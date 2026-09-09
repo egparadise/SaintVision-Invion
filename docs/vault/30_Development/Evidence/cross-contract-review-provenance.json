@@ -1,0 +1,174 @@
+{
+  "reviewer": "Codex",
+  "review_result": "request_changes",
+  "verified_at_kst": "2026-09-10T02:28:49+09:00",
+  "sources": [
+    {
+      "sha": "c323f551068b469e73fb8e84608c2a323c7ee98e",
+      "path": "apps/web/src/features/release/releaseEngine.ts",
+      "sha256": "252e733225a2cd1ddb809b2464bece68950f0f3dd6bf850132a329a211a77f10"
+    },
+    {
+      "sha": "c323f551068b469e73fb8e84608c2a323c7ee98e",
+      "path": "apps/web/src/features/recovery/recoveryEngine.ts",
+      "sha256": "94fc87bb7d0b656ff91f54b80358ce4a53a340aa99846e6c8713106f2bc386dc"
+    },
+    {
+      "sha": "c323f551068b469e73fb8e84608c2a323c7ee98e",
+      "path": "apps/web/src/features/auth/Login.tsx",
+      "sha256": "5df62a413cc09d50c8dd86c885e3b260475b32827fd4f39cbda9ac3a50dfc31e"
+    },
+    {
+      "sha": "c323f551068b469e73fb8e84608c2a323c7ee98e",
+      "path": "apps/web/tests/release-candidate.test.ts",
+      "sha256": "17affef59238e88f2bfe4b4e27914377707da06358057e41699f111bca0b0e7d"
+    },
+    {
+      "sha": "251b00ab8218a58307270432972e9900bdf3d2a8",
+      "path": "apps/web/src/features/deployment/deploymentEngine.ts",
+      "sha256": "148b3523ef171c088e45a179714c3d5ac2f0d3fdb63cb08a0a2c592b6b85f8d2"
+    },
+    {
+      "sha": "251b00ab8218a58307270432972e9900bdf3d2a8",
+      "path": "apps/web/tests/intranet-deployment.test.ts",
+      "sha256": "389834986b75e503c6cc2045830d660899f4565fa7cba89d636284a9eb324822"
+    },
+    {
+      "sha": "4fa551da59e05731b2a4b92976d62b1eb6a60e8a",
+      "path": "src/saintvision/api/v1/nodes.py",
+      "sha256": "3fc623f557c59bf1c30ae5b636885aafd23bf1d707be0b3bbb0d5dde12a9b94d"
+    },
+    {
+      "sha": "4fa551da59e05731b2a4b92976d62b1eb6a60e8a",
+      "path": "src/saintvision/services/nodes.py",
+      "sha256": "9d39f915e37a7884859c878a43e37a9ea4599593cd23a2b64cbc6735f5ac61e8"
+    },
+    {
+      "sha": "4fa551da59e05731b2a4b92976d62b1eb6a60e8a",
+      "path": "src/saintvision/services/pilot.py",
+      "sha256": "3d5391bfee6a7f5784066009613292feada49269dfe9fd9f44d667af3000a840"
+    },
+    {
+      "sha": "4fa551da59e05731b2a4b92976d62b1eb6a60e8a",
+      "path": "src/saintvision/api/deps.py",
+      "sha256": "c2da8407a353c800cec779e86335fc26c5072c97dacb10918c8fbe48b15d48ad"
+    },
+    {
+      "sha": "4fa551da59e05731b2a4b92976d62b1eb6a60e8a",
+      "path": "src/saintvision/api/app.py",
+      "sha256": "1aca3c570733ef6d8118f5a1bda2894e9ca290348aa13500f5e10ae17b8fecb0"
+    }
+  ],
+  "claude": {
+    "scope": "Exact verify_backup function with fake Session; route signature inspection. No production HTTP/DB exploit test.",
+    "non_hex_checksum_accepted": true,
+    "stored_checksum": "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+    "heartbeat_default_dependencies": [
+      "Header(alias='X-Inv-Tenant')",
+      "Depends(get_now)"
+    ]
+  },
+  "gemini": {
+    "scope": "Exact modules in memory; no browser audit, traffic, TLS session, training or deployment.",
+    "sloWithoutMeasurement": [
+      {
+        "name": "P95 배치 스케줄러 지연시간",
+        "status": "met",
+        "value": "1.24 초"
+      },
+      {
+        "name": "노드 Heartbeat 이탈 감지 시간",
+        "status": "met",
+        "value": "48.0 초"
+      },
+      {
+        "name": "미승인 L2/L3 명령 우회 실행 수",
+        "status": "met",
+        "value": "0 건 (100% 차단)"
+      },
+      {
+        "name": "Docker Socket 호스트 노출 수",
+        "status": "met",
+        "value": "0 건 (완전 격리)"
+      },
+      {
+        "name": "WAL 백업 복원 목표 시점 (RPO)",
+        "status": "met",
+        "value": "4.2 분"
+      },
+      {
+        "name": "재해 복구 가동 목표 시간 (RTO)",
+        "status": "met",
+        "value": "12.5 분"
+      },
+      {
+        "name": "Critical / High 미완화 보안 취약점",
+        "status": "met",
+        "value": "0 건"
+      }
+    ],
+    "auditsWithoutBrowser": [
+      {
+        "rule": "wcag21-1.4.3-contrast-minimum",
+        "status": "pass"
+      },
+      {
+        "rule": "wcag21-1.4.11-non-text-contrast",
+        "status": "pass"
+      },
+      {
+        "rule": "wcag21-2.1.1-keyboard-navigation",
+        "status": "pass"
+      },
+      {
+        "rule": "wcag21-2.4.7-focus-visible",
+        "status": "pass"
+      },
+      {
+        "rule": "wcag21-4.1.2-name-role-value",
+        "status": "pass"
+      }
+    ],
+    "rollbackWithoutDeployment": true,
+    "futureEpochAccepted": true,
+    "futureSequenceAccepted": true,
+    "declaredBorderContrast": 4.8,
+    "calculatedBorderContrast": 1.5506722801239818,
+    "nodesWithoutTraffic": [
+      {
+        "nodeId": "nod_01JABCDEF01",
+        "status": "passed",
+        "latencyMs": 11
+      },
+      {
+        "nodeId": "nod_01JABCDEF02",
+        "status": "passed",
+        "latencyMs": 14
+      },
+      {
+        "nodeId": "nod_01JABCDEF03",
+        "status": "passed",
+        "latencyMs": 9
+      },
+      {
+        "nodeId": "nod_01JABCDEF04",
+        "status": "passed",
+        "latencyMs": 18
+      },
+      {
+        "nodeId": "nod_01JABCDEF05",
+        "status": "passed",
+        "latencyMs": 16
+      }
+    ],
+    "trainingWithoutAction": [
+      "completed",
+      "completed",
+      "completed",
+      "completed"
+    ],
+    "signoffWithoutAuthentication": true,
+    "digestHas64Hex": true,
+    "generatedConfigHasIndexNoCache": false
+  }
+}

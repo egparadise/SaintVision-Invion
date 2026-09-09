@@ -2,7 +2,7 @@
 doc_id: "DEV-CONTROL-INTEGRATION-001"
 title: "Codex 인증된 Control Plane 통합 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-10T02:05:49+09:00"
 source_of_truth: "Git"
@@ -27,3 +27,7 @@ Python 138 passed / 136 skipped exit 0; JWT 신규 24건 포함. Windows Go test
 ## 2026-09-10T02:26:01+09:00 오류 계약 및 재검증
 
 수정 3ab41c8의 Core #34382252138, Documentation #34382252127 success. 최초 #34381950400의 Python 결과는 273 passed/1 failed였고 heartbeat 전용 fixture에 없는 command를 참조한 테스트 오류를 수정했다. 이후 오류 계약 검토에서 ProblemDetails 필드와 traceparent 전파가 빠져 있음을 확인해 추가했다. 새로운 Schema는 nullable causeRef/evidenceId의 TS/Go 타입을 명시하며 생성 drift 검사를 유지한다. 단위 인증·HTTP 경계 33 passed, Windows Go test ./... exit 0. 후속 SHA의 전체 CI 검증을 별도로 수행한다.
+
+## 2026-09-10T02:31:57+09:00 구현 push 및 원격 증거
+
+`git commit`와 `git push origin agent/codex/control-integration` exit 0. 구현 `87600e9e4b5edb90a85517ebeb6c617614fbd765` Core #34382890931, Documentation #34382890802 success. Python 283/0/0/0, Go 24 top-level/57 leaf cases 확인. [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]에 원본 artifact와 다음 담당자 기록. 교차 검토 소스 경로 초기 오기(없는 src/saintvision/app.py)는 git tree의 실제 api/app.py로 수정 후 고정 snapshot/repro 명령 exit 0. 제품 코드 실패와 구별한다.

@@ -43,3 +43,5 @@ Claude: 검증 identity와 기존 OIDC placeholder/등록 inventory를 연결하
 ProblemDetails 정본 Schema와 Python/TS/Go 생성물을 추가했다. 모든 오류는 code/category/retryable/traceId/causeRef/evidenceId 및 RFC 형태의 type/title/status/detail을 갖는다. 실제 원인·Evidence 참조가 없으면 null로 두며 추측 ID를 발급하지 않는다. traceId는 업무 ID와 별개다. 지원하는 version 00 traceparent의 정상 trace ID는 유지하고 server span ID는 새로 발급한다. 0 ID·중복·잘못된 길이·지원하지 않는 version은 새 trace로 대체하고 외부 문자열을 반사하지 않는다. unknown flags는 sampled bit만 보존한다. 오류·성공·capacity 초과 응답에 같은 trace 헤더를 넣는다. 이 상관관계 헤더는 인증·Evidence 권한이 아니며 OTel span 수집기 설치 완료를 의미하지 않는다.
 
 기준: [W3C Trace Context](https://www.w3.org/TR/trace-context/). 입력은 process당 64개 동시 요청·32KiB headers·64KiB body·5초 수신 기한으로 제한한다. 공개 ingress의 배포별 제한은 별도 설정이다.
+
+최종 실제 증거: [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]. Python 283개 및 Go 57 leaf case 통과. 다른 Agent 수정 요청: [[Codex 교차 코드 검토 - 인증과 실측 Evidence 정합성]].

@@ -1,0 +1,54 @@
+{
+  "task": "control-integration",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-10T02:30:59+09:00",
+  "implementation_sha": "87600e9e4b5edb90a85517ebeb6c617614fbd765",
+  "python_tests": {
+    "tests": 283,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "node_integration_cases": [
+    "test_real_mtls_probe_restores_offline_node_and_rejects_replay",
+    "test_heartbeat_policy_controls_cannot_be_overridden_by_liveness",
+    "test_late_probe_and_revoked_certificate_cannot_refresh_heartbeat",
+    "test_missing_heartbeats_preserve_reserved_resources",
+    "test_authenticated_browser_cancel_then_mtls_stop_returns_resources",
+    "test_cancel_unseen_command_never_executes_or_claims_release"
+  ],
+  "go_tests": {
+    "top_level": 24,
+    "leaf_cases": 57,
+    "failures": 0,
+    "skipped": 0,
+    "race_detector": true
+  },
+  "artifact_id": 10116671709,
+  "archive_sha256": "e13f0e30eeec91ef0b3c57ac7e855ccbe7ffd8b3a520f3fa0145b10e8b3178a7",
+  "files_sha256": {
+    "core-tests.xml": "25eb48bafaa45a884526d7ebda7a4f84e5d6d6d7e61981b26aca2e86b1fba83b",
+    "inv-node": "cbd7083b0fe5e9c812bd70030f0f80d2982988386e9c6b160d30664c06540808",
+    "node-unit.jsonl": "f37ca9ebff5b739ba0489e309cdfcfaed154ab48b97ce75446b8030fa4d26cc2",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "777a5e2d596e49aaf3b208c017467c9a480589b12c739d778ecf9bbe2ac14a7c",
+    "saintvision_control_plane-0.1.0.tar.gz": "4a19dc5cf0a99340f501292a7aa2cb097f213e025f799e9b65a6706a5bf71285"
+  },
+  "ci": [
+    {
+      "id": 34382890802,
+      "name": "Documentation Build",
+      "head_sha": "87600e9e4b5edb90a85517ebeb6c617614fbd765",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34382890802"
+    },
+    {
+      "id": 34382890931,
+      "name": "Core Build",
+      "head_sha": "87600e9e4b5edb90a85517ebeb6c617614fbd765",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34382890931"
+    }
+  ]
+}
