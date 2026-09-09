@@ -571,6 +571,38 @@ class NodePeerPolicy(BaseModel):
     clientFingerprints: list[ClientFingerprint] = Field(..., max_length=2)
 
 
+class EmptyRequest(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+
+
+class RunCancelInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class NodeProbeInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeProbeResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    profileVersion: constr(min_length=1, max_length=200)
+    observedAt: Timestamp
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -602,6 +634,10 @@ class INVCore(
         | NodeStopReceipt
         | NodeExecutionResult
         | NodePeerPolicy
+        | EmptyRequest
+        | RunCancelInput
+        | NodeProbeInput
+        | NodeProbeResult
     ]
 ):
     root: (
@@ -634,4 +670,8 @@ class INVCore(
         | NodeStopReceipt
         | NodeExecutionResult
         | NodePeerPolicy
+        | EmptyRequest
+        | RunCancelInput
+        | NodeProbeInput
+        | NodeProbeResult
     ) = Field(..., title='INVCore')

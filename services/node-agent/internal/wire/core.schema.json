@@ -1379,6 +1379,74 @@
         "clientFingerprints"
       ],
       "additionalProperties": false
+    },
+    "EmptyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "RunCancelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "expectedVersion"
+      ]
+    },
+    "NodeProbeInput": {
+      "type": "object",
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "nonce"
+      ],
+      "additionalProperties": false
+    },
+    "NodeProbeResult": {
+      "type": "object",
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "nonce",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "profileVersion",
+        "observedAt"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -1468,6 +1536,18 @@
     },
     {
       "$ref": "#/$defs/NodePeerPolicy"
+    },
+    {
+      "$ref": "#/$defs/EmptyRequest"
+    },
+    {
+      "$ref": "#/$defs/RunCancelInput"
+    },
+    {
+      "$ref": "#/$defs/NodeProbeInput"
+    },
+    {
+      "$ref": "#/$defs/NodeProbeResult"
     }
   ]
 }

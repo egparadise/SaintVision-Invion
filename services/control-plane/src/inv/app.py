@@ -1,25 +1,341 @@
-"""Minimal non-operational service shell. Business APIs are handed to Claude."""
+﻿"""Authenticated browser API factory; explicit deployment configuration required."""
 
-from fastapi import FastAPI
+import asyncio
+import json
+import os
+import time
+from fastapi import FastAPI, Request, Depends
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, StreamingResponse
+from starlette.concurrency import run_in_threadpool
+from starlette.exceptions import HTTPException
 from . import __version__
-
-app = FastAPI(title="Saint Vision INV Control Plane", version=__version__)
-
-
-@app.get("/healthz")
-def health():
-    return {"status": "ok", "version": __version__}
+from .contracts import validate_contract
+from .control import Control
+from .db import Database
+from .errors import DomainError
+from .identity import AccessTokens, strict_object, trusted_file
 
 
-@app.get("/readyz", status_code=503)
-def ready():
-    return {
-        "status": "not_ready",
-        "reason": "node-runtime-and-identity-integration-pending",
-    }
+def problem(error):
+    return JSONResponse(
+        {
+            "type": "about:blank",
+            "title": "Request rejected",
+            "status": error.status,
+            "code": error.code,
+            "detail": error.detail,
+            "retryable": error.retryable,
+        },
+        status_code=error.status,
+        headers={
+            "Cache-Control": "no-store",
+            **({"WWW-Authenticate": "Bearer"} if error.status == 401 else {}),
+        },
+        media_type="application/problem+json",
+    )
+
+
+class Boundary:
+    def __init__(self, app, origins):
+        self.app, self.origins = app, frozenset(origins)
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        started = False
+
+        async def safe_send(message):
+            nonlocal started
+            if message["type"] == "http.response.start":
+                started = True
+                message.setdefault("headers", []).extend(
+                    [
+                        (b"cache-control", b"no-store"),
+                        (b"x-content-type-options", b"nosniff"),
+                    ]
+                )
+            await send(message)
+
+        try:
+            headers = {}
+            for name, value in scope["headers"]:
+                if (
+                    name
+                    in {
+                        b"authorization",
+                        b"origin",
+                        b"content-type",
+                        b"content-length",
+                        b"idempotency-key",
+                        b"last-event-id",
+                    }
+                    and name in headers
+                ):
+                    raise DomainError("VAL-0003", "Ambiguous request headers", 400)
+                headers[name] = value
+            if (
+                b"origin" in headers
+                and headers[b"origin"].decode("latin1") not in self.origins
+            ):
+                raise DomainError("AUTH-0051", "Browser origin rejected", 403)
+            if (
+                scope["path"].startswith("/v1/")
+                and b"access_token" in scope.get("query_string", b"").lower()
+            ):
+                raise DomainError("AUTH-0050", "Use the Authorization header", 401)
+            chunks, length = [], 0
+
+            async def read_body():
+                nonlocal length
+                while True:
+                    message = await receive()
+                    if message["type"] != "http.request":
+                        raise DomainError("VAL-0003", "Request interrupted", 400)
+                    chunk = message.get("body", b"")
+                    length += len(chunk)
+                    if length > 65536:
+                        raise DomainError("VAL-0003", "Request exceeds limit", 413)
+                    chunks.append(chunk)
+                    if not message.get("more_body", False):
+                        return
+
+            await asyncio.wait_for(read_body(), 5)
+            body = b"".join(chunks)
+            if scope["method"] in {"POST", "PUT", "PATCH"}:
+                if (
+                    headers.get(b"content-type") != b"application/json"
+                    or b"content-encoding" in headers
+                ):
+                    raise DomainError("VAL-0003", "JSON content type required", 415)
+                try:
+                    strict_object(body)
+                except (ValueError, TypeError, RecursionError, UnicodeError):
+                    raise DomainError(
+                        "VAL-0003", "Unambiguous JSON object required", 422
+                    ) from None
+            sent = False
+
+            async def replay():
+                nonlocal sent
+                if not sent:
+                    sent = True
+                    return {"type": "http.request", "body": body, "more_body": False}
+                return await receive()
+
+            await self.app(scope, replay, safe_send)
+        except Exception as error:
+            if started:
+                return  # No internal diagnostics after streaming has begun.
+            if not isinstance(error, DomainError):
+                error = DomainError("SYS-0001", "Service temporarily unavailable", 503)
+            await problem(error)(scope, receive, send)
+
+
+def create_app(database=None, tokens=None, *, allowed_origins=()):
+    api = FastAPI(
+        title="Saint Vision INV Control Plane",
+        version=__version__,
+        docs_url=None,
+        redoc_url=None,
+    )
+    api.add_middleware(Boundary, origins=allowed_origins)
+    control = Control(database) if database else None
+
+    @api.exception_handler(DomainError)
+    async def domain_error(request, error):
+        return problem(error)
+
+    @api.exception_handler(RequestValidationError)
+    async def invalid(request, error):
+        return problem(DomainError("VAL-0003", "Invalid request", 422))
+
+    @api.exception_handler(HTTPException)
+    async def http_error(request, error):
+        return problem(
+            DomainError("HTTP-0001", "Request unavailable", error.status_code)
+        )
+
+    def authenticated(request: Request):
+        if control is None or tokens is None:
+            raise DomainError("AUTH-0050", "Identity configuration unavailable", 503)
+        header = request.headers.get("authorization", "")
+        if not header.startswith("Bearer ") or header.count(" ") != 1:
+            raise DomainError("AUTH-0050", "A current access token is required", 401)
+        return tokens.verify(header[7:])
+
+    def key(request):
+        value = request.headers.get("idempotency-key")
+        if (
+            not value
+            or len(value) > 200
+            or any(ord(c) < 33 or ord(c) > 126 for c in value)
+        ):
+            raise DomainError("VAL-0003", "Idempotency-Key required", 422)
+        return value
+
+    @api.get("/healthz")
+    def health():
+        return {"status": "ok", "version": __version__}
+
+    @api.get("/readyz")
+    def ready():
+        if control is None or tokens is None:
+            return JSONResponse(
+                {
+                    "status": "not_ready",
+                    "reason": "identity-and-database-configuration-pending",
+                },
+                status_code=503,
+            )
+        tokens._keys()
+        with database.transaction(tokens.tenant_id) as conn:
+            conn.execute("SELECT event_sequence FROM inv.runs LIMIT 0")
+        return {
+            "status": "ready",
+            "scope": "authenticated-control-api",
+            "executionDispatcher": "not_configured",
+        }
+
+    @api.get("/v1/projects")
+    def projects(identity=Depends(authenticated)):
+        return control.projects(identity.principal)
+
+    @api.get("/v1/projects/{project}/runs")
+    def runs(
+        project: str,
+        after: str | None = None,
+        limit: int = 50,
+        identity=Depends(authenticated),
+    ):
+        return control.list_runs(identity.principal, project, after=after, limit=limit)
+
+    @api.post("/v1/projects/{project}/runs", status_code=201)
+    async def create(project: str, request: Request, identity=Depends(authenticated)):
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            control.create, identity.principal, project, key(request)
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}")
+    def run(project: str, run_id: str, identity=Depends(authenticated)):
+        return control.get(identity.principal, project, run_id)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
+    async def cancel(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        data = await request.json()
+        validate_contract("RunCancelInput", data)
+        return await run_in_threadpool(
+            control.cancel,
+            identity.principal,
+            project,
+            run_id,
+            data["expectedVersion"],
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/nodes")
+    def nodes(project: str, identity=Depends(authenticated)):
+        return control.nodes(identity.principal, project)
+
+    @api.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
+    async def challenge(
+        project: str,
+        approval_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        validate_contract("EmptyRequest", await request.json())
+        validate_contract("ProjectId", project)
+        validate_contract("ApprovalId", approval_id)
+        return await run_in_threadpool(
+            control.approvals.challenge, identity.principal, project, approval_id
+        )
+
+    @api.post("/v1/projects/{project}/approvals/{approval_id}/decision")
+    async def decision(
+        project: str,
+        approval_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        data = await request.json()
+        validate_contract("ApprovalDecisionInput", data)
+        return await run_in_threadpool(
+            control.approvals.decide,
+            identity.principal,
+            project,
+            approval_id,
+            data["decision"],
+            data["nonce"],
+            action_digest=data["actionDigest"],
+            key=key(request),
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/events")
+    async def events(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        cursor = request.headers.get("last-event-id")
+        await run_in_threadpool(
+            control.events, identity.principal, project, run_id, cursor
+        )
+        bearer = request.headers["authorization"][7:]
+
+        async def stream():
+            current, deadline = cursor, time.monotonic() + 25
+            while time.monotonic() < deadline:
+                try:
+                    fresh = await run_in_threadpool(tokens.verify, bearer)
+                    if fresh.principal != identity.principal:
+                        return
+                    pending = await run_in_threadpool(
+                        control.events, fresh.principal, project, run_id, current
+                    )
+                except Exception:
+                    yield 'event: inv.stream.closed\ndata: {"reason":"authorization-or-service-unavailable"}\n\n'
+                    return
+                for item in pending:
+                    current = item["id"]
+                    yield "id: " + current + "\nevent: inv.event\ndata: " + json.dumps(
+                        item, separators=(",", ":")
+                    ) + "\n\n"
+                if len(pending) < 200:
+                    yield ": keepalive\n\n"
+                    await asyncio.sleep(1)
+            yield ": reconnect\n\n"
+
+        return StreamingResponse(
+            stream(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+        )
+
+    return api
+
+
+app = create_app()
 
 
 def main():
     import uvicorn
 
-    uvicorn.run("inv.app:app", host="127.0.0.1", port=8080)
+    try:
+        settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
+        identity = AccessTokens(**settings["identity"])
+        database = Database(
+            os.environ["INV_RUNTIME_DSN"],
+            recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
+        )
+        configured = create_app(
+            database, identity, allowed_origins=settings.get("allowedOrigins", [])
+        )
+    except Exception:
+        raise SystemExit(
+            "Explicit Control Plane identity/database configuration unavailable"
+        ) from None
+    uvicorn.run(
+        configured, host="127.0.0.1", port=8080, proxy_headers=False, access_log=False
+    )

@@ -307,3 +307,61 @@ func TestPeerPolicyFloorSurvivesRestart(t *testing.T) {
 		t.Fatal("forward policy update failed")
 	}
 }
+
+type cancelEngine struct {
+	fakeEngine
+	started chan struct{}
+}
+
+func (e *cancelEngine) Start(ctx context.Context, id string) error {
+	err := e.fakeEngine.Start(ctx, id)
+	close(e.started)
+	return err
+}
+func TestRemoteCancellationWaitsForOnePhysicalStop(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &cancelEngine{fakeEngine: fakeEngine{wait: true}, started: make(chan struct{})}
+	r := New(c, journalFor(t, c), e)
+	data := signed(t, p, k)
+	done := make(chan error, 1)
+	go func() { _, err := r.Execute(context.Background(), data); done <- err }()
+	select {
+	case <-e.started:
+	case <-time.After(2 * time.Second):
+		t.Fatal("did not start")
+	}
+	var wg sync.WaitGroup
+	failures := make(chan error, 8)
+	for i := 0; i < 8; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			result, err := r.Cancel(context.Background(), data)
+			if err == nil && (result.Receipt == nil || result.Receipt.Reason != "cancelled") {
+				err = errors.New("missing cancellation receipt")
+			}
+			failures <- err
+		}()
+	}
+	wg.Wait()
+	close(failures)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	for err := range failures {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if e.starts != 1 || e.stops != 1 || e.removes != 1 {
+		t.Fatal("physical effect duplicated")
+	}
+}
+func TestRemoteCancelCannotStartUnseenPermit(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &fakeEngine{}
+	r := New(c, journalFor(t, c), e)
+	if _, err := r.Cancel(context.Background(), signed(t, p, k)); err == nil || e.creates != 0 {
+		t.Fatal("unseen cancellation executed")
+	}
+}

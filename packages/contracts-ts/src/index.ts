@@ -326,3 +326,23 @@ export interface NodePeerPolicy {
   expiresAt: Timestamp;
   clientFingerprints: Array<string>;
 }
+
+export interface EmptyRequest {
+}
+
+export interface RunCancelInput {
+  expectedVersion: number;
+}
+
+export interface NodeProbeInput {
+  nonce: string;
+}
+
+export interface NodeProbeResult {
+  nonce: string;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  profileVersion: string;
+  observedAt: Timestamp;
+}
