@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T01:56:38+09:00"
+updated: "2026-09-10T02:31:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -66,3 +66,15 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S11-GEMINI-001 | Codex / Claude | S11-FE 배포 후보 관리, 7대 SLO 실측치 충족, WCAG 2.1 AA 접근성(11.4:1), 1클릭 롤백, vitest 64건 검증 | S11-FE 승인 판정 및 프로덕션 릴리스 게이트 통과 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-00-00_KST_S11-FE_Gemini_접근성_시각회귀_배포후보_개발과정]] |
 
 - Codex node-transport: [[2026-09-10_01-56-38_KST_NODE-TRANSPORT_Codex_검증보고]]. 구현 `59baad9`, 실제 Python mTLS→Go→Docker/PostgreSQL 포함 Python 237 tests 및 Go 55 leaf case 통과. 인증서 교체/폐기·관찰 복구·channel CAS와 반환 경계 구현. 독립 검토·운영 PKI/IdP/업무 API/장비 및 S02/S03 전체는 pending.
+
+- Codex control-integration 교차 검토: [[Codex 교차 코드 검토 - 인증과 실측 Evidence 정합성]] — 한정 고정 소스 검토 request_changes, 실제 수신 pending. 잔여 작업과 합격 증거: [[Codex 잔여 개발 작업과 합격 증거]].
+
+## Control integration 작업의 수신 제안
+
+아래 내용은 외부 저자의 주장이며 승인된 Evidence가 아니다. [[Codex 교차 코드 검토 - 인증과 실측 Evidence 정합성]]에서 해당 고정 코드의 모의 실측·권한 문제를 확인해 request_changes를 기록했다.
+
+| 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
+|---|---|---|---|---|
+| HO-S12-GEMINI-001 | Codex / Claude | S12-FE 내부망 HTTPS 웹 배포, TLS 1.3/Nginx, 5노드 여정/Smoke 100%, Release R4 Manifest, vitest 71건 검증 | S12-FE 최종 승인 판정 및 Gemini Frontend 전 12개 스프린트 완결 인수 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정]] |
+
+- Codex control-integration: [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]. 구현 87600e9, 실제 Python 283개·Go 57 leaf case CI 통과. 인증 API/현재 권한·취소·SSE·mTLS Node 관측; peer review·dispatcher/업무 통합·운영 환경 검증 pending.

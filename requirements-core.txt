@@ -6,3 +6,4 @@ pydantic==2.13.5
 alembic==1.19.2
 SQLAlchemy==2.0.52
 cryptography==50.0.1
+PyJWT==2.13.0

@@ -36,6 +36,13 @@ subprocess.run(
 
 
 def typename(spec, lang):
+    if "anyOf" in spec:
+        choices = spec["anyOf"]
+        concrete = [item for item in choices if item.get("type") != "null"]
+        if len(choices) != 2 or len(concrete) != 1:
+            raise ValueError("Only a single nullable type is supported")
+        value = typename(concrete[0], lang)
+        return "(" + value + " | null)" if lang == "ts" else "*" + value
     if "$ref" in spec:
         return spec["$ref"].split("/")[-1]
     if lang == "ts" and "const" in spec:

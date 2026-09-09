@@ -76,7 +76,19 @@ class NodeTLSClient:
             ) from None
         self.timeout = timeout
 
-    def exchange(self, channel, permit, *, observation_only=False):
+    def exchange(self, channel, permit, *, observation_only=False, cancel_only=False):
+        path = (
+            "/v1/executions/cancel"
+            if cancel_only
+            else ("/v1/executions/receipts" if observation_only else "/v1/executions")
+        )
+        return self._request(channel, permit, path, "NodeExecutionResult")
+
+    def probe(self, channel, request):
+        validate_contract("NodeProbeInput", request)
+        return self._request(channel, request, "/v1/heartbeats", "NodeProbeResult")
+
+    def _request(self, channel, permit, path, response_contract):
         body = json.dumps(permit, separators=(",", ":"), allow_nan=False).encode()
         if len(body) > 2 * 1024 * 1024:
             raise DomainError("NODE-0031", "Permit exceeds limit", 422)
@@ -111,7 +123,6 @@ class NodeTLSClient:
             if fingerprint != channel.certificate_sha256 or monotonic() >= deadline:
                 raise DomainError("NODE-0032", "Pinned Node certificate rejected", 403)
             conn.sock.settimeout(max(0.001, deadline - monotonic()))
-            path = "/v1/executions/receipts" if observation_only else "/v1/executions"
             conn.request(
                 "POST",
                 path,
@@ -133,7 +144,7 @@ class NodeTLSClient:
             if len(raw) > 1048576 or monotonic() >= deadline:
                 raise DomainError("NODE-0035", "Node response exceeds bounds", 502)
             result = strict_json(raw)
-            validate_contract("NodeExecutionResult", result)
+            validate_contract(response_contract, result)
             return result
         except (OSError, ValueError, ssl.SSLError, http.client.HTTPException):
             raise DomainError(
@@ -153,7 +164,7 @@ class NodeDelivery:
         self.channels = NodeChannels(database)
         self.receipts = NodeReceiptStore(database)
 
-    def deliver(self, node, permit, *, observation_only=False):
+    def deliver(self, node, permit, *, observation_only=False, cancel_only=False):
         permit = deepcopy(permit)
         validate_contract("SignedNodePermit", permit)
         try:
@@ -168,9 +179,14 @@ class NodeDelivery:
             or claim["recoveryEpoch"] != self.db.recovery_epoch
         ):
             raise DomainError("NODE-0032", "Permit Node identity differs", 403)
-        channel = self.channels.snapshot(node, observation_only=observation_only)
+        channel = self.channels.snapshot(
+            node, observation_only=observation_only or cancel_only
+        )
         result = self.client.exchange(
-            channel, permit, observation_only=observation_only
+            channel,
+            permit,
+            observation_only=observation_only,
+            **({"cancel_only": True} if cancel_only else {})
         )
         receipt = result["receipt"]
         if (

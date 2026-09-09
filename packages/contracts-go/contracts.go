@@ -328,3 +328,36 @@ type NodePeerPolicy struct {
     ExpiresAt Timestamp `json:"expiresAt"`
     ClientFingerprints []string `json:"clientFingerprints"`
 }
+
+type EmptyRequest struct {
+}
+
+type RunCancelInput struct {
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type NodeProbeInput struct {
+    Nonce string `json:"nonce"`
+}
+
+type NodeProbeResult struct {
+    Nonce string `json:"nonce"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ProfileVersion string `json:"profileVersion"`
+    ObservedAt Timestamp `json:"observedAt"`
+}
+
+type ProblemDetails struct {
+    Type string `json:"type"`
+    Title string `json:"title"`
+    Status int64 `json:"status"`
+    Code string `json:"code"`
+    Category string `json:"category"`
+    Detail string `json:"detail"`
+    Retryable bool `json:"retryable"`
+    TraceId TraceId `json:"traceId"`
+    CauseRef *string `json:"causeRef"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}

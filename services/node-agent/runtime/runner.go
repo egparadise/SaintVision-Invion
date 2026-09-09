@@ -20,10 +20,13 @@ type Result struct {
 	CleanupPending bool                       `json:"cleanupPending"`
 }
 type Runner struct {
-	config  Config
-	journal *Journal
-	engine  Engine
-	mutex   sync.Mutex
+	config       Config
+	journal      *Journal
+	engine       Engine
+	mutex        sync.Mutex
+	activeMutex  sync.Mutex
+	activeHash   string
+	activeCancel context.CancelFunc
 }
 
 func New(config Config, journal *Journal, engine Engine) *Runner {
@@ -50,6 +53,16 @@ func (r *Runner) Execute(ctx context.Context, envelope []byte) (Result, error) {
 	}
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+	ctx, stopRequest := context.WithCancel(ctx)
+	r.activeMutex.Lock()
+	r.activeHash, r.activeCancel = permit.Hash, stopRequest
+	r.activeMutex.Unlock()
+	defer func() {
+		stopRequest()
+		r.activeMutex.Lock()
+		r.activeHash, r.activeCancel = "", nil
+		r.activeMutex.Unlock()
+	}()
 	prior, receipt, err := r.journal.Get(string(permit.Data.Claim.CommandId))
 	if err != nil {
 		return Result{}, err
@@ -109,6 +122,33 @@ func (r *Runner) Execute(ctx context.Context, envelope []byte) (Result, error) {
 		select {
 		case <-execution.Done():
 			return r.reconcile(*record, reason(execution))
+		case <-ticker.C:
+		}
+	}
+}
+
+// Cancel can interrupt an active Execute without acquiring its long-held mutex.
+// It never creates intent or claims that an unseen command physically stopped.
+func (r *Runner) Cancel(ctx context.Context, envelope []byte) (Result, error) {
+	permit, err := Verify(envelope, r.config)
+	if err != nil {
+		return Result{}, err
+	}
+	ticker := time.NewTicker(10 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		r.activeMutex.Lock()
+		if r.activeHash == permit.Hash && r.activeCancel != nil {
+			r.activeCancel()
+		}
+		r.activeMutex.Unlock()
+		if r.mutex.TryLock() {
+			r.mutex.Unlock()
+			return r.Observe(ctx, envelope)
+		}
+		select {
+		case <-ctx.Done():
+			return Result{}, ctx.Err()
 		case <-ticker.C:
 		}
 	}

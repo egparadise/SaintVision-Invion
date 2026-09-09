@@ -98,7 +98,7 @@ def postgres():
             )
             conn.execute(
                 sql.SQL(
-                    "REVOKE INSERT,UPDATE,DELETE ON inv.project_grants FROM {}"
+                    "REVOKE INSERT,UPDATE,DELETE ON inv.project_grants,inv.project_nodes FROM {}"
                 ).format(sql.Identifier(role))
             )
             conn.execute(
