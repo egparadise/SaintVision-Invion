@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T03:15:23+09:00"
+updated: "2026-09-10T03:51:59+09:00"
 source_of_truth: "Git"
 ---
 
@@ -46,3 +46,7 @@ owner Codex / reviewer Claude / task control-integration follow-up. 입력 GUIDE
 ## Storage/Node 후속 반영
 
 [[2026-09-10_03-15-23_KST_STORAGE-NODE_Codex_검증보고]]에서 local object publication/part 재개/checkpoint pin과 bytes 복원·GC 경합, Go 공지/실측 snapshot/자동 observer/제한된 전송, 독립 shard plan의 원자 queue와 실제 컨테이너 실행을 검증했다. S3 50GiB/제품 presign, 실제 Workspace 파일 복원/PTY, Artifact Evidence publication, MPI/NCCL·reducer·parent 결과, 5대 운영/Windows/GPU·실측 locality/peer Adapter/검토는 여전히 미완료다. 현재 구현만으로 S04/S05/S06/S07 전체를 done으로 올리지 않는다. 담당 분담과 구체 Adapter 입력은 [[Codex Node와 저장소 Adapter 실행 안내]]를 따른다.
+
+## Execution recovery 후속 반영
+
+[[Codex 전체 후속 구현 실행표]]와 [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]에서 첫 네 영역을 이어 구현했다. 위 표의 역사적 미완료 항목 중 managed attempt/output commitment/Evidence 완료·새 generation의 실제 파일 복원·샤드 결과 manifest/전체 취소/실패 반영·실측 CPU/RAM/project 상한 예약은 내부 구현으로 확보했다. 실제 Node 출력 자동 publication과 업무 verifier, writable Workspace/PTY·Step/Git 재개, parent/collective/reducer, Claude pool/DB 통합과 실제 locality·대형 S3·cache·Windows/GPU·kill switch·운영/5대/Eval·독립 검토는 남는다. 이전 checkpoint 바이트 복원과 이번 실제 파일 복원을 혼동하지 않는다.
