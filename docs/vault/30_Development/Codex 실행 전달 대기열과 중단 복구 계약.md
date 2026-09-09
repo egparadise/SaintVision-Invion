@@ -36,6 +36,8 @@ NodeDelivery가 현재 mTLS channel에서 검증한 stop receipt를 resource 반
 
 ## 검증 및 다음 담당자
 
-로컬 일반 Python 147 passed, 기존 PostgreSQL/Linux 136 skipped. 초기 신규 fixture dependency 누락으로 16 setup errors를 확인해 approval/node_runtime import를 추가했고 이후 신규 17개는 DB 미설정으로 정상 skip을 확인했다. 전체 300개(실제 DB·Linux Node 포함)의 합격 숫자는 원격 CI 후 별도 기록한다. 정상 실행·8 worker 경합·원자 rollback·grant 철회·취소 선점·RLS/불변 guard·응답 유실·실행 전 crash·실제 worker CLI를 검증한다.
+로컬 일반 Python 147 passed, 기존 PostgreSQL/Linux 136 skipped. 초기 신규 fixture dependency 누락으로 16 setup errors를 확인해 approval/node_runtime import를 추가했고 이후 신규 17개는 DB 미설정으로 정상 skip을 확인했다. 전체 301개(실제 DB·Linux Node 포함)의 합격 숫자는 원격 CI 후 별도 기록한다. 정상 실행·8 worker 경합·원자 rollback·grant 철회·취소 선점·RLS/불변 guard·응답 유실·실행 전 crash·실제 worker CLI를 검증한다.
 
 Claude: 이 계약의 독립 검토 및 업무 workflow가 queue_signing_key 경로를 사용하는 adapter. Gemini: authenticated API의 resourceReleasePending 및 서버 관측 상태 반영. Codex: 원본 CI Evidence·보고·Obsidian 동기화, checkpoint/storage 불변 조건 후속. 아직 모르는 intent의 취소에서 자동 자원 반환을 구현했다고 주장하지 않는다.
+
+Node의 단일 execution slot과 맞추어 최초 예약은 Node 행 잠금 아래 같은 Node의 활성 execute worker를 검사한다. 다른 Run이 슬롯을 보유하면 queued를 유지하고 기다린다. 이후 2개 Run의 동시 slot 예약 방지 시나리오를 추가해 신규 통합은 18개다. 이 대기는 실행 여부 불확실 상태로 잘못 전이하지 않는다.

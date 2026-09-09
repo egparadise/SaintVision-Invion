@@ -1,6 +1,7 @@
 """Durable transmission reservations and recovery against actual PostgreSQL."""
 
 from concurrent.futures import ThreadPoolExecutor
+from copy import deepcopy
 from threading import Barrier
 from types import SimpleNamespace
 from uuid import UUID, uuid4
@@ -10,8 +11,9 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from inv.control import Control
 from inv.dispatch import DeliveryQueue, DeliveryWorker
 from inv.errors import DomainError
+from inv.leases import Allocation
 from inv.node_execution import seal_permit
-from test_approvals import approval, count
+from test_approvals import approval, request, challenge, decide, dispatch, count
 from test_tool_admission import gateway, claim
 
 pytestmark = pytest.mark.postgres
@@ -106,6 +108,45 @@ def test_concurrent_workers_get_only_one_start_reservation(gateway):
     attempts = [r for r in results if r is not None]
     assert len(attempts) == 1 and attempts[0].operation == "execute"
     assert row(a)["phase"] == "uncertain"
+
+
+def test_two_runs_cannot_reserve_the_same_node_execution_slot(gateway):
+    a = gateway
+    queued(a)
+    second = SimpleNamespace(**vars(a))
+    second.workload = deepcopy(a.workload)
+    second.run = a.e.runs.create(a.e.tenant, a.e.project)
+    for state in ["validated", "planned"]:
+        second.run = a.e.runs.transition(
+            a.e.tenant,
+            second.run["runId"],
+            state,
+            expected_version=second.run["version"],
+        )
+    pending = request(second, key="second-request")
+    for actor in ["alice", "bob"]:
+        pending = decide(
+            second,
+            pending,
+            actor,
+            challenge(second, pending, actor),
+            key="second-vote-" + actor,
+        )
+    second.command = dispatch(second, pending, key="second-dispatch")
+    leases = a.e.leases.reserve(
+        a.e.tenant,
+        a.e.project,
+        second.run["runId"],
+        [Allocation(a.e.resource, 1), Allocation(a.memory, 1)],
+        key="second-queued-run",
+        ttl_seconds=60,
+    )
+    second.proofs = {lease["leaseId"]: lease["fencingToken"] for lease in leases}
+    queued(second)
+    first = a.queue.acquire(a.e.tenant, command_id=a.command["commandId"])
+    assert first.operation == "execute"
+    assert a.queue.acquire(a.e.tenant, command_id=second.command["commandId"]) is None
+    assert row(second)["phase"] == "queued"
 
 
 def test_crash_before_network_and_stale_completion_never_issue_second_start(gateway):

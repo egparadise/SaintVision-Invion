@@ -149,6 +149,14 @@ class DeliveryQueue:
             ).fetchone()
             operation = "cancel" if run["state"] == "cancelled" else "observe"
             if row["phase"] == "queued" and self._can_start(conn, row, run, claim, now):
+                # _can_start holds the Node row lock. All first reservations on
+                # that Node serialize here, matching its single execution slot.
+                if conn.execute(
+                    """SELECT 1 FROM inv.execution_deliveries WHERE node_id=%s AND command_id<>%s
+                    AND phase='uncertain' AND operation='execute' AND lease_until>clock_timestamp() LIMIT 1""",
+                    (row["node_id"], row["command_id"]),
+                ).fetchone():
+                    return None
                 operation = "execute"
             token = str(uuid4())
             conn.execute(
