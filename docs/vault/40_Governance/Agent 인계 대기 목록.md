@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-09T15:37:31+09:00"
+updated: "2026-09-09T16:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,7 +17,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 | 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
 |---|---|---|---|---|
-| HO-DOC-CLAUDE-001 | Claude | CLAUDE.md·AGENTS.md, DB/Storage·Backend 계획, ADR-005~014; 계약/동시성/운영 누락 검토 | 검토 결과와 수정 요구를 날짜 보고서로 기록 | received 2026-09-09T15:45:31+09:00 / 보고서 [[2026-09-09_15-45-31_KST_HO-DOC-CLAUDE-001_Claude_검토보고]] / Codex 회신 대기 |
+| HO-DOC-CLAUDE-001 | Claude | CLAUDE.md·AGENTS.md, DB/Storage·Backend 계획, ADR-005~014; 계약/동시성/운영 누락 검토 | 검토 결과와 수정 요구를 날짜 보고서로 기록 | received 2026-09-09T15:45:31+09:00 / 보고서 [[2026-09-09_15-45-31_KST_HO-DOC-CLAUDE-001_Claude_검토보고]] / 후속 준비 초안 [[2026-09-09_16-06-56_KST_HO-DOC-CLAUDE-001_Claude_준비기록]] / Codex 회신 대기 |
 | HO-DOC-GEMINI-001 | Gemini / Antigravity | GEMINI.md·AGENTS.md, Frontend 계획, S01-FE; 여정·디자인 토큰·오류 UX·HTTPS 배포 검토 | 화면별 API 의존성과 검증 기준을 보고서로 기록 | pending |
 | HO-S01-CODEX-001 | Codex 다음 세션 | S01 네 작업, 장비·IdP·DNS/TLS·Storage 제품 조사, contract 기준선 | 확인값·미확인값·계약·reviewer 기록 후 ready | pending |
 
