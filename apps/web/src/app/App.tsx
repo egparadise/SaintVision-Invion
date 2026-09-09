@@ -156,14 +156,34 @@ const DEMO_APPROVAL: ApprovalItem = {
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [nodes, setNodes] = useState<NodeItem[]>(INITIAL_NODES);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
   const [approval, setApproval] = useState<ApprovalItem>(DEMO_APPROVAL);
+  const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Live Heartbeat & Metric Fluctuations Simulation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNodes((prevNodes) =>
+        prevNodes.map((n) => {
+          const delta = Math.floor(Math.random() * 5) - 2; // -2% ~ +2%
+          const newCpu = Math.min(95, Math.max(5, n.cpuUsagePercent + delta));
+          return {
+            ...n,
+            cpuUsagePercent: newCpu,
+            heartbeatAt: new Date().toISOString(),
+          };
+        })
+      );
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -179,7 +199,7 @@ export const App: React.FC = () => {
     setApproval((prev) => ({ ...prev, status: 'rejected' }));
   };
 
-  const selectedNode = INITIAL_NODES.find((n) => n.id === selectedNodeId);
+  const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedRun = INITIAL_RUNS.find((r) => r.id === selectedRunId);
 
   return (
@@ -219,12 +239,71 @@ export const App: React.FC = () => {
             {selectedNode ? (
               <NodeDetail node={selectedNode} onBack={() => setSelectedNodeId(null)} />
             ) : (
-              <NodeList
-                nodes={INITIAL_NODES}
-                isLoading={false}
-                error={null}
-                onSelectNode={(id) => setSelectedNodeId(id)}
-              />
+              <div>
+                {/* 5-State Simulation Controls (FR-01 / FR-02) */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '16px',
+                    padding: '8px 12px',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border-subtle)',
+                    fontSize: '0.8125rem',
+                  }}
+                >
+                  <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>화면 상태 시뮬레이션:</span>
+                  {(
+                    [
+                      { key: 'normal', label: '정상 (5대 온라인)' },
+                      { key: 'loading', label: '로딩 중 (Skeleton)' },
+                      { key: 'empty', label: '빈 상태 (Empty)' },
+                      { key: 'error', label: '오류 (RFC 9457)' },
+                      { key: 'forbidden', label: '권한 부족 (403)' },
+                    ] as const
+                  ).map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setNodeSimState(key)}
+                      style={{
+                        padding: '3px 8px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        border: '1px solid var(--color-border-strong)',
+                        backgroundColor: nodeSimState === key ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                        color: nodeSimState === key ? '#ffffff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                <NodeList
+                  nodes={nodeSimState === 'normal' ? nodes : []}
+                  isLoading={nodeSimState === 'loading'}
+                  isForbidden={nodeSimState === 'forbidden'}
+                  error={
+                    nodeSimState === 'error'
+                      ? {
+                          type: 'https://saintvision.invenio/problems/service-unavailable',
+                          title: 'Node Registry 통신 실패',
+                          status: 503,
+                          detail: '백엔드 노드 레지스트리 서비스 응답이 지연되고 있습니다. 잠시 후 재시도하십시오.',
+                          code: 'RES-NODE-TIMEOUT',
+                          category: 'RES',
+                          retryable: true,
+                          traceId: 'trace_simulation_987654',
+                        }
+                      : null
+                  }
+                  onRefresh={() => setNodeSimState('normal')}
+                  onSelectNode={(id) => setSelectedNodeId(id)}
+                />
+              </div>
             )}
           </div>
         )}
