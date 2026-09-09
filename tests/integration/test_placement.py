@@ -212,3 +212,18 @@ def test_ceiling_cannot_be_deleted_or_lowered_below_existing_reservations(placem
         with pytest.raises(psycopg.errors.CheckViolation):
             with psycopg.connect(a.e.owner) as conn:
                 conn.execute(statement, (a.e.tenant,))
+
+
+def test_membership_lock_permission_cannot_edit_authorized_nodes(placement):
+    a = placement
+    reserve(a)
+    for statement in [
+        "UPDATE inv.project_nodes SET enabled=false",
+        "DELETE FROM inv.project_nodes",
+    ]:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            with a.e.db.transaction(a.e.tenant) as conn:
+                conn.execute(statement)
+    with pytest.raises(psycopg.errors.CheckViolation):
+        with a.e.db.transaction(a.e.tenant) as conn:
+            conn.execute("UPDATE inv.project_nodes SET lock_sentinel=false")
