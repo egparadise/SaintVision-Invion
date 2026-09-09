@@ -13,7 +13,7 @@ tags: ["saintvision", "final-plan"]
 # 2026-09-09 HO-DOC-CLAUDE-001 Claude 개발과정
 
 - record_id: HIST-CLAUDE-001 / task_id: HO-DOC-CLAUDE-001 / sprint: S01 선행 / area: 문서·계약 검토 / agent: Claude / reviewer: Codex
-- started_at: 2026-09-09T15:45:31+09:00 / ended_at: 실행 시 갱신 / timezone: Asia/Seoul
+- started_at: 2026-09-09T15:45:31+09:00 / ended_at: 2026-09-09T16:02:00+09:00 / timezone: Asia/Seoul
 - status: review
 - objective: Codex 통합 기준선의 계약·동시성·운영 누락을 독립 검토하고 수정 요구를 기록한다
 - outcome_id: OUT-01 / acceptance_id: AC-01
@@ -71,11 +71,13 @@ ADR-005 동시성 결함은 **논증으로 확인**했고 PostgreSQL 실제 경�
 
 ## 커밋·배포
 
-- implementation_commit: 실행 시 기록
-- report_commit: 자기 참조 제외
-- push(remote/branch/result): 실행 시 기록
-- CI(run_id/url/status): 실행 시 기록
-- Obsidian report(대상·hash·동기화 결과): 실행 시 기록
+- implementation_commit: `5f5771e2a38eab19c9f95e7ab0ac78a2dfdb6566`
+- report_commit: 본 갱신 커밋(자기 SHA는 본문에 넣지 않는다)
+- push: `origin` / `agent/claude/HO-DOC-CLAUDE-001` / `[new branch]` 성공, exit 0
+- CI: run_id `34320951375`, Documentation Build, head_sha `5f5771e`, `completed/success`
+  - URL: https://github.com/egparadise/SaintVision-Invion/actions/runs/34320951375
+  - `gh run list`는 `gh auth login` 미완료로 사용 불가([[ERR-ENV-004 GitHub CLI 미로그인]]). [[RES-ENV-004 GitHub CLI 미로그인 대응]]대로 기존 Git credential을 **메모리에서만** 사용해 Actions API로 조회했다. credential 값은 출력·저장하지 않았다.
+- Obsidian report: `tools/sync_obsidian.py --check` → `88 managed files, 8 pending exports, 0 conflicts`; `--apply` → `EXPORTED: 8 files; all 88 destination hashes match. Unmanaged files untouched.` exit 0
 
 ## 오류·제한
 
