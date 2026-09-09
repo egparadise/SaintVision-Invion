@@ -32,7 +32,7 @@ NOW = dt.datetime(2026, 9, 10, 7, 0, 0, tzinfo=UTC)
 GIB = 1024**3
 
 
-def _announcement(instance="agent-01", hostname="lab-01", ram=32 * GIB, gpus=1):
+def _announcement(instance="agent-01", hostname="candidate-01", ram=32 * GIB, gpus=1):
     return discovery_service.Announcement(
         instance_id=instance,
         hostname=hostname,
@@ -178,7 +178,7 @@ def test_announcing_creates_a_candidate_and_nothing_else(app_sessionmaker, lab):
                     announcement=_announcement(), now=NOW,
                 )
                 node_count = session.execute(
-                    text("SELECT count(*) FROM nodes WHERE hostname = 'lab-01'")
+                    text("SELECT count(*) FROM nodes WHERE hostname = 'candidate-01'")
                 ).scalar_one()
                 token_count = session.execute(
                     text("SELECT count(*) FROM node_bootstrap_tokens")
@@ -299,7 +299,7 @@ def test_admission_mints_a_token_but_does_not_create_a_node(app_sessionmaker, la
                     admitted_by_user_id=lab["user_id"], now=NOW,
                 )
                 nodes_named = session.execute(
-                    text("SELECT count(*) FROM nodes WHERE hostname = 'lab-01'")
+                    text("SELECT count(*) FROM nodes WHERE hostname = 'candidate-01'")
                 ).scalar_one()
                 state = session.execute(
                     text("SELECT state FROM node_announcements WHERE announcement_id = :a"),

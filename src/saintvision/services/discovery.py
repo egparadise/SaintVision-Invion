@@ -114,6 +114,9 @@ def record_announcement(
         if open_candidates >= MAX_CANDIDATES_PER_TENANT:
             raise CandidateFlood(open_candidates)
 
+    # populate_existing: without it the ORM hands back the object already in the
+    # identity map and the values the database just computed in the ON CONFLICT
+    # SET — announce_count above all — are invisible to the caller.
     row = session.execute(
         pg_insert(NodeAnnouncement)
         .values(
@@ -150,7 +153,8 @@ def record_announcement(
                 # declined candidate or re-open an admitted one.
             },
         )
-        .returning(NodeAnnouncement)
+        .returning(NodeAnnouncement),
+        execution_options={"populate_existing": True},
     ).scalar_one()
     session.flush()
     return row
