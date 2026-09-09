@@ -7,6 +7,7 @@ import { WorkspaceList } from '@/features/workspaces/WorkspaceList';
 import { WorkspaceCreateModal } from '@/features/workspaces/WorkspaceCreateModal';
 import { ExecutionResultView } from '@/features/workspaces/ExecutionResultView';
 import { PlacementSimulator } from '@/features/placement/PlacementSimulator';
+import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -450,6 +451,11 @@ export const App: React.FC = () => {
               }}
             />
           </div>
+        )}
+
+        {/* Tab 2.5: Development Workspace Editor (S06-FE) */}
+        {activeTab === 'editor' && (
+          <MonacoWorkspaceEditor workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'} />
         )}
 
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}

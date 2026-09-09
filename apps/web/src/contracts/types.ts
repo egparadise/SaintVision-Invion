@@ -164,3 +164,53 @@ export interface PlacementExplainResult {
   evaluations: CandidateEvaluation[];
   decidedAt: string;
 }
+
+export type EditorLanguage = 'typescript' | 'javascript' | 'json' | 'markdown' | 'yaml' | 'python';
+
+export interface EditorFile {
+  path: string;
+  name: string;
+  content: string;
+  etag: string;
+  language: EditorLanguage;
+  isDirty?: boolean;
+}
+
+export interface DiffLine {
+  type: 'added' | 'removed' | 'unchanged';
+  originalLineNumber?: number;
+  modifiedLineNumber?: number;
+  content: string;
+}
+
+export interface FileDiffResult {
+  path: string;
+  originalEtag: string;
+  modifiedEtag: string;
+  lines: DiffLine[];
+  additionsCount: number;
+  deletionsCount: number;
+}
+
+export interface GitCommitRecord {
+  commitId: string; // 40-char SHA
+  parentCommitId: string | null;
+  author: string;
+  message: string;
+  timestamp: string;
+  stagedFiles: string[];
+  treeHash: string;
+}
+
+export interface TerminalSessionState {
+  sessionId: string;
+  workspaceId: string;
+  cols: number;
+  rows: number;
+  lastSeq: number;
+  checkpointHash: string;
+  reconnectToken: string;
+  status: 'connected' | 'reconnecting' | 'disconnected' | 'recovered';
+  duplicateExecutions: number;
+}
+
