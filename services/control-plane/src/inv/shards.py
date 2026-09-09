@@ -15,7 +15,7 @@ from .control import Control
 from .errors import DomainError
 from .leases import lock_run, lock_resources
 from .tooling import ToolGateway
-from .runs import RunStore, event
+from .runs import RunStore, event, public
 from .state import TERMINAL
 from .reservations import reclaim_unclaimed
 from .leases import fence
@@ -183,7 +183,16 @@ class ShardRuntime:
             if linked:
                 if len(linked) != len(shards):
                     raise DomainError("NODE-0062", "Shard plan is incomplete")
-                return {"planId": plan_id, "queued": len(linked), "replayed": True}
+                parent = conn.execute(
+                    "SELECT run_id FROM inv.shard_parents WHERE project_id=%s AND plan_id=%s",
+                    (project, plan_id),
+                ).fetchone()
+                return {
+                    "planId": plan_id,
+                    "queued": len(linked),
+                    "replayed": True,
+                    "parentRunId": parent["run_id"] if parent else None,
+                }
             for run in sorted(runs):
                 lock_run(conn, run, project)
             for approval in sorted({s.command["approvalId"] for s in shards}):
@@ -233,7 +242,15 @@ class ShardRuntime:
                         commands[index],
                     ),
                 )
-        return {"planId": plan_id, "queued": len(shards), "replayed": False}
+            from .shard_completion import create_parent
+
+            parent_id = create_parent(conn, self.db, tenant, project, plan_id)
+        return {
+            "planId": plan_id,
+            "queued": len(shards),
+            "replayed": False,
+            "parentRunId": parent_id,
+        }
 
     def status(self, tenant, project, plan_id):
         with self.db.transaction(tenant) as conn:
@@ -243,6 +260,10 @@ class ShardRuntime:
             ).fetchone()
             if not plan:
                 raise DomainError("RES-0004", "Shard plan not found", 404)
+            parent = conn.execute(
+                "SELECT r.run_id,r.state,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
+                (project, plan_id),
+            ).fetchone()
             rows = conn.execute(
                 """SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt,
               u.state,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
@@ -278,6 +299,9 @@ class ShardRuntime:
             )
             return {
                 "planId": plan_id,
+                "parentRunId": parent["run_id"] if parent else None,
+                "parentState": parent["state"] if parent else None,
+                "aggregateManifestSha256": parent["manifest_hash"] if parent else None,
                 "shardCount": plan["shard_count"],
                 "allPhysicallyStopped": len(rows) == plan["shard_count"]
                 and all(r["receipt"] is not None for r in rows),
@@ -313,7 +337,7 @@ class ShardRuntime:
             raise DomainError("NODE-0062", "Shard plan is incomplete")
         return [(member, lock_run(conn, member["run_id"], project)) for member in members]
 
-    def cancel(self, principal, project, plan_id, *, key):
+    def cancel(self, principal, project, plan_id, *, key, expected_parent_version=None):
         """One authorized, atomic cancellation request for all nonterminal members.
 
         Queue workers deliver individual cancellations. Physical leases remain
@@ -322,12 +346,39 @@ class ShardRuntime:
         approvals = ApprovalStore(self.db)
         with self.db.transaction(principal.tenant_id) as conn:
             prior = approvals._ledger(
-                conn, principal, project, "shard.cancel", key, {"planId": plan_id}
+                conn,
+                principal,
+                project,
+                "shard.cancel",
+                key,
+                {
+                    "planId": plan_id,
+                    **(
+                        {"parentVersion": expected_parent_version}
+                        if expected_parent_version is not None
+                        else {}
+                    ),
+                },
             )
             members = self._lock_members(conn, project, plan_id)
+            link = conn.execute(
+                "SELECT run_id FROM inv.shard_parents WHERE project_id=%s AND plan_id=%s",
+                (project, plan_id),
+            ).fetchone()
+            parent = lock_run(conn, link["run_id"], project) if link else None
             Control(self.db).grant(conn, principal, project, "can_request")
             if prior is not None:
                 return prior
+            if expected_parent_version is not None and (
+                not parent or parent["version"] != expected_parent_version
+            ):
+                raise DomainError("GRAPH-0003", "Parent version changed")
+            if (
+                expected_parent_version is not None
+                and parent["state"] in TERMINAL
+                and parent["state"] != "cancelled"
+            ):
+                raise DomainError("GRAPH-0002", "Parent is already terminal")
             changed = []
             for member, run in members:
                 if run["state"] not in TERMINAL:
@@ -342,12 +393,32 @@ class ShardRuntime:
                         {"planId": plan_id},
                     )
                     changed.append(run["run_id"])
+            parent_result = None
+            if parent:
+                if parent["state"] not in TERMINAL:
+                    parent_public = RunStore(self.db)._transition(
+                        conn, principal.tenant_id, parent, "cancelled", parent["version"]
+                    )
+                    event(
+                        conn,
+                        principal.tenant_id,
+                        parent["run_id"],
+                        "inv.run.cancel_requested",
+                        {"planId": plan_id},
+                    )
+                else:
+                    parent_public = public(parent)
+                pending = conn.execute(
+                    "SELECT 1 FROM inv.resource_leases WHERE run_id=ANY(%s) AND released_at IS NULL",
+                    ([r["run_id"] for _, r in members],),
+                ).fetchone()
+                parent_result = {**parent_public, "resourceReleasePending": bool(pending)}
             return approvals._save(
                 conn,
                 project,
                 "shard.cancel",
                 key,
-                {"planId": plan_id, "cancelledRuns": changed},
+                {"planId": plan_id, "cancelledRuns": changed, "parentRun": parent_result},
             )
 
     def reconcile_failures(self, tenant, project, plan_id):

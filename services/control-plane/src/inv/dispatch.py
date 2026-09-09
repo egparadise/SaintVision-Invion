@@ -247,11 +247,16 @@ class DeliveryWorker:
         from .output_ingestion import OutputIngestion
 
         self.outputs = OutputIngestion(database, output_provider)
+        from .shard_completion import ShardCompletion
+
+        self.parents = ShardCompletion(database, output_provider)
 
     def once(self, tenant_id, *, command_id=None):
         attempt = self.queue.acquire(tenant_id, command_id=command_id)
         if attempt is None:
-            return self.outputs.once(tenant_id, command_id=command_id)
+            outcome = self.outputs.once(tenant_id, command_id=command_id)
+            parent = self.parents.once(tenant_id, command_id=command_id)
+            return outcome if outcome != "idle" else parent
         error = None
         try:
             self.delivery.deliver(
@@ -265,4 +270,5 @@ class DeliveryWorker:
         outcome = self.queue.finish(attempt, error_code=error)
         if outcome == "stopped":
             self.outputs.once(tenant_id, command_id=attempt.command_id)
+            self.parents.once(tenant_id, command_id=attempt.command_id)
         return outcome

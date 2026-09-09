@@ -66,8 +66,9 @@ class Control:
             if not row:
                 raise DomainError("RES-0004", "Run not found", 404)
             active = conn.execute(
-                "SELECT count(*) AS n FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
-                (run_id,),
+                """SELECT count(*) AS n FROM inv.resource_leases WHERE released_at IS NULL AND
+                (run_id=%s OR run_id IN (SELECT s.run_id FROM inv.shard_commands s JOIN inv.shard_parents p USING(tenant_id,project_id,plan_id) WHERE p.run_id=%s))""",
+                (run_id, run_id),
             ).fetchone()["n"]
             return {**public(row), "resourceReleasePending": bool(active)}
 
@@ -91,6 +92,22 @@ class Control:
         validate_contract("RunId", run_id)
         if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:
             raise DomainError("VAL-0003", "Current integer Run version required", 422)
+        with self.db.transaction(principal.tenant_id) as conn:
+            parent = conn.execute(
+                "SELECT plan_id FROM inv.shard_parents WHERE project_id=%s AND run_id=%s",
+                (project, run_id),
+            ).fetchone()
+        if parent:
+            from .shards import ShardRuntime
+
+            result = ShardRuntime(self.db, None).cancel(
+                principal,
+                project,
+                parent["plan_id"],
+                key=key,
+                expected_parent_version=expected_version,
+            )
+            return result["parentRun"]
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.approvals._ledger(
                 conn,

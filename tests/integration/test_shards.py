@@ -29,13 +29,15 @@ def active(a):
         ).fetchone()["n"]
 
 
-def admissions(a):
+def admissions(a, commands=None):
     shards = []
     for index in range(2):
         child = copy(a)
         child.run = planned(a.e)
         child.workload = deepcopy(a.workload)
-        child.workload["command"] = ["/probe", "shard", str(index), "of", "2"]
+        child.workload["command"] = (
+            commands[index] if commands else ["/probe", "shard", str(index), "of", "2"]
+        )
         child.policy = {**a.policy, "actionDigest": action_digest(child.workload)}
         row = request(child, key="request:" + child.run["runId"])
         for actor in ("alice", "bob"):

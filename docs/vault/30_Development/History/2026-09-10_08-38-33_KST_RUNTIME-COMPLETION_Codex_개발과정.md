@@ -37,3 +37,5 @@ GUIDE·역할·Git 운영·agent-delivery·core-reliability v1.0.0, ADR v1.10.0 
 2차 복구: container 제거 전에 정지 후보와 출력 바이트를 fsync한다. 제거 ACK 또는 프로세스가 유실되어도 기록된 동일 ID의 부재를 확인한 뒤 같은 receipt를 복원한다. intent만 있는 불확실한 create는 이 경로를 사용할 수 없다.
 
 2차 결과: worker의 `outputRoot` 설정이 있으면 실제 출력 hash·bounded JSON·성공 exit를 검증하고 object→Evidence→Run succeeded로 확정한다. 인증된 현재 epoch의 receipt가 만료 전에 고정한 동일 출력만 사후 publish 가능하다. 작업 재실행 없이 결과 확정만 3회 재시도하며, 실패 물리 receipt는 Run failed에 자동 반영한다. 이는 프로세스 출력 검증이며 모델 품질·SLO 합격을 뜻하지 않는다. Windows 로컬 364 passed / 444 skipped, Linux 후속 CI 대기.
+
+3차 구현: 신규 샤드 계획에 실행 자원을 갖지 않는 부모 Run을 생성한다. 모든 child의 현재 attempt 결과와 저장 바이트를 재검증한 뒤, 순서가 고정된 manifest와 실제 결정 ID/policy version `shard-completion:v1`을 보존하고 부모 Evidence·succeeded를 함께 커밋한다. DB는 부모의 직접 tool claim/lease와 aggregate Evidence 없는 성공을 차단한다. 한 child 실패 시 부모 failed와 남은 child 취소를 자동 반영한다. 브라우저 부모 취소도 모든 child의 취소/자원 반환 대기를 표시한다. 부모 확정 직전 CP 재시작은 idle worker가 재조정하며, 명령을 재실행하지 않는다. 수치 reducer와 MPI/NCCL은 포함하지 않는다.
