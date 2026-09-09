@@ -1,4 +1,4 @@
-﻿---
+---
 doc_id: "HIST-S12-FE-001"
 title: "S12-FE Gemini 내부망 HTTPS 웹배포 운영인수 개발과정"
 version: "1.0.0"

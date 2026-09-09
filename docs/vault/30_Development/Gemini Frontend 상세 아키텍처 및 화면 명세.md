@@ -305,7 +305,6 @@ server {
         root /usr/share/nginx/html;
         index index.html;
         try_files $uri $uri/ /index.html;
-        
         # HTML은 항상 캐시 재검증 (배포 즉시 반영)
         add_header Cache-Control "no-cache, must-revalidate";
     }

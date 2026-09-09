@@ -1,0 +1,70 @@
+{
+  "task": "node-runtime",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-10T01:07:22+09:00",
+  "implementation_sha": "98d02be8528c3a09c5d38239fd8fcce93affa39e",
+  "python_tests": {
+    "tests": 194,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "node_integration_cases": [
+    "test_real_isolation_unicode_permit_and_durable_replay",
+    "test_real_nonzero_exit_does_not_mark_application_success",
+    "test_real_timeout_stops_before_resource_release",
+    "test_real_node_cancellation_verifies_stop",
+    "test_real_agent_crash_watchdog_and_recovery",
+    "test_real_tampered_signature_has_no_execution_effect",
+    "test_stop_receipt_and_all_lease_releases_rollback_together",
+    "test_stop_receipt_rejects_scope_and_fence_change[node]",
+    "test_stop_receipt_rejects_scope_and_fence_change[tenant]",
+    "test_stop_receipt_rejects_scope_and_fence_change[epoch]",
+    "test_stop_receipt_rejects_scope_and_fence_change[plan]",
+    "test_stop_receipt_rejects_scope_and_fence_change[claim]",
+    "test_stop_receipt_rejects_scope_and_fence_change[missing-allocation]",
+    "test_stop_receipt_rejects_scope_and_fence_change[wrong-fence]",
+    "test_stop_receipt_rejects_scope_and_fence_change[wrong-kind]",
+    "test_expired_lease_still_requires_and_accepts_actual_stop_receipt",
+    "test_signer_never_reissues_from_claim_replay",
+    "test_signer_rejects_unbound_or_expired_execution[launch]",
+    "test_signer_rejects_unbound_or_expired_execution[node]",
+    "test_signer_rejects_unbound_or_expired_execution[duplicate]",
+    "test_signer_rejects_unbound_or_expired_execution[lease-expiry]",
+    "test_signer_rejects_unbound_or_expired_execution[expired]"
+  ],
+  "go_tests": {
+    "top_level": 14,
+    "leaf_cases": 37,
+    "failures": 0,
+    "skipped": 0,
+    "race_detector": true
+  },
+  "artifact_id": 10112992275,
+  "archive_sha256": "608ad3884459c1c837f503b0a23023974c99bf6fa7b2dd9c30ab9214bd5c8b8a",
+  "files_sha256": {
+    "core-tests.xml": "6ece0a3a6bb1861ca63e5e72c2c564b1106fa09f573f0c10ac6e4b3d40519f01",
+    "inv-node": "2ed9c70201851cc9676dd231553bc7555bb5b3a8da89624bd59eee0648e9d8c9",
+    "node-unit.jsonl": "f02e651461d07ed02242df0e42fe2d9b7acd477207a1fbab8772870bb8c2f0bf",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "9789867a951a56f89ea6b31bf851f46e58aa29ae8931e049d9fe471d0a1c3ccb",
+    "saintvision_control_plane-0.1.0.tar.gz": "68c0617553376018c0842582989afde56d61e81c2e6ae19011b64c6b1f232f5b"
+  },
+  "ci": [
+    {
+      "id": 34373543859,
+      "name": "Documentation Build",
+      "head_sha": "98d02be8528c3a09c5d38239fd8fcce93affa39e",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34373543859"
+    },
+    {
+      "id": 34373543925,
+      "name": "Core Build",
+      "head_sha": "98d02be8528c3a09c5d38239fd8fcce93affa39e",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34373543925"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 """Alembic environment.
 
-The database URL is read from ``INV_DATABASE_URL`` and never from the ini file,
-so no connection string — and no credential — is committed.
+The database URL is read from ``INV_DATABASE_URL`` or ``INV_MIGRATION_DSN`` and
+never from the ini file, so no connection string — and no credential — is committed.
 """
 
 from __future__ import annotations
@@ -14,24 +14,30 @@ from pathlib import Path
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-SRC = Path(__file__).resolve().parents[1] / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+CP_SRC = ROOT / "services" / "control-plane" / "src"
 
-from saintvision.db.base import Base  # noqa: E402
-from saintvision.db import models  # noqa: E402,F401  (registers the tables)
+for p in (SRC, CP_SRC):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
+try:
+    from saintvision.db.base import Base
+    from saintvision.db import models  # noqa: F401  (registers tables)
+    target_metadata = Base.metadata
+except ImportError:
+    target_metadata = None
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
-
 
 def _database_url() -> str:
-    url = os.environ.get("INV_DATABASE_URL")
+    url = os.environ.get("INV_DATABASE_URL") or os.environ.get("INV_MIGRATION_DSN")
     if not url:
-        raise RuntimeError("INV_DATABASE_URL is not set")
+        raise RuntimeError("Neither INV_DATABASE_URL nor INV_MIGRATION_DSN is set")
     return url
 
 
@@ -42,6 +48,7 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        transactional_ddl=True,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -53,7 +60,10 @@ def run_migrations_online() -> None:
     connectable = engine_from_config(section, prefix="sqlalchemy.", poolclass=pool.NullPool)
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+            transactional_ddl=True,
         )
         with context.begin_transaction():
             context.run_migrations()

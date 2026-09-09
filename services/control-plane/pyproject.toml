@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saintvision-control-plane"
+version = "0.1.0"
+description = "Deterministic INV contracts and reliability core"
+requires-python = ">=3.12"
+dependencies = ["fastapi==0.141.1", "uvicorn==0.52.4", "psycopg[binary]==3.3.5", "jsonschema[format]==4.26.0", "pydantic==2.13.5", "cryptography==50.0.1", "PyJWT==2.13.0"]
+
+[project.scripts]
+inv-control-plane = "inv.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+inv = ["generated/*.json", "migrations/*.sql"]

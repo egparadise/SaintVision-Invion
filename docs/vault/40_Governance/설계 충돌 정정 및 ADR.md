@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.0.0"
+version: "1.6.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-09T15:10:54+09:00"
+updated: "2026-09-10T02:16:46+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -52,3 +52,17 @@ Browser SSE는 Authorization 헤더를 지원하는 fetch 기반 스트림을 �
 - [MinIO 공식 저장소](https://github.com/minio/minio): 2026-09-09 확인 시 archive 및 source-only 상태. [[Storage 최종 개발 계획]]의 제품 검증 과제에 반영한다.
 
 외부 정보 확인일은 2026-09-09다. 원문의 최신 모델명·미검증 링크 전체가 검증됐다고 주장하지 않는다. 변동 기술 버전과 라이선스는 도입 Sprint에서 해당 공식 출처를 다시 확인한다.
+
+## 2026-09-09 Codex 후속 결정
+
+ADR-019(물리 자원 반환), ADR-020(복원 epoch), ADR-021(시계 스큐), ADR-022(멱등 응답/보존), ADR-023(redaction fail-closed)의 결정과 구현 범위는 [[Codex 핵심 기반 계약과 검토 회신]]을 따른다. ADR-005/006/007/014의 해당 문구를 이 결정으로 보완한다. Claude 독립 재검토는 pending이며 Node·운영 시험 완료를 뜻하지 않는다.
+
+ADR-024(승인 내용 고정·distinct actor·nonce 원자 소비·dispatch/outbox/Run transaction)는 [[Codex 승인 경계 계약과 인계]]를 따른다. 서버 내부 계약의 사전 검증이며 공개 인증 adapter·실제 명령 실행 및 S04 완료를 뜻하지 않는다. 독립 reviewer Claude 검토 pending.
+
+ADR-025(일회 실행 허가·불확실한 실행의 자동 재시도 금지), ADR-026(고정 Sandbox launch 계약)은 [[Codex ToolGateway 실행 허가와 Sandbox 계약]]을 따른다. OS 격리 driver·실장비 검증·교차 검토는 별도다.
+
+ADR-027(서명된 Node permit·durable inbox·allocation high-water), ADR-028(독립 PID 1 deadline·삭제 확인 뒤 정지 영수증)의 계약은 [[Codex Node 실행 격리와 정지 영수증 계약]]이다. Linux 합성 컨테이너 검증과 운영 실장비/transport 검증을 구별한다.
+
+ADR-029(mTLS peer 검증·기존 실행 observation) 및 ADR-030(인증서 CAS/폐기·영수증 commit 시 현재 권한)은 [[Codex Node mTLS 전달과 인증서 권한 계약]]을 따른다. 실제 운영 PKI/IdP·전체 등록/Heartbeat API 및 실장비 승인은 별도다.
+
+ADR-031(resource-server 인증·현재 project grant)과 ADR-032(Run별 commit 순서 이벤트·mTLS 관측·원격 취소)는 [[Codex Control API 인증과 Node 관측 계약]]을 따른다. 실제 IdP/PKI·업무 adapter·운영 실장비 검증과 독립 검토는 별도다.
