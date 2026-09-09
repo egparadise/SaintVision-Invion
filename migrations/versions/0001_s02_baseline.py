@@ -178,11 +178,12 @@ def upgrade() -> None:
         ),
         sa.CheckConstraint("heartbeat_sequence >= 0", name="heartbeat_sequence_non_negative"),
     )
-    # NULLS NOT DISTINCT needs raw DDL: an unenrolled node has a NULL
-    # fingerprint, and a plain UNIQUE would allow unlimited such rows.
+    # Unique when present. NULL means enrollment has not completed, a state
+    # many nodes legitimately share, so this is a partial index; NULLS NOT
+    # DISTINCT here would cap the platform at one unenrolled node.
     op.execute(
-        "ALTER TABLE nodes ADD CONSTRAINT uq_nodes_certificate_fingerprint "
-        "UNIQUE NULLS NOT DISTINCT (certificate_fingerprint)"
+        "CREATE UNIQUE INDEX uq_nodes_certificate_fingerprint ON nodes "
+        "(certificate_fingerprint) WHERE certificate_fingerprint IS NOT NULL"
     )
     op.create_index("ix_nodes_tenant_id_status", "nodes", ["tenant_id", "status"])
     op.create_index("ix_nodes_tenant_id_last_heartbeat_at", "nodes", ["tenant_id", "last_heartbeat_at"])

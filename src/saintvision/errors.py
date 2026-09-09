@@ -93,7 +93,11 @@ class InvError(Exception):
             self.status = _STATUS[self.category]
         if self.retryable is None:
             self.retryable = _RETRYABLE[self.category]
-        super().__init__(self.message)
+        # Called explicitly rather than through a zero-argument super(): with
+        # slots=True the dataclass decorator builds a replacement class, and on
+        # Python 3.12 the __class__ cell still points at the original, so
+        # super() raises TypeError. Fixed in 3.13, but the floor is 3.11.
+        Exception.__init__(self, self.message)
 
     category: ErrorCategory = field(init=False)
 

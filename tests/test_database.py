@@ -187,21 +187,51 @@ def test_app_role_cannot_delete_audit_events(app_sessionmaker, two_tenants):
 # --------------------------------------------------------------------------
 
 
-def test_two_unenrolled_nodes_cannot_both_hold_a_null_fingerprint(
-    app_sessionmaker, two_tenants
-):
-    """NULLS NOT DISTINCT on the node's authenticated identity.
+def test_many_nodes_may_be_unenrolled_at_once(app_sessionmaker, two_tenants):
+    """A NULL fingerprint means "enrollment not complete", not an identity.
 
-    A plain UNIQUE permits unlimited NULLs, which is exactly the unenrolled
-    state; the constraint is what stops that becoming a shared identity.
+    Making NULLs distinct here is deliberate: NULLS NOT DISTINCT would allow
+    only one unenrolled node across the whole platform, which breaks concurrent
+    enrollment.
     """
     tenant_a, _ = two_tenants
     with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant_a):
+                _insert_node(session, tenant_a, "h1")
+                _insert_node(session, tenant_a, "h2")
+            count = session.execute(text("SELECT count(*) FROM nodes")).scalar_one()
+    assert count == 2
+
+
+def test_two_nodes_cannot_share_a_certificate_fingerprint(
+    app_sessionmaker, two_tenants
+):
+    """A present fingerprint is the node's authenticated identity.
+
+    Uniqueness is global rather than per tenant: one certificate must not
+    resolve to two nodes even across tenants.
+    """
+    tenant_a, _ = two_tenants
+    fingerprint = "c" * 64
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant_a):
+                first = _insert_node(session, tenant_a, "h1")
+                session.execute(
+                    text("UPDATE nodes SET certificate_fingerprint = :f WHERE node_id = :i"),
+                    {"f": fingerprint, "i": first},
+                )
         with pytest.raises(IntegrityError):
             with session.begin():
                 with tenant_scope(session, tenant_a):
-                    _insert_node(session, tenant_a, "h1")
-                    _insert_node(session, tenant_a, "h2")
+                    second = _insert_node(session, tenant_a, "h2")
+                    session.execute(
+                        text(
+                            "UPDATE nodes SET certificate_fingerprint = :f WHERE node_id = :i"
+                        ),
+                        {"f": fingerprint, "i": second},
+                    )
 
 
 def test_whole_host_capability_cannot_be_registered_twice(app_sessionmaker, two_tenants):
@@ -212,18 +242,13 @@ def test_whole_host_capability_cannot_be_registered_twice(app_sessionmaker, two_
             with tenant_scope(session, tenant_a):
                 node_id = _insert_node(session, tenant_a, "cap-host")
                 session.execute(
-                    text("UPDATE nodes SET certificate_fingerprint = :f WHERE node_id = :i"),
-                    {"f": "a" * 64, "i": node_id},
+                    text(
+                        "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
+                        "kind, device_index, total_quantity, unit, divisible, detected_at, version) "
+                        "VALUES (:c, :t, :n, 'ram', NULL, 64, 'GiB', true, now(), 1)"
+                    ),
+                    {"c": new_id("capability"), "t": tenant_a, "n": node_id},
                 )
-                for _ in range(1):
-                    session.execute(
-                        text(
-                            "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
-                            "kind, device_index, total_quantity, unit, divisible, detected_at, version) "
-                            "VALUES (:c, :t, :n, 'ram', NULL, 64, 'GiB', true, now(), 1)"
-                        ),
-                        {"c": new_id("capability"), "t": tenant_a, "n": node_id},
-                    )
         with pytest.raises(IntegrityError):
             with session.begin():
                 with tenant_scope(session, tenant_a):

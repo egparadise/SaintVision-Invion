@@ -31,14 +31,15 @@ class Node(Base):
     __table_args__ = (
         UniqueConstraint("tenant_id", "hostname"),
         UniqueConstraint("tenant_id", "node_id", name="uq_nodes_tenant_id_node_id"),
-        # The certificate fingerprint is the node's authenticated identity. A
-        # plain UNIQUE would let unlimited rows share a NULL fingerprint, which
-        # is exactly the "not yet enrolled" state an attacker would aim for, so
-        # NULLs are compared as equal here (PLAN-DB-001).
-        UniqueConstraint(
+        # Fingerprints are unique when present. NULL means "enrollment has not
+        # completed", which is a state many nodes legitimately share, so this is
+        # a partial index rather than NULLS NOT DISTINCT — the latter would cap
+        # the whole platform at one unenrolled node.
+        Index(
+            "uq_nodes_certificate_fingerprint",
             "certificate_fingerprint",
-            name="uq_nodes_certificate_fingerprint",
-            postgresql_nulls_not_distinct=True,
+            unique=True,
+            postgresql_where=text("certificate_fingerprint IS NOT NULL"),
         ),
         CheckConstraint(
             "status IN ('enrolling','active','draining','lost','retired')",
