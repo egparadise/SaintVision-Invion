@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the S02 and S03 scope.
+"""SQLAlchemy models for the S02, S03 and S09 scope.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
@@ -11,6 +11,23 @@ from .artifacts import (
     UPLOAD_STATUSES,
     Artifact,
     UploadSession,
+)
+from .context import (
+    CONTEXT_ITEM_KINDS,
+    SNAPSHOT_SOFT_LIMIT_BYTES,
+    ContextBundle,
+    ContextBundleItem,
+    ContextSnapshot,
+    RunRecord,
+    RunRecordArtifact,
+)
+from .evaluation import (
+    EVAL_CATEGORIES,
+    EVAL_OUTCOMES,
+    EvalCase,
+    EvalResult,
+    EvalRun,
+    EvalSuite,
 )
 from .evidence import (
     EVIDENCE_RESULTS,
@@ -90,6 +107,16 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "inbox_events",
     "artifacts",
     "upload_sessions",
+    # S09
+    "context_snapshots",
+    "context_bundles",
+    "context_bundle_items",
+    "run_records",
+    "run_record_artifacts",
+    "eval_suites",
+    "eval_cases",
+    "eval_runs",
+    "eval_results",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -101,10 +128,34 @@ PARTITIONED_TABLES: dict[str, str] = {
 
 #: Tables the application role may INSERT and SELECT but never UPDATE or
 #: DELETE. Append-only for the application; not a WORM claim (PLAN-DB-001).
-APPEND_ONLY_TABLES: tuple[str, ...] = ("audit_events", "evidence_envelopes")
+APPEND_ONLY_TABLES: tuple[str, ...] = (
+    "audit_events",
+    "evidence_envelopes",
+    # A sealed RunRecord is the account of what happened; rewriting one
+    # after the fact is exactly what it exists to prevent.
+    "run_records",
+    "run_record_artifacts",
+    # Snapshots are immutable by construction — the hash is part of the
+    # key — so UPDATE is meaningless and DELETE belongs to the orphan
+    # collector, which runs as the owner, not the application.
+    "context_snapshots",
+)
 
 __all__ = [
     "ACTOR_TYPES",
+    "CONTEXT_ITEM_KINDS",
+    "ContextBundle",
+    "ContextBundleItem",
+    "ContextSnapshot",
+    "EVAL_CATEGORIES",
+    "EVAL_OUTCOMES",
+    "EvalCase",
+    "EvalResult",
+    "EvalRun",
+    "EvalSuite",
+    "RunRecord",
+    "RunRecordArtifact",
+    "SNAPSHOT_SOFT_LIMIT_BYTES",
     "APPEND_ONLY_TABLES",
     "ARTIFACT_STATUSES",
     "Approval",
