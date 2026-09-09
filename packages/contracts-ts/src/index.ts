@@ -237,3 +237,40 @@ export interface AuthorizedCommand {
   recoveryEpoch: string;
   expiresAt: Timestamp;
 }
+
+export type ClaimId = string;
+
+export interface SandboxLaunchSpec {
+  profileVersion: string;
+  imageDigest: string;
+  argv: Array<string>;
+  workspaceId: WorkspaceId;
+  workingDirectory: "/workspace";
+  workspaceMode: "ephemeral";
+  cpuMillis: number;
+  memoryBytes: number;
+  timeoutSeconds: number;
+  pidsLimit: 64;
+  userId: 65532;
+  network: "none";
+  rootfsReadOnly: true;
+  capDropAll: true;
+  noNewPrivileges: true;
+  privileged: false;
+  hostAccess: false;
+}
+
+export interface ExecutionClaim {
+  commandId: CommandId;
+  claimId: ClaimId;
+  runId: RunId;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  nodeId: NodeId;
+  actionDigest: ActionDigest;
+  planDigest: ActionDigest;
+  policyVersion: string;
+  profileVersion: string;
+  recoveryEpoch: string;
+  notAfter: Timestamp;
+}

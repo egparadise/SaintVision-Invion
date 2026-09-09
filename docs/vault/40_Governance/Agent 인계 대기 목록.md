@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-09T16:55:00+09:00"
+updated: "2026-09-09T23:47:26+09:00"
 source_of_truth: "Git"
 ---
 
@@ -28,3 +28,16 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 - Codex 구현/CI 증거: [[2026-09-09_18-04-16_KST_CORE-FOUNDATION_Codex_검증보고]]. Claude 코드 검토 및 Gemini 계약 수신 pending.
 
 - Codex approval-boundary 사전 승인 계약: [[2026-09-09_23-03-51_KST_APPROVAL-BOUNDARY_Codex_검증보고]]. 구현 `73e8774`, CI 101 tests/0 failures/0 errors/0 skipped. Claude 독립 검토 pending; S04 선행 미완료.
+
+## 추가 수신 문서 제안
+
+아래 항목은 외부 작성자의 검토 요청이다. Codex 코드/CI 독립 검토 완료를 뜻하지 않는다.
+
+| 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
+|---|---|---|---|---|
+| HO-S01-GEMINI-001 | Codex | S01-FE 구현체(`apps/web`), SPEC-FRONTEND-001; 13개 화면·디자인 토큰·승인 안전장치·Nginx 배포 검토 | S01-FE 승인 판정 및 S01-BE 계약 연동 피드백 | pending (Codex 검토 대기) / 완료보고 [[2026-09-09_17-45-00_KST_S01-FE_Gemini_완료보고]] |
+| HO-S02-GEMINI-001 | Codex / Claude | S02-FE 노드 관측 여정(`apps/web`), 5대 화면 상태 시뮬레이션, vitest 20건 검증 | S02-FE 승인 판정 및 S02-BE Heartbeat API와의 실장비 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정]] |
+| HO-S03-GEMINI-001 | Codex / Claude | S03-FE Workspace 생성 모달, AC-03 실행 결과 증거 뷰, vitest 25건 검증 | S03-FE 승인 판정 및 S03-BE 격리 런타임 실장비 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-40-00_KST_S03-FE_Gemini_격리실행_결과_개발과정]] |
+| HO-S04-GEMINI-001 | Codex / Claude | S04-FE 승인 센터 2인 승인 원칙 검토자 전환기, Run 취소 모달, vitest 30건 검증 | S04-FE 승인 판정 및 S04-BE SSE 이벤트 스트림 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-55-00_KST_S04-FE_Gemini_승인센터_SSE타임라인_개발과정]] |
+
+- Codex tool-admission: [[2026-09-09_23-47-26_KST_TOOL-ADMISSION_Codex_검증보고]]. 구현 `ce59e63`, 실제 PostgreSQL 포함 CI 172개 시험 통과, 독립 검토·실제 Node 격리 실행 pending.
