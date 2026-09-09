@@ -10,7 +10,7 @@ depends_on = None
 
 
 def upgrade():
-    op.get_bind().exec_driver_sql(
+    op.get_bind().connection.driver_connection.execute(
         files("inv").joinpath("migrations/0008_storage.sql").read_text("utf-8")
     )
 
