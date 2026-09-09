@@ -1,0 +1,228 @@
+package runtime
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
+	"io"
+	"net"
+	"net/http"
+	"net/url"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+)
+
+var ErrAbsent = errors.New("NODE-0020: container not found; execution remains uncertain")
+var hexID = regexp.MustCompile(`^[0-9a-f]{64}$`)
+
+type State struct {
+	ID                  string
+	Running, Restarting bool
+	PID, ExitCode       int
+	StartedAt, Status   string
+}
+type Engine interface {
+	Create(context.Context, Record, contracts.SandboxLaunchSpec) (string, error)
+	Start(context.Context, string) error
+	Inspect(context.Context, string, Record) (State, error)
+	Stop(context.Context, string) error
+	Remove(context.Context, string, Record) error
+}
+type Docker struct{ client *http.Client }
+
+// Only a locally configured Unix socket is supported. Neither permit data nor
+// inherited DOCKER_HOST/proxy credentials can redirect this privileged connection.
+func NewDocker(socket string) (*Docker, error) {
+	if !filepath.IsAbs(socket) || filepath.Clean(socket) != socket {
+		return nil, errors.New("NODE-0021: absolute local Docker socket required")
+	}
+	transport := &http.Transport{Proxy: nil, DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+		return (&net.Dialer{}).DialContext(ctx, "unix", socket)
+	}}
+	return &Docker{client: &http.Client{Transport: transport, Timeout: 2 * time.Second, CheckRedirect: func(req *http.Request, via []*http.Request) error { return errors.New("redirect refused") }}}, nil
+}
+func (d *Docker) request(ctx context.Context, method, path string, body any, out any) error {
+	var reader io.Reader
+	if body != nil {
+		data, err := json.Marshal(body)
+		if err != nil {
+			return err
+		}
+		reader = bytes.NewReader(data)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, "http://docker/v1.45"+path, reader)
+	if err != nil {
+		return errors.New("NODE-0021: invalid engine request")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	response, err := d.client.Do(req)
+	if err != nil {
+		return errors.New("NODE-0022: engine unavailable")
+	}
+	defer response.Body.Close()
+	if response.StatusCode == 404 {
+		return ErrAbsent
+	}
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return fmt.Errorf("NODE-0022: engine status %d", response.StatusCode)
+	}
+	if out == nil {
+		_, _ = io.Copy(io.Discard, io.LimitReader(response.Body, 4096))
+		return nil
+	}
+	decoder := json.NewDecoder(io.LimitReader(response.Body, 2*1024*1024))
+	if err = decoder.Decode(out); err != nil {
+		return errors.New("NODE-0022: invalid engine response")
+	}
+	return nil
+}
+func labels(r Record) map[string]string {
+	return map[string]string{"ai.saintvision.node": string(r.Claim.NodeId), "ai.saintvision.tenant": string(r.Claim.TenantId), "ai.saintvision.command": string(r.Claim.CommandId), "ai.saintvision.plan": string(r.Claim.PlanDigest), "ai.saintvision.epoch": r.Claim.RecoveryEpoch}
+}
+
+func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {
+	var image struct {
+		ID     string `json:"Id"`
+		Config struct {
+			Volumes map[string]any
+			Labels  map[string]string
+		}
+	}
+	if err := d.request(ctx, "GET", "/images/"+url.PathEscape(p.ImageDigest)+"/json", nil, &image); err != nil {
+		return "", err
+	}
+	if image.ID != p.ImageDigest || len(image.Config.Volumes) != 0 || image.Config.Labels["ai.saintvision.supervisor"] != "deadline-v1" {
+		return "", errors.New("NODE-0023: image must be local pinned content without declared volumes")
+	}
+	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
+	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
+		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
+		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "none"}}
+	command := append([]string{"--not-after", string(r.Claim.NotAfter), "--timeout", strconv.FormatInt(p.TimeoutSeconds, 10), "--"}, p.Argv...)
+	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": []string{},
+		"Labels": labels(r), "NetworkDisabled": true, "AttachStdout": false, "AttachStderr": false, "OpenStdin": false, "Tty": false, "HostConfig": host}
+	var result struct {
+		ID string `json:"Id"`
+	}
+	if err := d.request(ctx, "POST", "/containers/create?name="+url.QueryEscape(r.Name), config, &result); err != nil {
+		return "", err
+	}
+	if !hexID.MatchString(result.ID) {
+		return "", errors.New("NODE-0022: invalid container ID")
+	}
+	// Verify actual daemon configuration before any process can start.
+	var actual inspection
+	if err := d.request(ctx, "GET", "/containers/"+result.ID+"/json", nil, &actual); err != nil {
+		return "", err
+	}
+	if err := owned(actual, r); err != nil {
+		return "", err
+	}
+	h := actual.HostConfig
+	if actual.Image != p.ImageDigest || actual.Config.User != "65532:65532" || actual.Config.WorkingDir != "/workspace" || !equal(actual.Config.Entrypoint, []string{"/inv-supervisor"}) || !equal(actual.Config.Cmd, command) ||
+		h.NetworkMode != "none" || !h.ReadonlyRootfs || h.Privileged || h.Memory != p.MemoryBytes || h.MemorySwap != p.MemoryBytes || h.NanoCpus != p.CpuMillis*1000000 || h.PidsLimit != 64 ||
+		!equal(h.CapDrop, []string{"ALL"}) || !(equal(h.SecurityOpt, []string{"no-new-privileges:true"}) || equal(h.SecurityOpt, []string{"no-new-privileges"})) ||
+		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "none" || len(h.Tmpfs) != 2 {
+		return "", errors.New("NODE-0024: daemon isolation configuration differs")
+	}
+	for path, options := range tmpfs {
+		if h.Tmpfs[path] != options {
+			return "", errors.New("NODE-0024: tmpfs configuration differs")
+		}
+	}
+	return result.ID, nil
+}
+func equal(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+type inspection struct {
+	ID          string `json:"Id"`
+	Name, Image string
+	Config      struct {
+		User, WorkingDir string
+		Entrypoint, Cmd  []string
+		Labels           map[string]string
+	}
+	HostConfig struct {
+		NetworkMode                             string
+		ReadonlyRootfs, Privileged, AutoRemove  bool
+		Memory, MemorySwap, NanoCpus, PidsLimit int64
+		CapDrop, SecurityOpt, Binds             []string
+		Devices, DeviceRequests                 []any
+		PortBindings                            map[string]any
+		Tmpfs                                   map[string]string
+		PidMode, IpcMode, UTSMode, CgroupnsMode string
+		RestartPolicy                           struct{ Name string }
+		LogConfig                               struct{ Type string }
+	}
+	State struct {
+		Running, Restarting bool
+		Pid, ExitCode       int
+		StartedAt, Status   string
+	}
+}
+
+func owned(value inspection, r Record) error {
+	if !hexID.MatchString(value.ID) || strings.TrimPrefix(value.Name, "/") != r.Name {
+		return errors.New("NODE-0025: container identity differs")
+	}
+	for key, wanted := range labels(r) {
+		if value.Config.Labels[key] != wanted {
+			return errors.New("NODE-0025: container ownership differs")
+		}
+	}
+	return nil
+}
+func (d *Docker) Start(ctx context.Context, id string) error {
+	if !hexID.MatchString(id) {
+		return errors.New("NODE-0025: invalid container ID")
+	}
+	return d.request(ctx, "POST", "/containers/"+id+"/start", nil, nil)
+}
+func (d *Docker) Inspect(ctx context.Context, name string, r Record) (State, error) {
+	var actual inspection
+	if name != r.Name && !hexID.MatchString(name) {
+		return State{}, errors.New("NODE-0025: invalid container identity")
+	}
+	if err := d.request(ctx, "GET", "/containers/"+url.PathEscape(name)+"/json", nil, &actual); err != nil {
+		return State{}, err
+	}
+	if err := owned(actual, r); err != nil {
+		return State{}, err
+	}
+	return State{ID: actual.ID, Running: actual.State.Running, Restarting: actual.State.Restarting, PID: actual.State.Pid, ExitCode: actual.State.ExitCode, StartedAt: actual.State.StartedAt, Status: actual.State.Status}, nil
+}
+func (d *Docker) Stop(ctx context.Context, id string) error {
+	if !hexID.MatchString(id) {
+		return errors.New("NODE-0025: invalid container ID")
+	}
+	return d.request(ctx, "POST", "/containers/"+id+"/stop?t=0", nil, nil)
+}
+func (d *Docker) Remove(ctx context.Context, id string, r Record) error {
+	state, err := d.Inspect(ctx, id, r)
+	if err != nil {
+		return err
+	}
+	if !stopped(state) {
+		return errors.New("NODE-0026: refuse to remove unconfirmed running container")
+	}
+	return d.request(ctx, "DELETE", "/containers/"+id+"?force=false&v=true", nil, nil)
+}
+func stopped(s State) bool {
+	return !s.Running && !s.Restarting && s.PID == 0 && (s.Status == "exited" || s.Status == "created")
+}

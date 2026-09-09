@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.3.0"
+version: "1.4.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-09T23:38:28+09:00"
+updated: "2026-09-10T00:50:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -60,3 +60,5 @@ ADR-019(물리 자원 반환), ADR-020(복원 epoch), ADR-021(시계 스큐), AD
 ADR-024(승인 내용 고정·distinct actor·nonce 원자 소비·dispatch/outbox/Run transaction)는 [[Codex 승인 경계 계약과 인계]]를 따른다. 서버 내부 계약의 사전 검증이며 공개 인증 adapter·실제 명령 실행 및 S04 완료를 뜻하지 않는다. 독립 reviewer Claude 검토 pending.
 
 ADR-025(일회 실행 허가·불확실한 실행의 자동 재시도 금지), ADR-026(고정 Sandbox launch 계약)은 [[Codex ToolGateway 실행 허가와 Sandbox 계약]]을 따른다. OS 격리 driver·실장비 검증·교차 검토는 별도다.
+
+ADR-027(서명된 Node permit·durable inbox·allocation high-water), ADR-028(독립 PID 1 deadline·삭제 확인 뒤 정지 영수증)의 계약은 [[Codex Node 실행 격리와 정지 영수증 계약]]이다. Linux 합성 컨테이너 검증과 운영 실장비/transport 검증을 구별한다.

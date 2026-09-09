@@ -110,3 +110,7 @@ for rel, lines in [
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(("\n".join(lines).rstrip() + "\n").encode())
 print("Generated Python, TypeScript, Go and packaged validation schema.")
+
+node_schema = ROOT / "services/node-agent/internal/wire/core.schema.json"
+node_schema.parent.mkdir(parents=True, exist_ok=True)
+node_schema.write_bytes(source.read_bytes())

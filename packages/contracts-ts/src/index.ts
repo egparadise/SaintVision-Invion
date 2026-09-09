@@ -274,3 +274,40 @@ export interface ExecutionClaim {
   recoveryEpoch: string;
   notAfter: Timestamp;
 }
+
+export interface NodeAllocation {
+  lease: ResourceLease;
+  nodeId: NodeId;
+  kind: "cpu" | "memory";
+}
+
+export interface NodeExecutionPermit {
+  claim: ExecutionClaim;
+  launch: SandboxLaunchSpec;
+  allocations: Array<NodeAllocation>;
+  issuedAt: Timestamp;
+}
+
+export interface SignedNodePermit {
+  payload: string;
+  signature: string;
+}
+
+export interface NodeStopReceipt {
+  receiptId: string;
+  claimId: ClaimId;
+  commandId: CommandId;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  runId: RunId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  planDigest: ActionDigest;
+  containerId: string;
+  stopped: true;
+  processStarted: boolean;
+  exitCode: number;
+  reason: "exited" | "timeout" | "cancelled" | "recovered";
+  finishedAt: Timestamp;
+  allocations: Array<NodeAllocation>;
+}
