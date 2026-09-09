@@ -1,7 +1,7 @@
 ---
 doc_id: "STORAGE-NODE-CONTRACT-001"
 title: "Codex 저장 복원과 Node 실행 후속 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 updated: "2026-09-10T03:03:00+09:00"
@@ -37,3 +37,23 @@ Claude의 idle-first 계산은 ADR-005 가중치 Scheduler를 대신할 수 없�
 ## 검증 상태
 
 로컬 pytest 147 passed / 169 skipped / 실패 0. Linux private directory/PostgreSQL/Docker 검증은 동일 SHA CI에서 실행 후 History에 원본 Evidence로 기록한다. peer review, 실장비 5대·IdP/CA/DNS·Storage 제품 선택은 pending이다.
+
+Storage 구현 `f4e33b958379e058196135d737539a3cee9d0a85`: Core #34386900927 / Docs #34386900905 success. 원본 [[storage-f4e33b9-tests.xml]], [[storage-f4e33b9-unit.jsonl]], [[storage-f4e33b9-provenance.json]]. Python 316/실패·오류·skip 0, Linux Go race 57 leaf cases. 초기 db7eae7의 migration 실패는 `%I`를 포함하는 SQL을 매개변수 보간 없이 실행하도록 수정한 후 재검증했다.
+
+## ADR-035: 공지·실측 관측·전송·독립 샤드
+
+- `inv-discover`는 명시적 HTTPS endpoint·CA·tenant·stable installation ID로 Claude의 `/v1/discovery/announcements` camelCase 계약에 공지한다. 30초 주기 또는 `--once`, 5초 timeout, proxy/redirect 금지. OS/CPU/RAM은 미검증 자기 보고이며 GPU 미측정은 labels에 명시한다. bootstrap token 소비나 Node 인증서 발급·등록 승인·Offer 편입을 자동 수행하지 않는다. Claude 실제 서버와의 통합은 adapter owner 검증 대기다.
+- 등록된 `inv-node`의 `/v1/snapshots`는 기존 pinned mTLS, Node/tenant/epoch 및 일회 nonce를 사용한다. Linux `/proc/stat` 150ms CPU delta와 `/proc/meminfo` MemAvailable을 읽고 CPU millis/메모리 bytes로 반환한다. guest double-count를 피한다. 읽기 실패/불완전한 counter는 여유 0의 실측으로 꾸미지 않고 요청을 거절한다. 이 snapshot은 Offer·GPU/VRAM·격리 capability 증명이 아니다.
+- `inv-observer-worker`는 명시적 tenant/DSN/epoch/TLS로 최대 5개 등록 채널을 5 worker에서 조회한다. 시작/끝 offline sweep, 5초 I/O와 5초 반복 대기, nonce/순서/clock/현재 인증서 검증 및 snapshot 저장을 묶는다. 60초 stale threshold는 sweep 주기와 함께 측정해야 하며 실장비 이탈 ≤60초 SLO를 아직 증명하지 않는다. Node 실종은 Lease 물리 반환 근거가 아니다.
+- 인증된 `/v1/projects/{project}/capacity`는 project_nodes 허용 목록의 CPU/memory만 totalOffered/largestSingleNode/spareNow로 제공한다. 15초 이내 관측과 current channel·epoch, 활성 Lease를 검사한다. host busy와 Lease를 별도로 차감하여 보수적인 여유를 계산한다. 단일 노드 최대치는 자원 차원별 값으로 동시에 해당 조합을 만족하는 Node를 보장하지 않는다. 예약 시에는 기존 Scheduler/Lease 잠금을 재실행한다.
+- `inv-node --objects <private-root>`를 명시한 경우에만 `/v1/objects/read`를 제공한다. SHA256 파일명·Linux openat/O_NOFOLLOW·private root·단일 link·읽기 전용 파일·전체 hash/size, 256KiB 응답 chunk와 Node 전송 슬롯 2개를 적용한다. host/service 계정은 신뢰 경계다. configured content root 전체를 현재 CP mTLS principal에 공개하므로 business adapter가 project별 catalog/읽기 권한을 검사해야 한다.
+- `NodeTransfer.fetch`는 catalog hash/size, nonce와 chunk scope, canonical base64 및 chunk SHA를 검사하고 part commit/finalize transaction에서 channel 권한을 다시 확인한다. 실제 수신 bytes의 전체 hash가 맞아야 ready다. 중단 시 저장 완료된 16MiB part부터 재개하며 진행 part는 재수신한다. 측정 경로는 **Node→CP**이므로 Node→Node 링크 대역폭 또는 5노드 locality 실측으로 재사용하지 않는다. 다운로드는 metadata만 받아 ready로 바꾸지 않는다.
+- `ShardRuntime.enqueue`는 명시적으로 분할 가능한 독립 workload 최대 16개, 서로 다른 Run/command 및 각 샤드의 사전 승인·Lease·현재 policy/runtime를 요구한다. plan→모든 Run→approval→모든 Node/resource→grant 잠금 후 기존 ToolGateway를 같은 transaction에서 호출한다. 하나라도 실패하면 전체 claim/queue/plan/outbox가 rollback된다. 기존 실행을 새 plan에 편입하지 않는다.
+- 전달은 기존 durable queue/worker→mTLS→Go→격리 컨테이너를 사용한다. 같은 Node의 여러 샤드는 현재 단일 실행 슬롯에 따라 순차 실행된다. plan 재요청은 관측만 한다. `allPhysicallyStopped`는 각 샤드의 실제 receipt를 의미하며 계산 결과 성공이 아니다. 전 Node 동시 시작/gang scheduling이나 실패 자동 재실행을 약속하지 않는다.
+- 샤드 간 MPI/NCCL/소켓 통신 및 output reducer는 미구현이며 `communication != none`을 거절한다. 현재 network=none 보안 계약을 암묵적으로 완화하지 않는다. S03-BE 위의 통신 격리·per-shard credential·새 서명 profile, 결과 교환/집계와 parent Run 성공의 Evidence가 후속이다.
+
+## Claude 최신 변경의 조율 요청
+
+고정 SHA 6db4a5f의 `pools.node_spare`는 node 하나의 어떤 capability라도 snapshot이 있으면 `measured=True`로 두고 나머지 used를 0으로 계산하며, latest snapshot 조회에 미래 시각 상한이 없다. `locality.estimate_transfer`도 link의 미래 시각을 제외하지 않는다. `mark_replica_ready`는 전달받은 hash와 catalog 문자열을 비교하므로 실제 byte를 검사한 trusted transfer adapter만 호출해야 한다. malformed/변조된 source bytes·stale/future 관측을 주입해 원 owner 테스트로 검증할 것을 요청한다. 이는 코드 검토 결과이며 Claude가 수신/수정/승인했다고 표시하지 않는다.
+
+이 branch는 Claude의 별도 SQLAlchemy 모델과 HTTP 앱을 병합하지 않았다. Claude는 본 API/단위/상태/인증 계약을 업무 adapter에 연결하고 기존 검토 P1 heartbeat 인증·경합·backup hash의 수정 SHA를 제시한다. Gemini는 세 용량 숫자와 후보/배치 Explain 화면에 실제 응답을 연결한다. 실제 장비·Windows/GPU·S3·PKI/IdP·업무 UI·collective 통신·독립 검토는 미완료다.

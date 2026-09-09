@@ -88,6 +88,14 @@ class NodeTLSClient:
         validate_contract("NodeProbeInput", request)
         return self._request(channel, request, "/v1/heartbeats", "NodeProbeResult")
 
+    def resource_snapshot(self, channel, request):
+        validate_contract("NodeProbeInput", request)
+        return self._request(channel, request, "/v1/snapshots", "NodeResourceSnapshot")
+
+    def read_chunk(self, channel, request):
+        validate_contract("NodeChunkInput", request)
+        return self._request(channel, request, "/v1/objects/read", "NodeChunkResult")
+
     def _request(self, channel, permit, path, response_contract):
         body = json.dumps(permit, separators=(",", ":"), allow_nan=False).encode()
         if len(body) > 2 * 1024 * 1024:

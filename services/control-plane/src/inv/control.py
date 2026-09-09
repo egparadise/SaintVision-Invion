@@ -148,6 +148,13 @@ class Control:
                 ]
             }
 
+    def capacity(self, principal, project):
+        from .capacity import project_capacity
+
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.grant(conn, principal, project)
+            return project_capacity(conn, project, self.db.recovery_epoch)
+
     def events(self, principal, project, run_id, cursor=None):
         validate_contract("RunId", run_id)
         prefix = self.db.recovery_epoch + ":" + run_id + ":"

@@ -1,7 +1,7 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.8.0"
+version: "1.9.0"
 status: "baseline"
 author: "Codex"
 updated: "2026-09-10T02:42:14+09:00"
@@ -70,3 +70,5 @@ ADR-031(resource-server 인증·현재 project grant)과 ADR-032(Run별 commit �
 ADR-033(원자 permit queue·일회 전송 예약·중단 후 관찰/취소·receipt 후 종료)은 [[Codex 실행 전달 대기열과 중단 복구 계약]]을 따른다. 운영 worker 설정과 전체 업무/실장비 인수는 별도다.
 
 ADR-034(제한된 local object publication·checkpoint pin·GC 중단 복구)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. S3 제품 및 실제 운영 복원/독립 검토는 별도다.
+
+ADR-035(미검증 공지·mTLS 실측 snapshot·명시적 content 전송·독립 샤드 원자 admission)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. collective 통신/GPU 및 peer 업무 앱 연결 완료를 의미하지 않는다.

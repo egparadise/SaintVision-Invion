@@ -83,7 +83,7 @@ class SnapshotStore:
             )
         return object_id
 
-    def put_part(self, tenant, project, object_id, index, data):
+    def put_part(self, tenant, project, object_id, index, data, *, authorize=None):
         if (
             type(index) is not int
             or not 0 <= index < 4
@@ -93,6 +93,8 @@ class SnapshotStore:
             raise DomainError("VAL-0013", "Invalid upload part", 422)
         digest = hashlib.sha256(data).hexdigest()
         with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+            if authorize is not None:
+                authorize(conn)
             row = self._row(conn, project, object_id)
             if row["state"] != "uploading" or len(data) != min(
                 PART_BYTES, row["size_bytes"] - index * PART_BYTES
@@ -130,8 +132,10 @@ class SnapshotStore:
                 "parts": parts,
             }
 
-    def finalize(self, tenant, project, object_id):
+    def finalize(self, tenant, project, object_id, *, authorize=None):
         with self.provider.locked() as files, self.db.transaction(tenant) as conn:
+            if authorize is not None:
+                authorize(conn)
             row = self._row(conn, project, object_id)
             if row["state"] not in {"uploading", "ready"}:
                 raise DomainError("STORE-0005", "Object is unavailable")

@@ -49,6 +49,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE/.work/node-image"
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/inv-node" ./cmd/inv-node
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/inv-discover" ./cmd/inv-discover
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/probe" ./tests/probe
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/inv-supervisor" ./cmd/inv-supervisor
           cp tests/probe/Dockerfile "$GITHUB_WORKSPACE/.work/node-image/Dockerfile"
