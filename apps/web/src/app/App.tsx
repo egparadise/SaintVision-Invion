@@ -3,13 +3,16 @@ import { Header } from '@/shared/ui/Header';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { NodeList } from '@/features/nodes/NodeList';
 import { NodeDetail } from '@/features/nodes/NodeDetail';
+import { WorkspaceList } from '@/features/workspaces/WorkspaceList';
+import { WorkspaceCreateModal } from '@/features/workspaces/WorkspaceCreateModal';
+import { ExecutionResultView } from '@/features/workspaces/ExecutionResultView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
 import { ApprovalDetail } from '@/features/approvals/ApprovalDetail';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
-import { NodeItem, RunItem, ApprovalItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
 
 // Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -153,10 +156,74 @@ const DEMO_APPROVAL: ApprovalItem = {
   createdAt: new Date().toISOString(),
 };
 
+const INITIAL_WORKSPACES: WorkspaceItem[] = [
+  {
+    id: 'wsp_01JABCDE001',
+    projectId: 'prj_01JABCDE',
+    name: 'pacs-core-build-sandbox',
+    targetNodeId: 'nod_01JABCDEF01',
+    isolationMode: 'process_sandbox',
+    allowedPaths: ['./workspace', './data'],
+    prohibitedPaths: ['/etc', 'C:\\Windows', '..', '/var/run'],
+    cpuLimitCores: 8,
+    memoryLimitBytes: 16 * 1024 ** 3,
+    status: 'active',
+    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+  },
+  {
+    id: 'wsp_01JABCDE002',
+    projectId: 'prj_01JABCDE',
+    name: 'dataset-preprocess-container',
+    targetNodeId: 'nod_01JABCDEF04',
+    isolationMode: 'container_isolated',
+    allowedPaths: ['./dataset', './output'],
+    prohibitedPaths: ['/etc', '..', '/sys'],
+    cpuLimitCores: 8,
+    memoryLimitBytes: 32 * 1024 ** 3,
+    status: 'reclaimed',
+    createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+  },
+];
+
+const SAMPLE_EXECUTION: ExecutionResultItem = {
+  runId: 'run_01JABCDE0001',
+  workspaceId: 'wsp_01JABCDE001',
+  command: 'pytest tests/test_contracts.py -v',
+  exitCode: 0,
+  state: 'succeeded',
+  evidenceId: 'evi_01JABCDEF987654',
+  resourceReclaimed: true,
+  allowedEvents: [
+    { timestamp: '2026-09-09T18:10:01Z', action: 'READ', path: './workspace/tests/test_contracts.py' },
+    { timestamp: '2026-09-09T18:10:02Z', action: 'WRITE', path: './data/output_report.json' },
+    { timestamp: '2026-09-09T18:10:03Z', action: 'NET_LISTEN', path: '127.0.0.1:8000' },
+  ],
+  deniedEvents: [
+    {
+      timestamp: '2026-09-09T18:10:01.4Z',
+      action: 'ACCESS',
+      path: '/etc/shadow',
+      reason: 'BLOCKED: Prohibited system path access denied (ADR-005)',
+    },
+    {
+      timestamp: '2026-09-09T18:10:01.8Z',
+      action: 'TRAVERSE',
+      path: '../config/keys.json',
+      reason: 'BLOCKED: Path traversal ".." is strictly forbidden',
+    },
+  ],
+  executedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+  completedAt: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
+};
+
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [nodes, setNodes] = useState<NodeItem[]>(INITIAL_NODES);
+  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>(INITIAL_WORKSPACES);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
+  const [executionResult] = useState<ExecutionResultItem | null>(SAMPLE_EXECUTION);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
@@ -213,6 +280,7 @@ export const App: React.FC = () => {
         onSelectTab={(tab) => {
           setActiveTab(tab);
           setSelectedNodeId(null);
+          setSelectedWorkspaceId(null);
           setSelectedRunId(null);
           setEvidenceRunId(null);
         }}
@@ -305,6 +373,44 @@ export const App: React.FC = () => {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        {/* Tab 2.5: Workspaces (S03-FE) */}
+        {activeTab === 'workspaces' && (
+          <div>
+            {selectedWorkspaceId && executionResult ? (
+              <ExecutionResultView
+                result={executionResult}
+                onBack={() => setSelectedWorkspaceId(null)}
+                onViewEvidence={(evidenceId) => {
+                  setActiveTab('runs');
+                  setEvidenceRunId(evidenceId);
+                }}
+              />
+            ) : (
+              <WorkspaceList
+                workspaces={workspaces}
+                nodes={nodes}
+                onCreateWorkspace={() => setIsCreateModalOpen(true)}
+                onSelectWorkspace={(wspId) => setSelectedWorkspaceId(wspId)}
+              />
+            )}
+
+            <WorkspaceCreateModal
+              projectId="prj_01JABCDE"
+              availableNodes={nodes}
+              isOpen={isCreateModalOpen}
+              onClose={() => setIsCreateModalOpen(false)}
+              onCreate={async (newWsp) => {
+                const created: WorkspaceItem = {
+                  ...newWsp,
+                  id: `wsp_${Date.now().toString(36)}`,
+                  createdAt: new Date().toISOString(),
+                };
+                setWorkspaces((prev) => [created, ...prev]);
+              }}
+            />
           </div>
         )}
 

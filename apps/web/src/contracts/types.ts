@@ -78,8 +78,27 @@ export interface WorkspaceItem {
   projectId: string;
   name: string;
   targetNodeId: string;
-  status: 'active' | 'suspended' | 'terminating';
+  isolationMode: 'process_sandbox' | 'container_isolated';
+  allowedPaths: string[];
+  prohibitedPaths: string[];
+  cpuLimitCores: number;
+  memoryLimitBytes: number;
+  status: 'active' | 'suspended' | 'terminating' | 'reclaimed';
   createdAt: string;
+}
+
+export interface ExecutionResultItem {
+  runId: string;
+  workspaceId: string;
+  command: string;
+  exitCode: number;
+  state: RunState;
+  evidenceId: string;
+  resourceReclaimed: boolean;
+  allowedEvents: Array<{ timestamp: string; action: string; path?: string }>;
+  deniedEvents: Array<{ timestamp: string; action: string; path?: string; reason: string }>;
+  executedAt: string;
+  completedAt: string;
 }
 
 export interface ApprovalItem {
