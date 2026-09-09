@@ -413,11 +413,21 @@ def upgrade() -> None:
     _install_rls()
 
 
+#: Partitioned tables **as of this revision**. Deliberately a literal rather
+#: than saintvision.db.models.PARTITIONED_TABLES: a later revision adding a
+#: table to that constant would make this migration try to partition something
+#: that does not exist yet. A migration is pinned to the schema of its own
+#: moment.
+PARTITIONED_AT_THIS_REVISION = {
+    "resource_snapshots": "observed_at",
+    "audit_events": "occurred_at",
+}
+
+
 def _create_initial_partitions() -> None:
     """Create this month plus three, per CR-06. No DEFAULT partition."""
     from alembic import context
 
-    from saintvision.db.models import PARTITIONED_TABLES
     from saintvision.db.partitions import add_months, ensure_partitions, month_floor, partition_name
 
     now = dt.datetime.now(dt.timezone.utc)
@@ -427,7 +437,7 @@ def _create_initial_partitions() -> None:
         # months unconditionally. Against an empty schema this is the same DDL
         # the online path produces.
         start = month_floor(now)
-        for table in PARTITIONED_TABLES:
+        for table in PARTITIONED_AT_THIS_REVISION:
             for offset in range(4):
                 lower = add_months(start, offset)
                 upper = add_months(lower, 1)
@@ -437,7 +447,9 @@ def _create_initial_partitions() -> None:
                 )
         return
 
-    created = ensure_partitions(op.get_bind(), now=now, lead_months=3)
+    created = ensure_partitions(
+        op.get_bind(), now=now, lead_months=3, tables=PARTITIONED_AT_THIS_REVISION
+    )
     if not created:  # pragma: no cover - initial migration always creates some
         raise RuntimeError("no partitions were created for the partitioned tables")
 
