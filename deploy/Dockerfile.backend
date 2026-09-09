@@ -1,0 +1,29 @@
+﻿# SaintVision Control Plane Gateway Backend Container
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system utilities
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python backend dependencies
+COPY requirements-backend.txt .
+RUN pip install --no-cache-dir -r requirements-backend.txt
+
+# Copy application source and database configuration
+COPY pyproject.toml .
+COPY alembic.ini .
+COPY migrations/ migrations/
+COPY src/ src/
+COPY tools/ tools/
+
+ENV PYTHONPATH=/app/src
+ENV PORT=8080
+
+EXPOSE 8080
+
+# Run mock control plane gateway or production app
+CMD ["python", "tools/mock_control_plane.py"]

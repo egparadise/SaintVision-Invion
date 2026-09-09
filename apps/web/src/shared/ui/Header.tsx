@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 
 export interface HeaderProps {
@@ -18,6 +18,39 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   onSelectTab,
 }) => {
+  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
+    online: true,
+    rttMs: 8,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkGateway = async () => {
+      const start = performance.now();
+      try {
+        const res = await fetch('/v1/health');
+        const rtt = Math.round(performance.now() - start);
+        if (isMounted) {
+          if (res.ok) {
+            setGatewayStatus({ online: true, rttMs: rtt });
+          } else {
+            setGatewayStatus({ online: false, rttMs: null });
+          }
+        }
+      } catch {
+        if (isMounted) {
+          setGatewayStatus({ online: false, rttMs: null });
+        }
+      }
+    };
+    checkGateway();
+    const interval = setInterval(checkGateway, 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   const tabs = [
     { id: 'dashboard', label: '클러스터 개요' },
     { id: 'nodes', label: 'Nodes 인벤토리' },
@@ -117,6 +150,32 @@ export const Header: React.FC<HeaderProps> = ({
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
             클러스터: <strong>{onlineNodesCount}/{totalNodesCount}</strong> Node 가동 중
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.8125rem',
+            padding: '4px 10px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            borderRadius: 'var(--radius-md)',
+          }}
+          title="Control Plane Gateway 실시간 RTT 지연시간"
+        >
+          <span
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: gatewayStatus.online ? 'var(--color-status-online)' : '#f85149',
+              display: 'inline-block',
+            }}
+          />
+          <span style={{ color: 'var(--color-text-secondary)' }}>
+            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: '#f85149' }}>Offline</strong>}
           </span>
         </div>
 
