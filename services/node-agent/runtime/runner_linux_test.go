@@ -275,3 +275,35 @@ func TestCorruptReceiptCannotBeReplayed(t *testing.T) {
 		t.Fatal("foreign receipt replayed")
 	}
 }
+
+func TestObservationNeverCreatesAnUnseenCommand(t *testing.T) {
+	c, p, k := fixture(t)
+	j := journalFor(t, c)
+	engine := &fakeEngine{}
+	r := New(c, j, engine)
+	if result, err := r.Observe(context.Background(), signed(t, p, k)); err == nil || result.Receipt != nil || engine.creates != 0 {
+		t.Fatal("observation created execution")
+	}
+}
+func TestPeerPolicyFloorSurvivesRestart(t *testing.T) {
+	c, _, _ := fixture(t)
+	j := journalFor(t, c)
+	if err := j.PinPeerPolicy(1, strings.Repeat("a", 64)); err != nil {
+		t.Fatal(err)
+	}
+	if err := j.PinPeerPolicy(2, strings.Repeat("b", 64)); err != nil {
+		t.Fatal(err)
+	}
+	_ = j.Close()
+	next, err := OpenJournal(j.root, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	if next.PinPeerPolicy(1, strings.Repeat("a", 64)) == nil || next.PinPeerPolicy(2, strings.Repeat("c", 64)) == nil {
+		t.Fatal("policy floor reset after restart")
+	}
+	if next.PinPeerPolicy(2, strings.Repeat("b", 64)) != nil || next.PinPeerPolicy(3, strings.Repeat("c", 64)) != nil {
+		t.Fatal("forward policy update failed")
+	}
+}

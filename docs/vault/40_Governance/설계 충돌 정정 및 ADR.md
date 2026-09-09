@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.4.0"
+version: "1.5.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T00:50:04+09:00"
+updated: "2026-09-10T01:49:58+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -62,3 +62,5 @@ ADR-024(승인 내용 고정·distinct actor·nonce 원자 소비·dispatch/outb
 ADR-025(일회 실행 허가·불확실한 실행의 자동 재시도 금지), ADR-026(고정 Sandbox launch 계약)은 [[Codex ToolGateway 실행 허가와 Sandbox 계약]]을 따른다. OS 격리 driver·실장비 검증·교차 검토는 별도다.
 
 ADR-027(서명된 Node permit·durable inbox·allocation high-water), ADR-028(독립 PID 1 deadline·삭제 확인 뒤 정지 영수증)의 계약은 [[Codex Node 실행 격리와 정지 영수증 계약]]이다. Linux 합성 컨테이너 검증과 운영 실장비/transport 검증을 구별한다.
+
+ADR-029(mTLS peer 검증·기존 실행 observation) 및 ADR-030(인증서 CAS/폐기·영수증 commit 시 현재 권한)은 [[Codex Node mTLS 전달과 인증서 권한 계약]]을 따른다. 실제 운영 PKI/IdP·전체 등록/Heartbeat API 및 실장비 승인은 별도다.

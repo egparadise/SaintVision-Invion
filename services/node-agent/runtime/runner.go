@@ -203,3 +203,33 @@ func (r *Runner) finish(record Record, state State, why string) (Result, error) 
 	return Result{Receipt: &receipt}, nil
 
 }
+
+// Observe never creates or starts a container, including when the permit is fresh.
+// It can return a durable receipt or reconcile a prior ambiguous intent.
+func (r *Runner) Observe(ctx context.Context, envelope []byte) (Result, error) {
+	permit, err := Verify(envelope, r.config)
+	if err != nil {
+		return Result{}, err
+	}
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if ctx.Err() != nil {
+		return Result{}, errors.New("NODE-0016: observation cancelled")
+	}
+	prior, receipt, err := r.journal.Get(string(permit.Data.Claim.CommandId))
+	if err != nil {
+		return Result{}, err
+	}
+	if prior == nil {
+		return Result{}, errors.New("NODE-0017: no durable execution intent")
+	}
+	if prior.Hash != permit.Hash {
+		return Result{}, errors.New("NODE-0015: command content differs")
+	}
+	if receipt != nil {
+		return Result{Duplicate: true, Receipt: receipt}, nil
+	}
+	result, err := r.reconcile(*prior, "recovered")
+	result.Duplicate = true
+	return result, err
+}

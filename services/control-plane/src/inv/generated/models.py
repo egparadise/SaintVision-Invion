@@ -546,6 +546,31 @@ class NodeStopReceipt(BaseModel):
     allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
 
 
+class NodeExecutionResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duplicate: bool
+    receipt: NodeStopReceipt
+    cleanupPending: Literal[False]
+
+
+class ClientFingerprint(RootModel[constr(pattern=r'^[0-9a-f]{64}$')]):
+    root: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodePeerPolicy(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    version: conint(ge=1, le=9007199254740991)
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    expiresAt: Timestamp
+    clientFingerprints: list[ClientFingerprint] = Field(..., max_length=2)
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -575,6 +600,8 @@ class INVCore(
         | NodeExecutionPermit
         | SignedNodePermit
         | NodeStopReceipt
+        | NodeExecutionResult
+        | NodePeerPolicy
     ]
 ):
     root: (
@@ -605,4 +632,6 @@ class INVCore(
         | NodeExecutionPermit
         | SignedNodePermit
         | NodeStopReceipt
+        | NodeExecutionResult
+        | NodePeerPolicy
     ) = Field(..., title='INVCore')

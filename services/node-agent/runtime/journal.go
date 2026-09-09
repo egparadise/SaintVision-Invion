@@ -208,3 +208,57 @@ func (j *Journal) Pending() ([]Record, error) {
 	}
 	return result, nil
 }
+
+// PinPeerPolicy persists an anti-rollback floor separately from allocation fences.
+// Caller serializes policy updates; the journal process lock prevents other writers.
+func (j *Journal) PinPeerPolicy(version int64, hash string) error {
+	if version < 1 || version > 9007199254740991 || !hexID.MatchString(hash) {
+		return errors.New("NODE-0041: invalid peer policy floor")
+	}
+	path := filepath.Join(j.root, ".peer-policy")
+	var prior struct {
+		Version int64
+		Hash    string
+	}
+	next := struct {
+		Version int64
+		Hash    string
+	}{version, hash}
+	err := readPrivate(path, &prior)
+	if os.IsNotExist(err) {
+		return j.create(path, next)
+	}
+	if err != nil {
+		return errors.New("NODE-0041: peer policy journal unavailable")
+	}
+	if prior.Version < 1 || !hexID.MatchString(prior.Hash) {
+		return errors.New("NODE-0041: corrupt peer policy floor")
+	}
+	if version < prior.Version || (version == prior.Version && hash != prior.Hash) {
+		return errors.New("NODE-0041: peer policy rollback rejected")
+	}
+	if next == prior {
+		return nil
+	}
+	file, err := os.CreateTemp(j.root, ".peer-policy-")
+	if err != nil {
+		return err
+	}
+	raw, _ := json.Marshal(next)
+	_, err = file.Write(raw)
+	if err == nil {
+		err = file.Sync()
+	}
+	name := file.Name()
+	closeErr := file.Close()
+	if err == nil {
+		err = closeErr
+	}
+	if err == nil {
+		err = os.Rename(name, path)
+	}
+	if err == nil {
+		err = j.syncDir()
+	}
+	return err
+}

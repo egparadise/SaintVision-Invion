@@ -313,3 +313,18 @@ type NodeStopReceipt struct {
     FinishedAt Timestamp `json:"finishedAt"`
     Allocations []NodeAllocation `json:"allocations"`
 }
+
+type NodeExecutionResult struct {
+    Duplicate bool `json:"duplicate"`
+    Receipt NodeStopReceipt `json:"receipt"`
+    CleanupPending bool `json:"cleanupPending"`
+}
+
+type NodePeerPolicy struct {
+    Version int64 `json:"version"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+    ClientFingerprints []string `json:"clientFingerprints"`
+}

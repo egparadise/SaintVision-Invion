@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T01:16:02+09:00"
+updated: "2026-09-10T01:56:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -56,3 +56,13 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S10-GEMINI-001 | Codex / Claude | S10-FE 모델 계보 역추적 뷰, Multi-LLM 어댑터 적합성(100%), 게이트 배포, vitest 59건 검증 | S10-FE 승인 판정 및 S10-BE MLflow/어댑터 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정]] |
 
 - Codex node-runtime: [[2026-09-10_01-16-02_KST_NODE-RUNTIME_Codex_검증보고]]. 구현 `98d02be`, 실제 Linux Docker/PostgreSQL 포함 Python 194 tests 및 Go 37 leaf case 통과. 독립 검토·mTLS/Windows/GPU/실장비 및 S03 전체는 pending.
+
+## Node transport 작업 중 추가 수신 제안
+
+아래 행은 외부 저자의 미검증 주장과 인계 요청을 보존한다. SLO·WCAG·롤백 실측 또는 배포 게이트 승인을 의미하지 않는다. [[외부 인계 제안 수신과 정본 동기화 복구]]의 검증 한계를 따른다.
+
+| 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
+|---|---|---|---|---|
+| HO-S11-GEMINI-001 | Codex / Claude | S11-FE 배포 후보 관리, 7대 SLO 실측치 충족, WCAG 2.1 AA 접근성(11.4:1), 1클릭 롤백, vitest 64건 검증 | S11-FE 승인 판정 및 프로덕션 릴리스 게이트 통과 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-00-00_KST_S11-FE_Gemini_접근성_시각회귀_배포후보_개발과정]] |
+
+- Codex node-transport: [[2026-09-10_01-56-38_KST_NODE-TRANSPORT_Codex_검증보고]]. 구현 `59baad9`, 실제 Python mTLS→Go→Docker/PostgreSQL 포함 Python 237 tests 및 Go 55 leaf case 통과. 인증서 교체/폐기·관찰 복구·channel CAS와 반환 경계 구현. 독립 검토·운영 PKI/IdP/업무 API/장비 및 S02/S03 전체는 pending.
