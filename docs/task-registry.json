@@ -132,7 +132,7 @@
       "area": "Backend",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -159,7 +159,7 @@
       "area": "DB",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -186,7 +186,7 @@
       "area": "Storage",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"

@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+pythonpath = ["services/control-plane/src"]
+testpaths = ["tests/core", "tests/integration"]
+addopts = "-ra"
+markers = ["postgres: requires an isolated PostgreSQL database"]

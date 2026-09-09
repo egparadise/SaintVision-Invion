@@ -302,7 +302,7 @@ res:OUT-12 a dev:ProductOutcome ;
 
 res:S01-BE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "in_progress" ;
     dev:ownedBy res:agent-Codex ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Claude ;
@@ -314,7 +314,7 @@ res:S01-BE a dev:DevelopmentTask ;
 
 res:S01-DB a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "in_progress" ;
     dev:ownedBy res:agent-Codex ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Claude ;
@@ -338,7 +338,7 @@ res:S01-FE a dev:DevelopmentTask ;
 
 res:S01-ST a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "in_progress" ;
     dev:ownedBy res:agent-Codex ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Claude ;

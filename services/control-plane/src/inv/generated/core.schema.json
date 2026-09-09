@@ -1,0 +1,877 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://saintvision.ai/contracts/v1alpha1/core.schema.json",
+  "title": "INVCore",
+  "$defs": {
+    "NodeId": {
+      "type": "string",
+      "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "ProjectId": {
+      "type": "string",
+      "pattern": "^prj_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "WorkspaceId": {
+      "type": "string",
+      "pattern": "^wsp_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "RunId": {
+      "type": "string",
+      "pattern": "^run_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "ResourceId": {
+      "type": "string",
+      "pattern": "^res_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "LeaseId": {
+      "type": "string",
+      "pattern": "^lse_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "EvidenceId": {
+      "type": "string",
+      "pattern": "^evd_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "WorkloadId": {
+      "type": "string",
+      "pattern": "^wld_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "TenantId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "TraceId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "RunState": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "validated",
+        "planned",
+        "awaiting_approval",
+        "scheduled",
+        "running",
+        "verifying",
+        "recovering",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "RiskLevel": {
+      "type": "string",
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3"
+      ]
+    },
+    "NodeRegistration": {
+      "type": "object",
+      "properties": {
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "hostname": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "osFamily": {
+          "type": "string",
+          "enum": [
+            "windows",
+            "linux"
+          ]
+        },
+        "architecture": {
+          "type": "string",
+          "enum": [
+            "amd64",
+            "arm64"
+          ]
+        },
+        "agentVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "csrPem": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "nodeId",
+        "tenantId",
+        "hostname",
+        "osFamily",
+        "architecture",
+        "agentVersion",
+        "csrPem"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceRequest": {
+      "type": "object",
+      "properties": {
+        "cpuMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "gpuCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "minVramBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "cpuMillis",
+        "memoryBytes",
+        "gpuCount",
+        "minVramBytes"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceOffer": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "cpu",
+            "memory",
+            "gpu",
+            "storage",
+            "network"
+          ]
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offered": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "resourceId",
+        "kind",
+        "capacity",
+        "offered"
+      ],
+      "additionalProperties": false
+    },
+    "Heartbeat": {
+      "type": "object",
+      "properties": {
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "online",
+            "draining",
+            "quarantined"
+          ]
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResourceOffer"
+          }
+        }
+      },
+      "required": [
+        "nodeId",
+        "observedAt",
+        "sequence",
+        "status",
+        "resources"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceSnapshot": {
+      "type": "object",
+      "properties": {
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResourceOffer"
+          }
+        }
+      },
+      "required": [
+        "snapshotId",
+        "observedAt",
+        "nodeId",
+        "resources"
+      ],
+      "additionalProperties": false
+    },
+    "WorkloadSpec": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "inv.saintvision.ai/v1alpha1"
+        },
+        "kind": {
+          "type": "string",
+          "const": "Workload"
+        },
+        "workloadId": {
+          "$ref": "#/$defs/WorkloadId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceRequest"
+        },
+        "imageDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "apiVersion",
+        "kind",
+        "workloadId",
+        "tenantId",
+        "projectId",
+        "workspaceId",
+        "resources",
+        "imageDigest",
+        "command",
+        "timeoutSeconds"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceLease": {
+      "type": "object",
+      "properties": {
+        "leaseId": {
+          "$ref": "#/$defs/LeaseId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "fencingToken": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[1-9][0-9]*$"
+        },
+        "grantedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "leaseId",
+        "tenantId",
+        "runId",
+        "resourceId",
+        "amount",
+        "fencingToken",
+        "grantedAt",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "PolicyDecision": {
+      "type": "object",
+      "properties": {
+        "decisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "deny",
+            "require_approval"
+          ]
+        },
+        "riskLevel": {
+          "$ref": "#/$defs/RiskLevel"
+        },
+        "actionDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "requiredApprovals": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "approvedBy": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "decisionId",
+        "tenantId",
+        "projectId",
+        "subjectId",
+        "effect",
+        "riskLevel",
+        "actionDigest",
+        "expiresAt",
+        "requiredApprovals",
+        "approvedBy"
+      ],
+      "additionalProperties": false
+    },
+    "EvidenceEnvelope": {
+      "type": "object",
+      "properties": {
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "traceId": {
+          "$ref": "#/$defs/TraceId"
+        },
+        "timestamp": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policyDecisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "outputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "succeeded",
+            "failed",
+            "denied"
+          ]
+        }
+      },
+      "required": [
+        "evidenceId",
+        "tenantId",
+        "runId",
+        "traceId",
+        "timestamp",
+        "actorId",
+        "action",
+        "policyDecisionId",
+        "inputSha256",
+        "outputSha256",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "RunRecord": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "workloadId": {
+          "$ref": "#/$defs/WorkloadId"
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contractVersion": {
+          "type": "string",
+          "const": "v1alpha1"
+        },
+        "contextHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "runId",
+        "tenantId",
+        "workloadId",
+        "state",
+        "version",
+        "attempt",
+        "policyVersion",
+        "contractVersion",
+        "contextHash"
+      ],
+      "additionalProperties": false
+    },
+    "StepResult": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceId"
+          }
+        }
+      },
+      "required": [
+        "runId",
+        "stepId",
+        "status",
+        "exitCode",
+        "evidenceIds"
+      ],
+      "additionalProperties": false
+    },
+    "IntentSpec": {
+      "type": "object",
+      "properties": {
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missingFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requestedRisk": {
+          "$ref": "#/$defs/RiskLevel"
+        }
+      },
+      "required": [
+        "objective",
+        "missingFields",
+        "requestedRisk"
+      ],
+      "additionalProperties": false
+    },
+    "ContextItem": {
+      "type": "object",
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "redactedContent": {
+          "type": "string"
+        },
+        "validUntil": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "sourceId",
+        "version",
+        "contentHash",
+        "redactedContent",
+        "validUntil"
+      ],
+      "additionalProperties": false
+    },
+    "ContextBundle": {
+      "type": "object",
+      "properties": {
+        "contextId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContextItem"
+          }
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tokenCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "contextId",
+        "tenantId",
+        "projectId",
+        "items",
+        "contentHash",
+        "tokenCount"
+      ],
+      "additionalProperties": false
+    },
+    "ToolManifest": {
+      "type": "object",
+      "properties": {
+        "toolId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "riskLevel": {
+          "$ref": "#/$defs/RiskLevel"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "idempotent": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "toolId",
+        "version",
+        "requiredScope",
+        "riskLevel",
+        "timeoutSeconds",
+        "idempotent"
+      ],
+      "additionalProperties": false
+    },
+    "GraphStep": {
+      "type": "object",
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "toolId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "stepId",
+        "toolId",
+        "dependsOn"
+      ],
+      "additionalProperties": false
+    },
+    "RunGraphSpec": {
+      "type": "object",
+      "properties": {
+        "graphId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GraphStep"
+          },
+          "minItems": 1
+        },
+        "retryBudget": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxWallTimeSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "graphId",
+        "version",
+        "steps",
+        "retryBudget",
+        "maxWallTimeSeconds"
+      ],
+      "additionalProperties": false
+    },
+    "AgentRunSpec": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowedTools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "graphRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxWallTimeSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "retryBudget": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "runId",
+        "tenantId",
+        "projectId",
+        "workspaceId",
+        "objective",
+        "allowedTools",
+        "graphRef",
+        "maxWallTimeSeconds",
+        "retryBudget"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/NodeRegistration"
+    },
+    {
+      "$ref": "#/$defs/ResourceRequest"
+    },
+    {
+      "$ref": "#/$defs/ResourceOffer"
+    },
+    {
+      "$ref": "#/$defs/Heartbeat"
+    },
+    {
+      "$ref": "#/$defs/ResourceSnapshot"
+    },
+    {
+      "$ref": "#/$defs/WorkloadSpec"
+    },
+    {
+      "$ref": "#/$defs/ResourceLease"
+    },
+    {
+      "$ref": "#/$defs/PolicyDecision"
+    },
+    {
+      "$ref": "#/$defs/EvidenceEnvelope"
+    },
+    {
+      "$ref": "#/$defs/RunRecord"
+    },
+    {
+      "$ref": "#/$defs/StepResult"
+    },
+    {
+      "$ref": "#/$defs/IntentSpec"
+    },
+    {
+      "$ref": "#/$defs/ContextItem"
+    },
+    {
+      "$ref": "#/$defs/ContextBundle"
+    },
+    {
+      "$ref": "#/$defs/ToolManifest"
+    },
+    {
+      "$ref": "#/$defs/GraphStep"
+    },
+    {
+      "$ref": "#/$defs/RunGraphSpec"
+    },
+    {
+      "$ref": "#/$defs/AgentRunSpec"
+    }
+  ]
+}
