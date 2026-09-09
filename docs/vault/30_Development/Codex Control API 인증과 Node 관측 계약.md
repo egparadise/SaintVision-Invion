@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTROL-INTEGRATION-CONTRACT-001"
 title: "Codex Control API 인증과 Node 관측 계약"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T02:16:46+09:00"
+updated: "2026-09-10T02:26:01+09:00"
 source_of_truth: "Git"
 ---
 
@@ -37,3 +37,9 @@ Node /v1/heartbeats는 기존 mTLS의 현재 CP 허용 정책 아래 난수 nonc
 Claude: 검증 identity와 기존 OIDC placeholder/등록 inventory를 연결하되 certificateFingerprint 입력을 key 소유 증거로 승격하지 않는다. 현재 inv 스키마와 Claude 별도 SQLAlchemy 모델의 ID·상태·epoch/량 단위 변환은 명시적 migration/adapter 검토가 필요하다. Gemini: JWT/local UI persona·SSE·취소 releasePending을 실제 API에 연결하고 시뮬레이션 성공을 운영 Evidence로 표시하지 않는다. 교차 검토 pending.
 
 공식 근거: [RFC 9068 access-token validation](https://www.rfc-editor.org/rfc/rfc9068.html), [PyJWT API](https://pyjwt.readthedocs.io/en/stable/api.html). PyJWT 2.13.0을 명시적으로 고정했다.
+
+## 오류 및 요청 상관관계 계약
+
+ProblemDetails 정본 Schema와 Python/TS/Go 생성물을 추가했다. 모든 오류는 code/category/retryable/traceId/causeRef/evidenceId 및 RFC 형태의 type/title/status/detail을 갖는다. 실제 원인·Evidence 참조가 없으면 null로 두며 추측 ID를 발급하지 않는다. traceId는 업무 ID와 별개다. 지원하는 version 00 traceparent의 정상 trace ID는 유지하고 server span ID는 새로 발급한다. 0 ID·중복·잘못된 길이·지원하지 않는 version은 새 trace로 대체하고 외부 문자열을 반사하지 않는다. unknown flags는 sampled bit만 보존한다. 오류·성공·capacity 초과 응답에 같은 trace 헤더를 넣는다. 이 상관관계 헤더는 인증·Evidence 권한이 아니며 OTel span 수집기 설치 완료를 의미하지 않는다.
+
+기준: [W3C Trace Context](https://www.w3.org/TR/trace-context/). 입력은 process당 64개 동시 요청·32KiB headers·64KiB body·5초 수신 기한으로 제한한다. 공개 ingress의 배포별 제한은 별도 설정이다.

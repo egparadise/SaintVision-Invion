@@ -16,17 +16,22 @@ from .control import Control
 from .db import Database
 from .errors import DomainError
 from .identity import AccessTokens, strict_object, trusted_file
+from .tracing import request_trace, nonzero_id
 
 
-def problem(error):
+def problem(error, trace_id=None):
     return JSONResponse(
         {
             "type": "about:blank",
             "title": "Request rejected",
             "status": error.status,
             "code": error.code,
+            "category": error.code.split("-", 1)[0],
             "detail": error.detail,
             "retryable": error.retryable,
+            "traceId": trace_id or nonzero_id(16),
+            "causeRef": None,
+            "evidenceId": None,
         },
         status_code=error.status,
         headers={
@@ -45,12 +50,33 @@ class Boundary:
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
+        trace_id, parent = request_trace(scope["headers"])
+        scope.setdefault("state", {})["trace_id"] = trace_id
+
+        async def traced_send(message):
+            if message["type"] == "http.response.start":
+                headers = message.setdefault("headers", [])
+                headers[:] = [
+                    (k, v)
+                    for k, v in headers
+                    if k
+                    not in {b"traceparent", b"cache-control", b"x-content-type-options"}
+                ]
+                headers.extend(
+                    [
+                        (b"traceparent", parent.encode("ascii")),
+                        (b"cache-control", b"no-store"),
+                        (b"x-content-type-options", b"nosniff"),
+                    ]
+                )
+            await send(message)
+
         if not self.slots.acquire(blocking=False):
             return await problem(
-                DomainError("RES-0007", "Request capacity reached", 429)
-            )(scope, receive, send)
+                DomainError("RES-0007", "Request capacity reached", 429), trace_id
+            )(scope, receive, traced_send)
         try:
-            return await self.handle(scope, receive, send)
+            return await self.handle(scope, receive, traced_send)
         finally:
             self.slots.release()
 
@@ -63,12 +89,6 @@ class Boundary:
             nonlocal started
             if message["type"] == "http.response.start":
                 started = True
-                message.setdefault("headers", []).extend(
-                    [
-                        (b"cache-control", b"no-store"),
-                        (b"x-content-type-options", b"nosniff"),
-                    ]
-                )
             await send(message)
 
         try:
@@ -145,7 +165,7 @@ class Boundary:
                 return  # No internal diagnostics after streaming has begun.
             if not isinstance(error, DomainError):
                 error = DomainError("SYS-0001", "Service temporarily unavailable", 503)
-            await problem(error)(scope, receive, send)
+            await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
 def create_app(database=None, tokens=None, *, allowed_origins=()):
@@ -160,16 +180,19 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 
     @api.exception_handler(DomainError)
     async def domain_error(request, error):
-        return problem(error)
+        return problem(error, request.state.trace_id)
 
     @api.exception_handler(RequestValidationError)
     async def invalid(request, error):
-        return problem(DomainError("VAL-0003", "Invalid request", 422))
+        return problem(
+            DomainError("VAL-0003", "Invalid request", 422), request.state.trace_id
+        )
 
     @api.exception_handler(HTTPException)
     async def http_error(request, error):
         return problem(
-            DomainError("HTTP-0001", "Request unavailable", error.status_code)
+            DomainError("HTTP-0001", "Request unavailable", error.status_code),
+            request.state.trace_id,
         )
 
     def authenticated(request: Request):

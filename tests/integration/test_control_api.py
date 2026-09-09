@@ -274,3 +274,4 @@ def test_error_response_never_contains_database_diagnostics(api, monkeypatch):
         and "secret" not in r.text
         and r.headers["content-type"].startswith("application/problem+json")
     )
+    assert r.json()["traceId"] == r.headers["traceparent"].split("-")[1]

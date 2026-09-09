@@ -1447,6 +1447,78 @@
         "observedAt"
       ],
       "additionalProperties": false
+    },
+    "ProblemDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "about:blank"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "status": {
+          "type": "integer",
+          "minimum": 400,
+          "maximum": 599
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]{4}$"
+        },
+        "category": {
+          "type": "string",
+          "pattern": "^[A-Z]+$"
+        },
+        "detail": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "traceId": {
+          "$ref": "#/$defs/TraceId"
+        },
+        "causeRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "category",
+        "detail",
+        "retryable",
+        "traceId",
+        "causeRef",
+        "evidenceId"
+      ]
     }
   },
   "oneOf": [

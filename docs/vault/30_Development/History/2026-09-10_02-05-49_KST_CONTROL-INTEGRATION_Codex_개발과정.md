@@ -23,3 +23,7 @@ scope: 공개 API의 검증된 identity·프로젝트 grant·승인 vote/취소�
 ## 2026-09-10T02:16:46+09:00 구현과 로컬 검증
 
 Python 138 passed / 136 skipped exit 0; JWT 신규 24건 포함. Windows Go test ./... exit 0 및 Linux cross-build exit 0. 신규 Run cancel/approval/SSE/PostgreSQL 7건, 실제 mTLS Node 관측·취소 6건과 Go 동시 cancel 2건은 CI에서 실행한다. [[Codex Control API 인증과 Node 관측 계약]]과 ADR-INDEX v1.6.0을 기록했다.
+
+## 2026-09-10T02:26:01+09:00 오류 계약 및 재검증
+
+수정 3ab41c8의 Core #34382252138, Documentation #34382252127 success. 최초 #34381950400의 Python 결과는 273 passed/1 failed였고 heartbeat 전용 fixture에 없는 command를 참조한 테스트 오류를 수정했다. 이후 오류 계약 검토에서 ProblemDetails 필드와 traceparent 전파가 빠져 있음을 확인해 추가했다. 새로운 Schema는 nullable causeRef/evidenceId의 TS/Go 타입을 명시하며 생성 drift 검사를 유지한다. 단위 인증·HTTP 경계 33 passed, Windows Go test ./... exit 0. 후속 SHA의 전체 CI 검증을 별도로 수행한다.

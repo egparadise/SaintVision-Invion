@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from inv.app import create_app
 from inv.errors import DomainError
 from inv.identity import public_subject
+from inv.contracts import validate_contract
 from jwt_support import jwt_fixture
 
 
@@ -121,3 +122,56 @@ def test_http_boundary_rejects_unconfigured_identity_oversize_and_ambiguous_json
         ).status_code
         == 403
     )
+
+
+@pytest.mark.parametrize("path", ["/v1/projects", "/missing", "/healthz"])
+def test_response_trace_retains_correlation_but_uses_new_server_span(path):
+    parent = "00-1234567890abcdef1234567890abcdef-1234567890abcdef-03"
+    client = TestClient(create_app(), raise_server_exceptions=False)
+    response = client.get(path, headers={"traceparent": parent})
+    version, trace, span, flags = response.headers["traceparent"].split("-")
+    assert version == "00" and trace == parent.split("-")[1] and flags == "01"
+    assert len(span) == 16 and int(span, 16) and span != parent.split("-")[2]
+    if response.status_code >= 400:
+        data = response.json()
+        validate_contract("ProblemDetails", data)
+        assert (
+            data["traceId"] == trace and data["category"] == data["code"].split("-")[0]
+        )
+        assert data["causeRef"] is None and data["evidenceId"] is None
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize(
+    "parent",
+    [
+        "00-" + "0" * 32 + "-1234567890abcdef-01",
+        "00-1234567890abcdef1234567890abcdef-" + "0" * 16 + "-01",
+        "00-1234567890abcdef1234567890abcdef-1234567890abcdef-01-secret",
+        "ff-1234567890abcdef1234567890abcdef-1234567890abcdef-01",
+        "secret-credential-reference",
+    ],
+)
+def test_invalid_trace_context_is_replaced_without_echo(parent):
+    client = TestClient(create_app(), raise_server_exceptions=False)
+    response = client.get("/v1/projects", headers={"traceparent": parent})
+    validate_contract("ProblemDetails", response.json())
+    trace = response.headers["traceparent"].split("-")[1]
+    assert int(trace, 16) and response.json()["traceId"] == trace
+    assert trace != "1234567890abcdef1234567890abcdef"
+    assert (
+        "secret" not in response.text
+        and "secret" not in response.headers["traceparent"]
+    )
+
+
+def test_duplicate_trace_headers_are_not_joined_or_used_as_authority():
+    client = TestClient(create_app(), raise_server_exceptions=False)
+    parent = "00-1234567890abcdef1234567890abcdef-1234567890abcdef-01"
+    response = client.get(
+        "/v1/projects", headers=[("traceparent", parent), ("traceparent", parent)]
+    )
+    assert (
+        response.status_code == 503
+    )  # Trace cannot configure or authenticate identity.
+    assert response.json()["traceId"] != parent.split("-")[1]

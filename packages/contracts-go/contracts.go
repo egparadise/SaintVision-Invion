@@ -348,3 +348,16 @@ type NodeProbeResult struct {
     ProfileVersion string `json:"profileVersion"`
     ObservedAt Timestamp `json:"observedAt"`
 }
+
+type ProblemDetails struct {
+    Type string `json:"type"`
+    Title string `json:"title"`
+    Status int64 `json:"status"`
+    Code string `json:"code"`
+    Category string `json:"category"`
+    Detail string `json:"detail"`
+    Retryable bool `json:"retryable"`
+    TraceId TraceId `json:"traceId"`
+    CauseRef *string `json:"causeRef"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}

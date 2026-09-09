@@ -603,6 +603,22 @@ class NodeProbeResult(BaseModel):
     observedAt: Timestamp
 
 
+class ProblemDetails(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['about:blank']
+    title: constr(min_length=1, max_length=200)
+    status: conint(ge=400, le=599)
+    code: constr(pattern=r'^[A-Z]+-[0-9]{4}$')
+    category: constr(pattern=r'^[A-Z]+$')
+    detail: constr(max_length=1000)
+    retryable: bool
+    traceId: TraceId
+    causeRef: constr(min_length=1, max_length=200) | None
+    evidenceId: EvidenceId | None
+
+
 class INVCore(
     RootModel[
         NodeRegistration
