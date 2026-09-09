@@ -96,6 +96,21 @@ def postgres():
                     sql.Identifier(role)
                 )
             )
+            conn.execute(
+                sql.SQL(
+                    "REVOKE INSERT,UPDATE,DELETE ON inv.project_grants FROM {}"
+                ).format(sql.Identifier(role))
+            )
+            conn.execute(
+                sql.SQL(
+                    "GRANT UPDATE(lock_sentinel) ON inv.project_grants TO {}"
+                ).format(sql.Identifier(role))
+            )
+            conn.execute(
+                sql.SQL(
+                    "REVOKE UPDATE,DELETE ON inv.approval_votes,inv.approval_dispatches,inv.approval_audit FROM {}"
+                ).format(sql.Identifier(role))
+            )
         yield SimpleNamespace(owner=owner, runtime=runtime)
     finally:
         # Only the unique name created above is eligible for teardown.

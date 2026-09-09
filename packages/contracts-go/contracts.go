@@ -194,3 +194,48 @@ type AgentRunSpec struct {
     MaxWallTimeSeconds int64 `json:"maxWallTimeSeconds"`
     RetryBudget int64 `json:"retryBudget"`
 }
+
+type ApprovalId string
+
+type CommandId string
+
+type ApprovalNonce string
+
+type ActionDigest string
+
+type ApprovalChallenge struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    Nonce ApprovalNonce `json:"nonce"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+}
+
+type ApprovalDecisionInput struct {
+    Decision string `json:"decision"`
+    Nonce ApprovalNonce `json:"nonce"`
+    ActionDigest ActionDigest `json:"actionDigest"`
+}
+
+type ApprovalView struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    RunId RunId `json:"runId"`
+    ProjectId ProjectId `json:"projectId"`
+    RequesterId string `json:"requesterId"`
+    ActionDigest ActionDigest `json:"actionDigest"`
+    PolicyVersion string `json:"policyVersion"`
+    RequiredApprovals int64 `json:"requiredApprovals"`
+    Status string `json:"status"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+    RunVersion int64 `json:"runVersion"`
+}
+
+type AuthorizedCommand struct {
+    CommandId CommandId `json:"commandId"`
+    ApprovalId ApprovalId `json:"approvalId"`
+    RunId RunId `json:"runId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    ActionDigest ActionDigest `json:"actionDigest"`
+    PolicyVersion string `json:"policyVersion"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ExpiresAt Timestamp `json:"expiresAt"`
+}

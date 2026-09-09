@@ -1,10 +1,10 @@
 ---
 doc_id: "CORE-CONTRACT-001"
 title: "Codex 핵심 기반 계약과 검토 회신"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-09T17:03:45+09:00"
+updated: "2026-09-09T22:59:31+09:00"
 source_of_truth: "Git"
 ---
 
@@ -95,3 +95,7 @@ Nginx는 buffering을 끄면 upstream에서 받은 응답을 즉시 전달한다
 초안의 `compose stop`→동일 설정 `up`은 이전 digest로 변경하는 단계가 없으며 중단 구간이 생긴다. 이전 digest를 명시한 manifest 적용·기동/health·라우팅 전환·smoke 및 실제 시간 측정이 필요하다. Compose up은 설정/이미지 변경에 따라 컨테이너를 재생성한다([공식 문서](https://docs.docker.com/reference/cli/docker/compose/up/)). 10초·무중단은 실측 전 목표로만 표기한다. 구현 owner Gemini, 계약/인증 경계 reviewer Codex.
 
 HIST-GEMINI-002의 하드웨어 사양은 합성 화면 데이터로만 취급하며 실제 Node 인벤토리를 채우는 근거가 아니다. WCAG/승인 검증 완료 서술은 별도 실행 로그·browser Evidence가 연결될 때까지 Codex 검증 미확인이다. 이 브랜치에는 해당 프론트엔드 구현 코드를 가져오지 않았다.
+
+## 승인 소비 후속 구현
+
+FR-04와 S04 사전 계약의 후속 내부 구현은 [[Codex 승인 경계 계약과 인계]](ADR-024)를 따른다. 공개 API·신원 provider·실행 consumer 연결과 독립 검토는 후속 범위다.

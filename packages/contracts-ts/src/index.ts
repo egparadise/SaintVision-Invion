@@ -192,3 +192,48 @@ export interface AgentRunSpec {
   maxWallTimeSeconds: number;
   retryBudget: number;
 }
+
+export type ApprovalId = string;
+
+export type CommandId = string;
+
+export type ApprovalNonce = string;
+
+export type ActionDigest = string;
+
+export interface ApprovalChallenge {
+  approvalId: ApprovalId;
+  nonce: ApprovalNonce;
+  expiresAt: Timestamp;
+}
+
+export interface ApprovalDecisionInput {
+  decision: "approve" | "reject";
+  nonce: ApprovalNonce;
+  actionDigest: ActionDigest;
+}
+
+export interface ApprovalView {
+  approvalId: ApprovalId;
+  runId: RunId;
+  projectId: ProjectId;
+  requesterId: string;
+  actionDigest: ActionDigest;
+  policyVersion: string;
+  requiredApprovals: 1 | 2;
+  status: "pending" | "approved" | "rejected" | "expired" | "dispatched";
+  expiresAt: Timestamp;
+  runVersion: number;
+}
+
+export interface AuthorizedCommand {
+  commandId: CommandId;
+  approvalId: ApprovalId;
+  runId: RunId;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  actionDigest: ActionDigest;
+  policyVersion: string;
+  recoveryEpoch: string;
+  expiresAt: Timestamp;
+}
