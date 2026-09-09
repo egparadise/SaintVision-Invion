@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T02:30:12+09:00"
+updated: "2026-09-10T03:15:23+09:00"
 source_of_truth: "Git"
 ---
 
@@ -42,3 +42,7 @@ owner Codex / reviewer Claude / task control-integration follow-up. 입력 GUIDE
 ## Durable dispatch 후속 반영
 
 [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]에서 claim/permit 원자 queue와 자동 전달·취소·관찰 worker를 구현/CI 검증했다. 위 S04/S06/S07의 dispatch daemon 항목 중 이 경계는 확보했으며 workflow enqueue adapter·heartbeat poll/sweep·Storage/Checkpoint·실장비 및 독립 검토는 남아 있다. 실제 운영 구성에 필요한 5대 PC 접속/IdP/CA/DNS/Storage 정보는 사용자에게 비밀을 제외한 값으로 요청했다. 답변 전 임의 운영 값을 만들지 않는다.
+
+## Storage/Node 후속 반영
+
+[[2026-09-10_03-15-23_KST_STORAGE-NODE_Codex_검증보고]]에서 local object publication/part 재개/checkpoint pin과 bytes 복원·GC 경합, Go 공지/실측 snapshot/자동 observer/제한된 전송, 독립 shard plan의 원자 queue와 실제 컨테이너 실행을 검증했다. S3 50GiB/제품 presign, 실제 Workspace 파일 복원/PTY, Artifact Evidence publication, MPI/NCCL·reducer·parent 결과, 5대 운영/Windows/GPU·실측 locality/peer Adapter/검토는 여전히 미완료다. 현재 구현만으로 S04/S05/S06/S07 전체를 done으로 올리지 않는다. 담당 분담과 구체 Adapter 입력은 [[Codex Node와 저장소 Adapter 실행 안내]]를 따른다.

@@ -359,3 +359,35 @@ export interface ProblemDetails {
   causeRef: (string | null);
   evidenceId: (EvidenceId | null);
 }
+
+export interface NodeResourceSnapshot {
+  nonce: string;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  profileVersion: string;
+  observedAt: Timestamp;
+  sampleMillis: number;
+  cpuCapacityMillis: number;
+  cpuBusyMillis: number;
+  memoryCapacityBytes: number;
+  memoryAvailableBytes: number;
+  osType: "linux";
+  agentVersion: "0.1.0";
+}
+
+export interface NodeChunkInput {
+  sha256: string;
+  sizeBytes: number;
+  offset: number;
+  nonce: string;
+}
+
+export interface NodeChunkResult {
+  sha256: string;
+  sizeBytes: number;
+  offset: number;
+  nonce: string;
+  dataBase64: string;
+  chunkSha256: string;
+}

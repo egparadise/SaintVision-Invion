@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T02:47:29+09:00"
+updated: "2026-09-10T03:15:23+09:00"
 source_of_truth: "Git"
 ---
 
@@ -80,3 +80,5 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 - Codex control-integration: [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]. 구현 87600e9, 실제 Python 283개·Go 57 leaf case CI 통과. 인증 API/현재 권한·취소·SSE·mTLS Node 관측; peer review·dispatcher/업무 통합·운영 환경 검증 pending.
 
 - Codex durable-dispatch: [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]. 구현 3a3858e, Python 301개·Go57 leaf case CI 통과. durable permit queue·일회 전송·worker 복구/취소·Node 슬롯 직렬화. workflow/UI·Storage/Checkpoint·운영 설정/실장비·독립 검토는 pending.
+
+- Codex storage-node-runtime: [[2026-09-10_03-15-23_KST_STORAGE-NODE_Codex_검증보고]]. Python 328/Go 62 leaf CI 통과. 실제 저장/복원·Node 관측/전송·독립 샤드 queue/실행 경계. Claude Adapter/독립 검토, collective/Workspace 결과·S3·실장비는 pending.

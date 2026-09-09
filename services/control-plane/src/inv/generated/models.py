@@ -619,6 +619,47 @@ class ProblemDetails(BaseModel):
     evidenceId: EvidenceId | None
 
 
+class NodeResourceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    profileVersion: constr(min_length=1, max_length=200)
+    observedAt: Timestamp
+    sampleMillis: conint(ge=100, le=5000)
+    cpuCapacityMillis: conint(ge=1, le=9007199254740991)
+    cpuBusyMillis: conint(ge=0, le=9007199254740991)
+    memoryCapacityBytes: conint(ge=1, le=9007199254740991)
+    memoryAvailableBytes: conint(ge=0, le=9007199254740991)
+    osType: Literal['linux']
+    agentVersion: Literal['0.1.0']
+
+
+class NodeChunkInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeChunkResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    dataBase64: constr(max_length=349528)
+    chunkSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
 class INVCore(
     RootModel[
         NodeRegistration
