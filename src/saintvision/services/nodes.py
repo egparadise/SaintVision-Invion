@@ -15,7 +15,7 @@ import datetime as dt
 import uuid
 from dataclasses import dataclass
 
-from sqlalchemy import select
+from sqlalchemy import case, select, update
 
 from ..db.models import Node, NodeCapability, ResourceOffer
 from ..errors import RES_NODE_NOT_FOUND, VAL_SCHEMA, InvError
@@ -136,6 +136,14 @@ def enroll_node(
     return node
 
 
+@dataclass(frozen=True, slots=True)
+class HeartbeatOutcome:
+    """What the heartbeat did. ``applied`` is decided by the database, not by us."""
+
+    node: Node
+    applied: bool
+
+
 def record_heartbeat(
     session,
     *,
@@ -143,28 +151,53 @@ def record_heartbeat(
     node_id: str,
     sequence: int,
     now: dt.datetime,
-) -> Node:
-    """Apply a heartbeat if its sequence advances.
+) -> HeartbeatOutcome:
+    """Apply a heartbeat if — and only if — its sequence advances.
 
-    A replayed or reordered heartbeat carries a sequence that does not advance;
-    it is ignored rather than applied, so a captured heartbeat cannot be used to
-    keep a removed node looking alive (ADR-007).
+    One conditional UPDATE, not a read followed by a write. Reading the current
+    sequence and then writing it back lets two heartbeats that arrive together
+    both observe the old value and both proceed, so a replayed sequence 5 can
+    overwrite a live sequence 7 and the node's liveness runs backwards. The
+    ``heartbeat_sequence < :sequence`` predicate is evaluated by PostgreSQL
+    while it holds the row, which is the only place the comparison and the
+    write are indivisible.
 
-    Returns the node either way. The caller can tell an applied heartbeat from
-    an ignored one by comparing ``last_heartbeat_at`` to ``now``.
+    Zero rows updated means the sequence did not advance: a replay, a reorder,
+    or a duplicate delivery. That is ignored rather than an error — at-least-once
+    delivery makes it a normal event (ADR-007) — but it is reported as
+    ``applied=False`` so the caller never mistakes it for a fresh beat.
     """
+    updated = session.execute(
+        update(Node)
+        .where(
+            Node.node_id == node_id,
+            Node.tenant_id == tenant_id,
+            # The guard. Anything not strictly greater is stale by definition.
+            Node.heartbeat_sequence < sequence,
+        )
+        .values(
+            heartbeat_sequence=sequence,
+            last_heartbeat_at=now,
+            # A node that was declared lost and is heard from again is back.
+            # Written in the same statement so it cannot be applied to a row
+            # whose sequence check failed.
+            status=case((Node.status == "lost", "active"), else_=Node.status),
+        )
+        .returning(Node)
+        .execution_options(synchronize_session=False, populate_existing=True)
+    ).scalar_one_or_none()
+
+    if updated is not None:
+        return HeartbeatOutcome(node=updated, applied=True)
+
+    # Nothing advanced. Distinguish "no such node" from "stale sequence": the
+    # first is a caller error and the second is routine.
     node = session.get(Node, node_id)
     if node is None or node.tenant_id != tenant_id:
         # A node in another tenant is reported as absent, not as forbidden.
         raise InvError(RES_NODE_NOT_FOUND, "node not found")
-    if sequence <= node.heartbeat_sequence:
-        return node
-    node.heartbeat_sequence = sequence
-    node.last_heartbeat_at = now
-    if node.status == "lost":
-        node.status = "active"
-    session.flush()
-    return node
+    session.refresh(node)
+    return HeartbeatOutcome(node=node, applied=False)
 
 
 def mark_lost_nodes(

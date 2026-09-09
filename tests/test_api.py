@@ -64,9 +64,16 @@ def seeded(owner_engine, two_tenants):
     }
 
 
+PROXY_ADDRESS = "10.9.9.9"
+
+
 @pytest.fixture
 def client(app_engine, seeded, monkeypatch):
     monkeypatch.setenv("INV_ENV", "test")
+    # The heartbeat route authenticates a node by its client certificate. A
+    # TestClient cannot perform mTLS, so these tests take the trusted-proxy
+    # path — which is itself only open because the address is allowlisted here.
+    monkeypatch.setenv("INV_TRUSTED_PROXY_ADDRESSES", f"{PROXY_ADDRESS}/32")
     principals = {
         "token-a": Principal(
             user_id=seeded["user_a"],
@@ -87,7 +94,7 @@ def client(app_engine, seeded, monkeypatch):
         verifier=StaticPrincipalVerifier(principals),
         clock=lambda: NOW,
     )
-    with TestClient(app) as test_client:
+    with TestClient(app, client=(PROXY_ADDRESS, 40000)) as test_client:
         yield test_client
 
 
@@ -102,6 +109,11 @@ def mint_token(app_engine, tenant_id, user_id) -> str:
                     session, tenant_id=tenant_id, issued_by_user_id=user_id, now=NOW
                 )
                 return issued.secret
+
+
+def node_headers(fingerprint: str = "b" * 64) -> dict:
+    """Headers a terminating proxy would set after verifying the client cert."""
+    return {"X-Inv-Node-Cert-Sha256": fingerprint}
 
 
 def enroll_payload(secret: str, hostname: str = "lab-01") -> dict:
@@ -281,20 +293,20 @@ def test_heartbeat_advances_and_replays_are_ignored(client, app_engine, seeded):
     ]["nodeId"]
 
     first = client.post(
-        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=headers
+        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=node_headers()
     )
     assert first.status_code == 202
     assert first.json()["applied"] is True
 
     # A captured heartbeat replayed: must not refresh liveness (ADR-007).
     replay = client.post(
-        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=headers
+        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=node_headers()
     )
     assert replay.json()["applied"] is False
     assert replay.json()["heartbeatSequence"] == 1
 
     ahead = client.post(
-        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 5}, headers=headers
+        f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 5}, headers=node_headers()
     )
     assert ahead.json()["applied"] is True
     assert ahead.json()["heartbeatSequence"] == 5
@@ -318,7 +330,7 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
                 {"capabilityId": capability_id, "usedQuantity": 3.5, "unit": "GiB"}
             ],
         },
-        headers=headers,
+        headers=node_headers(),
     )
     assert response.status_code == 202
     listed = client.get(f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-a"})
@@ -336,7 +348,7 @@ def test_liveness_sweep_marks_a_silent_node_lost(client, app_engine, seeded):
     node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()[
         "node"
     ]["nodeId"]
-    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=headers)
+    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=node_headers())
 
     auth = {"Authorization": "Bearer token-a"}
     # Still fresh: the sweep must not touch it.
@@ -363,7 +375,7 @@ def test_liveness_sweep_marks_a_silent_node_lost(client, app_engine, seeded):
     assert detail.json()["node"]["status"] == "lost"
 
     # A later heartbeat brings it back, rather than stranding it as lost.
-    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 2}, headers=headers)
+    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 2}, headers=node_headers())
     assert client.get(f"/v1/nodes/{node_id}", headers=auth).json()["node"]["status"] == "active"
 
 
@@ -389,7 +401,12 @@ def test_liveness_sweep_does_not_cross_tenants(client, app_engine, seeded):
     assert other.json()["markedLost"] == 0
 
 
-def test_heartbeat_for_another_tenants_node_is_not_found(client, app_engine, seeded):
+def test_a_heartbeat_for_a_node_you_are_not_is_refused(client, app_engine, seeded):
+    """A tenant header can no longer redirect a beat.
+
+    The node identity comes from the certificate, so claiming another node's id
+    in the path is a mismatch rather than a tenant question.
+    """
     secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
     node_id = client.post(
         "/v1/nodes",
@@ -400,10 +417,12 @@ def test_heartbeat_for_another_tenants_node_is_not_found(client, app_engine, see
     response = client.post(
         f"/v1/nodes/{node_id}/heartbeats",
         json={"sequence": 9},
-        headers={"X-Inv-Tenant": str(seeded["tenant_b"])},
+        headers=node_headers("f" * 64),
     )
-    assert response.status_code == 409
-    assert response.json()["code"] == "RES-NODE-NOT-FOUND"
+    # An unknown certificate is not a credential at all, so this never reaches
+    # the node lookup.
+    assert response.status_code == 403
+    assert response.json()["code"] == "AUTH-INVALID-CREDENTIAL"
 
 
 # --------------------------------------------------------------------------
