@@ -257,6 +257,11 @@ class SnapshotStore:
                     (project, identity(object_id)),
                 ).fetchone():
                     raise DomainError("STORE-0007", "Checkpoint retains this object")
+                if conn.execute(
+                    "SELECT 1 FROM inv.result_commitments WHERE project_id=%s AND object_id=%s",
+                    (project, identity(object_id)),
+                ).fetchone():
+                    raise DomainError("STORE-0007", "Execution result retains this object")
                 if row["state"] == "deleted":
                     return
                 # Operators decide retention before requesting collection. There

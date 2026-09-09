@@ -1,0 +1,182 @@
+"""Trusted Workspace service adapter: capture, pin and recover actual files.
+
+Only a recovering Run with physical leases released may publish a new restore.
+Storage bytes and generation fsync precede DB receipt, so a failed commit can be
+retried against the same immutable generation. This does not resume a process,
+restore PTY state or grant permission to mount arbitrary host directories.
+"""
+
+import hashlib
+from uuid import UUID, uuid5
+from .approvals import digest
+from .contracts import validate_contract
+from .errors import DomainError
+from .leases import lock_run
+from .object_store import PART_BYTES
+from .runs import event
+from .snapshots import identity, object_key
+
+
+class WorkspaceRecovery:
+    def __init__(self, snapshots, generations):
+        self.snapshots, self.generations = snapshots, generations
+        self.db = snapshots.db
+
+    def checkpoint(
+        self,
+        tenant,
+        project,
+        run_id,
+        workspace_id,
+        step_id,
+        source,
+        *,
+        proofs,
+        object_id=None
+    ):
+        # source is an already authorized private directory, never a browser path.
+        raw = source.capture(workspace_id)
+        object_id = identity(
+            object_id
+            or uuid5(
+                UUID(tenant),
+                digest(
+                    {
+                        "project": project,
+                        "run": run_id,
+                        "workspace": workspace_id,
+                        "step": step_id,
+                        "sha256": hashlib.sha256(raw).hexdigest(),
+                    }
+                ),
+            )
+        )
+        self.snapshots.begin(
+            tenant, project, object_id, hashlib.sha256(raw).hexdigest(), len(raw)
+        )
+        status = self.snapshots.status(tenant, project, object_id)
+        if status["state"] == "uploading":
+            for i, offset in enumerate(range(0, len(raw), PART_BYTES)):
+                self.snapshots.put_part(
+                    tenant, project, object_id, i, raw[offset : offset + PART_BYTES]
+                )
+        self.snapshots.finalize(tenant, project, object_id)
+        # Check project scope explicitly before the existing fenced pin operation.
+        with self.db.transaction(tenant) as conn:
+            lock_run(conn, run_id, project)
+        return self.snapshots.checkpoint(
+            tenant, run_id, step_id, object_id, proofs=proofs
+        )
+
+    def restore(
+        self,
+        tenant,
+        project,
+        run_id,
+        workspace_id,
+        source_attempt,
+        step_id,
+        restore_id,
+        *,
+        expected_version
+    ):
+        restore_id = identity(restore_id)
+        validate_contract("WorkspaceId", workspace_id)
+        if (
+            type(source_attempt) is not int
+            or source_attempt < 1
+            or not isinstance(step_id, str)
+            or not 1 <= len(step_id) <= 200
+        ):
+            raise DomainError("VAL-0003", "Invalid checkpoint identity", 422)
+        request_hash = digest(
+            {
+                "project": project,
+                "run": run_id,
+                "workspace": workspace_id,
+                "attempt": source_attempt,
+                "step": step_id,
+                "version": expected_version,
+                "epoch": self.db.recovery_epoch,
+                "root": [str(self.generations.root), *self.generations.identity],
+            }
+        )
+        with self.generations.locked() as root_fd, self.snapshots.provider.locked() as files, self.db.transaction(
+            tenant
+        ) as conn:
+            run = lock_run(conn, run_id, project)
+            prior = conn.execute(
+                "SELECT * FROM inv.workspace_restores WHERE restore_id=%s",
+                (restore_id,),
+            ).fetchone()
+            if prior and prior["request_hash"] != request_hash:
+                raise DomainError("IDEM-0001", "Restore identity already differs")
+            if not prior:
+                if (
+                    run["state"] != "recovering"
+                    or run["version"] != expected_version
+                    or source_attempt > run["attempt"]
+                ):
+                    raise DomainError(
+                        "GRAPH-0003", "Restore requires current recovering Run version"
+                    )
+                if conn.execute(
+                    "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+                    (run_id,),
+                ).fetchone():
+                    raise DomainError(
+                        "LEASE-0003", "Restore awaits physical resource release"
+                    )
+            pin = conn.execute(
+                "SELECT object_id FROM inv.checkpoint_objects WHERE project_id=%s AND run_id=%s AND attempt=%s AND step_id=%s",
+                (project, run_id, source_attempt, step_id),
+            ).fetchone()
+            if not pin:
+                raise DomainError("RES-0004", "Workspace checkpoint not found", 404)
+            obj = self.snapshots._row(conn, project, pin["object_id"])
+            if obj["state"] != "ready":
+                raise DomainError("STORE-0005", "Workspace checkpoint unavailable")
+            raw = files.read(
+                object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"]
+            )
+            generation = self.generations.publish(
+                root_fd, restore_id, raw, workspace_id, allow_create=prior is None
+            )
+            if not prior:
+                conn.execute(
+                    """INSERT INTO inv.workspace_restores
+                    (tenant_id,project_id,run_id,restore_id,workspace_id,source_attempt,step_id,request_hash,generation,content_hash)
+                    VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    (
+                        tenant,
+                        project,
+                        run_id,
+                        restore_id,
+                        workspace_id,
+                        source_attempt,
+                        step_id,
+                        request_hash,
+                        generation,
+                        obj["content_hash"],
+                    ),
+                )
+                event(
+                    conn,
+                    tenant,
+                    run_id,
+                    "inv.workspace.restored",
+                    {
+                        "restoreId": restore_id,
+                        "workspaceId": workspace_id,
+                        "sourceAttempt": source_attempt,
+                        "stepId": step_id,
+                        "sha256": obj["content_hash"],
+                    },
+                )
+            return {
+                "restoreId": restore_id,
+                "workspaceId": workspace_id,
+                "generation": generation,
+                "sha256": obj["content_hash"],
+                "replayed": prior is not None,
+            }

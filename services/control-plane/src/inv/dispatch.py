@@ -13,7 +13,7 @@ from .approvals import ApprovalStore
 from .errors import DomainError
 from .leases import assert_fences, lock_resources, lock_run
 from .node_execution import seal_permit
-from .runs import event
+from .runs import RunStore, event
 from .tooling import NodePrincipal
 
 
@@ -158,6 +158,34 @@ class DeliveryQueue:
                 ).fetchone():
                     return None
                 operation = "execute"
+                # Record logical attempt ownership before any network side effect.
+                # Running means an attempt is in flight; physical start remains
+                # unknown until Node evidence arrives. Replays never increment it.
+                current = RunStore(self.db)._transition(
+                    conn, tenant_id, run, "running", run["version"]
+                )
+                allocations = json.loads(base64.b64decode(row["envelope"]["payload"]))[
+                    "allocations"
+                ]
+                conn.execute(
+                    """INSERT INTO inv.execution_attempts
+                    (tenant_id,project_id,run_id,node_id,command_id,attempt,proofs)
+                    VALUES(%s,%s,%s,%s,%s,%s,%s)""",
+                    (
+                        tenant_id,
+                        row["project_id"],
+                        run["run_id"],
+                        row["node_id"],
+                        row["command_id"],
+                        current["attempt"],
+                        Jsonb(
+                            {
+                                a["lease"]["leaseId"]: a["lease"]["fencingToken"]
+                                for a in allocations
+                            }
+                        ),
+                    ),
+                )
             token = str(uuid4())
             conn.execute(
                 """UPDATE inv.execution_deliveries SET phase='uncertain',operation=%s,worker_token=%s,

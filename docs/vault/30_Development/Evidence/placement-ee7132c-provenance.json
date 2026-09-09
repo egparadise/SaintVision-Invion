@@ -1,0 +1,27 @@
+{
+  "sha": "ee7132cd8e59d264bd81e1cb3d3d96e81f56d63e",
+  "counts": {
+    "tests": 400,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "go": {
+    "top_level": 29,
+    "leaf_cases": 62,
+    "race_detector": true
+  },
+  "core_run": 34392036680,
+  "docs_run": 34392036686,
+  "artifact_id": 10120154499,
+  "verified_at_kst": "2026-09-10T04:01:12+09:00",
+  "archive_sha256": "966a8319a9d64c867137cd31997a95c58e2d6213d9fdcf0dfdc65c1041cec3b8",
+  "files_sha256": {
+    "core-tests.xml": "21f07f29eaab446057f731683af897585fd53418e23c651df9ba770fb35e8d35",
+    "inv-discover": "2eb93c128900698e4c3275ca22703c18aca664a198e3c77513e50aa1f65e32a8",
+    "inv-node": "3610123e566b377eaff92bc3be6bcc4847477abb84a154cba3ab43345be45f19",
+    "node-unit.jsonl": "695a68ed6379776e24d513436887a5f70925d98ca783ff5eb69111d5e6ebb6e1",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "73a6f39bf16dc112eb0b60b7353484893a59be20d5434e126f566b88c6f8d27a",
+    "saintvision_control_plane-0.1.0.tar.gz": "75e856ee0010a9161d2b2986e19599c2ed1f1d9761c1db4275692dfa5b067715"
+  }
+}

@@ -106,6 +106,13 @@ def postgres():
                     "GRANT UPDATE(lock_sentinel) ON inv.project_grants TO {}"
                 ).format(sql.Identifier(role))
             )
+            # PostgreSQL requires an UPDATE privilege for SELECT FOR SHARE.
+            # The CHECK-fixed sentinel allows locking without changing membership.
+            conn.execute(
+                sql.SQL(
+                    "GRANT UPDATE(lock_sentinel) ON inv.project_nodes TO {}"
+                ).format(sql.Identifier(role))
+            )
             conn.execute(
                 sql.SQL(
                     "REVOKE UPDATE,DELETE ON inv.approval_votes,inv.approval_dispatches,inv.approval_audit,inv.tool_claims,inv.node_stop_receipts FROM {}"

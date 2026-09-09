@@ -141,65 +141,103 @@ class LeaseStore:
                 )
             if prior["response"] is not None:
                 return prior["response"]
-            run = lock_run(conn, run_id, project_id)
-            if run["state"] not in {"planned", "scheduled", "running"}:
-                raise DomainError(
-                    "RES-0005", "Run cannot acquire resources in its current state"
-                )
-            if conn.execute(
-                "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
-                (run_id,),
-            ).fetchone():
-                raise DomainError(
-                    "LEASE-0003",
-                    "Previous allocations require verified stop acknowledgements",
-                )
-            resources = lock_resources(conn, [a.resource_id for a in ordered])
-            for node in sorted({r["node_id"] for r in resources.values()}):
-                valid = conn.execute(
-                    """SELECT status='online' AND heartbeat_at >= clock_timestamp()-interval '15 seconds'
-                    AND heartbeat_at <= clock_timestamp() AND abs(clock_skew_seconds) <= 5
-                    AND recovery_epoch=%s::uuid AS ready FROM inv.nodes WHERE node_id=%s""",
-                    (self.db.recovery_epoch, node),
-                ).fetchone()
-                if not valid["ready"]:
-                    raise DomainError(
-                        "RES-0006",
-                        "Node is unavailable or heartbeat is stale",
-                        retryable=True,
-                    )
-            result = []
-            for allocation in ordered:
-                resource = resources[allocation.resource_id]
-                if (
-                    active_total(conn, allocation.resource_id) + allocation.amount
-                    > resource["offered"]
-                ):
-                    raise DomainError(
-                        "RES-0001", "Insufficient offered capacity", retryable=True
-                    )
-                row = conn.execute(
-                    """INSERT INTO inv.resource_leases
-                    (tenant_id,project_id,run_id,resource_id,lease_id,amount,recovery_epoch,expires_at)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,clock_timestamp()+make_interval(secs=>%s)) RETURNING *""",
-                    (
-                        tenant_id,
-                        project_id,
-                        run_id,
-                        allocation.resource_id,
-                        new_id("lse"),
-                        allocation.amount,
-                        self.db.recovery_epoch,
-                        ttl_seconds,
-                    ),
-                ).fetchone()
-                result.append(wire(row))
+            result = self._reserve_locked(
+                conn, tenant_id, project_id, run_id, ordered, ttl_seconds
+            )
             conn.execute(
                 """UPDATE inv.idempotency SET response=%s
                 WHERE project_id=%s AND operation='lease.reserve' AND key=%s""",
                 (Jsonb(result), project_id, key),
             )
             return result
+
+    def _reserve_locked(
+        self, conn, tenant_id, project_id, run_id, ordered, ttl_seconds
+    ):
+        """Internal validated allocation API; caller owns its durable ledger.
+
+        Lock Run -> project mutex -> configured ceiling -> all Nodes -> Resources.
+        Ceiling rows are provisioned before enabling a project for placement.
+        """
+        run = lock_run(conn, run_id, project_id)
+        conn.execute(
+            "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
+            (project_id,),
+        ).fetchone()
+        if run["state"] not in {"planned", "scheduled", "running"}:
+            raise DomainError(
+                "RES-0005", "Run cannot acquire resources in its current state"
+            )
+        if conn.execute(
+            "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+            (run_id,),
+        ).fetchone():
+            raise DomainError(
+                "LEASE-0003",
+                "Previous allocations require verified stop acknowledgements",
+            )
+        limits = conn.execute(
+            "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
+            (project_id,),
+        ).fetchone()
+        resources = lock_resources(conn, [a.resource_id for a in ordered])
+        if limits:
+            for kind, field in [("cpu", "cpu_millis"), ("memory", "memory_bytes")]:
+                used = conn.execute(
+                    """SELECT coalesce(sum(l.amount),0) AS used FROM inv.resource_leases l
+                    JOIN inv.resources r USING(tenant_id,resource_id)
+                    WHERE l.project_id=%s AND l.released_at IS NULL AND r.kind=%s""",
+                    (project_id, kind),
+                ).fetchone()["used"]
+                needed = sum(
+                    a.amount
+                    for a in ordered
+                    if resources[a.resource_id]["kind"] == kind
+                )
+                if used + needed > limits[field]:
+                    raise DomainError(
+                        "RES-0001", "Project resource ceiling exhausted", retryable=True
+                    )
+        for node in sorted({r["node_id"] for r in resources.values()}):
+            valid = conn.execute(
+                """SELECT status='online' AND heartbeat_at >= clock_timestamp()-interval '15 seconds'
+                AND heartbeat_at <= clock_timestamp() AND abs(clock_skew_seconds) <= 5
+                AND recovery_epoch=%s::uuid AS ready FROM inv.nodes WHERE node_id=%s""",
+                (self.db.recovery_epoch, node),
+            ).fetchone()
+            if not valid["ready"]:
+                raise DomainError(
+                    "RES-0006",
+                    "Node is unavailable or heartbeat is stale",
+                    retryable=True,
+                )
+        result = []
+        for allocation in ordered:
+            resource = resources[allocation.resource_id]
+            if (
+                active_total(conn, allocation.resource_id) + allocation.amount
+                > resource["offered"]
+            ):
+                raise DomainError(
+                    "RES-0001", "Insufficient offered capacity", retryable=True
+                )
+            row = conn.execute(
+                """INSERT INTO inv.resource_leases
+                (tenant_id,project_id,run_id,resource_id,lease_id,amount,recovery_epoch,expires_at)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,clock_timestamp()+make_interval(secs=>%s)) RETURNING *""",
+                (
+                    tenant_id,
+                    project_id,
+                    run_id,
+                    allocation.resource_id,
+                    new_id("lse"),
+                    allocation.amount,
+                    self.db.recovery_epoch,
+                    ttl_seconds,
+                ),
+            ).fetchone()
+            result.append(wire(row))
+        return result
 
     def _locked_lease(self, conn, lease_id, token):
         candidate = conn.execute(
