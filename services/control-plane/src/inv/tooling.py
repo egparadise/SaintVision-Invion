@@ -14,7 +14,7 @@ from .approvals import ApprovalStore, digest
 from .contracts import validate_contract
 from .db import Database
 from .errors import DomainError
-from .leases import lock_run, lock_resources, assert_fences
+from .leases import lock_run, lock_resources, assert_fences, wire
 from .policy import action_digest, enforce_decision
 from .runs import event
 from .sandbox import SandboxProfile, RuntimeCapabilities, compile_launch
@@ -76,7 +76,8 @@ class ToolGateway:
         proofs,
         *,
         policy: CurrentPolicy,
-        runtime: RuntimeCapabilities
+        runtime: RuntimeCapabilities,
+        queue_signing_key=None
     ):
         # Snapshot mutable input before validation/hash use; no callback may mutate it.
         command = deepcopy(command)
@@ -114,6 +115,18 @@ class ToolGateway:
                 if prior["request_hash"] != request_hash:
                     raise DomainError(
                         "IDEM-0001", "Command already has different execution content"
+                    )
+                if (
+                    queue_signing_key is not None
+                    and not conn.execute(
+                        "SELECT 1 FROM inv.execution_deliveries WHERE command_id=%s",
+                        (command["commandId"],),
+                    ).fetchone()
+                ):
+                    raise DomainError(
+                        "NODE-0061",
+                        "Existing transient claim requires observation; it cannot be queued",
+                        409,
                     )
                 # A replay is an observation, never a renewed launch permission. This
                 # remains false after cancellation, expiry, or lost first response.
@@ -299,4 +312,22 @@ class ToolGateway:
             result = claim_view(row)
             validate_contract("ExecutionClaim", result)
             event(conn, node.tenant_id, run["run_id"], "inv.execution.claimed", result)
-            return ClaimResult(True, result, plan)
+            admitted = ClaimResult(True, result, plan)
+            if queue_signing_key is not None:
+                from .dispatch import persist_delivery
+
+                allocations = [
+                    {
+                        "nodeId": node.node_id,
+                        "kind": resources[r["resource_id"]]["kind"],
+                        "lease": wire(r),
+                    }
+                    for r in allocations
+                ]
+                persist_delivery(
+                    conn, admitted, allocations, queue_signing_key, now=now
+                )
+                # Only the durable queue may start this command. Do not also grant
+                # the caller a transient, separately sealable launch permission.
+                return ClaimResult(False, result, None)
+            return admitted
