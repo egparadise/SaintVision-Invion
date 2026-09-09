@@ -1,0 +1,273 @@
+{
+  "@context": {
+    "sv": "https://saintvision.ai/ontology/core#",
+    "inv": "https://saintvision.ai/ontology/inv#",
+    "dev": "https://saintvision.ai/ontology/dev#",
+    "ml": "https://saintvision.ai/ontology/mlops#",
+    "sec": "https://saintvision.ai/ontology/security#",
+    "res": "https://saintvision.ai/resource/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "displayName": "sv:displayName",
+    "status": "sv:status",
+    "version": "sv:version",
+    "correlationId": "sv:correlationId",
+    "hasWorkspace": {
+      "@id": "sv:hasWorkspace",
+      "@type": "@id"
+    },
+    "containsNode": {
+      "@id": "inv:containsNode",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "advertisesCapability": {
+      "@id": "inv:advertisesCapability",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "offersResource": {
+      "@id": "inv:offersResource",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "describesResource": {
+      "@id": "inv:describesResource",
+      "@type": "@id"
+    },
+    "usesRepository": {
+      "@id": "dev:usesRepository",
+      "@type": "@id"
+    },
+    "enablesTool": {
+      "@id": "dev:enablesTool",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "implementedByAdapter": {
+      "@id": "dev:implementedByAdapter",
+      "@type": "@id"
+    },
+    "submitsWorkload": {
+      "@id": "inv:submitsWorkload",
+      "@type": "@id"
+    },
+    "requiresResource": {
+      "@id": "inv:requiresResource",
+      "@type": "@id"
+    },
+    "createsRun": {
+      "@id": "inv:createsRun",
+      "@type": "@id"
+    },
+    "scheduledBy": {
+      "@id": "inv:scheduledBy",
+      "@type": "@id"
+    },
+    "selectsNode": {
+      "@id": "inv:selectsNode",
+      "@type": "@id"
+    },
+    "holdsLease": {
+      "@id": "inv:holdsLease",
+      "@type": "@id"
+    },
+    "leasesResource": {
+      "@id": "inv:leasesResource",
+      "@type": "@id"
+    },
+    "hasLocation": {
+      "@id": "ml:hasLocation",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "locatedOn": {
+      "@id": "inv:locatedOn",
+      "@type": "@id"
+    },
+    "consumesDataset": {
+      "@id": "ml:consumesDataset",
+      "@type": "@id"
+    },
+    "governedBy": {
+      "@id": "sec:governedBy",
+      "@type": "@id"
+    },
+    "hasDecision": {
+      "@id": "sec:hasDecision",
+      "@type": "@id"
+    },
+    "cpuCores": {
+      "@id": "inv:cpuCores",
+      "@type": "xsd:decimal"
+    },
+    "memoryBytes": {
+      "@id": "inv:memoryBytes",
+      "@type": "xsd:integer"
+    },
+    "vramBytes": {
+      "@id": "inv:vramBytes",
+      "@type": "xsd:integer"
+    },
+    "expiresAt": {
+      "@id": "inv:expiresAt",
+      "@type": "xsd:dateTime"
+    },
+    "fencingToken": "inv:fencingToken",
+    "checksum": "ml:checksum",
+    "riskCode": "sec:riskCode"
+  },
+  "@graph": [
+    {
+      "@id": "res:cluster-inv-lab-01",
+      "@type": "inv:Cluster",
+      "displayName": "INV LAB 01",
+      "containsNode": [
+        "res:node-03",
+        "res:node-05"
+      ]
+    },
+    {
+      "@id": "res:node-03",
+      "@type": "inv:Node",
+      "displayName": "INV Node 03",
+      "status": "online",
+      "advertisesCapability": [
+        "res:cap-cuda-12"
+      ],
+      "offersResource": [
+        "res:offer-node-03-gpu"
+      ]
+    },
+    {
+      "@id": "res:node-05",
+      "@type": "inv:Node",
+      "displayName": "INV Node 05",
+      "status": "online"
+    },
+    {
+      "@id": "res:cap-cuda-12",
+      "@type": "inv:Capability",
+      "displayName": "CUDA 12 compatible runtime"
+    },
+    {
+      "@id": "res:gpu-node-03-0",
+      "@type": "inv:GPUResource",
+      "displayName": "Node 03 GPU 0",
+      "vramBytes": 25769803776
+    },
+    {
+      "@id": "res:offer-node-03-gpu",
+      "@type": "inv:ResourceOffer",
+      "status": "available",
+      "describesResource": "res:gpu-node-03-0"
+    },
+    {
+      "@id": "res:project-pacs-ai",
+      "@type": "sv:Project",
+      "displayName": "PACS AI",
+      "hasWorkspace": "res:workspace-pacs-ai"
+    },
+    {
+      "@id": "res:workspace-pacs-ai",
+      "@type": "dev:DevelopmentWorkspace",
+      "displayName": "PACS AI Development Workspace",
+      "usesRepository": "res:repo-pacs-ai",
+      "enablesTool": [
+        "res:tool-codex",
+        "res:tool-claude-code"
+      ],
+      "submitsWorkload": "res:workload-evaluate-pacs"
+    },
+    {
+      "@id": "res:repo-pacs-ai",
+      "@type": "dev:Repository",
+      "displayName": "PACS AI Repository"
+    },
+    {
+      "@id": "res:tool-codex",
+      "@type": "dev:AITool",
+      "displayName": "Codex CLI",
+      "implementedByAdapter": "res:adapter-codex"
+    },
+    {
+      "@id": "res:tool-claude-code",
+      "@type": "dev:AITool",
+      "displayName": "Claude Code",
+      "implementedByAdapter": "res:adapter-claude-code"
+    },
+    {
+      "@id": "res:adapter-codex",
+      "@type": "dev:AIToolAdapter",
+      "displayName": "Codex Provider Adapter"
+    },
+    {
+      "@id": "res:adapter-claude-code",
+      "@type": "dev:AIToolAdapter",
+      "displayName": "Claude Code Provider Adapter"
+    },
+    {
+      "@id": "res:workload-evaluate-pacs",
+      "@type": "inv:Workload",
+      "displayName": "Evaluate PACS model",
+      "requiresResource": "res:request-one-gpu",
+      "createsRun": "res:run-evaluate-pacs-001"
+    },
+    {
+      "@id": "res:request-one-gpu",
+      "@type": "inv:ResourceRequest",
+      "cpuCores": 8,
+      "memoryBytes": 34359738368,
+      "vramBytes": 17179869184
+    },
+    {
+      "@id": "res:run-evaluate-pacs-001",
+      "@type": "ml:EvaluationRun",
+      "status": "scheduled",
+      "correlationId": "cor_01JINVEXAMPLE",
+      "scheduledBy": "res:plan-evaluate-pacs-001",
+      "holdsLease": "res:lease-gpu-node-03",
+      "consumesDataset": "res:dataset-pacs-v3",
+      "governedBy": "res:policy-default-workspace",
+      "hasDecision": "res:decision-allow-evaluation"
+    },
+    {
+      "@id": "res:plan-evaluate-pacs-001",
+      "@type": "inv:PlacementPlan",
+      "selectsNode": "res:node-03"
+    },
+    {
+      "@id": "res:lease-gpu-node-03",
+      "@type": "inv:ResourceLease",
+      "leasesResource": "res:gpu-node-03-0",
+      "expiresAt": "2026-09-09T08:00:00Z",
+      "fencingToken": "fence_00000042"
+    },
+    {
+      "@id": "res:dataset-pacs-v3",
+      "@type": "ml:DatasetVersion",
+      "version": "3.0.0",
+      "checksum": "sha256:example",
+      "hasLocation": [
+        "res:data-location-node-05"
+      ]
+    },
+    {
+      "@id": "res:data-location-node-05",
+      "@type": "ml:DataLocation",
+      "status": "primary",
+      "locatedOn": "res:node-05"
+    },
+    {
+      "@id": "res:policy-default-workspace",
+      "@type": "sec:Policy",
+      "displayName": "Default workspace policy",
+      "version": "1.0.0"
+    },
+    {
+      "@id": "res:decision-allow-evaluation",
+      "@type": "sec:PolicyDecision",
+      "status": "allow",
+      "riskCode": "L1"
+    }
+  ]
+}

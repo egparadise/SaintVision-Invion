@@ -1,0 +1,568 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dev: <https://saintvision.ai/ontology/dev#> .
+@prefix inv: <https://saintvision.ai/ontology/inv#> .
+@prefix ml: <https://saintvision.ai/ontology/mlops#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sec: <https://saintvision.ai/ontology/security#> .
+@prefix sv: <https://saintvision.ai/ontology/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sv:Agent a owl:Class ;
+    rdfs:label "Agent"@en ;
+    rdfs:subClassOf sv:Actor .
+
+sv:AgentProfile a owl:Class ;
+    rdfs:label "AgentProfile" ;
+    rdfs:subClassOf sv:Entity .
+
+sv:Tenant a owl:Class ;
+    rdfs:label "Tenant" ;
+    rdfs:subClassOf sv:Entity .
+
+sv:User a owl:Class ;
+    rdfs:label "User"@en ;
+    rdfs:subClassOf sv:Actor .
+
+sv:correlationId a owl:DatatypeProperty ;
+    rdfs:domain sv:Entity ;
+    rdfs:range xsd:string .
+
+sv:createdAt a owl:DatatypeProperty ;
+    rdfs:domain sv:Entity ;
+    rdfs:range xsd:dateTime .
+
+sv:displayName a owl:DatatypeProperty ;
+    rdfs:domain sv:Entity ;
+    rdfs:range xsd:string .
+
+sv:endedAt a owl:DatatypeProperty .
+
+sv:hasWorkspace a owl:ObjectProperty ;
+    rdfs:domain sv:Project ;
+    rdfs:range dev:DevelopmentWorkspace .
+
+sv:recordKind a owl:DatatypeProperty .
+
+sv:status a owl:DatatypeProperty ;
+    rdfs:domain sv:Entity ;
+    rdfs:range xsd:string .
+
+sv:version a owl:DatatypeProperty ;
+    rdfs:domain sv:Entity ;
+    rdfs:range xsd:string .
+
+dev:AcceptanceCriterion a owl:Class ;
+    rdfs:label "AcceptanceCriterion" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:Build a owl:Class ;
+    rdfs:label "Build"@en ;
+    rdfs:subClassOf inv:Run .
+
+dev:ContextBundle a owl:Class ;
+    rdfs:label "ContextBundle" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:Contract a owl:Class ;
+    rdfs:label "Contract" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:DevelopmentCapability a owl:Class ;
+    rdfs:label "DevelopmentCapability" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:DevelopmentReport a owl:Class ;
+    rdfs:label "DevelopmentReport" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:DevelopmentTask a owl:Class ;
+    rdfs:label "DevelopmentTask" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:ErrorRecord a owl:Class ;
+    rdfs:label "ErrorRecord" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:EvidenceRequirement a owl:Class ;
+    rdfs:label "EvidenceRequirement" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:HarnessProfile a owl:Class ;
+    rdfs:label "HarnessProfile" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:ProductOutcome a owl:Class ;
+    rdfs:label "ProductOutcome" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:PromptSpec a owl:Class ;
+    rdfs:label "PromptSpec" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:ResolutionRecord a owl:Class ;
+    rdfs:label "ResolutionRecord" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:SkillSpec a owl:Class ;
+    rdfs:label "SkillSpec" ;
+    rdfs:subClassOf sv:Entity .
+
+dev:TestRun a owl:Class ;
+    rdfs:label "Test run"@en ;
+    rdfs:subClassOf inv:Run .
+
+dev:WorkspaceTemplate a owl:Class ;
+    rdfs:label "Workspace template"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:commitSha a owl:DatatypeProperty ;
+    rdfs:domain dev:CodeCommit ;
+    rdfs:range xsd:string .
+
+dev:criterionText a owl:DatatypeProperty .
+
+dev:dependsOn a owl:ObjectProperty .
+
+dev:enablesTool a owl:ObjectProperty ;
+    rdfs:domain dev:DevelopmentWorkspace ;
+    rdfs:range dev:AITool .
+
+dev:evidenceDescription a owl:DatatypeProperty .
+
+dev:hasBuild a owl:ObjectProperty .
+
+dev:hasReport a owl:ObjectProperty .
+
+dev:hasTerminal a owl:ObjectProperty ;
+    rdfs:domain dev:DevelopmentWorkspace ;
+    rdfs:range dev:TerminalSession .
+
+dev:imageDigest a owl:DatatypeProperty ;
+    rdfs:domain dev:ContainerImage ;
+    rdfs:range xsd:string .
+
+dev:implementedByAdapter a owl:ObjectProperty ;
+    rdfs:domain dev:AITool ;
+    rdfs:range dev:AIToolAdapter .
+
+dev:ownedBy a owl:ObjectProperty .
+
+dev:realizes a owl:ObjectProperty .
+
+dev:reportsTask a owl:ObjectProperty .
+
+dev:requiresCriterion a owl:ObjectProperty .
+
+dev:requiresEvidence a owl:ObjectProperty .
+
+dev:resolvedBy a owl:ObjectProperty .
+
+dev:reviewedBy a owl:ObjectProperty .
+
+dev:scope a owl:DatatypeProperty .
+
+dev:taskId a owl:DatatypeProperty .
+
+dev:usesCommit a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range dev:CodeCommit .
+
+dev:usesContract a owl:ObjectProperty .
+
+dev:usesImage a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range dev:ContainerImage .
+
+dev:usesRepository a owl:ObjectProperty ;
+    rdfs:domain dev:DevelopmentWorkspace ;
+    rdfs:range dev:Repository .
+
+dev:usesShell a owl:ObjectProperty ;
+    rdfs:domain dev:TerminalSession ;
+    rdfs:range dev:Shell .
+
+dev:usesSkill a owl:ObjectProperty .
+
+dev:verifiesCriterion a owl:ObjectProperty .
+
+<https://saintvision.ai/ontology/inv> a owl:Ontology ;
+    dcterms:description "Ontology for the Saint Vision AI virtual computing and development fabric."@en ;
+    dcterms:modified "2026-09-09"^^xsd:date ;
+    dcterms:title "Saint Vision INV Ontology"@en ;
+    owl:versionInfo "0.2.0" .
+
+inv:Allocation a owl:Class ;
+    rdfs:label "Allocation" ;
+    rdfs:subClassOf sv:Entity .
+
+inv:CPUResource a owl:Class ;
+    rdfs:label "CPU resource"@en ;
+    rdfs:subClassOf inv:Resource .
+
+inv:Checkpoint a owl:Class ;
+    rdfs:label "Checkpoint" ;
+    rdfs:subClassOf sv:Entity .
+
+inv:ContainerRuntime a owl:Class ;
+    rdfs:label "Container runtime"@en ;
+    rdfs:subClassOf inv:Runtime .
+
+inv:DistributedRuntime a owl:Class ;
+    rdfs:label "Distributed runtime"@en ;
+    rdfs:subClassOf inv:Runtime .
+
+inv:GPUResource a owl:Class ;
+    rdfs:label "GPU resource"@en ;
+    rdfs:subClassOf inv:Resource .
+
+inv:MemoryResource a owl:Class ;
+    rdfs:label "Memory resource"@en ;
+    rdfs:subClassOf inv:Resource .
+
+inv:NetworkLink a owl:Class ;
+    rdfs:label "NetworkLink" ;
+    rdfs:subClassOf sv:Entity .
+
+inv:NetworkResource a owl:Class ;
+    rdfs:label "Network resource"@en ;
+    rdfs:subClassOf inv:Resource .
+
+inv:NodeAgent a owl:Class ;
+    rdfs:label "Node agent"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:RunAttempt a owl:Class ;
+    rdfs:label "RunAttempt" ;
+    rdfs:subClassOf sv:Entity .
+
+inv:RunGraph a owl:Class ;
+    rdfs:label "RunGraph" ;
+    rdfs:subClassOf sv:Entity .
+
+inv:StorageResource a owl:Class ;
+    rdfs:label "Storage resource"@en ;
+    rdfs:subClassOf inv:Resource .
+
+inv:advertisesCapability a owl:ObjectProperty ;
+    rdfs:domain inv:Node ;
+    rdfs:range inv:Capability .
+
+inv:allocatedBy a owl:ObjectProperty .
+
+inv:containsNode a owl:ObjectProperty ;
+    rdfs:domain inv:Cluster ;
+    rdfs:range inv:Node .
+
+inv:cpuCores a owl:DatatypeProperty ;
+    rdfs:range xsd:decimal .
+
+inv:createsRun a owl:ObjectProperty ;
+    rdfs:domain inv:Workload ;
+    rdfs:range inv:Run .
+
+inv:describesResource a owl:ObjectProperty ;
+    rdfs:domain inv:ResourceOffer ;
+    rdfs:range inv:Resource .
+
+inv:expiresAt a owl:DatatypeProperty ;
+    rdfs:domain inv:ResourceLease ;
+    rdfs:range xsd:dateTime .
+
+inv:fencingToken a owl:DatatypeProperty ;
+    rdfs:domain inv:ResourceLease ;
+    rdfs:range xsd:string .
+
+inv:grantedAt a owl:DatatypeProperty .
+
+inv:hasAttempt a owl:ObjectProperty .
+
+inv:hasCheckpoint a owl:ObjectProperty .
+
+inv:hasTask a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range inv:Task .
+
+inv:holdsLease a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range inv:ResourceLease .
+
+inv:leasesResource a owl:ObjectProperty ;
+    rdfs:domain inv:ResourceLease ;
+    rdfs:range inv:Resource .
+
+inv:locatedOn a owl:ObjectProperty ;
+    rdfs:domain ml:DataLocation ;
+    rdfs:range inv:Node .
+
+inv:memoryBytes a owl:DatatypeProperty ;
+    rdfs:range xsd:integer .
+
+inv:observedAt a owl:DatatypeProperty ;
+    rdfs:domain inv:ResourceSnapshot ;
+    rdfs:range xsd:dateTime .
+
+inv:offersResource a owl:ObjectProperty ;
+    rdfs:domain inv:Node ;
+    rdfs:range inv:ResourceOffer .
+
+inv:requiresResource a owl:ObjectProperty ;
+    rdfs:domain inv:Workload ;
+    rdfs:range inv:ResourceRequest .
+
+inv:scheduledBy a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range inv:PlacementPlan .
+
+inv:selectsNode a owl:ObjectProperty ;
+    rdfs:domain inv:PlacementPlan ;
+    rdfs:range inv:Node .
+
+inv:storageBytes a owl:DatatypeProperty ;
+    rdfs:range xsd:integer .
+
+inv:submitsWorkload a owl:ObjectProperty ;
+    rdfs:domain dev:DevelopmentWorkspace ;
+    rdfs:range inv:Workload .
+
+inv:usesGraph a owl:ObjectProperty .
+
+inv:vramBytes a owl:DatatypeProperty ;
+    rdfs:range xsd:integer .
+
+ml:Dataset a owl:Class ;
+    rdfs:label "Dataset"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:EvaluationRun a owl:Class ;
+    rdfs:label "Evaluation run"@en ;
+    rdfs:subClassOf inv:Run .
+
+ml:Experiment a owl:Class ;
+    rdfs:label "Experiment"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:Model a owl:Class ;
+    rdfs:label "Model"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:TrainingRun a owl:Class ;
+    rdfs:label "Training run"@en ;
+    rdfs:subClassOf inv:Run .
+
+ml:checksum a owl:DatatypeProperty ;
+    rdfs:range xsd:string .
+
+ml:consumesDataset a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range ml:DatasetVersion .
+
+ml:deploysModel a owl:ObjectProperty ;
+    rdfs:domain ml:Deployment ;
+    rdfs:range ml:ModelVersion .
+
+ml:hasLocation a owl:ObjectProperty ;
+    rdfs:domain ml:DatasetVersion ;
+    rdfs:range ml:DataLocation .
+
+ml:producesArtifact a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range ml:Artifact .
+
+ml:registersModel a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range ml:ModelVersion .
+
+sec:EvidenceEnvelope a owl:Class ;
+    rdfs:label "EvidenceEnvelope" ;
+    rdfs:subClassOf sv:Entity .
+
+sec:PolicyBundle a owl:Class ;
+    rdfs:label "PolicyBundle" ;
+    rdfs:subClassOf sv:Entity .
+
+sec:ProvenanceRecord a owl:Class ;
+    rdfs:label "ProvenanceRecord" ;
+    rdfs:subClassOf sv:Entity .
+
+sec:emitsAuditEvent a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range sec:AuditEvent .
+
+sec:governedBy a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range sec:Policy .
+
+sec:hasDecision a owl:ObjectProperty ;
+    rdfs:domain inv:Run ;
+    rdfs:range sec:PolicyDecision .
+
+sec:hasEvidence a owl:ObjectProperty .
+
+sec:hasProvenance a owl:ObjectProperty .
+
+sec:requiresApproval a owl:ObjectProperty ;
+    rdfs:domain sec:PolicyDecision ;
+    rdfs:range sec:Approval .
+
+sec:riskCode a owl:DatatypeProperty ;
+    rdfs:range xsd:string .
+
+sec:supportedByEvidence a owl:ObjectProperty ;
+    rdfs:domain sec:PolicyDecision ;
+    rdfs:range sec:EvidenceBundle .
+
+sec:usesCredential a owl:ObjectProperty ;
+    rdfs:domain dev:ToolInvocation ;
+    rdfs:range sec:CredentialReference .
+
+sv:Project a owl:Class ;
+    rdfs:label "Project"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:AIToolAdapter a owl:Class ;
+    rdfs:label "AI tool adapter"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:CLI a owl:Class ;
+    rdfs:label "CLI"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:Repository a owl:Class ;
+    rdfs:label "Repository"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:Shell a owl:Class ;
+    rdfs:label "Shell"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:ToolInvocation a owl:Class ;
+    rdfs:label "Tool invocation"@en ;
+    rdfs:subClassOf inv:Task .
+
+inv:Capability a owl:Class ;
+    rdfs:label "Capability"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:Cluster a owl:Class ;
+    rdfs:label "Cluster"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:ResourceRequest a owl:Class ;
+    rdfs:label "Resource request"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:ResourceSnapshot a owl:Class ;
+    rdfs:label "Resource snapshot"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+ml:Artifact a owl:Class ;
+    rdfs:label "Artifact"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:Deployment a owl:Class ;
+    rdfs:label "Deployment"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:Approval a owl:Class ;
+    rdfs:label "Approval"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:AuditEvent a owl:Class ;
+    rdfs:label "Audit event"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:CredentialReference a owl:Class ;
+    rdfs:label "Credential reference"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:EvidenceBundle a owl:Class ;
+    rdfs:label "Evidence bundle"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:Policy a owl:Class ;
+    rdfs:label "Policy"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sv:Actor a owl:Class ;
+    rdfs:label "Actor"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:AITool a owl:Class ;
+    rdfs:label "AI tool"@en ;
+    rdfs:subClassOf dev:CLI .
+
+dev:CodeCommit a owl:Class ;
+    rdfs:label "Code commit"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:ContainerImage a owl:Class ;
+    rdfs:label "Container image"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:TerminalSession a owl:Class ;
+    rdfs:label "Terminal session"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:PlacementPlan a owl:Class ;
+    rdfs:label "Placement plan"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:ResourceOffer a owl:Class ;
+    rdfs:label "Resource offer"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:Runtime a owl:Class ;
+    rdfs:label "Runtime"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:Task a owl:Class ;
+    rdfs:label "Task"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:DataLocation a owl:Class ;
+    rdfs:label "Data location"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:DatasetVersion a owl:Class ;
+    rdfs:label "Dataset version"@en ;
+    rdfs:subClassOf sv:Entity .
+
+ml:ModelVersion a owl:Class ;
+    rdfs:label "Model version"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:Workload a owl:Class ;
+    rdfs:label "Workload"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sec:PolicyDecision a owl:Class ;
+    rdfs:label "Policy decision"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:ResourceLease a owl:Class ;
+    rdfs:label "Resource lease"@en ;
+    rdfs:subClassOf sv:Entity .
+
+dev:DevelopmentWorkspace a owl:Class ;
+    rdfs:label "Development workspace"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:Node a owl:Class ;
+    rdfs:label "Node"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:Resource a owl:Class ;
+    rdfs:label "Resource"@en ;
+    rdfs:subClassOf inv:InfrastructureEntity .
+
+inv:InfrastructureEntity a owl:Class ;
+    rdfs:label "Infrastructure entity"@en ;
+    rdfs:subClassOf sv:Entity .
+
+inv:Run a owl:Class ;
+    rdfs:label "Run"@en ;
+    rdfs:subClassOf sv:Entity .
+
+sv:Entity a owl:Class ;
+    rdfs:label "Entity"@en .

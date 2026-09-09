@@ -1,0 +1,36 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sv: <https://saintvision.ai/ontology/core#> .
+@prefix inv: <https://saintvision.ai/ontology/inv#> .
+@prefix dev: <https://saintvision.ai/ontology/dev#> .
+@prefix ml: <https://saintvision.ai/ontology/mlops#> .
+@prefix sec: <https://saintvision.ai/ontology/security#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+dev:TaskShape a sh:NodeShape; sh:targetClass dev:DevelopmentTask;
+ sh:property [ sh:path dev:ownedBy; sh:minCount 1; sh:maxCount 1; sh:class sv:AgentProfile; sh:disjoint dev:reviewedBy ];
+ sh:property [ sh:path dev:reviewedBy; sh:minCount 1; sh:maxCount 1; sh:class sv:AgentProfile ];
+ sh:property [ sh:path dev:realizes; sh:minCount 1; sh:class dev:ProductOutcome ];
+ sh:property [ sh:path dev:usesContract; sh:minCount 1; sh:class dev:Contract ];
+ sh:property [ sh:path dev:usesSkill; sh:minCount 1; sh:class dev:SkillSpec ];
+ sh:property [ sh:path sv:status; sh:minCount 1; sh:maxCount 1; sh:in ("planned" "ready" "in_progress" "review" "done" "blocked") ].
+dev:OutcomeShape a sh:NodeShape; sh:targetClass dev:ProductOutcome;
+ sh:property [ sh:path dev:requiresCriterion; sh:minCount 1; sh:class dev:AcceptanceCriterion ].
+dev:CriterionShape a sh:NodeShape; sh:targetClass dev:AcceptanceCriterion;
+ sh:property [ sh:path dev:requiresEvidence; sh:minCount 1; sh:class dev:EvidenceRequirement ];
+ sh:property [ sh:path dev:criterionText; sh:minCount 1; sh:datatype xsd:string ].
+inv:NodeShape a sh:NodeShape; sh:targetClass inv:Node;
+ sh:property [ sh:path inv:advertisesCapability; sh:minCount 1; sh:class inv:Capability ].
+inv:RunShape a sh:NodeShape; sh:targetClass inv:Run;
+ sh:property [ sh:path [ sh:inversePath inv:createsRun ]; sh:minCount 1; sh:maxCount 1; sh:class inv:Workload ];
+ sh:property [ sh:path sv:status; sh:minCount 1; sh:maxCount 1; sh:in ("draft" "validated" "planned" "awaiting_approval" "scheduled" "running" "verifying" "recovering" "succeeded" "failed" "cancelled") ];
+ sh:or ( [ sh:not [ sh:property [ sh:path sv:status; sh:hasValue "scheduled" ] ] ] [ sh:property [ sh:path inv:scheduledBy; sh:minCount 1; sh:maxCount 1 ] ] );
+ sh:or ( [ sh:not [ sh:property [ sh:path sv:status; sh:hasValue "running" ] ] ] [ sh:property [ sh:path inv:holdsLease; sh:minCount 1; sh:class inv:ResourceLease ] ] );
+ sh:or ( [ sh:not [ sh:property [ sh:path sv:status; sh:hasValue "succeeded" ] ] ] [ sh:property [ sh:path sec:hasEvidence; sh:minCount 1; sh:class sec:EvidenceEnvelope ]; sh:property [ sh:path sv:endedAt; sh:minCount 1; sh:datatype xsd:dateTime ] ] ).
+inv:LeaseShape a sh:NodeShape; sh:targetClass inv:ResourceLease;
+ sh:property [ sh:path [ sh:inversePath inv:holdsLease ]; sh:minCount 1; sh:maxCount 1; sh:class inv:Run ];
+ sh:property [ sh:path inv:leasesResource; sh:minCount 1; sh:class inv:Resource ];
+ sh:property [ sh:path inv:fencingToken; sh:minCount 1; sh:maxCount 1 ];
+ sh:property [ sh:path inv:grantedAt; sh:minCount 1; sh:datatype xsd:dateTime; sh:lessThan inv:expiresAt ];
+ sh:property [ sh:path inv:expiresAt; sh:minCount 1; sh:datatype xsd:dateTime ].
+ml:LocationShape a sh:NodeShape; sh:targetClass ml:DataLocation;
+ sh:or ( [ sh:not [ sh:property [ sh:path sv:status; sh:hasValue "ready" ] ] ] [ sh:property [ sh:path ml:checksum; sh:minCount 1; sh:pattern "^sha256:[0-9a-f]{64}$" ] ] ).

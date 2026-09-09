@@ -1,0 +1,7 @@
+PREFIX sv: <https://saintvision.ai/ontology/core#>
+PREFIX inv: <https://saintvision.ai/ontology/inv#>
+PREFIX dev: <https://saintvision.ai/ontology/dev#>
+PREFIX ml: <https://saintvision.ai/ontology/mlops#>
+PREFIX sec: <https://saintvision.ai/ontology/security#>
+PREFIX res: <https://saintvision.ai/resource/>
+SELECT ?run ?attempt ?checkpoint ?token WHERE { ?run inv:hasAttempt ?attempt; inv:holdsLease ?lease. ?attempt inv:hasCheckpoint ?checkpoint. ?lease inv:fencingToken ?token. }

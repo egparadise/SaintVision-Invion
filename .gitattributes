@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.md text eol=lf whitespace=-blank-at-eol
+*.json text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.ttl text eol=lf
+*.jsonld text eol=lf
+docs/sources/** -text -whitespace

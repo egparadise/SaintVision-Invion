@@ -1,0 +1,198 @@
+{
+  "captured_at": "2026-09-09T15:10:54.204562+09:00",
+  "vault": "C:\\Users\\egpar\\OneDrive - Inviz\\15.Vibe Cording\\Obsidian\\SaintVision-Invion",
+  "files": [
+    {
+      "source_id": "SRC-001",
+      "path": "00_Index/Overview.md",
+      "sha256": "e768bf5df336c2f6f6780c0645addd321c88658670af312d6513c5ec588a48a7",
+      "bytes": 6732,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-002",
+      "path": "00_Index/SaintVision INV 개발 설계 인덱스.md",
+      "sha256": "766e7badc0e4f70c99969b71bd3846addcf53e8f86d6c8bc33721d426aaf6d57",
+      "bytes": 4987,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-003",
+      "path": "10_Concepts/용어 사전과 6단계 통합 모델.md",
+      "sha256": "a3a94b9d44f60e731105b3ca7c46c4b59b12e7255cec7753da55be9b90e576e5",
+      "bytes": 15454,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-004",
+      "path": "20_Architecture/Dev Workspace CLI Git Docker MLOps AI CLI 통합 설계.md",
+      "sha256": "db01568e480e7ca6134bd875f7047d6d49afe2f9e53418fd79a0096cc048330e",
+      "bytes": 12051,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-005",
+      "path": "20_Architecture/기술 관계도.md",
+      "sha256": "e48442c4c5fdfb783473c0f6a8dd3e8b08f3b84d7c521489eb72022274a4a793",
+      "bytes": 7165,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-006",
+      "path": "20_Architecture/기술 그래프.md",
+      "sha256": "10aeff4830490ebaa23a97f25d8ab349e6251b1663d4dda786f5d47e6898693e",
+      "bytes": 5693,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-007",
+      "path": "20_Architecture/기술 문서.md",
+      "sha256": "a36e34b88be0e746eecb1a2bffa3e35d5c1f129f68719d096c2571531a3f799f",
+      "bytes": 12998,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-008",
+      "path": "20_Architecture/시스템 스키마.md",
+      "sha256": "709f6885d9b43a6205b6926368d1b2c63790a0dffff6802bfeacf087dc20c521",
+      "bytes": 9201,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-009",
+      "path": "20_Architecture/시스템 아키텍처와 기술 스택.md",
+      "sha256": "051e2b16899c623e072ba4080e08a8ba3f9157820c4d4e030e8c2468083a36c7",
+      "bytes": 14819,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-010",
+      "path": "30_Development/24주 구현 로드맵과 백로그.md",
+      "sha256": "7c8427240f46f7e3ee72ff35332e557556905ad9c2847ba24ae86d25fe225391",
+      "bytes": 11584,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-011",
+      "path": "30_Development/개발 플랜.md",
+      "sha256": "a87075cca558bdfd5f02dbe219aff9916a30356d78c7a5277be72e416f74da3e",
+      "bytes": 8277,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-012",
+      "path": "30_Development/공통 계약 요구사항과 완료 기준.md",
+      "sha256": "2fd7f86b1c7698ba0436882e39335a15ef9d3741aa599f6bba038cf12dcfb604",
+      "bytes": 11571,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-013",
+      "path": "30_Development/단계별 개발 계획.md",
+      "sha256": "a71c689a118634e4b5888dcb435bea7cade386885941e3422056f1deb945cb6e",
+      "bytes": 16444,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-014",
+      "path": "40_Governance/보안 평가 운영 가이드.md",
+      "sha256": "d299118605923e4e68306c83bfb83b71074902381a3329aa35c99c6ca1f9d769",
+      "bytes": 12210,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-015",
+      "path": "50_Ontology/Ontology 설계.md",
+      "sha256": "1fd31443a13cad677f96b5b7ed80ec3d4002a1012a5deb571913d15107581897",
+      "bytes": 12584,
+      "review": "보존·계약 정합화",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-016",
+      "path": "50_Ontology/saintvision-inv.example.jsonld",
+      "sha256": "ebf32cbd6cc9ad413f9dedbf8b4198ccdd38ba136bb8604b4f6042b88ccd39ce",
+      "bytes": 6879,
+      "review": "보존·계약 정합화",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-017",
+      "path": "50_Ontology/saintvision-inv.ttl",
+      "sha256": "d89a3b7094a00c12ed6f44c6b0d9d3df400ad164e404343520b1ca01f97f4b3a",
+      "bytes": 14064,
+      "review": "보존·계약 정합화",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-018",
+      "path": "60_Gaps/00_보완 설계 종합 요약.md",
+      "sha256": "158aa31904b84757368852011589b916383f824d438e507fb4197e79c5e4e5ed",
+      "bytes": 15572,
+      "review": "채택·충돌 항목 수정",
+      "author": "Claude"
+    },
+    {
+      "source_id": "SRC-019",
+      "path": "60_Gaps/10_Frontend 보완 설계.md",
+      "sha256": "7dd0239c5dcb6eb1cc896a65a36f324ab01b0d6454fbc07c433b55aa35ca1c86",
+      "bytes": 16467,
+      "review": "채택·충돌 항목 수정",
+      "author": "Claude"
+    },
+    {
+      "source_id": "SRC-020",
+      "path": "60_Gaps/20_Backend 보완 설계.md",
+      "sha256": "dde7e7c3b4caccff6bc4ba346abe43329f864ecef78cbbc51cbd7ffe21ac54d3",
+      "bytes": 24720,
+      "review": "채택·충돌 항목 수정",
+      "author": "Claude"
+    },
+    {
+      "source_id": "SRC-021",
+      "path": "60_Gaps/30_DB 보완 설계.md",
+      "sha256": "3c95530e190fc789e366680c2d8d236f26d5d78edf56d7b33205000bd9adcd90",
+      "bytes": 31253,
+      "review": "채택·충돌 항목 수정",
+      "author": "Claude"
+    },
+    {
+      "source_id": "SRC-022",
+      "path": "60_Gaps/40_Storage 보완 설계.md",
+      "sha256": "17242ddab86e7064f1710a7de8e10532adb80d935a712e6b086978786cda027c",
+      "bytes": 21821,
+      "review": "채택·충돌 항목 수정",
+      "author": "Claude"
+    },
+    {
+      "source_id": "SRC-023",
+      "path": "90_Sources/최신 기술 출처와 설계 근거.md",
+      "sha256": "d0048d7ba020951aa1a736b35e2378d053c9202d8fe563fd7da364854f3a1e5a",
+      "bytes": 16556,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    },
+    {
+      "source_id": "SRC-024",
+      "path": "README.md",
+      "sha256": "17f3e871135dd562c9d370733f7d5d2479e4e34612dbee384149f3264bd433f1",
+      "bytes": 3097,
+      "review": "채택·충돌 항목 수정",
+      "author": "기존 설계(작성자 추정 안 함)"
+    }
+  ]
+}

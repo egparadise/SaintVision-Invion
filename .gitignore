@@ -1,0 +1,10 @@
+.work/
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.obsidian/
+node_modules/
+dist/

@@ -1,0 +1,43 @@
+---
+doc_id: "PLAN-S02"
+title: "S02 Node 관측"
+version: "1.0.0"
+status: "planned"
+author: "Codex"
+updated: "2026-09-09T15:10:54+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+tags: ["saintvision", "final-plan"]
+---
+
+# S02 Node 관측
+
+
+기간: 착수 후 3–4주 / 릴리스 R1 / 품질 게이트 G0 기반. **planned**. 실제 시작·종료 시각과 실행 페이지는 수행 시 생성한다.
+
+## 목표와 선행 조건
+
+OUT-02: 로그인한 사용자가 등록 Node와 제공 자원을 본다
+
+선행: S01의 4영역 검증 결과와 공유 계약. 아래 작업은 준비가 된 범위에서 병행하되 선행 완료를 거짓 표시하지 않는다.
+
+## 작업
+
+| ID | 영역 | owner | reviewer | 산출물 |
+|---|---|---|---|---|
+| S02-FE | Frontend | Gemini | Codex | 로그인·Node 목록·상세·오류 상태 |
+| S02-BE | Backend | Claude | Codex | OIDC·mTLS 등록·Heartbeat |
+| S02-DB | DB | Claude | Codex | User·Node·Capability·Snapshot |
+| S02-ST | Storage | Claude | Codex | 제공 폴더·DataLocation 카탈로그 |
+
+## 계약·검증
+
+각 영역의 [[Frontend 최종 개발 계획]], [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]]과 [[설계 충돌 정정 및 ADR]]을 입력으로 사용한다. 생성 계약은 소비자 검토 후 구현한다.
+
+AC-02: 허용 Node 등록·조회 성공, 토큰 재사용 차단, 다른 project 정보 접근 차단
+
+필수 증거: 실제 API·브라우저 여정·인증 실패 기록. 성공 수·전체 수·실제 명령·종료 코드·측정 환경을 기록한다. 실패가 있으면 [[오류 및 해결 인덱스]]에 재현과 해결을 연결한다.
+
+## 공통 완료·인계
+
+모든 작업에 init → 구현·검증 → commit → push → CI build → Obsidian report → reviewer 인계를 적용한다. API/상태/저장소 변경은 영향받는 Agent가 같은 계약 버전을 읽었는지 확인한다. 날짜별 기록은 [[개발 과정 기록 템플릿]]을 사용한다. 제품 기능 검증 전에는 이 계획의 checkbox나 task status를 done으로 바꾸지 않는다.

@@ -1,0 +1,22 @@
+{
+  "release": "documentation-baseline-1.0.0",
+  "guide_version": "1.0.0",
+  "ontology_version": "0.2.0",
+  "task_registry_version": "1.0.0",
+  "api_contract_version": "planned-v1alpha1",
+  "database_migration_version": null,
+  "product_build": "not_implemented",
+  "remote": "https://github.com/egparadise/SaintVision-Invion.git",
+  "source_of_truth": "Git docs/vault",
+  "validation": [
+    "source-hashes",
+    "wiki-links",
+    "task-traceability",
+    "sync-safety",
+    "rdf",
+    "shacl",
+    "sparql",
+    "documentation-bundle"
+  ],
+  "human_and_cross_agent_review": "pending"
+}
