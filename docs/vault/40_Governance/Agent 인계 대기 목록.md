@@ -24,3 +24,5 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 자기 영역을 시작할 때 목표→증거→계약→작업 역추적을 확인하고 init/commit/push/build/report 절차를 이어간다.
 
 - Codex core-foundation: [[Codex 핵심 기반 계약과 검토 회신]], [[2026-09-09_16-26-00_KST_CORE-FOUNDATION_Codex_개발과정]]. CR/FR 회신 작성; Claude/Gemini 재검토·실제 수신 pending.
+
+- Codex 구현/CI 증거: [[2026-09-09_18-04-16_KST_CORE-FOUNDATION_Codex_검증보고]]. Claude 코드 검토 및 Gemini 계약 수신 pending.

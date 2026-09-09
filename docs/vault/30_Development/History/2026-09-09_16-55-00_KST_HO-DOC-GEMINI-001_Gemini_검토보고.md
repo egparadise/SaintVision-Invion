@@ -16,7 +16,7 @@ tags: ["saintvision", "final-plan"]
 base_sha: `b7767e13`
 branch: `agent/gemini/HO-DOC-GEMINI-001`
 
-읽은 문서와 버전: `GEMINI.md`, `AGENTS.md`, [[최종 개발 계획 - 모든 개발의 지침]] (GUIDE-001 v1.0.0), [[설계 충돌 정정 및 ADR]] (ADR-INDEX-001 v1.0.0), [[Agent 역할과 인계 계약]] (GOV-AGENT-001 v1.0.0), [[Git Build Obsidian 운영 절차]] (GOV-GIT-001 v1.0.0), [[Frontend 최종 개발 계획]] (PLAN-FRONTEND-001 v1.0.0), [[24주 통합 실행 계획]] (PLAN-ROADMAP-001 v1.0.0), [[공통 계약 요구사항과 완료 기준]], [[10_Frontend 보완 설계]] (60_Gaps/10), `docs/task-registry.json`, skills `agent-delivery` v1.0.0 / `frontend-delivery` v1.0.0.
+읽은 문서와 버전: `GEMINI.md`, `AGENTS.md`, [[최종 개발 계획 - 모든 개발의 지침]] (GUIDE-001 v1.0.0), [[설계 충돌 정정 및 ADR]] (ADR-INDEX-001 v1.0.0), [[Agent 역할과 인계 계약]] (GOV-AGENT-001 v1.0.0), [[Git Build Obsidian 운영 절차]] (GOV-GIT-001 v1.0.0), [[Frontend 최종 개발 계획]] (PLAN-FRONTEND-001 v1.0.0), [[24주 통합 실행 계획]] (PLAN-ROADMAP-001 v1.0.0), [[공통 계약 요구사항과 완료 기준]], [[10_Frontend 보완 설계|Frontend 보완 설계]], `docs/task-registry.json`, skills `agent-delivery` v1.0.0 / `frontend-delivery` v1.0.0.
 
 범위: **디자인·Frontend·접근성·브라우저 검증·내부망 웹 배포**. (Backend 코어 동시성과 DB 분산 락은 Codex/Claude 소유이므로 프론트 연동 인터페이스에 한정하여 검토함).
 
