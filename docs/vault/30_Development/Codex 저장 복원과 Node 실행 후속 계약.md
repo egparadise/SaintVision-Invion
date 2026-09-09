@@ -4,7 +4,7 @@ title: "Codex 저장 복원과 Node 실행 후속 계약"
 version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T03:03:00+09:00"
+updated: "2026-09-10T03:15:23+09:00"
 source_of_truth: "Git"
 ---
 
