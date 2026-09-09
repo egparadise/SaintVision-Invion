@@ -2,7 +2,7 @@
 doc_id: "DEV-APPROVAL-BOUNDARY-001"
 title: "Codex 승인 경계 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-09T22:25:39+09:00"
 source_of_truth: "Git"
@@ -28,3 +28,7 @@ scope: core 승인 라이브러리, 0002 migration, additive JSON Schema/생성 
 ## 2026-09-09T22:59:31+09:00 로컬 검증
 
 python tools/generate_contracts.py exit 0; pytest 첫 수집 exit 1(동명 모듈 충돌), 수정 후 exit 0(63 passed/38 PostgreSQL skipped); check_docs.py/check_ontology.py/test_sync.py/git diff --check 모두 exit 0. sync_obsidian.py --check exit 0, 102 managed/11 pending/0 conflict(추가 계약 문서 작성 전 시점). DB 검증은 CI 격리 PostgreSQL로 이어간다. 오류·해결은 [[ERR-APPROVAL-001 승인 테스트 수집 충돌]]과 [[RES-APPROVAL-001 테스트 모듈 분리와 재검증]].
+
+## 2026-09-09T23:03:51+09:00 구현 CI 검증
+
+코드 `73e8774035a6a8677e5dfd317b444c6fa60a331f` commit/push exit 0. Core #34360662284 / Documentation #34360662521 success. 원본 JUnit 101 tests/0 failures/0 errors/0 skipped 확인. 보고서 [[2026-09-09_23-03-51_KST_APPROVAL-BOUNDARY_Codex_검증보고]]. 독립 검토 pending.

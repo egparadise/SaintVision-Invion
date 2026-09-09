@@ -61,3 +61,5 @@ lock_sentinel은 CHECK(true)인 고정 컬럼으로 SELECT FOR SHARE에 필요�
 - Codex: 리뷰 지적 반영, S03 ToolGateway/Sandbox와 실제 dispatch 소비자의 정책 재검사·command inbox·Node fence 결합. S01 환경 근거 없이 S04 전체를 완료 처리하지 않음.
 
 제품 Prompt/Context/Harness/ROOF/Graph 배포 버전은 미연동이다. 테스트 policy_version `roof:test:1`은 합성 fixture이며 운영 ROOF 버전이나 사람의 실제 승인이 아니다.
+
+실제 CI 확인: [[2026-09-09_23-03-51_KST_APPROVAL-BOUNDARY_Codex_검증보고]]. PostgreSQL 포함 101개 시험 통과이며 독립 검토는 pending이다.
