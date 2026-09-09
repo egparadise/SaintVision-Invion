@@ -1317,6 +1317,68 @@
         "allocations"
       ],
       "additionalProperties": false
+    },
+    "NodeExecutionResult": {
+      "type": "object",
+      "properties": {
+        "duplicate": {
+          "type": "boolean"
+        },
+        "receipt": {
+          "$ref": "#/$defs/NodeStopReceipt"
+        },
+        "cleanupPending": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "duplicate",
+        "receipt",
+        "cleanupPending"
+      ],
+      "additionalProperties": false
+    },
+    "NodePeerPolicy": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "clientFingerprints": {
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "expiresAt",
+        "clientFingerprints"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -1400,6 +1462,12 @@
     },
     {
       "$ref": "#/$defs/NodeStopReceipt"
+    },
+    {
+      "$ref": "#/$defs/NodeExecutionResult"
+    },
+    {
+      "$ref": "#/$defs/NodePeerPolicy"
     }
   ]
 }

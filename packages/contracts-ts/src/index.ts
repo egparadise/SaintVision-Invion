@@ -311,3 +311,18 @@ export interface NodeStopReceipt {
   finishedAt: Timestamp;
   allocations: Array<NodeAllocation>;
 }
+
+export interface NodeExecutionResult {
+  duplicate: boolean;
+  receipt: NodeStopReceipt;
+  cleanupPending: false;
+}
+
+export interface NodePeerPolicy {
+  version: number;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  expiresAt: Timestamp;
+  clientFingerprints: Array<string>;
+}

@@ -75,7 +75,7 @@ class NodeReceiptStore:
     def __init__(self, database: Database):
         self.db = database
 
-    def record(self, node: NodePrincipal, receipt):
+    def record(self, node: NodePrincipal, receipt, *, channel=None):
         receipt = deepcopy(receipt)
         validate_contract("NodeStopReceipt", receipt)
         if (
@@ -89,6 +89,27 @@ class NodeReceiptStore:
         fingerprint = digest(receipt)
         with self.db.transaction(node.tenant_id) as conn:
             run = lock_run(conn, receipt["runId"], receipt["projectId"])
+            if channel is not None:
+                from .node_channels import assert_channel
+
+                if (
+                    channel.tenant_id != node.tenant_id
+                    or channel.node_id != node.node_id
+                    or channel.recovery_epoch != self.db.recovery_epoch
+                ):
+                    raise DomainError("NODE-0033", "Channel receipt scope differs", 403)
+                current_node = conn.execute(
+                    "SELECT recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE",
+                    (node.node_id,),
+                ).fetchone()
+                if (
+                    not current_node
+                    or str(current_node["recovery_epoch"]) != channel.recovery_epoch
+                ):
+                    raise DomainError(
+                        "NODE-0033", "Node identity changed during delivery", 403
+                    )
+                assert_channel(conn, channel)
             prior = conn.execute(
                 "SELECT content_hash,envelope FROM inv.node_stop_receipts WHERE command_id=%s",
                 (receipt["commandId"],),
@@ -146,7 +167,7 @@ class NodeReceiptStore:
                         "LEASE-0002", "Stop receipt allocation proof differs"
                     )
             conn.execute(
-                "INSERT INTO inv.node_stop_receipts(tenant_id,command_id,claim_id,receipt_id,content_hash,envelope) VALUES(%s,%s,%s,%s,%s,%s)",
+                "INSERT INTO inv.node_stop_receipts(tenant_id,command_id,claim_id,receipt_id,content_hash,envelope,channel_version,peer_sha256) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)",
                 (
                     node.tenant_id,
                     receipt["commandId"],
@@ -154,6 +175,8 @@ class NodeReceiptStore:
                     receipt["receiptId"],
                     fingerprint,
                     Jsonb(receipt),
+                    channel.version if channel is not None else None,
+                    channel.certificate_sha256 if channel is not None else None,
                 ),
             )
             conn.execute(
