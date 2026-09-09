@@ -485,6 +485,67 @@ class ExecutionClaim(BaseModel):
     notAfter: Timestamp
 
 
+class Kind1(StrEnum):
+    cpu = 'cpu'
+    memory = 'memory'
+
+
+class NodeAllocation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    lease: ResourceLease
+    nodeId: NodeId
+    kind: Kind1
+
+
+class NodeExecutionPermit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    claim: ExecutionClaim
+    launch: SandboxLaunchSpec
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    issuedAt: Timestamp
+
+
+class SignedNodePermit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    payload: constr(min_length=1, max_length=1400000)
+    signature: constr(min_length=88, max_length=88)
+
+
+class Reason(StrEnum):
+    exited = 'exited'
+    timeout = 'timeout'
+    cancelled = 'cancelled'
+    recovered = 'recovered'
+
+
+class NodeStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    claimId: ClaimId
+    commandId: CommandId
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    planDigest: ActionDigest
+    containerId: constr(pattern=r'^[0-9a-f]{64}$')
+    stopped: Literal[True]
+    processStarted: bool
+    exitCode: conint(ge=-1, le=255)
+    reason: Reason
+    finishedAt: Timestamp
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -511,6 +572,9 @@ class INVCore(
         | AuthorizedCommand
         | SandboxLaunchSpec
         | ExecutionClaim
+        | NodeExecutionPermit
+        | SignedNodePermit
+        | NodeStopReceipt
     ]
 ):
     root: (
@@ -538,4 +602,7 @@ class INVCore(
         | AuthorizedCommand
         | SandboxLaunchSpec
         | ExecutionClaim
+        | NodeExecutionPermit
+        | SignedNodePermit
+        | NodeStopReceipt
     ) = Field(..., title='INVCore')

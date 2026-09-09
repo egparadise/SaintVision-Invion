@@ -1155,6 +1155,168 @@
         "notAfter"
       ],
       "additionalProperties": false
+    },
+    "NodeAllocation": {
+      "type": "object",
+      "properties": {
+        "lease": {
+          "$ref": "#/$defs/ResourceLease"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "cpu",
+            "memory"
+          ]
+        }
+      },
+      "required": [
+        "lease",
+        "nodeId",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "NodeExecutionPermit": {
+      "type": "object",
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/ExecutionClaim"
+        },
+        "launch": {
+          "$ref": "#/$defs/SandboxLaunchSpec"
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeAllocation"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "issuedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "claim",
+        "launch",
+        "allocations",
+        "issuedAt"
+      ],
+      "additionalProperties": false
+    },
+    "SignedNodePermit": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1400000
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 88,
+          "maxLength": 88
+        }
+      },
+      "required": [
+        "payload",
+        "signature"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStopReceipt": {
+      "type": "object",
+      "properties": {
+        "receiptId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "claimId": {
+          "$ref": "#/$defs/ClaimId"
+        },
+        "commandId": {
+          "$ref": "#/$defs/CommandId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "planDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "containerId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "stopped": {
+          "type": "boolean",
+          "const": true
+        },
+        "processStarted": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 255
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "exited",
+            "timeout",
+            "cancelled",
+            "recovered"
+          ]
+        },
+        "finishedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeAllocation"
+          },
+          "minItems": 1,
+          "maxItems": 128
+        }
+      },
+      "required": [
+        "receiptId",
+        "claimId",
+        "commandId",
+        "tenantId",
+        "projectId",
+        "runId",
+        "nodeId",
+        "recoveryEpoch",
+        "planDigest",
+        "containerId",
+        "stopped",
+        "processStarted",
+        "exitCode",
+        "reason",
+        "finishedAt",
+        "allocations"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -1229,6 +1391,15 @@
     },
     {
       "$ref": "#/$defs/ExecutionClaim"
+    },
+    {
+      "$ref": "#/$defs/NodeExecutionPermit"
+    },
+    {
+      "$ref": "#/$defs/SignedNodePermit"
+    },
+    {
+      "$ref": "#/$defs/NodeStopReceipt"
     }
   ]
 }

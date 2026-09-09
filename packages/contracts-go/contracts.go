@@ -276,3 +276,40 @@ type ExecutionClaim struct {
     RecoveryEpoch string `json:"recoveryEpoch"`
     NotAfter Timestamp `json:"notAfter"`
 }
+
+type NodeAllocation struct {
+    Lease ResourceLease `json:"lease"`
+    NodeId NodeId `json:"nodeId"`
+    Kind string `json:"kind"`
+}
+
+type NodeExecutionPermit struct {
+    Claim ExecutionClaim `json:"claim"`
+    Launch SandboxLaunchSpec `json:"launch"`
+    Allocations []NodeAllocation `json:"allocations"`
+    IssuedAt Timestamp `json:"issuedAt"`
+}
+
+type SignedNodePermit struct {
+    Payload string `json:"payload"`
+    Signature string `json:"signature"`
+}
+
+type NodeStopReceipt struct {
+    ReceiptId string `json:"receiptId"`
+    ClaimId ClaimId `json:"claimId"`
+    CommandId CommandId `json:"commandId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    PlanDigest ActionDigest `json:"planDigest"`
+    ContainerId string `json:"containerId"`
+    Stopped bool `json:"stopped"`
+    ProcessStarted bool `json:"processStarted"`
+    ExitCode int64 `json:"exitCode"`
+    Reason string `json:"reason"`
+    FinishedAt Timestamp `json:"finishedAt"`
+    Allocations []NodeAllocation `json:"allocations"`
+}
