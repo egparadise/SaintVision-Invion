@@ -130,7 +130,10 @@ def verify_backup(
     row = session.get(BackupRecord, backup_id)
     if row is None or row.tenant_id != tenant_id:
         raise InvError(RES_ARTIFACT_NOT_FOUND, "backup not found")
-    if len(checksum_sha256 or "") != 64 or checksum_sha256 != checksum_sha256.lower():
+    if (
+        len(checksum_sha256 or "") != 64
+        or not all(c in "0123456789abcdef" for c in checksum_sha256)
+    ):
         raise InvError(VAL_SCHEMA, "checksum must be a lowercase hex SHA-256")
     row.checksum_sha256 = checksum_sha256
     row.verified = True
