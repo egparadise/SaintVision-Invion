@@ -78,6 +78,7 @@ PREFIXES: Final[dict[str, str]] = {
     "announcement": "anc",
     "pool": "pol",
     "plan": "pln",
+    "replica": "rep",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")

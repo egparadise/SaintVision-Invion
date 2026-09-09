@@ -82,6 +82,13 @@ from .identity import (
     User,
     UserRole,
 )
+from .locality import (
+    CACHE_FILL_LIMIT,
+    MAX_CONCURRENT_TRANSFERS,
+    REPLICA_STATES,
+    DataReplica,
+    NodeLink,
+)
 from .operations import ACTOR_TYPES, AUDIT_OUTCOMES, AuditEvent, IdempotencyRecord
 from .operations_pilot import (
     ACCEPTANCE_OUTCOMES,
@@ -184,6 +191,8 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "resource_pool_members",
     "distributed_plans",
     "plan_placements",
+    "data_replicas",
+    "node_links",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -223,6 +232,11 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
 
 __all__ = [
     "ACCEPTANCE_OUTCOMES",
+    "CACHE_FILL_LIMIT",
+    "DataReplica",
+    "MAX_CONCURRENT_TRANSFERS",
+    "NodeLink",
+    "REPLICA_STATES",
     "DistributedPlan",
     "PLACEMENT_STATES",
     "PLAN_STATES",
