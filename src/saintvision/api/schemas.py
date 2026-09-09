@@ -129,4 +129,53 @@ class PageResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+
+
+class AnnouncementRequest(Strict):
+    """What a Node Agent says about itself when announcing.
+
+    Every field is a claim. The server records them prefixed ``claimed_`` and
+    never treats them as measured; the source address is taken from the
+    connection, not from here.
+    """
+
+    instance_id: str = Field(min_length=1, max_length=128, alias="instanceId")
+    hostname: str = Field(min_length=1, max_length=253)
+    os_type: str = Field(pattern="^(windows|linux)$", alias="osType")
+    os_version: str = Field(max_length=64, alias="osVersion")
+    agent_version: str = Field(max_length=64, alias="agentVersion")
+    cpu_cores: int = Field(default=0, ge=0, alias="cpuCores")
+    ram_bytes: int = Field(default=0, ge=0, alias="ramBytes")
+    gpu_count: int = Field(default=0, ge=0, alias="gpuCount")
+    labels: dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolRequest(Strict):
+    project_id: str = Field(max_length=30, alias="projectId")
+    name: str = Field(min_length=1, max_length=128)
+    description: str | None = Field(default=None, max_length=2000)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DistributedPlanRequest(Strict):
+    """How to spread one Run over a pool.
+
+    ``splittableDeclared`` has no default of convenience: splitting a program
+    that is not shard-aware produces a wrong answer, so the caller states it.
+    """
+
+    run_id: str = Field(max_length=30, alias="runId")
+    strategy: str = Field(pattern="^(single_node|data_parallel|sharded)$")
+    shard_count: int = Field(default=1, ge=1, le=1024, alias="shardCount")
+    splittable_declared: bool = Field(default=False, alias="splittableDeclared")
+    shard_cpu_cores: float = Field(default=0, ge=0, alias="shardCpuCores")
+    shard_ram_bytes: int = Field(default=0, ge=0, alias="shardRamBytes")
+    shard_gpu_count: int = Field(default=0, ge=0, alias="shardGpuCount")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 HeartbeatRequest.model_rebuild()

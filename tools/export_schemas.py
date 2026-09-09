@@ -34,6 +34,9 @@ EXPORTED = {
     "contribution-request": schemas.ContributionRequest,
     "contribution-response": schemas.ContributionResponse,
     "data-location-response": schemas.DataLocationResponse,
+    "announcement-request": schemas.AnnouncementRequest,
+    "pool-request": schemas.PoolRequest,
+    "distributed-plan-request": schemas.DistributedPlanRequest,
 }
 
 

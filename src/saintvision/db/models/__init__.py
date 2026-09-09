@@ -1,4 +1,5 @@
-"""SQLAlchemy models for the S02, S03 and S09 scope.
+"""SQLAlchemy models for the S02, S03, S09, S10 and S12 scope, plus node
+discovery and resource pools.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
@@ -20,6 +21,15 @@ from .context import (
     ContextSnapshot,
     RunRecord,
     RunRecordArtifact,
+)
+from .discovery import (
+    ANNOUNCEMENT_STATES,
+    ANNOUNCEMENT_TTL_SECONDS,
+    MAX_CANDIDATES_PER_TENANT,
+    POOL_STATUSES,
+    NodeAnnouncement,
+    ResourcePool,
+    ResourcePoolMember,
 )
 from .evaluation import (
     EVAL_CATEGORIES,
@@ -49,6 +59,19 @@ from .execution import (
     Workspace,
     WorkspaceVolume,
 )
+from .lineage import (
+    DEPLOYMENT_ENVIRONMENTS,
+    DEPLOYMENT_STATUSES,
+    LINEAGE_KINDS,
+    CodeCommit,
+    ContainerImage,
+    Dataset,
+    DatasetVersion,
+    Deployment,
+    Model,
+    ModelLineage,
+    ModelVersion,
+)
 from .identity import (
     PROJECT_STATUSES,
     USER_STATUSES,
@@ -59,7 +82,36 @@ from .identity import (
     User,
     UserRole,
 )
+from .locality import (
+    CACHE_FILL_LIMIT,
+    MAX_CONCURRENT_TRANSFERS,
+    REPLICA_STATES,
+    DataReplica,
+    NodeLink,
+)
 from .operations import ACTOR_TYPES, AUDIT_OUTCOMES, AuditEvent, IdempotencyRecord
+from .operations_pilot import (
+    ACCEPTANCE_OUTCOMES,
+    BACKUP_KINDS,
+    BACKUP_RETENTION_DAYS,
+    DRILL_OUTCOMES,
+    DRILL_SCOPES,
+    TARGET_RPO_SECONDS,
+    TARGET_RTO_SECONDS,
+    AcceptanceRecord,
+    BackupRecord,
+    PermissionSnapshot,
+    RecoveryDrill,
+    ReleaseManifest,
+    StorageCheck,
+)
+from .placement import (
+    PLACEMENT_STATES,
+    PLAN_STATES,
+    PLAN_STRATEGIES,
+    DistributedPlan,
+    PlanPlacement,
+)
 from .resource import (
     CAPABILITY_KINDS,
     NODE_STATUSES,
@@ -117,6 +169,30 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "eval_cases",
     "eval_runs",
     "eval_results",
+    # S10
+    "datasets",
+    "dataset_versions",
+    "code_commits",
+    "container_images",
+    "models",
+    "model_versions",
+    "model_lineage",
+    "deployments",
+    # S12
+    "backup_records",
+    "recovery_drills",
+    "storage_checks",
+    "release_manifests",
+    "acceptance_records",
+    "permission_snapshots",
+    # discovery and pools
+    "node_announcements",
+    "resource_pools",
+    "resource_pool_members",
+    "distributed_plans",
+    "plan_placements",
+    "data_replicas",
+    "node_links",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -141,8 +217,63 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     "context_snapshots",
 )
 
+#: Tables whose *identity* is immutable but whose lifecycle advances. The
+#: application role gets column-level UPDATE on exactly these columns and no
+#: others, so content_sha256 and version cannot be rewritten while stage,
+#: verification and the retention pin can still move forward.
+#:
+#: Blanket append-only was the first attempt and was wrong: a model version has
+#: to become verified, pinned and released after it is inserted, and CI caught
+#: the contradiction as "permission denied for table model_versions".
+LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
+    "dataset_versions": ("retention_pinned_until",),
+    "model_versions": ("stage", "verified_at", "retention_pinned_until"),
+}
+
 __all__ = [
+    "ACCEPTANCE_OUTCOMES",
+    "CACHE_FILL_LIMIT",
+    "DataReplica",
+    "MAX_CONCURRENT_TRANSFERS",
+    "NodeLink",
+    "REPLICA_STATES",
+    "DistributedPlan",
+    "PLACEMENT_STATES",
+    "PLAN_STATES",
+    "PLAN_STRATEGIES",
+    "PlanPlacement",
+    "ANNOUNCEMENT_STATES",
+    "ANNOUNCEMENT_TTL_SECONDS",
+    "MAX_CANDIDATES_PER_TENANT",
+    "NodeAnnouncement",
+    "POOL_STATUSES",
+    "ResourcePool",
+    "ResourcePoolMember",
     "ACTOR_TYPES",
+    "AcceptanceRecord",
+    "BACKUP_KINDS",
+    "BACKUP_RETENTION_DAYS",
+    "BackupRecord",
+    "DRILL_OUTCOMES",
+    "DRILL_SCOPES",
+    "PermissionSnapshot",
+    "RecoveryDrill",
+    "ReleaseManifest",
+    "StorageCheck",
+    "TARGET_RPO_SECONDS",
+    "TARGET_RTO_SECONDS",
+    "LIFECYCLE_UPDATE_COLUMNS",
+    "CodeCommit",
+    "ContainerImage",
+    "DEPLOYMENT_ENVIRONMENTS",
+    "DEPLOYMENT_STATUSES",
+    "Dataset",
+    "DatasetVersion",
+    "Deployment",
+    "LINEAGE_KINDS",
+    "Model",
+    "ModelLineage",
+    "ModelVersion",
     "CONTEXT_ITEM_KINDS",
     "ContextBundle",
     "ContextBundleItem",

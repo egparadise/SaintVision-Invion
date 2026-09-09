@@ -59,6 +59,26 @@ PREFIXES: Final[dict[str, str]] = {
     "eval_suite": "evs",
     "eval_case": "evc",
     "eval_run": "evr",
+    # S10
+    "dataset": "dst",
+    "dataset_version": "dsv",
+    "commit": "cmt",
+    "image": "img",
+    "model": "mdl",
+    "model_version": "mdv",
+    "deployment": "dpl",
+    # S12
+    "backup": "bkp",
+    "drill": "drl",
+    "storage_check": "chk",
+    "release": "rel",
+    "acceptance": "acc",
+    "permission_snapshot": "psn",
+    # discovery, pools and distributed placement
+    "announcement": "anc",
+    "pool": "pol",
+    "plan": "pln",
+    "replica": "rep",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")

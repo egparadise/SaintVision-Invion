@@ -201,3 +201,46 @@ def test_append_only_tables_are_never_granted_update_or_delete(rendered_sql):
         for grant in grants:
             assert "UPDATE" not in grant.upper(), f"{table}: UPDATE granted"
             assert "DELETE" not in grant.upper(), f"{table}: DELETE granted"
+
+
+def test_lifecycle_tables_get_column_scoped_update_and_no_delete(rendered_sql):
+    """Identity immutable, lifecycle advancing.
+
+    Blanket append-only on model_versions was the first attempt; a version has
+    to become verified, pinned and released after insertion, so CI failed with
+    "permission denied". Column-level UPDATE says the intended thing instead —
+    content_sha256 and version cannot be rewritten, stage and the pin can move.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db.models import LIFECYCLE_UPDATE_COLUMNS
+
+    for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
+        grants = re.findall(rf"GRANT ([^;]+) ON {table} TO inv_app", rendered_sql)
+        assert grants, f"{table}: no grant rendered"
+        assert not any(
+            "DELETE" in g.upper() for g in grants
+        ), f"{table}: DELETE granted"
+
+        scoped = [g for g in grants if g.upper().startswith("UPDATE (")]
+        assert len(scoped) == 1, f"{table}: expected exactly one column-scoped UPDATE"
+        granted = {c.strip() for c in scoped[0][len("UPDATE ("):-1].split(",")}
+        assert granted == set(columns), f"{table}: granted {granted}, expected {set(columns)}"
+
+        # An unqualified UPDATE would defeat the point entirely.
+        assert not any(
+            re.match(r"^UPDATE\b(?!\s*\()", g.strip(), re.IGNORECASE) for g in grants
+        ), f"{table}: an unqualified UPDATE is granted"
+
+
+def test_identity_columns_are_never_grantable(rendered_sql):
+    """The columns a lineage claim rests on must not appear in any grant."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db.models import LIFECYCLE_UPDATE_COLUMNS
+
+    forbidden = {"content_sha256", "version", "uri", "model_id", "dataset_id", "tenant_id"}
+    for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
+        assert not (set(columns) & forbidden), f"{table}: grants an identity column"
