@@ -46,8 +46,15 @@ NEW_TENANT_SCOPED = (
     "deployments",
 )
 
-#: Immutable once written, for the application role.
-NEW_APPEND_ONLY = ("dataset_versions", "model_versions")
+#: Identity is immutable; the lifecycle advances. The application role gets
+#: column-level UPDATE on exactly these columns, so content_sha256, version and
+#: uri cannot be rewritten while stage, verification and the retention pin can
+#: still move forward. Blanket append-only was tried first and was wrong — a
+#: model version must become verified, pinned and released after insertion.
+LIFECYCLE_UPDATE_COLUMNS = {
+    "dataset_versions": ("retention_pinned_until",),
+    "model_versions": ("stage", "verified_at", "retention_pinned_until"),
+}
 
 
 def _now():
@@ -277,8 +284,11 @@ def upgrade() -> None:
 
 def _install_rls() -> None:
     for table in NEW_TENANT_SCOPED:
-        if table in NEW_APPEND_ONLY:
+        if table in LIFECYCLE_UPDATE_COLUMNS:
+            # No DELETE, and UPDATE only on the named columns.
             op.execute(f"GRANT SELECT, INSERT ON {table} TO {APP_ROLE}")
+            columns = ", ".join(LIFECYCLE_UPDATE_COLUMNS[table])
+            op.execute(f"GRANT UPDATE ({columns}) ON {table} TO {APP_ROLE}")
         else:
             op.execute(f"GRANT SELECT, INSERT, UPDATE, DELETE ON {table} TO {APP_ROLE}")
         op.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY")

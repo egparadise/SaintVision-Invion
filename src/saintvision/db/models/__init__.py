@@ -161,14 +161,24 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     # key — so UPDATE is meaningless and DELETE belongs to the orphan
     # collector, which runs as the owner, not the application.
     "context_snapshots",
-    # A dataset or model version whose bytes can be replaced under a fixed name
-    # invalidates every lineage claim built on it.
-    "dataset_versions",
-    "model_versions",
 )
+
+#: Tables whose *identity* is immutable but whose lifecycle advances. The
+#: application role gets column-level UPDATE on exactly these columns and no
+#: others, so content_sha256 and version cannot be rewritten while stage,
+#: verification and the retention pin can still move forward.
+#:
+#: Blanket append-only was the first attempt and was wrong: a model version has
+#: to become verified, pinned and released after it is inserted, and CI caught
+#: the contradiction as "permission denied for table model_versions".
+LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
+    "dataset_versions": ("retention_pinned_until",),
+    "model_versions": ("stage", "verified_at", "retention_pinned_until"),
+}
 
 __all__ = [
     "ACTOR_TYPES",
+    "LIFECYCLE_UPDATE_COLUMNS",
     "CodeCommit",
     "ContainerImage",
     "DEPLOYMENT_ENVIRONMENTS",
