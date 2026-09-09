@@ -57,3 +57,5 @@ legacy enforce_decision의 L2 requiredApprovals=1 허용 틈을 코드 검토에
 - Claude: admission lock/rollback/재전달 의미 독립 검토. 인증·PDP·Node capability adapter 연결 시 브라우저/model 값을 trusted snapshot으로 승격하지 않음. 기존 Backend 서비스와 core 두 구현의 통합은 별도 리뷰로 진행.
 - Gemini: claim을 실행 완료/자원 회수 배지로 표시하지 않음. may_start=False는 새 실행 허가가 아님. actor 전환 UI는 인증을 대체하지 않으며 서버 nonce·quorum·상태를 사용. Evidence ID는 evd_, 물리 자원 반환은 stop ACK 뒤에만 표시.
 - Codex: Node durable inbox·OS Sandbox driver·실제 단절/watchdog·stop ACK/결과 저장을 결합하는 후속 작업. 제품 Prompt/Context/Harness/ROOF/Graph 실행 버전은 아직 연결하지 않았으며 테스트 profile/ROOF 값은 합성이다.
+
+실제 CI 증거: [[2026-09-09_23-47-26_KST_TOOL-ADMISSION_Codex_검증보고]]. PostgreSQL 포함 172개 시험 통과, 독립 검토 및 OS Sandbox/장비 시험은 pending.

@@ -2,7 +2,7 @@
 doc_id: "DEV-TOOL-ADMISSION-001"
 title: "Codex ToolGateway 실행 허가 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-09T23:23:12+09:00"
 source_of_truth: "Git"
@@ -25,3 +25,7 @@ scope: 서버 내부 admission/inbox, 고정 Sandbox launch 계약과 config all
 ## 2026-09-09T23:38:28+09:00 로컬 구현·검증
 
 python tools/generate_contracts.py exit 0; pytest -q --junitxml=.work/tool-local-tests.xml exit 0 (89 passed/83 PostgreSQL skipped). 신규 71개 시험을 추가했다. 문서·Ontology 검사와 실제 PostgreSQL CI를 이어간다. 공유 Obsidian export에 이전 코어 ADR/진행/인계 기록이 빠진 사본을 발견하여 정본 증거와 외부 새 인계 제안을 함께 보존할 예정이다.
+
+## 2026-09-09T23:47:26+09:00 실제 CI
+
+구현 `ce59e633d72fc16ab4b57e06d0c5066e89c95ce8` commit/push exit 0; Core #34364959828 및 Documentation #34364959844 success. 원본 JUnit 172 tests / 0 failures / 0 errors / 0 skipped 확인. [[2026-09-09_23-47-26_KST_TOOL-ADMISSION_Codex_검증보고]]에 기록.
