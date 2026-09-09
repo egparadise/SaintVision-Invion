@@ -54,11 +54,30 @@ jobs:
       - name: Migration renders offline
         run: python -m alembic upgrade head --sql > /dev/null
 
-      - name: Migration applies and reverses
+      - name: Migration chain is linear with a single head
+        run: python tools/migration_graph.py
+
+      - name: Migration applies to an empty database
+        run: python -m alembic upgrade head
+
+      - name: The reversible tail reverses
+        # Not a blind `downgrade base`. Some revisions are deliberately
+        # irreversible — PLAN-DB-001 says an irreversible migration states a
+        # verified restore and forward-fix plan instead of forcing a downgrade,
+        # and 0006_control_api does. Rolling past one is not a test to fix; it
+        # is the thing the plan says not to do. So only the tail above the
+        # newest irreversible revision is exercised, and when there is no such
+        # tail the step says so rather than passing quietly.
         run: |
-          python -m alembic upgrade head
-          python -m alembic downgrade base
-          python -m alembic upgrade head
+          TARGET=$(python tools/migration_graph.py --downgrade-target)
+          HEAD=$(python tools/migration_graph.py --head)
+          if [ "$TARGET" = "$HEAD" ]; then
+            echo "No reversible tail: head ($HEAD) is itself irreversible."
+            echo "Rollback for this chain is by verified restore, not downgrade."
+          else
+            python -m alembic downgrade "$TARGET"
+            python -m alembic upgrade head
+          fi
 
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
