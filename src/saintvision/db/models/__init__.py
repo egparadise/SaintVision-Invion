@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the S02, S03, S09 and S10 scope.
+"""SQLAlchemy models for the S02, S03, S09, S10 and S12 scope.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
@@ -73,6 +73,21 @@ from .identity import (
     UserRole,
 )
 from .operations import ACTOR_TYPES, AUDIT_OUTCOMES, AuditEvent, IdempotencyRecord
+from .operations_pilot import (
+    ACCEPTANCE_OUTCOMES,
+    BACKUP_KINDS,
+    BACKUP_RETENTION_DAYS,
+    DRILL_OUTCOMES,
+    DRILL_SCOPES,
+    TARGET_RPO_SECONDS,
+    TARGET_RTO_SECONDS,
+    AcceptanceRecord,
+    BackupRecord,
+    PermissionSnapshot,
+    RecoveryDrill,
+    ReleaseManifest,
+    StorageCheck,
+)
 from .resource import (
     CAPABILITY_KINDS,
     NODE_STATUSES,
@@ -139,6 +154,13 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "model_versions",
     "model_lineage",
     "deployments",
+    # S12
+    "backup_records",
+    "recovery_drills",
+    "storage_checks",
+    "release_manifests",
+    "acceptance_records",
+    "permission_snapshots",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -177,7 +199,20 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
 }
 
 __all__ = [
+    "ACCEPTANCE_OUTCOMES",
     "ACTOR_TYPES",
+    "AcceptanceRecord",
+    "BACKUP_KINDS",
+    "BACKUP_RETENTION_DAYS",
+    "BackupRecord",
+    "DRILL_OUTCOMES",
+    "DRILL_SCOPES",
+    "PermissionSnapshot",
+    "RecoveryDrill",
+    "ReleaseManifest",
+    "StorageCheck",
+    "TARGET_RPO_SECONDS",
+    "TARGET_RTO_SECONDS",
     "LIFECYCLE_UPDATE_COLUMNS",
     "CodeCommit",
     "ContainerImage",
