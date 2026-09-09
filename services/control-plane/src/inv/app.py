@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import time
+from threading import BoundedSemaphore
 from fastapi import FastAPI, Request, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -39,8 +40,21 @@ def problem(error):
 class Boundary:
     def __init__(self, app, origins):
         self.app, self.origins = app, frozenset(origins)
+        self.slots = BoundedSemaphore(64)
 
     async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        if not self.slots.acquire(blocking=False):
+            return await problem(
+                DomainError("RES-0007", "Request capacity reached", 429)
+            )(scope, receive, send)
+        try:
+            return await self.handle(scope, receive, send)
+        finally:
+            self.slots.release()
+
+    async def handle(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
         started = False
@@ -58,6 +72,8 @@ class Boundary:
             await send(message)
 
         try:
+            if sum(len(k) + len(v) for k, v in scope["headers"]) > 32768:
+                raise DomainError("VAL-0003", "Request headers exceed limit", 431)
             headers = {}
             for name, value in scope["headers"]:
                 if (
@@ -337,5 +353,12 @@ def main():
             "Explicit Control Plane identity/database configuration unavailable"
         ) from None
     uvicorn.run(
-        configured, host="127.0.0.1", port=8080, proxy_headers=False, access_log=False
+        configured,
+        host="127.0.0.1",
+        port=8080,
+        proxy_headers=False,
+        access_log=False,
+        limit_concurrency=64,
+        timeout_keep_alive=5,
+        h11_max_incomplete_event_size=32768,
     )

@@ -1,7 +1,10 @@
-﻿from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 import time
 import psycopg
 import pytest
+from fastapi.testclient import TestClient
+from inv.app import create_app
+from jwt_support import jwt_fixture
 from inv.control import Control
 from inv.errors import DomainError
 from inv.node_channels import revoke_channel
@@ -29,7 +32,7 @@ def test_real_mtls_probe_restores_offline_node_and_rejects_replay(remote):
     )
     with pytest.raises(DomainError):
         observer.accept(a.node, proof, request, response)
-    assert container(a) is None
+    assert not list((a.path / "state").glob("*.intent"))
 
 
 def test_heartbeat_policy_controls_cannot_be_overridden_by_liveness(remote):
@@ -76,7 +79,9 @@ def test_missing_heartbeats_preserve_reserved_resources(remote):
     assert observer.mark_offline(a.e.tenant) == []
 
 
-def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(remote):
+def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(
+    remote, tmp_path
+):
     a = remote
     a.workload.update(command=["/probe", "sleep", "10"], timeoutSeconds=15)
     prepare(a)
@@ -91,13 +96,23 @@ def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(remote):
         else:
             pytest.fail("Synthetic container did not start")
         run = a.e.runs.get(a.e.tenant, a.run["runId"])
-        cancelled = Control(a.e.db).cancel(
-            a.people["requester"],
-            a.e.project,
-            a.run["runId"],
-            run["version"],
-            "cancel-active",
-        )
+        identity = jwt_fixture(tmp_path, a.e.tenant)
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(
+                "INSERT INTO inv.project_grants(tenant_id,project_id,subject_id,can_request) VALUES(%s,%s,%s,true)",
+                (a.e.tenant, a.e.project, identity.subject("requester")),
+            )
+        with TestClient(create_app(a.e.db, identity.auth)) as client:
+            response = client.post(
+                "/v1/projects/" + a.e.project + "/runs/" + run["runId"] + "/cancel",
+                json={"expectedVersion": run["version"]},
+                headers={
+                    "Authorization": "Bearer " + identity.token(),
+                    "Idempotency-Key": "cancel-active",
+                },
+            )
+        assert response.status_code == 200
+        cancelled = response.json()
         assert cancelled["state"] == "cancelled" and cancelled["resourceReleasePending"]
         started = time.monotonic()
         stopped = a.delivery.deliver(a.node, a.permit, cancel_only=True)
