@@ -241,4 +241,38 @@ export interface ReconciliationRecord {
   timestamp: string;
 }
 
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  traceId: string;
+  actor: string;
+  action: string;
+  target: string;
+  outcome: 'allowed' | 'denied';
+  details: string;
+  integrityHash: string;
+}
+
+export interface SyntheticGpuResult {
+  nodeId: string;
+  gpuName: string;
+  benchmarkName: string;
+  vramAllocatedBytes: number;
+  computeThroughputTflops: number;
+  exitCode: number;
+  completedAt: string;
+  evidenceId: string;
+}
+
+export interface SecurityControlStatus {
+  dockerSocketExposed: boolean;
+  approvalBypassesBlocked: number;
+  emergencyKillSwitchActive: boolean;
+  gpuWorkloadStatus: 'healthy' | 'degraded' | 'idle';
+  latestBackupAt: string;
+  rpoMinutes: number;
+  rtoMinutes: number;
+}
+
+
 
