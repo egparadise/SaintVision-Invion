@@ -299,6 +299,31 @@ export interface GoldenEvalMetric {
   evaluatedAt: string;
 }
 
+export interface ModelLineage {
+  modelId: string;
+  modelName: string;
+  version: string;
+  datasetDigest: string; // dset_sha256
+  sourceCommitSha: string; // 40-char git sha
+  trainingRunId: string; // run_...
+  evalAccuracy: number; // e.g. 0.942
+  evalF1Score: number; // e.g. 0.915
+  approvalId: string; // apr_...
+  deploymentDigest: string; // sha256:...
+  deployedAt: string;
+  status: 'staging' | 'deployed' | 'deprecated';
+}
+
+export interface ProviderAdapterConformance {
+  provider: 'Codex' | 'Claude' | 'Local-vLLM';
+  conformancePassed: boolean;
+  contractVersion: string;
+  avgLatencyMs: number;
+  tokensPerSec: number;
+  supportedProtocols: string[];
+}
+
+
 
 
 

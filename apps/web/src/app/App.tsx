@@ -11,6 +11,7 @@ import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
 import { DistributedRecoveryView } from '@/features/recovery/DistributedRecoveryView';
 import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 import { NaturalLanguageRunView } from '@/features/agent/NaturalLanguageRunView';
+import { ModelLineageView } from '@/features/mlops/ModelLineageView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -479,6 +480,11 @@ export const App: React.FC = () => {
         {/* Tab 2.10: Natural Language Requester & Bounded Agent (S09-FE) */}
         {activeTab === 'agent' && (
           <NaturalLanguageRunView />
+        )}
+
+        {/* Tab 2.11: Model Lineage & Multi-LLM Conformance (S10-FE) */}
+        {activeTab === 'mlops' && (
+          <ModelLineageView />
         )}
 
         {/* Tab 3: Runs & Evidence */}
