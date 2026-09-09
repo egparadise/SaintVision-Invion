@@ -1,4 +1,4 @@
-﻿---
+---
 doc_id: "DOSSIER-FE-FINAL-001"
 title: "FE Final Dossier Gemini 12스프린트 완결보고서"
 version: "1.0.0"

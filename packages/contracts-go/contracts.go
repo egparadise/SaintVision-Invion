@@ -361,3 +361,35 @@ type ProblemDetails struct {
     CauseRef *string `json:"causeRef"`
     EvidenceId *EvidenceId `json:"evidenceId"`
 }
+
+type NodeResourceSnapshot struct {
+    Nonce string `json:"nonce"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ProfileVersion string `json:"profileVersion"`
+    ObservedAt Timestamp `json:"observedAt"`
+    SampleMillis int64 `json:"sampleMillis"`
+    CpuCapacityMillis int64 `json:"cpuCapacityMillis"`
+    CpuBusyMillis int64 `json:"cpuBusyMillis"`
+    MemoryCapacityBytes int64 `json:"memoryCapacityBytes"`
+    MemoryAvailableBytes int64 `json:"memoryAvailableBytes"`
+    OsType string `json:"osType"`
+    AgentVersion string `json:"agentVersion"`
+}
+
+type NodeChunkInput struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+}
+
+type NodeChunkResult struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+    DataBase64 string `json:"dataBase64"`
+    ChunkSha256 string `json:"chunkSha256"`
+}

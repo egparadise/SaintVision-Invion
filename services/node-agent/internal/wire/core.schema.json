@@ -1263,7 +1263,7 @@
         },
         "containerId": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^([0-9a-f]{64})?$"
         },
         "stopped": {
           "type": "boolean",
@@ -1283,7 +1283,8 @@
             "exited",
             "timeout",
             "cancelled",
-            "recovered"
+            "recovered",
+            "not_started"
           ]
         },
         "finishedAt": {
@@ -1316,7 +1317,41 @@
         "finishedAt",
         "allocations"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "const": "not_started"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "then": {
+            "properties": {
+              "containerId": {
+                "const": ""
+              },
+              "processStarted": {
+                "const": false
+              },
+              "exitCode": {
+                "const": -1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "containerId": {
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      ]
     },
     "NodeExecutionResult": {
       "type": "object",
@@ -1519,6 +1554,152 @@
         "causeRef",
         "evidenceId"
       ]
+    },
+    "NodeResourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nonce",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "profileVersion",
+        "observedAt",
+        "sampleMillis",
+        "cpuCapacityMillis",
+        "cpuBusyMillis",
+        "memoryCapacityBytes",
+        "memoryAvailableBytes",
+        "osType",
+        "agentVersion"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "sampleMillis": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 5000
+        },
+        "cpuCapacityMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "cpuBusyMillis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "memoryCapacityBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "memoryAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "osType": {
+          "type": "string",
+          "const": "linux"
+        },
+        "agentVersion": {
+          "type": "string",
+          "const": "0.1.0"
+        }
+      }
+    },
+    "NodeChunkInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "offset",
+        "nonce"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NodeChunkResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "offset",
+        "nonce",
+        "dataBase64",
+        "chunkSha256"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "dataBase64": {
+          "type": "string",
+          "maxLength": 349528
+        },
+        "chunkSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
     }
   },
   "oneOf": [

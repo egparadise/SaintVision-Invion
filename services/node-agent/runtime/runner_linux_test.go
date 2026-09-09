@@ -361,7 +361,87 @@ func TestRemoteCancelCannotStartUnseenPermit(t *testing.T) {
 	c, p, k := fixture(t)
 	e := &fakeEngine{}
 	r := New(c, journalFor(t, c), e)
-	if _, err := r.Cancel(context.Background(), signed(t, p, k)); err == nil || e.creates != 0 {
+	data := signed(t, p, k)
+	result, err := r.Cancel(context.Background(), data)
+	if err != nil || result.Receipt == nil || result.Receipt.Reason != "not_started" || result.Receipt.ContainerId != "" || result.Receipt.ProcessStarted || e.creates != 0 {
 		t.Fatal("unseen cancellation executed")
+	}
+	late, err := r.Execute(context.Background(), data)
+	if err != nil || !late.Duplicate || late.Receipt.ReceiptId != result.Receipt.ReceiptId || e.creates != 0 {
+		t.Fatal("delayed execute escaped cancellation", err)
+	}
+}
+
+func TestCancelTombstoneSurvivesCrashBeforeReceipt(t *testing.T) {
+	c, p, k := fixture(t)
+	j := journalFor(t, c)
+	data := signed(t, p, k)
+	permit, err := Verify(data, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := j.Reject(permit); err != nil {
+		t.Fatal(err)
+	}
+	_ = j.Close()
+	resumed, err := OpenJournal(j.root, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resumed.Close()
+	e := &fakeEngine{absent: true}
+	r := New(c, resumed, e)
+	results, err := r.Recover(context.Background())
+	if err != nil || len(results) != 1 || results[0].Receipt.Reason != "not_started" {
+		t.Fatal("lost tombstone", err)
+	}
+	result, err := r.Execute(context.Background(), data)
+	if err != nil || result.Receipt.ReceiptId != results[0].Receipt.ReceiptId || e.creates != 0 {
+		t.Fatal("crash restarted command", err)
+	}
+}
+
+func TestConcurrentUnseenCancelAndLateExecute(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &fakeEngine{}
+	r := New(c, journalFor(t, c), e)
+	data := signed(t, p, k)
+	first, err := r.Cancel(context.Background(), data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wg sync.WaitGroup
+	for i := 0; i < 16; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			var result Result
+			var err error
+			if i%2 == 0 {
+				result, err = r.Execute(context.Background(), data)
+			} else {
+				result, err = r.Cancel(context.Background(), data)
+			}
+			if err != nil || result.Receipt == nil || result.Receipt.ReceiptId != first.Receipt.ReceiptId {
+				t.Error("receipt changed", err)
+			}
+		}(i)
+	}
+	wg.Wait()
+	if e.creates != 0 {
+		t.Fatal("cancelled permit executed")
+	}
+}
+
+func TestCancelDoesNotTurnAmbiguousIntentIntoNeverStartedProof(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &fakeEngine{absent: true}
+	r := New(c, journalFor(t, c), e)
+	data := signed(t, p, k)
+	if _, err := r.Execute(context.Background(), data); err == nil {
+		t.Fatal("expected ambiguity")
+	}
+	if result, err := r.Cancel(context.Background(), data); err == nil || result.Receipt != nil {
+		t.Fatal("uncertain create incorrectly released")
 	}
 }

@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import secrets
+from psycopg.types.json import Jsonb
 from .contracts import validate_contract
 from .errors import DomainError
 from .node_channels import NodeChannels, assert_channel
@@ -22,7 +23,17 @@ class NodeObservation:
             )
         return proof, {"nonce": nonce}
 
-    def accept(self, node, proof, request, response):
+    def accept(self, node, proof, request, response, *, snapshot=None):
+        if snapshot is not None:
+            validate_contract("NodeResourceSnapshot", snapshot)
+            if (
+                any(snapshot[k] != v for k, v in response.items())
+                or snapshot["cpuBusyMillis"] > snapshot["cpuCapacityMillis"]
+                or snapshot["memoryAvailableBytes"] > snapshot["memoryCapacityBytes"]
+            ):
+                raise DomainError(
+                    "NODE-0051", "Resource observation is inconsistent", 422
+                )
         validate_contract("NodeProbeInput", request)
         validate_contract("NodeProbeResult", response)
         if (
@@ -86,6 +97,20 @@ class NodeObservation:
                     node.node_id,
                 ),
             ).fetchone()
+            if snapshot is not None:
+                conn.execute(
+                    """INSERT INTO inv.node_resource_snapshots(tenant_id,node_id,recovery_epoch,channel_version,received_at,snapshot)
+                    VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT(tenant_id,node_id) DO UPDATE SET
+                    recovery_epoch=excluded.recovery_epoch,channel_version=excluded.channel_version,received_at=excluded.received_at,snapshot=excluded.snapshot""",
+                    (
+                        node.tenant_id,
+                        node.node_id,
+                        self.db.recovery_epoch,
+                        proof.version,
+                        now,
+                        Jsonb(snapshot),
+                    ),
+                )
             return {
                 "nodeId": node.node_id,
                 "status": row["status"],
@@ -97,6 +122,22 @@ class NodeObservation:
         proof, request = self.begin(node)
         response = self.client.probe(proof, request)
         return self.accept(node, proof, request, response)
+
+    def poll_resources(self, node):
+        proof, request = self.begin(node)
+        snapshot = self.client.resource_snapshot(proof, request)
+        response = {
+            k: snapshot[k]
+            for k in (
+                "nonce",
+                "tenantId",
+                "nodeId",
+                "recoveryEpoch",
+                "profileVersion",
+                "observedAt",
+            )
+        }
+        return self.accept(node, proof, request, response, snapshot=snapshot)
 
     def mark_offline(self, tenant_id):
         with self.db.transaction(tenant_id) as conn:

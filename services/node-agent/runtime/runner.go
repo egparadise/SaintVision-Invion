@@ -128,7 +128,7 @@ func (r *Runner) Execute(ctx context.Context, envelope []byte) (Result, error) {
 }
 
 // Cancel can interrupt an active Execute without acquiring its long-held mutex.
-// It never creates intent or claims that an unseen command physically stopped.
+// An unseen command is durably prohibited before acknowledging non-execution.
 func (r *Runner) Cancel(ctx context.Context, envelope []byte) (Result, error) {
 	permit, err := Verify(envelope, r.config)
 	if err != nil {
@@ -143,8 +143,26 @@ func (r *Runner) Cancel(ctx context.Context, envelope []byte) (Result, error) {
 		}
 		r.activeMutex.Unlock()
 		if r.mutex.TryLock() {
-			r.mutex.Unlock()
-			return r.Observe(ctx, envelope)
+			defer r.mutex.Unlock()
+			if err := ctx.Err(); err != nil {
+				return Result{}, err
+			}
+			prior, receipt, err := r.journal.Get(string(permit.Data.Claim.CommandId))
+			if err != nil {
+				return Result{}, err
+			}
+			if prior == nil {
+				prior, err = r.journal.Reject(permit)
+				if err != nil {
+					return Result{}, err
+				}
+			} else if prior.Hash != permit.Hash {
+				return Result{}, errors.New("NODE-0015: command content differs")
+			}
+			if receipt != nil {
+				return Result{Duplicate: true, Receipt: receipt}, nil
+			}
+			return r.reconcile(*prior, "cancelled")
 		}
 		select {
 		case <-ctx.Done():
@@ -183,6 +201,22 @@ func (r *Runner) Recover(ctx context.Context) ([]Result, error) {
 	return results, nil
 }
 func (r *Runner) reconcile(record Record, why string) (Result, error) {
+	if record.NeverStarted {
+		claim := record.Claim
+		receipt := contracts.NodeStopReceipt{ReceiptId: uuid(), ClaimId: claim.ClaimId, CommandId: claim.CommandId,
+			TenantId: claim.TenantId, ProjectId: claim.ProjectId, RunId: claim.RunId, NodeId: claim.NodeId,
+			RecoveryEpoch: claim.RecoveryEpoch, PlanDigest: claim.PlanDigest, ContainerId: "", Stopped: true,
+			ProcessStarted: false, ExitCode: -1, Reason: "not_started",
+			FinishedAt: contracts.Timestamp(time.Now().UTC().Format(time.RFC3339Nano)), Allocations: record.Allocations}
+		raw, _ := json.Marshal(receipt)
+		if err := wire.Validate("NodeStopReceipt", raw); err != nil {
+			return Result{}, err
+		}
+		if err := r.journal.Save(receipt); err != nil {
+			return Result{}, errors.New("NODE-0013: receipt persistence failed")
+		}
+		return Result{Receipt: &receipt}, nil
+	}
 	// Cleanup gets its own bounded context after caller cancellation. A timeout or
 	// absent container does not prove the original create/start had no effect.
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)

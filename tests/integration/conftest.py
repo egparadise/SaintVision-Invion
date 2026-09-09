@@ -53,6 +53,7 @@ def postgres():
         env = {
             **os.environ,
             "INV_MIGRATION_DSN": url.render_as_string(hide_password=False),
+            "INV_DATABASE_URL": url.render_as_string(hide_password=False),
         }
         result = subprocess.run(
             [sys.executable, "-m", "alembic", "upgrade", "head"],
@@ -66,9 +67,7 @@ def postgres():
             result.returncode == 0
         ), "Alembic migration failed (credential-bearing diagnostics suppressed)"
         with psycopg.connect(owner) as conn:
-            conn.execute(
-                sql.SQL("GRANT USAGE ON SCHEMA inv TO {}").format(sql.Identifier(role))
-            )
+            conn.execute(sql.SQL("GRANT USAGE ON SCHEMA inv TO {}").format(sql.Identifier(role)))
             conn.execute(
                 sql.SQL(
                     "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA inv TO {}"
@@ -102,9 +101,16 @@ def postgres():
                 ).format(sql.Identifier(role))
             )
             conn.execute(
-                sql.SQL(
-                    "GRANT UPDATE(lock_sentinel) ON inv.project_grants TO {}"
-                ).format(sql.Identifier(role))
+                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.project_grants TO {}").format(
+                    sql.Identifier(role)
+                )
+            )
+            # PostgreSQL requires an UPDATE privilege for SELECT FOR SHARE.
+            # The CHECK-fixed sentinel allows locking without changing membership.
+            conn.execute(
+                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.project_nodes TO {}").format(
+                    sql.Identifier(role)
+                )
             )
             conn.execute(
                 sql.SQL(
@@ -117,18 +123,16 @@ def postgres():
                 ).format(sql.Identifier(role))
             )
             conn.execute(
-                sql.SQL(
-                    "GRANT UPDATE(lock_sentinel) ON inv.node_channels TO {}"
-                ).format(sql.Identifier(role))
+                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.node_channels TO {}").format(
+                    sql.Identifier(role)
+                )
             )
         yield SimpleNamespace(owner=owner, runtime=runtime)
     finally:
         # Only the unique name created above is eligible for teardown.
         assert name.startswith("inv_test_") and len(name) == 41
         with psycopg.connect(admin, autocommit=True) as conn:
-            conn.execute(
-                sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name))
-            )
+            conn.execute(sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name)))
             conn.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
 
 
@@ -169,5 +173,5 @@ def env(postgres):
         node=node,
         resource=resource,
         runs=RunStore(db),
-        leases=LeaseStore(db)
+        leases=LeaseStore(db),
     )

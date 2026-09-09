@@ -1,17 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-<<<<<<< HEAD
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-09-09T17:45:00+09:00"
-=======
-version: "1.0.2"
-status: "review"
-author: "Codex"
-updated: "2026-09-10T02:31:57+09:00"
->>>>>>> agent/codex/control-integration
+updated: "2026-09-10T04:01:17+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,8 +17,8 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 | 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
 |---|---|---|---|---|
-| HO-DOC-CLAUDE-001 | Claude | CLAUDE.md·AGENTS.md, DB/Storage·Backend 계획, ADR-005~014; 계약/동시성/운영 누락 검토 | 검토 결과와 수정 요구를 날짜 보고서로 기록 | received 2026-09-09T15:45:31+09:00 / 보고서 [[2026-09-09_15-45-31_KST_HO-DOC-CLAUDE-001_Claude_검토보고]] / 후속 준비 초안 [[2026-09-09_16-06-56_KST_HO-DOC-CLAUDE-001_Claude_준비기록]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / Claude 백엔드 구현 완료 |
-| HO-DOC-GEMINI-001 | Gemini / Antigravity | GEMINI.md·AGENTS.md, Frontend 계획, S01-FE; 여정·디자인 토큰·오류 UX·HTTPS 배포 검토 | 화면별 API 의존성과 검증 기준을 보고서로 기록 | received 2026-09-09T16:55:00+09:00 / 보고서 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_검토보고]] / 실행 기록 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_개발과정]] / 아키텍처 [[Gemini Frontend 상세 아키텍처 및 화면 명세]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / Gemini 프론트엔드 구현 완료 |
+| HO-DOC-CLAUDE-001 | Claude | CLAUDE.md·AGENTS.md, DB/Storage·Backend 계획, ADR-005~014; 계약/동시성/운영 누락 검토 | 검토 결과와 수정 요구를 날짜 보고서로 기록 | received 2026-09-09T15:45:31+09:00 / 보고서 [[2026-09-09_15-45-31_KST_HO-DOC-CLAUDE-001_Claude_검토보고]] / 후속 준비 초안 [[2026-09-09_16-06-56_KST_HO-DOC-CLAUDE-001_Claude_준비기록]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / 수신·재검토 pending |
+| HO-DOC-GEMINI-001 | Gemini / Antigravity | GEMINI.md·AGENTS.md, Frontend 계획, S01-FE; 여정·디자인 토큰·오류 UX·HTTPS 배포 검토 | 화면별 API 의존성과 검증 기준을 보고서로 기록 | received 2026-09-09T16:55:00+09:00 / 보고서 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_검토보고]] / 실행 기록 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_개발과정]] / 아키텍처 [[Gemini Frontend 상세 아키텍처 및 화면 명세]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / 수신·재검토 pending |
 | HO-S01-CODEX-001 | Codex 다음 세션 | S01 네 작업, 장비·IdP·DNS/TLS·Storage 제품 조사, contract 기준선 | 확인값·미확인값·계약·reviewer 기록 후 ready | pending |
 
 자기 영역을 시작할 때 목표→증거→계약→작업 역추적을 확인하고 init/commit/push/build/report 절차를 이어간다.
@@ -85,3 +78,14 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S12-GEMINI-001 | Codex / Claude | S12-FE 내부망 HTTPS 웹 배포, TLS 1.3/Nginx, 5노드 여정/Smoke 100%, Release R4 Manifest, vitest 71건 검증 | S12-FE 최종 승인 판정 및 Gemini Frontend 전 12개 스프린트 완결 인수 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정]] |
 
 - Codex control-integration: [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]. 구현 87600e9, 실제 Python 283개·Go 57 leaf case CI 통과. 인증 API/현재 권한·취소·SSE·mTLS Node 관측; peer review·dispatcher/업무 통합·운영 환경 검증 pending.
+
+- Codex durable-dispatch: [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]. 구현 3a3858e, Python 301개·Go57 leaf case CI 통과. durable permit queue·일회 전송·worker 복구/취소·Node 슬롯 직렬화. workflow/UI·Storage/Checkpoint·운영 설정/실장비·독립 검토는 pending.
+
+- Codex storage-node-runtime: [[2026-09-10_03-15-23_KST_STORAGE-NODE_Codex_검증보고]]. Python 328/Go 62 leaf CI 통과. 실제 저장/복원·Node 관측/전송·독립 샤드 queue/실행 경계. Claude Adapter/독립 검토, collective/Workspace 결과·S3·실장비는 pending.
+
+- HO-EXECUTION-CLAUDE-001 / Claude: [[2026-09-10_04-01-17_KST_EXECUTION-RECOVERY_Codex_검증보고]], [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]. API Adapter·migration/최소 잠금 권한·출력 verifier 순서 연결과 독립 코드 검토. Gemini는 상태/Explain 실제 화면 연결. 실제 수신·review 승인 pending.
+
+## 통합 브랜치 추가 수신 기록
+
+| HO-DOC-CLAUDE-001 | Claude | CLAUDE.md·AGENTS.md, DB/Storage·Backend 계획, ADR-005~014; 계약/동시성/운영 누락 검토 | 검토 결과와 수정 요구를 날짜 보고서로 기록 | received 2026-09-09T15:45:31+09:00 / 보고서 [[2026-09-09_15-45-31_KST_HO-DOC-CLAUDE-001_Claude_검토보고]] / 후속 준비 초안 [[2026-09-09_16-06-56_KST_HO-DOC-CLAUDE-001_Claude_준비기록]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / Claude 백엔드 구현 완료 |
+| HO-DOC-GEMINI-001 | Gemini / Antigravity | GEMINI.md·AGENTS.md, Frontend 계획, S01-FE; 여정·디자인 토큰·오류 UX·HTTPS 배포 검토 | 화면별 API 의존성과 검증 기준을 보고서로 기록 | received 2026-09-09T16:55:00+09:00 / 보고서 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_검토보고]] / 실행 기록 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_개발과정]] / 아키텍처 [[Gemini Frontend 상세 아키텍처 및 화면 명세]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / Gemini 프론트엔드 구현 완료 |

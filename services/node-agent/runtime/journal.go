@@ -15,10 +15,11 @@ import (
 )
 
 type Record struct {
-	Hash        string                     `json:"hash"`
-	Claim       contracts.ExecutionClaim   `json:"claim"`
-	Allocations []contracts.NodeAllocation `json:"allocations"`
-	Name        string                     `json:"name"`
+	Hash         string                     `json:"hash"`
+	Claim        contracts.ExecutionClaim   `json:"claim"`
+	Allocations  []contracts.NodeAllocation `json:"allocations"`
+	Name         string                     `json:"name"`
+	NeverStarted bool                       `json:"neverStarted,omitempty"`
 }
 
 type Journal struct {
@@ -127,7 +128,17 @@ func (j *Journal) Get(command string) (*Record, *contracts.NodeStopReceipt, erro
 	return &record, &receipt, nil
 }
 func (j *Journal) Begin(p Permit, name string) (*Record, error) {
-	record := &Record{Hash: p.Hash, Claim: p.Data.Claim, Allocations: p.Data.Allocations, Name: name}
+	return j.begin(p, name, false)
+}
+
+// Reject persists a tombstone under the same command key as Execute. A crash
+// before its receipt is saved can only recover this prohibition, never execute.
+func (j *Journal) Reject(p Permit) (*Record, error) {
+	return j.begin(p, "", true)
+}
+
+func (j *Journal) begin(p Permit, name string, neverStarted bool) (*Record, error) {
+	record := &Record{Hash: p.Hash, Claim: p.Data.Claim, Allocations: p.Data.Allocations, Name: name, NeverStarted: neverStarted}
 	for _, allocation := range record.Allocations {
 		lease := allocation.Lease
 		parts := strings.Split(lease.FencingToken, ":")
