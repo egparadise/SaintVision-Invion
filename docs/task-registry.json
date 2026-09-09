@@ -1365,7 +1365,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S10-FE",
         "S10-BE",

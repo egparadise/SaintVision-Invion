@@ -12,6 +12,7 @@ import { DistributedRecoveryView } from '@/features/recovery/DistributedRecovery
 import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 import { NaturalLanguageRunView } from '@/features/agent/NaturalLanguageRunView';
 import { ModelLineageView } from '@/features/mlops/ModelLineageView';
+import { ReleaseCandidateView } from '@/features/release/ReleaseCandidateView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -485,6 +486,11 @@ export const App: React.FC = () => {
         {/* Tab 2.11: Model Lineage & Multi-LLM Conformance (S10-FE) */}
         {activeTab === 'mlops' && (
           <ModelLineageView />
+        )}
+
+        {/* Tab 2.12: Release Candidate & Web Rollback (S11-FE) */}
+        {activeTab === 'release' && (
+          <ReleaseCandidateView />
         )}
 
         {/* Tab 3: Runs & Evidence */}

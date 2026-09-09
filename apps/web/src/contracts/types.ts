@@ -323,6 +323,33 @@ export interface ProviderAdapterConformance {
   supportedProtocols: string[];
 }
 
+export interface SloMetricRecord {
+  name: string;
+  targetValue: string;
+  actualValue: string;
+  status: 'met' | 'breached';
+  category: 'latency' | 'resilience' | 'security' | 'storage';
+}
+
+export interface AccessibilityAuditResult {
+  ruleId: string;
+  wcagLevel: 'A' | 'AA' | 'AAA';
+  description: string;
+  status: 'pass' | 'fail';
+  contrastRatio?: number;
+}
+
+export interface ReleaseCandidate {
+  tag: string;
+  buildSha: string;
+  builtAt: string;
+  unresolvedVulnerabilities: number;
+  sloComplianceRate: number;
+  rollbackVerified: boolean;
+  isActive: boolean;
+}
+
+
 
 
 
