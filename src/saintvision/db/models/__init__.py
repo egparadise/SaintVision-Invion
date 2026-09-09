@@ -1,4 +1,5 @@
-"""SQLAlchemy models for the S02, S03, S09, S10 and S12 scope.
+"""SQLAlchemy models for the S02, S03, S09, S10 and S12 scope, plus node
+discovery and resource pools.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
@@ -20,6 +21,15 @@ from .context import (
     ContextSnapshot,
     RunRecord,
     RunRecordArtifact,
+)
+from .discovery import (
+    ANNOUNCEMENT_STATES,
+    ANNOUNCEMENT_TTL_SECONDS,
+    MAX_CANDIDATES_PER_TENANT,
+    POOL_STATUSES,
+    NodeAnnouncement,
+    ResourcePool,
+    ResourcePoolMember,
 )
 from .evaluation import (
     EVAL_CATEGORIES,
@@ -87,6 +97,13 @@ from .operations_pilot import (
     RecoveryDrill,
     ReleaseManifest,
     StorageCheck,
+)
+from .placement import (
+    PLACEMENT_STATES,
+    PLAN_STATES,
+    PLAN_STRATEGIES,
+    DistributedPlan,
+    PlanPlacement,
 )
 from .resource import (
     CAPABILITY_KINDS,
@@ -161,6 +178,12 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "release_manifests",
     "acceptance_records",
     "permission_snapshots",
+    # discovery and pools
+    "node_announcements",
+    "resource_pools",
+    "resource_pool_members",
+    "distributed_plans",
+    "plan_placements",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -200,6 +223,18 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
 
 __all__ = [
     "ACCEPTANCE_OUTCOMES",
+    "DistributedPlan",
+    "PLACEMENT_STATES",
+    "PLAN_STATES",
+    "PLAN_STRATEGIES",
+    "PlanPlacement",
+    "ANNOUNCEMENT_STATES",
+    "ANNOUNCEMENT_TTL_SECONDS",
+    "MAX_CANDIDATES_PER_TENANT",
+    "NodeAnnouncement",
+    "POOL_STATUSES",
+    "ResourcePool",
+    "ResourcePoolMember",
     "ACTOR_TYPES",
     "AcceptanceRecord",
     "BACKUP_KINDS",

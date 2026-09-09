@@ -74,6 +74,10 @@ PREFIXES: Final[dict[str, str]] = {
     "release": "rel",
     "acceptance": "acc",
     "permission_snapshot": "psn",
+    # discovery, pools and distributed placement
+    "announcement": "anc",
+    "pool": "pol",
+    "plan": "pln",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")
