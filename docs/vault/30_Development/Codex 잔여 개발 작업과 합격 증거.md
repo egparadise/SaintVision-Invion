@@ -38,3 +38,7 @@ owner Codex / reviewer Claude / task control-integration follow-up. 입력 GUIDE
 
 운영 정보와 타 Agent 독립 검토 없이 모든 Sprint done을 선언할 수 없다. 기존 사용자 승인 아래 로컬 구현·시험·commit/push/report는 계속 수행 가능하다. 운영 배포·자격 증명 변경·기존 데이터 파괴 작업은 실제 대상과 영향이 확정됐을 때 별도 critical 경계로 판단한다.
 
+
+## Durable dispatch 후속 반영
+
+[[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]에서 claim/permit 원자 queue와 자동 전달·취소·관찰 worker를 구현/CI 검증했다. 위 S04/S06/S07의 dispatch daemon 항목 중 이 경계는 확보했으며 workflow enqueue adapter·heartbeat poll/sweep·Storage/Checkpoint·실장비 및 독립 검토는 남아 있다. 실제 운영 구성에 필요한 5대 PC 접속/IdP/CA/DNS/Storage 정보는 사용자에게 비밀을 제외한 값으로 요청했다. 답변 전 임의 운영 값을 만들지 않는다.

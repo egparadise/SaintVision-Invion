@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T02:31:57+09:00"
+updated: "2026-09-10T02:47:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -78,3 +78,5 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S12-GEMINI-001 | Codex / Claude | S12-FE 내부망 HTTPS 웹 배포, TLS 1.3/Nginx, 5노드 여정/Smoke 100%, Release R4 Manifest, vitest 71건 검증 | S12-FE 최종 승인 판정 및 Gemini Frontend 전 12개 스프린트 완결 인수 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정]] |
 
 - Codex control-integration: [[2026-09-10_02-31-57_KST_CONTROL-INTEGRATION_Codex_검증보고]]. 구현 87600e9, 실제 Python 283개·Go 57 leaf case CI 통과. 인증 API/현재 권한·취소·SSE·mTLS Node 관측; peer review·dispatcher/업무 통합·운영 환경 검증 pending.
+
+- Codex durable-dispatch: [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]. 구현 3a3858e, Python 301개·Go57 leaf case CI 통과. durable permit queue·일회 전송·worker 복구/취소·Node 슬롯 직렬화. workflow/UI·Storage/Checkpoint·운영 설정/실장비·독립 검토는 pending.

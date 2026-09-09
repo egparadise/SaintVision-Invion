@@ -2,7 +2,7 @@
 doc_id: "DEV-DURABLE-DISPATCH-001"
 title: "Codex durable dispatch와 중단 복구 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-10T02:35:31+09:00"
 source_of_truth: "Git"
@@ -21,3 +21,7 @@ queued → uncertain → stopped만 허용하며 uncertain을 queued로 되돌�
 ## 2026-09-10T02:42:14+09:00 구현·로컬 검증
 
 ToolGateway 원자 enqueue, migration 0007/DB guard/RLS, worker token·일회 execute·observe/cancel 복구, 명시적 worker CLI와 17개 신규 통합 시나리오를 작성했다. 로컬 초기 pytest는 147 passed/136 skipped/16 setup errors였으며 fixture import 누락을 수정했다. 신규 17개는 isolated DB 환경이 없어 skip(exit 0); 실제 DB/Go/Docker/CLI 결과는 CI로 확인한다. [[Codex 실행 전달 대기열과 중단 복구 계약]]과 ADR-INDEX v1.7.0을 기록했다.
+
+## 2026-09-10T02:47:29+09:00 원격 검증
+
+`git commit` 및 `git push -u origin agent/codex/durable-dispatch` exit 0. 구현 `3a3858eb9b1b3be63e250dc5e9b1bbb5156cd117` Core #34384656712/Documentation #34384656788 success. 원본 artifact Python 301/0/0/0, Go24 top-level/57 leaf case 확인. [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]에 코드·증거·남은 경계와 담당자 기록.

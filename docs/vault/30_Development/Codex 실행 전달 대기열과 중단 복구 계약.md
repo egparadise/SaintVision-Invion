@@ -41,3 +41,5 @@ NodeDelivery가 현재 mTLS channel에서 검증한 stop receipt를 resource 반
 Claude: 이 계약의 독립 검토 및 업무 workflow가 queue_signing_key 경로를 사용하는 adapter. Gemini: authenticated API의 resourceReleasePending 및 서버 관측 상태 반영. Codex: 원본 CI Evidence·보고·Obsidian 동기화, checkpoint/storage 불변 조건 후속. 아직 모르는 intent의 취소에서 자동 자원 반환을 구현했다고 주장하지 않는다.
 
 Node의 단일 execution slot과 맞추어 최초 예약은 Node 행 잠금 아래 같은 Node의 활성 execute worker를 검사한다. 다른 Run이 슬롯을 보유하면 queued를 유지하고 기다린다. 이후 2개 Run의 동시 slot 예약 방지 시나리오를 추가해 신규 통합은 18개다. 이 대기는 실행 여부 불확실 상태로 잘못 전이하지 않는다.
+
+실제 검증: [[2026-09-10_02-47-29_KST_DURABLE-DISPATCH_Codex_검증보고]]. 301 Python tests 및 57 Go leaf cases 통과. 운영 설정/실장비와 독립 검토는 별도다.
