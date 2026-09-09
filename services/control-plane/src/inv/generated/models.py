@@ -358,6 +358,84 @@ class AgentRunSpec(BaseModel):
     retryBudget: conint(ge=0, le=9007199254740991)
 
 
+class ApprovalId(RootModel[constr(pattern=r'^apr_[0-9A-HJKMNP-TV-Z]{26}$')]):
+    root: constr(pattern=r'^apr_[0-9A-HJKMNP-TV-Z]{26}$')
+
+
+class CommandId(RootModel[UUID]):
+    root: UUID
+
+
+class ApprovalNonce(RootModel[constr(pattern=r'^[A-Za-z0-9_-]{43}$')]):
+    root: constr(pattern=r'^[A-Za-z0-9_-]{43}$')
+
+
+class ActionDigest(RootModel[constr(pattern=r'^[0-9a-f]{64}$')]):
+    root: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class ApprovalChallenge(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    nonce: ApprovalNonce
+    expiresAt: Timestamp
+
+
+class Decision(StrEnum):
+    approve = 'approve'
+    reject = 'reject'
+
+
+class ApprovalDecisionInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decision: Decision
+    nonce: ApprovalNonce
+    actionDigest: ActionDigest
+
+
+class Status2(StrEnum):
+    pending = 'pending'
+    approved = 'approved'
+    rejected = 'rejected'
+    expired = 'expired'
+    dispatched = 'dispatched'
+
+
+class ApprovalView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    runId: RunId
+    projectId: ProjectId
+    requesterId: constr(min_length=1, max_length=200)
+    actionDigest: ActionDigest
+    policyVersion: constr(min_length=1, max_length=200)
+    requiredApprovals: RequiredApprovals
+    status: Status2
+    expiresAt: Timestamp
+    runVersion: conint(ge=1, le=9007199254740991)
+
+
+class AuthorizedCommand(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+    approvalId: ApprovalId
+    runId: RunId
+    tenantId: TenantId
+    projectId: ProjectId
+    actionDigest: ActionDigest
+    policyVersion: constr(min_length=1, max_length=200)
+    recoveryEpoch: UUID
+    expiresAt: Timestamp
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -378,6 +456,10 @@ class INVCore(
         | GraphStep
         | RunGraphSpec
         | AgentRunSpec
+        | ApprovalChallenge
+        | ApprovalDecisionInput
+        | ApprovalView
+        | AuthorizedCommand
     ]
 ):
     root: (
@@ -399,4 +481,8 @@ class INVCore(
         | GraphStep
         | RunGraphSpec
         | AgentRunSpec
+        | ApprovalChallenge
+        | ApprovalDecisionInput
+        | ApprovalView
+        | AuthorizedCommand
     ) = Field(..., title='INVCore')

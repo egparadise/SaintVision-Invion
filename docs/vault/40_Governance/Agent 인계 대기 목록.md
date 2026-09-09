@@ -26,3 +26,5 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 - Codex core-foundation: [[Codex 핵심 기반 계약과 검토 회신]], [[2026-09-09_16-26-00_KST_CORE-FOUNDATION_Codex_개발과정]]. CR/FR 회신 작성; Claude/Gemini 재검토·실제 수신 pending.
 
 - Codex 구현/CI 증거: [[2026-09-09_18-04-16_KST_CORE-FOUNDATION_Codex_검증보고]]. Claude 코드 검토 및 Gemini 계약 수신 pending.
+
+- Codex approval-boundary 사전 승인 계약: [[2026-09-09_23-03-51_KST_APPROVAL-BOUNDARY_Codex_검증보고]]. 구현 `73e8774`, CI 101 tests/0 failures/0 errors/0 skipped. Claude 독립 검토 pending; S04 선행 미완료.

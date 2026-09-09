@@ -816,6 +816,178 @@
         "retryBudget"
       ],
       "additionalProperties": false
+    },
+    "ApprovalId": {
+      "type": "string",
+      "pattern": "^apr_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "CommandId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ApprovalNonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "ActionDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ApprovalChallenge": {
+      "type": "object",
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "nonce": {
+          "$ref": "#/$defs/ApprovalNonce"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "approvalId",
+        "nonce",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovalDecisionInput": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "nonce": {
+          "$ref": "#/$defs/ApprovalNonce"
+        },
+        "actionDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        }
+      },
+      "required": [
+        "decision",
+        "nonce",
+        "actionDigest"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovalView": {
+      "type": "object",
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "requesterId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "actionDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "requiredApprovals": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "expired",
+            "dispatched"
+          ]
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "runVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "approvalId",
+        "runId",
+        "projectId",
+        "requesterId",
+        "actionDigest",
+        "policyVersion",
+        "requiredApprovals",
+        "status",
+        "expiresAt",
+        "runVersion"
+      ],
+      "additionalProperties": false
+    },
+    "AuthorizedCommand": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "$ref": "#/$defs/CommandId"
+        },
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "actionDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "commandId",
+        "approvalId",
+        "runId",
+        "tenantId",
+        "projectId",
+        "actionDigest",
+        "policyVersion",
+        "recoveryEpoch",
+        "expiresAt"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -872,6 +1044,18 @@
     },
     {
       "$ref": "#/$defs/AgentRunSpec"
+    },
+    {
+      "$ref": "#/$defs/ApprovalChallenge"
+    },
+    {
+      "$ref": "#/$defs/ApprovalDecisionInput"
+    },
+    {
+      "$ref": "#/$defs/ApprovalView"
+    },
+    {
+      "$ref": "#/$defs/AuthorizedCommand"
     }
   ]
 }
