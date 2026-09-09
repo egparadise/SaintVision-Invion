@@ -8,6 +8,7 @@ import { WorkspaceCreateModal } from '@/features/workspaces/WorkspaceCreateModal
 import { ExecutionResultView } from '@/features/workspaces/ExecutionResultView';
 import { PlacementSimulator } from '@/features/placement/PlacementSimulator';
 import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
+import { DistributedRecoveryView } from '@/features/recovery/DistributedRecoveryView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -461,6 +462,11 @@ export const App: React.FC = () => {
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}
         {activeTab === 'placement' && (
           <PlacementSimulator nodes={nodes} />
+        )}
+
+        {/* Tab 2.8: Distributed Recovery & Resilience (S07-FE) */}
+        {activeTab === 'recovery' && (
+          <DistributedRecoveryView nodes={nodes} />
         )}
 
         {/* Tab 3: Runs & Evidence */}

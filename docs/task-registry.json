@@ -853,7 +853,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S06-FE",
         "S06-BE",

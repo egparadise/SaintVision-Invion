@@ -214,3 +214,31 @@ export interface TerminalSessionState {
   duplicateExecutions: number;
 }
 
+export type NodeHealthState = 'online' | 'stale' | 'offline' | 'recovering' | 'fenced';
+
+export interface FencingToken {
+  nodeId: string;
+  epoch: number;
+  sequence: number;
+  issuedAt: string;
+}
+
+export interface LateResultRejection {
+  requestId: string;
+  nodeId: string;
+  attemptedToken: { epoch: number; sequence: number };
+  currentToken: { epoch: number; sequence: number };
+  rejectedAt: string;
+  reason: string;
+}
+
+export interface ReconciliationRecord {
+  reconciliationId: string;
+  nodeId: string;
+  evacuatedWorkspacesCount: number;
+  newEpoch: number;
+  recoverySuccess: boolean;
+  timestamp: string;
+}
+
+

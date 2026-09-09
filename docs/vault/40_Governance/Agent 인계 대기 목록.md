@@ -25,6 +25,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S04-GEMINI-001 | Codex / Claude | S04-FE 승인 센터 2인 승인 원칙 검토자 전환기, Run 취소 모달, vitest 30건 검증 | S04-FE 승인 판정 및 S04-BE SSE 이벤트 스트림 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-55-00_KST_S04-FE_Gemini_승인센터_SSE타임라인_개발과정]] |
 | HO-S05-GEMINI-001 | Codex / Claude | S05-FE 5개 노드 자원 토폴로지, Hard Filter 탈락 사유 및 가중치 Explain 뷰, vitest 35건 검증 | S05-FE 승인 판정 및 S05-BE 배치 스케줄러 알고리즘 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-10-00_KST_S05-FE_Gemini_자원배치_토폴로지_Explain_개발과정]] |
 | HO-S06-GEMINI-001 | Codex / Claude | S06-FE Monaco 에디터, Myers Diff 뷰어, Git 커밋 생성기, CP 재시작 세션 복구 매니저, vitest 41건 검증 | S06-FE 승인 판정 및 S06-BE PTY/세션 체크포인트 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정]] |
+| HO-S07-GEMINI-001 | Codex / Claude | S07-FE 분산 복구 대시보드, 단조 Fencing Token, Zombie 차단(0건), vitest 46건 검증 | S07-FE 승인 판정 및 S07-BE 분산 reconciliation API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정]] |
 | HO-S01-CODEX-001 | Codex 다음 세션 | S01 네 작업, 장비·IdP·DNS/TLS·Storage 제품 조사, contract 기준선 | 확인값·미확인값·계약·reviewer 기록 후 ready | pending |
 
 자기 영역을 시작할 때 목표→증거→계약→작업 역추적을 확인하고 init/commit/push/build/report 절차를 이어간다.
