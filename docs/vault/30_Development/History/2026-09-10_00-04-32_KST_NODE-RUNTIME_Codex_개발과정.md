@@ -2,7 +2,7 @@
 doc_id: "DEV-NODE-RUNTIME-001"
 title: "Codex Linux Node 실행기 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-10T00:04:32+09:00"
 source_of_truth: "Git"
@@ -27,3 +27,7 @@ scope: Linux Go Node 실행 library/제한 CLI, Ed25519 허가, 단일 로컬 Do
 Go 1.23.12 portable SHA 검증 후 프로젝트 전용 설치. Go 단위 검사 및 Linux cross-build exit 0. Python pytest exit 0: 89 passed / 실제 PostgreSQL·Linux가 없는 로컬 105 skipped. 실제 통합 성공 증거는 CI에서 별도로 확보한다. duplicate key/JSON depth 경계 시험 최초 실패 후 root depth를 1로 계산하도록 수정하고 회귀 통과. 제품 사고가 아닌 개발 중 발견이다.
 
 [[Codex Node 실행 격리와 정지 영수증 계약]] NODE-RUNTIME-CONTRACT-001 v1.0.0 / ADR-INDEX-001 v1.4.0(ADR-027/028). cryptography 50.0.1, Go JSON Schema v6.0.2, JSON Schema v1alpha1 생성 타입·embedded validator·migration 0004 구현. 후속 CI 및 reviewer Claude pending.
+
+## 2026-09-10T01:16:02+09:00 원격 검증 및 전달
+
+`git commit`·`git push -u origin agent/codex/node-runtime` exit 0. 구현 `98d02be8528c3a09c5d38239fd8fcce93affa39e`의 Core #34373543925 및 Documentation #34373543859 success. GitHub artifact 원본에서 Python 194/0/0/0 및 Go 14 top-level/37 leaf case 통과를 확인했다. [[2026-09-10_01-16-02_KST_NODE-RUNTIME_Codex_검증보고]]에 실제 증거를 보존했다. reviewer Claude 독립 검토 pending.

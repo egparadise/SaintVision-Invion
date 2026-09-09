@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-09T23:47:26+09:00"
+updated: "2026-09-10T01:16:02+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,3 +41,18 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S04-GEMINI-001 | Codex / Claude | S04-FE 승인 센터 2인 승인 원칙 검토자 전환기, Run 취소 모달, vitest 30건 검증 | S04-FE 승인 판정 및 S04-BE SSE 이벤트 스트림 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-55-00_KST_S04-FE_Gemini_승인센터_SSE타임라인_개발과정]] |
 
 - Codex tool-admission: [[2026-09-09_23-47-26_KST_TOOL-ADMISSION_Codex_검증보고]]. 구현 `ce59e63`, 실제 PostgreSQL 포함 CI 172개 시험 통과, 독립 검토·실제 Node 격리 실행 pending.
+
+## Node 작업 중 추가 수신 제안
+
+외부 저자 보고의 수신 기록이며 코드 검토·물리 실행·합격 수치를 승인한 기록이 아니다. [[외부 인계 제안 수신과 정본 동기화 복구]]의 검증 한계를 따른다.
+
+| 인계 ID | 수신 | 읽을 자료·구체 행동 | 완료 조건 | receipt |
+|---|---|---|---|---|
+| HO-S05-GEMINI-001 | Codex / Claude | S05-FE 5개 노드 자원 토폴로지, Hard Filter 탈락 사유 및 가중치 Explain 뷰, vitest 35건 검증 | S05-FE 승인 판정 및 S05-BE 배치 스케줄러 알고리즘 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-10-00_KST_S05-FE_Gemini_자원배치_토폴로지_Explain_개발과정]] |
+| HO-S06-GEMINI-001 | Codex / Claude | S06-FE Monaco 에디터, Myers Diff 뷰어, Git 커밋 생성기, CP 재시작 세션 복구 매니저, vitest 41건 검증 | S06-FE 승인 판정 및 S06-BE PTY/세션 체크포인트 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정]] |
+| HO-S07-GEMINI-001 | Codex / Claude | S07-FE 분산 복구 대시보드, 단조 Fencing Token, Zombie 차단(0건), vitest 46건 검증 | S07-FE 승인 판정 및 S07-BE 분산 reconciliation API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정]] |
+| HO-S08-GEMINI-001 | Codex / Claude | S08-FE 보안 감사 콘솔, Docker 소켓 차단, 합성 GPU GEMM 실측, Kill Switch, vitest 51건 검증 | S08-FE 승인 판정 및 S08-BE OPA/격리 런타임 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정]] |
+| HO-S09-GEMINI-001 | Codex / Claude | S09-FE 자연어 요청 화면, 예산 쿼터, Bounded Repair(3회 한도), Golden Eval(99%/80%/0누출), vitest 55건 검증 | S09-FE 승인 판정 및 S09-BE 컨텍스트 불변성 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정]] |
+| HO-S10-GEMINI-001 | Codex / Claude | S10-FE 모델 계보 역추적 뷰, Multi-LLM 어댑터 적합성(100%), 게이트 배포, vitest 59건 검증 | S10-FE 승인 판정 및 S10-BE MLflow/어댑터 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정]] |
+
+- Codex node-runtime: [[2026-09-10_01-16-02_KST_NODE-RUNTIME_Codex_검증보고]]. 구현 `98d02be`, 실제 Linux Docker/PostgreSQL 포함 Python 194 tests 및 Go 37 leaf case 통과. 독립 검토·mTLS/Windows/GPU/실장비 및 S03 전체는 pending.

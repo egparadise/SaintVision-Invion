@@ -43,3 +43,5 @@ exit code 0은 process stop이며 application success Evidence가 아니다. Run
 Claude는 transport identity·key provisioning/rotation·current PDP/capability verification·Run/Evidence adapter 및 본 경계의 독립 검토를 담당한다. Gemini는 stop receipt 전 자원 반환과 exit 0 성공 표시를 하지 않는 계약을 수신한다. 리뷰 수행·운영 배포·S03 done으로 표시하지 않는다.
 
 설계 근거: [Docker Engine API 1.45](https://docs.docker.com/reference/api/engine/version/v1.45/), [Go monotonic clocks](https://pkg.go.dev/time#hdr-Monotonic_Clocks), [JSON Schema Go 구현](https://github.com/santhosh-tekuri/jsonschema/blob/v6.0.2/README.md). JSON Schema v6.0.2와 cryptography 50.0.1을 고정한다. 실제 protocol/security 선택은 이 프로젝트 결정이며 외부 문서가 프로젝트 검증 결과를 보증하지 않는다.
+
+실제 구현·CI 증거: [[2026-09-10_01-16-02_KST_NODE-RUNTIME_Codex_검증보고]]. Linux Docker/PostgreSQL 포함 Python 194개와 Go 37 leaf case 통과. 독립 검토·운영 transport·Windows/GPU/실장비는 pending.
