@@ -3,6 +3,10 @@ package runtime
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,6 +37,7 @@ type Engine interface {
 	Inspect(context.Context, string, Record) (State, error)
 	Stop(context.Context, string) error
 	Remove(context.Context, string, Record) error
+	Output(context.Context, string, Record) (*contracts.NodeOutput, error)
 }
 type Docker struct{ client *http.Client }
 
@@ -97,13 +102,13 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	if err := d.request(ctx, "GET", "/images/"+url.PathEscape(p.ImageDigest)+"/json", nil, &image); err != nil {
 		return "", err
 	}
-	if image.ID != p.ImageDigest || len(image.Config.Volumes) != 0 || image.Config.Labels["ai.saintvision.supervisor"] != "deadline-v1" {
+	if image.ID != p.ImageDigest || len(image.Config.Volumes) != 0 || image.Config.Labels["ai.saintvision.supervisor"] != "deadline-v1" || image.Config.Labels["ai.saintvision.output"] != "bounded-streams-v1" {
 		return "", errors.New("NODE-0023: image must be local pinned content without declared volumes")
 	}
 	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
 	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
 		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
-		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "none"}}
+		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "local", "Config": map[string]string{"max-size": "512k", "max-file": "1", "compress": "false"}}}
 	command := append([]string{"--not-after", string(r.Claim.NotAfter), "--timeout", strconv.FormatInt(p.TimeoutSeconds, 10), "--"}, p.Argv...)
 	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": []string{},
 		"Labels": labels(r), "NetworkDisabled": true, "AttachStdout": false, "AttachStderr": false, "OpenStdin": false, "Tty": false, "HostConfig": host}
@@ -128,7 +133,7 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	if actual.Image != p.ImageDigest || actual.Config.User != "65532:65532" || actual.Config.WorkingDir != "/workspace" || !equal(actual.Config.Entrypoint, []string{"/inv-supervisor"}) || !equal(actual.Config.Cmd, command) ||
 		h.NetworkMode != "none" || !h.ReadonlyRootfs || h.Privileged || h.Memory != p.MemoryBytes || h.MemorySwap != p.MemoryBytes || h.NanoCpus != p.CpuMillis*1000000 || h.PidsLimit != 64 ||
 		!equal(h.CapDrop, []string{"ALL"}) || !(equal(h.SecurityOpt, []string{"no-new-privileges:true"}) || equal(h.SecurityOpt, []string{"no-new-privileges"})) ||
-		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "none" || len(h.Tmpfs) != 2 {
+		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "local" || h.LogConfig.Config["max-size"] != "512k" || h.LogConfig.Config["max-file"] != "1" || h.LogConfig.Config["compress"] != "false" || len(h.Tmpfs) != 2 {
 		return "", errors.New("NODE-0024: daemon isolation configuration differs")
 	}
 	for path, options := range tmpfs {
@@ -168,7 +173,10 @@ type inspection struct {
 		Tmpfs                                   map[string]string
 		PidMode, IpcMode, UTSMode, CgroupnsMode string
 		RestartPolicy                           struct{ Name string }
-		LogConfig                               struct{ Type string }
+		LogConfig                               struct {
+			Type   string
+			Config map[string]string
+		}
 	}
 	State struct {
 		Running, Restarting bool
@@ -225,4 +233,51 @@ func (d *Docker) Remove(ctx context.Context, id string, r Record) error {
 }
 func stopped(s State) bool {
 	return !s.Running && !s.Restarting && s.PID == 0 && (s.Status == "exited" || s.Status == "created")
+}
+
+func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.NodeOutput, error) {
+	state, err := d.Inspect(ctx, id, r)
+	if err != nil || !stopped(state) {
+		return nil, errors.New("NODE-0070: output requires stopped owned container")
+	}
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://docker/v1.45/containers/"+id+"/logs?stdout=true&stderr=true&follow=false", nil)
+	if err != nil {
+		return nil, err
+	}
+	response, err := d.client.Do(req)
+	if err != nil {
+		return nil, errors.New("NODE-0070: output unavailable")
+	}
+	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		return nil, errors.New("NODE-0070: output unavailable")
+	}
+	// Docker multiplexes stdout/stderr into 8-byte framed records. PID 1 emits
+	// exactly one JSON artifact on stdout; daemon diagnostics are never accepted.
+	reader := io.LimitReader(response.Body, 262145)
+	var data []byte
+	for {
+		header := make([]byte, 8)
+		n, err := io.ReadFull(reader, header)
+		if err == io.EOF && n == 0 {
+			break
+		}
+		if err != nil || header[0] != 1 || header[1] != 0 || header[2] != 0 || header[3] != 0 {
+			return nil, errors.New("NODE-0070: invalid output frame")
+		}
+		size := int(binary.BigEndian.Uint32(header[4:]))
+		if size > 180000-len(data) {
+			return nil, errors.New("NODE-0070: output exceeds bounds")
+		}
+		frame := make([]byte, size)
+		if _, err = io.ReadFull(reader, frame); err != nil {
+			return nil, errors.New("NODE-0070: incomplete output")
+		}
+		data = append(data, frame...)
+	}
+	if len(data) == 0 {
+		return nil, errors.New("NODE-0070: output missing")
+	}
+	sum := sha256.Sum256(data)
+	return &contracts.NodeOutput{Data: base64.StdEncoding.EncodeToString(data), Sha256: hex.EncodeToString(sum[:]), SizeBytes: int64(len(data))}, nil
 }

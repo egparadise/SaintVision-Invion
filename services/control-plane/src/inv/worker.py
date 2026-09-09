@@ -22,7 +22,11 @@ def main():
     args = parser.parse_args()
     try:
         config = strict_object(trusted_file(os.environ["INV_WORKER_CONFIG"]))
-        if set(config) != {"tenantId", "tls"}:
+        if not {"tenantId", "tls"} <= set(config) or set(config) - {
+            "tenantId",
+            "tls",
+            "outputRoot",
+        }:
             raise ValueError()
         tenant = str(UUID(config["tenantId"]))
         db = Database(
@@ -30,12 +34,15 @@ def main():
             recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
         )
         delivery = NodeDelivery(db, NodeTLSClient(**config["tls"]))
+        from .object_store import LocalObjects
+
+        output_provider = LocalObjects(config["outputRoot"]) if config.get("outputRoot") else None
         # Migrations and tenant/epoch privileges are checked before serving work.
         with db.transaction(tenant) as conn:
             conn.execute("SELECT command_id FROM inv.execution_deliveries LIMIT 0")
     except Exception:
         raise SystemExit("Explicit delivery worker configuration unavailable") from None
-    worker = DeliveryWorker(db, delivery)
+    worker = DeliveryWorker(db, delivery, output_provider=output_provider)
     if args.once:
         try:
             print(worker.once(tenant))

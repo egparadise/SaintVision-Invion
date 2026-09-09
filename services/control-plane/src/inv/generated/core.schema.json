@@ -1297,6 +1297,9 @@
           },
           "minItems": 1,
           "maxItems": 128
+        },
+        "output": {
+          "$ref": "#/$defs/NodeOutput"
         }
       },
       "required": [
@@ -1700,6 +1703,31 @@
           "pattern": "^[0-9a-f]{64}$"
         }
       }
+    },
+    "NodeOutput": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "maxLength": 240000,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 180000
+        }
+      },
+      "required": [
+        "data",
+        "sha256",
+        "sizeBytes"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [

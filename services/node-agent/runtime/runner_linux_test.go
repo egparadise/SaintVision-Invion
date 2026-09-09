@@ -19,6 +19,7 @@ type fakeEngine struct {
 	state                               State
 	creates, starts, stops, removes     int
 	lostStart, absent, removeFail, wait bool
+	removeLost                          bool
 }
 
 func (e *fakeEngine) Create(_ context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {
@@ -64,7 +65,13 @@ func (e *fakeEngine) Remove(_ context.Context, _ string, _ Record) error {
 		return errors.New("late start still running")
 	}
 	e.state = State{}
+	if e.removeLost {
+		return errors.New("lost removal ACK")
+	}
 	return nil
+}
+func (e *fakeEngine) Output(_ context.Context, _ string, _ Record) (*contracts.NodeOutput, error) {
+	return nil, nil // This fake cannot attest real process output.
 }
 func journalFor(t *testing.T, c Config) *Journal {
 	t.Helper()
@@ -443,5 +450,24 @@ func TestCancelDoesNotTurnAmbiguousIntentIntoNeverStartedProof(t *testing.T) {
 	}
 	if result, err := r.Cancel(context.Background(), data); err == nil || result.Receipt != nil {
 		t.Fatal("uncertain create incorrectly released")
+	}
+}
+
+func TestCrashAfterRemovalRecoversDurableStoppedCandidate(t *testing.T) {
+	c, p, k := fixture(t)
+	j := journalFor(t, c)
+	e := &fakeEngine{removeLost: true}
+	data := signed(t, p, k)
+	r := New(c, j, e)
+	if result, err := r.Execute(context.Background(), data); err == nil || result.Receipt != nil {
+		t.Fatal("unconfirmed removal acknowledged")
+	}
+	result, err := r.Observe(context.Background(), data)
+	if err != nil || result.Receipt == nil || result.Receipt.Reason != "exited" || e.creates != 1 || e.starts != 1 {
+		t.Fatal("durable stopped candidate not recovered", err)
+	}
+	again, err := r.Execute(context.Background(), data)
+	if err != nil || again.Receipt.ReceiptId != result.Receipt.ReceiptId || e.starts != 1 {
+		t.Fatal("recovery reexecuted", err)
 	}
 }

@@ -310,6 +310,7 @@ export interface NodeStopReceipt {
   reason: "exited" | "timeout" | "cancelled" | "recovered" | "not_started";
   finishedAt: Timestamp;
   allocations: Array<NodeAllocation>;
+  output?: NodeOutput;
 }
 
 export interface NodeExecutionResult {
@@ -390,4 +391,10 @@ export interface NodeChunkResult {
   nonce: string;
   dataBase64: string;
   chunkSha256: string;
+}
+
+export interface NodeOutput {
+  data: string;
+  sha256: string;
+  sizeBytes: number;
 }

@@ -69,18 +69,13 @@ class DeliveryQueue:
         ).fetchone()
         if not approval or approval["bound_run_version"] + 1 != run["version"]:
             return False
-        allocations = json.loads(base64.b64decode(row["envelope"]["payload"]))[
-            "allocations"
-        ]
+        allocations = json.loads(base64.b64decode(row["envelope"]["payload"]))["allocations"]
         try:
             lock_resources(conn, [a["lease"]["resourceId"] for a in allocations])
             assert_fences(
                 conn,
                 run["run_id"],
-                {
-                    a["lease"]["leaseId"]: a["lease"]["fencingToken"]
-                    for a in allocations
-                },
+                {a["lease"]["leaseId"]: a["lease"]["fencingToken"] for a in allocations},
             )
             voters = conn.execute(
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
@@ -101,8 +96,7 @@ class DeliveryQueue:
         except DomainError:
             return False
         return (
-            claim["not_after"]
-            > conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+            claim["not_after"] > conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
         )
 
     def acquire(self, tenant_id, *, command_id=None):
@@ -126,9 +120,7 @@ class DeliveryQueue:
                 "SELECT * FROM inv.execution_deliveries WHERE command_id=%s AND phase<>'stopped' FOR UPDATE",
                 (run["selected_command_id"],),
             ).fetchone()
-            if not row or (
-                command_id is not None and str(row["command_id"]) != command_id
-            ):
+            if not row or (command_id is not None and str(row["command_id"]) != command_id):
                 return None
             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
             takeover = run["state"] == "cancelled" and row["operation"] == "execute"
@@ -179,10 +171,7 @@ class DeliveryQueue:
                         row["command_id"],
                         current["attempt"],
                         Jsonb(
-                            {
-                                a["lease"]["leaseId"]: a["lease"]["fencingToken"]
-                                for a in allocations
-                            }
+                            {a["lease"]["leaseId"]: a["lease"]["fencingToken"] for a in allocations}
                         ),
                     ),
                 )
@@ -253,13 +242,16 @@ class DeliveryQueue:
 
 
 class DeliveryWorker:
-    def __init__(self, database, delivery):
+    def __init__(self, database, delivery, *, output_provider=None):
         self.queue, self.delivery = DeliveryQueue(database), delivery
+        from .output_ingestion import OutputIngestion
+
+        self.outputs = OutputIngestion(database, output_provider)
 
     def once(self, tenant_id, *, command_id=None):
         attempt = self.queue.acquire(tenant_id, command_id=command_id)
         if attempt is None:
-            return "idle"
+            return self.outputs.once(tenant_id, command_id=command_id)
         error = None
         try:
             self.delivery.deliver(
@@ -270,4 +262,7 @@ class DeliveryWorker:
             )
         except Exception as exc:
             error = exc.code if isinstance(exc, DomainError) else "SYS-0001"
-        return self.queue.finish(attempt, error_code=error)
+        outcome = self.queue.finish(attempt, error_code=error)
+        if outcome == "stopped":
+            self.outputs.once(tenant_id, command_id=attempt.command_id)
+        return outcome

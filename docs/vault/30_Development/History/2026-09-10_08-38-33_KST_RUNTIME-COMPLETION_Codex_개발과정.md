@@ -29,3 +29,11 @@ GUIDE·역할·Git 운영·agent-delivery·core-reliability v1.0.0, ADR v1.10.0 
 로컬 명령 및 결과: `python -m pytest -q -o addopts= --tb=short --junitxml=.work/local-tests.xml` exit 0, 358 passed / 439 skipped. 이 Windows 환경의 skip은 Linux/실DB 미실행이며 제품 합격이 아니다. `go test ./...` (services/node-agent) exit 0, Windows 가능 패키지만 검증. `python tools/check_docs.py`, `python tools/check_ontology.py` exit 0. Linux race·Docker·실DB는 CI 대기.
 
 다음: Linux 통합 CI 오류 수정 → 실제 출력 수집·전달/검증 → 샤드 부모/복구 → Workspace 재개. Push SHA/CI ID/동기화 결과는 검증보고에 추가한다.
+
+1차 push `0d25b57e1b26c6aa20d8d474f67a0ee3fadcb70b`: Core CI 34418400806에서 795 passed / 2 failed / 0 skipped. 실패는 기존 미수신 취소 시험의 이전 기대값과 새 시험의 idempotency 요청 version 변경이었다. 기대 계약과 동일 요청 replay를 바로잡았다. Documentation 34418400811, Frontend 34418400792 통과. Backend 34418400793은 신뢰성 migration의 의도적 downgrade 금지와 기존 전체 테스트 경로를 조정해야 했다. Backend는 서비스 migration의 역전과 전체 체인의 forward 적용을 구분하고, Core는 전체 실DB/Node 시험을 실행한다.
+
+2차 구현: 신뢰된 PID 1 supervisor가 stdout/stderr를 각 64 KiB로 제한하고 단일 JSON 결과를 출력한다. 초과 시 exit 122로 실패한다. Docker local 로그는 512 KiB/1개, Node는 정지한 소유 container에서만 바이트를 수집한다. 원시 출력은 민감 데이터일 수 있어 console/UI/진단 로그로 출력하지 않고 private Node journal·tenant RLS receipt·private object에 보존한다. 결과는 `NodeStopReceipt.output`의 base64/size/SHA-256으로 연결한다.
+
+2차 복구: container 제거 전에 정지 후보와 출력 바이트를 fsync한다. 제거 ACK 또는 프로세스가 유실되어도 기록된 동일 ID의 부재를 확인한 뒤 같은 receipt를 복원한다. intent만 있는 불확실한 create는 이 경로를 사용할 수 없다.
+
+2차 결과: worker의 `outputRoot` 설정이 있으면 실제 출력 hash·bounded JSON·성공 exit를 검증하고 object→Evidence→Run succeeded로 확정한다. 인증된 현재 epoch의 receipt가 만료 전에 고정한 동일 출력만 사후 publish 가능하다. 작업 재실행 없이 결과 확정만 3회 재시도하며, 실패 물리 receipt는 Run failed에 자동 반영한다. 이는 프로세스 출력 검증이며 모델 품질·SLO 합격을 뜻하지 않는다. Windows 로컬 364 passed / 444 skipped, Linux 후속 CI 대기.

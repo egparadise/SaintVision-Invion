@@ -41,7 +41,9 @@ func run() int {
 	}
 	child := exec.Command(flag.Args()[0], flag.Args()[1:]...)
 	child.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	// Untrusted stdout/stderr are discarded, not logged before redaction.
+	stdout, stderr := &outputBuffer{}, &outputBuffer{}
+	child.Stdout, child.Stderr = stdout, stderr
+	child.WaitDelay = 100 * time.Millisecond
 	child.Env = []string{"PATH=/usr/bin:/bin", "HOME=/workspace"}
 	if err := child.Start(); err != nil {
 		return 126
@@ -56,10 +58,10 @@ func run() int {
 	select {
 	case err := <-completed:
 		if err == nil {
-			return 0
+			return emitOutput(stdout, stderr, 0)
 		}
 		if exit, ok := err.(*exec.ExitError); ok && exit.ExitCode() >= 0 {
-			return exit.ExitCode()
+			return emitOutput(stdout, stderr, exit.ExitCode())
 		}
 		return 127
 	case <-timer.C:

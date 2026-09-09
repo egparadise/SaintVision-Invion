@@ -27,9 +27,7 @@ def test_real_mtls_probe_restores_offline_node_and_rejects_replay(remote):
     proof, request = observer.begin(a.node)
     response = a.client.probe(proof, request)
     result = observer.accept(a.node, proof, request, response)
-    assert (
-        result["status"] == "online" and result["profileVersion"] == a.profile.version
-    )
+    assert result["status"] == "online" and result["profileVersion"] == a.profile.version
     with pytest.raises(DomainError):
         observer.accept(a.node, proof, request, response)
     assert not list((a.path / "state").glob("*.intent"))
@@ -79,9 +77,7 @@ def test_missing_heartbeats_preserve_reserved_resources(remote):
     assert observer.mark_offline(a.e.tenant) == []
 
 
-def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(
-    remote, tmp_path
-):
+def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(remote, tmp_path):
     a = remote
     a.workload.update(command=["/probe", "sleep", "10"], timeoutSeconds=15)
     prepare(a)
@@ -117,21 +113,15 @@ def test_authenticated_browser_cancel_then_mtls_stop_returns_resources(
         started = time.monotonic()
         stopped = a.delivery.deliver(a.node, a.permit, cancel_only=True)
         execution.result(timeout=10)
-        assert (
-            time.monotonic() - started < 10
-            and stopped["receipt"]["reason"] == "cancelled"
-        )
+        assert time.monotonic() - started < 10 and stopped["receipt"]["reason"] == "cancelled"
         assert active(a) == 0 and container(a) is None
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "cancelled"
 
 
-def test_cancel_unseen_command_never_executes_or_claims_release(remote):
+def test_cancel_unseen_command_persists_nonexecution_proof_and_releases(remote):
     a = remote
     prepare(a)
-    with pytest.raises(DomainError):
-        a.delivery.deliver(a.node, a.permit, cancel_only=True)
-    assert (
-        container(a) is None
-        and active(a) == 2
-        and not list((a.path / "state").glob("*.intent"))
-    )
+    result = a.delivery.deliver(a.node, a.permit, cancel_only=True)
+    assert container(a) is None and active(a) == 0 and list((a.path / "state").glob("*.intent"))
+    assert result["receipt"]["reason"] == "not_started"
+    assert not result["receipt"]["processStarted"]

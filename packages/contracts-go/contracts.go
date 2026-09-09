@@ -312,6 +312,7 @@ type NodeStopReceipt struct {
     Reason string `json:"reason"`
     FinishedAt Timestamp `json:"finishedAt"`
     Allocations []NodeAllocation `json:"allocations"`
+    Output *NodeOutput `json:"output,omitempty"`
 }
 
 type NodeExecutionResult struct {
@@ -392,4 +393,10 @@ type NodeChunkResult struct {
     Nonce string `json:"nonce"`
     DataBase64 string `json:"dataBase64"`
     ChunkSha256 string `json:"chunkSha256"`
+}
+
+type NodeOutput struct {
+    Data string `json:"data"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
 }

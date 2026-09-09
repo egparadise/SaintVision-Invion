@@ -36,7 +36,16 @@ class ResultStore:
         return row
 
     def prepare(
-        self, tenant, project, run_id, command_id, object_id, evidence, *, proofs
+        self,
+        tenant,
+        project,
+        run_id,
+        command_id,
+        object_id,
+        evidence,
+        *,
+        proofs,
+        receipt_bound=False,
     ):
         command_id, object_id = str(UUID(command_id)), identity(object_id)
         evidence, proofs = deepcopy(evidence), deepcopy(proofs)
@@ -47,9 +56,7 @@ class ResultStore:
             "succeeded",
         ):
             raise DomainError("VERIFY-0002", "Evidence scope or result differs", 422)
-        fingerprint = digest(
-            {"command": command_id, "object": object_id, "evidence": evidence}
-        )
+        fingerprint = digest({"command": command_id, "object": object_id, "evidence": evidence})
         # Provider before Run before Node/resources before object, matching
         # checkpoint publication. GC never acquires Run after holding an object.
         with self.provider.locked() as files, self.db.transaction(tenant) as conn:
@@ -71,18 +78,41 @@ class ResultStore:
                     "replayed": True,
                 }
             if run["state"] not in {"running", "verifying"}:
-                raise DomainError(
-                    "GRAPH-0002", "Result requires a current running attempt"
-                )
-            assert_fences(conn, run_id, proofs)
+                raise DomainError("GRAPH-0002", "Result requires a current running attempt")
             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
-            if execution["not_after"] <= now or proofs != execution["proofs"]:
+            if receipt_bound:
+                # A current authenticated receipt carries the actual immutable
+                # bytes. Recovery may publish those bytes after lease release,
+                # but can never introduce new output under expired authority.
+                row = conn.execute(
+                    "SELECT envelope FROM inv.node_stop_receipts WHERE command_id=%s", (command_id,)
+                ).fetchone()
+                stop = row["envelope"] if row else {}
+                if (
+                    not stop.get("processStarted")
+                    or stop.get("exitCode") != 0
+                    or stop.get("reason") != "exited"
+                    or stop.get("output", {}).get("sha256") != evidence["outputSha256"]
+                    or datetime.fromisoformat(stop["finishedAt"].replace("Z", "+00:00"))
+                    > execution["not_after"]
+                    or conn.execute(
+                        "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+                        (run_id,),
+                    ).fetchone()
+                ):
+                    raise DomainError(
+                        "VERIFY-0022", "Receipt does not attest immutable timely output"
+                    )
+            else:
+                assert_fences(conn, run_id, proofs)
+            if (not receipt_bound and execution["not_after"] <= now) or proofs != execution[
+                "proofs"
+            ]:
                 raise DomainError("LEASE-0002", "Output authority expired or differs")
             if (
                 evidence["inputSha256"] != execution["action_digest"]
                 or evidence["policyDecisionId"] != execution["policy_decision_id"]
-                or datetime.fromisoformat(evidence["timestamp"].replace("Z", "+00:00"))
-                > now
+                or datetime.fromisoformat(evidence["timestamp"].replace("Z", "+00:00")) > now
             ):
                 raise DomainError(
                     "VERIFY-0002",
@@ -90,13 +120,8 @@ class ResultStore:
                     422,
                 )
             obj = SnapshotStore._row(conn, project, object_id)
-            if (
-                obj["state"] != "ready"
-                or evidence["outputSha256"] != obj["content_hash"]
-            ):
-                raise DomainError(
-                    "VERIFY-0010", "Result object is not verified and ready", 422
-                )
+            if obj["state"] != "ready" or evidence["outputSha256"] != obj["content_hash"]:
+                raise DomainError("VERIFY-0010", "Result object is not verified and ready", 422)
             files.read(object_key(object_id), obj["content_hash"], obj["size_bytes"])
             conn.execute(
                 """INSERT INTO inv.result_commitments
@@ -144,10 +169,7 @@ class ResultStore:
                 (command_id,),
             ).fetchone():
                 return public(run)
-            if (
-                run["state"] not in {"running", "verifying"}
-                or run["version"] != expected_version
-            ):
+            if run["state"] not in {"running", "verifying"} or run["version"] != expected_version:
                 raise DomainError(
                     "GRAPH-0003", "Completion requires current active attempt version"
                 )
@@ -175,22 +197,16 @@ class ResultStore:
                 }
                 != execution["proofs"]
             ):
-                raise DomainError(
-                    "VERIFY-0022", "Physical outcome does not support success"
-                )
+                raise DomainError("VERIFY-0022", "Physical outcome does not support success")
             if conn.execute(
                 "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
                 (run_id,),
             ).fetchone():
-                raise DomainError(
-                    "LEASE-0003", "Completion awaits physical resource release"
-                )
+                raise DomainError("LEASE-0003", "Completion awaits physical resource release")
             obj = SnapshotStore._row(conn, project, result["object_id"])
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Prepared output unavailable")
-            files.read(
-                object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"]
-            )
+            files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
             conn.execute(
                 "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)",
                 (tenant, run_id, result["evidence_id"], Jsonb(result["envelope"])),

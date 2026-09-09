@@ -517,37 +517,6 @@ class Reason(StrEnum):
     not_started = 'not_started'
 
 
-class NodeStopReceipt(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    receiptId: UUID
-    claimId: ClaimId
-    commandId: CommandId
-    tenantId: TenantId
-    projectId: ProjectId
-    runId: RunId
-    nodeId: NodeId
-    recoveryEpoch: UUID
-    planDigest: ActionDigest
-    containerId: constr(pattern=r'^([0-9a-f]{64})?$')
-    stopped: Literal[True]
-    processStarted: bool
-    exitCode: conint(ge=-1, le=255)
-    reason: Reason
-    finishedAt: Timestamp
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-
-
-class NodeExecutionResult(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    duplicate: bool
-    receipt: NodeStopReceipt
-    cleanupPending: Literal[False]
-
-
 class ClientFingerprint(RootModel[constr(pattern=r'^[0-9a-f]{64}$')]):
     root: constr(pattern=r'^[0-9a-f]{64}$')
 
@@ -651,6 +620,47 @@ class NodeChunkResult(BaseModel):
     nonce: constr(pattern=r'^[0-9a-f]{64}$')
     dataBase64: constr(max_length=349528)
     chunkSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    data: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', max_length=240000)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=180000)
+
+
+class NodeStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    claimId: ClaimId
+    commandId: CommandId
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    planDigest: ActionDigest
+    containerId: constr(pattern=r'^([0-9a-f]{64})?$')
+    stopped: Literal[True]
+    processStarted: bool
+    exitCode: conint(ge=-1, le=255)
+    reason: Reason
+    finishedAt: Timestamp
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    output: NodeOutput | None = None
+
+
+class NodeExecutionResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duplicate: bool
+    receipt: NodeStopReceipt
+    cleanupPending: Literal[False]
 
 
 class INVCore(

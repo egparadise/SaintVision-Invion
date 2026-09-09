@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 import pytest
 from inv.errors import DomainError
+from inv.control import Control
 from test_approvals import approval, count
 from test_tool_admission import gateway, claim
 from test_dispatch_queue import cancel
@@ -18,6 +19,7 @@ def active(a):
 
 def test_cancel_before_claim_returns_reservations_without_fabricated_node_receipt(gateway):
     a = gateway
+    version = a.e.runs.get(a.e.tenant, a.run["runId"])["version"]
     result = cancel(a)
     assert result["state"] == "cancelled" and not result["resourceReleasePending"]
     assert (
@@ -25,7 +27,12 @@ def test_cancel_before_claim_returns_reservations_without_fabricated_node_receip
         and count(a, "reservation_aborts") == 1
         and count(a, "node_stop_receipts") == 0
     )
-    assert cancel(a) == result
+    assert (
+        Control(a.e.db).cancel(
+            a.people["requester"], a.e.project, a.run["runId"], version, "cancel-queued"
+        )
+        == result
+    )
     with pytest.raises(DomainError):
         claim(a)
 

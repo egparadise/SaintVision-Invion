@@ -18,6 +18,15 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "fail" {
 		os.Exit(7)
 	}
+	if len(os.Args) > 1 && os.Args[1] == "output" {
+		fmt.Fprintln(os.Stdout, "actual-node-output")
+		fmt.Fprintln(os.Stderr, "actual-node-stderr")
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "overflow" {
+		fmt.Fprint(os.Stdout, strings.Repeat("x", 70000))
+		return
+	}
 	if os.Geteuid() != 65532 {
 		fail("uid")
 	}
