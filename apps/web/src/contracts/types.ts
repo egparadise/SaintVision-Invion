@@ -349,6 +349,57 @@ export interface ReleaseCandidate {
   isActive: boolean;
 }
 
+export interface TlsCertificateDetail {
+  domain: string;
+  issuer: string;
+  tlsVersion: string;
+  cipherSuite: string;
+  validFrom: string;
+  validTo: string;
+  hstsEnabled: boolean;
+  sanList: string[];
+}
+
+export interface NginxRoutingRule {
+  location: string;
+  targetUpstream: string;
+  protocol: 'HTTP' | 'SSE' | 'WebSocket' | 'Static';
+  bufferingOff: boolean;
+  cacheControl: string;
+  upgradeHeader: boolean;
+}
+
+export interface NodeJourneyVerification {
+  nodeId: string;
+  hostname: string;
+  os: 'windows' | 'linux';
+  roles: string[];
+  smokeStatus: 'passed' | 'failed';
+  latencyMs: number;
+  lastVerifiedAt: string;
+}
+
+export interface ReleaseManifest {
+  releaseId: string;
+  version: string;
+  imageDigest: string;
+  builtCommitSha: string;
+  targetClusters: string[];
+  totalNodes: number;
+  smokePassedRatio: number;
+  knownLimitations: string[];
+  operatorSignOff: boolean;
+}
+
+export interface TrainingModuleStep {
+  stepNumber: number;
+  title: string;
+  description: string;
+  actionRequired: string;
+  status: 'pending' | 'completed';
+}
+
+
 
 
 

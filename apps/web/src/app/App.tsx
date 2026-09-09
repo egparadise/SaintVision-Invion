@@ -13,6 +13,7 @@ import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 import { NaturalLanguageRunView } from '@/features/agent/NaturalLanguageRunView';
 import { ModelLineageView } from '@/features/mlops/ModelLineageView';
 import { ReleaseCandidateView } from '@/features/release/ReleaseCandidateView';
+import { IntranetDeploymentView } from '@/features/deployment/IntranetDeploymentView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -491,6 +492,11 @@ export const App: React.FC = () => {
         {/* Tab 2.12: Release Candidate & Web Rollback (S11-FE) */}
         {activeTab === 'release' && (
           <ReleaseCandidateView />
+        )}
+
+        {/* Tab 2.13: Intranet HTTPS Deployment & Operator Training (S12-FE) */}
+        {activeTab === 'deployment' && (
+          <IntranetDeploymentView />
         )}
 
         {/* Tab 3: Runs & Evidence */}

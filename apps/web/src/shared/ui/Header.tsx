@@ -29,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'agent', label: '자연어 요청 (S09)' },
     { id: 'mlops', label: '모델 계보 (S10)' },
     { id: 'release', label: '배포 후보 (S11)' },
+    { id: 'deployment', label: '내부망 배포 (S12)' },
     { id: 'runs', label: 'Runs 실행' },
     { id: 'approvals', label: '승인 센터' },
     { id: 'terminal', label: '웹 터미널' },

@@ -30,6 +30,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S09-GEMINI-001 | Codex / Claude | S09-FE 자연어 요청 화면, 예산 쿼터, Bounded Repair(3회 한도), Golden Eval(99%/80%/0누출), vitest 55건 검증 | S09-FE 승인 판정 및 S09-BE 컨텍스트 불변성 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정]] |
 | HO-S10-GEMINI-001 | Codex / Claude | S10-FE 모델 계보 역추적 뷰, Multi-LLM 어댑터 적합성(100%), 게이트 배포, vitest 59건 검증 | S10-FE 승인 판정 및 S10-BE MLflow/어댑터 API 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정]] |
 | HO-S11-GEMINI-001 | Codex / Claude | S11-FE 배포 후보 관리, 7대 SLO 실측치 충족, WCAG 2.1 AA 접근성(11.4:1), 1클릭 롤백, vitest 64건 검증 | S11-FE 승인 판정 및 프로덕션 릴리스 게이트 통과 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-00-00_KST_S11-FE_Gemini_접근성_시각회귀_배포후보_개발과정]] |
+| HO-S12-GEMINI-001 | Codex / Claude | S12-FE 내부망 HTTPS 웹 배포, TLS 1.3/Nginx, 5노드 여정/Smoke 100%, Release R4 Manifest, vitest 71건 검증 | S12-FE 최종 승인 판정 및 Gemini Frontend 전 12개 스프린트 완결 인수 | pending (Codex 검토 대기) / 실행기록 [[2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정]] |
 | HO-S01-CODEX-001 | Codex 다음 세션 | S01 네 작업, 장비·IdP·DNS/TLS·Storage 제품 조사, contract 기준선 | 확인값·미확인값·계약·reviewer 기록 후 ready | pending |
 
 자기 영역을 시작할 때 목표→증거→계약→작업 역추적을 확인하고 init/commit/push/build/report 절차를 이어간다.
