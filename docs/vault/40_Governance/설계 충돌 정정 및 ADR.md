@@ -1,7 +1,7 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.7.0"
+version: "1.8.0"
 status: "baseline"
 author: "Codex"
 updated: "2026-09-10T02:42:14+09:00"
@@ -68,3 +68,5 @@ ADR-029(mTLS peer 검증·기존 실행 observation) 및 ADR-030(인증서 CAS/�
 ADR-031(resource-server 인증·현재 project grant)과 ADR-032(Run별 commit 순서 이벤트·mTLS 관측·원격 취소)는 [[Codex Control API 인증과 Node 관측 계약]]을 따른다. 실제 IdP/PKI·업무 adapter·운영 실장비 검증과 독립 검토는 별도다.
 
 ADR-033(원자 permit queue·일회 전송 예약·중단 후 관찰/취소·receipt 후 종료)은 [[Codex 실행 전달 대기열과 중단 복구 계약]]을 따른다. 운영 worker 설정과 전체 업무/실장비 인수는 별도다.
+
+ADR-034(제한된 local object publication·checkpoint pin·GC 중단 복구)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. S3 제품 및 실제 운영 복원/독립 검토는 별도다.
