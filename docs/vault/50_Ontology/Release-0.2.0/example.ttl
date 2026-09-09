@@ -39,7 +39,7 @@ res:S12-DB a dev:DevelopmentTask ;
 
 res:S12-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S11-BE,
         res:S11-DB,
         res:S11-FE,
@@ -326,7 +326,7 @@ res:S01-DB a dev:DevelopmentTask ;
 
 res:S01-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:ownedBy res:agent-Gemini ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Codex ;
@@ -382,7 +382,7 @@ res:S02-DB a dev:DevelopmentTask ;
 
 res:S02-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S01-BE,
         res:S01-DB,
         res:S01-FE,
@@ -446,7 +446,7 @@ res:S03-DB a dev:DevelopmentTask ;
 
 res:S03-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S02-BE,
         res:S02-DB,
         res:S02-FE,
@@ -510,7 +510,7 @@ res:S04-DB a dev:DevelopmentTask ;
 
 res:S04-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S03-BE,
         res:S03-DB,
         res:S03-FE,
@@ -574,7 +574,7 @@ res:S05-DB a dev:DevelopmentTask ;
 
 res:S05-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S04-BE,
         res:S04-DB,
         res:S04-FE,
@@ -638,7 +638,7 @@ res:S06-DB a dev:DevelopmentTask ;
 
 res:S06-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S05-BE,
         res:S05-DB,
         res:S05-FE,
@@ -702,7 +702,7 @@ res:S07-DB a dev:DevelopmentTask ;
 
 res:S07-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S06-BE,
         res:S06-DB,
         res:S06-FE,
@@ -766,7 +766,7 @@ res:S08-DB a dev:DevelopmentTask ;
 
 res:S08-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S07-BE,
         res:S07-DB,
         res:S07-FE,
@@ -830,7 +830,7 @@ res:S09-DB a dev:DevelopmentTask ;
 
 res:S09-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S08-BE,
         res:S08-DB,
         res:S08-FE,
@@ -894,7 +894,7 @@ res:S10-DB a dev:DevelopmentTask ;
 
 res:S10-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S09-BE,
         res:S09-DB,
         res:S09-FE,
@@ -958,7 +958,7 @@ res:S11-DB a dev:DevelopmentTask ;
 
 res:S11-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S10-BE,
         res:S10-DB,
         res:S10-FE,
