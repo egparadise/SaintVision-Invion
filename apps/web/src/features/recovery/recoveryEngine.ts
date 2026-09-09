@@ -19,9 +19,19 @@ export function isTokenValidAndCurrent(
   attempted: { epoch: number; sequence: number },
   current: { epoch: number; sequence: number }
 ): boolean {
-  if (attempted.epoch < current.epoch) return false;
-  if (attempted.epoch === current.epoch && attempted.sequence < current.sequence) return false;
-  return true;
+  // Monotonic fencing invariant:
+  // An attempted execution/write token must match the currently issued active fencing token.
+  // Stale tokens (attempted < current) and unissued future tokens (attempted > current) are strictly rejected.
+  return attempted.epoch === current.epoch && attempted.sequence === current.sequence;
+}
+
+export function isTokenNewer(
+  candidate: { epoch: number; sequence: number },
+  baseline: { epoch: number; sequence: number }
+): boolean {
+  if (candidate.epoch > baseline.epoch) return true;
+  if (candidate.epoch === baseline.epoch && candidate.sequence > baseline.sequence) return true;
+  return false;
 }
 
 export class DistributedRecoveryManager {

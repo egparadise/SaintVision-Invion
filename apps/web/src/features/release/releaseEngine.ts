@@ -64,9 +64,9 @@ export class ReleaseManager {
     {
       ruleId: 'wcag21-1.4.11-non-text-contrast',
       wcagLevel: 'AA',
-      description: '버튼, 칩, 입력창 등 UI 컴포넌트 경계선의 명도 대비가 최소 3:1 이상이어야 함',
+      description: '버튼, 칩, 입력창 등 UI 컴포넌트 인터랙티브 경계선(#6e7681 on #0d1117) 명도 대비가 최소 3:1 이상(실측 4.12:1)이어야 함',
       status: 'pass',
-      contrastRatio: 4.8, // #30363d on #0d1117
+      contrastRatio: 4.12, // #6e7681 on #0d1117 (WCAG 2.1 AA non-text >= 3.0:1)
     },
     {
       ruleId: 'wcag21-2.1.1-keyboard-navigation',

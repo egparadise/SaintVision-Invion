@@ -1,4 +1,4 @@
-﻿import {
+import {
   TlsCertificateDetail,
   NginxRoutingRule,
   NodeJourneyVerification,
@@ -228,6 +228,10 @@ export class DeploymentManager {
   signOffRelease(operatorId: string): { success: boolean; manifest: ReleaseManifest; error?: string } {
     if (!operatorId || operatorId.trim().length === 0) {
       return { success: false, manifest: { ...this.releaseManifest }, error: 'Operator ID is required for sign-off' };
+    }
+    const isAuthorized = /^(usr_operator_|usr_admin_|admin|operator)/.test(operatorId.trim());
+    if (!isAuthorized) {
+      return { success: false, manifest: { ...this.releaseManifest }, error: `Unauthorized operator: '${operatorId}' does not hold deployment sign-off privilege` };
     }
     this.releaseManifest.operatorSignOff = true;
     return { success: true, manifest: { ...this.releaseManifest } };

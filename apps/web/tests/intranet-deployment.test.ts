@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { DeploymentManager } from '../src/features/deployment/deploymentEngine';
 
 describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkthrough (AC-12)', () => {
@@ -92,6 +92,11 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       const attempt1 = dm.signOffRelease('');
       expect(attempt1.success).toBe(false);
       expect(attempt1.error).toContain('Operator ID is required');
+
+      // Unauthorized arbitrary actor rejected
+      const attemptUnauthorized = dm.signOffRelease('arbitrary-actor');
+      expect(attemptUnauthorized.success).toBe(false);
+      expect(attemptUnauthorized.error).toContain('Unauthorized operator');
 
       // Valid operator sign-off succeeded
       const attempt2 = dm.signOffRelease('usr_operator_lead');
