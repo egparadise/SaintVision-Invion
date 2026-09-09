@@ -10,10 +10,13 @@ from copy import deepcopy
 from dataclasses import dataclass
 from uuid import UUID
 from psycopg.types.json import Jsonb
-from .approvals import digest
+from .approvals import ApprovalStore, digest
+from .control import Control
 from .errors import DomainError
 from .leases import lock_run, lock_resources
 from .tooling import ToolGateway
+from .runs import RunStore, event
+from .state import TERMINAL
 
 
 class BoundDatabase:
@@ -190,24 +193,148 @@ class ShardRuntime:
             if not plan:
                 raise DomainError("RES-0004", "Shard plan not found", 404)
             rows = conn.execute(
-                """SELECT s.shard_index,s.run_id,s.node_id,d.phase,r.envelope AS receipt
+                """SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt,
+              u.state,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
               FROM inv.shard_commands s JOIN inv.execution_deliveries d USING(tenant_id,command_id)
               LEFT JOIN inv.node_stop_receipts r USING(tenant_id,command_id)
+              JOIN inv.runs u ON (s.tenant_id,s.run_id)=(u.tenant_id,u.run_id)
+              LEFT JOIN inv.result_completions c ON (s.tenant_id,s.command_id,u.attempt)=(c.tenant_id,c.command_id,c.attempt)
+              LEFT JOIN inv.result_commitments p ON (s.tenant_id,s.command_id)=(p.tenant_id,p.command_id)
+              LEFT JOIN inv.storage_objects o ON (p.tenant_id,p.project_id,p.object_id)=(o.tenant_id,o.project_id,o.object_id)
               WHERE s.project_id=%s AND s.plan_id=%s ORDER BY s.shard_index""",
                 (project, plan_id),
             ).fetchall()
+            succeeded = len(rows) == plan["shard_count"] and all(
+                r["state"] == "succeeded"
+                and r["evidence_id"] is not None
+                and r["object_state"] == "ready"
+                for r in rows
+            )
+            manifest = (
+                [
+                    {
+                        "index": r["shard_index"],
+                        "runId": r["run_id"],
+                        "evidenceId": r["evidence_id"],
+                        "objectId": str(r["object_id"]),
+                        "sha256": r["content_hash"],
+                        "sizeBytes": r["size_bytes"],
+                    }
+                    for r in rows
+                ]
+                if succeeded
+                else None
+            )
             return {
                 "planId": plan_id,
                 "shardCount": plan["shard_count"],
                 "allPhysicallyStopped": len(rows) == plan["shard_count"]
                 and all(r["receipt"] is not None for r in rows),
+                "allSucceeded": succeeded,
+                "resultManifest": manifest,
+                "resultManifestSha256": (
+                    digest(manifest) if manifest is not None else None
+                ),
                 "shards": [
                     {
                         "index": r["shard_index"],
                         "runId": r["run_id"],
                         "nodeId": r["node_id"],
                         "phase": r["phase"],
+                        "state": r["state"],
+                        "evidenceId": r["evidence_id"],
                     }
                     for r in rows
                 ],
             }
+
+    @staticmethod
+    def _lock_members(conn, project, plan_id):
+        plan = conn.execute(
+            "SELECT shard_count FROM inv.shard_plans WHERE project_id=%s AND plan_id=%s FOR UPDATE",
+            (project, plan_id),
+        ).fetchone()
+        if not plan:
+            raise DomainError("RES-0004", "Shard plan not found", 404)
+        members = conn.execute(
+            "SELECT run_id,command_id FROM inv.shard_commands WHERE project_id=%s AND plan_id=%s ORDER BY run_id",
+            (project, plan_id),
+        ).fetchall()
+        if len(members) != plan["shard_count"]:
+            raise DomainError("NODE-0062", "Shard plan is incomplete")
+        return [
+            (member, lock_run(conn, member["run_id"], project)) for member in members
+        ]
+
+    def cancel(self, principal, project, plan_id, *, key):
+        """One authorized, atomic cancellation request for all nonterminal members.
+
+        Queue workers deliver individual cancellations. Physical leases remain
+        reserved until each authenticated stop receipt, including uncertain ones.
+        """
+        approvals = ApprovalStore(self.db)
+        with self.db.transaction(principal.tenant_id) as conn:
+            prior = approvals._ledger(
+                conn, principal, project, "shard.cancel", key, {"planId": plan_id}
+            )
+            members = self._lock_members(conn, project, plan_id)
+            Control(self.db).grant(conn, principal, project, "can_request")
+            if prior is not None:
+                return prior
+            changed = []
+            for member, run in members:
+                if run["state"] not in TERMINAL:
+                    RunStore(self.db)._transition(
+                        conn, principal.tenant_id, run, "cancelled", run["version"]
+                    )
+                    event(
+                        conn,
+                        principal.tenant_id,
+                        run["run_id"],
+                        "inv.run.cancel_requested",
+                        {"planId": plan_id},
+                    )
+                    changed.append(run["run_id"])
+            return approvals._save(
+                conn,
+                project,
+                "shard.cancel",
+                key,
+                {"planId": plan_id, "cancelledRuns": changed},
+            )
+
+    def reconcile_failures(self, tenant, project, plan_id):
+        """Project-authorized worker adapter; observe receipts, never retry work."""
+        with self.db.transaction(tenant) as conn:
+            members = self._lock_members(conn, project, plan_id)
+            failed = []
+            for member, run in members:
+                row = conn.execute(
+                    """SELECT r.envelope FROM inv.node_stop_receipts r
+                    JOIN inv.execution_attempts a USING(tenant_id,command_id)
+                    WHERE r.command_id=%s AND a.run_id=%s AND a.attempt=%s""",
+                    (member["command_id"], run["run_id"], run["attempt"]),
+                ).fetchone()
+                if not row or run["state"] not in {"running", "verifying"}:
+                    continue
+                receipt = row["envelope"]
+                if receipt["recoveryEpoch"] != self.db.recovery_epoch:
+                    continue
+                if (
+                    receipt["processStarted"]
+                    and receipt["exitCode"] == 0
+                    and receipt["reason"] == "exited"
+                ):
+                    continue
+                RunStore(self.db)._transition(
+                    conn, tenant, run, "failed", run["version"]
+                )
+                event(
+                    conn,
+                    tenant,
+                    run["run_id"],
+                    "inv.shard.failed",
+                    {"planId": plan_id, "commandId": str(member["command_id"])},
+                )
+                failed.append(run["run_id"])
+            return {"planId": plan_id, "failedRuns": failed}

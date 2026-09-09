@@ -1,7 +1,7 @@
 """Real, bounded Workspace snapshots and new-generation Linux restoration.
 
 Private service-owned roots and cooperative writer locks are mandatory. Restores
-publish a new read-only generation; they never overwrite a live/user directory.
+publish a new generation with read-only files; they never overwrite a live/user directory.
 The Workspace adapter must quiesce writers before snapshot and explicitly create
 a writable execution copy before resuming a process. No process is started here.
 """
