@@ -1,0 +1,172 @@
+{
+  "audit_at_kst": "2026-09-10T04:14:17+09:00",
+  "code_sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+  "integration_sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+  "execution_is_integration_ancestor": false,
+  "pr9": {
+    "number": 9,
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "head_sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+    "url": "https://github.com/egparadise/SaintVision-Invion/pull/9"
+  },
+  "ci": {
+    "run_id": 34392632691,
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34392632691",
+    "head_sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+    "conclusion": "success",
+    "artifact_id": 10120373573,
+    "archive_sha256": "151071c36b6062bccba6284d963e09cceb5b545a451f3984bfaed9387adbcad5",
+    "junit_sha256": "0d2b339882ceac12eb615ec2577721ad18f37ca9dbeea9b1423809090242301c",
+    "suite_counts": {
+      "tests": 400,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shard_tests": [
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_plan_starts_two_real_isolated_shards_once_and_reports_receipts",
+        "seconds": "0.981",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_second_shard_failure_rolls_back_first_permit_and_plan",
+        "seconds": "0.482",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_concurrent_plan_submission_creates_one_set_of_claims",
+        "seconds": "0.499",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_unsupported_collectives_or_implicit_splitting_never_queue[mpi-True]",
+        "seconds": "0.118",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_unsupported_collectives_or_implicit_splitting_never_queue[nccl-True]",
+        "seconds": "0.117",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_unsupported_collectives_or_implicit_splitting_never_queue[none-False]",
+        "seconds": "0.125",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_shard_manifest_requires_each_committed_evidence_and_physical_result",
+        "seconds": "1.388",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_plan_cancel_checks_current_permission_and_rolls_back_all_members",
+        "seconds": "0.574",
+        "passed": true
+      },
+      {
+        "class": "tests.integration.test_shards",
+        "name": "test_nonzero_shard_result_is_reconciled_without_retry",
+        "seconds": "0.571",
+        "passed": true
+      }
+    ]
+  },
+  "files": [
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "services/control-plane/src/inv/shards.py",
+      "present": true,
+      "sha256": "ea9b50e4d288fea1d6eb57015ea276e1078feecde75ff037bccd6af53449025f"
+    },
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "tests/integration/test_shards.py",
+      "present": true,
+      "sha256": "68f4810a103b365b7225aafd129bea5a48d0e308e13df8e055b3139e06640710"
+    },
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "present": true,
+      "sha256": "a6176ac1c6eedb09d04834ead4f20a604dc3238ff124e0d1ad947952a3d70bcf"
+    },
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "present": true,
+      "sha256": "81f8a6dae61bf9f94ee52b54fbecdde8ad011015e18bce9baba38b9953f50596"
+    },
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "services/node-agent/runtime/runner.go",
+      "present": true,
+      "sha256": "25d92231857b04f01d1cae69654d8b704290dca601b06d8a618fa091d8cbf6cc"
+    },
+    {
+      "sha": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "path": "services/node-agent/runtime/docker.go",
+      "present": true,
+      "sha256": "8e2065fd605d00711debc272c606591369747ee24bff401986876aabebb78ff3"
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "src/saintvision/services/pools.py",
+      "present": true,
+      "sha256": "5213914a46e60f16ec75a939d649c1dca5d92cbdcc654a0867f07e916c193375"
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "src/saintvision/api/v1/pools.py",
+      "present": true,
+      "sha256": "a4d0b4ec83df3b94605d985e3c6bd9759fbec07380aa938fcfe66dd238a537ff"
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "src/saintvision/api/schemas.py",
+      "present": true,
+      "sha256": "a4fa63626416073b7a6ecd21b16b1a5b26f3be6e7493e89f3ee397e0203899ae"
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "services/control-plane/src/inv/shards.py",
+      "present": false,
+      "sha256": null
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "present": false,
+      "sha256": null
+    },
+    {
+      "sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+      "path": "migrations/versions/0010_shards.py",
+      "present": false,
+      "sha256": null
+    }
+  ],
+  "limitations": [
+    "Existing CI artifact re-inspected; no fresh physical-device or product journey test",
+    "Shard cases use one synthetic Node sequentially",
+    "Result manifest fixture prepares synthetic verifier bytes before dispatch",
+    "Cancellation case ends before physical worker cancellation completes",
+    "Failure reconciliation fixture injects a trusted receipt"
+  ],
+  "integration_recheck": {
+    "at_kst": "2026-09-10T04:17:51+09:00",
+    "sha": "ed566c1d110394192d1bf795757e242e50044b16",
+    "source_diff_since_initial": [],
+    "latest_execution_still_absent": true
+  }
+}
