@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the S02, S03 and S09 scope.
+"""SQLAlchemy models for the S02, S03, S09 and S10 scope.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
@@ -48,6 +48,19 @@ from .execution import (
     Workload,
     Workspace,
     WorkspaceVolume,
+)
+from .lineage import (
+    DEPLOYMENT_ENVIRONMENTS,
+    DEPLOYMENT_STATUSES,
+    LINEAGE_KINDS,
+    CodeCommit,
+    ContainerImage,
+    Dataset,
+    DatasetVersion,
+    Deployment,
+    Model,
+    ModelLineage,
+    ModelVersion,
 )
 from .identity import (
     PROJECT_STATUSES,
@@ -117,6 +130,15 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "eval_cases",
     "eval_runs",
     "eval_results",
+    # S10
+    "datasets",
+    "dataset_versions",
+    "code_commits",
+    "container_images",
+    "models",
+    "model_versions",
+    "model_lineage",
+    "deployments",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
@@ -139,10 +161,25 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     # key — so UPDATE is meaningless and DELETE belongs to the orphan
     # collector, which runs as the owner, not the application.
     "context_snapshots",
+    # A dataset or model version whose bytes can be replaced under a fixed name
+    # invalidates every lineage claim built on it.
+    "dataset_versions",
+    "model_versions",
 )
 
 __all__ = [
     "ACTOR_TYPES",
+    "CodeCommit",
+    "ContainerImage",
+    "DEPLOYMENT_ENVIRONMENTS",
+    "DEPLOYMENT_STATUSES",
+    "Dataset",
+    "DatasetVersion",
+    "Deployment",
+    "LINEAGE_KINDS",
+    "Model",
+    "ModelLineage",
+    "ModelVersion",
     "CONTEXT_ITEM_KINDS",
     "ContextBundle",
     "ContextBundleItem",
