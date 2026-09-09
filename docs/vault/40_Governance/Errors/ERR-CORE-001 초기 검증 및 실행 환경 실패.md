@@ -15,3 +15,5 @@ source_of_truth: "Git"
 Windows exec/apply_patch sandbox 초기화가 helper_unknown_error로 실패. Docker pg16 시험 컨테이너 생성 후 시작·재시도 모두 newosproc/errno=11로 exit 1. 사용자 컨테이너나 daemon을 재시작하지 않았다. 실패 컨테이너 saintvision-core-test-20260909는 시작되지 않은 상태다.
 
 해결과 범위: [[RES-CORE-001 입력 검증 수정과 CI 대체 검증]].
+
+Core Build #34330563460 (e6336a7)에서 PostgreSQL migration 구문 오류를 재현했다. Run trigger IF 식의 CASE를 괄호로 감싸고 PL/pgSQL block END 구분자를 명시했다. 문서 CI #34330563371은 success. 수정 SHA의 DB 재검증 전 완료 아님.

@@ -111,9 +111,9 @@ BEGIN
   EXECUTE format('ALTER TABLE inv.%I FORCE ROW LEVEL SECURITY', tab);
   EXECUTE format('CREATE POLICY tenant_isolation ON inv.%I USING (tenant_id = nullif(current_setting(''inv.tenant_id'', true), '''')::uuid) WITH CHECK (tenant_id = nullif(current_setting(''inv.tenant_id'', true), '''')::uuid)', tab);
  END LOOP;
-END $body$;
+END; $body$;
 CREATE FUNCTION inv.immutable_record() RETURNS trigger LANGUAGE plpgsql AS $body$
-BEGIN RAISE EXCEPTION 'immutable record' USING ERRCODE = '23514'; END $body$;
+BEGIN RAISE EXCEPTION 'immutable record' USING ERRCODE = '23514'; END; $body$;
 CREATE TRIGGER evidence_immutable BEFORE UPDATE OR DELETE ON inv.evidence FOR EACH ROW EXECUTE FUNCTION inv.immutable_record();
 CREATE TRIGGER checkpoint_immutable BEFORE UPDATE OR DELETE ON inv.checkpoints FOR EACH ROW EXECUTE FUNCTION inv.immutable_record();
 CREATE FUNCTION inv.guard_run() RETURNS trigger LANGUAGE plpgsql AS $body$
@@ -144,7 +144,7 @@ BEGIN
  OR (OLD.state='verifying' AND NEW.state IN ('succeeded','recovering'))
  OR (OLD.state='recovering' AND NEW.state='scheduled');
  IF NOT allowed OR NEW.version <> OLD.version + 1
- OR NEW.attempt <> OLD.attempt + CASE WHEN NEW.state='running' THEN 1 ELSE 0 END THEN
+ OR NEW.attempt <> OLD.attempt + (CASE WHEN NEW.state='running' THEN 1 ELSE 0 END) THEN
   RAISE EXCEPTION 'invalid run transition' USING ERRCODE = '23514';
  END IF;
  IF NEW.state='succeeded' AND NOT EXISTS
@@ -153,7 +153,7 @@ BEGIN
  END IF;
  NEW.updated_at := clock_timestamp();
  RETURN NEW;
-END $body$;
+END; $body$;
 CREATE TRIGGER run_guard BEFORE INSERT OR UPDATE ON inv.runs FOR EACH ROW EXECUTE FUNCTION inv.guard_run();
 -- Resources may be revised, but identity cannot be relocated across nodes.
 CREATE FUNCTION inv.guard_resource_identity() RETURNS trigger LANGUAGE plpgsql AS $body$
@@ -163,6 +163,6 @@ BEGIN
   RAISE EXCEPTION 'resource identity is immutable' USING ERRCODE='23514';
  END IF;
  RETURN NEW;
-END $body$;
+END; $body$;
 CREATE TRIGGER resource_identity BEFORE UPDATE ON inv.resources FOR EACH ROW EXECUTE FUNCTION inv.guard_resource_identity();
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA inv FROM PUBLIC;
