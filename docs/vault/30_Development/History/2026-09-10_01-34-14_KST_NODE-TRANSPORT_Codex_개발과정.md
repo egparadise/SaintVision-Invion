@@ -2,7 +2,7 @@
 doc_id: "DEV-NODE-TRANSPORT-001"
 title: "Codex mTLS Node 실행 전달 개발 과정"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-10T01:34:14+09:00"
 source_of_truth: "Git"
@@ -27,3 +27,7 @@ scope: CA/hostname/EKU/URI/leaf fingerprint 검증, TLS 1.3, Node의 버전형 C
 Go 1.27.1 공식 archive SHA 확인 및 프로젝트 전용 설치/CI pin. Python 로컬 회귀 114 passed / 121 skipped(이 시점 신규 PostgreSQL 통합 16개 포함), exit 0. 이후 graceful shutdown/response binding 통합 2건 추가. Go real TLS 테스트 및 Linux cross-build 검사 진행. TLS fixture의 기본 httptest 인증서와 Python strict AKI 누락을 수정했고 explicit port 0 fallback 오류와 response socket 이전 후 deadline 누락을 보완했다. 인증 검증을 끄지 않고 synthetic certificate에 SKI/AKI를 추가했다.
 
 [[Codex Node mTLS 전달과 인증서 권한 계약]] NODE-TRANSPORT-CONTRACT-001 v1.0.0 / ADR-INDEX-001 v1.5.0. 생성 NodePeerPolicy·NodeExecutionResult, migration 0005, operator-only channel CAS, mTLS execution/observation 구현. 다음은 실제 Linux/PostgreSQL/Docker CI 검증이며 현재 결과를 운영 실측으로 표시하지 않는다.
+
+## 2026-09-10T01:56:38+09:00 원격 검증 및 전달
+
+`git commit`·`git push -u origin agent/codex/node-transport` exit 0. 구현 `59baad93cbe2f11c7b758b0ee668b8fbd67ce8ac`의 Core #34379287327 및 Documentation #34379287316 success. GitHub artifact 원본에서 Python 237/0/0/0 및 Go 22 top-level/55 leaf case 통과를 확인했다. [[2026-09-10_01-56-38_KST_NODE-TRANSPORT_Codex_검증보고]]에 실제 증거를 보존했다. reviewer Claude 독립 검토 pending.

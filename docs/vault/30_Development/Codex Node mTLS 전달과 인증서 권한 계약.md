@@ -48,3 +48,5 @@ Claude 영역의 `src/saintvision/services/nodes.py`를 읽은 한정 검토: ce
 검증 목표는 actual PostgreSQL + Python mTLS + Go + Docker 전체 경로, 잘못된 CA/URI/EKU/pin/만료, 기존 TLS 폐기, 인증서 교체/rollback, 느린 응답과 timeout, 응답 유실·재시작·observation 비실행, channel 변경 경쟁/CAS/RLS/권한/rollback이다. 실제 숫자와 CI ID는 History 검증보고에서 확인한다. 운영 CA/IdP·DNS·5대 장비·Windows/GPU·Artifact 검증·공개 업무 API·independent review는 별도다.
 
 공식 근거: [Go crypto/tls](https://pkg.go.dev/crypto/tls#Config)의 검증 callback/ClientAuth, [Go HTTP request context](https://pkg.go.dev/net/http#Request.Context), [Python SSLContext](https://docs.python.org/3/library/ssl.html#ssl.SSLContext). Go 1.27.1 portable archive는 공식 go.dev SHA-256 `a3911b5e0e1b1053f25ed0675f4c1c6aad1e2bfcf253df2b9be4caabd2edd95d`와 일치하고 CI도 1.27.1로 고정한다.
+
+실제 구현·CI 증거: [[2026-09-10_01-56-38_KST_NODE-TRANSPORT_Codex_검증보고]]. Python 237개(실제 mTLS/Go/Docker/PostgreSQL 통합 포함)와 Go 55 leaf case 통과. 독립 검토·운영 PKI/업무 API·장비는 pending.
