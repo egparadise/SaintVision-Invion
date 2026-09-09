@@ -537,9 +537,15 @@ def test_health_reports_unresolved_s01_settings(client):
 
 
 def test_readiness_reports_partition_lead(client):
+    """Every partitioned table is reported, whichever sprint added it.
+
+    Asserted against the live constant rather than a literal: a hardcoded list
+    here went stale the moment S03 added evidence_envelopes, and a readiness
+    probe that silently omits a table is worse than one that fails.
+    """
+    from saintvision.db.models import PARTITIONED_TABLES
+
     body = client.get("/v1/readiness").json()
     assert body["status"] == "ok"
-    assert {p["table"] for p in body["partitions"]} == {
-        "resource_snapshots",
-        "audit_events",
-    }
+    assert {p["table"] for p in body["partitions"]} == set(PARTITIONED_TABLES)
+    assert all(p["monthsAhead"] >= 1 for p in body["partitions"])
