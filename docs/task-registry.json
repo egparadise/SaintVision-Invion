@@ -469,7 +469,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S03-FE",
         "S03-BE",

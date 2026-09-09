@@ -6,6 +6,8 @@ export interface RunDetailProps {
   run: RunItem;
   onBack: () => void;
   onNavigateEvidence?: (runId: string) => void;
+  onNavigateApproval?: (runId: string) => void;
+  onCancelRun?: (runId: string, reason: string) => Promise<void>;
 }
 
 const LIFECYCLE_STEPS: RunState[] = [
@@ -19,8 +21,33 @@ const LIFECYCLE_STEPS: RunState[] = [
   'succeeded',
 ];
 
-export const RunDetail: React.FC<RunDetailProps> = ({ run, onBack, onNavigateEvidence }) => {
+export const RunDetail: React.FC<RunDetailProps> = ({
+  run,
+  onBack,
+  onNavigateEvidence,
+  onNavigateApproval,
+  onCancelRun,
+}) => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain'>('timeline');
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('user_requested');
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const canCancel =
+    run.state !== 'succeeded' && run.state !== 'failed' && run.state !== 'cancelled';
+
+  const handleCancelSubmit = async () => {
+    if (!onCancelRun) return;
+    setIsCancelling(true);
+    try {
+      await onCancelRun(run.id, cancelReason);
+      setShowCancelModal(false);
+    } catch (e: any) {
+      alert(e.message || '취소 실패');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <div>
@@ -40,12 +67,96 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, onBack, onNavigateEvi
           </div>
         </div>
 
-        {onNavigateEvidence && (
-          <Button variant="secondary" size="md" onClick={() => onNavigateEvidence(run.id)}>
-            🔍 불변 증거 (Evidence) 패키지 열람
-          </Button>
-        )}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {run.state === 'awaiting_approval' && onNavigateApproval && (
+            <Button variant="danger" size="md" onClick={() => onNavigateApproval(run.id)}>
+              🚨 승인 검토 이동
+            </Button>
+          )}
+
+          {canCancel && onCancelRun && (
+            <Button variant="secondary" size="md" onClick={() => setShowCancelModal(true)}>
+              ⛔ Run 취소 (S04)
+            </Button>
+          )}
+
+          {onNavigateEvidence && (
+            <Button variant="secondary" size="md" onClick={() => onNavigateEvidence(run.id)}>
+              🔍 불변 증거 열람
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Cancellation Modal (S04-FE / AC-04) */}
+      {showCancelModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '16px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border-subtle)',
+              padding: '24px',
+              maxWidth: '440px',
+              width: '100%',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
+              Run 실행 취소 확인 (AC-04)
+            </h3>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
+              현재 진행 중인 <code>{run.id}</code> 작업을 즉시 취소하고 할당된 노드 자원을 안전하게 회수합니다.
+            </p>
+
+            <div style={{ marginTop: '16px' }}>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '6px' }}>
+                취소 사유 선택 (ADR-001)
+              </label>
+              <select
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border-strong)',
+                  backgroundColor: 'var(--color-bg-subtle)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <option value="user_requested">사용자 직접 취소 요청 (user_requested)</option>
+                <option value="timeout">실행 제한 시간 초과 (timeout)</option>
+                <option value="budget_exceeded">프로젝트 예산 한도 초과 (budget_exceeded)</option>
+                <option value="security_concern">보안 격리 위반 의심 (security_concern)</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <Button variant="secondary" size="md" onClick={() => setShowCancelModal(false)} disabled={isCancelling}>
+                닫기
+              </Button>
+              <Button variant="danger" size="md" onClick={handleCancelSubmit} disabled={isCancelling}>
+                {isCancelling ? '취소 처리 중...' : '즉시 취소 실행'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4 Tabs */}
       <div

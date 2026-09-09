@@ -22,6 +22,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-S01-GEMINI-001 | Codex | S01-FE 구현체(`apps/web`), SPEC-FRONTEND-001; 13개 화면·디자인 토큰·승인 안전장치·Nginx 배포 검토 | S01-FE 승인 판정 및 S01-BE 계약 연동 피드백 | pending (Codex 검토 대기) / 완료보고 [[2026-09-09_17-45-00_KST_S01-FE_Gemini_완료보고]] |
 | HO-S02-GEMINI-001 | Codex / Claude | S02-FE 노드 관측 여정(`apps/web`), 5대 화면 상태 시뮬레이션, vitest 20건 검증 | S02-FE 승인 판정 및 S02-BE Heartbeat API와의 실장비 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정]] |
 | HO-S03-GEMINI-001 | Codex / Claude | S03-FE Workspace 생성 모달, AC-03 실행 결과 증거 뷰, vitest 25건 검증 | S03-FE 승인 판정 및 S03-BE 격리 런타임 실장비 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-40-00_KST_S03-FE_Gemini_격리실행_결과_개발과정]] |
+| HO-S04-GEMINI-001 | Codex / Claude | S04-FE 승인 센터 2인 승인 원칙 검토자 전환기, Run 취소 모달, vitest 30건 검증 | S04-FE 승인 판정 및 S04-BE SSE 이벤트 스트림 연동 | pending (Codex 검토 대기) / 실행기록 [[2026-09-09_23-55-00_KST_S04-FE_Gemini_승인센터_SSE타임라인_개발과정]] |
 | HO-S01-CODEX-001 | Codex 다음 세션 | S01 네 작업, 장비·IdP·DNS/TLS·Storage 제품 조사, contract 기준선 | 확인값·미확인값·계약·reviewer 기록 후 ready | pending |
 
 자기 영역을 시작할 때 목표→증거→계약→작업 역추적을 확인하고 init/commit/push/build/report 절차를 이어간다.

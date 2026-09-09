@@ -9,7 +9,7 @@ import { ExecutionResultView } from '@/features/workspaces/ExecutionResultView';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
-import { ApprovalDetail } from '@/features/approvals/ApprovalDetail';
+import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
@@ -224,10 +224,12 @@ export const App: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
   const [executionResult] = useState<ExecutionResultItem | null>(SAMPLE_EXECUTION);
+  const [runs, setRuns] = useState<RunItem[]>(INITIAL_RUNS);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
-  const [approval, setApproval] = useState<ApprovalItem>(DEMO_APPROVAL);
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([DEMO_APPROVAL]);
+  const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
 
   useEffect(() => {
@@ -258,16 +260,51 @@ export const App: React.FC = () => {
 
   const handleApprove = async (approvalId: string, nonce: string) => {
     alert(`승인 성공!\nApproval ID: ${approvalId}\nNonce: ${nonce}`);
-    setApproval((prev) => ({ ...prev, status: 'approved' }));
+    setApprovals((prev) =>
+      prev.map((a) => (a.id === approvalId ? { ...a, status: 'approved' } : a))
+    );
+    const matched = approvals.find((a) => a.id === approvalId);
+    if (matched) {
+      setRuns((prev) =>
+        prev.map((r) =>
+          r.id === matched.runId
+            ? { ...r, state: 'scheduled', updatedAt: new Date().toISOString() }
+            : r
+        )
+      );
+    }
   };
 
   const handleReject = async (approvalId: string, reason: string) => {
     alert(`반려 완료!\nApproval ID: ${approvalId}\n사유: ${reason}`);
-    setApproval((prev) => ({ ...prev, status: 'rejected' }));
+    setApprovals((prev) =>
+      prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
+    );
+    const matched = approvals.find((a) => a.id === approvalId);
+    if (matched) {
+      setRuns((prev) =>
+        prev.map((r) =>
+          r.id === matched.runId
+            ? { ...r, state: 'failed', updatedAt: new Date().toISOString() }
+            : r
+        )
+      );
+    }
+  };
+
+  const handleCancelRun = async (runId: string, reason: string) => {
+    alert(`Run이 취소되었습니다.\nRun ID: ${runId}\n사유: ${reason}`);
+    setRuns((prev) =>
+      prev.map((r) =>
+        r.id === runId
+          ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
+          : r
+      )
+    );
   };
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
-  const selectedRun = INITIAL_RUNS.find((r) => r.id === selectedRunId);
+  const selectedRun = runs.find((r) => r.id === selectedRunId);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -290,9 +327,9 @@ export const App: React.FC = () => {
         {/* Tab 1: Dashboard */}
         {activeTab === 'dashboard' && (
           <ClusterOverview
-            nodes={INITIAL_NODES}
-            runs={INITIAL_RUNS}
-            pendingApprovalsCount={approval.status === 'pending' ? 1 : 0}
+            nodes={nodes}
+            runs={runs}
+            pendingApprovalsCount={approvals.filter((a) => a.status === 'pending').length}
             onNavigate={(tab) => {
               setActiveTab(tab);
               setSelectedNodeId(null);
@@ -424,10 +461,12 @@ export const App: React.FC = () => {
                 run={selectedRun}
                 onBack={() => setSelectedRunId(null)}
                 onNavigateEvidence={(id) => setEvidenceRunId(id)}
+                onNavigateApproval={() => setActiveTab('approvals')}
+                onCancelRun={handleCancelRun}
               />
             ) : (
               <RunList
-                runs={INITIAL_RUNS}
+                runs={runs}
                 isLoading={false}
                 onSelectRun={(id) => setSelectedRunId(id)}
                 onCreateRun={() => alert('새 Run 요청 폼')}
@@ -436,22 +475,15 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 4: Approvals */}
+        {/* Tab 4: Approvals (S04-FE) */}
         {activeTab === 'approvals' && (
-          <div>
-            <div style={{ marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>승인 센터 (최우선 거버넌스 관문)</h2>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                L2/L3 위험 작업 실행 전 필수 거버넌스 검토 및 안전장치 통제 화면입니다.
-              </p>
-            </div>
-            <ApprovalDetail
-              approval={approval}
-              currentUserId="usr_reviewer_02"
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          </div>
+          <ApprovalCenter
+            approvals={approvals}
+            currentUserId={currentReviewerId}
+            onChangeUser={(newId) => setCurrentReviewerId(newId)}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
         )}
 
         {/* Tab 5: Terminal */}
