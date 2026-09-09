@@ -26,6 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'placement', label: '자원 배치 (S05)' },
     { id: 'recovery', label: '분산 복구 (S07)' },
     { id: 'admin', label: '보안·감사 (S08)' },
+    { id: 'agent', label: '자연어 요청 (S09)' },
     { id: 'runs', label: 'Runs 실행' },
     { id: 'approvals', label: '승인 센터' },
     { id: 'terminal', label: '웹 터미널' },

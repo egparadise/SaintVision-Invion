@@ -274,5 +274,31 @@ export interface SecurityControlStatus {
   rtoMinutes: number;
 }
 
+export interface AgentRunRequest {
+  id: string;
+  objective: string;
+  contextFiles: string[];
+  estimatedTokens: number;
+  estimatedCostKrw: number;
+  tenantRemainingBudgetKrw: number;
+  boundedRepairLoops: number;
+  maxRepairLoops: number;
+  status: 'draft' | 'evaluating' | 'ready' | 'repairing' | 'completed' | 'rejected';
+  proposedDiff?: string;
+  leakDetectionPassed: boolean;
+}
+
+export interface GoldenEvalMetric {
+  promptTotal: number;
+  promptValid: number;
+  promptValidityRate: number;
+  codingTasksTotal: number;
+  codingTasksPassed: number;
+  codingSuccessRate: number;
+  secretLeaksDetected: number;
+  evaluatedAt: string;
+}
+
+
 
 
