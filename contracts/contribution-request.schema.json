@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "availableBytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Availablebytes"
+    },
+    "capacityBytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capacitybytes"
+    },
+    "declaredPath": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "title": "Declaredpath",
+      "type": "string"
+    },
+    "mode": {
+      "default": "read_only",
+      "pattern": "^(read_only|read_write)$",
+      "title": "Mode",
+      "type": "string"
+    },
+    "nodeId": {
+      "maxLength": 30,
+      "title": "Nodeid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "nodeId",
+    "declaredPath"
+  ],
+  "title": "ContributionRequest",
+  "type": "object"
+}

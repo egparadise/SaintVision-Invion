@@ -1,0 +1,68 @@
+name: Backend Build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    # A real PostgreSQL, because the properties under test — RLS under a
+    # non-owner role, NULLS NOT DISTINCT, partition routing — have no
+    # substitute. Without it the suite would skip and report a false green.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: invowner
+          POSTGRES_PASSWORD: ci_local_only
+          POSTGRES_DB: invdev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U invowner -d invdev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      INV_ENV: test
+      INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-backend.txt
+      - run: python -m pip install -r requirements-backend.txt
+
+      - name: Contract schemas match their models
+        run: python tools/export_schemas.py --check
+
+      - name: Migration renders offline
+        run: python -m alembic upgrade head --sql > /dev/null
+
+      - name: Migration applies and reverses
+        run: |
+          python -m alembic upgrade head
+          python -m alembic downgrade base
+          python -m alembic upgrade head
+
+      - name: Tests
+        # -p no:randomly keeps ordering deterministic; the suite fails if any
+        # PostgreSQL-marked test is skipped, so a missing database cannot pass
+        # as a green build.
+        run: python -m pytest -q --strict-markers
+
+      - name: No PostgreSQL test was skipped
+        run: |
+          python -m pytest -q -m postgres --collect-only | tail -1
+          python -m pytest -m postgres -q -rs 2>&1 | tee /tmp/pg.txt
+          if grep -q "skipped" /tmp/pg.txt; then
+            echo "PostgreSQL-backed tests were skipped; refusing to report success."
+            exit 1
+          fi

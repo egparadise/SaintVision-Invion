@@ -1,0 +1,13 @@
+# Runtime and test dependencies for the Control Plane.
+# Versions are pinned to what was verified locally on 2026-09-09. S01-BE owns
+# the final compatibility lock (PLAN-BACKEND-001); until then these are the
+# versions this sprint was tested against, not a project-wide decision.
+fastapi==0.141.1
+starlette==1.6.0
+pydantic==2.13.5
+SQLAlchemy==2.0.52
+alembic==1.19.2
+psycopg[binary]==3.3.5
+uvicorn==0.52.4
+httpx==0.28.1
+pytest==9.1.1

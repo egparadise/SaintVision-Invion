@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "byteSize": {
+      "title": "Bytesize",
+      "type": "integer"
+    },
+    "checksumSha256": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checksumsha256"
+    },
+    "contributionId": {
+      "title": "Contributionid",
+      "type": "string"
+    },
+    "kind": {
+      "title": "Kind",
+      "type": "string"
+    },
+    "locationId": {
+      "title": "Locationid",
+      "type": "string"
+    },
+    "ready": {
+      "title": "Ready",
+      "type": "boolean"
+    },
+    "relativePath": {
+      "title": "Relativepath",
+      "type": "string"
+    },
+    "retentionPinnedUntil": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retentionpinneduntil"
+    },
+    "uri": {
+      "title": "Uri",
+      "type": "string"
+    },
+    "verifiedAt": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verifiedat"
+    }
+  },
+  "required": [
+    "locationId",
+    "contributionId",
+    "uri",
+    "kind",
+    "relativePath",
+    "byteSize",
+    "ready"
+  ],
+  "title": "DataLocationResponse",
+  "type": "object"
+}

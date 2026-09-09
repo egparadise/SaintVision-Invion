@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "CapabilityPayload": {
+      "additionalProperties": false,
+      "properties": {
+        "deviceIndex": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deviceindex"
+        },
+        "divisible": {
+          "default": false,
+          "title": "Divisible",
+          "type": "boolean"
+        },
+        "kind": {
+          "pattern": "^(cpu|gpu|ram|disk)$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "offeredQuantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Offeredquantity"
+        },
+        "totalQuantity": {
+          "minimum": 0,
+          "title": "Totalquantity",
+          "type": "number"
+        },
+        "unit": {
+          "maxLength": 16,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "vendor": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vendor"
+        }
+      },
+      "required": [
+        "kind",
+        "totalQuantity",
+        "unit"
+      ],
+      "title": "CapabilityPayload",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "agentVersion": {
+      "maxLength": 64,
+      "title": "Agentversion",
+      "type": "string"
+    },
+    "bootstrapToken": {
+      "maxLength": 256,
+      "minLength": 16,
+      "title": "Bootstraptoken",
+      "type": "string"
+    },
+    "capabilities": {
+      "items": {
+        "$ref": "#/$defs/CapabilityPayload"
+      },
+      "maxItems": 64,
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "certificateFingerprint": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Certificatefingerprint"
+    },
+    "hostname": {
+      "maxLength": 253,
+      "minLength": 1,
+      "title": "Hostname",
+      "type": "string"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "object"
+    },
+    "osType": {
+      "pattern": "^(windows|linux)$",
+      "title": "Ostype",
+      "type": "string"
+    },
+    "osVersion": {
+      "maxLength": 64,
+      "title": "Osversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "bootstrapToken",
+    "hostname",
+    "osType",
+    "osVersion",
+    "agentVersion"
+  ],
+  "title": "NodeEnrollRequest",
+  "type": "object"
+}
