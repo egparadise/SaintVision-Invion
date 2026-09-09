@@ -133,3 +133,34 @@ export interface RunItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface PlacementRequirement {
+  requiredCores: number;
+  requiredMemoryBytes: number;
+  requiresGpu: boolean;
+  preferredOs?: 'windows' | 'linux';
+  dataLocalityNodeId?: string;
+}
+
+export interface CandidateEvaluation {
+  nodeId: string;
+  hostname: string;
+  os: 'windows' | 'linux';
+  hardFilterPassed: boolean;
+  rejectionReasons: string[];
+  scores?: {
+    localityScore: number;
+    headroomScore: number;
+    networkCostScore: number;
+    totalScore: number;
+  };
+}
+
+export interface PlacementExplainResult {
+  runId: string;
+  selectedNodeId: string | null;
+  policyVersion: string;
+  snapshotVersion: string;
+  evaluations: CandidateEvaluation[];
+  decidedAt: string;
+}

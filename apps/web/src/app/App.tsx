@@ -6,6 +6,7 @@ import { NodeDetail } from '@/features/nodes/NodeDetail';
 import { WorkspaceList } from '@/features/workspaces/WorkspaceList';
 import { WorkspaceCreateModal } from '@/features/workspaces/WorkspaceCreateModal';
 import { ExecutionResultView } from '@/features/workspaces/ExecutionResultView';
+import { PlacementSimulator } from '@/features/placement/PlacementSimulator';
 import { RunList } from '@/features/runs/RunList';
 import { RunDetail } from '@/features/runs/RunDetail';
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
@@ -449,6 +450,11 @@ export const App: React.FC = () => {
               }}
             />
           </div>
+        )}
+
+        {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}
+        {activeTab === 'placement' && (
+          <PlacementSimulator nodes={nodes} />
         )}
 
         {/* Tab 3: Runs & Evidence */}

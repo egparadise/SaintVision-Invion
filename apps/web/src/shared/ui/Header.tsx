@@ -22,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'dashboard', label: '클러스터 개요' },
     { id: 'nodes', label: 'Nodes 인벤토리' },
     { id: 'workspaces', label: 'Workspaces (S03)' },
+    { id: 'placement', label: '자원 배치 (S05)' },
     { id: 'runs', label: 'Runs 실행' },
     { id: 'approvals', label: '승인 센터' },
     { id: 'terminal', label: '웹 터미널' },
