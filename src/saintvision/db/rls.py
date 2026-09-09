@@ -18,7 +18,7 @@ from __future__ import annotations
 from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
-from .models import TENANT_SCOPED_TABLES
+from .models import APPEND_ONLY_TABLES, TENANT_SCOPED_TABLES
 from .session import TENANT_GUC
 
 APP_ROLE = "inv_app"
@@ -60,10 +60,15 @@ def grant_app_privileges(
     targets = TENANT_SCOPED_TABLES if tables is None else tables
     connection.execute(text(f"GRANT USAGE ON SCHEMA public TO {role}"))
     for table in targets:
-        connection.execute(
-            text(f"GRANT SELECT, INSERT, UPDATE, DELETE ON {table} TO {role}")
-        )
-    connection.execute(text(f"GRANT SELECT, INSERT ON audit_events TO {role}"))
+        if table in APPEND_ONLY_TABLES:
+            connection.execute(text(f"GRANT SELECT, INSERT ON {table} TO {role}"))
+        else:
+            connection.execute(
+                text(f"GRANT SELECT, INSERT, UPDATE, DELETE ON {table} TO {role}")
+            )
+    for table in APPEND_ONLY_TABLES:
+        if table not in targets:
+            connection.execute(text(f"GRANT SELECT, INSERT ON {table} TO {role}"))
     connection.execute(text(f"GRANT SELECT ON tenants TO {role}"))
 
 

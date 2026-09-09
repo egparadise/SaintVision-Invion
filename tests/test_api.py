@@ -325,6 +325,70 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
     assert listed.status_code == 200
 
 
+def test_liveness_sweep_marks_a_silent_node_lost(client, app_engine, seeded):
+    """AC-02's observation half: a node that stops reporting is detected.
+
+    The clock is fixed at NOW for the app, so the sweep is driven by inserting a
+    heartbeat that is already older than the timeout rather than by waiting.
+    """
+    secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
+    headers = {"X-Inv-Tenant": str(seeded["tenant_a"])}
+    node_id = client.post("/v1/nodes", json=enroll_payload(secret), headers=headers).json()[
+        "node"
+    ]["nodeId"]
+    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 1}, headers=headers)
+
+    auth = {"Authorization": "Bearer token-a"}
+    # Still fresh: the sweep must not touch it.
+    quiet = client.post("/v1/nodes/liveness-sweeps", headers=auth)
+    assert quiet.status_code == 200
+    assert quiet.json()["markedLost"] == 0
+
+    from sqlalchemy.orm import sessionmaker
+
+    factory = sessionmaker(bind=app_engine, expire_on_commit=False)
+    with factory() as session:
+        with session.begin():
+            with tenant_scope(session, seeded["tenant_a"]):
+                session.execute(
+                    text(
+                        "UPDATE nodes SET last_heartbeat_at = :t WHERE node_id = :i"
+                    ),
+                    {"t": NOW - dt.timedelta(seconds=120), "i": node_id},
+                )
+
+    swept = client.post("/v1/nodes/liveness-sweeps", headers=auth)
+    assert swept.json()["markedLost"] == 1
+    detail = client.get(f"/v1/nodes/{node_id}", headers=auth)
+    assert detail.json()["node"]["status"] == "lost"
+
+    # A later heartbeat brings it back, rather than stranding it as lost.
+    client.post(f"/v1/nodes/{node_id}/heartbeats", json={"sequence": 2}, headers=headers)
+    assert client.get(f"/v1/nodes/{node_id}", headers=auth).json()["node"]["status"] == "active"
+
+
+def test_liveness_sweep_does_not_cross_tenants(client, app_engine, seeded):
+    secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
+    client.post(
+        "/v1/nodes",
+        json=enroll_payload(secret),
+        headers={"X-Inv-Tenant": str(seeded["tenant_a"])},
+    )
+    from sqlalchemy.orm import sessionmaker
+
+    factory = sessionmaker(bind=app_engine, expire_on_commit=False)
+    with factory() as session:
+        with session.begin():
+            with tenant_scope(session, seeded["tenant_a"]):
+                session.execute(text("UPDATE nodes SET last_heartbeat_at = :t"),
+                                {"t": NOW - dt.timedelta(seconds=600)})
+
+    other = client.post(
+        "/v1/nodes/liveness-sweeps", headers={"Authorization": "Bearer token-b"}
+    )
+    assert other.json()["markedLost"] == 0
+
+
 def test_heartbeat_for_another_tenants_node_is_not_found(client, app_engine, seeded):
     secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
     node_id = client.post(

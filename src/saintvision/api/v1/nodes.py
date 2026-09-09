@@ -180,6 +180,49 @@ def post_heartbeat(
     return result
 
 
+@router.post("/nodes/liveness-sweeps", status_code=200)
+def sweep_liveness(
+    request: Request,
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+    now: dt.datetime = Depends(get_now),
+) -> dict:
+    """Mark nodes whose heartbeat has aged out as lost.
+
+    Exposed as an endpoint rather than hidden inside a GET, because it mutates:
+    a read that quietly changes status is a read you cannot trust or repeat.
+
+    Who calls it on a timer is the same open question as the monthly partition
+    job — the scheduler is an S01-BE decision (config.S01_PENDING). The 60
+    second detection target in the final plan is met only once something does
+    call it at that cadence; this endpoint makes that possible, it does not by
+    itself satisfy the target.
+    """
+    changed = node_service.mark_lost_nodes(
+        session,
+        tenant_id=principal.tenant_id,
+        now=now,
+        timeout_seconds=settings.heartbeat_timeout_seconds,
+    )
+    if changed:
+        record_event(
+            session,
+            now=now,
+            actor_type="system",
+            actor_id=principal.user_id,
+            action="node.liveness.sweep",
+            outcome="allow",
+            tenant_id=principal.tenant_id,
+            trace_id=getattr(request.state, "trace_id", None),
+            detail={"markedLost": changed, "timeoutSeconds": settings.heartbeat_timeout_seconds},
+        )
+    return {
+        "markedLost": changed,
+        "timeoutSeconds": settings.heartbeat_timeout_seconds,
+    }
+
+
 @router.get("/nodes")
 def list_nodes(
     principal: Principal = Depends(get_principal),

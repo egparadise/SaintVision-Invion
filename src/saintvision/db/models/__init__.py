@@ -1,9 +1,37 @@
-"""SQLAlchemy models for the S02 scope.
+"""SQLAlchemy models for the S02 and S03 scope.
 
 Importing this package registers every table on ``Base.metadata``, which is what
 Alembic's autogenerate and the RLS helper both walk.
 """
 
+from .artifacts import (
+    ARTIFACT_STATUSES,
+    DEFAULT_PART_BYTES,
+    MAX_ARTIFACT_BYTES,
+    UPLOAD_STATUSES,
+    Artifact,
+    UploadSession,
+)
+from .evidence import (
+    EVIDENCE_RESULTS,
+    OUTBOX_STATUSES,
+    EvidenceEnvelope,
+    InboxEvent,
+    OutboxEvent,
+)
+from .execution import (
+    STEP_STATUSES,
+    VOLUME_KINDS,
+    WORKSPACE_STATUSES,
+    Approval,
+    Checkpoint,
+    Run,
+    RunAttempt,
+    Step,
+    Workload,
+    Workspace,
+    WorkspaceVolume,
+)
 from .identity import (
     PROJECT_STATUSES,
     USER_STATUSES,
@@ -48,16 +76,58 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "storage_contributions",
     "data_locations",
     "idempotency_records",
+    # S03
+    "workspaces",
+    "workspace_volumes",
+    "workloads",
+    "runs",
+    "run_attempts",
+    "steps",
+    "checkpoints",
+    "approvals",
+    "evidence_envelopes",
+    "outbox_events",
+    "inbox_events",
+    "artifacts",
+    "upload_sessions",
 )
 
 #: Range partitioned by month. Both are covered by the partition manager.
 PARTITIONED_TABLES: dict[str, str] = {
     "resource_snapshots": "observed_at",
     "audit_events": "occurred_at",
+    "evidence_envelopes": "recorded_at",
 }
+
+#: Tables the application role may INSERT and SELECT but never UPDATE or
+#: DELETE. Append-only for the application; not a WORM claim (PLAN-DB-001).
+APPEND_ONLY_TABLES: tuple[str, ...] = ("audit_events", "evidence_envelopes")
 
 __all__ = [
     "ACTOR_TYPES",
+    "APPEND_ONLY_TABLES",
+    "ARTIFACT_STATUSES",
+    "Approval",
+    "Artifact",
+    "Checkpoint",
+    "DEFAULT_PART_BYTES",
+    "EVIDENCE_RESULTS",
+    "EvidenceEnvelope",
+    "InboxEvent",
+    "MAX_ARTIFACT_BYTES",
+    "OUTBOX_STATUSES",
+    "OutboxEvent",
+    "Run",
+    "RunAttempt",
+    "STEP_STATUSES",
+    "Step",
+    "UPLOAD_STATUSES",
+    "UploadSession",
+    "VOLUME_KINDS",
+    "WORKSPACE_STATUSES",
+    "Workload",
+    "Workspace",
+    "WorkspaceVolume",
     "AUDIT_OUTCOMES",
     "AuditEvent",
     "CAPABILITY_KINDS",

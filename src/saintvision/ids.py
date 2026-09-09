@@ -42,6 +42,17 @@ PREFIXES: Final[dict[str, str]] = {
     "evidence": "evd",
     "run": "run",
     "step": "stp",
+    # S03
+    "workspace": "wsp",
+    "volume": "vol",
+    "workload": "wkl",
+    "attempt": "att",
+    "checkpoint": "ckp",
+    "approval": "apv",
+    "outbox": "obx",
+    "inbox": "ibx",
+    "artifact": "art",
+    "upload": "upl",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")
