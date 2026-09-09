@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-EXECUTION-001"
 title: "Codex 전체 후속 구현 실행표"
-version: "1.1.0"
+version: "1.1.1"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-10T04:01:17+09:00"
+updated: "2026-09-10T04:16:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -29,3 +29,5 @@ source_of_truth: "Git"
 첫 네 영역의 정확한 구현 경계·호출 순서·잔여 사항은 [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]을 따른다. 5~7 영역을 구현 완료나 실장비 착수로 표시하지 않는다. 전체 Sprint의 선행·독립 검토 조건은 유지한다.
 
 실행 증거: [[2026-09-10_04-01-17_KST_EXECUTION-RECOVERY_Codex_검증보고]]. 같은 SHA Linux CI Python 400개/Go race 62 leaf, 실패·오류·skip 0. reviewer 수신은 대기다.
+
+샤드 현황 재확인: [[샤드 관리 구현 현황과 잔여 범위]], [[2026-09-10_04-16-06_KST_SHARD-STATUS_Codex_확인보고]]. Codex 검토 branch의 구현과 통합 branch 반영 상태를 구분하며 SHARD-I01~I08의 다음 owner·합격 증거를 따른다.
