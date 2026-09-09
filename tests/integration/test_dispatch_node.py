@@ -45,7 +45,8 @@ def test_queued_execution_commits_one_physical_receipt_and_closes_once(remote):
     assert active(a) == 0 and row(a)["phase"] == "stopped"
     assert count(a, "node_stop_receipts") == 1 and container(a) is None
     assert worker.once(a.e.tenant) == "idle"
-    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "scheduled"
+    run = a.e.runs.get(a.e.tenant, a.run["runId"])
+    assert run["state"] == "running" and run["attempt"] == 1
 
 
 def test_restart_recovers_lost_tls_response_by_observation_without_new_execution(
