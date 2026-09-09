@@ -57,5 +57,5 @@ def enforce_decision(
             or any(not isinstance(x, str) or not x for x in approved)
         ):
             raise DomainError("AUTH-0014", "Invalid approval requirement", 403)
-        if len(set(approved)) < count:
+        if (risk == "L2" and count != 2) or len(set(approved)) < count:
             raise DomainError("AUTH-0014", "Required approvals missing", 403)

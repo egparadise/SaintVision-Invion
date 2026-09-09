@@ -239,3 +239,40 @@ type AuthorizedCommand struct {
     RecoveryEpoch string `json:"recoveryEpoch"`
     ExpiresAt Timestamp `json:"expiresAt"`
 }
+
+type ClaimId string
+
+type SandboxLaunchSpec struct {
+    ProfileVersion string `json:"profileVersion"`
+    ImageDigest string `json:"imageDigest"`
+    Argv []string `json:"argv"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    WorkingDirectory string `json:"workingDirectory"`
+    WorkspaceMode string `json:"workspaceMode"`
+    CpuMillis int64 `json:"cpuMillis"`
+    MemoryBytes int64 `json:"memoryBytes"`
+    TimeoutSeconds int64 `json:"timeoutSeconds"`
+    PidsLimit int64 `json:"pidsLimit"`
+    UserId int64 `json:"userId"`
+    Network string `json:"network"`
+    RootfsReadOnly bool `json:"rootfsReadOnly"`
+    CapDropAll bool `json:"capDropAll"`
+    NoNewPrivileges bool `json:"noNewPrivileges"`
+    Privileged bool `json:"privileged"`
+    HostAccess bool `json:"hostAccess"`
+}
+
+type ExecutionClaim struct {
+    CommandId CommandId `json:"commandId"`
+    ClaimId ClaimId `json:"claimId"`
+    RunId RunId `json:"runId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    NodeId NodeId `json:"nodeId"`
+    ActionDigest ActionDigest `json:"actionDigest"`
+    PlanDigest ActionDigest `json:"planDigest"`
+    PolicyVersion string `json:"policyVersion"`
+    ProfileVersion string `json:"profileVersion"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    NotAfter Timestamp `json:"notAfter"`
+}

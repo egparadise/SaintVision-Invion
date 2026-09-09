@@ -108,7 +108,7 @@ def postgres():
             )
             conn.execute(
                 sql.SQL(
-                    "REVOKE UPDATE,DELETE ON inv.approval_votes,inv.approval_dispatches,inv.approval_audit FROM {}"
+                    "REVOKE UPDATE,DELETE ON inv.approval_votes,inv.approval_dispatches,inv.approval_audit,inv.tool_claims FROM {}"
                 ).format(sql.Identifier(role))
             )
         yield SimpleNamespace(owner=owner, runtime=runtime)

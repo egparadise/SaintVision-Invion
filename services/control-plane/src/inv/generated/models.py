@@ -436,6 +436,55 @@ class AuthorizedCommand(BaseModel):
     expiresAt: Timestamp
 
 
+class ClaimId(RootModel[UUID]):
+    root: UUID
+
+
+class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
+    root: constr(min_length=1, max_length=4096)
+
+
+class SandboxLaunchSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    profileVersion: constr(min_length=1, max_length=200)
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
+    workspaceId: WorkspaceId
+    workingDirectory: Literal['/workspace']
+    workspaceMode: Literal['ephemeral']
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    pidsLimit: Literal[64]
+    userId: Literal[65532]
+    network: Literal['none']
+    rootfsReadOnly: Literal[True]
+    capDropAll: Literal[True]
+    noNewPrivileges: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+
+
+class ExecutionClaim(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+    claimId: ClaimId
+    runId: RunId
+    tenantId: TenantId
+    projectId: ProjectId
+    nodeId: NodeId
+    actionDigest: ActionDigest
+    planDigest: ActionDigest
+    policyVersion: constr(min_length=1, max_length=200)
+    profileVersion: constr(min_length=1, max_length=200)
+    recoveryEpoch: UUID
+    notAfter: Timestamp
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -460,6 +509,8 @@ class INVCore(
         | ApprovalDecisionInput
         | ApprovalView
         | AuthorizedCommand
+        | SandboxLaunchSpec
+        | ExecutionClaim
     ]
 ):
     root: (
@@ -485,4 +536,6 @@ class INVCore(
         | ApprovalDecisionInput
         | ApprovalView
         | AuthorizedCommand
+        | SandboxLaunchSpec
+        | ExecutionClaim
     ) = Field(..., title='INVCore')

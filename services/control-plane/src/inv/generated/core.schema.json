@@ -988,6 +988,173 @@
         "expiresAt"
       ],
       "additionalProperties": false
+    },
+    "ClaimId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "SandboxLaunchSpec": {
+      "type": "object",
+      "properties": {
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "imageDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "workingDirectory": {
+          "type": "string",
+          "const": "/workspace"
+        },
+        "workspaceMode": {
+          "type": "string",
+          "const": "ephemeral"
+        },
+        "cpuMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "pidsLimit": {
+          "type": "integer",
+          "const": 64
+        },
+        "userId": {
+          "type": "integer",
+          "const": 65532
+        },
+        "network": {
+          "type": "string",
+          "const": "none"
+        },
+        "rootfsReadOnly": {
+          "type": "boolean",
+          "const": true
+        },
+        "capDropAll": {
+          "type": "boolean",
+          "const": true
+        },
+        "noNewPrivileges": {
+          "type": "boolean",
+          "const": true
+        },
+        "privileged": {
+          "type": "boolean",
+          "const": false
+        },
+        "hostAccess": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "profileVersion",
+        "imageDigest",
+        "argv",
+        "workspaceId",
+        "workingDirectory",
+        "workspaceMode",
+        "cpuMillis",
+        "memoryBytes",
+        "timeoutSeconds",
+        "pidsLimit",
+        "userId",
+        "network",
+        "rootfsReadOnly",
+        "capDropAll",
+        "noNewPrivileges",
+        "privileged",
+        "hostAccess"
+      ],
+      "additionalProperties": false
+    },
+    "ExecutionClaim": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "$ref": "#/$defs/CommandId"
+        },
+        "claimId": {
+          "$ref": "#/$defs/ClaimId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "actionDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "planDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "notAfter": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "commandId",
+        "claimId",
+        "runId",
+        "tenantId",
+        "projectId",
+        "nodeId",
+        "actionDigest",
+        "planDigest",
+        "policyVersion",
+        "profileVersion",
+        "recoveryEpoch",
+        "notAfter"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -1056,6 +1223,12 @@
     },
     {
       "$ref": "#/$defs/AuthorizedCommand"
+    },
+    {
+      "$ref": "#/$defs/SandboxLaunchSpec"
+    },
+    {
+      "$ref": "#/$defs/ExecutionClaim"
     }
   ]
 }
