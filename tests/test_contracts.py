@@ -11,6 +11,7 @@ import uuid
 import pytest
 
 from saintvision import errors
+from saintvision.api.app import parse_traceparent
 from saintvision.errors import ErrorCategory, InvError, category_of
 from saintvision.ids import (
     is_id,
@@ -165,3 +166,19 @@ def test_page_reports_a_cursor_only_when_more_rows_exist():
     more = build_page(rows, limit=3, id_attr="node_id")
     assert len(more.items) == 3
     assert more.next_cursor == more.items[-1].node_id
+
+
+@pytest.mark.parametrize(
+    "header,expected_generated",
+    [
+        (None, True),
+        ("garbage", True),
+        ("00-" + "0" * 32 + "-" + "a" * 16 + "-01", True),  # all-zero trace id
+        ("00-" + "a" * 32 + "-" + "b" * 16 + "-01", False),
+    ],
+)
+def test_traceparent_parsing(header, expected_generated):
+    parsed = parse_traceparent(header)
+    assert len(parsed) == 32
+    if not expected_generated:
+        assert parsed == "a" * 32

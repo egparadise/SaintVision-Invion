@@ -15,7 +15,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
-from saintvision.api.app import create_app, parse_traceparent
+from saintvision.api.app import create_app
 from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
@@ -479,19 +479,3 @@ def test_readiness_reports_partition_lead(client):
         "resource_snapshots",
         "audit_events",
     }
-
-
-@pytest.mark.parametrize(
-    "header,expected_generated",
-    [
-        (None, True),
-        ("garbage", True),
-        ("00-" + "0" * 32 + "-" + "a" * 16 + "-01", True),  # all-zero trace id
-        ("00-" + "a" * 32 + "-" + "b" * 16 + "-01", False),
-    ],
-)
-def test_traceparent_parsing(header, expected_generated):
-    parsed = parse_traceparent(header)
-    assert len(parsed) == 32
-    if not expected_generated:
-        assert parsed == "a" * 32
