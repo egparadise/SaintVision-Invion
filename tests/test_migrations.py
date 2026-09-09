@@ -143,3 +143,61 @@ def test_every_revision_declares_its_predecessor():
     for revision, down in revisions.items():
         if down != "None":
             assert down in revisions, f"{revision} points at a missing revision {down}"
+
+
+def test_the_migrations_create_exactly_the_modelled_tables(rendered_sql):
+    """The invariant that would have caught three separate staleness bugs.
+
+    A model with no migration is a table that exists only in tests; a migration
+    with no model is a table nothing reads. Both are silent until something far
+    away breaks.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db import models  # noqa: F401  (registers the tables)
+    from saintvision.db.base import Base
+
+    created = set(re.findall(r"CREATE TABLE (\w+) \(", rendered_sql))
+    # Partition children are named <parent>_pYYYYMM and are not modelled
+    # separately; alembic owns its own bookkeeping table.
+    created = {
+        name
+        for name in created
+        if not re.search(r"_p\d{6}$", name) and name != "alembic_version"
+    }
+    modelled = set(Base.metadata.tables)
+
+    assert created - modelled == set(), f"migrated but not modelled: {created - modelled}"
+    assert modelled - created == set(), f"modelled but not migrated: {modelled - created}"
+
+
+def test_every_tenant_scoped_table_is_policed(rendered_sql):
+    """RLS is declared per table in each revision; a table added to the model
+    list without a policy would isolate nothing."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db.models import TENANT_SCOPED_TABLES
+
+    for table in TENANT_SCOPED_TABLES:
+        assert re.search(
+            rf"ALTER TABLE {table} FORCE ROW LEVEL SECURITY", rendered_sql
+        ), f"{table}: RLS not forced by any migration"
+        assert re.search(
+            rf"CREATE POLICY {table}_tenant_isolation", rendered_sql
+        ), f"{table}: no isolation policy"
+
+
+def test_append_only_tables_are_never_granted_update_or_delete(rendered_sql):
+    import sys
+
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.db.models import APPEND_ONLY_TABLES
+
+    for table in APPEND_ONLY_TABLES:
+        grants = re.findall(rf"GRANT ([^;]+) ON {table} TO inv_app", rendered_sql)
+        assert grants, f"{table}: no grant rendered"
+        for grant in grants:
+            assert "UPDATE" not in grant.upper(), f"{table}: UPDATE granted"
+            assert "DELETE" not in grant.upper(), f"{table}: DELETE granted"

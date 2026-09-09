@@ -78,24 +78,17 @@ def app_engine(migrated, database_url, owner_engine):
 
 @pytest.fixture
 def clean_tables(app_engine, owner_engine):
-    """Empty every table between tests, as the owner (RLS would block the app)."""
-    tables = (
-        "audit_events",
-        "idempotency_records",
-        "data_locations",
-        "storage_contributions",
-        "resource_snapshots",
-        "resource_offers",
-        "node_capabilities",
-        "node_bootstrap_tokens",
-        "nodes",
-        "project_members",
-        "projects",
-        "user_roles",
-        "roles",
-        "users",
-        "tenants",
-    )
+    """Empty every table between tests, as the owner (RLS would block the app).
+
+    The list is derived from the model metadata rather than typed out. A
+    hardcoded one went stale the moment S03 and S09 added tables, and the
+    symptom was a later test seeing an earlier test's rows — which read as a
+    product bug rather than a fixture bug.
+    """
+    from saintvision.db.base import Base
+    from saintvision.db import models  # noqa: F401  (registers the tables)
+
+    tables = [t.name for t in Base.metadata.sorted_tables]
     with owner_engine.begin() as connection:
         connection.execute(text(f"TRUNCATE {', '.join(tables)} CASCADE"))
     yield

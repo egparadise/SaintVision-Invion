@@ -141,26 +141,17 @@ def build_bundle(
     pairs: list[tuple[int, str]] = []
     total_bytes = 0
 
+    # Snapshots first. They have no dependency on the bundle, and storing them
+    # issues queries — which autoflush any pending rows. Items added before the
+    # bundle exists would be flushed into a foreign key violation.
+    digests: list[str] = []
     for ordinal, item in enumerate(items):
         digest, _ = store_snapshot(
             session, tenant_id=tenant_id, content=item.content, now=now
         )
+        digests.append(digest)
         pairs.append((ordinal, digest))
         total_bytes += len(item.content.encode("utf-8"))
-        session.add(
-            ContextBundleItem(
-                tenant_id=tenant_id,
-                bundle_id=bundle_id,
-                ordinal=ordinal,
-                item_id=item.item_id,
-                item_version=item.item_version,
-                content_hash=digest,
-                kind=item.kind,
-                source_uri=item.source_uri,
-                confidence=item.confidence,
-                redacted=item.redacted,
-            )
-        )
 
     bundle = ContextBundle(
         bundle_id=bundle_id,
@@ -175,6 +166,24 @@ def build_bundle(
         built_at=now,
     )
     session.add(bundle)
+    # The parent must be on disk before its children reference it.
+    session.flush()
+
+    for ordinal, (item, digest) in enumerate(zip(items, digests)):
+        session.add(
+            ContextBundleItem(
+                tenant_id=tenant_id,
+                bundle_id=bundle_id,
+                ordinal=ordinal,
+                item_id=item.item_id,
+                item_version=item.item_version,
+                content_hash=digest,
+                kind=item.kind,
+                source_uri=item.source_uri,
+                confidence=item.confidence,
+                redacted=item.redacted,
+            )
+        )
     session.flush()
     return bundle
 
