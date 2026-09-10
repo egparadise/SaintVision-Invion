@@ -598,6 +598,7 @@ class WorkspaceResumeRef(BaseModel):
     stepId: constr(min_length=1, max_length=200)
     inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
     inputSizeBytes: conint(ge=1, le=65536)
+    checkpointAttempt: conint(ge=1)
 
 
 class WorkspaceInput(BaseModel):

@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.5"
+version: "1.0.6"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T09:06:00+09:00"
+updated: "2026-09-10T09:40:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -91,3 +91,5 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | HO-DOC-GEMINI-001 | Gemini / Antigravity | GEMINI.md·AGENTS.md, Frontend 계획, S01-FE; 여정·디자인 토큰·오류 UX·HTTPS 배포 검토 | 화면별 API 의존성과 검증 기준을 보고서로 기록 | received 2026-09-09T16:55:00+09:00 / 보고서 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_검토보고]] / 실행 기록 [[2026-09-09_16-55-00_KST_HO-DOC-GEMINI-001_Gemini_개발과정]] / 아키텍처 [[Gemini Frontend 상세 아키텍처 및 화면 명세]] / Codex 회신 [[Codex 핵심 기반 계약과 검토 회신]] / Gemini 프론트엔드 구현 완료 |
 
 - HO-RUNTIME-COMPLETION-CLAUDE-001: [[Codex 실행 완료와 자원 회수 통합 계약]], [[2026-09-10_08-38-33_KST_RUNTIME-COMPLETION_Codex_개발과정]], PR #11. Claude: SQL chain/receipt-bound publish/부모 lock 순서 독립 검토 및 업무 Adapter. Gemini: parent/child·결과 Evidence·반환 대기 UI. 실제 수신·독립 검토 pending. 기본 폴더에서 별도로 진행 중인 미커밋 auth/server 수정은 이 인계에 포함하지 않았다.
+
+- HO-WORKSPACE-RESUME-CLAUDE-001: [[Codex Workspace 실행 재개와 결과 체크포인트 계약]], [[2026-09-10_09-29-08_KST_WORKSPACE-RESUME_Codex_개발과정]], PR #12. Claude: 프로젝트 권한/editor quiesce/identity 매핑/prepare→승인→enqueue→worker 업무 연결 및 migration 0018/무결성 경계 독립 검토. Gemini: frozen 입력·이후 편집·재개 Step/attempt·결과 checkpoint UI. 원문 입력을 로그/화면에 그대로 노출하지 않는다. 실제 전달·독립 검토 pending.

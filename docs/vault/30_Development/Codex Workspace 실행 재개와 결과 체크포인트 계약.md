@@ -18,6 +18,8 @@ Owner Codex, reviewer Claude pending. WORKSPACE-RESUME는 S06-BE/DB/ST, S03-BE�
 
 WorkloadSpec.workspaceResume는 resume/checkout/source attempt/source Step/next Step/input hash/size를 포함하며 승인 actionDigest에 포함된다. 원본 파일의 이후 편집은 보존되고 실행 입력을 변경하지 않는다. frozen snapshot은 tenant RLS와 immutable DB 행에 저장한다. 현재 manifest 상한은 64 KiB, 실제 파일 합은 32 KiB다. 기존 16 MiB snapshot 보관 기능과 이 실행 입력 상한은 구별한다.
 
+`sourceAttempt`는 재개 직전 RunAttempt, `checkpointAttempt`는 실제 복원 원본을 만든 RunAttempt다. 새 checkpoint 없이 중단된 attempt에서도 더 이전의 검증 checkpoint를 사용하여 새 checkout을 만들 수 있다. 두 값과 hash/Step을 모두 새 승인에 고정한다. 총 RunAttempt는 3회까지이며 최초 실행을 포함하므로 이 경로의 최대 재실행은 2회다. 상한 이후 prepare/admission은 거부한다. 자동으로 승인하거나 terminal failed/cancelled Run을 되살리지 않는다. 장애 coordinator는 물리 종료를 확인하고 아직 진행 중인 Run을 recovering으로 전이한 뒤 이 경로를 호출해야 한다.
+
 Run의 기존 11상태는 유지한다. `recovering → awaiting_approval → scheduled → running`을 추가하며 새 running에서 RunAttempt가 증가한다. CP Python과 업무 서비스의 상태 그래프를 동일하게 유지하고 교차 시험한다. DB는 frozen Step/이전 물리 종료 없는 recovery approval 및 결과 checkpoint 없는 resumed success를 거부한다. 업무 서비스의 상태 전이 가능 표시만으로 실행 권한이 생기지 않는다.
 
 `WorkspaceResume.enqueue`는 새 승인 dispatch를 입력으로 받아 새 lease·ToolGateway claim·서명 permit queue를 단일 transaction에 저장한다. admission 실패/commit 실패는 전체 rollback한다. 따라서 과거 attempt가 있는 Run에 새 미발급 예약만 남지 않는다. ToolGateway에서 이 원자 경로를 우회한 Workspace claim은 거부한다. 이전 승인·늦은 command·변경된 내용·stale epoch는 권한을 갱신할 수 없다. 동일 enqueue key의 재요청은 원래 command를 관찰하며 추가 실행을 만들지 않는다.

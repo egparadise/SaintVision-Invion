@@ -35,6 +35,7 @@ def test_workspace_launch_requires_explicit_bound_content(launch):
         "resumeId": str(uuid4()),
         "checkoutId": str(uuid4()),
         "sourceAttempt": 1,
+        "checkpointAttempt": 1,
         "sourceStepId": "before",
         "stepId": "after",
         "inputSha256": hashlib.sha256(raw).hexdigest(),

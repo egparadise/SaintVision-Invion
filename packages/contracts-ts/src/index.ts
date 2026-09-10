@@ -409,6 +409,7 @@ export interface WorkspaceResumeRef {
   stepId: string;
   inputSha256: string;
   inputSizeBytes: number;
+  checkpointAttempt: number;
 }
 
 export interface WorkspaceInput {

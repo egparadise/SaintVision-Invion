@@ -20,6 +20,7 @@ from .workspace_files import PrivateTree, canonical, decode_snapshot
 
 MAX_RESUME_BYTES = 65536
 MAX_RESUME_CONTENT = 32768
+MAX_WORKSPACE_ATTEMPTS = 3
 
 
 def bounded_snapshot(raw, workspace_id):
@@ -44,6 +45,7 @@ def approved_resume(conn, run, workload, epoch):
         not row
         or str(row["recovery_epoch"]) != epoch
         or row["source_attempt"] != run["attempt"]
+        or run["attempt"] >= MAX_WORKSPACE_ATTEMPTS
         or row["workload"] != workload
         or row["workspace_id"] != workload["workspaceId"]
     ):
@@ -111,6 +113,8 @@ class WorkspaceResume:
                 return {"workload": prior["workload"], "replayed": True}
             if run["state"] != "recovering" or run["version"] != expected_version:
                 raise DomainError("GRAPH-0003", "Resume requires current recovering Run")
+            if run["attempt"] >= MAX_WORKSPACE_ATTEMPTS:
+                raise DomainError("GRAPH-0005", "Workspace recovery attempt budget exhausted")
             if conn.execute(
                 "SELECT 1 FROM inv.workspace_resumptions WHERE run_id=%s AND source_attempt=%s AND recovery_epoch=%s",
                 (run_id, run["attempt"], self.db.recovery_epoch),
@@ -150,6 +154,7 @@ class WorkspaceResume:
                 "resumeId": resume_id,
                 "checkoutId": checkout_id,
                 "sourceAttempt": row["source_attempt"],
+                "checkpointAttempt": row["checkpoint_attempt"] or row["source_attempt"],
                 "sourceStepId": row["step_id"],
                 "stepId": step_id,
                 "inputSha256": hashlib.sha256(raw).hexdigest(),

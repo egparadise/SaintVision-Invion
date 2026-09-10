@@ -1795,6 +1795,10 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 65536
+        },
+        "checkpointAttempt": {
+          "type": "integer",
+          "minimum": 1
         }
       },
       "required": [
@@ -1804,7 +1808,8 @@
         "sourceStepId",
         "stepId",
         "inputSha256",
-        "inputSizeBytes"
+        "inputSizeBytes",
+        "checkpointAttempt"
       ]
     },
     "WorkspaceInput": {

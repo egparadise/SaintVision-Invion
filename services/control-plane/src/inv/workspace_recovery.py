@@ -211,7 +211,7 @@ class WorkspaceRecovery:
             if not prior and (
                 run["state"] != "recovering"
                 or run["version"] != expected_version
-                or restored["source_attempt"] != run["attempt"]
+                or restored["source_attempt"] > run["attempt"]
             ):
                 raise DomainError("GRAPH-0003", "Checkout requires current recovering attempt")
             if (
@@ -235,7 +235,8 @@ class WorkspaceRecovery:
                     "workspaceId": restored["workspace_id"],
                     "generation": prior["generation"],
                     "stepId": restored["step_id"],
-                    "sourceAttempt": restored["source_attempt"],
+                    "sourceAttempt": prior["source_attempt"],
+                    "checkpointAttempt": prior["checkpoint_attempt"] or prior["source_attempt"],
                     "sha256": prior["content_hash"],
                     "replayed": True,
                 }
@@ -255,8 +256,8 @@ class WorkspaceRecovery:
                 work_fd, generation, restored["workspace_id"], restored["content_hash"]
             )
             conn.execute(
-                """INSERT INTO inv.workspace_checkouts(tenant_id,project_id,run_id,checkout_id,restore_id,workspace_id,source_attempt,step_id,recovery_epoch,request_hash,generation,filesystem_identity,content_hash)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                """INSERT INTO inv.workspace_checkouts(tenant_id,project_id,run_id,checkout_id,restore_id,workspace_id,source_attempt,step_id,recovery_epoch,request_hash,generation,filesystem_identity,content_hash,checkpoint_attempt)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (
                     tenant,
                     project,
@@ -264,13 +265,14 @@ class WorkspaceRecovery:
                     checkout_id,
                     restore_id,
                     restored["workspace_id"],
-                    restored["source_attempt"],
+                    run["attempt"],
                     restored["step_id"],
                     self.db.recovery_epoch,
                     fingerprint,
                     generation,
                     Jsonb(filesystem_identity),
                     restored["content_hash"],
+                    restored["source_attempt"],
                 ),
             )
             event(
@@ -282,7 +284,8 @@ class WorkspaceRecovery:
                     "checkoutId": checkout_id,
                     "workspaceId": restored["workspace_id"],
                     "stepId": restored["step_id"],
-                    "sourceAttempt": restored["source_attempt"],
+                    "sourceAttempt": run["attempt"],
+                    "checkpointAttempt": restored["source_attempt"],
                     "sha256": restored["content_hash"],
                 },
             )
@@ -291,7 +294,8 @@ class WorkspaceRecovery:
                 "workspaceId": restored["workspace_id"],
                 "generation": generation,
                 "stepId": restored["step_id"],
-                "sourceAttempt": restored["source_attempt"],
+                "sourceAttempt": run["attempt"],
+                "checkpointAttempt": restored["source_attempt"],
                 "sha256": restored["content_hash"],
                 "replayed": False,
             }

@@ -1,8 +1,11 @@
+-- Historical source_attempt equalled the recovering attempt. Keep that cursor
+-- and record older checkpoint provenance separately for newly prepared copies.
+ALTER TABLE inv.workspace_checkouts ADD COLUMN checkpoint_attempt integer CHECK(checkpoint_attempt BETWEEN 1 AND source_attempt);
 ALTER TABLE inv.workspace_checkouts ADD UNIQUE(tenant_id,project_id,run_id,checkout_id,workspace_id,source_attempt,recovery_epoch);
 CREATE TABLE inv.workspace_resumptions (
  tenant_id uuid NOT NULL, project_id text NOT NULL, run_id text NOT NULL,
  resume_id uuid NOT NULL, checkout_id uuid NOT NULL, workspace_id text NOT NULL,
- source_attempt integer NOT NULL, step_id text NOT NULL CHECK(length(step_id) BETWEEN 1 AND 200),
+ source_attempt integer NOT NULL CHECK(source_attempt BETWEEN 1 AND 2), step_id text NOT NULL CHECK(length(step_id) BETWEEN 1 AND 200),
  recovery_epoch uuid NOT NULL, request_hash text NOT NULL CHECK(request_hash ~ '^[0-9a-f]{64}$'),
  workload jsonb NOT NULL, snapshot bytea NOT NULL CHECK(octet_length(snapshot) BETWEEN 1 AND 65536),
  created_at timestamptz NOT NULL DEFAULT clock_timestamp(),

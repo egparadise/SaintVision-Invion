@@ -411,6 +411,7 @@ type WorkspaceResumeRef struct {
     StepId string `json:"stepId"`
     InputSha256 string `json:"inputSha256"`
     InputSizeBytes int64 `json:"inputSizeBytes"`
+    CheckpointAttempt int64 `json:"checkpointAttempt"`
 }
 
 type WorkspaceInput struct {

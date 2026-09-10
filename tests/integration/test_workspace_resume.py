@@ -50,12 +50,12 @@ def freeze(a, *, resume_id=None):
     )
 
 
-def authorize(a):
+def authorize(a, prefix="resume"):
     a.policy["actionDigest"] = action_digest(a.workload)
-    row = request(a, key="resume-request")
+    row = request(a, key=prefix + "-request")
     for actor in ["alice", "bob"]:
-        row = decide(a, row, actor, challenge(a, row, actor), key="resume-decision:" + actor)
-    a.command = dispatch(a, row, key="resume-dispatch")
+        row = decide(a, row, actor, challenge(a, row, actor), key=prefix + "-decision:" + actor)
+    a.command = dispatch(a, row, key=prefix + "-dispatch")
     return row
 
 
@@ -287,3 +287,31 @@ def test_bad_node_workspace_cannot_be_success_or_checkpoint(remote, storage, tmp
     assert active(a) == 0 and count(a, "result_completions") == 0
     with pytest.raises(DomainError, match="RES-0004"):
         a.storage.restore(a.e.tenant, a.e.project, a.run["runId"], 2, "resumed-step")
+
+
+def test_older_checkpoint_can_recover_failed_attempt_but_fourth_execution_is_denied(remote, storage, tmp_path):
+    a = build_resume(remote, storage, tmp_path, "overflow")
+    authorize(a); enqueue(a)
+    second = a.queue.acquire(a.e.tenant)
+    a.delivery.deliver(a.node, second.envelope)
+    assert a.queue.finish(second) == "stopped" and active(a) == 0
+    a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
+    assert a.run["attempt"] == 2
+    a.run = a.e.runs.transition(a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"])
+    rid = str(uuid4())
+    a.recovery.restore(a.e.tenant, a.e.project, a.run["runId"], a.workspace_id, 1, "files-v1", rid, expected_version=a.run["version"])
+    a.checkout_id = str(uuid4())
+    checkout = a.recovery.checkout(a.e.tenant, a.e.project, a.run["runId"], rid, a.checkout_id, a.working, expected_version=a.run["version"])
+    assert checkout["sourceAttempt"] == 2 and checkout["checkpointAttempt"] == 1
+    a.workload = a.resume.prepare(a.e.tenant, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "retry-step", a.base_workload, expected_version=a.run["version"])["workload"]
+    assert a.workload["workspaceResume"]["checkpointAttempt"] == 1
+    authorize(a, prefix="third"); enqueue(a, key="third-enqueue")
+    third = a.queue.acquire(a.e.tenant)
+    a.delivery.deliver(a.node, third.envelope)
+    assert a.queue.finish(third) == "stopped" and active(a) == 0
+    a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
+    assert a.run["attempt"] == 3 and count(a, "execution_attempts") == 3
+    a.run = a.e.runs.transition(a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"])
+    with pytest.raises(DomainError, match="GRAPH-0005"):
+        a.resume.prepare(a.e.tenant, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "fourth-step", a.base_workload, expected_version=a.run["version"])
+    assert active(a) == 0 and count(a, "workspace_resumptions") == 2
