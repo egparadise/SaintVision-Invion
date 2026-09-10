@@ -53,6 +53,7 @@ jobs:
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/probe" ./tests/probe
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/inv-supervisor" ./cmd/inv-supervisor
           cp tests/probe/Dockerfile "$GITHUB_WORKSPACE/.work/node-image/Dockerfile"
+          python "$GITHUB_WORKSPACE/tools/prepare_git_probe.py" "$GITHUB_WORKSPACE/.work/node-image"
           docker build --network=none --pull=false -t "inv-node-test:$GITHUB_SHA" "$GITHUB_WORKSPACE/.work/node-image"
           echo "INV_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-node-test:$GITHUB_SHA")" >> "$GITHUB_ENV"
           echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"

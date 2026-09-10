@@ -19,19 +19,7 @@ from .runs import RunStore, event, public
 from .state import TERMINAL
 from .reservations import reclaim_unclaimed
 from .leases import fence
-
-
-class BoundDatabase:
-    """Private adapter so every nested admission uses its parent's transaction."""
-
-    def __init__(self, db, tenant, conn):
-        self.recovery_epoch, self.tenant, self.conn = db.recovery_epoch, tenant, conn
-
-    @contextmanager
-    def transaction(self, tenant):
-        if tenant != self.tenant:
-            raise DomainError("AUTH-0011", "Nested transaction scope differs", 403)
-        yield self.conn
+from .db import BoundDatabase
 
 
 @dataclass(frozen=True)

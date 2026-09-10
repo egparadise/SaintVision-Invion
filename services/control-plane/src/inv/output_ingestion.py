@@ -23,12 +23,19 @@ def output_bytes(receipt):
         data = base64.b64decode(value["data"], validate=True)
         if (
             len(data) != value["sizeBytes"]
-            or not 1 <= len(data) <= 180000
+            or not 1 <= len(data) <= 300000
             or hashlib.sha256(data).hexdigest() != value["sha256"]
         ):
             raise ValueError()
         artifact = strict_json(data)
-        if set(artifact) != {"stdout", "stderr", "truncated"} or artifact["truncated"] is not False:
+        if (
+            set(artifact)
+            not in (
+                {"stdout", "stderr", "truncated"},
+                {"stdout", "stderr", "truncated", "workspace"},
+            )
+            or artifact["truncated"] is not False
+        ):
             raise ValueError()
         for key in ("stdout", "stderr"):
             if (
@@ -126,6 +133,14 @@ class OutputIngestion:
                 (token, command),
             )
             execution = ResultStore._execution(conn, run, command)
+            delivery = conn.execute(
+                "SELECT envelope FROM inv.execution_deliveries WHERE command_id=%s", (command,)
+            ).fetchone()
+            launch = (
+                strict_json(base64.b64decode(delivery["envelope"]["payload"]))["launch"]
+                if delivery
+                else {}
+            )
         error = None
         try:
             data = output_bytes(receipt)
@@ -135,6 +150,21 @@ class OutputIngestion:
             if store.status(tenant, run["project_id"], oid)["state"] == "uploading":
                 store.put_part(tenant, run["project_id"], oid, 0, data)
             store.finalize(tenant, run["project_id"], oid)
+            from .workspace_resume import workspace_output
+
+            workspace = workspace_output(strict_json(data), launch)
+            if workspace is not None:
+                wid = str(uuid5(NAMESPACE_URL, "inv.workspace-output:" + tenant + ":" + command))
+                store.begin(
+                    tenant,
+                    run["project_id"],
+                    wid,
+                    hashlib.sha256(workspace).hexdigest(),
+                    len(workspace),
+                )
+                if store.status(tenant, run["project_id"], wid)["state"] == "uploading":
+                    store.put_part(tenant, run["project_id"], wid, 0, workspace)
+                store.finalize(tenant, run["project_id"], wid)
             evidence = {
                 "evidenceId": evidence_id(command),
                 "tenantId": tenant,

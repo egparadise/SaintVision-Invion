@@ -75,6 +75,7 @@ export interface WorkloadSpec {
   imageDigest: string;
   command: Array<string>;
   timeoutSeconds: number;
+  workspaceResume?: WorkspaceResumeRef;
 }
 
 export interface ResourceLease {
@@ -246,7 +247,7 @@ export interface SandboxLaunchSpec {
   argv: Array<string>;
   workspaceId: WorkspaceId;
   workingDirectory: "/workspace";
-  workspaceMode: "ephemeral";
+  workspaceMode: "ephemeral" | "restored";
   cpuMillis: number;
   memoryBytes: number;
   timeoutSeconds: number;
@@ -258,6 +259,7 @@ export interface SandboxLaunchSpec {
   noNewPrivileges: true;
   privileged: false;
   hostAccess: false;
+  workspaceInput?: WorkspaceInput;
 }
 
 export interface ExecutionClaim {
@@ -397,4 +399,37 @@ export interface NodeOutput {
   data: string;
   sha256: string;
   sizeBytes: number;
+}
+
+export interface WorkspaceResumeRef {
+  resumeId: string;
+  checkoutId: string;
+  sourceAttempt: number;
+  sourceStepId: string;
+  stepId: string;
+  inputSha256: string;
+  inputSizeBytes: number;
+}
+
+export interface WorkspaceInput {
+  resumeId: string;
+  stepId: string;
+  sha256: string;
+  sizeBytes: number;
+  dataBase64: string;
+}
+
+export interface WorkspaceSnapshotFile {
+  path: string;
+  executable: boolean;
+  sha256: string;
+  sizeBytes: number;
+  dataBase64: string;
+}
+
+export interface WorkspaceSnapshot {
+  format: "workspace-snapshot:1";
+  workspaceId: WorkspaceId;
+  directories: Array<string>;
+  files: Array<WorkspaceSnapshotFile>;
 }

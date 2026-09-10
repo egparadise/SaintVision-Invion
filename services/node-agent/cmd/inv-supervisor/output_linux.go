@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
 	"os"
 	"sync"
 )
@@ -13,6 +14,22 @@ type outputBuffer struct {
 	mutex     sync.Mutex
 	data      []byte
 	truncated bool
+}
+
+func emitWorkspaceOutput(stdout, stderr *outputBuffer, input *contracts.WorkspaceInput, snapshot contracts.WorkspaceSnapshot) int {
+	stdout.mutex.Lock()
+	defer stdout.mutex.Unlock()
+	stderr.mutex.Lock()
+	defer stderr.mutex.Unlock()
+	if stdout.truncated || stderr.truncated {
+		return 122
+	}
+	artifact := map[string]any{"stdout": append([]byte{}, stdout.data...), "stderr": append([]byte{}, stderr.data...), "truncated": false,
+		"workspace": map[string]any{"resumeId": input.ResumeId, "stepId": input.StepId, "inputSha256": input.Sha256, "snapshot": snapshot}}
+	if json.NewEncoder(os.Stdout).Encode(artifact) != nil {
+		return 122
+	}
+	return 0
 }
 
 func (b *outputBuffer) Write(p []byte) (int, error) {

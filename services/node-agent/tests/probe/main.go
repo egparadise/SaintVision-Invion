@@ -5,12 +5,49 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
 
 func fail(reason string) { fmt.Fprintln(os.Stderr, reason); os.Exit(41) }
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "workspace" {
+		data, err := os.ReadFile("/workspace/src/main.py")
+		if err != nil || string(data) != "print('checkpoint')\n" {
+			fail("restored input")
+		}
+		if os.Getenv("INV_WORKSPACE_INPUT") != "" {
+			fail("private input environment")
+		}
+		if err = os.WriteFile("/workspace/src/main.py", []byte("print('resumed')\n"), 0600); err != nil {
+			fail("resumed write")
+		}
+		if len(os.Args) > 2 && os.Args[2] == "symlink" {
+			os.Symlink("/etc/passwd", "/workspace/escape")
+			return
+		}
+		if len(os.Args) > 2 && os.Args[2] == "overflow" {
+			os.WriteFile("/workspace/overflow", []byte(strings.Repeat("x", 33000)), 0600)
+			return
+		}
+		os.Mkdir("/tmp/empty-template", 0700)
+		commands := [][]string{{"-c", "init.defaultBranch=main", "init", "--template=/tmp/empty-template"}, {"add", "src/main.py"},
+			{"-c", "user.name=Synthetic Test", "-c", "user.email=synthetic@example.invalid", "-c", "commit.gpgsign=false", "commit", "-m", "resumed step"}, {"rev-parse", "HEAD"}}
+		for _, args := range commands {
+			cmd := exec.Command("/usr/bin/git", args...)
+			cmd.Dir = "/workspace"
+			cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=/workspace", "GIT_CONFIG_NOSYSTEM=1", "GIT_CONFIG_GLOBAL=/dev/null"}
+			out, err := cmd.CombinedOutput()
+			if err != nil {
+				fail("local Git failed")
+			}
+			if args[0] == "rev-parse" {
+				fmt.Print(string(out))
+			}
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "sleep" {
 		time.Sleep(60 * time.Second)
 		return

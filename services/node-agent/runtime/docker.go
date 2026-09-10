@@ -105,12 +105,23 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	if image.ID != p.ImageDigest || len(image.Config.Volumes) != 0 || image.Config.Labels["ai.saintvision.supervisor"] != "deadline-v1" || image.Config.Labels["ai.saintvision.output"] != "bounded-streams-v1" {
 		return "", errors.New("NODE-0023: image must be local pinned content without declared volumes")
 	}
+	environment := []string{}
+	if p.WorkspaceInput != nil {
+		if image.Config.Labels["ai.saintvision.workspace"] != "snapshot-tmpfs-v1" {
+			return "", errors.New("NODE-0081: image lacks verified Workspace supervisor")
+		}
+		input, err := json.Marshal(p.WorkspaceInput)
+		if err != nil {
+			return "", err
+		}
+		environment = []string{"INV_WORKSPACE_INPUT=" + string(input), "INV_WORKSPACE_ID=" + string(p.WorkspaceId)}
+	}
 	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
 	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
 		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
 		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "local", "Config": map[string]string{"max-size": "512k", "max-file": "1", "compress": "false"}}}
 	command := append([]string{"--not-after", string(r.Claim.NotAfter), "--timeout", strconv.FormatInt(p.TimeoutSeconds, 10), "--"}, p.Argv...)
-	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": []string{},
+	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": environment,
 		"Labels": labels(r), "NetworkDisabled": true, "AttachStdout": false, "AttachStderr": false, "OpenStdin": false, "Tty": false, "HostConfig": host}
 	var result struct {
 		ID string `json:"Id"`
@@ -130,6 +141,17 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 		return "", err
 	}
 	h := actual.HostConfig
+	// Images may define benign defaults. The two private input variables must
+	// match exactly; duplicates or unexpected Workspace variables are rejected.
+	workspaceEnv := []string{}
+	for _, v := range actual.Config.Env {
+		if strings.HasPrefix(v, "INV_WORKSPACE_") {
+			workspaceEnv = append(workspaceEnv, v)
+		}
+	}
+	if !equal(workspaceEnv, environment) {
+		return "", errors.New("NODE-0081: Workspace input differs")
+	}
 	if actual.Image != p.ImageDigest || actual.Config.User != "65532:65532" || actual.Config.WorkingDir != "/workspace" || !equal(actual.Config.Entrypoint, []string{"/inv-supervisor"}) || !equal(actual.Config.Cmd, command) ||
 		h.NetworkMode != "none" || !h.ReadonlyRootfs || h.Privileged || h.Memory != p.MemoryBytes || h.MemorySwap != p.MemoryBytes || h.NanoCpus != p.CpuMillis*1000000 || h.PidsLimit != 64 ||
 		!equal(h.CapDrop, []string{"ALL"}) || !(equal(h.SecurityOpt, []string{"no-new-privileges:true"}) || equal(h.SecurityOpt, []string{"no-new-privileges"})) ||
@@ -159,9 +181,9 @@ type inspection struct {
 	ID          string `json:"Id"`
 	Name, Image string
 	Config      struct {
-		User, WorkingDir string
-		Entrypoint, Cmd  []string
-		Labels           map[string]string
+		User, WorkingDir     string
+		Entrypoint, Cmd, Env []string
+		Labels               map[string]string
 	}
 	HostConfig struct {
 		NetworkMode                             string
@@ -254,7 +276,7 @@ func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.No
 	}
 	// Docker multiplexes stdout/stderr into 8-byte framed records. PID 1 emits
 	// exactly one JSON artifact on stdout; daemon diagnostics are never accepted.
-	reader := io.LimitReader(response.Body, 262145)
+	reader := io.LimitReader(response.Body, 400001)
 	var data []byte
 	for {
 		header := make([]byte, 8)
@@ -266,7 +288,7 @@ func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.No
 			return nil, errors.New("NODE-0070: invalid output frame")
 		}
 		size := int(binary.BigEndian.Uint32(header[4:]))
-		if size > 180000-len(data) {
+		if size > 300000-len(data) {
 			return nil, errors.New("NODE-0070: output exceeds bounds")
 		}
 		frame := make([]byte, size)

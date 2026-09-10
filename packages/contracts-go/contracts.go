@@ -77,6 +77,7 @@ type WorkloadSpec struct {
     ImageDigest string `json:"imageDigest"`
     Command []string `json:"command"`
     TimeoutSeconds int64 `json:"timeoutSeconds"`
+    WorkspaceResume *WorkspaceResumeRef `json:"workspaceResume,omitempty"`
 }
 
 type ResourceLease struct {
@@ -260,6 +261,7 @@ type SandboxLaunchSpec struct {
     NoNewPrivileges bool `json:"noNewPrivileges"`
     Privileged bool `json:"privileged"`
     HostAccess bool `json:"hostAccess"`
+    WorkspaceInput *WorkspaceInput `json:"workspaceInput,omitempty"`
 }
 
 type ExecutionClaim struct {
@@ -399,4 +401,37 @@ type NodeOutput struct {
     Data string `json:"data"`
     Sha256 string `json:"sha256"`
     SizeBytes int64 `json:"sizeBytes"`
+}
+
+type WorkspaceResumeRef struct {
+    ResumeId string `json:"resumeId"`
+    CheckoutId string `json:"checkoutId"`
+    SourceAttempt int64 `json:"sourceAttempt"`
+    SourceStepId string `json:"sourceStepId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+}
+
+type WorkspaceInput struct {
+    ResumeId string `json:"resumeId"`
+    StepId string `json:"stepId"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+}
+
+type WorkspaceSnapshotFile struct {
+    Path string `json:"path"`
+    Executable bool `json:"executable"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+}
+
+type WorkspaceSnapshot struct {
+    Format string `json:"format"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    Directories []string `json:"directories"`
+    Files []WorkspaceSnapshotFile `json:"files"`
 }

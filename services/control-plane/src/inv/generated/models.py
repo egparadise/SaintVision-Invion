@@ -153,22 +153,6 @@ class ResourceSnapshot(BaseModel):
     resources: list[ResourceOffer]
 
 
-class WorkloadSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
-    kind: Literal['Workload']
-    workloadId: WorkloadId
-    tenantId: TenantId
-    projectId: ProjectId
-    workspaceId: WorkspaceId
-    resources: ResourceRequest
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    command: list[str] = Field(..., min_length=1)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
-
-
 class ResourceLease(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -436,27 +420,9 @@ class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
     root: constr(min_length=1, max_length=4096)
 
 
-class SandboxLaunchSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    profileVersion: constr(min_length=1, max_length=200)
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
-    workspaceId: WorkspaceId
-    workingDirectory: Literal['/workspace']
-    workspaceMode: Literal['ephemeral']
-    cpuMillis: conint(ge=1, le=9007199254740991)
-    memoryBytes: conint(ge=1, le=9007199254740991)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
-    pidsLimit: Literal[64]
-    userId: Literal[65532]
-    network: Literal['none']
-    rootfsReadOnly: Literal[True]
-    capDropAll: Literal[True]
-    noNewPrivileges: Literal[True]
-    privileged: Literal[False]
-    hostAccess: Literal[False]
+class WorkspaceMode(StrEnum):
+    ephemeral = 'ephemeral'
+    restored = 'restored'
 
 
 class ExecutionClaim(BaseModel):
@@ -489,16 +455,6 @@ class NodeAllocation(BaseModel):
     lease: ResourceLease
     nodeId: NodeId
     kind: Kind1
-
-
-class NodeExecutionPermit(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    claim: ExecutionClaim
-    launch: SandboxLaunchSpec
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-    issuedAt: Timestamp
 
 
 class SignedNodePermit(BaseModel):
@@ -626,9 +582,109 @@ class NodeOutput(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    data: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', max_length=240000)
+    data: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', max_length=400000)
     sha256: constr(pattern=r'^[0-9a-f]{64}$')
-    sizeBytes: conint(ge=1, le=180000)
+    sizeBytes: conint(ge=1, le=300000)
+
+
+class WorkspaceResumeRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    checkoutId: UUID
+    sourceAttempt: conint(ge=1)
+    sourceStepId: constr(min_length=1, max_length=200)
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+
+
+class WorkspaceInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+
+
+class WorkspaceSnapshotFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(min_length=1, max_length=1024)
+    executable: bool
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=32768)
+    dataBase64: constr(max_length=43692)
+
+
+class Directory(RootModel[constr(min_length=1, max_length=1024)]):
+    root: constr(min_length=1, max_length=1024)
+
+
+class WorkspaceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format: Literal['workspace-snapshot:1']
+    workspaceId: WorkspaceId
+    directories: list[Directory] = Field(..., max_length=2048)
+    files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
+
+
+class WorkloadSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['Workload']
+    workloadId: WorkloadId
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    resources: ResourceRequest
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    command: list[str] = Field(..., min_length=1)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    workspaceResume: WorkspaceResumeRef | None = None
+
+
+class SandboxLaunchSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    profileVersion: constr(min_length=1, max_length=200)
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
+    workspaceId: WorkspaceId
+    workingDirectory: Literal['/workspace']
+    workspaceMode: WorkspaceMode
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    pidsLimit: Literal[64]
+    userId: Literal[65532]
+    network: Literal['none']
+    rootfsReadOnly: Literal[True]
+    capDropAll: Literal[True]
+    noNewPrivileges: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+    workspaceInput: WorkspaceInput | None = None
+
+
+class NodeExecutionPermit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    claim: ExecutionClaim
+    launch: SandboxLaunchSpec
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    issuedAt: Timestamp
 
 
 class NodeStopReceipt(BaseModel):

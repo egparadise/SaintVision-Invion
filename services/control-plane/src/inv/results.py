@@ -206,7 +206,13 @@ class ResultStore:
             obj = SnapshotStore._row(conn, project, result["object_id"])
             if obj["state"] != "ready":
                 raise DomainError("STORE-0005", "Prepared output unavailable")
-            files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
+            data = files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
+            # A resumed Step must commit its actual modified files with completion.
+            # Publication may be retried independently, but success cannot precede
+            # the immutable checkpoint/pin in this same transaction.
+            from .workspace_resume import commit_workspace_output
+
+            commit_workspace_output(conn, files, tenant, project, run, command_id, receipt, data)
             conn.execute(
                 "INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)",
                 (tenant, run_id, result["evidence_id"], Jsonb(result["envelope"])),
