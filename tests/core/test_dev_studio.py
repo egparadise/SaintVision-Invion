@@ -97,3 +97,27 @@ def test_submission_idempotency_rejects_changed_content(studio):
     assert studio.submit('p', 'w', 'test', 'abcdefgh') == 'j'
     with pytest.raises(ValueError, match='different intent'):
         studio.submit('p', 'w', 'train', 'abcdefgh')
+
+
+def test_shared_context_binds_actual_workspace_without_initializing_git(studio, tmp_path):
+    path = tmp_path / "plain project"
+    path.mkdir()
+    project = studio.register('plain', path, tasks={'test': {'argv': ['python', 'test.py']}})
+    assert studio.configure_tools() == {'configuredWorkspaces': 1}
+    text = (path / '.saintvision/README.md').read_text('utf-8')
+    workspace = studio.status()['projects'][0]['workspaces'][0]['id']
+    assert "--project '" + project + "'" in text
+    assert "--workspace '" + workspace + "'" in text
+    assert not (path / '.git').exists()
+    assert studio.configure_tools() == {'configuredWorkspaces': 1}
+
+
+def test_shared_context_does_not_overwrite_user_file(studio, tmp_path):
+    path = tmp_path / 'project'
+    (path / '.saintvision').mkdir(parents=True)
+    target = path / '.saintvision/README.md'
+    target.write_text('My existing context', encoding='utf-8')
+    studio.register('existing', path)
+    with pytest.raises(ValueError, match='unmanaged'):
+        studio.configure_tools()
+    assert target.read_text() == 'My existing context'
