@@ -48,7 +48,10 @@ PREFIXES: Final[dict[str, str]] = {
     "workload": "wkl",
     "attempt": "att",
     "checkpoint": "ckp",
-    "approval": "apv",
+    # The execution core enforces `apr` with a CHECK constraint and the web
+    # client already uses it. One id has to be writable on both sides of the
+    # seam, and `apv` had one dictionary entry and three call sites.
+    "approval": "apr",
     "outbox": "obx",
     "inbox": "ibx",
     "artifact": "art",
@@ -79,6 +82,9 @@ PREFIXES: Final[dict[str, str]] = {
     "pool": "pol",
     "plan": "pln",
     "replica": "rep",
+    # The business chain that reaches the execution core
+    "edit_lock": "elk",
+    "binding": "exb",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")

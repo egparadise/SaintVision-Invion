@@ -82,6 +82,11 @@ from .identity import (
     User,
     UserRole,
 )
+from .handoff import (
+    BINDING_STATES,
+    ExecutionBinding,
+    WorkspaceEditLock,
+)
 from .locality import (
     CACHE_FILL_LIMIT,
     MAX_CONCURRENT_TRANSFERS,
@@ -137,6 +142,8 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "user_roles",
     "projects",
     "project_members",
+    "workspace_edit_locks",
+    "execution_bindings",
     "nodes",
     "node_bootstrap_tokens",
     "node_capabilities",
@@ -231,6 +238,9 @@ LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
 }
 
 __all__ = [
+    "BINDING_STATES",
+    "ExecutionBinding",
+    "WorkspaceEditLock",
     "ACCEPTANCE_OUTCOMES",
     "CACHE_FILL_LIMIT",
     "DataReplica",

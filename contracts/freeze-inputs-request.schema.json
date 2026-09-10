@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Bind exact bytes to one recovery epoch and one execution-core run version.\n\n``boundRunVersion`` and ``sourceAttempt`` come from the execution core's Run,\nnot from this side's. They are what the approval will be tied to, and a\nbinding that names a version the core has already moved past describes work\nnobody can authorise.",
+  "properties": {
+    "boundRunVersion": {
+      "minimum": 1,
+      "title": "Boundrunversion",
+      "type": "integer"
+    },
+    "checkoutId": {
+      "anyOf": [
+        {
+          "maxLength": 36,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checkoutid"
+    },
+    "inputSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Inputsha256",
+      "type": "string"
+    },
+    "inputSizeBytes": {
+      "minimum": 0,
+      "title": "Inputsizebytes",
+      "type": "integer"
+    },
+    "lockId": {
+      "maxLength": 30,
+      "title": "Lockid",
+      "type": "string"
+    },
+    "projectId": {
+      "maxLength": 30,
+      "title": "Projectid",
+      "type": "string"
+    },
+    "resumeId": {
+      "anyOf": [
+        {
+          "maxLength": 36,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resumeid"
+    },
+    "sourceAttempt": {
+      "minimum": 1,
+      "title": "Sourceattempt",
+      "type": "integer"
+    },
+    "stepId": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Stepid",
+      "type": "string"
+    },
+    "workspaceId": {
+      "maxLength": 30,
+      "title": "Workspaceid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "workspaceId",
+    "lockId",
+    "stepId",
+    "sourceAttempt",
+    "boundRunVersion",
+    "inputSha256",
+    "inputSizeBytes"
+  ],
+  "title": "FreezeInputsRequest",
+  "type": "object"
+}

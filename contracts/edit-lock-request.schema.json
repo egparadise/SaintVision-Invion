@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Stop editing a workspace so its inputs can be frozen.\n\n``contentSha256`` is what the caller sees in the workspace at this moment.\nThe control plane does not hold workspace bytes — the node does — so it\ncannot compute this itself. What it can do is refuse every later step whose\ndigest differs, which turns \"the inputs were still\" from an assumption into\nsomething the platform checks.",
+  "properties": {
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "projectId": {
+      "maxLength": 30,
+      "title": "Projectid",
+      "type": "string"
+    },
+    "reason": {
+      "default": "execution",
+      "maxLength": 64,
+      "title": "Reason",
+      "type": "string"
+    },
+    "runId": {
+      "maxLength": 30,
+      "title": "Runid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "runId",
+    "contentSha256"
+  ],
+  "title": "EditLockRequest",
+  "type": "object"
+}

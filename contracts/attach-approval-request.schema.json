@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Pair an execution-core approval with the frozen inputs it decided.",
+  "properties": {
+    "approvalId": {
+      "pattern": "^apr_[0-9A-HJKMNP-TV-Z]{26}$",
+      "title": "Approvalid",
+      "type": "string"
+    },
+    "projectId": {
+      "maxLength": 30,
+      "title": "Projectid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "approvalId"
+  ],
+  "title": "AttachApprovalRequest",
+  "type": "object"
+}
