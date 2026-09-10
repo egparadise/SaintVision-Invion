@@ -480,6 +480,11 @@ def _settle(
     binding.state = state
     binding.settled_at = now
     binding.note = note
+    # RETURNING with populate_existing, not a bare bulk UPDATE. Without it the
+    # session keeps its own copy of the lock and every later read in this
+    # transaction still shows the workspace as quiesced — so a caller that
+    # settles and then re-quiesces sees a lock that the database has released
+    # and the ORM has not.
     session.execute(
         update(WorkspaceEditLock)
         .where(
@@ -488,8 +493,9 @@ def _settle(
             WorkspaceEditLock.released_at.is_(None),
         )
         .values(released_at=now)
-        .execution_options(synchronize_session=False)
-    )
+        .returning(WorkspaceEditLock)
+        .execution_options(synchronize_session=False, populate_existing=True)
+    ).scalar_one_or_none()
     session.flush()
     return binding
 
