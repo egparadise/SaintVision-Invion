@@ -120,6 +120,7 @@ export interface ApprovalItem {
   firstApprovedBy?: string;
   secondApprovedBy?: string;
   policyReason: string;
+  boundRunVersion?: number;
   createdAt: string;
 }
 
@@ -167,6 +168,24 @@ export interface WorkspaceResumeSpec {
   createdAt: string;
 }
 
+export interface NodeStopReceipt {
+  receiptId: string;
+  runId: string;
+  nodeId: string;
+  commandId: string;
+  exitCode: number;
+  physicallyStopped: boolean;
+  resourceReclaimed: boolean;
+  verified: boolean;
+  output?: {
+    data?: string;
+    sha256: string;
+    sizeBytes: number;
+  };
+  stoppedAt: string;
+  supervisorLabel?: string;
+}
+
 export interface ShardExecutionItem {
   shardId: string;
   runId: string;
@@ -181,6 +200,8 @@ export interface ShardExecutionItem {
   outputHash?: string;
   evidenceId?: string;
   exitCode?: number;
+  receiptId?: string;
+  receipt?: NodeStopReceipt;
 }
 
 export interface DistributedPlanItem {

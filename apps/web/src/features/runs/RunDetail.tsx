@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RunItem, RunState, ShardExecutionItem } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 
@@ -44,6 +44,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
   const [isPreparingResume, setIsPreparingResume] = useState(false);
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceipt | null>(null);
+  const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
 
   const handlePrepareResume = async () => {
     setIsPreparingResume(true);
@@ -110,6 +112,18 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       alert(e.message || '자원 회수 실패');
     } finally {
       setIsReclaiming(false);
+    }
+  };
+
+  const handleInspectReceipt = async (receiptId: string) => {
+    setIsLoadingReceipt(true);
+    try {
+      const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
+      setSelectedReceipt(res);
+    } catch (e: any) {
+      alert(e.message || '영수증 조회 실패');
+    } finally {
+      setIsLoadingReceipt(false);
     }
   };
 
@@ -283,6 +297,141 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </Button>
               <Button variant="danger" size="md" onClick={handleCancelSubmit} disabled={isCancelling}>
                 {isCancelling ? '취소 처리 중...' : '즉시 취소 실행'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NodeStopReceipt Modal (ADR-027 / ADR-028 / ADR-040 / ADR-041) */}
+      {selectedReceipt && (
+        <div
+          data-testid="receipt-modal"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: '20px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border-subtle)',
+              padding: '24px',
+              maxWidth: '680px',
+              width: '100%',
+              boxShadow: 'var(--shadow-lg)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🧾</span> NodeStopReceipt 물리 정지 영수증 검증
+                </h3>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                  ADR-027 / ADR-028 / ADR-041 분산 노드 커널 정지 영수증 및 결과 검증 상태
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedReceipt(null)}>
+                ✕
+              </Button>
+            </div>
+
+            {/* Contrast Callout */}
+            <div
+              style={{
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: selectedReceipt.verified ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                border: `1px solid ${selectedReceipt.verified ? '#10b981' : '#ef4444'}`,
+                marginBottom: '16px',
+                fontSize: '0.8125rem',
+              }}
+            >
+              <div style={{ fontWeight: 600, color: selectedReceipt.verified ? '#10b981' : '#ef4444', marginBottom: '4px' }}>
+                {selectedReceipt.verified
+                  ? '✓ 물리 정지 영수증 수신 및 비즈니스 결과 검증(verified) 동시 합격'
+                  : '⚠️ 물리 정지(exitCode 0) 확인됨 / 그러나 애플리케이션 결과 검증(verified) 미합격'}
+              </div>
+              <div style={{ color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                {selectedReceipt.verified
+                  ? '컨테이너 프로세스가 정상 종료(exit 0)되었고, 검증기가 생성된 아티팩트의 스키마 및 체크섬을 승인하였습니다.'
+                  : 'ADR-028/ADR-041 핵심 규칙: exitCode 0은 컨테이너가 물리적으로 정상 중단되었다는 영수증일 뿐이며, 비즈니스 결과 합격의 증거가 될 수 없습니다.'}
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>영수증 식별자 (Receipt ID)</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace' }}>{selectedReceipt.receiptId}</div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>대상 Run ID</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace' }}>{selectedReceipt.runId}</div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>할당 노드 ID</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace' }}>{selectedReceipt.nodeId}</div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>명령 식별자 (Command ID)</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace' }}>{selectedReceipt.commandId}</div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>프로세스 Exit Code</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'monospace', color: selectedReceipt.exitCode === 0 ? '#10b981' : '#ef4444' }}>
+                  {selectedReceipt.exitCode} ({selectedReceipt.exitCode === 0 ? '정상 프로세스 종료' : '오류 종료'})
+                </div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>물리 정지 상태 (Physically Stopped)</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.physicallyStopped ? '#10b981' : '#f59e0b' }}>
+                  {selectedReceipt.physicallyStopped ? '✓ 물리 정지 영수증 확정' : '동작 중'}
+                </div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>자원 반환 (Resource Reclaimed)</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: selectedReceipt.resourceReclaimed ? '#10b981' : '#f59e0b' }}>
+                  {selectedReceipt.resourceReclaimed ? '✓ 자원 반환 완료' : '반환 대기 중 (Release Pending)'}
+                </div>
+              </div>
+              <div style={{ padding: '10px 12px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>정지 시각 (Stopped At)</div>
+                <div style={{ fontSize: '0.8125rem', fontFamily: 'monospace' }}>{selectedReceipt.stoppedAt}</div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Supervisor Label</div>
+              <code style={{ display: 'block', padding: '6px 10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem' }}>
+                {selectedReceipt.supervisorLabel}
+              </code>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+                출력 다이제스트 & 페이로드 (SHA-256 / Size: {selectedReceipt.output?.sizeBytes} bytes)
+              </div>
+              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)', fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                <div style={{ color: '#58a6ff', marginBottom: '4px' }}>{selectedReceipt.output?.sha256}</div>
+                <div style={{ color: 'var(--color-text-muted)', wordBreak: 'break-all' }}>{selectedReceipt.output?.data}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" size="md" onClick={() => setSelectedReceipt(null)}>
+                영수증 확인 완료
               </Button>
             </div>
           </div>
@@ -658,6 +807,27 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             </div>
           </div>
 
+          {/* Advisory Notice on Stop Receipt vs Verification */}
+          <div
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'rgba(234, 179, 8, 0.1)',
+              border: '1px solid rgba(234, 179, 8, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: '16px',
+              fontSize: '0.8125rem',
+              color: '#eab308',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+            <div>
+              <strong>ADR-028 / ADR-041 정지 영수증 대조 원칙:</strong> exitCode 0은 컨테이너 물리 정지 영수증(NodeStopReceipt)일 뿐이며, 비즈니스 애플리케이션 결과 검증(verified) 합격을 뜻하지 않습니다. 물리 정지와 결과 검증은 분리 대조됩니다.
+            </div>
+          </div>
+
           {/* Aggregate Manifest Card */}
           <div
             style={{
@@ -780,14 +950,32 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                         </span>
                       </td>
                       <td style={{ padding: '10px 12px' }}>
-                        {s.physicallyStopped ? (
-                          <span style={{ color: 'var(--color-status-online)', fontWeight: 600 }}>
-                            ✓ 수신 완료
-                          </span>
-                        ) : (
-                          <span style={{ color: '#d97706', fontSize: '0.8125rem' }}>
-                            ⏳ fsync 대기
-                          </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {s.physicallyStopped ? (
+                            <span style={{ color: 'var(--color-status-online)', fontWeight: 600 }}>
+                              ✓ 수신 완료
+                            </span>
+                          ) : (
+                            <span style={{ color: '#d97706', fontSize: '0.8125rem' }}>
+                              ⏳ fsync 대기
+                            </span>
+                          )}
+                          {s.receiptId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              data-testid={`inspect-receipt-${s.receiptId}`}
+                              onClick={() => handleInspectReceipt(s.receiptId!)}
+                              style={{ padding: '2px 6px', fontSize: '0.6875rem' }}
+                            >
+                              🧾 영수증 검증
+                            </Button>
+                          )}
+                        </div>
+                        {s.receiptId && (
+                          <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', marginTop: '2px' }}>
+                            {s.receiptId}
+                          </div>
                         )}
                       </td>
                       <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontSize: '0.75rem' }}>

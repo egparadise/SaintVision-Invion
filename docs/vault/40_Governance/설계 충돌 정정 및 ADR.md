@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.12.0"
+version: "1.13.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T09:40:15+09:00"
+updated: "2026-09-10T12:12:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -78,4 +78,6 @@ ADR-036(실행 attempt·fenced output commitment·receipt 후 Evidence 원자 �
 ADR-040(미발급 예약 회수·Node 미수신 취소 tombstone), ADR-041(실제 bounded 출력·정지 후보 보존), ADR-042(receipt 기반 결과 재시도와 샤드 부모 완료), ADR-043(writable checkout·변경 파일 보존)은 [[Codex 실행 완료와 자원 회수 통합 계약]]을 따른다. Node mount·PTY/Git·샤드 재실행/collective·실장비 및 독립 reviewer 인수는 별도다.
 
 ADR-044(고정 Workspace 입력·새 승인·원자 예약/admission·총 3 attempt 상한), ADR-045(Node private tmpfs 실행·수정 파일/Git 결과 checkpoint의 원자 확정)는 [[Codex Workspace 실행 재개와 결과 체크포인트 계약]]을 따른다. 기존 11상태에 `recovering → awaiting_approval` 간선을 추가하고 업무 서비스/실행 코어/DB 정합성을 검증한다. checkpoint를 만든 attempt와 재개 직전 attempt를 구분하여 이전 checkpoint 재사용을 지원한다. PTY·대용량 전송·원격 Git·다중 Node/실장비 및 독립 검토는 별도다.
+
+ADR-046(실행 kernel을 권위로 하는 공개 Workspace API·승인/예약/큐의 원자 등록), ADR-047(명시적 production 설정·모의 서버 분리·기존 양쪽 migration history의 merge 및 제한 runtime 그룹)은 [[Codex Workspace 공개 API와 실행 커널 통합 계약]]을 따른다. 현재 project grant와 새 distinct 승인을 실제 Node 경로에 연결하며 `accepted`와 실행 시작을 구분한다. public 데이터 이관·전체 업무/화면 연결·실장비·독립 review는 별도다.
 

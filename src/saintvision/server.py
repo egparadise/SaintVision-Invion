@@ -417,6 +417,7 @@ SHARDS: Dict[str, List[Dict[str, Any]]] = {
             "resourceReleasePending": False,
             "outputHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "evidenceId": "evi_01JSHARD_03",
+            "receiptId": "rcp_01JSHARD_03",
             "exitCode": 0,
         },
         {
@@ -432,6 +433,7 @@ SHARDS: Dict[str, List[Dict[str, Any]]] = {
             "resourceReleasePending": False,
             "outputHash": "sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
             "evidenceId": "evi_01JSHARD_04",
+            "receiptId": "rcp_01JSHARD_04",
             "exitCode": 0,
         },
     ],
@@ -466,6 +468,60 @@ EVIDENCES: Dict[str, Dict[str, Any]] = {
     }
 }
 
+RECEIPTS: Dict[str, Dict[str, Any]] = {
+    "rcp_01JSHARD_03": {
+        "receiptId": "rcp_01JSHARD_03",
+        "runId": "run_01JSHARD_03",
+        "nodeId": "nod_01JABCDEF04",
+        "commandId": "cmd_01JSHARD_03",
+        "exitCode": 0,
+        "physicallyStopped": True,
+        "resourceReclaimed": True,
+        "verified": True,
+        "output": {
+            "data": "eyJzdGF0dXMiOiAic3VjY2VzcyIsICJldmFsX3Njb3JlIjogMC45Nn0=",
+            "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sizeBytes": 1042,
+        },
+        "stoppedAt": "2026-09-10T00:08:00Z",
+        "supervisorLabel": "ai.saintvision.output=bounded-streams-v1",
+    },
+    "rcp_01JSHARD_04": {
+        "receiptId": "rcp_01JSHARD_04",
+        "runId": "run_01JSHARD_04",
+        "nodeId": "nod_01JABCDEF05",
+        "commandId": "cmd_01JSHARD_04",
+        "exitCode": 0,
+        "physicallyStopped": True,
+        "resourceReclaimed": True,
+        "verified": True,
+        "output": {
+            "data": "eyJzdGF0dXMiOiAic3VjY2VzcyIsICJldmFsX3Njb3JlIjogMC45OH0=",
+            "sha256": "sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+            "sizeBytes": 2048,
+        },
+        "stoppedAt": "2026-09-10T00:10:00Z",
+        "supervisorLabel": "ai.saintvision.output=bounded-streams-v1",
+    },
+    "rcp_01JFAILED_VERIFY": {
+        "receiptId": "rcp_01JFAILED_VERIFY",
+        "runId": "run_01JFAILED_VERIFY",
+        "nodeId": "nod_01JABCDEF02",
+        "commandId": "cmd_01JFAILED_VERIFY",
+        "exitCode": 0,
+        "physicallyStopped": True,
+        "resourceReclaimed": False,
+        "verified": False,
+        "output": {
+            "data": "eyJzdGF0dXMiOiAiZmFpbGVkIiwgImVyciI6ICJJbnZhbGlkU2NoZW1hIn0=",
+            "sha256": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+            "sizeBytes": 512,
+        },
+        "stoppedAt": "2026-09-10T00:15:00Z",
+        "supervisorLabel": "ai.saintvision.output=bounded-streams-v1",
+    },
+}
+
 RESUME_SPECS: Dict[str, Dict[str, Any]] = {}
 
 APPROVALS: List[Dict[str, Any]] = [
@@ -485,7 +541,26 @@ APPROVALS: List[Dict[str, Any]] = [
         "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=10)).isoformat(),
         "policyReason": "외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)",
         "createdAt": dt.datetime.now(dt.timezone.utc).isoformat(),
-    }
+    },
+    {
+        "id": "apr_01JL3PROD999",
+        "runId": "run_01JABCDE0001",
+        "workspaceId": "wsp_01JABCDE001",
+        "nodeId": "nod_01JABCDEF01",
+        "riskLevel": "L3",
+        "target": "Production Database Schema Migration",
+        "command": "db.migrate --env production --force",
+        "estimatedCostKrw": 12000,
+        "remainingBudgetKrw": 46800,
+        "blastRadius": "cluster_production",
+        "status": "pending",
+        "nonce": "nonce_l3_9876543210abcdef",
+        "unifiedDiff": "--- a/migrations/003_schema.sql\n+++ b/migrations/003_schema.sql\n@@ -1,3 +1,5 @@\n+ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE;\n+CREATE INDEX idx_users_mfa ON users(two_factor_enabled);\n",
+        "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
+        "policyReason": "L3 프로덕션 스키마 변경 및 고위험 마이그레이션 2인 승인 강제 (ADR-004)",
+        "createdAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "boundRunVersion": 1,
+    },
 ]
 
 # ------------------------------------------------------------------------------
@@ -975,6 +1050,28 @@ def reclaim_resources(run_id: str, request: Request):
                 for s in SHARDS[run_id]:
                     s["resourceReleasePending"] = False
                     s["physicallyStopped"] = True
+                    rcp_id = s.get("receiptId") or f"rcp_{s['shardId']}"
+                    s["receiptId"] = rcp_id
+                    if rcp_id not in RECEIPTS:
+                        RECEIPTS[rcp_id] = {
+                            "receiptId": rcp_id,
+                            "runId": s.get("runId", run_id),
+                            "nodeId": s.get("nodeId", "nod_01JABCDEF01"),
+                            "commandId": f"cmd_{s['shardId']}",
+                            "exitCode": 0,
+                            "physicallyStopped": True,
+                            "resourceReclaimed": True,
+                            "verified": s.get("verified", False),
+                            "output": {
+                                "data": "eyJzdGF0dXMiOiAiY2FuY2VsbGVkX3N0b3BwZWQifQ==",
+                                "sha256": s.get("outputHash") or f"sha256:{hashlib.sha256(rcp_id.encode()).hexdigest()}",
+                                "sizeBytes": 256,
+                            },
+                            "stoppedAt": now_iso,
+                            "supervisorLabel": "ai.saintvision.output=bounded-streams-v1",
+                        }
+                    else:
+                        RECEIPTS[rcp_id]["resourceReclaimed"] = True
             return {
                 "runId": run_id,
                 "resourceReleasePending": False,
@@ -984,6 +1081,49 @@ def reclaim_resources(run_id: str, request: Request):
     return rfc9457_problem(
         404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
     )
+
+
+# ------------------------------------------------------------------------------
+# NodeStopReceipt Endpoints (ADR-027 / ADR-028 / ADR-040 / ADR-041)
+# ------------------------------------------------------------------------------
+
+
+@app.get("/v1/receipts")
+def list_receipts():
+    """
+    List all immutable NodeStopReceipt records.
+    """
+    items = list(RECEIPTS.values())
+    return {"items": items, "total": len(items)}
+
+
+@app.get("/v1/receipts/{receipt_id}")
+def get_receipt(receipt_id: str, request: Request):
+    """
+    Retrieve single NodeStopReceipt by ID.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    if receipt_id in RECEIPTS:
+        return RECEIPTS[receipt_id]
+    return rfc9457_problem(
+        404, "RES-RECEIPT-404", "Receipt Not Found", f"NodeStopReceipt '{receipt_id}' not found.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/runs/{run_id}/receipts")
+def list_run_receipts(run_id: str):
+    """
+    List all NodeStopReceipts associated with a Run and its child shards.
+    """
+    child_ids = set()
+    for r in RUNS:
+        if r["id"] == run_id:
+            child_ids.update(r.get("childRunIds", []))
+    matched = [
+        rcp for rcp in RECEIPTS.values()
+        if rcp.get("runId") == run_id or rcp.get("runId") in child_ids
+    ]
+    return {"items": matched, "total": len(matched), "runId": run_id}
 
 
 # ------------------------------------------------------------------------------
@@ -1083,6 +1223,7 @@ def prepare_run_resume(run_id: str, request: Request):
         "blastRadius": "workspace_isolated",
         "status": "pending",
         "nonce": approval_nonce,
+        "unifiedDiff": f"--- a/checkpoint/step_{current_attempt:02d}\n+++ b/checkpoint/step_{current_attempt + 1:02d}\n@@ -1,2 +1,3 @@\n-status: checkpoint_quiesced\n+status: admitted_and_running\n+frozen_manifest_hash: {input_hash}\n",
         "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
         "policyReason": f"ADR-044 고정 Workspace 입력 재개 승인 (Attempt #{current_attempt + 1} / Max {max_attempts})",
         "createdAt": now_iso,
@@ -1313,6 +1454,20 @@ async def create_approval(request: Request):
     }
     APPROVALS.append(new_apprv)
     return new_apprv
+
+
+@app.get("/v1/approvals/{approval_id}")
+def get_approval(approval_id: str, request: Request):
+    """
+    Retrieve single approval item by ID.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for apprv in APPROVALS:
+        if apprv["id"] == approval_id:
+            return apprv
+    return rfc9457_problem(
+        404, "RES-APPROVAL-404", "Approval Not Found", f"Approval '{approval_id}' was not found.", trace_id, "RES"
+    )
 
 
 @app.post("/v1/approvals/{approval_id}/approve")

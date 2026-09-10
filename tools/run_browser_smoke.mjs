@@ -414,6 +414,48 @@ async function runFullSmokeJourney() {
     assert('Returns RFC 9457 VAL-MAX-ATTEMPTS-EXCEEDED Problem Details', ceilingProblem.code === 'VAL-MAX-ATTEMPTS-EXCEEDED');
 
     // -------------------------------------------------------------------------
+    // 12. NodeStopReceipt & Evidence Display Reconciliation (ADR-027 / ADR-028 / ADR-041)
+    // -------------------------------------------------------------------------
+    console.log('\n[Track 12] NodeStopReceipt & Evidence Display Reconciliation:');
+
+    // 1. List Receipts
+    const receiptsRes = await fetch(`${BACKEND_URL}/v1/receipts`);
+    assert('GET /v1/receipts returns HTTP 200', receiptsRes.status === 200);
+    const receiptsData = await receiptsRes.json();
+    assert('Receipts store contains valid items', Array.isArray(receiptsData.items) && receiptsData.total >= 3);
+
+    // 2. Fetch single receipt
+    const singleReceiptRes = await fetch(`${BACKEND_URL}/v1/receipts/rcp_01JSHARD_03`);
+    assert('GET /v1/receipts/{id} returns HTTP 200', singleReceiptRes.status === 200);
+    const singleReceipt = await singleReceiptRes.json();
+    assert('NodeStopReceipt has exitCode: 0', singleReceipt.exitCode === 0);
+    assert('NodeStopReceipt has physicallyStopped: true', singleReceipt.physicallyStopped === true);
+    assert('NodeStopReceipt has verified: true', singleReceipt.verified === true);
+    assert('NodeStopReceipt has resourceReclaimed: true', singleReceipt.resourceReclaimed === true);
+    assert('NodeStopReceipt has bounded stream label', singleReceipt.supervisorLabel.includes('bounded-streams'));
+
+    // 3. Contrast check: ADR-028/041 exitCode 0 != verified true
+    const contrastReceiptRes = await fetch(`${BACKEND_URL}/v1/receipts/rcp_01JFAILED_VERIFY`);
+    assert('GET contrast receipt returns HTTP 200', contrastReceiptRes.status === 200);
+    const contrastReceipt = await contrastReceiptRes.json();
+    assert('Contrast receipt has exitCode: 0 (container stopped)', contrastReceipt.exitCode === 0);
+    assert('Contrast receipt has physicallyStopped: true', contrastReceipt.physicallyStopped === true);
+    assert('Contrast receipt has verified: false (schema check failed)', contrastReceipt.verified === false);
+    assert('Contrast receipt has resourceReclaimed: false (hold on failure)', contrastReceipt.resourceReclaimed === false);
+
+    // 4. Run receipts query
+    const runReceiptsRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/receipts`);
+    assert('GET /v1/runs/{id}/receipts returns HTTP 200', runReceiptsRes.status === 200);
+    const runReceiptsData = await runReceiptsRes.json();
+    assert('Run receipts includes child shard receipts', runReceiptsData.total >= 2);
+
+    // 5. Seeded L3 Approval verification
+    const l3ApprvRes = await fetch(`${BACKEND_URL}/v1/approvals/apr_01JL3PROD999`);
+    assert('GET /v1/approvals/{id} for L3 returns HTTP 200', l3ApprvRes.status === 200);
+    const l3Apprv = await l3ApprvRes.json();
+    assert('L3 approval enforces diff requirement', typeof l3Apprv.unifiedDiff === 'string' && l3Apprv.unifiedDiff.length > 0);
+
+    // -------------------------------------------------------------------------
     // Summary Dossier
     // -------------------------------------------------------------------------
     console.log('\n======================================================================');

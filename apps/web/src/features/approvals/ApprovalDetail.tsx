@@ -35,7 +35,8 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
 
   const isExpired = secondsRemaining === 0 || approval.status === 'expired';
   const hasDiff = Boolean(approval.unifiedDiff && approval.unifiedDiff.trim().length > 0);
-  const isDiffLoadFailed = !hasDiff;
+  const diffRequired = approval.riskLevel === 'L3';
+  const isDiffLoadFailed = diffRequired && !hasDiff;
 
   // Two-Person Rule constraint
   const isFirstApprover = approval.firstApprovedBy === currentUserId;
@@ -45,7 +46,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   const canApprove =
     !isExpired &&
     !isSubmitting &&
-    hasDiff &&
+    (!diffRequired || hasDiff) &&
     !isSelfApprovalBlocked &&
     approval.status === 'pending';
 
@@ -104,6 +105,20 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
             승인 요청: <code>{approval.id}</code>
           </h2>
+          {approval.boundRunVersion && (
+            <span
+              style={{
+                fontSize: '0.75rem',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontWeight: 600,
+                backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                color: '#58a6ff',
+              }}
+            >
+              Bound Version: v{approval.boundRunVersion}
+            </span>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -214,7 +229,11 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               border: isDiffLoadFailed ? '1px solid var(--color-status-offline)' : '1px solid #30363d',
             }}
           >
-            {hasDiff ? approval.unifiedDiff : '(Diff 데이터를 불러올 수 없습니다)'}
+            {hasDiff
+              ? approval.unifiedDiff
+              : isDiffLoadFailed
+              ? '(L3 고위험 작업의 필수 Diff 데이터를 불러올 수 없습니다)'
+              : '(명령어 실행 및 샌드박스 상태 복구 작업 - 소스 코드 파일 변경 없음)'}
           </pre>
         </div>
 
