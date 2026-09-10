@@ -2502,6 +2502,284 @@
         "releasedAt",
         "workload"
       ]
+    },
+    "ContainmentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "maintenance",
+            "incident",
+            "operator_request"
+          ]
+        },
+        "approvalId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "expectedVersion",
+        "reasonCode",
+        "approvalId"
+      ]
+    },
+    "ContainmentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "killSwitchActive": {
+          "type": "boolean"
+        },
+        "nodeStatus": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "online",
+                "offline",
+                "draining",
+                "quarantined"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "activeLeases": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pendingDeliveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "unsettledRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "settled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nodeId",
+        "version",
+        "killSwitchActive",
+        "nodeStatus",
+        "activeLeases",
+        "pendingDeliveries",
+        "unsettledRuns",
+        "settled"
+      ]
+    },
+    "ContainmentResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "kill",
+            "clear",
+            "drain",
+            "resume"
+          ]
+        },
+        "control": {
+          "$ref": "#/$defs/ContainmentView"
+        },
+        "approvalId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "requestId",
+        "operation",
+        "control",
+        "approvalId"
+      ]
+    },
+    "ContainmentProposalInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "kill",
+            "clear",
+            "drain",
+            "resume"
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "maintenance",
+            "incident",
+            "operator_request"
+          ]
+        }
+      },
+      "required": [
+        "operation",
+        "nodeId",
+        "expectedVersion",
+        "reasonCode"
+      ]
+    },
+    "ContainmentDecisionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "contentDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "decision",
+        "contentDigest",
+        "nonce"
+      ]
+    },
+    "ContainmentApprovalView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "kill",
+            "clear",
+            "drain",
+            "resume"
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "gateVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "maintenance",
+            "incident",
+            "operator_request"
+          ]
+        },
+        "contentDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "consumed"
+          ]
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requiredApprovals": {
+          "type": "integer",
+          "const": 2
+        }
+      },
+      "required": [
+        "approvalId",
+        "operation",
+        "nodeId",
+        "expectedVersion",
+        "gateVersion",
+        "reasonCode",
+        "contentDigest",
+        "status",
+        "expiresAt",
+        "requiredApprovals"
+      ]
     }
   },
   "oneOf": [

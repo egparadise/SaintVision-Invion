@@ -28,7 +28,7 @@ class Database:
         self.recovery_epoch = str(UUID(recovery_epoch))
 
     @contextmanager
-    def transaction(self, tenant_id: str):
+    def transaction(self, tenant_id: str, *, containment_write=False):
         tenant = str(UUID(tenant_id))
         with psycopg.connect(self._dsn, row_factory=dict_row) as conn:
             # READ COMMITTED is essential: each post-lock statement sees fresh sums.
@@ -54,6 +54,16 @@ class Database:
                     "LEASE-0004", "Recovery epoch requires operator reconciliation", 503
                 )
             try:
+                # Tenant barrier precedes every Run/Node/grant lock. Containment
+                # writers acquire exclusive access directly, never upgrade SHARE.
+                # No network I/O may run inside this transaction.
+                gate = conn.execute(
+                    "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR "
+                    + ("UPDATE" if containment_write else "SHARE"),
+                    (tenant,),
+                ).fetchone()
+                if not gate:
+                    raise DomainError("AUTH-0060", "Tenant containment control unavailable", 503)
                 yield conn
             except (
                 psycopg.errors.LockNotAvailable,

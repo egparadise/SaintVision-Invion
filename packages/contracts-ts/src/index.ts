@@ -566,3 +566,53 @@ export interface BusinessBindingView {
   releasedAt: (string | null);
   workload: WorkloadSpec;
 }
+
+export interface ContainmentInput {
+  expectedVersion: number;
+  reasonCode: "maintenance" | "incident" | "operator_request";
+  approvalId: string;
+}
+
+export interface ContainmentView {
+  nodeId: (NodeId | null);
+  version: number;
+  killSwitchActive: boolean;
+  nodeStatus: ("online" | "offline" | "draining" | "quarantined" | null);
+  activeLeases: number;
+  pendingDeliveries: number;
+  unsettledRuns: number;
+  settled: boolean;
+}
+
+export interface ContainmentResult {
+  requestId: string;
+  operation: "kill" | "clear" | "drain" | "resume";
+  control: ContainmentView;
+  approvalId: string;
+}
+
+export interface ContainmentProposalInput {
+  operation: "kill" | "clear" | "drain" | "resume";
+  nodeId: (NodeId | null);
+  expectedVersion: number;
+  reasonCode: "maintenance" | "incident" | "operator_request";
+}
+
+export interface ContainmentDecisionInput {
+  decision: "approve" | "reject";
+  contentDigest: string;
+  nonce: string;
+}
+
+export interface ContainmentApprovalView {
+  approvalId: string;
+  operation: "kill" | "clear" | "drain" | "resume";
+  nodeId: (NodeId | null);
+  expectedVersion: number;
+  gateVersion: number;
+  reasonCode: "maintenance" | "incident" | "operator_request";
+  contentDigest: string;
+  status: "pending" | "approved" | "rejected" | "consumed";
+  expiresAt: string;
+  requiredApprovals: 2;
+}

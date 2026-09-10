@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.15.0"
+version: "1.17.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T13:50:00+09:00"
+updated: "2026-09-10T15:13:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -84,3 +84,7 @@ ADR-046(실행 kernel을 권위로 하는 공개 Workspace API·승인/예약/�
 ADR-048(물리적 종료·동일 작업·새 승인에 따른 독립 샤드 대체 Node 실행), ADR-049(불변 부모/자식 계보·최대 3개 실행 세대·하나의 후속 계획·원자 admission)은 [[Codex 샤드 재승인과 대체 Node 복구 계약]]을 따른다. 공개 recovery route/UI·Workspace Node 파일 이전·collective·5대 PC·독립 검토는 별도다.
 
 ADR-050(실제 kernel 기록에서 계산하는 불변 업무 binding·물리적 완료 후 자동 편집 lock 해제), ADR-051(명시적 OIDC/업무 identity 연결·현재 권한 교집합·기존 revision 보존), ADR-052(최초 전송 전 권한 상실의 취소 tombstone 및 관측 전용 bounded 재시도)는 [[Codex 업무 binding과 실행 커널 연결 계약]]을 따른다. 일반 CRUD/provisioning/editor/PTY·PR14 실험 DB 이관·5대 인수와 독립 검토는 별도다.
+
+ADR-053(tenant 실행 barrier·별도 현재 operator 권한·불변 제어 감사), ADR-054(Node drain·전송 전 거부의 취소 tombstone·물리 정리 후 명시적 재개), ADR-055(bounded reconciliation·독립 취소 처리·old epoch 예약 보존)는 [[Codex kill switch와 Node drain 및 정리 계약]]을 따른다. 운영 PKI/서비스·UI·5대 SLO·독립 인수 및 전체 ROOF/Windows/GPU/BuildKit 검증은 별도다.
+
+ADR-056(제어 변경의 현재 2인 L2 승인·검증된 서로 다른 사람·고정 내용/epoch/version/만료/nonce·승인 소비와 제어의 원자 확정)은 [[Codex kill switch와 Node drain 및 정리 계약]] v1.1.0을 따른다. 초기 operator-only 경계의 정정이며 자동 비상 예외를 만들지 않는다. 0022 뒤에 0023 forward migration을 추가하고 과거 기록은 보존한다.

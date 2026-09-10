@@ -123,6 +123,10 @@ class NodeChannels:
 
     def snapshot(self, node, *, observation_only=False):
         with self.db.transaction(node.tenant_id) as conn:
+            if not observation_only:
+                from .containment import require_execution
+
+                require_execution(conn)
             row = conn.execute(
                 "SELECT *,clock_timestamp() AS now FROM inv.nodes WHERE node_id=%s FOR SHARE",
                 (node.node_id,),

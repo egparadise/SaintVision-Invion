@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.7.0"
+version: "1.8.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T13:57:52+09:00"
+updated: "2026-09-10T15:33:52+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 containment 후속: `091b8e5`에서 tenant kill switch·Node drain·고정 내용/만료/nonce/별도 2인 승인·현재 operator/별도 resume 권한·전송 전 거부 정리·독립 취소 처리·주기 예약 정리를 구현했다. 전체 990개 및 전용 28개가 통과했다. [[2026-09-10_15-33-52_KST_NODE-CONTAINMENT_Codex_검증보고]], [[Codex kill switch와 Node drain 및 정리 계약]]을 따른다. 다음 Codex 범위는 editor/PTY/remote Git·Workspace Node 이전, Windows/GPU/BuildKit·Context/RO와 실제 5대 검증이다. Claude 독립 검토/provisioning/운영 및 Gemini 실제 화면 연결은 남는다. 아래 kill/drain 미구현 문구는 이전 SHA 기준 기록이다.
 
 2026-09-10 업무 kernel 연결 후속: `255b29e`에서 현재 public/kernel 권한 교집합, 실제 입력·새 승인·원자 큐·receipt/Evidence 기반 binding·자동 lock 해제를 구현했다. 전체 962개, 업무 전용 16개와 샤드 21개가 통과했다. [[2026-09-10_13-57-52_KST_BUSINESS-KERNEL_Codex_검증보고]], [[Codex 업무 binding과 실행 커널 연결 계약]]을 따른다. Codex 다음은 kill switch/drain·주기 reconciliation이다. public provisioning/첫 Run·checkout·editor/PTY·업무 router production 조합, PR14 실험 DB 이관, 실제 화면·독립 검토·5대 인수는 남는다. 아래 이전 PR14 통합 예정 문구는 해당 SHA 당시 기록이다.
 
