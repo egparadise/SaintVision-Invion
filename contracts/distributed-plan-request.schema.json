@@ -15,16 +15,16 @@
       "title": "Shardcount",
       "type": "integer"
     },
-    "shardCpuCores": {
+    "shardCpuMillicores": {
       "default": 0,
       "minimum": 0,
-      "title": "Shardcpucores",
-      "type": "number"
+      "title": "Shardcpumillicores",
+      "type": "integer"
     },
-    "shardGpuCount": {
+    "shardGpuDevices": {
       "default": 0,
       "minimum": 0,
-      "title": "Shardgpucount",
+      "title": "Shardgpudevices",
       "type": "integer"
     },
     "shardRamBytes": {
