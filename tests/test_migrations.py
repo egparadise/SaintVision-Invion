@@ -244,3 +244,62 @@ def test_identity_columns_are_never_grantable(rendered_sql):
     forbidden = {"content_sha256", "version", "uri", "model_id", "dataset_id", "tenant_id"}
     for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
         assert not (set(columns) & forbidden), f"{table}: grants an identity column"
+
+
+# --------------------------------------------------------------------------
+# The chain itself, read from source
+# --------------------------------------------------------------------------
+
+
+def test_the_chain_is_linear_with_a_single_head():
+    """Two heads mean nobody knows what `head` refers to, and an upgrade picks
+    one of them."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    ordered = migration_graph.chain()
+    assert len(ordered) == len(migration_graph.load())
+    assert ordered[0].down_revision is None
+    for parent, child in zip(ordered, ordered[1:]):
+        assert child.down_revision == parent.revision
+
+
+def test_every_irreversible_revision_says_what_to_do_instead():
+    """PLAN-DB-001: an irreversible migration states a verified restore and
+    forward-fix plan rather than forcing a downgrade.
+
+    A revision that simply refuses, with no reason recorded, leaves an operator
+    holding a broken rollback and no instruction.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    silent = [
+        r.name
+        for r in migration_graph.load()
+        if r.irreversible and not r.recovery_note
+    ]
+    assert silent == [], f"irreversible with no recovery note: {silent}"
+
+
+def test_the_downgrade_target_never_crosses_an_irreversible_revision():
+    """The rollback test must stop where the plan says to stop."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    ordered = migration_graph.chain()
+    target = migration_graph.downgrade_target(ordered)
+    if target == "base":
+        assert not any(r.irreversible for r in ordered)
+        return
+
+    index = [r.revision for r in ordered].index(target)
+    # Everything above the target reverses; the target itself does not.
+    assert ordered[index].irreversible
+    assert not any(r.irreversible for r in ordered[index + 1 :])

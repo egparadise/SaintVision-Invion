@@ -245,7 +245,7 @@ def test_whole_host_capability_cannot_be_registered_twice(app_sessionmaker, two_
                     text(
                         "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
                         "kind, device_index, total_quantity, unit, divisible, detected_at, version) "
-                        "VALUES (:c, :t, :n, 'ram', NULL, 64, 'GiB', true, now(), 1)"
+                        "VALUES (:c, :t, :n, 'ram', NULL, 68719476736, 'bytes', true, now(), 1)"
                     ),
                     {"c": new_id("capability"), "t": tenant_a, "n": node_id},
                 )
@@ -256,7 +256,7 @@ def test_whole_host_capability_cannot_be_registered_twice(app_sessionmaker, two_
                         text(
                             "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
                             "kind, device_index, total_quantity, unit, divisible, detected_at, version) "
-                            "VALUES (:c, :t, :n, 'ram', NULL, 64, 'GiB', true, now(), 1)"
+                            "VALUES (:c, :t, :n, 'ram', NULL, 68719476736, 'bytes', true, now(), 1)"
                         ),
                         {"c": new_id("capability"), "t": tenant_a, "n": node_id},
                     )
@@ -305,7 +305,7 @@ def test_gpu_requires_a_device_index_and_others_forbid_it(app_sessionmaker, two_
                         text(
                             "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
                             "kind, device_index, total_quantity, unit, divisible, detected_at, version) "
-                            "VALUES (:c, :t, :n, 'gpu', NULL, 1, 'device', false, now(), 1)"
+                            "VALUES (:c, :t, :n, 'gpu', NULL, 1, 'devices', false, now(), 1)"
                         ),
                         {"c": new_id("capability"), "t": tenant_a, "n": node_id},
                     )

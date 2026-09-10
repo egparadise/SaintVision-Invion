@@ -21,6 +21,7 @@ from ...identity.principal import Principal
 from ...services import discovery as discovery_service
 from ...services import pools as pool_service
 from ...services.audit import record_event
+from ...units import CANONICAL_UNIT
 from .. import schemas
 from ..deps import get_now, get_principal, get_session, get_settings
 
@@ -245,9 +246,9 @@ def placement_preview(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
     now: dt.datetime = Depends(get_now),
-    cpu_cores: float = Query(default=0, ge=0, alias="cpuCores"),
+    cpu_millicores: int = Query(default=0, ge=0, alias="cpuMillicores"),
     ram_bytes: int = Query(default=0, ge=0, alias="ramBytes"),
-    gpu_count: int = Query(default=0, ge=0, alias="gpuCount"),
+    gpu_devices: int = Query(default=0, ge=0, alias="gpuDevices"),
 ) -> dict:
     """Which nodes could hold one shard, idlest first, without placing anything."""
     ranked = pool_service.rank_idle_first(
@@ -255,11 +256,18 @@ def placement_preview(
         tenant_id=principal.tenant_id,
         pool_id=pool_id,
         requirement=pool_service.ShardRequirement(
-            cpu_cores=cpu_cores, ram_bytes=ram_bytes, gpu_count=gpu_count
+            cpu_millicores=cpu_millicores,
+            ram_bytes=ram_bytes,
+            gpu_devices=gpu_devices,
         ),
         now=now,
     )
-    return {"poolId": pool_id, "candidates": ranked, "candidateCount": len(ranked)}
+    return {
+        "poolId": pool_id,
+        "candidates": ranked,
+        "candidateCount": len(ranked),
+        "units": dict(CANONICAL_UNIT),
+    }
 
 
 @router.post("/pools/{pool_id}/plans", status_code=201)
@@ -284,9 +292,9 @@ def create_plan(
         strategy=payload.strategy,
         shard_count=payload.shard_count,
         requirement=pool_service.ShardRequirement(
-            cpu_cores=payload.shard_cpu_cores,
+            cpu_millicores=payload.shard_cpu_millicores,
             ram_bytes=payload.shard_ram_bytes,
-            gpu_count=payload.shard_gpu_count,
+            gpu_devices=payload.shard_gpu_devices,
         ),
         splittable_declared=payload.splittable_declared,
         now=now,
@@ -296,13 +304,14 @@ def create_plan(
         "runId": plan.run_id,
         "strategy": plan.strategy,
         "shardCount": plan.shard_count,
+        "units": dict(CANONICAL_UNIT),
         "placements": [
             {
                 "shardIndex": p.shard_index,
                 "nodeId": p.node_id,
-                "assignedCpuCores": float(p.assigned_cpu_cores),
+                "assignedCpuMillicores": p.assigned_cpu_millicores,
                 "assignedRamBytes": p.assigned_ram_bytes,
-                "assignedGpuCount": p.assigned_gpu_count,
+                "assignedGpuDevices": p.assigned_gpu_devices,
             }
             for p in placements
         ],

@@ -688,3 +688,139 @@ def test_an_artifact_cannot_be_active_without_verification(app_sessionmaker, pro
                         ),
                         {"a": new_id("artifact"), "t": project["tenant_a"], "r": run_id},
                     )
+
+
+# --------------------------------------------------------------------------
+# Scoping found by comparing the two implementations (public is authoritative)
+# --------------------------------------------------------------------------
+
+
+def test_the_same_idempotency_key_in_two_projects_is_two_operations(
+    app_sessionmaker, project
+):
+    """The defect the merge comparison exposed.
+
+    Keys are chosen by clients — "retry", "deploy-1". Two projects using the
+    same one for the same endpoint were colliding, and the second project
+    received the first project's stored response instead of performing its own
+    operation.
+    """
+    from saintvision.db.models import IdempotencyRecord
+
+    tenant = project["tenant_a"]
+    other_project = new_id("project")
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                for project_id in (project["project_id"], other_project):
+                    session.add(
+                        IdempotencyRecord(
+                            record_id=new_id("idempotency"),
+                            tenant_id=tenant,
+                            project_id=project_id,
+                            endpoint="POST /v1/runs",
+                            idempotency_key="retry",
+                            request_sha256="a" * 64,
+                            response_status=201,
+                            response_body={},
+                            created_at=NOW,
+                            expires_at=NOW + dt.timedelta(days=1),
+                        )
+                    )
+                session.flush()
+                count = session.execute(
+                    text(
+                        "SELECT count(*) FROM idempotency_records "
+                        "WHERE idempotency_key = 'retry'"
+                    )
+                ).scalar_one()
+    assert count == 2
+
+
+def test_the_same_key_in_one_project_still_collides(app_sessionmaker, project):
+    from saintvision.db.models import IdempotencyRecord
+
+    tenant = project["tenant_a"]
+
+    def record():
+        return IdempotencyRecord(
+            record_id=new_id("idempotency"),
+            tenant_id=tenant,
+            project_id=project["project_id"],
+            endpoint="POST /v1/runs",
+            idempotency_key="retry",
+            request_sha256="a" * 64,
+            response_status=201,
+            response_body={},
+            created_at=NOW,
+            expires_at=NOW + dt.timedelta(days=1),
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                session.add(record())
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    session.add(record())
+
+
+def test_two_tenant_wide_operations_with_one_key_still_collide(
+    app_sessionmaker, project
+):
+    """NULLS NOT DISTINCT: no project is still one scope, not unlimited ones."""
+    from saintvision.db.models import IdempotencyRecord
+
+    tenant = project["tenant_a"]
+
+    def record():
+        return IdempotencyRecord(
+            record_id=new_id("idempotency"),
+            tenant_id=tenant,
+            project_id=None,
+            endpoint="POST /v1/storage/contributions",
+            idempotency_key="k",
+            request_sha256="b" * 64,
+            response_status=201,
+            response_body={},
+            created_at=NOW,
+            expires_at=NOW + dt.timedelta(days=1),
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                session.add(record())
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    session.add(record())
+
+
+def test_one_tenants_processed_event_does_not_suppress_anothers(
+    app_sessionmaker, project
+):
+    """Inbox dedup is per tenant as well as per consumer."""
+    event_id = new_id("outbox")
+    for tenant in (project["tenant_a"], project["tenant_b"]):
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    evidence_service.mark_processed(
+                        session,
+                        tenant_id=tenant,
+                        consumer="projector",
+                        event_id=event_id,
+                        event_type="inv.run.succeeded",
+                        now=NOW,
+                    )
+    # Both recorded; neither hid the other.
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_b"]):
+                mine = session.execute(
+                    text("SELECT count(*) FROM inbox_events WHERE event_id = :e"),
+                    {"e": event_id},
+                ).scalar_one()
+    assert mine == 1

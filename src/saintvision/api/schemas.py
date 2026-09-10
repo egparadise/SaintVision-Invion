@@ -171,9 +171,13 @@ class DistributedPlanRequest(Strict):
     strategy: str = Field(pattern="^(single_node|data_parallel|sharded)$")
     shard_count: int = Field(default=1, ge=1, le=1024, alias="shardCount")
     splittable_declared: bool = Field(default=False, alias="splittableDeclared")
-    shard_cpu_cores: float = Field(default=0, ge=0, alias="shardCpuCores")
+    #: In the canonical units, and named after them. These are compared against
+    #: a node's spare capacity, so a field called ``shardCpuCores`` sitting next
+    #: to capacity measured in millicores is an invitation to be wrong by a
+    #: factor of a thousand — see ``saintvision.units``.
+    shard_cpu_millicores: int = Field(default=0, ge=0, alias="shardCpuMillicores")
     shard_ram_bytes: int = Field(default=0, ge=0, alias="shardRamBytes")
-    shard_gpu_count: int = Field(default=0, ge=0, alias="shardGpuCount")
+    shard_gpu_devices: int = Field(default=0, ge=0, alias="shardGpuDevices")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
