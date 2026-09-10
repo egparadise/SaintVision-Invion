@@ -11,6 +11,13 @@ from .workspace_files import WorkingGenerations
 
 
 def configured_workspace(database, tenant, settings):
+    settings = dict(settings)
+    destinations = settings.pop("destinations", [])
+    git_repositories = settings.pop("gitRepositories", [])
+    if not isinstance(git_repositories, list) or len(git_repositories) > 16:
+        raise ValueError("At most sixteen explicit Git repositories are allowed")
+    if not isinstance(destinations, list) or len(destinations) > 4:
+        raise ValueError("At most five trusted Workspace Nodes including the default are allowed")
     if set(settings) != {
         "workingRoot",
         "nodeId",
@@ -30,7 +37,7 @@ def configured_workspace(database, tenant, settings):
     )
     if not isinstance(signing_key, Ed25519PrivateKey):
         raise ValueError("Ed25519 queue signing key required")
-    return WorkspaceAPI(
+    result = WorkspaceAPI(
         database,
         WorkingGenerations(settings["workingRoot"]),
         RestrictedWorkspaceRuntime(
@@ -43,3 +50,24 @@ def configured_workspace(database, tenant, settings):
             client=NodeTLSClient(**settings["tls"]),
         ),
     )
+    pool = {result.runtime.node.node_id: result.runtime}
+    from .remote_git import GitHubRepository
+
+    result.git_repositories = {}
+    for repository in git_repositories:
+        configured_git = GitHubRepository(**repository)
+        if configured_git.alias in result.git_repositories:
+            raise ValueError("Duplicate Git repository alias")
+        result.git_repositories[configured_git.alias] = configured_git
+    for target in destinations:
+        if not isinstance(target, dict) or "destinations" in target or "gitRepositories" in target:
+            raise ValueError("Flat trusted destination configuration required")
+        if target.get("workingRoot") != settings["workingRoot"]:
+            raise ValueError("Destinations must share the same authoritative editor root")
+        configured = configured_workspace(database, tenant, target)
+        if configured.runtime.node.node_id in pool:
+            raise ValueError("Duplicate Workspace destination")
+        pool[configured.runtime.node.node_id] = configured.runtime
+    for runtime in pool.values():
+        runtime.destinations = pool
+    return result

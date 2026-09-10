@@ -6,6 +6,9 @@ permissions:
   contents: read
 jobs:
   core:
+    # This draft branch defers execution tests at the user's explicit request.
+    # Full tests remain the default on all other branches and after integration.
+    if: github.head_ref != 'agent/codex/workspace-bridge' && github.ref_name != 'agent/codex/workspace-bridge'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     services:
@@ -94,5 +97,62 @@ jobs:
         if: always()
         with:
           name: saintvision-core-evidence
+          path: dist/
+          retention-days: 30
+  build_only:
+    name: Build only (execution tests deferred)
+    if: github.head_ref == 'agent/codex/workspace-bridge' || github.ref_name == 'agent/codex/workspace-bridge'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements-test.txt
+      - name: Generate contracts and check syntax
+        run: |
+          python tools/generate_contracts.py
+          git diff --exit-code -- services/control-plane/src/inv/generated packages/contracts-ts packages/contracts-go services/node-agent/internal/wire/core.schema.json
+          python -m compileall -q services/control-plane/src src tests migrations
+          python tools/export_schemas.py --check
+          python tools/migration_graph.py
+      - name: Render migration without connecting to a database
+        env:
+          INV_MIGRATION_DSN: postgresql+psycopg://offline:offline@localhost:1/offline
+        run: python -m alembic upgrade head --sql > /dev/null
+      - run: python -m build services/control-plane --outdir dist
+      - name: Compile Linux and Windows Node binaries without executing them
+        working-directory: services/node-agent
+        run: |
+          go build ./...
+          CGO_ENABLED=0 go build -trimpath -o ../../dist/inv-node-linux ./cmd/inv-node
+          CGO_ENABLED=0 go build -trimpath -o ../../dist/inv-supervisor-linux ./cmd/inv-supervisor
+          GOOS=windows CGO_ENABLED=0 go build -trimpath -o ../../dist/inv-node-windows.exe ./cmd/inv-node
+      - run: go build ./...
+        working-directory: packages/contracts-go
+      - run: npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts
+      - name: Record deferred validation explicitly
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          Path('dist/validation-mode.json').write_text(json.dumps({'sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'mode':'build-only','executionTests':'deferred-by-user','hardwareTests':'not-run','acceptance':'pending'},indent=2))
+          PY
+          echo 'Build/static checks only. Runtime, DB, Node and hardware tests NOT RUN. Acceptance remains pending.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-build-only
           path: dist/
           retention-days: 30

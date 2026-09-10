@@ -120,6 +120,16 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 		}
 		environment = []string{"INV_WORKSPACE_INPUT=" + string(input), "INV_WORKSPACE_ID=" + string(p.WorkspaceId)}
 	}
+	if p.Terminal != nil {
+		if p.WorkspaceInput == nil || image.Config.Labels["ai.saintvision.terminal"] != "pty-v1" {
+			return "", errors.New("NODE-0090: approved terminal image required")
+		}
+		terminal, err := json.Marshal(p.Terminal)
+		if err != nil {
+			return "", err
+		}
+		environment = append(environment, "INV_TERMINAL_SPEC="+string(terminal), "INV_TERMINAL_COMMAND="+string(r.Claim.CommandId))
+	}
 	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
 	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
 		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
@@ -149,7 +159,7 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	// match exactly; duplicates or unexpected Workspace variables are rejected.
 	workspaceEnv := []string{}
 	for _, v := range actual.Config.Env {
-		if strings.HasPrefix(v, "INV_WORKSPACE_") {
+		if strings.HasPrefix(v, "INV_WORKSPACE_") || strings.HasPrefix(v, "INV_TERMINAL_") {
 			workspaceEnv = append(workspaceEnv, v)
 		}
 	}

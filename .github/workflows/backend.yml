@@ -6,6 +6,7 @@ permissions:
   contents: read
 jobs:
   backend:
+    if: github.head_ref != 'agent/codex/workspace-bridge' && github.ref_name != 'agent/codex/workspace-bridge'
     runs-on: ubuntu-latest
 
     # Both sides of the 3.13 dataclass/slots change. The first CI run failed

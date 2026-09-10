@@ -841,6 +841,227 @@ class ContainmentApprovalView(BaseModel):
     requiredApprovals: Literal[2]
 
 
+class WorkspaceFileEdit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    dataBase64: constr(max_length=43692) | None
+    executable: bool
+
+
+class WorkspaceEditInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: list[WorkspaceFileEdit] = Field(..., max_length=128, min_length=1)
+
+
+class WorkspaceEditView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    revision: conint(ge=0, le=9007199254740991)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    snapshot: WorkspaceSnapshot
+
+
+class TerminalSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    maxInputBytes: conint(ge=1, le=65536)
+    maxOutputBytes: conint(ge=1, le=65536)
+
+
+class Operation3(StrEnum):
+    poll = 'poll'
+    input = 'input'
+    resize = 'resize'
+
+
+class TerminalFrameInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    operation: Operation3
+    dataBase64: constr(max_length=1368)
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeTerminalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    permit: SignedNodePermit
+    frame: TerminalFrameInput
+
+
+class NodeTerminalResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    dataBase64: constr(max_length=5464)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class TerminalTicketInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+
+
+class TerminalTicketResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ticket: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    sessionId: UUID
+    websocketPath: constr(max_length=500)
+
+
+class Mode(StrEnum):
+    pull = 'pull'
+    push = 'push'
+
+
+class RemoteGitProposalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class RemoteGitVoteInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    decision: Decision
+
+
+class RemoteGitFileAddition(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    contents: constr(max_length=43692)
+
+
+class RemoteGitFileDeletion(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+
+
+class RemoteGitChanges(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    additions: list[RemoteGitFileAddition] = Field(..., max_length=128)
+    deletions: list[RemoteGitFileDeletion] = Field(..., max_length=128)
+
+
+class RemoteGitProposal(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    repository: constr(max_length=300)
+    branch: constr(max_length=200)
+    repositoryFingerprint: constr(pattern=r'^[0-9a-f]{64}$')
+    workspaceId: WorkspaceId
+    snapshotSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: RemoteGitChanges | None
+    operationId: UUID
+    requesterId: constr(max_length=200)
+    requesterPersonId: UUID
+    projectId: ProjectId
+    runId: RunId
+    checkoutId: UUID
+    recoveryEpoch: UUID
+    gateVersion: conint(ge=0, le=9007199254740991)
+    expiresAt: AwareDatetime
+
+
+class RemoteGitVoteView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    actorId: constr(max_length=200)
+    decision: Decision
+
+
+class RemoteGitObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    revision: conint(ge=1, le=9007199254740991) | None = None
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Phase(StrEnum):
+    pending = 'pending'
+    rejected = 'rejected'
+    dispatched = 'dispatched'
+    completed = 'completed'
+
+
+class RemoteGitView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operationId: UUID
+    projectId: ProjectId
+    runId: RunId
+    phase: Phase
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    requiredApprovals: Literal[2]
+    votes: list[RemoteGitVoteView] = Field(..., max_length=32)
+    proposal: RemoteGitProposal
+    snapshot: WorkspaceSnapshot
+    result: RemoteGitObservation | None
+
+
+class TerminalBrowserOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    text: constr(max_length=131072)
+    outputMode: Literal['redacted-complete-lines']
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -856,6 +1077,8 @@ class WorkloadSpec(BaseModel):
     command: list[str] = Field(..., min_length=1)
     timeoutSeconds: conint(ge=1, le=9007199254740991)
     workspaceResume: WorkspaceResumeRef | None = None
+    targetNodeId: NodeId | None = None
+    terminal: TerminalSpec | None = None
 
 
 class SandboxLaunchSpec(BaseModel):
@@ -880,6 +1103,7 @@ class SandboxLaunchSpec(BaseModel):
     privileged: Literal[False]
     hostAccess: Literal[False]
     workspaceInput: WorkspaceInput | None = None
+    terminal: TerminalSpec | None = None
 
 
 class NodeExecutionPermit(BaseModel):

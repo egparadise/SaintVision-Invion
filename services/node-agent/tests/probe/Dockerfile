@@ -5,5 +5,6 @@ COPY git-root/ /
 LABEL ai.saintvision.supervisor="deadline-v1"
 LABEL ai.saintvision.output="bounded-streams-v1"
 LABEL ai.saintvision.workspace="snapshot-tmpfs-v1"
+LABEL ai.saintvision.terminal="pty-v1"
 USER 65532:65532
 ENTRYPOINT ["/inv-supervisor"]

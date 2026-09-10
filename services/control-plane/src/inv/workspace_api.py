@@ -46,6 +46,16 @@ class RestrictedWorkspaceRuntime:
         self.db, self.profile, self.node = database, profile, node
         self.resources, self.signing_key = dict(resources), signing_key
         self.policy_version, self.client = policy_version, client
+        self.destinations = {}
+
+    def for_workload(self, workload):
+        target = workload.get("targetNodeId", self.node.node_id)
+        if target == self.node.node_id:
+            return self
+        destination = self.destinations.get(target)
+        if destination is None or destination.node.tenant_id != self.node.tenant_id:
+            raise DomainError("AUTH-0030", "Target Node is not configured for this Workspace", 403)
+        return destination
 
     def policy(self, principal, workload, *, for_approval=False):
         if (
@@ -55,6 +65,10 @@ class RestrictedWorkspaceRuntime:
             raise DomainError("AUTH-0011", "Configured Workspace tenant differs", 403)
         intent = deepcopy(workload)
         intent.pop("workspaceResume", None)
+        if intent.pop("terminal", None) is not None and (
+            not self.profile.allow_terminal or "workspaceResume" not in workload
+        ):
+            raise DomainError("SANDBOX-0002", "Explicit frozen terminal policy required", 403)
         compile_launch(intent, self.profile)
         now = datetime.now(timezone.utc)
         return CurrentPolicy(
@@ -118,12 +132,13 @@ class WorkspaceAPI:
         self.control.grant(conn, principal, project, "can_request")
         return run
 
-    def _node_membership(self, conn, project, *, lock=False):
+    def _node_membership(self, conn, project, *, lock=False, runtime=None):
         # Preflight is read-only. The final row lock follows admission's Node
         # locks, matching placement/provisioning; failure rolls admission back.
         query = "SELECT enabled FROM inv.project_nodes WHERE project_id=%s AND node_id=%s"
         row = conn.execute(
-            query + (" FOR SHARE" if lock else ""), (project, self.runtime.node.node_id)
+            query + (" FOR SHARE" if lock else ""),
+            (project, (runtime or self.runtime).node.node_id),
         ).fetchone()
         if not row or not row["enabled"]:
             raise DomainError("AUTH-0030", "Project Node membership unavailable", 403)
@@ -173,7 +188,9 @@ class WorkspaceAPI:
                     }
                 ),
             )
-            policy = self.runtime.policy(principal, frozen["workload"], for_approval=True)
+            policy = self.runtime.for_workload(frozen["workload"]).policy(
+                principal, frozen["workload"], for_approval=True
+            )
             approval = ApprovalStore(bound).request(
                 principal,
                 run_id,
@@ -249,9 +266,10 @@ class WorkspaceAPI:
             if prior is not None:
                 return prior
             frozen = self._frozen(conn, project, run_id, data["resumeId"])
-            self._node_membership(conn, project)
-        capabilities = self.runtime.observe()
-        policy = self.runtime.policy(principal, frozen["workload"])
+            runtime = self.runtime.for_workload(frozen["workload"])
+            self._node_membership(conn, project, runtime=runtime)
+        capabilities = runtime.observe()
+        policy = runtime.policy(principal, frozen["workload"])
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.ledger._ledger(
                 conn, principal, project, "workspace.api.enqueue", key, payload
@@ -288,17 +306,17 @@ class WorkspaceAPI:
                 key="workspace-api:" + data["resumeId"],
             )
             WorkspaceResume(bound, self.working).enqueue(
-                self.runtime.node,
+                runtime.node,
                 command,
                 frozen["workload"],
-                self.runtime.allocations(frozen["workload"]),
-                self.runtime.profile,
+                runtime.allocations(frozen["workload"]),
+                runtime.profile,
                 policy=policy,
                 runtime=capabilities,
-                signing_key=self.runtime.signing_key,
+                signing_key=runtime.signing_key,
                 key="workspace-api:" + data["resumeId"],
             )
-            self._node_membership(conn, project, lock=True)
+            self._node_membership(conn, project, lock=True, runtime=runtime)
             # Accepted into the durable queue; only the worker/Node can start it.
             result = {
                 "resumeId": data["resumeId"],

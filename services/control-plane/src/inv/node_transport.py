@@ -96,13 +96,20 @@ class NodeTLSClient:
         validate_contract("NodeChunkInput", request)
         return self._request(channel, request, "/v1/objects/read", "NodeChunkResult")
 
-    def _request(self, channel, permit, path, response_contract):
+    def terminal_frame(self, channel, request):
+        validate_contract("NodeTerminalInput", request)
+        return self._request(
+            channel, request, "/v1/terminals/frame", "NodeTerminalResult", timeout=3
+        )
+
+    def _request(self, channel, permit, path, response_contract, *, timeout=None):
         body = json.dumps(permit, separators=(",", ":"), allow_nan=False).encode()
         if len(body) > 2 * 1024 * 1024:
             raise DomainError("NODE-0031", "Permit exceeds limit", 422)
         host, port = endpoint_parts(channel.endpoint)
-        conn = OneConnection(host, port, context=self.context, timeout=self.timeout)
-        deadline = monotonic() + self.timeout
+        timeout = self.timeout if timeout is None else min(timeout, self.timeout)
+        conn = OneConnection(host, port, context=self.context, timeout=timeout)
+        deadline = monotonic() + timeout
         wire_socket = [None]
         response = None
 
@@ -115,7 +122,7 @@ class NodeTLSClient:
                     pass
                 conn.close()
 
-        timer = Timer(self.timeout, abort)
+        timer = Timer(timeout, abort)
         timer.daemon = True
         timer.start()
         try:

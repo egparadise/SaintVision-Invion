@@ -17,7 +17,6 @@ from .errors import DomainError
 from .leases import lock_run
 from .runs import public, event
 from .snapshots import identity
-from .workspace_files import PrivateTree
 from .workspace_resume import bounded_snapshot
 
 
@@ -238,13 +237,9 @@ class BusinessHandoff:
                 checkout["content_hash"],
                 checkout["filesystem_identity"],
             )
-            source = PrivateTree(self.workspace.working.root / checkout["generation"] / "files")
-            if source.identity != (
-                self.workspace.working.identity[0],
-                checkout["filesystem_identity"][-1],
-            ):
-                raise DomainError("STORE-0022", "Checkout files were replaced")
-            raw = source.capture(workspace_id)
+            from .workspace_editor import checkout_snapshot
+
+            raw, _ = checkout_snapshot(conn, self.workspace.working, root_fd, checkout)
             bounded_snapshot(raw, workspace_id)
             lock_id = str(uuid4())
             conn.execute(

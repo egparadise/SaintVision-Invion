@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"flag"
 	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire"
 	"github.com/egparadise/SaintVision-Invion/services/node-agent/workspace"
 	"os"
 	"os/exec"
@@ -16,7 +17,12 @@ import (
 	"time"
 )
 
-func main() { os.Exit(run()) }
+func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--terminal-frame" {
+		os.Exit(terminalFrame())
+	}
+	os.Exit(run())
+}
 func run() int {
 	var expiry string
 	var seconds int
@@ -65,8 +71,27 @@ func run() int {
 	child.Stdout, child.Stderr = stdout, stderr
 	child.WaitDelay = 100 * time.Millisecond
 	child.Env = []string{"PATH=/usr/bin:/bin", "HOME=/workspace"}
+	var terminal *terminalPTY
+	if raw := os.Getenv("INV_TERMINAL_SPEC"); raw != "" {
+		var spec contracts.TerminalSpec
+		command := contracts.CommandId(os.Getenv("INV_TERMINAL_COMMAND"))
+		encoded, _ := json.Marshal(command)
+		if input == nil || wire.Validate("TerminalSpec", []byte(raw)) != nil || wire.Validate("CommandId", encoded) != nil || json.Unmarshal([]byte(raw), &spec) != nil {
+			return 125
+		}
+		terminal, err = openTerminal(spec, command, child)
+		if err != nil {
+			return 125
+		}
+		defer terminal.close()
+	}
+	os.Unsetenv("INV_TERMINAL_SPEC")
+	os.Unsetenv("INV_TERMINAL_COMMAND")
 	if err := child.Start(); err != nil {
 		return 126
+	}
+	if terminal != nil {
+		terminal.start(stdout)
 	}
 	completed := make(chan error, 1)
 	go func() { completed <- child.Wait() }()
@@ -77,6 +102,12 @@ func run() int {
 	defer signal.Stop(signals)
 	select {
 	case err := <-completed:
+		if terminal != nil && err != nil {
+			_ = syscall.Kill(-1, syscall.SIGKILL)
+			if terminal.finish() != nil {
+				return 122
+			}
+		}
 		if input != nil && err == nil {
 			// Private PID namespace: no descendant may mutate files during capture.
 			if err := syscall.Kill(-1, syscall.SIGKILL); err != nil && err != syscall.ESRCH {
@@ -94,6 +125,9 @@ func run() int {
 				if err != nil {
 					return 125
 				}
+			}
+			if terminal != nil && terminal.finish() != nil {
+				return 122
 			}
 			snapshot, err := workspace.Capture("/workspace", workspaceID)
 			if err != nil {

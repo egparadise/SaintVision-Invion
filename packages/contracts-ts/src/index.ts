@@ -76,6 +76,8 @@ export interface WorkloadSpec {
   command: Array<string>;
   timeoutSeconds: number;
   workspaceResume?: WorkspaceResumeRef;
+  targetNodeId?: NodeId;
+  terminal?: TerminalSpec;
 }
 
 export interface ResourceLease {
@@ -260,6 +262,7 @@ export interface SandboxLaunchSpec {
   privileged: false;
   hostAccess: false;
   workspaceInput?: WorkspaceInput;
+  terminal?: TerminalSpec;
 }
 
 export interface ExecutionClaim {
@@ -615,4 +618,150 @@ export interface ContainmentApprovalView {
   status: "pending" | "approved" | "rejected" | "consumed";
   expiresAt: string;
   requiredApprovals: 2;
+}
+
+export interface WorkspaceFileEdit {
+  path: string;
+  expectedSha256: (string | null);
+  dataBase64: (string | null);
+  executable: boolean;
+}
+
+export interface WorkspaceEditInput {
+  expectedRevision: number;
+  expectedSha256: string;
+  changes: Array<WorkspaceFileEdit>;
+}
+
+export interface WorkspaceEditView {
+  checkoutId: string;
+  revision: number;
+  sha256: string;
+  snapshot: WorkspaceSnapshot;
+}
+
+export interface TerminalSpec {
+  sessionId: string;
+  rows: number;
+  columns: number;
+  maxInputBytes: number;
+  maxOutputBytes: number;
+}
+
+export interface TerminalFrameInput {
+  sequence: number;
+  cursor: number;
+  operation: "poll" | "input" | "resize";
+  dataBase64: string;
+  rows: number;
+  columns: number;
+  nonce: string;
+}
+
+export interface NodeTerminalInput {
+  permit: SignedNodePermit;
+  frame: TerminalFrameInput;
+}
+
+export interface NodeTerminalResult {
+  commandId: CommandId;
+  sessionId: string;
+  sequence: number;
+  cursor: number;
+  dataBase64: string;
+  nonce: string;
+}
+
+export interface TerminalTicketInput {
+  commandId: CommandId;
+}
+
+export interface TerminalTicketResult {
+  ticket: string;
+  expiresAt: string;
+  sessionId: string;
+  websocketPath: string;
+}
+
+export interface RemoteGitProposalInput {
+  alias: string;
+  mode: "pull" | "push";
+  commit: string;
+  expectedRevision: number;
+  expectedSha256: string;
+}
+
+export interface RemoteGitVoteInput {
+  contentDigest: string;
+  decision: "approve" | "reject";
+}
+
+export interface RemoteGitFileAddition {
+  path: string;
+  contents: string;
+}
+
+export interface RemoteGitFileDeletion {
+  path: string;
+}
+
+export interface RemoteGitChanges {
+  additions: Array<RemoteGitFileAddition>;
+  deletions: Array<RemoteGitFileDeletion>;
+}
+
+export interface RemoteGitProposal {
+  alias: string;
+  mode: "pull" | "push";
+  commit: string;
+  expectedRevision: number;
+  expectedSha256: string;
+  repository: string;
+  branch: string;
+  repositoryFingerprint: string;
+  workspaceId: WorkspaceId;
+  snapshotSha256: string;
+  changes: (RemoteGitChanges | null);
+  operationId: string;
+  requesterId: string;
+  requesterPersonId: string;
+  projectId: ProjectId;
+  runId: RunId;
+  checkoutId: string;
+  recoveryEpoch: string;
+  gateVersion: number;
+  expiresAt: string;
+}
+
+export interface RemoteGitVoteView {
+  actorId: string;
+  decision: "approve" | "reject";
+}
+
+export interface RemoteGitObservation {
+  commit: string;
+  revision?: number;
+  sha256: string;
+}
+
+export interface RemoteGitView {
+  operationId: string;
+  projectId: ProjectId;
+  runId: RunId;
+  phase: "pending" | "rejected" | "dispatched" | "completed";
+  contentDigest: string;
+  expiresAt: string;
+  requiredApprovals: 2;
+  votes: Array<RemoteGitVoteView>;
+  proposal: RemoteGitProposal;
+  snapshot: WorkspaceSnapshot;
+  result: (RemoteGitObservation | null);
+}
+
+export interface TerminalBrowserOutput {
+  sessionId: string;
+  sequence: number;
+  cursor: number;
+  text: string;
+  outputMode: "redacted-complete-lines";
 }
