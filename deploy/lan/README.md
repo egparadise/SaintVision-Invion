@@ -58,8 +58,11 @@ It has no upload/enrollment/signing endpoint and never serves private state.
    starts the Node container with a durable named volume. It preserves existing
    containers and stops on container name conflicts. A retry can reuse an exact
    firewall rule and an unused volume bearing this Node's ownership label; the
-   Node still validates the stored identity and epoch. Keys are copied with private
-   Linux file modes. Docker exposes the port directly on the Windows worker IP;
+   Node still validates the stored identity and epoch. Keys are copied through an
+   in-memory archive with explicit container UID/GID 0:0 and permissions 600;
+   their bytes and metadata are read back before startup. Host private keys are
+   unchanged. Startup checks that the process remains running for five seconds.
+   Docker exposes the port directly on the Windows worker IP;
    WSL portproxy and global network-profile changes are unnecessary.
 5. Run `lan_pilot.py --state <state> status` on the server. Completion requires
    `observed: true`, a current persisted snapshot, and the Node online through
@@ -73,6 +76,18 @@ inspected content ID. It does not assume an image ID from a different store can
 address the imported image. This check precedes volume/container creation.
 Installer metadata upgrades compare the fixed identity fields and preserve the
 worker private key. No Docker image-store setting is changed during recovery.
+
+For the earlier installer failure `NODE-0005: pinned public key unavailable`,
+first stop the assigned Node and inspect `signer.pub` metadata without printing
+the private key. An owner of 1000 with mode 600 prevents the capability-dropped
+root process from reading it. Obtain and independently verify the corrected
+bundle, extract it, then run `Repair-Worker.ps1` on that worker. Repair requires
+the assigned stopped container, matching Node/tenant/epoch and credential paths,
+and its writable owned state volume. It recopies only the five existing local
+credential/configuration files with explicit ownership and verifies their bytes;
+it preserves the Node key, journal, image, volume and container configuration.
+It starts the existing container and checks process stability. The operator must
+still confirm an actual mTLS observation from the server before calling it connected.
 
 CA lifetime is seven days; peer certificates and the initial allowlist last at
 most six days. Expiry fails closed. This first bootstrap intentionally does not

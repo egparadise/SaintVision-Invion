@@ -41,9 +41,6 @@ docker create --name "$name" --label "ai.saintvision.node=$node_id" \
     --state /state/journal --public-key /state/signer.pub \
     --tls-cert /state/node-cert.pem --tls-key /state/node-key.pem \
     --client-ca /state/ca.pem --peer-policy /state/peer-policy.json >/dev/null
-for file in node-cert.pem node-key.pem ca.pem signer.pub peer-policy.json; do
-    chmod 600 "$file"
-    docker cp "$file" "$name:/state/$file"
-done
+python3 worker_config.py install-files "$name" .
 docker start "$name"
-echo 'Node container started. Connection is complete only after the server verifies mTLS observations.'
+python3 worker_config.py check-running "$name"
