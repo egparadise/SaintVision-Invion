@@ -560,6 +560,8 @@ type BusinessBindingView struct {
     CommandId *string `json:"commandId"`
     Attempt *int64 `json:"attempt"`
     StopReceiptId *string `json:"stopReceiptId"`
+    DeliveryPhase *string `json:"deliveryPhase"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
     EvidenceId *EvidenceId `json:"evidenceId"`
     ReleaseAllowed bool `json:"releaseAllowed"`
     ResourceReleasePending bool `json:"resourceReleasePending"`

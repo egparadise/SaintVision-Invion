@@ -740,6 +740,12 @@ class State(StrEnum):
     abandoned = 'abandoned'
 
 
+class DeliveryPhase(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -902,6 +908,8 @@ class BusinessBindingView(BaseModel):
     commandId: UUID | None
     attempt: conint(ge=1, le=9007199254740991) | None
     stopReceiptId: UUID | None
+    deliveryPhase: DeliveryPhase | None
+    executionConfirmed: bool
     evidenceId: EvidenceId | None
     releaseAllowed: bool
     resourceReleasePending: bool

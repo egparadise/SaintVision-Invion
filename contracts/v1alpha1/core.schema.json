@@ -2427,6 +2427,24 @@
             }
           ]
         },
+        "deliveryPhase": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "queued",
+                "uncertain",
+                "stopped"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executionConfirmed": {
+          "type": "boolean"
+        },
         "evidenceId": {
           "anyOf": [
             {
@@ -2476,6 +2494,8 @@
         "commandId",
         "attempt",
         "stopReceiptId",
+        "deliveryPhase",
+        "executionConfirmed",
         "evidenceId",
         "releaseAllowed",
         "resourceReleasePending",

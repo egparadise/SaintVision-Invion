@@ -162,12 +162,14 @@ def test_binding_tracks_real_quorum_queue_receipt_evidence_and_safe_unlock(busin
     assert accepted.status_code == 202, accepted.text
     queued = a.http.get(a.binding_url, headers=a.headers()).json()
     assert queued["state"] == "queued" and not queued["releaseAllowed"] and active(a) == 2
+    assert queued["deliveryPhase"] == "queued" and not queued["executionConfirmed"]
     assert release(a).status_code == 409
     worker = DeliveryWorker(a.e.db, a.delivery, output_provider=a.storage.provider)
     assert worker.once(a.e.tenant) == "stopped"
     result = a.http.get(a.binding_url, headers=a.headers()).json()
     assert result["state"] == "settled" and result["run"]["state"] == "succeeded"
     assert result["attempt"] == 2 and result["stopReceiptId"] and result["evidenceId"]
+    assert result["deliveryPhase"] == "stopped" and result["executionConfirmed"]
     assert result["releaseAllowed"] and result["releasedAt"] and active(a) == 0
     with a.e.db.transaction(a.e.tenant) as conn:
         assert (

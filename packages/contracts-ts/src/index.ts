@@ -558,6 +558,8 @@ export interface BusinessBindingView {
   commandId: (string | null);
   attempt: (number | null);
   stopReceiptId: (string | null);
+  deliveryPhase: ("queued" | "uncertain" | "stopped" | null);
+  executionConfirmed: boolean;
   evidenceId: (EvidenceId | null);
   releaseAllowed: boolean;
   resourceReleasePending: boolean;

@@ -119,7 +119,7 @@ def status(conn, binding, lock, run):
     receipt = completion = attempt = None
     if delivery:
         receipt = conn.execute(
-            "SELECT receipt_id FROM inv.node_stop_receipts WHERE command_id=%s",
+            "SELECT receipt_id,envelope FROM inv.node_stop_receipts WHERE command_id=%s",
             (delivery["command_id"],),
         ).fetchone()
         completion = conn.execute(
@@ -167,6 +167,8 @@ def status(conn, binding, lock, run):
         "state": state,
         "run": public(run),
         "commandId": str(delivery["command_id"]) if delivery else None,
+        "deliveryPhase": delivery["phase"] if delivery else None,
+        "executionConfirmed": bool(receipt and receipt["envelope"]["processStarted"]),
         "attempt": attempt["attempt"] if attempt else None,
         "stopReceiptId": str(receipt["receipt_id"]) if receipt else None,
         "evidenceId": completion["evidence_id"] if completion else None,
