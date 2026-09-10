@@ -450,3 +450,40 @@ type WorkspaceEnqueueInput struct {
     ApprovalId ApprovalId `json:"approvalId"`
     ExpectedVersion int64 `json:"expectedVersion"`
 }
+
+type ControlRunView struct {
+    RunId RunId `json:"runId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    Attempt int64 `json:"attempt"`
+}
+
+type WorkspaceFrozenFile struct {
+    Path string `json:"path"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Sha256 ActionDigest `json:"sha256"`
+}
+
+type WorkspacePrepareResult struct {
+    ResumeId string `json:"resumeId"`
+    Workload WorkloadSpec `json:"workload"`
+    Approval ApprovalView `json:"approval"`
+    Run ControlRunView `json:"run"`
+}
+
+type WorkspaceResumptionView struct {
+    ResumeId string `json:"resumeId"`
+    Workload WorkloadSpec `json:"workload"`
+    Run ControlRunView `json:"run"`
+    Approval *ApprovalView `json:"approval"`
+    FrozenFiles []WorkspaceFrozenFile `json:"frozenFiles"`
+}
+
+type WorkspaceEnqueueResult struct {
+    ResumeId string `json:"resumeId"`
+    RunId RunId `json:"runId"`
+    CommandId string `json:"commandId"`
+    Accepted bool `json:"accepted"`
+}

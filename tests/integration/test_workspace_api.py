@@ -247,3 +247,16 @@ def test_unapproved_enqueue_is_not_dispatched(workspace_http):
     assert response.status_code == 403, response.text
     assert active(a) == 0 and count(a, "execution_deliveries") == 1
     assert count(a, "approval_dispatches") == 1
+
+
+def test_denied_profile_does_not_strand_a_frozen_attempt(workspace_http):
+    a = workspace_http
+    denied = deepcopy(a.prepare_input)
+    denied["workload"]["imageDigest"] = "sha256:" + "b" * 64
+    response = a.http.post(a.url + "/resume/prepare", headers=a.headers(), json=denied)
+    assert response.status_code == 403, response.text
+    assert count(a, "workspace_resumptions") == 0
+    assert count(a, "approval_requests") == 1 and active(a) == 0
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "recovering"
+    # The failed attempt must not consume the resume ID or idempotency key.
+    assert prepare(a)["run"]["state"] == "awaiting_approval"

@@ -159,6 +159,7 @@ class WorkspaceAPI:
                 "approval": approval,
                 "run": public(lock_run(conn, run_id, project)),
             }
+            validate_contract("WorkspacePrepareResult", result)
             return self.ledger._save(conn, project, "workspace.api.prepare", key, result)
 
     @staticmethod
@@ -181,7 +182,7 @@ class WorkspaceAPI:
                 (run_id, action_digest(row["workload"])),
             ).fetchone()
             manifest, _ = decode_snapshot(bytes(row["snapshot"]), row["workspace_id"])
-            return {
+            result = {
                 "resumeId": resume_id,
                 "workload": row["workload"],
                 "run": public(run),
@@ -190,6 +191,8 @@ class WorkspaceAPI:
                     {k: f[k] for k in ("path", "sizeBytes", "sha256")} for f in manifest["files"]
                 ],
             }
+            validate_contract("WorkspaceResumptionView", result)
+            return result
 
     def enqueue(self, principal, project, run_id, data, key):
         validate_contract("WorkspaceEnqueueInput", data)
@@ -248,4 +251,5 @@ class WorkspaceAPI:
                 "commandId": command["commandId"],
                 "accepted": True,
             }
+            validate_contract("WorkspaceEnqueueResult", result)
             return self.ledger._save(conn, project, "workspace.api.enqueue", key, result)
