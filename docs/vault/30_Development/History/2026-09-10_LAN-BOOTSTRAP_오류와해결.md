@@ -1,10 +1,10 @@
 ---
 doc_id: "ERR-LAN-BOOTSTRAP-20260910"
 title: "2026-09-10 LAN-BOOTSTRAP 오류와 해결"
-version: "1.1.0"
+version: "1.2.0"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-11T00:08:08+09:00"
+updated: "2026-09-11T00:33:25+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "error", "lan"]
@@ -24,5 +24,11 @@ tags: ["saintvision", "error", "lan"]
 8. 설치 재시도 identity: 기존 manifest 비교가 `agentImage`까지 불변으로 취급해 수정 bundle의 `Existing Node identity differs` 오류가 발생했다. 이전·새 bundle에서 Node/tenant/epoch/IP/port가 같고 image만 다른 것을 확인했다. 이미지 검증은 유지하며 지속 identity에서 소프트웨어 image ID를 제외했다. 회귀 시험 통과, 사용자의 owned volume 재사용 및 container 생성 확인. `--reuse-image`로 설치 스크립트 수정 시 Go VCS metadata 때문에 이미지를 다시 만드는 것을 피한다.
 9. 공개키 읽기 권한: 2026-09-11 사용자 출력에서 signer.pub는 32 bytes, UID/GID 1000/1000, mode 600이었고 container user는 root였다. `--cap-drop ALL`인 Node가 읽지 못해 `NODE-0005`로 재시작했다. 같은 조건을 별도 로컬 컨테이너에서 재현하고 UID/GID 0/0·mode 600으로 명시한 tar를 `docker cp -a`로 전달해 해결했다. 5개 파일의 내용과 소유권 readback, 실제 strict mTLS·snapshot 검증 통과. 수정 SHA `e4459b0bcdd91a614f8c7f0826ef59af7636e51d`; 물리 상대 PC의 복구 결과는 별도 확인이 필요하다.
 10. 복구 명령 복사: tar 파이프라인이 복사 중 여러 줄로 나뉘어 `option requires an argument -- f`, `must specify at least one container source`가 발생했다. 복구 성공으로 처리하지 않았다. 긴 셸 명령 대신 independently verified bundle에 `Repair-Worker.ps1`을 포함했고 짧은 Windows 실행 명령으로 안내했다. 개인키는 상대 PC 안에서만 처리한다.
+11. 실제 화면 API 초안: 존재하지 않는 node_channels.revoked_at을 조회해 실패했다. 실제 공통 계약의 enabled/certificate_not_after 및 snapshot channel_version 검사로 수정하고 실측 DB 조회를 확인했다.
+12. 실행 시험 launch 초안: privileged/hostAccess 명시 필드 누락으로 NodeExecutionPermit schema 검증 4건 실패. 두 값을 false로 명시해 네 모드 모두 통과했다. 실제 원격 실행 성공과 구분한다.
+13. 새 worktree Obsidian state 복사: .work 폴더가 없어 Copy-Item 실패. 해당 폴더를 생성하고 기존 baseline state를 복사한 뒤 check/apply/check를 수행했다. 기존 Obsidian 문서를 강제로 덮어쓰지 않았다.
+14. Orca 브라우저: 탭 생성 후 `runtime_unavailable: The Orca runtime closed the connection before responding`으로 snapshot/screenshot 실패. 사용자 Orca는 재시작하지 않았고 별도 Edge/Playwright로 실제 화면·상태·오류 복구 검증을 완료했다. 브라우저 실패 원인 자체는 확정하지 않는다.
 
 2026-09-11 00:07 KST 사용자 복구 실행 성공 후 실제 상대 PC의 mTLS snapshot과 DB online 전이를 확인했다. 00:08:08 KST 연속 10회 관측 성공까지 기록했다. 공개키 오류 및 두 PC 관측 연결은 해결됐으며, 실제 업무 실행·재부팅 복구·웹 인증 구성·CI/독립 검토는 후속이다.
+
+후속 실제 화면과 시험 준비는 [[2026-09-11_LAN-LIVE_Codex_실제화면과시험준비]]에 기록했다. 원격 실행 준비 결과는 아직 대기 중이다.
