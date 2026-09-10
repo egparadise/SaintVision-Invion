@@ -1,5 +1,7 @@
 -- Historical source_attempt equalled the recovering attempt. Keep that cursor
 -- and record older checkpoint provenance separately for newly prepared copies.
+ALTER TABLE inv.approval_requests DROP CONSTRAINT approval_requests_tenant_id_run_id_key;
+ALTER TABLE inv.approval_requests ADD UNIQUE(tenant_id,run_id,bound_run_version);
 ALTER TABLE inv.workspace_checkouts ADD COLUMN checkpoint_attempt integer CHECK(checkpoint_attempt BETWEEN 1 AND source_attempt);
 ALTER TABLE inv.workspace_checkouts ADD UNIQUE(tenant_id,project_id,run_id,checkout_id,workspace_id,source_attempt,recovery_epoch);
 CREATE TABLE inv.workspace_resumptions (

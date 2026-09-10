@@ -58,7 +58,9 @@ jobs:
           echo "INV_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-node-test:$GITHUB_SHA")" >> "$GITHUB_ENV"
           echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"
           echo "INV_RUN_NODE_TESTS=1" >> "$GITHUB_ENV"
-      - run: python -m pytest --junitxml=dist/core-tests.xml
+      - name: Verify Workspace recovery boundary first
+        run: python -m pytest tests/integration/test_workspace_resume.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45
       - name: Require executed integration evidence
         run: |
           python - <<'PY'

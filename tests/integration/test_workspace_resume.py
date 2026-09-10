@@ -293,7 +293,8 @@ def test_older_checkpoint_can_recover_failed_attempt_but_fourth_execution_is_den
     a = build_resume(remote, storage, tmp_path, "overflow")
     authorize(a); enqueue(a)
     second = a.queue.acquire(a.e.tenant)
-    a.delivery.deliver(a.node, second.envelope)
+    second_result = a.delivery.deliver(a.node, second.envelope)
+    assert second_result["receipt"]["exitCode"] == 122 and second_result["receipt"]["processStarted"]
     assert a.queue.finish(second) == "stopped" and active(a) == 0
     a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
     assert a.run["attempt"] == 2
@@ -307,7 +308,8 @@ def test_older_checkpoint_can_recover_failed_attempt_but_fourth_execution_is_den
     assert a.workload["workspaceResume"]["checkpointAttempt"] == 1
     authorize(a, prefix="third"); enqueue(a, key="third-enqueue")
     third = a.queue.acquire(a.e.tenant)
-    a.delivery.deliver(a.node, third.envelope)
+    third_result = a.delivery.deliver(a.node, third.envelope)
+    assert third_result["receipt"]["exitCode"] == 122 and third_result["receipt"]["processStarted"]
     assert a.queue.finish(third) == "stopped" and active(a) == 0
     a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
     assert a.run["attempt"] == 3 and count(a, "execution_attempts") == 3
