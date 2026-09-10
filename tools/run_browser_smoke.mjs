@@ -10,7 +10,8 @@
  *  7. Two-Person Approvals Nonce Verification (/v1/approvals/.../approve)
  *  8. Server-Sent Events (SSE) Telemetry Streaming Protocol (/v1/events)
  *  9. Interactive Sandboxed PTY Web Terminal WebSocket (/v1/terminal/ws)
- * 10. Operator Role Release Sign-Off Security Verification
+ * 10. Shard-I07 & ADR-040-043 Distributed Shard Lifecycle & Resource Reclamation
+ * 11. Workspace Resume & 3-Attempt Bound Lifecycle (ADR-044 / ADR-045)
  */
 
 import crypto from 'node:crypto';
@@ -359,6 +360,58 @@ async function runFullSmokeJourney() {
     const reclaimData = await reclaimRes.json();
     assert('Resource reclamation clears resourceReleasePending: false', reclaimData.resourceReleasePending === false);
     assert('All physical stops confirmed (allPhysicallyStopped: true)', reclaimData.allPhysicallyStopped === true);
+
+    // -------------------------------------------------------------------------
+    // 11. Workspace Resume & 3-Attempt Bound Lifecycle (ADR-044 / ADR-045)
+    // -------------------------------------------------------------------------
+    console.log('\n[Track 11] Workspace Resume & 3-Attempt Bound Lifecycle (ADR-044 / ADR-045):');
+
+    // 1. Initial state inspection
+    const testRunId = 'run_01JRECOVERING';
+    await fetch(`${BACKEND_URL}/v1/runs/${testRunId}/reset-recovering`, { method: 'POST' });
+    const initialResumeRes = await fetch(`${BACKEND_URL}/v1/runs/${testRunId}/resume`);
+    assert('GET /v1/runs/{id}/resume returns valid HTTP 200 ready_to_prepare', initialResumeRes.status === 200);
+    const initialResumeData = await initialResumeRes.json();
+    assert('Run is in recovering state with attempt 1', initialResumeData.state === 'recovering' && initialResumeData.attempt === 1);
+
+    // 2. Prepare resume: freezes manifest, generates L2 approval, binds next run version
+    const prepRes = await fetch(`${BACKEND_URL}/v1/runs/${testRunId}/resume/prepare`, { method: 'POST' });
+    assert('POST /v1/runs/{id}/resume/prepare returns HTTP 200', prepRes.status === 200);
+    const prepData = await prepRes.json();
+    assert('WorkspaceResumeSpec contains deterministic inputHash', typeof prepData.inputHash === 'string' && prepData.inputHash.startsWith('sha256:'));
+    assert('WorkspaceResumeSpec contains frozenFiles manifest (2 files)', Array.isArray(prepData.frozenFiles) && prepData.frozenFiles.length === 2);
+    assert('WorkspaceResumeSpec binds to next run version (boundRunVersion: 2)', prepData.boundRunVersion === 2);
+    assert('WorkspaceResumeSpec defines distinct nextStepId (step_02_infer)', prepData.nextStepId === 'step_02_infer');
+    assert('Associated L2 approval created', typeof prepData.approvalId === 'string' && prepData.approvalId.startsWith('apr_resume_'));
+
+    // 3. Negative test: Standalone resume disallowed for shard child/parent runs (ADR-044)
+    const shardResumeRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/resume/prepare`, { method: 'POST' });
+    assert('Shard parent run standalone resume prepare rejected with HTTP 400', shardResumeRes.status === 400);
+    const shardResumeProblem = await shardResumeRes.json();
+    assert('Returns RFC 9457 VAL-SHARD-RESUME-DISALLOWED Problem Details', shardResumeProblem.code === 'VAL-SHARD-RESUME-DISALLOWED');
+
+    // 4. Admission without approval rejected (ADR-044)
+    const unapprovedEnqueue = await fetch(`${BACKEND_URL}/v1/runs/${testRunId}/resume/enqueue`, { method: 'POST' });
+    assert('Enqueue without approved L2 status rejected with HTTP 400', unapprovedEnqueue.status === 400);
+    const unapprovedProblem = await unapprovedEnqueue.json();
+    assert('Returns RFC 9457 SEC-APPROVAL-REQUIRED Problem Details', unapprovedProblem.code === 'SEC-APPROVAL-REQUIRED');
+
+    // 5. Two-Person / L2 Approval resolution
+    const apprvRes = await fetch(`${BACKEND_URL}/v1/approvals/${prepData.approvalId}/approve`, { method: 'POST' });
+    assert('L2 Approval granted for resume preparation', apprvRes.status === 200);
+
+    // 6. Successful atomic enqueue and attempt increment
+    const enqRes = await fetch(`${BACKEND_URL}/v1/runs/${testRunId}/resume/enqueue`, { method: 'POST' });
+    assert('POST /v1/runs/{id}/resume/enqueue returns HTTP 200', enqRes.status === 200);
+    const enqData = await enqRes.json();
+    assert('Attempt count incremented from 1 to 2', enqData.attempt === 2);
+    assert('Run state transitions to running', enqData.state === 'running');
+
+    // 7. Attempt ceiling boundary enforcement (ADR-044: max 3 attempts)
+    const ceilingRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JRECOVERING_EXHAUSTED/resume/prepare`, { method: 'POST' });
+    assert('Resume prepare rejected when attempt >= maxAttempts (3) with HTTP 400', ceilingRes.status === 400);
+    const ceilingProblem = await ceilingRes.json();
+    assert('Returns RFC 9457 VAL-MAX-ATTEMPTS-EXCEEDED Problem Details', ceilingProblem.code === 'VAL-MAX-ATTEMPTS-EXCEEDED');
 
     // -------------------------------------------------------------------------
     // Summary Dossier

@@ -42,6 +42,23 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [isReclaiming, setIsReclaiming] = useState(false);
   const [isBulkCancelling, setIsBulkCancelling] = useState(false);
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
+  const [isPreparingResume, setIsPreparingResume] = useState(false);
+  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
+
+  const handlePrepareResume = async () => {
+    setIsPreparingResume(true);
+    try {
+      await apiClient(`/v1/runs/${run.id}/resume/prepare`, { method: 'POST' });
+      setResumeNotice(
+        `✓ ADR-044 Workspace 재개 준비 완료: 불변 스냅샷 해시가 고정되었으며 Attempt #${(run.attempt ?? 1) + 1} 승인 요청이 발행되었습니다.`
+      );
+      onRefreshRun?.();
+    } catch (e: any) {
+      alert(e.message || '재개 준비 실패');
+    } finally {
+      setIsPreparingResume(false);
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -121,16 +138,67 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             ← 목록으로
           </Button>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
-              Run 상세: <code>{run.id}</code>
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
+                Run 상세: <code>{run.id}</code>
+              </h2>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                  color: '#58a6ff',
+                }}
+              >
+                Attempt #{run.attempt ?? 1} / {run.maxAttempts ?? 3}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  backgroundColor:
+                    run.state === 'running'
+                      ? 'rgba(46, 160, 67, 0.2)'
+                      : run.state === 'recovering'
+                      ? 'rgba(217, 119, 6, 0.2)'
+                      : run.state === 'awaiting_approval'
+                      ? 'rgba(218, 54, 51, 0.2)'
+                      : 'rgba(110, 118, 129, 0.2)',
+                  color:
+                    run.state === 'running'
+                      ? '#3fb950'
+                      : run.state === 'recovering'
+                      ? '#d97706'
+                      : run.state === 'awaiting_approval'
+                      ? '#f85149'
+                      : 'var(--color-text-secondary)',
+                }}
+              >
+                {run.state.toUpperCase()}
+              </span>
+            </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
               {run.objective}
+              {run.frozenInputHash && (
+                <span style={{ marginLeft: '12px', color: '#58a6ff', fontFamily: 'monospace' }}>
+                  🔒 Frozen: {run.frozenInputHash.slice(0, 18)}... ({run.frozenInputSizeBytes ?? 0} B)
+                </span>
+              )}
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
+          {run.state === 'recovering' && (
+            <Button variant="primary" size="md" onClick={handlePrepareResume} disabled={isPreparingResume}>
+              {isPreparingResume ? '준비 중...' : '🚀 재개 Step 승인 준비 (ADR-044)'}
+            </Button>
+          )}
+
           {run.state === 'awaiting_approval' && onNavigateApproval && (
             <Button variant="danger" size="md" onClick={() => onNavigateApproval(run.id)}>
               🚨 승인 검토 이동
@@ -218,6 +286,61 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Workspace Recovery Banner (ADR-044 / ADR-045) */}
+      {run.state === 'recovering' && (
+        <div
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            border: '1px solid #f59e0b',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, color: '#b45309', fontSize: '0.875rem' }}>
+              🔄 워크스페이스 장애 복구 대기 (Workspace Recovering - ADR-044 / ADR-045)
+            </div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+              현재 RunAttempt: <strong>#{run.attempt ?? 1} / 최대 {run.maxAttempts ?? 3}회</strong>.
+              작업 공간의 체크포인트 상태를 불변 스냅샷으로 고정하고 새 L2 승인을 발행하여 다음 Step 실행으로 원자 전이할 수 있습니다.
+            </div>
+          </div>
+          <Button variant="primary" size="sm" onClick={handlePrepareResume} disabled={isPreparingResume}>
+            {isPreparingResume ? '고정 중...' : '다음 Step 승인 준비 (prepare)'}
+          </Button>
+        </div>
+      )}
+
+      {/* Resume Notice Banner */}
+      {resumeNotice && (
+        <div
+          style={{
+            padding: '12px 18px',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            border: '1px solid #10b981',
+            color: '#047857',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{resumeNotice}</span>
+          {onNavigateApproval && (
+            <Button variant="secondary" size="sm" onClick={() => onNavigateApproval(run.id)}>
+              승인 화면으로 이동 →
+            </Button>
+          )}
         </div>
       )}
 

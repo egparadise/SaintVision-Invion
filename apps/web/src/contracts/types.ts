@@ -143,6 +143,28 @@ export interface RunItem {
   allSucceeded?: boolean;
   aggregateEvidenceId?: string;
   manifestDigest?: string;
+  maxAttempts?: number;
+  boundRunVersion?: number;
+  frozenInputHash?: string;
+  frozenInputSizeBytes?: number;
+}
+
+export interface WorkspaceResumeSpec {
+  resumeId: string;
+  runId: string;
+  checkoutId: string;
+  sourceAttempt: number;
+  checkpointAttempt: number;
+  sourceStepId: string;
+  nextStepId: string;
+  inputHash: string;
+  inputSizeBytes: number;
+  boundRunVersion: number;
+  maxAttempts: number;
+  currentAttempt: number;
+  frozenFiles: Array<{ path: string; size: number; sha256: string }>;
+  approvalId?: string;
+  createdAt: string;
 }
 
 export interface ShardExecutionItem {

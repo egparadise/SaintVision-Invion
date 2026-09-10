@@ -342,6 +342,34 @@ RUNS: List[Dict[str, Any]] = [
         "updatedAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=50)).isoformat(),
         "version": 1,
     },
+    {
+        "id": "run_01JRECOVERING",
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "SaintVision PACS 워크스페이스 장애 복구 및 Step 재개 (ADR-044/045)",
+        "state": "recovering",
+        "requestedBy": "usr_developer_01",
+        "attempt": 1,
+        "maxAttempts": 3,
+        "boundRunVersion": 1,
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=20)).isoformat(),
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "version": 1,
+    },
+    {
+        "id": "run_01JRECOVERING_EXHAUSTED",
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "재시도 한도(3회)가 소진된 워크스페이스 복구 작업 (ADR-044 한계 시험)",
+        "state": "recovering",
+        "requestedBy": "usr_developer_01",
+        "attempt": 3,
+        "maxAttempts": 3,
+        "boundRunVersion": 3,
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=40)).isoformat(),
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "version": 3,
+    },
 ]
 
 SHARDS: Dict[str, List[Dict[str, Any]]] = {
@@ -437,6 +465,8 @@ EVIDENCES: Dict[str, Dict[str, Any]] = {
         "immutable": True,
     }
 }
+
+RESUME_SPECS: Dict[str, Dict[str, Any]] = {}
 
 APPROVALS: List[Dict[str, Any]] = [
     {
@@ -951,6 +981,278 @@ def reclaim_resources(run_id: str, request: Request):
                 "allPhysicallyStopped": True,
                 "reclaimedAt": now_iso,
             }
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+    )
+
+
+# ------------------------------------------------------------------------------
+# Workspace Resume & Checkpoint Endpoints (ADR-044 / ADR-045)
+# ------------------------------------------------------------------------------
+
+
+@app.post("/v1/runs/{run_id}/resume/prepare")
+def prepare_run_resume(run_id: str, request: Request):
+    """
+    ADR-044: Prepare next Step execution for a recovering Run.
+    Freezes immutable snapshot manifest, binds to next run version, generates L2 approval.
+    Enforces maximum 3 attempts bound (initial 1 + max 2 retries).
+    Rejects shard child/parent runs.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+
+    target_run = None
+    for r in RUNS:
+        if r["id"] == run_id:
+            target_run = r
+            break
+
+    if not target_run:
+        return rfc9457_problem(
+            404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+        )
+
+    # Shard child/parent rejection (ADR-044)
+    if target_run.get("parentId") or target_run.get("childRunIds"):
+        return rfc9457_problem(
+            400,
+            "VAL-SHARD-RESUME-DISALLOWED",
+            "Shard Resume Disallowed",
+            "Shard child/parent runs are disallowed from standalone workspace resume.",
+            trace_id,
+            "VAL",
+        )
+
+    # State validation: Must be in recovering state
+    if target_run.get("state") != "recovering":
+        return rfc9457_problem(
+            409,
+            "VAL-RUN-NOT-RECOVERING",
+            "Run Not Recovering",
+            f"Run must be in 'recovering' state to prepare resume. Current state: '{target_run.get('state')}'.",
+            trace_id,
+            "VAL",
+        )
+
+    # Enforce maximum 3 attempts bound (ADR-044)
+    current_attempt = target_run.get("attempt", 1)
+    max_attempts = target_run.get("maxAttempts", 3)
+    if current_attempt >= max_attempts:
+        return rfc9457_problem(
+            400,
+            "VAL-MAX-ATTEMPTS-EXCEEDED",
+            "Maximum Attempts Exceeded",
+            f"Total RunAttempts cannot exceed {max_attempts} (current: {current_attempt}). Further resumes are rejected.",
+            trace_id,
+            "VAL",
+        )
+
+    # Compute frozen workspace files manifest and hash
+    frozen_files = [
+        {
+            "path": "src/server.ts",
+            "size": 1024,
+            "sha256": "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        },
+        {
+            "path": "contracts/governance.yaml",
+            "size": 512,
+            "sha256": "sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b",
+        },
+    ]
+    manifest_bytes = json.dumps(frozen_files, sort_keys=True).encode("utf-8")
+    input_hash = f"sha256:{hashlib.sha256(manifest_bytes).hexdigest()}"
+    input_size_bytes = sum(f["size"] for f in frozen_files)
+
+    bound_run_version = target_run.get("version", 1) + 1
+    approval_id = f"apr_resume_{run_id}_{bound_run_version}"
+    approval_nonce = f"nonce_resume_{secrets.token_hex(6)}"
+
+    # Generate L2 Approval (ADR-044)
+    approval_item = {
+        "id": approval_id,
+        "runId": run_id,
+        "workspaceId": target_run.get("workspaceId", "wsp_01JABCDE001"),
+        "nodeId": target_run.get("nodeId", "nod_01JABCDEF01"),
+        "riskLevel": "L2",
+        "target": f"Workspace Resume [{target_run.get('workspaceId')}] Attempt #{current_attempt + 1}",
+        "command": f"workspace.resume.step --step-id step_{current_attempt + 1:02d}_infer",
+        "estimatedCostKrw": 1500,
+        "remainingBudgetKrw": 48500,
+        "blastRadius": "workspace_isolated",
+        "status": "pending",
+        "nonce": approval_nonce,
+        "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
+        "policyReason": f"ADR-044 고정 Workspace 입력 재개 승인 (Attempt #{current_attempt + 1} / Max {max_attempts})",
+        "createdAt": now_iso,
+        "boundRunVersion": bound_run_version,
+    }
+    # Remove any existing pending approval for same run version
+    global APPROVALS
+    APPROVALS = [a for a in APPROVALS if not (a.get("runId") == run_id and a.get("boundRunVersion") == bound_run_version)]
+    APPROVALS.append(approval_item)
+
+    # Build and store WorkspaceResumeSpec
+    resume_spec = {
+        "resumeId": f"res_{secrets.token_hex(6)}",
+        "runId": run_id,
+        "checkoutId": f"chk_{secrets.token_hex(6)}",
+        "sourceAttempt": current_attempt,
+        "checkpointAttempt": current_attempt,
+        "sourceStepId": f"step_{current_attempt:02d}_init",
+        "nextStepId": f"step_{current_attempt + 1:02d}_infer",
+        "inputHash": input_hash,
+        "inputSizeBytes": input_size_bytes,
+        "boundRunVersion": bound_run_version,
+        "maxAttempts": max_attempts,
+        "currentAttempt": current_attempt,
+        "frozenFiles": frozen_files,
+        "approvalId": approval_id,
+        "createdAt": now_iso,
+    }
+    RESUME_SPECS[run_id] = resume_spec
+
+    # Transition run state: recovering -> awaiting_approval
+    target_run["state"] = "awaiting_approval"
+    target_run["version"] = bound_run_version
+    target_run["boundRunVersion"] = bound_run_version
+    target_run["frozenInputHash"] = input_hash
+    target_run["frozenInputSizeBytes"] = input_size_bytes
+    target_run["updatedAt"] = now_iso
+
+    return resume_spec
+
+
+@app.post("/v1/runs/{run_id}/resume/enqueue")
+def enqueue_run_resume(run_id: str, request: Request):
+    """
+    ADR-044: Atomically admit and enqueue prepared resume execution upon verified approval.
+    Increments attempt and transitions awaiting_approval -> running.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+
+    target_run = None
+    for r in RUNS:
+        if r["id"] == run_id:
+            target_run = r
+            break
+
+    if not target_run:
+        return rfc9457_problem(
+            404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+        )
+
+    if run_id not in RESUME_SPECS:
+        return rfc9457_problem(
+            400,
+            "VAL-RESUME-SPEC-MISSING",
+            "Resume Spec Missing",
+            f"No prepared resume specification found for Run '{run_id}'. Prepare resume first.",
+            trace_id,
+            "VAL",
+        )
+
+    resume_spec = RESUME_SPECS[run_id]
+
+    # Verify that the required approval has been granted
+    approval_id = resume_spec.get("approvalId")
+    apprv = next((a for a in APPROVALS if a["id"] == approval_id), None)
+    if not apprv or apprv.get("status") != "approved":
+        return rfc9457_problem(
+            400,
+            "SEC-APPROVAL-REQUIRED",
+            "Approval Required",
+            f"Resume requires approved status for '{approval_id}'. Current status: '{apprv.get('status') if apprv else 'none'}'.",
+            trace_id,
+            "SEC",
+        )
+
+    # Enforce attempt bound check
+    current_attempt = target_run.get("attempt", 1)
+    max_attempts = target_run.get("maxAttempts", 3)
+    if current_attempt >= max_attempts:
+        return rfc9457_problem(
+            400,
+            "VAL-MAX-ATTEMPTS-EXCEEDED",
+            "Maximum Attempts Exceeded",
+            f"Attempt bound {max_attempts} reached. Admission rejected.",
+            trace_id,
+            "VAL",
+        )
+
+    # Atomic admission: increment attempt and transition to running
+    target_run["attempt"] = current_attempt + 1
+    target_run["state"] = "running"
+    target_run["updatedAt"] = now_iso
+    resume_spec["currentAttempt"] = target_run["attempt"]
+
+    return {
+        "runId": run_id,
+        "resumeId": resume_spec["resumeId"],
+        "attempt": target_run["attempt"],
+        "state": "running",
+        "boundRunVersion": target_run.get("boundRunVersion"),
+        "enqueuedAt": now_iso,
+    }
+
+
+@app.get("/v1/runs/{run_id}/resume")
+def get_run_resume(run_id: str, request: Request):
+    """
+    Get prepared or current WorkspaceResumeSpec for a run.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    if run_id in RESUME_SPECS:
+        return RESUME_SPECS[run_id]
+
+    # Check if run exists and is in recovering state
+    for r in RUNS:
+        if r["id"] == run_id:
+            if r.get("state") == "recovering":
+                return {
+                    "runId": run_id,
+                    "state": "recovering",
+                    "attempt": r.get("attempt", 1),
+                    "maxAttempts": r.get("maxAttempts", 3),
+                    "status": "ready_to_prepare",
+                }
+            return rfc9457_problem(
+                404,
+                "RES-RESUME-404",
+                "Resume Spec Not Found",
+                f"No active resume specification for run '{run_id}'.",
+                trace_id,
+                "RES",
+            )
+
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/runs/{run_id}/reset-recovering")
+def reset_recovering_run(run_id: str, request: Request):
+    """
+    Test harness utility: reset a test run back to initial recovering state with attempt 1.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    for r in RUNS:
+        if r["id"] == run_id:
+            r["state"] = "recovering"
+            r["attempt"] = 1
+            r["version"] = 1
+            r["boundRunVersion"] = 1
+            r["updatedAt"] = now_iso
+            if run_id in RESUME_SPECS:
+                del RESUME_SPECS[run_id]
+            # Remove any generated resume approval
+            global APPROVALS
+            APPROVALS = [a for a in APPROVALS if not (a.get("runId") == run_id and "resume" in a.get("id", ""))]
+            return {"runId": run_id, "state": "recovering", "attempt": 1}
+
     return rfc9457_problem(
         404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
     )
