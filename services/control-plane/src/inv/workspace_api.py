@@ -10,6 +10,7 @@ from copy import deepcopy
 from contextlib import nullcontext
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
+from time import sleep
 
 from .approvals import ApprovalStore, digest, view
 from .contracts import validate_contract
@@ -84,10 +85,11 @@ class RestrictedWorkspaceRuntime:
                 if not (
                     attempt < 2
                     and error.code == "NODE-0050"
-                    and error.status == 409
+                    and error.status in {409, 503}
                     and error.retryable
                 ):
                     raise
+                sleep(0.01 * (2**attempt))
         if observation["profileVersion"] != self.profile.version:
             raise DomainError("SANDBOX-0001", "Observed Node profile differs", 403)
         return RuntimeCapabilities(

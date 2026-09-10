@@ -449,8 +449,9 @@ def test_failed_parent_recovery_can_run_both_shards_on_replacement_node(pair, st
 
 
 @pytest.mark.parametrize("supersessions", [1, 3])
+@pytest.mark.parametrize("rejection", ["superseded", "capacity"])
 def test_node_observation_retries_with_fresh_nonces_and_a_hard_bound(
-    pair, monkeypatch, supersessions
+    pair, monkeypatch, supersessions, rejection
 ):
     a, _ = pair
     target = a.recovery.targets[a.e.node]
@@ -460,6 +461,8 @@ def test_node_observation_retries_with_fresh_nonces_and_a_hard_bound(
 
     def overtake(proof, request):
         nonces.append(request["nonce"])
+        if rejection == "capacity" and len(nonces) <= supersessions:
+            raise DomainError("NODE-0050", "Node observation capacity reached", 503, retryable=True)
         response = probe(proof, request)
         if len(nonces) <= supersessions:
             independent.poll(a.node)  # Commit a genuinely newer authenticated probe.
@@ -469,7 +472,9 @@ def test_node_observation_retries_with_fresh_nonces_and_a_hard_bound(
     if supersessions == 3:
         with pytest.raises(DomainError, match="NODE-0050") as failure:
             target.observe()
-        assert failure.value.retryable and failure.value.status == 409
+        assert failure.value.retryable and failure.value.status == (
+            409 if rejection == "superseded" else 503
+        )
         assert len(nonces) == 3
     else:
         assert target.observe().node_id == a.e.node

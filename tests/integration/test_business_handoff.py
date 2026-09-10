@@ -442,6 +442,13 @@ def test_worker_releases_completed_lock_after_requester_revocation(business):
             is not None
         )
     assert active(a) == 0
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "failed"
+    with a.e.db.transaction(a.e.tenant) as conn:
+        latest = conn.execute(
+            "SELECT s.envelope FROM inv.node_stop_receipts s JOIN inv.approval_dispatches d USING(tenant_id,command_id) WHERE d.approval_id=%s",
+            (a.prepared["approval"]["approvalId"],),
+        ).fetchone()
+    assert latest["envelope"]["processStarted"] is False
 
 
 def test_queued_cancellation_keeps_lock_until_node_stop_receipt(business):

@@ -139,8 +139,27 @@ class DeliveryQueue:
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (row["command_id"],),
             ).fetchone()
-            operation = "cancel" if run["state"] == "cancelled" else "observe"
-            if row["phase"] == "queued" and self._can_start(conn, row, run, claim, now):
+            operation = (
+                "cancel"
+                if run["state"] in {"cancelled", "failed"} or row["operation"] == "cancel"
+                else "observe"
+            )
+            may_start = row["phase"] == "queued" and self._can_start(conn, row, run, claim, now)
+            if row["phase"] == "queued" and not may_start:
+                # No transmission was reserved. An invalidated admission must
+                # obtain a Node tombstone, not observe an unseen command forever.
+                # Keep all leases until the authenticated physical receipt.
+                operation = "cancel"
+                if run["state"] not in {"succeeded", "failed", "cancelled"}:
+                    RunStore(self.db)._transition(conn, tenant_id, run, "failed", run["version"])
+                    event(
+                        conn,
+                        tenant_id,
+                        run["run_id"],
+                        "inv.execution.start_authority_lost",
+                        {"commandId": str(row["command_id"]), "action": "cancel_and_await_receipt"},
+                    )
+            if may_start:
                 # _can_start holds the Node row lock. All first reservations on
                 # that Node serialize here, matching its single execution slot.
                 if conn.execute(
