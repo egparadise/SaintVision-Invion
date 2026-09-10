@@ -80,6 +80,10 @@ def register_contribution(
         payload=body_for_hash,
         now=now,
         ttl_seconds=settings.idempotency_ttl_seconds,
+        # Registering a contribution is tenant-wide: a folder belongs to a
+        # node, not a project. Recorded as None so it collides with other
+        # tenant-wide operations and not with a project's.
+        project_id=None,
     )
     if replayed is not None:
         return replayed
@@ -126,6 +130,7 @@ def register_contribution(
         response_body=body,
         now=now,
         ttl_seconds=settings.idempotency_ttl_seconds,
+        project_id=None,
     )
     return body
 
