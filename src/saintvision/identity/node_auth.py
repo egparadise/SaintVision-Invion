@@ -39,10 +39,9 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Final
 
-from sqlalchemy import select
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from ..db.models import Node
 from ..errors import (
     AUTH_INVALID_CREDENTIAL,
     AUTH_MISSING_CREDENTIAL,
@@ -181,26 +180,41 @@ def resolve_node(
             AUTH_INVALID_CREDENTIAL, "certificate fingerprint is malformed", public=False
         )
 
-    node = session.scalar(
-        select(Node).where(Node.certificate_fingerprint == fingerprint)
-    )
-    if node is None:
+    # Through the narrow SECURITY DEFINER function, not a direct SELECT.
+    # Authentication happens before a tenant scope exists — the credential is
+    # what decides the tenant — and with RLS forced an unscoped SELECT on
+    # `nodes` correctly returns nothing. The alternative to this function would
+    # be relaxing RLS or granting BYPASSRLS, either of which opens every row to
+    # every unscoped query. See migration 0008.
+    row = session.execute(
+        text(
+            "SELECT node_id, tenant_id, status "
+            "FROM public.node_by_certificate(CAST(:fingerprint AS char(64)))"
+        ),
+        {"fingerprint": fingerprint},
+    ).one_or_none()
+
+    if row is None:
         raise InvError(
             AUTH_INVALID_CREDENTIAL,
             "no enrolled node holds this certificate",
             public=False,
         )
-    if node.status == "retired":
+    node_id, tenant_id, status = row
+    if status == "retired":
         # A retired machine's certificate must stop working, or retirement is
         # only a label.
         raise InvError(
             AUTH_INVALID_CREDENTIAL, "the node is retired", public=False
         )
     return NodePrincipal(
-        node_id=node.node_id,
-        tenant_id=node.tenant_id,
+        node_id=node_id,
+        tenant_id=tenant_id,
         certificate_sha256=fingerprint,
-        hostname=node.hostname,
+        # The function deliberately does not return the hostname: a credential
+        # check should learn who the certificate belongs to, not what that node
+        # is. Callers that need it read it inside the tenant scope.
+        hostname="",
         source=source,
     )
 
