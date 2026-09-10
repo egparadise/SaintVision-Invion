@@ -188,3 +188,21 @@ def test_the_recovery_epoch_is_lockable_but_never_writable(owner_engine, migrate
         "makes a stale reservation refuse to run; an application that can move "
         "it can make its own stale work look current."
     )
+
+
+def test_a_migrated_database_has_a_recovery_epoch(owner_engine, migrated):
+    """The other thing that existed only in the test fixture.
+
+    Every execution-core transaction reads inv.control_epoch before doing
+    anything and raises LEASE-0004 when the row is absent. Rolling the epoch is
+    an operator act and no migration should do it — but the first one is not a
+    roll. A database that has never run has nothing to reconcile.
+    """
+    with owner_engine.connect() as connection:
+        epoch = connection.execute(
+            text("SELECT epoch FROM inv.control_epoch WHERE singleton")
+        ).scalar_one_or_none()
+    assert epoch is not None, (
+        "inv.control_epoch is empty, so every execution-core transaction fails "
+        "with LEASE-0004 on a freshly migrated database"
+    )
