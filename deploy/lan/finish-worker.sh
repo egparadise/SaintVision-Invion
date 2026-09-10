@@ -6,6 +6,6 @@ node_id=$(python3 -c 'import json; print(json.load(open("manifest.json"))["nodeI
 [[ "$node_id" =~ ^nod_[0-9A-HJKMNP-TV-Z]{26}$ ]] || exit 1
 worker_root="$HOME/.local/share/saintvision/$node_id"
 [[ -f "$worker_root/node-key.pem" ]] || { echo 'Run Prepare-Worker.ps1 first'; exit 1; }
-cmp manifest.json "$worker_root/manifest.json"
-cp -- node-cert.pem "$worker_root/node-cert.pem"
+python3 worker_config.py identity "$worker_root/manifest.json" manifest.json
+cp -- node-cert.pem manifest.json ca.pem signer.pub peer-policy.json start-node.sh node-agent.tar worker_config.py "$worker_root/"
 bash "$worker_root/start-node.sh"

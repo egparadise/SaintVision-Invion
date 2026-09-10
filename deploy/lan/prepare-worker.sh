@@ -13,9 +13,9 @@ worker_root="$HOME/.local/share/saintvision/$node_id"
 mkdir -p -- "$worker_root"
 chmod 700 "$worker_root"
 if [[ -f "$worker_root/manifest.json" ]]; then
-    cmp manifest.json "$worker_root/manifest.json" || { echo 'Existing installation identity differs; preserve its state.'; exit 1; }
+    python3 worker_config.py identity "$worker_root/manifest.json" manifest.json
 fi
-cp -- manifest.json ca.pem signer.pub peer-policy.json start-node.sh node-agent.tar "$worker_root/"
+cp -- manifest.json ca.pem signer.pub peer-policy.json start-node.sh node-agent.tar worker_config.py "$worker_root/"
 if [[ ! -f "$worker_root/node-key.pem" ]]; then
     openssl genpkey -algorithm ED25519 -out "$worker_root/node-key.pem"
 fi

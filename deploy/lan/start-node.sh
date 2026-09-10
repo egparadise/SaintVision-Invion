@@ -11,6 +11,12 @@ openssl x509 -in node-cert.pem -checkend 60 -noout
 mapfile -t cfg < <(python3 -c 'import json; d=json.load(open("manifest.json")); print("\n".join(str(d[k]) for k in ("nodeId","tenantId","epoch","agentImage","nodeIP","nodePort")))')
 node_id=${cfg[0]}
 [[ "$node_id" =~ ^nod_[0-9A-HJKMNP-TV-Z]{26}$ ]] || exit 1
+# Reload into the engine used by this invocation before creating any state.
+# A classic-store config ID may not address an imported containerd-store image.
+timeout 120 docker load -i node-agent.tar
+image_tag=$(python3 -c 'import json; print(json.load(open("manifest.json"))["agentTag"])')
+docker image inspect "$image_tag" > image-inspect.json
+actual_image=$(python3 worker_config.py image manifest.json image-inspect.json)
 name="saintvision-${node_id,,}"
 volume="$name-state"
 if docker container inspect "$name" >/dev/null 2>&1; then
@@ -18,16 +24,18 @@ if docker container inspect "$name" >/dev/null 2>&1; then
     exit 1
 fi
 if docker volume inspect "$volume" >/dev/null 2>&1; then
-    echo "Volume $volume already exists. Operator reconciliation is required before reusing its journal."
-    exit 1
+    [[ "$(docker volume inspect --format '{{index .Labels "ai.saintvision.node"}}' "$volume")" == "$node_id" ]] || { echo 'Volume ownership differs'; exit 1; }
+    [[ -z "$(docker ps -aq --filter "volume=$volume")" ]] || { echo 'Volume is used by another container'; exit 1; }
+    echo 'Resuming with the existing owned volume; the Node validates its journal identity and epoch.'
+else
+    docker volume create --label "ai.saintvision.node=$node_id" "$volume" >/dev/null
 fi
-docker volume create --label "ai.saintvision.node=$node_id" "$volume" >/dev/null
 docker create --name "$name" --label "ai.saintvision.node=$node_id" \
     --restart unless-stopped --read-only --cap-drop ALL --security-opt no-new-privileges \
     --pids-limit 128 --memory 256m --cpus 0.5 \
     --publish "${cfg[4]}:${cfg[5]}:18443" \
     --mount "type=volume,source=$volume,target=/state" \
-    "${cfg[3]}" --serve --listen 0.0.0.0:18443 \
+    "$actual_image" --serve --listen 0.0.0.0:18443 \
     --tenant "${cfg[1]}" --node "$node_id" --epoch "${cfg[2]}" \
     --profile lan-observe-v1 --image "${cfg[3]}" --executable /inv-node \
     --state /state/journal --public-key /state/signer.pub \

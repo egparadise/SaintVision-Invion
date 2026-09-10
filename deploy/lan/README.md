@@ -56,13 +56,23 @@ It has no upload/enrollment/signing endpoint and never serves private state.
    -CertificateSHA256 <fileSHA256-from-operator>`. It verifies the certificate
    download, adds an inbound rule limited to TCP 18443 from the server IP, and
    starts the Node container with a durable named volume. It preserves existing
-   containers/volumes and stops on name conflicts. Keys are copied with private
+   containers and stops on container name conflicts. A retry can reuse an exact
+   firewall rule and an unused volume bearing this Node's ownership label; the
+   Node still validates the stored identity and epoch. Keys are copied with private
    Linux file modes. Docker exposes the port directly on the Windows worker IP;
    WSL portproxy and global network-profile changes are unnecessary.
 5. Run `lan_pilot.py --state <state> status` on the server. Completion requires
    `observed: true`, a current persisted snapshot, and the Node online through
    a successful mTLS observation. A running container, successful ping, generated
    certificate, or download alone is not sufficient.
+
+The image archive preserves its repository tag. Startup imports it into the
+current engine, verifies Linux/amd64, filesystem layer digests and execution
+configuration against the independently verified bundle, then uses that engine's
+inspected content ID. It does not assume an image ID from a different store can
+address the imported image. This check precedes volume/container creation.
+Installer metadata upgrades compare the fixed identity fields and preserve the
+worker private key. No Docker image-store setting is changed during recovery.
 
 CA lifetime is seven days; peer certificates and the initial allowlist last at
 most six days. Expiry fails closed. This first bootstrap intentionally does not

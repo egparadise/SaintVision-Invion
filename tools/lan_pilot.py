@@ -191,17 +191,20 @@ def bundle(args):
     tag = 'saintvision-lan-node:'+state['epoch'][:8]
     run(['docker','build','--network=none','--pull=false','-t',tag,build],timeout=120)
     image = run(['docker','image','inspect',tag,'--format','{{.Id}}'])
-    run(['docker','save','-o',path/'node-agent.tar',image],timeout=60)
+    # Preserve a named reference when importing into another Docker image store.
+    run(['docker','save','-o',path/'node-agent.tar',tag],timeout=60)
+    inspected = json.loads(run(['docker','image','inspect',image]))[0]
     state['agentImage'] = image
     save(path,state)
     manifest = {k:state[k] for k in ('tenantId','nodeId','epoch','serverIP','nodeIP','nodePort','baseSHA','agentImage')}
-    manifest.update(scope='observation-only',schemaVersion=1)
+    manifest.update(scope='observation-only',schemaVersion=2,agentTag=tag,
+                    imageLayers=inspected['RootFS']['Layers'],imageConfig=inspected['Config'])
     temporary = output/'worker.zip.tmp'
     with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED) as archive:
         archive.writestr('manifest.json',json.dumps(manifest,indent=2))
         for name in ('ca.pem','signer.pub','peer-policy.json','node-agent.tar'):
             archive.write(path/name,name)
-        for name in ('prepare-worker.sh','start-node.sh','finish-worker.sh','Prepare-Worker.ps1','Start-Worker.ps1'):
+        for name in ('prepare-worker.sh','start-node.sh','finish-worker.sh','Prepare-Worker.ps1','Start-Worker.ps1','worker_config.py'):
             archive.write(ROOT/'deploy/lan'/name,name)
     os.replace(temporary,output/'worker.zip')
     digest = hashlib.sha256((output/'worker.zip').read_bytes()).hexdigest()

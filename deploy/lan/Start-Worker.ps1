@@ -18,7 +18,16 @@ if (-not (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)) {
     New-NetFirewallRule -Name $ruleName -DisplayName $ruleName -Direction Inbound -Action Allow -Protocol TCP `
         -LocalAddress $manifest.nodeIP -LocalPort $manifest.nodePort -RemoteAddress $manifest.serverIP -Profile Any | Out-Null
 } else {
-    throw 'Firewall rule already exists. Inspect it before retrying; no existing rule was changed.'
+    $existingRule = Get-NetFirewallRule -Name $ruleName
+    $addresses = $existingRule | Get-NetFirewallAddressFilter
+    $ports = $existingRule | Get-NetFirewallPortFilter
+    if ($existingRule.Direction -ne 'Inbound' -or $existingRule.Action -ne 'Allow' -or $existingRule.Enabled -ne 'True' `
+        -or (@($addresses.LocalAddress) -join ',') -ne $manifest.nodeIP `
+        -or (@($addresses.RemoteAddress) -join ',') -ne $manifest.serverIP `
+        -or (@($ports.LocalPort) -join ',') -ne [string]$manifest.nodePort `
+        -or [string]$ports.Protocol -notin @('TCP','6')) {
+        throw 'Existing firewall rule differs from this Node configuration; no rule was changed.'
+    }
 }
 $workerLinuxPath = '/mnt/' + $PSScriptRoot.Substring(0,1).ToLower() + $PSScriptRoot.Substring(2).Replace('\','/')
 & wsl.exe -d Ubuntu -- bash "$workerLinuxPath/finish-worker.sh"
