@@ -50,8 +50,19 @@ def migrated(owner_engine, database_url):
     os.environ["INV_DATABASE_URL"] = database_url
     config = Config("alembic.ini")
     config.set_main_option("script_location", "migrations")
+    # Reset every schema the migrations own, not just `public`. The chain
+    # creates `inv` as well now, and dropping only `public` left it behind so
+    # the next upgrade failed on CREATE SCHEMA — a fixture that hardcodes the
+    # schema list goes stale exactly like a hardcoded table list does.
     with owner_engine.begin() as connection:
-        connection.execute(text("DROP SCHEMA public CASCADE"))
+        owned = connection.execute(
+            text(
+                "SELECT nspname FROM pg_namespace "
+                "WHERE nspname NOT LIKE 'pg\_%' AND nspname <> 'information_schema'"
+            )
+        ).scalars().all()
+        for schema in owned:
+            connection.execute(text(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'))
         connection.execute(text("CREATE SCHEMA public"))
     command.upgrade(config, "head")
     return True

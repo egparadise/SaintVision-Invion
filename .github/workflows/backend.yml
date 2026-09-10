@@ -106,7 +106,13 @@ jobs:
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass
         # as a green build.
-        run: python -m pytest -q --strict-markers
+        # The node-execution suites require the Go agent binary and a built
+        # container image, which the Core Build job provides and this one does
+        # not. They are ignored here rather than weakened there: their refusal
+        # to skip in CI is the right discipline, and duplicating the Go
+        # toolchain to satisfy it would run the same tests twice.
+        run: |
+          python -m pytest -q --strict-markers             --ignore=tests/integration/test_node_runtime.py             --ignore=tests/integration/test_node_control.py             --ignore=tests/integration/test_node_delivery.py
 
       - name: No PostgreSQL test was skipped
         run: |
