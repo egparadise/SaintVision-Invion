@@ -23,6 +23,7 @@ foreach ($svTemplate in @(@{name='ai-starter';kind='ai'},@{name='python-starter'
     }
 }
 Invoke-Studio @('register','SaintVision-Invion',$svCheckout) | Out-Null
+Invoke-Studio @('configure-tools') | Out-Null
 $svStart = Join-Path $PSScriptRoot 'Start-DevStudio.ps1'
 $svDesktop = [Environment]::GetFolderPath('Desktop')
 $svShortcutPath = Join-Path $svDesktop 'SaintVision 개발 시작.lnk'

@@ -22,6 +22,7 @@ if (Test-Path -LiteralPath "$svEnvironment/Scripts/python.exe") {
 $Host.UI.RawUI.WindowTitle = "SaintVision - $Tool - $(Split-Path $Workspace -Leaf)"
 Write-Host "Workspace: $Workspace"
 Write-Host 'Use this workspace for this agent. Test and train from SaintVision Studio.'
+Write-Host 'Shared task commands: .saintvision/README.md (no credentials).'
 switch ($Tool) {
     'codex' { & codex.cmd --sandbox workspace-write --approve-for-me }
     'claude' { & claude.exe --permission-mode auto }

@@ -213,7 +213,9 @@ class Studio:
         command(['git', '-C', str(path), '-c', 'user.name=SaintVision Workspace Setup', '-c', 'user.email=workspace@localhost',
                  'commit', '-m', 'Initialize editable development workspace'])
         command([sys.executable, '-m', 'venv', str(path / '.venv')], timeout=90)
-        return self.register(path.name, path, kind, tasks, ['src', 'tests', 'data'])
+        project = self.register(path.name, path, kind, tasks, ['src', 'tests', 'data'])
+        self.configure_tools()
+        return project
 
     def workspace(self, project, workspace):
         with self.db() as conn:
@@ -221,6 +223,47 @@ class Studio:
         if not row:
             raise ValueError('Workspace unavailable')
         return dict(row)
+
+    def configure_tools(self):
+        count = 0
+        for project in self.status()['projects']:
+            for workspace in project['workspaces']:
+                path = Path(workspace['path'])
+                directory = safe_file(path, '.saintvision')
+                directory.mkdir(exist_ok=True)
+                target = safe_file(path, '.saintvision/README.md')
+                marker = '<!-- SaintVision managed development context v1 -->'
+                if target.exists() and not target.read_text('utf-8').startswith(marker):
+                    raise ValueError('Existing unmanaged tool context preserved')
+                def quote(value):
+                    return "'" + str(value).replace("'", "''") + "'"
+                prefix = '& ' + quote(sys.executable) + ' ' + quote(ROOT / 'tools/dev_studio.py') + ' --root ' + quote(self.root)
+                lines = [marker, '# SaintVision development context', '',
+                         'Read AGENTS.md and README.md. Work only in the selected Workspace.',
+                         'Use these registered commands for bounded CPU tests/training. Do not invent Run/Evidence IDs or bypass production approvals.',
+                         'GPU and remote Node execution are not enabled in this developer environment.', '',
+                         f'Project: {project["name"]}', f'Workspace role: {workspace["role"]}', f'Workspace path: {path}', '', '```powershell']
+                for task in project['tasks']:
+                    lines.append(prefix + ' run --project ' + quote(project['id']) + ' --workspace ' + quote(workspace['id']) + ' --task ' + quote(task))
+                if not project['tasks']:
+                    lines.append('# No container task registered. Use the repository development instructions.')
+                lines += ['```', '', 'Report the returned job ID, actual status, exit code and artifact hashes. Credentials stay in the tool account; never copy them into source inputs.', '']
+                target.write_text('\n'.join(lines), encoding='utf-8')
+                try:
+                    common = Path(command(['git', '-C', path, 'rev-parse', '--git-common-dir']))
+                except ValueError:
+                    count += 1
+                    continue  # A plain folder can be opened without initializing Git.
+                if not common.is_absolute():
+                    common = (path / common).resolve()
+                exclude = common / 'info/exclude'
+                current = exclude.read_text('utf-8') if exclude.exists() else ''
+                if '.saintvision/' not in current.splitlines():
+                    exclude.parent.mkdir(parents=True, exist_ok=True)
+                    with exclude.open('a', encoding='utf-8') as stream:
+                        stream.write('\n.saintvision/\n')
+                count += 1
+        return {'configuredWorkspaces': count}
 
     def add_workspace(self, project, role):
         if role not in ('codex', 'claude', 'gemini', 'antigravity'):
@@ -245,6 +288,7 @@ class Studio:
             row = {'id': str(uuid4()), 'project': project, 'role': role, 'path': str(Path(path).resolve())}
             with self.db() as conn:
                 conn.execute('INSERT INTO workspaces VALUES(:id,:project,:role,:path)', row)
+            self.configure_tools()
             return row
 
     def open_tool(self, project, workspace, tool):
@@ -612,7 +656,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=DEFAULT)
     subs = parser.add_subparsers(dest='action', required=True)
-    for name in ('init', 'status', 'serve', 'login-link', 'recover'):
+    for name in ('init', 'status', 'serve', 'login-link', 'recover', 'configure-tools'):
         subs.add_parser(name)
     create = subs.add_parser('create')
     create.add_argument('name')
@@ -641,6 +685,9 @@ def main():
         print(studio.create(args.name, args.kind))
     elif args.action == 'register':
         print(studio.register(args.name, args.path))
+        studio.configure_tools()
+    elif args.action == 'configure-tools':
+        print(json.dumps(studio.configure_tools()))
     elif args.action == 'run':
         identity = studio.submit(args.project, args.workspace, args.task, args.request_id or uuid4().hex, background=False)
         job = studio.job(identity)
