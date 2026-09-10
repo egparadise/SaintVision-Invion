@@ -1,10 +1,10 @@
 ---
 doc_id: "LOG-WORKSPACE-API-001"
 title: "2026-09-10_11-59-00_KST_WORKSPACE-API_Codex_개발과정"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T11:59:00+09:00"
+updated: "2026-09-10T12:24:16+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,3 +24,5 @@ Task WORKSPACE-API, S03-BE 및 S06-BE/DB/ST 후속. Owner Codex, reviewer Claude
 
 - 2026-09-10 11:56 KST: `git fetch origin` exit 0 및 별도 worktree 생성 exit 0. 공유 통합 checkout은 수정하지 않았다.
 - 2026-09-10 11:59 KST: 기준 코드/승인/Workspace/API/배포와 양쪽 schema 경계 검토. 구현·검증·push·CI·sync 증거는 수행 후 추가한다.
+
+- 2026-09-10T12:24:16+09:00: 코드 `e9dd3419f04f20d729cdb28cf93387028dd9e292`의 전체 922 tests/Go 94 leaf case 및 artifact 검증. [[2026-09-10_12-24-16_KST_WORKSPACE-API_Codex_검증보고]]에 실제 증거·오류·남은 작업을 기록한다. 독립 검토는 pending이다.
