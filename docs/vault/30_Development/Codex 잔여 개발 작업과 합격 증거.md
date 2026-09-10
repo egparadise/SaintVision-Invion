@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.6.0"
+version: "1.7.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T12:24:16+09:00"
+updated: "2026-09-10T13:57:52+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 업무 kernel 연결 후속: `255b29e`에서 현재 public/kernel 권한 교집합, 실제 입력·새 승인·원자 큐·receipt/Evidence 기반 binding·자동 lock 해제를 구현했다. 전체 962개, 업무 전용 16개와 샤드 21개가 통과했다. [[2026-09-10_13-57-52_KST_BUSINESS-KERNEL_Codex_검증보고]], [[Codex 업무 binding과 실행 커널 연결 계약]]을 따른다. Codex 다음은 kill switch/drain·주기 reconciliation이다. public provisioning/첫 Run·checkout·editor/PTY·업무 router production 조합, PR14 실험 DB 이관, 실제 화면·독립 검토·5대 인수는 남는다. 아래 이전 PR14 통합 예정 문구는 해당 SHA 당시 기록이다.
 
 2026-09-10 샤드 복구 후속: `3835b19`에서 새 승인·물리적 종료·원자 예약/큐·새 부모와 불변 계보·최대 3세대를 구현했다. 실제 두 Go/mTLS Node와 Docker로 전용 19개 및 전체 941개가 통과했다. [[2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고]], [[Codex 샤드 재승인과 대체 Node 복구 계약]]을 따른다. Node는 한 CI 호스트의 별도 프로세스다. 공개 recovery route·운영/업무 연결(Claude), 실제 화면/브라우저(Gemini), 독립 검토와 5대 인수는 남는다. 다음 Codex 우선순위는 PR14 업무 연결과 migration/권한/실제 Evidence 통합, kill switch/drain·주기 reconciliation이며 PTY/remote Git·대용량/Workspace Node 이전·Windows/GPU/BuildKit·Context/RO 검증도 남는다. 아래의 재실행 미구현 문구는 과거 SHA 기준 기록이다.
 

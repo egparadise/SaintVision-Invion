@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.14.0"
+version: "1.15.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T13:05:06+09:00"
+updated: "2026-09-10T13:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -82,3 +82,5 @@ ADR-044(고정 Workspace 입력·새 승인·원자 예약/admission·총 3 atte
 ADR-046(실행 kernel을 권위로 하는 공개 Workspace API·승인/예약/큐의 원자 등록), ADR-047(명시적 production 설정·모의 서버 분리·기존 양쪽 migration history의 merge 및 제한 runtime 그룹)은 [[Codex Workspace 공개 API와 실행 커널 통합 계약]]을 따른다. 현재 project grant와 새 distinct 승인을 실제 Node 경로에 연결하며 `accepted`와 실행 시작을 구분한다. public 데이터 이관·전체 업무/화면 연결·실장비·독립 review는 별도다.
 
 ADR-048(물리적 종료·동일 작업·새 승인에 따른 독립 샤드 대체 Node 실행), ADR-049(불변 부모/자식 계보·최대 3개 실행 세대·하나의 후속 계획·원자 admission)은 [[Codex 샤드 재승인과 대체 Node 복구 계약]]을 따른다. 공개 recovery route/UI·Workspace Node 파일 이전·collective·5대 PC·독립 검토는 별도다.
+
+ADR-050(실제 kernel 기록에서 계산하는 불변 업무 binding·물리적 완료 후 자동 편집 lock 해제), ADR-051(명시적 OIDC/업무 identity 연결·현재 권한 교집합·기존 revision 보존), ADR-052(최초 전송 전 권한 상실의 취소 tombstone 및 관측 전용 bounded 재시도)는 [[Codex 업무 binding과 실행 커널 연결 계약]]을 따른다. 일반 CRUD/provisioning/editor/PTY·PR14 실험 DB 이관·5대 인수와 독립 검토는 별도다.

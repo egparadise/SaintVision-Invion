@@ -1,0 +1,51 @@
+{
+  "sha": "255b29e2b74a61bb8ef3dd798cacee10e7faecec",
+  "counts": {
+    "tests": 962,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "go": {
+    "top_level": 40,
+    "leaf_cases": 94,
+    "race_detector": true
+  },
+  "core_run": 34438622367,
+  "docs_run": 34438622380,
+  "artifact_id": 10137278486,
+  "verified_at_kst": "2026-09-10T13:57:47+09:00",
+  "archive_sha256": "e0efff37b4c659662e8062973bb540568a00a34151e60cf0e59dc7704abcf73d",
+  "files_sha256": {
+    "api-unconfigured.log": "d51e2d20e88ac938cfb1bb9d61a7b0b3bcf8250a09f4597e624d697da163f8c0",
+    "business-handoff-tests.xml": "c18793f869c43ddcaf0cc026d6e412e2a4547570bbc0bee0317690be3b51ee39",
+    "core-tests.xml": "ec9cb3e3478c3a9dbf18646209a41eb47b7e790c9103c3838eacb2ff13e8ecee",
+    "inv-discover": "5e89f98af76f19503acbd978970b74b07cb8276b60423fa4d31ae98935143678",
+    "inv-node": "d4817f1f65e20c17c0d180b71ce5a654578c04cad93230014a68d584198c159a",
+    "node-unit.jsonl": "d227917ad1c15a5b16ed1e39c37c15846399fe8e9cc10d609d41253e54d9fb9f",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "b5df8d050922e6da6461bd366387240160319f17c270672b42d41e3f763ee642",
+    "saintvision_control_plane-0.1.0.tar.gz": "0d149ab29bdab0b7b37f56517e8271c90938d635ed08ea6a193ce3ae90c157b1",
+    "shard-recovery-tests.xml": "ab05916541530a23acc7839b32e3c9365b6cff24c130d19b2cc6ea5234c9cde4",
+    "workspace-tests.xml": "f7064c6c7fd72964463644e81e47eab65c741a926d43f059fbe0eecf10e6dc70"
+  },
+  "workspace_api_cases": 9,
+  "workspace_counts": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "event": "push",
+  "shard_recovery_counts": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "business_handoff_counts": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}
