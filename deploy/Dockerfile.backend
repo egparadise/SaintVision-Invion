@@ -1,4 +1,4 @@
-﻿# SaintVision Control Plane Gateway Backend Container
+# SaintVision Control Plane Gateway Backend Container
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -25,5 +25,5 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-# Run mock control plane gateway or production app
-CMD ["python", "tools/mock_control_plane.py"]
+# Run production unified FastAPI control plane server
+CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]

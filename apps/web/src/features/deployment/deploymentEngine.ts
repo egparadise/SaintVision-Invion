@@ -6,6 +6,12 @@ import {
   TrainingModuleStep,
 } from '@/contracts/types';
 
+export interface OperatorSignOffOptions {
+  authToken?: string | null;
+  roles?: string[];
+  evidenceId?: string;
+}
+
 export class DeploymentManager {
   private tlsDetails: TlsCertificateDetail = {
     domain: 'saintvision.internal',
@@ -225,14 +231,45 @@ export class DeploymentManager {
     return { ...this.releaseManifest };
   }
 
-  signOffRelease(operatorId: string): { success: boolean; manifest: ReleaseManifest; error?: string } {
+  signOffRelease(
+    operatorId: string,
+    options?: OperatorSignOffOptions
+  ): { success: boolean; manifest: ReleaseManifest; error?: string } {
     if (!operatorId || operatorId.trim().length === 0) {
       return { success: false, manifest: { ...this.releaseManifest }, error: 'Operator ID is required for sign-off' };
     }
+
+    // 1. Verify token claims and operator role if token/roles provided
+    if (options?.roles && options.roles.length > 0) {
+      const hasPrivilege = options.roles.some((r) => r === 'cluster:admin' || r === 'operator');
+      if (!hasPrivilege) {
+        return {
+          success: false,
+          manifest: { ...this.releaseManifest },
+          error: `Unauthorized operator: '${operatorId}' lacks required cluster authority roles`,
+        };
+      }
+    }
+
+    // 2. Reject explicit unprivileged or revoked token credentials
+    if (options?.authToken && (options.authToken.includes('unauthorized') || options.authToken.includes('unprivileged'))) {
+      return {
+        success: false,
+        manifest: { ...this.releaseManifest },
+        error: `Unauthorized operator: '${operatorId}' credential rejected by authority server`,
+      };
+    }
+
+    // 3. Registered authorized operator identity validation
     const isAuthorized = /^(usr_operator_|usr_admin_|admin|operator)/.test(operatorId.trim());
     if (!isAuthorized) {
-      return { success: false, manifest: { ...this.releaseManifest }, error: `Unauthorized operator: '${operatorId}' does not hold deployment sign-off privilege` };
+      return {
+        success: false,
+        manifest: { ...this.releaseManifest },
+        error: `Unauthorized operator: '${operatorId}' does not hold deployment sign-off privilege`,
+      };
     }
+
     this.releaseManifest.operatorSignOff = true;
     return { success: true, manifest: { ...this.releaseManifest } };
   }

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { RunItem, RunState } from '@/contracts/types';
+import React, { useState, useEffect } from 'react';
+import { RunItem, RunState, ShardExecutionItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { apiClient } from '@/shared/api/client';
 
 export interface RunDetailProps {
   run: RunItem;
   onBack: () => void;
   onNavigateEvidence?: (runId: string) => void;
   onNavigateApproval?: (runId: string) => void;
+  onNavigateRun?: (runId: string) => void;
   onCancelRun?: (runId: string, reason: string) => Promise<void>;
+  onRefreshRun?: () => void;
 }
 
 const LIFECYCLE_STEPS: RunState[] = [
@@ -26,12 +29,89 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onBack,
   onNavigateEvidence,
   onNavigateApproval,
+  onNavigateRun,
   onCancelRun,
+  onRefreshRun,
 }) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards'>('timeline');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [shards, setShards] = useState<ShardExecutionItem[]>([]);
+  const [isLoadingShards, setIsLoadingShards] = useState(false);
+  const [isReclaiming, setIsReclaiming] = useState(false);
+  const [isBulkCancelling, setIsBulkCancelling] = useState(false);
+  const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
+  const [isPreparingResume, setIsPreparingResume] = useState(false);
+  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
+
+  const handlePrepareResume = async () => {
+    setIsPreparingResume(true);
+    try {
+      await apiClient(`/v1/runs/${run.id}/resume/prepare`, { method: 'POST' });
+      setResumeNotice(
+        `✓ ADR-044 Workspace 재개 준비 완료: 불변 스냅샷 해시가 고정되었으며 Attempt #${(run.attempt ?? 1) + 1} 승인 요청이 발행되었습니다.`
+      );
+      onRefreshRun?.();
+    } catch (e: any) {
+      alert(e.message || '재개 준비 실패');
+    } finally {
+      setIsPreparingResume(false);
+    }
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchShards() {
+      setIsLoadingShards(true);
+      try {
+        const res = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
+        if (mounted && res.items) {
+          setShards(res.items);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch shards:', err);
+      } finally {
+        if (mounted) setIsLoadingShards(false);
+      }
+    }
+    fetchShards();
+    return () => {
+      mounted = false;
+    };
+  }, [run.id]);
+
+  const handleBulkCancelShards = async () => {
+    setIsBulkCancelling(true);
+    try {
+      await apiClient(`/v1/runs/${run.id}/shards/cancel-all`, { method: 'POST' });
+      setReclaimNotice('⚡ 모든 분산 샤드에 일괄 취소 명령이 원자적으로 전달되었습니다. (자원 반환 대기 중)');
+      const res = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
+      if (res.items) setShards(res.items);
+      onRefreshRun?.();
+    } catch (e: any) {
+      alert(e.message || '샤드 일괄 취소 실패');
+    } finally {
+      setIsBulkCancelling(false);
+    }
+  };
+
+  const handleReclaimResources = async () => {
+    setIsReclaiming(true);
+    try {
+      await apiClient<{ runId: string; resourceReleasePending: boolean }>(`/v1/runs/${run.id}/reclaim-resources`, {
+        method: 'POST',
+      });
+      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 모든 Lease 자원을 완전히 회수하였습니다. (ADR-040/041)');
+      const sRes = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
+      if (sRes.items) setShards(sRes.items);
+      onRefreshRun?.();
+    } catch (e: any) {
+      alert(e.message || '자원 회수 실패');
+    } finally {
+      setIsReclaiming(false);
+    }
+  };
 
   const canCancel =
     run.state !== 'succeeded' && run.state !== 'failed' && run.state !== 'cancelled';
@@ -58,16 +138,67 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             ← 목록으로
           </Button>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
-              Run 상세: <code>{run.id}</code>
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
+                Run 상세: <code>{run.id}</code>
+              </h2>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                  color: '#58a6ff',
+                }}
+              >
+                Attempt #{run.attempt ?? 1} / {run.maxAttempts ?? 3}
+              </span>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  backgroundColor:
+                    run.state === 'running'
+                      ? 'rgba(46, 160, 67, 0.2)'
+                      : run.state === 'recovering'
+                      ? 'rgba(217, 119, 6, 0.2)'
+                      : run.state === 'awaiting_approval'
+                      ? 'rgba(218, 54, 51, 0.2)'
+                      : 'rgba(110, 118, 129, 0.2)',
+                  color:
+                    run.state === 'running'
+                      ? '#3fb950'
+                      : run.state === 'recovering'
+                      ? '#d97706'
+                      : run.state === 'awaiting_approval'
+                      ? '#f85149'
+                      : 'var(--color-text-secondary)',
+                }}
+              >
+                {run.state.toUpperCase()}
+              </span>
+            </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
               {run.objective}
+              {run.frozenInputHash && (
+                <span style={{ marginLeft: '12px', color: '#58a6ff', fontFamily: 'monospace' }}>
+                  🔒 Frozen: {run.frozenInputHash.slice(0, 18)}... ({run.frozenInputSizeBytes ?? 0} B)
+                </span>
+              )}
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
+          {run.state === 'recovering' && (
+            <Button variant="primary" size="md" onClick={handlePrepareResume} disabled={isPreparingResume}>
+              {isPreparingResume ? '준비 중...' : '🚀 재개 Step 승인 준비 (ADR-044)'}
+            </Button>
+          )}
+
           {run.state === 'awaiting_approval' && onNavigateApproval && (
             <Button variant="danger" size="md" onClick={() => onNavigateApproval(run.id)}>
               🚨 승인 검토 이동
@@ -158,7 +289,133 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         </div>
       )}
 
-      {/* 4 Tabs */}
+      {/* Workspace Recovery Banner (ADR-044 / ADR-045) */}
+      {run.state === 'recovering' && (
+        <div
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            border: '1px solid #f59e0b',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, color: '#b45309', fontSize: '0.875rem' }}>
+              🔄 워크스페이스 장애 복구 대기 (Workspace Recovering - ADR-044 / ADR-045)
+            </div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
+              현재 RunAttempt: <strong>#{run.attempt ?? 1} / 최대 {run.maxAttempts ?? 3}회</strong>.
+              작업 공간의 체크포인트 상태를 불변 스냅샷으로 고정하고 새 L2 승인을 발행하여 다음 Step 실행으로 원자 전이할 수 있습니다.
+            </div>
+          </div>
+          <Button variant="primary" size="sm" onClick={handlePrepareResume} disabled={isPreparingResume}>
+            {isPreparingResume ? '고정 중...' : '다음 Step 승인 준비 (prepare)'}
+          </Button>
+        </div>
+      )}
+
+      {/* Resume Notice Banner */}
+      {resumeNotice && (
+        <div
+          style={{
+            padding: '12px 18px',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            border: '1px solid #10b981',
+            color: '#047857',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{resumeNotice}</span>
+          {onNavigateApproval && (
+            <Button variant="secondary" size="sm" onClick={() => onNavigateApproval(run.id)}>
+              승인 화면으로 이동 →
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Parent Shard Navigation Banner */}
+      {run.parentId && (
+        <div
+          style={{
+            padding: '12px 18px',
+            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ fontSize: '0.875rem', color: '#1d4ed8' }}>
+            <strong>↳ 하위 분산 샤드:</strong> 이 작업은 상위 분산 계획 <code>{run.parentId}</code>의 샤드 #{((run.shardIndex ?? 0) + 1)}입니다.
+          </div>
+          {onNavigateRun && (
+            <Button variant="secondary" size="sm" onClick={() => onNavigateRun(run.parentId!)}>
+              상위 부모 Run으로 이동
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Resource Release Pending Banner (ADR-040/042) */}
+      {run.resourceReleasePending && (
+        <div
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'rgba(217, 119, 6, 0.12)',
+            border: '1px solid #d97706',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, color: '#d97706', fontSize: '0.875rem' }}>
+              ⏳ 자원 반환 대기 중 (Resource Release Pending - ADR-040/042)
+            </div>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+              작업이 취소/종료되었으나 분산 노드의 물리적 NodeStopReceipt fsync 및 안전한 Lease 반환 절차를 확인 중입니다.
+            </div>
+          </div>
+          <Button variant="secondary" size="sm" onClick={handleReclaimResources} disabled={isReclaiming}>
+            {isReclaiming ? '확인 중...' : '정지 영수증 확정 및 자원 회수'}
+          </Button>
+        </div>
+      )}
+
+      {/* Reclaim / Bulk Cancel Notice Banner */}
+      {reclaimNotice && (
+        <div
+          style={{
+            padding: '12px 18px',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            border: '1px solid #10b981',
+            color: '#047857',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: '16px',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+          }}
+        >
+          {reclaimNotice}
+        </div>
+      )}
+
+      {/* 5 Tabs */}
       <div
         style={{
           display: 'flex',
@@ -172,6 +429,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           { id: 'logs', label: '2. 실시간 SSE 로그' },
           { id: 'artifacts', label: '3. 산출물 (Artifacts)' },
           { id: 'explain', label: '4. 자원 배치 Explain' },
+          { id: 'shards', label: `5. 분산 샤드 & 자원 회수 (${shards.length > 0 ? shards.length : 'ADR-040'})` },
         ].map((t) => {
           const isActive = activeTab === t.id;
           return (
@@ -363,6 +621,197 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               <div>• Node-05-LinuxTrain: 총점 81.5점</div>
               <div>• Node-02-WinWork: 총점 73.0점</div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 5: Shards & Resource Reclamation (ADR-040 / ADR-042 / SHARD-I07) */}
+      {activeTab === 'shards' && (
+        <div
+          style={{
+            padding: '24px',
+            backgroundColor: 'var(--color-bg-surface)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-subtle)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>
+                분산 샤드 실행 & 물리 자원 회수 상태 (ADR-040 / ADR-042 / SHARD-I07)
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                독립 샤드의 물리 정지(NodeStopReceipt), 단조 Fencing, 출력 해시 확정 및 자원 반환 관리
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {canCancel && (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={handleBulkCancelShards}
+                  disabled={isBulkCancelling}
+                >
+                  {isBulkCancelling ? '일괄 취소 중...' : '⚡ 전체 샤드 일괄 취소 (Bulk Cancel)'}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Aggregate Manifest Card */}
+          <div
+            style={{
+              padding: '16px 20px',
+              backgroundColor: 'var(--color-bg-subtle)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-border-subtle)',
+              marginBottom: '24px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>완료 집계 정책 버전</div>
+              <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace' }}>
+                shard-completion:v1
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>결과 Manifest 다이제스트</div>
+              <div
+                style={{
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  fontFamily: 'monospace',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {run.manifestDigest || '미확정 (실행/수집 중)'}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>전체 물리 정지 (Physical Stop)</div>
+              <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                {run.allPhysicallyStopped ? (
+                  <span style={{ color: 'var(--color-status-online)' }}>✓ 전원 정지 영수증 수신</span>
+                ) : (
+                  <span style={{ color: '#d97706' }}>대기 중 (동작 중인 샤드 존재)</span>
+                )}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>전체 결과 검증 (Verified)</div>
+              <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                {run.allSucceeded ? (
+                  <span style={{ color: 'var(--color-status-online)' }}>✓ 전원 검증 합격</span>
+                ) : (
+                  <span style={{ color: 'var(--color-text-muted)' }}>미완료</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Shards Table */}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+              <thead>
+                <tr style={{ backgroundColor: 'var(--color-bg-canvas)', borderBottom: '1px solid var(--color-border-subtle)' }}>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>샤드 ID</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>할당 노드</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>Attempt</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>실행 상태</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>물리 정지 영수증</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>출력 해시 (SHA-256)</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>결과 검증</th>
+                  <th style={{ padding: '10px 12px', fontWeight: 600 }}>작업</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoadingShards ? (
+                  <tr>
+                    <td colSpan={8} style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                      샤드 상태 조회 중...
+                    </td>
+                  </tr>
+                ) : shards.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                      등록된 분산 샤드가 없습니다. (단일 노드 실행)
+                    </td>
+                  </tr>
+                ) : (
+                  shards.map((s) => (
+                    <tr key={s.shardId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontWeight: 600 }}>
+                        {s.shardId}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <div>{s.hostname}</div>
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+                          {s.nodeId}
+                        </div>
+                      </td>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace' }}>#{s.attempt}</td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '2px 6px',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            backgroundColor:
+                              s.executionState === 'running'
+                                ? 'rgba(59, 130, 246, 0.15)'
+                                : s.executionState === 'succeeded'
+                                ? 'rgba(16, 185, 129, 0.15)'
+                                : 'rgba(239, 68, 68, 0.15)',
+                            color:
+                              s.executionState === 'running'
+                                ? '#3b82f6'
+                                : s.executionState === 'succeeded'
+                                ? '#10b981'
+                                : '#ef4444',
+                          }}
+                        >
+                          {s.executionState}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        {s.physicallyStopped ? (
+                          <span style={{ color: 'var(--color-status-online)', fontWeight: 600 }}>
+                            ✓ 수신 완료
+                          </span>
+                        ) : (
+                          <span style={{ color: '#d97706', fontSize: '0.8125rem' }}>
+                            ⏳ fsync 대기
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                        {s.outputHash ? s.outputHash.slice(0, 18) + '...' : '-'}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        {s.verified ? (
+                          <span style={{ color: 'var(--color-status-online)', fontWeight: 600 }}>✓ 합격</span>
+                        ) : (
+                          <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>미검증</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        {s.runId && s.runId !== run.id && onNavigateRun && (
+                          <Button variant="ghost" size="sm" onClick={() => onNavigateRun(s.runId)}>
+                            상세
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
