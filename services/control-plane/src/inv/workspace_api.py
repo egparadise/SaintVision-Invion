@@ -7,6 +7,7 @@ approval, reservation, claim and queue are checked/committed together afterwards
 """
 
 from copy import deepcopy
+from contextlib import nullcontext
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -125,7 +126,7 @@ class WorkspaceAPI:
         if not row or not row["enabled"]:
             raise DomainError("AUTH-0030", "Project Node membership unavailable", 403)
 
-    def prepare(self, principal, project, run_id, data, key):
+    def prepare(self, principal, project, run_id, data, key, *, root_fd=None):
         validate_contract("WorkspacePrepareInput", data)
         workload = deepcopy(data["workload"])
         if (
@@ -138,7 +139,11 @@ class WorkspaceAPI:
         # All service writers must use this root lock. External writers have no
         # service ownership; capture detects races and fails instead of approving
         # a torn snapshot. Frozen bytes are immutable even after later edits.
-        with self.working.locked() as root_fd, self.db.transaction(principal.tenant_id) as conn:
+        root_lock = self.working.locked() if root_fd is None else nullcontext(root_fd)
+        with root_lock as root_fd, self.db.transaction(principal.tenant_id) as conn:
+            from .business_handoff import require_handoff
+
+            require_handoff(conn, self.db, run_id)
             prior = self.ledger._ledger(
                 conn, principal, project, "workspace.api.prepare", key, {"runId": run_id, **data}
             )
@@ -217,7 +222,7 @@ class WorkspaceAPI:
             validate_contract("WorkspaceResumptionView", result)
             return result
 
-    def enqueue(self, principal, project, run_id, data, key):
+    def enqueue(self, principal, project, run_id, data, key, *, binding_id=None):
         validate_contract("WorkspaceEnqueueInput", data)
         payload = {"runId": run_id, **data}
         # Persist only a retryable idempotency slot before network I/O. No approval
@@ -227,6 +232,18 @@ class WorkspaceAPI:
                 conn, principal, project, "workspace.api.enqueue", key, payload
             )
             self._scope(conn, principal, project, run_id)
+            from .business_handoff import check_admission
+
+            check_admission(
+                conn,
+                self.db,
+                principal,
+                project,
+                run_id,
+                data,
+                binding_id,
+                replay=prior is not None,
+            )
             if prior is not None:
                 return prior
             frozen = self._frozen(conn, project, run_id, data["resumeId"])
@@ -238,6 +255,16 @@ class WorkspaceAPI:
                 conn, principal, project, "workspace.api.enqueue", key, payload
             )
             run = self._scope(conn, principal, project, run_id)
+            check_admission(
+                conn,
+                self.db,
+                principal,
+                project,
+                run_id,
+                data,
+                binding_id,
+                replay=prior is not None,
+            )
             if prior is not None:
                 return prior
             if run["version"] != data["expectedVersion"] or run["state"] != "awaiting_approval":
@@ -250,6 +277,7 @@ class WorkspaceAPI:
             if not approval or approval["run_id"] != run_id:
                 raise DomainError("AUTH-0011", "Approval Run differs", 403)
             bound = BoundDatabase(self.db, principal.tenant_id, conn)
+            bound.business_handoff = binding_id is not None
             command = ApprovalStore(bound).dispatch(
                 principal,
                 project,

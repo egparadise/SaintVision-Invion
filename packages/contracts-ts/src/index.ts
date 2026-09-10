@@ -522,3 +522,45 @@ export interface ShardRecoveryEnqueued {
   replayed: boolean;
   parentRunId: RunId;
 }
+
+export interface BusinessEditLockInput {
+  projectId: ProjectId;
+  runId: RunId;
+  checkoutId: string;
+  expectedVersion: number;
+}
+
+export interface BusinessBindingInput {
+  projectId: ProjectId;
+  lockId: string;
+  prepare: WorkspacePrepareInput;
+}
+
+export interface BusinessApprovalInput {
+  approvalId: ApprovalId;
+}
+
+export interface BusinessBindingView {
+  bindingId: string;
+  projectId: ProjectId;
+  runId: RunId;
+  workspaceId: WorkspaceId;
+  lockId: string;
+  resumeId: string;
+  checkoutId: string;
+  recoveryEpoch: string;
+  boundRunVersion: number;
+  inputSha256: string;
+  inputSizeBytes: number;
+  approval: ApprovalView;
+  state: "frozen" | "approved" | "queued" | "executing" | "settled" | "abandoned";
+  run: ControlRunView;
+  commandId: (string | null);
+  attempt: (number | null);
+  stopReceiptId: (string | null);
+  evidenceId: (EvidenceId | null);
+  releaseAllowed: boolean;
+  resourceReleasePending: boolean;
+  releasedAt: (string | null);
+  workload: WorkloadSpec;
+}

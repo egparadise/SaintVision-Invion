@@ -16,6 +16,7 @@ class Control:
         self.runs = RunStore(database)
 
     def grant(self, conn, principal, project, permission=None):
+        from .business_auth import permission as business_permission
         validate_contract("ProjectId", project)
         row = conn.execute(
             "SELECT * FROM inv.project_grants WHERE project_id=%s AND subject_id=%s FOR SHARE",
@@ -28,18 +29,23 @@ class Control:
             or (permission and not row[permission])
         ):
             raise DomainError("AUTH-0030", "Project permission is unavailable", 403)
+        business_permission(conn, project, principal.subject_id, permission)
 
     def projects(self, principal):
         with self.db.transaction(principal.tenant_id) as conn:
-            return {
-                "items": [
-                    {"projectId": r["project_id"]}
-                    for r in conn.execute(
-                        "SELECT project_id FROM inv.project_grants WHERE subject_id=%s AND enabled AND (can_request OR can_approve) ORDER BY project_id LIMIT 200",
-                        (principal.subject_id,),
-                    ).fetchall()
-                ]
-            }
+            items = []
+            for row in conn.execute(
+                "SELECT project_id FROM inv.project_grants WHERE subject_id=%s AND enabled AND (can_request OR can_approve) ORDER BY project_id LIMIT 200",
+                (principal.subject_id,),
+            ).fetchall():
+                try:
+                    self.grant(conn, principal, row["project_id"])
+                except DomainError as error:
+                    if error.code != "AUTH-0030":
+                        raise
+                else:
+                    items.append({"projectId": row["project_id"]})
+            return {"items": items}
 
     def create(self, principal, project, key):
         with self.db.transaction(principal.tenant_id) as conn:

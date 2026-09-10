@@ -163,6 +163,9 @@ class LeaseStore:
         from .shard_recovery import require_recovery_admission
 
         require_recovery_admission(conn, self.db, run_id)
+        from .business_handoff import require_handoff
+
+        require_handoff(conn, self.db, run_id)
         conn.execute(
             "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
             (project_id,),

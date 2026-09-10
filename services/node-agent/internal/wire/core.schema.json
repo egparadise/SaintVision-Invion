@@ -2268,6 +2268,220 @@
           "$ref": "#/$defs/RunId"
         }
       }
+    },
+    "BusinessEditLockInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "projectId",
+        "runId",
+        "checkoutId",
+        "expectedVersion"
+      ]
+    },
+    "BusinessBindingInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "lockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "prepare": {
+          "$ref": "#/$defs/WorkspacePrepareInput"
+        }
+      },
+      "required": [
+        "projectId",
+        "lockId",
+        "prepare"
+      ]
+    },
+    "BusinessApprovalInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        }
+      },
+      "required": [
+        "approvalId"
+      ]
+    },
+    "BusinessBindingView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bindingId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "lockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "resumeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "boundRunVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "approval": {
+          "$ref": "#/$defs/ApprovalView"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "frozen",
+            "approved",
+            "queued",
+            "executing",
+            "settled",
+            "abandoned"
+          ]
+        },
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "commandId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempt": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stopReceiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "releaseAllowed": {
+          "type": "boolean"
+        },
+        "resourceReleasePending": {
+          "type": "boolean"
+        },
+        "releasedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        }
+      },
+      "required": [
+        "bindingId",
+        "projectId",
+        "runId",
+        "workspaceId",
+        "lockId",
+        "resumeId",
+        "checkoutId",
+        "recoveryEpoch",
+        "boundRunVersion",
+        "inputSha256",
+        "inputSizeBytes",
+        "approval",
+        "state",
+        "run",
+        "commandId",
+        "attempt",
+        "stopReceiptId",
+        "evidenceId",
+        "releaseAllowed",
+        "resourceReleasePending",
+        "releasedAt",
+        "workload"
+      ]
     }
   },
   "oneOf": [

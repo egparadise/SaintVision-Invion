@@ -307,6 +307,93 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
             raise DomainError("SYS-0001", "Workspace admission is not configured", 503)
         return workspace
 
+    def business_service():
+        from .business_handoff import BusinessHandoff
+
+        return BusinessHandoff(workspace_service())
+
+    @api.get("/v1/projects/{project}/permission")
+    def business_permission(project: str, identity=Depends(authenticated)):
+        from .business_auth import permission
+
+        with database.transaction(identity.principal.tenant_id) as conn:
+            control.grant(conn, identity.principal, project)
+            value = permission(conn, project, identity.principal.subject_id, linked=True)
+            return {
+                "projectId": project,
+                "userId": value["userId"],
+                "roleCode": value["roleCode"],
+                "canRequest": value["can_request"],
+                "canApprove": value["can_approve"],
+            }
+
+    @api.post("/v1/workspaces/{workspace_id}/edit-lock", status_code=201)
+    async def stop_business_editing(
+        workspace_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().stop,
+            identity.principal,
+            workspace_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.delete("/v1/edit-locks/{lock_id}")
+    async def release_business_editing(
+        lock_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().release, identity.principal, lock_id, key(request)
+        )
+
+    @api.post("/v1/runs/{run_id}/bindings", status_code=201)
+    async def prepare_business_binding(
+        run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().prepare,
+            identity.principal,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/bindings/{binding_id}")
+    def business_binding(binding_id: str, identity=Depends(authenticated)):
+        return business_service().get(identity.principal, binding_id)
+
+    @api.post("/v1/bindings/{binding_id}/approval")
+    async def business_approval(binding_id: str, request: Request, identity=Depends(authenticated)):
+        return await run_in_threadpool(
+            business_service().approved, identity.principal, binding_id, await request.json()
+        )
+
+    @api.post("/v1/bindings/{binding_id}/enqueue", status_code=202)
+    async def enqueue_business_binding(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            business_service().enqueue, identity.principal, binding_id, key(request)
+        )
+
+    @api.post("/v1/bindings/{binding_id}/reconcile")
+    async def reconcile_business_binding(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            business_service().reconcile, identity.principal, binding_id, key(request)
+        )
+
+    @api.post("/v1/bindings/{binding_id}/state")
+    async def reject_business_state(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        await run_in_threadpool(business_service().get, identity.principal, binding_id)
+        raise DomainError("AUTH-0045", "Binding state is derived from execution evidence", 403)
+
     @api.post("/v1/projects/{project}/runs/{run_id}/resume/prepare", status_code=201)
     async def prepare_workspace(
         project: str, run_id: str, request: Request, identity=Depends(authenticated)
