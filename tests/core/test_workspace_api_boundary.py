@@ -42,17 +42,23 @@ def test_integrated_migration_keeps_both_published_histories():
     spec.loader.exec_module(module)
     revisions = module.load()
     ordered = module.chain(revisions)
-    assert ordered[-1].revision == "0021_business_kernel"
+    assert ordered[-1].revision == "0022_node_containment"
     parents = {r.revision: r.down_revision for r in revisions}
     assert parents["0008_node_certificate_lookup"] == "0006_control_api"
     assert parents["0007_delivery_queue"] == "0006_control_api"
-    assert module.downgrade_target(revisions) == "0021_business_kernel"
+    assert module.downgrade_target(revisions) == "0022_node_containment"
     with pytest.raises(ValueError, match="unmerged"):
         module.chain(
             [
                 r
                 for r in revisions
-                if r.revision not in {"0019_workspace_api_integration", "0020_shard_recovery", "0021_business_kernel"}
+                if r.revision
+                not in {
+                    "0019_workspace_api_integration",
+                    "0020_shard_recovery",
+                    "0021_business_kernel",
+                    "0022_node_containment",
+                }
             ]
         )
     # A disconnected cycle must not be hidden behind the valid merged head.

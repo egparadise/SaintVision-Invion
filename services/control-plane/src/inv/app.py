@@ -229,6 +229,68 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     def projects(identity=Depends(authenticated)):
         return control.projects(identity.principal)
 
+    @api.get("/v1/operations/kill-switch")
+    def kill_status(identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return Containment(database).get(identity.principal)
+
+    @api.post("/v1/operations/kill-switch", status_code=202)
+    async def kill_switch(request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "kill",
+            await request.json(),
+            key(request),
+        )
+
+    @api.post("/v1/operations/kill-switch/clear")
+    async def clear_kill_switch(request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "clear",
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/nodes/{node_id}/control")
+    def node_control(node_id: str, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return Containment(database).get(identity.principal, node_id)
+
+    @api.post("/v1/nodes/{node_id}/drain", status_code=202)
+    async def drain_node(node_id: str, request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "drain",
+            await request.json(),
+            key(request),
+            node_id,
+        )
+
+    @api.post("/v1/nodes/{node_id}/resume")
+    async def resume_node(node_id: str, request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "resume",
+            await request.json(),
+            key(request),
+            node_id,
+        )
+
     @api.get("/v1/projects/{project}/runs")
     def runs(
         project: str,

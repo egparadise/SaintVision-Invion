@@ -61,6 +61,9 @@ class Control:
             self.grant(conn, principal, project, "can_request")
             if prior is not None:
                 return prior
+            from .containment import require_execution
+
+            require_execution(conn)
             row = conn.execute(
                 "INSERT INTO inv.runs(tenant_id,project_id,run_id) VALUES(%s,%s,%s) RETURNING *",
                 (principal.tenant_id, project, new_id("run")),

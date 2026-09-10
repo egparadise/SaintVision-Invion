@@ -143,6 +143,9 @@ class ToolGateway:
                 # A replay is an observation, never a renewed launch permission. This
                 # remains false after cancellation, expiry, or lost first response.
                 return ClaimResult(False, claim_view(prior), None)
+            from .containment import require_execution
+
+            require_execution(conn)
             approval = conn.execute(
                 "SELECT * FROM inv.approval_requests WHERE approval_id=%s AND run_id=%s FOR SHARE",
                 (command["approvalId"], command["runId"]),

@@ -144,8 +144,7 @@ class NodeTLSClient:
                 )
             if (
                 response.status != 200
-                or response.getheader("Content-Type", "").split(";")[0]
-                != "application/json"
+                or response.getheader("Content-Type", "").split(";")[0] != "application/json"
             ):
                 raise DomainError(
                     "NODE-0030",
@@ -191,14 +190,19 @@ class NodeDelivery:
             or claim["recoveryEpoch"] != self.db.recovery_epoch
         ):
             raise DomainError("NODE-0032", "Permit Node identity differs", 403)
-        channel = self.channels.snapshot(
-            node, observation_only=observation_only or cancel_only
-        )
+        try:
+            channel = self.channels.snapshot(node, observation_only=observation_only or cancel_only)
+        except DomainError as error:
+            # Only this pre-I/O boundary proves no execute request was sent.
+            # The queue still obtains a durable cancel tombstone before release.
+            if not observation_only and not cancel_only:
+                error.not_sent = True
+            raise
         result = self.client.exchange(
             channel,
             permit,
             observation_only=observation_only,
-            **({"cancel_only": True} if cancel_only else {})
+            **({"cancel_only": True} if cancel_only else {}),
         )
         receipt = result["receipt"]
         if (

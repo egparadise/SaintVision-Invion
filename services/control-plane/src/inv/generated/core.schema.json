@@ -2502,6 +2502,124 @@
         "releasedAt",
         "workload"
       ]
+    },
+    "ContainmentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "maintenance",
+            "incident",
+            "operator_request"
+          ]
+        }
+      },
+      "required": [
+        "expectedVersion",
+        "reasonCode"
+      ]
+    },
+    "ContainmentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "killSwitchActive": {
+          "type": "boolean"
+        },
+        "nodeStatus": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "online",
+                "offline",
+                "draining",
+                "quarantined"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "activeLeases": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pendingDeliveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "unsettledRuns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "settled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "nodeId",
+        "version",
+        "killSwitchActive",
+        "nodeStatus",
+        "activeLeases",
+        "pendingDeliveries",
+        "unsettledRuns",
+        "settled"
+      ]
+    },
+    "ContainmentResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "kill",
+            "clear",
+            "drain",
+            "resume"
+          ]
+        },
+        "control": {
+          "$ref": "#/$defs/ContainmentView"
+        }
+      },
+      "required": [
+        "requestId",
+        "operation",
+        "control"
+      ]
     }
   },
   "oneOf": [

@@ -746,6 +746,57 @@ class DeliveryPhase(StrEnum):
     stopped = 'stopped'
 
 
+class ReasonCode(StrEnum):
+    maintenance = 'maintenance'
+    incident = 'incident'
+    operator_request = 'operator_request'
+
+
+class ContainmentInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+
+
+class NodeStatus(StrEnum):
+    online = 'online'
+    offline = 'offline'
+    draining = 'draining'
+    quarantined = 'quarantined'
+
+
+class ContainmentView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId | None
+    version: conint(ge=0, le=9007199254740991)
+    killSwitchActive: bool
+    nodeStatus: NodeStatus | None
+    activeLeases: conint(ge=0, le=9007199254740991)
+    pendingDeliveries: conint(ge=0, le=9007199254740991)
+    unsettledRuns: conint(ge=0, le=9007199254740991)
+    settled: bool
+
+
+class Operation(StrEnum):
+    kill = 'kill'
+    clear = 'clear'
+    drain = 'drain'
+    resume = 'resume'
+
+
+class ContainmentResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    requestId: UUID
+    operation: Operation
+    control: ContainmentView
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

@@ -71,7 +71,18 @@ class DeliveryQueue:
             return False
         allocations = json.loads(base64.b64decode(row["envelope"]["payload"]))["allocations"]
         try:
+            from .containment import require_execution
+
+            require_execution(conn)
             lock_resources(conn, [a["lease"]["resourceId"] for a in allocations])
+            ready = conn.execute(
+                """SELECT 1 FROM inv.nodes WHERE node_id=%s AND status='online'
+                AND recovery_epoch=%s::uuid AND abs(clock_skew_seconds)<=5
+                AND heartbeat_at BETWEEN clock_timestamp()-interval '15 seconds' AND clock_timestamp()""",
+                (row["node_id"], self.db.recovery_epoch),
+            ).fetchone()
+            if not ready:
+                return False
             assert_fences(
                 conn,
                 run["run_id"],
@@ -232,9 +243,9 @@ class DeliveryQueue:
             {"commandId": str(row["command_id"])},
         )
 
-    def finish(self, attempt, *, error_code=None):
+    def finish(self, attempt, *, error_code=None, not_sent=False):
         with self.db.transaction(attempt.node.tenant_id) as conn:
-            lock_run(conn, attempt.run_id, attempt.project_id)
+            run = lock_run(conn, attempt.run_id, attempt.project_id)
             row = conn.execute(
                 "SELECT * FROM inv.execution_deliveries WHERE command_id=%s FOR UPDATE",
                 (attempt.command_id,),
@@ -249,6 +260,24 @@ class DeliveryQueue:
             ).fetchone():
                 self._stopped(conn, row)
                 return "stopped"
+            if not_sent and attempt.operation == "execute":
+                if run["state"] not in {"succeeded", "failed", "cancelled"}:
+                    RunStore(self.db)._transition(
+                        conn, attempt.node.tenant_id, run, "cancelled", run["version"]
+                    )
+                conn.execute(
+                    """UPDATE inv.execution_deliveries SET operation='cancel',worker_token=NULL,lease_until=NULL,
+                    next_attempt_at=clock_timestamp(),last_error_code=%s,updated_at=clock_timestamp() WHERE command_id=%s""",
+                    (error_code, attempt.command_id),
+                )
+                event(
+                    conn,
+                    attempt.node.tenant_id,
+                    attempt.run_id,
+                    "inv.execution.preflight_cancelled",
+                    {"commandId": attempt.command_id},
+                )
+                return "uncertain"
             # A transport return is not proof. NodeDelivery must first commit its
             # authenticated receipt; no receipt leaves the queue uncertain.
             conn.execute(
@@ -271,12 +300,15 @@ class DeliveryWorker:
         self.parents = ShardCompletion(database, output_provider)
 
     def once(self, tenant_id, *, command_id=None):
+        from .containment import ContainmentReconciler
+
+        reconciled = ContainmentReconciler(self.queue.db).once(tenant_id)
         attempt = self.queue.acquire(tenant_id, command_id=command_id)
         if attempt is None:
             outcome = self.outputs.once(tenant_id, command_id=command_id)
             parent = self.parents.once(tenant_id, command_id=command_id)
-            return outcome if outcome != "idle" else parent
-        error = None
+            return outcome if outcome != "idle" else parent if parent != "idle" else reconciled
+        error, not_sent = None, False
         try:
             self.delivery.deliver(
                 attempt.node,
@@ -286,7 +318,8 @@ class DeliveryWorker:
             )
         except Exception as exc:
             error = exc.code if isinstance(exc, DomainError) else "SYS-0001"
-        outcome = self.queue.finish(attempt, error_code=error)
+            not_sent = isinstance(exc, DomainError) and getattr(exc, "not_sent", False)
+        outcome = self.queue.finish(attempt, error_code=error, not_sent=not_sent)
         if outcome == "stopped":
             self.outputs.once(tenant_id, command_id=attempt.command_id)
             self.parents.once(tenant_id, command_id=attempt.command_id)
