@@ -21,6 +21,7 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
+import { apiClient } from '@/shared/api/client';
 
 // Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -239,10 +240,65 @@ export const App: React.FC = () => {
   const [approvals, setApprovals] = useState<ApprovalItem[]>([DEMO_APPROVAL]);
   const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
+  const [, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
+
+  const fetchRuns = () => {
+    apiClient<{ items: RunItem[] }>('/v1/runs')
+      .then((res) => {
+        if (res.items?.length > 0) {
+          setRuns(res.items);
+        }
+      })
+      .catch((err) => console.warn('Live /v1/runs fetch fallback:', err));
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Initial load from live backend endpoints
+  useEffect(() => {
+    let isMounted = true;
+    apiClient<{ items: any[] }>('/v1/nodes')
+      .then((res) => {
+        if (isMounted && res.items?.length > 0) {
+          setNodes(
+            res.items.map((srvNode) => ({
+              id: srvNode.nodeId || srvNode.id,
+              hostname: srvNode.hostname,
+              status: srvNode.status || 'online',
+              os: srvNode.osType || srvNode.os || 'windows',
+              cpuCores: srvNode.cpuCores || 8,
+              cpuUsagePercent: srvNode.cpuUsagePercent || 20,
+              memoryTotalBytes: srvNode.memoryTotalBytes || 32 * 1024 ** 3,
+              memoryUsedBytes: srvNode.memoryUsedBytes || 16 * 1024 ** 3,
+              gpuName: srvNode.gpuName,
+              gpuCount: srvNode.gpuCount || 0,
+              gpuVramTotalBytes: srvNode.gpuVramTotalBytes || 0,
+              gpuVramUsedBytes: srvNode.gpuVramUsedBytes || 0,
+              storageTotalBytes: srvNode.storageTotalBytes || 1000 * 1024 ** 3,
+              storageUsedBytes: srvNode.storageUsedBytes || 400 * 1024 ** 3,
+              heartbeatAt: srvNode.lastHeartbeatAt || srvNode.heartbeatAt || new Date().toISOString(),
+            }))
+          );
+        }
+      })
+      .catch((err) => console.warn('Live /v1/nodes fetch fallback:', err));
+
+    fetchRuns();
+
+    apiClient<{ items: ApprovalItem[] }>('/v1/approvals')
+      .then((res) => {
+        if (isMounted && res.items?.length > 0) {
+          setApprovals(res.items);
+        }
+      })
+      .catch((err) => console.warn('Live /v1/approvals fetch fallback:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Live Heartbeat & Metric Fluctuations Simulation
   useEffect(() => {
@@ -267,7 +323,14 @@ export const App: React.FC = () => {
   };
 
   const handleApprove = async (approvalId: string, nonce: string) => {
-    alert(`승인 성공!\nApproval ID: ${approvalId}\nNonce: ${nonce}`);
+    try {
+      await apiClient(`/v1/approvals/${approvalId}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ nonce }),
+      });
+    } catch (err) {
+      console.warn('Backend approval API fallback:', err);
+    }
     setApprovals((prev) =>
       prev.map((a) => (a.id === approvalId ? { ...a, status: 'approved' } : a))
     );
@@ -283,8 +346,7 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleReject = async (approvalId: string, reason: string) => {
-    alert(`반려 완료!\nApproval ID: ${approvalId}\n사유: ${reason}`);
+  const handleReject = async (approvalId: string, _reason: string) => {
     setApprovals((prev) =>
       prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
     );
@@ -301,14 +363,22 @@ export const App: React.FC = () => {
   };
 
   const handleCancelRun = async (runId: string, reason: string) => {
-    alert(`Run이 취소되었습니다.\nRun ID: ${runId}\n사유: ${reason}`);
-    setRuns((prev) =>
-      prev.map((r) =>
-        r.id === runId
-          ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
-          : r
-      )
-    );
+    try {
+      await apiClient(`/v1/runs/${runId}/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      });
+      fetchRuns();
+    } catch (err) {
+      console.warn('Backend run cancellation API fallback:', err);
+      setRuns((prev) =>
+        prev.map((r) =>
+          r.id === runId
+            ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
+            : r
+        )
+      );
+    }
   };
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -510,7 +580,9 @@ export const App: React.FC = () => {
                 onBack={() => setSelectedRunId(null)}
                 onNavigateEvidence={(id) => setEvidenceRunId(id)}
                 onNavigateApproval={() => setActiveTab('approvals')}
+                onNavigateRun={(id) => setSelectedRunId(id)}
                 onCancelRun={handleCancelRun}
+                onRefreshRun={fetchRuns}
               />
             ) : (
               <RunList
@@ -551,7 +623,8 @@ export const App: React.FC = () => {
         {activeTab === 'login' && (
           <Login
             onLoginSuccess={(user) => {
-              alert(`로그인 성공: ${user.name} (${user.role})`);
+              setCurrentUser(user);
+              setCurrentReviewerId(user.id);
               setActiveTab('dashboard');
             }}
           />

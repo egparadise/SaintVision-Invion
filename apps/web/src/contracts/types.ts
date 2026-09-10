@@ -132,6 +132,68 @@ export interface RunItem {
   requestedBy: string;
   createdAt: string;
   updatedAt: string;
+  parentId?: string;
+  childRunIds?: string[];
+  resourceReleasePending?: boolean;
+  attempt?: number;
+  outputEvidenceId?: string;
+  shardIndex?: number;
+  shardCount?: number;
+  allPhysicallyStopped?: boolean;
+  allSucceeded?: boolean;
+  aggregateEvidenceId?: string;
+  manifestDigest?: string;
+  maxAttempts?: number;
+  boundRunVersion?: number;
+  frozenInputHash?: string;
+  frozenInputSizeBytes?: number;
+}
+
+export interface WorkspaceResumeSpec {
+  resumeId: string;
+  runId: string;
+  checkoutId: string;
+  sourceAttempt: number;
+  checkpointAttempt: number;
+  sourceStepId: string;
+  nextStepId: string;
+  inputHash: string;
+  inputSizeBytes: number;
+  boundRunVersion: number;
+  maxAttempts: number;
+  currentAttempt: number;
+  frozenFiles: Array<{ path: string; size: number; sha256: string }>;
+  approvalId?: string;
+  createdAt: string;
+}
+
+export interface ShardExecutionItem {
+  shardId: string;
+  runId: string;
+  parentId: string;
+  nodeId: string;
+  hostname: string;
+  attempt: number;
+  executionState: RunState;
+  physicallyStopped: boolean;
+  verified: boolean;
+  resourceReleasePending: boolean;
+  outputHash?: string;
+  evidenceId?: string;
+  exitCode?: number;
+}
+
+export interface DistributedPlanItem {
+  planId: string;
+  parentRunId: string;
+  state: 'placed' | 'running' | 'completed' | 'cancelled' | 'failed';
+  shards: ShardExecutionItem[];
+  allPhysicallyStopped: boolean;
+  allSucceeded: boolean;
+  resourceReleasePending: boolean;
+  aggregateEvidenceId?: string;
+  manifestDigest?: string;
+  createdAt: string;
 }
 
 export interface PlacementRequirement {

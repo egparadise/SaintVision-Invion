@@ -52,10 +52,29 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
   });
 
   // Editor states
-  const [viewMode, setViewMode] = useState<'editor' | 'diff'>('editor');
+  const [viewMode, setViewMode] = useState<'editor' | 'diff' | 'frozen'>('editor');
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [conflictDiff, setConflictDiff] = useState<FileDiffResult | null>(null);
   const [simulateConflictOnSave, setSimulateConflictOnSave] = useState(false);
+
+  // ADR-044 Frozen Input Snapshot state
+  const [frozenSnapshot] = useState<{
+    boundRunVersion: number;
+    attempt: number;
+    maxAttempts: number;
+    inputHash: string;
+    files: Record<string, string>;
+  }>({
+    boundRunVersion: 2,
+    attempt: 1,
+    maxAttempts: 3,
+    inputHash: 'sha256:72f9a95f9eb3460f0c51f1d8c2f0fbc58369e1ceb1e73a5ba45d769887b7570f',
+    files: {
+      'src/server.ts': INITIAL_FILES[0].content,
+      'contracts/governance.yaml': INITIAL_FILES[1].content,
+      'README.md': INITIAL_FILES[2].content,
+    },
+  });
 
   // Git states
   const [showCommitModal, setShowCommitModal] = useState(false);
@@ -261,6 +280,13 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
             >
               Diff View {activeFile.isDirty && `(+${activeDiff.additionsCount}/-${activeDiff.deletionsCount})`}
             </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'frozen' ? 'primary' : 'secondary'}
+              onClick={() => setViewMode('frozen')}
+            >
+              🔒 Frozen Snapshot (ADR-044)
+            </Button>
           </div>
         </div>
 
@@ -350,6 +376,112 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 onApply={handleSaveFile}
                 onClose={() => setViewMode('editor')}
               />
+            ) : viewMode === 'frozen' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                {/* Frozen Snapshot Banner */}
+                <div
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: 'rgba(56, 139, 253, 0.12)',
+                    borderBottom: '1px solid rgba(56, 139, 253, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontSize: '12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontWeight: 600, color: '#58a6ff' }}>
+                      🔒 불변 Workspace 실행 입력 스냅샷 (ADR-044 Frozen Input)
+                    </span>
+                    <span style={{ color: '#8b949e' }}>
+                      Attempt #{frozenSnapshot.attempt}/{frozenSnapshot.maxAttempts} • Version v{frozenSnapshot.boundRunVersion}
+                    </span>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '11px', color: '#79c0ff' }}>
+                    Digest: {frozenSnapshot.inputHash.slice(0, 24)}...
+                  </div>
+                </div>
+
+                {/* Editor Tab Bar */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 16px',
+                    backgroundColor: '#161b22',
+                    borderBottom: '1px solid #30363d',
+                    fontSize: '12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: '#f0f6fc' }}>
+                      {activeFile.path}
+                    </span>
+                    <span
+                      style={{
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        backgroundColor: 'rgba(210, 153, 34, 0.2)',
+                        color: '#e3b341',
+                      }}
+                    >
+                      READ-ONLY (FROZEN)
+                    </span>
+                  </div>
+                  <span style={{ color: '#8b949e', fontSize: '11px' }}>
+                    고정 입력 • 호스트의 후속 편집과 엄격히 분리 보존됨 (ADR-044)
+                  </span>
+                </div>
+
+                {/* Frozen Code Area */}
+                <div style={{ flex: 1, display: 'flex', backgroundColor: '#090d13', overflow: 'hidden' }}>
+                  {/* Line Numbers Gutter */}
+                  <div
+                    style={{
+                      width: '44px',
+                      padding: '12px 6px',
+                      backgroundColor: '#070a0e',
+                      borderRight: '1px solid #21262d',
+                      color: '#484f58',
+                      fontFamily: 'var(--font-mono, monospace)',
+                      fontSize: '13px',
+                      lineHeight: '20px',
+                      textAlign: 'right',
+                      userSelect: 'none',
+                    }}
+                  >
+                    {(frozenSnapshot.files[activeFilePath] || activeFile.content).split('\n').map((_, i) => (
+                      <div key={i}>{i + 1}</div>
+                    ))}
+                  </div>
+
+                  {/* Code Area (Read Only) */}
+                  <textarea
+                    value={frozenSnapshot.files[activeFilePath] || activeFile.content}
+                    readOnly
+                    spellCheck={false}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      backgroundColor: 'transparent',
+                      color: '#8b949e',
+                      border: 'none',
+                      outline: 'none',
+                      resize: 'none',
+                      fontFamily: 'var(--font-mono, monospace)',
+                      fontSize: '13px',
+                      lineHeight: '20px',
+                      whiteSpace: 'pre',
+                      overflowY: 'auto',
+                      cursor: 'not-allowed',
+                    }}
+                  />
+                </div>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {/* Editor Tab Bar */}
@@ -581,7 +713,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         <GitCommitModal
           files={files}
           parentCommit={commits[0] || null}
-          onCommit={(newCommit) => {
+          onCommit={async (newCommit) => {
             setCommits([newCommit, ...commits]);
             // Clear dirty flags for committed files
             setFiles((prev) =>
@@ -589,6 +721,19 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 newCommit.stagedFiles.includes(f.path) ? { ...f, isDirty: false } : f
               )
             );
+            try {
+              const { apiClient } = await import('@/shared/api/client');
+              await apiClient('/v1/projects/prj_01JABCDE/runs', {
+                method: 'POST',
+                body: JSON.stringify({
+                  objective: `Git Commit [${newCommit.commitId.slice(0, 7)}]: ${newCommit.message}`,
+                  stagedFiles: newCommit.stagedFiles,
+                  treeHash: newCommit.treeHash,
+                }),
+              });
+            } catch (err) {
+              console.warn('Backend run trigger fallback on Git commit:', err);
+            }
             setShowCommitModal(false);
           }}
           onCancel={() => setShowCommitModal(false)}

@@ -149,26 +149,81 @@ export const RunList: React.FC<RunListProps> = ({
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 600 }}>
-                    {run.id}
+                    <div>{run.id}</div>
+                    {run.parentId && (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          marginTop: '2px',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '0.6875rem',
+                          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                          color: '#3b82f6',
+                          border: '1px solid rgba(59, 130, 246, 0.3)',
+                        }}
+                      >
+                        ↳ 샤드 #{((run.shardIndex ?? 0) + 1)} (부모: {run.parentId.slice(0, 14)}...)
+                      </span>
+                    )}
+                    {run.childRunIds && run.childRunIds.length > 0 && (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          marginTop: '2px',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '0.6875rem',
+                          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                          color: '#8b5cf6',
+                          border: '1px solid rgba(139, 92, 246, 0.3)',
+                        }}
+                      >
+                        ⚡ 분산 부모 ({run.childRunIds.length}개 샤드)
+                      </span>
+                    )}
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-primary)' }}>
-                    {run.objective}
+                    <div>{run.objective}</div>
+                    {run.manifestDigest && (
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', marginTop: '2px' }}>
+                        Manifest: {run.manifestDigest.slice(0, 22)}...
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: 'var(--radius-sm)',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: cfg.color,
-                        backgroundColor: cfg.bg,
-                        border: `1px solid ${cfg.color}`,
-                      }}
-                    >
-                      {cfg.label}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          color: cfg.color,
+                          backgroundColor: cfg.bg,
+                          border: `1px solid ${cfg.color}`,
+                        }}
+                      >
+                        {cfg.label}
+                      </span>
+                      {run.resourceReleasePending && (
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '1px 6px',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.6875rem',
+                            fontWeight: 600,
+                            color: '#d97706',
+                            backgroundColor: 'rgba(217, 119, 6, 0.15)',
+                            border: '1px solid #d97706',
+                          }}
+                        >
+                          ⏳ 자원 반환 대기 (ADR-040)
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-secondary)', fontSize: '0.8125rem' }}>
                     {run.requestedBy}

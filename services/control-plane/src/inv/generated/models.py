@@ -637,6 +637,46 @@ class WorkspaceSnapshot(BaseModel):
     files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
 
 
+class WorkspaceEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class ControlRunView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    tenantId: TenantId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attempt: conint(ge=0, le=9007199254740991)
+
+
+class WorkspaceFrozenFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(min_length=1, max_length=1024)
+    sizeBytes: conint(ge=0, le=32768)
+    sha256: ActionDigest
+
+
+class WorkspaceEnqueueResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    runId: RunId
+    commandId: UUID
+    accepted: Literal[True]
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -718,6 +758,38 @@ class NodeExecutionResult(BaseModel):
     duplicate: bool
     receipt: NodeStopReceipt
     cleanupPending: Literal[False]
+
+
+class WorkspacePrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class WorkspacePrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    workload: WorkloadSpec
+    approval: ApprovalView
+    run: ControlRunView
+
+
+class WorkspaceResumptionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    workload: WorkloadSpec
+    run: ControlRunView
+    approval: ApprovalView | None
+    frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
 
 
 class INVCore(

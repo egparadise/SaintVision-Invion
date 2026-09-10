@@ -67,66 +67,9 @@ def postgres():
             result.returncode == 0
         ), "Alembic migration failed (credential-bearing diagnostics suppressed)"
         with psycopg.connect(owner) as conn:
-            conn.execute(sql.SQL("GRANT USAGE ON SCHEMA inv TO {}").format(sql.Identifier(role)))
-            conn.execute(
-                sql.SQL(
-                    "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA inv TO {}"
-                ).format(sql.Identifier(role))
-            )
-            conn.execute(
-                sql.SQL("GRANT USAGE ON ALL SEQUENCES IN SCHEMA inv TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
-            conn.execute(
-                sql.SQL(
-                    "REVOKE INSERT,UPDATE,DELETE ON inv.control_epoch,inv.evidence,inv.checkpoints FROM {}"
-                ).format(sql.Identifier(role))
-            )
-            conn.execute(
-                sql.SQL("GRANT INSERT ON inv.evidence,inv.checkpoints TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
-            # SELECT FOR SHARE needs UPDATE privilege. Only the fixed sentinel may be named;
-            # CHECK(singleton) prevents changing it, and epoch itself remains read-only.
-            conn.execute(
-                sql.SQL("GRANT UPDATE(singleton) ON inv.control_epoch TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
-            conn.execute(
-                sql.SQL(
-                    "REVOKE INSERT,UPDATE,DELETE ON inv.project_grants,inv.project_nodes FROM {}"
-                ).format(sql.Identifier(role))
-            )
-            conn.execute(
-                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.project_grants TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
-            # PostgreSQL requires an UPDATE privilege for SELECT FOR SHARE.
-            # The CHECK-fixed sentinel allows locking without changing membership.
-            conn.execute(
-                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.project_nodes TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
-            conn.execute(
-                sql.SQL(
-                    "REVOKE UPDATE,DELETE ON inv.approval_votes,inv.approval_dispatches,inv.approval_audit,inv.tool_claims,inv.node_stop_receipts FROM {}"
-                ).format(sql.Identifier(role))
-            )
-            conn.execute(
-                sql.SQL(
-                    "REVOKE INSERT,UPDATE,DELETE ON inv.node_channels,inv.node_channel_audit FROM {}"
-                ).format(sql.Identifier(role))
-            )
-            conn.execute(
-                sql.SQL("GRANT UPDATE(lock_sentinel) ON inv.node_channels TO {}").format(
-                    sql.Identifier(role)
-                )
-            )
+            # Use the production migration's least-privilege group, not a test-only
+            # permission recipe which could hide a missing deployment grant.
+            conn.execute(sql.SQL("GRANT inv_kernel TO {}").format(sql.Identifier(role)))
         yield SimpleNamespace(owner=owner, runtime=runtime)
     finally:
         # Only the unique name created above is eligible for teardown.

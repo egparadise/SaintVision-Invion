@@ -22,6 +22,30 @@ export function generateSpanId(): string {
     .join('');
 }
 
+let inMemoryAuthToken: string | null = null;
+
+/**
+ * Set the current in-memory access token (OIDC / OAuth Bearer).
+ * Strict adherence to memory-only storage: NEVER persisted to localStorage/sessionStorage.
+ */
+export function setAuthToken(token: string | null): void {
+  inMemoryAuthToken = token;
+}
+
+/**
+ * Get current in-memory access token.
+ */
+export function getAuthToken(): string | null {
+  return inMemoryAuthToken;
+}
+
+/**
+ * Clear the in-memory access token on logout.
+ */
+export function clearAuthToken(): void {
+  inMemoryAuthToken = null;
+}
+
 export class ApiError extends Error {
   public readonly problem: ProblemDetails;
 
@@ -37,7 +61,7 @@ export interface RequestOptions extends RequestInit {
 }
 
 /**
- * Robust fetch wrapper with W3C traceparent injection and RFC 9457 Problem Details error handling.
+ * Robust fetch wrapper with W3C traceparent injection, Bearer auth, and RFC 9457 Problem Details error handling.
  */
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const traceId = options.traceId || generateTraceId();
@@ -48,6 +72,9 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
   headers.set('traceparent', traceparent);
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
+  }
+  if (inMemoryAuthToken && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${inMemoryAuthToken}`);
   }
 
   const response = await fetch(endpoint, {

@@ -434,3 +434,54 @@ export interface WorkspaceSnapshot {
   directories: Array<string>;
   files: Array<WorkspaceSnapshotFile>;
 }
+
+export interface WorkspacePrepareInput {
+  checkoutId: string;
+  resumeId: string;
+  stepId: string;
+  workload: WorkloadSpec;
+  expectedVersion: number;
+}
+
+export interface WorkspaceEnqueueInput {
+  resumeId: string;
+  approvalId: ApprovalId;
+  expectedVersion: number;
+}
+
+export interface ControlRunView {
+  runId: RunId;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  state: RunState;
+  version: number;
+  attempt: number;
+}
+
+export interface WorkspaceFrozenFile {
+  path: string;
+  sizeBytes: number;
+  sha256: ActionDigest;
+}
+
+export interface WorkspacePrepareResult {
+  resumeId: string;
+  workload: WorkloadSpec;
+  approval: ApprovalView;
+  run: ControlRunView;
+}
+
+export interface WorkspaceResumptionView {
+  resumeId: string;
+  workload: WorkloadSpec;
+  run: ControlRunView;
+  approval: (ApprovalView | null);
+  frozenFiles: Array<WorkspaceFrozenFile>;
+}
+
+export interface WorkspaceEnqueueResult {
+  resumeId: string;
+  runId: RunId;
+  commandId: string;
+  accepted: true;
+}

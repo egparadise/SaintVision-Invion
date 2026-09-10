@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T10:09:50+09:00"
+updated: "2026-09-10T12:24:16+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 공개 API 후속: `e9dd341`에서 JWT 기반 prepare·새 승인·원자 예약/큐·실제 Node/Git/Evidence 연결, production 모의 서버 분리 및 양쪽 migration/제한 DB 역할을 검증했다. 전체 922개와 Go race 94 leaf case가 통과했다. [[2026-09-10_12-24-16_KST_WORKSPACE-API_Codex_검증보고]], [[Codex Workspace 공개 API와 실행 커널 통합 계약]]을 따른다. 아직 public 데이터/업무 이관·첫 Run/checkout/editor 연결·실제 화면·독립 review는 남는다. 다음 Codex 우선순위는 샤드 재실행·대체 Node·다중 Node 복구다. 이전 아래 표는 당시 고정 SHA 기록이다.
 
 2026-09-10 Workspace 후속: `4f7d5d5`에서 새 승인 기반 Node 파일 실행·실제 로컬 Git·수정 checkpoint/Evidence·최대 3 attempt 복구를 검증했다. 통합 846개/Go race 93 leaf case 모두 통과했다. [[2026-09-10_10-09-50_KST_WORKSPACE-RESUME_Codex_검증보고]], [[Codex Workspace 실행 재개와 결과 체크포인트 계약]]을 따른다. 대용량/PTY/remote Git·샤드 재실행·다중 Node/실장비·업무/브라우저 통합과 독립 검토는 남는다. PR #12는 초안이며 아래 이전 기록과 그 미구현 문구는 당시 고정 SHA 기준이다.
 

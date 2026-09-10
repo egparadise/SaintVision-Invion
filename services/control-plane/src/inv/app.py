@@ -59,8 +59,7 @@ class Boundary:
                 headers[:] = [
                     (k, v)
                     for k, v in headers
-                    if k
-                    not in {b"traceparent", b"cache-control", b"x-content-type-options"}
+                    if k not in {b"traceparent", b"cache-control", b"x-content-type-options"}
                 ]
                 headers.extend(
                     [
@@ -110,10 +109,7 @@ class Boundary:
                 ):
                     raise DomainError("VAL-0003", "Ambiguous request headers", 400)
                 headers[name] = value
-            if (
-                b"origin" in headers
-                and headers[b"origin"].decode("latin1") not in self.origins
-            ):
+            if b"origin" in headers and headers[b"origin"].decode("latin1") not in self.origins:
                 raise DomainError("AUTH-0051", "Browser origin rejected", 403)
             if (
                 scope["path"].startswith("/v1/")
@@ -147,9 +143,7 @@ class Boundary:
                 try:
                     strict_object(body)
                 except (ValueError, TypeError, RecursionError, UnicodeError):
-                    raise DomainError(
-                        "VAL-0003", "Unambiguous JSON object required", 422
-                    ) from None
+                    raise DomainError("VAL-0003", "Unambiguous JSON object required", 422) from None
             sent = False
 
             async def replay():
@@ -168,7 +162,7 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
-def create_app(database=None, tokens=None, *, allowed_origins=()):
+def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None):
     api = FastAPI(
         title="Saint Vision INV Control Plane",
         version=__version__,
@@ -184,9 +178,7 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 
     @api.exception_handler(RequestValidationError)
     async def invalid(request, error):
-        return problem(
-            DomainError("VAL-0003", "Invalid request", 422), request.state.trace_id
-        )
+        return problem(DomainError("VAL-0003", "Invalid request", 422), request.state.trace_id)
 
     @api.exception_handler(HTTPException)
     async def http_error(request, error):
@@ -205,11 +197,7 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 
     def key(request):
         value = request.headers.get("idempotency-key")
-        if (
-            not value
-            or len(value) > 200
-            or any(ord(c) < 33 or ord(c) > 126 for c in value)
-        ):
+        if not value or len(value) > 200 or any(ord(c) < 33 or ord(c) > 126 for c in value):
             raise DomainError("VAL-0003", "Idempotency-Key required", 422)
         return value
 
@@ -233,7 +221,8 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
         return {
             "status": "ready",
             "scope": "authenticated-control-api",
-            "executionDispatcher": "not_configured",
+            "executionDispatcher": "external-worker-required" if workspace else "not_configured",
+            "workspaceAdmission": "configured" if workspace else "not_configured",
         }
 
     @api.get("/v1/projects")
@@ -252,18 +241,14 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
     @api.post("/v1/projects/{project}/runs", status_code=201)
     async def create(project: str, request: Request, identity=Depends(authenticated)):
         validate_contract("EmptyRequest", await request.json())
-        return await run_in_threadpool(
-            control.create, identity.principal, project, key(request)
-        )
+        return await run_in_threadpool(control.create, identity.principal, project, key(request))
 
     @api.get("/v1/projects/{project}/runs/{run_id}")
     def run(project: str, run_id: str, identity=Depends(authenticated)):
         return control.get(identity.principal, project, run_id)
 
     @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
-    async def cancel(
-        project: str, run_id: str, request: Request, identity=Depends(authenticated)
-    ):
+    async def cancel(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
         data = await request.json()
         validate_contract("RunCancelInput", data)
         return await run_in_threadpool(
@@ -317,14 +302,39 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
             key=key(request),
         )
 
-    @api.get("/v1/projects/{project}/runs/{run_id}/events")
-    async def events(
+    def workspace_service():
+        if workspace is None:
+            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)
+        return workspace
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/resume/prepare", status_code=201)
+    async def prepare_workspace(
         project: str, run_id: str, request: Request, identity=Depends(authenticated)
     ):
-        cursor = request.headers.get("last-event-id")
-        await run_in_threadpool(
-            control.events, identity.principal, project, run_id, cursor
+        data = await request.json()
+        return await run_in_threadpool(
+            workspace_service().prepare, identity.principal, project, run_id, data, key(request)
         )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/resume/enqueue", status_code=202)
+    async def enqueue_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        data = await request.json()
+        return await run_in_threadpool(
+            workspace_service().enqueue, identity.principal, project, run_id, data, key(request)
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/resumptions/{resume_id}")
+    def workspace_status(
+        project: str, run_id: str, resume_id: str, identity=Depends(authenticated)
+    ):
+        return workspace_service().get(identity.principal, project, run_id, resume_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/events")
+    async def events(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
+        cursor = request.headers.get("last-event-id")
+        await run_in_threadpool(control.events, identity.principal, project, run_id, cursor)
         bearer = request.headers["authorization"][7:]
 
         async def stream():
@@ -362,25 +372,38 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 app = create_app()
 
 
+def create_configured_app():
+    """Production factory: explicit operator configuration, never seeded demo data."""
+    try:
+        settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
+        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace"}:
+            raise ValueError()
+        identity = AccessTokens(**settings["identity"])
+        database = Database(
+            os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"]
+        )
+        workspace = None
+        if "workspace" in settings:
+            from .workspace_config import configured_workspace
+
+            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])
+        return create_app(
+            database,
+            identity,
+            allowed_origins=settings.get("allowedOrigins", []),
+            workspace=workspace,
+        )
+    except Exception:
+        raise RuntimeError(
+            "Explicit Control Plane identity/database/Workspace configuration unavailable"
+        ) from None
+
+
 def main():
     import uvicorn
 
-    try:
-        settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        identity = AccessTokens(**settings["identity"])
-        database = Database(
-            os.environ["INV_RUNTIME_DSN"],
-            recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
-        )
-        configured = create_app(
-            database, identity, allowed_origins=settings.get("allowedOrigins", [])
-        )
-    except Exception:
-        raise SystemExit(
-            "Explicit Control Plane identity/database configuration unavailable"
-        ) from None
     uvicorn.run(
-        configured,
+        create_configured_app(),
         host="127.0.0.1",
         port=8080,
         proxy_headers=False,

@@ -35,9 +35,18 @@ if config.config_file_name is not None:
 
 
 def _database_url() -> str:
-    url = os.environ.get("INV_DATABASE_URL") or os.environ.get("INV_MIGRATION_DSN")
+    # INV_MIGRATION_DSN first. It is passed by a caller that has decided which
+    # database to migrate — a test fixture provisioning a throwaway, an
+    # operator targeting one instance — while INV_DATABASE_URL is the ambient
+    # default the process would otherwise use.
+    #
+    # The other order silently migrated the wrong database: a fixture creating
+    # a scratch database and passing INV_MIGRATION_DSN inherited the job's
+    # INV_DATABASE_URL, alembic upgraded *that*, the fixture's database was
+    # left empty, and the failure surfaced much later as a missing schema.
+    url = os.environ.get("INV_MIGRATION_DSN") or os.environ.get("INV_DATABASE_URL")
     if not url:
-        raise RuntimeError("Neither INV_DATABASE_URL nor INV_MIGRATION_DSN is set")
+        raise RuntimeError("Neither INV_MIGRATION_DSN nor INV_DATABASE_URL is set")
     return url
 
 
