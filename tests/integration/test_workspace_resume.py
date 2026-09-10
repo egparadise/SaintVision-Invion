@@ -8,6 +8,7 @@ import os
 import sys
 from uuid import uuid4
 import pytest
+import psycopg
 from inv.dispatch import DeliveryWorker
 from inv.errors import DomainError
 from inv.leases import Allocation
@@ -144,6 +145,8 @@ def build_resume(remote, storage, tmp_path, attack=None):
 
 def test_fresh_approved_step_executes_real_git_and_commits_restorable_files(resumed):
     a = resumed
+    local_file = a.working.root / a.checkout["generation"] / "files/src/main.py"
+    local_file.write_bytes(b"editor change after frozen approval input")
     authorize(a)
     with ThreadPoolExecutor(max_workers=3) as pool:
         replies = list(pool.map(lambda _: enqueue(a), range(3)))
@@ -153,6 +156,7 @@ def test_fresh_approved_step_executes_real_git_and_commits_restorable_files(resu
     run = a.e.runs.get(a.e.tenant, a.run["runId"])
     assert run["state"] == "succeeded" and run["attempt"] == 2
     assert active(a) == 0 and container(a) is None
+    assert local_file.read_bytes() == b"editor change after frozen approval input"
     raw = a.storage.restore(a.e.tenant, a.e.project, run["runId"], 2, "resumed-step")
     manifest, content = decode_snapshot(raw, a.workspace_id)
     assert content["src/main.py"] == b"print('resumed')\n"
@@ -248,6 +252,25 @@ def test_resume_requires_current_attempt_scope_and_has_one_frozen_successor(chec
     a.e.runs.transition(a.e.tenant, run["runId"], "cancelled", expected_version=run["version"])
     a.workload = deepcopy(a.base_workload)
     with pytest.raises(DomainError):
+        authorize(a)
+
+
+def test_recovery_approval_db_guard_requires_frozen_step(checkout):
+    a = checkout
+    with pytest.raises(psycopg.errors.CheckViolation):
+        a.e.runs.transition(a.e.tenant, a.run["runId"], "awaiting_approval", expected_version=a.run["version"])
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "recovering"
+
+
+def test_resume_rejects_foreign_scope_and_stale_epoch(checkout):
+    a = checkout
+    publish(a)
+    a.workload = freeze(a)["workload"]
+    with pytest.raises(DomainError):
+        a.resume.prepare(a.e.other, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "foreign-step", a.base_workload, expected_version=a.run["version"])
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute("UPDATE inv.control_epoch SET epoch=%s WHERE singleton", (str(uuid4()),))
+    with pytest.raises(DomainError, match="LEASE-0004"):
         authorize(a)
 
 

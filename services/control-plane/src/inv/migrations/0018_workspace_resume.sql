@@ -1,3 +1,4 @@
+ALTER TABLE inv.workspace_checkouts ADD UNIQUE(tenant_id,project_id,run_id,checkout_id,workspace_id,source_attempt,recovery_epoch);
 CREATE TABLE inv.workspace_resumptions (
  tenant_id uuid NOT NULL, project_id text NOT NULL, run_id text NOT NULL,
  resume_id uuid NOT NULL, checkout_id uuid NOT NULL, workspace_id text NOT NULL,
@@ -6,7 +7,8 @@ CREATE TABLE inv.workspace_resumptions (
  workload jsonb NOT NULL, snapshot bytea NOT NULL CHECK(octet_length(snapshot) BETWEEN 1 AND 65536),
  created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
  PRIMARY KEY(tenant_id,resume_id), UNIQUE(tenant_id,run_id,source_attempt,recovery_epoch),
- FOREIGN KEY(tenant_id,checkout_id) REFERENCES inv.workspace_checkouts(tenant_id,checkout_id),
+ FOREIGN KEY(tenant_id,project_id,run_id,checkout_id,workspace_id,source_attempt,recovery_epoch)
+ REFERENCES inv.workspace_checkouts(tenant_id,project_id,run_id,checkout_id,workspace_id,source_attempt,recovery_epoch),
  FOREIGN KEY(tenant_id,project_id,run_id) REFERENCES inv.runs(tenant_id,project_id,run_id),
  CHECK(workload->>'workspaceId'=workspace_id AND workload->'workspaceResume'->>'resumeId'=resume_id::text)
 );
