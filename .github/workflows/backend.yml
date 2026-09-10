@@ -36,7 +36,11 @@ jobs:
 
     env:
       INV_ENV: test
-      INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      # INV_DATABASE_URL is deliberately NOT set job-wide. Test fixtures that
+      # provision their own database pass INV_MIGRATION_DSN, and an ambient
+      # default in scope for their subprocesses is how migrations end up
+      # applied to the wrong database. The migration steps below set it
+      # themselves.
       INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
       # Codex's suites refuse to skip in CI and want an admin DSN of their own.
       # Pointing it at this job's database is deliberate: running both halves
@@ -68,6 +72,8 @@ jobs:
         run: python tools/migration_graph.py
 
       - name: Migration applies to an empty database
+        env:
+          INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
         run: python -m alembic upgrade head
 
       - name: The reversible tail reverses
@@ -78,6 +84,8 @@ jobs:
         # is the thing the plan says not to do. So only the tail above the
         # newest irreversible revision is exercised, and when there is no such
         # tail the step says so rather than passing quietly.
+        env:
+          INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
         run: |
           TARGET=$(python tools/migration_graph.py --downgrade-target)
           HEAD=$(python tools/migration_graph.py --head)
