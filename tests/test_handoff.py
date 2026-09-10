@@ -95,8 +95,9 @@ def chain(owner_engine, two_tenants):
         c.execute(
             text(
                 "INSERT INTO workloads (workload_id, tenant_id, project_id, kind, "
-                "spec, spec_sha256, created_by_user_id, created_at, version) "
-                "VALUES (:w, :t, :p, 'batch', '{\"objective\": \"resume\"}', :d, :u, now(), 1)"
+                "objective, spec, spec_sha256, contract_version, "
+                "created_by_user_id, created_at, version) "
+                "VALUES (:w, :t, :p, 'batch', 'resume', '{}', :d, '1.0.0', :u, now(), 1)"
             ),
             {"w": ids["workload_id"], "t": tenant_a, "p": ids["project_id"],
              "d": digest, "u": ids["requester"]},
