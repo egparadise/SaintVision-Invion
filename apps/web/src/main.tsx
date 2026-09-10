@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { App } from '@/app/App';
+import { LiveApp as App } from '@/app/LiveApp';
 import './index.css';
 
 const rootElement = document.getElementById('root');
@@ -22,4 +22,3 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
     });
   });
 }
-
