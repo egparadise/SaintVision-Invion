@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.6.0"
+version: "1.11.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T02:16:46+09:00"
+updated: "2026-09-10T09:06:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -66,3 +66,15 @@ ADR-027(서명된 Node permit·durable inbox·allocation high-water), ADR-028(�
 ADR-029(mTLS peer 검증·기존 실행 observation) 및 ADR-030(인증서 CAS/폐기·영수증 commit 시 현재 권한)은 [[Codex Node mTLS 전달과 인증서 권한 계약]]을 따른다. 실제 운영 PKI/IdP·전체 등록/Heartbeat API 및 실장비 승인은 별도다.
 
 ADR-031(resource-server 인증·현재 project grant)과 ADR-032(Run별 commit 순서 이벤트·mTLS 관측·원격 취소)는 [[Codex Control API 인증과 Node 관측 계약]]을 따른다. 실제 IdP/PKI·업무 adapter·운영 실장비 검증과 독립 검토는 별도다.
+
+ADR-033(원자 permit queue·일회 전송 예약·중단 후 관찰/취소·receipt 후 종료)은 [[Codex 실행 전달 대기열과 중단 복구 계약]]을 따른다. 운영 worker 설정과 전체 업무/실장비 인수는 별도다.
+
+ADR-034(제한된 local object publication·checkpoint pin·GC 중단 복구)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. S3 제품 및 실제 운영 복원/독립 검토는 별도다.
+
+ADR-035(미검증 공지·mTLS 실측 snapshot·명시적 content 전송·독립 샤드 원자 admission)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. collective 통신/GPU 및 peer 업무 앱 연결 완료를 의미하지 않는다.
+
+ADR-036(실행 attempt·fenced output commitment·receipt 후 Evidence 원자 확정), ADR-037(실제 Workspace snapshot과 새 generation 복원), ADR-038(샤드 결과 manifest·권한 있는 전체 취소·실패 반영), ADR-039(실측 CPU/RAM 배치·Explain/Lease와 project 상한 잠금)은 [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]을 따른다. 업무 verifier/출력 수집·live Workspace/PTY·parent/collective·pool locality·운영 장비 연결과 독립 review는 별도다.
+
+ADR-040(미발급 예약 회수·Node 미수신 취소 tombstone), ADR-041(실제 bounded 출력·정지 후보 보존), ADR-042(receipt 기반 결과 재시도와 샤드 부모 완료), ADR-043(writable checkout·변경 파일 보존)은 [[Codex 실행 완료와 자원 회수 통합 계약]]을 따른다. Node mount·PTY/Git·샤드 재실행/collective·실장비 및 독립 reviewer 인수는 별도다.
+
+

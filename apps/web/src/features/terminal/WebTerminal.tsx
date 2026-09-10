@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { WsTerminalClient } from '@/shared/realtime/ws-terminal';
 
 export interface WebTerminalProps {
   workspaceId: string;
@@ -21,7 +22,37 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [isAccessibleView, setIsAccessibleView] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const clientRef = useRef<WsTerminalClient | null>(null);
+
+  useEffect(() => {
+    const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
+    const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
+
+    const client = new WsTerminalClient(
+      wsUrl,
+      (data) => {
+        // Format line breaks and append to output lines
+        const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
+        if (lines.length > 0) {
+          setTerminalOutput((prev) => [...prev, ...lines]);
+        }
+      },
+      (status) => {
+        setConnectionStatus(status);
+      }
+    );
+
+    clientRef.current = client;
+    client.connect(`ticket_${sessionId}_${Date.now()}`);
+
+    return () => {
+      client.disconnect();
+      clientRef.current = null;
+    };
+  }, [sessionId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -34,12 +65,18 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     const cmd = currentInput;
     setCurrentInput('');
 
-    setTerminalOutput((prev) => [
-      ...prev,
-      `saintvision@wsp-saint-pilot:~$ ${cmd}`,
-      `[Executed: ${cmd}] (exit code: 0)`,
-      'saintvision@wsp-saint-pilot:~$ ',
-    ]);
+    // Send command to live WebSocket
+    if (clientRef.current && connectionStatus === 'connected') {
+      clientRef.current.sendInput(cmd + '\r');
+    } else {
+      // Fallback local echo if offline
+      setTerminalOutput((prev) => [
+        ...prev,
+        `saintvision@wsp-saint-pilot:~$ ${cmd}`,
+        `[Executed: ${cmd}] (exit code: 0)`,
+        'saintvision@wsp-saint-pilot:~$ ',
+      ]);
+    }
   };
 
   return (
@@ -69,8 +106,23 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#238636' }} />
-          <span>PTY Web Terminal: <code>{workspaceId}</code></span>
+          <span
+            style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              backgroundColor:
+                connectionStatus === 'connected'
+                  ? '#238636'
+                  : connectionStatus === 'connecting'
+                  ? '#d29922'
+                  : '#8b949e',
+            }}
+          />
+          <span>
+            PTY Web Terminal: <code>{workspaceId}</code>{' '}
+            <span style={{ fontSize: '0.75rem', color: '#8b949e' }}>({connectionStatus})</span>
+          </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

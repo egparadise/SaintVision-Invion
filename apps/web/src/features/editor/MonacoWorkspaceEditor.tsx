@@ -581,7 +581,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         <GitCommitModal
           files={files}
           parentCommit={commits[0] || null}
-          onCommit={(newCommit) => {
+          onCommit={async (newCommit) => {
             setCommits([newCommit, ...commits]);
             // Clear dirty flags for committed files
             setFiles((prev) =>
@@ -589,6 +589,19 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 newCommit.stagedFiles.includes(f.path) ? { ...f, isDirty: false } : f
               )
             );
+            try {
+              const { apiClient } = await import('@/shared/api/client');
+              await apiClient('/v1/projects/prj_01JABCDE/runs', {
+                method: 'POST',
+                body: JSON.stringify({
+                  objective: `Git Commit [${newCommit.commitId.slice(0, 7)}]: ${newCommit.message}`,
+                  stagedFiles: newCommit.stagedFiles,
+                  treeHash: newCommit.treeHash,
+                }),
+              });
+            } catch (err) {
+              console.warn('Backend run trigger fallback on Git commit:', err);
+            }
             setShowCommitModal(false);
           }}
           onCancel={() => setShowCommitModal(false)}

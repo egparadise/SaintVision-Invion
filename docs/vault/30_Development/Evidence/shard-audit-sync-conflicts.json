@@ -1,0 +1,24 @@
+{
+  "observed_at_kst": "2026-09-10T04:17:51+09:00",
+  "full_sync_check_at_kst": "2026-09-10T04:16:45+09:00",
+  "full_sync_exit_code": 1,
+  "full_export_writes": 0,
+  "external_files_sha256": {
+    "00_Index/전체 개발 진행 현황.md": "0343bd2a9009363a53c5bae9de827e9cf4446eff3b5eaad7e76cd3f7749eda9f",
+    "30_Development/Codex 잔여 개발 작업과 합격 증거.md": "a1c9318238a1aab40e57d29a962f2a5b32202d57bd6bfe7e2c855b48d394cc02",
+    "30_Development/Gemini Frontend 상세 아키텍처 및 화면 명세.md": "5b434d2becc463ac1d6b37513212512cb9f48d00d6e2c4ff26a5113d5f164cfa",
+    "30_Development/History/2026-09-10_02-30-00_KST_FE_Final_Dossier_Gemini_12스프린트_완결보고서.md": "4a6777f4f51320e494386d09e635f1ed28754f072e0a90eb284a3f57619e83fc",
+    "30_Development/History/2026-09-10_03-00-00_KST_Track1_Track3_종합고도화_인프라패키징.md": "f46ec8513db7c5685786ca63a1b3c5eca6e4fafa7927f826e3b4cadf727a45f2",
+    "30_Development/History/개발 과정 인덱스.md": "7695bb42fc90a3213f0e52b588c30a83dbb13fe1df9332c15d669c1b96431905",
+    "40_Governance/Agent 인계 대기 목록.md": "59acb01a8c66b8b2cde71b80487a918e9d89d4ef6e8fe0909bf4df7382c50ac9",
+    "40_Governance/설계 충돌 정정 및 ADR.md": "7cdae82b4ac7013ac4a205f097b4ee04d7b9b7c37a6145fdfdf906dd88c918b6",
+    "40_Governance/오류 및 해결 인덱스.md": "5e4f7ae5ee065a065190ee899db70d512b264acbd31377dcb6c39b82c0e4b1dd",
+    "40_Governance/외부 인계 제안 수신과 정본 동기화 복구.md": "f9baa59fec90cd703efa4951ac0c1808e730d7d31bd3e3b6414d537f6e882fca",
+    "50_Ontology/Release-0.2.0/example.jsonld": "2cbfcbfc223d0e86453584bc7735875f2698569079b6d2f139d3dc21ac90af96",
+    "50_Ontology/Release-0.2.0/example.ttl": "8bbf64c30c16d7b9b7387ff8a3f21ce65bfeeb3e26125d5684a49b9927186208"
+  },
+  "preservation": "Excluded from the scoped export; reconcile separately before a full export",
+  "initial_integration_sha": "93825690d2575d0237c090db6ca4c6762a9fc970",
+  "latest_checked_integration_sha": "ed566c1d110394192d1bf795757e242e50044b16",
+  "runtime_source_diff": []
+}
