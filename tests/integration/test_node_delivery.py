@@ -186,7 +186,18 @@ def test_network_timeout_cancels_work_but_does_not_release_without_receipt(remot
     assert active(a) == 2 and count(a, "node_stop_receipts") == 0
     receipt = stopped(a)
     assert receipt["processStarted"] and receipt["reason"] == "cancelled"
-    result = a.delivery.deliver(a.node, a.permit, observation_only=True)
+    # Journal persistence precedes releasing the original HTTP execution slot.
+    # A receipt request can still be busy: retry observation only, never execute.
+    observer = NodeDelivery(a.e.db, NodeTLSClient(**a.client_files, timeout=2))
+    for attempt in range(3):
+        try:
+            result = observer.deliver(a.node, a.permit, observation_only=True)
+            break
+        except DomainError as exc:
+            if exc.code != "NODE-0030" or attempt == 2:
+                raise
+            assert active(a) == 2 and count(a, "node_stop_receipts") == 0
+            time.sleep(0.1 * (attempt + 1))
     assert_recorded(a, result)
 
 
