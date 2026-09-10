@@ -156,7 +156,11 @@ class DeliveryQueue:
                 if run["state"] in {"cancelled", "failed"} or row["operation"] == "cancel"
                 else "observe"
             )
-            may_start = row["phase"] == "queued" and self._can_start(conn, row, run, claim, now)
+            may_start = (
+                not control_only
+                and row["phase"] == "queued"
+                and self._can_start(conn, row, run, claim, now)
+            )
             if row["phase"] == "queued" and not may_start:
                 # No transmission was reserved. An invalidated admission must
                 # obtain a Node tombstone, not observe an unseen command forever.
