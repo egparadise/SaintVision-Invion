@@ -1,10 +1,10 @@
 ---
 doc_id: "LOG-WORKSPACE-RESUME-001"
 title: "2026-09-10_09-29-08_KST_WORKSPACE-RESUME_Codex_개발과정"
-version: "1.0.0"
-status: "in_progress"
+version: "1.0.1"
+status: "review"
 author: "Codex"
-updated: "2026-09-10T09:29:08+09:00"
+updated: "2026-09-10T10:09:50+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,3 +24,5 @@ Task WORKSPACE-RESUME, S06-BE/DB/ST 및 S03-BE 후속. Owner Codex, reviewer Cla
 
 - 2026-09-10 09:29 KST: 지침/작업/코드 읽기, `git fetch origin` exit 0, 별도 worktree 생성 exit 0. root의 타 Agent 미커밋 파일은 유지했다.
 - 구현·시험·push·CI·Obsidian 동기화 결과는 실제 수행 후 후속 보고서에 기록한다. 현재 planned 목표를 done으로 표시하지 않는다.
+
+- 2026-09-10T10:09:50+09:00: 코드 `4f7d5d5bcea6cd0879d93b56b2972d1adfb80b1a` push/실제 CI 846 tests 및 Go 93 leaf case/Artifact 검증 완료. [[2026-09-10_10-09-50_KST_WORKSPACE-RESUME_Codex_검증보고]]에 오류·수정·제한·인계를 기록한다.
