@@ -1,7 +1,7 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Codex"
 updated: "2026-09-10T12:24:16+09:00"
@@ -9,6 +9,8 @@ source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 샤드 복구 후속: `3835b19`에서 새 승인·물리적 종료·원자 예약/큐·새 부모와 불변 계보·최대 3세대를 구현했다. 실제 두 Go/mTLS Node와 Docker로 전용 19개 및 전체 941개가 통과했다. [[2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고]], [[Codex 샤드 재승인과 대체 Node 복구 계약]]을 따른다. Node는 한 CI 호스트의 별도 프로세스다. 공개 recovery route·운영/업무 연결(Claude), 실제 화면/브라우저(Gemini), 독립 검토와 5대 인수는 남는다. 다음 Codex 우선순위는 PR14 업무 연결과 migration/권한/실제 Evidence 통합, kill switch/drain·주기 reconciliation이며 PTY/remote Git·대용량/Workspace Node 이전·Windows/GPU/BuildKit·Context/RO 검증도 남는다. 아래의 재실행 미구현 문구는 과거 SHA 기준 기록이다.
 
 2026-09-10 공개 API 후속: `e9dd341`에서 JWT 기반 prepare·새 승인·원자 예약/큐·실제 Node/Git/Evidence 연결, production 모의 서버 분리 및 양쪽 migration/제한 DB 역할을 검증했다. 전체 922개와 Go race 94 leaf case가 통과했다. [[2026-09-10_12-24-16_KST_WORKSPACE-API_Codex_검증보고]], [[Codex Workspace 공개 API와 실행 커널 통합 계약]]을 따른다. 아직 public 데이터/업무 이관·첫 Run/checkout/editor 연결·실제 화면·독립 review는 남는다. 다음 Codex 우선순위는 샤드 재실행·대체 Node·다중 Node 복구다. 이전 아래 표는 당시 고정 SHA 기록이다.
 

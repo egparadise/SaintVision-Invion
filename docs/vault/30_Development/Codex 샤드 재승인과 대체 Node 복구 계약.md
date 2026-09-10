@@ -4,7 +4,7 @@ title: "Codex 샤드 재승인과 대체 Node 복구 계약"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T12:47:00+09:00"
+updated: "2026-09-10T13:05:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,8 @@ prepare는 새 자식 Run·새 Approval만 원자적으로 만든다. 각 자식
 
 `enqueue(principal, project, plan_id, key=...)`는 서버에 설치된 Node runtime으로 mTLS nonce 관찰과 새 정책 평가를 수행한다. 네트워크 I/O 이후 DB에서 원본 물리적 종료, 현재 requester/voter 권한, target project membership, 승인/Run/version/epoch를 다시 확인한다. 모든 승인 소비·새 lease/fence·claim·queue·부모 Run·복구 계보·event가 한 트랜잭션으로 확정된다. 중간 거부나 예외가 있으면 전체 rollback이다. 복구용 자식은 일반 dispatch/reserve/claim을 통해 개별 실행할 수 없다.
 
+동시 요청으로 더 최신 heartbeat가 먼저 확정되면 늦은 응답을 `NODE-0050 / 409 / retryable`로 거부한다. 제한 runtime은 새 nonce로 총 3회까지만 다시 관측한다. 기존 응답/nonce를 재사용하거나 nonce·scope·epoch·인증 오류(403)를 재시도하지 않는다. 이 관측 횟수와 실제 샤드 실행 세대 수는 서로 다르다.
+
 `RestrictedWorkspaceRuntime`의 operator 설정을 재사용한다. target별 CPU/memory resource와 signing key가 있고 동일한 제한 profile을 사용한다. 브라우저 입력으로 정책·capability·NodePrincipal·key를 받지 않는다. 이 변경은 서버 서비스 경계와 공통 Schema이며 공개 recovery HTTP route·설정 UI는 별도 통합 작업이다. 기존 실제 승인 challenge/decision 경로로 반환된 approvalId에 투표할 수 있다.
 
 ## ADR-049: 불변 계보와 최대 3개 실행 세대
@@ -32,6 +34,16 @@ prepare는 새 자식 Run·새 Approval만 원자적으로 만든다. 각 자식
 
 ## 합격 증거와 인계
 
+| 오류 코드 | 실제 의미 |
+|---|---|
+| LEASE-0003 | 원본 샤드의 물리 정지 또는 자원 반환이 아직 확인되지 않음 |
+| NODE-0063 | 실패/취소 부모가 아니거나 이 경로가 지원하지 않는 Workspace 복구 |
+| NODE-0064 | 총 3세대 상한 또는 원본의 후속 실행이 이미 등록됨 |
+| AUTH-0030 / AUTH-0031 | 현재 권한 없음 / 새 승인 만료·미승인·무효 |
+| AUTH-0045 | 복구 자식의 개별 dispatch/reserve/claim 우회 거부 |
+| NODE-0050 / 409 / retryable | 다른 최신 관측이 먼저 확정됨. 새 nonce로 제한 재관측 가능 |
+| GRAPH-0003 / IDEM-0001 | 준비 이후 Run 변경 / 같은 식별자의 다른 요청 |
+
 전용 통합 시험은 2개 Go Node 프로세스·서로 다른 인증서/서명 키/저널·실제 Docker 출력/해시/Evidence·부모 집계, 새 승인 누락, 권한 철회, 중간 등록 오류, 취소, 경합, epoch/project 차단, 총 3세대 상한을 확인한다. 두 Node는 같은 CI 호스트에서 실행한다. 5대 PC·원격 네트워크 분할·MPI/NCCL collective·GPU/Windows/BuildKit·성능 SLO 검증으로 확대 해석하지 않는다.
 
-Codex는 실행·계보·DB·보안 계약 및 실제 검증 증거를 전달한다. Claude는 독립 코드 검토, 서비스 route와 운영 설정, 준비 요청 보존/정리 정책, 기존 업무 데이터 연결을 맡는다. Gemini는 새 승인 표시·세대별 부모/자식·대체 Node·실행 대기/종료 미확인/상한/실패 표시와 실제 브라우저 검증을 맡는다. peer 검토는 아직 수행되지 않았다. 다음 Codex 영역은 kill switch/drain·주기 reconciliation, PTY/원격 Git·대용량/Workspace Node 이전, Windows/GPU/BuildKit 및 Context/RO/5대 검증이다.
+Codex는 실행·계보·DB·보안 계약 및 실제 검증 증거를 전달한다. Claude는 독립 코드 검토, 서비스 route와 운영 설정, 준비 요청 보존/정리 정책, 기존 업무 데이터 연결을 맡는다. Gemini는 새 승인 표시·세대별 부모/자식·대체 Node·실행 대기/종료 미확인/상한/실패 표시와 실제 브라우저 검증을 맡는다. PR15의 peer 검토는 아직 수행되지 않았다. 작업 중 도착한 PR14는 [[PR14 업무 연결과 실행 커널 통합 선행 검토]]를 먼저 해결해야 한다. 다음 Codex 영역은 이 통합, kill switch/drain·주기 reconciliation, PTY/원격 Git·대용량/Workspace Node 이전, Windows/GPU/BuildKit 및 Context/RO/5대 검증이다.
