@@ -24,6 +24,8 @@ Run의 기존 11상태는 유지한다. `recovering → awaiting_approval → sc
 
 `WorkspaceResume.enqueue`는 새 승인 dispatch를 입력으로 받아 새 lease·ToolGateway claim·서명 permit queue를 단일 transaction에 저장한다. admission 실패/commit 실패는 전체 rollback한다. 따라서 과거 attempt가 있는 Run에 새 미발급 예약만 남지 않는다. ToolGateway에서 이 원자 경로를 우회한 Workspace claim은 거부한다. 이전 승인·늦은 command·변경된 내용·stale epoch는 권한을 갱신할 수 없다. 동일 enqueue key의 재요청은 원래 command를 관찰하며 추가 실행을 만들지 않는다.
 
+승인 이력의 UNIQUE는 Run 전체가 아닌 `(tenant_id,run_id,bound_run_version)`이다. 과거 승인/nonce/vote/dispatch는 불변 이력으로 유지한다. 샤드 child/parent Run은 이 단독 Workspace 재개 경로에서 거부한다. 기존 샤드 계획의 command와 부모 집계 연결을 분리하는 우회를 허용하지 않으며 샤드 재실행은 별도 조정 계약으로 구현한다.
+
 ## ADR-045: Node private tmpfs와 수정 결과의 원자 확정
 
 추가 supervisor label은 `ai.saintvision.workspace=snapshot-tmpfs-v1`다. 고정 이미지의 trusted PID 1은 서명 launch의 hash/size와 manifest 전체를 검증하고, 비어 있는 `/workspace` tmpfs에 파일을 생성한다. 실제 Docker tmpfs 구성·이미지·launch를 확인하며 호스트 경로나 socket을 전달하지 않는다. 권한은 UID 65532, 파일 0600/0700, umask 077, network none 및 기존 자원/시간 상한이다.

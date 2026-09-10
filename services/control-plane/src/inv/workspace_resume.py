@@ -23,6 +23,14 @@ MAX_RESUME_CONTENT = 32768
 MAX_WORKSPACE_ATTEMPTS = 3
 
 
+def independent_run(conn, run_id):
+    if conn.execute(
+        "SELECT 1 FROM inv.shard_commands WHERE run_id=%s UNION ALL SELECT 1 FROM inv.shard_parents WHERE run_id=%s LIMIT 1",
+        (run_id, run_id),
+    ).fetchone():
+        raise DomainError("GRAPH-0005", "Shard recovery requires a coordinated new shard plan")
+
+
 def bounded_snapshot(raw, workspace_id):
     if len(raw) > MAX_RESUME_BYTES:
         raise DomainError("STORE-0020", "Resume manifest exceeds 64 KiB", 422)
@@ -35,6 +43,7 @@ def bounded_snapshot(raw, workspace_id):
 def approved_resume(conn, run, workload, epoch):
     """Called under the Run lock at approval and at ToolGateway admission."""
     ref = workload.get("workspaceResume")
+    independent_run(conn, run["run_id"])
     if ref is None:
         raise DomainError("AUTH-0044", "Recovery requires a frozen Workspace Step", 403)
     row = conn.execute(
@@ -115,6 +124,7 @@ class WorkspaceResume:
                 raise DomainError("GRAPH-0003", "Resume requires current recovering Run")
             if run["attempt"] >= MAX_WORKSPACE_ATTEMPTS:
                 raise DomainError("GRAPH-0005", "Workspace recovery attempt budget exhausted")
+            independent_run(conn, run_id)
             if conn.execute(
                 "SELECT 1 FROM inv.workspace_resumptions WHERE run_id=%s AND source_attempt=%s AND recovery_epoch=%s",
                 (run_id, run["attempt"], self.db.recovery_epoch),

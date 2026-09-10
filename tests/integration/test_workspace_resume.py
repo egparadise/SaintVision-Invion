@@ -258,8 +258,27 @@ def test_resume_requires_current_attempt_scope_and_has_one_frozen_successor(chec
 def test_recovery_approval_db_guard_requires_frozen_step(checkout):
     a = checkout
     with pytest.raises(psycopg.errors.CheckViolation):
-        a.e.runs.transition(a.e.tenant, a.run["runId"], "awaiting_approval", expected_version=a.run["version"])
+        a.e.runs.transition(
+            a.e.tenant, a.run["runId"], "awaiting_approval", expected_version=a.run["version"]
+        )
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "recovering"
+
+
+def test_workspace_resume_cannot_detach_a_child_from_its_shard_plan(checkout):
+    a = checkout
+    publish(a)
+    with a.e.db.transaction(a.e.tenant) as conn:
+        conn.execute(
+            "INSERT INTO inv.shard_plans VALUES(%s,%s,'existing-plan',%s,1)",
+            (a.e.tenant, a.e.project, "a" * 64),
+        )
+        conn.execute(
+            "INSERT INTO inv.shard_commands VALUES(%s,%s,'existing-plan',0,%s,%s,%s)",
+            (a.e.tenant, a.e.project, a.e.node, a.run["runId"], a.command["commandId"]),
+        )
+    with pytest.raises(DomainError, match="GRAPH-0005"):
+        freeze(a)
+    assert count(a, "workspace_resumptions") == 0
 
 
 def test_resume_rejects_foreign_scope_and_stale_epoch(checkout):
@@ -267,7 +286,16 @@ def test_resume_rejects_foreign_scope_and_stale_epoch(checkout):
     publish(a)
     a.workload = freeze(a)["workload"]
     with pytest.raises(DomainError):
-        a.resume.prepare(a.e.other, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "foreign-step", a.base_workload, expected_version=a.run["version"])
+        a.resume.prepare(
+            a.e.other,
+            a.e.project,
+            a.run["runId"],
+            a.checkout_id,
+            str(uuid4()),
+            "foreign-step",
+            a.base_workload,
+            expected_version=a.run["version"],
+        )
     with psycopg.connect(a.e.owner) as conn:
         conn.execute("UPDATE inv.control_epoch SET epoch=%s WHERE singleton", (str(uuid4()),))
     with pytest.raises(DomainError, match="LEASE-0004"):
@@ -289,31 +317,76 @@ def test_bad_node_workspace_cannot_be_success_or_checkpoint(remote, storage, tmp
         a.storage.restore(a.e.tenant, a.e.project, a.run["runId"], 2, "resumed-step")
 
 
-def test_older_checkpoint_can_recover_failed_attempt_but_fourth_execution_is_denied(remote, storage, tmp_path):
+def test_older_checkpoint_can_recover_failed_attempt_but_fourth_execution_is_denied(
+    remote, storage, tmp_path
+):
     a = build_resume(remote, storage, tmp_path, "overflow")
-    authorize(a); enqueue(a)
+    authorize(a)
+    enqueue(a)
     second = a.queue.acquire(a.e.tenant)
     second_result = a.delivery.deliver(a.node, second.envelope)
-    assert second_result["receipt"]["exitCode"] == 122 and second_result["receipt"]["processStarted"]
+    assert (
+        second_result["receipt"]["exitCode"] == 122 and second_result["receipt"]["processStarted"]
+    )
     assert a.queue.finish(second) == "stopped" and active(a) == 0
     a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
     assert a.run["attempt"] == 2
-    a.run = a.e.runs.transition(a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"])
+    a.run = a.e.runs.transition(
+        a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"]
+    )
     rid = str(uuid4())
-    a.recovery.restore(a.e.tenant, a.e.project, a.run["runId"], a.workspace_id, 1, "files-v1", rid, expected_version=a.run["version"])
+    a.recovery.restore(
+        a.e.tenant,
+        a.e.project,
+        a.run["runId"],
+        a.workspace_id,
+        1,
+        "files-v1",
+        rid,
+        expected_version=a.run["version"],
+    )
     a.checkout_id = str(uuid4())
-    checkout = a.recovery.checkout(a.e.tenant, a.e.project, a.run["runId"], rid, a.checkout_id, a.working, expected_version=a.run["version"])
+    checkout = a.recovery.checkout(
+        a.e.tenant,
+        a.e.project,
+        a.run["runId"],
+        rid,
+        a.checkout_id,
+        a.working,
+        expected_version=a.run["version"],
+    )
     assert checkout["sourceAttempt"] == 2 and checkout["checkpointAttempt"] == 1
-    a.workload = a.resume.prepare(a.e.tenant, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "retry-step", a.base_workload, expected_version=a.run["version"])["workload"]
+    a.workload = a.resume.prepare(
+        a.e.tenant,
+        a.e.project,
+        a.run["runId"],
+        a.checkout_id,
+        str(uuid4()),
+        "retry-step",
+        a.base_workload,
+        expected_version=a.run["version"],
+    )["workload"]
     assert a.workload["workspaceResume"]["checkpointAttempt"] == 1
-    authorize(a, prefix="third"); enqueue(a, key="third-enqueue")
+    authorize(a, prefix="third")
+    enqueue(a, key="third-enqueue")
     third = a.queue.acquire(a.e.tenant)
     third_result = a.delivery.deliver(a.node, third.envelope)
     assert third_result["receipt"]["exitCode"] == 122 and third_result["receipt"]["processStarted"]
     assert a.queue.finish(third) == "stopped" and active(a) == 0
     a.run = a.e.runs.get(a.e.tenant, a.run["runId"])
     assert a.run["attempt"] == 3 and count(a, "execution_attempts") == 3
-    a.run = a.e.runs.transition(a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"])
+    a.run = a.e.runs.transition(
+        a.e.tenant, a.run["runId"], "recovering", expected_version=a.run["version"]
+    )
     with pytest.raises(DomainError, match="GRAPH-0005"):
-        a.resume.prepare(a.e.tenant, a.e.project, a.run["runId"], a.checkout_id, str(uuid4()), "fourth-step", a.base_workload, expected_version=a.run["version"])
+        a.resume.prepare(
+            a.e.tenant,
+            a.e.project,
+            a.run["runId"],
+            a.checkout_id,
+            str(uuid4()),
+            "fourth-step",
+            a.base_workload,
+            expected_version=a.run["version"],
+        )
     assert active(a) == 0 and count(a, "workspace_resumptions") == 2
