@@ -185,12 +185,17 @@ def bundle(args):
     build = path/'node-build'
     build.mkdir(exist_ok=True)
     env = dict(os.environ, GOOS='linux', GOARCH='amd64', CGO_ENABLED='0')
-    print('Building Linux Node binary.',flush=True)
-    run([args.go,'build','-trimpath','-o',build/'inv-node','./cmd/inv-node'], cwd=ROOT/'services/node-agent', env=env, timeout=180)
-    shutil.copyfile(ROOT/'deploy/lan/Dockerfile.node',build/'Dockerfile')
     tag = 'saintvision-lan-node:'+state['epoch'][:8]
-    run(['docker','build','--network=none','--pull=false','-t',tag,build],timeout=120)
+    if not args.reuse_image:
+        if not args.go:
+            raise ValueError('An explicit Go executable is required for a new image build')
+        print('Building Linux Node binary.',flush=True)
+        run([args.go,'build','-trimpath','-o',build/'inv-node','./cmd/inv-node'], cwd=ROOT/'services/node-agent', env=env, timeout=180)
+        shutil.copyfile(ROOT/'deploy/lan/Dockerfile.node',build/'Dockerfile')
+        run(['docker','build','--network=none','--pull=false','-t',tag,build],timeout=120)
     image = run(['docker','image','inspect',tag,'--format','{{.Id}}'])
+    if args.reuse_image and image != state.get('agentImage'):
+        raise ValueError('Existing image tag differs from the recorded content ID')
     # Preserve a named reference when importing into another Docker image store.
     run(['docker','save','-o',path/'node-agent.tar',tag],timeout=60)
     inspected = json.loads(run(['docker','image','inspect',image]))[0]
@@ -322,7 +327,8 @@ def main():
     p.add_argument('--server-ip',required=True)
     p.add_argument('--node-ip',required=True)
     p = commands.add_parser('bundle')
-    p.add_argument('--go',required=True)
+    p.add_argument('--go')
+    p.add_argument('--reuse-image',action='store_true')
     p = commands.add_parser('enroll')
     p.add_argument('--csr',type=Path,required=True)
     commands.add_parser('status')

@@ -4,14 +4,17 @@ from pathlib import Path
 import re
 import sys
 
-IDENTITY = ('nodeId','tenantId','epoch','serverIP','nodeIP','nodePort','agentImage')
+# The independently verified bundle authorizes a software update. Its image
+# digest is verified separately and is not the durable Node/epoch identity.
+IDENTITY = ('nodeId','tenantId','epoch','serverIP','nodeIP','nodePort')
 CONFIG = ('User','Env','Cmd','WorkingDir','Entrypoint','OnBuild','Volumes','Labels',
           'Healthcheck','StopSignal','Shell','ExposedPorts','StopTimeout')
 
 
 def same_identity(previous, current):
-    if any(previous.get(k) != current.get(k) for k in IDENTITY):
-        raise ValueError('Existing Node identity differs; private key and journal preserved')
+    changed = [k for k in IDENTITY if previous.get(k) != current.get(k)]
+    if changed:
+        raise ValueError('Existing Node identity differs: '+', '.join(changed)+'; private key and journal preserved')
 
 
 def image_id(manifest, image):

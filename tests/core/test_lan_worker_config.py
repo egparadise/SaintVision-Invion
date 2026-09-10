@@ -35,7 +35,7 @@ def test_named_image_cannot_substitute_different_content(fault):
 
 def test_installer_metadata_upgrade_preserves_existing_identity():
     old=dict(nodeId='assigned',tenantId='tenant',epoch='epoch',serverIP='192.168.45.99',nodeIP='192.168.45.225',nodePort=18443,agentImage='sha256:'+'a'*64,schemaVersion=1)
-    current={**old,'schemaVersion':2,'agentTag':'new-reference'}
+    current={**old,'schemaVersion':2,'agentTag':'new-reference','agentImage':'sha256:'+'b'*64}
     worker.same_identity(old,current)
     current['epoch']='different'
     with pytest.raises(ValueError): worker.same_identity(old,current)
