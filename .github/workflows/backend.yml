@@ -38,6 +38,13 @@ jobs:
       INV_ENV: test
       INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
       INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      # Codex's suites refuse to skip in CI and want an admin DSN of their own.
+      # Pointing it at this job's database is deliberate: running both halves
+      # against one PostgreSQL is the only way the integration is actually
+      # regression-tested rather than each side passing in its own container.
+      # invowner is this container's superuser, which is what their fixtures
+      # need to provision roles and schemas.
+      INV_TEST_ADMIN_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
 
     steps:
       - uses: actions/checkout@v4
