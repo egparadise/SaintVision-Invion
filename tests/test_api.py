@@ -343,8 +343,10 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
     from sqlalchemy import text as _text
 
     with app_engine.begin() as connection:
+        # SET LOCAL takes no bind parameter; set_config is the parameterised form.
         connection.execute(
-            _text("SET LOCAL inv.tenant_id = :t"), {"t": str(seeded["tenant_a"])}
+            _text("SELECT set_config('inv.tenant_id', :t, true)"),
+            {"t": str(seeded["tenant_a"])},
         )
         stored = connection.execute(
             _text(
