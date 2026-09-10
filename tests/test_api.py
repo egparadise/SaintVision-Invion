@@ -320,7 +320,12 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
     detail = client.get(
         f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-a"}
     ).json()
-    capability_id = detail["capabilities"][0]["capabilityId"]
+    # By kind, not by position. GiB is a unit of memory and the first
+    # capability in the list is whichever id sorted lowest — reporting GiB
+    # against a GPU is now refused, which is the point.
+    capability_id = next(
+        c["capabilityId"] for c in detail["capabilities"] if c["kind"] == "ram"
+    )
 
     response = client.post(
         f"/v1/nodes/{node_id}/heartbeats",
@@ -333,6 +338,21 @@ def test_heartbeat_observations_land_in_the_right_partition(client, app_engine, 
         headers=node_headers(),
     )
     assert response.status_code == 202
+
+    # The node reported GiB; what is stored is bytes.
+    from sqlalchemy import text as _text
+
+    with app_engine.begin() as connection:
+        connection.execute(
+            _text("SET LOCAL inv.tenant_id = :t"), {"t": str(seeded["tenant_a"])}
+        )
+        stored = connection.execute(
+            _text(
+                "SELECT used_quantity FROM resource_snapshots WHERE capability_id = :c"
+            ),
+            {"c": capability_id},
+        ).scalar_one()
+    assert stored == int(3.5 * 1024**3)
     listed = client.get(f"/v1/nodes/{node_id}", headers={"Authorization": "Bearer token-a"})
     assert listed.status_code == 200
 
