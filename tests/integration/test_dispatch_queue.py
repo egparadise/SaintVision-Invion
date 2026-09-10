@@ -235,7 +235,12 @@ def test_rls_and_queue_state_guards_reject_content_change_reexecution_and_false_
     a = gateway
     queued(a)
     foreign = str(uuid4())
-    with a.e.db.transaction(foreign) as conn:
+    # Unknown tenants cannot bypass the containment barrier. Test RLS using
+    # the independently provisioned second tenant from the real DB fixture.
+    with pytest.raises(DomainError, match="AUTH-0060"):
+        with a.e.db.transaction(foreign):
+            pytest.fail("An unprovisioned tenant must not open a runtime transaction")
+    with a.e.db.transaction(a.e.other) as conn:
         assert (
             conn.execute(
                 "SELECT count(*) AS n FROM inv.execution_deliveries"
