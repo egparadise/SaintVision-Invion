@@ -10,6 +10,8 @@ source_of_truth: "Git"
 
 # SHARD-RECOVERY 통합 검증 오류
 
+13:08 KST, 보고서 commit `c7e14aaeecdb9e1213149d2083b980a0bde714f5`의 PR Core CI `34435855578`는 기존 Go `TestTimeoutAndCancellationRequirePhysicalStop/cancelled`에서 `stop not verified <nil>`로 실패했다. 이 실행은 Go 단계에서 종료되어 해당 CI의 Python 시험은 미실행이다. 같은 production 코드의 3835b19는 push/PR 모두 통과했지만 이 실패를 재실행으로 숨기지 않는다. 시험이 100ms 고정 타이머로 취소하여 journal fsync/VM 스케줄링에 따라 실제 Start보다 먼저 취소될 수 있는 구조를 확인했다. running 프로세스를 정지하는 시험과 시작 전 취소 시나리오가 섞여 있었다.
+
 2026-09-10 12:49 KST, 초기 코드 `abf95491d4fb9fde88d4a2b97146956b6d93501c`, Core CI push `34434581798`, PR `34434584972`가 복구 전용 첫 시험에서 실패했다. 기존 Workspace 전용 20개는 통과했고 새 샤드 첫 시험은 1 failure였다. 전체 suite는 fail-fast로 실행되지 않았으므로 전체 합격으로 계산하지 않는다.
 
 오류는 `inv.guard_shard_recovery()`의 source shard SQL 별칭 `old`가 PostgreSQL 트리거의 내장 `OLD` 레코드와 충돌한 `AmbiguousColumn`이다. migration 자체는 적용됐지만 실제 lineage INSERT에서 함수 본문을 실행할 때 드러났다. 실패 위치는 새 승인 소비·예약·claim·queue를 담은 바깥 트랜잭션 안이며 이 예외를 삼켜 성공 응답으로 바꾸지 않는다. raw 실패 artifact는 CI에 보존하고 이 문서에는 인증 정보가 포함될 수 있는 전체 traceback을 복제하지 않는다.

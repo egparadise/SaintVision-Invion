@@ -46,6 +46,8 @@ Obsidian 최초 check는 Gemini가 추가한 index 두 행 때문에 exit 1, 쓰
 
 ## 실제 남은 항목과 다음 담당자
 
+보고서 commit c7e14aa의 PR Core CI 34435855578에서 기존 Go 취소 시험의 100ms 타이머 의존성이 드러났다. actual Start 직후 cancel callback으로 바꾸고 `ProcessStarted` 및 start/stop/remove 1회 조건을 확인한다. 이는 production 변경이 아닌 시험 동기화 보완이다. 아래 코드 SHA의 raw 증거와 이 시험 보완을 포함한 최종 SHA의 CI 결과를 구분하며, 최종 PR #15에서 모두 추적할 수 있다.
+
 작업 중 PR14의 `44756e1` 업무 연결을 확인했다. [[PR14 업무 연결과 실행 커널 통합 선행 검토]]에 migration/DB 역할, kernel 증거 기반 binding, 현재 project/lock 권한의 통합 선행 사항을 기록했다. 다음 Codex 최우선은 이 통합이다. PR14 코드의 존재와 실제 실행 커널 연결 검증 완료를 구분한다.
 
 | 담당 | 남은 작업 |
