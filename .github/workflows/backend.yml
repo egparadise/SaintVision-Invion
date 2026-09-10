@@ -66,6 +66,11 @@ jobs:
         run: python tools/export_schemas.py --check
 
       - name: Migration renders offline
+        env:
+          # Offline rendering never connects, but alembic still requires a URL
+          # to pick a dialect. Named INV_MIGRATION_DSN like every other step
+          # that targets a specific database.
+          INV_MIGRATION_DSN: postgresql+psycopg://offline:offline@localhost:1/offline
         run: python -m alembic upgrade head --sql > /dev/null
 
       - name: Migration chain is linear with a single head
@@ -73,7 +78,7 @@ jobs:
 
       - name: Migration applies to an empty database
         env:
-          INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+          INV_MIGRATION_DSN: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
         run: python -m alembic upgrade head
 
       - name: The reversible tail reverses
@@ -85,7 +90,7 @@ jobs:
         # newest irreversible revision is exercised, and when there is no such
         # tail the step says so rather than passing quietly.
         env:
-          INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+          INV_MIGRATION_DSN: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
         run: |
           TARGET=$(python tools/migration_graph.py --downgrade-target)
           HEAD=$(python tools/migration_graph.py --head)
