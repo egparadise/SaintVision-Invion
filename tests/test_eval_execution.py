@@ -425,3 +425,60 @@ def test_the_reference_adapter_satisfies_the_executor(app_sessionmaker, two_tena
                 ).scalar_one()
     assert run.passed_gate
     assert observed["modelId"]
+
+
+# --------------------------------------------------------------------------
+# What a gate is, in one place
+# --------------------------------------------------------------------------
+
+
+def test_a_run_in_which_every_case_errored_does_not_pass(app_sessionmaker, suite):
+    """The defect the executor exposed, kept exposed.
+
+    finish_eval_run used to ask "no violations and every case recorded", which a
+    run of nothing but errors satisfies: nothing was violated, and every case was
+    accounted for. A provider outage read as a clean pass — the gate going green
+    precisely when the evaluation did not happen.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, suite["tenant_a"]):
+                run = _run(session, suite, _RunRaises())
+                report = evaluation_service.score_report(
+                    session, tenant_id=suite["tenant_a"], eval_run_id=run.eval_run_id
+                )
+    assert run.status == "completed"
+    assert run.violations == 0
+    assert run.passed_cases == 0
+    assert not run.passed_gate
+    # And the two places that compute it now agree.
+    assert report["passedGate"] == run.passed_gate
+
+
+def test_the_run_row_and_the_report_always_agree(app_sessionmaker, suite):
+    """Two answers to "did the gate pass" is one answer too many."""
+    for adapter in (_Base(), _RunRaises(), _LeaksASecret()):
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, suite["tenant_a"]):
+                    run = _run(session, suite, adapter)
+                    report = evaluation_service.score_report(
+                        session,
+                        tenant_id=suite["tenant_a"],
+                        eval_run_id=run.eval_run_id,
+                    )
+                    assert report["passedGate"] == run.passed_gate, adapter
+
+
+def test_an_empty_suite_is_not_a_pass():
+    """Zero of zero cases passing is a fact about arithmetic, not about a model."""
+    assert not evaluation_service.gate_passed(
+        total_cases=0, recorded=0, passed=0, violations=0
+    )
+
+
+def test_a_partial_run_is_not_a_pass():
+    """Cases that have not run yet cannot be assumed to be about to pass."""
+    assert not evaluation_service.gate_passed(
+        total_cases=3, recorded=2, passed=2, violations=0
+    )
