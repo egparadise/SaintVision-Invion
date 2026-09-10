@@ -119,6 +119,25 @@ def _observe_resource(owner_engine, seam, *, kind="memory", offered=64 * GIB):
     """What the core's own probes would have recorded. Never written by the gateway."""
     resource_id = new_id("run").replace("run_", "res_")
     with owner_engine.begin() as c:
+        # inv.resources references inv.nodes, so the node identity has to exist
+        # first. Written as the owner here because this stands in for the core's
+        # own observation path, which the gateway deliberately does not perform.
+        c.execute(
+            text(
+                "INSERT INTO inv.tenants (tenant_id, name) VALUES (:t, 'seam') "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": seam["tenant_a"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.nodes (tenant_id, node_id, status, heartbeat_at, "
+                "recovery_epoch, clock_skew_seconds) VALUES (:t, :n, 'online', "
+                "clock_timestamp(), (SELECT epoch FROM inv.control_epoch WHERE singleton), 0) "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": seam["tenant_a"], "n": seam["node_id"]},
+        )
         c.execute(
             text(
                 "INSERT INTO inv.resources (tenant_id, resource_id, node_id, kind, "
@@ -168,8 +187,7 @@ def _approved_binding(session, seam, owner_engine):
     )
     gateway.project_grant(
         session, tenant_id=seam["tenant_a"], project_id=seam["project_id"],
-        user_id=seam["approver"], can_request=approver.can_request,
-        can_approve=approver.can_approve,
+        user_id=seam["approver"],
     )
     handoff_service.attach_approval(
         session, tenant_id=seam["tenant_a"], binding_id=binding.binding_id,
@@ -252,7 +270,6 @@ def test_a_revoked_membership_becomes_a_revoked_grant(
                     gateway.project_grant(
                         session, tenant_id=seam["tenant_a"],
                         project_id=seam["project_id"], user_id=seam["approver"],
-                        can_request=True, can_approve=can,
                     )
     with owner_engine.connect() as c:
         row = c.execute(

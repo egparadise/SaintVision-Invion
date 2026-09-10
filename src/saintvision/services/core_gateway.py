@@ -187,34 +187,33 @@ def _advance_to_reservable(conn: _DictRows, tenant_id: uuid.UUID, run_id: str, r
 
 
 def project_grant(
-    session: Session,
-    *,
-    tenant_id: uuid.UUID,
-    project_id: str,
-    user_id: str,
-    can_request: bool,
-    can_approve: bool,
+    session: Session, *, tenant_id: uuid.UUID, project_id: str, user_id: str
 ) -> None:
-    """Project one membership decision into the core's grant table.
+    """Make the core's grant agree with ``public.project_members``.
 
     ``inv.approval_requests.requester_id`` has a foreign key to
-    ``inv.project_grants``, so an approval literally cannot exist without a row
-    here. That makes this projection load-bearing rather than a convenience:
-    without it the core's approval path is unreachable from the business
-    surface, no matter what ``public.project_members`` says.
+    ``inv.project_grants``, so an approval cannot exist without a row here.
+    That makes this projection load-bearing: without it the core's approval path
+    is unreachable from the business surface, whatever ``public`` says.
 
-    Written on every call rather than only on insert. A revoked membership must
+    The application cannot write that table — it holds ``UPDATE(lock_sentinel)``
+    and nothing more, so it can prove membership did not change under it and can
+    never change it. That is the right permission and this does not widen it.
+    The projection goes through a SECURITY DEFINER function that reads
+    ``public.project_members`` and decides the permissions itself, so the caller
+    chooses *whose* membership to project and never *what* it grants. An
+    application that has been taken over can use this only to make the core
+    agree with a table it also cannot write. See migration 0025.
+
+    Called on every pass rather than only on insert: a revoked membership has to
     become a revoked grant, and a projection that only ever adds is a permission
     system that only ever grows.
     """
     conn = _DictRows(session.connection().connection.driver_connection)
     conn.execute(
-        "INSERT INTO inv.project_grants "
-        "(tenant_id, project_id, subject_id, can_request, can_approve, enabled) "
-        "VALUES (%s, %s, %s, %s, %s, true) "
-        "ON CONFLICT (tenant_id, project_id, subject_id) DO UPDATE SET "
-        "can_request = excluded.can_request, can_approve = excluded.can_approve",
-        (str(tenant_id), project_id, user_id, can_request, can_approve),
+        "SELECT inv.project_grants_from_members(%s, CAST(%s AS char(30)), "
+        "CAST(%s AS char(30)))",
+        (str(tenant_id), project_id, user_id),
     )
 
 
