@@ -86,6 +86,19 @@ GRANT UPDATE(lock_sentinel) ON inv.business_projects,inv.business_subjects TO in
 GRANT UPDATE(released_at) ON public.workspace_edit_locks TO inv_kernel;
 CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON inv.business_runs
  FOR EACH ROW EXECUTE FUNCTION inv.immutable_record();
+CREATE FUNCTION inv.guard_business_identity() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF TG_OP='DELETE' OR (to_jsonb(NEW)-'enabled'-'lock_sentinel') IS DISTINCT FROM
+  (to_jsonb(OLD)-'enabled'-'lock_sentinel') THEN
+  RAISE EXCEPTION 'Business identity mapping is immutable; disable instead' USING ERRCODE='23514';
+ END IF;
+ RETURN NEW;
+END $$;
+CREATE TRIGGER identity_guard BEFORE UPDATE OR DELETE ON inv.business_subjects
+ FOR EACH ROW EXECUTE FUNCTION inv.guard_business_identity();
+CREATE TRIGGER identity_guard BEFORE UPDATE OR DELETE ON inv.business_projects
+ FOR EACH ROW EXECUTE FUNCTION inv.guard_business_identity();
+REVOKE ALL ON FUNCTION inv.guard_business_identity() FROM PUBLIC;
 CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON public.execution_bindings
  FOR EACH ROW EXECUTE FUNCTION inv.immutable_record();
 
@@ -137,3 +150,32 @@ END $$;
 CREATE TRIGGER unlock_guard BEFORE UPDATE OR DELETE ON public.workspace_edit_locks
  FOR EACH ROW EXECUTE FUNCTION inv.guard_business_unlock();
 REVOKE ALL ON FUNCTION inv.guard_business_binding(),inv.guard_business_unlock() FROM PUBLIC;
+
+-- A worker may release a completed execution even after its requester's grant
+-- is revoked. This grants no new execution authority. Run writers and lease
+-- release already hold the Run lock; the edit lock is acquired afterwards.
+CREATE FUNCTION inv.reconcile_business_locks() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ UPDATE public.workspace_edit_locks l SET released_at=clock_timestamp()
+ FROM public.execution_bindings b JOIN inv.runs r ON r.tenant_id=b.tenant_id AND r.run_id=b.run_id
+ WHERE l.tenant_id=NEW.tenant_id AND l.run_id=NEW.run_id AND l.released_at IS NULL
+  AND b.tenant_id=l.tenant_id AND b.lock_id=l.lock_id
+  AND NOT EXISTS(SELECT 1 FROM inv.resource_leases WHERE tenant_id=b.tenant_id AND run_id=b.run_id AND released_at IS NULL)
+  AND (
+   (r.state IN ('failed','cancelled') AND NOT EXISTS(
+    SELECT 1 FROM inv.approval_dispatches WHERE tenant_id=b.tenant_id AND approval_id=b.approval_id))
+   OR (r.state IN ('succeeded','failed','cancelled','recovering') AND EXISTS(
+    SELECT 1 FROM inv.approval_dispatches d JOIN inv.node_stop_receipts s
+     ON s.tenant_id=d.tenant_id AND s.command_id=d.command_id
+    WHERE d.tenant_id=b.tenant_id AND d.approval_id=b.approval_id
+     AND (r.state<>'succeeded' OR EXISTS(
+      SELECT 1 FROM inv.result_completions WHERE tenant_id=d.tenant_id AND command_id=d.command_id))))
+  );
+ RETURN NEW;
+END $$;
+CREATE TRIGGER business_run_settlement AFTER UPDATE OF state ON inv.runs
+ FOR EACH ROW EXECUTE FUNCTION inv.reconcile_business_locks();
+CREATE TRIGGER business_lease_settlement AFTER UPDATE OF released_at ON inv.resource_leases
+ FOR EACH ROW WHEN (OLD.released_at IS NULL AND NEW.released_at IS NOT NULL)
+ EXECUTE FUNCTION inv.reconcile_business_locks();
+REVOKE ALL ON FUNCTION inv.reconcile_business_locks() FROM PUBLIC;

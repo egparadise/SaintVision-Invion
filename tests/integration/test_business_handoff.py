@@ -168,7 +168,7 @@ def test_binding_tracks_real_quorum_queue_receipt_evidence_and_safe_unlock(busin
     result = a.http.get(a.binding_url, headers=a.headers()).json()
     assert result["state"] == "settled" and result["run"]["state"] == "succeeded"
     assert result["attempt"] == 2 and result["stopReceiptId"] and result["evidenceId"]
-    assert result["releaseAllowed"] and result["releasedAt"] is None and active(a) == 0
+    assert result["releaseAllowed"] and result["releasedAt"] and active(a) == 0
     with a.e.db.transaction(a.e.tenant) as conn:
         assert (
             conn.execute(
@@ -403,3 +403,48 @@ def test_database_roles_cannot_forge_authority_binding_or_unlock(business):
                 "INSERT INTO inv.business_subjects(tenant_id,subject_id,user_id) VALUES(%s,%s,%s)",
                 (a.e.tenant, a.jwt.subject("duplicate"), a.users["alice"]),
             )
+
+
+def test_worker_releases_completed_lock_after_requester_revocation(business):
+    a = business
+    stop(a)
+    prepare(a)
+    approve(a)
+    assert enqueue(a).status_code == 202
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute("DELETE FROM public.project_members WHERE user_id=%s", (a.users["requester"],))
+    assert release(a).status_code == 403
+    assert a.http.get("/v1/projects", headers=a.headers()).json()["items"] == []
+    worker = DeliveryWorker(a.e.db, a.delivery, output_provider=a.storage.provider)
+    assert worker.once(a.e.tenant) == "stopped"
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert (
+            conn.execute(
+                "SELECT released_at FROM public.workspace_edit_locks WHERE lock_id=%s",
+                (a.lock["lockId"],),
+            ).fetchone()["released_at"]
+            is not None
+        )
+    assert active(a) == 0
+
+
+def test_queued_cancellation_keeps_lock_until_node_stop_receipt(business):
+    a = business
+    stop(a)
+    prepare(a)
+    approve(a)
+    assert enqueue(a).status_code == 202
+    current = a.http.get(a.url, headers=a.headers()).json()
+    cancelled = a.http.post(
+        a.url + "/cancel",
+        json={"expectedVersion": current["version"]},
+        headers=a.headers(key="queued-cancel"),
+    )
+    assert cancelled.status_code == 200, cancelled.text
+    assert release(a).status_code == 409
+    assert active(a) == 2
+    worker = DeliveryWorker(a.e.db, a.delivery, output_provider=a.storage.provider)
+    assert worker.once(a.e.tenant) == "stopped"
+    view = a.http.get(a.binding_url, headers=a.headers()).json()
+    assert view["run"]["state"] == "cancelled" and view["stopReceiptId"]
+    assert view["releasedAt"] and active(a) == 0
