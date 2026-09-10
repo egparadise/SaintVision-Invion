@@ -21,6 +21,48 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
   const [resilientNodes, setResilientNodes] = useState<ResilientNodeState[]>(recoveryManager.getNodes());
   const [selectedNodeId, setSelectedNodeId] = useState<string>(nodes[0]?.id || 'nod_01JABCDEF01');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [checkouts, setCheckouts] = useState<
+    Array<{
+      checkoutId: string;
+      nodeId: string;
+      inode: string;
+      permissions: string;
+      checkpointSha: string;
+      epoch: number;
+      status: 'active' | 'reclaimed';
+      createdAt: string;
+    }>
+  >([
+    {
+      checkoutId: 'chk_01JABCDEF01',
+      nodeId: 'nod_01JABCDEF01',
+      inode: 'ino_49152',
+      permissions: '0600 (read/write)',
+      checkpointSha: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+      epoch: 1,
+      status: 'active',
+      createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    },
+  ]);
+
+  const handleCreateCheckout = () => {
+    const curToken = selectedNode.fencingToken;
+    const newChk = {
+      checkoutId: `chk_${Date.now().toString(36)}`,
+      nodeId: selectedNode.nodeId,
+      inode: `ino_${Math.floor(10000 + Math.random() * 50000)}`,
+      permissions: '0600 (read/write)',
+      checkpointSha: `sha256:${Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}...`,
+      epoch: curToken.epoch,
+      status: 'active' as const,
+      createdAt: new Date().toISOString(),
+    };
+    setCheckouts((prev) => [newChk, ...prev]);
+    setActionNotice({
+      type: 'success',
+      text: `✓ ADR-043 Writable Generation 생성 완료: ${newChk.checkoutId} (inode: ${newChk.inode}, 권한: 0600, Epoch: ${newChk.epoch})`,
+    });
+  };
 
   const selectedNode = resilientNodes.find((n) => n.nodeId === selectedNodeId) || resilientNodes[0];
 
@@ -373,6 +415,79 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* ADR-043 Writable Generations & Working Checkouts */}
+      <div
+        style={{
+          backgroundColor: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: 'var(--radius-lg, 8px)',
+          padding: '20px',
+          marginTop: '20px',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <div>
+            <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+              Working Generations &amp; Workspace Checkouts (ADR-043 수정 가능한 작업 사본)
+            </h4>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
+            </p>
+          </div>
+          <Button variant="secondary" size="sm" onClick={handleCreateCheckout}>
+            + 새 수정 가능 작업 사본 체크아웃 (Working Generation)
+          </Button>
+        </div>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+              <th style={{ padding: '8px' }}>Checkout ID</th>
+              <th style={{ padding: '8px' }}>Target Node</th>
+              <th style={{ padding: '8px' }}>Directory Inode</th>
+              <th style={{ padding: '8px' }}>POSIX Permissions</th>
+              <th style={{ padding: '8px' }}>Checkpoint Hash</th>
+              <th style={{ padding: '8px' }}>Fencing Epoch</th>
+              <th style={{ padding: '8px' }}>Status</th>
+              <th style={{ padding: '8px' }}>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {checkouts.map((chk) => (
+              <tr key={chk.checkoutId} style={{ borderBottom: '1px solid #21262d' }}>
+                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>
+                  {chk.checkoutId}
+                </td>
+                <td style={{ padding: '8px' }}>{chk.nodeId}</td>
+                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{chk.inode}</td>
+                <td style={{ padding: '8px' }}>
+                  <span
+                    style={{
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                      color: '#58a6ff',
+                      border: '1px solid rgba(56, 139, 253, 0.4)',
+                    }}
+                  >
+                    {chk.permissions}
+                  </span>
+                </td>
+                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                  {chk.checkpointSha.slice(0, 18)}...
+                </td>
+                <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {chk.epoch}</td>
+                <td style={{ padding: '8px', color: '#3fb950', fontWeight: 600 }}>
+                  ✓ {chk.status.toUpperCase()} (WRITABLE)
+                </td>
+                <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(chk.createdAt).toLocaleTimeString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -228,7 +228,215 @@ RUNS: List[Dict[str, Any]] = [
         "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "version": 1,
     },
+    {
+        "id": "run_01JPARENT_ACTIVE",
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "분산 5노드 AI 배치 및 샤드 병렬 처리 (SHARD-I07)",
+        "state": "running",
+        "requestedBy": "usr_developer_01",
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=10)).isoformat(),
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "childRunIds": ["run_01JSHARD_01", "run_01JSHARD_02"],
+        "shardCount": 2,
+        "allPhysicallyStopped": False,
+        "allSucceeded": False,
+        "resourceReleasePending": False,
+        "version": 1,
+    },
+    {
+        "id": "run_01JSHARD_01",
+        "parentId": "run_01JPARENT_ACTIVE",
+        "shardIndex": 0,
+        "shardCount": 2,
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "[샤드 1/2] Node-01 데이터 분할 로컬 인퍼런스",
+        "state": "running",
+        "requestedBy": "usr_developer_01",
+        "nodeId": "nod_01JABCDEF01",
+        "attempt": 1,
+        "allPhysicallyStopped": False,
+        "allSucceeded": False,
+        "resourceReleasePending": False,
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=10)).isoformat(),
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "version": 1,
+    },
+    {
+        "id": "run_01JSHARD_02",
+        "parentId": "run_01JPARENT_ACTIVE",
+        "shardIndex": 1,
+        "shardCount": 2,
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "[샤드 2/2] Node-02 데이터 분할 로컬 인퍼런스",
+        "state": "running",
+        "requestedBy": "usr_developer_01",
+        "nodeId": "nod_01JABCDEF02",
+        "attempt": 1,
+        "allPhysicallyStopped": False,
+        "allSucceeded": False,
+        "resourceReleasePending": False,
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=10)).isoformat(),
+        "updatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "version": 1,
+    },
+    {
+        "id": "run_01JPARENT_SUCCESS",
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "분산 LLM 모델 계보 평가 및 집계 (완료된 부모 Run)",
+        "state": "succeeded",
+        "requestedBy": "usr_admin_01",
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).isoformat(),
+        "updatedAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=50)).isoformat(),
+        "childRunIds": ["run_01JSHARD_03", "run_01JSHARD_04"],
+        "shardCount": 2,
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "resourceReleasePending": False,
+        "aggregateEvidenceId": "evi_01JAGGREGATE_001",
+        "manifestDigest": "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        "version": 2,
+    },
+    {
+        "id": "run_01JSHARD_03",
+        "parentId": "run_01JPARENT_SUCCESS",
+        "shardIndex": 0,
+        "shardCount": 2,
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "[샤드 1/2] Node-04 모델 평가",
+        "state": "succeeded",
+        "requestedBy": "usr_admin_01",
+        "nodeId": "nod_01JABCDEF04",
+        "attempt": 1,
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "resourceReleasePending": False,
+        "outputHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputEvidenceId": "evi_01JSHARD_03",
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).isoformat(),
+        "updatedAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=52)).isoformat(),
+        "version": 1,
+    },
+    {
+        "id": "run_01JSHARD_04",
+        "parentId": "run_01JPARENT_SUCCESS",
+        "shardIndex": 1,
+        "shardCount": 2,
+        "projectId": "prj_01JABCDE",
+        "workspaceId": "wsp_01JABCDE001",
+        "objective": "[샤드 2/2] Node-05 모델 평가",
+        "state": "succeeded",
+        "requestedBy": "usr_admin_01",
+        "nodeId": "nod_01JABCDEF05",
+        "attempt": 1,
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "resourceReleasePending": False,
+        "outputHash": "sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+        "outputEvidenceId": "evi_01JSHARD_04",
+        "createdAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).isoformat(),
+        "updatedAt": (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=50)).isoformat(),
+        "version": 1,
+    },
 ]
+
+SHARDS: Dict[str, List[Dict[str, Any]]] = {
+    "run_01JPARENT_ACTIVE": [
+        {
+            "shardId": "shd_01_active",
+            "runId": "run_01JSHARD_01",
+            "parentId": "run_01JPARENT_ACTIVE",
+            "nodeId": "nod_01JABCDEF01",
+            "hostname": "Node-01-WinMain",
+            "attempt": 1,
+            "executionState": "running",
+            "physicallyStopped": False,
+            "verified": False,
+            "resourceReleasePending": False,
+            "outputHash": None,
+            "evidenceId": None,
+        },
+        {
+            "shardId": "shd_02_active",
+            "runId": "run_01JSHARD_02",
+            "parentId": "run_01JPARENT_ACTIVE",
+            "nodeId": "nod_01JABCDEF02",
+            "hostname": "Node-02-WinWork",
+            "attempt": 1,
+            "executionState": "running",
+            "physicallyStopped": False,
+            "verified": False,
+            "resourceReleasePending": False,
+            "outputHash": None,
+            "evidenceId": None,
+        },
+    ],
+    "run_01JPARENT_SUCCESS": [
+        {
+            "shardId": "shd_03_success",
+            "runId": "run_01JSHARD_03",
+            "parentId": "run_01JPARENT_SUCCESS",
+            "nodeId": "nod_01JABCDEF04",
+            "hostname": "Node-04-LinuxBuild",
+            "attempt": 1,
+            "executionState": "succeeded",
+            "physicallyStopped": True,
+            "verified": True,
+            "resourceReleasePending": False,
+            "outputHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "evidenceId": "evi_01JSHARD_03",
+            "exitCode": 0,
+        },
+        {
+            "shardId": "shd_04_success",
+            "runId": "run_01JSHARD_04",
+            "parentId": "run_01JPARENT_SUCCESS",
+            "nodeId": "nod_01JABCDEF05",
+            "hostname": "Node-05-LinuxTrain",
+            "attempt": 1,
+            "executionState": "succeeded",
+            "physicallyStopped": True,
+            "verified": True,
+            "resourceReleasePending": False,
+            "outputHash": "sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+            "evidenceId": "evi_01JSHARD_04",
+            "exitCode": 0,
+        },
+    ],
+}
+
+EVIDENCES: Dict[str, Dict[str, Any]] = {
+    "run_01JPARENT_SUCCESS": {
+        "evidenceId": "evi_01JAGGREGATE_001",
+        "runId": "run_01JPARENT_SUCCESS",
+        "manifestDigest": "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        "policyVersion": "shard-completion:v1",
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "shards": [
+            {
+                "shardIndex": 0,
+                "nodeId": "nod_01JABCDEF04",
+                "outputHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "exitCode": 0,
+                "sizeBytes": 1042,
+            },
+            {
+                "shardIndex": 1,
+                "nodeId": "nod_01JABCDEF05",
+                "outputHash": "sha256:ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+                "exitCode": 0,
+                "sizeBytes": 2048,
+            },
+        ],
+        "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "immutable": True,
+    }
+}
 
 APPROVALS: List[Dict[str, Any]] = [
     {
@@ -591,22 +799,190 @@ def list_runs():
     return {"items": RUNS, "total": len(RUNS)}
 
 
-@app.get("/v1/projects/{project}/runs")
-def list_project_runs(project: str):
-    return {"items": [r for r in RUNS if r.get("projectId") == project], "total": len(RUNS)}
+@app.get("/v1/runs/{run_id}")
+def get_run(run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for r in RUNS:
+        if r["id"] == run_id:
+            return r
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/runs/{run_id}/children")
+def list_child_runs(run_id: str):
+    children = [r for r in RUNS if r.get("parentId") == run_id]
+    return {"items": children, "total": len(children)}
+
+
+@app.get("/v1/runs/{run_id}/shards")
+def get_run_shards(run_id: str):
+    # Check if run_id is a parent with direct shards
+    if run_id in SHARDS:
+        shards_list = SHARDS[run_id]
+        return {"items": shards_list, "total": len(shards_list), "runId": run_id}
+    # Check if run_id is a child run whose parent has shards
+    for r in RUNS:
+        if r["id"] == run_id and r.get("parentId") and r["parentId"] in SHARDS:
+            parent_shards = SHARDS[r["parentId"]]
+            return {"items": parent_shards, "total": len(parent_shards), "runId": run_id, "parentId": r["parentId"]}
+    return {"items": [], "total": 0, "runId": run_id}
+
+
+@app.get("/v1/runs/{run_id}/evidence")
+def get_run_evidence(run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    if run_id in EVIDENCES:
+        return EVIDENCES[run_id]
+    # Check if run is present and generate standard evidence
+    for r in RUNS:
+        if r["id"] == run_id:
+            return {
+                "evidenceId": f"evi_{r['id']}",
+                "runId": run_id,
+                "manifestDigest": r.get("manifestDigest") or f"sha256:{hashlib.sha256(run_id.encode()).hexdigest()}",
+                "policyVersion": "shard-completion:v1",
+                "state": r["state"],
+                "allPhysicallyStopped": r.get("allPhysicallyStopped", True),
+                "allSucceeded": r.get("allSucceeded", r["state"] == "succeeded"),
+                "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "immutable": True,
+            }
+    return rfc9457_problem(
+        404, "RES-EVI-404", "Evidence Not Found", f"Evidence for Run '{run_id}' not found.", trace_id, "RES"
+    )
 
 
 @app.post("/v1/runs/{run_id}/cancel")
 def cancel_run(run_id: str, request: Request):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
     for r in RUNS:
         if r["id"] == run_id:
             r["state"] = "cancelled"
-            r["updatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
-            return {"runId": run_id, "state": "cancelled", "updatedAt": r["updatedAt"]}
+            r["updatedAt"] = now_iso
+            # If parent run, cascade cancel to all child runs and set resourceReleasePending (ADR-040/042)
+            child_ids = r.get("childRunIds", [])
+            if child_ids:
+                r["resourceReleasePending"] = True
+                for child in RUNS:
+                    if child["id"] in child_ids:
+                        child["state"] = "cancelled"
+                        child["resourceReleasePending"] = True
+                        child["updatedAt"] = now_iso
+                if run_id in SHARDS:
+                    for s in SHARDS[run_id]:
+                        s["executionState"] = "cancelled"
+                        s["resourceReleasePending"] = True
+                return {
+                    "runId": run_id,
+                    "state": "cancelled",
+                    "resourceReleasePending": True,
+                    "childRunIds": child_ids,
+                    "updatedAt": now_iso,
+                }
+            return {"runId": run_id, "state": "cancelled", "resourceReleasePending": False, "updatedAt": now_iso}
     return rfc9457_problem(
         404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
     )
+
+
+@app.post("/v1/runs/{run_id}/shards/cancel-all")
+def cancel_all_shards(run_id: str, request: Request):
+    """
+    Atomically cancel all child shards of a distributed plan (SHARD-I07 / ADR-042).
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    target_parent_id = run_id
+    for r in RUNS:
+        if r["id"] == run_id and r.get("parentId"):
+            target_parent_id = r["parentId"]
+            break
+
+    affected_count = 0
+    for r in RUNS:
+        if r["id"] == target_parent_id or r.get("parentId") == target_parent_id:
+            r["state"] = "cancelled"
+            r["resourceReleasePending"] = True
+            r["updatedAt"] = now_iso
+            affected_count += 1
+
+    if target_parent_id in SHARDS:
+        for s in SHARDS[target_parent_id]:
+            s["executionState"] = "cancelled"
+            s["resourceReleasePending"] = True
+
+    return {
+        "parentRunId": target_parent_id,
+        "state": "cancelled",
+        "resourceReleasePending": True,
+        "affectedRuns": affected_count,
+        "updatedAt": now_iso,
+    }
+
+
+@app.post("/v1/runs/{run_id}/reclaim-resources")
+def reclaim_resources(run_id: str, request: Request):
+    """
+    Acknowledge physical NodeStopReceipts and release resources (ADR-040 / ADR-041).
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    for r in RUNS:
+        if r["id"] == run_id:
+            r["resourceReleasePending"] = False
+            r["allPhysicallyStopped"] = True
+            r["updatedAt"] = now_iso
+            child_ids = r.get("childRunIds", [])
+            for child in RUNS:
+                if child["id"] in child_ids:
+                    child["resourceReleasePending"] = False
+                    child["allPhysicallyStopped"] = True
+                    child["updatedAt"] = now_iso
+            if run_id in SHARDS:
+                for s in SHARDS[run_id]:
+                    s["resourceReleasePending"] = False
+                    s["physicallyStopped"] = True
+            return {
+                "runId": run_id,
+                "resourceReleasePending": False,
+                "allPhysicallyStopped": True,
+                "reclaimedAt": now_iso,
+            }
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/projects/{project}/runs")
+def list_project_runs(project: str):
+    return {"items": [r for r in RUNS if r.get("projectId") == project], "total": len(RUNS)}
+
+
+@app.post("/v1/projects/{project}/runs", status_code=201)
+async def create_project_run(project: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    new_id = f"run_{secrets.token_hex(6)}"
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    new_run = {
+        "id": new_id,
+        "projectId": project,
+        "workspaceId": data.get("workspaceId", "wsp_01JABCDE001"),
+        "objective": data.get("objective", f"Monaco commit execution {new_id}"),
+        "state": "running",
+        "requestedBy": data.get("requestedBy", "usr_current"),
+        "createdAt": now_iso,
+        "updatedAt": now_iso,
+        "version": 1,
+    }
+    RUNS.append(new_run)
+    return new_run
 
 
 @app.get("/v1/approvals")

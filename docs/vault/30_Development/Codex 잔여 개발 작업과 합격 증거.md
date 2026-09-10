@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T09:06:00+09:00"
+updated: "2026-09-10T10:09:50+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 Workspace 후속: `4f7d5d5`에서 새 승인 기반 Node 파일 실행·실제 로컬 Git·수정 checkpoint/Evidence·최대 3 attempt 복구를 검증했다. 통합 846개/Go race 93 leaf case 모두 통과했다. [[2026-09-10_10-09-50_KST_WORKSPACE-RESUME_Codex_검증보고]], [[Codex Workspace 실행 재개와 결과 체크포인트 계약]]을 따른다. 대용량/PTY/remote Git·샤드 재실행·다중 Node/실장비·업무/브라우저 통합과 독립 검토는 남는다. PR #12는 초안이며 아래 이전 기록과 그 미구현 문구는 당시 고정 SHA 기준이다.
 
 ## 2026-09-10 실행 완료 후속
 

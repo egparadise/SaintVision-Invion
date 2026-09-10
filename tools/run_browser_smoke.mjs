@@ -308,6 +308,59 @@ async function runFullSmokeJourney() {
     }
 
     // -------------------------------------------------------------------------
+    // [Track 10] Distributed Shards & Cascade Resource Reclamation (SHARD-I07 / ADR-040/042)
+    // -------------------------------------------------------------------------
+    console.log('\n[Track 10] Distributed Shards & Cascade Resource Reclamation:');
+
+    // 1. Get completed parent run with aggregate manifest
+    const pRunRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS`);
+    assert('Completed parent run returns HTTP 200', pRunRes.status === 200);
+    const pRunData = await pRunRes.json();
+    assert('Parent run contains valid manifest digest', typeof pRunData.manifestDigest === 'string' && pRunData.manifestDigest.startsWith('sha256:'));
+    assert('Parent run confirms allSucceeded: true', pRunData.allSucceeded === true);
+    assert('Parent run confirms allPhysicallyStopped: true', pRunData.allPhysicallyStopped === true);
+
+    // 2. Child runs listing
+    const chRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/children`);
+    assert('Child runs listing returns HTTP 200', chRes.status === 200);
+    const chData = await chRes.json();
+    assert('Child runs count matches parent shards (2 shards)', chData.items && chData.items.length === 2);
+
+    // 3. Shard status listing with physical stop vs verification separation
+    const shRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/shards`);
+    assert('Shards listing returns HTTP 200', shRes.status === 200);
+    const shData = await shRes.json();
+    assert('All shards confirm physical stop receipts', shData.items && shData.items.every((s) => s.physicallyStopped === true));
+    assert('All shards confirm output commitment hashes', shData.items && shData.items.every((s) => typeof s.outputHash === 'string'));
+
+    // 4. Evidence manifest inspection
+    const eviRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/evidence`);
+    assert('Run evidence manifest returns HTTP 200', eviRes.status === 200);
+    const eviData = await eviRes.json();
+    assert('Evidence uses policyVersion shard-completion:v1', eviData.policyVersion === 'shard-completion:v1');
+    assert('Evidence marked immutable', eviData.immutable === true);
+
+    // 5. Parent cascade cancellation sets resourceReleasePending (ADR-040)
+    const parentCancelRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_ACTIVE/cancel`, { method: 'POST' });
+    assert('Parent cancellation returns HTTP 200', parentCancelRes.status === 200);
+    const parentCancelData = await parentCancelRes.json();
+    assert('Parent cancel sets resourceReleasePending: true', parentCancelData.resourceReleasePending === true);
+    assert('Parent cancel cascades to child runs', Array.isArray(parentCancelData.childRunIds) && parentCancelData.childRunIds.length === 2);
+
+    // 6. Bulk shard cancellation (SHARD-I07)
+    const bulkCancelRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_ACTIVE/shards/cancel-all`, { method: 'POST' });
+    assert('Bulk shard cancellation returns HTTP 200', bulkCancelRes.status === 200);
+    const bulkCancelData = await bulkCancelRes.json();
+    assert('Bulk cancel reports resourceReleasePending: true', bulkCancelData.resourceReleasePending === true);
+
+    // 7. NodeStopReceipt acknowledgment releases resources (ADR-041)
+    const reclaimRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_ACTIVE/reclaim-resources`, { method: 'POST' });
+    assert('Resource reclamation returns HTTP 200', reclaimRes.status === 200);
+    const reclaimData = await reclaimRes.json();
+    assert('Resource reclamation clears resourceReleasePending: false', reclaimData.resourceReleasePending === false);
+    assert('All physical stops confirmed (allPhysicallyStopped: true)', reclaimData.allPhysicallyStopped === true);
+
+    // -------------------------------------------------------------------------
     // Summary Dossier
     // -------------------------------------------------------------------------
     console.log('\n======================================================================');

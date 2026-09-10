@@ -242,6 +242,16 @@ export const App: React.FC = () => {
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
+  const fetchRuns = () => {
+    apiClient<{ items: RunItem[] }>('/v1/runs')
+      .then((res) => {
+        if (res.items?.length > 0) {
+          setRuns(res.items);
+        }
+      })
+      .catch((err) => console.warn('Live /v1/runs fetch fallback:', err));
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -275,13 +285,7 @@ export const App: React.FC = () => {
       })
       .catch((err) => console.warn('Live /v1/nodes fetch fallback:', err));
 
-    apiClient<{ items: RunItem[] }>('/v1/runs')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setRuns(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/runs fetch fallback:', err));
+    fetchRuns();
 
     apiClient<{ items: ApprovalItem[] }>('/v1/approvals')
       .then((res) => {
@@ -364,16 +368,17 @@ export const App: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ reason }),
       });
+      fetchRuns();
     } catch (err) {
       console.warn('Backend run cancellation API fallback:', err);
+      setRuns((prev) =>
+        prev.map((r) =>
+          r.id === runId
+            ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
+            : r
+        )
+      );
     }
-    setRuns((prev) =>
-      prev.map((r) =>
-        r.id === runId
-          ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
-          : r
-      )
-    );
   };
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -575,7 +580,9 @@ export const App: React.FC = () => {
                 onBack={() => setSelectedRunId(null)}
                 onNavigateEvidence={(id) => setEvidenceRunId(id)}
                 onNavigateApproval={() => setActiveTab('approvals')}
+                onNavigateRun={(id) => setSelectedRunId(id)}
                 onCancelRun={handleCancelRun}
+                onRefreshRun={fetchRuns}
               />
             ) : (
               <RunList
