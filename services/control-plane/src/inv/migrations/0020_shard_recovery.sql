@@ -57,7 +57,12 @@ BEGIN
  END IF;
  SELECT shard_count INTO source_count FROM inv.shard_plans
   WHERE (tenant_id,project_id,plan_id)=(NEW.tenant_id,NEW.project_id,NEW.source_plan_id);
- IF NOT EXISTS(SELECT 1 FROM inv.shard_parents p JOIN inv.runs r USING(tenant_id,run_id)
+ IF source_count IS DISTINCT FROM (SELECT shard_count FROM inv.shard_plans
+   WHERE (tenant_id,project_id,plan_id)=(NEW.tenant_id,NEW.project_id,NEW.plan_id))
+  OR NOT EXISTS(SELECT 1 FROM inv.shard_parents p JOIN inv.runs r USING(tenant_id,run_id)
+   WHERE (p.tenant_id,p.project_id,p.plan_id)=(NEW.tenant_id,NEW.project_id,NEW.plan_id)
+   AND p.recovery_epoch=NEW.recovery_epoch AND r.state='running')
+  OR NOT EXISTS(SELECT 1 FROM inv.shard_parents p JOIN inv.runs r USING(tenant_id,run_id)
   WHERE (p.tenant_id,p.project_id,p.plan_id)=(NEW.tenant_id,NEW.project_id,NEW.source_plan_id)
   AND p.recovery_epoch=NEW.recovery_epoch AND r.state IN ('failed','cancelled'))
   OR EXISTS(SELECT 1 FROM inv.shard_commands s JOIN inv.runs r USING(tenant_id,run_id)
@@ -69,10 +74,10 @@ BEGIN
      (l.tenant_id,l.run_id)=(s.tenant_id,s.run_id) AND l.released_at IS NULL)))
   OR source_count<>(SELECT count(*) FROM inv.shard_commands s
    JOIN inv.shard_recovery_members m USING(tenant_id,project_id,plan_id,shard_index,run_id,node_id)
-   JOIN inv.shard_commands old ON (old.tenant_id,old.project_id,old.plan_id,old.shard_index)=
+   JOIN inv.shard_commands source_member ON (source_member.tenant_id,source_member.project_id,source_member.plan_id,source_member.shard_index)=
     (s.tenant_id,s.project_id,NEW.source_plan_id,s.shard_index)
    JOIN inv.tool_claims a ON (a.tenant_id,a.command_id)=(s.tenant_id,s.command_id)
-   JOIN inv.tool_claims b ON (b.tenant_id,b.command_id)=(old.tenant_id,old.command_id)
+   JOIN inv.tool_claims b ON (b.tenant_id,b.command_id)=(source_member.tenant_id,source_member.command_id)
    WHERE (s.tenant_id,s.project_id,s.plan_id)=(NEW.tenant_id,NEW.project_id,NEW.plan_id)
     AND a.action_digest=b.action_digest AND a.recovery_epoch=NEW.recovery_epoch
     AND b.recovery_epoch=NEW.recovery_epoch)
