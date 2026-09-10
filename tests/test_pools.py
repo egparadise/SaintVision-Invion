@@ -394,9 +394,10 @@ def test_capacity_reports_the_sum_and_the_single_node_ceiling(app_sessionmaker, 
                 capacity = pool_service.pool_capacity(
                     session, tenant_id=lab["tenant_a"], pool_id=lab["pool_id"], now=NOW
                 )
-    # 32 + 64 + 32 across the pool, but the biggest single machine is 64.
-    assert capacity["totalOffered"]["ram"] == 128
-    assert capacity["largestSingleNode"]["ram"] == 64
+    # 32 + 64 + 32 GiB across the pool, but the biggest single machine is 64.
+    # In bytes, because that is the unit the report declares.
+    assert capacity["totalOffered"]["ram"] == 128 * GIB
+    assert capacity["largestSingleNode"]["ram"] == 64 * GIB
     assert capacity["totalOffered"]["gpu"] == 4
     assert capacity["largestSingleNode"]["gpu"] == 2
     # Both are present, so a caller cannot show only the sum by accident.
@@ -411,8 +412,8 @@ def test_spare_reflects_current_utilisation(app_sessionmaker, lab):
                 capacity = pool_service.pool_capacity(
                     session, tenant_id=lab["tenant_a"], pool_id=lab["pool_id"], now=NOW
                 )
-    # Used RAM is 24 + 8 + 0 of 128 offered.
-    assert capacity["spareNow"]["ram"] == 96
+    # Used RAM is 24 + 8 + 0 GiB of the 128 offered.
+    assert capacity["spareNow"]["ram"] == 96 * GIB
     assert capacity["spareNow"]["ram"] < capacity["totalOffered"]["ram"]
 
 
@@ -429,7 +430,7 @@ def test_a_node_with_no_fresh_snapshot_counts_as_zero_spare(app_sessionmaker, la
     assert len(capacity["unmeasuredNodes"]) == 3
     # Offered capacity is still reported: the machines exist, we just do not
     # know what they are doing.
-    assert capacity["totalOffered"]["ram"] == 128
+    assert capacity["totalOffered"]["ram"] == 128 * GIB
 
 
 def test_a_lost_node_does_not_contribute_capacity(owner_engine, app_sessionmaker, lab):
@@ -445,8 +446,8 @@ def test_a_lost_node_does_not_contribute_capacity(owner_engine, app_sessionmaker
                     session, tenant_id=lab["tenant_a"], pool_id=lab["pool_id"], now=NOW
                 )
     assert capacity["activeMemberCount"] == 2
-    assert capacity["totalOffered"]["ram"] == 64
-    assert capacity["largestSingleNode"]["ram"] == 32
+    assert capacity["totalOffered"]["ram"] == 64 * GIB
+    assert capacity["largestSingleNode"]["ram"] == 32 * GIB
 
 
 # --------------------------------------------------------------------------
