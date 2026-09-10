@@ -87,6 +87,7 @@ def replay_or_reserve(
     payload: Any,
     now: dt.datetime,
     ttl_seconds: int,
+    project_id: str | None = None,
 ) -> dict[str, Any] | None:
     """Return a stored response for a repeated request, or None to proceed.
 
@@ -101,6 +102,9 @@ def replay_or_reserve(
         session.query(IdempotencyRecord)
         .filter(
             IdempotencyRecord.tenant_id == principal.tenant_id,
+            IdempotencyRecord.project_id.is_(None)
+            if project_id is None
+            else IdempotencyRecord.project_id == project_id,
             IdempotencyRecord.endpoint == endpoint,
             IdempotencyRecord.idempotency_key == idempotency_key,
         )
@@ -127,6 +131,7 @@ def store_idempotent_response(
     response_body: dict[str, Any],
     now: dt.datetime,
     ttl_seconds: int,
+    project_id: str | None = None,
 ) -> None:
     if idempotency_key is None:
         return
@@ -134,6 +139,7 @@ def store_idempotent_response(
         IdempotencyRecord(
             record_id=new_id("idempotency"),
             tenant_id=principal.tenant_id,
+            project_id=project_id,
             endpoint=endpoint,
             idempotency_key=idempotency_key,
             request_sha256=request_digest(payload),

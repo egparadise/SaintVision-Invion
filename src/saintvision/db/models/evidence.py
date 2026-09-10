@@ -137,7 +137,14 @@ class InboxEvent(Base):
 
     __tablename__ = "inbox_events"
     __table_args__ = (
-        UniqueConstraint("consumer", "event_id", name="uq_inbox_events_consumer_event_id"),
+        # Tenant included: one tenant's processed event must not suppress
+        # another's. ULID ids make an accidental clash unrealistic, but a
+        # deliberately chosen id is not, and "unrealistic" is not the property
+        # a deduplication key should rest on.
+        UniqueConstraint(
+            "tenant_id", "consumer", "event_id",
+            name="uq_inbox_events_consumer_event_id",
+        ),
         Index("ix_inbox_events_processed_at", "processed_at"),
     )
 

@@ -74,8 +74,14 @@ def migrated(owner_engine, database_url):
 
     config = Config("alembic.ini")
     config.set_main_option("script_location", "migrations")
+    # A fresh database per session, so the migration runs against an empty
+    # one. This supersedes dropping and recreating schemas: that was needed
+    # only because the suite reused a database it did not own, and it went
+    # stale the moment the chain started creating `inv` as well as `public`.
     with pytest.MonkeyPatch.context() as patch:
         patch.setenv("INV_DATABASE_URL", database_url)
+        # Explicit, because env.py must migrate the database this session
+        # allocated and not whichever one happens to be in the ambient DSN.
         patch.setenv("INV_MIGRATION_DSN", database_url)
         command.upgrade(config, "head")
     return True

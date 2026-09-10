@@ -1,13 +1,13 @@
-# Runtime and test dependencies for the Control Plane.
-# Versions are pinned to what was verified locally on 2026-09-09. S01-BE owns
-# the final compatibility lock (PLAN-BACKEND-001); until then these are the
-# versions this sprint was tested against, not a project-wide decision.
-fastapi==0.141.1
+# Backend Build dependencies.
+#
+# Composed from requirements-test.txt rather than restating it. Two lists for
+# one runtime is what broke the build after the integration merge: Codex's
+# tests arrived needing jsonschema, cryptography and PyJWT, this file did not
+# have them, and the failure looked like a test bug rather than a packaging
+# one. A dependency added for the core tests now reaches this build by
+# construction.
+-r requirements-test.txt
+
+# Pinned separately because FastAPI's floor is looser than the version this
+# suite is exercised against.
 starlette==1.6.0
-pydantic==2.13.5
-SQLAlchemy==2.0.52
-alembic==1.19.2
-psycopg[binary]==3.3.5
-uvicorn==0.52.4
-httpx==0.28.1
-pytest==9.1.1
