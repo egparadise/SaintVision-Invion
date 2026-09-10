@@ -20,6 +20,7 @@ type fakeEngine struct {
 	creates, starts, stops, removes     int
 	lostStart, absent, removeFail, wait bool
 	removeLost                          bool
+	onStart                             func()
 }
 
 func (e *fakeEngine) Create(_ context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {
@@ -39,6 +40,9 @@ func (e *fakeEngine) Start(_ context.Context, id string) error {
 		e.state.Status = "running"
 	} else {
 		e.state.Status = "exited"
+	}
+	if e.onStart != nil {
+		e.onStart()
 	}
 	if e.lostStart {
 		return errors.New("lost start ACK")
@@ -254,11 +258,14 @@ func TestTimeoutAndCancellationRequirePhysicalStop(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			if cancelNow {
-				time.AfterFunc(100*time.Millisecond, cancel)
+				// Cancel a RUNNING execution, independent of journal fsync speed.
+				// Pre-start cancellation has separate tombstone/non-execution tests.
+				p.Launch.TimeoutSeconds = 5
+				e.onStart = cancel
 			}
 			result, err := New(c, j, e).Execute(ctx, signed(t, p, k))
-			if err != nil || result.Receipt == nil || result.Receipt.Reason != name || e.stops != 1 || e.removes != 1 {
-				t.Fatal("stop not verified", err)
+			if err != nil || result.Receipt == nil || !result.Receipt.ProcessStarted || result.Receipt.Reason != name || e.starts != 1 || e.stops != 1 || e.removes != 1 {
+				t.Fatalf("stop not verified: err=%v starts=%d stops=%d removes=%d receipt=%+v", err, e.starts, e.stops, e.removes, result.Receipt)
 			}
 		})
 	}

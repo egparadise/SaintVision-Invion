@@ -160,6 +160,9 @@ class LeaseStore:
         Ceiling rows are provisioned before enabling a project for placement.
         """
         run = lock_run(conn, run_id, project_id)
+        from .shard_recovery import require_recovery_admission
+
+        require_recovery_admission(conn, self.db, run_id)
         conn.execute(
             "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
             (project_id,),

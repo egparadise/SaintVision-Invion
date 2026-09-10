@@ -31,9 +31,7 @@ class NodeObservation:
                 or snapshot["cpuBusyMillis"] > snapshot["cpuCapacityMillis"]
                 or snapshot["memoryAvailableBytes"] > snapshot["memoryCapacityBytes"]
             ):
-                raise DomainError(
-                    "NODE-0051", "Resource observation is inconsistent", 422
-                )
+                raise DomainError("NODE-0051", "Resource observation is inconsistent", 422)
         validate_contract("NodeProbeInput", request)
         validate_contract("NodeProbeResult", response)
         if (
@@ -68,22 +66,20 @@ class NodeObservation:
                 or pending["consumed_at"]
                 or not 0 <= (now - pending["issued_at"]).total_seconds() <= 10
             ):
-                raise DomainError(
-                    "NODE-0050", "Heartbeat challenge expired or reused", 403
-                )
+                raise DomainError("NODE-0050", "Heartbeat challenge expired or reused", 403)
             if (
                 current["probe_started_at"] is not None
                 and current["probe_started_at"] >= pending["issued_at"]
             ):
-                raise DomainError("NODE-0050", "Out-of-order heartbeat rejected", 409)
+                raise DomainError(
+                    "NODE-0050", "Out-of-order heartbeat rejected", 409, retryable=True
+                )
             # Conservative clock check against both ends of the DB-timed exchange.
             if (
                 abs((observed - now).total_seconds()) > 5
                 or abs((observed - pending["issued_at"]).total_seconds()) > 5
             ):
-                raise DomainError(
-                    "NODE-0050", "Node clock outside admission bounds", 403
-                )
+                raise DomainError("NODE-0050", "Node clock outside admission bounds", 403)
             conn.execute(
                 "UPDATE inv.node_probes SET consumed_at=%s WHERE nonce=%s",
                 (now, request["nonce"]),

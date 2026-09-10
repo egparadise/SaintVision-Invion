@@ -485,3 +485,40 @@ export interface WorkspaceEnqueueResult {
   commandId: string;
   accepted: true;
 }
+
+export type ShardPlanId = string;
+
+export interface ShardReplacementIntent {
+  nodeId: NodeId;
+  workload: WorkloadSpec;
+}
+
+export interface ShardRecoveryPrepareInput {
+  sourcePlanId: ShardPlanId;
+  planId: ShardPlanId;
+  intents: Array<ShardReplacementIntent>;
+}
+
+export interface ShardRecoveryPreparedMember {
+  index: number;
+  runId: RunId;
+  nodeId: NodeId;
+  approval: ApprovalView;
+}
+
+export interface ShardRecoveryPrepared {
+  planId: ShardPlanId;
+  sourcePlanId: ShardPlanId;
+  generation: number;
+  shards: Array<ShardRecoveryPreparedMember>;
+}
+
+export interface ShardRecoveryEnqueued {
+  planId: ShardPlanId;
+  sourcePlanId: ShardPlanId;
+  rootPlanId: ShardPlanId;
+  generation: number;
+  queued: number;
+  replayed: boolean;
+  parentRunId: RunId;
+}

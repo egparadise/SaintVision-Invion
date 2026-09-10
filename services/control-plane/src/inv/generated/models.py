@@ -677,6 +677,43 @@ class WorkspaceEnqueueResult(BaseModel):
     accepted: Literal[True]
 
 
+class ShardPlanId(RootModel[constr(min_length=1, max_length=200)]):
+    root: constr(min_length=1, max_length=200)
+
+
+class ShardRecoveryPreparedMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    nodeId: NodeId
+    approval: ApprovalView
+
+
+class ShardRecoveryPrepared(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId
+    generation: conint(ge=2, le=3)
+    shards: list[ShardRecoveryPreparedMember] = Field(..., max_length=16, min_length=1)
+
+
+class ShardRecoveryEnqueued(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId
+    rootPlanId: ShardPlanId
+    generation: conint(ge=2, le=3)
+    queued: conint(ge=1, le=16)
+    replayed: bool
+    parentRunId: RunId
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -790,6 +827,23 @@ class WorkspaceResumptionView(BaseModel):
     run: ControlRunView
     approval: ApprovalView | None
     frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
+
+
+class ShardReplacementIntent(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId
+    workload: WorkloadSpec
+
+
+class ShardRecoveryPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sourcePlanId: ShardPlanId
+    planId: ShardPlanId
+    intents: list[ShardReplacementIntent] = Field(..., max_length=16, min_length=1)
 
 
 class INVCore(

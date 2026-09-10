@@ -73,7 +73,20 @@ class RestrictedWorkspaceRuntime:
         )
 
     def observe(self):
-        observation = NodeObservation(self.db, self.client).poll(self.node)
+        for attempt in range(3):
+            try:
+                # A concurrent fresh probe may have overtaken this response.
+                # Retry with a NEW nonce; never accept the superseded response.
+                observation = NodeObservation(self.db, self.client).poll(self.node)
+                break
+            except DomainError as error:
+                if not (
+                    attempt < 2
+                    and error.code == "NODE-0050"
+                    and error.status == 409
+                    and error.retryable
+                ):
+                    raise
         if observation["profileVersion"] != self.profile.version:
             raise DomainError("SANDBOX-0001", "Observed Node profile differs", 403)
         return RuntimeCapabilities(
