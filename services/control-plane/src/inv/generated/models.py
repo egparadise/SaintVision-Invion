@@ -714,6 +714,38 @@ class ShardRecoveryEnqueued(BaseModel):
     parentRunId: RunId
 
 
+class BusinessEditLockInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    runId: RunId
+    checkoutId: UUID
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class BusinessApprovalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+
+
+class State(StrEnum):
+    frozen = 'frozen'
+    approved = 'approved'
+    queued = 'queued'
+    executing = 'executing'
+    settled = 'settled'
+    abandoned = 'abandoned'
+
+
+class DeliveryPhase(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -844,6 +876,45 @@ class ShardRecoveryPrepareInput(BaseModel):
     sourcePlanId: ShardPlanId
     planId: ShardPlanId
     intents: list[ShardReplacementIntent] = Field(..., max_length=16, min_length=1)
+
+
+class BusinessBindingInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    lockId: UUID
+    prepare: WorkspacePrepareInput
+
+
+class BusinessBindingView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bindingId: UUID
+    projectId: ProjectId
+    runId: RunId
+    workspaceId: WorkspaceId
+    lockId: UUID
+    resumeId: UUID
+    checkoutId: UUID
+    recoveryEpoch: UUID
+    boundRunVersion: conint(ge=1, le=9007199254740991)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=9007199254740991)
+    approval: ApprovalView
+    state: State
+    run: ControlRunView
+    commandId: UUID | None
+    attempt: conint(ge=1, le=9007199254740991) | None
+    stopReceiptId: UUID | None
+    deliveryPhase: DeliveryPhase | None
+    executionConfirmed: bool
+    evidenceId: EvidenceId | None
+    releaseAllowed: bool
+    resourceReleasePending: bool
+    releasedAt: AwareDatetime | None
+    workload: WorkloadSpec
 
 
 class INVCore(

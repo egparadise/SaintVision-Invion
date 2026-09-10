@@ -524,3 +524,47 @@ type ShardRecoveryEnqueued struct {
     Replayed bool `json:"replayed"`
     ParentRunId RunId `json:"parentRunId"`
 }
+
+type BusinessEditLockInput struct {
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    CheckoutId string `json:"checkoutId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type BusinessBindingInput struct {
+    ProjectId ProjectId `json:"projectId"`
+    LockId string `json:"lockId"`
+    Prepare WorkspacePrepareInput `json:"prepare"`
+}
+
+type BusinessApprovalInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+}
+
+type BusinessBindingView struct {
+    BindingId string `json:"bindingId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    LockId string `json:"lockId"`
+    ResumeId string `json:"resumeId"`
+    CheckoutId string `json:"checkoutId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    BoundRunVersion int64 `json:"boundRunVersion"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    Approval ApprovalView `json:"approval"`
+    State string `json:"state"`
+    Run ControlRunView `json:"run"`
+    CommandId *string `json:"commandId"`
+    Attempt *int64 `json:"attempt"`
+    StopReceiptId *string `json:"stopReceiptId"`
+    DeliveryPhase *string `json:"deliveryPhase"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+    ReleaseAllowed bool `json:"releaseAllowed"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+    ReleasedAt *string `json:"releasedAt"`
+    Workload WorkloadSpec `json:"workload"`
+}

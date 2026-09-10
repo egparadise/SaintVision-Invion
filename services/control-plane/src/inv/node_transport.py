@@ -138,6 +138,10 @@ class NodeTLSClient:
                 {"Content-Type": "application/json", "Connection": "close"},
             )
             response = conn.getresponse()
+            if response.status == 429 and path in {"/v1/heartbeats", "/v1/snapshots"}:
+                raise DomainError(
+                    "NODE-0050", "Node observation capacity reached", 503, retryable=True
+                )
             if (
                 response.status != 200
                 or response.getheader("Content-Type", "").split(";")[0]

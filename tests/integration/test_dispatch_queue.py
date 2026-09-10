@@ -172,7 +172,8 @@ def test_grant_revocation_after_enqueue_blocks_start(gateway, actor):
             (a.e.tenant, actor),
         )
     attempt = a.queue.acquire(a.e.tenant)
-    assert attempt.operation == "observe"
+    assert attempt.operation == "cancel"
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "failed"
     assert a.queue.finish(attempt) == "uncertain"
 
 

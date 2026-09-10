@@ -63,12 +63,14 @@ class ApprovalStore:
         self.runs = RunStore(database)
 
     def _grant(self, conn, project_id, subject_id, permission):
+        from .business_auth import permission as business_permission
         row = conn.execute(
             "SELECT * FROM inv.project_grants WHERE project_id=%s AND subject_id=%s FOR SHARE",
             (project_id, subject_id),
         ).fetchone()
         if not row or not row["enabled"] or not row[permission]:
             raise DomainError("AUTH-0030", "Project permission is unavailable", 403)
+        business_permission(conn, project_id, subject_id, permission)
 
     def _ledger(self, conn, principal, project_id, operation, key, payload):
         if not isinstance(key, str) or not 1 <= len(key) <= 200:
@@ -367,6 +369,9 @@ class ApprovalStore:
             from .shard_recovery import require_recovery_admission
 
             require_recovery_admission(conn, self.db, run["run_id"])
+            from .business_handoff import require_handoff
+
+            require_handoff(conn, self.db, run["run_id"])
             voters = conn.execute(
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
                 (approval_id,),

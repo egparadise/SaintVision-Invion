@@ -116,6 +116,9 @@ class ToolGateway:
             from .shard_recovery import require_recovery_admission
 
             require_recovery_admission(conn, self.db, run["run_id"])
+            from .business_handoff import require_handoff
+
+            require_handoff(conn, self.db, run["run_id"])
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),
