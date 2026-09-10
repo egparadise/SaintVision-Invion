@@ -966,6 +966,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                               size="sm"
                               data-testid={`inspect-receipt-${s.receiptId}`}
                               onClick={() => handleInspectReceipt(s.receiptId!)}
+                              disabled={isLoadingReceipt}
                               style={{ padding: '2px 6px', fontSize: '0.6875rem' }}
                             >
                               🧾 영수증 검증

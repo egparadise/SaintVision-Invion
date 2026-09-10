@@ -21,7 +21,7 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
-import { apiClient, getAuthToken, clearAuthToken } from '@/shared/api/client';
+import { apiClient, clearAuthToken } from '@/shared/api/client';
 
 // Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -346,7 +346,7 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleReject = async (approvalId: string, reason: string) => {
+  const handleReject = async (approvalId: string, _reason: string) => {
     setApprovals((prev) =>
       prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
     );
@@ -398,6 +398,12 @@ export const App: React.FC = () => {
           setSelectedWorkspaceId(null);
           setSelectedRunId(null);
           setEvidenceRunId(null);
+        }}
+        currentUser={currentUser}
+        onLogout={() => {
+          clearAuthToken();
+          setCurrentUser(null);
+          setActiveTab('login');
         }}
       />
 
