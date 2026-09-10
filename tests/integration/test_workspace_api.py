@@ -32,6 +32,10 @@ def workspace_http(remote, storage, tmp_path):
     a = build_resume(remote, storage, tmp_path, freeze_input=False)
     a.jwt = jwt_fixture(tmp_path, a.e.tenant)
     with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "INSERT INTO inv.project_nodes(tenant_id,project_id,node_id) VALUES(%s,%s,%s)",
+            (a.e.tenant, a.e.project, a.e.node),
+        )
         for actor in ("requester", "alice", "bob"):
             conn.execute(
                 "INSERT INTO inv.project_grants(tenant_id,project_id,subject_id,can_request,can_approve) VALUES(%s,%s,%s,%s,%s)",
@@ -161,7 +165,9 @@ def test_public_registration_failure_rolls_back_approval_and_leases(workspace_ht
     assert count(a, "execution_deliveries") == 2
 
 
-@pytest.mark.parametrize("intervention", ["cancel", "revoke_requester", "revoke_approver"])
+@pytest.mark.parametrize(
+    "intervention", ["cancel", "revoke_requester", "revoke_approver", "revoke_node"]
+)
 def test_authority_is_rechecked_after_network_observation(workspace_http, intervention):
     a = workspace_http
     prepare(a)
@@ -187,6 +193,12 @@ def test_authority_is_rechecked_after_network_observation(workspace_http, interv
                     json={"expectedVersion": a.enqueue_input["expectedVersion"]},
                 )
                 assert cancelled.status_code == 200, cancelled.text
+            elif intervention == "revoke_node":
+                with psycopg.connect(a.e.owner) as conn:
+                    conn.execute(
+                        "UPDATE inv.project_nodes SET enabled=false WHERE tenant_id=%s AND project_id=%s AND node_id=%s",
+                        (a.e.tenant, a.e.project, a.e.node),
+                    )
             else:
                 actor = "requester" if intervention == "revoke_requester" else "alice"
                 with psycopg.connect(a.e.owner) as conn:

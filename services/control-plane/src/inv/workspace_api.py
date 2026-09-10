@@ -102,6 +102,16 @@ class WorkspaceAPI:
         self.control.grant(conn, principal, project, "can_request")
         return run
 
+    def _node_membership(self, conn, project, *, lock=False):
+        # Preflight is read-only. The final row lock follows admission's Node
+        # locks, matching placement/provisioning; failure rolls admission back.
+        query = "SELECT enabled FROM inv.project_nodes WHERE project_id=%s AND node_id=%s"
+        row = conn.execute(
+            query + (" FOR SHARE" if lock else ""), (project, self.runtime.node.node_id)
+        ).fetchone()
+        if not row or not row["enabled"]:
+            raise DomainError("AUTH-0030", "Project Node membership unavailable", 403)
+
     def prepare(self, principal, project, run_id, data, key):
         validate_contract("WorkspacePrepareInput", data)
         workload = deepcopy(data["workload"])
@@ -207,6 +217,7 @@ class WorkspaceAPI:
             if prior is not None:
                 return prior
             frozen = self._frozen(conn, project, run_id, data["resumeId"])
+            self._node_membership(conn, project)
         capabilities = self.runtime.observe()
         policy = self.runtime.policy(principal, frozen["workload"])
         with self.db.transaction(principal.tenant_id) as conn:
@@ -244,6 +255,7 @@ class WorkspaceAPI:
                 signing_key=self.runtime.signing_key,
                 key="workspace-api:" + data["resumeId"],
             )
+            self._node_membership(conn, project, lock=True)
             # Accepted into the durable queue; only the worker/Node can start it.
             result = {
                 "resumeId": data["resumeId"],

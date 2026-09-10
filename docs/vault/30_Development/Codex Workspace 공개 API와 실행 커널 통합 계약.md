@@ -22,6 +22,8 @@ prepare는 private working-root lock 아래 동일 transaction에서 현재 권�
 
 enqueue는 프로젝트 권한을 검사한 후 mTLS nonce probe를 수행한다. 네트워크 I/O 중에는 실행 transaction을 유지하지 않는다. 마지막 transaction에서 Run version·현재 요청자/승인자 권한·승인 quorum/expiry·epoch·Node/자원을 재검사하고 approval dispatch·lease·claim·서명 permit queue를 함께 확정한다. 등록 실패는 승인 소비와 새 예약을 모두 되돌린다. 네트워크 전 멱등 ledger의 빈 slot은 남을 수 있지만 실행 권한이나 자원은 없다.
 
+Node는 현재 `inv.project_nodes`에 enabled 소속도 있어야 한다. preflight는 읽기만 하고, 최종 소속 row lock은 Node/Resource lock 뒤에 얻어 배치/권한 writer와 순서를 맞춘다. 관측 중 소속이 회수되면 생성 중인 admission 전체를 rollback한다. 서버에 Node를 지정했다는 이유만으로 tenant 안의 모든 프로젝트에 사용 권한을 부여하지 않는다.
+
 API는 `202 accepted`만 반환한다. DB는 `scheduled` 상태이며 Node/worker가 실제 실행을 시작한 뒤 `running`으로 바뀐다. 미승인은 기존 AUTH-0031 계약의 403이다. 현재 version/멱등 내용 충돌은 409다. 응답을 잃은 재요청은 같은 command의 관찰이며 Node가 offline이어도 재실행하지 않는다. replay에서도 현재 프로젝트 권한을 확인한다.
 
 ## Claude·Gemini 연결 계약
