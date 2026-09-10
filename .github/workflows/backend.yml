@@ -106,7 +106,23 @@ jobs:
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass
         # as a green build.
-        run: python -m pytest -q --strict-markers --ignore=tests/core --ignore=tests/integration --junitxml=backend-tests.xml
+        # tests/core and tests/integration are NOT excluded wholesale. Running
+        # the business surface and the execution core against one PostgreSQL is
+        # the only place their combined behaviour is exercised at all; excluding
+        # them leaves each half passing in its own container and the seam
+        # between them untested.
+        #
+        # The suites that need the Go agent binary and a built container image
+        # are left to Core Build, which provides both. That list is computed,
+        # not typed: it was three files, then thirteen, and most are reached
+        # transitively through shared fixtures. A hardcoded list here goes stale
+        # silently, and the symptom of a stale ignore list is a test that stops
+        # running rather than an error.
+        run: |
+          IGNORES=$(python tools/node_dependent_tests.py --pytest-args)
+          echo "Left to Core Build (needs the Node runtime):"
+          python tools/node_dependent_tests.py | sed 's/^/  /'
+          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES
 
       - name: No PostgreSQL test was skipped
         run: |
