@@ -218,29 +218,29 @@ def project_grant(
 
 
 def project_node(
-    session: Session,
-    *,
-    tenant_id: uuid.UUID,
-    node_id: str,
-    recovery_epoch: str,
-    now: dt.datetime,
-    clock_skew_seconds: float = 0.0,
+    session: Session, *, tenant_id: uuid.UUID, node_id: str
 ) -> None:
-    """Give the core the node identity it needs for a resource to reference.
+    """Give the core the node *identity* a resource row needs. Nothing else.
 
-    Only identity and liveness. What the node *has* is the core's own
-    observation and is not written here — see the module docstring.
+    The first version of this wrote ``status='online'`` and a heartbeat, and the
+    core refused every reservation with "Node is unavailable or heartbeat is
+    stale" — correctly. Whether a machine is alive right now is something the
+    core's own probes measure; the business surface has no way to know it and
+    should not be able to assert it. A control plane that can declare a node
+    online is one that can place work on a machine that is gone.
+
+    So the row arrives ``offline`` and stays that way until the core's
+    observation path says otherwise, and ``ON CONFLICT DO NOTHING`` means a
+    later projection never walks a live node back. A reservation against a node
+    the core has not observed is then refused for the same reason a reservation
+    against an unobserved resource is: nobody measured it.
     """
     conn = _DictRows(session.connection().connection.driver_connection)
     conn.execute(
-        "INSERT INTO inv.nodes "
-        "(tenant_id, node_id, status, heartbeat_at, recovery_epoch, clock_skew_seconds) "
-        "VALUES (%s, %s, 'online', %s, %s, %s) "
-        "ON CONFLICT (tenant_id, node_id) DO UPDATE SET "
-        "status = 'online', heartbeat_at = excluded.heartbeat_at, "
-        "recovery_epoch = excluded.recovery_epoch, "
-        "clock_skew_seconds = excluded.clock_skew_seconds",
-        (str(tenant_id), node_id, now, recovery_epoch, clock_skew_seconds),
+        "INSERT INTO inv.nodes (tenant_id, node_id, status) "
+        "VALUES (%s, %s, 'offline') "
+        "ON CONFLICT (tenant_id, node_id) DO NOTHING",
+        (str(tenant_id), node_id),
     )
 
 

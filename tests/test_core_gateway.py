@@ -107,14 +107,6 @@ def seam(owner_engine, two_tenants):
     return ids
 
 
-def _epoch(owner_engine) -> str:
-    with owner_engine.connect() as c:
-        return str(
-            c.execute(text("SELECT epoch FROM inv.control_epoch WHERE singleton"))
-            .scalar_one()
-        )
-
-
 def _observe_resource(owner_engine, seam, *, kind="memory", offered=64 * GIB):
     """What the core's own probes would have recorded. Never written by the gateway."""
     resource_id = new_id("run").replace("run_", "res_")
@@ -134,7 +126,9 @@ def _observe_resource(owner_engine, seam, *, kind="memory", offered=64 * GIB):
                 "INSERT INTO inv.nodes (tenant_id, node_id, status, heartbeat_at, "
                 "recovery_epoch, clock_skew_seconds) VALUES (:t, :n, 'online', "
                 "clock_timestamp(), (SELECT epoch FROM inv.control_epoch WHERE singleton), 0) "
-                "ON CONFLICT DO NOTHING"
+                "ON CONFLICT (tenant_id, node_id) DO UPDATE SET status = 'online', "
+                "heartbeat_at = clock_timestamp(), "
+                "recovery_epoch = excluded.recovery_epoch, clock_skew_seconds = 0"
             ),
             {"t": seam["tenant_a"], "n": seam["node_id"]},
         )
@@ -172,8 +166,7 @@ def _approved_binding(session, seam, owner_engine):
         project_id=seam["project_id"], run_id=run.run_id,
     )
     gateway.project_node(
-        session, tenant_id=seam["tenant_a"], node_id=seam["node_id"],
-        recovery_epoch=_epoch(owner_engine), now=NOW,
+        session, tenant_id=seam["tenant_a"], node_id=seam["node_id"]
     )
     binding = handoff_service.freeze_inputs(
         session, tenant_id=seam["tenant_a"], project_id=seam["project_id"],
@@ -258,7 +251,13 @@ def test_projecting_twice_does_not_disturb_a_run_the_core_has_moved(
 def test_a_revoked_membership_becomes_a_revoked_grant(
     app_sessionmaker, owner_engine, seam
 ):
-    """A projection that only ever adds is a permission system that only grows."""
+    """A projection that only ever adds is a permission system that only grows.
+
+    The grant is disabled rather than deleted: approval rows point at
+    project_grants, so removing one would either fail on the foreign key or
+    orphan the history of a decision that really was authorised when it was
+    made.
+    """
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, seam["tenant_a"]):
@@ -266,20 +265,72 @@ def test_a_revoked_membership_becomes_a_revoked_grant(
                     session, tenant_id=seam["tenant_a"], tenant_name="seam",
                     project_id=seam["project_id"], run_id=new_id("run"),
                 )
-                for can in (True, False):
-                    gateway.project_grant(
-                        session, tenant_id=seam["tenant_a"],
-                        project_id=seam["project_id"], user_id=seam["approver"],
-                    )
+                gateway.project_grant(
+                    session, tenant_id=seam["tenant_a"],
+                    project_id=seam["project_id"], user_id=seam["approver"],
+                )
     with owner_engine.connect() as c:
-        row = c.execute(
+        granted = c.execute(
             text(
-                "SELECT can_request, can_approve FROM inv.project_grants "
+                "SELECT can_request, can_approve, enabled FROM inv.project_grants "
                 "WHERE subject_id = :u"
             ),
             {"u": seam["approver"]},
         ).one()
-    assert row == (True, False)
+    # The permissions came from public.project_members, not from the caller:
+    # an approver may approve and may not request.
+    assert granted == (False, True, True)
+
+    with owner_engine.begin() as c:
+        c.execute(
+            text("DELETE FROM project_members WHERE user_id = :u"),
+            {"u": seam["approver"]},
+        )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, seam["tenant_a"]):
+                gateway.project_grant(
+                    session, tenant_id=seam["tenant_a"],
+                    project_id=seam["project_id"], user_id=seam["approver"],
+                )
+    with owner_engine.connect() as c:
+        revoked = c.execute(
+            text(
+                "SELECT can_request, can_approve, enabled FROM inv.project_grants "
+                "WHERE subject_id = :u"
+            ),
+            {"u": seam["approver"]},
+        ).one()
+    assert revoked == (False, False, False)
+
+
+def test_the_business_surface_cannot_declare_a_node_alive(
+    app_sessionmaker, owner_engine, seam
+):
+    """Node liveness is measured, not asserted.
+
+    The projection gives the core a node identity so a resource row can point
+    at it, and leaves the node offline. A control plane able to declare a node
+    online is one able to place work on a machine that is gone — and the core
+    refuses the reservation, which is how the first version of this projection
+    was caught.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, seam["tenant_a"]):
+                gateway.project_identity(
+                    session, tenant_id=seam["tenant_a"], tenant_name="seam",
+                    project_id=seam["project_id"], run_id=new_id("run"),
+                )
+                gateway.project_node(
+                    session, tenant_id=seam["tenant_a"], node_id=seam["node_id"]
+                )
+    with owner_engine.connect() as c:
+        status = c.execute(
+            text("SELECT status FROM inv.nodes WHERE node_id = :n"),
+            {"n": seam["node_id"]},
+        ).scalar_one()
+    assert status == "offline"
 
 
 # --------------------------------------------------------------------------
@@ -296,8 +347,7 @@ def test_the_kind_vocabularies_are_translated_in_one_place(
         with session.begin():
             with tenant_scope(session, seam["tenant_a"]):
                 gateway.project_node(
-                    session, tenant_id=seam["tenant_a"], node_id=seam["node_id"],
-                    recovery_epoch=_epoch(owner_engine), now=NOW,
+                    session, tenant_id=seam["tenant_a"], node_id=seam["node_id"]
                 )
                 resolved = gateway.resolve_resource(
                     session, tenant_id=seam["tenant_a"],
@@ -422,8 +472,7 @@ def test_a_binding_from_an_older_epoch_cannot_reserve(
                     project_id=seam["project_id"], run_id=run.run_id,
                 )
                 gateway.project_node(
-                    session, tenant_id=seam["tenant_a"], node_id=seam["node_id"],
-                    recovery_epoch=_epoch(owner_engine), now=NOW,
+                    session, tenant_id=seam["tenant_a"], node_id=seam["node_id"]
                 )
                 with pytest.raises(InvError, match="refused the reservation"):
                     gateway.reserve(
