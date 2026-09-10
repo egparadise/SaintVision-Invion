@@ -436,3 +436,17 @@ type WorkspaceSnapshot struct {
     Directories []string `json:"directories"`
     Files []WorkspaceSnapshotFile `json:"files"`
 }
+
+type WorkspacePrepareInput struct {
+    CheckoutId string `json:"checkoutId"`
+    ResumeId string `json:"resumeId"`
+    StepId string `json:"stepId"`
+    Workload WorkloadSpec `json:"workload"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type WorkspaceEnqueueInput struct {
+    ResumeId string `json:"resumeId"`
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}

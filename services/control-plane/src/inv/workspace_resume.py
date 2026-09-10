@@ -111,88 +111,117 @@ class WorkspaceResume:
             }
         )
         with self.working.locked() as root_fd, self.db.transaction(tenant) as conn:
-            run = lock_run(conn, run_id, project)
-            prior = conn.execute(
-                "SELECT * FROM inv.workspace_resumptions WHERE resume_id=%s", (resume_id,)
-            ).fetchone()
-            if prior:
-                if prior["request_hash"] != request_hash:
-                    raise DomainError("IDEM-0001", "Resume identity already differs")
-                # The immutable request is an observation, not new execution authority.
-                return {"workload": prior["workload"], "replayed": True}
-            if run["state"] != "recovering" or run["version"] != expected_version:
-                raise DomainError("GRAPH-0003", "Resume requires current recovering Run")
-            if run["attempt"] >= MAX_WORKSPACE_ATTEMPTS:
-                raise DomainError("GRAPH-0005", "Workspace recovery attempt budget exhausted")
-            independent_run(conn, run_id)
-            if conn.execute(
-                "SELECT 1 FROM inv.workspace_resumptions WHERE run_id=%s AND source_attempt=%s AND recovery_epoch=%s",
-                (run_id, run["attempt"], self.db.recovery_epoch),
-            ).fetchone():
-                raise DomainError("IDEM-0001", "Attempt already has a frozen next Step")
-            if conn.execute(
-                "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
-                (run_id,),
-            ).fetchone():
-                raise DomainError("LEASE-0003", "Resume awaits physical resource release")
-            row = conn.execute(
-                "SELECT * FROM inv.workspace_checkouts WHERE checkout_id=%s AND project_id=%s AND run_id=%s",
-                (checkout_id, project, run_id),
-            ).fetchone()
-            if (
-                not row
-                or str(row["recovery_epoch"]) != self.db.recovery_epoch
-                or row["source_attempt"] != run["attempt"]
-                or row["workspace_id"] != workload["workspaceId"]
-            ):
-                raise DomainError("STORE-0022", "Current Workspace checkout required")
-            if step_id == row["step_id"]:
-                raise DomainError("VAL-0003", "Use a distinct next Step identity", 422)
-            self.working.inspect_committed(
+            return self._prepare(
+                conn,
                 root_fd,
-                row["generation"],
+                tenant,
+                project,
+                run_id,
+                checkout_id,
+                resume_id,
+                step_id,
+                workload,
+                expected_version,
+                request_hash,
+            )
+
+    def _prepare(
+        self,
+        conn,
+        root_fd,
+        tenant,
+        project,
+        run_id,
+        checkout_id,
+        resume_id,
+        step_id,
+        workload,
+        expected_version,
+        request_hash,
+    ):
+        """Internal: caller holds the working-root lock and owns the transaction."""
+        run = lock_run(conn, run_id, project)
+        prior = conn.execute(
+            "SELECT * FROM inv.workspace_resumptions WHERE resume_id=%s", (resume_id,)
+        ).fetchone()
+        if prior:
+            if prior["request_hash"] != request_hash:
+                raise DomainError("IDEM-0001", "Resume identity already differs")
+            # The immutable request is an observation, not new execution authority.
+            return {"workload": prior["workload"], "replayed": True}
+        if run["state"] != "recovering" or run["version"] != expected_version:
+            raise DomainError("GRAPH-0003", "Resume requires current recovering Run")
+        if run["attempt"] >= MAX_WORKSPACE_ATTEMPTS:
+            raise DomainError("GRAPH-0005", "Workspace recovery attempt budget exhausted")
+        independent_run(conn, run_id)
+        if conn.execute(
+            "SELECT 1 FROM inv.workspace_resumptions WHERE run_id=%s AND source_attempt=%s AND recovery_epoch=%s",
+            (run_id, run["attempt"], self.db.recovery_epoch),
+        ).fetchone():
+            raise DomainError("IDEM-0001", "Attempt already has a frozen next Step")
+        if conn.execute(
+            "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+            (run_id,),
+        ).fetchone():
+            raise DomainError("LEASE-0003", "Resume awaits physical resource release")
+        row = conn.execute(
+            "SELECT * FROM inv.workspace_checkouts WHERE checkout_id=%s AND project_id=%s AND run_id=%s",
+            (checkout_id, project, run_id),
+        ).fetchone()
+        if (
+            not row
+            or str(row["recovery_epoch"]) != self.db.recovery_epoch
+            or row["source_attempt"] != run["attempt"]
+            or row["workspace_id"] != workload["workspaceId"]
+        ):
+            raise DomainError("STORE-0022", "Current Workspace checkout required")
+        if step_id == row["step_id"]:
+            raise DomainError("VAL-0003", "Use a distinct next Step identity", 422)
+        self.working.inspect_committed(
+            root_fd,
+            row["generation"],
+            row["workspace_id"],
+            row["content_hash"],
+            row["filesystem_identity"],
+        )
+        source = PrivateTree(self.working.root / row["generation"] / "files")
+        if source.identity != (self.working.identity[0], row["filesystem_identity"][-1]):
+            raise DomainError("STORE-0022", "Checkout files were replaced")
+        raw = source.capture(row["workspace_id"])
+        bounded_snapshot(raw, row["workspace_id"])
+        ref = {
+            "resumeId": resume_id,
+            "checkoutId": checkout_id,
+            "sourceAttempt": row["source_attempt"],
+            "checkpointAttempt": row["checkpoint_attempt"] or row["source_attempt"],
+            "sourceStepId": row["step_id"],
+            "stepId": step_id,
+            "inputSha256": hashlib.sha256(raw).hexdigest(),
+            "inputSizeBytes": len(raw),
+        }
+        workload["workspaceResume"] = ref
+        validate_contract("WorkloadSpec", workload)
+        conn.execute(
+            """INSERT INTO inv.workspace_resumptions
+            (tenant_id,project_id,run_id,resume_id,checkout_id,workspace_id,source_attempt,step_id,recovery_epoch,request_hash,workload,snapshot)
+            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (
+                tenant,
+                project,
+                run_id,
+                resume_id,
+                checkout_id,
                 row["workspace_id"],
-                row["content_hash"],
-                row["filesystem_identity"],
-            )
-            source = PrivateTree(self.working.root / row["generation"] / "files")
-            if source.identity != (self.working.identity[0], row["filesystem_identity"][-1]):
-                raise DomainError("STORE-0022", "Checkout files were replaced")
-            raw = source.capture(row["workspace_id"])
-            bounded_snapshot(raw, row["workspace_id"])
-            ref = {
-                "resumeId": resume_id,
-                "checkoutId": checkout_id,
-                "sourceAttempt": row["source_attempt"],
-                "checkpointAttempt": row["checkpoint_attempt"] or row["source_attempt"],
-                "sourceStepId": row["step_id"],
-                "stepId": step_id,
-                "inputSha256": hashlib.sha256(raw).hexdigest(),
-                "inputSizeBytes": len(raw),
-            }
-            workload["workspaceResume"] = ref
-            validate_contract("WorkloadSpec", workload)
-            conn.execute(
-                """INSERT INTO inv.workspace_resumptions
-                (tenant_id,project_id,run_id,resume_id,checkout_id,workspace_id,source_attempt,step_id,recovery_epoch,request_hash,workload,snapshot)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (
-                    tenant,
-                    project,
-                    run_id,
-                    resume_id,
-                    checkout_id,
-                    row["workspace_id"],
-                    run["attempt"],
-                    step_id,
-                    self.db.recovery_epoch,
-                    request_hash,
-                    Jsonb(workload),
-                    raw,
-                ),
-            )
-            event(conn, tenant, run_id, "inv.workspace.resume_prepared", ref)
-            return {"workload": workload, "replayed": False}
+                run["attempt"],
+                step_id,
+                self.db.recovery_epoch,
+                request_hash,
+                Jsonb(workload),
+                raw,
+            ),
+        )
+        event(conn, tenant, run_id, "inv.workspace.resume_prepared", ref)
+        return {"workload": workload, "replayed": False}
 
     def enqueue(
         self, node, command, workload, allocations, profile, *, policy, runtime, signing_key, key

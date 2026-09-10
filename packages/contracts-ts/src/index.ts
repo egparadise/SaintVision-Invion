@@ -434,3 +434,17 @@ export interface WorkspaceSnapshot {
   directories: Array<string>;
   files: Array<WorkspaceSnapshotFile>;
 }
+
+export interface WorkspacePrepareInput {
+  checkoutId: string;
+  resumeId: string;
+  stepId: string;
+  workload: WorkloadSpec;
+  expectedVersion: number;
+}
+
+export interface WorkspaceEnqueueInput {
+  resumeId: string;
+  approvalId: ApprovalId;
+  expectedVersion: number;
+}

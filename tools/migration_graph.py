@@ -9,7 +9,7 @@ unpicking an event ordering that cannot be safely reversed.
 
 So the round trip was testing the wrong property. What matters is:
 
-* the chain is linear and has one head — two heads mean nobody knows what
+* the graph is acyclic and has one integrated head — two heads mean nobody knows what
   ``head`` refers to;
 * a fresh database reaches head;
 * the **reversible tail** really does reverse, because that is the part an
@@ -39,7 +39,7 @@ VERSIONS = ROOT / "migrations" / "versions"
 @dataclass(frozen=True, slots=True)
 class Revision:
     revision: str
-    down_revision: str | None
+    down_revision: str | tuple[str, ...] | None
     path: Path
     irreversible: bool
     #: What the revision says to do instead of downgrading, if anything.
@@ -55,9 +55,12 @@ def _downgrade_is_refusal(tree: ast.Module) -> tuple[bool, str | None]:
     for node in tree.body:
         if not isinstance(node, ast.FunctionDef) or node.name != "downgrade":
             continue
-        body = [n for n in node.body if not isinstance(n, ast.Expr) or not isinstance(
-            getattr(n, "value", None), ast.Constant
-        )]
+        body = [
+            n
+            for n in node.body
+            if not isinstance(n, ast.Expr)
+            or not isinstance(getattr(n, "value", None), ast.Constant)
+        ]
         if len(body) == 1 and isinstance(body[0], ast.Raise):
             message = None
             exc = body[0].exc
@@ -76,9 +79,13 @@ def load() -> list[Revision]:
     for path in sorted(VERSIONS.glob("*.py")):
         source = path.read_text(encoding="utf-8")
         tree = ast.parse(source)
-        revision = re.search(r'^revision\s*=\s*"([^"]+)"', source, re.M)
-        down = re.search(r'^down_revision\s*=\s*(None|"[^"]+")', source, re.M)
-        if not revision or not down:
+        assignments = {}
+        for node in tree.body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id in {"revision", "down_revision"}:
+                        assignments[target.id] = ast.literal_eval(node.value)
+        if set(assignments) != {"revision", "down_revision"}:
             raise ValueError(f"{path.name}: revision or down_revision not declared")
         irreversible, message = _downgrade_is_refusal(tree)
         docstring = ast.get_docstring(tree) or ""
@@ -90,8 +97,8 @@ def load() -> list[Revision]:
                     break
         revisions.append(
             Revision(
-                revision=revision.group(1),
-                down_revision=None if down.group(1) == "None" else down.group(1).strip('"'),
+                revision=assignments["revision"],
+                down_revision=assignments["down_revision"],
                 path=path,
                 irreversible=irreversible,
                 recovery_note=note,
@@ -101,36 +108,47 @@ def load() -> list[Revision]:
 
 
 def chain(revisions: list[Revision] | None = None) -> list[Revision]:
-    """Return the revisions in application order, or raise if it is not a chain."""
+    """Return a deterministic topological order with one fully integrated head."""
     revisions = revisions or load()
     by_revision = {r.revision: r for r in revisions}
     if len(by_revision) != len(revisions):
         raise ValueError("duplicate revision identifiers")
 
-    roots = [r for r in revisions if r.down_revision is None]
-    if len(roots) != 1:
-        raise ValueError(f"expected exactly one root revision, found {len(roots)}")
+    parents = {
+        r.revision: (
+            ()
+            if r.down_revision is None
+            else (r.down_revision,) if isinstance(r.down_revision, str) else r.down_revision
+        )
+        for r in revisions
+    }
+    if any(not isinstance(p, tuple) or len(set(p)) != len(p) for p in parents.values()):
+        raise ValueError("invalid revision parents")
+    if len([p for p in parents.values() if not p]) != 1:
+        raise ValueError("expected exactly one root revision")
+    referenced = {p for ps in parents.values() for p in ps}
+    if referenced - by_revision.keys():
+        raise ValueError("unknown revision parent")
+    heads = by_revision.keys() - referenced
+    if len(heads) != 1:
+        raise ValueError("unmerged migration branches: expected exactly one head")
+    ordered, visiting, visited = [], set(), set()
 
-    children: dict[str | None, list[Revision]] = {}
-    for r in revisions:
-        children.setdefault(r.down_revision, []).append(r)
-    forks = {parent: [c.revision for c in kids] for parent, kids in children.items() if len(kids) > 1}
-    if forks:
-        # Two heads mean "head" is ambiguous, and an upgrade picks one at random.
-        raise ValueError(f"the chain forks: {forks}")
+    def visit(name):
+        if name in visiting:
+            raise ValueError("migration cycle")
+        if name in visited:
+            return
+        visiting.add(name)
+        for parent in sorted(parents[name]):
+            visit(parent)
+        visiting.remove(name)
+        visited.add(name)
+        ordered.append(by_revision[name])
 
-    ordered: list[Revision] = []
-    current: str | None = None
-    while True:
-        kids = children.get(current)
-        if not kids:
-            break
-        node = kids[0]
-        ordered.append(node)
-        current = node.revision
-    if len(ordered) != len(revisions):
-        missing = {r.revision for r in revisions} - {r.revision for r in ordered}
-        raise ValueError(f"revisions not reachable from the root: {sorted(missing)}")
+    visit(next(iter(heads)))
+    if len(visited) != len(revisions):
+        raise ValueError("unreachable revisions")
     return ordered
 
 
@@ -143,9 +161,10 @@ def downgrade_target(revisions: list[Revision] | None = None) -> str:
     the plan says not to do.
     """
     ordered = chain(revisions)
+    # Crossing a merge requires branch-aware rollback, so stop at the merge itself.
     last_irreversible = None
     for revision in ordered:
-        if revision.irreversible:
+        if revision.irreversible or isinstance(revision.down_revision, tuple):
             last_irreversible = revision.revision
     return last_irreversible or "base"
 

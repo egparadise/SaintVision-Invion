@@ -83,7 +83,7 @@ def resumed(remote, storage, tmp_path):
     return build_resume(remote, storage, tmp_path)
 
 
-def build_resume(remote, storage, tmp_path, attack=None):
+def build_resume(remote, storage, tmp_path, attack=None, *, freeze_input=True):
     a = remote
     prepare_queue(a)
     first = a.queue.acquire(a.e.tenant)
@@ -138,7 +138,8 @@ def build_resume(remote, storage, tmp_path, attack=None):
     a.workload.update(command=["/probe", "workspace"], timeoutSeconds=10)
     if attack:
         a.workload["command"].append(attack)
-    a.workload = freeze(a)["workload"]
+    if freeze_input:
+        a.workload = freeze(a)["workload"]
     a.storage = storage
     return a
 

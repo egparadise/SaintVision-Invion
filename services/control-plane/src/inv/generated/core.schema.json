@@ -1916,6 +1916,63 @@
         "directories",
         "files"
       ]
+    },
+    "WorkspacePrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "resumeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "checkoutId",
+        "resumeId",
+        "stepId",
+        "workload",
+        "expectedVersion"
+      ]
+    },
+    "WorkspaceEnqueueInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resumeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "resumeId",
+        "approvalId",
+        "expectedVersion"
+      ]
     }
   },
   "oneOf": [

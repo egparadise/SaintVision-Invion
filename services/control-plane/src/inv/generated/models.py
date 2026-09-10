@@ -637,6 +637,15 @@ class WorkspaceSnapshot(BaseModel):
     files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
 
 
+class WorkspaceEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -718,6 +727,17 @@ class NodeExecutionResult(BaseModel):
     duplicate: bool
     receipt: NodeStopReceipt
     cleanupPending: Literal[False]
+
+
+class WorkspacePrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
 
 
 class INVCore(
