@@ -53,19 +53,21 @@ def main():
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())
 
-    def consume():
+    def consume(control_only=False):
         while not stop.is_set():
             try:
-                outcome = worker.once(tenant)
+                outcome = worker.once(tenant, control_only=control_only)
             except Exception:
                 outcome = "unavailable"
             # No raw exception, request, permit, identity token or key is logged.
             stop.wait(0.1 if outcome == "stopped" else 1.0)
 
-    # A second worker can claim the cancellation control operation while the
-    # first waits on an active execution. Both obey the durable DB protocol.
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    # Five bounded control lanes remain available when execution lanes block in
+    # network I/O. They can only cancel, never reserve another execution. Queue
+    # leases coordinate all lanes and additional worker processes.
+    with ThreadPoolExecutor(max_workers=7) as executor:
         futures = [executor.submit(consume) for _ in range(2)]
+        futures += [executor.submit(consume, True) for _ in range(5)]
         for future in futures:
             future.result()
 

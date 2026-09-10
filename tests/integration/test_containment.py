@@ -17,7 +17,7 @@ from inv.runs import RunStore
 from test_control_api import api
 from test_approvals import approval, approved, dispatch, count
 from test_tool_admission import gateway, claim
-from test_node_delivery import remote
+from test_node_delivery import remote, start
 from test_node_runtime import node_runtime, active, container
 
 pytestmark = pytest.mark.postgres
@@ -137,6 +137,24 @@ def test_gate_serializes_kill_after_prior_admission_and_blocks_later_start(ops):
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "scheduled"
 
 
+def test_kill_barrier_rejects_late_success_and_rolls_back_state(ops):
+    a = ops
+    with a.e.db.transaction(a.e.tenant) as conn:
+        for state in ("scheduled", "running", "verifying"):
+            row = lock_run(conn, a.run["runId"])
+            RunStore(a.e.db)._transition(conn, a.e.tenant, row, state, row["version"])
+    change(a, "kill")
+    with pytest.raises(DomainError, match="AUTH-0061"):
+        with a.e.db.transaction(a.e.tenant) as conn:
+            row = lock_run(conn, a.run["runId"])
+            RunStore(a.e.db)._transition(
+                conn, a.e.tenant, row, "succeeded", row["version"], evidence_ready=True
+            )
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "verifying"
+    assert count(a, "evidence") == 0
+    assert ContainmentReconciler(a.e.db).once(a.e.tenant) == "cancelled"
+
+
 def test_kill_reclaims_unclaimed_reservation_and_clear_requires_settlement(ops):
     a = ops
     a.e.leases.reserve(
@@ -187,6 +205,21 @@ def test_parallel_reconciliation_cleans_preexisting_cancelled_reservation_once(o
         )
     assert outcomes.count("cancelled") == 1 and outcomes.count("idle") == 3
     assert active(a) == 0 and count(a, "reservation_aborts") == 1
+
+
+def test_old_epoch_reservation_remains_reported_without_reconciliation_spin(ops):
+    a = ops
+    a.e.leases.reserve(
+        a.e.tenant, a.e.project, a.run["runId"], [Allocation(a.e.resource, 1)], key="reserved"
+    )
+    a.e.runs.transition(a.e.tenant, a.run["runId"], "cancelled", expected_version=a.run["version"])
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE inv.resource_leases SET recovery_epoch=%s WHERE tenant_id=%s AND run_id=%s",
+            (uuid4(), a.e.tenant, a.run["runId"]),
+        )
+    assert ContainmentReconciler(a.e.db).once(a.e.tenant) == "idle"
+    assert active(a) == 1 and count(a, "reservation_aborts") == 0
 
 
 def test_drain_blocks_reservations_and_cleans_unclaimed_without_fabricated_receipt(ops):
@@ -295,9 +328,11 @@ def queued_node(a, *, sleeping=False):
 @pytest.mark.parametrize("operation", ["kill", "drain"])
 def test_queued_containment_gets_real_no_start_tombstone(remote, operation):
     a = queued_node(remote)
+    assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "idle"
+    assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "scheduled"
     result = change(a, operation)
     assert result["control"]["activeLeases"] == 2
-    assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant) == "stopped"
+    assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "stopped"
     with a.e.db.transaction(a.e.tenant) as conn:
         receipt = conn.execute(
             "SELECT envelope FROM inv.node_stop_receipts WHERE command_id=%s",
@@ -341,7 +376,7 @@ def test_running_kill_preempts_network_call_and_releases_only_after_real_stop(re
         assert stopped["control"]["activeLeases"] == 2
         with pytest.raises(DomainError, match="LEASE-0003"):
             change(a, "clear", 1)
-        assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant) == "stopped"
+        assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "stopped"
         assert start.result(timeout=15) in {"stopped", "superseded"}
     assert active(a) == 0 and not container(a)
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "cancelled"
@@ -395,3 +430,34 @@ def test_restart_reconciler_keeps_kill_active_after_operator_is_revoked(remote):
     with restarted.transaction(a.e.tenant) as conn:
         assert conn.execute("SELECT kill_switch FROM inv.tenant_controls").fetchone()["kill_switch"]
     assert active(a) == 0
+
+
+def test_partition_keeps_resources_until_restarted_node_returns_actual_receipt(remote):
+    a = queued_node(remote)
+    a.daemon.terminate()
+    a.daemon.communicate(timeout=12)
+    change(a, "kill")
+    assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "uncertain"
+    assert active(a) == 2 and count(a, "node_stop_receipts") == 0
+    with pytest.raises(DomainError, match="LEASE-0003"):
+        change(a, "clear", 1)
+    start(a)
+    from inv.node_channels import provision_channel
+
+    with psycopg.connect(a.e.owner) as conn:
+        provision_channel(
+            conn,
+            a.node,
+            epoch=a.e.epoch,
+            endpoint=a.endpoint,
+            certificate_der=a.server_cert.der,
+            expected_version=1,
+        )
+    with a.e.db.transaction(a.e.tenant) as conn:
+        conn.execute(
+            "UPDATE inv.execution_deliveries SET next_attempt_at=clock_timestamp() WHERE command_id=%s",
+            (a.command["commandId"],),
+        )
+    assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "stopped"
+    assert active(a) == 0 and count(a, "node_stop_receipts") == 1
+    assert change(a, "clear", 1)["control"]["settled"]

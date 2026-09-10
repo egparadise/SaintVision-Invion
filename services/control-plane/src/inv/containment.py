@@ -219,9 +219,10 @@ class ContainmentReconciler:
                 )) OR (state='cancelled'
                   AND NOT EXISTS(SELECT 1 FROM inv.tool_claims c WHERE c.run_id=r.run_id)
                   AND NOT EXISTS(SELECT 1 FROM inv.run_attempts a WHERE a.run_id=r.run_id)
+                  AND NOT EXISTS(SELECT 1 FROM inv.resource_leases l WHERE l.run_id=r.run_id AND l.released_at IS NULL AND l.recovery_epoch<>%s::uuid)
                   AND EXISTS(SELECT 1 FROM inv.resource_leases l WHERE l.run_id=r.run_id AND l.released_at IS NULL))
                 ORDER BY r.created_at,r.run_id LIMIT 1 FOR UPDATE OF r SKIP LOCKED""",
-                (killed,),
+                (killed, self.db.recovery_epoch),
             ).fetchone()
             if not row:
                 return "idle"
@@ -230,6 +231,8 @@ class ContainmentReconciler:
                 (row["run_id"],),
             ).fetchall()
             lock_resources(conn, [r["resource_id"] for r in leases])
+            if row["state"] == "cancelled" and not leases:
+                return "idle"
             # Re-read Node status after its lock; a completed drain/resume cannot
             # retroactively cancel a new admission selected from an older snapshot.
             drained = conn.execute(
@@ -243,7 +246,11 @@ class ContainmentReconciler:
             ).fetchone()
             if row["state"] != "cancelled" and not killed and not drained and not expired:
                 return "idle"
-            reason = "kill_switch" if killed else "node_drain" if drained else "unclaimed_expired"
+            reason = (
+                "cancelled_unclaimed"
+                if row["state"] == "cancelled"
+                else "kill_switch" if killed else "node_drain" if drained else "unclaimed_expired"
+            )
             changed = RunStore(self.db)._transition(conn, tenant, row, "cancelled", row["version"])
             reclaimed = reclaim_unclaimed(
                 conn,
