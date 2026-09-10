@@ -1,0 +1,54 @@
+{
+  "$defs": {
+    "ObservationPayload": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilityId": {
+          "maxLength": 30,
+          "title": "Capabilityid",
+          "type": "string"
+        },
+        "unit": {
+          "maxLength": 16,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "usedQuantity": {
+          "minimum": 0,
+          "title": "Usedquantity",
+          "type": "number"
+        }
+      },
+      "required": [
+        "capabilityId",
+        "usedQuantity",
+        "unit"
+      ],
+      "title": "ObservationPayload",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/ObservationPayload"
+      },
+      "maxItems": 256,
+      "title": "Observations",
+      "type": "array"
+    },
+    "sequence": {
+      "minimum": 0,
+      "title": "Sequence",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "sequence"
+  ],
+  "title": "HeartbeatRequest",
+  "type": "object"
+}

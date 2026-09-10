@@ -1,0 +1,37 @@
+{
+  "task": "tool-admission",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-09T23:47:26+09:00",
+  "implementation_sha": "ce59e633d72fc16ab4b57e06d0c5066e89c95ce8",
+  "tests": {
+    "tests": 172,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "artifact_id": 10109499266,
+  "archive_sha256": "62c8e80d78362c1ce4217eba6ee872a137a3ec12b1283b921ed56a90603b30f7",
+  "files_sha256": {
+    "core-tests.xml": "27959fe58e32b872fd2b5bfb4efff4e1c1c2e127f102abfb6929578fcca0bfc2",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "e9bf90fce427d7ae0b544077dc9899d98af2f6028ac226c69627d907f4a2b052",
+    "saintvision_control_plane-0.1.0.tar.gz": "2328aba39b6d29961b17d0b3a15f73b88266dcdfa2c40e828900b4293f390d68"
+  },
+  "ci": [
+    {
+      "id": 34364959828,
+      "name": "Core Build",
+      "head_sha": "ce59e633d72fc16ab4b57e06d0c5066e89c95ce8",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34364959828"
+    },
+    {
+      "id": 34364959844,
+      "name": "Documentation Build",
+      "head_sha": "ce59e633d72fc16ab4b57e06d0c5066e89c95ce8",
+      "conclusion": "success",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34364959844"
+    }
+  ]
+}

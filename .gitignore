@@ -1,4 +1,5 @@
 .work/
+.worktrees/
 .venv/
 __pycache__/
 *.pyc
@@ -8,3 +9,7 @@ __pycache__/
 .obsidian/
 node_modules/
 dist/
+build/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/

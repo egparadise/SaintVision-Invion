@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "How to spread one Run over a pool.\n\n``splittableDeclared`` has no default of convenience: splitting a program\nthat is not shard-aware produces a wrong answer, so the caller states it.",
+  "properties": {
+    "runId": {
+      "maxLength": 30,
+      "title": "Runid",
+      "type": "string"
+    },
+    "shardCount": {
+      "default": 1,
+      "maximum": 1024,
+      "minimum": 1,
+      "title": "Shardcount",
+      "type": "integer"
+    },
+    "shardCpuMillicores": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Shardcpumillicores",
+      "type": "integer"
+    },
+    "shardGpuDevices": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Shardgpudevices",
+      "type": "integer"
+    },
+    "shardRamBytes": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Shardrambytes",
+      "type": "integer"
+    },
+    "splittableDeclared": {
+      "default": false,
+      "title": "Splittabledeclared",
+      "type": "boolean"
+    },
+    "strategy": {
+      "pattern": "^(single_node|data_parallel|sharded)$",
+      "title": "Strategy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "runId",
+    "strategy"
+  ],
+  "title": "DistributedPlanRequest",
+  "type": "object"
+}

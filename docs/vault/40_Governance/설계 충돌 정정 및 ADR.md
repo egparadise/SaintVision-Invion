@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.0.0"
+version: "1.18.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-09T15:10:54+09:00"
+updated: "2026-09-10T17:11:46+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -52,3 +52,41 @@ Browser SSE는 Authorization 헤더를 지원하는 fetch 기반 스트림을 �
 - [MinIO 공식 저장소](https://github.com/minio/minio): 2026-09-09 확인 시 archive 및 source-only 상태. [[Storage 최종 개발 계획]]의 제품 검증 과제에 반영한다.
 
 외부 정보 확인일은 2026-09-09다. 원문의 최신 모델명·미검증 링크 전체가 검증됐다고 주장하지 않는다. 변동 기술 버전과 라이선스는 도입 Sprint에서 해당 공식 출처를 다시 확인한다.
+
+## 2026-09-09 Codex 후속 결정
+
+ADR-019(물리 자원 반환), ADR-020(복원 epoch), ADR-021(시계 스큐), ADR-022(멱등 응답/보존), ADR-023(redaction fail-closed)의 결정과 구현 범위는 [[Codex 핵심 기반 계약과 검토 회신]]을 따른다. ADR-005/006/007/014의 해당 문구를 이 결정으로 보완한다. Claude 독립 재검토는 pending이며 Node·운영 시험 완료를 뜻하지 않는다.
+
+ADR-024(승인 내용 고정·distinct actor·nonce 원자 소비·dispatch/outbox/Run transaction)는 [[Codex 승인 경계 계약과 인계]]를 따른다. 서버 내부 계약의 사전 검증이며 공개 인증 adapter·실제 명령 실행 및 S04 완료를 뜻하지 않는다. 독립 reviewer Claude 검토 pending.
+
+ADR-025(일회 실행 허가·불확실한 실행의 자동 재시도 금지), ADR-026(고정 Sandbox launch 계약)은 [[Codex ToolGateway 실행 허가와 Sandbox 계약]]을 따른다. OS 격리 driver·실장비 검증·교차 검토는 별도다.
+
+ADR-027(서명된 Node permit·durable inbox·allocation high-water), ADR-028(독립 PID 1 deadline·삭제 확인 뒤 정지 영수증)의 계약은 [[Codex Node 실행 격리와 정지 영수증 계약]]이다. Linux 합성 컨테이너 검증과 운영 실장비/transport 검증을 구별한다.
+
+ADR-029(mTLS peer 검증·기존 실행 observation) 및 ADR-030(인증서 CAS/폐기·영수증 commit 시 현재 권한)은 [[Codex Node mTLS 전달과 인증서 권한 계약]]을 따른다. 실제 운영 PKI/IdP·전체 등록/Heartbeat API 및 실장비 승인은 별도다.
+
+ADR-031(resource-server 인증·현재 project grant)과 ADR-032(Run별 commit 순서 이벤트·mTLS 관측·원격 취소)는 [[Codex Control API 인증과 Node 관측 계약]]을 따른다. 실제 IdP/PKI·업무 adapter·운영 실장비 검증과 독립 검토는 별도다.
+
+ADR-033(원자 permit queue·일회 전송 예약·중단 후 관찰/취소·receipt 후 종료)은 [[Codex 실행 전달 대기열과 중단 복구 계약]]을 따른다. 운영 worker 설정과 전체 업무/실장비 인수는 별도다.
+
+ADR-034(제한된 local object publication·checkpoint pin·GC 중단 복구)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. S3 제품 및 실제 운영 복원/독립 검토는 별도다.
+
+ADR-035(미검증 공지·mTLS 실측 snapshot·명시적 content 전송·독립 샤드 원자 admission)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. collective 통신/GPU 및 peer 업무 앱 연결 완료를 의미하지 않는다.
+
+ADR-036(실행 attempt·fenced output commitment·receipt 후 Evidence 원자 확정), ADR-037(실제 Workspace snapshot과 새 generation 복원), ADR-038(샤드 결과 manifest·권한 있는 전체 취소·실패 반영), ADR-039(실측 CPU/RAM 배치·Explain/Lease와 project 상한 잠금)은 [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]을 따른다. 업무 verifier/출력 수집·live Workspace/PTY·parent/collective·pool locality·운영 장비 연결과 독립 review는 별도다.
+
+ADR-040(미발급 예약 회수·Node 미수신 취소 tombstone), ADR-041(실제 bounded 출력·정지 후보 보존), ADR-042(receipt 기반 결과 재시도와 샤드 부모 완료), ADR-043(writable checkout·변경 파일 보존)은 [[Codex 실행 완료와 자원 회수 통합 계약]]을 따른다. Node mount·PTY/Git·샤드 재실행/collective·실장비 및 독립 reviewer 인수는 별도다.
+
+ADR-044(고정 Workspace 입력·새 승인·원자 예약/admission·총 3 attempt 상한), ADR-045(Node private tmpfs 실행·수정 파일/Git 결과 checkpoint의 원자 확정)는 [[Codex Workspace 실행 재개와 결과 체크포인트 계약]]을 따른다. 기존 11상태에 `recovering → awaiting_approval` 간선을 추가하고 업무 서비스/실행 코어/DB 정합성을 검증한다. checkpoint를 만든 attempt와 재개 직전 attempt를 구분하여 이전 checkpoint 재사용을 지원한다. PTY·대용량 전송·원격 Git·다중 Node/실장비 및 독립 검토는 별도다.
+
+ADR-046(실행 kernel을 권위로 하는 공개 Workspace API·승인/예약/큐의 원자 등록), ADR-047(명시적 production 설정·모의 서버 분리·기존 양쪽 migration history의 merge 및 제한 runtime 그룹)은 [[Codex Workspace 공개 API와 실행 커널 통합 계약]]을 따른다. 현재 project grant와 새 distinct 승인을 실제 Node 경로에 연결하며 `accepted`와 실행 시작을 구분한다. public 데이터 이관·전체 업무/화면 연결·실장비·독립 review는 별도다.
+
+ADR-048(물리적 종료·동일 작업·새 승인에 따른 독립 샤드 대체 Node 실행), ADR-049(불변 부모/자식 계보·최대 3개 실행 세대·하나의 후속 계획·원자 admission)은 [[Codex 샤드 재승인과 대체 Node 복구 계약]]을 따른다. 공개 recovery route/UI·Workspace Node 파일 이전·collective·5대 PC·독립 검토는 별도다.
+
+ADR-050(실제 kernel 기록에서 계산하는 불변 업무 binding·물리적 완료 후 자동 편집 lock 해제), ADR-051(명시적 OIDC/업무 identity 연결·현재 권한 교집합·기존 revision 보존), ADR-052(최초 전송 전 권한 상실의 취소 tombstone 및 관측 전용 bounded 재시도)는 [[Codex 업무 binding과 실행 커널 연결 계약]]을 따른다. 일반 CRUD/provisioning/editor/PTY·PR14 실험 DB 이관·5대 인수와 독립 검토는 별도다.
+
+ADR-053(tenant 실행 barrier·별도 현재 operator 권한·불변 제어 감사), ADR-054(Node drain·전송 전 거부의 취소 tombstone·물리 정리 후 명시적 재개), ADR-055(bounded reconciliation·독립 취소 처리·old epoch 예약 보존)는 [[Codex kill switch와 Node drain 및 정리 계약]]을 따른다. 운영 PKI/서비스·UI·5대 SLO·독립 인수 및 전체 ROOF/Windows/GPU/BuildKit 검증은 별도다.
+
+ADR-056(제어 변경의 현재 2인 L2 승인·검증된 서로 다른 사람·고정 내용/epoch/version/만료/nonce·승인 소비와 제어의 원자 확정)은 [[Codex kill switch와 Node drain 및 정리 계약]] v1.1.0을 따른다. 초기 operator-only 경계의 정정이며 자동 비상 예외를 만들지 않는다. 0022 뒤에 0023 forward migration을 추가하고 과거 기록은 보존한다.
+
+ADR-057(불변 editor revision과 승인 snapshot 일치), ADR-058(명시적 목적지 Node와 새 승인), ADR-059(제한 PTY·일회 ticket·현재 권한·bounded 입력/출력), ADR-060(고정 Git provider·현재 2인 승인·expected head publication·불확실 dispatch 재전송 금지)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]을 따른다. 사용자 지시로 실제 시험은 후속 단계이며 build-only 성공을 인수 완료로 표시하지 않는다. 0024는 forward only다.

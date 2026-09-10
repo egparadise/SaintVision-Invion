@@ -1,0 +1,98 @@
+name: Core Build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: inv_test_only
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements-test.txt
+      - name: Regenerate contracts and detect drift
+        run: |
+          python tools/generate_contracts.py
+          git diff --exit-code -- services/control-plane/src/inv/generated packages/contracts-ts packages/contracts-go services/node-agent/internal/wire/core.schema.json
+      - name: Upgrade each published migration head
+        run: python tools/check_migration_upgrade.py
+      - name: Test Linux Node concurrency and crash boundaries
+        working-directory: services/node-agent
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          go test -race -json ./... > "$GITHUB_WORKSPACE/dist/node-unit.jsonl" || { cat "$GITHUB_WORKSPACE/dist/node-unit.jsonl"; exit 1; }
+      - name: Build Node and isolated synthetic workload image
+        working-directory: services/node-agent
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/.work/node-image"
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/inv-node" ./cmd/inv-node
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/inv-discover" ./cmd/inv-discover
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/probe" ./tests/probe
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/.work/node-image/inv-supervisor" ./cmd/inv-supervisor
+          cp tests/probe/Dockerfile "$GITHUB_WORKSPACE/.work/node-image/Dockerfile"
+          python "$GITHUB_WORKSPACE/tools/prepare_git_probe.py" "$GITHUB_WORKSPACE/.work/node-image"
+          docker build --network=none --pull=false -t "inv-node-test:$GITHUB_SHA" "$GITHUB_WORKSPACE/.work/node-image"
+          echo "INV_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-node-test:$GITHUB_SHA")" >> "$GITHUB_ENV"
+          echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"
+          echo "INV_RUN_NODE_TESTS=1" >> "$GITHUB_ENV"
+      - name: Build production API image and require explicit configuration
+        run: |
+          docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
+          test "$(docker image inspect --format '{{.Config.User}}' "inv-api-test:$GITHUB_SHA")" = '65532:65532'
+          if docker run --rm --network=none --read-only "inv-api-test:$GITHUB_SHA" > dist/api-unconfigured.log 2>&1; then
+            echo 'Unconfigured production API must not start'
+            exit 1
+          fi
+          grep -q 'Explicit Control Plane identity/database/Workspace configuration unavailable' dist/api-unconfigured.log
+      - name: Verify Workspace recovery boundary first
+        run: python -m pytest tests/integration/test_workspace_resume.py tests/integration/test_workspace_api.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45
+      - name: Verify containment controls and physical cleanup
+        run: python -m pytest tests/integration/test_containment.py -x -q --junitxml=dist/containment-tests.xml -o faulthandler_timeout=45
+      - name: Verify business handoff against the execution kernel
+        run: python -m pytest tests/integration/test_business_handoff.py -x -q --junitxml=dist/business-handoff-tests.xml -o faulthandler_timeout=45
+      - name: Verify bounded shard replacement on two real Nodes
+        run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45
+      - name: Require executed integration evidence
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/core-tests.xml').getroot()
+          assert root.findall('.//testcase'), 'No test evidence'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every collected test must run and pass'
+          PY
+      - run: python -m build services/control-plane --outdir dist
+      - run: go test ./...
+        working-directory: packages/contracts-go
+      - run: npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: saintvision-core-evidence
+          path: dist/
+          retention-days: 30

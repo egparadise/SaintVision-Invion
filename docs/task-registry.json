@@ -105,7 +105,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -132,7 +132,7 @@
       "area": "Backend",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -159,7 +159,7 @@
       "area": "DB",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -186,7 +186,7 @@
       "area": "Storage",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -213,7 +213,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S01-FE",
         "S01-BE",
@@ -341,7 +341,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S02-FE",
         "S02-BE",
@@ -469,7 +469,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S03-FE",
         "S03-BE",
@@ -597,7 +597,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S04-FE",
         "S04-BE",
@@ -725,7 +725,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S05-FE",
         "S05-BE",
@@ -853,7 +853,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S06-FE",
         "S06-BE",
@@ -981,7 +981,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S07-FE",
         "S07-BE",
@@ -1109,7 +1109,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S08-FE",
         "S08-BE",
@@ -1237,7 +1237,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S09-FE",
         "S09-BE",
@@ -1365,7 +1365,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S10-FE",
         "S10-BE",
@@ -1493,7 +1493,7 @@
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S11-FE",
         "S11-BE",

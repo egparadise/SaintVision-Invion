@@ -1,0 +1,58 @@
+{
+  "sha": "091b8e52306305b91655baf762e5ba142f0585f1",
+  "counts": {
+    "tests": 990,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "go": {
+    "top_level": 40,
+    "leaf_cases": 94,
+    "race_detector": true
+  },
+  "core_run": 34445015092,
+  "docs_run": 34445015096,
+  "artifact_id": 10139513227,
+  "verified_at_kst": "2026-09-10T15:32:47+09:00",
+  "archive_sha256": "6b6a68071e8ea143668f16667866ca15e64366c87eb605a709f974f3df90cb66",
+  "files_sha256": {
+    "api-unconfigured.log": "b6b17f07e144108b045f57ff8ba1b974ef41e98757284ad2a9637301cdc4f080",
+    "business-handoff-tests.xml": "6f4bad530cf7fb3dcdb905e1e9b3d3069efad9955f8bd00376be228b682deb1e",
+    "containment-tests.xml": "8e15a04233aec980ba3babe7b551f40a629204d3f09e58dd8b99654065771845",
+    "core-tests.xml": "ddc0fd8d3165338b40f3d2c6d3220daa2f7fc6055cedf94156a7ae7a0e050d7c",
+    "inv-discover": "c87d8a6910f734c44b157f312496321be172264eee599d5e8a82e3ed6de9ce5c",
+    "inv-node": "a09de13e9568f4e5d11af957e966b968475f25e080035999b7019ed40472d8fd",
+    "node-unit.jsonl": "66b742f63c793115ce1308567f4aaa9a392950e9600b7ffd6a70cece8b9dd7f9",
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "0db1bf4f33e7950655e0a5feaa188408ab9d4a5d9c052cee46c6ecd799121be0",
+    "saintvision_control_plane-0.1.0.tar.gz": "d7ca9bcefe5c2544193693979ea956fd47d6a06eb30a86da2da851e8b5778076",
+    "shard-recovery-tests.xml": "a51c4ded6e7e244a29d9ce393fcbc144066fef1a2f5675aacc421fc52ef25eb5",
+    "workspace-tests.xml": "88303ab1fdf355a41a4ae7a186eb51a1a005c41469e13e8305fc9f12d6fe6ce8"
+  },
+  "workspace_api_cases": 9,
+  "workspace_counts": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "event": "push",
+  "shard_recovery_counts": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "business_handoff_counts": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "containment_counts": {
+    "tests": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

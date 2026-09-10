@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What a Node Agent says about itself when announcing.\n\nEvery field is a claim. The server records them prefixed ``claimed_`` and\nnever treats them as measured; the source address is taken from the\nconnection, not from here.",
+  "properties": {
+    "agentVersion": {
+      "maxLength": 64,
+      "title": "Agentversion",
+      "type": "string"
+    },
+    "cpuCores": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Cpucores",
+      "type": "integer"
+    },
+    "gpuCount": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Gpucount",
+      "type": "integer"
+    },
+    "hostname": {
+      "maxLength": 253,
+      "minLength": 1,
+      "title": "Hostname",
+      "type": "string"
+    },
+    "instanceId": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Instanceid",
+      "type": "string"
+    },
+    "labels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "object"
+    },
+    "osType": {
+      "pattern": "^(windows|linux)$",
+      "title": "Ostype",
+      "type": "string"
+    },
+    "osVersion": {
+      "maxLength": 64,
+      "title": "Osversion",
+      "type": "string"
+    },
+    "ramBytes": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Rambytes",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "instanceId",
+    "hostname",
+    "osType",
+    "osVersion",
+    "agentVersion"
+  ],
+  "title": "AnnouncementRequest",
+  "type": "object"
+}
