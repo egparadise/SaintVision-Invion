@@ -15,10 +15,11 @@ import (
 )
 
 type Record struct {
-	Hash        string                     `json:"hash"`
-	Claim       contracts.ExecutionClaim   `json:"claim"`
-	Allocations []contracts.NodeAllocation `json:"allocations"`
-	Name        string                     `json:"name"`
+	Hash         string                     `json:"hash"`
+	Claim        contracts.ExecutionClaim   `json:"claim"`
+	Allocations  []contracts.NodeAllocation `json:"allocations"`
+	Name         string                     `json:"name"`
+	NeverStarted bool                       `json:"neverStarted,omitempty"`
 }
 
 type Journal struct {
@@ -127,7 +128,17 @@ func (j *Journal) Get(command string) (*Record, *contracts.NodeStopReceipt, erro
 	return &record, &receipt, nil
 }
 func (j *Journal) Begin(p Permit, name string) (*Record, error) {
-	record := &Record{Hash: p.Hash, Claim: p.Data.Claim, Allocations: p.Data.Allocations, Name: name}
+	return j.begin(p, name, false)
+}
+
+// Reject persists a tombstone under the same command key as Execute. A crash
+// before its receipt is saved can only recover this prohibition, never execute.
+func (j *Journal) Reject(p Permit) (*Record, error) {
+	return j.begin(p, "", true)
+}
+
+func (j *Journal) begin(p Permit, name string, neverStarted bool) (*Record, error) {
+	record := &Record{Hash: p.Hash, Claim: p.Data.Claim, Allocations: p.Data.Allocations, Name: name, NeverStarted: neverStarted}
 	for _, allocation := range record.Allocations {
 		lease := allocation.Lease
 		parts := strings.Split(lease.FencingToken, ":")
@@ -186,6 +197,28 @@ func (j *Journal) Begin(p Permit, name string) (*Record, error) {
 }
 func (j *Journal) Save(receipt contracts.NodeStopReceipt) error {
 	return j.create(filepath.Join(j.root, string(receipt.CommandId)+".receipt"), receipt)
+}
+
+// A stopped-container candidate is durable before removal. It is not exposed as
+// a receipt until deletion of this specific container ID is confirmed.
+func (j *Journal) Prepared(record Record) (*contracts.NodeStopReceipt, error) {
+	var receipt contracts.NodeStopReceipt
+	err := readPrivate(filepath.Join(j.root, string(record.Claim.CommandId)+".stopped"), &receipt)
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	raw, _ := json.Marshal(receipt)
+	c := record.Claim
+	if wire.Validate("NodeStopReceipt", raw) != nil || receipt.CommandId != c.CommandId || receipt.ClaimId != c.ClaimId || receipt.TenantId != c.TenantId || receipt.ProjectId != c.ProjectId || receipt.RunId != c.RunId || receipt.NodeId != c.NodeId || receipt.RecoveryEpoch != c.RecoveryEpoch || receipt.PlanDigest != c.PlanDigest || !reflect.DeepEqual(receipt.Allocations, record.Allocations) || receipt.Reason == "not_started" {
+		return nil, errors.New("NODE-0013: stopped candidate differs from intent")
+	}
+	return &receipt, nil
+}
+func (j *Journal) PrepareStop(receipt contracts.NodeStopReceipt) error {
+	return j.create(filepath.Join(j.root, string(receipt.CommandId)+".stopped"), receipt)
 }
 func (j *Journal) Pending() ([]Record, error) {
 	files, err := os.ReadDir(j.root)

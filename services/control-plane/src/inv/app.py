@@ -279,6 +279,10 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
     def nodes(project: str, identity=Depends(authenticated)):
         return control.nodes(identity.principal, project)
 
+    @api.get("/v1/projects/{project}/capacity")
+    def capacity(project: str, identity=Depends(authenticated)):
+        return control.capacity(identity.principal, project)
+
     @api.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
     async def challenge(
         project: str,

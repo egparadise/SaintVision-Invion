@@ -294,6 +294,9 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 9007199254740991
+        },
+        "workspaceResume": {
+          "$ref": "#/$defs/WorkspaceResumeRef"
         }
       },
       "required": [
@@ -1024,7 +1027,10 @@
         },
         "workspaceMode": {
           "type": "string",
-          "const": "ephemeral"
+          "enum": [
+            "ephemeral",
+            "restored"
+          ]
         },
         "cpuMillis": {
           "type": "integer",
@@ -1072,6 +1078,9 @@
         "hostAccess": {
           "type": "boolean",
           "const": false
+        },
+        "workspaceInput": {
+          "$ref": "#/$defs/WorkspaceInput"
         }
       },
       "required": [
@@ -1093,7 +1102,30 @@
         "privileged",
         "hostAccess"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "workspaceMode": {
+                "const": "restored"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "workspaceInput"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "workspaceInput"
+              ]
+            }
+          }
+        }
+      ]
     },
     "ExecutionClaim": {
       "type": "object",
@@ -1263,7 +1295,7 @@
         },
         "containerId": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^([0-9a-f]{64})?$"
         },
         "stopped": {
           "type": "boolean",
@@ -1283,7 +1315,8 @@
             "exited",
             "timeout",
             "cancelled",
-            "recovered"
+            "recovered",
+            "not_started"
           ]
         },
         "finishedAt": {
@@ -1296,6 +1329,9 @@
           },
           "minItems": 1,
           "maxItems": 128
+        },
+        "output": {
+          "$ref": "#/$defs/NodeOutput"
         }
       },
       "required": [
@@ -1316,7 +1352,41 @@
         "finishedAt",
         "allocations"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "const": "not_started"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "then": {
+            "properties": {
+              "containerId": {
+                "const": ""
+              },
+              "processStarted": {
+                "const": false
+              },
+              "exitCode": {
+                "const": -1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "containerId": {
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      ]
     },
     "NodeExecutionResult": {
       "type": "object",
@@ -1518,6 +1588,333 @@
         "traceId",
         "causeRef",
         "evidenceId"
+      ]
+    },
+    "NodeResourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nonce",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "profileVersion",
+        "observedAt",
+        "sampleMillis",
+        "cpuCapacityMillis",
+        "cpuBusyMillis",
+        "memoryCapacityBytes",
+        "memoryAvailableBytes",
+        "osType",
+        "agentVersion"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "sampleMillis": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 5000
+        },
+        "cpuCapacityMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "cpuBusyMillis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "memoryCapacityBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "memoryAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "osType": {
+          "type": "string",
+          "const": "linux"
+        },
+        "agentVersion": {
+          "type": "string",
+          "const": "0.1.0"
+        }
+      }
+    },
+    "NodeChunkInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "offset",
+        "nonce"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NodeChunkResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "offset",
+        "nonce",
+        "dataBase64",
+        "chunkSha256"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 67108864
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "dataBase64": {
+          "type": "string",
+          "maxLength": 349528
+        },
+        "chunkSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NodeOutput": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "maxLength": 400000,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300000
+        }
+      },
+      "required": [
+        "data",
+        "sha256",
+        "sizeBytes"
+      ],
+      "additionalProperties": false
+    },
+    "WorkspaceResumeRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resumeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sourceAttempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceStepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "checkpointAttempt": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "resumeId",
+        "checkoutId",
+        "sourceAttempt",
+        "sourceStepId",
+        "stepId",
+        "inputSha256",
+        "inputSizeBytes",
+        "checkpointAttempt"
+      ]
+    },
+    "WorkspaceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resumeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "dataBase64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384
+        }
+      },
+      "required": [
+        "resumeId",
+        "stepId",
+        "sha256",
+        "sizeBytes",
+        "dataBase64"
+      ]
+    },
+    "WorkspaceSnapshotFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "executable": {
+          "type": "boolean"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32768
+        },
+        "dataBase64": {
+          "type": "string",
+          "maxLength": 43692
+        }
+      },
+      "required": [
+        "path",
+        "executable",
+        "sha256",
+        "sizeBytes",
+        "dataBase64"
+      ]
+    },
+    "WorkspaceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "workspace-snapshot:1"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "directories": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "files": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/WorkspaceSnapshotFile"
+          }
+        }
+      },
+      "required": [
+        "format",
+        "workspaceId",
+        "directories",
+        "files"
       ]
     }
   },

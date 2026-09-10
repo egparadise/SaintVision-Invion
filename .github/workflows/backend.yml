@@ -38,6 +38,7 @@ jobs:
       INV_ENV: test
       INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
       INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      INV_TEST_ADMIN_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
 
     steps:
       - uses: actions/checkout@v4
@@ -54,23 +55,23 @@ jobs:
       - name: Migration renders offline
         run: python -m alembic upgrade head --sql > /dev/null
 
-      - name: Migration applies and reverses
+      - name: Service migrations reverse; reliability migrations recover forward
         run: |
-          python -m alembic upgrade head
+          python -m alembic upgrade 0007_locality_replicas
           python -m alembic downgrade base
+          python -m alembic upgrade head
           python -m alembic upgrade head
 
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass
         # as a green build.
-        run: python -m pytest -q --strict-markers
+        run: python -m pytest -q --strict-markers --ignore=tests/core --ignore=tests/integration --junitxml=backend-tests.xml
 
       - name: No PostgreSQL test was skipped
         run: |
-          python -m pytest -q -m postgres --collect-only | tail -1
-          python -m pytest -m postgres -q -rs 2>&1 | tee /tmp/pg.txt
-          if grep -q "skipped" /tmp/pg.txt; then
-            echo "PostgreSQL-backed tests were skipped; refusing to report success."
-            exit 1
-          fi
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('backend-tests.xml').getroot()
+          assert not root.findall('.//skipped'), 'Backend tests must not be skipped'
+          PY

@@ -7,6 +7,19 @@ from psycopg.rows import dict_row
 from .errors import DomainError
 
 
+class BoundDatabase:
+    """Private adapter: nested service operations share one outer transaction."""
+
+    def __init__(self, db, tenant, conn):
+        self.recovery_epoch, self.tenant, self.conn = db.recovery_epoch, tenant, conn
+
+    @contextmanager
+    def transaction(self, tenant):
+        if tenant != self.tenant:
+            raise DomainError("AUTH-0011", "Nested transaction scope differs", 403)
+        yield self.conn
+
+
 class Database:
     def __init__(self, dsn: str, *, recovery_epoch: str):
         self._dsn = dsn

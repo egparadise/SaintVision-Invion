@@ -27,10 +27,35 @@ def pytest_configure(config):
 
 @pytest.fixture(scope="session")
 def database_url() -> str:
-    url = os.environ.get(TEST_DB_ENV)
-    if not url:
-        pytest.skip(f"{TEST_DB_ENV} is not set; PostgreSQL-backed tests not run")
-    return url
+    # Always allocate our own database. Never DROP SCHEMA in an operator's DB.
+    import psycopg
+    from psycopg import sql
+    from psycopg.conninfo import conninfo_to_dict
+    from sqlalchemy.engine import URL
+
+    admin = os.environ.get("INV_TEST_ADMIN_DSN")
+    if not admin:
+        if os.environ.get("CI"):
+            pytest.fail("CI requires INV_TEST_ADMIN_DSN for the combined backend suite")
+        pytest.skip("INV_TEST_ADMIN_DSN is absent; PostgreSQL tests not run")
+    name = "inv_backend_test_" + uuid.uuid4().hex
+    with psycopg.connect(admin, autocommit=True) as conn:
+        conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
+    info = conninfo_to_dict(admin)
+    url = URL.create(
+        "postgresql+psycopg",
+        username=info.get("user"),
+        password=info.get("password"),
+        host=info.get("host"),
+        port=int(info.get("port", 5432)),
+        database=name,
+    )
+    try:
+        yield url.render_as_string(hide_password=False)
+    finally:
+        assert name.startswith("inv_backend_test_") and len(name) == 49
+        with psycopg.connect(admin, autocommit=True) as conn:
+            conn.execute(sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name)))
 
 
 @pytest.fixture(scope="session")
@@ -47,13 +72,12 @@ def migrated(owner_engine, database_url):
     from alembic import command
     from alembic.config import Config
 
-    os.environ["INV_DATABASE_URL"] = database_url
     config = Config("alembic.ini")
     config.set_main_option("script_location", "migrations")
-    with owner_engine.begin() as connection:
-        connection.execute(text("DROP SCHEMA public CASCADE"))
-        connection.execute(text("CREATE SCHEMA public"))
-    command.upgrade(config, "head")
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv("INV_DATABASE_URL", database_url)
+        patch.setenv("INV_MIGRATION_DSN", database_url)
+        command.upgrade(config, "head")
     return True
 
 

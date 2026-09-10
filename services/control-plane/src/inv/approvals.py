@@ -38,9 +38,7 @@ class Principal:
 
 def digest(value):
     return hashlib.sha256(
-        json.dumps(
-            value, sort_keys=True, separators=(",", ":"), allow_nan=False
-        ).encode()
+        json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
     ).hexdigest()
 
 
@@ -92,9 +90,7 @@ class ApprovalStore:
             (project_id, operation, key),
         ).fetchone()
         if row["request_hash"] != request_hash:
-            raise DomainError(
-                "IDEM-0001", "Idempotency key has different request content"
-            )
+            raise DomainError("IDEM-0001", "Idempotency key has different request content")
         return row["response"]
 
     def _save(self, conn, project_id, operation, key, response):
@@ -125,13 +121,8 @@ class ApprovalStore:
             or row["expires_at"] <= now
             or str(row["recovery_epoch"]) != self.db.recovery_epoch
         ):
-            raise DomainError(
-                "AUTH-0031", "Approval is expired, stale, or unavailable", 403
-            )
-        if (
-            run["state"] != "awaiting_approval"
-            or run["version"] != row["bound_run_version"]
-        ):
+            raise DomainError("AUTH-0031", "Approval is expired, stale, or unavailable", 403)
+        if run["state"] != "awaiting_approval" or run["version"] != row["bound_run_version"]:
             raise DomainError("AUTH-0032", "Run changed after approval was requested")
 
     def _audit(self, conn, principal, row, phase):
@@ -169,17 +160,12 @@ class ApprovalStore:
         *,
         policy_version,
         expected_version,
-        key
+        key,
     ):
         validate_contract("WorkloadSpec", workload)
         validate_contract("PolicyDecision", policy)
-        if (
-            type(expected_version) is not int
-            or not 1 <= expected_version <= 9007199254740991
-        ):
-            raise DomainError(
-                "VAL-0003", "Current integer Run version is required", 422
-            )
+        if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:
+            raise DomainError("VAL-0003", "Current integer Run version is required", 422)
         if not isinstance(policy_version, str) or not 1 <= len(policy_version) <= 200:
             raise DomainError("VAL-0003", "Policy version is required", 422)
         project_id = workload["projectId"]
@@ -200,9 +186,7 @@ class ApprovalStore:
             or policy["approvedBy"]
             or (policy["riskLevel"] == "L2" and policy["requiredApprovals"] != 2)
         ):
-            raise DomainError(
-                "AUTH-0013", "Policy cannot be used to create an approval", 403
-            )
+            raise DomainError("AUTH-0013", "Policy cannot be used to create an approval", 403)
         expires = datetime.fromisoformat(policy["expiresAt"].replace("Z", "+00:00"))
         payload = {
             "run": run_id,
@@ -212,9 +196,7 @@ class ApprovalStore:
             "version": expected_version,
         }
         with self.db.transaction(principal.tenant_id) as conn:
-            prior = self._ledger(
-                conn, principal, project_id, "approval.request", key, payload
-            )
+            prior = self._ledger(conn, principal, project_id, "approval.request", key, payload)
             if prior is not None:
                 self._grant(conn, project_id, principal.subject_id, "can_request")
                 return prior
@@ -222,13 +204,22 @@ class ApprovalStore:
             self._grant(conn, project_id, principal.subject_id, "can_request")
             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
             if not now < expires or (expires - now).total_seconds() > 3600:
+                raise DomainError("AUTH-0031", "Approval expiry must be within one hour", 403)
+            if run["state"] not in {"planned", "recovering"} or run["version"] != expected_version:
                 raise DomainError(
-                    "AUTH-0031", "Approval expiry must be within one hour", 403
+                    "GRAPH-0003", "Approval requires the current planned or recovering Run"
                 )
-            if run["state"] != "planned" or run["version"] != expected_version:
-                raise DomainError(
-                    "GRAPH-0003", "Approval requires the current planned Run"
-                )
+            if run["state"] == "recovering" or "workspaceResume" in workload:
+                from .workspace_resume import approved_resume
+
+                approved_resume(conn, run, workload, self.db.recovery_epoch)
+                if conn.execute(
+                    "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+                    (run_id,),
+                ).fetchone():
+                    raise DomainError(
+                        "LEASE-0003", "Recovery approval awaits physical resource release"
+                    )
             changed = self.runs._transition(
                 conn, principal.tenant_id, run, "awaiting_approval", expected_version
             )
@@ -288,9 +279,7 @@ class ApprovalStore:
                 "expiresAt": result["expires_at"].isoformat(),
             }
 
-    def decide(
-        self, principal, project_id, approval_id, decision, nonce, *, action_digest, key
-    ):
+    def decide(self, principal, project_id, approval_id, decision, nonce, *, action_digest, key):
         validate_contract(
             "ApprovalDecisionInput",
             {"decision": decision, "nonce": nonce, "actionDigest": action_digest},
@@ -303,21 +292,14 @@ class ApprovalStore:
             "actionDigest": action_digest,
         }
         with self.db.transaction(principal.tenant_id) as conn:
-            prior = self._ledger(
-                conn, principal, project_id, "approval.decide", key, payload
-            )
+            prior = self._ledger(conn, principal, project_id, "approval.decide", key, payload)
             run, row = self._locked(conn, approval_id, project_id)
             self._grant(conn, project_id, principal.subject_id, "can_approve")
             if prior is not None:
                 return prior
             self._current(conn, run, row, {"pending"})
-            if (
-                principal.subject_id == row["requester_id"]
-                or action_digest != row["action_digest"]
-            ):
-                raise DomainError(
-                    "AUTH-0033", "Approval actor or action digest is invalid", 403
-                )
+            if principal.subject_id == row["requester_id"] or action_digest != row["action_digest"]:
+                raise DomainError("AUTH-0033", "Approval actor or action digest is invalid", 403)
             if conn.execute(
                 "SELECT 1 FROM inv.approval_votes WHERE approval_id=%s AND actor_id=%s",
                 (approval_id, principal.subject_id),
@@ -334,9 +316,7 @@ class ApprovalStore:
                 or challenge["consumed_at"] is not None
                 or not hmac.compare_digest(challenge["nonce_hash"], nonce_hash)
             ):
-                raise DomainError(
-                    "AUTH-0034", "Approval challenge is invalid or expired", 403
-                )
+                raise DomainError("AUTH-0034", "Approval challenge is invalid or expired", 403)
             conn.execute(
                 "UPDATE inv.approval_nonces SET consumed_at=clock_timestamp() WHERE approval_id=%s AND actor_id=%s",
                 (approval_id, principal.subject_id),
@@ -364,21 +344,14 @@ class ApprovalStore:
                 "UPDATE inv.approval_requests SET status=%s WHERE approval_id=%s RETURNING *",
                 (status, approval_id),
             ).fetchone()
-            self._audit(
-                conn, principal, row, "rejected" if decision == "reject" else "approved"
-            )
+            self._audit(conn, principal, row, "rejected" if decision == "reject" else "approved")
             if decision == "reject":
-                self.runs._transition(
-                    conn, principal.tenant_id, run, "failed", run["version"]
-                )
+                self.runs._transition(conn, principal.tenant_id, run, "failed", run["version"])
             return self._save(conn, project_id, "approval.decide", key, view(row))
 
     def dispatch(self, principal, project_id, approval_id, workload, *, key):
         validate_contract("WorkloadSpec", workload)
-        if (
-            workload["tenantId"] != principal.tenant_id
-            or workload["projectId"] != project_id
-        ):
+        if workload["tenantId"] != principal.tenant_id or workload["projectId"] != project_id:
             raise DomainError("AUTH-0011", "Action scope differs", 403)
         action_hash = action_digest(workload)
         with self.db.transaction(principal.tenant_id) as conn:
@@ -395,19 +368,14 @@ class ApprovalStore:
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
                 (approval_id,),
             ).fetchall()
-            for subject in sorted(
-                {principal.subject_id} | {v["actor_id"] for v in voters}
-            ):
+            for subject in sorted({principal.subject_id} | {v["actor_id"] for v in voters}):
                 self._grant(
                     conn,
                     project_id,
                     subject,
                     "can_request" if subject == principal.subject_id else "can_approve",
                 )
-            if (
-                principal.subject_id != row["requester_id"]
-                or action_hash != row["action_digest"]
-            ):
+            if principal.subject_id != row["requester_id"] or action_hash != row["action_digest"]:
                 raise DomainError("AUTH-0011", "Approval and action do not match", 403)
             if prior is not None:
                 return prior
@@ -415,9 +383,7 @@ class ApprovalStore:
             if len(voters) < row["required_approvals"] or any(
                 v["actor_id"] == principal.subject_id for v in voters
             ):
-                raise DomainError(
-                    "AUTH-0033", "Distinct approval quorum is missing", 403
-                )
+                raise DomainError("AUTH-0033", "Distinct approval quorum is missing", 403)
             command_id = str(uuid4())
             conn.execute(
                 "INSERT INTO inv.approval_dispatches(tenant_id,approval_id,command_id) VALUES(%s,%s,%s)",
@@ -446,9 +412,7 @@ class ApprovalStore:
                 result,
             )
             self._audit(conn, principal, row, "dispatched")
-            self.runs._transition(
-                conn, principal.tenant_id, run, "scheduled", run["version"]
-            )
+            self.runs._transition(conn, principal.tenant_id, run, "scheduled", run["version"])
             return self._save(conn, project_id, "approval.dispatch", key, result)
 
     def expire(self, tenant_id, project_id, approval_id):
@@ -462,9 +426,7 @@ class ApprovalStore:
                 "UPDATE inv.approval_requests SET status='expired' WHERE approval_id=%s RETURNING *",
                 (approval_id,),
             ).fetchone()
-            self._audit(
-                conn, Principal(tenant_id, "system:approval-expiry"), row, "expired"
-            )
+            self._audit(conn, Principal(tenant_id, "system:approval-expiry"), row, "expired")
             if run["state"] == "awaiting_approval":
                 self.runs._transition(conn, tenant_id, run, "failed", run["version"])
             return True

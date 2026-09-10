@@ -4,7 +4,8 @@ from .approvals import ApprovalStore
 from .contracts import validate_contract
 from .errors import DomainError
 from .ids import new_id
-from .leases import lock_run
+from .leases import lock_run, lock_resources
+from .reservations import reclaim_unclaimed
 from .runs import RunStore, event, public
 
 
@@ -42,9 +43,7 @@ class Control:
 
     def create(self, principal, project, key):
         with self.db.transaction(principal.tenant_id) as conn:
-            prior = self.approvals._ledger(
-                conn, principal, project, "api.run.create", key, {}
-            )
+            prior = self.approvals._ledger(conn, principal, project, "api.run.create", key, {})
             self.grant(conn, principal, project, "can_request")
             if prior is not None:
                 return prior
@@ -67,8 +66,9 @@ class Control:
             if not row:
                 raise DomainError("RES-0004", "Run not found", 404)
             active = conn.execute(
-                "SELECT count(*) AS n FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
-                (run_id,),
+                """SELECT count(*) AS n FROM inv.resource_leases WHERE released_at IS NULL AND
+                (run_id=%s OR run_id IN (SELECT s.run_id FROM inv.shard_commands s JOIN inv.shard_parents p USING(tenant_id,project_id,plan_id) WHERE p.run_id=%s))""",
+                (run_id, run_id),
             ).fetchone()["n"]
             return {**public(row), "resourceReleasePending": bool(active)}
 
@@ -90,11 +90,24 @@ class Control:
 
     def cancel(self, principal, project, run_id, expected_version, key):
         validate_contract("RunId", run_id)
-        if (
-            type(expected_version) is not int
-            or not 1 <= expected_version <= 9007199254740991
-        ):
+        if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:
             raise DomainError("VAL-0003", "Current integer Run version required", 422)
+        with self.db.transaction(principal.tenant_id) as conn:
+            parent = conn.execute(
+                "SELECT plan_id FROM inv.shard_parents WHERE project_id=%s AND run_id=%s",
+                (project, run_id),
+            ).fetchone()
+        if parent:
+            from .shards import ShardRuntime
+
+            result = ShardRuntime(self.db, None).cancel(
+                principal,
+                project,
+                parent["plan_id"],
+                key=key,
+                expected_parent_version=expected_version,
+            )
+            return result["parentRun"]
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.approvals._ledger(
                 conn,
@@ -105,11 +118,23 @@ class Control:
                 {"runId": run_id, "version": expected_version},
             )
             row = lock_run(conn, run_id, project)
+            resources = conn.execute(
+                "SELECT resource_id FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
+                (run_id,),
+            ).fetchall()
+            lock_resources(conn, [r["resource_id"] for r in resources])
             self.grant(conn, principal, project, "can_request")
             if prior is not None:
                 return prior
             changed = self.runs._transition(
                 conn, principal.tenant_id, row, "cancelled", expected_version
+            )
+            reclaim_unclaimed(
+                conn,
+                principal.tenant_id,
+                {**row, "state": "cancelled"},
+                self.db.recovery_epoch,
+                reason="cancelled_before_claim",
             )
             if row["state"] != "cancelled":
                 event(
@@ -148,6 +173,13 @@ class Control:
                 ]
             }
 
+    def capacity(self, principal, project):
+        from .capacity import project_capacity
+
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.grant(conn, principal, project)
+            return project_capacity(conn, project, self.db.recovery_epoch)
+
     def events(self, principal, project, run_id, cursor=None):
         validate_contract("RunId", run_id)
         prefix = self.db.recovery_epoch + ":" + run_id + ":"
@@ -171,9 +203,7 @@ class Control:
             if not row:
                 raise DomainError("RES-0004", "Run not found", 404)
             if sequence > row["event_sequence"]:
-                raise DomainError(
-                    "STREAM-0001", "Event cursor is ahead of this Run", 409
-                )
+                raise DomainError("STREAM-0001", "Event cursor is ahead of this Run", 409)
             rows = conn.execute(
                 "SELECT event_id,event_type,sequence FROM inv.outbox WHERE run_id=%s AND sequence>%s ORDER BY sequence LIMIT 200",
                 (run_id, sequence),

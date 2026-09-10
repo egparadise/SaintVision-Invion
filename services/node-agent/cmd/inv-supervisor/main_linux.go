@@ -5,7 +5,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/workspace"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -39,9 +42,28 @@ func run() int {
 	if limit := time.Duration(seconds) * time.Second; remaining > limit {
 		remaining = limit
 	}
+	// Covers input materialization and final capture as well as child execution.
+	watchdog := time.AfterFunc(time.Until(now.Add(remaining)), func() { os.Exit(124) })
+	defer watchdog.Stop()
+	syscall.Umask(0077)
+	var input *contracts.WorkspaceInput
+	workspaceID := contracts.WorkspaceId(os.Getenv("INV_WORKSPACE_ID"))
+	if raw := os.Getenv("INV_WORKSPACE_INPUT"); raw != "" {
+		if json.Unmarshal([]byte(raw), &input) != nil || input == nil {
+			return 125
+		}
+		snapshot, err := workspace.Input(input, workspaceID)
+		if err != nil || workspace.Seed("/workspace", snapshot) != nil {
+			return 125
+		}
+	}
+	os.Unsetenv("INV_WORKSPACE_INPUT")
+	os.Unsetenv("INV_WORKSPACE_ID")
 	child := exec.Command(flag.Args()[0], flag.Args()[1:]...)
 	child.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	// Untrusted stdout/stderr are discarded, not logged before redaction.
+	stdout, stderr := &outputBuffer{}, &outputBuffer{}
+	child.Stdout, child.Stderr = stdout, stderr
+	child.WaitDelay = 100 * time.Millisecond
 	child.Env = []string{"PATH=/usr/bin:/bin", "HOME=/workspace"}
 	if err := child.Start(); err != nil {
 		return 126
@@ -55,11 +77,35 @@ func run() int {
 	defer signal.Stop(signals)
 	select {
 	case err := <-completed:
+		if input != nil && err == nil {
+			// Private PID namespace: no descendant may mutate files during capture.
+			if err := syscall.Kill(-1, syscall.SIGKILL); err != nil && err != syscall.ESRCH {
+				return 125
+			}
+			for {
+				var status syscall.WaitStatus
+				_, err := syscall.Wait4(-1, &status, 0, nil)
+				if err == syscall.ECHILD {
+					break
+				}
+				if err == syscall.EINTR {
+					continue
+				}
+				if err != nil {
+					return 125
+				}
+			}
+			snapshot, err := workspace.Capture("/workspace", workspaceID)
+			if err != nil {
+				return 122
+			}
+			return emitWorkspaceOutput(stdout, stderr, input, snapshot)
+		}
 		if err == nil {
-			return 0
+			return emitOutput(stdout, stderr, 0)
 		}
 		if exit, ok := err.(*exec.ExitError); ok && exit.ExitCode() >= 0 {
-			return exit.ExitCode()
+			return emitOutput(stdout, stderr, exit.ExitCode())
 		}
 		return 127
 	case <-timer.C:

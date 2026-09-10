@@ -77,6 +77,7 @@ type WorkloadSpec struct {
     ImageDigest string `json:"imageDigest"`
     Command []string `json:"command"`
     TimeoutSeconds int64 `json:"timeoutSeconds"`
+    WorkspaceResume *WorkspaceResumeRef `json:"workspaceResume,omitempty"`
 }
 
 type ResourceLease struct {
@@ -260,6 +261,7 @@ type SandboxLaunchSpec struct {
     NoNewPrivileges bool `json:"noNewPrivileges"`
     Privileged bool `json:"privileged"`
     HostAccess bool `json:"hostAccess"`
+    WorkspaceInput *WorkspaceInput `json:"workspaceInput,omitempty"`
 }
 
 type ExecutionClaim struct {
@@ -312,6 +314,7 @@ type NodeStopReceipt struct {
     Reason string `json:"reason"`
     FinishedAt Timestamp `json:"finishedAt"`
     Allocations []NodeAllocation `json:"allocations"`
+    Output *NodeOutput `json:"output,omitempty"`
 }
 
 type NodeExecutionResult struct {
@@ -360,4 +363,76 @@ type ProblemDetails struct {
     TraceId TraceId `json:"traceId"`
     CauseRef *string `json:"causeRef"`
     EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type NodeResourceSnapshot struct {
+    Nonce string `json:"nonce"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ProfileVersion string `json:"profileVersion"`
+    ObservedAt Timestamp `json:"observedAt"`
+    SampleMillis int64 `json:"sampleMillis"`
+    CpuCapacityMillis int64 `json:"cpuCapacityMillis"`
+    CpuBusyMillis int64 `json:"cpuBusyMillis"`
+    MemoryCapacityBytes int64 `json:"memoryCapacityBytes"`
+    MemoryAvailableBytes int64 `json:"memoryAvailableBytes"`
+    OsType string `json:"osType"`
+    AgentVersion string `json:"agentVersion"`
+}
+
+type NodeChunkInput struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+}
+
+type NodeChunkResult struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+    DataBase64 string `json:"dataBase64"`
+    ChunkSha256 string `json:"chunkSha256"`
+}
+
+type NodeOutput struct {
+    Data string `json:"data"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+}
+
+type WorkspaceResumeRef struct {
+    ResumeId string `json:"resumeId"`
+    CheckoutId string `json:"checkoutId"`
+    SourceAttempt int64 `json:"sourceAttempt"`
+    SourceStepId string `json:"sourceStepId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    CheckpointAttempt int64 `json:"checkpointAttempt"`
+}
+
+type WorkspaceInput struct {
+    ResumeId string `json:"resumeId"`
+    StepId string `json:"stepId"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+}
+
+type WorkspaceSnapshotFile struct {
+    Path string `json:"path"`
+    Executable bool `json:"executable"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+}
+
+type WorkspaceSnapshot struct {
+    Format string `json:"format"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    Directories []string `json:"directories"`
+    Files []WorkspaceSnapshotFile `json:"files"`
 }
