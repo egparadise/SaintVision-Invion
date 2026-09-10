@@ -26,10 +26,12 @@ def operator(conn, principal, permission=None):
     if (
         not row
         or not row["enabled"]
-        or not (row["can_contain"] or row["can_resume"])
+        or row["person_id"] is None
+        or not (row["can_contain"] or row["can_resume"] or row["can_approve"])
         or (permission and not row[permission])
     ):
         raise DomainError("AUTH-0062", "Current operator permission required", 403)
+    return row
 
 
 def pending(conn, node_id=None):
@@ -135,6 +137,11 @@ class Containment:
             current = self._view(conn, node_id)
             if current["version"] != data["expectedVersion"]:
                 raise DomainError("GRAPH-0003", "Control version changed; reload before retry")
+            from .containment_approvals import ControlApprovals
+
+            ControlApprovals(self.db).consume(
+                conn, principal, operation, node_id, data, prior["request_id"]
+            )
             if operation == "kill":
                 conn.execute(
                     "UPDATE inv.tenant_controls SET kill_switch=true,version=version+1,updated_at=clock_timestamp()"
@@ -181,6 +188,7 @@ class Containment:
                 )
             result = {
                 "requestId": str(prior["request_id"]),
+                "approvalId": data["approvalId"],
                 "operation": operation,
                 "control": self._view(conn, node_id),
             }

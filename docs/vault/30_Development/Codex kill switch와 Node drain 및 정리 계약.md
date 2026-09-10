@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-NODE-CONTAINMENT-001"
 title: "Codex kill switch와 Node drain 및 정리 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T15:03:00+09:00"
+updated: "2026-09-10T15:13:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,6 +21,16 @@ task NODE-CONTAINMENT, S07-BE/DB·S08-BE/DB 부분 범위. owner Codex, reviewer
 HTTP는 기존 JWT에서 tenant와 issuer-qualified subject를 가져온다. 현재 `inv.operator_grants`의 enabled 및 can_contain/can_resume를 확인하며, 일반 Project requester/approver 권한이나 client role 필드로 운영자 권한을 만들지 않는다. 운영자는 검증한 주체를 별도 신뢰 provisioning으로 등록한다. runtime은 grant 권한 열을 수정할 수 없다. replay/read도 현재 운영자 권한이 필요하다.
 
 kill/clear/drain/resume는 expectedVersion과 Idempotency-Key, 제한된 reasonCode를 사용한다. actor·operation·Node·입력 digest와 최종 응답을 한 transaction의 불변 `containment_requests`에 기록한다. 같은 키의 다른 내용은 거부하고, 중복 처리로 version을 재증가시키지 않는다. 응답 유실 후 재시도는 원래 응답이며 현재 상태는 GET으로 확인한다.
+
+## ADR-056: 제어 변경도 L2의 2인 승인 적용
+
+[[20_Backend 보완 설계]]의 Node drain L2 분류와 [[보안 평가 운영 가이드]]의 명시적 승인·만료 요구를 적용한다. 초기 operator-only 구현은 최종 계약이 아니며 [[NODE-CONTAINMENT 승인 경계 검토 오류]]에 기록했다. 모든 kill/clear/drain/resume는 요청자를 제외한 서로 다른 두 사람의 승인이 필요하다. 긴급 상황이라고 암묵적인 승인 예외나 알람 기반 자동 kill을 만들지 않는다. 안전한 사전 승인은 최대 5분의 정확한 제어 범위·version에만 유효하다.
+
+후속 `0023_containment_approvals`는 0022를 재작성하지 않고 operator의 검증된 person_id·can_approve와 불변 제어 Approval/투표·일회 nonce를 추가한다. person_id는 tenant 내 UNIQUE이며 등록 후 변경할 수 없다. 기존 operator에 사람 identity나 승인 권한을 자동 할당하지 않고, person_id가 없는 grant는 사용을 거부한다. 사람 매핑과 역할 변경은 신뢰 provisioning만 가능하다.
+
+제안은 operation/Node/제어 version/tenant gate version/recovery epoch/요청자 identity/reason의 digest 및 DB 기준 5분 만료를 고정한다. 두 승인자는 현재 can_approve 권한과 서로 다른 person_id가 있어야 하며 요청자는 투표할 수 없다. 각 투표는 주체에 결합된 60초 이내 nonce와 정확한 contentDigest를 사용하고 한 번만 소비한다. 거절은 terminal이며 재투표로 뒤집지 않는다.
+
+실제 적용 직전 현재 requester/voter 권한·사람 identity·만료·epoch·gate/Node version을 다시 확인한다. 승인 소비·제어 변경·불변 감사 응답은 같은 transaction에서 확정하거나 전부 rollback한다. approvalId는 실제 consumed_request_id와 연결되며 가짜 ID나 한 표만으로 제어할 수 없다. 이미 접수된 kill의 취소 정리는 승인자의 후속 권한 철회와 별개로 계속된다. 정리 worker는 새로운 제어 결정을 만들지 않는다.
 
 ## ADR-054: drain과 물리 종료 확인
 
@@ -44,6 +54,10 @@ Node 단절은 물리 종료 증거가 아니다. control 응답의 activeLeases
 
 | 경로 | 의미 |
 |---|---|
+| POST /v1/operations/containment-approvals | ContainmentProposalInput으로 내용 고정, 5분 Approval 생성 |
+| GET /v1/operations/containment-approvals/{approvalId} | 고정 내용·digest·만료·실제 승인 상태 |
+| POST /v1/operations/containment-approvals/{approvalId}/challenge | 다른 승인자의 일회 nonce 발급 |
+| POST /v1/operations/containment-approvals/{approvalId}/decision | ContainmentDecisionInput으로 고정 내용 승인/거절 |
 | GET /v1/operations/kill-switch | tenant 제어 version, latch와 실제 정리 수치 |
 | POST /v1/operations/kill-switch | ContainmentInput; 202는 durable 차단·취소 요청 접수 |
 | POST /v1/operations/kill-switch/clear | ContainmentInput; 별도 재개 권한과 실제 정리 완료 필요 |
@@ -51,7 +65,7 @@ Node 단절은 물리 종료 증거가 아니다. control 응답의 activeLeases
 | POST /v1/nodes/{nodeId}/drain | ContainmentInput; 202는 drain 접수 |
 | POST /v1/nodes/{nodeId}/resume | ContainmentInput; 정리·현재 인증 관측 뒤 online 전이 |
 
-정본은 core JSON Schema의 ContainmentInput/View/Result와 생성 Python/TS/Go다. expectedVersion은 control version이며 Run version과 다르다. reasonCode는 maintenance/incident/operator_request다. 응답의 requestId를 불변 감사 기록과 연결한다. 임의 HTML 상태나 토글만으로 cluster 정지를 표시하지 않는다.
+정본은 core JSON Schema의 ContainmentInput/View/Result 및 제어 Approval 계약과 생성 Python/TS/Go다. ContainmentInput에는 실제 approvalId가 필수다. expectedVersion은 control version이며 Run version과 다르다. reasonCode는 maintenance/incident/operator_request다. 응답의 requestId·approvalId를 불변 감사 기록과 연결한다. 임의 HTML 상태나 토글만으로 cluster 정지를 표시하지 않는다.
 
 Gemini는 기존 관리자 화면의 모의 kill 상태를 위 API에 연결하고 요청 접수/물리 종료 대기/정리 완료/명시적 재개를 구분해야 한다. 이 API는 OS 전체 방화벽이나 사용자 프로세스를 조작하지 않는다. 기존 승인된 sandbox의 network=none 정책과 제어 중단을 화면에서 혼동하지 않는다.
 

@@ -758,6 +758,7 @@ class ContainmentInput(BaseModel):
     )
     expectedVersion: conint(ge=0, le=9007199254740991)
     reasonCode: ReasonCode
+    approvalId: UUID
 
 
 class NodeStatus(StrEnum):
@@ -795,6 +796,49 @@ class ContainmentResult(BaseModel):
     requestId: UUID
     operation: Operation
     control: ContainmentView
+    approvalId: UUID
+
+
+class ContainmentProposalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Operation
+    nodeId: NodeId | None
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+
+
+class ContainmentDecisionInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decision: Decision
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Status3(StrEnum):
+    pending = 'pending'
+    approved = 'approved'
+    rejected = 'rejected'
+    consumed = 'consumed'
+
+
+class ContainmentApprovalView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: UUID
+    operation: Operation
+    nodeId: NodeId | None
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    gateVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    status: Status3
+    expiresAt: AwareDatetime
+    requiredApprovals: Literal[2]
 
 
 class WorkloadSpec(BaseModel):

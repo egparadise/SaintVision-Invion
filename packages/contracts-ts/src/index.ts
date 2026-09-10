@@ -570,6 +570,7 @@ export interface BusinessBindingView {
 export interface ContainmentInput {
   expectedVersion: number;
   reasonCode: "maintenance" | "incident" | "operator_request";
+  approvalId: string;
 }
 
 export interface ContainmentView {
@@ -587,4 +588,31 @@ export interface ContainmentResult {
   requestId: string;
   operation: "kill" | "clear" | "drain" | "resume";
   control: ContainmentView;
+  approvalId: string;
+}
+
+export interface ContainmentProposalInput {
+  operation: "kill" | "clear" | "drain" | "resume";
+  nodeId: (NodeId | null);
+  expectedVersion: number;
+  reasonCode: "maintenance" | "incident" | "operator_request";
+}
+
+export interface ContainmentDecisionInput {
+  decision: "approve" | "reject";
+  contentDigest: string;
+  nonce: string;
+}
+
+export interface ContainmentApprovalView {
+  approvalId: string;
+  operation: "kill" | "clear" | "drain" | "resume";
+  nodeId: (NodeId | null);
+  expectedVersion: number;
+  gateVersion: number;
+  reasonCode: "maintenance" | "incident" | "operator_request";
+  contentDigest: string;
+  status: "pending" | "approved" | "rejected" | "consumed";
+  expiresAt: string;
+  requiredApprovals: 2;
 }

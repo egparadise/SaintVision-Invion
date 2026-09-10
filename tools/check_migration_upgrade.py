@@ -20,6 +20,7 @@ def main():
         "0019_workspace_api_integration",
         "0020_shard_recovery",
         "0021_business_kernel",
+        "0022_node_containment",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
@@ -46,7 +47,7 @@ def main():
                     raise RuntimeError("Migration path failed: " + prior + " -> " + target)
             with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
                 assert conn.execute("SELECT version_num FROM alembic_version").fetchall() == [
-                    ("0022_node_containment",)
+                    ("0023_containment_approvals",)
                 ]
                 assert conn.execute(
                     "SELECT rolsuper,rolcanlogin,rolbypassrls FROM pg_roles WHERE rolname='inv_kernel'"

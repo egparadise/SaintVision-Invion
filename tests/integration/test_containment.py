@@ -1,12 +1,14 @@
 """Operator containment with real PostgreSQL, and actual Go/mTLS/Docker receipts."""
 
 from concurrent.futures import ThreadPoolExecutor
-from threading import Event
+from threading import Event, Lock
 from time import monotonic, sleep
 from uuid import uuid4
 import psycopg
 import pytest
 from inv.containment import Containment, ContainmentReconciler
+from inv.containment_approvals import ControlApprovals
+from inv.approvals import Principal, digest
 from inv.dispatch import DeliveryQueue, DeliveryWorker
 from inv.errors import DomainError
 from inv.ids import new_id
@@ -24,13 +26,23 @@ pytestmark = pytest.mark.postgres
 
 
 def operators(a):
+    a.people["carol"] = Principal(
+        a.e.tenant, a.jwt.subject("carol") if hasattr(a, "jwt") else "carol"
+    )
     with psycopg.connect(a.e.owner) as conn:
-        for name, stop, resume in [("requester", True, False), ("bob", False, True)]:
+        for name, stop, resume, vote in [
+            ("requester", True, False, False),
+            ("bob", False, True, False),
+            ("alice", False, False, True),
+            ("carol", False, False, True),
+        ]:
             conn.execute(
-                "INSERT INTO inv.operator_grants(tenant_id,subject_id,can_contain,can_resume) VALUES(%s,%s,%s,%s)",
-                (a.e.tenant, a.people[name].subject_id, stop, resume),
+                "INSERT INTO inv.operator_grants(tenant_id,subject_id,person_id,can_contain,can_resume,can_approve) VALUES(%s,%s,%s,%s,%s,%s)",
+                (a.e.tenant, a.people[name].subject_id, uuid4(), stop, resume, vote),
             )
     a.ops = Containment(a.e.db)
+    a.control_approvals = ControlApprovals(a.e.db)
+    a.approval_cache, a.approval_lock = {}, Lock()
     return a
 
 
@@ -39,11 +51,43 @@ def ops(api):
     return operators(api)
 
 
+def approved_input(a, operation, version=0, *, key=None, actor=None):
+    actor = actor or ("bob" if operation in {"clear", "resume"} else "requester")
+    cache_key = (operation, version, key or operation, actor)
+    with a.approval_lock:
+        if cache_key not in a.approval_cache:
+            proposed = a.control_approvals.propose(
+                a.people[actor],
+                {
+                    "operation": operation,
+                    "nodeId": a.e.node if operation in {"drain", "resume"} else None,
+                    "expectedVersion": version,
+                    "reasonCode": "maintenance",
+                },
+                digest(cache_key),
+            )
+            for voter in ("alice", "carol"):
+                challenge = a.control_approvals.challenge(a.people[voter], proposed["approvalId"])
+                voted = a.control_approvals.decide(
+                    a.people[voter],
+                    proposed["approvalId"],
+                    {**challenge, "decision": "approve"},
+                    voter,
+                )
+            assert voted["status"] == "approved"
+            a.approval_cache[cache_key] = {
+                "expectedVersion": version,
+                "reasonCode": "maintenance",
+                "approvalId": proposed["approvalId"],
+            }
+        return a.approval_cache[cache_key]
+
+
 def change(a, operation, version=0, *, key=None, actor=None):
     return a.ops.change(
         a.people[actor or ("bob" if operation in {"clear", "resume"} else "requester")],
         operation,
-        {"expectedVersion": version, "reasonCode": "maintenance"},
+        approved_input(a, operation, version, key=key, actor=actor),
         key or operation,
         a.e.node if operation in {"drain", "resume"} else None,
     )
@@ -52,7 +96,7 @@ def change(a, operation, version=0, *, key=None, actor=None):
 def test_http_operator_is_distinct_from_project_roles_and_client_claims(ops):
     a = ops
     url = "/v1/operations/kill-switch"
-    data = {"expectedVersion": 0, "reasonCode": "incident"}
+    data = {"expectedVersion": 0, "reasonCode": "maintenance", "approvalId": str(uuid4())}
     assert a.client.post(url, json=data, headers=a.headers("alice")).status_code == 403
     assert a.client.post(url, json=data, headers=a.headers("bob")).status_code == 403
     assert (
@@ -66,6 +110,7 @@ def test_http_operator_is_distinct_from_project_roles_and_client_claims(ops):
         ).status_code
         == 404
     )
+    data = approved_input(a, "kill")
     response = a.client.post(url, json=data, headers=a.headers())
     assert (
         response.status_code == 202 and response.json()["control"]["killSwitchActive"]
@@ -109,6 +154,7 @@ def test_revoked_operator_cannot_replay_or_read(ops):
 
 def test_gate_serializes_kill_after_prior_admission_and_blocks_later_start(ops):
     a = ops
+    approved_input(a, "kill")
     started = Event()
 
     def kill():
@@ -461,3 +507,163 @@ def test_partition_keeps_resources_until_restarted_node_returns_actual_receipt(r
     assert DeliveryWorker(a.e.db, a.delivery).once(a.e.tenant, control_only=True) == "stopped"
     assert active(a) == 0 and count(a, "node_stop_receipts") == 1
     assert change(a, "clear", 1)["control"]["settled"]
+
+
+def proposal(a, operation="kill", key="proposal"):
+    return a.control_approvals.propose(
+        a.people["requester"],
+        {
+            "operation": operation,
+            "nodeId": a.e.node if operation == "drain" else None,
+            "expectedVersion": 0,
+            "reasonCode": "maintenance",
+        },
+        key,
+    )
+
+
+def test_http_two_person_approval_and_consumption_are_required(ops):
+    a = ops
+    root = "/v1/operations/containment-approvals"
+    intent = {
+        "operation": "kill",
+        "nodeId": None,
+        "expectedVersion": 0,
+        "reasonCode": "maintenance",
+    }
+    created = a.client.post(root, json=intent, headers=a.headers(key="proposal"))
+    assert created.status_code == 201, created.text
+    row = created.json()
+    url = root + "/" + row["approvalId"]
+    data = {"approvalId": row["approvalId"], "expectedVersion": 0, "reasonCode": "maintenance"}
+    assert (
+        a.client.post("/v1/operations/kill-switch", json=data, headers=a.headers()).status_code
+        == 403
+    )
+    for i, actor in enumerate(("alice", "carol")):
+        challenge = a.client.post(url + "/challenge", json={}, headers=a.headers(actor)).json()
+        vote = a.client.post(
+            url + "/decision",
+            json={**challenge, "decision": "approve"},
+            headers=a.headers(actor, key=actor),
+        )
+        assert vote.status_code == 200, vote.text
+        if i == 0:
+            assert vote.json()["status"] == "pending"
+            assert (
+                a.client.post(
+                    "/v1/operations/kill-switch", json=data, headers=a.headers()
+                ).status_code
+                == 403
+            )
+    accepted = a.client.post("/v1/operations/kill-switch", json=data, headers=a.headers())
+    assert accepted.status_code == 202 and accepted.json()["approvalId"] == row["approvalId"]
+    assert (
+        a.client.post("/v1/operations/kill-switch", json=data, headers=a.headers()).json()
+        == accepted.json()
+    )
+    current = a.client.get(url, headers=a.headers()).json()
+    assert current["status"] == "consumed"
+    with a.e.db.transaction(a.e.tenant) as conn:
+        approved = conn.execute(
+            "SELECT consumed_request_id FROM inv.containment_approvals WHERE approval_id=%s",
+            (row["approvalId"],),
+        ).fetchone()
+        assert str(approved["consumed_request_id"]) == accepted.json()["requestId"]
+
+
+def test_vote_nonce_content_actor_and_replay_are_bound(ops):
+    a = ops
+    row = proposal(a)
+    challenge = a.control_approvals.challenge(a.people["alice"], row["approvalId"])
+    data = {**challenge, "decision": "approve"}
+    for actor, content in [("carol", data), ("alice", {**data, "contentDigest": "0" * 64})]:
+        with pytest.raises(DomainError, match="AUTH-0063"):
+            a.control_approvals.decide(a.people[actor], row["approvalId"], content, "vote")
+    vote = a.control_approvals.decide(a.people["alice"], row["approvalId"], data, "vote")
+    assert a.control_approvals.decide(a.people["alice"], row["approvalId"], data, "vote") == vote
+    with pytest.raises(DomainError, match="IDEM-0001"):
+        a.control_approvals.decide(a.people["alice"], row["approvalId"], data, "vote-again")
+    second = a.control_approvals.challenge(a.people["carol"], row["approvalId"])
+    rejected = a.control_approvals.decide(
+        a.people["carol"], row["approvalId"], {**second, "decision": "reject"}, "reject"
+    )
+    assert rejected["status"] == "rejected"
+    with pytest.raises(DomainError, match="AUTH-0063"):
+        a.ops.change(
+            a.people["requester"],
+            "kill",
+            {"approvalId": row["approvalId"], "expectedVersion": 0, "reasonCode": "maintenance"},
+            "kill",
+        )
+
+
+@pytest.mark.parametrize("invalidated", ["voter", "requester", "expiry", "gate"])
+def test_current_authority_expiry_and_global_gate_invalidate_approved_control(ops, invalidated):
+    a = ops
+    data = dict(approved_input(a, "drain"))
+    if invalidated in {"voter", "requester"}:
+        actor = "alice" if invalidated == "voter" else "requester"
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(
+                "UPDATE inv.operator_grants SET enabled=false WHERE tenant_id=%s AND subject_id=%s",
+                (a.e.tenant, a.people[actor].subject_id),
+            )
+    elif invalidated == "gate":
+        change(a, "kill")
+    else:
+        expired = uuid4()
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(
+                """INSERT INTO inv.containment_approvals
+            SELECT tenant_id,%s,%s,requester_id,requester_person_id,operation,node_id,expected_version,gate_version,recovery_epoch,
+            reason_code,content_digest,request_hash,status,statement_timestamp()-interval '5 minutes',statement_timestamp()-interval '1 second',NULL
+            FROM inv.containment_approvals WHERE tenant_id=%s AND approval_id=%s""",
+                (expired, str(expired), a.e.tenant, data["approvalId"]),
+            )
+            conn.execute(
+                """INSERT INTO inv.containment_votes SELECT tenant_id,%s,actor_id,person_id,key,decision,request_hash,response,created_at
+            FROM inv.containment_votes WHERE tenant_id=%s AND approval_id=%s""",
+                (expired, a.e.tenant, data["approvalId"]),
+            )
+        data["approvalId"] = str(expired)
+    with pytest.raises(DomainError) as caught:
+        a.ops.change(a.people["requester"], "drain", data, "apply-drain", a.e.node)
+    assert caught.value.code in {"AUTH-0062", "AUTH-0063"}
+    if invalidated == "expiry":
+        assert "expired" in caught.value.detail
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert (
+            conn.execute("SELECT status FROM inv.nodes WHERE node_id=%s", (a.e.node,)).fetchone()[
+                "status"
+            ]
+            == "online"
+        )
+        assert not conn.execute(
+            "SELECT 1 FROM inv.containment_requests WHERE operation='drain'"
+        ).fetchone()
+
+
+def test_operator_identity_cannot_be_duplicated_or_requester_vote_reused(ops):
+    a = ops
+    row = proposal(a)
+    with psycopg.connect(a.e.owner) as conn:
+        person = conn.execute(
+            "SELECT person_id FROM inv.operator_grants WHERE tenant_id=%s AND subject_id=%s",
+            (a.e.tenant, a.people["requester"].subject_id),
+        ).fetchone()[0]
+        conn.execute(
+            "UPDATE inv.operator_grants SET can_approve=true WHERE tenant_id=%s AND subject_id=%s",
+            (a.e.tenant, a.people["requester"].subject_id),
+        )
+    with pytest.raises(DomainError, match="AUTH-0063"):
+        a.control_approvals.challenge(a.people["requester"], row["approvalId"])
+    with pytest.raises(psycopg.errors.UniqueViolation):
+        with psycopg.connect(a.e.owner) as conn:
+            conn.execute(
+                "INSERT INTO inv.operator_grants(tenant_id,subject_id,person_id,can_approve) VALUES(%s,'duplicate',%s,true)",
+                (a.e.tenant, person),
+            )
+    with pytest.raises(psycopg.errors.InsufficientPrivilege):
+        with a.e.db.transaction(a.e.tenant) as conn:
+            conn.execute("UPDATE inv.operator_grants SET can_approve=true")

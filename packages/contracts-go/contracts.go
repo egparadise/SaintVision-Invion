@@ -572,6 +572,7 @@ type BusinessBindingView struct {
 type ContainmentInput struct {
     ExpectedVersion int64 `json:"expectedVersion"`
     ReasonCode string `json:"reasonCode"`
+    ApprovalId string `json:"approvalId"`
 }
 
 type ContainmentView struct {
@@ -589,4 +590,31 @@ type ContainmentResult struct {
     RequestId string `json:"requestId"`
     Operation string `json:"operation"`
     Control ContainmentView `json:"control"`
+    ApprovalId string `json:"approvalId"`
+}
+
+type ContainmentProposalInput struct {
+    Operation string `json:"operation"`
+    NodeId *NodeId `json:"nodeId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    ReasonCode string `json:"reasonCode"`
+}
+
+type ContainmentDecisionInput struct {
+    Decision string `json:"decision"`
+    ContentDigest string `json:"contentDigest"`
+    Nonce string `json:"nonce"`
+}
+
+type ContainmentApprovalView struct {
+    ApprovalId string `json:"approvalId"`
+    Operation string `json:"operation"`
+    NodeId *NodeId `json:"nodeId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    GateVersion int64 `json:"gateVersion"`
+    ReasonCode string `json:"reasonCode"`
+    ContentDigest string `json:"contentDigest"`
+    Status string `json:"status"`
+    ExpiresAt string `json:"expiresAt"`
+    RequiredApprovals int64 `json:"requiredApprovals"`
 }
