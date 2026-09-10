@@ -21,6 +21,7 @@ from saintvision.db.session import tenant_scope
 from saintvision.errors import InvError
 from saintvision.ids import new_id
 from saintvision.services import discovery as discovery_service
+from saintvision.services import nodes as node_service
 from saintvision.services import pools as pool_service
 from saintvision.services import runs as run_service
 
@@ -124,10 +125,14 @@ def lab(owner_engine, two_tenants):
                 ),
                 {"t": tenant_a, "pl": ids["pool_id"], "n": node_id, "u": ids["user_id"]},
             )
+            # Stored in the canonical unit for each kind. The fixture used to
+            # hold "32" RAM in GiB, "16" CPU in cores and compare both against
+            # requirements expressed in bytes — the numbers were small enough
+            # that the comparisons still ordered correctly and nothing failed.
             for kind, total, used, unit, device in (
-                ("ram", ram_gib, used_ram_gib, "GiB", None),
-                ("gpu", gpus, 0, "device", 0),
-                ("cpu", 16, 2, "core", None),
+                ("ram", ram_gib * GIB, used_ram_gib * GIB, "bytes", None),
+                ("gpu", gpus, 0, "devices", 0),
+                ("cpu", 16_000, 2_000, "millicores", None),
             ):
                 capability_id = new_id("capability")
                 c.execute(
@@ -142,26 +147,34 @@ def lab(owner_engine, two_tenants):
                 c.execute(
                     text(
                         "INSERT INTO resource_offers (offer_id, tenant_id, capability_id, "
-                        "offered_quantity, unit, effective_from, version) "
-                        "VALUES (:o, :t, :c, :q, :un, :ef, 1)"
+                        "offered_quantity, effective_from, version) "
+                        "VALUES (:o, :t, :c, :q, :ef, 1)"
                     ),
                     {"o": new_id("offer"), "t": tenant_a, "c": capability_id,
-                     "q": total, "un": unit, "ef": NOW - dt.timedelta(hours=1)},
+                     "q": total, "ef": NOW - dt.timedelta(hours=1)},
                 )
                 c.execute(
                     text(
                         "INSERT INTO resource_snapshots (snapshot_id, observed_at, tenant_id, "
-                        "node_id, capability_id, used_quantity, unit, detail) "
-                        "VALUES (:s, :o, :t, :n, :c, :q, :un, '{}')"
+                        "node_id, capability_id, used_quantity, detail) "
+                        "VALUES (:s, :o, :t, :n, :c, :q, '{}')"
                     ),
                     {"s": new_id("snapshot"), "o": NOW - dt.timedelta(seconds=30),
-                     "t": tenant_a, "n": node_id, "c": capability_id, "q": used, "un": unit},
+                     "t": tenant_a, "n": node_id, "c": capability_id, "q": used},
                 )
     return ids
 
 
 def _req(cpu=0.0, ram=0, gpu=0):
-    return pool_service.ShardRequirement(cpu_cores=cpu, ram_bytes=ram, gpu_count=gpu)
+    """A requirement written the human way — cores and GiB — converted once.
+
+    The call sites read the same as before; what changed is that the numbers
+    they produce are now in the same units as the capacity they are compared
+    against.
+    """
+    return pool_service.ShardRequirement(
+        cpu_millicores=int(cpu * 1000), ram_bytes=ram * GIB, gpu_devices=gpu
+    )
 
 
 # --------------------------------------------------------------------------
@@ -494,8 +507,8 @@ def test_a_gpu_shard_is_not_sent_to_the_node_with_the_most_free_ram(
         c.execute(
             text(
                 "INSERT INTO resource_snapshots (snapshot_id, observed_at, tenant_id, node_id, "
-                "capability_id, used_quantity, unit, detail) "
-                "VALUES (:s, :o, :t, :n, :c, 2, 'device', '{}')"
+                "capability_id, used_quantity, detail) "
+                "VALUES (:s, :o, :t, :n, :c, 2, '{}')"
             ),
             {"s": new_id("snapshot"), "o": NOW - dt.timedelta(seconds=10),
              "t": lab["tenant_a"], "n": lab["nodes"][1], "c": capability_id},
@@ -615,8 +628,8 @@ def test_the_database_refuses_a_split_without_the_declaration(app_sessionmaker, 
                     session.execute(
                         text(
                             "INSERT INTO distributed_plans (plan_id, tenant_id, run_id, pool_id, "
-                            "strategy, state, shard_count, splittable_declared, shard_cpu_cores, "
-                            "shard_ram_bytes, shard_gpu_count, ranking_snapshot, created_at, version) "
+                            "strategy, state, shard_count, splittable_declared, shard_cpu_millicores, "
+                            "shard_ram_bytes, shard_gpu_devices, ranking_snapshot, created_at, version) "
                             "VALUES (:p, :t, :r, :pl, 'data_parallel', 'planned', 4, false, "
                             "0, 0, 0, '{}', now(), 1)"
                         ),
@@ -660,3 +673,212 @@ def test_pool_membership_is_idempotent(app_sessionmaker, lab):
                     {"n": lab["nodes"][0]},
                 ).scalar_one()
     assert count == 1
+
+
+# --------------------------------------------------------------------------
+# One unit per kind
+#
+# Before migration 0010 the unit was free text on the capability, the offer and
+# every observation, and `offered - used` never compared the three strings. The
+# tests below are the ways that could go wrong, each now closed in the database
+# rather than by a convention.
+# --------------------------------------------------------------------------
+
+
+def test_a_capability_cannot_be_stored_in_the_wrong_unit(app_sessionmaker, lab):
+    """32 "GiB" and 34359738368 "bytes" are one machine; only one is storable."""
+    with app_sessionmaker() as session:
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    session.execute(
+                        text(
+                            "INSERT INTO node_capabilities (capability_id, tenant_id, node_id, "
+                            "kind, device_index, total_quantity, unit, divisible, detected_at, "
+                            "version) VALUES (:c, :t, :n, 'ram', NULL, 32, 'GiB', true, now(), 1)"
+                        ),
+                        {"c": new_id("capability"), "t": lab["tenant_a"],
+                         "n": lab["nodes"][0]},
+                    )
+
+
+def test_a_node_may_not_observe_another_nodes_capability(app_sessionmaker, lab):
+    """The forgery the heartbeat authentication did not close on its own.
+
+    Node 0 reports utilisation naming a capability belonging to node 1. The
+    reading is filed under node 0 — making it look measured — while the kind
+    comes from node 1's capability, so node 0 appears to have spare capacity of
+    a kind it was never observed on.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                foreign = session.execute(
+                    text(
+                        "SELECT capability_id FROM node_capabilities "
+                        "WHERE node_id = :n AND kind = 'ram'"
+                    ),
+                    {"n": lab["nodes"][1]},
+                ).scalar_one()
+                with pytest.raises(InvError, match="does not belong to this node"):
+                    node_service.record_observations(
+                        session,
+                        tenant_id=lab["tenant_a"],
+                        node_id=lab["nodes"][0],
+                        observations=[
+                            node_service.ObservationInput(
+                                capability_id=foreign, used_quantity=0, unit="bytes"
+                            )
+                        ],
+                        now=NOW,
+                    )
+
+
+def test_the_database_refuses_a_foreign_capability_too(app_sessionmaker, lab):
+    """Not only the service. A check only the service performs is a convention."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                foreign = session.execute(
+                    text(
+                        "SELECT capability_id FROM node_capabilities "
+                        "WHERE node_id = :n AND kind = 'ram'"
+                    ),
+                    {"n": lab["nodes"][1]},
+                ).scalar_one()
+        with pytest.raises((IntegrityError, DBAPIError)):
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    session.execute(
+                        text(
+                            "INSERT INTO resource_snapshots (snapshot_id, observed_at, "
+                            "tenant_id, node_id, capability_id, used_quantity, detail) "
+                            "VALUES (:s, :o, :t, :n, :c, 0, '{}')"
+                        ),
+                        {"s": new_id("snapshot"), "o": NOW, "t": lab["tenant_a"],
+                         "n": lab["nodes"][0], "c": foreign},
+                    )
+
+
+def test_a_reported_unit_is_converted_before_it_is_stored(app_sessionmaker, lab):
+    """The node reports what it measured; the platform stores what it compares."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                capability_id = session.execute(
+                    text(
+                        "SELECT capability_id FROM node_capabilities "
+                        "WHERE node_id = :n AND kind = 'ram'"
+                    ),
+                    {"n": lab["nodes"][0]},
+                ).scalar_one()
+                node_service.record_observations(
+                    session,
+                    tenant_id=lab["tenant_a"],
+                    node_id=lab["nodes"][0],
+                    observations=[
+                        node_service.ObservationInput(
+                            capability_id=capability_id, used_quantity=4, unit="GiB"
+                        )
+                    ],
+                    now=NOW,
+                )
+                stored = session.execute(
+                    text(
+                        "SELECT used_quantity FROM resource_snapshots "
+                        "WHERE capability_id = :c AND observed_at = :o"
+                    ),
+                    {"c": capability_id, "o": NOW},
+                ).scalar_one()
+    assert stored == 4 * GIB
+
+
+def test_an_unconvertible_unit_is_refused_at_the_heartbeat(app_sessionmaker, lab):
+    """A unit the platform cannot interpret is a number it cannot compare."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                capability_id = session.execute(
+                    text(
+                        "SELECT capability_id FROM node_capabilities "
+                        "WHERE node_id = :n AND kind = 'ram'"
+                    ),
+                    {"n": lab["nodes"][0]},
+                ).scalar_one()
+                with pytest.raises(InvError, match="not a recognised unit"):
+                    node_service.record_observations(
+                        session,
+                        tenant_id=lab["tenant_a"],
+                        node_id=lab["nodes"][0],
+                        observations=[
+                            node_service.ObservationInput(
+                                capability_id=capability_id,
+                                used_quantity=4,
+                                unit="chunks",
+                            )
+                        ],
+                        now=NOW,
+                    )
+
+
+def test_the_idlest_node_is_the_one_with_the_most_free_bytes(app_sessionmaker, lab):
+    """The failure the free-text unit allowed, stated end to end.
+
+    Node 0 has 8 GiB spare, node 1 has 56 and node 2 has 32. When the offer and
+    the observation could be in different units, node 0's 24 GiB of usage could
+    be recorded as the number 24 against an offer of 34359738368 — a spare of
+    essentially its whole capacity, putting the busiest machine first in an
+    idle-first ranking. With one unit per kind, both sides are bytes.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                ranked = pool_service.rank_idle_first(
+                    session, tenant_id=lab["tenant_a"], pool_id=lab["pool_id"],
+                    requirement=_req(ram=8), now=NOW,
+                )
+    order = [c["nodeId"] for c in ranked]
+    assert order.index(lab["nodes"][1]) < order.index(lab["nodes"][0])
+    assert order.index(lab["nodes"][2]) < order.index(lab["nodes"][0])
+
+
+def test_the_database_bounds_shard_count(app_sessionmaker, lab):
+    """The API said le=1024 and the table said nothing at all."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                run = _run(session, lab)
+                run_id = run.run_id
+        with pytest.raises((IntegrityError, DBAPIError)):
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    session.execute(
+                        text(
+                            "INSERT INTO distributed_plans (plan_id, tenant_id, run_id, "
+                            "pool_id, strategy, state, shard_count, splittable_declared, "
+                            "shard_cpu_millicores, shard_ram_bytes, shard_gpu_devices, "
+                            "ranking_snapshot, created_at, version) "
+                            "VALUES (:p, :t, :r, :pl, 'sharded', 'planned', 2000, true, "
+                            "0, 0, 0, '{}', now(), 1)"
+                        ),
+                        {"p": new_id("plan"), "t": lab["tenant_a"], "r": run_id,
+                         "pl": lab["pool_id"]},
+                    )
+
+
+def test_the_pool_report_states_its_units(app_sessionmaker, lab):
+    """Every figure in the report is a bare integer until something names its unit."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                report = pool_service.pool_capacity(
+                    session, tenant_id=lab["tenant_a"], pool_id=lab["pool_id"], now=NOW
+                )
+    assert report["units"] == {
+        "cpu": "millicores",
+        "ram": "bytes",
+        "disk": "bytes",
+        "gpu": "devices",
+    }
+    # 32 + 64 + 32 GiB, in the unit the report has just declared.
+    assert report["totalOffered"]["ram"] == 128 * GIB

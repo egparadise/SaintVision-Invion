@@ -94,3 +94,50 @@ def test_every_schema_the_python_migrations_create_grants_the_app_role():
         f"revisions creating a schema must also grant it: {sorted(created)}"
     )
     assert granted, "no revision grants the application role"
+
+
+def test_the_two_halves_still_disagree_about_resource_kinds():
+    """A statement of the gap, so closing it is a deliberate act.
+
+    ``public`` says ``ram`` and ``disk``; ``inv`` says ``memory`` and
+    ``storage`` and adds ``network``. A lease for 'memory' cannot be matched to
+    an offer of 'ram' by string comparison, and matching it through a
+    translation table nobody wrote is worse than not matching it. Because
+    ``public`` is authoritative, ``inv`` is the side that moves — and when it
+    does, this test is what tells whoever did it that the seam is closed.
+    """
+    resources = schema_seam.report()["resources"]
+    assert resources["renames"] == {"ram": "memory", "disk": "storage"}, (
+        "the resource kind vocabularies have changed. If inv adopted public's "
+        "names, delete this test; if a new divergence appeared, it needs an "
+        "owner before either side leases against the other's numbers."
+    )
+    assert resources["onlyInv"] == ["network"], (
+        "inv declares a resource kind public cannot offer. Placement cannot "
+        "reserve what the offer side has no concept of."
+    )
+
+
+def test_public_declares_a_unit_for_every_kind_it_offers():
+    """The half of the seam I own.
+
+    inv's quantities are bare bigints with no unit column, which is its
+    owner's call to make. Mine must state the unit for every kind, because a
+    bigint whose meaning is implied is the same defect on the other side.
+    """
+    from saintvision.units import CANONICAL_UNIT, KINDS
+
+    assert set(KINDS) == set(CANONICAL_UNIT)
+    assert all(CANONICAL_UNIT[kind] for kind in KINDS)
+
+
+def test_the_canonical_units_are_all_integral():
+    """Why cpu is millicores and not cores.
+
+    Every canonical unit has to survive a round trip through ``bigint``,
+    because that is the type the execution core stores a lease amount in. A
+    unit that admits fractions cannot cross that boundary intact.
+    """
+    from saintvision.units import CANONICAL_UNIT
+
+    assert set(CANONICAL_UNIT.values()) == {"millicores", "bytes", "devices"}

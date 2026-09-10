@@ -17,10 +17,11 @@ from dataclasses import dataclass
 
 from sqlalchemy import case, select, update
 
-from ..db.models import Node, NodeCapability, ResourceOffer
+from ..db.models import Node, NodeCapability, ResourceOffer, ResourceSnapshot
 from ..errors import RES_NODE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..identity.tokens import consume_bootstrap_token
 from ..ids import new_id
+from ..units import KINDS, canonical_unit, to_canonical
 from .pagination import Page, build_page, clamp_limit, validate_cursor
 
 OS_TYPES = ("windows", "linux")
@@ -28,6 +29,14 @@ OS_TYPES = ("windows", "linux")
 
 @dataclass(frozen=True, slots=True)
 class CapabilityInput:
+    """What a node says it has, in whatever unit its agent measured.
+
+    The unit is converted to the canonical one for the kind before anything is
+    stored (``saintvision.units``). A node that reports GiB and a node that
+    reports bytes must end up comparable, because the platform's entire job is
+    to add their capacity together and subtract what is in use.
+    """
+
     kind: str
     total_quantity: float
     unit: str
@@ -37,11 +46,24 @@ class CapabilityInput:
     divisible: bool = False
     offered_quantity: float | None = None
 
+    def canonical_total(self) -> int:
+        return to_canonical(self.kind, self.total_quantity, self.unit)
+
+    def canonical_offered(self) -> int | None:
+        if self.offered_quantity is None:
+            return None
+        return to_canonical(self.kind, self.offered_quantity, self.unit)
+
     def validate(self) -> None:
-        if self.kind not in ("cpu", "gpu", "ram", "disk"):
+        if self.kind not in KINDS:
             raise InvError(VAL_SCHEMA, f"unknown capability kind: {self.kind!r}")
         if self.total_quantity < 0:
             raise InvError(VAL_SCHEMA, "total_quantity must not be negative")
+        # Raises if the unit is not one this kind can be measured in. Doing it
+        # during validation rather than at the INSERT means the node is told
+        # what was wrong with its report instead of getting a constraint name.
+        self.canonical_total()
+        self.canonical_offered()
         if (self.kind == "gpu") != (self.device_index is not None):
             raise InvError(
                 VAL_SCHEMA, "device_index is required for gpu and forbidden otherwise"
@@ -115,8 +137,8 @@ def enroll_node(
                 device_index=capability.device_index,
                 vendor=capability.vendor,
                 model=capability.model,
-                total_quantity=capability.total_quantity,
-                unit=capability.unit,
+                total_quantity=capability.canonical_total(),
+                unit=canonical_unit(capability.kind),
                 divisible=capability.divisible,
                 detected_at=now,
             )
@@ -127,8 +149,7 @@ def enroll_node(
                     offer_id=new_id("offer"),
                     tenant_id=tenant_id,
                     capability_id=capability_id,
-                    offered_quantity=capability.offered_quantity,
-                    unit=capability.unit,
+                    offered_quantity=capability.canonical_offered(),
                     effective_from=now,
                 )
             )
@@ -198,6 +219,87 @@ def record_heartbeat(
         raise InvError(RES_NODE_NOT_FOUND, "node not found")
     session.refresh(node)
     return HeartbeatOutcome(node=node, applied=False)
+
+
+@dataclass(frozen=True, slots=True)
+class ObservationInput:
+    """One utilisation reading, in whatever unit the node's agent measured."""
+
+    capability_id: str
+    used_quantity: float
+    unit: str
+
+
+def record_observations(
+    session,
+    *,
+    tenant_id: uuid.UUID,
+    node_id: str,
+    observations: list[ObservationInput],
+    now: dt.datetime,
+) -> int:
+    """Store utilisation readings for capabilities this node actually has.
+
+    Two things are checked here that the database now also enforces, and the
+    reason to check them here as well is that the node deserves to be told what
+    was wrong with its report rather than receiving a constraint violation.
+
+    **The capability must belong to the reporting node.** Nothing used to say
+    so. An enrolled node could post utilisation against any capability id in
+    its tenant, and ``node_spare`` files each reading under the *reporting*
+    node while taking the kind from the *named* capability. A busy machine
+    could therefore report zero against a capability it does not own, leave its
+    real RAM unobserved, and be ranked as the idlest node in the pool — which
+    is precisely the placement the heartbeat authentication was added to
+    protect.
+
+    **The unit is converted, not trusted.** The reading is compared against the
+    offer by subtraction, so a reading in MB against an offer in GiB is not a
+    smaller error than a missing reading.
+
+    ``observed_at`` is the server's clock, never the node's. A node that is
+    ahead of the control plane would otherwise write a reading that stays
+    "fresh" for as long as the skew lasts, keeping a stale utilisation figure
+    in front of every placement decision. ADR-021 puts clock skew on the
+    control plane's side of every ordering question, and this is one.
+    """
+    if not observations:
+        return 0
+
+    owned = {
+        capability_id: kind
+        for capability_id, kind in session.execute(
+            select(NodeCapability.capability_id, NodeCapability.kind).where(
+                NodeCapability.tenant_id == tenant_id,
+                NodeCapability.node_id == node_id,
+            )
+        ).all()
+    }
+
+    rows = []
+    for observation in observations:
+        kind = owned.get(observation.capability_id)
+        if kind is None:
+            raise InvError(
+                VAL_SCHEMA,
+                "the observed capability does not belong to this node",
+                extra={"capabilityId": observation.capability_id},
+            )
+        rows.append(
+            ResourceSnapshot(
+                snapshot_id=new_id("snapshot"),
+                observed_at=now,
+                tenant_id=tenant_id,
+                node_id=node_id,
+                capability_id=observation.capability_id,
+                used_quantity=to_canonical(
+                    kind, observation.used_quantity, observation.unit
+                ),
+            )
+        )
+    session.add_all(rows)
+    session.flush()
+    return len(rows)
 
 
 def mark_lost_nodes(

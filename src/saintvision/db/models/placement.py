@@ -36,10 +36,10 @@ from sqlalchemy import (
     UniqueConstraint,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB, NUMERIC
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..base import Base, InvId, Quantity, TenantId, Utc
+from ..base import Base, BigInteger, InvId, TenantId, Utc
 
 #: How a job uses more than one machine.
 #:
@@ -83,6 +83,9 @@ class DistributedPlan(Base):
             name="state_allowed",
         ),
         CheckConstraint("shard_count >= 1", name="shard_count_positive"),
+        # The API said le=1024 and the table said nothing. A bound that
+        # only one entry point enforces is not a bound.
+        CheckConstraint("shard_count <= 1024", name="shard_count_bounded"),
         # A single-node plan with several shards is a contradiction, and it is
         # the contradiction that would quietly turn "run it here" into "spread
         # it around".
@@ -108,10 +111,13 @@ class DistributedPlan(Base):
     #: infers it: a program that is not shard-aware produces wrong answers when
     #: split, not slow ones.
     splittable_declared: Mapped[bool] = mapped_column(default=False)
-    #: What one shard needs. Every shard must fit inside a single node.
-    shard_cpu_cores: Mapped[Quantity] = mapped_column(NUMERIC(20, 4), default=0)
-    shard_ram_bytes: Mapped[int] = mapped_column(default=0)
-    shard_gpu_count: Mapped[int] = mapped_column(Integer, default=0)
+    #: What one shard needs, in the same canonical units a node's spare
+    #: capacity is measured in (``saintvision.units``). These are compared with
+    #: ``>=`` against that spare capacity, so they cannot be in cores while the
+    #: capacity is in millicores — that comparison is the placement decision.
+    shard_cpu_millicores: Mapped[int] = mapped_column(BigInteger, default=0)
+    shard_ram_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
+    shard_gpu_devices: Mapped[int] = mapped_column(Integer, default=0)
     #: Why these nodes: the spare-capacity ranking at decision time, kept so a
     #: placement can be explained afterwards (PLAN-BACKEND-001 "explain").
     ranking_snapshot: Mapped[dict] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
@@ -140,9 +146,9 @@ class PlanPlacement(Base):
         CheckConstraint(
             "state IN ('planned','running','succeeded','failed','skipped')", name="state_allowed"
         ),
-        CheckConstraint("assigned_cpu_cores >= 0", name="assigned_cpu_non_negative"),
+        CheckConstraint("assigned_cpu_millicores >= 0", name="assigned_cpu_non_negative"),
         CheckConstraint("assigned_ram_bytes >= 0", name="assigned_ram_non_negative"),
-        CheckConstraint("assigned_gpu_count >= 0", name="assigned_gpu_non_negative"),
+        CheckConstraint("assigned_gpu_devices >= 0", name="assigned_gpu_non_negative"),
         Index("ix_plan_placements_tenant_id_node_id", "tenant_id", "node_id"),
     )
 
@@ -150,9 +156,9 @@ class PlanPlacement(Base):
     plan_id: Mapped[InvId] = mapped_column(primary_key=True)
     shard_index: Mapped[int] = mapped_column(Integer, primary_key=True)
     node_id: Mapped[InvId] = mapped_column()
-    assigned_cpu_cores: Mapped[Quantity] = mapped_column(NUMERIC(20, 4), default=0)
-    assigned_ram_bytes: Mapped[int] = mapped_column(default=0)
-    assigned_gpu_count: Mapped[int] = mapped_column(Integer, default=0)
+    assigned_cpu_millicores: Mapped[int] = mapped_column(BigInteger, default=0)
+    assigned_ram_bytes: Mapped[int] = mapped_column(BigInteger, default=0)
+    assigned_gpu_devices: Mapped[int] = mapped_column(Integer, default=0)
     #: The node's spare capacity when it was chosen, for the explain trail.
     spare_at_placement: Mapped[dict] = mapped_column(
         JSONB, server_default=text("'{}'::jsonb")

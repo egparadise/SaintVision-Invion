@@ -48,8 +48,7 @@ from ..db.models import (
 )
 from ..errors import RES_NODE_NOT_FOUND, VAL_SCHEMA, InvError
 from ..ids import new_id
-
-KINDS = ("cpu", "gpu", "ram", "disk")
+from ..units import CANONICAL_UNIT, KINDS
 
 #: How far back a utilisation snapshot still counts as "now". Older than this
 #: and the node's spare capacity is unknown rather than zero — treating an
@@ -59,20 +58,35 @@ SNAPSHOT_FRESHNESS_SECONDS = 120
 
 @dataclass(frozen=True, slots=True)
 class ShardRequirement:
-    """What one shard needs. Must fit inside a single node — that is the point."""
+    """What one shard needs. Must fit inside a single node — that is the point.
 
-    cpu_cores: float = 0.0
+    In the canonical units (``saintvision.units``), because every field here is
+    compared with ``>=`` against a node's spare capacity and that comparison is
+    the placement decision. A requirement in cores against spare capacity in
+    millicores would not fail loudly; it would place a thousand-fold too much
+    work on one machine, or find no candidate at all in a pool that is idle.
+    """
+
+    cpu_millicores: int = 0
     ram_bytes: int = 0
-    gpu_count: int = 0
+    gpu_devices: int = 0
 
     def validate(self) -> None:
         for name, value in (
-            ("cpu_cores", self.cpu_cores),
+            ("cpu_millicores", self.cpu_millicores),
             ("ram_bytes", self.ram_bytes),
-            ("gpu_count", self.gpu_count),
+            ("gpu_devices", self.gpu_devices),
         ):
             if value < 0:
                 raise InvError(VAL_SCHEMA, f"{name} must not be negative")
+
+    def per_kind(self) -> dict[str, float]:
+        """The requirement keyed the way spare capacity is keyed."""
+        return {
+            "cpu": self.cpu_millicores,
+            "ram": self.ram_bytes,
+            "gpu": self.gpu_devices,
+        }
 
 
 @dataclass
@@ -342,6 +356,10 @@ def pool_capacity(
             }
             for e in spares
         ],
+        # Every figure above is a bare number until this says what it counts.
+        # A consumer that infers the unit from the field name eventually infers
+        # it wrong, and these numbers decide where work runs.
+        "units": dict(CANONICAL_UNIT),
         "note": (
             "totalOffered is the sum across the pool. One task that cannot be "
             "split is bounded by largestSingleNode. Memory is not shared across "
@@ -383,22 +401,14 @@ def rank_idle_first(
     for entry in spares:
         if not entry.measured:
             continue
-        fits = (
-            entry.spare.get("cpu", 0.0) >= requirement.cpu_cores
-            and entry.spare.get("ram", 0.0) >= requirement.ram_bytes
-            and entry.spare.get("gpu", 0.0) >= requirement.gpu_count
-        )
-        if not fits:
+        wanted = requirement.per_kind()
+        if any(entry.spare.get(kind, 0.0) < need for kind, need in wanted.items()):
             continue
         # Score on the least-loaded dimension that the shard actually needs, so
         # a GPU job is not sent to the node with the most free RAM.
-        needed = [
-            (entry.spare["cpu"], requirement.cpu_cores),
-            (entry.spare["ram"], requirement.ram_bytes),
-            (entry.spare["gpu"], requirement.gpu_count),
-        ]
         headroom = min(
-            (spare / need if need else float("inf")) for spare, need in needed
+            (entry.spare[kind] / need if need else float("inf"))
+            for kind, need in wanted.items()
         )
         candidates.append(
             {
@@ -468,15 +478,13 @@ def plan_distributed_run(
                 if len(chosen) >= shard_count:
                     break
                 spare = remaining[candidate["nodeId"]]
-                if (
-                    spare.get("cpu", 0.0) >= requirement.cpu_cores
-                    and spare.get("ram", 0.0) >= requirement.ram_bytes
-                    and spare.get("gpu", 0.0) >= requirement.gpu_count
+                wanted = requirement.per_kind()
+                if all(
+                    spare.get(kind, 0.0) >= need for kind, need in wanted.items()
                 ):
                     chosen.append({**candidate, "spare": dict(spare)})
-                    spare["cpu"] -= requirement.cpu_cores
-                    spare["ram"] -= requirement.ram_bytes
-                    spare["gpu"] -= requirement.gpu_count
+                    for kind, need in wanted.items():
+                        spare[kind] -= need
                     placed_this_round = True
             if not placed_this_round:
                 break
@@ -500,9 +508,9 @@ def plan_distributed_run(
         state="placed",
         shard_count=shard_count,
         splittable_declared=splittable_declared,
-        shard_cpu_cores=requirement.cpu_cores,
+        shard_cpu_millicores=requirement.cpu_millicores,
         shard_ram_bytes=requirement.ram_bytes,
-        shard_gpu_count=requirement.gpu_count,
+        shard_gpu_devices=requirement.gpu_devices,
         # Kept so the placement can be explained later, not recomputed.
         ranking_snapshot={"ranked": ranked},
         created_at=now,
@@ -517,9 +525,9 @@ def plan_distributed_run(
             plan_id=plan.plan_id,
             shard_index=index,
             node_id=candidate["nodeId"],
-            assigned_cpu_cores=requirement.cpu_cores,
+            assigned_cpu_millicores=requirement.cpu_millicores,
             assigned_ram_bytes=requirement.ram_bytes,
-            assigned_gpu_count=requirement.gpu_count,
+            assigned_gpu_devices=requirement.gpu_devices,
             spare_at_placement=candidate["spare"],
             state="planned",
             placed_at=now,

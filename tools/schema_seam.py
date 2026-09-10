@@ -79,6 +79,46 @@ def public_tables() -> set[str]:
     return set(TENANT_SCOPED_TABLES) | {"tenants"}
 
 
+def resource_vocabulary() -> dict:
+    """How each side names and measures a resource.
+
+    Not a duplicated *table* — ``public.node_capabilities`` and
+    ``inv.resources`` are different shapes — but the same *quantity*, and the
+    execution core leases against it. Two things have to agree before a lease
+    can be checked against an offer:
+
+    **The kinds.** ``public`` says ``ram`` and ``disk``; ``inv`` says ``memory``
+    and ``storage`` and adds ``network``, which has no counterpart at all. A
+    lease for 'memory' cannot be matched to an offer of 'ram' by string
+    comparison, and matching it by a translation table nobody wrote is worse.
+
+    **The units.** ``public`` now stores one canonical unit per kind and
+    constrains it (migration 0010). ``inv.resources.capacity`` and
+    ``inv.resource_leases.amount`` are bare ``bigint`` with no unit column
+    anywhere — the unit is whatever the writer meant. Bigint is the right type
+    for millicores, bytes and devices; what is missing is the statement that
+    those are what the integers count.
+    """
+    sys.path.insert(0, str(ROOT / "src"))
+    from saintvision.units import CANONICAL_UNIT
+
+    inv_kinds = set()
+    for path in sorted(INV_SQL.glob("*.sql")):
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(r"kind text NOT NULL CHECK \(kind IN \(([^)]+)\)\)", text):
+            inv_kinds |= {value.strip().strip("'") for value in match.group(1).split(",")}
+
+    # Left is the public kind, right is what inv calls the same thing.
+    equivalents = {"cpu": "cpu", "ram": "memory", "disk": "storage", "gpu": "gpu"}
+    return {
+        "publicKinds": dict(CANONICAL_UNIT),
+        "invKinds": sorted(inv_kinds),
+        "renames": {k: v for k, v in equivalents.items() if k != v},
+        "onlyInv": sorted(inv_kinds - set(equivalents.values())),
+        "invDeclaresUnits": False,
+    }
+
+
 def report() -> dict:
     inv = inv_tables()
     mine = public_tables()
@@ -98,6 +138,7 @@ def report() -> dict:
         "duplicated": duplicated,
         "onlyPublic": only_public,
         "onlyInv": only_inv,
+        "resources": resource_vocabulary(),
         "invGrantRoles": sorted(inv_grants()),
         "publicGrantRole": "inv_app",
         # An empty inv grant list is the gap: the schema has no access path
@@ -123,6 +164,20 @@ def main() -> int:
     print("  " + ", ".join(data["onlyPublic"]))
     print(f"\nOnly in inv ({len(data['onlyInv'])}): execution mechanics")
     print("  " + ", ".join(data["onlyInv"]))
+    resources = data["resources"]
+    print("\nResource vocabulary — the same quantity, named and measured differently:")
+    for kind, unit in resources["publicKinds"].items():
+        renamed = resources["renames"].get(kind)
+        as_inv = f"inv.{renamed}" if renamed else f"inv.{kind}"
+        print(f"  public.{kind:5} in {unit:12} <-> {as_inv:14} in (no unit declared)")
+    if resources["onlyInv"]:
+        print(f"  only in inv: {', '.join(resources['onlyInv'])} — no counterpart in public")
+    print(
+        "  inv.resources.capacity and inv.resource_leases.amount are bigint with\n"
+        "  no unit column. bigint is right for millicores, bytes and devices;\n"
+        "  what is missing is the statement that those are what they count."
+    )
+
     print("\nApplication role:")
     print(f"  public: granted to {data['publicGrantRole']} in its migrations")
     if data["invHasProductionGrantPath"]:

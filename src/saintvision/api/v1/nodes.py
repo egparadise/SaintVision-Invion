@@ -18,10 +18,8 @@ from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from ...config import Settings
-from ...db.models import ResourceSnapshot
 from ...db.session import make_session_factory, tenant_scope
 from ...errors import VAL_SCHEMA, InvError
-from ...ids import new_id
 from ...identity.node_auth import authenticate_node
 from ...identity.principal import Principal
 from ...services import nodes as node_service
@@ -179,19 +177,20 @@ def post_heartbeat(
                     # Observations ride on the beat that won. Recording them for
                     # a stale beat would file utilisation under a timestamp the
                     # node has already moved past, and placement reads these.
-                    for observation in payload.observations:
-                        session.add(
-                            ResourceSnapshot(
-                                snapshot_id=new_id("snapshot"),
-                                observed_at=now,
-                                tenant_id=tenant_id,
-                                node_id=principal.node_id,
-                                capability_id=observation.capability_id,
-                                used_quantity=observation.used_quantity,
-                                unit=observation.unit,
+                    node_service.record_observations(
+                        session,
+                        tenant_id=tenant_id,
+                        node_id=principal.node_id,
+                        observations=[
+                            node_service.ObservationInput(
+                                capability_id=o.capability_id,
+                                used_quantity=o.used_quantity,
+                                unit=o.unit,
                             )
-                        )
-                    session.flush()
+                            for o in payload.observations
+                        ],
+                        now=now,
+                    )
                 result = {
                     "nodeId": outcome.node.node_id,
                     "applied": outcome.applied,
