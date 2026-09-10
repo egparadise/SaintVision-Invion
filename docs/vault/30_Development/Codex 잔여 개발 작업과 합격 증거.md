@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.8.0"
+version: "1.9.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T15:33:52+09:00"
+updated: "2026-09-10T17:11:46+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-10 Workspace bridge 후속: 편집 revision/동결 입력, 명시적 대체 Node, 제한 PTY/ticket, 고정 GitHub 원격 Git/2인 승인/불확실 dispatch 보존 코드를 추가했다. [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]과 [[2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정]]을 따른다. **사용자 지시로 실제 테스트는 미수행**이며 구현과 정적 build 전달 단계다. Codex의 즉시 다음 작업은 새 코드 전체 실제 회귀·DB/PTY/대체 Node/Git crash/CAS/권한 검증과 고정 SHA Evidence다. 독립 검토(Claude)·실제 API 화면/브라우저(Gemini), 대용량/장시간 PTY/다른 Git provider·Windows/GPU/BuildKit·Context/RO·물리 5대 인수는 남는다. 아래 과거 통과 수와 미구현 목록은 각 SHA 당시 기록이다.
 
 2026-09-10 containment 후속: `091b8e5`에서 tenant kill switch·Node drain·고정 내용/만료/nonce/별도 2인 승인·현재 operator/별도 resume 권한·전송 전 거부 정리·독립 취소 처리·주기 예약 정리를 구현했다. 전체 990개 및 전용 28개가 통과했다. [[2026-09-10_15-33-52_KST_NODE-CONTAINMENT_Codex_검증보고]], [[Codex kill switch와 Node drain 및 정리 계약]]을 따른다. 다음 Codex 범위는 editor/PTY/remote Git·Workspace Node 이전, Windows/GPU/BuildKit·Context/RO와 실제 5대 검증이다. Claude 독립 검토/provisioning/운영 및 Gemini 실제 화면 연결은 남는다. 아래 kill/drain 미구현 문구는 이전 SHA 기준 기록이다.
 
