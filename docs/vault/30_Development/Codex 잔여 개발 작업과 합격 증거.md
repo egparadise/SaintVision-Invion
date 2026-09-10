@@ -1,14 +1,19 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T03:51:59+09:00"
+updated: "2026-09-10T09:06:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+## 2026-09-10 실행 완료 후속
+
+현재 후속 정본은 [[Codex 실행 완료와 자원 회수 통합 계약]]이다. 실행 전 취소/등록 실패 회수, 실제 Node 출력/Evidence, 샤드 부모 완료·실패/취소 전파, 결과 확정 3회 재시도, writable checkout을 구현했다. 이하 기존 표의 출력/parent/파일 사본 미구현 문구는 과거 고정 SHA 기록이다. 실제 남은 것은 Node mount·새 Step 실행·PTY/Git, 최신 승인을 전제로 한 샤드 재실행, 다중 Node/collective, kill/drain·Windows/GPU/BuildKit·Context/RO·5대 운영 검증과 Claude/Gemini 업무 Adapter·화면 및 독립 검토다. PR #11에서 인계한다.
+
 
 현재 제품은 5대 PC의 자원을 내부망 웹에서 안전하게 사용하는 개발·실행 환경을 목표로 한다. 코드/CI가 존재하는 kernel과 제품 전체 합격을 구분한다. baseline registry v1.0.0의 48 task와 12 Outcome은 선행·실장비·독립 검토 조건 없이 done으로 올리지 않는다. 이 표는 미구현을 숨기거나 다음 세션에 작업 승인을 다시 받기 위한 목록이 아니다.
 
