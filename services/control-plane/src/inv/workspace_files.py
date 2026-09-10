@@ -124,23 +124,17 @@ def decode_snapshot(raw, workspace_id):
             raise ValueError()
         for path in paths:
             parts = path.split("/")
-            if any(
-                "/".join(parts[:n]) not in directory_names for n in range(1, len(parts))
-            ):
+            if any("/".join(parts[:n]) not in directory_names for n in range(1, len(parts))):
                 raise ValueError()
         return data, content
     except (ValueError, TypeError, KeyError, UnicodeError, RecursionError):
-        raise DomainError(
-            "VERIFY-0023", "Invalid immutable snapshot manifest", 422
-        ) from None
+        raise DomainError("VERIFY-0023", "Invalid immutable snapshot manifest", 422) from None
 
 
 class PrivateTree:
     def __init__(self, root):
         if sys.platform != "linux":
-            raise DomainError(
-                "STORE-0001", "Workspace handle provider requires Linux", 503
-            )
+            raise DomainError("STORE-0001", "Workspace handle provider requires Linux", 503)
         self.root = Path(root)
         if not self.root.is_absolute():
             raise ValueError("Explicit private Workspace root required")
@@ -163,9 +157,7 @@ class PrivateTree:
     @staticmethod
     def check(info, *, directory=False, device=None):
         if (
-            not (
-                stat.S_ISDIR(info.st_mode) if directory else stat.S_ISREG(info.st_mode)
-            )
+            not (stat.S_ISDIR(info.st_mode) if directory else stat.S_ISREG(info.st_mode))
             or info.st_uid != os.geteuid()
             or info.st_mode & 0o7077
             or (not directory and info.st_nlink != 1)
@@ -199,9 +191,7 @@ class PrivateTree:
                     path = prefix + name
                     portable_path(path)
                     if len(directories) + len(files) >= MAX_ENTRIES:
-                        raise DomainError(
-                            "STORE-0020", "Too many snapshot entries", 422
-                        )
+                        raise DomainError("STORE-0020", "Too many snapshot entries", 422)
                     info = os.stat(name, dir_fd=fd, follow_symlinks=False)
                     if stat.S_ISDIR(info.st_mode):
                         child = os.open(
@@ -210,9 +200,7 @@ class PrivateTree:
                             dir_fd=fd,
                         )
                         try:
-                            self.check(
-                                os.fstat(child), directory=True, device=self.identity[0]
-                            )
+                            self.check(os.fstat(child), directory=True, device=self.identity[0])
                             directories.append(path)
                             visit(child, path + "/")
                         finally:
@@ -235,9 +223,7 @@ class PrivateTree:
                                 opened.st_mtime_ns,
                                 opened.st_ctime_ns,
                             ) != (after.st_size, after.st_mtime_ns, after.st_ctime_ns):
-                                raise DomainError(
-                                    "STORE-0021", "Workspace changed during snapshot"
-                                )
+                                raise DomainError("STORE-0021", "Workspace changed during snapshot")
                         total += len(chunk)
                         files.append(
                             {
@@ -265,15 +251,17 @@ class PrivateTree:
 
 
 class RestoreGenerations(PrivateTree):
+    @staticmethod
+    def file_mode(file):
+        return 0o500 if file["executable"] else 0o400
+
     @contextmanager
     def parent(self, root_fd, path):
         parts = portable_path(path)
         fd = os.dup(root_fd)
         try:
             for part in parts[:-1]:
-                child = os.open(
-                    part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd
-                )
+                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
                 self.check(os.fstat(child), directory=True, device=self.identity[0])
                 os.close(fd)
                 fd = child
@@ -304,14 +292,10 @@ class RestoreGenerations(PrivateTree):
             raise DomainError("STORE-0022", "Committed restore generation is missing")
         staging = "stage-" + uuid4().hex
         os.mkdir(staging, 0o700, dir_fd=root_fd)
-        staged = os.open(
-            staging, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=root_fd
-        )
+        staged = os.open(staging, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=root_fd)
         try:
             os.mkdir("files", 0o700, dir_fd=staged)
-            files_fd = os.open(
-                "files", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=staged
-            )
+            files_fd = os.open("files", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=staged)
             try:
                 for path in data["directories"]:
                     with self.parent(files_fd, path) as (parent, name):
@@ -327,9 +311,7 @@ class RestoreGenerations(PrivateTree):
                         with os.fdopen(fd, "wb") as stream:
                             stream.write(contents[f["path"]])
                             stream.flush()
-                            os.fchmod(
-                                stream.fileno(), 0o500 if f["executable"] else 0o400
-                            )
+                            os.fchmod(stream.fileno(), self.file_mode(f))
                             os.fsync(stream.fileno())
                 for path in reversed(data["directories"]):
                     with self.parent(files_fd, path) as (parent, name):
@@ -373,22 +355,16 @@ class RestoreGenerations(PrivateTree):
     def _verify(self, fd, expected, data, contents):
         if set(os.listdir(fd)) != {"files", "receipt.json"}:
             raise DomainError("VERIFY-0023", "Unexpected restore metadata")
-        marker = os.open(
-            "receipt.json", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd
-        )
+        marker = os.open("receipt.json", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
         with os.fdopen(marker, "rb") as stream:
             self.check(os.fstat(stream.fileno()), device=self.identity[0])
             if stream.read(1025) != expected:
                 raise DomainError("IDEM-0001", "Restore generation identity differs")
-        files_fd = os.open(
-            "files", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd
-        )
+        files_fd = os.open("files", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
         try:
             self.check(os.fstat(files_fd), directory=True, device=self.identity[0])
             expected_dirs = set(data["directories"])
-            modes = {
-                f["path"]: 0o500 if f["executable"] else 0o400 for f in data["files"]
-            }
+            modes = {f["path"]: self.file_mode(f) for f in data["files"]}
             seen_dirs, seen_files = set(), set()
 
             def walk(current, prefix=""):
@@ -397,18 +373,14 @@ class RestoreGenerations(PrivateTree):
                     info = os.stat(name, dir_fd=current, follow_symlinks=False)
                     if stat.S_ISDIR(info.st_mode):
                         if path not in expected_dirs:
-                            raise DomainError(
-                                "VERIFY-0023", "Unexpected restore directory"
-                            )
+                            raise DomainError("VERIFY-0023", "Unexpected restore directory")
                         child = os.open(
                             name,
                             os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
                             dir_fd=current,
                         )
                         try:
-                            self.check(
-                                os.fstat(child), directory=True, device=self.identity[0]
-                            )
+                            self.check(os.fstat(child), directory=True, device=self.identity[0])
                             seen_dirs.add(path)
                             walk(child, path + "/")
                         finally:
@@ -425,13 +397,9 @@ class RestoreGenerations(PrivateTree):
                             info = os.fstat(stream.fileno())
                             self.check(info, device=self.identity[0])
                             if stat.S_IMODE(info.st_mode) != modes[path]:
-                                raise DomainError(
-                                    "VERIFY-0023", "Restored file permissions differ"
-                                )
+                                raise DomainError("VERIFY-0023", "Restored file permissions differ")
                             if stream.read(len(contents[path]) + 1) != contents[path]:
-                                raise DomainError(
-                                    "VERIFY-0023", "Restored bytes differ"
-                                )
+                                raise DomainError("VERIFY-0023", "Restored bytes differ")
                         seen_files.add(path)
 
             walk(files_fd)
@@ -439,3 +407,46 @@ class RestoreGenerations(PrivateTree):
                 raise DomainError("VERIFY-0023", "Restore generation is incomplete")
         finally:
             os.close(files_fd)
+
+
+class WorkingGenerations(RestoreGenerations):
+    """Service-owned writable checkout; immutable restore bytes stay separate.
+
+    Before DB publication, replay must still match initial bytes. After publication
+    only the pinned directory identity and immutable marker are checked: legitimate
+    edits must survive restart and must never be reset by replaying checkout.
+    """
+
+    @staticmethod
+    def file_mode(file):
+        return 0o700 if file["executable"] else 0o600
+
+    def inspect_committed(self, root_fd, generation, workspace_id, sha256, expected_identity=None):
+        if not re.fullmatch(r"generation-[0-9a-f]{32}", generation):
+            raise DomainError("SEC-0020", "Invalid working generation")
+        fd = os.open(generation, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=root_fd)
+        try:
+            info = os.fstat(fd)
+            self.check(info, directory=True, device=self.identity[0])
+            if set(os.listdir(fd)) != {"files", "receipt.json"}:
+                raise DomainError("VERIFY-0023", "Working generation metadata differs")
+            marker = os.open("receipt.json", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
+            with os.fdopen(marker, "rb") as stream:
+                marker_info = os.fstat(stream.fileno())
+                self.check(marker_info, device=self.identity[0])
+                if marker_info.st_mode & 0o222 or stream.read(1025) != canonical(
+                    {"sha256": sha256, "workspaceId": workspace_id}
+                ):
+                    raise DomainError("VERIFY-0023", "Working generation marker differs")
+            files = os.open("files", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+            try:
+                files_info = os.fstat(files)
+                self.check(files_info, directory=True, device=self.identity[0])
+                identity = [*self.identity, info.st_ino, files_info.st_ino]
+                if expected_identity is not None and identity != expected_identity:
+                    raise DomainError("STORE-0022", "Committed working generation was replaced")
+                return identity
+            finally:
+                os.close(files)
+        finally:
+            os.close(fd)

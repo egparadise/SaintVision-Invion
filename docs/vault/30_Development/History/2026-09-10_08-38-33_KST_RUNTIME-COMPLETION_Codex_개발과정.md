@@ -39,3 +39,7 @@ GUIDE·역할·Git 운영·agent-delivery·core-reliability v1.0.0, ADR v1.10.0 
 2차 결과: worker의 `outputRoot` 설정이 있으면 실제 출력 hash·bounded JSON·성공 exit를 검증하고 object→Evidence→Run succeeded로 확정한다. 인증된 현재 epoch의 receipt가 만료 전에 고정한 동일 출력만 사후 publish 가능하다. 작업 재실행 없이 결과 확정만 3회 재시도하며, 실패 물리 receipt는 Run failed에 자동 반영한다. 이는 프로세스 출력 검증이며 모델 품질·SLO 합격을 뜻하지 않는다. Windows 로컬 364 passed / 444 skipped, Linux 후속 CI 대기.
 
 3차 구현: 신규 샤드 계획에 실행 자원을 갖지 않는 부모 Run을 생성한다. 모든 child의 현재 attempt 결과와 저장 바이트를 재검증한 뒤, 순서가 고정된 manifest와 실제 결정 ID/policy version `shard-completion:v1`을 보존하고 부모 Evidence·succeeded를 함께 커밋한다. DB는 부모의 직접 tool claim/lease와 aggregate Evidence 없는 성공을 차단한다. 한 child 실패 시 부모 failed와 남은 child 취소를 자동 반영한다. 브라우저 부모 취소도 모든 child의 취소/자원 반환 대기를 표시한다. 부모 확정 직전 CP 재시작은 idle worker가 재조정하며, 명령을 재실행하지 않는다. 수치 reducer와 MPI/NCCL은 포함하지 않는다.
+
+2차 CI `1de376d1da8a9811504a668e316f39693fb9fe7c`: Core 34418862634, Python 808 passed / 0 failed / 0 skipped. Backend 34418862657와 Documentation 34418862645 통과. 3차 CI `d1e1246eb817f985dc18a58918973007a6328a19`: Core 34419166305, Python 812 passed / 0 failed / 0 skipped. 실제 Node 출력과 부모/취소/재시작 시험을 포함한다.
+
+4차 구현: private writable checkout과 immutable receipt, source Step 위치 및 filesystem inode를 연결했다. 정상/동시 replay·DB commit 실패·dirty 미커밋 거부·취소·directory 교체 시험을 추가했다. 이 단계는 파일/재개 위치 준비이며 Node mount·PTY/Git 프로세스는 남아 있다. 계약과 실제 잔여 범위는 [[Codex 실행 완료와 자원 회수 통합 계약]]에 명시했다.

@@ -58,6 +58,14 @@ jobs:
           echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"
           echo "INV_RUN_NODE_TESTS=1" >> "$GITHUB_ENV"
       - run: python -m pytest --junitxml=dist/core-tests.xml
+      - name: Require executed integration evidence
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/core-tests.xml').getroot()
+          assert root.findall('.//testcase'), 'No test evidence'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every collected test must run and pass'
+          PY
       - run: python -m build services/control-plane --outdir dist
       - run: go test ./...
         working-directory: packages/contracts-go

@@ -74,3 +74,5 @@ ADR-034(제한된 local object publication·checkpoint pin·GC 중단 복구)은
 ADR-035(미검증 공지·mTLS 실측 snapshot·명시적 content 전송·독립 샤드 원자 admission)은 [[Codex 저장 복원과 Node 실행 후속 계약]]을 따른다. collective 통신/GPU 및 peer 업무 앱 연결 완료를 의미하지 않는다.
 
 ADR-036(실행 attempt·fenced output commitment·receipt 후 Evidence 원자 확정), ADR-037(실제 Workspace snapshot과 새 generation 복원), ADR-038(샤드 결과 manifest·권한 있는 전체 취소·실패 반영), ADR-039(실측 CPU/RAM 배치·Explain/Lease와 project 상한 잠금)은 [[Codex 결과 확정과 Workspace 복구 및 배치 계약]]을 따른다. 업무 verifier/출력 수집·live Workspace/PTY·parent/collective·pool locality·운영 장비 연결과 독립 review는 별도다.
+
+ADR-040(미발급 예약 회수·Node 미수신 취소 tombstone), ADR-041(실제 bounded 출력·정지 후보 보존), ADR-042(receipt 기반 결과 재시도와 샤드 부모 완료), ADR-043(writable checkout·변경 파일 보존)은 [[Codex 실행 완료와 자원 회수 통합 계약]]을 따른다. Node mount·PTY/Git·샤드 재실행/collective·실장비 및 독립 reviewer 인수는 별도다.
