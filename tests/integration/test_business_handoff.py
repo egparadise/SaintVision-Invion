@@ -225,6 +225,20 @@ def test_same_tenant_other_project_and_other_lock_owner_are_denied(business):
         )
     assert a.http.get(a.binding_url, headers=a.headers("stranger")).status_code == 200
     assert release(a, "stranger").status_code == 403
+    current = a.http.get(
+        f"/v1/projects/{a.e.project}/permission", headers=a.headers("stranger")
+    ).json()
+    assert current["canRequest"] and not current["canApprove"]
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "UPDATE public.project_members SET role_code='approver' WHERE user_id=%s",
+            (a.users["requester"],),
+        )
+    # Having a different permission on each side gives no effective permission.
+    assert a.http.get("/v1/projects", headers=a.headers()).json()["items"] == []
+    assert (
+        a.http.get(f"/v1/projects/{a.e.project}/permission", headers=a.headers()).status_code == 403
+    )
 
 
 def test_current_public_scope_is_required_even_with_matching_tenant(business):

@@ -317,14 +317,14 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
         from .business_auth import permission
 
         with database.transaction(identity.principal.tenant_id) as conn:
-            control.grant(conn, identity.principal, project)
+            effective = control.grant(conn, identity.principal, project)
             value = permission(conn, project, identity.principal.subject_id, linked=True)
             return {
                 "projectId": project,
                 "userId": value["userId"],
                 "roleCode": value["roleCode"],
-                "canRequest": value["can_request"],
-                "canApprove": value["can_approve"],
+                "canRequest": effective["can_request"],
+                "canApprove": effective["can_approve"],
             }
 
     @api.post("/v1/workspaces/{workspace_id}/edit-lock", status_code=201)

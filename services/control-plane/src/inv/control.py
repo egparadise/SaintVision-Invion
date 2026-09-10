@@ -17,6 +17,7 @@ class Control:
 
     def grant(self, conn, principal, project, permission=None):
         from .business_auth import permission as business_permission
+
         validate_contract("ProjectId", project)
         row = conn.execute(
             "SELECT * FROM inv.project_grants WHERE project_id=%s AND subject_id=%s FOR SHARE",
@@ -29,7 +30,14 @@ class Control:
             or (permission and not row[permission])
         ):
             raise DomainError("AUTH-0030", "Project permission is unavailable", 403)
-        business_permission(conn, project, principal.subject_id, permission)
+        business = business_permission(conn, project, principal.subject_id, permission)
+        effective = {
+            name: bool(row[name] and (business is None or business[name]))
+            for name in ("can_request", "can_approve")
+        }
+        if not any(effective.values()):
+            raise DomainError("AUTH-0030", "Project permission is unavailable", 403)
+        return effective
 
     def projects(self, principal):
         with self.db.transaction(principal.tenant_id) as conn:
