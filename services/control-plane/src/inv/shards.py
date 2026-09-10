@@ -6,6 +6,7 @@ There is no all-start-at-once promise; delivery may be uncertain on any Node.
 """
 
 from contextlib import contextmanager
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass
 from uuid import UUID
@@ -136,6 +137,10 @@ class ShardRuntime:
             for s in shards
         ):
             raise DomainError("AUTH-0011", "Shard scope differs", 403)
+        if isinstance(signing_key, Mapping) and any(
+            signing_key.get(s.node.node_id) is None for s in shards
+        ):
+            raise DomainError("VAL-0003", "Every shard Node requires a signing key", 422)
         material = {
             "communication": "none",
             "epoch": self.db.recovery_epoch,
@@ -216,7 +221,11 @@ class ShardRuntime:
                     s.proofs,
                     policy=s.policy,
                     runtime=s.runtime,
-                    queue_signing_key=signing_key,
+                    queue_signing_key=(
+                        signing_key[s.node.node_id]
+                        if isinstance(signing_key, Mapping)
+                        else signing_key
+                    ),
                 )
                 conn.execute(
                     "INSERT INTO inv.shard_commands VALUES(%s,%s,%s,%s,%s,%s,%s)",
@@ -248,6 +257,10 @@ class ShardRuntime:
             ).fetchone()
             if not plan:
                 raise DomainError("RES-0004", "Shard plan not found", 404)
+            lineage = conn.execute(
+                "SELECT source_plan_id,root_plan_id,generation FROM inv.shard_recoveries WHERE project_id=%s AND plan_id=%s",
+                (project, plan_id),
+            ).fetchone()
             parent = conn.execute(
                 "SELECT r.run_id,r.state,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
                 (project, plan_id),
@@ -287,6 +300,9 @@ class ShardRuntime:
             )
             return {
                 "planId": plan_id,
+                "sourcePlanId": lineage["source_plan_id"] if lineage else None,
+                "rootPlanId": lineage["root_plan_id"] if lineage else plan_id,
+                "generation": lineage["generation"] if lineage else 1,
                 "parentRunId": parent["run_id"] if parent else None,
                 "parentState": parent["state"] if parent else None,
                 "aggregateManifestSha256": parent["manifest_hash"] if parent else None,

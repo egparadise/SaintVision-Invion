@@ -364,6 +364,9 @@ class ApprovalStore:
                 {"approval": approval_id, "actionDigest": action_hash},
             )
             run, row = self._locked(conn, approval_id, project_id)
+            from .shard_recovery import require_recovery_admission
+
+            require_recovery_admission(conn, self.db, run["run_id"])
             voters = conn.execute(
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
                 (approval_id,),

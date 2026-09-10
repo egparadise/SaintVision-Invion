@@ -12,6 +12,7 @@ class BoundDatabase:
 
     def __init__(self, db, tenant, conn):
         self.recovery_epoch, self.tenant, self.conn = db.recovery_epoch, tenant, conn
+        self.shard_recovery_admission = getattr(db, "shard_recovery_admission", False)
 
     @contextmanager
     def transaction(self, tenant):

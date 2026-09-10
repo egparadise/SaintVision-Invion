@@ -487,3 +487,40 @@ type WorkspaceEnqueueResult struct {
     CommandId string `json:"commandId"`
     Accepted bool `json:"accepted"`
 }
+
+type ShardPlanId string
+
+type ShardReplacementIntent struct {
+    NodeId NodeId `json:"nodeId"`
+    Workload WorkloadSpec `json:"workload"`
+}
+
+type ShardRecoveryPrepareInput struct {
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    PlanId ShardPlanId `json:"planId"`
+    Intents []ShardReplacementIntent `json:"intents"`
+}
+
+type ShardRecoveryPreparedMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    Approval ApprovalView `json:"approval"`
+}
+
+type ShardRecoveryPrepared struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    Generation int64 `json:"generation"`
+    Shards []ShardRecoveryPreparedMember `json:"shards"`
+}
+
+type ShardRecoveryEnqueued struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    RootPlanId ShardPlanId `json:"rootPlanId"`
+    Generation int64 `json:"generation"`
+    Queued int64 `json:"queued"`
+    Replayed bool `json:"replayed"`
+    ParentRunId RunId `json:"parentRunId"`
+}

@@ -71,6 +71,8 @@ jobs:
           grep -q 'Explicit Control Plane identity/database/Workspace configuration unavailable' dist/api-unconfigured.log
       - name: Verify Workspace recovery boundary first
         run: python -m pytest tests/integration/test_workspace_resume.py tests/integration/test_workspace_api.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45
+      - name: Verify bounded shard replacement on two real Nodes
+        run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
       - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45
       - name: Require executed integration evidence
         run: |

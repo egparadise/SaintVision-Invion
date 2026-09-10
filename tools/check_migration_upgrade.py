@@ -14,7 +14,11 @@ from sqlalchemy.engine import URL
 def main():
     admin = os.environ["INV_TEST_ADMIN_DSN"]
     root = Path(__file__).resolve().parents[1]
-    for prior in ("0018_workspace_resume", "0010_canonical_resource_units"):
+    for prior in (
+        "0018_workspace_resume",
+        "0010_canonical_resource_units",
+        "0019_workspace_api_integration",
+    ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
@@ -40,7 +44,7 @@ def main():
                     raise RuntimeError("Migration path failed: " + prior + " -> " + target)
             with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
                 assert conn.execute("SELECT version_num FROM alembic_version").fetchall() == [
-                    ("0019_workspace_api_integration",)
+                    ("0020_shard_recovery",)
                 ]
                 assert conn.execute(
                     "SELECT rolsuper,rolcanlogin,rolbypassrls FROM pg_roles WHERE rolname='inv_kernel'"

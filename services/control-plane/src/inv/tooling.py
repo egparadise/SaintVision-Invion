@@ -113,6 +113,9 @@ class ToolGateway:
         )
         with self.db.transaction(node.tenant_id) as conn:
             run = lock_run(conn, command["runId"], command["projectId"])
+            from .shard_recovery import require_recovery_admission
+
+            require_recovery_admission(conn, self.db, run["run_id"])
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),
