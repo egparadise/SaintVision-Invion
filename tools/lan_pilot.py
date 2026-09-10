@@ -84,6 +84,14 @@ def tls(path):
     return dict(ca_file=str(path/'ca.pem'), certificate_file=str(path/'control-cert.pem'), key_file=str(path/'control-key.pem'), timeout=5)
 
 
+def provision_observation_node(conn, state):
+    conn.execute('INSERT INTO inv.tenants VALUES(%s,%s) ON CONFLICT DO NOTHING',(state['tenantId'],'two-PC connection pilot'))
+    conn.execute("INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'offline',%s) ON CONFLICT DO NOTHING",(state['tenantId'],state['nodeId'],state['epoch']))
+    # The tenant insert trigger creates a row with false. Pin the gate before
+    # committing the new pilot; never leave its execution authority implicit.
+    conn.execute('INSERT INTO inv.tenant_controls(tenant_id,kill_switch) VALUES(%s,true) ON CONFLICT(tenant_id) DO UPDATE SET kill_switch=true,version=inv.tenant_controls.version+1,updated_at=clock_timestamp()',(state['tenantId'],))
+
+
 def init(args):
     path = args.state
     for value in (args.server_ip, args.node_ip):
@@ -147,9 +155,7 @@ def init(args):
         if prior and str(prior[0]) != state['epoch']:
             raise ValueError('Recovery epoch differs; refusing reset')
         conn.execute('INSERT INTO inv.control_epoch VALUES(true,%s) ON CONFLICT DO NOTHING',(state['epoch'],))
-        conn.execute('INSERT INTO inv.tenants VALUES(%s,%s) ON CONFLICT DO NOTHING',(state['tenantId'],'two-PC connection pilot'))
-        conn.execute("INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'offline',%s) ON CONFLICT DO NOTHING",(state['tenantId'],state['nodeId'],state['epoch']))
-        conn.execute('INSERT INTO inv.tenant_controls(tenant_id,kill_switch) VALUES(%s,true) ON CONFLICT DO NOTHING',(state['tenantId'],))
+        provision_observation_node(conn,state)
     if not (path/'ca.pem').exists():
         ca_key, ca_cert = ca_pair()
         control_key, signing_key = Ed25519PrivateKey.generate(), Ed25519PrivateKey.generate()
@@ -163,6 +169,8 @@ def init(args):
         write(path/'peer-policy.json',json.dumps(policy,indent=2))
     with runtime(state).transaction(state['tenantId']) as conn:
         conn.execute('SELECT node_id FROM inv.node_resource_snapshots LIMIT 0')
+        if not conn.execute('SELECT kill_switch FROM inv.tenant_controls').fetchone()['kill_switch']:
+            raise ValueError('Observation-only execution gate was not persisted')
     state['initialized'] = True
     save(path,state)
     print(json.dumps(dict(database='ready',scope='observation-only',nodeId=state['nodeId'],node='offline-awaiting-CSR',workloadExecution='disabled')))
