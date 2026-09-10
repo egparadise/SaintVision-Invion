@@ -200,6 +200,26 @@ func (r *Runner) Recover(ctx context.Context) ([]Result, error) {
 	}
 	return results, nil
 }
+
+// Retry only observation, within the existing cleanup deadline. A timed-out
+// create may still become visible; absence never authorizes another create/start.
+// Ownership/invalid-response failures remain immediate and cannot prove a stop.
+func (r *Runner) observeCleanup(ctx context.Context, identity string, record Record) (State, error) {
+	for attempt := 0; ; attempt++ {
+		state, err := r.engine.Inspect(ctx, identity, record)
+		if err == nil || attempt == 2 || (!errors.Is(err, ErrAbsent) && !errors.Is(err, ErrEngineUnavailable)) {
+			return state, err
+		}
+		timer := time.NewTimer(50 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return State{}, ctx.Err()
+		case <-timer.C:
+		}
+	}
+}
+
 func (r *Runner) reconcile(record Record, why string) (Result, error) {
 	if record.NeverStarted {
 		claim := record.Claim
@@ -221,7 +241,7 @@ func (r *Runner) reconcile(record Record, why string) (Result, error) {
 	// absent container does not prove the original create/start had no effect.
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
-	state, err := r.engine.Inspect(ctx, record.Name, record)
+	state, err := r.observeCleanup(ctx, record.Name, record)
 	if err != nil {
 		if errors.Is(err, ErrAbsent) {
 			prior, loadErr := r.journal.Prepared(record)
@@ -231,7 +251,7 @@ func (r *Runner) reconcile(record Record, why string) (Result, error) {
 			if prior != nil {
 				// An absent name alone is insufficient. The confirmed stopped ID
 				// must also be absent, fencing every delayed start for that ID.
-				_, idErr := r.engine.Inspect(ctx, prior.ContainerId, record)
+				_, idErr := r.observeCleanup(ctx, prior.ContainerId, record)
 				if errors.Is(idErr, ErrAbsent) {
 					if err := r.journal.Save(*prior); err != nil {
 						return Result{}, err
@@ -247,7 +267,7 @@ func (r *Runner) reconcile(record Record, why string) (Result, error) {
 		ticker := time.NewTicker(50 * time.Millisecond)
 		defer ticker.Stop()
 		for {
-			state, err = r.engine.Inspect(ctx, record.Name, record)
+			state, err = r.observeCleanup(ctx, record.Name, record)
 			if err != nil {
 				return Result{}, errors.New("NODE-0027: stop not verified")
 			}

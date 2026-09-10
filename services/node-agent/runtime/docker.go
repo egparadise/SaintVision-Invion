@@ -23,6 +23,7 @@ import (
 )
 
 var ErrAbsent = errors.New("NODE-0020: container not found; execution remains uncertain")
+var ErrEngineUnavailable = errors.New("NODE-0022: engine unavailable")
 var hexID = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
 type State struct {
@@ -68,13 +69,16 @@ func (d *Docker) request(ctx context.Context, method, path string, body any, out
 	req.Header.Set("Content-Type", "application/json")
 	response, err := d.client.Do(req)
 	if err != nil {
-		return errors.New("NODE-0022: engine unavailable")
+		return ErrEngineUnavailable
 	}
 	defer response.Body.Close()
 	if response.StatusCode == 404 {
 		return ErrAbsent
 	}
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		if response.StatusCode >= 500 {
+			return fmt.Errorf("%w: status %d", ErrEngineUnavailable, response.StatusCode)
+		}
 		return fmt.Errorf("NODE-0022: engine status %d", response.StatusCode)
 	}
 	if out == nil {
