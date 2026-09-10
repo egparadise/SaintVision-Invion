@@ -244,6 +244,6 @@ def test_unapproved_enqueue_is_not_dispatched(workspace_http):
     a = workspace_http
     prepare(a)
     response = enqueue(a)
-    assert response.status_code == 409, response.text
+    assert response.status_code == 403, response.text
     assert active(a) == 0 and count(a, "execution_deliveries") == 1
     assert count(a, "approval_dispatches") == 1

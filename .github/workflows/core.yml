@@ -39,6 +39,8 @@ jobs:
         run: |
           python tools/generate_contracts.py
           git diff --exit-code -- services/control-plane/src/inv/generated packages/contracts-ts packages/contracts-go services/node-agent/internal/wire/core.schema.json
+      - name: Upgrade each published migration head
+        run: python tools/check_migration_upgrade.py
       - name: Test Linux Node concurrency and crash boundaries
         working-directory: services/node-agent
         run: |
@@ -58,6 +60,15 @@ jobs:
           echo "INV_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-node-test:$GITHUB_SHA")" >> "$GITHUB_ENV"
           echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"
           echo "INV_RUN_NODE_TESTS=1" >> "$GITHUB_ENV"
+      - name: Build production API image and require explicit configuration
+        run: |
+          docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
+          test "$(docker image inspect --format '{{.Config.User}}' "inv-api-test:$GITHUB_SHA")" = '65532:65532'
+          if docker run --rm --network=none --read-only "inv-api-test:$GITHUB_SHA" > dist/api-unconfigured.log 2>&1; then
+            echo 'Unconfigured production API must not start'
+            exit 1
+          fi
+          grep -q 'Explicit Control Plane identity/database/Workspace configuration unavailable' dist/api-unconfigured.log
       - name: Verify Workspace recovery boundary first
         run: python -m pytest tests/integration/test_workspace_resume.py tests/integration/test_workspace_api.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45
       - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45

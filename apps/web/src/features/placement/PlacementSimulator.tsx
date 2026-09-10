@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { NodeItem, PlacementRequirement, PlacementEvaluationResult } from '@/contracts/types';
+import { NodeItem, PlacementRequirement, PlacementExplainResult } from '@/contracts/types';
 import { apiClient } from '@/shared/api/client';
 import { evaluatePlacement } from './placementEngine';
 import { ResourceTopologyGraph } from './ResourceTopologyGraph';
@@ -139,7 +139,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
   }, [requirement, fencedNodeIds, selectedPoolId]);
 
   const activePool = pools.find((p) => p.id === selectedPoolId) || pools[0];
-  const explainResult: PlacementEvaluationResult = localExplainResult;
+  const explainResult: PlacementExplainResult = localExplainResult;
 
   return (
     <div>

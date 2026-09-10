@@ -21,7 +21,7 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
-import { apiClient, getAuthToken, clearAuthToken } from '@/shared/api/client';
+import { apiClient } from '@/shared/api/client';
 
 // Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -240,7 +240,7 @@ export const App: React.FC = () => {
   const [approvals, setApprovals] = useState<ApprovalItem[]>([DEMO_APPROVAL]);
   const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
-  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
+  const [, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
   const fetchRuns = () => {
     apiClient<{ items: RunItem[] }>('/v1/runs')
@@ -346,7 +346,7 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleReject = async (approvalId: string, reason: string) => {
+  const handleReject = async (approvalId: string, _reason: string) => {
     setApprovals((prev) =>
       prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
     );
