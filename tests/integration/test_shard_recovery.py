@@ -13,6 +13,8 @@ from inv.dispatch import DeliveryWorker
 from inv.errors import DomainError
 from inv.ids import new_id
 from inv.node_channels import node_uri, provision_channel
+from inv.node_transport import NodeTLSClient
+from inv.observation import NodeObservation
 from inv.shard_recovery import ShardRecovery
 from inv.shards import ShardRuntime
 from inv.tooling import NodePrincipal
@@ -444,3 +446,50 @@ def test_failed_parent_recovery_can_run_both_shards_on_replacement_node(pair, st
     assert a.e.runs.get(a.e.tenant, replacement["parentRunId"])["state"] == "succeeded"
     assert a.e.runs.get(a.e.tenant, old["parentRunId"])["state"] == "failed"
     assert len(list((b.path / "state").glob("*.receipt"))) == 2 and active(a) == 0
+
+
+@pytest.mark.parametrize("supersessions", [1, 3])
+def test_node_observation_retries_with_fresh_nonces_and_a_hard_bound(
+    pair, monkeypatch, supersessions
+):
+    a, _ = pair
+    target = a.recovery.targets[a.e.node]
+    probe = a.client.probe
+    independent = NodeObservation(a.e.db, NodeTLSClient(**a.client_files))
+    nonces = []
+
+    def overtake(proof, request):
+        nonces.append(request["nonce"])
+        response = probe(proof, request)
+        if len(nonces) <= supersessions:
+            independent.poll(a.node)  # Commit a genuinely newer authenticated probe.
+        return response
+
+    monkeypatch.setattr(a.client, "probe", overtake)
+    if supersessions == 3:
+        with pytest.raises(DomainError, match="NODE-0050") as failure:
+            target.observe()
+        assert failure.value.retryable and failure.value.status == 409
+        assert len(nonces) == 3
+    else:
+        assert target.observe().node_id == a.e.node
+        assert len(nonces) == 2
+    assert len(nonces) == len(set(nonces)) and active(a) == 0
+
+
+def test_probe_scope_failure_is_not_retried(pair, monkeypatch):
+    a, _ = pair
+    probe = a.client.probe
+    calls = []
+
+    def wrong_epoch(proof, request):
+        calls.append(request["nonce"])
+        response = probe(proof, request)
+        response["recoveryEpoch"] = str(uuid4())
+        return response
+
+    monkeypatch.setattr(a.client, "probe", wrong_epoch)
+    with pytest.raises(DomainError, match="NODE-0050") as failure:
+        a.recovery.targets[a.e.node].observe()
+    assert failure.value.status == 403 and not failure.value.retryable
+    assert len(calls) == 1 and active(a) == 0
