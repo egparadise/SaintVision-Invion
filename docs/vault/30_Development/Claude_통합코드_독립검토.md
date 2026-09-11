@@ -94,3 +94,47 @@ CI는 계정 제한으로 실행되지 않았고 지시대로 그대로 뒀습�
 - **원격 실행은 아직 검증되지 않았습니다.** 192.168.45.225는 관측 전용입니다. 여기 어떤 것도 원격 실행이 동작함을 보이지 않습니다.
 - **복원 리허설·부하 시험 미수행.**
 - 작성자와 검토자가 분리되어야 하므로 **이 문서는 승인이 아닙니다.** Codex의 독립 검토가 필요합니다 — 특히 0028·0029 definer 함수 두 개와 `check_migration_upgrade` 수정.
+
+---
+
+## 6. 2차 검토 — `agent/codex/result-observation` (`c9dea3f`)
+
+### 긴급: 제 수정 전 초안이 그대로 실려 있습니다 — **tenant 간 정보 유출**
+
+그 브랜치의 `migrations/versions/0026_subject_kernel_link.py`는 **제 미수정 초안**입니다. `current_setting('inv.tenant_id')` 바인딩이 없습니다.
+
+SECURITY DEFINER 함수는 소유자로 실행되어 **RLS를 우회**하므로, 호출자가 `p_tenant_id`에 아무 tenant나 넣으면 **다른 tenant의 사용자가 승인 주체로 등록돼 있는지** 알 수 있습니다.
+
+읽어서 주장하는 대신 **실제로 재현했습니다**:
+
+```
+session tenant : A
+asked about    : tenant B's user
+  their 0026 -> True    <-- reads across tenants
+  fixed 0028 -> False   <-- bound to the session scope
+```
+
+**제 버그를 Codex가 물려받은 것**이고, 지금 통합을 향해 가고 있습니다. 수정본은 제 `0028_subject_kernel_link`에 있습니다 — 차이는 한 줄입니다:
+
+```sql
+AND p_tenant_id = nullif(pg_catalog.current_setting('inv.tenant_id', true), '')::uuid
+```
+
+같은 이유로 신규 `run_committed_outputs`(0029)와 `apply_resource_offer`(0030)도 처음부터 바인딩해 두었습니다. **0030은 쓰기 경로**라 더 중요합니다.
+
+### 확인한 사항
+
+`result_view.py`(275줄)와 `test_business_results.py`(397줄)는 제 `results.py` 위에 커널 쪽 정본 view를 얹은 것으로 보입니다. 두 구현이 같은 개념을 다루므로 **어느 쪽이 정본인지 정해야 합니다** — 제 쪽은 `public` 권한 검사와 "없는 값은 null+reason", 그쪽은 커널 기록입니다. 중복은 이번이 세 번째이고(handoff, binding에 이어), 매번 Codex 쪽이 커널 기록에 더 가까웠습니다.
+
+---
+
+## 7. 자원 제공량 연결 (신규)
+
+**`public.resource_offers`와 `inv.resources.offered`가 연결돼 있지 않았습니다.** 커널은 lease를 주기 전에 `inv.resources.offered`를 검사하고, 제 설정 API는 `public.resource_offers`를 씁니다. 즉 **운영자가 화면에서 제공량을 낮춰도 스케줄러가 읽지 않는 숫자만 바뀌고**, 기계는 주인이 방금 그만 받으라고 한 일을 계속 받았습니다.
+
+migration 0030이 커널 자신의 규칙으로 적용합니다:
+
+- `offered <= capacity` — 커널이 **관측한** 용량을 넘을 수 없습니다(제 쪽 capability 검사와는 다른 사실이고, 둘 다 성립해야 합니다).
+- `offered >= 반납되지 않은 lease 합` — **커널의 규칙이고 제가 문서에 쓴 것보다 엄격합니다.** 저는 "낮춘 제공량은 새 예약에만 적용되고 진행 중 작업은 반납까지 돈다"고 썼는데, 커널은 **아예 거부**합니다. 주인이 이제 허용하지 않는 양을 계속 붙들고 있지 않겠다는 것이고, 그쪽이 맞습니다. 문구를 고쳤습니다.
+
+커널이 **관측한 적 없는 노드**는 거부가 아니라 보고입니다 — 실행용으로 등록되지 않은 기계에 주인이 의사를 기록하는 것은 정상 상태입니다.

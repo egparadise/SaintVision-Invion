@@ -467,3 +467,167 @@ def test_a_workspace_reaches_deleted_only_through_deleting(app_sessionmaker, org
                     acting_user_id=org["owner"], now=NOW,
                 )
     assert deleted.deleted_at is not None
+
+
+# --------------------------------------------------------------------------
+# An offer only means something if the thing that grants leases reads it
+# --------------------------------------------------------------------------
+
+
+def _observe(owner_engine, org, *, kind="memory", capacity=64 * GIB):
+    """What the kernel's own probes would have recorded on this node."""
+    resource_id = new_id("run").replace("run_", "res_")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO inv.tenants (tenant_id, name) VALUES (:t, 'o') "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.nodes (tenant_id, node_id, status, heartbeat_at, "
+                "recovery_epoch, clock_skew_seconds) VALUES (:t, :n, 'online', "
+                "clock_timestamp(), gen_random_uuid(), 0) ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"], "n": org["node_id"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.resources (tenant_id, resource_id, node_id, kind, "
+                "capacity, offered) VALUES (:t, :r, :n, :k, :cap, 0)"
+            ),
+            {"t": org["tenant_a"], "r": resource_id, "n": org["node_id"],
+             "k": kind, "cap": capacity},
+        )
+    return resource_id
+
+
+def test_an_offer_reaches_what_the_kernel_grants_leases_against(
+    app_sessionmaker, owner_engine, org
+):
+    """Until this, a lowered offer changed a number no scheduler read.
+
+    The machine kept accepting the work its owner had just said it should stop
+    taking, and nothing anywhere reported a disagreement.
+    """
+    resource_id = _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                body = settings_service.set_resource_offer(
+                    session, tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=24, unit="GiB", now=NOW,
+                )
+    assert body["appliedToKernel"] is True
+    assert body["kernelResourceId"] == resource_id
+    with owner_engine.connect() as c:
+        offered = c.execute(
+            text("SELECT offered FROM inv.resources WHERE resource_id = :r"),
+            {"r": resource_id},
+        ).scalar_one()
+    assert offered == 24 * GIB
+
+
+def test_an_offer_below_what_is_already_leased_is_refused(
+    app_sessionmaker, owner_engine, org
+):
+    """The kernel's rule, and it is stricter than "a ceiling for future work".
+
+    Accepting it would leave the kernel holding more than the owner now permits.
+    """
+    resource_id = _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                settings_service.set_resource_offer(
+                    session, tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=48, unit="GiB", now=NOW,
+                )
+    # Something is running against it.
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO inv.projects (tenant_id, project_id) VALUES (:t, :p) "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"], "p": org["project_id"]},
+        )
+        run_id = new_id("run")
+        c.execute(
+            text(
+                "INSERT INTO inv.runs (tenant_id, project_id, run_id) "
+                "VALUES (:t, :p, :r)"
+            ),
+            {"t": org["tenant_a"], "p": org["project_id"], "r": run_id},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.resource_leases (tenant_id, project_id, run_id, "
+                "resource_id, lease_id, amount, recovery_epoch, expires_at) "
+                "VALUES (:t, :p, :r, :res, :l, :a, gen_random_uuid(), "
+                "clock_timestamp() + interval '1 hour')"
+            ),
+            {"t": org["tenant_a"], "p": org["project_id"], "r": run_id,
+             "res": resource_id, "l": new_id("run").replace("run_", "lse_"),
+             "a": 32 * GIB},
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                with pytest.raises(InvError, match="already leased exceeds"):
+                    settings_service.set_resource_offer(
+                        session, tenant_id=org["tenant_a"],
+                        capability_id=org["ram_capability"],
+                        offered_quantity=8, unit="GiB",
+                        now=NOW + dt.timedelta(minutes=1),
+                    )
+
+
+def test_an_unobserved_node_is_reported_not_refused(app_sessionmaker, org):
+    """A machine the kernel has never measured is a normal state.
+
+    An owner recording what they intend to offer on a node that is not enrolled
+    for execution yet should not be blocked by that.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                body = settings_service.set_resource_offer(
+                    session, tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=16, unit="GiB", now=NOW,
+                )
+    assert body["appliedToKernel"] is False
+    assert "has not observed" in body["kernelReason"]
+    assert body["offeredQuantity"] == 16 * GIB
+
+
+def test_applying_an_offer_is_bound_to_the_session_tenant(
+    app_sessionmaker, owner_engine, org, two_tenants
+):
+    """A definer function bypasses RLS, and this one writes.
+
+    Revision 0027 had to correct exactly this shape on a read path; repeating it
+    where the function changes what can be spent would be worse.
+    """
+    _, tenant_b = two_tenants
+    _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                applied, reason, _, _ = session.execute(
+                    text(
+                        "SELECT applied, reason, kernel_resource_id, "
+                        "kernel_capacity FROM "
+                        "public.apply_resource_offer(:t, CAST(:n AS char(30)), "
+                        "'ram', 1)"
+                    ),
+                    {"t": str(tenant_b), "n": org["node_id"]},
+                ).one()
+    assert applied is False
+    assert reason == "tenant scope mismatch"
