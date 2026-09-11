@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 from types import SimpleNamespace
 from uuid import UUID, uuid4
+import time
 
 import psycopg
 from psycopg import sql
@@ -306,3 +307,85 @@ def test_late_business_history_failure_rolls_back_kernel_change(offers):
         assert c.execute(
             "SELECT count(*) FROM public.resource_offers WHERE capability_id=%s", (a.cap,)
         ).fetchone() == (0,)
+
+
+def test_release_during_actual_offer_keeps_recorded_and_applied_totals_equal(offers):
+    """The real release must wait for the real offer, preserving its snapshot.
+
+    Only the disposable test DB gets this invoker trigger. An advisory lock
+    makes the release interleaving deterministic without changing production SQL.
+    """
+    a = offers
+    lease = a.e.leases.reserve(
+        a.e.tenant,
+        a.e.project,
+        planned(a.e)["runId"],
+        [Allocation(a.resources[1], 100)],
+        key=uuid4().hex,
+    )[0]
+    key = uuid4().int % 2_000_000_000 + 1
+    with psycopg.connect(a.e.owner, autocommit=True) as blocker:
+        blocker.execute(sql.SQL("""
+            CREATE FUNCTION public.offer_test_barrier() RETURNS trigger
+            LANGUAGE plpgsql AS $body$ BEGIN
+              PERFORM pg_catalog.pg_advisory_xact_lock({}); RETURN NEW;
+            END $body$;
+        """).format(sql.Literal(key)))
+        blocker.execute(sql.SQL("""
+            CREATE TRIGGER offer_test_barrier BEFORE UPDATE ON inv.resources
+            FOR EACH ROW WHEN (NEW.resource_id={})
+            EXECUTE FUNCTION public.offer_test_barrier()
+        """).format(sql.Literal(a.resources[0])))
+        blocker.execute("SELECT pg_advisory_lock(%s)", (key,))
+        try:
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                future = pool.submit(put, a, 1000)
+                try:
+                    deadline = time.monotonic() + 8
+                    while not blocker.execute(
+                        "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_locks WHERE "
+                        "locktype='advisory' AND classid=0 AND objid=%s AND NOT granted)",
+                        (key,),
+                    ).fetchone()[0]:
+                        assert (
+                            time.monotonic() < deadline
+                        ), "Offer did not reach the controlled interleaving"
+                        time.sleep(0.01)
+                    # Release locks Run -> Node -> Resource before its lease.
+                    # Observe the actual PostgreSQL wait, not a timing assumption.
+                    releasing = pool.submit(release, a.e, lease)
+                    deadline = time.monotonic() + 8
+                    while not blocker.execute(
+                        "SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_stat_activity a "
+                        "WHERE a.datname=current_database() AND a.wait_event_type='Lock' "
+                        "AND EXISTS(SELECT 1 FROM pg_catalog.pg_locks l "
+                        "WHERE l.locktype='advisory' AND l.classid=0 AND l.objid=%s "
+                        "AND NOT l.granted AND l.pid=ANY(pg_catalog.pg_blocking_pids(a.pid))))",
+                        (key,),
+                    ).fetchone()[0]:
+                        assert not releasing.done(), "Release bypassed the offer's resource locks"
+                        assert time.monotonic() < deadline, "Release did not wait for the offer"
+                        time.sleep(0.01)
+                    assert blocker.execute(
+                        "SELECT released_at IS NOT NULL FROM inv.resource_leases WHERE lease_id=%s",
+                        (lease["leaseId"],),
+                    ).fetchone() == (False,)
+                finally:
+                    blocker.execute("SELECT pg_advisory_unlock(%s)", (key,))
+                response = future.result(timeout=10)
+                releasing.result(timeout=10)
+            assert response.status_code == 200
+            assert response.json()["appliedToKernel"] is True
+            recorded = blocker.execute(
+                "SELECT offered_quantity FROM public.resource_offers WHERE capability_id=%s",
+                (a.cap,),
+            ).fetchone()[0]
+            applied = sum(value for _, value in amounts(a))
+            assert applied == recorded == 1000, f"Recorded {recorded}, applied {applied}"
+            assert blocker.execute(
+                "SELECT released_at IS NOT NULL FROM inv.resource_leases WHERE lease_id=%s",
+                (lease["leaseId"],),
+            ).fetchone() == (True,)
+        finally:
+            blocker.execute("DROP TRIGGER offer_test_barrier ON inv.resources")
+            blocker.execute("DROP FUNCTION public.offer_test_barrier()")
