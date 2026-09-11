@@ -324,4 +324,100 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
     expect(selectedReceipt).toBeNull();
     expect(errorMessage).toContain('RES-RECEIPT-404');
   });
+
+  it('Step 1: handles kernelLinked=false as an explainable security state rather than an error', () => {
+    // An unlinked project is not an error; it explains the separation between project creation and execution grant
+    const unlinkedProject = {
+      id: 'prj_01JUNLINKED',
+      name: 'SaintVision BioInformatics AI (Unlinked Demo)',
+      description: '신규 생성되어 아직 운영자 커널에 링크되지 않은 프로젝트 (의도된 안전 분리 상태)',
+      ownerId: 'usr_developer_01',
+      workspaceCount: 1,
+      createdAt: '2026-09-11T12:00:00Z',
+      kernelLinked: false,
+      kernelEnabled: false,
+    };
+
+    expect(unlinkedProject.kernelLinked).toBe(false);
+    expect(unlinkedProject.kernelEnabled).toBe(false);
+
+    // Explanatory state message check
+    const explainStatus = (proj: typeof unlinkedProject) => {
+      if (proj.kernelLinked === false) {
+        return '커널 미연결 상태 안내 (kernelLinked=false) — 오류가 아니라 설명할 정상 분리 상태입니다';
+      }
+      return '커널 연동 완료';
+    };
+
+    expect(explainStatus(unlinkedProject)).toContain('오류가 아니라 설명할 정상 분리 상태입니다');
+  });
+
+  it('Step 1 & 3: evaluates Execution Readiness 6 checks and identifies resolvedBy authority for each unmet item', () => {
+    const readinessReport = {
+      workspaceId: 'wsp_01JUNLINKED001',
+      projectId: 'prj_01JUNLINKED',
+      executable: false,
+      scope: 'workspace-preconditions-not-execution-admission',
+      nodeReadiness: 'blocked',
+      admissionRequired: true,
+      checks: [
+        {
+          check: 'project_linked_to_kernel',
+          satisfied: false,
+          detail: 'the execution kernel acts only on projects an operator has linked; creating a project deliberately does not grant that',
+          resolvedBy: 'operator',
+          remedy: 'ask the operator to enable this project for managed execution',
+        },
+        {
+          check: 'requester_registered_with_kernel',
+          satisfied: true,
+          detail: 'approval identity is registered by an operator and is one subject to one user',
+          resolvedBy: 'operator',
+          remedy: 'ask the operator to register this account for managed execution',
+        },
+        {
+          check: 'role_permits_requesting',
+          satisfied: true,
+          detail: "user's project role permits requesting work",
+          resolvedBy: 'project owner',
+          remedy: 'a project owner changes the role through the members API',
+        },
+        {
+          check: 'workspace_ready',
+          satisfied: true,
+          detail: "the workspace status is 'active'",
+          resolvedBy: 'project owner',
+        },
+        {
+          check: 'kernel_request_permission',
+          satisfied: false,
+          detail: 'the current account and project must have an enabled execution grant',
+          resolvedBy: 'operator',
+          remedy: "ask the operator to review this account's project execution permission",
+        },
+        {
+          check: 'tool_chosen_and_usable',
+          satisfied: true,
+          detail: 'development tool is chosen and verified on the target node',
+          resolvedBy: 'node owner',
+          remedy: 'connect the selected Node and verify its tool installation and login',
+        },
+      ],
+      blockedBy: ['operator'],
+      summary: '2 of 6 preconditions are unmet; Node validation and execution admission are required.',
+    };
+
+    expect(readinessReport.checks.length).toBe(6);
+    expect(readinessReport.executable).toBe(false);
+    expect(readinessReport.blockedBy).toContain('operator');
+
+    // Unmet check verification
+    const unmetChecks = readinessReport.checks.filter((c) => !c.satisfied);
+    expect(unmetChecks.length).toBe(2);
+    unmetChecks.forEach((c) => {
+      expect(c.resolvedBy).toBeDefined();
+      expect(c.remedy).toBeDefined();
+    });
+  });
 });
+

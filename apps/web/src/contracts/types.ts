@@ -82,6 +82,30 @@ export interface ProjectItem {
   gitBranch?: string;
   budgetKrw?: number;
   remainingBudgetKrw?: number;
+  kernelLinked?: boolean;
+  kernelEnabled?: boolean;
+}
+
+export type ReadinessResolver = 'operator' | 'project owner' | 'node owner' | 'requester';
+
+export interface ExecutionReadinessCheck {
+  check: string;
+  satisfied: boolean;
+  detail: string;
+  resolvedBy?: ReadinessResolver;
+  remedy?: string;
+}
+
+export interface WorkspaceReadiness {
+  workspaceId: string;
+  projectId: string;
+  executable: boolean;
+  scope: string;
+  nodeReadiness: string;
+  admissionRequired: boolean;
+  checks: ExecutionReadinessCheck[];
+  blockedBy: ReadinessResolver[];
+  summary: string;
 }
 
 export interface WorkspaceItem {

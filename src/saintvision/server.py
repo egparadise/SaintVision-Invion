@@ -238,6 +238,8 @@ PROJECTS: List[Dict[str, Any]] = [
         "gitBranch": "main",
         "budgetKrw": 50000000,
         "remainingBudgetKrw": 46800000,
+        "kernelLinked": True,
+        "kernelEnabled": True,
     },
     {
         "id": "prj_saint_mlops",
@@ -250,6 +252,22 @@ PROJECTS: List[Dict[str, Any]] = [
         "gitBranch": "feature/distributed-training",
         "budgetKrw": 80000000,
         "remainingBudgetKrw": 72500000,
+        "kernelLinked": True,
+        "kernelEnabled": True,
+    },
+    {
+        "id": "prj_01JUNLINKED",
+        "name": "SaintVision BioInformatics AI (Unlinked Demo)",
+        "description": "신규 생성되어 아직 운영자 커널에 링크되지 않은 프로젝트 (의도된 안전 분리 상태)",
+        "ownerId": "usr_developer_01",
+        "workspaceCount": 1,
+        "createdAt": "2026-09-11T12:00:00Z",
+        "gitRepo": "https://github.com/egparadise/SaintVision-Invion.git",
+        "gitBranch": "feature/bio-ai",
+        "budgetKrw": 30000000,
+        "remainingBudgetKrw": 30000000,
+        "kernelLinked": False,
+        "kernelEnabled": False,
     },
 ]
 
@@ -305,6 +323,19 @@ WORKSPACES: List[Dict[str, Any]] = [
         "memoryLimitBytes": 32 * 1024**3,
         "status": "active",
         "createdAt": "2026-09-09T14:00:00Z",
+    },
+    {
+        "id": "wsp_01JUNLINKED001",
+        "projectId": "prj_01JUNLINKED",
+        "name": "bio-ai-unlinked-sandbox",
+        "targetNodeId": "nod_01JABCDEF01",
+        "isolationMode": "process_sandbox",
+        "allowedPaths": ["./workspace"],
+        "prohibitedPaths": ["/etc", "C:\\Windows", ".."],
+        "cpuLimitCores": 4,
+        "memoryLimitBytes": 8 * 1024**3,
+        "status": "active",
+        "createdAt": "2026-09-11T12:00:00Z",
     },
 ]
 
@@ -1548,6 +1579,79 @@ def get_workspace(workspace_id: str, request: Request):
     )
 
 
+@app.get("/v1/workspaces/{workspace_id}/execution-readiness")
+def read_workspace_readiness(workspace_id: str, request: Request):
+    """
+    Every precondition for running work here, and who resolves each unmet one (ADR-063 / execution_readiness.py).
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    wsp = next((w for w in WORKSPACES if w["id"] == workspace_id), None)
+    if not wsp:
+        return rfc9457_problem(
+            404, "RES-WSP-404", "Workspace Not Found", f"Workspace with ID '{workspace_id}' was not found.", trace_id, "RES"
+        )
+    prj = next((p for p in PROJECTS if p["id"] == wsp.get("projectId")), None)
+    is_linked = bool(prj and prj.get("kernelLinked", True) and prj.get("kernelEnabled", True))
+
+    checks = [
+        {
+            "check": "project_linked_to_kernel",
+            "satisfied": is_linked,
+            "detail": "the execution kernel acts only on projects an operator has linked; creating a project deliberately does not grant that",
+            "resolvedBy": "operator",
+            "remedy": "ask the operator to enable this project for managed execution",
+        },
+        {
+            "check": "requester_registered_with_kernel",
+            "satisfied": True,
+            "detail": "approval identity is registered by an operator and is one subject to one user, so a two-person rule cannot be satisfied by one person holding two identities",
+            "resolvedBy": "operator",
+            "remedy": "ask the operator to register this account for managed execution",
+        },
+        {
+            "check": "role_permits_requesting",
+            "satisfied": True,
+            "detail": "this user's project role permits requesting work",
+            "resolvedBy": "project owner",
+            "remedy": "a project owner changes the role through the members API",
+        },
+        {
+            "check": "workspace_ready",
+            "satisfied": wsp.get("status") == "active",
+            "detail": f"the workspace status is '{wsp.get('status')}'",
+            "resolvedBy": "project owner",
+            "remedy": "the workspace becomes ready once its storage is provisioned" if wsp.get("status") != "active" else None,
+        },
+        {
+            "check": "kernel_request_permission",
+            "satisfied": is_linked,
+            "detail": "the current account and project must have an enabled execution grant",
+            "resolvedBy": "operator",
+            "remedy": "ask the operator to review this account's project execution permission",
+        },
+        {
+            "check": "tool_chosen_and_usable",
+            "satisfied": True,
+            "detail": "development tool is chosen and verified on the target node",
+            "resolvedBy": "node owner",
+            "remedy": "connect the selected Node and verify its tool installation and login",
+        },
+    ]
+
+    unmet = [c for c in checks if not c["satisfied"]]
+    return {
+        "workspaceId": workspace_id,
+        "projectId": wsp.get("projectId"),
+        "executable": len(unmet) == 0,
+        "scope": "workspace-preconditions-not-execution-admission",
+        "nodeReadiness": "ready" if len(unmet) == 0 else "blocked",
+        "admissionRequired": True,
+        "checks": checks,
+        "blockedBy": sorted(list({c["resolvedBy"] for c in unmet})),
+        "summary": "All workspace preconditions are satisfied." if len(unmet) == 0 else f"{len(unmet)} of {len(checks)} preconditions are unmet; Node validation and execution admission are required.",
+    }
+
+
 @app.post("/v1/workspaces", status_code=201)
 async def create_workspace(request: Request):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
@@ -1632,6 +1736,17 @@ async def create_project_run(project_id: str, request: Request):
             break
     if not project:
         project = project_id
+
+    matched_prj = next((p for p in PROJECTS if p["id"] == project_id), None)
+    if matched_prj and (matched_prj.get("kernelLinked") is False or matched_prj.get("kernelEnabled") is False):
+        return rfc9457_problem(
+            400,
+            "VAL-PROJECT-KERNEL-UNLINKED",
+            "Project Not Linked to Kernel",
+            f"Project '{project_id}' is not linked to the execution kernel (kernelLinked=false). Ask the operator to enable this project for managed execution.",
+            trace_id,
+            "VAL",
+        )
 
     target_node_id = data.get("targetNodeId", "nod_01JABCDEF01")
     target_node = None

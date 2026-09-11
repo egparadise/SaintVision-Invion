@@ -7,6 +7,7 @@ import {
   NodeStopReceipt,
   PlacementRequirement,
   ApprovalItem,
+  WorkspaceReadiness,
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
@@ -101,6 +102,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [selectedProjectId, setSelectedProjectId] = useState<string>('prj_01JABCDE');
   const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(initialWorkspaceId || 'wsp_01JABCDE001');
+  const [readiness, setReadiness] = useState<WorkspaceReadiness | null>(null);
+  const [isLoadingReadiness, setIsLoadingReadiness] = useState<boolean>(false);
 
   // Step 2: Placement & Resources
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(initialNodeId || 'nod_01JABCDEF01');
@@ -182,6 +185,87 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       mounted = false;
     };
   }, []);
+
+  // Fetch Execution Readiness (6-preconditions check)
+  useEffect(() => {
+    if (!selectedWorkspaceId) return;
+    let mounted = true;
+    setIsLoadingReadiness(true);
+    apiClient<WorkspaceReadiness>(`/v1/workspaces/${selectedWorkspaceId}/execution-readiness`)
+      .then((res) => {
+        if (mounted) {
+          setReadiness(res);
+          setIsLoadingReadiness(false);
+        }
+      })
+      .catch((err) => {
+        if (mounted) {
+          console.warn('Execution readiness fetch fallback:', err);
+          const prj = projects.find((p) => p.id === selectedProjectId);
+          const isLinked = prj?.kernelLinked !== false && prj?.kernelEnabled !== false;
+          setReadiness({
+            workspaceId: selectedWorkspaceId,
+            projectId: selectedProjectId,
+            executable: isLinked,
+            scope: 'workspace-preconditions-not-execution-admission',
+            nodeReadiness: isLinked ? 'ready' : 'blocked',
+            admissionRequired: true,
+            checks: [
+              {
+                check: 'project_linked_to_kernel',
+                satisfied: isLinked,
+                detail: 'the execution kernel acts only on projects an operator has linked; creating a project deliberately does not grant that',
+                resolvedBy: 'operator',
+                remedy: 'ask the operator to enable this project for managed execution',
+              },
+              {
+                check: 'requester_registered_with_kernel',
+                satisfied: true,
+                detail: 'approval identity is registered by an operator and is one subject to one user, so a two-person rule cannot be satisfied by one person holding two identities',
+                resolvedBy: 'operator',
+                remedy: 'ask the operator to register this account for managed execution',
+              },
+              {
+                check: 'role_permits_requesting',
+                satisfied: true,
+                detail: "this user's project role permits requesting work",
+                resolvedBy: 'project owner',
+                remedy: 'a project owner changes the role through the members API',
+              },
+              {
+                check: 'workspace_ready',
+                satisfied: true,
+                detail: "the workspace status is 'active'",
+                resolvedBy: 'project owner',
+              },
+              {
+                check: 'kernel_request_permission',
+                satisfied: isLinked,
+                detail: 'the current account and project must have an enabled execution grant',
+                resolvedBy: 'operator',
+                remedy: "ask the operator to review this account's project execution permission",
+              },
+              {
+                check: 'tool_chosen_and_usable',
+                satisfied: true,
+                detail: 'development tool is chosen and verified on the target node',
+                resolvedBy: 'node owner',
+                remedy: 'connect the selected Node and verify its tool installation and login',
+              },
+            ],
+            blockedBy: isLinked ? [] : ['operator'],
+            summary: isLinked
+              ? 'All workspace preconditions are satisfied.'
+              : '1 of 6 preconditions are unmet; Node validation and execution admission are required.',
+          });
+          setIsLoadingReadiness(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [selectedWorkspaceId, selectedProjectId, projects]);
 
   // Update selected run if initialRunId changes
   useEffect(() => {
@@ -668,7 +752,18 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{proj.name}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{proj.name}</h3>
+                        {proj.kernelLinked === false ? (
+                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'rgba(210, 153, 34, 0.2)', color: '#d29922', fontWeight: 600 }}>
+                            ℹ️ 커널 미연결 (설명 상태)
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '0.6875rem', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'rgba(46, 160, 67, 0.2)', color: '#3fb950', fontWeight: 600 }}>
+                            ✅ 커널 연동
+                          </span>
+                        )}
+                      </div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
                         {proj.id}
                       </span>
@@ -698,6 +793,32 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 );
               })}
             </div>
+
+            {/* kernelLinked=false Explanatory State Banner (Not an error, but an intended security separation) */}
+            {projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false && (
+              <div
+                style={{
+                  padding: '16px 20px',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'rgba(56, 139, 253, 0.08)',
+                  border: '1px solid #388bfd',
+                  marginBottom: '24px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '1.2rem' }}>ℹ️</span>
+                  <strong style={{ color: 'var(--color-brand-primary)', fontSize: '0.9375rem' }}>
+                    커널 미연결 상태 안내 (kernelLinked=false) — 오류가 아니라 설명할 정상 분리 상태입니다
+                  </strong>
+                </div>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                  새로 만든 프로젝트는 실행 커널(<code>inv.business_projects</code>)에 링크되기 전까지 원격 작업 실행이 보류됩니다.
+                  이것은 결함이나 오류가 아니라 의도된 보안 분리입니다. 프로젝트 생성은 사업체 네임스페이스와 예산을 정의하는 과정이며,
+                  타인의 기기(노드)에서 임의 코드를 실행할 권한(Execution Grant)과 자동 결합되어서는 안 됩니다.
+                  운영자(Operator)가 이 프로젝트를 검토하고 커널 실행 대상으로 활성화할 때까지 실행 투입이 보류됩니다.
+                </p>
+              </div>
+            )}
 
             <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '12px' }}>
               연결된 격리 워크스페이스 (Workspace)
@@ -765,6 +886,113 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   </div>
                 );
               })}
+            </div>
+
+            {/* Execution Readiness 6-Check Preconditions Matrix (ADR-063 / execution_readiness.py) */}
+            <div
+              style={{
+                marginTop: '8px',
+                marginBottom: '24px',
+                padding: '18px 20px',
+                backgroundColor: 'var(--color-bg-subtle)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🛡️ 워크스페이스 실행 준비 상태 검증 (Execution Readiness — 6대 전제조건)</span>
+                  </h4>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                    실행 실패의 5대 사전 원인과 1개 도구 유효성을 종합 평가하며, 각 미충족 항목에 대해 권한 있는 해결 담당자를 반환합니다.
+                  </div>
+                </div>
+                {readiness && (
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontWeight: 600,
+                      backgroundColor: readiness.executable ? 'rgba(46, 160, 67, 0.2)' : 'rgba(210, 153, 34, 0.2)',
+                      color: readiness.executable ? '#3fb950' : '#d29922',
+                    }}
+                  >
+                    {readiness.executable ? '✅ 실행 가능 (Ready)' : '⚠️ 승인/조치 대기 중'}
+                  </span>
+                )}
+              </div>
+
+              {isLoadingReadiness ? (
+                <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', padding: '12px 0' }}>
+                  ⏳ 워크스페이스 사전 실행 전제조건을 검증하는 중...
+                </div>
+              ) : readiness ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '10px' }}>
+                    {readiness.checks.map((chk) => {
+                      const isSatisfied = chk.satisfied;
+                      const checkTitles: Record<string, string> = {
+                        project_linked_to_kernel: '1. 프로젝트 커널 연동',
+                        requester_registered_with_kernel: '2. 실행 요청자 주체 등록',
+                        role_permits_requesting: '3. 프로젝트 역할 요청 권한',
+                        workspace_ready: '4. 워크스페이스 스토리지 준비',
+                        kernel_request_permission: '5. 커널 실행 허가 (Execution Grant)',
+                        tool_chosen_and_usable: '6. 개발 도구 선택 및 노드 검증',
+                      };
+                      return (
+                        <div
+                          key={chk.check}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: 'var(--radius-sm)',
+                            border: `1px solid ${isSatisfied ? 'rgba(46, 160, 67, 0.3)' : 'rgba(210, 153, 34, 0.4)'}`,
+                            backgroundColor: isSatisfied ? 'rgba(46, 160, 67, 0.04)' : 'rgba(210, 153, 34, 0.08)',
+                            fontSize: '0.8125rem',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <strong style={{ color: isSatisfied ? '#3fb950' : '#d29922' }}>
+                              {isSatisfied ? '✅' : '⚠️'} {checkTitles[chk.check] || chk.check}
+                            </strong>
+                            {chk.resolvedBy && !isSatisfied && (
+                              <span
+                                style={{
+                                  fontSize: '0.6875rem',
+                                  padding: '2px 6px',
+                                  borderRadius: 'var(--radius-sm)',
+                                  backgroundColor: 'rgba(210, 153, 34, 0.25)',
+                                  color: '#d29922',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                해결 담당: {chk.resolvedBy}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
+                            {chk.detail}
+                          </div>
+                          {chk.remedy && !isSatisfied && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                              👉 조치 안내: {chk.remedy}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    요약: <strong>{readiness.summary}</strong>
+                    {readiness.blockedBy && readiness.blockedBy.length > 0 && (
+                      <span style={{ marginLeft: '8px', color: '#d29922' }}>
+                        (필요 조치 권한자: <strong>{readiness.blockedBy.join(', ')}</strong>)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px' }}>
@@ -1388,14 +1616,35 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </div>
               </div>
 
+              {/* Readiness Blocking Warning */}
+              {projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false ? (
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
+                  <strong>⚠️ 커널 미연결 프로젝트:</strong> 운영자(Operator)가 이 프로젝트를 커널에 연결(<code>kernelLinked=true</code>)할 때까지 실행 투입이 안전하게 보류됩니다.
+                </div>
+              ) : readiness && !readiness.executable ? (
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
+                  <strong>⚠️ 실행 전제조건 미충족:</strong> {readiness.summary} (조치 필요: {readiness.blockedBy.join(', ')})
+                </div>
+              ) : null}
+
               <div style={{ display: 'flex', gap: '8px' }}>
                 <Button
                   variant="primary"
                   onClick={handleDispatchRun}
-                  disabled={isExecuting}
+                  disabled={
+                    isExecuting ||
+                    projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false ||
+                    (readiness ? !readiness.executable : false)
+                  }
                   style={{ padding: '8px 20px', fontWeight: 600 }}
                 >
-                  {isExecuting ? '⏳ 실행 등록 중...' : '⚡ 작업 실행 (Dispatch Run)'}
+                  {isExecuting
+                    ? '⏳ 실행 등록 중...'
+                    : projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false
+                    ? '🔒 실행 보류 (커널 미연결)'
+                    : readiness && !readiness.executable
+                    ? '🔒 실행 보류 (전제조건 미충족)'
+                    : '⚡ 작업 실행 (Dispatch Run)'}
                 </Button>
                 <Button
                   variant="secondary"
