@@ -21,6 +21,8 @@ source_of_truth: "Git"
 
 9995122: 복원에 public+inv 테이블 수·권한 digest 대조를 추가하고 live pg_proc definer 점검 도구를 작성했다. 코드 변경 확인이며 이 문서 작성자가 새 도구를 실운영 검증하거나 독립 승인한 것은 아니다.
 
+0581964 (Claude, 2026-09-11): 복원 시험에 인가 모델·definer 함수·서비스 재개·RLS 실제 작동 검사를 추가했다. policy 122개가 전부 살아 있고 digest까지 동일하면서 두 tenant가 서로 보이는 복원본이 기존 검사를 모두 통과하던 것이 핵심 결함이었다. 남은 object 저장소·journal은 각각 S01 미결정과 원격 설치에 막혀 있다.
+
 c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 검사가 실패할 수 있음을 로컬에서 실증했다. 네 결함 모두 "증거 없는 통과"를 만들고 있었다 — 특히 fencing 조회 실패가 0으로 읽혀 "safe"가 출력되던 건은 복원 수락 여부를 결정하는 검사에서의 거짓 통과였다. 정상 시험 RTO 6.1s·RPO 6.2s, old epoch 시험 exit 1. 역할·RLS·object 저장소·서비스 재개는 아직 검사 밖이므로 전체 복원 합격은 미완료다. reviewer Codex의 독립 확인은 아직 없다.
 
 ## 작업 카드
@@ -57,9 +59,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-03 — 복원 도구의 남은 검증 결함 수정
 
-- owner / reviewer: Claude / Codex; status: in-progress(네 결함 수정 완료, 합격 조건 일부 미충족); priority: P0.
+- owner / reviewer: Claude / Codex; status: in-progress(수행 가능한 범위 완료, 남은 2건은 외부 차단); priority: P0.
 - 원래 목표/합격 조건: OUT-12 / AC-12.
-- 진행 branch/SHA: `review/claude-account-results` c28cdff (9995122의 후속). push 완료.
+- 진행 branch/SHA: `review/claude-account-results` c28cdff → 0581964 (9995122의 후속). push 완료.
 - 실제 수행: 지목된 네 결함을 모두 수정하고, 각 검사가 **실패할 수 있음**을 로컬 PostgreSQL 16에서 실증했다. 통과만 가능한 검사는 아무것도 증명하지 않으므로, 수정마다 거짓 통과를 재현한 뒤 차단을 확인했다.
   1. fencing 조회 실패→0: 권한 오류로 양쪽이 0을 읽어 advance가 0이 되고 "fencing safe"가 출력됐다. 복원 수락 여부를 결정하는 유일한 검사에서의 거짓 통과다. `_fencing_state`가 컬럼별 오류 종류와 함께 `None`을 돌려주고, unknown이 합격을 차단한다.
   2. content digest의 public 4개 한정: 실행 기록(`inv.evidence`·`checkpoints`·`node_stop_receipts`·`result_commitments`·`resource_leases`)이 대조 밖이었다. 두 schema를 모두 포함하도록 확장했다.
@@ -73,8 +75,22 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - backup mtime을 24시간 과거로 강제 → RPO 222s(archive 헤더 기준). mtime 기준이면 86400s였다.
   - backup 이후 fencing token 7개 발급 → "advance inv.fencing_token_seq by 6", **exit 1**.
   - 정상 시험: RTO 6.1s, RPO 6.2s, table 1314 / column 7652 권한 일치, **exit 0**. AC-12의 RPO≤15분·RTO≤1시간은 이 값으로 충족한다.
-- 남은 문제(합격 미충족): 카드가 요구한 범위 중 **역할·definer 함수·RLS policy·object 저장소·journal·서비스 재개는 복원 시험이 아직 검사하지 않는다**. 현재 도구가 대조하는 것은 테이블/컬럼 권한, 두 schema의 row 수와 내용 digest, fencing 상태뿐이다. definer 함수는 별도 도구 `tools/check_definer_functions.py`가 live pg_proc로 보지만 복원 시험에 연결돼 있지 않다. 따라서 "전체 복원 합격"은 여전히 미완료다.
-- 다음 첫 행동: 복원 시험에 (a) `pg_roles`·role membership, (b) `pg_policy`와 `relrowsecurity`/`relforcerowsecurity`, (c) `check_definer_functions.py`의 판정, (d) object 저장소 바이트와 DB 참조의 일치, (e) 복원 후 서비스 재개(실제 기동과 첫 요청)를 추가한다. 담당 Claude, reviewer Codex.
+- 이어서 수행(0581964): 카드가 요구한 역할·RLS·definer 함수·서비스 재개를 복원 시험에 넣었다. 권한 digest만으로는 "누가 무엇을 볼 수 있는가"가 설명되지 않는다 — policy 122개를 모두 되살리고도 격리는 하나도 못 하는 복원본이 기존 검사 전부를 통과한다.
+  - 인가 모델: 역할·역할 소속·`relrowsecurity`/`relforcerowsecurity`·`pg_policies`를 부분별 digest로 대조해, 실패 시 어느 부분이 움직였는지 지목한다.
+  - definer 함수: `tools/check_definer_functions.py`를 **복원된 DB**에 실행한다. definer 함수는 RLS를 우회하고, 과거 두 번의 교차 tenant 결함 모두 `CREATE OR REPLACE`로 고쳤으므로 "지금 그 DB가 어떤 정의를 들고 있는가"는 복원 시점에만 물을 수 있다.
+  - 서비스 재개: 실제 요청이 하는 읽기를 비소유자 역할로 tenant scope 안에서 수행한다. 모델의 두 반쪽을 각각 본다 — `inv_app`은 `public` USAGE로 요청 경로를, `inv`의 실행 기록은 `inv_kernel` 소속으로 접근한다. 한쪽만 보면 접근의 절반을 잃은 DB를 "정상"이라 부른다.
+  - RLS 실제 작동: tenant 두 개를 심고 한 scope로 읽어 다른 tenant의 행이 **보이지 않아야** 통과한다. 항상 rollback하므로 `--keep`에서도 행이 남지 않는다.
+- 추가 검증 증거(각 검사가 실패할 수 있음을 실증):
+  - `public.projects`의 RLS를 끄면 policy 122개가 그대로 나열되고 policy digest도 바이트 동일한데 두 tenant가 모두 보인다 → `rlsScopes` False로 거부. **기존 검사 전부가 "verified"라 부르던 경우다.**
+  - `inv_lan_runtime`의 `inv_kernel` 소속 해제 → memberships digest만 이동.
+  - tenant 인자를 받고 scope에 묶지 않는 definer 함수 추가 → 7개 검사 중 1개 unsafe, 함수명까지 출력.
+  - `inv_kernel`의 `inv` schema USAGE 회수 → `publicRead`는 여전히 True인데 `resumed` False. 요청 경로만 봤다면 "정상"이라 보고했을 것이다.
+  - `inv_app`의 `public.projects` SELECT 회수 → `resumed` False.
+  - 정상 시험: 역할 4·소속 2·policy 122·RLS flag 129, definer 6개 중 unsafe 0, 서비스 재개, exit 0. 원본에는 시험 행이 0개 남았다.
+  - 결함이 아닌 확인: `inv_app`은 `inv.runs`를 읽지 못한다. 복원본과 **원본이 동일하게** 그렇고, 이는 모델이 의도대로 동작하는 것이다(`inv` USAGE는 `inv_kernel` 소유). 이 검사의 첫 판은 역할·테이블 짝을 잘못 잡았고, 원본을 대조해 바로잡았다.
+- 남은 문제(합격 미충족, 둘 다 **차단**이며 미수행이 아님):
+  - **object 저장소 바이트**: `INV_OBJECT_STORE_ENDPOINT`가 `config.py`의 `S01_PENDING`이다. 확정된 저장소가 없으므로 대조할 대상이 없다. 해소 담당 Codex(S01).
+  - **node 설치 journal**: 원격 호스트(.225)에 있고 DB dump에 들어오지 않는다. 원격 설치가 선행이며 해소 담당은 원격 PC 운영자·Codex다.
 - 선행/차단과 해소 담당: CX-07 복원 계약·Codex 검토. 기존 권한 대조/public+inv count 보완은 인정하되 전체 복원 합격은 미완료.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 - CI: 세 Agent 공통으로 계정 결제·한도 문제로 실행 전에 차단된다. 위 증거는 전부 로컬 실측이며 CI 통과와 동등하지 않다.
