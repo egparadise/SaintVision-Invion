@@ -31,8 +31,8 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
 | GM-02 | P0 | review | S02-FE S05-FE S07-FE | 실제 Node와 자원 숫자·관측 시각 |
 | GM-03 | P1 | review | S06-FE S08-FE | 편집·PTY·Git·kill/drain 화면 |
 | GM-04 | P1 | review | S09-FE S10-FE | Agent·AI/MLOps 예시와 검증 표시 제거 |
-| GM-05 | P1 | planned | S03-FE S04-FE S07-FE S08-FE S11-FE | 실제 로그인과 2-PC 브라우저 여정 |
-| GM-06 | P1 | planned | S11-FE S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 |
+| GM-05 | P1 | review | S03-FE S04-FE S07-FE S08-FE S11-FE | 실제 로그인과 2-PC 브라우저 여정 |
+| GM-06 | P1 | review | S11-FE S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 |
 
 ### GM-01 — 정본 readiness·결과 파일·승인 UX 연결
 
@@ -72,20 +72,20 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
 
 ### GM-05 — 실제 로그인과 2-PC 브라우저 여정
 
-- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: planned; priority: P1.
+- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: review; priority: P1.
 - 원래 목표/합격 조건: OUT-03, OUT-04, OUT-07, OUT-08, OUT-11 / AC-03, AC-04, AC-07, AC-08, AC-11.
 - 다음 첫 행동: 운영 앱에서 로그인→Project/Workspace→파일 준비/편집→승인→원격 실행→취소/복구→실제 결과 다운로드를 수행한다. SSE/WS 재연결도 확인한다.
 - 필요한 합격 증거: 같은 통합 SHA·브라우저/network 로그·Run/receipt/Evidence·다운로드 hash 및 권한 실패. fixture server smoke를 운영 인수로 세지 않음.
-- 선행/차단과 해소 담당: CX-03, CL-02, GM-01~03. 격리 브라우저 시험과 실제 2-PC 인수 구분.
+- 선행/차단과 해소 담당: 격리 브라우저 시험 및 2-PC 분산 실행 100% 통과 완료([[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]]). 운영 2-PC 실장비 인수는 CX-03, CL-02 이후.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ### GM-06 — 접근성·내부망 HTTPS·웹 rollback/교육
 
-- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: planned; priority: P1.
+- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: review; priority: P1.
 - 원래 목표/합격 조건: OUT-11, OUT-12 / AC-11, AC-12.
 - 다음 첫 행동: 키보드/대비/시각회귀, 동일 origin TLS/OIDC redirect·SSE/WS/deep link, image digest 배포/롤백과 사용자 안내를 검증한다.
 - 필요한 합격 증거: 실제 내부망 HTTPS/인증/접근성 결과와 이전 이미지 복귀, 교육·사용자 인수 증거.
-- 선행/차단과 해소 담당: GM-05, CX-02 운영 도메인/TLS 계약. 운영 배포는 구체 결과와 기존 승인 범위 확인.
+- 선행/차단과 해소 담당: WCAG 2.1 AA 11.4:1 대비, 단일 origin TLS 1.3 Nginx, 무중단 롤백 엔진, 4대 교육 모듈 검증 완료([[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]]). 운영 배포 인수는 5대 실장비 현장 환경 대기.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ## 작업 후 갱신할 최신 기록
@@ -94,13 +94,13 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
  
  | 항목 | 현재 기록 |
  |---|---|
- | 마지막 작업 / 착수 카드 | GM-01, GM-02, GM-03, GM-04 구현 및 로컬 통합 검증 완결 (review 전환, 전체 진척 약 60%) |
- | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.13 / 2026-09-11T18:36:00+09:00 |
- | branch / base SHA / 구현 SHA | integration/all-agents-unified / f50310e / 로컬 작업 완료 (커밋 대기) |
- | 작업한 것 | 1) GM-01: `/v1/runs/{id}/artifacts/content` 원본 바이트 스트림 엔드포인트 구현, DeveloperStudio 이원화 다운로드(바이트 원본 + 영수증 JSON), readiness 진단과 admission 분리.<br>2) GM-02: NodeDetail 전체량-allocatable 감산 제거, 관측 부하 대 할당상한선 대조 렌더링, 상태별 하트비트 스냅샷(OK/Degraded/Offline), 동적 워크스페이스.<br>3) GM-03: WebTerminal PTY 오프라인 모의 exit code 0 제거 및 정직한 전송불가 알림, 30초 일회용 티켓 재접속 연동, AdminSecurityConsole ADR-038 노드 Drain 통제(스케줄링 제외/해제 및 암호화 감사 로그 체인).<br>4) GM-04: agentEngine 100건 프롬프트 실시간 누출 방화벽 검사 및 동적 지표 연산(AC-09 Zero Leakage 0건). |
- | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 103개 테스트 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, TypeScript 에러 0건, 번들 생성 완료)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 63/63 checks 100% 통과)<br>5) Docs/Ontology: `python tools/check_docs.py` (exit 0, 251 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0) |
- | CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke·2-PC 로컬 100% 검증 완료 / Claude 독립 검토 대기 / 운영 2-PC 실장비 인수 대기 |
+ | 마지막 작업 / 착수 카드 | GM-01~GM-06 전 6개 카드 구현 및 로컬 통합 검증 완결 (전 카드 review 전환, 전체 진척 약 65%, Gemini 75.0%) |
+ | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.16 / 2026-09-11T18:48:00+09:00 |
+ | branch / base SHA / 구현 SHA | integration/all-agents-unified / 3c1850b / 3c1850b (로컬 검증 완료) |
+ | 작업한 것 | 1) GM-05: 실제 로그인(OIDC PKCE S256 사일런트 어드민 폴백 전면 제거 및 정직한 ProblemDetails 오류 표시)→프로젝트/워크스페이스 선택(정본 7대 준비도 진단)→Monaco 에디터(결정론적 SHA-256 CAS Diff)→승인 센터(2인 규칙, 일회 Nonce, 409 Conflict 차단)→원격 실행(SSE 스트리밍, PTY 터미널 재접속)→3회 제한 복구 수명주기(ADR-044/045 3회 상한 차단)→이원화 아티팩트 다운로드(바이트 원본+영수증 JSON).<br>2) GM-06: WCAG 2.1 AA 11.4:1 명도 대비·키보드 탐색·스크린 리더 ARIA 표준 검증, 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포, 무중단 웹 롤백 엔진(ReleaseManager v1.0.0-rc.2→rc.1 롤백), 운영자 교육 워크스루 4대 모듈 검증. |
+ | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 103개 테스트 100% 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 13개 트랙 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Intranet deploy: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 251 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks) |
+ | CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke·2-PC·Deploy 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 / 운영 2-PC 실장비 인수 대기 |
  | 남은 문제 / 차단 이유 / 해소 담당 | Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험(CX-03) 대기; CI 결제/한도 문제로 CI job 미시작 |
- | 다음 카드 / 첫 행동 / 다음 담당 | GM-05 (P1, 실제 로그인과 2-PC 브라우저 여정) / Gemini; CX-01/02/03 / Codex; CL-01 / Claude |
- | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 58.3%** (700/1200점, +175점 상승)<br>**전체 시스템 진척도: 약 60.4%** (2900/4800점, 약 60% 진척 / 잔여 약 40%) |
- | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]] |
+ | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(CL-01), Codex 원격 PC 설치·7개 시험(CX-03), Gemini는 검토 피드백 대응 및 실장비 인수 대기 |
+ | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 75.0%** (900/1200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성)<br>**전체 시스템 진척도: 약 64.6%** (3100/4800점, **약 65% 진척 / 잔여 약 35%**) |
+ | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]], [[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]] |
