@@ -41,7 +41,7 @@ def image_id(reference):
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
     exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
+             'tools/check_subject_tenant.py', 'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
     return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
@@ -110,6 +110,28 @@ def owned(name, label):
     return value
 
 
+def release_network(network, label):
+    """Release this invocation's empty network, preserving containers and logs."""
+    result = run(['docker', 'network', 'inspect', network])
+    if result.returncode:
+        diagnostic = result.stderr.lower()
+        if b'not found' in diagnostic or b'no such network' in diagnostic:
+            return True
+        raise RuntimeError('Test network inspection failed; network preserved')
+    value = json.loads(result.stdout)[0]
+    if (value['Name'] != network or value.get('Driver') != 'bridge'
+            or not value.get('Internal')
+            or value.get('Labels', {}).get('ai.saintvision.kernel-test') != label
+            or value.get('Containers')):
+        raise ValueError('Test network ownership or empty state differs; preserved')
+    for suffix in ('-runner', '-db'):
+        container = owned(label + suffix, label)
+        if container and (container['State']['Running'] or container['State']['Pid']):
+            raise ValueError('Test container still running; network preserved')
+    checked(['docker', 'network', 'rm', value['Id']])
+    return not checked(['docker', 'network', 'ls', '--filter', 'id=' + value['Id'], '--format', '{{.ID}}'])
+
+
 def execute(prepared, tests):
     if set(source_files()) != set(prepared['sourceHashes']):
         raise ValueError('Prepared source file set differs; rebuild before running')
@@ -164,6 +186,7 @@ def execute(prepared, tests):
             if current['State']['Running']: checked(['docker','stop','--time','10',target],timeout=30)
             final = owned(target,name)
             cleanup[target] = bool(final and not final['State']['Running'] and final['State']['Pid']==0)
+        cleanup[network] = release_network(network, name)
         workloads = [json.loads(p.read_text()) for p in sorted(work.glob('developer-*.json'))]
         first_workloads = [json.loads(p.read_text()) for p in sorted(work.glob('first-*.json'))]
         records_complete = ('tests/integration/test_developer_workloads.py' not in tests or
@@ -186,6 +209,7 @@ def execute(prepared, tests):
         for target in (runner,database):
             value=owned(target,name)
             if value and value['State']['Running']: checked(['docker','stop','--time','10',target],timeout=30)
+        release_network(network, name)
 
 
 def main():

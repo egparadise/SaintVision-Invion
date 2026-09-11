@@ -1,0 +1,482 @@
+{
+  "asOfKST": "2026-09-11T16:10:59+09:00",
+  "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+  "pulls": [
+    {
+      "number": 22,
+      "title": "fix(api): align resource offers, result routes and tenant-scoped readiness",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/22",
+      "base": "agent/codex/provisioning-integrity",
+      "head": "agent/codex/resource-offer-integrity",
+      "headSHA": "93c72c9fde4f4df7cc0c9904fca6cc7a2f1909ff",
+      "headAncestorOfMain": false
+    },
+    {
+      "number": 21,
+      "title": "계정 실행 권한의 원자 준비와 migration 무결성 보강",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/21",
+      "base": "agent/codex/result-observation",
+      "head": "agent/codex/provisioning-integrity",
+      "headSHA": "d945633afb590feaef0dd5777edc7da4210a4d43",
+      "headAncestorOfMain": false
+    },
+    {
+      "number": 20,
+      "title": "Merge reviewed final runtime integration and delivery records into main",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T13:49:51Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/20",
+      "base": "main",
+      "head": "agent/codex/final-main",
+      "headSHA": "f2df50f0049f5d4b0a493e5fae1151c291995b61",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 19,
+      "title": "Add versioned Workspace editor, bounded PTY and approved remote Git",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/19",
+      "base": "agent/codex/node-containment",
+      "head": "agent/codex/workspace-bridge",
+      "headSHA": "33e6510d4410639ac7bf1252f1a0c232b1659cbe",
+      "headAncestorOfMain": false
+    },
+    {
+      "number": 18,
+      "title": "Independent review of #13, #15, #16, #17: four findings against my own PR #14, two against the new work",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T12:46:00Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/18",
+      "base": "agent/codex/node-containment",
+      "head": "review/claude-pr13-pr17",
+      "headSHA": "edb2f8ddc81b14852deb84014435ce70d5344681",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 17,
+      "title": "Add operator kill switch, Node drain and durable cleanup",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T12:45:47Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/17",
+      "base": "agent/codex/business-kernel",
+      "head": "agent/codex/node-containment",
+      "headSHA": "dac25591adfb61a4a81382f737c4d1eed34c07d5",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 16,
+      "title": "Connect business Workspace handoff and clean up revoked queued runs",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T12:45:33Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/16",
+      "base": "agent/codex/shard-recovery",
+      "head": "agent/codex/business-kernel",
+      "headSHA": "990f3f3a89cef6f6e8c7dd1236d8f2518041fc4f",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 15,
+      "title": "Add freshly approved bounded shard recovery and replacement Nodes",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T12:45:21Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/15",
+      "base": "agent/codex/workspace-api",
+      "head": "agent/codex/shard-recovery",
+      "headSHA": "4290467fec203c0e8f290bd816c5d30ca1bd34bd",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 14,
+      "title": "Independent review of PR #11 and #12: merge them, run them together, fix what only that shows",
+      "state": "open",
+      "draft": false,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/14",
+      "base": "integration/all-agents-unified",
+      "head": "review/claude-pr11-pr12",
+      "headSHA": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+      "headAncestorOfMain": false
+    },
+    {
+      "number": 13,
+      "title": "Connect authenticated Workspace API to atomic approval and Node execution",
+      "state": "closed",
+      "draft": false,
+      "mergedAt": "2026-09-10T12:45:08Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/13",
+      "base": "agent/codex/workspace-resume",
+      "head": "agent/codex/workspace-api",
+      "headSHA": "a70aff43262b7457098d68c0d5b8a662aad4742a",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 12,
+      "title": "Resume approved Workspace Steps with isolated Node files and verified Git checkpoints",
+      "state": "closed",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/12",
+      "base": "agent/codex/runtime-completion",
+      "head": "agent/codex/workspace-resume",
+      "headSHA": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+      "headAncestorOfMain": false
+    },
+    {
+      "number": 11,
+      "title": "Complete runtime cancellation, verified outputs and shard parent coordination",
+      "state": "closed",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/11",
+      "base": "integration/all-agents-unified",
+      "head": "agent/codex/runtime-completion",
+      "headSHA": "92934d19213f4bda5bccfe1760373f59522ddccd",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 10,
+      "title": "docs(shards): 샤드 실행 현황·통합 누락·남은 합격 범위 확인",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/10",
+      "base": "agent/codex/execution-recovery",
+      "head": "agent/codex/shard-status-audit",
+      "headSHA": "39bd9e97819deaca66eab0368910a7b446cbd4e1",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 9,
+      "title": "feat(core): 실행 결과 확정·Workspace 복원·샤드 수명주기·실측 배치",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/9",
+      "base": "agent/codex/storage-node-runtime",
+      "head": "agent/codex/execution-recovery",
+      "headSHA": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 8,
+      "title": "feat(core): 체크포인트 복원과 Node 관측·전송·독립 샤드 실행",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/8",
+      "base": "agent/codex/durable-dispatch",
+      "head": "agent/codex/storage-node-runtime",
+      "headSHA": "227cd2984a256092f5496d9895060092cbf87145",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 7,
+      "title": "feat(core): 실행 전달 대기열과 중단 후 관찰·취소 복구",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/7",
+      "base": "agent/codex/control-integration",
+      "head": "agent/codex/durable-dispatch",
+      "headSHA": "6c4f8a937c399d7e79bf49d2538e0bce53f24af4",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 6,
+      "title": "feat(api): 인증된 Run API와 Node 관측·원격 취소",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/6",
+      "base": "agent/codex/node-transport",
+      "head": "agent/codex/control-integration",
+      "headSHA": "7d657602d3f48122c20207cfff0919755e97f959",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 5,
+      "title": "feat(node): mTLS 실행 전달과 인증서 폐기·복구 경계",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/5",
+      "base": "agent/codex/node-runtime",
+      "head": "agent/codex/node-transport",
+      "headSHA": "31f423679107ddc55c9d05566959d6aa69a36e2d",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 4,
+      "title": "feat(node): 서명된 격리 실행과 장애 시 정지 영수증",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/4",
+      "base": "agent/codex/tool-admission",
+      "head": "agent/codex/node-runtime",
+      "headSHA": "75e22940ca9807f603d4787619f9c8e9599e31dd",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 3,
+      "title": "feat(core): ToolGateway 일회 실행 허가와 Sandbox 계약",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/3",
+      "base": "agent/codex/approval-boundary",
+      "head": "agent/codex/tool-admission",
+      "headSHA": "85a8747a92efd56d14ed7fdfcba85fe03f60463f",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 2,
+      "title": "feat(core): 승인 내용 고정과 일회용 승인 원자 소비",
+      "state": "open",
+      "draft": true,
+      "mergedAt": null,
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/2",
+      "base": "agent/codex/core-foundation",
+      "head": "agent/codex/approval-boundary",
+      "headSHA": "0fbf66e2487cfdea54de66aadcb8c8b646335591",
+      "headAncestorOfMain": true
+    },
+    {
+      "number": 1,
+      "title": "feat(core): 공통 계약과 트랜잭션 신뢰성 기반 구현",
+      "state": "closed",
+      "draft": true,
+      "mergedAt": "2026-09-10T13:49:53Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/pull/1",
+      "base": "main",
+      "head": "agent/codex/core-foundation",
+      "headSHA": "33833dda70207cee39e73fb097140f9ad8abf3ad",
+      "headAncestorOfMain": true
+    }
+  ],
+  "ci": [
+    {
+      "ref": "HEAD",
+      "sha": "93c72c9fde4f4df7cc0c9904fca6cc7a2f1909ff",
+      "runs": [
+        {
+          "id": 34572128484,
+          "name": "Backend Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572128484",
+          "jobs": 2,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34572128543,
+          "name": "Core Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572128543",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34572128490,
+          "name": "Documentation Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572128490",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34572125290,
+          "name": "Backend Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572125290",
+          "jobs": 2,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34572125260,
+          "name": "Core Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572125260",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34572125267,
+          "name": "Documentation Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34572125267",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "integration/all-agents-unified",
+      "sha": "268b4008a8380854b812834738305d463867c3e1",
+      "runs": [
+        {
+          "id": 34571437018,
+          "name": "Documentation Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34571437018",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34571437017,
+          "name": "Core Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34571437017",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34571437022,
+          "name": "Frontend Build & Test",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34571437022",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34571437030,
+          "name": "Backend Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34571437030",
+          "jobs": 2,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        }
+      ]
+    },
+    {
+      "ref": "review/claude-account-results",
+      "sha": "6a11a036ffa0f35e472500cc5aa2e18f0bac5a20",
+      "runs": [
+        {
+          "id": 34570848617,
+          "name": "Documentation Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34570848617",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34570848625,
+          "name": "Core Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34570848625",
+          "jobs": 1,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        },
+        {
+          "id": 34570848653,
+          "name": "Backend Build",
+          "status": "completed",
+          "conclusion": "failure",
+          "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34570848653",
+          "jobs": 2,
+          "stepCount": 0,
+          "annotations": [
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+            "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+          ]
+        }
+      ]
+    }
+  ],
+  "live": {
+    "source": "live-postgresql-mtls",
+    "serverAddress": "192.168.45.99",
+    "generatedAt": "2026-09-11T07:10:58.998665+00:00",
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "lastHeartbeatAt": "2026-09-11T07:10:57.980385+00:00",
+        "lastSnapshotAt": "2026-09-11T07:10:57.980385+00:00",
+        "observationAgeSeconds": 1.0,
+        "osType": "linux",
+        "profileVersion": "lan-observe-v1",
+        "agentVersion": "0.1.0",
+        "cpuCores": 16.0,
+        "cpuUsagePercent": 0.0,
+        "memoryTotalBytes": 8247742464,
+        "memoryUsedBytes": 3226750976,
+        "gpuCount": null,
+        "storageTotalBytes": null,
+        "measurementScope": "node-visible-linux-environment"
+      }
+    ],
+    "runs": [],
+    "offered": {},
+    "killSwitch": true,
+    "userWorkloadSubmission": false,
+    "webAuthenticationConfigured": false,
+    "tests": []
+  }
+}

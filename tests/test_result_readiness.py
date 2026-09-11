@@ -5,10 +5,21 @@ from sqlalchemy import text
 
 from saintvision.db.session import tenant_scope
 from saintvision.services.execution_readiness import workspace_readiness
-from test_business_results import lab, scene, NOW
+from test_execution_readiness import lab, scene, NOW
 from test_account_integration import account_api, org
 
 pytestmark = pytest.mark.postgres
+
+
+def test_standalone_business_app_does_not_serve_duplicate_run_results(account_api):
+    from fastapi.testclient import TestClient
+
+    with TestClient(account_api.business, raise_server_exceptions=False) as client:
+        for suffix in ("result", "artifacts", "artifacts/content", "logs", "attempts"):
+            response = client.get(
+                "/v1/runs/run_" + "0" * 26 + "/" + suffix, headers=account_api.headers()
+            )
+            assert response.status_code == 404
 
 
 def test_readiness_uses_business_route_but_results_stay_on_kernel(account_api, org):

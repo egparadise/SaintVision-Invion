@@ -1,35 +1,9 @@
-"""Why this workspace cannot run yet, and who can fix each reason.
+"""Explain workspace preconditions and who can resolve each unmet condition.
 
-"실제 계정으로 생성한 Workspace가 실행 가능해지고" has five preconditions, and
-they are owned by four different people. Without something that states all five
-at once, the failure a user meets is whichever one the execution path happens to
-check first — reported as an authorisation error, which is only the right words
-for one of them.
-
-The five, and who owns each:
-
-1. **The project is linked to the execution kernel.** ``inv.business_projects``,
-   operator-owned, because creating a project must not also grant the right to
-   run code on somebody's machine.
-2. **The requester is registered as a kernel subject.**
-   ``inv.business_subjects``, operator-owned and one-to-one, because a
-   two-person rule one person can satisfy with two identities is not a
-   two-person rule.
-3. **The requester's project role permits requesting.** ``project_members`` —
-   owned by a project owner, changeable through this API.
-4. **The workspace is ready.** Owned by whoever provisioned it.
-5. **A development tool is chosen and usable on a node.** The choice is a
-   property of the workspace; usability is a property of a machine right now.
-
-This module answers all five in one call, and for each unmet one it says who
-fixes it. That distinction is the whole point: "you are not allowed" and "an
-operator has not finished setting this up" feel identical to whoever is blocked
-and need completely different next actions.
-
-**It never makes anything ready.** The two operator-owned links are deliberately
-out of reach of the web process; a function here that could satisfy them would
-be a way for the application to grant itself execution rights, which is exactly
-what their ownership prevents.
+Project/subject links, business membership, workspace lifecycle, the separate
+kernel execution grant, Node tool readiness and pending input are independent
+checks. None of them grants admission. The web process reads the kernel-owned
+links and prepared input; it cannot use this diagnostic to create authority.
 """
 
 from __future__ import annotations
@@ -44,6 +18,13 @@ from ..db.models import Workspace
 from ..errors import RES_NODE_NOT_FOUND, InvError
 from . import projects as project_service
 from . import settings as settings_service
+
+#: The kernel's bound on a workspace snapshot. Small and surprising: the files
+#: travel inside a signed launch payload rather than through an object store, so
+#: a person editing anything substantial hits it. Reported with the readiness
+#: answer rather than after a rejection.
+MAX_INPUT_BYTES: Final[int] = 65536
+MAX_INPUT_CONTENT_BYTES: Final[int] = 32768
 
 #: Who resolves an unmet precondition. Reported per check, because "you may not"
 #: and "nobody has set this up yet" need different actions from different people.
@@ -64,9 +45,7 @@ def _check(
     return body
 
 
-def _subject_registered(
-    session: Session, *, tenant_id: uuid.UUID, user_id: str
-) -> bool:
+def _subject_registered(session: Session, *, tenant_id: uuid.UUID, user_id: str) -> bool:
     """Whether the kernel knows this person as an approval subject.
 
     Asked through the same narrow definer route as the project link: the
@@ -109,9 +88,7 @@ def workspace_readiness(
                 "the execution kernel acts only on projects an operator has "
                 "linked; creating a project deliberately does not grant that"
             ),
-            remedy=(
-                "ask the operator to enable this project for managed execution"
-            ),
+            remedy=("ask the operator to enable this project for managed execution"),
         ),
         _check(
             "requester_registered_with_kernel",
@@ -122,9 +99,7 @@ def workspace_readiness(
                 "subject to one user, so a two-person rule cannot be satisfied "
                 "by one person holding two identities"
             ),
-            remedy=(
-                "ask the operator to register this account for managed execution"
-            ),
+            remedy=("ask the operator to register this account for managed execution"),
         ),
         _check(
             "role_permits_requesting",
@@ -150,13 +125,23 @@ def workspace_readiness(
         ),
     ]
 
-    allowed = bool(session.execute(text(
-        "SELECT public.business_execution_permission(:t,:p,:u)"),
-        {"t": str(tenant_id), "p": workspace.project_id, "u": user_id}).scalar())
-    checks.append(_check("kernel_request_permission", allowed, owner=OPERATOR,
-        detail="the current account and project must have an enabled execution grant",
-        remedy="ask the operator to review this account's project execution permission"))
+    allowed = bool(
+        session.execute(
+            text("SELECT public.business_execution_permission(:t,:p,:u)"),
+            {"t": str(tenant_id), "p": workspace.project_id, "u": user_id},
+        ).scalar()
+    )
+    checks.append(
+        _check(
+            "kernel_request_permission",
+            allowed,
+            owner=OPERATOR,
+            detail="the current account and project must have an enabled execution grant",
+            remedy="ask the operator to review this account's project execution permission",
+        )
+    )
     checks.append(_tool_check(workspace))
+    checks.append(_input_check(session, tenant_id=tenant_id, workspace_id=workspace_id))
 
     unmet = [c for c in checks if not c["satisfied"]]
     return {
@@ -174,13 +159,84 @@ def workspace_readiness(
     }
 
 
+def _input_check(session: Session, *, tenant_id: uuid.UUID, workspace_id: str) -> dict[str, Any]:
+    """Whether anything has been prepared to run.
+
+    An additional precondition, and one a user meets *after* satisfying the
+    other five: everything is permitted, everything is linked, and there is
+    still nothing to approve because no input was submitted.
+
+    Read, never written. The kernel's prepare endpoints accept the files and
+    record them; this side only asks whether that happened. Writing here would
+    make a second account of what is about to execute, which is the mistake this
+    surface has already made four times.
+    """
+    row = session.execute(
+        text(
+            "SELECT prepared, kind, run_id, step_id, snapshot_bytes "
+            "FROM public.workspace_input_state(:t, :w)"
+        ),
+        {"t": str(tenant_id), "w": workspace_id},
+    ).one_or_none()
+
+    if row is None:
+        body = _check(
+            "input_prepared",
+            False,
+            owner=REQUESTER,
+            detail=(
+                "no pending input in the current recovery epoch belongs to this "
+                "workspace and project"
+            ),
+            remedy=(
+                "prepare the files for a new execution or recovery; the snapshot is capped at "
+                f"{MAX_INPUT_BYTES} bytes with at most "
+                f"{MAX_INPUT_CONTENT_BYTES} bytes of file content"
+            ),
+        )
+        return {
+            **body,
+            "snapshotBytes": None,
+            "maxSnapshotBytes": MAX_INPUT_BYTES,
+            "maxContentBytes": MAX_INPUT_CONTENT_BYTES,
+            "runId": None,
+        }
+
+    prepared, kind, run_id, step_id, snapshot_bytes = row
+    body = _check(
+        "input_prepared",
+        bool(prepared),
+        owner=REQUESTER,
+        detail=(
+            f"{kind} input is prepared for run {run_id} step {step_id!r} "
+            f"({snapshot_bytes} of {MAX_INPUT_BYTES} bytes)"
+        ),
+    )
+    # Reported whether or not the check passed: a screen that shows how close to
+    # the bound the last submission came is one that can warn before the next
+    # one is refused.
+    body["snapshotBytes"] = snapshot_bytes
+    body["maxSnapshotBytes"] = MAX_INPUT_BYTES
+    body["maxContentBytes"] = MAX_INPUT_CONTENT_BYTES
+    body["runId"] = run_id
+    return body
+
+
 def _tool_check(workspace: Workspace) -> dict[str, Any]:
     # CP PATH/login files say nothing about the selected Node. This read cannot
     # run a local CLI probe or substitute its readiness for remote observation.
     if workspace.tool_name is None:
-        return _check("tool_chosen_and_usable", False, owner=REQUESTER,
+        return _check(
+            "tool_chosen_and_usable",
+            False,
+            owner=REQUESTER,
             detail="no development tool has been chosen for this workspace",
-            remedy="choose a development tool for this workspace")
-    return _check("tool_chosen_and_usable", False, owner=NODE_OWNER,
+            remedy="choose a development tool for this workspace",
+        )
+    return _check(
+        "tool_chosen_and_usable",
+        False,
+        owner=NODE_OWNER,
         detail=f"{workspace.tool_name}: readiness on the workspace Node is unknown",
-        remedy="connect the selected Node and verify its tool installation and login")
+        remedy="connect the selected Node and verify its tool installation and login",
+    )

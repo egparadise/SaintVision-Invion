@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from jwt_support import jwt_fixture
-from test_settings import org, NOW
+from test_settings import base_org as org, NOW
 from saintvision.api.app import create_app
 from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
@@ -33,7 +33,7 @@ def account_api(app_engine, app_sessionmaker, owner_engine, org, tmp_path):
     business = create_app(engine=app_engine, settings=Settings(database_url='unused'),
         verifier=OidcPrincipalVerifier(jwt.auth, app_sessionmaker), clock=lambda: NOW)
     with TestClient(kernel_app(tokens=jwt.auth, business=business), raise_server_exceptions=False) as client:
-        yield SimpleNamespace(client=client, jwt=jwt,
+        yield SimpleNamespace(client=client, business=business, jwt=jwt,
             headers=lambda who='owner': {'Authorization':'Bearer '+jwt.token(who)})
 
 
@@ -129,11 +129,14 @@ def test_concurrent_owner_removal_leaves_an_owner(app_sessionmaker, owner_engine
 
 
 def test_concurrent_offer_updates_have_one_current_interval(app_sessionmaker, owner_engine, org):
+    with owner_engine.begin() as c:
+        c.execute(text("INSERT INTO inv.business_admin_grants VALUES(:t,:u,'resources.manage',true)"),
+                  {'t':org['tenant_a'],'u':org['owner']})
     barrier=Barrier(2)
     def offer(quantity):
         with app_sessionmaker() as s,s.begin(),tenant_scope(s,org['tenant_a']):
             barrier.wait(timeout=5)
-            service.set_resource_offer(s,tenant_id=org['tenant_a'],capability_id=org['cpu_capability'],
+            service.set_resource_offer(s,acting_user_id=org['owner'],tenant_id=org['tenant_a'],capability_id=org['cpu_capability'],
                                       offered_quantity=quantity,unit='cores',now=NOW)
     with ThreadPoolExecutor(max_workers=2) as pool:
         list(pool.map(offer,(1,2)))

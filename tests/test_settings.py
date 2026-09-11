@@ -33,7 +33,7 @@ GIB = 1024**3
 
 
 @pytest.fixture
-def org(owner_engine, two_tenants):
+def base_org(owner_engine, two_tenants):
     """A project with an owner, a second owner, a viewer, a node and a workspace."""
     tenant_a, tenant_b = two_tenants
     ids = {
@@ -79,8 +79,7 @@ def org(owner_engine, two_tenants):
                 "status, created_by_user_id, created_at, version) "
                 "VALUES (:w, :t, :p, 'ws', 'ready', :u, now(), 1)"
             ),
-            {"w": ids["workspace_id"], "t": tenant_a, "p": ids["project_id"],
-             "u": ids["owner"]},
+            {"w": ids["workspace_id"], "t": tenant_a, "p": ids["project_id"], "u": ids["owner"]},
         )
         c.execute(
             text(
@@ -100,10 +99,27 @@ def org(owner_engine, two_tenants):
                     "kind, device_index, total_quantity, unit, divisible, detected_at, "
                     "version) VALUES (:c, :t, :n, :k, :d, :q, :un, true, now(), 1)"
                 ),
-                {"c": ids[key], "t": tenant_a, "n": ids["node_id"], "k": kind,
-                 "d": device, "q": total, "un": unit},
+                {
+                    "c": ids[key],
+                    "t": tenant_a,
+                    "n": ids["node_id"],
+                    "k": kind,
+                    "d": device,
+                    "q": total,
+                    "un": unit,
+                },
             )
     return ids
+
+
+@pytest.fixture
+def org(base_org, owner_engine):
+    with owner_engine.begin() as c:
+        c.execute(
+            text("INSERT INTO inv.business_admin_grants VALUES(:t,:u,'resources.manage',true)"),
+            {"t": base_org["tenant_a"], "u": base_org["owner"]},
+        )
+    return base_org
 
 
 def _permission(session, org, who):
@@ -176,8 +192,11 @@ def test_suspending_a_user_denies_them_immediately(app_sessionmaker, org):
             with tenant_scope(session, org["tenant_a"]):
                 assert _permission(session, org, "owner")["canApprove"]
                 settings_service.set_user_status(
-                    session, tenant_id=org["tenant_a"], user_id=org["owner"],
-                    status="suspended", now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    user_id=org["owner"],
+                    status="suspended",
+                    now=NOW,
                 )
                 after = _permission(session, org, "owner")
     # The role is unchanged and the permission is gone. A screen that rendered
@@ -193,8 +212,11 @@ def test_archiving_a_project_stops_everything_in_it(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_project_status(
-                    session, tenant_id=org["tenant_a"], project_id=org["project_id"],
-                    status="archived", acting_user_id=org["owner"],
+                    session,
+                    tenant_id=org["tenant_a"],
+                    project_id=org["project_id"],
+                    status="archived",
+                    acting_user_id=org["owner"],
                 )
                 after = _permission(session, org, "owner")
     assert after["projectStatus"] == "archived"
@@ -208,13 +230,19 @@ def test_a_retired_user_cannot_be_brought_back(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_user_status(
-                    session, tenant_id=org["tenant_a"], user_id=org["viewer"],
-                    status="retired", now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    user_id=org["viewer"],
+                    status="retired",
+                    now=NOW,
                 )
                 with pytest.raises(InvError, match="cannot be reactivated"):
                     settings_service.set_user_status(
-                        session, tenant_id=org["tenant_a"], user_id=org["viewer"],
-                        status="active", now=NOW,
+                        session,
+                        tenant_id=org["tenant_a"],
+                        user_id=org["viewer"],
+                        status="active",
+                        now=NOW,
                     )
 
 
@@ -229,9 +257,13 @@ def test_only_an_owner_may_change_settings(app_sessionmaker, org):
             with tenant_scope(session, org["tenant_a"]):
                 with pytest.raises(InvError, match="only a project owner"):
                     settings_service.set_member_role(
-                        session, tenant_id=org["tenant_a"],
-                        project_id=org["project_id"], user_id=org["viewer"],
-                        role_code="owner", acting_user_id=org["viewer"], now=NOW,
+                        session,
+                        tenant_id=org["tenant_a"],
+                        project_id=org["project_id"],
+                        user_id=org["viewer"],
+                        role_code="owner",
+                        acting_user_id=org["viewer"],
+                        now=NOW,
                     )
 
 
@@ -246,14 +278,20 @@ def test_a_project_cannot_lose_its_last_owner(app_sessionmaker, org):
             with tenant_scope(session, org["tenant_a"]):
                 with pytest.raises(InvError, match="only owner"):
                     settings_service.set_member_role(
-                        session, tenant_id=org["tenant_a"],
-                        project_id=org["project_id"], user_id=org["owner"],
-                        role_code="viewer", acting_user_id=org["owner"], now=NOW,
+                        session,
+                        tenant_id=org["tenant_a"],
+                        project_id=org["project_id"],
+                        user_id=org["owner"],
+                        role_code="viewer",
+                        acting_user_id=org["owner"],
+                        now=NOW,
                     )
                 with pytest.raises(InvError, match="only owner"):
                     settings_service.remove_member(
-                        session, tenant_id=org["tenant_a"],
-                        project_id=org["project_id"], user_id=org["owner"],
+                        session,
+                        tenant_id=org["tenant_a"],
+                        project_id=org["project_id"],
+                        user_id=org["owner"],
                         acting_user_id=org["owner"],
                     )
 
@@ -264,14 +302,22 @@ def test_a_second_owner_makes_the_first_removable(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_member_role(
-                    session, tenant_id=org["tenant_a"],
-                    project_id=org["project_id"], user_id=org["second_owner"],
-                    role_code="owner", acting_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    project_id=org["project_id"],
+                    user_id=org["second_owner"],
+                    role_code="owner",
+                    acting_user_id=org["owner"],
+                    now=NOW,
                 )
                 settings_service.set_member_role(
-                    session, tenant_id=org["tenant_a"],
-                    project_id=org["project_id"], user_id=org["owner"],
-                    role_code="viewer", acting_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    project_id=org["project_id"],
+                    user_id=org["owner"],
+                    role_code="viewer",
+                    acting_user_id=org["owner"],
+                    now=NOW,
                 )
                 remaining = _permission(session, org, "second_owner")
     assert remaining["canAdminister"]
@@ -293,14 +339,22 @@ def test_an_offer_is_superseded_not_edited(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=48, unit="GiB", now=NOW,
+                    offered_quantity=48,
+                    unit="GiB",
+                    now=NOW,
                 )
                 settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=32, unit="GiB", now=later,
+                    offered_quantity=32,
+                    unit="GiB",
+                    now=later,
                 )
                 rows = session.execute(
                     text(
@@ -323,14 +377,21 @@ def test_the_unit_is_converted_once_at_the_boundary(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 in_gib = settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=32, unit="GiB", now=NOW,
+                    offered_quantity=32,
+                    unit="GiB",
+                    now=NOW,
                 )
                 in_bytes = settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=32 * GIB, unit="bytes",
+                    offered_quantity=32 * GIB,
+                    unit="bytes",
                     now=NOW + dt.timedelta(minutes=1),
                 )
     assert in_gib["offeredQuantity"] == in_bytes["offeredQuantity"] == 32 * GIB
@@ -345,22 +406,30 @@ def test_a_node_cannot_offer_more_than_it_has(app_sessionmaker, org):
             with tenant_scope(session, org["tenant_a"]):
                 with pytest.raises(InvError, match="cannot offer more than it has"):
                     settings_service.set_resource_offer(
-                        session, tenant_id=org["tenant_a"],
+                        session,
+                        acting_user_id=org["owner"],
+                        tenant_id=org["tenant_a"],
                         capability_id=org["ram_capability"],
-                        offered_quantity=128, unit="GiB", now=NOW,
+                        offered_quantity=128,
+                        unit="GiB",
+                        now=NOW,
                     )
 
 
 def test_a_unit_from_the_wrong_kind_is_refused(app_sessionmaker, org):
-    """"cores" is a real unit and is not a real unit of memory."""
+    """ "cores" is a real unit and is not a real unit of memory."""
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 with pytest.raises(InvError, match="not a recognised unit"):
                     settings_service.set_resource_offer(
-                        session, tenant_id=org["tenant_a"],
+                        session,
+                        acting_user_id=org["owner"],
+                        tenant_id=org["tenant_a"],
                         capability_id=org["ram_capability"],
-                        offered_quantity=8, unit="cores", now=NOW,
+                        offered_quantity=8,
+                        unit="cores",
+                        now=NOW,
                     )
 
 
@@ -373,14 +442,21 @@ def test_lowering_an_offer_says_what_it_does_not_do(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=48, unit="GiB", now=NOW,
+                    offered_quantity=48,
+                    unit="GiB",
+                    now=NOW,
                 )
                 lowered = settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=8, unit="GiB",
+                    offered_quantity=8,
+                    unit="GiB",
                     now=NOW + dt.timedelta(minutes=1),
                 )
     assert "already leased" in lowered["note"]
@@ -397,18 +473,29 @@ def test_the_pool_reports_what_was_just_offered(app_sessionmaker, org):
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["ram_capability"],
-                    offered_quantity=24, unit="GiB", now=NOW,
+                    offered_quantity=24,
+                    unit="GiB",
+                    now=NOW,
                 )
                 pool = pool_service.create_pool(
-                    session, tenant_id=org["tenant_a"],
-                    project_id=org["project_id"], name="p",
-                    created_by_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    project_id=org["project_id"],
+                    name="p",
+                    created_by_user_id=org["owner"],
+                    now=NOW,
                 )
                 pool_service.add_member(
-                    session, tenant_id=org["tenant_a"], pool_id=pool.pool_id,
-                    node_id=org["node_id"], added_by_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    pool_id=pool.pool_id,
+                    node_id=org["node_id"],
+                    added_by_user_id=org["owner"],
+                    now=NOW,
                 )
                 capacity = pool_service.pool_capacity(
                     session, tenant_id=org["tenant_a"], pool_id=pool.pool_id, now=NOW
@@ -417,17 +504,19 @@ def test_the_pool_reports_what_was_just_offered(app_sessionmaker, org):
     assert capacity["units"]["ram"] == "bytes"
 
 
-def test_offers_are_listed_beside_what_the_machine_actually_has(
-    app_sessionmaker, org
-):
+def test_offers_are_listed_beside_what_the_machine_actually_has(app_sessionmaker, org):
     """A screen showing only the offer cannot tell if there is room to raise it."""
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, org["tenant_a"]):
                 settings_service.set_resource_offer(
-                    session, tenant_id=org["tenant_a"],
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
                     capability_id=org["cpu_capability"],
-                    offered_quantity=8, unit="cores", now=NOW,
+                    offered_quantity=8,
+                    unit="cores",
+                    now=NOW,
                 )
                 listed = settings_service.node_offers(
                     session, tenant_id=org["tenant_a"], node_id=org["node_id"], now=NOW
@@ -452,18 +541,211 @@ def test_a_workspace_reaches_deleted_only_through_deleting(app_sessionmaker, org
             with tenant_scope(session, org["tenant_a"]):
                 with pytest.raises(InvError, match="cannot go from"):
                     settings_service.set_workspace_status(
-                        session, tenant_id=org["tenant_a"],
-                        workspace_id=org["workspace_id"], status="deleted",
-                        acting_user_id=org["owner"], now=NOW,
+                        session,
+                        tenant_id=org["tenant_a"],
+                        workspace_id=org["workspace_id"],
+                        status="deleted",
+                        acting_user_id=org["owner"],
+                        now=NOW,
                     )
                 settings_service.set_workspace_status(
-                    session, tenant_id=org["tenant_a"],
-                    workspace_id=org["workspace_id"], status="deleting",
-                    acting_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    workspace_id=org["workspace_id"],
+                    status="deleting",
+                    acting_user_id=org["owner"],
+                    now=NOW,
                 )
                 deleted = settings_service.set_workspace_status(
-                    session, tenant_id=org["tenant_a"],
-                    workspace_id=org["workspace_id"], status="deleted",
-                    acting_user_id=org["owner"], now=NOW,
+                    session,
+                    tenant_id=org["tenant_a"],
+                    workspace_id=org["workspace_id"],
+                    status="deleted",
+                    acting_user_id=org["owner"],
+                    now=NOW,
                 )
     assert deleted.deleted_at is not None
+
+
+# --------------------------------------------------------------------------
+# An offer only means something if the thing that grants leases reads it
+# --------------------------------------------------------------------------
+
+
+def _observe(owner_engine, org, *, kind="memory", capacity=64 * GIB):
+    """What the kernel's own probes would have recorded on this node."""
+    resource_id = new_id("run").replace("run_", "res_")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO inv.tenants (tenant_id, name) VALUES (:t, 'o') "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.nodes (tenant_id, node_id, status, heartbeat_at, "
+                "recovery_epoch, clock_skew_seconds) VALUES (:t, :n, 'online', "
+                "clock_timestamp(), gen_random_uuid(), 0) ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"], "n": org["node_id"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.resources (tenant_id, resource_id, node_id, kind, "
+                "capacity, offered) VALUES (:t, :r, :n, :k, :cap, 0)"
+            ),
+            {
+                "t": org["tenant_a"],
+                "r": resource_id,
+                "n": org["node_id"],
+                "k": kind,
+                "cap": capacity,
+            },
+        )
+    return resource_id
+
+
+def test_an_offer_reaches_what_the_kernel_grants_leases_against(
+    app_sessionmaker, owner_engine, org
+):
+    """Until this, a lowered offer changed a number no scheduler read.
+
+    The machine kept accepting the work its owner had just said it should stop
+    taking, and nothing anywhere reported a disagreement.
+    """
+    resource_id = _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                body = settings_service.set_resource_offer(
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=24,
+                    unit="GiB",
+                    now=NOW,
+                )
+    assert body["appliedToKernel"] is True
+    assert body["kernelResourceId"] == resource_id
+    with owner_engine.connect() as c:
+        offered = c.execute(
+            text("SELECT offered FROM inv.resources WHERE resource_id = :r"),
+            {"r": resource_id},
+        ).scalar_one()
+    assert offered == 24 * GIB
+
+
+def test_an_offer_below_what_is_already_leased_is_refused(app_sessionmaker, owner_engine, org):
+    """The kernel's rule, and it is stricter than "a ceiling for future work".
+
+    Accepting it would leave the kernel holding more than the owner now permits.
+    """
+    resource_id = _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                settings_service.set_resource_offer(
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=48,
+                    unit="GiB",
+                    now=NOW,
+                )
+    # Something is running against it.
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO inv.projects (tenant_id, project_id) VALUES (:t, :p) "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": org["tenant_a"], "p": org["project_id"]},
+        )
+        run_id = new_id("run")
+        c.execute(
+            text("INSERT INTO inv.runs (tenant_id, project_id, run_id) " "VALUES (:t, :p, :r)"),
+            {"t": org["tenant_a"], "p": org["project_id"], "r": run_id},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.resource_leases (tenant_id, project_id, run_id, "
+                "resource_id, lease_id, amount, recovery_epoch, expires_at) "
+                "VALUES (:t, :p, :r, :res, :l, :a, gen_random_uuid(), "
+                "clock_timestamp() + interval '1 hour')"
+            ),
+            {
+                "t": org["tenant_a"],
+                "p": org["project_id"],
+                "r": run_id,
+                "res": resource_id,
+                "l": new_id("run").replace("run_", "lse_"),
+                "a": 32 * GIB,
+            },
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                with pytest.raises(InvError, match="already leased exceeds"):
+                    settings_service.set_resource_offer(
+                        session,
+                        acting_user_id=org["owner"],
+                        tenant_id=org["tenant_a"],
+                        capability_id=org["ram_capability"],
+                        offered_quantity=8,
+                        unit="GiB",
+                        now=NOW + dt.timedelta(minutes=1),
+                    )
+
+
+def test_an_unobserved_node_is_reported_not_refused(app_sessionmaker, org):
+    """A machine the kernel has never measured is a normal state.
+
+    An owner recording what they intend to offer on a node that is not enrolled
+    for execution yet should not be blocked by that.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                body = settings_service.set_resource_offer(
+                    session,
+                    acting_user_id=org["owner"],
+                    tenant_id=org["tenant_a"],
+                    capability_id=org["ram_capability"],
+                    offered_quantity=16,
+                    unit="GiB",
+                    now=NOW,
+                )
+    assert body["appliedToKernel"] is False
+    assert body["kernelReasonCode"] == "resource_not_registered"
+    assert body["offeredQuantity"] == 16 * GIB
+
+
+def test_applying_an_offer_is_bound_to_the_session_tenant(
+    app_sessionmaker, owner_engine, org, two_tenants
+):
+    """A definer function bypasses RLS, and this one writes.
+
+    Revision 0027 had to correct exactly this shape on a read path; repeating it
+    where the function changes what can be spent would be worse.
+    """
+    _, tenant_b = two_tenants
+    _observe(owner_engine, org)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, org["tenant_a"]):
+                applied, reason, _, _ = session.execute(
+                    text(
+                        "SELECT applied, reason, resource_ids, "
+                        "capacity FROM "
+                        "public.apply_capability_offer(:t, CAST(:n AS char(30)), "
+                        "CAST(:u AS char(30)), 1)"
+                    ),
+                    {"t": str(tenant_b), "n": org["ram_capability"], "u": org["owner"]},
+                ).one()
+    assert applied is False
+    assert reason == "tenant_scope_mismatch"

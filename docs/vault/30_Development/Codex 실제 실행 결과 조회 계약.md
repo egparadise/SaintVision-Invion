@@ -1,14 +1,16 @@
 ---
 doc_id: "CONTRACT-RESULT-OBSERVATION-001"
 title: "Codex 실제 실행 결과 조회 계약"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T13:44:00+09:00"
+updated: "2026-09-11T15:54:00+09:00"
 source_of_truth: "Git"
 ---
 
 # 실제 결과와 실행 준비 상태
+
+2026-09-11 후속: [[2026-09-11_Claude_잔여보고_Codex_독립검토]]에 따라 f4fe37e에서 업무 results.py와 중복 결과 라우터를 제거하고 readiness.py를 별도 연결했다. 기존 migration/데이터는 보존한다. 새 입력 준비 진단은 현재 epoch·동일 Workspace/project·대기 중인 attempt의 입력만 선택한다. 별도 kernel_request_permission과 input_prepared를 포함한 checks는 7개다. UI는 개수를 고정하지 말고 check ID와 배열을 사용한다. executable=false/admissionRequired=true는 유지한다. 코드 통합과 운영 배포·CI·독립 검토·물리 원격 인수는 별도 상태다.
 
 [[2026-09-11_RESULT-OBSERVATION_Codex_착수]] 및 [[Codex 계정과 실행 커널 통합 계약]]의 후속이다. Codex는 결과 무결성·권한 경계와 DB 이력 통합을 소유한다. Claude의 결과 조회·진단 서비스 원저자 이력은 보존하며 Codex 수정의 독립 검토는 Claude 대기다.
 
@@ -39,3 +41,11 @@ JSON Schema 정본 `contracts/v1alpha1/core.schema.json`의 RunResultView/RunArt
 이 조회는 운영 권한을 부여하거나 Node를 설치하지 않는다. subject 및 실행 권한 definer는 현재 transaction tenant만 조회하고 활성 계정/실제 subject 일치와 명시적 grant를 요구한다. `0026_subject_kernel_link`와 `0027_business_api_guards`를 고치지 않고 `0028_result_readiness_merge`에서 두 이력을 보존해 합친 후 tenant guard를 보강한다. downgrade는 거부한다.
 
 실제 IdP/Workspace provisioning·원격 도구 관측/실행·웹 인수는 후속 작업이다. 운영 DB/profile을 변경하지 않은 격리 시험을 실제 원격 PC·GPU·5대 검증이라고 표시하지 않는다.
+
+## 사용자 요청에 따른 구현 정본 확정
+
+실제 실행 결과 구현의 정본은 `services/control-plane/src/inv/result_view.py`, 데이터 정본은 inv Run/attempt/Node receipt/result completion/immutable Evidence다. Claude는 `src/saintvision/services/results.py`의 중복 실행 결과·artifact·attempt·raw output 구현과 해당 중복 route를 제거한다. canonical API의 current grant/출력 검증을 독립 검토하고 필요한 회귀 사례를 그 경로로 이전한다. 공개 migration·실행/감사 데이터는 삭제·개명하지 않는다.
+
+Workspace readiness는 별도 업무 진단 서비스 `execution_readiness.py`로 유지하며 그 route는 필요하면 독립 router로 옮긴다. 업무 Project/Workspace CRUD·메타데이터도 유지한다. public Run을 별도 성공/실패/Evidence 원장으로 동기화하지 않는다. handoff/binding은 kernel의 실제 승인·실행·복원 기록에서 읽는 업무 참조로 통일하며 별도 상태 머신을 만들지 않는다. Codex는 계약/분산 상태·무결성, Claude는 업무 서비스 정리/독립 검토, Gemini는 canonical API 화면 연결을 소유한다.
+
+구현 제거는 Claude의 다음 작업이다. 이 계약 확정 자체를 삭제 구현 완료나 독립 검토 승인으로 표시하지 않는다. 전체 인수 순서는 [[3 Agent 원격 실행과 운영 인수 확정]]이다.

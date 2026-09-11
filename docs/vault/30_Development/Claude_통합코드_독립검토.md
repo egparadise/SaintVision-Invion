@@ -1,10 +1,10 @@
 ---
 doc_id: "REVIEW-CLAUDE-ACCOUNT-RESULTS-20260911"
 title: "Claude 통합코드 독립검토"
-version: "1.0.0"
+version: "1.0.2"
 status: "review"
 author: "Claude"
-updated: "2026-09-11T13:54:39+09:00"
+updated: "2026-09-11T15:47:11+09:00"
 source_of_truth: "Git"
 ---
 
@@ -104,3 +104,70 @@ CI는 계정 제한으로 실행되지 않았고 지시대로 그대로 뒀습�
 - **원격 실행은 아직 검증되지 않았습니다.** 192.168.45.225는 관측 전용입니다. 여기 어떤 것도 원격 실행이 동작함을 보이지 않습니다.
 - **복원 리허설·부하 시험 미수행.**
 - 작성자와 검토자가 분리되어야 하므로 **이 문서는 승인이 아닙니다.** Codex의 독립 검토가 필요합니다 — 특히 0028·0029 definer 함수 두 개와 `check_migration_upgrade` 수정.
+
+---
+
+## 6. 2차 검토 — `agent/codex/result-observation` (`c9dea3f`)
+
+### 긴급: 제 수정 전 초안이 그대로 실려 있습니다 — **tenant 간 정보 유출**
+
+그 브랜치의 `migrations/versions/0026_subject_kernel_link.py`는 **제 미수정 초안**입니다. `current_setting('inv.tenant_id')` 바인딩이 없습니다.
+
+SECURITY DEFINER 함수는 소유자로 실행되어 **RLS를 우회**하므로, 호출자가 `p_tenant_id`에 아무 tenant나 넣으면 **다른 tenant의 사용자가 승인 주체로 등록돼 있는지** 알 수 있습니다.
+
+읽어서 주장하는 대신 **실제로 재현했습니다**:
+
+```
+session tenant : A
+asked about    : tenant B's user
+  their 0026 -> True    <-- reads across tenants
+  fixed 0028 -> False   <-- bound to the session scope
+```
+
+**제 버그를 Codex가 물려받은 것**이고, 지금 통합을 향해 가고 있습니다. 수정본은 제 `0028_subject_kernel_link`에 있습니다 — 차이는 한 줄입니다:
+
+```sql
+AND p_tenant_id = nullif(pg_catalog.current_setting('inv.tenant_id', true), '')::uuid
+```
+
+같은 이유로 신규 `run_committed_outputs`(0029)와 `apply_resource_offer`(0030)도 처음부터 바인딩해 두었습니다. **0030은 쓰기 경로**라 더 중요합니다.
+
+### 확인한 사항
+
+`result_view.py`(275줄)와 `test_business_results.py`(397줄)는 제 `results.py` 위에 커널 쪽 정본 view를 얹은 것으로 보입니다. 두 구현이 같은 개념을 다루므로 **어느 쪽이 정본인지 정해야 합니다** — 제 쪽은 `public` 권한 검사와 "없는 값은 null+reason", 그쪽은 커널 기록입니다. 중복은 이번이 세 번째이고(handoff, binding에 이어), 매번 Codex 쪽이 커널 기록에 더 가까웠습니다.
+
+---
+
+## 7. 자원 제공량 연결 (신규)
+
+**`public.resource_offers`와 `inv.resources.offered`가 연결돼 있지 않았습니다.** 커널은 lease를 주기 전에 `inv.resources.offered`를 검사하고, 제 설정 API는 `public.resource_offers`를 씁니다. 즉 **운영자가 화면에서 제공량을 낮춰도 스케줄러가 읽지 않는 숫자만 바뀌고**, 기계는 주인이 방금 그만 받으라고 한 일을 계속 받았습니다.
+
+migration 0030이 커널 자신의 규칙으로 적용합니다:
+
+- `offered <= capacity` — 커널이 **관측한** 용량을 넘을 수 없습니다(제 쪽 capability 검사와는 다른 사실이고, 둘 다 성립해야 합니다).
+- `offered >= 반납되지 않은 lease 합` — **커널의 규칙이고 제가 문서에 쓴 것보다 엄격합니다.** 저는 "낮춘 제공량은 새 예약에만 적용되고 진행 중 작업은 반납까지 돈다"고 썼는데, 커널은 **아예 거부**합니다. 주인이 이제 허용하지 않는 양을 계속 붙들고 있지 않겠다는 것이고, 그쪽이 맞습니다. 문구를 고쳤습니다.
+
+커널이 **관측한 적 없는 노드**는 거부가 아니라 보고입니다 — 실행용으로 등록되지 않은 기계에 주인이 의사를 기록하는 것은 정상 상태입니다.
+
+---
+
+## 8. 실행 결과 정본 확정에 따른 정리
+
+소유자 판단으로 **실행 결과의 정본은 `inv/result_view.py`** 로 확정됐습니다. 그에 따라 제 쪽 중복을 걷어냈습니다.
+
+중복은 코드만이 아니었습니다. 커널 앱이 `/v1/runs/{id}/result`, `/artifacts`, `/artifacts/content`를 서비스하고 **제 업무 앱이 같은 경로를 서비스하고 있었습니다.** 두 앱이 한 URL에 서로 다르게 답하는 상태이고, **경로 뒤에 배치된 쪽이 이기며 그 불일치를 아무도 보고하지 않습니다.** 어느 한쪽이 틀린 것보다 나쁩니다.
+
+그리고 `ResultView._scope`는 Run 잠금을 잡은 채 `Control.grant`를 확인합니다 — **권한 회수가 그 사이에 끼어들 수 없습니다.** 제 검사보다 강합니다.
+
+제거한 것:
+
+- `src/saintvision/services/results.py`
+- `src/saintvision/api/v1/results.py`의 result·artifacts·attempts·outputs 엔드포인트
+- migration `0029_run_outputs` (제 다운로드 경로만을 위한 것이었습니다). 아직 어떤 통합 브랜치에도 병합되지 않았고 폐기 가능한 시험 DB에만 적용됐으므로 제거했습니다 — "발행된 revision의 부모를 고쳐 쓰지 말라"는 제 원칙은 **누군가 적용했을 수 있는 revision**에 대한 것이고, 여기 해당하지 않습니다. `0030`을 `0028`로 재지정했습니다.
+
+남긴 것 — 커널이 소유하지 않는 질문입니다:
+
+- **`execution-readiness`** (`api/v1/readiness.py`). 결과 조회는 "무슨 일이 있었나"에 답하고, 이건 **"왜 아직 아무 일도 일어날 수 없나"** 에 답합니다. 프로젝트 멤버십·운영자 링크·Workspace 수명주기·기계에 설치된 도구에 걸쳐 있고, **그중 어느 하나도 커널의 것이 아닙니다.**
+- `0028_subject_kernel_link`(readiness가 씁니다), `0030_apply_resource_offer`.
+
+기록으로 남길 점: 같은 개념을 양쪽이 만든 것이 **네 번째**입니다(handoff, binding, results, 그리고 그 전 grants). 네 번 다 커널 기록에 가까운 쪽이 옳았습니다. 제 쪽이 반복적으로 **실행 사실을 재구성하려 한 것**이 원인이고, 업무 표면은 실행 사실을 **읽기만** 해야 합니다.

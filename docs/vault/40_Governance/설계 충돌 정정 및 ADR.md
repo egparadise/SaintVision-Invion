@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.24.0"
+version: "1.26.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T14:19:43+09:00"
+updated: "2026-09-11T15:47:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -102,3 +102,7 @@ ADR-064(같은 JWT 검증·명시적 업무 route 조합·분리된 inv_app/inv_
 ADR-066(현재 커널 Run/attempt/receipt/Evidence 조회와 검증된 파일 다운로드), ADR-067(실제 권한을 확인하는 준비 상태·원격 도구 미관측 시 unknown)은 [[Codex 실제 실행 결과 조회 계약]]을 따른다. public Run 기록과 실제 커널 실행 상태를 혼동하지 않는다. 0028에서 새 subject lookup 이력과 기존 권한 이력을 보존해 병합하고 tenant guard를 적용한다.
 
 ADR-068(명시적 계정/요청·승인 권한의 insert-only 원자 준비·현재 계정 잠금·불변 감사·공개 migration 이력 보존)은 [[Codex 계정 준비와 실행 권한 계약]]을 따른다. 계정 연결이 Node/Workspace 실행 가능을 뜻하지 않는다. 0030에서 두 결과 이력을 합치고 subject guard와 canonical 다운로드 경계를 유지한다.
+
+ADR-069(현재 관리자 권한·capability 전체 제공량을 모든 kernel slice에 원자 배분·Node→Resource 직렬화·GPU device 미매핑의 명시적 pending)은 [[Codex 자원 제공량과 예약 원자 반영 계약]]을 따른다. 0031은 두 공개 0030 이력을 보존한다. 결과 정본 및 다음 담당은 [[Codex 실제 실행 결과 조회 계약]] v1.1.0과 [[3 Agent 원격 실행과 운영 인수 확정]]이다.
+
+ADR-070(과거 migration 원본과 현재 적용 함수의 검증 구분·공개 이력 보존·현재 epoch/동일 project/대기 Run의 입력 진단)은 [[2026-09-11_Claude_잔여보고_Codex_독립검토]]를 따른다. 0032는 두 0031을 보존해 병합한다. 결과 URL은 kernel ResultView만 제공하고 업무 surface는 별도 readiness router를 사용한다. 로컬 회귀·CI·독립 검토·실제 운영 인수 상태는 분리한다.
