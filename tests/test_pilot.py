@@ -660,3 +660,23 @@ def test_pilot_records_are_tenant_isolated(app_sessionmaker, pilot):
                     assert (
                         session.execute(text(f"SELECT count(*) FROM {table}")).scalar_one() == 0
                     ), table
+
+
+@pytest.mark.parametrize("outcome", ["failed", "aborted"])
+def test_failed_or_aborted_drill_keeps_measurements_without_claiming_targets(app_sessionmaker, pilot, outcome):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                drill = pilot_service.record_recovery_drill(
+                    session, tenant_id=pilot["tenant_a"], scope="database",
+                    outcome=outcome, performed_by_user_id=pilot["user_id"], now=NOW,
+                    measurement=_measurement(), integrity_verified=True, fencing_verified=True,
+                )
+                drill_id = drill.drill_id
+    assert drill.measured_rpo_seconds is not None
+    assert drill.met_targets is False
+    with app_sessionmaker() as session:
+        with pytest.raises((IntegrityError, DBAPIError)):
+            with session.begin():
+                with tenant_scope(session, pilot["tenant_a"]):
+                    session.execute(text("UPDATE recovery_drills SET met_targets=true WHERE drill_id=:d"), {"d":drill_id})

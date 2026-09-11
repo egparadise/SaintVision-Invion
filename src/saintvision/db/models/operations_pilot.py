@@ -134,6 +134,7 @@ class RecoveryDrill(Base):
             "outcome <> 'passed' OR scope <> 'database' OR fencing_verified",
             name="database_pass_requires_fencing_check",
         ),
+        CheckConstraint("NOT met_targets OR outcome = 'passed'", name="met_targets_requires_passed"),
         # met_targets is a claim, and it must agree with the measurements.
         CheckConstraint(
             "NOT met_targets OR ("

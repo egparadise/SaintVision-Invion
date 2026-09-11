@@ -47,6 +47,7 @@ def main():
         "0032_workspace_readiness_merge",
         "0033_workspace_bridge_merge",
         "0034_terminal_frame_intents",
+        "0035_credential_registry",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
@@ -54,6 +55,7 @@ def main():
         try:
             sentinel = uuid4()
             preserved_workspace = None
+            preserved_drill = None
             info = conninfo_to_dict(admin)
             url = URL.create(
                 "postgresql+psycopg",
@@ -73,6 +75,15 @@ def main():
                 )
                 if result.returncode:
                     raise RuntimeError("Migration path failed: " + prior + " -> " + target)
+                if target == prior and prior == "0035_credential_registry":
+                    from saintvision.ids import new_id
+                    user, preserved_drill = new_id('user'), new_id('drill')
+                    with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
+                        conn.execute("INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'legacy claim')", (sentinel,'upgrade-'+sentinel.hex))
+                        conn.execute("INSERT INTO public.users(tenant_id,user_id,external_subject,display_name) VALUES(%s,%s,'synthetic','legacy operator')", (sentinel,user))
+                        conn.execute("""INSERT INTO public.recovery_drills
+                            (drill_id,tenant_id,scope,outcome,measured_rpo_seconds,measured_rto_seconds,target_rpo_seconds,target_rto_seconds,met_targets,fencing_verified,integrity_verified,performed_by_user_id,performed_at,notes)
+                            VALUES(%s,%s,'database','failed',1,1,900,3600,true,false,false,%s,now(),'{}')""", (preserved_drill,sentinel,user))
                 if target == prior and prior in {"0023_containment_approvals", "0025_workspace_start", "0025_workspace_tool_choice"}:
                     with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
                         conn.execute("INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'preserve-me')",
@@ -107,6 +118,16 @@ def main():
                     has_table_privilege('inv_kernel','inv.business_admin_grants','UPDATE')""").fetchone() == (False,False,False)
                 if prior in {"0023_containment_approvals", "0025_workspace_start", "0025_workspace_tool_choice"}:
                     assert conn.execute("SELECT display_name FROM public.tenants WHERE tenant_id=%s",(sentinel,)).fetchone()==('preserve-me',)
+                if preserved_drill:
+                    assert conn.execute("SELECT outcome,met_targets FROM public.recovery_drills WHERE drill_id=%s", (preserved_drill,)).fetchone() == ('failed',True)
+                    assert conn.execute("SELECT convalidated FROM pg_constraint WHERE conname='ck_recovery_drills_met_targets_requires_passed'").fetchone() == (False,)
+                    try:
+                        with conn.transaction():
+                            conn.execute("UPDATE public.recovery_drills SET met_targets=true WHERE drill_id=%s", (preserved_drill,))
+                    except psycopg.errors.CheckViolation:
+                        pass
+                    else:
+                        raise AssertionError('New writes must enforce outcome without rewriting historic claims')
                 if preserved_workspace:
                     assert conn.execute("SELECT tool_name FROM public.workspaces WHERE workspace_id=%s",(preserved_workspace,)).fetchone()==('codex-cli',)
             from check_definer_functions import audit

@@ -199,7 +199,8 @@ def record_recovery_drill(
         measurement.validate()
 
     met = bool(
-        measurement
+        outcome == "passed"
+        and measurement
         and measurement.rpo_seconds <= target_rpo_seconds
         and measurement.rto_seconds <= target_rto_seconds
     )
