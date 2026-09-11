@@ -422,6 +422,95 @@ def _rls_scopes(dsn: str, app_role: str) -> dict[str, Any]:
     }
 
 
+def rpo_bound_from(settings: dict[str, Any]) -> tuple[bool, int | None, str]:
+    """Decide the operational RPO bound from the server's settings.
+
+    Pure, and separate from the query, because the branch that matters most is
+    the awkward middle one — archiving switched on but ``archive_timeout`` left
+    at 0 — and a server started with ``-c archive_timeout=300`` cannot be talked
+    out of it by ALTER SYSTEM, so that branch is not reachable from a live
+    instance without rebuilding one.
+    """
+    archiving = settings.get("archive_mode") in ("on", "always") and (
+        settings.get("archive_command") or ""
+    ).strip() not in ("", "(disabled)")
+    timeout = str(settings.get("archive_timeout") or "")
+    if archiving and timeout.isdigit() and int(timeout) > 0:
+        return (
+            True,
+            int(timeout),
+            f"continuous archiving is on; a committed transaction is shipped "
+            f"within archive_timeout ({int(timeout)}s)",
+        )
+    if archiving:
+        return (
+            True,
+            None,
+            "continuous archiving is on but archive_timeout is 0, so a "
+            "low-traffic period can hold a committed transaction in an "
+            "unshipped segment indefinitely; the bound is not a number this "
+            "tool can state",
+        )
+    return (
+        False,
+        None,
+        "there is no point-in-time recovery: archive_mode is "
+        f"{settings.get('archive_mode')!r} and archive_command is not set. "
+        "The only recovery point is the last full backup, so the operational "
+        "RPO is the backup interval — which this tool does not know and will "
+        "not guess",
+    )
+
+
+def _recovery_capability(dsn: str) -> dict[str, Any]:
+    """What recovery this server is actually configured for.
+
+    The drill measures the gap between the backup it just took and now, and
+    that number is near zero by construction — it says the restore worked, and
+    it says nothing at all about the recovery point an operator would face at
+    03:00 on a Tuesday. Reporting it as evidence for an RPO target is the same
+    mistake as a check that can only pass.
+
+    The operational bound comes from the configuration, not from the drill:
+
+    * With continuous archiving on, the worst case is roughly
+      ``archive_timeout`` — the longest a committed transaction can sit in a
+      WAL segment that has not been shipped.
+    * With archiving off there is no point-in-time recovery at all. The only
+      recovery point is the last full backup, so the bound is the backup
+      interval, which this tool does not know and must not guess.
+
+    ``data_checksums`` is here because it decides whether the source of a backup
+    can be trusted. This drill compares a restore against its source, so a page
+    that was already silently corrupt reads identically on both sides and passes
+    every comparison made here.
+    """
+    settings: dict[str, Any] = {}
+    names = (
+        "wal_level",
+        "archive_mode",
+        "archive_command",
+        "archive_timeout",
+        "data_checksums",
+        "full_page_writes",
+    )
+    with _conn(dsn) as conn:
+        for name in names:
+            row = conn.execute(
+                "SELECT setting FROM pg_settings WHERE name = %s", (name,)
+            ).fetchone()
+            settings[name] = row[0] if row else None
+
+    archiving, bound, basis = rpo_bound_from(settings)
+    return {
+        "settings": settings,
+        "continuousArchiving": archiving,
+        "operationalRpoBoundSeconds": bound,
+        "basis": basis,
+        "detectsSilentCorruption": settings.get("data_checksums") == "on",
+    }
+
+
 def _fencing_state(dsn: str) -> dict[str, Any]:
     """The highest token issued, and the highest one a lease still holds.
 
@@ -657,6 +746,7 @@ def _restore_and_verify(
         report["targetCounts"] = target_counts
         report["targetDigests"] = target_digests
         report["measuredRtoSeconds"] = measured_rto
+        report["recoveryCapability"] = _recovery_capability(args.source)
         report["measuredRpoSeconds"] = (
             round(
                 (dt.datetime.now(dt.timezone.utc) - backup_taken_at).total_seconds(),
@@ -841,6 +931,21 @@ def record(report: dict[str, Any], args) -> str | None:
     return None
 
 
+def _meets_operational_rpo(report: dict[str, Any], target: int | None) -> bool:
+    """Does the configuration establish a bound at or under the target?
+
+    Separate from ``_passed`` because a successful restore and a met recovery
+    objective are different claims. A drill can restore perfectly on a server
+    that has no point-in-time recovery at all.
+    """
+    if target is None:
+        return True
+    bound = (report.get("recoveryCapability") or {}).get(
+        "operationalRpoBoundSeconds"
+    )
+    return bound is not None and bound <= target
+
+
 def _passed(report: dict[str, Any]) -> bool:
     """One definition of a passing drill, used by the exit code and the record.
 
@@ -909,6 +1014,18 @@ def main() -> int:
             "the model while the request path still works"
         ),
     )
+    parser.add_argument(
+        "--require-operational-rpo",
+        type=int,
+        metavar="SECONDS",
+        help=(
+            "fail unless the server's configuration establishes an operational "
+            "RPO bound at or under this many seconds. Use this when the drill "
+            "is being run as acceptance evidence for a target: without it the "
+            "drill reports the gap to a backup it took moments ago, which is "
+            "near zero however the server is configured"
+        ),
+    )
     parser.add_argument("--keep", action="store_true", help="do not drop the restore")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -920,12 +1037,44 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))
-        return 0 if _passed(report) else 1
+        return (
+            0
+            if _passed(report)
+            and _meets_operational_rpo(report, args.require_operational_rpo)
+            else 1
+        )
 
     print(f"backup        {report['backupBytes']} bytes, sha256 {report['backupSha256'][:16]}…")
     print(f"restore RTO   {report['measuredRtoSeconds']}s")
     rpo = report.get("measuredRpoSeconds")
-    print(f"recovery RPO  {rpo}s" if rpo is not None else "recovery RPO  unknown")
+    print(
+        f"recovery RPO  {rpo}s for this restore"
+        if rpo is not None
+        else "recovery RPO  unknown"
+    )
+    capability = report.get("recoveryCapability") or {}
+    bound = capability.get("operationalRpoBoundSeconds")
+    print(
+        f"operational   RPO bound {bound}s"
+        if bound is not None
+        else "operational   RPO bound NOT ESTABLISHED"
+    )
+    print(f"                {capability.get('basis')}")
+    if rpo is not None and bound is None:
+        # The measured number is the gap to a backup this drill took moments
+        # ago. Quoting it as the operational recovery point is how a target
+        # gets signed off against a measurement that could not have failed.
+        print(
+            "                the measured figure above is the gap to a backup "
+            "taken during this drill; it is not the recovery point an incident "
+            "would face and is not evidence for an RPO target"
+        )
+    if not capability.get("detectsSilentCorruption", True):
+        print(
+            "                data_checksums is off: a page already corrupt at "
+            "the source reads the same on both sides and passes every "
+            "comparison this drill makes"
+        )
     print(f"integrity     {'verified' if report['integrityVerified'] else 'FAILED'}")
     print(
         f"privileges    "
@@ -978,6 +1127,14 @@ def main() -> int:
     print(f"                {report['fencingNote']}")
     if report.get("drillId"):
         print(f"recorded      {report['drillId']}")
+    if not _meets_operational_rpo(report, args.require_operational_rpo):
+        print(
+            f"\nREFUSED as acceptance evidence: an operational RPO bound at or "
+            f"under {args.require_operational_rpo}s was required and the "
+            f"server's configuration does not establish one. The restore itself "
+            f"is reported above and may well be sound."
+        )
+        return 1
     return 0 if _passed(report) else 1
 
 
