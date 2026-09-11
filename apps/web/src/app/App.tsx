@@ -183,6 +183,7 @@ const DEMO_APPROVAL: ApprovalItem = {
   status: 'pending',
   nonce: 'nonce_987654321',
   expiresAt: new Date(Date.now() + 1000 * 60 * 8).toISOString(), // 8 minutes remaining
+  requestedBy: 'usr_requester_alice',
   policyReason: '외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)',
   createdAt: new Date().toISOString(),
 };

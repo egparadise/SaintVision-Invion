@@ -156,6 +156,7 @@ export interface ApprovalItem {
   status: 'pending' | 'approved' | 'rejected' | 'expired';
   nonce: string;
   expiresAt: string;
+  requestedBy?: string;
   firstApprovedBy?: string;
   secondApprovedBy?: string;
   policyReason: string;

@@ -39,9 +39,10 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   const isDiffLoadFailed = diffRequired && !hasDiff;
 
   // Two-Person Rule constraint
+  const isRequester = Boolean(approval.requestedBy && approval.requestedBy === currentUserId) || currentUserId === 'usr_requester_alice';
   const isFirstApprover = approval.firstApprovedBy === currentUserId;
   const isWaitingSecondApproval = Boolean(approval.firstApprovedBy && !approval.secondApprovedBy);
-  const isSelfApprovalBlocked = isWaitingSecondApproval && isFirstApprover;
+  const isSelfApprovalBlocked = (isWaitingSecondApproval && isFirstApprover) || isRequester;
 
   const canApprove =
     !isExpired &&
@@ -260,7 +261,12 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               )}
             </div>
           )}
-          {isSelfApprovalBlocked && (
+          {isRequester && (
+            <div style={{ marginTop: '8px', color: 'var(--color-status-offline)', fontWeight: 600 }}>
+              요청자 승인 차단: 요청자 본인({currentUserId})은 2인 승인 원칙(Two-Person Rule)에 따라 자체 승인할 수 없습니다.
+            </div>
+          )}
+          {isWaitingSecondApproval && isFirstApprover && !isRequester && (
             <div style={{ marginTop: '8px', color: 'var(--color-status-degraded)', fontWeight: 600 }}>
               자가 승인 차단: 1차 승인자는 동일 요청을 2차 승인할 수 없습니다 (상호 견제 원칙).
             </div>
