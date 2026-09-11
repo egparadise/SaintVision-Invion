@@ -42,14 +42,16 @@ def test_integrated_migration_keeps_both_published_histories():
     spec.loader.exec_module(module)
     revisions = module.load()
     ordered = module.chain(revisions)
-    assert ordered[-1].revision == "0027_business_api_guards"
+    assert ordered[-1].revision == "0028_result_readiness_merge"
     parents = {r.revision: r.down_revision for r in revisions}
     assert parents["0008_node_certificate_lookup"] == "0006_control_api"
     assert parents["0007_delivery_queue"] == "0006_control_api"
     assert set(parents["0026_business_start_merge"]) == {"0025_workspace_start", "0025_workspace_tool_choice"}
     assert parents["0025_workspace_start"] == "0023_containment_approvals"
     assert parents["0025_workspace_tool_choice"] == "0024_project_kernel_link"
-    assert module.downgrade_target(revisions) == "0027_business_api_guards"
+    assert set(parents["0028_result_readiness_merge"]) == {"0027_business_api_guards", "0026_subject_kernel_link"}
+    assert parents["0026_subject_kernel_link"] == "0025_workspace_tool_choice"
+    assert module.downgrade_target(revisions) == "0028_result_readiness_merge"
     with pytest.raises(ValueError, match="unmerged"):
         module.chain(
             [
@@ -67,6 +69,8 @@ def test_integrated_migration_keeps_both_published_histories():
                     "0025_workspace_tool_choice",
                     "0026_business_start_merge",
                     "0027_business_api_guards",
+                    "0026_subject_kernel_link",
+                    "0028_result_readiness_merge",
                 }
             ]
         )

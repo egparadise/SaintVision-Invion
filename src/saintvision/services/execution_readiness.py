@@ -110,8 +110,7 @@ def workspace_readiness(
                 "linked; creating a project deliberately does not grant that"
             ),
             remedy=(
-                "an operator inserts this project into inv.business_projects "
-                "with enabled = true, as the schema owner"
+                "ask the operator to enable this project for managed execution"
             ),
         ),
         _check(
@@ -124,8 +123,7 @@ def workspace_readiness(
                 "by one person holding two identities"
             ),
             remedy=(
-                "an operator maps this user's OIDC subject into "
-                "inv.business_subjects, as the schema owner"
+                "ask the operator to register this account for managed execution"
             ),
         ),
         _check(
@@ -152,84 +150,37 @@ def workspace_readiness(
         ),
     ]
 
+    allowed = bool(session.execute(text(
+        "SELECT public.business_execution_permission(:t,:p,:u)"),
+        {"t": str(tenant_id), "p": workspace.project_id, "u": user_id}).scalar())
+    checks.append(_check("kernel_request_permission", allowed, owner=OPERATOR,
+        detail="the current account and project must have an enabled execution grant",
+        remedy="ask the operator to review this account's project execution permission"))
     checks.append(_tool_check(workspace))
 
     unmet = [c for c in checks if not c["satisfied"]]
     return {
         "workspaceId": workspace_id,
         "projectId": workspace.project_id,
-        "executable": not unmet,
+        "executable": False,
+        "scope": "workspace-preconditions-not-execution-admission",
+        "nodeReadiness": "unknown",
+        "admissionRequired": True,
         "checks": checks,
         # Grouped, because the person reading this needs to know whether to act
         # or to ask somebody else.
         "blockedBy": sorted({c["resolvedBy"] for c in unmet}),
-        "summary": (
-            "This workspace can run work."
-            if not unmet
-            else f"{len(unmet)} of {len(checks)} preconditions are unmet."
-        ),
+        "summary": f"{len(unmet)} of {len(checks)} preconditions are unmet; Node validation and execution admission are required.",
     }
 
 
 def _tool_check(workspace: Workspace) -> dict[str, Any]:
-    """The chosen tool, and whether a machine can actually run it now.
-
-    Two facts with different lifetimes, so an unmet check says which one failed.
-    A workspace configured last week cannot promise anything about a machine
-    today, and "no tool chosen" and "tool chosen but not signed in" are fixed by
-    different people.
-    """
-    from ..adapters import agents
-
+    # CP PATH/login files say nothing about the selected Node. This read cannot
+    # run a local CLI probe or substitute its readiness for remote observation.
     if workspace.tool_name is None:
-        return _check(
-            "tool_chosen_and_usable",
-            False,
-            owner=REQUESTER,
+        return _check("tool_chosen_and_usable", False, owner=REQUESTER,
             detail="no development tool has been chosen for this workspace",
-            remedy="choose one through the workspace tool API",
-        )
-
-    readiness = agents.adapter_for(workspace.tool_name).readiness()
-    usable = (
-        readiness["installed"]
-        and readiness["headless"]
-        and readiness["loginState"] == "logged_in"
-    )
-    if usable:
-        return _check(
-            "tool_chosen_and_usable",
-            True,
-            owner=NODE_OWNER,
-            detail=f"{workspace.tool_name} is installed and signed in",
-        )
-
-    if not readiness["installed"]:
-        reason = (
-            f"{workspace.tool_name} is installed on this machine but is not on "
-            f"PATH ({readiness['installedElsewhere']})"
-            if readiness.get("installedElsewhere")
-            else f"{workspace.tool_name} is not installed"
-        )
-        remedy = (
-            "add its directory to PATH rather than installing it again"
-            if readiness.get("installedElsewhere")
-            else "install it on the node; the platform does not install software"
-        )
-    elif not readiness["headless"]:
-        reason = f"{workspace.tool_name} has no non-interactive mode"
-        remedy = "choose a tool the platform can drive"
-    else:
-        reason = (
-            f"{workspace.tool_name} is installed but its login state is "
-            f"{readiness['loginState']}"
-        )
-        remedy = "sign in on the node; the platform never starts a login flow"
-
-    return _check(
-        "tool_chosen_and_usable",
-        False,
-        owner=NODE_OWNER,
-        detail=reason,
-        remedy=remedy,
-    )
+            remedy="choose a development tool for this workspace")
+    return _check("tool_chosen_and_usable", False, owner=NODE_OWNER,
+        detail=f"{workspace.tool_name}: readiness on the workspace Node is unknown",
+        remedy="connect the selected Node and verify its tool installation and login")

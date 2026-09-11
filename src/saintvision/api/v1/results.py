@@ -26,7 +26,7 @@ from ...services import execution_readiness as readiness_service
 from ...services import results as results_service
 from ..deps import get_principal, get_session
 
-router = APIRouter(tags=["results"])
+router = APIRouter(prefix="/v1", tags=["results"])
 
 
 @router.get("/runs/{run_id}/result")

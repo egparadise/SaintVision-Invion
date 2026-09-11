@@ -271,6 +271,7 @@ def test_the_checklist_reports_every_precondition_at_once(app_sessionmaker, scen
         "requester_registered_with_kernel",
         "role_permits_requesting",
         "workspace_ready",
+        "kernel_request_permission",
         "tool_chosen_and_usable",
     ]
     assert report["executable"] is False
@@ -365,6 +366,8 @@ def test_an_operator_link_satisfies_the_kernel_checks(
             ),
             {"t": scene["tenant_a"], "s": "oidc:" + "b" * 64, "u": scene["owner"]},
         )
+        c.execute(text("UPDATE public.users SET external_subject=:s WHERE tenant_id=:t AND user_id=:u"),
+                  {"t":scene["tenant_a"],"u":scene["owner"],"s":"oidc:"+"b"*64})
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, scene["tenant_a"]):
@@ -375,8 +378,9 @@ def test_an_operator_link_satisfies_the_kernel_checks(
     by_name = {c["check"]: c for c in report["checks"]}
     assert by_name["project_linked_to_kernel"]["satisfied"]
     assert by_name["requester_registered_with_kernel"]["satisfied"]
-    # Only the tool choice is left, and it belongs to the requester.
-    assert report["blockedBy"] == ["requester"]
+    # Identity links alone do not grant permission to execute on this project.
+    assert not by_name["kernel_request_permission"]["satisfied"]
+    assert report["blockedBy"] == ["operator", "requester"]
 
 
 def test_the_checklist_cannot_be_used_to_probe_another_project(

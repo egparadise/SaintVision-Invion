@@ -9,10 +9,13 @@ from starlette.routing import Match
 class BusinessDispatch:
     def __init__(self, app, business):
         self.app, self.business = app, business
-        from saintvision.api.v1 import projects, settings, adapters
+        from saintvision.api.v1 import projects, settings, adapters, results
         # Read the three declared routers, not FastAPI's lazily included wrapper
         # routes. Keep all deeper execution routes on the kernel application.
         self.routes = [r for module in (projects, settings, adapters) for r in module.router.routes]
+        # Run result paths belong to the execution kernel, including first Runs
+        # which have no public.runs row. Only workspace readiness is business CRUD.
+        self.routes += [r for r in results.router.routes if r.path.startswith("/v1/workspaces/")]
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http" and any(r.matches(scope)[0] != Match.NONE for r in self.routes):

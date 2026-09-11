@@ -669,3 +669,82 @@ type WorkspaceStartEnqueueResult struct {
     Accepted bool `json:"accepted"`
     StartId string `json:"startId"`
 }
+
+type ResultOutputMetadata struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Verified bool `json:"verified"`
+}
+
+type ResultStopReceipt struct {
+    ReceiptId string `json:"receiptId"`
+    ProcessStarted bool `json:"processStarted"`
+    ExitCode int64 `json:"exitCode"`
+    Reason string `json:"reason"`
+    FinishedAt Timestamp `json:"finishedAt"`
+}
+
+type RunResultView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    AttemptCount int64 `json:"attemptCount"`
+    Sealed bool `json:"sealed"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
+    CommandId *string `json:"commandId"`
+    NodeId *NodeId `json:"nodeId"`
+    StopReceipt *ResultStopReceipt `json:"stopReceipt"`
+    Evidence *EvidenceEnvelope `json:"evidence"`
+    CompletedAt *Timestamp `json:"completedAt"`
+    Output *ResultOutputMetadata `json:"output"`
+    OutputAbsentReason *string `json:"outputAbsentReason"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+}
+
+type RunArtifactFile struct {
+    Path string `json:"path"`
+    ChecksumSha256 string `json:"checksumSha256"`
+    ByteSize int64 `json:"byteSize"`
+    Verified bool `json:"verified"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+}
+
+type RunArtifactList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Artifacts []RunArtifactFile `json:"artifacts"`
+    Count int64 `json:"count"`
+    VerifiedCount int64 `json:"verifiedCount"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunLogView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Stdout *string `json:"stdout"`
+    Stderr *string `json:"stderr"`
+    Redacted bool `json:"redacted"`
+    Truncated *bool `json:"truncated"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunAttemptObservation struct {
+    AttemptNumber int64 `json:"attemptNumber"`
+    StartedAt *Timestamp `json:"startedAt"`
+    NodeId *NodeId `json:"nodeId"`
+    CommandId *string `json:"commandId"`
+    StopReceiptId *string `json:"stopReceiptId"`
+    ExitCode *int64 `json:"exitCode"`
+    Reason *string `json:"reason"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type RunAttemptList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Attempts []RunAttemptObservation `json:"attempts"`
+    Count int64 `json:"count"`
+    NextCursor *int64 `json:"nextCursor"`
+}

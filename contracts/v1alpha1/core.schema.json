@@ -3053,6 +3053,476 @@
         "commandId",
         "accepted"
       ]
+    },
+    "ResultOutputMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "verified"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verified": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "ResultStopReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptId",
+        "processStarted",
+        "exitCode",
+        "reason",
+        "finishedAt"
+      ],
+      "properties": {
+        "receiptId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "processStarted": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "finishedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      }
+    },
+    "RunResultView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "projectId",
+        "state",
+        "version",
+        "attemptCount",
+        "sealed",
+        "executionConfirmed",
+        "commandId",
+        "nodeId",
+        "stopReceipt",
+        "evidence",
+        "completedAt",
+        "output",
+        "outputAbsentReason",
+        "resourceReleasePending"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "attemptCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sealed": {
+          "type": "boolean"
+        },
+        "executionConfirmed": {
+          "type": "boolean"
+        },
+        "commandId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stopReceipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultStopReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceEnvelope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultOutputMetadata"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outputAbsentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceReleasePending": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RunArtifactFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "checksumSha256",
+        "byteSize",
+        "verified",
+        "evidenceId"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "checksumSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byteSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verified": {
+          "type": "boolean",
+          "const": true
+        },
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        }
+      }
+    },
+    "RunArtifactList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "artifacts",
+        "count",
+        "verifiedCount",
+        "absentReason"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "artifacts": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/RunArtifactFile"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verifiedCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "absentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunLogView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "stdout",
+        "stderr",
+        "redacted",
+        "truncated",
+        "absentReason"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "stdout": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stderr": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "redacted": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "absentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunAttemptObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attemptNumber",
+        "startedAt",
+        "nodeId",
+        "commandId",
+        "stopReceiptId",
+        "exitCode",
+        "reason",
+        "evidenceId"
+      ],
+      "properties": {
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commandId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stopReceiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunAttemptList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "attempts",
+        "count",
+        "nextCursor"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "attempts": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/RunAttemptObservation"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
     }
   },
   "oneOf": [

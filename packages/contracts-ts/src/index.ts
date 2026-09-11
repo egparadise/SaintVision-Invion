@@ -667,3 +667,82 @@ export interface WorkspaceStartEnqueueResult {
   accepted: true;
   startId: string;
 }
+
+export interface ResultOutputMetadata {
+  sha256: string;
+  sizeBytes: number;
+  verified: true;
+}
+
+export interface ResultStopReceipt {
+  receiptId: string;
+  processStarted: boolean;
+  exitCode: number;
+  reason: string;
+  finishedAt: Timestamp;
+}
+
+export interface RunResultView {
+  source: "execution-kernel";
+  runId: RunId;
+  projectId: ProjectId;
+  state: RunState;
+  version: number;
+  attemptCount: number;
+  sealed: boolean;
+  executionConfirmed: boolean;
+  commandId: (string | null);
+  nodeId: (NodeId | null);
+  stopReceipt: (ResultStopReceipt | null);
+  evidence: (EvidenceEnvelope | null);
+  completedAt: (Timestamp | null);
+  output: (ResultOutputMetadata | null);
+  outputAbsentReason: (string | null);
+  resourceReleasePending: boolean;
+}
+
+export interface RunArtifactFile {
+  path: string;
+  checksumSha256: string;
+  byteSize: number;
+  verified: true;
+  evidenceId: EvidenceId;
+}
+
+export interface RunArtifactList {
+  source: "execution-kernel";
+  runId: RunId;
+  artifacts: Array<RunArtifactFile>;
+  count: number;
+  verifiedCount: number;
+  absentReason: (string | null);
+}
+
+export interface RunLogView {
+  source: "execution-kernel";
+  runId: RunId;
+  stdout: (string | null);
+  stderr: (string | null);
+  redacted: boolean;
+  truncated: (boolean | null);
+  absentReason: (string | null);
+}
+
+export interface RunAttemptObservation {
+  attemptNumber: number;
+  startedAt: (Timestamp | null);
+  nodeId: (NodeId | null);
+  commandId: (string | null);
+  stopReceiptId: (string | null);
+  exitCode: (number | null);
+  reason: (string | null);
+  evidenceId: (EvidenceId | null);
+}
+
+export interface RunAttemptList {
+  source: "execution-kernel";
+  runId: RunId;
+  attempts: Array<RunAttemptObservation>;
+  count: number;
+  nextCursor: (number | null);
+}

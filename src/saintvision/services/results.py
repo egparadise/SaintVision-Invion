@@ -21,11 +21,10 @@ Every absent value carries a ``reason``. A screen that cannot tell "no result
 yet" from "result with nothing in it" will eventually show one as the other, and
 the one time that matters is when somebody is deciding whether a job really ran.
 
-**On agreement with the kernel.** The Run, the Evidence and the binding are read
-from the rows the execution side writes — ``public.execution_bindings`` is
-Codex's table and this side has SELECT on it and nothing more. So "the screen
-and the API return the same Run and Evidence" is true because there is one copy,
-not because two are kept in step.
+These are public business records. Only execution_bindings is kernel-owned;
+public.runs and public Evidence are not synchronized projections of inv.runs.
+The combined production application's Run URLs use inv.result_view instead,
+including first executions that have no public Run record.
 """
 
 from __future__ import annotations
@@ -85,6 +84,7 @@ def run_result(
     ).first()
 
     body: dict[str, Any] = {
+        "source": "business-records",
         "runId": run.run_id,
         "projectId": workspace_project,
         "state": run.state,
@@ -223,9 +223,10 @@ def list_artifacts(
     pinned = {
         artifact_id
         for artifact_id in session.scalars(
-            select(RunRecordArtifact.artifact_id).where(
-                RunRecordArtifact.tenant_id == tenant_id
-            )
+            select(RunRecordArtifact.artifact_id).join(
+                RunRecord, (RunRecord.tenant_id == RunRecordArtifact.tenant_id) &
+                (RunRecord.record_id == RunRecordArtifact.record_id)
+            ).where(RunRecordArtifact.tenant_id == tenant_id, RunRecord.run_id == run_id)
         ).all()
     }
 

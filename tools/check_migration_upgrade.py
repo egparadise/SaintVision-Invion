@@ -24,6 +24,8 @@ def main():
         "0023_containment_approvals",
         "0025_workspace_start",
         "0025_workspace_tool_choice",
+        "0026_subject_kernel_link",
+        "0027_business_api_guards",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
@@ -62,7 +64,7 @@ def main():
                             conn.execute("INSERT INTO public.workspaces(tenant_id,project_id,workspace_id,name,created_by_user_id,tool_name) VALUES(%s,%s,%s,'preserve',%s,'codex-cli')",(sentinel,project,preserved_workspace,user))
             with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
                 assert conn.execute("SELECT version_num FROM alembic_version").fetchall() == [
-                    ("0027_business_api_guards",)
+                    ("0028_result_readiness_merge",)
                 ]
                 assert conn.execute(
                     "SELECT rolsuper,rolcanlogin,rolbypassrls FROM pg_roles WHERE rolname='inv_kernel'"

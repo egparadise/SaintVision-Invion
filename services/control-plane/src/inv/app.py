@@ -364,6 +364,43 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     def run(project: str, run_id: str, identity=Depends(authenticated)):
         return control.get(identity.principal, project, run_id)
 
+    # Both URL forms use the canonical kernel, never public.runs CRUD state.
+    from .result_view import ResultView
+    result_view = ResultView(database)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/result")
+    @api.get("/v1/runs/{run_id}/result")
+    def run_result(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.result(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts")
+    @api.get("/v1/runs/{run_id}/artifacts")
+    def run_artifacts(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.artifacts(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts/content")
+    @api.get("/v1/runs/{run_id}/artifacts/content")
+    def run_file(run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)):
+        import hashlib
+        from starlette.responses import Response
+        content = result_view.download(identity.principal, run_id, path, project)
+        return Response(content, media_type="application/octet-stream", headers={
+            "Content-Disposition": 'attachment; filename="artifact.bin"',
+            "X-Content-SHA256": hashlib.sha256(content).hexdigest(),
+            "X-Content-Type-Options": "nosniff",
+        })
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/logs")
+    @api.get("/v1/runs/{run_id}/logs")
+    def run_logs(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.logs(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/attempts")
+    @api.get("/v1/runs/{run_id}/attempts")
+    def run_attempts(run_id: str, project: str | None = None, after: int = 0, limit: int = 50,
+                     identity=Depends(authenticated)):
+        return result_view.attempts(identity.principal, run_id, project, after=after, limit=limit)
+
     @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
     async def cancel(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
         data = await request.json()

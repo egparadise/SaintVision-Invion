@@ -48,11 +48,24 @@ def test_account_project_and_kernel_use_same_identity_and_current_membership(env
             response=client.post(path,json={},headers=headers)
             assert response.status_code==201, response.text
             assert response.json()['state']=='draft'
+            run_id=response.json()['runId']
+            result=client.get('/v1/runs/'+run_id+'/result',headers=headers)
+            assert result.status_code==200, result.text
+            assert result.json()['source']=='execution-kernel' and not result.json()['sealed']
+            # No public.runs row exists: business CRUD cannot answer this call.
+            response=client.post('/v1/projects/'+project+'/workspaces',json={'name':'work'},headers=headers)
+            assert response.status_code==201, response.text
+            workspace=response.json()['workspaceId']
+            readiness=client.get('/v1/workspaces/'+workspace+'/execution-readiness',headers=headers)
+            assert readiness.status_code==200, readiness.text
+            checks={c['check']:c for c in readiness.json()['checks']}
+            assert checks['kernel_request_permission']['satisfied'] and not readiness.json()['executable']
             with psycopg.connect(env.owner) as c:
                 c.execute("UPDATE public.project_members SET role_code='viewer' WHERE tenant_id=%s AND project_id=%s",(env.tenant,project))
             headers['Idempotency-Key']=uuid4().hex
             assert client.post(path,json={},headers=headers).status_code==403
             assert client.get('/v1/projects',headers=headers).json()['projects'][0]['canRequest'] is False
+            assert client.get('/v1/runs/'+run_id+'/result',headers=headers).status_code==403
     finally:
         if business is not None:
             business.state.engine.dispose()

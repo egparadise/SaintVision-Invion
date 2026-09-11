@@ -893,6 +893,109 @@ class WorkspaceStartEnqueueResult(BaseModel):
     startId: UUID
 
 
+class ResultOutputMetadata(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+
+
+class ResultStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    processStarted: bool
+    exitCode: int
+    reason: constr(max_length=100)
+    finishedAt: Timestamp
+
+
+class RunResultView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attemptCount: conint(ge=0, le=9007199254740991)
+    sealed: bool
+    executionConfirmed: bool
+    commandId: UUID | None
+    nodeId: NodeId | None
+    stopReceipt: ResultStopReceipt | None
+    evidence: EvidenceEnvelope | None
+    completedAt: Timestamp | None
+    output: ResultOutputMetadata | None
+    outputAbsentReason: constr(max_length=1024) | None
+    resourceReleasePending: bool
+
+
+class RunArtifactFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    checksumSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    byteSize: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+    evidenceId: EvidenceId
+
+
+class RunArtifactList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    artifacts: list[RunArtifactFile] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    verifiedCount: conint(ge=0, le=9007199254740991)
+    absentReason: constr(max_length=1024) | None
+
+
+class RunLogView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    stdout: constr(max_length=65536) | None
+    stderr: constr(max_length=65536) | None
+    redacted: bool
+    truncated: bool | None
+    absentReason: constr(max_length=1024) | None
+
+
+class RunAttemptObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    attemptNumber: conint(ge=1, le=9007199254740991)
+    startedAt: Timestamp | None
+    nodeId: NodeId | None
+    commandId: UUID | None
+    stopReceiptId: UUID | None
+    exitCode: int | None
+    reason: constr(max_length=100) | None
+    evidenceId: EvidenceId | None
+
+
+class RunAttemptList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    attempts: list[RunAttemptObservation] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    nextCursor: conint(ge=1, le=9007199254740991) | None
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
