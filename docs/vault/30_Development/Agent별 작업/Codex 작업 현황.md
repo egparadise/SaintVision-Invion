@@ -131,7 +131,7 @@ source_of_truth: "Git"
 | 검증 | b5aef8a Linux64/core22 pass, 0skip, exit0; Go3는 변경 없는5fc1116 source 증거 |
 | CI / peer / 운영 | CI6 시작 전 계정 제한, Claude 최신 검토 pending, 전체 운영 인수 미완료 |
 | 다음 첫 행동 / owner | F1 제공량 경합 실제 함수 재현과 단일 snapshot 수정·F2 intent 감사 / Codex, 이후 CX-02 |
-| History / PR / sync | [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]] / PR19 / 18:56:07 관리430개 hash 일치, 최종 추가분은 후속 sync |
+| History / PR / sync | [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]] / PR19 / 18:59:44 전달3c74d13 관리433개 hash 일치, 최종 영수증 반영 |
 
 ## 2026-09-11 18:53 Codex 수신·검증·후속 기록
 
