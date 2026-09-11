@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:59:05+09:00"
+updated: "2026-09-12T01:12:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Codex 인계 2026-09-12T01:12:51+09:00: Claude dcad652 Context와5995b8b readiness 도구를 수신·검토해0f5f4e8에 보완 통합했다. 기존 원본 검토와 Codex 수정의 독립 승인은 별개다. CL-01의 다음 대상은74012b3/0035·0f5f4e8/ADR-077/078이며, 실제 Linux backend는 Codex가 구현했으므로 재작성하지 않고 CL-05 Provider 연결에 사용한다. 작성자 수정 승인 pending. [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]].
 
 CL-01 (Claude, 2026-09-11): d14db0a 독립 검토 완료. finding 2건(F1 제공량 기록·실제 불일치 재현, F2 PTY 감사 순서)을 Codex에 인계 대기. definer 함수 9개 전수 tenant 결속을 실측으로 확인했다. 전문 [[Claude_CL-01_커널독립검토]].
 

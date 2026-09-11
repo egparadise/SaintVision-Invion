@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-OPERATING-CONTRACT-001"
 title: "Codex 운영 자격증명과 Storage 계약"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T00:59:41+09:00"
+updated: "2026-09-12T01:12:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -50,7 +50,8 @@ Linux backend 구현은 서비스 소유 절대 root를 descriptor로 고정하�
 
 | 영역 | 구현 owner / reviewer | 필수 합격 증거 |
 |---|---|---|
-| Credential resolver·Linux backend·Adapter 연결 | Claude / Codex | 다른 tenant/project/purpose/목적지 거부, scope 재검사, 회전/회수 경합, symlink/교체 거부, 오류·trace·로그 비밀 비노출 |
+| Credential resolver·Linux backend | Codex / Claude | 다른 tenant/project/purpose/목적지 거부, scope 재검사, 회전/회수 경합, symlink/교체 거부, 오류·trace·로그 비밀 비노출 |
+| 실제 Provider Adapter 연결 | Claude / Codex | 기존 resolver 사용·stream/cancel/usage·현재 권한/오류 비노출 |
 | S3 일반 adapter·업로드 서비스 | Claude / Codex | 실제 제품의 중단/재개·hash 위조·complete replay·quota·pin/GC 경합·객체/DB 합동 복원 |
 | 무결성/경로/복구 판정 | Codex / Claude | TOCTOU·복원 missing/old epoch·정본 byte/권한 보존·fencing 재사용 거부 |
 | readiness·복구 안내·버전 표시 | Gemini / Claude(보안 Codex) | unknown을 성공으로 표시하지 않음, secret/ref 입력 대신 권한 있는 서버 alias 선택, 실제 브라우저 여정 |
@@ -76,3 +77,5 @@ Linux root의 경로 각 segment를 O_NOFOLLOW directory descriptor로 열고 �
 최종 registry 확인이 해당 callback의 admission 시점이다. 그 이후 회수는 다음 admission을 막지만 이미 진행 중인 외부 효과를 소급 중지하지 않는다. DB transaction/file lock을 callback 네트워크 구간에 걸쳐 유지하지 않는다. callback은 한 번만 호출하고 예외를 raw provider 오류 없이 CredentialDenied로 매핑한다. 모델 서비스의 streaming/cancel/usage/attestation 연결은 후속 Adapter 구현이다. grant의 epoch가 다르면 복원 뒤 새 서비스도 거부하고 운영자의 명시적 재인가가 필요하다.
 
 기존39개 conformance를 실제 Linux 파일·일회용 PostgreSQL에 연결한다. remove_version/rebind_destination 시나리오는 immutable version 파괴 대신 실제 grant 삭제/회수로 해석 불가를 만든다. outside_root는 원래 파일을 root 밖으로 옮기고 hard link를 되붙이는 실제 공격이다. 읽기 중 inode/root/내용 교체, 읽기 후 revocation commit, admission 뒤 회수, RLS/쓰기 권한/복원 epoch/kill/cancel을 추가 검증한다. 운영 키/실제 Provider 요청/Windows ACL/전체 장비 인수와는 구분한다.
+
+실제 구현·합격 범위: [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. Linux/DB conformance39+추가9 통과; 운영 보호 등록과 외부 Provider 연결은 남는다.
