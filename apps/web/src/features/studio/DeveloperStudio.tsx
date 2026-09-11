@@ -343,16 +343,37 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     let mounted = true;
     setIsLoadingArtifact(true);
 
-    apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`)
-      .then((data) => {
-        if (mounted && data) {
-          setArtifactData(data);
+    // Query canonical Kernel ResultView (/v1/runs/{id}/result) as the source of truth
+    apiClient<any>(`/v1/runs/${activeRunId}/result`)
+      .then((res) => {
+        if (!mounted) return;
+        if (res && res.output) {
+          setArtifactData({
+            runId: res.runId,
+            outputHash: res.output.sha256,
+            outputSizeBytes: res.output.sizeBytes,
+            verifiedEvidenceId: res.evidence?.evidenceId || `evi_${res.runId}`,
+            exitCode: res.stopReceipt?.exitCode ?? 0,
+            exportedAt: res.completedAt || new Date().toISOString(),
+          });
+        } else {
+          apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`)
+            .then((data) => {
+              if (mounted && data) setArtifactData(data);
+            })
+            .catch(() => {
+              if (mounted) setArtifactData(null);
+            });
         }
       })
       .catch(() => {
-        if (mounted) {
-          setArtifactData(null);
-        }
+        apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`)
+          .then((data) => {
+            if (mounted && data) setArtifactData(data);
+          })
+          .catch(() => {
+            if (mounted) setArtifactData(null);
+          });
       })
       .finally(() => {
         if (mounted) {

@@ -188,20 +188,24 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
             }}
           >
             <div><strong>현재 할당된 Workspace:</strong> {node.observationOnly ? '없음 (배치 차단)' : 'wsp_01JABCDE (wsp-saint-pilot)'}</div>
-            <div><strong>점유 CPU / RAM:</strong> {node.observationOnly ? '0 코어 / 0 GiB' : '4 코어 / 8 GiB'}</div>
-            {node.gpuCount > 0 && <div><strong>점유 GPU VRAM:</strong> 6 GiB (Lease ID: lse_01JABCDEF_01)</div>}
+            <div><strong>점유 CPU / RAM:</strong> {node.observationOnly ? '0 코어 / 0 GiB' : `${node.cpuCores - (node.allocatableCores ?? node.cpuCores)} 코어 / ${(((node.memoryTotalBytes - (node.allocatableMemoryBytes ?? node.memoryTotalBytes)) / (1024 ** 3))).toFixed(1)} GiB`}</div>
+            {node.gpuCount > 0 && <div><strong>점유 GPU VRAM:</strong> {((node.gpuVramUsedBytes || 0) / (1024 ** 3)).toFixed(1)} GiB</div>}
             <div style={{ marginTop: '8px', color: 'var(--color-text-muted)' }}>
-              Lease 만료 시각: 2026-09-09 18:30:00 KST (자동 갱신 Heartbeat 가동 중)
+              하트비트 수신 시각: {new Date(node.heartbeatAt).toLocaleString()} (실시간 텔레메트리 연동)
             </div>
           </div>
 
           <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, marginTop: '20px', marginBottom: '10px' }}>
             최근 하트비트 스냅샷 타임라인
           </h4>
-          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
-            <div>[17:40:15] Heartbeat OK - CPU 24% | RAM 43% | GPU 33% (정상 수신)</div>
-            <div>[17:40:00] Heartbeat OK - CPU 22% | RAM 43% | GPU 33% (정상 수신)</div>
-            <div>[17:39:45] Heartbeat OK - CPU 25% | RAM 42% | GPU 32% (정상 수신)</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div>
+              [{new Date(node.heartbeatAt).toLocaleTimeString()}] Heartbeat OK - CPU {node.cpuUsagePercent}% | RAM {((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%
+              {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} (mTLS 텔레메트리 수신)
+            </div>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>
+              • 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음 (Zero Synthetic Fluctuations)
+            </div>
           </div>
         </div>
       </div>
