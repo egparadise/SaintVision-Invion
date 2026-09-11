@@ -9,6 +9,7 @@ export interface TerminalMessage {
   payload?: string;
   cols?: number;
   rows?: number;
+  sequence?: number;
 }
 
 export type TerminalDataHandler = (data: string) => void;
@@ -20,6 +21,7 @@ export class WsTerminalClient {
   private onData: TerminalDataHandler;
   private onStatus: TerminalStatusHandler;
   private isClosed = false;
+  private sequenceCounter = 0;
 
   constructor(
     wsUrl: string,
@@ -69,12 +71,18 @@ export class WsTerminalClient {
 
   sendInput(data: string): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.sequenceCounter++;
       const msg: TerminalMessage = {
         type: 'data',
         payload: data,
+        sequence: this.sequenceCounter,
       };
       this.ws.send(JSON.stringify(msg));
     }
+  }
+
+  getSequence(): number {
+    return this.sequenceCounter;
   }
 
   sendResize(cols: number, rows: number): void {
