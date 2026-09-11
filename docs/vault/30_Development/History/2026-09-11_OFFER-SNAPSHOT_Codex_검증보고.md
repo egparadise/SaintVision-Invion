@@ -48,3 +48,5 @@ Claude cdf98ad F1의 “release는 lease만 잠근다”는 전제가 검토 대
 
 - 2026-09-11T23:57:24+09:00: `python tools/check_docs.py` exit0 (24 original hashes, 271 versioned documents, 48 tasks, 12 outcomes), `python tools/check_ontology.py` exit0, `python -m black --check tests/integration/test_resource_offer_integrity.py` exit0, `git diff --check` exit0.
 - `python tools/sync_obsidian.py --check --state .work/workspace-sync-state.json` exit0: 관리438개, 변경8개, 충돌0. 실제 apply 영수증은 다음 기록에서 확인한다.
+
+- 실제 전달 2026-09-11T23:57:37+09:00: source `0b121fe2422d548c6fac9a9430bf6ee10fcd761a` push exit0. `sync_obsidian.py --check → --apply → --check` 모두 exit0; 8개 export, 관리438개 hash 전부 일치, pending0/conflict0. 범위는 로컬 Obsidian 사본이며 OneDrive 클라우드 업로드는 확인하지 않았다. 이 영수증 commit도 같은 절차로 다시 동기화한다.
