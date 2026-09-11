@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.14.0"
+version: "1.15.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T13:23:00+09:00"
+updated: "2026-09-11T13:56:19+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 결과 조회 후속: [[2026-09-11_RESULT-OBSERVATION_Codex_검증보고]]의 8b97c6a에서 실제 kernel Run/receipt/Evidence와 검증된 파일 다운로드·로그·attempt를 연결했다. 0028로 이력을 보존해 병합하고 원격 미관측 도구와 실제 실행 grant를 구분했다. 기본 290/격리 통합 262개 통과. 남은 주 작업은 실제 worker 설치 후 원격 7개 인수(Codex), 독립 검토·운영 identity/Workspace provisioning·제공량 연결(Claude), 실제 API/브라우저 인수(Gemini)다. 전체 task done은 아니다.
 
 2026-09-11 계정 통합 후속: [[2026-09-11_ACCOUNT-KERNEL_Codex_검증보고]]와 [[Codex 계정과 실행 커널 통합 계약]]에서 Claude 서비스/OIDC를 같은 kernel HTTP 경계에 연결하고 별도 관리 권한·현재 tenant/멤버십·Project/Node 직렬화 및 0026/0027 이력 병합을 구현했다. 코드 149b565를 push했으며 로컬 DB/실행 증거를 해당 보고에 고정한다. 운영 계정/subject/project provisioning·public offer↔kernel 자원 연결·Workspace 준비와 결과 조회는 Claude, 실제 API/화면과 [[2026-09-11_GEMINI-ZERO-MOCK_Codex_후속검토]] P1은 Gemini, 실제 원격 설치 확인·장비 시험은 Codex의 다음 작업이다. 독립 Claude 재검토·CI 및 실제 운영 인수는 미완료다. 아래 과거 미연결 문구는 해당 SHA 당시 상태다.
 

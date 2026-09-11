@@ -1,10 +1,10 @@
 ---
 doc_id: "ERROR-RESULT-OBSERVATION-20260911"
 title: "RESULT-OBSERVATION 오류와 해결"
-version: "1.0.0"
-status: "in_progress"
+version: "1.0.1"
+status: "review"
 author: "Codex"
-updated: "2026-09-11T13:44:00+09:00"
+updated: "2026-09-11T13:56:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,3 +24,5 @@ source_of_truth: "Git"
 | 집중 시험에서 업무/통합 경로를 교차 나열할 때 일부 env fixture 미발견 | 기존 전체 시험과 같이 업무 경로 뒤 통합 경로로 묶어 실행. fixture 미실행을 통과로 집계하지 않음 |
 
 개인키·실제 DB 자격증명·운영 epoch/profile은 변경하지 않았다. 시험 로그는 접근 제한 .work에 두고 공개 기록에는 testcase 상태와 SHA만 남긴다. 작성자가 시행한 시험과 Codex의 검증을 구분하며 독립 재검토는 Claude 대기다.
+
+최종 clean 8b97c6a에서 기본/DB 검사 290개, 격리 통합 262개가 실패·오류·skip 없이 통과했다(exit 0). 상세 증거와 외부 CI 제한은 [[2026-09-11_RESULT-OBSERVATION_Codex_검증보고]]를 따른다.

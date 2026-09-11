@@ -1,0 +1,22 @@
+{
+  "source": "live-postgresql-mtls",
+  "generatedAt": "2026-09-11T04:56:19.625097+00:00",
+  "killSwitch": true,
+  "userWorkloadSubmission": false,
+  "webAuthenticationConfigured": false,
+  "nodes": [
+    {
+      "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+      "address": "192.168.45.225",
+      "profileVersion": "lan-observe-v1",
+      "fresh": true,
+      "status": "online",
+      "measurementScope": "node-visible-linux-environment",
+      "cpuCores": 16.0,
+      "memoryTotalBytes": 8247742464,
+      "gpuCount": null
+    }
+  ],
+  "runCount": 0,
+  "scope": "read-only-observation-not-remote-execution"
+}
