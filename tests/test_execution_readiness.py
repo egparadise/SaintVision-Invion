@@ -1,11 +1,11 @@
-"""Results, and never inventing one.
+"""Why a workspace cannot run yet.
 
-The governing test here is ``test_nothing_that_is_missing_is_rendered_as_a_value``.
-The studio screen that calls these endpoints was found showing a fixed hash,
-1,024 bytes and an invented Evidence id whenever the server did not answer. The
-screen is Gemini's to fix; what this side owes is an API where a missing fact
-never arrives looking like a present one, because an API that returns
-plausibly-shaped emptiness is half of how that defect happens.
+Execution results are read by ``inv.result_view.ResultView``, which is
+authoritative for them; the tests that lived here for a second reader on this
+side went with it. What remains is the question that is genuinely the business
+surface's: not "what happened" but "why can nothing happen yet", which spans
+project membership, an operator's kernel links, a workspace lifecycle and a
+tool installed on a machine — no one of which the kernel owns.
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ from saintvision.errors import InvError
 from saintvision.ids import new_id
 from saintvision.services import execution_readiness as readiness_service
 from saintvision.services import projects as project_service
-from saintvision.services import results as results_service
 from saintvision.services import runs as run_service
 from saintvision.services import settings as settings_service
 
@@ -99,152 +98,6 @@ def scene(app_sessionmaker, owner_engine, lab):
                 )
                 ids["run_id"] = run.run_id
     return ids
-
-
-# --------------------------------------------------------------------------
-# Never invent a result
-# --------------------------------------------------------------------------
-
-
-def test_nothing_that_is_missing_is_rendered_as_a_value(app_sessionmaker, scene):
-    """The rule this module exists for.
-
-    A Run that has produced nothing must not come back looking like a Run that
-    produced empty things. No zero hash, no zero-length digest, no fabricated
-    identifier, and every absence carrying the reason for it.
-    """
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                body = results_service.run_result(
-                    session, tenant_id=scene["tenant_a"],
-                    run_id=scene["run_id"], user_id=scene["owner"],
-                )
-    assert body["sealed"] is False
-    assert body["record"] is None
-    assert body["evidence"] is None
-    # Each absence explains itself rather than leaving a null to be guessed at.
-    assert body["recordAbsent"]["reason"]
-    assert body["evidenceAbsent"]["reason"]
-
-    # And nothing in the response looks like a digest, a placeholder size, or a
-    # fabricated identifier.
-    rendered = json.dumps(body)
-    assert "0" * 64 not in rendered
-    assert '"1024"' not in rendered and ": 1024" not in rendered
-    assert "e3b0c44298fc1c149afbf4c8996fb924" not in rendered  # sha256 of nothing
-
-
-def test_an_unmeasured_artifact_reports_no_size_rather_than_zero(
-    app_sessionmaker, owner_engine, scene
-):
-    """A size of zero is a real size; a size nobody measured is not.
-
-    Reporting them the same way is how a screen ends up showing a confident
-    number for a file that was never written.
-    """
-    artifact_id = new_id("artifact")
-    with owner_engine.begin() as c:
-        c.execute(
-            text(
-                "INSERT INTO artifacts (artifact_id, tenant_id, run_id, name, "
-                "media_type, status, byte_size, created_at, version) "
-                "VALUES (:a, :t, :r, 'out.txt', 'text/plain', 'staging', 0, now(), 1)"
-            ),
-            {"a": artifact_id, "t": scene["tenant_a"], "r": scene["run_id"]},
-        )
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                items = results_service.list_artifacts(
-                    session, tenant_id=scene["tenant_a"],
-                    run_id=scene["run_id"], user_id=scene["owner"],
-                )
-    assert len(items) == 1
-    assert items[0]["byteSize"] is None
-    assert items[0]["byteSizeAbsent"]["reason"]
-    assert items[0]["checksumSha256"] is None
-    assert items[0]["checksumAbsent"]["reason"]
-
-
-def test_a_digest_without_a_verification_is_not_verified(
-    app_sessionmaker, owner_engine, scene
-):
-    """The artifact most likely to be shown as confirmed, because it looks complete.
-
-    It is necessarily `staging`: the schema refuses an `active` artifact that
-    has no verification (``active_requires_verification``), so "has a digest,
-    was never verified" can only exist before promotion — which is exactly when
-    a screen is most tempted to treat the digest as proof.
-    """
-    with owner_engine.begin() as c:
-        c.execute(
-            text(
-                "INSERT INTO artifacts (artifact_id, tenant_id, run_id, name, "
-                "media_type, status, byte_size, checksum_sha256, created_at, version) "
-                "VALUES (:a, :t, :r, 'out.bin', 'application/octet-stream', "
-                "'staging', 42, :c, now(), 1)"
-            ),
-            {"a": new_id("artifact"), "t": scene["tenant_a"], "r": scene["run_id"],
-             "c": "a" * 64},
-        )
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                items = results_service.list_artifacts(
-                    session, tenant_id=scene["tenant_a"],
-                    run_id=scene["run_id"], user_id=scene["owner"],
-                )
-    assert items[0]["checksumSha256"] == "a" * 64
-    assert items[0]["verified"] is False
-    assert items[0]["verifiedAt"] is None
-    # A real size stays a real size.
-    assert items[0]["byteSize"] == 42
-
-
-def test_a_run_with_no_binding_reports_none_not_an_empty_binding(
-    app_sessionmaker, scene
-):
-    """The binding is the kernel's record of which approval and epoch applied."""
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                body = results_service.run_result(
-                    session, tenant_id=scene["tenant_a"],
-                    run_id=scene["run_id"], user_id=scene["owner"],
-                )
-    assert body["binding"] is None
-
-
-# --------------------------------------------------------------------------
-# Reading a result requires access to its project
-# --------------------------------------------------------------------------
-
-
-def test_a_non_member_cannot_read_a_result(app_sessionmaker, scene):
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                with pytest.raises(InvError, match="not accessible"):
-                    results_service.run_result(
-                        session, tenant_id=scene["tenant_a"],
-                        run_id=scene["run_id"], user_id=scene["outsider"],
-                    )
-
-
-def test_a_non_member_cannot_list_artifacts_or_attempts(app_sessionmaker, scene):
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                for call in (
-                    results_service.list_artifacts,
-                    results_service.attempt_log,
-                ):
-                    with pytest.raises(InvError, match="not accessible"):
-                        call(
-                            session, tenant_id=scene["tenant_a"],
-                            run_id=scene["run_id"], user_id=scene["outsider"],
-                        )
 
 
 # --------------------------------------------------------------------------
@@ -393,74 +246,3 @@ def test_the_checklist_cannot_be_used_to_probe_another_project(
                     )
 
 
-# --------------------------------------------------------------------------
-# Downloads
-# --------------------------------------------------------------------------
-
-
-def test_outputs_come_from_the_execution_record_not_the_artifact_table(
-    app_sessionmaker, scene
-):
-    """public.artifacts describes files nobody wrote.
-
-    Nothing writes that table and a row in it cannot be resolved to bytes, so
-    listing it would offer downloads that cannot happen. The outputs that exist
-    are the kernel's committed results.
-    """
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                outputs = results_service.committed_outputs(
-                    session, tenant_id=scene["tenant_a"],
-                    run_id=scene["run_id"], user_id=scene["owner"],
-                )
-    assert outputs == []
-
-
-def test_the_output_resolver_is_bound_to_the_session_tenant(
-    app_sessionmaker, owner_engine, scene, two_tenants
-):
-    """A definer function bypasses RLS, so a caller-supplied tenant is not a scope.
-
-    Revision 0027 had to correct exactly this in 0024. Asking about another
-    tenant returns nothing rather than that tenant's outputs.
-    """
-    _, tenant_b = two_tenants
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                rows = session.execute(
-                    text(
-                        "SELECT count(*) FROM public.run_committed_outputs(:t, :r)"
-                    ),
-                    {"t": str(tenant_b), "r": scene["run_id"]},
-                ).scalar_one()
-    assert rows == 0
-
-
-def test_a_non_member_cannot_list_outputs(app_sessionmaker, scene):
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                with pytest.raises(InvError, match="not accessible"):
-                    results_service.committed_outputs(
-                        session, tenant_id=scene["tenant_a"],
-                        run_id=scene["run_id"], user_id=scene["outsider"],
-                    )
-
-
-def test_downloading_an_output_that_does_not_exist_says_the_same_as_another_runs(
-    app_sessionmaker, scene, tmp_path
-):
-    """Distinguishing them would confirm an object id belongs to somebody."""
-    import uuid as _uuid
-
-    with app_sessionmaker() as session:
-        with session.begin():
-            with tenant_scope(session, scene["tenant_a"]):
-                with pytest.raises(InvError, match="output not found for this run"):
-                    results_service.read_output(
-                        session, tenant_id=scene["tenant_a"],
-                        run_id=scene["run_id"], object_id=str(_uuid.uuid4()),
-                        user_id=scene["owner"], object_root=str(tmp_path),
-                    )

@@ -1,7 +1,7 @@
 """Make an offer set on the screen change what the kernel can reserve.
 
 Revision ID: 0030_apply_resource_offer
-Revises: 0029_run_outputs
+Revises: 0028_subject_kernel_link
 Create Date: 2026-09-11
 
 ``public.resource_offers`` records how much of a machine its owner allows the
@@ -40,7 +40,7 @@ from __future__ import annotations
 from alembic import op
 
 revision = "0030_apply_resource_offer"
-down_revision = "0029_run_outputs"
+down_revision = "0028_subject_kernel_link"
 branch_labels = None
 depends_on = None
 
