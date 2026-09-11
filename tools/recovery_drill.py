@@ -432,6 +432,94 @@ def _rls_scopes(dsn: str, app_role: str, kernel_role: str) -> dict[str, Any]:
     }
 
 
+def rpo_bound_from(settings: dict[str, Any]) -> tuple[bool, None, str]:
+    """Configuration evidence alone never establishes a recoverable RPO bound.
+
+    Continues Claude 4b09dfc's distinction between a drill measurement and an
+    operating objective, without treating a WAL segment switch as delivery.
+    Even a successful archive command may be /bin/true or lose its destination.
+    """
+    configured = settings.get("archive_mode") in ("on", "always") and any(
+        isinstance(settings.get(key), str)
+        and settings[key].strip() not in ("", "(disabled)", "not configured")
+        for key in ("archive_command", "archive_library")
+    )
+    return (
+        configured,
+        None,
+        (
+            "archiving configuration observed; segment switching does not prove durable "
+            "WAL delivery, retained base backup/WAL continuity, or successful point-in-time "
+            "recovery; operational RPO is not established"
+            if configured
+            else "continuous archiving is not configured; backup schedule, replication and "
+            "recoverable copies were not verified; operational RPO is not established"
+        ),
+    )
+
+
+def _recovery_capability(dsn: str) -> dict[str, Any]:
+    # Never retrieve archive shell/library text: it may embed credentials.
+    names = [
+        "wal_level",
+        "archive_mode",
+        "archive_command",
+        "archive_library",
+        "archive_timeout",
+        "data_checksums",
+        "full_page_writes",
+    ]
+    with _conn(dsn) as conn:
+        rows = conn.execute(
+            """SELECT name, CASE WHEN name IN ('archive_command','archive_library')
+                THEN CASE WHEN btrim(setting) IN ('','(disabled)')
+                     THEN 'not configured' ELSE 'configured' END
+                ELSE setting END
+                FROM pg_settings WHERE name=ANY(%s)""",
+            (names,),
+        ).fetchall()
+    settings = dict(rows)
+    configured, bound, basis = rpo_bound_from(settings)
+    timeout = settings.get("archive_timeout", "")
+    return {
+        "settings": settings,
+        "archivingConfigured": configured,
+        "archiveSwitchTimeoutSeconds": int(timeout) if timeout.isdigit() else None,
+        "operationalRpoBoundSeconds": bound,
+        "operationalRpoVerified": False,
+        "basis": basis,
+        "dataChecksumsEnabled": settings.get("data_checksums") == "on",
+        "sourceCorruptionExcluded": False,
+        "requiredEvidence": [
+            "recoverable base backup and continuous retained WAL",
+            "durable destination and failure-domain validation",
+            "measured replay target and data-loss interval",
+            "ongoing archive failure and lag monitoring",
+        ],
+    }
+
+
+def _meets_operational_rpo(report: dict[str, Any], target: int | None) -> bool:
+    if target is None:
+        return True
+    if type(target) is not int or target <= 0:
+        return False
+    capability = report.get("recoveryCapability") or {}
+    bound = capability.get("operationalRpoBoundSeconds")
+    return (
+        capability.get("operationalRpoVerified") is True
+        and type(bound) in (int, float)
+        and math.isfinite(bound)
+        and 0 <= bound <= target
+    )
+
+
+def _accepted(report, args):
+    return _passed(report) and _meets_operational_rpo(
+        report, getattr(args, "require_operational_rpo", None)
+    )
+
+
 def _fencing_state(dsn: str) -> dict[str, Any]:
     """The highest token issued, and the highest one a lease still holds.
 
@@ -569,6 +657,7 @@ def rehearse(args) -> dict[str, Any]:
 
     # Everything measured against the source is captured before the restore, so
     # a drill cannot accidentally compare the restore to itself.
+    report["recoveryCapability"] = _recovery_capability(args.source)
     report["sourceCounts"] = _table_counts(args.source)
     report["sourceDigests"] = _content_digest(args.source)
     report["sourcePrivileges"] = _privileges(args.source)
@@ -827,7 +916,8 @@ def record(report: dict[str, Any], args) -> str | None:
     from saintvision.db.session import tenant_scope
     from saintvision.services import pilot as pilot_service
 
-    passed = _passed(report)
+    functional_passed = _passed(report)
+    passed = _accepted(report, args)
     from psycopg.conninfo import conninfo_to_dict
     from sqlalchemy.engine import URL
 
@@ -849,7 +939,7 @@ def record(report: dict[str, Any], args) -> str | None:
             rpo_seconds=math.ceil(report["measuredRpoSeconds"]),
             rto_seconds=math.ceil(report["measuredRtoSeconds"]),
         )
-        if passed
+        if functional_passed
         else None
     )
     try:
@@ -870,6 +960,18 @@ def record(report: dict[str, Any], args) -> str | None:
                         notes={
                             "scope": report["scope"],
                             "operationalRecoveryVerified": False,
+                            "functionalDrillPassed": functional_passed,
+                            "requiredOperationalRpoSeconds": getattr(
+                                args, "require_operational_rpo", None
+                            ),
+                            "operationalRpoRequirementMet": _meets_operational_rpo(
+                                report, getattr(args, "require_operational_rpo", None)
+                            ),
+                            "operationalRpoVerified": (report.get("recoveryCapability") or {}).get(
+                                "operationalRpoVerified"
+                            )
+                            is True,
+                            "recoveryCapability": report.get("recoveryCapability"),
                             "notVerified": report["notVerified"],
                             "backupSha256": report["backupSha256"],
                             "backupBytes": report["backupBytes"],
@@ -900,8 +1002,20 @@ def _passed(report: dict[str, Any]) -> bool:
     )
 
 
+class SafeParser(argparse.ArgumentParser):
+    def error(self, message):
+        self.exit(2, "Invalid recovery arguments; see --help.\n")
+
+
+def _positive_seconds(value):
+    result = int(value)
+    if result <= 0:
+        raise argparse.ArgumentTypeError("positive seconds required")
+    return result
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = SafeParser(description=__doc__, allow_abbrev=False)
     parser.add_argument(
         "--source",
         default=os.getenv("INV_RECOVERY_SOURCE_DSN"),
@@ -966,6 +1080,12 @@ def main() -> int:
             "the model while the request path still works"
         ),
     )
+    parser.add_argument(
+        "--require-operational-rpo",
+        type=_positive_seconds,
+        metavar="SECONDS",
+        help="require verified operational RPO, not just a successful logical restore; current configuration-only observations cannot satisfy this gate",
+    )
     parser.add_argument("--keep", action="store_true", help="do not drop the restore")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -974,6 +1094,16 @@ def main() -> int:
         return 2
     try:
         report = rehearse(args)
+        report["acceptance"] = {
+            "functionalDrillPassed": _passed(report),
+            "requiredOperationalRpoSeconds": args.require_operational_rpo,
+            "operationalRpoRequirementMet": (
+                _meets_operational_rpo(report, args.require_operational_rpo)
+                if args.require_operational_rpo is not None
+                else None
+            ),
+            "passed": _accepted(report, args),
+        }
         if args.tenant and args.user:
             report["drillId"] = record(report, args)
     except Exception as error:
@@ -983,12 +1113,21 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))
-        return 0 if _passed(report) else 1
+        return 0 if _accepted(report, args) else 1
 
     print(f"backup        {report['backupBytes']} bytes, sha256 {report['backupSha256'][:16]}…")
     print(f"restore RTO   {report['measuredRtoSeconds']}s")
     rpo = report.get("measuredRpoSeconds")
-    print(f"recovery RPO  {rpo}s" if rpo is not None else "recovery RPO  unknown")
+    print(
+        f"recovery RPO  {rpo}s for this restore only"
+        if rpo is not None
+        else "recovery RPO  unknown"
+    )
+    capability = report.get("recoveryCapability") or {}
+    print("operational   RPO NOT ESTABLISHED by configuration inspection")
+    print(f"                {capability.get('basis')}")
+    if not _meets_operational_rpo(report, args.require_operational_rpo):
+        print("operational target REFUSED; restore and operational acceptance are separate")
     print(f"integrity     {'verified' if report['integrityVerified'] else 'FAILED'}")
     print(
         f"privileges    "
@@ -1042,7 +1181,7 @@ def main() -> int:
     print("scope         database rehearsal; operational recovery remains unverified")
     if report.get("drillId"):
         print(f"recorded      {report['drillId']}")
-    return 0 if _passed(report) else 1
+    return 0 if _accepted(report, args) else 1
 
 
 if __name__ == "__main__":

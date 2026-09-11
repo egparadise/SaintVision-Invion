@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 from types import SimpleNamespace
 from uuid import uuid4
@@ -214,3 +215,150 @@ def test_actual_drill_result_can_be_recorded_through_pilot_service(args, uri):
     assert row[3]["scope"] == "database_rehearsal"
     assert row[3]["operationalRecoveryVerified"] is False
     assert row[3]["notVerified"] == report["notVerified"]
+
+
+def test_cli_and_database_record_refuse_unverified_operational_target(args):
+    from saintvision.ids import new_id
+
+    args.tenant, args.user = str(uuid4()), new_id("user")
+    with psycopg.connect(args.source) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'RPO test')",
+            (args.tenant, "rpo-" + args.tenant),
+        )
+        conn.execute(
+            "INSERT INTO public.users(user_id,tenant_id,external_subject,display_name) VALUES(%s,%s,%s,'RPO operator')",
+            (args.user, args.tenant, "rpo-" + args.tenant),
+        )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "tools/recovery_drill.py"),
+            "--json",
+            "--docker",
+            args.docker,
+            "--tenant",
+            args.tenant,
+            "--user",
+            args.user,
+            "--require-operational-rpo",
+            "900",
+        ],
+        env={
+            **os.environ,
+            "INV_RECOVERY_SOURCE_DSN": args.source,
+            "INV_RECOVERY_ADMIN_DSN": args.admin,
+            "INV_RECOVERY_RECORD_DSN": args.source,
+            "INV_RECOVERY_CONTAINER_DSN": args.container_dsn,
+        },
+        capture_output=True,
+        text=True,
+        timeout=90,
+    )
+    assert result.returncode == 1, "Operational acceptance must be refused"
+    report = json.loads(result.stdout)
+    assert report["acceptance"] == dict(
+        functionalDrillPassed=True,
+        requiredOperationalRpoSeconds=900,
+        operationalRpoRequirementMet=False,
+        passed=False,
+    )
+    with psycopg.connect(args.source) as conn:
+        outcome, met, notes = conn.execute(
+            "SELECT outcome,met_targets,notes FROM public.recovery_drills WHERE drill_id=%s",
+            (report["drillId"],),
+        ).fetchone()
+    assert outcome == "failed" and met is False
+    assert notes["functionalDrillPassed"] is True
+    assert notes["requiredOperationalRpoSeconds"] == 900
+    assert notes["operationalRpoRequirementMet"] is False
+    assert notes["operationalRpoVerified"] is False
+    assert args.source not in result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("archive_command", ["/bin/true", "/bin/false"])
+def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archive_command):
+    """A separate owned PG server, no published ports or production changes."""
+    name = "sv-rpo-" + uuid4().hex[:12]
+    base = json.loads(subprocess.check_output(["docker", "inspect", args.docker]))[0]
+    network = next(iter(base["NetworkSettings"]["Networks"]))
+    net = json.loads(subprocess.check_output(["docker", "network", "inspect", network]))[0]
+    assert net.get("Internal") is True
+    label = "ai.saintvision.rpo-test"
+    try:
+        created = subprocess.run(
+            [
+                "docker",
+                "run",
+                "-d",
+                "--name",
+                name,
+                "--label",
+                label + "=" + name,
+                "--network",
+                network,
+                "--tmpfs",
+                "/var/lib/postgresql/data:rw",
+                "-e",
+                "POSTGRES_HOST_AUTH_METHOD=trust",
+                base["Image"],
+                "-c",
+                "archive_mode=on",
+                "-c",
+                "archive_command=" + archive_command,
+                "-c",
+                "archive_timeout=300",
+            ],
+            capture_output=True,
+            timeout=30,
+        )
+        assert created.returncode == 0, "Owned archiver fixture could not start"
+        dsn = "postgresql://postgres@" + name + ":5432/postgres"
+        deadline = time.monotonic() + 30
+        while True:
+            try:
+                with psycopg.connect(dsn, connect_timeout=1) as conn:
+                    conn.execute("SELECT 1")
+                break
+            except psycopg.OperationalError:
+                if time.monotonic() > deadline:
+                    raise AssertionError("Owned archiver not ready") from None
+                time.sleep(0.1)
+        capability = drill._recovery_capability(dsn)
+        assert capability["archivingConfigured"] is True
+        assert capability["archiveSwitchTimeoutSeconds"] == 300
+        assert capability["settings"]["archive_command"] == "configured"
+        assert archive_command not in json.dumps(capability)
+        assert capability["operationalRpoBoundSeconds"] is None
+        assert capability["operationalRpoVerified"] is False
+        assert not drill._meets_operational_rpo({"recoveryCapability": capability}, 900)
+        # Even actual archiver exit-success is not proof of retained bytes.
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            conn.execute("CREATE TABLE archive_probe(value text)")
+            conn.execute("INSERT INTO archive_probe VALUES('synthetic-marker')")
+            conn.execute("SELECT pg_switch_wal()")
+            deadline = time.monotonic() + 15
+            while True:
+                conn.execute("SELECT pg_stat_clear_snapshot()")
+                archived, failed = conn.execute(
+                    "SELECT archived_count,failed_count FROM pg_stat_archiver"
+                ).fetchone()
+                if (archived if archive_command == "/bin/true" else failed) > 0:
+                    break
+                if time.monotonic() > deadline:
+                    raise AssertionError("Expected archive outcome not observed")
+                time.sleep(0.1)
+        assert not drill._meets_operational_rpo(
+            {"recoveryCapability": drill._recovery_capability(dsn)}, 900
+        )
+    finally:
+        inspected = subprocess.run(["docker", "inspect", name], capture_output=True, timeout=10)
+        if inspected.returncode == 0:
+            current = json.loads(inspected.stdout)[0]
+            assert current["Config"]["Labels"].get(label) == name
+            subprocess.run(
+                ["docker", "rm", "-f", "-v", current["Id"]],
+                capture_output=True,
+                timeout=30,
+                check=True,
+            )
