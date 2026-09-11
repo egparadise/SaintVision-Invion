@@ -186,7 +186,8 @@ def test_a_bundle_reproduces_its_items_in_order(app_sessionmaker, project):
                 )
 
 
-def test_build_bundle_refuses_a_secret_and_stores_nothing(app_sessionmaker, project):
+@pytest.mark.parametrize("secret_field", ["content", "item_id", "source_uri"])
+def test_build_bundle_refuses_a_secret_and_stores_nothing(app_sessionmaker, project, secret_field):
     """The refusal has to be wired into build_bundle, not merely available.
 
     Checked through the public function and against the database: a rejected
@@ -210,11 +211,10 @@ def test_build_bundle_refuses_a_secret_and_stores_nothing(app_sessionmaker, proj
                         run_id=run.run_id,
                         items=[
                             context_service.ContextItem(
-                                item_id="itm_leak",
                                 item_version=1,
                                 kind="document",
-                                content=token,
                                 redacted=True,
+                                **{**dict(item_id="itm_leak", content="ordinary", source_uri=None), secret_field: token},
                             )
                         ],
                         now=NOW,

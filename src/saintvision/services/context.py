@@ -63,7 +63,7 @@ class ContextItem:
         if self.item_version < 1:
             raise InvError(VAL_SCHEMA, "item_version must be at least 1")
         if self.kind not in ("document", "code", "message", "tool_output", "summary"):
-            raise InvError(VAL_SCHEMA, f"unknown context item kind: {self.kind!r}")
+            raise InvError(VAL_SCHEMA, "unknown context item kind")
         if self.confidence is not None and not 0.0 <= self.confidence <= 1.0:
             raise InvError(VAL_SCHEMA, "confidence must be between 0 and 1")
 
@@ -74,7 +74,7 @@ def _refuse_recognised_secrets(items: list[ContextItem]) -> None:
     The module's contract has always said content must arrive post-redaction,
     and until now that was only a sentence. A caller could pass a bearer token
     with ``redacted=True`` and the token would be hashed, stored, deduplicated
-    across tenants by that hash, and pinned into a RunRecord that is by design
+    within its tenant by that hash, and pinned into a RunRecord that is by design
     never rewritten.
 
     Refusing rather than redacting, deliberately: this function is not in the
@@ -90,18 +90,22 @@ def _refuse_recognised_secrets(items: list[ContextItem]) -> None:
     bundle as certified clean.
     """
     for ordinal, item in enumerate(items):
-        labels = recognised_secrets(item.content)
-        if labels:
-            # Names the kind and the position, never the matched text: putting
-            # the fragment in the message writes the secret into the error, the
-            # log and the audit trail, which is the leak being refused.
-            raise InvError(
-                VAL_SCHEMA,
-                f"context item {item.item_id!r} at position {ordinal} still "
-                f"contains {', '.join(labels)}; content must be redacted before "
-                f"it is stored, and declaring redacted=True does not make it so",
-                cause_ref=item.item_id,
-            )
+        for field in ("content", "item_id", "source_uri"):
+            value = getattr(item, field)
+            if value is None and field == "source_uri":
+                continue
+            if not isinstance(value, str):
+                raise InvError(VAL_SCHEMA, f"context item at position {ordinal}: invalid {field}")
+            labels = recognised_secrets(value)
+            if labels:
+                # Only server-owned labels and an ordinal may reach the error.
+                # Identifiers and source URIs can themselves contain credentials.
+                raise InvError(
+                    VAL_SCHEMA,
+                    f"context item at position {ordinal} contains {', '.join(labels)} "
+                    f"in {field}; content and metadata must be redacted before "
+                    "storage, and declaring redacted=True does not make it so",
+                )
 
 
 def content_hash(content: str) -> str:
@@ -175,7 +179,7 @@ def build_bundle(
     model saw things in is part of what happened.
     """
     if retrieval_strategy not in RETRIEVAL_STRATEGIES:
-        raise InvError(VAL_SCHEMA, f"unknown retrieval strategy: {retrieval_strategy!r}")
+        raise InvError(VAL_SCHEMA, "unknown retrieval strategy")
     for item in items:
         item.validate()
     # Before anything is written. Snapshots are stored by content hash and
@@ -193,9 +197,7 @@ def build_bundle(
     # bundle exists would be flushed into a foreign key violation.
     digests: list[str] = []
     for ordinal, item in enumerate(items):
-        digest, _ = store_snapshot(
-            session, tenant_id=tenant_id, content=item.content, now=now
-        )
+        digest, _ = store_snapshot(session, tenant_id=tenant_id, content=item.content, now=now)
         digests.append(digest)
         pairs.append((ordinal, digest))
         total_bytes += len(item.content.encode("utf-8"))
@@ -281,9 +283,7 @@ def verify_bundle(session: Session, *, tenant_id: uuid.UUID, bundle_id: str) -> 
     if bundle is None or bundle.tenant_id != tenant_id:
         raise InvError(CTX_SNAPSHOT_MISSING, "bundle not found", cause_ref=bundle_id)
     items = read_bundle(session, tenant_id=tenant_id, bundle_id=bundle_id)
-    recomputed = bundle_hash(
-        [(item.ordinal, content_hash(content)) for item, content in items]
-    )
+    recomputed = bundle_hash([(item.ordinal, content_hash(content)) for item, content in items])
     return recomputed == bundle.bundle_hash
 
 

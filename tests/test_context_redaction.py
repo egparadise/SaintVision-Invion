@@ -54,7 +54,8 @@ def test_the_refusal_never_echoes_the_secret(label: str, probe: str) -> None:
     assert secret not in message
     # It still has to be useful: the kind and the item are named.
     assert label.replace("_url", "") in message or "private_key" in message
-    assert "itm_probe" in message
+    assert "position 0" in message
+    assert raised.value.cause_ref is None
 
 
 def test_declaring_redacted_does_not_make_it_so() -> None:
@@ -90,7 +91,7 @@ def test_the_offending_item_is_identified_by_position() -> None:
     ]
     with pytest.raises(InvError) as raised:
         _refuse_recognised_secrets(items)
-    assert "itm_c" in str(raised.value)
+    assert "itm_c" not in str(raised.value)
     assert "position 2" in str(raised.value)
 
 
@@ -104,3 +105,27 @@ def test_recognising_is_not_proving() -> None:
     unrecognised = "the database password is hunter2, please keep it safe"
     assert recognised_secrets(unrecognised) == ()
     _refuse_recognised_secrets([_item(unrecognised, declared=True)])
+
+
+@pytest.mark.parametrize("field", ["item_id", "source_uri", "content"])
+@pytest.mark.parametrize("label,probe", REDACTION_PROBES)
+def test_metadata_and_public_errors_do_not_carry_credentials(field, label, probe):
+    from dataclasses import replace
+    import json
+
+    item = replace(_item("ordinary content"), **{field: probe})
+    with pytest.raises(InvError) as raised:
+        _refuse_recognised_secrets([item])
+    problem = json.dumps(raised.value.to_problem(trace_id="synthetic-trace"))
+    assert probe not in str(raised.value)
+    assert raised.value.cause_ref is None
+    assert "position 0" in problem
+
+
+def test_invalid_kind_does_not_echo_input():
+    from dataclasses import replace
+
+    probe = "Authorization: Bearer abcdefghijklmnopqrstuvwxyz012345"
+    with pytest.raises(InvError) as raised:
+        replace(_item("ordinary"), kind=probe).validate()
+    assert probe not in str(raised.value)
