@@ -13,11 +13,16 @@ from typing import Final
 
 #: Settings that S01 owns and that this sprint must not invent.
 #: Documented in docs/vault/30_Development/Claude 영역 구현 준비.md.
+#:
+#: ``INV_OIDC_JWKS_URL`` was here and has been removed, because the decision it
+#: was waiting for was made and went the other way: the verifier is offline by
+#: design (``inv.identity.AccessTokens``) and takes an operator-supplied trust
+#: bundle from a *file*. A URL is the thing that design rejects — fetching keys
+#: at verification time makes the identity provider's availability a dependency
+#: of every request and its DNS a trust boundary. Leaving the name here would
+#: have kept a decided question looking open and pointed at the wrong answer.
 S01_PENDING: Final[frozenset[str]] = frozenset(
     {
-        "INV_OIDC_ISSUER",
-        "INV_OIDC_AUDIENCE",
-        "INV_OIDC_JWKS_URL",
         "INV_NODE_MTLS_CA_BUNDLE",
         "INV_OBJECT_STORE_ENDPOINT",
     }
@@ -58,6 +63,29 @@ class Settings:
     #: Idempotency ledger retention.
     idempotency_ttl_seconds: int = 86_400
 
+    #: Real login. Absent means the static development verifier, which refuses
+    #: to be constructed outside dev and test — so a deployment either has all
+    #: four of these or has no way to authenticate anyone at all.
+    tenant_id: str | None = None
+    oidc_issuer: str | None = None
+    oidc_audience: str | None = None
+    oidc_client_ids: tuple[str, ...] = ()
+    #: A file, not a URL. Fetching keys at verification time makes the identity
+    #: provider's availability a dependency of every request.
+    oidc_jwks_file: str | None = None
+
+    @property
+    def login_configured(self) -> bool:
+        return all(
+            (
+                self.tenant_id,
+                self.oidc_issuer,
+                self.oidc_audience,
+                self.oidc_client_ids,
+                self.oidc_jwks_file,
+            )
+        )
+
     @classmethod
     def from_env(cls) -> "Settings":
         return cls(
@@ -69,6 +97,15 @@ class Settings:
             page_limit_default=_get_int("INV_PAGE_LIMIT_DEFAULT", 50),
             page_limit_max=_get_int("INV_PAGE_LIMIT_MAX", 200),
             idempotency_ttl_seconds=_get_int("INV_IDEMPOTENCY_TTL_SECONDS", 86_400),
+            tenant_id=os.environ.get("INV_TENANT_ID"),
+            oidc_issuer=os.environ.get("INV_OIDC_ISSUER"),
+            oidc_audience=os.environ.get("INV_OIDC_AUDIENCE"),
+            oidc_client_ids=tuple(
+                value
+                for value in os.environ.get("INV_OIDC_CLIENT_IDS", "").split(",")
+                if value.strip()
+            ),
+            oidc_jwks_file=os.environ.get("INV_OIDC_JWKS_FILE"),
         )
 
 

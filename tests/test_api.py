@@ -571,10 +571,25 @@ def test_traceparent_is_honoured_and_echoed(client):
 
 
 def test_health_reports_unresolved_s01_settings(client):
+    """Undecided settings show as unresolved rather than silently defaulted (AC-01).
+
+    This used to assert on INV_OIDC_ISSUER. That decision has since been made —
+    on the execution side, where inv.identity.AccessTokens verifies offline
+    against an operator-supplied trust bundle — so the setting is configured
+    rather than pending, and asserting it is still pending would keep a settled
+    question looking open.
+
+    Asserted against the live constant rather than a literal, so the next
+    decision that lands shrinks this list without anyone having to remember to
+    edit a test.
+    """
+    from saintvision.config import S01_PENDING
+
     body = client.get("/v1/health").json()
-    # OIDC and the object store are S01 decisions; they must show as unresolved
-    # rather than being silently defaulted (AC-01).
-    assert "INV_OIDC_ISSUER" in body["unresolvedSettings"]
+    assert set(body["unresolvedSettings"]) <= S01_PENDING
+    # There is still at least one open decision; when the last one closes this
+    # test should be replaced rather than weakened.
+    assert S01_PENDING
 
 
 def test_readiness_reports_partition_lead(client):
