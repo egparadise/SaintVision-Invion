@@ -687,6 +687,17 @@ def rehearse(args) -> dict[str, Any]:
     if args.save_backup:
         Path(args.save_backup).write_bytes(backup_bytes)
         report["backupSource"] = args.save_backup
+        # Hashed by reading back what is on disk, not by reusing the digest of
+        # the bytes we meant to write. "Verified" has to mean the file at this
+        # path is the backup; a truncated or partially flushed write hashes
+        # differently, and that is precisely the case worth catching before
+        # somebody restores from it.
+        written = Path(args.save_backup).read_bytes()
+        report["savedBackupBytes"] = len(written)
+        report["savedBackupSha256"] = hashlib.sha256(written).hexdigest()
+        report["savedBackupIntact"] = (
+            report["savedBackupSha256"] == report["backupSha256"]
+        )
 
     return _restore_and_verify(
         pg, args, report, backup_bytes, backup_taken_at, source_fencing, target_db
@@ -892,15 +903,22 @@ def record(report: dict[str, Any], args) -> str | None:
     from saintvision.services import pilot as pilot_service
 
     passed = _passed(report)
-    engine = create_engine(args.record_dsn or args.source, future=True)
+    # SQLAlchemy resolves a bare "postgresql://" to psycopg2, which this
+    # project does not install. The recording path therefore failed with
+    # ModuleNotFoundError for the DSN form everything else here accepts —
+    # which is why no drill row was ever written from an ordinary invocation.
+    record_url = args.record_dsn or args.source
+    if record_url.startswith("postgresql://"):
+        record_url = "postgresql+psycopg://" + record_url[len("postgresql://") :]
+    engine = create_engine(record_url, future=True)
     factory = sessionmaker(engine, future=True, expire_on_commit=False)
     now = dt.datetime.now(dt.timezone.utc)
     tenant = _uuid.UUID(args.tenant)
 
     measurement = (
         pilot_service.DrillMeasurement(
-            measured_rpo_seconds=int(report["measuredRpoSeconds"]),
-            measured_rto_seconds=int(report["measuredRtoSeconds"]),
+            rpo_seconds=int(report["measuredRpoSeconds"]),
+            rto_seconds=int(report["measuredRtoSeconds"]),
         )
         if passed
         else None
@@ -908,10 +926,49 @@ def record(report: dict[str, Any], args) -> str | None:
     with factory() as session:
         with session.begin():
             with tenant_scope(session, tenant):
+                # A saved dump is a backup, and BackupRecord exists to record
+                # one. It had no caller: the ledger and its verification both
+                # existed while nothing ever filed a row for them to act on.
+                if report.get("backupSource") and report.get("savedBackupSha256"):
+                    backup = pilot_service.record_backup(
+                        session,
+                        tenant_id=tenant,
+                        # pg_dump --format=custom is a logical backup. The
+                        # ledger's kinds are base, wal and logical, and this
+                        # platform produces only the third: there is no base
+                        # backup and no archived WAL, which is the same fact
+                        # the operational RPO bound reports from the other
+                        # direction.
+                        kind="logical",
+                        location_ref=str(report["backupSource"]),
+                        now=now,
+                        # The caller's assertion, never this tool's guess. A
+                        # dump written beside the database it protects is the
+                        # case ADR-018 separates out, so the default is the
+                        # one that claims less.
+                        off_site=bool(args.off_site),
+                        byte_size=int(report["savedBackupBytes"]),
+                    )
+                    report["backupId"] = backup.backup_id
+                    if report.get("savedBackupIntact"):
+                        # Verified from the file on disk, so this says the
+                        # backup at that path is the one that was taken.
+                        pilot_service.verify_backup(
+                            session,
+                            tenant_id=tenant,
+                            backup_id=backup.backup_id,
+                            checksum_sha256=report["savedBackupSha256"],
+                            now=now,
+                        )
+                        report["backupVerified"] = True
+                    else:
+                        report["backupVerified"] = False
+
                 drill = pilot_service.record_recovery_drill(
                     session,
                     tenant_id=tenant,
                     scope="database",
+                    backup_id=report.get("backupId"),
                     outcome="passed" if passed else "failed",
                     performed_by_user_id=args.user,
                     now=now,
@@ -988,6 +1045,16 @@ def main() -> int:
         ),
     )
     parser.add_argument("--save-backup", help="write the dump to this path")
+    parser.add_argument(
+        "--off-site",
+        action="store_true",
+        help=(
+            "assert that --save-backup writes outside this database's failure "
+            "domain. ADR-018 separates a durable write from surviving the loss "
+            "of the machine, and this tool cannot tell the difference, so the "
+            "claim is the operator's and the default claims less"
+        ),
+    )
     parser.add_argument(
         "--backup-taken-at",
         help=(
