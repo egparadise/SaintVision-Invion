@@ -38,7 +38,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | CL-01 | P0 | in-progress | S01-DB S04-DB S06-BE S06-DB S08-DB | Codex 최신 커널 독립 검토 |
 | CL-02 | P0 | in-progress | S02-BE S02-DB S02-ST S03-DB | 운영 로그인·권한·Workspace·폴더 적용 |
 | CL-03 | P0 | in-progress | S12-DB S12-ST | 복원 도구의 남은 검증 결함 수정 |
-| CL-04 | P1 | ready | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
+| CL-04 | P1 | blocked | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
 | CL-05 | P1 | planned | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
 | CL-06 | P1 | planned | S10-BE S10-DB S10-ST | 실제 학습·평가·MLflow·승인 배포 서비스 |
 | CL-07 | P1 | planned | S12-DB S12-ST | 운영 관측·장시간 시험·복원 절차 인수 |
@@ -122,11 +122,20 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-04 — Artifact·모델 바이트 정본과 보존 정리
 
-- owner / reviewer: Claude / Codex; status: ready; priority: P1.
+- owner / reviewer: Claude / Codex; status: blocked(조사 완료, seam 계약 대기); priority: P1.
 - 원래 목표/합격 조건: OUT-03, OUT-09, OUT-10 / AC-03, AC-09, AC-10.
-- 다음 첫 행동: public.artifacts 소비자/이력/보존 참조를 조사해 kernel 실제 object bytes로 연결하거나 보존 가능한 전환 migration을 만든다.
-- 필요한 합격 증거: 다운로드 actual bytes/hash·Evidence/model pin·GC/보존·기존 참조 이관 증거. ResultView와 중복 결과 reader 재도입 금지.
-- 선행/차단과 해소 담당: 현재 코드 조사 가능. 테이블/이력을 먼저 삭제하지 않음.
+- 조사 SHA: `review/claude-account-results` 5995b8b, 커널 `agent/codex/workspace-bridge` d14db0a. 전문은 [[Claude_CL-04_Artifact바이트정본_조사]].
+- 실제 수행: 카드의 첫 행동인 "소비자·이력·보존 참조 조사"를 마쳤다. 조사 결과가 "연결"과 "전환 migration" 중 어느 쪽도 **내가 단독으로 고를 수 없음**을 보여준다.
+- 확인한 사실(인용이 아니라 직접 확인):
+  1. `public.artifacts`에 **production writer가 없다.** `Artifact(` 생성은 model 정의뿐이고, 행을 넣는 곳은 시험 fixture 3곳(`tests/test_context_eval.py:412,467`, `tests/test_execution.py:685`)뿐이다. 동반 `public.upload_sessions`도 writer가 없고 `api/v1/`에 upload endpoint가 없다 — 공개 측 바이트 수집 경로 전체가 모델만 있고 구현이 없다.
+  2. 그래서 소비자가 운영에서 도달 불가다. `records.py::_pin_artifact`가 `public.artifacts`를 읽어 pin을 만드는데 원본이 없으므로 pin도 없고, `list_pinned_artifacts`는 운영에서 항상 비어 있다. `seal_run_record(artifacts=...)`는 운영에서 만족될 수 없는 인자를 받는다.
+  3. **보존은 색인만 있고 수거자가 없다.** `retention_pinned_until`과 색인은 있으나 이를 읽는 GC가 공개 측·커널 측 어디에도 없다.
+  4. 실제 바이트·해시는 `inv.result_commitments` + `inv.storage_objects`에 있고, 정본 reader `ResultView`가 이미 `artifacts()`·`download()`를 제공한다.
+- **일방 진행이 안 되는 이유**: 가장 그럴듯한 전환(공개 측이 커널 확정 산출물을 SQL로 해석)이 바로 `0029`가 만들고 `0030`이 **의도적으로 철회한 것**이다. head DB `proacl` 실측으로 `run_committed_outputs`가 소유자 전용임을 확인했다(CL-01 F3). 되살리면 `0030` 주석이 말한 "less restrictive alternate resolver"를 복원하는 것이고, 카드가 금지한 "ResultView와 중복 결과 reader 재도입"에도 걸린다. 같은 seam에서 과거 네 번(권한·handoff·binding·결과) 양측이 같은 개념을 만들었고 네 번 모두 실행 기록에 가까운 쪽이 옳았다. 여기서도 그쪽은 커널이다.
+- 아무것도 삭제하지 않았다. 카드 요구대로 테이블·이력을 그대로 두었다.
+- 남은 문제 / Codex 계약 질문 4개: (1) RunRecord 산출물 pin은 공개 측 유지인가 커널 이관인가. (2) `0030`이 철회한 SQL resolver 대신 봉인 시점에 `content_hash`·크기·`evidence_id`를 얻는 승인된 경로는 무엇인가. (3) `public.artifacts`·`upload_sessions`는 유지/보류/폐기 중 무엇이며 폐기라면 이력 보존과 `run_record_artifacts` FK 완화 migration의 소유자는 누구인가. (4) 보존/GC 소유자는 누구인가.
+- 만들 수 없는 합격 증거를 명시한다: "다운로드 actual bytes/hash"는 `ResultView`가 이미 제공하므로 다시 만들지 않는다. "GC/보존"은 수거자가 존재하지 않아 증거 자체를 만들 수 없다.
+- 다음 첫 행동: 위 4개 질문을 Codex에 인계한다. 답이 오면 전환 migration 구현은 Claude다.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ### CL-05 — Context와 실제 Provider/도구 Adapter
