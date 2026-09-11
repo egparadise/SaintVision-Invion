@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.9"
+version: "1.0.10"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:46:04+09:00"
+updated: "2026-09-12T01:57:25+09:00"
 source_of_truth: "Git"
 ---
 
@@ -171,3 +171,8 @@ source_of_truth: "Git"
 ## CREDENTIAL-CONFORMANCE 최신 작업 → 확인 → 다음
 
 - 2026-09-12T00:47:43+09:00 / CX-02:8222f0b 공통 Protocol/39개 suite 및 모델 검출력47개 확인. [[Codex 자격증명 보안 검증 인계]]에 actual harness 요구·모델 한계를 고정했다. 다음 Claude 실제 provider 연결, Codex 구현 독립 검토와 실제 inode/회수 경합 검증. 운영/실장비 증거는 아직 없다.
+
+
+## 최신 작업 — BACKUP-LEDGER
+
+420b81c Linux63/core50 완료, [[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]. PR19 draft/CI 계정 차단/Claude 독립 검토 pending. 다음 첫 행동: d63717f snapshot 프로젝트/관측시점/순서 계약 확정 및 수정본 검토, ade5bb8 AC-12 집계의 운영 증거 범위 검토. CX-03 프로필 미수신 상태는 별도.

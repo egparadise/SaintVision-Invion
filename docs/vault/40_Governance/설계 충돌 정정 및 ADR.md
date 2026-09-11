@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.0"
+version: "1.35.1"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T01:46:04+09:00"
+updated: "2026-09-12T01:57:25+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -124,3 +124,6 @@ ADR-078(Context metadata 저장 전 비밀 패턴 거부·오류 입력 비반�
 ADR-079(보호 운영자 register/grant 분리·current epoch/scope·Run 범위 원자 회전·폐기 권한 비재활성화·감사 rollback·기본 check/명시 apply)은 [[Codex 자격증명 등록 회전 회수 운영 절차]]와 [[Codex 운영 자격증명과 Storage 계약]] v1.3.0을 따른다. 공개 관리 API·운영 secret 등록·독립 인수 완료가 아니다.
 
 ADR-080(archive 설정과 운영 RPO 분리·command/library marker·공통 CLI/DB acceptance·실패/중단 목표 달성 거부·0036 과거 기록 보존/신규 쓰기 제약)은 [[Codex DB 함수 감사와 복원 판정 검토]] v1.2.0과 [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]]를 따른다. 운영 PITR·전수 과거 기록 검증 완료가 아니다.
+
+
+ADR-081(private Linux 백업 비파괴 게시·file/directory sync·저장 바이트/identity 재검사·BackupRecord/drill 원자 기록·실패 후 파일 보존)은 [[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]와 [[Codex DB 함수 감사와 복원 판정 검토]]를 따른다. 운영 RPO·별도 장애 영역·Windows 네이티브 저장 지원을 뜻하지 않는다.

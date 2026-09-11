@@ -1,0 +1,62 @@
+{
+  "codeSHA": "420b81c0be034f6b58c49cc4219f240b7d114f3c",
+  "kst": "2026-09-12T01:57:25+09:00",
+  "core": {
+    "cases": 50,
+    "exitCode": 0,
+    "scope": "Windows verdict and capability tests",
+    "command": "python -m pytest tests/core/test_recovery_verdict.py tests/core/test_recovery_capability.py -q",
+    "junitSHA256": "19733ca1d080195728b0dae9a9d918bcbd29c565b9d666e59a2057b8f2fe7293"
+  },
+  "originalBackup": {
+    "sourceSHA": "8a8f3b47514c9be31035f1c03c3b701d498d91f7",
+    "scope": "Original save block on disposable Windows file, not a full restore",
+    "existingBackupOverwritten": true,
+    "savedBackupIntactClaim": true,
+    "sourceBlockSha256": "fbecca9379c1a044ce47bd8273a2bf5181882f5638ee7637d09893010f5c2002"
+  },
+  "originalSnapshot": {
+    "sourceSHA": "d63717f1d63f00dba3117c0468647ab8a1a2b65f",
+    "sourceHash": "b65e4e6cbc364f59675c369a53d6e0cc4c64d6fd09dd1abc6e0fa68104cede5a",
+    "scope": "original snapshot function against disposable PostgreSQL; reproduces finding, not acceptance",
+    "observations": [
+      {
+        "project": "project-A",
+        "changed": null,
+        "previousDigest": null,
+        "digest": "2864c6001203d5c3fa1b23edcf2dc6b73ae2e67a612f63a7ed283c4313a0e1a0"
+      },
+      {
+        "project": "project-B",
+        "changed": true,
+        "previousDigest": "2864c6001203d5c3fa1b23edcf2dc6b73ae2e67a612f63a7ed283c4313a0e1a0",
+        "digest": "0c24b5686995b047ba99dc722b6f036235c89f1bdcee9a7a12f654001b3cb6f6"
+      },
+      {
+        "project": "project-A",
+        "changed": true,
+        "previousDigest": "0c24b5686995b047ba99dc722b6f036235c89f1bdcee9a7a12f654001b3cb6f6",
+        "digest": "2864c6001203d5c3fa1b23edcf2dc6b73ae2e67a612f63a7ed283c4313a0e1a0"
+      }
+    ],
+    "expectedSameProjectComparison": [
+      null,
+      null,
+      false
+    ]
+  },
+  "originalDisabledOperator": {
+    "sourceSHA": "d63717f1d63f00dba3117c0468647ab8a1a2b65f",
+    "scope": "original grants function, disposable PostgreSQL, disabled operator",
+    "operatorLayerHolds": false,
+    "mayApproveAsOperator": true,
+    "expected": false
+  },
+  "reproductionHarness": {
+    "work": "C:\\Project\\SaintVision-Invion\\.worktrees\\codex-workspace-bridge\\.work\\cx01-18c1dbb03fae",
+    "exitCode": 0,
+    "image": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+    "head": "420b81c0be034f6b58c49cc4219f240b7d114f3c",
+    "dirty": false
+  }
+}

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.5"
+version: "1.0.6"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:46:04+09:00"
+updated: "2026-09-12T01:57:25+09:00"
 source_of_truth: "Git"
 ---
 
@@ -173,3 +173,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
 
 최종 전달 갱신(2026-09-11T18:58:38+09:00): 구현869d74b/clean 검증b5aef8a Linux64·core22 exit0. 최신 독립 검토는 b5aef8a에 요청한다. 전체 진척57.29%(표시55%), CI·원격 인수 미완료.
+
+
+## Codex 검토 수신 대기 — BACKUP-LEDGER
+
+[[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]: 420b81c/ADR-081 독립 검토 요청 기록. d63717f에서 P1 프로젝트 섞인 직전 snapshot 비교와 disabled 운영자 승인 과장을 실제 DB로 재현했다. P2 관측/기록 시점·동시 순서도 조율한다. 원본 함수 증거를 읽고 수정 후 고정 SHA/명령/결과로 인계한다. ade5bb8 수신은 확인했으나 Codex 독립 검토 미완료.

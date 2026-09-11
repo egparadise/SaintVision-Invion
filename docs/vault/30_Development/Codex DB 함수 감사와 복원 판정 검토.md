@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-DEFINER-AUDIT-001"
 title: "Codex DB 함수 감사와 복원 판정 검토"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:46:04+09:00"
+updated: "2026-09-12T01:57:25+09:00"
 source_of_truth: "Git"
 ---
 
@@ -70,3 +70,8 @@ CLI와 DB record는 _accepted(기능 _passed + 요구된 운영 RPO 조건)를 �
 0036의 ck_recovery_drills_met_targets_requires_passed는 NOT VALID로 추가한다. 기존 실패/목표true 행을 삭제·재작성하지 않고 신규 INSERT/UPDATE에만 강제한다. 기존 이력 전수 검증/정정은 별도이며 NOT VALID를 전수 안전 증거로 쓰지 않는다. 정본 definer9개의 정의/권한은 그대로이고 policy revision만0036으로 갱신한다. 운영자와Claude는 현재 tenant scope에서 `met_targets AND outcome <> 'passed'`인 과거 행을 검토하고 원본 이력과 정정 판단을 구분한다.
 
 공식 근거: [PostgreSQL16 WAL settings](https://www.postgresql.org/docs/16/runtime-config-wal.html), [Continuous Archiving](https://www.postgresql.org/docs/16/continuous-archiving.html). 운영 PITR 배포·스케줄·매체 검증을 실행한 ADR가 아니다.
+
+
+## ADR-081 — 백업 비파괴 게시와 원장 연결
+
+[[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]를 따른다. private Linux 새 파일만 file/directory sync 후 실제 bytes/identity 확인, 원장 기록 전 재검사, 기존 BackupRecord와 drill의 한 트랜잭션 기록을 적용한다. 식별자는 commit 후 공개한다. 실패 후 파일은 보존·조율하며 off-site/영구 불변/운영RPO로 승격하지 않는다. Windows 네이티브 저장·PITR·사후 정기 재검증은 별도. Claude 독립 검토 pending.
