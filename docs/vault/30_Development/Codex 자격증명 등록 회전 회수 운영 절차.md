@@ -53,7 +53,7 @@ rotate/revoke도 같은 형식으로 해당 action용 manifest에 --check 후 --
 
 동일 version은 metadata가 완전히 같을 때만 재사용한다. 다른 파일/inode/hash로 바꾸려면 새 version을 사용한다. grant의 enabled/revoked/expiry/epoch가 달라지면 이전 manifest 재시도로 되살리지 않는다. 특히 expires를 다시 계산하여 자동 연장하지 않는다. 불확실한 commit 응답은 같은 고정 manifest로 재시도한다.
 
-rotate는 지정 subject/Run 하나의 권한만 바꾼다. 다른 Run에 남은 old version 권한은 자동 회수하지 않으므로 운영자는 전체 사용 범위를 별도로 추적해야 한다. 이미 회수/만료/old-epoch인 predecessor로 새 권한을 만들지 않는다. 이미 완료된 회전의 정확한 재시도만 허용한다. 두 회전이 같은 old grant를 경쟁하면 하나만 새 권한을 만들 수 있다.
+rotate는 지정 subject/Run 하나의 권한만 바꾼다. 다른 Run에 남은 old version 권한은 자동 회수하지 않으므로 운영자는 전체 사용 범위를 별도로 추적해야 한다. 이미 회수/만료/old-epoch인 predecessor로 새 권한을 만들지 않는다. 새 grant가 이미 존재하고 enabled/미회수/미만료/epoch/expiry가 요청과 일치할 때만 멱등 상태로 인정한다. 이 검사는 현재 DB 상태 기준이며 별도 관리 요청 ID나 외부 Provider 회전 완료를 증명하지 않는다. 두 회전이 같은 old grant를 경쟁하면 하나만 새 권한을 만들 수 있다.
 
 current epoch→tenant control→Run→project grant/credential grant 순서로 잠그고 한 DB transaction에서 version/grant와 inv.credential.register/grant/revoke/rotate 감사 event를 commit한다. audit 실패 시 모두 rollback한다. runtime writer 권한은 추가하지 않는다. 감사에는 credential/version/subject/DB 운영자 role과 회전 oldVersion만 남기며 secret/file path/hash/DSN은 남기지 않는다.
 

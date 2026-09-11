@@ -41,3 +41,5 @@ Linux90개는 새 provisioning20 + 기존 실제 backend48 + definer22다. 이�
 문서/ontology·최종 push·Obsidian check/apply/check 영수증은 이어 기록한다.
 
 - 2026-09-12T01:28 KST: check_docs.py exit0(24 원본hash/288 versioned docs/48tasks), check_ontology.py exit0, 변경Python3개 black --check exit0, git diff --check exit0. 첫 Obsidian check는 외부 편집2개로 exit1·쓰기0; 보존/병합 후 최종 검사를 수행한다. PR19 본문에90/4 검증과 초기 import 수정·인수 차단을 반영했다.
+
+- 전달 2026-09-12T01:29:21+09:00: source `c4ad214d314c290a012c0890722bb291c29fb278` push exit0. 외부2개 원문은 Git blob까지 SHA-256 일치를 확인하고 줄바꿈 변환을 방지했다. 동일 원문2개만 adopt-identical로 수용할 때 대상 쓰기0. 이어 정규 check→apply→check 모두 exit0,19개 export, 관리472개 hash 일치·pending0/conflict0. 로컬 Obsidian 사본 범위이며 OneDrive 클라우드는 미확인이다. 이 영수증도 같은 동기화 절차로 반영한다.
