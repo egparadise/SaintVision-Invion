@@ -61,6 +61,13 @@ class Workspace(Base):
         CheckConstraint(
             "(status = 'deleted') = (deleted_at IS NOT NULL)", name="deletion_paired"
         ),
+        # The tool set is code, not data: an unknown name is refused when it
+        # is written rather than discovered when someone tries to run it.
+        CheckConstraint(
+            "tool_name IS NULL OR tool_name IN "
+            "('claude-code','codex-cli','gemini-cli','antigravity')",
+            name="tool_name_allowed",
+        ),
         Index("ix_workspaces_tenant_id_project_id", "tenant_id", "project_id"),
     )
 
@@ -72,6 +79,11 @@ class Workspace(Base):
     #: Current placement. NULL while unplaced or between placements.
     node_id: Mapped[InvId | None] = mapped_column(nullable=True)
     created_by_user_id: Mapped[InvId] = mapped_column()
+    #: Which development tool this workspace is set up to use. NULL means the
+    #: choice has not been made. Recording it here rather than sending it with
+    #: each execution request is what stops two people in one workspace running
+    #: different tools without either knowing.
+    tool_name: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[Utc] = mapped_column(server_default=text("now()"))
     deleted_at: Mapped[Utc | None] = mapped_column(nullable=True)
     version: Mapped[int] = mapped_column(default=1)

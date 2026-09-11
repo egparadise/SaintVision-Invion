@@ -253,3 +253,20 @@ class WorkspaceCreateRequest(Strict):
     name: str = Field(min_length=2, max_length=128)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceToolRequest(Strict):
+    """Choose the development tool a workspace uses.
+
+    ``null`` clears the choice. The name is one of the adapters the platform
+    knows; ``GET /v1/adapters`` lists them with whether each is usable right
+    now, which is a property of a node rather than of this record.
+    """
+
+    tool_name: str | None = Field(
+        default=None,
+        pattern="^(claude-code|codex-cli|gemini-cli|antigravity)$",
+        alias="toolName",
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

@@ -291,11 +291,78 @@ def workspace_body(workspace: Workspace) -> dict[str, Any]:
         "name": workspace.name,
         "status": workspace.status,
         "nodeId": workspace.node_id,
+        "toolName": workspace.tool_name,
         "createdAt": workspace.created_at.isoformat(),
         "allowedNext": sorted(
             settings_service.WORKSPACE_TRANSITIONS.get(workspace.status, ())
         ),
     }
+
+
+def set_workspace_tool(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    workspace_id: str,
+    tool_name: str | None,
+    acting_user_id: str,
+) -> dict[str, Any]:
+    """Choose which development tool this workspace uses.
+
+    Requires ``canRequest``, not ownership: whoever may run work in a workspace
+    is who needs to say what runs it.
+
+    The name is checked against the adapter definitions rather than a list
+    repeated here — the tools are code, and a second list would be a second
+    answer. What this does **not** check is whether the tool is installed and
+    signed in: that is a property of a node at the moment of execution, and a
+    workspace configured last week cannot promise anything about a machine
+    today. Recording an unusable choice and reporting it as unusable is more
+    honest than refusing to record it, because the fix is on the node.
+    """
+    from ..adapters import agents
+
+    workspace = session.get(Workspace, workspace_id)
+    if workspace is None or workspace.tenant_id != tenant_id:
+        raise InvError(RES_NODE_NOT_FOUND, "workspace not found")
+    if tool_name is not None and tool_name not in agents.BY_NAME:
+        raise InvError(
+            VAL_SCHEMA,
+            f"unknown development tool: {tool_name!r}",
+            extra={"known": sorted(agents.BY_NAME)},
+        )
+    permission = require_project_access(
+        session,
+        tenant_id=tenant_id,
+        project_id=workspace.project_id,
+        user_id=acting_user_id,
+    )
+    if not permission["canRequest"]:
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "this project role may not configure a workspace tool",
+            extra={"roleCode": permission["roleCode"]},
+        )
+    if tool_name is not None and agents.BY_NAME[tool_name].prompt_args is None:
+        # A tool with no headless mode cannot be driven by the platform at all,
+        # so choosing it would configure a workspace that can never run.
+        raise InvError(
+            VAL_SCHEMA,
+            f"{tool_name} has no non-interactive mode, so the platform cannot "
+            f"drive it",
+            extra={"toolName": tool_name},
+        )
+
+    workspace.tool_name = tool_name
+    workspace.version += 1
+    session.flush()
+    body = workspace_body(workspace)
+    # Said beside the choice, not instead of it: the node decides whether this
+    # is usable right now, and the answer can change between requests.
+    body["toolReadiness"] = (
+        agents.adapter_for(tool_name).readiness() if tool_name else None
+    )
+    return body
 
 
 def list_workspaces(

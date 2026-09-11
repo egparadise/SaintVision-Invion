@@ -161,3 +161,42 @@ def create_workspace(
     )
     response.headers["Location"] = f"/v1/workspaces/{body['workspaceId']}"
     return body
+
+
+@router.put("/workspaces/{workspace_id}/tool")
+def set_workspace_tool(
+    workspace_id: str,
+    payload: schemas.WorkspaceToolRequest,
+    request: Request,
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+    now: dt.datetime = Depends(get_now),
+) -> dict:
+    """Choose which development tool this workspace uses.
+
+    The response carries the choice **and** whether that tool is usable on this
+    machine right now, because the two are different facts with different
+    lifetimes: the choice is a property of the workspace and persists, while
+    installed-and-signed-in is a property of a node and can change between two
+    requests. A screen that shows only the choice will eventually offer to run
+    something that cannot run.
+    """
+    body = project_service.set_workspace_tool(
+        session,
+        tenant_id=principal.tenant_id,
+        workspace_id=workspace_id,
+        tool_name=payload.tool_name,
+        acting_user_id=principal.user_id,
+    )
+    record_event(
+        session,
+        now=now,
+        actor_type="user",
+        actor_id=principal.user_id,
+        action="workspace.tool_set",
+        outcome="allow",
+        tenant_id=principal.tenant_id,
+        trace_id=getattr(request.state, "trace_id", None),
+        detail={"workspaceId": workspace_id, "toolName": payload.tool_name},
+    )
+    return body

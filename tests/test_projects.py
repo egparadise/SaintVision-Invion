@@ -378,3 +378,123 @@ def test_listing_workspaces_requires_membership(app_sessionmaker, people):
                         session, tenant_id=people["tenant_a"],
                         project_id=created["projectId"], user_id=people["bob"],
                     )
+
+
+# --------------------------------------------------------------------------
+# Which development tool a workspace uses
+# --------------------------------------------------------------------------
+
+
+def test_the_tool_choice_is_recorded_on_the_workspace(app_sessionmaker, people):
+    """Not sent with each execution request.
+
+    If the choice travelled on the request, the screen would decide the tool at
+    the moment of running and two people in one workspace could be running
+    different tools without either knowing.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, people["tenant_a"]):
+                created = _create(session, people)
+                workspace = project_service.create_workspace(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], name="dev",
+                    created_by_user_id=people["alice"], now=NOW,
+                )
+                assert workspace["toolName"] is None
+                chosen = project_service.set_workspace_tool(
+                    session, tenant_id=people["tenant_a"],
+                    workspace_id=workspace["workspaceId"],
+                    tool_name="claude-code", acting_user_id=people["alice"],
+                )
+    assert chosen["toolName"] == "claude-code"
+    # Usability is reported beside the choice, because it is a fact about a
+    # machine right now rather than about this record.
+    assert chosen["toolReadiness"]["adapter"] == "claude-code"
+
+
+def test_a_tool_with_no_headless_mode_cannot_be_chosen(app_sessionmaker, people):
+    """Choosing it would configure a workspace that can never run."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, people["tenant_a"]):
+                created = _create(session, people)
+                workspace = project_service.create_workspace(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], name="dev",
+                    created_by_user_id=people["alice"], now=NOW,
+                )
+                with pytest.raises(InvError, match="no non-interactive mode"):
+                    project_service.set_workspace_tool(
+                        session, tenant_id=people["tenant_a"],
+                        workspace_id=workspace["workspaceId"],
+                        tool_name="antigravity", acting_user_id=people["alice"],
+                    )
+
+
+def test_an_unknown_tool_is_refused_when_it_is_written(app_sessionmaker, people):
+    """Rather than discovered at the moment someone tries to run it."""
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, people["tenant_a"]):
+                created = _create(session, people)
+                workspace = project_service.create_workspace(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], name="dev",
+                    created_by_user_id=people["alice"], now=NOW,
+                )
+                with pytest.raises(InvError, match="unknown development tool"):
+                    project_service.set_workspace_tool(
+                        session, tenant_id=people["tenant_a"],
+                        workspace_id=workspace["workspaceId"],
+                        tool_name="emacs", acting_user_id=people["alice"],
+                    )
+
+
+def test_a_viewer_may_not_choose_the_tool(app_sessionmaker, people):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, people["tenant_a"]):
+                created = _create(session, people)
+                workspace = project_service.create_workspace(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], name="dev",
+                    created_by_user_id=people["alice"], now=NOW,
+                )
+                settings_service.set_member_role(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], user_id=people["bob"],
+                    role_code="viewer", acting_user_id=people["alice"], now=NOW,
+                )
+                with pytest.raises(InvError, match="may not configure"):
+                    project_service.set_workspace_tool(
+                        session, tenant_id=people["tenant_a"],
+                        workspace_id=workspace["workspaceId"],
+                        tool_name="claude-code", acting_user_id=people["bob"],
+                    )
+
+
+def test_the_database_refuses_a_tool_name_no_adapter_knows(app_sessionmaker, people):
+    """The check constraint, not only the service."""
+    from sqlalchemy.exc import IntegrityError
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, people["tenant_a"]):
+                created = _create(session, people)
+                workspace = project_service.create_workspace(
+                    session, tenant_id=people["tenant_a"],
+                    project_id=created["projectId"], name="dev",
+                    created_by_user_id=people["alice"], now=NOW,
+                )
+                workspace_id = workspace["workspaceId"]
+        with pytest.raises(IntegrityError):
+            with session.begin():
+                with tenant_scope(session, people["tenant_a"]):
+                    session.execute(
+                        text(
+                            "UPDATE workspaces SET tool_name = 'vim' "
+                            "WHERE workspace_id = :w"
+                        ),
+                        {"w": workspace_id},
+                    )
