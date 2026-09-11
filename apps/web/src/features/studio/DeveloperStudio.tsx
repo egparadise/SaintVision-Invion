@@ -15,6 +15,7 @@ import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 export interface DeveloperStudioProps {
   nodes: NodeItem[];
   runs: RunItem[];
+  currentUser?: { id: string; name: string; role: string; tenantId?: string } | null;
   initialStep?: 1 | 2 | 3 | 4;
   initialNodeId?: string | null;
   initialWorkspaceId?: string | null;
@@ -76,6 +77,7 @@ const INITIAL_CODE_FILES = [
 export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   nodes,
   runs,
+  currentUser,
   initialStep = 1,
   initialNodeId = null,
   initialWorkspaceId = null,
@@ -318,10 +320,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         body: JSON.stringify({
           workspaceId: selectedWorkspaceId,
           objective: runObjective,
-          requestedBy: selectedProject.ownerId || 'usr_developer_01',
+          requestedBy: currentUser?.id || selectedProject.ownerId || 'usr_developer_01',
           targetNodeId: selectedNodeId || 'nod_01JABCDEF01',
           entrypoint: activeFile.path,
-          files: files.map((f) => ({ path: f.path, size: f.content.length })),
+          files: files.map((f) => ({ path: f.path, content: f.content, size: f.content.length })),
           resourceRequests: {
             requiredCores: reqCores,
             requiredMemoryBytes: reqMemoryGb * 1024 ** 3,
@@ -364,34 +366,45 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   // Result Artifact Download handler
   const handleDownloadArtifact = async () => {
     if (!activeRunId) return;
+
+    if (currentRun?.state === 'running') {
+      alert('실행 진행 중인 작업의 아티팩트는 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.');
+      return;
+    }
+
     setIsDownloadingArtifact(true);
     try {
       let serverPayload: any = null;
       try {
         serverPayload = await apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`);
       } catch {
-        // Fallback to cached artifactData or defaults
+        // Fallback to cached artifactData
       }
 
       const effectivePayload = serverPayload || artifactData;
+
+      if (!effectivePayload || !effectivePayload.outputHash) {
+        alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
+        return;
+      }
 
       const artifactMeta = {
         runId: activeRunId,
         projectId: selectedProjectId,
         workspaceId: selectedWorkspaceId,
-        exportedAt: effectivePayload?.exportedAt || new Date().toISOString(),
+        exportedAt: effectivePayload.exportedAt || new Date().toISOString(),
         manifest: {
-          entrypoint: effectivePayload?.entrypoint || activeFile.path,
+          entrypoint: effectivePayload.entrypoint || activeFile.path,
           filesCount: files.length,
-          outputDigest: effectivePayload?.outputHash || 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b',
-          outputSizeBytes: effectivePayload?.outputSizeBytes || 1024,
-          verifiedEvidenceId: effectivePayload?.verifiedEvidenceId || `evi_rcp_${activeRunId}`,
+          outputDigest: effectivePayload.outputHash,
+          outputSizeBytes: effectivePayload.outputSizeBytes ?? 0,
+          verifiedEvidenceId: effectivePayload.verifiedEvidenceId || `evi_${activeRunId}`,
         },
         executionReceipt: selectedReceipt || {
-          exitCode: effectivePayload?.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : 137),
-          physicallyStopped: true,
+          exitCode: effectivePayload.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : 137),
+          physicallyStopped: currentRun?.state === 'succeeded',
           verified: currentRun?.state === 'succeeded',
-          resourceReclaimed: true,
+          resourceReclaimed: currentRun?.state === 'succeeded',
         },
       };
 
@@ -411,6 +424,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       ]);
     } catch (err: any) {
       console.error('Artifact download failed:', err);
+      alert(`아티팩트 다운로드 실패: ${err.message || '네트워크 오류'}`);
     } finally {
       setIsDownloadingArtifact(false);
     }
@@ -909,10 +923,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 ? ((node.gpuVramTotalBytes - (node.gpuVramUsedBytes || 0)) / 1024 ** 3).toFixed(1)
                 : '0';
 
+              const isNodeSchedulable =
+                !node.observationOnly &&
+                node.schedulable !== false &&
+                !node.isDraining &&
+                !node.killSwitchEngaged &&
+                node.allocatableCores !== undefined &&
+                node.allocatableMemoryBytes !== undefined;
+
               return (
                 <div
                   key={node.id}
-                  onClick={() => setSelectedNodeId(node.id)}
+                  onClick={() => {
+                    if (isNodeSchedulable) setSelectedNodeId(node.id);
+                  }}
                   style={{
                     padding: '20px',
                     borderRadius: 'var(--radius-lg)',
@@ -922,7 +946,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       : isSelected
                       ? 'rgba(56, 139, 253, 0.05)'
                       : 'var(--color-bg-surface)',
-                    cursor: 'pointer',
+                    cursor: isNodeSchedulable ? 'pointer' : 'not-allowed',
+                    opacity: isNodeSchedulable ? 1 : 0.75,
                     boxShadow: 'var(--shadow-sm)',
                     position: 'relative',
                   }}
@@ -1022,25 +1047,25 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{availVramGb}G</div>}
                     </div>
 
-                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', backgroundColor: (node.observationOnly || node.schedulable === false || node.isDraining || node.killSwitchEngaged) ? 'rgba(210, 153, 34, 0.08)' : 'rgba(46, 160, 67, 0.05)' }}>
+                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', backgroundColor: !isNodeSchedulable ? 'rgba(210, 153, 34, 0.08)' : 'rgba(46, 160, 67, 0.05)' }}>
                       <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>예약 가능</div>
-                      <div style={{ fontWeight: 700, color: (node.observationOnly || node.schedulable === false || node.isDraining || node.killSwitchEngaged) ? '#d29922' : '#3fb950' }}>
+                      <div style={{ fontWeight: 700, color: !isNodeSchedulable ? '#d29922' : '#3fb950' }}>
                         {node.observationOnly
                           ? '0 C (차단)'
                           : node.schedulable === false || node.isDraining || node.killSwitchEngaged
                           ? '0 C (배치불가)'
                           : node.allocatableCores !== undefined
                           ? `${node.allocatableCores}C`
-                          : `${availCores}C`}
+                          : '미확인 (선택 불가)'}
                       </div>
-                      <div style={{ fontSize: '0.6875rem', color: (node.observationOnly || node.schedulable === false) ? '#d29922' : '#3fb950', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.6875rem', color: !isNodeSchedulable ? '#d29922' : '#3fb950', fontWeight: 600 }}>
                         {node.observationOnly
                           ? '관측전용'
                           : node.schedulable === false
                           ? '배치비활성'
                           : node.allocatableMemoryBytes !== undefined
                           ? `${(node.allocatableMemoryBytes / 1024 ** 3).toFixed(1)}G`
-                          : `${availRamGb}G`}
+                          : '미확인 (선택 불가)'}
                       </div>
                     </div>
                   </div>
@@ -1087,12 +1112,23 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     <Button
                       variant={isSelected ? 'primary' : 'secondary'}
                       size="sm"
+                      disabled={!isNodeSchedulable}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedNodeId(node.id);
+                        if (isNodeSchedulable) {
+                          setSelectedNodeId(node.id);
+                        }
                       }}
                     >
-                      {isSelected ? '✓ 선택됨' : '이 노드 선택'}
+                      {node.observationOnly
+                        ? '관측전용 (선택불가)'
+                        : node.schedulable === false || node.isDraining || node.killSwitchEngaged
+                        ? '배치불가'
+                        : node.allocatableCores === undefined
+                        ? '미확인 (선택 불가)'
+                        : isSelected
+                        ? '✓ 선택됨'
+                        : '이 노드 선택'}
                     </Button>
                   </div>
                 </div>
@@ -1104,9 +1140,25 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             <Button variant="secondary" onClick={() => setCurrentStep(1)}>
               ← 이전: 프로젝트 선택
             </Button>
-            <Button variant="primary" onClick={() => setCurrentStep(3)}>
-              다음: 코드 편집 & 실행 설정 →
-            </Button>
+            {(() => {
+              const selectedNode = nodes.find((n) => n.id === selectedNodeId);
+              const canProceed = Boolean(
+                selectedNode &&
+                !selectedNode.observationOnly &&
+                selectedNode.schedulable !== false &&
+                selectedNode.allocatableCores !== undefined
+              );
+              return (
+                <Button
+                  variant="primary"
+                  disabled={!canProceed}
+                  title={!canProceed ? '예약 가능량이 확인된 유효 노드를 선택해야 진행할 수 있습니다' : undefined}
+                  onClick={() => setCurrentStep(3)}
+                >
+                  다음: 코드 편집 & 실행 설정 →
+                </Button>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -1442,8 +1494,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   <span>🖥️ 바인딩 노드: <strong>{currentRun?.nodeId || selectedNodeId || 'nod_01JABCDEF01'}</strong> ({boundNode?.hostname || 'Node-01-WinMain'})</span>
                   <span>📦 파일: <code>{activeFile.path}</code></span>
                   <span>🔒 격리: <code>0600 sandbox</code></span>
-                  <span style={{ color: boundNode?.observationOnly ? '#d29922' : '#3fb950', fontWeight: 600 }}>
-                    ⚡ 노드 예약가능량: {boundNode?.observationOnly ? '0C (차단)' : `${(boundNode?.cpuCores ? (boundNode.cpuCores * (1 - boundNode.cpuUsagePercent / 100)).toFixed(1) : 4)}C`}
+                  <span style={{ color: boundNode?.observationOnly ? '#d29922' : (boundNode?.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)'), fontWeight: 600 }}>
+                    ⚡ 노드 예약가능량: {boundNode?.observationOnly ? '0C (차단)' : (boundNode?.allocatableCores !== undefined ? `${boundNode.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
                 </div>
               </div>
@@ -1463,7 +1515,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   variant="secondary"
                   size="sm"
                   onClick={handleDownloadArtifact}
-                  disabled={isDownloadingArtifact || currentRun?.state === 'running'}
+                  disabled={isDownloadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
                   title="실행 결과 아티팩트 매니페스트 및 Evidence를 다운로드합니다"
                 >
                   {isDownloadingArtifact ? '⏳ 다운로드 중...' : '📥 결과 다운로드 (Artifact)'}
@@ -1589,7 +1641,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   variant="primary"
                   size="sm"
                   onClick={handleDownloadArtifact}
-                  disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running'}
+                  disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
                 >
                   {isDownloadingArtifact || isLoadingArtifact ? '⏳ 준비 중...' : '📥 산출물 다운로드 (.json)'}
                 </Button>
@@ -1617,7 +1669,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   산출물 다이제스트 (Output Hash)
                 </div>
                 <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', wordBreak: 'break-all', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                  {artifactData?.outputHash || 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b'}
+                  {artifactData?.outputHash ? (
+                    artifactData.outputHash
+                  ) : currentRun?.state === 'running' ? (
+                    <span style={{ color: '#58a6ff' }}>⏳ 생성 대기 중 (실행 진행 중)</span>
+                  ) : (
+                    <span style={{ color: 'var(--color-text-muted)' }}>미확인 (서버 응답 대기)</span>
+                  )}
                 </div>
               </div>
 
@@ -1633,7 +1691,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   산출물 크기 및 포맷
                 </div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                  {(artifactData?.outputSizeBytes || 1024).toLocaleString()} Bytes · application/json
+                  {artifactData?.outputSizeBytes !== undefined ? (
+                    `${artifactData.outputSizeBytes.toLocaleString()} Bytes · application/json`
+                  ) : (
+                    '-'
+                  )}
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                   엔트리포인트: <code>{artifactData?.entrypoint || activeFile.path}</code>
@@ -1651,8 +1713,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                   불변 검증 증거 식별자 (Evidence ID)
                 </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600, color: '#3fb950' }}>
-                  {artifactData?.verifiedEvidenceId || `evi_rcp_${activeRunId || 'run_01JABCDE0001'}`}
+                <div style={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600, color: artifactData?.verifiedEvidenceId ? '#3fb950' : 'var(--color-text-muted)' }}>
+                  {artifactData?.verifiedEvidenceId ? (
+                    artifactData.verifiedEvidenceId
+                  ) : currentRun?.state === 'running' ? (
+                    <span style={{ color: '#58a6ff' }}>⏳ 미발행 (실행 완료 후 생성)</span>
+                  ) : (
+                    '미발행 (실행 완료 후 생성)'
+                  )}
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                   불변 보존 정책: shard-completion:v1
@@ -1671,10 +1739,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   프로세스 종료 및 영수증 대조
                 </div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 600, color: currentRun?.state === 'succeeded' ? '#3fb950' : 'var(--color-text-primary)' }}>
-                  exitCode: {artifactData?.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : (currentRun?.state === 'running' ? 'N/A' : 137))}
+                  exitCode: {selectedReceipt?.exitCode ?? (artifactData?.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : (currentRun?.state === 'running' ? 'N/A (실행 중)' : '미확인')))}
                 </div>
-                <div style={{ fontSize: '0.6875rem', color: '#3fb950', marginTop: '2px', fontWeight: 600 }}>
-                  ✓ NodeStopReceipt 물리 정지 및 자원 반환 일치
+                <div style={{ fontSize: '0.6875rem', marginTop: '2px', fontWeight: 600 }}>
+                  {selectedReceipt?.physicallyStopped || (currentRun as any)?.allPhysicallyStopped ? (
+                    <span style={{ color: '#3fb950' }}>✓ NodeStopReceipt 물리 정지 및 자원 반환 일치</span>
+                  ) : (
+                    <span style={{ color: 'var(--color-text-muted)' }}>미수신 (정지 영수증 대기 중)</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1704,20 +1776,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       runId: activeRunId,
                       projectId: selectedProjectId,
                       workspaceId: selectedWorkspaceId,
-                      exportedAt: artifactData?.exportedAt || new Date().toISOString(),
-                      manifest: {
-                        entrypoint: artifactData?.entrypoint || activeFile.path,
+                      exportedAt: artifactData?.exportedAt || null,
+                      manifest: artifactData ? {
+                        entrypoint: artifactData.entrypoint || activeFile.path,
                         filesCount: files.length,
-                        outputDigest: artifactData?.outputHash || 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b',
-                        outputSizeBytes: artifactData?.outputSizeBytes || 1024,
-                        verifiedEvidenceId: artifactData?.verifiedEvidenceId || `evi_rcp_${activeRunId}`,
-                      },
-                      executionReceipt: selectedReceipt || {
-                        exitCode: artifactData?.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : 137),
+                        outputDigest: artifactData.outputHash || null,
+                        outputSizeBytes: artifactData.outputSizeBytes ?? null,
+                        verifiedEvidenceId: artifactData.verifiedEvidenceId || null,
+                      } : null,
+                      executionReceipt: selectedReceipt || (currentRun?.state === 'succeeded' ? {
+                        exitCode: artifactData?.exitCode ?? 0,
                         physicallyStopped: true,
-                        verified: currentRun?.state === 'succeeded',
+                        verified: true,
                         resourceReclaimed: true,
-                      },
+                      } : null),
                     },
                     null,
                     2

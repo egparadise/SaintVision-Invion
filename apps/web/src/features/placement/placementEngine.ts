@@ -38,21 +38,25 @@ export function evaluatePlacement(
     }
 
     // Check 5: CPU Cores Headroom vs Allocatable
-    const observedAvailCores = node.cpuCores * (1 - node.cpuUsagePercent / 100);
-    const maxSchedCores = node.allocatableCores !== undefined ? Math.min(observedAvailCores, node.allocatableCores) : observedAvailCores;
-    if (maxSchedCores < req.requiredCores) {
-      reasons.push(
-        `가용 CPU 코어 부족 (필요: ${req.requiredCores} 코어, 예약가능: ${maxSchedCores.toFixed(1)} 코어, 관측여유: ${observedAvailCores.toFixed(1)} 코어)`
-      );
-    }
+    if (node.allocatableCores === undefined || node.allocatableMemoryBytes === undefined) {
+      reasons.push('서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨');
+    } else {
+      const observedAvailCores = node.cpuCores * (1 - node.cpuUsagePercent / 100);
+      const maxSchedCores = Math.min(observedAvailCores, node.allocatableCores);
+      if (maxSchedCores < req.requiredCores) {
+        reasons.push(
+          `가용 CPU 코어 부족 (필요: ${req.requiredCores} 코어, 예약가능: ${maxSchedCores.toFixed(1)} 코어, 관측여유: ${observedAvailCores.toFixed(1)} 코어)`
+        );
+      }
 
-    // Check 6: Memory Headroom vs Allocatable
-    const observedAvailMemory = node.memoryTotalBytes - node.memoryUsedBytes;
-    const maxSchedMemory = node.allocatableMemoryBytes !== undefined ? Math.min(observedAvailMemory, node.allocatableMemoryBytes) : observedAvailMemory;
-    if (maxSchedMemory < req.requiredMemoryBytes) {
-      const availGb = (maxSchedMemory / 1024 ** 3).toFixed(1);
-      const reqGb = (req.requiredMemoryBytes / 1024 ** 3).toFixed(1);
-      reasons.push(`가용 메모리 부족 (필요: ${reqGb} GB, 예약가능: ${availGb} GB)`);
+      // Check 6: Memory Headroom vs Allocatable
+      const observedAvailMemory = node.memoryTotalBytes - node.memoryUsedBytes;
+      const maxSchedMemory = Math.min(observedAvailMemory, node.allocatableMemoryBytes);
+      if (maxSchedMemory < req.requiredMemoryBytes) {
+        const availGb = (maxSchedMemory / 1024 ** 3).toFixed(1);
+        const reqGb = (req.requiredMemoryBytes / 1024 ** 3).toFixed(1);
+        reasons.push(`가용 메모리 부족 (필요: ${reqGb} GB, 예약가능: ${availGb} GB)`);
+      }
     }
 
     // Check 7: GPU requirement

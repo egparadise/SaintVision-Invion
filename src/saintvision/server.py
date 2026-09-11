@@ -71,6 +71,10 @@ NODES: List[Dict[str, Any]] = [
         "cpuUsagePercent": 24,
         "memoryTotalBytes": 64 * 1024**3,
         "memoryUsedBytes": 28 * 1024**3,
+        "allocatableCores": 12,
+        "allocatableMemoryBytes": 36 * 1024**3,
+        "schedulable": True,
+        "observationOnly": False,
         "gpuName": "NVIDIA RTX 4090",
         "gpuCount": 1,
         "gpuVramTotalBytes": 24 * 1024**3,
@@ -93,6 +97,10 @@ NODES: List[Dict[str, Any]] = [
         "cpuUsagePercent": 42,
         "memoryTotalBytes": 32 * 1024**3,
         "memoryUsedBytes": 19 * 1024**3,
+        "allocatableCores": 4,
+        "allocatableMemoryBytes": 12 * 1024**3,
+        "schedulable": True,
+        "observationOnly": False,
         "gpuName": "NVIDIA RTX 3080",
         "gpuCount": 1,
         "gpuVramTotalBytes": 10 * 1024**3,
@@ -115,6 +123,10 @@ NODES: List[Dict[str, Any]] = [
         "cpuUsagePercent": 15,
         "memoryTotalBytes": 32 * 1024**3,
         "memoryUsedBytes": 11 * 1024**3,
+        "allocatableCores": 6,
+        "allocatableMemoryBytes": 20 * 1024**3,
+        "schedulable": True,
+        "observationOnly": False,
         "gpuCount": 0,
         "storageTotalBytes": 1000 * 1024**3,
         "storageUsedBytes": 310 * 1024**3,
@@ -137,6 +149,8 @@ NODES: List[Dict[str, Any]] = [
         "cpuUsagePercent": 68,
         "memoryTotalBytes": 64 * 1024**3,
         "memoryUsedBytes": 45 * 1024**3,
+        "allocatableCores": 0,
+        "allocatableMemoryBytes": 0,
         "gpuCount": 0,
         "storageTotalBytes": 4000 * 1024**3,
         "storageUsedBytes": 1800 * 1024**3,
@@ -156,6 +170,10 @@ NODES: List[Dict[str, Any]] = [
         "cpuUsagePercent": 10,
         "memoryTotalBytes": 32 * 1024**3,
         "memoryUsedBytes": 8 * 1024**3,
+        "allocatableCores": 10,
+        "allocatableMemoryBytes": 24 * 1024**3,
+        "schedulable": True,
+        "observationOnly": False,
         "gpuName": "NVIDIA A4000",
         "gpuCount": 1,
         "gpuVramTotalBytes": 16 * 1024**3,
@@ -894,6 +912,10 @@ def discovery_candidates():
             "os": n["osType"],
             "availableCores": n["cpuCores"] - int(n["cpuCores"] * (n["cpuUsagePercent"] / 100.0)),
             "availableMemoryBytes": n["memoryTotalBytes"] - n["memoryUsedBytes"],
+            "allocatableCores": n.get("allocatableCores"),
+            "allocatableMemoryBytes": n.get("allocatableMemoryBytes"),
+            "observationOnly": n.get("observationOnly", False),
+            "schedulable": n.get("schedulable", True),
             "gpuCount": n.get("gpuCount", 0),
             "gpuName": n.get("gpuName"),
             "healthStatus": n["status"],
@@ -931,12 +953,19 @@ async def placement_preview(pool_id: str, request: Request):
             reasons.append("노드가 관리자에 의해 격리(Fence)되어 있습니다.")
         if n["status"] != "online":
             reasons.append("노드 상태가 온라인이 아닙니다.")
-        avail_cores = n["cpuCores"] - int(n["cpuCores"] * (n["cpuUsagePercent"] / 100.0))
-        if avail_cores < req_cores:
-            reasons.append(f"필요 코어({req_cores}) 대비 잔여 코어({avail_cores}) 부족")
-        avail_mem = n["memoryTotalBytes"] - n["memoryUsedBytes"]
-        if avail_mem < req_memory:
-            reasons.append("가용 RAM 용량 부족")
+        if n.get("observationOnly") or n.get("schedulable") is False:
+            reasons.append("원격 실행 프로필 미설치 (관측 전용 노드 - 업무 제출 비활성)")
+        if n.get("allocatableCores") is None or n.get("allocatableMemoryBytes") is None:
+            reasons.append("서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨")
+        else:
+            avail_cores = n["cpuCores"] - int(n["cpuCores"] * (n["cpuUsagePercent"] / 100.0))
+            sched_cores = min(avail_cores, n["allocatableCores"])
+            if sched_cores < req_cores:
+                reasons.append(f"필요 코어({req_cores}) 대비 잔여 코어({sched_cores}) 부족")
+            avail_mem = n["memoryTotalBytes"] - n["memoryUsedBytes"]
+            sched_mem = min(avail_mem, n["allocatableMemoryBytes"])
+            if sched_mem < req_memory:
+                reasons.append("가용 RAM 용량 부족")
         if requires_gpu and n.get("gpuCount", 0) < 1:
             reasons.append("워크로드가 요구하는 GPU 장치가 없습니다.")
         if preferred_os and n["osType"] != preferred_os:
@@ -1578,13 +1607,20 @@ async def create_project_run(project: str, request: Request):
 
     new_id = f"run_{secrets.token_hex(6)}"
     now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    files_list = data.get("files", [])
+    content_bytes = b"".join(f.get("content", "").encode("utf-8") for f in files_list)
+    if not content_bytes:
+        content_bytes = new_id.encode("utf-8")
+    snapshot_hash = f"sha256:{hashlib.sha256(content_bytes).hexdigest()}"
+
     new_run = {
         "id": new_id,
         "projectId": project,
         "workspaceId": data.get("workspaceId", "wsp_01JABCDE001"),
         "nodeId": target_node_id,
         "entrypoint": data.get("entrypoint", "src/server.ts"),
-        "files": data.get("files", []),
+        "files": files_list,
+        "snapshotHash": snapshot_hash,
         "resourceRequests": data.get("resourceRequests", {}),
         "leaseId": f"lse_{secrets.token_hex(6)}",
         "objective": data.get("objective", f"Monaco commit execution {new_id}"),
@@ -1610,15 +1646,27 @@ def download_run_artifacts(run_id: str, request: Request):
         return rfc9457_problem(
             404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
         )
+
+    # Deterministic output hash tied to snapshot hash and run ID
+    output_hash = target_run.get("outputHash")
+    if not output_hash:
+        snap = target_run.get("snapshotHash", target_run["id"])
+        output_hash = f"sha256:{hashlib.sha256((snap + target_run['id']).encode('utf-8')).hexdigest()}"
+        target_run["outputHash"] = output_hash
+
+    files_list = target_run.get("files", [])
+    content_len = sum(len(f.get("content", "")) for f in files_list)
+    output_size = target_run.get("outputSizeBytes", max(content_len, 512))
+
     return {
         "runId": run_id,
         "projectId": target_run.get("projectId"),
         "workspaceId": target_run.get("workspaceId"),
         "entrypoint": target_run.get("entrypoint", "src/server.ts"),
         "state": target_run.get("state"),
-        "outputHash": "sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b",
-        "outputSizeBytes": 1024,
-        "verifiedEvidenceId": f"evi_{run_id}",
+        "outputHash": output_hash,
+        "outputSizeBytes": output_size,
+        "verifiedEvidenceId": target_run.get("verifiedEvidenceId") or f"evi_{run_id}",
         "exportedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "exitCode": 0 if target_run.get("state") == "succeeded" else (None if target_run.get("state") == "running" else 137),
     }

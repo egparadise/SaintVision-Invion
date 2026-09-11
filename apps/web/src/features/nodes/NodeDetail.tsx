@@ -168,10 +168,12 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
               <div style={{ color: node.observationOnly ? '#d29922' : '#3fb950', marginBottom: '2px', fontWeight: 600 }}>
                 예약 가능량 (Schedulable)
               </div>
-              <div style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? '#d29922' : '#3fb950' }}>
+              <div style={{ fontWeight: 800, fontSize: '0.875rem', color: node.observationOnly ? '#d29922' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
                 {node.observationOnly
                   ? '0C (차단)'
-                  : `${(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C / ${((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}GB`}
+                  : node.allocatableCores !== undefined && node.allocatableMemoryBytes !== undefined
+                  ? `${node.allocatableCores}C / ${(node.allocatableMemoryBytes / 1024 ** 3).toFixed(1)}GB`
+                  : '미확인 (선택 불가)'}
               </div>
             </div>
           </div>

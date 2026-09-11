@@ -223,8 +223,8 @@ export const NodeList: React.FC<NodeListProps> = ({
                   <span style={{ color: 'var(--color-text-muted)' }}>
                     관측여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}G
                   </span>
-                  <span style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : '#3fb950' }}>
-                    예약가능: {node.observationOnly ? '0C (차단)' : `${(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C`}
+                  <span style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
+                    예약가능: {node.observationOnly ? '0C (차단)' : (node.allocatableCores !== undefined ? `${node.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
                 </div>
                 {onOpenStudio && (

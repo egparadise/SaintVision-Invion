@@ -13,6 +13,8 @@ const TEST_NODES: NodeItem[] = [
     cpuUsagePercent: 25,
     memoryTotalBytes: 64 * 1024 ** 3,
     memoryUsedBytes: 24 * 1024 ** 3,
+    allocatableCores: 12,
+    allocatableMemoryBytes: 36 * 1024 ** 3,
     gpuName: 'NVIDIA RTX 4090',
     gpuCount: 1,
     gpuVramTotalBytes: 24 * 1024 ** 3,
@@ -30,6 +32,8 @@ const TEST_NODES: NodeItem[] = [
     cpuUsagePercent: 50,
     memoryTotalBytes: 32 * 1024 ** 3,
     memoryUsedBytes: 16 * 1024 ** 3,
+    allocatableCores: 4,
+    allocatableMemoryBytes: 12 * 1024 ** 3,
     gpuName: 'NVIDIA RTX 3080',
     gpuCount: 1,
     gpuVramTotalBytes: 10 * 1024 ** 3,
@@ -47,6 +51,8 @@ const TEST_NODES: NodeItem[] = [
     cpuUsagePercent: 10,
     memoryTotalBytes: 32 * 1024 ** 3,
     memoryUsedBytes: 8 * 1024 ** 3,
+    allocatableCores: 6,
+    allocatableMemoryBytes: 20 * 1024 ** 3,
     gpuCount: 0,
     storageTotalBytes: 1000 * 1024 ** 3,
     storageUsedBytes: 300 * 1024 ** 3,
@@ -61,6 +67,8 @@ const TEST_NODES: NodeItem[] = [
     cpuUsagePercent: 75,
     memoryTotalBytes: 64 * 1024 ** 3,
     memoryUsedBytes: 48 * 1024 ** 3,
+    allocatableCores: 4,
+    allocatableMemoryBytes: 16 * 1024 ** 3,
     gpuCount: 0,
     storageTotalBytes: 4000 * 1024 ** 3,
     storageUsedBytes: 2000 * 1024 ** 3,
@@ -75,6 +83,8 @@ const TEST_NODES: NodeItem[] = [
     cpuUsagePercent: 20,
     memoryTotalBytes: 32 * 1024 ** 3,
     memoryUsedBytes: 8 * 1024 ** 3,
+    allocatableCores: 10,
+    allocatableMemoryBytes: 24 * 1024 ** 3,
     gpuName: 'NVIDIA A4000',
     gpuCount: 1,
     gpuVramTotalBytes: 16 * 1024 ** 3,
@@ -198,6 +208,8 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
         heartbeatAt: new Date().toISOString(),
         observationOnly: true, // Configured as observation only!
         schedulable: false,
+        allocatableCores: 0,
+        allocatableMemoryBytes: 0,
       },
     ];
 
@@ -214,6 +226,27 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
     expect(evalRemote?.hardFilterPassed).toBe(false);
     expect(evalRemote?.rejectionReasons.some((r) => r.includes('관측 전용 노드'))).toBe(true);
     expect(result.selectedNodeId).not.toBe('nod_01JREMOTE_225');
+  });
+
+  it('Step 2: strictly blocks candidate placement when allocatable capacity is undefined/unverified', () => {
+    const unverifiedNode: NodeItem = {
+      ...TEST_NODES[0],
+      id: 'nod_unverified_core',
+      allocatableCores: undefined,
+    };
+
+    const req: PlacementRequirement = {
+      requiredCores: 2,
+      requiredMemoryBytes: 4 * 1024 ** 3,
+      requiresGpu: false,
+    };
+
+    const result = evaluatePlacement([unverifiedNode], req);
+    expect(result.evaluations[0].hardFilterPassed).toBe(false);
+    expect(result.evaluations[0].rejectionReasons).toContain(
+      '서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨'
+    );
+    expect(result.selectedNodeId).toBeNull();
   });
 
   it('Step 4: validates result artifact manifest structure with verified evidence', () => {
