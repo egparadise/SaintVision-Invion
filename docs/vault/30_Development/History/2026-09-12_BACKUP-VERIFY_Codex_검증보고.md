@@ -54,4 +54,4 @@ hash_file의 contribution 경로 정규화는 문법 검사다. 아직 허용 ro
 - Claude: 4ddb622/ADR-084 독립 검토, sweep 실패와 과거 성공 관측을 운영 문서/consumer에서 구분. DB 기록만으로 현재 파일 정상이나 운영 인수 완료를 선언하지 않는다.
 - Gemini: 이전 verified와 최근 실패를 구분할 UI 계약은 durable 관측 연계 후 조율. 기존 인증/hash/drain/ticket 인수는 별도.
 
-전체 추정 **57.29% 완료/42.71% 잔여 유지**. CI·독립 review·운영 Evidence/5대/실장비 인수 미완료로 공식 task done을 올리지 않는다. check_docs.py(원문24·문서301·작업48), check_ontology.py, git diff --check exit0. Obsidian 사전 check는510개·pending11·충돌0·쓰기0, PR19 설명 갱신/draft 유지. 최종 push/동기화는 후속 영수증에 기록한다.
+전체 추정 **57.29% 완료/42.71% 잔여 유지**. CI·독립 review·운영 Evidence/5대/실장비 인수 미완료로 공식 task done을 올리지 않는다. check_docs.py(원문24·문서301·작업48), check_ontology.py, git diff --check exit0. Obsidian 사전 check는510개·pending11·충돌0·쓰기0, PR19 설명 갱신/draft 유지. 보고41213bb push exit0. 2026-09-12 02:32:43 KST Obsidian510개 해시 일치·pending0·충돌0·check/apply/check exit0. [동기화 영수증](../Evidence/backup-verify-obsidian-20260912.json). 영수증 포함 최종 문서도 commit/push 후 재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
