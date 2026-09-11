@@ -47,12 +47,13 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   const handleCreateCheckout = () => {
     const curToken = selectedNode.fencingToken;
+    const chkId = `chk_${Date.now().toString(36)}`;
     const newChk = {
-      checkoutId: `chk_${Date.now().toString(36)}`,
+      checkoutId: chkId,
       nodeId: selectedNode.nodeId,
-      inode: `ino_${Math.floor(10000 + Math.random() * 50000)}`,
+      inode: `ino_${49152 + checkouts.length}`,
       permissions: '0600 (read/write)',
-      checkpointSha: `sha256:${Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}...`,
+      checkpointSha: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
       epoch: curToken.epoch,
       status: 'active' as const,
       createdAt: new Date().toISOString(),

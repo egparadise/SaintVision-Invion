@@ -1579,13 +1579,59 @@ def list_project_runs(project: str):
     return {"items": [r for r in RUNS if r.get("projectId") == project], "total": len(RUNS)}
 
 
-@app.post("/v1/projects/{project}/runs", status_code=201)
-async def create_project_run(project: str, request: Request):
+async def _auto_complete_run(run_id: str, delay_seconds: float = 2.5):
+    """
+    Simulates local execution completion, registering deterministic NodeStopReceipt and output hash.
+    """
+    await asyncio.sleep(delay_seconds)
+    for r in RUNS:
+        if r["id"] == run_id and r.get("state") in ("running", "scheduled") and r.get("state") != "cancelled":
+            now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+            snap = r.get("snapshotHash", r["id"])
+            output_hash = f"sha256:{hashlib.sha256((snap + r['id']).encode('utf-8')).hexdigest()}"
+            r["state"] = "succeeded"
+            r["outputHash"] = output_hash
+            r["outputSizeBytes"] = max(sum(len(f.get("content", "")) for f in r.get("files", [])), 1024)
+            r["verifiedEvidenceId"] = f"evi_{run_id}"
+            r["updatedAt"] = now_iso
+            rcp_id = f"rcp_{run_id}"
+            RECEIPTS[rcp_id] = {
+                "receiptId": rcp_id,
+                "runId": run_id,
+                "nodeId": r.get("nodeId", "nod_01JABCDEF01"),
+                "commandId": f"cmd_{run_id}",
+                "exitCode": 0,
+                "physicallyStopped": True,
+                "resourceReclaimed": True,
+                "verified": True,
+                "output": {
+                    "sha256": output_hash,
+                    "sizeBytes": r["outputSizeBytes"],
+                },
+                "stoppedAt": now_iso,
+                "supervisorLabel": "ai.saintvision.output=bounded-streams-v1",
+            }
+            break
+
+
+@app.post("/v1/projects/{project_id}/runs", status_code=201)
+async def create_project_run(project_id: str, request: Request):
+    """
+    Create a new project execution run with full contract binding.
+    """
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
     try:
         data = await request.json()
     except Exception:
         data = {}
+
+    project = None
+    for p in PROJECTS:
+        if p["id"] == project_id:
+            project = p["id"]
+            break
+    if not project:
+        project = project_id
 
     target_node_id = data.get("targetNodeId", "nod_01JABCDEF01")
     target_node = None
@@ -1613,6 +1659,9 @@ async def create_project_run(project: str, request: Request):
         content_bytes = new_id.encode("utf-8")
     snapshot_hash = f"sha256:{hashlib.sha256(content_bytes).hexdigest()}"
 
+    requires_approval = bool(data.get("requiresApproval") or data.get("riskLevel") in ("L2", "L3"))
+    run_state = "awaiting_approval" if requires_approval else "running"
+
     new_run = {
         "id": new_id,
         "projectId": project,
@@ -1624,13 +1673,37 @@ async def create_project_run(project: str, request: Request):
         "resourceRequests": data.get("resourceRequests", {}),
         "leaseId": f"lse_{secrets.token_hex(6)}",
         "objective": data.get("objective", f"Monaco commit execution {new_id}"),
-        "state": "running",
+        "state": run_state,
+        "riskLevel": data.get("riskLevel", "L2" if requires_approval else "L1"),
         "requestedBy": data.get("requestedBy", "usr_current"),
         "createdAt": now_iso,
         "updatedAt": now_iso,
         "version": 1,
     }
     RUNS.append(new_run)
+
+    if requires_approval:
+        apprv_id = f"apr_{secrets.token_hex(6)}"
+        nonce = f"nonce_{secrets.token_hex(6)}"
+        new_apprv = {
+            "id": apprv_id,
+            "runId": new_id,
+            "workspaceId": new_run["workspaceId"],
+            "nodeId": target_node_id,
+            "riskLevel": new_run["riskLevel"],
+            "target": f"Workspace [{new_run['workspaceId']}] on Node {target_node_id}",
+            "command": f"exec {new_run['entrypoint']}",
+            "status": "pending",
+            "nonce": nonce,
+            "policyReason": data.get("policyReason", f"거버넌스 위험 등급 {new_run['riskLevel']} 정책에 따른 실행 사전 승인 요구 (Rule #304)"),
+            "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
+            "createdAt": now_iso,
+        }
+        APPROVALS.append(new_apprv)
+        new_run["approvalId"] = apprv_id
+    else:
+        asyncio.create_task(_auto_complete_run(new_id, 2.5))
+
     return new_run
 
 
@@ -1750,6 +1823,7 @@ async def approve_request(approval_id: str, request: Request):
                     if r.get("id") == apprv["runId"] and r.get("state") == "awaiting_approval":
                         r["state"] = "scheduled"
                         r["updatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                        asyncio.create_task(_auto_complete_run(apprv["runId"], 2.0))
                         break
             return {"approvalId": approval_id, "status": "approved", "nonce": nonce}
 

@@ -122,6 +122,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   });
   const [editorMode, setEditorMode] = useState<'edit' | 'diff' | 'frozen'>('edit');
   const [runObjective, setRunObjective] = useState('SaintVision PACS Core 빌드 및 가속 추론 벤치마크');
+  const [riskLevel, setRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L1');
   const [isExecuting, setIsExecuting] = useState(false);
   const [dispatchError, setDispatchError] = useState<string | null>(null);
   const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
@@ -338,6 +339,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             requiredMemoryBytes: reqMemoryGb * 1024 ** 3,
             requiresGpu,
           },
+          riskLevel,
+          requiresApproval: riskLevel !== 'L1',
+          policyReason: riskLevel !== 'L1' ? `거버넌스 위험 등급 ${riskLevel} 정책에 따른 사전 승인 요구 (Rule #304)` : undefined,
         }),
       });
 
@@ -1354,6 +1358,34 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     fontSize: '0.875rem',
                   }}
                 />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                    🛡️ 거버넌스 위험 등급:
+                  </span>
+                  <select
+                    value={riskLevel}
+                    onChange={(e) => setRiskLevel(e.target.value as 'L1' | 'L2' | 'L3')}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--color-border-strong)',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '0.8125rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <option value="L1">L1 (일반 실행 - 즉시 격리 시작)</option>
+                    <option value="L2">L2 (중간 위험 - 1차 검토자 사전 승인 요구)</option>
+                    <option value="L3">L3 (고위험 - Two-Person Rule 2인 승인 & Diff 필수)</option>
+                  </select>
+                  {riskLevel !== 'L1' && (
+                    <span style={{ fontSize: '0.75rem', color: '#d29922', fontWeight: 600 }}>
+                      ⚠️ 4단계에서 거버넌스 승인 절차가 진행됩니다.
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div style={{ display: 'flex', gap: '8px' }}>
