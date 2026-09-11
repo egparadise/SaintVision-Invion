@@ -190,6 +190,12 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - "이전 스냅샷 없음"과 "변경 없음"을 구분한다(`changed=None`). 없음은 같음이 아니다 — 복원 시험에서 누락 대 누락에 필요했던 것과 같은 구분이다.
 - **이 과정에서 찾은 내 도구의 결함 2건(고침)**: (1) `mayApprove`가 서로 다른 두 권한을 한 답으로 뭉갰다. 업무 승인은 project 역할에서 오고, 특권 operator 투표는 `inv.operator_grants.can_approve`에서 오며 `workspace_git`의 `_actor`가 투표를 세기 전에 그것을 확인한다. 그래서 `can_approve=false`인 project owner를 "승인 가능"으로 보고해 **실제보다 과장**했다. 이제 `mayApproveInProject`와 `mayApproveAsOperator`로 나눠 보고한다. (2) 도구가 `src`를 `sys.path`에 넣지 않아 첫 `--snapshot` 실행이 `ModuleNotFoundError`로 죽었고, SQLAlchemy에 psycopg 드라이버를 명시해야 했다.
 - 추가 검증 증거: 읽기는 기록 0건. 첫 스냅샷은 비교 대상 없음. 변경 없으면 digest 동일. `can_approve` 회수 → digest 이동·CHANGED 보고. 되돌리면 digest가 **이전 값으로 복귀**(권한 상태의 순수 함수라면 그래야 한다). 시험 15개, 변조 2종(operator 승인을 항상 참으로 되돌리기, drift 판정 끄기)에서 각각 2개씩 실패.
+- 이어서 수행(8a8f3b4) — **내 복원 도구의 기록 단계가 한 번도 실행된 적이 없었다.** 도구 docstring이 약속하는 세 가지 중 셋째가 "결과 기록"인데, 그 경로는 `--tenant`·`--user`를 함께 줄 때만 돌고 결함이 셋 겹쳐 있었다: (1) SQLAlchemy가 맨 `postgresql://`을 psycopg2로 해석하는데 설치돼 있지 않음, (2) `DrillMeasurement`를 없는 인자 이름으로 호출, (3) 백업을 원장이 허용하지 않는 종류 `database`로 기록(허용값은 `base`·`wal`·`logical`). **플래그 없이 돌린 모든 시험이 exit 0이면서 아무것도 기록하지 않아** 셋 다 드러나지 않았고, 절차서에는 "기록한다"고 적혀 있었다. 절차서 8-0-0으로 정정했다.
+  - 같은 수정에서 **백업 원장을 연결했다**: `record_backup`은 S12부터 호출자가 없었고 `verify_backup`은 이미 `verification.py`에서 쓰이고 있었다 — 아무도 만들지 않는 기록을 검증하는 절반짜리 사슬이었다. `--save-backup` 덤프가 이제 원장에 기록되고 드릴 행과 연결된다.
+  - 검증은 **디스크의 파일을 다시 읽어** 해시한다. 쓰려던 바이트의 해시를 재사용하지 않는다 — "검증됨"은 그 경로의 파일이 그 백업이라는 뜻이어야 하고 잘린 쓰기는 다른 해시가 나온다. 불일치면 **기록은 남기고 verified=false**로 둔다. 나쁜 백업이 있다는 사실이 복원 전에 봐야 할 증거다.
+  - `off_site`는 운영자 주장(`--off-site`)이며 도구가 판단하지 않는다(ADR-018).
+  - 실측: `backup ('logical', off_site=False, 590350 bytes, verified=True)`, `drill ('database','passed',rpo=6,rto=6,fencing_verified=True, backup 연결됨)`. 시험 5개, 세 결함을 각각 되돌리면 5/4/3개 실패.
+  - 두 발견이 만나는 지점: 원장의 종류는 `base`·`wal`·`logical`을 상정하는데 우리는 **`logical` 하나만** 만든다. 8-0의 "시점 복구 없음"과 같은 사실이다.
 - 부수 발견(보고만, 수정은 운영 행위): `docker-compose.prod.yml`에 `POSTGRES_PASSWORD=postgres`와 `inv_app:apptestonly`가 그대로 있다. prod 이름을 단 파일의 기본 credential이다.
 - 남은 문제: 연속 아카이빙·보관 매체·백업 주기는 **운영 결정**이며 CX-09 릴리스 시험과 함께 정해야 한다. 알람/worker 재시작/partition/장시간 표본과 사용자 인수는 미수행이고, CL-02의 실제 운영 입력과 CX-09 공동 시나리오가 선행이다. 작성자(Claude)와 승인자(Codex)는 구분한다.
 - 다음 첫 행동: PITR·보관 매체·주기 결정을 CX-09와 함께 받는다. 결정되면 같은 gate로 실측해 인수 증거를 만든다. 담당 Claude, 결정 Codex·운영자.
