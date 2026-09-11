@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-DEFINER-AUDIT-001"
 title: "Codex DB 함수 감사와 복원 판정 검토"
-version: "1.0.1"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:10:30+09:00"
+updated: "2026-09-11T18:43:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,3 +41,22 @@ Gemini f50310e의 파일 버튼/Node 표시 개선을 확인했으나, fixture h
 ## 18:08 이후 수정본 인수 메모
 
 Claude c28cdff는 과거 invalid backup/empty DB 허위 성공을 실제 재시험에서 거부했다. 남은 _passed의 측정값/restore exit 판정과 전체 복원 범위는 [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]]를 따른다. 과거 9995122 finding을 수정본에도 미수정이라고 전파하지 않는다. Gemini f50310e의 결과/평가 finding은 유지한다.
+
+## ADR-073 — 복원 도구의 정본 연결과 보수적 판정
+
+`tools/recovery_drill.py`는 Claude dee31e5(복원 구현 0581964)의 도구를 이어받은 **하나의 진입점**이다. 일반 복원 기능 owner는 Claude, 이번 판정/무결성 통합 변경 owner는 Codex이며 Claude의 독립 검토를 요청한다. `_definer_rules.py`의 SQL 패턴 판별을 ADR-072 정책과 나란히 합격 판정기로 두지 않는다. 정책 정의/EXECUTE/migration이 모두 일치해야 이후 DB 역할 probe를 실행한다.
+
+- 실제 pg_restore nonzero, target에서 완전히 빠진 테이블, 읽기 실패, digest·권한·RLS·소유자 불일치는 합격 불가다. 원본 객체 owner/권한을 복원하며 `--no-owner`나 `--no-privileges`로 오류를 숨기지 않는다.
+- public/inv 양쪽 role로 두 tenant와 빈 scope를 읽는다. 임의 고유 ID를 임시 삽입하고 항상 transaction rollback한다. 역할명은 SQL Identifier로 인용하며 superuser/BYPASSRLS를 거부한다.
+- 현재 정책 9개와 table inventory/count·9개 Evidence 테이블 내용 digest를 검증한다. 전체 table content/DDL/trigger의 보안 증명은 아니다. `contentDigestScope`에 대상이 나온다.
+- RPO는 복원 시작 시각−백업 recovery point다. 새 dump는 시작 시각을 보수적인 recovery point로 사용한다. 파일 mtime은 사용하지 않고, timezone 미상·미래·음수/NaN/Infinity·미측정은 합격 불가다. RTO는 DB 생성부터 함수/권한/tenant/fencing 확인 종료까지 잰다.
+- source의 전/후 발급 상한과 target의 `last_value/is_called`를 비교해 **다음 발급값**이 이미 관측한 토큰보다 커야 한다. 도구가 sequence/epoch/Node를 자동으로 변경하거나 운영 제출을 재개하지 않는다.
+- CLI 종료와 기록은 같은 `_passed`를 사용한다. 실제 pilot 서비스의 `rpo_seconds/rto_seconds` 인자를 사용하며 DB에 저장하는 정수 초는 올림한다. 따라서 900.01초를 900초로 내려 RPO 목표 합격으로 기록하지 않는다. 복원 기능 합격과 `met_targets`는 구분한다.
+- DSN은 `INV_RECOVERY_{SOURCE,ADMIN,CONTAINER,RECORD}_DSN`을 사용한다. 하위 pg client의 password는 argv에서 제거해 해당 프로세스 환경으로 전달하며 예외 원문/SQL/행 데이터는 공용 출력에 남기지 않는다. 로그에 비밀을 기록한 뒤 정규식으로 지우는 방식에 의존하지 않는다.
+- `scope=database_rehearsal`, `operationalRecoveryVerified=false`, `notVerified`를 보고서와 DB notes에 보존한다. `serviceResumed`는 호환 필드이며 DB role probe 결과다. 실제 HTTP 로그인·업무 재개를 뜻하지 않는다.
+
+이 도구는 신뢰된 백업과 미리 role이 준비된 격리 복원 환경에서 사용한다. 비교 중 source 쓰기는 중지되어야 한다. 같은 클러스터에서 role을 관측한 것은 별도 클러스터의 role 복원 훈련이 아니다. 객체 바이트·Node journal/epoch·PITR·쓰기 동시성·운영 로그인·실장비 작업 재개는 CL-03/CX-07 잔여다. CLI exit 0만으로 전체 인수 완료를 주장하지 않는다.
+
+공식 근거(2026-09-11 확인): [PostgreSQL pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html), [Sequence functions](https://www.postgresql.org/docs/16/functions-sequence.html), [Docker exec environment](https://docs.docker.com/reference/cli/docker/container/exec/). 위 문서의 정의와 로컬 실행 증거를 구분한다.
+
+착수/범위: [[2026-09-11_RECOVERY-INTEGRATION_Codex_착수]]. 검증·진행도와 다음 인계는 작업 후 History에 추가한다.
