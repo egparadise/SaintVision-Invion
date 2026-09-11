@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.27.0"
+version: "1.28.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T16:59:36+09:00"
+updated: "2026-09-11T18:03:37+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -108,3 +108,5 @@ ADR-069(현재 관리자 권한·capability 전체 제공량을 모든 kernel sl
 ADR-070(과거 migration 원본과 현재 적용 함수의 검증 구분·공개 이력 보존·현재 epoch/동일 project/대기 Run의 입력 진단)은 [[2026-09-11_Claude_잔여보고_Codex_독립검토]]를 따른다. 0032는 두 0031을 보존해 병합한다. 결과 URL은 kernel ResultView만 제공하고 업무 surface는 별도 readiness router를 사용한다. 로컬 회귀·CI·독립 검토·실제 운영 인수 상태는 분리한다.
 
 ADR-071(공개 0024/0032 이력의 0033 병합·첫 실행과 복구의 명시적 PTY 허용·협상된 Docker helper API·Git replay의 현재 public 권한 재검사)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0을 따른다. branch별 build-only 유예를 제거하며 로컬 실제 실행·CI·독립 검토·물리 장비 운영 인수는 각각 기록한다.
+
+ADR-072(정확한 definer 정의/시그니처/EXECUTE 정책·필수 inventory·read-only snapshot·관측 실패 거부)은 [[Codex DB 함수 감사와 복원 판정 검토]]를 따른다. catalog 일치와 전체 tenant/복원 안전을 구분하며 실제 mutation/권한 시험·독립 검토를 별도로 요구한다.

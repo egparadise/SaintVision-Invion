@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:21:49+09:00"
+updated: "2026-09-11T17:52:37+09:00"
 source_of_truth: "Git"
 ---
 
@@ -27,7 +27,7 @@ source_of_truth: "Git"
 
 | 카드 | 우선순위 | 상태 | 부모 task | 범위 |
 |---|---|---|---|---|
-| CX-01 | P0 | ready | S01-DB S04-DB S08-DB | 최신 3 Agent 변경 통합과 보안 검토 |
+| CX-01 | P0 | in_progress | S01-DB S04-DB S08-DB | 최신 3 Agent 변경 통합과 보안 검토 |
 | CX-02 | P0 | ready | S01-BE S01-ST S08-ST | 운영·credential·Storage 공통 계약 확정 |
 | CX-03 | P0 | blocked | S03-BE S04-BE S12-BE | 실제 원격 Node 실행 프로필과 7개 시험 |
 | CX-04 | P1 | planned | S06-BE S06-DB S06-ST | 원격 개발 작업공간과 실제 Git 인수 |
@@ -39,7 +39,7 @@ source_of_truth: "Git"
 
 ### CX-01 — 최신 3 Agent 변경 통합과 보안 검토
 
-- owner / reviewer: Codex / Claude; status: ready; priority: P0.
+- owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-08 / AC-01, AC-04, AC-08.
 - 다음 첫 행동: Claude 9995122와 Gemini f08bf33을 c5f2154 계약에 대조하고 아래 신규 검토 항목을 owner에게 돌려보낸다. 수정 수신 후 하나의 통합 SHA로 정합성·tenant·결과 경계를 검증한다.
 - 필요한 합격 증거: review finding별 해결 SHA/독립 검토, 현재 적용 DB 함수의 실제 다른 tenant 거부, 계약·migration 이력 보존. CI와 main 상태 별도.
@@ -124,7 +124,7 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | DEVELOPMENT-CONTINUITY / 공통 진행판 집계 대행. 제품 CX 카드의 완료를 뜻하지 않음 |
+| 마지막 작업 / 착수 카드 | CX-01 / SECURITY-AUDIT-INTEGRITY: DB 함수 경계와 복원 판정 검토 착수 |
 | 실제 owner / 읽은 진행판 버전 / KST | Codex / INDEX-PROGRESS-001 v1.0.12 / 2026-09-11T17:18:43+09:00 |
 | branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 02e6188 / 공통 진입 b2c37f2, 문서 전달 994ab49, 최종 영수증 SHA는 Git 이력 참조 |
 | 작업한 것 | 최신 3 Agent 소스·최초 12목표/48task 확인, 공통 진행판·26개 카드·상시 기록 지침 작성 |

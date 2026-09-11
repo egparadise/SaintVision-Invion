@@ -107,7 +107,13 @@ def main():
                     assert conn.execute("SELECT display_name FROM public.tenants WHERE tenant_id=%s",(sentinel,)).fetchone()==('preserve-me',)
                 if preserved_workspace:
                     assert conn.execute("SELECT tool_name FROM public.workspaces WHERE workspace_id=%s",(preserved_workspace,)).fetchone()==('codex-cli',)
-            print("PASS: " + prior + " -> integrated head, replay, restricted runtime grants")
+            from check_definer_functions import audit
+
+            findings = audit(make_conninfo(admin, dbname=name))
+            assert findings and not any(f["problems"] for f in findings), (
+                "Applied privileged function catalogue differs from policy"
+            )
+            print("PASS: " + prior + " -> integrated head, replay, restricted runtime grants, privileged function policy")
         finally:
             assert name.startswith("inv_upgrade_test_") and len(name) == 49
             with psycopg.connect(admin, autocommit=True) as conn:

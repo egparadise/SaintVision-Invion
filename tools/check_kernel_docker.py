@@ -41,7 +41,7 @@ def image_id(reference):
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
     exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/check_subject_tenant.py', 'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
+             'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
     return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
