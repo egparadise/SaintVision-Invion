@@ -41,3 +41,5 @@ Linux103 = DB 무결성14 + 파일 hash13 + root23 + pilot35 + 복원18. Windows
 
 
 문서 검사: check_docs.py exit0(원문24·문서305·작업48), check_ontology.py exit0, git diff --check exit0. 변경 Python5개 Black 적용. PR19 설명 갱신/draft 유지. Obsidian 외부2개 원문 보존/검토 후 동일 bytes 인수 및 정상 export를 진행한다.
+
+전달 보고43a67c3 commit/push exit0. 2026-09-12T02:54:38+09:00 외부 원문2개 동일 bytes 인수(목적지 쓰기0) 후 Obsidian check/apply/check exit0:525개 해시 일치, pending0, 충돌0. [동기화 영수증](../Evidence/backup-root-obsidian-20260912.json). 영수증 포함 최종 문서도 commit/push 후 재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
