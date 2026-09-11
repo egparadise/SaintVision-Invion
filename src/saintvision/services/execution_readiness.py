@@ -45,6 +45,13 @@ from ..errors import RES_NODE_NOT_FOUND, InvError
 from . import projects as project_service
 from . import settings as settings_service
 
+#: The kernel's bound on a workspace snapshot. Small and surprising: the files
+#: travel inside a signed launch payload rather than through an object store, so
+#: a person editing anything substantial hits it. Reported with the readiness
+#: answer rather than after a rejection.
+MAX_INPUT_BYTES: Final[int] = 65536
+MAX_INPUT_CONTENT_BYTES: Final[int] = 32768
+
 #: Who resolves an unmet precondition. Reported per check, because "you may not"
 #: and "nobody has set this up yet" need different actions from different people.
 OPERATOR: Final[str] = "operator"
@@ -153,6 +160,7 @@ def workspace_readiness(
     ]
 
     checks.append(_tool_check(workspace))
+    checks.append(_input_check(session, tenant_id=tenant_id, workspace_id=workspace_id))
 
     unmet = [c for c in checks if not c["satisfied"]]
     return {
@@ -169,6 +177,65 @@ def workspace_readiness(
             else f"{len(unmet)} of {len(checks)} preconditions are unmet."
         ),
     }
+
+
+def _input_check(
+    session: Session, *, tenant_id: uuid.UUID, workspace_id: str
+) -> dict[str, Any]:
+    """Whether anything has been prepared to run.
+
+    The sixth precondition, and the one a user meets *after* satisfying the
+    other five: everything is permitted, everything is linked, and there is
+    still nothing to approve because no input was submitted.
+
+    Read, never written. The kernel's prepare endpoints accept the files and
+    record them; this side only asks whether that happened. Writing here would
+    make a second account of what is about to execute, which is the mistake this
+    surface has already made four times.
+    """
+    row = session.execute(
+        text(
+            "SELECT prepared, kind, run_id, step_id, snapshot_bytes "
+            "FROM public.workspace_input_state(:t, :w)"
+        ),
+        {"t": str(tenant_id), "w": workspace_id},
+    ).one_or_none()
+
+    if row is None:
+        return _check(
+            "input_prepared",
+            False,
+            owner=REQUESTER,
+            detail=(
+                "no workspace input has been submitted, so there is nothing to "
+                "approve or run"
+            ),
+            remedy=(
+                "submit the files through the execution kernel's workspace "
+                "prepare endpoint; the snapshot is capped at "
+                f"{MAX_INPUT_BYTES} bytes with at most "
+                f"{MAX_INPUT_CONTENT_BYTES} bytes of file content, because it "
+                "travels inside a signed launch payload"
+            ),
+        )
+
+    prepared, kind, run_id, step_id, snapshot_bytes = row
+    body = _check(
+        "input_prepared",
+        bool(prepared),
+        owner=REQUESTER,
+        detail=(
+            f"{kind} input is prepared for run {run_id} step {step_id!r} "
+            f"({snapshot_bytes} of {MAX_INPUT_BYTES} bytes)"
+        ),
+    )
+    # Reported whether or not the check passed: a screen that shows how close to
+    # the bound the last submission came is one that can warn before the next
+    # one is refused.
+    body["snapshotBytes"] = snapshot_bytes
+    body["maxSnapshotBytes"] = MAX_INPUT_BYTES
+    body["runId"] = run_id
+    return body
 
 
 def _tool_check(workspace: Workspace) -> dict[str, Any]:

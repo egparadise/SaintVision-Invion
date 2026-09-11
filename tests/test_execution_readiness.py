@@ -125,6 +125,7 @@ def test_the_checklist_reports_every_precondition_at_once(app_sessionmaker, scen
         "role_permits_requesting",
         "workspace_ready",
         "tool_chosen_and_usable",
+        "input_prepared",
     ]
     assert report["executable"] is False
 
@@ -228,7 +229,7 @@ def test_an_operator_link_satisfies_the_kernel_checks(
     by_name = {c["check"]: c for c in report["checks"]}
     assert by_name["project_linked_to_kernel"]["satisfied"]
     assert by_name["requester_registered_with_kernel"]["satisfied"]
-    # Only the tool choice is left, and it belongs to the requester.
+    # Only the requester's own steps are left: choose a tool, submit input.
     assert report["blockedBy"] == ["requester"]
 
 
@@ -246,3 +247,112 @@ def test_the_checklist_cannot_be_used_to_probe_another_project(
                     )
 
 
+
+
+def test_input_is_the_precondition_a_user_meets_after_the_others(
+    app_sessionmaker, scene
+):
+    """Everything permitted, everything linked, and still nothing to run.
+
+    Submitting workspace files is the execution kernel's endpoint; this side
+    only asks whether it happened. Without the check, a person satisfies five
+    preconditions and then presses a button that fails for a sixth reason
+    nothing mentioned.
+    """
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, scene["tenant_a"]):
+                report = readiness_service.workspace_readiness(
+                    session, tenant_id=scene["tenant_a"],
+                    workspace_id=scene["workspace_id"], user_id=scene["owner"],
+                )
+    check = {c["check"]: c for c in report["checks"]}["input_prepared"]
+    assert check["satisfied"] is False
+    assert check["resolvedBy"] == "requester"
+    # The bound is stated before a submission is refused for exceeding it.
+    assert "65536 bytes" in check["remedy"]
+
+
+def test_prepared_input_satisfies_the_check_and_reports_its_size(
+    app_sessionmaker, owner_engine, scene
+):
+    """Read from what the kernel wrote, never reconstructed here."""
+    import uuid as _uuid
+
+    with owner_engine.begin() as c:
+        # The operator's step. inv.control_epoch is created empty on purpose —
+        # rolling the epoch voids every reservation in flight, so no migration
+        # does it — and the kernel's guard requires the current one, so without
+        # this the insert fails exactly as it should.
+        c.execute(
+            text(
+                "INSERT INTO inv.control_epoch (singleton, epoch) "
+                "VALUES (true, gen_random_uuid()) ON CONFLICT DO NOTHING"
+            )
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.tenants (tenant_id, name) VALUES (:t, 'r') "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": scene["tenant_a"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.projects (tenant_id, project_id) VALUES (:t, :p) "
+                "ON CONFLICT DO NOTHING"
+            ),
+            {"t": scene["tenant_a"], "p": scene["project_id"]},
+        )
+        c.execute(
+            text(
+                "INSERT INTO inv.runs (tenant_id, project_id, run_id) "
+                "VALUES (:t, :p, :r) ON CONFLICT DO NOTHING"
+            ),
+            {"t": scene["tenant_a"], "p": scene["project_id"], "r": scene["run_id"]},
+        )
+        start_id = _uuid.uuid4()
+        c.execute(
+            text(
+                "INSERT INTO inv.workspace_starts (tenant_id, project_id, run_id, "
+                "start_id, workspace_id, step_id, requester_id, recovery_epoch, "
+                "workload, snapshot) VALUES (:t, :p, :r, :s, :w, 'build', :u, "
+                "(SELECT epoch FROM inv.control_epoch WHERE singleton), "
+                "CAST(:wl AS jsonb), :snap)"
+            ),
+            {"t": scene["tenant_a"], "p": scene["project_id"], "r": scene["run_id"],
+             "s": start_id, "w": scene["workspace_id"], "u": scene["owner"],
+             "wl": '{"workspaceId": "%s", "workspaceStart": {"startId": "%s"}}'
+                   % (scene["workspace_id"], start_id),
+             "snap": b"x" * 1234},
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, scene["tenant_a"]):
+                report = readiness_service.workspace_readiness(
+                    session, tenant_id=scene["tenant_a"],
+                    workspace_id=scene["workspace_id"], user_id=scene["owner"],
+                )
+    check = {c["check"]: c for c in report["checks"]}["input_prepared"]
+    assert check["satisfied"] is True
+    assert check["snapshotBytes"] == 1234
+    assert check["maxSnapshotBytes"] == 65536
+    assert check["runId"] == scene["run_id"]
+
+
+def test_the_input_reader_is_bound_to_the_session_tenant(
+    app_sessionmaker, scene, two_tenants
+):
+    """Every definer function added after 0027 is bound from the start."""
+    _, tenant_b = two_tenants
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, scene["tenant_a"]):
+                rows = session.execute(
+                    text(
+                        "SELECT count(*) FROM public.workspace_input_state(:t, :w)"
+                    ),
+                    {"t": str(tenant_b), "w": scene["workspace_id"]},
+                ).scalar_one()
+    assert rows == 0
