@@ -52,7 +52,7 @@ SELECT n.nspname AS schema,
        p.proname AS name,
        pg_catalog.pg_get_function_identity_arguments(p.oid) AS args,
        p.prosrc AS body,
-       coalesce(array_to_string(p.proconfig, ' '), '') AS config,
+       coalesce(p.proconfig, '{}') AS config,
        pg_catalog.pg_get_userbyid(p.proowner) AS owner
 FROM pg_catalog.pg_proc p
 JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
@@ -66,14 +66,23 @@ def audit(dsn: str) -> list[dict]:
     import psycopg
     from psycopg.rows import dict_row
 
+    try:
+        from _definer_rules import judge
+    except ImportError:
+        import sys as _sys
+        from pathlib import Path as _Path
+
+        _sys.path.insert(0, str(_Path(__file__).resolve().parent))
+        from _definer_rules import judge
+
     findings = []
     with psycopg.connect(dsn, row_factory=dict_row) as conn:
         for row in conn.execute(QUERY).fetchall():
-            body = row["body"] or ""
             args = row["args"] or ""
-            takes_tenant = "tenant" in args.lower()
-            binds_tenant = "current_setting" in body and "inv.tenant_id" in body
-            pins_search_path = "search_path" in (row["config"] or "")
+            verdict = judge(row["body"] or "", args, row["config"] or [])
+            takes_tenant = verdict["takesTenant"]
+            binds_tenant = verdict["bindsTenant"]
+            pins_search_path = verdict["pinsSearchPath"]
 
             allowed_reason = NO_TENANT_ARGUMENT.get(row["name"])
             # A function with no tenant argument cannot be asked about another
@@ -92,6 +101,12 @@ def audit(dsn: str) -> list[dict]:
                     "does not pin search_path, so it resolves names through the "
                     "caller's path with the owner's rights"
                 )
+            if verdict["tempSchemaMisplaced"]:
+                problems.append(
+                    "resolves through pg_temp before its own schemas "
+                    f"(search_path = {verdict['searchPath']}), so a caller can "
+                    "create a temporary object that shadows a name it reads"
+                )
             if takes_tenant and allowed_reason is not None and not binds_tenant:
                 problems.append(
                     "is allowlisted but takes a tenant id; the allowlist is for "
@@ -105,6 +120,7 @@ def audit(dsn: str) -> list[dict]:
                     "takesTenant": takes_tenant,
                     "bindsTenant": binds_tenant,
                     "pinsSearchPath": pins_search_path,
+                    "searchPath": verdict["searchPath"],
                     "allowlisted": allowed_reason is not None,
                     "allowlistReason": allowed_reason,
                     "problems": problems,
@@ -140,9 +156,11 @@ def main() -> int:
 
     if unsafe:
         print(
-            f"\n{len(unsafe)} function(s) can be asked about a tenant the session "
-            f"is not in. A definer function bypasses row level security, so this "
-            f"is the isolation boundary, not a defence behind it."
+            f"\n{len(unsafe)} function(s) run with the owner's rights and are "
+            f"not held to the session's scope — by answering about a tenant the "
+            f"session is not in, or by resolving a name the caller controls. A "
+            f"definer function bypasses row level security, so this is the "
+            f"isolation boundary, not a defence behind it."
         )
         return 1
     print("\nEvery definer function is bound to the session's tenant scope.")
