@@ -1,16 +1,16 @@
 ---
 doc_id: "HIST-RECOVERY-INTEGRATION-REPORT-20260911"
 title: "2026-09-11 RECOVERY-INTEGRATION Codex 검증보고"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:53:13+09:00"
+updated: "2026-09-11T18:58:38+09:00"
 source_of_truth: "Git"
 ---
 
 # 2026-09-11 RECOVERY-INTEGRATION Codex 검증보고
 
-복원 도구를 정본 함수 감사와 통합한 구현 SHA는 **5fc1116cd3711ee57a43e4d1ec6dabdf901772f9**다. CX-01/CX-07의 이번 구현 단위는 전달하며 전체 카드/운영 인수는 진행 중이다. owner Codex, reviewer Claude pending. 착수 base d14db0a, branch agent/codex/workspace-bridge, PR19. [[2026-09-11_RECOVERY-INTEGRATION_Codex_착수]]와 [[Codex DB 함수 감사와 복원 판정 검토]] v1.1.0/ADR-073을 따른다.
+최종 구현은 **869d74b**, clean 검증 SHA는 **b5aef8a23bd4d8baf69db58d83366637e65c8126**다. 초회 구현/검증 5fc1116은 아래에 이력으로 보존했다. CX-01/CX-07의 이번 구현 단위는 전달하며 전체 카드/운영 인수는 진행 중이다. owner Codex, reviewer Claude pending. 착수 base d14db0a, branch agent/codex/workspace-bridge, PR19. [[2026-09-11_RECOVERY-INTEGRATION_Codex_착수]]와 [[Codex DB 함수 감사와 복원 판정 검토]] v1.1.0/ADR-073을 따른다.
 
 ## 작업한 것
 
@@ -65,4 +65,12 @@ Gemini 858763c의 64.58%는 작성자 보고로 보존하되 공통 승인 수�
 
 ### 최종 기록 보강
 
-869d74b에서 JSON 보고서의 `scope/operationalRecoveryVerified/notVerified`를 DB notes에도 보존하도록 보강하고 실제 저장/조회 assertion을 추가했다. 앞 표의 64/22/3은 정확히 5fc1116의 증거다. 이 소규모 후속 변경의 검증은 다음 동일 소스 SHA 실행 뒤 별도 영수증으로 갱신한다.
+869d74b에서 JSON 보고서의 `scope/operationalRecoveryVerified/notVerified`를 DB notes에도 보존하도록 보강하고 실제 저장/조회 assertion을 추가했다. 앞 표의 64/22/3은 정확히 5fc1116의 증거다. 이 후속 변경을 포함한 clean b5aef8a에서 Linux64/core22가 다시 통과했다. DB notes의 범위와 미검증 조건 저장/조회도 실제 시험에 포함했다.
+
+### 최종 고정 SHA 검증·전달
+
+- **b5aef8a / 구현 869d74b**: Linux 통합 **64 pass/0 skip**, core **22 pass/0 skip**, exit0. 5fc1116 때의 같은 64/22를 다시 더하지 않는다. Node 소스는 5fc1116 이후 바뀌지 않았으며 Go3 증거는 원래 SHA로 보존했다.
+- [최종 Linux 원본](../Evidence/recovery-b5aef8a-linux.json), [최종 판정 검사](../Evidence/recovery-b5aef8a-checks.json), [최종 CI 원본](../Evidence/recovery-b5aef8a-ci.json). b5aef8a CI6은 계정 제한으로 job 시작 전 failure다.
+- docs268/원문24/task48/outcome12, ontology, black, 문서 ZIP build exit0. 제품 전체 build나 물리 장비 시험 합격을 뜻하지 않는다.
+- b5aef8a push exit0. 18:56:07 Obsidian 관리430개 전부 hash 일치, pending0/conflict0, 외부 원문3개 보존. 이번 최종 증거/영수증 추가 후 같은 sync 절차를 다시 수행한다. OneDrive cloud upload는 별도 확인하지 않았다.
+- 다음 첫 행동/owner는 변함없다: Codex F1 경합 수정/F2 감사 검토→CX-02; Claude는 최신 b5aef8a/ADR-073 독립 검토. 원격 설치·운영 인수·CI 차단은 미해소다.

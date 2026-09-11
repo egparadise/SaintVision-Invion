@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:53:13+09:00"
+updated: "2026-09-11T18:59:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -124,15 +124,14 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | SECURITY-AUDIT-INTEGRITY / CX-01 일부 구현·검토 전달; 전체 통합은 진행 중 |
-| 실제 owner / 읽은 진행판 버전 / KST | Codex / 시작 v1.0.13 → 현재 v1.0.14 / 2026-09-11T18:10:30+09:00 |
-| branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 995b3a3 / b9a53f8 |
-| 작업한 것 | 감사 허위 합격 5개 재현·단일 도구 보강·9개 정책·migration gate, Claude/Gemini 수정본 검토 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 고정 SHA Linux PostgreSQL/Node 65 pass, core 304 pass, 20 prior 경로 및 함수 정책, exit 0; 이전 Windows 57/1skip 중복 가산 안 함 |
-| CI / 독립 reviewer / 운영 인수 | b9a53f8 CI 6개 계정 제한으로 시작 전 failure; Claude 독립 검토 pending; 운영 원격/5대 인수 미완료 |
-| 남은 문제 / 차단 이유 / 해소 담당 | Claude CL-03 측정·restore 오류/전체복원, Gemini GM-01/04 bytes 인증·생성 결과/평가 제거; CI 운영자, 원격 profile 운영자+Codex |
-| 다음 카드 / 첫 행동 / 다음 담당 | CX-01 수정본 재검토·같은 SHA 통합; 독립 진행 CX-02 credential/Storage 입력 계약 / Codex |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]], [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]] / PR19 / 외부 제안 3개 보존·병합; 18:13 KST 417개 hash 일치, 대기 0·충돌 0 |
+| 마지막 작업 / 카드 | RECOVERY-INTEGRATION / CX-01·CX-07 일부 구현 전달; 전체 카드 in_progress |
+| owner / 진행판 / KST | Codex / 시작1.0.14→현재1.0.16 / 2026-09-11T18:58:38+09:00 |
+| branch / base / 구현 / 검증 | agent/codex/workspace-bridge / d14db0a / 869d74b / clean b5aef8a |
+| 작업 | 단일 복원 도구·정본 감사·실패 거부·양쪽 RLS·측정/fencing·DB 기록 |
+| 검증 | b5aef8a Linux64/core22 pass, 0skip, exit0; Go3는 변경 없는5fc1116 source 증거 |
+| CI / peer / 운영 | CI6 시작 전 계정 제한, Claude 최신 검토 pending, 전체 운영 인수 미완료 |
+| 다음 첫 행동 / owner | F1 제공량 경합 실제 함수 재현과 단일 snapshot 수정·F2 intent 감사 / Codex, 이후 CX-02 |
+| History / PR / sync | [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]] / PR19 / 18:56:07 관리430개 hash 일치, 최종 추가분은 후속 sync |
 
 ## 2026-09-11 18:53 Codex 수신·검증·후속 기록
 

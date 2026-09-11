@@ -1,6 +1,6 @@
 {
-  "asOfKST": "2026-09-11T18:51:01+09:00",
-  "baseSHA": "5fc1116cd3711ee57a43e4d1ec6dabdf901772f9",
+  "asOfKST": "2026-09-11T18:58:38+09:00",
+  "baseSHA": "b5aef8a23bd4d8baf69db58d83366637e65c8126",
   "method": "48 original tasks, equal weights; engineering delivery maturity estimate, not acceptance/effort/time",
   "rubric": {
     "0": "no usable deliverable",
@@ -858,5 +858,6 @@
     "Gemini claim 64.58% not adopted: scripted local controls/tickets, mismatched result headers and compose config-only preflight do not establish the claimed implementation/operating integrations."
   ],
   "totalScore": 2750,
-  "maximumScore": 4800
+  "maximumScore": 4800,
+  "implementationSHA": "869d74b"
 }

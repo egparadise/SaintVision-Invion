@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:53:13+09:00"
+updated: "2026-09-11T18:59:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -165,3 +165,5 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 - CL-03 남은 범위: 독립 클러스터 role 복원·실제 계정 로그인/업무 재개·object bytes·Node journal/epoch·PITR/SLO. CL-02/04 ready 작업을 계속할 수 있다.
 
 상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
+
+최종 전달 갱신(2026-09-11T18:58:38+09:00): 구현869d74b/clean 검증b5aef8a Linux64·core22 exit0. 최신 독립 검토는 b5aef8a에 요청한다. 전체 진척57.29%(표시55%), CI·원격 인수 미완료.

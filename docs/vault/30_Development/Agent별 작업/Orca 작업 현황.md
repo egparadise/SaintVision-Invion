@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:53:13+09:00"
+updated: "2026-09-11T18:59:05+09:00"
 source_of_truth: "Git"
 ---
 
@@ -92,3 +92,5 @@ source_of_truth: "Git"
 - 원격 .225 관측 전용/7개 미실행, 공식 task done0은 그대로다. Obsidian 원문3개를 보존한 뒤 변경 파일 hash로 sync 확인한다.
 
 상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
+
+최종 전달 갱신(2026-09-11T18:58:38+09:00): 구현869d74b/clean 검증b5aef8a Linux64·core22 exit0. 최신 독립 검토는 b5aef8a에 요청한다. 전체 진척57.29%(표시55%), CI·원격 인수 미완료.
