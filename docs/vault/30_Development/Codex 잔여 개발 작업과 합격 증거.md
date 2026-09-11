@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.17.0"
+version: "1.18.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T14:56:20+09:00"
+updated: "2026-09-11T15:55:07+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 tenant/인계 재검토: [[2026-09-11_TENANT-BOUNDARY_Codex_검증보고]]의 f4fe37e에서 원본 0026 누수를 재현하고 후속 적용 guard의 거부를 확인했다. 결과 중복 제거·현재 입력 readiness·0032 이력 병합을 통합했으며 최종 로컬 회귀 305개/18개 migration 경로가 통과했다. #11/#12 중복 draft를 닫았고 #13/15/16/17/18/20의 기존 병합 사실을 확인했다. CI·독립 검토·원격 7개·운영/브라우저 인수와 새 main 반영은 남는다.
 
 2026-09-11 자원 제공량 후속: [[2026-09-11_RESOURCE-OFFER_Codex_검증보고]]의 01fdb15에서 현재 관리자 권한·전체 slice 제공 총량·미반납 예약 잠금·원자 history·0031 이력 병합을 구현했다. clean core 290/격리 통합 297개와 16개 upgrade 경로 통과. 실제 결과 정본과 [[3 Agent 원격 실행과 운영 인수 확정]]을 확정했으며 실제 원격 7개 시험, 운영 계정/Workspace 준비, UI 인수, 독립 검토·CI는 남는다.
 

@@ -1,14 +1,16 @@
 ---
 doc_id: "CONTRACT-RESULT-OBSERVATION-001"
 title: "Codex 실제 실행 결과 조회 계약"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T14:40:09+09:00"
+updated: "2026-09-11T15:54:00+09:00"
 source_of_truth: "Git"
 ---
 
 # 실제 결과와 실행 준비 상태
+
+2026-09-11 후속: [[2026-09-11_Claude_잔여보고_Codex_독립검토]]에 따라 f4fe37e에서 업무 results.py와 중복 결과 라우터를 제거하고 readiness.py를 별도 연결했다. 기존 migration/데이터는 보존한다. 새 입력 준비 진단은 현재 epoch·동일 Workspace/project·대기 중인 attempt의 입력만 선택한다. 별도 kernel_request_permission과 input_prepared를 포함한 checks는 7개다. UI는 개수를 고정하지 말고 check ID와 배열을 사용한다. executable=false/admissionRequired=true는 유지한다. 코드 통합과 운영 배포·CI·독립 검토·물리 원격 인수는 별도 상태다.
 
 [[2026-09-11_RESULT-OBSERVATION_Codex_착수]] 및 [[Codex 계정과 실행 커널 통합 계약]]의 후속이다. Codex는 결과 무결성·권한 경계와 DB 이력 통합을 소유한다. Claude의 결과 조회·진단 서비스 원저자 이력은 보존하며 Codex 수정의 독립 검토는 Claude 대기다.
 
