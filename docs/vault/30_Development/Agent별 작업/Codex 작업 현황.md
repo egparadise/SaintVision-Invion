@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.5"
+version: "1.0.6"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T00:32:00+09:00"
+updated: "2026-09-12T00:47:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -50,7 +50,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-08 / AC-01, AC-08.
-- 다음 첫 행동: ADR-075/076 및 운영 입력판 전달 후 resolver scope/회수/파일 descriptor 보안 conformance를 구체화한다. Claude 구현의 독립 검토와 실제 운영 입력 수신을 잇는다.
+- 다음 첫 행동: 8222f0b 공통39개 conformance 전달 후 Claude 실제 backend fixture 연결 결과를 인수하고 scope/회수/descriptor를 독립 검토한다. 실제 open→read 교체 및 다중 프로세스 회수 경합 시험을 추가한다.
 - 필요한 합격 증거: 미확인 항목에 결정 담당·차단 범위 명시, 비밀값 없는 버전 계약, Claude/Gemini가 구현할 입력·출력 합의. 실제 계정값은 운영자 확인 필요.
 - 선행/차단과 해소 담당: 초안/계약 검토는 즉시 가능. 운영 권한/장비 정보 확정은 운영자 입력 필요.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
@@ -124,14 +124,14 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 카드 | OPERATING-CONTRACT / CX-02 기준 결정·인계, 구현/운영 검토 진행 중 |
-| owner / 진행판 / KST | Codex / 1.0.19 / 2026-09-12T00:32:00+09:00 |
-| branch / base | agent/codex/workspace-bridge / f5c43a1 |
-| 작업 | ADR-075/076, opaque reference schema, 운영 입력12항목·owner/차단 범위 |
-| 검증 | schema 정상1/거부12, 문서/ontology 및 실제 전달은 History 참조; 제품 실행 시험 아님 |
-| CI / peer / 운영 | CI 계정 제한 추적, Claude 계약 검토 pending, 운영 값/배포 미완료 |
-| 다음 첫 행동 / owner | resolver scope/회수/경로 conformance / Codex; 구현 / Claude |
-| History / PR / sync | [[2026-09-12_OPERATING-CONTRACT_Codex_검증보고]] / PR19 / History 영수증 |
+| 마지막 작업 / 카드 | CREDENTIAL-CONFORMANCE / CX-02 공통 검증 전달, 실제 backend 인수 대기 |
+| owner / 진행판 / KST | Codex / 1.0.20 / 2026-09-12T00:47:43+09:00 |
+| branch / base / 구현·검증 | agent/codex/workspace-bridge / 34d457c / clean8222f0b |
+| 작업 | 내부 credential Protocol·39개 재사용 conformance·실제/모델 marker 분리 |
+| 검증 | 합성 모델39+결함검출8=47 pass/skip0; backend 선택 exit5(모델 제외) |
+| CI / peer / 운영 | CI 시작 전 계정 제한, Claude reviewer pending, 실제 backend/운영 인수 미완료 |
+| 다음 첫 행동 / owner | 실제 backend 연결 / Claude; 독립 scope·회수·descriptor 검토·경합 시험 / Codex |
+| History / PR / sync | [[2026-09-12_CREDENTIAL-CONFORMANCE_Codex_검증보고]] / PR19 / History 영수증 |
 
 ## 2026-09-11 18:53 Codex 수신·검증·후속 기록
 
@@ -158,3 +158,7 @@ source_of_truth: "Git"
 ## OPERATING-CONTRACT 최신 작업 → 확인 → 다음
 
 - 2026-09-12T00:32:00+09:00 / CX-02: [[Codex 운영 자격증명과 Storage 계약]], [[운영 환경 입력과 Agent 인계]] 전달. 내부 reference 문법 결정과 runtime resolver 구현/운영 계정 등록을 구분한다. 다음 Codex 보안 conformance와 독립 검토, Claude provider 구현, Gemini unknown/readiness 반영. 전체 진척은 운영 인수 전 임의 가산하지 않는다.
+
+## CREDENTIAL-CONFORMANCE 최신 작업 → 확인 → 다음
+
+- 2026-09-12T00:47:43+09:00 / CX-02:8222f0b 공통 Protocol/39개 suite 및 모델 검출력47개 확인. [[Codex 자격증명 보안 검증 인계]]에 actual harness 요구·모델 한계를 고정했다. 다음 Claude 실제 provider 연결, Codex 구현 독립 검토와 실제 inode/회수 경합 검증. 운영/실장비 증거는 아직 없다.
