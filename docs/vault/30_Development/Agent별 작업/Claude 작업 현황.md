@@ -102,7 +102,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - 빈 테이블 `e3b0c442…`(빈 입력의 sha256) vs 삭제된 테이블 `unreadable:UndefinedTable` → 서로 다름. 양쪽 삭제 시 값은 같지만 prefix로 걸러 차단.
   - backup mtime을 24시간 과거로 강제 → RPO 222s(archive 헤더 기준). mtime 기준이면 86400s였다.
   - backup 이후 fencing token 7개 발급 → "advance inv.fencing_token_seq by 6", **exit 1**.
-  - 정상 시험: RTO 6.1s, RPO 6.2s, table 1314 / column 7652 권한 일치, **exit 0**. AC-12의 RPO≤15분·RTO≤1시간은 이 값으로 충족한다.
+  - 정상 시험: RTO 6.1s, RPO 6.2s, table 1314 / column 7652 권한 일치, **exit 0**. ~~AC-12의 RPO≤15분·RTO≤1시간은 이 값으로 충족한다.~~ **정정(CL-07, 2026-09-12)**: 이 문장은 틀렸다. RPO 6.2초는 이 도구가 방금 뜬 백업과의 간격이라 서버 설정과 무관하게 거의 0이 나오며, **실패할 수 없는 숫자를 목표 충족의 증거로 쓴 것**이다. RTO 실측은 유효하다. 실제 운영 RPO는 백업 주기이고 이 배포는 `archive_mode=off`라 시점 복구가 없어 **RPO 목표는 미달성**이다. CL-07과 절차서 8-0 참조.
 - 이어서 수행(0581964): 카드가 요구한 역할·RLS·definer 함수·서비스 재개를 복원 시험에 넣었다. 권한 digest만으로는 "누가 무엇을 볼 수 있는가"가 설명되지 않는다 — policy 122개를 모두 되살리고도 격리는 하나도 못 하는 복원본이 기존 검사 전부를 통과한다.
   - 인가 모델: 역할·역할 소속·`relrowsecurity`/`relforcerowsecurity`·`pg_policies`를 부분별 digest로 대조해, 실패 시 어느 부분이 움직였는지 지목한다.
   - definer 함수: `tools/check_definer_functions.py`를 **복원된 DB**에 실행한다. definer 함수는 RLS를 우회하고, 과거 두 번의 교차 tenant 결함 모두 `CREATE OR REPLACE`로 고쳤으므로 "지금 그 DB가 어떤 정의를 들고 있는가"는 복원 시점에만 물을 수 있다.
