@@ -82,8 +82,9 @@ def hash_file(
     """Read a file and return what is actually in it.
 
     A trusted worker must supply its preconfigured ReadRoot. Authorization is
-    checked on opened handles, never inferred from the requested path. Reads
-    are bounded by the initial size and rejected if the file changes.
+    checked on opened handles, never inferred from the requested path. Two
+    bounded reads must agree: timestamp granularity alone cannot detect rapid
+    same-size writes. This is an observation, not a filesystem snapshot.
     """
     from time import monotonic as _monotonic
 
@@ -104,18 +105,24 @@ def hash_file(
         raise VerificationFailed("refusing to read that path: ambiguous path")
     target = Path(str(path))
     started = clock()
-    digest = hashlib.sha256()
-    total = 0
     try:
         with allowed_root.open(target) as (handle, initial_size):
-            while total <= initial_size:
-                chunk = handle.read(min(chunk_bytes, initial_size + 1 - total))
-                if not chunk:
-                    break
-                digest.update(chunk)
-                total += len(chunk)
-            if total != initial_size:
-                raise VerificationFailed("file changed during read")
+            first_digest = None
+            for _ in range(2):
+                handle.seek(0)
+                digest = hashlib.sha256()
+                total = 0
+                while total <= initial_size:
+                    chunk = handle.read(min(chunk_bytes, initial_size + 1 - total))
+                    if not chunk:
+                        break
+                    digest.update(chunk)
+                    total += len(chunk)
+                if total != initial_size:
+                    raise VerificationFailed("file changed during read")
+                if first_digest is not None and first_digest != digest.digest():
+                    raise VerificationFailed("file changed during read")
+                first_digest = digest.digest()
     except FileNotFoundError:
         raise VerificationFailed("the file does not exist") from None
     except IsADirectoryError:

@@ -167,7 +167,9 @@ class ReadRoot:
                 )
             )
             try:
-                handle = os.fdopen(fd, "rb")
+                # A validation reread must reach the filesystem, not an old
+                # BufferedReader cache after seek(0).
+                handle = os.fdopen(fd, "rb", buffering=0)
             except BaseException:
                 os.close(fd)
                 raise

@@ -207,6 +207,26 @@ def test_during_read_mutation_is_blocked_or_observation_rejected(storage, monkey
 
 if sys.platform == "linux":
 
+    def test_same_size_write_is_rejected_even_when_stat_version_is_unchanged(storage, monkeypatch):
+        import stat
+
+        _, target, _, authorized = storage
+        original_stat = os.fstat
+        versions = []
+
+        def coarse_stat(fd):
+            current = original_stat(fd)
+            if stat.S_ISREG(current.st_mode):
+                if not versions:
+                    versions.append(current)
+                return versions[0]
+            return current
+
+        monkeypatch.setattr(os, "fstat", coarse_stat)
+        intercept_read(monkeypatch, lambda: target.write_bytes(b"modified backup"))
+        with pytest.raises(InvError, match="file changed during read"):
+            observe(target, authorized)
+
     def test_a_continuously_growing_file_does_not_extend_read_budget(storage, monkeypatch):
         _, target, _, authorized = storage
         initial_size = target.stat().st_size
