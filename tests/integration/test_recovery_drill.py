@@ -207,7 +207,10 @@ def test_actual_drill_result_can_be_recorded_through_pilot_service(args, uri):
     record_id = drill.record(report, args)
     with psycopg.connect(args.source) as conn:
         row = conn.execute(
-            "SELECT outcome,measured_rpo_seconds,met_targets FROM public.recovery_drills WHERE drill_id=%s",
+            "SELECT outcome,measured_rpo_seconds,met_targets,notes FROM public.recovery_drills WHERE drill_id=%s",
             (record_id,),
         ).fetchone()
-    assert row == ("passed", 901, False)
+    assert row[:3] == ("passed", 901, False)
+    assert row[3]["scope"] == "database_rehearsal"
+    assert row[3]["operationalRecoveryVerified"] is False
+    assert row[3]["notVerified"] == report["notVerified"]

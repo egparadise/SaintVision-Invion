@@ -868,6 +868,9 @@ def record(report: dict[str, Any], args) -> str | None:
                         fencing_note=report["fencingNote"],
                         integrity_verified=report["integrityVerified"],
                         notes={
+                            "scope": report["scope"],
+                            "operationalRecoveryVerified": False,
+                            "notVerified": report["notVerified"],
                             "backupSha256": report["backupSha256"],
                             "backupBytes": report["backupBytes"],
                             "tablesWithDifferentCounts": report["tablesWithDifferentCounts"],
