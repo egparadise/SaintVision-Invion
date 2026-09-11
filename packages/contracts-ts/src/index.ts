@@ -76,6 +76,7 @@ export interface WorkloadSpec {
   command: Array<string>;
   timeoutSeconds: number;
   workspaceResume?: WorkspaceResumeRef;
+  workspaceStart?: WorkspaceStartRef;
 }
 
 export interface ResourceLease {
@@ -247,7 +248,7 @@ export interface SandboxLaunchSpec {
   argv: Array<string>;
   workspaceId: WorkspaceId;
   workingDirectory: "/workspace";
-  workspaceMode: "ephemeral" | "restored";
+  workspaceMode: "ephemeral" | "restored" | "initialized";
   cpuMillis: number;
   memoryBytes: number;
   timeoutSeconds: number;
@@ -413,11 +414,12 @@ export interface WorkspaceResumeRef {
 }
 
 export interface WorkspaceInput {
-  resumeId: string;
+  resumeId?: string;
   stepId: string;
   sha256: string;
   sizeBytes: number;
   dataBase64: string;
+  startId?: string;
 }
 
 export interface WorkspaceSnapshotFile {
@@ -615,4 +617,53 @@ export interface ContainmentApprovalView {
   status: "pending" | "approved" | "rejected" | "consumed";
   expiresAt: string;
   requiredApprovals: 2;
+}
+
+export interface WorkspaceStartRef {
+  startId: string;
+  stepId: string;
+  inputSha256: string;
+  inputSizeBytes: number;
+  nodeId: NodeId;
+  cpuResourceId: ResourceId;
+  memoryResourceId: ResourceId;
+  profileVersion: string;
+  policyVersion: string;
+}
+
+export interface WorkspaceStartPrepareInput {
+  stepId: string;
+  workload: WorkloadSpec;
+  expectedVersion: number;
+  startId: string;
+  snapshotBase64: string;
+  targetNodeId: NodeId;
+}
+
+export interface WorkspaceStartPrepareResult {
+  workload: WorkloadSpec;
+  approval: ApprovalView;
+  run: ControlRunView;
+  startId: string;
+}
+
+export interface WorkspaceStartView {
+  workload: WorkloadSpec;
+  run: ControlRunView;
+  approval: (ApprovalView | null);
+  frozenFiles: Array<WorkspaceFrozenFile>;
+  startId: string;
+}
+
+export interface WorkspaceStartEnqueueInput {
+  approvalId: ApprovalId;
+  expectedVersion: number;
+  startId: string;
+}
+
+export interface WorkspaceStartEnqueueResult {
+  runId: RunId;
+  commandId: string;
+  accepted: true;
+  startId: string;
 }

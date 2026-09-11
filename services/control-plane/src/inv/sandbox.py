@@ -49,8 +49,7 @@ class SandboxProfile:
         ):
             raise ValueError("Immutable nonempty sandbox allowlists required")
         if any(
-            not isinstance(image, str)
-            or re.fullmatch(r"sha256:[0-9a-f]{64}", image) is None
+            not isinstance(image, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", image) is None
             for image in self.images
         ):
             raise ValueError("Pinned image digests required")
@@ -116,9 +115,7 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         or resources["minVramBytes"] != 0
         or workload["timeoutSeconds"] > profile.max_timeout_seconds
     ):
-        raise DomainError(
-            "SANDBOX-0002", "Workload exceeds the approved sandbox profile", 403
-        )
+        raise DomainError("SANDBOX-0002", "Workload exceeds the approved sandbox profile", 403)
     plan = {
         "profileVersion": profile.version,
         "imageDigest": workload["imageDigest"],
@@ -138,10 +135,13 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         "privileged": False,
         "hostAccess": False,
     }
-    if "workspaceResume" in workload:
+    if "workspaceResume" in workload or "workspaceStart" in workload:
         if workspace_input is None:
             raise DomainError("AUTH-0044", "Verified Workspace input required", 403)
-        plan.update(workspaceMode="restored", workspaceInput=workspace_input)
+        plan.update(
+            workspaceMode="initialized" if "workspaceStart" in workload else "restored",
+            workspaceInput=workspace_input,
+        )
     elif workspace_input is not None:
         raise DomainError("AUTH-0044", "Unexpected Workspace input", 403)
     validate_contract("SandboxLaunchSpec", plan)

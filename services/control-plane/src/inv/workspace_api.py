@@ -55,6 +55,7 @@ class RestrictedWorkspaceRuntime:
             raise DomainError("AUTH-0011", "Configured Workspace tenant differs", 403)
         intent = deepcopy(workload)
         intent.pop("workspaceResume", None)
+        intent.pop("workspaceStart", None)
         compile_launch(intent, self.profile)
         now = datetime.now(timezone.utc)
         return CurrentPolicy(

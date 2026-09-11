@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.20.0"
+version: "1.21.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T09:27:00+09:00"
+updated: "2026-09-11T10:50:59+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -94,3 +94,5 @@ ADR-057(불변 editor revision과 승인 snapshot 일치), ADR-058(명시적 목
 ADR-061(Windows 사용자 전용 개발 Studio·개발 도구와 제품 실행 권한 분리)은 [[Codex 개발 Studio와 제품 실행 경계]]를 따른다. 프로젝트·도구·로컬 CPU 개발 컨테이너를 제공하며 PostgreSQL Run/승인/Node permit/Evidence를 대체하지 않는다. 다중 사용자·원격 업무·GPU 기능은 별도 검증 전까지 비활성이다.
 
 ADR-062(Linux Docker API 1.41~1.45 범위 협상·실제 격리 설정 재검증·512 KiB/1개 json-file 출력 로그)은 [[Codex Node 실행 격리와 정지 영수증 계약]] v1.1.0을 따른다. 성공한 협상만 캐시하고 실행 변경 요청의 자동 재전송은 금지한다. DB/permit/승인 계약은 유지한다. 기존 local logging driver 설정은 서버 20.10 호환성 문제에 따라 정정하며 실제 장비 검증 범위는 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에 기록한다.
+
+ADR-063(실행 이력이 없는 draft Run의 불변 첫 입력·명시적 Node/자원/버전 고정·원자 승인 소비/예약/queue·attempt 1 및 결과 checkpoint)은 [[Codex Workspace 첫 실행과 승인 입력 계약]]을 따른다. 첫 실행은 startId/initialized, 복구는 resumeId/restored로 구분한다. 0025 forward migration을 현재 실제 head 0023 뒤에 추가한다. 운영 사용자/프로젝트 provisioning·화면·원격 PC 설치와 독립 검토는 별도다.

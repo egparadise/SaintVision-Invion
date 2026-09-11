@@ -78,6 +78,7 @@ type WorkloadSpec struct {
     Command []string `json:"command"`
     TimeoutSeconds int64 `json:"timeoutSeconds"`
     WorkspaceResume *WorkspaceResumeRef `json:"workspaceResume,omitempty"`
+    WorkspaceStart *WorkspaceStartRef `json:"workspaceStart,omitempty"`
 }
 
 type ResourceLease struct {
@@ -415,11 +416,12 @@ type WorkspaceResumeRef struct {
 }
 
 type WorkspaceInput struct {
-    ResumeId string `json:"resumeId"`
+    ResumeId *string `json:"resumeId,omitempty"`
     StepId string `json:"stepId"`
     Sha256 string `json:"sha256"`
     SizeBytes int64 `json:"sizeBytes"`
     DataBase64 string `json:"dataBase64"`
+    StartId *string `json:"startId,omitempty"`
 }
 
 type WorkspaceSnapshotFile struct {
@@ -617,4 +619,53 @@ type ContainmentApprovalView struct {
     Status string `json:"status"`
     ExpiresAt string `json:"expiresAt"`
     RequiredApprovals int64 `json:"requiredApprovals"`
+}
+
+type WorkspaceStartRef struct {
+    StartId string `json:"startId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    NodeId NodeId `json:"nodeId"`
+    CpuResourceId ResourceId `json:"cpuResourceId"`
+    MemoryResourceId ResourceId `json:"memoryResourceId"`
+    ProfileVersion string `json:"profileVersion"`
+    PolicyVersion string `json:"policyVersion"`
+}
+
+type WorkspaceStartPrepareInput struct {
+    StepId string `json:"stepId"`
+    Workload WorkloadSpec `json:"workload"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+    SnapshotBase64 string `json:"snapshotBase64"`
+    TargetNodeId NodeId `json:"targetNodeId"`
+}
+
+type WorkspaceStartPrepareResult struct {
+    Workload WorkloadSpec `json:"workload"`
+    Approval ApprovalView `json:"approval"`
+    Run ControlRunView `json:"run"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartView struct {
+    Workload WorkloadSpec `json:"workload"`
+    Run ControlRunView `json:"run"`
+    Approval *ApprovalView `json:"approval"`
+    FrozenFiles []WorkspaceFrozenFile `json:"frozenFiles"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueResult struct {
+    RunId RunId `json:"runId"`
+    CommandId string `json:"commandId"`
+    Accepted bool `json:"accepted"`
+    StartId string `json:"startId"`
 }

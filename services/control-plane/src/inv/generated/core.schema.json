@@ -297,6 +297,9 @@
         },
         "workspaceResume": {
           "$ref": "#/$defs/WorkspaceResumeRef"
+        },
+        "workspaceStart": {
+          "$ref": "#/$defs/WorkspaceStartRef"
         }
       },
       "required": [
@@ -311,7 +314,17 @@
         "command",
         "timeoutSeconds"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "workspaceResume",
+              "workspaceStart"
+            ]
+          }
+        }
+      ]
     },
     "ResourceLease": {
       "type": "object",
@@ -1029,7 +1042,8 @@
           "type": "string",
           "enum": [
             "ephemeral",
-            "restored"
+            "restored",
+            "initialized"
           ]
         },
         "cpuMillis": {
@@ -1108,20 +1122,56 @@
           "if": {
             "properties": {
               "workspaceMode": {
+                "const": "ephemeral"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "workspaceInput"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "workspaceInput"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "workspaceMode": {
                 "const": "restored"
               }
             }
           },
           "then": {
-            "required": [
-              "workspaceInput"
-            ]
+            "properties": {
+              "workspaceInput": {
+                "required": [
+                  "resumeId"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "workspaceMode": {
+                "const": "initialized"
+              }
+            }
           },
-          "else": {
-            "not": {
-              "required": [
-                "workspaceInput"
-              ]
+          "then": {
+            "properties": {
+              "workspaceInput": {
+                "required": [
+                  "startId"
+                ]
+              }
             }
           }
         }
@@ -1838,14 +1888,29 @@
           "type": "string",
           "minLength": 4,
           "maxLength": 87384
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
         }
       },
       "required": [
-        "resumeId",
         "stepId",
         "sha256",
         "sizeBytes",
         "dataBase64"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "resumeId"
+          ]
+        },
+        {
+          "required": [
+            "startId"
+          ]
+        }
       ]
     },
     "WorkspaceSnapshotFile": {
@@ -2779,6 +2844,214 @@
         "status",
         "expiresAt",
         "requiredApprovals"
+      ]
+    },
+    "WorkspaceStartRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "cpuResourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "memoryResourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "startId",
+        "stepId",
+        "inputSha256",
+        "inputSizeBytes",
+        "nodeId",
+        "cpuResourceId",
+        "memoryResourceId",
+        "profileVersion",
+        "policyVersion"
+      ]
+    },
+    "WorkspaceStartPrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "snapshotBase64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384
+        },
+        "targetNodeId": {
+          "$ref": "#/$defs/NodeId"
+        }
+      },
+      "required": [
+        "startId",
+        "stepId",
+        "workload",
+        "expectedVersion",
+        "snapshotBase64",
+        "targetNodeId"
+      ]
+    },
+    "WorkspaceStartPrepareResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "approval": {
+          "$ref": "#/$defs/ApprovalView"
+        },
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "workload",
+        "approval",
+        "run"
+      ]
+    },
+    "WorkspaceStartView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ApprovalView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frozenFiles": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/WorkspaceFrozenFile"
+          }
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "workload",
+        "run",
+        "approval",
+        "frozenFiles"
+      ]
+    },
+    "WorkspaceStartEnqueueInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "approvalId",
+        "expectedVersion"
+      ]
+    },
+    "WorkspaceStartEnqueueResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "commandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "accepted": {
+          "type": "boolean",
+          "const": true
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "runId",
+        "commandId",
+        "accepted"
       ]
     }
   },

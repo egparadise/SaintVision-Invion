@@ -423,6 +423,7 @@ class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
 class WorkspaceMode(StrEnum):
     ephemeral = 'ephemeral'
     restored = 'restored'
+    initialized = 'initialized'
 
 
 class ExecutionClaim(BaseModel):
@@ -601,7 +602,7 @@ class WorkspaceResumeRef(BaseModel):
     checkpointAttempt: conint(ge=1)
 
 
-class WorkspaceInput(BaseModel):
+class WorkspaceInput1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -610,6 +611,23 @@ class WorkspaceInput(BaseModel):
     sha256: constr(pattern=r'^[0-9a-f]{64}$')
     sizeBytes: conint(ge=1, le=65536)
     dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID | None = None
+
+
+class WorkspaceInput2(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID | None = None
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID
+
+
+class WorkspaceInput(RootModel[WorkspaceInput1 | WorkspaceInput2]):
+    root: WorkspaceInput1 | WorkspaceInput2
 
 
 class WorkspaceSnapshotFile(BaseModel):
@@ -841,6 +859,40 @@ class ContainmentApprovalView(BaseModel):
     requiredApprovals: Literal[2]
 
 
+class WorkspaceStartRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    startId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+    nodeId: NodeId
+    cpuResourceId: ResourceId
+    memoryResourceId: ResourceId
+    profileVersion: constr(min_length=1, max_length=200)
+    policyVersion: constr(min_length=1, max_length=200)
+
+
+class WorkspaceStartEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+
+
+class WorkspaceStartEnqueueResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    commandId: UUID
+    accepted: Literal[True]
+    startId: UUID
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -856,6 +908,7 @@ class WorkloadSpec(BaseModel):
     command: list[str] = Field(..., min_length=1)
     timeoutSeconds: conint(ge=1, le=9007199254740991)
     workspaceResume: WorkspaceResumeRef | None = None
+    workspaceStart: WorkspaceStartRef | None = None
 
 
 class SandboxLaunchSpec(BaseModel):
@@ -1010,6 +1063,39 @@ class BusinessBindingView(BaseModel):
     resourceReleasePending: bool
     releasedAt: AwareDatetime | None
     workload: WorkloadSpec
+
+
+class WorkspaceStartPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+    snapshotBase64: constr(min_length=4, max_length=87384)
+    targetNodeId: NodeId
+
+
+class WorkspaceStartPrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    approval: ApprovalView
+    run: ControlRunView
+    startId: UUID
+
+
+class WorkspaceStartView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    run: ControlRunView
+    approval: ApprovalView | None
+    frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
+    startId: UUID
 
 
 class INVCore(

@@ -24,8 +24,16 @@ func emitWorkspaceOutput(stdout, stderr *outputBuffer, input *contracts.Workspac
 	if stdout.truncated || stderr.truncated {
 		return 122
 	}
+	workspace := map[string]any{"stepId": input.StepId, "inputSha256": input.Sha256, "snapshot": snapshot}
+	if input.StartId != nil {
+		workspace["startId"] = *input.StartId
+	} else if input.ResumeId != nil {
+		workspace["resumeId"] = *input.ResumeId
+	} else {
+		return 122
+	}
 	artifact := map[string]any{"stdout": append([]byte{}, stdout.data...), "stderr": append([]byte{}, stderr.data...), "truncated": false,
-		"workspace": map[string]any{"resumeId": input.ResumeId, "stepId": input.StepId, "inputSha256": input.Sha256, "snapshot": snapshot}}
+		"workspace": workspace}
 	if json.NewEncoder(os.Stdout).Encode(artifact) != nil {
 		return 122
 	}

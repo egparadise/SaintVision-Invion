@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
     'test_node_runtime', 'test_node_delivery', 'test_output_ingestion',
-    'test_workspace_resume', 'test_workspace_api', 'test_developer_workloads', 'test_shard_recovery', 'test_containment')]
+    'test_workspace_resume', 'test_workspace_api', 'test_developer_workloads', 'test_workspace_start', 'test_business_handoff', 'test_shard_recovery', 'test_containment')]
 
 
 def run(args, **kwargs):
@@ -41,8 +41,8 @@ def image_id(reference):
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
     exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py'}
-    return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'tests/', 'contracts/', 'migrations/'))))
+             'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
+    return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
 def prepare(args):
@@ -165,14 +165,17 @@ def execute(prepared, tests):
             final = owned(target,name)
             cleanup[target] = bool(final and not final['State']['Running'] and final['State']['Pid']==0)
         workloads = [json.loads(p.read_text()) for p in sorted(work.glob('developer-*.json'))]
+        first_workloads = [json.loads(p.read_text()) for p in sorted(work.glob('first-*.json'))]
         records_complete = ('tests/integration/test_developer_workloads.py' not in tests or
                             {row['case'] for row in workloads} == {'python','ai','ai-output-recovery','python-failure'})
+        first_complete = ('tests/integration/test_workspace_start.py' not in tests or
+                          {row['case'] for row in first_workloads} == {'python','ai','output-recovery','failure'})
         result=dict(at=datetime.now(timezone.utc).isoformat(),codeSHA=prepared['codeSHA'],dirty=prepared['dirty'],
                     sourceHashes=prepared['sourceHashes'],binaryHashes=prepared['binaryHashes'],
                     nodeImage=prepared['nodeImage'],kernelImage=prepared['kernelImage'],postgresImage=prepared['postgresImage'],
                     scope='local-kernel-tests-synthetic-identity-not-two-physical-pcs',exitCode=exit_code,
-                    passed=exit_code==0 and bool(rows) and all(r['status']=='passed' for r in rows) and all(cleanup.values()) and records_complete,cases=rows,
-                    cleanup=cleanup,developerWorkloads=workloads,
+                    passed=exit_code==0 and bool(rows) and all(r['status']=='passed' for r in rows) and all(cleanup.values()) and records_complete and first_complete,cases=rows,
+                    cleanup=cleanup,developerWorkloads=workloads,firstWorkloads=first_workloads,
                     privateLogSHA256=hashlib.sha256((work/'pytest.log').read_bytes()).hexdigest())
         (work/'evidence.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps({k:result[k] for k in ('at','codeSHA','dirty','scope','exitCode','passed')} | {'cases':len(rows),'evidence':str(work/'evidence.json')}),flush=True)

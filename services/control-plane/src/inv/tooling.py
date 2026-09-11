@@ -85,7 +85,7 @@ class ToolGateway:
         proofs = deepcopy(proofs)
         validate_contract("AuthorizedCommand", command)
         validate_contract("WorkloadSpec", workload)
-        if "workspaceResume" in workload and (
+        if ("workspaceResume" in workload or "workspaceStart" in workload) and (
             queue_signing_key is None or not getattr(self.db, "workspace_admission", False)
         ):
             raise DomainError(
@@ -119,6 +119,9 @@ class ToolGateway:
             from .business_handoff import require_handoff
 
             require_handoff(conn, self.db, run["run_id"])
+            from .workspace_start import require_start_admission
+
+            require_start_admission(conn, self.db, run["run_id"])
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),
@@ -274,6 +277,10 @@ class ToolGateway:
                 from .workspace_resume import approved_resume
 
                 workspace_input = approved_resume(conn, run, workload, self.db.recovery_epoch)
+            elif "workspaceStart" in workload:
+                from .workspace_start import approved_start
+
+                workspace_input = approved_start(conn, run, workload, self.db.recovery_epoch)
             plan = compile_launch(workload, self.profile, workspace_input=workspace_input)
             deadline = min(
                 approval["expires_at"],

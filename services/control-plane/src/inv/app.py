@@ -498,6 +498,43 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
         await run_in_threadpool(business_service().get, identity.principal, binding_id)
         raise DomainError("AUTH-0045", "Binding state is derived from execution evidence", 403)
 
+    def first_workspace_service():
+        from .workspace_start import WorkspaceStart
+
+        return WorkspaceStart(workspace_service())
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/prepare", status_code=201)
+    async def prepare_first_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            first_workspace_service().prepare,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/enqueue", status_code=202)
+    async def enqueue_first_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            first_workspace_service().enqueue,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/starts/{start_id}")
+    def first_workspace_status(
+        project: str, run_id: str, start_id: str, identity=Depends(authenticated)
+    ):
+        return first_workspace_service().get(identity.principal, project, run_id, start_id)
+
     @api.post("/v1/projects/{project}/runs/{run_id}/resume/prepare", status_code=201)
     async def prepare_workspace(
         project: str, run_id: str, request: Request, identity=Depends(authenticated)
