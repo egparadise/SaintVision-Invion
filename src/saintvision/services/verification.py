@@ -37,6 +37,7 @@ from typing import Final
 from sqlalchemy.orm import Session
 
 from ..errors import VAL_SCHEMA, InvError
+from ..storage.readroot import ReadRoot
 from ..storage.pathsafe import UnsafePath, normalize_contribution_path
 
 #: 4 MiB. Large enough that syscall overhead is irrelevant, small enough that a
@@ -73,45 +74,48 @@ class ByteObservation:
 def hash_file(
     path: str | os.PathLike[str],
     *,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
     chunk_bytes: int = CHUNK_BYTES,
     monotonic=None,
 ) -> ByteObservation:
     """Read a file and return what is actually in it.
 
-    The path receives the contribution syntax check. This is not an open-time
-    symlink/containment boundary: a trusted worker must resolve its authorized
-    storage root before calling this primitive. Do not expose arbitrary paths
-    from an HTTP caller as worker inputs.
-
-    Reads in chunks and counts the bytes it read rather than trusting
-    ``stat()``: the size that matters is the size that was hashed, and a file
-    growing under the reader would otherwise produce a digest and a size that
-    describe different content.
+    A trusted worker must supply its preconfigured ReadRoot. Authorization is
+    checked on opened handles, never inferred from the requested path. Reads
+    are bounded by the initial size and rejected if the file changes.
     """
     from time import monotonic as _monotonic
 
     clock = monotonic or _monotonic
-    if chunk_bytes <= 0:
-        raise InvError(VAL_SCHEMA, "chunk_bytes must be positive")
+    if type(chunk_bytes) is not int or not 1 <= chunk_bytes <= CHUNK_BYTES:
+        raise InvError(VAL_SCHEMA, "chunk_bytes must be an integer between 1 and 4 MiB")
 
     try:
         checked = normalize_contribution_path(str(path), os_type)
     except UnsafePath as exc:
         raise VerificationFailed(f"refusing to read that path: {exc.rule}") from None
 
-    target = Path(checked.normalized)
+    if not isinstance(allowed_root, ReadRoot):
+        raise VerificationFailed("an authorized read root is required")
+    # Do not silently reinterpret encoded aliases or traversal during syntax
+    # normalization; use the original path for the actual boundary.
+    if Path(str(path)) != Path(checked.normalized):
+        raise VerificationFailed("refusing to read that path: ambiguous path")
+    target = Path(str(path))
     started = clock()
     digest = hashlib.sha256()
     total = 0
     try:
-        with open(target, "rb") as handle:
-            while True:
-                chunk = handle.read(chunk_bytes)
+        with allowed_root.open(target) as (handle, initial_size):
+            while total <= initial_size:
+                chunk = handle.read(min(chunk_bytes, initial_size + 1 - total))
                 if not chunk:
                     break
                 digest.update(chunk)
                 total += len(chunk)
+            if total != initial_size:
+                raise VerificationFailed("file changed during read")
     except FileNotFoundError:
         raise VerificationFailed("the file does not exist") from None
     except IsADirectoryError:
@@ -138,6 +142,7 @@ def verify_backup_bytes(
     backup_id: str,
     path: str | os.PathLike[str],
     now: dt.datetime,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
     expected_sha256: str | None = None,
 ) -> ByteObservation:
@@ -171,7 +176,7 @@ def verify_backup_bytes(
     ):
         raise VerificationFailed("expected digest disagrees with recorded backup")
 
-    observation = hash_file(path, os_type=os_type)
+    observation = hash_file(path, allowed_root=allowed_root, os_type=os_type)
 
     baseline = row.checksum_sha256 if row.checksum_sha256 is not None else expected_sha256
     if baseline is not None and observation.sha256 != baseline:
@@ -212,6 +217,7 @@ def verify_replica_bytes(
     replica_id: str,
     path: str | os.PathLike[str],
     now: dt.datetime,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
 ) -> ByteObservation:
     """Hash a replica on the node holding it and promote it if it matches.
@@ -223,7 +229,7 @@ def verify_replica_bytes(
     """
     from .locality import mark_replica_ready
 
-    observation = hash_file(path, os_type=os_type)
+    observation = hash_file(path, allowed_root=allowed_root, os_type=os_type)
     mark_replica_ready(
         session,
         tenant_id=tenant_id,
@@ -240,6 +246,7 @@ def verify_pending_backups(
     tenant_id: uuid.UUID,
     now: dt.datetime,
     resolve_path,
+    allowed_root: ReadRoot | None = None,
     limit: int = 10,
 ) -> dict[str, list[str]]:
     """Verify unverified backups, reporting both outcomes.
@@ -277,7 +284,13 @@ def verify_pending_backups(
                 if path is None:
                     raise VerificationFailed("backup location is unavailable")
                 verify_backup_bytes(
-                    session, tenant_id=tenant_id, backup_id=row.backup_id, path=path, now=now
+                    session,
+                    tenant_id=tenant_id,
+                    backup_id=row.backup_id,
+                    path=path,
+                    now=now,
+                    allowed_root=allowed_root,
+                    os_type="windows" if os.name == "nt" else "linux",
                 )
         except (InvError, OSError):
             # Recorded as a failure and the sweep continues: one unreadable

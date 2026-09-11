@@ -17,6 +17,46 @@ from test_pilot import pilot
 NOW = dt.datetime(2026, 9, 12, tzinfo=dt.timezone.utc)
 
 
+def test_missing_root_cannot_promote_backup(app_sessionmaker, pilot, tmp_path):
+    tenant = pilot["tenant_a"]
+    key = create(app_sessionmaker, tenant, 0)
+    path = tmp_path / "backup.dump"
+    path.write_bytes(b"unscoped bytes")
+    with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
+        with pytest.raises(InvError):
+            verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=path, now=NOW)
+    assert read(app_sessionmaker, tenant, key) == (False, None, 0)
+
+
+def test_sweep_rejects_outside_root_and_commits_only_authorized_file(
+    app_sessionmaker, pilot, tmp_path
+):
+    tenant = pilot["tenant_a"]
+    rejected = create(app_sessionmaker, tenant, 0)
+    accepted = create(app_sessionmaker, tenant, 0)
+    inside = tmp_path / "authorized"
+    inside.mkdir()
+    good = inside / "backup.dump"
+    bad = tmp_path / "foreign.dump"
+    good.write_bytes(b"good")
+    bad.write_bytes(b"private")
+    with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
+        result = verification.verify_pending_backups(
+            s,
+            tenant_id=tenant,
+            now=NOW,
+            allowed_root=verification.ReadRoot(inside),
+            resolve_path=lambda row: good if row.backup_id == accepted else bad,
+        )
+    assert result == {"verified": [accepted], "failed": [rejected]}
+    assert read(app_sessionmaker, tenant, rejected) == (False, None, 0)
+    assert read(app_sessionmaker, tenant, accepted) == (
+        True,
+        hashlib.sha256(b"good").hexdigest(),
+        4,
+    )
+
+
 @pytest.fixture(autouse=True)
 def native_hash(monkeypatch):
     original = verification.hash_file
@@ -55,7 +95,11 @@ def test_sweep_size_failure_stays_unverified_after_commit(app_sessionmaker, pilo
     p.write_bytes(b"short")
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         result = verification.verify_pending_backups(
-            s, tenant_id=tenant, now=NOW, resolve_path=lambda row: p
+            s,
+            allowed_root=verification.ReadRoot(tmp_path),
+            tenant_id=tenant,
+            now=NOW,
+            resolve_path=lambda row: p,
         )
     assert key in result["failed"] and key not in result["verified"]
     assert read(app_sessionmaker, tenant, key) == (False, None, 99)
@@ -68,7 +112,14 @@ def test_caught_direct_size_error_does_not_mutate_record(app_sessionmaker, pilot
     p.write_bytes(b"short")
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         with pytest.raises(InvError):
-            verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=p, now=NOW)
+            verification.verify_backup_bytes(
+                s,
+                allowed_root=verification.ReadRoot(tmp_path),
+                tenant_id=tenant,
+                backup_id=key,
+                path=p,
+                now=NOW,
+            )
     assert read(app_sessionmaker, tenant, key) == (False, None, 99)
 
 
@@ -78,12 +129,26 @@ def test_reverification_checks_stored_digest_without_caller_hint(app_sessionmake
     p = tmp_path / "backup.dump"
     p.write_bytes(b"good")
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
-        verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=p, now=NOW)
+        verification.verify_backup_bytes(
+            s,
+            allowed_root=verification.ReadRoot(tmp_path),
+            tenant_id=tenant,
+            backup_id=key,
+            path=p,
+            now=NOW,
+        )
     before = read(app_sessionmaker, tenant, key)
     p.write_bytes(b"evil")
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         with pytest.raises(InvError):
-            verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=p, now=NOW)
+            verification.verify_backup_bytes(
+                s,
+                allowed_root=verification.ReadRoot(tmp_path),
+                tenant_id=tenant,
+                backup_id=key,
+                path=p,
+                now=NOW,
+            )
     assert read(app_sessionmaker, tenant, key) == before
 
 
@@ -102,7 +167,12 @@ def test_foreign_tenant_is_denied_before_file_read(app_sessionmaker, pilot, tmp_
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, pilot["tenant_b"]):
         with pytest.raises(InvError):
             verification.verify_backup_bytes(
-                s, tenant_id=pilot["tenant_b"], backup_id=key, path=p, now=NOW
+                s,
+                allowed_root=verification.ReadRoot(tmp_path),
+                tenant_id=pilot["tenant_b"],
+                backup_id=key,
+                path=p,
+                now=NOW,
             )
     assert reads == []
 
@@ -120,7 +190,12 @@ def test_two_initial_verifiers_cannot_replace_each_others_digest(app_sessionmake
         with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
             try:
                 verification.verify_backup_bytes(
-                    s, tenant_id=tenant, backup_id=key, path=path, now=NOW
+                    s,
+                    allowed_root=verification.ReadRoot(tmp_path),
+                    tenant_id=tenant,
+                    backup_id=key,
+                    path=path,
+                    now=NOW,
                 )
             except InvError:
                 return False
@@ -151,7 +226,14 @@ def test_failure_after_promotion_rolls_back_only_that_verification(
     monkeypatch.setattr(service, "verify_backup", fail)
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         with pytest.raises(RuntimeError, match="injected"):
-            verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=p, now=NOW)
+            verification.verify_backup_bytes(
+                s,
+                allowed_root=verification.ReadRoot(tmp_path),
+                tenant_id=tenant,
+                backup_id=key,
+                path=p,
+                now=NOW,
+            )
     assert read(app_sessionmaker, tenant, key) == (False, None, 4)
 
 
@@ -171,7 +253,11 @@ def test_sweep_continues_after_resolver_error_without_promoting_failure(
 
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         result = verification.verify_pending_backups(
-            s, tenant_id=tenant, now=NOW, resolve_path=resolve
+            s,
+            allowed_root=verification.ReadRoot(tmp_path),
+            tenant_id=tenant,
+            now=NOW,
+            resolve_path=resolve,
         )
     assert bad in result["failed"] and good in result["verified"]
     assert read(app_sessionmaker, tenant, bad) == (False, None, 4)
@@ -184,7 +270,14 @@ def test_caller_hint_cannot_replace_stored_baseline(app_sessionmaker, pilot, tmp
     p = tmp_path / "backup.dump"
     p.write_bytes(b"good")
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
-        verification.verify_backup_bytes(s, tenant_id=tenant, backup_id=key, path=p, now=NOW)
+        verification.verify_backup_bytes(
+            s,
+            allowed_root=verification.ReadRoot(tmp_path),
+            tenant_id=tenant,
+            backup_id=key,
+            path=p,
+            now=NOW,
+        )
     original = read(app_sessionmaker, tenant, key)
 
     def forbidden(*a, **kw):
@@ -194,7 +287,13 @@ def test_caller_hint_cannot_replace_stored_baseline(app_sessionmaker, pilot, tmp
     with app_sessionmaker() as s, s.begin(), tenant_scope(s, tenant):
         with pytest.raises(InvError):
             verification.verify_backup_bytes(
-                s, tenant_id=tenant, backup_id=key, path=p, expected_sha256="f" * 64, now=NOW
+                s,
+                allowed_root=verification.ReadRoot(tmp_path),
+                tenant_id=tenant,
+                backup_id=key,
+                path=p,
+                expected_sha256="f" * 64,
+                now=NOW,
             )
     assert read(app_sessionmaker, tenant, key) == original
 

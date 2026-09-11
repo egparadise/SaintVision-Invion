@@ -14,6 +14,7 @@ import sys
 
 import pytest
 
+from saintvision.storage.readroot import ReadRoot
 from saintvision.errors import InvError
 from saintvision.services import verification
 
@@ -40,7 +41,9 @@ def payload(tmp_path):
 
 
 def _hash(path, **kwargs):
-    return verification.hash_file(path, os_type=_os_type(), **kwargs)
+    return verification.hash_file(
+        path, allowed_root=ReadRoot(path.parent), os_type=_os_type(), **kwargs
+    )
 
 
 def test_the_digest_matches_the_file(payload):
@@ -52,7 +55,7 @@ def test_the_digest_matches_the_file(payload):
 def test_a_large_file_is_read_in_chunks(payload, monkeypatch):
     """A base backup is measured in gigabytes; read() on one is an outage."""
     reads: list[int] = []
-    real_open = open
+    real_open = os.fdopen
 
     def counting_open(*args, **kwargs):
         handle = real_open(*args, **kwargs)
@@ -66,7 +69,7 @@ def test_a_large_file_is_read_in_chunks(payload, monkeypatch):
         handle.read = read  # type: ignore[method-assign]
         return handle
 
-    monkeypatch.setattr("builtins.open", counting_open)
+    monkeypatch.setattr("os.fdopen", counting_open)
     observation = _hash(payload["path"])
 
     assert observation.sha256 == payload["sha256"]
@@ -80,9 +83,7 @@ def test_the_size_counted_is_what_was_hashed(payload):
     produce a digest and a size describing different content."""
     observation = _hash(payload["path"])
     assert observation.byte_size == os.path.getsize(payload["path"])
-    assert observation.sha256 == hashlib.sha256(
-        payload["path"].read_bytes()
-    ).hexdigest()
+    assert observation.sha256 == hashlib.sha256(payload["path"].read_bytes()).hexdigest()
 
 
 def test_a_smaller_chunk_gives_the_same_digest(payload):
@@ -115,8 +116,11 @@ def test_a_directory_is_a_failure(tmp_path):
 
 @pytest.mark.parametrize(
     "path",
-    ["/etc/shadow", "/proc/self/environ"] if sys.platform != "win32"
-    else [r"C:\Windows\System32\config\SAM", r"C:\Windows\win.ini"],
+    (
+        ["/etc/shadow", "/proc/self/environ"]
+        if sys.platform != "win32"
+        else [r"C:\Windows\System32\config\SAM", r"C:\Windows\win.ini"]
+    ),
 )
 def test_a_protected_path_is_refused_before_it_is_opened(path):
     """A verification job must not be steerable into the OS by a crafted record."""
@@ -140,16 +144,17 @@ def test_the_observation_reports_how_long_the_read_took(payload):
     when the digest matches."""
     ticks = iter([100.0, 142.5])
     observation = verification.hash_file(
-        payload["path"], os_type=_os_type(), monotonic=lambda: next(ticks)
+        payload["path"],
+        allowed_root=ReadRoot(payload["path"].parent),
+        os_type=_os_type(),
+        monotonic=lambda: next(ticks),
     )
     assert observation.duration_seconds == pytest.approx(42.5)
 
 
 def test_matches_checks_both_digest_and_size(payload):
     observation = _hash(payload["path"])
-    assert observation.matches(
-        expected_sha256=payload["sha256"], expected_size=payload["size"]
-    )
+    assert observation.matches(expected_sha256=payload["sha256"], expected_size=payload["size"])
     # A truncated file has a perfectly valid SHA-256 of the wrong content.
     assert not observation.matches(
         expected_sha256=payload["sha256"], expected_size=payload["size"] - 1
