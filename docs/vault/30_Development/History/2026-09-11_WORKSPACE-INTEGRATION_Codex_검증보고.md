@@ -56,5 +56,7 @@ CI push/PR 8개 workflow는 job 시작 전 결제/사용 한도 제한으로 fai
 
 ## Obsidian 전달
 
-문서 정본은 Git이다. 후속 sync receipt에 `--check → --apply → --check`, source SHA, 파일 수와 충돌/미반영 개수 및 해시 일치를 기록한다. OneDrive 클라우드 업로드 완료를 주장하지 않는다.
+2026-09-11 17:00 KST report SHA `8283cfddf55fae051d37e905251a0921e1663814`에서 `python tools/sync_obsidian.py --check → --apply → --check`를 실행했다. exit 0, 13개 export, 관리 파일 396개 전체 SHA-256 일치, pending 0/conflict 0을 확인했다. 이 후속 전달 기록도 commit/push 후 다시 동기화한다. OneDrive 클라우드 업로드 완료는 검증하지 않았다.
+
+같은 report SHA의 CI도 Core 34577022052/34577016166 등에서 job 시작 전 결제/한도 제한을 확인했다. 코드 SHA와 report SHA의 제품 소스 차이는 없다. PR19는 resource-offer-integrity를 base로 하는 draft이며 독립 승인·main 병합은 남는다.
 
