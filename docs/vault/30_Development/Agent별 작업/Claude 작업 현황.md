@@ -196,6 +196,11 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - `off_site`는 운영자 주장(`--off-site`)이며 도구가 판단하지 않는다(ADR-018).
   - 실측: `backup ('logical', off_site=False, 590350 bytes, verified=True)`, `drill ('database','passed',rpo=6,rto=6,fencing_verified=True, backup 연결됨)`. 시험 5개, 세 결함을 각각 되돌리면 5/4/3개 실패.
   - 두 발견이 만나는 지점: 원장의 종류는 `base`·`wal`·`logical`을 상정하는데 우리는 **`logical` 하나만** 만든다. 8-0의 "시점 복구 없음"과 같은 사실이다.
+- 이어서 수행(ade5bb8) — **AC-12 증거 보고에 호출자를 붙였다**: `pilot_readiness`는 S12부터 AC-12가 요구하는 증거를 모아 왔지만 **아무도 질문하지 않았다**. 이제 `--acceptance-evidence`로 묻는다.
+  - `release_id`를 선택값으로 바꿨다. AC-12가 요구하는 것 대부분(통과한 DB 복원 시험, 검증된 백업, 장애 도메인 소실을 견디는 사본, 누군가 실제로 확인한 제공 폴더)은 **어느 release인지가 아니라 배포에 대한 증거**다. manifest가 있어야 gap을 볼 수 있게 두면 release를 자른 뒤에야 gap을 알게 되는데, 준비를 목적으로 하는 것에는 순서가 거꾸로다. release manifest 자체는 S12-BE(Codex) 소관이며 내가 만들 것이 아니다.
+  - release 없이 부르면 승인 쪽은 **NOT ASSESSED**로 보고하고 `evidenceComplete`는 false로 둔다. 평가하지 않은 기준이 충족된 기준으로 읽혀서는 안 된다 — 복원 시험의 "누락 대 빈 테이블", 스냅샷의 "이전 없음 대 변경 없음"과 같은 구분이다.
+  - 새 배포에서 실제로 지금 비어 있는 세 가지를 지목한다: 통과한 복원 시험 없음, 검증된 백업 없음, **검증된 off-site 백업 없음**(ADR-018).
+- **이 기능이 드러낸 결함(고침)**: `--json` 분기와 출력 분기가 **각자의 exit 식**을 들고 있어서, AC-12 blocker를 전부 나열하고도 `--json`에서는 exit 0이었다. 복원 도구의 `_passed`에서 고쳤던 것과 같은 결함이다 — 합격 규칙 사본 두 개는 갈라지고, 각자 자기 자리에서는 맞아 보이기 때문에 갈라진 것이 보이지 않는다. `_exit_code` 하나로 합치고 text/json이 같은 값을 내는지 확인했다.
 - 부수 발견(보고만, 수정은 운영 행위): `docker-compose.prod.yml`에 `POSTGRES_PASSWORD=postgres`와 `inv_app:apptestonly`가 그대로 있다. prod 이름을 단 파일의 기본 credential이다.
 - 남은 문제: 연속 아카이빙·보관 매체·백업 주기는 **운영 결정**이며 CX-09 릴리스 시험과 함께 정해야 한다. 알람/worker 재시작/partition/장시간 표본과 사용자 인수는 미수행이고, CL-02의 실제 운영 입력과 CX-09 공동 시나리오가 선행이다. 작성자(Claude)와 승인자(Codex)는 구분한다.
 - 다음 첫 행동: PITR·보관 매체·주기 결정을 CX-09와 함께 받는다. 결정되면 같은 gate로 실측해 인수 증거를 만든다. 담당 Claude, 결정 Codex·운영자.
