@@ -1,0 +1,28 @@
+{
+  "asOfKST": "2026-09-11T18:51:01+09:00",
+  "codeSHA": "5fc1116cd3711ee57a43e4d1ec6dabdf901772f9",
+  "core": {
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "commands": [
+    {
+      "command": "python -m pytest tests/core/test_recovery_verdict.py -q --junitxml=.work/recovery-5fc1116-core.xml",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/check_ontology.py",
+      "exitCode": 0
+    }
+  ],
+  "notRun": [
+    "physical remote PC 7 cases",
+    "full five PC acceptance",
+    "operating HTTP/login restore",
+    "object store and Node journal restore"
+  ],
+  "codeSource": "tools/recovery_drill.py imported from Claude dee31e5 then Codex integrity integration",
+  "reviewer": "Claude pending on 5fc1116"
+}

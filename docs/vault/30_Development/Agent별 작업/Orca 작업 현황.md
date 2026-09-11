@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-ORCA-001"
 title: "Orca 작업 현황"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:13:25+09:00"
+updated: "2026-09-11T18:53:13+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,9 +12,9 @@ source_of_truth: "Git"
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
-- 배정 owner: Orca. 독립 reviewer: Codex (제품 승인과 별도). 현재 카드 수신/착수 여부: **Codex의 초기 정의이며 각 담당 Agent의 수신 확인은 아직 없다**. Codex는 이 문서 작업만 실제 수행 중이다.
+- 배정 owner: Orca. 독립 reviewer: Codex (제품 승인과 별도). 현재 착수/검토 기록은 아래 실제 SHA와 History로 확인한다. 작성자 보고를 독립 승인으로 바꾸지 않는다.
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill agent-delivery v1.1.0. 계획: [[Agent 역할과 인계 계약]].
-- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.29.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
@@ -83,3 +83,12 @@ source_of_truth: "Git"
 | 남은 문제 / 차단 이유 / 해소 담당 | 해당 카드의 선행 조건 참조 |
 | 다음 카드 / 첫 행동 / 다음 담당 | 위 ready 카드부터 하나 선택 후 담당자가 명시 |
 | History / 오류 / Evidence / PR / sync 결과 | 실제 링크와 SHA를 담당자가 기록 |
+
+## 2026-09-11 18:53 Codex 수신·검증·후속 기록
+
+- 3 Agent 최신 작성자 보고와 Codex 5fc1116 실제 검증을 수신·집계했다. 작성자 완료/검토 요청/로컬 시험/CI/운영 인수를 분리한다.
+- 공통 전체 수치는 48task 2750/4800=57.29%(5% 단위55%), 잔여 표시45%. 858763c의 65%는 별도 작성자 주장으로 보존하고 정본 인수로 집계하지 않는다.
+- PR21→22→19 순서와 CI 계정 제한을 추적. 다음 Codex F1/F2 및 CX-02, Claude 5fc1116 검토/운영, Gemini 실제 제어/ticket/파일과 배포 증거 정정.
+- 원격 .225 관측 전용/7개 미실행, 공식 task done0은 그대로다. Obsidian 원문3개를 보존한 뒤 변경 파일 hash로 sync 확인한다.
+
+상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:10:30+09:00"
+updated: "2026-09-11T18:53:13+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,9 +12,9 @@ source_of_truth: "Git"
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
-- 배정 owner: Codex. 독립 reviewer: Claude. 현재 카드 수신/착수 여부: **Codex의 초기 정의이며 각 담당 Agent의 수신 확인은 아직 없다**. Codex는 이 문서 작업만 실제 수행 중이다.
+- 배정 owner: Codex. 독립 reviewer: Claude. 현재 착수/검토 기록은 아래 실제 SHA와 History로 확인한다. 작성자 보고를 독립 승인으로 바꾸지 않는다.
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill core-reliability v1.0.0. 계획: [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]].
-- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.29.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
@@ -41,7 +41,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-08 / AC-01, AC-04, AC-08.
-- 다음 첫 행동: Claude 9995122와 Gemini f08bf33을 c5f2154 계약에 대조하고 아래 신규 검토 항목을 owner에게 돌려보낸다. 수정 수신 후 하나의 통합 SHA로 정합성·tenant·결과 경계를 검증한다.
+- 다음 첫 행동: 복원 5fc1116 전달 후 Claude cdf98ad F1 제공량 snapshot 경합을 실제 함수로 재현·수정하고, F2 감사 intent와 Node 중복 방어를 구분해 보강한다. Gemini 858763c의 정본 API/운영 인수 finding도 추적한다.
 - 필요한 합격 증거: review finding별 해결 SHA/독립 검토, 현재 적용 DB 함수의 실제 다른 tenant 거부, 계약·migration 이력 보존. CI와 main 상태 별도.
 - 선행/차단과 해소 담당: 검토할 코드 확보됨. 독립 승인자는 CL-01.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
@@ -133,3 +133,13 @@ source_of_truth: "Git"
 | 남은 문제 / 차단 이유 / 해소 담당 | Claude CL-03 측정·restore 오류/전체복원, Gemini GM-01/04 bytes 인증·생성 결과/평가 제거; CI 운영자, 원격 profile 운영자+Codex |
 | 다음 카드 / 첫 행동 / 다음 담당 | CX-01 수정본 재검토·같은 SHA 통합; 독립 진행 CX-02 credential/Storage 입력 계약 / Codex |
 | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]], [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]] / PR19 / 외부 제안 3개 보존·병합; 18:13 KST 417개 hash 일치, 대기 0·충돌 0 |
+
+## 2026-09-11 18:53 Codex 수신·검증·후속 기록
+
+- 실제 owner Codex, 진행판 시작 v1.0.14→현재 v1.0.15, base d14db0a→구현 5fc1116. CX-01/CX-07 일부 구현 전달, 카드 전체 done 아님.
+- 작업: 단일 recovery_drill에 정본 감사·false-pass 거부·양쪽 RLS·시각/fencing·실제 DB 기록 연결.
+- 확인: Linux64/core22/Go3 exit0, CI6 시작 전 계정 제한, 독립 reviewer Claude pending, 운영 인수 미완료.
+- **다음 첫 행동 CX-01**: Claude cdf98ad F1을 두 session의 실제 함수 시험으로 재현하고 held를 단일 snapshot으로 고정하는 forward 변경. F2는 Node 중복 방어 유지하며 pre-dispatch intent/감사 정합성 검토.
+- 이어 CX-02 credential/Storage 계약. CX-03 실제 원격 설치 receipt 미수신으로 blocked. PR19에 같은 변경 전달, Obsidian hash는 최종 영수증에 기록.
+
+상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
