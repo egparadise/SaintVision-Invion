@@ -96,6 +96,14 @@ class Postgres:
         )
 
 
+_SECRET = __import__("re").compile(r"(?i)(password=)[^\s'\"]+")
+
+
+def _keep_key(match) -> str:
+    """Keep the key, drop the value: the reader needs to know *what* was wrong."""
+    return match.group(1) + "[redacted]"
+
+
 def _redacted(text: str) -> str:
     """Client-tool output with any password in a connection string removed.
 
@@ -105,7 +113,7 @@ def _redacted(text: str) -> str:
     """
     import re
 
-    return re.sub(r"(?i)(password=)[^\s'\"]+", r"[redacted]", text)
+    return re.sub(_SECRET, _keep_key, text)
 
 
 def _conn(dsn: str):
@@ -115,21 +123,66 @@ def _conn(dsn: str):
 
 
 def _table_counts(dsn: str) -> dict[str, int]:
-    from saintvision.db.base import Base
-    from saintvision.db import models  # noqa: F401
+    """Every table in both schemas, discovered rather than listed.
 
+    The first version counted only the tables the business models declare, which
+    is a minority of the system: the execution kernel's ``inv`` schema holds the
+    runs, leases, evidence and receipts a restore mostly exists to bring back.
+    Reading the catalogue means a table added by either half is counted the day
+    it appears.
+    """
     counts: dict[str, int] = {}
     with _conn(dsn) as conn:
-        for table in sorted(t.name for t in Base.metadata.sorted_tables):
+        tables = conn.execute(
+            "SELECT schemaname, tablename FROM pg_catalog.pg_tables "
+            "WHERE schemaname IN ('public', 'inv') ORDER BY schemaname, tablename"
+        ).fetchall()
+        for schema, table in tables:
+            key = f"{schema}.{table}"
             try:
-                counts[table] = conn.execute(
-                    f'SELECT count(*) FROM public."{table}"'
+                counts[key] = conn.execute(
+                    f'SELECT count(*) FROM "{schema}"."{table}"'
                 ).fetchone()[0]
             except Exception:
                 # A table the restore did not bring back is a finding, recorded
                 # as absent rather than skipped.
-                counts[table] = -1
+                counts[key] = -1
     return counts
+
+
+def _privileges(dsn: str) -> dict[str, str]:
+    """Who may do what, per table and per column, as a comparable digest.
+
+    A restore that brings back every row and none of the grants is a database
+    the system cannot connect to — the runtime refuses to run as the owner, so
+    losing the grants means losing the only role it will accept. Column
+    privileges are included because the design leans on them: UPDATE on one
+    CHECK-pinned sentinel column is what separates "may lock this row" from
+    "may change it".
+    """
+    digests: dict[str, str] = {}
+    with _conn(dsn) as conn:
+        table_rows = conn.execute(
+            "SELECT table_schema, table_name, grantee, privilege_type "
+            "FROM information_schema.role_table_grants "
+            "WHERE table_schema IN ('public','inv') "
+            "ORDER BY 1,2,3,4"
+        ).fetchall()
+        column_rows = conn.execute(
+            "SELECT table_schema, table_name, column_name, grantee, privilege_type "
+            "FROM information_schema.column_privileges "
+            "WHERE table_schema IN ('public','inv') "
+            "ORDER BY 1,2,3,4,5"
+        ).fetchall()
+    digests["table"] = hashlib.sha256(
+        "\n".join("|".join(map(str, r)) for r in table_rows).encode()
+    ).hexdigest()
+    digests["column"] = hashlib.sha256(
+        "\n".join("|".join(map(str, r)) for r in column_rows).encode()
+    ).hexdigest()
+    digests["tableGrantCount"] = str(len(table_rows))
+    digests["columnGrantCount"] = str(len(column_rows))
+    return digests
 
 
 def _content_digest(dsn: str) -> dict[str, str]:
@@ -211,6 +264,7 @@ def rehearse(args) -> dict[str, Any]:
     # a drill cannot accidentally compare the restore to itself.
     report["sourceCounts"] = _table_counts(args.source)
     report["sourceDigests"] = _content_digest(args.source)
+    report["sourcePrivileges"] = _privileges(args.source)
     source_fencing = _fencing_state(args.source)
     report["sourceFencing"] = source_fencing
 
@@ -286,7 +340,13 @@ def _restore_and_verify(
         )
         restored = pg.run(
             "pg_restore",
-            ["--no-owner", "--no-privileges", "--dbname", restore_target],
+            # Privileges are restored, not discarded. The first version of
+            # this passed --no-privileges and then reported "integrity
+            # verified" over a database with none of the carefully scoped
+            # grants — inv_kernel able to touch nothing, inv_app able to
+            # touch everything the owner can. A restore that loses the
+            # authorisation model has not restored the system.
+            ["--no-owner", "--dbname", restore_target],
             stdin=backup_bytes,
         )
         if restored.returncode != 0:
@@ -299,6 +359,7 @@ def _restore_and_verify(
 
         target_counts = _table_counts(target_dsn)
         target_digests = _content_digest(target_dsn)
+        target_privileges = _privileges(target_dsn)
         measured_rto = round(time.monotonic() - restore_started, 3)
 
         report["targetCounts"] = target_counts
@@ -316,9 +377,21 @@ def _restore_and_verify(
             t for t, d in target_digests.items()
             if d != report["sourceDigests"].get(t)
         )
+        privileges_match = (
+            target_privileges["table"] == report["sourcePrivileges"]["table"]
+            and target_privileges["column"]
+            == report["sourcePrivileges"]["column"]
+        )
+        report["targetPrivileges"] = target_privileges
+        report["privilegesRestored"] = privileges_match
         report["tablesWithDifferentCounts"] = missing
         report["tablesWithDifferentContent"] = differing
-        report["integrityVerified"] = not missing and not differing
+        # Privileges count toward integrity. A database with every row and no
+        # grants is one the runtime cannot connect to at all, because it refuses
+        # to run as the owner — so losing them loses the only role it accepts.
+        report["integrityVerified"] = (
+            not missing and not differing and privileges_match
+        )
 
         # ERR-DESIGN-006. The restored sequence must not issue a token a live
         # node already holds.
@@ -449,6 +522,14 @@ def main() -> int:
     print(f"backup        {report['backupBytes']} bytes, sha256 {report['backupSha256'][:16]}…")
     print(f"restore RTO   {report['measuredRtoSeconds']}s")
     print(f"integrity     {'verified' if report['integrityVerified'] else 'FAILED'}")
+    print(
+        f"privileges    "
+        f"{'restored' if report['privilegesRestored'] else 'LOST'}"
+        f"  ({report['targetPrivileges']['tableGrantCount']} table, "
+        f"{report['targetPrivileges']['columnGrantCount']} column"
+        f" vs {report['sourcePrivileges']['tableGrantCount']}/"
+        f"{report['sourcePrivileges']['columnGrantCount']} at source)"
+    )
     for table in report["tablesWithDifferentCounts"]:
         print(f"                count differs: {table}")
     for table in report["tablesWithDifferentContent"]:
