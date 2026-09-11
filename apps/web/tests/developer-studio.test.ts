@@ -178,4 +178,66 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
     expect(receipt.output?.sha256).toBeDefined();
     expect(receipt.resourceReclaimed).toBe(true);
   });
+
+  it('Step 2: strictly rejects observation-only node (192.168.45.225) from workload placement', () => {
+    const nodesWithObservation: NodeItem[] = [
+      ...TEST_NODES,
+      {
+        id: 'nod_01JREMOTE_225',
+        hostname: 'Node-Remote-192.168.45.225',
+        ipAddress: '192.168.45.225',
+        status: 'online',
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 10,
+        memoryTotalBytes: 64 * 1024 ** 3,
+        memoryUsedBytes: 10 * 1024 ** 3,
+        gpuCount: 0,
+        storageTotalBytes: 2000 * 1024 ** 3,
+        storageUsedBytes: 300 * 1024 ** 3,
+        heartbeatAt: new Date().toISOString(),
+        observationOnly: true, // Configured as observation only!
+        schedulable: false,
+      },
+    ];
+
+    const req: PlacementRequirement = {
+      requiredCores: 4,
+      requiredMemoryBytes: 8 * 1024 ** 3,
+      preferredOs: 'linux',
+    };
+
+    const result = evaluatePlacement(nodesWithObservation, req);
+    const evalRemote = result.evaluations.find((e) => e.nodeId === 'nod_01JREMOTE_225');
+
+    expect(evalRemote).toBeDefined();
+    expect(evalRemote?.hardFilterPassed).toBe(false);
+    expect(evalRemote?.rejectionReasons.some((r) => r.includes('관측 전용 노드'))).toBe(true);
+    expect(result.selectedNodeId).not.toBe('nod_01JREMOTE_225');
+  });
+
+  it('Step 4: validates result artifact manifest structure with verified evidence', () => {
+    const artifact = {
+      runId: 'run_test_01',
+      projectId: 'prj_01JABCDE',
+      workspaceId: 'wsp_01JABCDE001',
+      manifest: {
+        entrypoint: 'src/server.ts',
+        filesCount: 3,
+        outputDigest: 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b',
+        verifiedEvidenceId: 'evi_rcp_run_test_01',
+      },
+      executionReceipt: {
+        exitCode: 0,
+        physicallyStopped: true,
+        verified: true,
+        resourceReclaimed: true,
+      },
+    };
+
+    expect(artifact.runId).toBe('run_test_01');
+    expect(artifact.manifest.outputDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(artifact.executionReceipt.verified).toBe(true);
+    expect(artifact.executionReceipt.physicallyStopped).toBe(true);
+  });
 });

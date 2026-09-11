@@ -126,10 +126,13 @@ NODES: List[Dict[str, Any]] = [
     {
         "nodeId": "nod_01JABCDEF04",
         "hostname": "Node-04-LinuxBuild",
+        "ipAddress": "192.168.45.225",
         "osType": "linux",
         "osVersion": "Ubuntu 22.04 LTS",
         "agentVersion": "0.1.0",
         "status": "online",
+        "observationOnly": True,
+        "schedulable": False,
         "cpuCores": 16,
         "cpuUsagePercent": 68,
         "memoryTotalBytes": 64 * 1024**3,
@@ -140,7 +143,7 @@ NODES: List[Dict[str, Any]] = [
         "enrolledAt": "2026-09-01T00:00:00Z",
         "lastHeartbeatAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "heartbeatSequence": 1120,
-        "labels": {"role": "build-farm", "lease": "monotonic"},
+        "labels": {"role": "build-farm", "lease": "monotonic", "ip": "192.168.45.225", "profile": "observation_only"},
     },
     {
         "nodeId": "nod_01JABCDEF05",
@@ -1554,12 +1557,36 @@ async def create_project_run(project: str, request: Request):
         data = await request.json()
     except Exception:
         data = {}
+
+    target_node_id = data.get("targetNodeId", "nod_01JABCDEF01")
+    target_node = None
+    for n in NODES:
+        if n["nodeId"] == target_node_id:
+            target_node = n
+            break
+
+    # Rejection of observation-only nodes (Codex P1 / Remote worker without execution profile)
+    if target_node and (target_node.get("observationOnly") or target_node.get("schedulable") is False):
+        return rfc9457_problem(
+            400,
+            "VAL-NODE-OBSERVATION-ONLY",
+            "Node Observation Only",
+            f"Target node '{target_node_id}' ({target_node.get('hostname')}) is configured in observation-only mode. Remote execution profile is not installed on this PC.",
+            trace_id,
+            "VAL",
+        )
+
     new_id = f"run_{secrets.token_hex(6)}"
     now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
     new_run = {
         "id": new_id,
         "projectId": project,
         "workspaceId": data.get("workspaceId", "wsp_01JABCDE001"),
+        "nodeId": target_node_id,
+        "entrypoint": data.get("entrypoint", "src/server.ts"),
+        "files": data.get("files", []),
+        "resourceRequests": data.get("resourceRequests", {}),
+        "leaseId": f"lse_{secrets.token_hex(6)}",
         "objective": data.get("objective", f"Monaco commit execution {new_id}"),
         "state": "running",
         "requestedBy": data.get("requestedBy", "usr_current"),
@@ -1569,6 +1596,32 @@ async def create_project_run(project: str, request: Request):
     }
     RUNS.append(new_run)
     return new_run
+
+
+@app.get("/v1/runs/{run_id}/artifacts/download")
+def download_run_artifacts(run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    target_run = None
+    for r in RUNS:
+        if r["id"] == run_id:
+            target_run = r
+            break
+    if not target_run:
+        return rfc9457_problem(
+            404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
+        )
+    return {
+        "runId": run_id,
+        "projectId": target_run.get("projectId"),
+        "workspaceId": target_run.get("workspaceId"),
+        "entrypoint": target_run.get("entrypoint", "src/server.ts"),
+        "state": target_run.get("state"),
+        "outputHash": "sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b",
+        "outputSizeBytes": 1024,
+        "verifiedEvidenceId": f"evi_{run_id}",
+        "exportedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "exitCode": 0 if target_run.get("state") == "succeeded" else (None if target_run.get("state") == "running" else 137),
+    }
 
 
 @app.get("/v1/approvals")

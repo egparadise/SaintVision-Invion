@@ -62,6 +62,13 @@ export interface NodeItem {
   storageTotalBytes: number;
   storageUsedBytes: number;
   heartbeatAt: string;
+  observationOnly?: boolean;
+  schedulable?: boolean;
+  isDraining?: boolean;
+  killSwitchEngaged?: boolean;
+  allocatableCores?: number;
+  allocatableMemoryBytes?: number;
+  ipAddress?: string;
 }
 
 export interface ProjectItem {
@@ -152,6 +159,9 @@ export interface RunItem {
   boundRunVersion?: number;
   frozenInputHash?: string;
   frozenInputSizeBytes?: number;
+  nodeId?: string;
+  entrypoint?: string;
+  leaseId?: string;
 }
 
 export interface WorkspaceResumeSpec {

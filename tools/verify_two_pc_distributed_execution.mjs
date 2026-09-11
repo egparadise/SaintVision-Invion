@@ -140,12 +140,31 @@ async function runTwoPcVerification() {
     // ---------------------------------------------------------------------------
     console.log('\n[Step 4] 실제 2개 PC (Windows Node-01 <-> Linux Node-04/05) 분산 실행·취소·복구·결과 대조:');
 
-    // 4.1 실행 (Execution): Dispatch from Node-01 to Linux Node-05
+    // 4.1-A 거버넌스 검증: 관측 전용 노드 (192.168.45.225) 업무 제출 차단 (Codex P1 / Zero Mock)
+    const rejectRes = await fetch(`${BACKEND_URL}/v1/projects/prj_saint_mlops/runs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workspaceId: 'wsp_saint_mlops_gpu',
+        targetNodeId: 'nod_01JABCDEF04', // 192.168.45.225 observation-only node
+        objective: 'Disallowed run on observation-only worker',
+        requestedBy: 'usr_researcher_02',
+      }),
+    });
+    assert('Dispatch to observation-only node is rejected with HTTP 400', rejectRes.status === 400);
+    const rejectProblem = await rejectRes.json();
+    assert('Rejection code is VAL-NODE-OBSERVATION-ONLY (no mock run created)', rejectProblem.code === 'VAL-NODE-OBSERVATION-ONLY');
+
+    // 4.1-B 실행 (Execution): Dispatch with complete contract payload to Linux Node-05
     const dispatchRes = await fetch(`${BACKEND_URL}/v1/projects/prj_saint_mlops/runs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         workspaceId: 'wsp_saint_mlops_gpu',
+        targetNodeId: 'nod_01JABCDEF05',
+        entrypoint: 'src/server.ts',
+        files: [{ path: 'src/server.ts', size: 1024 }],
+        resourceRequests: { requiredCores: 8, requiredMemoryBytes: 16 * 1024 ** 3, requiresGpu: true },
         objective: '2-PC Cross-Node DICOM Preprocessing & GPU Validation',
         requestedBy: 'usr_researcher_02',
       }),
@@ -154,6 +173,14 @@ async function runTwoPcVerification() {
     const run = await dispatchRes.json();
     const runId = run.id;
     assert('Run assigned valid id and running state', Boolean(runId && run.state === 'running'));
+    assert('Run binds targetNodeId nod_01JABCDEF05', run.nodeId === 'nod_01JABCDEF05');
+    assert('Run binds entrypoint and leaseId', Boolean(run.entrypoint && run.leaseId));
+
+    // 4.1-C 결과 아티팩트 다운로드 엔드포인트 검증
+    const artRes = await fetch(`${BACKEND_URL}/v1/runs/${runId}/artifacts/download`);
+    assert('GET /v1/runs/{id}/artifacts/download returns HTTP 200', artRes.status === 200);
+    const artData = await artRes.json();
+    assert('Downloaded artifact contains deterministic outputHash SHA-256', Boolean(artData.outputHash?.startsWith('sha256:')));
 
     // 4.2 취소 (Cancellation): Outbox hold and resource release pending
     const cancelRes = await fetch(`${BACKEND_URL}/v1/runs/${runId}/cancel`, {

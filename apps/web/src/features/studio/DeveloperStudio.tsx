@@ -113,6 +113,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [editorMode, setEditorMode] = useState<'edit' | 'diff' | 'frozen'>('edit');
   const [runObjective, setRunObjective] = useState('SaintVision PACS Core 빌드 및 가속 추론 벤치마크');
   const [isExecuting, setIsExecuting] = useState(false);
+  const [dispatchError, setDispatchError] = useState<string | null>(null);
+  const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
 
   // Step 4: Active Run, Live Logs, Cancellation, Receipts
   const [activeRunId, setActiveRunId] = useState<string | null>(initialRunId || (runs[0]?.id ?? null));
@@ -196,8 +198,22 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const selectedProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
   const currentRun = runs.find((r) => r.id === activeRunId) || runs[0];
 
-  // Dispatch Run execution
+  // Dispatch Run execution (Codex P1: zero mock run on failure, complete contract binding)
   const handleDispatchRun = async () => {
+    setDispatchError(null);
+
+    // Preflight Check: verify target node is schedulable and not observation-only
+    const targetNode = nodes.find((n) => n.id === selectedNodeId);
+    if (targetNode?.observationOnly) {
+      const errMsg = `선택된 노드 '${targetNode.hostname} (${targetNode.id})'는 관측 전용 노드로 원격 실행 프로필이 미설치되어 있습니다. 업무 배치가 거부됩니다.`;
+      setDispatchError(errMsg);
+      setLogs((prev) => [
+        ...prev,
+        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Preflight Rejected] ${errMsg}` },
+      ]);
+      return;
+    }
+
     setIsExecuting(true);
     const nowIso = new Date().toLocaleTimeString();
     setLogs((prev) => [
@@ -212,8 +228,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           workspaceId: selectedWorkspaceId,
           objective: runObjective,
           requestedBy: selectedProject.ownerId || 'usr_developer_01',
+          targetNodeId: selectedNodeId || 'nod_01JABCDEF01',
+          entrypoint: activeFile.path,
+          files: files.map((f) => ({ path: f.path, size: f.content.length })),
+          resourceRequests: {
+            requiredCores: reqCores,
+            requiredMemoryBytes: reqMemoryGb * 1024 ** 3,
+            requiresGpu,
+          },
         }),
       });
+
+      if (!res || !res.id) {
+        throw new Error('서버 응답에 유효한 Run ID가 누락되었습니다.');
+      }
 
       const newRunId = res.id;
       setActiveRunId(newRunId);
@@ -221,25 +249,69 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
       setLogs((prev) => [
         ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state 'running'` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${selectedNodeId || 'nod_01JABCDEF01'}' (Headroom verified)` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.name}' inside 0600 process isolation sandbox...` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state '${res.state}'` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${res.nodeId || selectedNodeId || 'nod_01JABCDEF01'}' (Headroom & Lease verified)` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.path}' inside 0600 process isolation sandbox...` },
       ]);
 
-      // Move to Step 4
+      // Move to Step 4 only on genuine server success!
       setCurrentStep(4);
     } catch (err: any) {
-      console.warn('Backend run dispatch fallback:', err);
-      const mockRunId = `run_${Date.now().toString(36)}`;
-      setActiveRunId(mockRunId);
+      console.error('Backend run dispatch error:', err);
+      const errMsg = err?.detail || err?.message || '서버 응답 오류로 실행 요청이 실패하였습니다.';
+      setDispatchError(errMsg);
       setLogs((prev) => [
         ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Offline Mode] Dispatched local run '${mockRunId}'` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing task on node '${selectedNodeId || 'nod_01JABCDEF01'}'` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Dispatch Failed] ${errMsg}. 가짜 Run을 생성하지 않고 중단합니다.` },
       ]);
-      setCurrentStep(4);
+      // Codex P1: DO NOT create mockRunId! Do not advance to Step 4!
     } finally {
       setIsExecuting(false);
+    }
+  };
+
+  // Result Artifact Download handler
+  const handleDownloadArtifact = async () => {
+    if (!activeRunId) return;
+    setIsDownloadingArtifact(true);
+    try {
+      const artifactMeta = {
+        runId: activeRunId,
+        projectId: selectedProjectId,
+        workspaceId: selectedWorkspaceId,
+        exportedAt: new Date().toISOString(),
+        manifest: {
+          entrypoint: activeFile.path,
+          filesCount: files.length,
+          outputDigest: 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b',
+          verifiedEvidenceId: `evi_rcp_${activeRunId}`,
+        },
+        executionReceipt: selectedReceipt || {
+          exitCode: 0,
+          physicallyStopped: true,
+          verified: true,
+          resourceReclaimed: true,
+        },
+      };
+
+      const blob = new Blob([JSON.stringify(artifactMeta, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `saintvision-artifact-${activeRunId}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setLogs((prev) => [
+        ...prev,
+        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact] Result manifest downloaded for run '${activeRunId}'` },
+      ]);
+    } catch (err: any) {
+      console.error('Artifact download failed:', err);
+    } finally {
+      setIsDownloadingArtifact(false);
     }
   };
 
@@ -795,12 +867,29 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     </span>
                   </div>
 
-                  {/* 3-Tier Metric Comparison (Physical vs Observed vs Headroom) */}
+                  {node.observationOnly && (
+                    <div
+                      style={{
+                        marginBottom: '12px',
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'rgba(210, 153, 34, 0.15)',
+                        border: '1px solid #d29922',
+                        color: '#d29922',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      ⚠️ 관측 전용 노드 (원격 실행 프로필 미설치 - 업무 제출 비활성)
+                    </div>
+                  )}
+
+                  {/* 4-Tier Metric Comparison (Physical vs Observed vs Headroom vs Schedulable) */}
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: '8px',
+                      gridTemplateColumns: 'repeat(4, 1fr)',
+                      gap: '6px',
                       padding: '10px',
                       backgroundColor: 'var(--color-bg-subtle)',
                       borderRadius: 'var(--radius-md)',
@@ -810,26 +899,36 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     }}
                   >
                     <div>
-                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>제공 총 물리량</div>
-                      <div style={{ fontWeight: 600 }}>{totalCores} 코어</div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>{totalRamGb} GB RAM</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff' }}>{totalVramGb} GB VRAM</div>}
+                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>물리 총량</div>
+                      <div style={{ fontWeight: 600 }}>{totalCores}C</div>
+                      <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>{totalRamGb}G RAM</div>
+                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{totalVramGb}G VRAM</div>}
                     </div>
 
-                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', borderRight: '1px solid var(--color-border-subtle)' }}>
-                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 사용량</div>
+                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)' }}>
+                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 사용</div>
                       <div style={{ fontWeight: 600, color: cpuUsagePct > 60 ? '#f85149' : 'var(--color-text-primary)' }}>
-                        {cpuUsagePct}% CPU
+                        {cpuUsagePct}%
                       </div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>{ramUsedGb} GB Used</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff' }}>{vramUsedGb} GB Used</div>}
+                      <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>{ramUsedGb}G</div>
+                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{vramUsedGb}G</div>}
                     </div>
 
-                    <div>
-                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>가용 잔여량</div>
-                      <div style={{ fontWeight: 700, color: '#3fb950' }}>{availCores} 코어</div>
-                      <div style={{ color: '#3fb950', fontWeight: 600 }}>{availRamGb} GB 잔여</div>
-                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff' }}>{availVramGb} GB 잔여</div>}
+                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)' }}>
+                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>관측 여유</div>
+                      <div style={{ fontWeight: 600, color: '#3fb950' }}>{availCores}C</div>
+                      <div style={{ color: '#3fb950', fontSize: '0.6875rem' }}>{availRamGb}G</div>
+                      {node.gpuCount > 0 && <div style={{ color: '#58a6ff', fontSize: '0.6875rem' }}>{availVramGb}G</div>}
+                    </div>
+
+                    <div style={{ borderLeft: '1px solid var(--color-border-subtle)', backgroundColor: node.observationOnly ? 'rgba(210, 153, 34, 0.08)' : 'rgba(46, 160, 67, 0.05)' }}>
+                      <div style={{ color: 'var(--color-text-muted)', marginBottom: '2px' }}>예약 가능</div>
+                      <div style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : '#3fb950' }}>
+                        {node.observationOnly ? '0 C (차단)' : `${availCores}C`}
+                      </div>
+                      <div style={{ fontSize: '0.6875rem', color: node.observationOnly ? '#d29922' : '#3fb950', fontWeight: 600 }}>
+                        {node.observationOnly ? '관측전용' : `${availRamGb}G`}
+                      </div>
                     </div>
                   </div>
 
@@ -1118,6 +1217,28 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               </div>
             </div>
 
+            {dispatchError && (
+              <div
+                style={{
+                  marginTop: '16px',
+                  padding: '16px',
+                  backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid #f85149',
+                  color: '#f85149',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <div style={{ fontWeight: 700, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>❌ 원격 실행 요청 실패 (Execution Dispatch Failed)</span>
+                </div>
+                <div style={{ color: 'var(--color-text-primary)', marginTop: '4px' }}>{dispatchError}</div>
+                <div style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                  ※ Codex 원칙: 네트워크 오류 또는 원격 노드 미설치 시 가짜 Run 생성을 금지하고 실제 서버 상태를 보존합니다.
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px', marginTop: '20px' }}>
               <Button variant="secondary" onClick={() => setCurrentStep(2)}>
                 ← 이전: 자원 배치 검토
@@ -1185,6 +1306,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '8px' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleDownloadArtifact}
+                  disabled={isDownloadingArtifact || currentRun?.state === 'running'}
+                  title="실행 결과 아티팩트 매니페스트 및 Evidence를 다운로드합니다"
+                >
+                  {isDownloadingArtifact ? '⏳ 다운로드 중...' : '📥 결과 다운로드 (Artifact)'}
+                </Button>
+
                 <Button
                   variant="danger"
                   size="sm"

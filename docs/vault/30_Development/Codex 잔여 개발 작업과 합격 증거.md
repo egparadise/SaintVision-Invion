@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.10.0"
+version: "1.11.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T09:32:53+09:00"
+updated: "2026-09-11T10:13:52+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 kernel 실제 업무 검증 후속: [[2026-09-11_KERNEL-LIVE_Codex_검증보고]]의 clean 코드 `e5d9b0b`에서 실제 Python·CPU 학습·승인 입력 고정·출력 복구와 기존 Node/Workspace/샤드/containment 통합 118개가 통과했다. 독립 테스트 identity/DB를 사용했으며 Studio 운영 계정·권한·제출과 원격 업무 연결은 미완료다. 다음 담당과 합격 조건은 해당 보고서 표를 따른다. [[2026-09-11_GEMINI-TWO-PC_Codex_검토]]의 fixture 기반 2-PC/GPU 완료 주장은 물리 장비 증거로 인수하지 않는다.
 
 2026-09-11 실제 개발 환경 후속: [[2026-09-11_DEV-ENV_Codex_로컬개발환경구성과검증]]의 프로젝트/도구/CPU Studio를 구성했고 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에서 서버 서비스 재기동 및 실제 Docker API 1.41 Node 시험을 검증했다. 현재 다른 PC는 mTLS 관측 전용이다. 다음은 원격 시험 프로필 설치 후 실제 실행·복구, Studio와 제품 사용자/권한/Run/Lease/Evidence 연결이다. GPU·다중 Node 업무·5대 인수 및 독립 검토는 미완료다. 아래 과거 기록의 시험 미수행 문구와 통과 수는 해당 코드 SHA/범위에 한정한다.
 

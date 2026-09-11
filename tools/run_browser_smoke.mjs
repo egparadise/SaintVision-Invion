@@ -509,17 +509,28 @@ async function runFullSmokeJourney() {
     const studioNodesRes = await fetch(`${BACKEND_URL}/v1/nodes`);
     const studioNodesData = await studioNodesRes.json();
     const nodeItems = studioNodesData.items || [];
-    assert('All 5 nodes report positive physical capacity', nodeItems.every((n) => n.cpuCores > 0 && n.memoryTotalBytes > 0));
+    assert('All 5 enrolled nodes report positive physical capacity', nodeItems.length === 5 && nodeItems.every((n) => n.cpuCores > 0 && n.memoryTotalBytes > 0));
     assert(
       'All 5 nodes report valid available headroom (Cores & RAM)',
-      nodeItems.every((n) => {
-        const availCores = n.cpuCores * (1 - n.cpuUsagePercent / 100);
-        const availRam = n.memoryTotalBytes - n.memoryUsedBytes;
-        return availCores > 0 && availRam > 0;
-      })
+      nodeItems.length === 5 &&
+        nodeItems.every((n) => {
+          const availCores = n.cpuCores * (1 - n.cpuUsagePercent / 100);
+          const availRam = n.memoryTotalBytes - n.memoryUsedBytes;
+          return availCores > 0 && availRam > 0;
+        })
     );
 
-    // 6. Placement candidate discovery explanation
+    // 6. Observation-only Node Safety (Codex P1 / Remote worker without execution profile)
+    const obsNode = nodeItems.find((n) => n.observationOnly);
+    assert('Observation-only node (192.168.45.225) reports schedulable: false', Boolean(obsNode && obsNode.schedulable === false));
+
+    // 7. Result Artifact Download Endpoint Verification
+    const dlRes = await fetch(`${BACKEND_URL}/v1/runs/${dispatchedRun.id}/artifacts/download`);
+    assert('GET /v1/runs/{id}/artifacts/download returns HTTP 200', dlRes.status === 200);
+    const dlData = await dlRes.json();
+    assert('Artifact download response contains deterministic outputHash', Boolean(dlData.outputHash?.startsWith('sha256:')));
+
+    // 8. Placement candidate discovery explanation
     const candRes = await fetch(`${BACKEND_URL}/v1/discovery/candidates?minCores=4&minMemoryGb=8`);
     assert('GET /v1/discovery/candidates returns HTTP 200', candRes.status === 200);
     const candData = await candRes.json();
