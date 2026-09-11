@@ -456,9 +456,12 @@ def set_resource_offer(
     offering "32 GiB" and a screen offering bytes must land on the same number,
     and ``saintvision.units`` is the only place that conversion happens.
 
-    Lowering an offer is a ceiling for future reservations, not a recall of
-    current ones. Work the execution core has already leased runs until it is
-    returned. The response says so rather than leaving the operator to find out.
+    The offer is applied to ``inv.resources.offered`` — what the kernel checks
+    before granting a lease — under the kernel's own rules. Lowering it below
+    what is already leased is **refused** rather than accepted as a
+    future-only ceiling: the kernel will not hold more than the owner now
+    permits, and the business record must not claim something it will not
+    honour.
     """
     capability = session.get(NodeCapability, capability_id)
     if capability is None or capability.tenant_id != tenant_id:
@@ -480,6 +483,20 @@ def set_resource_offer(
             },
         )
 
+    # Applied to the kernel before the local write. inv.resources.offered is
+    # what a lease is actually checked against, and until this call an offer
+    # changed on a settings screen was a number no scheduler read — the machine
+    # kept accepting work its owner had just said it should stop taking. Doing
+    # it first means a refusal leaves both sides on the old number rather than
+    # leaving the business record ahead of what can be spent.
+    applied = _apply_to_kernel(
+        session,
+        tenant_id=tenant_id,
+        node_id=capability.node_id,
+        kind=capability.kind,
+        offered=canonical,
+    )
+
     previous = session.scalars(select(ResourceOffer).where(
         ResourceOffer.tenant_id == tenant_id, ResourceOffer.capability_id == capability_id,
         ResourceOffer.effective_to.is_(None),
@@ -488,7 +505,7 @@ def set_resource_offer(
         if previous.offered_quantity == canonical:
             # Setting the same number is not a change. Writing a new row anyway
             # would fill the history with events that record nothing.
-            return _offer_body(capability, previous, previous, now)
+            return _offer_body(capability, previous, previous, now, applied)
         now = max(now, previous.effective_from + dt.timedelta(microseconds=1))
         previous.effective_to = now
 
@@ -501,7 +518,46 @@ def set_resource_offer(
     )
     session.add(offer)
     session.flush()
-    return _offer_body(capability, offer, previous, now)
+    return _offer_body(capability, offer, previous, now, applied)
+
+
+def _apply_to_kernel(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    node_id: str,
+    kind: str,
+    offered: int,
+) -> dict[str, Any]:
+    """Push the offer into ``inv.resources.offered`` under the kernel's rules.
+
+    Two kinds of refusal, treated differently on purpose.
+
+    A resource the kernel has never observed is a **normal** state on a machine
+    that has not been enrolled into execution yet, and it should not stop an
+    owner recording what they intend to offer. That is reported, not raised.
+
+    A refusal that means the number is *wrong* — more than the machine has, or
+    less than what is already leased — is raised, because storing it would leave
+    the business record claiming something the kernel will not honour.
+    """
+    row = session.execute(
+        text(
+            "SELECT applied, reason, kernel_resource_id, kernel_capacity "
+            "FROM public.apply_resource_offer(:t, CAST(:n AS char(30)), :k, :o)"
+        ),
+        {"t": str(tenant_id), "n": node_id, "k": kind, "o": int(offered)},
+    ).one()
+    applied, reason, resource_id, capacity = row
+    if applied:
+        return {"appliedToKernel": True, "kernelResourceId": resource_id}
+    if reason and "has not observed" in reason:
+        return {"appliedToKernel": False, "kernelReason": reason}
+    raise InvError(
+        VAL_SCHEMA,
+        f"the execution kernel refused this offer: {reason}",
+        extra={"kernelResourceId": resource_id, "kernelCapacity": capacity},
+    )
 
 
 def _offer_body(
@@ -509,6 +565,7 @@ def _offer_body(
     offer: ResourceOffer,
     previous: ResourceOffer | None,
     now: dt.datetime,
+    applied: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     lowered = previous is not None and offer.offered_quantity < previous.offered_quantity
     return {
@@ -524,11 +581,14 @@ def _offer_body(
         "effectiveFrom": offer.effective_from.isoformat(),
         # Said plainly, because it is the part that surprises people.
         "note": (
-            "A lowered offer applies to new reservations. Work already leased "
-            "by the execution core runs until it is returned."
+            "A lowered offer takes effect for new reservations. The execution "
+            "kernel refuses an offer below what is already leased, so work in "
+            "flight must be released before going that low."
             if lowered
             else "The offer is a ceiling the platform may use, not a promise."
         ),
+        # Whether it reached the thing that actually decides a lease.
+        **(applied or {"appliedToKernel": False, "kernelReason": "not attempted"}),
     }
 
 
