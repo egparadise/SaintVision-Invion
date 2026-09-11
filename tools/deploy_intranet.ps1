@@ -47,9 +47,12 @@ if ($LASTEXITCODE -ne 0) { throw "E2E browser smoke suite failed with exit code 
 Write-Host "`n[5/5] Docker Compose Intranet Deployment Orchestration & Preflight..." -ForegroundColor Yellow
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     docker compose -f docker-compose.prod.yml config --quiet
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✔ docker-compose.prod.yml syntax and service graph validated successfully!" -ForegroundColor Green
+    if ($LASTEXITCODE -ne 0) {
+        throw "Docker compose production configuration validation failed with exit code $LASTEXITCODE"
     }
+    Write-Host "✔ docker-compose.prod.yml syntax and service graph validated successfully!" -ForegroundColor Green
+} else {
+    Write-Host "ℹ Docker command not detected on host environment; skipping container stack preflight." -ForegroundColor Yellow
 }
 Write-Host "  - Frontend Portal (Nginx TLS 1.3): https://saintvision.internal:8443/" -ForegroundColor White
 Write-Host "  - Control Plane Gateway (FastAPI): http://127.0.0.1:8080/v1/health" -ForegroundColor White

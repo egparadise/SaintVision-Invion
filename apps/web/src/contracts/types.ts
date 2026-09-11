@@ -157,6 +157,7 @@ export interface RunItem {
   manifestDigest?: string;
   maxAttempts?: number;
   boundRunVersion?: number;
+  version?: number;
   frozenInputHash?: string;
   frozenInputSizeBytes?: number;
   nodeId?: string;

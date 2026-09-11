@@ -190,6 +190,24 @@ export const NodeList: React.FC<NodeListProps> = ({
                 </div>
               </div>
 
+              {/* Observation-Only and Schedulable Capacity */}
+              {node.observationOnly && (
+                <div
+                  style={{
+                    marginTop: '8px',
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'rgba(210, 153, 34, 0.15)',
+                    border: '1px solid #d29922',
+                    color: '#d29922',
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  ⚠️ 관측 전용 (192.168.45.225 - 원격 프로필 미설치)
+                </div>
+              )}
+
               {/* Resource Headroom & Studio Jump Action */}
               <div
                 style={{
@@ -201,8 +219,13 @@ export const NodeList: React.FC<NodeListProps> = ({
                   alignItems: 'center',
                 }}
               >
-                <div style={{ fontSize: '0.75rem', color: '#3fb950', fontWeight: 600 }}>
-                  가용 여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}코어 · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}GB
+                <div style={{ fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>
+                    관측여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}G
+                  </span>
+                  <span style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : '#3fb950' }}>
+                    예약가능: {node.observationOnly ? '0C (차단)' : `${(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C`}
+                  </span>
                 </div>
                 {onOpenStudio && (
                   <button
@@ -210,12 +233,13 @@ export const NodeList: React.FC<NodeListProps> = ({
                       e.stopPropagation();
                       onOpenStudio(node.id);
                     }}
+                    title={node.observationOnly ? '관측 전용 노드는 업무 배치가 비활성화되어 있습니다' : '이 노드로 Studio 열기'}
                     style={{
                       padding: '4px 10px',
                       fontSize: '0.75rem',
                       fontWeight: 600,
                       borderRadius: 'var(--radius-sm)',
-                      backgroundColor: 'var(--color-brand-primary)',
+                      backgroundColor: node.observationOnly ? 'var(--color-border-strong)' : 'var(--color-brand-primary)',
                       color: '#ffffff',
                       border: 'none',
                       cursor: 'pointer',

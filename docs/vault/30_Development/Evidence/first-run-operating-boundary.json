@@ -1,0 +1,56 @@
+{
+  "at": "2026-09-11T01:58:05.524260+00:00",
+  "codeSHA": "b6301a9613097122a7574fa647b63d791fe13d2d",
+  "scope": "read-only-operating-observation-not-workload-execution",
+  "services": [
+    {
+      "url": "http://localhost:3000",
+      "httpStatus": 200
+    },
+    {
+      "url": "http://127.0.0.1:18100",
+      "httpStatus": 200
+    },
+    {
+      "url": "http://127.0.0.1:18082/pilot/v1/overview",
+      "httpStatus": 200
+    }
+  ],
+  "liveOverview": {
+    "source": "live-postgresql-mtls",
+    "serverAddress": "192.168.45.99",
+    "generatedAt": "2026-09-11T01:58:05.514709+00:00",
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "lastHeartbeatAt": "2026-09-11T01:58:04.041040+00:00",
+        "lastSnapshotAt": "2026-09-11T01:58:04.041040+00:00",
+        "observationAgeSeconds": 1.5,
+        "osType": "linux",
+        "profileVersion": "lan-observe-v1",
+        "agentVersion": "0.1.0",
+        "cpuCores": 16.0,
+        "cpuUsagePercent": 0.0,
+        "memoryTotalBytes": 8247742464,
+        "memoryUsedBytes": 3038105600,
+        "gpuCount": null,
+        "storageTotalBytes": null,
+        "measurementScope": "node-visible-linux-environment"
+      }
+    ],
+    "runs": [],
+    "offered": {},
+    "killSwitch": true,
+    "userWorkloadSubmission": false,
+    "webAuthenticationConfigured": false,
+    "tests": []
+  },
+  "runningContainers": [
+    "saintvision-lan-db-bff1a31d",
+    "saintview-orthanc-h2",
+    "saintview-orthanc-h1"
+  ]
+}

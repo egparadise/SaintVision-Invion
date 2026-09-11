@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.11.0"
+version: "1.12.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T10:13:52+09:00"
+updated: "2026-09-11T11:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 첫 Workspace 실행 후속: [[2026-09-11_FIRST-RUN_Codex_검증보고]]의 clean 코드 `b6301a9`에서 새 draft 입력/선택 Node 고정→승인→원자 예약/queue→attempt 1→실제 출력/checkpoint/Evidence를 검증했다. 통합 159개·core 260개·Windows Go 통과다. [[Codex Workspace 첫 실행과 승인 입력 계약]](ADR-063)의 업무 API/provisioning 및 독립 검토는 Claude, 실제 입력/상태/다운로드 UI는 Gemini, 새 원격 agent/profile 배포 후 실제 PC 실행/취소/복구는 Codex다. 장시간/대용량·GPU·분산 학습·5대·Context/RO 인수는 남는다. 과거 0024/Workspace bridge 문서와 달리 현재 추적 코드에는 해당 revision이 없으며 이번 0025는 실제 head 0023을 잇는다. 과거 기록만으로 PTY/Git 통합 완료를 인정하지 않는다. 상세 순서·합격 증거는 최신 보고서 표를 우선한다. Gemini 최신 수정본은 [[2026-09-11_GEMINI-STUDIO_수정본_Codex_재검토]]의 남은 P1/P2를 따른다.
 
 2026-09-11 kernel 실제 업무 검증 후속: [[2026-09-11_KERNEL-LIVE_Codex_검증보고]]의 clean 코드 `e5d9b0b`에서 실제 Python·CPU 학습·승인 입력 고정·출력 복구와 기존 Node/Workspace/샤드/containment 통합 118개가 통과했다. 독립 테스트 identity/DB를 사용했으며 Studio 운영 계정·권한·제출과 원격 업무 연결은 미완료다. 다음 담당과 합격 조건은 해당 보고서 표를 따른다. [[2026-09-11_GEMINI-TWO-PC_Codex_검토]]의 fixture 기반 2-PC/GPU 완료 주장은 물리 장비 증거로 인수하지 않는다.
 
