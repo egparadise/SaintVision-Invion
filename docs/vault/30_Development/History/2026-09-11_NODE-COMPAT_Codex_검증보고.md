@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-NODE-COMPAT-REPORT-20260911"
 title: "NODE-COMPAT Codex 검증보고"
-version: "1.0.0"
-status: "in_progress"
+version: "1.1.0"
+status: "review"
 author: "Codex"
-updated: "2026-09-11T09:28:00+09:00"
+updated: "2026-09-11T09:32:53+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["development", "node", "evidence"]
@@ -48,4 +48,14 @@ Orca는 worktree·개발 도구 조정 환경이며 별도 실행 권한자가 �
 
 ## 전달 상태
 
-코드 commit/push, 동일 SHA CI 및 Obsidian 동기화 결과를 후속 기록한다. 기존 CI 계정/결제 문제는 사용자 지시대로 변경하지 않는다. 다른 Agent 검토·main 병합은 수행되지 않았다. 오류는 [[2026-09-11_NODE-COMPAT_오류와해결]]에 별도 보존한다.
+코드 `08d8dde280afe014bfda732d174951468e375283` commit/push exit 0. 09:29 KST clean SHA의 실제 Linux runtime 27개/실제 Docker 4종 시험 exit 0, runner 종료 확인. 결과는 `Evidence/node-compat-08d8dde.json`에 원본 로그 SHA·binary SHA·컨테이너/이미지 ID와 함께 저장했다. 문서 201개/ontology/PowerShell 3개 구문 검사 exit 0 이후 인계 기록을 추가했다.
+
+동일 SHA CI [Core 34546665501](https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665501), [Backend 34546665413](https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665413), [Docs 34546665643](https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665643)는 모두 계정 결제/사용 한도 때문에 job 시작 전 차단됐다. 코드 시험 실패로 해석하지 않으며 CI 통과로 표시하지 않는다. 사용자 지시대로 계정 설정은 변경하지 않았다.
+
+Obsidian check에서 기존 최신 계약/History가 과거 버전으로 바뀐 3문서와 추가 Gemini 보고를 발견했다. diff 검토 후 4개 원문 바이트·SHA를 `Evidence/node-compat-sync-proposals.json`에 보존했다. 최신 Git 정본을 유지하고 추가 주장에 대해서는 [[2026-09-11_GEMINI-STUDIO_Codex_통합검토]]에 4개 P1을 기록했다. 검토한 원문의 SHA가 변하지 않았을 때만 동기화 기준을 갱신해 재출력한다. 이후 동기화 명령/결과를 아래에 기록한다.
+
+문서 확인 exit 0 (202개 versioned documents), sync `--check` → `--apply` → `--check` exit 0: 310 managed files, 11개 출력 후 pending 0/conflicts 0. 로컬 Obsidian 파일 hash 일치이며 OneDrive 원격 클라우드 동기화 완료 증거는 아니다. 다른 PC의 실행 명령은 [[2026-09-11_NODE-COMPAT_다른PC실행안내]]에 정리했다.
+
+09:32:53 KST 안내문 추가 후 최종 문서 203개/ontology 검사와 sync check/apply/check가 각각 exit 0. 311 managed files, 추가 6개 출력 후 pending 0/conflicts 0. 본 결과 기록을 포함한 최종 보고 문서는 별도 docs commit으로 전달한다.
+
+Codex 코드의 Claude 독립 검토·main 병합은 수행되지 않았다. 오류는 [[2026-09-11_NODE-COMPAT_오류와해결]]에 별도 보존한다.

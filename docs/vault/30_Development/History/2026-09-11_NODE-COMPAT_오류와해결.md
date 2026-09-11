@@ -1,10 +1,10 @@
 ---
 doc_id: "ERR-NODE-COMPAT-20260911"
 title: "NODE-COMPAT 오류와 해결"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T09:28:00+09:00"
+updated: "2026-09-11T09:32:53+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["error", "node", "recovery"]
@@ -21,5 +21,7 @@ tags: ["error", "node", "recovery"]
 | 첫 실제 시험에서 fail/sleep 출력 존재 단언 실패, exit 1 | 기존 계약은 정상 종료만 output commitment 수집. 시험의 기대가 계약과 달랐음 | 실패 영수증/물리 종료/재실행 금지를 확인하도록 시험 수정. 정상 stdout/stderr 시험 추가 |
 | 최초 코드 조회 경로 일부 오기 | `internal/runtime` 대신 실제 `runtime`, workdir에 중복 prefix 사용 | `rg --files`/실제 경로로 재조회, 데이터 수정 없음 |
 | 다른 PC SSH 22 timeout | 원격 관리 셸 접근 경로 없음. mTLS 관측은 별도로 정상 | 사용자에게 해당 PC의 제한 실행 시험 설치 스크립트 인계. 설치 결과 대기 |
+| Obsidian sync check exit 1, 3개 외부 변경 | 잔여 목록/History/ADR가 이전 버전으로 돌아갔고 Gemini 새 보고가 추가됨 | 4개 원문·SHA를 JSON 보존, diff 및 실제 코드 검토 후 최신 정본 유지. 원문 hash가 달라지면 재동기화 중단 |
+| 코드 08d8dde의 3개 CI job 미시작 | 기존 계정 결제/사용 한도 안내 | Git push는 성공. 계정 변경 없이 차단 기록, CI 합격/전체 done 처리하지 않음 |
 
 실패한 시험 컨테이너와 로그는 보존했다. 실제 업무 DB/인증서/Node identity/epoch를 초기화하거나 다른 업무 컨테이너를 정지하지 않았다. [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에서 합격 증거와 미완료 범위를 구분한다.

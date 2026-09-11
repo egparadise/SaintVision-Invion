@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.9.0"
+version: "1.10.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T17:11:46+09:00"
+updated: "2026-09-11T09:32:53+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 실제 개발 환경 후속: [[2026-09-11_DEV-ENV_Codex_로컬개발환경구성과검증]]의 프로젝트/도구/CPU Studio를 구성했고 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에서 서버 서비스 재기동 및 실제 Docker API 1.41 Node 시험을 검증했다. 현재 다른 PC는 mTLS 관측 전용이다. 다음은 원격 시험 프로필 설치 후 실제 실행·복구, Studio와 제품 사용자/권한/Run/Lease/Evidence 연결이다. GPU·다중 Node 업무·5대 인수 및 독립 검토는 미완료다. 아래 과거 기록의 시험 미수행 문구와 통과 수는 해당 코드 SHA/범위에 한정한다.
 
 2026-09-10 Workspace bridge 후속: 편집 revision/동결 입력, 명시적 대체 Node, 제한 PTY/ticket, 고정 GitHub 원격 Git/2인 승인/불확실 dispatch 보존 코드를 추가했다. [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]과 [[2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정]]을 따른다. **사용자 지시로 실제 테스트는 미수행**이며 구현과 정적 build 전달 단계다. Codex의 즉시 다음 작업은 새 코드 전체 실제 회귀·DB/PTY/대체 Node/Git crash/CAS/권한 검증과 고정 SHA Evidence다. 독립 검토(Claude)·실제 API 화면/브라우저(Gemini), 대용량/장시간 PTY/다른 Git provider·Windows/GPU/BuildKit·Context/RO·물리 5대 인수는 남는다. 아래 과거 통과 수와 미구현 목록은 각 SHA 당시 기록이다.
 
