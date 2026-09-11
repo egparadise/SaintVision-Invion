@@ -28,6 +28,8 @@ import hashlib
 import json
 import math
 import os
+import stat
+from contextlib import contextmanager
 import subprocess
 import sys
 import time
@@ -515,9 +517,118 @@ def _meets_operational_rpo(report: dict[str, Any], target: int | None) -> bool:
 
 
 def _accepted(report, args):
-    return _passed(report) and _meets_operational_rpo(
-        report, getattr(args, "require_operational_rpo", None)
+    return (
+        (not report.get("savedBackupRequested") or report.get("savedBackupIntact") is True)
+        and _passed(report)
+        and _meets_operational_rpo(report, getattr(args, "require_operational_rpo", None))
     )
+
+
+@contextmanager
+def _backup_parent(path):
+    """Linux operator-owned private directory; never follow a path symlink."""
+    path = Path(path)
+    if (
+        sys.platform != "linux"
+        or not path.is_absolute()
+        or ".." in path.parts
+        or path.name in ("", ".")
+    ):
+        raise ValueError("Private absolute Linux backup path required")
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    fd = os.open("/", flags)
+    try:
+        for part in path.parts[1:-1]:
+            child = os.open(part, flags, dir_fd=fd)
+            os.close(fd)
+            fd = child
+        info = os.fstat(fd)
+        if info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o077:
+            raise ValueError("Private operator-owned backup directory required")
+        yield fd, path.name
+    finally:
+        os.close(fd)
+
+
+def _read_backup_at(parent, name):
+    fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
+    with os.fdopen(fd, "rb") as stream:
+        before = os.fstat(stream.fileno())
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or before.st_uid != os.geteuid()
+            or stat.S_IMODE(before.st_mode) != 0o600
+            or before.st_nlink != 1
+        ):
+            raise ValueError("Private single-link backup file required")
+        value = stream.read()
+        after = os.fstat(stream.fileno())
+        named = os.stat(name, dir_fd=parent, follow_symlinks=False)
+        signature = lambda s: (
+            s.st_dev,
+            s.st_ino,
+            s.st_size,
+            s.st_mtime_ns,
+            s.st_ctime_ns,
+            s.st_nlink,
+        )
+        if signature(before) != signature(after) or signature(after) != signature(named):
+            raise ValueError("Backup changed during observation")
+        return value, {"device": after.st_dev, "inode": after.st_ino}
+
+
+def _save_backup(path, value):
+    """Publish without overwriting; sync bytes and directory before verification.
+
+    A process crash may leave a private temp/orphan file. It is never a ledger
+    success, never automatically replayed, and never deletes an existing backup.
+    This is a local filesystem durability observation, not off-site evidence.
+    """
+    with _backup_parent(path) as (parent, name):
+        temp = ".inv-backup-" + uuid.uuid4().hex
+        fd = os.open(
+            temp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=parent
+        )
+        try:
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(value)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.link(temp, name, src_dir_fd=parent, dst_dir_fd=parent, follow_symlinks=False)
+        finally:
+            os.unlink(temp, dir_fd=parent)
+        os.fsync(parent)
+        written, identity = _read_backup_at(parent, name)
+    digest = hashlib.sha256(written).hexdigest()
+    if written != value:
+        raise ValueError("Saved backup differs from dump")
+    return written, dict(
+        savedBackupRequested=True,
+        backupSource=str(path),
+        savedBackupBytes=len(written),
+        savedBackupSha256=digest,
+        savedBackupIdentity=identity,
+        savedBackupIntact=True,
+        localBackupSynced=True,
+        offSiteVerified=False,
+    )
+
+
+def _recheck_saved_backup(report):
+    if not report.get("savedBackupRequested"):
+        return
+    try:
+        with _backup_parent(report["backupSource"]) as (parent, name):
+            written, identity = _read_backup_at(parent, name)
+        intact = (
+            identity == report["savedBackupIdentity"]
+            and len(written) == report["backupBytes"]
+            and hashlib.sha256(written).hexdigest() == report["backupSha256"]
+            and report.get("localBackupSynced") is True
+        )
+    except (OSError, ValueError, KeyError):
+        intact = False
+    report["savedBackupIntact"] = intact
 
 
 def _fencing_state(dsn: str) -> dict[str, Any]:
@@ -709,8 +820,8 @@ def rehearse(args) -> dict[str, Any]:
     report["backupSha256"] = hashlib.sha256(backup_bytes).hexdigest()
     report["dumpSeconds"] = round(time.monotonic() - dump_started, 3)
     if args.save_backup:
-        Path(args.save_backup).write_bytes(backup_bytes)
-        report["backupSource"] = args.save_backup
+        backup_bytes, saved = _save_backup(args.save_backup, backup_bytes)
+        report.update(saved)
 
     return _restore_and_verify(
         pg, args, report, backup_bytes, backup_taken_at, source_fencing, target_db
@@ -916,6 +1027,7 @@ def record(report: dict[str, Any], args) -> str | None:
     from saintvision.db.session import tenant_scope
     from saintvision.services import pilot as pilot_service
 
+    _recheck_saved_backup(report)
     functional_passed = _passed(report)
     passed = _accepted(report, args)
     from psycopg.conninfo import conninfo_to_dict
@@ -946,10 +1058,30 @@ def record(report: dict[str, Any], args) -> str | None:
         with factory() as session:
             with session.begin():
                 with tenant_scope(session, tenant):
+                    backup = None
+                    if report.get("savedBackupRequested"):
+                        backup = pilot_service.record_backup(
+                            session,
+                            tenant_id=tenant,
+                            kind="logical",
+                            location_ref=report["backupSource"],
+                            now=now,
+                            off_site=False,
+                            byte_size=report["backupBytes"],
+                        )
+                        if report.get("savedBackupIntact") is True:
+                            pilot_service.verify_backup(
+                                session,
+                                tenant_id=tenant,
+                                backup_id=backup.backup_id,
+                                checksum_sha256=report["backupSha256"],
+                                now=now,
+                            )
                     drill = pilot_service.record_recovery_drill(
                         session,
                         tenant_id=tenant,
                         scope="database",
+                        backup_id=backup.backup_id if backup else None,
                         outcome="passed" if passed else "failed",
                         performed_by_user_id=args.user,
                         now=now,
@@ -975,12 +1107,19 @@ def record(report: dict[str, Any], args) -> str | None:
                             "notVerified": report["notVerified"],
                             "backupSha256": report["backupSha256"],
                             "backupBytes": report["backupBytes"],
+                            "savedBackupRequested": bool(report.get("savedBackupRequested")),
+                            "savedBackupIntact": report.get("savedBackupIntact"),
+                            "backupVerificationScope": "local-file-observation-not-offsite-or-PITR",
                             "tablesWithDifferentCounts": report["tablesWithDifferentCounts"],
                             "tablesWithDifferentContent": report["tablesWithDifferentContent"],
                             "fencingAdvanceRequired": report["fencingAdvanceRequired"],
                         },
                     )
-                    return drill.drill_id
+        # Publish identifiers only after the transaction has committed.
+        if backup is not None:
+            report["backupId"] = backup.backup_id
+            report["backupVerified"] = backup.verified
+        return drill.drill_id
     finally:
         engine.dispose()
 
@@ -1053,7 +1192,10 @@ def main() -> int:
             "left it."
         ),
     )
-    parser.add_argument("--save-backup", help="write the dump to this path")
+    parser.add_argument(
+        "--save-backup",
+        help="publish a new dump in an existing private Linux directory; never overwrite",
+    )
     parser.add_argument(
         "--backup-taken-at",
         help=(
@@ -1089,11 +1231,16 @@ def main() -> int:
     parser.add_argument("--keep", action="store_true", help="do not drop the restore")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+    if args.from_backup and args.save_backup:
+        parser.error("backup input and output are mutually exclusive")
     if not args.source or not args.admin or bool(args.tenant) != bool(args.user):
         print(json.dumps({"status": "unavailable", "error": "required_configuration_missing"}))
         return 2
     try:
         report = rehearse(args)
+        _recheck_saved_backup(report)
+        if args.tenant and args.user:
+            report["drillId"] = record(report, args)
         report["acceptance"] = {
             "functionalDrillPassed": _passed(report),
             "requiredOperationalRpoSeconds": args.require_operational_rpo,
@@ -1104,8 +1251,6 @@ def main() -> int:
             ),
             "passed": _accepted(report, args),
         }
-        if args.tenant and args.user:
-            report["drillId"] = record(report, args)
     except Exception as error:
         # Driver/client exceptions may echo credentials, SQL or row bytes.
         print(json.dumps({"status": "unavailable", "error": type(error).__name__}))

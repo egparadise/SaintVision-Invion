@@ -362,3 +362,82 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
                 timeout=30,
                 check=True,
             )
+
+
+@pytest.mark.parametrize("changed", [False, True])
+def test_saved_backup_is_linked_and_rechecked_before_record(args, tmp_path, changed):
+    from saintvision.ids import new_id
+
+    args.save_backup = str(tmp_path / "saved.dump")
+    report = drill.rehearse(args)
+    assert drill._passed(report)
+    assert report["savedBackupIntact"] is True
+    args.tenant, args.user = str(uuid4()), new_id("user")
+    with psycopg.connect(args.source) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'backup test')",
+            (args.tenant, "b-" + args.tenant),
+        )
+        conn.execute(
+            "INSERT INTO public.users(user_id,tenant_id,external_subject,display_name) VALUES(%s,%s,%s,'backup operator')",
+            (args.user, args.tenant, "b-" + args.tenant),
+        )
+    if changed:
+        Path(args.save_backup).write_bytes(b"post-restore corruption")
+    key = drill.record(report, args)
+    with psycopg.connect(args.source) as conn:
+        row = conn.execute(
+            """SELECT d.outcome,d.met_targets,d.backup_id,b.verified,b.kind,b.off_site,b.checksum_sha256,d.notes
+            FROM public.recovery_drills d JOIN public.backup_records b USING(backup_id)
+            WHERE d.drill_id=%s""",
+            (key,),
+        ).fetchone()
+    assert row[0] == ("failed" if changed else "passed")
+    assert row[1] is (not changed)
+    assert row[2] == report["backupId"]
+    assert row[3] is (not changed)
+    assert row[4:6] == ("logical", False)
+    assert row[6] == (None if changed else report["backupSha256"])
+    assert row[7]["savedBackupIntact"] is (not changed)
+    assert report["backupVerified"] is (not changed)
+    assert drill._accepted(report, args) is (not changed)
+
+
+def test_ledger_and_drill_rollback_together(args, tmp_path, monkeypatch):
+    from saintvision.ids import new_id
+    from saintvision.services import pilot
+
+    args.save_backup = str(tmp_path / "rollback.dump")
+    report = drill.rehearse(args)
+    args.tenant, args.user = str(uuid4()), new_id("user")
+    with psycopg.connect(args.source) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'rollback test')",
+            (args.tenant, "b-" + args.tenant),
+        )
+        conn.execute(
+            "INSERT INTO public.users(user_id,tenant_id,external_subject,display_name) VALUES(%s,%s,%s,'backup operator')",
+            (args.user, args.tenant, "b-" + args.tenant),
+        )
+    original = pilot.record_recovery_drill
+
+    def fail(*values, **kwargs):
+        original(*values, **kwargs)
+        raise RuntimeError("injected after drill flush")
+
+    monkeypatch.setattr(pilot, "record_recovery_drill", fail)
+    with pytest.raises(RuntimeError, match="injected"):
+        drill.record(report, args)
+    with psycopg.connect(args.source) as conn:
+        for table in ("backup_records", "recovery_drills"):
+            assert (
+                conn.execute(
+                    sql.SQL("SELECT count(*) FROM public.{} WHERE tenant_id=%s").format(
+                        sql.Identifier(table)
+                    ),
+                    (args.tenant,),
+                ).fetchone()[0]
+                == 0
+            )
+    assert "backupId" not in report and "backupVerified" not in report
+    assert Path(args.save_backup).exists(), "Keep the orphan file for operator reconciliation"
