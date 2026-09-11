@@ -22,6 +22,7 @@ from ..errors import PROBLEM_CONTENT_TYPE, VAL_SCHEMA, InvError
 from ..ids import is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
+from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
 from .v1 import settings as settings_router
@@ -168,4 +169,5 @@ def create_app(
     app.include_router(storage_router.router)
     app.include_router(pools_router.router)
     app.include_router(settings_router.router)
+    app.include_router(adapters_router.router)
     return app
