@@ -26,6 +26,7 @@ from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
 from .v1 import projects as projects_router
+from .v1 import results as results_router
 from .v1 import settings as settings_router
 from .v1 import storage as storage_router
 
@@ -172,4 +173,5 @@ def create_app(
     app.include_router(settings_router.router)
     app.include_router(adapters_router.router)
     app.include_router(projects_router.router)
+    app.include_router(results_router.router)
     return app
