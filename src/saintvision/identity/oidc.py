@@ -73,7 +73,7 @@ def load_access_tokens(settings: Any) -> TokenVerifier:
 
     missing = [
         name
-        for name in ("oidc_issuer", "oidc_audience", "oidc_client_ids", "oidc_jwks_file")
+        for name in ("tenant_id", "oidc_issuer", "oidc_audience", "oidc_client_ids", "oidc_jwks_file")
         if not getattr(settings, name, None)
     ]
     if missing:
@@ -103,7 +103,12 @@ class OidcPrincipalVerifier:
         self._session_factory = session_factory
 
     def verify(self, credential: str) -> Principal:
-        identity = self._tokens.verify(credential)
+        from inv.errors import DomainError
+        try:
+            identity = self._tokens.verify(credential)
+        except DomainError:
+            raise InvError(AUTH_INVALID_CREDENTIAL, "credential is not recognised",
+                           public=False, status=401) from None
         subject = identity.principal.subject_id
         tenant_id = uuid.UUID(identity.principal.tenant_id)
 
@@ -142,6 +147,7 @@ def principal_for_subject(
             "credential is not recognised",
             extra={"reason": "no account is linked to this subject"},
             public=False,
+            status=401,
         )
     if user.status != "active":
         # A suspended account with a live token is exactly the case suspension
@@ -151,6 +157,7 @@ def principal_for_subject(
             "credential is not recognised",
             extra={"reason": f"the account is {user.status}"},
             public=False,
+            status=401,
         )
 
     memberships = session.execute(

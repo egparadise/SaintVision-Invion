@@ -29,7 +29,7 @@ from ...adapters import agents
 from ...identity.principal import Principal
 from ..deps import get_principal
 
-router = APIRouter(tags=["adapters"])
+router = APIRouter(prefix="/v1", tags=["adapters"])
 
 
 @router.get("/adapters")
@@ -43,6 +43,8 @@ def list_adapters(principal: Principal = Depends(get_principal)) -> dict:
     rows = agents.readiness()
     return {
         "adapters": rows,
+        "measurementScope": "control-plane-host",
+        "remoteNodeReadiness": "unknown",
         "readyCount": sum(
             1
             for row in rows

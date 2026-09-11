@@ -41,7 +41,7 @@ def image_id(reference):
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
     exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
+             'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
     return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
@@ -116,7 +116,7 @@ def execute(prepared, tests):
     for relative, expected in prepared['sourceHashes'].items():
         if hashlib.sha256((ROOT/relative).read_bytes()).hexdigest()!=expected:
             raise ValueError('Prepared source differs; rebuild before running')
-    if not tests or any(t not in prepared['sourceHashes'] or not t.startswith('tests/integration/test_') for t in tests):
+    if not tests or any(t not in prepared['sourceHashes'] or not t.startswith(('tests/integration/test_', 'tests/test_')) for t in tests):
         raise ValueError('Tests must be present in the prepared source copy')
     work=Path(prepared['work'])/'runs'/uuid4().hex[:12]
     work.mkdir(parents=True)

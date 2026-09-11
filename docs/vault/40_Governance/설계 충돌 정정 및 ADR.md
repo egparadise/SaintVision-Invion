@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.21.0"
+version: "1.22.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T10:50:59+09:00"
+updated: "2026-09-11T13:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -96,3 +96,5 @@ ADR-061(Windows 사용자 전용 개발 Studio·개발 도구와 제품 실행 �
 ADR-062(Linux Docker API 1.41~1.45 범위 협상·실제 격리 설정 재검증·512 KiB/1개 json-file 출력 로그)은 [[Codex Node 실행 격리와 정지 영수증 계약]] v1.1.0을 따른다. 성공한 협상만 캐시하고 실행 변경 요청의 자동 재전송은 금지한다. DB/permit/승인 계약은 유지한다. 기존 local logging driver 설정은 서버 20.10 호환성 문제에 따라 정정하며 실제 장비 검증 범위는 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에 기록한다.
 
 ADR-063(실행 이력이 없는 draft Run의 불변 첫 입력·명시적 Node/자원/버전 고정·원자 승인 소비/예약/queue·attempt 1 및 결과 checkpoint)은 [[Codex Workspace 첫 실행과 승인 입력 계약]]을 따른다. 첫 실행은 startId/initialized, 복구는 resumeId/restored로 구분한다. 0025 forward migration을 현재 실제 head 0023 뒤에 추가한다. 운영 사용자/프로젝트 provisioning·화면·원격 PC 설치와 독립 검토는 별도다.
+
+ADR-064(같은 JWT 검증·명시적 업무 route 조합·분리된 inv_app/inv_kernel DB 계정), ADR-065(별도 운영자 관리 grant·현재 tenant definer·Project/Node writer 직렬화)는 [[Codex 계정과 실행 커널 통합 계약]]을 따른다. 0026에서 두 공개 0025 이력을 보존해 합치고 0027로 권한을 보강한다. 운영 IdP/provisioning·원격 Node·UI·독립 재검토는 별도다.

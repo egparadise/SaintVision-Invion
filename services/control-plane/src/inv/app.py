@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import time
+from contextlib import asynccontextmanager
 from threading import BoundedSemaphore
 from fastapi import FastAPI, Request, Depends
 from fastapi.exceptions import RequestValidationError
@@ -162,13 +163,25 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
-def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None):
+def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None, business=None):
+    @asynccontextmanager
+    async def lifespan(api):
+        if business is None:
+            yield
+        else:
+            async with business.router.lifespan_context(business):
+                yield
+
     api = FastAPI(
         title="Saint Vision INV Control Plane",
         version=__version__,
         docs_url=None,
         redoc_url=None,
+        lifespan=lifespan,
     )
+    if business is not None:
+        from .business_surface import BusinessDispatch
+        api.add_middleware(BusinessDispatch, business=business)
     api.add_middleware(Boundary, origins=allowed_origins)
     control = Control(database) if database else None
 
@@ -604,7 +617,7 @@ def create_configured_app():
     """Production factory: explicit operator configuration, never seeded demo data."""
     try:
         settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace"}:
+        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business"}:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
         database = Database(
@@ -615,11 +628,18 @@ def create_configured_app():
             from .workspace_config import configured_workspace
 
             workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])
+        business = None
+        if "business" in settings:
+            if settings["business"] is not True:
+                raise ValueError()
+            from .business_surface import configured_business
+            business = configured_business(database, identity)
         return create_app(
             database,
             identity,
             allowed_origins=settings.get("allowedOrigins", []),
             workspace=workspace,
+            business=business,
         )
     except Exception:
         raise RuntimeError(

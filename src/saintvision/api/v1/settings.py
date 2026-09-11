@@ -29,7 +29,7 @@ from ...services.audit import record_event
 from .. import schemas
 from ..deps import get_now, get_principal, get_session
 
-router = APIRouter(tags=["settings"])
+router = APIRouter(prefix="/v1", tags=["settings"])
 
 
 def _audit(session, request, principal, action, detail, now):
@@ -63,7 +63,8 @@ def read_my_permission(
     function every write is guarded by, so the controls shown and the controls
     that work cannot drift apart.
     """
-    return settings_service.effective_permission(
+    from ...services.projects import require_project_access
+    return require_project_access(
         session,
         tenant_id=principal.tenant_id,
         project_id=project_id,
@@ -77,6 +78,9 @@ def list_members(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
 ) -> dict:
+    from ...services.projects import require_project_access
+    require_project_access(session, tenant_id=principal.tenant_id,
+                           project_id=project_id, user_id=principal.user_id)
     members = settings_service.list_members(
         session, tenant_id=principal.tenant_id, project_id=project_id
     )
@@ -159,6 +163,10 @@ def set_user_status(
     Effective immediately everywhere, including inside the execution kernel,
     because the kernel reads this row rather than a copy of it.
     """
+    settings_service.require_global_administrator(
+        session, tenant_id=principal.tenant_id, user_id=principal.user_id,
+        permission="users.manage", target_user_id=user_id,
+    )
     user = settings_service.set_user_status(
         session,
         tenant_id=principal.tenant_id,
@@ -263,6 +271,10 @@ def set_resource_offer(
     and the response states the canonical unit the platform stored. A screen
     that sends GiB and a screen that sends bytes describe the same machine.
     """
+    settings_service.require_global_administrator(
+        session, tenant_id=principal.tenant_id, user_id=principal.user_id,
+        permission="resources.manage",
+    )
     result = settings_service.set_resource_offer(
         session,
         tenant_id=principal.tenant_id,

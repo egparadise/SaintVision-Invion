@@ -101,7 +101,7 @@ class Settings:
             oidc_issuer=os.environ.get("INV_OIDC_ISSUER"),
             oidc_audience=os.environ.get("INV_OIDC_AUDIENCE"),
             oidc_client_ids=tuple(
-                value
+                value.strip()
                 for value in os.environ.get("INV_OIDC_CLIENT_IDS", "").split(",")
                 if value.strip()
             ),

@@ -15,12 +15,12 @@ def main():
                        INV_NODE_BINARY='/app/binaries/inv-node',
                        INV_DISCOVER_BINARY='/app/binaries/inv-discover')
     tests = config['tests']
-    if not tests or any(not name.startswith('tests/integration/test_') or not name.endswith('.py') for name in tests):
+    if not tests or any(not name.startswith(('tests/integration/test_', 'tests/test_')) or not name.endswith('.py') or '..' in name for name in tests):
         raise ValueError('Explicit integration test files required')
     # Capture to a private artifact. Test assertion traces can contain DB fixtures.
     # Public evidence is separately extracted from the JUnit status attributes.
     with Path('/evidence/pytest.log').open('wb') as log:
-        result = subprocess.run([sys.executable, '-m', 'pytest', '-x', '-q',
+        result = subprocess.run([sys.executable, '-m', 'pytest', '--maxfail=10', '-q',
                                  '--junitxml=/evidence/tests.xml', '-o', 'faulthandler_timeout=45',
                                  '--basetemp=/tmp/kernel-tests', *tests], env=environment,
                                 stdout=log, stderr=subprocess.STDOUT, timeout=900)

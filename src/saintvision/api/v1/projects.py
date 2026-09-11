@@ -29,7 +29,7 @@ from ...services.audit import record_event
 from .. import schemas
 from ..deps import get_now, get_principal, get_session
 
-router = APIRouter(tags=["projects"])
+router = APIRouter(prefix="/v1", tags=["projects"])
 
 
 @router.get("/projects")

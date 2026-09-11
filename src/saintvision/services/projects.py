@@ -91,7 +91,7 @@ def create_project(
     if not display_name.strip():
         raise InvError(VAL_SCHEMA, "a project needs a display name")
 
-    creator = session.get(User, created_by_user_id)
+    creator = session.get(User, created_by_user_id, populate_existing=True, with_for_update={"read": True})
     if creator is None or creator.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "user not found")
     if creator.status != "active":
@@ -193,8 +193,10 @@ def list_projects(
     for project, role_code in rows:
         body = project_body(session, project, tenant_id=tenant_id)
         body["roleCode"] = role_code
-        body["canRequest"] = role_code in settings_service.CAN_REQUEST
-        body["canApprove"] = role_code in settings_service.CAN_APPROVE
+        permission = settings_service.effective_permission(
+            session, tenant_id=tenant_id, project_id=project.project_id, user_id=user_id)
+        body["canRequest"] = permission["canRequest"]
+        body["canApprove"] = permission["canApprove"]
         out.append(body)
     return out
 
@@ -208,8 +210,9 @@ def require_project_access(
     simply cannot see it. Distinguishing them would confirm the existence of
     another project's identifier to someone who has no access to it.
     """
-    membership = session.get(ProjectMember, (tenant_id, project_id, user_id))
-    if membership is None:
+    membership = session.get(ProjectMember, (tenant_id, project_id, user_id), populate_existing=True)
+    user = session.get(User, user_id, populate_existing=True)
+    if membership is None or user is None or user.tenant_id != tenant_id or user.status != "active":
         raise InvError(
             AUTH_PROJECT_SCOPE,
             "project is not accessible to this principal",
@@ -248,6 +251,7 @@ def create_workspace(
         raise InvError(
             VAL_SCHEMA, "a workspace name is 2-128 characters", extra={"name": name}
         )
+    settings_service.lock_project(session, tenant_id, project_id)
     permission = require_project_access(
         session, tenant_id=tenant_id, project_id=project_id, user_id=created_by_user_id
     )
@@ -325,6 +329,10 @@ def set_workspace_tool(
     workspace = session.get(Workspace, workspace_id)
     if workspace is None or workspace.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "workspace not found")
+    settings_service.lock_project(session, tenant_id, workspace.project_id)
+    session.refresh(workspace, with_for_update=True)
+    if workspace.status not in {"provisioning", "ready", "suspended"}:
+        raise InvError(VAL_SCHEMA, "workspace is no longer configurable")
     if tool_name is not None and tool_name not in agents.BY_NAME:
         raise InvError(
             VAL_SCHEMA,
@@ -359,9 +367,9 @@ def set_workspace_tool(
     body = workspace_body(workspace)
     # Said beside the choice, not instead of it: the node decides whether this
     # is usable right now, and the answer can change between requests.
-    body["toolReadiness"] = (
-        agents.adapter_for(tool_name).readiness() if tool_name else None
-    )
+    body["toolReadiness"] = ({"adapter": tool_name, "nodeId": workspace.node_id,
+        "ready": False, "state": "unknown", "measurementScope": "workspace-node",
+        "reason": "Fresh authenticated Node tool observation is required"} if tool_name else None)
     return body
 
 

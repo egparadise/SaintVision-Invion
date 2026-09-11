@@ -88,7 +88,7 @@ def create_app(
 
     @app.middleware("http")
     async def _trace(request: Request, call_next):
-        trace_id = parse_traceparent(request.headers.get("traceparent"))
+        trace_id = getattr(request.state, "trace_id", None) or parse_traceparent(request.headers.get("traceparent"))
         request.state.trace_id = trace_id
         response = await call_next(request)
         response.headers["traceparent"] = f"{TRACEPARENT_VERSION}-{trace_id}-{'0'*16}-01"

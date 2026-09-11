@@ -42,7 +42,7 @@ import datetime as dt
 import uuid
 from typing import Any, Final
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from ..db.models import (
@@ -50,6 +50,7 @@ from ..db.models import (
     Project,
     ProjectMember,
     ResourceOffer,
+    Node,
     User,
     Workspace,
 )
@@ -92,6 +93,32 @@ WORKSPACE_TRANSITIONS: Final[dict[str, frozenset[str]]] = {
 # --------------------------------------------------------------------------
 
 
+def lock_project(session: Session, tenant_id: uuid.UUID, project_id: str) -> Project:
+    # Serialize every membership writer before checking the actor and owner count.
+    project = session.scalars(select(Project).where(
+        Project.tenant_id == tenant_id, Project.project_id == project_id
+    ).with_for_update().execution_options(populate_existing=True)).one_or_none()
+    if project is None:
+        raise InvError(AUTH_PROJECT_SCOPE, "project is not accessible to this principal")
+    return project
+
+
+def require_global_administrator(session: Session, *, tenant_id: uuid.UUID,
+                                 user_id: str, permission: str,
+                                 target_user_id: str | None = None) -> None:
+    # Project ownership never grants tenant administration. Sorted user locks
+    # also serialize two administrators changing each other's status.
+    session.scalars(select(User).where(
+        User.tenant_id == tenant_id,
+        User.user_id.in_(sorted({user_id, target_user_id or user_id})),
+    ).order_by(User.user_id).with_for_update().execution_options(populate_existing=True)).all()
+    allowed = session.execute(text(
+        "SELECT public.business_admin_allowed(:t,:u,:p)"
+    ), {"t": tenant_id, "u": user_id, "p": permission}).scalar_one()
+    if not allowed:
+        raise InvError(AUTH_PROJECT_SCOPE, "current tenant administration permission required")
+
+
 def effective_permission(
     session: Session, *, tenant_id: uuid.UUID, project_id: str, user_id: str
 ) -> dict[str, Any]:
@@ -109,8 +136,8 @@ def effective_permission(
     project = session.get(Project, project_id)
     if project is None or project.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "project not found")
-    user = session.get(User, user_id)
-    membership = session.get(ProjectMember, (tenant_id, project_id, user_id))
+    user = session.get(User, user_id, populate_existing=True, with_for_update={"read": True})
+    membership = session.get(ProjectMember, (tenant_id, project_id, user_id), populate_existing=True)
 
     active = (
         project.status == "active"
@@ -135,12 +162,16 @@ def effective_permission(
 
 
 def require_administrator(
-    session: Session, *, tenant_id: uuid.UUID, project_id: str, user_id: str
+    session: Session, *, tenant_id: uuid.UUID, project_id: str, user_id: str,
+    allow_archived: bool = False,
 ) -> dict[str, Any]:
     permission = effective_permission(
         session, tenant_id=tenant_id, project_id=project_id, user_id=user_id
     )
-    if not permission["canAdminister"]:
+    archived_owner = (allow_archived and permission["projectStatus"] == "archived"
+                      and permission["userStatus"] == "active"
+                      and permission["roleCode"] in CAN_ADMINISTER)
+    if not (permission["canAdminister"] or archived_owner):
         raise InvError(
             AUTH_PROJECT_SCOPE,
             "only a project owner may change project settings",
@@ -188,6 +219,7 @@ def set_member_role(
             f"unknown project role: {role_code!r}",
             extra={"allowed": list(PROJECT_ROLES)},
         )
+    lock_project(session, tenant_id, project_id)
     require_administrator(
         session, tenant_id=tenant_id, project_id=project_id, user_id=acting_user_id
     )
@@ -234,6 +266,7 @@ def remove_member(
     user_id: str,
     acting_user_id: str,
 ) -> None:
+    lock_project(session, tenant_id, project_id)
     require_administrator(
         session, tenant_id=tenant_id, project_id=project_id, user_id=acting_user_id
     )
@@ -251,6 +284,8 @@ def remove_member(
 def list_members(
     session: Session, *, tenant_id: uuid.UUID, project_id: str
 ) -> list[dict[str, Any]]:
+    project = session.get(Project, project_id, populate_existing=True)
+    project_active = project is not None and project.tenant_id == tenant_id and project.status == "active"
     rows = session.execute(
         select(ProjectMember, User)
         .join(
@@ -272,8 +307,8 @@ def list_members(
             "userStatus": user.status,
             # Shown beside the role because the role alone does not decide it:
             # a suspended owner may do nothing at all.
-            "canRequest": user.status == "active" and member.role_code in CAN_REQUEST,
-            "canApprove": user.status == "active" and member.role_code in CAN_APPROVE,
+            "canRequest": project_active and user.status == "active" and member.role_code in CAN_REQUEST,
+            "canApprove": project_active and user.status == "active" and member.role_code in CAN_APPROVE,
             "grantedAt": member.granted_at.isoformat(),
         }
         for member, user in rows
@@ -325,10 +360,11 @@ def set_project_status(
     """Archive or reactivate a project. Archiving stops all execution in it."""
     if status not in ("active", "archived"):
         raise InvError(VAL_SCHEMA, f"unknown project status: {status!r}")
+    project = lock_project(session, tenant_id, project_id)
     require_administrator(
-        session, tenant_id=tenant_id, project_id=project_id, user_id=acting_user_id
+        session, tenant_id=tenant_id, project_id=project_id, user_id=acting_user_id,
+        allow_archived=True,
     )
-    project = session.get(Project, project_id)
     project.status = status
     project.version += 1
     session.flush()
@@ -357,6 +393,8 @@ def set_workspace_status(
     workspace = session.get(Workspace, workspace_id)
     if workspace is None or workspace.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "workspace not found")
+    lock_project(session, tenant_id, workspace.project_id)
+    session.refresh(workspace, with_for_update=True)
     require_administrator(
         session,
         tenant_id=tenant_id,
@@ -425,6 +463,10 @@ def set_resource_offer(
     capability = session.get(NodeCapability, capability_id)
     if capability is None or capability.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "capability not found")
+    # Match placement's Node -> capability lock order; reread after waiting.
+    session.scalars(select(Node).where(Node.node_id == capability.node_id,
+                                      Node.tenant_id == tenant_id).with_for_update()).one()
+    session.refresh(capability, with_for_update=True)
 
     canonical = to_canonical(capability.kind, offered_quantity, unit)
     if canonical > capability.total_quantity:
@@ -438,14 +480,16 @@ def set_resource_offer(
             },
         )
 
-    previous = current_offer(
-        session, tenant_id=tenant_id, capability_id=capability_id, now=now
-    )
+    previous = session.scalars(select(ResourceOffer).where(
+        ResourceOffer.tenant_id == tenant_id, ResourceOffer.capability_id == capability_id,
+        ResourceOffer.effective_to.is_(None),
+    ).with_for_update().execution_options(populate_existing=True)).one_or_none()
     if previous is not None:
         if previous.offered_quantity == canonical:
             # Setting the same number is not a change. Writing a new row anyway
             # would fill the history with events that record nothing.
             return _offer_body(capability, previous, previous, now)
+        now = max(now, previous.effective_from + dt.timedelta(microseconds=1))
         previous.effective_to = now
 
     offer = ResourceOffer(

@@ -1,3 +1,13 @@
+---
+doc_id: "REPORT-CLAUDE-PROJECT-API-20260911"
+title: "Claude 사용자 프로젝트 업무 API 검증보고"
+version: "1.0.0"
+status: "review"
+author: "Claude"
+updated: "2026-09-11T10:44:51+09:00"
+source_of_truth: "Git"
+---
+
 # Claude — 사용자·프로젝트·업무 API 검증 보고
 
 - **작성자**: Claude
