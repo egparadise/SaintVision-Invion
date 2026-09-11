@@ -56,7 +56,21 @@ sys.path.insert(0, str(ROOT / "src"))
 #: Tables whose contents are digested rather than merely counted. These are the
 #: ones a restore exists to bring back intact; a count alone would not notice a
 #: row that came back with different bytes.
-DIGESTED = ("evidence_envelopes", "run_records", "artifacts", "backup_records")
+#: Evidence-bearing tables, in both schemas. The first version listed four
+#: public ones, which left out everything the kernel records — the evidence,
+#: the stop receipts and the committed results a restore mostly exists to bring
+#: back. A count notices a lost row; only a digest notices a changed one.
+DIGESTED = (
+    "public.evidence_envelopes",
+    "public.run_records",
+    "public.artifacts",
+    "public.backup_records",
+    "inv.evidence",
+    "inv.checkpoints",
+    "inv.node_stop_receipts",
+    "inv.result_commitments",
+    "inv.resource_leases",
+)
 
 
 class Postgres:
@@ -193,43 +207,114 @@ def _content_digest(dsn: str) -> dict[str, str]:
     """
     digests: dict[str, str] = {}
     with _conn(dsn) as conn:
-        for table in DIGESTED:
+        for qualified in DIGESTED:
+            schema, table = qualified.split(".", 1)
             try:
                 rows = conn.execute(
-                    f'SELECT to_jsonb(t)::text FROM public."{table}" t ORDER BY 1'
+                    f'SELECT to_jsonb(t)::text FROM "{schema}"."{table}" t ORDER BY 1'
                 ).fetchall()
-            except Exception:
-                digests[table] = "absent"
+            except Exception as error:
+                # Distinguished from an empty table: "could not read" and
+                # "read and found nothing" are different facts, and treating
+                # them alike is how a lost table passes verification.
+                digests[qualified] = f"unreadable:{type(error).__name__}"
                 continue
             digest = hashlib.sha256()
             for (row,) in rows:
                 digest.update(row.encode())
                 digest.update(b"\n")
-            digests[table] = digest.hexdigest()
+            digests[qualified] = digest.hexdigest()
     return digests
 
 
-def _fencing_state(dsn: str) -> dict[str, int]:
+def _fencing_state(dsn: str) -> dict[str, Any]:
     """The highest token issued, and the highest one a lease still holds.
 
-    Both matter. The sequence says what will be issued next; the leases say what
-    is out in the world and cannot be recalled.
+    A failed query is ``None``, never ``0``. The first version swallowed the
+    exception and returned zero, which is the worst possible answer here: a
+    permission error or a missing table made both sides read 0, the required
+    advance computed to 0, and the drill reported "fencing safe" — a false pass
+    on the single check that decides whether a restore can be accepted at all.
+
+    Not knowing is a result. It is reported as one, and it blocks the pass.
     """
+    state: dict[str, Any] = {}
     with _conn(dsn) as conn:
-        try:
-            issued = conn.execute(
-                "SELECT last_value FROM inv.fencing_token_seq"
-            ).fetchone()[0]
-        except Exception:
-            issued = 0
-        try:
-            held = conn.execute(
+        for key, sql_text in (
+            ("sequenceLastValue", "SELECT last_value FROM inv.fencing_token_seq"),
+            (
+                "highestHeldToken",
                 "SELECT coalesce(max(fencing_token), 0) FROM inv.resource_leases "
-                "WHERE released_at IS NULL"
-            ).fetchone()[0]
-        except Exception:
-            held = 0
-    return {"sequenceLastValue": int(issued), "highestHeldToken": int(held)}
+                "WHERE released_at IS NULL",
+            ),
+        ):
+            try:
+                state[key] = int(conn.execute(sql_text).fetchone()[0])
+            except Exception as error:
+                state[key] = None
+                state.setdefault("errors", {})[key] = type(error).__name__
+    return state
+
+
+def _archive_taken_at(pg, backup_path: Path, args):
+    """When the dump was actually taken, from the archive's own header.
+
+    ``pg_restore --list`` prints the archive's creation time. That is the moment
+    the backup represents; a file's mtime is the moment it was last written,
+    which a copy resets. An RPO computed from mtime measures the filesystem, not
+    the recovery point.
+
+    An explicit ``--backup-taken-at`` wins, because an operator restoring from a
+    media catalogue knows better than either.
+    """
+    if getattr(args, "backup_taken_at", None):
+        return dt.datetime.fromisoformat(args.backup_taken_at)
+    listed = pg.run("pg_restore", ["--list"], stdin=backup_path.read_bytes())
+    if listed.returncode != 0:
+        return None
+    for line in listed.stdout.decode("utf-8", "replace").splitlines():
+        if "Archive created at" not in line:
+            continue
+        stamp = line.split("Archive created at", 1)[1].strip()
+        # pg_restore ends the line with the *server's local* zone abbreviation
+        # ("... 08:53:45 UTC", "... 17:53:45 KST"). Assuming UTC would put the
+        # recovery point hours off in either direction, so the abbreviation is
+        # resolved against the database rather than guessed.
+        head, _, zone = stamp.rpartition(" ")
+        if not zone.isalpha():
+            head, zone = stamp, ""
+        for fmt in ("%a %b %d %H:%M:%S %Y", "%Y-%m-%d %H:%M:%S"):
+            try:
+                naive = dt.datetime.strptime(head.strip(), fmt)
+            except ValueError:
+                continue
+            offset = _zone_offset(zone, args)
+            if offset is None:
+                return None
+            return (naive - offset).replace(tzinfo=dt.timezone.utc)
+    return None
+
+
+def _zone_offset(abbrev: str, args) -> dt.timedelta | None:
+    """The UTC offset of a zone abbreviation, from Postgres' own table.
+
+    Returns ``None`` for an abbreviation Postgres does not know rather than
+    falling back to UTC: a silently wrong offset is a recovery point reported
+    hours from the truth, which is worse than reporting none.
+    """
+    if abbrev in ("", "UTC", "GMT", "Z"):
+        return dt.timedelta(0)
+    try:
+        import psycopg
+
+        with psycopg.connect(args.admin) as conn:
+            row = conn.execute(
+                "SELECT utc_offset FROM pg_timezone_abbrevs WHERE abbrev = %s",
+                (abbrev,),
+            ).fetchone()
+    except Exception:
+        return None
+    return row[0] if row else None
 
 
 def rehearse(args) -> dict[str, Any]:
@@ -276,11 +361,21 @@ def rehearse(args) -> dict[str, Any]:
         # can only ever pass — which makes it a check that proves nothing.
         backup_path = Path(args.from_backup)
         backup_bytes = backup_path.read_bytes()
-        backup_taken_at = dt.datetime.fromtimestamp(
-            backup_path.stat().st_mtime, dt.timezone.utc
-        )
+        # mtime is when the file was last written — copying or moving it resets
+        # that, and an RPO computed from it is a measurement of the filesystem.
+        # A custom-format dump records when it was actually taken; that is read
+        # from the archive, and when it cannot be, RPO is unknown rather than
+        # invented.
+        backup_taken_at = _archive_taken_at(pg, backup_path, args)
+        if backup_taken_at is None:
+            report["rpoUnknownReason"] = (
+                "the archive does not state when it was taken and file mtime is "
+                "not that time; pass --backup-taken-at to measure RPO"
+            )
         report["backupSource"] = str(backup_path)
-        report["backupTakenAt"] = backup_taken_at.isoformat()
+        report["backupTakenAt"] = (
+            backup_taken_at.isoformat() if backup_taken_at else None
+        )
         report["dumpSeconds"] = 0.0
         report["backupBytes"] = len(backup_bytes)
         report["backupSha256"] = hashlib.sha256(backup_bytes).hexdigest()
@@ -365,17 +460,31 @@ def _restore_and_verify(
         report["targetCounts"] = target_counts
         report["targetDigests"] = target_digests
         report["measuredRtoSeconds"] = measured_rto
-        report["measuredRpoSeconds"] = round(
-            (dt.datetime.now(dt.timezone.utc) - backup_taken_at).total_seconds(), 3
+        report["measuredRpoSeconds"] = (
+            round(
+                (dt.datetime.now(dt.timezone.utc) - backup_taken_at).total_seconds(),
+                3,
+            )
+            if backup_taken_at is not None
+            else None
         )
 
+        # A table that is unreadable on both sides compares equal and would
+        # otherwise pass. Absent from both is not "verified", it is "not
+        # verified" — the drill has no evidence either way and must say so.
+        unreadable = sorted(
+            t for t, n in target_counts.items()
+            if n == -1 or report["sourceCounts"].get(t) == -1
+        )
         missing = sorted(
             t for t, n in target_counts.items()
             if n != report["sourceCounts"].get(t)
         )
+        report["tablesUnreadable"] = unreadable
         differing = sorted(
             t for t, d in target_digests.items()
             if d != report["sourceDigests"].get(t)
+            or str(d).startswith("unreadable:")
         )
         privileges_match = (
             target_privileges["table"] == report["sourcePrivileges"]["table"]
@@ -390,29 +499,51 @@ def _restore_and_verify(
         # grants is one the runtime cannot connect to at all, because it refuses
         # to run as the owner — so losing them loses the only role it accepts.
         report["integrityVerified"] = (
-            not missing and not differing and privileges_match
+            not missing
+            and not differing
+            and not unreadable
+            and privileges_match
         )
 
         # ERR-DESIGN-006. The restored sequence must not issue a token a live
         # node already holds.
         target_fencing = _fencing_state(target_dsn)
         report["targetFencing"] = target_fencing
-        safe_floor = max(
-            source_fencing["sequenceLastValue"], source_fencing["highestHeldToken"]
+        values = (
+            source_fencing.get("sequenceLastValue"),
+            source_fencing.get("highestHeldToken"),
+            target_fencing.get("sequenceLastValue"),
         )
-        advance = max(0, safe_floor - target_fencing["sequenceLastValue"])
-        report["fencingAdvanceRequired"] = advance
-        report["fencingVerified"] = advance == 0
-        report["fencingNote"] = (
-            "the restored sequence is at or above every token the source had "
-            "issued or leased"
-            if advance == 0
-            else (
-                f"the restored sequence would reissue tokens a live node may "
-                f"hold; advance inv.fencing_token_seq by {advance} before "
-                f"accepting any command"
+        if any(v is None for v in values):
+            # Unknown is not safe. A drill that could not read the sequence has
+            # not shown the restore is acceptable, and saying "safe" because the
+            # query failed is the failure mode this check exists to prevent.
+            report["fencingAdvanceRequired"] = None
+            report["fencingVerified"] = False
+            report["fencingNote"] = (
+                "the fencing state could not be read on one or both sides "
+                f"({source_fencing.get('errors') or target_fencing.get('errors')}); "
+                "a restore whose token ordering is unknown has not been shown "
+                "to be safe"
             )
-        )
+        else:
+            safe_floor = max(
+                source_fencing["sequenceLastValue"],
+                source_fencing["highestHeldToken"],
+            )
+            advance = max(0, safe_floor - target_fencing["sequenceLastValue"])
+            report["fencingAdvanceRequired"] = advance
+            report["fencingVerified"] = advance == 0
+            report["fencingNote"] = (
+                "the restored sequence is at or above every token the source had "
+                "issued or leased"
+                if advance == 0
+                else (
+                    f"the restored sequence would reissue tokens a live node may "
+                    f"hold; advance inv.fencing_token_seq by {advance} before "
+                    f"accepting any command"
+                )
+            )
         return report
     finally:
         if not args.keep:
@@ -443,15 +574,19 @@ def record(report: dict[str, Any], args) -> str | None:
     from saintvision.db.session import tenant_scope
     from saintvision.services import pilot as pilot_service
 
-    passed = report["integrityVerified"] and report["fencingVerified"]
+    passed = _passed(report)
     engine = create_engine(args.record_dsn or args.source, future=True)
     factory = sessionmaker(engine, future=True, expire_on_commit=False)
     now = dt.datetime.now(dt.timezone.utc)
     tenant = _uuid.UUID(args.tenant)
 
-    measurement = pilot_service.DrillMeasurement(
-        measured_rpo_seconds=int(report["measuredRpoSeconds"]),
-        measured_rto_seconds=int(report["measuredRtoSeconds"]),
+    measurement = (
+        pilot_service.DrillMeasurement(
+            measured_rpo_seconds=int(report["measuredRpoSeconds"]),
+            measured_rto_seconds=int(report["measuredRtoSeconds"]),
+        )
+        if passed
+        else None
     )
     with factory() as session:
         with session.begin():
@@ -463,7 +598,7 @@ def record(report: dict[str, Any], args) -> str | None:
                     outcome="passed" if passed else "failed",
                     performed_by_user_id=args.user,
                     now=now,
-                    measurement=measurement if passed else None,
+                    measurement=measurement,
                     fencing_verified=report["fencingVerified"],
                     fencing_note=report["fencingNote"],
                     integrity_verified=report["integrityVerified"],
@@ -477,6 +612,21 @@ def record(report: dict[str, Any], args) -> str | None:
                 )
                 return drill.drill_id
     return None
+
+
+def _passed(report: dict[str, Any]) -> bool:
+    """One definition of a passing drill, used by the exit code and the record.
+
+    Kept in one place because the two disagreed in the first version: the
+    printed result said "verified" while the recorded row would have refused the
+    pass for want of measurements.
+    """
+    return bool(
+        report.get("integrityVerified")
+        and report.get("fencingVerified")
+        and report.get("measuredRpoSeconds") is not None
+        and report.get("measuredRtoSeconds") is not None
+    )
 
 
 def main() -> int:
@@ -506,6 +656,14 @@ def main() -> int:
         ),
     )
     parser.add_argument("--save-backup", help="write the dump to this path")
+    parser.add_argument(
+        "--backup-taken-at",
+        help=(
+            "ISO timestamp the backup represents. Overrides the archive header; "
+            "an operator restoring from a media catalogue knows this better "
+            "than the file does."
+        ),
+    )
     parser.add_argument("--keep", action="store_true", help="do not drop the restore")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -517,10 +675,12 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(report, indent=2, ensure_ascii=False))
-        return 0 if report["integrityVerified"] and report["fencingVerified"] else 1
+        return 0 if _passed(report) else 1
 
     print(f"backup        {report['backupBytes']} bytes, sha256 {report['backupSha256'][:16]}…")
     print(f"restore RTO   {report['measuredRtoSeconds']}s")
+    rpo = report.get("measuredRpoSeconds")
+    print(f"recovery RPO  {rpo}s" if rpo is not None else "recovery RPO  unknown")
     print(f"integrity     {'verified' if report['integrityVerified'] else 'FAILED'}")
     print(
         f"privileges    "
@@ -534,11 +694,13 @@ def main() -> int:
         print(f"                count differs: {table}")
     for table in report["tablesWithDifferentContent"]:
         print(f"                content differs: {table}")
+    for table in report.get("tablesUnreadable", []):
+        print(f"                unreadable (not verified either way): {table}")
     print(f"fencing       {'safe' if report['fencingVerified'] else 'UNSAFE'}")
     print(f"                {report['fencingNote']}")
     if report.get("drillId"):
         print(f"recorded      {report['drillId']}")
-    return 0 if report["integrityVerified"] and report["fencingVerified"] else 1
+    return 0 if _passed(report) else 1
 
 
 if __name__ == "__main__":
