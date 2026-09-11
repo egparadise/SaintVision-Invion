@@ -227,6 +227,201 @@ def _content_digest(dsn: str) -> dict[str, str]:
     return digests
 
 
+def _authorisation_model(dsn: str) -> dict[str, Any]:
+    """Roles, memberships, RLS flags and policies — the rest of the boundary.
+
+    Grants alone do not describe who can see what. ``inv_app`` is a non-owner
+    precisely so row level security applies to it, and RLS only applies when the
+    table has it **enabled and forced**: a restore that brings back the policies
+    but loses ``FORCE`` leaves every policy in place and silently inapplicable to
+    the owner. Losing a role membership does the same from the other direction.
+
+    Each part is digested separately so a failure names which part moved rather
+    than reporting one opaque mismatch.
+    """
+    parts: dict[str, Any] = {}
+    queries = {
+        "roles": (
+            "SELECT rolname, rolsuper, rolbypassrls, rolcanlogin, rolinherit "
+            "FROM pg_catalog.pg_roles WHERE rolname LIKE 'inv%' ORDER BY 1"
+        ),
+        "memberships": (
+            "SELECT r.rolname, m.rolname, a.admin_option "
+            "FROM pg_catalog.pg_auth_members a "
+            "JOIN pg_catalog.pg_roles r ON r.oid = a.roleid "
+            "JOIN pg_catalog.pg_roles m ON m.oid = a.member "
+            "WHERE r.rolname LIKE 'inv%' OR m.rolname LIKE 'inv%' ORDER BY 1,2"
+        ),
+        # relrowsecurity without relforcerowsecurity is RLS that the owner walks
+        # straight through, which is the shape this schema deliberately avoids.
+        "rowSecurity": (
+            "SELECT n.nspname, c.relname, c.relrowsecurity, c.relforcerowsecurity "
+            "FROM pg_catalog.pg_class c "
+            "JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace "
+            "WHERE n.nspname IN ('public','inv') AND c.relkind = 'r' ORDER BY 1,2"
+        ),
+        "policies": (
+            "SELECT schemaname, tablename, policyname, permissive, roles::text, "
+            "cmd, coalesce(qual,''), coalesce(with_check,'') "
+            "FROM pg_catalog.pg_policies "
+            "WHERE schemaname IN ('public','inv') ORDER BY 1,2,3"
+        ),
+    }
+    with _conn(dsn) as conn:
+        for key, sql_text in queries.items():
+            try:
+                rows = conn.execute(sql_text).fetchall()
+            except Exception as error:
+                # Same rule as everywhere else here: unknown is not a match.
+                parts[key] = f"unreadable:{type(error).__name__}"
+                parts.setdefault("counts", {})[key] = None
+                continue
+            parts[key] = hashlib.sha256(
+                "\n".join("|".join(map(str, r)) for r in rows).encode()
+            ).hexdigest()
+            parts.setdefault("counts", {})[key] = len(rows)
+    return parts
+
+
+def _definer_verdict(dsn: str) -> dict[str, Any]:
+    """Run the live definer-function audit against the restored database.
+
+    A SECURITY DEFINER function bypasses row level security, so its *restored*
+    definition is part of the isolation boundary, not a detail behind it. This
+    repository has twice shipped one that read across tenants, and both fixes
+    were ``CREATE OR REPLACE`` — which is exactly why the question can only be
+    answered about a database, and why a restore is the right place to ask it.
+    """
+    try:
+        from check_definer_functions import audit
+    except ImportError:
+        import sys as _sys
+
+        _sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from check_definer_functions import audit
+    try:
+        findings = audit(dsn)
+    except Exception as error:
+        return {"checked": None, "unsafe": None, "error": type(error).__name__}
+    unsafe = [f["function"] for f in findings if f["problems"]]
+    return {"checked": len(findings), "unsafe": len(unsafe), "functions": unsafe}
+
+
+def _service_resumption(
+    dsn: str, app_role: str, kernel_role: str
+) -> dict[str, Any]:
+    """Can the restored database actually serve a request, and does RLS scope?
+
+    "Restored" and "back in service" are different claims, and the drill has so
+    far only supported the first. The runtime connects as a non-owner without
+    BYPASSRLS, sets a transaction-local tenant scope and reads. Two roles,
+    because the authorisation model has two halves and a restore can lose either
+    one: ``inv_app`` holds USAGE on ``public`` and serves the request path,
+    while the execution record in ``inv`` is reached through ``inv_kernel``
+    membership. Checking only one would have declared the database in service
+    with half its access gone.
+
+    Then the part a grants digest cannot show: that RLS *scopes*. Two tenants
+    are seeded and read back under one scope; the other tenant's row must be
+    invisible, not merely covered by a policy that exists. Policies survive a
+    restore that drops ``FORCE``, and such a database passes every comparison
+    here while isolating nothing.
+
+    The seed runs inside a transaction that is always rolled back, so the drill
+    leaves no rows behind even under ``--keep``.
+    """
+    result: dict[str, Any] = {"appRole": app_role, "kernelRole": kernel_role}
+    probes = (
+        ("publicRead", app_role, "SELECT count(*) FROM public.projects"),
+        ("kernelRead", kernel_role, "SELECT count(*) FROM inv.runs"),
+    )
+    try:
+        with _conn(dsn) as conn:
+            for key, role, sql_text in probes:
+                with conn.transaction():
+                    conn.execute(f'SET LOCAL ROLE "{role}"')
+                    conn.execute(
+                        "SELECT set_config('inv.tenant_id', %s, true)",
+                        (str(uuid.UUID(int=0)),),
+                    )
+                    conn.execute(sql_text).fetchone()
+                    bypasses = conn.execute(
+                        "SELECT rolbypassrls FROM pg_roles "
+                        "WHERE rolname = current_user"
+                    ).fetchone()[0]
+                    # A role that bypasses RLS is not a working service, it is a
+                    # tenant boundary that is not there.
+                    result[key] = not bypasses
+                    result[f"{key}Bypasses"] = bool(bypasses)
+    except Exception as error:
+        result["error"] = f"{type(error).__name__}: {str(error).strip()[:200]}"
+        result["resumed"] = False
+        return result
+
+    result.update(_rls_scopes(dsn, app_role))
+    result["resumed"] = bool(
+        result.get("publicRead")
+        and result.get("kernelRead")
+        and result.get("rlsScopes")
+    )
+    return result
+
+
+def _rls_scopes(dsn: str, app_role: str) -> dict[str, Any]:
+    """Seed two tenants, read under one scope, require the other to be unseen.
+
+    Always rolled back. A restored database that returns both rows has policies
+    and no isolation, which every other check in this drill would call verified.
+    """
+    mine = uuid.UUID("00000000-0000-0000-0000-00000000d21e")
+    theirs = uuid.UUID("00000000-0000-0000-0000-00000000d21f")
+    try:
+        with _conn(dsn) as conn:
+            transaction = conn.transaction()
+            transaction.__enter__()
+            try:
+                for tenant, slug in ((mine, "drill-a"), (theirs, "drill-b")):
+                    conn.execute(
+                        "INSERT INTO public.tenants "
+                        "(tenant_id, slug, display_name) VALUES (%s, %s, %s)",
+                        (tenant, f"recovery-{slug}", f"recovery drill {slug}"),
+                    )
+                    conn.execute(
+                        "INSERT INTO public.projects "
+                        "(project_id, tenant_id, code, display_name) "
+                        "VALUES (%s, %s, %s, %s)",
+                        (
+                            f"prj_drill_{slug}",
+                            tenant,
+                            f"drill-{slug}",
+                            "recovery drill",
+                        ),
+                    )
+                conn.execute(f'SET LOCAL ROLE "{app_role}"')
+                conn.execute(
+                    "SELECT set_config('inv.tenant_id', %s, true)", (str(mine),)
+                )
+                visible = [
+                    row[0]
+                    for row in conn.execute(
+                        "SELECT tenant_id FROM public.projects "
+                        "WHERE project_id LIKE 'prj_drill_%'"
+                    ).fetchall()
+                ]
+            finally:
+                # Never commit. The drill is a measurement, not a writer.
+                transaction.__exit__(Exception, Exception("rollback"), None)
+    except Exception as error:
+        return {
+            "rlsScopes": False,
+            "rlsError": f"{type(error).__name__}: {str(error).strip()[:200]}",
+        }
+    return {
+        "rlsScopes": visible == [mine],
+        "rlsVisibleTenants": [str(t) for t in visible],
+    }
+
+
 def _fencing_state(dsn: str) -> dict[str, Any]:
     """The highest token issued, and the highest one a lease still holds.
 
@@ -350,6 +545,7 @@ def rehearse(args) -> dict[str, Any]:
     report["sourceCounts"] = _table_counts(args.source)
     report["sourceDigests"] = _content_digest(args.source)
     report["sourcePrivileges"] = _privileges(args.source)
+    report["sourceAuthorisation"] = _authorisation_model(args.source)
     source_fencing = _fencing_state(args.source)
     report["sourceFencing"] = source_fencing
 
@@ -455,6 +651,7 @@ def _restore_and_verify(
         target_counts = _table_counts(target_dsn)
         target_digests = _content_digest(target_dsn)
         target_privileges = _privileges(target_dsn)
+        target_authorisation = _authorisation_model(target_dsn)
         measured_rto = round(time.monotonic() - restore_started, 3)
 
         report["targetCounts"] = target_counts
@@ -492,6 +689,33 @@ def _restore_and_verify(
             == report["sourcePrivileges"]["column"]
         )
         report["targetPrivileges"] = target_privileges
+
+        # Roles, memberships, RLS enable/force and policies. Compared part by
+        # part so a failure says which part moved.
+        source_auth = report["sourceAuthorisation"]
+        authorisation_moved = sorted(
+            part
+            for part in ("roles", "memberships", "rowSecurity", "policies")
+            if target_authorisation.get(part) != source_auth.get(part)
+            or str(target_authorisation.get(part)).startswith("unreadable:")
+        )
+        report["targetAuthorisation"] = target_authorisation
+        report["authorisationChanged"] = authorisation_moved
+        report["authorisationRestored"] = not authorisation_moved
+
+        # The restored definitions of every SECURITY DEFINER function, which
+        # bypass RLS and are therefore part of the boundary being restored.
+        definer = _definer_verdict(target_dsn)
+        report["definerFunctions"] = definer
+        report["definerFunctionsSafe"] = definer.get("unsafe") == 0
+
+        # Restored is not the same claim as back in service.
+        resumption = _service_resumption(
+            target_dsn, args.app_role, args.kernel_role
+        )
+        report["serviceResumption"] = resumption
+        report["serviceResumed"] = bool(resumption.get("resumed"))
+
         report["privilegesRestored"] = privileges_match
         report["tablesWithDifferentCounts"] = missing
         report["tablesWithDifferentContent"] = differing
@@ -503,6 +727,9 @@ def _restore_and_verify(
             and not differing
             and not unreadable
             and privileges_match
+            and not authorisation_moved
+            and report["definerFunctionsSafe"]
+            and report["serviceResumed"]
         )
 
         # ERR-DESIGN-006. The restored sequence must not issue a token a live
@@ -664,6 +891,24 @@ def main() -> int:
             "than the file does."
         ),
     )
+    parser.add_argument(
+        "--app-role",
+        default="inv_app",
+        help=(
+            "the non-owner role the runtime connects as; the drill sets it and "
+            "performs the read a request performs, because a database that "
+            "cannot serve one has not been recovered"
+        ),
+    )
+    parser.add_argument(
+        "--kernel-role",
+        default="inv_kernel",
+        help=(
+            "the role with access to the execution record in inv; the runtime "
+            "reaches it through membership, so a restore can lose this half of "
+            "the model while the request path still works"
+        ),
+    )
     parser.add_argument("--keep", action="store_true", help="do not drop the restore")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -696,6 +941,39 @@ def main() -> int:
         print(f"                content differs: {table}")
     for table in report.get("tablesUnreadable", []):
         print(f"                unreadable (not verified either way): {table}")
+    auth = report.get("sourceAuthorisation", {}).get("counts") or {}
+    print(
+        f"authorisation "
+        f"{'restored' if report.get('authorisationRestored') else 'CHANGED'}"
+        f"  ({auth.get('roles')} roles, {auth.get('memberships')} memberships, "
+        f"{auth.get('policies')} policies, {auth.get('rowSecurity')} tables' RLS flags)"
+    )
+    for part in report.get("authorisationChanged", []):
+        print(f"                differs: {part}")
+    definer = report.get("definerFunctions") or {}
+    print(
+        f"definer fns   "
+        f"{'bound to tenant scope' if report.get('definerFunctionsSafe') else 'UNSAFE'}"
+        f"  ({definer.get('checked')} checked, {definer.get('unsafe')} unsafe)"
+    )
+    for name in definer.get("functions") or []:
+        print(f"                bypasses RLS without binding the scope: {name}")
+    resumption = report.get("serviceResumption") or {}
+    print(
+        f"service       "
+        f"{'resumed' if report.get('serviceResumed') else 'NOT RESUMED'}"
+        f"  (public as {resumption.get('appRole')}, "
+        f"inv as {resumption.get('kernelRole')}, "
+        f"RLS scopes={resumption.get('rlsScopes')})"
+    )
+    for note in (resumption.get("error"), resumption.get("rlsError")):
+        if note:
+            print(f"                {note}")
+    if resumption.get("rlsScopes") is False and resumption.get("rlsVisibleTenants"):
+        print(
+            "                another tenant's row was visible under this scope: "
+            f"{resumption['rlsVisibleTenants']}"
+        )
     print(f"fencing       {'safe' if report['fencingVerified'] else 'UNSAFE'}")
     print(f"                {report['fencingNote']}")
     if report.get("drillId"):
