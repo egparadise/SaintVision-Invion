@@ -9,7 +9,7 @@ tags:
   - product
   - architecture
 status: baseline
-updated: 2026-09-09
+updated: 2026-09-11
 ---
 
 > [!important] 기존 설계 원문 참조
@@ -141,3 +141,8 @@ Claude Code, Codex, Orca 계열 도구, Antigravity와 기타 상용 또는 오�
 - [[Dev Workspace CLI Git Docker MLOps AI CLI 통합 설계]]
 - [[개발 플랜]]
 - [[Ontology 설계]]
+
+
+## 작업 재개 진입점
+
+[[전체 개발 진행 현황]] → 자기 Agent 작업판 → [[Agent 지속 개발 운영 규칙]]. 매 작업의 결과·검증·다음 첫 행동을 기록한다.

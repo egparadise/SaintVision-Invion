@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-AGENT-001"
 title: "Agent 역할과 인계 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-09T15:10:54+09:00"
+updated: "2026-09-11T17:15:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -24,6 +24,8 @@ tags: ["saintvision", "final-plan"]
 Codex는 공통 계약 통합 책임자다. Claude는 중간 난도 구현과 독립 검토를 소유한다. Gemini는 디자인 결정과 Frontend·웹 배포를 소유한다. 개발 Agent 역할은 제품 내부 Supervisor/Executor/Verifier와 혼동하지 않는다.
 
 ## 시작 시 읽을 Context
+
+최우선 재개 페이지는 [[전체 개발 진행 현황]]과 [[Codex 작업 현황]]·[[Claude 작업 현황]]·[[Gemini 작업 현황]]·[[Orca 작업 현황]]이다. 시작/종료 기록과 공통 집계·동시 수정 처리 규칙은 [[Agent 지속 개발 운영 규칙]]을 따른다. 수신 확인 전에 타 Agent가 실행 중/검토 완료라고 표시하지 않는다.
 
 1. 저장소 루트 `AGENTS.md`와 자신의 `CLAUDE.md` 또는 `GEMINI.md`.
 2. [[최종 개발 계획 - 모든 개발의 지침]]과 [[설계 충돌 정정 및 ADR]].
