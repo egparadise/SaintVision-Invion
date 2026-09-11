@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.13.0"
+version: "1.14.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T11:34:00+09:00"
+updated: "2026-09-11T13:23:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 계정 통합 후속: [[2026-09-11_ACCOUNT-KERNEL_Codex_검증보고]]와 [[Codex 계정과 실행 커널 통합 계약]]에서 Claude 서비스/OIDC를 같은 kernel HTTP 경계에 연결하고 별도 관리 권한·현재 tenant/멤버십·Project/Node 직렬화 및 0026/0027 이력 병합을 구현했다. 코드 149b565를 push했으며 로컬 DB/실행 증거를 해당 보고에 고정한다. 운영 계정/subject/project provisioning·public offer↔kernel 자원 연결·Workspace 준비와 결과 조회는 Claude, 실제 API/화면과 [[2026-09-11_GEMINI-ZERO-MOCK_Codex_후속검토]] P1은 Gemini, 실제 원격 설치 확인·장비 시험은 Codex의 다음 작업이다. 독립 Claude 재검토·CI 및 실제 운영 인수는 미완료다. 아래 과거 미연결 문구는 해당 SHA 당시 상태다.
 
 2026-09-11 원격 Node 배포 후속: [[2026-09-11_REMOTE-WORKSPACE_Codex_검증보고]]에서 새 설치본 0123640을 게시하고 기존 identity/key/journal 보존·실패 rollback 3개, 서버 시험 도구 650ca0b의 로컬 실제 실행/취소/출력 복구 7개를 검증했다. Codex의 바로 다음 작업은 [[2026-09-11_REMOTE-WORKSPACE_다른PC설치안내]]의 worker 설치 JSON 확인 후 같은 7개를 실제 192.168.45.225에 실행하는 것이다. 현재 SSH/WinRM 경로 없음·lan-observe-v1이라 실제 원격 설치/실행 완료가 아니다. 기존 운영 DB/gate/권한은 유지하고 장비 시험은 격리 DB에서 수행한다. Claude 운영 identity/업무 API·독립 검토, Gemini 실제 UI 인수와 후속 GPU/장시간·다중 Node 범위는 남는다.
 

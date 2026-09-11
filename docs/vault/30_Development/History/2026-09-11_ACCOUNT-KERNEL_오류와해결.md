@@ -1,10 +1,10 @@
 ---
 doc_id: "ERROR-ACCOUNT-KERNEL-20260911"
 title: "ACCOUNT-KERNEL 오류와 해결"
-version: "1.0.0"
-status: "in_progress"
+version: "1.0.1"
+status: "review"
 author: "Codex"
-updated: "2026-09-11T13:10:00+09:00"
+updated: "2026-09-11T13:25:48+09:00"
 source_of_truth: "Git"
 ---
 
@@ -29,3 +29,5 @@ Claude 5e0fed9와 Codex 97e68af를 통합 검토했다. [[Codex 계정과 실행
 | 새 public project가 kernel에 없으면 Run ledger FK 쓰기가 권한 검사보다 먼저 실패 | Control.create에서 현재 grant를 먼저 검사, 미연결 프로젝트도 403으로 거부 |
 
 진단 로그·시험 DB 연결 설정은 .work의 접근 제한된 실행 폴더에 보존한다. 공개 기록에는 testcase 상태와 코드 SHA만 사용한다. 이 작업으로 운영 Node/DB/로그인/방화벽을 변경하지 않았다.
+
+최종 재검증은 clean 코드 149b565에서 기본/DB 정적 검사 290개와 격리 통합 243개 통과(exit 0)다. 상세 증거는 [[2026-09-11_ACCOUNT-KERNEL_Codex_검증보고]]를 따른다. GitHub CI는 계정 결제 제한으로 시작되지 않았으며 로컬 검사 성공과 구분한다. Obsidian index의 외부 수정은 원문 바이트를 Evidence/account-kernel-sync-proposal.json에 보존하고 기존 History·추가 Gemini 보고를 정본에 반영한 뒤 동기화한다.
