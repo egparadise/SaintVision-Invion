@@ -54,16 +54,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       setAuthToken(response.access_token);
       onLoginSuccess(response.user);
     } catch (err: any) {
-      console.warn('Real OIDC /v1/auth/token returned error or offline, providing resilient fallback:', err);
-      // If server returned ProblemDetails or network failed, fallback gracefully to authenticated admin
-      const fallbackUser = {
-        id: 'usr_01JABCDEF_ADMIN',
-        name: selectedIdp === 'internal-keycloak' ? 'Keycloak 통합 관리자' : 'AD 도메인 관리자',
-        role: 'cluster:admin',
-        tenantId: '00000000-0000-0000-0000-000000000001',
-      };
-      setAuthToken('saintvision_token_dev_verified_jwt_admin_s256');
-      onLoginSuccess(fallbackUser);
+      console.error('OIDC /v1/auth/token authentication failed:', err);
+      const detail = err.detail || err.message || '인증 서버(/v1/auth/token) 연결에 실패했습니다.';
+      setErrorMessage(`인증 실패: ${detail}`);
     } finally {
       setIsLoading(false);
     }
