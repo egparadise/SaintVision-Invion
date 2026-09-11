@@ -27,3 +27,9 @@ Task DEVELOPMENT-AUDIT-20260911 / owner Codex / reviewer Claude 대기. base SHA
 새 제품/장비 시험은 수행하지 않았다. source f4fe37e의 기존 로컬305개/18경로, Claude 로컬 복원 작성자 보고, Gemini 정적 검토의 범위를 구분했다. 원래 registry 상태를 done으로 바꾸지 않았고 타 Agent 코드/운영 서버/계정/DB를 수정하지 않았다. 다음 owner는 신규 지적별 Gemini/Claude, 공통 통합·원격 실행 Codex이며 감사 문서 독립 reviewer는 Claude다.
 
 2026-09-11T16:16:52+09:00 전달 전 동기화: `--apply`는 8개 파일 반영/388개 목적지 hash 일치, 이어 `--check`는 대기0/충돌0으로 각각 exit 0이었다. 이 기록 추가분도 같은 state로 반영한다.
+
+## Git·CI·전달 결과
+
+감사 구현/보고 commit `96957f808bfaf6f8ee842179e238a55b93dd5edb`를 기존 agent/codex/resource-offer-integrity에 push했다(exit 0). 새 PR을 만들지 않고 PR22의 기존 인계 자료에 포함했다. 388개 파일의 Obsidian 최종 check는 대기0/충돌0, exit 0이었다.
+
+2026-09-11T16:17:24+09:00 동일 SHA CI 조회: Core Build 34573668217, Documentation Build 34573668233, Backend Build 34573668194, Core Build 34573665422, Backend Build 34573665509, Documentation Build 34573665353. 모든 workflow는 기존 billing/spending 제한으로 job 시작 전 실패했다. 로컬 문서/온톨로지 검증 성공을 제품 CI 성공으로 표시하지 않는다. 결제 변경이나 수동 반복 재실행은 하지 않았다. 이 전달 기록 추가분도 commit/push 및 같은 state로 동기화한다.
