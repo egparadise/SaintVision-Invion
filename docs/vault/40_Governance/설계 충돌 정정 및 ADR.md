@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.1"
+version: "1.35.2"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T01:57:25+09:00"
+updated: "2026-09-12T02:08:57+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -127,3 +127,6 @@ ADR-080(archive 설정과 운영 RPO 분리·command/library marker·공통 CLI/
 
 
 ADR-081(private Linux 백업 비파괴 게시·file/directory sync·저장 바이트/identity 재검사·BackupRecord/drill 원자 기록·실패 후 파일 보존)은 [[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]와 [[Codex DB 함수 감사와 복원 판정 검토]]를 따른다. 운영 RPO·별도 장애 영역·Windows 네이티브 저장 지원을 뜻하지 않는다.
+
+
+ADR-082(tenant/project/user/contract별 관측 비교·lock 이후 일관 transaction·관측시각 보존·owner 전용 명시 기록·현재 인가 unknown)과 ADR-083(AC-12 기록 목록과 운영 인수 증거 분리·만료/목표/criterion 검사·공통CLIexit)는 [[Codex 권한 관측과 운영 인수 집계 계약]]과 [[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]]를 따른다. 운영 Evidence 평가 수집기·실장비·독립 인수 완료가 아니다.

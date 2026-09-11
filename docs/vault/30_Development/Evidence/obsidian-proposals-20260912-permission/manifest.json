@@ -1,0 +1,15 @@
+{
+  "scope": "Preserved external author reports; not independent acceptance",
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-permission/progress.txt",
+      "externalSHA256": "6dca59f0dc3a3096ebbb1fa7806495dae3112fc661623f3db9408ef8cce52efd"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-permission/gemini.txt",
+      "externalSHA256": "27d922eb6b794a7dd91d7f02fb043237ea6a32f9f27de130ee6e0d1f8095c32c"
+    }
+  ]
+}

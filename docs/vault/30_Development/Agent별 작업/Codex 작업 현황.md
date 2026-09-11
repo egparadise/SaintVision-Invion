@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.10"
+version: "1.0.11"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:57:25+09:00"
+updated: "2026-09-12T02:08:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -176,3 +176,8 @@ source_of_truth: "Git"
 ## 최신 작업 — BACKUP-LEDGER
 
 420b81c Linux63/core50 완료, [[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]. PR19 draft/CI 계정 차단/Claude 독립 검토 pending. 다음 첫 행동: d63717f snapshot 프로젝트/관측시점/순서 계약 확정 및 수정본 검토, ade5bb8 AC-12 집계의 운영 증거 범위 검토. CX-03 프로필 미수신 상태는 별도.
+
+
+## 최신 작업 — PERMISSION-SNAPSHOT
+
+9755c60 Linux74/core55, [[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]]. d63717f P1/P2 보완, ade5bb8 원본 집계 과장4개 재현/수정. PR19 draft/CI 계정 제한/Claude 독립 review pending. 다음: 실제 운영 Evidence 수집·검증 경로와 최신 변경 공통 계약 검토; 원격 profile 수신 시 CX-03 실제7개.
