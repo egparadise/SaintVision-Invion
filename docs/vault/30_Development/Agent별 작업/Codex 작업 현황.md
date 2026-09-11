@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T23:56:33+09:00"
+updated: "2026-09-12T00:24:11+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,7 +41,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-08 / AC-01, AC-04, AC-08.
-- 다음 첫 행동: 29c810f에서 F1의 기존 잠금 보호를 실제 확인했다. Claude 재검토를 기다리며 F2 감사 intent와 Node 중복 방어를 구분해 보강한다. Gemini 858763c의 정본 API/운영 인수 finding도 추적한다.
+- 다음 첫 행동: 29c810f에서 F1의 기존 잠금 보호를 실제 확인했다. F2 intent1460634를 전달했고 Claude 재검토를 기다리며 CX-02 운영 credential/Storage 계약을 진행한다. Gemini 858763c의 정본 API/운영 인수 finding도 추적한다.
 - 필요한 합격 증거: review finding별 해결 SHA/독립 검토, 현재 적용 DB 함수의 실제 다른 tenant 거부, 계약·migration 이력 보존. CI와 main 상태 별도.
 - 선행/차단과 해소 담당: 검토할 코드 확보됨. 독립 승인자는 CL-01.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
@@ -124,14 +124,14 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 카드 | OFFER-SNAPSHOT / CX-01 F1 재검증, reviewer pending |
-| owner / 진행판 / KST | Codex / 1.0.17 / 2026-09-11T23:57:24+09:00 |
-| branch / base / 검증 | agent/codex/workspace-bridge / ade6721 / clean 29c810f |
-| 작업 | 실제 HTTP offer와 receipt-backed release의 잠금 직렬화 회귀 |
-| 검증 | PostgreSQL36 pass, 0skip, exit0; 잠금 제거 변이 exit1 / 원본 복구 |
-| CI / peer / 운영 | CI 시작 전 계정 제한, Claude F1 재검토 pending, 전체 운영 인수 미완료 |
-| 다음 첫 행동 / owner | F2 pre-dispatch intent와 응답 유실 감사 / Codex, 이후 CX-02 |
-| History / PR / sync | [[2026-09-11_OFFER-SNAPSHOT_Codex_검증보고]] / PR19 / 전달 영수증에 기록 |
+| 마지막 작업 / 카드 | PTY-INTENT / CX-01 F2 구현 전달, reviewer pending |
+| owner / 진행판 / KST | Codex / 1.0.18 / 2026-09-12T00:24:11+09:00 |
+| branch / base / 구현·검증 | agent/codex/workspace-bridge / fd32eda / 1460634 |
+| 작업 | immutable 입력 intent 선기록, 후행 완료 audit, 불확실 입력의 digest/순번 보호 |
+| 검증 | clean Linux61/core25 exit0; upgrade21 경로 exit0(문서 Evidence만 dirty) |
+| CI / peer / 운영 | CI6 시작 전 계정 제한, Claude 재검토 pending, 운영 인수 미완료 |
+| 다음 첫 행동 / owner | CX-02 운영 credential/Storage 계약 / Codex; F1/F2 독립 검토 / Claude |
+| History / PR / sync | [[2026-09-12_PTY-INTENT_Codex_검증보고]] / PR19 / History 전달 영수증 |
 
 ## 2026-09-11 18:53 Codex 수신·검증·후속 기록
 
@@ -149,3 +149,8 @@ source_of_truth: "Git"
 - 작업: F1 실제 API/lease release 경합 회귀. 확인: 실 PostgreSQL36개 exit0, 잠금 한 줄 제거 변이 exit1, 원본 복구. d14db0a에도 잠금이 있어 F1 전제 재검토를 요청한다. 제품/migration 변경 없음.
 - 다음 첫 행동: F2 pre-dispatch intent/sequence/hash 감사와 응답 유실 정합성 보강; 이후 CX-02. 과거 snapshot 수정 계획은 최신 실험으로 대체.
 - [[2026-09-11_OFFER-SNAPSHOT_Codex_검증보고]], [[2026-09-11_OFFER-SNAPSHOT_오류와해결]]. 전체57.29%(표시55%) 유지. CI 계정 제한·peer·원격 인수 미완료.
+
+## PTY-INTENT 최신 작업 → 확인 → 다음
+
+- 2026-09-12T00:24:11+09:00 / CX-01 / owner Codex / reviewer Claude pending. base fd32eda →1460634, PR19.
+- 작업/확인: intent/완료 분리와 replay 보호, Linux61/core25/upgrade21 통과. [[2026-09-12_PTY-INTENT_Codex_검증보고]]. 다음 첫 행동은 CX-02 운영 credential 참조/회수/로그 및 Storage 계약이다. F1/F2 독립 검토·원격 실행 인수·CI는 남는다.
