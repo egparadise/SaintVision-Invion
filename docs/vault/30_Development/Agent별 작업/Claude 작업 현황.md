@@ -184,6 +184,12 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - `data_checksums=off`: 이 시험은 복원본을 **원본과** 대조하므로, 원본에서 이미 손상된 페이지는 양쪽에서 같게 읽혀 모든 대조를 통과한다. 이 도구는 원본이 온전했다고 말해주지 않는다. initdb 시점에만 켤 수 있어 운영 배포 전 결정이 필요하다.
 - **인수용 gate를 추가했다**: `--require-operational-rpo SECONDS`. 설정이 그 이하의 한계를 확립하지 못하면 **거부**한다. opt-in이라 일반 기능 시험은 막지 않는다 — 인수 증거를 요구하는 것은 의도적 행위여야 하기 때문이다.
 - 실제 검증 증거(로컬 PostgreSQL 16): 기능 시험은 exit 0이되 한계는 NOT ESTABLISHED로 보고. 같은 시험에 `--require-operational-rpo 900`을 주면 **exit 1**. `archive_mode=on`·`archive_command`·`archive_timeout=300`으로 띄운 probe 서버에서는 한계 300s로 읽히고 900s 목표는 만족, 60s 목표는 불만족. 판정을 순수 함수로 분리해 시험 10개 — 가장 필요한 분기(아카이빙은 켰지만 `archive_timeout=0`이라 아무것도 한계 짓지 못한 경우)는 `-c archive_timeout`으로 띄운 서버에서 `ALTER SYSTEM`이 먹지 않아 **실서버로는 도달 불가**였고, 그래서 처음에 시험되지 않았다.
+- 이어서 수행(d63717f) — **권한 재검증을 실제 절차로 만들었다**: 카드가 지목한 "권한 재검증"은 오늘의 권한을 마지막으로 승인된 상태와 비교하는 일이다. 기록자 `pilot.take_permission_snapshot`은 S12부터 있었지만 **호출자가 없었다** — 서비스는 기록할 줄 알고 아무도 수집할 줄 몰랐다. 두 번째 기록자를 만들지 않고 **수집자를 붙였다**.
+  - 보고서가 출력한 **바로 그 계산**에서 기록한다. 따로 조회해 만들면 옆의 보고서와 어긋나고, 그 사실은 사고 중에 스냅샷 두 개를 비교할 때 처음 알게 된다.
+  - 쓰기는 opt-in(`--snapshot`)이다. 기본은 운영에 그대로 겨눌 수 있는 읽기이며, 보고만 하면 아무것도 기록하지 않음을 시험한다.
+  - "이전 스냅샷 없음"과 "변경 없음"을 구분한다(`changed=None`). 없음은 같음이 아니다 — 복원 시험에서 누락 대 누락에 필요했던 것과 같은 구분이다.
+- **이 과정에서 찾은 내 도구의 결함 2건(고침)**: (1) `mayApprove`가 서로 다른 두 권한을 한 답으로 뭉갰다. 업무 승인은 project 역할에서 오고, 특권 operator 투표는 `inv.operator_grants.can_approve`에서 오며 `workspace_git`의 `_actor`가 투표를 세기 전에 그것을 확인한다. 그래서 `can_approve=false`인 project owner를 "승인 가능"으로 보고해 **실제보다 과장**했다. 이제 `mayApproveInProject`와 `mayApproveAsOperator`로 나눠 보고한다. (2) 도구가 `src`를 `sys.path`에 넣지 않아 첫 `--snapshot` 실행이 `ModuleNotFoundError`로 죽었고, SQLAlchemy에 psycopg 드라이버를 명시해야 했다.
+- 추가 검증 증거: 읽기는 기록 0건. 첫 스냅샷은 비교 대상 없음. 변경 없으면 digest 동일. `can_approve` 회수 → digest 이동·CHANGED 보고. 되돌리면 digest가 **이전 값으로 복귀**(권한 상태의 순수 함수라면 그래야 한다). 시험 15개, 변조 2종(operator 승인을 항상 참으로 되돌리기, drift 판정 끄기)에서 각각 2개씩 실패.
 - 부수 발견(보고만, 수정은 운영 행위): `docker-compose.prod.yml`에 `POSTGRES_PASSWORD=postgres`와 `inv_app:apptestonly`가 그대로 있다. prod 이름을 단 파일의 기본 credential이다.
 - 남은 문제: 연속 아카이빙·보관 매체·백업 주기는 **운영 결정**이며 CX-09 릴리스 시험과 함께 정해야 한다. 알람/worker 재시작/partition/장시간 표본과 사용자 인수는 미수행이고, CL-02의 실제 운영 입력과 CX-09 공동 시나리오가 선행이다. 작성자(Claude)와 승인자(Codex)는 구분한다.
 - 다음 첫 행동: PITR·보관 매체·주기 결정을 CX-09와 함께 받는다. 결정되면 같은 gate로 실측해 인수 증거를 만든다. 담당 Claude, 결정 Codex·운영자.
