@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.3"
+version: "1.35.4"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T02:31:57+09:00"
+updated: "2026-09-12T02:53:57+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -133,3 +133,6 @@ ADR-082(tenant/project/user/contract별 관측 비교·lock 이후 일관 transa
 
 
 ADR-084(백업 bytes 검증 전 tenant/row잠금·기존checksum 불변 비교·검증 성공 savepoint·항목별 sweep 실패 격리·과거 관측과 현재 정상 분리)는 [[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]를 따른다. open-time 경로 보호·durable 실패 관측/Evidence 연결·운영 인수 완료가 아니다.
+
+
+ADR-085(명시적 worker ReadRoot·root identity pin·Linux descriptor/Windows reparse handle 경계·N+1 bounded unbuffered 두 번의 hash 관측·같은 timestamp의 덮어쓰기 방어)는 [[Codex 허용 저장소 파일 검증 계약]]과 [[2026-09-12_BACKUP-ROOT_Codex_검증보고]]를 따른다. node identity·snapshot·운영 RPO 인수의 대체물이 아니다.
