@@ -33,7 +33,7 @@ def account_api(app_engine, app_sessionmaker, owner_engine, org, tmp_path):
     business = create_app(engine=app_engine, settings=Settings(database_url='unused'),
         verifier=OidcPrincipalVerifier(jwt.auth, app_sessionmaker), clock=lambda: NOW)
     with TestClient(kernel_app(tokens=jwt.auth, business=business), raise_server_exceptions=False) as client:
-        yield SimpleNamespace(client=client, jwt=jwt,
+        yield SimpleNamespace(client=client, business=business, jwt=jwt,
             headers=lambda who='owner': {'Authorization':'Bearer '+jwt.token(who)})
 
 

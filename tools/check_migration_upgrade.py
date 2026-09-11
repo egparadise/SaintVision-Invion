@@ -41,6 +41,8 @@ def main():
         "0029_run_outputs",
         "0030_provisioning_integrity",
         "0030_apply_resource_offer",
+        "0031_resource_offer_integrity",
+        "0031_workspace_input_state",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
