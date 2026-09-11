@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+CL-05 (Claude, 2026-09-12): dcad652. Context의 redaction을 caller 선언에서 **거부**로 바꿨다. 단위 시험 13개는 배선을 끊어도 전부 통과했고, DB를 거치는 배선 시험만 그것을 잡았다. Context에 호출자가 없다는 점과 TTL이 수명 결정을 먼저 요구한다는 점을 남은 문제로 기록했다.
+
 CL-02 (Claude, 2026-09-12): 5995b8b. 운영 준비 판정을 입력·권한·실행 admission 셋으로 분리하고 각 거부가 발동함을 실측했다. 핵심 증거는 "권한 전부 정상 + kill switch ON → 권한 거부 없음, 실행 불가"다. 실제 운영 입력(계정·폴더·원격 profile·object endpoint)은 여전히 대기 중이며 지어내지 않았다. 전문 [[Claude_CL-02_운영준비_검증보고]].
 
 CL-01 (Claude, 2026-09-11): d14db0a 독립 검토 완료. finding 2건(F1 제공량 기록·실제 불일치 재현, F2 PTY 감사 순서)을 Codex에 인계 대기. definer 함수 9개 전수 tenant 결속을 실측으로 확인했다. 전문 [[Claude_CL-01_커널독립검토]].
@@ -39,7 +41,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | CL-02 | P0 | in-progress | S02-BE S02-DB S02-ST S03-DB | 운영 로그인·권한·Workspace·폴더 적용 |
 | CL-03 | P0 | in-progress | S12-DB S12-ST | 복원 도구의 남은 검증 결함 수정 |
 | CL-04 | P1 | blocked | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
-| CL-05 | P1 | planned | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
+| CL-05 | P1 | in-progress | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
 | CL-06 | P1 | planned | S10-BE S10-DB S10-ST | 실제 학습·평가·MLflow·승인 배포 서비스 |
 | CL-07 | P1 | planned | S12-DB S12-ST | 운영 관측·장시간 시험·복원 절차 인수 |
 
@@ -140,11 +142,21 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-05 — Context와 실제 Provider/도구 Adapter
 
-- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- owner / reviewer: Claude / Codex; status: in-progress(redaction 거부 완료, Provider 실행은 CX-02 차단); priority: P1.
 - 원래 목표/합격 조건: OUT-09, OUT-10 / AC-09, AC-10.
-- 다음 첫 행동: credential 계약 아래 Context 권한·TTL·redaction과 실제 두 Provider의 실행/취소/collect/attest를 연결한다. Orca/Codex/Claude/Antigravity의 desktop와 headless 지원 범위를 분명히 한다.
-- 필요한 합격 증거: 실제 Provider별 정상·실패·취소·누출 거부·trace/산출물 bytes. 모델 확정 전 vector 차원 고정 금지.
-- 선행/차단과 해소 담당: CX-02 credential 경계. Antigravity 미지원 headless를 실행 가능으로 표시하지 않음.
+- 진행 branch/SHA: `review/claude-account-results` **dcad652**.
+- 실제 수행 — **redaction을 선언에서 거부로 바꿨다**: `ContextItem.redacted`는 늘 caller의 주장이었고 모듈도 "이 모듈은 redaction이 실행됐는지 알 수 없다"고 정직하게 적으면서 도착한 것을 그대로 저장했다. bearer token을 `redacted=True`로 넘기면 그 token이 hash되고 저장되고 같은 hash를 참조하는 tenant 내 모든 bundle이 공유하며, 설계상 다시 쓰이지 않는 RunRecord에 pin된다. 이제 `build_bundle`이 **쓰기 전에** 플랫폼이 인식하는 비밀을 담은 내용을 거부한다.
+  - 재작성이 아니라 거부: 이 함수는 모델에 내용을 넣는 경로가 아니므로 여기서 조용히 고치면 저장된 기록이 모델이 실제로 받은 것과 달라진다. 맞지 않는 context 기록은 기록이 없는 것보다 나쁘다.
+  - 재구현이 아니라 재사용: 판정은 `adapters/reference.py`의 기존 ADR-014 패턴 목록에 `recognised_secrets()`를 더해 쓴다. 두 번째 목록은 adapter가 강제하는 것과 어긋나게 된다.
+  - 종류만 말하고 일치한 문자열은 절대 말하지 않는다: 조각을 오류 메시지에 넣으면 메시지·로그·감사기록에 비밀을 쓰는 것이고, 그것이 바로 이 거부가 막으려는 누출이다. probe마다 단언한다.
+- 실제 검증 증거: 시험 14개. conformance probe 4종(api_key·bearer·presigned·private_key) 전부 거부, 메시지가 비밀을 되풀이하지 않음을 각각 확인, redaction을 거친 내용은 통과, 거부 시 어느 항목·몇 번째인지 지목. **단위 시험만으로는 부족했다** — `build_bundle`에서 호출을 빼도 13개가 전부 통과했다. 그래서 공개 함수와 DB를 거치는 배선 시험을 추가해 "거부된 bundle은 snapshot을 남기지 않는다"를 확인했고, 호출을 빼면 그 시험만 실패한다.
+- **한계를 시험으로 고정했다**: 인식은 증명이 아니다. ADR-014 1차 패턴이 담지 않는 형태의 비밀은 그대로 저장되며, 저장된 bundle을 "검증된 깨끗함"으로 읽으면 안 된다는 것을 `test_recognising_is_not_proving`이 기록한다.
+- 확인만 하고 다시 만들지 않은 것(이미 있음): desktop/headless 지원 범위는 `agents.py`에 이미 사실대로 있다. 코드에서 뽑은 표 — claude-code/codex-cli/gemini-cli는 headless 가능, **antigravity는 headless 불가**(`prompt_args=None`)이며 `cli.py:398`이 "the platform cannot drive it"으로 **실제로 거부**하고 `test_a_tool_with_no_headless_mode_is_refused_rather_than_guessed`가 이를 시험한다. 카드의 "Antigravity 미지원 headless를 실행 가능으로 표시하지 않음"은 충족돼 있다.
+- 남은 문제:
+  - **Context에 호출자가 없다.** `build_bundle`/`read_bundle`을 부르는 production 코드가 없고 API도 없다(eval 실행 경로 포함). `public.artifacts`와 같은 모양이다. 따라서 "권한"을 붙일 경계가 아직 없다.
+  - **TTL은 수명 결정이 먼저다.** TTL column을 수거자 없이 추가하면 CL-04에서 내가 지적한 실수(색인만 있고 수거자 없음)를 그대로 반복하게 된다. 게다가 `collect_orphan_snapshots`는 있으나 호출자가 없고, orphan은 bundle이 삭제돼야 생기는데 bundle을 삭제하는 것이 없어 구조적으로 할 일이 없다. context bundle의 보존 기간은 제품 결정이므로 내가 지어내지 않는다 — CL-04 질문 4(보존/GC 소유자)와 함께 답이 필요하다.
+  - **실제 두 Provider의 실행/취소/collect/attest는 CX-02 credential 경계 대기.**
+- 다음 첫 행동: CX-02 credential 계약과 context 수명 결정을 받는다. 그 전까지 Claude는 CL-07 운영 관측·장시간 시험을 진행한다.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ### CL-06 — 실제 학습·평가·MLflow·승인 배포 서비스
