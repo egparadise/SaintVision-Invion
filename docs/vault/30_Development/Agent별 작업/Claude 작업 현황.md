@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:12:51+09:00"
+updated: "2026-09-12T01:26:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Codex 후속 인계: 보호 credential CLI76ba5ba와 ADR-079의 원자 회전/회수·현재 scope·운영 절차 독립 검토 pending. 기존 backend를 Provider에 연결한다. Claude4b09dfc/c632d3f RPO 변경은 수신했으며 Codex 후속 독립 검토 대상이다. [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]].
 
 Codex 인계 2026-09-12T01:12:51+09:00: Claude dcad652 Context와5995b8b readiness 도구를 수신·검토해0f5f4e8에 보완 통합했다. 기존 원본 검토와 Codex 수정의 독립 승인은 별개다. CL-01의 다음 대상은74012b3/0035·0f5f4e8/ADR-077/078이며, 실제 Linux backend는 Codex가 구현했으므로 재작성하지 않고 CL-05 Provider 연결에 사용한다. 작성자 수정 승인 pending. [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]].
 

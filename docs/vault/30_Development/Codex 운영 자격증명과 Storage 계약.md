@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-OPERATING-CONTRACT-001"
 title: "Codex 운영 자격증명과 Storage 계약"
-version: "1.2.1"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:12:51+09:00"
+updated: "2026-09-12T01:26:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -79,3 +79,7 @@ Linux root의 경로 각 segment를 O_NOFOLLOW directory descriptor로 열고 �
 기존39개 conformance를 실제 Linux 파일·일회용 PostgreSQL에 연결한다. remove_version/rebind_destination 시나리오는 immutable version 파괴 대신 실제 grant 삭제/회수로 해석 불가를 만든다. outside_root는 원래 파일을 root 밖으로 옮기고 hard link를 되붙이는 실제 공격이다. 읽기 중 inode/root/내용 교체, 읽기 후 revocation commit, admission 뒤 회수, RLS/쓰기 권한/복원 epoch/kill/cancel을 추가 검증한다. 운영 키/실제 Provider 요청/Windows ACL/전체 장비 인수와는 구분한다.
 
 실제 구현·합격 범위: [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. Linux/DB conformance39+추가9 통과; 운영 보호 등록과 외부 Provider 연결은 남는다.
+
+## ADR-079 — 보호 운영자 등록·Run 범위 원자 회전/회수
+
+[[Codex 자격증명 등록 회전 회수 운영 절차]]를 따른다. 기존0035에만 쓰는 운영자 CLI를 추가한다. table owner/superuser·현재 epoch·tenant/Run/project grant·불변 파일을 검증하고 register와grant를 분리한다. 같은 old grant의 경쟁 회전은 하나만 성공하며 audit/version/grant는 원자 commit한다. 폐기/만료/old epoch grant를 재활성화하지 않는다. default check는 쓰지 않고 명시적 apply만 반영하며 DSN/원문 오류는 노출하지 않는다. revoke는 지정subject/Run 범위이며 실제 Provider token/global revocation이나 secret 파일 삭제를 뜻하지 않는다. 운영 적용·독립 검토는 별도다. [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]].

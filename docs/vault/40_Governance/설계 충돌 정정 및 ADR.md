@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.33.0"
+version: "1.34.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T01:12:51+09:00"
+updated: "2026-09-12T01:26:09+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -120,3 +120,5 @@ ADR-075(opaque immutable credential reference·Linux service-owned file backend 
 ADR-077(Linux descriptor/hash-bound credential backend·PostgreSQL 현재 scope/epoch/회수·runtime SELECT-only·최종 확인 admission과 callback 분리)는 [[Codex 운영 자격증명과 Storage 계약]] v1.2.0을 따른다. 0035는 private version/grant metadata를 추가하며 실제 secret/provider/운영 인수를 대신하지 않는다.
 
 ADR-078(Context metadata 저장 전 비밀 패턴 거부·오류 입력 비반사·운영 CLI 진단과 kernel 인가 분리·DSN 보호 환경/고정 오류·읽기 전용 일관 snapshot)은 [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]를 따른다. 공개 readiness API 변경·운영 인수 완료가 아니다.
+
+ADR-079(보호 운영자 register/grant 분리·current epoch/scope·Run 범위 원자 회전·폐기 권한 비재활성화·감사 rollback·기본 check/명시 apply)은 [[Codex 자격증명 등록 회전 회수 운영 절차]]와 [[Codex 운영 자격증명과 Storage 계약]] v1.3.0을 따른다. 공개 관리 API·운영 secret 등록·독립 인수 완료가 아니다.

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:12:51+09:00"
+updated: "2026-09-12T01:26:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,9 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+- 최신 자격증명 등록·회전·회수: [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]], [[Codex 자격증명 등록 회전 회수 운영 절차]]. 76ba5ba Linux90/CLI4 통과. 운영 적용·Provider·CI·독립 인수 별도.
+
 
 - 최신 자격증명 backend·Context/readiness 통합: [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. 제품0f5f4e8 Linux154/core53, migration22(74012b3) 통과. 실제 Linux/DB backend 확보, 외부 Provider·CI·peer·물리 원격 인수는 남음.
 
@@ -53,7 +56,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-08 / AC-01, AC-08.
-- 다음 첫 행동: 74012b3 실제 Linux/DB backend와 0f5f4e8 통합을 전달했다. 보호 registry 등록/회전·회수 운영 절차와 Storage 인수를 진행하며 Claude 독립 검토를 받는다. 실제 파일 교체/회수 경합48개는 검증됐다.
+- 다음 첫 행동: 74012b3 실제 Linux/DB backend와 0f5f4e8 통합을 전달했다. 보호 registry CLI/원자 회전76ba5ba와 운영 절차를 전달했다. 다음 Claude4b09dfc/c632d3f RPO 변경 독립 검토와 Storage 인수를 진행하며 credential 독립 검토를 받는다. 실제 파일 교체/회수 경합48개는 검증됐다.
 - 필요한 합격 증거: 미확인 항목에 결정 담당·차단 범위 명시, 비밀값 없는 버전 계약, Claude/Gemini가 구현할 입력·출력 합의. 실제 계정값은 운영자 확인 필요.
 - 선행/차단과 해소 담당: 초안/계약 검토는 즉시 가능. 운영 권한/장비 정보 확정은 운영자 입력 필요.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
