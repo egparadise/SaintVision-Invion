@@ -276,20 +276,30 @@ def serve(args):
                 return
             names = {'/worker.zip':'worker.zip','/worker.sha256':'worker.sha256','/node-cert.pem':'node-cert.pem',
                      '/workspace-worker.zip':'workspace-worker.zip','/workspace-worker.sha256':'workspace-worker.sha256'}
+            target = None
             if self.path == '/healthz':
                 data = b'{"service":"SaintVision LAN bootstrap","status":"ready","scope":"public-file-transfer-only"}'
+                length = len(data)
             elif self.path in names and (public/names[self.path]).is_file():
-                data = (public/names[self.path]).read_bytes()
+                target = public/names[self.path]
+                length = target.stat().st_size
             else:
                 self.send_error(404)
                 return
             self.send_response(200)
             self.send_header('Content-Type','application/octet-stream')
-            self.send_header('Content-Length',str(len(data)))
+            self.send_header('Content-Length',str(length))
             self.send_header('Cache-Control','no-store')
             self.send_header('X-Content-Type-Options','nosniff')
             self.end_headers()
-            self.wfile.write(data)
+            if target is None:
+                self.wfile.write(data)
+            else:
+                # Bound memory and apply the socket deadline to individual chunks.
+                # A slow Windows download must not time out as one giant sendall.
+                with target.open('rb') as stream:
+                    for chunk in iter(lambda: stream.read(256*1024), b''):
+                        self.wfile.write(chunk)
         def log_message(self,*_):
             pass
         def setup(self):
