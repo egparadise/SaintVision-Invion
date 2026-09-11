@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T01:25:00+09:00"
+updated: "2026-09-12T01:38:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `9532a35` |
+| **고정 구현 Commit SHA** | `5109962` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -60,10 +60,10 @@ source_of_truth: "Git"
   - `mlopsEngine`: 실제 API 미연결 시 임의 모델 적합성 표시를 배제하고 미실행/미평가 상태 정직하게 렌더링.
 
 ### GM-05: 실제 로그인과 2-PC 브라우저 여정 (`S03-FE`, `S04-FE`, `S07-FE`, `S08-FE`, `S11-FE`)
-- **수정 위치**: `apps/web/src/features/auth/Login.tsx`, `apps/web/src/app/App.tsx`, `tools/run_browser_smoke.mjs`
+- **수정 위치**: `apps/web/src/features/auth/Login.tsx`, `apps/web/src/features/approvals/ApprovalDetail.tsx`, `apps/web/src/contracts/types.ts`, `apps/web/src/app/App.tsx`, `tools/run_browser_smoke.mjs`
 - **검토 중점**:
   - `Login.tsx`: OIDC 실패 시 `usr_01JABCDEF_ADMIN`으로 사일런트 자동 승격하던 코드 전면 제거, 실제 RFC 9457 ProblemDetails 기반 오류 표시.
-  - Two-Person Rule 승인 센터: 일회용 Nonce 리플레이 가드 및 중복 승인 시 409 Conflict 차단.
+  - Two-Person Rule 승인 센터: 요청자 본인 자가 승인 차단(`ApprovalItem.requestedBy === currentUserId` 및 `usr_requester_alice` 검사) 및 사용자 통지 배너, 일회용 Nonce 리플레이 가드 및 중복 승인 시 409 Conflict 차단.
   - 3회 제한 워크스페이스 복구 수명주기 (ADR-044 / ADR-045): `resume/prepare` → L2 승인 → `resume/enqueue` 순차 전이 및 `attempt >= 3` 시 차단.
 
 ### GM-06: 접근성·내부망 HTTPS·웹 rollback/교육 (`S11-FE`, `S12-FE`)
@@ -81,7 +81,7 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 104개 테스트)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 105개 테스트)
 npm --prefix apps/web test -- --run
 
 # 2. Vite 프로덕션 빌드 및 타입 검사
