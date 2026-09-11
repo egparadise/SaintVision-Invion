@@ -44,4 +44,4 @@ ade5bb8의 release 없는 집계·명시적 CLI 호출·공통 종료 코드도 
 - Codex: 운영 인수를 true로 만들 실제 Evidence 수집·검증 경로와 최신 Agent 변경의 공통 계약을 검토한다. 원격 profile 수신 시 CX-03 실제7개를 재개하고 그 전에는 기존 계획의 실행 가능한 보안/복구 후속을 진행한다.
 - Orca/운영 책임자: CI 계정 해소·실장비 설치 및 운영 입력 추적. PR21→22→19 검토 순서를 유지하며 미검토 main 병합을 하지 않는다.
 
-전체 추정 **57.29% 완료/42.71% 잔여 유지**. 코드·로컬 검증은 진행됐으나 CI·peer·운영 증거/물리 인수 미완료로 공식 task done을 올리지 않는다. check_docs.py(원문24·문서298·작업48), check_ontology.py, 변경3개 Python Black 검사, git diff --check exit0. Obsidian 최초 check는 외부편집2개로 exit1·쓰기0: 원본을 보존하고 새 Agent 보고를 작성자 주장으로 조율했다. 최종 push/동기화는 영수증에 기록한다.
+전체 추정 **57.29% 완료/42.71% 잔여 유지**. 코드·로컬 검증은 진행됐으나 CI·peer·운영 증거/물리 인수 미완료로 공식 task done을 올리지 않는다. check_docs.py(원문24·문서298·작업48), check_ontology.py, 변경3개 Python Black 검사, git diff --check exit0. Obsidian 최초 check는 외부편집2개로 exit1·쓰기0: 원본을 보존하고 새 Agent 보고를 작성자 주장으로 조율했다. 보고0778238 push exit0, PR19 설명 갱신/draft 유지. 2026-09-12 02:10:12 KST Obsidian503개 해시 일치·pending0·conflict0, check/apply/check exit0. [동기화 영수증](../Evidence/permission-obsidian-20260912.json). 영수증 추가 후 최종 문서도 commit/push/재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
