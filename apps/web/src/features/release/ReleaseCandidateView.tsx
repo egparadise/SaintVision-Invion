@@ -55,7 +55,9 @@ export const ReleaseCandidateView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : '#f85149', marginTop: '4px' }}>
             {vulnsCountStr} {isZeroVulns ? '(ZERO BUG)' : '(ACTION REQUIRED)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>보안·무결성 전수 검증 완료</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {isZeroVulns ? '보안·무결성 전수 검증 완료' : '미완화 결함 조치 필요'}
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -63,7 +65,9 @@ export const ReleaseCandidateView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: metCount === totalSlos ? '#3fb950' : '#d29922', marginTop: '4px' }}>
             {sloRate}% ({metCount}/{totalSlos} 지표 Met)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>P95 지연, Heartbeat, RPO/RTO 실측</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {metCount === totalSlos ? '전체 목표 지표 충족 (Met)' : `${totalSlos - metCount}개 지표 미충족 또는 실측 중`}
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -71,7 +75,9 @@ export const ReleaseCandidateView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: passCount === totalAudits ? '#3fb950' : '#d29922', marginTop: '4px' }}>
             {auditRate}% ({passCount}/{totalAudits} 적합)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>명도대비 11.4:1 &amp; 키보드 완결</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {passCount === totalAudits ? '명도대비 11.4:1 & 키보드 완결' : `${totalAudits - passCount}개 규정 점검 필요`}
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
