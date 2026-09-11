@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.30.0"
+version: "1.31.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T00:19:45+09:00"
+updated: "2026-09-12T00:32:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -114,3 +114,5 @@ ADR-072(정확한 definer 정의/시그니처/EXECUTE 정책·필수 inventory·
 ADR-073(복원 nonzero/누락/불확실 관측 거부·정본 definer 정책·양쪽 tenant probe·실측 구간·다음 fencing 값·DB 기록 정합성)은 [[Codex DB 함수 감사와 복원 판정 검토]] v1.1.0을 따른다. DB 리허설과 객체/Node/별도 클러스터/실제 서비스의 운영 복구 합격은 구분한다.
 
 ADR-074(PTY 전송 전 불변 intent commit·확인된 응답 audit 분리·미확정 입력의 digest 고정과 후속 순번 거부·기존 이력 보존)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.2.0을 따른다. 0034는 일반 표 추가이며 definer 정의/권한 정책은 그대로이고 정책 head만 갱신한다.
+
+ADR-075(opaque immutable credential reference·Linux service-owned file backend 구현 기준·현재 scope/회수/목적지 검사·기존 CLI 로그인 관측과 hosted provider 분리)와 ADR-076(제한된 LocalObjects 파일럿·운영 S3 합격 조건·기존 보존 기간·객체/DB/키의 복원 책임 분리)은 [[Codex 운영 자격증명과 Storage 계약]]을 따른다. [[운영 환경 입력과 Agent 인계]]에 미확정 운영 값과 담당자를 둔다. 실제 resolver/운영 배포·제품 선택·독립 인수 완료가 아니다.

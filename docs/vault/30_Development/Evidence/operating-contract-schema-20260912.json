@@ -1,0 +1,23 @@
+{
+  "atKst": "2026-09-12T00:31:09+09:00",
+  "scope": "JSON Schema syntax validation only; resolver authorization and live credentials not implemented or tested",
+  "schema": "contracts/credential-reference.schema.json",
+  "schemaValid": true,
+  "acceptedExamples": 1,
+  "rejectedCases": [
+    "latest",
+    "missing_version",
+    "path",
+    "url",
+    "raw_string",
+    "object",
+    "unknown_revision",
+    "newline",
+    "overlong",
+    "null",
+    "boolean",
+    "uppercase"
+  ],
+  "exitCode": 0,
+  "productCodeChanged": false
+}
