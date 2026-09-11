@@ -298,6 +298,9 @@
         "workspaceResume": {
           "$ref": "#/$defs/WorkspaceResumeRef"
         },
+        "workspaceStart": {
+          "$ref": "#/$defs/WorkspaceStartRef"
+        },
         "targetNodeId": {
           "$ref": "#/$defs/NodeId"
         },
@@ -317,7 +320,17 @@
         "command",
         "timeoutSeconds"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "workspaceResume",
+              "workspaceStart"
+            ]
+          }
+        }
+      ]
     },
     "ResourceLease": {
       "type": "object",
@@ -1035,7 +1048,8 @@
           "type": "string",
           "enum": [
             "ephemeral",
-            "restored"
+            "restored",
+            "initialized"
           ]
         },
         "cpuMillis": {
@@ -1117,20 +1131,56 @@
           "if": {
             "properties": {
               "workspaceMode": {
+                "const": "ephemeral"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "workspaceInput"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "workspaceInput"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "workspaceMode": {
                 "const": "restored"
               }
             }
           },
           "then": {
-            "required": [
-              "workspaceInput"
-            ]
+            "properties": {
+              "workspaceInput": {
+                "required": [
+                  "resumeId"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "workspaceMode": {
+                "const": "initialized"
+              }
+            }
           },
-          "else": {
-            "not": {
-              "required": [
-                "workspaceInput"
-              ]
+          "then": {
+            "properties": {
+              "workspaceInput": {
+                "required": [
+                  "startId"
+                ]
+              }
             }
           }
         }
@@ -1847,14 +1897,29 @@
           "type": "string",
           "minLength": 4,
           "maxLength": 87384
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
         }
       },
       "required": [
-        "resumeId",
         "stepId",
         "sha256",
         "sizeBytes",
         "dataBase64"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "resumeId"
+          ]
+        },
+        {
+          "required": [
+            "startId"
+          ]
+        }
       ]
     },
     "WorkspaceSnapshotFile": {
@@ -2789,6 +2854,684 @@
         "expiresAt",
         "requiredApprovals"
       ]
+    },
+    "WorkspaceStartRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "inputSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "cpuResourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "memoryResourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "startId",
+        "stepId",
+        "inputSha256",
+        "inputSizeBytes",
+        "nodeId",
+        "cpuResourceId",
+        "memoryResourceId",
+        "profileVersion",
+        "policyVersion"
+      ]
+    },
+    "WorkspaceStartPrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "snapshotBase64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384
+        },
+        "targetNodeId": {
+          "$ref": "#/$defs/NodeId"
+        }
+      },
+      "required": [
+        "startId",
+        "stepId",
+        "workload",
+        "expectedVersion",
+        "snapshotBase64",
+        "targetNodeId"
+      ]
+    },
+    "WorkspaceStartPrepareResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "approval": {
+          "$ref": "#/$defs/ApprovalView"
+        },
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "workload",
+        "approval",
+        "run"
+      ]
+    },
+    "WorkspaceStartView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ApprovalView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frozenFiles": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/WorkspaceFrozenFile"
+          }
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "workload",
+        "run",
+        "approval",
+        "frozenFiles"
+      ]
+    },
+    "WorkspaceStartEnqueueInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "approvalId",
+        "expectedVersion"
+      ]
+    },
+    "WorkspaceStartEnqueueResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "commandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "accepted": {
+          "type": "boolean",
+          "const": true
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "runId",
+        "commandId",
+        "accepted"
+      ]
+    },
+    "ResultOutputMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "sizeBytes",
+        "verified"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verified": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "ResultStopReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptId",
+        "processStarted",
+        "exitCode",
+        "reason",
+        "finishedAt"
+      ],
+      "properties": {
+        "receiptId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "processStarted": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "finishedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      }
+    },
+    "RunResultView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "projectId",
+        "state",
+        "version",
+        "attemptCount",
+        "sealed",
+        "executionConfirmed",
+        "commandId",
+        "nodeId",
+        "stopReceipt",
+        "evidence",
+        "completedAt",
+        "output",
+        "outputAbsentReason",
+        "resourceReleasePending"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "attemptCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sealed": {
+          "type": "boolean"
+        },
+        "executionConfirmed": {
+          "type": "boolean"
+        },
+        "commandId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stopReceipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultStopReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceEnvelope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultOutputMetadata"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outputAbsentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceReleasePending": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RunArtifactFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "checksumSha256",
+        "byteSize",
+        "verified",
+        "evidenceId"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "checksumSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byteSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verified": {
+          "type": "boolean",
+          "const": true
+        },
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        }
+      }
+    },
+    "RunArtifactList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "artifacts",
+        "count",
+        "verifiedCount",
+        "absentReason"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "artifacts": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/RunArtifactFile"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verifiedCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "absentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunLogView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "stdout",
+        "stderr",
+        "redacted",
+        "truncated",
+        "absentReason"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "stdout": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stderr": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "redacted": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "absentReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunAttemptObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attemptNumber",
+        "startedAt",
+        "nodeId",
+        "commandId",
+        "stopReceiptId",
+        "exitCode",
+        "reason",
+        "evidenceId"
+      ],
+      "properties": {
+        "attemptNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NodeId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commandId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stopReceiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "RunAttemptList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "runId",
+        "attempts",
+        "count",
+        "nextCursor"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "attempts": {
+          "type": "array",
+          "maxItems": 2048,
+          "items": {
+            "$ref": "#/$defs/RunAttemptObservation"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
     },
     "WorkspaceFileEdit": {
       "type": "object",

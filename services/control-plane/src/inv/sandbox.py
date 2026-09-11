@@ -138,10 +138,13 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         "privileged": False,
         "hostAccess": False,
     }
-    if "workspaceResume" in workload:
+    if "workspaceResume" in workload or "workspaceStart" in workload:
         if workspace_input is None:
             raise DomainError("AUTH-0044", "Verified Workspace input required", 403)
-        plan.update(workspaceMode="restored", workspaceInput=workspace_input)
+        plan.update(
+            workspaceMode="initialized" if "workspaceStart" in workload else "restored",
+            workspaceInput=workspace_input,
+        )
     elif workspace_input is not None:
         raise DomainError("AUTH-0044", "Unexpected Workspace input", 403)
     if "terminal" in workload:

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "How much of one capability the platform may use.\n\n``unit`` is whatever the calling screen measures in — cores, GiB, devices.\nIt is converted once, here, so two screens describing the same machine\ncannot store two different numbers.",
+  "properties": {
+    "offeredQuantity": {
+      "minimum": 0,
+      "title": "Offeredquantity",
+      "type": "number"
+    },
+    "unit": {
+      "maxLength": 16,
+      "minLength": 1,
+      "title": "Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "offeredQuantity",
+    "unit"
+  ],
+  "title": "ResourceOfferRequest",
+  "type": "object"
+}

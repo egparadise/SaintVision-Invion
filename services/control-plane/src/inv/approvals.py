@@ -222,6 +222,10 @@ class ApprovalStore:
                     raise DomainError(
                         "LEASE-0003", "Recovery approval awaits physical resource release"
                     )
+            if "workspaceStart" in workload:
+                from .workspace_start import approved_start
+
+                approved_start(conn, run, workload, self.db.recovery_epoch)
             changed = self.runs._transition(
                 conn, principal.tenant_id, run, "awaiting_approval", expected_version
             )
@@ -372,6 +376,9 @@ class ApprovalStore:
             from .business_handoff import require_handoff
 
             require_handoff(conn, self.db, run["run_id"])
+            from .workspace_start import require_start_admission
+
+            require_start_admission(conn, self.db, run["run_id"])
             voters = conn.execute(
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
                 (approval_id,),

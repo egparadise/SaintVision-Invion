@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Choose the development tool a workspace uses.\n\n``null`` clears the choice. The name is one of the adapters the platform\nknows; ``GET /v1/adapters`` lists them with whether each is usable right\nnow, which is a property of a node rather than of this record.",
+  "properties": {
+    "toolName": {
+      "anyOf": [
+        {
+          "pattern": "^(claude-code|codex-cli|gemini-cli|antigravity)$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Toolname"
+    }
+  },
+  "title": "WorkspaceToolRequest",
+  "type": "object"
+}

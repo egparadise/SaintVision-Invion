@@ -1,14 +1,32 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.9.0"
+version: "1.18.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T17:11:46+09:00"
+updated: "2026-09-11T15:55:07+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 tenant/인계 재검토: [[2026-09-11_TENANT-BOUNDARY_Codex_검증보고]]의 f4fe37e에서 원본 0026 누수를 재현하고 후속 적용 guard의 거부를 확인했다. 결과 중복 제거·현재 입력 readiness·0032 이력 병합을 통합했으며 최종 로컬 회귀 305개/18개 migration 경로가 통과했다. #11/#12 중복 draft를 닫았고 #13/15/16/17/18/20의 기존 병합 사실을 확인했다. CI·독립 검토·원격 7개·운영/브라우저 인수와 새 main 반영은 남는다.
+
+2026-09-11 자원 제공량 후속: [[2026-09-11_RESOURCE-OFFER_Codex_검증보고]]의 01fdb15에서 현재 관리자 권한·전체 slice 제공 총량·미반납 예약 잠금·원자 history·0031 이력 병합을 구현했다. clean core 290/격리 통합 297개와 16개 upgrade 경로 통과. 실제 결과 정본과 [[3 Agent 원격 실행과 운영 인수 확정]]을 확정했으며 실제 원격 7개 시험, 운영 계정/Workspace 준비, UI 인수, 독립 검토·CI는 남는다.
+
+2026-09-11 provisioning 후속: [[2026-09-11_PROVISIONING-INTEGRITY_Codex_검증보고]]의 a6054f3에서 Claude 신규 코드를 통합 검토하고 명시적 계정 grant·충돌 거부·원자 감사·0030 이력 병합을 구현했다. clean 통합 283개/14개 upgrade 경로 통과. 운영 provisioning 도구는 준비됐지만 실제 IdP 계정 적용·Workspace/자원 연결(Claude), 실제 worker 설치와 원격 7개 시험(Codex), 실제 UI/브라우저(Gemini)는 남는다. Codex 변경 독립 검토와 CI는 미완료다.
+
+2026-09-11 결과 조회 후속: [[2026-09-11_RESULT-OBSERVATION_Codex_검증보고]]의 8b97c6a에서 실제 kernel Run/receipt/Evidence와 검증된 파일 다운로드·로그·attempt를 연결했다. 0028로 이력을 보존해 병합하고 원격 미관측 도구와 실제 실행 grant를 구분했다. 기본 290/격리 통합 262개 통과. 남은 주 작업은 실제 worker 설치 후 원격 7개 인수(Codex), 독립 검토·운영 identity/Workspace provisioning·제공량 연결(Claude), 실제 API/브라우저 인수(Gemini)다. 전체 task done은 아니다.
+
+2026-09-11 계정 통합 후속: [[2026-09-11_ACCOUNT-KERNEL_Codex_검증보고]]와 [[Codex 계정과 실행 커널 통합 계약]]에서 Claude 서비스/OIDC를 같은 kernel HTTP 경계에 연결하고 별도 관리 권한·현재 tenant/멤버십·Project/Node 직렬화 및 0026/0027 이력 병합을 구현했다. 코드 149b565를 push했으며 로컬 DB/실행 증거를 해당 보고에 고정한다. 운영 계정/subject/project provisioning·public offer↔kernel 자원 연결·Workspace 준비와 결과 조회는 Claude, 실제 API/화면과 [[2026-09-11_GEMINI-ZERO-MOCK_Codex_후속검토]] P1은 Gemini, 실제 원격 설치 확인·장비 시험은 Codex의 다음 작업이다. 독립 Claude 재검토·CI 및 실제 운영 인수는 미완료다. 아래 과거 미연결 문구는 해당 SHA 당시 상태다.
+
+2026-09-11 원격 Node 배포 후속: [[2026-09-11_REMOTE-WORKSPACE_Codex_검증보고]]에서 새 설치본 0123640을 게시하고 기존 identity/key/journal 보존·실패 rollback 3개, 서버 시험 도구 650ca0b의 로컬 실제 실행/취소/출력 복구 7개를 검증했다. Codex의 바로 다음 작업은 [[2026-09-11_REMOTE-WORKSPACE_다른PC설치안내]]의 worker 설치 JSON 확인 후 같은 7개를 실제 192.168.45.225에 실행하는 것이다. 현재 SSH/WinRM 경로 없음·lan-observe-v1이라 실제 원격 설치/실행 완료가 아니다. 기존 운영 DB/gate/권한은 유지하고 장비 시험은 격리 DB에서 수행한다. Claude 운영 identity/업무 API·독립 검토, Gemini 실제 UI 인수와 후속 GPU/장시간·다중 Node 범위는 남는다.
+
+2026-09-11 첫 Workspace 실행 후속: [[2026-09-11_FIRST-RUN_Codex_검증보고]]의 clean 코드 `b6301a9`에서 새 draft 입력/선택 Node 고정→승인→원자 예약/queue→attempt 1→실제 출력/checkpoint/Evidence를 검증했다. 통합 159개·core 260개·Windows Go 통과다. [[Codex Workspace 첫 실행과 승인 입력 계약]](ADR-063)의 업무 API/provisioning 및 독립 검토는 Claude, 실제 입력/상태/다운로드 UI는 Gemini, 새 원격 agent/profile 배포 후 실제 PC 실행/취소/복구는 Codex다. 장시간/대용량·GPU·분산 학습·5대·Context/RO 인수는 남는다. 과거 0024/Workspace bridge 문서와 달리 현재 추적 코드에는 해당 revision이 없으며 이번 0025는 실제 head 0023을 잇는다. 과거 기록만으로 PTY/Git 통합 완료를 인정하지 않는다. 상세 순서·합격 증거는 최신 보고서 표를 우선한다. Gemini 최신 수정본은 [[2026-09-11_GEMINI-STUDIO_수정본_Codex_재검토]]의 남은 P1/P2를 따른다.
+
+2026-09-11 kernel 실제 업무 검증 후속: [[2026-09-11_KERNEL-LIVE_Codex_검증보고]]의 clean 코드 `e5d9b0b`에서 실제 Python·CPU 학습·승인 입력 고정·출력 복구와 기존 Node/Workspace/샤드/containment 통합 118개가 통과했다. 독립 테스트 identity/DB를 사용했으며 Studio 운영 계정·권한·제출과 원격 업무 연결은 미완료다. 다음 담당과 합격 조건은 해당 보고서 표를 따른다. [[2026-09-11_GEMINI-TWO-PC_Codex_검토]]의 fixture 기반 2-PC/GPU 완료 주장은 물리 장비 증거로 인수하지 않는다.
+
+2026-09-11 실제 개발 환경 후속: [[2026-09-11_DEV-ENV_Codex_로컬개발환경구성과검증]]의 프로젝트/도구/CPU Studio를 구성했고 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에서 서버 서비스 재기동 및 실제 Docker API 1.41 Node 시험을 검증했다. 현재 다른 PC는 mTLS 관측 전용이다. 다음은 원격 시험 프로필 설치 후 실제 실행·복구, Studio와 제품 사용자/권한/Run/Lease/Evidence 연결이다. GPU·다중 Node 업무·5대 인수 및 독립 검토는 미완료다. 아래 과거 기록의 시험 미수행 문구와 통과 수는 해당 코드 SHA/범위에 한정한다.
 
 2026-09-10 Workspace bridge 후속: 편집 revision/동결 입력, 명시적 대체 Node, 제한 PTY/ticket, 고정 GitHub 원격 Git/2인 승인/불확실 dispatch 보존 코드를 추가했다. [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]과 [[2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정]]을 따른다. **사용자 지시로 실제 테스트는 미수행**이며 구현과 정적 build 전달 단계다. Codex의 즉시 다음 작업은 새 코드 전체 실제 회귀·DB/PTY/대체 Node/Git crash/CAS/권한 검증과 고정 SHA Evidence다. 독립 검토(Claude)·실제 API 화면/브라우저(Gemini), 대용량/장시간 PTY/다른 Git provider·Windows/GPU/BuildKit·Context/RO·물리 5대 인수는 남는다. 아래 과거 통과 수와 미구현 목록은 각 SHA 당시 기록이다.
 

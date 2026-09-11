@@ -1,0 +1,199 @@
+{
+  "scope": "local-developer-environment",
+  "implementationSHA": "5efc13567c8fe93294247a7a3189db75d353351f",
+  "executionCoreTestedSHA": "216027ed49dcd0ee78277d7fc1f5bf25a02b9384",
+  "unitTestsPassed": 16,
+  "browser": {
+    "at": "2026-09-10T16:02:50.868Z",
+    "actualJobId": "dev_c0392ef4e18044e0be93044a33fa35d3",
+    "login": true,
+    "oneTimeToken": true,
+    "httpOnly": true,
+    "crossOriginRejected": true,
+    "realTraining": true,
+    "downloadHashes": true,
+    "mobileNoOverflow": true,
+    "pageErrors": []
+  },
+  "workspaceJob": {
+    "id": "dev_4a22aac7ee3b4b91939a90d900d36439",
+    "status": "succeeded",
+    "record": {
+      "scope": "developer-container",
+      "machine": "server-local-docker",
+      "container": "svdev-dev_4a22aac7ee3b4b91939a90d900d36439",
+      "image": "sha256:5efa1fae77f5d8bc330fd75ff4e03d35c95bef84ab5fca7852001a2e8ad781f9",
+      "budget": {
+        "cpuMillis": 500,
+        "memoryMiB": 256,
+        "timeoutSeconds": 120
+      },
+      "argv": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "workspacePath": "C:\\Project\\ai-starter\\studio-codex",
+      "inputSha256": "ab21e4c675bfa715837efb1b57e7f4d1c4f18b985dbea1ca82d671394db2a39e",
+      "inputFiles": [
+        {
+          "path": "src/train.py",
+          "sha256": "225b139dfcdf1b66d567a394d2b95aba32c29ea5a6c48b181bc438342b4bff37"
+        },
+        {
+          "path": "tests/test_train.py",
+          "sha256": "2811187f7be2e352baae5be803b199a068366adc41007b8b2d878ee3f35fe607"
+        },
+        {
+          "path": "data/synthetic.csv",
+          "sha256": "fee766e4ef998de37820f5debde70a681c5339b092b62c817ccc6e9b0e766318"
+        }
+      ],
+      "gitCommit": "33c3e066a84f26884e99e2507691cfd9b641ce51",
+      "implementationSHA": "5efc13567c8fe93294247a7a3189db75d353351f",
+      "implementationDirty": false,
+      "implementationFiles": {
+        "tools/dev_studio.py": "da210e728f46ff4fafd9fa985ffca43ef39c7d55c538786b607adb181f45e3aa",
+        "tools/studio_templates.py": "f85ee423d309b1194060d6264b421307f1df836c0589eb1cba29f0e34ec25ee6",
+        "deploy/studio/container_worker.py": "9f886fe99f23d49e9919d69f568a9cc96ce57fdf29a4cb00a45d8f31ce7b1a4e"
+      },
+      "artifacts": [],
+      "enforced": {
+        "cpuMillis": 500,
+        "memoryBytes": 268435456,
+        "network": "none",
+        "readonlyRoot": true,
+        "pids": 64
+      },
+      "receiptSha256": "e296f5f963575df3b4798e323bfd6ba879fcca282ce74d1e84023a75c5dd6640",
+      "exitCode": 0,
+      "reason": "exited",
+      "durationSeconds": 0.453,
+      "stdout": "",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "test_generalizes (test_train.TrainingTest.test_generalizes) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nOK\n",
+      "stderrSha256": "16ef96455efc2cc6c2a0c27a49b9fc61e15fbf4641b88f340a902972bd47c19d",
+      "stopped": true
+    }
+  },
+  "trainingJob": {
+    "id": "dev_c0392ef4e18044e0be93044a33fa35d3",
+    "status": "succeeded",
+    "record": {
+      "scope": "developer-container",
+      "machine": "server-local-docker",
+      "container": "svdev-dev_c0392ef4e18044e0be93044a33fa35d3",
+      "image": "sha256:5efa1fae77f5d8bc330fd75ff4e03d35c95bef84ab5fca7852001a2e8ad781f9",
+      "budget": {
+        "cpuMillis": 500,
+        "memoryMiB": 256,
+        "timeoutSeconds": 120
+      },
+      "argv": [
+        "python",
+        "src/train.py"
+      ],
+      "workspacePath": "C:\\Project\\SaintVision-Workspaces\\Projects\\ai-starter",
+      "inputSha256": "ab21e4c675bfa715837efb1b57e7f4d1c4f18b985dbea1ca82d671394db2a39e",
+      "inputFiles": [
+        {
+          "path": "src/train.py",
+          "sha256": "225b139dfcdf1b66d567a394d2b95aba32c29ea5a6c48b181bc438342b4bff37"
+        },
+        {
+          "path": "tests/test_train.py",
+          "sha256": "2811187f7be2e352baae5be803b199a068366adc41007b8b2d878ee3f35fe607"
+        },
+        {
+          "path": "data/synthetic.csv",
+          "sha256": "fee766e4ef998de37820f5debde70a681c5339b092b62c817ccc6e9b0e766318"
+        }
+      ],
+      "gitCommit": "33c3e066a84f26884e99e2507691cfd9b641ce51",
+      "implementationSHA": "216027ed49dcd0ee78277d7fc1f5bf25a02b9384",
+      "implementationDirty": false,
+      "implementationFiles": {
+        "tools/dev_studio.py": "93d139629ec5e41e4ecf8721ac446030b563cbf8540a1c4c036f0828b910bebb",
+        "tools/studio_templates.py": "f85ee423d309b1194060d6264b421307f1df836c0589eb1cba29f0e34ec25ee6",
+        "deploy/studio/container_worker.py": "9f886fe99f23d49e9919d69f568a9cc96ce57fdf29a4cb00a45d8f31ce7b1a4e"
+      },
+      "artifacts": [
+        {
+          "path": "loss.csv",
+          "sha256": "eace8907e94687ed4b29f49cdceddeb7e6d61c1e6b812bf40af8d6fcca3c87e8",
+          "sizeBytes": 10181
+        },
+        {
+          "path": "metrics.json",
+          "sha256": "935a7897c2a4229393adf09af7d701499e90c40555fce8a460af26d2df953322",
+          "sizeBytes": 238
+        },
+        {
+          "path": "model.json",
+          "sha256": "452726ece7f1d699df3d2943ce84de5ac05cf5cd96429a5bfc7a7d70d796d104",
+          "sizeBytes": 63
+        }
+      ],
+      "enforced": {
+        "cpuMillis": 500,
+        "memoryBytes": 268435456,
+        "network": "none",
+        "readonlyRoot": true,
+        "pids": 64
+      },
+      "receiptSha256": "fd0d639fb03879721741aa6dc3606070d9086956094efb9fd6f3fcd77f98a936",
+      "exitCode": 0,
+      "reason": "exited",
+      "durationSeconds": 0.302,
+      "stdout": "{\n  \"dataset\": \"synthetic-linear-v1\",\n  \"trainingRows\": 51,\n  \"evaluationRows\": 50,\n  \"epochs\": 400,\n  \"initialLoss\": 6.147429546666667,\n  \"finalLoss\": 1.7218560389123921e-12,\n  \"evaluationMSE\": 1.6549685545817487e-12,\n  \"device\": \"cpu\"\n}\n",
+      "stdoutSha256": "42f6cfb7c97c9140ecab4ed4f4140636094ffc20c3144a2968ec26666c211b75",
+      "stderr": "",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stopped": true
+    }
+  },
+  "containerAcceptance": [
+    {
+      "case": "isolation-and-idempotency",
+      "id": "dev_c950a6519c064bea9a79ddc361227431",
+      "status": "succeeded",
+      "exitCode": 0,
+      "stopped": true
+    },
+    {
+      "case": "failure-exit",
+      "id": "dev_1c41135c89df4ef5b2cf97a2ed83701d",
+      "status": "failed",
+      "exitCode": 7,
+      "stopped": true
+    },
+    {
+      "case": "deadline",
+      "id": "dev_7ad66dde264f44d7946a618bf7caf402",
+      "status": "failed",
+      "exitCode": 124,
+      "stopped": true
+    },
+    {
+      "case": "cancel-running",
+      "id": "dev_222581088a9642f9b4e13d26bdc00174",
+      "status": "cancelled",
+      "exitCode": null,
+      "stopped": true
+    },
+    {
+      "case": "process-crash-recovery-no-replay",
+      "id": "dev_da4ba2faf65d4ccc9708f44dc87267ce",
+      "status": "interrupted",
+      "exitCode": null,
+      "stopped": true
+    }
+  ],
+  "remoteNodeExecutionTested": false,
+  "gpuExecutionTested": false,
+  "independentReview": "pending"
+}

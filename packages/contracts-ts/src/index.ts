@@ -76,6 +76,7 @@ export interface WorkloadSpec {
   command: Array<string>;
   timeoutSeconds: number;
   workspaceResume?: WorkspaceResumeRef;
+  workspaceStart?: WorkspaceStartRef;
   targetNodeId?: NodeId;
   terminal?: TerminalSpec;
 }
@@ -249,7 +250,7 @@ export interface SandboxLaunchSpec {
   argv: Array<string>;
   workspaceId: WorkspaceId;
   workingDirectory: "/workspace";
-  workspaceMode: "ephemeral" | "restored";
+  workspaceMode: "ephemeral" | "restored" | "initialized";
   cpuMillis: number;
   memoryBytes: number;
   timeoutSeconds: number;
@@ -416,11 +417,12 @@ export interface WorkspaceResumeRef {
 }
 
 export interface WorkspaceInput {
-  resumeId: string;
+  resumeId?: string;
   stepId: string;
   sha256: string;
   sizeBytes: number;
   dataBase64: string;
+  startId?: string;
 }
 
 export interface WorkspaceSnapshotFile {
@@ -618,6 +620,134 @@ export interface ContainmentApprovalView {
   status: "pending" | "approved" | "rejected" | "consumed";
   expiresAt: string;
   requiredApprovals: 2;
+}
+
+export interface WorkspaceStartRef {
+  startId: string;
+  stepId: string;
+  inputSha256: string;
+  inputSizeBytes: number;
+  nodeId: NodeId;
+  cpuResourceId: ResourceId;
+  memoryResourceId: ResourceId;
+  profileVersion: string;
+  policyVersion: string;
+}
+
+export interface WorkspaceStartPrepareInput {
+  stepId: string;
+  workload: WorkloadSpec;
+  expectedVersion: number;
+  startId: string;
+  snapshotBase64: string;
+  targetNodeId: NodeId;
+}
+
+export interface WorkspaceStartPrepareResult {
+  workload: WorkloadSpec;
+  approval: ApprovalView;
+  run: ControlRunView;
+  startId: string;
+}
+
+export interface WorkspaceStartView {
+  workload: WorkloadSpec;
+  run: ControlRunView;
+  approval: (ApprovalView | null);
+  frozenFiles: Array<WorkspaceFrozenFile>;
+  startId: string;
+}
+
+export interface WorkspaceStartEnqueueInput {
+  approvalId: ApprovalId;
+  expectedVersion: number;
+  startId: string;
+}
+
+export interface WorkspaceStartEnqueueResult {
+  runId: RunId;
+  commandId: string;
+  accepted: true;
+  startId: string;
+}
+
+export interface ResultOutputMetadata {
+  sha256: string;
+  sizeBytes: number;
+  verified: true;
+}
+
+export interface ResultStopReceipt {
+  receiptId: string;
+  processStarted: boolean;
+  exitCode: number;
+  reason: string;
+  finishedAt: Timestamp;
+}
+
+export interface RunResultView {
+  source: "execution-kernel";
+  runId: RunId;
+  projectId: ProjectId;
+  state: RunState;
+  version: number;
+  attemptCount: number;
+  sealed: boolean;
+  executionConfirmed: boolean;
+  commandId: (string | null);
+  nodeId: (NodeId | null);
+  stopReceipt: (ResultStopReceipt | null);
+  evidence: (EvidenceEnvelope | null);
+  completedAt: (Timestamp | null);
+  output: (ResultOutputMetadata | null);
+  outputAbsentReason: (string | null);
+  resourceReleasePending: boolean;
+}
+
+export interface RunArtifactFile {
+  path: string;
+  checksumSha256: string;
+  byteSize: number;
+  verified: true;
+  evidenceId: EvidenceId;
+}
+
+export interface RunArtifactList {
+  source: "execution-kernel";
+  runId: RunId;
+  artifacts: Array<RunArtifactFile>;
+  count: number;
+  verifiedCount: number;
+  absentReason: (string | null);
+}
+
+export interface RunLogView {
+  source: "execution-kernel";
+  runId: RunId;
+  stdout: (string | null);
+  stderr: (string | null);
+  redacted: boolean;
+  truncated: (boolean | null);
+  absentReason: (string | null);
+}
+
+export interface RunAttemptObservation {
+  attemptNumber: number;
+  startedAt: (Timestamp | null);
+  nodeId: (NodeId | null);
+  commandId: (string | null);
+  stopReceiptId: (string | null);
+  exitCode: (number | null);
+  reason: (string | null);
+  evidenceId: (EvidenceId | null);
+}
+
+export interface RunAttemptList {
+  source: "execution-kernel";
+  runId: RunId;
+  attempts: Array<RunAttemptObservation>;
+  count: number;
+  nextCursor: (number | null);
 }
 
 export interface WorkspaceFileEdit {

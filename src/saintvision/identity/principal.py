@@ -10,10 +10,12 @@ ships two implementations:
     an in-process table. Refuses to be constructed when the process is not
     explicitly marked as development.
 
-``OidcPrincipalVerifier``
-    Placeholder that raises ``SettingUnresolved`` until S01 supplies the issuer
-    configuration. It exists so the wiring is real and the gap is visible at
-    startup rather than discovered later.
+``saintvision.identity.oidc.OidcPrincipalVerifier``
+    The real one. It delegates token verification to ``inv.identity.AccessTokens``
+    — the offline resource-server verifier the execution side already built —
+    and adds the part that side deliberately stops short of: mapping a verified
+    ``oidc:`` subject to a ``public.users`` row, refusing an unknown one rather
+    than creating it.
 
 Project membership is checked separately from tenancy: RLS gives tenant
 isolation, but every user in a tenant passes RLS, so "another project's data"
@@ -36,8 +38,16 @@ class Principal:
     user_id: str
     tenant_id: uuid.UUID
     external_subject: str
-    #: Projects this principal belongs to. Empty means no project access at
-    #: all, which is a valid state for a freshly created user.
+    #: Projects this principal belonged to when the credential was verified.
+    #:
+    #: **Not what authorisation rests on.** It is a snapshot, and it is wrong in
+    #: both directions: a project created after sign-in is missing from it, so
+    #: its own creator could not open it; and a membership revoked after the
+    #: token was issued stays in it until the token expires, which is the whole
+    #: span during which revocation is supposed to matter. Every check reads
+    #: ``project_members`` at the point of use — see
+    #: ``saintvision.services.projects.require_project_access`` — which is also
+    #: the row the execution kernel reads.
     project_ids: frozenset[str] = field(default_factory=frozenset)
     roles: frozenset[str] = field(default_factory=frozenset)
 
@@ -77,18 +87,16 @@ class StaticPrincipalVerifier:
         return principal
 
 
-class OidcPrincipalVerifier:
-    """Real verifier. Unimplemented until S01-BE decides the IdP.
+def _real_verifier_moved(*args, **kwargs):  # pragma: no cover - see below
+    raise SettingUnresolved(
+        "the real verifier now lives in saintvision.identity.oidc, because the "
+        "decision this placeholder was waiting for was made on the execution "
+        "side: inv.identity.AccessTokens verifies offline against an "
+        "operator-supplied trust bundle, and duplicating it here would be a "
+        "second answer to who a caller is"
+    )
 
-    Constructing it raises rather than returning something that silently accepts
-    nothing, so a misconfigured deployment fails at startup.
-    """
 
-    def __init__(self) -> None:
-        raise SettingUnresolved(
-            "OIDC issuer, audience and JWKS URL are S01-BE decisions and are not set; "
-            "see docs/vault/30_Development/Claude 영역 구현 준비.md"
-        )
-
-    def verify(self, credential: str) -> Principal:  # pragma: no cover - unreachable
-        raise SettingUnresolved("OIDC verifier is not configured")
+#: Kept as a name so an import does not silently succeed against nothing.
+#: :class:`saintvision.identity.oidc.OidcPrincipalVerifier` is the real one.
+OidcPrincipalVerifier = _real_verifier_moved

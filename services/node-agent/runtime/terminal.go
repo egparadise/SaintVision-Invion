@@ -71,7 +71,11 @@ func (d *Docker) Terminal(ctx context.Context, r Record, frame contracts.Termina
 	if !hexID.MatchString(created.ID) {
 		return zero, errors.New("NODE-0090: invalid terminal helper")
 	}
-	req, err := http.NewRequestWithContext(ctx, "POST", "http://docker/v1.45/exec/"+created.ID+"/start", bytes.NewBufferString(`{"Detach":false,"Tty":false}`))
+	version, err := d.apiVersion(ctx)
+	if err != nil {
+		return zero, err
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://docker/"+version+"/exec/"+created.ID+"/start", bytes.NewBufferString(`{"Detach":false,"Tty":false}`))
 	if err != nil {
 		return zero, err
 	}

@@ -423,6 +423,7 @@ class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
 class WorkspaceMode(StrEnum):
     ephemeral = 'ephemeral'
     restored = 'restored'
+    initialized = 'initialized'
 
 
 class ExecutionClaim(BaseModel):
@@ -601,7 +602,7 @@ class WorkspaceResumeRef(BaseModel):
     checkpointAttempt: conint(ge=1)
 
 
-class WorkspaceInput(BaseModel):
+class WorkspaceInput1(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
@@ -610,6 +611,23 @@ class WorkspaceInput(BaseModel):
     sha256: constr(pattern=r'^[0-9a-f]{64}$')
     sizeBytes: conint(ge=1, le=65536)
     dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID | None = None
+
+
+class WorkspaceInput2(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID | None = None
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID
+
+
+class WorkspaceInput(RootModel[WorkspaceInput1 | WorkspaceInput2]):
+    root: WorkspaceInput1 | WorkspaceInput2
 
 
 class WorkspaceSnapshotFile(BaseModel):
@@ -839,6 +857,143 @@ class ContainmentApprovalView(BaseModel):
     status: Status3
     expiresAt: AwareDatetime
     requiredApprovals: Literal[2]
+
+
+class WorkspaceStartRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    startId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+    nodeId: NodeId
+    cpuResourceId: ResourceId
+    memoryResourceId: ResourceId
+    profileVersion: constr(min_length=1, max_length=200)
+    policyVersion: constr(min_length=1, max_length=200)
+
+
+class WorkspaceStartEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+
+
+class WorkspaceStartEnqueueResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    commandId: UUID
+    accepted: Literal[True]
+    startId: UUID
+
+
+class ResultOutputMetadata(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+
+
+class ResultStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    processStarted: bool
+    exitCode: int
+    reason: constr(max_length=100)
+    finishedAt: Timestamp
+
+
+class RunResultView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attemptCount: conint(ge=0, le=9007199254740991)
+    sealed: bool
+    executionConfirmed: bool
+    commandId: UUID | None
+    nodeId: NodeId | None
+    stopReceipt: ResultStopReceipt | None
+    evidence: EvidenceEnvelope | None
+    completedAt: Timestamp | None
+    output: ResultOutputMetadata | None
+    outputAbsentReason: constr(max_length=1024) | None
+    resourceReleasePending: bool
+
+
+class RunArtifactFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    checksumSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    byteSize: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+    evidenceId: EvidenceId
+
+
+class RunArtifactList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    artifacts: list[RunArtifactFile] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    verifiedCount: conint(ge=0, le=9007199254740991)
+    absentReason: constr(max_length=1024) | None
+
+
+class RunLogView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    stdout: constr(max_length=65536) | None
+    stderr: constr(max_length=65536) | None
+    redacted: bool
+    truncated: bool | None
+    absentReason: constr(max_length=1024) | None
+
+
+class RunAttemptObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    attemptNumber: conint(ge=1, le=9007199254740991)
+    startedAt: Timestamp | None
+    nodeId: NodeId | None
+    commandId: UUID | None
+    stopReceiptId: UUID | None
+    exitCode: int | None
+    reason: constr(max_length=100) | None
+    evidenceId: EvidenceId | None
+
+
+class RunAttemptList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    attempts: list[RunAttemptObservation] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    nextCursor: conint(ge=1, le=9007199254740991) | None
 
 
 class WorkspaceFileEdit(BaseModel):
@@ -1077,6 +1232,7 @@ class WorkloadSpec(BaseModel):
     command: list[str] = Field(..., min_length=1)
     timeoutSeconds: conint(ge=1, le=9007199254740991)
     workspaceResume: WorkspaceResumeRef | None = None
+    workspaceStart: WorkspaceStartRef | None = None
     targetNodeId: NodeId | None = None
     terminal: TerminalSpec | None = None
 
@@ -1234,6 +1390,39 @@ class BusinessBindingView(BaseModel):
     resourceReleasePending: bool
     releasedAt: AwareDatetime | None
     workload: WorkloadSpec
+
+
+class WorkspaceStartPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+    snapshotBase64: constr(min_length=4, max_length=87384)
+    targetNodeId: NodeId
+
+
+class WorkspaceStartPrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    approval: ApprovalView
+    run: ControlRunView
+    startId: UUID
+
+
+class WorkspaceStartView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    run: ControlRunView
+    approval: ApprovalView | None
+    frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
+    startId: UUID
 
 
 class INVCore(

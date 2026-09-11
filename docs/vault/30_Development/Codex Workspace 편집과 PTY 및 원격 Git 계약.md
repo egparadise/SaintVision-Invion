@@ -1,16 +1,16 @@
 ---
 doc_id: "CODEX-WORKSPACE-BRIDGE-001"
 title: "Codex Workspace 편집과 PTY 및 원격 Git 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T17:07:26+09:00"
+updated: "2026-09-11T16:51:15+09:00"
 source_of_truth: "Git"
 ---
 
 # Workspace 편집·PTY·원격 Git 후속 계약
 
-WORKSPACE-BRIDGE / S06-BE/DB/ST 부분 / OUT-06·AC-06. owner Codex, 독립 reviewer Claude pending. base PR17 `dac25591adfb61a4a81382f737c4d1eed34c07d5`, branch `agent/codex/workspace-bridge`. GUIDE/PLAN-BACKEND/DB/STORAGE/GOV-AGENT/GOV-GIT v1.0.0와 ADR-056을 잇는다. **사용자 요청으로 이번에는 실제 시험을 수행하지 않는다. 구현·정적 검사·컴파일 성공은 AC-06 합격 증거가 아니다.** 이전 PR17 990개 통과를 새 코드의 시험 증거로 재사용하지 않는다.
+WORKSPACE-BRIDGE / S06-BE/DB/ST 부분 / OUT-06·AC-06. owner Codex, 독립 reviewer Claude pending. base PR17 `dac25591adfb61a4a81382f737c4d1eed34c07d5`, branch `agent/codex/workspace-bridge`. GUIDE/PLAN-BACKEND/DB/STORAGE/GOV-AGENT/GOV-GIT v1.0.0와 ADR-056을 잇는다. 2026-09-10에는 사용자 요청으로 build-only 검증했다. 2026-09-11 WORKSPACE-INTEGRATION은 후속 사용자 지시에 따라 실제 격리 PostgreSQL·Node·PTY 시험을 진행한다. 최종 실행 증거와 남은 인수 항목은 후속 History에 기록한다. 구현·컴파일만으로 AC-06 합격을 선언하지 않는다. 이전 PR17 990개 통과를 새 코드의 시험 증거로 재사용하지 않는다.
 
 ## ADR-057 — 편집 revision과 다음 Node 입력의 일치
 
@@ -60,11 +60,19 @@ DB/working-root lock 안에서 네트워크를 호출하지 않는다. **kill/�
 
 ## DB·배포 및 후속 검증
 
-0023 뒤 0024_workspace_bridge forward migration은 workspace_edits, terminal_tickets/connections/frame_audit, git_operations/votes, operator.can_git를 추가한다. 모두 tenant FORCE RLS와 최소 column grant를 적용한다. immutable intent/vote/revision과 일회 ticket/dispatch 상태 전이를 보존한다. 기존 migration을 수정하지 않는다. 실제 DB 적용·upgrade/restore/rollback은 아직 수행하지 않았다. downgrade 대신 검토된 forward fix 또는 검증된 backup restore가 필요하다.
+0023 뒤 0024_workspace_bridge forward migration은 workspace_edits, terminal_tickets/connections/frame_audit, git_operations/votes, operator.can_git를 추가한다. 모두 tenant FORCE RLS와 최소 column grant를 적용한다. immutable intent/vote/revision과 일회 ticket/dispatch 상태 전이를 보존한다. 기존 migration을 수정하지 않는다. 2026-09-11 격리 DB에서 실제 upgrade를 검증한다. 운영 DB 적용·전체 backup restore는 별도다. downgrade 대신 검토된 forward fix 또는 검증된 backup restore가 필요하다.
 
-이번 branch에 한해 Core의 build_only job을 실행하고 기존 runtime/DB 시험 job 및 docs sync 시험을 제외한다. 정상 branch는 기존 전체 시험을 유지한다. build-only artifact의 validation-mode.json은 executionTests=deferred-by-user, acceptance=pending이다. PR을 merge하지 않은 채 후속 시험 단계에서 이 branch 조건을 제거하고 같은 코드에 대해 전체 CI를 실행해야 한다. 문서 check_docs/check_ontology·컴파일·offline SQL render는 허용된 정적 확인이다.
+2026-09-10 build-only 유예는 종료했다. Core/Backend/Frontend/Documentation의 branch별 시험 생략 조건을 제거했다. GitHub Actions 시작 여부와 결제 제한은 실제 run/annotation으로 따로 기록하며, 로컬 통과를 CI 통과로 바꾸어 보고하지 않는다.
 
-작성한 회귀 시험 소스도 이번에는 실행하지 않는다. 실제 인수 순서는 다음과 같다.
+## ADR-071 — 최신 커널과 편집·PTY 통합
+
+0033_workspace_bridge_merge는 공개된 0024_workspace_bridge와 0032_workspace_readiness_merge를 합친다. 과거 revision의 parent를 바꾸지 않는다. 공개 prior 20개에서 최신 head 업그레이드·재적용·제한 역할을 검사한다. tenant subject 경계 보강과 kernel ResultView를 유지한다.
+
+PTY는 frozen workspaceStart 또는 workspaceResume 중 정확히 하나와 allow_terminal=true를 요구한다. 첫 실행은 기본 설정 Node에 고정하며 prepare.targetNodeId와 workload.targetNodeId가 충돌하면 거부한다. HTTP로 frozen reference를 주입하지 못한다. Node의 TerminalSpec/CommandId/Frame/Input/Result 검증기를 명시적으로 등록하며 Docker helper exec/start는 협상된 API 버전을 사용한다. 모호한 mutation은 자동 재전송하지 않는다.
+
+Git proposal의 idempotent 재조회에도 현재 business membership을 다시 검사한다. 이전 성공 기록이나 살아 있는 kernel grant만으로 현재 public 프로젝트 권한 회수를 우회할 수 없다. 모든 구현은 기존 격리·승인·deadline·출력 상한 안에서 동작한다.
+
+다음 표는 최초 인수 범위이며, 실제 수행분과 아직 남은 운영 검증은 후속 History의 고정 SHA 증거가 우선한다.
 
 | 담당 | 다음 작업과 합격 증거 |
 |---|---|

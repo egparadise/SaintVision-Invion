@@ -152,7 +152,8 @@ class WorkspaceGit:
             if prior:
                 if prior["request_hash"] != request_hash:
                     raise DomainError("IDEM-0001", "Git proposal key has different content")
-                return self._view(conn, prior)
+                current = self._locked(conn, principal, project, str(prior["operation_id"]))
+                return self._view(conn, current)
             checkout = self.editor._scope(
                 conn, principal, project, run_id, checkout_id, writing=True
             )
@@ -193,7 +194,8 @@ class WorkspaceGit:
             if prior:
                 if prior["request_hash"] != request_hash:
                     raise DomainError("IDEM-0001", "Git proposal key has different content")
-                return self._view(conn, prior)
+                current = self._locked(conn, principal, project, str(prior["operation_id"]))
+                return self._view(conn, current)
             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
             operation_id = str(uuid4())
             gate_version = conn.execute("SELECT version FROM inv.tenant_controls").fetchone()[

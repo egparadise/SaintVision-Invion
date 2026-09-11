@@ -57,8 +57,10 @@ class Control:
 
     def create(self, principal, project, key):
         with self.db.transaction(principal.tenant_id) as conn:
-            prior = self.approvals._ledger(conn, principal, project, "api.run.create", key, {})
+            # A new business project may not have a kernel row yet. Check its
+            # current grant before the ledger's FK write, and on every replay.
             self.grant(conn, principal, project, "can_request")
+            prior = self.approvals._ledger(conn, principal, project, "api.run.create", key, {})
             if prior is not None:
                 return prior
             from .containment import require_execution

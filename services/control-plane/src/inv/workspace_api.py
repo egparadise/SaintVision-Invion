@@ -65,8 +65,10 @@ class RestrictedWorkspaceRuntime:
             raise DomainError("AUTH-0011", "Configured Workspace tenant differs", 403)
         intent = deepcopy(workload)
         intent.pop("workspaceResume", None)
+        intent.pop("workspaceStart", None)
         if intent.pop("terminal", None) is not None and (
-            not self.profile.allow_terminal or "workspaceResume" not in workload
+            not self.profile.allow_terminal
+            or sum(name in workload for name in ("workspaceResume", "workspaceStart")) != 1
         ):
             raise DomainError("SANDBOX-0002", "Explicit frozen terminal policy required", 403)
         compile_launch(intent, self.profile)
@@ -150,6 +152,7 @@ class WorkspaceAPI:
             workload["tenantId"] != principal.tenant_id
             or workload["projectId"] != project
             or "workspaceResume" in workload
+            or "workspaceStart" in workload
         ):
             raise DomainError("AUTH-0011", "Workspace intent scope differs", 403)
         checkout_id, resume_id = identity(data["checkoutId"]), identity(data["resumeId"])

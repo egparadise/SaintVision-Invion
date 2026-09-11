@@ -1,0 +1,11 @@
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+RUN apt-get update && apt-get install -y --no-install-recommends git docker-cli ca-certificates
+WORKDIR /app
+COPY requirements-core.txt requirements-test.txt requirements-backend.txt ./
+RUN pip install --no-cache-dir -r requirements-backend.txt
+ENV PYTHONPATH=/app:/app/src:/app/services/control-plane/src:/app/tests:/app/tests/integration
+ENV PYTHONDONTWRITEBYTECODE=1
+COPY . /app
+RUN mkdir -p /node-image /run/test /evidence && chmod 755 binaries/* && python tools/prepare_git_probe.py /node-image
+ENTRYPOINT ["python", "/app/tools/kernel_test_entry.py"]

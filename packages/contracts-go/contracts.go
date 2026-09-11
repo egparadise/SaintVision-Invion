@@ -78,6 +78,7 @@ type WorkloadSpec struct {
     Command []string `json:"command"`
     TimeoutSeconds int64 `json:"timeoutSeconds"`
     WorkspaceResume *WorkspaceResumeRef `json:"workspaceResume,omitempty"`
+    WorkspaceStart *WorkspaceStartRef `json:"workspaceStart,omitempty"`
     TargetNodeId *NodeId `json:"targetNodeId,omitempty"`
     Terminal *TerminalSpec `json:"terminal,omitempty"`
 }
@@ -418,11 +419,12 @@ type WorkspaceResumeRef struct {
 }
 
 type WorkspaceInput struct {
-    ResumeId string `json:"resumeId"`
+    ResumeId *string `json:"resumeId,omitempty"`
     StepId string `json:"stepId"`
     Sha256 string `json:"sha256"`
     SizeBytes int64 `json:"sizeBytes"`
     DataBase64 string `json:"dataBase64"`
+    StartId *string `json:"startId,omitempty"`
 }
 
 type WorkspaceSnapshotFile struct {
@@ -620,6 +622,134 @@ type ContainmentApprovalView struct {
     Status string `json:"status"`
     ExpiresAt string `json:"expiresAt"`
     RequiredApprovals int64 `json:"requiredApprovals"`
+}
+
+type WorkspaceStartRef struct {
+    StartId string `json:"startId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    NodeId NodeId `json:"nodeId"`
+    CpuResourceId ResourceId `json:"cpuResourceId"`
+    MemoryResourceId ResourceId `json:"memoryResourceId"`
+    ProfileVersion string `json:"profileVersion"`
+    PolicyVersion string `json:"policyVersion"`
+}
+
+type WorkspaceStartPrepareInput struct {
+    StepId string `json:"stepId"`
+    Workload WorkloadSpec `json:"workload"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+    SnapshotBase64 string `json:"snapshotBase64"`
+    TargetNodeId NodeId `json:"targetNodeId"`
+}
+
+type WorkspaceStartPrepareResult struct {
+    Workload WorkloadSpec `json:"workload"`
+    Approval ApprovalView `json:"approval"`
+    Run ControlRunView `json:"run"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartView struct {
+    Workload WorkloadSpec `json:"workload"`
+    Run ControlRunView `json:"run"`
+    Approval *ApprovalView `json:"approval"`
+    FrozenFiles []WorkspaceFrozenFile `json:"frozenFiles"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueResult struct {
+    RunId RunId `json:"runId"`
+    CommandId string `json:"commandId"`
+    Accepted bool `json:"accepted"`
+    StartId string `json:"startId"`
+}
+
+type ResultOutputMetadata struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Verified bool `json:"verified"`
+}
+
+type ResultStopReceipt struct {
+    ReceiptId string `json:"receiptId"`
+    ProcessStarted bool `json:"processStarted"`
+    ExitCode int64 `json:"exitCode"`
+    Reason string `json:"reason"`
+    FinishedAt Timestamp `json:"finishedAt"`
+}
+
+type RunResultView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    AttemptCount int64 `json:"attemptCount"`
+    Sealed bool `json:"sealed"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
+    CommandId *string `json:"commandId"`
+    NodeId *NodeId `json:"nodeId"`
+    StopReceipt *ResultStopReceipt `json:"stopReceipt"`
+    Evidence *EvidenceEnvelope `json:"evidence"`
+    CompletedAt *Timestamp `json:"completedAt"`
+    Output *ResultOutputMetadata `json:"output"`
+    OutputAbsentReason *string `json:"outputAbsentReason"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+}
+
+type RunArtifactFile struct {
+    Path string `json:"path"`
+    ChecksumSha256 string `json:"checksumSha256"`
+    ByteSize int64 `json:"byteSize"`
+    Verified bool `json:"verified"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+}
+
+type RunArtifactList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Artifacts []RunArtifactFile `json:"artifacts"`
+    Count int64 `json:"count"`
+    VerifiedCount int64 `json:"verifiedCount"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunLogView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Stdout *string `json:"stdout"`
+    Stderr *string `json:"stderr"`
+    Redacted bool `json:"redacted"`
+    Truncated *bool `json:"truncated"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunAttemptObservation struct {
+    AttemptNumber int64 `json:"attemptNumber"`
+    StartedAt *Timestamp `json:"startedAt"`
+    NodeId *NodeId `json:"nodeId"`
+    CommandId *string `json:"commandId"`
+    StopReceiptId *string `json:"stopReceiptId"`
+    ExitCode *int64 `json:"exitCode"`
+    Reason *string `json:"reason"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type RunAttemptList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Attempts []RunAttemptObservation `json:"attempts"`
+    Count int64 `json:"count"`
+    NextCursor *int64 `json:"nextCursor"`
 }
 
 type WorkspaceFileEdit struct {

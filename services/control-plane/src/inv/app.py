@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import time
+from contextlib import asynccontextmanager
 from threading import BoundedSemaphore
 from fastapi import FastAPI, Request, Depends, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
@@ -162,13 +163,25 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
-def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None):
+def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None, business=None):
+    @asynccontextmanager
+    async def lifespan(api):
+        if business is None:
+            yield
+        else:
+            async with business.router.lifespan_context(business):
+                yield
+
     api = FastAPI(
         title="Saint Vision INV Control Plane",
         version=__version__,
         docs_url=None,
         redoc_url=None,
+        lifespan=lifespan,
     )
+    if business is not None:
+        from .business_surface import BusinessDispatch
+        api.add_middleware(BusinessDispatch, business=business)
     api.add_middleware(Boundary, origins=allowed_origins)
     control = Control(database) if database else None
 
@@ -350,6 +363,43 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     @api.get("/v1/projects/{project}/runs/{run_id}")
     def run(project: str, run_id: str, identity=Depends(authenticated)):
         return control.get(identity.principal, project, run_id)
+
+    # Both URL forms use the canonical kernel, never public.runs CRUD state.
+    from .result_view import ResultView
+    result_view = ResultView(database)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/result")
+    @api.get("/v1/runs/{run_id}/result")
+    def run_result(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.result(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts")
+    @api.get("/v1/runs/{run_id}/artifacts")
+    def run_artifacts(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.artifacts(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts/content")
+    @api.get("/v1/runs/{run_id}/artifacts/content")
+    def run_file(run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)):
+        import hashlib
+        from starlette.responses import Response
+        content = result_view.download(identity.principal, run_id, path, project)
+        return Response(content, media_type="application/octet-stream", headers={
+            "Content-Disposition": 'attachment; filename="artifact.bin"',
+            "X-Content-SHA256": hashlib.sha256(content).hexdigest(),
+            "X-Content-Type-Options": "nosniff",
+        })
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/logs")
+    @api.get("/v1/runs/{run_id}/logs")
+    def run_logs(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.logs(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/attempts")
+    @api.get("/v1/runs/{run_id}/attempts")
+    def run_attempts(run_id: str, project: str | None = None, after: int = 0, limit: int = 50,
+                     identity=Depends(authenticated)):
+        return result_view.attempts(identity.principal, run_id, project, after=after, limit=limit)
 
     @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
     async def cancel(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
@@ -699,6 +749,43 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
         await run_in_threadpool(business_service().get, identity.principal, binding_id)
         raise DomainError("AUTH-0045", "Binding state is derived from execution evidence", 403)
 
+    def first_workspace_service():
+        from .workspace_start import WorkspaceStart
+
+        return WorkspaceStart(workspace_service())
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/prepare", status_code=201)
+    async def prepare_first_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            first_workspace_service().prepare,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/enqueue", status_code=202)
+    async def enqueue_first_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            first_workspace_service().enqueue,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/starts/{start_id}")
+    def first_workspace_status(
+        project: str, run_id: str, start_id: str, identity=Depends(authenticated)
+    ):
+        return first_workspace_service().get(identity.principal, project, run_id, start_id)
+
     @api.post("/v1/projects/{project}/runs/{run_id}/resume/prepare", status_code=201)
     async def prepare_workspace(
         project: str, run_id: str, request: Request, identity=Depends(authenticated)
@@ -768,7 +855,7 @@ def create_configured_app():
     """Production factory: explicit operator configuration, never seeded demo data."""
     try:
         settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace"}:
+        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business"}:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
         database = Database(
@@ -779,11 +866,18 @@ def create_configured_app():
             from .workspace_config import configured_workspace
 
             workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])
+        business = None
+        if "business" in settings:
+            if settings["business"] is not True:
+                raise ValueError()
+            from .business_surface import configured_business
+            business = configured_business(database, identity)
         return create_app(
             database,
             identity,
             allowed_origins=settings.get("allowedOrigins", []),
             workspace=workspace,
+            business=business,
         )
     except Exception:
         raise RuntimeError(

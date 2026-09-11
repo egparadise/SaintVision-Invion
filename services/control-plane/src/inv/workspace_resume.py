@@ -238,7 +238,10 @@ class WorkspaceResume:
 
         validate_contract("AuthorizedCommand", command)
         validate_contract("WorkloadSpec", workload)
-        if "workspaceResume" not in workload or command["tenantId"] != node.tenant_id:
+        first = "workspaceStart" in workload
+        if ("workspaceResume" not in workload and not first) or command[
+            "tenantId"
+        ] != node.tenant_id:
             raise DomainError("AUTH-0044", "Workspace execution scope differs", 403)
         payload = {
             "command": command,
@@ -255,7 +258,12 @@ class WorkspaceResume:
             if prior is not None:
                 return prior
             run = lock_run(conn, run_id, project)
-            approved_resume(conn, run, workload, self.db.recovery_epoch)
+            if first:
+                from .workspace_start import approved_start
+
+                approved_start(conn, run, workload, self.db.recovery_epoch)
+            else:
+                approved_resume(conn, run, workload, self.db.recovery_epoch)
             conn.execute(
                 "SELECT approval_id FROM inv.approval_requests WHERE approval_id=%s FOR SHARE",
                 (command["approvalId"],),
@@ -267,7 +275,11 @@ class WorkspaceResume:
                 project,
                 run_id,
                 allocations,
-                key="workspace:" + workload["workspaceResume"]["resumeId"],
+                key=(
+                    "workspace-start:" + workload["workspaceStart"]["startId"]
+                    if first
+                    else "workspace:" + workload["workspaceResume"]["resumeId"]
+                ),
                 ttl_seconds=60,
             )
             admitted = ToolGateway(bound, profile).claim(
@@ -292,10 +304,11 @@ def workspace_output(artifact, launch):
         if value is not None:
             raise DomainError("VERIFY-0023", "Unexpected Workspace output")
         return None
+    identifier = "startId" if "startId" in input else "resumeId"
     if (
         not isinstance(value, dict)
-        or set(value) != {"resumeId", "stepId", "inputSha256", "snapshot"}
-        or value["resumeId"] != input["resumeId"]
+        or set(value) != {identifier, "stepId", "inputSha256", "snapshot"}
+        or value[identifier] != input[identifier]
         or value["stepId"] != input["stepId"]
         or value["inputSha256"] != input["sha256"]
     ):
@@ -349,7 +362,11 @@ def commit_workspace_output(conn, files, tenant, project, run, command, receipt,
         "inv.workspace.step_committed",
         {
             "commandId": command,
-            "resumeId": launch["workspaceInput"]["resumeId"],
+            **{
+                k: launch["workspaceInput"][k]
+                for k in ("startId", "resumeId")
+                if k in launch["workspaceInput"]
+            },
             "stepId": step,
             "attempt": run["attempt"],
             "sha256": obj["content_hash"],

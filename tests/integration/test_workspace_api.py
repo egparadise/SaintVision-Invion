@@ -89,7 +89,7 @@ def prepare(a):
 
 
 def test_editor_revision_cas_and_frozen_step_use_same_bytes(workspace_http):
-    """Prepared for WORKSPACE-BRIDGE's later execution phase."""
+    """The actual Node reads the edited frozen input and returns restorable output."""
     import base64
 
     a = workspace_http
@@ -116,11 +116,23 @@ def test_editor_revision_cas_and_frozen_step_use_same_bytes(workspace_http):
     assert (
         a.http.post(url, json=edit, headers=a.headers(key="stale-editor-change")).status_code == 409
     )
+    a.prepare_input["workload"]["command"] = ["/probe", "workspace-edited"]
     prepared = prepare(a)
     assert prepared["workload"]["workspaceResume"]["inputSha256"] == first.json()["sha256"]
     assert (
         a.http.post(url, json=edit, headers=a.headers(key="edit-after-freeze")).status_code == 409
     )
+    approve(a)
+    response = enqueue(a)
+    assert response.status_code == 202, response.text
+    a.command = {"commandId": response.json()["commandId"]}
+    worker = DeliveryWorker(a.e.db, a.delivery, output_provider=a.storage.provider)
+    assert worker.once(a.e.tenant) == "stopped"
+    current = a.http.get(a.url, headers=a.headers()).json()
+    assert current["state"] == "succeeded" and current["attempt"] == 2
+    raw = a.storage.restore(a.e.tenant, a.e.project, current["runId"], 2, "public-step")
+    assert decode_snapshot(raw, a.workspace_id)[1]["src/main.py"] == b"print('resumed')\n"
+    assert count(a, "result_completions") == 1 and active(a) == 0 and container(a) is None
 
 
 def test_remote_git_dispatch_is_not_repeated_after_lost_response(workspace_http):

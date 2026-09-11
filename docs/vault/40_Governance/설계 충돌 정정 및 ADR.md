@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.18.0"
+version: "1.27.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-10T17:11:46+09:00"
+updated: "2026-09-11T15:47:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -89,4 +89,22 @@ ADR-053(tenant 실행 barrier·별도 현재 operator 권한·불변 제어 감�
 
 ADR-056(제어 변경의 현재 2인 L2 승인·검증된 서로 다른 사람·고정 내용/epoch/version/만료/nonce·승인 소비와 제어의 원자 확정)은 [[Codex kill switch와 Node drain 및 정리 계약]] v1.1.0을 따른다. 초기 operator-only 경계의 정정이며 자동 비상 예외를 만들지 않는다. 0022 뒤에 0023 forward migration을 추가하고 과거 기록은 보존한다.
 
-ADR-057(불변 editor revision과 승인 snapshot 일치), ADR-058(명시적 목적지 Node와 새 승인), ADR-059(제한 PTY·일회 ticket·현재 권한·bounded 입력/출력), ADR-060(고정 Git provider·현재 2인 승인·expected head publication·불확실 dispatch 재전송 금지)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]을 따른다. 사용자 지시로 실제 시험은 후속 단계이며 build-only 성공을 인수 완료로 표시하지 않는다. 0024는 forward only다.
+ADR-057(불변 editor revision과 승인 snapshot 일치), ADR-058(명시적 목적지 Node와 새 승인), ADR-059(제한 PTY·일회 ticket·현재 권한·bounded 입력/출력), ADR-060(고정 Git provider·현재 2인 승인·expected head publication·불확실 dispatch 재전송 금지)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]을 따른다. 2026-09-10 build-only 기록은 보존한다. 후속 실제 시험과 통합은 ADR-071을 따른다. 0024는 forward only다.
+
+ADR-061(Windows 사용자 전용 개발 Studio·개발 도구와 제품 실행 권한 분리)은 [[Codex 개발 Studio와 제품 실행 경계]]를 따른다. 프로젝트·도구·로컬 CPU 개발 컨테이너를 제공하며 PostgreSQL Run/승인/Node permit/Evidence를 대체하지 않는다. 다중 사용자·원격 업무·GPU 기능은 별도 검증 전까지 비활성이다.
+
+ADR-062(Linux Docker API 1.41~1.45 범위 협상·실제 격리 설정 재검증·512 KiB/1개 json-file 출력 로그)은 [[Codex Node 실행 격리와 정지 영수증 계약]] v1.1.0을 따른다. 성공한 협상만 캐시하고 실행 변경 요청의 자동 재전송은 금지한다. DB/permit/승인 계약은 유지한다. 기존 local logging driver 설정은 서버 20.10 호환성 문제에 따라 정정하며 실제 장비 검증 범위는 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에 기록한다.
+
+ADR-063(실행 이력이 없는 draft Run의 불변 첫 입력·명시적 Node/자원/버전 고정·원자 승인 소비/예약/queue·attempt 1 및 결과 checkpoint)은 [[Codex Workspace 첫 실행과 승인 입력 계약]]을 따른다. 첫 실행은 startId/initialized, 복구는 resumeId/restored로 구분한다. 0025 forward migration을 현재 실제 head 0023 뒤에 추가한다. 운영 사용자/프로젝트 provisioning·화면·원격 PC 설치와 독립 검토는 별도다.
+
+ADR-064(같은 JWT 검증·명시적 업무 route 조합·분리된 inv_app/inv_kernel DB 계정), ADR-065(별도 운영자 관리 grant·현재 tenant definer·Project/Node writer 직렬화)는 [[Codex 계정과 실행 커널 통합 계약]]을 따른다. 0026에서 두 공개 0025 이력을 보존해 합치고 0027로 권한을 보강한다. 운영 IdP/provisioning·원격 Node·UI·독립 재검토는 별도다.
+
+ADR-066(현재 커널 Run/attempt/receipt/Evidence 조회와 검증된 파일 다운로드), ADR-067(실제 권한을 확인하는 준비 상태·원격 도구 미관측 시 unknown)은 [[Codex 실제 실행 결과 조회 계약]]을 따른다. public Run 기록과 실제 커널 실행 상태를 혼동하지 않는다. 0028에서 새 subject lookup 이력과 기존 권한 이력을 보존해 병합하고 tenant guard를 적용한다.
+
+ADR-068(명시적 계정/요청·승인 권한의 insert-only 원자 준비·현재 계정 잠금·불변 감사·공개 migration 이력 보존)은 [[Codex 계정 준비와 실행 권한 계약]]을 따른다. 계정 연결이 Node/Workspace 실행 가능을 뜻하지 않는다. 0030에서 두 결과 이력을 합치고 subject guard와 canonical 다운로드 경계를 유지한다.
+
+ADR-069(현재 관리자 권한·capability 전체 제공량을 모든 kernel slice에 원자 배분·Node→Resource 직렬화·GPU device 미매핑의 명시적 pending)은 [[Codex 자원 제공량과 예약 원자 반영 계약]]을 따른다. 0031은 두 공개 0030 이력을 보존한다. 결과 정본 및 다음 담당은 [[Codex 실제 실행 결과 조회 계약]] v1.1.0과 [[3 Agent 원격 실행과 운영 인수 확정]]이다.
+
+ADR-070(과거 migration 원본과 현재 적용 함수의 검증 구분·공개 이력 보존·현재 epoch/동일 project/대기 Run의 입력 진단)은 [[2026-09-11_Claude_잔여보고_Codex_독립검토]]를 따른다. 0032는 두 0031을 보존해 병합한다. 결과 URL은 kernel ResultView만 제공하고 업무 surface는 별도 readiness router를 사용한다. 로컬 회귀·CI·독립 검토·실제 운영 인수 상태는 분리한다.
+
+ADR-071(공개 0024/0032 이력의 0033 병합·첫 실행과 복구의 명시적 PTY 허용·협상된 Docker helper API·Git replay의 현재 public 권한 재검사)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0을 따른다. branch별 build-only 유예를 제거하며 로컬 실제 실행·CI·독립 검토·물리 장비 운영 인수는 각각 기록한다.
