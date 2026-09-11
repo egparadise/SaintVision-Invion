@@ -61,7 +61,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 - owner / reviewer: Claude / Codex; status: in-progress(수행 가능한 범위 완료, 남은 2건은 외부 차단); priority: P0.
 - 원래 목표/합격 조건: OUT-12 / AC-12.
-- 진행 branch/SHA: `review/claude-account-results` c28cdff → 0581964 (9995122의 후속). push 완료.
+- 진행 branch/SHA: `review/claude-account-results` c28cdff → 0581964 → dee31e5 (9995122의 후속). push 완료.
 - 실제 수행: 지목된 네 결함을 모두 수정하고, 각 검사가 **실패할 수 있음**을 로컬 PostgreSQL 16에서 실증했다. 통과만 가능한 검사는 아무것도 증명하지 않으므로, 수정마다 거짓 통과를 재현한 뒤 차단을 확인했다.
   1. fencing 조회 실패→0: 권한 오류로 양쪽이 0을 읽어 advance가 0이 되고 "fencing safe"가 출력됐다. 복원 수락 여부를 결정하는 유일한 검사에서의 거짓 통과다. `_fencing_state`가 컬럼별 오류 종류와 함께 `None`을 돌려주고, unknown이 합격을 차단한다.
   2. content digest의 public 4개 한정: 실행 기록(`inv.evidence`·`checkpoints`·`node_stop_receipts`·`result_commitments`·`resource_leases`)이 대조 밖이었다. 두 schema를 모두 포함하도록 확장했다.
@@ -88,6 +88,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - `inv_app`의 `public.projects` SELECT 회수 → `resumed` False.
   - 정상 시험: 역할 4·소속 2·policy 122·RLS flag 129, definer 6개 중 unsafe 0, 서비스 재개, exit 0. 원본에는 시험 행이 0개 남았다.
   - 결함이 아닌 확인: `inv_app`은 `inv.runs`를 읽지 못한다. 복원본과 **원본이 동일하게** 그렇고, 이는 모델이 의도대로 동작하는 것이다(`inv` USAGE는 `inv_kernel` 소유). 이 검사의 첫 판은 역할·테이블 짝을 잘못 잡았고, 원본을 대조해 바로잡았다.
+- 정정(dee31e5): 0581964이 definer 판정을 복원 합격의 관문으로 만들었는데, 그 판정은 Codex가 지적한 대로 문자열 대조 휴리스틱이었다. 확인하려고 만든 네 정의가 **전부 누수인데 전부 통과**했다 — 주석 속 binding, 문자열 리터럴 속 binding, tenant 인자를 `org`로 개명, `search_path = pg_temp, inv`. 약한 검사가 합격을 결정하게 두는 것은 이 카드 내내 제거해 온 바로 그 실패 방식이라 먼저 고쳤다. 실측: 조작 누수 4건 전부 차단, head 6개 오탐 0, 0024 실제 누수 재검출 exit 1, 시험 17개 통과. 남은 한계는 정적 판정이라는 점이며 CX-01/CL-01 검토 범위다.
 - 남은 문제(합격 미충족, 둘 다 **차단**이며 미수행이 아님):
   - **object 저장소 바이트**: `INV_OBJECT_STORE_ENDPOINT`가 `config.py`의 `S01_PENDING`이다. 확정된 저장소가 없으므로 대조할 대상이 없다. 해소 담당 Codex(S01).
   - **node 설치 journal**: 원격 호스트(.225)에 있고 DB dump에 들어오지 않는다. 원격 설치가 선행이며 해소 담당은 원격 PC 운영자·Codex다.
