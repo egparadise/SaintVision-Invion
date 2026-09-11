@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T01:38:00+09:00"
+updated: "2026-09-12T02:00:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `5109962` |
+| **고정 구현 Commit SHA** | `6cbb715` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -67,8 +67,9 @@ source_of_truth: "Git"
   - 3회 제한 워크스페이스 복구 수명주기 (ADR-044 / ADR-045): `resume/prepare` → L2 승인 → `resume/enqueue` 순차 전이 및 `attempt >= 3` 시 차단.
 
 ### GM-06: 접근성·내부망 HTTPS·웹 rollback/교육 (`S11-FE`, `S12-FE`)
-- **수정 위치**: `apps/web/src/features/release/releaseEngine.ts`, `apps/web/src/features/deployment/deploymentEngine.ts`, `tools/deploy_intranet.ps1`
+- **수정 위치**: `apps/web/src/features/release/ReleaseCandidateView.tsx`, `apps/web/src/features/release/releaseEngine.ts`, `apps/web/src/features/deployment/deploymentEngine.ts`, `tools/deploy_intranet.ps1`
 - **검토 중점**:
+  - `ReleaseCandidateView`: 하드코딩된 SLO/결함/접근성 배너 수치 및 고정 `MET` 배지 전면 제거, `slos` 및 `audits` 실측치 기반 동적 집계 및 `slo.status.toUpperCase()` 렌더링 전환.
   - WCAG 2.1 AA 명도 대비(11.4:1) 및 키보드 탐색/스크린 리더 ARIA 표준 준수.
   - 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포 파이프라인.
   - 무중단 웹 롤백 엔진(`ReleaseManager` v1.0.0-rc.2 → rc.1 롤백) 검증.
