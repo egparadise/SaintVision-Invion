@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Gemini"
-updated: "2026-09-11T23:51:00+09:00"
+updated: "2026-09-12T01:25:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `858763c` |
+| **고정 구현 Commit SHA** | `9532a35` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -47,9 +47,10 @@ source_of_truth: "Git"
   - 정적 고정 목록 대신 실제 대상 노드에 바인딩된 동적 워크스페이스 목록 렌더링.
 
 ### GM-03: 편집·PTY·Git·kill/drain 화면 (`S06-FE`, `S08-FE`)
-- **수정 위치**: `apps/web/src/features/terminal/WebTerminal.tsx`, `apps/web/src/features/admin/AdminSecurityConsole.tsx`, `apps/web/src/features/admin/securityEngine.ts`
+- **수정 위치**: `apps/web/src/features/terminal/WebTerminal.tsx`, `apps/web/src/shared/realtime/ws-terminal.ts`, `apps/web/src/features/admin/AdminSecurityConsole.tsx`, `apps/web/src/features/admin/securityEngine.ts`
 - **검토 중점**:
   - `WebTerminal`: 오프라인 상태에서 임의 에코 및 가짜 `exit code: 0` 생성 코드 전면 제거, 정직한 `[전송 불가]` 오류 통지 및 30초 일회용 티켓 재접속(`handleReconnect`) 연동.
+  - `WsTerminalClient`: 클라이언트 측 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동 (`sendInput` 시 `{ type: 'data', payload, sequence }` 전송) 및 PTY 감사 순서(F2) 정렬, 재연결 및 오류 디스패치 테스트.
   - `AdminSecurityConsole`: ADR-038 노드 Drain 통제(스케줄링 제외/해제 토글, `drainedNodesCount` 추적) 및 SHA-256 감사 로그 체인(`node_drain_activated`, `node_drain_deactivated`) 연동.
 
 ### GM-04: Agent·AI/MLOps 예시와 검증 표시 제거 (`S09-FE`, `S10-FE`)
@@ -80,7 +81,7 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 103개 테스트)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 104개 테스트)
 npm --prefix apps/web test -- --run
 
 # 2. Vite 프로덕션 빌드 및 타입 검사
