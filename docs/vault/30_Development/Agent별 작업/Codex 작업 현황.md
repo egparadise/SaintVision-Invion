@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.11"
+version: "1.0.12"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T02:08:57+09:00"
+updated: "2026-09-12T02:31:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -181,3 +181,8 @@ source_of_truth: "Git"
 ## 최신 작업 — PERMISSION-SNAPSHOT
 
 9755c60 Linux74/core55, [[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]]. d63717f P1/P2 보완, ade5bb8 원본 집계 과장4개 재현/수정. PR19 draft/CI 계정 제한/Claude 독립 review pending. 다음: 실제 운영 Evidence 수집·검증 경로와 최신 변경 공통 계약 검토; 원격 profile 수신 시 CX-03 실제7개.
+
+
+## 최신 작업 — BACKUP-VERIFY
+
+4ddb622 Linux78/Windows DB60, 원본 실제5개 오류를 보완. [[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]. PR19 draft/CI 계정 차단/Claude review pending. 다음 첫 행동: hash_file의 허용 root·descriptor/handle·링크/교체 경계; 그 뒤 durable 검증 관측/Evidence 연결. 02:30 .225 online/fresh, lan-observe-v1로 원격7개 미수행.

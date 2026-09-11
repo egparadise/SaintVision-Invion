@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T02:08:57+09:00"
+updated: "2026-09-12T02:31:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -183,3 +183,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## Codex 수정·검토 수신 대기 — PERMISSION-SNAPSHOT
 
 9755c60/ADR-082/083 독립 검토 요청은 [[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]], [[Codex 권한 관측과 운영 인수 집계 계약]]을 따른다. d63717f 프로젝트/disabled/관측시점 지적을 보완했고 ade5bb8의 만료/목표초과/다른criterion/metadata-only 완료 과장4개를 실제 재현해 수정했다. 별도 collector를 복제하지 말고 정본 서비스·CLI 및 consumer를 조율한다. 실제 검토 수신/승인은 pending.
+
+
+## Codex 백업 verifier 검토 수신 대기
+
+[[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]의 4ddb622/ADR-084 독립 검토 필요. 기존 verification.py의 실제5개 실패를 비교 전 row잠금/baseline, 비교 후 savepoint로 보완했다. 과거 성공 관측과 최근 실패를 구분하며 현재 bytes 정상/운영 인수 완료로 승격하지 않는다. hash_file open-time 경계는 Codex 후속.
