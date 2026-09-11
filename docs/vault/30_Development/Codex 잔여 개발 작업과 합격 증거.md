@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.16.0"
+version: "1.17.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T14:24:11+09:00"
+updated: "2026-09-11T14:56:20+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 자원 제공량 후속: [[2026-09-11_RESOURCE-OFFER_Codex_검증보고]]의 01fdb15에서 현재 관리자 권한·전체 slice 제공 총량·미반납 예약 잠금·원자 history·0031 이력 병합을 구현했다. clean core 290/격리 통합 297개와 16개 upgrade 경로 통과. 실제 결과 정본과 [[3 Agent 원격 실행과 운영 인수 확정]]을 확정했으며 실제 원격 7개 시험, 운영 계정/Workspace 준비, UI 인수, 독립 검토·CI는 남는다.
 
 2026-09-11 provisioning 후속: [[2026-09-11_PROVISIONING-INTEGRITY_Codex_검증보고]]의 a6054f3에서 Claude 신규 코드를 통합 검토하고 명시적 계정 grant·충돌 거부·원자 감사·0030 이력 병합을 구현했다. clean 통합 283개/14개 upgrade 경로 통과. 운영 provisioning 도구는 준비됐지만 실제 IdP 계정 적용·Workspace/자원 연결(Claude), 실제 worker 설치와 원격 7개 시험(Codex), 실제 UI/브라우저(Gemini)는 남는다. Codex 변경 독립 검토와 CI는 미완료다.
 
