@@ -50,4 +50,4 @@ Linux63은 실제 파일13·실제 복원18·pilot32개다. 저장 경합/기존
 - Claude: 420b81c/ADR-081 독립 검토. 위 P1/P2를 d63717f 후속에서 수정하고 프로젝트 A/B·disabled·동시성 재현을 포함한다. 승인 완료로 표기하지 않는다.
 - Gemini: backupVerified와 기능 복원/운영 RPO를 구분하며 private 파일 경로나 진단값을 실제 다운로드 권한으로 사용하지 않는다. 기존 UI finding/실장비 인수는 별도다.
 
-전체 추정 **57.29% 완료 /42.71% 잔여 유지**. CI·독립 검토·운영 RPO·물리 장비 인수 미완료로 공식 task done 승격 없음. check_docs.py(원문24·문서294·작업48), check_ontology.py, 변경 Python3개 Black 검사, git diff --check 모두 exit0. Obsidian 사전 check:490개·pending13·충돌0·쓰기0. PR19 설명 갱신, draft 유지. 최종 push와 Obsidian apply/check는 후속 영수증에 기록한다.
+전체 추정 **57.29% 완료 /42.71% 잔여 유지**. CI·독립 검토·운영 RPO·물리 장비 인수 미완료로 공식 task done 승격 없음. check_docs.py(원문24·문서294·작업48), check_ontology.py, 변경 Python3개 Black 검사, git diff --check 모두 exit0. Obsidian 사전 check:490개·pending13·충돌0·쓰기0. PR19 설명 갱신, draft 유지. 보고7d18b4a push exit0. 2026-09-12 01:58:06 KST Obsidian490개 해시 일치·pending0·conflict0, check/apply/check exit0. [동기화 영수증](../Evidence/backup-ledger-obsidian-20260912.json). 영수증 포함 최종 문서도 commit/push 후 재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
