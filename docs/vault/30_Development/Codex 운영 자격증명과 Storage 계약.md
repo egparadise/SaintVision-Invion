@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-OPERATING-CONTRACT-001"
 title: "Codex 운영 자격증명과 Storage 계약"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T00:45:47+09:00"
+updated: "2026-09-12T00:59:41+09:00"
 source_of_truth: "Git"
 ---
 
@@ -61,3 +61,18 @@ Linux backend 구현은 서비스 소유 절대 root를 descriptor로 고정하�
 ## 공통 executable 계약과 검증
 
 `src/saintvision/credentials/contract.py`가 내부 Protocol 정본이다. [[Codex 자격증명 보안 검증 인계]]의39개 conformance에 실제 backend를 연결한다. 합성 모델39개+결함검출8개의 통과는 runtime provider 구현·운영 인수와 구분한다. 공개 HTTP 권한이나 모델 차원을 추가하지 않는다.
+
+
+## ADR-077 — 실제 Linux/DB backend와 복원 이후 권한
+
+사용자의 전체 과정 계속 지시에 따라 이번 backend 구현 단위를 Codex가 맡는다. Claude는 독립 reviewer 및 후속 Adapter/운영 연결 owner다. `LinuxFileCredentials`와 `PostgresCredentialRegistry`를 기존 Protocol에 연결하며 두 번째 자격증명 정본을 만들지 않는다.
+
+0035의 credential_versions는 tenant/project별 immutable 버전 metadata(고정 basename·device/inode·SHA-256)를 저장하고 credential_grants는 subject+Run별 enabled/만료/revoked/복구 epoch를 저장한다. 둘 다 FORCE RLS와 tenant 복합 FK이며 inv_kernel에는 SELECT만 허용한다. secret bytes는 DB에 저장하지 않는다. runtime이 자신에게 grant를 발급하거나 version을 수정할 수 없다. 운영자만 보호된 별도 경로에서 version/grant를 등록한다. 버전 metadata 변경/삭제는 trigger가 거부하고, grant 회수·만료 변경은 운영자 권한이다. 운영 provisioning UI/CLI와 실제 secret 등록은 아직 별도다.
+
+registry는 exact ref와 현재 project can_request, subject/Run/project/purpose/destination, 만료·회수, 살아 있는 Run, 현재 epoch 및 kill switch를 확인한다. 이 backend는 명시적 Run scope용이며 독립 운영 backup/KEK 발급기가 아니다. 원래 ToolGateway/승인 절차는 계속 필요하다. 허용된 조회는 inv.credential.authorized 이벤트에 식별자/목적/alias만 기록하며 byte 읽기나 외부 실행 성공 증거로 사용하지 않는다.
+
+Linux root의 경로 각 segment를 O_NOFOLLOW directory descriptor로 열고 서비스 owner/비공개 mode와 inode를 고정한다. 파일은 등록된32hex basename만 허용하며 O_NOFOLLOW/O_NONBLOCK으로 열어 정규 파일·owner·비공개 mode·단일 hard link·1~65536bytes 및 등록 inode를 검사한다. 같은 descriptor에서 bounded read하고 SHA-256, 읽기 전후 size/mtime/ctime와 현재 이름/root identity를 대조한다. root/파일 교체와 공유 hard link를 통해 외부 파일로 바꾸는 접근은 거부한다. 정상 byte를 읽은 뒤 registry를 다시 조회하여 그 사이 commit된 회수를 확인한다.
+
+최종 registry 확인이 해당 callback의 admission 시점이다. 그 이후 회수는 다음 admission을 막지만 이미 진행 중인 외부 효과를 소급 중지하지 않는다. DB transaction/file lock을 callback 네트워크 구간에 걸쳐 유지하지 않는다. callback은 한 번만 호출하고 예외를 raw provider 오류 없이 CredentialDenied로 매핑한다. 모델 서비스의 streaming/cancel/usage/attestation 연결은 후속 Adapter 구현이다. grant의 epoch가 다르면 복원 뒤 새 서비스도 거부하고 운영자의 명시적 재인가가 필요하다.
+
+기존39개 conformance를 실제 Linux 파일·일회용 PostgreSQL에 연결한다. remove_version/rebind_destination 시나리오는 immutable version 파괴 대신 실제 grant 삭제/회수로 해석 불가를 만든다. outside_root는 원래 파일을 root 밖으로 옮기고 hard link를 되붙이는 실제 공격이다. 읽기 중 inode/root/내용 교체, 읽기 후 revocation commit, admission 뒤 회수, RLS/쓰기 권한/복원 epoch/kill/cancel을 추가 검증한다. 운영 키/실제 Provider 요청/Windows ACL/전체 장비 인수와는 구분한다.

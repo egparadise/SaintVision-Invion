@@ -46,6 +46,7 @@ def main():
         "0031_workspace_input_state",
         "0032_workspace_readiness_merge",
         "0033_workspace_bridge_merge",
+        "0034_terminal_frame_intents",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
