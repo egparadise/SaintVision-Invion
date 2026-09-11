@@ -154,7 +154,7 @@ def prepared(migrated, database_url):
     return ids
 
 
-def _run(ids) -> tuple[dict, int]:
+def _run(ids, *extra: str) -> tuple[dict, int]:
     completed = subprocess.run(
         [
             sys.executable,
@@ -164,6 +164,7 @@ def _run(ids) -> tuple[dict, int]:
             "--project", ids["project"],
             "--user", ids["user"],
             "--json",
+            *extra,
         ],
         capture_output=True,
         text=True,
@@ -327,3 +328,71 @@ def test_the_recorded_offer_and_the_kernel_offer_must_agree(prepared) -> None:
     (entry,) = result["offerAgreement"]["disagreeing"]
     assert (entry["recordedOffer"], entry["kernelOffer"]) == (2000, 1800)
     assert code == 1
+
+
+def _snapshot_count(ids) -> int:
+    import psycopg
+
+    with psycopg.connect(ids["dsn"]) as conn:
+        return conn.execute(
+            "SELECT count(*) FROM public.permission_snapshots WHERE tenant_id=%s",
+            (ids["tenant"],),
+        ).fetchone()[0]
+
+
+def test_a_report_without_snapshot_writes_nothing(prepared) -> None:
+    """The default is a read. A tool that files a record while you are looking
+    at it is not safe to point at production."""
+    _beat(prepared)
+    _run(prepared)
+    assert _snapshot_count(prepared) == 0
+
+
+def test_a_snapshot_has_nothing_to_compare_against_the_first_time(prepared) -> None:
+    """Absent is not unchanged, and the first snapshot must not claim to be."""
+    _beat(prepared)
+    result, _ = _run(prepared, "--snapshot")
+    taken = result["permissionSnapshot"]
+    assert taken["previousDigest"] is None
+    assert taken["changed"] is None
+    assert _snapshot_count(prepared) == 1
+
+
+def test_an_unchanged_grant_chain_digests_the_same(prepared) -> None:
+    _beat(prepared)
+    first, _ = _run(prepared, "--snapshot")
+    second, _ = _run(prepared, "--snapshot")
+    assert second["permissionSnapshot"]["digest"] == first["permissionSnapshot"]["digest"]
+    assert second["permissionSnapshot"]["changed"] is False
+
+
+def test_a_revoked_capability_moves_the_digest(prepared) -> None:
+    """Re-verifying permissions means comparing today against what was filed."""
+    _beat(prepared)
+    _run(prepared, "--snapshot")
+    _sql(
+        prepared,
+        "UPDATE inv.operator_grants SET can_approve=false WHERE subject_id=%s",
+        (prepared["subject"],),
+    )
+    after, _ = _run(prepared, "--snapshot")
+    assert after["permissionSnapshot"]["changed"] is True
+    assert after["grants"]["mayApproveAsOperator"] is False
+
+
+def test_project_approval_and_operator_approval_are_reported_apart(prepared) -> None:
+    """They are different authorities and the first version collapsed them.
+
+    A project owner whose operator grant says can_approve is false could still
+    be reported as able to approve, which overstates what workspace_git would
+    actually let them do.
+    """
+    _beat(prepared)
+    _sql(
+        prepared,
+        "UPDATE inv.operator_grants SET can_approve=false WHERE subject_id=%s",
+        (prepared["subject"],),
+    )
+    result, _ = _run(prepared)
+    assert result["grants"]["mayApproveInProject"] is True
+    assert result["grants"]["mayApproveAsOperator"] is False

@@ -27,12 +27,18 @@ It also compares the recorded offer with the offer the kernel actually holds.
 Those are two rows in two schemas and they can disagree, so "the administrator
 set 4 cores" and "the kernel will lease 4 cores" are different claims.
 
-Read-only. Safe against production, and it makes no decision it does not show
-the evidence for.
+Reading is the default and is safe against production; it makes no decision it
+does not show the evidence for. ``--snapshot`` is the one action that writes, and
+it is opt-in for that reason: it files the grant intersection as a
+``PermissionSnapshot`` so that "who could do what" is an artefact rather than a
+memory, and reports whether the digest has moved since the last one. That is what
+re-verifying permissions means in practice — comparing today against the state
+that was accepted.
 
 Usage:
     python tools/operational_readiness.py --dsn DSN --tenant UUID
         [--project prj_...] [--user usr_...] [--json]
+        [--snapshot --performed-by usr_...]
 """
 
 from __future__ import annotations
@@ -40,7 +46,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 #: Who supplies each operational input. The point of naming them is that an
 #: absent input has an owner, and telling somebody "permission denied" when the
@@ -398,10 +407,18 @@ def grants(conn, tenant: str, project: str, user: str, columns: list[str]) -> di
         "refusedBy": refusing,
         # The intersection, which is the only thing that answers "can they work".
         "mayRequestWork": not refusing and role in CAN_REQUEST,
-        "mayApprove": not [
+        # Two different authorities, reported separately because they are.
+        # Business approval comes from the project role. Privileged operator
+        # voting comes from inv.operator_grants.can_approve, which is what
+        # workspace_git's _actor checks before it will count a vote. The first
+        # version returned one "mayApprove" from the role alone, and reported
+        # True for somebody whose operator grant said can_approve is false.
+        # Collapsing them overstated what a person could do.
+        "mayApproveInProject": not [
             layer["layer"] for layer in layers
             if not layer["holds"] and layer["layer"] != "role permits requesting work"
         ] and role in CAN_APPROVE,
+        "mayApproveAsOperator": bool(capabilities.get("can_approve")),
     }
 
 
@@ -478,6 +495,79 @@ def admission(conn, tenant: str) -> dict[str, Any]:
     return {"gates": gates, "closed": closed, "wouldAdmit": not closed}
 
 
+def snapshot_permissions(args, grants: dict[str, Any]) -> dict[str, Any]:
+    """File the grant intersection, and say whether it moved.
+
+    Written from the **same** computation the report printed, not a second pass
+    over the database. A snapshot assembled independently would drift from the
+    report beside it, and the first anyone would learn of the drift is while
+    comparing two snapshots during an incident.
+
+    The recorder is ``pilot.take_permission_snapshot``, which has existed since
+    S12 and had no caller — the service knew how to file a snapshot and nothing
+    knew how to collect one. This supplies the collector rather than adding a
+    second recorder.
+    """
+    import datetime as dt
+    import uuid as _uuid
+
+    from sqlalchemy import create_engine, select
+    from sqlalchemy.orm import sessionmaker
+
+    from saintvision.db.models import PermissionSnapshot
+    from saintvision.db.session import tenant_scope
+    from saintvision.services import pilot as pilot_service
+
+    tenant = _uuid.UUID(args.tenant)
+    # The project belongs in the payload: one person holds different grants in
+    # different projects, and the model records a subject, not a subject here.
+    payload = [
+        {"projectId": grants["projectId"], "layer": layer["layer"], "holds": layer["holds"],
+         "value": layer["value"]}
+        for layer in grants["layers"]
+    ]
+    # SQLAlchemy picks psycopg2 for a bare "postgresql://"; this project uses
+    # psycopg 3 and the driver has to be named for it.
+    url = args.dsn
+    if url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url[len("postgresql://") :]
+    engine = create_engine(url, future=True)
+    factory = sessionmaker(engine, future=True, expire_on_commit=False)
+    try:
+        with factory() as session:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    previous = session.scalars(
+                        select(PermissionSnapshot)
+                        .where(
+                            PermissionSnapshot.tenant_id == tenant,
+                            PermissionSnapshot.subject_type == "user",
+                            PermissionSnapshot.subject_id == grants["userId"],
+                        )
+                        .order_by(PermissionSnapshot.taken_at.desc())
+                        .limit(1)
+                    ).first()
+                    before = previous.digest_sha256 if previous else None
+                    taken = pilot_service.take_permission_snapshot(
+                        session,
+                        tenant_id=tenant,
+                        subject_type="user",
+                        subject_id=grants["userId"],
+                        grants=payload,
+                        now=dt.datetime.now(dt.timezone.utc),
+                    )
+                    return {
+                        "snapshotId": taken.snapshot_id,
+                        "digest": taken.digest_sha256,
+                        "previousDigest": before,
+                        # None means there is nothing to compare against yet,
+                        # which is not the same as "unchanged".
+                        "changed": None if before is None else before != taken.digest_sha256,
+                    }
+    finally:
+        engine.dispose()
+
+
 def report(args) -> dict[str, Any]:
     import psycopg
 
@@ -491,6 +581,8 @@ def report(args) -> dict[str, Any]:
             result["grants"] = grants(
                 conn, args.tenant, args.project, args.user, _capability_columns(conn)
             )
+    if args.snapshot and "grants" in result:
+        result["permissionSnapshot"] = snapshot_permissions(args, result["grants"])
     return result
 
 
@@ -500,10 +592,20 @@ def main() -> int:
     parser.add_argument("--tenant", required=True)
     parser.add_argument("--project", help="report the grant intersection in this project")
     parser.add_argument("--user", help="the user to report it for")
+    parser.add_argument(
+        "--snapshot",
+        action="store_true",
+        help=(
+            "file the grant intersection as a PermissionSnapshot and report "
+            "whether its digest moved since the last one. This writes"
+        ),
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     if bool(args.project) != bool(args.user):
         parser.error("--project and --user are given together or not at all")
+    if args.snapshot and not args.project:
+        parser.error("--snapshot needs --project and --user: a snapshot is of a subject")
 
     result = report(args)
     absent = result["absent"]
@@ -551,8 +653,23 @@ def main() -> int:
             print(f"  {mark} {layer['layer']}: {layer['value']}")
             if not layer["holds"]:
                 print(f"            granted by {layer['grantedBy']} — {layer['means']}")
-        print(f"  may request work: {g['mayRequestWork']}")
-        print(f"  may approve:      {g['mayApprove']}")
+        print(f"  may request work:        {g['mayRequestWork']}")
+        print(f"  may approve in project:  {g['mayApproveInProject']}")
+        print(f"  may approve as operator: {g['mayApproveAsOperator']}")
+
+    taken = result.get("permissionSnapshot")
+    if taken:
+        print(f"\npermission snapshot {taken['snapshotId']}")
+        print(f"  digest   {taken['digest'][:16]}…")
+        if taken["previousDigest"] is None:
+            print("  no earlier snapshot for this subject; nothing to compare against")
+        elif taken["changed"]:
+            print(
+                f"  CHANGED  from {taken['previousDigest'][:16]}… — what this "
+                f"person can do is not what was last filed"
+            )
+        else:
+            print("  unchanged from the previous snapshot")
 
     print("\nexecution admission (not a permission)")
     for gate in result["admission"]["gates"]:
