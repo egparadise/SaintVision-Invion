@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-DEFINER-AUDIT-001"
 title: "Codex DB 함수 감사와 복원 판정 검토"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:43:33+09:00"
+updated: "2026-09-12T01:46:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -60,3 +60,13 @@ Claude c28cdff는 과거 invalid backup/empty DB 허위 성공을 실제 재시�
 공식 근거(2026-09-11 확인): [PostgreSQL pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html), [Sequence functions](https://www.postgresql.org/docs/16/functions-sequence.html), [Docker exec environment](https://docs.docker.com/reference/cli/docker/container/exec/). 위 문서의 정의와 로컬 실행 증거를 구분한다.
 
 착수/범위: [[2026-09-11_RECOVERY-INTEGRATION_Codex_착수]]. 검증·진행도와 다음 인계는 작업 후 History에 추가한다.
+
+## ADR-080 — 설정 관측·복원 기능·운영 RPO 인수 분리
+
+[[2026-09-12_RPO-CAPABILITY_Codex_검증보고]]를 따른다. archive_timeout은 archiveSwitchTimeoutSeconds로만 보고하고 command/library 원문은 SQL marker로 대체한다. archivingConfigured/dataChecksumsEnabled가 true라도 보관 성공/원본 무손상/운영 RPO 검증이 아니다. operationalRpoBoundSeconds=null·operationalRpoVerified=false를 유지한다. 실제 base backup·연속WAL·독립 보관/장애 범위·복원 손실 구간·지속 관측 증거가 필요하다.
+
+CLI와 DB record는 _accepted(기능 _passed + 요구된 운영 RPO 조건)를 공통으로 사용한다. --require-operational-rpo가 없으면 기존 database_rehearsal 결과이며 운영 합격을 뜻하지 않는다. 요구했는데 확인되지 않으면 기능 통과 측정값은 보존하되 outcome=failed, met_targets=false, notes에 기능 통과/요구 목표/미검증을 기록한다. 서비스는 failed/aborted 측정치가 작아도 met_targets를 true로 계산하지 않는다.
+
+0036의 ck_recovery_drills_met_targets_requires_passed는 NOT VALID로 추가한다. 기존 실패/목표true 행을 삭제·재작성하지 않고 신규 INSERT/UPDATE에만 강제한다. 기존 이력 전수 검증/정정은 별도이며 NOT VALID를 전수 안전 증거로 쓰지 않는다. 정본 definer9개의 정의/권한은 그대로이고 policy revision만0036으로 갱신한다. 운영자와Claude는 현재 tenant scope에서 `met_targets AND outcome <> 'passed'`인 과거 행을 검토하고 원본 이력과 정정 판단을 구분한다.
+
+공식 근거: [PostgreSQL16 WAL settings](https://www.postgresql.org/docs/16/runtime-config-wal.html), [Continuous Archiving](https://www.postgresql.org/docs/16/continuous-archiving.html). 운영 PITR 배포·스케줄·매체 검증을 실행한 ADR가 아니다.

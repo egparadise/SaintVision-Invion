@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T01:26:09+09:00"
+updated: "2026-09-12T01:46:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Codex RPO 검토 인계:4b09dfc timeout=운영RPO, raw archive_command, CLI/record gate 불일치와 실제 pilot met_targets 오류를 b49ecd3/0036에 보완했다. Linux69·core53·upgrade23 실제 통과, 독립 reviewer Claude pending. 8a8f3b4의 기록 fault3개는 최신 Codex 정본에 이미 수정돼 있으며 ledger 신규 연결은 후속 검토다. [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]].
 
 Codex 후속 인계: 보호 credential CLI76ba5ba와 ADR-079의 원자 회전/회수·현재 scope·운영 절차 독립 검토 pending. 기존 backend를 Provider에 연결한다. Claude4b09dfc/c632d3f RPO 변경은 수신했으며 Codex 후속 독립 검토 대상이다. [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]].
 

@@ -1,0 +1,70 @@
+{
+  "recordedKst": "2026-09-12T01:46:04+09:00",
+  "codeSHA": "b49ecd3bcc8836350f972392759851f6c05f9b58",
+  "core": {
+    "passed": 53,
+    "skipped": 0,
+    "exitCode": 0,
+    "scope": "Windows decision and migration graph tests",
+    "junitSHA256": "5b19ea8c26d9e05b4fb57e65de1b8372c9ba1c35eb88d2a430dc4cdf86a6f9cc"
+  },
+  "upgrade": {
+    "priorRevisions": [
+      "0018_workspace_resume",
+      "0010_canonical_resource_units",
+      "0019_workspace_api_integration",
+      "0020_shard_recovery",
+      "0021_business_kernel",
+      "0022_node_containment",
+      "0023_containment_approvals",
+      "0024_workspace_bridge",
+      "0025_workspace_start",
+      "0025_workspace_tool_choice",
+      "0026_subject_kernel_link",
+      "0027_business_api_guards",
+      "0028_result_readiness_merge",
+      "0028_subject_kernel_link",
+      "0029_run_outputs",
+      "0030_provisioning_integrity",
+      "0030_apply_resource_offer",
+      "0031_resource_offer_integrity",
+      "0031_workspace_input_state",
+      "0032_workspace_readiness_merge",
+      "0033_workspace_bridge_merge",
+      "0034_terminal_frame_intents",
+      "0035_credential_registry"
+    ],
+    "head": "0036_recovery_target_outcome",
+    "exitCode": 0,
+    "legacyInvalidClaimPreserved": true,
+    "newWritesEnforced": true,
+    "postgresImage": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+    "privateLogSHA256": "900408b848ff5221b6512ffb3081bceef763ae915ab732ec2be89f416f2a9583"
+  },
+  "originalReproduction": {
+    "sourceSHA": "4b09dfc947ace30cec52cddf79dd3d1105fefa75",
+    "scope": "exact original pure functions; not live PostgreSQL",
+    "cases": [
+      {
+        "command": "/bin/true",
+        "configured": true,
+        "bound": 300,
+        "target900Passed": true
+      },
+      {
+        "command": "/bin/false",
+        "configured": true,
+        "bound": 300,
+        "target900Passed": true
+      }
+    ]
+  },
+  "firstIntegration": {
+    "codeSHA": "08cd83d08f922888799d7fa60108fe016ba00e91",
+    "cases": 67,
+    "passed": 66,
+    "failed": 1,
+    "finding": "CLI refused target and recorded outcome failed, but pilot service computed met_targets=true from measurements alone",
+    "resolvedBy": "b49ecd3bcc8836350f972392759851f6c05f9b58"
+  }
+}
