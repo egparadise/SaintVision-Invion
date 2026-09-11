@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+CL-07 (Claude, 2026-09-12): 4b09dfc·c632d3f. WAL·PITR을 검증하다 **복원 시험의 RPO 숫자가 실패할 수 없는 값**임을 발견해 "이번 복원의 간격"과 "설정이 보장하는 한계"로 분리했다. 이 배포는 `archive_mode=off`라 시점 복구가 없고 **AC-12의 RPO 목표는 미달성**이다. 인수용 gate `--require-operational-rpo`는 지금 exit 1이다.
+
 CL-05 (Claude, 2026-09-12): dcad652. Context의 redaction을 caller 선언에서 **거부**로 바꿨다. 단위 시험 13개는 배선을 끊어도 전부 통과했고, DB를 거치는 배선 시험만 그것을 잡았다. Context에 호출자가 없다는 점과 TTL이 수명 결정을 먼저 요구한다는 점을 남은 문제로 기록했다.
 
 CL-02 (Claude, 2026-09-12): 5995b8b. 운영 준비 판정을 입력·권한·실행 admission 셋으로 분리하고 각 거부가 발동함을 실측했다. 핵심 증거는 "권한 전부 정상 + kill switch ON → 권한 거부 없음, 실행 불가"다. 실제 운영 입력(계정·폴더·원격 profile·object endpoint)은 여전히 대기 중이며 지어내지 않았다. 전문 [[Claude_CL-02_운영준비_검증보고]].
@@ -42,8 +44,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | CL-03 | P0 | in-progress | S12-DB S12-ST | 복원 도구의 남은 검증 결함 수정 |
 | CL-04 | P1 | blocked | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
 | CL-05 | P1 | in-progress | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
-| CL-06 | P1 | planned | S10-BE S10-DB S10-ST | 실제 학습·평가·MLflow·승인 배포 서비스 |
-| CL-07 | P1 | planned | S12-DB S12-ST | 운영 관측·장시간 시험·복원 절차 인수 |
+| CL-06 | P1 | blocked | S10-BE S10-DB S10-ST | 실제 학습·평가·MLflow·승인 배포 서비스 |
+| CL-07 | P1 | in-progress | S12-DB S12-ST | 운영 관측·장시간 시험·복원 절차 인수 |
 
 ### CL-01 — Codex 최신 커널 독립 검토
 
@@ -161,8 +163,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-06 — 실제 학습·평가·MLflow·승인 배포 서비스
 
-- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- owner / reviewer: Claude / Codex; status: blocked(CL-04 seam 계약 선행); priority: P1.
 - 원래 목표/합격 조건: OUT-10 / AC-10.
+- 착수 판단(Claude, 2026-09-12): 카드는 "CPU 경로 구현을 GPU 준비 때문에 멈추지 않음"이라고 하며 그 말은 옳다. 그러나 이 카드의 합격 증거는 **모델 bytes와 배포 digest의 역추적**이고, CL-04 조사에서 확인했듯 공개 측에는 바이트를 가리키는 writer가 없으며 그 연결 방식 자체가 Codex 계약 대기 중이다. 지금 CPU 경로를 구현하면 저장할 곳이 정해지지 않은 바이트를 위한 계보를 만들게 되고, 카드가 금지한 "예시 모델/메타데이터만으로 배포 완료 표시"에 가까워진다. 그래서 GPU가 아니라 **CL-04의 답**을 기다린다.
 - 다음 첫 행동: CPU/GPU 학습 결과를 Dataset/commit/image/model bytes·평가·승인·배포 digest로 연결하고 전체 역추적을 구현한다.
 - 필요한 합격 증거: 실제 학습→평가→모델 다운로드→승인→배포/rollback 계보와 참조 보존. 예시 모델/메타데이터만으로 배포 완료 표시 금지.
 - 선행/차단과 해소 담당: CL-04/05, GPU 경로는 CX-06. CPU 경로 구현을 GPU 준비 때문에 멈추지 않음.
@@ -170,11 +173,20 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-07 — 운영 관측·장시간 시험·복원 절차 인수
 
-- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- owner / reviewer: Claude / Codex; status: in-progress(WAL·PITR 검증 완료, 운영 결정과 장시간 시험 대기); priority: P1.
 - 원래 목표/합격 조건: OUT-12 / AC-12.
-- 다음 첫 행동: 알람/worker 재시작/partition/보존/백업 매체/WAL·PITR·권한 재검증 절차를 검증하고 Codex·Gemini 릴리스 시험을 지원한다.
-- 필요한 합격 증거: 실제 운영 로그/알람·장시간 표본·전체 복구/사용자 인수와 실패 처리 절차. 작성자와 승인자 구분.
-- 선행/차단과 해소 담당: CL-02/03/06, CX-09와 공동 시나리오. 각각 owner는 유지.
+- 진행 branch/SHA: `review/claude-account-results` **4b09dfc**(도구), **c632d3f**(절차서 8-0).
+- 실제 수행 — 카드가 지목한 **WAL·PITR 절차를 검증했고, 그 과정에서 내 도구의 헤드라인 숫자가 증거가 될 수 없음을 발견해 고쳤다.**
+  - 복원 시험은 백업을 방금 뜨고 곧바로 복원하므로 "recovery RPO 6초"가 나온다. 서버 설정과 무관하게 거의 0이 나오는 **실패할 수 없는 숫자**이며, AC-12의 RPO 목표 증거로 쓸 수 없다. 이 도구에서 네 번이나 제거한 결함이 헤드라인에 남아 있었다.
+  - 이제 두 가지를 구분해 보고한다: `recovery RPO … for this restore`(이번 복원의 간격)와 `operational RPO bound`(설정이 보장하는 한계).
+- **실측한 설정 결함(개발 컨테이너와 `docker-compose.prod.yml` 동일)**: `archive_mode=off`, `archive_command` 미설정, `wal_keep_size=0`, `archive_timeout=0`, `data_checksums=off`.
+  - **연속 아카이빙이 꺼져 있어 시점 복구가 불가능하다.** 복구 지점은 마지막 전체 백업뿐이므로 **운영 RPO = 백업 주기**다. 15분 목표를 지금 설정으로 만족하려면 15분마다 전체 덤프를 떠야 하고 절차서는 그런 주기를 규정하지 않았다. → **AC-12의 RPO 목표는 현재 미달성이다.**
+  - `data_checksums=off`: 이 시험은 복원본을 **원본과** 대조하므로, 원본에서 이미 손상된 페이지는 양쪽에서 같게 읽혀 모든 대조를 통과한다. 이 도구는 원본이 온전했다고 말해주지 않는다. initdb 시점에만 켤 수 있어 운영 배포 전 결정이 필요하다.
+- **인수용 gate를 추가했다**: `--require-operational-rpo SECONDS`. 설정이 그 이하의 한계를 확립하지 못하면 **거부**한다. opt-in이라 일반 기능 시험은 막지 않는다 — 인수 증거를 요구하는 것은 의도적 행위여야 하기 때문이다.
+- 실제 검증 증거(로컬 PostgreSQL 16): 기능 시험은 exit 0이되 한계는 NOT ESTABLISHED로 보고. 같은 시험에 `--require-operational-rpo 900`을 주면 **exit 1**. `archive_mode=on`·`archive_command`·`archive_timeout=300`으로 띄운 probe 서버에서는 한계 300s로 읽히고 900s 목표는 만족, 60s 목표는 불만족. 판정을 순수 함수로 분리해 시험 10개 — 가장 필요한 분기(아카이빙은 켰지만 `archive_timeout=0`이라 아무것도 한계 짓지 못한 경우)는 `-c archive_timeout`으로 띄운 서버에서 `ALTER SYSTEM`이 먹지 않아 **실서버로는 도달 불가**였고, 그래서 처음에 시험되지 않았다.
+- 부수 발견(보고만, 수정은 운영 행위): `docker-compose.prod.yml`에 `POSTGRES_PASSWORD=postgres`와 `inv_app:apptestonly`가 그대로 있다. prod 이름을 단 파일의 기본 credential이다.
+- 남은 문제: 연속 아카이빙·보관 매체·백업 주기는 **운영 결정**이며 CX-09 릴리스 시험과 함께 정해야 한다. 알람/worker 재시작/partition/장시간 표본과 사용자 인수는 미수행이고, CL-02의 실제 운영 입력과 CX-09 공동 시나리오가 선행이다. 작성자(Claude)와 승인자(Codex)는 구분한다.
+- 다음 첫 행동: PITR·보관 매체·주기 결정을 CX-09와 함께 받는다. 결정되면 같은 gate로 실측해 인수 증거를 만든다. 담당 Claude, 결정 Codex·운영자.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ## 작업 후 갱신할 최신 기록
