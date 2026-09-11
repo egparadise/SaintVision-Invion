@@ -1,10 +1,10 @@
 ---
 doc_id: "GUIDE-REMOTE-WORKSPACE-20260911"
 title: "원격 Workspace Node 설치 안내"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T11:28:00+09:00"
+updated: "2026-09-11T11:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,4 +36,4 @@ Node hard limit는 CPU 1 core, RAM 512 MiB, 30초이며 아래 시험은 CPU 0.5
 
 설치가 끝나면 Codex는 fresh mTLS profile을 확인하고 **운영 DB와 분리한 시험 DB**에서 최초 Python/CPU 학습·실행 전/실행 중 취소·exit 7·timeout·서버 프로세스 종료 후 출력 복구를 확인한다. JWT/승인자는 그 시험 DB에서만 사용하는 합성 actor다. 실제 물리 Node·파일·receipt/Evidence 검증과 운영 로그인/일반 업무 인수는 구분한다. 기존 운영 DB의 kill switch·grants·offers는 변경하지 않는다.
 
-설치본 코드는 `01236401367c4a430cf73da2b68984ca411e4883`, 이미지 코드는 실제 첫 실행 159개를 통과한 `b6301a9613097122a7574fa647b63d791fe13d2d`다. 기존 `Enable-ExecutionTests.ps1` probe 설치와 다르다. 현재 배포 및 검증 기록은 [[2026-09-11_REMOTE-WORKSPACE_Codex_착수]]에서 이어 기록한다.
+설치본 코드는 `01236401367c4a430cf73da2b68984ca411e4883`, 이미지 코드는 실제 첫 실행 159개를 통과한 `b6301a9613097122a7574fa647b63d791fe13d2d`다. 기존 `Enable-ExecutionTests.ps1` probe 설치와 다르다. 현재 배포 및 검증 기록은 [[2026-09-11_REMOTE-WORKSPACE_Codex_검증보고]]를 따른다.

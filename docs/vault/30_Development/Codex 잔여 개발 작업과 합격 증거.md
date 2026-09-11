@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.12.0"
+version: "1.13.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T11:00:00+09:00"
+updated: "2026-09-11T11:34:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 원격 Node 배포 후속: [[2026-09-11_REMOTE-WORKSPACE_Codex_검증보고]]에서 새 설치본 0123640을 게시하고 기존 identity/key/journal 보존·실패 rollback 3개, 서버 시험 도구 650ca0b의 로컬 실제 실행/취소/출력 복구 7개를 검증했다. Codex의 바로 다음 작업은 [[2026-09-11_REMOTE-WORKSPACE_다른PC설치안내]]의 worker 설치 JSON 확인 후 같은 7개를 실제 192.168.45.225에 실행하는 것이다. 현재 SSH/WinRM 경로 없음·lan-observe-v1이라 실제 원격 설치/실행 완료가 아니다. 기존 운영 DB/gate/권한은 유지하고 장비 시험은 격리 DB에서 수행한다. Claude 운영 identity/업무 API·독립 검토, Gemini 실제 UI 인수와 후속 GPU/장시간·다중 Node 범위는 남는다.
 
 2026-09-11 첫 Workspace 실행 후속: [[2026-09-11_FIRST-RUN_Codex_검증보고]]의 clean 코드 `b6301a9`에서 새 draft 입력/선택 Node 고정→승인→원자 예약/queue→attempt 1→실제 출력/checkpoint/Evidence를 검증했다. 통합 159개·core 260개·Windows Go 통과다. [[Codex Workspace 첫 실행과 승인 입력 계약]](ADR-063)의 업무 API/provisioning 및 독립 검토는 Claude, 실제 입력/상태/다운로드 UI는 Gemini, 새 원격 agent/profile 배포 후 실제 PC 실행/취소/복구는 Codex다. 장시간/대용량·GPU·분산 학습·5대·Context/RO 인수는 남는다. 과거 0024/Workspace bridge 문서와 달리 현재 추적 코드에는 해당 revision이 없으며 이번 0025는 실제 head 0023을 잇는다. 과거 기록만으로 PTY/Git 통합 완료를 인정하지 않는다. 상세 순서·합격 증거는 최신 보고서 표를 우선한다. Gemini 최신 수정본은 [[2026-09-11_GEMINI-STUDIO_수정본_Codex_재검토]]의 남은 P1/P2를 따른다.
 

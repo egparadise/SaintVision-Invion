@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-11T02:18:27.050332+00:00",
+  "codeSHA": "01236401367c4a430cf73da2b68984ca411e4883",
+  "dirty": false,
+  "scope": "local-real-docker-installer-synthetic-pki",
+  "agentImage": "sha256:153bcae19a2aab26dbaab638ddaa3aa6622a628f99d32c76b3ee711f63473753",
+  "nodeImage": "sha256:f8af70427bcc35f1bebe18f4d121a505eb1a346028596c133fe6cd481a1c6abe",
+  "runtimeImageCodeSHA": "b6301a9613097122a7574fa647b63d791fe13d2d",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_real_upgrade_preserves_credentials_journal_and_replays",
+      "passed": true
+    },
+    {
+      "name": "test_real_failed_start_restores_prior_container_and_journal",
+      "passed": true
+    },
+    {
+      "name": "test_real_trust_mismatch_does_not_stop_node",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "deploy/lan/worker_workspace.py": "da46ab67d0220b705c54bf889c3bf63e18b3bddb327bfe5881969121d43711c3",
+    "deploy/lan/worker_config.py": "74977149a13441a2d251e99d1133995a2d48754a04c354b0d97ecd9150f5b1d3",
+    "tests/integration/test_workspace_upgrade.py": "0c42da94e78a99a8f1ba0e35678f77005db834f79ad83c563fbe09f95fe4db99"
+  }
+}
