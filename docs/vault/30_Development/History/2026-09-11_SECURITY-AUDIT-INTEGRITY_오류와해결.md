@@ -1,10 +1,10 @@
 ---
 doc_id: "ERR-SECURITY-AUDIT-INTEGRITY-20260911"
 title: "DB 감사·복원·결과 검토 오류와 해결"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:03:37+09:00"
+updated: "2026-09-11T18:10:30+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,3 +22,9 @@ source_of_truth: "Git"
 | CX01-06 / 로컬 시험 fixture | 첫 real-login 테스트가 public.projects의 없는 name 열 사용으로 실패 | 실제 code/display_name 열로 fixture 수정 후 같은 시험 재실행. 제품 DB schema 변경 없음 |
 
 재현 원본은 [review reproduction](../Evidence/security-audit-review-20260911.json). 테스트용 DB/container만 사용하고 운영 데이터·계정·Node는 변경하지 않았다. Claude recovery 및 Gemini UI의 이 시각 이후 수정은 별도 SHA에서 재검토한다.
+
+## 수정본과 동기화 후속
+
+- c28cdff 재검토: CX01-02의 기존 invalid backup/empty DB 허위 성공은 거부로 바뀌었다. 전체 복원 인수는 미완료. `_passed`의 음수 RPO·restore nonzero 판정은 아직 true이며 별도 판정 함수 시험으로 재현했다. Claude CL-03에서 유한/비음수 측정·명시적 restore 오류 정책·필수 schema/role/RLS/함수/object/journal/서비스 재개를 연결한다.
+- sync --check는 외부 문서 3개 충돌로 exit 1, no writes. 외부 원문·hash와 소스 commit을 Evidence에 보존하고 신선한 History/검토 기록을 유지하여 병합한다. 바이트가 동일한 캡처 baseline만 state로 인수한 뒤 정상 동기화한다.
+- CI 6개 account billing/spending limit 때문에 시작 불가. 운영 책임자 해소 후 같은 구현 SHA에서 재실행. 로컬 통과를 CI 성공이라 쓰지 않는다.

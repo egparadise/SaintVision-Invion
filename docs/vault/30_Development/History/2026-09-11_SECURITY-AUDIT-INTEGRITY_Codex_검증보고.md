@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-SECURITY-AUDIT-INTEGRITY-VERIFY-20260911"
 title: "DB 감사 무결성 보강과 3 Agent 검토 보고"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:03:37+09:00"
+updated: "2026-09-11T18:10:30+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,3 +30,21 @@ base 995b3a3, branch agent/codex/workspace-bridge, 기존 PR19 후속. Claude 99
 ## 전달과 다음 행동
 
 고정 SHA 검증 후 push/CI 상태·Obsidian 동기화를 기록한다. 다음 Codex는 CX-01의 수정본 독립 재검토/통합과 CX-02 운영·credential·Storage 계약을 진행한다. CX-03 원격 설치 및 7개는 기존 선행 상태를 유지한다. 전체 CX-01/main/운영 인수를 done으로 올리지 않는다.
+
+## 고정 SHA 검증·수정본 재검토
+
+구현 SHA **b9a53f891a32be42da7d6cecb2a06a295814f3a1**. source copy가 clean이고 전체 source hash를 검사한 Linux 격리 환경에서 **65 passed / 0 skipped**, exit 0. 새 definer mutation/실제 로그인·기존 subject tenant·자원 제공량·프로비저닝·실제 recovery 입력·계정/migration 회귀를 포함한다. Docker runner/DB/network 정리도 모두 확인했다. [Linux Evidence](../Evidence/security-audit-b9a53f8-linux.json).
+
+같은 SHA 기본 회귀 **304 passed / 0 skipped**, exit 0. 기존 공개 **20개 prior→head→head** 모두 제한 runtime grant와 새 9개 privileged function policy 확인에 통과했다. Windows 중간 57/skip 1은 디버깅 기록으로 남기고 최종 합계에 중복 가산하지 않는다. [검사 영수증](../Evidence/security-audit-b9a53f8-checks.json).
+
+18:05 이후 Claude **c28cdff**를 재검토했다. 같은 invalid backup/empty DB 실제 재현에서 `restoreExitCode=1`, `integrityVerified=false`, `fencingVerified=false`로 바뀌어 **이전 허위 성공 사례의 수정은 확인**했다. inv 내용 digest·unknown fencing·archive 시각·공통 _passed 보완도 소스에서 확인했다. 다만 _passed에 명시적인 음수 RPO 입력과 restoreExitCode=1 입력을 각각 주면 true다. 이 두 항목은 판정 함수 시험이며 새로운 전체 복원 성공 재현으로 과장하지 않는다. [수정본 재검토](../Evidence/security-audit-claude-c28cdff-recheck.json).
+
+Claude 7810ac1의 CL-03 진행 기록과 Gemini f50310e의 GM-01/02/04 기록을 수신해 각 작업판에 합쳤다. 작성자 보고의 수치와 Codex 검토 결과를 구분한다. Gemini의 없는 파일 생성 응답·인증 없는 raw fetch·고정 코딩 평가에 대해서는 **수정 요청**을 유지한다. 전체 CLAUDE/Gemini 코드를 이 보안 commit에 병합했다고 표시하지 않는다.
+
+## GitHub 및 Obsidian
+
+b9a53f8 origin push exit 0. 같은 SHA CI 6개는 계정 결제/사용 한도 때문에 시작 전 실패했다. [Core 34582518481](https://github.com/egparadise/SaintVision-Invion/actions/runs/34582518481), [Documentation 34582518319](https://github.com/egparadise/SaintVision-Invion/actions/runs/34582518319). [모든 CI 결과](../Evidence/security-audit-b9a53f8-ci.json). 코드의 독립 reviewer Claude pending, main/운영 인수 미완료.
+
+Obsidian check에서 외부 변경 3개로 정상 중단했다. progress/Gemini 작업판은 f50310e, History 인덱스는 같은 source의 오래된 v1.0.16/줄바꿈 차이였다. [외부 원문과 hash](../Evidence/security-audit-sync-proposals-20260911.json)를 보존하고, 현재 Codex History v1.0.22의 내용은 유지하면서 새 담당 보고만 연결했다. 동일 원문 baseline을 바이트 변경 없이 인수한 뒤 통상 check/apply/check로 최종 내용을 전달한다. 강제 충돌 무시나 과거 이력 삭제는 하지 않는다.
+
+다음 Codex: CX-01의 원 owner 수정본 인수·같은 SHA 통합 및 CX-02의 credential/Storage/운영 계약. Claude: CL-03에 numeric/restore exit/schema·role·RLS·definer/journal/object/서비스 재개 경계 추가, 새 감사 도구 독립 검토. Gemini: GM-01/04 수정본 제출 후 실제 인증 API·파일 bytes·평가 Evidence 대조. CX-03 원격 설치 대기는 유지한다.

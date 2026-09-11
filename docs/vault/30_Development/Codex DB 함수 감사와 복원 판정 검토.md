@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-DEFINER-AUDIT-001"
 title: "Codex DB 함수 감사와 복원 판정 검토"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:03:37+09:00"
+updated: "2026-09-11T18:10:30+09:00"
 source_of_truth: "Git"
 ---
 
@@ -37,3 +37,7 @@ Gemini f50310e의 파일 버튼/Node 표시 개선을 확인했으나, fixture h
 오류와 재현: [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]]. 검증·전달 기록은 [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]].
 
 공식 근거: [PostgreSQL 16 CREATE FUNCTION](https://www.postgresql.org/docs/16/sql-createfunction.html), [Row Security Policies](https://www.postgresql.org/docs/16/ddl-rowsecurity.html), 2026-09-11 확인. SECURITY DEFINER는 owner 권한으로 실행하며 RLS 우회 여부는 superuser/BYPASSRLS 및 table ownership/FORCE RLS에 달린다. 선언 하나로 항상 우회한다고 단정하지 않는다.
+
+## 18:08 이후 수정본 인수 메모
+
+Claude c28cdff는 과거 invalid backup/empty DB 허위 성공을 실제 재시험에서 거부했다. 남은 _passed의 측정값/restore exit 판정과 전체 복원 범위는 [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]]를 따른다. 과거 9995122 finding을 수정본에도 미수정이라고 전파하지 않는다. Gemini f50310e의 결과/평가 finding은 유지한다.

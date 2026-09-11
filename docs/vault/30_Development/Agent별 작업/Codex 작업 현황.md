@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:52:37+09:00"
+updated: "2026-09-11T18:10:30+09:00"
 source_of_truth: "Git"
 ---
 
@@ -124,12 +124,12 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | CX-01 / SECURITY-AUDIT-INTEGRITY: DB 함수 경계와 복원 판정 검토 착수 |
-| 실제 owner / 읽은 진행판 버전 / KST | Codex / INDEX-PROGRESS-001 v1.0.12 / 2026-09-11T17:18:43+09:00 |
-| branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 02e6188 / 공통 진입 b2c37f2, 문서 전달 994ab49, 최종 영수증 SHA는 Git 이력 참조 |
-| 작업한 것 | 최신 3 Agent 소스·최초 12목표/48task 확인, 공통 진행판·26개 카드·상시 기록 지침 작성 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | check_docs.py 0; check_ontology.py 0; sync --check 0, conflict 0; 소스/PR/LAN 조회 Evidence 확보 |
-| CI / 독립 reviewer / 운영 인수 | 994ab49 CI 6개 모두 계정 제한으로 시작 전 실패; Claude 독립 검토 pending; 원격/5대 운영 인수 미완료 |
-| 남은 문제 / 차단 이유 / 해소 담당 | CI 계정 제한 운영자, 원격 실행 profile 설치 다른 PC 운영자+Codex 확인 |
-| 다음 카드 / 첫 행동 / 다음 담당 | CX-01 / Claude 9995122 복원·definer와 Gemini f08bf33 계약 차이를 검토 / Codex |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_DEVELOPMENT-CONTINUITY_Codex_검증보고]] / PR19 / 405개 hash 일치, 대기 0·충돌 0; 공통 지침 Gemini 1fba8c9·Claude 3ec288a push 확인 |
+| 마지막 작업 / 착수 카드 | SECURITY-AUDIT-INTEGRITY / CX-01 일부 구현·검토 전달; 전체 통합은 진행 중 |
+| 실제 owner / 읽은 진행판 버전 / KST | Codex / 시작 v1.0.13 → 현재 v1.0.14 / 2026-09-11T18:10:30+09:00 |
+| branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 995b3a3 / b9a53f8 |
+| 작업한 것 | 감사 허위 합격 5개 재현·단일 도구 보강·9개 정책·migration gate, Claude/Gemini 수정본 검토 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 고정 SHA Linux PostgreSQL/Node 65 pass, core 304 pass, 20 prior 경로 및 함수 정책, exit 0; 이전 Windows 57/1skip 중복 가산 안 함 |
+| CI / 독립 reviewer / 운영 인수 | b9a53f8 CI 6개 계정 제한으로 시작 전 failure; Claude 독립 검토 pending; 운영 원격/5대 인수 미완료 |
+| 남은 문제 / 차단 이유 / 해소 담당 | Claude CL-03 측정·restore 오류/전체복원, Gemini GM-01/04 bytes 인증·생성 결과/평가 제거; CI 운영자, 원격 profile 운영자+Codex |
+| 다음 카드 / 첫 행동 / 다음 담당 | CX-01 수정본 재검토·같은 SHA 통합; 독립 진행 CX-02 credential/Storage 입력 계약 / Codex |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]], [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]] / PR19 / 외부 제안 3개 보존·병합 후 동기화 |

@@ -1,0 +1,18 @@
+{
+  "verifiedKst": "2026-09-11T18:10:30+09:00",
+  "codeSHA": "b9a53f891a32be42da7d6cecb2a06a295814f3a1",
+  "core": {
+    "command": "python -m pytest tests/core tests/test_migrations.py -q",
+    "exitCode": 0,
+    "passed": 304,
+    "skipped": 0,
+    "junitSHA256": "ef364de690b460b2e8868da93a2df839bd33d780089d87d1edd81559b67f9154"
+  },
+  "linux": {
+    "passed": 65,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "migrationPriors": 20,
+  "scope": "fixed SHA local checks; no new physical LAN acceptance"
+}

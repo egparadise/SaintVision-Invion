@@ -1,0 +1,47 @@
+{
+  "sourceCommit": "c28cdff",
+  "negativeRpoPassed": true,
+  "nonzeroRestorePassed": true,
+  "baselineFunctionCount": 9,
+  "oldAuditFalseNegatives": [
+    {
+      "case": "zero-argument-tenant-enumeration",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "misleading-binding-comment",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "certificate-name-overload",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "unsafe-search-path",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "retired-reader-regranted",
+      "oldAuditUnsafe": 0
+    }
+  ],
+  "invalidBackupFalseSuccess": {
+    "restoreExitCode": 1,
+    "integrityVerified": false,
+    "fencingVerified": false,
+    "sourceCounts": {},
+    "sourceDigests": {
+      "public.evidence_envelopes": "unreadable:UndefinedTable",
+      "public.run_records": "unreadable:UndefinedTable",
+      "public.artifacts": "unreadable:UndefinedTable",
+      "public.backup_records": "unreadable:UndefinedTable",
+      "inv.evidence": "unreadable:UndefinedTable",
+      "inv.checkpoints": "unreadable:UndefinedTable",
+      "inv.node_stop_receipts": "unreadable:UndefinedTable",
+      "inv.result_commitments": "unreadable:UndefinedTable",
+      "inv.resource_leases": "unreadable:UndefinedTable"
+    }
+  },
+  "scope": "disposable PostgreSQL; no production state",
+  "predicateChecksScope": "negativeRpoPassed/nonzeroRestorePassed call _passed with explicit in-memory report inputs; invalidBackupFalseSuccess is a real disposable pg_restore"
+}
