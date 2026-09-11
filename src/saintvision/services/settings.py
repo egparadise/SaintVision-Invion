@@ -95,26 +95,41 @@ WORKSPACE_TRANSITIONS: Final[dict[str, frozenset[str]]] = {
 
 def lock_project(session: Session, tenant_id: uuid.UUID, project_id: str) -> Project:
     # Serialize every membership writer before checking the actor and owner count.
-    project = session.scalars(select(Project).where(
-        Project.tenant_id == tenant_id, Project.project_id == project_id
-    ).with_for_update().execution_options(populate_existing=True)).one_or_none()
+    project = session.scalars(
+        select(Project)
+        .where(Project.tenant_id == tenant_id, Project.project_id == project_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).one_or_none()
     if project is None:
         raise InvError(AUTH_PROJECT_SCOPE, "project is not accessible to this principal")
     return project
 
 
-def require_global_administrator(session: Session, *, tenant_id: uuid.UUID,
-                                 user_id: str, permission: str,
-                                 target_user_id: str | None = None) -> None:
+def require_global_administrator(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: str,
+    permission: str,
+    target_user_id: str | None = None,
+) -> None:
     # Project ownership never grants tenant administration. Sorted user locks
     # also serialize two administrators changing each other's status.
-    session.scalars(select(User).where(
-        User.tenant_id == tenant_id,
-        User.user_id.in_(sorted({user_id, target_user_id or user_id})),
-    ).order_by(User.user_id).with_for_update().execution_options(populate_existing=True)).all()
-    allowed = session.execute(text(
-        "SELECT public.business_admin_allowed(:t,:u,:p)"
-    ), {"t": tenant_id, "u": user_id, "p": permission}).scalar_one()
+    session.scalars(
+        select(User)
+        .where(
+            User.tenant_id == tenant_id,
+            User.user_id.in_(sorted({user_id, target_user_id or user_id})),
+        )
+        .order_by(User.user_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).all()
+    allowed = session.execute(
+        text("SELECT public.business_admin_allowed(:t,:u,:p)"),
+        {"t": tenant_id, "u": user_id, "p": permission},
+    ).scalar_one()
     if not allowed:
         raise InvError(AUTH_PROJECT_SCOPE, "current tenant administration permission required")
 
@@ -137,7 +152,9 @@ def effective_permission(
     if project is None or project.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "project not found")
     user = session.get(User, user_id, populate_existing=True, with_for_update={"read": True})
-    membership = session.get(ProjectMember, (tenant_id, project_id, user_id), populate_existing=True)
+    membership = session.get(
+        ProjectMember, (tenant_id, project_id, user_id), populate_existing=True
+    )
 
     active = (
         project.status == "active"
@@ -162,15 +179,22 @@ def effective_permission(
 
 
 def require_administrator(
-    session: Session, *, tenant_id: uuid.UUID, project_id: str, user_id: str,
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    project_id: str,
+    user_id: str,
     allow_archived: bool = False,
 ) -> dict[str, Any]:
     permission = effective_permission(
         session, tenant_id=tenant_id, project_id=project_id, user_id=user_id
     )
-    archived_owner = (allow_archived and permission["projectStatus"] == "archived"
-                      and permission["userStatus"] == "active"
-                      and permission["roleCode"] in CAN_ADMINISTER)
+    archived_owner = (
+        allow_archived
+        and permission["projectStatus"] == "archived"
+        and permission["userStatus"] == "active"
+        and permission["roleCode"] in CAN_ADMINISTER
+    )
     if not (permission["canAdminister"] or archived_owner):
         raise InvError(
             AUTH_PROJECT_SCOPE,
@@ -274,9 +298,7 @@ def remove_member(
     if existing is None:
         return
     if existing.role_code == "owner" and _owner_count(session, tenant_id, project_id) == 1:
-        raise InvError(
-            VAL_SCHEMA, "this is the project's only owner; promote another owner first"
-        )
+        raise InvError(VAL_SCHEMA, "this is the project's only owner; promote another owner first")
     session.delete(existing)
     session.flush()
 
@@ -285,13 +307,14 @@ def list_members(
     session: Session, *, tenant_id: uuid.UUID, project_id: str
 ) -> list[dict[str, Any]]:
     project = session.get(Project, project_id, populate_existing=True)
-    project_active = project is not None and project.tenant_id == tenant_id and project.status == "active"
+    project_active = (
+        project is not None and project.tenant_id == tenant_id and project.status == "active"
+    )
     rows = session.execute(
         select(ProjectMember, User)
         .join(
             User,
-            (User.tenant_id == ProjectMember.tenant_id)
-            & (User.user_id == ProjectMember.user_id),
+            (User.tenant_id == ProjectMember.tenant_id) & (User.user_id == ProjectMember.user_id),
         )
         .where(
             ProjectMember.tenant_id == tenant_id,
@@ -307,8 +330,12 @@ def list_members(
             "userStatus": user.status,
             # Shown beside the role because the role alone does not decide it:
             # a suspended owner may do nothing at all.
-            "canRequest": project_active and user.status == "active" and member.role_code in CAN_REQUEST,
-            "canApprove": project_active and user.status == "active" and member.role_code in CAN_APPROVE,
+            "canRequest": project_active
+            and user.status == "active"
+            and member.role_code in CAN_REQUEST,
+            "canApprove": project_active
+            and user.status == "active"
+            and member.role_code in CAN_APPROVE,
             "grantedAt": member.granted_at.isoformat(),
         }
         for member, user in rows
@@ -362,7 +389,10 @@ def set_project_status(
         raise InvError(VAL_SCHEMA, f"unknown project status: {status!r}")
     project = lock_project(session, tenant_id, project_id)
     require_administrator(
-        session, tenant_id=tenant_id, project_id=project_id, user_id=acting_user_id,
+        session,
+        tenant_id=tenant_id,
+        project_id=project_id,
+        user_id=acting_user_id,
         allow_archived=True,
     )
     project.status = status
@@ -429,8 +459,7 @@ def current_offer(
             ResourceOffer.tenant_id == tenant_id,
             ResourceOffer.capability_id == capability_id,
             ResourceOffer.effective_from <= now,
-            (ResourceOffer.effective_to.is_(None))
-            | (ResourceOffer.effective_to > now),
+            (ResourceOffer.effective_to.is_(None)) | (ResourceOffer.effective_to > now),
         )
         .order_by(ResourceOffer.effective_from.desc())
     ).first()
@@ -441,6 +470,7 @@ def set_resource_offer(
     *,
     tenant_id: uuid.UUID,
     capability_id: str,
+    acting_user_id: str,
     offered_quantity: float,
     unit: str,
     now: dt.datetime,
@@ -463,12 +493,18 @@ def set_resource_offer(
     permits, and the business record must not claim something it will not
     honour.
     """
+    require_global_administrator(
+        session, tenant_id=tenant_id, user_id=acting_user_id, permission="resources.manage"
+    )
     capability = session.get(NodeCapability, capability_id)
     if capability is None or capability.tenant_id != tenant_id:
         raise InvError(RES_NODE_NOT_FOUND, "capability not found")
     # Match placement's Node -> capability lock order; reread after waiting.
-    session.scalars(select(Node).where(Node.node_id == capability.node_id,
-                                      Node.tenant_id == tenant_id).with_for_update()).one()
+    session.scalars(
+        select(Node)
+        .where(Node.node_id == capability.node_id, Node.tenant_id == tenant_id)
+        .with_for_update()
+    ).one()
     session.refresh(capability, with_for_update=True)
 
     canonical = to_canonical(capability.kind, offered_quantity, unit)
@@ -492,15 +528,21 @@ def set_resource_offer(
     applied = _apply_to_kernel(
         session,
         tenant_id=tenant_id,
-        node_id=capability.node_id,
-        kind=capability.kind,
+        capability_id=capability_id,
+        acting_user_id=acting_user_id,
         offered=canonical,
     )
 
-    previous = session.scalars(select(ResourceOffer).where(
-        ResourceOffer.tenant_id == tenant_id, ResourceOffer.capability_id == capability_id,
-        ResourceOffer.effective_to.is_(None),
-    ).with_for_update().execution_options(populate_existing=True)).one_or_none()
+    previous = session.scalars(
+        select(ResourceOffer)
+        .where(
+            ResourceOffer.tenant_id == tenant_id,
+            ResourceOffer.capability_id == capability_id,
+            ResourceOffer.effective_to.is_(None),
+        )
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).one_or_none()
     if previous is not None:
         if previous.offered_quantity == canonical:
             # Setting the same number is not a change. Writing a new row anyway
@@ -522,41 +564,40 @@ def set_resource_offer(
 
 
 def _apply_to_kernel(
-    session: Session,
-    *,
-    tenant_id: uuid.UUID,
-    node_id: str,
-    kind: str,
-    offered: int,
+    session: Session, *, tenant_id: uuid.UUID, capability_id: str, acting_user_id: str, offered: int
 ) -> dict[str, Any]:
-    """Push the offer into ``inv.resources.offered`` under the kernel's rules.
-
-    Two kinds of refusal, treated differently on purpose.
-
-    A resource the kernel has never observed is a **normal** state on a machine
-    that has not been enrolled into execution yet, and it should not stop an
-    owner recording what they intend to offer. That is reported, not raised.
-
-    A refusal that means the number is *wrong* — more than the machine has, or
-    less than what is already leased — is raised, because storing it would leave
-    the business record claiming something the kernel will not honour.
-    """
     row = session.execute(
         text(
-            "SELECT applied, reason, kernel_resource_id, kernel_capacity "
-            "FROM public.apply_resource_offer(:t, CAST(:n AS char(30)), :k, :o)"
+            "SELECT applied,reason,resource_ids,capacity FROM public.apply_capability_offer("
+            ":t,CAST(:c AS char(30)),CAST(:u AS char(30)),:o)"
         ),
-        {"t": str(tenant_id), "n": node_id, "k": kind, "o": int(offered)},
+        {"t": str(tenant_id), "c": capability_id, "u": acting_user_id, "o": offered},
     ).one()
-    applied, reason, resource_id, capacity = row
+    applied, reason, ids, capacity = row
+    common = {
+        "appliedToKernel": bool(applied),
+        "kernelResourceIds": list(ids),
+        "kernelResourceId": ids[0] if len(ids) == 1 else None,
+        "kernelCapacity": capacity,
+        "kernelReasonCode": reason,
+        "executionReady": False,
+    }
     if applied:
-        return {"appliedToKernel": True, "kernelResourceId": resource_id}
-    if reason and "has not observed" in reason:
-        return {"appliedToKernel": False, "kernelReason": reason}
+        return common
+    pending = {
+        "resource_not_registered": "The execution kernel has no registered resource for this capability.",
+        "device_mapping_required": "This GPU needs an explicit device mapping before its offer can be applied.",
+    }
+    if reason in pending:
+        return {**common, "kernelReason": pending[reason]}
+    messages = {
+        "below_unreleased_leases": "work already leased exceeds this offer; physical release is required",
+        "exceeds_kernel_capacity": "a node cannot offer more than its registered kernel capacity",
+    }
     raise InvError(
         VAL_SCHEMA,
-        f"the execution kernel refused this offer: {reason}",
-        extra={"kernelResourceId": resource_id, "kernelCapacity": capacity},
+        messages.get(reason, "the execution kernel refused this offer"),
+        extra={"kernelReasonCode": reason, "kernelCapacity": capacity},
     )
 
 
@@ -575,9 +616,7 @@ def _offer_body(
         "unit": canonical_unit(capability.kind),
         "offeredQuantity": offer.offered_quantity,
         "totalQuantity": capability.total_quantity,
-        "previousOfferedQuantity": (
-            previous.offered_quantity if previous is not None else None
-        ),
+        "previousOfferedQuantity": (previous.offered_quantity if previous is not None else None),
         "effectiveFrom": offer.effective_from.isoformat(),
         # Said plainly, because it is the part that surprises people.
         "note": (
@@ -598,9 +637,7 @@ def node_offers(
     """Everything one machine currently offers, beside what it actually has."""
     capabilities = session.scalars(
         select(NodeCapability)
-        .where(
-            NodeCapability.tenant_id == tenant_id, NodeCapability.node_id == node_id
-        )
+        .where(NodeCapability.tenant_id == tenant_id, NodeCapability.node_id == node_id)
         .order_by(NodeCapability.kind, NodeCapability.device_index)
     ).all()
     out = []

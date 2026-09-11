@@ -64,6 +64,7 @@ def read_my_permission(
     that work cannot drift apart.
     """
     from ...services.projects import require_project_access
+
     return require_project_access(
         session,
         tenant_id=principal.tenant_id,
@@ -79,8 +80,10 @@ def list_members(
     session: Session = Depends(get_session),
 ) -> dict:
     from ...services.projects import require_project_access
-    require_project_access(session, tenant_id=principal.tenant_id,
-                           project_id=project_id, user_id=principal.user_id)
+
+    require_project_access(
+        session, tenant_id=principal.tenant_id, project_id=project_id, user_id=principal.user_id
+    )
     members = settings_service.list_members(
         session, tenant_id=principal.tenant_id, project_id=project_id
     )
@@ -114,7 +117,10 @@ def set_member_role(
         now=now,
     )
     _audit(
-        session, request, principal, "project.member.role_set",
+        session,
+        request,
+        principal,
+        "project.member.role_set",
         {"projectId": project_id, "userId": user_id, "roleCode": payload.role_code},
         now,
     )
@@ -138,8 +144,12 @@ def remove_member(
         acting_user_id=principal.user_id,
     )
     _audit(
-        session, request, principal, "project.member.removed",
-        {"projectId": project_id, "userId": user_id}, now,
+        session,
+        request,
+        principal,
+        "project.member.removed",
+        {"projectId": project_id, "userId": user_id},
+        now,
     )
     return {"projectId": project_id, "userId": user_id, "removed": True}
 
@@ -164,8 +174,11 @@ def set_user_status(
     because the kernel reads this row rather than a copy of it.
     """
     settings_service.require_global_administrator(
-        session, tenant_id=principal.tenant_id, user_id=principal.user_id,
-        permission="users.manage", target_user_id=user_id,
+        session,
+        tenant_id=principal.tenant_id,
+        user_id=principal.user_id,
+        permission="users.manage",
+        target_user_id=user_id,
     )
     user = settings_service.set_user_status(
         session,
@@ -175,8 +188,12 @@ def set_user_status(
         now=now,
     )
     _audit(
-        session, request, principal, "user.status_set",
-        {"userId": user_id, "status": payload.status}, now,
+        session,
+        request,
+        principal,
+        "user.status_set",
+        {"userId": user_id, "status": payload.status},
+        now,
     )
     return {"userId": user.user_id, "status": user.status}
 
@@ -199,8 +216,12 @@ def set_project_status(
         acting_user_id=principal.user_id,
     )
     _audit(
-        session, request, principal, "project.status_set",
-        {"projectId": project_id, "status": payload.status}, now,
+        session,
+        request,
+        principal,
+        "project.status_set",
+        {"projectId": project_id, "status": payload.status},
+        now,
     )
     return {"projectId": project.project_id, "status": project.status}
 
@@ -223,15 +244,17 @@ def set_workspace_status(
         now=now,
     )
     _audit(
-        session, request, principal, "workspace.status_set",
-        {"workspaceId": workspace_id, "status": payload.status}, now,
+        session,
+        request,
+        principal,
+        "workspace.status_set",
+        {"workspaceId": workspace_id, "status": payload.status},
+        now,
     )
     return {
         "workspaceId": workspace.workspace_id,
         "status": workspace.status,
-        "allowedNext": sorted(
-            settings_service.WORKSPACE_TRANSITIONS.get(workspace.status, ())
-        ),
+        "allowedNext": sorted(settings_service.WORKSPACE_TRANSITIONS.get(workspace.status, ())),
     }
 
 
@@ -272,19 +295,25 @@ def set_resource_offer(
     that sends GiB and a screen that sends bytes describe the same machine.
     """
     settings_service.require_global_administrator(
-        session, tenant_id=principal.tenant_id, user_id=principal.user_id,
+        session,
+        tenant_id=principal.tenant_id,
+        user_id=principal.user_id,
         permission="resources.manage",
     )
     result = settings_service.set_resource_offer(
         session,
         tenant_id=principal.tenant_id,
         capability_id=capability_id,
+        acting_user_id=principal.user_id,
         offered_quantity=payload.offered_quantity,
         unit=payload.unit,
         now=now,
     )
     _audit(
-        session, request, principal, "node.offer_set",
+        session,
+        request,
+        principal,
+        "node.offer_set",
         {
             "capabilityId": capability_id,
             "offeredQuantity": result["offeredQuantity"],
