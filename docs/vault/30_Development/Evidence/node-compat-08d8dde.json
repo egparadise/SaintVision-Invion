@@ -1,0 +1,100 @@
+{
+  "node": {
+    "at": "2026-09-11T00:29:12.955649+00:00",
+    "passed": true,
+    "scope": "local-node-component-acceptance-not-production-run",
+    "codeSHA": "08d8dde280afe014bfda732d174951468e375283",
+    "dirty": false,
+    "binarySHA256": "98a943b64d8a038842d0d63411d532b837aa3d5e79783a1f9ad9343c9c8d6e1a",
+    "probeImage": "sha256:701236e95cff59aa352e75c60366dbe6056584e1faca9ad1dbb27fb2d91f3996",
+    "testImage": "sha256:1c2dbc5bdef2107a771a675b0cfa5443fd16cfee8ecdd85d14772fb1aa0ee3fd",
+    "testContainer": "saintvision-compat-06a506eaa655",
+    "exitCode": 0,
+    "stopped": true,
+    "cases": [
+      "docker_linux_test.go:97: api=v1.41 mode=isolation exit=0 outputSHA256=54ed33d2aeaf3271c99795dda4d69ba374ac1b794ca4714ae9b25941c1033782 duplicate=true cleanup=true",
+      "docker_linux_test.go:97: api=v1.41 mode=output exit=0 outputSHA256=e2e8f2a47f4bcb6b2e5e1c002815be47e1adbc11d455c2157b0ca774267b90b1 duplicate=true cleanup=true",
+      "docker_linux_test.go:97: api=v1.41 mode=fail exit=7 outputSHA256=not-collected-for-failed-execution duplicate=true cleanup=true",
+      "docker_linux_test.go:97: api=v1.41 mode=sleep exit=143 outputSHA256=not-collected-for-failed-execution duplicate=true cleanup=true"
+    ],
+    "passedTests": 27,
+    "logSHA256": "851ac27ecc582f0091e93168f7e702e989961cc1912ccba6e952ad5bad8fa455",
+    "log": "C:\\Project\\SaintVision-Invion\\agent-codex-dev-environment\\.work\\saintvision-compat-06a506eaa655\\tests.log"
+  },
+  "startup": {
+    "listeners": [
+      "18082:22128",
+      "18100:22076",
+      "3000:3812"
+    ],
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "lastHeartbeatAt": "2026-09-11T00:25:29.748418+00:00",
+        "lastSnapshotAt": "2026-09-11T00:25:29.748418+00:00",
+        "observationAgeSeconds": 1.8,
+        "osType": "linux",
+        "profileVersion": "lan-observe-v1",
+        "agentVersion": "0.1.0",
+        "cpuCores": 16.0,
+        "cpuUsagePercent": 0.0,
+        "memoryTotalBytes": 8247738368,
+        "memoryUsedBytes": 2809643008,
+        "gpuCount": null,
+        "storageTotalBytes": null,
+        "measurementScope": "node-visible-linux-environment"
+      }
+    ],
+    "realRebootTest": false,
+    "observerProcesses": [
+      9856,
+      25528
+    ],
+    "at": "2026-09-11T09:25:31.6279283+09:00",
+    "killSwitch": true,
+    "passed": true,
+    "startupRegistered": true
+  },
+  "ci": {
+    "kst": "2026-09-11T09:29:09+09:00",
+    "sha": "08d8dde280afe014bfda732d174951468e375283",
+    "runs": [
+      {
+        "id": 34546665643,
+        "name": "Documentation Build",
+        "head_sha": "08d8dde280afe014bfda732d174951468e375283",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665643",
+        "annotations": [
+          "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        ]
+      },
+      {
+        "id": 34546665501,
+        "name": "Core Build",
+        "head_sha": "08d8dde280afe014bfda732d174951468e375283",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665501",
+        "annotations": [
+          "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        ]
+      },
+      {
+        "id": 34546665413,
+        "name": "Backend Build",
+        "head_sha": "08d8dde280afe014bfda732d174951468e375283",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34546665413",
+        "annotations": [
+          "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        ]
+      }
+    ]
+  }
+}

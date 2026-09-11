@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-RUNTIME-COMPLETION-001"
 title: "Codex 실행 완료와 자원 회수 통합 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T09:02:10+09:00"
+updated: "2026-09-11T09:28:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,7 +20,7 @@ Node의 미수신 cancel은 동일 command의 durable tombstone과 allocation hi
 
 ## ADR-041: 실제 출력 및 정지 후보의 보존
 
-신뢰된 pinned 이미지의 supervisor는 `ai.saintvision.output=bounded-streams-v1` 라벨과 일치해야 한다. stdout/stderr 각각 64 KiB만 보존하고 전체 쓰기는 소비한다. 한도를 넘으면 exit 122, 성공 Evidence는 생성하지 않는다. PID 1이 단일 JSON artifact를 쓰며 Docker local log는 512 KiB/1개/압축 없음으로 제한한다. Node는 소유한 정지 container의 frame을 읽어 `NodeStopReceipt.output={data,sha256,sizeBytes}`에 실제 바이트를 연결한다. 이 출력은 민감 데이터를 포함할 수 있으므로 UI·console·진단 로그에 원문을 출력하지 않는다. 저장 위치는 private journal·tenant RLS receipt·private object다. 별도 redaction이 완료됐다고 주장하지 않는다.
+신뢰된 pinned 이미지의 supervisor는 `ai.saintvision.output=bounded-streams-v1` 라벨과 일치해야 한다. stdout/stderr 각각 64 KiB만 보존하고 전체 쓰기는 소비한다. 한도를 넘으면 exit 122, 성공 Evidence는 생성하지 않는다. PID 1이 단일 JSON artifact를 쓰며 ADR-062부터 Docker `json-file` log를 512 KiB/1개로 제한하고 실제 설정을 재검증한다. Node는 소유한 정지 container의 frame을 읽어 `NodeStopReceipt.output={data,sha256,sizeBytes}`에 실제 바이트를 연결한다. 현재 출력 commitment는 정상 종료에만 수집하며 실패·시간 초과를 성공 결과로 확정하지 않는다. 이 출력은 민감 데이터를 포함할 수 있으므로 UI·console·진단 로그에 원문을 출력하지 않는다. 저장 위치는 private journal·tenant RLS receipt·private object다. 별도 redaction이 완료됐다고 주장하지 않는다.
 
 정지 후보와 출력은 container 삭제 전에 fsync된다. 후보 자체는 외부 정지 receipt가 아니다. 삭제 ACK 유실이나 Node 재시작 시 후보에 기록된 동일 container ID의 부재까지 확인한 뒤 receipt를 확정한다. create intent만 남은 불확실성은 이 증명으로 바꿀 수 없다.
 
