@@ -1,0 +1,36 @@
+{
+  "at": "2026-09-11T10:53:06.739428+09:00",
+  "codeSHA": "b6301a9613097122a7574fa647b63d791fe13d2d",
+  "checks": [
+    {
+      "name": "python-core",
+      "command": [
+        "C:\\Project\\SaintVision-Invion\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/core",
+        "-q"
+      ],
+      "exitCode": 0,
+      "logSHA256": "6f52537779faad5c3d5e63e8f762977321ece737df99feee54b958c207eb1349",
+      "summary": [
+        "260 passed, 2 warnings in 17.84s"
+      ]
+    },
+    {
+      "name": "go-windows",
+      "command": [
+        "C:/Project/SaintVision-Invion/.work/node-toolchain-1.27.1/go/bin/go.exe",
+        "test",
+        "-p",
+        "1",
+        "./..."
+      ],
+      "exitCode": 0,
+      "logSHA256": "0a9630b6e7f3feab9a2d5686f588362486947aa14e6aca70c2ef388a0d6779b9",
+      "summary": [
+        "ok  \tgithub.com/egparadise/SaintVision-Invion/services/node-agent/workspace\t0.515s"
+      ]
+    }
+  ]
+}
