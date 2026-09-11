@@ -396,3 +396,94 @@ def test_project_approval_and_operator_approval_are_reported_apart(prepared) -> 
     result, _ = _run(prepared)
     assert result["grants"]["mayApproveInProject"] is True
     assert result["grants"]["mayApproveAsOperator"] is False
+
+
+def test_acceptance_evidence_names_what_is_missing(prepared) -> None:
+    """A fresh deployment has none of AC-12's evidence, and says which.
+
+    pilot_readiness has existed since S12 with no caller: the aggregation was
+    written and nothing ever asked it the question.
+    """
+    _beat(prepared)
+    result, code = _run(prepared, "--acceptance-evidence")
+    evidence = result["acceptanceEvidence"]
+    assert "no passing database recovery drill" in evidence["blockers"]
+    assert "no verified backup" in evidence["blockers"]
+    # ADR-018: local durability is not recovery from losing the domain.
+    assert "no verified off-site backup" in evidence["blockers"]
+    assert code == 1
+
+
+def test_unassessed_acceptance_never_reads_as_accepted(prepared) -> None:
+    """The distinction that keeps this honest before a release is cut."""
+    _beat(prepared)
+    result, _ = _run(prepared, "--acceptance-evidence")
+    evidence = result["acceptanceEvidence"]
+    assert evidence["acceptanceAssessed"] is False
+    # Even with every other blocker cleared, the evidence cannot be complete
+    # while acceptance has not been assessed at all.
+    assert evidence["evidenceComplete"] is False
+
+
+def test_recorded_evidence_clears_the_blockers_it_covers(prepared) -> None:
+    """Evidence is what was recorded, so recording it is what closes a gap."""
+    import datetime as dt
+    import uuid
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from saintvision.db.session import tenant_scope
+    from saintvision.services import pilot as pilot_service
+
+    _beat(prepared)
+    url = "postgresql+psycopg://" + prepared["dsn"][len("postgresql://") :]
+    engine = create_engine(url, future=True)
+    factory = sessionmaker(engine, future=True, expire_on_commit=False)
+    tenant = uuid.UUID(prepared["tenant"])
+    now = dt.datetime.now(dt.timezone.utc)
+    try:
+        with factory() as session:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    backup = pilot_service.record_backup(
+                        session,
+                        tenant_id=tenant,
+                        kind="logical",
+                        location_ref="//nas/offsite/db.dump",
+                        now=now,
+                        off_site=True,
+                        byte_size=1024,
+                    )
+                    pilot_service.verify_backup(
+                        session,
+                        tenant_id=tenant,
+                        backup_id=backup.backup_id,
+                        checksum_sha256="e" * 64,
+                        now=now,
+                    )
+                    pilot_service.record_recovery_drill(
+                        session,
+                        tenant_id=tenant,
+                        scope="database",
+                        outcome="passed",
+                        performed_by_user_id=prepared["user"],
+                        now=now,
+                        measurement=pilot_service.DrillMeasurement(
+                            rpo_seconds=6, rto_seconds=6
+                        ),
+                        backup_id=backup.backup_id,
+                        fencing_verified=True,
+                        integrity_verified=True,
+                    )
+    finally:
+        engine.dispose()
+
+    result, _ = _run(prepared, "--acceptance-evidence")
+    blockers = result["acceptanceEvidence"]["blockers"]
+    assert "no passing database recovery drill" not in blockers
+    assert "no verified backup" not in blockers
+    assert "no verified off-site backup" not in blockers
+    # The contributed folder is active and has never been health checked, which
+    # is reported as needing attention rather than assumed fine.
+    assert any("contributed folder" in b for b in blockers)

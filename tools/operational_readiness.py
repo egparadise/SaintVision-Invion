@@ -568,6 +568,44 @@ def snapshot_permissions(args, grants: dict[str, Any]) -> dict[str, Any]:
         engine.dispose()
 
 
+def acceptance_evidence(args) -> dict[str, Any]:
+    """The evidence AC-12 asks for, and which of it does not exist yet.
+
+    Calls ``pilot.pilot_readiness``, which has had no caller since S12 — the
+    aggregation existed and nothing ever asked it the question. Reported before
+    a release manifest exists, because the gaps it names (no passing drill, no
+    verified backup, no off-site copy, folders nobody has checked) are the ones
+    worth closing *before* a release is cut, not after.
+    """
+    import datetime as dt
+    import uuid as _uuid
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from saintvision.db.session import tenant_scope
+    from saintvision.services import pilot as pilot_service
+
+    url = args.dsn
+    if url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url[len("postgresql://") :]
+    engine = create_engine(url, future=True)
+    factory = sessionmaker(engine, future=True, expire_on_commit=False)
+    tenant = _uuid.UUID(args.tenant)
+    try:
+        with factory() as session:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    return pilot_service.pilot_readiness(
+                        session,
+                        tenant_id=tenant,
+                        now=dt.datetime.now(dt.timezone.utc),
+                        release_id=args.release or None,
+                    )
+    finally:
+        engine.dispose()
+
+
 def report(args) -> dict[str, Any]:
     import psycopg
 
@@ -583,7 +621,29 @@ def report(args) -> dict[str, Any]:
             )
     if args.snapshot and "grants" in result:
         result["permissionSnapshot"] = snapshot_permissions(args, result["grants"])
+    if args.acceptance_evidence:
+        result["acceptanceEvidence"] = acceptance_evidence(args)
     return result
+
+
+def _exit_code(result: dict[str, Any]) -> int:
+    """One rule for both output modes.
+
+    The JSON branch and the printed branch each had their own expression, and
+    they disagreed the moment acceptance evidence was added: a run that listed
+    every AC-12 blocker still exited 0 under --json. Two copies of a pass rule
+    drift, and the drift is invisible because each copy looks right where it
+    sits.
+    """
+    evidence = result.get("acceptanceEvidence")
+    return (
+        1
+        if result["absent"]
+        or result["offerAgreement"]["disagreeing"]
+        or result.get("grants", {}).get("refusedBy", [])
+        or (evidence is not None and not evidence["evidenceComplete"])
+        else 0
+    )
 
 
 def main() -> int:
@@ -600,8 +660,23 @@ def main() -> int:
             "whether its digest moved since the last one. This writes"
         ),
     )
+    parser.add_argument(
+        "--acceptance-evidence",
+        action="store_true",
+        help="report the evidence AC-12 requires, and what is missing",
+    )
+    parser.add_argument(
+        "--release",
+        help=(
+            "assess acceptance against this release manifest. Without it the "
+            "acceptance side is reported as not assessed, which is not the same "
+            "as satisfied"
+        ),
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+    if args.release and not args.acceptance_evidence:
+        parser.error("--release is only meaningful with --acceptance-evidence")
     if bool(args.project) != bool(args.user):
         parser.error("--project and --user are given together or not at all")
     if args.snapshot and not args.project:
@@ -614,7 +689,7 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(result, indent=2, default=str))
-        return 1 if absent or disagreeing or refused else 0
+        return _exit_code(result)
 
     print(f"tenant {args.tenant}\n")
     print("operational inputs")
@@ -681,7 +756,32 @@ def main() -> int:
             "are closed, and granting more permissions does not open them"
         )
 
-    return 1 if absent or disagreeing or refused else 0
+    evidence = result.get("acceptanceEvidence")
+    if evidence:
+        print("\nacceptance evidence (AC-12)")
+        if not evidence["acceptanceAssessed"]:
+            print(
+                "  acceptance NOT ASSESSED — no release named. This is not the "
+                "same as accepted, and the evidence below cannot be complete "
+                "without it."
+            )
+        for blocker in evidence["blockers"]:
+            print(f"  MISSING  {blocker}")
+        for drill in evidence["drillsMissingTargets"]:
+            print(
+                f"  MISSED   drill {drill['drillId']} passed but measured "
+                f"RPO {drill['measuredRpoSeconds']}s / RTO "
+                f"{drill['measuredRtoSeconds']}s against targets "
+                f"{drill['targetRpoSeconds']}s / {drill['targetRtoSeconds']}s"
+            )
+        for folder in evidence["contributionsNeedingAttention"]:
+            print(f"  FOLDER   {folder.get('normalizedPath')}: {folder.get('reason')}")
+        for limitation in evidence["knownLimitations"]:
+            print(f"  NOTED    known limitation: {limitation}")
+        if not evidence["blockers"]:
+            print("  every piece of evidence AC-12 names has been recorded")
+
+    return _exit_code(result)
 
 
 if __name__ == "__main__":

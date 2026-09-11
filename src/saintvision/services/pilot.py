@@ -449,25 +449,43 @@ def take_permission_snapshot(
 
 
 def pilot_readiness(
-    session: Session, *, tenant_id: uuid.UUID, release_id: str, now: dt.datetime
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    now: dt.datetime,
+    release_id: str | None = None,
 ) -> dict[str, Any]:
-    """Whether the evidence AC-12 requires actually exists for this release.
+    """Whether the evidence AC-12 requires actually exists.
 
     Returns the gaps, not a verdict dressed as one. Every ``blocker`` is
     something that has not been recorded — the function does not decide whether
     the pilot is good, only whether it can be shown.
-    """
-    release = session.get(ReleaseManifest, release_id)
-    if release is None or release.tenant_id != tenant_id:
-        raise InvError(RES_ARTIFACT_NOT_FOUND, "release manifest not found")
 
-    acceptances = list(
-        session.scalars(
-            select(AcceptanceRecord).where(
-                AcceptanceRecord.tenant_id == tenant_id,
-                AcceptanceRecord.release_id == release_id,
-            )
-        ).all()
+    ``release_id`` is optional. Most of what AC-12 asks for — a passing
+    database drill, a verified backup, one that survives losing the domain,
+    contributed folders somebody has actually looked at — is evidence about the
+    deployment and not about which release is being cut. Requiring a manifest to
+    see those gaps means nobody can see them until the release exists, which is
+    backwards for something whose whole purpose is preparation. Without one, the
+    acceptance side is reported as not assessed rather than as satisfied.
+    """
+    release = None
+    if release_id is not None:
+        release = session.get(ReleaseManifest, release_id)
+        if release is None or release.tenant_id != tenant_id:
+            raise InvError(RES_ARTIFACT_NOT_FOUND, "release manifest not found")
+
+    acceptances = (
+        list(
+            session.scalars(
+                select(AcceptanceRecord).where(
+                    AcceptanceRecord.tenant_id == tenant_id,
+                    AcceptanceRecord.release_id == release_id,
+                )
+            ).all()
+        )
+        if release_id is not None
+        else []
     )
     database_drills = list(
         session.scalars(
@@ -495,12 +513,21 @@ def pilot_readiness(
     unhealthy = contributions_needing_attention(session, tenant_id=tenant_id, now=now)
 
     blockers: list[str] = []
-    if not acceptances:
-        blockers.append("no acceptance record for this release")
-    if any(a.outcome == "rejected" for a in acceptances):
-        blockers.append("a rejected acceptance stands against this release")
-    if any(a.accepted_manifest_sha256 != release.manifest_sha256 for a in acceptances):
-        blockers.append("an acceptance refers to a different manifest than the current one")
+    if release_id is None:
+        # Not a blocker and not a pass: this call was not asked about a release,
+        # so it has nothing to say about acceptance and says that instead.
+        pass
+    else:
+        if not acceptances:
+            blockers.append("no acceptance record for this release")
+        if any(a.outcome == "rejected" for a in acceptances):
+            blockers.append("a rejected acceptance stands against this release")
+        if any(
+            a.accepted_manifest_sha256 != release.manifest_sha256 for a in acceptances
+        ):
+            blockers.append(
+                "an acceptance refers to a different manifest than the current one"
+            )
     if not database_drills:
         blockers.append("no passing database recovery drill")
     if not verified_backups:
@@ -528,8 +555,11 @@ def pilot_readiness(
 
     return {
         "releaseId": release_id,
-        "version": release.version,
-        "manifestSha256": release.manifest_sha256,
+        "version": release.version if release else None,
+        "manifestSha256": release.manifest_sha256 if release else None,
+        # Stated rather than left to be inferred from a null release id: an
+        # unassessed criterion must never read as a met one.
+        "acceptanceAssessed": release_id is not None,
         "acceptances": [
             {"criterion": a.acceptance_id_ref, "outcome": a.outcome} for a in acceptances
         ],
@@ -538,5 +568,8 @@ def pilot_readiness(
         "drillsMissingTargets": missed_targets,
         "contributionsNeedingAttention": unhealthy,
         "blockers": blockers,
-        "evidenceComplete": not blockers,
+        # Complete only when everything was actually looked at. Without a
+        # release there is no acceptance record to check, so the evidence for
+        # AC-12 cannot be complete however good the rest of it is.
+        "evidenceComplete": not blockers and release_id is not None,
     }
