@@ -48,3 +48,9 @@ b9a53f8 origin push exit 0. 같은 SHA CI 6개는 계정 결제/사용 한도 �
 Obsidian check에서 외부 변경 3개로 정상 중단했다. progress/Gemini 작업판은 f50310e, History 인덱스는 같은 source의 오래된 v1.0.16/줄바꿈 차이였다. [외부 원문과 hash](../Evidence/security-audit-sync-proposals-20260911.json)를 보존하고, 현재 Codex History v1.0.22의 내용은 유지하면서 새 담당 보고만 연결했다. 동일 원문 baseline을 바이트 변경 없이 인수한 뒤 통상 check/apply/check로 최종 내용을 전달한다. 강제 충돌 무시나 과거 이력 삭제는 하지 않는다.
 
 다음 Codex: CX-01의 원 owner 수정본 인수·같은 SHA 통합 및 CX-02의 credential/Storage/운영 계약. Claude: CL-03에 numeric/restore exit/schema·role·RLS·definer/journal/object/서비스 재개 경계 추가, 새 감사 도구 독립 검토. Gemini: GM-01/04 수정본 제출 후 실제 인증 API·파일 bytes·평가 Evidence 대조. CX-03 원격 설치 대기는 유지한다.
+
+## 최종 전달 확인
+
+2026-09-11T18:13:30+09:00 문서 SHA `5a815c0e7bdbe5a39570fb6f88da5d10b4469dad`에서 Obsidian **417개 관리 파일 전체 hash 일치**, export 대기 0/conflict 0, check/apply/check exit 0. 외부 3개 원문은 보존하고 동일 baseline 인수는 destination 0 writes였다. 추가 신규 Gemini 보고서는 Git 원문과 줄바꿈만 다른 것을 확인해 로컬 사본을 같은 바이트로 맞췄다. 공유 폴더의 새 편집 내용을 강제로 덮어쓰지 않았다.
+
+문서 검사 exit 0: 원문 hash 24, versioned 문서 262, 48 task/12 outcome/links/owner/reviewer/skills/DAG. ontology 검사와 문서 ZIP build도 exit 0. 독립 문서/코드 승인 Claude pending, CI 계정 제한과 실장비 인수는 남는다. 이 전달 기록의 후속 commit은 제품 source를 바꾸지 않으며 commit/push 뒤 다시 동기화한다.

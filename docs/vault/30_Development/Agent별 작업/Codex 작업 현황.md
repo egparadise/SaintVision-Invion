@@ -132,4 +132,4 @@ source_of_truth: "Git"
 | CI / 독립 reviewer / 운영 인수 | b9a53f8 CI 6개 계정 제한으로 시작 전 failure; Claude 독립 검토 pending; 운영 원격/5대 인수 미완료 |
 | 남은 문제 / 차단 이유 / 해소 담당 | Claude CL-03 측정·restore 오류/전체복원, Gemini GM-01/04 bytes 인증·생성 결과/평가 제거; CI 운영자, 원격 profile 운영자+Codex |
 | 다음 카드 / 첫 행동 / 다음 담당 | CX-01 수정본 재검토·같은 SHA 통합; 독립 진행 CX-02 credential/Storage 입력 계약 / Codex |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]], [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]] / PR19 / 외부 제안 3개 보존·병합 후 동기화 |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_SECURITY-AUDIT-INTEGRITY_Codex_검증보고]], [[2026-09-11_SECURITY-AUDIT-INTEGRITY_오류와해결]] / PR19 / 외부 제안 3개 보존·병합; 18:13 KST 417개 hash 일치, 대기 0·충돌 0 |
