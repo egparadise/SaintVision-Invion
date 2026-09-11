@@ -71,6 +71,10 @@ export interface ProjectItem {
   ownerId: string;
   workspaceCount: number;
   createdAt: string;
+  gitRepo?: string;
+  gitBranch?: string;
+  budgetKrw?: number;
+  remainingBudgetKrw?: number;
 }
 
 export interface WorkspaceItem {

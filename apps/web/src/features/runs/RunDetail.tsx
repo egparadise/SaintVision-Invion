@@ -11,6 +11,7 @@ export interface RunDetailProps {
   onNavigateRun?: (runId: string) => void;
   onCancelRun?: (runId: string, reason: string) => Promise<void>;
   onRefreshRun?: () => void;
+  onOpenStudio?: (runId: string) => void;
 }
 
 const LIFECYCLE_STEPS: RunState[] = [
@@ -32,6 +33,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onNavigateRun,
   onCancelRun,
   onRefreshRun,
+  onOpenStudio,
 }) => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards'>('timeline');
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -228,6 +230,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           {onNavigateEvidence && (
             <Button variant="secondary" size="md" onClick={() => onNavigateEvidence(run.id)}>
               🔍 불변 증거 열람
+            </Button>
+          )}
+
+          {onOpenStudio && (
+            <Button variant="primary" size="md" onClick={() => onOpenStudio(run.id)}>
+              ⚡ Developer Studio에서 열기
             </Button>
           )}
         </div>

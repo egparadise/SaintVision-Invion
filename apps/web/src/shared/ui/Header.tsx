@@ -57,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const tabs = [
     { id: 'dashboard', label: '클러스터 개요' },
+    { id: 'studio', label: '🚀 개발 Studio (통합)' },
     { id: 'nodes', label: 'Nodes 인벤토리' },
     { id: 'workspaces', label: 'Workspaces (S03)' },
     { id: 'editor', label: '개발 에디터 (S06)' },

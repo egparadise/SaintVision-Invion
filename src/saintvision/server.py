@@ -205,6 +205,88 @@ POOLS: List[Dict[str, Any]] = [
     },
 ]
 
+PROJECTS: List[Dict[str, Any]] = [
+    {
+        "id": "prj_01JABCDE",
+        "name": "SaintVision PACS Core",
+        "description": "의료 영상 저장·전송 및 DICOM/HL7 고속 추론 코어 엔진",
+        "ownerId": "usr_developer_01",
+        "workspaceCount": 3,
+        "createdAt": "2026-09-01T00:00:00Z",
+        "gitRepo": "https://github.com/egparadise/SaintVision-Invion.git",
+        "gitBranch": "main",
+        "budgetKrw": 50000000,
+        "remainingBudgetKrw": 46800000,
+    },
+    {
+        "id": "prj_saint_mlops",
+        "name": "SaintVision MLOps Pipeline",
+        "description": "분산 5노드 GPU 학습 및 다중 LLM 적합성 자동 검증 파이프라인",
+        "ownerId": "usr_researcher_02",
+        "workspaceCount": 2,
+        "createdAt": "2026-09-05T00:00:00Z",
+        "gitRepo": "https://github.com/egparadise/SaintVision-Invion.git",
+        "gitBranch": "feature/distributed-training",
+        "budgetKrw": 80000000,
+        "remainingBudgetKrw": 72500000,
+    },
+]
+
+WORKSPACES: List[Dict[str, Any]] = [
+    {
+        "id": "wsp_01JABCDE001",
+        "projectId": "prj_01JABCDE",
+        "name": "pacs-core-build-sandbox",
+        "targetNodeId": "nod_01JABCDEF01",
+        "isolationMode": "process_sandbox",
+        "allowedPaths": ["./workspace", "./data", "./src"],
+        "prohibitedPaths": ["/etc", "C:\\Windows", "..", "/var/run"],
+        "cpuLimitCores": 8,
+        "memoryLimitBytes": 16 * 1024**3,
+        "status": "active",
+        "createdAt": "2026-09-08T10:00:00Z",
+    },
+    {
+        "id": "wsp_01JABCDE002",
+        "projectId": "prj_01JABCDE",
+        "name": "dataset-preprocess-container",
+        "targetNodeId": "nod_01JABCDEF04",
+        "isolationMode": "container_isolated",
+        "allowedPaths": ["./dataset", "./output"],
+        "prohibitedPaths": ["/etc", "..", "/sys"],
+        "cpuLimitCores": 8,
+        "memoryLimitBytes": 32 * 1024**3,
+        "status": "reclaimed",
+        "createdAt": "2026-09-08T12:00:00Z",
+    },
+    {
+        "id": "wsp_saint_mlops_gpu",
+        "projectId": "prj_saint_mlops",
+        "name": "mlops-distributed-train",
+        "targetNodeId": "nod_01JABCDEF05",
+        "isolationMode": "container_isolated",
+        "allowedPaths": ["./models", "./checkpoints", "./datasets"],
+        "prohibitedPaths": ["/etc", "C:\\Windows", ".."],
+        "cpuLimitCores": 12,
+        "memoryLimitBytes": 32 * 1024**3,
+        "status": "active",
+        "createdAt": "2026-09-09T08:00:00Z",
+    },
+    {
+        "id": "wsp-saint-pilot",
+        "projectId": "prj_01JABCDE",
+        "name": "saint-pilot-dev",
+        "targetNodeId": "nod_01JABCDEF01",
+        "isolationMode": "process_sandbox",
+        "allowedPaths": ["./workspace", "./src"],
+        "prohibitedPaths": ["/etc", ".."],
+        "cpuLimitCores": 16,
+        "memoryLimitBytes": 32 * 1024**3,
+        "status": "active",
+        "createdAt": "2026-09-09T14:00:00Z",
+    },
+]
+
 RUNS: List[Dict[str, Any]] = [
     {
         "id": "run_01JABCDE0001",
@@ -1397,6 +1479,67 @@ def reset_recovering_run(run_id: str, request: Request):
     return rfc9457_problem(
         404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found.", trace_id, "RES"
     )
+
+
+@app.get("/v1/projects")
+def list_projects():
+    return {"items": PROJECTS, "total": len(PROJECTS)}
+
+
+@app.get("/v1/projects/{project_id}")
+def get_project(project_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for p in PROJECTS:
+        if p["id"] == project_id:
+            return p
+    return rfc9457_problem(
+        404, "RES-PRJ-404", "Project Not Found", f"Project with ID '{project_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/workspaces")
+def list_workspaces(project_id: Optional[str] = Query(None, alias="projectId")):
+    filtered = WORKSPACES
+    if project_id:
+        filtered = [w for w in WORKSPACES if w.get("projectId") == project_id]
+    return {"items": filtered, "total": len(filtered)}
+
+
+@app.get("/v1/workspaces/{workspace_id}")
+def get_workspace(workspace_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for w in WORKSPACES:
+        if w["id"] == workspace_id:
+            return w
+    return rfc9457_problem(
+        404, "RES-WSP-404", "Workspace Not Found", f"Workspace with ID '{workspace_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/workspaces", status_code=201)
+async def create_workspace(request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    new_id = data.get("id") or f"wsp_{secrets.token_hex(6)}"
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    new_wsp = {
+        "id": new_id,
+        "projectId": data.get("projectId", "prj_01JABCDE"),
+        "name": data.get("name", f"workspace-{new_id}"),
+        "targetNodeId": data.get("targetNodeId", "nod_01JABCDEF01"),
+        "isolationMode": data.get("isolationMode", "process_sandbox"),
+        "allowedPaths": data.get("allowedPaths", ["./workspace", "./data"]),
+        "prohibitedPaths": data.get("prohibitedPaths", ["/etc", "C:\\Windows", ".."]),
+        "cpuLimitCores": data.get("cpuLimitCores", 8),
+        "memoryLimitBytes": data.get("memoryLimitBytes", 16 * 1024**3),
+        "status": "active",
+        "createdAt": now_iso,
+    }
+    WORKSPACES.append(new_wsp)
+    return new_wsp
 
 
 @app.get("/v1/projects/{project}/runs")

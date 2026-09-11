@@ -456,6 +456,76 @@ async function runFullSmokeJourney() {
     assert('L3 approval enforces diff requirement', typeof l3Apprv.unifiedDiff === 'string' && l3Apprv.unifiedDiff.length > 0);
 
     // -------------------------------------------------------------------------
+    // 13. Integrated Developer Studio 4-Step Workflow & Resource Headroom
+    // -------------------------------------------------------------------------
+    console.log('\n[Track 13] Integrated Developer Studio 4-Step Workflow & Resource Headroom:');
+
+    // 1. Projects API
+    const projsRes = await fetch(`${BACKEND_URL}/v1/projects`);
+    assert('GET /v1/projects returns HTTP 200', projsRes.status === 200);
+    const projsData = await projsRes.json();
+    assert('Projects store contains canonical projects', Array.isArray(projsData.items) && projsData.total >= 2);
+    const pacsProj = projsData.items.find((p) => p.id === 'prj_01JABCDE');
+    assert('PACS Core project has budget & git info', Boolean(pacsProj && pacsProj.gitRepo && pacsProj.remainingBudgetKrw));
+
+    // 2. Workspaces API
+    const wspsRes = await fetch(`${BACKEND_URL}/v1/workspaces`);
+    assert('GET /v1/workspaces returns HTTP 200', wspsRes.status === 200);
+    const wspsData = await wspsRes.json();
+    assert('Workspaces store contains active sandboxes', Array.isArray(wspsData.items) && wspsData.total >= 2);
+
+    // 3. Create Studio Workspace
+    const createWspRes = await fetch(`${BACKEND_URL}/v1/workspaces`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId: 'prj_01JABCDE',
+        name: 'studio-validation-sandbox',
+        targetNodeId: 'nod_01JABCDEF01',
+        isolationMode: 'process_sandbox',
+        cpuLimitCores: 8,
+        memoryLimitBytes: 16 * 1024 ** 3,
+      }),
+    });
+    assert('POST /v1/workspaces returns HTTP 201', createWspRes.status === 201);
+    const createdWsp = await createWspRes.json();
+    assert('Created workspace has valid id and active status', Boolean(createdWsp.id && createdWsp.status === 'active'));
+
+    // 4. Studio Dispatch Run
+    const dispatchRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workspaceId: createdWsp.id,
+        objective: 'Studio E2E Workflow Dispatch Validation',
+        requestedBy: 'usr_developer_01',
+      }),
+    });
+    assert('POST /v1/projects/{id}/runs returns HTTP 201', dispatchRes.status === 201);
+    const dispatchedRun = await dispatchRes.json();
+    assert('Dispatched run is in running state', dispatchedRun.state === 'running');
+
+    // 5. Node Resource Headroom Distinction (Physical vs Observed vs Available Headroom)
+    const studioNodesRes = await fetch(`${BACKEND_URL}/v1/nodes`);
+    const studioNodesData = await studioNodesRes.json();
+    const nodeItems = studioNodesData.items || [];
+    assert('All 5 nodes report positive physical capacity', nodeItems.every((n) => n.cpuCores > 0 && n.memoryTotalBytes > 0));
+    assert(
+      'All 5 nodes report valid available headroom (Cores & RAM)',
+      nodeItems.every((n) => {
+        const availCores = n.cpuCores * (1 - n.cpuUsagePercent / 100);
+        const availRam = n.memoryTotalBytes - n.memoryUsedBytes;
+        return availCores > 0 && availRam > 0;
+      })
+    );
+
+    // 6. Placement candidate discovery explanation
+    const candRes = await fetch(`${BACKEND_URL}/v1/discovery/candidates?minCores=4&minMemoryGb=8`);
+    assert('GET /v1/discovery/candidates returns HTTP 200', candRes.status === 200);
+    const candData = await candRes.json();
+    assert('Placement discovery returns evaluated candidates', Array.isArray(candData.items) && candData.total >= 1);
+
+    // -------------------------------------------------------------------------
     // Summary Dossier
     // -------------------------------------------------------------------------
     console.log('\n======================================================================');

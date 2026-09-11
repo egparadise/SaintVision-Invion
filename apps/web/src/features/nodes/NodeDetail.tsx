@@ -5,18 +5,26 @@ import { Button } from '@/shared/ui/Button';
 export interface NodeDetailProps {
   node: NodeItem;
   onBack: () => void;
+  onOpenStudio?: (nodeId: string) => void;
 }
 
-export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack }) => {
+export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStudio }) => {
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          ← 인벤토리로 돌아가기
-        </Button>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
-          Node 상세 정보: <code>{node.hostname}</code> ({node.id})
-        </h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            ← 인벤토리로 돌아가기
+          </Button>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
+            Node 상세 정보: <code>{node.hostname}</code> ({node.id})
+          </h2>
+        </div>
+        {onOpenStudio && (
+          <Button variant="primary" size="sm" onClick={() => onOpenStudio(node.id)}>
+            ⚡ 이 노드에서 Studio 열기
+          </Button>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>

@@ -20,6 +20,7 @@ import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
 import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
+import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
 
@@ -242,6 +243,20 @@ export const App: React.FC = () => {
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
+  // Integrated Developer Studio navigation state
+  const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
+  const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
+  const [studioWorkspaceId, setStudioWorkspaceId] = useState<string | null>(null);
+  const [studioRunId, setStudioRunId] = useState<string | null>(null);
+
+  const handleOpenStudio = (opts: { step?: 1 | 2 | 3 | 4; nodeId?: string; workspaceId?: string; runId?: string }) => {
+    if (opts.step) setStudioStep(opts.step);
+    if (opts.nodeId) setStudioNodeId(opts.nodeId);
+    if (opts.workspaceId) setStudioWorkspaceId(opts.workspaceId);
+    if (opts.runId) setStudioRunId(opts.runId);
+    setActiveTab('studio');
+  };
+
   const fetchRuns = () => {
     apiClient<{ items: RunItem[] }>('/v1/runs')
       .then((res) => {
@@ -422,11 +437,32 @@ export const App: React.FC = () => {
           />
         )}
 
+        {/* Tab 1.5: Integrated Developer Studio */}
+        {activeTab === 'studio' && (
+          <DeveloperStudio
+            nodes={nodes}
+            runs={runs}
+            initialStep={studioStep}
+            initialNodeId={studioNodeId}
+            initialWorkspaceId={studioWorkspaceId}
+            initialRunId={studioRunId}
+            onNavigateTab={(tab, entityId) => {
+              setActiveTab(tab);
+              if (tab === 'runs' && entityId) setSelectedRunId(entityId);
+            }}
+            onRefreshRuns={fetchRuns}
+          />
+        )}
+
         {/* Tab 2: Nodes */}
         {activeTab === 'nodes' && (
           <div>
             {selectedNode ? (
-              <NodeDetail node={selectedNode} onBack={() => setSelectedNodeId(null)} />
+              <NodeDetail
+                node={selectedNode}
+                onBack={() => setSelectedNodeId(null)}
+                onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
+              />
             ) : (
               <div>
                 {/* 5-State Simulation Controls (FR-01 / FR-02) */}
@@ -491,6 +527,7 @@ export const App: React.FC = () => {
                   }
                   onRefresh={() => setNodeSimState('normal')}
                   onSelectNode={(id) => setSelectedNodeId(id)}
+                  onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
                 />
               </div>
             )}
@@ -515,6 +552,7 @@ export const App: React.FC = () => {
                 nodes={nodes}
                 onCreateWorkspace={() => setIsCreateModalOpen(true)}
                 onSelectWorkspace={(wspId) => setSelectedWorkspaceId(wspId)}
+                onOpenStudio={(wspId) => handleOpenStudio({ step: 1, workspaceId: wspId })}
               />
             )}
 
@@ -589,6 +627,7 @@ export const App: React.FC = () => {
                 onNavigateRun={(id) => setSelectedRunId(id)}
                 onCancelRun={handleCancelRun}
                 onRefreshRun={fetchRuns}
+                onOpenStudio={(runId) => handleOpenStudio({ step: 4, runId })}
               />
             ) : (
               <RunList

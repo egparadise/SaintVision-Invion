@@ -11,6 +11,7 @@ export interface NodeListProps {
   isForbidden?: boolean;
   onRefresh?: () => void;
   onSelectNode?: (nodeId: string) => void;
+  onOpenStudio?: (nodeId: string) => void;
 }
 
 export const NodeList: React.FC<NodeListProps> = ({
@@ -20,6 +21,7 @@ export const NodeList: React.FC<NodeListProps> = ({
   isForbidden = false,
   onRefresh,
   onSelectNode,
+  onOpenStudio,
 }) => {
   // State 1: Forbidden (403)
   if (isForbidden) {
@@ -186,6 +188,42 @@ export const NodeList: React.FC<NodeListProps> = ({
                   <span>로컬 스토리지:</span>
                   <span>{storageUsedGb} / {storageTotalGb} GiB</span>
                 </div>
+              </div>
+
+              {/* Resource Headroom & Studio Jump Action */}
+              <div
+                style={{
+                  marginTop: '14px',
+                  paddingTop: '10px',
+                  borderTop: '1px solid var(--color-border-subtle)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ fontSize: '0.75rem', color: '#3fb950', fontWeight: 600 }}>
+                  가용 여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}코어 · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}GB
+                </div>
+                {onOpenStudio && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenStudio(node.id);
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--color-brand-primary)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ⚡ Studio 열기
+                  </button>
+                )}
               </div>
             </div>
           );
