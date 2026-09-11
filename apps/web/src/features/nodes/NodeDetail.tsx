@@ -91,12 +91,12 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.875rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px' }}>
               <span style={{ color: 'var(--color-text-muted)' }}>운영체제:</span>
-              <strong>{node.os === 'windows' ? 'Windows 11 Pro 64-bit' : 'Ubuntu 24.04 LTS'}</strong>
+              <strong>{node.os ? node.os.toUpperCase() : '알 수 없음'}</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px' }}>
-              <span style={{ color: 'var(--color-text-muted)' }}>CPU 모델 및 코어:</span>
-              <strong>AMD/Intel x86_64 ({node.cpuCores} 코어)</strong>
+              <span style={{ color: 'var(--color-text-muted)' }}>CPU 아키텍처 및 물리 코어:</span>
+              <strong>x86_64 ({node.cpuCores} 코어)</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px' }}>
@@ -187,9 +187,9 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
               lineHeight: 1.6,
             }}
           >
-            <div><strong>현재 할당된 Workspace:</strong> {node.observationOnly ? '없음 (배치 차단)' : 'wsp_01JABCDE (wsp-saint-pilot)'}</div>
-            <div><strong>점유 CPU / RAM:</strong> {node.observationOnly ? '0 코어 / 0 GiB' : `${node.cpuCores - (node.allocatableCores ?? node.cpuCores)} 코어 / ${(((node.memoryTotalBytes - (node.allocatableMemoryBytes ?? node.memoryTotalBytes)) / (1024 ** 3))).toFixed(1)} GiB`}</div>
-            {node.gpuCount > 0 && <div><strong>점유 GPU VRAM:</strong> {((node.gpuVramUsedBytes || 0) / (1024 ** 3)).toFixed(1)} GiB</div>}
+            <div><strong>현재 할당된 Workspace:</strong> {node.observationOnly ? '없음 (원격 배치 차단)' : '미할당 (유휴 상태 대기)'}</div>
+            <div><strong>실측 부하 (Observed Usage):</strong> {node.cpuUsagePercent}% ({(node.cpuCores * node.cpuUsagePercent / 100).toFixed(1)}C) / {((node.memoryUsedBytes / 1024 ** 3)).toFixed(1)} GiB</div>
+            {node.gpuCount > 0 && <div><strong>GPU VRAM 사용량:</strong> {((node.gpuVramUsedBytes || 0) / (1024 ** 3)).toFixed(1)} / {((node.gpuVramTotalBytes || 0) / (1024 ** 3)).toFixed(1)} GiB</div>}
             <div style={{ marginTop: '8px', color: 'var(--color-text-muted)' }}>
               하트비트 수신 시각: {new Date(node.heartbeatAt).toLocaleString()} (실시간 텔레메트리 연동)
             </div>
@@ -200,11 +200,15 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
           </h4>
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div>
-              [{new Date(node.heartbeatAt).toLocaleTimeString()}] Heartbeat OK - CPU {node.cpuUsagePercent}% | RAM {((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%
-              {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} (mTLS 텔레메트리 수신)
+              [{new Date(node.heartbeatAt).toLocaleTimeString()}]{' '}
+              <span style={{ color: node.status === 'online' ? '#3fb950' : node.status === 'degraded' ? '#d29922' : '#f85149', fontWeight: 600 }}>
+                {node.status === 'online' ? 'Heartbeat OK' : node.status === 'degraded' ? 'Heartbeat Warning (Degraded)' : 'Heartbeat FAILED (Offline)'}
+              </span>{' '}
+              - CPU {node.cpuUsagePercent}% | RAM {((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%
+              {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} ({node.status === 'online' ? 'mTLS 텔레메트리 수신' : '통신 상태 확인 필요'})
             </div>
             <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>
-              • 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음 (Zero Synthetic Fluctuations)
+              • 상태: <strong>{node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음
             </div>
           </div>
         </div>

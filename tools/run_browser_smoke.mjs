@@ -548,6 +548,11 @@ async function runFullSmokeJourney() {
     const artsData = await artsRes.json();
     assert('Artifacts endpoint reports execution-kernel source', artsData.source === 'execution-kernel');
 
+    const rawArtRes = await fetch(`${BACKEND_URL}/v1/runs/${dispatchedRun.id}/artifacts/content?path=output.log`);
+    assert('GET /v1/runs/{id}/artifacts/content returns HTTP 200 raw bytes', rawArtRes.status === 200);
+    assert('Raw artifact content includes X-Checksum-SHA256 header', Boolean(rawArtRes.headers.get('X-Checksum-SHA256')));
+    assert('Raw artifact content-type is octet-stream', rawArtRes.headers.get('Content-Type')?.includes('application/octet-stream'));
+
     // 8. Placement candidate discovery explanation
     const candRes = await fetch(`${BACKEND_URL}/v1/discovery/candidates?minCores=4&minMemoryGb=8`);
     assert('GET /v1/discovery/candidates returns HTTP 200', candRes.status === 200);

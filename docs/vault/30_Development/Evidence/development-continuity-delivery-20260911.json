@@ -1,0 +1,421 @@
+{
+  "recordedKst": "2026-09-11T17:21:49+09:00",
+  "documentSha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+  "coverage": {
+    "cards": 26,
+    "originalTasksCovered": 48,
+    "allTasksHaveTheirOriginalOwner": true,
+    "cardHeadingsPresent": true,
+    "originalRegistryUnchanged": true
+  },
+  "entryDelivery": {
+    "verifiedKst": "2026-09-11T17:20:14+09:00",
+    "instructionCommit": "b2c37f2ecba3c8d92a4ffdabce74dbab03c7f5fa",
+    "deliveries": [
+      {
+        "agent": "Gemini",
+        "worktree": "C:/Project/SaintVision-Invion",
+        "branch": "integration/all-agents-unified",
+        "before": "f08bf33100051b952d5507b21b5288111359e83e",
+        "after": "1fba8c95c03464c06ff937aa23e681d3094e2fcf",
+        "changedPaths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "GEMINI.md",
+          "skills/agent-delivery/SKILL.md"
+        ],
+        "entryFilesIdentical": true,
+        "productSourceUnchanged": true,
+        "pushExitCode": 0,
+        "remoteHeadVerified": true,
+        "acknowledgment": "pending; instructions delivered, session not activated"
+      },
+      {
+        "agent": "Claude",
+        "worktree": "C:/Project/SaintVision-Invion/.worktrees/claude-lane",
+        "branch": "review/claude-account-results",
+        "before": "9995122a840dc4383b38d954d3b7d8c475386037",
+        "after": "3ec288a172535dd4a8b3715790dd29abbf1b0f62",
+        "changedPaths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          "GEMINI.md",
+          "skills/agent-delivery/SKILL.md"
+        ],
+        "entryFilesIdentical": true,
+        "productSourceUnchanged": true,
+        "pushExitCode": 0,
+        "remoteHeadVerified": true,
+        "acknowledgment": "pending; instructions delivered, session not activated"
+      }
+    ]
+  },
+  "ci": {
+    "checkedAt": "2026-09-11T17:20:40+09:00",
+    "heads": [
+      {
+        "agent": "Codex",
+        "sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+        "runs": [
+          {
+            "id": 34578593704,
+            "name": "Core Build",
+            "event": "pull_request",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578593704",
+            "jobs": [
+              {
+                "id": 103196687159,
+                "name": "core",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:14Z",
+                "completed_at": "2026-09-11T08:19:16Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578593481,
+            "name": "Documentation Build",
+            "event": "pull_request",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578593481",
+            "jobs": [
+              {
+                "id": 103196685737,
+                "name": "docs",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:13Z",
+                "completed_at": "2026-09-11T08:19:16Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578593883,
+            "name": "Backend Build",
+            "event": "pull_request",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578593883",
+            "jobs": [
+              {
+                "id": 103196687358,
+                "name": "backend (3.12)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:14Z",
+                "completed_at": "2026-09-11T08:19:16Z"
+              },
+              {
+                "id": 103196687607,
+                "name": "backend (3.14)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:14Z",
+                "completed_at": "2026-09-11T08:19:16Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578589545,
+            "name": "Documentation Build",
+            "event": "push",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578589545",
+            "jobs": [
+              {
+                "id": 103196673279,
+                "name": "docs",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:11Z",
+                "completed_at": "2026-09-11T08:19:13Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578589574,
+            "name": "Backend Build",
+            "event": "push",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578589574",
+            "jobs": [
+              {
+                "id": 103196673887,
+                "name": "backend (3.12)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:11Z",
+                "completed_at": "2026-09-11T08:19:13Z"
+              },
+              {
+                "id": 103196674121,
+                "name": "backend (3.14)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:11Z",
+                "completed_at": "2026-09-11T08:19:13Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578589627,
+            "name": "Core Build",
+            "event": "push",
+            "head_sha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578589627",
+            "jobs": [
+              {
+                "id": 103196673774,
+                "name": "core",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:19:11Z",
+                "completed_at": "2026-09-11T08:19:13Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          }
+        ]
+      },
+      {
+        "agent": "Gemini",
+        "sha": "1fba8c95c03464c06ff937aa23e681d3094e2fcf",
+        "runs": [
+          {
+            "id": 34578669161,
+            "name": "Backend Build",
+            "event": "push",
+            "head_sha": "1fba8c95c03464c06ff937aa23e681d3094e2fcf",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578669161",
+            "jobs": [
+              {
+                "id": 103196924282,
+                "name": "backend (3.14)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:10Z",
+                "completed_at": "2026-09-11T08:20:13Z"
+              },
+              {
+                "id": 103196924595,
+                "name": "backend (3.12)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:11Z",
+                "completed_at": "2026-09-11T08:20:12Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578669131,
+            "name": "Core Build",
+            "event": "push",
+            "head_sha": "1fba8c95c03464c06ff937aa23e681d3094e2fcf",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578669131",
+            "jobs": [
+              {
+                "id": 103196924016,
+                "name": "core",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:10Z",
+                "completed_at": "2026-09-11T08:20:13Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578669147,
+            "name": "Documentation Build",
+            "event": "push",
+            "head_sha": "1fba8c95c03464c06ff937aa23e681d3094e2fcf",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578669147",
+            "jobs": [
+              {
+                "id": 103196924343,
+                "name": "docs",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:10Z",
+                "completed_at": "2026-09-11T08:20:14Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          }
+        ]
+      },
+      {
+        "agent": "Claude",
+        "sha": "3ec288a172535dd4a8b3715790dd29abbf1b0f62",
+        "runs": [
+          {
+            "id": 34578680295,
+            "name": "Backend Build",
+            "event": "push",
+            "head_sha": "3ec288a172535dd4a8b3715790dd29abbf1b0f62",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578680295",
+            "jobs": [
+              {
+                "id": 103196958393,
+                "name": "backend (3.12)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:18Z",
+                "completed_at": "2026-09-11T08:20:20Z"
+              },
+              {
+                "id": 103196958809,
+                "name": "backend (3.14)",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:18Z",
+                "completed_at": "2026-09-11T08:20:20Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578680274,
+            "name": "Core Build",
+            "event": "push",
+            "head_sha": "3ec288a172535dd4a8b3715790dd29abbf1b0f62",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578680274",
+            "jobs": [
+              {
+                "id": 103196958065,
+                "name": "core",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:18Z",
+                "completed_at": "2026-09-11T08:20:20Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          },
+          {
+            "id": 34578680324,
+            "name": "Documentation Build",
+            "event": "push",
+            "head_sha": "3ec288a172535dd4a8b3715790dd29abbf1b0f62",
+            "status": "completed",
+            "conclusion": "failure",
+            "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34578680324",
+            "jobs": [
+              {
+                "id": 103196958497,
+                "name": "docs",
+                "status": "completed",
+                "conclusion": "failure",
+                "started_at": "2026-09-11T08:20:18Z",
+                "completed_at": "2026-09-11T08:20:20Z"
+              }
+            ],
+            "annotations": [
+              "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "initialObsidianDelivery": {
+    "verifiedKst": "2026-09-11T17:19:42+09:00",
+    "sourceSha": "994ab49eb1695e5c886c5f3783aa577217a1d858",
+    "managedFiles": 405,
+    "allHashesMatch": true,
+    "pendingExports": 0,
+    "conflicts": 0,
+    "commands": [
+      {
+        "command": [
+          "tools/sync_obsidian.py",
+          "--check",
+          "--state",
+          ".work/workspace-sync-state.json"
+        ],
+        "exit_code": 0,
+        "stdout": "CHECK: 405 managed files, 16 pending exports, 0 conflicts. No writes.",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "tools/sync_obsidian.py",
+          "--apply",
+          "--state",
+          ".work/workspace-sync-state.json"
+        ],
+        "exit_code": 0,
+        "stdout": "EXPORTED: 16 files; all 405 destination hashes match. Unmanaged files untouched.",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "tools/sync_obsidian.py",
+          "--check",
+          "--state",
+          ".work/workspace-sync-state.json"
+        ],
+        "exit_code": 0,
+        "stdout": "CHECK: 405 managed files, 0 pending exports, 0 conflicts. No writes.",
+        "stderr": ""
+      }
+    ],
+    "scope": "Local Obsidian mirror; OneDrive cloud upload not verified"
+  },
+  "limits": [
+    "Other agent acknowledgment and independent review pending",
+    "CI could not start due to billing/spending limit",
+    "Operating acceptance not performed by this documentation change"
+  ]
+}

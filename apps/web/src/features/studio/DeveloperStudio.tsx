@@ -491,6 +491,54 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     }
   };
 
+  // Raw Output Artifact File Bytes Download handler (GM-01)
+  const handleDownloadRawFile = async (targetPath?: string) => {
+    if (!activeRunId) return;
+    const filePath = targetPath || artifactData?.entrypoint || activeFile.path;
+    const fileName = filePath.split('/').pop() || 'artifact.txt';
+
+    if (currentRun?.state === 'running') {
+      alert('실행 진행 중인 작업의 산출물 파일은 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.');
+      return;
+    }
+
+    setIsDownloadingArtifact(true);
+    try {
+      const res = await fetch(`/v1/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setLogs((prev) => [
+        ...prev,
+        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact File] Raw file bytes downloaded for '${filePath}' (${blob.size.toLocaleString()} Bytes)` },
+      ]);
+    } catch (err: any) {
+      console.error('Raw artifact download failed, falling back to local cached content:', err);
+      const fileObj = files.find((f) => f.path === filePath) || activeFile;
+      const blob = new Blob([fileObj.content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsDownloadingArtifact(false);
+    }
+  };
+
   // Immediate Cancel handler
   const handleCancelSubmit = async () => {
     if (!activeRunId) return;
@@ -979,7 +1027,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               ) : null}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', maxWidth: '650px' }}>
+                💡 <strong>안내:</strong> 사전 준비 상태(Readiness) 진단과 실제 실행 투입(Admission)은 엄격히 분리되어 있습니다.
+                파일 준비(<code>input_prepared</code>) 등 일부 미충족 항목이 있더라도 2단계(자원 배치 검토) 및 3단계(파일 편집 및 입력 동결)를 계속 진행하여 사전 조건을 완료할 수 있습니다.
+              </div>
               <Button variant="primary" onClick={() => setCurrentStep(2)}>
                 다음: 자원 배치 & 노드 검토 →
               </Button>
@@ -1985,7 +2037,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </span>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -1996,10 +2048,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="primary"
                   size="sm"
+                  onClick={() => handleDownloadRawFile()}
+                  disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
+                  title="실행 커널이 생성한 실제 산출물 파일 바이트를 다운로드합니다"
+                >
+                  {isDownloadingArtifact ? '⏳ 다운로드 중...' : '📥 결과 파일 다운로드 (Bytes)'}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={handleDownloadArtifact}
                   disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
+                  title="실행 영수증과 검증 다이제스트를 포함한 JSON 매니페스트를 다운로드합니다"
                 >
-                  {isDownloadingArtifact || isLoadingArtifact ? '⏳ 준비 중...' : '📥 산출물 다운로드 (.json)'}
+                  📜 영수증 메타 (.json)
                 </Button>
               </div>
             </div>
