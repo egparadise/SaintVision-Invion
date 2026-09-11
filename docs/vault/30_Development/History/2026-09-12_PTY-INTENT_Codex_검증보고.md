@@ -51,3 +51,5 @@ intent는 실행 완료가 아니다. 검증된 Node 응답과 현재 권한·�
 
 - 2026-09-12T00:24:51+09:00: `python tools/check_docs.py` exit0(24 원본 hash, 274 versioned docs, 48 tasks), `python tools/check_ontology.py` exit0, 변경 Python4개 `black --check` exit0, `git diff --check` exit0.
 - Obsidian 사전 check exit0: 관리444개, 변경11개, 충돌0. 실제 export는 다음 영수증으로 기록한다.
+
+- 실제 전달 2026-09-12T00:24:59+09:00: source `c928c28cedce30cac8ac627c936bec69ce31fbfc` push exit0; `sync_obsidian.py --check → --apply → --check` 모두 exit0, 변경11개 export, 관리444개 hash 일치, pending0/conflict0. 로컬 Obsidian 사본 범위이며 OneDrive 클라우드는 미확인. 이 영수증 commit도 같은 절차로 export한다.
