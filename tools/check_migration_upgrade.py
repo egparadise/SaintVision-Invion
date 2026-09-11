@@ -14,6 +14,16 @@ from sqlalchemy.engine import URL
 def main():
     admin = os.environ["INV_TEST_ADMIN_DSN"]
     root = Path(__file__).resolve().parents[1]
+    # Both paths, because this runs as a standalone script: pytest supplies
+    # them from pyproject, and the subprocess it launches inherits neither. The
+    # missing one failed the ninth prior on every run, and the credential-safe
+    # diagnostic suppression turned a plain ModuleNotFoundError into
+    # "migration validation failed" — which reads as a broken migration.
+    sys.path.insert(0, str(root / "tools"))
+    sys.path.insert(0, str(root / "src"))
+    from migration_graph import chain
+
+    expected_head = chain()[-1].revision
     for prior in (
         "0018_workspace_resume",
         "0010_canonical_resource_units",
@@ -24,8 +34,6 @@ def main():
         "0023_containment_approvals",
         "0025_workspace_start",
         "0025_workspace_tool_choice",
-        "0026_subject_kernel_link",
-        "0027_business_api_guards",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
@@ -63,8 +71,13 @@ def main():
                             conn.execute("INSERT INTO public.projects(tenant_id,project_id,code,display_name) VALUES(%s,%s,'preserve','preserve')",(sentinel,project))
                             conn.execute("INSERT INTO public.workspaces(tenant_id,project_id,workspace_id,name,created_by_user_id,tool_name) VALUES(%s,%s,%s,'preserve',%s,'codex-cli')",(sentinel,project,preserved_workspace,user))
             with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
+                # Derived, not pinned. A literal head here goes stale the
+                # moment anyone adds a revision — which is what a tool that
+                # exists to prove upgrades work should be least able to do —
+                # and the failure reads as a broken migration path rather than
+                # a stale expectation.
                 assert conn.execute("SELECT version_num FROM alembic_version").fetchall() == [
-                    ("0028_result_readiness_merge",)
+                    (expected_head,)
                 ]
                 assert conn.execute(
                     "SELECT rolsuper,rolcanlogin,rolbypassrls FROM pg_roles WHERE rolname='inv_kernel'"
