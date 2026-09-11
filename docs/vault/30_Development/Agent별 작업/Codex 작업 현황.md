@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T18:59:05+09:00"
+updated: "2026-09-11T23:56:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,7 +41,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-08 / AC-01, AC-04, AC-08.
-- 다음 첫 행동: 복원 5fc1116 전달 후 Claude cdf98ad F1 제공량 snapshot 경합을 실제 함수로 재현·수정하고, F2 감사 intent와 Node 중복 방어를 구분해 보강한다. Gemini 858763c의 정본 API/운영 인수 finding도 추적한다.
+- 다음 첫 행동: 29c810f에서 F1의 기존 잠금 보호를 실제 확인했다. Claude 재검토를 기다리며 F2 감사 intent와 Node 중복 방어를 구분해 보강한다. Gemini 858763c의 정본 API/운영 인수 finding도 추적한다.
 - 필요한 합격 증거: review finding별 해결 SHA/독립 검토, 현재 적용 DB 함수의 실제 다른 tenant 거부, 계약·migration 이력 보존. CI와 main 상태 별도.
 - 선행/차단과 해소 담당: 검토할 코드 확보됨. 독립 승인자는 CL-01.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
@@ -124,14 +124,14 @@ source_of_truth: "Git"
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 카드 | RECOVERY-INTEGRATION / CX-01·CX-07 일부 구현 전달; 전체 카드 in_progress |
-| owner / 진행판 / KST | Codex / 시작1.0.14→현재1.0.16 / 2026-09-11T18:58:38+09:00 |
-| branch / base / 구현 / 검증 | agent/codex/workspace-bridge / d14db0a / 869d74b / clean b5aef8a |
-| 작업 | 단일 복원 도구·정본 감사·실패 거부·양쪽 RLS·측정/fencing·DB 기록 |
-| 검증 | b5aef8a Linux64/core22 pass, 0skip, exit0; Go3는 변경 없는5fc1116 source 증거 |
-| CI / peer / 운영 | CI6 시작 전 계정 제한, Claude 최신 검토 pending, 전체 운영 인수 미완료 |
-| 다음 첫 행동 / owner | F1 제공량 경합 실제 함수 재현과 단일 snapshot 수정·F2 intent 감사 / Codex, 이후 CX-02 |
-| History / PR / sync | [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]] / PR19 / 18:59:44 전달3c74d13 관리433개 hash 일치, 최종 영수증 반영 |
+| 마지막 작업 / 카드 | OFFER-SNAPSHOT / CX-01 F1 재검증, reviewer pending |
+| owner / 진행판 / KST | Codex / 1.0.17 / 2026-09-11T23:57:24+09:00 |
+| branch / base / 검증 | agent/codex/workspace-bridge / ade6721 / clean 29c810f |
+| 작업 | 실제 HTTP offer와 receipt-backed release의 잠금 직렬화 회귀 |
+| 검증 | PostgreSQL36 pass, 0skip, exit0; 잠금 제거 변이 exit1 / 원본 복구 |
+| CI / peer / 운영 | CI 시작 전 계정 제한, Claude F1 재검토 pending, 전체 운영 인수 미완료 |
+| 다음 첫 행동 / owner | F2 pre-dispatch intent와 응답 유실 감사 / Codex, 이후 CX-02 |
+| History / PR / sync | [[2026-09-11_OFFER-SNAPSHOT_Codex_검증보고]] / PR19 / 전달 영수증에 기록 |
 
 ## 2026-09-11 18:53 Codex 수신·검증·후속 기록
 
@@ -142,3 +142,10 @@ source_of_truth: "Git"
 - 이어 CX-02 credential/Storage 계약. CX-03 실제 원격 설치 receipt 미수신으로 blocked. PR19에 같은 변경 전달, Obsidian hash는 최종 영수증에 기록.
 
 상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
+
+## OFFER-SNAPSHOT 최신 작업 → 확인 → 다음
+
+- 2026-09-11T23:56:33+09:00 / CX-01 / owner Codex / reviewer Claude pending. base ade6721 → clean 검증29c810f, PR19.
+- 작업: F1 실제 API/lease release 경합 회귀. 확인: 실 PostgreSQL36개 exit0, 잠금 한 줄 제거 변이 exit1, 원본 복구. d14db0a에도 잠금이 있어 F1 전제 재검토를 요청한다. 제품/migration 변경 없음.
+- 다음 첫 행동: F2 pre-dispatch intent/sequence/hash 감사와 응답 유실 정합성 보강; 이후 CX-02. 과거 snapshot 수정 계획은 최신 실험으로 대체.
+- [[2026-09-11_OFFER-SNAPSHOT_Codex_검증보고]], [[2026-09-11_OFFER-SNAPSHOT_오류와해결]]. 전체57.29%(표시55%) 유지. CI 계정 제한·peer·원격 인수 미완료.
