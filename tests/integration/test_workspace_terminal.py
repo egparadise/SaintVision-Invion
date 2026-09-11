@@ -237,3 +237,93 @@ def test_actual_terminal_websocket_uses_single_use_ticket(terminal):
         ) as ws:
             ws.send_json({"ticket": value["ticket"]})
             ws.receive_json()
+
+
+@pytest.mark.parametrize("fault", ["before_send", "lost_response", "wrong_scope"])
+def test_terminal_intent_survives_uncertain_dispatch_and_pins_replay(terminal, monkeypatch, fault):
+    a = terminal
+    attached = redeem(a, ticket(a).json())
+    request = frame("input", sequence=1, text="intent-once\n")
+    original = a.runtime.client.terminal_frame
+    calls = []
+
+    def uncertain(channel, payload):
+        calls.append(payload)
+        # A separate transaction can see the committed intent before transport.
+        assert count(a, "terminal_frame_intents") == 1
+        assert count(a, "terminal_frame_audit") == 0
+        if fault == "before_send":
+            raise TimeoutError("test transport unavailable")
+        result = original(channel, payload)
+        if fault == "lost_response":
+            raise TimeoutError("test response lost after Node accepted input")
+        return {**result, "nonce": "0" * 64}
+
+    monkeypatch.setattr(a.runtime.client, "terminal_frame", uncertain)
+    with pytest.raises((TimeoutError, DomainError)):
+        a.terminal.frame(attached, request)
+    assert count(a, "terminal_frame_intents") == 1
+    assert count(a, "terminal_frame_audit") == 0
+    # A fresh service object must respect durable intent, not process memory.
+    service = TerminalService(a.service, (ORIGIN,))
+    for invalid in [
+        frame("input", sequence=1, text="changed\n"),
+        frame("input", sequence=2, text="overtake\n"),
+    ]:
+        with pytest.raises(DomainError):
+            service.frame(attached, invalid)
+    assert len(calls) == 1  # Rejections occur before contacting the Node.
+    monkeypatch.setattr(a.runtime.client, "terminal_frame", original)
+    service.frame(attached, frame())  # Reading alone is not completion evidence.
+    assert count(a, "terminal_frame_audit") == 0
+    service.frame(attached, request)
+    assert count(a, "terminal_frame_audit") == 1
+    assert count(a, "terminal_frame_intents") == 1
+    with a.e.db.transaction(a.e.tenant) as conn:
+        events = conn.execute(
+            "SELECT event_type,payload FROM inv.outbox WHERE run_id=%s AND event_type IN ('inv.terminal.frame_intended','inv.terminal.frame')",
+            (run(a)["runId"],),
+        ).fetchall()
+    assert sorted(e["event_type"] for e in events) == [
+        "inv.terminal.frame",
+        "inv.terminal.frame_intended",
+    ]
+    assert all("dataBase64" not in e["payload"] and "nonce" not in e["payload"] for e in events)
+    output = b""
+    deadline = time.monotonic() + 4
+    while time.monotonic() < deadline:
+        result = service.frame(attached, frame(cursor=len(output)))
+        output += base64.b64decode(result["dataBase64"])
+        if b"ACK:intent-once" in output:
+            break
+        time.sleep(0.02)
+    assert output.count(b"ACK:intent-once") == 1
+    assert b"changed" not in output and b"overtake" not in output
+    with a.e.db.transaction(a.e.other) as conn:
+        assert (
+            conn.execute("SELECT count(*) AS n FROM inv.terminal_frame_intents").fetchone()["n"]
+            == 0
+        )
+    with psycopg.connect(a.e.owner) as conn, pytest.raises(psycopg.Error):
+        conn.execute("DELETE FROM inv.terminal_frame_intents")
+
+
+def test_terminal_failed_intent_transaction_never_dispatches(terminal, monkeypatch):
+    import inv.terminal as module
+
+    a = terminal
+    attached = redeem(a, ticket(a).json())
+    original_event = module.event
+    calls = []
+
+    def fail_event(conn, tenant, run_id, event_type, payload):
+        if event_type == "inv.terminal.frame_intended":
+            raise RuntimeError("test intent transaction failure")
+        return original_event(conn, tenant, run_id, event_type, payload)
+
+    monkeypatch.setattr(module, "event", fail_event)
+    monkeypatch.setattr(a.runtime.client, "terminal_frame", lambda *args: calls.append(args))
+    with pytest.raises(RuntimeError, match="intent transaction failure"):
+        a.terminal.frame(attached, frame("input", sequence=1, text="not-dispatched\n"))
+    assert calls == []
+    assert count(a, "terminal_frame_intents") == count(a, "terminal_frame_audit") == 0

@@ -224,10 +224,52 @@ class TerminalService:
     def frame(self, attachment, data):
         validate_contract("TerminalFrameInput", data)
         principal = attachment.principal
+        fingerprint = digest(data)
         with self.db.transaction(principal.tenant_id) as conn:
             row, launch, now = self._current(conn, principal, attachment.command_id)
             self._connection(conn, attachment, now)
             node = NodePrincipal(principal.tenant_id, row["node_id"])
+            if data["operation"] != "poll":
+                # _current holds the Run lock. Commit intent before any network
+                # call; a lost response must never erase the attempted input.
+                # Old completed audits remain authoritative across the upgrade.
+                prior = conn.execute(
+                    "SELECT frame_digest FROM inv.terminal_frame_intents WHERE command_id=%s AND sequence=%s "
+                    "UNION ALL SELECT frame_digest FROM inv.terminal_frame_audit WHERE command_id=%s AND sequence=%s",
+                    (
+                        attachment.command_id,
+                        data["sequence"],
+                        attachment.command_id,
+                        data["sequence"],
+                    ),
+                ).fetchall()
+                if any(p["frame_digest"] != fingerprint for p in prior):
+                    raise DomainError("AUTH-0070", "Terminal sequence intent differs", 403)
+                if not prior:
+                    completed = conn.execute(
+                        "SELECT coalesce(max(sequence),0) AS sequence FROM inv.terminal_frame_audit WHERE command_id=%s",
+                        (attachment.command_id,),
+                    ).fetchone()["sequence"]
+                    if data["sequence"] != completed + 1:
+                        raise DomainError(
+                            "AUTH-0070", "Confirm the preceding terminal frame first", 409
+                        )
+                    conn.execute(
+                        "INSERT INTO inv.terminal_frame_intents(tenant_id,command_id,sequence,frame_digest) VALUES(%s,%s,%s,%s)",
+                        (principal.tenant_id, attachment.command_id, data["sequence"], fingerprint),
+                    )
+                    event(
+                        conn,
+                        principal.tenant_id,
+                        row["run_id"],
+                        "inv.terminal.frame_intended",
+                        {
+                            "sessionId": attachment.session_id,
+                            "sequence": data["sequence"],
+                            "operation": data["operation"],
+                            "frameDigest": fingerprint,
+                        },
+                    )
         # An existing draining Node may finish its approved terminal. A kill is
         # denied by _current and its durable cancellation proceeds independently.
         channel = NodeChannels(self.db).snapshot(node, observation_only=True)
@@ -247,13 +289,13 @@ class TerminalService:
             if data["operation"] != "poll":
                 inserted = conn.execute(
                     "INSERT INTO inv.terminal_frame_audit(tenant_id,command_id,sequence,frame_digest) VALUES(%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING sequence",
-                    (principal.tenant_id, attachment.command_id, data["sequence"], digest(data)),
+                    (principal.tenant_id, attachment.command_id, data["sequence"], fingerprint),
                 ).fetchone()
                 prior = conn.execute(
                     "SELECT frame_digest FROM inv.terminal_frame_audit WHERE command_id=%s AND sequence=%s",
                     (attachment.command_id, data["sequence"]),
                 ).fetchone()
-                if prior["frame_digest"] != digest(data):
+                if prior["frame_digest"] != fingerprint:
                     raise DomainError("AUTH-0070", "Terminal sequence audit differs", 403)
                 if inserted:
                     event(

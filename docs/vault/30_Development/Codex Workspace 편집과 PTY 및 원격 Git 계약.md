@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-WORKSPACE-BRIDGE-001"
 title: "Codex Workspace 편집과 PTY 및 원격 Git 계약"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T16:51:15+09:00"
+updated: "2026-09-12T00:19:45+09:00"
 source_of_truth: "Git"
 ---
 
@@ -83,3 +83,16 @@ Git proposal의 idempotent 재조회에도 현재 business membership을 다시 
 대용량 Git/Workspace, 일반 SSH/다른 Git provider, 장시간/full-screen terminal, Windows/GPU/BuildKit 격리, 전체 Context/RO secret 평가와 물리 5대 부하·장애·복구/운영 인수는 후속 범위다. peer review를 수행한 것으로 표시하지 않는다.
 
 외부 계약 참고: [GitHub createCommitOnBranch](https://docs.github.com/en/enterprise-cloud%40latest/graphql/reference/commits), [Git file changes](https://docs.github.com/en/graphql/reference/git), [Go SysProcAttr](https://pkg.go.dev/syscall#SysProcAttr), [Docker Engine API v1.45](https://docs.docker.com/reference/api/engine/version/v1.45/), [websockets package](https://pypi.org/project/websockets/).
+
+
+## ADR-074 — PTY 실행 의도와 확인된 응답 분리
+
+0034_terminal_frame_intents는 command+sequence별 digest와 생성시각만 저장하는 append-only tenant FORCE RLS 표를 추가한다. 원문 입력/nonce/출력을 저장하지 않는다. inv_kernel에는 SELECT/INSERT만 허용한다. 기존 완료 terminal_frame_audit와 0033 이전 이력은 변경하지 않는다.
+
+현재 권한 및 attachment 검사와 같은 Run 잠금 transaction에서 intent와 inv.terminal.frame_intended를 먼저 commit한다. 같은 순번의 다른 digest는 전송 전에 거부한다. 새 mutation 순번은 마지막 확인된 audit+1만 허용한다. 미확정 intent가 있으면 정확히 같은 frame의 재확인 또는 poll/종료만 가능하다. intent는 전송 또는 실행 성공 증거가 아니다.
+
+네트워크는 transaction 밖에서 호출한다. 응답의 command/session/nonce/sequence와 현재 권한/채널을 재검증한 후 기존 terminal_frame_audit 및 inv.terminal.frame을 한 번 기록한다. 전송 실패, 응답 유실, scope 불일치, 후행 권한 거부는 intent만 남기며 임의 완료로 바꾸지 않는다. poll의 sequence 관측도 특정 digest의 실행 증거가 아니므로 미확정 intent를 완료하지 않는다.
+
+정확한 replay는 Node 기존 마지막 sequence/hash replay 보호를 사용한다. 부분 write의 poisoned session을 재실행하지 않고 프로세스 종료 후 입력을 복원하지 않는다. 원래 frame을 잃었거나 재확인이 불가능하면 mutation을 계속하지 말고 승인된 실행을 종료하고 새 승인 흐름을 사용한다. 이전 완료 audit만 존재하는 upgrade 전 frame은 그 digest를 먼저 검사하며 과거 실행 앞에 intent가 있었던 것처럼 소급 생성하지 않는다.
+
+Node는 이미 다른 digest/같은 순번을 실행 전 거부한다. 이번 변경은 그 검사를 서버 dispatch 전에도 수행하고 durable intent 공백을 없앤다. in-flight dispatch 뒤의 권한 회수가 이미 전달된 입력을 소급 취소한다는 보장은 하지 않는다. 물리 원격/브라우저 운영 인수와 독립 검토는 별도다.
