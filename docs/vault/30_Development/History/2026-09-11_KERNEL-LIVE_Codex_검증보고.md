@@ -22,7 +22,7 @@ Task KERNEL-LIVE / S03·S06·S12 후속 / owner Codex / reviewer Claude 대기. 
 & 'C:/Project/SaintVision-Invion/.venv/Scripts/python.exe' tools/check_kernel_docker.py --go 'C:/Project/SaintVision-Invion/.work/node-toolchain-1.27.1/go/bin/go.exe'
 ```
 
-공개 증거 `Evidence/kernel-live-e5d9b0b.json`에 사례별 결과·소스/바이너리/이미지 SHA·Run/command/receipt/Evidence ID·모델 파일 SHA·raw log SHA 및 시험 컨테이너 종료 확인을 저장했다. 파일 SHA-256 `c28e6688fea8063d91bb46f3762e454d35a3bde0e0bf62b1894517b1a4232705`. Node image `sha256:cb79b7baa273afe70cbcf10ea8c5e33f6bfa3ba7ca5dcb39c976ac3f77052ad2`.
+공개 증거 `Evidence/kernel-live-e5d9b0b.json`에 사례별 결과·소스/바이너리/이미지 SHA·Run/command/receipt/Evidence ID·모델 파일 SHA·raw log SHA 및 시험 컨테이너 종료 확인을 저장했다. 수집 원본(CRLF) SHA-256 `c28e6688fea8063d91bb46f3762e454d35a3bde0e0bf62b1894517b1a4232705`, Git 정본(LF) SHA-256 `f23890fe5a51951b3b6619d581e8cb4659ecb906025c5a6cf34444853b056125`. Git의 줄바꿈 정규화에 따른 파일 바이트 차이이며 내부 실제 출력/모델 digest는 동일하다. Node image `sha256:cb79b7baa273afe70cbcf10ea8c5e33f6bfa3ba7ca5dcb39c976ac3f77052ad2`.
 
 | 통합 영역 | 통과 사례 |
 |---|---:|
@@ -71,3 +71,5 @@ Obsidian check는 외부 History 인덱스 편집 1건을 감지해 exit 1, 파�
 ## 문서 전달 실행 기록
 
 2026-09-11 10:14:50 KST: python tools/check_docs.py exit 0 (208 versioned documents, 원본 24개 hash, 48 tasks/12 outcomes 유지), python tools/check_ontology.py exit 0, git diff --check exit 0. sync_obsidian.py --check → --apply → --check 각각 exit 0: 318 managed files, 9개 출력 후 pending 0/conflicts 0. Obsidian 로컬 파일 hash 일치이며 OneDrive 클라우드 동기화 완료를 뜻하지 않는다. 이 결과 기록을 포함한 문서는 docs-only 후속 commit/push로 전달하고 실제 제품 시험을 다시 실행한 것으로 세지 않는다.
+
+보고 commit `e9ad6da199605e1868c696104a3a74adae42fc21` push exit 0. 10:15 KST CI Core 34549930599 / Backend 34549930535 / Documentation 34549930539 모두 같은 계정 사유로 시작 전 차단. 웹 3000·Studio 18100·관측 API 18082 HTTP 200, 원격 Node fresh observe-only 유지, 실행 중 테스트 컨테이너 0을 확인했다. 이 파일의 원본/Git SHA 표기 정정은 시험 결과를 변경하지 않는다.
