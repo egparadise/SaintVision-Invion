@@ -27,7 +27,10 @@ It also compares the recorded offer with the offer the kernel actually holds.
 Those are two rows in two schemas and they can disagree, so "the administrator
 set 4 cores" and "the kernel will lease 4 cores" are different claims.
 
-Uses a read-only, repeatable-read transaction. Exit zero reports no missing
+Default reads use a read-only, repeatable-read transaction. --snapshot is an
+explicit operator write of a historical observation, serialized per tenant/user/project.
+--acceptance-evidence reads the existing AC-12 catalog in the same snapshot,
+without certifying physical recovery or off-site evidence. Exit zero reports no missing
 observed inputs or grants; it does not authorize a run or certify readiness.
 
 Usage:
@@ -38,11 +41,16 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import sys
+from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+SNAPSHOT_CONTRACT = "permission-observation-v1"
 
 #: Who supplies each operational input. The point of naming them is that an
 #: absent input has an owner, and telling somebody "permission denied" when the
@@ -366,6 +374,8 @@ def grants(conn, tenant: str, project: str, user: str, columns: list[str]) -> di
             # with no person behind it cannot satisfy a two-person rule.
             "holds": bool(operator_row and operator_row[0] and operator_row[1] is not None),
             "value": capabilities,
+            "operatorEnabled": bool(operator_row and operator_row[0]),
+            "operatorPersonId": str(operator_row[1]) if operator_row and operator_row[1] else None,
             "grantedBy": OPERATOR,
             "means": "privileged operations, each named separately",
         }
@@ -400,6 +410,15 @@ def grants(conn, tenant: str, project: str, user: str, columns: list[str]) -> di
         "observedRequestGrantsHold": not refusing and role in CAN_REQUEST,
         "mayRequestWork": None,
         "mayApprove": None,
+        "mayApproveAsOperator": None,
+        "observedOperatorApprovalCapability": bool(
+            operator_row
+            and operator_row[0]
+            and operator_row[1] is not None
+            and capabilities.get("can_approve")
+            and subject is not None
+            and mapped == subject
+        ),
         "scope": "diagnostic-not-authorization",
         "unverified": [
             "current project grant",
@@ -502,20 +521,181 @@ def admission(conn, tenant: str) -> dict[str, Any]:
     }
 
 
+def _collect(conn, args):
+    observed = conn.execute("SELECT transaction_timestamp()").fetchone()[0]
+    result: dict[str, Any] = {"tenant": args.tenant, "observedAt": observed.isoformat()}
+    result.update(inputs(conn, args.tenant))
+    result["offerAgreement"] = offers(conn, args.tenant)
+    result["admission"] = admission(conn, args.tenant)
+    if args.project and args.user:
+        result["grants"] = grants(
+            conn, args.tenant, args.project, args.user, _capability_columns(conn)
+        )
+    return result
+
+
+def _snapshot_lock_key(args):
+    scope = json.dumps(
+        [SNAPSHOT_CONTRACT, args.tenant, args.project, args.user], separators=(",", ":")
+    )
+    return int.from_bytes(hashlib.sha256(scope.encode()).digest()[:8], "big", signed=True)
+
+
+def _acceptance_evidence(session, args, result):
+    if not getattr(args, "acceptance_evidence", False):
+        return
+    import datetime as dt
+    import uuid
+    from saintvision.services import pilot
+
+    result["acceptanceEvidence"] = pilot.pilot_readiness(
+        session,
+        tenant_id=uuid.UUID(args.tenant),
+        now=dt.datetime.fromisoformat(result["observedAt"]),
+        release_id=getattr(args, "release", None),
+    )
+
+
+def _catalog_report(args):
+    import uuid
+    from psycopg.conninfo import conninfo_to_dict
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import URL
+    from sqlalchemy.orm import Session
+    from saintvision.db.session import tenant_scope
+
+    engine = create_engine(
+        URL.create("postgresql+psycopg"),
+        connect_args=conninfo_to_dict(args.dsn),
+        isolation_level="REPEATABLE READ",
+        future=True,
+    )
+    try:
+        with Session(engine) as session:
+            with session.begin():
+                session.execute(text("SET TRANSACTION READ ONLY"))
+                with tenant_scope(session, uuid.UUID(args.tenant)):
+                    result = _collect(session.connection().connection.driver_connection, args)
+                    _acceptance_evidence(session, args, result)
+            return result
+    finally:
+        engine.dispose()
+
+
+def _snapshot_report(args):
+    """Lock before opening the observation snapshot; one transaction records it.
+
+    The dedicated lock transaction ends on every path, including commit
+    errors. Hash collisions only serialize unrelated observers. This collector
+    coordinates with itself; older unversioned writers are excluded from its
+    comparisons. It never claims to freeze production authorization changes.
+    """
+    import datetime as dt
+    import uuid
+    import psycopg
+    from psycopg.conninfo import conninfo_to_dict
+    from sqlalchemy import create_engine, select
+    from sqlalchemy.engine import URL
+    from sqlalchemy.orm import Session
+    from saintvision.db.models import PermissionSnapshot
+    from saintvision.db.session import tenant_scope
+    from saintvision.services import pilot
+
+    tenant = uuid.UUID(args.tenant)
+    args.tenant = str(tenant)
+    if not args.project or not args.user:
+        raise ValueError("Snapshot requires project and user")
+    # No application runtime credential can promote itself to a snapshot writer.
+    with psycopg.connect(args.dsn, connect_timeout=5) as lock:
+        allowed = lock.execute("""SELECT r.rolsuper OR pg_has_role(current_user,d.datdba,'USAGE')
+            FROM pg_roles r CROSS JOIN pg_database d
+            WHERE r.rolname=current_user AND d.datname=current_database()""").fetchone()
+        if not allowed or not allowed[0]:
+            raise PermissionError("Operator database role required")
+        lock.execute("SET LOCAL lock_timeout='5s'")
+        lock.execute("SELECT pg_advisory_xact_lock(%s)", (_snapshot_lock_key(args),))
+        engine = create_engine(
+            URL.create("postgresql+psycopg"),
+            connect_args=conninfo_to_dict(args.dsn),
+            isolation_level="REPEATABLE READ",
+            future=True,
+        )
+        try:
+            with Session(engine, expire_on_commit=False) as session:
+                with session.begin():
+                    with tenant_scope(session, tenant):
+                        raw = session.connection().connection.driver_connection
+                        exists = raw.execute(
+                            """SELECT
+                            EXISTS(SELECT 1 FROM public.users WHERE tenant_id=%s AND user_id=%s),
+                            EXISTS(SELECT 1 FROM public.projects WHERE tenant_id=%s AND project_id=%s)""",
+                            (tenant, args.user, tenant, args.project),
+                        ).fetchone()
+                        if not exists or not all(exists):
+                            raise ValueError("Snapshot subject or project absent in tenant")
+                        result = _collect(raw, args)
+                        _acceptance_evidence(session, args, result)
+                        marker = {"contract": SNAPSHOT_CONTRACT, "projectId": args.project}
+                        previous = session.scalars(
+                            select(PermissionSnapshot)
+                            .where(
+                                PermissionSnapshot.tenant_id == tenant,
+                                PermissionSnapshot.subject_type == "user",
+                                PermissionSnapshot.subject_id == args.user,
+                                PermissionSnapshot.grants.contains([marker]),
+                            )
+                            .order_by(
+                                PermissionSnapshot.taken_at.desc(),
+                                PermissionSnapshot.snapshot_id.desc(),
+                            )
+                            .limit(1)
+                        ).first()
+                        observed = dt.datetime.fromisoformat(result["observedAt"])
+                        # Reject clock rollback instead of silently reordering history.
+                        if previous is not None and observed <= previous.taken_at:
+                            raise ValueError("Observation clock did not advance")
+                        payload = [marker] + [dict(layer) for layer in result["grants"]["layers"]]
+                        taken = pilot.take_permission_snapshot(
+                            session,
+                            tenant_id=tenant,
+                            subject_type="user",
+                            subject_id=args.user,
+                            grants=payload,
+                            now=observed,
+                        )
+                        receipt = dict(
+                            snapshotId=taken.snapshot_id,
+                            digest=taken.digest_sha256,
+                            previousSnapshotId=previous.snapshot_id if previous else None,
+                            previousDigest=previous.digest_sha256 if previous else None,
+                            changed=(
+                                None
+                                if previous is None
+                                else previous.digest_sha256 != taken.digest_sha256
+                            ),
+                            contract=SNAPSHOT_CONTRACT,
+                            projectId=args.project,
+                            observedAt=result["observedAt"],
+                            scope="historical-observation-not-authorization",
+                        )
+                # Do not expose a receipt for a rolled-back transaction.
+                result["permissionSnapshot"] = receipt
+                return result
+        finally:
+            engine.dispose()
+
+
 def report(args) -> dict[str, Any]:
     import psycopg
 
+    if getattr(args, "snapshot", False):
+        return _snapshot_report(args)
+    if getattr(args, "acceptance_evidence", False):
+        return _catalog_report(args)
     with psycopg.connect(args.dsn, connect_timeout=5) as conn:
         conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
         conn.execute("SELECT set_config('inv.tenant_id', %s, true)", (args.tenant,))
-        result: dict[str, Any] = {"tenant": args.tenant}
-        result.update(inputs(conn, args.tenant))
-        result["offerAgreement"] = offers(conn, args.tenant)
-        result["admission"] = admission(conn, args.tenant)
-        if args.project and args.user:
-            result["grants"] = grants(
-                conn, args.tenant, args.project, args.user, _capability_columns(conn)
-            )
+        result = _collect(conn, args)
     return result
 
 
@@ -523,6 +703,20 @@ class SafeParser(argparse.ArgumentParser):
     def error(self, message):
         # argparse's default includes rejected values, which may be credentials.
         self.exit(2, "Invalid readiness arguments; see --help.\n")
+
+
+def _exit_code(result):
+    evidence = result.get("acceptanceEvidence")
+    return (
+        1
+        if (
+            result["absent"]
+            or result["offerAgreement"]["disagreeing"]
+            or result.get("grants", {}).get("refusedBy", [])
+            or (evidence is not None and evidence.get("evidenceComplete") is not True)
+        )
+        else 0
+    )
 
 
 def main() -> int:
@@ -535,10 +729,25 @@ def main() -> int:
     parser.add_argument("--tenant", required=True)
     parser.add_argument("--project", help="report the grant intersection in this project")
     parser.add_argument("--user", help="the user to report it for")
+    parser.add_argument(
+        "--snapshot",
+        action="store_true",
+        help="operator-only: record a historical project permission observation",
+    )
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--acceptance-evidence",
+        action="store_true",
+        help="read the AC-12 record catalog; operating acceptance remains unassessed",
+    )
+    parser.add_argument("--release", help="release whose AC-12 acceptance record is compared")
     args = parser.parse_args()
+    if args.release and not args.acceptance_evidence:
+        parser.error("release requires acceptance evidence")
     if bool(args.project) != bool(args.user):
         parser.error("--project and --user are given together or not at all")
+    if args.snapshot and not args.project:
+        parser.error("snapshot requires project and user")
 
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.dsn_env):
         parser.error("invalid environment variable name")
@@ -556,7 +765,7 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(result, indent=2, default=str))
-        return 1 if absent or disagreeing or refused else 0
+        return _exit_code(result)
 
     print(f"tenant {args.tenant}\n")
     print("operational inputs")
@@ -598,6 +807,13 @@ def main() -> int:
         print(f"  may request work: {g['mayRequestWork']}")
         print(f"  may approve:      {g['mayApprove']}")
 
+    if "permissionSnapshot" in result:
+        taken = result["permissionSnapshot"]
+        print(f"\npermission observation {taken['snapshotId']}")
+        print(f"  observed at: {taken['observedAt']}")
+        print(f"  changed within project: {taken['changed']}")
+        print("  historical observation; current authorization remains unverified")
+
     print("\nobserved execution gates (admission remains unverified)")
     for gate in result["admission"]["gates"]:
         mark = "open   " if gate["open"] else "CLOSED "
@@ -608,7 +824,13 @@ def main() -> int:
             "are closed, and granting more permissions does not open them"
         )
 
-    return 1 if absent or disagreeing or refused else 0
+    if "acceptanceEvidence" in result:
+        evidence = result["acceptanceEvidence"]
+        print(f"\nAC-12 record catalog complete: {evidence['catalogComplete']}")
+        print("  operating acceptance: not assessed")
+        for reason in evidence["blockers"] + evidence["unverified"]:
+            print(f"  {reason}")
+    return _exit_code(result)
 
 
 if __name__ == "__main__":

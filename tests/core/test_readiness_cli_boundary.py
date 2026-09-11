@@ -58,6 +58,12 @@ def test_report_uses_read_only_repeatable_snapshot(monkeypatch):
 
         def execute(self, query, *args):
             commands.append(query)
+            return self
+
+        def fetchone(self):
+            import datetime as dt
+
+            return (dt.datetime.now(dt.timezone.utc),)
 
     monkeypatch.setattr(psycopg, "connect", lambda *a, **kw: Connection())
     monkeypatch.setattr(tool, "inputs", lambda *a: {})
@@ -66,3 +72,13 @@ def test_report_uses_read_only_repeatable_snapshot(monkeypatch):
     tool.report(argparse.Namespace(dsn="synthetic", tenant="tenant", project=None, user=None))
     assert commands[0] == "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY"
     assert "set_config('inv.tenant_id', %s, true)" in commands[1]
+
+
+@pytest.mark.parametrize("extra", [["--snapshot"], ["--release", "synthetic-secret"]])
+def test_incomplete_write_or_release_arguments_are_sanitized(monkeypatch, capsys, extra):
+    monkeypatch.setattr(sys, "argv", ["readiness", "--tenant", "tenant"] + extra)
+    with pytest.raises(SystemExit) as error:
+        _tool().main()
+    assert error.value.code == 2
+    captured = capsys.readouterr()
+    assert "synthetic-secret" not in captured.out + captured.err
