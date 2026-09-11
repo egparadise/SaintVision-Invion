@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T02:00:00+09:00"
+updated: "2026-09-12T02:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -94,13 +94,13 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
  
  | 항목 | 현재 기록 |
  |---|---|
- | 마지막 작업 / 착수 카드 | GM-01~GM-06 전 6개 카드 구현 및 로컬 통합 검증 완결 (전 카드 review 전환, 전체 진척 약 65%, Gemini 75.0%) + PTY 단조 증가 시퀀스 카운터(F2 정렬) 및 번들 최적화 |
- | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.23 / 2026-09-12T02:00:00+09:00 |
- | branch / base SHA / 구현 SHA | integration/all-agents-unified / 3c1850b / 6cbb715 (로컬 검증 및 push 완료) |
- | 작업한 것 | 1) GM-05: 실제 로그인(OIDC PKCE S256 사일런트 어드민 폴백 전면 제거 및 정직한 ProblemDetails 오류 표시)→프로젝트/워크스페이스 선택(정본 7대 준비도 진단)→Monaco 에디터(결정론적 SHA-256 CAS Diff)→승인 센터(Two-Person Rule 요청자 자가 승인 차단 및 1차 승인자 중복 승인 차단, 일회 Nonce, 409 Conflict 차단)→원격 실행(SSE 스트리밍, PTY 터미널 재접속)→3회 제한 복구 수명주기(ADR-044/045 3회 상한 차단)→이원화 아티팩트 다운로드(바이트 원본+영수증 JSON).<br>2) GM-06: WCAG 2.1 AA 11.4:1 명도 대비·키보드 탐색·스크린 리더 ARIA 표준 검증, 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포, 무중단 웹 롤백 엔진(ReleaseManager v1.0.0-rc.2→rc.1 롤백), 운영자 교육 워크스루 4대 모듈 검증, ReleaseCandidateView 하드코딩 배너 및 고정 MET 태그 제거 후 실측치 동적 집계 렌더링.<br>3) PTY sequence/재연결: WsTerminalClient 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동 및 재연결/에러 디스패치 테스트(Claude CL-01 F2 지적 선제 정렬). 번들 청크 최적화로 빌드 경고 0건 달성. |
- | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 105개 테스트 100% 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 13개 트랙 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Intranet deploy: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 257 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks) |
+ | 마지막 작업 / 착수 카드 | GM-01~GM-06 전 6개 카드 구현 및 로컬 통합 검증 완결 (전 카드 review 전환, 전체 진척 65.63%, Gemini 75.0%) + ReleaseCandidateView 전 지표 동적 평가 및 SLO 위반 감지 테스트 완결 |
+ | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.25 / 2026-09-12T02:45:00+09:00 |
+ | branch / base SHA / 구현 SHA | integration/all-agents-unified / 6cbb715 / 1133666 (로컬 검증 완료) |
+ | 작업한 것 | 1) GM-05: 실제 로그인(OIDC PKCE S256 사일런트 어드민 폴백 전면 제거 및 정직한 ProblemDetails 오류 표시)→프로젝트/워크스페이스 선택(정본 7대 준비도 진단)→Monaco 에디터(결정론적 SHA-256 CAS Diff)→승인 센터(Two-Person Rule 요청자 자가 승인 차단 및 1차 승인자 중복 승인 차단, 일회 Nonce, 409 Conflict 차단)→원격 실행(SSE 스트리밍, PTY 터미널 재접속)→3회 제한 복구 수명주기(ADR-044/045 3회 상한 차단)→이원화 아티팩트 다운로드(바이트 원본+영수증 JSON).<br>2) GM-06: WCAG 2.1 AA 11.4:1 명도 대비·키보드 탐색·스크린 리더 ARIA 표준 검증, 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포, 무중단 웹 롤백 엔진(ReleaseManager v1.0.0-rc.2→rc.1 롤백), 운영자 교육 워크스루 4대 모듈 검증, ReleaseCandidateView 하드코딩 배너 및 고정 MET 태그 제거 후 실측치 동적 집계 렌더링 및 부제 상태값 동적 판정 연동.<br>3) PTY sequence/재연결: WsTerminalClient 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동 및 재연결/에러 디스패치 테스트(Claude CL-01 F2 지적 선제 정렬). 번들 청크 최적화로 빌드 경고 0건 달성. |
+ | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 106개 테스트 100% 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 13개 트랙 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Intranet deploy: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 257 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks) |
  | CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke·2-PC·Deploy 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 / 운영 2-PC 실장비 인수 대기 |
  | 남은 문제 / 차단 이유 / 해소 담당 | Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험(CX-03) 대기; CI 결제/한도 문제로 CI job 미시작 |
  | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(CL-01/HO-GEMINI-CLAUDE-002), Codex 원격 PC 설치·7개 시험(CX-03), Gemini는 검토 피드백 대응 및 실장비 인수 대기 |
- | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 75.0%** (900/1200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성)<br>**전체 시스템 진척도: 약 64.6%** (3100/4800점, **약 65% 진척 / 잔여 약 35%**) |
+ | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 75.0%** (900/1200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성)<br>**전체 시스템 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**) |
  | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]], [[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]], [[2026-09-12_PTY-SEQUENCE-AND-RECONNECT_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |

@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T02:00:00+09:00"
+updated: "2026-09-12T02:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,8 +24,8 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `6cbb715` |
-| **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 약 65%) |
+| **고정 구현 Commit SHA** | `1133666` |
+| **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
 ---
@@ -82,7 +82,7 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 105개 테스트)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 106개 테스트)
 npm --prefix apps/web test -- --run
 
 # 2. Vite 프로덕션 빌드 및 타입 검사
