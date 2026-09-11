@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.23.0"
+version: "1.24.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T13:44:00+09:00"
+updated: "2026-09-11T14:19:43+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -100,3 +100,5 @@ ADR-063(실행 이력이 없는 draft Run의 불변 첫 입력·명시적 Node/�
 ADR-064(같은 JWT 검증·명시적 업무 route 조합·분리된 inv_app/inv_kernel DB 계정), ADR-065(별도 운영자 관리 grant·현재 tenant definer·Project/Node writer 직렬화)는 [[Codex 계정과 실행 커널 통합 계약]]을 따른다. 0026에서 두 공개 0025 이력을 보존해 합치고 0027로 권한을 보강한다. 운영 IdP/provisioning·원격 Node·UI·독립 재검토는 별도다.
 
 ADR-066(현재 커널 Run/attempt/receipt/Evidence 조회와 검증된 파일 다운로드), ADR-067(실제 권한을 확인하는 준비 상태·원격 도구 미관측 시 unknown)은 [[Codex 실제 실행 결과 조회 계약]]을 따른다. public Run 기록과 실제 커널 실행 상태를 혼동하지 않는다. 0028에서 새 subject lookup 이력과 기존 권한 이력을 보존해 병합하고 tenant guard를 적용한다.
+
+ADR-068(명시적 계정/요청·승인 권한의 insert-only 원자 준비·현재 계정 잠금·불변 감사·공개 migration 이력 보존)은 [[Codex 계정 준비와 실행 권한 계약]]을 따른다. 계정 연결이 Node/Workspace 실행 가능을 뜻하지 않는다. 0030에서 두 결과 이력을 합치고 subject guard와 canonical 다운로드 경계를 유지한다.

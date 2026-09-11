@@ -1,255 +1,260 @@
-"""Operator provisioning: link an account, a project and a workspace for execution.
+"""Explicit operator-owned account links and project grants, in one transaction.
 
-``GET /v1/workspaces/{id}/execution-readiness`` reports five preconditions and
-says which of them an operator owns. This is the other half — the thing an
-operator actually runs to satisfy them.
-
-**It is deliberately not an API.** Two of the five links decide which projects
-may execute and who may approve, and the whole reason they live in
-``inv.business_projects`` and ``inv.business_subjects`` is that the web process
-must not be able to grant itself either. A endpoint that did this, however well
-guarded, would be that grant. So it is a command an operator runs with the
-schema owner's credentials, on purpose, and it prints what it did.
-
-**It refuses to guess the subject.** ``inv.business_subjects.subject_id`` is
-``oidc:sha256([issuer, sub])`` and the mapping is one-to-one and immutable — a
-two-person rule one person can satisfy with two identities is not a two-person
-rule. So the issuer and the subject are named explicitly and the hash is derived
-here with the same function the kernel uses, rather than accepting a
-pre-computed digest that nobody could check.
-
-**Every step is idempotent and none is destructive.** Running it twice is what a
-retry looks like. It never disables a link, never changes a role that already
-exists, and never moves the recovery epoch — rolling the epoch voids every
-reservation in flight and is a separate, deliberate act.
-
-Usage:
-    python tools/provision_account.py --dsn ... --check   PROJECT USER ISSUER SUB
-    python tools/provision_account.py --dsn ... --apply   PROJECT USER ISSUER SUB
+Set INV_PROVISION_DSN outside shell history; use --check before --apply.
+Existing login subjects, disabled links/grants, roles and epochs are never changed.
+This prepares account permissions; it does not admit a workload or prepare a Node.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
+import os
+from pathlib import Path
+import re
 import sys
-from typing import Any
+from urllib.parse import urlsplit
+from uuid import UUID, uuid4
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "services/control-plane/src"))
+from inv.identity import public_subject
+
+SCOPES = {"request": (True, False), "approve": (False, True), "request-and-approve": (True, True)}
 
 
-def public_subject(issuer: str, subject: str) -> str:
-    """The kernel's derivation, not a second one.
+class ProvisioningRefused(ValueError):
+    """A public, credential-free refusal reason."""
 
-    Imported if the package is importable, recomputed identically otherwise, so
-    this tool can run on a machine that has the database but not the service.
-    """
+
+def identity(tenant, project, user, issuer, sub, grant):
     try:
-        from inv.identity import public_subject as kernel_subject
-
-        return kernel_subject(issuer, subject)
-    except Exception:
-        return (
-            "oidc:"
-            + hashlib.sha256(
-                json.dumps([issuer, subject], separators=(",", ":")).encode()
-            ).hexdigest()
+        tenant = str(UUID(tenant))
+        parsed = urlsplit(issuer)
+        valid = (
+            parsed.scheme == "https"
+            and parsed.hostname
+            and not parsed.username
+            and not parsed.password
+            and not parsed.query
+            and not parsed.fragment
+            and 1 <= len(issuer) <= 2048
+            and 1 <= len(sub) <= 200
+            and not any(ord(c) < 32 for c in issuer + sub)
+            and re.fullmatch(r"prj_[0-9A-HJKMNP-TV-Z]{26}", project)
+            and re.fullmatch(r"usr_[0-9A-HJKMNP-TV-Z]{26}", user)
+            and grant in SCOPES
         )
+        if not valid:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise ProvisioningRefused(
+            "Invalid explicit tenant/project/user/OIDC identity or grant scope"
+        ) from None
+    return dict(
+        tenant=tenant, project=project, user=user, subject=public_subject(issuer, sub), grant=grant
+    )
 
 
-def _rows(conn, sql: str, params: tuple) -> list[tuple]:
-    with conn.cursor() as cursor:
-        cursor.execute(sql, params)
-        return cursor.fetchall()
+def _state(conn, *, tenant, project, user, subject, grant, lock=False):
+    conn.execute("SELECT set_config('inv.tenant_id', %s, true)", (tenant,))
+    suffix = " FOR SHARE" if lock else ""
 
+    def one(query, values=()):
+        return conn.execute(query + suffix, values).fetchone()
 
-def inspect(conn, *, tenant: str, project: str, user: str, subject: str) -> dict[str, Any]:
-    """What is already in place. Read-only, and safe to run against production."""
-    state: dict[str, Any] = {}
-    state["epoch"] = bool(
-        _rows(conn, "SELECT 1 FROM inv.control_epoch WHERE singleton", ())
+    epoch = one("SELECT epoch FROM inv.control_epoch WHERE singleton")
+    permission = one(
+        "SELECT enabled,can_request,can_approve FROM inv.project_grants WHERE tenant_id=%s AND project_id=%s AND subject_id=%s",
+        (tenant, project, subject),
     )
-    state["publicProject"] = bool(
-        _rows(
-            conn,
-            "SELECT 1 FROM public.projects WHERE tenant_id=%s AND project_id=%s",
-            (tenant, project),
-        )
+    link = one(
+        "SELECT enabled FROM inv.business_projects WHERE tenant_id=%s AND project_id=%s",
+        (tenant, project),
     )
-    state["publicUser"] = bool(
-        _rows(
-            conn,
-            "SELECT 1 FROM public.users WHERE tenant_id=%s AND user_id=%s AND status='active'",
-            (tenant, user),
-        )
+    public_project = one(
+        "SELECT status FROM public.projects WHERE tenant_id=%s AND project_id=%s", (tenant, project)
     )
-    state["kernelTenant"] = bool(
-        _rows(conn, "SELECT 1 FROM inv.tenants WHERE tenant_id=%s", (tenant,))
-    )
-    state["kernelProject"] = bool(
-        _rows(
-            conn,
-            "SELECT 1 FROM inv.projects WHERE tenant_id=%s AND project_id=%s",
-            (tenant, project),
-        )
-    )
-    state["businessProject"] = bool(
-        _rows(
-            conn,
-            "SELECT 1 FROM inv.business_projects WHERE tenant_id=%s AND project_id=%s AND enabled",
-            (tenant, project),
-        )
-    )
-    existing = _rows(
-        conn,
-        "SELECT subject_id FROM inv.business_subjects WHERE tenant_id=%s AND user_id=%s",
+    mappings = conn.execute(
+        "SELECT subject_id,user_id,enabled FROM inv.business_subjects WHERE tenant_id=%s AND (user_id=%s OR subject_id=%s) ORDER BY subject_id"
+        + suffix,
+        (tenant, user, subject),
+    ).fetchall()
+    account = one(
+        "SELECT status,external_subject FROM public.users WHERE tenant_id=%s AND user_id=%s",
         (tenant, user),
     )
-    state["businessSubject"] = bool(existing)
-    # The one case that must never be papered over: this user is already mapped
-    # to a *different* subject. The mapping is one-to-one on purpose, and
-    # silently replacing it would let one person hold two voting identities.
-    state["conflictingSubject"] = (
-        existing[0][0] if existing and existing[0][0] != subject else None
+    member = one(
+        "SELECT role_code FROM public.project_members WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
+        (tenant, project, user),
     )
-    state["externalSubjectMatches"] = bool(
-        _rows(
-            conn,
-            "SELECT 1 FROM public.users WHERE tenant_id=%s AND user_id=%s "
-            "AND external_subject=%s",
-            (tenant, user, subject),
-        )
+    public_tenant = one("SELECT display_name FROM public.tenants WHERE tenant_id=%s", (tenant,))
+    kernel_tenant = one("SELECT 1 FROM inv.tenants WHERE tenant_id=%s", (tenant,))
+    kernel_project = one(
+        "SELECT 1 FROM inv.projects WHERE tenant_id=%s AND project_id=%s", (tenant, project)
     )
-    return state
-
-
-def apply(conn, *, tenant: str, project: str, user: str, subject: str) -> list[str]:
-    """Do the missing steps. Idempotent, and never destructive."""
-    done: list[str] = []
-    with conn.cursor() as cursor:
-        cursor.execute(
-            "INSERT INTO inv.control_epoch (singleton, epoch) "
-            "VALUES (true, gen_random_uuid()) ON CONFLICT (singleton) DO NOTHING"
+    blockers = []
+    if not epoch:
+        blockers.append("Recovery epoch must already be provisioned separately")
+    if not public_tenant:
+        blockers.append("Business tenant does not exist")
+    if not public_project or public_project[0] != "active":
+        blockers.append("Active business project required")
+    if not account or account != ("active", subject):
+        blockers.append("Active account with the exact existing OIDC subject required")
+    if mappings and (len(mappings) != 1 or mappings[0] != (subject, user, True)):
+        blockers.append("Existing subject mapping conflicts or is disabled")
+    if link and not link[0]:
+        blockers.append("Existing project link is disabled")
+    requested = SCOPES[grant]
+    if permission and permission != (True, *requested):
+        blockers.append("Existing grant is disabled or has a different scope")
+    role = member[0] if member else None
+    if requested[0] and role not in {"owner", "maintainer", "operator"}:
+        blockers.append("Current project membership does not permit requesting")
+    if requested[1] and role not in {"owner", "approver"}:
+        blockers.append("Current project membership does not permit approving")
+    missing = [
+        name
+        for name, present in (
+            ("kernelTenant", kernel_tenant),
+            ("kernelProject", kernel_project),
+            ("businessProject", link),
+            ("businessSubject", mappings),
+            ("projectGrant", permission),
         )
-        if cursor.rowcount:
-            done.append("seeded the first recovery epoch")
+        if not present
+    ]
+    return dict(
+        scope="account-kernel-provisioning",
+        tenantId=tenant,
+        projectId=project,
+        userId=user,
+        subject=subject,
+        grant=grant,
+        role=role,
+        epoch=str(epoch[0]) if epoch else None,
+        blockers=blockers,
+        missing=missing,
+        linked=not blockers and not missing,
+        executionReady=False,
+    )
 
-        cursor.execute(
-            "INSERT INTO inv.tenants (tenant_id, name) "
-            "SELECT tenant_id, display_name FROM public.tenants WHERE tenant_id=%s "
-            "ON CONFLICT (tenant_id) DO NOTHING",
-            (tenant,),
+
+def inspect(conn, **target):
+    """A read-only diagnostic. It is never authorization for a later apply."""
+    with conn.transaction():
+        conn.execute("SET TRANSACTION READ ONLY")
+        return _state(conn, **target)
+
+
+def apply(conn, *, reason, **target):
+    """Recheck under locks, insert only missing rows, audit and commit atomically."""
+    if not isinstance(reason, str) or not 1 <= len(reason.strip()) <= 300:
+        raise ProvisioningRefused("An explicit operator reason (1-300 characters) is required")
+    with conn.transaction():
+        conn.execute("SET LOCAL lock_timeout = '5s'")
+        # Serializes invocations, including two projects for one account.
+        # Current service membership/status writers meet the row locks below.
+        conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s,0))",
+            ("account-provisioning:" + target["tenant"],),
         )
-        if cursor.rowcount:
-            done.append("projected the tenant into the kernel")
-
-        cursor.execute(
-            "INSERT INTO inv.projects (tenant_id, project_id) VALUES (%s, %s) "
-            "ON CONFLICT DO NOTHING",
-            (tenant, project),
+        state = _state(conn, **target, lock=True)
+        if state["blockers"]:
+            raise ProvisioningRefused("; ".join(state["blockers"]))
+        tenant, project, user, subject = (
+            target[k] for k in ("tenant", "project", "user", "subject")
         )
-        if cursor.rowcount:
-            done.append("projected the project into the kernel")
+        missing = state["missing"]
+        if "kernelTenant" in missing:
+            conn.execute(
+                "INSERT INTO inv.tenants(tenant_id,name) SELECT tenant_id,display_name FROM public.tenants WHERE tenant_id=%s",
+                (tenant,),
+            )
+        if "kernelProject" in missing:
+            conn.execute(
+                "INSERT INTO inv.projects(tenant_id,project_id) VALUES(%s,%s)", (tenant, project)
+            )
+        if "businessProject" in missing:
+            conn.execute(
+                "INSERT INTO inv.business_projects(tenant_id,project_id) VALUES(%s,%s)",
+                (tenant, project),
+            )
+        if "businessSubject" in missing:
+            conn.execute(
+                "INSERT INTO inv.business_subjects(tenant_id,subject_id,user_id) VALUES(%s,%s,%s)",
+                (tenant, subject, user),
+            )
+        if "projectGrant" in missing:
+            conn.execute(
+                "INSERT INTO inv.project_grants(tenant_id,project_id,subject_id,can_request,can_approve) VALUES(%s,%s,%s,%s,%s)",
+                (tenant, project, subject, *SCOPES[target["grant"]]),
+            )
+        audit = str(uuid4()) if missing else None
+        if audit:
+            conn.execute(
+                "INSERT INTO inv.account_provisioning_events(tenant_id,event_id,project_id,user_id,subject_id,grant_scope,recovery_epoch,operator_name,reason,created_links) VALUES(%s,%s,%s,%s,%s,%s,%s,session_user,%s,%s::jsonb)",
+                (
+                    tenant,
+                    audit,
+                    project,
+                    user,
+                    subject,
+                    target["grant"],
+                    state["epoch"],
+                    reason.strip(),
+                    json.dumps(missing),
+                ),
+            )
+        after = _state(conn, **target, lock=True)
+        if not after["linked"]:
+            raise ProvisioningRefused("Provisioning postcondition failed; transaction rolled back")
+        return {**after, "changed": missing, "auditId": audit}
 
-        cursor.execute(
-            "INSERT INTO inv.business_projects (tenant_id, project_id, enabled) "
-            "VALUES (%s, %s, true) "
-            "ON CONFLICT (tenant_id, project_id) DO UPDATE SET enabled = true",
-            (tenant, project),
-        )
-        done.append("linked the project for execution")
 
-        cursor.execute(
-            "UPDATE public.users SET external_subject=%s "
-            "WHERE tenant_id=%s AND user_id=%s AND external_subject IS DISTINCT FROM %s",
-            (subject, tenant, user, subject),
-        )
-        if cursor.rowcount:
-            done.append("set the account's login subject")
-
-        cursor.execute(
-            "INSERT INTO inv.business_subjects (tenant_id, subject_id, user_id, enabled) "
-            "VALUES (%s, %s, %s, true) ON CONFLICT DO NOTHING",
-            (tenant, subject, user),
-        )
-        if cursor.rowcount:
-            done.append("registered the approval subject")
-    return done
-
-
-def main() -> int:
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dsn", required=True, help="schema owner DSN")
-    parser.add_argument("--tenant", required=True)
-    parser.add_argument("project")
-    parser.add_argument("user", help="public.users.user_id, e.g. usr_01...")
-    parser.add_argument("issuer", help="OIDC issuer, exactly as the token carries it")
-    parser.add_argument("sub", help="OIDC subject claim")
+    parser.add_argument(
+        "--dsn-env",
+        default="INV_PROVISION_DSN",
+        help="environment variable holding the schema-owner DSN",
+    )
+    for name in ("tenant", "project", "user", "issuer", "sub"):
+        parser.add_argument("--" + name, required=True)
+    parser.add_argument("--grant", choices=SCOPES, required=True)
+    parser.add_argument("--reason")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--check", action="store_true", help="report only")
-    group.add_argument("--apply", action="store_true", help="make the missing links")
-    args = parser.parse_args()
-
+    group.add_argument("--check", action="store_true")
+    group.add_argument("--apply", action="store_true")
+    args = parser.parse_args(argv)
     import psycopg
 
-    subject = public_subject(args.issuer, args.sub)
-    with psycopg.connect(args.dsn, autocommit=False) as conn:
-        state = inspect(
-            conn,
-            tenant=args.tenant,
-            project=args.project,
-            user=args.user,
-            subject=subject,
-        )
-        print(f"subject: {subject}")
-        for key, value in state.items():
-            if key == "conflictingSubject":
-                continue
-            print(f"  {key:24} {'ok' if value else 'MISSING'}")
-
-        if state["conflictingSubject"]:
-            # Refused rather than replaced. The mapping is one-to-one so that a
-            # two-person approval cannot be satisfied by one person holding two
-            # identities; quietly repointing it would undo that.
-            print(
-                f"\nREFUSED: {args.user} is already mapped to "
-                f"{state['conflictingSubject']}. The mapping is one-to-one on "
-                f"purpose. An operator must decide which identity is correct and "
-                f"remove the other deliberately.",
-                file=sys.stderr,
+    try:
+        target = identity(args.tenant, args.project, args.user, args.issuer, args.sub, args.grant)
+        dsn = os.environ.get(args.dsn_env)
+        if not dsn:
+            raise ProvisioningRefused("Provisioning DSN environment variable is not configured")
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            result = (
+                apply(conn, reason=args.reason, **target) if args.apply else inspect(conn, **target)
             )
-            return 2
-
-        if not state["publicProject"] or not state["publicUser"]:
-            print(
-                "\nREFUSED: the project or the active user does not exist on the "
-                "business side. Create them through the API first; this tool "
-                "links what exists and does not invent accounts.",
-                file=sys.stderr,
-            )
-            return 2
-
-        if args.check:
-            missing = [k for k, v in state.items() if k != "conflictingSubject" and not v]
-            print(f"\n{len(missing)} link(s) missing" if missing else "\nfully linked")
-            return 1 if missing else 0
-
-        done = apply(
-            conn,
-            tenant=args.tenant,
-            project=args.project,
-            user=args.user,
-            subject=subject,
-        )
-        conn.commit()
-        print("\napplied:")
-        for line in done:
-            print(f"  - {line}")
+        print(json.dumps(result, ensure_ascii=True))
+        return 0 if result["linked"] else 1
+    except ProvisioningRefused as exc:
+        print(json.dumps({"refused": str(exc)}), file=sys.stderr)
+        return 2
+    except psycopg.Error as exc:
         print(
-            "\nThe workspace tool choice and the node's installed tools are not "
-            "set here: one belongs to whoever runs the work, the other to the "
-            "machine. Check /v1/workspaces/{id}/execution-readiness."
+            json.dumps(
+                {
+                    "refused": "Database operation failed; no partial provisioning committed",
+                    "sqlstate": exc.sqlstate,
+                }
+            ),
+            file=sys.stderr,
         )
-        return 0
+        return 2
 
 
 if __name__ == "__main__":

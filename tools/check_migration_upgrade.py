@@ -34,6 +34,11 @@ def main():
         "0023_containment_approvals",
         "0025_workspace_start",
         "0025_workspace_tool_choice",
+        "0026_subject_kernel_link",
+        "0027_business_api_guards",
+        "0028_result_readiness_merge",
+        "0028_subject_kernel_link",
+        "0029_run_outputs",
     ):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
