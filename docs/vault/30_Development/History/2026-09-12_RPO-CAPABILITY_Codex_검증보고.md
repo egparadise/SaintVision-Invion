@@ -54,4 +54,4 @@ Linux는 실제 복원15개·definer22개·pilot32개다. 새 archiver2개는 �
 
 ## 전달 검사
 
-check_docs.py(원문24·문서291·작업48), check_ontology.py, git diff --check 모두 exit0. 선택적 Black 검사는 7개 중3개 통과,4개 재포맷 요구(exit1)이며 동일4개는 basef46b399에서도 미통과함을 확인했다. 전체 formatter 통과로 보고하지 않으며 광범위한 기존 코드 재포맷은 이번 변경에 섞지 않았다. 최종 push·Obsidian 영수증은 이어서 기록한다.
+check_docs.py(원문24·문서291·작업48), check_ontology.py, git diff --check 모두 exit0. 선택적 Black 검사는 7개 중3개 통과,4개 재포맷 요구(exit1)이며 동일4개는 basef46b399에서도 미통과함을 확인했다. 전체 formatter 통과로 보고하지 않으며 광범위한 기존 코드 재포맷은 이번 변경에 섞지 않았다. 구현 b49ecd3·보고42edd6a·외부 제안 보존25b802e push exit0, PR19 설명 갱신(draft 유지). Obsidian은 2026-09-12 01:48:06 KST, 25b802e 기준482개 해시 일치·pending0·conflict0을 확인했다. [동기화 영수증](../Evidence/rpo-obsidian-delivery-20260912.json). 처음 외부 편집2개로 exit1/쓰기0이었으며 원문 바이트를 Git에 보존하고 동일 사본만 채택한 뒤 정본을 동기화했다. 이 영수증을 추가한 최종 문서도 commit/push 후 재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
