@@ -1,25 +1,25 @@
 ---
 doc_id: "CODEX-CREDENTIAL-CONFORMANCE-001"
 title: "Codex 자격증명 보안 검증 인계"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T00:45:47+09:00"
+updated: "2026-09-12T01:14:28+09:00"
 source_of_truth: "Git"
 ---
 
 # 자격증명 보안 검증 인계
 
-CX-02, owner Codex(공통 경계/검증), reviewer Claude. runtime resolver/backend owner Claude, 보안 reviewer Codex. [[Codex 운영 자격증명과 Storage 계약]] ADR-075를 executable contract로 옮긴다. 같은 개념의 두 resolver를 만들지 않는다.
+CX-02, owner Codex(공통 경계/검증), reviewer Claude. 사용자 후속 지시에 따른 runtime resolver/backend owner Codex, 독립 reviewer Claude. 실제 Provider Adapter 연결 owner Claude, reviewer Codex. [[Codex 운영 자격증명과 Storage 계약]] ADR-075를 executable contract로 옮긴다. 같은 개념의 두 resolver를 만들지 않는다.
 
 ## 정본 파일과 실행
 
 - `src/saintvision/credentials/contract.py`: CredentialContext / CredentialResolver / CredentialHandle / CredentialDenied. 인증된 context와 내부 callback용 Protocol이며 인가 구현이나 공개 HTTP 요청 모델이 아니다.
-- `tests/credential_conformance.py`: CredentialConformance, 현재 **39개** parametrized 보안 사례. 구현별로 subclass하고 `credential_harness` fixture를 제공한다. 기본 fixture/실제 secret backend는 없다.
+- `tests/credential_conformance.py`: CredentialConformance, 현재 **39개** parametrized 보안 사례. 구현별로 subclass하고 `credential_harness` fixture를 제공한다. 공통 suite 자체에는 기본 fixture가 없다. 실제 Linux/PostgreSQL fixture는 `tests/integration/test_credential_backend.py`에 구현됐다.
 - `tests/test_credential_conformance.py`: 합성 모델39개와 의도적인 결함8개 검출 시험. `credential_model` marker이며 실제 OS/DB/Provider 안전을 입증하지 않는다.
 - `credential_backend` marker는 실제 구현의 독립 harness에만 붙인다. release 검증은 `pytest -m credential_backend`를 별도로 실행해 필요한39개 사례가 실제 수집·실행됐는지 확인한다. 0개(exit5)·skip·xfail·오류는 합격이 아니다. marker 선언만으로 실제 backend임을 증명하지 못하므로 reviewer는 fixture를 검토해야 한다.
 
-Claude의 연결 형태:
+기존 Linux backend39+추가9개는74012b3/0f5f4e8에서 실제 통과했다. [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. Claude는 이를 독립 검토하고 기존 resolver를 Provider에 연결한다. 아래는 새 backend를 추가할 때 사용하는 확장 형태이며 두 번째 Linux resolver를 요청하는 것이 아니다:
 
 ```python
 from credential_conformance import CredentialConformance

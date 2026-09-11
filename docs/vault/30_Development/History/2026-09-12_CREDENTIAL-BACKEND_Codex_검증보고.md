@@ -56,3 +56,5 @@ Linux154개는 실제 backend39+추가경합/권한9, DB definer22, 복원12, PT
 최종 문서 검사·push·Obsidian check/apply/check 결과는 전달 영수증으로 이어서 기록한다.
 
 - 2026-09-12T01:13 KST: check_docs.py exit0(24 원본hash/284 versioned docs/48tasks), check_ontology.py exit0, git diff --check exit0. Obsidian 사전check461개/변경13개/충돌0, exit0.
+
+- 실제 전달 2026-09-12T01:13:56+09:00: source `ed2a1e485e7604956891c19e8b2e2ce3844ca183` commit/push exit0. sync_obsidian.py --check → --apply → --check 모두 exit0, 변경13개 export, 관리461개 hash 일치, pending0/conflict0. 로컬 Obsidian 범위이며 OneDrive 클라우드 동기화는 미확인. PR19 제목/본문에 최종 backend·Context/readiness와 검증/차단을 반영했다. 이 영수증·정본 conformance 인계 갱신도 같은 절차로 export한다.
