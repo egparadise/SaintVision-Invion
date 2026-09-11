@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:13:25+09:00"
+updated: "2026-09-11T17:21:49+09:00"
 source_of_truth: "Git"
 ---
 
@@ -126,10 +126,10 @@ source_of_truth: "Git"
 |---|---|
 | 마지막 작업 / 착수 카드 | DEVELOPMENT-CONTINUITY / 공통 진행판 집계 대행. 제품 CX 카드의 완료를 뜻하지 않음 |
 | 실제 owner / 읽은 진행판 버전 / KST | Codex / INDEX-PROGRESS-001 v1.0.12 / 2026-09-11T17:18:43+09:00 |
-| branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 02e6188 / 공통 진입 b2c37f2, 문서 전달 SHA는 검증보고 참조 |
+| branch / base SHA / 구현 SHA | agent/codex/workspace-bridge / 02e6188 / 공통 진입 b2c37f2, 문서 전달 994ab49, 최종 영수증 SHA는 Git 이력 참조 |
 | 작업한 것 | 최신 3 Agent 소스·최초 12목표/48task 확인, 공통 진행판·26개 카드·상시 기록 지침 작성 |
 | 확인한 것 / 명령 / exit code / 실제 환경 | check_docs.py 0; check_ontology.py 0; sync --check 0, conflict 0; 소스/PR/LAN 조회 Evidence 확보 |
-| CI / 독립 reviewer / 운영 인수 | 같은 문서 SHA CI 조회 예정; Claude 독립 검토 pending; 원격/5대 운영 인수 미완료 |
+| CI / 독립 reviewer / 운영 인수 | 994ab49 CI 6개 모두 계정 제한으로 시작 전 실패; Claude 독립 검토 pending; 원격/5대 운영 인수 미완료 |
 | 남은 문제 / 차단 이유 / 해소 담당 | CI 계정 제한 운영자, 원격 실행 profile 설치 다른 PC 운영자+Codex 확인 |
 | 다음 카드 / 첫 행동 / 다음 담당 | CX-01 / Claude 9995122 복원·definer와 Gemini f08bf33 계약 차이를 검토 / Codex |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_DEVELOPMENT-CONTINUITY_Codex_검증보고]] / PR19 / 실제 전달 결과는 보고서에 추가 |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_DEVELOPMENT-CONTINUITY_Codex_검증보고]] / PR19 / 405개 hash 일치, 대기 0·충돌 0; 공통 지침 Gemini 1fba8c9·Claude 3ec288a push 확인 |

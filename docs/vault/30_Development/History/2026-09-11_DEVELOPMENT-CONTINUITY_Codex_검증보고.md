@@ -4,7 +4,7 @@ title: "공통 개발 진행판과 Agent별 후속 업무 검증보고"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:18:43+09:00"
+updated: "2026-09-11T17:21:49+09:00"
 source_of_truth: "Git"
 ---
 
@@ -40,7 +40,13 @@ source_of_truth: "Git"
 
 ## 전달 기록
 
-문서 commit/push, 같은 SHA CI, Obsidian check/apply/check와 파일 hash 대조를 진행 중이다. 다른 작업 폴더는 clean/preimage를 확인한 경우에만 공통 진입 지침 4개 파일을 적용한다. 제품 소스는 유지한다. 오류 원인 CI 계정 제한은 [[2026-09-11_WORKSPACE-INTEGRATION_오류와해결]]의 운영 책임자 해소 항목을 따른다.
+- 17:19 KST: 문서 commit `994ab49eb1695e5c886c5f3783aa577217a1d858`, origin push exit 0, PR19 본문 반영. common entry `b2c37f2`를 포함한다.
+- 최종 내용 로컬 검사: check_docs exit 0 — 원문 24/버전 문서 257/48 task/12 outcome/links/DAG. check_ontology exit 0. build_docs exit 0 — 문서 ZIP 1,625,461 bytes. 26개 카드 heading과 원래 48개 task 각각의 owner 연결을 별도로 대조했다. 제품 시험으로 세지 않는다.
+- 17:19:42 KST Obsidian: **405개 관리 파일 전체 hash 일치**, check→apply→check 모두 exit 0, export 대기 0/conflict 0. 로컬 Obsidian 폴더 대조이며 OneDrive 클라우드 업로드 완료는 별도 미확인이다. 이번 전달 영수증 추가 뒤 최종 동기화를 다시 수행한다.
+- 17:20:14 KST 공통 지침 전달: Gemini `f08bf33→1fba8c9`, Claude `9995122→3ec288a`. 각각 clean/head/preimage 확인 뒤 common entry commit을 cherry-pick, push exit 0, 원격 SHA 일치. 변경 파일은 AGENTS.md/CLAUDE.md/GEMINI.md/skills/agent-delivery/SKILL.md 네 개뿐이다. **양쪽 제품 소스 불변**, Agent의 실제 수신/착수/검토는 pending이다.
+- 17:20:40 KST CI: Codex 994ab49의 6개 workflow, Gemini 1fba8c9의 3개, Claude 3ec288a의 3개 모두 account payment/spending-limit 제한으로 job 시작 전 실패. Codex [Documentation Build 34578593481](https://github.com/egparadise/SaintVision-Invion/actions/runs/34578593481), [Core Build 34578593704](https://github.com/egparadise/SaintVision-Invion/actions/runs/34578593704). 전체 run ID·SHA·annotation과 동기화/진입 지침 전파 영수증은 [전달 Evidence](../Evidence/development-continuity-delivery-20260911.json)에 있다.
+- 오류 원인/해소 담당: [[2026-09-11_WORKSPACE-INTEGRATION_오류와해결]]의 계정 제한과 동일. 운영 책임자가 해소한 뒤 해당 코드 SHA CI를 재실행한다. 이 제약을 로컬 검사로 대체하여 통합 검증 완료라 선언하지 않는다.
+- 독립 문서 검토 Claude pending, 원격 설치/실행 검증 CX-03 pending. 사용자 요청의 공통 진행판/업무 정의/진입 지침 전달은 구현했으며 제품 작업의 done/운영 인수와 구분한다.
 
 ## 다음 첫 행동 / 다음 담당
 
