@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-OPERATING-CONTRACT-001"
 title: "Codex 운영 자격증명과 Storage 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T00:30:42+09:00"
+updated: "2026-09-12T00:45:47+09:00"
 source_of_truth: "Git"
 ---
 
@@ -57,3 +57,7 @@ Linux backend 구현은 서비스 소유 절대 root를 descriptor로 고정하�
 | 실제 계정/허용 폴더/도메인/저장 장비 | 운영자, Claude 설정 / Codex 검토 | [[운영 환경 입력과 Agent 인계]]의 비밀 없는 값·검증 Evidence |
 
 이 표는 타 Agent의 작업 착수/동의/승인을 대신 기록한 것이 아니다. CI 제한과 물리 원격 profile 설치·실장비 시험은 별도다.
+
+## 공통 executable 계약과 검증
+
+`src/saintvision/credentials/contract.py`가 내부 Protocol 정본이다. [[Codex 자격증명 보안 검증 인계]]의39개 conformance에 실제 backend를 연결한다. 합성 모델39개+결함검출8개의 통과는 runtime provider 구현·운영 인수와 구분한다. 공개 HTTP 권한이나 모델 차원을 추가하지 않는다.
