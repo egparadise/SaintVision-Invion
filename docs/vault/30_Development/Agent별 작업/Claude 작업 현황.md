@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+CL-02 (Claude, 2026-09-12): 5995b8b. 운영 준비 판정을 입력·권한·실행 admission 셋으로 분리하고 각 거부가 발동함을 실측했다. 핵심 증거는 "권한 전부 정상 + kill switch ON → 권한 거부 없음, 실행 불가"다. 실제 운영 입력(계정·폴더·원격 profile·object endpoint)은 여전히 대기 중이며 지어내지 않았다. 전문 [[Claude_CL-02_운영준비_검증보고]].
+
 CL-01 (Claude, 2026-09-11): d14db0a 독립 검토 완료. finding 2건(F1 제공량 기록·실제 불일치 재현, F2 PTY 감사 순서)을 Codex에 인계 대기. definer 함수 9개 전수 tenant 결속을 실측으로 확인했다. 전문 [[Claude_CL-01_커널독립검토]].
 
 9995122: 복원에 public+inv 테이블 수·권한 digest 대조를 추가하고 live pg_proc definer 점검 도구를 작성했다. 코드 변경 확인이며 이 문서 작성자가 새 도구를 실운영 검증하거나 독립 승인한 것은 아니다.
@@ -34,7 +36,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | 카드 | 우선순위 | 상태 | 부모 task | 범위 |
 |---|---|---|---|---|
 | CL-01 | P0 | in-progress | S01-DB S04-DB S06-BE S06-DB S08-DB | Codex 최신 커널 독립 검토 |
-| CL-02 | P0 | ready | S02-BE S02-DB S02-ST S03-DB | 운영 로그인·권한·Workspace·폴더 적용 |
+| CL-02 | P0 | in-progress | S02-BE S02-DB S02-ST S03-DB | 운영 로그인·권한·Workspace·폴더 적용 |
 | CL-03 | P0 | in-progress | S12-DB S12-ST | 복원 도구의 남은 검증 결함 수정 |
 | CL-04 | P1 | ready | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
 | CL-05 | P1 | planned | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
@@ -59,11 +61,24 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-02 — 운영 로그인·권한·Workspace·폴더 적용
 
-- owner / reviewer: Claude / Codex; status: ready; priority: P0.
+- owner / reviewer: Claude / Codex; status: in-progress(판정과 시험 완성, 실제 운영 입력 대기); priority: P0.
 - 원래 목표/합격 조건: OUT-02, OUT-03 / AC-02, AC-03.
-- 다음 첫 행동: 현재 CRUD/OIDC/provisioning을 실제 허용 계정·project·Workspace·Node·제공 폴더에 연결한다. 없는 운영 입력은 명시하고 현재 grant 교집합을 시험한다.
-- 필요한 합격 증거: 실제 로그인/권한 거부·public/kernel 매핑·ready Workspace·허용 폴더·Node 제공량 일치. 권한 부여와 실행 admission 구분.
-- 선행/차단과 해소 담당: CX-02 계약 및 운영자 계정/폴더 입력. 로컬 준비/설정 점검은 즉시 가능.
+- 진행 branch/SHA: `review/claude-account-results` **5995b8b**. 전문은 [[Claude_CL-02_운영준비_검증보고]].
+- 실제 수행: `tools/operational_readiness.py`와 `tests/test_operational_readiness.py`를 만들어, 카드가 요구한 **권한 부여와 실행 admission의 구분**을 판정 구조 자체로 분리했다. 운영 준비는 스위치 하나가 아니다 — 로그인할 수 있는 사람이 작업을 요청하지 못하고, 존재하는 project는 의도적으로 커널에 연결돼 있지 않으며, 등록된 Node는 관리자가 양을 정하기 전까지 아무것도 제공하지 않는다. 셋은 서로 다른 사람이 넣는 입력이고, "권한이 없습니다"로 뭉뚱그리면 아무도 넣지 않은 입력을 권한 문제로 오해한다.
+  - `inputs` — 12개 운영 입력의 유무와 **담당자**(operator / project owner / node owner). 없음은 거부가 아니다.
+  - `grants` — 5개 계층(project 소속, 역할 역량, 커널 subject 매핑, 커널 연결, operator grant/업무 관리) 중 **어느 것이 거부하는지**.
+  - `admission` — kill switch·recovery epoch·살아 있는 Node·커널에 제공된 용량. **권한이 아니다.**
+  - 기록된 제공량(`public.resource_offers`) 대 커널이 들고 있는 제공량(`inv.resources.offered`) 대조 — CL-01 F1이 만드는 상태를 운영 점검으로 잡는다.
+- 실제 검증 증거(로컬 PostgreSQL 16, head `0031_workspace_input_state`, 각 거부가 발동함을 확인):
+  - 전부 준비된 tenant → `absent=[]`, `refusedBy=[]`, `wouldAdmit=True`, exit 0.
+  - 빈 tenant → 12개 입력 전부 ABSENT, 각각 담당자 명시. 역할 `viewer` → `role permits requesting work` 거부. project 미연결 / operator grant 비활성 / subject 매핑 비활성 / 폴더 revoked → 각각 단독 지목. 기록 2000 vs 커널 1800 → 불일치 보고.
+  - **카드가 요구한 구분의 증거**: 권한 전부 정상 + kill switch ON → `refusedBy=[]`, `mayRequestWork=True`, `wouldAdmit=False`. 권한을 더 줘도 열리지 않는다. Node heartbeat 정지도 같은 형태다.
+  - 시험 10개 통과. 역할과 소속을 다시 합치자 해당 시험만 실패(9 passed, 1 failed) → 시험이 실제로 잡는다.
+- 이 과정에서 고친 내 결함 2건: (1) 첫 판은 "구성원인가"만 보고 `viewer`를 정상이라 보고했다(exit 0인데 mayRequestWork=False). 소속과 역량은 해결법이 다른 별개 실패다. (2) migration 그래프에 **통과만 가능한 단언**을 넣을 뻔했다 — `downgrade_target` 뒤에 되돌릴 수 없는 revision이 없다는 것은 그 함수의 정의상 항상 참이다. 역방향 독립 스캔 비교로 바꾸고 변조로 실패를 확인했다.
+- 부수 수정: `test_integrated_migration_keeps_both_published_histories`가 `dee31e5`에서 이미 깨져 있었다(stash로 확인). 이 저장소의 **여섯·일곱 번째 하드코딩 revision 목록**이다. head를 literal로 박고, 별개 개념인 downgrade target을 head와 같다고 단언하고, unmerged 경우를 revision 이름 나열로 만들고 있었다 — 0028 이후가 생기자 `unknown revision parent`가 나면서 **unmerged 경우가 더 이상 시험되지 않고 있었다.** 셋 다 그래프에서 유도하도록 고쳤다.
+- 운영 위험 1건 기록: `inv.operator_grants`는 subject로 keying돼 있어 사람의 OIDC subject를 재발급하면 operator grant가 조용히 고아가 된다. 한쪽만 고치면 계속 거부되므로 도구가 둘 다 보고한다. `inv.business_subjects`·`inv.operator_grants`는 trigger로 불변이며 운영 절차는 비활성화를 써야 한다.
+- 남은 문제(실제 운영 입력 대기, 지어내지 않음): 실제 OIDC issuer와 사용자 계정(운영자), 원격 PC(.225) 실행 profile 설치(원격 운영자·Codex), 실제 제공 폴더 경로와 소유자 동의(Node 소유자), object 저장소 endpoint(Codex, S01). 이것들 전에는 "운영 로그인이 동작한다"고 말하지 않는다. 지금 말할 수 있는 것은 입력이 갖춰졌을 때 무엇이 통과하고 무엇이 거부되는지가 재현 가능하게 고정됐다는 것이다.
+- 다음 첫 행동: 실제 계정·폴더·원격 profile이 들어오면 같은 도구를 운영 DB에 그대로 돌려 인수 증거로 삼는다. 담당 Claude, 입력은 운영자·Codex. 브라우저 로그인 여정은 Gemini 영역이다.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
 
 ### CL-03 — 복원 도구의 남은 검증 결함 수정
