@@ -10,7 +10,13 @@ import subprocess
 import sys
 import psycopg
 import pytest
-import provision_credentials as admin
+import importlib.util
+from pathlib import Path
+
+_admin_path = Path(__file__).resolve().parents[2] / "tools" / "provision_credentials.py"
+_admin_spec = importlib.util.spec_from_file_location("credential_admin_under_test", _admin_path)
+admin = importlib.util.module_from_spec(_admin_spec)
+_admin_spec.loader.exec_module(admin)
 from saintvision.credentials.contract import CredentialDenied
 from test_credential_backend import credential_harness
 
@@ -232,6 +238,17 @@ def test_cli_default_check_and_no_sensitive_output(credential_harness, tmp_path)
     assert json.loads(r.stdout)["status"] == "checked"
     assert count(h, "credential_versions", m["version"]) == 0
     assert h.e.owner not in r.stdout + r.stderr and h.secret.decode() not in r.stdout + r.stderr
+    applied = subprocess.run(
+        args + ["--apply"],
+        env={**os.environ, "INV_CREDENTIAL_ADMIN_DSN": h.e.owner},
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert applied.returncode == 0
+    assert json.loads(applied.stdout)["status"] == "applied"
+    assert count(h, "credential_versions", m["version"]) == 1
+    assert count(h, "credential_grants", m["version"]) == 0
     path.write_text("{ malformed synthetic-private-detail")
     r = subprocess.run(
         args,
@@ -241,3 +258,25 @@ def test_cli_default_check_and_no_sensitive_output(credential_harness, tmp_path)
         timeout=15,
     )
     assert r.returncode == 2 and "synthetic-private-detail" not in r.stdout + r.stderr
+
+
+def test_exact_grant_replay_after_revocation_is_refused(credential_harness):
+    h = credential_harness
+    v = str(uuid4())
+    call(h, manifest(h, "register", version=v, path=newfile(h)), "register")
+    grant = manifest(h, "grant", version=v)
+    result = call(h, grant, "grant")
+    assert read(h, result["reference"]) == b"synthetic-rotated-token"
+    call(h, manifest(h, "revoke", version=v), "revoke")
+    with pytest.raises(admin.ProvisioningDenied):
+        call(h, grant, "grant")
+    with pytest.raises(CredentialDenied):
+        read(h, result["reference"])
+
+
+def test_existing_version_cannot_be_rebound_to_another_file(credential_harness):
+    h = credential_harness
+    changed = manifest(h, "register", path=newfile(h))
+    with pytest.raises(admin.ProvisioningDenied):
+        call(h, changed, "register")
+    assert read(h, h.reference) == h.secret
