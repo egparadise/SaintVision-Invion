@@ -41,3 +41,5 @@ CX-02와 실제 운영 인수는 진행 중이다. 전체 추정 **57.29% 완료
 문서/ontology·최종 push 및 Obsidian 영수증은 아래에 기록한다.
 
 - 2026-09-12T00:48:13+09:00: `check_docs.py` exit0(24 원본hash/281 versioned docs/48tasks), `check_ontology.py` exit0, 변경Python4개 `black --check` exit0, `git diff --check` exit0. Obsidian 사전check455개/변경9개/충돌0, exit0.
+
+- 실제 전달 2026-09-12T00:48:21+09:00: source `f19c3706c285d0524d89dc986dbc631076abd62a` push exit0. `sync_obsidian.py --check → --apply → --check` 모두 exit0, 변경9개 export, 관리455개 hash 일치, pending0/conflict0. 로컬 Obsidian 사본 범위이며 OneDrive 클라우드는 미확인. 이 영수증 commit도 같은 절차로 export한다.
