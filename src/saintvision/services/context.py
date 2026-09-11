@@ -24,6 +24,7 @@ from sqlalchemy import delete, select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
+from ..adapters.reference import recognised_secrets
 from ..db.models import (
     SNAPSHOT_SOFT_LIMIT_BYTES,
     ContextBundle,
@@ -40,9 +41,14 @@ RETRIEVAL_STRATEGIES = ("lexical", "metadata", "hybrid", "explicit")
 class ContextItem:
     """One thing to put in a bundle, already redacted by the caller.
 
-    ``content`` must be post-redaction. This module cannot tell whether
-    redaction ran, so ``redacted`` is the caller's declaration and is recorded
-    as such — it says what the caller claims, not what was verified.
+    ``content`` must be post-redaction. ``redacted`` remains the caller's
+    declaration and is recorded as such — it says what the caller claims.
+
+    What changed: the claim is no longer the only thing standing between a
+    credential and the permanent record. ``build_bundle`` refuses content that
+    still carries a secret this platform recognises, whatever the declaration
+    says. See :func:`_refuse_recognised_secrets` for what that does and does
+    not establish.
     """
 
     item_id: str
@@ -60,6 +66,42 @@ class ContextItem:
             raise InvError(VAL_SCHEMA, f"unknown context item kind: {self.kind!r}")
         if self.confidence is not None and not 0.0 <= self.confidence <= 1.0:
             raise InvError(VAL_SCHEMA, "confidence must be between 0 and 1")
+
+
+def _refuse_recognised_secrets(items: list[ContextItem]) -> None:
+    """Refuse items whose content still carries a secret we can recognise.
+
+    The module's contract has always said content must arrive post-redaction,
+    and until now that was only a sentence. A caller could pass a bearer token
+    with ``redacted=True`` and the token would be hashed, stored, deduplicated
+    across tenants by that hash, and pinned into a RunRecord that is by design
+    never rewritten.
+
+    Refusing rather than redacting, deliberately: this function is not in the
+    path that feeds the model, so silently rewriting the content here would
+    make the stored record disagree with what the model was actually given —
+    and a record of context that does not match the context is worse than no
+    record. The caller redacts before it both sends and stores.
+
+    **Recognising is not proving.** This catches the patterns in ADR-014's
+    first pass — private keys, bearer headers, presigned URLs, API keys,
+    ``token=`` assignments. Content that passes has not been shown to be free
+    of secrets, only free of those. Nothing downstream may treat a stored
+    bundle as certified clean.
+    """
+    for ordinal, item in enumerate(items):
+        labels = recognised_secrets(item.content)
+        if labels:
+            # Names the kind and the position, never the matched text: putting
+            # the fragment in the message writes the secret into the error, the
+            # log and the audit trail, which is the leak being refused.
+            raise InvError(
+                VAL_SCHEMA,
+                f"context item {item.item_id!r} at position {ordinal} still "
+                f"contains {', '.join(labels)}; content must be redacted before "
+                f"it is stored, and declaring redacted=True does not make it so",
+                cause_ref=item.item_id,
+            )
 
 
 def content_hash(content: str) -> str:
@@ -136,6 +178,11 @@ def build_bundle(
         raise InvError(VAL_SCHEMA, f"unknown retrieval strategy: {retrieval_strategy!r}")
     for item in items:
         item.validate()
+    # Before anything is written. Snapshots are stored by content hash and
+    # shared by every bundle in the tenant that references them, and a sealed
+    # RunRecord is never rewritten — so a secret that gets in is not something
+    # a later pass can take out.
+    _refuse_recognised_secrets(items)
 
     bundle_id = new_id("bundle")
     pairs: list[tuple[int, str]] = []
