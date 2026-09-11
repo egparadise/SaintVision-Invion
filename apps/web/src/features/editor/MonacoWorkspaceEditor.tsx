@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EditorFile, GitCommitRecord, FileDiffResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { apiClient } from '@/shared/api/client';
 import { computeSha256, computeDiff } from './diffEngine';
 import { SessionRecoveryManager, CommandLogEntry } from './sessionRecovery';
 import { DiffViewer } from './DiffViewer';
@@ -722,7 +723,6 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
               )
             );
             try {
-              const { apiClient } = await import('@/shared/api/client');
               await apiClient('/v1/projects/prj_01JABCDE/runs', {
                 method: 'POST',
                 body: JSON.stringify({

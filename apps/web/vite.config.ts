@@ -24,11 +24,13 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           query: ['@tanstack/react-query', 'zustand'],
+          icons: ['lucide-react'],
         },
       },
     },
