@@ -58,6 +58,35 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [terminalOutput]);
 
+  const handleReconnect = () => {
+    if (clientRef.current) {
+      clientRef.current.disconnect();
+    }
+    const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
+    const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
+
+    const client = new WsTerminalClient(
+      wsUrl,
+      (data) => {
+        const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
+        if (lines.length > 0) {
+          setTerminalOutput((prev) => [...prev, ...lines]);
+        }
+      },
+      (status) => {
+        setConnectionStatus(status);
+      }
+    );
+
+    clientRef.current = client;
+    client.connect(`ticket_${sessionId}_${Date.now()}`);
+    setTerminalOutput((prev) => [
+      ...prev,
+      `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 시도합니다...`,
+    ]);
+  };
+
   const handleCommandSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentInput.trim()) return;
@@ -69,11 +98,11 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     if (clientRef.current && connectionStatus === 'connected') {
       clientRef.current.sendInput(cmd + '\r');
     } else {
-      // Fallback local echo if offline
+      // Truthful error notice if disconnected (Zero-Mock: never fabricate fake exit codes)
       setTerminalOutput((prev) => [
         ...prev,
         `saintvision@wsp-saint-pilot:~$ ${cmd}`,
-        `[Executed: ${cmd}] (exit code: 0)`,
+        `🛑 [전송 불가]: PTY 터미널 세션이 오프라인 상태(${connectionStatus})입니다. [재접속] 버튼을 눌러 새 티켓으로 접속하세요.`,
         'saintvision@wsp-saint-pilot:~$ ',
       ]);
     }
@@ -126,6 +155,14 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Button
+            variant="secondary"
+            size="sm"
+            style={{ fontSize: '0.75rem', padding: '2px 8px' }}
+            onClick={handleReconnect}
+          >
+            🔄 재접속 (새 티켓)
+          </Button>
           <Button
             variant="ghost"
             size="sm"

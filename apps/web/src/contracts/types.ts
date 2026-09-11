@@ -394,6 +394,7 @@ export interface SecurityControlStatus {
   dockerSocketExposed: boolean;
   approvalBypassesBlocked: number;
   emergencyKillSwitchActive: boolean;
+  drainedNodesCount?: number;
   gpuWorkloadStatus: 'healthy' | 'degraded' | 'idle';
   latestBackupAt: string;
   rpoMinutes: number;

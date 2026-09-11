@@ -6,6 +6,7 @@ export class SecurityControlManager {
   private killSwitchActive = false;
   private approvalBypassesBlocked = 0;
   private dockerSocketAttemptsBlocked = 0;
+  private drainedNodes = new Set<string>();
 
   constructor() {
     this.seedInitialAuditLogs();
@@ -77,6 +78,7 @@ export class SecurityControlManager {
       dockerSocketExposed: false, // Invariant: always false
       approvalBypassesBlocked: this.approvalBypassesBlocked,
       emergencyKillSwitchActive: this.killSwitchActive,
+      drainedNodesCount: this.drainedNodes.size,
       gpuWorkloadStatus: 'healthy',
       latestBackupAt: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
       rpoMinutes: 4,
@@ -229,5 +231,40 @@ export class SecurityControlManager {
     }
 
     return { isValid: true, checkedRecords: this.auditLogs.length };
+  }
+
+  /**
+   * ADR-038 Node Drain / Schedulable Control
+   */
+  drainNode(nodeId: string, actor: string, reason: string): boolean {
+    this.drainedNodes.add(nodeId);
+    this.logEvent({
+      actor,
+      action: 'node_drain_activated',
+      target: nodeId,
+      outcome: 'allowed',
+      details: `Node ${nodeId} placed into DRAIN state (scheduling excluded). Reason: ${reason}`,
+    });
+    return true;
+  }
+
+  undrainNode(nodeId: string, actor: string): boolean {
+    this.drainedNodes.delete(nodeId);
+    this.logEvent({
+      actor,
+      action: 'node_drain_deactivated',
+      target: nodeId,
+      outcome: 'allowed',
+      details: `Node ${nodeId} returned to SCHEDULABLE state.`,
+    });
+    return true;
+  }
+
+  isNodeDrained(nodeId: string): boolean {
+    return this.drainedNodes.has(nodeId);
+  }
+
+  getDrainedNodes(): string[] {
+    return Array.from(this.drainedNodes);
   }
 }

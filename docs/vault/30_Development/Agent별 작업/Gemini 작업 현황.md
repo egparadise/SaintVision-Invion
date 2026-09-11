@@ -29,7 +29,7 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
 |---|---|---|---|---|
 | GM-01 | P0 | review | S01-FE S03-FE S04-FE | 정본 readiness·결과 파일·승인 UX 연결 |
 | GM-02 | P0 | review | S02-FE S05-FE S07-FE | 실제 Node와 자원 숫자·관측 시각 |
-| GM-03 | P1 | ready | S06-FE S08-FE | 편집·PTY·Git·kill/drain 화면 |
+| GM-03 | P1 | review | S06-FE S08-FE | 편집·PTY·Git·kill/drain 화면 |
 | GM-04 | P1 | review | S09-FE S10-FE | Agent·AI/MLOps 예시와 검증 표시 제거 |
 | GM-05 | P1 | planned | S03-FE S04-FE S07-FE S08-FE S11-FE | 실제 로그인과 2-PC 브라우저 여정 |
 | GM-06 | P1 | planned | S11-FE S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 |
@@ -94,12 +94,13 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
  
  | 항목 | 현재 기록 |
  |---|---|
- | 마지막 작업 / 착수 카드 | GM-01, GM-02, GM-04 구현 및 로컬 통합 검증 완결 (review 전환) |
- | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.13 / 2026-09-11T18:00:00+09:00 |
- | branch / base SHA / 구현 SHA | integration/all-agents-unified / 995b3a3 / 로컬 작업 완료 (커밋 대기) |
- | 작업한 것 | 1) GM-01: `/v1/runs/{id}/artifacts/content` 원본 바이트 스트림 엔드포인트 구현, DeveloperStudio 이원화 다운로드(바이트 원본 + 영수증 JSON), readiness 진단과 admission 분리(input_prepared=false 시에도 편집/준비 단계 진입 허용).<br>2) GM-02: NodeDetail 전체량-allocatable 감산 제거, 관측 부하 대 할당상한선 대조 렌더링, 상태별 하트비트 스냅샷(OK/Degraded/Offline), 동적 워크스페이스.<br>3) GM-04: agentEngine 100건 프롬프트 실시간 누출 방화벽 검사 및 동적 지표 연산(AC-09 Zero Leakage 0건). |
- | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 102개 테스트 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, TypeScript 에러 0건, 번들 생성 완료)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 63/63 checks 100% 통과)<br>5) Docs/Ontology: `python tools/check_docs.py` (exit 0, 250 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0) |
+ | 마지막 작업 / 착수 카드 | GM-01, GM-02, GM-03, GM-04 구현 및 로컬 통합 검증 완결 (review 전환, 전체 진척 약 60%) |
+ | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.13 / 2026-09-11T18:36:00+09:00 |
+ | branch / base SHA / 구현 SHA | integration/all-agents-unified / f50310e / 로컬 작업 완료 (커밋 대기) |
+ | 작업한 것 | 1) GM-01: `/v1/runs/{id}/artifacts/content` 원본 바이트 스트림 엔드포인트 구현, DeveloperStudio 이원화 다운로드(바이트 원본 + 영수증 JSON), readiness 진단과 admission 분리.<br>2) GM-02: NodeDetail 전체량-allocatable 감산 제거, 관측 부하 대 할당상한선 대조 렌더링, 상태별 하트비트 스냅샷(OK/Degraded/Offline), 동적 워크스페이스.<br>3) GM-03: WebTerminal PTY 오프라인 모의 exit code 0 제거 및 정직한 전송불가 알림, 30초 일회용 티켓 재접속 연동, AdminSecurityConsole ADR-038 노드 Drain 통제(스케줄링 제외/해제 및 암호화 감사 로그 체인).<br>4) GM-04: agentEngine 100건 프롬프트 실시간 누출 방화벽 검사 및 동적 지표 연산(AC-09 Zero Leakage 0건). |
+ | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 103개 테스트 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, TypeScript 에러 0건, 번들 생성 완료)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 129/129 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 63/63 checks 100% 통과)<br>5) Docs/Ontology: `python tools/check_docs.py` (exit 0, 251 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0) |
  | CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke·2-PC 로컬 100% 검증 완료 / Claude 독립 검토 대기 / 운영 2-PC 실장비 인수 대기 |
  | 남은 문제 / 차단 이유 / 해소 담당 | Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험(CX-03) 대기; CI 결제/한도 문제로 CI job 미시작 |
- | 다음 카드 / 첫 행동 / 다음 담당 | GM-03 (P1, 편집·PTY·Git·kill/drain 화면) 및 GM-05 (P1, 실제 로그인과 2-PC 브라우저 여정) / Gemini; CX-01/02/03 / Codex; CL-01 / Claude |
- | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]] |
+ | 다음 카드 / 첫 행동 / 다음 담당 | GM-05 (P1, 실제 로그인과 2-PC 브라우저 여정) / Gemini; CX-01/02/03 / Codex; CL-01 / Claude |
+ | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 58.3%** (700/1200점, +175점 상승)<br>**전체 시스템 진척도: 약 60.4%** (2900/4800점, 약 60% 진척 / 잔여 약 40%) |
+ | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]] |
