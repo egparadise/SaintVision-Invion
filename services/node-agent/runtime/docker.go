@@ -19,6 +19,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -40,7 +41,63 @@ type Engine interface {
 	Remove(context.Context, string, Record) error
 	Output(context.Context, string, Record) (*contracts.NodeOutput, error)
 }
-type Docker struct{ client *http.Client }
+type Docker struct {
+	client    *http.Client
+	versionMu sync.Mutex
+	version   string
+}
+
+// 1.41 is the first API with CgroupnsMode. Never silently remove an isolation
+// setting to reach an older engine. Cap the client at its understood API (1.45).
+func (d *Docker) apiVersion(ctx context.Context) (string, error) {
+	d.versionMu.Lock()
+	defer d.versionMu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return "", ErrEngineUnavailable
+	}
+	if d.version != "" {
+		return d.version, nil
+	}
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://docker/version", nil)
+	if err != nil {
+		return "", err
+	}
+	response, err := d.client.Do(req)
+	if err != nil {
+		return "", ErrEngineUnavailable
+	}
+	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		return "", ErrEngineUnavailable
+	}
+	var info struct{ ApiVersion, MinAPIVersion, Os string }
+	decoder := json.NewDecoder(io.LimitReader(response.Body, 65537))
+	if decoder.Decode(&info) != nil || decoder.Decode(new(any)) != io.EOF {
+		return "", errors.New("NODE-0022: invalid engine version response")
+	}
+	parse := func(value string) (int, error) {
+		if !regexp.MustCompile(`^1\.[1-9][0-9]{0,2}$`).MatchString(value) {
+			return 0, errors.New("NODE-0022: invalid engine API version")
+		}
+		return strconv.Atoi(strings.TrimPrefix(value, "1."))
+	}
+	maximum, err := parse(info.ApiVersion)
+	if err != nil {
+		return "", err
+	}
+	minimum, err := parse(info.MinAPIVersion)
+	if err != nil {
+		return "", err
+	}
+	chosen := min(maximum, 45)
+	if info.Os != "linux" || maximum < minimum || chosen < 41 || chosen < minimum {
+		return "", errors.New("NODE-0022: Linux Docker API 1.41 through 1.45 required")
+	}
+	// Cache successful negotiation only; a missing engine can become available.
+	// Requests that mutate execution are never replayed for negotiation/recovery.
+	d.version = "v1." + strconv.Itoa(chosen)
+	return d.version, nil
+}
 
 // Only a locally configured Unix socket is supported. Neither permit data nor
 // inherited DOCKER_HOST/proxy credentials can redirect this privileged connection.
@@ -54,6 +111,10 @@ func NewDocker(socket string) (*Docker, error) {
 	return &Docker{client: &http.Client{Transport: transport, Timeout: 2 * time.Second, CheckRedirect: func(req *http.Request, via []*http.Request) error { return errors.New("redirect refused") }}}, nil
 }
 func (d *Docker) request(ctx context.Context, method, path string, body any, out any) error {
+	version, err := d.apiVersion(ctx)
+	if err != nil {
+		return err
+	}
 	var reader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
@@ -62,7 +123,7 @@ func (d *Docker) request(ctx context.Context, method, path string, body any, out
 		}
 		reader = bytes.NewReader(data)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, "http://docker/v1.45"+path, reader)
+	req, err := http.NewRequestWithContext(ctx, method, "http://docker/"+version+path, reader)
 	if err != nil {
 		return errors.New("NODE-0021: invalid engine request")
 	}
@@ -123,7 +184,7 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	tmpfs := map[string]string{"/workspace": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700", "/tmp": "rw,nosuid,nodev,noexec,size=16777216,uid=65532,gid=65532,mode=0700"}
 	host := map[string]any{"NetworkMode": "none", "ReadonlyRootfs": true, "CapDrop": []string{"ALL"}, "SecurityOpt": []string{"no-new-privileges:true"}, "Privileged": false,
 		"PidsLimit": int64(64), "Memory": p.MemoryBytes, "MemorySwap": p.MemoryBytes, "NanoCpus": p.CpuMillis * 1000000, "Tmpfs": tmpfs, "AutoRemove": false,
-		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "local", "Config": map[string]string{"max-size": "512k", "max-file": "1", "compress": "false"}}}
+		"IpcMode": "private", "CgroupnsMode": "private", "RestartPolicy": map[string]any{"Name": "no"}, "LogConfig": map[string]any{"Type": "json-file", "Config": map[string]string{"max-size": "512k", "max-file": "1"}}}
 	command := append([]string{"--not-after", string(r.Claim.NotAfter), "--timeout", strconv.FormatInt(p.TimeoutSeconds, 10), "--"}, p.Argv...)
 	config := map[string]any{"Image": p.ImageDigest, "Entrypoint": []string{"/inv-supervisor"}, "Cmd": command, "User": "65532:65532", "WorkingDir": "/workspace", "Env": environment,
 		"Labels": labels(r), "NetworkDisabled": true, "AttachStdout": false, "AttachStderr": false, "OpenStdin": false, "Tty": false, "HostConfig": host}
@@ -159,7 +220,7 @@ func (d *Docker) Create(ctx context.Context, r Record, p contracts.SandboxLaunch
 	if actual.Image != p.ImageDigest || actual.Config.User != "65532:65532" || actual.Config.WorkingDir != "/workspace" || !equal(actual.Config.Entrypoint, []string{"/inv-supervisor"}) || !equal(actual.Config.Cmd, command) ||
 		h.NetworkMode != "none" || !h.ReadonlyRootfs || h.Privileged || h.Memory != p.MemoryBytes || h.MemorySwap != p.MemoryBytes || h.NanoCpus != p.CpuMillis*1000000 || h.PidsLimit != 64 ||
 		!equal(h.CapDrop, []string{"ALL"}) || !(equal(h.SecurityOpt, []string{"no-new-privileges:true"}) || equal(h.SecurityOpt, []string{"no-new-privileges"})) ||
-		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "local" || h.LogConfig.Config["max-size"] != "512k" || h.LogConfig.Config["max-file"] != "1" || h.LogConfig.Config["compress"] != "false" || len(h.Tmpfs) != 2 {
+		len(h.Binds) != 0 || len(h.Devices) != 0 || len(h.DeviceRequests) != 0 || len(h.PortBindings) != 0 || h.PidMode != "" || h.IpcMode != "private" || h.UTSMode != "" || h.CgroupnsMode != "private" || h.AutoRemove || h.RestartPolicy.Name != "no" || h.LogConfig.Type != "json-file" || h.LogConfig.Config["max-size"] != "512k" || h.LogConfig.Config["max-file"] != "1" || len(h.LogConfig.Config) != 2 || len(h.Tmpfs) != 2 {
 		return "", errors.New("NODE-0024: daemon isolation configuration differs")
 	}
 	for path, options := range tmpfs {
@@ -266,7 +327,11 @@ func (d *Docker) Output(ctx context.Context, id string, r Record) (*contracts.No
 	if err != nil || !stopped(state) {
 		return nil, errors.New("NODE-0070: output requires stopped owned container")
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", "http://docker/v1.45/containers/"+id+"/logs?stdout=true&stderr=true&follow=false", nil)
+	version, err := d.apiVersion(ctx)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://docker/"+version+"/containers/"+id+"/logs?stdout=true&stderr=true&follow=false", nil)
 	if err != nil {
 		return nil, err
 	}

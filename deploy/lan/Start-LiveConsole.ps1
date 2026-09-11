@@ -1,5 +1,10 @@
 param([string]$StatePath = 'C:/Project/SaintVision-Invion/.work/lan-pilot')
 $ErrorActionPreference = 'Stop'
+$svMutex = New-Object Threading.Mutex($false, ('Local\SaintVision.LiveConsole.' + [Security.Principal.WindowsIdentity]::GetCurrent().User.Value))
+$svLocked = $false
+try {
+try { $svLocked = $svMutex.WaitOne(30000) } catch [Threading.AbandonedMutexException] { $svLocked = $true }
+if (-not $svLocked) { throw 'Another console startup is still in progress.' }
 $svCheckout = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path.Replace('\','/')
 $StatePath = (Resolve-Path -LiteralPath $StatePath).Path.Replace('\','/')
 $svCommon = & git -C $svCheckout rev-parse --git-common-dir
@@ -29,7 +34,7 @@ function Start-SvListener([int]$Port,[string]$Expected,[string]$Executable,[stri
     return $svProcess.Id
 }
 $svObserver = Get-CimInstance Win32_Process | Where-Object {
-    $_.Name -eq 'python.exe' -and $_.CommandLine -and $_.CommandLine.Replace('\','/').Contains($StatePath) -and $_.CommandLine -match 'lan_pilot.py.* observe$'
+    $_.Name -eq 'python.exe' -and $_.CommandLine -and $_.CommandLine.Replace('\','/').Contains($StatePath) -and $_.CommandLine -match 'lan_pilot.py.*\bobserve\s*$'
 } | Select-Object -First 1
 if (-not $svObserver) {
     $svObserver = Start-Process -FilePath $svPython -ArgumentList @('-u',"$svCheckout/tools/lan_pilot.py",'--state',$StatePath,'observe') -WorkingDirectory $svCheckout -WindowStyle Hidden -PassThru -RedirectStandardOutput "$StatePath/observer.stdout.log" -RedirectStandardError "$StatePath/observer.stderr.log"
@@ -42,3 +47,7 @@ $svWebId = Start-SvListener 3000 $svVite (Get-Command node.exe).Source @($svVite
 @{observerPid=$svObserverId;consolePid=$svConsoleId;webPid=$svWebId} | ConvertTo-Json | Set-Content -LiteralPath "$StatePath/live-console-processes.json"
 Write-Output 'SaintVision: http://localhost:3000'
 Write-Output 'The page shows current connection status; no workload is started by this script.'
+} finally {
+    if ($svLocked) { $svMutex.ReleaseMutex() }
+    $svMutex.Dispose()
+}

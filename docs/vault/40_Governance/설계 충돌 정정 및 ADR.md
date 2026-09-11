@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.19.0"
+version: "1.20.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T00:59:00+09:00"
+updated: "2026-09-11T09:27:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -92,3 +92,5 @@ ADR-056(제어 변경의 현재 2인 L2 승인·검증된 서로 다른 사람·
 ADR-057(불변 editor revision과 승인 snapshot 일치), ADR-058(명시적 목적지 Node와 새 승인), ADR-059(제한 PTY·일회 ticket·현재 권한·bounded 입력/출력), ADR-060(고정 Git provider·현재 2인 승인·expected head publication·불확실 dispatch 재전송 금지)은 [[Codex Workspace 편집과 PTY 및 원격 Git 계약]]을 따른다. 사용자 지시로 실제 시험은 후속 단계이며 build-only 성공을 인수 완료로 표시하지 않는다. 0024는 forward only다.
 
 ADR-061(Windows 사용자 전용 개발 Studio·개발 도구와 제품 실행 권한 분리)은 [[Codex 개발 Studio와 제품 실행 경계]]를 따른다. 프로젝트·도구·로컬 CPU 개발 컨테이너를 제공하며 PostgreSQL Run/승인/Node permit/Evidence를 대체하지 않는다. 다중 사용자·원격 업무·GPU 기능은 별도 검증 전까지 비활성이다.
+
+ADR-062(Linux Docker API 1.41~1.45 범위 협상·실제 격리 설정 재검증·512 KiB/1개 json-file 출력 로그)은 [[Codex Node 실행 격리와 정지 영수증 계약]] v1.1.0을 따른다. 성공한 협상만 캐시하고 실행 변경 요청의 자동 재전송은 금지한다. DB/permit/승인 계약은 유지한다. 기존 local logging driver 설정은 서버 20.10 호환성 문제에 따라 정정하며 실제 장비 검증 범위는 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에 기록한다.

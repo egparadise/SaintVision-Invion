@@ -1,10 +1,10 @@
 ---
 doc_id: "NODE-RUNTIME-CONTRACT-001"
 title: "Codex Node 실행 격리와 정지 영수증 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T00:50:04+09:00"
+updated: "2026-09-11T09:27:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,9 +22,11 @@ Linux 전용 private 0700 journal과 flock으로 worker를 단일화한다. 개�
 
 ## ADR-028 독립 PID 1 기한과 제거 후 stop ACK
 
-Docker Engine API 1.45 local Unix socket만 사용한다. 입력 permit/DOCKER_HOST/proxy가 privileged 연결을 바꾸지 않는다. 미리 설치된 image content ID (`sha256:...`)만 허용하며 pull하지 않는다. 이는 registry manifest digest와 구별된다. 추후 registry resolver는 별도 신뢰 경계다. approved image는 이 저장소의 `/inv-supervisor`를 PID 1으로 포함하고 `ai.saintvision.supervisor=deadline-v1` label을 갖는다. label 자체는 attestation이 아니며 image content allowlist가 신뢰 근거다.
+Docker Engine local Unix socket만 사용한다. ADR-062부터 `/version`의 Linux OS·최소/최대 API를 확인하여 클라이언트 지원 범위 1.41~1.45 안에서 협상한다. 범위가 겹치지 않거나 응답이 잘못되면 실행 요청 전에 거부한다. CgroupnsMode를 위해 1.41보다 낮은 API로 내리지 않는다. 성공한 협상만 캐시하며 create/start/stop/delete를 자동 재전송하지 않는다. 입력 permit/DOCKER_HOST/proxy가 privileged 연결을 바꾸지 않는다. 미리 설치된 image content ID (`sha256:...`)만 허용하며 pull하지 않는다. 이는 registry manifest digest와 구별된다. 추후 registry resolver는 별도 신뢰 경계다. approved image는 이 저장소의 `/inv-supervisor`를 PID 1으로 포함하고 `ai.saintvision.supervisor=deadline-v1` label을 갖는다. label 자체는 attestation이 아니며 image content allowlist가 신뢰 근거다.
 
-컨테이너는 UID/GID 65532, network none, read-only root, 모든 capability 제거, no-new-privileges, PID limit 64, CPU quota, memory/swap hard limit, private IPC/cgroup namespace, host mount/device/port 없음, /workspace와 /tmp의 제한된 noexec tmpfs만 사용한다. daemon이 생성한 실제 설정을 다시 대조한 뒤 start한다. raw stdout/stderr는 supervisor와 Docker logging none에서 폐기한다. Artifact/로그 수집·GPU·host 명령은 이번 구현에 없다.
+컨테이너는 UID/GID 65532, network none, read-only root, 모든 capability 제거, no-new-privileges, PID limit 64, CPU quota, memory/swap hard limit, private IPC/cgroup namespace, host mount/device/port 없음, /workspace와 /tmp의 제한된 noexec tmpfs만 사용한다. daemon이 생성한 실제 설정을 다시 대조한 뒤 start한다. 후속 ADR-041에서 bounded stdout/stderr 수집을 추가했으며 ADR-062부터 Docker `json-file` log 512 KiB/1개로 제한한다. 성공/실패 출력의 확정 조건은 [[Codex 실행 완료와 자원 회수 통합 계약]]을 따른다. GPU·host 명령은 이번 구현에 없다.
+
+API 협상 근거: [Docker Engine API 공식 문서](https://docs.docker.com/reference/api/engine/). 실제 20.10.22/API 1.41의 실행 증거와 최신 daemon의 협상 단위 시험은 [[2026-09-11_NODE-COMPAT_Codex_검증보고]]에서 구분한다.
 
 Node Go monotonic deadline은 claim.notAfter에서 허용 clock skew 5초를 뺀 시간과 workload timeout 중 작은 값이다. intent fsync와 create/start 시간도 포함한다. signed permit TTL 상한은 30초다. PID 1 supervisor는 별도 monotonic timer를 가지므로 Node process가 SIGKILL로 중단되어도 기한에 종료된다. workload는 child process group이며 PID 1 종료는 namespace 내 남은 프로세스를 종료한다. supervisor의 dumpable을 끄고 raw 출력은 보존하지 않는다.
 

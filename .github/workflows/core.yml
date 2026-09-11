@@ -60,6 +60,11 @@ jobs:
           echo "INV_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-node-test:$GITHUB_SHA")" >> "$GITHUB_ENV"
           echo "INV_NODE_BINARY=$GITHUB_WORKSPACE/dist/inv-node" >> "$GITHUB_ENV"
           echo "INV_RUN_NODE_TESTS=1" >> "$GITHUB_ENV"
+      - name: Verify Docker API negotiation and actual bounded execution
+        working-directory: services/node-agent
+        env:
+          INV_RUN_DOCKER_COMPAT: '1'
+        run: go test -v -run '^TestDockerLiveCompatibility$' ./runtime > "$GITHUB_WORKSPACE/dist/docker-compatibility.log" 2>&1 || { cat "$GITHUB_WORKSPACE/dist/docker-compatibility.log"; exit 1; }
       - name: Build production API image and require explicit configuration
         run: |
           docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
