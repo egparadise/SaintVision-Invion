@@ -1,0 +1,12 @@
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+# Install libraries from this base distribution; do not overlay another host's
+# glibc or /lib symlinks. Execution itself always uses network=none.
+RUN apt-get update && apt-get install -y --no-install-recommends git
+COPY --chmod=0755 probe /probe
+COPY --chmod=0755 inv-supervisor /inv-supervisor
+LABEL ai.saintvision.supervisor="deadline-v1"
+LABEL ai.saintvision.output="bounded-streams-v1"
+LABEL ai.saintvision.workspace="snapshot-tmpfs-v1"
+USER 65532:65532
+ENTRYPOINT ["/inv-supervisor"]

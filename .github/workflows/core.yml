@@ -20,6 +20,7 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
+      INV_TEST_EVIDENCE_DIR: ${{ github.workspace }}/dist
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -65,6 +66,12 @@ jobs:
         env:
           INV_RUN_DOCKER_COMPAT: '1'
         run: go test -v -run '^TestDockerLiveCompatibility$' ./runtime > "$GITHUB_WORKSPACE/dist/docker-compatibility.log" 2>&1 || { cat "$GITHUB_WORKSPACE/dist/docker-compatibility.log"; exit 1; }
+      - name: Build pinned Python workload image for kernel integration
+        run: |
+          docker pull python:3.12-slim
+          python_base=$(docker image inspect --format '{{index .RepoDigests 0}}' python:3.12-slim)
+          docker build --pull=false --build-arg "PYTHON_IMAGE=$python_base" -f deploy/testing/Dockerfile.python-node -t "inv-python-node:$GITHUB_SHA" .work/node-image
+          echo "INV_PYTHON_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-python-node:$GITHUB_SHA")" >> "$GITHUB_ENV"
       - name: Build production API image and require explicit configuration
         run: |
           docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
