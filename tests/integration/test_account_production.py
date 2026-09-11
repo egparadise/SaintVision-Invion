@@ -38,12 +38,16 @@ def test_account_project_and_kernel_use_same_identity_and_current_membership(env
             assert response.json()['kernelLinked'] is False
             path='/v1/projects/'+project+'/runs'
             assert client.post(path,json={},headers=headers).status_code==403
-            # Operator provisioning is synthetic test setup, never a browser grant.
-            with psycopg.connect(env.owner) as c:
-                c.execute('INSERT INTO inv.projects VALUES(%s,%s)',(env.tenant,project))
-                c.execute('INSERT INTO inv.business_projects(tenant_id,project_id) VALUES(%s,%s)',(env.tenant,project))
-                c.execute('INSERT INTO inv.business_subjects(tenant_id,subject_id,user_id) VALUES(%s,%s,%s)',(env.tenant,jwt.subject('owner'),user))
-                c.execute('INSERT INTO inv.project_grants(tenant_id,project_id,subject_id,can_request,can_approve) VALUES(%s,%s,%s,true,false)',(env.tenant,project,jwt.subject('owner')))
+            # Exercise the operator tool with the same verified synthetic JWT identity.
+            import sys
+            from pathlib import Path
+            sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+            import provision_account
+            with psycopg.connect(env.owner, autocommit=True) as c:
+                prepared = provision_account.apply(c, reason='synthetic JWT integration',
+                    tenant=str(env.tenant), project=project, user=user,
+                    subject=jwt.subject('owner'), grant='request')
+            assert prepared['linked'] and not prepared['executionReady']
             assert client.get('/v1/projects/'+project,headers=headers).json()['kernelLinked'] is True
             response=client.post(path,json={},headers=headers)
             assert response.status_code==201, response.text

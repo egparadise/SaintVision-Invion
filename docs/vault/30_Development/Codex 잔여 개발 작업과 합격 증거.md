@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.15.0"
+version: "1.16.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T13:56:19+09:00"
+updated: "2026-09-11T14:24:11+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 provisioning 후속: [[2026-09-11_PROVISIONING-INTEGRITY_Codex_검증보고]]의 a6054f3에서 Claude 신규 코드를 통합 검토하고 명시적 계정 grant·충돌 거부·원자 감사·0030 이력 병합을 구현했다. clean 통합 283개/14개 upgrade 경로 통과. 운영 provisioning 도구는 준비됐지만 실제 IdP 계정 적용·Workspace/자원 연결(Claude), 실제 worker 설치와 원격 7개 시험(Codex), 실제 UI/브라우저(Gemini)는 남는다. Codex 변경 독립 검토와 CI는 미완료다.
 
 2026-09-11 결과 조회 후속: [[2026-09-11_RESULT-OBSERVATION_Codex_검증보고]]의 8b97c6a에서 실제 kernel Run/receipt/Evidence와 검증된 파일 다운로드·로그·attempt를 연결했다. 0028로 이력을 보존해 병합하고 원격 미관측 도구와 실제 실행 grant를 구분했다. 기본 290/격리 통합 262개 통과. 남은 주 작업은 실제 worker 설치 후 원격 7개 인수(Codex), 독립 검토·운영 identity/Workspace provisioning·제공량 연결(Claude), 실제 API/브라우저 인수(Gemini)다. 전체 task done은 아니다.
 
