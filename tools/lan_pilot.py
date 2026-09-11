@@ -274,7 +274,8 @@ def serve(args):
             if self.client_address[0] not in {state['serverIP'],state['nodeIP'],'127.0.0.1'}:
                 self.send_error(403)
                 return
-            names = {'/worker.zip':'worker.zip','/worker.sha256':'worker.sha256','/node-cert.pem':'node-cert.pem'}
+            names = {'/worker.zip':'worker.zip','/worker.sha256':'worker.sha256','/node-cert.pem':'node-cert.pem',
+                     '/workspace-worker.zip':'workspace-worker.zip','/workspace-worker.sha256':'workspace-worker.sha256'}
             if self.path == '/healthz':
                 data = b'{"service":"SaintVision LAN bootstrap","status":"ready","scope":"public-file-transfer-only"}'
             elif self.path in names and (public/names[self.path]).is_file():
