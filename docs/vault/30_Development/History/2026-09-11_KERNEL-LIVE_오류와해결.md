@@ -1,10 +1,10 @@
 ---
 doc_id: "ERR-KERNEL-LIVE-20260911"
 title: "KERNEL-LIVE 오류와 해결"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T10:05:00+09:00"
+updated: "2026-09-11T10:13:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["error", "kernel", "integration"]
@@ -20,3 +20,5 @@ tags: ["error", "kernel", "integration"]
 | 일부 로컬 경로/검색식 오기 | PowerShell 경로 glob과 rg 정규식 중괄호 사용 오류 | 실제 경로 확인 후 재조회. 구현 파일이나 기존 사용자 자료 변경 없음 |
 
 첫 실패의 private pytest 로그와 JUnit은 `.work/sv-kernel-c4e334e6f563/runs/bb1d3f5af5a8`에 보존했다. DB 비밀번호·JWT가 포함될 수 있는 원문 로그는 공개 Git 보고서에 복사하지 않는다. 수정 후 10:02 KST 전용 4개 시험 exit 0을 확인했다. [[2026-09-11_KERNEL-LIVE_Codex_검증보고]]에서 확정 코드 SHA와 후속 통합 결과를 분리한다.
+
+추가 sync check exit 1: 외부 History 인덱스 1개 변경을 감지해 쓰기 없이 중단했다. 새 Gemini 2-PC 보고와 함께 원문 2개를 Evidence에 보존·검토한 뒤 해당 인덱스의 확인된 SHA만 sync 기준에 반영했다. 실제 장비 완료 주장은 [[2026-09-11_GEMINI-TWO-PC_Codex_검토]]에서 request_changes로 기록했다. 최종 clean SHA e5d9b0b의 통합 118개 exit 0, 전용 Python/AI 4개 포함, 시험 runner/DB 종료를 확인했다.
