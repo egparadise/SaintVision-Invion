@@ -27,17 +27,43 @@ from saintvision.api import schemas  # noqa: E402
 
 OUT_DIR = ROOT / "contracts"
 
-EXPORTED = {
-    "node-enroll-request": schemas.NodeEnrollRequest,
-    "node-response": schemas.NodeResponse,
-    "heartbeat-request": schemas.HeartbeatRequest,
-    "contribution-request": schemas.ContributionRequest,
-    "contribution-response": schemas.ContributionResponse,
-    "data-location-response": schemas.DataLocationResponse,
-    "announcement-request": schemas.AnnouncementRequest,
-    "pool-request": schemas.PoolRequest,
-    "distributed-plan-request": schemas.DistributedPlanRequest,
-}
+def _contract_name(class_name: str) -> str:
+    """``NodeEnrollRequest`` -> ``node-enroll-request``."""
+    out = []
+    for index, char in enumerate(class_name):
+        if char.isupper() and index:
+            out.append("-")
+        out.append(char.lower())
+    return "".join(out)
+
+
+def exported() -> dict[str, type]:
+    """Every request and response contract, found rather than listed.
+
+    This was a hand-written dictionary, which is the fourth hardcoded list in
+    this repository to go stale — and the failure mode here is the quietest of
+    them: a new endpoint's schema is simply never generated, so there is no
+    contract to drift from and ``--check`` passes.
+
+    The rule is the one the models already follow: a ``Strict`` subclass whose
+    name ends in Request or Response is part of the wire contract. Everything
+    else in the module — the nested payloads — appears inline inside the
+    contract that carries it, which is where a caller needs to see it.
+    """
+    found: dict[str, type] = {}
+    for name in dir(schemas):
+        model = getattr(schemas, name)
+        if (
+            isinstance(model, type)
+            and issubclass(model, schemas.Strict)
+            and model is not schemas.Strict
+            and (name.endswith("Request") or name.endswith("Response"))
+        ):
+            found[_contract_name(name)] = model
+    return found
+
+
+EXPORTED = exported()
 
 
 def render(model) -> str:

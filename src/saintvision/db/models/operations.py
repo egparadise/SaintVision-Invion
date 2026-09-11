@@ -36,11 +36,18 @@ class IdempotencyRecord(Base):
 
     __tablename__ = "idempotency_records"
     __table_args__ = (
-        UniqueConstraint(
+        # The unique index is created in migration 0009 with NULLS NOT
+        # DISTINCT, which SQLAlchemy cannot express on a UniqueConstraint here
+        # without losing the null handling; declared as an Index so the model
+        # and the migration agree.
+        Index(
+            "uq_idempotency_records_scope_key",
             "tenant_id",
+            "project_id",
             "endpoint",
             "idempotency_key",
-            name="uq_idempotency_records_scope_key",
+            unique=True,
+            postgresql_nulls_not_distinct=True,
         ),
         CheckConstraint(
             "response_status BETWEEN 100 AND 599",
@@ -51,6 +58,10 @@ class IdempotencyRecord(Base):
 
     record_id: Mapped[InvId] = mapped_column(primary_key=True)
     tenant_id: Mapped[TenantId] = mapped_column()
+    #: The project the operation belongs to, when it belongs to one. Part of
+    #: the key: two projects using the same client-chosen key for the same
+    #: endpoint are two operations, not a replay of one.
+    project_id: Mapped[InvId | None] = mapped_column(nullable=True)
     endpoint: Mapped[str] = mapped_column(String(128))
     idempotency_key: Mapped[str] = mapped_column(String(128))
     request_sha256: Mapped[Sha256]

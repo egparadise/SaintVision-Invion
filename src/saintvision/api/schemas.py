@@ -171,11 +171,76 @@ class DistributedPlanRequest(Strict):
     strategy: str = Field(pattern="^(single_node|data_parallel|sharded)$")
     shard_count: int = Field(default=1, ge=1, le=1024, alias="shardCount")
     splittable_declared: bool = Field(default=False, alias="splittableDeclared")
-    shard_cpu_cores: float = Field(default=0, ge=0, alias="shardCpuCores")
+    #: In the canonical units, and named after them. These are compared against
+    #: a node's spare capacity, so a field called ``shardCpuCores`` sitting next
+    #: to capacity measured in millicores is an invitation to be wrong by a
+    #: factor of a thousand — see ``saintvision.units``.
+    shard_cpu_millicores: int = Field(default=0, ge=0, alias="shardCpuMillicores")
     shard_ram_bytes: int = Field(default=0, ge=0, alias="shardRamBytes")
-    shard_gpu_count: int = Field(default=0, ge=0, alias="shardGpuCount")
+    shard_gpu_devices: int = Field(default=0, ge=0, alias="shardGpuDevices")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 HeartbeatRequest.model_rebuild()
+
+
+class EditLockRequest(Strict):
+    """Stop editing a workspace so its inputs can be frozen.
+
+    ``contentSha256`` is what the caller sees in the workspace at this moment.
+    The control plane does not hold workspace bytes — the node does — so it
+    cannot compute this itself. What it can do is refuse every later step whose
+    digest differs, which turns "the inputs were still" from an assumption into
+    something the platform checks.
+    """
+
+    project_id: str = Field(max_length=30, alias="projectId")
+    run_id: str = Field(max_length=30, alias="runId")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    reason: str = Field(default="execution", max_length=64)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class FreezeInputsRequest(Strict):
+    """Bind exact bytes to one recovery epoch and one execution-core run version.
+
+    ``boundRunVersion`` and ``sourceAttempt`` come from the execution core's Run,
+    not from this side's. They are what the approval will be tied to, and a
+    binding that names a version the core has already moved past describes work
+    nobody can authorise.
+    """
+
+    project_id: str = Field(max_length=30, alias="projectId")
+    workspace_id: str = Field(max_length=30, alias="workspaceId")
+    lock_id: str = Field(max_length=30, alias="lockId")
+    step_id: str = Field(min_length=1, max_length=200, alias="stepId")
+    source_attempt: int = Field(ge=1, alias="sourceAttempt")
+    bound_run_version: int = Field(ge=1, alias="boundRunVersion")
+    input_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="inputSha256")
+    input_size_bytes: int = Field(ge=0, alias="inputSizeBytes")
+    resume_id: str | None = Field(default=None, max_length=36, alias="resumeId")
+    checkout_id: str | None = Field(default=None, max_length=36, alias="checkoutId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class AttachApprovalRequest(Strict):
+    """Pair an execution-core approval with the frozen inputs it decided."""
+
+    project_id: str = Field(max_length=30, alias="projectId")
+    approval_id: str = Field(
+        pattern="^apr_[0-9A-HJKMNP-TV-Z]{26}$", alias="approvalId"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class BindingStateRequest(Strict):
+    """Report where the execution core has taken this binding."""
+
+    state: str = Field(pattern="^(queued|executing|settled|abandoned)$")
+    note: str | None = Field(default=None, max_length=200)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

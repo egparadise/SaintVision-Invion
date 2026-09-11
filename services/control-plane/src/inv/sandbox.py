@@ -101,7 +101,7 @@ class RuntimeCapabilities:
             )
 
 
-def compile_launch(workload, profile: SandboxProfile):
+def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
     validate_contract("WorkloadSpec", workload)
     resources = workload["resources"]
     argv = workload["command"]
@@ -138,5 +138,11 @@ def compile_launch(workload, profile: SandboxProfile):
         "privileged": False,
         "hostAccess": False,
     }
+    if "workspaceResume" in workload:
+        if workspace_input is None:
+            raise DomainError("AUTH-0044", "Verified Workspace input required", 403)
+        plan.update(workspaceMode="restored", workspaceInput=workspace_input)
+    elif workspace_input is not None:
+        raise DomainError("AUTH-0044", "Unexpected Workspace input", 403)
     validate_contract("SandboxLaunchSpec", plan)
     return plan

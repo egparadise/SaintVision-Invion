@@ -333,6 +333,11 @@ class Approval(Base):
         ),
         CheckConstraint("risk_level BETWEEN 0 AND 3", name="risk_level_in_range"),
         CheckConstraint("expires_at > decided_at", name="expiry_after_decision"),
+        # The execution core spells this `apr_` and enforces it. One approval id
+        # has to be writable on both sides of the seam it crosses.
+        CheckConstraint(
+            "approval_id ~ '^apr_[0-9A-HJKMNP-TV-Z]{26}$'", name="approval_id_prefix"
+        ),
         Index("ix_approvals_tenant_id_run_id", "tenant_id", "run_id"),
     )
 

@@ -58,7 +58,9 @@ _FORWARD: Final[dict[RunState, frozenset[RunState]]] = {
     RunState.SCHEDULED: frozenset({RunState.RUNNING}),
     RunState.RUNNING: frozenset({RunState.VERIFYING, RunState.RECOVERING}),
     RunState.VERIFYING: frozenset({RunState.SUCCEEDED, RunState.RECOVERING}),
-    RunState.RECOVERING: frozenset({RunState.SCHEDULED}),
+    # ADR-044: a frozen Workspace Step enters a fresh approval before dispatch.
+    # The execution kernel enforces checkout, epoch and physical-release guards.
+    RunState.RECOVERING: frozenset({RunState.SCHEDULED, RunState.AWAITING_APPROVAL}),
     RunState.SUCCEEDED: frozenset(),
     RunState.FAILED: frozenset(),
     RunState.CANCELLED: frozenset(),

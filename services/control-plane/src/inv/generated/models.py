@@ -7,15 +7,7 @@ from enum import IntEnum, StrEnum
 from typing import Literal
 from uuid import UUID
 
-from pydantic import (
-    AwareDatetime,
-    BaseModel,
-    ConfigDict,
-    Field,
-    RootModel,
-    conint,
-    constr,
-)
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, conint, constr
 
 
 class NodeId(RootModel[constr(pattern=r'^nod_[0-9A-HJKMNP-TV-Z]{26}$')]):
@@ -159,22 +151,6 @@ class ResourceSnapshot(BaseModel):
     observedAt: Timestamp
     nodeId: NodeId
     resources: list[ResourceOffer]
-
-
-class WorkloadSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
-    kind: Literal['Workload']
-    workloadId: WorkloadId
-    tenantId: TenantId
-    projectId: ProjectId
-    workspaceId: WorkspaceId
-    resources: ResourceRequest
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    command: list[str] = Field(..., min_length=1)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
 
 
 class ResourceLease(BaseModel):
@@ -444,27 +420,9 @@ class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
     root: constr(min_length=1, max_length=4096)
 
 
-class SandboxLaunchSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    profileVersion: constr(min_length=1, max_length=200)
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
-    workspaceId: WorkspaceId
-    workingDirectory: Literal['/workspace']
-    workspaceMode: Literal['ephemeral']
-    cpuMillis: conint(ge=1, le=9007199254740991)
-    memoryBytes: conint(ge=1, le=9007199254740991)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
-    pidsLimit: Literal[64]
-    userId: Literal[65532]
-    network: Literal['none']
-    rootfsReadOnly: Literal[True]
-    capDropAll: Literal[True]
-    noNewPrivileges: Literal[True]
-    privileged: Literal[False]
-    hostAccess: Literal[False]
+class WorkspaceMode(StrEnum):
+    ephemeral = 'ephemeral'
+    restored = 'restored'
 
 
 class ExecutionClaim(BaseModel):
@@ -499,16 +457,6 @@ class NodeAllocation(BaseModel):
     kind: Kind1
 
 
-class NodeExecutionPermit(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    claim: ExecutionClaim
-    launch: SandboxLaunchSpec
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-    issuedAt: Timestamp
-
-
 class SignedNodePermit(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -522,37 +470,7 @@ class Reason(StrEnum):
     timeout = 'timeout'
     cancelled = 'cancelled'
     recovered = 'recovered'
-
-
-class NodeStopReceipt(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    receiptId: UUID
-    claimId: ClaimId
-    commandId: CommandId
-    tenantId: TenantId
-    projectId: ProjectId
-    runId: RunId
-    nodeId: NodeId
-    recoveryEpoch: UUID
-    planDigest: ActionDigest
-    containerId: constr(pattern=r'^[0-9a-f]{64}$')
-    stopped: Literal[True]
-    processStarted: bool
-    exitCode: conint(ge=-1, le=255)
-    reason: Reason
-    finishedAt: Timestamp
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-
-
-class NodeExecutionResult(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    duplicate: bool
-    receipt: NodeStopReceipt
-    cleanupPending: Literal[False]
+    not_started = 'not_started'
 
 
 class ClientFingerprint(RootModel[constr(pattern=r'^[0-9a-f]{64}$')]):
@@ -617,6 +535,189 @@ class ProblemDetails(BaseModel):
     traceId: TraceId
     causeRef: constr(min_length=1, max_length=200) | None
     evidenceId: EvidenceId | None
+
+
+class NodeResourceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    profileVersion: constr(min_length=1, max_length=200)
+    observedAt: Timestamp
+    sampleMillis: conint(ge=100, le=5000)
+    cpuCapacityMillis: conint(ge=1, le=9007199254740991)
+    cpuBusyMillis: conint(ge=0, le=9007199254740991)
+    memoryCapacityBytes: conint(ge=1, le=9007199254740991)
+    memoryAvailableBytes: conint(ge=0, le=9007199254740991)
+    osType: Literal['linux']
+    agentVersion: Literal['0.1.0']
+
+
+class NodeChunkInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeChunkResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    dataBase64: constr(max_length=349528)
+    chunkSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    data: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', max_length=400000)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=300000)
+
+
+class WorkspaceResumeRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    checkoutId: UUID
+    sourceAttempt: conint(ge=1)
+    sourceStepId: constr(min_length=1, max_length=200)
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+    checkpointAttempt: conint(ge=1)
+
+
+class WorkspaceInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+
+
+class WorkspaceSnapshotFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(min_length=1, max_length=1024)
+    executable: bool
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=32768)
+    dataBase64: constr(max_length=43692)
+
+
+class Directory(RootModel[constr(min_length=1, max_length=1024)]):
+    root: constr(min_length=1, max_length=1024)
+
+
+class WorkspaceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format: Literal['workspace-snapshot:1']
+    workspaceId: WorkspaceId
+    directories: list[Directory] = Field(..., max_length=2048)
+    files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
+
+
+class WorkloadSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['Workload']
+    workloadId: WorkloadId
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    resources: ResourceRequest
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    command: list[str] = Field(..., min_length=1)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    workspaceResume: WorkspaceResumeRef | None = None
+
+
+class SandboxLaunchSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    profileVersion: constr(min_length=1, max_length=200)
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
+    workspaceId: WorkspaceId
+    workingDirectory: Literal['/workspace']
+    workspaceMode: WorkspaceMode
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    pidsLimit: Literal[64]
+    userId: Literal[65532]
+    network: Literal['none']
+    rootfsReadOnly: Literal[True]
+    capDropAll: Literal[True]
+    noNewPrivileges: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+    workspaceInput: WorkspaceInput | None = None
+
+
+class NodeExecutionPermit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    claim: ExecutionClaim
+    launch: SandboxLaunchSpec
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    issuedAt: Timestamp
+
+
+class NodeStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    claimId: ClaimId
+    commandId: CommandId
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    planDigest: ActionDigest
+    containerId: constr(pattern=r'^([0-9a-f]{64})?$')
+    stopped: Literal[True]
+    processStarted: bool
+    exitCode: conint(ge=-1, le=255)
+    reason: Reason
+    finishedAt: Timestamp
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    output: NodeOutput | None = None
+
+
+class NodeExecutionResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duplicate: bool
+    receipt: NodeStopReceipt
+    cleanupPending: Literal[False]
 
 
 class INVCore(

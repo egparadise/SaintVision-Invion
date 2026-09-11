@@ -329,3 +329,61 @@ func TestPlainHTTPIdentityHeadersHaveNoAuthority(t *testing.T) {
 		t.Fatal("forged header accepted")
 	}
 }
+
+type heldResponse struct {
+	*httptest.ResponseRecorder
+	entered chan struct{}
+	release chan struct{}
+}
+
+func (w *heldResponse) WriteHeader(status int) {
+	close(w.entered)
+	<-w.release
+	w.ResponseRecorder.WriteHeader(status)
+}
+
+func TestReceiptObservationWaitsForPriorHTTPResponseSlot(t *testing.T) {
+	s := fixture(t)
+	leaf, err := x509.ParseCertificate(s.cert.Certificate[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := func(path string) *http.Request {
+		r := httptest.NewRequest("POST", "https://local"+path, bytes.NewReader(envelope()))
+		r.Header.Set("Content-Type", "application/json")
+		r.TLS = &tls.ConnectionState{Version: tls.VersionTLS13, PeerCertificates: []*x509.Certificate{leaf}, VerifiedChains: [][]*x509.Certificate{{leaf, s.ca.cert}}}
+		return r
+	}
+	h := Handler(s.authority, s.runner)
+	w := &heldResponse{ResponseRecorder: httptest.NewRecorder(), entered: make(chan struct{}), release: make(chan struct{})}
+	done := make(chan struct{})
+	go func() { defer close(done); h.ServeHTTP(w, request("/v1/executions")) }()
+	released := false
+	defer func() {
+		if !released {
+			close(w.release)
+		}
+		<-done
+	}()
+	select {
+	case <-w.entered:
+	case <-time.After(3 * time.Second):
+		t.Fatal("execution did not reach response")
+	}
+	// The executor has returned, but its HTTP response still owns the slot.
+	busy := httptest.NewRecorder()
+	h.ServeHTTP(busy, request("/v1/executions/receipts"))
+	if busy.Code != 429 || s.runner.calls.Load() != 1 {
+		t.Fatal("observation bypassed bounded execution slot", busy.Code)
+	}
+	close(w.release)
+	released = true
+	<-done
+	again := httptest.NewRecorder()
+	h.ServeHTTP(again, request("/v1/executions/receipts"))
+	// This fake returns an error and cannot attest a real receipt. The second
+	// request reaches Observe only after the response slot is available.
+	if again.Code != 503 || s.runner.calls.Load() != 2 {
+		t.Fatal("observation did not reach runner after response completed", again.Code)
+	}
+}

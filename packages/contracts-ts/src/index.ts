@@ -75,6 +75,7 @@ export interface WorkloadSpec {
   imageDigest: string;
   command: Array<string>;
   timeoutSeconds: number;
+  workspaceResume?: WorkspaceResumeRef;
 }
 
 export interface ResourceLease {
@@ -246,7 +247,7 @@ export interface SandboxLaunchSpec {
   argv: Array<string>;
   workspaceId: WorkspaceId;
   workingDirectory: "/workspace";
-  workspaceMode: "ephemeral";
+  workspaceMode: "ephemeral" | "restored";
   cpuMillis: number;
   memoryBytes: number;
   timeoutSeconds: number;
@@ -258,6 +259,7 @@ export interface SandboxLaunchSpec {
   noNewPrivileges: true;
   privileged: false;
   hostAccess: false;
+  workspaceInput?: WorkspaceInput;
 }
 
 export interface ExecutionClaim {
@@ -307,9 +309,10 @@ export interface NodeStopReceipt {
   stopped: true;
   processStarted: boolean;
   exitCode: number;
-  reason: "exited" | "timeout" | "cancelled" | "recovered";
+  reason: "exited" | "timeout" | "cancelled" | "recovered" | "not_started";
   finishedAt: Timestamp;
   allocations: Array<NodeAllocation>;
+  output?: NodeOutput;
 }
 
 export interface NodeExecutionResult {
@@ -358,4 +361,76 @@ export interface ProblemDetails {
   traceId: TraceId;
   causeRef: (string | null);
   evidenceId: (EvidenceId | null);
+}
+
+export interface NodeResourceSnapshot {
+  nonce: string;
+  tenantId: TenantId;
+  nodeId: NodeId;
+  recoveryEpoch: string;
+  profileVersion: string;
+  observedAt: Timestamp;
+  sampleMillis: number;
+  cpuCapacityMillis: number;
+  cpuBusyMillis: number;
+  memoryCapacityBytes: number;
+  memoryAvailableBytes: number;
+  osType: "linux";
+  agentVersion: "0.1.0";
+}
+
+export interface NodeChunkInput {
+  sha256: string;
+  sizeBytes: number;
+  offset: number;
+  nonce: string;
+}
+
+export interface NodeChunkResult {
+  sha256: string;
+  sizeBytes: number;
+  offset: number;
+  nonce: string;
+  dataBase64: string;
+  chunkSha256: string;
+}
+
+export interface NodeOutput {
+  data: string;
+  sha256: string;
+  sizeBytes: number;
+}
+
+export interface WorkspaceResumeRef {
+  resumeId: string;
+  checkoutId: string;
+  sourceAttempt: number;
+  sourceStepId: string;
+  stepId: string;
+  inputSha256: string;
+  inputSizeBytes: number;
+  checkpointAttempt: number;
+}
+
+export interface WorkspaceInput {
+  resumeId: string;
+  stepId: string;
+  sha256: string;
+  sizeBytes: number;
+  dataBase64: string;
+}
+
+export interface WorkspaceSnapshotFile {
+  path: string;
+  executable: boolean;
+  sha256: string;
+  sizeBytes: number;
+  dataBase64: string;
+}
+
+export interface WorkspaceSnapshot {
+  format: "workspace-snapshot:1";
+  workspaceId: WorkspaceId;
+  directories: Array<string>;
+  files: Array<WorkspaceSnapshotFile>;
 }

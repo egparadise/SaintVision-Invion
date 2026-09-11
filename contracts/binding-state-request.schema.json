@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Report where the execution core has taken this binding.",
+  "properties": {
+    "note": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
+    "state": {
+      "pattern": "^(queued|executing|settled|abandoned)$",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "state"
+  ],
+  "title": "BindingStateRequest",
+  "type": "object"
+}
