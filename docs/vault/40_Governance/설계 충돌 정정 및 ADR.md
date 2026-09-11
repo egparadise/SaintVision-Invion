@@ -4,7 +4,7 @@ title: "설계 충돌 정정 및 ADR"
 version: "1.27.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T15:47:11+09:00"
+updated: "2026-09-11T16:59:36+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]

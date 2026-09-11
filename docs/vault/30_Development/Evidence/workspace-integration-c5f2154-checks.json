@@ -1,0 +1,87 @@
+{
+  "codeSHA": "c5f215475b203b1e6731927117093921cda9c183",
+  "coreCases": 301,
+  "linuxGo": {
+    "unit": {
+      "scope": "cross-compiled-linux-unit-no-race-detector",
+      "codeSHA": "c5f215475b203b1e6731927117093921cda9c183",
+      "results": [
+        {
+          "package": "runtime",
+          "exitCode": 0,
+          "passed": 27,
+          "skipped": [
+            "--- SKIP: TestDockerLiveCompatibility (0.00s)"
+          ],
+          "failed": [],
+          "binarySHA256": "c6f54ce97739fc0bea54e8322dd396548fe8b7641ba4c35073f5ccc23cc8e714",
+          "logSHA256": "96e3f3b3e2169c19df9f1e64356c49c29d90997a4951c6e9c140288723399989"
+        },
+        {
+          "package": "cmd/inv-supervisor",
+          "exitCode": 0,
+          "passed": 4,
+          "skipped": [],
+          "failed": [],
+          "binarySHA256": "45c8cbdea09bf0b79e2cd5d62c89d5c53c21971e14f346482f1b50d6e17fff56",
+          "logSHA256": "bd0142ed7d790be478414965f19e9ed03c52a453da186349aa9129ad7ddae49f"
+        },
+        {
+          "package": "transport",
+          "exitCode": 0,
+          "passed": 7,
+          "skipped": [],
+          "failed": [],
+          "binarySHA256": "d5509906b963f1c599875f4758a42ca47e1ae03429d7d989239382eae6045cb3",
+          "logSHA256": "5f71e9ca60d2ff0cab971dc2658c95b61adc8b0d9e0049891461eeb065a5cb23"
+        },
+        {
+          "package": "workspace",
+          "exitCode": 0,
+          "passed": 4,
+          "skipped": [],
+          "failed": [],
+          "binarySHA256": "a439ba3f2235b59ba950efee99dd0a1d44af56165ee46adf138b3bc7ad4c8425",
+          "logSHA256": "fb1cb6629763fe5342da7f6b0eb3af8ac34402735a1db0e8bf2bb8372be48700"
+        }
+      ]
+    },
+    "actualDocker": {
+      "at": "2026-09-11T07:55:33.066479+00:00",
+      "passed": true,
+      "scope": "local-node-component-acceptance-not-production-run",
+      "codeSHA": "c5f215475b203b1e6731927117093921cda9c183",
+      "dirty": false,
+      "binarySHA256": "c6f54ce97739fc0bea54e8322dd396548fe8b7641ba4c35073f5ccc23cc8e714",
+      "probeImage": "sha256:9bb52aa6ae2d47733510bc0a48e5005c69a11cadaf2190cd97c5ae9f103d2516",
+      "testImage": "sha256:0207f1b758ea3c981b7344966b7003acf8034e290fd742da0bfebee9fd46e5a7",
+      "testContainer": "saintvision-compat-d57928efa41d",
+      "exitCode": 0,
+      "stopped": true,
+      "cases": [
+        "docker_linux_test.go:97: api=v1.41 mode=isolation exit=0 outputSHA256=54ed33d2aeaf3271c99795dda4d69ba374ac1b794ca4714ae9b25941c1033782 duplicate=true cleanup=true",
+        "docker_linux_test.go:97: api=v1.41 mode=output exit=0 outputSHA256=e2e8f2a47f4bcb6b2e5e1c002815be47e1adbc11d455c2157b0ca774267b90b1 duplicate=true cleanup=true",
+        "docker_linux_test.go:97: api=v1.41 mode=fail exit=7 outputSHA256=not-collected-for-failed-execution duplicate=true cleanup=true",
+        "docker_linux_test.go:97: api=v1.41 mode=sleep exit=143 outputSHA256=not-collected-for-failed-execution duplicate=true cleanup=true"
+      ],
+      "passedTests": 28,
+      "logSHA256": "d717e017d7a4e20952b218d7c8eb74ed7bfcebbe898ddc7615248d473255ca89",
+      "log": "C:\\Project\\SaintVision-Invion\\.worktrees\\codex-workspace-bridge\\.work\\saintvision-compat-d57928efa41d\\tests.log"
+    },
+    "uniqueTopLevelCases": 43,
+    "raceDetector": "not run locally; CI start blocked"
+  },
+  "build": {
+    "apiWheel": true,
+    "apiSdist": true,
+    "typeScriptContract": true,
+    "goContractCompile": true,
+    "generatedContractDrift": false
+  },
+  "migrationPriorPaths": 20,
+  "scope": "local-isolated-tests-not-operating-acceptance",
+  "packages": {
+    "saintvision_control_plane-0.1.0-py3-none-any.whl": "884a84bd4d93242cf448bcb4064e9d7ecef6b1c8945d40611b4def518f4ae6dd",
+    "saintvision_control_plane-0.1.0.tar.gz": "45fec6128479e8f63cdcf02aec276ebbbc2a13d68eaa0f7693f3d0d65ddde95d"
+  }
+}

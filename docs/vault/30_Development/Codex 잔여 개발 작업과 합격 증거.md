@@ -1,14 +1,16 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.18.0"
+version: "1.19.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T15:55:07+09:00"
+updated: "2026-09-11T16:59:36+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 Workspace 통합: [[2026-09-11_WORKSPACE-INTEGRATION_Codex_검증보고]]의 clean `c5f2154`에서 editor/PTY/Git를 최신 계정·tenant·자원 kernel에 통합했다. 기본 301개/격리 통합 402개/공개 prior 20개 upgrade·Linux Go 고유 43개를 검증했다. PR19 build-only 유예는 종료했다. 실제 GitHub publication·물리 원격 7개·독립 검토·CI·운영 인수는 남는다. 아래 과거 시험 미수행 문구는 해당 SHA 당시 기록이다.
 
 2026-09-11 tenant/인계 재검토: [[2026-09-11_TENANT-BOUNDARY_Codex_검증보고]]의 f4fe37e에서 원본 0026 누수를 재현하고 후속 적용 guard의 거부를 확인했다. 결과 중복 제거·현재 입력 readiness·0032 이력 병합을 통합했으며 최종 로컬 회귀 305개/18개 migration 경로가 통과했다. #11/#12 중복 draft를 닫았고 #13/15/16/17/18/20의 기존 병합 사실을 확인했다. CI·독립 검토·원격 7개·운영/브라우저 인수와 새 main 반영은 남는다.
 
