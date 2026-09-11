@@ -79,9 +79,10 @@ def hash_file(
 ) -> ByteObservation:
     """Read a file and return what is actually in it.
 
-    The path is normalised through the same safety check contributed folders
-    use, so a verification job cannot be pointed at ``/etc/shadow`` or walked
-    out of its root by a crafted record.
+    The path receives the contribution syntax check. This is not an open-time
+    symlink/containment boundary: a trusted worker must resolve its authorized
+    storage root before calling this primitive. Do not expose arbitrary paths
+    from an HTTP caller as worker inputs.
 
     Reads in chunks and counts the bytes it read rather than trusting
     ``stat()``: the size that matters is the size that was hashed, and a file
@@ -112,15 +113,15 @@ def hash_file(
                 digest.update(chunk)
                 total += len(chunk)
     except FileNotFoundError:
-        raise VerificationFailed("the file does not exist", path_checked=str(target)) from None
+        raise VerificationFailed("the file does not exist") from None
     except IsADirectoryError:
         raise VerificationFailed("the path is a directory") from None
     except PermissionError:
         # Not a skip. A pass that ignores what it could not open reports success
         # for a backup nobody has read.
         raise VerificationFailed("the file could not be read") from None
-    except OSError as exc:
-        raise VerificationFailed(f"the file could not be read: {exc.strerror}") from None
+    except OSError:
+        raise VerificationFailed("the file could not be read") from None
 
     return ByteObservation(
         sha256=digest.hexdigest(),
@@ -146,15 +147,34 @@ def verify_backup_bytes(
     ``backup_records`` is one this process computed over the bytes, not one a
     caller supplied.
 
-    ``expected_sha256`` is optional and is a *re-verification* check — a backup
-    verified last week should still hash the same. Passing it turns silent bit
-    rot into a failure.
+    The stored digest is always a re-verification constraint. A caller hint can
+    add a constraint, never replace that baseline. Lock metadata before reading
+    bytes, so concurrent first verifiers cannot replace each other's digest.
+    A rejected observation does not alter a previous successful observation.
     """
     from .pilot import verify_backup
+    from sqlalchemy import select
+    from ..db.models import BackupRecord
+
+    row = session.scalars(
+        select(BackupRecord)
+        .where(BackupRecord.tenant_id == tenant_id, BackupRecord.backup_id == backup_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).first()
+    if row is None:
+        raise VerificationFailed("backup is unavailable in this tenant")
+    if (
+        expected_sha256 is not None
+        and row.checksum_sha256 is not None
+        and expected_sha256 != row.checksum_sha256
+    ):
+        raise VerificationFailed("expected digest disagrees with recorded backup")
 
     observation = hash_file(path, os_type=os_type)
 
-    if expected_sha256 is not None and observation.sha256 != expected_sha256:
+    baseline = row.checksum_sha256 if row.checksum_sha256 is not None else expected_sha256
+    if baseline is not None and observation.sha256 != baseline:
         raise VerificationFailed(
             "the backup no longer hashes to its recorded digest",
             cause_ref=backup_id,
@@ -162,25 +182,26 @@ def verify_backup_bytes(
             byteSize=observation.byte_size,
         )
 
-    row = verify_backup(
-        session,
-        tenant_id=tenant_id,
-        backup_id=backup_id,
-        checksum_sha256=observation.sha256,
-        now=now,
-    )
     if row.byte_size and row.byte_size != observation.byte_size:
-        # The digest is of a different amount of data than was recorded. Do not
-        # leave the row verified on the strength of it.
+        # Validate before any successful-verification write. Catching this
+        # application exception and committing must not promote a bad backup.
         raise VerificationFailed(
             "the backup on disk is a different size than the record",
             cause_ref=backup_id,
             recordedBytes=row.byte_size,
             observedBytes=observation.byte_size,
         )
-    if not row.byte_size:
-        row.byte_size = observation.byte_size
-        session.flush()
+    with session.begin_nested():
+        verify_backup(
+            session,
+            tenant_id=tenant_id,
+            backup_id=backup_id,
+            checksum_sha256=observation.sha256,
+            now=now,
+        )
+        if not row.byte_size:
+            row.byte_size = observation.byte_size
+            session.flush()
     return observation
 
 
@@ -234,6 +255,9 @@ def verify_pending_backups(
 
     from ..db.models import BackupRecord
 
+    if type(limit) is not int or not 1 <= limit <= 100:
+        raise VerificationFailed("verification limit must be between 1 and 100")
+
     rows = session.scalars(
         select(BackupRecord)
         .where(
@@ -247,15 +271,15 @@ def verify_pending_backups(
     verified: list[str] = []
     failed: list[str] = []
     for row in rows:
-        path = resolve_path(row)
-        if path is None:
-            failed.append(row.backup_id)
-            continue
         try:
-            verify_backup_bytes(
-                session, tenant_id=tenant_id, backup_id=row.backup_id, path=path, now=now
-            )
-        except InvError:
+            with session.begin_nested():
+                path = resolve_path(row)
+                if path is None:
+                    raise VerificationFailed("backup location is unavailable")
+                verify_backup_bytes(
+                    session, tenant_id=tenant_id, backup_id=row.backup_id, path=path, now=now
+                )
+        except (InvError, OSError):
             # Recorded as a failure and the sweep continues: one unreadable
             # backup must not hide the state of the rest.
             failed.append(row.backup_id)
