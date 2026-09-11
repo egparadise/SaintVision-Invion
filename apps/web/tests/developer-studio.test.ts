@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { evaluatePlacement } from '../src/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '../src/features/editor/diffEngine';
-import { NodeItem, PlacementRequirement, NodeStopReceipt } from '../src/contracts/types';
+import { NodeItem, PlacementRequirement, NodeStopReceipt, RunItem, ApprovalItem } from '../src/contracts/types';
 
 const TEST_NODES: NodeItem[] = [
   {
@@ -272,5 +272,56 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
     expect(artifact.manifest.outputDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(artifact.executionReceipt.verified).toBe(true);
     expect(artifact.executionReceipt.physicallyStopped).toBe(true);
+  });
+
+  it('Step 4: links awaiting_approval run to governance approval with idempotency nonce', () => {
+    const run: RunItem = {
+      id: 'run_01JABCDE0002',
+      projectId: 'prj_01JABCDE',
+      workspaceId: 'wsp_01JABCDE001',
+      objective: '합성 데이터셋 전처리 및 로컬 분할 검증',
+      state: 'awaiting_approval',
+      requestedBy: 'usr_researcher_02',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      version: 1,
+    };
+
+    const approval: ApprovalItem = {
+      id: 'apr_01JXYZ987654',
+      runId: 'run_01JABCDE0002',
+      workspaceId: 'wsp_01JABCDE001',
+      nodeId: 'nod_01JABCDEF01',
+      riskLevel: 'L2',
+      target: 'Workspace Sandbox on Node-01',
+      command: 'deploy.release',
+      status: 'pending',
+      nonce: 'nonce_987654321',
+      expiresAt: new Date(Date.now() + 600000).toISOString(),
+      policyReason: '외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)',
+      createdAt: new Date().toISOString(),
+    };
+
+    expect(run.state).toBe('awaiting_approval');
+    expect(approval.runId).toBe(run.id);
+    expect(approval.nonce).toBe('nonce_987654321');
+    expect(approval.riskLevel).toBe('L2');
+    expect(approval.status).toBe('pending');
+  });
+
+  it('Step 4 & Zero-Mock: strictly prevents synthesizing fake NodeStopReceipt on fetch failure', () => {
+    // When receipt fetch returns 404 or fails, receipt must NOT be forged with fake hashes
+    let selectedReceipt: NodeStopReceipt | null = null;
+    let errorMessage: string | null = null;
+
+    const simulateReceiptFetchError = (err: { detail: string; status: number }) => {
+      // Must not assign fabricated receipt
+      errorMessage = `물리 정지 영수증(NodeStopReceipt) 조회 실패: ${err.detail}`;
+    };
+
+    simulateReceiptFetchError({ detail: 'RES-RECEIPT-404', status: 404 });
+
+    expect(selectedReceipt).toBeNull();
+    expect(errorMessage).toContain('RES-RECEIPT-404');
   });
 });

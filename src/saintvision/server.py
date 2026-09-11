@@ -1744,7 +1744,51 @@ async def approve_request(approval_id: str, request: Request):
                     "SEC",
                 )
             apprv["status"] = "approved"
+            apprv["decidedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+            if apprv.get("runId"):
+                for r in RUNS:
+                    if r.get("id") == apprv["runId"] and r.get("state") == "awaiting_approval":
+                        r["state"] = "scheduled"
+                        r["updatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                        break
             return {"approvalId": approval_id, "status": "approved", "nonce": nonce}
+
+    return rfc9457_problem(
+        404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/approvals/{approval_id}/reject")
+async def reject_request(approval_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    reason = data.get("reason", "Rejected by administrator")
+
+    for apprv in APPROVALS:
+        if apprv["id"] == approval_id:
+            if apprv["status"] != "pending":
+                return rfc9457_problem(
+                    409,
+                    "VAL-ALREADY-DECIDED",
+                    "Approval Already Decided",
+                    f"Approval '{approval_id}' has already been decided.",
+                    trace_id,
+                    "VAL",
+                )
+            apprv["status"] = "rejected"
+            apprv["rejectReason"] = reason
+            apprv["decidedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+            if apprv.get("runId"):
+                for r in RUNS:
+                    if r.get("id") == apprv["runId"] and r.get("state") == "awaiting_approval":
+                        r["state"] = "cancelled"
+                        r["cancelReason"] = f"Approval rejected: {reason}"
+                        r["updatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+                        break
+            return {"approvalId": approval_id, "status": "rejected", "reason": reason}
 
     return rfc9457_problem(
         404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found.", trace_id, "RES"

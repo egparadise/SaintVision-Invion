@@ -278,15 +278,63 @@ export const App: React.FC = () => {
     setActiveTab('studio');
   };
 
-  const fetchRuns = () => {
-    apiClient<{ items: RunItem[] }>('/v1/runs')
-      .then((res) => {
-        if (res.items?.length > 0) {
-          setRuns(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/runs fetch fallback:', err));
-  };
+  const fetchNodes = React.useCallback(async () => {
+    try {
+      const res = await apiClient<{ items: any[] }>('/v1/nodes');
+      if (res.items?.length > 0) {
+        setNodes(
+          res.items.map((srvNode) => ({
+            id: srvNode.nodeId || srvNode.id,
+            hostname: srvNode.hostname,
+            status: srvNode.status || 'online',
+            os: srvNode.osType || srvNode.os || 'windows',
+            cpuCores: srvNode.cpuCores || 8,
+            cpuUsagePercent: srvNode.cpuUsagePercent ?? 20,
+            memoryTotalBytes: srvNode.memoryTotalBytes || 32 * 1024 ** 3,
+            memoryUsedBytes: srvNode.memoryUsedBytes || 16 * 1024 ** 3,
+            allocatableCores: srvNode.allocatableCores,
+            allocatableMemoryBytes: srvNode.allocatableMemoryBytes,
+            observationOnly: srvNode.observationOnly ?? false,
+            schedulable: srvNode.schedulable ?? true,
+            isDraining: srvNode.isDraining ?? false,
+            killSwitchEngaged: srvNode.killSwitchEngaged ?? false,
+            ipAddress: srvNode.ipAddress,
+            gpuName: srvNode.gpuName,
+            gpuCount: srvNode.gpuCount || 0,
+            gpuVramTotalBytes: srvNode.gpuVramTotalBytes || 0,
+            gpuVramUsedBytes: srvNode.gpuVramUsedBytes || 0,
+            storageTotalBytes: srvNode.storageTotalBytes || 1000 * 1024 ** 3,
+            storageUsedBytes: srvNode.storageUsedBytes || 400 * 1024 ** 3,
+            heartbeatAt: srvNode.lastHeartbeatAt || srvNode.heartbeatAt || new Date().toISOString(),
+          }))
+        );
+      }
+    } catch (err) {
+      console.warn('Live /v1/nodes fetch fallback:', err);
+    }
+  }, []);
+
+  const fetchRuns = React.useCallback(async () => {
+    try {
+      const res = await apiClient<{ items: RunItem[] }>('/v1/runs');
+      if (res.items?.length > 0) {
+        setRuns(res.items);
+      }
+    } catch (err) {
+      console.warn('Live /v1/runs fetch fallback:', err);
+    }
+  }, []);
+
+  const fetchApprovals = React.useCallback(async () => {
+    try {
+      const res = await apiClient<{ items: ApprovalItem[] }>('/v1/approvals');
+      if (res.items?.length > 0) {
+        setApprovals(res.items);
+      }
+    } catch (err) {
+      console.warn('Live /v1/approvals fetch fallback:', err);
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -294,72 +342,20 @@ export const App: React.FC = () => {
 
   // Initial load from live backend endpoints
   useEffect(() => {
-    let isMounted = true;
-    apiClient<{ items: any[] }>('/v1/nodes')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setNodes(
-            res.items.map((srvNode) => ({
-              id: srvNode.nodeId || srvNode.id,
-              hostname: srvNode.hostname,
-              status: srvNode.status || 'online',
-              os: srvNode.osType || srvNode.os || 'windows',
-              cpuCores: srvNode.cpuCores || 8,
-              cpuUsagePercent: srvNode.cpuUsagePercent || 20,
-              memoryTotalBytes: srvNode.memoryTotalBytes || 32 * 1024 ** 3,
-              memoryUsedBytes: srvNode.memoryUsedBytes || 16 * 1024 ** 3,
-              allocatableCores: srvNode.allocatableCores,
-              allocatableMemoryBytes: srvNode.allocatableMemoryBytes,
-              observationOnly: srvNode.observationOnly ?? false,
-              schedulable: srvNode.schedulable ?? true,
-              isDraining: srvNode.isDraining ?? false,
-              killSwitchEngaged: srvNode.killSwitchEngaged ?? false,
-              ipAddress: srvNode.ipAddress,
-              gpuName: srvNode.gpuName,
-              gpuCount: srvNode.gpuCount || 0,
-              gpuVramTotalBytes: srvNode.gpuVramTotalBytes || 0,
-              gpuVramUsedBytes: srvNode.gpuVramUsedBytes || 0,
-              storageTotalBytes: srvNode.storageTotalBytes || 1000 * 1024 ** 3,
-              storageUsedBytes: srvNode.storageUsedBytes || 400 * 1024 ** 3,
-              heartbeatAt: srvNode.lastHeartbeatAt || srvNode.heartbeatAt || new Date().toISOString(),
-            }))
-          );
-        }
-      })
-      .catch((err) => console.warn('Live /v1/nodes fetch fallback:', err));
-
+    fetchNodes();
     fetchRuns();
+    fetchApprovals();
+  }, [fetchNodes, fetchRuns, fetchApprovals]);
 
-    apiClient<{ items: ApprovalItem[] }>('/v1/approvals')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setApprovals(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/approvals fetch fallback:', err));
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Live Heartbeat & Metric Fluctuations Simulation
+  // Periodic Telemetry Sync (Genuine Server Polling, Zero Synthetic Fluctuations)
   useEffect(() => {
     const interval = setInterval(() => {
-      setNodes((prevNodes) =>
-        prevNodes.map((n) => {
-          const delta = Math.floor(Math.random() * 5) - 2; // -2% ~ +2%
-          const newCpu = Math.min(95, Math.max(5, n.cpuUsagePercent + delta));
-          return {
-            ...n,
-            cpuUsagePercent: newCpu,
-            heartbeatAt: new Date().toISOString(),
-          };
-        })
-      );
-    }, 4000);
+      fetchNodes();
+      fetchRuns();
+      fetchApprovals();
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNodes, fetchRuns, fetchApprovals]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -371,37 +367,29 @@ export const App: React.FC = () => {
         method: 'POST',
         body: JSON.stringify({ nonce }),
       });
-    } catch (err) {
-      console.warn('Backend approval API fallback:', err);
-    }
-    setApprovals((prev) =>
-      prev.map((a) => (a.id === approvalId ? { ...a, status: 'approved' } : a))
-    );
-    const matched = approvals.find((a) => a.id === approvalId);
-    if (matched) {
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === matched.runId
-            ? { ...r, state: 'scheduled', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+      // Fetch fresh runs and approvals after server confirmed approval
+      await Promise.all([fetchApprovals(), fetchRuns()]);
+    } catch (err: any) {
+      console.error('Backend approval API failed:', err);
+      const errMsg = err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
+      alert(`승인 처리 실패: ${errMsg}`);
+      throw err;
     }
   };
 
-  const handleReject = async (approvalId: string, _reason: string) => {
-    setApprovals((prev) =>
-      prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
-    );
-    const matched = approvals.find((a) => a.id === approvalId);
-    if (matched) {
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === matched.runId
-            ? { ...r, state: 'failed', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+  const handleReject = async (approvalId: string, reason: string) => {
+    try {
+      await apiClient(`/v1/approvals/${approvalId}/reject`, {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      });
+      // Fetch fresh runs and approvals after server confirmed rejection
+      await Promise.all([fetchApprovals(), fetchRuns()]);
+    } catch (err: any) {
+      console.error('Backend approval reject API failed:', err);
+      const errMsg = err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
+      alert(`승인 반려 실패: ${errMsg}`);
+      throw err;
     }
   };
 
@@ -470,16 +458,20 @@ export const App: React.FC = () => {
           <DeveloperStudio
             nodes={nodes}
             runs={runs}
+            approvals={approvals}
             currentUser={currentUser}
             initialStep={studioStep}
             initialNodeId={studioNodeId}
             initialWorkspaceId={studioWorkspaceId}
             initialRunId={studioRunId}
             onNavigateTab={(tab, entityId) => {
-              setActiveTab(tab);
+              setActiveTab(tab as any);
               if (tab === 'runs' && entityId) setSelectedRunId(entityId);
+              if (tab === 'nodes' && entityId) setSelectedNodeId(entityId);
             }}
             onRefreshRuns={fetchRuns}
+            onApprove={handleApprove}
+            onReject={handleReject}
           />
         )}
 

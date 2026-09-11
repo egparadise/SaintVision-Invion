@@ -6,8 +6,10 @@ import {
   ProjectItem,
   NodeStopReceipt,
   PlacementRequirement,
+  ApprovalItem,
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { apiClient } from '@/shared/api/client';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
@@ -15,6 +17,7 @@ import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 export interface DeveloperStudioProps {
   nodes: NodeItem[];
   runs: RunItem[];
+  approvals?: ApprovalItem[];
   currentUser?: { id: string; name: string; role: string; tenantId?: string } | null;
   initialStep?: 1 | 2 | 3 | 4;
   initialNodeId?: string | null;
@@ -22,6 +25,8 @@ export interface DeveloperStudioProps {
   initialRunId?: string | null;
   onNavigateTab?: (tab: string, entityId?: string) => void;
   onRefreshRuns?: () => void;
+  onApprove?: (approvalId: string, nonce: string) => Promise<void>;
+  onReject?: (approvalId: string, reason: string) => Promise<void>;
 }
 
 const DEFAULT_PROJECTS: ProjectItem[] = [
@@ -77,6 +82,7 @@ const INITIAL_CODE_FILES = [
 export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   nodes,
   runs,
+  approvals = [],
   currentUser,
   initialStep = 1,
   initialNodeId = null,
@@ -84,6 +90,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   initialRunId = null,
   onNavigateTab,
   onRefreshRuns,
+  onApprove,
+  onReject,
 }) => {
   // Stepper state (1: Project & Workspace -> 2: Resources & Placement -> 3: Code & Execution -> 4: Results & Receipts)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(initialStep);
@@ -290,6 +298,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const selectedProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
   const currentRun = (liveRun && liveRun.id === activeRunId ? liveRun : runs.find((r) => r.id === activeRunId)) || runs[0];
   const boundNode = nodes.find((n) => n.id === (currentRun?.nodeId || selectedNodeId));
+  const matchedApproval = approvals.find((a) => a.runId === (currentRun?.id || activeRunId));
 
   // Dispatch Run execution (Codex P1: zero mock run on failure, complete contract binding)
   const handleDispatchRun = async () => {
@@ -479,26 +488,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       setSelectedReceipt(res);
       setReceiptModalOpen(true);
       setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
-    } catch (_err: any) {
-      // Fallback demo receipt
-      setSelectedReceipt({
-        receiptId: `rcp_${activeRunId || '01JABCDEF'}`,
-        runId: activeRunId || 'run_01JABCDE0001',
-        nodeId: selectedNodeId || 'nod_01JABCDEF01',
-        commandId: 'cmd_exec_sandbox',
-        exitCode: 0,
-        physicallyStopped: true,
-        resourceReclaimed: true,
-        verified: true,
-        output: {
-          sha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-          sizeBytes: 1024,
-        },
-        stoppedAt: new Date().toISOString(),
-        supervisorLabel: 'proc_sandbox_isolated',
-      });
-      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
-      setReceiptModalOpen(true);
+    } catch (err: any) {
+      console.warn('Failed to fetch NodeStopReceipt:', err);
+      const errMsg = err?.detail || err?.message || 'RES-RECEIPT-404';
+      alert(`물리 정지 영수증(NodeStopReceipt) 조회 실패: 해당 실행(${activeRunId})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다. (${errMsg})`);
     } finally {
       setIsLoadingReceipt(false);
     }
@@ -1585,6 +1578,92 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               </div>
             )}
           </div>
+
+          {/* Governance Approval Attention & Action Card */}
+          {currentRun?.state === 'awaiting_approval' && (
+            <div
+              style={{
+                padding: '20px 24px',
+                backgroundColor: 'rgba(210, 153, 34, 0.08)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid rgba(210, 153, 34, 0.35)',
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ flex: 1, minWidth: '280px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#d29922' }}>
+                      거버넌스 승인 대기 중 (Awaiting Governance Approval)
+                    </h3>
+                    {matchedApproval && <RiskBadge level={matchedApproval.riskLevel} />}
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '12px', lineHeight: 1.5 }}>
+                    {matchedApproval?.policyReason || '원격 노드 실행 또는 특권 자원 접근 정책(Rule #304)에 따라 검토자의 승인이 완료되어야 실행이 재개됩니다.'}
+                  </p>
+
+                  <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
+                    <span>🆔 안건 ID: <code>{matchedApproval?.id || 'apr_01JXYZ987654'}</code></span>
+                    <span>🔑 Idempotency Nonce: <code>{matchedApproval?.nonce || 'nonce_987654321'}</code></span>
+                    <span>🎯 대상: <strong>{matchedApproval?.target || 'Workspace Sandbox on Node-01'}</strong></span>
+                    {matchedApproval?.expiresAt && (
+                      <span>⏳ 만료 예정: {new Date(matchedApproval.expiresAt).toLocaleTimeString()}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {onApprove && matchedApproval && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await onApprove(matchedApproval.id, matchedApproval.nonce);
+                          refreshActiveRun();
+                          onRefreshRuns?.();
+                        } catch {
+                          // Error alert handled by onApprove
+                        }
+                      }}
+                    >
+                      ✓ 승인 확정 (Approve)
+                    </Button>
+                  )}
+                  {onReject && matchedApproval && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={async () => {
+                        const reason = prompt('승인 반려 사유를 입력하십시오:', '개발자 요청으로 Studio에서 반려');
+                        if (reason && reason.trim()) {
+                          try {
+                            await onReject(matchedApproval.id, reason.trim());
+                            refreshActiveRun();
+                            onRefreshRuns?.();
+                          } catch {
+                            // Error alert handled by onReject
+                          }
+                        }
+                      }}
+                    >
+                      ✕ 반려 (Reject)
+                    </Button>
+                  )}
+                  {onNavigateTab && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onNavigateTab('approvals', matchedApproval?.id)}
+                    >
+                      📋 승인 센터 상세 보기 →
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Dedicated Output Artifact & Verified Evidence Card */}
           <div
