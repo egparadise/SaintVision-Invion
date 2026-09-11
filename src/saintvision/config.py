@@ -74,6 +74,11 @@ class Settings:
     #: provider's availability a dependency of every request.
     oidc_jwks_file: str | None = None
 
+    #: Where the execution kernel writes committed output objects. Absent means
+    #: this control plane cannot serve downloads, which is reported rather than
+    #: answered with an empty body.
+    object_root: str | None = None
+
     @property
     def login_configured(self) -> bool:
         return all(
@@ -106,6 +111,7 @@ class Settings:
                 if value.strip()
             ),
             oidc_jwks_file=os.environ.get("INV_OIDC_JWKS_FILE"),
+            object_root=os.environ.get("INV_OBJECT_ROOT"),
         )
 
 
