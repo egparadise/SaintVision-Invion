@@ -183,3 +183,53 @@ class DistributedPlanRequest(Strict):
 
 
 HeartbeatRequest.model_rebuild()
+
+
+class MemberRoleRequest(Strict):
+    """Grant or change one project membership.
+
+    The role vocabulary is a contract with the execution kernel, which reads
+    ``public.project_members.role_code`` before it will start anything. A value
+    outside the set saves and then means nothing, so the pattern is closed
+    rather than free text.
+    """
+
+    role_code: str = Field(
+        pattern="^(owner|maintainer|operator|approver|viewer)$", alias="roleCode"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class UserStatusRequest(Strict):
+    status: str = Field(pattern="^(active|suspended|retired)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectStatusRequest(Strict):
+    status: str = Field(pattern="^(active|archived)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceStatusRequest(Strict):
+    status: str = Field(
+        pattern="^(provisioning|ready|suspended|deleting|deleted)$"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ResourceOfferRequest(Strict):
+    """How much of one capability the platform may use.
+
+    ``unit`` is whatever the calling screen measures in — cores, GiB, devices.
+    It is converted once, here, so two screens describing the same machine
+    cannot store two different numbers.
+    """
+
+    offered_quantity: float = Field(ge=0, alias="offeredQuantity")
+    unit: str = Field(min_length=1, max_length=16)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

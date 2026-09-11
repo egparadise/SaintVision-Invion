@@ -24,6 +24,7 @@ from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
+from .v1 import settings as settings_router
 from .v1 import storage as storage_router
 
 TRACEPARENT_VERSION = "00"
@@ -166,4 +167,5 @@ def create_app(
     app.include_router(nodes_router.router)
     app.include_router(storage_router.router)
     app.include_router(pools_router.router)
+    app.include_router(settings_router.router)
     return app
