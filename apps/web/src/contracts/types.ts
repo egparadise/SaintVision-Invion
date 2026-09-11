@@ -94,6 +94,10 @@ export interface ExecutionReadinessCheck {
   detail: string;
   resolvedBy?: ReadinessResolver;
   remedy?: string;
+  snapshotBytes?: number | null;
+  maxSnapshotBytes?: number;
+  maxContentBytes?: number;
+  runId?: string | null;
 }
 
 export interface WorkspaceReadiness {

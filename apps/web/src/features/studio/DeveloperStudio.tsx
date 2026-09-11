@@ -104,6 +104,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(initialWorkspaceId || 'wsp_01JABCDE001');
   const [readiness, setReadiness] = useState<WorkspaceReadiness | null>(null);
   const [isLoadingReadiness, setIsLoadingReadiness] = useState<boolean>(false);
+  const [readinessError, setReadinessError] = useState<string | null>(null);
 
   // Step 2: Placement & Resources
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(initialNodeId || 'nod_01JABCDEF01');
@@ -186,78 +187,25 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     };
   }, []);
 
-  // Fetch Execution Readiness (6-preconditions check)
+  // Fetch Execution Readiness (7-preconditions check: ADR-063 & execution_readiness.py)
   useEffect(() => {
     if (!selectedWorkspaceId) return;
     let mounted = true;
     setIsLoadingReadiness(true);
+    setReadinessError(null);
     apiClient<WorkspaceReadiness>(`/v1/workspaces/${selectedWorkspaceId}/execution-readiness`)
       .then((res) => {
         if (mounted) {
           setReadiness(res);
+          setReadinessError(null);
           setIsLoadingReadiness(false);
         }
       })
       .catch((err) => {
         if (mounted) {
-          console.warn('Execution readiness fetch fallback:', err);
-          const prj = projects.find((p) => p.id === selectedProjectId);
-          const isLinked = prj?.kernelLinked !== false && prj?.kernelEnabled !== false;
-          setReadiness({
-            workspaceId: selectedWorkspaceId,
-            projectId: selectedProjectId,
-            executable: isLinked,
-            scope: 'workspace-preconditions-not-execution-admission',
-            nodeReadiness: isLinked ? 'ready' : 'blocked',
-            admissionRequired: true,
-            checks: [
-              {
-                check: 'project_linked_to_kernel',
-                satisfied: isLinked,
-                detail: 'the execution kernel acts only on projects an operator has linked; creating a project deliberately does not grant that',
-                resolvedBy: 'operator',
-                remedy: 'ask the operator to enable this project for managed execution',
-              },
-              {
-                check: 'requester_registered_with_kernel',
-                satisfied: true,
-                detail: 'approval identity is registered by an operator and is one subject to one user, so a two-person rule cannot be satisfied by one person holding two identities',
-                resolvedBy: 'operator',
-                remedy: 'ask the operator to register this account for managed execution',
-              },
-              {
-                check: 'role_permits_requesting',
-                satisfied: true,
-                detail: "this user's project role permits requesting work",
-                resolvedBy: 'project owner',
-                remedy: 'a project owner changes the role through the members API',
-              },
-              {
-                check: 'workspace_ready',
-                satisfied: true,
-                detail: "the workspace status is 'active'",
-                resolvedBy: 'project owner',
-              },
-              {
-                check: 'kernel_request_permission',
-                satisfied: isLinked,
-                detail: 'the current account and project must have an enabled execution grant',
-                resolvedBy: 'operator',
-                remedy: "ask the operator to review this account's project execution permission",
-              },
-              {
-                check: 'tool_chosen_and_usable',
-                satisfied: true,
-                detail: 'development tool is chosen and verified on the target node',
-                resolvedBy: 'node owner',
-                remedy: 'connect the selected Node and verify its tool installation and login',
-              },
-            ],
-            blockedBy: isLinked ? [] : ['operator'],
-            summary: isLinked
-              ? 'All workspace preconditions are satisfied.'
-              : '1 of 6 preconditions are unmet; Node validation and execution admission are required.',
-          });
+          console.warn('Execution readiness fetch failed:', err);
+          setReadiness(null);
+          setReadinessError(err?.message || '사전 준비 상태 검증 API 조회 실패');
           setIsLoadingReadiness(false);
         }
       });
@@ -352,8 +300,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             runId: res.runId,
             outputHash: res.output.sha256,
             outputSizeBytes: res.output.sizeBytes,
-            verifiedEvidenceId: res.evidence?.evidenceId || `evi_${res.runId}`,
-            exitCode: res.stopReceipt?.exitCode ?? 0,
+            verifiedEvidenceId: res.evidence?.evidenceId || null,
+            exitCode: res.stopReceipt?.exitCode ?? null,
             exportedAt: res.completedAt || new Date().toISOString(),
           });
         } else {
@@ -516,14 +464,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           filesCount: files.length,
           outputDigest: effectivePayload.outputHash,
           outputSizeBytes: effectivePayload.outputSizeBytes ?? 0,
-          verifiedEvidenceId: effectivePayload.verifiedEvidenceId || `evi_${activeRunId}`,
+          verifiedEvidenceId: effectivePayload.verifiedEvidenceId || null,
         },
-        executionReceipt: selectedReceipt || {
-          exitCode: effectivePayload.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : 137),
-          physicallyStopped: currentRun?.state === 'succeeded',
-          verified: currentRun?.state === 'succeeded',
-          resourceReclaimed: currentRun?.state === 'succeeded',
-        },
+        executionReceipt: selectedReceipt || (effectivePayload.stopReceipt ? effectivePayload.stopReceipt : null),
       };
 
       const blob = new Blob([JSON.stringify(artifactMeta, null, 2)], { type: 'application/json' });
@@ -909,7 +852,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               })}
             </div>
 
-            {/* Execution Readiness 6-Check Preconditions Matrix (ADR-063 / execution_readiness.py) */}
+            {/* Execution Readiness 7-Check Preconditions Matrix (ADR-063 / execution_readiness.py) */}
             <div
               style={{
                 marginTop: '8px',
@@ -923,10 +866,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
                   <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>🛡️ 워크스페이스 실행 준비 상태 검증 (Execution Readiness — 6대 전제조건)</span>
+                    <span>🛡️ 워크스페이스 실행 준비 상태 검증 (Execution Readiness — 7대 전제조건)</span>
                   </h4>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                    실행 실패의 5대 사전 원인과 1개 도구 유효성을 종합 평가하며, 각 미충족 항목에 대해 권한 있는 해결 담당자를 반환합니다.
+                    실행 실패의 6대 사전 원인과 1개 입력 매니페스트를 종합 평가하며, 각 미충족 항목에 대해 권한 있는 해결 담당자를 반환합니다.
                   </div>
                 </div>
                 {readiness && (
@@ -949,6 +892,19 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', padding: '12px 0' }}>
                   ⏳ 워크스페이스 사전 실행 전제조건을 검증하는 중...
                 </div>
+              ) : readinessError ? (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid rgba(248, 81, 73, 0.4)',
+                    backgroundColor: 'rgba(248, 81, 73, 0.08)',
+                    color: '#f85149',
+                    fontSize: '0.8125rem',
+                  }}
+                >
+                  <strong>⚠️ 준비 상태 검증 실패:</strong> {readinessError} (커널 서버 연결 및 워크스페이스 상태를 확인하십시오)
+                </div>
               ) : readiness ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '10px' }}>
@@ -961,6 +917,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         workspace_ready: '4. 워크스페이스 스토리지 준비',
                         kernel_request_permission: '5. 커널 실행 허가 (Execution Grant)',
                         tool_chosen_and_usable: '6. 개발 도구 선택 및 노드 검증',
+                        input_prepared: '7. 입력 매니페스트 및 동결 파일 준비',
+                        input_manifest_and_frozen_files: '7. 입력 매니페스트 및 동결 파일 준비',
                       };
                       return (
                         <div
@@ -995,6 +953,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                             {chk.detail}
                           </div>
+                          {chk.snapshotBytes !== undefined && chk.snapshotBytes !== null && (
+                            <div style={{ fontSize: '0.75rem', color: '#58a6ff', marginBottom: '2px' }}>
+                              📦 스냅샷 크기: {chk.snapshotBytes.toLocaleString()} / {chk.maxSnapshotBytes?.toLocaleString() || 65536} Bytes
+                            </div>
+                          )}
                           {chk.remedy && !isSatisfied && (
                             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
                               👉 조치 안내: {chk.remedy}
@@ -1642,6 +1605,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
                   <strong>⚠️ 커널 미연결 프로젝트:</strong> 운영자(Operator)가 이 프로젝트를 커널에 연결(<code>kernelLinked=true</code>)할 때까지 실행 투입이 안전하게 보류됩니다.
                 </div>
+              ) : readinessError ? (
+                <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(248, 81, 73, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #f85149', fontSize: '0.8125rem', color: '#f85149' }}>
+                  <strong>🛑 실행 전제조건 검증 실패:</strong> {readinessError} (커널 서버 연결 상태 확인 필요)
+                </div>
               ) : readiness && !readiness.executable ? (
                 <div style={{ marginTop: '12px', padding: '10px 14px', backgroundColor: 'rgba(210, 153, 34, 0.12)', borderRadius: 'var(--radius-sm)', border: '1px solid #d29922', fontSize: '0.8125rem', color: '#d29922' }}>
                   <strong>⚠️ 실행 전제조건 미충족:</strong> {readiness.summary} (조치 필요: {readiness.blockedBy.join(', ')})
@@ -1654,17 +1621,25 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   onClick={handleDispatchRun}
                   disabled={
                     isExecuting ||
+                    isLoadingReadiness ||
                     projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false ||
-                    (readiness ? !readiness.executable : false)
+                    !readiness ||
+                    !readiness.executable
                   }
                   style={{ padding: '8px 20px', fontWeight: 600 }}
                 >
                   {isExecuting
                     ? '⏳ 실행 등록 중...'
+                    : isLoadingReadiness
+                    ? '⏳ 준비 상태 검증 중...'
                     : projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false
                     ? '🔒 실행 보류 (커널 미연결)'
+                    : readinessError
+                    ? '🔒 실행 불가 (검증 실패)'
                     : readiness && !readiness.executable
                     ? '🔒 실행 보류 (전제조건 미충족)'
+                    : !readiness
+                    ? '🔒 실행 대기 (검증 미완료)'
                     : '⚡ 작업 실행 (Dispatch Run)'}
                 </Button>
                 <Button
@@ -2120,7 +2095,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   프로세스 종료 및 영수증 대조
                 </div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 600, color: currentRun?.state === 'succeeded' ? '#3fb950' : 'var(--color-text-primary)' }}>
-                  exitCode: {selectedReceipt?.exitCode ?? (artifactData?.exitCode ?? (currentRun?.state === 'succeeded' ? 0 : (currentRun?.state === 'running' ? 'N/A (실행 중)' : '미확인')))}
+                  exitCode: {selectedReceipt?.exitCode ?? (artifactData?.exitCode ?? (currentRun?.state === 'running' ? 'N/A (실행 중)' : '미확인'))}
                 </div>
                 <div style={{ fontSize: '0.6875rem', marginTop: '2px', fontWeight: 600 }}>
                   {selectedReceipt?.physicallyStopped || (currentRun as any)?.allPhysicallyStopped ? (
@@ -2165,12 +2140,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                         outputSizeBytes: artifactData.outputSizeBytes ?? null,
                         verifiedEvidenceId: artifactData.verifiedEvidenceId || null,
                       } : null,
-                      executionReceipt: selectedReceipt || (currentRun?.state === 'succeeded' ? {
-                        exitCode: artifactData?.exitCode ?? 0,
-                        physicallyStopped: true,
-                        verified: true,
-                        resourceReclaimed: true,
-                      } : null),
+                      executionReceipt: selectedReceipt || null,
                     },
                     null,
                     2

@@ -491,6 +491,14 @@ async function runFullSmokeJourney() {
     const createdWsp = await createWspRes.json();
     assert('Created workspace has valid id and active status', Boolean(createdWsp.id && createdWsp.status === 'active'));
 
+    // 3.1 Execution Readiness 7-Preconditions Check (ADR-063 & execution_readiness.py)
+    const readinessRes = await fetch(`${BACKEND_URL}/v1/workspaces/${createdWsp.id}/execution-readiness`);
+    assert('GET /v1/workspaces/{id}/execution-readiness returns HTTP 200', readinessRes.status === 200);
+    const readinessData = await readinessRes.json();
+    assert('Execution readiness evaluates exactly 7 preconditions', Array.isArray(readinessData.checks) && readinessData.checks.length === 7);
+    assert('Execution readiness includes input_prepared check', readinessData.checks.some((c) => c.check === 'input_prepared'));
+    assert('Active linked workspace reports executable: true', readinessData.executable === true);
+
     // 4. Studio Dispatch Run
     const dispatchRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs`, {
       method: 'POST',
@@ -524,11 +532,21 @@ async function runFullSmokeJourney() {
     const obsNode = nodeItems.find((n) => n.observationOnly);
     assert('Observation-only node (192.168.45.225) reports schedulable: false', Boolean(obsNode && obsNode.schedulable === false));
 
-    // 7. Result Artifact Download Endpoint Verification
+    // 7. Result Artifact Download & Canonical ResultView Verification
     const dlRes = await fetch(`${BACKEND_URL}/v1/runs/${dispatchedRun.id}/artifacts/download`);
     assert('GET /v1/runs/{id}/artifacts/download returns HTTP 200', dlRes.status === 200);
     const dlData = await dlRes.json();
     assert('Artifact download response contains deterministic outputHash', Boolean(dlData.outputHash?.startsWith('sha256:')));
+
+    const resultRes = await fetch(`${BACKEND_URL}/v1/runs/${dispatchedRun.id}/result`);
+    assert('GET /v1/runs/{id}/result returns HTTP 200', resultRes.status === 200);
+    const resultData = await resultRes.json();
+    assert('ResultView reports execution-kernel source', resultData.source === 'execution-kernel');
+
+    const artsRes = await fetch(`${BACKEND_URL}/v1/runs/${dispatchedRun.id}/artifacts`);
+    assert('GET /v1/runs/{id}/artifacts returns HTTP 200', artsRes.status === 200);
+    const artsData = await artsRes.json();
+    assert('Artifacts endpoint reports execution-kernel source', artsData.source === 'execution-kernel');
 
     // 8. Placement candidate discovery explanation
     const candRes = await fetch(`${BACKEND_URL}/v1/discovery/candidates?minCores=4&minMemoryGb=8`);

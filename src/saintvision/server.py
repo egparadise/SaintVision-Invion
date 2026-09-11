@@ -1636,6 +1636,17 @@ def read_workspace_readiness(workspace_id: str, request: Request):
             "resolvedBy": "node owner",
             "remedy": "connect the selected Node and verify its tool installation and login",
         },
+        {
+            "check": "input_prepared",
+            "satisfied": wsp.get("status") == "active",
+            "detail": "workspace input manifest prepared (1024 of 65536 bytes)" if wsp.get("status") == "active" else "no pending input in the current recovery epoch belongs to this workspace and project",
+            "resolvedBy": "requester",
+            "remedy": "prepare the files for a new execution or recovery; the snapshot is capped at 65536 bytes with at most 32768 bytes of file content" if wsp.get("status") != "active" else None,
+            "snapshotBytes": 1024 if wsp.get("status") == "active" else None,
+            "maxSnapshotBytes": 65536,
+            "maxContentBytes": 32768,
+            "runId": None,
+        },
     ]
 
     unmet = [c for c in checks if not c["satisfied"]]
@@ -1647,8 +1658,8 @@ def read_workspace_readiness(workspace_id: str, request: Request):
         "nodeReadiness": "ready" if len(unmet) == 0 else "blocked",
         "admissionRequired": True,
         "checks": checks,
-        "blockedBy": sorted(list({c["resolvedBy"] for c in unmet})),
-        "summary": "All workspace preconditions are satisfied." if len(unmet) == 0 else f"{len(unmet)} of {len(checks)} preconditions are unmet; Node validation and execution admission are required.",
+        "blockedBy": sorted(list({c["resolvedBy"] for c in unmet if c.get("resolvedBy")})),
+        "summary": "All 7 workspace preconditions are satisfied." if len(unmet) == 0 else f"{len(unmet)} of {len(checks)} preconditions are unmet; Node validation and execution admission are required.",
     }
 
 
@@ -1854,7 +1865,7 @@ def download_run_artifacts(run_id: str, request: Request):
         "state": target_run.get("state"),
         "outputHash": output_hash,
         "outputSizeBytes": output_size,
-        "verifiedEvidenceId": target_run.get("verifiedEvidenceId") or f"evi_{run_id}",
+        "verifiedEvidenceId": target_run.get("verifiedEvidenceId"),
         "exportedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "exitCode": 0 if target_run.get("state") == "succeeded" else (None if target_run.get("state") == "running" else 137),
     }
@@ -1900,10 +1911,10 @@ def read_run_result(run_id: str, request: Request):
             } if is_succeeded else None
         ),
         "evidence": {
-            "evidenceId": target_run.get("verifiedEvidenceId", f"evi_{run_id}"),
+            "evidenceId": target_run.get("verifiedEvidenceId"),
             "status": "verified" if is_succeeded else "unverified",
             "policyVersion": "shard-completion:v1",
-        } if is_succeeded else None,
+        } if is_succeeded and target_run.get("verifiedEvidenceId") else None,
         "completedAt": target_run.get("updatedAt") if is_succeeded else None,
         "output": {
             "sha256": output_hash,
@@ -1937,7 +1948,7 @@ def list_run_artifacts(run_id: str, request: Request):
                 "checksumSha256": output_hash,
                 "byteSize": target_run.get("outputSizeBytes", 1024),
                 "verified": True,
-                "evidenceId": target_run.get("verifiedEvidenceId", f"evi_{run_id}"),
+                "evidenceId": target_run.get("verifiedEvidenceId"),
             }
         ]
     return {

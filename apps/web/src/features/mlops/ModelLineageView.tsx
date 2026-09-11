@@ -65,8 +65,8 @@ export const ModelLineageView: React.FC = () => {
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            100% 적합 (Codex = Claude)
+          <div style={{ fontSize: '24px', fontWeight: 700, color: conformances.every((c) => c.conformancePassed) ? '#3fb950' : '#d29922', marginTop: '4px' }}>
+            {conformances.every((c) => c.conformancePassed) ? '100% 적합' : '일부 불일치'} ({conformances.map((c) => c.provider).join(' = ')})
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>W3C-Trace / SSE-v2 / RFC 9457 일치</div>
         </div>
@@ -92,7 +92,9 @@ export const ModelLineageView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#f0f6fc', marginTop: '4px' }}>
             {lineages.length} 개 모델
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>2개 Deployed, 1개 Staging</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {lineages.filter((m) => m.status === 'deployed').length}개 Deployed, {lineages.filter((m) => m.status === 'staging').length}개 Staging
+          </div>
         </div>
       </div>
 
@@ -241,25 +243,29 @@ export const ModelLineageView: React.FC = () => {
           <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
             <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>1. DATASET DIGEST</div>
             <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.datasetDigest.slice(0, 16)}...
+              {selectedModel.datasetDigest ? selectedModel.datasetDigest.slice(0, 16) + '...' : '미지정'}
             </div>
-            <div style={{ fontSize: '11px', color: '#3fb950', marginTop: '4px' }}>SHA-256 Verified</div>
+            <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+              {selectedModel.datasetDigest ? 'SHA-256 Verified' : '미검증'}
+            </div>
           </div>
 
           {/* Node 2: Source Git Commit */}
           <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
             <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>2. SOURCE COMMIT</div>
             <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.sourceCommitSha.slice(0, 12)}
+              {selectedModel.sourceCommitSha ? selectedModel.sourceCommitSha.slice(0, 12) : '미지정'}
             </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Git Signed SHA</div>
+            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>
+              {selectedModel.sourceCommitSha ? 'Git Signed SHA' : '커밋 없음'}
+            </div>
           </div>
 
           {/* Node 3: Training Run ID */}
           <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
             <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>3. TRAINING RUN</div>
             <div style={{ fontSize: '12px', color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.trainingRunId}
+              {selectedModel.trainingRunId || '미실행'}
             </div>
             <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime</div>
           </div>
@@ -267,10 +273,12 @@ export const ModelLineageView: React.FC = () => {
           {/* Node 4: Evaluation Score */}
           <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
             <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION</div>
-            <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
-              Acc: {(selectedModel.evalAccuracy * 100).toFixed(1)}%
+            <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
+              Acc: {selectedModel.evalAccuracy !== undefined ? (selectedModel.evalAccuracy * 100).toFixed(1) + '%' : '미평가'}
             </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>F1 Score: {selectedModel.evalF1Score}</div>
+            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+              F1 Score: {selectedModel.evalF1Score !== undefined ? selectedModel.evalF1Score.toFixed(3) : 'N/A'}
+            </div>
           </div>
 
           {/* Node 5: Governance Approval */}
