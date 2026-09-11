@@ -233,3 +233,23 @@ class ResourceOfferRequest(Strict):
     unit: str = Field(min_length=1, max_length=16)
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectCreateRequest(Strict):
+    """Create a project. The caller becomes its owner.
+
+    ``code`` is constrained because it appears in URLs and in operator
+    conversation; a project called "My Project (v2)!" is one nobody can refer to
+    unambiguously.
+    """
+
+    code: str = Field(pattern="^[a-z][a-z0-9-]{1,62}[a-z0-9]$")
+    display_name: str = Field(min_length=1, max_length=200, alias="displayName")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceCreateRequest(Strict):
+    name: str = Field(min_length=2, max_length=128)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

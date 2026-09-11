@@ -20,6 +20,7 @@ from ...errors import VAL_SCHEMA, InvError
 from ...identity.principal import Principal
 from ...services import discovery as discovery_service
 from ...services import pools as pool_service
+from ...services import projects as project_service
 from ...services.audit import record_event
 from ...units import CANONICAL_UNIT
 from .. import schemas
@@ -175,7 +176,15 @@ def create_pool(
     session: Session = Depends(get_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
-    principal.require_project(payload.project_id)
+    # Read now, not from the credential: a project created a moment ago
+    # belongs to its creator, and a membership revoked a moment ago is
+    # gone. A set fixed at sign-in expresses neither.
+    project_service.require_project_access(
+        session,
+        tenant_id=principal.tenant_id,
+        project_id=payload.project_id,
+        user_id=principal.user_id,
+    )
     pool = pool_service.create_pool(
         session,
         tenant_id=principal.tenant_id,
