@@ -41,3 +41,5 @@ CX-02는 구현·독립 검토·실제 운영 값 수신이 남아 in_progress�
 - 2026-09-12T00:32:35+09:00: `python tools/check_docs.py` exit0(24 원본 hash/278 versioned docs/48tasks), `python tools/check_ontology.py` exit0, `git diff --check` exit0. Obsidian 사전 check exit0:449개/변경9개/충돌0.
 
 - 계약/schema commit `ea7dbb00977d91ee2954815130267eaa672b4ebd` push exit0. 2026-09-12T00:32:55+09:00 같은 SHA CI6개 모두 job 시작 전 계정 결제/한도 failure. [CI ID·원인](../Evidence/operating-contract-ea7dbb0-ci.json), 기존 원인/대응은 [[2026-09-12_PTY-INTENT_오류와해결]] 참조. 로컬 schema 검사를 CI 완료로 표시하지 않는다.
+
+- 실제 전달 2026-09-12T00:33:22+09:00: source `a47a90550fcfdf464610bb23c365c88ac8cdc361` push exit0, `sync_obsidian.py --check → --apply → --check` 모두 exit0. 변경10개 export, 관리450개 hash 전부 일치, pending0/conflict0. 로컬 Obsidian 사본 범위이고 OneDrive 클라우드 업로드는 미확인. 이 영수증 commit도 같은 절차로 export한다.
