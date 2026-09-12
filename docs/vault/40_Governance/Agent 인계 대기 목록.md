@@ -170,6 +170,41 @@ B-2를 없애려고 integration 위에 병합 후보 branch를 만들어 실제�
 
 **이 답이 나오기 전에는 두 branch를 병합하면 안 된다.** 병합 자체는 6건 충돌로 기계적으로 가능하지만(B-2), 결과물은 위 두 시험이 실패하는 상태다.
 
+### B-4. **최우선** — 배포되는 backend가 인증도 DB도 없이 고정 데이터를 제공한다 (실측)
+
+B-3을 grep에 근거해 적었으므로 직접 실행해 확인했다. 결과가 B-3보다 무겁다.
+
+`deploy/Dockerfile.backend:29`
+
+```
+CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]
+```
+
+**운영 backend 컨테이너가 실행하는 응용이 바로 그 2442줄 `server.py`다.** `INV_*` 환경변수를 모두 제거하고 module을 import해 TestClient로 호출한 실측:
+
+| 확인 | 결과 |
+|---|---|
+| 설정 없이 import | 성공. module 수준에서 `app = FastAPI(...)` 생성 |
+| 노출 route | **56개** |
+| `/readyz` | **200** `{"status":"ready","scope":"authenticated-control-api","executionDispatcher":"active"}` |
+| `/v1/approvals` (인증 없음) | **200**, 승인 항목 반환 |
+| `/v1/runs`, `/v1/projects`, `/v1/nodes` (인증 없음) | **200**, 항목 반환 |
+| 인증 장치 | `Depends(`·`Security(`·`HTTPBearer`·`oauth2`·`verify_token`·`require_` **0건** |
+| 데이터베이스 | `psycopg`·`sqlalchemy`·`create_engine`·`DATABASE_URL` **0건** |
+| 고정 데이터 | 합성 id 36곳 하드코딩. `list_approvals()`는 module 수준 `APPROVALS`를 그대로 반환 |
+| integration에서의 시험 | `saintvision.server`를 import하는 시험 파일 **0개** |
+| 읽는 환경변수 | `PORT` 하나뿐 |
+
+즉 배포되는 backend는 **데이터베이스에 연결하지 않고, 어떤 route에도 인증이 없으며, 승인·Run·Project·Node를 하드코딩된 값으로 응답하면서, `/readyz`에서 스스로를 "authenticated-control-api"이자 "executionDispatcher: active"라고 보고한다.** 세 서술 모두 사실과 다르다.
+
+**내 이전 판단을 정정한다.** B-2에서 병합 충돌을 integration 쪽으로 남기며 "2인 승인 원칙 보안 통제를 지키기 위해서"라고 적었다. 그 검사는 실재하지만 **DB에 연결하지 않고 고정 데이터를 반환하는 프로그램 안에 있다.** 그것을 남기는 것은 운영 통제를 지키는 일이 아니다.
+
+이력: `4a1f58a feat(core): transition mock control-plane to production FastAPI server …`에서 mock이 "production" 이름을 얻었고, 이후 `268b400`·`f08bf33`·`f50310e`(합성 fallback 제거)·`fa01d77`(2인 승인)·`9e304d9`(터미널 ticket)가 그 위에 쌓였다. 정본 응용 `saintvision.api.app`은 정상적으로 import된다.
+
+**판단은 내 몫이 아니다.** 무엇을 배포할지는 Codex(커널)·Gemini(화면)·사용자의 결정이다. 다만 다음은 사실로 기록한다 — 지금 `deploy/Dockerfile.backend`대로 올리면 내부망의 누구나 자격증명 없이 `/v1/approvals`를 호출할 수 있고, 화면은 실재하지 않는 승인·Run·Project를 실제처럼 보여준다.
+
+확인 방법(재현): `INV_*`를 모두 지운 뒤 `src`를 path에 넣고 `from saintvision import server`, `TestClient(server.app).get("/v1/approvals")`.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
