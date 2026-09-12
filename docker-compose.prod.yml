@@ -27,18 +27,18 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - INV_DATABASE_URL=${INV_DATABASE_URL:?Set a deployment-specific non-owner login DSN}
+      - INV_BUSINESS_DSN=${INV_BUSINESS_DSN:?Set a deployment-specific non-owner login DSN}
       - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
       - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
       - INV_API_CONFIG=/run/saintvision/api.json
       - PORT=8080
     volumes:
-      - type: bind
-        source: ${INV_CONFIG_DIRECTORY:?Set the private server configuration directory}
+      - type: volume
+        source: server_config
         target: /run/saintvision
         read_only: true
-        bind:
-          create_host_path: false
+        volume:
+          nocopy: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/readyz"]
       interval: 10s
@@ -89,6 +89,9 @@ services:
       - saintvision-net
 
 volumes:
+  server_config:
+    external: true
+    name: ${INV_CONFIG_VOLUME:?Prepare a private server configuration volume first}
   postgres_data:
   minio_data:
 

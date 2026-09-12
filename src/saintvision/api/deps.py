@@ -46,7 +46,7 @@ def get_principal(
     and both are recorded.
     """
     if not authorization or not authorization.lower().startswith("bearer "):
-        raise InvError(AUTH_MISSING_CREDENTIAL, "a bearer credential is required")
+        raise InvError(AUTH_MISSING_CREDENTIAL, "a bearer credential is required", status=401)
     credential = authorization.split(" ", 1)[1].strip()
     principal = request.app.state.verifier.verify(credential)
     # Recorded on the request so the error handler can attribute a later denial.

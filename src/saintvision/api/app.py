@@ -102,6 +102,7 @@ def create_app(
             status_code=error.status or 500,
             content=body,
             media_type=PROBLEM_CONTENT_TYPE,
+            headers={"WWW-Authenticate": "Bearer"} if error.status == 401 else {},
         )
 
     @app.exception_handler(InvError)
