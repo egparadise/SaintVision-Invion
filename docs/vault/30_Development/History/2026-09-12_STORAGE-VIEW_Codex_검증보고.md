@@ -50,3 +50,6 @@ Obsidian check에서 진행판/Gemini 작업판/History 인덱스/인계 목록4
 
 
 전달 전 검사: check_docs.py exit0(원문24/문서324/작업48), check_ontology.py exit0, git diff --check exit0. PR19 설명을 새 인증 조회/검증 범위로 갱신하고 draft 유지. 보고 commit/push 후 보존 원문4개를 Git blob·mirror·staging hash로 대조하여 쓰기0 인수하고 Obsidian을 동기화한다.
+
+
+최종 전달: 보고4bc42c9 push exit0. 외부 원문4개는 동일 bytes 쓰기0 인수. 2026-09-12T14:16:07+09:00 Obsidian601개 hash일치/pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-view-obsidian-20260912.json). 영수증 포함 후속 commit도 push/재동기화한다. OneDrive 클라우드 업로드 미검증. 다음 Codex는 폴더-root policy 설치·교체/receipt, Claude9d7559e 독립 검토, Gemini 인증 GET 표시 연결.
