@@ -469,6 +469,17 @@ inv_app_676598fab9e441bbbedb inherits inv_kernel   (배포별 생성)
 
 확인 방법: `psycopg.connect("postgresql://inv_app:apptestonly@127.0.0.1:55440/saintvision_lan")`.
 
+### B-9 후속 — 원인 mechanism을 고치고, 탐지를 상시화했다 (`87eeb71`)
+
+B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지를 했다.
+
+1. **guard 수정**: `create_app_role`이 이미 있는 역할을 이름만 보고 받아들이지 않는다. 설계 모양(NOLOGIN·NOBYPASSRLS·NOSUPERUSER·NOCREATEDB·NOCREATEROLE)과 대조해 어긋나면 **속성을 말로 지목하며 거부**한다. `ALTER ROLE`은 일부러 하지 않는다 — 그 약한 역할이 지금 돌아가는 배포의 접속 역할일 수 있고, migration 도중 조용히 NOLOGIN으로 바꾸면 그 배포가 부수 효과로 죽는다. 시점은 운영자가 고르고, 이것은 크게 말하는 쪽을 고른다. (이 helper는 호출자가 0이었으므로 기존 migration의 동작은 변하지 않는다. 0001은 자기 복사본을 쓴다.)
+2. **탐지 상시화**: 판정 규칙은 `rls.py`의 순수 함수 `shape_deviations` 하나이고, `operational_readiness.py`가 매 실행 역할 모양을 검사해 exit code에 반영한다. **없음도 문제다** — 역할이 아예 없으면 migration이 돈 적이 없다는 뜻이지 문제없음이 아니다.
+
+실측: 시험 33개 통과, yield-to-predecessor를 되살리면 2개 실패. **실제 cluster에 읽기 전용으로 실행하면 `WEAKER inv_app`을 B-9 설명 그대로 출력한다** — 이 검사가 있었으면 B-9는 보고서가 아니라 알람이었다.
+
+시험 부수 정리: 역할은 cluster 전역이므로 readiness 시험이 자기 소유의 설계 모양 scratch 역할을 만들고 지우도록 바꿨다. 이 기계의 실제 약화된 `inv_app`에 시험 결과가 좌우되던 것을 끊었다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
