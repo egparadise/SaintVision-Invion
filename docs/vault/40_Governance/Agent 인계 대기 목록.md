@@ -122,6 +122,25 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 | **CX-02 credential 경계** | Codex | 실제 두 Provider의 실행/취소/collect/attest | CL-05 |
 | 실제 OIDC issuer·계정, 제공 폴더 경로와 소유자 동의, 원격 PC(.225) 실행 profile | 운영자·원격 운영자 | 운영 로그인 인수 | CL-02 |
 
+### B-2. 통합 시 주의 — 이 branch를 통째로 병합하면 Gemini의 최신 작업을 되돌릴 수 있다
+
+`review/claude-account-results`는 `2244853`에서 갈라진 **오래된 branch**이고, 이번 세션 이전의 commit들이 `apps/web/`과 `src/saintvision/server.py`의 **옛 판본**을 들고 있다. 그 사이 integration에는 더 새로운 판본이 들어왔다.
+
+| 파일 | integration의 최신 | 내 lane의 판본 |
+|---|---|---|
+| `apps/web/src/app/App.tsx` | `5109962` 요청자 자기 승인 차단(2인 승인 원칙) | `d486109` (더 오래됨) |
+| `src/saintvision/server.py` | `fa01d77` 서버 측 자기 승인 검사, smoke 133개 | `4a60a15` (더 오래됨) |
+
+**통째 병합 후 충돌을 "ours"로 정리하면 2인 승인 원칙의 자기 승인 차단이 사라진다.** 보안 통제가 조용히 되돌아가는 형태이므로 미리 적는다.
+
+**안전한 범위**: 이번 세션의 commit 15개(`9995122`~`f17ad62`)는 `tools/`·`tests/`·`src/saintvision/services/{context,pilot}.py`·`adapters/reference.py`와 공통 지침 파일만 건드린다. 실측:
+
+- 내 session이 건드린 source 파일 4개는 base 이후 integration에서 **변경 0건**이다.
+- 공통 지침 4개(`AGENTS.md`·`CLAUDE.md`·`GEMINI.md`·`skills/agent-delivery/SKILL.md`)는 양쪽이 **내용 동일**(같은 변경이 `1fba8c9`/`3ec288a`로 각각 들어감).
+- 내 session commit은 `apps/web/`과 `server.py`를 **건드리지 않는다**.
+
+따라서 그 범위만 옮기면 코드 충돌이 없다. 옛 이력까지 함께 가져갈 이유가 있다면 `apps/web/`과 `server.py`는 integration 쪽을 남겨야 한다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
