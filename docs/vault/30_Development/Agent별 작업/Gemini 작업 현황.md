@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T11:05:00+09:00"
+updated: "2026-09-12T13:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -93,14 +93,14 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
  아래 항목은 담당자가 매 작업 단위마다 갱신한다. 상세 기록은 History에 새 페이지로 남기며 이전 검증/실패 이력을 덮어쓰지 않는다.
  
  | 항목 | 현재 기록 |
- |---|---|
- | 마지막 작업 / 착수 카드 | GM-01~GM-06 전 6개 카드 구현 및 로컬 통합 검증 완결 (전 카드 review 전환, 전체 진척 65.63%, Gemini 75.0%) + 서버 및 브라우저 스모크 Two-Person Rule 403 차단 및 동반 검증 완결 (133/133 checks) |
- | 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.26 / 2026-09-12T11:05:00+09:00 |
- | branch / base SHA / 구현 SHA | integration/all-agents-unified / 7fb5b9b / fa01d77 (로컬 검증 완료) |
- | 작업한 것 | 1) GM-01, GM-05: 승인 센터 Two-Person Rule 서버 레벨 연동 — `/v1/approvals/{id}/approve`에 요청자 자가 승인 시도 시 RFC 9457 `403 SEC-TWO-PERSON-RULE-VIOLATION` 즉시 반환하도록 방화벽 검증 및 독립 피어 승인자(HTTP 200) 분리 실장.<br>2) E2E 브라우저 스모크 트랙 7 확장: 유효 Nonce 승인, 중복 승인 시 409 차단, 요청자 본인 승인 시 403 차단, 독립 피어 승인 성공까지 4개 항목을 추가하여 총 133개 항목 전수 통과 확인.<br>3) GM-06: ReleaseCandidateView 전 지표 동적 평가 및 SLO 위반 감지 테스트 완결 (106개 Vitest 테스트 무오류). |
- | 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 106개 테스트 100% 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 13개 트랙 133/133 checks 100% 통과)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Intranet deploy: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 257 docs), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks) |
- | CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke·2-PC·Deploy 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 / 운영 2-PC 실장비 인수 대기 |
- | 남은 문제 / 차단 이유 / 해소 담당 | Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험(CX-03) 대기; CI 결제/한도 문제로 CI job 미시작 |
- | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(CL-01/HO-GEMINI-CLAUDE-002), Codex 원격 PC 설치·7개 시험(CX-03), Gemini는 검토 피드백 대응 및 실장비 인수 대기 |
- | 진척도 산정 (AUDIT 기준) | **Gemini 담당 진척도: 75.0%** (900/1200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성)<br>**전체 시스템 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**) |
- | History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]], [[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]], [[2026-09-12_PTY-SEQUENCE-AND-RECONNECT_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+|---|---|
+| 마지막 작업 / 착수 카드 | GM-03, GM-05, GM-06: PTY 30초 일회용 티켓(/v1/terminal/tickets 발급·단일 사용 원칙·4003 차단) 및 ADR-038 노드 Drain/Undrain REST API 연동, 브라우저 스모크 154/154 checks 무오류 통과 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.29 / 2026-09-12T13:20:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 2814310 / fa01d77+로컬 완결 (로컬 검증 완료) |
+| 작업한 것 | 1) GM-03: PTY 터미널 일회용 티켓 시스템 실장 — 클라이언트 문자열 임의 생성 제거, 제어 평면 `/v1/terminal/tickets`에서 암호학적 30초 일회용 티켓 발급 후 WebSocket 인증(`?ticket=tkt_...`). 무효 티켓 및 재사용 시 4003 Policy Violation 즉시 차단.<br>2) GM-03, GM-05: ADR-038 노드 Drain/Undrain 제어 평면 REST API (`POST /v1/nodes/{id}/drain`, `POST /v1/nodes/{id}/undrain`) 연동 — Drain 시 스케줄링 즉시 배제(`schedulable: false`, `status: draining`), 배치 엔진(placement-preview) 하드 필터 자동 탈락, 보안 감사 원장(`AUDIT_LOGS`) 자동 기록, Undrain 시 복구.<br>3) GM-06, 도구: `tools/deploy_intranet.ps1` 배포 사전 검증 파이프라인의 정직한 범위 명시(정적 검증/빌드/스모크 통과 vs 물리 5대 실장비 인수 경계 분리) 및 실시간 게이트웨이 헬스 프로브 연동.<br>4) E2E 브라우저 스모크 검증 확장: Track 9 (티켓 발급, 정상 연결, 무효 티켓 4003 거부, 티켓 재사용 차단) 및 Track 14 (노드 Drain 격리, 배치 배제, 감사 원장, Undrain 복구) 21개 항목 추가하여 **154/154 checks (100% 통과)** 달성. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 106개 테스트 100% 통과)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 4.80s, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 14개 트랙 **154/154 checks 100% 통과**)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Intranet deploy preflight: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료, Gateway Healthy)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 257 docs PASS), `python tools/check_ontology.py` (exit 0, 48 tasks PASS) |
+| CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke(154)·2-PC(63)·Deploy(5) 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 (`HO-GEMINI-CLAUDE-002` v1.0.6) / 운영 2-PC 및 5대 실장비 인수 대기 |
+| 남은 문제 / 차단 이유 / 해소 담당 | Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험(CX-03) 대기; CI 결제/한도 문제로 CI job 미시작 |
+| 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(CL-01/HO-GEMINI-CLAUDE-002), Codex 원격 PC 설치·7개 시험(CX-03), Gemini는 검토 피드백 대응 및 실장비 인수 대기 |
+| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성, review 대기)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-11_GM01-GM02-GM04-ZERO-MOCK_Gemini_검증보고]], [[2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고]], [[2026-09-11_GM05-GM06-JOURNEY-AND-DEPLOYMENT_Gemini_검증보고]], [[2026-09-12_PTY-SEQUENCE-AND-RECONNECT_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |

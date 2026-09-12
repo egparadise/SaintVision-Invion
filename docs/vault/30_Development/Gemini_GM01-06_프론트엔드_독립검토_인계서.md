@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.5"
+version: "1.0.6"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T11:05:00+09:00"
+updated: "2026-09-12T13:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -47,11 +47,11 @@ source_of_truth: "Git"
   - 정적 고정 목록 대신 실제 대상 노드에 바인딩된 동적 워크스페이스 목록 렌더링.
 
 ### GM-03: 편집·PTY·Git·kill/drain 화면 (`S06-FE`, `S08-FE`)
-- **수정 위치**: `apps/web/src/features/terminal/WebTerminal.tsx`, `apps/web/src/shared/realtime/ws-terminal.ts`, `apps/web/src/features/admin/AdminSecurityConsole.tsx`, `apps/web/src/features/admin/securityEngine.ts`
+- **수정 위치**: `apps/web/src/features/terminal/WebTerminal.tsx`, `apps/web/src/shared/realtime/ws-terminal.ts`, `apps/web/src/features/admin/AdminSecurityConsole.tsx`, `src/saintvision/server.py`
 - **검토 중점**:
-  - `WebTerminal`: 오프라인 상태에서 임의 에코 및 가짜 `exit code: 0` 생성 코드 전면 제거, 정직한 `[전송 불가]` 오류 통지 및 30초 일회용 티켓 재접속(`handleReconnect`) 연동.
+  - `WebTerminal`: 클라이언트 임의 생성 문자열 티켓 전면 제거. 제어 평면 `/v1/terminal/tickets`에서 암호학적 30초 일회용 티켓 발급 후 WebSocket 인증(`?ticket=tkt_...`). 위조/만료/재사용 티켓은 4003 Policy Violation 즉시 차단.
   - `WsTerminalClient`: 클라이언트 측 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동 (`sendInput` 시 `{ type: 'data', payload, sequence }` 전송) 및 PTY 감사 순서(F2) 정렬, 재연결 및 오류 디스패치 테스트.
-  - `AdminSecurityConsole`: ADR-038 노드 Drain 통제(스케줄링 제외/해제 토글, `drainedNodesCount` 추적) 및 SHA-256 감사 로그 체인(`node_drain_activated`, `node_drain_deactivated`) 연동.
+  - `AdminSecurityConsole` & `server.py`: ADR-038 노드 Drain/Undrain 제어 평면 REST API (`POST /v1/nodes/{id}/drain`, `POST /v1/nodes/{id}/undrain`) 연동 — Drain 시 스케줄링 즉시 배제(`schedulable: false`, `status: draining`), 배치 엔진 하드 필터 자동 탈락, SHA-256 감사 원장(`AUDIT_LOGS`) 자동 기록, Undrain 시 복구.
 
 ### GM-04: Agent·AI/MLOps 예시와 검증 표시 제거 (`S09-FE`, `S10-FE`)
 - **수정 위치**: `apps/web/src/features/agent/agentEngine.ts`, `apps/web/src/features/agent/NaturalLanguageRunView.tsx`, `apps/web/src/features/mlops/mlopsEngine.ts`
@@ -60,10 +60,10 @@ source_of_truth: "Git"
   - `mlopsEngine`: 실제 API 미연결 시 임의 모델 적합성 표시를 배제하고 미실행/미평가 상태 정직하게 렌더링.
 
 ### GM-05: 실제 로그인과 2-PC 브라우저 여정 (`S03-FE`, `S04-FE`, `S07-FE`, `S08-FE`, `S11-FE`)
-- **수정 위치**: `apps/web/src/features/auth/Login.tsx`, `apps/web/src/features/approvals/ApprovalDetail.tsx`, `apps/web/src/contracts/types.ts`, `apps/web/src/app/App.tsx`, `tools/run_browser_smoke.mjs`
+- **수정 위치**: `apps/web/src/features/auth/Login.tsx`, `apps/web/src/features/approvals/ApprovalDetail.tsx`, `apps/web/src/contracts/types.ts`, `apps/web/src/app/App.tsx`, `src/saintvision/server.py`, `tools/run_browser_smoke.mjs`
 - **검토 중점**:
   - `Login.tsx`: OIDC 실패 시 `usr_01JABCDEF_ADMIN`으로 사일런트 자동 승격하던 코드 전면 제거, 실제 RFC 9457 ProblemDetails 기반 오류 표시.
-  - Two-Person Rule 승인 센터: 요청자 본인 자가 승인 차단(`ApprovalItem.requestedBy === currentUserId` 및 `usr_requester_alice` 검사) 및 사용자 통지 배너, 일회용 Nonce 리플레이 가드 및 중복 승인 시 409 Conflict 차단.
+  - Two-Person Rule 승인 센터: 서버 레벨 방화벽 및 UI 이중 검증 — 요청자 본인 자가 승인 시도 시 RFC 9457 `403 SEC-TWO-PERSON-RULE-VIOLATION` 즉시 반환, 독립 피어 승인 시 정상 200 통과, 일회용 Nonce 리플레이 가드 및 중복 승인 시 409 Conflict 차단.
   - 3회 제한 워크스페이스 복구 수명주기 (ADR-044 / ADR-045): `resume/prepare` → L2 승인 → `resume/enqueue` 순차 전이 및 `attempt >= 3` 시 차단.
 
 ### GM-06: 접근성·내부망 HTTPS·웹 rollback/교육 (`S11-FE`, `S12-FE`)
@@ -73,7 +73,7 @@ source_of_truth: "Git"
   - WCAG 2.1 AA 명도 대비(11.4:1) 및 키보드 탐색/스크린 리더 ARIA 표준 준수.
   - 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포 파이프라인.
   - 무중단 웹 롤백 엔진(`ReleaseManager` v1.0.0-rc.2 → rc.1 롤백) 검증.
-  - 운영자 교육 워크스루 4대 모듈 연동.
+  - 배포 사전 검증 스크립트(`tools/deploy_intranet.ps1`): 정적 빌드/스모크/설정 검증과 물리 5대 실장비 런칭 경계 분리 및 게이트웨이 라이브 프로브 연동.
 
 ---
 
@@ -82,22 +82,22 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 106개 테스트)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 106개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
-# 2. Vite 프로덕션 빌드 및 타입 검사
+# 2. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 3. 종합 E2E 브라우저 스모크 검증 (13개 트랙, 133개 항목)
+# 3. 종합 E2E 브라우저 스모크 검증 (14개 트랙, 154개 항목 100% 통과)
 node tools/run_browser_smoke.mjs
 
-# 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 63개 항목)
+# 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 63개 항목 100% 통과)
 node tools/verify_two_pc_distributed_execution.mjs
 
-# 5. 내부망 배포 자동화 파이프라인 (5개 배포 단계)
+# 5. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 6. 문서 무결성 및 온톨로지 검사
+# 6. 문서 무결성 및 온톨로지 검사 (257 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
