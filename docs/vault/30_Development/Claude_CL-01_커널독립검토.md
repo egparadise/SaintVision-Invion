@@ -1,10 +1,10 @@
 ---
 doc_id: "REVIEW-CLAUDE-CL01-001"
 title: "Claude CL-01 커널 독립 검토"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
-updated: "2026-09-11T20:40:00+09:00"
+updated: "2026-09-13T13:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -26,6 +26,21 @@ source_of_truth: "Git"
 **작성자의 시험 기록을 승인으로 옮겨 적지 않는다.** 아래 "확인함" 항목은 내가 실제로 조회하거나 실행한 결과이고, finding은 코드 위치와 재현 절차를 함께 둔다. 모든 소스 줄의 보안 감사는 아니다.
 
 CI는 세 Agent 공통으로 계정 결제·한도 문제로 실행 전에 차단되어 있다. 아래는 전부 로컬 실측이며 CI 통과와 동등하지 않다.
+
+## 재확인 — 2026-09-13 (workspace-bridge `6ff090b`)
+
+이 문서의 finding들은 `d14db0a` 기준이다. Codex의 후속 push를 **전부 실측으로** 재검증했다. 현재 상태:
+
+| finding | 상태 |
+|---|---|
+| **F1** | **미해결.** `leases.py`·`0031` 무변경. 아래 재현 절차 그대로 유효 |
+| **F2** | **수정 확인.** `frame()`이 Node 호출 전에 Run lock 아래 intent를 commit(`inv.terminal_frame_intents`, DDL `0034` — FORCE RLS·immutable·kernel 전용 grant). 같은 sequence·다른 내용은 실행 전 거부, sequence는 완료+1 강제. scratch DB 적용 실측. 관찰(차단 아님): 동일 digest의 재전송은 여전히 Node에 재도달 — 기존과 동일, Node sequence 계약 소관 |
+| **F3** | **소멸.** entrypoint 복원으로 fixture 서버가 `demo_server.py`로 재격리되고 폐기 함수 문제의 전제가 사라짐 |
+| **F4** | **소멸(동일 사유).** `.git` 제외 불일치는 남아 있으나 닫히는 방향의 정보 항목으로 유지 |
+
+추가로 신규 migration **0035~0037을 같은 기준으로 검토**했다 — 차단 finding 없음, 0036은 양방향 실측(failed+met_targets 거부/passed 수락), 0037은 CL-07의 원격 폴더 공백에 대한 커널 측 해답. 상세는 [[Agent 인계 대기 목록]]의 재확인 회신과 0035~0037 검토 절.
+
+**남은 것은 F1 하나다.**
 
 ## Finding
 
