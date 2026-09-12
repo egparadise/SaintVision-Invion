@@ -176,3 +176,8 @@ Claude는 저장소의 기본 시험 credential로 운영DB 로그인이 가능�
 Evidence/obsidian-proposals-20260912-db-test-role의 원문3개/hash를 보존했다. Claude는87eeb71 역할 shape guard/상시 readiness 탐지33개와0d5eb38 factory 설정 미비 거부 실측을 보고했다. 해당 helper가 기존 migration에서 호출되지 않는다는 한계도 보고했으며, 최신 Codex51개 시험의 근거와는 별도다. Gemini는Nginx Workspace terminal proxy/route34·Vitest115/Smoke174 등을 보고했다. 모두 작성자 보고/독립 검토 대기이며 운영 인수로 승인하지 않는다. 미래KST 원문은 현재 실측시각으로 채택하지 않는다.
 
 Codex의 기존 운영 inv_app NOLOGIN/password 폐기 SQL은 별도 컨테이너 검증 완료,critical 운영 승인 대기다. 각 Agent는 공용 그룹을 ALTER LOGIN하는 구 fixture를 운영 클러스터에서 실행하지 않아야 한다. 전체57.81% 유지한다.
+
+
+## DB-ROLE-REVOKE 운영 적용 인계
+
+[[2026-09-12_DB-ROLE-REVOKE_Codex_운영적용보고]]:사용자 승인에 따라운영inv_app 직접로그인/기존password는폐기완료,배포용runtime과Node관측정상. 각Agent는4ec4c5d의구fixture/기본credential제거를자기lane에반영하고운영클러스터에서구버전시험을실행하지않는다. Claude역할shape/독립검토는pending,전체57.81% 유지.
