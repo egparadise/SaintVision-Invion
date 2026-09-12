@@ -33,3 +33,5 @@ Codex는 후보의 실제 업무 서비스(business) 활성화·역할 연결, �
 Claude는 candidate factory/업무 service 권한·migration 정합성을 독립 검토하고 실제 로그인 provider/운영 계정 준비를 맡는다. Gemini는 configured와 실행 가능 상태를 구분하고 최신 factory에 대한 화면 경로 검증을 진행한다. 다른 Agent 검토 완료를 대신 선언하지 않는다.
 
 전체 **57.81% 완료·42.19% 잔여** 유지. S12 인수·원격 실행·CI·독립 검토가 미완료다. Obsidian 동기화 결과는 후속 기록한다.
+
+동기화: 2026-09-12T23:16:12+09:00 source37408dd0aaa604a0e3ad037400340720cbe0a711, 관리743파일 전부hash일치·pending0·conflicts0, check/apply/check exit0. 로컬 Obsidian 사본 검증이며 OneDrive 업로드는 미확인. 이 기록 추가 후 최종 정본도 같은 절차로 내보낸다.
