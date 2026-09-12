@@ -1,4 +1,4 @@
-﻿-- SaintVision PostgreSQL Initial Database Bootstrap
+-- SaintVision PostgreSQL Initial Database Bootstrap
 -- Roles and grants are owned by migrations. Do not pre-create inv_app as LOGIN:
 -- it is a NOLOGIN permission group, inherited by deployment-specific logins.
 -- Existing clusters require a separately reviewed credential remediation;
