@@ -18,6 +18,35 @@ RELATIONS = (
     "public.data_locations", "inv.storage_sample_requests",
     "inv.storage_sample_consumptions",
 )
+SELECT_COLUMNS = {
+    "public.storage_contributions": ("tenant_id", "contribution_id", "node_id", "status", "registered_by_user_id", "normalized_path", "version"),
+    "public.data_locations": ("tenant_id", "contribution_id", "location_id", "version", "relative_path", "byte_size", "checksum_sha256"),
+}
+
+
+def relation_access(conn, name):
+    schema, table_name = name.split(".", 1)
+    metadata = conn.execute("""SELECT c.oid,has_schema_privilege(current_user,n.oid,'USAGE') AS usage
+        FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+        WHERE n.nspname=%s AND c.relname=%s""", (schema, table_name)).fetchone()
+    present = metadata is not None
+    result = dict(relation=name, present=present, selectAllowed=None)
+    if not present:
+        return result
+    result["schemaUsageAllowed"] = metadata["usage"]
+    if not metadata["usage"]:
+        result["selectAllowed"] = False
+        return result
+    table = conn.execute("SELECT has_table_privilege(current_user,%s,'SELECT') AS allowed", (name,)).fetchone()["allowed"]
+    columns = SELECT_COLUMNS.get(name, ())
+    # A missing column is a schema mismatch, not a SQL error aborting the audit.
+    available = {r["attname"]: r["allowed"] for r in conn.execute(
+        """SELECT attname,has_column_privilege(current_user,attrelid,attnum,'SELECT') AS allowed
+        FROM pg_attribute WHERE attrelid=to_regclass(%s) AND attnum>0 AND NOT attisdropped""", (name,))}
+    result.update(tableSelectAllowed=table, requiredColumns=list(columns),
+                  missingColumns=[c for c in columns if c not in available],
+                  selectAllowed=(all(available.get(c, False) for c in columns) if columns else table))
+    return result
 REQUIRED_FILES = (
     "Replace-Storage.ps1", "worker_storage_bridge.py", "worker_replace.py",
     "worker_replacement.py", "worker_storage.py",
@@ -86,9 +115,7 @@ def inspect(state_path):
             WHERE n.tenant_id=%s AND n.node_id=%s""", (state["tenantId"], state["nodeId"])).fetchall()
         relations = []
         for name in RELATIONS:
-            present = conn.execute("SELECT to_regclass(%s) IS NOT NULL AS present", (name,)).fetchone()["present"]
-            allowed = conn.execute("SELECT has_table_privilege(current_user,%s,'SELECT') AS allowed", (name,)).fetchone()["allowed"] if present else None
-            relations.append(dict(relation=name, present=present, selectAllowed=allowed))
+            relations.append(relation_access(conn, name))
         nodes = [{k: node_view(r, now)[k] for k in
                   ("nodeId", "address", "status", "fresh", "lastSnapshotAt", "profileVersion", "agentVersion")}
                  for r in rows]

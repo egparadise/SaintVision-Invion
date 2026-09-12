@@ -1,6 +1,7 @@
 """Verify both published heads upgrade in newly allocated disposable databases."""
 
 import os
+import argparse
 from pathlib import Path
 import subprocess
 import sys
@@ -24,7 +25,7 @@ def main():
     from migration_graph import chain
 
     expected_head = chain()[-1].revision
-    for prior in (
+    priors = (
         "0018_workspace_resume",
         "0010_canonical_resource_units",
         "0019_workspace_api_integration",
@@ -48,7 +49,12 @@ def main():
         "0033_workspace_bridge_merge",
         "0034_terminal_frame_intents",
         "0035_credential_registry",
-    ):
+        "0036_recovery_target_outcome",
+    )
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--from-revision", choices=priors, help="Test one published starting revision; default tests all")
+    args = parser.parse_args()
+    for prior in ((args.from_revision,) if args.from_revision else priors):
         name = "inv_upgrade_test_" + uuid4().hex
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
