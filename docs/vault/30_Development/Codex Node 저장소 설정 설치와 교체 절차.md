@@ -1,10 +1,10 @@
 ---
 doc_id: "RUNBOOK-STORAGE-POLICY-001"
 title: "Codex Node 저장소 설정 설치와 교체 절차"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:40:43+09:00"
+updated: "2026-09-12T15:52:13+09:00"
 source_of_truth: "Git"
 ---
 
@@ -43,3 +43,10 @@ journal에는 contribution별 최소 버전이 남아 다른 contribution을 선
 start-node.sh는 Linux 경로와 policy hash 두 인수를 받고, storage-ready.json에 최소 로컬 기록을 남긴다. 이 파일은 Windows 다운로드 폴더가 아니라 WSL private worker 디렉터리에 있다. 오류 시 journal/키/volume을 보존한다. 서버 검증 전 연결 완료/스케줄링 가능으로 표시하지 않는다. 현 시험은 Linux Docker 설치2개이며 Windows launcher 실제 실행은 미검증이다.
 
 다음 첫 행동: Codex 기존 Node 통제된 교체 및 forward 재개 자동화. Claude ADR-093 독립 검토 pending.
+
+
+## 기존 Node 읽기 전용 사전 점검 (823b4b8)
+
+검토된 새 storage-plan.json을 준비한 Linux private worker 디렉터리에서 `python3 worker_replacement.py preflight storage-plan.json > replacement-preflight.json`으로 점검하고 `python3 worker_replacement.py recheck storage-plan.json replacement-preflight.json`으로 현재 상태를 다시 대조한다. 실행 중이면 거부하며 이 명령이 Node를 정지하지 않는다. clean exited 관측 Node 전용이다. 실패 컨테이너를 정리하는 수단이 아니다.
+
+결과에 키/파일 원문은 없으며 최대16MiB state를 검사한다. 용량 초과는 자동 생략하지 않고 거부한다. replacementAuthorized=false인 로컬 점검 결과이며 삭제 명령에 대한 승인이 아니다. 점검 후 변경을 원자적으로 차단하는 lock/fence는 후속 교체 executor에서 구현해야 한다. 실제 Windows/WSL/원격 적용은 미수행이다. 다음 Codex durable 교체 단계·forward 재개 구현, Claude ADR-094 검토 pending.

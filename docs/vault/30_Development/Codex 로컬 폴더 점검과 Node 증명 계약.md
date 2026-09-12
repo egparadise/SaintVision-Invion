@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.6.0"
+version: "1.7.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:40:43+09:00"
+updated: "2026-09-12T15:52:13+09:00"
 source_of_truth: "Git"
 ---
 
@@ -93,3 +93,8 @@ local startup receipt는 tenant/node/epoch·contribution·두 버전·hash이며
 ## ADR-093 — 새 LAN 컨테이너의 명시적 저장소 설치
 
 서버 등록값과 일치하는 exact policy/hash와 사용자가 허용한 특정 source 폴더만 설치 입력으로 받는다. Node 내부 root는 /contribution으로 고정하고 readonly/rprivate/nonrecursive mount를 inspect로 확인한다. policy를 root:root 0600으로 전달·재읽기 검증한다. 키/journal/private 폴더와 겹치는 source 및 링크 경로를 거부한다. 기존 컨테이너는 자동 교체하지 않는다. receipt는 동일 Node/epoch/정책 hash/버전과 실제 image/mount를 대조한 로컬 기록이며 operationalAcceptanceAssessed=false다. source inode 사전 재검사는 daemon mount의 원자적 descriptor pin 또는 관리자 변조 방지를 의미하지 않는다. 기존 Node 교체·서버 mTLS/Evidence·운영 인수는 후속이다. [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]] 참조.
+
+
+## ADR-094 — 교체 전 비변경 점검과 stale receipt
+
+정지된 정상 종료 관측 Node만 대상이다. identity/epoch·volume 소유/단독 사용·기존 mount를 검사하고 제한된 전체 상태 archive의 내용/권한 해시와 inspect/새 plan 해시에 묶는다. 키/원문은 반환하지 않는다. recheck는 현재 동일 기록만 수락한다. mount 순서는 정규화하되 속성은 유지한다. receipt는 권한 또는 daemon fencing이 아니며 replacementAuthorized=false다. actual replacement executor와 durable forward 재개는 후속, 현재 도구가 삭제·정지·교체를 수행하지 않는다. [[2026-09-12_STORAGE-REPLACE-PREFLIGHT_Codex_검증보고]] 참조.
