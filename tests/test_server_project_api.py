@@ -165,3 +165,29 @@ def test_project_scoped_resume_lifecycle(client):
     enq_data = enq_res.json()
     assert enq_data["state"] == "running"
     assert enq_data["attempt"] == 2
+
+
+def test_workspace_terminal_tickets_canonical(client):
+    # 1. Canonical workspace terminal tickets route
+    ws_ticket_res = client.post(
+        "/v1/workspaces/wsp_01JABCDE/terminal-tickets",
+        json={"sessionId": "sess_test_01"},
+    )
+    assert ws_ticket_res.status_code == 201
+    ticket_data = ws_ticket_res.json()
+    assert "ticketId" in ticket_data
+    assert ticket_data["ticketId"].startswith("tkt_")
+    assert ticket_data["workspaceId"] == "wsp_01JABCDE"
+    assert ticket_data["expiresInSeconds"] == 30
+    assert ticket_data["used"] is False
+
+    # 2. Flat terminal tickets route compatibility
+    flat_ticket_res = client.post(
+        "/v1/terminal/tickets",
+        json={"workspaceId": "wsp_01JABCDE", "sessionId": "sess_test_02"},
+    )
+    assert flat_ticket_res.status_code == 201
+    flat_data = flat_ticket_res.json()
+    assert "ticketId" in flat_data
+    assert flat_data["ticketId"].startswith("tkt_")
+    assert flat_data["workspaceId"] == "wsp_01JABCDE"

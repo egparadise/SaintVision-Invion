@@ -544,10 +544,23 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     if (!activeRunId) return;
     setIsCancelling(true);
     try {
-      await apiClient(`/v1/runs/${activeRunId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason: cancelReason }),
-      });
+      try {
+        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: cancelReason }),
+        });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/runs/${activeRunId}/cancel`, {
+            method: 'POST',
+            body: JSON.stringify({ reason: cancelReason }),
+          });
+        } else {
+          throw err;
+        }
+      }
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled (Reason: ${cancelReason}). Outbox holds command until NodeStopReceipt verified.` },
@@ -558,7 +571,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     } catch (err: any) {
       setLogs((prev) => [
         ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Cancel Failed] ${err.message || 'Error cancelling run'}` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Cancel Failed] ${err.problem?.detail || err.message || 'Error cancelling run'}` },
       ]);
     } finally {
       setIsCancelling(false);
@@ -571,8 +584,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     try {
       try {
         await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
-      } catch {
-        await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+        } else {
+          throw err;
+        }
       }
       setLogs((prev) => [
         ...prev,
@@ -580,7 +599,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       ]);
       onRefreshRuns?.();
     } catch (err: any) {
-      alert(err.message || '재개 준비 실패');
+      alert(err.problem?.detail || err.message || '재개 준비 실패');
     }
   };
 

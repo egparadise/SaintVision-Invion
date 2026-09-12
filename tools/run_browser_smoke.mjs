@@ -349,6 +349,17 @@ async function runFullSmokeJourney() {
     assert('Ticket validity is exactly 30s', ticketData.expiresInSeconds === 30);
     assert('Ticket initially marked unused', ticketData.used === false);
 
+    // Canonical workspace terminal ticket route check
+    const wsTicketRes = await fetch(`${BACKEND_URL}/v1/workspaces/wsp_smoke_test/terminal-tickets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: 'usr_smoke_operator' }),
+    });
+    assert('Workspace canonical terminal ticket issued successfully (HTTP 201)', wsTicketRes.status === 201);
+    const wsTicketData = await wsTicketRes.json();
+    assert('Workspace ticket ID starts with tkt_ prefix', Boolean(wsTicketData.ticketId?.startsWith('tkt_')));
+    assert('Workspace ticket binds workspaceId', wsTicketData.workspaceId === 'wsp_smoke_test');
+
     const validTicket = ticketData.ticketId;
 
     if (typeof globalThis.WebSocket !== 'undefined') {

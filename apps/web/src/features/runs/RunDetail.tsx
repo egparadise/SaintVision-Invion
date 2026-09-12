@@ -52,13 +52,24 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const handlePrepareResume = async () => {
     setIsPreparingResume(true);
     try {
-      await apiClient(`/v1/runs/${run.id}/resume/prepare`, { method: 'POST' });
+      const prjId = run.projectId || 'prj_01JABCDE';
+      try {
+        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, { method: 'POST' });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/runs/${run.id}/resume/prepare`, { method: 'POST' });
+        } else {
+          throw err;
+        }
+      }
       setResumeNotice(
         `✓ ADR-044 Workspace 재개 준비 완료: 불변 스냅샷 해시가 고정되었으며 Attempt #${(run.attempt ?? 1) + 1} 승인 요청이 발행되었습니다.`
       );
       onRefreshRun?.();
     } catch (e: any) {
-      alert(e.message || '재개 준비 실패');
+      alert(e.problem?.detail || e.message || '재개 준비 실패');
     } finally {
       setIsPreparingResume(false);
     }

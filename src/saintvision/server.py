@@ -2521,7 +2521,8 @@ async def events_sse_stream():
 
 
 @app.post("/v1/terminal/tickets", status_code=201)
-async def create_terminal_ticket(request: Request):
+@app.post("/v1/workspaces/{workspace_id}/terminal-tickets", status_code=201)
+async def create_terminal_ticket(request: Request, workspace_id: Optional[str] = None):
     """
     Issue cryptographically signed 30-second one-time ticket for PTY WebSocket access.
     """
@@ -2530,7 +2531,7 @@ async def create_terminal_ticket(request: Request):
         data = await request.json()
     except Exception:
         data = {}
-    workspace_id = data.get("workspaceId", "wsp_default")
+    ws_id = workspace_id or data.get("workspaceId", "wsp_default")
     user_id = data.get("userId", "usr_dev_01")
     ticket_id = f"tkt_{secrets.token_urlsafe(24)}"
     now = dt.datetime.now(dt.timezone.utc)
@@ -2538,7 +2539,7 @@ async def create_terminal_ticket(request: Request):
 
     record = {
         "ticketId": ticket_id,
-        "workspaceId": workspace_id,
+        "workspaceId": ws_id,
         "userId": user_id,
         "issuedAt": now.isoformat(),
         "expiresAt": expires_at.isoformat(),
@@ -2565,7 +2566,13 @@ def get_terminal_ticket(ticket_id: str, request: Request):
 
 
 @app.websocket("/v1/terminal/ws")
-async def terminal_websocket(websocket: WebSocket, ticket: Optional[str] = Query(None)):
+@app.websocket("/v1/workspaces/{workspace_id}/terminals/{session_id}")
+async def terminal_websocket(
+    websocket: WebSocket,
+    ticket: Optional[str] = Query(None),
+    workspace_id: Optional[str] = None,
+    session_id: Optional[str] = None,
+):
     now = dt.datetime.now(dt.timezone.utc)
     # 1. Require and validate 30s one-time cryptographic ticket
     if not ticket or ticket not in TERMINAL_TICKETS:

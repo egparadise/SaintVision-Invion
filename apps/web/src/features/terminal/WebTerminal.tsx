@@ -37,13 +37,20 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         setConnectionStatus('connecting');
         setTerminalOutput((prev) => [
           ...prev,
-          `[인계] 제어 평면(/v1/terminal/tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
+          `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
         ]);
-        const res = await fetch('/v1/terminal/tickets', {
+        let res = await fetch(`/v1/workspaces/${workspaceId}/terminal-tickets`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ workspaceId, sessionId }),
         });
+        if (res.status === 404) {
+          res = await fetch('/v1/terminal/tickets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ workspaceId, sessionId }),
+          });
+        }
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: 일회용 티켓 발급 거부`);
         }

@@ -372,18 +372,24 @@ export const App: React.FC = () => {
           method: 'POST',
           body: JSON.stringify({ decision: 'approve', nonce }),
         });
-      } catch {
-        // 2. Fallback to flat endpoint
-        await apiClient(`/v1/approvals/${approvalId}/approve`, {
-          method: 'POST',
-          body: JSON.stringify({ nonce }),
-        });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
+        // Never duplicate submission on 400 (Bad Request), 401 (Unauthorized), 403 (Two-Person Rule), or 409 (Conflict).
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/approvals/${approvalId}/approve`, {
+            method: 'POST',
+            body: JSON.stringify({ nonce }),
+          });
+        } else {
+          throw err;
+        }
       }
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
       console.error('Backend approval API failed:', err);
-      const errMsg = err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
+      const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
       alert(`승인 처리 실패: ${errMsg}`);
       throw err;
     }
@@ -399,18 +405,23 @@ export const App: React.FC = () => {
           method: 'POST',
           body: JSON.stringify({ decision: 'reject', reason }),
         });
-      } catch {
-        // 2. Fallback to flat endpoint
-        await apiClient(`/v1/approvals/${approvalId}/reject`, {
-          method: 'POST',
-          body: JSON.stringify({ reason }),
-        });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/approvals/${approvalId}/reject`, {
+            method: 'POST',
+            body: JSON.stringify({ reason }),
+          });
+        } else {
+          throw err;
+        }
       }
       // Fetch fresh runs and approvals after server confirmed rejection
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
       console.error('Backend approval reject API failed:', err);
-      const errMsg = err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
+      const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
       alert(`승인 반려 실패: ${errMsg}`);
       throw err;
     }
@@ -426,16 +437,21 @@ export const App: React.FC = () => {
           method: 'POST',
           body: JSON.stringify({ reason }),
         });
-      } catch {
-        // 2. Fallback to flat endpoint
-        await apiClient(`/v1/runs/${runId}/cancel`, {
-          method: 'POST',
-          body: JSON.stringify({ reason }),
-        });
+      } catch (err: any) {
+        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
+        const status = err?.problem?.status || err?.status;
+        if (status === 404) {
+          await apiClient(`/v1/runs/${runId}/cancel`, {
+            method: 'POST',
+            body: JSON.stringify({ reason }),
+          });
+        } else {
+          throw err;
+        }
       }
       fetchRuns();
     } catch (err) {
-      console.warn('Backend run cancellation API fallback:', err);
+      console.warn('Backend run cancellation API error:', err);
       setRuns((prev) =>
         prev.map((r) =>
           r.id === runId
