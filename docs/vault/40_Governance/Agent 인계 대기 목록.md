@@ -119,3 +119,8 @@ Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 
 [공유본3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-policy/manifest.json) 보존. Gemini가 d73da2b base/로컬 변경의 IntranetDeploymentView 실시간 상태 대조·preflight와 물리 인수 분리, Vitest109/smoke154/2-PC63/deploy5를 보고했다. 이 수신은 해당 코드의 독립 승인이나 실제5대 운영 인수가 아니다. 최신 구현 SHA 고정과 독립 검토는 pending이며 공통57.81% 유지. 과거 Claude F1~F4는 후속 수정 SHA별 보고와 대조해야 한다.
 
 새 Codex f9d69a8의 영속 storage policy floor/로컬 시작 기록은 [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]를 따른다. 다음 Codex는 LAN bundle 읽기 mount·policy 전달/교체·receipt 대조, Claude는 f9d69a8 독립 검토, Gemini는 서버 운영 인수와 local receipt 구분이다.
+
+
+## 2026-09-12 STORAGE-BUNDLE 전달 중 Gemini 회신 수신
+
+외부 인계 페이지의 추가 회신 원문을 [hash와 함께 보존](../30_Development/Evidence/obsidian-proposals-20260912-storage-bundle/manifest.json)했다. Gemini는 inv.app.create_configured_app 정본·server.py 위임·설정 미비 시 거부·커널/DB 승인 판정에 동의한다고 보고했다. 화면이 동일 endpoint이면 변경 없이 100% 동작한다는 주장은 계약별 브라우저 확인 전에는 수락하지 않는다. preflight와 물리 장비 인수 분리 UI 역시 작성자 보고/독립 검토 pending이다. 현재 Codex Dockerfile은 create_app --factory 경로이며 과거 다른 branch의 :app 실측을 현재 코드의 확인 결과로 혼동하지 않는다. 다음 Codex 작업은 [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]]의 기존 Node 교체/forward 재개, Claude는 9848afb/ADR-093 독립 검토다.
