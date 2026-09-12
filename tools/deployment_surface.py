@@ -49,6 +49,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 #: because what they *claim* matters as much as what the data routes return.
 PROBES: tuple[str, ...] = (
     "/readyz",
+    "/v1/auth/userinfo",
     "/healthz",
     "/v1/approvals",
     "/v1/runs",
@@ -126,6 +127,21 @@ def inspect(target: str, module_source: str | None) -> dict[str, Any]:
             report["claims"] = response.text[:200]
         if response.status_code < 400:
             entry["bytes"] = len(response.content)
+        elif response.status_code in (401, 403):
+            # It refused, which is the right answer — but refusing an absent
+            # credential is not the same as checking a present one. A route that
+            # turns a rejection into a success for *any* string beginning with
+            # "Bearer " has authentication in shape only, and that reads as
+            # protection to everyone downstream.
+            try:
+                retried = client.get(
+                    path, headers={"Authorization": "Bearer not-a-real-token"}
+                )
+            except Exception:  # noqa: BLE001
+                retried = None
+            if retried is not None and retried.status_code < 400:
+                entry["acceptsAnyBearerToken"] = True
+                entry["grants"] = retried.text[:160]
         report["answers"].append(entry)
     return report
 
@@ -157,6 +173,13 @@ def verdict(report: dict[str, Any]) -> list[str]:
         )
     if report.get("declaresAuthentication") is False:
         problems.append("the module declares no authentication of its own")
+    forged = [a for a in report["answers"] if a.get("acceptsAnyBearerToken")]
+    for answer in forged:
+        problems.append(
+            f"{answer['path']} refuses a missing credential and then accepts an "
+            f"arbitrary one: 'Bearer not-a-real-token' returns "
+            f"{answer.get('grants', '')[:120]}"
+        )
     return problems
 
 

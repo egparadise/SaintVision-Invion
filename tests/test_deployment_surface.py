@@ -136,3 +136,57 @@ def test_declared_authentication_is_noticed(module) -> None:
     report = inspect(f"{name}:app", source)
     assert report["declaresAuthentication"] is True
     assert "no authentication" not in " ".join(verdict(report))
+
+
+ACCEPTS_ANY_TOKEN = '''
+from typing import Optional
+from fastapi import FastAPI, Header
+from fastapi.responses import JSONResponse
+app = FastAPI()
+
+@app.get("/v1/auth/userinfo")
+def userinfo(authorization: Optional[str] = Header(None)):
+    # Refuses an absent credential, then accepts any present one. This is the
+    # shape that reads as protection to everything downstream.
+    if not authorization or not authorization.startswith("Bearer "):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    return {"sub": "usr_admin", "role": "cluster:admin"}
+'''
+
+REALLY_CHECKS = '''
+from typing import Optional
+from fastapi import FastAPI, Header
+from fastapi.responses import JSONResponse
+app = FastAPI()
+
+@app.get("/v1/auth/userinfo")
+def userinfo(authorization: Optional[str] = Header(None)):
+    if authorization != "Bearer the-one-valid-token":
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    return {"sub": "usr_admin"}
+'''
+
+
+def test_a_route_that_accepts_any_bearer_token_is_reported(module) -> None:
+    """Refusing an absent credential is not checking a present one.
+
+    This is the sharpest shape, because everything downstream reads the 401 as
+    proof that the endpoint authenticates.
+    """
+    name = module("surface_forged", ACCEPTS_ANY_TOKEN)
+    report = inspect(f"{name}:app", ACCEPTS_ANY_TOKEN)
+    entry = next(a for a in report["answers"] if a["path"] == "/v1/auth/userinfo")
+    assert entry["status"] == 401, "it must genuinely refuse the empty case first"
+    assert entry["acceptsAnyBearerToken"] is True
+    assert "cluster:admin" in entry["grants"]
+    assert [p for p in verdict(report) if "arbitrary one" in p]
+
+
+def test_a_route_that_verifies_the_token_is_not_reported(module) -> None:
+    """The check must not accuse an endpoint that actually validates."""
+    name = module("surface_real", REALLY_CHECKS)
+    report = inspect(f"{name}:app", REALLY_CHECKS)
+    entry = next(a for a in report["answers"] if a["path"] == "/v1/auth/userinfo")
+    assert entry["status"] == 401
+    assert not entry.get("acceptsAnyBearerToken")
+    assert not [p for p in verdict(report) if "arbitrary one" in p]
