@@ -786,6 +786,7 @@ def readiness():
     return {
         "status": "ready",
         "scope": "authenticated-control-api",
+        "workspaceAdmission": "configured",
         "executionDispatcher": "active",
     }
 

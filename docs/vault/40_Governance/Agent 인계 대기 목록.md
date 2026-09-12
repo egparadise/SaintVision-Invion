@@ -552,7 +552,7 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.18).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.19).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 
@@ -570,7 +570,7 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 - **검증 스위트 통과 증거**:
   1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 115개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
-  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 174/174 checks 100% 통과)
+  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 176/176 checks 100% 통과)
   4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 67/67 checks 100% 통과)
   5. Python 단위 시험: `.venv\Scripts\pytest tests/core/test_deployment_credentials.py tests/test_server_auth_integrity.py tests/test_server_project_api.py` (15 passed), `pytest tests/` (338 passed, 340 skipped)
   6. 내부망 배포 사전 검증: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과, Gateway Healthy)

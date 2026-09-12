@@ -83,6 +83,8 @@ async function runFullSmokeJourney() {
     assert('Backend /readyz returns HTTP 200', readyRes.status === 200);
     const ready = await readyRes.json();
     assert('Readiness probe status is ready', ready.status === 'ready');
+    assert('Readiness probe scope is authenticated-control-api', ready.scope === 'authenticated-control-api');
+    assert('Readiness probe specifies workspaceAdmission', Boolean(ready.workspaceAdmission));
 
     // -------------------------------------------------------------------------
     // 3. OIDC PKCE S256 Cryptographic Authentication Journey

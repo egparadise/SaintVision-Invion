@@ -42,7 +42,7 @@ try {
 }
 
 # Step 4: Run E2E Web Smoke Verification
-Write-Host "`n[4/5] Running E2E Smoke & Gateway Verification (174 checks)..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Running E2E Smoke & Gateway Verification (176 checks)..." -ForegroundColor Yellow
 node tools/run_browser_smoke.mjs
 if ($LASTEXITCODE -ne 0) { throw "E2E browser smoke suite failed with exit code $LASTEXITCODE" }
 
