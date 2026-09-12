@@ -2,7 +2,7 @@
 
 `saintvision.server:create_app --factory`는 `inv.app.create_configured_app`를 호출한다. `/healthz`는 프로세스 생존, `/readyz`는 공개 키 신뢰 파일·비소유자 DB 역할·tenant·복구 epoch 접근을 확인한다. Workspace가 없으면 응답의 `workspaceAdmission`은 `not_configured`이며 실행 가능 판정으로 사용하지 않는다.
 
-Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수행하지 않는다. 먼저 운영 절차에 따라 schema와 tenant, 프로젝트 권한 및 복구 epoch를 준비해야 한다. 빈 PostgreSQL을 기동하는 것만으로 서버가 준비되지 않는다. 현재 Compose PostgreSQL 이미지는 확장 요구까지 검증된 배포 패키지가 아니며 전체 스택 운영 인수는 별도다.
+Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수행하지 않는다. 먼저 운영 절차에 따라 schema와 tenant, 프로젝트 권한 및 복구 epoch를 준비해야 한다. 빈 PostgreSQL을 기동하는 것만으로 서버가 준비되지 않는다. 전체 스택 운영 인수는 별도다. 현재 migration은 pgvector 확장을 활성화하지 않는다. 모델 선택 이전 임의 벡터 차원을 고정하지 않는다.
 
 필수 환경 변수:
 
@@ -32,3 +32,14 @@ Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수
 컨테이너 UID/GID `65532:65532`가 디렉터리를 탐색하고 파일을 읽을 수 있어야 한다. Linux 설정 파일은 일반 파일이고 group/other 쓰기 권한이 없어야 한다(예: 소유자 65532, 파일 0600, 디렉터리 0700). Windows Docker bind mount의 실제 접근 권한은 후보 컨테이너에서 별도로 확인해야 한다. 운영 키 파일에 일괄 chmod/chown을 적용하지 않는다.
 
 환경을 안전하게 제공한 뒤 `docker compose -f docker-compose.prod.yml config --quiet`로 필수 설정을 검증한다. 실제 기동은 별도 운영 인수 단계다. 미설정 factory가 시작을 거부하거나 `/readyz`가 비정상이면 웹 서비스의 healthy 의존 조건을 충족하지 않는다. 기존 SQLite 개발 작업대의 로그인/예시 데이터를 운영 인증으로 옮기지 않는다.
+
+
+## 후보 이미지와 Workspace 인수
+
+`docker build -f deploy/Dockerfile.backend -t saintvision-backend-candidate:<source-sha> .`로 별도 후보 이미지를 만든다. 운영 컨테이너를 교체하기 전에 격리 PostgreSQL에 migration head를 적용하고 비소유자 로그인으로 `/readyz`와 권한별 `/v1/projects`를 검증한다.
+
+추가 Docker 시험은 `tests/integration/test_server_container.py`다. 전용 폐기 클러스터의 `INV_TEST_ADMIN_DSN`, 후보 `INV_TEST_SERVER_IMAGE`, 후보 컨테이너에서 접근할 **그 시험 DB만의** `INV_CONTAINER_TEST_DB_HOST`(포트5432)를 명시해야 한다. 다른 클러스터 주소를 넣지 않는다. 시험별 난수 컨테이너/volume만 생성·제거한다. Linux volume UID65532/0600·읽기 전용 mount 경계 시험과 Windows bind mount 인수는 별개다.
+
+Workspace 설정에는 `workingRoot`, `nodeId`, CPU·memory의 서로 다른 resource ID, digest로 고정한 sandbox profile, `policyVersion`, Ed25519 `signingKeyFile`, 명시적 TLS CA·client certificate·private key가 모두 필요하다. `workingRoot`는 Linux의 서비스 소유 개인 디렉터리여야 하며 쓰기 가능한 전용 영속 volume으로 준비한다. 시험의 tmpfs는 운영 영속 Workspace 대체물이 아니다. 서명 키와 TLS 개인 키는 소유자만 접근 가능해야 한다. 이 키들은 앞의 공개 identity trust 파일과 별도이며, 실제 운영 키는 인증된 전용 경로로 제공한다.
+
+`workspaceAdmission: configured`는 설정을 읽었다는 뜻이다. `executionDispatcher: external-worker-required`이면 별도 dispatcher가 여전히 필요하다. 실제 Node의 mTLS, image/profile capability, 프로젝트 Node 소속, CPU·memory resource 등록, 승인·Lease·kill switch가 검증되기 전에는 실행 가능한 Node로 표시하지 않는다. 합성 profile/TLS와 메모리 resource ID를 쓰는 후보 기동 시험은 원격 작업 실행이나 영속 복구 시험이 아니다.
