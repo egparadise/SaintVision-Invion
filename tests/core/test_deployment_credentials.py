@@ -7,6 +7,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED = {"INV_DATABASE_URL": "postgresql://example:example@postgres/saintvision",
+            "INV_RUNTIME_DSN": "postgresql://kernel:example@postgres/saintvision",
+            "INV_RECOVERY_EPOCH": "11111111-1111-4111-8111-111111111111",
+            "INV_CONFIG_DIRECTORY": str(ROOT / "deploy"),
             "POSTGRES_PASSWORD": "synthetic-admin-only", "MINIO_ROOT_USER": "synthetic-admin",
             "MINIO_ROOT_PASSWORD": "synthetic-storage-only"}
 
