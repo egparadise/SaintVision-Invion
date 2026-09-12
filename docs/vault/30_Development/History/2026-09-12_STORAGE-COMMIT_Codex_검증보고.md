@@ -46,3 +46,6 @@ Claude: fd0c081/0037 최소권한·RLS·잠금 순서·기존 StorageCheck와의
 
 
 전달 검증: `.work/cx01_local.py upgrade` exit0, 기존23개 prior→0037 head/replay/최소권한/definer audit 통과. [DB 업그레이드](../Evidence/storage-commit-upgrade-fd0c081.json). 종료 시 문서 보고 작성 중이라 harness dirty=true이며 제품 소스는 fd0c081에서 변경하지 않았다. [Windows22](../Evidence/storage-commit-windows-20260912.json)는 commit 전 시험으로 구분한다. check_docs.py exit0(원문24/문서321/작업48), check_ontology.py exit0, diff --check exit0. PR19 설명 갱신/draft 유지. 보고 commit/push 후 Obsidian check→apply→check를 진행한다.
+
+
+동기화 중 외부 수정4개를 감지해 최초 check exit1/쓰기0. [외부 원문/hash](../Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)를 보존하고 현재 정본4페이지에 수신/검토 대기 요약만 반영했다. Gemini의 새154개 smoke 등은 작성자 주장이고 실제 물리2-PC 인수로 올리지 않는다. 동일 원문 bytes의 Git 보존을 확인한 후 쓰기0 인수와 정상 동기화를 재개한다.

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.9"
+version: "1.0.10"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T12:57:44+09:00"
+updated: "2026-09-12T13:24:54+09:00"
 source_of_truth: "Git"
 ---
 
@@ -207,3 +207,10 @@ Claude f17ad62 partition runner3파일 변경을 git show로 확인했다. 작�
 [[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]:688678d Go opt-in 폴더 설정/mTLS/실제 서명 sample과 Python 검증 연결. Linux 실제 통합130, Windows98 및 Go 경계 시험 통과. durable challenge/nonce 소비·기존 StorageCheck/Evidence 원자 쓰기는 다음 작업. 운영 .225/Windows native 수집/CI/독립 검토 미완료, 전체57.81% 유지.
 
 현재 독립 검토 대상688678d/ADR-089. 작성자 Codex의 시험은 reviewer 승인과 별개다. Agent 인계 대기 목록 외부 Claude/Gemini 절은 원문을 보존해 수신했으며 기존 보완 SHA의 검토 요청을 삭제하지 않았다.
+
+
+## 외부 후속 인계 수신 (2026-09-12T13:24:54+09:00)
+
+공유본 외부 수정4개를 [원문·SHA256 보존본](../Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)으로 받았다. 정본의 최신 Codex 검증 이력은 유지한다. Claude의 기존 복원/Storage/RPO 정정 및 F1~F4는 고정 SHA별 후속 수정과 대조가 필요하다. Gemini는 GM-03 PTY ticket/Drain 연결과 smoke154/Vitest106/2-PC63/deploy5를 작성자 보고로 추가했다. 이번에는 해당 소스·실장비를 독립 검증하지 않았으며 자동 승인이나 운영2-PC/GPU 성공으로 채택하지 않는다. 원문 시각은 작성자 기재값이며 현재 검증 시각으로 사용하지 않는다.
+
+공통 성숙도는 검증된48행 기준57.81% 유지, Gemini의 기대65.63%는 독립 통합 검토 전이다. 새 Codex fd0c081/0037 저장소 기록은 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 다음 Codex는 sample 조회/운영 설치 계약, Claude는0037 독립 검토, Gemini는 최신 통합 SHA를 명시한 실제 API/브라우저 증거 보완이다. 수신은 다른 Agent 실행 또는 승인을 뜻하지 않는다.

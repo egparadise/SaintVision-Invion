@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T11:12:57+09:00"
+updated: "2026-09-12T13:24:54+09:00"
 source_of_truth: "Git"
 ---
 
@@ -142,3 +142,10 @@ Gemini1133666(ReleaseCandidateView subtitle/SLO)의 작성자 Vitest106·Smoke12
 ## 2026-09-12 STORAGE-CHECK 전달 중 작성자 제안 수신
 
 fa01d77의 서버 자가 승인403/스모크133 보고를 수신했다. 작성자는 GM01~04를 review로 보고했으며 독립 승인과 다르다. 최신 보안/운영 finding을 보존한다. Codex는 해당2파일 변경만 확인했고 UI/실장비 시험을 재실행하지 않았다. [원문](../Evidence/obsidian-proposals-20260912-storage-check/manifest.json). 공통 진척은 S12-ST의 새 실제 로컬 점검 증거만 반영하여57.81%로 갱신했다. 작성자65.63%를 채택한 것은 아니다.
+
+
+## 외부 후속 인계 수신 (2026-09-12T13:24:54+09:00)
+
+공유본 외부 수정4개를 [원문·SHA256 보존본](../Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)으로 받았다. 정본의 최신 Codex 검증 이력은 유지한다. Claude의 기존 복원/Storage/RPO 정정 및 F1~F4는 고정 SHA별 후속 수정과 대조가 필요하다. Gemini는 GM-03 PTY ticket/Drain 연결과 smoke154/Vitest106/2-PC63/deploy5를 작성자 보고로 추가했다. 이번에는 해당 소스·실장비를 독립 검증하지 않았으며 자동 승인이나 운영2-PC/GPU 성공으로 채택하지 않는다. 원문 시각은 작성자 기재값이며 현재 검증 시각으로 사용하지 않는다.
+
+공통 성숙도는 검증된48행 기준57.81% 유지, Gemini의 기대65.63%는 독립 통합 검토 전이다. 새 Codex fd0c081/0037 저장소 기록은 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 다음 Codex는 sample 조회/운영 설치 계약, Claude는0037 독립 검토, Gemini는 최신 통합 SHA를 명시한 실제 API/브라우저 증거 보완이다. 수신은 다른 Agent 실행 또는 승인을 뜻하지 않는다.
