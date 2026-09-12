@@ -87,6 +87,41 @@ def test_go_mtls_signed_sample_verified_by_python_without_operational_record(sto
     assert not list((a.path / "state").glob("*.intent"))
 
 
+def test_go_mtls_sample_commits_existing_evidence_and_storage_check(storage_remote):
+    from uuid import uuid4
+    from inv.storage_commit import StorageSampleStore
+    from test_storage_commit import register_owner
+
+    a = storage_remote
+    principal, _ = register_owner(a.e, a.contribution, a.root)
+    before = a.e.runs.get(a.e.tenant, a.run["runId"])
+    store = StorageSampleStore(a.e.db)
+    result = store.collect(
+        principal,
+        a.e.project,
+        a.run["runId"],
+        a.contribution,
+        request_id=str(uuid4()),
+        client=a.client,
+    )
+    assert not result["replayed"]
+    assert a.e.runs.get(a.e.tenant, a.run["runId"]) == before
+    with a.e.db.transaction(a.e.tenant) as c:
+        row = c.execute(
+            "SELECT healthy,detail FROM public.storage_checks WHERE check_id=%s",
+            (result["checkId"],),
+        ).fetchone()
+        assert row["healthy"] and row["detail"]["evidenceId"] == result["evidenceId"]
+        assert not row["detail"]["operationalAcceptanceAssessed"]
+        assert (
+            c.execute(
+                "SELECT envelope->>'result' AS result FROM inv.evidence WHERE evidence_id=%s",
+                (result["evidenceId"],),
+            ).fetchone()["result"]
+            == "succeeded"
+        )
+
+
 @pytest.mark.parametrize(
     "fault",
     ["corrupt", "missing", "size", "unknown", "oversized", "symlink", "hardlink", "parent-link"],

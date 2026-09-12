@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0036_recovery_target_outcome",
+  "revision": "0037_storage_sample_commit",
   "referenceSource": "c5f215475b203b1e6731927117093921cda9c183",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
