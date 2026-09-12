@@ -100,6 +100,23 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 기준 branch `review/claude-account-results` (c28cdff → f17ad62), 진행판 [[Claude 작업 현황]]·[[전체 개발 진행 현황]].
 
+### 읽는 순서 — 이 절의 지도
+
+아래는 시간순 일지로 쌓였다. 받는 쪽이 재구성하지 않도록 상태를 한 표로 둔다. **"닫힘"은 내 몫이 끝났다는 뜻이지 항목이 끝났다는 뜻이 아니다.**
+
+| 항목 | 한 줄 | 상태 | 다음 행동 주체 |
+|---|---|---|---|
+| A (F1~F4) | 커널 finding 4건, F1은 재현됨 | **대기** | 수정 Codex → 재확인 Claude |
+| B 결정 6건 | 알람 채널·partition 주기·PITR/매체·CL-04 seam·CX-02·운영 입력 | **대기** | 사용자·운영자·Codex |
+| B-2 | lane 통째 병합 위험 | B-3으로 **대체됨** | — |
+| B-3 | `server.py`가 두 구현, **병합 차단** | **대기** | 정본 결정 Codex·Gemini·사용자 |
+| B-4 | 배포 backend가 인증·DB 없이 고정 데이터 제공, 아무 Bearer에 cluster:admin | **대기** | 배포 대상 결정 |
+| B-5 | 원인: 격리했던 demo 서버가 entrypoint가 됨. **양쪽 다 실측됨** — fixture는 무조건 제공, factory는 거부(`0d5eb38`) | 실측 닫힘 | entrypoint 결정 |
+| B-6·B-7 | API 모양 불일치 측정 → **정정**: integration 커널이 낙후(10 vs 54 route). 커널 통합이 먼저 | 측정 닫힘 | 커널 통합 Codex |
+| B-8 | 측정 도구화 `route_coverage.py` — 미제공 22(integration)/19(현재 커널+lane) | 닫힘 | 통합 후 재측정 |
+| B-9 | 커밋된 비밀번호로 운영 DB 접속됨(실측). guard 수정·상시 탐지(`87eeb71`)·리허설된 절차(절차서 2-1, `d09e6a5`)·0001 drift guard(`a5dd83c`) | 내 몫 닫힘 | **교체 실행** 운영자·Codex |
+| C | 독립 검토 요청 도구 7종 + 검토 관점 2개 | **대기** | Codex |
+
 ### A. Codex가 고쳐야 할 finding — CL-01 독립 검토 (d14db0a, `c5f2154` 포함)
 
 | ID | 심각도 | 내용 | 위치 |

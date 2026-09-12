@@ -27,7 +27,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - INV_DATABASE_URL=postgresql://inv_app:apptestonly@postgres:5432/saintvision
+      - INV_DATABASE_URL=${INV_DATABASE_URL:?Set a deployment-specific non-owner login DSN}
       - PORT=8080
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
@@ -49,7 +49,7 @@ services:
     environment:
       - POSTGRES_DB=saintvision
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set a unique PostgreSQL administrator password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./deploy/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
@@ -70,8 +70,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      - MINIO_ROOT_USER=saintadmin
-      - MINIO_ROOT_PASSWORD=saintvision_secure_storage_2026
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:?Set the deployment storage administrator}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:?Set a unique storage administrator password}
     volumes:
       - minio_data:/data
     restart: unless-stopped
