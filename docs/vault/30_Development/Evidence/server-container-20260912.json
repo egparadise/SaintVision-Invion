@@ -1,0 +1,21 @@
+{
+  "command": "python -m pytest -q tests/integration/test_server_container.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "candidate Docker image default command, UID65532, readonly root/config, tmpfs workspace",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "isolatedContainerRemoved": true,
+  "verifiedKst": "2026-09-12T23:15:51+09:00",
+  "testCodeSha": "2bfd5fac4b1df437a9be4bd52154d8e7386409bd",
+  "imageSourceSha": "6ff090bc7d486ad1866d5cad37c44ffb190034f7",
+  "imageId": "sha256:b4cddf9f190906f8f3bc4b97a7b5c5a9584803c9eb1a98b2517452dcd2a29fce",
+  "imageUser": "65532:65532",
+  "buildExitCode": 0,
+  "testsPassed": 5,
+  "durationSeconds": 53.86,
+  "postgresImage": "postgres:16",
+  "imageInputsUnchangedSinceSource": true,
+  "testFileSHA256": "596a9a87313f88f9ba4be2244fd244c00959e97dc7c6df29e89d823762fb7912",
+  "workspace": "synthetic config loads; external dispatcher still required; no Node execution",
+  "configMount": "disposable Linux named volume; not Windows bind mount"
+}
