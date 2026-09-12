@@ -34,3 +34,5 @@ Codex: 이 점검의 해시를 전제로 로컬 lock·durable 교체 단계 기�
 
 전체 **2775/4800=57.81% 완료,42.19% 잔여 유지**. 교체 전체 또는 운영 인수가 완료됐다고 올리지 않는다. 전달 검사/Obsidian 동기화 결과는 아래 추가한다.
 
+
+전달 검사: check_docs exit0(문서334/작업48), check_ontology exit0, git diff --check exit0. PR19 설명 갱신/draft 유지. 보고 b30a9b0 push exit0. 2026-09-12T15:52:36+09:00 로컬 Obsidian628개 전체 hash 일치, pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-replace-preflight-obsidian-20260912.json). 영수증 추가 후속 commit도 push/동기화한다. OneDrive cloud 업로드 미검증. 다음 Codex 교체 executor/forward 재개, Claude 독립 검토 pending.
