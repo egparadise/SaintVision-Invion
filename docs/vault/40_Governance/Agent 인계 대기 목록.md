@@ -313,6 +313,35 @@ Claude의 B-6 실측(커널은 `/v1/projects/{project}/...` 범위, SPA는 평�
    - `npm --prefix apps/web test -- --run`: **19개 파일, 109개 테스트 통과 (100%)**
    - `npm --prefix apps/web run build`: **Exit 0, 클린 빌드 성공**
 
+### B-7. B-6 정정 — integration의 커널이 Codex의 현재 커널보다 크게 뒤처져 있다
+
+B-6에서 "23개가 어디에도 없다"고 적었다. **측정을 integration의 커널로 했기 때문에 과장됐다.** 커널 route 추출 정규식이 `@app.`·`@router.`만 보고 `@api.`를 놓친 것도 함께 고쳤다.
+
+| 대상 | 커널 route 수 |
+|---|---:|
+| `integration/all-agents-unified` | **10** |
+| `agent/codex/workspace-bridge` (CL-01에서 검토한 그 branch) | **54** |
+
+Codex의 현재 커널은 SPA가 원하는 **평면** 경로를 이미 제공한다: `/v1/runs/{id}/result`, `/v1/runs/{id}/artifacts`, `/v1/runs/{id}/artifacts/content`, `/v1/runs/{id}/logs`, `/v1/runs/{id}/attempts`. 터미널(`/v1/workspaces/{id}/terminal-tickets`, `/v1/workspaces/{id}/terminals/{session}`), `/v1/nodes/{id}/drain`, kill switch, containment 승인, Git 작업도 있다.
+
+integration의 `inv/app.py`에는 `ResultView`·`TerminalService`를 연결하는 코드가 **없다**. 그 이름은 `server.py`의 **주석**에만 나온다("Canonical kernel ResultView.artifacts: Files this Run produced"). 즉 **integration은 Codex의 현재 커널을 갖고 있지 않고, fixture 서버가 그 공백을 메우고 있다.**
+
+정정된 수치:
+
+| 조합 | SPA 30개 중 제공되지 않는 것 |
+|---|---:|
+| integration 커널(10) + integration api | 24 |
+| Codex 현재 커널(54) + 내 lane api | **21** |
+
+**그러므로 B-6의 결론을 수정한다.** "화면과 커널이 합의한 적이 없다"는 절반만 맞다. 정확히는 **두 가지가 동시에 참**이다.
+
+1. **integration이 Codex의 현재 커널을 통합하지 않았다.** 이것만으로도 큰 공백이며, 해소는 통합 작업이지 새 개발이 아니다.
+2. 현재 커널을 넣어도 **21개는 이름이 다르다** — 승인(`/v1/approvals/{id}/approve` vs `/v1/projects/{project}/approvals/{id}/decision`), 목록(`/v1/runs`·`/v1/workspaces`), 터미널(`/v1/terminal/tickets` vs `/v1/workspaces/{id}/terminal-tickets`), `receipts`·`events`·`auth/token`.
+
+따라서 **먼저 할 일은 adapter 계층 설계가 아니라 커널 통합**이다. 그 뒤에 남는 21개에 대해서만 "SPA를 옮길 것인가, 얇은 이름 맞춤 계층을 둘 것인가"를 결정하면 된다. 그 21개 중 상당수는 이름만 다르므로 2번은 생각보다 얇을 수 있다.
+
+측정 한계는 B-6과 같다(정적 비교, 동적 조립 경로는 놓칠 수 있음). 수치는 대략값이고, "integration이 10 route, Codex가 54 route"라는 대비가 결론을 지탱한다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
