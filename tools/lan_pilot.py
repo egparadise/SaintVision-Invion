@@ -209,7 +209,7 @@ def bundle(args):
         archive.writestr('manifest.json',json.dumps(manifest,indent=2))
         for name in ('ca.pem','signer.pub','peer-policy.json','node-agent.tar'):
             archive.write(path/name,name)
-        for name in ('prepare-worker.sh','start-node.sh','finish-worker.sh','Prepare-Worker.ps1','Start-Worker.ps1','worker_config.py','repair-node.sh','Repair-Worker.ps1'):
+        for name in ('prepare-worker.sh','start-node.sh','finish-worker.sh','Prepare-Worker.ps1','Start-Worker.ps1','worker_config.py','worker_storage.py','repair-node.sh','Repair-Worker.ps1'):
             archive.write(ROOT/'deploy/lan'/name,name)
     os.replace(temporary,output/'worker.zip')
     digest = hashlib.sha256((output/'worker.zip').read_bytes()).hexdigest()
