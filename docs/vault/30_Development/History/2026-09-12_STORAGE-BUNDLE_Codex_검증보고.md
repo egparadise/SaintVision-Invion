@@ -34,3 +34,5 @@ Claude: ADR-093/설치 입력·파일 경계·기존 volume 보존과 receipt �
 전체 개발 성숙도 **2775/4800=57.81% 완료 /42.19% 잔여 유지**. 신규 설치 경로 통과만으로 48행의 운영 합격 조건을 올리지 않는다. PR19 draft / 선행 검토 #21→#22→#19 유지. 전달 후 Obsidian check→apply→check 결과를 추가한다.
 
 전달 검사: check_docs exit0(문서331/작업48), check_ontology exit0, git diff --check exit0. PR19 설명 갱신 및 5cb3349 보고 push exit0. 첫 Obsidian check는 외부 인계 페이지1개 변경으로 exit1/쓰기0. Gemini 신규 정본 수렴 회신의 원문/hash를 보존하고 작성자 주장으로 수신 요약했다. 동일 원문 Git 보존 후 쓰기0 인수·정본 동기화를 진행한다.
+
+최종 전달: 19acdab push exit0. 2026-09-12T15:42:15+09:00 Obsidian622개 전체 hash 일치/pending0/conflict0/check→apply→check exit0. [동기화 영수증](../Evidence/storage-bundle-obsidian-20260912.json). 영수증 포함 후속 commit도 push/재동기화한다. OneDrive cloud 업로드는 미검증. 다음 Codex 통제된 기존 Node 교체와 forward 재개, Claude 독립 검토 pending.
