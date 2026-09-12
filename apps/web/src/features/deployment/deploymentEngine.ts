@@ -75,6 +75,14 @@ export class DeploymentManager {
       cacheControl: 'off',
       upgradeHeader: true,
     },
+    {
+      location: '/v1/workspaces/{id}/terminals/{sessionId}',
+      targetUpstream: 'http://pacs-backend:8080/v1/workspaces/.../terminals/...',
+      protocol: 'WebSocket',
+      bufferingOff: true,
+      cacheControl: 'off',
+      upgradeHeader: true,
+    },
   ];
 
   private nodeVerifications: NodeJourneyVerification[] = [
@@ -225,6 +233,15 @@ export class DeploymentManager {
     # Isolated Web Terminal (WebSocket Upgrade)
     location /v1/terminal/ws {
         proxy_pass http://pacs-backend:8080/v1/terminal/ws;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400s;
+    }
+
+    # Canonical Workspace Web Terminal (WebSocket Upgrade - ADR-038)
+    location ~ ^/v1/workspaces/[^/]+/terminals/ {
+        proxy_pass http://pacs-backend:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

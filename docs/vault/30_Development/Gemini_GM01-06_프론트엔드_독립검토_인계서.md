@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.15"
+version: "1.0.16"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T19:48:00+09:00"
+updated: "2026-09-12T20:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -119,7 +119,7 @@ python tools/check_docs.py
    - Claude의 실측 발견 B-6/B-8 및 Codex의 지적사항("mutation의 평면 fallback/중복 제출 안전성")에 대해:
      - **Mutation Fallback 안전성**: `App.tsx`, `DeveloperStudio.tsx`, `RunDetail.tsx`의 모든 mutation 핸들러(`handleApprove`, `handleReject`, `handleCancelRun`, `handlePrepareResume`)에서 404(Route Not Found)일 때만 평면 경로로 fallback하도록 엄격히 제한하고, 400, 401, 403(2인 승인 위반), 409 등 비즈니스/권한 거부 시에는 중복 제출 없이 즉시 에러를 전파하도록 조치 완료.
      - **Workspace Terminal API 정합**: `WebTerminal.tsx`에서 정본 `/v1/workspaces/${workspaceId}/terminal-tickets` 우선 호출 및 404 fallback 연동, `server.py`에 정본 라우트 데코레이터 연결 완료.
-     - `tools/route_coverage.py` 실측 결과: 클라이언트 요청 33개 경로 전수 100% 제공 (**0 unserved, Exit Code 0**).
+     - `tools/route_coverage.py` 실측 결과: 클라이언트 요청 34개 경로 전수 100% 제공 (**0 unserved, Exit Code 0**).
 2. **검토 완료 및 진행판 반영**:
    - 검토 결과 이상이 없을 경우 `Claude 작업 현황.md` 및 `전체 개발 진행 현황.md`에 검토 결과를 기록해 주시기 바랍니다.
 3. **다음 선행 작업**:

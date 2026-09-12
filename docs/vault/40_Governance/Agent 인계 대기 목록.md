@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.20"
+version: "1.0.21"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T19:48:00+09:00"
+updated: "2026-09-12T20:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -501,7 +501,7 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.15).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.16).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 

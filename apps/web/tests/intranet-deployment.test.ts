@@ -36,6 +36,12 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(wsRule).toBeDefined();
       expect(wsRule?.protocol).toBe('WebSocket');
       expect(wsRule?.upgradeHeader).toBe(true);
+
+      // Canonical Workspace Terminal rule (ADR-038)
+      const canonicalWsRule = rules.find((r) => r.location.includes('/terminals/'));
+      expect(canonicalWsRule).toBeDefined();
+      expect(canonicalWsRule?.protocol).toBe('WebSocket');
+      expect(canonicalWsRule?.upgradeHeader).toBe(true);
     });
 
     it('generates production-grade nginx.conf containing SSL and reverse proxy directives', () => {
@@ -48,6 +54,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(conf).toContain('proxy_buffering off;');
       expect(conf).toContain('proxy_set_header Upgrade $http_upgrade;');
       expect(conf).toContain('try_files $uri $uri/ /index.html;');
+      expect(conf).toContain('location ~ ^/v1/workspaces/[^/]+/terminals/');
     });
   });
 
