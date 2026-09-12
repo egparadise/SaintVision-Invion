@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.11"
+version: "1.0.12"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T15:22:00+09:00"
@@ -222,6 +222,21 @@ obtainable    False — factory refuses to build without arguments:
               'engine', 'settings', and 'verifier'
 → exit 0, "nothing here serves without configuration"
 ```
+
+**추가 실측 — 인증이 없는 것보다 나쁜 형태가 있다.** `/v1/auth/userinfo`는 Authorization을 **확인한다**. 헤더가 없으면 401을 돌려준다. 그런데 `"Bearer "`로 시작하기만 하면 무엇이든 받아들인다.
+
+```
+GET /v1/auth/userinfo                                  → 401
+GET /v1/auth/userinfo  Authorization: Bearer not-a-real-token
+  → 200 {"sub":"usr_01JABCDEF_ADMIN","role":"cluster:admin",
+         "roles":["cluster:admin","operator"], ...}
+```
+
+다른 어떤 route도 이 헤더를 읽지 않는다. 그리고 앞단 `apps/web/nginx.conf`에는 `auth_basic`·`auth_request`·`satisfy`·`deny`·`allow`·`jwt`·`oauth`가 **0건**이며 `/v1/`은 `proxy_pass http://control-plane:8080`으로 그대로 넘긴다. **경로 어디에도 인증이 없다.**
+
+**이 형태가 단순한 인증 부재보다 나쁜 이유**: 401이 downstream 전체에 "이 endpoint는 인증한다"는 증거로 읽힌다. 브라우저는 로그인하고, 신원을 돌려받고, 화면은 DB에 연결되지 않은 서버가 말해주는 것을 그대로 표시한다.
+
+도구도 이 형태를 잡는다(`5f950a2`): 401/403이 나오면 쓰레기 token으로 한 번 더 물어보고, 성공으로 바뀌면 무엇을 내주었는지 인용해 보고한다.
 
 **대비가 요점이다.** 설정을 요구하는 factory는 실수로 제공될 수 없고, module 수준 `app = FastAPI(...)`는 import만으로 제공된다. 도구는 한계도 함께 출력한다 — 이것은 응용을 보지 배포를 보지 않으며, 앞단 proxy가 인증한다면 그 proxy가 망과 데이터 사이의 유일한 장치라는 뜻이고 그것은 발견이 아니라 결정이어야 한다.
 
