@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.12"
+version: "1.0.13"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T19:48:36+09:00"
+updated: "2026-09-12T22:08:46+09:00"
 source_of_truth: "Git"
 ---
 
@@ -181,3 +181,9 @@ Codex의 기존 운영 inv_app NOLOGIN/password 폐기 SQL은 별도 컨테이�
 ## DB-ROLE-REVOKE 운영 적용 인계
 
 [[2026-09-12_DB-ROLE-REVOKE_Codex_운영적용보고]]:사용자 승인에 따라운영inv_app 직접로그인/기존password는폐기완료,배포용runtime과Node관측정상. 각Agent는4ec4c5d의구fixture/기본credential제거를자기lane에반영하고운영클러스터에서구버전시험을실행하지않는다. Claude역할shape/독립검토는pending,전체57.81% 유지.
+
+## 2026-09-12 CONFIGURED-SERVER 수신 제안·검토 대기
+
+외부 수정 3개 원문과 SHA-256은 `30_Development/Evidence/obsidian-proposals-20260912-configured-server`에 보존했다. Gemini 22:05 보고는 로그인 격리 통합·deploy_intranet.ps1의 미설정 환경변수 기본값 주입·작성자 시험 결과다. 기본값을 넣은 `compose config` 성공은 운영 credential/config 준비 증거가 아니다. 기본값은 합성 사전점검 과정에만 한정되고 실제 기동에 전파되지 않는지 독립 검토가 필요하다. 이번 Codex Compose는 추가 필수 설정3개와 /readyz를 연결했고 실제 factory HTTP/별도DB14개 시험을 통과했다(510ced4). Gemini의 기존5개 설정 시험과 route34/Smoke174/2-PC67은 작성자 보고로 보존하며 실제 원격 인수로 승격하지 않는다.
+
+Claude d09e6a5 scratch-role 리허설 및 a5dd83c 0001 drift guard13개 보고·인계 상태 지도는 수신했으며 독립 검토 전이다. 원문의 2026-09-13 미래 시각은 작성자가 적은 값으로 보존하고 실제 수행 시각으로 확정하지 않는다. B-9의 “운영 교체 실행 대기”는 Codex 20:47:51 운영 NOLOGIN/password 제거와 사후 검증으로 해소됐다. B-3/B-4의 타 lane demo entrypoint 문제는 해당 branch 통합 검토가 여전히 필요하며 정본은 saintvision.server:create_app→inv.app.create_configured_app이다. 공통 완료율57.81% 유지.

@@ -32,3 +32,5 @@ Codex: 실제 backend 후보 컨테이너 build/비root 설정 mount·DB 확장 
 Claude: 설정/역할·migration 계약 독립 검토, 실제 issuer·운영 계정 준비 및 업무 서비스 활성화 조건 확인. Gemini: /readyz의 workspaceAdmission과 실제 실행 가능 상태 구분, 후보 정본 서버 연결 후 브라우저 검증. 다른 Agent 작업을 대신 완료로 표시하지 않는다.
 
 전체 성숙도 **2775/4800=57.81% 완료,42.19% 잔여** 유지. 원격 실행/통합 CI/독립 검토/운영 인수 게이트 미완료. 동기화 결과는 후속 기록한다.
+
+Obsidian 첫 check는 외부 편집3개로 exit1/쓰기0. 원문·hash 보존 후 공통/Gemini/인계에 수신 요약을 추가했다. 원문을 증거로 보존한 동일 바이트만 sync state로 인수한 뒤 정본을 동기화한다.
