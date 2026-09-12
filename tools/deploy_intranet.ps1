@@ -42,7 +42,7 @@ try {
 }
 
 # Step 4: Run E2E Web Smoke Verification
-Write-Host "`n[4/5] Running E2E Smoke & Gateway Verification (154 checks)..." -ForegroundColor Yellow
+Write-Host "`n[4/5] Running E2E Smoke & Gateway Verification (174 checks)..." -ForegroundColor Yellow
 node tools/run_browser_smoke.mjs
 if ($LASTEXITCODE -ne 0) { throw "E2E browser smoke suite failed with exit code $LASTEXITCODE" }
 
@@ -50,6 +50,9 @@ if ($LASTEXITCODE -ne 0) { throw "E2E browser smoke suite failed with exit code 
 Write-Host "`n[5/5] Docker Compose Intranet Deployment Orchestration & Preflight..." -ForegroundColor Yellow
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     if (-not $env:INV_DATABASE_URL) { $env:INV_DATABASE_URL = "postgresql://preflight:preflight@postgres/saintvision" }
+    if (-not $env:INV_RUNTIME_DSN) { $env:INV_RUNTIME_DSN = "postgresql://preflight-kernel:preflight@postgres/saintvision" }
+    if (-not $env:INV_RECOVERY_EPOCH) { $env:INV_RECOVERY_EPOCH = "11111111-1111-4111-8111-111111111111" }
+    if (-not $env:INV_CONFIG_DIRECTORY) { $env:INV_CONFIG_DIRECTORY = "$PSScriptRoot\..\deploy" }
     if (-not $env:POSTGRES_PASSWORD) { $env:POSTGRES_PASSWORD = "preflight-postgres-password" }
     if (-not $env:MINIO_ROOT_USER) { $env:MINIO_ROOT_USER = "preflight-minio-user" }
     if (-not $env:MINIO_ROOT_PASSWORD) { $env:MINIO_ROOT_PASSWORD = "preflight-minio-password" }
