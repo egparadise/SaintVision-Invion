@@ -78,6 +78,7 @@ def hash_file(
     os_type: str = "linux",
     chunk_bytes: int = CHUNK_BYTES,
     monotonic=None,
+    max_bytes: int | None = None,
 ) -> ByteObservation:
     """Read a file and return what is actually in it.
 
@@ -89,6 +90,8 @@ def hash_file(
     from time import monotonic as _monotonic
 
     clock = monotonic or _monotonic
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 0):
+        raise VerificationFailed("invalid verification byte budget")
     if type(chunk_bytes) is not int or not 1 <= chunk_bytes <= CHUNK_BYTES:
         raise InvError(VAL_SCHEMA, "chunk_bytes must be an integer between 1 and 4 MiB")
 
@@ -107,6 +110,8 @@ def hash_file(
     started = clock()
     try:
         with allowed_root.open(target) as (handle, initial_size):
+            if max_bytes is not None and initial_size > max_bytes:
+                raise VerificationFailed("file exceeds verification byte budget")
             first_digest = None
             for _ in range(2):
                 handle.seek(0)
