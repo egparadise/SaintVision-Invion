@@ -54,3 +54,5 @@ Claude:688678d/공통 Schema/ADR-089·Go 경로/키 경계 독립 검토. Gemini
 Obsidian Agent 인계 대기 목록에 Claude/Gemini 추가 절이 있어 --check exit1/쓰기0. [원문/hash](../Evidence/obsidian-proposals-20260912-storage-node/manifest.json)를 보존하고 수신 요약만 정본에 추가했다. Claude d14db0a/c5f2154 기준F1~F4 및 f17ad62 운영 질문, Gemini fa01d77 작성자106/133/63/5 주장이다. 이번에 그 소스/운영을 다시 검증하지 않았으므로 최신 결함 판정·실제2-PC/GPU 통과·독립 승인으로 표시하지 않는다. ADR-074 등 후속 Codex 수정은 기존 보고를 확인해야 한다. 수신 확인은 코드 승인과 다르다.
 
 전달 준비: check_docs.py exit0(원문24/문서318/작업48), check_ontology.py exit0, git diff --check exit0. 생성 Schema/bundle/types 반영. PR19 설명 갱신/draft 유지. 원문 보존·commit/push 후 동일 bytes 인수 및 Obsidian 동기화를 진행한다.
+
+최종 전달: 보고 commit `7f30fe7740f0620790df49909584ecf616b78ee9` push exit0; 인계 외부 원문1개는 Git blob/hash 동일성 확인 후 쓰기0으로 인수. 2026-09-12T12:58:43+09:00 로컬 Obsidian 574개 hash 일치, pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-node-obsidian-20260912.json). 영수증 포함 후속 commit도 push 후 다시 동기화한다. OneDrive 클라우드 업로드는 미검증. 다음 Codex는 durable challenge/nonce·기존 Evidence/StorageCheck 원자 DB 쓰기, Claude688678d 독립 검토 pending.
