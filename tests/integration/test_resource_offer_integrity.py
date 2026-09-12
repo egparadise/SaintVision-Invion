@@ -78,6 +78,7 @@ def offers(env, tmp_path, monkeypatch):
         host=info["host"],
         port=int(info["port"]),
         database=info["dbname"],
+        query={k: v for k, v in info.items() if k not in {"user", "password", "host", "port", "dbname"}},
     )
     monkeypatch.setenv("INV_BUSINESS_DSN", url.render_as_string(hide_password=False))
     business = configured_business(env.db, jwt.auth)
@@ -197,6 +198,52 @@ def test_reservation_and_offer_reduction_cannot_both_spend_the_same_capacity(off
             (a.e.tenant,),
         ).fetchone()[0]
     assert sum(v for _, v in amounts(a)) >= held
+
+
+def test_release_waits_for_offer_and_retry_keeps_exact_requested_total(offers):
+    """F1: real release locks Node/Resource; replaying only its UPDATE omits that."""
+    a = offers
+    lease = a.e.leases.reserve(a.e.tenant, a.e.project, planned(a.e)["runId"],
+                              [Allocation(a.resources[1], 100)], key=uuid4().hex)[0]
+    key = int(uuid4().hex[:7], 16)
+    name = "offer_barrier_" + uuid4().hex
+    with psycopg.connect(a.e.owner, autocommit=True) as gate:
+        # Only the disposable test DB contains this hook. The application
+        # function itself and the lease writer are unmodified production code.
+        gate.execute(sql.SQL("CREATE FUNCTION public.{}() RETURNS trigger LANGUAGE plpgsql AS $body$ "
+                             "BEGIN IF NEW.resource_id={} THEN PERFORM pg_advisory_xact_lock({}); "
+                             "END IF; RETURN NEW; END $body$").format(
+                                 sql.Identifier(name), sql.Literal(a.resources[0]), sql.Literal(key)))
+        gate.execute(sql.SQL("CREATE TRIGGER {} AFTER UPDATE ON inv.resources "
+                             "FOR EACH ROW EXECUTE FUNCTION public.{}()").format(sql.Identifier(name), sql.Identifier(name)))
+        gate.execute("SELECT pg_advisory_lock(%s)", (key,))
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(put, a, 1000)
+                try:
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline:
+                        blocked = gate.execute("SELECT 1 FROM pg_locks WHERE locktype='advisory' AND objid=%s AND NOT granted", (key,)).fetchone()
+                        if blocked:
+                            break
+                        time.sleep(.005)
+                    else:
+                        pytest.fail("Offer did not reach the slice-update barrier")
+                    with pytest.raises(DomainError) as refused:
+                        release(a.e, lease)
+                    assert refused.value.code == 'RES-0007'
+                    assert gate.execute('SELECT released_at IS NULL FROM inv.resource_leases WHERE lease_id=%s',
+                                        (lease['leaseId'],)).fetchone() == (True,)
+                finally:
+                    gate.execute("SELECT pg_advisory_unlock(%s)", (key,))
+                assert future.result(timeout=5).status_code == 200
+            assert sum(v for _, v in amounts(a)) == 1000
+            release(a.e, lease)
+            assert sum(v for _, v in amounts(a)) == 1000
+        finally:
+            gate.execute("SELECT pg_advisory_unlock(%s)", (key,))
+            gate.execute(sql.SQL("DROP TRIGGER {} ON inv.resources").format(sql.Identifier(name)))
+            gate.execute(sql.SQL("DROP FUNCTION public.{}()").format(sql.Identifier(name)))
 
 
 @pytest.mark.parametrize("change", ["revoke", "suspend", "wrong-permission"])
