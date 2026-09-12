@@ -190,3 +190,19 @@ def test_a_route_that_verifies_the_token_is_not_reported(module) -> None:
     assert entry["status"] == 401
     assert not entry.get("acceptsAnyBearerToken")
     assert not [p for p in verdict(report) if "arbitrary one" in p]
+
+
+def test_an_unimportable_target_is_inconclusive_not_a_pass(module) -> None:
+    """The failure mode this tool exists to remove, in the tool itself.
+
+    A checkout that cannot import the target has established nothing. Reporting
+    that as "nothing serves without configuration" would be a check that passes
+    because it could not run -- which is the shape this whole exercise has been
+    about.
+    """
+    name = module("surface_broken", "import a_module_that_is_not_installed\n")
+    report = inspect(f"{name}:app", None)
+    assert report["obtainable"] is False
+    assert report["how"].startswith("INCONCLUSIVE")
+    problems = verdict(report)
+    assert problems and "did not run" in problems[0]

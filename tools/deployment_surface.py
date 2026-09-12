@@ -76,7 +76,17 @@ def obtain(target: str) -> tuple[Any, str]:
     import importlib
 
     module_name, _, attr = target.partition(":")
-    module = importlib.import_module(module_name)
+    try:
+        module = importlib.import_module(module_name)
+    except Exception as error:  # noqa: BLE001
+        # Reported, not raised. A tool that tracebacks teaches people to
+        # distrust the tool; and "could not import" is a real answer that is
+        # not the same as "refuses by design" — it usually means this checkout
+        # cannot see a dependency the container would have.
+        return None, (
+            f"INCONCLUSIVE: module could not be imported here: "
+            f"{type(error).__name__}: {error}"
+        )
     if not attr:
         return None, "no attribute named; nothing to serve"
     candidate = getattr(module, attr, None)
@@ -149,6 +159,12 @@ def inspect(target: str, module_source: str | None) -> dict[str, Any]:
 def verdict(report: dict[str, Any]) -> list[str]:
     """Everything wrong with serving this, stated one finding per line."""
     problems: list[str] = []
+    if report["how"].startswith("INCONCLUSIVE"):
+        # Not a pass. The tool established nothing, and "could not run" must
+        # never read as "nothing wrong" — usually it means this checkout cannot
+        # see a dependency the container would have, so the question is still
+        # open.
+        return ["the check did not run: " + report["how"]]
     if not report["obtainable"]:
         return problems
     served = [
@@ -233,6 +249,17 @@ def main() -> int:
         print(f"database      {'referenced' if report['referencesDatabase'] else 'NOT referenced'}")
         print(f"authentication{'  declared' if report['declaresAuthentication'] else '  NOT declared'}")
 
+    if report["how"].startswith("INCONCLUSIVE"):
+        # Deliberately not phrased as a finding about the target. The tool
+        # established nothing, and saying anything stronger would turn "could
+        # not run" into evidence.
+        print(f"\nNOTHING ESTABLISHED — {report['how']}")
+        print(
+            "  This checkout could not import the target, which is not evidence "
+            "either way. Run it where the container's dependencies are present. "
+            "Exiting non-zero because an unanswered question is not a pass."
+        )
+        return 1
     if problems:
         print("\nnot fit to serve as it stands:")
         for problem in problems:
