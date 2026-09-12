@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.12"
+version: "1.0.13"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T15:22:00+09:00"
@@ -239,6 +239,28 @@ GET /v1/auth/userinfo  Authorization: Bearer not-a-real-token
 도구도 이 형태를 잡는다(`5f950a2`): 401/403이 나오면 쓰레기 token으로 한 번 더 물어보고, 성공으로 바뀌면 무엇을 내주었는지 인용해 보고한다.
 
 **대비가 요점이다.** 설정을 요구하는 factory는 실수로 제공될 수 없고, module 수준 `app = FastAPI(...)`는 import만으로 제공된다. 도구는 한계도 함께 출력한다 — 이것은 응용을 보지 배포를 보지 않으며, 앞단 proxy가 인증한다면 그 proxy가 망과 데이터 사이의 유일한 장치라는 뜻이고 그것은 발견이 아니라 결정이어야 한다.
+
+### B-5. 원인 — 격리해 둔 demo 서버가 운영 entrypoint가 되었다
+
+B-4까지는 증상이다. 원인은 단순하고 실측으로 확인된다.
+
+| | `review/claude-account-results` | `integration/all-agents-unified` |
+|---|---|---|
+| `src/saintvision/demo_server.py` | **있음** (1459줄, 고정 id 23개) | **없음** |
+| `src/saintvision/server.py` | **6줄**. `inv.app.create_configured_app`에 위임. docstring: *"Production entrypoint. Demo fixtures live in saintvision.demo_server explicitly."* | **2442줄**, 고정 id 34개 |
+| `deploy/Dockerfile.backend` | `saintvision.server:create_app` **`--factory`** | `saintvision.server:app` (module 수준 객체) |
+
+**격리돼 있던 demo 서버의 고정 id 23개가 integration의 `server.py`에 전부 들어 있다**(34개 중 23개 일치). `demo_server.py`는 그 branch에서 사라졌다.
+
+즉 내 branch가 `demo_server.py`라는 이름으로 명시적으로 격리하고 `QUARANTINE`에 사유와 함께 등록해 둔 fixture 서버가, integration에서 **`server.py`라는 이름으로 옮겨져 "Production Unified FastAPI Control Plane Server"로 개명되고 약 1000줄이 더해진 뒤 배포 대상이 되었다.** 격리 파일은 더 이상 존재하지 않으므로 `QUARANTINE` guard도 그것을 가리키지 못한다.
+
+entrypoint 방식도 바뀌었다. `--factory`는 설정을 요구하는 factory를 호출하므로 설정 없이는 뜨지 않는다. module 수준 `app`은 import만으로 뜬다. **이 한 글자 차이가 "설정 없으면 거부"와 "무조건 제공"을 가른다.**
+
+### B-5 판정에 필요한 답
+
+1. 운영 entrypoint를 `saintvision.server:create_app --factory`(커널 위임)로 되돌릴 것인가.
+2. 되돌린다면 `server.py`에 쌓인 Studio·승인·터미널 작업은 어디로 가는가 — 커널 API로 옮기는가, `demo_server.py`로 되돌려 격리하는가.
+3. 되돌리지 않는다면 인증·DB 연결·설정 게이트를 `server.py`에 넣는 일의 owner는 누구인가.
 
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
