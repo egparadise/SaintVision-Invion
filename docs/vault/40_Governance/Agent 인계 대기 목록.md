@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.11"
+version: "1.0.12"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T18:19:38+09:00"
+updated: "2026-09-12T19:48:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -157,3 +157,12 @@ Evidence/obsidian-proposals-20260912-lan-migration의 원문3개/hash manifest�
 
 
 추가 외부 변경(18:18 Gemini/base1a1719a)은 Evidence/obsidian-proposals-20260912-lan-migration-2에 별도 보존했다. 작성자는404만 mutation fallback/terminal canonical 경로를 보고했다(Smoke174,Pytest6,2-PC67,Vitest109,Deploy5,route33/0unserved). 독립 검토 전이다. 404는 라우트 부재뿐 아니라 객체 미존재·권한 은닉 응답일 수도 있으므로404만으로 안전한 재제출을 보장한다고 인정하지 않는다. 명시적 API capability/version 선택 또는 동일 idempotency/scope 보장 검토가 필요하며 kernel 연결/물리 인수와 별개다.
+
+
+## 2026-09-12 RETAINED-BACKUP 외부 보고와 우선순위 정정
+
+Evidence/obsidian-proposals-20260912-retained-backup의 원문3개와hash를 보존했다. Gemini는 Idempotency-Key/route404 판별·WebTerminal apiClient와Vitest114를 보고했다. 작성자 보고이며 실제 커널의 idempotency 저장·응답 계약과 운영 인수는 검토 대기다.
+
+Claude는 저장소의 기본 시험 credential로 운영DB 로그인이 가능하다고 보고했다. Codex가 실제 READ ONLY metadata를 확인한 결과 inv_app LOGIN=true,superuser=false,bypassrls=false,inv_kernel LOGIN=false이며 조회 순간 해당 그룹과inv_lan_runtime active session은0이었다(상시 미사용 증거 아님). 실제 password 인증은 이번 Codex 확인에서 재시도하지 않았다. deploy/init-db.sql의 고정 password LOGIN 생성뿐 아니라 tests/conftest.py의 기존 app_engine fixture에도 공용 inv_app 역할을 고정 password LOGIN으로 바꾸는 코드가 있어 재발 경로다. 폐기용 DB라도 역할은 클러스터 전역이라는 점을 반드시 수정해야 한다.
+
+최우선 다음 Codex: init SQL/compose 고정 로그인 제거, 테스트별 난수 login 역할 생성·정리로 공용 그룹 역할 변경 금지, 해당 회귀 검증. 그 뒤 실제 서비스 의존성과 권한 확인을 마치고 운영 inv_app NOLOGIN/password 폐기 조치를 별도 critical 운영 변경으로 제시한다. 현재 사용자 지침에서 critical 변경은 자동 승인 범위에서 제외되어 있으므로 이번에는 운영 credential/역할을 변경하지 않았다. 기존 정본 서버 candidate 작업보다 이 항목을 먼저 수행한다. 미래KST 원문은 현재 실측 시각으로 채택하지 않으며 전체57.81% 유지한다.

@@ -33,3 +33,12 @@ Evidence: [[lan-retained-backup-7a0a25b.json]], [[lan-retained-backup-7a0a25b-te
 다음 Codex: 기존 로컬 작업대와 별도 포트의 정본 서버 candidate를 구분해 운영 설정·인증·실제 DB 연결 검증 및 구체적 적용/복구 계획을 만든다. Claude: 보관 백업과 상위 복구 훈련/독립 검토. Gemini: 정본 candidate에 대한 화면 계약·실제 로그인 여정 확인. 운영 DB upgrade/kill switch 해제/Node 교체는 아직 수행하지 않았다.
 
 off-device/독립 클러스터/역할 복원/PITR/HTTP 로그인/Node journal/원격7개 시험은 미완료. 현재 DB 리허설은 같은 클러스터 기존 역할 재사용이다. 전체2775/4800=57.8125%,잔여42.1875% 유지. PR19 draft/독립 검토/CI/운영 인수 미완료. 최종 문서 검사와 Obsidian 영수증은 후속 기록한다.
+
+
+## 2026-09-12 RETAINED-BACKUP 외부 보고와 우선순위 정정
+
+Evidence/obsidian-proposals-20260912-retained-backup의 원문3개와hash를 보존했다. Gemini는 Idempotency-Key/route404 판별·WebTerminal apiClient와Vitest114를 보고했다. 작성자 보고이며 실제 커널의 idempotency 저장·응답 계약과 운영 인수는 검토 대기다.
+
+Claude는 저장소의 기본 시험 credential로 운영DB 로그인이 가능하다고 보고했다. Codex가 실제 READ ONLY metadata를 확인한 결과 inv_app LOGIN=true,superuser=false,bypassrls=false,inv_kernel LOGIN=false이며 조회 순간 해당 그룹과inv_lan_runtime active session은0이었다(상시 미사용 증거 아님). 실제 password 인증은 이번 Codex 확인에서 재시도하지 않았다. deploy/init-db.sql의 고정 password LOGIN 생성뿐 아니라 tests/conftest.py의 기존 app_engine fixture에도 공용 inv_app 역할을 고정 password LOGIN으로 바꾸는 코드가 있어 재발 경로다. 폐기용 DB라도 역할은 클러스터 전역이라는 점을 반드시 수정해야 한다.
+
+최우선 다음 Codex: init SQL/compose 고정 로그인 제거, 테스트별 난수 login 역할 생성·정리로 공용 그룹 역할 변경 금지, 해당 회귀 검증. 그 뒤 실제 서비스 의존성과 권한 확인을 마치고 운영 inv_app NOLOGIN/password 폐기 조치를 별도 critical 운영 변경으로 제시한다. 현재 사용자 지침에서 critical 변경은 자동 승인 범위에서 제외되어 있으므로 이번에는 운영 credential/역할을 변경하지 않았다. 기존 정본 서버 candidate 작업보다 이 항목을 먼저 수행한다. 미래KST 원문은 현재 실측 시각으로 채택하지 않으며 전체57.81% 유지한다.
