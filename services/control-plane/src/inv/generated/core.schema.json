@@ -4193,6 +4193,218 @@
         "outputMode"
       ],
       "additionalProperties": false
+    },
+    "NodeStorageChannel": {
+      "type": "object",
+      "properties": {
+        "tenant_id": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "node_id": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recovery_epoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f-]{36}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^https://"
+        },
+        "certificate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "node_id",
+        "recovery_epoch",
+        "version",
+        "endpoint",
+        "certificate_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageItem": {
+      "type": "object",
+      "properties": {
+        "location_id": {
+          "type": "string",
+          "pattern": "^dtl_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "relative_path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "checksum_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "location_id",
+        "version",
+        "relative_path",
+        "byte_size",
+        "checksum_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageChallenge": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/NodeStorageChannel"
+        },
+        "project_id": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/RunId"
+        },
+        "contribution_id": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "root_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "catalogued": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/NodeStorageItem"
+          }
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "issued_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expires_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "channel",
+        "project_id",
+        "run_id",
+        "contribution_id",
+        "root_version",
+        "catalogued",
+        "items",
+        "nonce",
+        "issued_at",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageSampleInput": {
+      "type": "object",
+      "properties": {
+        "challenge": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        }
+      },
+      "required": [
+        "challenge"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageSignedSample": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 88,
+          "maxLength": 88,
+          "pattern": "^[A-Za-z0-9+/]{86}==$"
+        }
+      },
+      "required": [
+        "payload",
+        "signature"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageRootConfig": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/NodeStorageChannel"
+        },
+        "contribution_id": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "root_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "root": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "channel",
+        "contribution_id",
+        "root_version",
+        "root"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [

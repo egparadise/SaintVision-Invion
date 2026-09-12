@@ -1217,6 +1217,70 @@ class TerminalBrowserOutput(BaseModel):
     outputMode: Literal['redacted-complete-lines']
 
 
+class NodeStorageChannel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tenant_id: TenantId
+    node_id: NodeId
+    recovery_epoch: UUID
+    version: conint(ge=1, le=2147483647)
+    endpoint: constr(pattern=r'^https://', min_length=1, max_length=2048)
+    certificate_sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeStorageItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    location_id: constr(pattern=r'^dtl_[0-9A-HJKMNP-TV-Z]{26}$')
+    version: conint(ge=1, le=2147483647)
+    relative_path: constr(min_length=1, max_length=1024)
+    byte_size: conint(ge=0, le=1048576)
+    checksum_sha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+
+
+class NodeStorageChallenge(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    project_id: ProjectId
+    run_id: RunId
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    catalogued: conint(ge=1, le=9007199254740991)
+    items: list[NodeStorageItem] = Field(..., max_length=32, min_length=1)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    issued_at: conint(ge=0, le=9007199254740991)
+    expires_at: conint(ge=0, le=9007199254740991)
+
+
+class NodeStorageSampleInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    challenge: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+
+
+class NodeStorageSignedSample(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    payload: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+    signature: constr(pattern=r'^[A-Za-z0-9+/]{86}==$', min_length=88, max_length=88)
+
+
+class NodeStorageRootConfig(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    root: constr(min_length=2, max_length=4096)
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

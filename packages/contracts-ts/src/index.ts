@@ -895,3 +895,49 @@ export interface TerminalBrowserOutput {
   text: string;
   outputMode: "redacted-complete-lines";
 }
+
+export interface NodeStorageChannel {
+  tenant_id: TenantId;
+  node_id: NodeId;
+  recovery_epoch: string;
+  version: number;
+  endpoint: string;
+  certificate_sha256: string;
+}
+
+export interface NodeStorageItem {
+  location_id: string;
+  version: number;
+  relative_path: string;
+  byte_size: number;
+  checksum_sha256: (string | null);
+}
+
+export interface NodeStorageChallenge {
+  channel: NodeStorageChannel;
+  project_id: ProjectId;
+  run_id: RunId;
+  contribution_id: string;
+  root_version: number;
+  catalogued: number;
+  items: Array<NodeStorageItem>;
+  nonce: string;
+  issued_at: number;
+  expires_at: number;
+}
+
+export interface NodeStorageSampleInput {
+  challenge: string;
+}
+
+export interface NodeStorageSignedSample {
+  payload: string;
+  signature: string;
+}
+
+export interface NodeStorageRootConfig {
+  channel: NodeStorageChannel;
+  contribution_id: string;
+  root_version: number;
+  root: string;
+}

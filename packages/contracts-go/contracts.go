@@ -897,3 +897,49 @@ type TerminalBrowserOutput struct {
     Text string `json:"text"`
     OutputMode string `json:"outputMode"`
 }
+
+type NodeStorageChannel struct {
+    Tenant_id TenantId `json:"tenant_id"`
+    Node_id NodeId `json:"node_id"`
+    Recovery_epoch string `json:"recovery_epoch"`
+    Version int64 `json:"version"`
+    Endpoint string `json:"endpoint"`
+    Certificate_sha256 string `json:"certificate_sha256"`
+}
+
+type NodeStorageItem struct {
+    Location_id string `json:"location_id"`
+    Version int64 `json:"version"`
+    Relative_path string `json:"relative_path"`
+    Byte_size int64 `json:"byte_size"`
+    Checksum_sha256 *string `json:"checksum_sha256"`
+}
+
+type NodeStorageChallenge struct {
+    Channel NodeStorageChannel `json:"channel"`
+    Project_id ProjectId `json:"project_id"`
+    Run_id RunId `json:"run_id"`
+    Contribution_id string `json:"contribution_id"`
+    Root_version int64 `json:"root_version"`
+    Catalogued int64 `json:"catalogued"`
+    Items []NodeStorageItem `json:"items"`
+    Nonce string `json:"nonce"`
+    Issued_at int64 `json:"issued_at"`
+    Expires_at int64 `json:"expires_at"`
+}
+
+type NodeStorageSampleInput struct {
+    Challenge string `json:"challenge"`
+}
+
+type NodeStorageSignedSample struct {
+    Payload string `json:"payload"`
+    Signature string `json:"signature"`
+}
+
+type NodeStorageRootConfig struct {
+    Channel NodeStorageChannel `json:"channel"`
+    Contribution_id string `json:"contribution_id"`
+    Root_version int64 `json:"root_version"`
+    Root string `json:"root"`
+}
