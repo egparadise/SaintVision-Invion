@@ -47,3 +47,5 @@ Gemini fa01d77은 서버/스모크2파일 변경과 작성자133/106/63/5 보고
 문서 검사·보고 push·Obsidian 결과는 전달 영수증에 추가한다.
 
 전달 준비: check_docs.py exit0(원문24·문서309·작업48), check_ontology.py exit0, git diff --check exit0. Python 변경3파일 Black 적용. PR19 설명 갱신/draft 유지. 외부2파일의 원문/hash를 보존했고 최종 보고 commit 뒤 동일 bytes 인수·정본 sync를 수행한다.
+
+보고5cca4eb commit/push exit0. 2026-09-12T11:13:49+09:00 외부 원문2개 동일 bytes 인수(목적지 쓰기0) 후 Obsidian check/apply/check exit0:540개 해시 일치·pending0·충돌0. [동기화 영수증](../Evidence/storage-check-obsidian-20260912.json). 이 영수증을 포함한 최종 문서도 commit/push 후 재동기화한다. OneDrive 클라우드 업로드 완료는 확인하지 않았다.
