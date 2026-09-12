@@ -43,7 +43,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+# Mirror the container's import path, not a narrower one. deploy/Dockerfile.backend
+# sets PYTHONPATH=/app/src:/app/services/control-plane/src, and judging the
+# entrypoint on less than the container sees reports INCONCLUSIVE about a module
+# the container would actually import — which is how this tool spent a day
+# unable to say whether the factory entrypoint refuses.
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT / "src"))
+_KERNEL_SRC = _ROOT / "services" / "control-plane" / "src"
+if _KERNEL_SRC.is_dir():
+    sys.path.insert(1, str(_KERNEL_SRC))
 
 #: Paths worth asking about without credentials. Health endpoints are here
 #: because what they *claim* matters as much as what the data routes return.
