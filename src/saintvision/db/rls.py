@@ -32,11 +32,63 @@ def policy_name(table: str) -> str:
     return f"{table}_tenant_isolation"
 
 
+#: What the application group role is designed to be, per property. One place,
+#: because two callers need the same answer: the migration that creates the
+#: role, and the operational report that checks a live deployment against it.
+DESIGNED_ROLE_SHAPE: dict[str, bool] = {
+    "rolcanlogin": False,
+    "rolbypassrls": False,
+    "rolsuper": False,
+    "rolcreatedb": False,
+    "rolcreaterole": False,
+}
+
+#: How each deviation reads to a person, and why it matters here.
+_SHAPE_MEANING: dict[str, str] = {
+    "rolcanlogin": (
+        "has LOGIN, but it is designed as a NOLOGIN group role — connections "
+        "come from per-deployment login roles that inherit it, so a password "
+        "on this role is a credential that should not exist"
+    ),
+    "rolbypassrls": "has BYPASSRLS, which makes every tenant policy decorative",
+    "rolsuper": "is SUPERUSER, which bypasses every permission this schema sets",
+    "rolcreatedb": "may CREATE DATABASE, which the application never needs",
+    "rolcreaterole": "may CREATE ROLE, which turns it into its own admin",
+}
+
+
+def shape_deviations(properties: dict) -> list[str]:
+    """How a role's actual properties differ from the designed shape.
+
+    Pure, so the migration path (SQLAlchemy) and the operational report
+    (psycopg) judge by the same rule instead of each keeping a copy that
+    drifts.
+    """
+    return [
+        _SHAPE_MEANING[name]
+        for name, designed in DESIGNED_ROLE_SHAPE.items()
+        if name in properties and bool(properties[name]) is not designed
+    ]
+
+
+class WeakerRoleExists(RuntimeError):
+    """The role is already there, and it is not the role the design describes."""
+
+
 def create_app_role(connection: Connection, *, role: str = APP_ROLE) -> None:
-    """Create the login-less application role if it does not exist.
+    """Create the login-less application role, or verify the one that exists.
 
     NOBYPASSRLS is stated explicitly rather than relied on as the default, so
     that reading this file answers the question.
+
+    The guard used to be ``IF NOT EXISTS`` and nothing more, which meant it
+    deferred to whatever already held the name. That is exactly how a deployed
+    database ended up with an ``inv_app`` that has LOGIN and a password
+    committed to the repository: a bootstrap script created the weaker role
+    first, and every later migration saw the name and moved on. A guard written
+    for idempotency must not yield to a weaker predecessor — so an existing
+    role is now checked against the designed shape, and a mismatch refuses
+    loudly instead of building tenant isolation on top of it.
     """
     connection.execute(
         text(
@@ -46,6 +98,27 @@ def create_app_role(connection: Connection, *, role: str = APP_ROLE) -> None:
             "END IF; END $$;"
         )
     )
+    row = connection.execute(
+        text(
+            "SELECT rolcanlogin, rolbypassrls, rolsuper, rolcreatedb, rolcreaterole "
+            "FROM pg_roles WHERE rolname = :role"
+        ),
+        {"role": role},
+    ).mappings().one()
+    deviations = shape_deviations(dict(row))
+    if deviations:
+        # Deliberately not ALTER ROLE. The weaker role may be what a running
+        # deployment currently connects as, and silently flipping it to
+        # NOLOGIN mid-migration would take that deployment down as a side
+        # effect. The operator chooses when; this chooses loudly.
+        raise WeakerRoleExists(
+            f"role {role!r} already exists and is weaker than designed: "
+            + "; ".join(deviations)
+            + ". It was probably created by a deployment bootstrap before the "
+            "migrations ran. Recreate it to the designed shape (or drop it and "
+            "re-run) before continuing — tenant isolation is built on this "
+            "role being exactly what the design says it is."
+        )
 
 
 def grant_app_privileges(

@@ -606,6 +606,42 @@ def acceptance_evidence(args) -> dict[str, Any]:
         engine.dispose()
 
 
+def app_role_shape(conn, role: str) -> dict[str, Any]:
+    """Is the application group role the role the design describes?
+
+    Judged by ``saintvision.db.rls.shape_deviations`` — the same rule the
+    migration path enforces — rather than a second copy that drifts. This is
+    the check that would have caught a live deployment whose ``inv_app`` had
+    LOGIN and a password committed to the repository: the bootstrap created
+    the weaker role first, and the migrations' existence guard deferred to it.
+
+    Absent is a problem too. A deployment with no application role at all is
+    one where nothing has run the migrations, not one with nothing wrong.
+    """
+    from saintvision.db.rls import shape_deviations
+
+    row = conn.execute(
+        "SELECT rolcanlogin, rolbypassrls, rolsuper, rolcreatedb, rolcreaterole "
+        "FROM pg_roles WHERE rolname = %s",
+        (role,),
+    ).fetchone()
+    if row is None:
+        return {
+            "role": role,
+            "exists": False,
+            "deviations": [
+                "the role does not exist; the migrations that create it have "
+                "not run against this database"
+            ],
+        }
+    names = ("rolcanlogin", "rolbypassrls", "rolsuper", "rolcreatedb", "rolcreaterole")
+    return {
+        "role": role,
+        "exists": True,
+        "deviations": shape_deviations(dict(zip(names, row))),
+    }
+
+
 def report(args) -> dict[str, Any]:
     import psycopg
 
@@ -615,6 +651,7 @@ def report(args) -> dict[str, Any]:
         result.update(inputs(conn, args.tenant))
         result["offerAgreement"] = offers(conn, args.tenant)
         result["admission"] = admission(conn, args.tenant)
+        result["appRoleShape"] = app_role_shape(conn, args.app_role)
         if args.project and args.user:
             result["grants"] = grants(
                 conn, args.tenant, args.project, args.user, _capability_columns(conn)
@@ -642,6 +679,7 @@ def _exit_code(result: dict[str, Any]) -> int:
         or result["offerAgreement"]["disagreeing"]
         or result.get("grants", {}).get("refusedBy", [])
         or (evidence is not None and not evidence["evidenceComplete"])
+        or result.get("appRoleShape", {}).get("deviations")
         else 0
     )
 
@@ -652,6 +690,11 @@ def main() -> int:
     parser.add_argument("--tenant", required=True)
     parser.add_argument("--project", help="report the grant intersection in this project")
     parser.add_argument("--user", help="the user to report it for")
+    parser.add_argument(
+        "--app-role",
+        default="inv_app",
+        help="the application group role whose shape is checked against the design",
+    )
     parser.add_argument(
         "--snapshot",
         action="store_true",
@@ -745,6 +788,20 @@ def main() -> int:
             )
         else:
             print("  unchanged from the previous snapshot")
+
+    shape = result.get("appRoleShape")
+    if shape:
+        print()
+        print("application role shape")
+        mark = "ok     " if not shape["deviations"] else "WEAKER "
+        print(f"  {mark} {shape['role']}")
+        for deviation in shape["deviations"]:
+            print(f"           {deviation}")
+        if shape["deviations"] and shape["exists"]:
+            print(
+                "           tenant isolation is built on this role being "
+                "exactly what the design says; fix the role, not the report"
+            )
 
     print("\nexecution admission (not a permission)")
     for gate in result["admission"]["gates"]:

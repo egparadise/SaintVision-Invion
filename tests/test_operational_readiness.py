@@ -32,7 +32,12 @@ def _id(prefix: str) -> str:
 
 @pytest.fixture
 def prepared(migrated, database_url):
-    """A tenant with every operational input in place, and nothing more."""
+    """A tenant with every operational input in place, and nothing more.
+
+    Includes its own designed-shape application role, because roles are
+    cluster-wide: the cluster these tests run on may carry a real deployment's
+    weakened ``inv_app``, and a hermetic test must not inherit that.
+    """
     import psycopg
 
     dsn = database_url.replace("postgresql+psycopg://", "postgresql://")
@@ -49,6 +54,7 @@ def prepared(migrated, database_url):
         "person": str(uuid.uuid4()),
         "epoch": str(uuid.uuid4()),
         "dsn": dsn,
+        "appRole": "inv_or_test_" + uuid.uuid4().hex[:16],
     }
     # The subject a real token carries: sha256 over issuer and sub, not the sub
     # alone — two issuers may use the same sub for different people.
@@ -151,7 +157,13 @@ def prepared(migrated, database_url):
             "INSERT INTO inv.resources VALUES(%s,%s,%s,'cpu',4000,2000)",
             (t, ids["resource"], ids["node"]),
         )
-    return ids
+        conn.execute(
+            "CREATE ROLE " + ids["appRole"]
+            + " NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE"
+        )
+    yield ids
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        conn.execute("DROP ROLE IF EXISTS " + ids["appRole"])
 
 
 def _run(ids, *extra: str) -> tuple[dict, int]:
@@ -163,6 +175,7 @@ def _run(ids, *extra: str) -> tuple[dict, int]:
             "--tenant", ids["tenant"],
             "--project", ids["project"],
             "--user", ids["user"],
+            "--app-role", ids.get("appRole", "inv_app"),
             "--json",
             *extra,
         ],
@@ -487,3 +500,46 @@ def test_recorded_evidence_clears_the_blockers_it_covers(prepared) -> None:
     # The contributed folder is active and has never been health checked, which
     # is reported as needing attention rather than assumed fine.
     assert any("contributed folder" in b for b in blockers)
+
+
+def test_the_designed_role_shape_reads_ok(prepared) -> None:
+    _beat(prepared)
+    result, code = _run(prepared)
+    assert result["appRoleShape"]["deviations"] == []
+    assert code == 0
+
+
+def test_a_weaker_app_role_is_reported_and_fails(prepared) -> None:
+    """The B-9 state, as the readiness report would have shown it.
+
+    A bootstrap-created role with LOGIN reads as "a role exists" to an
+    existence check, and as a named weakness to this one.
+    """
+    import psycopg
+    import uuid as _uuid
+
+    weak = "inv_or_weak_" + _uuid.uuid4().hex[:16]
+    with psycopg.connect(prepared["dsn"], autocommit=True) as conn:
+        conn.execute("CREATE ROLE " + weak + " LOGIN PASSWORD 'bootstrapped'")
+    try:
+        _beat(prepared)
+        # argparse takes the last occurrence, so the extra flag overrides the
+        # fixture's hermetic role for this one run.
+        result, code = _run(prepared, "--app-role", weak)
+        shape = result["appRoleShape"]
+        assert shape["exists"] is True
+        assert any("NOLOGIN group role" in d for d in shape["deviations"])
+        assert code == 1
+    finally:
+        with psycopg.connect(prepared["dsn"], autocommit=True) as conn:
+            conn.execute("DROP ROLE IF EXISTS " + weak)
+
+
+def test_an_absent_app_role_is_a_problem_not_a_pass(prepared) -> None:
+    """No role at all means the migrations never ran, not that nothing is wrong."""
+    _beat(prepared)
+    result, code = _run(prepared, "--app-role", "inv_or_absent_role")
+    shape = result["appRoleShape"]
+    assert shape["exists"] is False
+    assert any("does not exist" in d for d in shape["deviations"])
+    assert code == 1
