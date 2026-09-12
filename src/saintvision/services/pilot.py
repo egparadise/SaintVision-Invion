@@ -72,9 +72,7 @@ class ReleaseComponent:
         if not self.digest:
             # A component without a digest makes the manifest unverifiable, and
             # the manifest is the whole point.
-            raise InvError(
-                VAL_SCHEMA, f"release component {self.name!r} has no digest"
-            )
+            raise InvError(VAL_SCHEMA, f"release component {self.name!r} has no digest")
 
 
 def canonical_digest(payload: Any) -> str:
@@ -130,9 +128,8 @@ def verify_backup(
     row = session.get(BackupRecord, backup_id)
     if row is None or row.tenant_id != tenant_id:
         raise InvError(RES_ARTIFACT_NOT_FOUND, "backup not found")
-    if (
-        len(checksum_sha256 or "") != 64
-        or not all(c in "0123456789abcdef" for c in checksum_sha256)
+    if len(checksum_sha256 or "") != 64 or not all(
+        c in "0123456789abcdef" for c in checksum_sha256
     ):
         raise InvError(VAL_SCHEMA, "checksum must be a lowercase hex SHA-256")
     row.checksum_sha256 = checksum_sha256
@@ -250,6 +247,15 @@ def record_storage_check(
     contribution = session.get(StorageContribution, contribution_id)
     if contribution is None or contribution.tenant_id != tenant_id:
         raise InvError(RES_ARTIFACT_NOT_FOUND, "storage contribution not found")
+    if (
+        type(sampled_count) is not int
+        or type(mismatch_count) is not int
+        or sampled_count < 0
+        or mismatch_count < 0
+    ):
+        raise InvError(VAL_SCHEMA, "sample counts must be nonnegative integers")
+    if type(reachable) is not bool or (detail is not None and not isinstance(detail, dict)):
+        raise InvError(VAL_SCHEMA, "invalid storage observation")
     if mismatch_count > sampled_count:
         raise InvError(VAL_SCHEMA, "more mismatches than samples")
 
@@ -261,7 +267,12 @@ def record_storage_check(
         sampled_count=sampled_count,
         mismatch_count=mismatch_count,
         free_bytes=free_bytes,
-        healthy=bool(reachable and mismatch_count == 0),
+        healthy=bool(
+            reachable
+            and sampled_count > 0
+            and mismatch_count == 0
+            and not (detail or {}).get("unverifiable")
+        ),
         checked_at=now,
         detail=detail or {},
     )
@@ -306,19 +317,31 @@ def contributions_needing_attention(
     for contribution, last_checked in rows:
         if last_checked is None:
             reason = "never checked"
+        elif last_checked > now:
+            reason = "future observation"
         elif last_checked < cutoff:
             reason = "stale"
         else:
-            healthy = session.scalar(
-                select(StorageCheck.healthy)
+            checks = session.scalars(
+                select(StorageCheck)
                 .where(
                     StorageCheck.tenant_id == tenant_id,
                     StorageCheck.contribution_id == contribution.contribution_id,
+                    StorageCheck.checked_at == last_checked,
                 )
-                .order_by(StorageCheck.checked_at.desc())
-                .limit(1)
-            )
-            if healthy:
+                .execution_options(populate_existing=True)
+            ).all()
+            # Re-evaluate legacy rows, including ties, instead of trusting the
+            # old boolean that labelled zero verifiable files as healthy.
+            if checks and all(
+                c.healthy
+                and c.reachable
+                and c.sampled_count > 0
+                and c.mismatch_count == 0
+                and isinstance(c.detail, dict)
+                and not (c.detail or {}).get("unverifiable")
+                for c in checks
+            ):
                 continue
             reason = "unhealthy"
         out.append(
@@ -528,21 +551,14 @@ def pilot_readiness(
             blockers.append("no acceptance record for AC-12 in this release")
         if any(a.outcome == "rejected" for a in acceptances):
             blockers.append("a rejected acceptance stands against this release")
-        if any(
-            a.accepted_manifest_sha256 != release.manifest_sha256 for a in acceptances
-        ):
-            blockers.append(
-                "an acceptance refers to a different manifest than the current one"
-            )
+        if any(a.accepted_manifest_sha256 != release.manifest_sha256 for a in acceptances):
+            blockers.append("an acceptance refers to a different manifest than the current one")
     if not database_drills:
         blockers.append("no passing database recovery drill")
     elif not any(
-        d.met_targets and d.integrity_verified and d.fencing_verified
-        for d in database_drills
+        d.met_targets and d.integrity_verified and d.fencing_verified for d in database_drills
     ):
-        blockers.append(
-            "no database recovery drill meeting targets and integrity/fencing checks"
-        )
+        blockers.append("no database recovery drill meeting targets and integrity/fencing checks")
     if not verified_backups:
         blockers.append("no verified backup")
     if not off_site_backups:
@@ -574,8 +590,7 @@ def pilot_readiness(
         # unassessed criterion must never read as a met one.
         "acceptanceAssessed": release_id is not None,
         "acceptances": [
-            {"criterion": a.acceptance_id_ref, "outcome": a.outcome}
-            for a in acceptances
+            {"criterion": a.acceptance_id_ref, "outcome": a.outcome} for a in acceptances
         ],
         "knownLimitations": limitations,
         # A drill can pass and still miss the target. Both are reported.
