@@ -422,6 +422,53 @@ Codex의 지적사항("SPA 경로 이름 일치만으로 커널 연결이 증명
    - `python tools/route_coverage.py --served src/saintvision --client apps/web/src`
    - 클라이언트 요청 33개 경로 전수 100% 제공 (**0 unserved, Exit 0**).
 
+### B-9. **실측** — 저장소에 커밋된 비밀번호로 운영 DB에 접속된다
+
+`docker-compose.prod.yml`의 기본 credential을 B-2에서 "보고만 한다"고 적고 확인하지 않았다. 확인했다.
+
+`deploy/init-db.sql` 전문(6줄):
+
+```sql
+CREATE ROLE inv_app WITH LOGIN PASSWORD 'apptestonly' NOBYPASSRLS;
+GRANT ALL PRIVILEGES ON DATABASE saintvision TO inv_app;
+GRANT ALL ON SCHEMA public TO inv_app;
+```
+
+이 기계의 실제 배포 DB(`saintvision_lan`)에 **그 비밀번호로 접속된다**:
+
+```
+CONNECTED as inv_app to saintvision_lan using the password from deploy/init-db.sql
+  tables visible: 60
+  public.tenants readable: 0 row(s)   ← RLS는 정상 작동(scope 미설정이라 0행)
+```
+
+RLS는 살아 있다. 문제는 **접속 자체가 된다**는 것이고, 그 비밀번호가 저장소에 있다는 것이다. `docker-compose.prod.yml:30`도 같은 값을 쓴다(`INV_DATABASE_URL=postgresql://inv_app:apptestonly@...`).
+
+**설계와 어긋나는 지점.** migration `0001_s02_baseline.py:461`은 `inv_app`을 이렇게 만든다:
+
+```sql
+CREATE ROLE inv_app NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE
+```
+
+**NOLOGIN 그룹 역할**이다. 실제 접속은 그것을 상속하는 별도 login 역할이 한다 — 이 기계의 실측이 그 설계를 보여준다:
+
+```
+inv_lan_runtime              inherits inv_kernel   (lan_pilot.py가 생성, 비밀번호 난수)
+inv_app_676598fab9e441bbbedb inherits inv_kernel   (배포별 생성)
+```
+
+그런데 실제 `inv_app`은 **login=True**다. 원인은 순서와 guard의 조합이다: `init-db.sql`이 `docker-entrypoint-initdb.d`에서 **먼저** 실행돼 LOGIN 역할을 만들고, migration 0001은 `IF NOT EXISTS`로 감싸져 있어 **이미 있는 약한 정의를 그대로 두고 넘어간다.** 멱등성을 위한 guard가 더 약한 선행 정의에 양보한다.
+
+`GRANT ALL ON SCHEMA public`도 설계보다 넓다. migration은 `GRANT USAGE`와 테이블별 최소 권한만 준다.
+
+**권고(내가 실행하지 않았다 — 운영 행위이고 앱 설정과 함께 바뀌어야 한다).**
+
+1. `deploy/init-db.sql`에서 `inv_app` 생성을 **제거한다**. 역할과 권한은 migration이 정본이다.
+2. 앱은 `lan_pilot.py`가 이미 하는 방식대로 **난수 비밀번호를 가진 배포별 login 역할**로 접속하고, 그 역할이 `inv_kernel`을 상속한다.
+3. 그때까지 `apptestonly`는 **유출된 자격증명으로 취급한다.** 저장소에 있고 실제로 동작한다.
+
+확인 방법: `psycopg.connect("postgresql://inv_app:apptestonly@127.0.0.1:55440/saintvision_lan")`.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
