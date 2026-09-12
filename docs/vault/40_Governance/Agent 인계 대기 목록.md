@@ -141,6 +141,35 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 따라서 그 범위만 옮기면 코드 충돌이 없다. 옛 이력까지 함께 가져갈 이유가 있다면 `apps/web/`과 `server.py`는 integration 쪽을 남겨야 한다.
 
+### B-3. **통합 차단 사항** — `src/saintvision/server.py`가 두 개의 서로 다른 구현이다
+
+B-2를 없애려고 integration 위에 병합 후보 branch를 만들어 실제로 시험을 돌렸다. **시험이 실패했고, 그 실패가 B-2보다 중요한 사실을 드러냈다.** 후보 branch는 push하지 않았고 삭제했다.
+
+두 branch의 `src/saintvision/server.py`는 버전 차이가 아니라 **서로 다른 구현**이다.
+
+| | 줄 수 | 내용 |
+|---|---:|---|
+| `review/claude-account-results` | **6** | `inv.app.create_configured_app`에 위임하는 shim. 설정이 없으면 서비스가 뜨지 않는다 |
+| `integration/all-agents-unified` | **2442** | "SaintVision Production Unified FastAPI Control Plane Server". REST·SSE·WebSocket 터미널과 자체 승인 로직 보유 |
+
+합쳐 보면 시험 2개가 실패한다(1027 passed / 2 failed).
+
+1. `test_the_package_exposes_one_application_plus_the_known_quarantine` — **설치 패키지 안에 FastAPI 응용이 두 개**가 된다. 정본은 `api/app.py`인데 `server.py`가 두 번째 응용이다. 이 guard는 **내 branch에만 있어서** integration에서는 아무도 통보받지 못했다.
+2. `test_unconfigured_production_never_serves_demo_runs` — integration의 `server.py`에는 `create_app`이 없어 import부터 실패한다. 실측으로 그 파일에는 `create_configured_app`도 `configuration unavailable`도 **0건**이다. 즉 **설정되지 않은 운영이 서비스를 거부하는 경계가 그 경로에는 없다.**
+
+이력상 `4a1f58a feat(core): transition mock control-plane to production FastAPI server …`에서 mock 제어 평면이 `server.py`의 운영 FastAPI 서버로 바뀌었고, 이후 Studio·승인·터미널 작업이 그 위에 쌓였다(`f50310e`, `fa01d77`, `9e304d9`).
+
+**이것은 같은 개념을 양쪽이 각각 만든 다섯 번째 사례이며 규모가 가장 크다.** 과거 네 번(권한·handoff·binding·결과) 모두 실행 기록에 가까운 쪽이 옳았다.
+
+**내가 단독으로 정할 수 없다.** 어느 응용이 정본인지는 architecture 결정이고 Codex(커널)와 Gemini(그 위에 화면을 붙임) 양쪽이 걸려 있다. 필요한 답:
+
+1. 운영에서 제공되는 응용은 `api/app.py`인가 `server.py`인가, 아니면 둘 다 서로 다른 경계로 제공되는가.
+2. `server.py`가 정본이라면 `create_configured_app` 위임과 "설정 없으면 거부" 경계를 어떻게 되살리는가.
+3. 2인 승인 원칙이 `server.py`와 커널 승인 경로 **양쪽**에 있는데, 둘 중 어느 것이 판정하는가.
+4. 두 번째 응용을 유지한다면 `QUARANTINE`에 사유와 owner를 넣어야 한다 — guard가 요구하는 형식이다.
+
+**이 답이 나오기 전에는 두 branch를 병합하면 안 된다.** 병합 자체는 6건 충돌로 기계적으로 가능하지만(B-2), 결과물은 위 두 시험이 실패하는 상태다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
