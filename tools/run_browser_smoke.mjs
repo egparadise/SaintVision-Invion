@@ -240,6 +240,42 @@ async function runFullSmokeJourney() {
     });
     assert('Repeat approval returns HTTP 409 (Already Decided)', replayRes.status === 409);
 
+    // Two-Person Rule negative test: requester self-approval rejected with HTTP 403
+    const selfNonce = `nonce_self_${Date.now()}`;
+    const selfApprvCreateRes = await fetch(`${BASE_URL}/v1/approvals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nonce: selfNonce,
+        command: 'self.test --deploy',
+        requestedBy: 'usr_requester_charlie',
+      }),
+    });
+    assert('Two-Person Rule test approval created with HTTP 201', selfApprvCreateRes.status === 201);
+    const selfApprv = await selfApprvCreateRes.json();
+    const selfApproveRes = await fetch(`${BASE_URL}/v1/approvals/${selfApprv.id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nonce: selfNonce,
+        approverId: 'usr_requester_charlie',
+      }),
+    });
+    assert('Requester self-approval returns HTTP 403 (Two-Person Rule)', selfApproveRes.status === 403);
+    const selfProb = await selfApproveRes.json();
+    assert('Returns RFC 9457 SEC-TWO-PERSON-RULE-VIOLATION', selfProb.code === 'SEC-TWO-PERSON-RULE-VIOLATION');
+
+    // Positive test: independent peer approval accepted
+    const peerApproveRes = await fetch(`${BASE_URL}/v1/approvals/${selfApprv.id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nonce: selfNonce,
+        approverId: 'usr_approver_dan',
+      }),
+    });
+    assert('Independent peer approval returns HTTP 200', peerApproveRes.status === 200);
+
     // -------------------------------------------------------------------------
     // 8. Server-Sent Events (SSE) Streaming Protocol Validation
     // -------------------------------------------------------------------------

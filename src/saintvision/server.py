@@ -672,6 +672,7 @@ APPROVALS: List[Dict[str, Any]] = [
         "blastRadius": "workspace_isolated",
         "status": "pending",
         "nonce": "nonce_987654321",
+        "requestedBy": "usr_requester_alice",
         "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=10)).isoformat(),
         "policyReason": "외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)",
         "createdAt": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -689,6 +690,7 @@ APPROVALS: List[Dict[str, Any]] = [
         "blastRadius": "cluster_production",
         "status": "pending",
         "nonce": "nonce_l3_9876543210abcdef",
+        "requestedBy": "usr_requester_bob",
         "unifiedDiff": "--- a/migrations/003_schema.sql\n+++ b/migrations/003_schema.sql\n@@ -1,3 +1,5 @@\n+ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE;\n+CREATE INDEX idx_users_mfa ON users(two_factor_enabled);\n",
         "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
         "policyReason": "L3 프로덕션 스키마 변경 및 고위험 마이그레이션 2인 승인 강제 (ADR-004)",
@@ -1821,6 +1823,7 @@ async def create_project_run(project_id: str, request: Request):
             "command": f"exec {new_run['entrypoint']}",
             "status": "pending",
             "nonce": nonce,
+            "requestedBy": new_run.get("requestedBy"),
             "policyReason": data.get("policyReason", f"거버넌스 위험 등급 {new_run['riskLevel']} 정책에 따른 실행 사전 승인 요구 (Rule #304)"),
             "expiresAt": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat(),
             "createdAt": now_iso,
@@ -2049,6 +2052,7 @@ async def create_approval(request: Request):
         "target": data.get("target", "Workspace Sandbox"),
         "command": data.get("command", "deploy.release"),
         "status": "pending",
+        "requestedBy": data.get("requestedBy"),
         "nonce": data.get("nonce", f"nonce_{secrets.token_hex(6)}"),
         "createdAt": dt.datetime.now(dt.timezone.utc).isoformat(),
     }
@@ -2078,6 +2082,7 @@ async def approve_request(approval_id: str, request: Request):
     except Exception:
         data = {}
     nonce = data.get("nonce")
+    approver_id = data.get("approverId") or request.headers.get("X-Approver-Id") or data.get("userId")
 
     for apprv in APPROVALS:
         if apprv["id"] == approval_id:
@@ -2099,7 +2104,19 @@ async def approve_request(approval_id: str, request: Request):
                     trace_id,
                     "SEC",
                 )
+            # Two-Person Rule: Requester self-approval is strictly disallowed
+            req_by = apprv.get("requestedBy")
+            if req_by and approver_id and req_by == approver_id:
+                return rfc9457_problem(
+                    403,
+                    "SEC-TWO-PERSON-RULE-VIOLATION",
+                    "Requester Self-Approval Disallowed",
+                    f"Requester '{approver_id}' cannot approve their own request under Two-Person Rule.",
+                    trace_id,
+                    "SEC",
+                )
             apprv["status"] = "approved"
+            apprv["approverId"] = approver_id
             apprv["decidedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
             if apprv.get("runId"):
                 for r in RUNS:
@@ -2108,7 +2125,7 @@ async def approve_request(approval_id: str, request: Request):
                         r["updatedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
                         asyncio.create_task(_auto_complete_run(apprv["runId"], 2.0))
                         break
-            return {"approvalId": approval_id, "status": "approved", "nonce": nonce}
+            return {"approvalId": approval_id, "status": "approved", "nonce": nonce, "approverId": approver_id}
 
     return rfc9457_problem(
         404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found.", trace_id, "RES"
