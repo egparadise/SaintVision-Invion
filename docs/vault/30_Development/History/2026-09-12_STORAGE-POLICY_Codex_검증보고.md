@@ -38,3 +38,6 @@ source_of_truth: "Git"
 
 
 전달 전 검사: check_docs.py exit0(원문24/문서328/작업48), check_ontology.py exit0, git diff --check exit0. PR19 설명 갱신/draft 유지. 보고 commit/push 후 Obsidian check→apply→check 및 모든 파일 hash 대조를 진행한다.
+
+
+동기화 최초 check exit1/쓰기0: 외부3개 변경을 발견해 [원문/hash](../Evidence/obsidian-proposals-20260912-storage-policy/manifest.json)를 보존하고 수신 요약만 추가했다. Gemini Vitest109 등은 작성자 보고/독립 검토 pending. 동일 bytes Git 보존을 확인한 뒤 쓰기0 인수하여 정본과 동기화한다.

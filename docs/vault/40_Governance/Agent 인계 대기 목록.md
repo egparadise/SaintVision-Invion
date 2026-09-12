@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.8"
+version: "1.0.9"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T14:15:21+09:00"
+updated: "2026-09-12T15:26:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -112,3 +112,10 @@ Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 
 ## 외부 인계 수신 (2026-09-12T14:15:21+09:00)
 
 [공유본 원문4개/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-view/manifest.json)를 보존했다. Gemini b90c788 PTY/Drain·Vitest107/smoke154/2-PC63/deploy5는 작성자 보고이며 이번 Codex 독립 승인/물리2-PC 인수와 다르다. 오래된 공유본의 기존 Codex 이력 제거·65.63% 기대값을 정본으로 덮어쓰지 않는다. 공통57.81% 유지. 최신 Codex는 [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]:9d7559e 인증 GET/현재 권한·소유자/저장 서명·Evidence 재검증, pending·expired·recorded와 currentHealth unknown 분리. Linux153/Windows25 통과. 다음 폴더-root policy 설치·교체/receipt 계약, Claude 독립 검토·Gemini 화면 연결. 전체57.81% 유지, CI/물리 원격 인수 미완료.
+
+
+## 외부 인계 수신 (2026-09-12T15:26:21+09:00)
+
+[공유본3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-policy/manifest.json) 보존. Gemini가 d73da2b base/로컬 변경의 IntranetDeploymentView 실시간 상태 대조·preflight와 물리 인수 분리, Vitest109/smoke154/2-PC63/deploy5를 보고했다. 이 수신은 해당 코드의 독립 승인이나 실제5대 운영 인수가 아니다. 최신 구현 SHA 고정과 독립 검토는 pending이며 공통57.81% 유지. 과거 Claude F1~F4는 후속 수정 SHA별 보고와 대조해야 한다.
+
+새 Codex f9d69a8의 영속 storage policy floor/로컬 시작 기록은 [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]를 따른다. 다음 Codex는 LAN bundle 읽기 mount·policy 전달/교체·receipt 대조, Claude는 f9d69a8 독립 검토, Gemini는 서버 운영 인수와 local receipt 구분이다.
