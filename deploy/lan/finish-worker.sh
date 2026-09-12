@@ -15,7 +15,7 @@ if [[ $# -ne 0 ]]; then
         exit 1
     fi
 fi
-cp -- node-cert.pem manifest.json ca.pem signer.pub peer-policy.json start-node.sh node-agent.tar worker_config.py worker_storage.py "$worker_root/"
+cp -- node-cert.pem manifest.json ca.pem signer.pub peer-policy.json start-node.sh node-agent.tar worker_config.py worker_storage.py worker_replacement.py "$worker_root/"
 if [[ $# -ne 0 ]]; then
     cp -- storage-policy.json "$worker_root/"
 fi

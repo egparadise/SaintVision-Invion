@@ -104,6 +104,7 @@ def main(prepared):
         ]
         files = [
             "deploy/lan/worker_storage.py",
+            "deploy/lan/worker_replacement.py",
             "deploy/lan/start-node.sh",
             "deploy/lan/finish-worker.sh",
             "deploy/lan/Start-Worker.ps1",
@@ -129,7 +130,7 @@ def main(prepared):
                 dict(evidence=str(work / "evidence.json"), exitCode=r.returncode, cases=cases)
             )
         )
-        return r.returncode == 0 and len(cases) == 2 and all(c["passed"] for c in cases)
+        return r.returncode == 0 and len(cases) == 3 and all(c["passed"] for c in cases)
     finally:
         if created:
             value = json.loads(run(["docker", "inspect", runner]))[0]

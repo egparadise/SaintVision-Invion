@@ -153,3 +153,30 @@ def test_real_bad_policy_hash_creates_no_node_or_volume(installation):
         ).returncode
         != 0
     )
+
+
+def test_real_replacement_preflight_preserves_state_and_rejects_stale_restart(installation):
+    import worker_replacement as replacement
+
+    a = installation
+    assert start(a).returncode == 0
+    plan = json.loads((a["folder"] / "storage-plan.json").read_text())
+    # Running Nodes are not stopped by preflight.
+    with pytest.raises(ValueError):
+        replacement.capture(plan)
+    assert json.loads(storage.docker("inspect", a["name"]))[0]["State"]["Running"]
+    storage.docker("stop", a["name"])
+    original = replacement.state_archive(a["name"])
+    receipt = replacement.capture(plan)
+    assert receipt["replacementAuthorized"] is False
+    assert receipt["operationalAcceptanceAssessed"] is False
+    assert replacement.recheck(plan, receipt) == receipt
+    assert replacement.state_digest(original, plan["manifest"]) == receipt["stateSHA256"]
+    # A restart invalidates the old inspection even when the same container survives.
+    storage.docker("start", a["name"])
+    storage.docker("stop", a["name"])
+    with pytest.raises(ValueError):
+        replacement.recheck(plan, receipt)
+    fresh = replacement.capture(plan)
+    assert fresh["containerId"] == receipt["containerId"]
+    assert fresh["stateSHA256"] == receipt["stateSHA256"]
