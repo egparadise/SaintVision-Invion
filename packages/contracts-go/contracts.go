@@ -943,3 +943,30 @@ type NodeStorageRootConfig struct {
     Root_version int64 `json:"root_version"`
     Root string `json:"root"`
 }
+
+type RecordedStorageObservation struct {
+    EvidenceId EvidenceId `json:"evidenceId"`
+    CheckId string `json:"checkId"`
+    ObservedAt int64 `json:"observedAt"`
+    IntegrityVerified bool `json:"integrityVerified"`
+    SampleHealthy bool `json:"sampleHealthy"`
+    Sampled int64 `json:"sampled"`
+    Mismatches int64 `json:"mismatches"`
+    Unverifiable int64 `json:"unverifiable"`
+    Examined int64 `json:"examined"`
+    Unsampled int64 `json:"unsampled"`
+}
+
+type StorageObservationView struct {
+    RequestId string `json:"requestId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    ContributionId string `json:"contributionId"`
+    Status string `json:"status"`
+    CreatedAt string `json:"createdAt"`
+    ExpiresAt int64 `json:"expiresAt"`
+    CurrentHealth string `json:"currentHealth"`
+    OperationalAcceptanceAssessed bool `json:"operationalAcceptanceAssessed"`
+    Observation *RecordedStorageObservation `json:"observation"`
+}

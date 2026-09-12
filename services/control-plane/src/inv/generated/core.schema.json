@@ -4405,6 +4405,157 @@
         "root"
       ],
       "additionalProperties": false
+    },
+    "RecordedStorageObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "checkId": {
+          "type": "string",
+          "pattern": "^chk_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "integrityVerified": {
+          "type": "boolean",
+          "const": true
+        },
+        "sampleHealthy": {
+          "type": "boolean"
+        },
+        "sampled": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mismatches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unverifiable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "examined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsampled": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "evidenceId",
+        "checkId",
+        "observedAt",
+        "integrityVerified",
+        "sampleHealthy",
+        "sampled",
+        "mismatches",
+        "unverifiable",
+        "examined",
+        "unsampled"
+      ]
+    },
+    "StorageObservationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "contributionId": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "expired",
+            "recorded"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currentHealth": {
+          "type": "string",
+          "const": "unknown"
+        },
+        "operationalAcceptanceAssessed": {
+          "type": "boolean",
+          "const": false
+        },
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordedStorageObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "requestId",
+        "tenantId",
+        "projectId",
+        "runId",
+        "contributionId",
+        "status",
+        "createdAt",
+        "expiresAt",
+        "currentHealth",
+        "operationalAcceptanceAssessed",
+        "observation"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "recorded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "observation": {
+                "$ref": "#/$defs/RecordedStorageObservation"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "observation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "oneOf": [

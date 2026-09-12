@@ -1281,6 +1281,45 @@ class NodeStorageRootConfig(BaseModel):
     root: constr(min_length=2, max_length=4096)
 
 
+class RecordedStorageObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    evidenceId: EvidenceId
+    checkId: constr(pattern=r'^chk_[0-9A-HJKMNP-TV-Z]{26}$')
+    observedAt: conint(ge=0)
+    integrityVerified: Literal[True]
+    sampleHealthy: bool
+    sampled: conint(ge=0)
+    mismatches: conint(ge=0)
+    unverifiable: conint(ge=0)
+    examined: conint(ge=0)
+    unsampled: conint(ge=0)
+
+
+class Status4(StrEnum):
+    pending = 'pending'
+    expired = 'expired'
+    recorded = 'recorded'
+
+
+class StorageObservationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    requestId: UUID
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    contributionId: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    status: Status4
+    createdAt: AwareDatetime
+    expiresAt: conint(ge=0)
+    currentHealth: Literal['unknown']
+    operationalAcceptanceAssessed: Literal[False]
+    observation: RecordedStorageObservation | None
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

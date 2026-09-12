@@ -941,3 +941,30 @@ export interface NodeStorageRootConfig {
   root_version: number;
   root: string;
 }
+
+export interface RecordedStorageObservation {
+  evidenceId: EvidenceId;
+  checkId: string;
+  observedAt: number;
+  integrityVerified: true;
+  sampleHealthy: boolean;
+  sampled: number;
+  mismatches: number;
+  unverifiable: number;
+  examined: number;
+  unsampled: number;
+}
+
+export interface StorageObservationView {
+  requestId: string;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  runId: RunId;
+  contributionId: string;
+  status: "pending" | "expired" | "recorded";
+  createdAt: string;
+  expiresAt: number;
+  currentHealth: "unknown";
+  operationalAcceptanceAssessed: false;
+  observation: (RecordedStorageObservation | null);
+}

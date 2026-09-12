@@ -20,9 +20,9 @@ from pki_support import authority, issue
 pytestmark = pytest.mark.postgres
 
 
-def register_owner(e, contribution, root):
+def register_owner(e, contribution, root, *, subject=None):
     user = new_id("usr")
-    subject = "oidc:" + hashlib.sha256(uuid4().bytes).hexdigest()
+    subject = subject or "oidc:" + hashlib.sha256(uuid4().bytes).hexdigest()
     with psycopg.connect(e.owner) as c:
         c.execute(
             "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'storage test')",
@@ -71,13 +71,18 @@ def register_owner(e, contribution, root):
 
 
 @pytest.fixture
-def sample(env, tmp_path):
+def storage_subject():
+    return None
+
+
+@pytest.fixture
+def sample(env, tmp_path, storage_subject):
     e = env
     root = tmp_path / "contributed"
     root.mkdir()
     (root / "data.bin").write_bytes(b"actual bytes")
     contribution = new_id("stc")
-    principal, user = register_owner(e, contribution, root)
+    principal, user = register_owner(e, contribution, root, subject=storage_subject)
     node = NodePrincipal(e.tenant, e.node)
     certificate = issue(authority(), node_uri(node, e.epoch), server=True)
     with psycopg.connect(e.owner) as c:

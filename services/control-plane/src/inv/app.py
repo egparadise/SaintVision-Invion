@@ -368,6 +368,14 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     from .result_view import ResultView
     result_view = ResultView(database)
 
+    from .storage_view import StorageObservationView
+    storage_view = StorageObservationView(database)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
+    def storage_observation(project: str, run_id: str, request_id: str,
+                            identity=Depends(authenticated)):
+        return storage_view.result(identity.principal, project, run_id, request_id)
+
     @api.get("/v1/projects/{project}/runs/{run_id}/result")
     @api.get("/v1/runs/{run_id}/result")
     def run_result(run_id: str, project: str | None = None, identity=Depends(authenticated)):

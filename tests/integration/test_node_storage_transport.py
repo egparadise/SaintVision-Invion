@@ -90,22 +90,30 @@ def test_go_mtls_signed_sample_verified_by_python_without_operational_record(sto
 def test_go_mtls_sample_commits_existing_evidence_and_storage_check(storage_remote):
     from uuid import uuid4
     from inv.storage_commit import StorageSampleStore
+    from inv.storage_view import StorageObservationView
     from test_storage_commit import register_owner
 
     a = storage_remote
     principal, _ = register_owner(a.e, a.contribution, a.root)
     before = a.e.runs.get(a.e.tenant, a.run["runId"])
     store = StorageSampleStore(a.e.db)
+    request_id = str(uuid4())
     result = store.collect(
         principal,
         a.e.project,
         a.run["runId"],
         a.contribution,
-        request_id=str(uuid4()),
+        request_id=request_id,
         client=a.client,
     )
     assert not result["replayed"]
     assert a.e.runs.get(a.e.tenant, a.run["runId"]) == before
+    observed = StorageObservationView(a.e.db).result(
+        principal, a.e.project, a.run["runId"], request_id
+    )
+    assert observed["observation"]["evidenceId"] == result["evidenceId"]
+    assert observed["observation"]["integrityVerified"]
+    assert observed["currentHealth"] == "unknown"
     with a.e.db.transaction(a.e.tenant) as c:
         row = c.execute(
             "SELECT healthy,detail FROM public.storage_checks WHERE check_id=%s",
