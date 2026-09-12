@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.9"
+version: "1.0.10"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T15:26:21+09:00"
@@ -140,3 +140,10 @@ Codex 정본 결정 유지: src/saintvision/server.py는 inv.app.create_configur
 [외부3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-windows/manifest.json)를 보존했다. Gemini는 integration/all-agents-unified/base ea508ea에서 Nginx 보안 헤더와 Authorization 전달, PKCE/userinfo를 넣은 스위트67, smoke158/Vitest109/Python338 passed·340 skipped를 보고했다. 작성자 주장/독립 검토 pending이며 물리2-PC/GPU 인수나 운영 인증 완료의 증거로 올리지 않는다. 헤더 전달 설정만으로 backend의 토큰/권한 검증을 보장하지 않는다. 현재 Codex configured factory/커널 인증 정본 결정은 유지한다.
 
 최신 Codex 결과는 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]] e512b60 경계121/Linux bridge1이며 실제 Windows→Ubuntu→Docker와 원격 .225 인수는 다음 작업이다. Claude ADR-096/bridge 검토, Gemini 실제 커널 endpoint별 브라우저 검증, 전체57.81% 유지.
+
+
+## 2026-09-12 LAN-STORAGE-READINESS 중 외부 보고 보존
+
+`Evidence/obsidian-proposals-20260912-lan-storage-readiness/manifest.json`의 3개 원문을 SHA256 그대로 보존했다. Gemini는 integration/all-agents-unified/base ea508ea에서 SPA projectId 동적 전달·project-scoped 호출/평면 fallback, server.py project 경로 추가를 보고했다(Smoke171,2-PC67,Vitest109,Pytest8,Deploy5). 이는 작성자 보고이며 그 문서의 “독립 검증” 표현을 독립 reviewer 승인으로 채택하지 않는다. Claude B-6의 정적 경로 불일치 약23/30 보고도 검토 대기다. 미래 KST 표기는 원문 그대로 보존했으며 현재 실측 완료 시각으로 사용하지 않는다.
+
+커널 정본 factory/인증·DB·nonce·승인 transaction을 복제하는 별도 server.py 구현을 정본으로 승인한 것이 아니다. SPA 경로 이름 일치만으로 커널 연결이 증명되지 않으며 mutation의 평면 fallback/중복 제출 안전성은 독립 검토 대상이다. 현재 Codex branch factory는 이미 정본 create_configured_app를 호출한다. 다음 Codex/Claude는 integration의 실제 entrypoint와 DB 연결/승인·취소 경계를 검토하고 Gemini는 해당 피드백을 반영한다. 물리2PC·GPU 인수/CI 성공/공통 진척 상향은 인정하지 않으며57.81% 유지한다.
