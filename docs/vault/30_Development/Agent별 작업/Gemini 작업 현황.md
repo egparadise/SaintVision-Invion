@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.14"
+version: "1.0.15"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T22:08:46+09:00"
+updated: "2026-09-12T23:37:17+09:00"
 source_of_truth: "Git"
 ---
 
@@ -209,3 +209,9 @@ Codex의 기존 운영 inv_app NOLOGIN/password 폐기 SQL은 별도 컨테이�
 외부 수정 3개 원문과 SHA-256은 `30_Development/Evidence/obsidian-proposals-20260912-configured-server`에 보존했다. Gemini 22:05 보고는 로그인 격리 통합·deploy_intranet.ps1의 미설정 환경변수 기본값 주입·작성자 시험 결과다. 기본값을 넣은 `compose config` 성공은 운영 credential/config 준비 증거가 아니다. 기본값은 합성 사전점검 과정에만 한정되고 실제 기동에 전파되지 않는지 독립 검토가 필요하다. 이번 Codex Compose는 추가 필수 설정3개와 /readyz를 연결했고 실제 factory HTTP/별도DB14개 시험을 통과했다(510ced4). Gemini의 기존5개 설정 시험과 route34/Smoke174/2-PC67은 작성자 보고로 보존하며 실제 원격 인수로 승격하지 않는다.
 
 Claude d09e6a5 scratch-role 리허설 및 a5dd83c 0001 drift guard13개 보고·인계 상태 지도는 수신했으며 독립 검토 전이다. 원문의 2026-09-13 미래 시각은 작성자가 적은 값으로 보존하고 실제 수행 시각으로 확정하지 않는다. B-9의 “운영 교체 실행 대기”는 Codex 20:47:51 운영 NOLOGIN/password 제거와 사후 검증으로 해소됐다. B-3/B-4의 타 lane demo entrypoint 문제는 해당 branch 통합 검토가 여전히 필요하며 정본은 saintvision.server:create_app→inv.app.create_configured_app이다. 공통 완료율57.81% 유지.
+
+## 2026-09-12 BUSINESS-WORKSPACE 수신 갱신
+
+외부3개 원문/hash는 Evidence/obsidian-proposals-20260912-business-workspace에 보존했다. Gemini23:15 보고는510ced4 설정 수용/작성자시험이며, 이후14de71d의 INV_BUSINESS_DSN·INV_CONFIG_VOLUME/영속overlay 변경이 추가됐다. 합성 default 환경변수의 사전점검은 실제 운영준비 증거가 아니다.
+
+Claude가6ff090b를 재확인해 F2/entrypoint/B-9의 해소를 보고했다. 해당 scope의 독립 재확인 수신으로 기록하며, 이후 Codex 수정까지 검토한 것으로 확대하지 않는다. 원문의2026-09-13 시각은 작성자 값이다. **F1 offer/release snapshot 불일치는 미해결 재현 보고**이므로 Codex가 우선 재현·수정한다. 87eeb71/a5dd83c role guard를 코드로 읽었으며 helper의 검사는 존재하지만0001은 그 helper를 호출하지 않는다는 범위 제한을 확인했다. 이 독해만으로 해당13개시험 재수행/운영migration guard 인수를 선언하지 않는다.
