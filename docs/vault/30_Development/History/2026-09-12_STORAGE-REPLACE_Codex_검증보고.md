@@ -43,3 +43,5 @@ Codex: Windows/WSL 교체 진입점과 명시적 source/policy/receipt 전달·�
 
 
 전달 검사: check_docs exit0(문서337/작업48), check_ontology exit0, git diff --check의 문서 EOF 빈 줄2개 수정 후 exit0. PR19 갱신/draft 유지. 보고7e5d029 push exit0. Obsidian 첫 check는 외부3개 변경으로 exit1/쓰기0. 원문/hash를 보존하고 별도 브랜치의 인증 보고를 작성자 주장으로 인계했다. Codex factory 진입점은 직접 확인해 정본 유지 결정을 남겼다.
+
+최종 전달: 352a075 push exit0. 2026-09-12T16:13:47+09:00 로컬 Obsidian640개 전체 hash 일치/pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-replace-obsidian-20260912.json). 영수증 포함 후속 commit도 push/동기화한다. OneDrive cloud 업로드 미검증. 다음 Codex Windows/WSL 교체 진입점·서버 검증 연결, Claude 독립 검토 pending.
