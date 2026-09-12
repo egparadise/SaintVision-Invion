@@ -1,6 +1,5 @@
 ﻿-- SaintVision PostgreSQL Initial Database Bootstrap
--- Creates application role with NOBYPASSRLS for row-level security (RLS) enforcement
-
-CREATE ROLE inv_app WITH LOGIN PASSWORD 'apptestonly' NOBYPASSRLS;
-GRANT ALL PRIVILEGES ON DATABASE saintvision TO inv_app;
-GRANT ALL ON SCHEMA public TO inv_app;
+-- Roles and grants are owned by migrations. Do not pre-create inv_app as LOGIN:
+-- it is a NOLOGIN permission group, inherited by deployment-specific logins.
+-- Existing clusters require a separately reviewed credential remediation;
+-- changing this bootstrap does not revoke previously installed credentials.
