@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T14:10:00+09:00"
+updated: "2026-09-12T15:22:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -67,9 +67,10 @@ source_of_truth: "Git"
   - 3회 제한 워크스페이스 복구 수명주기 (ADR-044 / ADR-045): `resume/prepare` → L2 승인 → `resume/enqueue` 순차 전이 및 `attempt >= 3` 시 차단.
 
 ### GM-06: 접근성·내부망 HTTPS·웹 rollback/교육 (`S11-FE`, `S12-FE`)
-- **수정 위치**: `apps/web/src/features/release/ReleaseCandidateView.tsx`, `apps/web/src/features/release/releaseEngine.ts`, `apps/web/src/features/deployment/deploymentEngine.ts`, `tools/deploy_intranet.ps1`
+- **수정 위치**: `apps/web/src/features/release/ReleaseCandidateView.tsx`, `apps/web/src/features/deployment/IntranetDeploymentView.tsx`, `apps/web/src/features/deployment/deploymentEngine.ts`, `apps/web/src/app/App.tsx`, `tools/deploy_intranet.ps1`
 - **검토 중점**:
   - `ReleaseCandidateView`: 하드코딩된 SLO/결함/접근성 배너 수치 및 고정 `MET` 배지 전면 제거, `slos` 및 `audits` 실측치 기반 동적 집계 및 `slo.status.toUpperCase()` 렌더링 전환.
+  - `IntranetDeploymentView`: `clusterNodes` 연동 및 `reconcileLiveClusterNodes` 실장 — 5-Node 전수 여정 검증 테이블에 제어 평면 실측 클러스터 상태(online, draining 스케줄 배제, 관측 전용 .225) 실시간 대조 표시, 사전 검증(Preflight: 154 checks 통과) vs 물리 5대 실장비 프로덕션 가동(운영자 인수 대기) 경계 전용 배너 분리.
   - WCAG 2.1 AA 명도 대비(11.4:1) 및 키보드 탐색/스크린 리더 ARIA 표준 준수.
   - 단일 Origin Nginx TLS 1.3 리버스 프록시 및 HSTS 배포 파이프라인.
   - 무중단 웹 롤백 엔진(`ReleaseManager` v1.0.0-rc.2 → rc.1 롤백) 검증.
@@ -82,7 +83,7 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 107개 테스트 100% 통과)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 109개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 2. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)

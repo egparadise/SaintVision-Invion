@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.10"
+version: "1.0.11"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T14:10:00+09:00"
+updated: "2026-09-12T15:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -215,7 +215,7 @@ CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.7).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.8).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 
@@ -226,12 +226,12 @@ CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]
 | **GM-03** | S06-FE, S08-FE | 편집·PTY·Git·kill/drain 화면 | PTY 30초 일회용 티켓(/v1/terminal/tickets) 발급 및 단일 사용/4003 차단, 단조 증가 시퀀스, ADR-038 노드 Drain/Undrain REST API 연동 및 SHA-256 감사 원장 |
 | **GM-04** | S09-FE, S10-FE | Agent·AI/MLOps 예시/검증 제거 | 99/100, 24/30 하드코딩 제거, 100건 프롬프트 실시간 누출 방화벽 검사, 미실행/미평가 상태 정직한 렌더링 |
 | **GM-05** | S03-FE, S04-FE, S07-FE, S08-FE, S11-FE | 실제 로그인과 2-PC 브라우저 여정 | OIDC 사일런트 어드민 폴백 전면 제거(ProblemDetails 오류 표시), 3회 제한 복구 수명주기(ADR-044/045), 분산 샤드 자원 연쇄 회수 |
-| **GM-06** | S11-FE, S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 | ReleaseCandidateView 실측치 동적 집계 렌더링, WCAG 2.1 AA 11.4:1 명도 대비 및 키보드/ARIA 표준, Nginx TLS 1.3 무중단 롤백 엔진 |
+| **GM-06** | S11-FE, S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 | IntranetDeploymentView 실시간 클러스터 노드 상태(온라인/draining/관측전용) 대조 및 사전 검증(Preflight) vs 실장비 가동 분리 배너, ReleaseCandidateView 동적 평가, WCAG AA 접근성, Nginx TLS 1.3 무중단 롤백 |
 
 ### B. 독립 검토자(Claude) 확인 요청 사항 및 재현 증거
 
 - **검증 스위트 통과 증거**:
-  1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 107개 테스트 100% 통과)
+  1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 109개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
   3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 154/154 checks 100% 통과)
   4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 63/63 checks 100% 통과)
