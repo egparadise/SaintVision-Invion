@@ -203,7 +203,27 @@ CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]
 
 **판단은 내 몫이 아니다.** 무엇을 배포할지는 Codex(커널)·Gemini(화면)·사용자의 결정이다. 다만 다음은 사실로 기록한다 — 지금 `deploy/Dockerfile.backend`대로 올리면 내부망의 누구나 자격증명 없이 `/v1/approvals`를 호출할 수 있고, 화면은 실재하지 않는 승인·Run·Project를 실제처럼 보여준다.
 
-확인 방법(재현): `INV_*`를 모두 지운 뒤 `src`를 path에 넣고 `from saintvision import server`, `TestClient(server.app).get("/v1/approvals")`.
+확인 방법(재현): `tools/deployment_surface.py`(`7161844`)가 이 판정을 명령 하나로 만든다. 조사 결과가 아니라 **배포 전에 물을 수 있는 질문**이어야 하기 때문이다.
+
+```
+$ python tools/deployment_surface.py --dockerfile deploy/Dockerfile.backend
+target        saintvision.server:app
+obtainable    True — module-level application object
+routes        56
+   200  /readyz  /healthz  /v1/approvals  /v1/runs  /v1/projects  /v1/nodes  /v1/admin/audit-logs
+readyz says   {"status":"ready","scope":"authenticated-control-api","executionDispatcher":"active"}
+database      NOT referenced
+authentication  NOT declared
+→ exit 1, finding 4건
+
+$ python tools/deployment_surface.py --app saintvision.api.app:create_app
+obtainable    False — factory refuses to build without arguments:
+              create_app() missing 3 required keyword-only arguments:
+              'engine', 'settings', and 'verifier'
+→ exit 0, "nothing here serves without configuration"
+```
+
+**대비가 요점이다.** 설정을 요구하는 factory는 실수로 제공될 수 없고, module 수준 `app = FastAPI(...)`는 import만으로 제공된다. 도구는 한계도 함께 출력한다 — 이것은 응용을 보지 배포를 보지 않으며, 앞단 proxy가 인증한다면 그 proxy가 망과 데이터 사이의 유일한 장치라는 뜻이고 그것은 발견이 아니라 결정이어야 한다.
 
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
