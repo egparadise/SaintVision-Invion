@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { WsTerminalClient } from '../src/shared/realtime/ws-terminal';
+import { apiClient } from '../src/shared/api/client';
 
 describe('S01-FE: WebSocket Terminal PTY Client', () => {
   it('connects with 30s one-time ticket query parameter', () => {
@@ -108,5 +109,28 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
     expect(client.getSequence()).toBe(0);
     client.disconnect();
     expect(onStatus).toHaveBeenCalledWith('disconnected');
+  });
+
+  it('requests one-time terminal ticket from canonical workspace endpoint', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url: any) => {
+      if (String(url).includes('/v1/workspaces/wsp_01/terminal-tickets')) {
+        return {
+          ok: true,
+          status: 201,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => ({ ticketId: 'tkt_canonical_123', ptyWsUrl: 'ws://localhost:8080/v1/workspaces/wsp_01/terminals/sess_01' }),
+        } as any;
+      }
+      return { ok: false, status: 404, statusText: 'Not Found', headers: new Headers(), json: async () => ({ detail: 'Not Found' }) } as any;
+    });
+
+    const ticketData = await apiClient<{ ticketId: string }>('/v1/workspaces/wsp_01/terminal-tickets', {
+      method: 'POST',
+      body: JSON.stringify({ workspaceId: 'wsp_01', sessionId: 'sess_01' }),
+    });
+
+    expect(ticketData.ticketId).toBe('tkt_canonical_123');
+    expect(fetchSpy).toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 });

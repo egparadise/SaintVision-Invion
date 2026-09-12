@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NodeItem, SyntheticGpuResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
 interface AdminSecurityConsoleProps {
@@ -38,9 +39,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       secManager.undrainNode(nodeId, 'usr_admin_01');
       refreshState();
       try {
-        await fetch(`/v1/nodes/${nodeId}/undrain`, {
+        await apiClient(`/v1/nodes/${nodeId}/undrain`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ actor: 'usr_admin_01' }),
         });
       } catch (err) {
@@ -50,9 +50,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');
       refreshState();
       try {
-        await fetch(`/v1/nodes/${nodeId}/drain`, {
+        await apiClient(`/v1/nodes/${nodeId}/drain`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Admin manual maintenance and isolation protocol' }),
         });
       } catch (err) {

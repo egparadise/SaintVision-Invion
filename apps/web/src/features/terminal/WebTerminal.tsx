@@ -123,15 +123,28 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         ...prev,
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
       ]);
-      const res = await fetch('/v1/terminal/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workspaceId, sessionId }),
-      });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: 일회용 티켓 재발급 거부`);
+      let ticketData: { ticketId: string; ptyWsUrl?: string };
+      try {
+        ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+          `/v1/workspaces/${workspaceId}/terminal-tickets`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ workspaceId, sessionId }),
+          }
+        );
+      } catch (err: any) {
+        if (isRouteNotFoundError(err)) {
+          ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+            '/v1/terminal/tickets',
+            {
+              method: 'POST',
+              body: JSON.stringify({ workspaceId, sessionId }),
+            }
+          );
+        } else {
+          throw err;
+        }
       }
-      const ticketData = await res.json();
       const ticket = ticketData.ticketId;
 
       setTerminalOutput((prev) => [

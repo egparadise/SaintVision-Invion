@@ -11,7 +11,7 @@ import {
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
-import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
+import { apiClient, isRouteNotFoundError, getAuthToken } from '@/shared/api/client';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 
@@ -504,7 +504,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
     setIsDownloadingArtifact(true);
     try {
-      const res = await fetch(`/v1/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`);
+      const headers: Record<string, string> = {};
+      const token = getAuthToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const res = await fetch(`/v1/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`, {
+        headers,
+      });
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
