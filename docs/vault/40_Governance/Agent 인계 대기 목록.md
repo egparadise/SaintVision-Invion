@@ -491,6 +491,8 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 
 시험 부수 정리: 역할은 cluster 전역이므로 readiness 시험이 자기 소유의 설계 모양 scratch 역할을 만들고 지우도록 바꿨다. 이 기계의 실제 약화된 `inv_app`에 시험 결과가 좌우되던 것을 끊었다.
 
+**B-9 교정 절차 문서화(`d09e6a5`)** — 운영자가 실행할 절차를 절차서 2-1로 적었고, **적기 전에 scratch role 쌍으로 리허설했다**(실제 `inv_app`은 건드리지 않음). 리허설이 순서를 확정했다: 새 자격증명을 만들고 접속·상속을 확인한 **뒤에** 그룹 role을 `NOLOGIN PASSWORD NULL`로 되돌린다 — 반대 순서는 그 사이 배포가 접속을 잃는다. 인수 확인은 상시 검사 그대로: `operational_readiness`의 role shape가 `WEAKER` → `ok`. 남는 운영자 행위는 실행 시점 결정과 `init-db.sql`의 `inv_app` 생성 제거(배포 결정과 함께)뿐이다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
