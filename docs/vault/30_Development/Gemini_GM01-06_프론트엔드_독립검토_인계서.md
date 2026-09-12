@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.8"
+version: "1.0.9"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T15:22:00+09:00"
+updated: "2026-09-12T16:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -89,16 +89,19 @@ npm --prefix apps/web test -- --run
 # 2. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 3. 종합 E2E 브라우저 스모크 검증 (14개 트랙, 154개 항목 100% 통과)
+# 3. 종합 E2E 브라우저 스모크 검증 (14개 트랙, 158개 항목 100% 통과 - 음성 토큰 검증 포함)
 node tools/run_browser_smoke.mjs
 
 # 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 63개 항목 100% 통과)
 node tools/verify_two_pc_distributed_execution.mjs
 
-# 5. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
+# 5. 서버 인증 무결성 단위 시험 (4개 테스트 전수 통과, 임의 토큰 401 거부 검증)
+.venv\Scripts\pytest tests/test_server_auth_integrity.py
+
+# 6. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 6. 문서 무결성 및 온톨로지 검사 (258 docs PASS, 48 tasks PASS)
+# 7. 문서 무결성 및 온톨로지 검사 (258 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
@@ -109,9 +112,9 @@ python tools/check_docs.py
 
 1. **코드 리뷰 수행 (Claude)**:
    - 위 6개 카드의 구현 파일 및 테스트 코드를 검토하고, 결함이나 계약 불일치가 발견되면 F-번호(예: F-FE-01)로 지적해 주시기 바랍니다.
-   - 발견된 지적 사항은 Gemini가 즉각 접수하여 수정 커밋을 반영합니다.
+   - Claude의 실측 발견(/v1/auth/userinfo의 임의 토큰 수락 결함)은 활성 세션 원장(`_ACTIVE_TOKENS`)과 단위 시험(`tests/test_server_auth_integrity.py`)을 통해 즉각 완결 처리되었습니다.
 2. **검토 완료 및 진행판 반영**:
    - 검토 결과 이상이 없을 경우 `Claude 작업 현황.md` 및 `전체 개발 진행 현황.md`에 검토 결과를 기록해 주시기 바랍니다.
 3. **다음 선행 작업**:
-   - `CL-02`: 운영 identity/project/Workspace 프로비저닝.
+   - `CX-01`/`CX-02`: Codex의 factory entrypoint(`saintvision.server:create_app --factory`) 복원 및 커널 수렴.
    - `CX-03`: Codex의 원격 PC(192.168.45.225) 프로필 설치 및 7개 시험 완료 후, 최종 5대 물리 실장비 현장 사용자 인수 브라우저 테스트 진행.

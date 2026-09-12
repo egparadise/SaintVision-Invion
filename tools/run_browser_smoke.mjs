@@ -88,10 +88,40 @@ async function runFullSmokeJourney() {
     // 3. OIDC PKCE S256 Cryptographic Authentication Journey
     // -------------------------------------------------------------------------
     console.log('\n[Track 3] OIDC + PKCE S256 Cryptographic Authentication:');
+    // Negative test 3.1: Absent header rejected with 401
+    const noAuthRes = await fetch(`${BASE_URL}/v1/auth/userinfo`);
+    assert('Unauthenticated /v1/auth/userinfo returns HTTP 401', noAuthRes.status === 401);
+
+    // Negative test 3.2: Junk/untrusted Bearer token rejected with 401 (Zero-Mock Security Guard)
+    const junkAuthRes = await fetch(`${BASE_URL}/v1/auth/userinfo`, {
+      headers: { Authorization: 'Bearer not-a-real-token' },
+    });
+    assert('Junk Bearer token rejected with HTTP 401', junkAuthRes.status === 401);
+    const junkProblem = await junkAuthRes.json();
+    assert('Junk Bearer token returns RFC 9457 AUTH-0050', junkProblem.code === 'AUTH-0050');
+
     const codeVerifier = base64Url(crypto.randomBytes(32));
     const codeChallenge = await sha256Base64Url(codeVerifier);
     const state = crypto.randomUUID();
     const nonce = crypto.randomBytes(16).toString('hex');
+
+    // Negative test 3.3: Invalid PKCE challenge rejected
+    const invalidPkceRes = await fetch(`${BASE_URL}/v1/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'authorization_code',
+        code: 'auth_code_invalid',
+        code_verifier: codeVerifier,
+        code_challenge: 'invalid_mismatching_challenge',
+        code_challenge_method: 'S256',
+        client_id: 'saintvision-web',
+        idp: 'internal-keycloak',
+        state,
+        nonce,
+      }),
+    });
+    assert('Mismatching PKCE challenge rejected with HTTP 401', invalidPkceRes.status === 401);
 
     const tokenRes = await fetch(`${BASE_URL}/v1/auth/token`, {
       method: 'POST',

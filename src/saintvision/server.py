@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import secrets
+import time
 from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from fastapi import (
@@ -797,6 +798,23 @@ def sha256_base64url(plain: str) -> str:
     return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
 
 
+_ACTIVE_TOKENS: Dict[str, Dict[str, Any]] = {}
+
+
+def verify_bearer_token(authorization: Optional[str]) -> Optional[Dict[str, Any]]:
+    """
+    Verify Bearer token against issued active sessions and token expiry.
+    Returns session dict if valid and unexpired; None otherwise.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization[7:].strip()
+    session = _ACTIVE_TOKENS.get(token)
+    if not session or session.get("expires_at", 0) < time.time():
+        return None
+    return session
+
+
 @app.post("/v1/auth/token")
 async def exchange_token(request: Request):
     """
@@ -841,6 +859,18 @@ async def exchange_token(request: Request):
         "email": "admin@saintvision.internal",
     }
 
+    expires_at = time.time() + 3600
+    _ACTIVE_TOKENS[access_token] = {
+        "sub": user["id"],
+        "name": user["name"],
+        "role": user["role"],
+        "roles": ["cluster:admin", "operator"],
+        "tenantId": user["tenantId"],
+        "email": user["email"],
+        "expires_at": expires_at,
+        "scope": "openid profile email cluster:admin",
+    }
+
     return {
         "access_token": access_token,
         "token_type": "Bearer",
@@ -858,13 +888,19 @@ def get_userinfo(request: Request, authorization: Optional[str] = Header(None)):
             401, "AUTH-0050", "Unauthorized", "A valid Bearer token is required.", trace_id, "AUTH"
         )
 
+    session = verify_bearer_token(authorization)
+    if not session:
+        return rfc9457_problem(
+            401, "AUTH-0050", "Unauthorized", "Invalid, expired, or untrusted Bearer token.", trace_id, "AUTH"
+        )
+
     return {
-        "sub": "usr_01JABCDEF_ADMIN",
-        "name": "Keycloak 통합 관리자",
-        "role": "cluster:admin",
-        "roles": ["cluster:admin", "operator"],
-        "tenantId": "00000000-0000-0000-0000-000000000001",
-        "email": "admin@saintvision.internal",
+        "sub": session["sub"],
+        "name": session["name"],
+        "role": session["role"],
+        "roles": session["roles"],
+        "tenantId": session["tenantId"],
+        "email": session["email"],
     }
 
 

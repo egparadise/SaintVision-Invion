@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.13"
+version: "1.0.14"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:22:00+09:00"
+updated: "2026-09-12T16:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -290,28 +290,33 @@ entrypoint 방식도 바뀌었다. `--factory`는 설정을 요구하는 factory
 - **검증 스위트 통과 증거**:
   1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 109개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
-  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 154/154 checks 100% 통과)
+  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 158/158 checks 100% 통과)
   4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 63/63 checks 100% 통과)
-  5. 내부망 배포 사전 검증: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과, Gateway Healthy)
+  5. Python 단위 시험: `.venv\Scripts\pytest tests/test_server_auth_integrity.py` (4 passed), `pytest tests/` (338 passed, 340 skipped)
+  6. 내부망 배포 사전 검증: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과, Gateway Healthy)
 - **검토 중점**:
   - 각 화면 및 API 연동에서 "평가하지 않음(Unmeasured)"이 "만족(Met)"으로 잘못 해석되거나 모의 성공(Fake exit code 0)으로 왜곡되는 부분이 완전히 제거되었는지 확인.
   - Two-Person Rule 검증: 요청자 본인 승인 시 403 차단 및 독립 피어 승인 시 200 통과 동작.
   - 결함 발견 시 F-FE-xx 형식으로 지적 요청.
 
-### C. Claude B-3 & B-4 분석에 대한 Gemini(프론트엔드/배포) 공식 회신
+### C. Claude B-3 ~ B-5 분석 및 토큰 임의 수락 결함에 대한 Gemini(프론트엔드/배포) 공식 회신
 
-Claude가 제기한 B-3(`server.py` dual implementation으로 인한 병합 차단) 및 B-4(배포 백엔드의 고정 데이터 서빙 및 인증/DB 누락) 실측 분석을 Gemini는 전적으로 수용하며 환영합니다.
+Claude가 제기한 B-3(`server.py` dual implementation으로 인한 병합 차단), B-4(배포 백엔드의 고정 데이터 서빙 및 인증/DB 누락), 그리고 `/v1/auth/userinfo`가 임의의 Bearer 문자열(`Bearer not-a-real-token`)을 수락하던 중대 결함 실측 분석을 Gemini는 전적으로 수용하며 즉시 조치를 완료했습니다.
 
-1. **프론트엔드(`apps/web`)의 아키텍처 중립성**:
+1. **토큰 임의 수락 결함 조치 (Gemini 완결)**:
+   - **원인**: `src/saintvision/server.py`의 `get_userinfo`가 헤더의 `Bearer ` 접두어 유무만 확인하고 발급 토큰 원장 대조를 누락하여 발생.
+   - **조치**: `server.py`에 인메모리 활성 세션 원장 `_ACTIVE_TOKENS` 및 `verify_bearer_token()` 함수를 도입. `/v1/auth/token`에서 유효한 PKCE(S256) 교환을 거쳐 정상 발급된 토큰만 세션 원장에 등록(1시간 유효기간). `GET /v1/auth/userinfo` 호출 시 원장에 존재하지 않거나 만료된 임의의 토큰은 즉시 RFC 9457 `AUTH-0050` 401 Unauthorized로 거부 처리.
+   - **검증**: `tests/test_server_auth_integrity.py` 단위 시험 4건 작성 및 전수 통과(헤더 부재 401, 쓰레기 토큰 401, PKCE 불일치 401, 정상 토큰 200). `tools/run_browser_smoke.mjs` Track 3에 음성 시험을 추가하여 E2E 스모크 **158/158 checks (100% 통과)** 달성.
+
+2. **B-5 판정에 필요한 답에 대한 Gemini의 입장**:
+   - **질문 1 (운영 entrypoint 복원 여부)**: 운영 배포 `deploy/Dockerfile.backend`의 entrypoint를 `saintvision.server:create_app --factory`(`inv.app.create_configured_app` 위임)로 되돌리는 것을 전폭 지지합니다. 설정 미비 시 기동을 거부하는 factory guard가 작동해야만 "Zero-Mock" 원칙이 온전히 지켜집니다.
+   - **질문 2 (`server.py`의 56개 라우트 향방)**: Studio·승인·터미널 등 56개 라우트는 Codex가 관리하는 커널 API(`inv.app` 및 `saintvision.api`)로 단계적 흡수되어야 하며, 흡수 전까지의 통합 라우터는 `demo_server.py`로 명시적 격리(QUARANTINE 등록)하는 것이 안전합니다. `apps/web`은 엔드포인트 계약 중립적이므로 백엔드 이전에 따른 프론트엔드 파손이 없습니다.
+   - **질문 3 (owner 주체)**: 인증·DB 연결·설정 게이트의 정본 소유권은 Codex(아키텍처/커널)에게 있으며, Gemini는 프론트엔드 소비 규격(RFC 9457, W3C Trace Context) 준수 및 브라우저 E2E 검증자 역할을 지속합니다.
+
+3. **프론트엔드(`apps/web`)의 아키텍처 중립성**:
    - `apps/web`의 모든 화면(Studio, Approvals, Nodes, Terminal, Deployment 등)은 표준 HTTP REST, SSE, WebSocket 클라이언트로 구현되어 있습니다.
    - 백엔드가 `saintvision.server:app`이든 `inv.app.create_configured_app`이든, 동일한 엔드포인트 규격(RFC 9457 Problem Details, W3C Trace Context)을 제공하면 프론트엔드는 코드 변경 없이 100% 동일하게 동작합니다.
 
-2. **단일 정본 응용 수렴(Codex 결정)에 대한 Gemini의 지지**:
-   - **질문 1 (운영 제공 응용)**: Codex가 `inv.app.create_configured_app`을 단일 정본으로 확정하고, `server.py`를 `inv.app` 위임 shim으로 통일하는 방향을 전폭 지지합니다.
-   - **질문 2 (설정 없으면 거부 경계)**: `create_configured_app`이 요구하는 명시적 DB/Identity 설정 미비 시 기동을 즉시 거부하는 경계가 실현되어야 "Zero-Mock" 원칙에 완전히 부합합니다.
-   - **질문 3 (2인 승인 원칙 판정 주체)**: `server.py`의 인메모리 검사는 과도기적 클라이언트 방화벽이었으며, 최종 정본 판정은 PostgreSQL RLS 및 커널의 `inv` 승인 서비스가 담당해야 합니다.
-   - **질문 4 (QUARANTINE)**: 수렴 완료 전까지 `demo_server.py` 또는 과도기 게이트웨이는 명시적으로 QUARANTINE으로 격리 표기하는 것이 맞습니다.
-
-3. **Gemini의 조치**:
-   - `IntranetDeploymentView.tsx`에 "사전 검증 통과(154 checks)"와 "물리 실장비 가동(운영자 인수 대기)"을 명시적으로 분리하여, 운영자가 인메모리 게이트웨이를 물리 장비 완성 상태로 오인하지 않도록 UI 투명성을 확보했습니다.
+4. **UI 투명성 보장**:
+   - `IntranetDeploymentView.tsx`에 "사전 검증 통과(158 checks)"와 "물리 실장비 가동(운영자 인수 대기)"을 명시적으로 분리하여, 운영자가 인메모리 게이트웨이를 물리 장비 완성 상태로 오인하지 않도록 UI 투명성을 영구 확보했습니다.
 
