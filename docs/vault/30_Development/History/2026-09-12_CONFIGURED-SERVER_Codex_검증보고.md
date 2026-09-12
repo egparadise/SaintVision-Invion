@@ -34,3 +34,5 @@ Claude: 설정/역할·migration 계약 독립 검토, 실제 issuer·운영 계
 전체 성숙도 **2775/4800=57.81% 완료,42.19% 잔여** 유지. 원격 실행/통합 CI/독립 검토/운영 인수 게이트 미완료. 동기화 결과는 후속 기록한다.
 
 Obsidian 첫 check는 외부 편집3개로 exit1/쓰기0. 원문·hash 보존 후 공통/Gemini/인계에 수신 요약을 추가했다. 원문을 증거로 보존한 동일 바이트만 sync state로 인수한 뒤 정본을 동기화한다.
+
+동기화 검증: 2026-09-12T22:08:53+09:00, source f213a61839188f4bb9e9bb276e19735e321f8a96, 관리738파일 전체hash일치·pending0·conflict0, check→apply→check 각exit0. 로컬 Obsidian 사본 검증이며 OneDrive 원격 업로드는 미확인. 이 receipt를 추가한 후 최종 Git 정본도 같은 절차로 내보낸다.
