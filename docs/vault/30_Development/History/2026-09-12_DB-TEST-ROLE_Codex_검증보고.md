@@ -35,3 +35,7 @@ Evidence: [[db-test-role-4ec4c5d.json]], [[db-test-role-4ec4c5d-tests.xml]], [[d
 Claude: 코드/SQL 독립 검토와 현재 작업 lane의 구 fixture 변경 반영. Gemini: 배포 환경 변수 주입/정본 factory 설정·인증 준비,기본 credential fallback 재도입 금지. 모든 Agent는 예전 공용 inv_app ALTER ROLE fixture를 운영 연결에서 다시 실행하지 않는다.
 
 전체2775/4800=57.8125%,잔여42.1875% 유지. 재발 방지 코드는 수정됐지만 기존 운영 credential 폐기/CI/독립 검토/실제 운영 인수는 미완료. 보관 백업은 앞선 [[2026-09-12_LAN-RETAINED-BACKUP_Codex_검증보고]]를 따른다. 최종 문서 검사와 sync 영수증은 후속 기록한다.
+
+## 최종 전달
+
+문서355개/48 task와 ontology 검사 exit0. 외부3개 편집 원본/hash 보존 후 동일bytes adopt. 20:11:42 KST/2e66d0c 로컬 Obsidian721개 hash 일치/pending0/conflicts0. [[db-test-role-obsidian-20260912.json]]. OneDrive cloud 미확인. 영수증 추가 후 최종 commit/push/sync를 수행한다.
