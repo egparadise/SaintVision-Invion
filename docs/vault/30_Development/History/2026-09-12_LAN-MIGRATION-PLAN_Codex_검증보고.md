@@ -41,3 +41,7 @@ Evidence: [[lan-migration-plan-b5493d7.json]], [[lan-migration-validation-b5493d
 3. Codex: 검증된 복구·DB 적용 계획과 별도 Node 후보 묶음을 연결하고, 원격 Windows/WSL 경로 확인 후 실제 mTLS/Evidence·7개 실행/취소/복구 인수 진행.
 
 전체2775/4800=57.8125%, 잔여42.1875% 유지. PR19 draft/CI/독립 검토/원격 인수 미완료. Obsidian 최종 동기화는 후속 기입.
+
+## 최종 전달
+
+문서346개/48task·ontology exit0. 외부 동시 편집3개가 두 번 감지되어 각각 원문/hash 보존 후 동일bytes adopt로만 동기화했다. 18:20:24 KST/e1acb7e 로컬 Obsidian683개 hash 일치/pending0/conflicts0, [[lan-migration-obsidian-20260912.json]]. OneDrive cloud 미확인. 이 영수증 추가 후 최종 commit/push/sync를 수행한다.
