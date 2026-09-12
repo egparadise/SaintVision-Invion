@@ -33,3 +33,5 @@ Codex: 원격 PC의 Ubuntu/Docker 경로와 준비/교체 receipt를 실제 검�
 Claude: ADR-096 입력·prepared request 해시/잠금·bridge/executor 경계를 독립 검토. Gemini: prepare/로컬 설치/서버 인수 상태를 분리 표시하고 실제 커널 계약 브라우저 검증을 수행한다.
 
 전체 **2775/4800=57.81% 완료 /42.19% 잔여 유지**. Windows 모사 시험과 Linux 시험을 물리 Windows/원격 인수로 합쳐 표현하지 않는다. [[Codex Node 저장소 설정 설치와 교체 절차]]에 운영 입력 예제를 기록했다.
+
+전달 검사: check_docs exit0(문서340/작업48), check_ontology exit0, git diff --check exit0. PR19 갱신/draft 유지. 보고ea5eff8 push exit0. 첫 Obsidian check는 외부3개 변경으로 exit1/쓰기0. 원문/hash를 보존하고 Gemini ea508ea 주장을 독립 검증과 구분해 수신 기록했다. 동일 bytes 보존을 확인한 뒤 쓰기0 인수·정본 동기화를 진행한다.

@@ -133,3 +133,10 @@ Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 
 Codex 정본 결정 유지: src/saintvision/server.py는 inv.app.create_configured_app 위임, deploy/Dockerfile.backend는 saintvision.server:create_app --factory다(현재7e5d029 직접 읽기 확인). 새 인메모리 토큰 원장을 운영 인증 정본으로 채택하지 않는다. fixture route를 그대로 옮기지 않고 현재 커널 권한/DB/Evidence 계약에 필요한 경로를 비교한다. Frontend 변경 없이 100% 동일 동작한다는 주장은 endpoint별 브라우저 확인 전에는 수락하지 않는다. 해당 integration branch 배포/병합에는 별도 독립 검토가 필요하다.
 
 신규 교체 결과는 [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]]의 f766146 실제 Docker11/경계111이다. 다음 Codex Windows/WSL 진입점, Claude ADR-095/교체 복구 검토, Gemini 실제 계약에 대한 화면 확인. 전체57.81% 유지.
+
+
+## 2026-09-12 STORAGE-WINDOWS 전달 중 Gemini 보고 수신
+
+[외부3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-windows/manifest.json)를 보존했다. Gemini는 integration/all-agents-unified/base ea508ea에서 Nginx 보안 헤더와 Authorization 전달, PKCE/userinfo를 넣은 스위트67, smoke158/Vitest109/Python338 passed·340 skipped를 보고했다. 작성자 주장/독립 검토 pending이며 물리2-PC/GPU 인수나 운영 인증 완료의 증거로 올리지 않는다. 헤더 전달 설정만으로 backend의 토큰/권한 검증을 보장하지 않는다. 현재 Codex configured factory/커널 인증 정본 결정은 유지한다.
+
+최신 Codex 결과는 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]] e512b60 경계121/Linux bridge1이며 실제 Windows→Ubuntu→Docker와 원격 .225 인수는 다음 작업이다. Claude ADR-096/bridge 검토, Gemini 실제 커널 endpoint별 브라우저 검증, 전체57.81% 유지.

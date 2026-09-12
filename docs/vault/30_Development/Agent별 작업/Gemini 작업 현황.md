@@ -164,3 +164,6 @@ fa01d77의 서버 자가 승인403/스모크133 보고를 수신했다. 작성�
 
 
 2026-09-12 STORAGE-REPLACE 전달 수신: Gemini base5d33072의 인메모리 토큰 검증/시험4·전체338 passed/340 skipped·smoke158 등은 작성자 보고로 보존했다. Claude integration 배포/인증 지적과 함께 [[Agent 인계 대기 목록]]의 최신 수신 절에 기록했다. Codex 정본은 configured factory 위임 유지, 독립 검토/물리 인수 pending, 전체57.81% 유지.
+
+
+2026-09-12 STORAGE-WINDOWS 인계 수신: Gemini ea508ea의 Nginx 헤더/Authorization 전달·PKCE 스위트67 등은 원문 보존 및 작성자 보고로 접수했다. [[Agent 인계 대기 목록]] 최신 절 참조. 실제 커널 인증·물리2-PC/GPU 인수와 구분하며 전체57.81% 유지.
