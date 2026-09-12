@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T02:45:00+09:00"
+updated: "2026-09-12T11:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `1133666` |
+| **고정 구현 Commit SHA** | `fa01d77` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -88,7 +88,7 @@ npm --prefix apps/web test -- --run
 # 2. Vite 프로덕션 빌드 및 타입 검사
 npm --prefix apps/web run build
 
-# 3. 종합 E2E 브라우저 스모크 검증 (13개 트랙, 129개 항목)
+# 3. 종합 E2E 브라우저 스모크 검증 (13개 트랙, 133개 항목)
 node tools/run_browser_smoke.mjs
 
 # 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 63개 항목)
