@@ -1,5 +1,11 @@
-﻿import { describe, it, expect, vi } from 'vitest';
-import { apiClient, ApiError, generateTraceId, generateSpanId } from '../src/shared/api/client';
+import { describe, it, expect, vi } from 'vitest';
+import {
+  apiClient,
+  ApiError,
+  generateTraceId,
+  generateSpanId,
+  isRouteNotFoundError,
+} from '../src/shared/api/client';
 import { ProblemDetails } from '../src/contracts/types';
 
 describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
@@ -28,6 +34,25 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
     const traceparent = headers.get('traceparent');
     expect(traceparent).toBeDefined();
     expect(traceparent).toMatch(/^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
+
+    fetchSpy.mockRestore();
+  });
+
+  it('injects Idempotency-Key header when idempotencyKey option is provided', async () => {
+    const mockResponse = { ok: true, status: 200, json: async () => ({ status: 'cancelled' }) };
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse as any);
+
+    await apiClient('/v1/runs/run_01/cancel', {
+      method: 'POST',
+      idempotencyKey: 'idmp_test_12345',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const [, init] = fetchSpy.mock.calls[0];
+    const headers = init?.headers as Headers;
+
+    expect(headers).toBeDefined();
+    expect(headers.get('Idempotency-Key')).toBe('idmp_test_12345');
 
     fetchSpy.mockRestore();
   });
@@ -66,5 +91,70 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
     } finally {
       fetchSpy.mockRestore();
     }
+  });
+
+  describe('isRouteNotFoundError boundary discrimination', () => {
+    it('identifies unmapped FastAPI route 404 ({detail: "Not Found"}) as route not found', () => {
+      const err = new ApiError({
+        type: 'about:blank',
+        title: 'Not Found',
+        status: 404,
+        detail: 'Not Found',
+      });
+      expect(isRouteNotFoundError(err)).toBe(true);
+    });
+
+    it('identifies synthetic client network 404 as route not found', () => {
+      const err = new ApiError({
+        type: 'about:blank',
+        title: 'Not Found',
+        status: 404,
+        code: 'NET-404',
+        detail: 'Network 404',
+      });
+      expect(isRouteNotFoundError(err)).toBe(true);
+    });
+
+    it('distinguishes entity/resource RES-RUN-404 from route not found', () => {
+      const err = new ApiError({
+        type: 'https://saintvision.invenio/problems/run-not-found',
+        title: 'Run Not Found',
+        status: 404,
+        code: 'RES-RUN-404',
+        category: 'RES',
+        detail: 'Run run_123 does not exist or is masked',
+      });
+      expect(isRouteNotFoundError(err)).toBe(false);
+    });
+
+    it('distinguishes SEC-TWO-PERSON-403, VAL-400, SEC-STATE-409 from route not found', () => {
+      const err403 = new ApiError({
+        type: 'https://saintvision.invenio/problems/forbidden',
+        title: 'Forbidden',
+        status: 403,
+        code: 'SEC-TWO-PERSON-403',
+        detail: 'Proposer cannot approve',
+      });
+      const err409 = new ApiError({
+        type: 'https://saintvision.invenio/problems/conflict',
+        title: 'Conflict',
+        status: 409,
+        code: 'SEC-STATE-409',
+        detail: 'Run not in resumable state',
+      });
+      const err500 = new ApiError({
+        type: 'https://saintvision.invenio/problems/internal',
+        title: 'Internal Server Error',
+        status: 500,
+        code: 'SYS-500',
+        detail: 'Internal server error',
+      });
+
+      expect(isRouteNotFoundError(err403)).toBe(false);
+      expect(isRouteNotFoundError(err409)).toBe(false);
+      expect(isRouteNotFoundError(err500)).toBe(false);
+      expect(isRouteNotFoundError(null)).toBe(false);
+      expect(isRouteNotFoundError(undefined)).toBe(false);
+    });
   });
 });

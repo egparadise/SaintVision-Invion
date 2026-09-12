@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { WsTerminalClient } from '@/shared/realtime/ws-terminal';
+import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 
 export interface WebTerminalProps {
   workspaceId: string;
@@ -39,22 +40,28 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           ...prev,
           `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
         ]);
-        let res = await fetch(`/v1/workspaces/${workspaceId}/terminal-tickets`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ workspaceId, sessionId }),
-        });
-        if (res.status === 404) {
-          res = await fetch('/v1/terminal/tickets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ workspaceId, sessionId }),
-          });
+        let ticketData: { ticketId: string; ptyWsUrl?: string };
+        try {
+          ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+            `/v1/workspaces/${workspaceId}/terminal-tickets`,
+            {
+              method: 'POST',
+              body: JSON.stringify({ workspaceId, sessionId }),
+            }
+          );
+        } catch (err: any) {
+          if (isRouteNotFoundError(err)) {
+            ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+              '/v1/terminal/tickets',
+              {
+                method: 'POST',
+                body: JSON.stringify({ workspaceId, sessionId }),
+              }
+            );
+          } else {
+            throw err;
+          }
         }
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: 일회용 티켓 발급 거부`);
-        }
-        const ticketData = await res.json();
         const ticket = ticketData.ticketId;
         if (!active) return;
 

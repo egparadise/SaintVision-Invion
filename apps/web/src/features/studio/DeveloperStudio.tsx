@@ -11,7 +11,7 @@ import {
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
-import { apiClient } from '@/shared/api/client';
+import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 
@@ -543,19 +543,21 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handleCancelSubmit = async () => {
     if (!activeRunId) return;
     setIsCancelling(true);
+    const idempotencyKey = `idmp_cancel_${activeRunId}`;
     try {
       try {
         await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
           method: 'POST',
           body: JSON.stringify({ reason: cancelReason }),
+          idempotencyKey,
         });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
+        if (isRouteNotFoundError(err)) {
           await apiClient(`/v1/runs/${activeRunId}/cancel`, {
             method: 'POST',
             body: JSON.stringify({ reason: cancelReason }),
+            idempotencyKey,
           });
         } else {
           throw err;
@@ -581,14 +583,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   // Prepare Resume (ADR-044)
   const handlePrepareResume = async () => {
     if (!activeRunId) return;
+    const idempotencyKey = `idmp_resume_prep_${activeRunId}`;
     try {
       try {
-        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, {
+          method: 'POST',
+          idempotencyKey,
+        });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
-          await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
+        if (isRouteNotFoundError(err)) {
+          await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, {
+            method: 'POST',
+            idempotencyKey,
+          });
         } else {
           throw err;
         }

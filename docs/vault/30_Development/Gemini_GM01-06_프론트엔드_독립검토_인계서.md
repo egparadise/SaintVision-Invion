@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.13"
+version: "1.0.14"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T18:18:00+09:00"
+updated: "2026-09-12T18:57:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -87,7 +87,7 @@ source_of_truth: "Git"
 .venv\Scripts\python.exe tools/route_coverage.py --served src/saintvision --client apps/web/src
 .venv\Scripts\pytest tests/test_route_coverage.py
 
-# 2. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 109개 테스트 100% 통과)
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 114개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)

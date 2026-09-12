@@ -22,7 +22,7 @@ import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
-import { apiClient, clearAuthToken } from '@/shared/api/client';
+import { apiClient, clearAuthToken, isRouteNotFoundError } from '@/shared/api/client';
 
 // Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -366,20 +366,22 @@ export const App: React.FC = () => {
     try {
       const apprv = approvals.find((a) => a.id === approvalId);
       const prjId = apprv?.projectId || 'prj_01JABCDE';
+      const idempotencyKey = `idmp_apprv_${approvalId}_${nonce}`;
       try {
         // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
         await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
           method: 'POST',
           body: JSON.stringify({ decision: 'approve', nonce }),
+          idempotencyKey,
         });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
-        // Never duplicate submission on 400 (Bad Request), 401 (Unauthorized), 403 (Two-Person Rule), or 409 (Conflict).
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
+        // Safe mutation fallback: Only fallback to legacy flat route if route does not exist (Router 404).
+        // If the resource was not found (RES-404) or blocked (400, 401, 403, 409), re-throw without fallback.
+        if (isRouteNotFoundError(err)) {
           await apiClient(`/v1/approvals/${approvalId}/approve`, {
             method: 'POST',
             body: JSON.stringify({ nonce }),
+            idempotencyKey,
           });
         } else {
           throw err;
@@ -399,19 +401,20 @@ export const App: React.FC = () => {
     try {
       const apprv = approvals.find((a) => a.id === approvalId);
       const prjId = apprv?.projectId || 'prj_01JABCDE';
+      const idempotencyKey = `idmp_reject_${approvalId}_${Date.now()}`;
       try {
         // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
         await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
           method: 'POST',
           body: JSON.stringify({ decision: 'reject', reason }),
+          idempotencyKey,
         });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
+        if (isRouteNotFoundError(err)) {
           await apiClient(`/v1/approvals/${approvalId}/reject`, {
             method: 'POST',
             body: JSON.stringify({ reason }),
+            idempotencyKey,
           });
         } else {
           throw err;
@@ -431,19 +434,20 @@ export const App: React.FC = () => {
     try {
       const targetRun = runs.find((r) => r.id === runId);
       const prjId = targetRun?.projectId || 'prj_01JABCDE';
+      const idempotencyKey = `idmp_cancel_${runId}`;
       try {
         // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
         await apiClient(`/v1/projects/${prjId}/runs/${runId}/cancel`, {
           method: 'POST',
           body: JSON.stringify({ reason }),
+          idempotencyKey,
         });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to legacy flat route if 404 (route not found).
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
+        if (isRouteNotFoundError(err)) {
           await apiClient(`/v1/runs/${runId}/cancel`, {
             method: 'POST',
             body: JSON.stringify({ reason }),
+            idempotencyKey,
           });
         } else {
           throw err;

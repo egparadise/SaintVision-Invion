@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
-import { apiClient } from '@/shared/api/client';
+import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -53,13 +53,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     setIsPreparingResume(true);
     try {
       const prjId = run.projectId || 'prj_01JABCDE';
+      const idempotencyKey = `idmp_resume_prep_${run.id}`;
       try {
-        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, { method: 'POST' });
+        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, {
+          method: 'POST',
+          idempotencyKey,
+        });
       } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (404)
-        const status = err?.problem?.status || err?.status;
-        if (status === 404) {
-          await apiClient(`/v1/runs/${run.id}/resume/prepare`, { method: 'POST' });
+        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
+        if (isRouteNotFoundError(err)) {
+          await apiClient(`/v1/runs/${run.id}/resume/prepare`, {
+            method: 'POST',
+            idempotencyKey,
+          });
         } else {
           throw err;
         }
