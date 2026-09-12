@@ -305,7 +305,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             exportedAt: res.completedAt || new Date().toISOString(),
           });
         } else {
-          apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`)
+          apiClient<any>(`/v1/runs/${activeRunId}/artifacts`)
             .then((data) => {
               if (mounted && data) setArtifactData(data);
             })
@@ -315,7 +315,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         }
       })
       .catch(() => {
-        apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`)
+        apiClient<any>(`/v1/runs/${activeRunId}/artifacts`)
           .then((data) => {
             if (mounted && data) setArtifactData(data);
           })
@@ -442,7 +442,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     try {
       let serverPayload: any = null;
       try {
-        serverPayload = await apiClient<any>(`/v1/runs/${activeRunId}/artifacts/download`);
+        serverPayload = await apiClient<any>(`/v1/runs/${activeRunId}/artifacts`);
       } catch {
         // Fallback to cached artifactData
       }

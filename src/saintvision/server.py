@@ -997,6 +997,7 @@ async def drain_node(node_id: str, request: Request):
 
 
 @app.post("/v1/nodes/{node_id}/undrain")
+@app.post("/v1/nodes/{node_id}/resume")
 async def undrain_node(node_id: str, request: Request):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
     try:

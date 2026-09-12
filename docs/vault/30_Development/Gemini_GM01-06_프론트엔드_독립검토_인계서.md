@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.19"
+version: "1.0.20"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T23:25:00+09:00"
+updated: "2026-09-12T23:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -51,7 +51,7 @@ source_of_truth: "Git"
 - **검토 중점**:
   - `WebTerminal`: 클라이언트 임의 생성 문자열 티켓 전면 제거. 제어 평면 `/v1/terminal/tickets`에서 암호학적 30초 일회용 티켓 발급 후 WebSocket 인증(`?ticket=tkt_...`). 위조/만료/재사용 티켓은 4003 Policy Violation 즉시 차단.
   - `WsTerminalClient`: 클라이언트 측 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동 (`sendInput` 시 `{ type: 'data', payload, sequence }` 전송) 및 PTY 감사 순서(F2) 정렬, 재연결 및 오류 디스패치 테스트.
-  - `AdminSecurityConsole` & `server.py`: ADR-038 노드 Drain/Undrain 제어 평면 REST API (`POST /v1/nodes/{id}/drain`, `POST /v1/nodes/{id}/undrain`) 연동 — Drain 시 스케줄링 즉시 배제(`schedulable: false`, `status: draining`), 배치 엔진 하드 필터 자동 탈락, SHA-256 감사 원장(`AUDIT_LOGS`) 자동 기록, Undrain 시 복구.
+  - `AdminSecurityConsole` & `server.py`: ADR-038 노드 Drain/Resume 제어 평면 REST API (`POST /v1/nodes/{id}/drain`, `POST /v1/nodes/{id}/resume` 및 하위 호환 `/undrain`) 연동 — Drain 시 스케줄링 즉시 배제(`schedulable: false`, `status: draining`), 배치 엔진 하드 필터 자동 탈락, SHA-256 감사 원장(`AUDIT_LOGS`) 자동 기록, Resume 시 복구.
 
 ### GM-04: Agent·AI/MLOps 예시와 검증 표시 제거 (`S09-FE`, `S10-FE`)
 - **수정 위치**: `apps/web/src/features/agent/agentEngine.ts`, `apps/web/src/features/agent/NaturalLanguageRunView.tsx`, `apps/web/src/features/mlops/mlopsEngine.ts`
@@ -93,7 +93,7 @@ npm --prefix apps/web test -- --run
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 4. E2E 브라우저 스모크 검증 (14개 트랙, 174개 항목 100% 통과 - 프로젝트 스코프 및 터미널 API 포함)
+# 4. E2E 브라우저 스모크 검증 (14개 트랙, 181개 항목 100% 통과 - 커널 resume 엔드포인트 포함)
 node tools/run_browser_smoke.mjs
 
 # 5. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
@@ -105,7 +105,7 @@ node tools/verify_two_pc_distributed_execution.mjs
 # 7. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 8. 문서 무결성 및 온톨로지 검사 (264 docs PASS, 48 tasks PASS)
+# 8. 문서 무결성 및 온톨로지 검사 (267 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
@@ -116,10 +116,10 @@ python tools/check_docs.py
 
 1. **코드 리뷰 수행 (Claude)**:
    - 위 6개 카드의 구현 파일 및 테스트 코드를 검토하고, 결함이나 계약 불일치가 발견되면 F-번호(예: F-FE-01)로 지적해 주시기 바랍니다.
-   - Claude의 실측 발견 B-6/B-8 및 Codex의 지적사항("mutation의 평면 fallback/중복 제출 안전성")에 대해:
-     - **Mutation Fallback 안전성**: `App.tsx`, `DeveloperStudio.tsx`, `RunDetail.tsx`의 모든 mutation 핸들러(`handleApprove`, `handleReject`, `handleCancelRun`, `handlePrepareResume`)에서 404(Route Not Found)일 때만 평면 경로로 fallback하도록 엄격히 제한하고, 400, 401, 403(2인 승인 위반), 409 등 비즈니스/권한 거부 시에는 중복 제출 없이 즉시 에러를 전파하도록 조치 완료.
-     - **Workspace Terminal API 정합**: `WebTerminal.tsx`에서 정본 `/v1/workspaces/${workspaceId}/terminal-tickets` 우선 호출 및 404 fallback 연동, `server.py`에 정본 라우트 데코레이터 연결 완료.
-     - `tools/route_coverage.py` 실측 결과: 클라이언트 요청 34개 경로 전수 100% 제공 (**0 unserved, Exit Code 0**).
+   - Claude의 실측 발견 B-6/B-8 및 Codex의 지적사항에 대해:
+     - **Mutation Fallback 안전성**: `App.tsx`, `DeveloperStudio.tsx`, `RunDetail.tsx`의 모든 mutation 핸들러에서 404(Route Not Found)일 때만 평면 경로로 fallback하도록 제한하고, 400, 401, 403, 409 등 비즈니스/권한 거부 시에는 중복 제출 없이 즉시 에러를 전파하도록 조치 완료.
+     - **커널 Resume 및 Artifacts API 정합**: `AdminSecurityConsole.tsx`에서 커널 정본 `POST /v1/nodes/${nodeId}/resume` 우선 호출, `DeveloperStudio.tsx`에서 커널 정본 `GET /v1/runs/${id}/artifacts` 호출, `server.py`에 별칭 데코레이터 연결 완료.
+     - `tools/route_coverage.py` 실측 결과: 클라이언트 요청 35개 경로 전수 100% 제공 (**0 unserved, Exit Code 0**).
 2. **검토 완료 및 진행판 반영**:
    - 검토 결과 이상이 없을 경우 `Claude 작업 현황.md` 및 `전체 개발 진행 현황.md`에 검토 결과를 기록해 주시기 바랍니다.
 3. **다음 선행 작업**:

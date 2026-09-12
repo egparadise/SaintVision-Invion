@@ -813,7 +813,7 @@ async function runFullSmokeJourney() {
     const drainLog = auditData.items?.find((item) => item.action === 'node_drain_activated' && item.target === 'nod_01JABCDEF02');
     assert('Audit log contains node_drain_activated record', Boolean(drainLog));
 
-    // 4. Undrain node nod_01JABCDEF02
+    // 4. Undrain node nod_01JABCDEF02 (legacy alias)
     const undrainRes = await fetch(`${BACKEND_URL}/v1/nodes/nod_01JABCDEF02/undrain`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -824,6 +824,25 @@ async function runFullSmokeJourney() {
     assert('Restored node status is online', undrainData.status === 'online');
     assert('Restored node schedulable is true', undrainData.schedulable === true);
     assert('Restored node isDraining is false', undrainData.isDraining === false);
+
+    // 5. Test canonical kernel route POST /v1/nodes/{id}/resume
+    const reDrainRes = await fetch(`${BACKEND_URL}/v1/nodes/nod_01JABCDEF02/drain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Kernel resume verification' }),
+    });
+    assert('POST /v1/nodes/{id}/drain re-drain returns HTTP 200', reDrainRes.status === 200);
+
+    const resumeRes = await fetch(`${BACKEND_URL}/v1/nodes/nod_01JABCDEF02/resume`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actor: 'usr_admin_01' }),
+    });
+    assert('POST /v1/nodes/{id}/resume (canonical kernel route) returns HTTP 200', resumeRes.status === 200);
+    const resumeData = await resumeRes.json();
+    assert('Resumed node status is online via /resume', resumeData.status === 'online');
+    assert('Resumed node schedulable is true via /resume', resumeData.schedulable === true);
+    assert('Resumed node isDraining is false via /resume', resumeData.isDraining === false);
 
     // -------------------------------------------------------------------------
     // Summary Dossier

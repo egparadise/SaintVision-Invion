@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NodeItem, SyntheticGpuResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
-import { apiClient } from '@/shared/api/client';
+import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
 interface AdminSecurityConsoleProps {
@@ -39,12 +39,23 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       secManager.undrainNode(nodeId, 'usr_admin_01');
       refreshState();
       try {
-        await apiClient(`/v1/nodes/${nodeId}/undrain`, {
+        await apiClient(`/v1/nodes/${nodeId}/resume`, {
           method: 'POST',
           body: JSON.stringify({ actor: 'usr_admin_01' }),
         });
       } catch (err) {
-        console.error('Failed to sync node undrain to control plane:', err);
+        if (isRouteNotFoundError(err)) {
+          try {
+            await apiClient(`/v1/nodes/${nodeId}/undrain`, {
+              method: 'POST',
+              body: JSON.stringify({ actor: 'usr_admin_01' }),
+            });
+          } catch (e) {
+            console.error('Failed to sync node undrain to control plane:', e);
+          }
+        } else {
+          console.error('Failed to sync node undrain to control plane:', err);
+        }
       }
     } else {
       secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');

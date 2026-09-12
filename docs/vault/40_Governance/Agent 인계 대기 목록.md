@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.25"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T23:25:00+09:00"
+updated: "2026-09-12T23:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -574,7 +574,7 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.19).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.20).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 
@@ -582,17 +582,17 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 |---|---|---|---|
 | **GM-01** | S01-FE, S03-FE, S04-FE | 정본 readiness·결과 파일·승인 UX | `/v1/runs/{id}/artifacts/content` 원본 바이트 다운로드 및 SHA-256 대조, 7대 정본 준비도 평가와 admission 분리, Two-Person Rule 요청자 자가 승인 차단(403) |
 | **GM-02** | S02-FE, S05-FE, S07-FE | 실제 Node와 자원 숫자·관측 시각 | 전체량-allocatable 감산 왜곡 제거, Headroom(물리/실측/가용) 분리 렌더링, 관측 전용 노드(.225) 스케줄링 배제 |
-| **GM-03** | S06-FE, S08-FE | 편집·PTY·Git·kill/drain 화면 | PTY 30초 일회용 티켓(/v1/terminal/tickets) 발급 및 단일 사용/4003 차단, 단조 증가 시퀀스, ADR-038 노드 Drain/Undrain REST API 연동 및 SHA-256 감사 원장 |
+| **GM-03** | S06-FE, S08-FE | 편집·PTY·Git·kill/drain 화면 | PTY 30초 일회용 티켓(/v1/terminal/tickets) 발급 및 단일 사용/4003 차단, 단조 증가 시퀀스, ADR-038 노드 Drain/Resume REST API (`POST /v1/nodes/{id}/resume` 및 `/undrain`) 연동 및 SHA-256 감사 원장 |
 | **GM-04** | S09-FE, S10-FE | Agent·AI/MLOps 예시/검증 제거 | 99/100, 24/30 하드코딩 제거, 100건 프롬프트 실시간 누출 방화벽 검사, 미실행/미평가 상태 정직한 렌더링 |
 | **GM-05** | S03-FE, S04-FE, S07-FE, S08-FE, S11-FE | 실제 로그인과 2-PC 브라우저 여정 | OIDC 사일런트 어드민 폴백 전면 제거(ProblemDetails 오류 표시), 3회 제한 복구 수명주기(ADR-044/045), 분산 샤드 자원 연쇄 회수 |
-| **GM-06** | S11-FE, S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 | IntranetDeploymentView 실시간 클러스터 노드 상태(온라인/draining/관측전용) 대조 및 사전 검증(Preflight) vs 실장비 가동 분리 배너, ReleaseCandidateView 동적 평가, WCAG AA 접근성, Nginx TLS 1.3 무중단 롤백 |
+| **GM-06** | S11-FE, S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 | IntranetDeploymentView 실시간 클러스터 노드 상태(온라인/draining/관측전용) 대조 및 사전 검증(Preflight: 181 checks 통과) vs 실장비 가동 분리 배너, ReleaseCandidateView 동적 평가, WCAG AA 접근성, Nginx TLS 1.3 무중단 롤백 |
 
 ### B. 독립 검토자(Claude) 확인 요청 사항 및 재현 증거
 
 - **검증 스위트 통과 증거**:
   1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 115개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
-  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 176/176 checks 100% 통과)
+  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 181/181 checks 100% 통과 - 커널 resume 엔드포인트 포함)
   4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 67/67 checks 100% 통과)
   5. Python 단위 시험: `.venv\Scripts\pytest tests/core/test_deployment_credentials.py tests/test_server_auth_integrity.py tests/test_server_project_api.py` (15 passed), `pytest tests/` (338 passed, 340 skipped)
   6. 내부망 배포 사전 검증: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과, Gateway Healthy)
