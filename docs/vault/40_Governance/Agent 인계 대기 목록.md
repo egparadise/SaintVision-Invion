@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T21:10:00+09:00"
+updated: "2026-09-12T12:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -127,3 +127,33 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
 
 검토 시 봐 주었으면 하는 것: 각 검사가 **실패할 수 있는지**, 그리고 "평가하지 않음"이 "충족"으로 읽히는 곳이 남아 있는지. 이 작업에서 고친 결함의 다수가 그 두 가지였다.
+
+## Gemini 프론트엔드·배포 후속 카드 인계 (GM-01~GM-06) — 2026-09-12
+
+작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
+
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.5).
+
+### A. 인계 대상 카드 및 핵심 변경 사항
+
+| 카드 ID | 대상 Task | 범위 | 핵심 검증 완료 내역 |
+|---|---|---|---|
+| **GM-01** | S01-FE, S03-FE, S04-FE | 정본 readiness·결과 파일·승인 UX | `/v1/runs/{id}/artifacts/content` 원본 바이트 다운로드 및 SHA-256 대조, 7대 정본 준비도 평가와 admission 분리, Two-Person Rule 요청자 자가 승인 차단(403) |
+| **GM-02** | S02-FE, S05-FE, S07-FE | 실제 Node와 자원 숫자·관측 시각 | 전체량-allocatable 감산 왜곡 제거, Headroom(물리/실측/가용) 분리 렌더링, 관측 전용 노드(.225) 스케줄링 배제 |
+| **GM-03** | S06-FE, S08-FE | 편집·PTY·Git·kill/drain 화면 | PTY 단조 증가 시퀀스 카운터(`sequenceCounter`) 연동(CL-01 F2 선제 정렬), 일회용 티켓 재접속, ADR-038 노드 Drain 통제 및 SHA-256 감사 원장 |
+| **GM-04** | S09-FE, S10-FE | Agent·AI/MLOps 예시/검증 제거 | 99/100, 24/30 하드코딩 제거, 100건 프롬프트 실시간 누출 방화벽 검사, 미실행/미평가 상태 정직한 렌더링 |
+| **GM-05** | S03-FE, S04-FE, S07-FE, S08-FE, S11-FE | 실제 로그인과 2-PC 브라우저 여정 | OIDC 사일런트 어드민 폴백 전면 제거(ProblemDetails 오류 표시), 3회 제한 복구 수명주기(ADR-044/045), 분산 샤드 자원 연쇄 회수 |
+| **GM-06** | S11-FE, S12-FE | 접근성·내부망 HTTPS·웹 rollback/교육 | ReleaseCandidateView 실측치 동적 집계 렌더링, WCAG 2.1 AA 11.4:1 명도 대비 및 키보드/ARIA 표준, Nginx TLS 1.3 무중단 롤백 엔진 |
+
+### B. 독립 검토자(Claude) 확인 요청 사항 및 재현 증거
+
+- **검증 스위트 통과 증거**:
+  1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 106개 테스트 100% 통과)
+  2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
+  3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (13개 트랙, 133/133 checks 100% 통과)
+  4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 63/63 checks 100% 통과)
+  5. 내부망 배포 자동화: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과)
+- **검토 중점**:
+  - 각 화면 및 API 연동에서 "평가하지 않음(Unmeasured)"이 "만족(Met)"으로 잘못 해석되거나 모의 성공(Fake exit code 0)으로 왜곡되는 부분이 완전히 제거되었는지 확인.
+  - Two-Person Rule 검증: 요청자 본인 승인 시 403 차단 및 독립 피어 승인 시 200 통과 동작.
+  - 결함 발견 시 F-FE-xx 형식으로 지적 요청.
