@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.6"
+version: "1.35.7"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T12:57:44+09:00"
+updated: "2026-09-12T13:23:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -148,3 +148,6 @@ ADR-088(내부 Run/ChannelProof/root/catalog/nonce-bound Ed25519 sample·공유 
 
 
 ADR-089(공통 Schema·Go opt-in 보호 폴더/mTLS 서명 sample·Linux descriptor 경계·실제 TLS peer certificate 반환·운영 기록 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.2.0 및 [[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]를 따른다. durable nonce/Evidence commit·운영 .225 인수는 후속이다.
+
+
+ADR-090(현재 프로젝트 요청 권한+폴더 등록 소유자·durable challenge/nonce·기존 Evidence/StorageCheck 원자 쓰기·같은 응답 replay·최소권한/RLS/불변 기록)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.3.0과 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 공개 API/운영 설치·실장비 인수/Run 완료와 구분한다.

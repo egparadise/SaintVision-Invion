@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T12:57:44+09:00"
+updated: "2026-09-12T13:23:04+09:00"
 source_of_truth: "Git"
 ---
 
@@ -63,3 +63,12 @@ opt-in --storage-policy의 NodeStorageRootConfig(channel,contribution_id,root_ve
 Go 수집은 Linux descriptor 경계/동일 device/regular single-link/두 번 bounded hash를 사용한다. Windows native opener는 거부하며 Docker/WSL Linux에서 동작하는 Node와 구분한다. Node별 별도 sample slot1/5초 cooperative context, client6초, 기존32파일/1MiB/30초·64KiB 제한이다. blocking filesystem syscall 강제 중단/일관 snapshot은 아니다. Control Plane은 실제 TLS peer DER를 envelope와 함께 받아 별도 signature verifier에 공급한다.
 
 실제 Go+mTLS/파일/DB 시험130 통과는 운영 기록 성공이 아니다. durable issuer·nonce 소비·현재 Run/project/channel/contribution/catalog 재확인 및 기존 Evidence/StorageCheck의 단일 transaction 연결을 구현할 때까지 운영 기록0을 유지한다. 같은 epoch/version 숫자만으로 current 권한을 주장하지 않는다.
+
+
+## ADR-090 — durable 발급과 기존 기록의 원자 연결
+
+fd0c081/0037부터 StorageSampleStore.issue/accept/collect는 내부 trusted boundary다. 현재 linked project can_request와 contribution 등록 소유자를 함께 검사한다. Run version/attempt, epoch, channel proof, root path/version, 제한된 catalog 항목을 발급·기록 transaction에서 잠그고 재검사한다. network I/O는 두 transaction 사이에만 있다. requests/consumptions는 불변 protocol state이며 inv.evidence/public.storage_checks가 기존 기록 정본이다.
+
+같은 request는 sample_limit/scope/nonce를 바꿀 수 없다. accept는 같은 bytes만 같은 IDs로 replay하며 다른 응답은 충돌이다. 현재 권한은 replay에도 필요하다. 모든 증거/점검/consumption/outbox는 원자 기록되며 만료를 마지막 쓰기 뒤에도 검사한다. sample_healthy는 표본 일치일 뿐 Run 완료·운영 인수/전체 디스크 정상 판정이 아니다. cataloguedAtIssue는 발급 때의 수이며 unsampled 파일 bytes를 증명하지 않는다. 실제 안전한 디스크 snapshot도 아니다.
+
+최소 컬럼 SELECT·고정 sentinel UPDATE·tenant RLS와 불변 trigger를 적용한다. 새 SECURITY DEFINER 없음. 신규 공개 API/자동 만료 갱신/운영 설치/ResultView UI 표시/독립 인수는 미완료. [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]의 같은 SHA 검증을 따른다. 앞 절의 미구현 진술은 해당 과거 단계 기준이며 이 절이 후속 DB 구현 상태를 갱신한다.
