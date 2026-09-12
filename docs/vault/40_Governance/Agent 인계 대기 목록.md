@@ -128,6 +128,13 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
 
+**범위 한정(중요)** — 위 B-3/4/5의 "해소 확인"은 **`agent/codex/workspace-bridge`에서의 확인**이다. **integration은 아직 아니다**: 이 branch의 `src/saintvision/server.py`는 여전히 fixture 서버이고 **2677줄로 더 자랐다**(70 route). 따라서 두 가지가 따라온다.
+
+1. Gemini 보고의 "Route Coverage 34 paths 0 unserved (100%)"는 **산술적으로 참이지만 fixture 서버를 served에 넣고 잰 값**이다. 실측 재현: integration `src` 포함 → 0 unserved; fixture를 빼고 실제 커널(54)+업무 API(34)로 재면 **19 unserved**(기존 B-8과 동일). 도구가 출력하는 한계 그대로다 — "그 모양의 route가 있다"는 것이지 응답이 진짜라는 뜻이 아니다.
+2. integration이 workspace-bridge의 entrypoint 복원을 가져오는 순간 그 19개가 다시 미제공이 되고 화면이 깨진다. **B-6/B-7의 이름 결정(SPA를 project 범위로 옮기거나 얇은 이름 계층)이 통합 전에 필요하다.**
+
+**운영 사고 기록(내 것)** — `b1a1132`에 Gemini의 23:15 작업(신규 검증보고 74줄, 상태 행, 버전 범프)이 **의도치 않게 함께 commit됐다.** 같은 main worktree에서 두 agent가 동시 작업 중이었고 내 `git add -A docs/vault`가 그들의 진행 중 편집을 쓸어담았다. 내용은 온전하며 지워진 것은 없다 — 귀속만 어긋났다. 이후 나는 명시적 파일만 stage한다. **같은 worktree에서의 동시 commit은 실재하는 위험이며**, agent별 worktree 분리가 규칙이 되어야 한다(운영 규칙 문서 소관).
+
 정정 하나(내 것): F2의 intents 테이블에 "만드는 migration이 없다"고 의심했으나 **내 grep 범위가 틀렸다**(kernel `.sql` 경로만 봄; 실제는 Alembic `0034`). 못박기 전에 확인해 유령 finding을 내지 않았다.
 
 **남은 것: F1 하나다** (그리고 알람 채널·partition 주기·PITR·CL-04 seam·CX-02 결정들은 기존대로).

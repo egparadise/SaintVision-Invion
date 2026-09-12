@@ -53,7 +53,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-01 — Codex 최신 커널 독립 검토
 
-- owner / reviewer: Claude / Codex; status: in-progress(검토 완료, finding 2건 인계 대기); priority: P0.
+- owner / reviewer: Claude / Codex; status: in-progress(**재확인 1회 완료** — F2 수정 확인, F1만 잔여); priority: P0.
+- 재확인(2026-09-13, workspace-bridge 6ff090b): **F2 수정 확인** — intent-before-execute, `0034` DDL(FORCE RLS·immutable) scratch DB 적용 실측. **F3/F4는 entrypoint 복원으로 소멸.** **F1 미해결**(leases/0031 무변경, 재현 절차 유효). B-9는 live에서 완전 종결(`apptestonly` 거부, role shape `ok`). 상세는 [[Agent 인계 대기 목록]] 재확인 회신.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-06, OUT-08 / AC-01, AC-04, AC-06, AC-08.
 - 검토 SHA: `agent/codex/workspace-bridge` **d14db0a**(카드가 지정한 `c5f2154`를 포함한 현재 head), migration head `0033_workspace_bridge_merge`. 전문은 [[Claude_CL-01_커널독립검토]].
 - 실제 수행: 0028~0033의 적용 함수·grant, reservation/출력, PTY ticket/frame, Git dispatch/current scope를 지정된 범위대로 보았다. 작성자 시험 기록을 승인으로 옮기지 않고, 확인한 것은 직접 조회·실행한 결과만 적었다.
