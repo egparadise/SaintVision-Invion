@@ -1,10 +1,10 @@
 ---
 doc_id: "RUNBOOK-STORAGE-POLICY-001"
 title: "Codex Node 저장소 설정 설치와 교체 절차"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:52:13+09:00"
+updated: "2026-09-12T16:12:16+09:00"
 source_of_truth: "Git"
 ---
 
@@ -50,3 +50,18 @@ start-node.sh는 Linux 경로와 policy hash 두 인수를 받고, storage-ready
 검토된 새 storage-plan.json을 준비한 Linux private worker 디렉터리에서 `python3 worker_replacement.py preflight storage-plan.json > replacement-preflight.json`으로 점검하고 `python3 worker_replacement.py recheck storage-plan.json replacement-preflight.json`으로 현재 상태를 다시 대조한다. 실행 중이면 거부하며 이 명령이 Node를 정지하지 않는다. clean exited 관측 Node 전용이다. 실패 컨테이너를 정리하는 수단이 아니다.
 
 결과에 키/파일 원문은 없으며 최대16MiB state를 검사한다. 용량 초과는 자동 생략하지 않고 거부한다. replacementAuthorized=false인 로컬 점검 결과이며 삭제 명령에 대한 승인이 아니다. 점검 후 변경을 원자적으로 차단하는 lock/fence는 후속 교체 executor에서 구현해야 한다. 실제 Windows/WSL/원격 적용은 미수행이다. 다음 Codex durable 교체 단계·forward 재개 구현, Claude ADR-094 검토 pending.
+
+
+## 정지 Node의 교체·재개 CLI (f766146)
+
+검토한 기존 private worker 디렉터리(소유자 일치/0700)에서 새 storage-plan.json과 교체 전 replacement-preflight.json을 사용한다.
+
+```bash
+python3 worker_replace.py storage-plan.json replacement-preflight.json > storage-replace-ready.json
+```
+
+실패/중단하면 같은 명령과 같은 두 입력으로 재개한다. storage-replacement.json과 .storage-replace.lock, 보존 컨테이너, 상태 volume을 삭제하지 않는다. plan 변경/손상된 기록은 자동 초기화하지 않는다. 기존 Node는 정상 종료된 lan-observe-v1이어야 하며 이 도구가 실행 중 Node를 자동 정지하지 않는다. 원본 image가 로컬에 있고 새 image는 plan manifest의 filesystem/config 검증을 통과해야 한다.
+
+기존 컨테이너는 이름이 변경되고 restart=no로 남는다. 새 컨테이너도 restart=no이며 JSON은 서버 mTLS 검증 대기 상태다. old 컨테이너는 shared volume을 보므로 독립 데이터 백업으로 취급하거나 수동 재시작하지 않는다. 정책의 버전 floor 이후 실패는 옛 정책으로 되돌리지 않는다. 다른 정책이 필요한 경우 운영자/서버와 forward 버전 계획을 다시 조율해야 한다.
+
+이 명령은 Linux에서 시험했다. Windows/WSL wrapper 및 실제 원격 설치는 다음 Codex 범위, Claude ADR-095 독립 검토 pending이다.

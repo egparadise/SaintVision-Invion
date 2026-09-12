@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.11"
+version: "1.35.12"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T15:52:13+09:00"
+updated: "2026-09-12T16:12:16+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -163,3 +163,6 @@ ADR-093(명시적 source/policy hash·새 컨테이너 읽기 mount·보호 파�
 
 
 ADR-094(정지 관측 Node 교체 전 비변경 점검·bounded state digest·현재 container/volume/plan 결합·stale 거부·교체 승인과 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.7.0과 [[2026-09-12_STORAGE-REPLACE-PREFLIGHT_Codex_검증보고]]를 따른다.
+
+
+ADR-095(기존 container/정책 보존·private durable 단계·same-plan forward 재개·변경 허용 파일 제한·ID 고정·로컬 설치와 운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.8.0과 [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]]를 따른다.

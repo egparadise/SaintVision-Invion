@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.7.0"
+version: "1.8.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:52:13+09:00"
+updated: "2026-09-12T16:12:16+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,3 +98,10 @@ local startup receipt는 tenant/node/epoch·contribution·두 버전·hash이며
 ## ADR-094 — 교체 전 비변경 점검과 stale receipt
 
 정지된 정상 종료 관측 Node만 대상이다. identity/epoch·volume 소유/단독 사용·기존 mount를 검사하고 제한된 전체 상태 archive의 내용/권한 해시와 inspect/새 plan 해시에 묶는다. 키/원문은 반환하지 않는다. recheck는 현재 동일 기록만 수락한다. mount 순서는 정규화하되 속성은 유지한다. receipt는 권한 또는 daemon fencing이 아니며 replacementAuthorized=false다. actual replacement executor와 durable forward 재개는 후속, 현재 도구가 삭제·정지·교체를 수행하지 않는다. [[2026-09-12_STORAGE-REPLACE-PREFLIGHT_Codex_검증보고]] 참조.
+
+
+## ADR-095 — 보존 컨테이너와 forward 교체
+
+ADR-094 receipt·plan을 재검사하고 private flock/0600 fsync 기록으로 교체 단계를 진행한다. 기존 container는 restart=no로 이름 변경 후 보존, 같은 상태 volume을 새 컨테이너와 공유한다. old image/config·이전 정책 exact bytes를 private 보존하며 기존 키/journal을 삭제하지 않는다. 정책과 해당 contribution floor만 변경을 허용한다. currentId·label·설정과 상태 해시를 재개 때 검증한다. starting을 시작 전에 기록하고 이전 policy/container로 자동 rollback하지 않는다.
+
+실제 volume CreatedAt은 쓰기 뒤 변할 수 있어 교체 중 신원 키로 쓰지 않는다. 원래 preflight hash 및 보존 container ID/mount·나머지 volume metadata·old/new만의 consumer 집합을 함께 확인한다. 새 Node는 restart=no/운영 인수 false로 반환한다. 단계 fenced는 자동 재시작 차단일 뿐 daemon/분산 fencing이 아니다. [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]] 참조.

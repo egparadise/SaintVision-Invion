@@ -1,0 +1,67 @@
+{
+  "at": "2026-09-12T07:12:08.140426+00:00",
+  "codeSHA": "f766146f348d1190d25115a570f63e36956d0c25",
+  "dirty": false,
+  "runtimeCodeSHA": "f9d69a8ed3fde2bc99096b5f551c3e6a5bc386b4",
+  "agentImage": "sha256:dfa9450b4386f9d8dbc60b599d2f3d64d934da95ef166db3dc2f37ceda671a90",
+  "scope": "isolated-real-docker-new-container-installation-synthetic-pki-not-wsl-or-remote-pc",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt",
+      "passed": true
+    },
+    {
+      "name": "test_real_bad_policy_hash_creates_no_node_or_volume",
+      "passed": true
+    },
+    {
+      "name": "test_real_replacement_preflight_preserves_state_and_rejects_stale_restart",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[None]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[prepared]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[fenced]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[renamed]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[created]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[installed]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[starting]",
+      "passed": true
+    },
+    {
+      "name": "test_real_storage_replacement_resumes_without_rollback_or_key_loss[ready]",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "deploy/lan/worker_storage.py": "19de8b70f0251e886b386eb4664f2676305efc9b1cb15efc3074412ea9b151f5",
+    "deploy/lan/worker_replacement.py": "d8c3b54c9807d5d5b8dae4096d4c1964efc7007f4dc8feefb31e486fd60b8e0d",
+    "deploy/lan/worker_replace.py": "562cb55feffdf0df72efd2e29f60b374b65db2649af4dcd1cdb8ea795150d276",
+    "deploy/lan/start-node.sh": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+    "deploy/lan/finish-worker.sh": "3e9d638306742f284951c28a12dc2dc10f09eb837f4ff1beadcde4a8b5a40ea2",
+    "deploy/lan/Start-Worker.ps1": "733277ee7afc4a092fe7de93ae3968e30ab5bf838f4ba3ab8b01ecd2ddf23bf2",
+    "deploy/lan/worker_config.py": "74977149a13441a2d251e99d1133995a2d48754a04c354b0d97ecd9150f5b1d3",
+    "tools/lan_pilot.py": "18f0d8803808334fd0d54f9904379e4edaf3b57c5ae0829b3d832231fabd6ba8",
+    "tools/check_storage_bundle.py": "f3d4a51499d0ca28252b8587d225e141faffb30e2841b6b63fb8ab9804458d97",
+    "tests/integration/test_lan_storage_install.py": "2faad6a4c3bc0cce7582cdb867b66dba2c4cc7db4a7a0650ee268f2ead2a8adf"
+  }
+}
