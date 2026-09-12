@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.22"
+version: "1.0.23"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T22:05:00+09:00"
+updated: "2026-09-12T23:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -106,16 +106,31 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 | 항목 | 한 줄 | 상태 | 다음 행동 주체 |
 |---|---|---|---|
-| A (F1~F4) | 커널 finding 4건, F1은 재현됨 | **대기** | 수정 Codex → 재확인 Claude |
+| A (F1~F4) | 커널 finding 4건 | **F2 수정 확인·F3/F4 소멸(entrypoint 복원)·F1만 대기** | F1 수정 Codex |
 | B 결정 6건 | 알람 채널·partition 주기·PITR/매체·CL-04 seam·CX-02·운영 입력 | **대기** | 사용자·운영자·Codex |
 | B-2 | lane 통째 병합 위험 | B-3으로 **대체됨** | — |
-| B-3 | `server.py`가 두 구현, **병합 차단** | **대기** | 정본 결정 Codex·Gemini·사용자 |
-| B-4 | 배포 backend가 인증·DB 없이 고정 데이터 제공, 아무 Bearer에 cluster:admin | **대기** | 배포 대상 결정 |
+| B-3 | `server.py`가 두 구현, 병합 차단 | **해소 확인**(entrypoint 복원, 재확인 회신 참조) | — |
+| B-4 | 배포 backend가 고정 데이터 제공 | **해소 확인**(factory 거부 실측 exit 0) | — |
 | B-5 | 원인: 격리했던 demo 서버가 entrypoint가 됨. **양쪽 다 실측됨** — fixture는 무조건 제공, factory는 거부(`0d5eb38`) | 실측 닫힘 | entrypoint 결정 |
 | B-6·B-7 | API 모양 불일치 측정 → **정정**: integration 커널이 낙후(10 vs 54 route). 커널 통합이 먼저 | 측정 닫힘 | 커널 통합 Codex |
 | B-8 | 측정 도구화 `route_coverage.py` — 미제공 22(integration)/19(현재 커널+lane) | 닫힘 | 통합 후 재측정 |
-| B-9 | 커밋된 비밀번호로 운영 DB 접속됨(실측). guard 수정·상시 탐지(`87eeb71`)·리허설된 절차(절차서 2-1, `d09e6a5`)·0001 drift guard(`a5dd83c`) | 내 몫 닫힘 | **교체 실행** 운영자·Codex |
+| B-9 | 커밋된 비밀번호로 운영 DB 접속됨 | **완전 종결** — 교체 실행됨·live 실측으로 인수(`WEAKER`→`ok`) | — |
 | C | 독립 검토 요청 도구 7종 + 검토 관점 2개 | **대기** | Codex |
+
+### 재확인 회신 — 2026-09-13, Claude (workspace-bridge `6ff090b` 기준)
+
+Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부 실측이다** — 작성자 보고 인용이 아니다.
+
+| 항목 | 재확인 결과 |
+|---|---|
+| **F2** | **수정 확인.** `frame()`이 Node 호출 **전에** Run lock 아래에서 intent를 commit하고(`inv.terminal_frame_intents`) `frame_intended` event를 남긴다. 같은 sequence·다른 내용은 실행 전 `Terminal sequence intent differs`로 거부, sequence는 `완료+1` 강제. DDL은 `0034_terminal_frame_intents.py`(FORCE RLS·immutable trigger·`inv_kernel` SELECT/INSERT만) — scratch DB에 0037까지 **적용 성공**, intents 테이블 FORCE RLS=True 실측. 관찰 1건(차단 아님): 이미 audit된 frame을 **같은 digest로** 재전송하면 여전히 Node에 재도달한다 — 기존과 동일하며 Node 쪽 sequence 계약 소관 |
+| **F1** | **미해결.** `leases.py`·`0031`의 offer/release snapshot 불일치는 변경 없음. 재현 절차는 A의 F1 그대로 유효 |
+| **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
+| **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+정정 하나(내 것): F2의 intents 테이블에 "만드는 migration이 없다"고 의심했으나 **내 grep 범위가 틀렸다**(kernel `.sql` 경로만 봄; 실제는 Alembic `0034`). 못박기 전에 확인해 유령 finding을 내지 않았다.
+
+**남은 것: F1 하나다** (그리고 알람 채널·partition 주기·PITR·CL-04 seam·CX-02 결정들은 기존대로).
 
 ### A. Codex가 고쳐야 할 finding — CL-01 독립 검토 (d14db0a, `c5f2154` 포함)
 
@@ -520,7 +535,7 @@ B-9의 credential 교체는 여전히 운영자 몫이다. 내 몫인 두 가지
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.17).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.18).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 
