@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.11"
+version: "1.0.12"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:26:21+09:00"
+updated: "2026-09-12T18:19:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -174,3 +174,10 @@ fa01d77의 서버 자가 승인403/스모크133 보고를 수신했다. 작성�
 `Evidence/obsidian-proposals-20260912-lan-storage-readiness/manifest.json`의 3개 원문을 SHA256 그대로 보존했다. Gemini는 integration/all-agents-unified/base ea508ea에서 SPA projectId 동적 전달·project-scoped 호출/평면 fallback, server.py project 경로 추가를 보고했다(Smoke171,2-PC67,Vitest109,Pytest8,Deploy5). 이는 작성자 보고이며 그 문서의 “독립 검증” 표현을 독립 reviewer 승인으로 채택하지 않는다. Claude B-6의 정적 경로 불일치 약23/30 보고도 검토 대기다. 미래 KST 표기는 원문 그대로 보존했으며 현재 실측 완료 시각으로 사용하지 않는다.
 
 커널 정본 factory/인증·DB·nonce·승인 transaction을 복제하는 별도 server.py 구현을 정본으로 승인한 것이 아니다. SPA 경로 이름 일치만으로 커널 연결이 증명되지 않으며 mutation의 평면 fallback/중복 제출 안전성은 독립 검토 대상이다. 현재 Codex branch factory는 이미 정본 create_configured_app를 호출한다. 다음 Codex/Claude는 integration의 실제 entrypoint와 DB 연결/승인·취소 경계를 검토하고 Gemini는 해당 피드백을 반영한다. 물리2PC·GPU 인수/CI 성공/공통 진척 상향은 인정하지 않으며57.81% 유지한다.
+
+
+## 2026-09-12 LAN-MIGRATION-PLAN 외부 보고 보존
+
+Evidence/obsidian-proposals-20260912-lan-migration의 원문3개/hash manifest를 보존했다. Claude는 이전 수동 경로 비교를 정정하고 route_coverage(30f48f4) 기준 integration22/현재Codex+Claude19 미제공을 보고했다. Gemini는 base92b558e에서32개client/0unserved, Resume project 경로·fallback, 단위15/Pytest31 및 전체369passed340skipped/Smoke171/2-PC67/Vitest109/Deploy5를 보고했다. 모두 작성자 보고이며 이 수치를 독립 검토나 실제 물리 인수로 승인하지 않는다. 미래KST 원문은 현재 실측 시각으로 채택하지 않는다.
+
+`--served src/saintvision`의 정적0unserved는 factory가 실제 등록하는 라우터·인증·DB·커널 실행을 입증하지 않는다. 다음Codex/Claude는 실제 배포 entrypoint에 현재커널이 연결되는지 확인한 뒤 남은 화면 계약을 검토한다. Gemini는 경로/응답 계약과 mutation fallback 안전성을 재확인한다. 기존Codex 최신 기록은 보존하고 전체57.81% 유지한다.
