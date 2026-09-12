@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T14:15:21+09:00"
+updated: "2026-09-12T15:24:08+09:00"
 source_of_truth: "Git"
 ---
 
@@ -81,3 +81,10 @@ GET /v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}는 kernel 
 StorageObservationView/RecordedStorageObservation이 공통 Schema다. pending/expired에는 observation=null, recorded에는 evidenceId/checkId/observedAt/integrityVerified/sampleHealthy 및 표본 집계가 있다. currentHealth는unknown, operationalAcceptanceAssessed는false다. 원 root/path·파일명·nonce·서명·인증서·subject는 HTTP 응답에 포함하지 않고 no-store를 적용한다.
 
 terminal Run/회수된 Node channel·contribution도 현재 원 요청자와 등록 소유자 권한이 유지되면 역사 조회는 허용한다. 새 수집은0037의 active/current channel/root 조건을 계속 요구한다. 당시 인증서 유효성과 현재 운영 신뢰를 혼동하지 않는다. request 목록·수집 POST·운영 설치/화면 인수는 별도이며 이 GET 구현을 운영 배포 완료로 표시하지 않는다. [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]의 같은 SHA 증거를 따른다.
+
+
+## ADR-092 — 재시작 후에도 유지되는 설정 최소 버전
+
+f9d69a8은 기존 identity/epoch-bound private journal에 contribution별 rootVersion/channelVersion 및 root/channel/exact policy hash를 보존한다. 두 버전은 각각 단조 증가하고 같은 버전의 경로·채널 변경 또는 두 버전 모두 같은데 exact bytes 변경은 거부한다. 새 contribution 선택이 기존 contribution floor를 제거하지 않는다. 현재 TLS 인증서/키와 root/config를 검증한 뒤 floor를 영속화한다. pin callback 없는 sampler는 생성하지 않는다. 동시 writer는 기존 journal process lock으로 배제하고 이 함수는 startup 전용이다.
+
+local startup receipt는 tenant/node/epoch·contribution·두 버전·hash이며 raw root/key/certificate는 포함하지 않는다. operationalAcceptanceAssessed=false다. 서명된 서버 인수나 Node 운영 health/작업 성공 증거로 쓰지 않는다. 전체 journal의 관리자 삭제·과거 backup 복원을 탐지하는 장치가 아니며 기존 recovery epoch/fencing 계약을 유지한다. [[Codex Node 저장소 설정 설치와 교체 절차]]에 실패 후 forward 복구·실제 운영 bundle 미연결 범위를 기록한다.

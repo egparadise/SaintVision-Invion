@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.8"
+version: "1.35.9"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T14:15:21+09:00"
+updated: "2026-09-12T15:25:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -154,3 +154,6 @@ ADR-090(현재 프로젝트 요청 권한+폴더 등록 소유자·durable chall
 
 
 ADR-091(현재 원 요청자/등록 소유자의 과거 storage observation 조회·당시 서명 및 기존 Evidence 연결 재검증·UTC 시각 의미·pending/expired/recorded·currentHealth unknown·정보 최소화)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.4.0과 [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]를 따른다. 운영 현재 health/Run 완료·수집 시작·배포 완료와 구분한다.
+
+
+ADR-092(contribution별 root/channel 독립 최소 버전·hash의 기존 journal 영속화·같은 버전 변경 거부·현재 인증서/root 검증 후 pin·로컬 시작 기록과 운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.5.0, [[Codex Node 저장소 설정 설치와 교체 절차]], [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]를 따른다. 전체 journal 삭제/backup rollback·실장비 전원 장애 인수까지 보장하지 않는다.
