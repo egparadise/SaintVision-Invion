@@ -612,7 +612,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.9: Admin Security & Audit Console (S08-FE) */}
         {activeTab === 'admin' && (
-          <AdminSecurityConsole nodes={nodes} />
+          <AdminSecurityConsole nodes={nodes} onRefreshNodes={fetchNodes} />
         )}
 
         {/* Tab 2.10: Natural Language Requester & Bounded Agent (S09-FE) */}

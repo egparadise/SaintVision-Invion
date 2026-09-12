@@ -5,9 +5,10 @@ import { SecurityControlManager } from './securityEngine';
 
 interface AdminSecurityConsoleProps {
   nodes: NodeItem[];
+  onRefreshNodes?: () => void;
 }
 
-export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes }) => {
+export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes, onRefreshNodes }) => {
   const [secManager] = useState<SecurityControlManager>(() => new SecurityControlManager());
   const [activeSubTab, setActiveSubTab] = useState<'audit' | 'isolation' | 'gpu' | 'backup' | 'drain'>('audit');
   const [status, setStatus] = useState(secManager.getStatus());
@@ -57,6 +58,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       } catch (err) {
         console.error('Failed to sync node drain to control plane:', err);
       }
+    }
+    if (onRefreshNodes) {
+      onRefreshNodes();
     }
   };
   const [bypassRiskLevel, setBypassRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L2');
