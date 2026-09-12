@@ -36,3 +36,7 @@ Evidence: [[lan-storage-readiness-f2a7fbc.json]], [[lan-storage-readiness-f2a7fb
 5. Gemini: 실제 관측 전용/준비 미완료 상태 표시, 이후 스케줄링 가능 상태와 브라우저 실행 검증. Orca 운영 기록 담당은 카드/branch/담당 추적 유지.
 
 정식 done/PR19 merge 미완료. 전체48행 근거 기준 2775/4800=57.8125%, 잔여42.1875% 유지. 이 도구 추가로 실장비 인수 진척을 올리지 않는다. Obsidian 동기화 결과는 후속 기입.
+
+## 동기화와 최종 검사
+
+343문서/48task 검사와 ontology exit0. 외부3개 편집을 원본 hash로 보존한 뒤 동일 bytes adopt, 2026-09-12T16:56:46 KST/2758297에서 로컬 Obsidian664파일 hash 일치, pending0/conflicts0. [[lan-storage-readiness-obsidian-20260912.json]]. OneDrive cloud 업로드 미확인. 이 영수증 추가 후 최종 commit/push와 동기화를 다시 수행한다.
