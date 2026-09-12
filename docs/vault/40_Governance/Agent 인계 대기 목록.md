@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.6"
+version: "1.0.7"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T09:40:15+09:00"
+updated: "2026-09-12T21:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -93,3 +93,37 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 - HO-RUNTIME-COMPLETION-CLAUDE-001: [[Codex 실행 완료와 자원 회수 통합 계약]], [[2026-09-10_08-38-33_KST_RUNTIME-COMPLETION_Codex_개발과정]], PR #11. Claude: SQL chain/receipt-bound publish/부모 lock 순서 독립 검토 및 업무 Adapter. Gemini: parent/child·결과 Evidence·반환 대기 UI. 실제 수신·독립 검토 pending. 기본 폴더에서 별도로 진행 중인 미커밋 auth/server 수정은 이 인계에 포함하지 않았다.
 
 - HO-WORKSPACE-RESUME-CLAUDE-001: [[Codex Workspace 실행 재개와 결과 체크포인트 계약]], [[2026-09-10_09-29-08_KST_WORKSPACE-RESUME_Codex_개발과정]], PR #12. Claude: 프로젝트 권한/editor quiesce/identity 매핑/prepare→승인→enqueue→worker 업무 연결 및 migration 0018/무결성 경계 독립 검토. Gemini: frozen 입력·이후 편집·재개 Step/attempt·결과 checkpoint UI. 원문 입력을 로그/화면에 그대로 노출하지 않는다. 실제 전달·독립 검토 pending.
+
+## Claude 후속 카드 인계 (CL-01~CL-07) — 2026-09-12
+
+작성: Claude. 위 표는 Codex 발신분이며 이 절만 Claude가 덧붙였다. 실제 수신 확인 전까지 pending이고 외부 메시지는 보내지 않았다.
+
+기준 branch `review/claude-account-results` (c28cdff → f17ad62), 진행판 [[Claude 작업 현황]]·[[전체 개발 진행 현황]].
+
+### A. Codex가 고쳐야 할 finding — CL-01 독립 검토 (d14db0a, `c5f2154` 포함)
+
+| ID | 심각도 | 내용 | 위치 |
+|---|---|---|---|
+| **F1** | 중간, **재현함** | `apply_capability_offer`가 lease 총량을 서로 다른 snapshot에서 두 번 읽는다. `release()`는 lease 행만 잠그고 자원 행은 잠그지 않아 그 사이에 commit된다. 함수 자신의 문장 순서를 두 session으로 재생해 **요청 1000 / 기록 900 / `applied=true`**를 재현했다. `remaining`이 0으로 끝나 loop 끝 검사로는 잡히지 않는다 | `migrations/versions/0031_resource_offer_integrity.py`, `services/control-plane/src/inv/leases.py:293` |
+| **F2** | 중간 | PTY frame의 sequence·digest 감사가 Node 실행 **뒤에** 있다. 같은 sequence로 내용이 다른 frame을 보내면 PTY에서 실행된 뒤 거절되고, 감사 행은 첫 내용의 digest를 유지하며 event는 `if inserted`라 남지 않는다 | `services/control-plane/src/inv/terminal.py` `frame()` |
+| F3 | 낮음 | 폐기된 definer 함수 `run_committed_outputs`·`apply_resource_offer`가 grantee 없이 남는다(`proacl` 실측). 이후 광범위 GRANT가 폐기 경로를 되살린다 | 0029/0030/0031 |
+| F4 | 정보 | `.git` 제외가 `export_snapshot`(첫 segment)과 `git_files`(모든 segment)에서 다르다. 닫히는 방향이나 docstring과 코드가 어긋난다 | `remote_git.py` |
+
+전문 [[Claude_CL-01_커널독립검토]]. **승인으로 표시하지 않았다.** 해결 SHA가 나오면 Claude가 재확인한다.
+
+### B. 결정이 필요한 것 — 이것들이 풀리기 전에는 해당 카드가 진행되지 않는다
+
+| 결정 | 요청 대상 | 막고 있는 것 | 근거 |
+|---|---|---|---|
+| **알람 채널과 수신자** | 사용자 | `GOV-ALERT-001`이 `unknown`으로 남긴 값. P1을 추측한 곳으로 보내지 않으려 채널을 구현하지 않았다 | CL-07 |
+| **partition 생성 주기** | 운영자·Codex | 이 배포의 partition은 **2027-01-01까지**이고 그 날 Evidence 기록이 멈춘다. 도구(`tools/ensure_partitions.py`)는 있으나 **명령은 일정이 아니다** | CL-07, 절차서 7-9 |
+| **PITR·보관 매체·백업 주기** | CX-09·운영자 | `archive_mode=off`라 시점 복구가 불가능하고 **AC-12의 RPO 목표는 현재 미달성**이다. `data_checksums=off`도 함께 결정해야 한다(initdb 시점에만 가능) | CL-07, 절차서 8-0 |
+| **CL-04 seam 계약 4개 질문** | Codex | RunRecord 산출물 pin의 소속, 봉인 시점에 `content_hash`를 얻는 승인된 경로, `public.artifacts`·`upload_sessions`의 존폐, 보존/GC 소유자 | CL-04, CL-06 |
+| **CX-02 credential 경계** | Codex | 실제 두 Provider의 실행/취소/collect/attest | CL-05 |
+| 실제 OIDC issuer·계정, 제공 폴더 경로와 소유자 동의, 원격 PC(.225) 실행 profile | 운영자·원격 운영자 | 운영 로그인 인수 | CL-02 |
+
+### C. Codex 독립 검토를 요청하는 Claude 산출물
+
+`tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
+
+검토 시 봐 주었으면 하는 것: 각 검사가 **실패할 수 있는지**, 그리고 "평가하지 않음"이 "충족"으로 읽히는 곳이 남아 있는지. 이 작업에서 고친 결함의 다수가 그 두 가지였다.
