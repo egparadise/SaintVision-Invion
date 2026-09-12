@@ -49,6 +49,11 @@ if ($LASTEXITCODE -ne 0) { throw "E2E browser smoke suite failed with exit code 
 # Step 5: Docker Compose Production Config Validation & Live Gateway Probe
 Write-Host "`n[5/5] Docker Compose Intranet Deployment Orchestration & Preflight..." -ForegroundColor Yellow
 if (Get-Command docker -ErrorAction SilentlyContinue) {
+    if (-not $env:INV_DATABASE_URL) { $env:INV_DATABASE_URL = "postgresql://preflight:preflight@postgres/saintvision" }
+    if (-not $env:POSTGRES_PASSWORD) { $env:POSTGRES_PASSWORD = "preflight-postgres-password" }
+    if (-not $env:MINIO_ROOT_USER) { $env:MINIO_ROOT_USER = "preflight-minio-user" }
+    if (-not $env:MINIO_ROOT_PASSWORD) { $env:MINIO_ROOT_PASSWORD = "preflight-minio-password" }
+
     docker compose -f docker-compose.prod.yml config --quiet
     if ($LASTEXITCODE -ne 0) {
         throw "Docker compose production configuration validation failed with exit code $LASTEXITCODE"

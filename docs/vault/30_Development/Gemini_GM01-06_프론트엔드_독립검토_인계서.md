@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.16"
+version: "1.0.17"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T20:05:00+09:00"
+updated: "2026-09-12T22:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -99,13 +99,13 @@ node tools/run_browser_smoke.mjs
 # 5. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
 node tools/verify_two_pc_distributed_execution.mjs
 
-# 6. 배포 표면, 정본 프로젝트 API, 라우트 커버리지 단위 시험 (31개 테스트 전수 통과)
-.venv\Scripts\pytest tests/test_deployment_surface.py tests/test_server_project_api.py tests/test_route_coverage.py
+# 6. 배포 자격증명 격리, 인증 무결성, 정본 프로젝트 API, 라우트 커버리지 단위 시험
+.venv\Scripts\pytest tests/core/test_deployment_credentials.py tests/test_server_auth_integrity.py tests/test_server_project_api.py tests/test_route_coverage.py
 
 # 7. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 8. 문서 무결성 및 온톨로지 검사 (260 docs PASS, 48 tasks PASS)
+# 8. 문서 무결성 및 온톨로지 검사 (264 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
