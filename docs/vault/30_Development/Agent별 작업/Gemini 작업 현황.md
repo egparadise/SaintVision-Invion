@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.6"
+version: "1.0.7"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T16:05:00+09:00"
+updated: "2026-09-12T16:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -94,12 +94,12 @@ f08bf33: readiness 실패의 성공 fallback, 일부 Evidence ID/exit code/가�
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-05, GM-06, GM-03: Claude 지적 토큰 임의 수락 결함 조치 — server.py 활성 세션 원장(_ACTIVE_TOKENS) 구축 및 Bearer 유효성 엄격 검증, 단위 시험(test_server_auth_integrity.py) 4건 및 E2E 스모크(158/158) 완결 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.36 / 2026-09-12T16:05:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 5d33072 / 로컬 완결 (로컬 검증 완료) |
-| 작업한 것 | 1) GM-05/보안: Claude의 실측 발견(/v1/auth/userinfo가 헤더 부재 시 401을 주나 'Bearer not-a-real-token' 등 임의 문자열에 200과 cluster:admin을 발급하던 결함)을 확인하고, `src/saintvision/server.py`에 인메모리 활성 세션 원장 `_ACTIVE_TOKENS` 및 `verify_bearer_token`을 구축하여 미인증 또는 유효하지 않은/만료된 토큰을 RFC 9457 `AUTH-0050` 401로 엄격 차단.<br>2) GM-05: `tests/test_server_auth_integrity.py` 단위 시험 4건을 신규 작성하여 헤더 부재 거부(401), 쓰레기 토큰 거부(401), PKCE challenge 불일치 거부(401), 정상 PKCE 교환 토큰 승인(200)을 검증 (4/4 PASS). 전체 Python 단위 시험 338 passed / 340 skipped 달성.<br>3) GM-05/GM-06: `tools/run_browser_smoke.mjs` Track 3에 헤더 부재 음성 시험, 쓰레기 Bearer 토큰 음성 시험, PKCE 불일치 음성 시험을 추가하여 E2E 스모크 **158/158 checks (100% 통과)** 달성.<br>4) GM-06: `IntranetDeploymentView` 실시간 노드 상태 대조(온라인/Draining/관측전용) 및 사전 검증(158 checks 완료) vs 물리 5대 실장비 인수 분리 렌더링 유지.<br>5) Vitest 109/109, Vite build 클린(0 warning, 0 error), 2-PC 분산 실행 63/63 checks, 내부망 배포 사전 검증 5/5 전 스위트 100% 무오류 유지. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 **109개 테스트 100% 통과**)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 5.21s, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 14개 트랙 **158/158 checks 100% 통과**)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 63/63 checks 100% 통과)<br>5) Pytest: `.venv\Scripts\pytest tests/test_server_auth_integrity.py` (exit 0, 4 passed), `.venv\Scripts\pytest tests/` (exit 0, 338 passed, 340 skipped)<br>6) Intranet deploy preflight: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료, Gateway Healthy)<br>7) Docs/Ontology: `python tools/check_docs.py` (exit 0, 258 docs PASS), `python tools/check_ontology.py` (exit 0, 48 tasks PASS) |
-| CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke(158)·2-PC(63)·Pytest(338)·Deploy(5) 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 (`HO-GEMINI-CLAUDE-002` v1.0.9) / 운영 2-PC 및 5대 실장비 인수 대기 |
+| 마지막 작업 / 착수 카드 | GM-06, GM-05, GM-03: Nginx TLS 리버스 프록시 보안 헤더 및 Authorization 명시적 전달 강화, 2-PC 분산 실행 스위트 OIDC PKCE 인증 연동(67/67 checks 100%) |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.37 / 2026-09-12T16:35:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / ea508ea / 로컬 완결 (로컬 검증 완료) |
+| 작업한 것 | 1) GM-06/배포: `apps/web/nginx.conf`에 엔터프라이즈 내부망 보안 헤더(`X-Content-Type-Options nosniff`, `X-Frame-Options DENY`, `X-XSS-Protection`, `HSTS`, `Referrer-Policy`)를 추가하고, `/v1/` 프록시 경로에서 `Authorization` 헤더의 명시적 전달(`proxy_set_header Authorization $http_authorization`, `proxy_pass_header Authorization`)을 확립하여 프록시 인증 누락 위험을 원천 차단.<br>2) GM-05/2-PC: `tools/verify_two_pc_distributed_execution.mjs` Step 1에 OIDC PKCE S256 암호학적 교환 및 `/v1/auth/userinfo` 검증(Step 1.3)을 추가하여 2-PC 분산 실행 스위트가 실제 Bearer 토큰 하에서 실행되도록 확장 (전 5단계 **67/67 checks 100% PASS**).<br>3) GM-05/보안: `src/saintvision/server.py`의 활성 세션 원장(`_ACTIVE_TOKENS`)과 단위 시험(`tests/test_server_auth_integrity.py` 4건) 및 E2E 브라우저 스모크 Track 3 음성 시험(158/158 checks) 무오류 유지.<br>4) Vitest 109/109, Vite build(0 warning, 0 error), Python 전체 시험 338 passed / 340 skipped, 내부망 배포 사전 검증 5/5 전 스위트 100% 무오류 완결. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 19개 파일 **109개 테스트 100% 통과**)<br>2) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 5.21s, 경고 0건, exit 0)<br>3) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 14개 트랙 **158/158 checks 100% 통과**)<br>4) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 **67/67 checks 100% 통과**)<br>5) Pytest: `.venv\Scripts\pytest tests/test_server_auth_integrity.py` (exit 0, 4 passed), `.venv\Scripts\pytest tests/` (exit 0, 338 passed, 340 skipped)<br>6) Intranet deploy preflight: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료, Gateway Healthy)<br>7) Docs/Ontology: `python tools/check_docs.py` (exit 0, 258 docs PASS), `python tools/check_ontology.py` (exit 0, 48 tasks PASS) |
+| CI / 독립 reviewer / 운영 인수 | Vitest·Vite·Smoke(158)·2-PC(67)·Pytest(338)·Deploy(5) 파이프라인 100% 검증 완료 / Claude 독립 검토 대기 (`HO-GEMINI-CLAUDE-002` v1.0.10) / 운영 2-PC 및 5대 실장비 인수 대기 |
 | 남은 문제 / 차단 이유 / 해소 담당 | Codex의 factory entrypoint(`saintvision.server:create_app --factory`) 복원 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
 | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(CL-01/HO-GEMINI-CLAUDE-002), Codex 커널 entrypoint 복원 및 원격 PC 설치·7개 시험(CX-01~03), Gemini는 검토 피드백 대응 및 실장비 인수 대기 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 75점 최고 구현 상태 달성, review 대기)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**) |

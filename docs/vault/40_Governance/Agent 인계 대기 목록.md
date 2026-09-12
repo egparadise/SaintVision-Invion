@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.14"
+version: "1.0.15"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T16:05:00+09:00"
+updated: "2026-09-12T16:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -291,7 +291,7 @@ entrypoint 방식도 바뀌었다. `--factory`는 설정을 요구하는 factory
   1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 109개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
   3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 158/158 checks 100% 통과)
-  4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 63/63 checks 100% 통과)
+  4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 67/67 checks 100% 통과)
   5. Python 단위 시험: `.venv\Scripts\pytest tests/test_server_auth_integrity.py` (4 passed), `pytest tests/` (338 passed, 340 skipped)
   6. 내부망 배포 사전 검증: `powershell -File tools/deploy_intranet.ps1` (5/5 전 단계 통과, Gateway Healthy)
 - **검토 중점**:

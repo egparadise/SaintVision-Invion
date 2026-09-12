@@ -22,6 +22,20 @@ const FRONTEND_URL = process.env.TEST_FRONTEND_URL || 'http://localhost:3000';
 let totalChecks = 0;
 let passedChecks = 0;
 
+function base64Url(buf) {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function sha256Base64Url(plain) {
+  const hash = crypto.createHash('sha256').update(plain).digest();
+  return base64Url(hash);
+}
+
+let bearerToken = null;
+function authHeaders(extra = {}) {
+  return bearerToken ? { Authorization: `Bearer ${bearerToken}`, ...extra } : { ...extra };
+}
+
 function assert(title, condition, extra = '') {
   totalChecks++;
   if (condition) {
@@ -60,6 +74,34 @@ async function runTwoPcVerification() {
     assert('Receipt verified is FALSE (ADR-028: business schema check failed)', contrastReceipt.verified === false);
     assert('Receipt resourceReclaimed is FALSE (held for inspection)', contrastReceipt.resourceReclaimed === false);
     assert('CORE CONTRACT: exitCode 0 is never treated as verified application success', contrastReceipt.exitCode === 0 && !contrastReceipt.verified);
+
+    // 1.3 OIDC PKCE S256 Cryptographic Authentication (ADR-004 / RFC 7636)
+    const codeVerifier = base64Url(crypto.randomBytes(32));
+    const codeChallenge = await sha256Base64Url(codeVerifier);
+    const tokenRes = await fetch(`${BACKEND_URL}/v1/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'authorization_code',
+        code: `auth_code_${crypto.randomBytes(8).toString('hex')}`,
+        code_verifier: codeVerifier,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
+        client_id: 'saintvision-2pc-runner',
+        idp: 'internal-keycloak',
+      }),
+    });
+    assert('2-PC Suite OIDC PKCE token exchange returns HTTP 200', tokenRes.status === 200);
+    const tokenData = await tokenRes.json();
+    bearerToken = tokenData.access_token;
+    assert('2-PC Suite Bearer access token granted', Boolean(bearerToken));
+
+    const userinfoRes = await fetch(`${BACKEND_URL}/v1/auth/userinfo`, {
+      headers: authHeaders(),
+    });
+    assert('2-PC Suite operator identity verified at /v1/auth/userinfo', userinfoRes.status === 200);
+    const userinfo = await userinfoRes.json();
+    assert('2-PC Suite operator role confirmed as cluster:admin', userinfo.roles?.includes('cluster:admin'));
 
     // ---------------------------------------------------------------------------
     // Step 2: Claude 프로젝트·자원 설정·Adapter API 연결 검증

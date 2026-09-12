@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.9"
+version: "1.0.10"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T16:05:00+09:00"
+updated: "2026-09-12T16:35:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -92,7 +92,7 @@ npm --prefix apps/web run build
 # 3. 종합 E2E 브라우저 스모크 검증 (14개 트랙, 158개 항목 100% 통과 - 음성 토큰 검증 포함)
 node tools/run_browser_smoke.mjs
 
-# 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 63개 항목 100% 통과)
+# 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
 node tools/verify_two_pc_distributed_execution.mjs
 
 # 5. 서버 인증 무결성 단위 시험 (4개 테스트 전수 통과, 임의 토큰 401 거부 검증)
