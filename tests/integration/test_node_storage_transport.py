@@ -64,8 +64,100 @@ def storage_remote(remote):
     assert ready, "storage Node startup timed out"
     line = a.daemon.stdout.readline()
     assert line, "storage Node startup rejected: " + a.daemon.stderr.read()
-    assert "https://" + json.loads(line)["listening"] == a.endpoint
+    a.storage_startup = json.loads(line)
+    assert "https://" + a.storage_startup["listening"] == a.endpoint
     return a
+
+
+def restart_storage(a, *, rejected=False):
+    args = list(a.daemon.args)
+    a.daemon.terminate()
+    a.daemon.communicate(timeout=12)
+    a.daemon = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if rejected:
+        stdout, stderr = a.daemon.communicate(timeout=12)
+        assert a.daemon.returncode != 0 and not stdout
+        assert "NODE-0061" in stderr
+        return None
+    ready, _, _ = select.select([a.daemon.stdout], [], [], 10)
+    assert ready, "storage restart timed out"
+    line = a.daemon.stdout.readline()
+    assert line, "storage restart rejected: " + a.daemon.stderr.read()
+    return json.loads(line)
+
+
+def test_storage_installation_receipt_is_scoped_private_and_durable(storage_remote):
+    a = storage_remote
+    receipt = a.storage_startup
+    assert (receipt["tenantId"], receipt["nodeId"], receipt["recoveryEpoch"]) == (
+        a.e.tenant,
+        a.e.node,
+        a.e.epoch,
+    )
+    assert (
+        receipt["storagePolicy"]["policySha256"]
+        == hashlib.sha256(a.storage_policy.read_bytes()).hexdigest()
+    )
+    assert receipt["storagePolicy"]["contributionId"] == a.contribution
+    assert not receipt["operationalAcceptanceAssessed"]
+    assert str(a.root) not in json.dumps(receipt) and "certificateDer" not in json.dumps(receipt)
+    assert restart_storage(a) == receipt
+    assert collect(a)[0].sample_healthy
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "root-rollback",
+        "channel-rollback",
+        "same-root-version",
+        "same-channel-version",
+        "same-versions-bytes",
+    ],
+)
+def test_restart_rejects_storage_policy_rollback_and_equivocation(storage_remote, change):
+    a = storage_remote
+    original = json.loads(a.storage_policy.read_bytes())
+    forward = json.loads(a.storage_policy.read_bytes())
+    forward["root_version"] = 2
+    forward["channel"]["version"] = 2
+    a.storage_policy.write_bytes(canonical(forward))
+    assert restart_storage(a)["storagePolicy"]["rootVersion"] == 2
+    bad = json.loads(canonical(forward))
+    if change == "root-rollback":
+        bad["root_version"] = 1
+        bad["channel"]["version"] = 3
+    elif change == "channel-rollback":
+        bad["channel"]["version"] = 1
+        bad["root_version"] = 3
+    elif change == "same-root-version":
+        other = a.path / "other-contributed"
+        other.mkdir()
+        bad["root"] = str(other)
+        bad["channel"]["version"] = 3
+    elif change == "same-channel-version":
+        bad["channel"]["endpoint"] = "https://127.0.0.1:18444"
+        bad["root_version"] = 3
+    a.storage_policy.write_bytes(
+        canonical(bad) + (b" " if change == "same-versions-bytes" else b"")
+    )
+    restart_storage(a, rejected=True)
+    # A failed replacement never lowers the floor; the last accepted exact
+    # configuration remains usable with the same identity/epoch journal.
+    a.storage_policy.write_bytes(canonical(forward))
+    assert restart_storage(a)["storagePolicy"]["channelVersion"] == 2
+
+
+def test_corrupt_storage_floor_fails_closed_without_erasing_identity(storage_remote):
+    from pathlib import Path
+
+    a = storage_remote
+    args = list(a.daemon.args)
+    journal = Path(args[args.index("--state") + 1])
+    identity = (journal / "identity.json").read_bytes()
+    (journal / (".storage-" + a.contribution)).write_bytes(b"{incomplete")
+    restart_storage(a, rejected=True)
+    assert (journal / "identity.json").read_bytes() == identity
 
 
 def collect(a, challenge=None):

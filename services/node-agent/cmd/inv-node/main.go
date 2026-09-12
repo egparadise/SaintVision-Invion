@@ -94,13 +94,16 @@ func run() error {
 			return err
 		}
 		var sampler transport.StorageSampler
+		var storageInstallation *node.StoragePolicyPin
 		if storagePolicy != "" {
-			configured, err := transport.NewStorageSampler(config, storagePolicy, tlsConfig)
+			configured, err := transport.NewStorageSampler(config, storagePolicy, tlsConfig, journal.PinStoragePolicy)
 			if err != nil {
 				return err
 			}
 			defer configured.Close()
 			sampler = configured
+			receipt := configured.Installation()
+			storageInstallation = &receipt
 		}
 		listener, err := net.Listen("tcp", listen)
 		if err != nil {
@@ -108,7 +111,15 @@ func run() error {
 		}
 		defer listener.Close()
 		// Fixed-format local startup record contains no credential or request data.
-		if err = json.NewEncoder(os.Stdout).Encode(map[string]string{"listening": listener.Addr().String()}); err != nil {
+		startup := map[string]any{"listening": listener.Addr().String()}
+		if storageInstallation != nil {
+			startup["storagePolicy"] = storageInstallation
+			startup["operationalAcceptanceAssessed"] = false
+			startup["tenantId"] = config.TenantID
+			startup["nodeId"] = config.NodeID
+			startup["recoveryEpoch"] = config.Epoch
+		}
+		if err = json.NewEncoder(os.Stdout).Encode(startup); err != nil {
 			return err
 		}
 		return transport.Serve(ctx, listener, tlsConfig, transport.HandlerWithStorage(authority, runner, objects, sampler))

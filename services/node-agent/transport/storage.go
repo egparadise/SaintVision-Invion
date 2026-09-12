@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/tls"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -21,11 +22,15 @@ type ConfiguredStorage struct {
 	hash    [32]byte
 	sampler *storage.Sampler
 	tls     *tls.Config
+	receipt node.StoragePolicyPin
 }
 
 // One explicitly configured contribution per Node in v1. A changed config
 // fails closed until a controlled restart, never silently broadens a live root.
-func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config) (*ConfiguredStorage, error) {
+func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config, pin func(node.StoragePolicyPin) error) (*ConfiguredStorage, error) {
+	if pin == nil {
+		return nil, errors.New("NODE-0061: durable storage policy floor required")
+	}
 	raw, err := SafeFile(path, true)
 	if err != nil || wire.Validate("NodeStorageRootConfig", raw) != nil {
 		return nil, errors.New("NODE-0060: storage configuration unavailable")
@@ -38,9 +43,28 @@ func NewStorageSampler(config node.Config, path string, tlsConfig *tls.Config) (
 	if err != nil {
 		return nil, err
 	}
-	return &ConfiguredStorage{path, sha256.Sum256(raw), sampler, tlsConfig}, nil
+	channel, _ := json.Marshal(policy.Channel)
+	digest := func(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
+	receipt := node.StoragePolicyPin{ContributionID: policy.Contribution_id, RootVersion: policy.Root_version, ChannelVersion: policy.Channel.Version, RootSHA256: digest([]byte(policy.Root)), ChannelSHA256: digest(channel), PolicySHA256: digest(raw)}
+	s := &ConfiguredStorage{path, sha256.Sum256(raw), sampler, tlsConfig, receipt}
+	pair, err := tlsConfig.GetCertificate(nil)
+	if err == nil {
+		err = sampler.CheckCertificate(pair)
+	}
+	if err == nil && !s.current() {
+		err = errors.New("NODE-0060: storage configuration changed")
+	}
+	if err == nil {
+		err = pin(receipt)
+	}
+	if err != nil {
+		_ = sampler.Close()
+		return nil, err
+	}
+	return s, nil
 }
-func (s *ConfiguredStorage) Close() error { return s.sampler.Close() }
+func (s *ConfiguredStorage) Installation() node.StoragePolicyPin { return s.receipt }
+func (s *ConfiguredStorage) Close() error                        { return s.sampler.Close() }
 func (s *ConfiguredStorage) current() bool {
 	raw, err := SafeFile(s.path, true)
 	return err == nil && sha256.Sum256(raw) == s.hash

@@ -45,6 +45,12 @@ func Open(raw []byte) (*Sampler, error) {
 }
 func (s *Sampler) Close() error { return s.root.close() }
 
+// Validate the current local server key before committing an installation floor.
+func (s *Sampler) CheckCertificate(pair *tls.Certificate) error {
+	_, err := keyFor(pair, s.config.Channel, time.Now())
+	return err
+}
+
 func endpoint(value string) bool {
 	u, err := url.Parse(value)
 	if err != nil || u.Scheme != "https" || u.Hostname() == "" || u.User != nil || (u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.Fragment != "" {
