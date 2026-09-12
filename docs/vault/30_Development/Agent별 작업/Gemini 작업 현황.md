@@ -161,3 +161,6 @@ fa01d77의 서버 자가 승인403/스모크133 보고를 수신했다. 작성�
 [공유본3개 원문/hash](../Evidence/obsidian-proposals-20260912-storage-policy/manifest.json) 보존. Gemini가 d73da2b base/로컬 변경의 IntranetDeploymentView 실시간 상태 대조·preflight와 물리 인수 분리, Vitest109/smoke154/2-PC63/deploy5를 보고했다. 이 수신은 해당 코드의 독립 승인이나 실제5대 운영 인수가 아니다. 최신 구현 SHA 고정과 독립 검토는 pending이며 공통57.81% 유지. 과거 Claude F1~F4는 후속 수정 SHA별 보고와 대조해야 한다.
 
 새 Codex f9d69a8의 영속 storage policy floor/로컬 시작 기록은 [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]를 따른다. 다음 Codex는 LAN bundle 읽기 mount·policy 전달/교체·receipt 대조, Claude는 f9d69a8 독립 검토, Gemini는 서버 운영 인수와 local receipt 구분이다.
+
+
+2026-09-12 STORAGE-REPLACE 전달 수신: Gemini base5d33072의 인메모리 토큰 검증/시험4·전체338 passed/340 skipped·smoke158 등은 작성자 보고로 보존했다. Claude integration 배포/인증 지적과 함께 [[Agent 인계 대기 목록]]의 최신 수신 절에 기록했다. Codex 정본은 configured factory 위임 유지, 독립 검토/물리 인수 pending, 전체57.81% 유지.

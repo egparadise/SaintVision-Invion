@@ -41,3 +41,5 @@ Codex: Windows/WSL 교체 진입점과 명시적 source/policy/receipt 전달·�
 
 전체 **2775/4800=57.81% 완료 /42.19% 잔여 유지**. 내부 교체 시험만으로 운영 인수 행을 올리지 않는다. 전달/Obsidian 동기화 결과는 아래 추가한다.
 
+
+전달 검사: check_docs exit0(문서337/작업48), check_ontology exit0, git diff --check의 문서 EOF 빈 줄2개 수정 후 exit0. PR19 갱신/draft 유지. 보고7e5d029 push exit0. Obsidian 첫 check는 외부3개 변경으로 exit1/쓰기0. 원문/hash를 보존하고 별도 브랜치의 인증 보고를 작성자 주장으로 인계했다. Codex factory 진입점은 직접 확인해 정본 유지 결정을 남겼다.

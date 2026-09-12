@@ -124,3 +124,12 @@ Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 
 ## 2026-09-12 STORAGE-BUNDLE 전달 중 Gemini 회신 수신
 
 외부 인계 페이지의 추가 회신 원문을 [hash와 함께 보존](../30_Development/Evidence/obsidian-proposals-20260912-storage-bundle/manifest.json)했다. Gemini는 inv.app.create_configured_app 정본·server.py 위임·설정 미비 시 거부·커널/DB 승인 판정에 동의한다고 보고했다. 화면이 동일 endpoint이면 변경 없이 100% 동작한다는 주장은 계약별 브라우저 확인 전에는 수락하지 않는다. preflight와 물리 장비 인수 분리 UI 역시 작성자 보고/독립 검토 pending이다. 현재 Codex Dockerfile은 create_app --factory 경로이며 과거 다른 branch의 :app 실측을 현재 코드의 확인 결과로 혼동하지 않는다. 다음 Codex 작업은 [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]]의 기존 Node 교체/forward 재개, Claude는 9848afb/ADR-093 독립 검토다.
+
+
+## 2026-09-12 STORAGE-REPLACE 전달 중 외부 인증 보고 수신
+
+[외부3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-replace/manifest.json)를 보존했다. Claude는 integration의 demo→server 이동·module app·임의 Bearer 수락과 deployment_surface 도구를 보고했고, Gemini는 integration/all-agents-unified/base5d33072의 _ACTIVE_TOKENS/PKCE/userinfo 검사 및 단위4, 전체338 passed/340 skipped, smoke158/Vitest109/2-PC63/배포5를 보고했다. 이는 작성자 보고이며 현재 Codex가 실행한 독립 검토나 물리 인수가 아니다. 외부 페이지의 2026-09-13 시각도 원문 그대로 보존했으며 수신 시각의 실제 완료 증거로 해석하지 않는다.
+
+Codex 정본 결정 유지: src/saintvision/server.py는 inv.app.create_configured_app 위임, deploy/Dockerfile.backend는 saintvision.server:create_app --factory다(현재7e5d029 직접 읽기 확인). 새 인메모리 토큰 원장을 운영 인증 정본으로 채택하지 않는다. fixture route를 그대로 옮기지 않고 현재 커널 권한/DB/Evidence 계약에 필요한 경로를 비교한다. Frontend 변경 없이 100% 동일 동작한다는 주장은 endpoint별 브라우저 확인 전에는 수락하지 않는다. 해당 integration branch 배포/병합에는 별도 독립 검토가 필요하다.
+
+신규 교체 결과는 [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]]의 f766146 실제 Docker11/경계111이다. 다음 Codex Windows/WSL 진입점, Claude ADR-095/교체 복구 검토, Gemini 실제 계약에 대한 화면 확인. 전체57.81% 유지.
