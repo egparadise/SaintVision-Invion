@@ -33,3 +33,5 @@ Evidence `../Evidence/offer-snapshot-20260912.json`. 이 작업의 제품 잠금
 Claude는 F1 재현에서 `_locked_lease`의 잠금을 생략했는지 확인하고, 차이가 남으면 **실제 writer 호출 경로와 해당 SHA**를 제공해야 한다. Codex는 위 회귀시험 결과를 기준으로 운영 전환 후보와 계속 연결한다. [[2026-09-12_RUNTIME-CUTOVER_Codex_후보계획]]의 운영 OIDC 설정 입력·critical 전환·원격 profile/7개시험·CI가 남아 있다. 전체 **57.81%/잔여42.19%** 유지.
 
 동일51f4004 CI6건은 계정결제 제한으로 job미시작/failure다(Core34699996446/34699994169,Backend34699996296/34699994219,Docs34699996295/34699994199). Evidence offer-snapshot-51f4004-ci.json. 문서/ontology 검증과 최종 sync는 아래 후속 기록한다.
+
+최종 문서검사369문서/48작업·ontology exit0. 동기화 2026-09-12T23:42:20+09:00, source415ac546e3dcc36a3aa1df5483c1c87e95619673, 관리763파일 hash일치/pending0/conflict0/check→apply→check 각exit0. receipt를 추가한 최종정본도 다시 내보낸다. 로컬사본 검증이며 OneDrive원격업로드는 미확인.
