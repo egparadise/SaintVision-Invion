@@ -262,6 +262,33 @@ entrypoint 방식도 바뀌었다. `--factory`는 설정을 요구하는 factory
 2. 되돌린다면 `server.py`에 쌓인 Studio·승인·터미널 작업은 어디로 가는가 — 커널 API로 옮기는가, `demo_server.py`로 되돌려 격리하는가.
 3. 되돌리지 않는다면 인증·DB 연결·설정 게이트를 `server.py`에 넣는 일의 owner는 누구인가.
 
+### B-6. 왜 그렇게 됐는지 — 화면과 커널이 API 모양에 합의한 적이 없다
+
+B-5의 1번 질문("entrypoint를 factory로 되돌릴 것인가")에 답하려면 **되돌리면 무엇이 안 뜨는지**를 알아야 한다. 측정했다.
+
+integration의 SPA가 호출하는 `/v1` 경로 **30개** 중, 정본 응용과 커널이 실제로 제공하는 것을 빼면 **23개가 남는다**(내 lane의 `projects`·`settings`·`readiness`·`adapters` router를 더해도 그렇다. integration 기준으로는 24개).
+
+남는 23개는 기능이 없어서가 아니다. **모양이 다르다.**
+
+| SPA가 부르는 것 | 커널이 제공하는 것 |
+|---|---|
+| `/v1/runs`, `/v1/runs/{id}/cancel` | `/v1/projects/{project}/runs`, `/v1/projects/{project}/runs/{run_id}/cancel` |
+| `/v1/approvals/{id}/approve` | `/v1/projects/{project}/approvals/{approval_id}/decision` |
+| `/v1/nodes/{id}/drain` | `/v1/projects/{project}/nodes` |
+
+커널 API는 **project 범위**이고 SPA는 **평면**이다. fixture 서버가 하고 있는 일이 정확히 이 둘을 잇는 것이며, 고정 데이터로 잇고 있다. **그래서 fixture 서버가 배포 대상이 되었다 — 화면에 답해 주는 것이 그것뿐이기 때문이다.**
+
+SPA 소스에 `"/v1/projects/prj_01JABCDE/runs"`가 **문자열로 박혀 있다**. `prj_01JABCDE`는 격리돼 있던 demo 서버의 고정 project id다.
+
+**그러므로 B-5의 선택지는 둘 중 하나다.**
+
+1. SPA를 커널의 project 범위 API로 옮긴다. 화면 변경이 크고 Gemini 영역이다.
+2. 평면 모양을 커널 위에 구현하는 **실제 adapter 계층**을 만든다. 그것이 있어야 할 자리는 정본 응용이고, DB에 연결되며 인증한다.
+
+**fixture 서버는 2번이 아니다.** DB에 연결하지 않으므로 잇는 것이 없고, 고정 값을 돌려줄 뿐이다.
+
+측정 방법과 한계: 경로를 정규화해 정적으로 비교했다(`${...}`와 `{...}`를 하나로 취급). 동적으로 조립되는 경로는 놓칠 수 있으므로 23이라는 수는 **대략값**이고, 모양 불일치라는 결론이 수의 정확도에 의존하지는 않는다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
