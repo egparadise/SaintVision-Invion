@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.5"
+version: "1.35.6"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T11:12:57+09:00"
+updated: "2026-09-12T11:46:52+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -139,3 +139,6 @@ ADR-085(명시적 worker ReadRoot·root identity pin·Linux descriptor/Windows r
 
 
 ADR-086(local-storage-sample-v1:명시적 root·READ ONLY sample/size 검증·--node는 선언·운영 기록0·빈/검증불가 sample 정상 판정 거부·과거 boolean 재평가)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]]과 [[2026-09-12_STORAGE-CHECK_Codex_검증보고]]를 따른다. 인증된 Node 관측의 기록/Evidence 연결은 후속이다.
+
+
+ADR-087(ASGI client_cert_error 최종 거부·잘못된 direct chain의 proxy fallback 금지·inbound 관측 기록 transaction의 현재 tenant/node/certificate/status row lock)은 [[2026-09-12_NODE-AUTH-COMMIT_Codex_검증보고]]를 따른다. storage challenge·kernel epoch 증명·Evidence 쓰기는 후속이다.

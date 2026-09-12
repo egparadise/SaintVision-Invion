@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.8"
+version: "1.0.9"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T02:31:57+09:00"
+updated: "2026-09-12T11:46:52+09:00"
 source_of_truth: "Git"
 ---
 
@@ -188,3 +188,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## Codex 백업 verifier 검토 수신 대기
 
 [[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]의 4ddb622/ADR-084 독립 검토 필요. 기존 verification.py의 실제5개 실패를 비교 전 row잠금/baseline, 비교 후 savepoint로 보완했다. 과거 성공 관측과 최근 실패를 구분하며 현재 bytes 정상/운영 인수 완료로 승격하지 않는다. hash_file open-time 경계는 Codex 후속.
+
+
+## 2026-09-12 Node 인증 전달·작성자 외부 보고 수신
+
+Claude의 CL01/02/04/07 후속 조사·00b1159 알람 보고 전체를 [원문/hash](../Evidence/obsidian-proposals-20260912-node-auth/manifest.json)로 보존했다. 알람7개 평가/partition2027-01-01은 작성자 보고이며 이번 Codex에서 독립 검증하지 않았다. permission/backup/storage 판정은 최신 Codex 보완 보고를 따르고 기존 검토 요청은 계속 pending이다.2830887/ADR-087 inbound 인증 오류·회수 경쟁 보강의 독립 검토가 필요하다. storage_check는 read-only이며 --node가 실제 기계를 증명한다는 원본 설명은 ADR-086에서 정정됐다.

@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T11:11:46+09:00"
+updated: "2026-09-12T11:46:52+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,3 +36,8 @@ record_storage_check의 healthy는 reachable AND sampled_count>0 AND mismatch_co
 
 Claude는 이 보완본을 독립 검토하고 운영 절차를 조율한다. Gemini는 sample 일치와 Node 증명/운영 상태 unknown을 구분해야 한다. 실제 .225 설치/7개 시험과5대 인수는 이 로컬 점검으로 충족되지 않는다.
 
+
+
+## 인증 선행 보강2830887
+
+ADR-087에서 inbound ASGI verification failure를 명시적으로 거부하고 NodePrincipal.lock_current를 실제 heartbeat 기록 transaction에 연결했다. 이 메서드는 public tenant/node/certificate/status를 row lock으로 재확인한다. kernel recovery epoch/Storage challenge/Evidence 원자 연결은 아직 아니며 기존 Go transport nonce·ChannelProof 경로를 재사용하는 후속 계약을 진행한다. [[2026-09-12_NODE-AUTH-COMMIT_Codex_검증보고]].
