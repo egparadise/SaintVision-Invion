@@ -34,3 +34,5 @@ Evidence는 `../Evidence/business-workspace-20260912.json` 및 같은 접두어�
 [[2026-09-12_RUNTIME-CUTOVER_Codex_후보계획]]에 실제 입력·담당·전환순서를 정리했다. 공개 OIDC 설정값 요청은 진행 중이며 답변을 운영승인으로 추정하지 않는다. Codex는 DB role/Claude guard 독립 검토 및 전환계획 정합성을 이어 확인한다. Claude는 실제 운영계정·issuer 준비/독립 검토, Gemini는 정본factory에 대한 실제로그인·준비상태·화면 검증을 맡는다. migration/Node프로필/kill switch의 critical 운영변경은 적용하지 않았다.
 
 전체 **57.81% 완료/42.19% 잔여** 유지. CI/독립검토/운영SSO/원격실행 인수 미완료. Obsidian 결과 후속 기록.
+
+Obsidian 외부3개 편집 원문/hash를 보존·수신요약 후 동기화했다. 23:37:27KST e7f1844 기준759관리파일 hash일치/pending0/conflict0/check→apply→check exit0. receipt business-workspace-obsidian-sync-20260912.json. F1 추가독립확인은 별도보고로 이어간다.

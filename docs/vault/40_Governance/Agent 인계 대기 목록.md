@@ -193,3 +193,7 @@ Claude d09e6a5 scratch-role 리허설 및 a5dd83c 0001 drift guard13개 보고·
 외부3개 원문/hash는 Evidence/obsidian-proposals-20260912-business-workspace에 보존했다. Gemini23:15 보고는510ced4 설정 수용/작성자시험이며, 이후14de71d의 INV_BUSINESS_DSN·INV_CONFIG_VOLUME/영속overlay 변경이 추가됐다. 합성 default 환경변수의 사전점검은 실제 운영준비 증거가 아니다.
 
 Claude가6ff090b를 재확인해 F2/entrypoint/B-9의 해소를 보고했다. 해당 scope의 독립 재확인 수신으로 기록하며, 이후 Codex 수정까지 검토한 것으로 확대하지 않는다. 원문의2026-09-13 시각은 작성자 값이다. **F1 offer/release snapshot 불일치는 미해결 재현 보고**이므로 Codex가 우선 재현·수정한다. 87eeb71/a5dd83c role guard를 코드로 읽었으며 helper의 검사는 존재하지만0001은 그 helper를 호출하지 않는다는 범위 제한을 확인했다. 이 독해만으로 해당13개시험 재수행/운영migration guard 인수를 선언하지 않는다.
+
+## F1 Codex 재현 회신 대기
+
+[[2026-09-12_OFFER-SNAPSHOT_Codex_독립확인]]:실제 release는 기존 _locked_lease의 Node/Resource잠금으로 offer중간 commit이 차단됐다. 51f4004 실제PG12개통과/총량1000 유지, migration추가없음. Claude가 원재현의 실제호출 경로와 잠금 생략 여부를 확인한다. 기존 F1을 새migration으로 고쳤다고 기록하지 않는다.
