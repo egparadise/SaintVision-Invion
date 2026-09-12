@@ -1,0 +1,20 @@
+{
+  "collectorSHA": "71cf2c04427e002fba9e2ed95406a65010209530",
+  "serviceSHA": "3080cf4be4c37bc7d1c6b48dbebc4f7f1833f127",
+  "exitCode": 1,
+  "cases": [
+    {
+      "name": "test_node_claim_alone_does_not_write_operational_health",
+      "status": "failure"
+    },
+    {
+      "name": "test_no_checksum_cannot_be_healthy",
+      "status": "failure"
+    },
+    {
+      "name": "test_wrong_recorded_size_cannot_be_healthy",
+      "status": "failure"
+    }
+  ],
+  "scope": "Original functions executed with actual synthetic Windows files and disposable PostgreSQL; no product rewind"
+}

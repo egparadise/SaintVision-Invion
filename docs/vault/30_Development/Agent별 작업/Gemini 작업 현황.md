@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.6"
+version: "1.0.7"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T02:53:57+09:00"
+updated: "2026-09-12T11:12:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -137,3 +137,8 @@ Gemini 작성자는 5109962의 요청자 자가 승인 차단과 Vitest105 통�
 ## 2026-09-12 BACKUP-ROOT 전달 중 작성자 제안 수신
 
 Gemini1133666(ReleaseCandidateView subtitle/SLO)의 작성자 Vitest106·Smoke129·2-PC63·Deploy5/전체65.63% 보고를 수신했다. Git2파일 변경만 확인했으며 Codex 독립 UI/운영 인수 결과는 아니다. 최신 보안/운영 경계와 공통57.29%를 유지하고 기존 finding을 삭제하지 않는다. [작성자 원문/hash](../Evidence/obsidian-proposals-20260912-root/manifest.json). Codex6a72b9d 파일 root 경계 Linux103/Windows80은 원격7개 통과가 아니다.
+
+
+## 2026-09-12 STORAGE-CHECK 전달 중 작성자 제안 수신
+
+fa01d77의 서버 자가 승인403/스모크133 보고를 수신했다. 작성자는 GM01~04를 review로 보고했으며 독립 승인과 다르다. 최신 보안/운영 finding을 보존한다. Codex는 해당2파일 변경만 확인했고 UI/실장비 시험을 재실행하지 않았다. [원문](../Evidence/obsidian-proposals-20260912-storage-check/manifest.json). 공통 진척은 S12-ST의 새 실제 로컬 점검 증거만 반영하여57.81%로 갱신했다. 작성자65.63%를 채택한 것은 아니다.

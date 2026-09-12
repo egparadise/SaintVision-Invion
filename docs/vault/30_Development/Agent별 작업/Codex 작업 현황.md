@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.13"
+version: "1.0.14"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T02:53:57+09:00"
+updated: "2026-09-12T11:12:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+- [[2026-09-12_STORAGE-CHECK_Codex_검증보고]]:8c6805f/a7d0f5e 실제 local sample/READ ONLY·ReadRoot·hash/size 검증, Linux138/Windows105 통과. 입력 Node 이름은 신원 증명이 아니므로 운영 기록0. zero sample/과거 잘못된 healthy 판정을 보완했다. 다음 기존 Node 인증·epoch·challenge·root 버전/Evidence 원자 연결, Claude 독립 검토. S12-ST25→50, 전체57.81%/잔여42.19%, CI/원격 인수 미완료.
 
 - [[2026-09-12_BACKUP-ROOT_Codex_검증보고]]:6a72b9d에서 허용 root·링크/교체 차단·시간 정보가 같을 때도 bounded 재읽기 hash 비교를 구현했다. 최종 Linux103/Windows80 통과. 다음71cf2c0 storage_check 실제 node binding·root 조율/독립 검토, 이후 durable 관측/Evidence. PR19 draft/CI 계정 차단/reviewer pending/실장비 인수 미완료. 전체57.29% 유지.
 
@@ -61,7 +63,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-08 / AC-01, AC-08.
-- 다음 첫 행동: backup ledger·permission snapshot·hash_file root 검토/보완을6a72b9d까지 전달했다. Claude71cf2c0 storage_check의 실제 node identity binding과 ReadRoot 계약을 독립 검토하고 durable 성공/실패 관측·Evidence 연결을 진행한다. 운영 인수와 reviewer 수신은 별도다.
+- 다음 첫 행동: a7d0f5e 로컬 sample/읽기 전용 경계까지 전달했다. 기존 Node mTLS/epoch·challenge·승인 root 설정 버전과 관측을 묶고 StorageCheck/Evidence 원자 기록을 구현한다. Claude 독립 검토와 실제 .225 profile 수신/원격7개는 별도다.
 - 필요한 합격 증거: 미확인 항목에 결정 담당·차단 범위 명시, 비밀값 없는 버전 계약, Claude/Gemini가 구현할 입력·출력 합의. 실제 계정값은 운영자 확인 필요.
 - 선행/차단과 해소 담당: 초안/계약 검토는 즉시 가능. 운영 권한/장비 정보 확정은 운영자 입력 필요.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
@@ -193,3 +195,8 @@ source_of_truth: "Git"
 ## 최신 작업 — BACKUP-ROOT
 
 [[2026-09-12_BACKUP-ROOT_Codex_검증보고]]:6a72b9d에서 허용 root·링크/교체 차단·시간 정보가 같을 때도 bounded 재읽기 hash 비교를 구현했다. 최종 Linux103/Windows80 통과. 다음71cf2c0 storage_check 실제 node binding·root 조율/독립 검토, 이후 durable 관측/Evidence. PR19 draft/CI 계정 차단/reviewer pending/실장비 인수 미완료. 전체57.29% 유지.
+
+
+## 최신 작업 — STORAGE-CHECK
+
+[[2026-09-12_STORAGE-CHECK_Codex_검증보고]]:8c6805f/a7d0f5e 실제 local sample/READ ONLY·ReadRoot·hash/size 검증, Linux138/Windows105 통과. 입력 Node 이름은 신원 증명이 아니므로 운영 기록0. zero sample/과거 잘못된 healthy 판정을 보완했다. 다음 기존 Node 인증·epoch·challenge·root 버전/Evidence 원자 연결, Claude 독립 검토. S12-ST25→50, 전체57.81%/잔여42.19%, CI/원격 인수 미완료.
