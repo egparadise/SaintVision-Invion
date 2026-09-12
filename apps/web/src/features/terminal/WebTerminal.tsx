@@ -27,64 +27,126 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   const clientRef = useRef<WsTerminalClient | null>(null);
 
   useEffect(() => {
+    let active = true;
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
     const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
 
-    const client = new WsTerminalClient(
-      wsUrl,
-      (data) => {
-        // Format line breaks and append to output lines
-        const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
-        if (lines.length > 0) {
-          setTerminalOutput((prev) => [...prev, ...lines]);
+    const initTerminal = async () => {
+      try {
+        setConnectionStatus('connecting');
+        setTerminalOutput((prev) => [
+          ...prev,
+          `[인계] 제어 평면(/v1/terminal/tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
+        ]);
+        const res = await fetch('/v1/terminal/tickets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workspaceId, sessionId }),
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: 일회용 티켓 발급 거부`);
         }
-      },
-      (status) => {
-        setConnectionStatus(status);
-      }
-    );
+        const ticketData = await res.json();
+        const ticket = ticketData.ticketId;
+        if (!active) return;
 
-    clientRef.current = client;
-    client.connect(`ticket_${sessionId}_${Date.now()}`);
+        setTerminalOutput((prev) => [
+          ...prev,
+          `[확인] 일회용 티켓(${ticket.slice(0, 12)}...) 획득 성공 (유효기간: 30초). PTY 세션 연결 중...`,
+        ]);
+
+        const client = new WsTerminalClient(
+          wsUrl,
+          (data) => {
+            const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
+            if (lines.length > 0) {
+              setTerminalOutput((prev) => [...prev, ...lines]);
+            }
+          },
+          (status) => {
+            if (active) setConnectionStatus(status);
+          }
+        );
+
+        clientRef.current = client;
+        client.connect(ticket);
+      } catch (err: any) {
+        if (!active) return;
+        setConnectionStatus('error');
+        setTerminalOutput((prev) => [
+          ...prev,
+          `❌ [티켓 발급 실패]: ${err.message || err}. 재접속 버튼으로 다시 시도하십시오.`,
+        ]);
+      }
+    };
+
+    initTerminal();
 
     return () => {
-      client.disconnect();
+      active = false;
+      clientRef.current?.disconnect();
       clientRef.current = null;
     };
-  }, [sessionId]);
+  }, [sessionId, workspaceId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [terminalOutput]);
 
-  const handleReconnect = () => {
+  const handleReconnect = async () => {
     if (clientRef.current) {
       clientRef.current.disconnect();
+      clientRef.current = null;
     }
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
     const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
 
-    const client = new WsTerminalClient(
-      wsUrl,
-      (data) => {
-        const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
-        if (lines.length > 0) {
-          setTerminalOutput((prev) => [...prev, ...lines]);
-        }
-      },
-      (status) => {
-        setConnectionStatus(status);
+    try {
+      setConnectionStatus('connecting');
+      setTerminalOutput((prev) => [
+        ...prev,
+        `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
+      ]);
+      const res = await fetch('/v1/terminal/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId, sessionId }),
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: 일회용 티켓 재발급 거부`);
       }
-    );
+      const ticketData = await res.json();
+      const ticket = ticketData.ticketId;
 
-    clientRef.current = client;
-    client.connect(`ticket_${sessionId}_${Date.now()}`);
-    setTerminalOutput((prev) => [
-      ...prev,
-      `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 시도합니다...`,
-    ]);
+      setTerminalOutput((prev) => [
+        ...prev,
+        `[확인] 신규 일회용 티켓(${ticket.slice(0, 12)}...) 획득 완료. 재연결 진행.`,
+      ]);
+
+      const client = new WsTerminalClient(
+        wsUrl,
+        (data) => {
+          const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
+          if (lines.length > 0) {
+            setTerminalOutput((prev) => [...prev, ...lines]);
+          }
+        },
+        (status) => {
+          setConnectionStatus(status);
+        }
+      );
+
+      clientRef.current = client;
+      client.connect(ticket);
+    } catch (err: any) {
+      setConnectionStatus('error');
+      setTerminalOutput((prev) => [
+        ...prev,
+        `❌ [재접속 실패]: ${err.message || err}`,
+      ]);
+    }
   };
 
   const handleCommandSubmit = (e: React.FormEvent) => {

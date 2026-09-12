@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NodeItem, SyntheticGpuResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { SecurityControlManager } from './securityEngine';
@@ -18,13 +18,46 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [mountTestPath, setMountTestPath] = useState('/var/run/docker.sock');
   const [mountTestResult, setMountTestResult] = useState<string | null>(null);
 
-  const handleToggleDrain = (nodeId: string, currentDrained: boolean) => {
+  useEffect(() => {
+    let changed = false;
+    nodes.forEach((n) => {
+      const isDrainingOnServer = n.status === 'draining' || (n as any).isDraining === true;
+      if (isDrainingOnServer && !secManager.isNodeDrained(n.id)) {
+        secManager.drainNode(n.id, 'system', 'Cluster control plane reported draining status');
+        changed = true;
+      }
+    });
+    if (changed) {
+      refreshState();
+    }
+  }, [nodes]);
+
+  const handleToggleDrain = async (nodeId: string, currentDrained: boolean) => {
     if (currentDrained) {
       secManager.undrainNode(nodeId, 'usr_admin_01');
+      refreshState();
+      try {
+        await fetch(`/v1/nodes/${nodeId}/undrain`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ actor: 'usr_admin_01' }),
+        });
+      } catch (err) {
+        console.error('Failed to sync node undrain to control plane:', err);
+      }
     } else {
       secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');
+      refreshState();
+      try {
+        await fetch(`/v1/nodes/${nodeId}/drain`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Admin manual maintenance and isolation protocol' }),
+        });
+      } catch (err) {
+        console.error('Failed to sync node drain to control plane:', err);
+      }
     }
-    refreshState();
   };
   const [bypassRiskLevel, setBypassRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L2');
   const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);

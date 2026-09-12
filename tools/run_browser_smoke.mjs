@@ -303,45 +303,121 @@ async function runFullSmokeJourney() {
     }
 
     // -------------------------------------------------------------------------
-    // 9. Interactive Sandboxed PTY Web Terminal WebSocket Check
+    // 9. Interactive Sandboxed PTY Web Terminal WebSocket Check (ADR-038)
     // -------------------------------------------------------------------------
-    console.log('\n[Track 9] Interactive PTY Web Terminal WebSocket:');
+    console.log('\n[Track 9] Interactive PTY Web Terminal WebSocket (ADR-038):');
+
+    // 1. Issue authentic 30s one-time cryptographic ticket
+    const ticketRes = await fetch(`${BACKEND_URL}/v1/terminal/tickets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workspaceId: 'wsp_smoke_test', userId: 'usr_smoke_operator' }),
+    });
+    assert('One-time terminal ticket issued successfully (HTTP 201)', ticketRes.status === 201);
+    const ticketData = await ticketRes.json();
+    assert('Ticket ID starts with tkt_ prefix', Boolean(ticketData.ticketId?.startsWith('tkt_')));
+    assert('Ticket validity is exactly 30s', ticketData.expiresInSeconds === 30);
+    assert('Ticket initially marked unused', ticketData.used === false);
+
+    const validTicket = ticketData.ticketId;
+
     if (typeof globalThis.WebSocket !== 'undefined') {
+      // 2. Connect with authentic ticket
       await new Promise((resolve) => {
-        const wsUrl = `${BACKEND_URL.replace('http', 'ws')}/v1/terminal/ws?ticket=smoke_test_ticket`;
+        const wsUrl = `${BACKEND_URL.replace('http', 'ws')}/v1/terminal/ws?ticket=${validTicket}`;
         const ws = new globalThis.WebSocket(wsUrl);
-        let received = false;
+        let bannerReceived = false;
+        let statusReceived = false;
 
         const timer = setTimeout(() => {
           ws.close();
-          assert('Terminal WebSocket session connected and verified', received);
+          assert('Terminal WebSocket connected with authentic 30s ticket', bannerReceived);
+          assert('Terminal executed status command and returned cluster info', statusReceived);
           resolve();
-        }, 2000);
+        }, 2500);
 
         ws.onopen = () => {
           ws.send('status\r');
         };
 
         ws.onmessage = (ev) => {
-          if (typeof ev.data === 'string' && (ev.data.includes('SaintVision') || ev.data.includes('node-01'))) {
-            received = true;
+          if (typeof ev.data === 'string') {
+            if (ev.data.includes('SaintVision PTY Terminal')) {
+              bannerReceived = true;
+            }
+            if (ev.data.includes('Cluster: 5 nodes online') || ev.data.includes('Gateway: healthy')) {
+              statusReceived = true;
+            }
           }
         };
 
-        ws.onerror = () => {
+        ws.onerror = (err) => {
           clearTimeout(timer);
-          assert('Terminal WebSocket session established', true, '(fallback simulation)');
+          assert('Terminal WebSocket unexpected error', false, String(err));
           resolve();
         };
 
         ws.onclose = () => {
           clearTimeout(timer);
-          assert('Terminal WebSocket session established', true);
+          assert('Terminal WebSocket connected with authentic 30s ticket', bannerReceived);
+          assert('Terminal executed status command and returned cluster info', statusReceived);
           resolve();
         };
       });
+
+      // 3. Negative test: connect with invalid/fabricated ticket
+      await new Promise((resolve) => {
+        const fakeWsUrl = `${BACKEND_URL.replace('http', 'ws')}/v1/terminal/ws?ticket=fake_unauthorized_token_xyz`;
+        const ws = new globalThis.WebSocket(fakeWsUrl);
+        let closedForbidden = false;
+
+        const timer = setTimeout(() => {
+          ws.close();
+          assert('Fabricated ticket rejected by server (Forbidden/Close code 4003)', closedForbidden);
+          resolve();
+        }, 1500);
+
+        ws.onclose = (ev) => {
+          clearTimeout(timer);
+          if (ev.code === 4003 || ev.code === 1008 || ev.code === 1000 || ev.code === 1006) {
+            closedForbidden = true;
+          }
+          assert('Fabricated ticket rejected by server (Forbidden/Close code 4003)', closedForbidden);
+          resolve();
+        };
+
+        ws.onerror = () => {
+          // Handshake error expected
+        };
+      });
+
+      // 4. Negative test: replay prevention (re-use previously consumed ticket)
+      await new Promise((resolve) => {
+        const replayWsUrl = `${BACKEND_URL.replace('http', 'ws')}/v1/terminal/ws?ticket=${validTicket}`;
+        const ws = new globalThis.WebSocket(replayWsUrl);
+        let rejectedOnReplay = false;
+
+        const timer = setTimeout(() => {
+          ws.close();
+          assert('Reused ticket rejected by server (Single Use Protection)', rejectedOnReplay);
+          resolve();
+        }, 1500);
+
+        ws.onclose = (ev) => {
+          clearTimeout(timer);
+          if (ev.code === 4003 || ev.code === 1008 || ev.code === 1000 || ev.code === 1006) {
+            rejectedOnReplay = true;
+          }
+          assert('Reused ticket rejected by server (Single Use Protection)', rejectedOnReplay);
+          resolve();
+        };
+
+        ws.onerror = () => {
+          // Handshake error expected
+        };
+      });
     } else {
-      assert('WebSocket client available in runtime', true, '(node standard ws)');
+      assert('WebSocket client available in runtime', false, 'Missing WebSocket in Node');
     }
 
     // -------------------------------------------------------------------------
@@ -594,6 +670,54 @@ async function runFullSmokeJourney() {
     assert('GET /v1/discovery/candidates returns HTTP 200', candRes.status === 200);
     const candData = await candRes.json();
     assert('Placement discovery returns evaluated candidates', Array.isArray(candData.items) && candData.total >= 1);
+
+    // -------------------------------------------------------------------------
+    // [Track 14] Node Drain & Schedulable Isolation Control (ADR-038)
+    // -------------------------------------------------------------------------
+    console.log('\n[Track 14] Node Drain & Schedulable Isolation Control (ADR-038):');
+
+    // 1. Drain node nod_01JABCDEF02
+    const drainRes = await fetch(`${BACKEND_URL}/v1/nodes/nod_01JABCDEF02/drain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Smoke test scheduled isolation' }),
+    });
+    assert('POST /v1/nodes/{id}/drain returns HTTP 200', drainRes.status === 200);
+    const drainData = await drainRes.json();
+    assert('Drained node status is draining', drainData.status === 'draining');
+    assert('Drained node schedulable is false', drainData.schedulable === false);
+    assert('Drained node isDraining is true', drainData.isDraining === true);
+
+    // 2. Verify placement engine excludes drained node
+    const placementRes = await fetch(`${BACKEND_URL}/v1/pools/pool_02_inference/placement-preview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requiredCores: 2 }),
+    });
+    assert('Placement preview returns HTTP 200 during node drain', placementRes.status === 200);
+    const placementData = await placementRes.json();
+    const evalN2 = placementData.evaluations?.find((e) => e.nodeId === 'nod_01JABCDEF02');
+    assert('Drained node is evaluated as not eligible in placement', evalN2 && evalN2.eligible === false);
+    assert('Drained node has rejection reasons registered', Boolean(evalN2 && evalN2.rejectionReasons?.length > 0));
+
+    // 3. Verify security audit log recorded drain action
+    const auditRes = await fetch(`${BACKEND_URL}/v1/admin/audit-logs`);
+    assert('GET /v1/admin/audit-logs returns HTTP 200', auditRes.status === 200);
+    const auditData = await auditRes.json();
+    const drainLog = auditData.items?.find((item) => item.action === 'node_drain_activated' && item.target === 'nod_01JABCDEF02');
+    assert('Audit log contains node_drain_activated record', Boolean(drainLog));
+
+    // 4. Undrain node nod_01JABCDEF02
+    const undrainRes = await fetch(`${BACKEND_URL}/v1/nodes/nod_01JABCDEF02/undrain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actor: 'usr_admin_01' }),
+    });
+    assert('POST /v1/nodes/{id}/undrain returns HTTP 200', undrainRes.status === 200);
+    const undrainData = await undrainRes.json();
+    assert('Restored node status is online', undrainData.status === 'online');
+    assert('Restored node schedulable is true', undrainData.schedulable === true);
+    assert('Restored node isDraining is false', undrainData.isDraining === false);
 
     // -------------------------------------------------------------------------
     // Summary Dossier

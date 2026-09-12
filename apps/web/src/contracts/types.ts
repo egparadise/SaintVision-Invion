@@ -30,7 +30,7 @@ export type ErrorCategory =
 
 export type RiskLevel = 'L0' | 'L1' | 'L2' | 'L3';
 
-export type NodeStatus = 'online' | 'degraded' | 'offline';
+export type NodeStatus = 'online' | 'degraded' | 'offline' | 'draining' | 'enrolling' | 'retired';
 
 export interface ProblemDetails {
   type: string;

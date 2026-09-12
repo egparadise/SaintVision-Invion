@@ -59,6 +59,12 @@ app.add_middleware(
 # In-Memory State Stores (Seeded with canonical project fixtures)
 # ------------------------------------------------------------------------------
 
+# Terminal Ticket Registry (30s Single-Use Cryptographic Tickets)
+TERMINAL_TICKETS: Dict[str, Dict[str, Any]] = {}
+
+# Cluster Security & Governance Audit Log (ADR-038 / OPA)
+AUDIT_LOGS: List[Dict[str, Any]] = []
+
 NODES: List[Dict[str, Any]] = [
     {
         "nodeId": "nod_01JABCDEF01",
@@ -912,6 +918,84 @@ def node_heartbeat(node_id: str, request: Request):
         trace_id,
         "RES",
     )
+
+
+@app.post("/v1/nodes/{node_id}/drain")
+async def drain_node(node_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    reason = data.get("reason", "Admin manual maintenance and isolation protocol")
+    actor = data.get("actor", "usr_admin_01")
+    for node in NODES:
+        if node["nodeId"] == node_id:
+            node["schedulable"] = False
+            node["status"] = "draining"
+            node["isDraining"] = True
+            node["drainedAt"] = dt.datetime.now(dt.timezone.utc).isoformat()
+            node["drainedBy"] = actor
+            node["drainReason"] = reason
+            AUDIT_LOGS.append({
+                "id": f"aud_{secrets.token_hex(6)}",
+                "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "actor": actor,
+                "action": "node_drain_activated",
+                "target": node_id,
+                "details": f"Node {node_id} ({node['hostname']}) placed into DRAIN state (scheduling excluded). Reason: {reason}",
+                "severity": "high",
+            })
+            return node
+    return rfc9457_problem(
+        404,
+        "RES-NODE-404",
+        "Node Not Found",
+        f"Node with ID '{node_id}' does not exist.",
+        trace_id,
+        "RES",
+    )
+
+
+@app.post("/v1/nodes/{node_id}/undrain")
+async def undrain_node(node_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    actor = data.get("actor", "usr_admin_01")
+    for node in NODES:
+        if node["nodeId"] == node_id:
+            node["schedulable"] = True
+            node["status"] = "online"
+            node["isDraining"] = False
+            node.pop("drainedAt", None)
+            node.pop("drainedBy", None)
+            node.pop("drainReason", None)
+            AUDIT_LOGS.append({
+                "id": f"aud_{secrets.token_hex(6)}",
+                "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(),
+                "actor": actor,
+                "action": "node_drain_deactivated",
+                "target": node_id,
+                "details": f"Node {node_id} ({node['hostname']}) returned to SCHEDULABLE state.",
+                "severity": "medium",
+            })
+            return node
+    return rfc9457_problem(
+        404,
+        "RES-NODE-404",
+        "Node Not Found",
+        f"Node with ID '{node_id}' does not exist.",
+        trace_id,
+        "RES",
+    )
+
+
+@app.get("/v1/admin/audit-logs")
+def get_admin_audit_logs():
+    return {"items": list(reversed(AUDIT_LOGS)), "total": len(AUDIT_LOGS)}
 
 
 # ------------------------------------------------------------------------------
@@ -2204,17 +2288,83 @@ async def events_sse_stream():
 
 
 # ------------------------------------------------------------------------------
-# Interactive Web Terminal (WebSocket)
+# Interactive Web Terminal (WebSocket) & One-Time Tickets (ADR-038)
 # ------------------------------------------------------------------------------
 
 
+@app.post("/v1/terminal/tickets", status_code=201)
+async def create_terminal_ticket(request: Request):
+    """
+    Issue cryptographically signed 30-second one-time ticket for PTY WebSocket access.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    workspace_id = data.get("workspaceId", "wsp_default")
+    user_id = data.get("userId", "usr_dev_01")
+    ticket_id = f"tkt_{secrets.token_urlsafe(24)}"
+    now = dt.datetime.now(dt.timezone.utc)
+    expires_at = now + dt.timedelta(seconds=30)
+
+    record = {
+        "ticketId": ticket_id,
+        "workspaceId": workspace_id,
+        "userId": user_id,
+        "issuedAt": now.isoformat(),
+        "expiresAt": expires_at.isoformat(),
+        "expiresInSeconds": 30,
+        "used": False,
+    }
+    TERMINAL_TICKETS[ticket_id] = record
+    return record
+
+
+@app.get("/v1/terminal/tickets/{ticket_id}")
+def get_terminal_ticket(ticket_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    if ticket_id not in TERMINAL_TICKETS:
+        return rfc9457_problem(
+            404,
+            "RES-TICKET-404",
+            "Terminal Ticket Not Found",
+            f"Ticket '{ticket_id}' does not exist or expired.",
+            trace_id,
+            "RES",
+        )
+    return TERMINAL_TICKETS[ticket_id]
+
+
 @app.websocket("/v1/terminal/ws")
-async def terminal_websocket(websocket: WebSocket):
+async def terminal_websocket(websocket: WebSocket, ticket: Optional[str] = Query(None)):
+    now = dt.datetime.now(dt.timezone.utc)
+    # 1. Require and validate 30s one-time cryptographic ticket
+    if not ticket or ticket not in TERMINAL_TICKETS:
+        # RFC 6455 closure code 4003: Policy Violation / Unauthorized
+        await websocket.close(code=4003, reason="Forbidden: Invalid or missing one-time terminal ticket")
+        return
+
+    record = TERMINAL_TICKETS[ticket]
+    if record.get("used"):
+        await websocket.close(code=4003, reason="Forbidden: One-time terminal ticket already used (Replay Protection)")
+        return
+
+    expires_at = dt.datetime.fromisoformat(record["expiresAt"])
+    if now > expires_at:
+        await websocket.close(code=4003, reason="Forbidden: Terminal ticket expired (>30s)")
+        return
+
+    # Atomically mark ticket as consumed
+    record["used"] = True
+    record["usedAt"] = now.isoformat()
+
     await websocket.accept()
     welcome_banner = (
         "\r\n\x1b[1;36m====================================================\x1b[0m\r\n"
         "\x1b[1;32m SaintVision PTY Terminal (Intranet Sandboxed Session)\x1b[0m\r\n"
         "\x1b[1;36m====================================================\x1b[0m\r\n"
+        f" Ticket: \x1b[1;33m{ticket[:14]}...\x1b[0m (Verified 30s One-Time Token)\r\n"
         " Type \x1b[1;33m'help'\x1b[0m for available commands. (L0-L3 Protected)\r\n\r\n"
         "saintvision@node-01:~$ "
     )
@@ -2223,52 +2373,63 @@ async def terminal_websocket(websocket: WebSocket):
     buffer = ""
     try:
         while True:
-            char = await websocket.receive_text()
-            if char in ("\r", "\n"):
-                cmd = buffer.strip()
-                await websocket.send_text("\r\n")
-                if cmd == "help":
-                    resp = (
-                        "Available Sandbox Commands:\r\n"
-                        "  status  - Cluster node summary\r\n"
-                        "  ps      - Active container processes\r\n"
-                        "  ls      - Workspace sandbox directory\r\n"
-                        "  uname   - Operating system and kernel\r\n"
-                        "  exit    - Terminate terminal session\r\n"
-                    )
-                    await websocket.send_text(resp)
-                elif cmd == "status":
-                    resp = f"Cluster: 5 nodes online | Gateway: healthy (RTT: 0.8ms) | Active Runs: {len(RUNS)}\r\n"
-                    await websocket.send_text(resp)
-                elif cmd == "ps":
-                    resp = (
-                        "PID   USER     TIME   COMMAND\r\n"
-                        "  1   saint    0:01   /bin/sandbox-supervisor\r\n"
-                        " 42   app      0:15   python3 -m saintvision.server\r\n"
-                    )
-                    await websocket.send_text(resp)
-                elif cmd == "ls":
-                    resp = "config/  contracts/  data/  models/  logs/  output.json\r\n"
-                    await websocket.send_text(resp)
-                elif cmd == "uname":
-                    resp = "Linux saintvision-node01 6.1.0-custom-invion #1 SMP PREEMPT_DYNAMIC x86_64\r\n"
-                    await websocket.send_text(resp)
-                elif cmd == "exit":
-                    await websocket.send_text("Session terminated by operator.\r\n")
-                    await websocket.close()
-                    break
-                elif cmd:
-                    await websocket.send_text(f"bash: {cmd}: command sandboxed or restricted (Rule #304)\r\n")
-                buffer = ""
-                await websocket.send_text("saintvision@node-01:~$ ")
-            elif char in ("\x7f", "\b"):  # Backspace
-                if len(buffer) > 0:
-                    buffer = buffer[:-1]
-                    await websocket.send_text("\b \b")
-            else:
-                buffer += char
-                await websocket.send_text(char)
+            raw = await websocket.receive_text()
+            char = raw
+            try:
+                data_obj = json.loads(raw)
+                if isinstance(data_obj, dict) and "payload" in data_obj:
+                    char = data_obj["payload"]
+            except Exception:
+                pass
+
+            for c in char:
+                if c in ("\r", "\n"):
+                    cmd = buffer.strip()
+                    await websocket.send_text("\r\n")
+                    if cmd == "help":
+                        resp = (
+                            "Available Sandbox Commands:\r\n"
+                            "  status  - Cluster node summary\r\n"
+                            "  ps      - Active container processes\r\n"
+                            "  ls      - Workspace sandbox directory\r\n"
+                            "  uname   - Operating system and kernel\r\n"
+                            "  exit    - Terminate terminal session\r\n"
+                        )
+                        await websocket.send_text(resp)
+                    elif cmd == "status":
+                        resp = f"Cluster: 5 nodes online | Gateway: healthy (RTT: 0.8ms) | Active Runs: {len(RUNS)}\r\n"
+                        await websocket.send_text(resp)
+                    elif cmd == "ps":
+                        resp = (
+                            "PID   USER     TIME   COMMAND\r\n"
+                            "  1   saint    0:01   /bin/sandbox-supervisor\r\n"
+                            " 42   app      0:15   python3 -m saintvision.server\r\n"
+                        )
+                        await websocket.send_text(resp)
+                    elif cmd == "ls":
+                        resp = "config/  contracts/  data/  models/  logs/  output.json\r\n"
+                        await websocket.send_text(resp)
+                    elif cmd == "uname":
+                        resp = "Linux saintvision-node01 6.1.0-custom-invion #1 SMP PREEMPT_DYNAMIC x86_64\r\n"
+                        await websocket.send_text(resp)
+                    elif cmd == "exit":
+                        await websocket.send_text("Session terminated by operator.\r\n")
+                        await websocket.close()
+                        return
+                    elif cmd:
+                        await websocket.send_text(f"bash: {cmd}: command sandboxed or restricted (Rule #304)\r\n")
+                    buffer = ""
+                    await websocket.send_text("saintvision@node-01:~$ ")
+                elif c in ("\x7f", "\b"):  # Backspace
+                    if len(buffer) > 0:
+                        buffer = buffer[:-1]
+                        await websocket.send_text("\b \b")
+                else:
+                    buffer += c
+                    await websocket.send_text(c)
     except WebSocketDisconnect:
+        pass
+    except Exception:
         pass
 
 
