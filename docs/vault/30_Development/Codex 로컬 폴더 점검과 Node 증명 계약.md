@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.8.0"
+version: "1.9.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T16:12:16+09:00"
+updated: "2026-09-12T16:41:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -105,3 +105,7 @@ local startup receipt는 tenant/node/epoch·contribution·두 버전·hash이며
 ADR-094 receipt·plan을 재검사하고 private flock/0600 fsync 기록으로 교체 단계를 진행한다. 기존 container는 restart=no로 이름 변경 후 보존, 같은 상태 volume을 새 컨테이너와 공유한다. old image/config·이전 정책 exact bytes를 private 보존하며 기존 키/journal을 삭제하지 않는다. 정책과 해당 contribution floor만 변경을 허용한다. currentId·label·설정과 상태 해시를 재개 때 검증한다. starting을 시작 전에 기록하고 이전 policy/container로 자동 rollback하지 않는다.
 
 실제 volume CreatedAt은 쓰기 뒤 변할 수 있어 교체 중 신원 키로 쓰지 않는다. 원래 preflight hash 및 보존 container ID/mount·나머지 volume metadata·old/new만의 consumer 집합을 함께 확인한다. 새 Node는 restart=no/운영 인수 false로 반환한다. 단계 fenced는 자동 재시작 차단일 뿐 daemon/분산 fencing이 아니다. [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]] 참조.
+
+## ADR-096 — Windows/WSL 준비 기록과 명시적 apply
+
+Windows 입력은 특정 허용 폴더·exact policy hash·배정 IP와 reparse 경계를 검사한다. 기존 WSL Node identity를 보존하고 고정 private 하위 디렉터리에 exact policy·plan/preflight request를 기록한다. prepare는 image import/파일 준비이며 Node 교체가 아니다. Apply는 request bytes SHA256을 명시하고 같은 입력/기록으로만 재개한다. 기존 키/manifest를 덮어쓰지 않고 결과는 서버 검증 대기/운영 인수 false다. 실제 Windows→Ubuntu→Docker/원격 경로 인수는 별도이며 두 분리 시험의 성공으로 대신하지 않는다. [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]] 참조.

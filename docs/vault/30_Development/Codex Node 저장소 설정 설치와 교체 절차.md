@@ -1,10 +1,10 @@
 ---
 doc_id: "RUNBOOK-STORAGE-POLICY-001"
 title: "Codex Node 저장소 설정 설치와 교체 절차"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T16:12:16+09:00"
+updated: "2026-09-12T16:41:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -65,3 +65,21 @@ python3 worker_replace.py storage-plan.json replacement-preflight.json > storage
 기존 컨테이너는 이름이 변경되고 restart=no로 남는다. 새 컨테이너도 restart=no이며 JSON은 서버 mTLS 검증 대기 상태다. old 컨테이너는 shared volume을 보므로 독립 데이터 백업으로 취급하거나 수동 재시작하지 않는다. 정책의 버전 floor 이후 실패는 옛 정책으로 되돌리지 않는다. 다른 정책이 필요한 경우 운영자/서버와 forward 버전 계획을 다시 조율해야 한다.
 
 이 명령은 Linux에서 시험했다. Windows/WSL wrapper 및 실제 원격 설치는 다음 Codex 범위, Claude ADR-095 독립 검토 pending이다.
+
+## Windows 진입점 (e512b60)
+
+검토된 새 worker bundle에 현재 서버 등록값과 맞는 storage-policy.json을 포함한다. 기존 Node가 정상 정지된 관측 프로필인지 먼저 확인한다. 아래 경로와 hash는 운영자가 허용한 실제 폴더/정책 값으로 바꿔야 한다. 진입점이 실행 중 Node를 자동 정지하거나 방화벽을 변경하지 않는다.
+
+```powershell
+$svScript = Join-Path $env:USERPROFILE 'Downloads\SaintVision-LAN\worker\Replace-Storage.ps1'
+$svSource = 'D:\SaintVision-Provided'
+$svPolicyHash = '<독립적으로 확인한 정책 SHA256>'
+$svPrepared = & $svScript -StorageSource $svSource -StoragePolicySHA256 $svPolicyHash
+$svPrepared
+# 준비 결과를 확인한 후 같은 입력으로 실행. 중단 시 이 Apply를 반복한다.
+& $svScript -StorageSource $svSource -StoragePolicySHA256 $svPolicyHash -Apply -RequestSHA256 $svPrepared.requestSHA256
+```
+
+request hash는 WSL 기존 Node 폴더의 storage-replacement-input/request.json exact bytes에 묶인다. 다음 세션에는 같은 prepare를 다시 호출해 기존 hash를 받을 수 있다. 이것은 새 preflight를 수행했다는 의미가 아니며 apply에서 기존 상태/복구 기록을 대조한다. source/policy 변경은 기존 요청에 덮어쓰지 않는다. 새 컨테이너는 restart=no/서버 검증 대기다.
+
+실제 원격 Windows/Ubuntu 경로는 아직 인수하지 않았다. Ubuntu 누락, daemon mount Source 차이, 서버 버전 불일치를 우회하지 말고 기록을 보존한다. 다음 Codex 실제 PC 경로/receipt/mTLS·Evidence 연결, Claude ADR-096 독립 검토 pending.
