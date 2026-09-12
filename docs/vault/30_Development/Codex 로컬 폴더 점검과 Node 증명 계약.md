@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:24:08+09:00"
+updated: "2026-09-12T15:40:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -88,3 +88,8 @@ terminal Run/회수된 Node channel·contribution도 현재 원 요청자와 등
 f9d69a8은 기존 identity/epoch-bound private journal에 contribution별 rootVersion/channelVersion 및 root/channel/exact policy hash를 보존한다. 두 버전은 각각 단조 증가하고 같은 버전의 경로·채널 변경 또는 두 버전 모두 같은데 exact bytes 변경은 거부한다. 새 contribution 선택이 기존 contribution floor를 제거하지 않는다. 현재 TLS 인증서/키와 root/config를 검증한 뒤 floor를 영속화한다. pin callback 없는 sampler는 생성하지 않는다. 동시 writer는 기존 journal process lock으로 배제하고 이 함수는 startup 전용이다.
 
 local startup receipt는 tenant/node/epoch·contribution·두 버전·hash이며 raw root/key/certificate는 포함하지 않는다. operationalAcceptanceAssessed=false다. 서명된 서버 인수나 Node 운영 health/작업 성공 증거로 쓰지 않는다. 전체 journal의 관리자 삭제·과거 backup 복원을 탐지하는 장치가 아니며 기존 recovery epoch/fencing 계약을 유지한다. [[Codex Node 저장소 설정 설치와 교체 절차]]에 실패 후 forward 복구·실제 운영 bundle 미연결 범위를 기록한다.
+
+
+## ADR-093 — 새 LAN 컨테이너의 명시적 저장소 설치
+
+서버 등록값과 일치하는 exact policy/hash와 사용자가 허용한 특정 source 폴더만 설치 입력으로 받는다. Node 내부 root는 /contribution으로 고정하고 readonly/rprivate/nonrecursive mount를 inspect로 확인한다. policy를 root:root 0600으로 전달·재읽기 검증한다. 키/journal/private 폴더와 겹치는 source 및 링크 경로를 거부한다. 기존 컨테이너는 자동 교체하지 않는다. receipt는 동일 Node/epoch/정책 hash/버전과 실제 image/mount를 대조한 로컬 기록이며 operationalAcceptanceAssessed=false다. source inode 사전 재검사는 daemon mount의 원자적 descriptor pin 또는 관리자 변조 방지를 의미하지 않는다. 기존 Node 교체·서버 mTLS/Evidence·운영 인수는 후속이다. [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]] 참조.

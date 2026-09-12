@@ -1,16 +1,16 @@
 ---
 doc_id: "RUNBOOK-STORAGE-POLICY-001"
 title: "Codex Node 저장소 설정 설치와 교체 절차"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:24:08+09:00"
+updated: "2026-09-12T15:40:43+09:00"
 source_of_truth: "Git"
 ---
 
 # Node 저장소 설정 설치·교체 절차
 
-이 절차는 f9d69a8의 Go Linux Node `--storage-policy`와 기존 private journal을 사용한다. Windows PC에서는 Docker/WSL의 Linux Node에 적용하며 Windows 네이티브 파일 수집 지원과 다르다. 현재 LAN Start-Worker/start-node 패키지는 이 옵션과 제공 폴더 mount를 자동 구성하지 않는다. 운영 bundle 수정·허용 폴더 입력·원격 적용은 후속이다.
+이 절차는 f9d69a8의 Go Linux Node `--storage-policy`와 기존 private journal을 사용한다. Windows PC에서는 Docker/WSL의 Linux Node에 적용하며 Windows 네이티브 파일 수집 지원과 다르다. 9848afb부터 LAN Start-Worker/start-node는 새 컨테이너에 명시적 제공 폴더와 policy hash를 받아 읽기 mount/설정/시작 기록 검증을 수행한다. 기존 컨테이너 교체·원격 Windows/WSL 적용은 후속이다.
 
 ## 설치 전 확보할 값
 
@@ -34,3 +34,12 @@ NODE-0061은 낮아진 root/channel 버전, 같은 버전의 다른 경로/채�
 journal에는 contribution별 최소 버전이 남아 다른 contribution을 선택해도 옛 floor를 삭제하지 않는다. 프로세스의 journal lock을 유지하고 시작 시에만 갱신한다. 전체 journal 삭제/백업 롤백이나 호스트 관리자에 의한 변조까지 방지하는 hardware monotonic counter는 아니다. 전원 장애·디스크 손실·복원 후 epoch 조율은 기존 복구 계약으로 별도 인수해야 한다.
 
 다음 담당: Codex 운영 bundle의 명시적 읽기 mount·설정 전달/교체 receipt 확인 자동화, 원격 운영자 실제 허용 폴더/설치, Claude 독립 검토, Gemini local receipt와 서버 인수/현재 health unknown 구분.
+
+
+## 새 컨테이너 설치 입력 (9848afb)
+
+승인된 storage-policy.json을 bundle 옆에 놓고 root=/contribution, 현재 tenant/node/epoch/channel/기여 버전 및 인증서 pin을 맞춘다. exact bytes SHA256은 별도로 확인한다. Windows 관리자 PowerShell의 Start-Worker.ps1에 기존 -CertificateSHA256 외에 -StorageSource 'D:\SaintVision-Provided' -StoragePolicySHA256 <확인한64자리hash>를 함께 전달한다. 예시 경로는 사용자가 허용한 실제 폴더로 바꿔야 한다. 기존 컨테이너가 있으면 이 경로는 거부되므로 삭제하여 우회하지 않는다.
+
+start-node.sh는 Linux 경로와 policy hash 두 인수를 받고, storage-ready.json에 최소 로컬 기록을 남긴다. 이 파일은 Windows 다운로드 폴더가 아니라 WSL private worker 디렉터리에 있다. 오류 시 journal/키/volume을 보존한다. 서버 검증 전 연결 완료/스케줄링 가능으로 표시하지 않는다. 현 시험은 Linux Docker 설치2개이며 Windows launcher 실제 실행은 미검증이다.
+
+다음 첫 행동: Codex 기존 Node 통제된 교체 및 forward 재개 자동화. Claude ADR-093 독립 검토 pending.

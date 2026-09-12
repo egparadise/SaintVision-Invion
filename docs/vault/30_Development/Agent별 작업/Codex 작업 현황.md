@@ -4,11 +4,13 @@ title: "Codex 작업 현황"
 version: "1.0.20"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T15:25:11+09:00"
+updated: "2026-09-12T15:40:43+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+- 최신 [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]]: 9848afb 새 LAN 컨테이너 readonly mount·policy/Go receipt 대조, 실제 Docker2/경계62 통과. 기존 Node 교체·Windows WSL/원격 설치·서버 인수 미완료, CI 결제 제한/Claude 검토 pending. 다음 Codex 통제된 교체·forward 재개, 전체57.81% 유지.
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
