@@ -22,7 +22,7 @@ def run(args, timeout=60):
     return r.stdout.decode().strip()
 
 
-def main(prepared):
+def main(prepared, bridge_only=False):
     p = json.loads(prepared.read_text())
     name = "sv-storage-bundle-" + uuid4().hex[:12]
     work = ROOT / ".work" / name
@@ -87,6 +87,7 @@ def main(prepared):
                 "-q",
                 "tests/integration/test_lan_storage_install.py",
                 "--junitxml=/evidence/storage.xml",
+                *(["-k", "storage_bridge"] if bridge_only else []),
             ]
         )
         created = True
@@ -113,6 +114,8 @@ def main(prepared):
             "deploy/lan/worker_storage.py",
             "deploy/lan/worker_replacement.py",
             "deploy/lan/worker_replace.py",
+            "deploy/lan/worker_storage_bridge.py",
+            "deploy/lan/Replace-Storage.ps1",
             "deploy/lan/start-node.sh",
             "deploy/lan/finish-worker.sh",
             "deploy/lan/Start-Worker.ps1",
@@ -138,7 +141,11 @@ def main(prepared):
                 dict(evidence=str(work / "evidence.json"), exitCode=r.returncode, cases=cases)
             )
         )
-        return r.returncode == 0 and len(cases) == 11 and all(c["passed"] for c in cases)
+        return (
+            r.returncode == 0
+            and len(cases) == (1 if bridge_only else 12)
+            and all(c["passed"] for c in cases)
+        )
     finally:
         if created:
             value = json.loads(run(["docker", "inspect", runner]))[0]
@@ -152,5 +159,6 @@ def main(prepared):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prepared", type=Path, required=True)
+    parser.add_argument("--bridge-only", action="store_true")
     args = parser.parse_args()
-    raise SystemExit(0 if main(args.prepared) else 1)
+    raise SystemExit(0 if main(args.prepared, args.bridge_only) else 1)

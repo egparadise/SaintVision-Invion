@@ -259,3 +259,58 @@ def test_real_storage_replacement_resumes_without_rollback_or_key_loss(installat
     if interruption is None:
         storage.docker("stop", result["containerId"])
         assert replacement.run(plan, receipt)["containerId"] == result["containerId"]
+
+
+def test_real_storage_bridge_prepares_hash_bound_request_and_resumes(installation, tmp_path):
+    a = installation
+    assert start(a).returncode == 0
+    storage.docker("stop", a["name"])
+    original_id = json.loads(storage.docker("inspect", a["name"]))[0]["Id"]
+    home = tmp_path / "home"
+    state = home / ".local/share/saintvision" / a["node"]
+    state.mkdir(mode=0o700, parents=True)
+    shutil.copyfile(a["folder"] / "manifest.json", state / "manifest.json")
+    original_manifest = (state / "manifest.json").read_bytes()
+    policy_file = a["folder"] / "storage-policy.json"
+    policy = json.loads(policy_file.read_text())
+    policy["root_version"] = 2
+    policy_file.write_text(json.dumps(policy))
+    policy_hash = storage.digest(policy_file.read_bytes())
+    script = Path(__file__).resolve().parents[2] / "deploy/lan/worker_storage_bridge.py"
+
+    def call(mode, request=None, source=None):
+        cmd = [
+            sys.executable,
+            str(script),
+            mode,
+            str(a["folder"]),
+            str(source or a["source"]),
+            policy_hash,
+        ]
+        if request is not None:
+            cmd.append(request)
+        return subprocess.run(
+            cmd, env=dict(os.environ, HOME=str(home)), capture_output=True, timeout=120
+        )
+
+    prepared = call("prepare")
+    assert prepared.returncode == 0, prepared.stderr.decode()
+    result = json.loads(prepared.stdout)
+    digest = result["requestSHA256"]
+    assert result["replacementAuthorized"] is False
+    assert json.loads(call("prepare").stdout)["requestSHA256"] == digest
+    assert call("apply", "0" * 64).returncode != 0
+    other = a["source"].parent / ("other-" + uuid4().hex)
+    other.mkdir()
+    assert call("prepare", source=other).returncode != 0
+    assert json.loads(storage.docker("inspect", a["name"]))[0]["Id"] == original_id
+    applied = call("apply", digest)
+    assert applied.returncode == 0, applied.stderr.decode()
+    actual = json.loads(applied.stdout)
+    assert actual["previousContainerId"] == original_id
+    assert actual["containerId"] != original_id
+    assert actual["status"] == "awaiting-server-mtls-verification"
+    assert actual["operationalAcceptanceAssessed"] is False
+    assert json.loads(call("apply", digest).stdout)["containerId"] == actual["containerId"]
+    assert (state / "manifest.json").read_bytes() == original_manifest
+    assert not (state / "node-key.pem").exists()  # bridge never copied a private key
