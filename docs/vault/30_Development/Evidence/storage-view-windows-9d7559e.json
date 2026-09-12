@@ -1,0 +1,108 @@
+{
+  "productSHA": "9d7559efb15a1f8fcbe90c74d2cd985bd1f44d0c",
+  "scope": "Windows actual disposable PostgreSQL; product unchanged, external proposal documentation saved during test",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_get_pending_then_recorded_is_read_only_and_redacts_inputs",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_permission_revocation_hides_stored_result[UPDATE inv.project_grants SET enabled=false]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_permission_revocation_hides_stored_result[UPDATE inv.business_subjects SET enabled=false]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_permission_revocation_hides_stored_result[UPDATE public.project_members SET role_code='viewer']",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_permission_revocation_hides_stored_result[UPDATE public.users SET status='suspended']",
+      "status": "passed"
+    },
+    {
+      "name": "test_recorded_history_survives_terminal_run_and_channel_retirement",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_or_invalid_identity_never_reads",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_unconsumed_request_does_not_renew_on_get",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[healthy]",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[evidenceId]",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[signature]",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[challenge]",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[sampled]",
+      "status": "passed"
+    },
+    {
+      "name": "test_tampered_stored_records_cannot_be_reported_verified[evidence_hash]",
+      "status": "passed"
+    },
+    {
+      "name": "test_read_holds_current_grant_until_verified_response",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_owner_change_and_other_tenant_cannot_read",
+      "status": "passed"
+    },
+    {
+      "name": "test_recorded_mismatch_is_historical_failure_not_current_health",
+      "status": "passed"
+    },
+    {
+      "name": "test_history_timestamp_is_independent_of_database_session_timezone",
+      "status": "passed"
+    },
+    {
+      "name": "test_public_create_cancel_and_replay_are_durable",
+      "status": "passed"
+    },
+    {
+      "name": "test_public_identity_scope_and_body_cannot_supply_authority",
+      "status": "passed"
+    },
+    {
+      "name": "test_grant_revocation_applies_to_replays_and_inventory_is_explicit",
+      "status": "passed"
+    },
+    {
+      "name": "test_authenticated_approval_votes_require_two_distinct_people",
+      "status": "passed"
+    },
+    {
+      "name": "test_per_run_event_order_blocks_late_commit_and_never_exposes_payload",
+      "status": "passed"
+    },
+    {
+      "name": "test_event_stream_closes_on_token_expiry_and_can_reconnect",
+      "status": "passed"
+    },
+    {
+      "name": "test_error_response_never_contains_database_diagnostics",
+      "status": "passed"
+    }
+  ],
+  "privateJUnitSHA256": "8657499d9bfd31e883fb854e7f23c9e01c96a87cc90b4c6e04788c0fd6359956"
+}

@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T13:23:04+09:00"
+updated: "2026-09-12T14:15:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -72,3 +72,12 @@ fd0c081/0037부터 StorageSampleStore.issue/accept/collect는 내부 trusted bou
 같은 request는 sample_limit/scope/nonce를 바꿀 수 없다. accept는 같은 bytes만 같은 IDs로 replay하며 다른 응답은 충돌이다. 현재 권한은 replay에도 필요하다. 모든 증거/점검/consumption/outbox는 원자 기록되며 만료를 마지막 쓰기 뒤에도 검사한다. sample_healthy는 표본 일치일 뿐 Run 완료·운영 인수/전체 디스크 정상 판정이 아니다. cataloguedAtIssue는 발급 때의 수이며 unsampled 파일 bytes를 증명하지 않는다. 실제 안전한 디스크 snapshot도 아니다.
 
 최소 컬럼 SELECT·고정 sentinel UPDATE·tenant RLS와 불변 trigger를 적용한다. 새 SECURITY DEFINER 없음. 신규 공개 API/자동 만료 갱신/운영 설치/ResultView UI 표시/독립 인수는 미완료. [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]의 같은 SHA 검증을 따른다. 앞 절의 미구현 진술은 해당 과거 단계 기준이며 이 절이 후속 DB 구현 상태를 갱신한다.
+
+
+## ADR-091 — 인증된 과거 관측 조회
+
+GET /v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}는 kernel AccessTokens 인증 후 현재 can_request·linked business 권한·원 요청자·등록 소유자를 잠그고 검사한다. 기존 request/consumption/Evidence/StorageCheck를 조회하여 당시 시각의 서명/인증서, challenge/response hash 및 metadata 연결을 재검증한다. UTC timestamp 의미를 사용하여 DB 시간대와 무관하게 확인한다. 조회는 DB 관측·Run 상태를 변경하거나 Node 수집을 시작하지 않는다.
+
+StorageObservationView/RecordedStorageObservation이 공통 Schema다. pending/expired에는 observation=null, recorded에는 evidenceId/checkId/observedAt/integrityVerified/sampleHealthy 및 표본 집계가 있다. currentHealth는unknown, operationalAcceptanceAssessed는false다. 원 root/path·파일명·nonce·서명·인증서·subject는 HTTP 응답에 포함하지 않고 no-store를 적용한다.
+
+terminal Run/회수된 Node channel·contribution도 현재 원 요청자와 등록 소유자 권한이 유지되면 역사 조회는 허용한다. 새 수집은0037의 active/current channel/root 조건을 계속 요구한다. 당시 인증서 유효성과 현재 운영 신뢰를 혼동하지 않는다. request 목록·수집 POST·운영 설치/화면 인수는 별도이며 이 GET 구현을 운영 배포 완료로 표시하지 않는다. [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]의 같은 SHA 증거를 따른다.

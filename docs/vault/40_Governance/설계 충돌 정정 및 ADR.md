@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.7"
+version: "1.35.8"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T13:23:04+09:00"
+updated: "2026-09-12T14:15:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -151,3 +151,6 @@ ADR-089(공통 Schema·Go opt-in 보호 폴더/mTLS 서명 sample·Linux descrip
 
 
 ADR-090(현재 프로젝트 요청 권한+폴더 등록 소유자·durable challenge/nonce·기존 Evidence/StorageCheck 원자 쓰기·같은 응답 replay·최소권한/RLS/불변 기록)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.3.0과 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 공개 API/운영 설치·실장비 인수/Run 완료와 구분한다.
+
+
+ADR-091(현재 원 요청자/등록 소유자의 과거 storage observation 조회·당시 서명 및 기존 Evidence 연결 재검증·UTC 시각 의미·pending/expired/recorded·currentHealth unknown·정보 최소화)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.4.0과 [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]를 따른다. 운영 현재 health/Run 완료·수집 시작·배포 완료와 구분한다.

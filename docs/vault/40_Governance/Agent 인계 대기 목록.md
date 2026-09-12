@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.7"
+version: "1.0.8"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T13:24:54+09:00"
+updated: "2026-09-12T14:15:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -107,3 +107,8 @@ Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 
 공유본 외부 수정4개를 [원문·SHA256 보존본](../30_Development/Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)으로 받았다. 정본의 최신 Codex 검증 이력은 유지한다. Claude의 기존 복원/Storage/RPO 정정 및 F1~F4는 고정 SHA별 후속 수정과 대조가 필요하다. Gemini는 GM-03 PTY ticket/Drain 연결과 smoke154/Vitest106/2-PC63/deploy5를 작성자 보고로 추가했다. 이번에는 해당 소스·실장비를 독립 검증하지 않았으며 자동 승인이나 운영2-PC/GPU 성공으로 채택하지 않는다. 원문 시각은 작성자 기재값이며 현재 검증 시각으로 사용하지 않는다.
 
 공통 성숙도는 검증된48행 기준57.81% 유지, Gemini의 기대65.63%는 독립 통합 검토 전이다. 새 Codex fd0c081/0037 저장소 기록은 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 다음 Codex는 sample 조회/운영 설치 계약, Claude는0037 독립 검토, Gemini는 최신 통합 SHA를 명시한 실제 API/브라우저 증거 보완이다. 수신은 다른 Agent 실행 또는 승인을 뜻하지 않는다.
+
+
+## 외부 인계 수신 (2026-09-12T14:15:21+09:00)
+
+[공유본 원문4개/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-view/manifest.json)를 보존했다. Gemini b90c788 PTY/Drain·Vitest107/smoke154/2-PC63/deploy5는 작성자 보고이며 이번 Codex 독립 승인/물리2-PC 인수와 다르다. 오래된 공유본의 기존 Codex 이력 제거·65.63% 기대값을 정본으로 덮어쓰지 않는다. 공통57.81% 유지. 최신 Codex는 [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]:9d7559e 인증 GET/현재 권한·소유자/저장 서명·Evidence 재검증, pending·expired·recorded와 currentHealth unknown 분리. Linux153/Windows25 통과. 다음 폴더-root policy 설치·교체/receipt 계약, Claude 독립 검토·Gemini 화면 연결. 전체57.81% 유지, CI/물리 원격 인수 미완료.
