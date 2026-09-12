@@ -4,7 +4,7 @@ title: "설계 충돌 정정 및 ADR"
 version: "1.35.6"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T11:46:52+09:00"
+updated: "2026-09-12T12:19:39+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -142,3 +142,6 @@ ADR-086(local-storage-sample-v1:명시적 root·READ ONLY sample/size 검증·--
 
 
 ADR-087(ASGI client_cert_error 최종 거부·잘못된 direct chain의 proxy fallback 금지·inbound 관측 기록 transaction의 현재 tenant/node/certificate/status row lock)은 [[2026-09-12_NODE-AUTH-COMMIT_Codex_검증보고]]를 따른다. storage challenge·kernel epoch 증명·Evidence 쓰기는 후속이다.
+
+
+ADR-088(내부 Run/ChannelProof/root/catalog/nonce-bound Ed25519 sample·공유 ReadRoot sampler·사전 byte budget·검증과 durable nonce/Evidence 기록 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.1.0 및 [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]를 따른다. Go endpoint/실제 장비·운영 DB 기록 완료가 아니다.

@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.0.1"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T11:46:52+09:00"
+updated: "2026-09-12T12:19:39+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,3 +41,14 @@ Claude는 이 보완본을 독립 검토하고 운영 절차를 조율한다. Ge
 ## 인증 선행 보강2830887
 
 ADR-087에서 inbound ASGI verification failure를 명시적으로 거부하고 NodePrincipal.lock_current를 실제 heartbeat 기록 transaction에 연결했다. 이 메서드는 public tenant/node/certificate/status를 row lock으로 재확인한다. kernel recovery epoch/Storage challenge/Evidence 원자 연결은 아직 아니며 기존 Go transport nonce·ChannelProof 경로를 재사용하는 후속 계약을 진행한다. [[2026-09-12_NODE-AUTH-COMMIT_Codex_검증보고]].
+
+
+## ADR-088 내부 서명 sample 프로토콜
+
+[[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]] 구현124fe97. 불변 Challenge는 ChannelProof 전체·Run/project/contribution·승인 root_version·ordered catalog ID/version/path/hash/size·catalogued·32byte nonce·발급/만료를 포함한다. manifest 자체의 SHA-256은 domain prefix와 canonical JSON으로 계산한다. canonical JSON은 Python sort_keys/ensure_ascii/공백 없는 separators/NaN 금지이며 시각은 정수 epoch seconds, 용량·항목 수는 제한된 정수다. endpoint 등 문자열도 digest에 포함한다.
+
+서명 payload는 protocol=node-storage-sample-v1, challengeSha256, observedAt(epoch seconds), ordered observations(locationId/sha256/byteSize)뿐이다. envelope는 payload/base64와 signature/base64뿐이다. 서명 대상은 ASCII saintvision/node-storage-sample/v1 뒤 NUL byte와 payload bytes다. Ed25519 인증서의 pin/SAN/epoch/EKU/유효기간을 기존 certificate_identity로 확인하고 같은 키로 검증한다. 인증서 DER는 신뢰된 채널에서 얻어 증거와 보존해야 하며 request의 자기 선언 공개키를 신뢰하지 않는다.
+
+v1은32파일·파일당1MiB·payload64KiB·30초의 제한된 sample이다. 실제 열린 파일 크기를 먼저 확인한다. 강제 OS I/O deadline은 아니며 완료 시 만료면 서명하지 않는다. 실패 파일은 null hash/size 쌍이며 mismatch, 기준 없는 파일은 unverifiable이다. 빈/중복 manifest, 관측 누락·개수/순서 불일치·추가 필드·크기/서명/서명 domain 변경을 거부한다. 건강 판정은 verifier가 재계산한다. CLI와 같은 sampler/hash_file을 사용하고 CLI 출력의 Node 신원 미검증/운영 기록0은 유지한다.
+
+이것은 내부 Python 참조 구현이며 공개 JSON Schema/Go endpoint를 추가한 것이 아니다. trusted caller가 실제 Run 권한/현재 catalog를 고정해야 한다. 실제 Node adapter는 인증된 요청만 처리하고 승인된 로컬 root/key를 선택해야 한다. private key를 Control Plane으로 보내지 않는다. 소비되지 않은 challenge인지와 현재 authority 재검사는 후속 DB transaction 책임이다. 같은 증거의 순수 재검증은 가능하며 기록0/운영 인수false다. 새 원장 없이 기존 inv.evidence와 StorageCheck를 연결하는 후속 검증 전에는 운영 건강을 갱신하지 않는다.

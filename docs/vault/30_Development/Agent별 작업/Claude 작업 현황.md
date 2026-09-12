@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.0.9"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T11:46:52+09:00"
+updated: "2026-09-12T12:19:39+09:00"
 source_of_truth: "Git"
 ---
 
@@ -193,3 +193,10 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 2026-09-12 Node 인증 전달·작성자 외부 보고 수신
 
 Claude의 CL01/02/04/07 후속 조사·00b1159 알람 보고 전체를 [원문/hash](../Evidence/obsidian-proposals-20260912-node-auth/manifest.json)로 보존했다. 알람7개 평가/partition2027-01-01은 작성자 보고이며 이번 Codex에서 독립 검증하지 않았다. permission/backup/storage 판정은 최신 Codex 보완 보고를 따르고 기존 검토 요청은 계속 pending이다.2830887/ADR-087 inbound 인증 오류·회수 경쟁 보강의 독립 검토가 필요하다. storage_check는 read-only이며 --node가 실제 기계를 증명한다는 원본 설명은 ADR-086에서 정정됐다.
+
+
+## 추가 수신·독립 검토 대기 (2026-09-12T12:19:39+09:00)
+
+Codex124fe97 서명 sample/ADR-088: [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]:124fe97 실제 ReadRoot sample·불변 Run/ChannelProof/root/catalog/nonce challenge·Ed25519 서명 검증, Windows124/Linux129 통과. 내부 Python 수집/검증 모듈이며 Go 배포·durable nonce·StorageCheck/inv.evidence 원자 기록은 아직 남음. CI 계정 제한/독립 검토/물리 장비 인수 별도, 전체57.81% 유지.
+
+Claude f17ad62 partition runner3파일 변경을 git show로 확인했다. 작성자7시험/실측27개 partition/110→383일 주장은 수신 기록이며 Codex 독립 재현/운영 적용은 하지 않았다. 이전00b1159 알람과 함께 검토 대기. 외부 원문은 Evidence/obsidian-proposals-20260912-storage-signed에 보존했다. 기존 검토 요청 기록을 삭제하지 않는다.
