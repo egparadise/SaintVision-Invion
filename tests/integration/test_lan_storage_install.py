@@ -64,7 +64,7 @@ def installation(tmp_path):
     image = json.loads(storage.docker("image", "inspect", agent))[0]
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
-        port = reservation.getsockname()[1]
+        port = int(os.environ.get("INV_STORAGE_TEST_PORT", reservation.getsockname()[1]))
     manifest = dict(
         nodeId=node,
         tenantId=tenant,
@@ -98,11 +98,17 @@ def installation(tmp_path):
     try:
         yield dict(folder=folder, source=source, name=name, node=node, originals=originals)
     finally:
-        result = subprocess.run(["docker", "inspect", name], capture_output=True)
-        if result.returncode == 0:
-            owned = json.loads(result.stdout)[0]
+        # Only disposable containers bearing this fixture's unique Node ownership.
+        for identifier in (
+            storage.docker(
+                "ps", "-aq", "--no-trunc", "--filter", "label=ai.saintvision.node=" + node
+            )
+            .decode()
+            .split()
+        ):
+            owned = json.loads(storage.docker("inspect", identifier))[0]
             assert owned["Config"]["Labels"]["ai.saintvision.node"] == node
-            storage.docker("rm", "-f", name)
+            storage.docker("rm", "-f", identifier)
         result = subprocess.run(
             ["docker", "volume", "inspect", name + "-state"], capture_output=True
         )
@@ -180,3 +186,76 @@ def test_real_replacement_preflight_preserves_state_and_rejects_stale_restart(in
     fresh = replacement.capture(plan)
     assert fresh["containerId"] == receipt["containerId"]
     assert fresh["stateSHA256"] == receipt["stateSHA256"]
+
+
+@pytest.mark.parametrize(
+    "interruption",
+    [None, "prepared", "fenced", "renamed", "created", "installed", "starting", "ready"],
+)
+def test_real_storage_replacement_resumes_without_rollback_or_key_loss(installation, interruption):
+    import worker_replacement as preflight
+    import worker_replace as replacement
+
+    a = installation
+    assert start(a).returncode == 0
+    storage.docker("stop", a["name"])
+    a["folder"].chmod(0o700)
+    previous = preflight.inspected(a["name"])
+    plan = json.loads((a["folder"] / "storage-plan.json").read_text())
+    previous_policy = (a["folder"] / "storage-policy.json").read_bytes()
+    # Advance the real Go policy floor, keeping the existing contribution and keys.
+    policy = plan["policy"]
+    policy["root_version"] = 2
+    (a["folder"] / "storage-policy.json").write_text(json.dumps(policy))
+    plan = storage.prepare(
+        plan["manifest"],
+        plan["policyPath"],
+        plan["source"],
+        storage.digest((a["folder"] / "storage-policy.json").read_bytes()),
+        plan["image"],
+    )
+    receipt = preflight.capture(plan)
+    original = replacement.preserved(plan, previous["Id"])
+    if interruption is None:
+        # Another invocation using the same private installation directory is fenced.
+        with replacement.locked(a["folder"]):
+            with pytest.raises(BlockingIOError):
+                replacement.run(plan, receipt)
+        assert not (a["folder"] / "storage-replacement.json").exists()
+
+    class Interrupted(RuntimeError):
+        pass
+
+    def fail(phase):
+        if phase == interruption:
+            raise Interrupted()
+
+    if interruption:
+        with pytest.raises(Interrupted):
+            replacement.run(plan, receipt, checkpoint=fail)
+    result = replacement.run(plan, receipt)
+    assert result["previousContainerId"] == previous["Id"]
+    assert result["previousContainerPreserved"]
+    assert result["storagePolicy"]["rootVersion"] == 2
+    assert result["operationalAcceptanceAssessed"] is False
+    assert result["containerId"] != previous["Id"]
+    record_file = a["folder"] / "storage-replacement.json"
+    assert record_file.stat().st_mode & 0o7777 == 0o600
+    import base64
+
+    assert (
+        base64.b64decode(json.loads(record_file.read_text())["previousPolicyBase64"])
+        == previous_policy
+    )
+    invalid_receipt = dict(receipt, stateSHA256="0" * 64)
+    with pytest.raises(ValueError):
+        replacement.run(plan, invalid_receipt)
+    backup = preflight.inspected(previous["Id"])
+    assert backup["State"]["Running"] is False
+    assert backup["HostConfig"]["RestartPolicy"]["Name"] == "no"
+    assert replacement.preserved(plan, result["containerId"]) == original
+    assert replacement.run(plan, receipt)["containerId"] == result["containerId"]
+    # Simulate a later orderly stop. Forward retry starts the same replacement.
+    if interruption is None:
+        storage.docker("stop", result["containerId"])
+        assert replacement.run(plan, receipt)["containerId"] == result["containerId"]

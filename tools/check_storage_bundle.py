@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import socket
 import subprocess
 import sys
 from uuid import uuid4
@@ -47,6 +48,9 @@ def main(prepared):
     )
     runner = name + "-runner"
     created = False
+    with socket.socket() as available:
+        available.bind(("127.0.0.1", 0))
+        test_port = available.getsockname()[1]
     try:
         run(
             [
@@ -72,11 +76,14 @@ def main(prepared):
                 "INV_STORAGE_SOURCE_ROOT=" + mount,
                 "--env",
                 "INV_STORAGE_AGENT_IMAGE=" + agent,
+                "--env",
+                "INV_STORAGE_TEST_PORT=" + str(test_port),
                 "--entrypoint",
                 "python",
                 p["kernelImage"],
                 "-m",
                 "pytest",
+                "-x",
                 "-q",
                 "tests/integration/test_lan_storage_install.py",
                 "--junitxml=/evidence/storage.xml",
@@ -92,7 +99,7 @@ def main(prepared):
                 runner + ":/app/tests/integration/test_lan_storage_install.py",
             ]
         )
-        r = subprocess.run(["docker", "start", "-a", runner], capture_output=True, timeout=300)
+        r = subprocess.run(["docker", "start", "-a", runner], capture_output=True, timeout=900)
         (work / "private.log").write_bytes(r.stdout + r.stderr)
         run(["docker", "cp", runner + ":/evidence/storage.xml", work / "tests.xml"])
         cases = [
@@ -105,6 +112,7 @@ def main(prepared):
         files = [
             "deploy/lan/worker_storage.py",
             "deploy/lan/worker_replacement.py",
+            "deploy/lan/worker_replace.py",
             "deploy/lan/start-node.sh",
             "deploy/lan/finish-worker.sh",
             "deploy/lan/Start-Worker.ps1",
@@ -130,7 +138,7 @@ def main(prepared):
                 dict(evidence=str(work / "evidence.json"), exitCode=r.returncode, cases=cases)
             )
         )
-        return r.returncode == 0 and len(cases) == 3 and all(c["passed"] for c in cases)
+        return r.returncode == 0 and len(cases) == 11 and all(c["passed"] for c in cases)
     finally:
         if created:
             value = json.loads(run(["docker", "inspect", runner]))[0]

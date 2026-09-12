@@ -51,7 +51,7 @@ def state_archive(container):
                 process.kill()
 
 
-def state_digest(raw, manifest):
+def state_digest(raw, manifest, *, exclude=()):
     if len(raw) > LIMIT:
         storage.reject()
     files, rows, seen = {}, [], set()
@@ -75,6 +75,8 @@ def state_digest(raw, manifest):
                 if len(data) != entry.size:
                     storage.reject()
                 files[str(path)] = (entry, data)
+            if str(path) in exclude:
+                continue
             rows.append(
                 [
                     str(path),
