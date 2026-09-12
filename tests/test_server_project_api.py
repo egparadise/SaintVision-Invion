@@ -130,3 +130,38 @@ def test_project_approval_challenge_and_decision_flow(client):
     run_res = client.get(f"/v1/projects/prj_01JABCDE/runs/{run_data['id']}")
     assert run_res.status_code == 200
     assert run_res.json()["state"] in ("scheduled", "succeeded")
+
+
+def test_project_scoped_resume_lifecycle(client):
+    # Reset recovering run
+    client.post("/v1/runs/run_01JRECOVERING/reset")
+
+    # 1. Prepare resume via project-scoped route
+    prep_res = client.post("/v1/projects/prj_01JABCDE/runs/run_01JRECOVERING/resume/prepare")
+    assert prep_res.status_code == 200
+    prep_data = prep_res.json()
+    assert "inputHash" in prep_data
+    approval_id = prep_data["approvalId"]
+
+    # 2. Approve via project-scoped route
+    chall_res = client.post(
+        f"/v1/projects/prj_01JABCDE/approvals/{approval_id}/challenge",
+        headers={"X-Subject": "usr_reviewer_01"},
+    )
+    assert chall_res.status_code == 200
+    nonce = chall_res.json()["nonce"]
+
+    decide_res = client.post(
+        f"/v1/projects/prj_01JABCDE/approvals/{approval_id}/decision",
+        json={"decision": "approve", "nonce": nonce},
+        headers={"X-Subject": "usr_reviewer_01"},
+    )
+    assert decide_res.status_code == 200
+    assert decide_res.json()["status"] == "approved"
+
+    # 3. Enqueue resume via project-scoped route
+    enq_res = client.post("/v1/projects/prj_01JABCDE/runs/run_01JRECOVERING/resume/enqueue")
+    assert enq_res.status_code == 200
+    enq_data = enq_res.json()
+    assert enq_data["state"] == "running"
+    assert enq_data["attempt"] == 2

@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.11"
+version: "1.0.12"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T16:47:00+09:00"
+updated: "2026-09-12T17:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -83,25 +83,29 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 109개 테스트 100% 통과)
+# 1. 라우트 커버리지 도구 실측 (클라이언트 요청 32개 경로 중 미제공 0개, 100% 서빙)
+.venv\Scripts\python.exe tools/route_coverage.py --served src/saintvision --client apps/web/src
+.venv\Scripts\pytest tests/test_route_coverage.py
+
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 109개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
-# 2. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
+# 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 3. E2E 브라우저 스모크 검증 (14개 트랙, 171개 항목 100% 통과 - 프로젝트 스코프 API 포함)
+# 4. E2E 브라우저 스모크 검증 (14개 트랙, 171개 항목 100% 통과 - 프로젝트 스코프 API 포함)
 node tools/run_browser_smoke.mjs
 
-# 4. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
+# 5. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
 node tools/verify_two_pc_distributed_execution.mjs
 
-# 5. 서버 인증 무결성 및 정본 프로젝트 API 단위 시험 (8개 테스트 전수 통과)
-.venv\Scripts\pytest tests/test_server_project_api.py tests/test_server_auth_integrity.py
+# 6. 배포 표면, 정본 프로젝트 API, 라우트 커버리지 단위 시험 (31개 테스트 전수 통과)
+.venv\Scripts\pytest tests/test_deployment_surface.py tests/test_server_project_api.py tests/test_route_coverage.py
 
-# 6. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
+# 7. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 7. 문서 무결성 및 온톨로지 검사 (258 docs PASS, 48 tasks PASS)
+# 8. 문서 무결성 및 온톨로지 검사 (259 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
@@ -112,7 +116,9 @@ python tools/check_docs.py
 
 1. **코드 리뷰 수행 (Claude)**:
    - 위 6개 카드의 구현 파일 및 테스트 코드를 검토하고, 결함이나 계약 불일치가 발견되면 F-번호(예: F-FE-01)로 지적해 주시기 바랍니다.
-   - Claude의 실측 발견 B-6(커널 project-scoped API와 평면 SPA 호출 불일치 및 문자열 `prj_01JABCDE` 하드코딩)은 SPA dynamic prop 디스패치 전환, `handleApprove`/`handleReject`/`handleCancelRun`의 커널 경로 1차 호출, 그리고 `server.py` 내 정본 커널 제어 평면 엔드포인트(`GET/POST /v1/projects/{project}/...`) 추가 및 단위 시험(`tests/test_server_project_api.py`)과 스모크 검증(171/171 checks)으로 즉각 완결 처리되었습니다.
+   - Claude의 실측 발견 B-6(커널 project-scoped API와 평면 SPA 호출 불일치 및 문자열 `prj_01JABCDE` 하드코딩) 및 B-8(라우트 커버리지 도구 측정)에 대해:
+     - SPA dynamic prop 디스패치 전환, `handleApprove`/`handleReject`/`handleCancelRun`의 커널 경로 1차 호출, `DeveloperStudio.tsx`의 Resume 수명주기(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`) 정본 경로 연동을 완결했습니다.
+     - `server.py` 내 정본 커널 제어 평면 엔드포인트(`GET/POST /v1/projects/{project}/...`, `resume/prepare`, `resume/enqueue`) 및 Two-Person Rule 완결로 `tools/route_coverage.py` 실측 결과 클라이언트 요청 32개 경로 중 **미제공 0개 (0 unserved, 100%)**를 달성했습니다.
 2. **검토 완료 및 진행판 반영**:
    - 검토 결과 이상이 없을 경우 `Claude 작업 현황.md` 및 `전체 개발 진행 현황.md`에 검토 결과를 기록해 주시기 바랍니다.
 3. **다음 선행 작업**:

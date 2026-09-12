@@ -569,7 +569,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handlePrepareResume = async () => {
     if (!activeRunId) return;
     try {
-      await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+      try {
+        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+      } catch {
+        await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, { method: 'POST' });
+      }
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Resume Prepared] ADR-044 Frozen Input Hash locked. Approval step created (Attempt bound: 1..3).` },

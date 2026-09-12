@@ -1401,7 +1401,8 @@ def list_run_receipts(run_id: str):
 
 
 @app.post("/v1/runs/{run_id}/resume/prepare")
-def prepare_run_resume(run_id: str, request: Request):
+@app.post("/v1/projects/{project}/runs/{run_id}/resume/prepare")
+def prepare_run_resume(run_id: str, request: Request, project: Optional[str] = None):
     """
     ADR-044: Prepare next Step execution for a recovering Run.
     Freezes immutable snapshot manifest, binds to next run version, generates L2 approval.
@@ -1535,7 +1536,8 @@ def prepare_run_resume(run_id: str, request: Request):
 
 
 @app.post("/v1/runs/{run_id}/resume/enqueue")
-def enqueue_run_resume(run_id: str, request: Request):
+@app.post("/v1/projects/{project}/runs/{run_id}/resume/enqueue")
+def enqueue_run_resume(run_id: str, request: Request, project: Optional[str] = None):
     """
     ADR-044: Atomically admit and enqueue prepared resume execution upon verified approval.
     Increments attempt and transitions awaiting_approval -> running.
