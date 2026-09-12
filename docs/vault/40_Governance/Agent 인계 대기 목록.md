@@ -256,6 +256,17 @@ B-4까지는 증상이다. 원인은 단순하고 실측으로 확인된다.
 
 entrypoint 방식도 바뀌었다. `--factory`는 설정을 요구하는 factory를 호출하므로 설정 없이는 뜨지 않는다. module 수준 `app`은 import만으로 뜬다. **이 한 글자 차이가 "설정 없으면 거부"와 "무조건 제공"을 가른다.**
 
+**B-5 보강 실측(`0d5eb38`)** — 되돌릴 대상인 factory entrypoint가 실제로 거부함을 증명했다. 그동안 `saintvision.server:create_app`(→ `inv.app.create_configured_app`)의 거부는 **내 주장**이었다. 도구가 kernel 소스를 import하지 못해 INCONCLUSIVE였기 때문이다. 도구가 컨테이너의 PYTHONPATH(`/app/src:/app/services/control-plane/src`)를 그대로 쓰도록 고친 뒤:
+
+```
+$ python tools/deployment_surface.py --dockerfile deploy/Dockerfile.backend   (lane)
+obtainable    False — factory refused: RuntimeError: Explicit Control Plane
+              identity/database/Workspace configuration unavailable
+→ exit 0, refusal by design
+```
+
+즉 B-5의 선택지 1(entrypoint 복원)은 이제 설계 의도가 아니라 **측정된 동작**이다: `INV_API_CONFIG`·`INV_RUNTIME_DSN`·`INV_RECOVERY_EPOCH` 없이는 뜨지 않는다.
+
 ### B-5 판정에 필요한 답
 
 1. 운영 entrypoint를 `saintvision.server:create_app --factory`(커널 위임)로 되돌릴 것인가.
