@@ -41,3 +41,6 @@ source_of_truth: "Git"
 
 
 동기화 최초 check exit1/쓰기0: 외부3개 변경을 발견해 [원문/hash](../Evidence/obsidian-proposals-20260912-storage-policy/manifest.json)를 보존하고 수신 요약만 추가했다. Gemini Vitest109 등은 작성자 보고/독립 검토 pending. 동일 bytes Git 보존을 확인한 뒤 쓰기0 인수하여 정본과 동기화한다.
+
+
+최종 전달: 보고56ee3c4/외부 인계 보존6d94bfd push exit0. 2026-09-12T15:26:27+09:00 로컬 Obsidian613개 hash일치/pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-policy-obsidian-20260912.json). 영수증 포함 후속 commit도 push/재동기화한다. OneDrive 클라우드 업로드 미검증. 다음 Codex는 LAN bundle 읽기 mount·policy/receipt 연결, Claude f9d69a8 독립 검토 pending.
