@@ -142,6 +142,7 @@ export interface ExecutionResultItem {
 
 export interface ApprovalItem {
   id: string; // apr_...
+  projectId?: string;
   runId: string;
   workspaceId: string;
   nodeId: string;

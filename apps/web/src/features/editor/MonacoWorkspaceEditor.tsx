@@ -37,10 +37,12 @@ const INITIAL_FILES: EditorFile[] = [
 
 interface MonacoWorkspaceEditorProps {
   workspaceId?: string;
+  projectId?: string;
 }
 
 export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
   workspaceId = 'wsp_saint_core_01',
+  projectId = 'prj_01JABCDE',
 }) => {
   const [files, setFiles] = useState<EditorFile[]>(INITIAL_FILES);
   const [activeFilePath, setActiveFilePath] = useState<string>('src/server.ts');
@@ -723,7 +725,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
               )
             );
             try {
-              await apiClient('/v1/projects/prj_01JABCDE/runs', {
+              await apiClient(`/v1/projects/${projectId}/runs`, {
                 method: 'POST',
                 body: JSON.stringify({
                   objective: `Git Commit [${newCommit.commitId.slice(0, 7)}]: ${newCommit.message}`,

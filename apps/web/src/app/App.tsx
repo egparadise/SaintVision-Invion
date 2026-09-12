@@ -364,10 +364,21 @@ export const App: React.FC = () => {
 
   const handleApprove = async (approvalId: string, nonce: string) => {
     try {
-      await apiClient(`/v1/approvals/${approvalId}/approve`, {
-        method: 'POST',
-        body: JSON.stringify({ nonce }),
-      });
+      const apprv = approvals.find((a) => a.id === approvalId);
+      const prjId = apprv?.projectId || 'prj_01JABCDE';
+      try {
+        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
+        await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
+          method: 'POST',
+          body: JSON.stringify({ decision: 'approve', nonce }),
+        });
+      } catch {
+        // 2. Fallback to flat endpoint
+        await apiClient(`/v1/approvals/${approvalId}/approve`, {
+          method: 'POST',
+          body: JSON.stringify({ nonce }),
+        });
+      }
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -380,10 +391,21 @@ export const App: React.FC = () => {
 
   const handleReject = async (approvalId: string, reason: string) => {
     try {
-      await apiClient(`/v1/approvals/${approvalId}/reject`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      });
+      const apprv = approvals.find((a) => a.id === approvalId);
+      const prjId = apprv?.projectId || 'prj_01JABCDE';
+      try {
+        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
+        await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
+          method: 'POST',
+          body: JSON.stringify({ decision: 'reject', reason }),
+        });
+      } catch {
+        // 2. Fallback to flat endpoint
+        await apiClient(`/v1/approvals/${approvalId}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reason }),
+        });
+      }
       // Fetch fresh runs and approvals after server confirmed rejection
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -396,10 +418,21 @@ export const App: React.FC = () => {
 
   const handleCancelRun = async (runId: string, reason: string) => {
     try {
-      await apiClient(`/v1/runs/${runId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      });
+      const targetRun = runs.find((r) => r.id === runId);
+      const prjId = targetRun?.projectId || 'prj_01JABCDE';
+      try {
+        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
+        await apiClient(`/v1/projects/${prjId}/runs/${runId}/cancel`, {
+          method: 'POST',
+          body: JSON.stringify({ reason }),
+        });
+      } catch {
+        // 2. Fallback to flat endpoint
+        await apiClient(`/v1/runs/${runId}/cancel`, {
+          method: 'POST',
+          body: JSON.stringify({ reason }),
+        });
+      }
       fetchRuns();
     } catch (err) {
       console.warn('Backend run cancellation API fallback:', err);
@@ -597,7 +630,10 @@ export const App: React.FC = () => {
 
         {/* Tab 2.5: Development Workspace Editor (S06-FE) */}
         {activeTab === 'editor' && (
-          <MonacoWorkspaceEditor workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'} />
+          <MonacoWorkspaceEditor
+            workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'}
+            projectId="prj_01JABCDE"
+          />
         )}
 
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}

@@ -701,6 +701,69 @@ async function runFullSmokeJourney() {
     const candData = await candRes.json();
     assert('Placement discovery returns evaluated candidates', Array.isArray(candData.items) && candData.total >= 1);
 
+    // 9. Canonical Kernel Project-Scoped Control APIs (ADR-001, ADR-004, S04-FE)
+    const prjRunsRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs`);
+    assert('GET /v1/projects/{project}/runs returns HTTP 200', prjRunsRes.status === 200);
+    const prjRunsData = await prjRunsRes.json();
+    assert('Project runs list contains active run', Array.isArray(prjRunsData.items) && prjRunsData.items.some((r) => r.id === dispatchedRun.id));
+
+    const prjSingleRunRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs/${dispatchedRun.id}`);
+    assert('GET /v1/projects/{project}/runs/{id} returns HTTP 200', prjSingleRunRes.status === 200);
+    const prjSingleRunData = await prjSingleRunRes.json();
+    assert('Retrieved project run matches dispatched run id', prjSingleRunData.id === dispatchedRun.id);
+
+    const prjNodesRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/nodes`);
+    assert('GET /v1/projects/{project}/nodes returns HTTP 200', prjNodesRes.status === 200);
+    const prjNodesData = await prjNodesRes.json();
+    assert('Project nodes list returns cluster inventory', Array.isArray(prjNodesData.items) && prjNodesData.total >= 5);
+
+    // Project-scoped Approval Challenge & Decision Flow with Two-Person Rule
+    const l2RunRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workspaceId: createdWsp.id,
+        objective: 'Project-Scoped L2 Approval Journey Validation',
+        riskLevel: 'L2',
+        requiresApproval: true,
+        requestedBy: 'usr_requester_alice',
+      }),
+    });
+    assert('POST /v1/projects/{id}/runs with L2 creates awaiting_approval run', l2RunRes.status === 201);
+    const l2RunData = await l2RunRes.json();
+    const l2ApprovalId = l2RunData.approvalId;
+    assert('L2 run has linked approval id', Boolean(l2ApprovalId));
+
+    // Two-Person Rule: Requester cannot challenge approval
+    const selfChallRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/approvals/${l2ApprovalId}/challenge`, {
+      method: 'POST',
+      headers: { 'X-Subject': 'usr_requester_alice' },
+    });
+    assert('Self-challenge by requester rejected with HTTP 403 (Two-Person Rule)', selfChallRes.status === 403);
+
+    // Independent reviewer challenges for nonce
+    const peerChallRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/approvals/${l2ApprovalId}/challenge`, {
+      method: 'POST',
+      headers: { 'X-Subject': 'usr_reviewer_02' },
+    });
+    assert('Independent peer challenge returns HTTP 200', peerChallRes.status === 200);
+    const peerChallData = await peerChallRes.json();
+    assert('Peer challenge provides one-time nonce', Boolean(peerChallData.nonce));
+
+    // Independent reviewer decides approval
+    const peerDecideRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/approvals/${l2ApprovalId}/decision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Subject': 'usr_reviewer_02' },
+      body: JSON.stringify({
+        decision: 'approve',
+        nonce: peerChallData.nonce,
+        actionDigest: 'sha256:4a6f9821ef34a02937cd219e88a31401f82e1850d810237913fb9a3d467e2a9b',
+      }),
+    });
+    assert('Independent peer decision returns HTTP 200 and ApprovalView', peerDecideRes.status === 200);
+    const peerDecideData = await peerDecideRes.json();
+    assert('ApprovalView reports status approved and links projectId', peerDecideData.status === 'approved' && peerDecideData.projectId === 'prj_01JABCDE');
+
     // -------------------------------------------------------------------------
     // [Track 14] Node Drain & Schedulable Isolation Control (ADR-038)
     // -------------------------------------------------------------------------

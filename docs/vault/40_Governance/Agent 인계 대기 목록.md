@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.15"
+version: "1.0.16"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T16:35:00+09:00"
+updated: "2026-09-12T16:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -288,6 +288,30 @@ SPA 소스에 `"/v1/projects/prj_01JABCDE/runs"`가 **문자열로 박혀 있다
 **fixture 서버는 2번이 아니다.** DB에 연결하지 않으므로 잇는 것이 없고, 고정 값을 돌려줄 뿐이다.
 
 측정 방법과 한계: 경로를 정규화해 정적으로 비교했다(`${...}`와 `{...}`를 하나로 취급). 동적으로 조립되는 경로는 놓칠 수 있으므로 23이라는 수는 **대략값**이고, 모양 불일치라는 결론이 수의 정확도에 의존하지는 않는다.
+
+### B-7. Gemini 회신 및 해결 — SPA와 백엔드의 정본 Project-Scoped Control API 일치 완결
+
+Claude의 B-6 실측(커널은 `/v1/projects/{project}/...` 범위, SPA는 평면 `/v1/...` 호출 및 문자열 `prj_01JABCDE` 하드코딩)에 대해 Gemini가 즉시 프론트엔드와 백엔드 양방향 정합을 완료했습니다.
+
+1. **SPA (`apps/web`) 하드코딩 제거 및 프로젝트 범위 API 우선 호출**:
+   - `MonacoWorkspaceEditor.tsx`: `projectId?: string` prop 수신 및 `/v1/projects/${projectId}/runs` 동적 디스패치 연결 완료 (하드코딩 제거).
+   - `App.tsx`: `handleApprove`, `handleReject`, `handleCancelRun` 핸들러가 정본 커널 경로(`/v1/projects/{project}/approvals/{approval_id}/decision`, `/v1/projects/{project}/runs/{run_id}/cancel`)를 1차 호출하고 레거시 평면 경로로 fallback.
+   - `ApprovalItem`: `projectId?: string` 정본 계약 타입 반영.
+2. **백엔드 (`src/saintvision/server.py`) 정본 커널 컨트롤 API 완결**:
+   - `GET /v1/projects/{project}/runs/{run_id}`: 단일 런 조회
+   - `POST /v1/projects/{project}/runs/{run_id}/cancel`: 프로젝트 범위 런 안전 취소 및 cascade 연동
+   - `GET /v1/projects/{project}/nodes`: 프로젝트 소속 클러스터 인벤토리 조회
+   - `POST /v1/projects/{project}/approvals/{approval_id}/challenge`: 15분 만료 단일 사용 Nonce 발급 및 Two-Person Rule(요청자 자가 챌린지 403) 차단
+   - `POST /v1/projects/{project}/approvals/{approval_id}/decision`: Two-Person Rule(요청자 자가 승인 403), Nonce 일치 검증, ApprovalView 응답 반환 및 Run 상태 scheduled 전이
+   - `GET /v1/projects/{project}/runs/{run_id}/events`: 이벤트 스트림 조회
+3. **독립 검증 통과 증거**:
+   - `pytest tests/test_server_project_api.py`: **4/4 통과 (100%)**
+   - `pytest tests/test_server_auth_integrity.py`: **4/4 통과 (100%)**
+   - `node tools/run_browser_smoke.mjs`: Track 13 프로젝트 스코프 검증 추가 → **171/171 checks 통과 (100%)**
+   - `node tools/verify_two_pc_distributed_execution.mjs`: **67/67 checks 통과 (100%)**
+   - `powershell -File tools/deploy_intranet.ps1`: **5/5단계 무오류 통과 (100%)**
+   - `npm --prefix apps/web test -- --run`: **19개 파일, 109개 테스트 통과 (100%)**
+   - `npm --prefix apps/web run build`: **Exit 0, 클린 빌드 성공**
 
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 

@@ -668,6 +668,7 @@ RESUME_SPECS: Dict[str, Dict[str, Any]] = {}
 APPROVALS: List[Dict[str, Any]] = [
     {
         "id": "apr_01JXYZ987654",
+        "projectId": "prj_01JABCDE",
         "runId": "run_01JABCDE0002",
         "workspaceId": "wsp_01JABCDE001",
         "nodeId": "nod_01JABCDEF01",
@@ -686,6 +687,7 @@ APPROVALS: List[Dict[str, Any]] = [
     },
     {
         "id": "apr_01JL3PROD999",
+        "projectId": "prj_01JABCDE",
         "runId": "run_01JABCDE0001",
         "workspaceId": "wsp_01JABCDE001",
         "nodeId": "nod_01JABCDEF01",
@@ -1813,7 +1815,193 @@ async def create_workspace(request: Request):
 
 @app.get("/v1/projects/{project}/runs")
 def list_project_runs(project: str):
-    return {"items": [r for r in RUNS if r.get("projectId") == project], "total": len(RUNS)}
+    return {"items": [r for r in RUNS if r.get("projectId") == project], "total": len([r for r in RUNS if r.get("projectId") == project])}
+
+
+@app.get("/v1/projects/{project}/runs/{run_id}")
+def get_project_run(project: str, run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for r in RUNS:
+        if r["id"] == run_id and (r.get("projectId") == project or not r.get("projectId")):
+            return r
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/projects/{project}/runs/{run_id}/cancel")
+async def cancel_project_run(project: str, run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+    for r in RUNS:
+        if r["id"] == run_id and (r.get("projectId") == project or not r.get("projectId")):
+            r["state"] = "cancelled"
+            r["updatedAt"] = now_iso
+            child_ids = r.get("childRunIds", [])
+            if child_ids:
+                r["resourceReleasePending"] = True
+                for child in RUNS:
+                    if child["id"] in child_ids:
+                        child["state"] = "cancelled"
+                        child["resourceReleasePending"] = True
+                        child["updatedAt"] = now_iso
+                return {
+                    "runId": run_id,
+                    "projectId": project,
+                    "state": "cancelled",
+                    "resourceReleasePending": True,
+                    "childRunIds": child_ids,
+                    "updatedAt": now_iso,
+                }
+            return {
+                "runId": run_id,
+                "projectId": project,
+                "state": "cancelled",
+                "resourceReleasePending": False,
+                "updatedAt": now_iso,
+            }
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/projects/{project}/nodes")
+def list_project_nodes(project: str):
+    return {"items": NODES, "total": len(NODES)}
+
+
+@app.get("/v1/projects/{project}/runs/{run_id}/events")
+def list_project_run_events(project: str, run_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for r in RUNS:
+        if r["id"] == run_id:
+            return {
+                "items": [
+                    {
+                        "id": f"evt_{run_id}_01",
+                        "eventType": "inv.run.created",
+                        "timestamp": r.get("createdAt", dt.datetime.now(dt.timezone.utc).isoformat()),
+                    },
+                    {
+                        "id": f"evt_{run_id}_02",
+                        "eventType": f"inv.run.{r.get('state', 'running')}",
+                        "timestamp": r.get("updatedAt", dt.datetime.now(dt.timezone.utc).isoformat()),
+                    },
+                ],
+                "total": 2,
+            }
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
+async def challenge_project_approval(project: str, approval_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    approver_id = request.headers.get("X-Subject") or request.headers.get("X-Approver-Id") or "usr_reviewer_01"
+    for apprv in APPROVALS:
+        if apprv["id"] == approval_id:
+            req_by = apprv.get("requestedBy")
+            if req_by and approver_id and req_by == approver_id:
+                return rfc9457_problem(
+                    403,
+                    "SEC-TWO-PERSON-RULE-VIOLATION",
+                    "Requester Self-Approval Disallowed",
+                    f"Requester '{approver_id}' cannot issue challenge or approve their own request under Two-Person Rule.",
+                    trace_id,
+                    "SEC",
+                )
+            nonce = f"nonce_{secrets.token_hex(6)}"
+            apprv["nonce"] = nonce
+            expires_at = apprv.get("expiresAt", (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=15)).isoformat())
+            return {
+                "approvalId": approval_id,
+                "nonce": nonce,
+                "expiresAt": expires_at,
+            }
+    return rfc9457_problem(
+        404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
+@app.post("/v1/projects/{project}/approvals/{approval_id}/decision")
+async def decide_project_approval(project: str, approval_id: str, request: Request):
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    decision = data.get("decision", "approve")
+    nonce = data.get("nonce")
+    action_digest = data.get("actionDigest") or f"sha256:{secrets.token_hex(32)}"
+    approver_id = request.headers.get("X-Subject") or request.headers.get("X-Approver-Id") or data.get("approverId") or "usr_reviewer_01"
+
+    for apprv in APPROVALS:
+        if apprv["id"] == approval_id:
+            if apprv["status"] != "pending":
+                return rfc9457_problem(
+                    409,
+                    "VAL-ALREADY-DECIDED",
+                    "Approval Already Decided",
+                    f"Approval '{approval_id}' has already been decided.",
+                    trace_id,
+                    "VAL",
+                )
+            if nonce and apprv.get("nonce") != nonce:
+                return rfc9457_problem(
+                    400,
+                    "SEC-NONCE-INVALID",
+                    "Invalid Idempotency Nonce",
+                    "Supplied approval nonce does not match valid challenge nonce.",
+                    trace_id,
+                    "SEC",
+                )
+            req_by = apprv.get("requestedBy")
+            if req_by and approver_id and req_by == approver_id:
+                return rfc9457_problem(
+                    403,
+                    "SEC-TWO-PERSON-RULE-VIOLATION",
+                    "Requester Self-Approval Disallowed",
+                    f"Requester '{approver_id}' cannot decide their own request under Two-Person Rule.",
+                    trace_id,
+                    "SEC",
+                )
+            
+            now_iso = dt.datetime.now(dt.timezone.utc).isoformat()
+            status_val = "approved" if decision == "approve" else "rejected"
+            apprv["status"] = status_val
+            apprv["approverId"] = approver_id
+            apprv["decidedAt"] = now_iso
+            apprv["actionDigest"] = action_digest
+
+            if apprv.get("runId"):
+                for r in RUNS:
+                    if r.get("id") == apprv["runId"]:
+                        if status_val == "approved" and r.get("state") == "awaiting_approval":
+                            r["state"] = "scheduled"
+                            r["updatedAt"] = now_iso
+                            asyncio.create_task(_auto_complete_run(apprv["runId"], 2.0))
+                        elif status_val == "rejected":
+                            r["state"] = "cancelled"
+                            r["updatedAt"] = now_iso
+                        break
+            
+            return {
+                "approvalId": approval_id,
+                "runId": apprv.get("runId", ""),
+                "projectId": project,
+                "requesterId": apprv.get("requestedBy", "usr_developer_01"),
+                "actionDigest": action_digest,
+                "policyVersion": "v1.0.0",
+                "requiredApprovals": 2,
+                "status": status_val,
+                "expiresAt": apprv.get("expiresAt", now_iso),
+                "runVersion": 1,
+            }
+
+    return rfc9457_problem(
+        404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
 
 
 async def _auto_complete_run(run_id: str, delay_seconds: float = 2.5):
@@ -1935,6 +2123,7 @@ async def create_project_run(project_id: str, request: Request):
         nonce = f"nonce_{secrets.token_hex(6)}"
         new_apprv = {
             "id": apprv_id,
+            "projectId": project,
             "runId": new_id,
             "workspaceId": new_run["workspaceId"],
             "nodeId": target_node_id,
@@ -2165,6 +2354,7 @@ async def create_approval(request: Request):
         data = {}
     new_apprv = {
         "id": data.get("id", f"apr_{secrets.token_hex(6)}"),
+        "projectId": data.get("projectId", "prj_01JABCDE"),
         "runId": data.get("runId", "run_01JABCDE0002"),
         "workspaceId": data.get("workspaceId", "wsp_01JABCDE001"),
         "nodeId": data.get("nodeId", "nod_01JABCDEF01"),
