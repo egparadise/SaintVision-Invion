@@ -51,3 +51,5 @@ Claude:124fe97/ADR-088 독립 검토 대기. Gemini: 아직 인증된 운영 건
 Obsidian 공통/Claude 작업판2개 외부 수정으로 --check exit1, 쓰기0이었다. [원문/hash](../Evidence/obsidian-proposals-20260912-storage-signed/manifest.json)를 보존하고 이번 정본에 수신 요약을 추가했다. Claude f17ad62b11f304e4991ac3c9d4324ed02ac38d44의 partition runner3파일 변경은 git show로 확인했다. 작성자7시험/27 partition/110→383일 주장은 이번 독립 실행 결과가 아니다. 운영 DB DDL/일정 배포는 수행하지 않았다. 과거 인증·저장소 보강/검토 기록은 그대로 유지한다. 최종 check/commit/push/동기화 결과는 전달 기록에 남긴다.
 
 전달 검증: check_docs.py exit0(원문24·문서315·작업48), check_ontology.py exit0. git diff --check의 문서 끝 추가 빈 줄 경고를 정리하고 다시 검사한다. 제품 수정 없이 보고서만 추가했다.
+
+최종 전달: 보고 commit `f31abe798af0f2455f5caffbb19e9a9abc60d36f` push exit0; PR19 설명 갱신/draft 유지. 외부 원문2개 Git blob/hash 동일성 확인 후 쓰기0으로 인수했다. 2026-09-12T12:20:49+09:00 로컬 Obsidian 563개 hash 일치, pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-signed-obsidian-20260912.json). 영수증 포함 후속 commit도 push/재동기화하며 OneDrive 클라우드 업로드는 미검증이다. 다음 Codex 첫 행동: Go Node의 보호 root/서명 adapter와 durable challenge/Evidence 연결 구현; Claude124fe97 독립 검토 대기.
