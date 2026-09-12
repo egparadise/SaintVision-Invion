@@ -35,3 +35,5 @@ Claude: ADR-096 입력·prepared request 해시/잠금·bridge/executor 경계�
 전체 **2775/4800=57.81% 완료 /42.19% 잔여 유지**. Windows 모사 시험과 Linux 시험을 물리 Windows/원격 인수로 합쳐 표현하지 않는다. [[Codex Node 저장소 설정 설치와 교체 절차]]에 운영 입력 예제를 기록했다.
 
 전달 검사: check_docs exit0(문서340/작업48), check_ontology exit0, git diff --check exit0. PR19 갱신/draft 유지. 보고ea5eff8 push exit0. 첫 Obsidian check는 외부3개 변경으로 exit1/쓰기0. 원문/hash를 보존하고 Gemini ea508ea 주장을 독립 검증과 구분해 수신 기록했다. 동일 bytes 보존을 확인한 뒤 쓰기0 인수·정본 동기화를 진행한다.
+
+최종 전달: d03d1c6 push exit0. 2026-09-12T16:43:01+09:00 로컬 Obsidian652개 전체 hash 일치/pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-windows-obsidian-20260912.json). 영수증 포함 후속 commit도 push/동기화한다. OneDrive cloud 업로드 미검증. 다음 Codex 실제 원격 Ubuntu/Docker 경로·정책/receipt 및 서버 mTLS/Evidence 인수, Claude ADR-096 독립 검토 pending.
