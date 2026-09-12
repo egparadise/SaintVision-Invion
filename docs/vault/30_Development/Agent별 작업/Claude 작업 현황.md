@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.0.9"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T12:19:39+09:00"
+updated: "2026-09-12T12:57:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -200,3 +200,10 @@ Claude의 CL01/02/04/07 후속 조사·00b1159 알람 보고 전체를 [원문/h
 Codex124fe97 서명 sample/ADR-088: [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]:124fe97 실제 ReadRoot sample·불변 Run/ChannelProof/root/catalog/nonce challenge·Ed25519 서명 검증, Windows124/Linux129 통과. 내부 Python 수집/검증 모듈이며 Go 배포·durable nonce·StorageCheck/inv.evidence 원자 기록은 아직 남음. CI 계정 제한/독립 검토/물리 장비 인수 별도, 전체57.81% 유지.
 
 Claude f17ad62 partition runner3파일 변경을 git show로 확인했다. 작성자7시험/실측27개 partition/110→383일 주장은 수신 기록이며 Codex 독립 재현/운영 적용은 하지 않았다. 이전00b1159 알람과 함께 검토 대기. 외부 원문은 Evidence/obsidian-proposals-20260912-storage-signed에 보존했다. 기존 검토 요청 기록을 삭제하지 않는다.
+
+
+## Go Node sample 검토 요청 (2026-09-12T12:57:44+09:00)
+
+[[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]:688678d Go opt-in 폴더 설정/mTLS/실제 서명 sample과 Python 검증 연결. Linux 실제 통합130, Windows98 및 Go 경계 시험 통과. durable challenge/nonce 소비·기존 StorageCheck/Evidence 원자 쓰기는 다음 작업. 운영 .225/Windows native 수집/CI/독립 검토 미완료, 전체57.81% 유지.
+
+현재 독립 검토 대상688678d/ADR-089. 작성자 Codex의 시험은 reviewer 승인과 별개다. Agent 인계 대기 목록 외부 Claude/Gemini 절은 원문을 보존해 수신했으며 기존 보완 SHA의 검토 요청을 삭제하지 않았다.

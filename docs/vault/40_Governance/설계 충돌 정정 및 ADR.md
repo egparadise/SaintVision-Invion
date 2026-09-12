@@ -4,7 +4,7 @@ title: "설계 충돌 정정 및 ADR"
 version: "1.35.6"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T12:19:39+09:00"
+updated: "2026-09-12T12:57:44+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -145,3 +145,6 @@ ADR-087(ASGI client_cert_error 최종 거부·잘못된 direct chain의 proxy fa
 
 
 ADR-088(내부 Run/ChannelProof/root/catalog/nonce-bound Ed25519 sample·공유 ReadRoot sampler·사전 byte budget·검증과 durable nonce/Evidence 기록 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.1.0 및 [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]를 따른다. Go endpoint/실제 장비·운영 DB 기록 완료가 아니다.
+
+
+ADR-089(공통 Schema·Go opt-in 보호 폴더/mTLS 서명 sample·Linux descriptor 경계·실제 TLS peer certificate 반환·운영 기록 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.2.0 및 [[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]를 따른다. durable nonce/Evidence commit·운영 .225 인수는 후속이다.

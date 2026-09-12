@@ -1,0 +1,53 @@
+{
+  "codeSHA": "688678d510b676d59d80c69de08bc69569828dd5",
+  "dirty": false,
+  "scope": "Linux standalone Go tests in disposable local containers; no physical Node",
+  "image": "sha256:ec7d6c95cd3692a2e2d228a8b1ca74e4025b54121fcc4c5da6f09cfa473315ad",
+  "packages": [
+    {
+      "package": "storage",
+      "exitCode": 0,
+      "binarySHA256": "a96bae3b9460aba1bfa3aae85ac4f72560fbc0f6a04faf3d5874db762aa1d00f",
+      "cases": [
+        "--- PASS: TestRootAndFileBoundary (0.01s)",
+        "--- PASS: TestRootAndFileBoundary/valid (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/symlink (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/hardlink (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/parent-link (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/root-replaced (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/oversized (0.00s)",
+        "--- PASS: TestRootAndFileBoundary/fifo (0.00s)",
+        "--- PASS: TestRootAncestorSymlinkAndFilesystemRootRejected (0.00s)"
+      ]
+    },
+    {
+      "package": "transport",
+      "exitCode": 0,
+      "binarySHA256": "6aa06c70dd7b0d1d2bd2f56b5f635d224be80a11832331e5fe35364e40b1a7e7",
+      "cases": [
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient (0.07s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/no-certificate (0.00s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/wrong-ca (0.00s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/wrong-uri (0.00s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/expired (0.00s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/wrong-eku (0.00s)",
+        "--- PASS: TestMTLSAllowsOnlyPinnedScopedClient/unpinned (0.00s)",
+        "--- PASS: TestPolicyRevocationOnExistingTLSConnection (0.01s)",
+        "--- PASS: TestClientCertificateOverlapAndRollback (0.01s)",
+        "--- PASS: TestRevocationCancelsActiveRequest (0.11s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor (0.03s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/expired-policy (0.00s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/same-version-change (0.00s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/malformed-policy (0.00s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/oversize-body (0.01s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/query (0.00s)",
+        "--- PASS: TestInvalidPolicyAndFramingNeverReachExecutor/wrong-path (0.00s)",
+        "--- PASS: TestPlainHTTPIdentityHeadersHaveNoAuthority (0.00s)",
+        "--- PASS: TestReceiptObservationWaitsForPriorHTTPResponseSlot (0.01s)",
+        "--- PASS: TestStorageDisabledWithoutLocalConfiguration (0.01s)",
+        "--- PASS: TestStorageRechecksPeerAfterCollection (0.01s)",
+        "--- PASS: TestStorageSlotDoesNotConsumeHeartbeatCapacity (0.01s)"
+      ]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 ---
 doc_id: "CONTRACT-STORAGE-SAMPLE-001"
 title: "Codex 로컬 폴더 점검과 Node 증명 계약"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T12:19:39+09:00"
+updated: "2026-09-12T12:57:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -52,3 +52,14 @@ ADR-087에서 inbound ASGI verification failure를 명시적으로 거부하고 
 v1은32파일·파일당1MiB·payload64KiB·30초의 제한된 sample이다. 실제 열린 파일 크기를 먼저 확인한다. 강제 OS I/O deadline은 아니며 완료 시 만료면 서명하지 않는다. 실패 파일은 null hash/size 쌍이며 mismatch, 기준 없는 파일은 unverifiable이다. 빈/중복 manifest, 관측 누락·개수/순서 불일치·추가 필드·크기/서명/서명 domain 변경을 거부한다. 건강 판정은 verifier가 재계산한다. CLI와 같은 sampler/hash_file을 사용하고 CLI 출력의 Node 신원 미검증/운영 기록0은 유지한다.
 
 이것은 내부 Python 참조 구현이며 공개 JSON Schema/Go endpoint를 추가한 것이 아니다. trusted caller가 실제 Run 권한/현재 catalog를 고정해야 한다. 실제 Node adapter는 인증된 요청만 처리하고 승인된 로컬 root/key를 선택해야 한다. private key를 Control Plane으로 보내지 않는다. 소비되지 않은 challenge인지와 현재 authority 재검사는 후속 DB transaction 책임이다. 같은 증거의 순수 재검증은 가능하며 기록0/운영 인수false다. 새 원장 없이 기존 inv.evidence와 StorageCheck를 연결하는 후속 검증 전에는 운영 건강을 갱신하지 않는다.
+
+
+## ADR-089 Go Node 연결
+
+[[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]],688678d. 내부 Python 참조만 있던 ADR-088 후속으로 공통 JSON Schema 6개와 Go endpoint를 추가했다. POST /v1/storage/sample request는 NodeStorageSampleInput(challenge=canonical Challenge bytes의 base64), response는 NodeStorageSignedSample(payload/signature)다. Go는 받은 정확한 challenge bytes를 digest에 넣고 Python verifier는 발급된 canonical challenge와 대조한다. request가 canonical이 아니면 verifier 일치 보장을 얻지 못한다.
+
+opt-in --storage-policy의 NodeStorageRootConfig(channel,contribution_id,root_version,root)는 로컬 보호 파일이며 v1에서 한 폴더만 활성화한다. Node peer mTLS가 먼저 필요하고 Node scope와 구성 hash/현재 인증서를 수집 전후 확인한다. 설정 변경은 fail closed/재시작으로 처리하며 root-policy의 durable rollback floor는 아직 없다. worker workload에 Node 키를 전달하지 않는다. 승인 root/key를 request 경로에서 만들지 않는다.
+
+Go 수집은 Linux descriptor 경계/동일 device/regular single-link/두 번 bounded hash를 사용한다. Windows native opener는 거부하며 Docker/WSL Linux에서 동작하는 Node와 구분한다. Node별 별도 sample slot1/5초 cooperative context, client6초, 기존32파일/1MiB/30초·64KiB 제한이다. blocking filesystem syscall 강제 중단/일관 snapshot은 아니다. Control Plane은 실제 TLS peer DER를 envelope와 함께 받아 별도 signature verifier에 공급한다.
+
+실제 Go+mTLS/파일/DB 시험130 통과는 운영 기록 성공이 아니다. durable issuer·nonce 소비·현재 Run/project/channel/contribution/catalog 재확인 및 기존 Evidence/StorageCheck의 단일 transaction 연결을 구현할 때까지 운영 기록0을 유지한다. 같은 epoch/version 숫자만으로 current 권한을 주장하지 않는다.

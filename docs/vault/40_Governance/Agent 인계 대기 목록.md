@@ -4,7 +4,7 @@ title: "Agent 인계 대기 목록"
 version: "1.0.6"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T09:40:15+09:00"
+updated: "2026-09-12T12:57:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -93,3 +93,10 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 - HO-RUNTIME-COMPLETION-CLAUDE-001: [[Codex 실행 완료와 자원 회수 통합 계약]], [[2026-09-10_08-38-33_KST_RUNTIME-COMPLETION_Codex_개발과정]], PR #11. Claude: SQL chain/receipt-bound publish/부모 lock 순서 독립 검토 및 업무 Adapter. Gemini: parent/child·결과 Evidence·반환 대기 UI. 실제 수신·독립 검토 pending. 기본 폴더에서 별도로 진행 중인 미커밋 auth/server 수정은 이 인계에 포함하지 않았다.
 
 - HO-WORKSPACE-RESUME-CLAUDE-001: [[Codex Workspace 실행 재개와 결과 체크포인트 계약]], [[2026-09-10_09-29-08_KST_WORKSPACE-RESUME_Codex_개발과정]], PR #12. Claude: 프로젝트 권한/editor quiesce/identity 매핑/prepare→승인→enqueue→worker 업무 연결 및 migration 0018/무결성 경계 독립 검토. Gemini: frozen 입력·이후 편집·재개 Step/attempt·결과 checkpoint UI. 원문 입력을 로그/화면에 그대로 노출하지 않는다. 실제 전달·독립 검토 pending.
+
+
+## 보존된 외부 후속 인계 수신 (2026-09-12T12:57:44+09:00)
+
+Claude d14db0a/c5f2154의 F1~F4·운영 결정/검토 요청 및 Gemini fa01d77 GM01~06 작성자 보고를 수신했다. 원문은 [보존본/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-node/manifest.json)에 있다. 실제2-PC/GPU·운영 배포 성공 및 독립 검토 승인으로 승격하지 않는다. 이후 Codex ADR-074 등 수정 여부는 고정 SHA별 검증보고를 대조해야 한다.
+
+새 Codex 인계: [[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]:688678d Go opt-in 폴더 설정/mTLS/실제 서명 sample과 Python 검증 연결. Linux 실제 통합130, Windows98 및 Go 경계 시험 통과. durable challenge/nonce 소비·기존 StorageCheck/Evidence 원자 쓰기는 다음 작업. 운영 .225/Windows native 수집/CI/독립 검토 미완료, 전체57.81% 유지. Claude 독립 검토 pending. 다음 Codex는 DB durable challenge/Evidence 원자 연결을 진행한다.
