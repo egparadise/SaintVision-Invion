@@ -214,6 +214,11 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
   - **실측 발견**: 이 배포의 partition은 **2027-01-01까지**이고 migration 밖에서 partition을 만드는 것이 없다. `ensure_partitions`는 있으나 호출자가 migration뿐이다 — 같은 유형의 네 번째 사례다. 경고가 몇 주 여유를 두고 오게 됐다.
   - 채널은 구현하지 않았다. `GOV-ALERT-001`이 채널·사람을 `unknown`으로 두었고, P1을 추측한 곳으로 보내는 것은 출력만 하는 것보다 나쁘다.
   - 실제 검증 증거: 시험 7개, 각 조건을 실제로 울렸다. partition 알람은 미래 시점 3개로 검증 — runway 45일이면 P2, 10일이면 P1, 상계를 넘기면 "inserts are failing now".
+- 이어서 수행(f17ad62) — **알람이 경고하는 문제에 조치 수단을 붙였다**: `ensure_partitions`도 첫 migration부터 있었고 **호출자가 migration뿐**이다. 그래서 배포본은 마지막 migration 날 만들어진 3개월치 partition을 그대로 들고 있고, 이 배포는 **2027-01-01에 Evidence 기록이 멈춘다**(오늘 기준 약 110일).
+  - 새 로직이 아니라 **runner**다. `ensure_partitions`가 이미 정하는 것을 다시 정하지 않는다. 아무도 부르지 않는 mechanism은 mechanism이 아니기 때문에 만들었다.
+  - 보고가 기본값이다. partition 생성은 운영 DB에 대한 DDL이므로 `--apply`는 명시적이고, `--check`는 여유가 기준 미만이면 **exit 1**이라 무인 guard로 쓸 수 있다. 기본 45일로 알람의 30일보다 **일부러 길게** 뒀다 — 여유 있게 조치할 시간에 실패해야지, 이미 나빠진 상태를 알람과 함께 확인해서는 늦다.
+  - **명령은 일정이 아니다.** 운영자가 기억해야 하는 방식이 지금의 공백을 만든 방식이다. 주기 실행은 제어 평면 호스트의 스케줄러 몫이고, 그 전까지 `alarm_check`가 안전망이다. 절차서 7-9에 적었다.
+  - 실측: 조치 전 여유 110일 → 12개월 lead로 partition 27개 생성 → 383일. 두 번째 `--apply`는 아무것도 만들지 않는다(멱등). 시험 7개이며 핵심은 **`--check`가 실패할 수 있다는 것**이다. 공유 session DB에 partition을 적용하는 두 시험은 lead를 현재 상태에서 유도하도록 바꾸고 **양쪽 순서로 실행해 확인**했다.
 - 부수 발견(보고만, 수정은 운영 행위): `docker-compose.prod.yml`에 `POSTGRES_PASSWORD=postgres`와 `inv_app:apptestonly`가 그대로 있다. prod 이름을 단 파일의 기본 credential이다.
 - 남은 문제: 연속 아카이빙·보관 매체·백업 주기는 **운영 결정**이며 CX-09 릴리스 시험과 함께 정해야 한다. 알람/worker 재시작/partition/장시간 표본과 사용자 인수는 미수행이고, CL-02의 실제 운영 입력과 CX-09 공동 시나리오가 선행이다. 작성자(Claude)와 승인자(Codex)는 구분한다.
 - 다음 첫 행동: PITR·보관 매체·주기 결정을 CX-09와 함께 받는다. 결정되면 같은 gate로 실측해 인수 증거를 만든다. 담당 Claude, 결정 Codex·운영자.
