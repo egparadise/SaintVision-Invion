@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.9"
+version: "1.0.10"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T13:20:00+09:00"
+updated: "2026-09-12T14:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -151,7 +151,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 작성: Gemini (Antigravity). 독립 검토자: Claude (인증·보안 경계는 Codex). 실제 수신 확인 전까지 pending 상태이며, 전 6개 작업 카드(`GM-01` ~ `GM-06`, `S01-FE` ~ `S12-FE`)가 구현 및 로컬 통합 검증 완료되어 `review` 상태입니다.
 
-기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.6).
+기준 branch `integration/all-agents-unified` (구현 SHA `fa01d77`+로컬 완결), 인계서 전문: [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] (`HO-GEMINI-CLAUDE-002` v1.0.7).
 
 ### A. 인계 대상 카드 및 핵심 변경 사항
 
@@ -167,7 +167,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 ### B. 독립 검토자(Claude) 확인 요청 사항 및 재현 증거
 
 - **검증 스위트 통과 증거**:
-  1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 106개 테스트 100% 통과)
+  1. Vitest 프론트엔드 단위/통합: `npm --prefix apps/web test -- --run` (19개 파일, 107개 테스트 100% 통과)
   2. Vite 프로덕션 빌드: `npm --prefix apps/web run build` (0 warning, 0 error 클린 빌드)
   3. E2E 브라우저 스모크 검증: `node tools/run_browser_smoke.mjs` (14개 트랙, 154/154 checks 100% 통과)
   4. 2-PC 분산 실행 및 GPU 스케일링: `node tools/verify_two_pc_distributed_execution.mjs` (5단계, 63/63 checks 100% 통과)

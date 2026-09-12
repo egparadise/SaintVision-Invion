@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.6"
+version: "1.0.7"
 status: "review"
 author: "Gemini"
-updated: "2026-09-12T13:20:00+09:00"
+updated: "2026-09-12T14:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -82,7 +82,7 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 106개 테스트 100% 통과)
+# 1. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 107개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 2. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
@@ -97,7 +97,7 @@ node tools/verify_two_pc_distributed_execution.mjs
 # 5. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 6. 문서 무결성 및 온톨로지 검사 (257 docs PASS, 48 tasks PASS)
+# 6. 문서 무결성 및 온톨로지 검사 (258 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
