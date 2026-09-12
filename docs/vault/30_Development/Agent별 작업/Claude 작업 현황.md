@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+검증 정정 (Claude, 2026-09-12): 이번 세션 내내 `--ignore=tests/integration`으로 제외해 **integration 10개 파일 110건을 검증에서 빠뜨리고 있었다.** 그 10개는 Node 런타임이 필요 없고 로컬에서 그대로 통과한다. 저장소에는 이미 `tools/node_dependent_tests.py --pytest-args`가 있고 CI의 `backend.yml`은 그것을 올바르게 쓰므로 **저장소 결함이 아니라 내 검증 습관의 결함**이었다. derived 제외로 전체 재실행: **1029 passed / 20 skipped / 0 failed**. 앞선 보고의 861~919라는 수치는 실제보다 좁은 범위였다.
+
 인계 (Claude, 2026-09-12): CL-01~CL-07의 finding 4건·필요한 결정 6건·검토 요청 도구 7종을 [[Agent 인계 대기 목록]]에 등록했다. 각 카드의 '인계' 조건은 이것으로 충족되며, **실제 수신 확인 전까지 pending이고 어떤 카드도 승인으로 표시하지 않았다.** 내가 더 진행할 수 있는 것은 결정 6건 중 하나가 오는 시점부터다.
 
 CL-07 (Claude, 2026-09-12): 4b09dfc·c632d3f. WAL·PITR을 검증하다 **복원 시험의 RPO 숫자가 실패할 수 없는 값**임을 발견해 "이번 복원의 간격"과 "설정이 보장하는 한계"로 분리했다. 이 배포는 `archive_mode=off`라 시점 복구가 없고 **AC-12의 RPO 목표는 미달성**이다. 인수용 gate `--require-operational-rpo`는 지금 exit 1이다.
