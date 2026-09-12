@@ -49,3 +49,6 @@ Claude: fd0c081/0037 최소권한·RLS·잠금 순서·기존 StorageCheck와의
 
 
 동기화 중 외부 수정4개를 감지해 최초 check exit1/쓰기0. [외부 원문/hash](../Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)를 보존하고 현재 정본4페이지에 수신/검토 대기 요약만 반영했다. Gemini의 새154개 smoke 등은 작성자 주장이고 실제 물리2-PC 인수로 올리지 않는다. 동일 원문 bytes의 Git 보존을 확인한 후 쓰기0 인수와 정상 동기화를 재개한다.
+
+
+최종 전달: 보고 b5e3a4b/외부 원문 인수 ab19897 push exit0. 2026-09-12T13:25:02+09:00 Obsidian588개 hash일치/pending0/conflict0, check→apply→check exit0. [동기화 영수증](../Evidence/storage-commit-obsidian-20260912.json). 영수증 포함 후속 commit도 push와 재동기화한다. OneDrive 클라우드 업로드 미검증. 제품 fd0c081/0037 독립 검토·CI·운영 인수 pending, 다음 Codex 첫 행동은 내부 sample 조회/권한·운영 설치 연결 계약이다.
