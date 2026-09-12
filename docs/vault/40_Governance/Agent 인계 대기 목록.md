@@ -342,6 +342,40 @@ integration의 `inv/app.py`에는 `ResultView`·`TerminalService`를 연결하�
 
 측정 한계는 B-6과 같다(정적 비교, 동적 조립 경로는 놓칠 수 있음). 수치는 대략값이고, "integration이 10 route, Codex가 54 route"라는 대비가 결론을 지탱한다.
 
+### B-8. 수치를 도구로 대체 — `tools/route_coverage.py` (`30f48f4`)
+
+B-6과 B-7의 수치는 내가 손으로 잰 것이고 **두 번 다 틀렸다.** 그래서 측정을 시험이 붙은 도구로 옮겼다. 시험 15개는 전부 손으로 짠 정규식이 놓쳤거나 놓쳤을 형태다 — factory 안의 `@api.` decorator, 임의의 보유 변수명, websocket route, `APIRouter` prefix, f-string 경로, Python과 TypeScript가 같은 parameter를 부르는 세 가지 표기.
+
+**도구로 잰 값이 내 손 계산을 대체한다.**
+
+| 조합 | client 31개 중 미제공 |
+|---|---:|
+| integration 트리들(커널 10 + api 19) | **22** |
+| Codex 현재 커널(54) + 내 lane api(34) | **19** |
+
+손 계산은 24와 21이었다. 도구가 양쪽에서 route를 더 찾으므로 **실제 공백은 내가 보고한 것보다 작다.**
+
+Codex 현재 커널 기준으로 남는 19개:
+
+```
+/v1/approvals            /v1/approvals/{}/approve   /v1/approvals/{}/reject
+/v1/auth/token           /v1/events                 /v1/nodes/{}/undrain
+/v1/receipts             /v1/receipts/{}            /v1/runs
+/v1/runs/{}              /v1/runs/{}/artifacts/download
+/v1/runs/{}/cancel       /v1/runs/{}/reclaim-resources
+/v1/runs/{}/resume/prepare
+/v1/runs/{}/shards       /v1/runs/{}/shards/cancel-all
+/v1/terminal/tickets     /v1/terminal/ws            /v1/workspaces
+```
+
+사용법 — 커널을 통합한 뒤 다시 재서 남은 것만 결정하면 된다.
+
+```
+python tools/route_coverage.py   --served services/control-plane/src/inv   --served src/saintvision/api   --client apps/web/src
+```
+
+**한계를 결과와 함께 출력한다**: 제공된다고 센 것은 그 모양의 route가 있다는 뜻이지 응답이 화면이 기대하는 것이라는 뜻이 아니다. 이름이 같아도 내용이 다를 수 있고, 그 확인은 이 도구의 범위 밖이다.
+
 ### C. Codex 독립 검토를 요청하는 Claude 산출물
 
 `tools/recovery_drill.py`(복원 검증·인가 모델·definer·서비스 재개·RLS 작동·fencing, `--require-operational-rpo` gate), `tools/operational_readiness.py`(입력·권한 교집합·실행 admission 분리, PermissionSnapshot drift, AC-12 증거), `tools/storage_check.py`(제공 폴더 재해시, node 안전장치), `tools/alarm_check.py`(GOV-ALERT-001 조건 평가), `tools/ensure_partitions.py`(runner), `tools/check_definer_functions.py`+`_definer_rules.py`(코드 판독), Context redaction 거부(`services/context.py`).
