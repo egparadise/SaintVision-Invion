@@ -127,3 +127,44 @@ def test_each_deviation_is_named_in_words(prop: str, expected: str):
 def test_unknown_properties_are_ignored_not_judged():
     """The rule judges only what it defines; extra pg_roles columns pass through."""
     assert shape_deviations(dict(DESIGNED_ROLE_SHAPE, rolreplication=True)) == []
+
+
+def test_the_inline_copy_in_0001_matches_the_designed_shape():
+    """Migration 0001 carries its own CREATE ROLE, and copies drift.
+
+    0001 is published and already applied everywhere real, so it cannot import
+    the hardened helper retroactively — but its literal is what every fresh
+    deployment actually runs, and this repository has already had five
+    hardcoded lists drift away from the thing they copied. The keywords are
+    derived from DESIGNED_ROLE_SHAPE rather than typed again, so weakening
+    either side names the property that moved.
+    """
+    from pathlib import Path
+
+    keyword_of = {
+        "rolcanlogin": "NOLOGIN",
+        "rolbypassrls": "NOBYPASSRLS",
+        "rolsuper": "NOSUPERUSER",
+        "rolcreatedb": "NOCREATEDB",
+        "rolcreaterole": "NOCREATEROLE",
+    }
+    assert set(keyword_of) == set(DESIGNED_ROLE_SHAPE), (
+        "a property was added to the designed shape without deciding its "
+        "CREATE ROLE keyword; extend both together"
+    )
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "migrations/versions/0001_s02_baseline.py"
+    ).read_text(encoding="utf-8")
+    (create_line,) = [
+        line for line in source.splitlines() if "CREATE ROLE" in line
+    ]
+    missing = [
+        keyword_of[prop]
+        for prop, designed in DESIGNED_ROLE_SHAPE.items()
+        if not designed and keyword_of[prop] not in create_line
+    ]
+    assert not missing, (
+        f"0001's inline CREATE ROLE no longer states {missing}; it has drifted "
+        f"from the designed shape in saintvision.db.rls"
+    )
