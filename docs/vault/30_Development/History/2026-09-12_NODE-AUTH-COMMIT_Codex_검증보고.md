@@ -46,3 +46,5 @@ Claude는2830887/ADR-087 독립 검토를 수행하고, 최신00b1159 알람 보
 
 
 전달 준비: check_docs.py exit0(원문24·문서312·작업48), check_ontology.py exit0, git diff --check exit0. 변경 Python Black 적용. PR19 설명 갱신/draft 유지. Obsidian 외부2개를 원문/hash 보존했고 동일 bytes 인수 후 정본 동기화한다.
+
+전달 확인: 보고 commit `4a3654fd2e18ff92944915d1e4a4a6580051bd86` push exit0. 2026-09-12 11:47:30 KST 로컬 Obsidian 552개 파일 hash 일치, pending0/conflict0, check→apply→check 모두 exit0. [동기화 영수증](../Evidence/node-auth-commit-obsidian-20260912.json). 이 영수증을 포함한 최종 기록 commit도 push 후 다시 동기화한다. OneDrive 클라우드 업로드는 검증하지 않았다. 다음 담당 Codex: 서명된 Storage 관측과 기존 Run Evidence 연결; Claude: 독립 검토.
