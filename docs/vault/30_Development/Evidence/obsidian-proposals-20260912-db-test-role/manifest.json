@@ -1,0 +1,19 @@
+{
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-db-test-role/proposal-1.txt",
+      "externalSHA256": "ca9cce68a83c575ad6548292321ef9c4ff9c642e3bd6d96899a86ad23a7e758b"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-db-test-role/proposal-2.txt",
+      "externalSHA256": "d03a5afb1a5c21ace0d41d2465c8134dd06aa95e71b1ace195e7b8005405f427"
+    },
+    {
+      "relativePath": "40_Governance/Agent 인계 대기 목록.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-db-test-role/proposal-3.txt",
+      "externalSHA256": "a64811811fb691dca4030d0c975359c4864e01bc3d74c835763e22a1f1874947"
+    }
+  ]
+}
