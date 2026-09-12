@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.23"
+version: "1.0.24"
 status: "review"
 author: "Codex"
-updated: "2026-09-12T23:15:00+09:00"
+updated: "2026-09-12T23:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -127,6 +127,16 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **미해결.** `leases.py`·`0031`의 offer/release snapshot 불일치는 변경 없음. 재현 절차는 A의 F1 그대로 유효 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### 신규 migration 0035~0037 독립 검토 — 2026-09-13, Claude (`6ff090b`)
+
+CL-01의 범위(0028~0033)를 넘는 신규분. **차단 finding 없음.** scratch DB 두 번에 걸쳐 0037까지 적용 성공을 실측했다.
+
+| migration | 판정 | 근거(실측 포함) |
+|---|---|---|
+| `0035_credential_registry` | 이상 없음 + 관찰 1 | 두 테이블 모두 RLS **FORCE**·kernel SELECT만·`versions`는 immutable trigger. **관찰**: `credential_grants`에는 trigger가 없다(실측 0개) — `revoked_at`/`enabled` 갱신(폐기)이 owner 경로로 가능해야 하므로 **의도로 읽힌다**. device/inode·`content_sha256` 고정은 파일 교체를 새 version으로 강제하는 설계 |
+| `0036_recovery_target_outcome` | 이상 없음, **실측 검증** | `failed` + `met_targets=true` INSERT → **CheckViolation 거부**, `passed` + met → 수락. `NOT VALID`로 과거 행 보존 — "없음≠같음" 원칙과 일치. 내 drill 경로와 호환: 실패 시 measurement를 기록하지 않으므로 met_targets가 참이 될 수 없다 |
+| `0037_storage_sample_commit` | 이상 없음 | **내 CL-07 공백("원격 node 폴더는 그 기계에서")의 커널 측 해답이다.** 내구 challenge(nonce UNIQUE) + 단일 consumption이 `inv.evidence`와 `public.storage_checks` **양쪽에 UNIQUE FK**로 원자 결속. `sample_limit 1..32`는 내 `storage_check.py`의 상한과 일치. `storage_lock_sentinel`은 문서화된 CHECK-고정 sentinel 패턴. `storage_checks`의 writer가 둘이 된다(내 운영자-로컬 도구 + 커널-원격 경로) — 충돌 없음, 상보적 |
 
 **범위 한정(중요)** — 위 B-3/4/5의 "해소 확인"은 **`agent/codex/workspace-bridge`에서의 확인**이다. **integration은 아직 아니다**: 이 branch의 `src/saintvision/server.py`는 여전히 fixture 서버이고 **2677줄로 더 자랐다**(70 route). 따라서 두 가지가 따라온다.
 
