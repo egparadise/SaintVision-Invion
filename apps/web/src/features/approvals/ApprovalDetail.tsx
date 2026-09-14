@@ -21,7 +21,6 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
     return Math.max(0, diff);
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
 
   // Countdown timer effect
@@ -46,6 +45,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
 
   const canApprove =
     !isExpired &&
+    Boolean(approval.actionDigest) &&
     !isSubmitting &&
     (!diffRequired || hasDiff) &&
     !isSelfApprovalBlocked &&
@@ -68,10 +68,10 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   };
 
   const handleConfirmReject = async () => {
-    if (!rejectReason.trim()) return;
+    if (isExpired || isSubmitting || !approval.actionDigest || approval.status !== 'pending') return;
     setIsSubmitting(true);
     try {
-      await onReject(approval.id, rejectReason);
+      await onReject(approval.id, '');
       setShowRejectModal(false);
     } finally {
       setIsSubmitting(false);
@@ -320,28 +320,11 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
             }}
           >
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '12px' }}>
-              승인 반려 사유 입력
+              승인 요청 반려 확인
             </h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-              반려 사유는 불변 감사 로그(Evidence)에 영구 기록됩니다.
+              이 승인 요청을 반려하시겠습니까? 서버에서 처리 결과를 확인합니다.
             </p>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="구체적인 반려 사유를 입력하세요 (예: 불필요한 엔드포인트 변경 감지)"
-              rows={4}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-strong)',
-                backgroundColor: 'var(--color-bg-canvas)',
-                color: 'var(--color-text-primary)',
-                marginBottom: '16px',
-                fontSize: '0.875rem',
-                fontFamily: 'inherit',
-              }}
-            />
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <Button variant="ghost" size="sm" onClick={() => setShowRejectModal(false)}>
                 취소
@@ -349,7 +332,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               <Button
                 variant="danger"
                 size="sm"
-                disabled={!rejectReason.trim() || isSubmitting}
+                disabled={isExpired || isSubmitting || !approval.actionDigest || approval.status !== 'pending'}
                 isLoading={isSubmitting}
                 onClick={handleConfirmReject}
               >

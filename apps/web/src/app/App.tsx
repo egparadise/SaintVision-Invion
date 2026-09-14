@@ -23,6 +23,7 @@ import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
+import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
 // Default Cluster Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -344,6 +345,7 @@ export const App: React.FC = () => {
         setApprovals(
           res.items.map((item: any) => ({
             id: item.approvalId || item.id,
+            actionDigest: item.actionDigest,
             projectId: item.projectId || 'prj_01JABCDE',
             runId: item.runId,
             workspaceId: item.workspaceId || 'wsp_01JABCDE001',
@@ -403,17 +405,11 @@ export const App: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const handleApprove = async (approvalId: string, nonce: string) => {
+  const handleApprove = async (approvalId: string, _nonce: string) => {
     try {
-      const apprv = approvals.find((a) => a.id === approvalId);
-      const prjId = apprv?.projectId || 'prj_01JABCDE';
-      const idempotencyKey = `idmp_apprv_${approvalId}_${nonce}`;
-      // Canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
-      await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
-        method: 'POST',
-        body: JSON.stringify({ decision: 'approve', nonce }),
-        idempotencyKey,
-      });
+      const approval = approvals.find((a) => a.id === approvalId);
+      if (!approval) throw new Error('승인 요청을 새로고침하세요.');
+      await decideApproval(approval, 'approve');
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -424,17 +420,11 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleReject = async (approvalId: string, reason: string) => {
+  const handleReject = async (approvalId: string, _reason: string) => {
     try {
-      const apprv = approvals.find((a) => a.id === approvalId);
-      const prjId = apprv?.projectId || 'prj_01JABCDE';
-      const idempotencyKey = `idmp_reject_${approvalId}_${Date.now()}`;
-      // Canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
-      await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
-        method: 'POST',
-        body: JSON.stringify({ decision: 'reject', reason }),
-        idempotencyKey,
-      });
+      const approval = approvals.find((a) => a.id === approvalId);
+      if (!approval) throw new Error('승인 요청을 새로고침하세요.');
+      await decideApproval(approval, 'reject');
       // Fetch fresh runs and approvals after server confirmed rejection
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -445,27 +435,15 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleCancelRun = async (runId: string, reason: string) => {
+  const handleCancelRun = async (runId: string, _reason: string) => {
     try {
       const targetRun = runs.find((r) => r.id === runId);
-      const prjId = targetRun?.projectId || 'prj_01JABCDE';
-      const idempotencyKey = `idmp_cancel_${runId}`;
-      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
-      await apiClient(`/v1/projects/${prjId}/runs/${runId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-        idempotencyKey,
-      });
-      fetchRuns();
+      await cancelKernelRun(targetRun?.projectId, runId);
+      await fetchRuns();
     } catch (err) {
       console.warn('Backend run cancellation API error:', err);
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === runId
-            ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+      alert('취소를 확인하지 못했습니다. 실행 상태를 새로고침한 뒤 확인하세요.');
+      throw err;
     }
   };
 

@@ -142,6 +142,7 @@ export interface ExecutionResultItem {
 
 export interface ApprovalItem {
   id: string; // apr_...
+  actionDigest?: string;
   projectId?: string;
   runId: string;
   workspaceId: string;
@@ -665,4 +666,3 @@ export interface ShardObservation {
   items?: ShardExecutionItem[];
   total?: number;
 }
-
