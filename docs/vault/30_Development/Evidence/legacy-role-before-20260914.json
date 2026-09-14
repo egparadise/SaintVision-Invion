@@ -1,0 +1,16 @@
+{
+  "observedKst": "2026-09-14T17:51:08+09:00",
+  "scope": "read-only-live-permission-group-recheck",
+  "groups": [
+    {
+      "name": "inv_app",
+      "login": true,
+      "passwordPresent": true
+    },
+    {
+      "name": "inv_kernel",
+      "login": false,
+      "passwordPresent": false
+    }
+  ]
+}
