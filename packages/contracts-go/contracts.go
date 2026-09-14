@@ -1009,3 +1009,10 @@ type ShardObservation struct {
     ResultManifestSha256 *string `json:"resultManifestSha256"`
     Shards []ShardObservedMember `json:"shards"`
 }
+
+type ApprovalReviewView struct {
+    Approval ApprovalView `json:"approval"`
+    Workload WorkloadSpec `json:"workload"`
+    RiskLevel string `json:"riskLevel"`
+    PolicyDigest ActionDigest `json:"policyDigest"`
+}

@@ -248,8 +248,44 @@ class ApprovalStore:
                     expires,
                 ),
             ).fetchone()
+            conn.execute(
+                "INSERT INTO inv.approval_review_snapshots(tenant_id,approval_id,workload,policy,policy_sha256) VALUES(%s,%s,%s,%s,%s)",
+                (principal.tenant_id, row["approval_id"], Jsonb(workload), Jsonb(policy), digest(policy)),
+            )
             self._audit(conn, principal, row, "requested")
             return self._save(conn, project_id, "approval.request", key, view(row))
+
+    def _review_snapshot(self, conn, row):
+        snapshot = conn.execute(
+            "SELECT * FROM inv.approval_review_snapshots WHERE approval_id=%s",
+            (row["approval_id"],),
+        ).fetchone()
+        if not snapshot:
+            raise DomainError("AUTH-0031", "Approval review snapshot unavailable", 409)
+        workload, policy = snapshot["workload"], snapshot["policy"]
+        validate_contract("WorkloadSpec", workload)
+        validate_contract("PolicyDecision", policy)
+        expected = {"tenantId": str(row["tenant_id"]), "projectId": row["project_id"],
+                    "subjectId": row["requester_id"], "actionDigest": row["action_digest"],
+                    "decisionId": row["policy_decision_id"], "requiredApprovals": row["required_approvals"]}
+        if (action_digest(workload) != row["action_digest"] or digest(policy) != snapshot["policy_sha256"]
+            or workload["tenantId"] != str(row["tenant_id"]) or workload["projectId"] != row["project_id"]
+            or any(policy.get(k) != v for k, v in expected.items())
+            or policy["effect"] != "require_approval" or policy["riskLevel"] == "L3" or policy["approvedBy"]
+            or datetime.fromisoformat(policy["expiresAt"].replace("Z", "+00:00")) != row["expires_at"]):
+            raise DomainError("AUTH-0032", "Approval review snapshot binding differs")
+        return {"approval": view(row), "workload": workload, "riskLevel": policy["riskLevel"],
+                "policyDigest": snapshot["policy_sha256"]}
+
+    def review(self, principal, project_id, approval_id):
+        validate_contract("ApprovalId", approval_id)
+        with self.db.transaction(principal.tenant_id) as conn:
+            run, row = self._locked(conn, approval_id, project_id)
+            self._grant(conn, project_id, principal.subject_id, "can_approve")
+            self._current(conn, run, row, {"pending", "approved"})
+            result = self._review_snapshot(conn, row)
+            validate_contract("ApprovalReviewView", result)
+            return result
 
     def challenge(self, principal, project_id, approval_id):
         with self.db.transaction(principal.tenant_id) as conn:
@@ -304,6 +340,8 @@ class ApprovalStore:
             if prior is not None:
                 return prior
             self._current(conn, run, row, {"pending"})
+            if decision == "approve":
+                self._review_snapshot(conn, row)
             if principal.subject_id == row["requester_id"] or action_digest != row["action_digest"]:
                 raise DomainError("AUTH-0033", "Approval actor or action digest is invalid", 403)
             if conn.execute(
@@ -395,6 +433,7 @@ class ApprovalStore:
             if prior is not None:
                 return prior
             self._current(conn, run, row, {"approved"})
+            self._review_snapshot(conn, row)
             if len(voters) < row["required_approvals"] or any(
                 v["actor_id"] == principal.subject_id for v in voters
             ):

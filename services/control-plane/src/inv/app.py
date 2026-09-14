@@ -436,6 +436,12 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
         return control.list_approvals(identity.principal, project, after=after,
                                       limit=limit, run_id=runId)
 
+    @api.get("/v1/projects/{project}/approvals/{approval_id}/review")
+    def approval_review(project: str, approval_id: str, identity=Depends(authenticated)):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(control.approvals.review(identity.principal, project, approval_id),
+                            headers={"Cache-Control": "no-store"})
+
     @api.get("/v1/projects/{project}/approvals/{approval_id}")
     def approval(project: str, approval_id: str, identity=Depends(authenticated)):
         return control.get_approval(identity.principal, project, approval_id)

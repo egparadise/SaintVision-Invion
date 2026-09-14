@@ -1377,6 +1377,12 @@ class ShardObservation(BaseModel):
     shards: list[ShardObservedMember] = Field(..., max_length=16)
 
 
+class RiskLevel1(StrEnum):
+    L0 = 'L0'
+    L1 = 'L1'
+    L2 = 'L2'
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1583,6 +1589,16 @@ class WorkspaceStartView(BaseModel):
     approval: ApprovalView | None
     frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
     startId: UUID
+
+
+class ApprovalReviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approval: ApprovalView
+    workload: WorkloadSpec
+    riskLevel: RiskLevel1
+    policyDigest: ActionDigest
 
 
 class INVCore(

@@ -4783,6 +4783,35 @@
         "shards"
       ],
       "additionalProperties": false
+    },
+    "ApprovalReviewView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "$ref": "#/$defs/ApprovalView"
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": [
+            "L0",
+            "L1",
+            "L2"
+          ]
+        },
+        "policyDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        }
+      },
+      "required": [
+        "approval",
+        "workload",
+        "riskLevel",
+        "policyDigest"
+      ]
     }
   },
   "oneOf": [
