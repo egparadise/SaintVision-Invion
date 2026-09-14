@@ -37,3 +37,9 @@ CX-01/CX-02 Codex owner/Claude reviewer pending. 제품4f518ea93bbea9766b99fbcf7
 다음: Codex는 원격재연결 후 서명·profile·7개시험 준비를 이어가고, Gemini는 위정본 API 계약으로 화면연결/fixture없는브라우저검증, Claude는 신규조회권한·계약 독립검토와 운영OIDC 설정 준비. 공통 전체 **2775/4800=57.81% 완료/42.19% 잔여** 유지. 이 카드의 로컬구현을 전체개발/운영인수 완료로 선언하지 않는다.
 
 최종 문서376개/48작업·ontology·diff검사 exit0. Go1.27.1 `go test ./internal/wire` exit0/no test files: 생성wire 패키지 컴파일 확인이며 시험수에 합산하지 않음. 44939b9 CI6건도 계정결제 제한으로job미시작/failure, Evidence project-observation-44939b9-ci.json.
+
+## 2026-09-14 PROJECT-OBSERVATION 수신 조율
+
+외부 진행판/Gemini 작업판2개 원바이트를 Evidence/obsidian-proposals-20260914-project-observation에 보존했다. Gemini는 ResultView 타입 및 resume/decision/terminal 경로 정렬,181/115/67 checks를 보고했다. 작성자 보고이며 원격인수 증거로 합산하지 않는다. Claude route checker fef3292 오탐수정 보고를 받았다. 작성된17:45 시각은 Codex 확인 시각을 대신하지 않는다.
+
+Codex는 [[승인 샤드 화면 정본 API 계약]]에 기존 부재4개 결정을 완료했다. 승인목록·샤드조회는4f518ea 실제API,전체취소는 기존부모Run cancel,수동reclaim은receipt자동회수상태로 수렴한다. Gemini는 이새계약까지 연결 후 실제configured factory 기준으로 검증해야 한다. 전체57.81% 유지.

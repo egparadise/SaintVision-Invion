@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.16"
+version: "1.0.17"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T13:48:30+09:00"
+updated: "2026-09-14T17:38:42+09:00"
 source_of_truth: "Git"
 ---
 
@@ -227,3 +227,9 @@ Gemini는181 smoke/115 Vitest/67 two-PC checks와 embedded stopReceipt 폴백을
 **다음 Codex 통합 카드**: configured factory 기준 승인목록·reclaim·shard 조회/전체취소4개 미제공 경로의 계약 결정. 승인목록은 기존 project/run 승인 모델과 연결할 읽기 경로 검토, reclaim은 receipt 자동회수 의미를 유지하고 성공을 꾸미는 수동 endpoint를 만들지 않기, shard는 durable 부모Run/자식 binding/result 정본을 근거로 조회·취소의 tenant/권한/동시성 경계를 검토한다. Gemini는 fixture가 아닌 정본 factory에서 응답 스키마 대조, Claude는 검토 및 운영OIDC 설정 준비. 본 문단은 이4개 API 구현 완료를 뜻하지 않는다.
 
 Migration guard 정본은 온라인 진입점의 migration_guard.py이다. “없는 역할도 생성 거부”라는 외부 표현은 정정한다: 없는 그룹은 허용하고, 위험플래그가 있는 기존 그룹을 거부한다(실제13개 시험). helper와 통합할 때 published migration을 수정하거나 guard를 제거해 약한 운영그룹을 통과시키지 않는다.
+
+## 2026-09-14 PROJECT-OBSERVATION 수신 조율
+
+외부 진행판/Gemini 작업판2개 원바이트를 Evidence/obsidian-proposals-20260914-project-observation에 보존했다. Gemini는 ResultView 타입 및 resume/decision/terminal 경로 정렬,181/115/67 checks를 보고했다. 작성자 보고이며 원격인수 증거로 합산하지 않는다. Claude route checker fef3292 오탐수정 보고를 받았다. 작성된17:45 시각은 Codex 확인 시각을 대신하지 않는다.
+
+Codex는 [[승인 샤드 화면 정본 API 계약]]에 기존 부재4개 결정을 완료했다. 승인목록·샤드조회는4f518ea 실제API,전체취소는 기존부모Run cancel,수동reclaim은receipt자동회수상태로 수렴한다. Gemini는 이새계약까지 연결 후 실제configured factory 기준으로 검증해야 한다. 전체57.81% 유지.
