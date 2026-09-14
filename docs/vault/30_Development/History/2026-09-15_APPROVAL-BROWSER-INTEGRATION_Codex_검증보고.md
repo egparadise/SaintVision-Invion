@@ -27,3 +27,5 @@ source_of_truth: "Git"
 동일SHA CI4건은00:21:00KST 결제/한도 제한으로 job 시작 전 실패. [CI증거](../Evidence/approval-browser-ci-e0b4b4f.json). 문서406개/48task·ontology 검사exit0.
 
 최초sync 외부3개편집감지exit1/쓰기0. raw제안보존및수신검토후재동기화. [[2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_오류해결]] 참조.
+
+전달확인:문서407개/48task·ontology exit0. 5e7670a push후00:22:11KST Obsidian check/apply/check exit0,905관리파일hash일치/pending0/conflict0. [영수증](../Evidence/approval-browser-sync-5e7670a.json). 로컬사본확인이며cloud업로드는미측정.
