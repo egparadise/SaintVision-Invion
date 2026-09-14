@@ -1207,7 +1207,8 @@ def get_run_shards(run_id: str):
 
 
 @app.get("/v1/runs/{run_id}/evidence")
-def get_run_evidence(run_id: str, request: Request):
+@app.get("/v1/projects/{project}/runs/{run_id}/evidence")
+def get_run_evidence(run_id: str, request: Request, project: Optional[str] = None):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
     if run_id in EVIDENCES:
         return EVIDENCES[run_id]
