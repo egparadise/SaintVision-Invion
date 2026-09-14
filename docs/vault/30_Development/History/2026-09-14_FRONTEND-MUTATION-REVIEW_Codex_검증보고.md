@@ -35,3 +35,5 @@ Frontend 작성 Gemini, 독립 검토 Codex. 검토 대상 integration/all-agent
 Gemini owner: FE-M01~05 수정과 브라우저 성공/422/401/403/네트워크실패·빈목록 회귀 증거를 새 SHA로 제공. Codex reviewer: 새 SHA를 정본 kernel과 재검토. Claude: 재현 시험 자체 검토 및 운영 인증 입력. 새로운 API 추가나 커널의 엄격한 입력검사를 완화할 필요가 없다. 전체성숙도57.81% 유지, CI/운영인수 별도.
 
 동일SHA CI6건은20:50:47 KST billing 제한으로job시작전실패. [CI 증거](../Evidence/frontend-mutation-ci-b95ab27.json). 실제진행하지않은CI/브라우저를통과로표시하지않는다.
+
+최초 sync는 공통/Gemini 진행판 외부편집2개로exit1/쓰기0이었다. [원문 보존](../Evidence/obsidian-proposals-20260914-frontend-review/manifest.json) 후 경로정렬 보고와 이번payload검토를 구분해 정본에 합쳤다.

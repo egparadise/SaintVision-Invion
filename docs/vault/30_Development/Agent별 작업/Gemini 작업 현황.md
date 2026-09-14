@@ -240,3 +240,7 @@ Codex는 [[승인 샤드 화면 정본 API 계약]]에 기존 부재4개 결정�
 ## 2026-09-14 20:00 외부 진행 기록 수신
 
 Gemini가 프로젝트 범위 ApprovalPage/ShardObservation 연결, 정적 미서빙 경로0건, smoke181/2-PC67 통과를 보고했다. Claude의 부재 route 재분류와 자동 회수 버튼 제거 제안도 수신했다. 이는 작성자 보고이며 Codex가 새 frontend SHA/실제 configured route/브라우저를 독립 검증한 결과가 아니다. 원격 물리 PC 인수나 CI 성공으로 바꾸지 않는다. 다음 CX-01에서 실제 frontend 변경 SHA와 정본 API 정합을 검토한다. 전체 기준선57.81% 유지. 외부 원문2개는 [제안 보존 manifest](../Evidence/obsidian-proposals-20260914-cli-output/manifest.json)로 보존했다.
+
+## 2026-09-14 20:15 외부 보고 수신과 독립 대조
+
+Gemini의 5곳 project scope 정렬·미서빙0건 보고와 Claude의 fixture 포함 측정 한계 보고를 추가 수신했다. 원문은 Evidence/obsidian-proposals-20260914-frontend-review에 SHA와 함께 보존했다. 이번 검토70ea3fb는 해당 경로정렬 이후 코드이며, FE-M01~05 payload/실패처리 finding은 그대로 남는다. 수신 보고를 독립 승인이나 운영 완료로 승격하지 않는다.
