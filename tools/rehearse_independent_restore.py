@@ -22,7 +22,8 @@ from psycopg import sql
 from psycopg.conninfo import make_conninfo
 from sqlalchemy.engine import URL
 
-from rehearse_lan_upgrade import read_snapshot, digest_db, assert_preserved
+from rehearse_lan_upgrade import read_snapshot, read_backup_file, digest_db, assert_preserved
+from saintvision.storage.readroot import ReadRoot
 from recovery_drill import Postgres, _definer_verdict
 from migration_graph import chain
 
@@ -47,10 +48,11 @@ def pinned_snapshot(directory, expected_hash):
         info = (directory / filename).lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or getattr(info, 'st_file_attributes', 0) & 0x400 or info.st_size > limit:
             raise ValueError('Bounded regular single-link backup required')
-    manifest = json.loads((directory / 'manifest.json').read_text('utf-8'))
+    root = ReadRoot(directory)
+    manifest = json.loads(read_backup_file(root, 'manifest.json'))
     if manifest['archiveSha256'] != expected_hash:
         raise ValueError('Saved manifest differs from pinned archive')
-    return read_snapshot(directory, manifest), manifest
+    return read_snapshot(directory, manifest, root=root), manifest
 
 
 def docker(*args, env=None, check=True):
@@ -82,6 +84,7 @@ def rehearse(directory, expected_hash, image):
         'check_definer_functions.py', 'definer-policy.json')],
         *sorted((ROOT / 'migrations').rglob('*.py')),
         ROOT / 'src/saintvision/db/migration_guard.py',
+        ROOT / 'src/saintvision/storage/readroot.py',
         ROOT / 'services/control-plane/src/inv/db.py']
     report['sourceHashes'] = {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                               for path in inputs}
@@ -161,8 +164,8 @@ def rehearse(directory, expected_hash, image):
             if conn.execute('SELECT count(*) FROM inv.nodes').fetchone()[0] != 0:
                 raise ValueError('Restored tenant isolation failed')
         # Read back the retained files after the entire drill, without rewriting.
-        verified_archive, _ = pinned_snapshot(directory, expected_hash)
-        if verified_archive != archive:
+        verified_archive, verified_manifest = pinned_snapshot(directory, expected_hash)
+        if verified_archive != archive or verified_manifest != manifest:
             raise ValueError('Source backup changed during rehearsal')
         report.update(status='passed', finalHeads=heads, oldColumnRowsPreserved=True, replayExactRows=True,
                       permissionGroupsSafe=True, definer=verdict, runtimeTransactionPassed=True,

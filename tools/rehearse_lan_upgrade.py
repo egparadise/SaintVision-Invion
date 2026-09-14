@@ -23,6 +23,7 @@ from sqlalchemy.engine import URL
 from lan_pilot import load, runtime, private_directory
 from migration_graph import chain
 from plan_lan_migration import gap_plan
+from saintvision.storage.readroot import ReadRoot
 from recovery_drill import Postgres, _definer_verdict
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,15 +57,34 @@ def retain_snapshot(directory, archive, manifest):
     return read_snapshot(directory, expected)
 
 
-def read_snapshot(directory, expected):
+SNAPSHOT_LIMITS = {"snapshot.dump": 256 * 1024 * 1024, "manifest.json": 8 * 1024 * 1024}
+
+
+def read_backup_file(root, name):
+    """Bound the opened file and verify bytes twice under the existing root guard."""
+    limit = SNAPSHOT_LIMITS[name]
+    try:
+        with root.open(root.path / name) as (stream, size):
+            if size > limit:
+                raise ValueError("Backup file exceeds size limit")
+            raw = stream.read(limit + 1)
+            if len(raw) != size or len(raw) > limit:
+                raise ValueError("Backup file changed size")
+            stream.seek(0)
+            if stream.read(limit + 1) != raw:
+                raise ValueError("Backup bytes changed during read")
+        return raw
+    except OSError:
+        raise ValueError("Backup file cannot be read through its pinned root") from None
+
+
+def read_snapshot(directory, expected, *, root=None):
     """Use only regular single-link files whose bytes match the captured manifest."""
-    result = {}
-    for name in ("snapshot.dump", "manifest.json"):
-        path = directory / name
-        info = path.lstat()
-        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or getattr(info, "st_file_attributes", 0) & 0x400:
-            raise ValueError("Backup file is not a regular private file")
-        result[name] = path.read_bytes()
+    try:
+        root = root or ReadRoot(Path(os.path.abspath(directory)))
+        result = {name: read_backup_file(root, name) for name in SNAPSHOT_LIMITS}
+    except OSError:
+        raise ValueError("Backup root cannot be verified") from None
     if json.loads(result["manifest.json"]) != expected:
         raise ValueError("Saved snapshot manifest differs")
     archive = result["snapshot.dump"]

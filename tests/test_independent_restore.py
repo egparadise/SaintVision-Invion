@@ -62,3 +62,50 @@ def test_existing_report_is_preserved_before_any_restore(backup, monkeypatch):
     with pytest.raises(SystemExit) as error:
         main()
     assert error.value.code == 2 and report.read_text() == 'existing-evidence'
+
+
+def test_alias_created_after_initial_stat_is_rejected(backup, monkeypatch):
+    from contextlib import contextmanager
+    import rehearse_independent_restore as subject
+    directory, _, pin = backup
+    original = subject.ReadRoot.open
+
+    @contextmanager
+    def raced_open(root, path):
+        if path.name == 'snapshot.dump':
+            os.link(path, directory / 'late-alias.dump')
+        with original(root, path) as opened:
+            yield opened
+
+    monkeypatch.setattr(subject.ReadRoot, 'open', raced_open)
+    with pytest.raises(ValueError, match='pinned root'):
+        pinned_snapshot(directory, pin)
+
+
+def test_opened_file_limit_is_enforced(backup, monkeypatch):
+    import rehearse_lan_upgrade as shared
+    directory, archive, pin = backup
+    monkeypatch.setitem(shared.SNAPSHOT_LIMITS, 'snapshot.dump', len(archive) - 1)
+    with pytest.raises(ValueError, match='size limit'):
+        pinned_snapshot(directory, pin)
+
+
+def test_same_size_changed_reread_is_rejected(backup, monkeypatch):
+    from contextlib import contextmanager
+    import io
+    import rehearse_lan_upgrade as shared
+    directory, archive, _ = backup
+
+    class ChangingStream(io.BytesIO):
+        def seek(self, offset, whence=0):
+            self.getbuffer()[0] ^= 1
+            return super().seek(offset, whence)
+
+    @contextmanager
+    def changed_bytes(root, path):
+        yield ChangingStream(archive), len(archive)
+
+    root = shared.ReadRoot(directory)
+    monkeypatch.setattr(shared.ReadRoot, 'open', changed_bytes)
+    with pytest.raises(ValueError, match='bytes changed'):
+        shared.read_backup_file(root, 'snapshot.dump')
