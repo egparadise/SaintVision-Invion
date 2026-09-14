@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.40"
+version: "1.0.41"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -114,7 +114,7 @@ B-2~B-9와 FE-M 검토가 흩어져 있어, Codex가 CX-01을 실행할 때 볼 
 
 5. **route_coverage.py 파일 충돌**: 내 lane 판과 Codex 판(내 것 + `--configured-surface`) 동명 — **Codex 판 정본**, 내 lane 판 미push.
 
-6. **credential 교체** (B-9): guard·탐지·리허설 절차 완결. live `inv_app`은 이미 NOLOGIN(운영자 실행됨). `init-db.sql` LOGIN 생성 제거는 배포 결정과 함께. **정정(2026-09-14, Claude, `29712a2`)**: 위 '가드 미착지' 판단은 **틀렸다**. B-9 가드는 이미 있었다 — cafd127의 `tests/test_database_login_isolation.py`가 더 철저히(role 멤버십·tenant 가시성·`init-db.sql` 부트스트랩 검사) 같은 불변식을 지킨다. 나는 파일명(`test_role_fixture_preservation.py`)만 찾아 놓쳤고, 내가 8063999로 착지시킨 그 파일은 부분집합이라 **되돌렸다(삭제)**. 대신 전체 postgres 스위트를 로컬 throwaway `postgres:16`로 돌려보다 **진짜 버그 둘**을 찾아 고쳤다: (a) conftest가 둘이라 `from conftest import application_test_engine`가 prepend 모드에서 integration conftest로 해석돼 **전체 수집이 cafd127부터 이미 불가**(CI 결제 막힘으로 미포착) → 헬퍼를 `tests/db_login.py`로 분리, 수집 `2 errors 중단`→`721 collected, 0 errors`; (b) 그 가드가 `tenants==0`을 `clean_tables` 없이 가정해 순서 취약(선행 `two_tenants` seed 2행 잔존 시 `assert 2==0` 실패) → `clean_tables` 의존 추가. **검증(clean throwaway, 실 클러스터 아님)**: 수정 전 204 passed/2 failed → 수정 후 **206 passed / 0 failed / 136 skipped**(skip은 `INV_TEST_ADMIN_DSN` 필요분, not_run으로 정직 보고), exit 0. 실패했던 정확한 순서(test_api→isolation)도 29 passed로 재확인.
+6. **credential 교체** (B-9): guard·탐지·리허설 절차 완결. live `inv_app`은 이미 NOLOGIN(운영자 실행됨). `init-db.sql` LOGIN 생성 제거는 배포 결정과 함께. **정정(2026-09-14, Claude, `29712a2`)**: 위 '가드 미착지' 판단은 **틀렸다**. B-9 가드는 이미 있었다 — cafd127의 `tests/test_database_login_isolation.py`가 더 철저히(role 멤버십·tenant 가시성·`init-db.sql` 부트스트랩 검사) 같은 불변식을 지킨다. 나는 파일명(`test_role_fixture_preservation.py`)만 찾아 놓쳤고, 내가 8063999로 착지시킨 그 파일은 부분집합이라 **되돌렸다(삭제)**. 대신 전체 postgres 스위트를 로컬 throwaway `postgres:16`로 돌려보다 **진짜 버그 둘**을 찾아 고쳤다: (a) conftest가 둘이라 `from conftest import application_test_engine`가 prepend 모드에서 integration conftest로 해석돼 **전체 수집이 cafd127부터 이미 불가**(CI 결제 막힘으로 미포착) → 헬퍼를 `tests/db_login.py`로 분리, 수집 `2 errors 중단`→`721 collected, 0 errors`; (b) 그 가드가 `tenants==0`을 `clean_tables` 없이 가정해 순서 취약(선행 `two_tenants` seed 2행 잔존 시 `assert 2==0` 실패) → `clean_tables` 의존 추가. **검증(clean throwaway, 실 클러스터 아님)**: 수정 전 204 passed/2 failed → 수정 후 **206 passed / 0 failed / 136 skipped**(skip은 `INV_TEST_ADMIN_DSN` 필요분, not_run으로 정직 보고), exit 0. 실패했던 정확한 순서(test_api→isolation)도 29 passed로 재확인. **커밋 정정(2026-09-15, `49391f1`)**: 위에서 `29712a2`로 적었으나 그 커밋은 **파일 삭제만** 담았다 — `git add`에 이미 삭제된 경로를 함께 넘겨 pathspec 에러가 났고, git add는 원자적이라 나머지를 스테이징하지 못했다. 그래서 integration HEAD는 `db_login.py` 없이 옛 `from conftest import`인 채 **여전히 수집 불가**였다(내 검증은 워킹트리 기준이라 유효했지만 미커밋). 실제 수정은 `49391f1`에 착지, 그 HEAD에서 수집 `721 collected, 0 errors` 재확인·push. **전체 스위트 정합(같은 워킹트리 내용)**: 비-postgres 378 passed/1 skipped + postgres 206 passed/136 skipped = **584 passed / 137 skipped / 0 failed = 721 collected**(skip은 `INV_TEST_ADMIN_DSN` 136·Windows symlink 1). 로컬 clean-room 검증이지 CI-equivalent 아님.
 
 7. **FE-M01~05**: Codex 시험 검토·인정. Gemini 수정 진행 중(FE-M04 확인, auth 실 IdP 정당). 브라우저 회귀 증거는 Gemini 새 SHA.
 
