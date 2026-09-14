@@ -129,7 +129,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
           }}
         >
           <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, marginBottom: '16px' }}>활성 자원 Lease & 스케줄링 용량</h3>
-          
+
           {/* 4-Tier Resource Capacity Breakdown */}
           <div
             style={{
