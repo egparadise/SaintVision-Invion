@@ -238,6 +238,15 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
             "workspaceAdmission": "configured" if workspace else "not_configured",
         }
 
+    @api.get("/v1/session")
+    def session(identity=Depends(authenticated)):
+        # Resource-server identity, not browser-decoded claims or IdP roles.
+        value = {"subjectId": identity.principal.subject_id,
+                 "tenantId": identity.principal.tenant_id,
+                 "expiresAt": identity.expires_at}
+        validate_contract("SessionView", value)
+        return value
+
     @api.get("/v1/projects")
     def projects(identity=Depends(authenticated)):
         return control.projects(identity.principal)

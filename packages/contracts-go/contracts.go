@@ -1016,3 +1016,9 @@ type ApprovalReviewView struct {
     RiskLevel string `json:"riskLevel"`
     PolicyDigest ActionDigest `json:"policyDigest"`
 }
+
+type SessionView struct {
+    SubjectId string `json:"subjectId"`
+    TenantId string `json:"tenantId"`
+    ExpiresAt int64 `json:"expiresAt"`
+}

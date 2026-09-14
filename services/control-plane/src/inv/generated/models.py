@@ -1383,6 +1383,15 @@ class RiskLevel1(StrEnum):
     L2 = 'L2'
 
 
+class SessionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    subjectId: constr(pattern=r'^oidc:[0-9a-f]{64}$')
+    tenantId: UUID
+    expiresAt: conint(ge=1)
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

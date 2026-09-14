@@ -17,7 +17,7 @@ pytestmark = [pytest.mark.postgres, pytest.mark.skipif(os.getenv('INV_BROWSER_TE
 ROOT = Path(__file__).resolve().parents[2]
 
 @contextmanager
-def browser_page(api_url, port):
+def browser_page(api_url, port, *, entry='/tests/browser/approval.html', config=None):
     import playwright.sync_api as playwright
     child = subprocess.Popen([shutil.which('node'), 'node_modules/vite/bin/vite.js', '--config',
         'tests/browser/vite.config.ts', '--port', str(port)], cwd=ROOT/'apps/web',
@@ -25,7 +25,7 @@ def browser_page(api_url, port):
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
     try:
-        url = f'http://127.0.0.1:{port}/tests/browser/approval.html'
+        url = f'http://127.0.0.1:{port}{entry}'
         for _ in range(100):
             assert child.poll() is None, 'Test Vite server exited'
             try:
@@ -38,8 +38,13 @@ def browser_page(api_url, port):
             if os.name == 'nt': options['channel'] = 'msedge'
             browser = p.chromium.launch(**options)
             try:
-                page = browser.new_page(); page.goto(url)
-                page.wait_for_function('typeof window.mountApprovalTest === "function"')
+                page = browser.new_page(viewport={'width': 1600, 'height': 1000})
+                if config:
+                    import json
+                    page.add_init_script('window.__SAINTVISION_CONFIG__ = ' + json.dumps(config))
+                page.goto(url)
+                if entry == '/tests/browser/approval.html':
+                    page.wait_for_function('typeof window.mountApprovalTest === "function"')
                 yield page
             finally: browser.close()
     finally:

@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { LiveApp as App } from '@/app/LiveApp';
+import { LiveApp } from '@/app/LiveApp';
 import './index.css';
+const StudioApp = React.lazy(() => import('@/app/App').then(module => ({ default: module.App })));
+const isStudio = ['/studio', '/callback'].includes(window.location.pathname);
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -10,7 +12,9 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    <React.Suspense fallback={<p>화면을 불러오는 중입니다.</p>}>
+      {isStudio ? <StudioApp /> : <LiveApp />}
+    </React.Suspense>
   </React.StrictMode>
 );
 

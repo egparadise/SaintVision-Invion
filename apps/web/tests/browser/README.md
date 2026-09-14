@@ -14,3 +14,5 @@ Without explicit opt-in the browser cases skip; a skipped test is not browser va
 No browser artifact is captured except an optional synthetic screenshot in .work. Tokens stay in memory.
 
 From the repository root, python tools/run_approval_browser_test.py creates a dedicated Docker PostgreSQL cluster, enables these tests, and removes only that owned container afterward. Docker postgres:16 must be available.
+
+The same runner now also tests the full /studio login/project/approval/logout entry with a local synthetic OAuth server. See ../../STUDIO_AUTH.md for that separate scope; operational IdP acceptance remains pending.

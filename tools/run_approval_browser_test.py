@@ -17,12 +17,12 @@ try:
             break
         except psycopg.OperationalError: time.sleep(.2)
     else: raise RuntimeError('isolated PostgreSQL unavailable')
-    cmd=[sys.executable,'-m','pytest','-q','tests/integration/test_approval_browser.py','--junitxml=.work/approval-browser-tests.xml']
+    cmd=[sys.executable,'-m','pytest','-q','tests/integration/test_approval_browser.py','tests/integration/test_studio_browser.py','tests/core/test_identity.py','--junitxml=.work/approval-browser-tests.xml']
     result=subprocess.run(cmd,env={**os.environ,'INV_TEST_ADMIN_DSN':dsn,'INV_BROWSER_TEST':'1','INV_TEST_SERVER_IMAGE':'saintvision-backend-candidate:6ff090b','INV_CONTAINER_TEST_DB_HOST':info['NetworkSettings']['IPAddress']},capture_output=True,text=True,timeout=300)
     (root/'.work/approval-browser-private.log').write_text(result.stdout+result.stderr,encoding='utf-8')
     # Pytest failures might contain DSNs: output only summary lines here.
     print('\n'.join(l for l in result.stdout.splitlines() if l.startswith(('FAILED','ERROR','===','..')) or 'passed' in l))
-    proof={'command':'python -m pytest -q tests/integration/test_approval_browser.py','exitCode':result.returncode,'postgres':'isolated tmpfs cluster; localhost ephemeral port','http':'real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution','identity':'synthetic RS256 issuer; no operational SSO claim','browser':'real headless Chromium/Edge; production ApprovalCenter in test-only entry; configured server factory over HTTP'}
+    proof={'command':'python -m pytest -q tests/integration/test_approval_browser.py tests/integration/test_studio_browser.py tests/core/test_identity.py','exitCode':result.returncode,'postgres':'isolated tmpfs cluster; localhost ephemeral port','http':'real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution','identity':'synthetic RS256 issuer; no operational SSO claim','browser':'real headless Chromium/Edge; ApprovalCenter harness plus full /studio entry with synthetic PKCE IdP; configured server factory over HTTP'}
 finally:
     if cid:
         label=subprocess.check_output(['docker','inspect',cid,'--format','{{index .Config.Labels "ai.saintvision.configured"}}'],text=True).strip()

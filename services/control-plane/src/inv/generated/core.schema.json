@@ -4812,6 +4812,29 @@
         "riskLevel",
         "policyDigest"
       ]
+    },
+    "SessionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subjectId": {
+          "type": "string",
+          "pattern": "^oidc:[0-9a-f]{64}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "subjectId",
+        "tenantId",
+        "expiresAt"
+      ]
     }
   },
   "oneOf": [

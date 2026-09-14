@@ -15,16 +15,16 @@ export interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onToggleTheme,
-  onlineNodesCount = 5,
-  totalNodesCount = 5,
+  onlineNodesCount = 0,
+  totalNodesCount = 0,
   activeTab,
   onSelectTab,
   currentUser,
   onLogout,
 }) => {
-  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
-    online: true,
-    rttMs: 8,
+  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean | null; rttMs: number | null }>({
+    online: null,
+    rttMs: null,
   });
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
     const checkGateway = async () => {
       const start = performance.now();
       try {
-        const res = await fetch('/v1/health');
+        const res = await fetch('/readyz');
         const rtt = Math.round(performance.now() - start);
         if (isMounted) {
           if (res.ok) {
@@ -81,7 +81,9 @@ export const Header: React.FC<HeaderProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px',
-        height: '60px',
+        minHeight: '60px',
+        flexWrap: 'wrap',
+        gap: '12px',
         backgroundColor: 'var(--color-bg-surface)',
         borderBottom: '1px solid var(--color-border-subtle)',
         position: 'sticky',
@@ -89,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
         zIndex: 50,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-brand-primary)' }}>
             SaintVision
@@ -107,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
-        <nav style={{ display: 'flex', gap: '8px' }}>
+        <nav aria-label="주 메뉴" style={{ display: 'flex', gap: '8px', minWidth: 0, overflowX: 'auto' }}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -115,6 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
                 key={tab.id}
                 onClick={() => onSelectTab(tab.id)}
                 style={{
+                  whiteSpace: 'nowrap', flexShrink: 0,
                   padding: '8px 12px',
                   fontSize: '0.875rem',
                   fontWeight: isActive ? 600 : 500,
@@ -132,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', whiteSpace: 'nowrap' }}>
         <div
           style={{
             display: 'flex',
@@ -180,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: '#f85149' }}>Offline</strong>}
+            Gateway: {gatewayStatus.online === null ? <strong>확인 중</strong> : gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: '#f85149' }}>Offline</strong>}
           </span>
         </div>
 
@@ -198,7 +201,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
           >
             <span style={{ fontWeight: 600, color: '#58a6ff' }}>
-              👤 {currentUser.name}
+              👤 <span title={currentUser.id}>{currentUser.name.length > 24 ? `${currentUser.name.slice(0, 20)}…` : currentUser.name}</span>
             </span>
             <span
               style={{

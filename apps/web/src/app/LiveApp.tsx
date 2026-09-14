@@ -50,7 +50,7 @@ export const LiveApp: React.FC = () => {
       <nav aria-label="주 메뉴">{[['overview','전체 현황'],['nodes','연결된 Node'],['tests','실행·복구 기록'],['guide','사용 안내']].map(([key,label]) =>
         <button key={key} aria-current={tab===key?'page':undefined} onClick={() => setTab(key)}>{label}</button>)}</nav>
       <button aria-label="화면 테마 변경" onClick={() => setTheme(theme==='dark'?'light':'dark')}>{theme==='dark'?'밝게':'어둡게'}</button>
-      {['localhost','127.0.0.1','192.168.45.99'].includes(window.location.hostname) && <a href="http://127.0.0.1:18100" target="_blank" rel="noreferrer">개발 Studio ↗</a>}
+      <a href="/studio">개발 Studio ↗</a>
     </header>
     <main className="live-main">
       <section className="live-banner">

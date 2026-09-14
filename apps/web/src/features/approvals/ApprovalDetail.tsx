@@ -206,7 +206,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
             }}
           >
             <span>⚠️</span>
-            <span>주의: 자동 롤백 절차가 정의되지 않았습니다. 장애 발생 시 수동 조치가 필요합니다.</span>
+            <span>롤백 계획이 이 응답에 포함되어 있지 않습니다.</span>
           </div>
         )}
 

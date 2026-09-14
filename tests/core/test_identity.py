@@ -175,3 +175,17 @@ def test_duplicate_trace_headers_are_not_joined_or_used_as_authority():
         response.status_code == 503
     )  # Trace cannot configure or authenticate identity.
     assert response.json()["traceId"] != parent.split("-")[1]
+
+
+def test_session_returns_verified_subject_and_tenant_without_untrusted_roles(auth):
+    from types import SimpleNamespace
+    client = TestClient(create_app(SimpleNamespace(), auth.auth))
+    assert client.get('/v1/session').status_code == 401
+    assert client.get('/v1/session', headers={'Authorization': 'Bearer invalid'}).status_code == 401
+    token = auth.token(claims={'tenantId': str(uuid4()), 'roles': ['admin']})
+    result = client.get('/v1/session', headers={'Authorization': 'Bearer ' + token})
+    assert result.status_code == 200 and result.headers['cache-control'] == 'no-store'
+    value = result.json()
+    validate_contract('SessionView', value)
+    assert value['subjectId'] == auth.subject('requester') and value['tenantId'] == auth.tenant
+    assert set(value) == {'subjectId', 'tenantId', 'expiresAt'}
