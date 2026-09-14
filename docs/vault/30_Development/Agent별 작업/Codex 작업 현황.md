@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.47"
+version: "1.0.48"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T23:41:19+09:00"
+updated: "2026-09-15T00:20:53+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+- [[2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_검증보고]]:e0b4b4f 실제Edge+configured factory+격리PG 승인2여정통과,unit214/수정후관련47·build통과. component harness이며전체App/SSO/Node검증아님. 다음Codex운영진입점통합,GeminiUI,Claude독립검토. 전체57.81%유지.
 
 - [[2026-09-14_APPROVAL-REVIEW-UI_Codex_검증보고]]:ab8b645 검토 snapshot화면·표시digest결정결속·미관측거부,210시험/build통과. 서버024a817과단일통합/배포미완료. 다음Codex격리통합/브라우저,Gemini UI,Claude독립검토. 전체57.81%유지.
 
