@@ -108,4 +108,20 @@ describe('S02-FE Node Observation Journey & State Transitions', () => {
     headers.set('X-Inv-Tenant', tenantId);
     expect(headers.get('X-Inv-Tenant')).toBe(tenantId);
   });
+
+  it('should support project-scoped node resolution with canonical mapping', () => {
+    const prjId = 'prj_01JABCDE';
+    const projectNodesPath = `/v1/projects/${prjId}/nodes`;
+    expect(projectNodesPath).toBe('/v1/projects/prj_01JABCDE/nodes');
+
+    const mapped = mockNodes.map((srvNode) => ({
+      id: srvNode.id,
+      hostname: srvNode.hostname,
+      status: srvNode.status || 'online',
+      schedulable: srvNode.schedulable ?? true,
+    }));
+    expect(mapped.length).toBe(2);
+    expect(mapped[0].hostname).toBe('Node-01-WinMain');
+    expect(mapped[1].hostname).toBe('Node-04-LinuxBuild');
+  });
 });

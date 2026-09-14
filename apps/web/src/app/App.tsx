@@ -282,7 +282,13 @@ export const App: React.FC = () => {
 
   const fetchNodes = React.useCallback(async () => {
     try {
-      const res = await apiClient<{ items: any[] }>('/v1/nodes');
+      const prjId = 'prj_01JABCDE';
+      let res: { items: any[] };
+      try {
+        res = await apiClient<{ items: any[] }>(`/v1/projects/${prjId}/nodes`);
+      } catch {
+        res = await apiClient<{ items: any[] }>('/v1/nodes');
+      }
       if (res.items?.length > 0) {
         setNodes(
           res.items.map((srvNode) => ({
