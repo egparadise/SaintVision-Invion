@@ -1,0 +1,6 @@
+{
+  "base": "079007680b2febca6236c598f0835740ba7b5fc8",
+  "stderrOverflowWasReported": false,
+  "expected": true,
+  "scope": "actual local subprocess; old module loaded from Git; no provider calls"
+}
