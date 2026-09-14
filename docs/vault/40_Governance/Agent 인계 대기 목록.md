@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.37"
+version: "1.0.38"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -99,6 +99,26 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 작성: Claude. 위 표는 Codex 발신분이며 이 절만 Claude가 덧붙였다. 실제 수신 확인 전까지 pending이고 외부 메시지는 보내지 않았다.
 
 기준 branch `review/claude-account-results` (c28cdff → f17ad62), 진행판 [[Claude 작업 현황]]·[[전체 개발 진행 현황]].
+
+### CX-01 통합 준비 스냅샷 — 단일 실행 체크리스트 (2026-09-14, Claude)
+
+B-2~B-9와 FE-M 검토가 흩어져 있어, Codex가 CX-01을 실행할 때 볼 **하나의 검증된 baseline**으로 응축한다. 각 항목은 내 도구/소스 실측 근거를 단다. **이 통합은 Codex 몫이다** — 아래는 실행 목록이지 내가 하겠다는 뜻이 아니다.
+
+1. **fixture backend 제거** (B-3/4/5): workspace-bridge에 **이미 완결** — `deploy/Dockerfile.backend`(factory CMD)·`src/saintvision/server.py`(6줄 shim)·`src/saintvision/demo_server.py`(복원)·fixture 시험 2개 삭제. integration은 이 파일들을 가져오면 된다. **인수 증거**: 통합 후 `python tools/deployment_surface.py --dockerfile deploy/Dockerfile.backend` → `factory refused ... exit 0`.
+
+2. **커널 통합** (B-6/7): integration 커널 10 route → workspace-bridge 54 route. **인수 증거**: `python tools/route_coverage.py --served services/control-plane/src/inv --served src/saintvision/api --client apps/web/src` → 미제an이 fixture 없이 낮은 수(현재 SPA 기준 3, 그중 실질 `/v1/workspaces` 1). **신규 커널 route 결정 0** (receipt=payload·auth=IdP흐름·shards/reclaim=frontend, 전부 근거 확립).
+
+3. **SPA 정렬** (Gemini, 거의 완료): 미제an 24→3. 남은 실질 1개 `/v1/workspaces` bare list. `auth/token`은 verification 전용 fallback(운영은 실 IdP), `events`는 nginx 문자열.
+
+4. **role guard 정본화**: Codex `migration_guard.py`와 내 `rls.py`가 독립 수렴 — 통합 시 하나로. Codex 판이 더 엄격(`rolreplication`·생성 거부).
+
+5. **route_coverage.py 파일 충돌**: 내 lane 판과 Codex 판(내 것 + `--configured-surface`) 동명 — **Codex 판 정본**, 내 lane 판 미push.
+
+6. **credential 교체** (B-9): guard·탐지·리허설 절차 완결. live `inv_app`은 이미 NOLOGIN(운영자 실행됨). `init-db.sql` LOGIN 생성 제거는 배포 결정과 함께.
+
+7. **FE-M01~05**: Codex 시험 검토·인정. Gemini 수정 진행 중(FE-M04 확인, auth 실 IdP 정당). 브라우저 회귀 증거는 Gemini 새 SHA.
+
+**band 상승의 잔여 관문(코드 아님)**: CI 결제(사용자)·실 운영 인수(운영자)·위 통합 실행(Codex). 이 셋 외에 개발/검증에서 내가 닫지 않은 것은 없다.
 
 ### 읽는 순서 — 이 절의 지도
 
