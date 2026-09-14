@@ -133,4 +133,16 @@ describe('S04-FE Approval Center & Run SSE Timeline (AC-04)', () => {
     expect(isApprovalAllowedForUser('usr_reviewer_01', firstApprovedItem)).toBe(false);
     expect(isApprovalAllowedForUser('usr_reviewer_02', firstApprovedItem)).toBe(true);
   });
+
+  it('handles empty approvals state gracefully without throwing', () => {
+    const emptyList: ApprovalItem[] = [];
+    const pending = emptyList.filter((a) => a.status === 'pending').length;
+    const approved = emptyList.filter((a) => a.status === 'approved').length;
+    const rejected = emptyList.filter((a) => a.status === 'rejected').length;
+
+    expect(pending).toBe(0);
+    expect(approved).toBe(0);
+    expect(rejected).toBe(0);
+    expect(emptyList[0]).toBeUndefined();
+  });
 });

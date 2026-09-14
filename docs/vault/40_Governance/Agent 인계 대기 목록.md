@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.43"
+version: "1.0.44"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -106,9 +106,9 @@ B-2~B-9와 FE-M 검토가 흩어져 있어, Codex가 CX-01을 실행할 때 볼 
 
 1. **fixture backend 제거** (B-3/4/5): workspace-bridge에 **이미 완결** — `deploy/Dockerfile.backend`(factory CMD)·`src/saintvision/server.py`(6줄 shim)·`src/saintvision/demo_server.py`(복원)·fixture 시험 2개 삭제. integration은 이 파일들을 가져오면 된다. **인수 증거**: 통합 후 `python tools/deployment_surface.py --dockerfile deploy/Dockerfile.backend` → `factory refused ... exit 0`.
 
-2. **커널 통합** (B-6/7): integration 커널 10 route → workspace-bridge 54 route. **인수 증거**: `python tools/route_coverage.py --served services/control-plane/src/inv --served src/saintvision/api --client apps/web/src` → 미제an이 fixture 없이 낮은 수(현재 SPA 기준 3, 그중 실질 `/v1/workspaces` 1). **신규 커널 route 결정 0** (receipt=payload·auth=IdP흐름·shards/reclaim=frontend, 전부 근거 확립).
+2. **커널 통합** (B-6/7) — **측정 정정(2026-09-15, Claude, served-set 명시)**: 이전의 '미제an 3·신규 커널 route 0'은 **fixture를 포함한 served-set으로 잰 오해**였다. 정확한 재측정(worktree로 wb kernel 58 route 실측): **(A)** fixture(`src/saintvision` 80 route) 포함 → **0 unserved**(단 fixture는 DB·auth 없는 hollow). **(B)** integration 실 백엔드(kernel 10 + api 19, fixture 제외) → **17 unserved**. **(C)** CX-01 목표인 **wb kernel(58 route) 대비 → 13 unserved**. 비직관: SPA가 올바르게 project-scoped로 수렴할수록 얇은 integration kernel 대비 미제an은 오히려 늘어, 실제 수렴 대상은 wb kernel이다. **그러나 wb kernel조차 SPA를 완전히 서빙하지 못한다** — 13 중 SPA 실제 호출로 확인된 **진짜 커널 갭**: `/v1/pools`·`/v1/pools/{}/placement-preview`·`/v1/discovery/candidates`(PlacementSimulator), `/v1/workspaces/{}/execution-readiness`(DeveloperStudio), `/v1/projects/{}/runs/{}/evidence`·`/v1/runs/{}/evidence`(EvidenceViewer, 6b32c5a 신규 — wb kernel엔 artifacts/result/logs만 있고 evidence 없음), `/v1/health`(Header ping이나 kernel은 `/healthz` — 경로 불일치). 나머지: `/v1/auth/token`·`/v1/events`는 non-call(IdP/nginx); `/v1/runs`·`/v1/nodes`·`/v1/workspaces`는 project-scoped 형제가 서빙되는 flat fallback. **따라서 '신규 커널 route 결정 0'은 오류다** — CX-01은 wb kernel 도입에 더해 위 capability(evidence·pools·discovery·execution-readiness)를 실 kernel에 추가하거나, SPA가 그 호출을 접어야 한다. 지금은 전부 fixture만 서빙한다(그래서 A가 0으로 보였다).
 
-3. **SPA 정렬** (Gemini, 거의 완료): 미제an 24→3. 남은 실질 1개 `/v1/workspaces` bare list. `auth/token`은 verification 전용 fallback(운영은 실 IdP), `events`는 nginx 문자열.
+3. **SPA 정렬** (Gemini) — **정정**: 위 2번 재측정에 따라 '거의 완료(미제an 3)'는 철회한다. SPA는 project-scoped로 잘 수렴 중이나, 그 호출 중 evidence·pools·discovery·execution-readiness는 **실 kernel(wb 포함)에 대응 route가 없어** 현재 fixture에만 의존한다. 이는 SPA 결함이 아니라 kernel 측 미구현(2번 참조).
 
 4. **role guard 정본화**: Codex `migration_guard.py`와 내 `rls.py`가 독립 수렴 — 통합 시 하나로. Codex 판이 더 엄격(`rolreplication`·생성 거부).
 

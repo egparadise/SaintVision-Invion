@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ApprovalItem } from '@/contracts/types';
 import { ApprovalDetail } from './ApprovalDetail';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
+import { EmptyState } from '@/shared/ui/EmptyState';
 
 export interface ApprovalCenterProps {
   approvals: ApprovalItem[];
@@ -123,9 +124,16 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
       </div>
 
       {/* Main Layout: Left Approvals List / Right Approval Detail */}
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
-        {/* Left List */}
-        <div
+      {approvals.length === 0 ? (
+        <EmptyState
+          icon="🛡️"
+          title="대기 중인 거버넌스 승인 안건 없음"
+          description="현재 클러스터에 검토 또는 승인이 필요한 L1~L3 위험 작업 요청이 없습니다."
+        />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
+          {/* Left List */}
+          <div
           style={{
             backgroundColor: 'var(--color-bg-surface)',
             borderRadius: 'var(--radius-lg)',
@@ -212,6 +220,7 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
           )}
         </div>
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 };
