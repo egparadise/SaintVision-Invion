@@ -1,5 +1,12 @@
-﻿import { describe, it, expect } from 'vitest';
-import { generateCodeVerifier, generateCodeChallenge, generateState, generateNonce } from '../src/features/auth/pkce';
+import { describe, it, expect } from 'vitest';
+import {
+  generateCodeVerifier,
+  generateCodeChallenge,
+  generateState,
+  generateNonce,
+  parseJwtPayload,
+  resolveUserFromToken,
+} from '../src/features/auth/pkce';
 
 describe('Auth & Security: RFC 7636 PKCE Cryptographic Protocol', () => {
   it('generates high-entropy code verifier conforming to RFC 7636 bounds', () => {
@@ -42,5 +49,43 @@ describe('Auth & Security: RFC 7636 PKCE Cryptographic Protocol', () => {
     expect(nonce1).toBeDefined();
     expect(nonce1.length).toBe(32); // 16 bytes hex = 32 chars
     expect(nonce1).not.toBe(nonce2);
+  });
+
+  it('parses standard RFC 7519 JWT payload claims accurately', () => {
+    const payloadObj = {
+      sub: 'usr_test_99',
+      name: 'Dr. Alice Smith',
+      preferred_username: 'alice',
+      role: 'cluster:admin',
+      tenant_id: 'tnt_hospital_01',
+    };
+    const encodedPayload = btoa(JSON.stringify(payloadObj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const jwt = `eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.${encodedPayload}.mock_sig`;
+
+    const parsed = parseJwtPayload(jwt);
+    expect(parsed).toEqual(payloadObj);
+    expect(parseJwtPayload('invalid-jwt')).toBeNull();
+    expect(parseJwtPayload('')).toBeNull();
+  });
+
+  it('resolves user identity prioritizing explicit user object and falling back to JWT claims', () => {
+    const explicitUser = { id: 'usr_explicit', name: 'Explicit Operator', role: 'cluster:admin' };
+    const resWithUser = resolveUserFromToken({ access_token: 'dummy', user: explicitUser });
+    expect(resWithUser).toBe(explicitUser);
+
+    const payloadObj = {
+      sub: 'usr_jwt_sub',
+      preferred_username: 'jwt_operator',
+      role: 'operator',
+      tenant_id: 'tnt_001',
+    };
+    const encodedPayload = btoa(JSON.stringify(payloadObj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const jwt = `header.${encodedPayload}.signature`;
+
+    const resFromJwt = resolveUserFromToken({ access_token: jwt });
+    expect(resFromJwt.id).toBe('usr_jwt_sub');
+    expect(resFromJwt.name).toBe('jwt_operator');
+    expect(resFromJwt.role).toBe('operator');
+    expect(resFromJwt.tenantId).toBe('tnt_001');
   });
 });

@@ -51,3 +51,41 @@ export function generateNonce(): string {
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
+
+/**
+ * Safely decodes RFC 7519 JWT payload without external libraries.
+ */
+export function parseJwtPayload(token: string): Record<string, any> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const jsonStr = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonStr);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolves standard user identity from token response or JWT claims.
+ */
+export function resolveUserFromToken(
+  tokenResponse: { access_token: string; user?: { id: string; name: string; role: string; tenantId?: string } }
+): { id: string; name: string; role: string; tenantId?: string } {
+  if (tokenResponse.user) {
+    return tokenResponse.user;
+  }
+  const claims = parseJwtPayload(tokenResponse.access_token);
+  return {
+    id: claims?.sub || 'usr_oidc_user',
+    name: claims?.preferred_username || claims?.name || 'OIDC Operator',
+    role: claims?.role || (claims?.realm_access?.roles?.includes('cluster:admin') ? 'cluster:admin' : 'operator'),
+    tenantId: claims?.tenant_id || claims?.tid,
+  };
+}

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { apiClient, setAuthToken } from '@/shared/api/client';
-import { generateCodeVerifier, generateCodeChallenge, generateState, generateNonce } from './pkce';
+import {
+  generateCodeVerifier,
+  generateCodeChallenge,
+  generateState,
+  generateNonce,
+  resolveUserFromToken,
+} from './pkce';
 
 export interface LoginProps {
   onLoginSuccess: (user: { id: string; name: string; role: string; tenantId?: string }) => void;
@@ -11,7 +17,7 @@ interface TokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
-  user: {
+  user?: {
     id: string;
     name: string;
     role: string;
@@ -38,7 +44,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       sessionStorage.removeItem('oidc_verifier');
       window.history.replaceState({}, document.title, window.location.pathname);
       setIsLoading(true);
-      apiClient<TokenResponse>('/v1/auth/token', {
+      const tokenEndpoint = (window as any).__SAINTVISION_CONFIG__?.idpTokenUrl || '/v1/auth/token';
+      apiClient<TokenResponse>(tokenEndpoint, {
         method: 'POST',
         body: JSON.stringify({
           grant_type: 'authorization_code',
@@ -50,7 +57,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       })
         .then((response) => {
           setAuthToken(response.access_token);
-          onLoginSuccess(response.user);
+          onLoginSuccess(resolveUserFromToken(response));
         })
         .catch((err: any) => {
           console.error('OIDC Callback exchange failed:', err);
@@ -101,7 +108,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
       // 3. Store in memory (never in localStorage) and notify parent
       setAuthToken(response.access_token);
-      onLoginSuccess(response.user);
+      onLoginSuccess(resolveUserFromToken(response));
     } catch (err: any) {
       console.error('OIDC authentication failed:', err);
       const detail = err.detail || err.message || '인증 서버(/v1/auth/token) 연결에 실패했습니다.';
