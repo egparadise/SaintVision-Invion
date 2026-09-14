@@ -182,6 +182,20 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                 assert unknown.json()['code'] == 'AUTH-INVALID-CREDENTIAL'
             else:
                 assert result.json() == {"items": [{"projectId": env.project}]}
+                # Verify the packaged configured factory exposes the new kernel
+                # reads, with authentication and actual empty database results.
+                paths = [
+                    ('/approvals', 200),
+                    ('/approvals/' + new_id('apr'), 404),
+                    ('/runs/' + new_id('run') + '/shards', 404),
+                ]
+                for suffix, status in paths:
+                    url = '/v1/projects/' + env.project + suffix
+                    assert client.get(url).status_code == 401
+                    observed = client.get(url, headers={'Authorization': 'Bearer ' + identity.token()})
+                    assert observed.status_code == status
+                    if status == 200:
+                        assert observed.json() == {'items': [], 'nextCursor': None}
             write = subprocess.run(["docker", "exec", container, "python", "-c",
                                     "open('/run/saintvision/api.json','w')"], capture_output=True)
             assert write.returncode != 0
