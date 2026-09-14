@@ -1320,6 +1320,63 @@ class StorageObservationView(BaseModel):
     observation: RecordedStorageObservation | None
 
 
+class ApprovalPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    items: list[ApprovalView] = Field(..., max_length=200)
+    nextCursor: ApprovalId | None
+
+
+class Phase1(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
+class ShardObservedMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    nodeId: NodeId
+    phase: Phase1
+    state: RunState
+    evidenceId: EvidenceId | None
+
+
+class ShardResultMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    evidenceId: EvidenceId
+    objectId: UUID
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+
+
+class ShardObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId | None
+    rootPlanId: ShardPlanId
+    generation: conint(ge=1, le=3)
+    parentRunId: RunId | None
+    parentState: RunState | None
+    aggregateManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shardCount: conint(ge=1, le=16)
+    allPhysicallyStopped: bool
+    allSucceeded: bool
+    resultManifest: list[ShardResultMember] | None
+    resultManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shards: list[ShardObservedMember] = Field(..., max_length=16)
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

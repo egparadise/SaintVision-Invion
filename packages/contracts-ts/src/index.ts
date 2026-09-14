@@ -968,3 +968,42 @@ export interface StorageObservationView {
   operationalAcceptanceAssessed: false;
   observation: (RecordedStorageObservation | null);
 }
+
+export interface ApprovalPage {
+  items: Array<ApprovalView>;
+  nextCursor: (ApprovalId | null);
+}
+
+export interface ShardObservedMember {
+  index: number;
+  runId: RunId;
+  nodeId: NodeId;
+  phase: "queued" | "uncertain" | "stopped";
+  state: RunState;
+  evidenceId: (EvidenceId | null);
+}
+
+export interface ShardResultMember {
+  index: number;
+  runId: RunId;
+  evidenceId: EvidenceId;
+  objectId: string;
+  sha256: string;
+  sizeBytes: number;
+}
+
+export interface ShardObservation {
+  planId: ShardPlanId;
+  sourcePlanId: (ShardPlanId | null);
+  rootPlanId: ShardPlanId;
+  generation: number;
+  parentRunId: (RunId | null);
+  parentState: (RunState | null);
+  aggregateManifestSha256: (string | null);
+  shardCount: number;
+  allPhysicallyStopped: boolean;
+  allSucceeded: boolean;
+  resultManifest: (Array<ShardResultMember> | null);
+  resultManifestSha256: (string | null);
+  shards: Array<ShardObservedMember>;
+}

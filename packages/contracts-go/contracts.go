@@ -970,3 +970,42 @@ type StorageObservationView struct {
     OperationalAcceptanceAssessed bool `json:"operationalAcceptanceAssessed"`
     Observation *RecordedStorageObservation `json:"observation"`
 }
+
+type ApprovalPage struct {
+    Items []ApprovalView `json:"items"`
+    NextCursor *ApprovalId `json:"nextCursor"`
+}
+
+type ShardObservedMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    Phase string `json:"phase"`
+    State RunState `json:"state"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type ShardResultMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+    ObjectId string `json:"objectId"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+}
+
+type ShardObservation struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId *ShardPlanId `json:"sourcePlanId"`
+    RootPlanId ShardPlanId `json:"rootPlanId"`
+    Generation int64 `json:"generation"`
+    ParentRunId *RunId `json:"parentRunId"`
+    ParentState *RunState `json:"parentState"`
+    AggregateManifestSha256 *string `json:"aggregateManifestSha256"`
+    ShardCount int64 `json:"shardCount"`
+    AllPhysicallyStopped bool `json:"allPhysicallyStopped"`
+    AllSucceeded bool `json:"allSucceeded"`
+    ResultManifest *[]ShardResultMember `json:"resultManifest"`
+    ResultManifestSha256 *string `json:"resultManifestSha256"`
+    Shards []ShardObservedMember `json:"shards"`
+}

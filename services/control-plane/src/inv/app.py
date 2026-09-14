@@ -430,6 +430,20 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     def capacity(project: str, identity=Depends(authenticated)):
         return control.capacity(identity.principal, project)
 
+    @api.get("/v1/projects/{project}/approvals")
+    def approvals(project: str, after: str | None = None, limit: int = 50,
+                  runId: str | None = None, identity=Depends(authenticated)):
+        return control.list_approvals(identity.principal, project, after=after,
+                                      limit=limit, run_id=runId)
+
+    @api.get("/v1/projects/{project}/approvals/{approval_id}")
+    def approval(project: str, approval_id: str, identity=Depends(authenticated)):
+        return control.get_approval(identity.principal, project, approval_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/shards")
+    def shards(project: str, run_id: str, identity=Depends(authenticated)):
+        return control.shards(identity.principal, project, run_id)
+
     @api.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
     async def challenge(
         project: str,
