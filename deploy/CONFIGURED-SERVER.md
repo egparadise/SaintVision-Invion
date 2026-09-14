@@ -71,3 +71,10 @@ python tools/prepare_server_config.py --directory <보호된-설정-디렉터리
 복사 바이트 hash·owner65532·0600·현재 identity 신뢰 묶음을 컨테이너에서 검증한다. 실패하면 이번에 만든 volume만 정리하고, 기존 volume·입력 파일은 보존한다. 성공 receipt의 volume 이름을 `INV_CONFIG_VOLUME`에 지정한다. 이 도구는 서버 기동·DB 수정·Workspace 실행을 하지 않는다. 설정 변경 시에도 새 volume을 검증한 후 전환하며, 기존 운영 volume을 덮어쓰지 않는다. Workspace 개인키의 실제 용도·mTLS 유효성은 후보 서버 기동/Node 연결 단계에서 별도로 검증된다.
 
 업무 API의 인증 헤더 누락은 이제401/WWW-Authenticate: Bearer로 커널 및 실제 OIDC 거부와 일치한다. 인증된 사용자의 프로젝트 실행 권한 부족은403을 유지한다.
+
+
+## Migration 권한 그룹 사전 검사
+
+온라인 Alembic은 migration 실행 전에 기존 `inv_app`·`inv_kernel` 그룹을 검사한다. LOGIN/SUPERUSER/BYPASSRLS/CREATEDB/CREATEROLE/REPLICATION 중 하나라도 있으면 schema 쓰기 전에 거부한다. 그룹이 없으면 기존 초기 migration이 생성한다. 정상 그룹은 upgrade/replay를 허용한다.
+
+거부된 그룹을 자동 ALTER하거나 세션을 끊지 않는다. 운영자가 실제 로그인 역할과 의존 관계를 확인하고 별도 승인 절차로 조정한다. 이 검사는 그 시점의 직접 role 속성을 확인하며 모든 ACL·membership·password 상태를 검증하는 전체 운영 감사가 아니다. 동시 관리자의 ALTER ROLE을 봉쇄하지 않는다. Offline SQL 생성은 실DB 권한 검사 증거가 아니므로 실제 적용 전 온라인 검증이 필요하다.
