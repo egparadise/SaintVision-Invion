@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.35"
+version: "1.0.36"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,18 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### auth 수정 검토 — Gemini `96191cc`은 올바르다, 잔여는 fixture 결합 한 가닥 (2026-09-14, Claude)
+
+Gemini가 `1e35815`(FE-M01~05 통합)와 `96191cc`(실 IdP PKCE redirect callback)를 push했다. FE-M04는 실측 확인됨 — `onlineNodesCount={nodes.filter(n=>n.status==='online').length}`(고정 5 → 실 관측 집계). auth 흐름을 소스로 검토했다.
+
+`Login.tsx`는 이제 두 경로다:
+- **실 IdP**(76-82): `externalIdpUrl` 설정 시 `window.location.href`로 진짜 `response_type=code&...&code_challenge=...&code_challenge_method=S256` redirect. callback `useEffect`(27-46)가 `window.location.search`의 실 `code`와 `code_verifier`로 교환. **정당하다** — B-6/7·ADR-014 인용, `/v1/auth/token`을 타지 않는다.
+- **Standalone/Verification fallback**(86-91): IdP 미설정 시 `/v1/auth/token`에 조작된 `code: auth_code_${nonce}` broker.
+
+**판정: 실 IdP 경로는 올바르다.** 잔여 한 가닥만 정밀히 남긴다 — fallback의 `/v1/auth/token`은 **fixture 서버만 제공한다**(커널에 없음). 즉 이 fallback은 B-4의 fixture backend에 결합돼 있고, fixture 제거 시 standalone 로그인이 깨진다. **운영이 항상 `externalIdpUrl`을 설정하는 한 문제없다**(fallback은 label대로 verification 전용). fixture 제거 단계에서 이 fallback도 함께 제거하거나, verification 전용임을 배포 게이트로 강제해야 한다. 결함이 아니라 **제거 순서 의존성** 기록이다.
+
+미제an은 여전히 4(`auth/token`은 이제 verification 전용 fallback, `runs`·`workspaces` bare list는 Gemini 잔여, `events`는 nginx 문자열). 실 production 경로에 필요한 신규 커널 route는 0.
 
 ### B-6/7 완결 — 신규 커널 route 0, `auth/token`은 mock login이었다 (2026-09-14, Claude)
 
