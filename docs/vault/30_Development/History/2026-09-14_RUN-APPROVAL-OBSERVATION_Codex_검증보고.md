@@ -25,3 +25,5 @@ source_of_truth: "Git"
 다음 Codex: 승인 요청 생성 및 action_digest 구성 소스를 확인하고, 동일 snapshot에 결속된 검토 전용 view와 변경 시 거부 시험을 구현한다. Gemini: b0ecb5e까지 통합 후 미관측/승인 보류/실제 계정 표시 브라우저 확인. Claude: 승인 관측 경계와 새 계약 독립 검토. 전체 성숙도 2775/4800=57.8125%, 남음42.1875% 유지.
 
 동일 SHA CI4건은23:23:15KST 결제/한도 제한으로 job 시작 전 실패했다. [CI 증거](../Evidence/run-approval-ci-b0ecb5e.json). 문서399개/48task·ontology 검사 exit0.
+
+전달 확인: b228b03 push 후23:23:40KST Obsidian check/apply/check exit0,878관리파일 hash일치/pending0/conflict0. [영수증](../Evidence/run-approval-sync-b228b03.json). 로컬 사본 확인이며 cloud 업로드는 미측정.
