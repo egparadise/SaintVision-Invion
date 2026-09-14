@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { ReleaseManager } from '../src/features/release/releaseEngine';
 
 describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC-11)', () => {
@@ -32,6 +32,33 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       const rtoSlo = slos.find((s) => s.name.includes('RTO'));
       expect(rpoSlo).toBeDefined();
       expect(rtoSlo).toBeDefined();
+    });
+
+    it('strictly marks breached status when telemetry exceeds thresholds (Zero-Mock)', () => {
+      const rm = new ReleaseManager();
+      const breachedSlos = rm.computeSloRecords({
+        schedulerP95LatencySeconds: 3.45,
+        heartbeatDetectionSeconds: 75.0,
+        unapprovedExecutionsCount: 2,
+        dockerSocketExposedCount: 1,
+        rpoMinutes: 22.0,
+        rtoMinutes: 80.0,
+        unresolvedVulnerabilitiesCount: 3,
+      });
+
+      expect(breachedSlos).toHaveLength(7);
+      breachedSlos.forEach((slo) => {
+        expect(slo.status).toBe('breached');
+      });
+
+      const latencySlo = breachedSlos.find((s) => s.category === 'latency');
+      expect(latencySlo?.actualValue).toBe('3.45 초');
+
+      const vulnsSlo = breachedSlos.find((s) => s.name.includes('취약점'));
+      expect(vulnsSlo?.actualValue).toBe('3 건');
+
+      const bypassSlo = breachedSlos.find((s) => s.name.includes('우회'));
+      expect(bypassSlo?.actualValue).toBe('2 건 위반');
     });
   });
 

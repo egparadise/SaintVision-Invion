@@ -116,4 +116,45 @@ describe('S08-FE: Security Controls, Isolation, Audit Ledger & GPU Benchmark (AC
       expect(latestLog.details).toContain('Threat containment protocol');
     });
   });
+
+  describe('Node Drain & Schedulable Control (ADR-038)', () => {
+    it('places node into drain state, excludes from scheduling, and logs audit event', () => {
+      const sec = new SecurityControlManager();
+      expect(sec.isNodeDrained('nod_01JABCDEF01')).toBe(false);
+      expect(sec.getStatus().drainedNodesCount).toBe(0);
+
+      sec.drainNode('nod_01JABCDEF01', 'usr_admin', 'Routine maintenance');
+      expect(sec.isNodeDrained('nod_01JABCDEF01')).toBe(true);
+      expect(sec.getStatus().drainedNodesCount).toBe(1);
+      expect(sec.getDrainedNodes()).toContain('nod_01JABCDEF01');
+
+      const log = sec.getAuditLogs()[0];
+      expect(log.action).toBe('node_drain_activated');
+      expect(log.target).toBe('nod_01JABCDEF01');
+
+      // Undrain node
+      sec.undrainNode('nod_01JABCDEF01', 'usr_admin');
+      expect(sec.isNodeDrained('nod_01JABCDEF01')).toBe(false);
+      expect(sec.getStatus().drainedNodesCount).toBe(0);
+
+      const undrainLog = sec.getAuditLogs()[0];
+      expect(undrainLog.action).toBe('node_drain_deactivated');
+    });
+
+    it('maintains cryptographic audit hash chain integrity across drain and undrain operations', () => {
+      const sec = new SecurityControlManager();
+      sec.drainNode('nod_01JABCDEF02', 'usr_admin', 'Scheduled maintenance');
+      sec.drainNode('nod_01JABCDEF03', 'usr_admin', 'Hardware upgrade');
+      expect(sec.getStatus().drainedNodesCount).toBe(2);
+      expect(sec.getDrainedNodes()).toEqual(['nod_01JABCDEF02', 'nod_01JABCDEF03']);
+
+      sec.undrainNode('nod_01JABCDEF02', 'usr_admin');
+      expect(sec.getStatus().drainedNodesCount).toBe(1);
+      expect(sec.isNodeDrained('nod_01JABCDEF03')).toBe(true);
+      expect(sec.isNodeDrained('nod_01JABCDEF02')).toBe(false);
+
+      const verification = sec.verifyLedgerIntegrity();
+      expect(verification.isValid).toBe(true);
+    });
+  });
 });

@@ -13,6 +13,8 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       cpuUsagePercent: 20,
       memoryTotalBytes: 64 * 1024 ** 3,
       memoryUsedBytes: 20 * 1024 ** 3,
+      allocatableCores: 12,
+      allocatableMemoryBytes: 36 * 1024 ** 3,
       gpuCount: 1,
       gpuName: 'NVIDIA RTX 4090',
       gpuVramTotalBytes: 24 * 1024 ** 3,
@@ -30,6 +32,8 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       cpuUsagePercent: 30,
       memoryTotalBytes: 32 * 1024 ** 3,
       memoryUsedBytes: 15 * 1024 ** 3,
+      allocatableCores: 4,
+      allocatableMemoryBytes: 12 * 1024 ** 3,
       gpuCount: 1,
       gpuName: 'NVIDIA RTX 3080',
       gpuVramTotalBytes: 10 * 1024 ** 3,
@@ -47,6 +51,8 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       cpuUsagePercent: 10,
       memoryTotalBytes: 32 * 1024 ** 3,
       memoryUsedBytes: 8 * 1024 ** 3,
+      allocatableCores: 6,
+      allocatableMemoryBytes: 20 * 1024 ** 3,
       gpuCount: 0,
       storageTotalBytes: 1000 * 1024 ** 3,
       storageUsedBytes: 200 * 1024 ** 3,
@@ -61,6 +67,8 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       cpuUsagePercent: 60,
       memoryTotalBytes: 64 * 1024 ** 3,
       memoryUsedBytes: 40 * 1024 ** 3,
+      allocatableCores: 4,
+      allocatableMemoryBytes: 16 * 1024 ** 3,
       gpuCount: 0,
       storageTotalBytes: 4000 * 1024 ** 3,
       storageUsedBytes: 1500 * 1024 ** 3,
@@ -75,6 +83,8 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       cpuUsagePercent: 15,
       memoryTotalBytes: 32 * 1024 ** 3,
       memoryUsedBytes: 8 * 1024 ** 3,
+      allocatableCores: 10,
+      allocatableMemoryBytes: 24 * 1024 ** 3,
       gpuCount: 1,
       gpuName: 'NVIDIA A4000',
       gpuVramTotalBytes: 16 * 1024 ** 3,
@@ -176,5 +186,23 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
     const expectedTotal = Math.round(localityScore * 0.4 + headroomScore * 0.3 + networkCostScore * 0.3);
 
     expect(totalScore).toBe(expectedTotal);
+  });
+
+  it('should reject candidates when allocatable capacity is unverified (undefined)', () => {
+    const unverifiedNode: NodeItem = {
+      ...mockNodes[0],
+      id: 'nod_unverified',
+      allocatableCores: undefined,
+    };
+    const req: PlacementRequirement = {
+      requiredCores: 2,
+      requiredMemoryBytes: 4 * 1024 ** 3,
+      requiresGpu: false,
+    };
+    const result = evaluatePlacement([unverifiedNode], req);
+    expect(result.evaluations[0].hardFilterPassed).toBe(false);
+    expect(result.evaluations[0].rejectionReasons).toContain(
+      '서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨'
+    );
   });
 });

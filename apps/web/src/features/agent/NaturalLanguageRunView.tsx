@@ -93,7 +93,7 @@ export const NaturalLanguageRunView: React.FC = () => {
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Prompt 100건 유효율 (AC-09)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            {goldenMetric.promptValidityRate.toFixed(1)}% (99/100)
+            {goldenMetric.promptValidityRate.toFixed(1)}% ({goldenMetric.promptValid}/{goldenMetric.promptTotal})
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (달성)</div>
         </div>
@@ -101,17 +101,17 @@ export const NaturalLanguageRunView: React.FC = () => {
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>코딩 과제 30건 성공률 (AC-09)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            {goldenMetric.codingSuccessRate.toFixed(1)}% (24/30)
+            {goldenMetric.codingSuccessRate.toFixed(1)}% ({goldenMetric.codingTasksPassed}/{goldenMetric.codingTasksTotal})
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (달성)</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>비밀/시스템 프롬프트 누출</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            0 건 (완전 방어)
+          <div style={{ fontSize: '24px', fontWeight: 700, color: goldenMetric.secretLeaksDetected === 0 ? '#3fb950' : '#f85149', marginTop: '4px' }}>
+            {goldenMetric.secretLeaksDetected} 건 ({goldenMetric.secretLeaksDetected === 0 ? '완전 차단' : '누출 감지'})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-09 Leakage: 0 달성</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-09 Zero Leakage 기준</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -119,7 +119,7 @@ export const NaturalLanguageRunView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
             {currentBudget.toLocaleString()} KRW
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>총 1,000,000 KRW 중 65% 잔여</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>작업 요청 시 실시간 차감</div>
         </div>
       </div>
 

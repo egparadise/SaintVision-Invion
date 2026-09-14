@@ -13,33 +13,53 @@ export function evaluatePlacement(
       reasons.push(`노드 상태 비정상 (${node.status})`);
     }
 
-    // Check 2: Fenced status
+    // Check 2: Fenced or Kill Switch status
     if (fencedNodeIds.has(node.id)) {
       reasons.push('노드가 격리/Fenced 상태로 안전 잠금됨');
     }
+    if (node.killSwitchEngaged) {
+      reasons.push('비상 Kill Switch 발동으로 신규 워크로드 실행 차단됨');
+    }
 
-    // Check 3: OS preference
+    // Check 3: Schedulability and Observation-Only
+    if (node.observationOnly) {
+      reasons.push('원격 실행 프로필 미설치 (관측 전용 노드 - 업무 제출 비활성)');
+    }
+    if (node.schedulable === false) {
+      reasons.push('스케줄러에 의해 배치 비활성화됨 (schedulable=false)');
+    }
+    if (node.isDraining) {
+      reasons.push('노드 Drain 정리 진행 중으로 신규 실행 불가');
+    }
+
+    // Check 4: OS preference
     if (req.preferredOs && node.os !== req.preferredOs) {
       reasons.push(`운영체제 불일치 (요청: ${req.preferredOs}, 노드: ${node.os})`);
     }
 
-    // Check 4: CPU Cores Headroom
-    const availableCores = node.cpuCores * (1 - node.cpuUsagePercent / 100);
-    if (availableCores < req.requiredCores) {
-      reasons.push(
-        `가용 CPU 코어 부족 (필요: ${req.requiredCores} 코어, 가용: ${availableCores.toFixed(1)} 코어)`
-      );
+    // Check 5: CPU Cores Headroom vs Allocatable
+    if (node.allocatableCores === undefined || node.allocatableMemoryBytes === undefined) {
+      reasons.push('서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨');
+    } else {
+      const observedAvailCores = node.cpuCores * (1 - node.cpuUsagePercent / 100);
+      const maxSchedCores = Math.min(observedAvailCores, node.allocatableCores);
+      if (maxSchedCores < req.requiredCores) {
+        reasons.push(
+          `가용 CPU 코어 부족 (필요: ${req.requiredCores} 코어, 예약가능: ${maxSchedCores.toFixed(1)} 코어, 관측여유: ${observedAvailCores.toFixed(1)} 코어)`
+        );
+      }
+
+      // Check 6: Memory Headroom vs Allocatable
+      const observedAvailMemory = node.memoryTotalBytes - node.memoryUsedBytes;
+      const maxSchedMemory = Math.min(observedAvailMemory, node.allocatableMemoryBytes);
+      if (maxSchedMemory < req.requiredMemoryBytes) {
+        const availGb = (maxSchedMemory / 1024 ** 3).toFixed(1);
+        const reqGb = (req.requiredMemoryBytes / 1024 ** 3).toFixed(1);
+        reasons.push(`가용 메모리 부족 (필요: ${reqGb} GB, 예약가능: ${availGb} GB)`);
+      }
     }
 
-    // Check 5: Memory Headroom
-    const availableMemory = node.memoryTotalBytes - node.memoryUsedBytes;
-    if (availableMemory < req.requiredMemoryBytes) {
-      const availGb = (availableMemory / 1024 ** 3).toFixed(1);
-      const reqGb = (req.requiredMemoryBytes / 1024 ** 3).toFixed(1);
-      reasons.push(`가용 메모리 부족 (필요: ${reqGb} GB, 가용: ${availGb} GB)`);
-    }
-
-    // Check 6: GPU requirement
+    // Check 7: GPU requirement
     if (req.requiresGpu && node.gpuCount === 0) {
       reasons.push('가속 GPU 부재 (GPU 워크로드 요구)');
     }

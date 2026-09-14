@@ -14,10 +14,6 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     proxy: {
-      '/pilot': {
-        target: 'http://127.0.0.1:18082',
-        changeOrigin: true,
-      },
       '/v1': {
         target: 'http://127.0.0.1:8080',
         changeOrigin: true,
@@ -28,11 +24,13 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           query: ['@tanstack/react-query', 'zustand'],
+          icons: ['lucide-react'],
         },
       },
     },

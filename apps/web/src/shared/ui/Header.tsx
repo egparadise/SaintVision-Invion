@@ -8,6 +8,8 @@ export interface HeaderProps {
   totalNodesCount?: number;
   activeTab: string;
   onSelectTab: (tab: string) => void;
+  currentUser?: { id: string; name: string; role: string } | null;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   totalNodesCount = 5,
   activeTab,
   onSelectTab,
+  currentUser,
+  onLogout,
 }) => {
   const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
     online: true,
@@ -53,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const tabs = [
     { id: 'dashboard', label: '클러스터 개요' },
+    { id: 'studio', label: '🚀 개발 Studio (통합)' },
     { id: 'nodes', label: 'Nodes 인벤토리' },
     { id: 'workspaces', label: 'Workspaces (S03)' },
     { id: 'editor', label: '개발 에디터 (S06)' },
@@ -178,6 +183,45 @@ export const Header: React.FC<HeaderProps> = ({
             Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: '#f85149' }}>Offline</strong>}
           </span>
         </div>
+
+        {currentUser ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 10px',
+              backgroundColor: 'rgba(56, 139, 253, 0.12)',
+              border: '1px solid rgba(56, 139, 253, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.8125rem',
+            }}
+          >
+            <span style={{ fontWeight: 600, color: '#58a6ff' }}>
+              👤 {currentUser.name}
+            </span>
+            <span
+              style={{
+                fontSize: '0.6875rem',
+                backgroundColor: 'rgba(56, 139, 253, 0.25)',
+                padding: '1px 5px',
+                borderRadius: 'var(--radius-sm)',
+                color: '#79c0ff',
+              }}
+            >
+              {currentUser.role}
+            </span>
+            {onLogout && (
+              <Button variant="ghost" size="sm" onClick={onLogout} style={{ padding: '2px 6px', fontSize: '0.75rem', color: '#f85149' }}>
+                로그아웃
+              </Button>
+            )}
+          </div>
+        ) : (
+          <Button variant="primary" size="sm" onClick={() => onSelectTab('login')}>
+            SSO 로그인
+          </Button>
+        )}
 
         <Button variant="secondary" size="sm" onClick={onToggleTheme} aria-label="테마 전환">
           {currentTheme === 'dark' ? '☀️ 라이트 모드' : '🌙 다크 모드'}

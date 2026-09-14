@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { apiClient, setAuthToken } from '@/shared/api/client';
 import { generateCodeVerifier, generateCodeChallenge, generateState, generateNonce } from './pkce';
@@ -24,6 +24,45 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [selectedIdp, setSelectedIdp] = useState('internal-keycloak');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Handle OIDC Authorization Code redirect callback with PKCE code_verifier
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const returnedState = params.get('state');
+    const savedState = sessionStorage.getItem('oidc_state');
+    const codeVerifier = sessionStorage.getItem('oidc_verifier');
+
+    if (code && codeVerifier && returnedState && returnedState === savedState) {
+      sessionStorage.removeItem('oidc_state');
+      sessionStorage.removeItem('oidc_verifier');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setIsLoading(true);
+      apiClient<TokenResponse>('/v1/auth/token', {
+        method: 'POST',
+        body: JSON.stringify({
+          grant_type: 'authorization_code',
+          code,
+          code_verifier: codeVerifier,
+          client_id: 'saintvision-web',
+          state: returnedState,
+        }),
+      })
+        .then((response) => {
+          setAuthToken(response.access_token);
+          onLoginSuccess(response.user);
+        })
+        .catch((err: any) => {
+          console.error('OIDC Callback exchange failed:', err);
+          const detail = err.detail || err.message || '인증 코드 교환에 실패했습니다.';
+          setErrorMessage(`인증 실패: ${detail}`);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [onLoginSuccess]);
+
   const handleOidcLogin = async () => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -34,7 +73,17 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       const state = generateState();
       const nonce = generateNonce();
 
-      // 2. Exchange authorization code with PKCE verification at /v1/auth/token
+      // Real external IdP redirect flow (Claude B-6/7 & ADR-014 OIDC specification)
+      const externalIdpUrl = (window as any).__SAINTVISION_CONFIG__?.idpAuthorizeUrl;
+      if (externalIdpUrl) {
+        sessionStorage.setItem('oidc_verifier', codeVerifier);
+        sessionStorage.setItem('oidc_state', state);
+        const redirectUri = encodeURIComponent(`${window.location.origin}/callback`);
+        window.location.href = `${externalIdpUrl}?response_type=code&client_id=saintvision-web&redirect_uri=${redirectUri}&scope=openid%20profile%20email&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+        return;
+      }
+
+      // Standalone Intranet / Verification Environment: Exchange via control plane broker at /v1/auth/token
       const response = await apiClient<TokenResponse>('/v1/auth/token', {
         method: 'POST',
         body: JSON.stringify({
@@ -54,16 +103,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       setAuthToken(response.access_token);
       onLoginSuccess(response.user);
     } catch (err: any) {
-      console.warn('Real OIDC /v1/auth/token returned error or offline, providing resilient fallback:', err);
-      // If server returned ProblemDetails or network failed, fallback gracefully to authenticated admin
-      const fallbackUser = {
-        id: 'usr_01JABCDEF_ADMIN',
-        name: selectedIdp === 'internal-keycloak' ? 'Keycloak 통합 관리자' : 'AD 도메인 관리자',
-        role: 'cluster:admin',
-        tenantId: '00000000-0000-0000-0000-000000000001',
-      };
-      setAuthToken('saintvision_token_dev_verified_jwt_admin_s256');
-      onLoginSuccess(fallbackUser);
+      console.error('OIDC authentication failed:', err);
+      const detail = err.detail || err.message || '인증 서버(/v1/auth/token) 연결에 실패했습니다.';
+      setErrorMessage(`인증 실패: ${detail}`);
     } finally {
       setIsLoading(false);
     }

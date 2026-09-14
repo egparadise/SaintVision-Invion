@@ -1,5 +1,6 @@
-﻿import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { WsTerminalClient } from '../src/shared/realtime/ws-terminal';
+import { apiClient } from '../src/shared/api/client';
 
 describe('S01-FE: WebSocket Terminal PTY Client', () => {
   it('connects with 30s one-time ticket query parameter', () => {
@@ -46,18 +47,30 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
       wsInstance.onopen!();
       expect(onStatus).toHaveBeenCalledWith('connected');
 
-      // Send input
+      // Send input with monotonic sequence
       client.sendInput('ls -la\n');
       expect(wsInstance.sentMessages).toHaveLength(1);
       expect(JSON.parse(wsInstance.sentMessages[0])).toEqual({
         type: 'data',
         payload: 'ls -la\n',
+        sequence: 1,
       });
+      expect(client.getSequence()).toBe(1);
+
+      // Send second input with incremented sequence
+      client.sendInput('pwd\n');
+      expect(wsInstance.sentMessages).toHaveLength(2);
+      expect(JSON.parse(wsInstance.sentMessages[1])).toEqual({
+        type: 'data',
+        payload: 'pwd\n',
+        sequence: 2,
+      });
+      expect(client.getSequence()).toBe(2);
 
       // Send resize
       client.sendResize(120, 40);
-      expect(wsInstance.sentMessages).toHaveLength(2);
-      expect(JSON.parse(wsInstance.sentMessages[1])).toEqual({
+      expect(wsInstance.sentMessages).toHaveLength(3);
+      expect(JSON.parse(wsInstance.sentMessages[2])).toEqual({
         type: 'resize',
         cols: 120,
         rows: 40,
@@ -69,11 +82,55 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
       });
       expect(onData).toHaveBeenCalledWith('total 64\ndrwxr-xr-x ...');
 
+      // Fallback: receive raw non-JSON text frame
+      wsInstance.onmessage!({
+        data: 'saintvision@wsp-saint-pilot:~$ ',
+      });
+      expect(onData).toHaveBeenCalledWith('saintvision@wsp-saint-pilot:~$ ');
+
+      // Trigger error and close
+      wsInstance.onerror!();
+      expect(onStatus).toHaveBeenCalledWith('error');
+
       // Disconnect
       client.disconnect();
       expect((client as any).isClosed).toBe(true);
+      expect(onStatus).toHaveBeenCalledWith('disconnected');
     } finally {
       globalThis.WebSocket = originalWs;
     }
+  });
+
+  it('handles disconnect and reconnect cycle gracefully', () => {
+    const onData = vi.fn();
+    const onStatus = vi.fn();
+    const client = new WsTerminalClient('ws://localhost:8080/v1/terminal/ws', onData, onStatus);
+
+    expect(client.getSequence()).toBe(0);
+    client.disconnect();
+    expect(onStatus).toHaveBeenCalledWith('disconnected');
+  });
+
+  it('requests one-time terminal ticket from canonical workspace endpoint', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url: any) => {
+      if (String(url).includes('/v1/workspaces/wsp_01/terminal-tickets')) {
+        return {
+          ok: true,
+          status: 201,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => ({ ticketId: 'tkt_canonical_123', ptyWsUrl: 'ws://localhost:8080/v1/workspaces/wsp_01/terminals/sess_01' }),
+        } as any;
+      }
+      return { ok: false, status: 404, statusText: 'Not Found', headers: new Headers(), json: async () => ({ detail: 'Not Found' }) } as any;
+    });
+
+    const ticketData = await apiClient<{ ticketId: string }>('/v1/workspaces/wsp_01/terminal-tickets', {
+      method: 'POST',
+      body: JSON.stringify({ workspaceId: 'wsp_01', sessionId: 'sess_01' }),
+    });
+
+    expect(ticketData.ticketId).toBe('tkt_canonical_123');
+    expect(fetchSpy).toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 });

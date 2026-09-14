@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NodeItem, SyntheticGpuResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
 interface AdminSecurityConsoleProps {
   nodes: NodeItem[];
+  onRefreshNodes?: () => void;
 }
 
-export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes }) => {
+export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes, onRefreshNodes }) => {
   const [secManager] = useState<SecurityControlManager>(() => new SecurityControlManager());
-  const [activeSubTab, setActiveSubTab] = useState<'audit' | 'isolation' | 'gpu' | 'backup'>('audit');
+  const [activeSubTab, setActiveSubTab] = useState<'audit' | 'isolation' | 'gpu' | 'backup' | 'drain'>('audit');
   const [status, setStatus] = useState(secManager.getStatus());
   const [auditLogs, setAuditLogs] = useState(secManager.getAuditLogs());
 
@@ -17,6 +19,49 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [ledgerVerification, setLedgerVerification] = useState<{ isValid: boolean; checked: number } | null>(null);
   const [mountTestPath, setMountTestPath] = useState('/var/run/docker.sock');
   const [mountTestResult, setMountTestResult] = useState<string | null>(null);
+
+  useEffect(() => {
+    let changed = false;
+    nodes.forEach((n) => {
+      const isDrainingOnServer = n.status === 'draining' || (n as any).isDraining === true;
+      if (isDrainingOnServer && !secManager.isNodeDrained(n.id)) {
+        secManager.drainNode(n.id, 'system', 'Cluster control plane reported draining status');
+        changed = true;
+      }
+    });
+    if (changed) {
+      refreshState();
+    }
+  }, [nodes]);
+
+  const handleToggleDrain = async (nodeId: string, currentDrained: boolean) => {
+    if (currentDrained) {
+      secManager.undrainNode(nodeId, 'usr_admin_01');
+      refreshState();
+      try {
+        await apiClient(`/v1/nodes/${nodeId}/resume`, {
+          method: 'POST',
+          body: JSON.stringify({ actor: 'usr_admin_01' }),
+        });
+      } catch (err) {
+        console.error('Failed to sync node resume to control plane:', err);
+      }
+    } else {
+      secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');
+      refreshState();
+      try {
+        await apiClient(`/v1/nodes/${nodeId}/drain`, {
+          method: 'POST',
+          body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Admin manual maintenance and isolation protocol' }),
+        });
+      } catch (err) {
+        console.error('Failed to sync node drain to control plane:', err);
+      }
+    }
+    if (onRefreshNodes) {
+      onRefreshNodes();
+    }
+  };
   const [bypassRiskLevel, setBypassRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L2');
   const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);
   const [selectedGpuNodeId, setSelectedGpuNodeId] = useState<string>('nod_01JABCDEF01');
@@ -191,6 +236,13 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             onClick={() => setActiveSubTab('backup')}
           >
             재해 복구 및 WAL 백업
+          </Button>
+          <Button
+            size="sm"
+            variant={activeSubTab === 'drain' ? 'primary' : 'secondary'}
+            onClick={() => setActiveSubTab('drain')}
+          >
+            노드 Drain 통제 (ADR-038)
           </Button>
         </div>
 
@@ -544,6 +596,88 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               </div>
               <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>Epoch 전진 포함</div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sub-Tab 5: Node Drain & Schedulable Control (ADR-038) */}
+      {activeSubTab === 'drain' && (
+        <div
+          style={{
+            backgroundColor: '#161b22',
+            border: '1px solid #30363d',
+            borderRadius: '8px',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+              클러스터 노드 Drain 및 스케줄링 통제 (ADR-038)
+            </h3>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+              점검 또는 장애 노드를 스케줄링에서 즉시 제외(Drain)하고 실행 중인 워크로드를 안전하게 격리합니다.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {nodes.map((n) => {
+              const isDrained = secManager.isNodeDrained(n.id);
+              return (
+                <div
+                  key={n.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '14px 18px',
+                    backgroundColor: '#0d1117',
+                    border: `1px solid ${isDrained ? '#f85149' : '#30363d'}`,
+                    borderRadius: '6px',
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
+                        {n.hostname}
+                      </span>
+                      <code style={{ fontSize: '11px', color: '#58a6ff' }}>{n.id}</code>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          backgroundColor: isDrained ? 'rgba(248,81,73,0.2)' : 'rgba(63,185,80,0.2)',
+                          color: isDrained ? '#f85149' : '#3fb950',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {isDrained ? '🚨 DRAINED (스케줄링 제외)' : '✔ SCHEDULABLE (가용)'}
+                      </span>
+                      {n.observationOnly && (
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '12px', backgroundColor: 'rgba(210,153,34,0.2)', color: '#d29922' }}>
+                          관측 전용
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#8b949e' }}>
+                      {n.telemetryUnavailable ? '자원 정보 미관측' : `OS: ${n.os.toUpperCase()} • CPU: ${n.cpuCores}C (${n.cpuUsagePercent}%) • RAM: ${(n.memoryTotalBytes / 1024 ** 3).toFixed(0)} GiB`}
+                      {n.gpuName && ` • GPU: ${n.gpuName}`}
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant={isDrained ? 'primary' : 'danger'}
+                    onClick={() => handleToggleDrain(n.id, isDrained)}
+                  >
+                    {isDrained ? '✔ Drain 해제 (Schedulable)' : '🚨 Node Drain'}
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

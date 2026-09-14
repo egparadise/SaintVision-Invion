@@ -7,6 +7,7 @@ export interface WorkspaceListProps {
   nodes: NodeItem[];
   onCreateWorkspace: () => void;
   onSelectWorkspace: (workspaceId: string) => void;
+  onOpenStudio?: (workspaceId: string) => void;
 }
 
 export const WorkspaceList: React.FC<WorkspaceListProps> = ({
@@ -14,6 +15,7 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
   nodes,
   onCreateWorkspace,
   onSelectWorkspace,
+  onOpenStudio,
 }) => {
   const getNodeHostname = (nodeId: string) => {
     return nodes.find((n) => n.id === nodeId)?.hostname || nodeId;
@@ -101,10 +103,30 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
                 </div>
               </div>
 
-              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border-subtle)', textAlign: 'right' }}>
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-brand-primary)', fontWeight: 600 }}>
                   실행 결과 및 증거 보기 →
                 </span>
+                {onOpenStudio && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenStudio(wsp.id);
+                    }}
+                    style={{
+                      padding: '3px 8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: '1px solid var(--color-border-strong)',
+                      color: 'var(--color-text-primary)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ⚡ Studio에서 열기
+                  </button>
+                )}
               </div>
             </div>
           );

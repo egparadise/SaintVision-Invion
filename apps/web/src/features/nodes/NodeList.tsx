@@ -11,6 +11,7 @@ export interface NodeListProps {
   isForbidden?: boolean;
   onRefresh?: () => void;
   onSelectNode?: (nodeId: string) => void;
+  onOpenStudio?: (nodeId: string) => void;
 }
 
 export const NodeList: React.FC<NodeListProps> = ({
@@ -20,6 +21,7 @@ export const NodeList: React.FC<NodeListProps> = ({
   isForbidden = false,
   onRefresh,
   onSelectNode,
+  onOpenStudio,
 }) => {
   // State 1: Forbidden (403)
   if (isForbidden) {
@@ -97,6 +99,10 @@ export const NodeList: React.FC<NodeListProps> = ({
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {nodes.map((node) => {
+          if (node.telemetryUnavailable) return <div key={node.id} role="status">
+            <strong>{node.hostname}</strong> — 자원 정보 미관측 · 실행 대상에서 제외
+          </div>;
+
           const statusColor =
             node.status === 'online'
               ? 'var(--color-status-online)'
@@ -186,6 +192,66 @@ export const NodeList: React.FC<NodeListProps> = ({
                   <span>로컬 스토리지:</span>
                   <span>{storageUsedGb} / {storageTotalGb} GiB</span>
                 </div>
+              </div>
+
+              {/* Observation-Only and Schedulable Capacity */}
+              {node.observationOnly && (
+                <div
+                  style={{
+                    marginTop: '8px',
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'rgba(210, 153, 34, 0.15)',
+                    border: '1px solid #d29922',
+                    color: '#d29922',
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  ⚠️ 관측 전용 (192.168.45.225 - 원격 프로필 미설치)
+                </div>
+              )}
+
+              {/* Resource Headroom & Studio Jump Action */}
+              <div
+                style={{
+                  marginTop: '14px',
+                  paddingTop: '10px',
+                  borderTop: '1px solid var(--color-border-subtle)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>
+                    관측여유: {(node.cpuCores * (1 - node.cpuUsagePercent / 100)).toFixed(1)}C · {((node.memoryTotalBytes - node.memoryUsedBytes) / 1024 ** 3).toFixed(1)}G
+                  </span>
+                  <span style={{ fontWeight: 700, color: node.observationOnly ? '#d29922' : (node.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)') }}>
+                    예약가능: {node.observationOnly ? '0C (차단)' : (node.allocatableCores !== undefined ? `${node.allocatableCores}C` : '미확인 (선택 불가)')}
+                  </span>
+                </div>
+                {onOpenStudio && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenStudio(node.id);
+                    }}
+                    title={node.observationOnly ? '관측 전용 노드는 업무 배치가 비활성화되어 있습니다' : '이 노드로 Studio 열기'}
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: node.observationOnly ? 'var(--color-border-strong)' : 'var(--color-brand-primary)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ⚡ Studio 열기
+                  </button>
+                )}
               </div>
             </div>
           );

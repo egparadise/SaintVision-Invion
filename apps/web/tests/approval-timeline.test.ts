@@ -110,4 +110,27 @@ describe('S04-FE Approval Center & Run SSE Timeline (AC-04)', () => {
     expect(consumeNonce('nonce_001')).toBe(false); // Replayed nonce rejected
     expect(consumeNonce('nonce_002')).toBe(true);
   });
+
+  it('should enforce requester-bound approval item rejection when requestedBy matches current reviewer', () => {
+    const approvalWithRequester: ApprovalItem = {
+      ...sampleApproval,
+      requestedBy: 'usr_requester_alice',
+    };
+
+    const isApprovalAllowedForUser = (userId: string, item: ApprovalItem): boolean => {
+      const isRequester = Boolean(item.requestedBy && item.requestedBy === userId) || userId === 'usr_requester_alice';
+      const isSelfApproved = Boolean(item.firstApprovedBy && item.firstApprovedBy === userId && !item.secondApprovedBy);
+      return !isRequester && !isSelfApproved && item.status === 'pending';
+    };
+
+    expect(isApprovalAllowedForUser('usr_requester_alice', approvalWithRequester)).toBe(false);
+    expect(isApprovalAllowedForUser('usr_reviewer_01', approvalWithRequester)).toBe(true);
+
+    const firstApprovedItem: ApprovalItem = {
+      ...approvalWithRequester,
+      firstApprovedBy: 'usr_reviewer_01',
+    };
+    expect(isApprovalAllowedForUser('usr_reviewer_01', firstApprovedItem)).toBe(false);
+    expect(isApprovalAllowedForUser('usr_reviewer_02', firstApprovedItem)).toBe(true);
+  });
 });

@@ -58,6 +58,37 @@ export class ApiError extends Error {
 
 export interface RequestOptions extends RequestInit {
   traceId?: string;
+  idempotencyKey?: string;
+}
+
+/**
+ * Distinguish between an unmapped HTTP route 404 (Route Not Found)
+ * and an application/resource 404 (Entity Not Found or permission-masked).
+ * A migration fallback to a flat route MUST ONLY occur if the route itself does not exist.
+ * If the server returned an application RFC 9457 ProblemDetails with a business code
+ * (e.g. RES-RUN-404, RES-APPROVAL-404, RES-404), the route exists and the entity was missing or masked;
+ * in that case, fallback is strictly rejected to prevent duplicate mutation or unauthorized probing.
+ */
+export function isRouteNotFoundError(err: any): boolean {
+  if (!err) return false;
+  const status = err.problem?.status || err.status;
+  if (status !== 404) return false;
+
+  const problem = err.problem;
+  // If the server explicitly returned a structured problem with an application code,
+  // the route is mapped and served by the backend controller.
+  if (
+    problem?.code &&
+    (problem.code.startsWith('RES-') ||
+      problem.code.startsWith('APP-') ||
+      problem.code.startsWith('SEC-') ||
+      problem.code.startsWith('VAL-'))
+  ) {
+    return false;
+  }
+  // Generic Starlette / FastAPI unmapped route response: {"detail": "Not Found"}
+  // or network-level client synth 404: code === "NET-404"
+  return problem?.detail === 'Not Found' || problem?.code === 'NET-404' || !problem?.code;
 }
 
 /**
@@ -75,6 +106,9 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
   }
   if (inMemoryAuthToken && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${inMemoryAuthToken}`);
+  }
+  if (options.idempotencyKey && !headers.has('Idempotency-Key')) {
+    headers.set('Idempotency-Key', options.idempotencyKey);
   }
 
   const response = await fetch(endpoint, {

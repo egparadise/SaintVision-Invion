@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { approveReviewed, type ReviewedAction } from '@/shared/api/approvalReview';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/shared/ui/Header';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { NodeList } from '@/features/nodes/NodeList';
@@ -20,237 +21,106 @@ import { EvidenceViewer } from '@/features/evidence/EvidenceViewer';
 import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
-import { apiClient } from '@/shared/api/client';
-
-// Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
-const INITIAL_NODES: NodeItem[] = [
-  {
-    id: 'nod_01JABCDEF01',
-    hostname: 'Node-01-WinMain',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 16,
-    cpuUsagePercent: 24,
-    memoryTotalBytes: 64 * 1024 ** 3,
-    memoryUsedBytes: 28 * 1024 ** 3,
-    gpuName: 'NVIDIA RTX 4090',
-    gpuCount: 1,
-    gpuVramTotalBytes: 24 * 1024 ** 3,
-    gpuVramUsedBytes: 8 * 1024 ** 3,
-    storageTotalBytes: 2000 * 1024 ** 3,
-    storageUsedBytes: 850 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF02',
-    hostname: 'Node-02-WinWork',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 8,
-    cpuUsagePercent: 42,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 19 * 1024 ** 3,
-    gpuName: 'NVIDIA RTX 3080',
-    gpuCount: 1,
-    gpuVramTotalBytes: 10 * 1024 ** 3,
-    gpuVramUsedBytes: 6 * 1024 ** 3,
-    storageTotalBytes: 1000 * 1024 ** 3,
-    storageUsedBytes: 420 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF03',
-    hostname: 'Node-03-WinDev',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 8,
-    cpuUsagePercent: 15,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 11 * 1024 ** 3,
-    gpuCount: 0,
-    storageTotalBytes: 1000 * 1024 ** 3,
-    storageUsedBytes: 310 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF04',
-    hostname: 'Node-04-LinuxBuild',
-    status: 'online',
-    os: 'linux',
-    cpuCores: 16,
-    cpuUsagePercent: 68,
-    memoryTotalBytes: 64 * 1024 ** 3,
-    memoryUsedBytes: 45 * 1024 ** 3,
-    gpuCount: 0,
-    storageTotalBytes: 4000 * 1024 ** 3,
-    storageUsedBytes: 1800 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF05',
-    hostname: 'Node-05-LinuxTrain',
-    status: 'online',
-    os: 'linux',
-    cpuCores: 12,
-    cpuUsagePercent: 10,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 8 * 1024 ** 3,
-    gpuName: 'NVIDIA A4000',
-    gpuCount: 1,
-    gpuVramTotalBytes: 16 * 1024 ** 3,
-    gpuVramUsedBytes: 2 * 1024 ** 3,
-    storageTotalBytes: 2000 * 1024 ** 3,
-    storageUsedBytes: 600 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-];
-
-const INITIAL_RUNS: RunItem[] = [
-  {
-    id: 'run_01JABCDE0001',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: 'SaintVision PACS Core 빌드 및 단위 테스트',
-    state: 'running',
-    requestedBy: 'usr_developer_01',
-    createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'run_01JABCDE0002',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: '합성 데이터셋 전처리 및 로컬 분할 검증',
-    state: 'awaiting_approval',
-    requestedBy: 'usr_researcher_02',
-    createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'run_01JABCDE0003',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: 'GPU 가속 모델 추론 벤치마크 (RTX 4090)',
-    state: 'succeeded',
-    requestedBy: 'usr_admin_01',
-    createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-const DEMO_APPROVAL: ApprovalItem = {
-  id: 'apr_01JXYZ987654',
-  runId: 'run_01JABCDE0002',
-  workspaceId: 'wsp_01JABCDE',
-  nodeId: 'nod_01JABCDEF01',
-  riskLevel: 'L2',
-  target: 'Workspace [wsp-saint-pilot] on Node-01',
-  command: 'git.deploy --release prod-v1.0.0',
-  unifiedDiff: `--- a/config/environment.prod.json
-+++ b/config/environment.prod.json
-@@ -12,4 +12,5 @@
--  "GATEWAY_PORT": 8080,
-+  "GATEWAY_PORT": 8443,
-+  "TLS_STRICT": true,
-+  "AUDIT_IMMUTABLE": true`,
-  estimatedCostKrw: 3200,
-  remainingBudgetKrw: 46800,
-  blastRadius: 'workspace_isolated',
-  rollbackPlan: undefined, // Demonstrating rollback warning badge
-  status: 'pending',
-  nonce: 'nonce_987654321',
-  expiresAt: new Date(Date.now() + 1000 * 60 * 8).toISOString(), // 8 minutes remaining
-  policyReason: '외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)',
-  createdAt: new Date().toISOString(),
-};
-
-const INITIAL_WORKSPACES: WorkspaceItem[] = [
-  {
-    id: 'wsp_01JABCDE001',
-    projectId: 'prj_01JABCDE',
-    name: 'pacs-core-build-sandbox',
-    targetNodeId: 'nod_01JABCDEF01',
-    isolationMode: 'process_sandbox',
-    allowedPaths: ['./workspace', './data'],
-    prohibitedPaths: ['/etc', 'C:\\Windows', '..', '/var/run'],
-    cpuLimitCores: 8,
-    memoryLimitBytes: 16 * 1024 ** 3,
-    status: 'active',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-  {
-    id: 'wsp_01JABCDE002',
-    projectId: 'prj_01JABCDE',
-    name: 'dataset-preprocess-container',
-    targetNodeId: 'nod_01JABCDEF04',
-    isolationMode: 'container_isolated',
-    allowedPaths: ['./dataset', './output'],
-    prohibitedPaths: ['/etc', '..', '/sys'],
-    cpuLimitCores: 8,
-    memoryLimitBytes: 32 * 1024 ** 3,
-    status: 'reclaimed',
-    createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-  },
-];
-
-const SAMPLE_EXECUTION: ExecutionResultItem = {
-  runId: 'run_01JABCDE0001',
-  workspaceId: 'wsp_01JABCDE001',
-  command: 'pytest tests/test_contracts.py -v',
-  exitCode: 0,
-  state: 'succeeded',
-  evidenceId: 'evi_01JABCDEF987654',
-  resourceReclaimed: true,
-  allowedEvents: [
-    { timestamp: '2026-09-09T18:10:01Z', action: 'READ', path: './workspace/tests/test_contracts.py' },
-    { timestamp: '2026-09-09T18:10:02Z', action: 'WRITE', path: './data/output_report.json' },
-    { timestamp: '2026-09-09T18:10:03Z', action: 'NET_LISTEN', path: '127.0.0.1:8000' },
-  ],
-  deniedEvents: [
-    {
-      timestamp: '2026-09-09T18:10:01.4Z',
-      action: 'ACCESS',
-      path: '/etc/shadow',
-      reason: 'BLOCKED: Prohibited system path access denied (ADR-005)',
-    },
-    {
-      timestamp: '2026-09-09T18:10:01.8Z',
-      action: 'TRAVERSE',
-      path: '../config/keys.json',
-      reason: 'BLOCKED: Path traversal ".." is strictly forbidden',
-    },
-  ],
-  executedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-  completedAt: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
-};
+import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
+import { apiClient, clearAuthToken } from '@/shared/api/client';
+import { fetchProjects } from '@/shared/api/projectObservation';
+import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
+import { observedNode } from '@/shared/api/nodeObservation';
+import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [nodes, setNodes] = useState<NodeItem[]>(INITIAL_NODES);
-  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>(INITIAL_WORKSPACES);
+  const [nodes, setNodes] = useState<NodeItem[]>([]);
+  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
-  const [executionResult] = useState<ExecutionResultItem | null>(SAMPLE_EXECUTION);
-  const [runs, setRuns] = useState<RunItem[]>(INITIAL_RUNS);
+  const [executionResult] = useState<ExecutionResultItem | null>(null);
+  const [runs, setRuns] = useState<RunItem[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
-  const [approvals, setApprovals] = useState<ApprovalItem[]>([DEMO_APPROVAL]);
-  const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
+  const [runError, setRunError] = useState<string | null>(null);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
+  const activeProject = useRef('');
+  const runRequest = useRef(0);
+  const approvalRequest = useRef(0);
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
-  const [, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
-  const fetchRuns = () => {
-    apiClient<{ items: RunItem[] }>('/v1/runs')
-      .then((res) => {
-        if (res.items?.length > 0) {
-          setRuns(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/runs fetch fallback:', err));
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [projectId, setProjectId] = useState('');
+  const [projectError, setProjectError] = useState<string | null>(null);
+  const scopeRef = useRef(0);
+  const measuredNodes = nodes.filter(node => !node.telemetryUnavailable);
+  const selectedProject = projects.find(p => p.id === projectId);
+  const chooseProject = (id: string) => {
+    scopeRef.current += 1;
+    activeProject.current = id;
+    setRunError(null); setApprovalError(null);
+    setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
+    setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
+    setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
   };
+  useEffect(() => {
+    let active = true;
+    setProjects([]); chooseProject(''); setProjectError(null);
+    if (currentUser) fetchProjects().then(items => {
+      if (active) { setProjects(items); chooseProject(items[0]?.id ?? ''); }
+    }).catch(() => { if (active) setProjectError('프로젝트 목록을 확인하지 못했습니다.'); });
+    return () => { active = false; };
+  }, [currentUser]);
+
+  // Integrated Developer Studio navigation state
+  const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
+  const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
+  const [studioWorkspaceId, setStudioWorkspaceId] = useState<string | null>(null);
+  const [studioRunId, setStudioRunId] = useState<string | null>(null);
+
+  const handleOpenStudio = (opts: { step?: 1 | 2 | 3 | 4; nodeId?: string; workspaceId?: string; runId?: string }) => {
+    if (opts.step) setStudioStep(opts.step);
+    if (opts.nodeId) setStudioNodeId(opts.nodeId);
+    if (opts.workspaceId) setStudioWorkspaceId(opts.workspaceId);
+    if (opts.runId) setStudioRunId(opts.runId);
+    setActiveTab('studio');
+  };
+
+  const fetchNodes = React.useCallback(async () => {
+    if (!currentUser) return;
+    const scope = scopeRef.current;
+    try {
+      const page = await apiClient<{ items: Record<string, unknown>[] }>('/v1/nodes');
+      if (scopeRef.current === scope) setNodes(page.items.map(observedNode));
+    } catch {
+      if (scopeRef.current === scope) setNodes([]);
+    }
+  }, [currentUser]);
+
+  const fetchRuns = React.useCallback(async () => {
+    if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const scope = scopeRef.current;
+    const request = ++runRequest.current;
+    try {
+      const items = await fetchObservedRuns(projectId);
+      if (scopeRef.current === scope && request === runRequest.current) { setRuns(items); setRunError(null); }
+    } catch {
+      if (scopeRef.current === scope && request === runRequest.current) { setRuns([]); setRunError('Run 목록을 확인하지 못했습니다.'); }
+    }
+  }, [currentUser, projectId]);
+
+  const fetchApprovals = React.useCallback(async () => {
+    if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const scope = scopeRef.current;
+    const request = ++approvalRequest.current;
+    try {
+      const items = await fetchObservedApprovals(projectId);
+      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals(items); setApprovalError(null); }
+    } catch {
+      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals([]); setApprovalError('승인 목록을 확인하지 못했습니다.'); }
+    }
+  }, [currentUser, projectId]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -258,126 +128,64 @@ export const App: React.FC = () => {
 
   // Initial load from live backend endpoints
   useEffect(() => {
-    let isMounted = true;
-    apiClient<{ items: any[] }>('/v1/nodes')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setNodes(
-            res.items.map((srvNode) => ({
-              id: srvNode.nodeId || srvNode.id,
-              hostname: srvNode.hostname,
-              status: srvNode.status || 'online',
-              os: srvNode.osType || srvNode.os || 'windows',
-              cpuCores: srvNode.cpuCores || 8,
-              cpuUsagePercent: srvNode.cpuUsagePercent || 20,
-              memoryTotalBytes: srvNode.memoryTotalBytes || 32 * 1024 ** 3,
-              memoryUsedBytes: srvNode.memoryUsedBytes || 16 * 1024 ** 3,
-              gpuName: srvNode.gpuName,
-              gpuCount: srvNode.gpuCount || 0,
-              gpuVramTotalBytes: srvNode.gpuVramTotalBytes || 0,
-              gpuVramUsedBytes: srvNode.gpuVramUsedBytes || 0,
-              storageTotalBytes: srvNode.storageTotalBytes || 1000 * 1024 ** 3,
-              storageUsedBytes: srvNode.storageUsedBytes || 400 * 1024 ** 3,
-              heartbeatAt: srvNode.lastHeartbeatAt || srvNode.heartbeatAt || new Date().toISOString(),
-            }))
-          );
-        }
-      })
-      .catch((err) => console.warn('Live /v1/nodes fetch fallback:', err));
-
+    fetchNodes();
     fetchRuns();
+    fetchApprovals();
+  }, [fetchNodes, fetchRuns, fetchApprovals]);
 
-    apiClient<{ items: ApprovalItem[] }>('/v1/approvals')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setApprovals(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/approvals fetch fallback:', err));
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Live Heartbeat & Metric Fluctuations Simulation
+  // Periodic Telemetry Sync (Genuine Server Polling, Zero Synthetic Fluctuations)
   useEffect(() => {
     const interval = setInterval(() => {
-      setNodes((prevNodes) =>
-        prevNodes.map((n) => {
-          const delta = Math.floor(Math.random() * 5) - 2; // -2% ~ +2%
-          const newCpu = Math.min(95, Math.max(5, n.cpuUsagePercent + delta));
-          return {
-            ...n,
-            cpuUsagePercent: newCpu,
-            heartbeatAt: new Date().toISOString(),
-          };
-        })
-      );
-    }, 4000);
+      fetchNodes();
+      fetchRuns();
+      fetchApprovals();
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNodes, fetchRuns, fetchApprovals]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const handleApprove = async (approvalId: string, nonce: string) => {
+  const handleApprove = async (approvalId: string, _nonce: string, shown?: ReviewedAction) => {
     try {
-      await apiClient(`/v1/approvals/${approvalId}/approve`, {
-        method: 'POST',
-        body: JSON.stringify({ nonce }),
-      });
-    } catch (err) {
-      console.warn('Backend approval API fallback:', err);
-    }
-    setApprovals((prev) =>
-      prev.map((a) => (a.id === approvalId ? { ...a, status: 'approved' } : a))
-    );
-    const matched = approvals.find((a) => a.id === approvalId);
-    if (matched) {
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === matched.runId
-            ? { ...r, state: 'scheduled', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+      const approval = approvals.find((a) => a.id === approvalId);
+      if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
+      await approveReviewed(approval, shown);
+      // Fetch fresh runs and approvals after server confirmed approval
+      await Promise.all([fetchApprovals(), fetchRuns()]);
+    } catch (err: any) {
+      console.error('Backend approval API failed:', err);
+      const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
+      alert(`승인 처리 실패: ${errMsg}`);
+      throw err;
     }
   };
 
   const handleReject = async (approvalId: string, _reason: string) => {
-    setApprovals((prev) =>
-      prev.map((a) => (a.id === approvalId ? { ...a, status: 'rejected' } : a))
-    );
-    const matched = approvals.find((a) => a.id === approvalId);
-    if (matched) {
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === matched.runId
-            ? { ...r, state: 'failed', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+    try {
+      const approval = approvals.find((a) => a.id === approvalId);
+      if (!approval) throw new Error('승인 요청을 새로고침하세요.');
+      await decideApproval(approval, 'reject');
+      // Fetch fresh runs and approvals after server confirmed rejection
+      await Promise.all([fetchApprovals(), fetchRuns()]);
+    } catch (err: any) {
+      console.error('Backend approval reject API failed:', err);
+      const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
+      alert(`승인 반려 실패: ${errMsg}`);
+      throw err;
     }
   };
 
-  const handleCancelRun = async (runId: string, reason: string) => {
+  const handleCancelRun = async (runId: string, _reason: string) => {
     try {
-      await apiClient(`/v1/runs/${runId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      });
-      fetchRuns();
+      const targetRun = runs.find((r) => r.id === runId);
+      await cancelKernelRun(targetRun?.projectId, runId);
+      await fetchRuns();
     } catch (err) {
-      console.warn('Backend run cancellation API fallback:', err);
-      setRuns((prev) =>
-        prev.map((r) =>
-          r.id === runId
-            ? { ...r, state: 'cancelled', updatedAt: new Date().toISOString() }
-            : r
-        )
-      );
+      console.warn('Backend run cancellation API error:', err);
+      alert('취소를 확인하지 못했습니다. 실행 상태를 새로고침한 뒤 확인하세요.');
+      throw err;
     }
   };
 
@@ -389,8 +197,8 @@ export const App: React.FC = () => {
       <Header
         currentTheme={theme}
         onToggleTheme={toggleTheme}
-        onlineNodesCount={5}
-        totalNodesCount={5}
+        onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
+        totalNodesCount={nodes.length}
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);
@@ -399,9 +207,22 @@ export const App: React.FC = () => {
           setSelectedRunId(null);
           setEvidenceRunId(null);
         }}
+        currentUser={currentUser}
+        onLogout={() => {
+          clearAuthToken();
+          setNodes([]); chooseProject(''); setProjects([]);
+          setCurrentUser(null);
+          setActiveTab('login');
+        }}
       />
 
       <main style={{ flex: 1, padding: '32px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        {currentUser && <label>프로젝트 <select aria-label="프로젝트" value={projectId} onChange={e => chooseProject(e.target.value)}>
+          <option value="">프로젝트 선택</option>
+          {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
+        </select>{projectError && <span role="alert">{projectError}</span>}</label>}
+        {runError && <p role="alert">{runError}</p>}
+        {approvalError && <p role="alert">{approvalError}</p>}
         {/* Tab 1: Dashboard */}
         {activeTab === 'dashboard' && (
           <ClusterOverview
@@ -416,11 +237,40 @@ export const App: React.FC = () => {
           />
         )}
 
+        {activeTab === 'studio' && !selectedProject && <p role="status">프로젝트를 선택하면 Studio를 열 수 있습니다.</p>}
+        {/* Tab 1.5: Integrated Developer Studio */}
+        {activeTab === 'studio' && selectedProject && (
+          <DeveloperStudio
+            key={projectId}
+            project={selectedProject}
+            nodes={measuredNodes}
+            runs={runs}
+            approvals={approvals}
+            currentUser={currentUser}
+            initialStep={studioStep}
+            initialNodeId={studioNodeId}
+            initialWorkspaceId={studioWorkspaceId}
+            initialRunId={studioRunId}
+            onNavigateTab={(tab, entityId) => {
+              setActiveTab(tab as any);
+              if (tab === 'runs' && entityId) setSelectedRunId(entityId);
+              if (tab === 'nodes' && entityId) setSelectedNodeId(entityId);
+            }}
+            onRefreshRuns={fetchRuns}
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        )}
+
         {/* Tab 2: Nodes */}
         {activeTab === 'nodes' && (
           <div>
             {selectedNode ? (
-              <NodeDetail node={selectedNode} onBack={() => setSelectedNodeId(null)} />
+              <NodeDetail
+                node={selectedNode}
+                onBack={() => setSelectedNodeId(null)}
+                onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
+              />
             ) : (
               <div>
                 {/* 5-State Simulation Controls (FR-01 / FR-02) */}
@@ -485,6 +335,7 @@ export const App: React.FC = () => {
                   }
                   onRefresh={() => setNodeSimState('normal')}
                   onSelectNode={(id) => setSelectedNodeId(id)}
+                  onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
                 />
               </div>
             )}
@@ -509,6 +360,7 @@ export const App: React.FC = () => {
                 nodes={nodes}
                 onCreateWorkspace={() => setIsCreateModalOpen(true)}
                 onSelectWorkspace={(wspId) => setSelectedWorkspaceId(wspId)}
+                onOpenStudio={(wspId) => handleOpenStudio({ step: 1, workspaceId: wspId })}
               />
             )}
 
@@ -531,12 +383,15 @@ export const App: React.FC = () => {
 
         {/* Tab 2.5: Development Workspace Editor (S06-FE) */}
         {activeTab === 'editor' && (
-          <MonacoWorkspaceEditor workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'} />
+          <MonacoWorkspaceEditor
+            workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'}
+            projectId="prj_01JABCDE"
+          />
         )}
 
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}
         {activeTab === 'placement' && (
-          <PlacementSimulator nodes={nodes} />
+          <PlacementSimulator nodes={measuredNodes} />
         )}
 
         {/* Tab 2.8: Distributed Recovery & Resilience (S07-FE) */}
@@ -546,7 +401,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.9: Admin Security & Audit Console (S08-FE) */}
         {activeTab === 'admin' && (
-          <AdminSecurityConsole nodes={nodes} />
+          <AdminSecurityConsole nodes={nodes} onRefreshNodes={fetchNodes} />
         )}
 
         {/* Tab 2.10: Natural Language Requester & Bounded Agent (S09-FE) */}
@@ -566,7 +421,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.13: Intranet HTTPS Deployment & Operator Training (S12-FE) */}
         {activeTab === 'deployment' && (
-          <IntranetDeploymentView />
+          <IntranetDeploymentView clusterNodes={nodes} />
         )}
 
         {/* Tab 3: Runs & Evidence */}
@@ -583,6 +438,7 @@ export const App: React.FC = () => {
                 onNavigateRun={(id) => setSelectedRunId(id)}
                 onCancelRun={handleCancelRun}
                 onRefreshRun={fetchRuns}
+                onOpenStudio={(runId) => handleOpenStudio({ step: 4, runId })}
               />
             ) : (
               <RunList
@@ -598,9 +454,9 @@ export const App: React.FC = () => {
         {/* Tab 4: Approvals (S04-FE) */}
         {activeTab === 'approvals' && (
           <ApprovalCenter
+            key={`${currentUser?.tenantId}:${currentUser?.id}:${projectId}`}
             approvals={approvals}
-            currentUserId={currentReviewerId}
-            onChangeUser={(newId) => setCurrentReviewerId(newId)}
+            currentUserId={currentUser?.id ?? ''}
             onApprove={handleApprove}
             onReject={handleReject}
           />
@@ -624,7 +480,6 @@ export const App: React.FC = () => {
           <Login
             onLoginSuccess={(user) => {
               setCurrentUser(user);
-              setCurrentReviewerId(user.id);
               setActiveTab('dashboard');
             }}
           />
