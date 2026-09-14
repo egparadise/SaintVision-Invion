@@ -28,3 +28,5 @@ source_of_truth: "Git"
 다음 Codex: frontend b0ecb5e에 명시적 review fetch를 연결하고 사용자가 확인한 actionDigest와 결정 payload가 동일함을 보장한다. UI에서 command 배열/자원·image·timeout·resume/start 정보와 위험도를 표시하고, 늦은 응답/다른 안건/다이제스트 변경/미지원 서버를 거부한다. 현재 UI 승인은 계속 보류된다. Claude: snapshot 보존·RLS·구버전 이행 독립 검토. Gemini: 통합 후 실제 브라우저 확인. 전체57.8125%(2775/4800), 남음42.1875% 유지.
 
 동일 SHA CI6건(Backend/Core/Docs 각2)은23:29:51KST 결제/한도 제한으로 job 시작 전 실패. [CI 증거](../Evidence/approval-review-ci-024a817.json). 문서401개/48task·ontology exit0. CI/독립검토/운영인수 완료 아님.
+
+외부편집3개로 최초sync exit1/쓰기0. 원문 보존·수신 검토 후 재동기화한다. [[2026-09-14_APPROVAL-REVIEW-SNAPSHOT_Codex_오류해결]] 참조.
