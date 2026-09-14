@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.30"
+version: "1.0.31"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,18 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### **결정적 — "실재 부재"는 0개다** (2026-09-14, Claude, 커널 소스 실측)
+
+receipts가 result payload에 이미 있던 것처럼, 남은 "부재 3개"도 커널 소스를 읽으니 전부 이미 있거나 제거 대상이었다. **통합 전 신규 커널 route가 필요한 실 결정은 없다.**
+
+| SPA 경로 | 실측 판정 |
+|---|---|
+| `/v1/runs/{}/shards` (GET) | **존재.** 커널 `app.py:443` `/v1/projects/{project}/runs/{run_id}/shards`. 범위 문제일 뿐 — Gemini 정렬 |
+| `/v1/runs/{}/reclaim-resources` (POST) | **제거 대상.** 커널이 `reclaim_unclaimed`(`reservations.py:12`)를 containment(`containment.py:263`)·cancel(`control.py:202`) 경로에서 **자동 수행**하고, run status에 `resourceReleasePending`를 노출한다(`control.py:92,219`). 브라우저가 수동으로 회수를 트리거하는 것은 fixture 시대 개념 — SPA에서 제거하고 `resourceReleasePending` 표시로 대체 |
+| `/v1/runs/{}/shards/cancel-all` (POST) | **설계 판단(소).** 취소 능력은 존재(`shards.py:348` `cancel`, `control.py:161` run `cancel`). 별도 "전체 취소" 편의 route가 필요한지 vs run-cancel로 충분한지의 판단뿐 — 신규 커널 기능은 아님 |
+
+**결론**: SPA가 부르는 모든 것은 (a) project 범위로 이미 존재하거나(Gemini 이름 정렬), (b) 커널이 자동 처리하므로 SPA에서 빼야 하거나(reclaim), (c) 소소한 편의 route 판단(shards/cancel-all)이다. **커널에 새 route를 만들어야 하는 일은 없다.** 따라서 B-6/7은 통합 전 개발 결정이 아니라 **기계적 정렬 + fixture 버튼 2개 제거**로 끝난다. 이는 integration 통합(CX-01)의 위험을 크게 낮춘다.
 
 ### 진행 — Gemini가 4곳 정렬(`8778c78`), 미제공 18→13 (2026-09-14, Claude)
 
