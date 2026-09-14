@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 
@@ -40,6 +40,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
   const [shards, setShards] = useState<ShardExecutionItem[]>([]);
+  const [shardObservation, setShardObservation] = useState<ShardObservation | null>(null);
   const [isLoadingShards, setIsLoadingShards] = useState(false);
   const [isReclaiming, setIsReclaiming] = useState(false);
   const [isBulkCancelling, setIsBulkCancelling] = useState(false);
@@ -85,6 +86,33 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     let mounted = true;
     async function fetchShards() {
       setIsLoadingShards(true);
+      const prjId = run.projectId || 'prj_01JABCDE';
+      try {
+        const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
+        if (mounted && res) {
+          setShardObservation(res);
+          const shardItems: ShardExecutionItem[] =
+            res.items ||
+            res.shards?.map((m: any) => ({
+              shardId: `shd_${m.index + 1}_${m.runId.slice(-6)}`,
+              runId: m.runId,
+              parentId: run.id,
+              nodeId: m.nodeId,
+              hostname: m.nodeId,
+              attempt: 1,
+              executionState: m.state,
+              physicallyStopped: m.phase === 'stopped',
+              verified: m.evidenceId != null,
+              resourceReleasePending: m.phase === 'stopped' && !res.allPhysicallyStopped,
+              evidenceId: m.evidenceId || undefined,
+            })) ||
+            [];
+          setShards(shardItems);
+          return;
+        }
+      } catch (err) {
+        console.warn('Live /v1/projects/.../runs/.../shards fetch fallback:', err);
+      }
       try {
         const res = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
         if (mounted && res.items) {
@@ -100,15 +128,41 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     return () => {
       mounted = false;
     };
-  }, [run.id]);
+  }, [run.id, run.projectId]);
 
   const handleBulkCancelShards = async () => {
     setIsBulkCancelling(true);
+    const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      await apiClient(`/v1/runs/${run.id}/shards/cancel-all`, { method: 'POST' });
+      try {
+        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/cancel`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: 'Parent batch cancellation requested' }),
+        });
+      } catch {
+        await apiClient(`/v1/runs/${run.id}/shards/cancel-all`, { method: 'POST' });
+      }
       setReclaimNotice('⚡ 모든 분산 샤드에 일괄 취소 명령이 원자적으로 전달되었습니다. (자원 반환 대기 중)');
-      const res = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
-      if (res.items) setShards(res.items);
+      const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
+      if (res?.items) {
+        setShards(res.items);
+      } else if (res?.shards) {
+        setShards(
+          res.shards.map((m: any) => ({
+            shardId: `shd_${m.index + 1}_${m.runId.slice(-6)}`,
+            runId: m.runId,
+            parentId: run.id,
+            nodeId: m.nodeId,
+            hostname: m.nodeId,
+            attempt: 1,
+            executionState: m.state,
+            physicallyStopped: m.phase === 'stopped',
+            verified: m.evidenceId != null,
+            resourceReleasePending: m.phase === 'stopped' && !res.allPhysicallyStopped,
+            evidenceId: m.evidenceId || undefined,
+          }))
+        );
+      }
       onRefreshRun?.();
     } catch (e: any) {
       alert(e.message || '샤드 일괄 취소 실패');
@@ -147,8 +201,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           receipt = res;
         } catch (err: any) {
           if (isRouteNotFoundError(err)) {
-            const prj = run.projectId ? `projects/${run.projectId}/` : '';
-            const resultRes = await apiClient<RunResultView>(`/v1/${prj}runs/${run.id}/result`);
+            const resultRes = await apiClient<RunResultView>(`/v1/runs/${run.id}/result`);
             if (resultRes?.stopReceipt) {
               receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
@@ -890,6 +943,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 shard-completion:v1
               </div>
             </div>
+            {shardObservation && (
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>커널 분산 계획 ID (Gen)</div>
+                <div style={{ fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {shardObservation.planId} (Gen {shardObservation.generation})
+                </div>
+              </div>
+            )}
             <div>
               <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>결과 Manifest 다이제스트</div>
               <div

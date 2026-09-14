@@ -21,7 +21,7 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage } from '@/contracts/types';
 import { apiClient, clearAuthToken, isRouteNotFoundError } from '@/shared/api/client';
 
 // Default Cluster Nodes (Matching the project specification: 5 Windows/Linux nodes)
@@ -327,6 +327,37 @@ export const App: React.FC = () => {
   }, []);
 
   const fetchApprovals = React.useCallback(async () => {
+    try {
+      const prjId = 'prj_01JABCDE';
+      const res = await apiClient<ApprovalPage>(`/v1/projects/${prjId}/approvals`);
+      if (res?.items && res.items.length > 0) {
+        setApprovals(
+          res.items.map((item: any) => ({
+            id: item.approvalId || item.id,
+            projectId: item.projectId || 'prj_01JABCDE',
+            runId: item.runId,
+            workspaceId: item.workspaceId || 'wsp_01JABCDE001',
+            nodeId: item.nodeId || 'nod_01JABCDEF01',
+            riskLevel: item.riskLevel || (item.requiredApprovals === 2 ? 'L2' : 'L1'),
+            target: item.target || 'Workspace Sandbox',
+            command: item.command || 'deploy.release',
+            status: item.status || 'pending',
+            nonce: item.nonce || '',
+            expiresAt: item.expiresAt,
+            requestedBy: item.requesterId || item.requestedBy,
+            policyReason: item.policyVersion ? `Policy ${item.policyVersion}` : 'Security Review Required',
+            boundRunVersion: item.runVersion || item.boundRunVersion || 1,
+            estimatedCostKrw: item.estimatedCostKrw || 0,
+            remainingBudgetKrw: item.remainingBudgetKrw || 10000000,
+            blastRadius: item.blastRadius || 'workspace_isolated',
+            createdAt: item.createdAt || new Date().toISOString(),
+          }))
+        );
+        return;
+      }
+    } catch (err) {
+      console.warn('Live /v1/projects/.../approvals fetch fallback:', err);
+    }
     try {
       const res = await apiClient<{ items: ApprovalItem[] }>('/v1/approvals');
       if (res.items?.length > 0) {

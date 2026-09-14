@@ -609,3 +609,60 @@ export interface RunAttemptList {
   count: number;
   nextCursor?: number | null;
 }
+
+export interface ApprovalView {
+  approvalId: string;
+  runId: string;
+  projectId: string;
+  requesterId: string;
+  actionDigest: string;
+  policyVersion: string;
+  requiredApprovals: 1 | 2;
+  status: 'pending' | 'approved' | 'rejected' | 'expired' | 'dispatched';
+  expiresAt: string;
+  runVersion: number;
+}
+
+export interface ApprovalPage {
+  items: ApprovalView[];
+  nextCursor: string | null;
+}
+
+export type ShardPlanId = string;
+
+export interface ShardObservedMember {
+  index: number;
+  runId: string;
+  nodeId: string;
+  phase: 'queued' | 'uncertain' | 'stopped';
+  state: RunState;
+  evidenceId: string | null;
+}
+
+export interface ShardResultMember {
+  index: number;
+  runId: string;
+  evidenceId: string;
+  objectId: string;
+  sha256: string;
+  sizeBytes: number;
+}
+
+export interface ShardObservation {
+  planId: ShardPlanId;
+  sourcePlanId: ShardPlanId | null;
+  rootPlanId: ShardPlanId;
+  generation: number;
+  parentRunId: string | null;
+  parentState: RunState | null;
+  aggregateManifestSha256: string | null;
+  shardCount: number;
+  allPhysicallyStopped: boolean;
+  allSucceeded: boolean;
+  resultManifest: ShardResultMember[] | null;
+  resultManifestSha256: string | null;
+  shards: ShardObservedMember[];
+  items?: ShardExecutionItem[];
+  total?: number;
+}
+

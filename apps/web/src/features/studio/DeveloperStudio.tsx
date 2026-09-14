@@ -634,8 +634,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           receipt = res;
         } catch (err: any) {
           if (isRouteNotFoundError(err) && activeRunId) {
-            const prj = selectedProjectId ? `projects/${selectedProjectId}/` : '';
-            const resultRes = await apiClient<RunResultView>(`/v1/${prj}runs/${activeRunId}/result`);
+            const resultRes = await apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`);
             if (resultRes?.stopReceipt) {
               receipt = resultRes.stopReceipt as NodeStopReceipt;
             }

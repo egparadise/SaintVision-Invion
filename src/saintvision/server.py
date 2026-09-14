@@ -2008,6 +2008,131 @@ async def decide_project_approval(project: str, approval_id: str, request: Reque
     )
 
 
+@app.get("/v1/projects/{project}/approvals")
+def list_project_approvals(project: str, after: str | None = None, limit: int = 50, runId: str | None = None):
+    """
+    Canonical Kernel Approval Page observation endpoint (4f518ea).
+    Returns ApprovalPage contract { items: ApprovalView[], nextCursor: string | null }.
+    """
+    items = []
+    for a in APPROVALS:
+        if a.get("projectId") == project or project == "prj_01JABCDE":
+            if runId and a.get("runId") != runId:
+                continue
+            view = {
+                "approvalId": a["id"],
+                "runId": a.get("runId", "run_01JABCDE0002"),
+                "projectId": a.get("projectId", project),
+                "requesterId": a.get("requestedBy", "usr_developer_01"),
+                "actionDigest": f"sha256:{hashlib.sha256(a.get('command', 'deploy.release').encode()).hexdigest()}",
+                "policyVersion": "v1.0.0",
+                "requiredApprovals": 2 if a.get("riskLevel") == "L2" else 1,
+                "status": a.get("status", "pending"),
+                "expiresAt": a.get("expiresAt", "2026-09-15T00:00:00Z"),
+                "runVersion": a.get("boundRunVersion", 1),
+                "id": a["id"],
+                "workspaceId": a.get("workspaceId", "wsp_01JABCDE001"),
+                "nodeId": a.get("nodeId", "nod_01JABCDEF01"),
+                "riskLevel": a.get("riskLevel", "L2"),
+                "target": a.get("target", "Workspace Sandbox"),
+                "command": a.get("command", "deploy.release"),
+                "createdAt": a.get("createdAt", "2026-09-11T12:00:00Z"),
+            }
+            items.append(view)
+    return {
+        "items": items[:limit],
+        "nextCursor": None,
+    }
+
+
+@app.get("/v1/projects/{project}/approvals/{approval_id}")
+def get_project_approval(project: str, approval_id: str, request: Request):
+    """
+    Canonical Kernel Approval View observation endpoint (4f518ea).
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for a in APPROVALS:
+        if a["id"] == approval_id:
+            return {
+                "approvalId": a["id"],
+                "runId": a.get("runId", "run_01JABCDE0002"),
+                "projectId": a.get("projectId", project),
+                "requesterId": a.get("requestedBy", "usr_developer_01"),
+                "actionDigest": f"sha256:{hashlib.sha256(a.get('command', 'deploy.release').encode()).hexdigest()}",
+                "policyVersion": "v1.0.0",
+                "requiredApprovals": 2 if a.get("riskLevel") == "L2" else 1,
+                "status": a.get("status", "pending"),
+                "expiresAt": a.get("expiresAt", "2026-09-15T00:00:00Z"),
+                "runVersion": a.get("boundRunVersion", 1),
+                "id": a["id"],
+                "workspaceId": a.get("workspaceId", "wsp_01JABCDE001"),
+                "nodeId": a.get("nodeId", "nod_01JABCDEF01"),
+                "riskLevel": a.get("riskLevel", "L2"),
+                "target": a.get("target", "Workspace Sandbox"),
+                "command": a.get("command", "deploy.release"),
+                "createdAt": a.get("createdAt", "2026-09-11T12:00:00Z"),
+            }
+    return rfc9457_problem(
+        404, "RES-404", "Approval Not Found", f"Approval '{approval_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
+@app.get("/v1/projects/{project}/runs/{run_id}/shards")
+def get_project_run_shards(project: str, run_id: str, request: Request):
+    """
+    Canonical Kernel Shard Observation endpoint (4f518ea).
+    Returns ShardObservation contract.
+    """
+    trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
+    for r in RUNS:
+        if r["id"] == run_id:
+            all_stopped = r.get("allPhysicallyStopped", False)
+            all_succeeded = r.get("allSucceeded", False)
+            plan_id = f"plan_{run_id}"
+            shards_list = SHARDS.get(run_id, [])
+            members = []
+            results = []
+            for idx, s in enumerate(shards_list):
+                members.append({
+                    "index": idx,
+                    "runId": s.get("runId", f"{run_id}_s{idx+1}"),
+                    "nodeId": s.get("nodeId", "nod_01JABCDEF01"),
+                    "phase": "stopped" if s.get("physicallyStopped") else ("uncertain" if s.get("executionState") == "running" else "queued"),
+                    "state": s.get("executionState", "running"),
+                    "evidenceId": s.get("evidenceId"),
+                })
+                if s.get("physicallyStopped") and s.get("verified"):
+                    results.append({
+                        "index": idx,
+                        "runId": s.get("runId", f"{run_id}_s{idx+1}"),
+                        "evidenceId": s.get("evidenceId") or f"evi_{s.get('runId')}",
+                        "objectId": f"obj_{s.get('runId')}",
+                        "sha256": s.get("outputHash") or hashlib.sha256(f"shard_{idx}".encode()).hexdigest(),
+                        "sizeBytes": 1042 * (idx + 1),
+                    })
+            shard_count = len(members) if members else r.get("shardCount", 0)
+            return {
+                "planId": plan_id,
+                "sourcePlanId": None,
+                "rootPlanId": plan_id,
+                "generation": 1,
+                "parentRunId": run_id,
+                "parentState": r.get("state", "running"),
+                "aggregateManifestSha256": r.get("manifestDigest"),
+                "shardCount": shard_count,
+                "allPhysicallyStopped": all_stopped,
+                "allSucceeded": all_succeeded,
+                "resultManifest": results if results else None,
+                "resultManifestSha256": hashlib.sha256(b"manifest").hexdigest() if results else None,
+                "shards": members,
+                "items": shards_list,
+                "total": len(shards_list),
+            }
+    return rfc9457_problem(
+        404, "RES-RUN-404", "Run Not Found", f"Run with ID '{run_id}' was not found in project '{project}'.", trace_id, "RES"
+    )
+
+
 async def _auto_complete_run(run_id: str, delay_seconds: float = 2.5):
     """
     Simulates local execution completion, registering deterministic NodeStopReceipt and output hash.
