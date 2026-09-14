@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.36"
+version: "1.0.37"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,22 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### fixture 제거는 신규 작업이 아니다 — workspace-bridge에 이미 완결돼 있다 (2026-09-14, Claude)
+
+내 auth 검토의 "fixture 결합"을 계기로 integration의 fixture 의존을 전수 확인했다. **B-3/4/5는 workspace-bridge에서 완전히 해소됐고, integration에만 아직 반영되지 않았다.**
+
+| 항목 | integration (현재) | workspace-bridge (해결됨) |
+|---|---|---|
+| `Dockerfile.backend` CMD | `saintvision.server:app` (**fixture 배포**) | `saintvision.server:create_app --factory` |
+| `src/saintvision/server.py` | **2811줄 fixture** | **6줄 shim** (→ `inv.app.create_configured_app`) |
+| `src/saintvision/demo_server.py` | **없음** | 있음 (정상 격리처) |
+| `test_server_auth_integrity.py`·`test_server_project_api.py` | fixture import | **제거됨** |
+| standalone auth fallback `/v1/auth/token` | fixture 의존 | (통합 시 함께 정리) |
+
+integration의 자기 문서 `deploy/CONFIGURED-SERVER.md`도 이미 `create_app --factory`를 정본으로 적었는데 **Dockerfile이 그것과 불일치**한다 — 문서는 고쳐졌고 배포 파일만 안 따라온 상태다.
+
+**결론**: fixture 제거는 CX-01이 새로 할 일이 아니라 **workspace-bridge의 deploy/·server.py·demo_server.py·시험 삭제를 integration이 가져오는 것**이다. B-4의 실측 위험(인증·DB 없이 고정 데이터 배포)은 workspace-bridge에서 이미 닫혔고, 남은 것은 그 커밋들이 integration에 도달하는 것뿐이다. 내 `deployment_surface.py`를 통합 후 `--dockerfile deploy/Dockerfile.backend`로 돌려 factory 거부(exit 0)를 인수 증거로 삼으면 된다.
 
 ### auth 수정 검토 — Gemini `96191cc`은 올바르다, 잔여는 fixture 결합 한 가닥 (2026-09-14, Claude)
 
