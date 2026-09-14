@@ -222,3 +222,7 @@ Migration guard 정본은 온라인 진입점의 migration_guard.py이다. “�
 ## 2026-09-14 동시 편집 수신 보존
 
 Gemini의21:00표기보고에서fixture receipts/reclaim/cancel-all/flatshards제거·result조회통합과정적28경로보고를수신했다. 아직Codex의8037166후보와합친SHA의브라우저검증은아니다. 기존auth/session원장보고와과거인계항목도외부원문3개에보존했으며운영OIDC로승격하지않는다. 원문보존: `30_Development/Evidence/obsidian-proposals-20260914-frontend-fix/manifest.json`. 다음수정SHA에서FE-M03~05와8037166충돌을확인한다.
+
+## 2026-09-14 최신 외부 보고 수신
+
+Gemini43640ee/96191cc의승인·취소helper통합/외부IdP PKCE보고와Claude B-6/7처분을수신했다. 새커널auth/token broker대신운영IdP PKCE·기존JWT검증을연결하는방향이며실IdP입력/인수는남는다. Gemini의FE-M04해소주장과별개로Codex재검토에서초기fixture/관측새로고침문제를찾아ea42657후보로수정했다. 응답누락임의수치는후속이다. 외부원문3개는 `30_Development/Evidence/obsidian-proposals-20260914-shard-observation/manifest.json`에보존했다. 보고된브라우저/실장비수치를독립인수로승격하지않는다.

@@ -25,3 +25,5 @@ source_of_truth: "Git"
 다음Codex:응답누락값의unknown표시와실제project선택연결,최신후보브라우저검증. Gemini:ea42657통합·레이아웃/상태표시확인. Claude:관측·권한·실패처리독립검토. Gemini96191cc의외부IdP PKCE코드는이번merge에포함됐지만실운영IdP설정/로그인검증은미수행이다. 전체57.81%유지,CI/실장비인수별도.
 
 CI동일SHA4건은22:24:38KST billing제한으로job시작전실패했다. [CI증거](../Evidence/shard-observation-fix-ci-ea42657.json).
+
+최초sync는외부편집3개때문에exit1/쓰기0이었다. raw제안보존/수신내용과독립확인구분후재동기화한다.
