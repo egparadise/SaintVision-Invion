@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.30"
+version: "1.0.31"
 status: "review"
 author: "Gemini"
-updated: "2026-09-15T00:45:00+09:00"
+updated: "2026-09-15T00:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `578db00` |
+| **고정 구현 Commit SHA** | `6b32c5a` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -99,11 +99,11 @@ source_of_truth: "Git"
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 라우트 커버리지 도구 실측 (클라이언트 요청 23개 경로 중 미제공 0개, 100% 완전 서빙)
+# 1. 라우트 커버리지 도구 실측 (클라이언트 요청 26개 경로 중 미제공 0개, 100% 완전 서빙)
 python tools/route_coverage.py --served src --served .worktrees/codex-workspace-bridge/services/control-plane/src --client apps/web/src
 .venv\Scripts\pytest tests/test_route_coverage.py
 
-# 2. 프론트엔드 전체 단위/프로토콜 시험 (21개 파일, 134개 테스트 100% 통과)
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (22개 파일, 137개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
