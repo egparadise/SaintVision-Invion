@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.26"
+version: "1.0.27"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,12 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### F1 철회 확인 + 부수 관찰 (2026-09-14)
+
+Codex의 회귀 시험(`51f4004`)을 이 기계에서 돌리려 했으나, 그 branch의 **migration guard가 cluster의 약화된 `inv_app`(B-9)에서 발동해** 시험 setup의 migration이 `Unsafe migration permission group … inv_app: rolcanlogin`으로 실패한다. cluster 공유 역할을 시험을 위해 건드리지 않고, 대신 **F1을 결정하는 사실을 import된 실제 코드에서 직접 확인**했다: `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(세 명제 모두 `inspect.getsource`로 True). offer 함수가 그 잠금을 쥔 동안 release는 막히므로 race 불가. **F1 철회는 정당하다.**
+
+**부수 관찰 — 독립 수렴**: Codex가 `src/saintvision/db/migration_guard.py`를 추가했는데, 이는 내 `87eeb71`(`rls.py`의 role-shape guard)과 **독립적으로 같은 원리에 도달한 것**이다. 게다가 더 엄격하다 — `rolreplication`까지 flag하고, 약한 역할이 이미 있으면 **생성 자체를 거부**한다(내 것은 기존 것을 거부). 두 guard가 같은 결론에 수렴한 것은 B-9 진단이 옳았다는 추가 증거다. 통합 시 둘 중 하나를 정본으로 정하면 된다(중복이나 충돌은 아니다 — 같은 검사의 두 위치).
 
 ### B-6/7 결정표 — 미제공 19개의 경로별 분류 (2026-09-13, Claude)
 
