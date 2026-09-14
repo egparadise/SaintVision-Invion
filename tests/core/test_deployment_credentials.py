@@ -11,6 +11,7 @@ REQUIRED = {"INV_BUSINESS_DSN": "postgresql+psycopg://example:example@postgres/s
             "INV_RUNTIME_DSN": "postgresql://kernel:example@postgres/saintvision",
             "INV_RECOVERY_EPOCH": "11111111-1111-4111-8111-111111111111",
             "INV_CONFIG_VOLUME": "synthetic-config-volume",
+            "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
             "POSTGRES_PASSWORD": "synthetic-admin-only", "MINIO_ROOT_USER": "synthetic-admin",
             "MINIO_ROOT_PASSWORD": "synthetic-storage-only"}
 
@@ -54,6 +55,10 @@ def test_workspace_overlay_requires_external_volume(tmp_path, volume):
         return
     assert result.returncode == 0
     config = json.loads(result.stdout)
+    auth_mount = next(v for v in config['services']['web']['volumes'] if v['target'] == '/usr/share/nginx/html/auth-config.js')
+    assert auth_mount['type'] == 'bind' and auth_mount['read_only'] is True
+    # Compose omits false booleans in its normalized JSON output.
+    assert auth_mount.get('bind', {}).get('create_host_path', False) is False
     assert config["volumes"]["workspace_data"]["external"] is True
     assert config["volumes"]["workspace_data"]["name"] == volume
     backend = config["services"]["control-plane"]

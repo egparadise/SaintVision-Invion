@@ -50,3 +50,43 @@ redirect URI, client and S256 verifier; the production factory validates signed 
 The full App test checks valid login/project/approval/logout and wrong-audience token
 rejection. No responses are intercepted by Playwright. This is not operational SSO,
 remote Node execution, or independent reviewer acceptance.
+
+
+## Built HTTPS proxy verification
+
+Compose requires `INV_WEB_AUTH_CONFIG` to point to an existing public JavaScript
+configuration file. It mounts that single file read-only at `/auth-config.js` and
+will not create a missing host path. Keep TLS certificate/key mounts separate.
+The provided Compose publishes HTTPS on 8443 and HTTP on 8081; HTTP redirects target
+8443. A different external port needs an explicit redirect configuration change.
+
+```powershell
+docker build -t saintvision-web-candidate:studio-tls apps/web
+$env:INV_WEB_IMAGE = 'saintvision-web-candidate:studio-tls'
+python -m pytest -q tests/integration/test_web_container.py tests/core/test_deployment_credentials.py
+```
+
+Install requirements-backend.txt and requirements-browser.txt first. Windows uses
+installed Edge; Linux needs `python -m playwright install --with-deps chromium`.
+The opt-in test runs the actual built frontend container, with an ephemeral local
+certificate and a separate HTTP transport fixture. Ports bind only to 127.0.0.1.
+httpx trusts the test certificate explicitly and rejects it without that trust;
+the browser pins only its ephemeral SPKI. No OS trust store or operational certificate
+is modified. Containers and networks are removed only after ownership-label checks.
+
+The tests cover mounted public configuration, full `/studio` bundle rendering,
+no-store and security headers, cache exclusion, real proxy Bearer/status forwarding,
+first SSE event delivery before the upstream finishes, query/Referer log redaction,
+and disconnect/reconnect of the same upstream container. The upstream is deliberately
+**a transport fixture**, not a replacement for kernel/JWT/DB acceptance or the prior
+synthetic PKCE full-App test. No operational SSO or remote Node execution is claimed.
+
+Nginx's local Docker health check measures its HTTP liveness. `/readyz` separately
+proxies backend readiness and preserves failure statuses. Static cache headers must
+include security-headers.conf because Nginx 1.27 does not inherit parent `add_header`
+when a location declares its own ([Nginx reference](https://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header)).
+Canonical project Run SSE has buffering disabled. Upstream connection timeout is two
+seconds; a stopped endpoint returns 502/504 instead of serving SPA success content.
+Existing `tools/deploy_intranet.ps1` is not part of this acceptance: its hard-coded
+success reporting and simulated deployment checks need a separate cleanup before it
+can serve as an operational acceptance script.
