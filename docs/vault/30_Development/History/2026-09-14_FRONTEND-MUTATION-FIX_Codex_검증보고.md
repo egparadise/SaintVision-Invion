@@ -26,3 +26,5 @@ Gemini가공유checkout의RunDetail/DeveloperStudio를수정중이며이파일�
 Claude c5c014e는b95ab27의재현시험이정본동작에근거한다고독립검토했다(실제commit내용수신). 이는8037166수정후보승인이아니다. 수동reclaim제거/부모cancel재사용에동의하며새kernelroute불필요로정정했다. 운영OIDC/실장비/CI인수는남는다.
 
 첫sync는외부편집3개로exit1/쓰기0. 원문·hash보존후최신Codex보고와수신주장을분리해재동기화한다.
+
+최종전달:393문서/48task및ontology검사exit0. 외부편집이한차례추가되어r2원문보존후동일bytes만채택했다. 9a2ec5e push후21:00:01 KST check/apply/check모두exit0,856관리파일hash일치/pending0/conflict0. [영수증](../Evidence/frontend-fix-sync-9a2ec5e.json). 로컬Obsidian사본기준이다.
