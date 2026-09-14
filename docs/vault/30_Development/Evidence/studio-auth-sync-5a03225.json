@@ -1,0 +1,44 @@
+{
+  "verifiedKst": "2026-09-15T00:54:54+09:00",
+  "sourceSha": "5a03225f1c2303d4c5e427bf410bbf6df60618b5",
+  "managedFiles": 917,
+  "allHashesMatch": true,
+  "pendingExports": 0,
+  "conflicts": 0,
+  "commands": [
+    {
+      "command": [
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        ".work/workspace-sync-state.json"
+      ],
+      "exit_code": 0,
+      "stdout": "CHECK: 917 managed files, 15 pending exports, 0 conflicts. No writes.",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "tools/sync_obsidian.py",
+        "--apply",
+        "--state",
+        ".work/workspace-sync-state.json"
+      ],
+      "exit_code": 0,
+      "stdout": "EXPORTED: 15 files; all 917 destination hashes match. Unmanaged files untouched.",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        ".work/workspace-sync-state.json"
+      ],
+      "exit_code": 0,
+      "stdout": "CHECK: 917 managed files, 0 pending exports, 0 conflicts. No writes.",
+      "stderr": ""
+    }
+  ],
+  "scope": "Local Obsidian mirror; OneDrive cloud upload not verified"
+}

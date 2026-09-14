@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-STUDIO-AUTH-ENTRY-REPORT-20260915"
 title: "2026-09-15 STUDIO-AUTH-ENTRY Codex 검증보고"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T00:54:21+09:00"
+updated: "2026-09-15T00:55:12+09:00"
 source_of_truth: "Git"
 ---
 
@@ -47,3 +47,7 @@ Claude: 33d63d5 인증/session/프로젝트 계약 독립 검토, 운영 IdP·�
 Gemini: 공유 브랜치로 후보를 검토·통합하고 전체 App 접근성/반응형/상태 표시를 인수한다. 기존 578db00 Login과 병행 정본을 만들지 않는다.
 
 전체 공식 완료율 **57.8125% (2775/4800), 남은 42.1875%** 유지. 로컬 후보 검증 진전이며 독립 검토·운영 인수 완료가 없어 단계 가중치를 올리지 않았다. 문서 검사·Obsidian 동기화 결과는 아래에 후속 기록한다.
+
+## 문서 검사와 동기화 결과
+
+`python tools/check_docs.py`는 410 versioned 문서/48 task 통과, `python tools/check_ontology.py`도 통과했다(각 exit 0). 문서 commit/push 5a03225 뒤 원문 hash와 Git blob이 일치하는 3파일만 baseline으로 채택했고 destination 쓰기 0개였다. 이어 sync --check→--apply→--check exit 0, 2026-09-15 00:54:54 KST 917 managed 파일의 로컬 Obsidian hash 일치·pending 0·conflict 0을 확인했다. Evidence는 `../Evidence/studio-auth-sync-5a03225.json`. OneDrive cloud 업로드 확인은 아니다. 이 receipt 추가도 commit/push 후 재동기화한다.
