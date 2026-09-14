@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.33"
+version: "1.0.35"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,38 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### B-6/7 완결 — 신규 커널 route 0, `auth/token`은 mock login이었다 (2026-09-14, Claude)
+
+Gemini `09b8fb7`("aligning with Claude 6212291 review")이 내 검토 목록을 소비했고, 정직한 미제공(fixture 제외)이 11→**4**로 떨어졌다. 남은 4의 정체:
+
+| 경로 | 처분 |
+|---|---|
+| `/v1/runs`(bare list) | 정렬 — 커널 `/v1/projects/{p}/runs` 존재. Gemini 잔여 |
+| `/v1/workspaces`(bare list) | 정렬 — `/v1/projects/{p}/workspaces` 존재. Gemini 잔여 |
+| `/v1/events` | **API 아님** — `deploymentEngine.ts`의 nginx proxy 설정 문자열 |
+| `/v1/auth/token` | **mock login.** `Login.tsx:42`가 `code: auth_code_${generateNonce()}` — 조작된 auth code를 만들어 보낸다. 실 IdP redirect(`window.location`·`/authorize`·`redirect_uri`) 없음. FE-M04와 같은 mock |
+
+**`auth/token` 결정 근거**: 커널은 절차서 2절대로 **offline verifier**(JWT 검증, JWKS 파일)이지 code 교환 broker가 아니다. 올바른 흐름은 SPA가 실 IdP의 authorization-code+PKCE를 직접 수행 → 받은 JWT를 backend가 오프라인 검증. 즉 `/v1/auth/token` POST는 **커널에 만들 endpoint가 아니라 교체할 mock**이다. 실 IdP 설정은 운영자 입력, SPA 흐름 교체는 Gemini.
+
+**결론(근거 확립)**: SPA가 부르는 것 중 **신규 커널 route가 필요한 것은 0개**다. 미제공 4는 = 정렬 2(Gemini)·비호출 1(nginx)·mock login 1(Gemini 교체 + 운영자 실 IdP). B-6/7의 "화면과 커널이 합의 못했다"는 최종적으로 **커널은 이미 다 제공하고, 화면이 fixture 흐름을 실 흐름으로 바꾸면 된다**로 귀결된다. 통합(CX-01)에 커널 개발 결정은 없다.
+
+### Codex FE-M01~05 재현 시험 검토 (Codex가 배정, 2026-09-14, Claude)
+
+Codex가 `test_frontend_mutation_contract.py`로 SPA의 **body 계약** 불일치를 잡았고, 검토 보고 끝에 "Claude: 재현 시험 자체 검토"를 내게 배정했다. 이건 내 route-shape 도구가 출력하던 한계("route 존재 ≠ 응답이 화면 기대와 일치")를 Codex가 닫은 것이다. 검토했다 — **시험은 타당하고, 커널의 실제 동작에 근거한다.**
+
+- **양면적**: SPA의 현재 body(`{"decision":"approve","nonce":""}`, cancel `{reason}`)가 **422로 거부되고 승인/Run을 변경하지 않음**을 확인한 뒤, 올바른 계약(`challenge→nonce→actionDigest`, `{expectedVersion}`)이 **200**으로 동작함을 확인한다. "실패할 수 있는가 AND 통과할 수 있는가" 둘 다 건다.
+- **바라는 동작이 아니라 실제 동작 확인**: 커널 소스로 대조했다 — `control.cancel`은 정수 `expected_version` 없으면 `VAL-0003` **422**(`control.py:163`), 승인은 `challenge`가 nonce를 발급(`approvals.py:254,267`)하고 decision이 그것을 요구한다. 시험이 주장하는 422/200이 실코드 동작이다.
+- **판정**: Codex의 시험을 **인정한다**(승인이 아니라 재현 시험의 타당성 확인). 단, Codex 본인이 적었듯 이는 payload 경계 검증이지 브라우저 성공/실패 회귀는 아니며, 그 증거는 Gemini의 새 SHA 몫이다.
+
+**이것이 내 "결정 3개"를 더 무너뜨린다**:
+- **reclaim-resources**: FE-M03이 "수동 회수 제거, `resourceReleasePending` 재조회로 대체"로 확정 → 내 "제거" 판정과 일치. **결정 아님, frontend 수정.**
+- **shards/cancel-all**: FE-M03이 "부모 정본 cancel(expectedVersion/key), 다른 경로 fallback 금지"로 확정 → 신규 route 아님. **결정 아님, frontend 수정.**
+- **receipt-by-id**: `result_view.result()`가 이미 `receiptId`·receipt를 payload에 포함(`result_view.py:130`) → **payload로 접기**가 근거 있는 답. 신규 route 불필요.
+
+**따라서 신규 커널 route가 필요한 실 결정은 다시 0에 수렴한다** — 이번엔 receipt·auth까지 확인한 근거 위에서. 남은 건 전부 명명된 frontend 수정(FE-M01~05 + 정렬 5곳)이다. `auth/token`(PKCE broker 여부)만은 Codex의 FE-M 목록에 없어 여전히 열린 유일한 설계 질문으로 남긴다.
+
+**주목**: FE-M02(422 취소를 'cancelled'로 표시)·FE-M04(onlineNodesCount=5 고정, 임의 기본값을 실측처럼)는 내가 세션 내내 쫓은 "미확인을 성공으로·fixture를 실측으로"의 frontend 발현이다. B-4(fixture 서버가 고정 데이터)가 화면에서 FE-M04로 드러난 것 — 두 검토가 같은 결함의 양끝을 잡았다.
 
 ### 정정 — "부재 0"은 과장이었다. 실 결정은 3개다 (2026-09-14, Claude)
 

@@ -320,20 +320,11 @@ export const App: React.FC = () => {
     try {
       const prjId = 'prj_01JABCDE';
       const res = await apiClient<{ items: RunItem[] }>(`/v1/projects/${prjId}/runs`);
-      if (res.items?.length > 0) {
-        setRuns(res.items);
-        return;
-      }
-    } catch (err) {
-      console.warn('Live /v1/projects/.../runs fetch fallback:', err);
-    }
-    try {
-      const res = await apiClient<{ items: RunItem[] }>('/v1/runs');
-      if (res.items?.length > 0) {
+      if (res.items) {
         setRuns(res.items);
       }
     } catch (err) {
-      console.warn('Live /v1/runs fetch fallback:', err);
+      console.warn('Live /v1/projects/.../runs fetch failed:', err);
     }
   }, []);
 
@@ -341,7 +332,7 @@ export const App: React.FC = () => {
     try {
       const prjId = 'prj_01JABCDE';
       const res = await apiClient<ApprovalPage>(`/v1/projects/${prjId}/approvals`);
-      if (res?.items && res.items.length > 0) {
+      if (res?.items) {
         setApprovals(
           res.items.map((item: any) => ({
             id: item.approvalId || item.id,
@@ -365,18 +356,9 @@ export const App: React.FC = () => {
             createdAt: item.createdAt || new Date().toISOString(),
           }))
         );
-        return;
       }
     } catch (err) {
-      console.warn('Live /v1/projects/.../approvals fetch fallback:', err);
-    }
-    try {
-      const res = await apiClient<{ items: ApprovalItem[] }>('/v1/approvals');
-      if (res.items?.length > 0) {
-        setApprovals(res.items);
-      }
-    } catch (err) {
-      console.warn('Live /v1/approvals fetch fallback:', err);
+      console.warn('Live /v1/projects/.../approvals fetch failed:', err);
     }
   }, []);
 
@@ -455,8 +437,8 @@ export const App: React.FC = () => {
       <Header
         currentTheme={theme}
         onToggleTheme={toggleTheme}
-        onlineNodesCount={5}
-        totalNodesCount={5}
+        onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
+        totalNodesCount={nodes.length}
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);

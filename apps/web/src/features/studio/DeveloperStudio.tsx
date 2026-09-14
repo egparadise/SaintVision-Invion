@@ -14,6 +14,7 @@ import {
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { apiClient, isRouteNotFoundError, getAuthToken } from '@/shared/api/client';
+import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 
@@ -179,19 +180,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     const prjId = selectedProjectId || 'prj_01JABCDE';
     apiClient<{ items: WorkspaceItem[] }>(`/v1/projects/${prjId}/workspaces`)
       .then((res) => {
-        if (mounted && res.items && res.items.length > 0) {
+        if (mounted && res.items) {
           setWorkspaces(res.items);
         }
       })
-      .catch(() => {
-        apiClient<{ items: WorkspaceItem[] }>('/v1/workspaces')
-          .then((res) => {
-            if (mounted && res.items && res.items.length > 0) {
-              setWorkspaces(res.items);
-            }
-          })
-          .catch((err) => console.warn('Workspaces fetch fallback:', err));
-      });
+      .catch((err) => console.warn('Live /v1/projects/.../workspaces fetch failed:', err));
 
     return () => {
       mounted = false;
@@ -257,18 +250,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
       if (data && data.id) {
         setLiveRun(data);
-        return;
       }
-    } catch {
-      // fallback
-    }
-    try {
-      const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
-      if (data && data.id) {
-        setLiveRun(data);
-      }
-    } catch {
-      // quiet fallback
+    } catch (err) {
+      console.warn('Failed to refresh active run:', err);
     }
   };
 
@@ -283,18 +267,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
         if (mounted && data && data.id) {
           setLiveRun(data);
-          return;
         }
-      } catch {
-        // fallback
-      }
-      try {
-        const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
-        if (mounted && data && data.id) {
-          setLiveRun(data);
-        }
-      } catch {
-        // quiet fallback
+      } catch (err) {
+        console.warn('Active run poll failed:', err);
       }
     };
 
@@ -581,17 +556,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handleCancelSubmit = async () => {
     if (!activeRunId) return;
     setIsCancelling(true);
-    const idempotencyKey = `idmp_cancel_${activeRunId}`;
     try {
-      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
-      await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason: cancelReason }),
-        idempotencyKey,
-      });
+      await cancelKernelRun(selectedProjectId, activeRunId);
       setLogs((prev) => [
         ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled (Reason: ${cancelReason}). Outbox holds command until NodeStopReceipt verified.` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled. Outbox holds command until NodeStopReceipt verified.` },
       ]);
       setReclaimNotice('⚡ 취소 명령이 발행되었습니다. NodeStopReceipt 수신 시까지 Outbox에 보류됩니다.');
       setShowCancelModal(false);
@@ -634,18 +603,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       if (liveRun?.stopReceipt && ((liveRun.stopReceipt as any).receiptId === receiptId || !receiptId)) {
         receipt = liveRun.stopReceipt as NodeStopReceipt;
       }
-      if (!receipt) {
+      if (!receipt && activeRunId) {
+        const prjId = selectedProject?.id || 'prj_01JABCDE';
         try {
-          const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
-          receipt = res;
+          const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
+          if (resultRes?.stopReceipt) {
+            receipt = resultRes.stopReceipt as NodeStopReceipt;
+          }
         } catch (err: any) {
-          if (isRouteNotFoundError(err) && activeRunId) {
+          if (isRouteNotFoundError(err)) {
             const resultRes = await apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`);
             if (resultRes?.stopReceipt) {
               receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
           }
-          if (!receipt) throw err;
         }
       }
       setSelectedReceipt(receipt);
