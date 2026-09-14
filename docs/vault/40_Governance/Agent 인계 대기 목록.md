@@ -1,14 +1,17 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.15"
+version: "1.0.16"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T13:48:30+09:00"
+updated: "2026-09-14T20:50:38+09:00"
 source_of_truth: "Git"
 ---
 
 # Agent 인계 대기 목록
+
+
+- [[2026-09-14_FRONTEND-MUTATION-REVIEW_Codex_검증보고]]:frontend70ea3fb 독립검토 changes requested(FE-M01~05). 승인nonce/digest·취소version누락,취소실패성공표시,flat회수/fallback·임의관측·로딩오류. 실제격리PG/HTTP6개통과로현body422/상태보존·정본200확인(b95ab27). 다음Gemini수정/Codex재검토,전체57.81%유지.
 
 기준 implementation commit: d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3
 CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Invion/actions/runs/34319745273)
