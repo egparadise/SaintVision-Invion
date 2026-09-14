@@ -27,3 +27,5 @@ source_of_truth: "Git"
 CI동일SHA4건은22:24:38KST billing제한으로job시작전실패했다. [CI증거](../Evidence/shard-observation-fix-ci-ea42657.json).
 
 최초sync는외부편집3개때문에exit1/쓰기0이었다. raw제안보존/수신내용과독립확인구분후재동기화한다.
+
+전달확인:395문서/48task·ontology검사exit0. ef86155 push후22:26:00KST Obsidian check/apply/check exit0,865관리파일hash일치/pending0/conflict0. [영수증](../Evidence/shard-observation-sync-ef86155.json). 로컬사본확인,cloud동기화미측정.
