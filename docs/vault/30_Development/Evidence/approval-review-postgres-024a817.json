@@ -1,0 +1,13 @@
+{
+  "command": "python -m pytest -q tests/integration/test_approval_review.py tests/integration/test_approvals.py tests/integration/test_project_observation.py tests/integration/test_control_api.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "isolatedContainerRemoved": true,
+  "productSha": "024a817",
+  "passed": 48,
+  "newTests": 7,
+  "durationSeconds": 34.44,
+  "migration": "new disposable database upgrade through0038; no live upgrade"
+}
