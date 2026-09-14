@@ -179,19 +179,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     const prjId = selectedProjectId || 'prj_01JABCDE';
     apiClient<{ items: WorkspaceItem[] }>(`/v1/projects/${prjId}/workspaces`)
       .then((res) => {
-        if (mounted && res.items && res.items.length > 0) {
+        if (mounted && res.items) {
           setWorkspaces(res.items);
         }
       })
-      .catch(() => {
-        apiClient<{ items: WorkspaceItem[] }>('/v1/workspaces')
-          .then((res) => {
-            if (mounted && res.items && res.items.length > 0) {
-              setWorkspaces(res.items);
-            }
-          })
-          .catch((err) => console.warn('Workspaces fetch fallback:', err));
-      });
+      .catch((err) => console.warn('Live /v1/projects/.../workspaces fetch failed:', err));
 
     return () => {
       mounted = false;
@@ -257,18 +249,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
       if (data && data.id) {
         setLiveRun(data);
-        return;
       }
-    } catch {
-      // fallback
-    }
-    try {
-      const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
-      if (data && data.id) {
-        setLiveRun(data);
-      }
-    } catch {
-      // quiet fallback
+    } catch (err) {
+      console.warn('Failed to refresh active run:', err);
     }
   };
 
@@ -283,18 +266,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
         if (mounted && data && data.id) {
           setLiveRun(data);
-          return;
         }
-      } catch {
-        // fallback
-      }
-      try {
-        const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
-        if (mounted && data && data.id) {
-          setLiveRun(data);
-        }
-      } catch {
-        // quiet fallback
+      } catch (err) {
+        console.warn('Active run poll failed:', err);
       }
     };
 
