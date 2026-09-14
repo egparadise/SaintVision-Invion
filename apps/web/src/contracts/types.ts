@@ -239,11 +239,11 @@ export interface ShardExecutionItem {
   parentId: string;
   nodeId: string;
   hostname: string;
-  attempt: number;
+  attempt?: number;
   executionState: RunState;
   physicallyStopped: boolean;
   verified: boolean;
-  resourceReleasePending: boolean;
+  resourceReleasePending?: boolean;
   outputHash?: string;
   evidenceId?: string;
   exitCode?: number;

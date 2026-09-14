@@ -25,243 +25,19 @@ import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, Ap
 import { apiClient, clearAuthToken } from '@/shared/api/client';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
-// Default Cluster Nodes (Matching the project specification: 5 Windows/Linux nodes)
-const INITIAL_NODES: NodeItem[] = [
-  {
-    id: 'nod_01JABCDEF01',
-    hostname: 'Node-01-WinMain',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 16,
-    cpuUsagePercent: 24,
-    memoryTotalBytes: 64 * 1024 ** 3,
-    memoryUsedBytes: 28 * 1024 ** 3,
-    allocatableCores: 12,
-    allocatableMemoryBytes: 36 * 1024 ** 3,
-    schedulable: true,
-    observationOnly: false,
-    gpuName: 'NVIDIA RTX 4090',
-    gpuCount: 1,
-    gpuVramTotalBytes: 24 * 1024 ** 3,
-    gpuVramUsedBytes: 8 * 1024 ** 3,
-    storageTotalBytes: 2000 * 1024 ** 3,
-    storageUsedBytes: 850 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF02',
-    hostname: 'Node-02-WinWork',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 8,
-    cpuUsagePercent: 42,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 19 * 1024 ** 3,
-    allocatableCores: 4,
-    allocatableMemoryBytes: 12 * 1024 ** 3,
-    schedulable: true,
-    observationOnly: false,
-    gpuName: 'NVIDIA RTX 3080',
-    gpuCount: 1,
-    gpuVramTotalBytes: 10 * 1024 ** 3,
-    gpuVramUsedBytes: 6 * 1024 ** 3,
-    storageTotalBytes: 1000 * 1024 ** 3,
-    storageUsedBytes: 420 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF03',
-    hostname: 'Node-03-WinDev',
-    status: 'online',
-    os: 'windows',
-    cpuCores: 8,
-    cpuUsagePercent: 15,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 11 * 1024 ** 3,
-    allocatableCores: 6,
-    allocatableMemoryBytes: 20 * 1024 ** 3,
-    schedulable: true,
-    observationOnly: false,
-    gpuCount: 0,
-    storageTotalBytes: 1000 * 1024 ** 3,
-    storageUsedBytes: 310 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF04',
-    hostname: 'Node-04-LinuxBuild',
-    status: 'online',
-    os: 'linux',
-    cpuCores: 16,
-    cpuUsagePercent: 68,
-    memoryTotalBytes: 64 * 1024 ** 3,
-    memoryUsedBytes: 45 * 1024 ** 3,
-    allocatableCores: 0,
-    allocatableMemoryBytes: 0,
-    observationOnly: true,
-    schedulable: false,
-    ipAddress: '192.168.45.225',
-    gpuCount: 0,
-    storageTotalBytes: 4000 * 1024 ** 3,
-    storageUsedBytes: 1800 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-  {
-    id: 'nod_01JABCDEF05',
-    hostname: 'Node-05-LinuxTrain',
-    status: 'online',
-    os: 'linux',
-    cpuCores: 12,
-    cpuUsagePercent: 10,
-    memoryTotalBytes: 32 * 1024 ** 3,
-    memoryUsedBytes: 8 * 1024 ** 3,
-    allocatableCores: 10,
-    allocatableMemoryBytes: 24 * 1024 ** 3,
-    schedulable: true,
-    observationOnly: false,
-    gpuName: 'NVIDIA A4000',
-    gpuCount: 1,
-    gpuVramTotalBytes: 16 * 1024 ** 3,
-    gpuVramUsedBytes: 2 * 1024 ** 3,
-    storageTotalBytes: 2000 * 1024 ** 3,
-    storageUsedBytes: 600 * 1024 ** 3,
-    heartbeatAt: new Date().toISOString(),
-  },
-];
-
-const INITIAL_RUNS: RunItem[] = [
-  {
-    id: 'run_01JABCDE0001',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: 'SaintVision PACS Core 빌드 및 단위 테스트',
-    state: 'running',
-    requestedBy: 'usr_developer_01',
-    createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'run_01JABCDE0002',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: '합성 데이터셋 전처리 및 로컬 분할 검증',
-    state: 'awaiting_approval',
-    requestedBy: 'usr_researcher_02',
-    createdAt: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'run_01JABCDE0003',
-    projectId: 'prj_01JABCDE',
-    workspaceId: 'wsp_01JABCDE',
-    objective: 'GPU 가속 모델 추론 벤치마크 (RTX 4090)',
-    state: 'succeeded',
-    requestedBy: 'usr_admin_01',
-    createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-const DEMO_APPROVAL: ApprovalItem = {
-  id: 'apr_01JXYZ987654',
-  runId: 'run_01JABCDE0002',
-  workspaceId: 'wsp_01JABCDE',
-  nodeId: 'nod_01JABCDEF01',
-  riskLevel: 'L2',
-  target: 'Workspace [wsp-saint-pilot] on Node-01',
-  command: 'git.deploy --release prod-v1.0.0',
-  unifiedDiff: `--- a/config/environment.prod.json
-+++ b/config/environment.prod.json
-@@ -12,4 +12,5 @@
--  "GATEWAY_PORT": 8080,
-+  "GATEWAY_PORT": 8443,
-+  "TLS_STRICT": true,
-+  "AUDIT_IMMUTABLE": true`,
-  estimatedCostKrw: 3200,
-  remainingBudgetKrw: 46800,
-  blastRadius: 'workspace_isolated',
-  rollbackPlan: undefined, // Demonstrating rollback warning badge
-  status: 'pending',
-  nonce: 'nonce_987654321',
-  expiresAt: new Date(Date.now() + 1000 * 60 * 8).toISOString(), // 8 minutes remaining
-  requestedBy: 'usr_requester_alice',
-  policyReason: '외부 접근 포트 변경 및 TLS 암호화 활성화 정책에 따른 L2 승인 요구 (Rule #304)',
-  createdAt: new Date().toISOString(),
-};
-
-const INITIAL_WORKSPACES: WorkspaceItem[] = [
-  {
-    id: 'wsp_01JABCDE001',
-    projectId: 'prj_01JABCDE',
-    name: 'pacs-core-build-sandbox',
-    targetNodeId: 'nod_01JABCDEF01',
-    isolationMode: 'process_sandbox',
-    allowedPaths: ['./workspace', './data'],
-    prohibitedPaths: ['/etc', 'C:\\Windows', '..', '/var/run'],
-    cpuLimitCores: 8,
-    memoryLimitBytes: 16 * 1024 ** 3,
-    status: 'active',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-  {
-    id: 'wsp_01JABCDE002',
-    projectId: 'prj_01JABCDE',
-    name: 'dataset-preprocess-container',
-    targetNodeId: 'nod_01JABCDEF04',
-    isolationMode: 'container_isolated',
-    allowedPaths: ['./dataset', './output'],
-    prohibitedPaths: ['/etc', '..', '/sys'],
-    cpuLimitCores: 8,
-    memoryLimitBytes: 32 * 1024 ** 3,
-    status: 'reclaimed',
-    createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-  },
-];
-
-const SAMPLE_EXECUTION: ExecutionResultItem = {
-  runId: 'run_01JABCDE0001',
-  workspaceId: 'wsp_01JABCDE001',
-  command: 'pytest tests/test_contracts.py -v',
-  exitCode: 0,
-  state: 'succeeded',
-  evidenceId: 'evi_01JABCDEF987654',
-  resourceReclaimed: true,
-  allowedEvents: [
-    { timestamp: '2026-09-09T18:10:01Z', action: 'READ', path: './workspace/tests/test_contracts.py' },
-    { timestamp: '2026-09-09T18:10:02Z', action: 'WRITE', path: './data/output_report.json' },
-    { timestamp: '2026-09-09T18:10:03Z', action: 'NET_LISTEN', path: '127.0.0.1:8000' },
-  ],
-  deniedEvents: [
-    {
-      timestamp: '2026-09-09T18:10:01.4Z',
-      action: 'ACCESS',
-      path: '/etc/shadow',
-      reason: 'BLOCKED: Prohibited system path access denied (ADR-005)',
-    },
-    {
-      timestamp: '2026-09-09T18:10:01.8Z',
-      action: 'TRAVERSE',
-      path: '../config/keys.json',
-      reason: 'BLOCKED: Path traversal ".." is strictly forbidden',
-    },
-  ],
-  executedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-  completedAt: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
-};
-
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [nodes, setNodes] = useState<NodeItem[]>(INITIAL_NODES);
-  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>(INITIAL_WORKSPACES);
+  const [nodes, setNodes] = useState<NodeItem[]>([]);
+  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
-  const [executionResult] = useState<ExecutionResultItem | null>(SAMPLE_EXECUTION);
-  const [runs, setRuns] = useState<RunItem[]>(INITIAL_RUNS);
+  const [executionResult] = useState<ExecutionResultItem | null>(null);
+  const [runs, setRuns] = useState<RunItem[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
-  const [approvals, setApprovals] = useState<ApprovalItem[]>([DEMO_APPROVAL]);
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
   const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
@@ -283,7 +59,7 @@ export const App: React.FC = () => {
   const fetchNodes = React.useCallback(async () => {
     try {
       const res = await apiClient<{ items: any[] }>('/v1/nodes');
-      if (res.items?.length > 0) {
+      if (res.items) {
         setNodes(
           res.items.map((srvNode) => ({
             id: srvNode.nodeId || srvNode.id,
