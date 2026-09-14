@@ -1,8 +1,8 @@
+import { fetchProjectWorkspaces, type ProjectWorkspace } from '@/shared/api/projectObservation';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   NodeItem,
   RunItem,
-  WorkspaceItem,
   ProjectItem,
   NodeStopReceipt,
   PlacementRequirement,
@@ -19,6 +19,7 @@ import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 
 export interface DeveloperStudioProps {
+  project: ProjectItem;
   nodes: NodeItem[];
   runs: RunItem[];
   approvals?: ApprovalItem[];
@@ -32,33 +33,6 @@ export interface DeveloperStudioProps {
   onApprove?: (approvalId: string, nonce: string) => Promise<void>;
   onReject?: (approvalId: string, reason: string) => Promise<void>;
 }
-
-const DEFAULT_PROJECTS: ProjectItem[] = [
-  {
-    id: 'prj_01JABCDE',
-    name: 'SaintVision PACS Core',
-    description: '의료 영상 저장·전송 및 DICOM/HL7 고속 추론 코어 엔진',
-    ownerId: 'usr_developer_01',
-    workspaceCount: 3,
-    createdAt: '2026-09-01T00:00:00Z',
-    gitRepo: 'https://github.com/egparadise/SaintVision-Invion.git',
-    gitBranch: 'main',
-    budgetKrw: 50000000,
-    remainingBudgetKrw: 46800000,
-  },
-  {
-    id: 'prj_saint_mlops',
-    name: 'SaintVision MLOps Pipeline',
-    description: '분산 5노드 GPU 학습 및 다중 LLM 적합성 자동 검증 파이프라인',
-    ownerId: 'usr_researcher_02',
-    workspaceCount: 2,
-    createdAt: '2026-09-05T00:00:00Z',
-    gitRepo: 'https://github.com/egparadise/SaintVision-Invion.git',
-    gitBranch: 'feature/distributed-training',
-    budgetKrw: 80000000,
-    remainingBudgetKrw: 72500000,
-  },
-];
 
 const INITIAL_CODE_FILES = [
   {
@@ -84,6 +58,7 @@ const INITIAL_CODE_FILES = [
 ];
 
 export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
+  project,
   nodes,
   runs,
   approvals = [],
@@ -101,16 +76,17 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(initialStep);
 
   // Step 1: Projects & Workspaces
-  const [projects, setProjects] = useState<ProjectItem[]>(DEFAULT_PROJECTS);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('prj_01JABCDE');
-  const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(initialWorkspaceId || 'wsp_01JABCDE001');
+  const projects = [project];
+  const selectedProjectId = project.id;
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
+  const [workspaces, setWorkspaces] = useState<ProjectWorkspace[]>([]);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(initialWorkspaceId || '');
   const [readiness, setReadiness] = useState<WorkspaceReadiness | null>(null);
   const [isLoadingReadiness, setIsLoadingReadiness] = useState<boolean>(false);
   const [readinessError, setReadinessError] = useState<string | null>(null);
 
   // Step 2: Placement & Resources
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(initialNodeId || 'nod_01JABCDEF01');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(initialNodeId);
   const [reqCores, setReqCores] = useState<number>(4);
   const [reqMemoryGb, setReqMemoryGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
@@ -152,9 +128,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [isLoadingArtifact, setIsLoadingArtifact] = useState<boolean>(false);
   const [showArtifactInspector, setShowArtifactInspector] = useState<boolean>(false);
   const [logs, setLogs] = useState<Array<{ timestamp: string; level: 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS'; message: string }>>([
-    { timestamp: '10:00:01', level: 'INFO', message: '[Studio] Session attached to control plane gateway' },
-    { timestamp: '10:00:02', level: 'INFO', message: '[Workspace] Sandbox container initialized with 0600 permissions' },
-    { timestamp: '10:00:03', level: 'SUCCESS', message: '[Runtime] Dependencies verified. Environment ready for execution.' },
   ]);
   const [autoScroll, setAutoScroll] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -169,22 +142,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   // Load Projects and Workspaces from API
   useEffect(() => {
     let mounted = true;
-    apiClient<{ items: ProjectItem[] }>('/v1/projects')
+    const prjId = selectedProjectId;
+    fetchProjectWorkspaces(prjId)
       .then((res) => {
-        if (mounted && res.items && res.items.length > 0) {
-          setProjects(res.items);
+        if (mounted) {
+          setWorkspaces(res);
         }
       })
-      .catch((err) => console.warn('Projects fetch fallback:', err));
-
-    const prjId = selectedProjectId || 'prj_01JABCDE';
-    apiClient<{ items: WorkspaceItem[] }>(`/v1/projects/${prjId}/workspaces`)
-      .then((res) => {
-        if (mounted && res.items) {
-          setWorkspaces(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/projects/.../workspaces fetch failed:', err));
+      .catch(() => { if (mounted) setWorkspaceError('Workspace 목록을 확인하지 못했습니다.'); });
 
     return () => {
       mounted = false;
@@ -195,6 +160,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   useEffect(() => {
     if (!selectedWorkspaceId) return;
     let mounted = true;
+    setReadiness(null);
     setIsLoadingReadiness(true);
     setReadinessError(null);
     apiClient<WorkspaceReadiness>(`/v1/workspaces/${selectedWorkspaceId}/execution-readiness`)
@@ -245,7 +211,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   // Manual & Polling Active Run Refresh
   const refreshActiveRun = async () => {
     if (!activeRunId) return;
-    const prjId = selectedProjectId || 'prj_01JABCDE';
+    const prjId = selectedProjectId;
     try {
       const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
       if (data && data.id) {
@@ -260,7 +226,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   useEffect(() => {
     if (!activeRunId) return;
     let mounted = true;
-    const prjId = selectedProjectId || 'prj_01JABCDE';
+    const prjId = selectedProjectId;
 
     const poll = async () => {
       try {
@@ -389,7 +355,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         body: JSON.stringify({
           workspaceId: selectedWorkspaceId,
           objective: runObjective,
-          requestedBy: currentUser?.id || selectedProject.ownerId || 'usr_developer_01',
+          requestedBy: currentUser?.id,
           targetNodeId: selectedNodeId || 'nod_01JABCDEF01',
           entrypoint: activeFile.path,
           files: files.map((f) => ({ path: f.path, content: f.content, size: f.content.length })),
@@ -787,7 +753,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 return (
                   <div
                     key={proj.id}
-                    onClick={() => setSelectedProjectId(proj.id)}
+                    
                     style={{
                       padding: '20px',
                       borderRadius: 'var(--radius-md)',
@@ -820,7 +786,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <div>📦 Git: <code style={{ color: 'var(--color-brand-primary)' }}>{proj.gitRepo}</code> ({proj.gitBranch})</div>
-                      <div>👤 책임자: <strong>{proj.ownerId}</strong></div>
+                      <div>👤 책임자: <strong>{proj.ownerId ?? '미관측'}</strong></div>
                       {proj.budgetKrw && proj.remainingBudgetKrw && (
                         <div style={{ marginTop: '6px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -870,39 +836,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               연결된 격리 워크스페이스 (Workspace)
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-              {(workspaces.length > 0 ? workspaces : [
-                {
-                  id: 'wsp_01JABCDE001',
-                  projectId: 'prj_01JABCDE',
-                  name: 'pacs-core-build-sandbox',
-                  targetNodeId: 'nod_01JABCDEF01',
-                  isolationMode: 'process_sandbox' as const,
-                  allowedPaths: ['./workspace', './data'],
-                  prohibitedPaths: ['/etc', '..'],
-                  cpuLimitCores: 8,
-                  memoryLimitBytes: 16 * 1024 ** 3,
-                  status: 'active' as const,
-                  createdAt: '2026-09-08T10:00:00Z',
-                },
-                {
-                  id: 'wsp_saint_mlops_gpu',
-                  projectId: 'prj_saint_mlops',
-                  name: 'mlops-distributed-train',
-                  targetNodeId: 'nod_01JABCDEF05',
-                  isolationMode: 'container_isolated' as const,
-                  allowedPaths: ['./models', './checkpoints'],
-                  prohibitedPaths: ['/etc', '..'],
-                  cpuLimitCores: 12,
-                  memoryLimitBytes: 32 * 1024 ** 3,
-                  status: 'active' as const,
-                  createdAt: '2026-09-09T08:00:00Z',
-                },
-              ]).map((wsp) => {
-                const isWspSelected = selectedWorkspaceId === wsp.id;
+              {workspaceError ? <p role="alert">{workspaceError}</p> : workspaces.length === 0 && <p role="status">확인된 Workspace가 없습니다.</p>}
+              {workspaces.map((wsp) => {
+                const isWspSelected = selectedWorkspaceId === wsp.workspaceId;
                 return (
                   <div
-                    key={wsp.id}
-                    onClick={() => setSelectedWorkspaceId(wsp.id)}
+                    key={wsp.workspaceId}
+                    onClick={() => setSelectedWorkspaceId(wsp.workspaceId)}
                     style={{
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-md)',
@@ -926,8 +866,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       </span>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                      <div>바인딩 노드: <code>{wsp.targetNodeId}</code></div>
-                      <div>격리 수준: <code>{wsp.isolationMode}</code> (최대 {wsp.cpuLimitCores}코어)</div>
+                      <div>바인딩 노드: <code>{wsp.nodeId ?? '미연결'}</code></div>
+                      <div>도구: <code>{wsp.toolName ?? '미지정'}</code></div>
                     </div>
                   </div>
                 );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/shared/ui/Header';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { NodeList } from '@/features/nodes/NodeList';
@@ -21,8 +21,10 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage, ProjectItem } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
+import { fetchProjects } from '@/shared/api/projectObservation';
+import { observedNode } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
 export const App: React.FC = () => {
@@ -42,6 +44,27 @@ export const App: React.FC = () => {
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [projectId, setProjectId] = useState('');
+  const [projectError, setProjectError] = useState<string | null>(null);
+  const scopeRef = useRef(0);
+  const measuredNodes = nodes.filter(node => !node.telemetryUnavailable);
+  const selectedProject = projects.find(p => p.id === projectId);
+  const chooseProject = (id: string) => {
+    scopeRef.current += 1;
+    setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
+    setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
+    setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
+  };
+  useEffect(() => {
+    let active = true;
+    setProjects([]); chooseProject(''); setProjectError(null);
+    if (currentUser) fetchProjects().then(items => {
+      if (active) { setProjects(items); chooseProject(items[0]?.id ?? ''); }
+    }).catch(() => { if (active) setProjectError('프로젝트 목록을 확인하지 못했습니다.'); });
+    return () => { active = false; };
+  }, [currentUser]);
+
   // Integrated Developer Studio navigation state
   const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
   const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
@@ -57,63 +80,42 @@ export const App: React.FC = () => {
   };
 
   const fetchNodes = React.useCallback(async () => {
+    if (!currentUser) return;
+    const scope = scopeRef.current;
     try {
-      const res = await apiClient<{ items: any[] }>('/v1/nodes');
-      if (res.items) {
-        setNodes(
-          res.items.map((srvNode) => ({
-            id: srvNode.nodeId || srvNode.id,
-            hostname: srvNode.hostname,
-            status: srvNode.status || 'online',
-            os: srvNode.osType || srvNode.os || 'windows',
-            cpuCores: srvNode.cpuCores || 8,
-            cpuUsagePercent: srvNode.cpuUsagePercent ?? 20,
-            memoryTotalBytes: srvNode.memoryTotalBytes || 32 * 1024 ** 3,
-            memoryUsedBytes: srvNode.memoryUsedBytes || 16 * 1024 ** 3,
-            allocatableCores: srvNode.allocatableCores,
-            allocatableMemoryBytes: srvNode.allocatableMemoryBytes,
-            observationOnly: srvNode.observationOnly ?? false,
-            schedulable: srvNode.schedulable ?? true,
-            isDraining: srvNode.isDraining ?? false,
-            killSwitchEngaged: srvNode.killSwitchEngaged ?? false,
-            ipAddress: srvNode.ipAddress,
-            gpuName: srvNode.gpuName,
-            gpuCount: srvNode.gpuCount || 0,
-            gpuVramTotalBytes: srvNode.gpuVramTotalBytes || 0,
-            gpuVramUsedBytes: srvNode.gpuVramUsedBytes || 0,
-            storageTotalBytes: srvNode.storageTotalBytes || 1000 * 1024 ** 3,
-            storageUsedBytes: srvNode.storageUsedBytes || 400 * 1024 ** 3,
-            heartbeatAt: srvNode.lastHeartbeatAt || srvNode.heartbeatAt || new Date().toISOString(),
-          }))
-        );
-      }
-    } catch (err) {
-      console.warn('Live /v1/nodes fetch fallback:', err);
+      const page = await apiClient<{ items: Record<string, unknown>[] }>('/v1/nodes');
+      if (scopeRef.current === scope) setNodes(page.items.map(observedNode));
+    } catch {
+      if (scopeRef.current === scope) setNodes([]);
     }
-  }, []);
+  }, [currentUser]);
 
   const fetchRuns = React.useCallback(async () => {
     try {
-      const prjId = 'prj_01JABCDE';
+      if (!currentUser || !projectId) return;
+      const requestScope = scopeRef.current;
+      const prjId = encodeURIComponent(projectId);
       const res = await apiClient<{ items: RunItem[] }>(`/v1/projects/${prjId}/runs`);
-      if (res.items) {
+      if (scopeRef.current === requestScope && res.items) {
         setRuns(res.items);
       }
     } catch (err) {
       console.warn('Live /v1/projects/.../runs fetch failed:', err);
     }
-  }, []);
+  }, [currentUser, projectId]);
 
   const fetchApprovals = React.useCallback(async () => {
     try {
-      const prjId = 'prj_01JABCDE';
+      if (!currentUser || !projectId) return;
+      const requestScope = scopeRef.current;
+      const prjId = encodeURIComponent(projectId);
       const res = await apiClient<ApprovalPage>(`/v1/projects/${prjId}/approvals`);
-      if (res?.items) {
+      if (scopeRef.current === requestScope && res?.items) {
         setApprovals(
           res.items.map((item: any) => ({
             id: item.approvalId || item.id,
             actionDigest: item.actionDigest,
-            projectId: item.projectId || 'prj_01JABCDE',
+            projectId: item.projectId,
             runId: item.runId,
             workspaceId: item.workspaceId || 'wsp_01JABCDE001',
             nodeId: item.nodeId || 'nod_01JABCDEF01',
@@ -136,7 +138,7 @@ export const App: React.FC = () => {
     } catch (err) {
       console.warn('Live /v1/projects/.../approvals fetch failed:', err);
     }
-  }, []);
+  }, [currentUser, projectId]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -226,12 +228,17 @@ export const App: React.FC = () => {
         currentUser={currentUser}
         onLogout={() => {
           clearAuthToken();
+          setNodes([]); chooseProject(''); setProjects([]);
           setCurrentUser(null);
           setActiveTab('login');
         }}
       />
 
       <main style={{ flex: 1, padding: '32px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        {currentUser && <label>프로젝트 <select aria-label="프로젝트" value={projectId} onChange={e => chooseProject(e.target.value)}>
+          <option value="">프로젝트 선택</option>
+          {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
+        </select>{projectError && <span role="alert">{projectError}</span>}</label>}
         {/* Tab 1: Dashboard */}
         {activeTab === 'dashboard' && (
           <ClusterOverview
@@ -246,10 +253,13 @@ export const App: React.FC = () => {
           />
         )}
 
+        {activeTab === 'studio' && !selectedProject && <p role="status">프로젝트를 선택하면 Studio를 열 수 있습니다.</p>}
         {/* Tab 1.5: Integrated Developer Studio */}
-        {activeTab === 'studio' && (
+        {activeTab === 'studio' && selectedProject && (
           <DeveloperStudio
-            nodes={nodes}
+            key={projectId}
+            project={selectedProject}
+            nodes={measuredNodes}
             runs={runs}
             approvals={approvals}
             currentUser={currentUser}
@@ -397,7 +407,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}
         {activeTab === 'placement' && (
-          <PlacementSimulator nodes={nodes} />
+          <PlacementSimulator nodes={measuredNodes} />
         )}
 
         {/* Tab 2.8: Distributed Recovery & Resilience (S07-FE) */}

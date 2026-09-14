@@ -47,6 +47,7 @@ export interface ProblemDetails {
 }
 
 export interface NodeItem {
+  telemetryUnavailable?: boolean;
   id: string; // nod_...
   hostname: string;
   status: NodeStatus;
@@ -74,9 +75,9 @@ export interface NodeItem {
 export interface ProjectItem {
   id: string; // prj_...
   name: string;
-  description: string;
-  ownerId: string;
-  workspaceCount: number;
+  description?: string;
+  ownerId?: string;
+  workspaceCount?: number;
   createdAt: string;
   gitRepo?: string;
   gitBranch?: string;
