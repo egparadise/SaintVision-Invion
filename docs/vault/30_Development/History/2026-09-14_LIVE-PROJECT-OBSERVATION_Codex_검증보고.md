@@ -25,3 +25,5 @@ source_of_truth: "Git"
 다음 Codex는 Run/Approval 응답 계약을 실제 커널과 맞춘다. Gemini는 이 후보를 통합하고 프로젝트 전환/빈 목록/미관측 UI를 실제 브라우저로 확인한다. Claude는 관측/권한 경계 독립 검토를 수행한다.
 
 동일 SHA CI 4건은 23:17:17 KST 계정 결제/한도 제한으로 job 시작 전 실패했다. [CI 증거](../Evidence/live-project-ci-7b50ae2.json). 문서397개/48task와 ontology 검사는 exit0. CI 통합 검증 완료 아님.
+
+Obsidian 최초 sync는 외부 편집3개를 감지해 exit1/쓰기0. 원문을 별도 Evidence에 보존하고 작성자 주장과 독립 확인을 구분해 수신 기록을 반영했다. 동일 보존 바이트 확인 후 기준선만 채택하고 정본을 동기화한다.

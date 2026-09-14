@@ -1,10 +1,10 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.18"
+version: "1.0.19"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T22:24:31+09:00"
+updated: "2026-09-14T23:18:07+09:00"
 source_of_truth: "Git"
 ---
 
@@ -226,3 +226,10 @@ Gemini의21:00표기보고에서fixture receipts/reclaim/cancel-all/flatshards�
 ## 2026-09-14 최신 외부 보고 수신
 
 Gemini43640ee/96191cc의승인·취소helper통합/외부IdP PKCE보고와Claude B-6/7처분을수신했다. 새커널auth/token broker대신운영IdP PKCE·기존JWT검증을연결하는방향이며실IdP입력/인수는남는다. Gemini의FE-M04해소주장과별개로Codex재검토에서초기fixture/관측새로고침문제를찾아ea42657후보로수정했다. 응답누락임의수치는후속이다. 외부원문3개는 `30_Development/Evidence/obsidian-proposals-20260914-shard-observation/manifest.json`에보존했다. 보고된브라우저/실장비수치를독립인수로승격하지않는다.
+
+
+## 외부 제안 수신 — LIVE-PROJECT-OBSERVATION
+
+2026-09-14 외부 진행판 3개를 `30_Development/Evidence/obsidian-proposals-20260914-live-project`에 원문 바이트와 SHA256 manifest로 보존했다. Gemini는 e5455c3의 프로젝트 결과/아티팩트 스모크186, route22/0 unserved, unit131을 보고했다. Claude는 fixture backend/커널 통합·role guard·route coverage·credential·FE-M의 CX-01 실행 체크리스트를 제안했다. 이는 작성자 보고 수신이며 이 코드의 독립 검증이나 운영 인수로 간주하지 않는다.
+
+Codex 확인: workspace-bridge의 configured factory가 정본이고 기존 fixture 통합은 별도 작업이다. route_coverage의 소스 스캔 숫자만으로 실제 configured surface를 검증했다고 하지 않는다. 고정 online5 제거는 FE-M04의 일부이며 이번 실제 projects/workspaces 계약·초기 fixture·누락 Node 수치 수정이 추가로 필요했다. 따라서 "코드 잔여 없음" 또는 "FE-M04 전체 완료"를 채택하지 않는다. 실제 IdP와 원격 PC도 미검증이다. 새 제품 후보7b50ae2를 포함해 최신 공유 브랜치와 통합한 뒤 검증한다.
