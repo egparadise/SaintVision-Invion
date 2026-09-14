@@ -11,12 +11,12 @@ from __future__ import annotations
 import datetime as dt
 import os
 import uuid
-import secrets
-from contextlib import contextmanager
 
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+
+from db_login import application_test_engine
 
 TEST_DB_ENV = "INV_TEST_DATABASE_URL"
 #: Migration-owned permission group; tests never change its login or password.
@@ -57,32 +57,6 @@ def migrated(owner_engine, database_url):
         connection.execute(text("CREATE SCHEMA public"))
     command.upgrade(config, "head")
     return True
-
-
-@contextmanager
-def application_test_engine(database_url, owner_engine):
-    """Owned temporary login inherits inv_app; leave cluster-wide groups intact."""
-    from psycopg import sql
-    from sqlalchemy.engine import make_url
-
-    role = "inv_backend_login_" + uuid.uuid4().hex
-    password = secrets.token_urlsafe(32)
-    with owner_engine.begin() as connection:
-        conn = connection.connection.driver_connection
-        conn.execute(sql.SQL("CREATE ROLE {} LOGIN PASSWORD {} INHERIT NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION").format(
-            sql.Identifier(role), sql.Literal(password)))
-        conn.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(APP_ROLE), sql.Identifier(role)))
-    engine = None
-    try:
-        url = make_url(database_url).set(username=role, password=password)
-        engine = create_engine(url, future=True)
-        yield engine
-    finally:
-        if engine is not None:
-            engine.dispose()
-        assert role.startswith("inv_backend_login_") and len(role) == 50
-        with owner_engine.begin() as connection:
-            connection.connection.driver_connection.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
 
 
 @pytest.fixture(scope="session")

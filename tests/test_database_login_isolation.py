@@ -2,7 +2,7 @@
 import pytest
 from pathlib import Path
 from sqlalchemy import text
-from conftest import application_test_engine
+from db_login import application_test_engine
 
 pytestmark = pytest.mark.postgres
 
@@ -14,7 +14,10 @@ def group_state(owner_engine):
 
 
 @pytest.mark.parametrize("fail_body", [False, True])
-def test_temporary_login_cleanup_and_group_preservation(migrated, database_url, owner_engine, fail_body):
+def test_temporary_login_cleanup_and_group_preservation(migrated, clean_tables, database_url, owner_engine, fail_body):
+    # clean_tables empties tenants first: this test asserts the table is empty,
+    # and clean_tables truncates at setup with no teardown, so without it a
+    # prior test's seeded rows (two_tenants) leak in and the count is not 0.
     before = group_state(owner_engine)
     role = None
     try:
