@@ -25,3 +25,5 @@ source_of_truth: "Git"
 남은 것: actual App 로그인→프로젝트선택→승인센터 라우팅과 configured business API의 응답 계약 통합, 최신 공유frontend 변경 독립검토, 운영0038 이행·기존승인처리·retained backup upgrade·실IdP/원격PC/CI인수. 다음 Codex는 production LiveApp 진입점과 새 Studio/App 기능을 하나의 운영 경로로 연결하기 전에 현재 화면/API 차이를 확인한다. Gemini는 실제 브라우저 화면/키보드/작은화면 검토, Claude는 snapshot/권한/통합후보 독립검토. 전체57.8125%(2775/4800),남음42.1875% 유지. 이번 실제 browser 증거가 새로 생겼지만 전체 운영인수나 peer승인을 대신하지 않는다.
 
 동일SHA CI4건은00:21:00KST 결제/한도 제한으로 job 시작 전 실패. [CI증거](../Evidence/approval-browser-ci-e0b4b4f.json). 문서406개/48task·ontology 검사exit0.
+
+최초sync 외부3개편집감지exit1/쓰기0. raw제안보존및수신검토후재동기화. [[2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_오류해결]] 참조.

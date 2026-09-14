@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.21"
+version: "1.0.22"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T23:30:50+09:00"
+updated: "2026-09-15T00:22:02+09:00"
 source_of_truth: "Git"
 ---
 
@@ -266,3 +266,8 @@ Codex 확인: workspace-bridge의 configured factory가 정본이고 기존 fixt
 ## 외부 제안 수신 — APPROVAL-REVIEW-SNAPSHOT
 
 외부 진행판3개를 Evidence/obsidian-proposals-20260914-approval-review에 원문 SHA256과 함께 보존했다. Gemini는 ee63948의 프로젝트 Node 조회 우선/global fallback,132시험·스모크186·route23을 보고했다. 같은 문서에 기존181/24 숫자도 있어 실행별 증거를 다시 맞춰야 한다. 기록의23:45시각은 이번 수신 시각보다 미래이며 실제 수행 시각으로 채택하지 않는다. Codex는 아직 해당 SHA를 독립 검증하지 않았다. 프로젝트 Node→global fallback의 권한 경계 및 누락 telemetry 임의값 여부는 최신 후보 통합 때 검토한다. 실행체인/원격시험 합격 주장이나 완료율에 자동 반영하지 않는다.
+
+
+## 외부 제안 수신 — APPROVAL-BROWSER-INTEGRATION
+
+2026-09-15 외부 진행판3개의 원문과 SHA256을 Evidence/obsidian-proposals-20260915-approval-browser에 보존했다. Gemini는578db00의 외부 idpTokenUrl/JWT payload 표시·134시험·186스모크를 보고했다. 아직 독립 확인하지 않았으며 JWT 해석을 서버 서명검증/운영 SSO 인수와 동일시하지 않는다. Claude는 기존cafd127의 login guard가 이미 있고 새 중복guard를 제거했으며, conftest 이름충돌과 tenant행0개 가정의 순서문제를 고쳐206passed/136skipped를 얻었다고 정정했다. kernel용 INV_TEST_ADMIN_DSN 필요분136개 skip은 미실행 그대로 유지한다. 위 작성자 보고는 이번 Codex의 실제Edge+configured서버+격리PG2여정과 별개다. 다음통합시 해당코드/증거를 독립검토한다.
