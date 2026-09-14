@@ -22,3 +22,7 @@ CX-01/CX-07/S12-ST 지원. Codex 작성, Claude 독립 검토 pending. 제품 3e
 - 실제 .225:18443 TCP 재확인 불가. [관측](../Evidence/backup-open-guard-observation-20260914.json). mTLS/원격7개 시험 미수행.
 
 문서385개/48task 검사 및 ontology exit0(착수 문서 시점). 보고 추가 후 별도 검사 결과를 전달한다. 독립 검토/운영 OIDC/원격 설치·7개/5대 최종 인수/off-device/PITR 미완료, 전체 성숙도2775/4800=57.81% 유지. 다음 Codex는 원격 준비 후 실제 설치·mTLS·7개, Claude는 이 변경과 기존 커널 변경 독립 검토, Gemini는 정본 승인/샤드/ResultView 계약 연결을 확인한다. Obsidian sync는 Git 보고 commit 후 수행하고 실제 영수증을 남긴다.
+
+## 전달 확인
+
+보고 포함 문서387개/48task와 ontology 검사 exit0. 8744d85 commit/push 후 19:48:02 KST Obsidian check→apply→check 모두 exit0, 관리822파일 hash 일치/pending0/conflict0. 로컬 mirror 확인이며 OneDrive cloud 완료 주장은 아니다. [동기화 영수증](../Evidence/backup-open-guard-sync-8744d85.json).
