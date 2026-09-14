@@ -1,0 +1,8 @@
+{
+  "observedKst": "2026-09-14T17:34:04+09:00",
+  "address": "192.168.45.225",
+  "ports": {
+    "18443": "unreachable",
+    "22": "unreachable"
+  }
+}
