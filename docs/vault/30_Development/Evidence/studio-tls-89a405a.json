@@ -1,0 +1,176 @@
+{
+  "verifiedKst": "2026-09-15T01:07:48+09:00",
+  "codeSha": "89a405a98e21f54feb84bc8799a441f971026a6b",
+  "imageId": "sha256:7215cd99b0f4081e17091c4a28bc52d5f497dc610496df5cf4de49b1a7bb0143",
+  "owner": "Codex",
+  "reviewer": "Claude pending",
+  "checks": [
+    {
+      "scope": "TLS proxy and actual built Edge page",
+      "counts": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "7",
+        "time": "19.322",
+        "timestamp": "2026-09-15T01:05:23.553410+09:00",
+        "hostname": "Surface_Studio"
+      },
+      "tests": [
+        {
+          "name": "test_studio_callback_and_mounted_auth_config_have_security_headers",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_unknown_ca_is_rejected_and_tls_is_negotiated",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_built_studio_page_uses_mounted_config_without_caching_credentials",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_real_proxy_preserves_authorization_errors_and_readiness",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_canonical_run_events_are_not_buffered",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_callback_secrets_are_absent_from_http_and_https_access_logs",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_proxy_fails_closed_and_reconnects_after_upstream_restart",
+          "failed": false,
+          "error": false
+        }
+      ]
+    },
+    {
+      "scope": "Compose configuration",
+      "counts": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "11",
+        "time": "9.190",
+        "timestamp": "2026-09-15T01:04:40.670410+09:00",
+        "hostname": "Surface_Studio"
+      },
+      "tests": [
+        {
+          "name": "test_compose_requires_explicit_credentials[None]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[INV_BUSINESS_DSN]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[INV_RUNTIME_DSN]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[INV_RECOVERY_EPOCH]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[INV_CONFIG_VOLUME]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[INV_WEB_AUTH_CONFIG]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[POSTGRES_PASSWORD]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[MINIO_ROOT_USER]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_compose_requires_explicit_credentials[MINIO_ROOT_PASSWORD]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_workspace_overlay_requires_external_volume[None]",
+          "failed": false,
+          "error": false
+        },
+        {
+          "name": "test_workspace_overlay_requires_external_volume[synthetic-preprovisioned-volume]",
+          "failed": false,
+          "error": false
+        }
+      ]
+    },
+    {
+      "scope": "33d63d5 old Nginx regression reproduction",
+      "counts": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "3",
+        "skipped": "0",
+        "tests": "3",
+        "time": "11.254",
+        "timestamp": "2026-09-15T01:02:58.281093+09:00",
+        "hostname": "Surface_Studio"
+      },
+      "tests": [
+        {
+          "name": "test_studio_callback_and_mounted_auth_config_have_security_headers",
+          "failed": true,
+          "error": false
+        },
+        {
+          "name": "test_canonical_run_events_are_not_buffered",
+          "failed": true,
+          "error": false
+        },
+        {
+          "name": "test_callback_secrets_are_absent_from_http_and_https_access_logs",
+          "failed": true,
+          "error": false
+        }
+      ]
+    }
+  ],
+  "commands": [
+    "docker build --tag saintvision-web-candidate:studio-tls apps/web",
+    "INV_WEB_IMAGE=saintvision-web-candidate:studio-tls python -m pytest -q tests/integration/test_web_container.py",
+    "python -m pytest -q tests/core/test_deployment_credentials.py"
+  ],
+  "buildExitCode": 0,
+  "finalTestExitCodes": [
+    0,
+    0
+  ],
+  "baselineExitCode": 1,
+  "noTestContainersRemaining": true,
+  "noTestNetworksRemaining": true,
+  "scope": "Actual Nginx 1.27.5 image, TLS sockets, built Studio page in Edge; upstream is a transport fixture, NOT kernel authorization, operational SSO or remote execution",
+  "operatingServicesChanged": false,
+  "ci": "job not started: account billing limit",
+  "formalCompletionPercent": 57.8125
+}
