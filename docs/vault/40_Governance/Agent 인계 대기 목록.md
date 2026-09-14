@@ -1,14 +1,16 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.21"
+version: "1.0.22"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T00:22:02+09:00"
+updated: "2026-09-15T00:54:21+09:00"
 source_of_truth: "Git"
 ---
 
 # Agent 인계 대기 목록
+
+- [[2026-09-15_STUDIO-AUTH-ENTRY_Codex_검증보고]]: 33d63d5 실제 /studio 로그인→프로젝트→승인→로그아웃, 합성 PKCE IdP+커널+격리PG/Edge 통과. 전체 unit233·브라우저/인증38·계약10·build 통과. 운영 SSO/Node·Nginx 배포·CI·peer 인수는 미완료. 다음 Codex 격리 배포/업무 흐름, Claude 인증 독립 검토, Gemini 화면 통합. 전체57.81% 유지.
 
 
 - [[2026-09-14_SHARD-OBSERVATION-FIX_Codex_검증보고]]:ea42657 Gemini최신43640ee통합후샤드관측/새로고침정본화·미확인receipt성공표시제거·초기fixture제거. 최종140시험/build통과,공유integration/운영배포전. 다음응답unknown/project선택·브라우저/peer인수,전체57.81%유지.
@@ -243,3 +245,7 @@ Codex 확인: workspace-bridge의 configured factory가 정본이고 기존 fixt
 ## 외부 제안 수신 — APPROVAL-BROWSER-INTEGRATION
 
 2026-09-15 외부 진행판3개의 원문과 SHA256을 Evidence/obsidian-proposals-20260915-approval-browser에 보존했다. Gemini는578db00의 외부 idpTokenUrl/JWT payload 표시·134시험·186스모크를 보고했다. 아직 독립 확인하지 않았으며 JWT 해석을 서버 서명검증/운영 SSO 인수와 동일시하지 않는다. Claude는 기존cafd127의 login guard가 이미 있고 새 중복guard를 제거했으며, conftest 이름충돌과 tenant행0개 가정의 순서문제를 고쳐206passed/136skipped를 얻었다고 정정했다. kernel용 INV_TEST_ADMIN_DSN 필요분136개 skip은 미실행 그대로 유지한다. 위 작성자 보고는 이번 Codex의 실제Edge+configured서버+격리PG2여정과 별개다. 다음통합시 해당코드/증거를 독립검토한다.
+
+### STUDIO-AUTH-ENTRY 외부 검토 수신
+
+Claude의 578db00 UI JWT decode 비권위성 검토 원문은 obsidian-proposals-20260915-studio-auth에 보존했다. 원래 커널 권한 경계의 우회로 분류하지 않는다. 이번 33d63d5의 실제 PKCE/form·canonical session·프로젝트 계약 변경은 새 독립 검토 대상이다. deploymentEngine의 표시용 signoff를 운영 승인 근거로 사용하지 않는 후속 검토는 Claude/Gemini에 남긴다.
