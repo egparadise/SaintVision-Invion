@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.32"
+version: "1.0.33"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,27 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### 정정 — "부재 0"은 과장이었다. 실 결정은 3개다 (2026-09-14, Claude)
+
+앞 절에서 "실재 부재 0"이라 적었으나, receipt·auth를 커널 소스로 확인하니 성급했다. 정확한 처분(현재 미제공 11개, 정정된 도구):
+
+**정렬 — Gemini (커널에 project 범위로 존재, file:line):**
+- `App.tsx:330` `/v1/runs` → `/v1/projects/{p}/runs`
+- `App.tsx:372` `/v1/approvals` → `/v1/projects/{p}/approvals` (커널 `app.py:433` 존재)
+- `DeveloperStudio.tsx:187` `/v1/workspaces` → `/v1/projects/{p}/workspaces`
+- `RunDetail.tsx:106,170` `/v1/runs/{}/shards` → `/v1/projects/{p}/runs/{id}/shards` (커널 `app.py:443` 존재)
+- `App.tsx`의 `/v1/runs/{}` 잔여
+
+**제거 — SPA (커널 자동 수행):**
+- `RunDetail.tsx:166` `/v1/runs/{}/reclaim-resources` → `resourceReleasePending` 상태 표시로 대체
+
+**진짜 결정 3개 — Codex·Gemini (커널에 대응 route 없음):**
+1. `RunDetail.tsx:189`·`DeveloperStudio.tsx:639` `/v1/receipts/{receiptId}` — 커널에 receipt-by-id route **없음**. receipt는 result_view payload와 node-mTLS `/v1/executions/receipts`에만 있다. **payload로 접기 vs 신규 조회 route** 결정
+2. `Login.tsx:38` `/v1/auth/token` — Login이 백엔드에 **PKCE code 교환**을 요청한다. 그러나 커널은 offline verifier(토큰 검증만, code 교환 안 함). **SPA가 IdP와 직접 PKCE vs 백엔드 broker endpoint** 결정. 절차서 2절은 "검증기는 오프라인, JWKS는 파일"이라 직접 방식을 시사하지만 확정은 설계 결정이다
+3. `RunDetail.tsx:132` `/v1/runs/{}/shards/cancel-all` — shard·run cancel 능력은 존재. **전체취소 편의 route 신설 vs run-cancel로 충분** 결정
+
+**정정 사유 기록**: 내가 앞서 "부재 0"이라 단정한 것은 approvals·shards·reclaim만 보고 receipt-by-id와 auth/token을 확인하지 않은 탓이다. F1과 같은 종류의 성급함이라 스스로 정정한다. 실 결정은 0이 아니라 **3개**다 — 다만 여전히 작고 명확하며, 통합의 큰 위험은 아니다.
 
 ### 세 측정의 정리 — "0 unserved"는 fixture 서버에 대고 잰 값이다 (2026-09-14, Claude)
 
