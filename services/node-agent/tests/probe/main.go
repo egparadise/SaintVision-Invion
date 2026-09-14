@@ -12,9 +12,13 @@ import (
 
 func fail(reason string) { fmt.Fprintln(os.Stderr, reason); os.Exit(41) }
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "workspace" {
+	if len(os.Args) > 1 && (os.Args[1] == "workspace" || os.Args[1] == "workspace-edited") {
+		expected := "print('checkpoint')\n"
+		if os.Args[1] == "workspace-edited" {
+			expected = "print('edited before approval')\n"
+		}
 		data, err := os.ReadFile("/workspace/src/main.py")
-		if err != nil || string(data) != "print('checkpoint')\n" {
+		if err != nil || string(data) != expected {
 			fail("restored input")
 		}
 		if os.Getenv("INV_WORKSPACE_INPUT") != "" {

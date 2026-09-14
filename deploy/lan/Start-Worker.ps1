@@ -1,6 +1,24 @@
-param([Parameter(Mandatory=$true)][ValidatePattern('^[a-fA-F0-9]{64}$')][string]$CertificateSHA256)
+param([Parameter(Mandatory=$true)][ValidatePattern('^[a-fA-F0-9]{64}$')][string]$CertificateSHA256,
+      [string]$StorageSource,
+      [ValidatePattern('^[a-fA-F0-9]{64}$')][string]$StoragePolicySHA256)
 $ErrorActionPreference = 'Stop'
 $manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'manifest.json') -Raw | ConvertFrom-Json
+$svStorageArgs = @()
+if ($StorageSource -or $StoragePolicySHA256) {
+    if (-not $StorageSource -or -not $StoragePolicySHA256) { throw 'Specify both StorageSource and StoragePolicySHA256.' }
+    $svSource = Get-Item -LiteralPath $StorageSource
+    if (-not $svSource.PSIsContainer -or $svSource.FullName -notmatch '^[A-Za-z]:\\' -or $svSource.Parent -eq $null) {
+        throw 'Choose a specific folder on a local Windows drive.'
+    }
+    $svFolderPrefix = $svSource.FullName.TrimEnd('\') + '\'
+    if ($PSScriptRoot.StartsWith($svFolderPrefix, [StringComparison]::OrdinalIgnoreCase) -or $PSScriptRoot -eq $svSource.FullName) {
+        throw 'The contributed folder must not include the installation bundle.'
+    }
+    $svPolicy = Join-Path $PSScriptRoot 'storage-policy.json'
+    if ((Get-FileHash -LiteralPath $svPolicy -Algorithm SHA256).Hash -ne $StoragePolicySHA256) { throw 'Storage policy hash differs.' }
+    $svLinuxSource = '/mnt/' + $svSource.FullName.Substring(0,1).ToLower() + $svSource.FullName.Substring(2).Replace('\','/')
+    $svStorageArgs = @($svLinuxSource, $StoragePolicySHA256.ToLowerInvariant())
+}
 $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     throw 'Run this script from an Administrator PowerShell to add the Node firewall rule.'
@@ -30,5 +48,5 @@ if (-not (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)) {
     }
 }
 $workerLinuxPath = '/mnt/' + $PSScriptRoot.Substring(0,1).ToLower() + $PSScriptRoot.Substring(2).Replace('\','/')
-& wsl.exe -d Ubuntu -- bash "$workerLinuxPath/finish-worker.sh"
+& wsl.exe -d Ubuntu -- bash "$workerLinuxPath/finish-worker.sh" @svStorageArgs
 if ($LASTEXITCODE -ne 0) { throw 'Node startup failed. Preserve its journal and inspect the output.' }

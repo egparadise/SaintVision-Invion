@@ -37,6 +37,7 @@ from typing import Final
 from sqlalchemy.orm import Session
 
 from ..errors import VAL_SCHEMA, InvError
+from ..storage.readroot import ReadRoot
 from ..storage.pathsafe import UnsafePath, normalize_contribution_path
 
 #: 4 MiB. Large enough that syscall overhead is irrelevant, small enough that a
@@ -73,54 +74,70 @@ class ByteObservation:
 def hash_file(
     path: str | os.PathLike[str],
     *,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
     chunk_bytes: int = CHUNK_BYTES,
     monotonic=None,
+    max_bytes: int | None = None,
 ) -> ByteObservation:
     """Read a file and return what is actually in it.
 
-    The path is normalised through the same safety check contributed folders
-    use, so a verification job cannot be pointed at ``/etc/shadow`` or walked
-    out of its root by a crafted record.
-
-    Reads in chunks and counts the bytes it read rather than trusting
-    ``stat()``: the size that matters is the size that was hashed, and a file
-    growing under the reader would otherwise produce a digest and a size that
-    describe different content.
+    A trusted worker must supply its preconfigured ReadRoot. Authorization is
+    checked on opened handles, never inferred from the requested path. Two
+    bounded reads must agree: timestamp granularity alone cannot detect rapid
+    same-size writes. This is an observation, not a filesystem snapshot.
     """
     from time import monotonic as _monotonic
 
     clock = monotonic or _monotonic
-    if chunk_bytes <= 0:
-        raise InvError(VAL_SCHEMA, "chunk_bytes must be positive")
+    if max_bytes is not None and (type(max_bytes) is not int or max_bytes < 0):
+        raise VerificationFailed("invalid verification byte budget")
+    if type(chunk_bytes) is not int or not 1 <= chunk_bytes <= CHUNK_BYTES:
+        raise InvError(VAL_SCHEMA, "chunk_bytes must be an integer between 1 and 4 MiB")
 
     try:
         checked = normalize_contribution_path(str(path), os_type)
     except UnsafePath as exc:
         raise VerificationFailed(f"refusing to read that path: {exc.rule}") from None
 
-    target = Path(checked.normalized)
+    if not isinstance(allowed_root, ReadRoot):
+        raise VerificationFailed("an authorized read root is required")
+    # Do not silently reinterpret encoded aliases or traversal during syntax
+    # normalization; use the original path for the actual boundary.
+    if Path(str(path)) != Path(checked.normalized):
+        raise VerificationFailed("refusing to read that path: ambiguous path")
+    target = Path(str(path))
     started = clock()
-    digest = hashlib.sha256()
-    total = 0
     try:
-        with open(target, "rb") as handle:
-            while True:
-                chunk = handle.read(chunk_bytes)
-                if not chunk:
-                    break
-                digest.update(chunk)
-                total += len(chunk)
+        with allowed_root.open(target) as (handle, initial_size):
+            if max_bytes is not None and initial_size > max_bytes:
+                raise VerificationFailed("file exceeds verification byte budget")
+            first_digest = None
+            for _ in range(2):
+                handle.seek(0)
+                digest = hashlib.sha256()
+                total = 0
+                while total <= initial_size:
+                    chunk = handle.read(min(chunk_bytes, initial_size + 1 - total))
+                    if not chunk:
+                        break
+                    digest.update(chunk)
+                    total += len(chunk)
+                if total != initial_size:
+                    raise VerificationFailed("file changed during read")
+                if first_digest is not None and first_digest != digest.digest():
+                    raise VerificationFailed("file changed during read")
+                first_digest = digest.digest()
     except FileNotFoundError:
-        raise VerificationFailed("the file does not exist", path_checked=str(target)) from None
+        raise VerificationFailed("the file does not exist") from None
     except IsADirectoryError:
         raise VerificationFailed("the path is a directory") from None
     except PermissionError:
         # Not a skip. A pass that ignores what it could not open reports success
         # for a backup nobody has read.
         raise VerificationFailed("the file could not be read") from None
-    except OSError as exc:
-        raise VerificationFailed(f"the file could not be read: {exc.strerror}") from None
+    except OSError:
+        raise VerificationFailed("the file could not be read") from None
 
     return ByteObservation(
         sha256=digest.hexdigest(),
@@ -137,6 +154,7 @@ def verify_backup_bytes(
     backup_id: str,
     path: str | os.PathLike[str],
     now: dt.datetime,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
     expected_sha256: str | None = None,
 ) -> ByteObservation:
@@ -146,15 +164,34 @@ def verify_backup_bytes(
     ``backup_records`` is one this process computed over the bytes, not one a
     caller supplied.
 
-    ``expected_sha256`` is optional and is a *re-verification* check — a backup
-    verified last week should still hash the same. Passing it turns silent bit
-    rot into a failure.
+    The stored digest is always a re-verification constraint. A caller hint can
+    add a constraint, never replace that baseline. Lock metadata before reading
+    bytes, so concurrent first verifiers cannot replace each other's digest.
+    A rejected observation does not alter a previous successful observation.
     """
     from .pilot import verify_backup
+    from sqlalchemy import select
+    from ..db.models import BackupRecord
 
-    observation = hash_file(path, os_type=os_type)
+    row = session.scalars(
+        select(BackupRecord)
+        .where(BackupRecord.tenant_id == tenant_id, BackupRecord.backup_id == backup_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).first()
+    if row is None:
+        raise VerificationFailed("backup is unavailable in this tenant")
+    if (
+        expected_sha256 is not None
+        and row.checksum_sha256 is not None
+        and expected_sha256 != row.checksum_sha256
+    ):
+        raise VerificationFailed("expected digest disagrees with recorded backup")
 
-    if expected_sha256 is not None and observation.sha256 != expected_sha256:
+    observation = hash_file(path, allowed_root=allowed_root, os_type=os_type)
+
+    baseline = row.checksum_sha256 if row.checksum_sha256 is not None else expected_sha256
+    if baseline is not None and observation.sha256 != baseline:
         raise VerificationFailed(
             "the backup no longer hashes to its recorded digest",
             cause_ref=backup_id,
@@ -162,25 +199,26 @@ def verify_backup_bytes(
             byteSize=observation.byte_size,
         )
 
-    row = verify_backup(
-        session,
-        tenant_id=tenant_id,
-        backup_id=backup_id,
-        checksum_sha256=observation.sha256,
-        now=now,
-    )
     if row.byte_size and row.byte_size != observation.byte_size:
-        # The digest is of a different amount of data than was recorded. Do not
-        # leave the row verified on the strength of it.
+        # Validate before any successful-verification write. Catching this
+        # application exception and committing must not promote a bad backup.
         raise VerificationFailed(
             "the backup on disk is a different size than the record",
             cause_ref=backup_id,
             recordedBytes=row.byte_size,
             observedBytes=observation.byte_size,
         )
-    if not row.byte_size:
-        row.byte_size = observation.byte_size
-        session.flush()
+    with session.begin_nested():
+        verify_backup(
+            session,
+            tenant_id=tenant_id,
+            backup_id=backup_id,
+            checksum_sha256=observation.sha256,
+            now=now,
+        )
+        if not row.byte_size:
+            row.byte_size = observation.byte_size
+            session.flush()
     return observation
 
 
@@ -191,6 +229,7 @@ def verify_replica_bytes(
     replica_id: str,
     path: str | os.PathLike[str],
     now: dt.datetime,
+    allowed_root: ReadRoot | None = None,
     os_type: str = "linux",
 ) -> ByteObservation:
     """Hash a replica on the node holding it and promote it if it matches.
@@ -202,7 +241,7 @@ def verify_replica_bytes(
     """
     from .locality import mark_replica_ready
 
-    observation = hash_file(path, os_type=os_type)
+    observation = hash_file(path, allowed_root=allowed_root, os_type=os_type)
     mark_replica_ready(
         session,
         tenant_id=tenant_id,
@@ -219,6 +258,7 @@ def verify_pending_backups(
     tenant_id: uuid.UUID,
     now: dt.datetime,
     resolve_path,
+    allowed_root: ReadRoot | None = None,
     limit: int = 10,
 ) -> dict[str, list[str]]:
     """Verify unverified backups, reporting both outcomes.
@@ -234,6 +274,9 @@ def verify_pending_backups(
 
     from ..db.models import BackupRecord
 
+    if type(limit) is not int or not 1 <= limit <= 100:
+        raise VerificationFailed("verification limit must be between 1 and 100")
+
     rows = session.scalars(
         select(BackupRecord)
         .where(
@@ -247,15 +290,21 @@ def verify_pending_backups(
     verified: list[str] = []
     failed: list[str] = []
     for row in rows:
-        path = resolve_path(row)
-        if path is None:
-            failed.append(row.backup_id)
-            continue
         try:
-            verify_backup_bytes(
-                session, tenant_id=tenant_id, backup_id=row.backup_id, path=path, now=now
-            )
-        except InvError:
+            with session.begin_nested():
+                path = resolve_path(row)
+                if path is None:
+                    raise VerificationFailed("backup location is unavailable")
+                verify_backup_bytes(
+                    session,
+                    tenant_id=tenant_id,
+                    backup_id=row.backup_id,
+                    path=path,
+                    now=now,
+                    allowed_root=allowed_root,
+                    os_type="windows" if os.name == "nt" else "linux",
+                )
+        except (InvError, OSError):
             # Recorded as a failure and the sweep continues: one unreadable
             # backup must not hide the state of the rest.
             failed.append(row.backup_id)

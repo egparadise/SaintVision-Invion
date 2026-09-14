@@ -75,6 +75,9 @@ def run_migrations_online() -> None:
             transactional_ddl=True,
         )
         with context.begin_transaction():
+            from saintvision.db.migration_guard import assert_permission_groups
+
+            assert_permission_groups(connection)
             context.run_migrations()
 
 

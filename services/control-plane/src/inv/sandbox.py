@@ -37,8 +37,11 @@ class SandboxProfile:
     max_cpu_millis: int = 1000
     max_memory_bytes: int = 536870912
     max_timeout_seconds: int = 30
+    allow_terminal: bool = False
 
     def __post_init__(self):
+        if type(self.allow_terminal) is not bool:
+            raise ValueError("Explicit terminal policy flag required")
         if not isinstance(self.version, str) or not 1 <= len(self.version) <= 200:
             raise ValueError("Versioned sandbox configuration required")
         if (
@@ -144,5 +147,11 @@ def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
         )
     elif workspace_input is not None:
         raise DomainError("AUTH-0044", "Unexpected Workspace input", 403)
+    if "terminal" in workload:
+        # Interactive stdin is an explicit part of the fixed approved action.
+        # It receives no additional process, host mount or network authority.
+        if workspace_input is None or not profile.allow_terminal:
+            raise DomainError("AUTH-0044", "Terminal requires a frozen Workspace Step", 403)
+        plan["terminal"] = dict(workload["terminal"])
     validate_contract("SandboxLaunchSpec", plan)
     return plan

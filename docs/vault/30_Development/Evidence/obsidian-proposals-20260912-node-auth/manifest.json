@@ -1,0 +1,16 @@
+{
+  "kst": "2026-09-12T11:45:50+09:00",
+  "scope": "External author reports retained; old canonical review records not removed",
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-node-auth/progress.txt",
+      "externalSHA256": "5944115df104c236c2af12dd04f732e84b4c233d1a0052b89a5407bb86783e84"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Claude 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-node-auth/claude.txt",
+      "externalSHA256": "e83d768758992221ca877432767211051e0fc5d37c23d26e7a27658a67116dab"
+    }
+  ]
+}

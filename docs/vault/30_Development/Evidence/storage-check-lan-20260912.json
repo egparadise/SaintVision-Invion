@@ -1,0 +1,17 @@
+{
+  "kst": "2026-09-12T11:11:46+09:00",
+  "scope": "read-only local LAN console, not direct Node execution",
+  "nodes": [
+    {
+      "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+      "address": "192.168.45.225",
+      "status": "online",
+      "fresh": true,
+      "profileVersion": "lan-observe-v1"
+    }
+  ],
+  "gates": {
+    "killSwitch": true,
+    "userWorkloadSubmission": false
+  }
+}

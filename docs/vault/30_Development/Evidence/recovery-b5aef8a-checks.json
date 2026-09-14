@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-11T18:58:38+09:00",
+  "codeSHA": "b5aef8a23bd4d8baf69db58d83366637e65c8126",
+  "core": {
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "exitCode": 0,
+  "scope": "actual fixed-SHA local validation; operating acceptance pending",
+  "implementationSHA": "869d74b",
+  "priorGoEvidence": "recovery-5fc1116-supervisor.json",
+  "unchangedGoSources": true
+}

@@ -1,0 +1,454 @@
+{
+  "codeSHA": "28308870268b2d37b924d74e4305f129b5b9adb1",
+  "dirty": false,
+  "exitCode": 0,
+  "postgresImage": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+  "scope": "Native Windows ASGI/API/actual PostgreSQL tests; transport metadata fixtures, not live TLS handshake",
+  "cases": [
+    {
+      "name": "test_tls_error_is_terminal_even_with_trusted_proxy[expired certificate]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_tls_error_is_terminal_even_with_trusted_proxy[unknown CA]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_tls_error_is_terminal_even_with_trusted_proxy[]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_tls_error_is_terminal_even_with_trusted_proxy[False]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_tls_error_is_terminal_even_with_trusted_proxy[0]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[chain0]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[chain1]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[chain2]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[cert0]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[cert1]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[123]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_direct_chain_cannot_fall_back[None]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_asgi_iterable_certificate_chain_is_supported",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_failed_transport_cannot_resolve_even_an_enrolled_fingerprint",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_api_rechecks_binding_after_authentication_before_heartbeat[retired]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_api_rechecks_binding_after_authentication_before_heartbeat[rotated]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_api_rechecks_binding_after_authentication_before_heartbeat[cleared]",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_guard_holds_binding_until_transaction_end",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_binding_guard_cannot_cross_tenant_scope",
+      "suite": "tests.test_node_auth_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_forwarded_fingerprint_from_an_unlisted_peer_is_ignored",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_with_no_allowlist_the_proxy_path_is_closed",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_certificate_at_all_is_refused",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_allowlisted_proxy_authenticates_the_node",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_direct_mtls_needs_no_allowlist",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_direct_mtls_beats_a_forwarded_header",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unknown_certificate_is_refused",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_retired_nodes_certificate_stops_working",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_malformed_fingerprint_is_refused",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_node_may_only_act_as_itself",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_typo_in_the_allowlist_does_not_widen_it",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_auth_errors_do_not_echo_the_credential",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_sequence_that_does_not_advance_is_not_applied",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_beat_revives_a_node_that_was_declared_lost",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_stale_beat_does_not_revive_a_lost_node",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_only_one_of_two_concurrent_beats_applies",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_increasing_beats_leave_the_highest",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_beat_for_an_unknown_node_is_not_found",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_beat_cannot_cross_tenants",
+      "suite": "tests.test_node_auth",
+      "status": "passed"
+    },
+    {
+      "name": "test_enrolled_node_is_registered_and_readable",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_bootstrap_token_cannot_be_used_twice",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_bootstrap_token_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_tokens_tenant_is_binding",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_denials_are_recorded",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenants_node_is_not_listed",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenants_node_is_not_readable_by_id",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_project_scope_is_checked_separately_from_tenancy",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_credential_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_credential_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_heartbeat_advances_and_replays_are_ignored",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_heartbeat_observations_land_in_the_right_partition",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_liveness_sweep_marks_a_silent_node_lost",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_liveness_sweep_does_not_cross_tenants",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_heartbeat_for_a_node_you_are_not_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_contribution_is_registered_with_a_normalised_path",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_contribution_path_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_contribution_registration_is_idempotent",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_key_with_a_different_body_is_a_conflict",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenant_cannot_see_the_contribution",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_fields_are_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_page_limit_is_capped",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_cursor_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_is_honoured_and_echoed",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_health_reports_unresolved_s01_settings",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_readiness_reports_partition_lead",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_intact_local_sample_is_read_only_and_not_node_attestation",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_unverified_bytes_never_pass[corrupt]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_unverified_bytes_never_pass[missing]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_unverified_bytes_never_pass[size]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_unverified_bytes_never_pass[checksum]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_scope_mismatch_refused_before_read[tenant]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_scope_mismatch_refused_before_read[node]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_scope_mismatch_refused_before_read[root]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_root_junction_cannot_be_authorized",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_limit_refused_before_database[0]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_limit_refused_before_database[-1]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_limit_refused_before_database[True]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_limit_refused_before_database[1001]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_legacy_zero_sample_healthy_row_still_needs_attention",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_verified_evidence_is_not_healthy[0-detail0]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_verified_evidence_is_not_healthy[1-detail1]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_counts_fail_before_promotion[-1]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_counts_fail_before_promotion[True]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_counts_fail_before_promotion[1.5]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_tied_failed_sample_cannot_be_hidden",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_future_observation_does_not_clear_attention",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_cli_rejects_dsn_and_apply_without_echoing_secrets",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_actual_cli_reads_sample_without_recording[True]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_actual_cli_reads_sample_without_recording[False]",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_sampling_reports_unexamined_files",
+      "suite": "tests.test_storage_check_integrity",
+      "status": "passed"
+    }
+  ]
+}

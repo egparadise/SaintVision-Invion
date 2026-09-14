@@ -261,6 +261,45 @@ def test_current_public_scope_is_required_even_with_matching_tenant(business):
     assert response.status_code == 403, response.text
 
 
+def test_git_proposal_replay_rechecks_current_business_membership(business):
+    # Real DB grants and immutable Git intent; the remote provider is in-memory.
+    from test_workspace_api import test_remote_git_dispatch_is_not_repeated_after_lost_response
+
+    a = business
+    checkout = a.url + "/checkouts/" + a.checkout_id
+    view = a.http.get(checkout + "/files", headers=a.headers()).json()
+    test_remote_git_dispatch_is_not_repeated_after_lost_response(a)
+    payload = dict(
+        alias="sample",
+        mode="push",
+        commit="a" * 40,
+        expectedRevision=view["revision"],
+        expectedSha256=view["sha256"],
+    )
+    assert (
+        a.http.post(
+            checkout + "/git", json=payload, headers=a.headers(key="git-propose")
+        ).status_code
+        == 201
+    )
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "DELETE FROM public.project_members WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
+            (a.e.tenant, a.e.project, a.users["requester"]),
+        )
+        assert conn.execute(
+            "SELECT enabled FROM inv.project_grants WHERE tenant_id=%s AND project_id=%s AND subject_id=%s",
+            (a.e.tenant, a.e.project, a.jwt.subject("requester")),
+        ).fetchone() == (True,)
+    assert (
+        a.http.post(
+            checkout + "/git", json=payload, headers=a.headers(key="git-propose")
+        ).status_code
+        == 403
+    )
+    assert a.service.git_repositories["sample"].calls == 1
+
+
 def test_changed_files_roll_back_freeze_approval_and_binding(business):
     a = business
     stop(a)

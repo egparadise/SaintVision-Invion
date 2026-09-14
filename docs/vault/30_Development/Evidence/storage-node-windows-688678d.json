@@ -1,0 +1,525 @@
+{
+  "verifiedKst": "2026-09-12T12:57:44+09:00",
+  "codeSHA": "688678d510b676d59d80c69de08bc69569828dd5",
+  "dirty": false,
+  "pythonExitCode": 0,
+  "pythonCases": [
+    {
+      "name": "test_real_bytes_bound_to_run_and_certificate_without_operational_write",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_sample_does_not_turn_unverified_bytes_into_health[corrupt]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_sample_does_not_turn_unverified_bytes_into_health[size]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_sample_does_not_turn_unverified_bytes_into_health[missing]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_sample_does_not_turn_unverified_bytes_into_health[unknown_hash]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_sample_does_not_turn_unverified_bytes_into_health[oversized]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[run_id-run_01M29W2PTGWR6TQ1QFGYESMAC4]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[project_id-prj_01M29W2PTGP1GJJ4QK9PNP441C]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[contribution_id-stc_01M29W2PTG041K2QJ1QEPW6CBX]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[root_version-3]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[nonce-abababababababababababababababababababababababababababababababab]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[catalogued-8]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[issued_at-1799999999]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_other_challenge_cannot_reuse_signature[expires_at-1800000029]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[tenant_id-bf7ea0e0-9f0c-42bf-82c5-02833838e0db]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[node_id-nod_01M29W2PTGK2YTGKDMTAQTJNPM]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[recovery_epoch-bae0ba67-e35b-4304-8e34-2016e5161f4b]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[version-2]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[endpoint-https://elsewhere.invalid]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_scope_change_refused_before_read_and_on_verification[certificate_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_catalog_mutation_cannot_reuse_signature[relative_path-different.bin]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_catalog_mutation_cannot_reuse_signature[version-2]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_catalog_mutation_cannot_reuse_signature[byte_size-11]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_catalog_mutation_cannot_reuse_signature[checksum_sha256-0000000000000000000000000000000000000000000000000000000000000000]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_catalog_mutation_cannot_reuse_signature[location_id-dtl_01M29W2PTGV7RAS6RAA3J78B4P]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[../secret]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[/etc/passwd]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[C:/secret]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[x\\\\secret]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[x/../secret]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[./data.bin]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[x//data.bin]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[%2e%2e/secret]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_manifest_rejected_before_read[data.bin\\x00]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_directory_link_escape_is_signed_as_failed_observation",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[empty]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[duplicate]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[bool_version]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[over_count]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[over_size]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_or_unbounded_challenge_refused[long_ttl]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_or_future_challenge_refused[1799999999]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_or_future_challenge_refused[1800000030]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_or_future_challenge_refused[1800000031]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_expiry_during_read_does_not_produce_signature",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_unrelated_key_cannot_collect_or_sign",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[omit]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[duplicate]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[extra]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[bool_size]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[future]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[claim_health]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[wrong_hash_type]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_valid_signature_with_invalid_content_is_not_accepted[unpaired]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_certificate_and_different_pin_rejected",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_byte_budget_rejects_before_stream_read",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[tamper]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[bad_base64]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[too_large]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[short_signature]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[extra_field]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_wire_corruption_and_signature_domain_rejected[wrong_domain]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_root_configuration_mismatch_rejected_before_read[root_version-3]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_root_configuration_mismatch_rejected_before_read[contribution_id-stc_01M29W2PTGCWM7NQR4ZZSQD4J3]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_byte_budget_rejected[-1]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_byte_budget_rejected[True]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_byte_budget_rejected[1.5]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_byte_budget_rejected[10]",
+      "suite": "tests.test_node_storage_sample",
+      "status": "passed"
+    },
+    {
+      "name": "test_id_is_prefix_and_ulid",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_id_column_width_matches_the_schema",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_entity_kind_is_refused",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod_]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nodx_01ARZ3NDEKTSV4RRFFQ69G5FAV]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod_short]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[NOD_01ARZ3NDEKTSV4RRFFQ69G5FAV]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_ulids_sort_by_creation_time",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_ulid_body_uses_crockford_alphabet_only",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_trace_and_span_ids_are_hex_and_never_zero",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_tenant_id_is_a_uuid",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[VAL-SCHEMA-VAL]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[AUTH-BOOTSTRAP-TOKEN-CONSUMED-AUTH]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[RES-NODE-NOT-FOUND-RES]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[SEC-TENANT-SCOPE-UNSET-SEC]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[GRAPH-IDEMPOTENCY-CONFLICT-GRAPH]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_code_family_is_refused",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_problem_carries_every_required_field",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_internal_message_is_withheld_when_not_public",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_retryability_follows_the_category_table",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_limit_defaults_and_clamps",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_limit_below_one_is_rejected",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_cursor_must_be_an_identifier",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_page_reports_a_cursor_only_when_more_rows_exist",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[None-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[garbage-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[00-00000000000000000000000000000000-aaaaaaaaaaaaaaaa-01-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01-False]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    }
+  ],
+  "goExitCode": 0,
+  "goPassEvents": [
+    "TestMTLSAllowsOnlyPinnedScopedClient/no-certificate",
+    "TestMTLSAllowsOnlyPinnedScopedClient/wrong-ca",
+    "TestMTLSAllowsOnlyPinnedScopedClient/wrong-uri",
+    "TestMTLSAllowsOnlyPinnedScopedClient/expired",
+    "TestMTLSAllowsOnlyPinnedScopedClient/wrong-eku",
+    "TestMTLSAllowsOnlyPinnedScopedClient/unpinned",
+    "TestMTLSAllowsOnlyPinnedScopedClient",
+    "TestPolicyRevocationOnExistingTLSConnection",
+    "TestClientCertificateOverlapAndRollback",
+    "TestRevocationCancelsActiveRequest",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/expired-policy",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/same-version-change",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/malformed-policy",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/oversize-body",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/query",
+    "TestInvalidPolicyAndFramingNeverReachExecutor/wrong-path",
+    "TestInvalidPolicyAndFramingNeverReachExecutor",
+    "TestPlainHTTPIdentityHeadersHaveNoAuthority",
+    "TestReceiptObservationWaitsForPriorHTTPResponseSlot",
+    "TestStorageDisabledWithoutLocalConfiguration",
+    "TestStorageRechecksPeerAfterCollection",
+    "TestStorageSlotDoesNotConsumeHeartbeatCapacity"
+  ],
+  "goLeafCases": 20,
+  "scope": "Windows Python verifier/contracts and Go transport tests; Linux-only storage reading is tested in separate Linux evidence"
+}

@@ -314,6 +314,22 @@ def test_first_cancel_before_enqueue_never_reserves_or_executes(first):
     assert run(a)["state"] == "cancelled" and run(a)["attempt"] == 0
 
 
+def test_first_start_refuses_conflicting_node_and_unapproved_terminal_profile(first):
+    a = first
+    original = deepcopy(a.prepare_input)
+    a.prepare_input["workload"]["targetNodeId"] = new_id("nod")
+    response = a.http.post(a.url + "/start/prepare", json=a.prepare_input, headers=a.headers())
+    assert response.status_code == 403, response.text
+    a.prepare_input = original
+    a.prepare_input["workload"]["terminal"] = dict(
+        sessionId=str(uuid4()), rows=24, columns=80, maxInputBytes=4096, maxOutputBytes=8192
+    )
+    response = a.http.post(a.url + "/start/prepare", json=a.prepare_input, headers=a.headers())
+    assert response.status_code == 403, response.text
+    clean(a)
+    assert count(a, "workspace_starts") == 0 and run(a)["state"] == "draft"
+
+
 @pytest.mark.parametrize("change", ["grant", "node-membership", "capacity", "kill", "runtime"])
 def test_first_admission_rechecks_authority_after_observation(first, change):
     a = first

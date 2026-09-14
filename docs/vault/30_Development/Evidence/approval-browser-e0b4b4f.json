@@ -1,0 +1,14 @@
+{
+  "command": "python -m pytest -q tests/integration/test_approval_browser.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "browser": "real headless Chromium/Edge; production ApprovalCenter in test-only entry; configured server factory over HTTP",
+  "isolatedContainerRemoved": true,
+  "productCommit": "fa21264",
+  "deliveryCommit": "e0b4b4f",
+  "passed": 2,
+  "durationSeconds": 16.51,
+  "scope": "ApprovalCenter component harness + production configured factory + isolated PostgreSQL; not full App login or remote Node"
+}

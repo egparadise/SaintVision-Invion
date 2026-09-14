@@ -162,6 +162,7 @@ def post_heartbeat(
     with factory() as session:
         with session.begin():
             with tenant_scope(session, tenant_id):
+                principal.lock_current(session)
                 # The read-then-compare that used to decide `applied` is gone.
                 # Two heartbeats arriving together both read the old sequence
                 # and both concluded they had advanced it; the database now

@@ -1,16 +1,16 @@
 ---
 doc_id: "CODEX-WORKSPACE-BRIDGE-001"
 title: "Codex Workspace 편집과 PTY 및 원격 Git 계약"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T17:07:26+09:00"
+updated: "2026-09-12T00:19:45+09:00"
 source_of_truth: "Git"
 ---
 
 # Workspace 편집·PTY·원격 Git 후속 계약
 
-WORKSPACE-BRIDGE / S06-BE/DB/ST 부분 / OUT-06·AC-06. owner Codex, 독립 reviewer Claude pending. base PR17 `dac25591adfb61a4a81382f737c4d1eed34c07d5`, branch `agent/codex/workspace-bridge`. GUIDE/PLAN-BACKEND/DB/STORAGE/GOV-AGENT/GOV-GIT v1.0.0와 ADR-056을 잇는다. **사용자 요청으로 이번에는 실제 시험을 수행하지 않는다. 구현·정적 검사·컴파일 성공은 AC-06 합격 증거가 아니다.** 이전 PR17 990개 통과를 새 코드의 시험 증거로 재사용하지 않는다.
+WORKSPACE-BRIDGE / S06-BE/DB/ST 부분 / OUT-06·AC-06. owner Codex, 독립 reviewer Claude pending. base PR17 `dac25591adfb61a4a81382f737c4d1eed34c07d5`, branch `agent/codex/workspace-bridge`. GUIDE/PLAN-BACKEND/DB/STORAGE/GOV-AGENT/GOV-GIT v1.0.0와 ADR-056을 잇는다. 2026-09-10에는 사용자 요청으로 build-only 검증했다. 2026-09-11 WORKSPACE-INTEGRATION은 후속 사용자 지시에 따라 실제 격리 PostgreSQL·Node·PTY 시험을 진행한다. 최종 실행 증거와 남은 인수 항목은 후속 History에 기록한다. 구현·컴파일만으로 AC-06 합격을 선언하지 않는다. 이전 PR17 990개 통과를 새 코드의 시험 증거로 재사용하지 않는다.
 
 ## ADR-057 — 편집 revision과 다음 Node 입력의 일치
 
@@ -60,11 +60,19 @@ DB/working-root lock 안에서 네트워크를 호출하지 않는다. **kill/�
 
 ## DB·배포 및 후속 검증
 
-0023 뒤 0024_workspace_bridge forward migration은 workspace_edits, terminal_tickets/connections/frame_audit, git_operations/votes, operator.can_git를 추가한다. 모두 tenant FORCE RLS와 최소 column grant를 적용한다. immutable intent/vote/revision과 일회 ticket/dispatch 상태 전이를 보존한다. 기존 migration을 수정하지 않는다. 실제 DB 적용·upgrade/restore/rollback은 아직 수행하지 않았다. downgrade 대신 검토된 forward fix 또는 검증된 backup restore가 필요하다.
+0023 뒤 0024_workspace_bridge forward migration은 workspace_edits, terminal_tickets/connections/frame_audit, git_operations/votes, operator.can_git를 추가한다. 모두 tenant FORCE RLS와 최소 column grant를 적용한다. immutable intent/vote/revision과 일회 ticket/dispatch 상태 전이를 보존한다. 기존 migration을 수정하지 않는다. 2026-09-11 격리 DB에서 실제 upgrade를 검증한다. 운영 DB 적용·전체 backup restore는 별도다. downgrade 대신 검토된 forward fix 또는 검증된 backup restore가 필요하다.
 
-이번 branch에 한해 Core의 build_only job을 실행하고 기존 runtime/DB 시험 job 및 docs sync 시험을 제외한다. 정상 branch는 기존 전체 시험을 유지한다. build-only artifact의 validation-mode.json은 executionTests=deferred-by-user, acceptance=pending이다. PR을 merge하지 않은 채 후속 시험 단계에서 이 branch 조건을 제거하고 같은 코드에 대해 전체 CI를 실행해야 한다. 문서 check_docs/check_ontology·컴파일·offline SQL render는 허용된 정적 확인이다.
+2026-09-10 build-only 유예는 종료했다. Core/Backend/Frontend/Documentation의 branch별 시험 생략 조건을 제거했다. GitHub Actions 시작 여부와 결제 제한은 실제 run/annotation으로 따로 기록하며, 로컬 통과를 CI 통과로 바꾸어 보고하지 않는다.
 
-작성한 회귀 시험 소스도 이번에는 실행하지 않는다. 실제 인수 순서는 다음과 같다.
+## ADR-071 — 최신 커널과 편집·PTY 통합
+
+0033_workspace_bridge_merge는 공개된 0024_workspace_bridge와 0032_workspace_readiness_merge를 합친다. 과거 revision의 parent를 바꾸지 않는다. 공개 prior 20개에서 최신 head 업그레이드·재적용·제한 역할을 검사한다. tenant subject 경계 보강과 kernel ResultView를 유지한다.
+
+PTY는 frozen workspaceStart 또는 workspaceResume 중 정확히 하나와 allow_terminal=true를 요구한다. 첫 실행은 기본 설정 Node에 고정하며 prepare.targetNodeId와 workload.targetNodeId가 충돌하면 거부한다. HTTP로 frozen reference를 주입하지 못한다. Node의 TerminalSpec/CommandId/Frame/Input/Result 검증기를 명시적으로 등록하며 Docker helper exec/start는 협상된 API 버전을 사용한다. 모호한 mutation은 자동 재전송하지 않는다.
+
+Git proposal의 idempotent 재조회에도 현재 business membership을 다시 검사한다. 이전 성공 기록이나 살아 있는 kernel grant만으로 현재 public 프로젝트 권한 회수를 우회할 수 없다. 모든 구현은 기존 격리·승인·deadline·출력 상한 안에서 동작한다.
+
+다음 표는 최초 인수 범위이며, 실제 수행분과 아직 남은 운영 검증은 후속 History의 고정 SHA 증거가 우선한다.
 
 | 담당 | 다음 작업과 합격 증거 |
 |---|---|
@@ -75,3 +83,16 @@ DB/working-root lock 안에서 네트워크를 호출하지 않는다. **kill/�
 대용량 Git/Workspace, 일반 SSH/다른 Git provider, 장시간/full-screen terminal, Windows/GPU/BuildKit 격리, 전체 Context/RO secret 평가와 물리 5대 부하·장애·복구/운영 인수는 후속 범위다. peer review를 수행한 것으로 표시하지 않는다.
 
 외부 계약 참고: [GitHub createCommitOnBranch](https://docs.github.com/en/enterprise-cloud%40latest/graphql/reference/commits), [Git file changes](https://docs.github.com/en/graphql/reference/git), [Go SysProcAttr](https://pkg.go.dev/syscall#SysProcAttr), [Docker Engine API v1.45](https://docs.docker.com/reference/api/engine/version/v1.45/), [websockets package](https://pypi.org/project/websockets/).
+
+
+## ADR-074 — PTY 실행 의도와 확인된 응답 분리
+
+0034_terminal_frame_intents는 command+sequence별 digest와 생성시각만 저장하는 append-only tenant FORCE RLS 표를 추가한다. 원문 입력/nonce/출력을 저장하지 않는다. inv_kernel에는 SELECT/INSERT만 허용한다. 기존 완료 terminal_frame_audit와 0033 이전 이력은 변경하지 않는다.
+
+현재 권한 및 attachment 검사와 같은 Run 잠금 transaction에서 intent와 inv.terminal.frame_intended를 먼저 commit한다. 같은 순번의 다른 digest는 전송 전에 거부한다. 새 mutation 순번은 마지막 확인된 audit+1만 허용한다. 미확정 intent가 있으면 정확히 같은 frame의 재확인 또는 poll/종료만 가능하다. intent는 전송 또는 실행 성공 증거가 아니다.
+
+네트워크는 transaction 밖에서 호출한다. 응답의 command/session/nonce/sequence와 현재 권한/채널을 재검증한 후 기존 terminal_frame_audit 및 inv.terminal.frame을 한 번 기록한다. 전송 실패, 응답 유실, scope 불일치, 후행 권한 거부는 intent만 남기며 임의 완료로 바꾸지 않는다. poll의 sequence 관측도 특정 digest의 실행 증거가 아니므로 미확정 intent를 완료하지 않는다.
+
+정확한 replay는 Node 기존 마지막 sequence/hash replay 보호를 사용한다. 부분 write의 poisoned session을 재실행하지 않고 프로세스 종료 후 입력을 복원하지 않는다. 원래 frame을 잃었거나 재확인이 불가능하면 mutation을 계속하지 말고 승인된 실행을 종료하고 새 승인 흐름을 사용한다. 이전 완료 audit만 존재하는 upgrade 전 frame은 그 digest를 먼저 검사하며 과거 실행 앞에 intent가 있었던 것처럼 소급 생성하지 않는다.
+
+Node는 이미 다른 digest/같은 순번을 실행 전 거부한다. 이번 변경은 그 검사를 서버 dispatch 전에도 수행하고 durable intent 공백을 없앤다. in-flight dispatch 뒤의 권한 회수가 이미 전달된 입력을 소급 취소한다는 보장은 하지 않는다. 물리 원격/브라우저 운영 인수와 독립 검토는 별도다.

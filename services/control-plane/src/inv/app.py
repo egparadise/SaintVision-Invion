@@ -6,7 +6,7 @@ import os
 import time
 from contextlib import asynccontextmanager
 from threading import BoundedSemaphore
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.concurrency import run_in_threadpool
@@ -368,6 +368,14 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     from .result_view import ResultView
     result_view = ResultView(database)
 
+    from .storage_view import StorageObservationView
+    storage_view = StorageObservationView(database)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
+    def storage_observation(project: str, run_id: str, request_id: str,
+                            identity=Depends(authenticated)):
+        return storage_view.result(identity.principal, project, run_id, request_id)
+
     @api.get("/v1/projects/{project}/runs/{run_id}/result")
     @api.get("/v1/runs/{run_id}/result")
     def run_result(run_id: str, project: str | None = None, identity=Depends(authenticated)):
@@ -422,6 +430,26 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     def capacity(project: str, identity=Depends(authenticated)):
         return control.capacity(identity.principal, project)
 
+    @api.get("/v1/projects/{project}/approvals")
+    def approvals(project: str, after: str | None = None, limit: int = 50,
+                  runId: str | None = None, identity=Depends(authenticated)):
+        return control.list_approvals(identity.principal, project, after=after,
+                                      limit=limit, run_id=runId)
+
+    @api.get("/v1/projects/{project}/approvals/{approval_id}/review")
+    def approval_review(project: str, approval_id: str, identity=Depends(authenticated)):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(control.approvals.review(identity.principal, project, approval_id),
+                            headers={"Cache-Control": "no-store"})
+
+    @api.get("/v1/projects/{project}/approvals/{approval_id}")
+    def approval(project: str, approval_id: str, identity=Depends(authenticated)):
+        return control.get_approval(identity.principal, project, approval_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/shards")
+    def shards(project: str, run_id: str, identity=Depends(authenticated)):
+        return control.shards(identity.principal, project, run_id)
+
     @api.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
     async def challenge(
         project: str,
@@ -460,6 +488,207 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
         if workspace is None:
             raise DomainError("SYS-0001", "Workspace admission is not configured", 503)
         return workspace
+
+    terminal_slots = BoundedSemaphore(32)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/git", status_code=201)
+    async def propose_git(
+        project: str,
+        run_id: str,
+        checkout_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        from .workspace_git import WorkspaceGit
+
+        data = await request.json()
+        return await run_in_threadpool(
+            WorkspaceGit(workspace_service()).propose,
+            identity.principal,
+            project,
+            run_id,
+            checkout_id,
+            data,
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/git/{operation_id}")
+    def get_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).get(identity.principal, project, operation_id)
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/votes")
+    async def vote_git(
+        project: str, operation_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        from .workspace_git import WorkspaceGit
+
+        return await run_in_threadpool(
+            WorkspaceGit(workspace_service()).vote,
+            identity.principal,
+            project,
+            operation_id,
+            await request.json(),
+        )
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/apply")
+    def apply_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).apply(identity.principal, project, operation_id)
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/reconcile")
+    def reconcile_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).reconcile(
+            identity.principal, project, operation_id
+        )
+
+    @api.post("/v1/workspaces/{workspace_id}/terminal-tickets", status_code=201)
+    async def terminal_ticket(workspace_id: str, request: Request, identity=Depends(authenticated)):
+        from .terminal import TerminalService
+
+        data = await request.json()
+        return await run_in_threadpool(
+            TerminalService(workspace_service(), allowed_origins).issue,
+            identity,
+            workspace_id,
+            data,
+            request.headers.get("origin", ""),
+        )
+
+    @api.websocket("/v1/workspaces/{workspace_id}/terminals/{session_id}")
+    async def terminal_socket(websocket: WebSocket, workspace_id: str, session_id: str):
+        from .terminal import TerminalService, TerminalText
+        import secrets
+
+        origin = websocket.headers.get("origin", "")
+        if (
+            origin not in allowed_origins
+            or websocket.scope.get("query_string")
+            or websocket.headers.get("sec-websocket-protocol") != "inv-terminal-v1"
+            or len([h for h in websocket.scope["headers"] if h[0] == b"origin"]) != 1
+            or len([h for h in websocket.scope["headers"] if h[0] == b"sec-websocket-protocol"])
+            != 1
+            or sum(len(k) + len(v) for k, v in websocket.scope["headers"]) > 32768
+        ):
+            await websocket.close(code=4403)
+            return
+        if not terminal_slots.acquire(blocking=False):
+            await websocket.close(code=4429)
+            return
+        attachment = None
+        service = None
+        try:
+            service = TerminalService(workspace_service(), allowed_origins)
+            await websocket.accept(subprotocol="inv-terminal-v1")
+            first = await asyncio.wait_for(websocket.receive_text(), timeout=5)
+            if len(first) > 200:
+                raise DomainError("AUTH-0070", "Terminal authentication frame exceeds bound", 403)
+            auth = strict_object(first)
+            if not isinstance(auth, dict) or set(auth) != {"ticket"}:
+                raise DomainError("AUTH-0070", "Single-use terminal ticket required", 403)
+            attachment = await run_in_threadpool(
+                service.redeem, tokens.tenant_id, workspace_id, session_id, auth["ticket"], origin
+            )
+            text = TerminalText()
+            # Start from zero on every attachment; never redact only a suffix
+            # whose secret/escape prefix was seen by a previous connection.
+            data = {
+                "sequence": 0,
+                "cursor": 0,
+                "operation": "poll",
+                "dataBase64": "",
+                "rows": 24,
+                "columns": 80,
+                "nonce": secrets.token_hex(32),
+            }
+            while True:
+                if data["cursor"] != text.cursor:
+                    raise DomainError(
+                        "AUTH-0070", "Terminal cursor must follow acknowledged output", 403
+                    )
+                result = await run_in_threadpool(service.frame, attachment, data)
+                output = text.accept(result)
+                browser_output = {
+                    "sessionId": session_id,
+                    "sequence": result["sequence"],
+                    "cursor": text.cursor,
+                    "text": output,
+                    "outputMode": "redacted-complete-lines",
+                }
+                validate_contract("TerminalBrowserOutput", browser_output)
+                await asyncio.wait_for(
+                    websocket.send_json(browser_output),
+                    timeout=2,
+                )
+                try:
+                    raw = await asyncio.wait_for(websocket.receive_text(), timeout=0.5)
+                    if len(raw) > 8192:
+                        raise DomainError("VAL-0003", "Terminal frame exceeds bound", 422)
+                    data = strict_object(raw)
+                    validate_contract("TerminalFrameInput", data)
+                except asyncio.TimeoutError:
+                    data = {
+                        "sequence": 0,
+                        "cursor": text.cursor,
+                        "operation": "poll",
+                        "dataBase64": "",
+                        "rows": 24,
+                        "columns": 80,
+                        "nonce": secrets.token_hex(32),
+                    }
+        except (WebSocketDisconnect, asyncio.TimeoutError, DomainError, ValueError, TypeError):
+            try:
+                await websocket.close(code=4403)
+            except RuntimeError:
+                pass
+        except Exception:
+            # Never put raw frames, credentials or driver exceptions on the wire.
+            try:
+                await websocket.close(code=1011)
+            except RuntimeError:
+                pass
+        finally:
+            if attachment is not None:
+                try:
+                    await run_in_threadpool(service.release, attachment)
+                except Exception:
+                    pass  # Durable lease expires; this never grants a new execution.
+            terminal_slots.release()
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files")
+    def checkout_files(
+        project: str, run_id: str, checkout_id: str, identity=Depends(authenticated)
+    ):
+        from .workspace_editor import WorkspaceEditor
+
+        return WorkspaceEditor(workspace_service()).get(
+            identity.principal, project, run_id, checkout_id
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files")
+    async def edit_checkout_files(
+        project: str,
+        run_id: str,
+        checkout_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        from .workspace_editor import WorkspaceEditor
+
+        data = await request.json()
+        return await run_in_threadpool(
+            WorkspaceEditor(workspace_service()).edit,
+            identity.principal,
+            project,
+            run_id,
+            checkout_id,
+            data,
+            key(request),
+        )
 
     def business_service():
         from .business_handoff import BusinessHandoff
@@ -694,6 +923,10 @@ def main():
         proxy_headers=False,
         access_log=False,
         limit_concurrency=64,
+        ws="websockets",
+        ws_max_size=8192,
+        ws_max_queue=1,
+        ws_per_message_deflate=False,
         timeout_keep_alive=5,
         h11_max_incomplete_event_size=32768,
     )

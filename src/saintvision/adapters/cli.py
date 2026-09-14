@@ -68,6 +68,7 @@ from .contract import (
     Usage,
 )
 from .reference import redact_text
+from .process_output import ProcessOutput
 
 #: Output kept per stream. An agent that loops can produce far more; the rest is
 #: dropped and the fact recorded, because a control plane that runs out of
@@ -151,11 +152,7 @@ def _home() -> pathlib.Path:
 
 def _child_env() -> dict[str, str]:
     """A deliberately small environment for the child process."""
-    return {
-        key: os.environ[key]
-        for key in INHERITED_ENV
-        if key in os.environ
-    }
+    return {key: os.environ[key] for key in INHERITED_ENV if key in os.environ}
 
 
 def _run_quietly(
@@ -168,17 +165,30 @@ def _run_quietly(
     and the symptom is a status screen that never loads rather than an error.
     """
     try:
-        completed = subprocess.run(  # noqa: S603 - argv is built from a pinned path
+        process = subprocess.Popen(  # noqa: S603 - argv is built from a pinned path
             argv,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             env=_child_env(),
         )
-    except (OSError, subprocess.TimeoutExpired):
+    except OSError:
         return None, ""
-    return completed.returncode, (completed.stdout or "") + (completed.stderr or "")
+    capture = ProcessOutput(process, MAX_OUTPUT_BYTES)
+    timed_out = False
+    try:
+        process.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        process.kill()
+        try:
+            process.wait(timeout=TERMINATE_GRACE_SECONDS)
+        except subprocess.TimeoutExpired:
+            pass
+    stdout, stderr, complete, truncated = capture.finish(TERMINATE_GRACE_SECONDS)
+    if timed_out or not complete or truncated:
+        return None, ""
+    return process.returncode, (stdout + stderr).decode("utf-8", "replace")
 
 
 class CliAdapter:
@@ -397,8 +407,7 @@ class CliAdapter:
             raise FileNotFoundError(f"{self.tool.executable} is not on PATH")
         if self.tool.prompt_args is None:
             raise RuntimeError(
-                f"{self.tool.name} has no non-interactive mode; the platform "
-                f"cannot drive it"
+                f"{self.tool.name} has no non-interactive mode; the platform " f"cannot drive it"
             )
 
         prompt = str(request.get("input", ""))
@@ -412,13 +421,13 @@ class CliAdapter:
             # Closed, not inherited: an agent that decides to ask a question
             # would otherwise block until something kills it.
             stdin=subprocess.DEVNULL,
-            text=True,
             cwd=cwd,
             env=_child_env(),
         )
         handle_id = new_id("run")
         self._runs[handle_id] = {
             "process": process,
+            "capture": ProcessOutput(process, MAX_OUTPUT_BYTES),
             "path": resolved,
             "argv": argv,
             "started_at": started,
@@ -476,31 +485,36 @@ class CliAdapter:
         """
         state = self._runs.get(handle.handle_id)
         if state is None:
-            return CollectResult(
-                completed=False, content="", error_code="RES-RUN-NOT-FOUND"
-            )
+            return CollectResult(completed=False, content="", error_code="RES-RUN-NOT-FOUND")
         if state["collected"] is not None:
             return state["collected"]
 
         process = state["process"]
         try:
-            stdout, stderr = process.communicate(timeout=PROBE_TIMEOUT_SECONDS * 4)
+            process.wait(timeout=PROBE_TIMEOUT_SECONDS * 4)
+            timed_out = False
         except subprocess.TimeoutExpired:
+            timed_out = True
             process.kill()
-            stdout, stderr = process.communicate()
+            try:
+                process.wait(timeout=TERMINATE_GRACE_SECONDS)
+            except subprocess.TimeoutExpired:
+                pass
 
-        raw = stdout or ""
-        truncated = len(raw.encode("utf-8", "replace")) > MAX_OUTPUT_BYTES
-        if truncated:
-            raw = raw.encode("utf-8", "replace")[:MAX_OUTPUT_BYTES].decode(
-                "utf-8", "ignore"
-            )
+        stdout, stderr, complete, truncated = state["capture"].finish(TERMINATE_GRACE_SECONDS)
+        raw = stdout.decode("utf-8", "replace")
         content, changed = self.redact(raw)
-        errors, _ = self.redact((stderr or "")[:MAX_OUTPUT_BYTES])
+        errors, _ = self.redact(stderr.decode("utf-8", "replace"))
 
         exit_code = process.returncode
         if state["cancel_requested"]:
             error_code = "RUN-CANCELLED"
+            completed = False
+        elif timed_out:
+            error_code = "RUN-TIMEOUT"
+            completed = False
+        elif not complete:
+            error_code = "RUN-OUTPUT-INCOMPLETE"
             completed = False
         elif exit_code == 0:
             error_code = None
@@ -513,7 +527,15 @@ class CliAdapter:
             completed=completed,
             content=content,
             usage=Usage(),
-            stop_reason="cancelled" if state["cancel_requested"] else f"exit:{exit_code}",
+            stop_reason=(
+                "cancelled"
+                if state["cancel_requested"]
+                else (
+                    "timeout"
+                    if timed_out
+                    else "output-incomplete" if not complete else f"exit:{exit_code}"
+                )
+            ),
             model_id=None,
             redacted=changed,
             error_code=error_code,
@@ -542,21 +564,15 @@ class CliAdapter:
         """
         state = self._runs.get(handle.handle_id)
         if state is None:
-            return Attestation(
-                result=AttestationResult.UNVERIFIABLE, detail="unknown handle"
-            )
+            return Attestation(result=AttestationResult.UNVERIFIABLE, detail="unknown handle")
         digest = None
         try:
-            digest = hashlib.sha256(
-                pathlib.Path(state["path"]).read_bytes()
-            ).hexdigest()
+            digest = hashlib.sha256(pathlib.Path(state["path"]).read_bytes()).hexdigest()
         except OSError:
             digest = None
         # NUL-separated, not space-joined: ["a b"] and ["a", "b"] are
         # different invocations and must not digest to the same value.
-        request_digest = hashlib.sha256(
-            "\x00".join(state["argv"]).encode()
-        ).hexdigest()
+        request_digest = hashlib.sha256("\x00".join(state["argv"]).encode()).hexdigest()
         return Attestation(
             result=AttestationResult.UNVERIFIABLE,
             request_sha256=request_digest,

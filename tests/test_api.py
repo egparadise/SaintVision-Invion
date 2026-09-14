@@ -270,7 +270,8 @@ def test_project_scope_is_checked_separately_from_tenancy(seeded):
 
 def test_missing_credential_is_refused(client):
     response = client.get("/v1/nodes")
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json()["code"] == "AUTH-MISSING-CREDENTIAL"
 
 

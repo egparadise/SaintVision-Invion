@@ -1,5 +1,6 @@
 fastapi==0.141.1
 uvicorn==0.52.4
+websockets==17.1
 psycopg[binary]==3.3.5
 jsonschema[format]==4.26.0
 pydantic==2.13.5

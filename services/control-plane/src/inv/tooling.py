@@ -95,6 +95,7 @@ class ToolGateway:
             command["tenantId"] != node.tenant_id
             or workload["tenantId"] != node.tenant_id
             or workload["projectId"] != command["projectId"]
+            or workload.get("targetNodeId", node.node_id) != node.node_id
         ):
             raise DomainError("AUTH-0011", "Execution scope differs", 403)
         if not isinstance(proofs, dict) or not proofs or len(proofs) > 128:

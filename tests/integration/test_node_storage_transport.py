@@ -1,0 +1,320 @@
+"""Real Go daemon, pinned mTLS, actual files and Python signature verification."""
+
+import base64
+from dataclasses import asdict, replace
+import hashlib
+import json
+import os
+import select
+import subprocess
+import time
+from urllib.parse import urlsplit
+
+import pytest
+from inv.errors import DomainError
+from inv.ids import new_id
+from inv.node_channels import NodeChannels
+from inv.storage_sampling import SampleItem, canonical, new_challenge, verify_sample
+from test_node_delivery import remote, policy
+from test_node_runtime import node_runtime
+from test_approvals import approval
+
+pytestmark = pytest.mark.postgres
+
+
+def challenge_for(a, name="data.bin"):
+    return new_challenge(
+        channel=NodeChannels(a.e.db).snapshot(a.node, observation_only=True),
+        project_id=a.e.project,
+        run_id=a.run["runId"],
+        contribution_id=a.contribution,
+        root_version=1,
+        catalogued=3,
+        items=[SampleItem(new_id("dtl"), 1, name, 12, hashlib.sha256(b"actual bytes").hexdigest())],
+    )
+
+
+@pytest.fixture
+def storage_remote(remote):
+    a = remote
+    a.root = a.path / "contributed"
+    a.root.mkdir()
+    (a.root / "data.bin").write_bytes(b"actual bytes")
+    a.contribution = new_id("stc")
+    challenge = challenge_for(a)
+    a.storage_policy = a.path / "storage-policy.json"
+    a.storage_policy.write_bytes(
+        canonical(
+            dict(
+                channel=asdict(challenge.channel),
+                contribution_id=a.contribution,
+                root_version=1,
+                root=str(a.root),
+            )
+        )
+    )
+    a.storage_policy.chmod(0o600)
+    args = list(a.daemon.args)
+    args[args.index("--listen") + 1] = urlsplit(a.endpoint).netloc
+    args += ["--storage-policy", str(a.storage_policy)]
+    a.daemon.terminate()
+    a.daemon.communicate(timeout=12)
+    a.daemon = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    ready, _, _ = select.select([a.daemon.stdout], [], [], 10)
+    assert ready, "storage Node startup timed out"
+    line = a.daemon.stdout.readline()
+    assert line, "storage Node startup rejected: " + a.daemon.stderr.read()
+    a.storage_startup = json.loads(line)
+    assert "https://" + a.storage_startup["listening"] == a.endpoint
+    return a
+
+
+def restart_storage(a, *, rejected=False):
+    args = list(a.daemon.args)
+    a.daemon.terminate()
+    a.daemon.communicate(timeout=12)
+    a.daemon = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if rejected:
+        stdout, stderr = a.daemon.communicate(timeout=12)
+        assert a.daemon.returncode != 0 and not stdout
+        assert "NODE-0061" in stderr
+        return None
+    ready, _, _ = select.select([a.daemon.stdout], [], [], 10)
+    assert ready, "storage restart timed out"
+    line = a.daemon.stdout.readline()
+    assert line, "storage restart rejected: " + a.daemon.stderr.read()
+    return json.loads(line)
+
+
+def test_storage_installation_receipt_is_scoped_private_and_durable(storage_remote):
+    a = storage_remote
+    receipt = a.storage_startup
+    assert (receipt["tenantId"], receipt["nodeId"], receipt["recoveryEpoch"]) == (
+        a.e.tenant,
+        a.e.node,
+        a.e.epoch,
+    )
+    assert (
+        receipt["storagePolicy"]["policySha256"]
+        == hashlib.sha256(a.storage_policy.read_bytes()).hexdigest()
+    )
+    assert receipt["storagePolicy"]["contributionId"] == a.contribution
+    assert not receipt["operationalAcceptanceAssessed"]
+    assert str(a.root) not in json.dumps(receipt) and "certificateDer" not in json.dumps(receipt)
+    assert restart_storage(a) == receipt
+    assert collect(a)[0].sample_healthy
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "root-rollback",
+        "channel-rollback",
+        "same-root-version",
+        "same-channel-version",
+        "same-versions-bytes",
+    ],
+)
+def test_restart_rejects_storage_policy_rollback_and_equivocation(storage_remote, change):
+    a = storage_remote
+    original = json.loads(a.storage_policy.read_bytes())
+    forward = json.loads(a.storage_policy.read_bytes())
+    forward["root_version"] = 2
+    forward["channel"]["version"] = 2
+    a.storage_policy.write_bytes(canonical(forward))
+    assert restart_storage(a)["storagePolicy"]["rootVersion"] == 2
+    bad = json.loads(canonical(forward))
+    if change == "root-rollback":
+        bad["root_version"] = 1
+        bad["channel"]["version"] = 3
+    elif change == "channel-rollback":
+        bad["channel"]["version"] = 1
+        bad["root_version"] = 3
+    elif change == "same-root-version":
+        other = a.path / "other-contributed"
+        other.mkdir()
+        bad["root"] = str(other)
+        bad["channel"]["version"] = 3
+    elif change == "same-channel-version":
+        bad["channel"]["endpoint"] = "https://127.0.0.1:18444"
+        bad["root_version"] = 3
+    a.storage_policy.write_bytes(
+        canonical(bad) + (b" " if change == "same-versions-bytes" else b"")
+    )
+    restart_storage(a, rejected=True)
+    # A failed replacement never lowers the floor; the last accepted exact
+    # configuration remains usable with the same identity/epoch journal.
+    a.storage_policy.write_bytes(canonical(forward))
+    assert restart_storage(a)["storagePolicy"]["channelVersion"] == 2
+
+
+def test_corrupt_storage_floor_fails_closed_without_erasing_identity(storage_remote):
+    from pathlib import Path
+
+    a = storage_remote
+    args = list(a.daemon.args)
+    journal = Path(args[args.index("--state") + 1])
+    identity = (journal / "identity.json").read_bytes()
+    (journal / (".storage-" + a.contribution)).write_bytes(b"{incomplete")
+    restart_storage(a, rejected=True)
+    assert (journal / "identity.json").read_bytes() == identity
+
+
+def collect(a, challenge=None):
+    challenge = challenge or challenge_for(a)
+    envelope, certificate = a.client.storage_sample(challenge.channel, challenge)
+    assert certificate == a.server_cert.der
+    return verify_sample(challenge, envelope, certificate_der=certificate), envelope, challenge
+
+
+def test_go_mtls_signed_sample_verified_by_python_without_operational_record(storage_remote):
+    a = storage_remote
+    with a.e.db.transaction(a.e.tenant) as c:
+        before = c.execute("SELECT count(*) AS n FROM inv.evidence").fetchone()["n"]
+    report, _, _ = collect(a)
+    assert report.sample_healthy and report.examined == 1 and report.unsampled == 2
+    assert not report.recorded and not report.operational_acceptance_assessed
+    with a.e.db.transaction(a.e.tenant) as c:
+        assert c.execute("SELECT count(*) AS n FROM inv.evidence").fetchone()["n"] == before
+    assert not list((a.path / "state").glob("*.intent"))
+
+
+def test_go_mtls_sample_commits_existing_evidence_and_storage_check(storage_remote):
+    from uuid import uuid4
+    from inv.storage_commit import StorageSampleStore
+    from inv.storage_view import StorageObservationView
+    from test_storage_commit import register_owner
+
+    a = storage_remote
+    principal, _ = register_owner(a.e, a.contribution, a.root)
+    before = a.e.runs.get(a.e.tenant, a.run["runId"])
+    store = StorageSampleStore(a.e.db)
+    request_id = str(uuid4())
+    result = store.collect(
+        principal,
+        a.e.project,
+        a.run["runId"],
+        a.contribution,
+        request_id=request_id,
+        client=a.client,
+    )
+    assert not result["replayed"]
+    assert a.e.runs.get(a.e.tenant, a.run["runId"]) == before
+    observed = StorageObservationView(a.e.db).result(
+        principal, a.e.project, a.run["runId"], request_id
+    )
+    assert observed["observation"]["evidenceId"] == result["evidenceId"]
+    assert observed["observation"]["integrityVerified"]
+    assert observed["currentHealth"] == "unknown"
+    with a.e.db.transaction(a.e.tenant) as c:
+        row = c.execute(
+            "SELECT healthy,detail FROM public.storage_checks WHERE check_id=%s",
+            (result["checkId"],),
+        ).fetchone()
+        assert row["healthy"] and row["detail"]["evidenceId"] == result["evidenceId"]
+        assert not row["detail"]["operationalAcceptanceAssessed"]
+        assert (
+            c.execute(
+                "SELECT envelope->>'result' AS result FROM inv.evidence WHERE evidence_id=%s",
+                (result["evidenceId"],),
+            ).fetchone()["result"]
+            == "succeeded"
+        )
+
+
+@pytest.mark.parametrize(
+    "fault",
+    ["corrupt", "missing", "size", "unknown", "oversized", "symlink", "hardlink", "parent-link"],
+)
+def test_go_file_failures_never_become_healthy(storage_remote, fault):
+    a = storage_remote
+    challenge = challenge_for(a)
+    path = a.root / "data.bin"
+    if fault == "corrupt":
+        path.write_bytes(b"broken bytes")
+    elif fault == "missing":
+        path.unlink()
+    elif fault == "size":
+        challenge = replace(challenge, items=(replace(challenge.items[0], byte_size=13),))
+    elif fault == "unknown":
+        challenge = replace(challenge, items=(replace(challenge.items[0], checksum_sha256=None),))
+    elif fault == "oversized":
+        with path.open("wb") as f:
+            f.truncate(1048577)
+    elif fault in {"symlink", "hardlink"}:
+        outside = a.path / "outside.bin"
+        outside.write_bytes(b"actual bytes")
+        path.unlink()
+        (os.symlink if fault == "symlink" else os.link)(outside, path)
+    else:
+        outside = a.path / "outside"
+        outside.mkdir()
+        (outside / "data.bin").write_bytes(b"actual bytes")
+        os.symlink(outside, a.root / "linked")
+        challenge = replace(
+            challenge, items=(replace(challenge.items[0], relative_path="linked/data.bin"),)
+        )
+    report, _, _ = collect(a, challenge)
+    assert not report.sample_healthy
+    assert report.unverifiable == int(fault == "unknown")
+
+
+def test_unicode_manifest_has_same_cross_language_digest(storage_remote):
+    a = storage_remote
+    name = "샘플😀.bin"
+    (a.root / name).write_bytes(b"actual bytes")
+    assert collect(a, challenge_for(a, name))[0].sample_healthy
+
+
+def test_local_policy_change_and_root_replacement_fail_closed(storage_remote):
+    a = storage_remote
+    original = a.storage_policy.read_bytes()
+    a.storage_policy.write_bytes(original + b" ")
+    with pytest.raises(DomainError):
+        collect(a)
+    a.storage_policy.write_bytes(original)
+    a.root.rename(a.path / "previous-root")
+    a.root.mkdir()
+    (a.root / "data.bin").write_bytes(b"actual bytes")
+    with pytest.raises(DomainError):
+        collect(a)
+
+
+def test_revoked_mtls_client_cannot_collect(storage_remote):
+    a = storage_remote
+    policy(a, 2, [])
+    with pytest.raises(DomainError):
+        collect(a)
+
+
+@pytest.mark.parametrize(
+    "fault", ["root_version", "contribution", "expired", "duplicate", "path", "extra"]
+)
+def test_go_rejects_invalid_request_even_when_sent_without_python_checks(storage_remote, fault):
+    a = storage_remote
+    challenge = challenge_for(a)
+    value = json.loads(canonical(asdict(challenge)))
+    if fault == "root_version":
+        value["root_version"] += 1
+    elif fault == "contribution":
+        value["contribution_id"] = new_id("stc")
+    elif fault == "expired":
+        value.update(issued_at=int(time.time()) - 40, expires_at=int(time.time()) - 10)
+    elif fault == "duplicate":
+        value["items"] *= 2
+    elif fault == "path":
+        value["items"][0]["relative_path"] = "../outside.bin"
+    else:
+        value["ignored"] = True
+    request = {"challenge": base64.b64encode(canonical(value)).decode()}
+    with pytest.raises(DomainError):
+        a.client._request(
+            challenge.channel, request, "/v1/storage/sample", "NodeStorageSignedSample"
+        )
+
+
+def test_default_node_does_not_enable_storage_read(remote):
+    a = remote
+    a.contribution = new_id("stc")
+    with pytest.raises(DomainError):
+        collect(a)

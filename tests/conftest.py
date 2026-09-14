@@ -11,13 +11,15 @@ from __future__ import annotations
 import datetime as dt
 import os
 import uuid
+import secrets
+from contextlib import contextmanager
 
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 TEST_DB_ENV = "INV_TEST_DATABASE_URL"
-#: The non-owner role the application connects as. Created by the migration.
+#: Migration-owned permission group; tests never change its login or password.
 APP_ROLE = "inv_app"
 
 
@@ -81,23 +83,37 @@ def migrated(owner_engine, database_url):
     return True
 
 
-@pytest.fixture(scope="session")
-def app_engine(migrated, database_url, owner_engine):
-    """Engine connected as ``inv_app``: a non-owner, NOBYPASSRLS role.
-
-    Tests must run as this role. Running them as the owner would pass even with
-    RLS misconfigured, which is the exact failure this suite exists to catch.
-    """
-    with owner_engine.begin() as connection:
-        connection.execute(text(f"ALTER ROLE {APP_ROLE} LOGIN PASSWORD 'apptestonly'"))
-
-    # Swap the credentials in the URL, keeping host/port/database.
+@contextmanager
+def application_test_engine(database_url, owner_engine):
+    """Owned temporary login inherits inv_app; leave cluster-wide groups intact."""
+    from psycopg import sql
     from sqlalchemy.engine import make_url
 
-    url = make_url(database_url).set(username=APP_ROLE, password="apptestonly")
-    engine = create_engine(url, future=True)
-    yield engine
-    engine.dispose()
+    role = "inv_backend_login_" + uuid.uuid4().hex
+    password = secrets.token_urlsafe(32)
+    with owner_engine.begin() as connection:
+        conn = connection.connection.driver_connection
+        conn.execute(sql.SQL("CREATE ROLE {} LOGIN PASSWORD {} INHERIT NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION").format(
+            sql.Identifier(role), sql.Literal(password)))
+        conn.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(APP_ROLE), sql.Identifier(role)))
+    engine = None
+    try:
+        url = make_url(database_url).set(username=role, password=password)
+        engine = create_engine(url, future=True)
+        yield engine
+    finally:
+        if engine is not None:
+            engine.dispose()
+        assert role.startswith("inv_backend_login_") and len(role) == 50
+        with owner_engine.begin() as connection:
+            connection.connection.driver_connection.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
+
+
+@pytest.fixture(scope="session")
+def app_engine(migrated, database_url, owner_engine):
+    """Real non-owner login; actual inherited migration grants and RLS apply."""
+    with application_test_engine(database_url, owner_engine) as engine:
+        yield engine
 
 
 @pytest.fixture

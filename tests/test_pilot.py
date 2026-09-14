@@ -532,43 +532,93 @@ def test_readiness_lists_every_missing_piece(app_sessionmaker, pilot):
         assert expected in blockers, expected
 
 
-def test_readiness_is_complete_once_the_evidence_exists(app_sessionmaker, pilot):
+@pytest.mark.parametrize("fault", [None, "expired", "missed-target", "wrong-criterion"])
+def test_readiness_catalog_does_not_certify_operating_acceptance(
+    app_sessionmaker, pilot, fault
+):
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, pilot["tenant_a"]):
                 tenant = pilot["tenant_a"]
                 backup = pilot_service.record_backup(
-                    session, tenant_id=tenant, kind="base",
-                    location_ref="vol://offsite", now=NOW, off_site=True,
+                    session,
+                    tenant_id=tenant,
+                    kind="base",
+                    location_ref="vol://offsite",
+                    now=NOW,
+                    off_site=True,
+                    retention_days=0 if fault == "expired" else 35,
                 )
                 pilot_service.verify_backup(
-                    session, tenant_id=tenant, backup_id=backup.backup_id,
-                    checksum_sha256="f" * 64, now=NOW,
+                    session,
+                    tenant_id=tenant,
+                    backup_id=backup.backup_id,
+                    checksum_sha256="f" * 64,
+                    now=NOW,
                 )
                 pilot_service.record_recovery_drill(
-                    session, tenant_id=tenant, scope="database", outcome="passed",
-                    performed_by_user_id=pilot["user_id"], now=NOW,
-                    measurement=_measurement(), integrity_verified=True,
-                    fencing_verified=True, backup_id=backup.backup_id,
+                    session,
+                    tenant_id=tenant,
+                    scope="database",
+                    outcome="passed",
+                    performed_by_user_id=pilot["user_id"],
+                    now=NOW,
+                    measurement=(
+                        _measurement(rto=TARGET_RTO_SECONDS + 1)
+                        if fault == "missed-target"
+                        else _measurement()
+                    ),
+                    integrity_verified=True,
+                    fencing_verified=True,
+                    backup_id=backup.backup_id,
                 )
                 pilot_service.record_storage_check(
-                    session, tenant_id=tenant, contribution_id=pilot["contribution_id"],
-                    now=NOW, reachable=True, sampled_count=20, mismatch_count=0,
+                    session,
+                    tenant_id=tenant,
+                    contribution_id=pilot["contribution_id"],
+                    now=NOW,
+                    reachable=True,
+                    sampled_count=20,
+                    mismatch_count=0,
                 )
                 release = pilot_service.create_release_manifest(
-                    session, tenant_id=tenant, version="R4", components=_components(),
-                    created_by_user_id=pilot["user_id"], now=NOW,
+                    session,
+                    tenant_id=tenant,
+                    version="R4",
+                    components=_components(),
+                    created_by_user_id=pilot["user_id"],
+                    now=NOW,
                 )
                 pilot_service.record_acceptance(
-                    session, tenant_id=tenant, release_id=release.release_id,
-                    acceptance_criterion="AC-12", outcome="conditional",
-                    accepted_by_user_id=pilot["user_id"], now=NOW,
-                    known_limitations=["single control plane; 99.5% is measured, not HA"],
+                    session,
+                    tenant_id=tenant,
+                    release_id=release.release_id,
+                    acceptance_criterion=(
+                        "AC-11" if fault == "wrong-criterion" else "AC-12"
+                    ),
+                    outcome="conditional",
+                    accepted_by_user_id=pilot["user_id"],
+                    now=NOW,
+                    known_limitations=[
+                        "single control plane; 99.5% is measured, not HA"
+                    ],
                 )
                 report = pilot_service.pilot_readiness(
                     session, tenant_id=tenant, release_id=release.release_id, now=NOW
                 )
-    assert report["evidenceComplete"], report["blockers"]
+    assert report["catalogComplete"] is (fault is None), report["blockers"]
+    if fault == "expired":
+        assert "no verified off-site backup" in report["blockers"]
+    if fault == "missed-target":
+        assert (
+            "no database recovery drill meeting targets and integrity/fencing checks"
+            in report["blockers"]
+        )
+    if fault == "wrong-criterion":
+        assert "no acceptance record for AC-12 in this release" in report["blockers"]
+    assert report["evidenceComplete"] is False
+    assert report["operationalAcceptanceAssessed"] is False
+    assert "off-site bytes and failure-domain proof" in report["unverified"]
     # Complete evidence is not the same as no limitations, and the report keeps
     # the limitations visible rather than absorbing them into a green flag.
     assert report["knownLimitations"] == [
@@ -596,6 +646,8 @@ def test_readiness_reports_a_drill_that_passed_but_missed_the_target(
                     session, tenant_id=pilot["tenant_a"],
                     release_id=release.release_id, now=NOW,
                 )
+    assert not report["catalogComplete"]
+    assert "no database recovery drill meeting targets and integrity/fencing checks" in report["blockers"]
     assert len(report["drillsMissingTargets"]) == 1
     assert report["drillsMissingTargets"][0]["measuredRtoSeconds"] > TARGET_RTO_SECONDS
 
@@ -660,3 +712,23 @@ def test_pilot_records_are_tenant_isolated(app_sessionmaker, pilot):
                     assert (
                         session.execute(text(f"SELECT count(*) FROM {table}")).scalar_one() == 0
                     ), table
+
+
+@pytest.mark.parametrize("outcome", ["failed", "aborted"])
+def test_failed_or_aborted_drill_keeps_measurements_without_claiming_targets(app_sessionmaker, pilot, outcome):
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, pilot["tenant_a"]):
+                drill = pilot_service.record_recovery_drill(
+                    session, tenant_id=pilot["tenant_a"], scope="database",
+                    outcome=outcome, performed_by_user_id=pilot["user_id"], now=NOW,
+                    measurement=_measurement(), integrity_verified=True, fencing_verified=True,
+                )
+                drill_id = drill.drill_id
+    assert drill.measured_rpo_seconds is not None
+    assert drill.met_targets is False
+    with app_sessionmaker() as session:
+        with pytest.raises((IntegrityError, DBAPIError)):
+            with session.begin():
+                with tenant_scope(session, pilot["tenant_a"]):
+                    session.execute(text("UPDATE recovery_drills SET met_targets=true WHERE drill_id=:d"), {"d":drill_id})

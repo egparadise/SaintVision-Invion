@@ -16,7 +16,7 @@ from .errors import DomainError
 from .leases import lock_run
 from .runs import event
 from .snapshots import identity, SnapshotStore, object_key
-from .workspace_files import PrivateTree, canonical, decode_snapshot
+from .workspace_files import canonical, decode_snapshot
 
 MAX_RESUME_BYTES = 65536
 MAX_RESUME_CONTENT = 32768
@@ -184,10 +184,9 @@ class WorkspaceResume:
             row["content_hash"],
             row["filesystem_identity"],
         )
-        source = PrivateTree(self.working.root / row["generation"] / "files")
-        if source.identity != (self.working.identity[0], row["filesystem_identity"][-1]):
-            raise DomainError("STORE-0022", "Checkout files were replaced")
-        raw = source.capture(row["workspace_id"])
+        from .workspace_editor import checkout_snapshot
+
+        raw, _ = checkout_snapshot(conn, self.working, root_fd, row)
         bounded_snapshot(raw, row["workspace_id"])
         ref = {
             "resumeId": resume_id,

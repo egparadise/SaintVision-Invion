@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-GIT-001"
 title: "Git Build Obsidian 운영 절차"
-version: "1.0.0"
+version: "1.1.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-09T15:10:54+09:00"
+updated: "2026-09-11T17:15:06+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -18,6 +18,8 @@ tags: ["saintvision", "final-plan"]
 origin은 **https://github.com/egparadise/SaintVision-Invion.git**이다. 최초 원격 refs를 확인해 기존 이력이 있으면 clone하고, 비어 있으면 main을 초기화한다. 최초 문서 기준선 이후 각 작업은 `agent/{codex|claude|gemini}/{task-id}`를 사용한다. main 통합은 교차 검토와 필수 build를 전제로 한다. force push는 기본 금지다.
 
 ## 단계 절차와 증거
+
+매 작업은 [[전체 개발 진행 현황]]과 자기 작업판을 읽는 것으로 시작하고, 작업·검증·다음 카드/첫 행동/담당을 갱신한 뒤 끝낸다. 상세 절차와 오래된 branch의 안전한 문서 집계는 [[Agent 지속 개발 운영 규칙]]을 따른다.
 
 | 단계 | 수행 | 증거 |
 |---|---|---|

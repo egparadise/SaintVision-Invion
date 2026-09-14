@@ -1,0 +1,21 @@
+{
+  "scope": "isolated PostgreSQL16 and actual kernel HTTP; synthetic JWT; no browser or Node execution",
+  "tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 12.675,
+  "cases": [
+    "test_frontend_decision_payload_rejected_without_mutating_approval[payload0]",
+    "test_frontend_decision_payload_rejected_without_mutating_approval[payload1]",
+    "test_frontend_cancel_payload_cannot_cancel_but_versioned_request_can[user_requested]",
+    "test_frontend_cancel_payload_cannot_cancel_but_versioned_request_can[Parent batch cancellation requested]",
+    "test_challenge_digest_decision_roundtrip_is_the_working_contract[approve]",
+    "test_challenge_digest_decision_roundtrip_is_the_working_contract[reject]"
+  ],
+  "sourceFrontend": "70ea3fb",
+  "frontendModified": false,
+  "rejectedRequestsPreservedState": true,
+  "canonicalRequestsSucceeded": true,
+  "isolatedContainerRemoved": true
+}

@@ -23,6 +23,15 @@ if docker container inspect "$name" >/dev/null 2>&1; then
     echo "Container $name already exists. Preserve its journal; use docker start only after checking its status."
     exit 1
 fi
+storage_mount=()
+storage_flags=()
+if [[ $# -ne 0 ]]; then
+    [[ $# -eq 2 ]] || { echo 'Storage source and independently supplied policy hash are both required'; exit 1; }
+    python3 worker_storage.py prepare manifest.json storage-policy.json "$1" "$2" "$actual_image" > storage-plan.json
+    python3 worker_storage.py mount-args storage-plan.json > storage-mount.args
+    mapfile -d '' -t storage_mount < storage-mount.args
+    storage_flags=(--storage-policy /state/storage-policy.json)
+fi
 if docker volume inspect "$volume" >/dev/null 2>&1; then
     [[ "$(docker volume inspect --format '{{index .Labels "ai.saintvision.node"}}' "$volume")" == "$node_id" ]] || { echo 'Volume ownership differs'; exit 1; }
     [[ -z "$(docker ps -aq --filter "volume=$volume")" ]] || { echo 'Volume is used by another container'; exit 1; }
@@ -35,12 +44,20 @@ docker create --name "$name" --label "ai.saintvision.node=$node_id" \
     --pids-limit 128 --memory 256m --cpus 0.5 \
     --publish "${cfg[4]}:${cfg[5]}:18443" \
     --mount "type=volume,source=$volume,target=/state" \
+    "${storage_mount[@]}" \
     "$actual_image" --serve --listen 0.0.0.0:18443 \
     --tenant "${cfg[1]}" --node "$node_id" --epoch "${cfg[2]}" \
     --profile lan-observe-v1 --image "${cfg[3]}" --executable /inv-node \
     --state /state/journal --public-key /state/signer.pub \
     --tls-cert /state/node-cert.pem --tls-key /state/node-key.pem \
-    --client-ca /state/ca.pem --peer-policy /state/peer-policy.json >/dev/null
+    --client-ca /state/ca.pem --peer-policy /state/peer-policy.json "${storage_flags[@]}" >/dev/null
 python3 worker_config.py install-files "$name" .
+if [[ ${#storage_flags[@]} -ne 0 ]]; then
+    python3 worker_storage.py install storage-plan.json "$name"
+fi
 docker start "$name"
 python3 worker_config.py check-running "$name"
+if [[ ${#storage_flags[@]} -ne 0 ]]; then
+    python3 worker_storage.py receipt storage-plan.json "$name" > storage-ready.json
+    echo 'Read-only storage configuration checked locally; server mTLS and Evidence verification remain required.'
+fi

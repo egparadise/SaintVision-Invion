@@ -996,6 +996,393 @@ class RunAttemptList(BaseModel):
     nextCursor: conint(ge=1, le=9007199254740991) | None
 
 
+class WorkspaceFileEdit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    dataBase64: constr(max_length=43692) | None
+    executable: bool
+
+
+class WorkspaceEditInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: list[WorkspaceFileEdit] = Field(..., max_length=128, min_length=1)
+
+
+class WorkspaceEditView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    revision: conint(ge=0, le=9007199254740991)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    snapshot: WorkspaceSnapshot
+
+
+class TerminalSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    maxInputBytes: conint(ge=1, le=65536)
+    maxOutputBytes: conint(ge=1, le=65536)
+
+
+class Operation3(StrEnum):
+    poll = 'poll'
+    input = 'input'
+    resize = 'resize'
+
+
+class TerminalFrameInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    operation: Operation3
+    dataBase64: constr(max_length=1368)
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeTerminalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    permit: SignedNodePermit
+    frame: TerminalFrameInput
+
+
+class NodeTerminalResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    dataBase64: constr(max_length=5464)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class TerminalTicketInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+
+
+class TerminalTicketResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ticket: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    sessionId: UUID
+    websocketPath: constr(max_length=500)
+
+
+class Mode(StrEnum):
+    pull = 'pull'
+    push = 'push'
+
+
+class RemoteGitProposalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class RemoteGitVoteInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    decision: Decision
+
+
+class RemoteGitFileAddition(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    contents: constr(max_length=43692)
+
+
+class RemoteGitFileDeletion(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+
+
+class RemoteGitChanges(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    additions: list[RemoteGitFileAddition] = Field(..., max_length=128)
+    deletions: list[RemoteGitFileDeletion] = Field(..., max_length=128)
+
+
+class RemoteGitProposal(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    repository: constr(max_length=300)
+    branch: constr(max_length=200)
+    repositoryFingerprint: constr(pattern=r'^[0-9a-f]{64}$')
+    workspaceId: WorkspaceId
+    snapshotSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: RemoteGitChanges | None
+    operationId: UUID
+    requesterId: constr(max_length=200)
+    requesterPersonId: UUID
+    projectId: ProjectId
+    runId: RunId
+    checkoutId: UUID
+    recoveryEpoch: UUID
+    gateVersion: conint(ge=0, le=9007199254740991)
+    expiresAt: AwareDatetime
+
+
+class RemoteGitVoteView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    actorId: constr(max_length=200)
+    decision: Decision
+
+
+class RemoteGitObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    revision: conint(ge=1, le=9007199254740991) | None = None
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Phase(StrEnum):
+    pending = 'pending'
+    rejected = 'rejected'
+    dispatched = 'dispatched'
+    completed = 'completed'
+
+
+class RemoteGitView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operationId: UUID
+    projectId: ProjectId
+    runId: RunId
+    phase: Phase
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    requiredApprovals: Literal[2]
+    votes: list[RemoteGitVoteView] = Field(..., max_length=32)
+    proposal: RemoteGitProposal
+    snapshot: WorkspaceSnapshot
+    result: RemoteGitObservation | None
+
+
+class TerminalBrowserOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    text: constr(max_length=131072)
+    outputMode: Literal['redacted-complete-lines']
+
+
+class NodeStorageChannel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tenant_id: TenantId
+    node_id: NodeId
+    recovery_epoch: UUID
+    version: conint(ge=1, le=2147483647)
+    endpoint: constr(pattern=r'^https://', min_length=1, max_length=2048)
+    certificate_sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeStorageItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    location_id: constr(pattern=r'^dtl_[0-9A-HJKMNP-TV-Z]{26}$')
+    version: conint(ge=1, le=2147483647)
+    relative_path: constr(min_length=1, max_length=1024)
+    byte_size: conint(ge=0, le=1048576)
+    checksum_sha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+
+
+class NodeStorageChallenge(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    project_id: ProjectId
+    run_id: RunId
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    catalogued: conint(ge=1, le=9007199254740991)
+    items: list[NodeStorageItem] = Field(..., max_length=32, min_length=1)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    issued_at: conint(ge=0, le=9007199254740991)
+    expires_at: conint(ge=0, le=9007199254740991)
+
+
+class NodeStorageSampleInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    challenge: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+
+
+class NodeStorageSignedSample(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    payload: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+    signature: constr(pattern=r'^[A-Za-z0-9+/]{86}==$', min_length=88, max_length=88)
+
+
+class NodeStorageRootConfig(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    root: constr(min_length=2, max_length=4096)
+
+
+class RecordedStorageObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    evidenceId: EvidenceId
+    checkId: constr(pattern=r'^chk_[0-9A-HJKMNP-TV-Z]{26}$')
+    observedAt: conint(ge=0)
+    integrityVerified: Literal[True]
+    sampleHealthy: bool
+    sampled: conint(ge=0)
+    mismatches: conint(ge=0)
+    unverifiable: conint(ge=0)
+    examined: conint(ge=0)
+    unsampled: conint(ge=0)
+
+
+class Status4(StrEnum):
+    pending = 'pending'
+    expired = 'expired'
+    recorded = 'recorded'
+
+
+class StorageObservationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    requestId: UUID
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    contributionId: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    status: Status4
+    createdAt: AwareDatetime
+    expiresAt: conint(ge=0)
+    currentHealth: Literal['unknown']
+    operationalAcceptanceAssessed: Literal[False]
+    observation: RecordedStorageObservation | None
+
+
+class ApprovalPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    items: list[ApprovalView] = Field(..., max_length=200)
+    nextCursor: ApprovalId | None
+
+
+class Phase1(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
+class ShardObservedMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    nodeId: NodeId
+    phase: Phase1
+    state: RunState
+    evidenceId: EvidenceId | None
+
+
+class ShardResultMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    evidenceId: EvidenceId
+    objectId: UUID
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+
+
+class ShardObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId | None
+    rootPlanId: ShardPlanId
+    generation: conint(ge=1, le=3)
+    parentRunId: RunId | None
+    parentState: RunState | None
+    aggregateManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shardCount: conint(ge=1, le=16)
+    allPhysicallyStopped: bool
+    allSucceeded: bool
+    resultManifest: list[ShardResultMember] | None
+    resultManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shards: list[ShardObservedMember] = Field(..., max_length=16)
+
+
+class RiskLevel1(StrEnum):
+    L0 = 'L0'
+    L1 = 'L1'
+    L2 = 'L2'
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1012,6 +1399,8 @@ class WorkloadSpec(BaseModel):
     timeoutSeconds: conint(ge=1, le=9007199254740991)
     workspaceResume: WorkspaceResumeRef | None = None
     workspaceStart: WorkspaceStartRef | None = None
+    targetNodeId: NodeId | None = None
+    terminal: TerminalSpec | None = None
 
 
 class SandboxLaunchSpec(BaseModel):
@@ -1036,6 +1425,7 @@ class SandboxLaunchSpec(BaseModel):
     privileged: Literal[False]
     hostAccess: Literal[False]
     workspaceInput: WorkspaceInput | None = None
+    terminal: TerminalSpec | None = None
 
 
 class NodeExecutionPermit(BaseModel):
@@ -1199,6 +1589,16 @@ class WorkspaceStartView(BaseModel):
     approval: ApprovalView | None
     frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
     startId: UUID
+
+
+class ApprovalReviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approval: ApprovalView
+    workload: WorkloadSpec
+    riskLevel: RiskLevel1
+    policyDigest: ActionDigest
 
 
 class INVCore(

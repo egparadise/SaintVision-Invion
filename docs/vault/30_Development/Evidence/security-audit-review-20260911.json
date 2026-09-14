@@ -1,0 +1,48 @@
+{
+  "sourceCommit": "9995122",
+  "baselineFunctionCount": 9,
+  "oldAuditFalseNegatives": [
+    {
+      "case": "zero-argument-tenant-enumeration",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "misleading-binding-comment",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "certificate-name-overload",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "unsafe-search-path",
+      "oldAuditUnsafe": 0
+    },
+    {
+      "case": "retired-reader-regranted",
+      "oldAuditUnsafe": 0
+    }
+  ],
+  "invalidBackupFalseSuccess": {
+    "restoreExitCode": 1,
+    "integrityVerified": true,
+    "fencingVerified": true,
+    "sourceCounts": {},
+    "sourceDigests": {
+      "evidence_envelopes": "absent",
+      "run_records": "absent",
+      "artifacts": "absent",
+      "backup_records": "absent"
+    }
+  },
+  "scope": "disposable PostgreSQL; no production state",
+  "gemini": {
+    "source": "f50310eaa629706206730a4f853866ad0f3577eb",
+    "scope": "direct fixture handler in isolated Python process; no production traffic",
+    "status": 200,
+    "bytes": 216,
+    "generatedFallback": true,
+    "sha256": "0a468883cea1068ab416638382b59bb02844cc0a0c1df69bcf5595c79cec7768"
+  },
+  "recordedKst": "2026-09-11T18:03:37+09:00"
+}

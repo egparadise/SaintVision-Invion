@@ -251,79 +251,83 @@ class ShardRuntime:
 
     def status(self, tenant, project, plan_id):
         with self.db.transaction(tenant) as conn:
-            plan = conn.execute(
-                "SELECT shard_count FROM inv.shard_plans WHERE project_id=%s AND plan_id=%s",
-                (project, plan_id),
-            ).fetchone()
-            if not plan:
-                raise DomainError("RES-0004", "Shard plan not found", 404)
-            lineage = conn.execute(
-                "SELECT source_plan_id,root_plan_id,generation FROM inv.shard_recoveries WHERE project_id=%s AND plan_id=%s",
-                (project, plan_id),
-            ).fetchone()
-            parent = conn.execute(
-                "SELECT r.run_id,r.state,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
-                (project, plan_id),
-            ).fetchone()
-            rows = conn.execute(
-                """SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt,
-              u.state,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
-              FROM inv.shard_commands s JOIN inv.execution_deliveries d USING(tenant_id,command_id)
-              LEFT JOIN inv.node_stop_receipts r USING(tenant_id,command_id)
-              JOIN inv.runs u ON (s.tenant_id,s.run_id)=(u.tenant_id,u.run_id)
-              LEFT JOIN inv.result_completions c ON (s.tenant_id,s.command_id,u.attempt)=(c.tenant_id,c.command_id,c.attempt)
-              LEFT JOIN inv.result_commitments p ON (s.tenant_id,s.command_id)=(p.tenant_id,p.command_id)
-              LEFT JOIN inv.storage_objects o ON (p.tenant_id,p.project_id,p.object_id)=(o.tenant_id,o.project_id,o.object_id)
-              WHERE s.project_id=%s AND s.plan_id=%s ORDER BY s.shard_index""",
-                (project, plan_id),
-            ).fetchall()
-            succeeded = len(rows) == plan["shard_count"] and all(
-                r["state"] == "succeeded"
-                and r["evidence_id"] is not None
-                and r["object_state"] == "ready"
+            return self._status(conn, project, plan_id)
+
+    @staticmethod
+    def _status(conn, project, plan_id):
+        plan = conn.execute(
+            "SELECT shard_count FROM inv.shard_plans WHERE project_id=%s AND plan_id=%s",
+            (project, plan_id),
+        ).fetchone()
+        if not plan:
+            raise DomainError("RES-0004", "Shard plan not found", 404)
+        lineage = conn.execute(
+            "SELECT source_plan_id,root_plan_id,generation FROM inv.shard_recoveries WHERE project_id=%s AND plan_id=%s",
+            (project, plan_id),
+        ).fetchone()
+        parent = conn.execute(
+            "SELECT r.run_id,r.state,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
+            (project, plan_id),
+        ).fetchone()
+        rows = conn.execute(
+            """SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt,
+          u.state,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
+          FROM inv.shard_commands s JOIN inv.execution_deliveries d USING(tenant_id,command_id)
+          LEFT JOIN inv.node_stop_receipts r USING(tenant_id,command_id)
+          JOIN inv.runs u ON (s.tenant_id,s.run_id)=(u.tenant_id,u.run_id)
+          LEFT JOIN inv.result_completions c ON (s.tenant_id,s.command_id,u.attempt)=(c.tenant_id,c.command_id,c.attempt)
+          LEFT JOIN inv.result_commitments p ON (s.tenant_id,s.command_id)=(p.tenant_id,p.command_id)
+          LEFT JOIN inv.storage_objects o ON (p.tenant_id,p.project_id,p.object_id)=(o.tenant_id,o.project_id,o.object_id)
+          WHERE s.project_id=%s AND s.plan_id=%s ORDER BY s.shard_index""",
+            (project, plan_id),
+        ).fetchall()
+        succeeded = len(rows) == plan["shard_count"] and all(
+            r["state"] == "succeeded"
+            and r["evidence_id"] is not None
+            and r["object_state"] == "ready"
+            for r in rows
+        )
+        manifest = (
+            [
+                {
+                    "index": r["shard_index"],
+                    "runId": r["run_id"],
+                    "evidenceId": r["evidence_id"],
+                    "objectId": str(r["object_id"]),
+                    "sha256": r["content_hash"],
+                    "sizeBytes": r["size_bytes"],
+                }
                 for r in rows
-            )
-            manifest = (
-                [
-                    {
-                        "index": r["shard_index"],
-                        "runId": r["run_id"],
-                        "evidenceId": r["evidence_id"],
-                        "objectId": str(r["object_id"]),
-                        "sha256": r["content_hash"],
-                        "sizeBytes": r["size_bytes"],
-                    }
-                    for r in rows
-                ]
-                if succeeded
-                else None
-            )
-            return {
-                "planId": plan_id,
-                "sourcePlanId": lineage["source_plan_id"] if lineage else None,
-                "rootPlanId": lineage["root_plan_id"] if lineage else plan_id,
-                "generation": lineage["generation"] if lineage else 1,
-                "parentRunId": parent["run_id"] if parent else None,
-                "parentState": parent["state"] if parent else None,
-                "aggregateManifestSha256": parent["manifest_hash"] if parent else None,
-                "shardCount": plan["shard_count"],
-                "allPhysicallyStopped": len(rows) == plan["shard_count"]
-                and all(r["receipt"] is not None for r in rows),
-                "allSucceeded": succeeded,
-                "resultManifest": manifest,
-                "resultManifestSha256": (digest(manifest) if manifest is not None else None),
-                "shards": [
-                    {
-                        "index": r["shard_index"],
-                        "runId": r["run_id"],
-                        "nodeId": r["node_id"],
-                        "phase": r["phase"],
-                        "state": r["state"],
-                        "evidenceId": r["evidence_id"],
-                    }
-                    for r in rows
-                ],
-            }
+            ]
+            if succeeded
+            else None
+        )
+        return {
+            "planId": plan_id,
+            "sourcePlanId": lineage["source_plan_id"] if lineage else None,
+            "rootPlanId": lineage["root_plan_id"] if lineage else plan_id,
+            "generation": lineage["generation"] if lineage else 1,
+            "parentRunId": parent["run_id"] if parent else None,
+            "parentState": parent["state"] if parent else None,
+            "aggregateManifestSha256": parent["manifest_hash"] if parent else None,
+            "shardCount": plan["shard_count"],
+            "allPhysicallyStopped": len(rows) == plan["shard_count"]
+            and all(r["receipt"] is not None for r in rows),
+            "allSucceeded": succeeded,
+            "resultManifest": manifest,
+            "resultManifestSha256": (digest(manifest) if manifest is not None else None),
+            "shards": [
+                {
+                    "index": r["shard_index"],
+                    "runId": r["run_id"],
+                    "nodeId": r["node_id"],
+                    "phase": r["phase"],
+                    "state": r["state"],
+                    "evidenceId": r["evidence_id"],
+                }
+                for r in rows
+            ],
+        }
 
     @staticmethod
     def _lock_members(conn, project, plan_id):

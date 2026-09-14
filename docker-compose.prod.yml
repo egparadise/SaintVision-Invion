@@ -27,10 +27,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - INV_DATABASE_URL=postgresql://inv_app:apptestonly@postgres:5432/saintvision
+      - INV_BUSINESS_DSN=${INV_BUSINESS_DSN:?Set a deployment-specific non-owner login DSN}
+      - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
+      - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
+      - INV_API_CONFIG=/run/saintvision/api.json
       - PORT=8080
+    volumes:
+      - type: volume
+        source: server_config
+        target: /run/saintvision
+        read_only: true
+        volume:
+          nocopy: true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/readyz"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -49,7 +59,7 @@ services:
     environment:
       - POSTGRES_DB=saintvision
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set a unique PostgreSQL administrator password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./deploy/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
@@ -70,8 +80,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      - MINIO_ROOT_USER=saintadmin
-      - MINIO_ROOT_PASSWORD=saintvision_secure_storage_2026
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:?Set the deployment storage administrator}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:?Set a unique storage administrator password}
     volumes:
       - minio_data:/data
     restart: unless-stopped
@@ -79,6 +89,9 @@ services:
       - saintvision-net
 
 volumes:
+  server_config:
+    external: true
+    name: ${INV_CONFIG_VOLUME:?Prepare a private server configuration volume first}
   postgres_data:
   minio_data:
 

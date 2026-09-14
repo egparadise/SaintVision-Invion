@@ -300,6 +300,12 @@
         },
         "workspaceStart": {
           "$ref": "#/$defs/WorkspaceStartRef"
+        },
+        "targetNodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "terminal": {
+          "$ref": "#/$defs/TerminalSpec"
         }
       },
       "required": [
@@ -1095,6 +1101,9 @@
         },
         "workspaceInput": {
           "$ref": "#/$defs/WorkspaceInput"
+        },
+        "terminal": {
+          "$ref": "#/$defs/TerminalSpec"
         }
       },
       "required": [
@@ -3523,6 +3532,1286 @@
           ]
         }
       }
+    },
+    "WorkspaceFileEdit": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "expectedSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataBase64": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 43692
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path",
+        "expectedSha256",
+        "dataBase64",
+        "executable"
+      ],
+      "additionalProperties": false
+    },
+    "WorkspaceEditInput": {
+      "type": "object",
+      "properties": {
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/WorkspaceFileEdit"
+          }
+        }
+      },
+      "required": [
+        "expectedRevision",
+        "expectedSha256",
+        "changes"
+      ],
+      "additionalProperties": false
+    },
+    "WorkspaceEditView": {
+      "type": "object",
+      "properties": {
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/WorkspaceSnapshot"
+        }
+      },
+      "required": [
+        "checkoutId",
+        "revision",
+        "sha256",
+        "snapshot"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalSpec": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "maxInputBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "maxOutputBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "sessionId",
+        "rows",
+        "columns",
+        "maxInputBytes",
+        "maxOutputBytes"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalFrameInput": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "poll",
+            "input",
+            "resize"
+          ]
+        },
+        "dataBase64": {
+          "type": "string",
+          "maxLength": 1368
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 400
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "sequence",
+        "cursor",
+        "operation",
+        "dataBase64",
+        "rows",
+        "columns",
+        "nonce"
+      ],
+      "additionalProperties": false
+    },
+    "NodeTerminalInput": {
+      "type": "object",
+      "properties": {
+        "permit": {
+          "$ref": "#/$defs/SignedNodePermit"
+        },
+        "frame": {
+          "$ref": "#/$defs/TerminalFrameInput"
+        }
+      },
+      "required": [
+        "permit",
+        "frame"
+      ],
+      "additionalProperties": false
+    },
+    "NodeTerminalResult": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "$ref": "#/$defs/CommandId"
+        },
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "dataBase64": {
+          "type": "string",
+          "maxLength": 5464
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "commandId",
+        "sessionId",
+        "sequence",
+        "cursor",
+        "dataBase64",
+        "nonce"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalTicketInput": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "$ref": "#/$defs/CommandId"
+        }
+      },
+      "required": [
+        "commandId"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalTicketResult": {
+      "type": "object",
+      "properties": {
+        "ticket": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "websocketPath": {
+          "type": "string",
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "ticket",
+        "expiresAt",
+        "sessionId",
+        "websocketPath"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitProposalInput": {
+      "type": "object",
+      "properties": {
+        "alias": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "pull",
+            "push"
+          ]
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "alias",
+        "mode",
+        "commit",
+        "expectedRevision",
+        "expectedSha256"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitVoteInput": {
+      "type": "object",
+      "properties": {
+        "contentDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        }
+      },
+      "required": [
+        "contentDigest",
+        "decision"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitFileAddition": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "contents": {
+          "type": "string",
+          "maxLength": 43692
+        }
+      },
+      "required": [
+        "path",
+        "contents"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitFileDeletion": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitChanges": {
+      "type": "object",
+      "properties": {
+        "additions": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/RemoteGitFileAddition"
+          }
+        },
+        "deletions": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/RemoteGitFileDeletion"
+          }
+        }
+      },
+      "required": [
+        "additions",
+        "deletions"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitProposal": {
+      "type": "object",
+      "properties": {
+        "alias": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,63}$"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "pull",
+            "push"
+          ]
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expectedSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "repository": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "branch": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "repositoryFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "snapshotSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "changes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RemoteGitChanges"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requesterId": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "requesterPersonId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "gateVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "alias",
+        "mode",
+        "commit",
+        "expectedRevision",
+        "expectedSha256",
+        "repository",
+        "branch",
+        "repositoryFingerprint",
+        "workspaceId",
+        "snapshotSha256",
+        "changes",
+        "operationId",
+        "requesterId",
+        "requesterPersonId",
+        "projectId",
+        "runId",
+        "checkoutId",
+        "recoveryEpoch",
+        "gateVersion",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitVoteView": {
+      "type": "object",
+      "properties": {
+        "actorId": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        }
+      },
+      "required": [
+        "actorId",
+        "decision"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitObservation": {
+      "type": "object",
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "commit",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "RemoteGitView": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "rejected",
+            "dispatched",
+            "completed"
+          ]
+        },
+        "contentDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requiredApprovals": {
+          "type": "integer",
+          "const": 2
+        },
+        "votes": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/RemoteGitVoteView"
+          }
+        },
+        "proposal": {
+          "$ref": "#/$defs/RemoteGitProposal"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/WorkspaceSnapshot"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RemoteGitObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "operationId",
+        "projectId",
+        "runId",
+        "phase",
+        "contentDigest",
+        "expiresAt",
+        "requiredApprovals",
+        "votes",
+        "proposal",
+        "snapshot",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalBrowserOutput": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 131072
+        },
+        "outputMode": {
+          "type": "string",
+          "const": "redacted-complete-lines"
+        }
+      },
+      "required": [
+        "sessionId",
+        "sequence",
+        "cursor",
+        "text",
+        "outputMode"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageChannel": {
+      "type": "object",
+      "properties": {
+        "tenant_id": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "node_id": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recovery_epoch": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-f-]{36}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^https://"
+        },
+        "certificate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "tenant_id",
+        "node_id",
+        "recovery_epoch",
+        "version",
+        "endpoint",
+        "certificate_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageItem": {
+      "type": "object",
+      "properties": {
+        "location_id": {
+          "type": "string",
+          "pattern": "^dtl_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "relative_path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "checksum_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "location_id",
+        "version",
+        "relative_path",
+        "byte_size",
+        "checksum_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageChallenge": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/NodeStorageChannel"
+        },
+        "project_id": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/RunId"
+        },
+        "contribution_id": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "root_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "catalogued": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/NodeStorageItem"
+          }
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "issued_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expires_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "channel",
+        "project_id",
+        "run_id",
+        "contribution_id",
+        "root_version",
+        "catalogued",
+        "items",
+        "nonce",
+        "issued_at",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageSampleInput": {
+      "type": "object",
+      "properties": {
+        "challenge": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        }
+      },
+      "required": [
+        "challenge"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageSignedSample": {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384,
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 88,
+          "maxLength": 88,
+          "pattern": "^[A-Za-z0-9+/]{86}==$"
+        }
+      },
+      "required": [
+        "payload",
+        "signature"
+      ],
+      "additionalProperties": false
+    },
+    "NodeStorageRootConfig": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/NodeStorageChannel"
+        },
+        "contribution_id": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "root_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "root": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "channel",
+        "contribution_id",
+        "root_version",
+        "root"
+      ],
+      "additionalProperties": false
+    },
+    "RecordedStorageObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "checkId": {
+          "type": "string",
+          "pattern": "^chk_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "integrityVerified": {
+          "type": "boolean",
+          "const": true
+        },
+        "sampleHealthy": {
+          "type": "boolean"
+        },
+        "sampled": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mismatches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unverifiable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "examined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsampled": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "evidenceId",
+        "checkId",
+        "observedAt",
+        "integrityVerified",
+        "sampleHealthy",
+        "sampled",
+        "mismatches",
+        "unverifiable",
+        "examined",
+        "unsampled"
+      ]
+    },
+    "StorageObservationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "contributionId": {
+          "type": "string",
+          "pattern": "^stc_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "expired",
+            "recorded"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currentHealth": {
+          "type": "string",
+          "const": "unknown"
+        },
+        "operationalAcceptanceAssessed": {
+          "type": "boolean",
+          "const": false
+        },
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordedStorageObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "requestId",
+        "tenantId",
+        "projectId",
+        "runId",
+        "contributionId",
+        "status",
+        "createdAt",
+        "expiresAt",
+        "currentHealth",
+        "operationalAcceptanceAssessed",
+        "observation"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "recorded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "observation": {
+                "$ref": "#/$defs/RecordedStorageObservation"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "observation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ApprovalPage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ApprovalView"
+          },
+          "maxItems": 200
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ApprovalId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
+    "ShardObservedMember": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "uncertain",
+            "stopped"
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "evidenceId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "index",
+        "runId",
+        "nodeId",
+        "phase",
+        "state",
+        "evidenceId"
+      ],
+      "additionalProperties": false
+    },
+    "ShardResultMember": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "objectId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "index",
+        "runId",
+        "evidenceId",
+        "objectId",
+        "sha256",
+        "sizeBytes"
+      ],
+      "additionalProperties": false
+    },
+    "ShardObservation": {
+      "type": "object",
+      "properties": {
+        "planId": {
+          "$ref": "#/$defs/ShardPlanId"
+        },
+        "sourcePlanId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShardPlanId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rootPlanId": {
+          "$ref": "#/$defs/ShardPlanId"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "parentRunId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parentState": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aggregateManifestSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shardCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "allPhysicallyStopped": {
+          "type": "boolean"
+        },
+        "allSucceeded": {
+          "type": "boolean"
+        },
+        "resultManifest": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ShardResultMember"
+              },
+              "maxItems": 16
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resultManifestSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ShardObservedMember"
+          },
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "planId",
+        "sourcePlanId",
+        "rootPlanId",
+        "generation",
+        "parentRunId",
+        "parentState",
+        "aggregateManifestSha256",
+        "shardCount",
+        "allPhysicallyStopped",
+        "allSucceeded",
+        "resultManifest",
+        "resultManifestSha256",
+        "shards"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovalReviewView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approval": {
+          "$ref": "#/$defs/ApprovalView"
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": [
+            "L0",
+            "L1",
+            "L2"
+          ]
+        },
+        "policyDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        }
+      },
+      "required": [
+        "approval",
+        "workload",
+        "riskLevel",
+        "policyDigest"
+      ]
     }
   },
   "oneOf": [

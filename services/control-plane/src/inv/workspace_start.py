@@ -125,6 +125,7 @@ class WorkspaceStart:
             or "workspaceResume" in workload
             or "workspaceStart" in workload
             or data["targetNodeId"] != self.runtime.node.node_id
+            or workload.get("targetNodeId", data["targetNodeId"]) != data["targetNodeId"]
         ):
             raise DomainError("AUTH-0011", "First Workspace intent scope differs", 403)
         start_id = identity(data["startId"])

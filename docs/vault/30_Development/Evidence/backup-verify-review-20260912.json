@@ -1,0 +1,58 @@
+{
+  "codeSHA": "4ddb622a1992568c891db321a32bfd1e3993d421",
+  "kst": "2026-09-12T02:31:57+09:00",
+  "windowsPostgres": {
+    "work": "C:\\Project\\SaintVision-Invion\\.worktrees\\codex-workspace-bridge\\.work\\cx01-2008effe2355",
+    "exitCode": 0,
+    "image": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+    "head": "4ddb622a1992568c891db321a32bfd1e3993d421",
+    "dirty": false,
+    "cases": 60,
+    "privateJUnitSHA256": "c12ac734c6d5f8d01b8d8f264a17a778beede0d1af4643b7f84e289dc205cd01"
+  },
+  "original": {
+    "baseSHA": "135b15ad3c608318fdc4a677b674c1ea17c6123d",
+    "scope": "unmodified verification service; new tests with actual files and disposable PostgreSQL",
+    "exitCode": 1,
+    "cases": [
+      {
+        "name": "test_sweep_size_failure_stays_unverified_after_commit",
+        "status": "failed"
+      },
+      {
+        "name": "test_caught_direct_size_error_does_not_mutate_record",
+        "status": "failed"
+      },
+      {
+        "name": "test_reverification_checks_stored_digest_without_caller_hint",
+        "status": "failed"
+      },
+      {
+        "name": "test_foreign_tenant_is_denied_before_file_read",
+        "status": "failed"
+      },
+      {
+        "name": "test_two_initial_verifiers_cannot_replace_each_others_digest",
+        "status": "failed"
+      }
+    ],
+    "privateJUnitSHA256": "d780e10298ad4a3d5a48a3c82a9cc3e4161a34f8b9adb5c5850a790102864b55"
+  },
+  "lan": {
+    "kst": "2026-09-12T02:30:21+09:00",
+    "scope": "read-only local LAN console observation",
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "profileVersion": "lan-observe-v1"
+      }
+    ],
+    "gates": {
+      "killSwitch": true,
+      "userWorkloadSubmission": false
+    }
+  }
+}

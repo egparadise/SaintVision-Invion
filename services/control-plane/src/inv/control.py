@@ -107,6 +107,57 @@ class Control:
                 "nextCursor": rows[limit - 1]["run_id"] if len(rows) > limit else None,
             }
 
+    def list_approvals(self, principal, project, *, after=None, limit=50, run_id=None):
+        from .approvals import view
+
+        if after is not None:
+            validate_contract("ApprovalId", after)
+        if run_id is not None:
+            validate_contract("RunId", run_id)
+        if type(limit) is not int or not 1 <= limit <= 200:
+            raise DomainError("VAL-0003", "Invalid page size", 422)
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.grant(conn, principal, project)
+            rows = conn.execute(
+                """SELECT * FROM inv.approval_requests WHERE project_id=%s
+                AND (%s::text IS NULL OR approval_id>%s)
+                AND (%s::text IS NULL OR run_id=%s)
+                ORDER BY approval_id LIMIT %s""",
+                (project, after, after, run_id, run_id, limit + 1),
+            ).fetchall()
+            return {
+                "items": [view(row) for row in rows[:limit]],
+                "nextCursor": rows[limit - 1]["approval_id"] if len(rows) > limit else None,
+            }
+
+    def get_approval(self, principal, project, approval_id):
+        from .approvals import view
+
+        validate_contract("ApprovalId", approval_id)
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.grant(conn, principal, project)
+            row = conn.execute(
+                "SELECT * FROM inv.approval_requests WHERE project_id=%s AND approval_id=%s",
+                (project, approval_id),
+            ).fetchone()
+            if not row:
+                raise DomainError("RES-0004", "Approval not found", 404)
+            return view(row)
+
+    def shards(self, principal, project, run_id):
+        from .shards import ShardRuntime
+
+        validate_contract("RunId", run_id)
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.grant(conn, principal, project)
+            link = conn.execute(
+                "SELECT plan_id FROM inv.shard_parents WHERE project_id=%s AND run_id=%s",
+                (project, run_id),
+            ).fetchone()
+            if not link:
+                raise DomainError("RES-0004", "Shard parent not found", 404)
+            return ShardRuntime._status(conn, project, link["plan_id"])
+
     def cancel(self, principal, project, run_id, expected_version, key):
         validate_contract("RunId", run_id)
         if type(expected_version) is not int or not 1 <= expected_version <= 9007199254740991:

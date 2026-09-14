@@ -49,6 +49,9 @@ jobs:
       # invowner is this container's superuser, which is what their fixtures
       # need to provision roles and schemas.
       INV_TEST_ADMIN_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      # Role-shape rejection tests mutate cluster-wide role flags. They own a
+      # separate disposable cluster instead of altering the shared service.
+      INV_TEST_ROLE_GUARD_IMAGE: postgres:16
 
     steps:
       - uses: actions/checkout@v4

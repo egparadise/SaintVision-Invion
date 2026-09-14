@@ -1,0 +1,6 @@
+{
+  "scope": "Local Windows ACL; OWNER RIGHTS, current user, SYSTEM and Administrators observed",
+  "ownerIsCurrentUser": true,
+  "ruleCount": 4,
+  "protected": true
+}

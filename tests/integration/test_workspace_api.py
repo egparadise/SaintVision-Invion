@@ -88,6 +88,133 @@ def prepare(a):
     return a.prepared
 
 
+def test_editor_revision_cas_and_frozen_step_use_same_bytes(workspace_http):
+    """The actual Node reads the edited frozen input and returns restorable output."""
+    import base64
+
+    a = workspace_http
+    url = a.url + "/checkouts/" + a.checkout_id + "/files"
+    original = a.http.get(url, headers=a.headers()).json()
+    file = next(f for f in original["snapshot"]["files"] if f["path"] == "src/main.py")
+    edit = {
+        "expectedRevision": original["revision"],
+        "expectedSha256": original["sha256"],
+        "changes": [
+            {
+                "path": "src/main.py",
+                "expectedSha256": file["sha256"],
+                "executable": False,
+                "dataBase64": base64.b64encode(b"print('edited before approval')\n").decode(),
+            }
+        ],
+    }
+    first = a.http.post(url, json=edit, headers=a.headers(key="editor-change"))
+    assert first.status_code == 200, first.text
+    assert (
+        a.http.post(url, json=edit, headers=a.headers(key="editor-change")).json() == first.json()
+    )
+    assert (
+        a.http.post(url, json=edit, headers=a.headers(key="stale-editor-change")).status_code == 409
+    )
+    a.prepare_input["workload"]["command"] = ["/probe", "workspace-edited"]
+    prepared = prepare(a)
+    assert prepared["workload"]["workspaceResume"]["inputSha256"] == first.json()["sha256"]
+    assert (
+        a.http.post(url, json=edit, headers=a.headers(key="edit-after-freeze")).status_code == 409
+    )
+    approve(a)
+    response = enqueue(a)
+    assert response.status_code == 202, response.text
+    a.command = {"commandId": response.json()["commandId"]}
+    worker = DeliveryWorker(a.e.db, a.delivery, output_provider=a.storage.provider)
+    assert worker.once(a.e.tenant) == "stopped"
+    current = a.http.get(a.url, headers=a.headers()).json()
+    assert current["state"] == "succeeded" and current["attempt"] == 2
+    raw = a.storage.restore(a.e.tenant, a.e.project, current["runId"], 2, "public-step")
+    assert decode_snapshot(raw, a.workspace_id)[1]["src/main.py"] == b"print('resumed')\n"
+    assert count(a, "result_completions") == 1 and active(a) == 0 and container(a) is None
+
+
+def test_remote_git_dispatch_is_not_repeated_after_lost_response(workspace_http):
+    """DB approval/replay regression with an in-memory provider; real Git is separate."""
+    from inv.errors import DomainError
+    from inv.workspace_files import FORMAT, canonical
+
+    a = workspace_http
+
+    class Remote:
+        alias, project, repository, branch, fingerprint = (
+            "sample",
+            a.e.project,
+            "owner/repo",
+            "review",
+            "f" * 64,
+        )
+        calls = 0
+
+        def snapshot(self, commit, workspace):
+            return (
+                canonical(
+                    {"format": FORMAT, "workspaceId": workspace, "directories": [], "files": []}
+                ),
+                {},
+            )
+
+        def publish(self, *args):
+            self.calls += 1
+            raise DomainError("STORE-0024", "Lost remote response", 503)
+
+        def reconcile(self, *args):
+            return "c" * 40
+
+    repo = Remote()
+    a.service.git_repositories = {"sample": repo}
+    with psycopg.connect(a.e.owner) as conn:
+        for actor in ("requester", "alice", "bob"):
+            conn.execute(
+                "INSERT INTO inv.operator_grants(tenant_id,subject_id,person_id,can_git,can_approve) VALUES(%s,%s,%s,%s,%s)",
+                (
+                    a.e.tenant,
+                    a.jwt.subject(actor),
+                    uuid4(),
+                    actor == "requester",
+                    actor != "requester",
+                ),
+            )
+    checkout = a.url + "/checkouts/" + a.checkout_id
+    view = a.http.get(checkout + "/files", headers=a.headers()).json()
+    proposal = a.http.post(
+        checkout + "/git",
+        headers=a.headers(key="git-propose"),
+        json={
+            "alias": "sample",
+            "mode": "push",
+            "commit": "a" * 40,
+            "expectedRevision": view["revision"],
+            "expectedSha256": view["sha256"],
+        },
+    )
+    assert proposal.status_code == 201, proposal.text
+    intent = proposal.json()
+    url = f"/v1/projects/{a.e.project}/git/{intent['operationId']}"
+    assert a.http.post(url + "/apply", headers=a.headers(), json={}).status_code == 403
+    for actor in ("alice", "bob"):
+        vote = a.http.post(
+            url + "/votes",
+            headers=a.headers(actor),
+            json={"contentDigest": intent["contentDigest"], "decision": "approve"},
+        )
+        assert vote.status_code == 200, vote.text
+    for _ in range(2):
+        applied = a.http.post(url + "/apply", headers=a.headers(), json={})
+        assert applied.status_code == 200 and applied.json()["phase"] == "dispatched", applied.text
+    assert repo.calls == 1
+    completed = a.http.post(url + "/reconcile", headers=a.headers(), json={})
+    assert completed.status_code == 200 and completed.json()["phase"] == "completed", completed.text
+    assert a.http.post(url + "/apply", headers=a.headers(), json={}).json() == completed.json()
+    assert repo.calls == 1
+
+
 def approve(a):
     row = a.prepared["approval"]
     url = f"/v1/projects/{a.e.project}/approvals/{row['approvalId']}"
