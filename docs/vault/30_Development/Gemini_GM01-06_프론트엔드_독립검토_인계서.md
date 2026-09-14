@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.28"
+version: "1.0.30"
 status: "review"
 author: "Gemini"
-updated: "2026-09-14T23:15:00+09:00"
+updated: "2026-09-15T00:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `e5455c3` |
+| **고정 구현 Commit SHA** | `578db00` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -78,22 +78,38 @@ source_of_truth: "Git"
 
 ---
 
+### 최근 핵심 정합 내역 (2026-09-14 ~ 2026-09-15 반영)
+1. **FE-M01~M05 변이 계약 전면 통합 (`kernelMutations.ts`, `App.tsx`, `Header.tsx`)**:
+   - `decideApproval`: 챌린지 선발급 및 `actionDigest` 불변 유지, Nonce 바인딩.
+   - `cancelKernelRun`: Run 버전 사전 조회 후 `expectedVersion` 탑재 및 `Idempotency-Key` 헤더 적용.
+   - `Header.tsx`: `onlineNodesCount`를 고정값 5가 아닌 실제 관측된 온라인 노드 집계로 전환(FE-M04 완결).
+2. **프로젝트 스코프 결과/아티팩트 정합 및 186체크 스모크 확장 (`tools/run_browser_smoke.mjs`)**:
+   - `DeveloperStudio.tsx` 및 `RunDetail.tsx`의 결과 조회와 다운로드를 `/v1/projects/${prjId}/runs/...`로 일원화.
+   - 스모크 스위트 Track 13에 프로젝트 스코프 정본 4종 엔드포인트 검증 추가하여 총 **186/186 checks (100%)** 달성.
+3. **클러스터 노드 텔레메트리 프로젝트 스코프 1순위 조회 정합 (`App.tsx`)**:
+   - `fetchNodes`에서 `GET /v1/projects/${prjId}/nodes` 우선 조회 및 `/v1/nodes` 폴백 다중 방어 수립.
+4. **외부 IdP 토큰 엔드포인트(`idpTokenUrl`) 연동 및 RFC 7519 JWT 클레임 해석 (`Login.tsx`, `pkce.ts`)**:
+   - 외부 Keycloak/Authentik 구성 시 백엔드 fixture 브로커 의존 없이 순수 OIDC PKCE로 인증 완결.
+   - `parseJwtPayload` 및 `resolveUserFromToken`으로 토큰 클레임(`sub`, `role`, `tenant_id`) 안전 해석.
+
+---
+
 ## 3. 검증 실행 증거 및 재현 명령
 
 독립 검토자는 로컬 환경에서 아래 명령을 통해 동일한 합격 결과를 재현할 수 있습니다:
 
 ```bash
-# 1. 라우트 커버리지 도구 실측 (클라이언트 요청 32개 경로 중 미제공 0개, 100% 서빙)
-.venv\Scripts\python.exe tools/route_coverage.py --served src/saintvision --client apps/web/src
+# 1. 라우트 커버리지 도구 실측 (클라이언트 요청 23개 경로 중 미제공 0개, 100% 완전 서빙)
+python tools/route_coverage.py --served src --served .worktrees/codex-workspace-bridge/services/control-plane/src --client apps/web/src
 .venv\Scripts\pytest tests/test_route_coverage.py
 
-# 2. 프론트엔드 전체 단위/프로토콜 시험 (19개 파일, 115개 테스트 100% 통과)
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (21개 파일, 134개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 4. E2E 브라우저 스모크 검증 (14개 트랙, 181개 항목 100% 통과 - 커널 resume 엔드포인트 포함)
+# 4. E2E 브라우저 스모크 검증 (14개 트랙, 186개 항목 100% 통과 - 프로젝트 스코프 결과/아티팩트 포함)
 node tools/run_browser_smoke.mjs
 
 # 5. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
@@ -105,7 +121,7 @@ node tools/verify_two_pc_distributed_execution.mjs
 # 7. 내부망 배포 사전 검증 파이프라인 (5개 배포 단계 무오류, Gateway Healthy)
 powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
 
-# 8. 문서 무결성 및 온톨로지 검사 (267 docs PASS, 48 tasks PASS)
+# 8. 문서 무결성 및 온톨로지 검사 (281 docs PASS, 48 tasks PASS)
 python tools/check_docs.py
 .venv\Scripts\python.exe tools/check_ontology.py
 ```
