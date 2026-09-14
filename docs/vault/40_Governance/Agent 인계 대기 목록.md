@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.27"
+version: "1.0.28"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,17 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### B-6/7 진행 재측정 (2026-09-14) — Gemini가 결정표를 소비 중
+
+결정표(B-6/7)를 낸 뒤 두 방향이 그것을 실제로 사용하기 시작했다.
+
+- Gemini `3363bd4`: node resume·artifacts를 커널 정본 경로로 정렬(내 표의 "이름" 행 2개).
+- Gemini `fe1706d`: receipt를 result payload에서 조회(내 표의 "PAYLOAD" 행 — 전용 route 불필요).
+
+재측정 중 **내 도구의 오탐 2건**을 발견해 고쳤다(`fef3292`): `/v1/${prj}runs`(=`/v1/projects/{id}/runs`, `prj`가 이미 `projects/<id>/`로 끝남)가 `/v1/{}runs`로 잘못 잡혔고, base-URL 상수 `/v1`이 호출로 세어졌다. 교정 후 **미제공 18개**(현재 커널 + 내 lane API 기준). 세션 내내 내 측정이 공백을 부풀리는 방향으로 틀렸는데, 이번엔 도구가 스스로 잡도록 시험을 더했다.
+
+남은 18개는 결정표 그대로다: 이름/범위(승인·runs·workspaces·terminal·undrain — Gemini 진행 중), payload(receipts — Gemini 방금 처리), 제거(`auth/token`), 실재 부재 4(승인 목록·reclaim·shards×2 — Codex·Gemini 결정 대기).
 
 ### F1 철회 확인 + 부수 관찰 (2026-09-14)
 
