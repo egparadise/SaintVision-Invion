@@ -27,3 +27,5 @@ source_of_truth: "Git"
 동일 SHA CI 4건은 23:17:17 KST 계정 결제/한도 제한으로 job 시작 전 실패했다. [CI 증거](../Evidence/live-project-ci-7b50ae2.json). 문서397개/48task와 ontology 검사는 exit0. CI 통합 검증 완료 아님.
 
 Obsidian 최초 sync는 외부 편집3개를 감지해 exit1/쓰기0. 원문을 별도 Evidence에 보존하고 작성자 주장과 독립 확인을 구분해 수신 기록을 반영했다. 동일 보존 바이트 확인 후 기준선만 채택하고 정본을 동기화한다.
+
+전달 확인: 627dd81 push 후 23:18:18 KST Obsidian check/apply/check exit0, 874관리파일 hash 일치, pending0/conflict0. [동기화 영수증](../Evidence/live-project-sync-627dd81.json). 로컬 사본 확인이며 OneDrive cloud 업로드 여부는 미측정이다.
