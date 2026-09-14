@@ -1,3 +1,4 @@
+import type { ReviewedAction } from '@/shared/api/approvalReview';
 import { fetchProjectWorkspaces, type ProjectWorkspace } from '@/shared/api/projectObservation';
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -30,7 +31,7 @@ export interface DeveloperStudioProps {
   initialRunId?: string | null;
   onNavigateTab?: (tab: string, entityId?: string) => void;
   onRefreshRuns?: () => void;
-  onApprove?: (approvalId: string, nonce: string) => Promise<void>;
+  onApprove?: (approvalId: string, nonce: string, shown?: ReviewedAction) => Promise<void>;
   onReject?: (approvalId: string, reason: string) => Promise<void>;
 }
 
@@ -69,7 +70,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   initialRunId = null,
   onNavigateTab,
   onRefreshRuns,
-  onApprove,
   onReject,
 }) => {
   // Stepper state (1: Project & Workspace -> 2: Resources & Placement -> 3: Code & Execution -> 4: Results & Receipts)
@@ -1917,23 +1917,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {onApprove && matchedApproval?.command && matchedApproval.riskLevel && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          await onApprove(matchedApproval.id, matchedApproval.nonce ?? '');
-                          refreshActiveRun();
-                          onRefreshRuns?.();
-                        } catch {
-                          // Error alert handled by onApprove
-                        }
-                      }}
-                    >
-                      ✓ 승인 확정 (Approve)
-                    </Button>
-                  )}
+                  {matchedApproval && <Button onClick={() => onNavigateTab?.('approvals')}>
+                    작업 내용 확인 및 승인
+                  </Button>}
                   {onReject && matchedApproval && (
                     <Button
                       variant="secondary"

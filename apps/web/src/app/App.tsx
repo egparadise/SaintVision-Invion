@@ -1,3 +1,4 @@
+import { approveReviewed, type ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/shared/ui/Header';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
@@ -146,11 +147,11 @@ export const App: React.FC = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const handleApprove = async (approvalId: string, _nonce: string) => {
+  const handleApprove = async (approvalId: string, _nonce: string, shown?: ReviewedAction) => {
     try {
       const approval = approvals.find((a) => a.id === approvalId);
-      if (!approval || !approval.command || !approval.riskLevel) throw new Error('승인할 작업 내용과 위험도를 먼저 확인해야 합니다.');
-      await decideApproval(approval, 'approve');
+      if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
+      await approveReviewed(approval, shown);
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -453,6 +454,7 @@ export const App: React.FC = () => {
         {/* Tab 4: Approvals (S04-FE) */}
         {activeTab === 'approvals' && (
           <ApprovalCenter
+            key={`${currentUser?.tenantId}:${currentUser?.id}:${projectId}`}
             approvals={approvals}
             currentUserId={currentUser?.id ?? ''}
             onApprove={handleApprove}

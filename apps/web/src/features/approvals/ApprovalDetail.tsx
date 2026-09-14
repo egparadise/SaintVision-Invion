@@ -1,3 +1,4 @@
+import type { ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState, useEffect } from 'react';
 import { ApprovalItem } from '@/contracts/types';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
@@ -6,13 +7,15 @@ import { Button } from '@/shared/ui/Button';
 export interface ApprovalDetailProps {
   approval: ApprovalItem;
   currentUserId: string;
-  onApprove: (approvalId: string, nonce: string) => Promise<void>;
+  reviewedAction?: ReviewedAction;
+  onApprove: (approvalId: string, nonce: string, shown?: ReviewedAction) => Promise<void>;
   onReject: (approvalId: string, reason: string) => Promise<void>;
 }
 
 export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   approval,
   currentUserId,
+  reviewedAction,
   onApprove,
   onReject,
 }) => {
@@ -45,7 +48,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
 
   const canApprove =
     !isExpired &&
-    Boolean(currentUserId && approval.actionDigest && approval.riskLevel && approval.command) &&
+    Boolean(currentUserId && reviewedAction && reviewedAction.actionDigest === approval.actionDigest && approval.riskLevel && approval.command) &&
     !isSubmitting &&
     (!diffRequired || hasDiff) &&
     !isSelfApprovalBlocked &&
@@ -61,7 +64,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
     if (!canApprove) return;
     setIsSubmitting(true);
     try {
-      await onApprove(approval.id, approval.nonce ?? '');
+      await onApprove(approval.id, approval.nonce ?? '', reviewedAction);
     } finally {
       setIsSubmitting(false);
     }
@@ -251,18 +254,9 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           }}
         >
           <div style={{ marginBottom: '6px' }}>
-            <strong>정책 엔진 재계산 근거:</strong> {approval.policyReason}
+            <strong>정책 버전:</strong> {approval.policyReason}
           </div>
-          {approval.riskLevel === 'L3' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)' }}>
-              <strong>Two-Person Rule 상태:</strong>
-              {approval.firstApprovedBy ? (
-                <span>1차 승인 완료 ({approval.firstApprovedBy}) · 2차 검토 대기</span>
-              ) : (
-                <span>1차 승인 대기 중</span>
-              )}
-            </div>
-          )}
+          {approval.requiredApprovals === 2 && <p>서로 다른 검토자 2인의 승인이 필요합니다. 현재 투표 내역은 이 응답에 포함되지 않습니다.</p>}
           {isRequester && (
             <div style={{ marginTop: '8px', color: 'var(--color-status-offline)', fontWeight: 600 }}>
               요청자 승인 차단: 요청자 본인({currentUserId})은 2인 승인 원칙(Two-Person Rule)에 따라 자체 승인할 수 없습니다.

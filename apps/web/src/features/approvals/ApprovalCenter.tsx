@@ -1,12 +1,14 @@
+import type { ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState } from 'react';
 import { ApprovalItem } from '@/contracts/types';
-import { ApprovalDetail } from './ApprovalDetail';
+import { ApprovalReviewPanel } from './ApprovalReviewPanel';
+import { reviewIdentity } from '@/shared/api/approvalReview';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 
 export interface ApprovalCenterProps {
   approvals: ApprovalItem[];
   currentUserId: string;
-  onApprove: (approvalId: string, nonce: string) => Promise<void>;
+  onApprove: (approvalId: string, nonce: string, shown?: ReviewedAction) => Promise<void>;
   onReject: (approvalId: string, reason: string) => Promise<void>;
 }
 
@@ -181,8 +183,8 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
         {/* Right Detail */}
         <div>
           {selectedApproval ? (
-            <ApprovalDetail
-              key={`${selectedApproval.id}:${selectedApproval.expiresAt}`}
+            <ApprovalReviewPanel
+              key={`${currentUserId}:${reviewIdentity(selectedApproval)}`}
               approval={selectedApproval}
               currentUserId={currentUserId}
               onApprove={onApprove}
