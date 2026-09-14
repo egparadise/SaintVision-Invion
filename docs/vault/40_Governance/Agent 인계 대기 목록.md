@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.34"
+version: "1.0.35"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,21 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### B-6/7 완결 — 신규 커널 route 0, `auth/token`은 mock login이었다 (2026-09-14, Claude)
+
+Gemini `09b8fb7`("aligning with Claude 6212291 review")이 내 검토 목록을 소비했고, 정직한 미제공(fixture 제외)이 11→**4**로 떨어졌다. 남은 4의 정체:
+
+| 경로 | 처분 |
+|---|---|
+| `/v1/runs`(bare list) | 정렬 — 커널 `/v1/projects/{p}/runs` 존재. Gemini 잔여 |
+| `/v1/workspaces`(bare list) | 정렬 — `/v1/projects/{p}/workspaces` 존재. Gemini 잔여 |
+| `/v1/events` | **API 아님** — `deploymentEngine.ts`의 nginx proxy 설정 문자열 |
+| `/v1/auth/token` | **mock login.** `Login.tsx:42`가 `code: auth_code_${generateNonce()}` — 조작된 auth code를 만들어 보낸다. 실 IdP redirect(`window.location`·`/authorize`·`redirect_uri`) 없음. FE-M04와 같은 mock |
+
+**`auth/token` 결정 근거**: 커널은 절차서 2절대로 **offline verifier**(JWT 검증, JWKS 파일)이지 code 교환 broker가 아니다. 올바른 흐름은 SPA가 실 IdP의 authorization-code+PKCE를 직접 수행 → 받은 JWT를 backend가 오프라인 검증. 즉 `/v1/auth/token` POST는 **커널에 만들 endpoint가 아니라 교체할 mock**이다. 실 IdP 설정은 운영자 입력, SPA 흐름 교체는 Gemini.
+
+**결론(근거 확립)**: SPA가 부르는 것 중 **신규 커널 route가 필요한 것은 0개**다. 미제공 4는 = 정렬 2(Gemini)·비호출 1(nginx)·mock login 1(Gemini 교체 + 운영자 실 IdP). B-6/7의 "화면과 커널이 합의 못했다"는 최종적으로 **커널은 이미 다 제공하고, 화면이 fixture 흐름을 실 흐름으로 바꾸면 된다**로 귀결된다. 통합(CX-01)에 커널 개발 결정은 없다.
 
 ### Codex FE-M01~05 재현 시험 검토 (Codex가 배정, 2026-09-14, Claude)
 
