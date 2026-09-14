@@ -28,3 +28,5 @@ CX-01/CX-08 지원, Codex 작성/Claude reviewer pending. 제품 `dcd5f791f50b52
 Claude: process_output/CLI의 출력·취소·상태 판정 독립 검토. Codex: 실제 Node 실행/제한 Agent 루프와 연결할 때 예산·승인·Evidence 정본을 유지한다. 원격 .225/운영 OIDC/CI 계정 제한은 기존 차단이며 본 시험으로 해소되지 않는다. 전체 성숙도2775/4800=57.81% 유지. CI와 Obsidian은 실제 결과를 아래에 추가한다.
 
 동일SHA CI6건은20:00:21 KST 확인 시 billing 제한으로 job 시작 전 실패했다. [CI 증거](../Evidence/cli-output-ci-dcd5f79.json). 로컬 시험과 CI 성공은 동등하게 표시하지 않는다.
+
+최초 Obsidian check는 공통/Gemini 진행판 외부 편집2개 때문에 exit1/쓰기0으로 중단됐다. raw 원문과 SHA manifest를 보존하고 작성자 주장과 독립 검증을 구분해 수신 기록을 합친 후 재동기화한다. 신규 frontend 검토는 다음 CX-01이다.
