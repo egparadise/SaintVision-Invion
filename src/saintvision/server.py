@@ -2282,7 +2282,8 @@ async def create_project_run(project_id: str, request: Request):
 
 
 @app.get("/v1/runs/{run_id}/artifacts/download")
-def download_run_artifacts(run_id: str, request: Request):
+@app.get("/v1/projects/{project_id}/runs/{run_id}/artifacts/download")
+def download_run_artifacts(run_id: str, request: Request, project_id: Optional[str] = None):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))
     target_run = None
     for r in RUNS:
@@ -2320,7 +2321,8 @@ def download_run_artifacts(run_id: str, request: Request):
 
 
 @app.get("/v1/runs/{run_id}/result")
-def read_run_result(run_id: str, request: Request):
+@app.get("/v1/projects/{project_id}/runs/{run_id}/result")
+def read_run_result(run_id: str, request: Request, project_id: Optional[str] = None):
     """
     Canonical kernel ResultView.result (services/control-plane/src/inv/result_view.py):
     What this Run produced, with every gap named rather than filled.
@@ -2375,7 +2377,8 @@ def read_run_result(run_id: str, request: Request):
 
 
 @app.get("/v1/runs/{run_id}/artifacts")
-def list_run_artifacts(run_id: str, request: Request):
+@app.get("/v1/projects/{project_id}/runs/{run_id}/artifacts")
+def list_run_artifacts(run_id: str, request: Request, project_id: Optional[str] = None):
     """
     Canonical kernel ResultView.artifacts: Files this Run produced.
     """
@@ -2410,7 +2413,8 @@ def list_run_artifacts(run_id: str, request: Request):
 
 
 @app.get("/v1/runs/{run_id}/artifacts/content")
-def get_run_artifact_content(run_id: str, request: Request, path: Optional[str] = None):
+@app.get("/v1/projects/{project_id}/runs/{run_id}/artifacts/content")
+def get_run_artifact_content(run_id: str, request: Request, path: Optional[str] = None, project_id: Optional[str] = None):
     """
     Download actual raw file bytes for a specific run artifact path.
     """

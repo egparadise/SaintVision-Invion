@@ -13,7 +13,7 @@ import {
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
-import { apiClient, isRouteNotFoundError, getAuthToken } from '@/shared/api/client';
+import { apiClient, getAuthToken } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
@@ -297,8 +297,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     let mounted = true;
     setIsLoadingArtifact(true);
 
-    // Query canonical Kernel ResultView (/v1/runs/{id}/result) as the source of truth
-    apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`)
+    // Query canonical Kernel ResultView (/v1/projects/{prjId}/runs/{id}/result) as the source of truth
+    const prjId = selectedProjectId || 'prj_01JABCDE';
+    apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`)
       .then((res) => {
         if (!mounted) return;
         if (res && res.output) {
@@ -311,7 +312,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             exportedAt: res.completedAt || new Date().toISOString(),
           });
         } else {
-          apiClient<RunArtifactList>(`/v1/runs/${activeRunId}/artifacts`)
+          apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
             .then((data) => {
               if (mounted && data) setArtifactData(data);
             })
@@ -321,7 +322,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         }
       })
       .catch(() => {
-        apiClient<RunArtifactList>(`/v1/runs/${activeRunId}/artifacts`)
+        apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
           .then((data) => {
             if (mounted && data) setArtifactData(data);
           })
@@ -448,7 +449,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     try {
       let serverPayload: any = null;
       try {
-        serverPayload = await apiClient<any>(`/v1/runs/${activeRunId}/artifacts`);
+        const prjId = selectedProjectId || 'prj_01JABCDE';
+        serverPayload = await apiClient<any>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
       } catch {
         // Fallback to cached artifactData
       }
@@ -515,7 +517,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await fetch(`/v1/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`, {
+      const prjId = selectedProjectId || 'prj_01JABCDE';
+      const res = await fetch(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`, {
         headers,
       });
       if (!res.ok) {
@@ -610,13 +613,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           if (resultRes?.stopReceipt) {
             receipt = resultRes.stopReceipt as NodeStopReceipt;
           }
-        } catch (err: any) {
-          if (isRouteNotFoundError(err)) {
-            const resultRes = await apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`);
-            if (resultRes?.stopReceipt) {
-              receipt = resultRes.stopReceipt as NodeStopReceipt;
-            }
-          }
+        } catch {
+          // Result not yet available or receipt not present in ResultView
         }
       }
       setSelectedReceipt(receipt);

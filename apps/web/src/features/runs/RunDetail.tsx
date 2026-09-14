@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
-import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
+import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 
 export interface RunDetailProps {
@@ -176,13 +176,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           if (resultRes?.stopReceipt) {
             receipt = resultRes.stopReceipt as NodeStopReceipt;
           }
-        } catch (err: any) {
-          if (isRouteNotFoundError(err)) {
-            const resultRes = await apiClient<RunResultView>(`/v1/runs/${run.id}/result`);
-            if (resultRes?.stopReceipt) {
-              receipt = resultRes.stopReceipt as NodeStopReceipt;
-            }
-          }
+        } catch {
+          // Result not yet available or receipt not present in ResultView
         }
       }
       setSelectedReceipt(receipt);
