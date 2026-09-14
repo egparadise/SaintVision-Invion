@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.25"
+version: "1.0.26"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -106,7 +106,7 @@ CI Evidence: [Documentation Build](https://github.com/egparadise/SaintVision-Inv
 
 | 항목 | 한 줄 | 상태 | 다음 행동 주체 |
 |---|---|---|---|
-| A (F1~F4) | 커널 finding 4건 | **F2 수정 확인·F3/F4 소멸(entrypoint 복원)·F1만 대기** | F1 수정 Codex |
+| A (F1~F4) | 커널 finding 4건 | **전부 닫힘** — F1 철회(내 오류), F2 수정 확인, F3·F4 소멸 | — |
 | B 결정 6건 | 알람 채널·partition 주기·PITR/매체·CL-04 seam·CX-02·운영 입력 | **대기** | 사용자·운영자·Codex |
 | B-2 | lane 통째 병합 위험 | B-3으로 **대체됨** | — |
 | B-3 | `server.py`가 두 구현, 병합 차단 | **해소 확인**(entrypoint 복원, 재확인 회신 참조) | — |
@@ -124,7 +124,7 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | 항목 | 재확인 결과 |
 |---|---|
 | **F2** | **수정 확인.** `frame()`이 Node 호출 **전에** Run lock 아래에서 intent를 commit하고(`inv.terminal_frame_intents`) `frame_intended` event를 남긴다. 같은 sequence·다른 내용은 실행 전 `Terminal sequence intent differs`로 거부, sequence는 `완료+1` 강제. DDL은 `0034_terminal_frame_intents.py`(FORCE RLS·immutable trigger·`inv_kernel` SELECT/INSERT만) — scratch DB에 0037까지 **적용 성공**, intents 테이블 FORCE RLS=True 실측. 관찰 1건(차단 아님): 이미 audit된 frame을 **같은 digest로** 재전송하면 여전히 Node에 재도달한다 — 기존과 동일하며 Node 쪽 sequence 계약 소관 |
-| **F1** | **미해결.** `leases.py`·`0031`의 offer/release snapshot 불일치는 변경 없음. 재현 절차는 A의 F1 그대로 유효 |
+| **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
 
@@ -169,7 +169,7 @@ CL-01의 범위(0028~0033)를 넘는 신규분. **차단 finding 없음.** scrat
 
 정정 하나(내 것): F2의 intents 테이블에 "만드는 migration이 없다"고 의심했으나 **내 grep 범위가 틀렸다**(kernel `.sql` 경로만 봄; 실제는 Alembic `0034`). 못박기 전에 확인해 유령 finding을 내지 않았다.
 
-**남은 것: F1 하나다** (그리고 알람 채널·partition 주기·PITR·CL-04 seam·CX-02 결정들은 기존대로).
+**CL-01 finding은 전부 닫혔다** (F1 철회·F2 수정·F3/F4 소멸). 남은 것은 결정들뿐: 알람 채널·partition 주기·PITR·CL-04 seam·CX-02, 그리고 B-6/7 부재 4개.
 
 ### A. Codex가 고쳐야 할 finding — CL-01 독립 검토 (d14db0a, `c5f2154` 포함)
 

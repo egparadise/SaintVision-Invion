@@ -53,7 +53,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 ### CL-01 — Codex 최신 커널 독립 검토
 
-- owner / reviewer: Claude / Codex; status: in-progress(**재확인 1회 완료** — F2 수정 확인, F1만 잔여); priority: P0.
+- owner / reviewer: Claude / Codex; status: **finding 전부 닫힘**(F1 철회·F2 수정·F3/F4 소멸); priority: P0.
+- **F1 철회(2026-09-14, 내 오류)**: 재현이 실제 `release()` 경로를 쓰지 않고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제 `release()`→`_locked_lease`→`lock_resources`는 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로 고정. **CL-01의 finding은 모두 닫혔다.**
 - 재확인(2026-09-13, workspace-bridge 6ff090b): **F2 수정 확인** — intent-before-execute, `0034` DDL(FORCE RLS·immutable) scratch DB 적용 실측. **F3/F4는 entrypoint 복원으로 소멸.** **F1 미해결**(leases/0031 무변경, 재현 절차 유효). B-9는 live에서 완전 종결(`apptestonly` 거부, role shape `ok`). 상세는 [[Agent 인계 대기 목록]] 재확인 회신.
 - 원래 목표/합격 조건: OUT-01, OUT-04, OUT-06, OUT-08 / AC-01, AC-04, AC-06, AC-08.
 - 검토 SHA: `agent/codex/workspace-bridge` **d14db0a**(카드가 지정한 `c5f2154`를 포함한 현재 head), migration head `0033_workspace_bridge_merge`. 전문은 [[Claude_CL-01_커널독립검토]].

@@ -1,10 +1,10 @@
 ---
 doc_id: "REVIEW-CLAUDE-CL01-001"
 title: "Claude CL-01 커널 독립 검토"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
-updated: "2026-09-13T13:30:00+09:00"
+updated: "2026-09-14T09:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -33,18 +33,24 @@ CI는 세 Agent 공통으로 계정 결제·한도 문제로 실행 전에 차�
 
 | finding | 상태 |
 |---|---|
-| **F1** | **미해결.** `leases.py`·`0031` 무변경. 아래 재현 절차 그대로 유효 |
+| **F1** | **철회함(내 오류).** 아래 재현은 무효였다 — 실제 `release()` 경로가 아니라 lease 행만 잠그는 `release`를 내가 손으로 짜서 존재하지 않는 race를 만들었다. 실제 `release()`→`_locked_lease`→`lock_resources`는 `inv.nodes`·`inv.resources`를 **`FOR UPDATE`로 잠근다**(e6336a7, 2026-09-09부터, 내 d14db0a 검토 이전). offer 함수가 자원 잠금을 쥐고 있으면 release가 그 잠금에서 막히므로 race는 발생할 수 없다. Codex `51f4004`의 회귀 시험(RES-0007로 해제 대기, 재시도 후 제공량 1000)이 이를 고정했고, 나는 `d14db0a`의 `leases.py` 소스로 직접 재확인했다 |
 | **F2** | **수정 확인.** `frame()`이 Node 호출 전에 Run lock 아래 intent를 commit(`inv.terminal_frame_intents`, DDL `0034` — FORCE RLS·immutable·kernel 전용 grant). 같은 sequence·다른 내용은 실행 전 거부, sequence는 완료+1 강제. scratch DB 적용 실측. 관찰(차단 아님): 동일 digest의 재전송은 여전히 Node에 재도달 — 기존과 동일, Node sequence 계약 소관 |
 | **F3** | **소멸.** entrypoint 복원으로 fixture 서버가 `demo_server.py`로 재격리되고 폐기 함수 문제의 전제가 사라짐 |
 | **F4** | **소멸(동일 사유).** `.git` 제외 불일치는 남아 있으나 닫히는 방향의 정보 항목으로 유지 |
 
 추가로 신규 migration **0035~0037을 같은 기준으로 검토**했다 — 차단 finding 없음, 0036은 양방향 실측(failed+met_targets 거부/passed 수락), 0037은 CL-07의 원격 폴더 공백에 대한 커널 측 해답. 상세는 [[Agent 인계 대기 목록]]의 재확인 회신과 0035~0037 검토 절.
 
-**남은 것은 F1 하나다.**
+**남은 것: 없음.** F1은 철회, F2 수정 확인, F3·F4 소멸. CL-01의 finding은 모두 닫혔다.
 
 ## Finding
 
-### F1 — 적용된 제공량이 기록된 제공량보다 조용히 작아질 수 있다 (중간, 재현함)
+### F1 — **철회함 (2026-09-14)**. 아래는 내가 틀린 기록으로 보존한다
+
+**철회 사유**: 내 재현은 실제 `release()` 경로를 쓰지 않고, lease 행만 잠그는 `release` UPDATE를 두 session 스크립트로 손수 재생했다. 실제 코드에서 `release()`는 `_locked_lease`를 거쳐 `lock_resources`로 `inv.nodes`·`inv.resources`를 `FOR UPDATE` 잠근다 — `e6336a7`(2026-09-09)부터, 내 검토 SHA `d14db0a` 이전. 따라서 offer 함수가 자원 잠금을 쥔 동안 release는 그 잠금에서 대기하고, 내가 "재현"한 900/1000 불일치는 실제 경로에서 일어날 수 없다. `d14db0a`의 `leases.py:_locked_lease`를 직접 다시 읽어 확인했다. 원래 CL-01 검토에서 `release()` 본문만 보고 그것이 부르는 `_locked_lease`의 잠금을 따라가지 않은 것이 내 실수다.
+
+이하 원문(틀린 finding):
+
+### F1(원문·무효) — 적용된 제공량이 기록된 제공량보다 조용히 작아질 수 있다
 
 **위치**: `migrations/versions/0031_resource_offer_integrity.py`, `public.apply_capability_offer`
 **관련**: `services/control-plane/src/inv/leases.py:293` `release()`
