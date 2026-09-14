@@ -39,3 +39,15 @@ Alembic online 진입점에서 schema 쓰기 전에 inv_app/inv_kernel의 LOGIN�
 전체 성숙도 **2775/4800=57.8125% 완료,42.1875% 잔여** 유지. CI/독립검토/운영 인수 미충족으로 task done 또는 통합 완료 선언하지 않는다. 문서검사·ontology·Obsidian sync 결과는 후속 기록한다.
 
 최종 CI 설정221d253 동일 SHA도6건 job미시작/계정결제 failure(Core34807287175/34807284997,Backend34807287203/34807284980,Docs34807287174/34807285007). Evidence migration-guard-221d253-ci.json. 문서372개/48작업 검사 및 ontology 모두exit0, git diff --check exit0.
+
+## 2026-09-14 외부 기록 수신 및 통합 조건
+
+Obsidian 외부 편집3개를 Evidence/obsidian-proposals-20260914-migration-guard/proposal-1~3.txt에 원바이트/hash로 보존했다. 원문 작성 시각은 실제 실행 시각 검증을 대신하지 않는다.
+
+Claude가 F1을 철회했다고 보고했다. 수동 lease UPDATE 재생이 실제 release→lock_resources를 생략했다는 설명은 Codex51f4004 실제 회귀증거와 일치한다. F1 수정대기는 해소하되, 이를 신규 migration guard 전체 또는 현재 배포의 독립 승인으로 확대하지 않는다. Claude0035~0037 검토의 차단finding 없음·scratch 적용 보고는 원문에 보존한다.
+
+Gemini는181 smoke/115 Vitest/67 two-PC checks와 embedded stopReceipt 폴백을 보고했다. 작성자 보고이며 Codex가 재실행한 결과가 아니다. integration의 fixture server 포함 route coverage0은 실제 configured factory 제공 API 검증이 아니다. 75%/65% 예상 수치는 공통2775/4800 산정에 합산하지 않는다. 실제 원격 .225는13:46 KST offline/stale로 확인됐다.
+
+**다음 Codex 통합 카드**: configured factory 기준 승인목록·reclaim·shard 조회/전체취소4개 미제공 경로의 계약 결정. 승인목록은 기존 project/run 승인 모델과 연결할 읽기 경로 검토, reclaim은 receipt 자동회수 의미를 유지하고 성공을 꾸미는 수동 endpoint를 만들지 않기, shard는 durable 부모Run/자식 binding/result 정본을 근거로 조회·취소의 tenant/권한/동시성 경계를 검토한다. Gemini는 fixture가 아닌 정본 factory에서 응답 스키마 대조, Claude는 검토 및 운영OIDC 설정 준비. 본 문단은 이4개 API 구현 완료를 뜻하지 않는다.
+
+Migration guard 정본은 온라인 진입점의 migration_guard.py이다. “없는 역할도 생성 거부”라는 외부 표현은 정정한다: 없는 그룹은 허용하고, 위험플래그가 있는 기존 그룹을 거부한다(실제13개 시험). helper와 통합할 때 published migration을 수정하거나 guard를 제거해 약한 운영그룹을 통과시키지 않는다.
