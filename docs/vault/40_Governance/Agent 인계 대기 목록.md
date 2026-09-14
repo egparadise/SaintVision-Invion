@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.38"
+version: "1.0.39"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -114,7 +114,7 @@ B-2~B-9와 FE-M 검토가 흩어져 있어, Codex가 CX-01을 실행할 때 볼 
 
 5. **route_coverage.py 파일 충돌**: 내 lane 판과 Codex 판(내 것 + `--configured-surface`) 동명 — **Codex 판 정본**, 내 lane 판 미push.
 
-6. **credential 교체** (B-9): guard·탐지·리허설 절차 완결. live `inv_app`은 이미 NOLOGIN(운영자 실행됨). `init-db.sql` LOGIN 생성 제거는 배포 결정과 함께.
+6. **credential 교체** (B-9): guard·탐지·리허설 절차 완결. live `inv_app`은 이미 NOLOGIN(운영자 실행됨). `init-db.sql` LOGIN 생성 제거는 배포 결정과 함께. **추가(2026-09-14, Claude)**: 테스트 fixture가 공유 `inv_app`을 LOGIN으로 되살리던 벡터는 conftest 수정(throwaway login role이 그룹 상속)으로 integration에 이미 닫혔으나, 그것을 지키는 회귀 시험은 미착지였다. Codex 저작 `tests/test_role_fixture_preservation.py`(4da131f)를 integration에 착지(`8063999`)하고 throwaway postgres:16으로 양방향 독립 검증: 안전 fixture 2 passed / 벡터 되살리면 깨끗한 DB에서 `assert username != 'inv_app'` assertion 실패 2 failed(셋업 에러 아님). 이제 향후 편집이 벡터를 되살리면 CI/로컬에서 잡힌다.
 
 7. **FE-M01~05**: Codex 시험 검토·인정. Gemini 수정 진행 중(FE-M04 확인, auth 실 IdP 정당). 브라우저 회귀 증거는 Gemini 새 SHA.
 
