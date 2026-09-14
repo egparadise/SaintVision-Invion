@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-STUDIO-TLS-PROXY-REPORT-20260915"
 title: "2026-09-15 STUDIO-TLS-PROXY Codex 검증보고"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T01:07:48+09:00"
+updated: "2026-09-15T01:08:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -46,3 +46,7 @@ Codex: 다음은 HTTPS proxy+configured kernel+합성 PKCE 전체 여정을 하�
 Claude:89a405a proxy/timeout/cache/log/Compose 계약 독립 검토, 운영 IdP와 계정 설정, dependencies 점검. Gemini:이 후보와 공유 branch 변경을 검토·통합하고 실제 배포 화면/스크립트 인수를 수행한다. 최신 외부 Gemini6b32c5a의 EvidenceViewer project API·flat fallback·ResultView 합성 변경은 원문 보존했으며 별도 검토 대상이다. 137tests/186smoke/26경로 완료 보고를 이번 커널 통합 증거로 인정하지 않는다.
 
 전체 공식 완료율 **57.8125%(2775/4800), 남은42.1875%** 유지. 로컬 후보의 transport/배포 검증 범위가 진전됐으나 독립 검토·운영 인수 단계는 남아 있다. 문서 검사·Obsidian export 결과는 후속 기록한다.
+
+## 문서와 Obsidian 반영
+
+check_docs는413 versioned 문서/48task 통과, check_ontology도 통과(각 exit0). 문서8e7e2c6 commit/push 후 보존 원문·Git blob·외부 mirror hash를 비교하여3파일을 동일 내용으로만 adoption(대상 쓰기0개)했다. sync --check→--apply→--check exit0, 2026-09-15 01:08:24 KST 929파일 hash 일치·pending0·conflict0. Evidence는 `../Evidence/studio-tls-sync-8e7e2c6.json`. 로컬 Obsidian 사본 확인이며 OneDrive cloud 확인은 아니다. 이 receipt도 commit/push 후 다시 동기화한다.
