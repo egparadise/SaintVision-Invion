@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.29"
+version: "1.0.30"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,28 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### 진행 — Gemini가 4곳 정렬(`8778c78`), 미제공 18→13 (2026-09-14, Claude)
+
+Gemini가 앞서 지목한 네 곳(undrain·approvals·terminal tickets/ws)을 정확히 정렬했다. 재측정: **미제공 18 → 13**(정정된 도구 기준). 남은 13의 분류와 **정확한 위치**:
+
+**A. flat scope — Gemini 다음 목록** (각 파일:줄, project 범위로):
+- `app/App.tsx:320` `/v1/runs` (목록) → `/v1/projects/{p}/runs`
+- `features/studio/DeveloperStudio.tsx:179` `/v1/workspaces` → `/v1/projects/{p}/workspaces`
+- `features/studio/DeveloperStudio.tsx:247` `/v1/runs/${id}` → `/v1/projects/{p}/runs/{id}`
+- `features/runs/RunDetail.tsx:65` `/v1/runs/${id}/resume/prepare` → `.../projects/{p}/runs/{id}/resume/prepare`
+- `app/App.tsx:421` `/v1/runs/${id}/cancel` → `.../projects/{p}/runs/{id}/cancel`
+- `/v1/events` (deploymentEngine.ts:63 등)는 **nginx proxy 설정 문자열**이지 API 호출이 아님 — 검토 후 제외 대상
+
+**B. payload** — `/v1/receipts`·`/v1/receipts/{}`: receipt는 result 응답에 포함(Gemini `fe1706d` 부분 처리). 잔여 직접 조회처 제거
+
+**C. 제거** — `/v1/auth/token`: PKCE 브라우저↔IdP 직행, backend endpoint 불필요
+
+**D. 실재 부재 — 이제 3개** (Codex·Gemini 결정. `/v1/approvals` 목록은 해소됨):
+- `RunDetail.tsx:123` `/v1/runs/${id}/reclaim-resources` — 커널 회수는 receipt 기반 자동(`resourceReleasePending`). 브라우저 트리거 노출 여부 결정
+- `RunDetail.tsx:89,108,110,127` `/v1/runs/${id}/shards`·`.../shards/cancel-all` — shard 상태·취소 API. 커널 노출 위치 결정
+
+A/B/C가 정렬되면 미제공 13 → **실재 부재 3개**만 남는다. 그 3개가 통합 전 유일한 실 결정이다.
 
 ### Gemini 잔여 SPA 정렬 — 정확한 위치 (2026-09-14, Claude)
 
