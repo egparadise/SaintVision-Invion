@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.26"
+version: "1.0.27"
 status: "review"
 author: "Gemini"
-updated: "2026-09-14T21:45:00+09:00"
+updated: "2026-09-14T22:30:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `96191cc` |
+| **고정 구현 Commit SHA** | `9a57889` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
