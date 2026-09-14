@@ -30,3 +30,5 @@ Claude: process_output/CLI의 출력·취소·상태 판정 독립 검토. Codex
 동일SHA CI6건은20:00:21 KST 확인 시 billing 제한으로 job 시작 전 실패했다. [CI 증거](../Evidence/cli-output-ci-dcd5f79.json). 로컬 시험과 CI 성공은 동등하게 표시하지 않는다.
 
 최초 Obsidian check는 공통/Gemini 진행판 외부 편집2개 때문에 exit1/쓰기0으로 중단됐다. raw 원문과 SHA manifest를 보존하고 작성자 주장과 독립 검증을 구분해 수신 기록을 합친 후 재동기화한다. 신규 frontend 검토는 다음 CX-01이다.
+
+最終 전달: 보고 포함389문서/48task 검사 exit0. 7ab16b8 push 후20:01:32 KST check→apply→check exit0, 관리832파일 hash 일치/pending0/conflict0. [동기화 영수증](../Evidence/cli-output-sync-7ab16b8.json). 로컬 Obsidian 사본이며 OneDrive cloud 완료는 미확인.
