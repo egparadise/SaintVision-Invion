@@ -37,3 +37,5 @@ Gemini owner: FE-M01~05 수정과 브라우저 성공/422/401/403/네트워크�
 동일SHA CI6건은20:50:47 KST billing 제한으로job시작전실패. [CI 증거](../Evidence/frontend-mutation-ci-b95ab27.json). 실제진행하지않은CI/브라우저를통과로표시하지않는다.
 
 최초 sync는 공통/Gemini 진행판 외부편집2개로exit1/쓰기0이었다. [원문 보존](../Evidence/obsidian-proposals-20260914-frontend-review/manifest.json) 후 경로정렬 보고와 이번payload검토를 구분해 정본에 합쳤다.
+
+최종 보고 포함391문서/48task·ontology 검사 exit0. bb62670 push 후20:51:59 KST Obsidian check→apply→check exit0,842파일 hash일치/pending0/conflict0. [영수증](../Evidence/frontend-review-sync-bb62670.json). 원격cloud완료는미확인. 다음 Gemini FE-M01~05 수정, Codex 새 SHA 재검토.
