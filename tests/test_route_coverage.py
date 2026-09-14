@@ -109,3 +109,27 @@ def test_a_served_tree_and_a_client_tree_can_disagree_completely() -> None:
     served = served_routes('@api.post("/v1/projects/{p}/approvals/{a}/decision")')
     wanted = client_paths("""fetch(`/v1/approvals/${id}/approve`)""")
     assert not (wanted & served)
+
+
+def test_a_bare_v1_base_constant_is_not_a_call() -> None:
+    """A base-URL literal like `${API}/v1` is configuration, not a request."""
+    assert client_paths('const API_BASE = "/v1";') == set()
+
+
+def test_a_hole_fused_to_a_segment_is_dropped_as_an_artefact() -> None:
+    """/v1/${prj}runs, where prj already ends in projects/<id>/, must not be
+    reported as the malformed /v1/{}runs -- that is the tool's artefact, not a
+    path the SPA asks for."""
+    source = 'apiClient(`/v1/${prj}runs/${run.id}/result`)'
+    got = client_paths(source)
+    assert "/v1/{}runs/{}/result" not in got
+    # It is dropped entirely rather than half-corrected; the well-formed sibling
+    # (with a slash before the hole) is what the same screen also calls and what
+    # the coverage should credit.
+    assert all("{}runs" not in p for p in got)
+
+
+def test_a_properly_separated_interpolation_still_counts() -> None:
+    """The fix must not suppress a legitimate leading-parameter path."""
+    source = 'apiClient(`/v1/projects/${prj}/runs`)'
+    assert "/v1/projects/{}/runs" in client_paths(source)

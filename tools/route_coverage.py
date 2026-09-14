@@ -40,6 +40,10 @@ _PREFIX = re.compile(r"APIRouter\([^)]*prefix\s*=\s*[\"']([^\"']+)", re.DOTALL)
 #: Literal paths in client source, including the head of an interpolated one.
 _CLIENT = re.compile(r"""[\"'`](/v1/[A-Za-z0-9_\-/{}$:.]*)[\"'`]""")
 _CLIENT_HEAD = re.compile(r"""[\"'`](/v1/[^\"'`]*?)\$\{""")
+#: A template hole glued directly onto a path segment, e.g. ``${prj}runs`` where
+#: ``prj`` already ends in ``projects/<id>/``. The leftover ``{}runs`` is a tool
+#: artefact, not a path the SPA asks for.
+_GLUED_HOLE = re.compile(r"\{\}(?=[A-Za-z])")
 
 
 def normalise(path: str) -> str:
@@ -62,10 +66,20 @@ def served_routes(text: str) -> set[str]:
 
 
 def client_paths(text: str) -> set[str]:
-    """``/v1`` paths a client source file mentions."""
+    """``/v1`` paths a client source file mentions.
+
+    A bare ``/v1`` base-URL constant is not a call and is dropped, and a
+    template hole fused to the next segment (``/v1/{}runs`` from ``/v1/${prj}runs``,
+    where ``prj`` already ends in ``projects/<id>/``) is a tool artefact rather
+    than a request, so it is dropped too rather than reported as unserved.
+    """
     found = {normalise(m) for m in _CLIENT.findall(text)}
     found |= {normalise(m) for m in _CLIENT_HEAD.findall(text)}
-    return {p for p in found if p.startswith("/v1")}
+    return {
+        p
+        for p in found
+        if p.startswith("/v1/") and not _GLUED_HOLE.search(p)
+    }
 
 
 def scan_served(root: Path) -> set[str]:
