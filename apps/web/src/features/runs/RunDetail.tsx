@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
 
@@ -148,9 +148,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         } catch (err: any) {
           if (isRouteNotFoundError(err)) {
             const prj = run.projectId ? `projects/${run.projectId}/` : '';
-            const resultRes = await apiClient<any>(`/v1/${prj}runs/${run.id}/result`);
+            const resultRes = await apiClient<RunResultView>(`/v1/${prj}runs/${run.id}/result`);
             if (resultRes?.stopReceipt) {
-              receipt = resultRes.stopReceipt;
+              receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
           }
           if (!receipt) throw err;

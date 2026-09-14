@@ -8,6 +8,8 @@ import {
   PlacementRequirement,
   ApprovalItem,
   WorkspaceReadiness,
+  RunResultView,
+  RunArtifactList,
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
@@ -292,7 +294,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     setIsLoadingArtifact(true);
 
     // Query canonical Kernel ResultView (/v1/runs/{id}/result) as the source of truth
-    apiClient<any>(`/v1/runs/${activeRunId}/result`)
+    apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`)
       .then((res) => {
         if (!mounted) return;
         if (res && res.output) {
@@ -300,12 +302,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             runId: res.runId,
             outputHash: res.output.sha256,
             outputSizeBytes: res.output.sizeBytes,
-            verifiedEvidenceId: res.evidence?.evidenceId || null,
+            verifiedEvidenceId: res.evidence?.evidenceId || undefined,
             exitCode: res.stopReceipt?.exitCode ?? null,
             exportedAt: res.completedAt || new Date().toISOString(),
           });
         } else {
-          apiClient<any>(`/v1/runs/${activeRunId}/artifacts`)
+          apiClient<RunArtifactList>(`/v1/runs/${activeRunId}/artifacts`)
             .then((data) => {
               if (mounted && data) setArtifactData(data);
             })
@@ -315,7 +317,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         }
       })
       .catch(() => {
-        apiClient<any>(`/v1/runs/${activeRunId}/artifacts`)
+        apiClient<RunArtifactList>(`/v1/runs/${activeRunId}/artifacts`)
           .then((data) => {
             if (mounted && data) setArtifactData(data);
           })
@@ -633,9 +635,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         } catch (err: any) {
           if (isRouteNotFoundError(err) && activeRunId) {
             const prj = selectedProjectId ? `projects/${selectedProjectId}/` : '';
-            const resultRes = await apiClient<any>(`/v1/${prj}runs/${activeRunId}/result`);
+            const resultRes = await apiClient<RunResultView>(`/v1/${prj}runs/${activeRunId}/result`);
             if (resultRes?.stopReceipt) {
-              receipt = resultRes.stopReceipt;
+              receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
           }
           if (!receipt) throw err;

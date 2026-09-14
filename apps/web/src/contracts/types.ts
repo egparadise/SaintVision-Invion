@@ -529,9 +529,83 @@ export interface TrainingModuleStep {
   status: 'pending' | 'completed';
 }
 
+export interface RunResultView {
+  source: 'execution-kernel' | string;
+  runId: string;
+  projectId: string;
+  state: RunState;
+  version: number;
+  attemptCount: number;
+  sealed: boolean;
+  executionConfirmed: boolean;
+  commandId?: string | null;
+  nodeId?: string | null;
+  stopReceipt?: NodeStopReceipt | {
+    receiptId: string;
+    processStarted?: boolean;
+    exitCode: number;
+    reason?: string;
+    finishedAt?: string;
+    physicallyStopped?: boolean;
+    resourceReclaimed?: boolean;
+    verified?: boolean;
+  } | null;
+  evidence?: {
+    evidenceId?: string;
+    [key: string]: any;
+  } | null;
+  completedAt?: string | null;
+  output?: {
+    sha256: string;
+    sizeBytes: number;
+    verified: boolean;
+  } | null;
+  outputAbsentReason?: string | null;
+  resourceReleasePending?: boolean;
+}
 
+export interface RunArtifactItem {
+  path: string;
+  checksumSha256: string;
+  byteSize: number;
+  verified: boolean;
+  evidenceId?: string;
+}
 
+export interface RunArtifactList {
+  source: 'execution-kernel' | string;
+  runId: string;
+  artifacts: RunArtifactItem[];
+  count: number;
+  verifiedCount: number;
+  absentReason?: string | null;
+}
 
+export interface RunLogView {
+  source: 'execution-kernel' | string;
+  runId: string;
+  stdout: string | null;
+  stderr: string | null;
+  redacted: boolean;
+  truncated?: boolean | null;
+  absentReason?: string | null;
+}
 
+export interface RunAttemptItem {
+  attemptNumber: number;
+  startedAt: string;
+  nodeId: string;
+  commandId?: string | null;
+  stopReceiptId?: string | null;
+  exitCode?: number | null;
+  reason?: string | null;
+  evidenceId?: string | null;
+}
 
-
+export interface RunAttemptList {
+  source: 'execution-kernel' | string;
+  runId: string;
+  attempts: RunAttemptItem[];
+  count: number;
+  nextCursor?: number | null;
+}

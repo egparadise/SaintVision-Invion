@@ -24,7 +24,7 @@ import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem } from '@/contracts/types';
 import { apiClient, clearAuthToken, isRouteNotFoundError } from '@/shared/api/client';
 
-// Mock 5 Nodes (Matching the project specification: 5 Windows/Linux nodes)
+// Default Cluster Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
   {
     id: 'nod_01JABCDEF01',
