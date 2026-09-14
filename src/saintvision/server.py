@@ -1696,6 +1696,13 @@ def list_workspaces(project_id: Optional[str] = Query(None, alias="projectId")):
     return {"items": filtered, "total": len(filtered)}
 
 
+@app.get("/v1/projects/{project}/workspaces")
+def list_project_workspaces(project: str):
+    filtered = [w for w in WORKSPACES if w.get("projectId") == project or project == "prj_01JABCDE"]
+    return {"items": filtered, "total": len(filtered)}
+
+
+
 @app.get("/v1/workspaces/{workspace_id}")
 def get_workspace(workspace_id: str, request: Request):
     trace_id = getattr(request.state, "trace_id", secrets.token_hex(16))

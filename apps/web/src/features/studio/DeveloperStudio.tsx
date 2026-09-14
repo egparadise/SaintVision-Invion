@@ -176,13 +176,22 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       })
       .catch((err) => console.warn('Projects fetch fallback:', err));
 
-    apiClient<{ items: WorkspaceItem[] }>('/v1/workspaces')
+    const prjId = selectedProjectId || 'prj_01JABCDE';
+    apiClient<{ items: WorkspaceItem[] }>(`/v1/projects/${prjId}/workspaces`)
       .then((res) => {
         if (mounted && res.items && res.items.length > 0) {
           setWorkspaces(res.items);
         }
       })
-      .catch((err) => console.warn('Workspaces fetch fallback:', err));
+      .catch(() => {
+        apiClient<{ items: WorkspaceItem[] }>('/v1/workspaces')
+          .then((res) => {
+            if (mounted && res.items && res.items.length > 0) {
+              setWorkspaces(res.items);
+            }
+          })
+          .catch((err) => console.warn('Workspaces fetch fallback:', err));
+      });
 
     return () => {
       mounted = false;
@@ -243,6 +252,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   // Manual & Polling Active Run Refresh
   const refreshActiveRun = async () => {
     if (!activeRunId) return;
+    const prjId = selectedProjectId || 'prj_01JABCDE';
+    try {
+      const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
+      if (data && data.id) {
+        setLiveRun(data);
+        return;
+      }
+    } catch {
+      // fallback
+    }
     try {
       const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
       if (data && data.id) {
@@ -257,8 +276,18 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   useEffect(() => {
     if (!activeRunId) return;
     let mounted = true;
+    const prjId = selectedProjectId || 'prj_01JABCDE';
 
     const poll = async () => {
+      try {
+        const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
+        if (mounted && data && data.id) {
+          setLiveRun(data);
+          return;
+        }
+      } catch {
+        // fallback
+      }
       try {
         const data = await apiClient<RunItem>(`/v1/runs/${activeRunId}`);
         if (mounted && data && data.id) {
@@ -554,24 +583,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     setIsCancelling(true);
     const idempotencyKey = `idmp_cancel_${activeRunId}`;
     try {
-      try {
-        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
-          method: 'POST',
-          body: JSON.stringify({ reason: cancelReason }),
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/runs/${activeRunId}/cancel`, {
-            method: 'POST',
-            body: JSON.stringify({ reason: cancelReason }),
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
+      await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: cancelReason }),
+        idempotencyKey,
+      });
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled (Reason: ${cancelReason}). Outbox holds command until NodeStopReceipt verified.` },
@@ -594,22 +611,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     if (!activeRunId) return;
     const idempotencyKey = `idmp_resume_prep_${activeRunId}`;
     try {
-      try {
-        await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, {
-          method: 'POST',
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/runs/${activeRunId}/resume/prepare`, {
-            method: 'POST',
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/resume/prepare
+      await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/resume/prepare`, {
+        method: 'POST',
+        idempotencyKey,
+      });
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Resume Prepared] ADR-044 Frozen Input Hash locked. Approval step created (Attempt bound: 1..3).` },

@@ -55,22 +55,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     try {
       const prjId = run.projectId || 'prj_01JABCDE';
       const idempotencyKey = `idmp_resume_prep_${run.id}`;
-      try {
-        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, {
-          method: 'POST',
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        // Safe mutation fallback: Only fallback to flat endpoint if project-scoped endpoint is not found (Router 404)
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/runs/${run.id}/resume/prepare`, {
-            method: 'POST',
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/resume/prepare
+      await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, {
+        method: 'POST',
+        idempotencyKey,
+      });
       setResumeNotice(
         `✓ ADR-044 Workspace 재개 준비 완료: 불변 스냅샷 해시가 고정되었으며 Attempt #${(run.attempt ?? 1) + 1} 승인 요청이 발행되었습니다.`
       );

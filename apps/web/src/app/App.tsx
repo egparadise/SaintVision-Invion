@@ -22,7 +22,7 @@ import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage } from '@/contracts/types';
-import { apiClient, clearAuthToken, isRouteNotFoundError } from '@/shared/api/client';
+import { apiClient, clearAuthToken } from '@/shared/api/client';
 
 // Default Cluster Nodes (Matching the project specification: 5 Windows/Linux nodes)
 const INITIAL_NODES: NodeItem[] = [
@@ -317,6 +317,16 @@ export const App: React.FC = () => {
 
   const fetchRuns = React.useCallback(async () => {
     try {
+      const prjId = 'prj_01JABCDE';
+      const res = await apiClient<{ items: RunItem[] }>(`/v1/projects/${prjId}/runs`);
+      if (res.items?.length > 0) {
+        setRuns(res.items);
+        return;
+      }
+    } catch (err) {
+      console.warn('Live /v1/projects/.../runs fetch fallback:', err);
+    }
+    try {
       const res = await apiClient<{ items: RunItem[] }>('/v1/runs');
       if (res.items?.length > 0) {
         setRuns(res.items);
@@ -440,24 +450,12 @@ export const App: React.FC = () => {
       const targetRun = runs.find((r) => r.id === runId);
       const prjId = targetRun?.projectId || 'prj_01JABCDE';
       const idempotencyKey = `idmp_cancel_${runId}`;
-      try {
-        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
-        await apiClient(`/v1/projects/${prjId}/runs/${runId}/cancel`, {
-          method: 'POST',
-          body: JSON.stringify({ reason }),
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/runs/${runId}/cancel`, {
-            method: 'POST',
-            body: JSON.stringify({ reason }),
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
+      await apiClient(`/v1/projects/${prjId}/runs/${runId}/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+        idempotencyKey,
+      });
       fetchRuns();
     } catch (err) {
       console.warn('Backend run cancellation API error:', err);
