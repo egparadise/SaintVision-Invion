@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { WsTerminalClient } from '@/shared/realtime/ws-terminal';
-import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
+import { apiClient } from '@/shared/api/client';
 
 export interface WebTerminalProps {
   workspaceId: string;
@@ -40,28 +40,13 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           ...prev,
           `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
         ]);
-        let ticketData: { ticketId: string; ptyWsUrl?: string };
-        try {
-          ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
-            `/v1/workspaces/${workspaceId}/terminal-tickets`,
-            {
-              method: 'POST',
-              body: JSON.stringify({ workspaceId, sessionId }),
-            }
-          );
-        } catch (err: any) {
-          if (isRouteNotFoundError(err)) {
-            ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
-              '/v1/terminal/tickets',
-              {
-                method: 'POST',
-                body: JSON.stringify({ workspaceId, sessionId }),
-              }
-            );
-          } else {
-            throw err;
+        const ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+          `/v1/workspaces/${workspaceId}/terminal-tickets`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ workspaceId, sessionId }),
           }
-        }
+        );
         const ticket = ticketData.ticketId;
         if (!active) return;
 
@@ -123,28 +108,13 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         ...prev,
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
       ]);
-      let ticketData: { ticketId: string; ptyWsUrl?: string };
-      try {
-        ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
-          `/v1/workspaces/${workspaceId}/terminal-tickets`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ workspaceId, sessionId }),
-          }
-        );
-      } catch (err: any) {
-        if (isRouteNotFoundError(err)) {
-          ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
-            '/v1/terminal/tickets',
-            {
-              method: 'POST',
-              body: JSON.stringify({ workspaceId, sessionId }),
-            }
-          );
-        } else {
-          throw err;
+      const ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+        `/v1/workspaces/${workspaceId}/terminal-tickets`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ workspaceId, sessionId }),
         }
-      }
+      );
       const ticket = ticketData.ticketId;
 
       setTerminalOutput((prev) => [

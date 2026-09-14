@@ -68,14 +68,6 @@ export class DeploymentManager {
       upgradeHeader: false,
     },
     {
-      location: '/v1/terminal/ws',
-      targetUpstream: 'http://pacs-backend:8080/v1/terminal/ws',
-      protocol: 'WebSocket',
-      bufferingOff: true,
-      cacheControl: 'off',
-      upgradeHeader: true,
-    },
-    {
       location: '/v1/workspaces/{id}/terminals/{sessionId}',
       targetUpstream: 'http://pacs-backend:8080/v1/workspaces/.../terminals/...',
       protocol: 'WebSocket',

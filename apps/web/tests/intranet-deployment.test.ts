@@ -31,13 +31,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(sseRule?.protocol).toBe('SSE');
       expect(sseRule?.bufferingOff).toBe(true);
 
-      // WebSocket Terminal rule (Upgrade header required)
-      const wsRule = rules.find((r) => r.location === '/v1/terminal/ws');
-      expect(wsRule).toBeDefined();
-      expect(wsRule?.protocol).toBe('WebSocket');
-      expect(wsRule?.upgradeHeader).toBe(true);
-
-      // Canonical Workspace Terminal rule (ADR-038)
+      // Canonical Workspace Terminal rule (ADR-038, Upgrade header required)
       const canonicalWsRule = rules.find((r) => r.location.includes('/terminals/'));
       expect(canonicalWsRule).toBeDefined();
       expect(canonicalWsRule?.protocol).toBe('WebSocket');

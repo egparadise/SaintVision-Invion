@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.22"
+version: "1.0.23"
 status: "review"
 author: "Gemini"
-updated: "2026-09-14T17:30:00+09:00"
+updated: "2026-09-14T17:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---

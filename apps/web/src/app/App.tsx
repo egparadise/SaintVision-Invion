@@ -367,26 +367,12 @@ export const App: React.FC = () => {
       const apprv = approvals.find((a) => a.id === approvalId);
       const prjId = apprv?.projectId || 'prj_01JABCDE';
       const idempotencyKey = `idmp_apprv_${approvalId}_${nonce}`;
-      try {
-        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
-        await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
-          method: 'POST',
-          body: JSON.stringify({ decision: 'approve', nonce }),
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        // Safe mutation fallback: Only fallback to legacy flat route if route does not exist (Router 404).
-        // If the resource was not found (RES-404) or blocked (400, 401, 403, 409), re-throw without fallback.
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/approvals/${approvalId}/approve`, {
-            method: 'POST',
-            body: JSON.stringify({ nonce }),
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
+      await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
+        method: 'POST',
+        body: JSON.stringify({ decision: 'approve', nonce }),
+        idempotencyKey,
+      });
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
@@ -402,24 +388,12 @@ export const App: React.FC = () => {
       const apprv = approvals.find((a) => a.id === approvalId);
       const prjId = apprv?.projectId || 'prj_01JABCDE';
       const idempotencyKey = `idmp_reject_${approvalId}_${Date.now()}`;
-      try {
-        // 1. Attempt canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
-        await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
-          method: 'POST',
-          body: JSON.stringify({ decision: 'reject', reason }),
-          idempotencyKey,
-        });
-      } catch (err: any) {
-        if (isRouteNotFoundError(err)) {
-          await apiClient(`/v1/approvals/${approvalId}/reject`, {
-            method: 'POST',
-            body: JSON.stringify({ reason }),
-            idempotencyKey,
-          });
-        } else {
-          throw err;
-        }
-      }
+      // Canonical kernel endpoint: /v1/projects/{project}/approvals/{approvalId}/decision
+      await apiClient(`/v1/projects/${prjId}/approvals/${approvalId}/decision`, {
+        method: 'POST',
+        body: JSON.stringify({ decision: 'reject', reason }),
+        idempotencyKey,
+      });
       // Fetch fresh runs and approvals after server confirmed rejection
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
