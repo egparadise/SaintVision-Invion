@@ -51,3 +51,5 @@ Gemini는181 smoke/115 Vitest/67 two-PC checks와 embedded stopReceipt 폴백을
 **다음 Codex 통합 카드**: configured factory 기준 승인목록·reclaim·shard 조회/전체취소4개 미제공 경로의 계약 결정. 승인목록은 기존 project/run 승인 모델과 연결할 읽기 경로 검토, reclaim은 receipt 자동회수 의미를 유지하고 성공을 꾸미는 수동 endpoint를 만들지 않기, shard는 durable 부모Run/자식 binding/result 정본을 근거로 조회·취소의 tenant/권한/동시성 경계를 검토한다. Gemini는 fixture가 아닌 정본 factory에서 응답 스키마 대조, Claude는 검토 및 운영OIDC 설정 준비. 본 문단은 이4개 API 구현 완료를 뜻하지 않는다.
 
 Migration guard 정본은 온라인 진입점의 migration_guard.py이다. “없는 역할도 생성 거부”라는 외부 표현은 정정한다: 없는 그룹은 허용하고, 위험플래그가 있는 기존 그룹을 거부한다(실제13개 시험). helper와 통합할 때 published migration을 수정하거나 guard를 제거해 약한 운영그룹을 통과시키지 않는다.
+
+Obsidian 최종 확인 2026-09-14T13:48:43+09:00, source25c924aa5a17bdf0297f9ed2acab4982acb95aca: 관리778파일 전체hash일치/pending0/conflict0, check→apply→check 각exit0. 원문충돌3개는 보존 후 반영했다. receipt 추가 정본도 다시 내보낸다. OneDrive cloud 업로드는 미확인.
