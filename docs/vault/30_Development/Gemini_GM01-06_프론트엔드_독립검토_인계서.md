@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.31"
+version: "1.0.32"
 status: "review"
 author: "Gemini"
-updated: "2026-09-15T00:55:00+09:00"
+updated: "2026-09-15T01:30:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -24,7 +24,7 @@ source_of_truth: "Git"
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
 | **작업 브랜치** | `integration/all-agents-unified` |
-| **고정 구현 Commit SHA** | `6b32c5a` |
+| **고정 구현 Commit SHA** | `aad3d2b` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
 
@@ -91,6 +91,9 @@ source_of_truth: "Git"
 4. **외부 IdP 토큰 엔드포인트(`idpTokenUrl`) 연동 및 RFC 7519 JWT 클레임 해석 (`Login.tsx`, `pkce.ts`)**:
    - 외부 Keycloak/Authentik 구성 시 백엔드 fixture 브로커 의존 없이 순수 OIDC PKCE로 인증 완결.
    - `parseJwtPayload` 및 `resolveUserFromToken`으로 토큰 클레임(`sub`, `role`, `tenant_id`) 안전 해석.
+5. **ApprovalCenter 접근성 EmptyState 연동 및 테스트 확장 (`ApprovalCenter.tsx`, `approval-timeline.test.ts`)**:
+   - 대기 중인 승인 안건이 0건일 때 `EmptyState` 컴포넌트를 렌더링하여 빈 목록 프레임 방지 및 WCAG 2.1 AA 시각 피드백 강화.
+   - `approval-timeline.test.ts`에 빈 안건 목록 처리 테스트 추가하여 Vitest 스위트 **138/138 tests 100% 무오류 통과**.
 
 ---
 
@@ -103,7 +106,7 @@ source_of_truth: "Git"
 python tools/route_coverage.py --served src --served .worktrees/codex-workspace-bridge/services/control-plane/src --client apps/web/src
 .venv\Scripts\pytest tests/test_route_coverage.py
 
-# 2. 프론트엔드 전체 단위/프로토콜 시험 (22개 파일, 137개 테스트 100% 통과)
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (22개 파일, 138개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
