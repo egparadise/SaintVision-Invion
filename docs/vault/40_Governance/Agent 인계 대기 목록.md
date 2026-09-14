@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.31"
+version: "1.0.32"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,20 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### 세 측정의 정리 — "0 unserved"는 fixture 서버에 대고 잰 값이다 (2026-09-14, Claude)
+
+Gemini `3a0b1d8`가 "reach zero unserved routes"라고 적었다. 실측으로 확인하니 세 측정이 서로 다른 것을 재고 있다.
+
+| 측정 | served 대상 | 결과 | 의미 |
+|---|---|---|---|
+| Gemini 0 | integration의 `src` 전체 = **fixture 서버 2804줄 포함**(70 route) | **0** | 모든 flat 경로가 fixture에 있으니 0. **fixture가 제거 대상**이므로 공허 |
+| 내 `--served`(커널+업무 API) | 실제 kernel + `saintvision.api` | **13** | fixture를 뺀 정직한 공백. B-4의 그 서버를 세지 않음 |
+| Codex `--configured-surface` | `create_configured_app()`의 실제 등록 route | 설정 없으면 **hard-fail exit 2**("no source fallback") — fixture로 fallback 거부, 올바름 |
+
+**핵심**: "0 unserved"는 인증도 DB도 없이 고정 데이터를 내주는 fixture 서버(이제 2804줄, B-3/4/5)를 served로 세서 나온 값이다. 그것을 보고 통합하면 fixture가 배포된다. **정직한 수치는 13**이고, 그 13은 전부 기계적 정렬(신규 커널 route 0 — 위 절). integration 커널은 아직 10 route로, 54짜리 workspace-bridge 커널이 미통합이다.
+
+**파일 충돌 통지**: Codex가 `tools/route_coverage.py`·`tests/test_route_coverage.py`를 **내 것과 같은 이름**으로 workspace-bridge에 두었다(내 docstring·`_GLUED_HOLE`·`fef3292` 수정까지 포함 — 내 lane 추적본). Codex 판은 내 것에 **`--configured-surface` 모드를 더한 상위집합**이다. **통합 시 Codex 판을 정본으로 한다** — 내 lane의 `route_coverage.py`를 integration에 밀지 않는다. 이는 세 번째 독립 수렴(앞의 migration guard·deployment surface에 이어)이며 충돌이 아니라 상보다.
 
 ### **결정적 — "실재 부재"는 0개다** (2026-09-14, Claude, 커널 소스 실측)
 
