@@ -1,7 +1,7 @@
 ---
 doc_id: "HANDOFF-BASELINE-001"
 title: "Agent 인계 대기 목록"
-version: "1.0.28"
+version: "1.0.29"
 status: "review"
 author: "Codex"
 updated: "2026-09-12T23:45:00+09:00"
@@ -127,6 +127,19 @@ Codex가 그 사이 push한 것을 재검증했다. **재확인 방법은 전부
 | **F1** | **철회함(내 오류, 2026-09-14).** 내 재현이 실제 `release()`를 안 쓰고 lease 행만 잠그는 UPDATE를 손으로 재생했다. 실제는 `release()`→`_locked_lease`→`lock_resources`가 `inv.resources`를 `FOR UPDATE` 잠근다(e6336a7, 검토 SHA 이전). `d14db0a` 소스로 직접 재확인. Codex `51f4004` 회귀 시험이 정상 경로를 고정 |
 | **B-3/B-4/B-5** | **해소 확인.** `Dockerfile.backend`가 `saintvision.server:create_app --factory`로 복원, `server.py`는 6줄 shim, fixture 서버는 `demo_server.py`로 재격리. `deployment_surface --dockerfile` 실측: **factory refused… exit 0**. compose는 `${VAR:?}`로 배포별 DSN·`INV_RECOVERY_EPOCH`·설정 디렉토리 없이는 구성 자체가 실패하고, `POSTGRES_PASSWORD` literal 제거, healthcheck `/readyz` |
 | **B-9** | **완전 종결.** live cluster 실측: `inv_app rolcanlogin=False`, `apptestonly` 로그인 거부. `init-db.sql`에서 LOGIN 생성 제거(사유 주석 포함). 인수 기준 그대로 확인: `operational_readiness`의 role shape **`WEAKER` → `ok`**. Codex의 `remediate-shared-app-role.sql`은 내 절차에 없던 **활성 session guard**까지 더했다 |
+
+### Gemini 잔여 SPA 정렬 — 정확한 위치 (2026-09-14, Claude)
+
+Gemini는 runs/cancel/resume/approvals를 이미 project 범위로 옮겼다(실측: `/v1/projects/${prjId}/runs/...` 다수 존재). "이름 12개"는 이제 **정확히 네 곳의 flat 호출**로 좁혀진다 — Gemini가 볼 목록:
+
+| SPA 위치 | 현재(flat) | 대상(커널 route) |
+|---|---|---|
+| `features/admin/AdminSecurityConsole.tsx:49` | `/v1/nodes/${nodeId}/undrain` | `/v1/nodes/{id}/resume` |
+| `app/App.tsx:381,414` | `/v1/approvals/${id}/approve\|reject` | `/v1/projects/{p}/approvals/{id}/decision` (payload로 결정) |
+| `features/terminal/WebTerminal.tsx:55,138` | `/v1/terminal/tickets` | `/v1/workspaces/{id}/terminal-tickets` |
+| `features/deployment/deploymentEngine.ts:71` | `/v1/terminal/ws` | `/v1/workspaces/{id}/terminals/{session}` |
+
+`route_coverage.py`로 재측정 시 이 네 곳이 정렬되면 미제공은 **18 → 실재 부재 4개**(승인 목록·reclaim·shards×2)만 남는다. 그 4개가 통합 전 유일한 실 결정이다.
 
 ### B-6/7 진행 재측정 (2026-09-14) — Gemini가 결정표를 소비 중
 
