@@ -25,3 +25,5 @@ Windows `npm.cmd --prefix apps/web test`:25파일 **210passed**, exit0,3.97s(23:
 다음 Codex: 최신 Gemini 공유후보와 서버024a817/프론트ab8b645를 격리 통합해 configured backend+SPA 실제 승인 브라우저 여정 검증. 현재 두 후보는 별도 브랜치이며 단일 배포물 검증이 아니다. 서버migration0038 미반영 환경/기존 snapshot 없는 승인은 계속 보류된다. 기존 승인의 운영 전환/retained backup upgrade, 실제 IdP/원격PC·CI·독립검토는 미완료. Gemini UI·접근성 검토, Claude snapshot/결정 결속 독립검토 대기. 전체57.8125%(2775/4800),남음42.1875%유지.
 
 동일SHA CI4건은23:41:26KST 결제/한도 제한으로 job시작전 실패. [CI증거](../Evidence/approval-review-ui-ci-ab8b645.json). 문서404개/48task·ontology 검사exit0. CI/운영인수 완료 아님.
+
+전달확인:f79d21c push후23:41:49KST Obsidian check/apply/check exit0,893관리파일hash일치/pending0/conflict0. [영수증](../Evidence/approval-review-ui-sync-f79d21c.json). 로컬 사본 확인이며 cloud 업로드는 미측정.
