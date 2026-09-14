@@ -139,7 +139,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               PREFLIGHT PASS ✔
             </span>
             <strong style={{ fontSize: '14px', color: '#f0f6fc' }}>
-              내부망 배포 사전 검증 파이프라인 무오류 통과 (181/181 Checks PASS)
+              내부망 배포 사전 검증 파이프라인 무오류 통과 (186/186 Checks PASS)
             </strong>
           </div>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>

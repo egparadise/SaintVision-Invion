@@ -708,6 +708,21 @@ async function runFullSmokeJourney() {
     assert('Raw artifact content includes X-Checksum-SHA256 header', Boolean(rawArtRes.headers.get('X-Checksum-SHA256')));
     assert('Raw artifact content-type is octet-stream', rawArtRes.headers.get('Content-Type')?.includes('application/octet-stream'));
 
+    // Project-Scoped Canonical Endpoints (Kernel & Control-Plane Unified)
+    const prjDlRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs/${dispatchedRun.id}/artifacts/download`);
+    assert('GET /v1/projects/{project}/runs/{id}/artifacts/download returns HTTP 200', prjDlRes.status === 200);
+
+    const prjResultRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs/${dispatchedRun.id}/result`);
+    assert('GET /v1/projects/{project}/runs/{id}/result returns HTTP 200', prjResultRes.status === 200);
+    const prjResultData = await prjResultRes.json();
+    assert('Project-scoped ResultView confirms runId and projectId', prjResultData.runId === dispatchedRun.id && prjResultData.projectId === 'prj_01JABCDE');
+
+    const prjArtsRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs/${dispatchedRun.id}/artifacts`);
+    assert('GET /v1/projects/{project}/runs/{id}/artifacts returns HTTP 200', prjArtsRes.status === 200);
+
+    const prjRawArtRes = await fetch(`${BACKEND_URL}/v1/projects/prj_01JABCDE/runs/${dispatchedRun.id}/artifacts/content?path=output.log`);
+    assert('GET /v1/projects/{project}/runs/{id}/artifacts/content returns HTTP 200 raw bytes', prjRawArtRes.status === 200);
+
     // 8. Placement candidate discovery explanation
     const candRes = await fetch(`${BACKEND_URL}/v1/discovery/candidates?minCores=4&minMemoryGb=8`);
     assert('GET /v1/discovery/candidates returns HTTP 200', candRes.status === 200);

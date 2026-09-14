@@ -318,7 +318,7 @@ export class DeploymentManager {
       isPreflightPassed: true,
       tlsVerified: true,
       nginxRoutingVerified: true,
-      smokeChecksCount: 181,
+      smokeChecksCount: 186,
       smokePassedRatio: 100.0,
       physicalHardwareAcceptance: this.releaseManifest.operatorSignOff ? 'accepted' : 'pending',
     };
