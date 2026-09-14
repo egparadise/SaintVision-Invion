@@ -437,8 +437,8 @@ export const App: React.FC = () => {
       <Header
         currentTheme={theme}
         onToggleTheme={toggleTheme}
-        onlineNodesCount={5}
-        totalNodesCount={5}
+        onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
+        totalNodesCount={nodes.length}
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);

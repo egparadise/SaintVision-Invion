@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient, isRouteNotFoundError } from '@/shared/api/client';
+import { cancelKernelRun } from '@/shared/api/kernelMutations';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -114,10 +115,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     setIsBulkCancelling(true);
     const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      await apiClient(`/v1/projects/${prjId}/runs/${run.id}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason: 'Parent batch cancellation requested' }),
-      });
+      await cancelKernelRun(prjId, run.id);
       setReclaimNotice('⚡ 모든 분산 샤드에 일괄 취소 명령이 원자적으로 전달되었습니다. (자원 반환 대기 중)');
       const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
       if (res?.items) {

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { apiClient } from './client';
-import { cancelKernelRun, decideApproval } from './kernelMutations';
+import { apiClient } from '@/shared/api/client';
+import { cancelKernelRun, decideApproval } from '@/shared/api/kernelMutations';
 
-vi.mock('./client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'test-intent-key' }));
+vi.mock('@/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'test-intent-key' }));
 const api = vi.mocked(apiClient);
 beforeEach(() => api.mockReset());
 

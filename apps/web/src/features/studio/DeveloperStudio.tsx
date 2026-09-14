@@ -14,6 +14,7 @@ import {
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { apiClient, isRouteNotFoundError, getAuthToken } from '@/shared/api/client';
+import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 
@@ -555,17 +556,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handleCancelSubmit = async () => {
     if (!activeRunId) return;
     setIsCancelling(true);
-    const idempotencyKey = `idmp_cancel_${activeRunId}`;
     try {
-      // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/cancel
-      await apiClient(`/v1/projects/${selectedProjectId}/runs/${activeRunId}/cancel`, {
-        method: 'POST',
-        body: JSON.stringify({ reason: cancelReason }),
-        idempotencyKey,
-      });
+      await cancelKernelRun(selectedProjectId, activeRunId);
       setLogs((prev) => [
         ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled (Reason: ${cancelReason}). Outbox holds command until NodeStopReceipt verified.` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'WARN', message: `[Cancel] Run '${activeRunId}' cancelled. Outbox holds command until NodeStopReceipt verified.` },
       ]);
       setReclaimNotice('⚡ 취소 명령이 발행되었습니다. NodeStopReceipt 수신 시까지 Outbox에 보류됩니다.');
       setShowCancelModal(false);
