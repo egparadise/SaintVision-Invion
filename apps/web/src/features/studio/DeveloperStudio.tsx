@@ -753,7 +753,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 return (
                   <div
                     key={proj.id}
-                    
+
                     style={{
                       padding: '20px',
                       borderRadius: 'var(--radius-md)',
