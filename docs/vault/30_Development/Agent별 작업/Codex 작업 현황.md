@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.38"
+version: "1.0.39"
 status: "review"
 author: "Codex"
-updated: "2026-09-14T17:56:33+09:00"
+updated: "2026-09-14T19:47:26+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+- 최신 [[2026-09-14_BACKUP-OPEN-GUARD_Codex_검증보고]]:3eced3b 보관 백업을 기존 ReadRoot로 읽도록 통합, Windows 관련42개 및 clean SHA 독립 PostgreSQL 복원130테이블/0037/tenant격리 통과. .225 TCP 불가·CI billing 차단·독립검토 pending, 전체57.81% 유지.
 
 - 최신 [[2026-09-14_LEGACY-ROLE-REPAIR_Codex_검증보고]]:공용LOGIN재발관측,구Codex상주코드경로의위험fixture를4da131f로backport수정·격리PG21개통과. 실제재활성화주체는불명. 기존승인으로17:54:35 재폐기·권한보존. [[2026-09-14_INDEPENDENT-RESTORE_Codex_검증보고]]:33785f2 보관백업130테이블독립cluster복원/0037·replay/definer9·tenant격리통과. 원격/CI/운영인수미완료,전체57.81% 유지.
 
@@ -111,7 +113,7 @@ source_of_truth: "Git"
 
 - owner / reviewer: Codex / Claude; status: in_progress; priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-08 / AC-01, AC-08.
-- 다음 첫 행동: a7d0f5e 로컬 sample/읽기 전용 경계까지 전달했다. 기존 Node mTLS/epoch·challenge·승인 root 설정 버전과 관측을 묶고 StorageCheck/Evidence 원자 기록을 구현한다. Claude 독립 검토와 실제 .225 profile 수신/원격7개는 별도다.
+- 다음 첫 행동: 서명 sample/0037 Evidence 원자 기록과 Windows bundle 연결은 구현·로컬 검증됐으며, 최신 보고를 따른다. 운영 OIDC 입력·최신 migration/프로필 배포 조건을 확인하고 실제 .225 설치 후 mTLS/7개 시험을 수행한다. 독립 검토·CI·운영 인수는 미완료다.
 - 필요한 합격 증거: 미확인 항목에 결정 담당·차단 범위 명시, 비밀값 없는 버전 계약, Claude/Gemini가 구현할 입력·출력 합의. 실제 계정값은 운영자 확인 필요.
 - 선행/차단과 해소 담당: 초안/계약 검토는 즉시 가능. 운영 권한/장비 정보 확정은 운영자 입력 필요.
 - 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
