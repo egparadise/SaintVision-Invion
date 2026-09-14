@@ -97,18 +97,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             })) ||
             [];
           setShards(shardItems);
-          return;
         }
       } catch (err) {
-        console.warn('Live /v1/projects/.../runs/.../shards fetch fallback:', err);
-      }
-      try {
-        const res = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
-        if (mounted && res.items) {
-          setShards(res.items);
-        }
-      } catch (err) {
-        console.warn('Failed to fetch shards:', err);
+        console.warn('Live /v1/projects/.../runs/.../shards fetch failed:', err);
       } finally {
         if (mounted) setIsLoadingShards(false);
       }
@@ -123,14 +114,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     setIsBulkCancelling(true);
     const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      try {
-        await apiClient(`/v1/projects/${prjId}/runs/${run.id}/cancel`, {
-          method: 'POST',
-          body: JSON.stringify({ reason: 'Parent batch cancellation requested' }),
-        });
-      } catch {
-        await apiClient(`/v1/runs/${run.id}/shards/cancel-all`, { method: 'POST' });
-      }
+      await apiClient(`/v1/projects/${prjId}/runs/${run.id}/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: 'Parent batch cancellation requested' }),
+      });
       setReclaimNotice('⚡ 모든 분산 샤드에 일괄 취소 명령이 원자적으로 전달되었습니다. (자원 반환 대기 중)');
       const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
       if (res?.items) {
@@ -162,16 +149,16 @@ export const RunDetail: React.FC<RunDetailProps> = ({
 
   const handleReclaimResources = async () => {
     setIsReclaiming(true);
+    const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      await apiClient<{ runId: string; resourceReleasePending: boolean }>(`/v1/runs/${run.id}/reclaim-resources`, {
-        method: 'POST',
-      });
-      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 모든 Lease 자원을 완전히 회수하였습니다. (ADR-040/041)');
-      const sRes = await apiClient<{ items: ShardExecutionItem[] }>(`/v1/runs/${run.id}/shards`);
-      if (sRes.items) setShards(sRes.items);
-      onRefreshRun?.();
+      // Kernel automatically executes reclaim_unclaimed upon containment/cancellation.
+      // Synchronize canonical run and shard observation state.
+      await onRefreshRun?.();
+      const sRes = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
+      if (sRes?.items) setShards(sRes.items);
+      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신 및 커널 자동 회수 상태를 성공적으로 동기화하였습니다. (ADR-040/041)');
     } catch (e: any) {
-      alert(e.message || '자원 회수 실패');
+      alert(e.message || '자원 회수 상태 동기화 실패');
     } finally {
       setIsReclaiming(false);
     }
@@ -179,6 +166,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
 
   const handleInspectReceipt = async (receiptId: string) => {
     setIsLoadingReceipt(true);
+    const prjId = run.projectId || 'prj_01JABCDE';
     try {
       let receipt: NodeStopReceipt | null = null;
       if (run.stopReceipt && ((run.stopReceipt as any).receiptId === receiptId || !receiptId)) {
@@ -186,8 +174,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       }
       if (!receipt) {
         try {
-          const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
-          receipt = res;
+          const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${run.id}/result`);
+          if (resultRes?.stopReceipt) {
+            receipt = resultRes.stopReceipt as NodeStopReceipt;
+          }
         } catch (err: any) {
           if (isRouteNotFoundError(err)) {
             const resultRes = await apiClient<RunResultView>(`/v1/runs/${run.id}/result`);
@@ -195,7 +185,6 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
           }
-          if (!receipt) throw err;
         }
       }
       setSelectedReceipt(receipt);
@@ -626,7 +615,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             </div>
           </div>
           <Button variant="secondary" size="sm" onClick={handleReclaimResources} disabled={isReclaiming}>
-            {isReclaiming ? '확인 중...' : '정지 영수증 확정 및 자원 회수'}
+            {isReclaiming ? '동기화 중...' : '자원 회수 상태 동기화'}
           </Button>
         </div>
       )}

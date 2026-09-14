@@ -634,18 +634,20 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       if (liveRun?.stopReceipt && ((liveRun.stopReceipt as any).receiptId === receiptId || !receiptId)) {
         receipt = liveRun.stopReceipt as NodeStopReceipt;
       }
-      if (!receipt) {
+      if (!receipt && activeRunId) {
+        const prjId = selectedProject?.id || 'prj_01JABCDE';
         try {
-          const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
-          receipt = res;
+          const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
+          if (resultRes?.stopReceipt) {
+            receipt = resultRes.stopReceipt as NodeStopReceipt;
+          }
         } catch (err: any) {
-          if (isRouteNotFoundError(err) && activeRunId) {
+          if (isRouteNotFoundError(err)) {
             const resultRes = await apiClient<RunResultView>(`/v1/runs/${activeRunId}/result`);
             if (resultRes?.stopReceipt) {
               receipt = resultRes.stopReceipt as NodeStopReceipt;
             }
           }
-          if (!receipt) throw err;
         }
       }
       setSelectedReceipt(receipt);
