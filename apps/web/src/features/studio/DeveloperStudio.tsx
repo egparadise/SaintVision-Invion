@@ -622,8 +622,26 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handleInspectReceipt = async (receiptId: string) => {
     setIsLoadingReceipt(true);
     try {
-      const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
-      setSelectedReceipt(res);
+      let receipt: NodeStopReceipt | null = null;
+      if (liveRun?.stopReceipt && ((liveRun.stopReceipt as any).receiptId === receiptId || !receiptId)) {
+        receipt = liveRun.stopReceipt as NodeStopReceipt;
+      }
+      if (!receipt) {
+        try {
+          const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
+          receipt = res;
+        } catch (err: any) {
+          if (isRouteNotFoundError(err) && activeRunId) {
+            const prj = selectedProjectId ? `projects/${selectedProjectId}/` : '';
+            const resultRes = await apiClient<any>(`/v1/${prj}runs/${activeRunId}/result`);
+            if (resultRes?.stopReceipt) {
+              receipt = resultRes.stopReceipt;
+            }
+          }
+          if (!receipt) throw err;
+        }
+      }
+      setSelectedReceipt(receipt);
       setReceiptModalOpen(true);
       setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
     } catch (err: any) {

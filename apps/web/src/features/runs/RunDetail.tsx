@@ -137,8 +137,26 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const handleInspectReceipt = async (receiptId: string) => {
     setIsLoadingReceipt(true);
     try {
-      const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
-      setSelectedReceipt(res);
+      let receipt: NodeStopReceipt | null = null;
+      if (run.stopReceipt && ((run.stopReceipt as any).receiptId === receiptId || !receiptId)) {
+        receipt = run.stopReceipt as NodeStopReceipt;
+      }
+      if (!receipt) {
+        try {
+          const res = await apiClient<NodeStopReceipt>(`/v1/receipts/${receiptId}`);
+          receipt = res;
+        } catch (err: any) {
+          if (isRouteNotFoundError(err)) {
+            const prj = run.projectId ? `projects/${run.projectId}/` : '';
+            const resultRes = await apiClient<any>(`/v1/${prj}runs/${run.id}/result`);
+            if (resultRes?.stopReceipt) {
+              receipt = resultRes.stopReceipt;
+            }
+          }
+          if (!receipt) throw err;
+        }
+      }
+      setSelectedReceipt(receipt);
     } catch (e: any) {
       alert(e.message || '영수증 조회 실패');
     } finally {

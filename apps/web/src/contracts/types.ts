@@ -193,6 +193,7 @@ export interface RunItem {
   nodeId?: string;
   entrypoint?: string;
   leaseId?: string;
+  stopReceipt?: NodeStopReceipt;
 }
 
 export interface WorkspaceResumeSpec {
