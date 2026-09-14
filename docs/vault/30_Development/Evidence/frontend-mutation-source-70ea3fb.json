@@ -1,0 +1,22 @@
+{
+  "frontendSHA": "70ea3fbf9bf0a6f536450b392074f7366945f318",
+  "kernelBase": "16a894ad314cb1a7bfd721e02f49bc3ba9270de6",
+  "files": [
+    {
+      "path": "apps/web/src/app/App.tsx",
+      "sha256": "528cbdf9d8d2d3ae0380d7e0feb094a872a55109836e7268a28a69d8a0be4acb"
+    },
+    {
+      "path": "apps/web/src/features/runs/RunDetail.tsx",
+      "sha256": "5b82230177bf7f216a88ae557c6e40cdbd41275f34a9f0d98b04190c4767cf86"
+    },
+    {
+      "path": "apps/web/src/features/approvals/ApprovalDetail.tsx",
+      "sha256": "9a0357eeb35c7b6c2a842c83a635e4d9f2b1f517e9f58a91beb5c3bfcc580206"
+    },
+    {
+      "path": "apps/web/src/contracts/types.ts",
+      "sha256": "02a9f7fd01d2bc2c783e4b92e946840a6551ea308c9d918471ab77d7ebf0fa87"
+    }
+  ]
+}
