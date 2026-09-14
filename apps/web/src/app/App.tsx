@@ -21,9 +21,10 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage, ProjectItem } from '@/contracts/types';
+import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
 import { fetchProjects } from '@/shared/api/projectObservation';
+import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
@@ -40,7 +41,11 @@ export const App: React.FC = () => {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
   const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
-  const [currentReviewerId, setCurrentReviewerId] = useState('usr_reviewer_02');
+  const [runError, setRunError] = useState<string | null>(null);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
+  const activeProject = useRef('');
+  const runRequest = useRef(0);
+  const approvalRequest = useRef(0);
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
@@ -52,6 +57,8 @@ export const App: React.FC = () => {
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
+    activeProject.current = id;
+    setRunError(null); setApprovalError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -91,52 +98,26 @@ export const App: React.FC = () => {
   }, [currentUser]);
 
   const fetchRuns = React.useCallback(async () => {
+    if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const scope = scopeRef.current;
+    const request = ++runRequest.current;
     try {
-      if (!currentUser || !projectId) return;
-      const requestScope = scopeRef.current;
-      const prjId = encodeURIComponent(projectId);
-      const res = await apiClient<{ items: RunItem[] }>(`/v1/projects/${prjId}/runs`);
-      if (scopeRef.current === requestScope && res.items) {
-        setRuns(res.items);
-      }
-    } catch (err) {
-      console.warn('Live /v1/projects/.../runs fetch failed:', err);
+      const items = await fetchObservedRuns(projectId);
+      if (scopeRef.current === scope && request === runRequest.current) { setRuns(items); setRunError(null); }
+    } catch {
+      if (scopeRef.current === scope && request === runRequest.current) { setRuns([]); setRunError('Run 목록을 확인하지 못했습니다.'); }
     }
   }, [currentUser, projectId]);
 
   const fetchApprovals = React.useCallback(async () => {
+    if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const scope = scopeRef.current;
+    const request = ++approvalRequest.current;
     try {
-      if (!currentUser || !projectId) return;
-      const requestScope = scopeRef.current;
-      const prjId = encodeURIComponent(projectId);
-      const res = await apiClient<ApprovalPage>(`/v1/projects/${prjId}/approvals`);
-      if (scopeRef.current === requestScope && res?.items) {
-        setApprovals(
-          res.items.map((item: any) => ({
-            id: item.approvalId || item.id,
-            actionDigest: item.actionDigest,
-            projectId: item.projectId,
-            runId: item.runId,
-            workspaceId: item.workspaceId || 'wsp_01JABCDE001',
-            nodeId: item.nodeId || 'nod_01JABCDEF01',
-            riskLevel: item.riskLevel || (item.requiredApprovals === 2 ? 'L2' : 'L1'),
-            target: item.target || 'Workspace Sandbox',
-            command: item.command || 'deploy.release',
-            status: item.status || 'pending',
-            nonce: item.nonce || '',
-            expiresAt: item.expiresAt,
-            requestedBy: item.requesterId || item.requestedBy,
-            policyReason: item.policyVersion ? `Policy ${item.policyVersion}` : 'Security Review Required',
-            boundRunVersion: item.runVersion || item.boundRunVersion || 1,
-            estimatedCostKrw: item.estimatedCostKrw || 0,
-            remainingBudgetKrw: item.remainingBudgetKrw || 10000000,
-            blastRadius: item.blastRadius || 'workspace_isolated',
-            createdAt: item.createdAt || new Date().toISOString(),
-          }))
-        );
-      }
-    } catch (err) {
-      console.warn('Live /v1/projects/.../approvals fetch failed:', err);
+      const items = await fetchObservedApprovals(projectId);
+      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals(items); setApprovalError(null); }
+    } catch {
+      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals([]); setApprovalError('승인 목록을 확인하지 못했습니다.'); }
     }
   }, [currentUser, projectId]);
 
@@ -168,7 +149,7 @@ export const App: React.FC = () => {
   const handleApprove = async (approvalId: string, _nonce: string) => {
     try {
       const approval = approvals.find((a) => a.id === approvalId);
-      if (!approval) throw new Error('승인 요청을 새로고침하세요.');
+      if (!approval || !approval.command || !approval.riskLevel) throw new Error('승인할 작업 내용과 위험도를 먼저 확인해야 합니다.');
       await decideApproval(approval, 'approve');
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
@@ -239,6 +220,8 @@ export const App: React.FC = () => {
           <option value="">프로젝트 선택</option>
           {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
         </select>{projectError && <span role="alert">{projectError}</span>}</label>}
+        {runError && <p role="alert">{runError}</p>}
+        {approvalError && <p role="alert">{approvalError}</p>}
         {/* Tab 1: Dashboard */}
         {activeTab === 'dashboard' && (
           <ClusterOverview
@@ -471,8 +454,7 @@ export const App: React.FC = () => {
         {activeTab === 'approvals' && (
           <ApprovalCenter
             approvals={approvals}
-            currentUserId={currentReviewerId}
-            onChangeUser={(newId) => setCurrentReviewerId(newId)}
+            currentUserId={currentUser?.id ?? ''}
             onApprove={handleApprove}
             onReject={handleReject}
           />
@@ -496,7 +478,6 @@ export const App: React.FC = () => {
           <Login
             onLoginSuccess={(user) => {
               setCurrentUser(user);
-              setCurrentReviewerId(user.id);
               setActiveTab('dashboard');
             }}
           />

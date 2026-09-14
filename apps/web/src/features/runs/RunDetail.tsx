@@ -229,7 +229,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-              {run.objective}
+              {run.objective ?? '작업 목적 미관측'}
               {run.frozenInputHash && (
                 <span style={{ marginLeft: '12px', color: '#58a6ff', fontFamily: 'monospace' }}>
                   🔒 Frozen: {run.frozenInputHash.slice(0, 18)}... ({run.frozenInputSizeBytes ?? 0} B)

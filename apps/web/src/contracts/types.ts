@@ -144,38 +144,39 @@ export interface ExecutionResultItem {
 export interface ApprovalItem {
   id: string; // apr_...
   actionDigest?: string;
+  requiredApprovals?: 1 | 2;
   projectId?: string;
   runId: string;
-  workspaceId: string;
-  nodeId: string;
-  riskLevel: RiskLevel;
-  target: string;
-  command: string;
+  workspaceId?: string;
+  nodeId?: string;
+  riskLevel?: RiskLevel;
+  target?: string;
+  command?: string;
   unifiedDiff?: string;
-  estimatedCostKrw: number;
-  remainingBudgetKrw: number;
-  blastRadius: 'workspace_isolated' | 'host_boundary' | 'network_wide';
+  estimatedCostKrw?: number;
+  remainingBudgetKrw?: number;
+  blastRadius?: 'workspace_isolated' | 'host_boundary' | 'network_wide';
   rollbackPlan?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'expired';
-  nonce: string;
+  status: 'pending' | 'approved' | 'rejected' | 'expired' | 'dispatched';
+  nonce?: string;
   expiresAt: string;
   requestedBy?: string;
   firstApprovedBy?: string;
   secondApprovedBy?: string;
   policyReason: string;
   boundRunVersion?: number;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface RunItem {
   id: string; // run_...
   projectId: string;
-  workspaceId: string;
-  objective: string;
+  workspaceId?: string;
+  objective?: string;
   state: RunState;
-  requestedBy: string;
-  createdAt: string;
-  updatedAt: string;
+  requestedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
   parentId?: string;
   childRunIds?: string[];
   resourceReleasePending?: boolean;

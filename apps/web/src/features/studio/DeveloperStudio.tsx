@@ -1900,16 +1900,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#d29922' }}>
                       거버넌스 승인 대기 중 (Awaiting Governance Approval)
                     </h3>
-                    {matchedApproval && <RiskBadge level={matchedApproval.riskLevel} />}
+                    {matchedApproval?.riskLevel ? <RiskBadge level={matchedApproval.riskLevel} /> : <span>위험도 미관측</span>}
                   </div>
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '12px', lineHeight: 1.5 }}>
                     {matchedApproval?.policyReason || '원격 노드 실행 또는 특권 자원 접근 정책(Rule #304)에 따라 검토자의 승인이 완료되어야 실행이 재개됩니다.'}
                   </p>
 
                   <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
-                    <span>🆔 안건 ID: <code>{matchedApproval?.id || 'apr_01JXYZ987654'}</code></span>
-                    <span>🔑 Idempotency Nonce: <code>{matchedApproval?.nonce || 'nonce_987654321'}</code></span>
-                    <span>🎯 대상: <strong>{matchedApproval?.target || 'Workspace Sandbox on Node-01'}</strong></span>
+                    <span>🆔 안건 ID: <code>{matchedApproval?.id ?? '미관측'}</code></span>
+                    <span>🔑 Idempotency Nonce: <code>{matchedApproval?.nonce ?? '승인 시 challenge 발급'}</code></span>
+                    <span>🎯 대상: <strong>{matchedApproval?.target ?? '미관측'}</strong></span>
                     {matchedApproval?.expiresAt && (
                       <span>⏳ 만료 예정: {new Date(matchedApproval.expiresAt).toLocaleTimeString()}</span>
                     )}
@@ -1917,13 +1917,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {onApprove && matchedApproval && (
+                  {onApprove && matchedApproval?.command && matchedApproval.riskLevel && (
                     <Button
                       variant="primary"
                       size="sm"
                       onClick={async () => {
                         try {
-                          await onApprove(matchedApproval.id, matchedApproval.nonce);
+                          await onApprove(matchedApproval.id, matchedApproval.nonce ?? '');
                           refreshActiveRun();
                           onRefreshRuns?.();
                         } catch {

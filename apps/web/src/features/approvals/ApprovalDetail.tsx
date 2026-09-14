@@ -38,14 +38,14 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   const isDiffLoadFailed = diffRequired && !hasDiff;
 
   // Two-Person Rule constraint
-  const isRequester = Boolean(approval.requestedBy && approval.requestedBy === currentUserId) || currentUserId === 'usr_requester_alice';
+  const isRequester = Boolean(approval.requestedBy && approval.requestedBy === currentUserId);
   const isFirstApprover = approval.firstApprovedBy === currentUserId;
   const isWaitingSecondApproval = Boolean(approval.firstApprovedBy && !approval.secondApprovedBy);
   const isSelfApprovalBlocked = (isWaitingSecondApproval && isFirstApprover) || isRequester;
 
   const canApprove =
     !isExpired &&
-    Boolean(approval.actionDigest) &&
+    Boolean(currentUserId && approval.actionDigest && approval.riskLevel && approval.command) &&
     !isSubmitting &&
     (!diffRequired || hasDiff) &&
     !isSelfApprovalBlocked &&
@@ -61,7 +61,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
     if (!canApprove) return;
     setIsSubmitting(true);
     try {
-      await onApprove(approval.id, approval.nonce);
+      await onApprove(approval.id, approval.nonce ?? '');
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +102,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <RiskBadge level={approval.riskLevel} />
+          {approval.riskLevel ? <RiskBadge level={approval.riskLevel} /> : <span>위험도 미관측</span>}
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
             승인 요청: <code>{approval.id}</code>
           </h2>
@@ -142,6 +142,8 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
       </div>
 
       <div style={{ padding: '24px' }}>
+        {(!approval.riskLevel || !approval.command) && <p role="status">승인할 작업 내용과 위험도를 확인하지 못해 승인이 보류됩니다.</p>}
+        <p>작업 다이제스트: <code>{approval.actionDigest ?? '미관측'}</code> · 필요 승인 수: {approval.requiredApprovals ?? '미관측'}</p>
         {/* Key Execution Metadata Grid */}
         <div
           style={{
@@ -157,28 +159,28 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>실행 대상:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.target} (Node: {approval.nodeId})
+              {approval.target ?? '미관측'} (Node: {approval.nodeId ?? '미관측'})
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>명령 / 도구:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace', marginTop: '2px' }}>
-              {approval.command}
+              {approval.command ?? '미관측'}
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>비용 / 잔여 예산:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.estimatedCostKrw.toLocaleString()} KRW 소모 예상 (잔여 {approval.remainingBudgetKrw.toLocaleString()} KRW)
+              {approval.estimatedCostKrw?.toLocaleString() ?? '미관측'} KRW 소모 예상 (잔여 {approval.remainingBudgetKrw?.toLocaleString() ?? '미관측'} KRW)
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>영향 반경:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.blastRadius === 'workspace_isolated' ? '🟢 워크스페이스 격리 유지' : '🔴 호스트 경계 / 외부 영향 가능'}
+              {!approval.blastRadius ? '미관측' : approval.blastRadius === 'workspace_isolated' ? '🟢 워크스페이스 격리 유지' : '🔴 호스트 경계 / 외부 영향 가능'}
             </div>
           </div>
         </div>
