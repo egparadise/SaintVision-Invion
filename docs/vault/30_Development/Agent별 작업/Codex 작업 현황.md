@@ -363,3 +363,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 2026-09-15T18:54:05+09:00 Desktop 실HTTP 검증 착수, base0fcbea4/agent/codex/vf-desktop-http. [[2026-09-15_VF-DESKTOP-HTTP_Codex]].
 
 - Desktop 실HTTP/PG: 관련57통과, 명시적browser2재검증통과/0skip. Claude b30a723 배포권한보강 독립검토 수신(Desktop검토 아님). 전용browser CI 추가. [[2026-09-15_VF-DESKTOP-HTTP_Codex]]. 다음 Gemini·Claude 이번변경검토/운영owner CI·SSO·장비.
+
+- PR30/7c55fea push: 실제브라우저→canonical HTTP→비소유자PG 검증, 관련57/최종browser2통과. 전용Desktop CI도 billing실행전차단. [[2026-09-15_VF-DESKTOP-HTTP_Codex]], 다음 Gemini·Claude 독립검토/운영owner 선행조건.

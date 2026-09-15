@@ -25,3 +25,13 @@ source_of_truth: "Git"
 - 전용 Desktop HTTP Browser Acceptance CI를 추가했다. Node22/Python3.12/Playwright1.62.0 Chromium 설치 후 동일 격리 runner 실행, 2pass/0skip/컨테이너제거를 강제한다. backend/core는 이 파일만 전용 job에 맡긴다. CI 실행 결과는 push 후 따로 기록한다.
 - `python tools/check_docs.py`481문서 exit0, `python tools/check_ontology.py`exit0. 제품 코드 변경 없음. 프런트엔드 build242시험 증거는 기반81987d3이며 이번 실행으로 재계산하지 않는다.
 - 다음 담당: Gemini 실제 Desktop 화면/접근성 독립 검토, Claude 이번 harness/CI와 수정된 HTTPBearer 기대값 검토. 운영 owner는 SSO·5대/PITR·CI billing. 기존57.81%/VF운영0/5 유지.
+
+## 고정 SHA 전달
+
+- 코드 `7c55fea796dd0ceffd4522dea38b92eadf755729` commit/push exit0, [Draft PR30](https://github.com/egparadise/SaintVision-Invion/pull/30), base PR29.
+- 동일 SHA Actions: backend34955324585/core34955324722/docs34955324686/Desktop34955324668/frontend34955324511, 6check 모두 billing/spending limit 사유로 job 시작 전 차단. 특히 새 browser job도 실행 전 차단이며 Linux CI 성공으로 표기하지 않는다. 원문 receipt: Evidence/vf-desktop-http/ci.json.
+- 전체 `sync_obsidian.py --check` exit1, 외부 편집 충돌로 쓰기 없음. base0fcbea4와 공유본을 대조해 이번 문서만 제한 동기화한다. 일반 Codex 작업판 공유본의 외부 편집은 보존한다.
+- 구현/로컬실HTTP/PG/브라우저 검증 완료. 새로운 독립검토·CI build·운영 인수 미완. ready 후속인 Desktop 실HTTP 경계 검증까지 전달했고 남은 VF 운영 선행조건은 기존과 같다.
+- 다음 첫 행동: Gemini는 PR29/30 Desktop 접근성 및 실HTTP 여정 독립검토; Claude는 PR30 test/CI 및 storage missing bearer401 기대값 검토. 운영 owner는 billing·SSO/PITR/5대 접근 복구, Codex는 수신 finding 재현 및 수정. 기존 진행률 유지.
+
+- scoped Obsidian check→apply→check exit0: 8파일 hash 일치, pending0/conflict0. receipt와 최종보고를 같은 관리 state로 재동기화한다. 문서481/ontology/소스diff 검사통과.
