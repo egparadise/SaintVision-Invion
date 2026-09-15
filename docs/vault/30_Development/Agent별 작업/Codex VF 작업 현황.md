@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.0"
+version: "1.0.1"
 status: "in_progress"
 author: "Codex"
 updated: "2026-09-15T11:47:29+09:00"
@@ -16,7 +16,7 @@ source_of_truth: "Git"
 
 | 카드 | 현재 상태 | 다음 행동 |
 |---|---|---|
-| VF-CX-01 | canonical factory·fixture 격리 구현, 통합 검증 진행 | Linux 복원/definer 검증 → Evidence 고정/독립 검토 인계 |
+| VF-CX-01 | canonical factory·fixture 격리 구현, 통합 검증 진행 | [[2026-09-15_VF-CX-01_Codex_인계]]; 41 Linux/5 factory 통과, CI billing blocked; 전체 최종 재회귀 진행 |
 | VF-CX-02 | ready (01 일부 보안 경계 로컬 검증) | 기존 DataLocation/Lease 위 manifest 계약과 검증 commit 구현 |
 | VF-CX-03 | 02 의존 | 검증된 replica locality와 scheduler 연결 |
 | VF-CX-04 | 03 의존 | 기존 dispatch/permit/recovery 경계 연결 |
@@ -37,7 +37,7 @@ source_of_truth: "Git"
 - 관리자 발급 우회/실제 factory 경로 추가 시험 2 passed; Compose 경계 2 passed; package+fixture 보존 13 passed (fixture 시험은 제품 인증 증거가 아님).
 - Windows launcher/마이그레이션 경계 13 passed. 이후 실제 PG definer/account/upgrade 검증은 통과했고, 복원 시험의 Linux 전용/내부 network 요건은 별도 Linux runner에서 확인 중.
 - 문서 검사·ontology·19 schema export·생성 계약 drift 검사 통과. 제품 인수와 별도.
-- CI 같은 SHA: push 전 미실행. 독립 검토 미실행. 운영 자격증명/기존 DB 역할/운영 PITR/실장비는 미확인.
+- CI 290aba5: 네 workflow 모두 billing으로 시작 전 거부. 독립 검토 미실행. 운영 자격증명/기존 DB 역할/운영 PITR/실장비는 미확인.
 
 ## 이어서
 
