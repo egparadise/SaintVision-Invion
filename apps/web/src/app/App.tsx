@@ -1,3 +1,4 @@
+import { DesktopShell } from '@/features/desktop/DesktopShell';
 import { approveReviewed, type ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/shared/ui/Header';
@@ -30,6 +31,7 @@ import { observedNode } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 
 export const App: React.FC = () => {
+  const [desktop, setDesktop] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [nodes, setNodes] = useState<NodeItem[]>([]);
@@ -192,9 +194,18 @@ export const App: React.FC = () => {
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedRun = runs.find((r) => r.id === selectedRunId);
 
+  if (desktop && currentUser && projectId) return <DesktopShell
+    key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
+    nodes={nodes} runs={runs} approvals={approvals} workspaces={workspaces}
+    currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
+    onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
+    onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
+    onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />;
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header
+        onSwitchToDesktop={currentUser && projectId ? () => setDesktop(true) : undefined}
         currentTheme={theme}
         onToggleTheme={toggleTheme}
         onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
