@@ -306,4 +306,4 @@ Claude는 저장소의 기본 시험 credential로 운영DB 로그인이 가능�
 
 ## VF 서비스 통합 최신 기록
 
-2026-09-15T14:27:00+09:00 / Codex / base dd04562 / agent/codex/vf-service-integration. Claude7ef9a3c 독립 검토에서 pin 이탈·URI 경계 결함4개 재현,0043·용량·parser 수정 후보 검증. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]. Claude 재검토/CI/운영 인수 pending. 다음 Codex 전달·Claude 수정 재검토.
+2026-09-15T14:27:00+09:00 / Codex / base dd04562 / agent/codex/vf-service-integration. Claude7ef9a3c 독립 검토에서 pin 이탈·URI 경계 결함4개 재현,0043·용량·parser 수정. 최종통합d237d30/PR23: 전체1779 passed/139 skipped, 최종통합115/115, image/설정거부 통과. CI billing차단. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]. Claude 재검토/CI/운영 인수 pending. 다음 Codex 전달·Claude 수정 재검토.

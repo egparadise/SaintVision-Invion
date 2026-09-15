@@ -4,7 +4,7 @@ title: "VF 서비스 독립 검토와 통합"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T14:23:32+09:00"
+updated: "2026-09-15T14:37:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -75,3 +75,12 @@ source_of_truth: "Git"
 - 독립 검토: Claude 원본을 Codex가 검토해 결함 재현. Codex 수정에 대한 Claude 검토는 pending.
 - 운영 인수: 미수행; runtime CPU32KiB/원격5대/SSO/PITR 미완 상태 유지.
 - 다음 첫 행동: Claude가 PR23의0043·이탈잠금·URI 제한 재검토. Codex는 받은 finding 및 실제API/ModelManifest 서비스 연결을 진행. 공용 integration/운영 migration 승격 전 CI/독립 검토 필요.
+
+
+## 최종 전달 영수증
+
+- 누적 통합d237d30814457ccc1c5e01dd553fd4e054919621 push exit0, draft PR23 갱신 완료. 제품08ece3b와 진단f885553/c8168e1, 후속 시험5e57f18을 포함한다.
+- d237d30 CI push/PR 각3 run 모두 billing·spending limit으로 시작 전 실패. 실제 annotation8개: Evidence/vf-service-review/ci-merged.json. CI 성공/독립 승인/운영 인수로 올리지 않는다.
+- docs exit0(468문서), ontology exit0, diff exit0. 최종115/115 후 제품 변경 없음.
+- Obsidian 공유 공통 진행판·Codex VF판·ADR·오류 이력을 c8168e1 Git내용과 대조(LF/CRLF만 동일)하고 기존 바이트hash를 확인한 뒤 범위 제한 동기화.16개 관리/13개 export/hash16개 일치/pending0/conflict0. generic Codex 작업판 공유본만 기존Git내용과 달라 보존했으며, 정본Git의 기록과 공통/VF판으로 다음 행동을 전달한다.
+- 이번 영수증과 추가CI/sync JSON은 문서만 변경하며 마지막 push 후 같은 관리 범위로 다시 동기화한다. 원본24개 불변, 원격5대와 운영 변경 미실행. 다음 담당은 Claude(PR23 수정 재검토), Codex(실제 서비스 API·ModelManifest 연결), 운영 owner(CI/SSO/PITR/장비)다.
