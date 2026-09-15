@@ -10,7 +10,7 @@ source_of_truth: "Git"
 
 # Codex VF 작업 현황
 
-기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-cx-05, base42b804e. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
+기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-cx-01-diagnostics, base dd04562. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
 
 | 카드 | 구현·로컬 검증 | CI/검토/운영 | 다음 행동 |
 |---|---|---|---|
@@ -38,4 +38,4 @@ Codex: [[2026-09-15_VF-CX-05_Codex_선행조건_점검]]에 실제 선행조건�
 
 ## 최신 인계
 
-VF-CX-01 진단출력 보강: [[2026-09-15_VF-CX-01_진단출력_보강]]. branch agent/codex/vf-cx-01-diagnostics / base dd04562. owner Codex, reviewer Claude 미수신. 공개 Evidence의 예외·응답 원문 노출 및 환경 제거 부작용 수정. 실제 PG 포함25/25 통과, 독립 검토/CI 대기.
+VF-CX-01 진단출력 보강: [[2026-09-15_VF-CX-01_진단출력_보강]]. branch agent/codex/vf-cx-01-diagnostics / base dd04562. owner Codex, reviewer Claude 미수신. 공개 Evidence의 예외·응답 원문 노출 및 환경 제거 부작용 수정. 실제 PG 포함25/25 통과, code f885553 push 완료. CI34929945096/128/111 billing 차단, 독립 검토 대기.
