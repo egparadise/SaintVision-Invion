@@ -221,6 +221,33 @@ def test_a_departed_node_marks_its_copies_stale_and_keeps_the_location(
                 assert still == 1
 
 
+def test_fleet_summary_aggregates_classification_across_the_catalogue(
+    owner_engine, app_sessionmaker, location
+):
+    # With no replica, the one catalogued location is unreplicated.
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                summary = replica_repair.fleet_replica_summary(
+                    session, tenant_id=location["tenant_a"], desired=2,
+                )
+                assert summary.to_dict() == {
+                    "locations": 1, "healthy": 0, "underReplicated": 0,
+                    "atRisk": 0, "unreplicated": 1, "needingRepair": 1,
+                }
+    # Bring it to the factor and it moves to healthy.
+    _add_replica(owner_engine, location, 0, "ready")
+    _add_replica(owner_engine, location, 1, "ready")
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                summary = replica_repair.fleet_replica_summary(
+                    session, tenant_id=location["tenant_a"], desired=2,
+                )
+                assert summary.healthy == 1
+                assert summary.needing_repair == 0
+
+
 def test_a_replica_factor_below_one_is_rejected(app_sessionmaker, location):
     with app_sessionmaker() as session:
         with session.begin():

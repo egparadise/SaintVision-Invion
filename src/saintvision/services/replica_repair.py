@@ -165,6 +165,71 @@ def locations_needing_repair(
     return out
 
 
+@dataclass(frozen=True)
+class FleetReplicaSummary:
+    """Replica health across a tenant's whole catalogue, for metrics/runbook.
+
+    ``at_risk`` and ``unreplicated`` are the numbers a runbook pages on: an item
+    with no usable copy is one node-loss or one corruption from being gone. They
+    are reported separately from ``under_replicated`` because the response
+    differs -- repair soon versus repair now.
+    """
+
+    locations: int
+    healthy: int
+    under_replicated: int
+    at_risk: int
+    unreplicated: int
+
+    @property
+    def needing_repair(self) -> int:
+        return self.under_replicated + self.at_risk + self.unreplicated
+
+    def to_dict(self) -> dict[str, int]:
+        return {
+            "locations": self.locations,
+            "healthy": self.healthy,
+            "underReplicated": self.under_replicated,
+            "atRisk": self.at_risk,
+            "unreplicated": self.unreplicated,
+            "needingRepair": self.needing_repair,
+        }
+
+
+def fleet_replica_summary(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    desired: int = DEFAULT_REPLICA_FACTOR,
+) -> FleetReplicaSummary:
+    """Aggregate every catalogued location's classification into one summary.
+
+    The observability source for VF-CL-04: a metrics endpoint or runbook reads
+    this rather than recomputing per-location classification itself, so the
+    definition of "at risk" lives in one place.
+    """
+    if desired < 1:
+        raise InvError(VAL_SCHEMA, "replica factor must be at least 1")
+    tally = {"healthy": 0, "under_replicated": 0, "at_risk": 0, "unreplicated": 0}
+    location_ids = list(
+        session.scalars(
+            select(DataLocation.location_id).where(DataLocation.tenant_id == tenant_id)
+        ).all()
+    )
+    for location_id in location_ids:
+        health = replica_health(
+            session, tenant_id=tenant_id, location_id=location_id, desired=desired
+        )
+        tally[health.classification] += 1
+    return FleetReplicaSummary(
+        locations=len(location_ids),
+        healthy=tally["healthy"],
+        under_replicated=tally["under_replicated"],
+        at_risk=tally["at_risk"],
+        unreplicated=tally["unreplicated"],
+    )
+
+
 def mark_node_replicas_unavailable(
     session: Session,
     *,
