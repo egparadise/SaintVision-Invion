@@ -21,6 +21,7 @@ import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
+import { DesktopShell } from '@/features/desktop/DesktopShell';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ApprovalPage } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
@@ -251,6 +252,7 @@ const SAMPLE_EXECUTION: ExecutionResultItem = {
 
 export const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [viewMode, setViewMode] = useState<'desktop' | 'portal'>('desktop');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [nodes, setNodes] = useState<NodeItem[]>(INITIAL_NODES);
   const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>(INITIAL_WORKSPACES);
@@ -435,6 +437,25 @@ export const App: React.FC = () => {
     }
   };
 
+  if (viewMode === 'desktop') {
+    return (
+      <DesktopShell
+        nodes={nodes}
+        runs={runs}
+        approvals={approvals}
+        workspaces={workspaces}
+        currentReviewerId={currentReviewerId}
+        onRefreshNodes={fetchNodes}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onChangeUser={(id) => setCurrentReviewerId(id)}
+        onSwitchToPortalView={() => setViewMode('portal')}
+        currentTheme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    );
+  }
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedRun = runs.find((r) => r.id === selectedRunId);
 
@@ -443,6 +464,7 @@ export const App: React.FC = () => {
       <Header
         currentTheme={theme}
         onToggleTheme={toggleTheme}
+        onSwitchToDesktop={() => setViewMode('desktop')}
         onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
         totalNodesCount={nodes.length}
         activeTab={activeTab}

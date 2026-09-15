@@ -1,10 +1,10 @@
 ---
 doc_id: "HO-GEMINI-CLAUDE-002"
 title: "Gemini GM01~06 프론트엔드·배포 독립 검토 인계서"
-version: "1.0.32"
+version: "1.0.33"
 status: "review"
 author: "Gemini"
-updated: "2026-09-15T01:30:00+09:00"
+updated: "2026-09-15T11:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -23,7 +23,7 @@ source_of_truth: "Git"
 | **수신자 (Independent Reviewer)** | Claude (인증·보안 계약은 Codex) |
 | **대상 작업 카드** | `GM-01`, `GM-02`, `GM-03`, `GM-04`, `GM-05`, `GM-06` |
 | **부모 Task (12개)** | `S01-FE` ~ `S12-FE` (전 Frontend 태스크) |
-| **작업 브랜치** | `integration/all-agents-unified` |
+| **작업 브랜치** | `agent/gemini/virtual-fabric` |
 | **고정 구현 Commit SHA** | `aad3d2b` |
 | **현재 카드 상태** | `review` (Gemini 영역 진척도: 75.0%, 전체 진척도: 65.63%, 약 65%) |
 | **핵심 원칙** | Zero-Mock (가짜 exit code 0, 사일런트 어드민 우회 전면 제거), 정직한 텔레메트리, 브라우저 스모크와 물리 실장비 인수 구분 |
@@ -94,6 +94,13 @@ source_of_truth: "Git"
 5. **ApprovalCenter 접근성 EmptyState 연동 및 테스트 확장 (`ApprovalCenter.tsx`, `approval-timeline.test.ts`)**:
    - 대기 중인 승인 안건이 0건일 때 `EmptyState` 컴포넌트를 렌더링하여 빈 목록 프레임 방지 및 WCAG 2.1 AA 시각 피드백 강화.
    - `approval-timeline.test.ts`에 빈 안건 목록 처리 테스트 추가하여 Vitest 스위트 **138/138 tests 100% 무오류 통과**.
+6. **VF-GM-01~06 단일 가상 컴퓨터 Web Desktop, Resource Explorer, inv:// File Explorer, Model Studio, Terminal UX 구현**:
+   - `DesktopShell.tsx`: Start Menu, System Tray, Desktop Shortcuts, Bottom Dock, 윈도우 매니저(`DesktopWindowComponent`), 세션 복원 및 포털/데스크톱 양방향 전환.
+   - `ResourceExplorer.tsx`: 논리 통합 가상 자원 풀(60 vCPU, 224 GiB RAM, 3 GPU 50GB VRAM, 10TB Storage)과 노드별 실제 물리 토폴로지 대조 표시(물리 장치 융합 왜곡 방지).
+   - `InvFileExplorer.tsx`: `inv://` 네임스페이스 주소창, SHA-256 검증, 복제본 위치 추적 및 부분 실패(Degraded replica) 감지/원클릭 복구.
+   - `ModelStudioView.tsx`: `ModelManifest` 등록부, 샤드/복제본 매트릭스, Locality/Capability Aware 분산 실행 계획기.
+   - `TerminalSessionView.tsx`: Windows(PowerShell)/Linux(Bash) 자동 매핑 및 30초 1회용 PTY 티켓 인증.
+   - `run_browser_smoke.mjs` Track 15 신설: 브라우저 스모크 **15개 트랙 200/200 checks 100% 통과**.
 
 ---
 
@@ -106,13 +113,13 @@ source_of_truth: "Git"
 python tools/route_coverage.py --served src --served .worktrees/codex-workspace-bridge/services/control-plane/src --client apps/web/src
 .venv\Scripts\pytest tests/test_route_coverage.py
 
-# 2. 프론트엔드 전체 단위/프로토콜 시험 (22개 파일, 138개 테스트 100% 통과)
+# 2. 프론트엔드 전체 단위/프로토콜 시험 (23개 파일, 143개 테스트 100% 통과)
 npm --prefix apps/web test -- --run
 
 # 3. Vite 프로덕션 빌드 및 타입 검사 (0 warning, 0 error 클린 빌드)
 npm --prefix apps/web run build
 
-# 4. E2E 브라우저 스모크 검증 (14개 트랙, 186개 항목 100% 통과 - 프로젝트 스코프 결과/아티팩트 포함)
+# 4. E2E 브라우저 스모크 검증 (15개 트랙, 200개 항목 100% 통과 - 프로젝트 스코프 결과/아티팩트 포함)
 node tools/run_browser_smoke.mjs
 
 # 5. 2-PC 분산 실행 및 자원 스케일링 검증 (5개 단계, 67개 항목 100% 통과 - OIDC PKCE 인증 연동)
