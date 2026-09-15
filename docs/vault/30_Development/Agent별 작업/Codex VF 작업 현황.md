@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.1"
+version: "1.0.2"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T11:47:29+09:00"
+updated: "2026-09-15T12:12:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -23,8 +23,8 @@ source_of_truth: "Git"
 | 카드 | 현재 상태 | 다음 행동 |
 |---|---|---|
 | VF-CX-01 | canonical factory·fixture 격리 구현, 통합 검증 진행 | [[2026-09-15_VF-CX-01_Codex_인계]]; 41 Linux/5 factory 통과, CI billing blocked; 전체 최종 재회귀 진행 |
-| VF-CX-02 | ready (01 일부 보안 경계 로컬 검증) | 기존 DataLocation/Lease 위 manifest 계약과 검증 commit 구현 |
-| VF-CX-03 | 02 의존 | 검증된 replica locality와 scheduler 연결 |
+| VF-CX-02 | review: d6d9d87, Windows66/Linux49 검증·CI billing blocked | 기존 DataLocation/Lease 위 manifest 계약과 검증 commit 구현 |
+| VF-CX-03 | ready: 로컬 계약/시험 준비, 독립 검토는 병행 대기 | 검증된 replica locality와 scheduler 연결 |
 | VF-CX-04 | 03 의존 | 기존 dispatch/permit/recovery 경계 연결 |
 | VF-CX-05 | W2~W4·실장비 의존 | 실제 5대 및 운영 자격증명 확보 후 signed Evidence 인수 |
 

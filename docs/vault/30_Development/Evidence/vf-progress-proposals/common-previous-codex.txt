@@ -1,0 +1,399 @@
+---
+doc_id: "INDEX-PROGRESS-001"
+title: "전체 개발 진행 현황"
+version: "1.0.74"
+status: "review"
+author: "Codex"
+updated: "2026-09-14T23:41:19+09:00"
+source_of_truth: "Git"
+---
+
+# 전체 개발 진행 현황
+
+- [[2026-09-15_VF-CX-02_Codex_검증보고]]: ModelManifest/DataLocation FK·전체 bytes hash·lease/fence commit, Windows66/Linux49 통과. 독립 검토·CI·실장비 미완료. 다음 Codex VF-CX-03 locality 결속.
+
+
+- 2026-09-15T11:54:32+09:00 VF-CX-02 착수: base 3efa507, 별도 agent/codex/vf-cx-02. [[2026-09-15_VF-CX-02_Codex_착수]]. owner Codex/reviewer Claude 미수신.
+
+
+- [[2026-09-15_VF-CX-01_Codex_검증보고]]: canonical factory·fixture 격리·실제 인증/DB 보강, Linux 복원/definer/tenant 41 및 factory/account 5 통과. CI/독립 검토/운영 인수 미완료. 다음 Codex VF-CX-02; [[Codex VF 작업 현황]].
+
+
+- VF-CX-01 착수 (2026-09-15T11:34:04+09:00): 원격 b9752a8 기반 별도 agent/codex/vf-cx-01, canonical factory 통합·fixture 격리 후 보안/PG 검증 중. owner Codex, reviewer Claude 미수신; [[2026-09-15_VF-CX-01_Codex_착수]]. 기존 57.81%와 VF 인수율은 별도.
+
+
+- [[2026-09-14_APPROVAL-REVIEW-UI_Codex_검증보고]]:ab8b645 검토 snapshot화면·표시digest결정결속·미관측거부,210시험/build통과. 서버024a817과단일통합/배포미완료. 다음Codex격리통합/브라우저,Gemini UI,Claude독립검토. 전체57.81%유지.
+
+- [[2026-09-14_APPROVAL-REVIEW-SNAPSHOT_Codex_검증보고]]:024a817 immutable 승인 검토snapshot/GET·approve/dispatch 결속 검사. 격리PG/HTTP48·계약10통과,운영DB/UI미반영. 다음Codex review화면연결,Claude독립검토,Gemini브라우저. 전체57.81%유지.
+
+- [[2026-09-14_RUN-APPROVAL-OBSERVATION_Codex_검증보고]]: b0ecb5e Run/승인 정본 변환·임의 명령/예산/검토자 제거,182시험/build통과. 내용 미관측 요청 승인 보류; 다음 Codex digest결속 검토view, Gemini 통합/브라우저, Claude 독립검토. 전체57.81%유지.
+
+- [[2026-09-14_LIVE-PROJECT-OBSERVATION_Codex_검증보고]]: 7b50ae2 실제 프로젝트 선택·Workspace 계약·미관측 Node 제외, 163시험/build 통과. 공유 통합/운영 배포/브라우저/peer 미완료. 다음 Codex Run/Approval 매핑, Gemini 통합/브라우저, Claude 독립 검토. 전체57.81% 유지.
+
+
+- [[2026-09-14_SHARD-OBSERVATION-FIX_Codex_검증보고]]:ea42657 Gemini최신43640ee통합후샤드관측/새로고침정본화·미확인receipt성공표시제거·초기fixture제거. 최종140시험/build통과,공유integration/운영배포전. 다음응답unknown/project선택·브라우저/peer인수,전체57.81%유지.
+
+
+- [[2026-09-14_FRONTEND-MUTATION-FIX_Codex_검증보고]]:별도frontend후보8037166 승인challenge/digest·일반취소version/실패상태보존,Vitest127/최종build통과. 공유App/RunDetail편집보존,아직통합/브라우저/peer미완료. Gemini후보병합·샤드연결/Codex재검토. Claude c5c014e는기존재현시험만독립확인. 전체57.81%유지.
+
+
+- [[2026-09-14_FRONTEND-MUTATION-REVIEW_Codex_검증보고]]:frontend70ea3fb 독립검토 changes requested(FE-M01~05). 승인nonce/digest·취소version누락,취소실패성공표시,flat회수/fallback·임의관측·로딩오류. 실제격리PG/HTTP6개통과로현body422/상태보존·정본200확인(b95ab27). 다음Gemini수정/Codex재검토,전체57.81%유지.
+
+- 최신 [[2026-09-14_CLI-OUTPUT-BOUNDARY_Codex_검증보고]]:dcd5f79 Agent CLI 수집 중 메모리 상한·timeout/incomplete·stderr 잘림 판정 보완. 실제 로컬 subprocess Windows24/Linux24 통과(동일24개). 실제 Provider/원격 인수·독립검토 미완료,전체57.81% 유지.
+
+- 최신 [[2026-09-14_BACKUP-OPEN-GUARD_Codex_검증보고]]:3eced3b 보관 백업을 기존 ReadRoot로 읽도록 통합, Windows 관련42개 및 clean SHA 독립 PostgreSQL 복원130테이블/0037/tenant격리 통과. .225 TCP 불가·CI billing 차단·독립검토 pending, 전체57.81% 유지.
+
+- 최신 [[2026-09-14_LEGACY-ROLE-REPAIR_Codex_검증보고]]:공용LOGIN재발관측,구Codex상주코드경로의위험fixture를4da131f로backport수정·격리PG21개통과. 실제재활성화주체는불명. 기존승인으로17:54:35 재폐기·권한보존. [[2026-09-14_INDEPENDENT-RESTORE_Codex_검증보고]]:33785f2 보관백업130테이블독립cluster복원/0037·replay/definer9·tenant격리통과. 원격/CI/운영인수미완료,전체57.81% 유지.
+
+- 최신 [[2026-09-14_ROUTE-SURFACE_Codex_검증보고]]:8ef06eb Claude fef3292 경로도구통합·configured factory 측정/BusinessDispatch 선택범위·미등록fixture제외. 관련24개통과,추가lazyWS unit23개통과(중복합산안함). 다음Gemini 실제정본API/브라우저·Claude 독립검토·Codex 원격준비후7개. CI/운영인수미완료,전체57.81% 유지.
+
+- 최신 [[2026-09-14_PROJECT-OBSERVATION_Codex_검증보고]]:4f518ea project 승인목록/상세·샤드조회·생성계약 연결. PG/HTTP16+승인계약10+실제후보컨테이너8 통과. 부모전체취소는 기존cancel,회수는receipt자동처리 정본. .225 접속불가·CI결제차단,전체57.81% 유지. 다음Gemini 정본계약 화면연결/Claude 독립검토/Codex 원격재연결 후7개시험.
+
+- 최신 [[2026-09-14_MIGRATION-GUARD_Codex_검증보고]]:3742f11 Alembic 실제 진입점 그룹검사/별도PG13개 통과,221d253 CI opt-in 연결. 운영inv_app LOGIN 재발을 기존승인으로13:45:50 재폐기·권한/schema보존. 재활성화 원인 미확인. .225 offline/stale/observe,DB0023·kill switch유지. CI결제차단·독립검토/운영인수 미완료,전체57.81% 유지.
+
+- 최신 [[2026-09-12_OFFER-SNAPSHOT_Codex_독립확인]]:51f4004 실제 offer중간 release는 기존Node/Resource잠금으로 차단·재시도성공, 관련12개통과. F1의 lease행만 잠근다는 전제는 실제호출과 달라 Claude재확인 요청. 새migration없음/0037유지. 업무·영속설정27개검증과 운영전환입력 준비 완료,실제OIDC/critical전환/원격7개/CI남음. 전체57.81% 유지.
+
+- 최신 [[2026-09-12_BUSINESS-WORKSPACE_Codex_검증보고]]:14de71d 업무DSN/401정합·Windows설정volume·영속Workspace overlay, 실제컨테이너/DB/재시작/설정경계27개 통과. 운영 .225 fresh/observe·kill switch=true·DB0023 유지. 다음Codex role독립검토/운영전환계획,Claude 운영OIDC·계정/검토,Gemini 정본연결. CI차단,전체57.81% 유지.
+
+- 최신 [[2026-09-12_SERVER-CONTAINER_Codex_검증보고]]:2bfd5fa 후보 backend 실제 image build/UID65532·DB·Workspace 설정/권한거부5개 통과. 일반 PostgreSQL16 head0037 적용. 원격 실행·운영SSO·Windows bind·영속Workspace 인수 미완료. 다음Codex business 활성화/영속volume·설정전달 검증,Claude 독립 검토. CI 결제 차단,전체57.81% 유지.
+
+- 최신 [[2026-09-12_CONFIGURED-SERVER_Codex_검증보고]]:510ced4 정본 factory 필수 설정·readonly mount·/readyz 연결, 격리 PostgreSQL/실제 HTTP/Compose 경계14개 통과. 운영 SSO·후보 컨테이너·Workspace 활성화/원격 시험 미완료. 다음Codex 후보 backend build/비root mount/DB 확장 검증,Claude 독립 검토. CI 결제 차단,전체57.81% 유지.
+
+- 최신 [[2026-09-12_DB-ROLE-REVOKE_Codex_운영적용보고]]:사용자 승인 후20:47:51 KST 운영inv_app NOLOGIN/password폐기 완료. 기존credential 인증거부·runtimeDB 접근·변경후Node fresh 확인,grant/RLS/membership 보존. **운영 로그인 폐기 승인대기 해소**. 다음Codex 정본server candidate/인증·DB 연결,각Agent 구fixture 갱신. 전체57.81% 유지.
+
+- 최신 [[2026-09-12_DB-TEST-ROLE_Codex_검증보고]]:4ec4c5d 공용inv_app LOGIN/password 변경 제거·시험별 난수login/정리·배포 기본credential 제거. 별도PostgreSQL/Compose51개 통과,remediation SQL 별도컨테이너 거부/적용/replay 확인. **기존 운영credential 폐기는 critical 승인 대기**. 다음Codex 승인 후 서비스 의존 재확인/조치,각Agent 구fixture 갱신. 전체57.81% 유지.
+
+- 최신 [[2026-09-12_LAN-RETAINED-BACKUP_Codex_검증보고]]:7a0a25b private 로컬 보관 파일 재검증→실제130테이블/조회행합계28726 복원·0037 upgrade/replay 통과,경계11 통과. 18100은 SQLite 로컬 작업대임을 확인. 다음Codex 별도 정본 server candidate/설정·인증·DB 검증,Claude 독립 검토. off-device/운영 인수 미완료,전체57.81% 유지.
+
+- 최신 [[2026-09-12_LAN-RESTORE-UPGRADE_Codex_검증보고]]:04bd617 실제snapshot130테이블/조회행합계28165 복원,0037upgrade/전체replay/기존열보존·definer9·runtimeDBtransaction 통과,경계5통과. 원본0023/Node fresh 유지·폐기DB정리. 영속백업/독립클러스터/HTTP·운영인수미완료. 다음Codex 서비스호환성·실제배포계획,Claude독립검토. 전체57.81% 유지.
+
+- 최신 [[2026-09-12_LAN-MIGRATION-PLAN_Codex_검증보고]]: b5493d7 운영0023→코드0037 미적용20개 계획, 열별SELECT/schema USAGE 판정 보완. 실제PG 포함15개/폐기용0023 upgrade·replay 통과. 운영 변경 없음. 다음Codex 복원 사본 리허설/호환성, Claude 독립 검토. 전체57.81% 유지.
+
+- 최신 [[2026-09-12_LAN-STORAGE-READINESS_Codex_검증보고]]: f2a7fbc 읽기 전용 실제 운영 점검/경계6 통과. .225 online/fresh이나 observe 전용·kill switch 활성, storage 증명 관계2개 없음, 관측 역할 조회 제한, 공개 묶음 구형. 다음 Codex 실제 서비스 migration/역할/등록 연결 검토 후 후보 묶음, Claude 독립 검토. CI 결제 차단, 전체57.81% 유지.
+
+- 최신 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]]:e512b60 Windows 진입점/WSL request hash 준비·교체·재개 연결. 경계121(실제 PowerShell+모사WSL10 포함), 실제 Linux bridge1 통과. 본 서버 Ubuntu 없음, 실제 원격 경로·mTLS/Evidence 인수/CI/독립 검토 미완료. 다음 Codex 실제 PC 경로와 receipt 확인,전체57.81% 유지.
+
+- 최신 [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]]: f766146 보존 컨테이너/durable 교체/forward 재개, 실제 Docker11·경계111 통과. Windows/WSL 진입점·원격 .225·서버 인수/CI/Claude 검토 미완료. 다음 Codex wrapper/실제 mTLS·Evidence 연결, 전체57.81% 유지.
+
+- 최신 [[2026-09-12_STORAGE-REPLACE-PREFLIGHT_Codex_검증보고]]:823b4b8 교체 전 읽기 점검·상태 해시·stale 재검사. 경계90/실제 Docker3 통과. **교체 실행기/forward 재개는 후속**이며 운영 Node 변경 없음. CI 결제 제한/Claude 검토 pending,전체57.81% 유지.
+
+- 최신 [[2026-09-12_STORAGE-BUNDLE_Codex_검증보고]]: 9848afb 새 LAN 컨테이너 readonly mount·policy/Go receipt 대조, 실제 Docker2/경계62 통과. 기존 Node 교체·Windows WSL/원격 설치·서버 인수 미완료, CI 결제 제한/Claude 검토 pending. 다음 Codex 통제된 교체·forward 재개, 전체57.81% 유지.
+
+**모든 Agent는 작업 시작 전에 이 페이지와 자신의 작업 페이지를 읽고, 작업 후 `작업한 것 → 확인한 증거 → 이어서 할 첫 행동`을 남긴다.** 긴 로그는 History/Evidence에 두고 이 페이지는 현재 상태와 다음 담당을 유지한다. 운영 방법은 [[Agent 지속 개발 운영 규칙]].
+
+## 지금의 상태
+
+- [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]:f9d69a8 기존 Node journal에 폴더/channel 독립 최소 버전·hash 영속화, 역행/같은 버전 변경 거부 및 로컬 시작 receipt. 실제 재시작 포함 Linux85 통과. 다음 LAN bundle 읽기 mount·policy 전달/교체·receipt 대조 연결. CI/독립 검토/운영 인수 미완료, 전체57.81% 유지.
+
+- [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]:9d7559e 인증 GET/현재 권한·소유자/저장 서명·Evidence 재검증, pending·expired·recorded와 currentHealth unknown 분리. Linux153/Windows25 통과. 다음 폴더-root policy 설치·교체/receipt 계약, Claude 독립 검토·Gemini 화면 연결. 전체57.81% 유지, CI/물리 원격 인수 미완료.
+
+- [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]:fd0c081/0037 현재 프로젝트 요청 권한+등록 소유자·durable challenge/nonce·기존 Evidence/StorageCheck 원자 기록. Linux156/Windows DB22 통과. Studio 시작 바로가기 복구/로그인 세션 생성 확인. 다음 조회·운영 설치 연결, CI/Claude 독립 검토/원격 인수 pending. 전체57.81% 유지.
+
+- 최신 Go Node sample: [[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]:688678d Go opt-in 폴더 설정/mTLS/실제 서명 sample과 Python 검증 연결. Linux 실제 통합130, Windows98 및 Go 경계 시험 통과. durable challenge/nonce 소비·기존 StorageCheck/Evidence 원자 쓰기는 다음 작업. 운영 .225/Windows native 수집/CI/독립 검토 미완료, 전체57.81% 유지.
+
+- 최신 서명 sample: [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]:124fe97 실제 ReadRoot sample·불변 Run/ChannelProof/root/catalog/nonce challenge·Ed25519 서명 검증, Windows124/Linux129 통과. 내부 Python 수집/검증 모듈이며 Go 배포·durable nonce·StorageCheck/inv.evidence 원자 기록은 아직 남음. CI 계정 제한/독립 검토/물리 장비 인수 별도, 전체57.81% 유지.
+
+- 최신 Node 인증 선행 보강: [[2026-09-12_NODE-AUTH-COMMIT_Codex_검증보고]]:2830887 ASGI 인증서 오류 거부·proxy fallback 우회 차단·heartbeat 기록 transaction에서 현재 certificate/node row lock. 원본3개 오류 재현, Windows89/Linux89 통과. storage challenge/Evidence 쓰기 자체는 아직 미구현이며 다음 기존 Go nonce/ChannelProof/epoch와 Run-bound inv.evidence 연결 계약을 진행한다. 전체57.81% 유지, CI/peer/운영 인수 pending.
+
+- 최신 폴더 점검 검토: [[2026-09-12_STORAGE-CHECK_Codex_검증보고]]:8c6805f/a7d0f5e 실제 local sample/READ ONLY·ReadRoot·hash/size 검증, Linux138/Windows105 통과. 입력 Node 이름은 신원 증명이 아니므로 운영 기록0. zero sample/과거 잘못된 healthy 판정을 보완했다. 다음 기존 Node 인증·epoch·challenge·root 버전/Evidence 원자 연결, Claude 독립 검토. S12-ST25→50, 전체57.81%/잔여42.19%, CI/원격 인수 미완료.
+
+- 선행 파일 읽기 경계: [[2026-09-12_BACKUP-ROOT_Codex_검증보고]],6a72b9d Linux103/Windows80. ReadRoot·링크/교체·동일 timestamp 재읽기 경계를 구현했고 후속 점검 도구 연결/최신 진척은 STORAGE-CHECK 보고를 따른다.
+
+- 최신 복구 목표 판정: [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]]. b49ecd3 Linux69 / core53 / upgrade23 통과. 설정만으로 운영 RPO를 확정하지 않고 실패/중단의 목표 달성 오기록을 서비스·0036 DB 제약으로 차단. 운영 PITR·CI·peer 인수는 별도.
+
+
+- 최신 자격증명 등록·회전·회수: [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]], [[Codex 자격증명 등록 회전 회수 운영 절차]]. 76ba5ba Linux90/CLI4 통과. 운영 적용·Provider·CI·독립 인수 별도.
+
+
+- 최신 자격증명 backend·Context/readiness 통합: [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. 제품0f5f4e8 Linux154/core53, migration22(74012b3) 통과. 실제 Linux/DB backend 확보, 외부 Provider·CI·peer·물리 원격 인수는 남음.
+
+
+- 확인 시각: **2026-09-11T18:53:13+09:00**(Git/코드/보고), LAN 읽기는 18:42:48. 수신: Claude dee31e5/cdf98ad, Gemini 487a42c/3c1850b/858763c. 작성자 주장과 아래 Codex 확인을 구분한다.
+- 목표: 5대 Windows/Linux의 허용 자원을 관리하고 내부망 웹에서 일반 개발·AI 개발/학습·평가·승인 배포·복구를 수행한다. 개발 도구와 제품 내부 실행 Agent를 구분한다.
+- **핵심 실행 코드는 구현·로컬 검증이 진행됐고 전체 운영 인수는 남아 있다.** 제품 코드가 없다는 예전 문구는 현재 상태가 아니다.
+- 최신 Codex 제품 `c5f2154`: 통합 402개·기본 301개·Linux Go 고유 43개·migration prior 20개 확인. CI·독립 검토·실장비 인수와 합치지 않는다. [[2026-09-11_WORKSPACE-INTEGRATION_Codex_검증보고]].
+- 실제 구성: 서버 .99와 등록 worker .225 1대. 최신 .225:18443 TCP 재확인 불가이며 마지막 프로필은 `lan-observe-v1`; online/fresh로 표시하지 않는다. 운영 제출·웹 인증 미설정, kill switch 켜짐. 연결된 5대나 원격 업무 완료로 표시하지 않는다.
+- 원래 task-registry:48개 중 공식 done0개. 현재 개발 성숙도 추정 **2775/4800=57.81% 완료 /42.19% 잔여**. S12-ST25→50을 이번 실제 폴더 점검 연결/검증에 따라 반영했다. CI·독립 검토·운영 인수 완료 비율이 아니다. [48개 row/산식](../30_Development/Evidence/development-progress-storage-check-20260912.json). 이전57.29%는 아래 과거 보고 시점의 수치다.
+
+## Agent별 바로 다음 작업
+
+| Agent | 바로 시작할 일 | 별도 차단 / 이어질 일 | 상세 작업판 |
+|---|---|---|---|
+| Codex | 3eced3b 백업 경계·4f518ea/8ef06eb 정본 조회 검토 인계; 운영 전환 조건 확인 | CX-03 원격 설치 수신→실제 7개; 이후 원격 PTY/Git·5대/GPU·Storage·RO | [[Codex 작업 현황]] |
+| Claude | CL-01 b49ecd3/0036/ADR-080 및credential 변경 독립 검토; 기존 resolver의 Provider 연결·CL-02 운영 준비 | 실제 Provider/Context·모델 bytes/MLflow·운영 복원 | [[Claude 작업 현황]] |
+| Gemini / Antigravity | GM-01 결과 인증/hash·GM-03 정본 drain/ticket·GM-04 예시 제거; GM-05/06 증거 범위 정정 | GM-03 PTY/Git 연결→운영 2-PC 브라우저→접근성/HTTPS/rollback | [[Gemini 작업 현황]] |
+| Orca | OR-01 진행판 집계, OR-02 PR/branch/reviewer 순서 | OR-03 계정 제한은 운영 책임자 조치 필요; OR-04 최종 인수 관리 | [[Orca 작업 현황]] |
+
+Orca 관리 세션이 배정되기 전에는 Codex가 공통 집계를 맡는다. 이 문서는 다른 Agent 세션을 자동으로 실행했다는 기록이 아니다. **차단된 한 작업 때문에 다른 ready 작업까지 멈추지 않는다.**
+
+## 통합을 막는 조건
+
+| 조건 | 해소 담당 | 재개할 수 있는 증거 | 그동안 가능한 작업 |
+|---|---|---|---|
+| CI 결제/사용 한도 때문에 job 시작 전 실패 | 운영 책임자 조치, Orca 추적 | 같은 코드 SHA에서 runner가 실제 실행한 CI 성공 | 모든 Agent 구현·로컬 검증·독립 검토 |
+| .225 실행 profile 미설치/미확인 | 원격 PC 운영자 설치, Codex 확인 | 설치 JSON의 profile/image/identity/journal 보존과 mTLS 확인 | Codex 계약/검토, Claude 운영 준비, Gemini 실제 API 연결 |
+| 운영 identity/project/Workspace/허용 폴더·Node 설정 미완료 | Claude, 운영자 입력 | 현재 권한 교집합·ready 상태·운영 정상/거부 여정 | 격리 계정·DB의 개발/실패 시험 |
+| c5f2154와 새 Claude/Gemini 소스가 단일 운영 SHA로 인수되지 않음 | Codex 통합, Claude 독립 검토, Gemini 브라우저 | 같은 통합 SHA의 code/DB/API/브라우저 증거 | 소유 영역별 수정·검토 결과 작성 |
+
+원격 설치 안내: [[2026-09-11_REMOTE-WORKSPACE_다른PC설치안내]]. 비밀키·토큰을 진행판에 붙이지 않는다.
+
+## 최초 설계 전체 범위
+
+| 단계 | 목표 | 현재 확보 | 남은 핵심 | 담당 카드 |
+|---|---|---|---|---|
+| S01 | 기준선·운영/보안 계약 | 공통 schema/ADR/DB·개발환경 | 5대 조사·credential/IdP/TLS·Storage 결정 | CX-01/02, GM-01 |
+| S02 | 등록·관측·제공량 | 실제 mTLS worker 1대·계정/제공량 코드 | 운영 로그인/허용 폴더·5대 등록·관측 수치 | CL-02, CX-03, GM-02 |
+| S03 | 격리 실행·Workspace | 로컬 CPU 실행·첫 입력·Evidence | 실제 원격 profile·업무 연결·바이트 정본 | CX-03, CL-02/04, GM-01 |
+| S04 | 승인·취소·결과 | 원자 승인·취소·실제 출력 hash/회수 | 원격 7개·파일 bytes UI·대용량 전송 | CX-03/07, GM-01/05 |
+| S05 | 자원 배치·지역성 | lease/fencing/offer/배치 코드 | 5대·50동시·지역성·SLO 실측 | CX-05, GM-02 |
+| S06 | 편집·PTY·Git·재개 | c5f2154 최신 통합과 실제 로컬 PTY/편집 시험 | 실제 GitHub publication·원격/대체 Node·브라우저 | CX-04, CL-01, GM-03/05 |
+| S07 | 샤드·장애 복구 | 부모 집계·제한 재시도·drain/복구 | 물리 partition·다중 Node 통신·복구율 표본 | CX-05, GM-02/05 |
+| S08 | 보안·운영 통제 | CPU 격리·kill/drain·tenant guard·pin | Windows/GPU/BuildKit·운영 권한/키·복원 | CX-01/02/06/07, CL-03, GM-03 |
+| S09 | 제한 Agent·Context·RO | Context/RunRecord/eval·정책 기반 | 실제 bounded Agent/Provider·100/30 과제 | CX-08, CL-04/05, GM-04 |
+| S10 | AI/MLOps | Adapter·학습/모델/계보 데이터 구조 | 실제 Provider·MLflow·모델 bytes·승인 배포 | CL-04/05/06, GM-04 |
+| S11 | 릴리스 후보 | 고정 SHA 로컬 회귀·migration·복원 도구 | CI·장시간/부하/보안·전체 복원·접근성 | CX-07/09, CL-03/07, GM-05/06 |
+| S12 | 5대 파일럿 인수 | 설치본·일부 LAN·운영 절차 | 5대 전체 여정·HTTPS/rollback·사용자 인수 | CX-09, CL-07, GM-06, OR-04 |
+
+계획 밖인 완전한 분산 파일시스템·공용 멀티테넌트 hosting·임의 모델 자동 분할·무인 관리자 실행을 잔여 범위에 추가하지 않는다. CPU/RAM/VRAM 숫자를 합쳐 하나의 메모리로 쓸 수 있다고 약속하지 않는다.
+
+## 최신 소스·검증·PR
+
+| 대상 | 고정 기준 | 확인 수준 |
+|---|---|---|
+| main | f9be6b61c9970d7feeb0d43fafb3c0704b8d31de | 최신 개발 branch의 기능이 모두 main에 있다는 뜻 아님 |
+| Codex | 실행 c5f2154 / 감사 b9a53f8 / 복원 869d74b / 검증 b5aef8a / PR19 | 이번 Linux64/core22/Go3, CI 시작 제한·독립/운영 인수 미완료 |
+| Claude | 제품 dee31e5 / 독립 검토 cdf98ad | d14db0a F1/F2 인계 수신, 복원 도구는 5fc1116 통합; 최신 승인 아님 |
+| Gemini | 제품 f50310e / 진행 기록 7810ac1 | Node 표시 개선 확인; 생성 파일/인증/평가 수정 요청 |
+
+현재 열린 PR 13개/draft 12개. #13·15·16·17·18·20은 merged, #11·12는 superseded closed다. **#21 → #22 → #19** 순서로 선행 commit·독립 review·CI를 확인한다. #19 base는 resource-offer-integrity다. #2~10은 main 포함 여부 재확인 후 승계 종료 정리 대상이며 #14는 오래된 별도 검토 PR이다. 이 표는 병합 실행 기록이 아니다.
+
+최신 조회 원본: [17:07 GitHub/branch/LAN snapshot](../30_Development/Evidence/development-continuity-20260911.json). 실행 기준 문서: [[2026-09-11_WORKSPACE-INTEGRATION_Codex_검증보고]], [[2026-09-11_TENANT-BOUNDARY_Codex_검증보고]]. 기존 긴 인덱스는 [[2026-09-11_공통진행판_개편전기록]]에 보존했다.
+
+## 최근 보완의 Codex 검토 결과
+
+- 869d74b/b5aef8a 복원 통합: 실제 DB dump/restore·양쪽 tenant·정본 감사·측정/기록·fencing 검증. Linux64/core22/Go3 통과. 전체 운영 복원은 미완료.
+- Claude cdf98ad F1은 29c810f 실경합에서 기존 자원 잠금으로 직렬화됨을 확인했다. 기록/적용1000 일치, 잠금 제거 변이 실패. F1 판정은 Claude 재검토 대기다. F2의 서버 감사는 후행이지만 Node가 sequence/hash를 실행 전 검사하므로 중복 실행 주장은 입증되지 않았다. intent/응답 유실 감사는 후속 검토한다.
+- Gemini 858763c의 원 보고는 보존한다. 그러나 487a42c drain은 local Set, PTY ticket은 client 문자열, deploy 도구는 config만 검사하며 실제 up은 안내문이다. 65%나 실제 운영 인수 완료로 채택하지 않는다. 로그인 fallback 제거는 인정한다.
+- 검증·근거·다음 담당: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 물리 원격 profile·CI 계정 차단은 그대로다.
+
+## 작업 → 확인 → 다음 진행 기록
+
+| KST | 담당 / 카드 | 작업한 것 | 확인한 것 | 다음 첫 행동 / 담당 |
+|---|---|---|---|---|
+| 2026-09-11 18:53 | Codex / RECOVERY-INTEGRATION | Claude 복원 도구를 정본 감사/판정/기록과 통합, 최신 검토 수신 | clean 5fc1116 Linux64/core22/Go3; CI6 계정 제한; 48task 57.29%(표시55%) | F1 단일 snapshot 수정·F2 의도/감사 검토 / Codex; 5fc1116 독립 검토 / Claude |
+| 2026-09-11 17:00 | Codex / WORKSPACE-INTEGRATION | 편집·PTY·Git와 최신 kernel 통합 및 PR19 전달 | c5f2154 로컬 402/301/43, 20 upgrade; CI 시작 제한; Obsidian 396개 일치 | 최신 Agent 소스/잔여를 공통 작업판으로 정리 / Codex |
+| 2026-09-11 17:07 이후 | Codex / DEVELOPMENT-CONTINUITY | 최초 12목표/48task와 최신 3 Agent 코드 대조, 공통/개별 작업판 및 진입 규칙 작성 | 소스/PR/LAN 확인. 이번 작업의 문서 검사·push/sync는 [[2026-09-11_DEVELOPMENT-CONTINUITY_Codex_검증보고]] 참조 | 각 Agent가 자기 ready 카드 수신 확인·착수 SHA 기록, Codex는 CX-01/02 |
+| 2026-09-11 18:40 | Claude / CL-03 | 복원 시험의 네 거짓 통과 경로 수정: fencing 조회 실패, inv schema 밖 digest, 누락 대 누락, mtime RPO | 정상 RTO 6.1s·RPO 6.2s·권한 1314/7652 exit 0, old epoch exit 1, mtime 24h 위조에도 RPO 222s, 빈 테이블과 삭제된 테이블 구분 | 역할·RLS·object·서비스 재개 검사 추가 / Claude, 독립 검토 / Codex |
+| 2026-09-11 18:00 | Gemini / GM-01, GM-02, GM-04 | 원본 바이트 다운로드(/artifacts/content), 실측 텔레메트리 대조, 동적 프롬프트 누출 검사 | 작성자 보고: Vitest 102/102·Smoke 129/129·fixture 63/63; Codex 실제 2-PC 인수 아님 | GM-01/04 Codex finding 수정, GM-03 병행 / Gemini |
+
+17:20 전달 확인: 최초 진행판 `994ab49` push 및 Obsidian 405개 hash 일치. 세 작업 폴더의 공통 진입 지침 적용·push를 확인했다. CI는 세 Agent 모두 결제/한도 문제로 시작하지 못했다. 상세 SHA/run ID/sync·수신 대기는 [[2026-09-11_DEVELOPMENT-CONTINUITY_Codex_검증보고]] 참조. 이 행 이후의 문서 영수증 commit은 Git 이력에 남긴다.
+
+2026-09-11T18:10:30+09:00 Codex / CX-01: b9a53f8 보안 감사 보강·Linux 65/기본 304/20 migration 경로 통과. Claude 최신 수정의 이전 실패 거부를 확인하고 Gemini 생성 결과/평가에 수정 요청. 다음 Codex는 CX-01 수정본 인수와 CX-02 계약; owner별 작업판에 다음 첫 행동을 기록했다.
+
+최근 기록은 짧게 유지하고 이전 행은 내용·시각·SHA를 보존해 History로 이동한다. **기록 누락이나 조회 실패는 unknown이며 done으로 바꾸지 않는다.**
+
+최종 전달 검증: b5aef8a Linux64/core22 exit0, CI6 시작 전 계정 제한. Obsidian433개 hash 일치(18:59:44, 전달3c74d13); 최종 영수증은 History에 기록했다. 전체 진척57.29%(표시55%)·잔여42.71%(표시45%), 최종 운영 인수 미완료.
+
+## OFFER-SNAPSHOT 최신 전달
+
+- 2026-09-11T23:56:33+09:00 / Codex CX-01: 29c810f 실 PostgreSQL36개 통과, 잠금 제거 변이 실패 확인. F1 전제 정정 근거와 전체 해제 writer 잠금 경로를 [[2026-09-11_OFFER-SNAPSHOT_Codex_검증보고]]에 기록했다.
+- 다음: Codex F2 pre-dispatch intent 감사, Claude F1 판정 재검토. 전체 추정57.29%(표시55%) 유지. CI/peer/원격 운영 인수는 별도 미완료. 과거 행의 F1 snapshot 수정 계획은 이 최신 확인으로 대체한다.
+
+## PTY-INTENT 최신 전달
+
+- 2026-09-12T00:24:11+09:00 / Codex CX-01: 1460634 입력 의도 선기록·확인된 완료 분리·미확정 digest/후속 순번 보호 구현. Linux61/core25, upgrade21 경로 exit0. [[2026-09-12_PTY-INTENT_Codex_검증보고]].
+- 다음 Codex CX-02 운영 credential/Storage 계약; Claude F1/F2 독립 검토; Gemini GM-03 미확정 입력의 동일 replay/종료 UX. CI6 계정 제한, 원격 profile/운영 인수 미완료. 전체57.29%(표시55%) 유지.
+
+## OPERATING-CONTRACT 최신 전달
+
+- 2026-09-12T00:32:00+09:00 / Codex CX-02: [[Codex 운영 자격증명과 Storage 계약]]과 [[운영 환경 입력과 Agent 인계]] 작성. Linux 보호 파일 provider 구현 기준, opaque 버전 참조 schema, 회수/목적지/권한, 로컬64MiB/S3 인수 경계, 기존 보존 기간을 고정했다.
+- Schema 정상1개/거부12개 확인. resolver/실제 자격증명/운영 S3는 미구현·미인수다. 다음 Claude resolver 및 CLI 인증 증거 구분, Codex 경로/scope/회수 conformance·독립 검토, Gemini readiness unknown 표시. 입력12항목의 담당/차단 범위는 운영 입력판.
+- 관측 API 읽기에서 worker1대 online/lan-observe-v1 보고, 직접 mTLS/실행 시험 아님. 전체57.29%(표시55%) 유지.
+
+## CREDENTIAL-CONFORMANCE 최신 전달
+
+- 2026-09-12T00:47:43+09:00 / Codex CX-02: 공통 Protocol과39개 재사용 보안 사례, 모델39+결함검출8 통과. 실제 backend 선택은 모델47개 deselect/exit5. [[2026-09-12_CREDENTIAL-CONFORMANCE_Codex_검증보고]], [[Codex 자격증명 보안 검증 인계]].
+- 다음 Claude 실제 registry/Linux backend fixture 연결, Codex 독립 보안 검토와 open/read·회수 경합 시험. 모델 통과는 운영 합격 아님. CI 계정 제한·운영 입력 대기는 유지, 전체57.29%(표시55%).
+
+- 2026-09-12T01:12:51+09:00: Codex backend 구현 인수·Claude Context/readiness 통합→Linux154/core53 및 upgrade22 확인→Claude 독립 검토/Provider 연결, Codex 보호 등록·Storage/원격 후속. [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]]. CI6건 계정 제한, .225 관측 전용 재확인, 진척57.29% 유지.
+
+- 2026-09-12T01:26:09+09:00: Codex 보호 CLI 구현→Linux90/CLI4 검증→운영 절차/Claude 검토 인계. 다음 Codex4b09dfc/c632d3f RPO 독립 검토. CI 계정 제한·원격 profile/실제 Provider는 미완료, 진척57.29% 유지. [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]].
+
+## 외부 진행 보고 수신·병합 2026-09-12T01:28:09+09:00
+
+- Gemini9532a35의 PTY 단조 sequence 수정 commit(실제2파일 변경)을 확인했고 작성자 보고의 Vitest104/build/fixture 결과를 수신했다. 독립 실행·브라우저/원격 인수는 이번에 검증하지 않았다. 기존 인증/hash/download/drain/ticket/실장비 finding을 해결됨으로 바꾸지 않는다.
+- Claude4b09dfc/c632d3f의 운영 RPO capability 보고를 수신했다. PITR/WAL/보관 매체·운영 목표의 독립 검토가 다음 Codex 작업이다. 작성자 보고의 전체 차단/검증 수치를 최신 kernel 인수로 승격하지 않는다.
+- 외부 진행판은 최신 credential/PTY/복원 검토 이력을 빠뜨린 이전 내용을 포함했다. [외부 원문·hash 보존](../30_Development/Evidence/obsidian-proposals-20260912-provision/manifest.json) 후 이 페이지의 최신 기록과 병합했다. 외부65% 또는 시각이 맞지 않는 작성자 행을 새 전체 평가로 채택하지 않으며57.29%를 유지한다. 다른 Agent 변경은 삭제하지 않고 원문과 수신 요약을 남긴다.
+
+- 2026-09-12T01:46:04+09:00: Codex RPO 원본 오판 재현→설정/운영 인수 분리·서비스/DB failed target 방어→Linux69·core53·upgrade23 확인. 다음 backup ledger8a8f3b4·permission snapshotd63717f 검토. 진척57.29%, 운영 RPO·CI·peer 미완료. [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]].
+
+
+## 2026-09-12 RPO 전달 시 외부 제안 수신
+
+Obsidian 외부 편집 원문은 [제안 보존 기록](../30_Development/Evidence/obsidian-proposals-20260912-rpo/manifest.json)에 바이트 그대로 보존했다. Gemini는 5109962에서 요청자 자가 승인 차단, Vitest105·Smoke129·2-PC63·Deploy5 통과를 보고했다. 이번 Codex 회차에서는 해당 소스/시험을 독립 재검증하지 않았으며 기존 UI 지적 해소나 실장비 인수로 승격하지 않는다. 전체 65%는 작성자 추정이며 공통 근거 기준 57.29%를 유지한다.
+
+Claude의 d63717f 권한 snapshot과 8a8f3b4 백업 원장 연결 보고를 수신했다. 다음 Codex 검토 대상이다. ‘기록 단계 미실행·결함3개’는 Claude 계보의 보고이며 최신 Codex 복원 정본에 그대로 적용되지 않는다. 이번 실제 CLI·DB 기록 시험과 R1~R4 수정은 [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]]를 따른다. 외부 시각 14:30/15:40은 작성자 표기이며 이번 실제 KST 관측 시각으로 재해석하지 않는다.
+
+
+## 최신 Codex 백업 원장 전달
+
+[[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]: 420b81c Linux63/core50, 백업 비파괴 게시·로컬 동기화·원장/drill 원자 기록 검증. d63717f 프로젝트 비교/disabled 승인 오류 실제2개 재현, 통합하지 않음. 다음 Codex는 permission snapshot 계약과 ade5bb8 AC-12 집계 검토, Claude는 수정/독립 검토. CI/실장비/운영 인수 미완료, 전체57.29% 유지.
+
+
+## 최신 권한 관측·운영 인수 집계
+
+[[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]]:9755c60 Linux74/core55. 프로젝트별 관측·동시 기록·rollback, 원본 집계 과장4개 재현 및 수정. 다음 Claude 독립 검토/consumer 조율, Gemini unknown/catalog 표시, Codex 실제 운영 Evidence 수집 경로 검토·원격 설치 수신 시7개 재개. CI/운영 인수 미완료, 전체57.29% 유지.
+
+
+## 2026-09-12 권한 관측 전달 중 외부 보고 수신
+
+Gemini는 6cbb715의 ReleaseCandidateView 고정 배너/MET 제거 및 동적 집계를 보고했다. 이번 Codex 회차는 이 UI의 소스/브라우저를 독립 검증하지 않았다. 105/129/63/5 시험·전체65%는 작성자 보고로 보존하며 기존 실제 API/인수 finding을 삭제하거나 공통57.29%를 대체하지 않는다. Claude ade5bb8 집계 보고는 원본 실제4개 재현 후9755c60에서 보완했다. 원문 외부 시각16:50은 작성자 표기이며 실제 관측 시각으로 재해석하지 않는다. 원본 파일/해시는 [외부 제안](../30_Development/Evidence/obsidian-proposals-20260912-permission/manifest.json)에 보존했다.
+
+
+## 최신 백업 bytes 검증 무결성
+
+[[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]:4ddb622 Linux78/Windows DB60, 원본5개 오류 재현 후 수정. 검증 전 tenant/row 잠금·기준hash 비교·실패 savepoint로 선기록/덮어쓰기를 차단했다. 다음 Codex는 hash_file의 open-time root/링크/교체 경계, Claude 독립 검토. 02:30 LAN .225 online/fresh지만 observe profile/kill switch 유지, 원격7개 미수행. 전체57.29% 유지.
+
+
+## 2026-09-12 BACKUP-ROOT 외부 보고 수신
+
+Gemini1133666의 ReleaseCandidateView subtitle/SLO 테스트(작성자106/129/63/5)를 수신했다. 실제2파일 변경은 Git에서 확인했으나 UI/브라우저/실장비 시험은 이번에 독립 재검증하지 않았다. 전체65.63%는 작성자 추정으로 보존한다. Claude71cf2c0은 실제2파일 collector 추가를 확인했으며 자체 path.open/resolve_within 및 --node binding 검토가 다음 Codex 작업이다. 작성자7개 시험과 S12-ST25→50/57.81% 제안은 독립 검토 대기이며 공통57.29%를 아직 변경하지 않는다. 외부18:00/18:10은 작성자 표기이고 현재 관측 시각으로 재해석하지 않는다. [원문/hash 보존](../30_Development/Evidence/obsidian-proposals-20260912-root/manifest.json).
+
+
+## 2026-09-12 STORAGE-CHECK 외부 제안 수신
+
+Gemini fa01d77의 Two-Person Rule 서버/스모크 변경2파일 및 작성자133/106/63/5 보고를 수신했다. 독립 서버/브라우저 재검증은 이번에 미수행, 기존 finding/원격7개 상태를 유지한다. Gemini65.63%는 채택하지 않았다. 원문은 [보존 기록](../30_Development/Evidence/obsidian-proposals-20260912-storage-check/manifest.json)에 있다.
+
+
+## 2026-09-12 Node 인증 전달 중 외부 Claude 보고
+
+00b1159의 알람7개 평가/10개 미평가·partition runway7개 시험 보고를 수신했다.2파일 변경만 확인하고 독립 시험/실제 운영 partition 상태는 검증하지 않았다. 외부 작성자19:20은 실제 관측 시각이 아니다. [원문](../30_Development/Evidence/obsidian-proposals-20260912-node-auth/manifest.json). 기존 Codex 복원·권한·Storage 보완 기록을 유지한다.
+
+
+## 외부 후속 인계 수신 (2026-09-12T13:24:54+09:00)
+
+공유본 외부 수정4개를 [원문·SHA256 보존본](../30_Development/Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)으로 받았다. 정본의 최신 Codex 검증 이력은 유지한다. Claude의 기존 복원/Storage/RPO 정정 및 F1~F4는 고정 SHA별 후속 수정과 대조가 필요하다. Gemini는 GM-03 PTY ticket/Drain 연결과 smoke154/Vitest106/2-PC63/deploy5를 작성자 보고로 추가했다. 이번에는 해당 소스·실장비를 독립 검증하지 않았으며 자동 승인이나 운영2-PC/GPU 성공으로 채택하지 않는다. 원문 시각은 작성자 기재값이며 현재 검증 시각으로 사용하지 않는다.
+
+공통 성숙도는 검증된48행 기준57.81% 유지, Gemini의 기대65.63%는 독립 통합 검토 전이다. 새 Codex fd0c081/0037 저장소 기록은 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 다음 Codex는 sample 조회/운영 설치 계약, Claude는0037 독립 검토, Gemini는 최신 통합 SHA를 명시한 실제 API/브라우저 증거 보완이다. 수신은 다른 Agent 실행 또는 승인을 뜻하지 않는다.
+
+
+## 외부 인계 수신 (2026-09-12T14:15:21+09:00)
+
+[공유본 원문4개/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-view/manifest.json)를 보존했다. Gemini b90c788 PTY/Drain·Vitest107/smoke154/2-PC63/deploy5는 작성자 보고이며 이번 Codex 독립 승인/물리2-PC 인수와 다르다. 오래된 공유본의 기존 Codex 이력 제거·65.63% 기대값을 정본으로 덮어쓰지 않는다. 공통57.81% 유지. 최신 Codex는 [[2026-09-12_STORAGE-VIEW_Codex_검증보고]]:9d7559e 인증 GET/현재 권한·소유자/저장 서명·Evidence 재검증, pending·expired·recorded와 currentHealth unknown 분리. Linux153/Windows25 통과. 다음 폴더-root policy 설치·교체/receipt 계약, Claude 독립 검토·Gemini 화면 연결. 전체57.81% 유지, CI/물리 원격 인수 미완료.
+
+
+## 외부 인계 수신 (2026-09-12T15:26:21+09:00)
+
+[공유본3개 원문/hash](../30_Development/Evidence/obsidian-proposals-20260912-storage-policy/manifest.json) 보존. Gemini가 d73da2b base/로컬 변경의 IntranetDeploymentView 실시간 상태 대조·preflight와 물리 인수 분리, Vitest109/smoke154/2-PC63/deploy5를 보고했다. 이 수신은 해당 코드의 독립 승인이나 실제5대 운영 인수가 아니다. 최신 구현 SHA 고정과 독립 검토는 pending이며 공통57.81% 유지. 과거 Claude F1~F4는 후속 수정 SHA별 보고와 대조해야 한다.
+
+새 Codex f9d69a8의 영속 storage policy floor/로컬 시작 기록은 [[2026-09-12_STORAGE-POLICY_Codex_검증보고]]를 따른다. 다음 Codex는 LAN bundle 읽기 mount·policy 전달/교체·receipt 대조, Claude는 f9d69a8 독립 검토, Gemini는 서버 운영 인수와 local receipt 구분이다.
+
+
+다음 Codex 첫 행동: ADR-094 preflight를 전제로 durable 교체 단계와 중단 지점별 forward 재개 구현.
+
+
+다음 첫 행동: Codex Windows/WSL 교체 진입점과 명시적 정책/receipt 전달·출력 검증 연결.
+
+
+2026-09-12 STORAGE-REPLACE 전달 수신: Gemini base5d33072의 인메모리 토큰 검증/시험4·전체338 passed/340 skipped·smoke158 등은 작성자 보고로 보존했다. Claude integration 배포/인증 지적과 함께 [[Agent 인계 대기 목록]]의 최신 수신 절에 기록했다. Codex 정본은 configured factory 위임 유지, 독립 검토/물리 인수 pending, 전체57.81% 유지.
+
+다음 Codex 첫 행동: 실제 원격 Ubuntu/Docker 경로·현재 policy와 receipt를 확인하고 서버 mTLS/Evidence를 연결한다.
+
+
+2026-09-12 STORAGE-WINDOWS 인계 수신: Gemini ea508ea의 Nginx 헤더/Authorization 전달·PKCE 스위트67 등은 원문 보존 및 작성자 보고로 접수했다. [[Agent 인계 대기 목록]] 최신 절 참조. 실제 커널 인증·물리2-PC/GPU 인수와 구분하며 전체57.81% 유지.
+
+
+## 2026-09-12 LAN-STORAGE-READINESS 중 외부 보고 보존
+
+`Evidence/obsidian-proposals-20260912-lan-storage-readiness/manifest.json`의 3개 원문을 SHA256 그대로 보존했다. Gemini는 integration/all-agents-unified/base ea508ea에서 SPA projectId 동적 전달·project-scoped 호출/평면 fallback, server.py project 경로 추가를 보고했다(Smoke171,2-PC67,Vitest109,Pytest8,Deploy5). 이는 작성자 보고이며 그 문서의 “독립 검증” 표현을 독립 reviewer 승인으로 채택하지 않는다. Claude B-6의 정적 경로 불일치 약23/30 보고도 검토 대기다. 미래 KST 표기는 원문 그대로 보존했으며 현재 실측 완료 시각으로 사용하지 않는다.
+
+커널 정본 factory/인증·DB·nonce·승인 transaction을 복제하는 별도 server.py 구현을 정본으로 승인한 것이 아니다. SPA 경로 이름 일치만으로 커널 연결이 증명되지 않으며 mutation의 평면 fallback/중복 제출 안전성은 독립 검토 대상이다. 현재 Codex branch factory는 이미 정본 create_configured_app를 호출한다. 다음 Codex/Claude는 integration의 실제 entrypoint와 DB 연결/승인·취소 경계를 검토하고 Gemini는 해당 피드백을 반영한다. 물리2PC·GPU 인수/CI 성공/공통 진척 상향은 인정하지 않으며57.81% 유지한다.
+
+
+## 2026-09-12 LAN-MIGRATION-PLAN 외부 보고 보존
+
+Evidence/obsidian-proposals-20260912-lan-migration의 원문3개/hash manifest를 보존했다. Claude는 이전 수동 경로 비교를 정정하고 route_coverage(30f48f4) 기준 integration22/현재Codex+Claude19 미제공을 보고했다. Gemini는 base92b558e에서32개client/0unserved, Resume project 경로·fallback, 단위15/Pytest31 및 전체369passed340skipped/Smoke171/2-PC67/Vitest109/Deploy5를 보고했다. 모두 작성자 보고이며 이 수치를 독립 검토나 실제 물리 인수로 승인하지 않는다. 미래KST 원문은 현재 실측 시각으로 채택하지 않는다.
+
+`--served src/saintvision`의 정적0unserved는 factory가 실제 등록하는 라우터·인증·DB·커널 실행을 입증하지 않는다. 다음Codex/Claude는 실제 배포 entrypoint에 현재커널이 연결되는지 확인한 뒤 남은 화면 계약을 검토한다. Gemini는 경로/응답 계약과 mutation fallback 안전성을 재확인한다. 기존Codex 최신 기록은 보존하고 전체57.81% 유지한다.
+
+
+추가 외부 변경(18:18 Gemini/base1a1719a)은 Evidence/obsidian-proposals-20260912-lan-migration-2에 별도 보존했다. 작성자는404만 mutation fallback/terminal canonical 경로를 보고했다(Smoke174,Pytest6,2-PC67,Vitest109,Deploy5,route33/0unserved). 독립 검토 전이다. 404는 라우트 부재뿐 아니라 객체 미존재·권한 은닉 응답일 수도 있으므로404만으로 안전한 재제출을 보장한다고 인정하지 않는다. 명시적 API capability/version 선택 또는 동일 idempotency/scope 보장 검토가 필요하며 kernel 연결/물리 인수와 별개다.
+
+
+## 2026-09-12 RETAINED-BACKUP 외부 보고와 우선순위 정정
+
+Evidence/obsidian-proposals-20260912-retained-backup의 원문3개와hash를 보존했다. Gemini는 Idempotency-Key/route404 판별·WebTerminal apiClient와Vitest114를 보고했다. 작성자 보고이며 실제 커널의 idempotency 저장·응답 계약과 운영 인수는 검토 대기다.
+
+Claude는 저장소의 기본 시험 credential로 운영DB 로그인이 가능하다고 보고했다. Codex가 실제 READ ONLY metadata를 확인한 결과 inv_app LOGIN=true,superuser=false,bypassrls=false,inv_kernel LOGIN=false이며 조회 순간 해당 그룹과inv_lan_runtime active session은0이었다(상시 미사용 증거 아님). 실제 password 인증은 이번 Codex 확인에서 재시도하지 않았다. deploy/init-db.sql의 고정 password LOGIN 생성뿐 아니라 tests/conftest.py의 기존 app_engine fixture에도 공용 inv_app 역할을 고정 password LOGIN으로 바꾸는 코드가 있어 재발 경로다. 폐기용 DB라도 역할은 클러스터 전역이라는 점을 반드시 수정해야 한다.
+
+최우선 다음 Codex: init SQL/compose 고정 로그인 제거, 테스트별 난수 login 역할 생성·정리로 공용 그룹 역할 변경 금지, 해당 회귀 검증. 그 뒤 실제 서비스 의존성과 권한 확인을 마치고 운영 inv_app NOLOGIN/password 폐기 조치를 별도 critical 운영 변경으로 제시한다. 현재 사용자 지침에서 critical 변경은 자동 승인 범위에서 제외되어 있으므로 이번에는 운영 credential/역할을 변경하지 않았다. 기존 정본 서버 candidate 작업보다 이 항목을 먼저 수행한다. 미래KST 원문은 현재 실측 시각으로 채택하지 않으며 전체57.81% 유지한다.
+
+
+동시 편집 추가본은 Evidence/obsidian-proposals-20260912-retained-backup-2에 보존했다. Gemini는19:48 apiClient 일원화·다운로드 Bearer·터미널 재접속/Vitest115를 보고했다. 작성자 보고/독립 검토 대기이며 실제 운영 인수·CI 성공으로 채택하지 않는다. 다음 우선순위는 공용 DB 역할의 시험 credential 재발 경로 수정이다.
+
+
+## DB-TEST-ROLE 中 외부 보고 보존
+
+Evidence/obsidian-proposals-20260912-db-test-role의 원문3개/hash를 보존했다. Claude는87eeb71 역할 shape guard/상시 readiness 탐지33개와0d5eb38 factory 설정 미비 거부 실측을 보고했다. 해당 helper가 기존 migration에서 호출되지 않는다는 한계도 보고했으며, 최신 Codex51개 시험의 근거와는 별도다. Gemini는Nginx Workspace terminal proxy/route34·Vitest115/Smoke174 등을 보고했다. 모두 작성자 보고/독립 검토 대기이며 운영 인수로 승인하지 않는다. 미래KST 원문은 현재 실측시각으로 채택하지 않는다.
+
+Codex의 기존 운영 inv_app NOLOGIN/password 폐기 SQL은 별도 컨테이너 검증 완료,critical 운영 승인 대기다. 각 Agent는 공용 그룹을 ALTER LOGIN하는 구 fixture를 운영 클러스터에서 실행하지 않아야 한다. 전체57.81% 유지한다.
+
+## 2026-09-12 CONFIGURED-SERVER 수신 제안·검토 대기
+
+외부 수정 3개 원문과 SHA-256은 `30_Development/Evidence/obsidian-proposals-20260912-configured-server`에 보존했다. Gemini 22:05 보고는 로그인 격리 통합·deploy_intranet.ps1의 미설정 환경변수 기본값 주입·작성자 시험 결과다. 기본값을 넣은 `compose config` 성공은 운영 credential/config 준비 증거가 아니다. 기본값은 합성 사전점검 과정에만 한정되고 실제 기동에 전파되지 않는지 독립 검토가 필요하다. 이번 Codex Compose는 추가 필수 설정3개와 /readyz를 연결했고 실제 factory HTTP/별도DB14개 시험을 통과했다(510ced4). Gemini의 기존5개 설정 시험과 route34/Smoke174/2-PC67은 작성자 보고로 보존하며 실제 원격 인수로 승격하지 않는다.
+
+Claude d09e6a5 scratch-role 리허설 및 a5dd83c 0001 drift guard13개 보고·인계 상태 지도는 수신했으며 독립 검토 전이다. 원문의 2026-09-13 미래 시각은 작성자가 적은 값으로 보존하고 실제 수행 시각으로 확정하지 않는다. B-9의 “운영 교체 실행 대기”는 Codex 20:47:51 운영 NOLOGIN/password 제거와 사후 검증으로 해소됐다. B-3/B-4의 타 lane demo entrypoint 문제는 해당 branch 통합 검토가 여전히 필요하며 정본은 saintvision.server:create_app→inv.app.create_configured_app이다. 공통 완료율57.81% 유지.
+
+## 2026-09-12 BUSINESS-WORKSPACE 수신 갱신
+
+외부3개 원문/hash는 Evidence/obsidian-proposals-20260912-business-workspace에 보존했다. Gemini23:15 보고는510ced4 설정 수용/작성자시험이며, 이후14de71d의 INV_BUSINESS_DSN·INV_CONFIG_VOLUME/영속overlay 변경이 추가됐다. 합성 default 환경변수의 사전점검은 실제 운영준비 증거가 아니다.
+
+Claude가6ff090b를 재확인해 F2/entrypoint/B-9의 해소를 보고했다. 해당 scope의 독립 재확인 수신으로 기록하며, 이후 Codex 수정까지 검토한 것으로 확대하지 않는다. 원문의2026-09-13 시각은 작성자 값이다. **F1 offer/release snapshot 불일치는 미해결 재현 보고**이므로 Codex가 우선 재현·수정한다. 87eeb71/a5dd83c role guard를 코드로 읽었으며 helper의 검사는 존재하지만0001은 그 helper를 호출하지 않는다는 범위 제한을 확인했다. 이 독해만으로 해당13개시험 재수행/운영migration guard 인수를 선언하지 않는다.
+
+## 2026-09-14 외부 기록 수신 및 통합 조건
+
+Obsidian 외부 편집3개를 Evidence/obsidian-proposals-20260914-migration-guard/proposal-1~3.txt에 원바이트/hash로 보존했다. 원문 작성 시각은 실제 실행 시각 검증을 대신하지 않는다.
+
+Claude가 F1을 철회했다고 보고했다. 수동 lease UPDATE 재생이 실제 release→lock_resources를 생략했다는 설명은 Codex51f4004 실제 회귀증거와 일치한다. F1 수정대기는 해소하되, 이를 신규 migration guard 전체 또는 현재 배포의 독립 승인으로 확대하지 않는다. Claude0035~0037 검토의 차단finding 없음·scratch 적용 보고는 원문에 보존한다.
+
+Gemini는181 smoke/115 Vitest/67 two-PC checks와 embedded stopReceipt 폴백을 보고했다. 작성자 보고이며 Codex가 재실행한 결과가 아니다. integration의 fixture server 포함 route coverage0은 실제 configured factory 제공 API 검증이 아니다. 75%/65% 예상 수치는 공통2775/4800 산정에 합산하지 않는다. 실제 원격 .225는13:46 KST offline/stale로 확인됐다.
+
+**다음 Codex 통합 카드**: configured factory 기준 승인목록·reclaim·shard 조회/전체취소4개 미제공 경로의 계약 결정. 승인목록은 기존 project/run 승인 모델과 연결할 읽기 경로 검토, reclaim은 receipt 자동회수 의미를 유지하고 성공을 꾸미는 수동 endpoint를 만들지 않기, shard는 durable 부모Run/자식 binding/result 정본을 근거로 조회·취소의 tenant/권한/동시성 경계를 검토한다. Gemini는 fixture가 아닌 정본 factory에서 응답 스키마 대조, Claude는 검토 및 운영OIDC 설정 준비. 본 문단은 이4개 API 구현 완료를 뜻하지 않는다.
+
+Migration guard 정본은 온라인 진입점의 migration_guard.py이다. “없는 역할도 생성 거부”라는 외부 표현은 정정한다: 없는 그룹은 허용하고, 위험플래그가 있는 기존 그룹을 거부한다(실제13개 시험). helper와 통합할 때 published migration을 수정하거나 guard를 제거해 약한 운영그룹을 통과시키지 않는다.
+
+## 2026-09-14 PROJECT-OBSERVATION 수신 조율
+
+외부 진행판/Gemini 작업판2개 원바이트를 Evidence/obsidian-proposals-20260914-project-observation에 보존했다. Gemini는 ResultView 타입 및 resume/decision/terminal 경로 정렬,181/115/67 checks를 보고했다. 작성자 보고이며 원격인수 증거로 합산하지 않는다. Claude route checker fef3292 오탐수정 보고를 받았다. 작성된17:45 시각은 Codex 확인 시각을 대신하지 않는다.
+
+Codex는 [[승인 샤드 화면 정본 API 계약]]에 기존 부재4개 결정을 완료했다. 승인목록·샤드조회는4f518ea 실제API,전체취소는 기존부모Run cancel,수동reclaim은receipt자동회수상태로 수렴한다. Gemini는 이새계약까지 연결 후 실제configured factory 기준으로 검증해야 한다. 전체57.81% 유지.
+
+## 2026-09-14 20:00 외부 진행 기록 수신
+
+Gemini가 프로젝트 범위 ApprovalPage/ShardObservation 연결, 정적 미서빙 경로0건, smoke181/2-PC67 통과를 보고했다. Claude의 부재 route 재분류와 자동 회수 버튼 제거 제안도 수신했다. 이는 작성자 보고이며 Codex가 새 frontend SHA/실제 configured route/브라우저를 독립 검증한 결과가 아니다. 원격 물리 PC 인수나 CI 성공으로 바꾸지 않는다. 다음 CX-01에서 실제 frontend 변경 SHA와 정본 API 정합을 검토한다. 전체 기준선57.81% 유지. 외부 원문2개는 [제안 보존 manifest](../30_Development/Evidence/obsidian-proposals-20260914-cli-output/manifest.json)로 보존했다.
+
+## 2026-09-14 20:15 외부 보고 수신과 독립 대조
+
+Gemini의 5곳 project scope 정렬·미서빙0건 보고와 Claude의 fixture 포함 측정 한계 보고를 추가 수신했다. 원문은 Evidence/obsidian-proposals-20260914-frontend-review에 SHA와 함께 보존했다. 이번 검토70ea3fb는 해당 경로정렬 이후 코드이며, FE-M01~05 payload/실패처리 finding은 그대로 남는다. 수신 보고를 독립 승인이나 운영 완료로 승격하지 않는다.
+
+## 2026-09-14 동시 편집 수신 보존
+
+Gemini의21:00표기보고에서fixture receipts/reclaim/cancel-all/flatshards제거·result조회통합과정적28경로보고를수신했다. 아직Codex의8037166후보와합친SHA의브라우저검증은아니다. 기존auth/session원장보고와과거인계항목도외부원문3개에보존했으며운영OIDC로승격하지않는다. 원문보존: `30_Development/Evidence/obsidian-proposals-20260914-frontend-fix/manifest.json`. 다음수정SHA에서FE-M03~05와8037166충돌을확인한다.
+
+추가수신(작성자21:15표기): Gemini가App/Studio잔여flatfallback제거·26개경로/단독커널미제공11을보고했다. Claude재현시험인정도진행판에반영됐다. 새원문은frontend-fix-r2제안폴더로보존했다. 후보8037166과통합검증완료는아니다.
+
+## 2026-09-14 최신 외부 보고 수신
+
+Gemini43640ee/96191cc의승인·취소helper통합/외부IdP PKCE보고와Claude B-6/7처분을수신했다. 새커널auth/token broker대신운영IdP PKCE·기존JWT검증을연결하는방향이며실IdP입력/인수는남는다. Gemini의FE-M04해소주장과별개로Codex재검토에서초기fixture/관측새로고침문제를찾아ea42657후보로수정했다. 응답누락임의수치는후속이다. 외부원문3개는 `30_Development/Evidence/obsidian-proposals-20260914-shard-observation/manifest.json`에보존했다. 보고된브라우저/실장비수치를독립인수로승격하지않는다.
+
+
+## 외부 제안 수신 — LIVE-PROJECT-OBSERVATION
+
+2026-09-14 외부 진행판 3개를 `30_Development/Evidence/obsidian-proposals-20260914-live-project`에 원문 바이트와 SHA256 manifest로 보존했다. Gemini는 e5455c3의 프로젝트 결과/아티팩트 스모크186, route22/0 unserved, unit131을 보고했다. Claude는 fixture backend/커널 통합·role guard·route coverage·credential·FE-M의 CX-01 실행 체크리스트를 제안했다. 이는 작성자 보고 수신이며 이 코드의 독립 검증이나 운영 인수로 간주하지 않는다.
+
+Codex 확인: workspace-bridge의 configured factory가 정본이고 기존 fixture 통합은 별도 작업이다. route_coverage의 소스 스캔 숫자만으로 실제 configured surface를 검증했다고 하지 않는다. 고정 online5 제거는 FE-M04의 일부이며 이번 실제 projects/workspaces 계약·초기 fixture·누락 Node 수치 수정이 추가로 필요했다. 따라서 "코드 잔여 없음" 또는 "FE-M04 전체 완료"를 채택하지 않는다. 실제 IdP와 원격 PC도 미검증이다. 새 제품 후보7b50ae2를 포함해 최신 공유 브랜치와 통합한 뒤 검증한다.
+
+
+## 외부 제안 수신 — APPROVAL-REVIEW-SNAPSHOT
+
+외부 진행판3개를 Evidence/obsidian-proposals-20260914-approval-review에 원문 SHA256과 함께 보존했다. Gemini는 ee63948의 프로젝트 Node 조회 우선/global fallback,132시험·스모크186·route23을 보고했다. 같은 문서에 기존181/24 숫자도 있어 실행별 증거를 다시 맞춰야 한다. 기록의23:45시각은 이번 수신 시각보다 미래이며 실제 수행 시각으로 채택하지 않는다. Codex는 아직 해당 SHA를 독립 검증하지 않았다. 프로젝트 Node→global fallback의 권한 경계 및 누락 telemetry 임의값 여부는 최신 후보 통합 때 검토한다. 실행체인/원격시험 합격 주장이나 완료율에 자동 반영하지 않는다.

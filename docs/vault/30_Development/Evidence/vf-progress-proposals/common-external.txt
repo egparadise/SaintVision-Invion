@@ -1,23 +1,14 @@
 ---
 doc_id: "INDEX-PROGRESS-001"
 title: "전체 개발 진행 현황"
-version: "1.0.75"
+version: "1.0.65"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T12:12:44+09:00"
+updated: "2026-09-15T11:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # 전체 개발 진행 현황
-
-## 신규 VF 트랙 현재 상태 (Codex)
-
-- 정본 작업판: [[Codex VF 작업 현황]]. VF-CX-01 code 290aba5: canonical factory·fixture 격리, Windows 최종1613 통과/139 skipped와 별도 Linux복원41 통과. [[2026-09-15_VF-CX-01_Codex_인계]].
-- VF-CX-02 code d6d9d87: ModelManifest/DataLocation FK·full-byte hash·lease/fence commit, Windows66/Linux49 및 URI기본76 통과. [[2026-09-15_VF-CX-02_Codex_인계]]. 실제 원격 모델 실행 인수가 아님.
-- CI는 두 code SHA에서 billing/한도 때문에 시작 전 거부. 독립 검토/운영 SSO/PITR/5대 인수 미완료. 다음 Codex VF-CX-03 locality/예약 결속; Claude 계약 독립 검토/서비스, Gemini 실제 route/UI 정합.
-- 기존 57.81%와 새 VF 범위는 별도. 새 Codex VF 운영 인수 0/5, 구현·로컬 시험을 done 또는 운영 인수율로 계산하지 않음.
-- 아래 기존 공유 진행 내용은 보존했다. 다른 Agent의 보고 수신/독립 검토를 Codex가 대신 완료 처리하지 않는다.
-
 
 **모든 Agent는 작업 시작 전에 이 페이지와 자신의 작업 페이지를 읽고, 작업 후 `작업한 것 → 확인한 증거 → 이어서 할 첫 행동`을 남긴다.** 긴 로그는 History/Evidence에 두고 이 페이지는 현재 상태와 다음 담당을 유지한다. 운영 방법은 [[Agent 지속 개발 운영 규칙]].
 
