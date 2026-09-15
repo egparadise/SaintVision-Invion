@@ -382,7 +382,8 @@ def cache_usage(
         select(func.coalesce(func.sum(DataReplica.local_bytes), 0)).where(
             DataReplica.tenant_id == tenant_id,
             DataReplica.contribution_id == contribution_id,
-            DataReplica.state.in_(("ready", "transferring")),
+            # Unavailable/corrupt bytes still occupy storage until eviction.
+            DataReplica.state != "evicted",
         )
     )
     capacity = contribution.capacity_bytes
