@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.13"
+version: "1.0.14"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T15:30:50+09:00"
+updated: "2026-09-15T16:20:06+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
+
+- 최신배포registry: Claude검토2commit수신, 승인시간/ORM캐시/동시등록4실패재현·수정, 최종82시험통과/실제image8통과. [[2026-09-15_VF-DEPLOYMENT-GUARD_Codex]]. 기존DB중복거부유지,새수정독립검토/CI/운영미완.
+
+
+- 2026-09-15T16:13:30+09:00 배포레지스트리검토착수 base0db07c8. [[2026-09-15_VF-DEPLOYMENT-GUARD_Codex]].
+
 
 - 최신 모델커밋관측: 현재project권한·저장manifest무결성검사·최소요약GET, 최종141시험(실제image포함)통과. [[2026-09-15_VF-MODEL-OBSERVATION_Codex]]. Claude독립검토/Gemini화면/CI·운영은미완.
 
@@ -25,7 +31,7 @@ source_of_truth: "Git"
 - 2026-09-15T15:11:55+09:00 Codex VF-CX-02 검토 finding 판정 착수, base116e6e5/agent/codex/vf-model-review. [[2026-09-15_VF-MODEL-REVIEW_Codex]].
 
 
-기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-model-observation, base c74ce2e. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
+기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-deployment-guard, base 0db07c8. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
 
 | 카드 | 구현·로컬 검증 | CI/검토/운영 | 다음 행동 |
 |---|---|---|---|

@@ -1,11 +1,11 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-15T15:27:33+09:00"
+updated: "2026-09-15T16:17:58+09:00"
 source_of_truth: "Git"
 ---
 
@@ -54,3 +54,15 @@ GET /v1/projects/{project}/models/{model_id}/versions/{version}/commitment
 - licensePolicy는불변선언이지실제라이선스허가판정이아니다. 공개ModelVersion자동결속/배포/다운로드/현재실행가능판정은여전히후속이다.
 
 검증및인계: [[2026-09-15_VF-MODEL-OBSERVATION_Codex]]. Gemini Model Studio는정확한project/model/version을선택해과거커밋요약으로표시하고실행가능배지를이응답만으로만들지않는다.
+
+
+## S10 배포 기록 승인·동시성 (1.2.0)
+
+record_deployment는신뢰된내부호출자가제공한timezone-aware now의배포사실을등록하는metadata service다. 물리배포·kernel실행permit·현재프로젝트인가를대신하지않고새HTTP경로를열지않는다.
+
+- 같은tenant/model_version에FOR UPDATE를획득한뒤stage와digest를읽는다. ORM identity cache를populate_existing으로새로고친다. 기존deployment행이없는최초동시등록도직렬화된다.
+- 이어같은tenant approval을FOR SHARE로재조회해결정/digest및 decided_at <= now < expires_at을검사한다. 미래승인·만료시각포함·거절결정은수용하지않는다. now는기록대상시각이며현재실행권한만료검사의대체가아니다.
+- 같은tenant/version/environment의기존active행은모두superseded로바꾸고새active행하나를같은transaction에기록한다. 기존0004의부분고유index도같은범위의active중복을거부한다. 다른version/environment의상태는바꾸지않는다.
+- 기존DB고유제약은유지하며service잠금은동시등록이고유제약예외로실패하지않고직렬대체되도록한다. 원시SQL직접쓰기권한이나운영DB정리를추가하지않았다. 운영사용자·승인scope·실제배포성과확인은별도kernel절차가필요하다.
+
+실제실패재현/동시transaction검증은 [[2026-09-15_VF-DEPLOYMENT-GUARD_Codex]]. Claude독립재검토대상이다.

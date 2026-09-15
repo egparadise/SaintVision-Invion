@@ -17,7 +17,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from ..db.models import (
@@ -472,11 +472,25 @@ def record_deployment(
 
     An existing active deployment of this version in this environment is marked
     superseded in the same transaction, so "what is live" is never ambiguous.
+
+    This records registry metadata at the trusted caller's timezone-aware
+    ``now``; it does not perform deployment or issue a kernel execution permit.
+    Approval validity is the half-open interval [decided_at, expires_at).
     """
     if environment not in ("lab", "staging", "pilot"):
         raise InvError(VAL_SCHEMA, f"unknown environment: {environment!r}")
 
-    version = _load_model_version(session, tenant_id=tenant_id, model_version_id=model_version_id)
+    # The version exists even when no deployment does: lock it before looking
+    # for a previous active record, serializing concurrent first registrations.
+    # Refresh ORM identities so earlier reads cannot preserve stale authority.
+    version = session.scalar(
+        select(ModelVersion).where(
+            ModelVersion.tenant_id == tenant_id,
+            ModelVersion.model_version_id == model_version_id,
+        ).with_for_update().execution_options(populate_existing=True)
+    )
+    if version is None:
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "model version not found")
     if version.stage != "released":
         raise InvError(
             VAL_SCHEMA,
@@ -484,11 +498,17 @@ def record_deployment(
             cause_ref=model_version_id,
         )
 
-    approval = session.get(Approval, approval_id)
+    approval = session.scalar(
+        select(Approval).where(
+            Approval.tenant_id == tenant_id, Approval.approval_id == approval_id,
+        ).with_for_update(read=True).execution_options(populate_existing=True)
+    )
     if approval is None or approval.tenant_id != tenant_id:
         raise InvError(AUTH_APPROVAL_DIGEST_MISMATCH, "approval not found")
     if approval.decision != "approved":
         raise InvError(AUTH_APPROVAL_DIGEST_MISMATCH, "the recorded decision is not an approval")
+    if not approval.decided_at <= now < approval.expires_at:
+        raise InvError(AUTH_APPROVAL_DIGEST_MISMATCH, "approval is not valid at the recorded deployment time")
     if approval.subject_sha256 != version.content_sha256:
         raise InvError(
             AUTH_APPROVAL_DIGEST_MISMATCH,
@@ -496,18 +516,14 @@ def record_deployment(
             cause_ref=approval_id,
         )
 
-    previous = session.scalar(
-        select(Deployment).where(
+    session.execute(
+        update(Deployment).where(
             Deployment.tenant_id == tenant_id,
             Deployment.model_version_id == model_version_id,
             Deployment.environment == environment,
             Deployment.status == "active",
-        )
+        ).values(status="superseded", superseded_at=now)
     )
-    if previous is not None:
-        previous.status = "superseded"
-        previous.superseded_at = now
-        session.flush()
 
     deployment = Deployment(
         deployment_id=new_id("deployment"),
