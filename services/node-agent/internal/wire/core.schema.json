@@ -4835,6 +4835,213 @@
         "tenantId",
         "expiresAt"
       ]
+    },
+    "ModelId": {
+      "type": "string",
+      "pattern": "^mdl_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "ModelShard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "offset",
+        "byteLength",
+        "sha256"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1023
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1099511627776
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1099511627776
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "ModelReplica": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shardIndex",
+        "locationId",
+        "locationVersion",
+        "nodeId",
+        "state"
+      ],
+      "properties": {
+        "shardIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1023
+        },
+        "locationId": {
+          "type": "string",
+          "pattern": "^dtl_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "locationVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "unverified",
+            "verified",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "ModelRuntimeCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "version",
+        "modes"
+      ],
+      "properties": {
+        "adapter": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "modes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "single-node",
+              "request-routing",
+              "data-parallel",
+              "tensor-parallel",
+              "pipeline-parallel",
+              "offload"
+            ]
+          }
+        }
+      }
+    },
+    "ModelManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelId",
+        "version",
+        "format",
+        "totalBytes",
+        "contentHash",
+        "shards",
+        "replicas",
+        "runtimeCompatibility",
+        "licensePolicy",
+        "classification",
+        "encryption",
+        "keyRef"
+      ],
+      "properties": {
+        "modelId": {
+          "$ref": "#/$defs/ModelId"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1099511627776
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "shards": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": {
+            "$ref": "#/$defs/ModelShard"
+          }
+        },
+        "replicas": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "$ref": "#/$defs/ModelReplica"
+          }
+        },
+        "runtimeCompatibility": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/ModelRuntimeCompatibility"
+          }
+        },
+        "licensePolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        },
+        "encryption": {
+          "type": "string",
+          "enum": [
+            "none",
+            "aes256-gcm"
+          ]
+        },
+        "keyRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^svcred:1:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
     }
   },
   "oneOf": [
@@ -4936,6 +5143,18 @@
     },
     {
       "$ref": "#/$defs/NodeProbeResult"
+    },
+    {
+      "$ref": "#/$defs/ModelShard"
+    },
+    {
+      "$ref": "#/$defs/ModelReplica"
+    },
+    {
+      "$ref": "#/$defs/ModelRuntimeCompatibility"
+    },
+    {
+      "$ref": "#/$defs/ModelManifest"
     }
   ]
 }

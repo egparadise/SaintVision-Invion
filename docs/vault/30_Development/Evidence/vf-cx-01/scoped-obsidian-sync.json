@@ -1,0 +1,9 @@
+{
+  "sourceSha": "3efa507e7b7755265326a53a64f0a12305f4976d",
+  "fullVaultCheckExit": 1,
+  "scope": "new VF-CX-01 history/evidence and Codex VF board only; no old full-vault overwrite",
+  "files": 13,
+  "applied": 0,
+  "remaining": 0,
+  "externalOtherAgentPages": "untouched"
+}

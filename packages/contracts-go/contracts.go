@@ -1022,3 +1022,41 @@ type SessionView struct {
     TenantId string `json:"tenantId"`
     ExpiresAt int64 `json:"expiresAt"`
 }
+
+type ModelId string
+
+type ModelShard struct {
+    Index int64 `json:"index"`
+    Offset int64 `json:"offset"`
+    ByteLength int64 `json:"byteLength"`
+    Sha256 string `json:"sha256"`
+}
+
+type ModelReplica struct {
+    ShardIndex int64 `json:"shardIndex"`
+    LocationId string `json:"locationId"`
+    LocationVersion int64 `json:"locationVersion"`
+    NodeId NodeId `json:"nodeId"`
+    State string `json:"state"`
+}
+
+type ModelRuntimeCompatibility struct {
+    Adapter string `json:"adapter"`
+    Version string `json:"version"`
+    Modes []string `json:"modes"`
+}
+
+type ModelManifest struct {
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    Format string `json:"format"`
+    TotalBytes int64 `json:"totalBytes"`
+    ContentHash string `json:"contentHash"`
+    Shards []ModelShard `json:"shards"`
+    Replicas []ModelReplica `json:"replicas"`
+    RuntimeCompatibility []ModelRuntimeCompatibility `json:"runtimeCompatibility"`
+    LicensePolicy string `json:"licensePolicy"`
+    Classification string `json:"classification"`
+    Encryption string `json:"encryption"`
+    KeyRef *string `json:"keyRef"`
+}

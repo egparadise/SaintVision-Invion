@@ -1392,6 +1392,89 @@ class SessionView(BaseModel):
     expiresAt: conint(ge=1)
 
 
+class ModelId(RootModel[constr(pattern=r'^mdl_[0-9A-HJKMNP-TV-Z]{26}$')]):
+    root: constr(pattern=r'^mdl_[0-9A-HJKMNP-TV-Z]{26}$')
+
+
+class ModelShard(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=1023)
+    offset: conint(ge=0, le=1099511627776)
+    byteLength: conint(ge=1, le=1099511627776)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class State1(StrEnum):
+    unverified = 'unverified'
+    verified = 'verified'
+    unavailable = 'unavailable'
+
+
+class ModelReplica(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    shardIndex: conint(ge=0, le=1023)
+    locationId: constr(pattern=r'^dtl_[0-9A-HJKMNP-TV-Z]{26}$')
+    locationVersion: conint(ge=1, le=2147483647)
+    nodeId: NodeId
+    state: State1
+
+
+class Mode2(StrEnum):
+    single_node = 'single-node'
+    request_routing = 'request-routing'
+    data_parallel = 'data-parallel'
+    tensor_parallel = 'tensor-parallel'
+    pipeline_parallel = 'pipeline-parallel'
+    offload = 'offload'
+
+
+class ModelRuntimeCompatibility(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    adapter: constr(min_length=1, max_length=80)
+    version: constr(min_length=1, max_length=80)
+    modes: list[Mode2] = Field(..., max_length=6, min_length=1)
+
+
+class Classification(StrEnum):
+    public = 'public'
+    internal = 'internal'
+    restricted = 'restricted'
+
+
+class Encryption(StrEnum):
+    none = 'none'
+    aes256_gcm = 'aes256-gcm'
+
+
+class ModelManifest(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    modelId: ModelId
+    version: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
+    format: constr(min_length=1, max_length=64)
+    totalBytes: conint(ge=1, le=1099511627776)
+    contentHash: constr(pattern=r'^[0-9a-f]{64}$')
+    shards: list[ModelShard] = Field(..., max_length=1024, min_length=1)
+    replicas: list[ModelReplica] = Field(..., max_length=4096, min_length=1)
+    runtimeCompatibility: list[ModelRuntimeCompatibility] = Field(..., max_length=32, min_length=1)
+    licensePolicy: constr(min_length=1, max_length=200)
+    classification: Classification
+    encryption: Encryption
+    keyRef: (
+        constr(
+            pattern=r'^svcred:1:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        )
+        | None
+    )
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1645,6 +1728,10 @@ class INVCore(
         | RunCancelInput
         | NodeProbeInput
         | NodeProbeResult
+        | ModelShard
+        | ModelReplica
+        | ModelRuntimeCompatibility
+        | ModelManifest
     ]
 ):
     root: (
@@ -1681,4 +1768,8 @@ class INVCore(
         | RunCancelInput
         | NodeProbeInput
         | NodeProbeResult
+        | ModelShard
+        | ModelReplica
+        | ModelRuntimeCompatibility
+        | ModelManifest
     ) = Field(..., title='INVCore')

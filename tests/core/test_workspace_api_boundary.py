@@ -42,7 +42,7 @@ def test_integrated_migration_keeps_both_published_histories():
     spec.loader.exec_module(module)
     revisions = module.load()
     ordered = module.chain(revisions)
-    assert ordered[-1].revision == "0038_approval_review_snapshot"
+    assert ordered[-1].revision == "0039_model_manifest"
     parents = {r.revision: r.down_revision for r in revisions}
     assert parents["0008_node_certificate_lookup"] == "0006_control_api"
     assert parents["0007_delivery_queue"] == "0006_control_api"
@@ -75,7 +75,7 @@ def test_integrated_migration_keeps_both_published_histories():
         "0024_workspace_bridge",
         "0032_workspace_readiness_merge",
     }
-    assert module.downgrade_target(revisions) == "0038_approval_review_snapshot"
+    assert module.downgrade_target(revisions) == "0039_model_manifest"
     published_prefix = ordered[:next(i for i, r in enumerate(ordered)
                                     if r.revision == "0019_workspace_api_integration")]
     with pytest.raises(ValueError, match="unmerged"):
@@ -87,3 +87,9 @@ def test_integrated_migration_keeps_both_published_histories():
     ]
     with pytest.raises(ValueError, match="unreachable"):
         module.chain(revisions + extra)
+
+
+def test_model_manifest_extends_the_published_approval_history():
+    import runpy
+    revision = runpy.run_path(str(Path(__file__).resolve().parents[2] / "migrations/versions/0039_model_manifest.py"))
+    assert revision["down_revision"] == "0038_approval_review_snapshot"

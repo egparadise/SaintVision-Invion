@@ -22,6 +22,7 @@ def main():
     # "migration validation failed" — which reads as a broken migration.
     sys.path.insert(0, str(root / "tools"))
     sys.path.insert(0, str(root / "src"))
+    sys.path.insert(0, str(root / "services/control-plane/src"))
     from migration_graph import chain
 
     expected_head = chain()[-1].revision
@@ -50,6 +51,8 @@ def main():
         "0034_terminal_frame_intents",
         "0035_credential_registry",
         "0036_recovery_target_outcome",
+        "0037_storage_sample_commit",
+        "0038_approval_review_snapshot",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--from-revision", choices=priors, help="Test one published starting revision; default tests all")
@@ -62,6 +65,7 @@ def main():
             sentinel = uuid4()
             preserved_workspace = None
             preserved_drill = None
+            preserved_lease = None
             info = conninfo_to_dict(admin)
             url = URL.create(
                 "postgresql+psycopg",
@@ -81,6 +85,24 @@ def main():
                 )
                 if result.returncode:
                     raise RuntimeError("Migration path failed: " + prior + " -> " + target)
+                if target == prior and prior in {"0037_storage_sample_commit", "0038_approval_review_snapshot"}:
+                    from inv.ids import new_id as kernel_id
+                    lease_id = kernel_id('lse')
+                    project, node, resource, run_id = (kernel_id(p) for p in ('prj','nod','res','run'))
+                    epoch = uuid4()
+                    with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
+                        conn.execute("INSERT INTO inv.control_epoch(singleton,epoch) VALUES(true,%s)", (epoch,))
+                        conn.execute("INSERT INTO inv.tenants VALUES(%s,'lease-preservation')", (sentinel,))
+                        conn.execute("INSERT INTO inv.projects VALUES(%s,%s)", (sentinel,project))
+                        conn.execute("INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'online',%s)", (sentinel,node,epoch))
+                        conn.execute("INSERT INTO inv.resources VALUES(%s,%s,%s,'cpu',10,10)", (sentinel,resource,node))
+                        conn.execute("INSERT INTO inv.runs(tenant_id,project_id,run_id) VALUES(%s,%s,%s)", (sentinel,project,run_id))
+                        for state in ('validated','planned'):
+                            conn.execute("UPDATE inv.runs SET state=%s,version=version+1 WHERE run_id=%s", (state,run_id))
+                        conn.execute("""INSERT INTO inv.resource_leases(tenant_id,project_id,run_id,resource_id,lease_id,amount,recovery_epoch,expires_at)
+                            VALUES(%s,%s,%s,%s,%s,1,%s,clock_timestamp()+interval '300 seconds')""", (sentinel,project,run_id,resource,lease_id,epoch))
+                        preserved_lease = conn.execute("SELECT row_to_json(l) FROM inv.resource_leases l WHERE lease_id=%s", (lease_id,)).fetchone()[0]
+                        preserved_sequence = conn.execute("SELECT last_value FROM inv.fencing_token_seq").fetchone()[0]
                 if target == prior and prior == "0035_credential_registry":
                     from saintvision.ids import new_id
                     user, preserved_drill = new_id('user'), new_id('drill')
@@ -134,6 +156,9 @@ def main():
                         pass
                     else:
                         raise AssertionError('New writes must enforce outcome without rewriting historic claims')
+                if preserved_lease:
+                    assert conn.execute("SELECT row_to_json(l) FROM inv.resource_leases l WHERE lease_id=%s", (lease_id,)).fetchone()[0] == preserved_lease
+                    assert conn.execute("SELECT last_value FROM inv.fencing_token_seq").fetchone()[0] == preserved_sequence
                 if preserved_workspace:
                     assert conn.execute("SELECT tool_name FROM public.workspaces WHERE workspace_id=%s",(preserved_workspace,)).fetchone()==('codex-cli',)
             from check_definer_functions import audit

@@ -12,7 +12,7 @@
       "title": "Canonical configured control app",
       "owner": "Codex",
       "reviewer": "Claude",
-      "state": "in_progress",
+      "state": "review",
       "dependsOn": [],
       "implemented": "partial",
       "locallyVerified": "partial",
@@ -25,12 +25,12 @@
       "title": "ModelManifest, shard/replica hash commit and fences",
       "owner": "Codex",
       "reviewer": "Claude",
-      "state": "ready",
+      "state": "review",
       "dependsOn": [
         "VF-CX-01"
       ],
-      "implemented": false,
-      "locallyVerified": false,
+      "implemented": true,
+      "locallyVerified": true,
       "ciVerified": false,
       "independentlyReviewed": false,
       "operationallyAccepted": false
@@ -40,7 +40,7 @@
       "title": "Measured locality and execution placement",
       "owner": "Codex",
       "reviewer": "Claude",
-      "state": "waiting_dependency",
+      "state": "ready",
       "dependsOn": [
         "VF-CX-02"
       ],

@@ -1020,3 +1020,41 @@ export interface SessionView {
   tenantId: string;
   expiresAt: number;
 }
+
+export type ModelId = string;
+
+export interface ModelShard {
+  index: number;
+  offset: number;
+  byteLength: number;
+  sha256: string;
+}
+
+export interface ModelReplica {
+  shardIndex: number;
+  locationId: string;
+  locationVersion: number;
+  nodeId: NodeId;
+  state: "unverified" | "verified" | "unavailable";
+}
+
+export interface ModelRuntimeCompatibility {
+  adapter: string;
+  version: string;
+  modes: Array<"single-node" | "request-routing" | "data-parallel" | "tensor-parallel" | "pipeline-parallel" | "offload">;
+}
+
+export interface ModelManifest {
+  modelId: ModelId;
+  version: string;
+  format: string;
+  totalBytes: number;
+  contentHash: string;
+  shards: Array<ModelShard>;
+  replicas: Array<ModelReplica>;
+  runtimeCompatibility: Array<ModelRuntimeCompatibility>;
+  licensePolicy: string;
+  classification: "public" | "internal" | "restricted";
+  encryption: "none" | "aes256-gcm";
+  keyRef: (string | null);
+}
