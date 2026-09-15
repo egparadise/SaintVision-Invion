@@ -38,7 +38,7 @@ VF-CL-03(model registry, MLflow/lineage, import adapter)의 **계약 무관 부�
 
 ## 남은 부분 (미착수/blocked)
 
-- **성공 release happy-path**: eval_run·approval subject는 evaluation/execution FK 사슬 seeding 필요 → fixture 후속. 현재는 그 부재가 release를 막는 refusal로 검증됨.
+- **성공 release happy-path**: 채웠다 — `_seed_traceable_subjects`(workspace·workload·run·eval_suite·eval_run·approval 재사용 fixture)로 verified+pinned+4종 lineage → `release_model_version`이 stage='released' 반환, `fullyTraceable=True`. 시험 11개로 확장.
 - **import adapter(MLflow/lineage import)·license/classification 정책**: 새 VF-CX-02 ModelManifest 필드(licensePolicy/classification/encryption)와 맞물리는 부분은 계약 대기. S10 ModelVersion엔 아직 license 필드 없음 — 계약이 그 위치를 정한다.
 
 ## 상태
