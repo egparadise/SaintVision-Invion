@@ -17,6 +17,7 @@ from ...config import Settings
 from ...identity.principal import Principal
 from ...errors import InvError, RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA
 from ...services import resolver
+from ...services.replica_observation import observe_replicas
 from ...services import storage as storage_service
 from ...services.audit import record_event
 from .. import schemas
@@ -231,3 +232,22 @@ def resolve_uri(
         # No existence oracle or reflection of an untrusted URI in diagnostics.
         raise InvError(RES_ARTIFACT_NOT_FOUND, "data location not found", status=404) from None
     return {"location": _location_body(location)}
+
+
+@router.get("/storage/replica-status")
+def replica_status(
+    uri: str = Query(min_length=1, max_length=2048),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Recorded states for an owned location; current byte availability is unknown."""
+    try:
+        observation = observe_replicas(
+            session, tenant_id=principal.tenant_id,
+            reader_user_id=principal.user_id, uri=uri,
+        )
+    except ValueError:
+        raise InvError(VAL_SCHEMA, "invalid storage URI") from None
+    return {"observation": schemas.ReplicaObservationResponse.model_validate(
+        observation
+    ).model_dump(by_alias=True, mode="json")}

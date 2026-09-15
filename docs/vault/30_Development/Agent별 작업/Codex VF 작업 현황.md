@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.11"
+version: "1.0.12"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T15:14:17+09:00"
+updated: "2026-09-15T15:19:35+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
+
+- 최신 replica 관측: 소유자·활성폴더/단일SQL/현재가용성unknown, 관련137·실제image8통과. [[2026-09-15_VF-REPLICA-OBSERVATION_Codex]]. Claude독립검토·Gemini화면연결·CI/운영은미완.
+
+
+- 2026-09-15T15:16:03+09:00 VF replica 관측 착수: base1f71d89/agent/codex/vf-replica-observation. [[2026-09-15_VF-REPLICA-OBSERVATION_Codex]].
+
 
 - 2026-09-15T15:11:55+09:00 Codex VF-CX-02 검토 finding 판정 착수, base116e6e5/agent/codex/vf-model-review. [[2026-09-15_VF-MODEL-REVIEW_Codex]].
 

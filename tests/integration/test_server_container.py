@@ -174,6 +174,10 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                     assert observed.json() == {'items': [], 'nextCursor': None}
                 assert client.post('/v1/storage/contributions', headers=headers,
                                    json={}).status_code in (404, 405)
+                replica_path = '/v1/storage/replica-status?uri=inv://datasets/missing@1'
+                assert client.get(replica_path).status_code == 401
+                assert client.get(replica_path, headers=headers).status_code == 404
+                assert client.post(replica_path, headers=headers, json={}).status_code in (404, 405)
                 project = client.post('/v1/projects', headers=headers,
                                       json={'code': 'candidate-' + uuid4().hex[:8], 'displayName': 'Candidate'})
                 assert project.status_code == 201
