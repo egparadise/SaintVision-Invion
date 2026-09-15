@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "RecordedReplicaStates": {
+      "additionalProperties": false,
+      "properties": {
+        "corrupt": {
+          "minimum": 0,
+          "title": "Corrupt",
+          "type": "integer"
+        },
+        "evicted": {
+          "minimum": 0,
+          "title": "Evicted",
+          "type": "integer"
+        },
+        "ready": {
+          "minimum": 0,
+          "title": "Ready",
+          "type": "integer"
+        },
+        "stale": {
+          "minimum": 0,
+          "title": "Stale",
+          "type": "integer"
+        },
+        "transferring": {
+          "minimum": 0,
+          "title": "Transferring",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ready",
+        "transferring",
+        "stale",
+        "corrupt",
+        "evicted"
+      ],
+      "title": "RecordedReplicaStates",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "currentAvailability": {
+      "const": "unknown",
+      "title": "Currentavailability",
+      "type": "string"
+    },
+    "locationId": {
+      "title": "Locationid",
+      "type": "string"
+    },
+    "locationVersion": {
+      "minimum": 1,
+      "title": "Locationversion",
+      "type": "integer"
+    },
+    "observedAt": {
+      "format": "date-time",
+      "title": "Observedat",
+      "type": "string"
+    },
+    "recordedStates": {
+      "$ref": "#/$defs/RecordedReplicaStates"
+    },
+    "requiresExecutionRevalidation": {
+      "const": true,
+      "title": "Requiresexecutionrevalidation",
+      "type": "boolean"
+    },
+    "totalRecords": {
+      "minimum": 0,
+      "title": "Totalrecords",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "locationId",
+    "locationVersion",
+    "observedAt",
+    "recordedStates",
+    "totalRecords",
+    "currentAvailability",
+    "requiresExecutionRevalidation"
+  ],
+  "title": "ReplicaObservationResponse",
+  "type": "object"
+}

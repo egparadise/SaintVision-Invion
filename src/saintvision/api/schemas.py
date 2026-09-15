@@ -12,6 +12,7 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -120,6 +121,24 @@ class DataLocationResponse(Strict):
     )
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RecordedReplicaStates(Strict):
+    ready: int = Field(ge=0)
+    transferring: int = Field(ge=0)
+    stale: int = Field(ge=0)
+    corrupt: int = Field(ge=0)
+    evicted: int = Field(ge=0)
+
+
+class ReplicaObservationResponse(Strict):
+    location_id: str = Field(alias="locationId")
+    location_version: int = Field(ge=1, alias="locationVersion")
+    observed_at: dt.datetime = Field(alias="observedAt")
+    recorded_states: RecordedReplicaStates = Field(alias="recordedStates")
+    total_records: int = Field(ge=0, alias="totalRecords")
+    current_availability: Literal["unknown"] = Field(alias="currentAvailability")
+    requires_execution_revalidation: Literal[True] = Field(alias="requiresExecutionRevalidation")
 
 
 class PageResponse(Strict):

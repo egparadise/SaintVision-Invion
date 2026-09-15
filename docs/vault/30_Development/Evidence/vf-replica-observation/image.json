@@ -1,0 +1,6 @@
+{
+  "command": "docker build -f deploy/Dockerfile.backend -t saintvision-backend-candidate:vf-replica-observation .",
+  "exitCode": 0,
+  "image": "sha256:ab9e4e56ca1e8855e9f0dabec8bf392b633019977fa0bb31a9303e9f02c9cde9",
+  "operationalDeployment": false
+}

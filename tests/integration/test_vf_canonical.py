@@ -50,6 +50,7 @@ def test_factory_route_measurement_is_not_fixture_union(env, tmp_path, monkeypat
     assert '/v1/auth/token' not in served
     assert '/v1/session' in served
     assert '/v1/storage/resolve' not in served
+    assert '/v1/storage/replica-status' not in served
     wanted = scan_client(root / 'apps/web/src')
     (root / '.work/vf-route-gap.json').write_text(json.dumps({
         'measurement': 'configured-factory, synthetic issuer, isolated PostgreSQL, workspace/business disabled',
@@ -77,6 +78,7 @@ def test_factory_route_measurement_is_not_fixture_union(env, tmp_path, monkeypat
         assert '/v1/projects/{}/workspaces' in composed
         assert '/v1/workspaces/{}/execution-readiness' in composed
         assert '/v1/storage/resolve' in composed
+        assert '/v1/storage/replica-status' in composed
         assert '/v1/storage/contributions' in composed
         assert '/v1/storage/locations' in composed
         assert '/v1/auth/token' not in composed
