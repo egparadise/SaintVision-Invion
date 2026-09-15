@@ -123,9 +123,9 @@ class ToolGateway:
             from .workspace_start import require_start_admission
 
             require_start_admission(conn, self.db, run["run_id"])
-            from .model_locality import require_model_admission
+            from .model_runtime import require_model_reference
 
-            require_model_admission(conn, run["run_id"])
+            require_model_reference(conn, run, workload)
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),
@@ -285,6 +285,19 @@ class ToolGateway:
                 from .workspace_start import approved_start
 
                 workspace_input = approved_start(conn, run, workload, self.db.recovery_epoch)
+            elif "modelInput" in workload:
+                from .model_runtime import approved_model
+
+                workspace_input = approved_model(
+                    conn,
+                    run,
+                    workload,
+                    self.db.recovery_epoch,
+                    node_id=node.node_id,
+                    proofs=proofs,
+                    database=self.db,
+                    requester=requester,
+                )
             plan = compile_launch(workload, self.profile, workspace_input=workspace_input)
             deadline = min(
                 approval["expires_at"],

@@ -95,7 +95,21 @@ class ConfiguredModelVerifier:
         self.roots = {r.contribution_id: r for r in roots}
         self.max_read_bytes = max_read_bytes
 
-    def verify(self, manifest, snapshots):
+    def freeze(self, manifest, snapshots, *, max_content=32768):
+        body = manifest_copy(manifest)
+        if (
+            type(max_content) is not int
+            or not 1 <= max_content <= 32768
+            or body["totalBytes"] > max_content
+        ):
+            raise DomainError("MODEL-0002", "Configured model input exceeds 32 KiB", 422)
+        chunks = {s["index"]: bytearray() for s in body["shards"]}
+        verified = self.verify(
+            body, snapshots, _collect=lambda index, chunk: chunks[index].extend(chunk)
+        )
+        return verified, {index: bytes(data) for index, data in chunks.items()}
+
+    def verify(self, manifest, snapshots, *, _collect=None):
         body = manifest_copy(manifest)
         if body["encryption"] != "none":
             raise DomainError("MODEL-0002", "Encrypted model verifier is not configured", 422)
@@ -141,6 +155,8 @@ class ConfiguredModelVerifier:
                         digest.update(chunk)
                         if first:
                             whole.update(chunk)
+                            if _collect is not None:
+                                _collect(shard["index"], chunk)
                 if total != shard["byteLength"] or digest.hexdigest() != shard["sha256"]:
                     rejected()
                 done.add(shard["index"])

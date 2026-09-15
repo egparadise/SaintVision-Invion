@@ -1475,6 +1475,23 @@ class ModelManifest(BaseModel):
     )
 
 
+class ModelExecutionRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    inputId: UUID
+    runId: RunId
+    modelId: ModelId
+    version: constr(min_length=1, max_length=200)
+    manifestHash: ActionDigest
+    inputSha256: ActionDigest
+    inputSizeBytes: conint(ge=1, le=65536)
+    nodeId: NodeId
+    adapter: Literal['python-files']
+    adapterVersion: Literal['1']
+    mode: Literal['single-node']
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1493,6 +1510,7 @@ class WorkloadSpec(BaseModel):
     workspaceStart: WorkspaceStartRef | None = None
     targetNodeId: NodeId | None = None
     terminal: TerminalSpec | None = None
+    modelInput: ModelExecutionRef | None = None
 
 
 class SandboxLaunchSpec(BaseModel):

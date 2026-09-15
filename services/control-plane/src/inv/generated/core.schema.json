@@ -306,6 +306,9 @@
         },
         "terminal": {
           "$ref": "#/$defs/TerminalSpec"
+        },
+        "modelInput": {
+          "$ref": "#/$defs/ModelExecutionRef"
         }
       },
       "required": [
@@ -327,6 +330,30 @@
             "required": [
               "workspaceResume",
               "workspaceStart"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "workspaceStart"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "workspaceResume"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "terminal"
             ]
           }
         }
@@ -5040,6 +5067,66 @@
               "type": "null"
             }
           ]
+        }
+      }
+    },
+    "ModelExecutionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inputId",
+        "runId",
+        "modelId",
+        "version",
+        "manifestHash",
+        "inputSha256",
+        "inputSizeBytes",
+        "nodeId",
+        "adapter",
+        "adapterVersion",
+        "mode"
+      ],
+      "properties": {
+        "inputId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "modelId": {
+          "$ref": "#/$defs/ModelId"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "manifestHash": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "inputSha256": {
+          "$ref": "#/$defs/ActionDigest"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "adapter": {
+          "const": "python-files",
+          "type": "string"
+        },
+        "adapterVersion": {
+          "const": "1",
+          "type": "string"
+        },
+        "mode": {
+          "const": "single-node",
+          "type": "string"
         }
       }
     }

@@ -55,12 +55,12 @@
       "title": "Runtime admission and multi-node recovery",
       "owner": "Codex",
       "reviewer": "Claude",
-      "state": "ready",
+      "state": "review",
       "dependsOn": [
         "VF-CX-03"
       ],
-      "implemented": false,
-      "locallyVerified": false,
+      "implemented": true,
+      "locallyVerified": true,
       "ciVerified": false,
       "independentlyReviewed": false,
       "operationallyAccepted": false

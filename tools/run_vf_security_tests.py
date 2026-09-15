@@ -5,6 +5,7 @@ Node-dependent suites stay in the explicit Node acceptance lane. Skips are count
 """
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import subprocess
@@ -27,6 +28,9 @@ def main():
     prefix = os.environ.get('VF_EVIDENCE_PREFIX', 'vf-security')
     if not prefix.replace('-', '').isalnum():
         raise ValueError('Invalid evidence prefix')
+    server_image = os.environ.get('VF_TEST_IMAGE', 'saintvision-backend-candidate:vf-cx-01')
+    if re.fullmatch(r'(?:sha256:[0-9a-f]{64}|saintvision-backend-candidate:vf-cx-[0-9]{2})', server_image) is None:
+        raise ValueError('Explicit local VF candidate image required')
     base_env = {k: v for k, v in os.environ.items()
                 if not k.startswith(('INV_', 'CX01_', 'VF_'))}
     name = 'sv-container-' + uuid4().hex
@@ -34,7 +38,7 @@ def main():
     container = None
     proof = {'exitCode': 1, 'postgres': 'isolated tmpfs PostgreSQL 16; loopback ephemeral port',
              'identity': 'synthetic issuer; no operational SSO acceptance',
-             'operationalAcceptance': False, 'nodeDependentSuitesExcluded': dependents()}
+             'operationalAcceptance': False, 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
     code = 1
     try:
         container = subprocess.check_output([
@@ -66,7 +70,7 @@ def main():
             try:
                 result = subprocess.run(command, env={
                     **base_env, 'INV_TEST_ADMIN_DSN': dsn, 'CX01_CONTAINER': name,
-                    'INV_TEST_SERVER_IMAGE': 'saintvision-backend-candidate:vf-cx-01',
+                    'INV_TEST_SERVER_IMAGE': server_image,
                     'INV_CONTAINER_TEST_DB_HOST': info['NetworkSettings']['IPAddress'],
                 }, stdout=log, stderr=subprocess.STDOUT, timeout=1800)
                 code = result.returncode

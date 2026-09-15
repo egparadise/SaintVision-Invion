@@ -1,0 +1,52 @@
+{
+  "activeLeases": 0,
+  "case": "replacement-node",
+  "executionAttempts": 2,
+  "modelInput": {
+    "adapter": "python-files",
+    "adapterVersion": "1",
+    "inputId": "b5f7c686-ff9d-41c9-a271-647ed4148a44",
+    "inputSha256": "353068051eed04ba7bccae8282fd8588d1f34afb8a9b880d1b84aa61a4b114fd",
+    "inputSizeBytes": 899,
+    "manifestHash": "ad85ec4977f1471823801b2b77224ebc63e99dec8e2c7074962a0d5afe711367",
+    "mode": "single-node",
+    "modelId": "mdl_01M2HK181W3NK75YACHTA48FJJ",
+    "nodeId": "nod_01M2HK17Z7YWSQ84C2SGRP3XSZ",
+    "runId": "run_01M2HK1AAYMHMP5PCESPVYCMTQ",
+    "version": "1.0.0"
+  },
+  "receipts": [
+    {
+      "authenticatedPeerSHA256": "f7686ce16c7aab39f7f9ba1de228cbb06bccc0eb6854c11fb0a1fdf069a1135f",
+      "commandId": "a1be539d-e247-47a1-8bfa-51658535913b",
+      "exitCode": 7,
+      "nodeId": "nod_01M2HK17N4APSJE7H3HSJY7X7E",
+      "outputHash": null,
+      "processStarted": true,
+      "reason": "exited",
+      "receiptHash": "178b56c00381e5fe0f91e5345e81e9ae3ffef02caab36dc7b15612e1278b3e50",
+      "recoveryEpoch": "6db384b3-581e-47f7-9aed-67369561e324"
+    },
+    {
+      "authenticatedPeerSHA256": "35e2ce5dabf4f728c3b559d7399a5465eed428b7dc5f412cb0950cf74837adfb",
+      "commandId": "ef692ddc-f6eb-446b-9a74-cb4d14ec0662",
+      "exitCode": 0,
+      "nodeId": "nod_01M2HK17Z7YWSQ84C2SGRP3XSZ",
+      "outputHash": "95b21e082f4bd67f9c93620666b24e00aac6abc5d868f0486576016baef2a74d",
+      "processStarted": true,
+      "reason": "exited",
+      "receiptHash": "c574d0627c0769757d01a29f31ff7778d202ef550725047fd48b28f811253914",
+      "recoveryEpoch": "6db384b3-581e-47f7-9aed-67369561e324"
+    }
+  ],
+  "resultCompletions": 1,
+  "run": {
+    "attempt": 1,
+    "projectId": "prj_01M2HK17N487CNG9NKRM2FRJ4C",
+    "runId": "run_01M2HK1AAYMHMP5PCESPVYCMTQ",
+    "state": "succeeded",
+    "tenantId": "100f5261-58ed-46c8-bd7a-443b667f6119",
+    "version": 8
+  },
+  "scope": "isolated-Go-mTLS-Docker; not physical-PC acceptance"
+}

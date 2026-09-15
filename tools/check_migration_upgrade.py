@@ -54,6 +54,8 @@ def main():
         "0037_storage_sample_commit",
         "0038_approval_review_snapshot",
         "0039_model_manifest",
+        "0040_model_run_input",
+        "0041_model_runtime_input",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--from-revision", choices=priors, help="Test one published starting revision; default tests all")
@@ -86,7 +88,7 @@ def main():
                 )
                 if result.returncode:
                     raise RuntimeError("Migration path failed: " + prior + " -> " + target)
-                if target == prior and prior in {"0037_storage_sample_commit", "0038_approval_review_snapshot", "0039_model_manifest"}:
+                if target == prior and prior in {"0037_storage_sample_commit", "0038_approval_review_snapshot", "0039_model_manifest", "0040_model_run_input", "0041_model_runtime_input"}:
                     from inv.ids import new_id as kernel_id
                     lease_id = kernel_id('lse')
                     project, node, resource, run_id = (kernel_id(p) for p in ('prj','nod','res','run'))

@@ -189,6 +189,9 @@ def execute(prepared, tests):
         cleanup[network] = release_network(network, name)
         workloads = [json.loads(p.read_text()) for p in sorted(work.glob('developer-*.json'))]
         first_workloads = [json.loads(p.read_text()) for p in sorted(work.glob('first-*.json'))]
+        model_workloads = [json.loads(p.read_text()) for p in sorted(work.glob('model-*.json'))]
+        models_complete = ('tests/integration/test_model_node.py' not in tests or
+                           {row['case'] for row in model_workloads} == {'single','output-recovery','cancel','stale','node-loss','replacement-node'})
         records_complete = ('tests/integration/test_developer_workloads.py' not in tests or
                             {row['case'] for row in workloads} == {'python','ai','ai-output-recovery','python-failure'})
         first_complete = ('tests/integration/test_workspace_start.py' not in tests or
@@ -197,8 +200,8 @@ def execute(prepared, tests):
                     sourceHashes=prepared['sourceHashes'],binaryHashes=prepared['binaryHashes'],
                     nodeImage=prepared['nodeImage'],kernelImage=prepared['kernelImage'],postgresImage=prepared['postgresImage'],
                     scope='local-kernel-tests-synthetic-identity-not-two-physical-pcs',exitCode=exit_code,
-                    passed=exit_code==0 and bool(rows) and all(r['status']=='passed' for r in rows) and all(cleanup.values()) and records_complete and first_complete,cases=rows,
-                    cleanup=cleanup,developerWorkloads=workloads,firstWorkloads=first_workloads,
+                    passed=exit_code==0 and bool(rows) and all(r['status']=='passed' for r in rows) and all(cleanup.values()) and records_complete and first_complete and models_complete,cases=rows,
+                    cleanup=cleanup,developerWorkloads=workloads,firstWorkloads=first_workloads,modelWorkloads=model_workloads,
                     privateLogSHA256=hashlib.sha256((work/'pytest.log').read_bytes()).hexdigest())
         (work/'evidence.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
         print(json.dumps({k:result[k] for k in ('at','codeSHA','dirty','scope','exitCode','passed')} | {'cases':len(rows),'evidence':str(work/'evidence.json')}),flush=True)

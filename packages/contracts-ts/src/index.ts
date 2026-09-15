@@ -79,6 +79,7 @@ export interface WorkloadSpec {
   workspaceStart?: WorkspaceStartRef;
   targetNodeId?: NodeId;
   terminal?: TerminalSpec;
+  modelInput?: ModelExecutionRef;
 }
 
 export interface ResourceLease {
@@ -1057,4 +1058,18 @@ export interface ModelManifest {
   classification: "public" | "internal" | "restricted";
   encryption: "none" | "aes256-gcm";
   keyRef: (string | null);
+}
+
+export interface ModelExecutionRef {
+  inputId: string;
+  runId: RunId;
+  modelId: ModelId;
+  version: string;
+  manifestHash: ActionDigest;
+  inputSha256: ActionDigest;
+  inputSizeBytes: number;
+  nodeId: NodeId;
+  adapter: "python-files";
+  adapterVersion: "1";
+  mode: "single-node";
 }

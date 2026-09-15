@@ -226,6 +226,11 @@ class ApprovalStore:
                 from .workspace_start import approved_start
 
                 approved_start(conn, run, workload, self.db.recovery_epoch)
+            from .model_runtime import require_model_reference, approved_model
+
+            require_model_reference(conn, run, workload)
+            if "modelInput" in workload:
+                approved_model(conn, run, workload, self.db.recovery_epoch, requester=principal.subject_id)
             changed = self.runs._transition(
                 conn, principal.tenant_id, run, "awaiting_approval", expected_version
             )

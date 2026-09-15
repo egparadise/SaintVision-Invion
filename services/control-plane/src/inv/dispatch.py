@@ -104,6 +104,22 @@ class DeliveryQueue:
                     actor,
                     "can_request" if actor == requester else "can_approve",
                 )
+            model = conn.execute(
+                "SELECT workload FROM inv.model_runtime_inputs WHERE run_id=%s", (run["run_id"],)
+            ).fetchone()
+            if model:
+                from .model_runtime import approved_model
+
+                approved_model(
+                    conn,
+                    run,
+                    model["workload"],
+                    self.db.recovery_epoch,
+                    node_id=row["node_id"],
+                    requester=requester,
+                    database=self.db,
+                    proofs={a["lease"]["leaseId"]: a["lease"]["fencingToken"] for a in allocations},
+                )
         except DomainError:
             return False
         return (

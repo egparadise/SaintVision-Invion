@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-LOCALITY-001"
 title: "모델 locality 예약과 실행 입력 경계"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 updated: "2026-09-15T12:24:59+09:00"
@@ -9,6 +9,8 @@ source_of_truth: "Git"
 ---
 
 # 모델 locality 예약과 실행 입력 경계
+
+VF-CX-04의 실행 연결은 [[모델 실행 입력과 대체 Node 복구 계약]]을 따른다. 아래 MODEL-0006 설명은 VF-CX-03 후보의 경계이며, 현재는 유효한 frozen input/승인/permit이 갖춰진 adapter 경로만 허용한다.
 
 기준 [[ModelManifest 커널 계약과 저장 Catalog 경계]], ARCH-WEB-FABRIC-001 1.0.0. owner Codex, 독립 reviewer Claude 미수신.
 

@@ -163,3 +163,21 @@ def test_encryption_without_a_configured_provider_never_claims_verified_bytes(ma
     )
     with pytest.raises(DomainError, match="Encrypted model verifier"):
         verifier.verify(body, snapshots)
+
+
+def test_frozen_shards_are_verified_bytes_and_remain_stable(material):
+    body, snapshots, verifier, root = material
+    digest, chunks = verifier.freeze(body, snapshots)
+    assert digest == verifier.verify(body, snapshots)
+    assert chunks == {0: b"first-shard", 1: b"second-shard"}
+    (root / "0.bin").write_bytes(b"replacement")
+    assert chunks[0] == b"first-shard"
+    with pytest.raises(DomainError):
+        verifier.freeze(body, snapshots)
+
+
+@pytest.mark.parametrize("limit", [True, 0, 1, 32769])
+def test_model_freeze_cannot_expand_node_input_budget(material, limit):
+    body, snapshots, verifier, _ = material
+    with pytest.raises(DomainError):
+        verifier.freeze(body, snapshots, max_content=limit)

@@ -1,54 +1,35 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.4"
+version: "1.0.6"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T12:12:44+09:00"
+updated: "2026-09-15T12:59:40+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
 
-- [[2026-09-15_VF-CX-03_Codex_검증보고]]: 실제 locality/원자 예약·모델 입력 무시 거부. Windows69 + 수정26, Linux131/1 fixture error 후 수정26/26 통과. 다음 VF-CX-04.
+기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-cx-04, base4761a8c. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
 
-- [[2026-09-15_VF-CX-03_Codex_착수]]: 2026-09-15T12:18:42+09:00 base ddd0497, 모델 locality/예약 입력 결속 착수.
-
-- [[2026-09-15_VF-CX-02_Codex_검증보고]]: ModelManifest/DataLocation FK·전체 bytes hash·lease/fence commit, Windows66/Linux49 통과. 독립 검토·CI·실장비 미완료. 다음 Codex VF-CX-03 locality 결속.
-
-
-- 2026-09-15T11:54:32+09:00 VF-CX-02 착수: base 3efa507, 별도 agent/codex/vf-cx-02. [[2026-09-15_VF-CX-02_Codex_착수]]. owner Codex/reviewer Claude 미수신.
-
-
-기준: ROADMAP-VIRTUAL-COMPUTER-001 1.0.0, ARCH-WEB-FABRIC-001 1.0.0, GOV-CONTINUOUS-001 1.0.0. 원격 기준 b9752a8e31573ee92b5bbb89724224923459f295. 작업 branch agent/codex/vf-cx-01, worktree codex-vf-cx. owner Codex, reviewer Claude (수신/착수/승인 미확인).
-
-기존 진척 2775/4800 = 57.81%는 유지한다. 새 Codex VF의 운영 인수 분모는 5카드이며 현재 0/5 = 0%다. 구현·로컬 시험을 운영 인수로 계산하지 않는다. 다른 Agent 카드와 전체 VF의 가중 진행률은 미산정.
-
-| 카드 | 현재 상태 | 다음 행동 |
-|---|---|---|
-| VF-CX-01 | canonical factory·fixture 격리 구현, 통합 검증 진행 | [[2026-09-15_VF-CX-01_Codex_인계]]; 41 Linux/5 factory 통과, CI billing blocked; 전체 최종 재회귀 진행 |
-| VF-CX-02 | review: d6d9d87, Windows66/Linux49 검증·CI billing blocked | 기존 DataLocation/Lease 위 manifest 계약과 검증 commit 구현 |
-| VF-CX-03 | review: 모델 locality·원자 예약 로컬 확인 | CI/독립 검토 인계; 상세 위 검증보고 |
-| VF-CX-04 | ready: 03 로컬 계약 준비 | 기존 dispatch/permit/recovery 경계 연결 |
-| VF-CX-05 | W2~W4·실장비 의존 | 실제 5대 및 운영 자격증명 확보 후 signed Evidence 인수 |
+| 카드 | 구현·로컬 검증 | CI/검토/운영 | 다음 행동 |
+|---|---|---|---|
+| VF-CX-01 | canonical factory·fixture 격리·인증 경계, code290aba5, Windows1613/139 skipped·Linux41 | CI billing, 독립 검토/운영 미완 | 실제 route/UI 정합, 운영 SSO/PITR |
+| VF-CX-02 | ModelManifest·bytes hash·기존 Lease/FK commit, coded6d9d87, Windows66/Linux49 | CI billing, 독립 검토/운영 미완 | Claude Catalog/API 연결·독립 검토 |
+| VF-CX-03 | 측정 locality·원자 예약·model input, codebc8797c, 상세 회귀 증거 인계 | CI billing, 독립 검토/운영 미완 | 04 입력 freeze/실행과 연결됨 |
+| VF-CX-04 | CPU 모델 입력 freeze·기존 permit·최대3세대 대체 실행, Linux140/140 | 전체 Windows 회귀 진행, CI/독립 검토/운영 미완 | push/CI/Obsidian 인계 및 05 선행조건 점검 |
+| VF-CX-05 | W2~W4와 실제5대 인수 선행 미완 | 운영 미확인 | Codex 읽기 전용 inventory와 gap report |
 
 ## 작업한 것
 
-- 이전 Codex 커널 89a405a 계보를 b9752a8에 통합 중. 0038까지 migration history와 Lease/epoch 경계를 보존.
-- 배포 정본은 `saintvision.server:create_app --factory`. 두 역사적 mock 서버는 `tests/fixtures`로 이동. 원문 bytes 보존, 배포 image/package에서 제거.
-- apps/web 및 frontend workflow는 원격 b9752a8 그대로 유지. 기존 mock의 임의 Bearer는 401이지만 자가 생성 code/PKCE는 관리자 토큰 발급 200, 인증 없는 프로젝트 조회 200을 재현.
-- 구성된 정본은 이 발급 경로 404, 임의 bearer 401, 설정 없으면 기동 거부. Compose 내부 서비스는 localhost publish, 암호 필수.
-- 감사 정책 revision을 실제 0038에 맞춤 (함수 hash/허용 grant 완화 없음), DB target 비교에서 connect_timeout의 오탐을 수정.
+[[2026-09-15_VF-CX-01_Codex_인계]], [[2026-09-15_VF-CX-02_Codex_인계]], [[2026-09-15_VF-CX-03_Codex_검증보고]], [[2026-09-15_VF-CX-04_Codex_검증보고]]. 정본 API/실행 권한을 복제하지 않고 기존 Catalog/Lease/승인/Node/Result를 연결했다. apps/web와 다른 Agent 작업판을 수정하지 않았다.
 
 ## 확인한 것
 
-- Windows Python 3.14, Docker Linux Python 3.12/PG16. 운영 DB/Node를 사용하지 않은 임시 자원.
-- 전체 최초 회귀: 1583 passed, 26 failed, 18 errors, 139 skipped (exit 1); 실패 원인을 보존하고 수정 후 선택 재검증 중. 통합 완료 주장이 아니다.
-- 관리자 발급 우회/실제 factory 경로 추가 시험 2 passed; Compose 경계 2 passed; package+fixture 보존 13 passed (fixture 시험은 제품 인증 증거가 아님).
-- Windows launcher/마이그레이션 경계 13 passed. 이후 실제 PG definer/account/upgrade 검증은 통과했고, 복원 시험의 Linux 전용/내부 network 요건은 별도 Linux runner에서 확인 중.
-- 문서 검사·ontology·19 schema export·생성 계약 drift 검사 통과. 제품 인수와 별도.
-- CI 290aba5: 네 workflow 모두 billing으로 시작 전 거부. 독립 검토 미실행. 운영 자격증명/기존 DB 역할/운영 PITR/실장비는 미확인.
+140개 최종 Linux 시험에서 모델 입력 실행·출력 복구·취소·실제 만료·Node 이탈 거부·두 Go Node 대체 실행을 확인했다. Evidence는 한 Docker host의 격리 시험이며 실제 두 PC/5대 인수가 아니다. [[모델 실행 입력과 대체 Node 복구 계약]]의32KiB CPU 범위를 넘어선 GPU/collective/대용량 provider는 미지원으로 표시한다. 실패와 수정은 [[2026-09-15_VF_오류와_해결]].
 
 ## 이어서
 
-Codex: VF-CX-01의 Linux 복원 결과를 확인하고 commit/push/같은 SHA CI/Evidence/Obsidian 인계 기록 후 VF-CX-02로 진행한다. Claude: 실제 요청 인계본의 definer·migration·canonical 경계를 독립 검토한다. Gemini: fixture auth 및 실제 route gap을 정본 계약에 맞추고 실제 API E2E를 수행한다. 어느 Agent도 상대방의 검토를 완료 처리하지 않는다.
+Codex: 04 전체 회귀와 전달 상태를 마무리하고 05의 실제 장비/운영 선행조건을 점검한다. Claude: kernel migration/동시성/보안 독립 검토와 서비스 API. Gemini: canonical route/모델 상태/UI 연결 및 browser 검증. 운영 owner: CI billing, SSO/credential/PITR,5대 장비 및 검증된 runtime profile.
+
+기존2775/4800=57.81% 유지. 새 VF 운영 인수0/5(0%). 구현/로컬/CI/독립 검토/운영 인수를 별도로 관리한다. 다른 Agent의 수신·착수·승인을 대신 기록하지 않는다.

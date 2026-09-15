@@ -81,6 +81,7 @@ type WorkloadSpec struct {
     WorkspaceStart *WorkspaceStartRef `json:"workspaceStart,omitempty"`
     TargetNodeId *NodeId `json:"targetNodeId,omitempty"`
     Terminal *TerminalSpec `json:"terminal,omitempty"`
+    ModelInput *ModelExecutionRef `json:"modelInput,omitempty"`
 }
 
 type ResourceLease struct {
@@ -1059,4 +1060,18 @@ type ModelManifest struct {
     Classification string `json:"classification"`
     Encryption string `json:"encryption"`
     KeyRef *string `json:"keyRef"`
+}
+
+type ModelExecutionRef struct {
+    InputId string `json:"inputId"`
+    RunId RunId `json:"runId"`
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    ManifestHash ActionDigest `json:"manifestHash"`
+    InputSha256 ActionDigest `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    NodeId NodeId `json:"nodeId"`
+    Adapter string `json:"adapter"`
+    AdapterVersion string `json:"adapterVersion"`
+    Mode string `json:"mode"`
 }

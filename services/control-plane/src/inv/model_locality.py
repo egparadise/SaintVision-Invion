@@ -19,11 +19,6 @@ from .model_commit import ModelManifestStore, capture_locations
 from .model_manifest import ConfiguredModelVerifier, canonical, manifest_copy, rejected
 
 
-def require_model_admission(conn, run_id):
-    if conn.execute("SELECT 1 FROM inv.model_run_inputs WHERE run_id=%s", (run_id,)).fetchone():
-        raise DomainError("MODEL-0006", "Model runtime admission is not configured", 422)
-
-
 def _capture(conn, db, principal, project, body):
     require_execution(conn)
     nodes = sorted({r["nodeId"] for r in body["replicas"]})

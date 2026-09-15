@@ -13,7 +13,8 @@ import pytest
 from inv.approvals import Principal
 from inv.errors import DomainError
 from inv.ids import new_id
-from inv.model_locality import LocalModelObservation, ModelLocalityStore, require_model_admission
+from inv.model_locality import LocalModelObservation, ModelLocalityStore
+from inv.model_runtime import require_model_reference
 from inv.placement import PlacementStore
 from inv.scheduler import Request
 from test_model_commit import model, commit
@@ -111,8 +112,8 @@ def test_verified_locality_binds_existing_leases_and_durable_duplicate(locality)
         ).fetchone()
         assert row["input"]["leases"] == first["leases"]
         with pytest.raises(DomainError, match="MODEL-0006"):
-            require_model_admission(c, a.target)
-        require_model_admission(c, a.run)
+            require_model_reference(c, {"run_id": a.target}, {})
+        require_model_reference(c, {"run_id": a.run}, {})
 
 
 @pytest.mark.parametrize("kind", ["corrupt", "truncated", "missing", "budget"])
@@ -271,7 +272,7 @@ def test_post_observation_file_change_never_becomes_an_execution_permit(locality
     reserve(a, measured)
     with a.e.db.transaction(a.e.tenant) as c:
         with pytest.raises(DomainError, match="MODEL-0006"):
-            require_model_admission(c, a.target)
+            require_model_reference(c, {"run_id": a.target}, {})
 
 
 def test_actual_tool_gateway_cannot_ignore_model_input(locality, approval):
