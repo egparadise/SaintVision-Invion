@@ -15,6 +15,12 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   pendingApprovalsCount,
   onNavigate,
 }) => {
+  if (!nodes.length || nodes.some(node => node.telemetryUnavailable)) return <section>
+    <h1>분산 Node 클러스터 개요</h1>
+    <p role="status">자원 합계를 확인할 수 없습니다. 미관측 정보가 있습니다.</p>
+    <ul>{nodes.map(node => <li key={node.id}>{node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}</li>)}</ul>
+    <p>표시된 노드 {nodes.length}대 · 활성 실행 {runs.filter(run => run.state === 'running').length}건</p>
+  </section>;
   // Aggregate Cluster Metrics
   const totalCores = nodes.reduce((acc, n) => acc + n.cpuCores, 0);
   const avgCpuUsage = Math.round(
@@ -63,9 +69,9 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
         }}
       >
         <div>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 700 }}>5개 분산 Node 클러스터 개요</h1>
+          <h1 style={{ fontSize: '1.375rem', fontWeight: 700 }}>분산 Node 클러스터 개요</h1>
           <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-            Windows 3대 + Linux 2대 사내 물리 기기 연동 (온라인 {onlineNodes}/{nodes.length}대, 활성 실행 {runningRuns}건)
+            관측된 노드 (온라인 {onlineNodes}/{nodes.length}대, 활성 실행 {runningRuns}건)
           </p>
         </div>
 

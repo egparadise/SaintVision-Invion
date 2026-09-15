@@ -184,7 +184,7 @@ export const RunList: React.FC<RunListProps> = ({
                     )}
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-primary)' }}>
-                    <div>{run.objective}</div>
+                    <div>{run.objective ?? '작업 목적 미관측'}</div>
                     {run.manifestDigest && (
                       <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', marginTop: '2px' }}>
                         Manifest: {run.manifestDigest.slice(0, 22)}...
@@ -226,10 +226,10 @@ export const RunList: React.FC<RunListProps> = ({
                     </div>
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-secondary)', fontSize: '0.8125rem' }}>
-                    {run.requestedBy}
+                    {run.requestedBy ?? '미관측'}
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
-                    {new Date(run.createdAt).toLocaleString('ko-KR')}
+                    {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측'}
                   </td>
                 </tr>
               );
