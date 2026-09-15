@@ -9,6 +9,7 @@ export interface NodeDetailProps {
 }
 
 export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStudio }) => {
+  if (node.telemetryUnavailable) return <div role="status"><Button onClick={onBack}>돌아가기</Button><h2>{node.hostname}</h2>자원 정보가 미관측 상태입니다. 실행 대상으로 사용할 수 없습니다.</div>;
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>

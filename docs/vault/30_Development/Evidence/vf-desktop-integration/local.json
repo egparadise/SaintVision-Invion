@@ -1,0 +1,23 @@
+{
+  "codeSha": "81987d3723e4cfca9d8712196136d39f469b83c7",
+  "platform": "Windows; Node/Vite; Python .venv; installed Edge Chromium",
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0
+  },
+  "tests": {
+    "command": "npm test",
+    "exitCode": 0,
+    "passed": 242,
+    "skipped": 0
+  },
+  "browser": {
+    "command": "python tools/verify_desktop_observation_browser.py",
+    "exitCode": 0,
+    "passed": 7,
+    "backend": "intercepted HTTP fixture; not live SSO/backend"
+  },
+  "independentReview": "pending",
+  "operations": "pending",
+  "pr": "https://github.com/egparadise/SaintVision-Invion/pull/29"
+}

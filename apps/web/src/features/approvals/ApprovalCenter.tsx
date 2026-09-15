@@ -1,21 +1,21 @@
+import type { ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState } from 'react';
 import { ApprovalItem } from '@/contracts/types';
-import { ApprovalDetail } from './ApprovalDetail';
+import { ApprovalReviewPanel } from './ApprovalReviewPanel';
+import { reviewIdentity } from '@/shared/api/approvalReview';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { EmptyState } from '@/shared/ui/EmptyState';
 
 export interface ApprovalCenterProps {
   approvals: ApprovalItem[];
   currentUserId: string;
-  onChangeUser: (newUserId: string) => void;
-  onApprove: (approvalId: string, nonce: string) => Promise<void>;
+  onApprove: (approvalId: string, nonce: string, shown?: ReviewedAction) => Promise<void>;
   onReject: (approvalId: string, reason: string) => Promise<void>;
 }
 
 export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
   approvals,
   currentUserId,
-  onChangeUser,
   onApprove,
   onReject,
 }) => {
@@ -48,7 +48,7 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>거버넌스 승인 센터 (S04-FE)</h2>
           <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-            L1~L3 고위험 작업 통제 · 2인 승인 원칙(Two-Person Rule) 및 15분 만료 타이머 강제
+            서버 정책과 만료 시각을 기준으로 승인 요청을 확인합니다.
           </p>
         </div>
 
@@ -57,23 +57,7 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
           <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
             현재 검토자 계정:
           </span>
-          <select
-            value={currentUserId}
-            onChange={(e) => onChangeUser(e.target.value)}
-            style={{
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-border-strong)',
-              backgroundColor: 'var(--color-bg-subtle)',
-              color: 'var(--color-text-primary)',
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-            }}
-          >
-            <option value="usr_reviewer_01">usr_reviewer_01 (1차 승인자 담당)</option>
-            <option value="usr_reviewer_02">usr_reviewer_02 (2차 독립 승인자)</option>
-            <option value="usr_requester_alice">usr_requester_alice (요청자 - 승인 권한 없음)</option>
-          </select>
+          <strong>{currentUserId || '로그인 필요'}</strong>
         </div>
       </div>
 
@@ -168,7 +152,7 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <RiskBadge level={item.riskLevel} />
+                    {item.riskLevel ? <RiskBadge level={item.riskLevel} /> : <span>위험도 미관측</span>}
                     <span
                       style={{
                         fontSize: '0.6875rem',
@@ -207,7 +191,8 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
         {/* Right Detail */}
         <div>
           {selectedApproval ? (
-            <ApprovalDetail
+            <ApprovalReviewPanel
+              key={`${currentUserId}:${reviewIdentity(selectedApproval)}`}
               approval={selectedApproval}
               currentUserId={currentUserId}
               onApprove={onApprove}

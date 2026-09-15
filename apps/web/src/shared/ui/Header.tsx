@@ -10,6 +10,7 @@ export interface HeaderProps {
   onSelectTab: (tab: string) => void;
   currentUser?: { id: string; name: string; role: string } | null;
   onLogout?: () => void;
+  onSwitchToDesktop?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab,
   currentUser,
   onLogout,
+  onSwitchToDesktop,
 }) => {
   const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
     online: true,
@@ -220,6 +222,26 @@ export const Header: React.FC<HeaderProps> = ({
         ) : (
           <Button variant="primary" size="sm" onClick={() => onSelectTab('login')}>
             SSO 로그인
+          </Button>
+        )}
+
+        {onSwitchToDesktop && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onSwitchToDesktop}
+            aria-label="Web Desktop으로 전환"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              border: '1px solid rgba(59, 130, 246, 0.4)',
+              color: '#60a5fa',
+            }}
+          >
+            <span>🖥️</span>
+            <span>Web Desktop</span>
           </Button>
         )}
 

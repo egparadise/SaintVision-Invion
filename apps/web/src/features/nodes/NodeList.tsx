@@ -99,6 +99,10 @@ export const NodeList: React.FC<NodeListProps> = ({
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {nodes.map((node) => {
+          if (node.telemetryUnavailable) return <div key={node.id} role="status">
+            <strong>{node.hostname}</strong> — 자원 정보 미관측 · 실행 대상에서 제외
+          </div>;
+
           const statusColor =
             node.status === 'online'
               ? 'var(--color-status-online)'
