@@ -1,0 +1,6 @@
+{
+  "command": "python -m alembic heads",
+  "exitCode": 0,
+  "head": "0043_replica_retention",
+  "operationalMigrationApplied": false
+}

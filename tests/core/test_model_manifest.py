@@ -12,6 +12,30 @@ from inv.model_manifest import ConfiguredModelVerifier, LocationSnapshot, RootBi
 from saintvision.storage.readroot import ReadRoot
 
 
+def test_schema_accepts_exact_database_shard_limit():
+    body = model_body(
+        new_id("nod"), [new_id("dtl") for _ in range(1024)], [b"x"] * 1024
+    )
+    assert manifest_copy(body) == body
+
+
+def test_schema_rejects_excess_shards_before_reading_files(material, monkeypatch):
+    _, _, verifier, _ = material
+    body = model_body(
+        new_id("nod"), [new_id("dtl") for _ in range(1025)], [b"x"] * 1025
+    )
+
+    def forbidden_open(*args, **kwargs):
+        pytest.fail("Oversized manifest reached file I/O")
+
+    monkeypatch.setattr(ReadRoot, "open", forbidden_open)
+    for operation in (lambda: manifest_copy(body), lambda: verifier.verify(body, [])):
+        with pytest.raises(DomainError) as error:
+            operation()
+        assert (error.value.code, error.value.status) == ("VAL-0002", 422)
+        assert error.value.detail == "ModelManifest: invalid contract"
+
+
 @pytest.fixture
 def material(tmp_path):
     node, contribution = new_id("nod"), new_id("stc")
