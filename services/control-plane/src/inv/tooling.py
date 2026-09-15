@@ -123,6 +123,9 @@ class ToolGateway:
             from .workspace_start import require_start_admission
 
             require_start_admission(conn, self.db, run["run_id"])
+            from .model_locality import require_model_admission
+
+            require_model_admission(conn, run["run_id"])
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),

@@ -156,7 +156,7 @@ def test_setting_text_or_unused_lookup_does_not_prove_binding(postgres, body):
         ),
         (
             "UPDATE public.alembic_version SET version_num='unknown'",
-            "UPDATE public.alembic_version SET version_num='0039_model_manifest'",
+            "UPDATE public.alembic_version SET version_num='0040_model_run_input'",
             "migration_revision_mismatch",
         ),
     ],

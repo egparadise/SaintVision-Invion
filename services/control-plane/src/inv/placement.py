@@ -33,13 +33,22 @@ class PlacementStore:
         policy_version,
         node_ids=None,
         pool_version="project-nodes:1",
-        ttl_seconds=30
+        ttl_seconds=30,
+        model_observation=None,
     ):
-        if not isinstance(request, Request) or not isinstance(
-            request.max_host_load, Decimal
-        ):
+        if not isinstance(request, Request) or not isinstance(request.max_host_load, Decimal):
             raise DomainError("VAL-0003", "Typed placement request required", 422)
-        if request.gpu_count or request.min_vram_bytes or request.required_bytes:
+        from .model_locality import LocalModelObservation
+
+        if model_observation is not None and not isinstance(
+            model_observation, LocalModelObservation
+        ):
+            raise DomainError("VAL-0003", "Trusted model observation required", 422)
+        if (
+            request.gpu_count
+            or request.min_vram_bytes
+            or (request.required_bytes and model_observation is None)
+        ):
             raise DomainError(
                 "RES-0008",
                 "Measured GPU and locality providers are not configured",
@@ -53,9 +62,7 @@ class PlacementStore:
             or type(ttl_seconds) is not int
             or not 1 <= ttl_seconds <= 300
         ):
-            raise DomainError(
-                "VAL-0003", "Versioned placement configuration required", 422
-            )
+            raise DomainError("VAL-0003", "Versioned placement configuration required", 422)
         if node_ids is not None:
             if (
                 not isinstance(node_ids, (list, tuple))
@@ -63,9 +70,7 @@ class PlacementStore:
                 or not all(isinstance(n, str) for n in node_ids)
                 or len(set(node_ids)) != len(node_ids)
             ):
-                raise DomainError(
-                    "VAL-0003", "Bounded unique pool node set required", 422
-                )
+                raise DomainError("VAL-0003", "Bounded unique pool node set required", 422)
             for node in node_ids:
                 validate_contract("NodeId", node)
             node_ids = sorted(node_ids)
@@ -77,19 +82,23 @@ class PlacementStore:
             "pool": pool_version,
             "ttl": ttl_seconds,
         }
+        if model_observation is not None:
+            material["modelInput"] = model_observation.reference
         approvals = ApprovalStore(self.db)
         # Early authorization closes before acquiring mutation locks. Recheck
         # below at commit scope in the canonical Node -> grant lock order.
         with self.db.transaction(principal.tenant_id) as conn:
             Control(self.db).grant(conn, principal, project, "can_request")
         with self.db.transaction(principal.tenant_id) as conn:
-            prior = approvals._ledger(
-                conn, principal, project, "placement.reserve", key, material
-            )
+            prior = approvals._ledger(conn, principal, project, "placement.reserve", key, material)
             lock_run(conn, run_id, project)
             if prior is not None:
                 Control(self.db).grant(conn, principal, project, "can_request")
                 return prior
+            if conn.execute(
+                "SELECT 1 FROM inv.model_run_inputs WHERE run_id=%s", (run_id,)
+            ).fetchone():
+                raise DomainError("MODEL-0003", "Run already has a model input reservation", 409)
             conn.execute(
                 "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
                 (project,),
@@ -99,9 +108,7 @@ class PlacementStore:
                 (project,),
             ).fetchone()
             if not limits:
-                raise DomainError(
-                    "RES-0008", "Provisioned project resource ceilings required", 403
-                )
+                raise DomainError("RES-0008", "Provisioned project resource ceilings required", 403)
             permitted = [
                 r["node_id"]
                 for r in conn.execute(
@@ -113,9 +120,7 @@ class PlacementStore:
                 raise DomainError("RES-0003", "Bounded authorized node set unavailable")
             selected_pool = node_ids if node_ids is not None else permitted
             if not set(selected_pool) <= set(permitted):
-                raise DomainError(
-                    "AUTH-0030", "Pool contains unauthorized project nodes", 403
-                )
+                raise DomainError("AUTH-0030", "Pool contains unauthorized project nodes", 403)
             resource_ids = [
                 r["resource_id"]
                 for r in conn.execute(
@@ -124,9 +129,7 @@ class PlacementStore:
                 ).fetchall()
             ]
             if not resource_ids or len(resource_ids) > 128:
-                raise DomainError(
-                    "RES-0003", "Bounded measured resource set unavailable"
-                )
+                raise DomainError("RES-0003", "Bounded measured resource set unavailable")
             resources = lock_resources(conn, resource_ids)
             # Recheck membership under a row lock after discovering/locking Nodes.
             authorized = [
@@ -151,6 +154,11 @@ class PlacementStore:
                 (selected_pool,),
             ).fetchall()
             now = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+            locality = {}
+            if model_observation is not None:
+                locality = model_observation.revalidate(
+                    conn, self.db, principal, project, now, request.required_bytes, selected_pool
+                )
             candidates = []
             for row in rows:
                 node = measured.get(row["node_id"])
@@ -167,16 +175,24 @@ class PlacementStore:
                         node["spare"]["cpuMillis"],
                         node["spare"]["memoryBytes"],
                         (),
-                        0,
+                        locality.get(row["node_id"], 0),
                         None,
-                        Decimal(snapshot["cpuBusyMillis"])
-                        / Decimal(snapshot["cpuCapacityMillis"]),
+                        Decimal(snapshot["cpuBusyMillis"]) / Decimal(snapshot["cpuCapacityMillis"]),
                         clock_skew_seconds=row["clock_skew_seconds"],
                     )
                 )
             snapshot_id = digest(
                 {
                     "pool": selected_pool,
+                    "modelLocality": (
+                        None
+                        if model_observation is None
+                        else {
+                            **model_observation.reference,
+                            "observedAt": model_observation.observed_at.isoformat(),
+                            "localBytes": locality,
+                        }
+                    ),
                     "limitsVersion": limits["version"],
                     "capacity": [measured[n] for n in sorted(measured)],
                     "observations": [
@@ -196,13 +212,18 @@ class PlacementStore:
                 snapshot_id=snapshot_id,
                 policy_version=policy_version,
             )
+            if model_observation is not None:
+                explain["modelInput"] = {
+                    **model_observation.reference,
+                    "observedAt": model_observation.observed_at.isoformat(),
+                    "requiresExecutionRevalidation": True,
+                    "unavailableReplicas": dict(model_observation.rejected_nodes),
+                }
             explain["poolVersion"] = pool_version
             explain["projectLimitsVersion"] = limits["version"]
             for node in selected_pool:
                 if node not in {c.node_id for c in candidates}:
-                    explain["rejected"][node] = [
-                        "current_authorized_measurement_unavailable"
-                    ]
+                    explain["rejected"][node] = ["current_authorized_measurement_unavailable"]
             allocations = []
             for kind, need in [
                 ("cpu", request.cpu_millis),
@@ -210,14 +231,9 @@ class PlacementStore:
             ]:
                 for rid in sorted(resources):
                     resource = resources[rid]
-                    if (
-                        resource["node_id"] != explain["nodeId"]
-                        or resource["kind"] != kind
-                    ):
+                    if resource["node_id"] != explain["nodeId"] or resource["kind"] != kind:
                         continue
-                    amount = min(
-                        need, max(0, resource["offered"] - int(active_total(conn, rid)))
-                    )
+                    amount = min(need, max(0, resource["offered"] - int(active_total(conn, rid))))
                     if amount:
                         allocations.append(Allocation(rid, amount))
                         need -= amount
@@ -234,7 +250,7 @@ class PlacementStore:
                 ttl_seconds,
             )
             result = {"runId": run_id, "placement": explain, "leases": leases}
-            event(
-                conn, principal.tenant_id, run_id, "inv.run.placement_reserved", result
-            )
+            if model_observation is not None:
+                model_observation.bind(conn, principal, project, run_id, result)
+            event(conn, principal.tenant_id, run_id, "inv.run.placement_reserved", result)
             return approvals._save(conn, project, "placement.reserve", key, result)

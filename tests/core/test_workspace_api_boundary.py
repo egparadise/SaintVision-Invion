@@ -42,7 +42,7 @@ def test_integrated_migration_keeps_both_published_histories():
     spec.loader.exec_module(module)
     revisions = module.load()
     ordered = module.chain(revisions)
-    assert ordered[-1].revision == "0039_model_manifest"
+    assert ordered[-1].revision == "0040_model_run_input"
     parents = {r.revision: r.down_revision for r in revisions}
     assert parents["0008_node_certificate_lookup"] == "0006_control_api"
     assert parents["0007_delivery_queue"] == "0006_control_api"
@@ -75,7 +75,7 @@ def test_integrated_migration_keeps_both_published_histories():
         "0024_workspace_bridge",
         "0032_workspace_readiness_merge",
     }
-    assert module.downgrade_target(revisions) == "0039_model_manifest"
+    assert module.downgrade_target(revisions) == "0040_model_run_input"
     published_prefix = ordered[:next(i for i, r in enumerate(ordered)
                                     if r.revision == "0019_workspace_api_integration")]
     with pytest.raises(ValueError, match="unmerged"):

@@ -64,60 +64,7 @@ class ModelManifestStore:
             ).fetchone()
             if not node or not node["available"] or not public or public["status"] != "active":
                 rejected()
-        ids = sorted(r["locationId"] for r in body["replicas"])
-        hints = conn.execute(
-            "SELECT location_id,contribution_id FROM public.data_locations WHERE location_id=ANY(%s)",
-            (ids,),
-        ).fetchall()
-        if len(hints) != len(ids):
-            rejected()
-        roots = {}
-        for root_id in sorted({r["contribution_id"] for r in hints}):
-            root = conn.execute(
-                """SELECT contribution_id,node_id,status,registered_by_user_id,version
-                FROM public.storage_contributions WHERE contribution_id=%s FOR SHARE""",
-                (root_id,),
-            ).fetchone()
-            if (
-                not root
-                or root["status"] != "active"
-                or root["registered_by_user_id"] != owner["userId"]
-            ):
-                rejected()
-            roots[root_id] = root
-        replicas = {r["locationId"]: r for r in body["replicas"]}
-        snapshots = []
-        for location_id in ids:
-            row = conn.execute(
-                """SELECT location_id,contribution_id,version,relative_path,byte_size,checksum_sha256
-                FROM public.data_locations WHERE location_id=%s FOR SHARE""",
-                (location_id,),
-            ).fetchone()
-            if not row or row["contribution_id"] not in roots:
-                rejected()
-            root, replica = roots[row["contribution_id"]], replicas[location_id]
-            shard = body["shards"][replica["shardIndex"]]
-            if (
-                replica["state"] != "verified"
-                or root["node_id"] != replica["nodeId"]
-                or row["version"] != replica["locationVersion"]
-                or (row["byte_size"], row["checksum_sha256"])
-                != (shard["byteLength"], shard["sha256"])
-            ):
-                rejected()
-            snapshots.append(
-                LocationSnapshot(
-                    location_id,
-                    row["version"],
-                    row["contribution_id"],
-                    root["version"],
-                    root["node_id"],
-                    row["relative_path"],
-                    row["byte_size"],
-                    row["checksum_sha256"],
-                )
-            )
-        return (run["version"], run["attempt"]), tuple(snapshots)
+        return (run["version"], run["attempt"]), capture_locations(conn, owner, body)
 
     def commit(self, principal, project, run_id, manifest, proofs, *, key):
         body = manifest_copy(manifest)
@@ -206,3 +153,59 @@ class ModelManifestStore:
                 "committed": True,
                 "requiresExecutionRevalidation": True,
             }
+
+
+def capture_locations(conn, owner, body):
+    ids = sorted(r["locationId"] for r in body["replicas"])
+    hints = conn.execute(
+        "SELECT location_id,contribution_id FROM public.data_locations WHERE location_id=ANY(%s)",
+        (ids,),
+    ).fetchall()
+    if len(hints) != len(ids):
+        rejected()
+    roots = {}
+    for root_id in sorted({r["contribution_id"] for r in hints}):
+        root = conn.execute(
+            """SELECT contribution_id,node_id,status,registered_by_user_id,version
+            FROM public.storage_contributions WHERE contribution_id=%s FOR SHARE""",
+            (root_id,),
+        ).fetchone()
+        if (
+            not root
+            or root["status"] != "active"
+            or root["registered_by_user_id"] != owner["userId"]
+        ):
+            rejected()
+        roots[root_id] = root
+    replicas = {r["locationId"]: r for r in body["replicas"]}
+    snapshots = []
+    for location_id in ids:
+        row = conn.execute(
+            """SELECT location_id,contribution_id,version,relative_path,byte_size,checksum_sha256
+            FROM public.data_locations WHERE location_id=%s FOR SHARE""",
+            (location_id,),
+        ).fetchone()
+        if not row or row["contribution_id"] not in roots:
+            rejected()
+        root, replica = roots[row["contribution_id"]], replicas[location_id]
+        shard = body["shards"][replica["shardIndex"]]
+        if (
+            replica["state"] != "verified"
+            or root["node_id"] != replica["nodeId"]
+            or row["version"] != replica["locationVersion"]
+            or (row["byte_size"], row["checksum_sha256"]) != (shard["byteLength"], shard["sha256"])
+        ):
+            rejected()
+        snapshots.append(
+            LocationSnapshot(
+                location_id,
+                row["version"],
+                row["contribution_id"],
+                root["version"],
+                root["node_id"],
+                row["relative_path"],
+                row["byte_size"],
+                row["checksum_sha256"],
+            )
+        )
+    return tuple(snapshots)
