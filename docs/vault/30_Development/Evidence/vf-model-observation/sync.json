@@ -1,0 +1,9 @@
+{
+  "base": "c74ce2e",
+  "skippedDivergent": [
+    "30_Development/Agent별 작업/Codex 작업 현황.md"
+  ],
+  "pending": 0,
+  "managed": 13,
+  "hashMatches": 13
+}

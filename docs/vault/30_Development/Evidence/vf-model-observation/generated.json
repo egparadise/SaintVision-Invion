@@ -1,0 +1,12 @@
+{
+  "command": "python tools/generate_contracts.py (second generation)",
+  "exitCode": 0,
+  "deterministic": true,
+  "hashes": {
+    "services/control-plane/src/inv/generated/core.schema.json": "98db3f5438d96190f19e07ab76adeab71deda3b5719643c0fdc187a935c71def",
+    "services/control-plane/src/inv/generated/models.py": "d9dd06dc911eeab93795d5d8e10864e31260a90dfb4ef8c02c1c892cfdc164c0",
+    "packages/contracts-ts/src/index.ts": "b1e7e74d67a5bbef11fd7ba7ea7a67daf447e3150f2f635b602f4bb0964d65f7",
+    "packages/contracts-go/contracts.go": "6f5e1feb7d742f0267d8c2b5912d776418ee2376a8c6ce361a57c98e1f87573f",
+    "services/node-agent/internal/wire/core.schema.json": "98db3f5438d96190f19e07ab76adeab71deda3b5719643c0fdc187a935c71def"
+  }
+}

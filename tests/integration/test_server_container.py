@@ -165,6 +165,9 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                 assert missing.json()["code"] == "AUTH-MISSING-CREDENTIAL"
             result = client.get("/v1/projects", headers={"Authorization": "Bearer " + identity.token()})
             assert result.status_code == 200
+            model_path = '/v1/projects/prj_' + '0' * 26 + '/models/mdl_' + '0' * 26 + '/versions/1/commitment'
+            assert client.get(model_path).status_code == 401
+            assert client.get(model_path, headers={"Authorization": "Bearer " + identity.token()}).status_code == 403
             if business:
                 headers = {"Authorization": "Bearer " + identity.token(), "Idempotency-Key": uuid4().hex}
                 for path in ('/v1/storage/locations', '/v1/storage/contributions'):
