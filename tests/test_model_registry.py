@@ -332,9 +332,10 @@ def _seed_traceable_subjects(owner_engine, registry, user_id):
             text(
                 "INSERT INTO approvals (approval_id, tenant_id, run_id, subject_sha256, decision, "
                 "risk_level, decided_by_user_id, decided_at, expires_at) "
-                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, now(), now() + interval '1 day')"
+                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, :decided, :expires)"
             ),
-            {"a": ids["approval_id"], "t": t, "r": ids["run_id"], "sh": "c" * 64, "u": user_id},
+            {"a": ids["approval_id"], "t": t, "r": ids["run_id"], "sh": "c" * 64, "u": user_id,
+             "decided": NOW - dt.timedelta(minutes=1), "expires": NOW + dt.timedelta(days=1)},
         )
     return ids
 
@@ -438,10 +439,11 @@ def _deployment_approval(owner_engine, registry, subjects, user_id, *, digest, a
             text(
                 "INSERT INTO approvals (approval_id, tenant_id, run_id, subject_sha256, decision, "
                 "risk_level, decided_by_user_id, decided_at, expires_at) "
-                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, now(), now() + interval '1 day')"
+                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, :decided, :expires)"
             ),
             {"a": approval_id, "t": registry["tenant_a"], "r": subjects["run_id"],
-             "sh": digest, "u": user_id},
+             "sh": digest, "u": user_id,
+             "decided": NOW - dt.timedelta(minutes=1), "expires": NOW + dt.timedelta(days=1)},
         )
 
 
