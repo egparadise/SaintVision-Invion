@@ -1,0 +1,175 @@
+############################################################
+# VF-CL-05 deployment boundary reproduction
+# base SHA: b9752a8  KST: 2026-09-15
+############################################################
+
+===== (1) Dockerfile.backend target =====
+23:ENV PYTHONPATH=/app/src
+29:CMD ["uvicorn", "saintvision.server:app", "--host", "0.0.0.0", "--port", "8080"]
+
+===== (2) deployment_surface: what the deployed target serves unconfigured =====
+C:\Project\SaintVision-Invion\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+deploy/Dockerfile.backend serves saintvision.server:app
+
+target        saintvision.server:app
+obtainable    True — module-level application object
+routes        76
+   200  /readyz
+   401  /v1/auth/userinfo
+   200  /healthz
+   200  /v1/approvals
+   200  /v1/runs
+   200  /v1/projects
+   200  /v1/nodes
+   200  /v1/admin/audit-logs
+readyz says   {"status":"ready","scope":"authenticated-control-api","workspaceAdmission":"configured","executionDispatcher":"active"}
+database      NOT referenced
+authentication  NOT declared
+
+not fit to serve as it stands:
+  - 5 data route(s) answer without credentials: /v1/approvals, /v1/runs, /v1/projects, /v1/nodes, /v1/admin/audit-logs
+  - /readyz reports ready with nothing configured, so readiness does not mean the process can do its job
+  - the module refers to no database, so whatever it returns is not the recorded state
+  - the module declares no authentication of its own
+
+This inspects the application, not the deployment. A proxy in front may authenticate; if so, that proxy is the only thing between the network and this, which should be a decision rather than a discovery.
+
+===== (3) canonical candidates: do they refuse to serve unconfigured? =====
+----- candidate: inv.app:create_app -----
+target        inv.app:create_app
+obtainable    False — INCONCLUSIVE: module could not be imported here: ModuleNotFoundError: No module named 'inv'
+
+NOTHING ESTABLISHED — INCONCLUSIVE: module could not be imported here: ModuleNotFoundError: No module named 'inv'
+  This checkout could not import the target, which is not evidence either way. Run it where the container's dependencies are present. Exiting non-zero because an unanswered question is not a pass.
+
+----- candidate: inv.app:app -----
+target        inv.app:app
+obtainable    False — INCONCLUSIVE: module could not be imported here: ModuleNotFoundError: No module named 'inv'
+
+NOTHING ESTABLISHED — INCONCLUSIVE: module could not be imported here: ModuleNotFoundError: No module named 'inv'
+  This checkout could not import the target, which is not evidence either way. Run it where the container's dependencies are present. Exiting non-zero because an unanswered question is not a pass.
+
+----- candidate: saintvision.api.app:create_app -----
+target        saintvision.api.app:create_app
+obtainable    False — factory refuses to build without arguments: create_app() missing 3 required keyword-only arguments: 'engine', 'settings', and 'verifier'
+database      referenced
+authentication  NOT declared
+
+nothing here serves without configuration
+
+
+===== (3b) kernel inv.app:app manual verification (tool reported INCONCLUSIVE here) =====
+explicit PYTHONPATH import, INV_* stripped:
+  /readyz -> 503 (fail-closed, NOT fake-ready)
+  /v1/projects -> 503 (identity/config unavailable, refuses data)
+  /healthz -> 200
+  => kernel fails closed unconfigured; SAFE canonical candidate. Contrast: fixture serves data + fake-ready.
+
+===== (4) auth negative cases against the REAL kernel verifier (AccessTokens.verify) =====
+C:\Project\SaintVision-Invion\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+negative auth against kernel /v1/projects (expect 401 or 503, never 200):
+  [PASS-refused] no Authorization header: 503
+  [PASS-refused] empty Bearer: 503
+  [PASS-refused] arbitrary bearer string: 503
+  [PASS-refused] forged alg:none admin token: 503
+  [PASS-refused] malformed (2 segments): 503
+C:\Project\SaintVision-Invion\.venv\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 25 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+===== (4b) configured verifier negative/positive cases (direct AccessTokens.verify) =====
+  [PASS] valid RS256 token: ACCEPTED
+  [PASS] alg:none forgery: REJECTED AUTH-0050/401
+  [PASS] wrong issuer: REJECTED AUTH-0050/401
+  [PASS] wrong audience: REJECTED AUTH-0050/401
+  [PASS] expired: REJECTED AUTH-0050/401
+  [PASS] missing scope inv.api: REJECTED AUTH-0050/401
+  [PASS] unknown client_id: REJECTED AUTH-0050/401
+  [PASS] HS256 alg-confusion: REJECTED AUTH-0050/401
+
+===== (5) default credential surface (static) =====
+--- deploy/init-db.sql: does it CREATE a LOGIN role with a committed password? ---
+2:-- Roles and grants are owned by migrations. Do not pre-create inv_app as LOGIN:
+3:-- it is a NOLOGIN permission group, inherited by deployment-specific logins.
+
+--- deploy/remediate-shared-app-role.sql (the rehearsed fix) ---
+3:-- This disables future inv_app logins and removes its password, retaining
+10:  IF EXISTS (SELECT 1 FROM pg_stat_activity WHERE usename = 'inv_app') THEN
+11:    RAISE EXCEPTION 'inv_app sessions remain; reconcile services before remediation';
+14:ALTER ROLE inv_app NOLOGIN PASSWORD NULL;
+
+--- any committed passwords elsewhere in deploy/ ? ---
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_s02_baseline, S02 baseline: identity, node observation, storage catalogue, operations.
+INFO  [alembic.runtime.migration] Running upgrade 0001_s02_baseline -> 0002_s03_execution, S03 execution: workspace, workload, run, evidence, artifact.
+INFO  [alembic.runtime.migration] Running upgrade 0002_s03_execution -> 0003_s09_context_eval, S09 context, run record and evaluation.
+INFO  [alembic.runtime.migration] Running upgrade 0003_s09_context_eval -> 0004_s10_lineage, S10 lineage: dataset, commit, image, model version, deployment.
+INFO  [alembic.runtime.migration] Running upgrade 0004_s10_lineage -> 0005_s12_pilot_operations, S12 pilot operations: backup, recovery drill, release, acceptance.
+INFO  [alembic.runtime.migration] Running upgrade 0005_s12_pilot_operations -> 0006_discovery_pools_placement, Node discovery, resource pools and distributed placement.
+INFO  [alembic.runtime.migration] Running upgrade 0006_discovery_pools_placement -> 0007_locality_replicas, Data replicas and measured node links.
+INFO  [alembic.runtime.migration] Running upgrade 0007_locality_replicas -> 0001_core, Core lease, run, tenant and event persistence.
+Traceback (most recent call last):
+  File "<stdin>", line 15, in <module>
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\command.py", line 487, in upgrade
+    script.run_env()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\script\base.py", line 550, in run_env
+    util.load_python_file(self.dir, "env.py")
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\util\pyfiles.py", line 114, in load_python_file
+    module = load_module_py(module_id, path)
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\util\pyfiles.py", line 132, in load_module_py
+    spec.loader.exec_module(module)  # type: ignore
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "C:\Project\SaintVision-Invion\migrations\env.py", line 75, in <module>
+    run_migrations_online()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\SaintVision-Invion\migrations\env.py", line 69, in run_migrations_online
+    context.run_migrations()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 8, in run_migrations
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\runtime\environment.py", line 970, in run_migrations
+    self.get_context().run_migrations(**kw)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\alembic\runtime\migration.py", line 621, in run_migrations
+    step.migration_fn(**kw)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Project\SaintVision-Invion\migrations\versions\0001_core.py", line 23, in upgrade
+    driver_conn.execute(script)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Project\SaintVision-Invion\.venv\Lib\site-packages\psycopg\connection.py", line 300, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.DuplicateSchema: schema "inv" already exists
+
+===== (6) DB/RLS (throwaway postgres:16, migrated head) =====
+pytest tests/test_database.py tests/test_database_login_isolation.py -> 22 passed
+  incl. test_every_tenant_table_has_rls_enabled_and_forced (RLS ENABLE+FORCE on every tenant table)
+  incl. non-owner login isolation + shared inv_app group preservation (fail_body both).
+  NOTE: a separate ad-hoc cross-tenant demo did NOT run (container-reuse left schema 'inv',
+        re-migrate raised DuplicateSchema) -> NOT counted as evidence. The 22-passed run stands.
+
+===== (7) PITR readiness (default postgres:16 config) =====
+  archive_mode=off  archive_command=(disabled)  wal_level=replica  => NO point-in-time recovery.
+  Confirms roadmap P0 '미구성 PITR'. recovery_drill --require-operational-rpo tool lives on
+  review/claude-account-results (NOT integration); on integration only operations_pilot.py models it.
+
+===== (8) route coverage (served-set pinned; see handoff registry aad3d2b) =====
+  fixture included (src/saintvision 80r): 0 unserved (hollow).
+  real backend (kernel10+api19): 17 unserved.  wb kernel(58r) target: 13 unserved.
+  Real kernel gaps served only by fixture: pools, discovery/candidates, execution-readiness, run evidence.
+
+############ CL-05 VERDICT (evidence-backed) ############
+P0-1 canonical app: Dockerfile.backend STILL deploys fixture saintvision.server:app (76r), which serves
+     5 data routes (incl /v1/admin/audit-logs) unauthenticated + fake /readyz ready + no DB + no auth.
+     Two SAFE candidates exist and fail closed: kernel inv.app:app (503 unconfigured) and
+     saintvision.api.app:create_app (refuses w/o engine/settings/verifier). => repoint Dockerfile (Codex VF-CX-01).
+P0-2 auth: the REAL kernel verifier rejects every forgery (alg:none, HS256-confusion, iss/aud/exp/scope/client_id)
+     with 401; accepts only valid RS256. Sound. The gap is purely which app is deployed, not the auth code.
+P0-3 credentials: init-db.sql no longer creates a LOGIN inv_app; remediate-shared-app-role.sql present.
+     Live-cluster remediation is OPERATOR action (blocked, not code).
+P0-4 PITR: none in default config (archive_mode off). OPERATOR/deploy decision (blocked).
+P0-5 route: fixture masks real kernel gaps; CX-01 alone insufficient (evidence aad3d2b).
+########################################################
