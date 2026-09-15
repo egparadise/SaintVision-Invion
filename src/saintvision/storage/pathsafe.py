@@ -256,3 +256,66 @@ def build_uri(kind: str, *, name: str = "", version: str = "", relative_path: st
             raise ValueError("workspace URI requires a workspaceId and a relative path")
         return f"inv://workspaces/{workspace_id}/{relative_path}"
     raise ValueError(f"unknown URI kind: {kind!r}")
+
+
+#: URI scheme for the logical namespace (ADR-010).
+_URI_PREFIX = "inv://"
+
+
+@dataclass(frozen=True)
+class ParsedUri:
+    """The components of an ``inv://`` URI, the inverse of :func:`build_uri`.
+
+    A URI that parses is a URI that is *well-formed*; it is not necessarily a URI
+    that resolves. Whether a catalogued location and a ready replica exist for it
+    is a database question, answered by the resolver, not here.
+    """
+
+    kind: str
+    name: str = ""
+    version: str = ""
+    relative_path: str = ""
+    run_id: str = ""
+    artifact_id: str = ""
+    workspace_id: str = ""
+
+
+def parse_uri(uri: str) -> ParsedUri:
+    """Parse an ``inv://`` URI back into its components (ADR-010).
+
+    The strict inverse of :func:`build_uri`: for any URI ``build_uri`` produces,
+    ``build_uri(**parse fields)`` reproduces it exactly. Anything outside the
+    grammar is rejected rather than guessed at, because a URI the resolver cannot
+    trust to mean one thing must not become a silent lookup for something else.
+
+    A version segment must not contain ``/`` (the path begins at the first ``/``
+    after ``name@version``); ``build_uri`` never emits one that does.
+    """
+    if not isinstance(uri, str) or not uri.startswith(_URI_PREFIX):
+        raise ValueError("not an inv:// URI")
+    body = uri[len(_URI_PREFIX) :]
+    namespace, sep, rest = body.partition("/")
+    if not sep or not rest:
+        raise ValueError(f"inv:// URI has no path: {uri!r}")
+
+    if namespace in ("datasets", "models"):
+        kind = "dataset" if namespace == "datasets" else "model"
+        head, _, relative = rest.partition("/")
+        name, at, version = head.partition("@")
+        if not at or not name or not version:
+            raise ValueError(f"{kind} URI must be inv://{namespace}/<name>@<version>")
+        return ParsedUri(kind=kind, name=name, version=version, relative_path=relative)
+
+    if namespace == "artifacts":
+        parts = rest.split("/")
+        if len(parts) != 2 or not all(parts):
+            raise ValueError("artifact URI must be inv://artifacts/<runId>/<artifactId>")
+        return ParsedUri(kind="artifact", run_id=parts[0], artifact_id=parts[1])
+
+    if namespace == "workspaces":
+        workspace_id, slash, relative = rest.partition("/")
+        if not workspace_id or not slash or not relative:
+            raise ValueError("workspace URI must be inv://workspaces/<id>/<relativePath>")
+        return ParsedUri(kind="workspace", workspace_id=workspace_id, relative_path=relative)
+
+    raise ValueError(f"unknown inv:// namespace: {namespace!r}")
