@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.7"
+version: "1.0.8"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T13:10:39+09:00"
+updated: "2026-09-15T13:43:22+09:00"
 source_of_truth: "Git"
 ---
 
@@ -35,3 +35,7 @@ Codex: [[2026-09-15_VF-CX-05_Codex_선행조건_점검]]에 실제 선행조건�
 기존2775/4800=57.81% 유지. 새 VF 운영 인수0/5(0%). 구현/로컬/CI/독립 검토/운영 인수를 별도로 관리한다. 다른 Agent의 수신·착수·승인을 대신 기록하지 않는다.
 
 최종 로컬 회귀1716 passed/139 skipped/0 failed; Linux140/140은 한 Docker host이다. GPU/대용량/routing/data/tensor-pipeline 및 W2~W4 전체 인수는 여전히 별도 미완 범위다. 05 준비 점검을 제품 인수 성공으로 바꾸지 않았다.
+
+## 최신 인계
+
+VF-CX-01 진단출력 보강: [[2026-09-15_VF-CX-01_진단출력_보강]]. branch agent/codex/vf-cx-01-diagnostics / base dd04562. owner Codex, reviewer Claude 미수신. 공개 Evidence의 예외·응답 원문 노출 및 환경 제거 부작용 수정. 실제 PG 포함25/25 통과, 독립 검토/CI 대기.
