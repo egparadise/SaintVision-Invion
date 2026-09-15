@@ -31,6 +31,9 @@ def main():
     server_image = os.environ.get('VF_TEST_IMAGE', 'saintvision-backend-candidate:vf-cx-01')
     if re.fullmatch(r'(?:sha256:[0-9a-f]{64}|saintvision-backend-candidate:vf-cx-[0-9]{2})', server_image) is None:
         raise ValueError('Explicit local VF candidate image required')
+    browser_tests = os.environ.get('VF_BROWSER_TEST', '0')
+    if browser_tests not in ('0', '1'):
+        raise ValueError('VF_BROWSER_TEST must be 0 or 1')
     base_env = {k: v for k, v in os.environ.items()
                 if not k.startswith(('INV_', 'CX01_', 'VF_'))}
     name = 'sv-container-' + uuid4().hex
@@ -38,7 +41,7 @@ def main():
     container = None
     proof = {'exitCode': 1, 'postgres': 'isolated tmpfs PostgreSQL 16; loopback ephemeral port',
              'identity': 'synthetic issuer; no operational SSO acceptance',
-             'operationalAcceptance': False, 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
+             'operationalAcceptance': False, 'browserOptIn': browser_tests == '1', 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
     code = 1
     try:
         container = subprocess.check_output([
@@ -70,6 +73,7 @@ def main():
             try:
                 result = subprocess.run(command, env={
                     **base_env, 'INV_TEST_ADMIN_DSN': dsn, 'CX01_CONTAINER': name,
+                    'INV_BROWSER_TEST': browser_tests,
                     'INV_TEST_SERVER_IMAGE': server_image,
                     'INV_CONTAINER_TEST_DB_HOST': info['NetworkSettings']['IPAddress'],
                 }, stdout=log, stderr=subprocess.STDOUT, timeout=1800)

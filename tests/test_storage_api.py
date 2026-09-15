@@ -5,10 +5,8 @@ layer on top of it -- ``saintvision.api.app`` with its real dependency chain
 (bearer credential -> Principal -> tenant-scoped session), which had no test.
 Each assertion is a place the route, not the service, is responsible for:
 
-* a missing or unrecognised bearer credential is refused (AUTH -> 403); the two
-  carry different InvError *codes* (AUTH_MISSING_CREDENTIAL vs
-  AUTH_INVALID_CREDENTIAL) so the audit trail can tell "not logged in" from
-  "rejected", though both surface as 403;
+* a missing bearer credential is refused by HTTPBearer (401 + challenge);
+  an unrecognised token reaches the domain verifier and is also refused;
 * an unknown field in the body is refused (the request models are strict, 422);
 * an unknown node is a RESOURCE error, which this API maps to 409 by category
   (errors.py _STATUS), not 404 -- the test asserts the API's own convention;
@@ -83,9 +81,10 @@ def _auth(extra=None):
 
 
 def test_a_missing_bearer_credential_is_refused(api):
-    # AUTH errors map to 403 in this API (errors.py _STATUS), not 401.
+    # HTTPBearer rejects a missing credential before the domain error mapper.
     resp = api["client"].get("/v1/storage/contributions")
-    assert resp.status_code == 403
+    assert resp.status_code == 401
+    assert resp.headers["www-authenticate"] == "Bearer"
 
 
 def test_an_unrecognised_credential_is_refused(api):

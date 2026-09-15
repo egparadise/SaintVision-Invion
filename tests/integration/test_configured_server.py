@@ -22,13 +22,13 @@ pytestmark = pytest.mark.postgres
 
 
 @contextmanager
-def running_server(env, tmp_path, identity, *, epoch=None, allowed_origins=()):
+def running_server(env, tmp_path, identity, *, epoch=None, allowed_origins=(), business=False):
     config = tmp_path / "api.json"
     config.write_text(json.dumps({"identity": {
         "tenant_id": env.tenant, "issuer": identity.issuer,
         "audience": identity.audience, "client_ids": ["synthetic-web"],
         "jwks_file": str(identity.path),
-    }, "allowedOrigins": list(allowed_origins)}), encoding="utf-8")
+    }, "allowedOrigins": list(allowed_origins), **({"business": True} if business else {})}), encoding="utf-8")
     config.chmod(0o600)
     with socket.socket() as probe:
         probe.bind(("127.0.0.1", 0))
