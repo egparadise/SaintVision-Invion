@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.14"
+version: "1.35.15"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-15T14:27:00+09:00"
+updated: "2026-09-15T15:14:17+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -173,3 +173,8 @@ ADR-096(Windows 입력·WSL 고정 private 준비·request SHA 지정 apply·같
 ## VF 서비스 통합 정정 — 복제본 가용성과 보존 분리
 
 ADR-012를 보강한다. Node 이탈은 복제본을 stale로 만들지만 기존 pinned_until을 삭제하지 않는다. ready/stale에 retention pin을 허용하는 0043 forward migration을 사용하며 stale는 실행·복사 source·eviction 후보가 아니다. 아직 회수되지 않은 stale/corrupt 바이트도 cache 용량에 포함한다. URI version과 식별자에는 경로 구분 slash를 허용하지 않고 parse/build 왕복이 불가능한 빈 suffix는 거부한다. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]의 실제 재현/수정 증거 참조. Codex 수정의 Claude 재검토와 운영 적용은 pending이다.
+
+
+## VF 모델 업무 등록과 실행 manifest 경계
+
+ADR-010을 보강한다. [[모델 레지스트리와 실행 Manifest 권한 경계]]에 따라 S10 registry와 kernel manifest를 명시적 결속 전까지 구분한다. 이름/URI/hash의 일치가 결속·정책승인·실행 permit을 만들지 않는다. inv_app 직접 kernel 접근을 허용하지 않고 현재 프로젝트 권한을 검사하는 API를 후속 구현한다. [[2026-09-15_VF-MODEL-REVIEW_Codex]]의 독립 finding 판정과 회귀시험을 따른다.

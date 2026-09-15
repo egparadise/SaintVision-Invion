@@ -173,3 +173,23 @@ P0-3 credentials: init-db.sql no longer creates a LOGIN inv_app; remediate-share
 P0-4 PITR: none in default config (archive_mode off). OPERATOR/deploy decision (blocked).
 P0-5 route: fixture masks real kernel gaps; CX-01 alone insufficient (evidence aad3d2b).
 ########################################################
+
+############################################################
+# CL-05 finding resolution — verified 2026-09-15 (Claude)
+############################################################
+P0-1 canonical app: RESOLVED by Codex VF-CX-01 (agent/codex/vf-cx-02, 290aba5).
+  - deploy/Dockerfile.backend now: PYTHONPATH=/app/src:/app/services/control-plane/src
+    (kernel added), CMD uvicorn saintvision.server:create_app --factory (not the
+    module-level fixture app).
+  - src/saintvision/server.py is now 6 lines: a production entrypoint delegating to
+    inv.app:create_configured_app(); the 2811-line fixture is removed and the demo
+    moved to saintvision.demo_server explicitly.
+  - inv.app docstring: "explicit deployment configuration required"; create_app with
+    no database/tokens fails closed (503 Identity configuration unavailable, /readyz
+    not_ready). So the deployment now serves the real fail-closed control plane, not
+    the hollow fixture. Exactly the P0-1 recommendation.
+  Verified by reading vf-cx-02 source; that branch's container was not built here.
+P0-3 credentials: was already artifact-clean on integration (init-db.sql, remediate
+  script). Live remediation remains operator action.
+Still open (not code): P0-4 PITR media (operator), CI billing (user), CX-01 merge to
+  integration (Codex — integration is still b9752a8; vf-cx-02 unmerged).
