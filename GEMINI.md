@@ -7,3 +7,5 @@ AGENTS.md를 먼저 읽는다. Gemini는 Antigravity에서 디자인·Frontend·
 Frontend는 계약 타입과 실제 API를 사용하고 정상·빈 상태·오류·권한·부분 실패를 검증한다. 인증·SSE·WS·승인 코어는 Codex와 계약을 합의한다. 내부망 HTTPS 배포·웹 rollback·브라우저 smoke·접근성 증거를 기록한다. Backend·DB·Storage의 정본 계약을 UI 편의로 바꾸지 않는다.
 
 Antigravity 세션에 이 파일과 AGENTS.md를 Context로 명시적으로 제공하고 읽은 버전을 시작 기록에 남긴다. 규칙 파일 자동 로드 여부는 실행 도구에서 확인한다.
+
+2026-09-15 보강 트랙은 `docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md`의 VF-GM 카드를 우선한다. Web Desktop Shell, My Computer/Resource Explorer, File Explorer, Model Studio, Terminal/IDE, 외부 HTTPS와 브라우저 인수 순으로 준비된 카드를 중간 사용자 확인 없이 이어간다. 실제 API·권한·부분 실패·접근성 E2E 전에는 done으로 표시하지 않는다.

@@ -3,6 +3,7 @@
 ## 먼저 읽기
 
 0. `docs/vault/00_Index/전체 개발 진행 현황.md`와 자신의 `docs/vault/30_Development/Agent별 작업/{Codex|Claude|Gemini|Orca} 작업 현황.md`를 읽고 진행판 버전·작업 카드·다음 행동을 확인한다.
+0-1. `docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md`, `docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md`, `docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md`를 읽는다.
 1. `docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md`
 2. `docs/vault/40_Governance/설계 충돌 정정 및 ADR.md`
 3. `docs/vault/40_Governance/Agent 역할과 인계 계약.md`
@@ -16,6 +17,7 @@
 - Gemini: Antigravity에서 디자인·Frontend·접근성·브라우저 검증·내부망 웹 배포.
 - 작업당 owner 하나, 작성자와 reviewer 분리. 다른 Agent 검토를 수행했다고 꾸미지 않는다.
 - 사용자 지시·이미 부여된 승인을 우선하며 반복 승인 요구로 승인된 작업을 중단하지 않는다.
+- 승인된 범위에서는 `ready 선택 → 구현 → 내부 검증 → Evidence/인계 → 다음 ready`를 반복한다. routine 중간 사용자 확인을 요구하지 않으며, 권한·자격증명·비용·공개 배포·파괴적 변경처럼 새 승인이 필요한 경계에서만 멈춘다.
 
 ## 작업 계약
 
@@ -28,6 +30,7 @@
 - origin: https://github.com/egparadise/SaintVision-Invion.git
 - 작업 브랜치: agent/{codex|claude|gemini}/{task-id}; 별도 worktree 권장.
 - 선행 미완료·검증 실패·push/build/report 미완료는 done이 아니다.
+- 연속 실행은 test, CI, 독립 review, 운영 인수를 생략한다는 뜻이 아니다. 한 카드가 외부 요인으로 막히면 이유를 기록하고 다른 ready 카드를 진행한다.
 - 실제 실행 기록은 docs/vault/30_Development/History; 오류·해결은 별도 페이지.
 - KST 시각·명령·exit code·코드 SHA·CI ID·sync 결과·다음 담당자를 남긴다.
 - 문서 정본은 docs/vault, Obsidian은 동기화 사본. 외부 편집은 제안으로 반영한다.
