@@ -1,4 +1,4 @@
-version: '3.8'
+﻿version: '3.8'
 
 services:
   web:
@@ -12,6 +12,12 @@ services:
     volumes:
       - ./deploy/certs/saintvision.crt:/etc/ssl/certs/saintvision.crt:ro
       - ./deploy/certs/saintvision.key:/etc/ssl/private/saintvision.key:ro
+      - type: bind
+        source: ${INV_WEB_AUTH_CONFIG:?Set an existing public OAuth configuration JavaScript file}
+        target: /usr/share/nginx/html/auth-config.js
+        read_only: true
+        bind:
+          create_host_path: false
     depends_on:
       control-plane:
         condition: service_healthy
@@ -25,20 +31,20 @@ services:
       dockerfile: deploy/Dockerfile.backend
     container_name: saintvision-control-plane
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
-      - INV_DATABASE_URL=${INV_DATABASE_URL:?Set a deployment-specific non-owner login DSN}
+      - INV_BUSINESS_DSN=${INV_BUSINESS_DSN:?Set a deployment-specific non-owner login DSN}
       - INV_RUNTIME_DSN=${INV_RUNTIME_DSN:?Set the non-owner kernel login DSN}
       - INV_RECOVERY_EPOCH=${INV_RECOVERY_EPOCH:?Set the reconciled database recovery epoch}
       - INV_API_CONFIG=/run/saintvision/api.json
       - PORT=8080
     volumes:
-      - type: bind
-        source: ${INV_CONFIG_DIRECTORY:?Set the private server configuration directory}
+      - type: volume
+        source: server_config
         target: /run/saintvision
         read_only: true
-        bind:
-          create_host_path: false
+        volume:
+          nocopy: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/readyz"]
       interval: 10s
@@ -55,7 +61,7 @@ services:
     image: postgres:16-alpine
     container_name: saintvision-postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
       - POSTGRES_DB=saintvision
       - POSTGRES_USER=postgres
@@ -77,8 +83,8 @@ services:
     container_name: saintvision-minio
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER:?Set the deployment storage administrator}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:?Set a unique storage administrator password}
@@ -89,6 +95,9 @@ services:
       - saintvision-net
 
 volumes:
+  server_config:
+    external: true
+    name: ${INV_CONFIG_VOLUME:?Prepare a private server configuration volume first}
   postgres_data:
   minio_data:
 

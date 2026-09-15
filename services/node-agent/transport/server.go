@@ -5,8 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
 	"github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire"
 	node "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
 	"io"
 	"log"
 	"net"
@@ -20,14 +23,29 @@ type Executor interface {
 	Observe(context.Context, []byte) (node.Result, error)
 }
 type handler struct {
-	authority   *Authority
-	runner      Executor
-	slot        chan struct{}
-	controlSlot chan struct{}
+	authority    *Authority
+	runner       Executor
+	slot         chan struct{}
+	controlSlot  chan struct{}
+	transferSlot chan struct{}
+	terminalSlot chan struct{}
+	objects      *transfer.Source
+	storage      StorageSampler
+	storageSlot  chan struct{}
 }
 
-func Handler(authority *Authority, runner Executor) http.Handler {
-	return &handler{authority: authority, runner: runner, slot: make(chan struct{}, 1), controlSlot: make(chan struct{}, 1)}
+func HandlerWithStorage(authority *Authority, runner Executor, objects *transfer.Source, storage StorageSampler) http.Handler {
+	h := Handler(authority, runner, objects).(*handler)
+	h.storage, h.storageSlot = storage, make(chan struct{}, 1)
+	return h
+}
+
+func Handler(authority *Authority, runner Executor, objects ...*transfer.Source) http.Handler {
+	h := &handler{authority: authority, runner: runner, slot: make(chan struct{}, 1), controlSlot: make(chan struct{}, 1), transferSlot: make(chan struct{}, 2), terminalSlot: make(chan struct{}, 1)}
+	if len(objects) == 1 {
+		h.objects = objects[0]
+	}
+	return h
 }
 func reject(w http.ResponseWriter, status int) {
 	w.Header().Set("Content-Type", "application/problem+json")
@@ -40,8 +58,12 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	probe := r.URL.Path == "/v1/heartbeats"
+	snapshot := r.URL.Path == "/v1/snapshots"
+	chunk := r.URL.Path == "/v1/objects/read"
+	terminal := r.URL.Path == "/v1/terminals/frame"
 	cancelling := r.URL.Path == "/v1/executions/cancel"
-	if r.Method != "POST" || (r.URL.Path != "/v1/executions" && r.URL.Path != "/v1/executions/receipts" && !probe && !cancelling) || r.URL.RawQuery != "" || r.URL.RawPath != "" {
+	storageSample := r.URL.Path == "/v1/storage/sample"
+	if r.Method != "POST" || (r.URL.Path != "/v1/executions" && r.URL.Path != "/v1/executions/receipts" && !probe && !cancelling && !snapshot && !chunk && !terminal && !storageSample) || r.URL.RawQuery != "" || r.URL.RawPath != "" {
 		reject(w, 404)
 		return
 	}
@@ -50,8 +72,21 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	slot := h.slot
-	if probe || cancelling {
+	if probe || cancelling || snapshot {
 		slot = h.controlSlot
+	}
+	if chunk {
+		slot = h.transferSlot
+	}
+	if terminal {
+		slot = h.terminalSlot
+	}
+	if storageSample {
+		if h.storage == nil {
+			reject(w, 503)
+			return
+		}
+		slot = h.storageSlot
 	}
 	select {
 	case slot <- struct{}{}:
@@ -62,8 +97,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	raw, err := io.ReadAll(io.LimitReader(r.Body, 2*1024*1024+1))
 	contract := "SignedNodePermit"
-	if probe {
+	if probe || snapshot {
 		contract = "NodeProbeInput"
+	}
+	if chunk {
+		contract = "NodeChunkInput"
+	}
+	if terminal {
+		contract = "NodeTerminalInput"
+	}
+	if storageSample {
+		contract = "NodeStorageSampleInput"
 	}
 	if err != nil || len(raw) > 2*1024*1024 || wire.Validate(contract, raw) != nil {
 		reject(w, 400)
@@ -75,14 +119,93 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		reject(w, 403)
 		return
 	}
-	if probe {
+	if storageSample {
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		result, err := h.storage.Sample(ctx, raw)
+		if err != nil || ctx.Err() != nil || h.authority.Authorize(r.TLS) != nil {
+			reject(w, 403)
+			return
+		}
+		body, err := json.Marshal(result)
+		if err != nil || wire.Validate("NodeStorageSignedSample", body) != nil {
+			reject(w, 503)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(body)
+		return
+	}
+	if terminal {
+		engine, ok := h.runner.(interface {
+			Terminal(context.Context, []byte) (contracts.NodeTerminalResult, error)
+		})
+		if !ok {
+			reject(w, 503)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		result, err := engine.Terminal(ctx, raw)
+		if err != nil || h.authority.Authorize(r.TLS) != nil {
+			reject(w, 403)
+			return
+		}
+		body, err := json.Marshal(result)
+		if err != nil || wire.Validate("NodeTerminalResult", body) != nil {
+			reject(w, 503)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(body)
+		return
+	}
+	if chunk {
+		var input transfer.Request
+		_ = json.Unmarshal(raw, &input)
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		result, err := h.objects.Read(ctx, input)
+		if err != nil || h.authority.Authorize(r.TLS) != nil {
+			reject(w, 503)
+			return
+		}
+		body, err := json.Marshal(result)
+		if err != nil || wire.Validate("NodeChunkResult", body) != nil {
+			reject(w, 503)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(body)
+		return
+	}
+	if probe || snapshot {
 		var input struct {
 			Nonce string `json:"nonce"`
 		}
 		_ = json.Unmarshal(raw, &input)
 		config := h.authority.config
-		body, _ := json.Marshal(map[string]any{"nonce": input.Nonce, "tenantId": config.TenantID, "nodeId": config.NodeID, "recoveryEpoch": config.Epoch, "profileVersion": config.Profile, "observedAt": time.Now().UTC().Format(time.RFC3339Nano)})
-		if wire.Validate("NodeProbeResult", body) != nil {
+		result := map[string]any{}
+		responseContract := "NodeProbeResult"
+		if snapshot {
+			ctx, cancel := context.WithTimeout(r.Context(), 4*time.Second)
+			defer cancel()
+			var err error
+			result, err = telemetry.Sample(ctx)
+			if err != nil || h.authority.Authorize(r.TLS) != nil {
+				reject(w, 503)
+				return
+			}
+			responseContract = "NodeResourceSnapshot"
+		}
+		for k, v := range map[string]any{"nonce": input.Nonce, "tenantId": config.TenantID, "nodeId": config.NodeID, "recoveryEpoch": config.Epoch, "profileVersion": config.Profile, "observedAt": time.Now().UTC().Format(time.RFC3339Nano)} {
+			result[k] = v
+		}
+		body, _ := json.Marshal(result)
+		if wire.Validate(responseContract, body) != nil {
 			reject(w, 503)
 			return
 		}

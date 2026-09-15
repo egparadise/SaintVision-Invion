@@ -1,0 +1,72 @@
+{
+  "currentAccountChecks": true,
+  "expectedHead": "0032_workspace_readiness_merge",
+  "scope": "disposable-postgresql-restricted-business-login-not-production",
+  "stages": [
+    {
+      "appliedRevisions": [
+        "0026_subject_kernel_link"
+      ],
+      "crossTenant": true,
+      "emptyScope": true,
+      "functionSHA256": "a0215f8ede00159453715a8da985d6712a2947343536e47b6d52c4ad017d5d59",
+      "historicalLeakExpected": true,
+      "requestedRevision": "0026_subject_kernel_link",
+      "restrictedLogin": true,
+      "sameTenant": true,
+      "unsetScope": true
+    },
+    {
+      "appliedRevisions": [
+        "0028_result_readiness_merge"
+      ],
+      "crossTenant": false,
+      "emptyScope": false,
+      "functionSHA256": "fcaa51cd4eaa3a069b750440f3ae10c84d9cdba3b64b37f379ddafcd9d162777",
+      "historicalLeakExpected": false,
+      "requestedRevision": "0028_result_readiness_merge",
+      "restrictedLogin": true,
+      "sameTenant": true,
+      "unsetScope": false
+    },
+    {
+      "appliedRevisions": [
+        "0030_provisioning_integrity"
+      ],
+      "crossTenant": false,
+      "emptyScope": false,
+      "functionSHA256": "fcaa51cd4eaa3a069b750440f3ae10c84d9cdba3b64b37f379ddafcd9d162777",
+      "historicalLeakExpected": false,
+      "requestedRevision": "0030_provisioning_integrity",
+      "restrictedLogin": true,
+      "sameTenant": true,
+      "unsetScope": false
+    },
+    {
+      "appliedRevisions": [
+        "0031_resource_offer_integrity"
+      ],
+      "crossTenant": false,
+      "emptyScope": false,
+      "functionSHA256": "fcaa51cd4eaa3a069b750440f3ae10c84d9cdba3b64b37f379ddafcd9d162777",
+      "historicalLeakExpected": false,
+      "requestedRevision": "0031_resource_offer_integrity",
+      "restrictedLogin": true,
+      "sameTenant": true,
+      "unsetScope": false
+    },
+    {
+      "appliedRevisions": [
+        "0032_workspace_readiness_merge"
+      ],
+      "crossTenant": false,
+      "emptyScope": false,
+      "functionSHA256": "fcaa51cd4eaa3a069b750440f3ae10c84d9cdba3b64b37f379ddafcd9d162777",
+      "historicalLeakExpected": false,
+      "requestedRevision": "head",
+      "restrictedLogin": true,
+      "sameTenant": true,
+      "unsetScope": false
+    }
+  ]
+}

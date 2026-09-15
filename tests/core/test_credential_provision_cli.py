@@ -1,0 +1,51 @@
+﻿"""Provisioning input and CLI failures never echo operator credentials."""
+
+import importlib.util
+from pathlib import Path
+import sys
+import pytest
+
+
+def module():
+    p = Path(__file__).resolve().parents[2] / "tools/provision_credentials.py"
+    spec = importlib.util.spec_from_file_location("credential_admin_cli", p)
+    tool = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tool)
+    return tool
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["register", "--dsn", "postgresql://synthetic-secret"],
+        ["secret-action", "--manifest", "x", "--root", "x"],
+    ],
+)
+def test_argument_errors_are_sanitized(monkeypatch, capsys, arguments):
+    monkeypatch.setattr(sys, "argv", ["provision"] + arguments)
+    with pytest.raises(SystemExit) as raised:
+        module().main()
+    assert raised.value.code == 2
+    output = capsys.readouterr()
+    assert "synthetic-secret" not in output.err + output.out
+    assert "secret-action" not in output.err + output.out
+
+
+def test_manifest_error_has_no_input_text():
+    tool = module()
+    with pytest.raises(tool.ProvisioningDenied) as raised:
+        tool.validate_manifest({"secret": "synthetic-private-value"}, "register")
+    assert str(raised.value) == "Credential provisioning refused"
+
+
+def test_missing_connection_configuration_does_not_leak(monkeypatch, capsys):
+    monkeypatch.delenv("INV_CREDENTIAL_ADMIN_DSN", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["provision", "register", "--root", "x", "--manifest", "synthetic-private-path"],
+    )
+    assert module().main() == 2
+    output = capsys.readouterr()
+    assert "synthetic-private-path" not in output.err + output.out
+    assert "credential_provisioning_refused" in output.out

@@ -1,0 +1,863 @@
+{
+  "asOfKST": "2026-09-11T18:58:38+09:00",
+  "baseSHA": "b5aef8a23bd4d8baf69db58d83366637e65c8126",
+  "method": "48 original tasks, equal weights; engineering delivery maturity estimate, not acceptance/effort/time",
+  "rubric": {
+    "0": "no usable deliverable",
+    "25": "design/contract/scaffold or fixture prototype",
+    "50": "partial functional implementation; major integration/evidence gap",
+    "75": "substantial implementation with relevant local/earlier fixed-SHA verification; final integration/operating acceptance pending",
+    "100": "all scope, dependencies, fixed-SHA CI, independent review and required operating acceptance complete"
+  },
+  "progressEstimate": 57.291666666666664,
+  "remainingEstimate": 42.708333333333336,
+  "displayProgress": 55,
+  "displayRemaining": 45,
+  "remainingJudgementRange": [
+    35,
+    55
+  ],
+  "rangeIsStatisticalConfidenceInterval": false,
+  "registryDone": 0,
+  "rows": [
+    {
+      "taskId": "S01-FE",
+      "outcomeId": "OUT-01",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "사용자 여정·디자인 토큰·화면 상태 명세",
+      "registryStatus": "review",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "화면 구조·토큰·상태 명세",
+      "remaining": "실제 상태/정본 계약과 일치하는 명세 확정",
+      "sourceRefs": [
+        "docs/task-registry.json",
+        "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md"
+      ]
+    },
+    {
+      "taskId": "S01-BE",
+      "outcomeId": "OUT-01",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "저장소·계약·개발 환경·권한 경계",
+      "registryStatus": "in_progress",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "Schema·권한·개발/시험 환경",
+      "remaining": "IdP/DNS/CA/credential provider 운영 계약과 통합 검토",
+      "sourceRefs": [
+        "docs/task-registry.json",
+        "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md"
+      ]
+    },
+    {
+      "taskId": "S01-DB",
+      "outcomeId": "OUT-01",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "ERD·ID·상태·마이그레이션 순서",
+      "registryStatus": "in_progress",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "양쪽 DB와 migration 정합성 시험",
+      "remaining": "최종 계보 독립 검토·운영 적용",
+      "sourceRefs": [
+        "docs/task-registry.json",
+        "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md"
+      ]
+    },
+    {
+      "taskId": "S01-ST",
+      "outcomeId": "OUT-01",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "URI·보존·제품 검증·장비 인벤토리",
+      "registryStatus": "in_progress",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "URI·보존 계약·2-PC 조사",
+      "remaining": "5대 실제 조사·허용 폴더·S3 제품/배포 책임 확정",
+      "sourceRefs": [
+        "docs/task-registry.json",
+        "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md"
+      ]
+    },
+    {
+      "taskId": "S02-FE",
+      "outcomeId": "OUT-02",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "로그인·Node 목록·상세·오류 상태",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "로그인·Node 화면·일부 실측 polling",
+      "remaining": "운영 인증·실제 Node/offer만 표시·실패/권한 상태",
+      "sourceRefs": [
+        "src/saintvision/identity/oidc.py",
+        "src/saintvision/services/nodes.py",
+        "docs/vault/30_Development/History/2026-09-11_ACCOUNT-KERNEL_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S02-BE",
+      "outcomeId": "OUT-02",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "OIDC·mTLS 등록·Heartbeat",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "OIDC·mTLS·heartbeat 서비스/로컬 시험",
+      "remaining": "운영 IdP/subject와 원격 profile 연결",
+      "sourceRefs": [
+        "src/saintvision/identity/oidc.py",
+        "src/saintvision/services/nodes.py",
+        "docs/vault/30_Development/History/2026-09-11_ACCOUNT-KERNEL_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S02-DB",
+      "outcomeId": "OUT-02",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "User·Node·Capability·Snapshot",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "User/Node/Capability/Snapshot 모델",
+      "remaining": "실제 5대 등록·계정/제공량 일치 인수",
+      "sourceRefs": [
+        "src/saintvision/identity/oidc.py",
+        "src/saintvision/services/nodes.py",
+        "docs/vault/30_Development/History/2026-09-11_ACCOUNT-KERNEL_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S02-ST",
+      "outcomeId": "OUT-02",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "제공 폴더·DataLocation 카탈로그",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "제공 폴더·DataLocation 카탈로그",
+      "remaining": "사용자가 허용한 실제 폴더·경로/바이트 연결",
+      "sourceRefs": [
+        "src/saintvision/identity/oidc.py",
+        "src/saintvision/services/nodes.py",
+        "docs/vault/30_Development/History/2026-09-11_ACCOUNT-KERNEL_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S03-FE",
+      "outcomeId": "OUT-03",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "Project·Workspace 생성과 실행 결과",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "Project/Workspace/Studio 화면",
+      "remaining": "kernel 입력/승인/결과 실제 API와 전체 사용자 여정",
+      "sourceRefs": [
+        "services/control-plane/src/inv/sandbox.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "docs/vault/30_Development/History/2026-09-11_FIRST-RUN_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S03-BE",
+      "outcomeId": "OUT-03",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "Sandbox·Tool Gateway·기본 정책",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "Linux Sandbox·Tool Gateway·서명 permit",
+      "remaining": "실제 .225 실행 프로필과 Windows/격리 운영 검증",
+      "sourceRefs": [
+        "services/control-plane/src/inv/sandbox.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "docs/vault/30_Development/History/2026-09-11_FIRST-RUN_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S03-DB",
+      "outcomeId": "OUT-03",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "Workspace·Workload·Run·Evidence",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "Workspace/Run/Evidence 모델과 kernel 연결",
+      "remaining": "public 중복 모델/소비자 정리·운영 provisioning",
+      "sourceRefs": [
+        "services/control-plane/src/inv/sandbox.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "docs/vault/30_Development/History/2026-09-11_FIRST-RUN_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S03-ST",
+      "outcomeId": "OUT-03",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "볼륨·Artifact 기본 전송",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "kernel 파일/바이트 전송·업무 metadata",
+      "remaining": "public.artifacts 바이트 정본 연결·제품 Storage 통합",
+      "sourceRefs": [
+        "services/control-plane/src/inv/sandbox.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "docs/vault/30_Development/History/2026-09-11_FIRST-RUN_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S04-FE",
+      "outcomeId": "OUT-04",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "승인 화면·Run SSE 타임라인",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "승인·Run 상태 UI",
+      "remaining": "정본 SSE/cursor·만료/거부·원격 취소/다운로드 브라우저 검증",
+      "sourceRefs": [
+        "services/control-plane/src/inv/output_ingestion.py",
+        "services/control-plane/src/inv/result_view.py",
+        "docs/vault/30_Development/History/2026-09-11_TENANT-BOUNDARY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S04-BE",
+      "outcomeId": "OUT-04",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "취소·timeout·승인 digest·재연결",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "취소/timeout/approval digest·회수",
+      "remaining": "원격 7개 시험·취소 지연 실측",
+      "sourceRefs": [
+        "services/control-plane/src/inv/output_ingestion.py",
+        "services/control-plane/src/inv/result_view.py",
+        "docs/vault/30_Development/History/2026-09-11_TENANT-BOUNDARY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S04-DB",
+      "outcomeId": "OUT-04",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "허용 상태 전이·outbox·idempotency",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "원자 전이·outbox·중복 방지",
+      "remaining": "최종 통합 SHA 회귀·독립 검토",
+      "sourceRefs": [
+        "services/control-plane/src/inv/output_ingestion.py",
+        "services/control-plane/src/inv/result_view.py",
+        "docs/vault/30_Development/History/2026-09-11_TENANT-BOUNDARY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S04-ST",
+      "outcomeId": "OUT-04",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "전송 재개·실제 checksum 검증",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "실제 출력 hash·전송 재개/확정 시험",
+      "remaining": "제품 S3 multipart·최대 50GiB·원격 전송 검증",
+      "sourceRefs": [
+        "services/control-plane/src/inv/output_ingestion.py",
+        "services/control-plane/src/inv/result_view.py",
+        "docs/vault/30_Development/History/2026-09-11_TENANT-BOUNDARY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S05-FE",
+      "outcomeId": "OUT-05",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "자원 그래프·후보 제외·Explain",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "후보/Explain·예약량 표시",
+      "remaining": "실제 offered/largest/spare/lease 의미 연결·가상 수치 제거",
+      "sourceRefs": [
+        "services/control-plane/src/inv/placement.py",
+        "services/control-plane/src/inv/leases.py",
+        "docs/vault/30_Development/History/2026-09-11_RESOURCE-OFFER_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S05-BE",
+      "outcomeId": "OUT-05",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "Hard filter·가중 score·Node 재검증",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "결정론 배치·hard filter·Node 재검증",
+      "remaining": "5대 실측 locality·P95 2초·동시 Run 성능",
+      "sourceRefs": [
+        "services/control-plane/src/inv/placement.py",
+        "services/control-plane/src/inv/leases.py",
+        "docs/vault/30_Development/History/2026-09-11_RESOURCE-OFFER_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S05-DB",
+      "outcomeId": "OUT-05",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "Lease 잠금·Fencing·Allocation",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "Lease 잠금·fencing·offer 원자 변경",
+      "remaining": "실제 50동시 요청/운영 부하·최신 권한 통합",
+      "sourceRefs": [
+        "services/control-plane/src/inv/placement.py",
+        "services/control-plane/src/inv/leases.py",
+        "docs/vault/30_Development/History/2026-09-11_RESOURCE-OFFER_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S05-ST",
+      "outcomeId": "OUT-05",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "지역성·전송 비용·권한 확인",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "지역성/전송비용 코드·경계 검사",
+      "remaining": "물리 링크 대역폭·데이터 지역성·제품 전송 연결",
+      "sourceRefs": [
+        "services/control-plane/src/inv/placement.py",
+        "services/control-plane/src/inv/leases.py",
+        "docs/vault/30_Development/History/2026-09-11_RESOURCE-OFFER_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S06-FE",
+      "outcomeId": "OUT-06",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "Monaco·xterm·diff·session UX",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "편집/diff/terminal UI",
+      "remaining": "실제 편집 revision·일회 WS ticket·PTY·Git API/재연결",
+      "sourceRefs": [
+        "services/control-plane/src/inv/workspace_resume.py",
+        "https://github.com/egparadise/SaintVision-Invion/pull/19",
+        "docs/vault/30_Development/History/2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S06-BE",
+      "outcomeId": "OUT-06",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "Git·PTY·checkpoint·resume",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "c5f2154 최신 커널 통합 및 실제 로컬 PTY/편집/제한 Git provider 시험; 5fc1116 유지",
+      "remaining": "실제 원격/대체 Node PTY, 실제 GitHub CAS/응답 유실 인수; CL-01 감사 순서 검토",
+      "sourceRefs": [
+        "services/control-plane/src/inv/workspace_resume.py",
+        "https://github.com/egparadise/SaintVision-Invion/pull/19",
+        "docs/vault/30_Development/History/2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정.md",
+        "docs/vault/30_Development/History/2026-09-11_WORKSPACE-INTEGRATION_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S06-DB",
+      "outcomeId": "OUT-06",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "RunAttempt·Step·Checkpoint·session",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "RunAttempt/Step/Checkpoint·원자 재개",
+      "remaining": "PR19 session 이력 합류·통합 재시작 시험",
+      "sourceRefs": [
+        "services/control-plane/src/inv/workspace_resume.py",
+        "https://github.com/egparadise/SaintVision-Invion/pull/19",
+        "docs/vault/30_Development/History/2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S06-ST",
+      "outcomeId": "OUT-06",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "persistent snapshot·복원 경로",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "실제 writable 복원·snapshot hash",
+      "remaining": "원격 대체 Node/대용량 복원·미저장 손실 범위 인수",
+      "sourceRefs": [
+        "services/control-plane/src/inv/workspace_resume.py",
+        "https://github.com/egparadise/SaintVision-Invion/pull/19",
+        "docs/vault/30_Development/History/2026-09-10_16-32-13_KST_WORKSPACE-BRIDGE_Codex_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S07-FE",
+      "outcomeId": "OUT-07",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "offline·recovering·stale 상태 UI",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "offline/recovering/receipt 화면",
+      "remaining": "관측 기반 상태·복구 작업 원본 Evidence 연결",
+      "sourceRefs": [
+        "services/control-plane/src/inv/shard_recovery.py",
+        "services/control-plane/src/inv/containment.py",
+        "docs/vault/30_Development/History/2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S07-BE",
+      "outcomeId": "OUT-07",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "drain·재스케줄·reconciliation",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "drain/reconcile·부모 shard 복구",
+      "remaining": "물리 Node 분할·복구/취소 동시성·95% 표본 실측",
+      "sourceRefs": [
+        "services/control-plane/src/inv/shard_recovery.py",
+        "services/control-plane/src/inv/containment.py",
+        "docs/vault/30_Development/History/2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S07-DB",
+      "outcomeId": "OUT-07",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "갱신/반납/Offer 경합·복구 기록",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "갱신/반납/offer 경합·fencing 시험",
+      "remaining": "운영 DB 재시작·stale result·복원 token 검증",
+      "sourceRefs": [
+        "services/control-plane/src/inv/shard_recovery.py",
+        "services/control-plane/src/inv/containment.py",
+        "docs/vault/30_Development/History/2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S07-ST",
+      "outcomeId": "OUT-07",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "복제·cache pin·quota",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "cache pin/quota/GC·제한 복제 코드",
+      "remaining": "실제 다중 Node 복제·손상/용량/축출 경합",
+      "sourceRefs": [
+        "services/control-plane/src/inv/shard_recovery.py",
+        "services/control-plane/src/inv/containment.py",
+        "docs/vault/30_Development/History/2026-09-10_13-05-06_KST_SHARD-RECOVERY_Codex_검증보고.md"
+      ]
+    },
+    {
+      "taskId": "S08-FE",
+      "outcomeId": "OUT-08",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "감사·격리·관리 화면",
+      "registryStatus": "review",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "승인/감사/관리 화면",
+      "remaining": "실제 kill/drain/별도 2인 승인·현재 권한 상태 연결",
+      "sourceRefs": [
+        "services/control-plane/src/inv/containment_approvals.py",
+        "services/control-plane/src/inv/object_store.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-functions.json"
+      ]
+    },
+    {
+      "taskId": "S08-BE",
+      "outcomeId": "OUT-08",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "ROOF·kill switch·BuildKit·단일 GPU",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "CPU 격리·kill switch·drain·ROOF 경계",
+      "remaining": "Windows/GPU/BuildKit 실행·격리·우회 시험",
+      "sourceRefs": [
+        "services/control-plane/src/inv/containment_approvals.py",
+        "services/control-plane/src/inv/object_store.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-functions.json"
+      ]
+    },
+    {
+      "taskId": "S08-DB",
+      "outcomeId": "OUT-08",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "RLS·감사 immutable·보존",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "RLS·불변 Evidence·tenant guard 시험",
+      "remaining": "운영 revision/권한·보존/partition/감사 인수",
+      "sourceRefs": [
+        "services/control-plane/src/inv/containment_approvals.py",
+        "services/control-plane/src/inv/object_store.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-functions.json"
+      ]
+    },
+    {
+      "taskId": "S08-ST",
+      "outcomeId": "OUT-08",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "GC·secret provider·backup",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "local GC/pin·백업 계약",
+      "remaining": "credential provider·암호화 키 관리·off-site backup/제품 lifecycle",
+      "sourceRefs": [
+        "services/control-plane/src/inv/containment_approvals.py",
+        "services/control-plane/src/inv/object_store.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-functions.json"
+      ]
+    },
+    {
+      "taskId": "S09-FE",
+      "outcomeId": "OUT-09",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "자연어 요청·예산·diff 검토",
+      "registryStatus": "review",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "자연어/예산/diff UI와 고정 평가 예시",
+      "remaining": "실제 Context/AgentRun/예산 API·모의 성적 제거",
+      "sourceRefs": [
+        "src/saintvision/services/context.py",
+        "src/saintvision/services/eval_execution.py",
+        "src/saintvision/services/records.py"
+      ]
+    },
+    {
+      "taskId": "S09-BE",
+      "outcomeId": "OUT-09",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "Prompt·Context·Skill·bounded repair",
+      "registryStatus": "planned",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "공통 계약·bounded repair/policy 기반",
+      "remaining": "실제 Prompt→Context→제한 수정/테스트 루프·100/30 평가",
+      "sourceRefs": [
+        "src/saintvision/services/context.py",
+        "src/saintvision/services/eval_execution.py",
+        "src/saintvision/services/records.py"
+      ]
+    },
+    {
+      "taskId": "S09-DB",
+      "outcomeId": "OUT-09",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "불변 Context/RunRecord·eval",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "불변 Context/RunRecord·eval 모델/실행기",
+      "remaining": "실제 Provider 평가·권한/TTL/주입 공격/누출 검증",
+      "sourceRefs": [
+        "src/saintvision/services/context.py",
+        "src/saintvision/services/eval_execution.py",
+        "src/saintvision/services/records.py"
+      ]
+    },
+    {
+      "taskId": "S09-ST",
+      "outcomeId": "OUT-09",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "diff·테스트·trace Artifact 연결",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "diff/test/trace 참조·pin 규칙",
+      "remaining": "실제 Agent 산출물 바이트와 Evidence 보존 연결",
+      "sourceRefs": [
+        "src/saintvision/services/context.py",
+        "src/saintvision/services/eval_execution.py",
+        "src/saintvision/services/records.py"
+      ]
+    },
+    {
+      "taskId": "S10-FE",
+      "outcomeId": "OUT-10",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "AI 도구·실험·모델·배포 화면",
+      "registryStatus": "review",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "MLOps·모델 계보 화면과 예시 데이터",
+      "remaining": "실제 학습/평가/승인/배포 API 및 미확인 상태",
+      "sourceRefs": [
+        "src/saintvision/adapters/agents.py",
+        "src/saintvision/services/lineage.py",
+        "docs/vault/30_Development/History/2026-09-09_23-20-00_KST_S10_Claude_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S10-BE",
+      "outcomeId": "OUT-10",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "두 Provider adapter·MLflow·승인 배포",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "CLI adapter/계약·평가 호출 기반",
+      "remaining": "두 Provider 실제 작업/취소·MLflow·승인 배포 연결",
+      "sourceRefs": [
+        "src/saintvision/adapters/agents.py",
+        "src/saintvision/services/lineage.py",
+        "docs/vault/30_Development/History/2026-09-09_23-20-00_KST_S10_Claude_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S10-DB",
+      "outcomeId": "OUT-10",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "Dataset/commit/image/model lineage",
+      "registryStatus": "planned",
+      "credit": 75,
+      "weight": 1,
+      "evidenceSummary": "Dataset/commit/image/model lineage 질의",
+      "remaining": "실제 학습 결과·평가·배포 digest 전체 역추적",
+      "sourceRefs": [
+        "src/saintvision/adapters/agents.py",
+        "src/saintvision/services/lineage.py",
+        "docs/vault/30_Development/History/2026-09-09_23-20-00_KST_S10_Claude_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S10-ST",
+      "outcomeId": "OUT-10",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "Model immutable version·보존 pin",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "Model 불변 버전/보존 metadata",
+      "remaining": "실제 모델 바이트·object lifecycle/pin·MLflow 보존",
+      "sourceRefs": [
+        "src/saintvision/adapters/agents.py",
+        "src/saintvision/services/lineage.py",
+        "docs/vault/30_Development/History/2026-09-09_23-20-00_KST_S10_Claude_개발과정.md"
+      ]
+    },
+    {
+      "taskId": "S11-FE",
+      "outcomeId": "OUT-11",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "접근성·시각 회귀·배포 후보",
+      "registryStatus": "review",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "릴리스/접근성 검사 구조·UI 시험 일부",
+      "remaining": "실제 인증 브라우저·키보드/대비/시각회귀·HTTPS rollback",
+      "sourceRefs": [
+        "tools/check_migration_upgrade.py",
+        "Claude 6a11a03:tools/recovery_drill.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-f4fe37e.json"
+      ]
+    },
+    {
+      "taskId": "S11-BE",
+      "outcomeId": "OUT-11",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "장시간·부하·security·rollback",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "권한/crash/복구 로컬 회귀·장애 도구",
+      "remaining": "장시간·5대 부하·보안·롤백·통합 SLO",
+      "sourceRefs": [
+        "tools/check_migration_upgrade.py",
+        "Claude 6a11a03:tools/recovery_drill.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-f4fe37e.json"
+      ]
+    },
+    {
+      "taskId": "S11-DB",
+      "outcomeId": "OUT-11",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "migration·restore·SLO 집계",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "18 migration 경로·로컬 복원 도구 보고; 5fc1116 정본 감사와 실제 DB 복원/tenant/측정/기록 통합 시험",
+      "remaining": "별도 클러스터 역할/로그인, object/Node journal/epoch, PITR/운영 SLO와 실제 업무 재개",
+      "sourceRefs": [
+        "tools/check_migration_upgrade.py",
+        "Claude 6a11a03:tools/recovery_drill.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-f4fe37e.json"
+      ]
+    },
+    {
+      "taskId": "S11-ST",
+      "outcomeId": "OUT-11",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "손상·용량·backup 장애 시험",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "작은 바이트 손상/GC/복원 시험",
+      "remaining": "운영 용량·50GiB·백업 매체/네트워크 장애",
+      "sourceRefs": [
+        "tools/check_migration_upgrade.py",
+        "Claude 6a11a03:tools/recovery_drill.py",
+        "docs/vault/30_Development/Evidence/tenant-boundary-f4fe37e.json"
+      ]
+    },
+    {
+      "taskId": "S12-FE",
+      "outcomeId": "OUT-12",
+      "owner": "Gemini",
+      "reviewer": "Codex",
+      "scope": "내부망 HTTPS 웹 배포·교육",
+      "registryStatus": "review",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "내부망 배포/교육 초안·개발 화면",
+      "remaining": "운영 HTTPS 동일 origin·교육·전체 브라우저 인수",
+      "sourceRefs": [
+        "docs/vault/30_Development/History/2026-09-11_REMOTE-WORKSPACE_Codex_검증보고.md",
+        "docs/vault/30_Development/Evidence/development-audit-20260911.json"
+      ]
+    },
+    {
+      "taskId": "S12-BE",
+      "outcomeId": "OUT-12",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "scope": "설치·upgrade·rollback·운영 인계",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "설치본·identity/journal 보존/rollback 시험",
+      "remaining": "5대 설치/upgrade/rollback·최종 release manifest",
+      "sourceRefs": [
+        "docs/vault/30_Development/History/2026-09-11_REMOTE-WORKSPACE_Codex_검증보고.md",
+        "docs/vault/30_Development/Evidence/development-audit-20260911.json"
+      ]
+    },
+    {
+      "taskId": "S12-DB",
+      "outcomeId": "OUT-12",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "복원·권한·운영 인수",
+      "registryStatus": "planned",
+      "credit": 50,
+      "weight": 1,
+      "evidenceSummary": "권한·복구 기록과 Claude 로컬 drill 보고; 5fc1116 정본 감사와 실제 DB 복원/tenant/측정/기록 통합 시험",
+      "remaining": "별도 클러스터 역할/로그인, object/Node journal/epoch, PITR/운영 SLO와 실제 업무 재개",
+      "sourceRefs": [
+        "docs/vault/30_Development/History/2026-09-11_REMOTE-WORKSPACE_Codex_검증보고.md",
+        "docs/vault/30_Development/Evidence/development-audit-20260911.json"
+      ]
+    },
+    {
+      "taskId": "S12-ST",
+      "outcomeId": "OUT-12",
+      "owner": "Claude",
+      "reviewer": "Codex",
+      "scope": "운영 점검·제공 폴더·복구 훈련",
+      "registryStatus": "planned",
+      "credit": 25,
+      "weight": 1,
+      "evidenceSummary": "폴더/운영점검·복구 절차 기반",
+      "remaining": "운영 매체/폴더 전체 복구 훈련·사용자 인수",
+      "sourceRefs": [
+        "docs/vault/30_Development/History/2026-09-11_REMOTE-WORKSPACE_Codex_검증보고.md",
+        "docs/vault/30_Development/Evidence/development-audit-20260911.json"
+      ]
+    }
+  ],
+  "byOwner": {
+    "Codex": {
+      "tasks": 24,
+      "progress": 62.5,
+      "remaining": 37.5
+    },
+    "Claude": {
+      "tasks": 12,
+      "progress": 58.333333333333336,
+      "remaining": 41.666666666666664
+    },
+    "Gemini": {
+      "tasks": 12,
+      "progress": 43.75,
+      "remaining": 56.25
+    }
+  },
+  "previousEvidence": "development-progress-20260911.json",
+  "reviewedAuthorSources": {
+    "claude": "cdf98ad/dee31e5",
+    "gemini": "858763c/3c1850b/487a42c"
+  },
+  "changeNotes": [
+    "S06-BE 50->75: c5f2154 integrated latest kernel and actual local PTY/editor tests, carried into 5fc1116. Real remote Git/PC acceptance remains pending.",
+    "Recovery security integration adds evidence inside S11-DB/S12-DB already scored 50; no automatic additional points for a new tool or test counts.",
+    "Gemini claim 64.58% not adopted: scripted local controls/tickets, mismatched result headers and compose config-only preflight do not establish the claimed implementation/operating integrations."
+  ],
+  "totalScore": 2750,
+  "maximumScore": 4800,
+  "implementationSHA": "869d74b"
+}

@@ -1,0 +1,9 @@
+{
+  "command": "C:\\Project\\SaintVision-Invion\\.venv\\Scripts\\python.exe -m pytest -q tests/integration/test_definer_audit.py tests/integration/test_account_production.py tests/integration/test_recovery_drill.py tests/test_account_integration.py --ignore=tests/integration/test_business_handoff.py --ignore=tests/integration/test_containment.py --ignore=tests/integration/test_developer_workloads.py --ignore=tests/integration/test_dispatch_node.py --ignore=tests/integration/test_node_control.py --ignore=tests/integration/test_node_delivery.py --ignore=tests/integration/test_node_extensions.py --ignore=tests/integration/test_node_runtime.py --ignore=tests/integration/test_node_storage_transport.py --ignore=tests/integration/test_output_ingestion.py --ignore=tests/integration/test_placement.py --ignore=tests/integration/test_result_observation.py --ignore=tests/integration/test_results.py --ignore=tests/integration/test_resume_input_readiness.py --ignore=tests/integration/test_shard_parent.py --ignore=tests/integration/test_shard_recovery.py --ignore=tests/integration/test_shards.py --ignore=tests/integration/test_workspace_api.py --ignore=tests/integration/test_workspace_checkout.py --ignore=tests/integration/test_workspace_recovery.py --ignore=tests/integration/test_workspace_resume.py --ignore=tests/integration/test_workspace_start.py --ignore=tests/integration/test_workspace_terminal.py --junitxml=.work/vf-regression-fixes-tests.xml",
+  "exitCode": 1,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "browser": "not assessed; Node-dependent tests excluded; opt-in tests reported as skipped",
+  "isolatedContainerRemoved": true
+}

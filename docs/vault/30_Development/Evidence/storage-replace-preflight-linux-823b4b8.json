@@ -1,0 +1,34 @@
+{
+  "at": "2026-09-12T06:50:57.808675+00:00",
+  "codeSHA": "823b4b83f9b0fe5a7a89416b96db21a7219113af",
+  "dirty": false,
+  "runtimeCodeSHA": "f9d69a8ed3fde2bc99096b5f551c3e6a5bc386b4",
+  "agentImage": "sha256:dfa9450b4386f9d8dbc60b599d2f3d64d934da95ef166db3dc2f37ceda671a90",
+  "scope": "isolated-real-docker-new-container-installation-synthetic-pki-not-wsl-or-remote-pc",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt",
+      "passed": true
+    },
+    {
+      "name": "test_real_bad_policy_hash_creates_no_node_or_volume",
+      "passed": true
+    },
+    {
+      "name": "test_real_replacement_preflight_preserves_state_and_rejects_stale_restart",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "deploy/lan/worker_storage.py": "19de8b70f0251e886b386eb4664f2676305efc9b1cb15efc3074412ea9b151f5",
+    "deploy/lan/worker_replacement.py": "278b9752b0fc65105571ebd5ccf708de8082fe8edbf3314317d9bcad12e1d4f2",
+    "deploy/lan/start-node.sh": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+    "deploy/lan/finish-worker.sh": "4921e8dfe382212eec857e8d950638264a70baf6288d6e18e6c07d26e9123ebd",
+    "deploy/lan/Start-Worker.ps1": "733277ee7afc4a092fe7de93ae3968e30ab5bf838f4ba3ab8b01ecd2ddf23bf2",
+    "deploy/lan/worker_config.py": "74977149a13441a2d251e99d1133995a2d48754a04c354b0d97ecd9150f5b1d3",
+    "tools/lan_pilot.py": "64c0d5a9e76bdb8823ac64dec1352b626de1f7d0b2ebccce49b1b60b42d9658a",
+    "tools/check_storage_bundle.py": "950d12135f0af30a2f2ea814cf108247de2eb26fc2326f03578abc7916319123",
+    "tests/integration/test_lan_storage_install.py": "66ce2a252f318c77c119dfc5f5ced755a0de1b491e0f00217e619e9fda0d79b9"
+  }
+}

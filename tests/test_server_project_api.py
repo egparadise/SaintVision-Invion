@@ -1,3 +1,4 @@
+"""Quarantined legacy fixture tests: NOT production authentication or DB evidence."""
 """
 Tests for saintvision.server canonical project-scoped control API endpoints:
 1. GET /v1/projects/{project}/runs and GET /v1/projects/{project}/runs/{run_id}
@@ -12,7 +13,7 @@ Tests for saintvision.server canonical project-scoped control API endpoints:
 from fastapi.testclient import TestClient
 import pytest
 
-from saintvision.server import app
+from fixtures.legacy_control import app
 
 
 @pytest.fixture

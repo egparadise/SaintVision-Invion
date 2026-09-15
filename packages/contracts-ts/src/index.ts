@@ -1007,3 +1007,16 @@ export interface ShardObservation {
   resultManifestSha256: (string | null);
   shards: Array<ShardObservedMember>;
 }
+
+export interface ApprovalReviewView {
+  approval: ApprovalView;
+  workload: WorkloadSpec;
+  riskLevel: "L0" | "L1" | "L2";
+  policyDigest: ActionDigest;
+}
+
+export interface SessionView {
+  subjectId: string;
+  tenantId: string;
+  expiresAt: number;
+}

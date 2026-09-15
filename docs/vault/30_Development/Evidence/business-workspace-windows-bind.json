@@ -1,0 +1,6 @@
+{
+  "exitCode": 1,
+  "stdout": "{\"uid\": 65532, \"fileUid\": 0, \"mode\": \"0o777\"}",
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/app/services/control-plane/src/inv/identity.py\", line 59, in trusted_file\n    raise ValueError(\"operator-owned regular public configuration required\")\nValueError: operator-owned regular public configuration required",
+  "data": "public empty JSON only; no credentials"
+}

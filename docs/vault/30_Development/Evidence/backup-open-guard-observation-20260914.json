@@ -1,0 +1,7 @@
+{
+  "kst": "2026-09-14T19:46:48+09:00",
+  "endpoint": "192.168.45.225:18443",
+  "tcpReachable": false,
+  "mtlsVerified": false,
+  "remoteExecutionAssessed": false
+}

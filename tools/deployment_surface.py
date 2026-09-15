@@ -44,6 +44,7 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "services/control-plane/src"))
 
 #: Paths worth asking about without credentials. Health endpoints are here
 #: because what they *claim* matters as much as what the data routes return.

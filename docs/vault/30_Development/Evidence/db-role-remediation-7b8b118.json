@@ -1,0 +1,10 @@
+{
+  "codeSHA": "7b8b1185af7a2f57b8e53bceaf6bc498ebcdf417",
+  "scope": "separate network-none disposable PostgreSQL container",
+  "activeSessionRefused": true,
+  "refusalPreservedRole": true,
+  "noLoginAndPasswordCleared": true,
+  "replayPassed": true,
+  "operatingClusterChanged": false,
+  "disposableContainerRemoved": true
+}

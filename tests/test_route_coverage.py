@@ -17,6 +17,75 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from route_coverage import client_paths, normalise, served_routes  # noqa: E402
 
 
+def test_registered_surface_ignores_unmounted_router_and_keeps_prefix_and_websocket():
+    from fastapi import FastAPI, APIRouter
+    from route_coverage import registered_routes
+
+    app = FastAPI()
+    mounted, unmounted = APIRouter(prefix='/v1/projects'), APIRouter()
+    mounted.add_api_route('/{project}/approvals', lambda: {}, methods=['GET'])
+    mounted.add_api_websocket_route('/{project}/socket', lambda: None)
+    unmounted.add_api_route('/v1/fixture-only', lambda: {}, methods=['GET'])
+    app.include_router(mounted)
+
+    @app.websocket('/v1/workspaces/{workspace}/terminals/{session}')
+    async def terminal(socket):
+        pass
+
+    assert registered_routes(app) == {
+        '/v1/projects/{}/approvals', '/v1/workspaces/{}/terminals/{}',
+        '/v1/projects/{}/socket',
+    }
+
+
+def test_business_dispatch_does_not_expose_its_unselected_routes():
+    from fastapi import FastAPI
+    from inv.business_surface import BusinessDispatch
+    from route_coverage import registered_routes
+
+    app, business = FastAPI(), FastAPI()
+    for route in ['/v1/projects', '/v1/projects/{project}/approvals', '/v1/projects/{project}/members']:
+        app.add_api_route(route, lambda: {})
+    business.add_api_route('/v1/projects', lambda: {})
+    business.add_api_route('/v1/fixture-only', lambda: {})
+    app.add_middleware(BusinessDispatch, business=business)
+    # Member listing is shadowed by dispatch but absent from this business app.
+    assert registered_routes(app) == {'/v1/projects', '/v1/projects/{}/approvals'}
+
+
+def test_configured_failure_is_sanitized_and_never_falls_back(tmp_path, monkeypatch, capsys):
+    import route_coverage
+    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--configured-surface', '--client', str(tmp_path)])
+    def broken():
+        raise RuntimeError('private-dsn-and-key-path')
+    monkeypatch.setattr(route_coverage, 'configured_routes', broken)
+    with pytest.raises(SystemExit) as error:
+        route_coverage.main()
+    assert error.value.code == 2
+    captured = capsys.readouterr()
+    assert 'no source fallback' in captured.err
+    assert 'private-dsn' not in captured.err
+
+
+def test_empty_source_measurement_never_claims_operating_acceptance(tmp_path, monkeypatch, capsys):
+    import json
+    import route_coverage
+    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path), '--json'])
+    assert route_coverage.main() == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output['measurement'] == 'source-declarations'
+    assert output['operationalAcceptanceAssessed'] is False
+    assert 'dynamic prefixes' in output['limitations']
+
+
+def test_missing_input_directory_is_not_zero_unserved(tmp_path, monkeypatch):
+    import route_coverage
+    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path / 'missing')])
+    with pytest.raises(SystemExit) as error:
+        route_coverage.main()
+    assert error.value.code == 2
+
+
 def test_the_kernel_decorator_form_is_found() -> None:
     """The miss that made a 54-route service look like a 10-route one.
 
@@ -109,3 +178,27 @@ def test_a_served_tree_and_a_client_tree_can_disagree_completely() -> None:
     served = served_routes('@api.post("/v1/projects/{p}/approvals/{a}/decision")')
     wanted = client_paths("""fetch(`/v1/approvals/${id}/approve`)""")
     assert not (wanted & served)
+
+
+def test_a_bare_v1_base_constant_is_not_a_call() -> None:
+    """A base-URL literal like `${API}/v1` is configuration, not a request."""
+    assert client_paths('const API_BASE = "/v1";') == set()
+
+
+def test_a_hole_fused_to_a_segment_is_dropped_as_an_artefact() -> None:
+    """/v1/${prj}runs, where prj already ends in projects/<id>/, must not be
+    reported as the malformed /v1/{}runs -- that is the tool's artefact, not a
+    path the SPA asks for."""
+    source = 'apiClient(`/v1/${prj}runs/${run.id}/result`)'
+    got = client_paths(source)
+    assert "/v1/{}runs/{}/result" not in got
+    # It is dropped entirely rather than half-corrected; the well-formed sibling
+    # (with a slash before the hole) is what the same screen also calls and what
+    # the coverage should credit.
+    assert all("{}runs" not in p for p in got)
+
+
+def test_a_properly_separated_interpolation_still_counts() -> None:
+    """The fix must not suppress a legitimate leading-parameter path."""
+    source = 'apiClient(`/v1/projects/${prj}/runs`)'
+    assert "/v1/projects/{}/runs" in client_paths(source)

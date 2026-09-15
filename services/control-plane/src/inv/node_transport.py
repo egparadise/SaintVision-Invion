@@ -88,13 +88,60 @@ class NodeTLSClient:
         validate_contract("NodeProbeInput", request)
         return self._request(channel, request, "/v1/heartbeats", "NodeProbeResult")
 
-    def _request(self, channel, permit, path, response_contract):
+    def resource_snapshot(self, channel, request):
+        validate_contract("NodeProbeInput", request)
+        return self._request(channel, request, "/v1/snapshots", "NodeResourceSnapshot")
+
+    def storage_sample(self, channel, challenge):
+        from dataclasses import asdict
+        import time
+        from .storage_sampling import canonical
+
+        challenge.validate(int(time.time()))
+        if challenge.channel != channel:
+            raise DomainError("NODE-0032", "Storage challenge channel differs", 403)
+        value = strict_json(canonical(asdict(challenge)))
+        validate_contract("NodeStorageChallenge", value)
+        request = {"challenge": base64.b64encode(canonical(value)).decode("ascii")}
+        validate_contract("NodeStorageSampleInput", request)
+        # Return the actual pinned TLS leaf with the envelope for independent
+        # signature verification and later durable evidence retention.
+        return self._request(
+            channel,
+            request,
+            "/v1/storage/sample",
+            "NodeStorageSignedSample",
+            timeout=6,
+            include_peer_certificate=True,
+        )
+
+    def read_chunk(self, channel, request):
+        validate_contract("NodeChunkInput", request)
+        return self._request(channel, request, "/v1/objects/read", "NodeChunkResult")
+
+    def terminal_frame(self, channel, request):
+        validate_contract("NodeTerminalInput", request)
+        return self._request(
+            channel, request, "/v1/terminals/frame", "NodeTerminalResult", timeout=3
+        )
+
+    def _request(
+        self,
+        channel,
+        permit,
+        path,
+        response_contract,
+        *,
+        timeout=None,
+        include_peer_certificate=False,
+    ):
         body = json.dumps(permit, separators=(",", ":"), allow_nan=False).encode()
         if len(body) > 2 * 1024 * 1024:
             raise DomainError("NODE-0031", "Permit exceeds limit", 422)
         host, port = endpoint_parts(channel.endpoint)
-        conn = OneConnection(host, port, context=self.context, timeout=self.timeout)
-        deadline = monotonic() + self.timeout
+        timeout = self.timeout if timeout is None else min(timeout, self.timeout)
+        conn = OneConnection(host, port, context=self.context, timeout=timeout)
+        deadline = monotonic() + timeout
         wire_socket = [None]
         response = None
 
@@ -107,7 +154,7 @@ class NodeTLSClient:
                     pass
                 conn.close()
 
-        timer = Timer(self.timeout, abort)
+        timer = Timer(timeout, abort)
         timer.daemon = True
         timer.start()
         try:
@@ -115,8 +162,9 @@ class NodeTLSClient:
             wire_socket[0] = conn.sock
             if conn.sock is None or monotonic() >= deadline:
                 raise DomainError("NODE-0030", "Node delivery deadline exceeded", 503)
+            peer_certificate = conn.sock.getpeercert(binary_form=True)
             fingerprint, _ = certificate_identity(
-                conn.sock.getpeercert(binary_form=True),
+                peer_certificate,
                 NodePrincipal(channel.tenant_id, channel.node_id),
                 channel.recovery_epoch,
             )
@@ -130,10 +178,17 @@ class NodeTLSClient:
                 {"Content-Type": "application/json", "Connection": "close"},
             )
             response = conn.getresponse()
+            if response.status == 429 and path in {
+                "/v1/heartbeats",
+                "/v1/snapshots",
+                "/v1/storage/sample",
+            }:
+                raise DomainError(
+                    "NODE-0050", "Node observation capacity reached", 503, retryable=True
+                )
             if (
                 response.status != 200
-                or response.getheader("Content-Type", "").split(";")[0]
-                != "application/json"
+                or response.getheader("Content-Type", "").split(";")[0] != "application/json"
             ):
                 raise DomainError(
                     "NODE-0030",
@@ -145,7 +200,7 @@ class NodeTLSClient:
                 raise DomainError("NODE-0035", "Node response exceeds bounds", 502)
             result = strict_json(raw)
             validate_contract(response_contract, result)
-            return result
+            return (result, peer_certificate) if include_peer_certificate else result
         except (OSError, ValueError, ssl.SSLError, http.client.HTTPException):
             raise DomainError(
                 "NODE-0030", "Node delivery unconfirmed; observe the same command", 503
@@ -179,14 +234,19 @@ class NodeDelivery:
             or claim["recoveryEpoch"] != self.db.recovery_epoch
         ):
             raise DomainError("NODE-0032", "Permit Node identity differs", 403)
-        channel = self.channels.snapshot(
-            node, observation_only=observation_only or cancel_only
-        )
+        try:
+            channel = self.channels.snapshot(node, observation_only=observation_only or cancel_only)
+        except DomainError as error:
+            # Only this pre-I/O boundary proves no execute request was sent.
+            # The queue still obtains a durable cancel tombstone before release.
+            if not observation_only and not cancel_only:
+                error.not_sent = True
+            raise
         result = self.client.exchange(
             channel,
             permit,
             observation_only=observation_only,
-            **({"cancel_only": True} if cancel_only else {})
+            **({"cancel_only": True} if cancel_only else {}),
         )
         receipt = result["receipt"]
         if (

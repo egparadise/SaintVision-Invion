@@ -1,0 +1,32 @@
+{
+  "source": "live-postgresql-mtls",
+  "serverAddress": "192.168.45.99",
+  "generatedAt": "2026-09-11T06:55:07.589419+00:00",
+  "nodes": [
+    {
+      "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+      "address": "192.168.45.225",
+      "status": "online",
+      "fresh": true,
+      "lastHeartbeatAt": "2026-09-11T06:55:07.484034+00:00",
+      "lastSnapshotAt": "2026-09-11T06:55:07.484034+00:00",
+      "observationAgeSeconds": 0.1,
+      "osType": "linux",
+      "profileVersion": "lan-observe-v1",
+      "agentVersion": "0.1.0",
+      "cpuCores": 16.0,
+      "cpuUsagePercent": 5.5,
+      "memoryTotalBytes": 8247742464,
+      "memoryUsedBytes": 3243171840,
+      "gpuCount": null,
+      "storageTotalBytes": null,
+      "measurementScope": "node-visible-linux-environment"
+    }
+  ],
+  "runs": [],
+  "offered": {},
+  "killSwitch": true,
+  "userWorkloadSubmission": false,
+  "webAuthenticationConfigured": false,
+  "tests": []
+}

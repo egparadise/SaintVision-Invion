@@ -1,0 +1,241 @@
+{
+  "atKst": "2026-09-11T23:56:33+09:00",
+  "codeSHA": "29c810f6487957a3f5f912e7ce292b5d2e454ac9",
+  "dirty": false,
+  "environment": "Windows Python client, owned disposable PostgreSQL 16 Docker container",
+  "postgresImage": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+  "command": "python .work/cx01_local.py tests/integration/test_resource_offer_integrity.py tests/integration/test_reservation_aborts.py tests/integration/test_definer_audit.py",
+  "exitCode": 0,
+  "passed": 36,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "test_http_offer_sets_one_budget_across_every_slice_and_replay",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "3.358",
+      "passed": true
+    },
+    {
+      "name": "test_real_leases_prevent_lowering_and_future_reservations_obey_the_budget",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.801",
+      "passed": true
+    },
+    {
+      "name": "test_reservation_and_offer_reduction_cannot_both_spend_the_same_capacity",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.442",
+      "passed": true
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[revoke]",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.392",
+      "passed": true
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[suspend]",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.441",
+      "passed": true
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[wrong-permission]",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.517",
+      "passed": true
+    },
+    {
+      "name": "test_old_definer_and_direct_kernel_updates_are_unavailable",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.344",
+      "passed": true
+    },
+    {
+      "name": "test_cross_tenant_definer_never_changes_resources",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.306",
+      "passed": true
+    },
+    {
+      "name": "test_gpu_offer_is_intent_until_the_device_identity_can_be_mapped",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.439",
+      "passed": true
+    },
+    {
+      "name": "test_late_business_history_failure_rolls_back_kernel_change",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.269",
+      "passed": true
+    },
+    {
+      "name": "test_release_during_actual_offer_keeps_recorded_and_applied_totals_equal",
+      "class": "tests.integration.test_resource_offer_integrity",
+      "seconds": "0.579",
+      "passed": true
+    },
+    {
+      "name": "test_cancel_before_claim_returns_reservations_without_fabricated_node_receipt",
+      "class": "tests.integration.test_reservation_aborts",
+      "seconds": "1.236",
+      "passed": true
+    },
+    {
+      "name": "test_cancel_racing_admission_never_releases_a_possible_execution",
+      "class": "tests.integration.test_reservation_aborts",
+      "seconds": "0.815",
+      "passed": true
+    },
+    {
+      "name": "test_issued_claim_still_requires_authenticated_node_proof",
+      "class": "tests.integration.test_reservation_aborts",
+      "seconds": "0.996",
+      "passed": true
+    },
+    {
+      "name": "test_current_catalogue_matches_complete_policy",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.464",
+      "passed": true
+    },
+    {
+      "name": "test_unrecognized_function_and_certificate_overloads_are_rejected[public.cx01_no_args()--]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.170",
+      "passed": true
+    },
+    {
+      "name": "test_unrecognized_function_and_certificate_overloads_are_rejected[public.node_by_certificate()--]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.173",
+      "passed": true
+    },
+    {
+      "name": "test_unrecognized_function_and_certificate_overloads_are_rejected[audit_untrusted.node_by_certificate()-CREATE SCHEMA audit_untrusted;-DROP SCHEMA audit_untrusted;]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.189",
+      "passed": true
+    },
+    {
+      "name": "test_unrecognized_function_and_certificate_overloads_are_rejected[pgx.node_by_certificate()-CREATE SCHEMA pgx;-DROP SCHEMA pgx;]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.139",
+      "passed": true
+    },
+    {
+      "name": "test_setting_text_or_unused_lookup_does_not_prove_binding[SELECT true /* current_setting('inv.tenant_id') */]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.146",
+      "passed": true
+    },
+    {
+      "name": "test_setting_text_or_unused_lookup_does_not_prove_binding[WITH ignored AS (SELECT current_setting('inv.tenant_id',true)) SELECT true]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.179",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[ALTER FUNCTION public.subject_kernel_link(uuid,character) SET search_path=public,pg_catalog-ALTER FUNCTION public.subject_kernel_link(uuid,character) SET search_path=pg_catalog-definition_differs_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.205",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[ALTER FUNCTION public.subject_kernel_link(uuid,character) RESET search_path-ALTER FUNCTION public.subject_kernel_link(uuid,character) SET search_path=pg_catalog-definition_differs_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.167",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[ALTER FUNCTION public.subject_kernel_link(uuid,character) SECURITY INVOKER-ALTER FUNCTION public.subject_kernel_link(uuid,character) SECURITY DEFINER-expected_privileged_function_missing]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.175",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT EXECUTE ON FUNCTION public.subject_kernel_link(uuid,character) TO PUBLIC-REVOKE EXECUTE ON FUNCTION public.subject_kernel_link(uuid,character) FROM PUBLIC-execute_grants_differ_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.198",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT EXECUTE ON FUNCTION public.subject_kernel_link(uuid,character) TO inv_app WITH GRANT OPTION-REVOKE GRANT OPTION FOR EXECUTE ON FUNCTION public.subject_kernel_link(uuid,character) FROM inv_app-execute_grants_differ_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.160",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT EXECUTE ON FUNCTION public.run_committed_outputs(uuid,text) TO inv_app-REVOKE EXECUTE ON FUNCTION public.run_committed_outputs(uuid,text) FROM inv_app-execute_grants_differ_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.160",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT EXECUTE ON FUNCTION public.apply_resource_offer(uuid,character,text,bigint) TO inv_app-REVOKE EXECUTE ON FUNCTION public.apply_resource_offer(uuid,character,text,bigint) FROM inv_app-execute_grants_differ_from_policy]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.159",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT CREATE ON SCHEMA public TO inv_app-REVOKE CREATE ON SCHEMA public FROM inv_app-runtime_can_create_in_trusted_schema]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.133",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[GRANT CREATE ON SCHEMA inv TO inv_kernel-REVOKE CREATE ON SCHEMA inv FROM inv_kernel-runtime_can_create_in_trusted_schema]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.129",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[ALTER ROLE inv_app BYPASSRLS-ALTER ROLE inv_app NOBYPASSRLS-runtime_role_bypasses_rls]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.131",
+      "passed": true
+    },
+    {
+      "name": "test_definition_grants_roles_and_revision_changes_fail_closed[UPDATE public.alembic_version SET version_num='unknown'-UPDATE public.alembic_version SET version_num='0033_workspace_bridge_merge'-migration_revision_mismatch]",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.154",
+      "passed": true
+    },
+    {
+      "name": "test_missing_function_is_not_an_empty_success",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.142",
+      "passed": true
+    },
+    {
+      "name": "test_runtime_must_not_assume_function_owner",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.174",
+      "passed": true
+    },
+    {
+      "name": "test_empty_database_audit_is_unavailable_not_pass",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.378",
+      "passed": true
+    },
+    {
+      "name": "test_project_lookup_denies_other_unset_and_empty_scope_with_real_login",
+      "class": "tests.integration.test_definer_audit",
+      "seconds": "0.185",
+      "passed": true
+    }
+  ],
+  "initialExperiment": {
+    "exitCode": 1,
+    "reason": "Actual release waited for resource lock, RES-0007 timeout; no 1000/900 mismatch reproduced"
+  },
+  "mutation": {
+    "removed": "Only lock_resources call in LeaseStore._locked_lease",
+    "exitCode": 1,
+    "expectedFailure": "Release bypassed the offer's resource locks",
+    "restoredExactBytes": true
+  },
+  "finding": "F1 release-without-resource-lock premise contradicted by reviewed d14db0a source and actual API test; independent reviewer confirmation pending",
+  "operationalAcceptance": false
+}

@@ -37,8 +37,11 @@ class SandboxProfile:
     max_cpu_millis: int = 1000
     max_memory_bytes: int = 536870912
     max_timeout_seconds: int = 30
+    allow_terminal: bool = False
 
     def __post_init__(self):
+        if type(self.allow_terminal) is not bool:
+            raise ValueError("Explicit terminal policy flag required")
         if not isinstance(self.version, str) or not 1 <= len(self.version) <= 200:
             raise ValueError("Versioned sandbox configuration required")
         if (
@@ -49,8 +52,7 @@ class SandboxProfile:
         ):
             raise ValueError("Immutable nonempty sandbox allowlists required")
         if any(
-            not isinstance(image, str)
-            or re.fullmatch(r"sha256:[0-9a-f]{64}", image) is None
+            not isinstance(image, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", image) is None
             for image in self.images
         ):
             raise ValueError("Pinned image digests required")
@@ -101,7 +103,7 @@ class RuntimeCapabilities:
             )
 
 
-def compile_launch(workload, profile: SandboxProfile):
+def compile_launch(workload, profile: SandboxProfile, *, workspace_input=None):
     validate_contract("WorkloadSpec", workload)
     resources = workload["resources"]
     argv = workload["command"]
@@ -116,9 +118,7 @@ def compile_launch(workload, profile: SandboxProfile):
         or resources["minVramBytes"] != 0
         or workload["timeoutSeconds"] > profile.max_timeout_seconds
     ):
-        raise DomainError(
-            "SANDBOX-0002", "Workload exceeds the approved sandbox profile", 403
-        )
+        raise DomainError("SANDBOX-0002", "Workload exceeds the approved sandbox profile", 403)
     plan = {
         "profileVersion": profile.version,
         "imageDigest": workload["imageDigest"],
@@ -138,5 +138,20 @@ def compile_launch(workload, profile: SandboxProfile):
         "privileged": False,
         "hostAccess": False,
     }
+    if "workspaceResume" in workload or "workspaceStart" in workload:
+        if workspace_input is None:
+            raise DomainError("AUTH-0044", "Verified Workspace input required", 403)
+        plan.update(
+            workspaceMode="initialized" if "workspaceStart" in workload else "restored",
+            workspaceInput=workspace_input,
+        )
+    elif workspace_input is not None:
+        raise DomainError("AUTH-0044", "Unexpected Workspace input", 403)
+    if "terminal" in workload:
+        # Interactive stdin is an explicit part of the fixed approved action.
+        # It receives no additional process, host mount or network authority.
+        if workspace_input is None or not profile.allow_terminal:
+            raise DomainError("AUTH-0044", "Terminal requires a frozen Workspace Step", 403)
+        plan["terminal"] = dict(workload["terminal"])
     validate_contract("SandboxLaunchSpec", plan)
     return plan

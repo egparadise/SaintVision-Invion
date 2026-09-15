@@ -11,7 +11,7 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
-from sqlalchemy import text
+from sqlalchemy import func, select, text
 from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
 
 from saintvision.db.session import tenant_scope
@@ -184,6 +184,45 @@ def test_a_bundle_reproduces_its_items_in_order(app_sessionmaker, project):
                 assert context_service.verify_bundle(
                     session, tenant_id=project["tenant_a"], bundle_id=bundle.bundle_id
                 )
+
+
+@pytest.mark.parametrize("secret_field", ["content", "item_id", "source_uri"])
+def test_build_bundle_refuses_a_secret_and_stores_nothing(app_sessionmaker, project, secret_field):
+    """The refusal has to be wired into build_bundle, not merely available.
+
+    Checked through the public function and against the database: a rejected
+    bundle must leave no snapshot behind, because a snapshot is keyed by content
+    hash and would outlive the bundle that was refused.
+    """
+    from saintvision.db.models import ContextSnapshot
+
+    token = "Authorization: Bearer abcdefghijklmnopqrstuvwxyz012345"
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, project["tenant_a"]):
+                run = _make_run(session, project)
+                before = session.scalar(
+                    select(func.count()).select_from(ContextSnapshot)
+                )
+                with pytest.raises(InvError, match="does not make it so"):
+                    context_service.build_bundle(
+                        session,
+                        tenant_id=project["tenant_a"],
+                        run_id=run.run_id,
+                        items=[
+                            context_service.ContextItem(
+                                item_version=1,
+                                kind="document",
+                                redacted=True,
+                                **{**dict(item_id="itm_leak", content="ordinary", source_uri=None), secret_field: token},
+                            )
+                        ],
+                        now=NOW,
+                    )
+                after = session.scalar(
+                    select(func.count()).select_from(ContextSnapshot)
+                )
+                assert after == before
 
 
 def test_bundle_hash_depends_on_order(app_sessionmaker, project):

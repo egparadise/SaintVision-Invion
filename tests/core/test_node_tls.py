@@ -73,9 +73,7 @@ def peer(tmp_path):
     cp = issue(ca, "synthetic-control-plane")
     files = credentials(tmp_path, ca, server, prefix="server")
     client_files = credentials(tmp_path, ca, cp, prefix="client")
-    state = SimpleNamespace(
-        requests=0, result=receipt(node, epoch), status=200, drip=False
-    )
+    state = SimpleNamespace(requests=0, result=receipt(node, epoch), status=200, drip=False)
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -180,6 +178,16 @@ def test_redirect_is_not_followed(peer):
     assert peer.state.requests == 1
 
 
+@pytest.mark.parametrize("path", ["/v1/heartbeats", "/v1/snapshots", "/v1/executions"])
+def test_capacity_rejection_is_retryable_only_for_observation(peer, path):
+    peer.state.status = 429
+    with pytest.raises(DomainError) as failure:
+        peer.client._request(peer.channel, {}, path, "NodeProbeResult")
+    assert peer.state.requests == 1  # Transport itself never resends anything.
+    assert failure.value.retryable is (path != "/v1/executions")
+    assert failure.value.code == ("NODE-0030" if path == "/v1/executions" else "NODE-0050")
+
+
 def test_slow_response_is_bounded_without_reconnect(peer):
     peer.state.drip = True
     client = NodeTLSClient(**peer.client_files, timeout=0.3)
@@ -189,9 +197,7 @@ def test_slow_response_is_bounded_without_reconnect(peer):
     assert time.monotonic() - started < 1.2 and peer.state.requests == 1
 
 
-@pytest.mark.parametrize(
-    "value", ['{"a":1,"a":2}', '{"a":NaN}', "{} {}", '{"invalid":']
-)
+@pytest.mark.parametrize("value", ['{"a":1,"a":2}', '{"a":NaN}', "{} {}", '{"invalid":'])
 def test_ambiguous_json_response_is_rejected(value):
     with pytest.raises(DomainError):
         strict_json(value)

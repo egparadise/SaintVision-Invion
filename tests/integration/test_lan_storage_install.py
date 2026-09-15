@@ -1,0 +1,316 @@
+"""Real packaged Bash entry point, Docker mounts/copy and Go startup receipt."""
+
+from datetime import datetime, timedelta, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import socket
+import subprocess
+import sys
+from uuid import uuid4
+
+import pytest
+from inv.ids import new_id
+from inv.node_channels import node_uri
+from inv.tooling import NodePrincipal
+from pki_support import authority, issue
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "deploy/lan"))
+import worker_storage as storage
+
+pytestmark = pytest.mark.skipif(
+    sys.platform != "linux" or not os.getenv("INV_STORAGE_SOURCE_ROOT"),
+    reason="Opt-in owned Docker storage installer test",
+)
+
+
+@pytest.fixture
+def installation(tmp_path):
+    node = new_id("nod")
+    tenant = str(uuid4())
+    epoch = str(uuid4())
+    name = "saintvision-" + node.lower()
+    folder = tmp_path / "bundle"
+    folder.mkdir()
+    source = Path(os.environ["INV_STORAGE_SOURCE_ROOT"]) / ("provided-" + uuid4().hex)
+    source.mkdir()
+    (source / "data.bin").write_bytes(b"actual contribution bytes")
+    ca = authority()
+    cert = issue(ca, node_uri(NodePrincipal(tenant, node), epoch), server=True)
+    control = issue(ca, f"spiffe://saintvision.ai/tenant/{tenant}/control-plane/epoch/{epoch}")
+    originals = {
+        "node-cert.pem": cert.pem,
+        "node-key.pem": cert.private,
+        "ca.pem": ca.pem,
+        "signer.pub": Ed25519PrivateKey.generate().public_key().public_bytes_raw(),
+    }
+    originals["peer-policy.json"] = json.dumps(
+        dict(
+            version=1,
+            tenantId=tenant,
+            nodeId=node,
+            recoveryEpoch=epoch,
+            expiresAt=(datetime.now(timezone.utc) + timedelta(hours=1)).isoformat(),
+            clientFingerprints=[control.fingerprint],
+        )
+    ).encode()
+    for filename, raw in originals.items():
+        (folder / filename).write_bytes(raw)
+        (folder / filename).chmod(0o600)
+    agent = os.environ["INV_STORAGE_AGENT_IMAGE"]
+    image = json.loads(storage.docker("image", "inspect", agent))[0]
+    with socket.socket() as reservation:
+        reservation.bind(("127.0.0.1", 0))
+        port = int(os.environ.get("INV_STORAGE_TEST_PORT", reservation.getsockname()[1]))
+    manifest = dict(
+        nodeId=node,
+        tenantId=tenant,
+        epoch=epoch,
+        serverIP="127.0.0.2",
+        nodeIP="127.0.0.1",
+        nodePort=port,
+        agentImage=agent,
+        agentTag=agent,
+        imageLayers=image["RootFS"]["Layers"],
+        imageConfig=image["Config"],
+    )
+    policy = dict(
+        channel=dict(
+            tenant_id=tenant,
+            node_id=node,
+            recovery_epoch=epoch,
+            version=1,
+            endpoint=f"https://127.0.0.1:{port}",
+            certificate_sha256=cert.fingerprint,
+        ),
+        contribution_id=new_id("stc"),
+        root_version=1,
+        root=storage.TARGET,
+    )
+    (folder / "manifest.json").write_text(json.dumps(manifest))
+    (folder / "storage-policy.json").write_text(json.dumps(policy))
+    (folder / "node-agent.tar").write_bytes(storage.docker("save", agent))
+    for file in ["start-node.sh", "worker_config.py", "worker_storage.py"]:
+        shutil.copyfile(Path(__file__).resolve().parents[2] / "deploy/lan" / file, folder / file)
+    try:
+        yield dict(folder=folder, source=source, name=name, node=node, originals=originals)
+    finally:
+        # Only disposable containers bearing this fixture's unique Node ownership.
+        for identifier in (
+            storage.docker(
+                "ps", "-aq", "--no-trunc", "--filter", "label=ai.saintvision.node=" + node
+            )
+            .decode()
+            .split()
+        ):
+            owned = json.loads(storage.docker("inspect", identifier))[0]
+            assert owned["Config"]["Labels"]["ai.saintvision.node"] == node
+            storage.docker("rm", "-f", identifier)
+        result = subprocess.run(
+            ["docker", "volume", "inspect", name + "-state"], capture_output=True
+        )
+        if result.returncode == 0:
+            assert json.loads(result.stdout)[0]["Labels"]["ai.saintvision.node"] == node
+            storage.docker("volume", "rm", name + "-state")
+
+
+def start(a, hash_value=None):
+    expected = (
+        hash_value or hashlib.sha256((a["folder"] / "storage-policy.json").read_bytes()).hexdigest()
+    )
+    return subprocess.run(
+        ["bash", str(a["folder"] / "start-node.sh"), str(a["source"]), expected],
+        capture_output=True,
+        timeout=180,
+    )
+
+
+def test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt(installation):
+    a = installation
+    r = start(a)
+    assert r.returncode == 0, (
+        r.stdout.decode(errors="replace")[-1500:] + r.stderr.decode(errors="replace")[-1500:]
+    )
+    result = json.loads((a["folder"] / "storage-ready.json").read_text())
+    assert result["readOnlyMount"] and not result["operationalAcceptanceAssessed"]
+    value = json.loads(storage.docker("inspect", a["name"]))[0]
+    mount = next(m for m in value["Mounts"] if m["Destination"] == storage.TARGET)
+    assert mount["Source"] == str(a["source"]) and mount["RW"] is False
+    assert (a["source"] / "data.bin").read_bytes() == b"actual contribution bytes"
+    for name, raw in a["originals"].items():
+        assert (a["folder"] / name).read_bytes() == raw
+    identity = storage.docker("cp", a["name"] + ":/state/journal/identity.json", "-")
+    # Re-running never stops or replaces an existing Node.
+    assert start(a).returncode != 0
+    assert json.loads(storage.docker("inspect", a["name"]))[0]["Id"] == value["Id"]
+    assert storage.docker("cp", a["name"] + ":/state/journal/identity.json", "-") == identity
+
+
+def test_real_bad_policy_hash_creates_no_node_or_volume(installation):
+    a = installation
+    assert start(a, "0" * 64).returncode != 0
+    assert subprocess.run(["docker", "inspect", a["name"]], capture_output=True).returncode != 0
+    assert (
+        subprocess.run(
+            ["docker", "volume", "inspect", a["name"] + "-state"], capture_output=True
+        ).returncode
+        != 0
+    )
+
+
+def test_real_replacement_preflight_preserves_state_and_rejects_stale_restart(installation):
+    import worker_replacement as replacement
+
+    a = installation
+    assert start(a).returncode == 0
+    plan = json.loads((a["folder"] / "storage-plan.json").read_text())
+    # Running Nodes are not stopped by preflight.
+    with pytest.raises(ValueError):
+        replacement.capture(plan)
+    assert json.loads(storage.docker("inspect", a["name"]))[0]["State"]["Running"]
+    storage.docker("stop", a["name"])
+    original = replacement.state_archive(a["name"])
+    receipt = replacement.capture(plan)
+    assert receipt["replacementAuthorized"] is False
+    assert receipt["operationalAcceptanceAssessed"] is False
+    assert replacement.recheck(plan, receipt) == receipt
+    assert replacement.state_digest(original, plan["manifest"]) == receipt["stateSHA256"]
+    # A restart invalidates the old inspection even when the same container survives.
+    storage.docker("start", a["name"])
+    storage.docker("stop", a["name"])
+    with pytest.raises(ValueError):
+        replacement.recheck(plan, receipt)
+    fresh = replacement.capture(plan)
+    assert fresh["containerId"] == receipt["containerId"]
+    assert fresh["stateSHA256"] == receipt["stateSHA256"]
+
+
+@pytest.mark.parametrize(
+    "interruption",
+    [None, "prepared", "fenced", "renamed", "created", "installed", "starting", "ready"],
+)
+def test_real_storage_replacement_resumes_without_rollback_or_key_loss(installation, interruption):
+    import worker_replacement as preflight
+    import worker_replace as replacement
+
+    a = installation
+    assert start(a).returncode == 0
+    storage.docker("stop", a["name"])
+    a["folder"].chmod(0o700)
+    previous = preflight.inspected(a["name"])
+    plan = json.loads((a["folder"] / "storage-plan.json").read_text())
+    previous_policy = (a["folder"] / "storage-policy.json").read_bytes()
+    # Advance the real Go policy floor, keeping the existing contribution and keys.
+    policy = plan["policy"]
+    policy["root_version"] = 2
+    (a["folder"] / "storage-policy.json").write_text(json.dumps(policy))
+    plan = storage.prepare(
+        plan["manifest"],
+        plan["policyPath"],
+        plan["source"],
+        storage.digest((a["folder"] / "storage-policy.json").read_bytes()),
+        plan["image"],
+    )
+    receipt = preflight.capture(plan)
+    original = replacement.preserved(plan, previous["Id"])
+    if interruption is None:
+        # Another invocation using the same private installation directory is fenced.
+        with replacement.locked(a["folder"]):
+            with pytest.raises(BlockingIOError):
+                replacement.run(plan, receipt)
+        assert not (a["folder"] / "storage-replacement.json").exists()
+
+    class Interrupted(RuntimeError):
+        pass
+
+    def fail(phase):
+        if phase == interruption:
+            raise Interrupted()
+
+    if interruption:
+        with pytest.raises(Interrupted):
+            replacement.run(plan, receipt, checkpoint=fail)
+    result = replacement.run(plan, receipt)
+    assert result["previousContainerId"] == previous["Id"]
+    assert result["previousContainerPreserved"]
+    assert result["storagePolicy"]["rootVersion"] == 2
+    assert result["operationalAcceptanceAssessed"] is False
+    assert result["containerId"] != previous["Id"]
+    record_file = a["folder"] / "storage-replacement.json"
+    assert record_file.stat().st_mode & 0o7777 == 0o600
+    import base64
+
+    assert (
+        base64.b64decode(json.loads(record_file.read_text())["previousPolicyBase64"])
+        == previous_policy
+    )
+    invalid_receipt = dict(receipt, stateSHA256="0" * 64)
+    with pytest.raises(ValueError):
+        replacement.run(plan, invalid_receipt)
+    backup = preflight.inspected(previous["Id"])
+    assert backup["State"]["Running"] is False
+    assert backup["HostConfig"]["RestartPolicy"]["Name"] == "no"
+    assert replacement.preserved(plan, result["containerId"]) == original
+    assert replacement.run(plan, receipt)["containerId"] == result["containerId"]
+    # Simulate a later orderly stop. Forward retry starts the same replacement.
+    if interruption is None:
+        storage.docker("stop", result["containerId"])
+        assert replacement.run(plan, receipt)["containerId"] == result["containerId"]
+
+
+def test_real_storage_bridge_prepares_hash_bound_request_and_resumes(installation, tmp_path):
+    a = installation
+    assert start(a).returncode == 0
+    storage.docker("stop", a["name"])
+    original_id = json.loads(storage.docker("inspect", a["name"]))[0]["Id"]
+    home = tmp_path / "home"
+    state = home / ".local/share/saintvision" / a["node"]
+    state.mkdir(mode=0o700, parents=True)
+    shutil.copyfile(a["folder"] / "manifest.json", state / "manifest.json")
+    original_manifest = (state / "manifest.json").read_bytes()
+    policy_file = a["folder"] / "storage-policy.json"
+    policy = json.loads(policy_file.read_text())
+    policy["root_version"] = 2
+    policy_file.write_text(json.dumps(policy))
+    policy_hash = storage.digest(policy_file.read_bytes())
+    script = Path(__file__).resolve().parents[2] / "deploy/lan/worker_storage_bridge.py"
+
+    def call(mode, request=None, source=None):
+        cmd = [
+            sys.executable,
+            str(script),
+            mode,
+            str(a["folder"]),
+            str(source or a["source"]),
+            policy_hash,
+        ]
+        if request is not None:
+            cmd.append(request)
+        return subprocess.run(
+            cmd, env=dict(os.environ, HOME=str(home)), capture_output=True, timeout=120
+        )
+
+    prepared = call("prepare")
+    assert prepared.returncode == 0, prepared.stderr.decode()
+    result = json.loads(prepared.stdout)
+    digest = result["requestSHA256"]
+    assert result["replacementAuthorized"] is False
+    assert json.loads(call("prepare").stdout)["requestSHA256"] == digest
+    assert call("apply", "0" * 64).returncode != 0
+    other = a["source"].parent / ("other-" + uuid4().hex)
+    other.mkdir()
+    assert call("prepare", source=other).returncode != 0
+    assert json.loads(storage.docker("inspect", a["name"]))[0]["Id"] == original_id
+    applied = call("apply", digest)
+    assert applied.returncode == 0, applied.stderr.decode()
+    actual = json.loads(applied.stdout)
+    assert actual["previousContainerId"] == original_id
+    assert actual["containerId"] != original_id
+    assert actual["status"] == "awaiting-server-mtls-verification"
+    assert actual["operationalAcceptanceAssessed"] is False
+    assert json.loads(call("apply", digest).stdout)["containerId"] == actual["containerId"]
+    assert (state / "manifest.json").read_bytes() == original_manifest
+    assert not (state / "node-key.pem").exists()  # bridge never copied a private key

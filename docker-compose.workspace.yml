@@ -1,0 +1,15 @@
+# Optional persistent editor root. Provision this external Linux volume with
+# owner 65532:65532 and mode 0700 before enabling workspace in api.json.
+services:
+  control-plane:
+    volumes:
+      - type: volume
+        source: workspace_data
+        target: /workspaces
+        volume:
+          nocopy: true
+
+volumes:
+  workspace_data:
+    external: true
+    name: ${INV_WORKSPACE_VOLUME:?Set the pre-provisioned private Workspace volume}

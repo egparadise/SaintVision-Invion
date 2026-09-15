@@ -1,0 +1,16 @@
+{
+  "kst": "2026-09-12T11:10:49+09:00",
+  "scope": "External author report preserved before canonical merge; independent review pending",
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-check/progress.txt",
+      "externalSHA256": "13a29c785af6b865461bcc06ad3096481ac17b24fd81a5207079bf955b0f2d8c"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-check/gemini.txt",
+      "externalSHA256": "ef4dd574721b83579ac29cb3c958453afadaf82f9a36a13c73f08c7e3202c87a"
+    }
+  ]
+}

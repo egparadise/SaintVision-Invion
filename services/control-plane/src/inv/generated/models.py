@@ -7,15 +7,7 @@ from enum import IntEnum, StrEnum
 from typing import Literal
 from uuid import UUID
 
-from pydantic import (
-    AwareDatetime,
-    BaseModel,
-    ConfigDict,
-    Field,
-    RootModel,
-    conint,
-    constr,
-)
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, conint, constr
 
 
 class NodeId(RootModel[constr(pattern=r'^nod_[0-9A-HJKMNP-TV-Z]{26}$')]):
@@ -159,22 +151,6 @@ class ResourceSnapshot(BaseModel):
     observedAt: Timestamp
     nodeId: NodeId
     resources: list[ResourceOffer]
-
-
-class WorkloadSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
-    kind: Literal['Workload']
-    workloadId: WorkloadId
-    tenantId: TenantId
-    projectId: ProjectId
-    workspaceId: WorkspaceId
-    resources: ResourceRequest
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    command: list[str] = Field(..., min_length=1)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
 
 
 class ResourceLease(BaseModel):
@@ -444,27 +420,10 @@ class ArgvItem(RootModel[constr(min_length=1, max_length=4096)]):
     root: constr(min_length=1, max_length=4096)
 
 
-class SandboxLaunchSpec(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    profileVersion: constr(min_length=1, max_length=200)
-    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
-    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
-    workspaceId: WorkspaceId
-    workingDirectory: Literal['/workspace']
-    workspaceMode: Literal['ephemeral']
-    cpuMillis: conint(ge=1, le=9007199254740991)
-    memoryBytes: conint(ge=1, le=9007199254740991)
-    timeoutSeconds: conint(ge=1, le=9007199254740991)
-    pidsLimit: Literal[64]
-    userId: Literal[65532]
-    network: Literal['none']
-    rootfsReadOnly: Literal[True]
-    capDropAll: Literal[True]
-    noNewPrivileges: Literal[True]
-    privileged: Literal[False]
-    hostAccess: Literal[False]
+class WorkspaceMode(StrEnum):
+    ephemeral = 'ephemeral'
+    restored = 'restored'
+    initialized = 'initialized'
 
 
 class ExecutionClaim(BaseModel):
@@ -499,16 +458,6 @@ class NodeAllocation(BaseModel):
     kind: Kind1
 
 
-class NodeExecutionPermit(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    claim: ExecutionClaim
-    launch: SandboxLaunchSpec
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-    issuedAt: Timestamp
-
-
 class SignedNodePermit(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -522,37 +471,7 @@ class Reason(StrEnum):
     timeout = 'timeout'
     cancelled = 'cancelled'
     recovered = 'recovered'
-
-
-class NodeStopReceipt(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    receiptId: UUID
-    claimId: ClaimId
-    commandId: CommandId
-    tenantId: TenantId
-    projectId: ProjectId
-    runId: RunId
-    nodeId: NodeId
-    recoveryEpoch: UUID
-    planDigest: ActionDigest
-    containerId: constr(pattern=r'^[0-9a-f]{64}$')
-    stopped: Literal[True]
-    processStarted: bool
-    exitCode: conint(ge=-1, le=255)
-    reason: Reason
-    finishedAt: Timestamp
-    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
-
-
-class NodeExecutionResult(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    duplicate: bool
-    receipt: NodeStopReceipt
-    cleanupPending: Literal[False]
+    not_started = 'not_started'
 
 
 class ClientFingerprint(RootModel[constr(pattern=r'^[0-9a-f]{64}$')]):
@@ -617,6 +536,1078 @@ class ProblemDetails(BaseModel):
     traceId: TraceId
     causeRef: constr(min_length=1, max_length=200) | None
     evidenceId: EvidenceId | None
+
+
+class NodeResourceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    tenantId: TenantId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    profileVersion: constr(min_length=1, max_length=200)
+    observedAt: Timestamp
+    sampleMillis: conint(ge=100, le=5000)
+    cpuCapacityMillis: conint(ge=1, le=9007199254740991)
+    cpuBusyMillis: conint(ge=0, le=9007199254740991)
+    memoryCapacityBytes: conint(ge=1, le=9007199254740991)
+    memoryAvailableBytes: conint(ge=0, le=9007199254740991)
+    osType: Literal['linux']
+    agentVersion: Literal['0.1.0']
+
+
+class NodeChunkInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeChunkResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=67108864)
+    offset: conint(ge=0, le=67108864)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    dataBase64: constr(max_length=349528)
+    chunkSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    data: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', max_length=400000)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=300000)
+
+
+class WorkspaceResumeRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    checkoutId: UUID
+    sourceAttempt: conint(ge=1)
+    sourceStepId: constr(min_length=1, max_length=200)
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+    checkpointAttempt: conint(ge=1)
+
+
+class WorkspaceInput1(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID | None = None
+
+
+class WorkspaceInput2(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID | None = None
+    stepId: constr(min_length=1, max_length=200)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=1, le=65536)
+    dataBase64: constr(min_length=4, max_length=87384)
+    startId: UUID
+
+
+class WorkspaceInput(RootModel[WorkspaceInput1 | WorkspaceInput2]):
+    root: WorkspaceInput1 | WorkspaceInput2
+
+
+class WorkspaceSnapshotFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(min_length=1, max_length=1024)
+    executable: bool
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=32768)
+    dataBase64: constr(max_length=43692)
+
+
+class Directory(RootModel[constr(min_length=1, max_length=1024)]):
+    root: constr(min_length=1, max_length=1024)
+
+
+class WorkspaceSnapshot(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format: Literal['workspace-snapshot:1']
+    workspaceId: WorkspaceId
+    directories: list[Directory] = Field(..., max_length=2048)
+    files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
+
+
+class WorkspaceEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class ControlRunView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    tenantId: TenantId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attempt: conint(ge=0, le=9007199254740991)
+
+
+class WorkspaceFrozenFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(min_length=1, max_length=1024)
+    sizeBytes: conint(ge=0, le=32768)
+    sha256: ActionDigest
+
+
+class WorkspaceEnqueueResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    runId: RunId
+    commandId: UUID
+    accepted: Literal[True]
+
+
+class ShardPlanId(RootModel[constr(min_length=1, max_length=200)]):
+    root: constr(min_length=1, max_length=200)
+
+
+class ShardRecoveryPreparedMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    nodeId: NodeId
+    approval: ApprovalView
+
+
+class ShardRecoveryPrepared(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId
+    generation: conint(ge=2, le=3)
+    shards: list[ShardRecoveryPreparedMember] = Field(..., max_length=16, min_length=1)
+
+
+class ShardRecoveryEnqueued(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId
+    rootPlanId: ShardPlanId
+    generation: conint(ge=2, le=3)
+    queued: conint(ge=1, le=16)
+    replayed: bool
+    parentRunId: RunId
+
+
+class BusinessEditLockInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    runId: RunId
+    checkoutId: UUID
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class BusinessApprovalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+
+
+class State(StrEnum):
+    frozen = 'frozen'
+    approved = 'approved'
+    queued = 'queued'
+    executing = 'executing'
+    settled = 'settled'
+    abandoned = 'abandoned'
+
+
+class DeliveryPhase(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
+class ReasonCode(StrEnum):
+    maintenance = 'maintenance'
+    incident = 'incident'
+    operator_request = 'operator_request'
+
+
+class ContainmentInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+    approvalId: UUID
+
+
+class NodeStatus(StrEnum):
+    online = 'online'
+    offline = 'offline'
+    draining = 'draining'
+    quarantined = 'quarantined'
+
+
+class ContainmentView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId | None
+    version: conint(ge=0, le=9007199254740991)
+    killSwitchActive: bool
+    nodeStatus: NodeStatus | None
+    activeLeases: conint(ge=0, le=9007199254740991)
+    pendingDeliveries: conint(ge=0, le=9007199254740991)
+    unsettledRuns: conint(ge=0, le=9007199254740991)
+    settled: bool
+
+
+class Operation(StrEnum):
+    kill = 'kill'
+    clear = 'clear'
+    drain = 'drain'
+    resume = 'resume'
+
+
+class ContainmentResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    requestId: UUID
+    operation: Operation
+    control: ContainmentView
+    approvalId: UUID
+
+
+class ContainmentProposalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Operation
+    nodeId: NodeId | None
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+
+
+class ContainmentDecisionInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    decision: Decision
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Status3(StrEnum):
+    pending = 'pending'
+    approved = 'approved'
+    rejected = 'rejected'
+    consumed = 'consumed'
+
+
+class ContainmentApprovalView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: UUID
+    operation: Operation
+    nodeId: NodeId | None
+    expectedVersion: conint(ge=0, le=9007199254740991)
+    gateVersion: conint(ge=0, le=9007199254740991)
+    reasonCode: ReasonCode
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    status: Status3
+    expiresAt: AwareDatetime
+    requiredApprovals: Literal[2]
+
+
+class WorkspaceStartRef(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    startId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=65536)
+    nodeId: NodeId
+    cpuResourceId: ResourceId
+    memoryResourceId: ResourceId
+    profileVersion: constr(min_length=1, max_length=200)
+    policyVersion: constr(min_length=1, max_length=200)
+
+
+class WorkspaceStartEnqueueInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approvalId: ApprovalId
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+
+
+class WorkspaceStartEnqueueResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    commandId: UUID
+    accepted: Literal[True]
+    startId: UUID
+
+
+class ResultOutputMetadata(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+
+
+class ResultStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    processStarted: bool
+    exitCode: int
+    reason: constr(max_length=100)
+    finishedAt: Timestamp
+
+
+class RunResultView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attemptCount: conint(ge=0, le=9007199254740991)
+    sealed: bool
+    executionConfirmed: bool
+    commandId: UUID | None
+    nodeId: NodeId | None
+    stopReceipt: ResultStopReceipt | None
+    evidence: EvidenceEnvelope | None
+    completedAt: Timestamp | None
+    output: ResultOutputMetadata | None
+    outputAbsentReason: constr(max_length=1024) | None
+    resourceReleasePending: bool
+
+
+class RunArtifactFile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    checksumSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    byteSize: conint(ge=0, le=9007199254740991)
+    verified: Literal[True]
+    evidenceId: EvidenceId
+
+
+class RunArtifactList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    artifacts: list[RunArtifactFile] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    verifiedCount: conint(ge=0, le=9007199254740991)
+    absentReason: constr(max_length=1024) | None
+
+
+class RunLogView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    stdout: constr(max_length=65536) | None
+    stderr: constr(max_length=65536) | None
+    redacted: bool
+    truncated: bool | None
+    absentReason: constr(max_length=1024) | None
+
+
+class RunAttemptObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    attemptNumber: conint(ge=1, le=9007199254740991)
+    startedAt: Timestamp | None
+    nodeId: NodeId | None
+    commandId: UUID | None
+    stopReceiptId: UUID | None
+    exitCode: int | None
+    reason: constr(max_length=100) | None
+    evidenceId: EvidenceId | None
+
+
+class RunAttemptList(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    runId: RunId
+    attempts: list[RunAttemptObservation] = Field(..., max_length=2048)
+    count: conint(ge=0, le=9007199254740991)
+    nextCursor: conint(ge=1, le=9007199254740991) | None
+
+
+class WorkspaceFileEdit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    dataBase64: constr(max_length=43692) | None
+    executable: bool
+
+
+class WorkspaceEditInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: list[WorkspaceFileEdit] = Field(..., max_length=128, min_length=1)
+
+
+class WorkspaceEditView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    revision: conint(ge=0, le=9007199254740991)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    snapshot: WorkspaceSnapshot
+
+
+class TerminalSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    maxInputBytes: conint(ge=1, le=65536)
+    maxOutputBytes: conint(ge=1, le=65536)
+
+
+class Operation3(StrEnum):
+    poll = 'poll'
+    input = 'input'
+    resize = 'resize'
+
+
+class TerminalFrameInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    operation: Operation3
+    dataBase64: constr(max_length=1368)
+    rows: conint(ge=1, le=200)
+    columns: conint(ge=1, le=400)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeTerminalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    permit: SignedNodePermit
+    frame: TerminalFrameInput
+
+
+class NodeTerminalResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    dataBase64: constr(max_length=5464)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class TerminalTicketInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commandId: CommandId
+
+
+class TerminalTicketResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ticket: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    sessionId: UUID
+    websocketPath: constr(max_length=500)
+
+
+class Mode(StrEnum):
+    pull = 'pull'
+    push = 'push'
+
+
+class RemoteGitProposalInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class RemoteGitVoteInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    decision: Decision
+
+
+class RemoteGitFileAddition(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+    contents: constr(max_length=43692)
+
+
+class RemoteGitFileDeletion(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: constr(max_length=1024)
+
+
+class RemoteGitChanges(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    additions: list[RemoteGitFileAddition] = Field(..., max_length=128)
+    deletions: list[RemoteGitFileDeletion] = Field(..., max_length=128)
+
+
+class RemoteGitProposal(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    alias: constr(pattern=r'^[a-z][a-z0-9-]{0,63}$')
+    mode: Mode
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    expectedRevision: conint(ge=0, le=9007199254740991)
+    expectedSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    repository: constr(max_length=300)
+    branch: constr(max_length=200)
+    repositoryFingerprint: constr(pattern=r'^[0-9a-f]{64}$')
+    workspaceId: WorkspaceId
+    snapshotSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    changes: RemoteGitChanges | None
+    operationId: UUID
+    requesterId: constr(max_length=200)
+    requesterPersonId: UUID
+    projectId: ProjectId
+    runId: RunId
+    checkoutId: UUID
+    recoveryEpoch: UUID
+    gateVersion: conint(ge=0, le=9007199254740991)
+    expiresAt: AwareDatetime
+
+
+class RemoteGitVoteView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    actorId: constr(max_length=200)
+    decision: Decision
+
+
+class RemoteGitObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    commit: constr(pattern=r'^[0-9a-f]{40}$')
+    revision: conint(ge=1, le=9007199254740991) | None = None
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Phase(StrEnum):
+    pending = 'pending'
+    rejected = 'rejected'
+    dispatched = 'dispatched'
+    completed = 'completed'
+
+
+class RemoteGitView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operationId: UUID
+    projectId: ProjectId
+    runId: RunId
+    phase: Phase
+    contentDigest: constr(pattern=r'^[0-9a-f]{64}$')
+    expiresAt: AwareDatetime
+    requiredApprovals: Literal[2]
+    votes: list[RemoteGitVoteView] = Field(..., max_length=32)
+    proposal: RemoteGitProposal
+    snapshot: WorkspaceSnapshot
+    result: RemoteGitObservation | None
+
+
+class TerminalBrowserOutput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sessionId: UUID
+    sequence: conint(ge=0, le=4096)
+    cursor: conint(ge=0, le=65536)
+    text: constr(max_length=131072)
+    outputMode: Literal['redacted-complete-lines']
+
+
+class NodeStorageChannel(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tenant_id: TenantId
+    node_id: NodeId
+    recovery_epoch: UUID
+    version: conint(ge=1, le=2147483647)
+    endpoint: constr(pattern=r'^https://', min_length=1, max_length=2048)
+    certificate_sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class NodeStorageItem(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    location_id: constr(pattern=r'^dtl_[0-9A-HJKMNP-TV-Z]{26}$')
+    version: conint(ge=1, le=2147483647)
+    relative_path: constr(min_length=1, max_length=1024)
+    byte_size: conint(ge=0, le=1048576)
+    checksum_sha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+
+
+class NodeStorageChallenge(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    project_id: ProjectId
+    run_id: RunId
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    catalogued: conint(ge=1, le=9007199254740991)
+    items: list[NodeStorageItem] = Field(..., max_length=32, min_length=1)
+    nonce: constr(pattern=r'^[0-9a-f]{64}$')
+    issued_at: conint(ge=0, le=9007199254740991)
+    expires_at: conint(ge=0, le=9007199254740991)
+
+
+class NodeStorageSampleInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    challenge: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+
+
+class NodeStorageSignedSample(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    payload: constr(pattern=r'^[A-Za-z0-9+/]*={0,2}$', min_length=4, max_length=87384)
+    signature: constr(pattern=r'^[A-Za-z0-9+/]{86}==$', min_length=88, max_length=88)
+
+
+class NodeStorageRootConfig(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    channel: NodeStorageChannel
+    contribution_id: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    root_version: conint(ge=1, le=2147483647)
+    root: constr(min_length=2, max_length=4096)
+
+
+class RecordedStorageObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    evidenceId: EvidenceId
+    checkId: constr(pattern=r'^chk_[0-9A-HJKMNP-TV-Z]{26}$')
+    observedAt: conint(ge=0)
+    integrityVerified: Literal[True]
+    sampleHealthy: bool
+    sampled: conint(ge=0)
+    mismatches: conint(ge=0)
+    unverifiable: conint(ge=0)
+    examined: conint(ge=0)
+    unsampled: conint(ge=0)
+
+
+class Status4(StrEnum):
+    pending = 'pending'
+    expired = 'expired'
+    recorded = 'recorded'
+
+
+class StorageObservationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    requestId: UUID
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    contributionId: constr(pattern=r'^stc_[0-9A-HJKMNP-TV-Z]{26}$')
+    status: Status4
+    createdAt: AwareDatetime
+    expiresAt: conint(ge=0)
+    currentHealth: Literal['unknown']
+    operationalAcceptanceAssessed: Literal[False]
+    observation: RecordedStorageObservation | None
+
+
+class ApprovalPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    items: list[ApprovalView] = Field(..., max_length=200)
+    nextCursor: ApprovalId | None
+
+
+class Phase1(StrEnum):
+    queued = 'queued'
+    uncertain = 'uncertain'
+    stopped = 'stopped'
+
+
+class ShardObservedMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    nodeId: NodeId
+    phase: Phase1
+    state: RunState
+    evidenceId: EvidenceId | None
+
+
+class ShardResultMember(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    index: conint(ge=0, le=15)
+    runId: RunId
+    evidenceId: EvidenceId
+    objectId: UUID
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    sizeBytes: conint(ge=0, le=9007199254740991)
+
+
+class ShardObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    planId: ShardPlanId
+    sourcePlanId: ShardPlanId | None
+    rootPlanId: ShardPlanId
+    generation: conint(ge=1, le=3)
+    parentRunId: RunId | None
+    parentState: RunState | None
+    aggregateManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shardCount: conint(ge=1, le=16)
+    allPhysicallyStopped: bool
+    allSucceeded: bool
+    resultManifest: list[ShardResultMember] | None
+    resultManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
+    shards: list[ShardObservedMember] = Field(..., max_length=16)
+
+
+class RiskLevel1(StrEnum):
+    L0 = 'L0'
+    L1 = 'L1'
+    L2 = 'L2'
+
+
+class SessionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    subjectId: constr(pattern=r'^oidc:[0-9a-f]{64}$')
+    tenantId: UUID
+    expiresAt: conint(ge=1)
+
+
+class WorkloadSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    apiVersion: Literal['inv.saintvision.ai/v1alpha1']
+    kind: Literal['Workload']
+    workloadId: WorkloadId
+    tenantId: TenantId
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    resources: ResourceRequest
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    command: list[str] = Field(..., min_length=1)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    workspaceResume: WorkspaceResumeRef | None = None
+    workspaceStart: WorkspaceStartRef | None = None
+    targetNodeId: NodeId | None = None
+    terminal: TerminalSpec | None = None
+
+
+class SandboxLaunchSpec(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    profileVersion: constr(min_length=1, max_length=200)
+    imageDigest: constr(pattern=r'^sha256:[0-9a-f]{64}$')
+    argv: list[ArgvItem] = Field(..., max_length=128, min_length=1)
+    workspaceId: WorkspaceId
+    workingDirectory: Literal['/workspace']
+    workspaceMode: WorkspaceMode
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    timeoutSeconds: conint(ge=1, le=9007199254740991)
+    pidsLimit: Literal[64]
+    userId: Literal[65532]
+    network: Literal['none']
+    rootfsReadOnly: Literal[True]
+    capDropAll: Literal[True]
+    noNewPrivileges: Literal[True]
+    privileged: Literal[False]
+    hostAccess: Literal[False]
+    workspaceInput: WorkspaceInput | None = None
+    terminal: TerminalSpec | None = None
+
+
+class NodeExecutionPermit(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    claim: ExecutionClaim
+    launch: SandboxLaunchSpec
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    issuedAt: Timestamp
+
+
+class NodeStopReceipt(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    receiptId: UUID
+    claimId: ClaimId
+    commandId: CommandId
+    tenantId: TenantId
+    projectId: ProjectId
+    runId: RunId
+    nodeId: NodeId
+    recoveryEpoch: UUID
+    planDigest: ActionDigest
+    containerId: constr(pattern=r'^([0-9a-f]{64})?$')
+    stopped: Literal[True]
+    processStarted: bool
+    exitCode: conint(ge=-1, le=255)
+    reason: Reason
+    finishedAt: Timestamp
+    allocations: list[NodeAllocation] = Field(..., max_length=128, min_length=1)
+    output: NodeOutput | None = None
+
+
+class NodeExecutionResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duplicate: bool
+    receipt: NodeStopReceipt
+    cleanupPending: Literal[False]
+
+
+class WorkspacePrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    checkoutId: UUID
+    resumeId: UUID
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class WorkspacePrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    workload: WorkloadSpec
+    approval: ApprovalView
+    run: ControlRunView
+
+
+class WorkspaceResumptionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resumeId: UUID
+    workload: WorkloadSpec
+    run: ControlRunView
+    approval: ApprovalView | None
+    frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
+
+
+class ShardReplacementIntent(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId
+    workload: WorkloadSpec
+
+
+class ShardRecoveryPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    sourcePlanId: ShardPlanId
+    planId: ShardPlanId
+    intents: list[ShardReplacementIntent] = Field(..., max_length=16, min_length=1)
+
+
+class BusinessBindingInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    lockId: UUID
+    prepare: WorkspacePrepareInput
+
+
+class BusinessBindingView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    bindingId: UUID
+    projectId: ProjectId
+    runId: RunId
+    workspaceId: WorkspaceId
+    lockId: UUID
+    resumeId: UUID
+    checkoutId: UUID
+    recoveryEpoch: UUID
+    boundRunVersion: conint(ge=1, le=9007199254740991)
+    inputSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=1, le=9007199254740991)
+    approval: ApprovalView
+    state: State
+    run: ControlRunView
+    commandId: UUID | None
+    attempt: conint(ge=1, le=9007199254740991) | None
+    stopReceiptId: UUID | None
+    deliveryPhase: DeliveryPhase | None
+    executionConfirmed: bool
+    evidenceId: EvidenceId | None
+    releaseAllowed: bool
+    resourceReleasePending: bool
+    releasedAt: AwareDatetime | None
+    workload: WorkloadSpec
+
+
+class WorkspaceStartPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    stepId: constr(min_length=1, max_length=200)
+    workload: WorkloadSpec
+    expectedVersion: conint(ge=1, le=9007199254740991)
+    startId: UUID
+    snapshotBase64: constr(min_length=4, max_length=87384)
+    targetNodeId: NodeId
+
+
+class WorkspaceStartPrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    approval: ApprovalView
+    run: ControlRunView
+    startId: UUID
+
+
+class WorkspaceStartView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workload: WorkloadSpec
+    run: ControlRunView
+    approval: ApprovalView | None
+    frozenFiles: list[WorkspaceFrozenFile] = Field(..., max_length=2048)
+    startId: UUID
+
+
+class ApprovalReviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    approval: ApprovalView
+    workload: WorkloadSpec
+    riskLevel: RiskLevel1
+    policyDigest: ActionDigest
 
 
 class INVCore(

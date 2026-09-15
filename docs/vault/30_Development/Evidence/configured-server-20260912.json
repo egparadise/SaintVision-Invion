@@ -1,0 +1,13 @@
+{
+  "command": "python -m pytest -q tests/integration/test_configured_server.py tests/core/test_deployment_credentials.py tests/core/test_workspace_api_boundary.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "actual uvicorn saintvision.server:create_app --factory subprocess",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "isolatedContainerRemoved": true,
+  "codeSha": "510ced45c4250830d9c8afcaa15c592759950978",
+  "verifiedKst": "2026-09-12T22:07:46+09:00",
+  "testsPassed": 14,
+  "warnings": 2,
+  "operationalServiceChanged": false
+}

@@ -1,0 +1,398 @@
+{
+  "checkedAt": "2026-09-11T18:42:48+09:00",
+  "heads": {
+    "codex": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8",
+    "claude": "dee31e5145954d9d5195e8508133c1d6d78b30c6",
+    "gemini": "487a42cbe82798020711c7aadd70f56b7c9ca0e1"
+  },
+  "main": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+  "pullRequests": [
+    {
+      "number": 22,
+      "title": "fix(api): align resource offers, result routes and tenant-scoped readiness",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/22",
+      "head": "609c807d8cd61cbfab2f9a705baf9660459c3744",
+      "branch": "agent/codex/resource-offer-integrity",
+      "base": "agent/codex/provisioning-integrity"
+    },
+    {
+      "number": 21,
+      "title": "계정 실행 권한의 원자 준비와 migration 무결성 보강",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/21",
+      "head": "d945633afb590feaef0dd5777edc7da4210a4d43",
+      "branch": "agent/codex/provisioning-integrity",
+      "base": "agent/codex/result-observation"
+    },
+    {
+      "number": 20,
+      "title": "Merge reviewed final runtime integration and delivery records into main",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T13:49:51Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/20",
+      "head": "f2df50f0049f5d4b0a493e5fae1151c291995b61",
+      "branch": "agent/codex/final-main",
+      "base": "main"
+    },
+    {
+      "number": 19,
+      "title": "Integrate Workspace editing, PTY and Git with the current kernel",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/19",
+      "head": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8",
+      "branch": "agent/codex/workspace-bridge",
+      "base": "agent/codex/resource-offer-integrity"
+    },
+    {
+      "number": 18,
+      "title": "Independent review of #13, #15, #16, #17: four findings against my own PR #14, two against the new work",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T12:46:00Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/18",
+      "head": "edb2f8ddc81b14852deb84014435ce70d5344681",
+      "branch": "review/claude-pr13-pr17",
+      "base": "agent/codex/node-containment"
+    },
+    {
+      "number": 17,
+      "title": "Add operator kill switch, Node drain and durable cleanup",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T12:45:47Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/17",
+      "head": "dac25591adfb61a4a81382f737c4d1eed34c07d5",
+      "branch": "agent/codex/node-containment",
+      "base": "agent/codex/business-kernel"
+    },
+    {
+      "number": 16,
+      "title": "Connect business Workspace handoff and clean up revoked queued runs",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T12:45:33Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/16",
+      "head": "990f3f3a89cef6f6e8c7dd1236d8f2518041fc4f",
+      "branch": "agent/codex/business-kernel",
+      "base": "agent/codex/shard-recovery"
+    },
+    {
+      "number": 15,
+      "title": "Add freshly approved bounded shard recovery and replacement Nodes",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T12:45:21Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/15",
+      "head": "4290467fec203c0e8f290bd816c5d30ca1bd34bd",
+      "branch": "agent/codex/shard-recovery",
+      "base": "agent/codex/workspace-api"
+    },
+    {
+      "number": 14,
+      "title": "Independent review of PR #11 and #12: merge them, run them together, fix what only that shows",
+      "state": "open",
+      "draft": false,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/14",
+      "head": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+      "branch": "review/claude-pr11-pr12",
+      "base": "integration/all-agents-unified"
+    },
+    {
+      "number": 13,
+      "title": "Connect authenticated Workspace API to atomic approval and Node execution",
+      "state": "closed",
+      "draft": false,
+      "merged_at": "2026-09-10T12:45:08Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/13",
+      "head": "a70aff43262b7457098d68c0d5b8a662aad4742a",
+      "branch": "agent/codex/workspace-api",
+      "base": "agent/codex/workspace-resume"
+    },
+    {
+      "number": 12,
+      "title": "Resume approved Workspace Steps with isolated Node files and verified Git checkpoints",
+      "state": "closed",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/12",
+      "head": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+      "branch": "agent/codex/workspace-resume",
+      "base": "agent/codex/runtime-completion"
+    },
+    {
+      "number": 11,
+      "title": "Complete runtime cancellation, verified outputs and shard parent coordination",
+      "state": "closed",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/11",
+      "head": "92934d19213f4bda5bccfe1760373f59522ddccd",
+      "branch": "agent/codex/runtime-completion",
+      "base": "integration/all-agents-unified"
+    },
+    {
+      "number": 10,
+      "title": "docs(shards): 샤드 실행 현황·통합 누락·남은 합격 범위 확인",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/10",
+      "head": "39bd9e97819deaca66eab0368910a7b446cbd4e1",
+      "branch": "agent/codex/shard-status-audit",
+      "base": "agent/codex/execution-recovery"
+    },
+    {
+      "number": 9,
+      "title": "feat(core): 실행 결과 확정·Workspace 복원·샤드 수명주기·실측 배치",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/9",
+      "head": "31fa2c4eb95508970dc0e44e709ef9e990102024",
+      "branch": "agent/codex/execution-recovery",
+      "base": "agent/codex/storage-node-runtime"
+    },
+    {
+      "number": 8,
+      "title": "feat(core): 체크포인트 복원과 Node 관측·전송·독립 샤드 실행",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/8",
+      "head": "227cd2984a256092f5496d9895060092cbf87145",
+      "branch": "agent/codex/storage-node-runtime",
+      "base": "agent/codex/durable-dispatch"
+    },
+    {
+      "number": 7,
+      "title": "feat(core): 실행 전달 대기열과 중단 후 관찰·취소 복구",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/7",
+      "head": "6c4f8a937c399d7e79bf49d2538e0bce53f24af4",
+      "branch": "agent/codex/durable-dispatch",
+      "base": "agent/codex/control-integration"
+    },
+    {
+      "number": 6,
+      "title": "feat(api): 인증된 Run API와 Node 관측·원격 취소",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/6",
+      "head": "7d657602d3f48122c20207cfff0919755e97f959",
+      "branch": "agent/codex/control-integration",
+      "base": "agent/codex/node-transport"
+    },
+    {
+      "number": 5,
+      "title": "feat(node): mTLS 실행 전달과 인증서 폐기·복구 경계",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/5",
+      "head": "31f423679107ddc55c9d05566959d6aa69a36e2d",
+      "branch": "agent/codex/node-transport",
+      "base": "agent/codex/node-runtime"
+    },
+    {
+      "number": 4,
+      "title": "feat(node): 서명된 격리 실행과 장애 시 정지 영수증",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/4",
+      "head": "75e22940ca9807f603d4787619f9c8e9599e31dd",
+      "branch": "agent/codex/node-runtime",
+      "base": "agent/codex/tool-admission"
+    },
+    {
+      "number": 3,
+      "title": "feat(core): ToolGateway 일회 실행 허가와 Sandbox 계약",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/3",
+      "head": "85a8747a92efd56d14ed7fdfcba85fe03f60463f",
+      "branch": "agent/codex/tool-admission",
+      "base": "agent/codex/approval-boundary"
+    },
+    {
+      "number": 2,
+      "title": "feat(core): 승인 내용 고정과 일회용 승인 원자 소비",
+      "state": "open",
+      "draft": true,
+      "merged_at": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/2",
+      "head": "0fbf66e2487cfdea54de66aadcb8c8b646335591",
+      "branch": "agent/codex/approval-boundary",
+      "base": "agent/codex/core-foundation"
+    },
+    {
+      "number": 1,
+      "title": "feat(core): 공통 계약과 트랜잭션 신뢰성 기반 구현",
+      "state": "closed",
+      "draft": true,
+      "merged_at": "2026-09-10T13:49:53Z",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/pull/1",
+      "head": "33833dda70207cee39e73fb097140f9ad8abf3ad",
+      "branch": "agent/codex/core-foundation",
+      "base": "main"
+    }
+  ],
+  "ci": {
+    "codex": [
+      {
+        "id": 34583173994,
+        "name": "Backend Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583173994",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      },
+      {
+        "id": 34583173996,
+        "name": "Documentation Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583173996",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      },
+      {
+        "id": 34583174019,
+        "name": "Core Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583174019",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      },
+      {
+        "id": 34583169848,
+        "name": "Backend Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583169848",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      },
+      {
+        "id": 34583169756,
+        "name": "Core Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583169756",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      },
+      {
+        "id": 34583169836,
+        "name": "Documentation Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583169836",
+        "head_sha": "d14db0a9f6a943a2fa83f0bfdbec50f101556ea8"
+      }
+    ],
+    "claude": [
+      {
+        "id": 34583476519,
+        "name": "Documentation Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583476519",
+        "head_sha": "dee31e5145954d9d5195e8508133c1d6d78b30c6"
+      },
+      {
+        "id": 34583476633,
+        "name": "Core Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583476633",
+        "head_sha": "dee31e5145954d9d5195e8508133c1d6d78b30c6"
+      },
+      {
+        "id": 34583476546,
+        "name": "Backend Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34583476546",
+        "head_sha": "dee31e5145954d9d5195e8508133c1d6d78b30c6"
+      }
+    ],
+    "gemini": [
+      {
+        "id": 34585150105,
+        "name": "Core Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34585150105",
+        "head_sha": "487a42cbe82798020711c7aadd70f56b7c9ca0e1"
+      },
+      {
+        "id": 34585150132,
+        "name": "Frontend Build & Test",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34585150132",
+        "head_sha": "487a42cbe82798020711c7aadd70f56b7c9ca0e1"
+      },
+      {
+        "id": 34585150077,
+        "name": "Backend Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34585150077",
+        "head_sha": "487a42cbe82798020711c7aadd70f56b7c9ca0e1"
+      },
+      {
+        "id": 34585150167,
+        "name": "Documentation Build",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/34585150167",
+        "head_sha": "487a42cbe82798020711c7aadd70f56b7c9ca0e1"
+      }
+    ]
+  },
+  "operatingObservation": {
+    "source": "live-postgresql-mtls",
+    "serverAddress": "192.168.45.99",
+    "generatedAt": "2026-09-11T09:42:51.057027+00:00",
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "lastHeartbeatAt": "2026-09-11T09:42:47.201167+00:00",
+        "lastSnapshotAt": "2026-09-11T09:42:47.201167+00:00",
+        "observationAgeSeconds": 3.9,
+        "osType": "linux",
+        "profileVersion": "lan-observe-v1",
+        "agentVersion": "0.1.0",
+        "cpuCores": 16.0,
+        "cpuUsagePercent": 7.4,
+        "memoryTotalBytes": 8247742464,
+        "memoryUsedBytes": 3255169024,
+        "gpuCount": null,
+        "storageTotalBytes": null,
+        "measurementScope": "node-visible-linux-environment"
+      }
+    ],
+    "runs": [],
+    "offered": {},
+    "killSwitch": true,
+    "userWorkloadSubmission": false,
+    "webAuthenticationConfigured": false,
+    "tests": []
+  },
+  "reviewScope": "read-only branch/GitHub/LAN status at stated time; product tests recorded separately"
+}

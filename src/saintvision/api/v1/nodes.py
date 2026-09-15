@@ -18,10 +18,9 @@ from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from ...config import Settings
-from ...db.models import ResourceSnapshot
 from ...db.session import make_session_factory, tenant_scope
 from ...errors import VAL_SCHEMA, InvError
-from ...ids import new_id
+from ...identity.node_auth import authenticate_node
 from ...identity.principal import Principal
 from ...services import nodes as node_service
 from ...services.audit import record_event
@@ -126,56 +125,77 @@ def post_heartbeat(
     request: Request,
     node_id: str,
     payload: schemas.HeartbeatRequest,
-    tenant: str = Header(alias="X-Inv-Tenant"),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Record a heartbeat and any observations that came with it.
+
+    Authenticated by the node's client certificate, not by a header. The tenant
+    and the node identity both come from the verified certificate: previously
+    this route took ``X-Inv-Tenant`` and a path id and checked neither, so any
+    caller who knew a node id could keep a removed machine looking alive or
+    inject utilisation figures that steer placement onto it.
 
     Idempotent by sequence rather than by an Idempotency-Key header: heartbeats
     are frequent and self-numbering, and a replayed one must be ignored, not
     replayed back (ADR-007).
     """
-    try:
-        tenant_id = uuid.UUID(tenant)
-    except ValueError:
-        raise InvError(VAL_SCHEMA, "X-Inv-Tenant must be a UUID") from None
+    factory = make_session_factory(request.app.state.engine)
+
+    # Authenticate before opening a tenant scope: the credential decides which
+    # tenant this is, so a scope opened first would be a scope chosen by the
+    # caller.
+    with factory() as auth_session:
+        with auth_session.begin():
+            principal = authenticate_node(
+                auth_session,
+                scope=request.scope,
+                headers={k.lower(): v for k, v in request.headers.items()},
+                peer_address=request.client.host if request.client else None,
+            )
+    principal.require_node(node_id)
+    tenant_id = principal.tenant_id
 
     request.state.actor_type = "node"
-    request.state.actor_id = node_id
+    request.state.actor_id = principal.node_id
     request.state.tenant_id = tenant_id
 
-    factory = make_session_factory(request.app.state.engine)
     with factory() as session:
         with session.begin():
             with tenant_scope(session, tenant_id):
-                before = session.get(node_service.Node, node_id)
-                previous_sequence = before.heartbeat_sequence if before else -1
-                node = node_service.record_heartbeat(
+                principal.lock_current(session)
+                # The read-then-compare that used to decide `applied` is gone.
+                # Two heartbeats arriving together both read the old sequence
+                # and both concluded they had advanced it; the database now
+                # decides, once, while holding the row.
+                outcome = node_service.record_heartbeat(
                     session,
                     tenant_id=tenant_id,
-                    node_id=node_id,
+                    node_id=principal.node_id,
                     sequence=payload.sequence,
                     now=now,
                 )
-                applied = payload.sequence > previous_sequence
-                if applied:
-                    for observation in payload.observations:
-                        session.add(
-                            ResourceSnapshot(
-                                snapshot_id=new_id("snapshot"),
-                                observed_at=now,
-                                tenant_id=tenant_id,
-                                node_id=node_id,
-                                capability_id=observation.capability_id,
-                                used_quantity=observation.used_quantity,
-                                unit=observation.unit,
+                if outcome.applied:
+                    # Observations ride on the beat that won. Recording them for
+                    # a stale beat would file utilisation under a timestamp the
+                    # node has already moved past, and placement reads these.
+                    node_service.record_observations(
+                        session,
+                        tenant_id=tenant_id,
+                        node_id=principal.node_id,
+                        observations=[
+                            node_service.ObservationInput(
+                                capability_id=o.capability_id,
+                                used_quantity=o.used_quantity,
+                                unit=o.unit,
                             )
-                        )
-                    session.flush()
+                            for o in payload.observations
+                        ],
+                        now=now,
+                    )
                 result = {
-                    "nodeId": node.node_id,
-                    "applied": applied,
-                    "heartbeatSequence": node.heartbeat_sequence,
+                    "nodeId": outcome.node.node_id,
+                    "applied": outcome.applied,
+                    "heartbeatSequence": outcome.node.heartbeat_sequence,
                 }
     return result
 

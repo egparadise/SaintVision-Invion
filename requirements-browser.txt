@@ -1,0 +1,2 @@
+# Optional real browser integration tests; use installed Edge or playwright install chromium.
+playwright==1.62.0

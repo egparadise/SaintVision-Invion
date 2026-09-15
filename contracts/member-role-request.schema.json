@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Grant or change one project membership.\n\nThe role vocabulary is a contract with the execution kernel, which reads\n``public.project_members.role_code`` before it will start anything. A value\noutside the set saves and then means nothing, so the pattern is closed\nrather than free text.",
+  "properties": {
+    "roleCode": {
+      "pattern": "^(owner|maintainer|operator|approver|viewer)$",
+      "title": "Rolecode",
+      "type": "string"
+    }
+  },
+  "required": [
+    "roleCode"
+  ],
+  "title": "MemberRoleRequest",
+  "type": "object"
+}

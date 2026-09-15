@@ -1,0 +1,30 @@
+{
+  "kst": "2026-09-15T11:40:56.264307+09:00",
+  "baseSha": "b9752a8e31573ee92b5bbb89724224923459f295",
+  "fixture": {
+    "untrustedBearer": 401,
+    "selfChosenCodeExchange": 200,
+    "selfChosenCodeGrantsAdmin": true,
+    "unauthenticatedProjects": 200,
+    "legacySourceSha256": "b862ea10c11ade600465ba586aff93cb23aaa13f481f7c5d7d8863672337874b"
+  },
+  "canonical": {
+    "configuredFactory": "saintvision.server:create_app",
+    "unconfigured": "startup refused",
+    "syntheticControllersPackaged": false,
+    "productionImageId": "sha256:db3427a8a4844e3fe0219189cc612adb1a21508eed42795b5f56a4dd2783701f"
+  },
+  "credentials": {
+    "bootstrapCreatesDefaultLogin": false,
+    "composeRequiresExplicitSecrets": true,
+    "existingOperationalRolesInspected": false,
+    "credentialRotationPerformed": false
+  },
+  "pitr": {
+    "composeConfiguresWalArchiving": false,
+    "operationalArchiveInspected": false,
+    "operationalRestoreTestPerformed": false,
+    "readyzIsPitrAcceptance": false
+  },
+  "frontend": "apps/web and frontend workflow preserved from b9752a8; route gaps remain; no browser acceptance claim"
+}

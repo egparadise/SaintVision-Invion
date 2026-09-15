@@ -1,0 +1,55 @@
+{
+  "at": "2026-09-11T02:32:57.658273+00:00",
+  "scope": "read-only-operating-observation-no-remote-workload-executed",
+  "overview": {
+    "source": "live-postgresql-mtls",
+    "serverAddress": "192.168.45.99",
+    "generatedAt": "2026-09-11T02:32:57.629542+00:00",
+    "nodes": [
+      {
+        "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+        "address": "192.168.45.225",
+        "status": "online",
+        "fresh": true,
+        "lastHeartbeatAt": "2026-09-11T02:32:55.011068+00:00",
+        "lastSnapshotAt": "2026-09-11T02:32:55.011068+00:00",
+        "observationAgeSeconds": 2.6,
+        "osType": "linux",
+        "profileVersion": "lan-observe-v1",
+        "agentVersion": "0.1.0",
+        "cpuCores": 16.0,
+        "cpuUsagePercent": 0.0,
+        "memoryTotalBytes": 8247742464,
+        "memoryUsedBytes": 3055058944,
+        "gpuCount": null,
+        "storageTotalBytes": null,
+        "measurementScope": "node-visible-linux-environment"
+      }
+    ],
+    "runs": [],
+    "offered": {},
+    "killSwitch": true,
+    "userWorkloadSubmission": false,
+    "webAuthenticationConfigured": false,
+    "tests": []
+  },
+  "bootstrapChecks": [
+    {
+      "path": "/healthz",
+      "httpStatus": 200
+    },
+    {
+      "path": "/private-state.json",
+      "httpStatus": 404
+    },
+    {
+      "path": "/workspace-worker.zip?extra=1",
+      "httpStatus": 404
+    }
+  ],
+  "runningContainers": [
+    "saintvision-lan-db-bff1a31d",
+    "saintview-orthanc-h2",
+    "saintview-orthanc-h1"
+  ]
+}

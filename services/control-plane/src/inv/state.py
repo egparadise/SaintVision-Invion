@@ -27,7 +27,7 @@ FORWARD = {
     RunState.SCHEDULED: {RunState.RUNNING},
     RunState.RUNNING: {RunState.VERIFYING, RunState.RECOVERING},
     RunState.VERIFYING: {RunState.SUCCEEDED, RunState.RECOVERING},
-    RunState.RECOVERING: {RunState.SCHEDULED},
+    RunState.RECOVERING: {RunState.SCHEDULED, RunState.AWAITING_APPROVAL},
 }
 
 

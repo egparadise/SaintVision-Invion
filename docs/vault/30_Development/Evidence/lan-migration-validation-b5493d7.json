@@ -1,0 +1,28 @@
+{
+  "codeSHA": "b5493d79121eae84c654f98e172d54414a01990c",
+  "dirty": false,
+  "completedAt": "2026-09-12T09:17:40.170328+00:00",
+  "checks": [
+    {
+      "check": 0,
+      "exitCode": 0
+    },
+    {
+      "check": 1,
+      "exitCode": 0
+    },
+    {
+      "check": 2,
+      "exitCode": 1
+    },
+    {
+      "check": 3,
+      "exitCode": 1
+    }
+  ],
+  "testsPassed": 15,
+  "upgradePathsTested": [
+    "0023_containment_approvals"
+  ],
+  "operatingDatabaseMutated": false
+}

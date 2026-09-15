@@ -14,7 +14,7 @@ from .approvals import ApprovalStore, digest
 from .contracts import validate_contract
 from .db import Database
 from .errors import DomainError
-from .leases import lock_run, lock_resources, assert_fences
+from .leases import lock_run, lock_resources, assert_fences, wire
 from .policy import action_digest, enforce_decision
 from .runs import event
 from .sandbox import SandboxProfile, RuntimeCapabilities, compile_launch
@@ -76,7 +76,8 @@ class ToolGateway:
         proofs,
         *,
         policy: CurrentPolicy,
-        runtime: RuntimeCapabilities
+        runtime: RuntimeCapabilities,
+        queue_signing_key=None,
     ):
         # Snapshot mutable input before validation/hash use; no callback may mutate it.
         command = deepcopy(command)
@@ -84,10 +85,17 @@ class ToolGateway:
         proofs = deepcopy(proofs)
         validate_contract("AuthorizedCommand", command)
         validate_contract("WorkloadSpec", workload)
+        if ("workspaceResume" in workload or "workspaceStart" in workload) and (
+            queue_signing_key is None or not getattr(self.db, "workspace_admission", False)
+        ):
+            raise DomainError(
+                "AUTH-0044", "Workspace Steps require atomic reservation and delivery", 403
+            )
         if (
             command["tenantId"] != node.tenant_id
             or workload["tenantId"] != node.tenant_id
             or workload["projectId"] != command["projectId"]
+            or workload.get("targetNodeId", node.node_id) != node.node_id
         ):
             raise DomainError("AUTH-0011", "Execution scope differs", 403)
         if not isinstance(proofs, dict) or not proofs or len(proofs) > 128:
@@ -106,6 +114,15 @@ class ToolGateway:
         )
         with self.db.transaction(node.tenant_id) as conn:
             run = lock_run(conn, command["runId"], command["projectId"])
+            from .shard_recovery import require_recovery_admission
+
+            require_recovery_admission(conn, self.db, run["run_id"])
+            from .business_handoff import require_handoff
+
+            require_handoff(conn, self.db, run["run_id"])
+            from .workspace_start import require_start_admission
+
+            require_start_admission(conn, self.db, run["run_id"])
             prior = conn.execute(
                 "SELECT * FROM inv.tool_claims WHERE command_id=%s",
                 (command["commandId"],),
@@ -115,9 +132,24 @@ class ToolGateway:
                     raise DomainError(
                         "IDEM-0001", "Command already has different execution content"
                     )
+                if (
+                    queue_signing_key is not None
+                    and not conn.execute(
+                        "SELECT 1 FROM inv.execution_deliveries WHERE command_id=%s",
+                        (command["commandId"],),
+                    ).fetchone()
+                ):
+                    raise DomainError(
+                        "NODE-0061",
+                        "Existing transient claim requires observation; it cannot be queued",
+                        409,
+                    )
                 # A replay is an observation, never a renewed launch permission. This
                 # remains false after cancellation, expiry, or lost first response.
                 return ClaimResult(False, claim_view(prior), None)
+            from .containment import require_execution
+
+            require_execution(conn)
             approval = conn.execute(
                 "SELECT * FROM inv.approval_requests WHERE approval_id=%s AND run_id=%s FOR SHARE",
                 (command["approvalId"], command["runId"]),
@@ -126,14 +158,8 @@ class ToolGateway:
                 "SELECT command_id FROM inv.approval_dispatches WHERE approval_id=%s",
                 (command["approvalId"],),
             ).fetchone()
-            if (
-                not approval
-                or not dispatch
-                or str(dispatch["command_id"]) != command["commandId"]
-            ):
-                raise DomainError(
-                    "AUTH-0040", "Durable approval dispatch is missing", 403
-                )
+            if not approval or not dispatch or str(dispatch["command_id"]) != command["commandId"]:
+                raise DomainError("AUTH-0040", "Durable approval dispatch is missing", 403)
             expected = {
                 "commandId": str(dispatch["command_id"]),
                 "approvalId": approval["approval_id"],
@@ -145,10 +171,7 @@ class ToolGateway:
                 "recoveryEpoch": str(approval["recovery_epoch"]),
                 "expiresAt": approval["expires_at"].isoformat(),
             }
-            if (
-                command != expected
-                or action_digest(workload) != approval["action_digest"]
-            ):
+            if command != expected or action_digest(workload) != approval["action_digest"]:
                 raise DomainError(
                     "AUTH-0040",
                     "Execution content differs from its durable approval",
@@ -171,9 +194,7 @@ class ToolGateway:
             resources = lock_resources(conn, [r["resource_id"] for r in allocations])
             assert_fences(conn, run["run_id"], proofs)
             if any(r["node_id"] != node.node_id for r in resources.values()):
-                raise DomainError(
-                    "AUTH-0042", "Allocation belongs to a different Node", 403
-                )
+                raise DomainError("AUTH-0042", "Allocation belongs to a different Node", 403)
             health = conn.execute(
                 """SELECT status='online' AND heartbeat_at>=clock_timestamp()-interval '15 seconds'
                 AND heartbeat_at<=clock_timestamp() AND abs(clock_skew_seconds)<=5 AND recovery_epoch=%s::uuid AS ready
@@ -181,9 +202,7 @@ class ToolGateway:
                 (self.db.recovery_epoch, node.node_id),
             ).fetchone()
             if not health or not health["ready"]:
-                raise DomainError(
-                    "RES-0006", "Node is unavailable or heartbeat is stale", 503
-                )
+                raise DomainError("RES-0006", "Node is unavailable or heartbeat is stale", 503)
             totals = {}
             for allocation in allocations:
                 kind = resources[allocation["resource_id"]]["kind"]
@@ -192,9 +211,7 @@ class ToolGateway:
                 totals.get("cpu", 0) < workload["resources"]["cpuMillis"]
                 or totals.get("memory", 0) < workload["resources"]["memoryBytes"]
             ):
-                raise DomainError(
-                    "RES-0001", "Allocation does not cover the workload limits"
-                )
+                raise DomainError("RES-0001", "Allocation does not cover the workload limits")
             votes = conn.execute(
                 "SELECT actor_id FROM inv.approval_votes WHERE approval_id=%s AND decision='approve' ORDER BY actor_id",
                 (approval["approval_id"],),
@@ -202,9 +219,7 @@ class ToolGateway:
             actors = {v["actor_id"] for v in votes}
             requester = approval["requester_id"]
             if requester in actors or len(actors) < approval["required_approvals"]:
-                raise DomainError(
-                    "AUTH-0033", "Distinct approval quorum is missing", 403
-                )
+                raise DomainError("AUTH-0033", "Distinct approval quorum is missing", 403)
             for actor in sorted(actors | {requester}):
                 self.approvals._grant(
                     conn,
@@ -234,17 +249,13 @@ class ToolGateway:
                 )
             decision = deepcopy(policy.decision)
             validate_contract("PolicyDecision", decision)
-            expires = datetime.fromisoformat(
-                decision["expiresAt"].replace("Z", "+00:00")
-            )
+            expires = datetime.fromisoformat(decision["expiresAt"].replace("Z", "+00:00"))
             if (
                 decision["approvedBy"]
                 or not now < expires <= policy.evaluated_at + timedelta(seconds=30)
                 or decision["requiredApprovals"] > approval["required_approvals"]
             ):
-                raise DomainError(
-                    "AUTH-0043", "Policy snapshot requires a new approval", 403
-                )
+                raise DomainError("AUTH-0043", "Policy snapshot requires a new approval", 403)
             decision["approvedBy"] = sorted(actors)
             enforce_decision(
                 decision,
@@ -255,26 +266,31 @@ class ToolGateway:
                 now=now,
             )
             if not isinstance(runtime, RuntimeCapabilities):
-                raise DomainError(
-                    "SANDBOX-0001", "Verified runtime is unavailable", 403
-                )
+                raise DomainError("SANDBOX-0001", "Verified runtime is unavailable", 403)
             runtime.check(
                 node_id=node.node_id,
                 epoch=self.db.recovery_epoch,
                 profile_version=self.profile.version,
                 now=now,
             )
-            plan = compile_launch(workload, self.profile)
+            workspace_input = None
+            if "workspaceResume" in workload:
+                from .workspace_resume import approved_resume
+
+                workspace_input = approved_resume(conn, run, workload, self.db.recovery_epoch)
+            elif "workspaceStart" in workload:
+                from .workspace_start import approved_start
+
+                workspace_input = approved_start(conn, run, workload, self.db.recovery_epoch)
+            plan = compile_launch(workload, self.profile, workspace_input=workspace_input)
             deadline = min(
                 approval["expires_at"],
                 expires,
                 runtime.expires_at,
-                *[r["expires_at"] for r in allocations]
+                *[r["expires_at"] for r in allocations],
             )
             if (deadline - now).total_seconds() < 1:
-                raise DomainError(
-                    "AUTH-0043", "Insufficient admission validity remains", 403
-                )
+                raise DomainError("AUTH-0043", "Insufficient admission validity remains", 403)
             row = conn.execute(
                 """INSERT INTO inv.tool_claims(tenant_id,project_id,run_id,command_id,claim_id,node_id,
                 request_hash,action_digest,plan_digest,policy_version,profile_version,policy_decision_id,recovery_epoch,not_after)
@@ -299,4 +315,20 @@ class ToolGateway:
             result = claim_view(row)
             validate_contract("ExecutionClaim", result)
             event(conn, node.tenant_id, run["run_id"], "inv.execution.claimed", result)
-            return ClaimResult(True, result, plan)
+            admitted = ClaimResult(True, result, plan)
+            if queue_signing_key is not None:
+                from .dispatch import persist_delivery
+
+                allocations = [
+                    {
+                        "nodeId": node.node_id,
+                        "kind": resources[r["resource_id"]]["kind"],
+                        "lease": wire(r),
+                    }
+                    for r in allocations
+                ]
+                persist_delivery(conn, admitted, allocations, queue_signing_key, now=now)
+                # Only the durable queue may start this command. Do not also grant
+                # the caller a transient, separately sealable launch permission.
+                return ClaimResult(False, result, None)
+            return admitted

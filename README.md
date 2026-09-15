@@ -3,6 +3,8 @@
 5대 Windows/Linux PC의 제공 자원을 연결하는 내부망 AI 개발 플랫폼의 **개발 지침 기준선**입니다. Codex 핵심 기반 코드는 `services/control-plane`에서 개발 중이며, 장비·인증·Frontend 통합은 후속 단계입니다.
 
 - [최종 개발 계획](docs/vault/00_Index/최종%20개발%20계획%20-%20모든%20개발의%20지침.md)
+- [공통 개발 진행판 — 작업·검증·다음 담당](docs/vault/00_Index/전체%20개발%20진행%20현황.md)
+- [Agent 지속 개발 운영 규칙](docs/vault/40_Governance/Agent%20지속%20개발%20운영%20규칙.md)
 - [Agent 시작 지침](AGENTS.md)
 - [24주 실행 계획](docs/vault/30_Development/24주%20통합%20실행%20계획.md)
 - [원문 반영 목록](docs/vault/00_Index/원문%20분석%20및%20반영%20목록.md)

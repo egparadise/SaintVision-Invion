@@ -219,6 +219,35 @@ def record_result(
     return result
 
 
+def gate_passed(
+    *, total_cases: int, recorded: int, passed: int, violations: int
+) -> bool:
+    """Whether a run passes the gate. The only definition of it.
+
+    This was computed in two places that disagreed. ``finish_eval_run`` asked
+    for "no violations and every case recorded", and ``score_report`` asked for
+    "no violations and every case *passed*". The difference is invisible until
+    something produces results that are neither passes nor failures — and then
+    a run in which **every single case errored** satisfies the first version:
+    nothing was violated, and every case was accounted for.
+
+    That is the worst possible way for a gate to be wrong, because it goes green
+    precisely when the evaluation did not happen. A provider outage would have
+    read as a clean pass.
+
+    So the rule is stated once: every case ran, every case passed, nothing was
+    violated, and there was something to run in the first place. An empty suite
+    is not a pass either — zero of zero cases passing is a fact about arithmetic
+    rather than about the model.
+    """
+    return (
+        total_cases > 0
+        and recorded >= total_cases
+        and passed == total_cases
+        and violations == 0
+    )
+
+
 def finish_eval_run(
     session: Session, *, tenant_id: uuid.UUID, eval_run_id: str, now: dt.datetime
 ) -> EvalRun:
@@ -245,8 +274,11 @@ def finish_eval_run(
     run.passed_cases = passed
     run.violations = violations
     run.status = "completed" if recorded >= run.total_cases else "aborted"
-    run.passed_gate = (
-        run.status == "completed" and violations == 0 and recorded >= run.total_cases
+    run.passed_gate = gate_passed(
+        total_cases=run.total_cases,
+        recorded=recorded,
+        passed=passed,
+        violations=violations,
     )
     run.ended_at = now
     session.flush()
@@ -314,7 +346,10 @@ def score_report(
         "passed": passed,
         "passRate": passed / total if total else 0.0,
         "categories": categories,
-        # The gate is not the pass rate. Any violation fails it.
+        # The gate is not the pass rate. Any violation fails it, and so does
+        # any case that did not pass — including one that errored.
         "violations": violations,
-        "passedGate": total > 0 and not violations and passed == total,
+        "passedGate": gate_passed(
+            total_cases=total, recorded=total, passed=passed, violations=len(violations)
+        ),
     }

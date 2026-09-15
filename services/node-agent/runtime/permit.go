@@ -9,6 +9,7 @@ import (
 	"errors"
 	contracts "github.com/egparadise/SaintVision-Invion/packages/contracts-go"
 	"github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/workspace"
 	"strconv"
 	"strings"
 	"time"
@@ -69,6 +70,11 @@ func Verify(envelope []byte, config Config) (Permit, error) {
 	for _, arg := range plan.Argv {
 		if strings.ContainsRune(arg, 0) {
 			return permit, errors.New("NODE-0008: NUL argument rejected")
+		}
+	}
+	if plan.WorkspaceInput != nil {
+		if _, err := workspace.Input(plan.WorkspaceInput, plan.WorkspaceId); err != nil {
+			return permit, err
 		}
 	}
 	seen := map[contracts.LeaseId]bool{}

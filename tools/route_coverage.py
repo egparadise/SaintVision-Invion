@@ -29,6 +29,45 @@ import json
 import re
 from pathlib import Path
 
+LIMITATION = (
+    "Static path shapes only; dynamic prefixes may be omitted. HTTP methods, "
+    "payloads, authentication, live availability and operating acceptance are not verified."
+)
+
+
+def registered_routes(api) -> set[str]:
+    """Inspect the constructed application, not every Python file in its tree.
+
+    BusinessDispatch deliberately exposes only a subset of the business app.
+    Respect its selection and shadowing instead of unioning both full apps.
+    OpenAPI expands FastAPI's included routers, including lazy wrappers.
+    """
+    from inv.business_surface import BusinessDispatch
+    from starlette.routing import WebSocketRoute
+
+    http = {normalise(path) for path in api.openapi()['paths']}
+    websocket = set()
+    for route in api.routes:
+        # Older FastAPI flattens includes; newer versions expose effective
+        # contexts. Use the resolved Starlette route so include prefixes survive.
+        contexts = getattr(route, 'effective_route_contexts', None)
+        candidates = [context.starlette_route for context in contexts()] if callable(contexts) else [route]
+        websocket.update(normalise(candidate.path) for candidate in candidates
+                         if isinstance(candidate, WebSocketRoute))
+    for middleware in api.user_middleware:
+        if middleware.cls is BusinessDispatch:
+            business = middleware.kwargs['business']
+            selected = {normalise(route.path) for route in
+                        BusinessDispatch(None, business).routes}
+            available = {normalise(path) for path in business.openapi()['paths']}
+            http = (http - selected) | (selected & available)
+    return {path for path in http | websocket if path.startswith('/v1/')}
+
+
+def configured_routes() -> set[str]:
+    from inv.app import create_configured_app
+    return registered_routes(create_configured_app())
+
 #: Route decorators. ``@api.get`` is here because the kernel builds its
 #: application inside a factory and names it ``api``; missing that form is what
 #: made a 54-route service look like a 10-route one.
@@ -40,6 +79,10 @@ _PREFIX = re.compile(r"APIRouter\([^)]*prefix\s*=\s*[\"']([^\"']+)", re.DOTALL)
 #: Literal paths in client source, including the head of an interpolated one.
 _CLIENT = re.compile(r"""[\"'`](/v1/[A-Za-z0-9_\-/{}$:.]*)[\"'`]""")
 _CLIENT_HEAD = re.compile(r"""[\"'`](/v1/[^\"'`]*?)\$\{""")
+#: A template hole glued directly onto a path segment, e.g. ``${prj}runs`` where
+#: ``prj`` already ends in ``projects/<id>/``. The leftover ``{}runs`` is a tool
+#: artefact, not a path the SPA asks for.
+_GLUED_HOLE = re.compile(r"\{\}(?=[A-Za-z])")
 
 
 def normalise(path: str) -> str:
@@ -62,10 +105,20 @@ def served_routes(text: str) -> set[str]:
 
 
 def client_paths(text: str) -> set[str]:
-    """``/v1`` paths a client source file mentions."""
+    """``/v1`` paths a client source file mentions.
+
+    A bare ``/v1`` base-URL constant is not a call and is dropped, and a
+    template hole fused to the next segment (``/v1/{}runs`` from ``/v1/${prj}runs``,
+    where ``prj`` already ends in ``projects/<id>/``) is a tool artefact rather
+    than a request, so it is dropped too rather than reported as unserved.
+    """
     found = {normalise(m) for m in _CLIENT.findall(text)}
     found |= {normalise(m) for m in _CLIENT_HEAD.findall(text)}
-    return {p for p in found if p.startswith("/v1")}
+    return {
+        p
+        for p in found
+        if p.startswith("/v1/") and not _GLUED_HOLE.search(p)
+    }
 
 
 def scan_served(root: Path) -> set[str]:
@@ -89,12 +142,25 @@ def scan_client(root: Path) -> set[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--served", action="append", required=True, type=Path)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--served", action="append", type=Path)
+    mode.add_argument("--configured-surface", action="store_true",
+                      help="Use the validated INV_API_CONFIG factory; never scan demo source")
     parser.add_argument("--client", required=True, type=Path)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    per_tree = {str(root): scan_served(root) for root in args.served}
+    if not args.client.is_dir() or any(not root.is_dir() for root in args.served or []):
+        parser.error('Client and source inputs must be existing directories')
+    if args.configured_surface:
+        try:
+            per_tree = {'configured-factory': configured_routes()}
+        except Exception:
+            # Configuration/database failures can contain private file names or
+            # credentials. Never print them or fall back to source-tree scans.
+            parser.exit(2, 'Configured factory validation failed; no source fallback performed.\n')
+    else:
+        per_tree = {str(root): scan_served(root) for root in args.served}
     served = set().union(*per_tree.values()) if per_tree else set()
     wanted = scan_client(args.client)
     missing = sorted(wanted - served)
@@ -105,6 +171,9 @@ def main() -> int:
                 "servedByTree": {k: sorted(v) for k, v in per_tree.items()},
                 "clientPaths": sorted(wanted),
                 "unserved": missing,
+                "measurement": "configured-factory" if args.configured_surface else "source-declarations",
+                "operationalAcceptanceAssessed": False,
+                "limitations": LIMITATION,
             },
             indent=2,
         ))
@@ -117,11 +186,7 @@ def main() -> int:
     print(f"  {len(missing):4} unserved\n")
     for path in missing:
         print(f"    {path}")
-    if missing:
-        print(
-            "\nA path counted as served means a route exists at that shape. It "
-            "does not mean the response is what the screen expects."
-        )
+    print('\n' + LIMITATION)
     return 1 if missing else 0
 
 

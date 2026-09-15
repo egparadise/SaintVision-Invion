@@ -1,0 +1,238 @@
+{
+  "initial": {
+    "kst": "2026-09-11T15:36:02+09:00",
+    "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+    "openCount": 15,
+    "draftCount": 14,
+    "pulls": [
+      {
+        "number": 11,
+        "title": "Complete runtime cancellation, verified outputs and shard parent coordination",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/11",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "mergedAt": null,
+        "base": "integration/all-agents-unified",
+        "head": "agent/codex/runtime-completion",
+        "headSHA": "92934d19213f4bda5bccfe1760373f59522ddccd",
+        "mergeCommit": null,
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 12,
+        "title": "Resume approved Workspace Steps with isolated Node files and verified Git checkpoints",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/12",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "mergedAt": null,
+        "base": "agent/codex/runtime-completion",
+        "head": "agent/codex/workspace-resume",
+        "headSHA": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+        "mergeCommit": "8e82c5d8ab673d477dbff6b3a58daa8c019c1953",
+        "headAncestorOfMain": false,
+        "ancestryKnown": true
+      },
+      {
+        "number": 13,
+        "title": "Connect authenticated Workspace API to atomic approval and Node execution",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/13",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T12:45:08Z",
+        "base": "agent/codex/workspace-resume",
+        "head": "agent/codex/workspace-api",
+        "headSHA": "a70aff43262b7457098d68c0d5b8a662aad4742a",
+        "mergeCommit": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 14,
+        "title": "Independent review of PR #11 and #12: merge them, run them together, fix what only that shows",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/14",
+        "state": "open",
+        "draft": false,
+        "merged": false,
+        "mergedAt": null,
+        "base": "integration/all-agents-unified",
+        "head": "review/claude-pr11-pr12",
+        "headSHA": "e491ec73c6c1aa48e63dcf45f2df190c760d6465",
+        "mergeCommit": "acdceeae49b41cd9f97387006ed6272dc6467938",
+        "headAncestorOfMain": false,
+        "ancestryKnown": true
+      },
+      {
+        "number": 15,
+        "title": "Add freshly approved bounded shard recovery and replacement Nodes",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/15",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T12:45:21Z",
+        "base": "agent/codex/workspace-api",
+        "head": "agent/codex/shard-recovery",
+        "headSHA": "4290467fec203c0e8f290bd816c5d30ca1bd34bd",
+        "mergeCommit": "bb27909786d84ceb8ae146269808ded9fe7d5a02",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 16,
+        "title": "Connect business Workspace handoff and clean up revoked queued runs",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/16",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T12:45:33Z",
+        "base": "agent/codex/shard-recovery",
+        "head": "agent/codex/business-kernel",
+        "headSHA": "990f3f3a89cef6f6e8c7dd1236d8f2518041fc4f",
+        "mergeCommit": "b9c744fc7a95edb11f83306a43514c4ae9bf2da4",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 17,
+        "title": "Add operator kill switch, Node drain and durable cleanup",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/17",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T12:45:47Z",
+        "base": "agent/codex/business-kernel",
+        "head": "agent/codex/node-containment",
+        "headSHA": "dac25591adfb61a4a81382f737c4d1eed34c07d5",
+        "mergeCommit": "85a3618f201c8d212e680fe7fc5a5b49191a1ee4",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 18,
+        "title": "Independent review of #13, #15, #16, #17: four findings against my own PR #14, two against the new work",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/18",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T12:46:00Z",
+        "base": "agent/codex/node-containment",
+        "head": "review/claude-pr13-pr17",
+        "headSHA": "edb2f8ddc81b14852deb84014435ce70d5344681",
+        "mergeCommit": "6bc890349297d9a16b66f71e199ab9a440250c4f",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 19,
+        "title": "Add versioned Workspace editor, bounded PTY and approved remote Git",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/19",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "mergedAt": null,
+        "base": "agent/codex/node-containment",
+        "head": "agent/codex/workspace-bridge",
+        "headSHA": "33e6510d4410639ac7bf1252f1a0c232b1659cbe",
+        "mergeCommit": "3f082e109064e6438ccb62afe60ecad799c50a67",
+        "headAncestorOfMain": false,
+        "ancestryKnown": true
+      },
+      {
+        "number": 20,
+        "title": "Merge reviewed final runtime integration and delivery records into main",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/20",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "mergedAt": "2026-09-10T13:49:51Z",
+        "base": "main",
+        "head": "agent/codex/final-main",
+        "headSHA": "f2df50f0049f5d4b0a493e5fae1151c291995b61",
+        "mergeCommit": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+        "headAncestorOfMain": true,
+        "ancestryKnown": true
+      },
+      {
+        "number": 21,
+        "title": "계정 실행 권한의 원자 준비와 migration 무결성 보강",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/21",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "mergedAt": null,
+        "base": "agent/codex/result-observation",
+        "head": "agent/codex/provisioning-integrity",
+        "headSHA": "d945633afb590feaef0dd5777edc7da4210a4d43",
+        "mergeCommit": "dc577ed758e809350b474247616d3f74e755492f",
+        "headAncestorOfMain": false,
+        "ancestryKnown": true
+      },
+      {
+        "number": 22,
+        "title": "fix(resources): reconcile host offers with authorized kernel reservations",
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/22",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "mergedAt": null,
+        "base": "agent/codex/provisioning-integrity",
+        "head": "agent/codex/resource-offer-integrity",
+        "headSHA": "5de316d7fec3a57d1441c1d6c64bfaa609b0c3a7",
+        "mergeCommit": "dc0208dba65271009ce7f623e3b9658ec4305f9d",
+        "headAncestorOfMain": false,
+        "ancestryKnown": true
+      }
+    ]
+  },
+  "closures": {
+    "kst": "2026-09-11T15:45:02+09:00",
+    "pulls": [
+      {
+        "number": 11,
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/11",
+        "state": "closed",
+        "merged": false,
+        "headSHA": "92934d19213f4bda5bccfe1760373f59522ddccd",
+        "includedCommit": "92934d19213f4bda5bccfe1760373f59522ddccd",
+        "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de"
+      },
+      {
+        "number": 12,
+        "url": "https://github.com/egparadise/SaintVision-Invion/pull/12",
+        "state": "closed",
+        "merged": false,
+        "headSHA": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+        "includedCommit": "a70aff43262b7457098d68c0d5b8a662aad4742a",
+        "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de"
+      }
+    ]
+  },
+  "mergeCandidates": {
+    "kst": "2026-09-11T15:51:21+09:00",
+    "openCount": 13,
+    "draftCount": 12,
+    "candidates": [
+      {
+        "candidate": "workspace-bridge",
+        "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+        "headSHA": "33e6510d4410639ac7bf1252f1a0c232b1659cbe",
+        "cleanMerge": false,
+        "conflicts": [
+          "docs/vault/30_Development/History/개발 과정 인덱스.md"
+        ],
+        "scope": "read-only-merge-tree-no-main-or-worktree-update"
+      },
+      {
+        "candidate": "latest-account-resource",
+        "mainSHA": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de",
+        "headSHA": "f4fe37ebbed3641f9bcfe2adf913da16e2a985be",
+        "cleanMerge": true,
+        "conflicts": [],
+        "scope": "read-only-merge-tree-no-main-or-worktree-update"
+      }
+    ]
+  }
+}

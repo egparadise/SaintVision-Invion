@@ -1,0 +1,7 @@
+{
+  "observedKst": "2026-09-14T17:58:44+09:00",
+  "sharedLogin": false,
+  "sharedPasswordPresent": false,
+  "remoteNodePortReachable": false,
+  "scope": "read-only-role-and-TCP-recheck"
+}

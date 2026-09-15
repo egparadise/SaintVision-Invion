@@ -1,0 +1,30 @@
+{
+  "codeSHA": "dcd5f791f50b5287c98910ed4888aed3d5af3306",
+  "scope": "real local Python child processes, no model calls",
+  "windows": {
+    "newBoundaryTests": 6,
+    "seconds": 8.11,
+    "existingTests": 18,
+    "existingSeconds": 2.11,
+    "deselected": 5,
+    "exitCode": 0
+  },
+  "linux": {
+    "tests": 24,
+    "seconds": 4.23,
+    "deselected": 5,
+    "exitCode": 0,
+    "image": "sha256:3bfff4c786d96362967adfed1d954db0d666fef1aeed29b95c524e16985bde48",
+    "network": "none",
+    "sourceMount": "readonly"
+  },
+  "memoryAssertion": {
+    "emittedPerStreamBytes": 16777216,
+    "retainedPerStreamBytes": 1024,
+    "pythonTracemallocPeakUpperBoundBytes": 4194304,
+    "wholeProcessRSSMeasured": false
+  },
+  "providerAuthenticationAssessed": false,
+  "processTreeStopped": false,
+  "operationalAcceptanceAssessed": false
+}
