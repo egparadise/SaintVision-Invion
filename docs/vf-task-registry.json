@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
   "track": "VF-CX",
   "owner": "Codex",
@@ -70,7 +70,7 @@
       "title": "Five physical Node acceptance",
       "owner": "Codex",
       "reviewer": "Claude",
-      "state": "waiting_dependency",
+      "state": "blocked",
       "dependsOn": [
         "VF-CX-04"
       ],
@@ -78,7 +78,16 @@
       "locallyVerified": false,
       "ciVerified": false,
       "independentlyReviewed": false,
-      "operationallyAccepted": false
+      "operationallyAccepted": false,
+      "preflightVerified": true,
+      "blockers": [
+        "remote-node-unreachable-three-probes",
+        "operational-migration-backup-review-required",
+        "W2-W4-acceptance-unverified",
+        "ci-billing",
+        "independent-review-pending"
+      ],
+      "evidence": "docs/vault/30_Development/Evidence/vf-cx-05"
     }
   ]
 }
