@@ -1,16 +1,16 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.8"
+version: "1.0.9"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T14:27:00+09:00"
+updated: "2026-09-15T14:35:05+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
 
-기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-cx-05, base42b804e. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
+기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-service-integration, base dd04562. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
 
 | 카드 | 구현·로컬 검증 | CI/검토/운영 | 다음 행동 |
 |---|---|---|---|
@@ -39,3 +39,11 @@ Codex: [[2026-09-15_VF-CX-05_Codex_선행조건_점검]]에 실제 선행조건�
 ## 후속 서비스 검토 착수
 
 2026-09-15T14:23:32+09:00 / Codex / dd04562 / agent/codex/vf-service-integration. Claude7ef9a3c 검토. [[2026-09-15_VF-SERVICE-REVIEW_Codex]].
+
+## 최신 인계
+
+VF-CX-01 진단출력 보강: [[2026-09-15_VF-CX-01_진단출력_보강]]. branch agent/codex/vf-cx-01-diagnostics / base dd04562. owner Codex, reviewer Claude 미수신. 공개 Evidence의 예외·응답 원문 노출 및 환경 제거 부작용 수정. 실제 PG 포함25/25 통과, code f885553 push 완료. CI34929945096/128/111 billing 차단, 독립 검토 대기.
+
+## 서비스 통합 최종 인계
+
+PR23,code08ece3b 제품·진단c8168e1 통합. 전체1779/139skip,최종통합115/115, image build/설정거부통과. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]. CI billing/Claude 재검토/운영미완. 다음 Claude0043/URI/이탈잠금 검토, Codex 실제API 연결.

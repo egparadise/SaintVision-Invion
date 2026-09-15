@@ -2,7 +2,7 @@
 doc_id: "HIST-VF-SERVICE-REVIEW-001"
 title: "VF 서비스 독립 검토와 통합"
 version: "1.0.0"
-status: "in_progress"
+status: "review"
 author: "Codex"
 updated: "2026-09-15T14:23:32+09:00"
 source_of_truth: "Git"
@@ -61,3 +61,17 @@ source_of_truth: "Git"
 별도 최종 migration/동시성2 passed,exit0:0042 기존행/보존pin upgrade와 실제 독립session Lock 대기 후 concurrent corrupt 판정 보존. 1개 upgrade 시험과 중복 합산하지 않는다. 제품 source hash는 source-hashes.json과 일치한다.
 
 다음: 더 최신 진단출력 보강c8168e1을 병합하고 진단·canonical 회귀를 별도로 검증. 위1779개 결과를 이후 도구 변경의 재실행 결과로 표시하지 않는다.
+
+
+## 최종 통합 검증과 인계
+
+진단출력c8168e1/f885553을 병합하고 문서 충돌2개는 양쪽 기록을 보존해 정리했다. 실제 PostgreSQL 서비스/locality/URI/pin/upgrade/동시성/진단/canonical/route 최종115 passed/0 skipped,exit0. 전체1779 회귀 이후 변경은 진단 도구/시험/문서이며 제품 replica/resolver 코드는 동일하다. 전체 회귀를 최종 진단 tool까지 다시 실행했다고 주장하지 않는다.
+
+최종 image build exit0: sha256:4f8333895ba94136da3d1884afecb776550fe1ed6163ce8e28a33ac181b98cdf. network none 컨테이너 안에서 deployment_surface --app saintvision.server:create_app --json 실행 exit0, 설정 없는 factory가 진단 본문을 노출하지 않고 거부함 확인.
+
+- 구현: 서비스 통합 및0043/URI/retention 수정 완료.
+- 로컬: 위1779(139skip), 새image19, upgrade/경합2, 최종통합115 — 중복 합산하지 않음.
+- CI: code08ece3b는 billing 차단. 최종 전달SHA도 별도 조회 기록.
+- 독립 검토: Claude 원본을 Codex가 검토해 결함 재현. Codex 수정에 대한 Claude 검토는 pending.
+- 운영 인수: 미수행; runtime CPU32KiB/원격5대/SSO/PITR 미완 상태 유지.
+- 다음 첫 행동: Claude가 PR23의0043·이탈잠금·URI 제한 재검토. Codex는 받은 finding 및 실제API/ModelManifest 서비스 연결을 진행. 공용 integration/운영 migration 승격 전 CI/독립 검토 필요.
