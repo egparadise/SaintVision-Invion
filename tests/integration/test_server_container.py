@@ -167,6 +167,13 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
             assert result.status_code == 200
             if business:
                 headers = {"Authorization": "Bearer " + identity.token(), "Idempotency-Key": uuid4().hex}
+                for path in ('/v1/storage/locations', '/v1/storage/contributions'):
+                    assert client.get(path).status_code == 401
+                    observed = client.get(path, headers=headers)
+                    assert observed.status_code == 200
+                    assert observed.json() == {'items': [], 'nextCursor': None}
+                assert client.post('/v1/storage/contributions', headers=headers,
+                                   json={}).status_code in (404, 405)
                 project = client.post('/v1/projects', headers=headers,
                                       json={'code': 'candidate-' + uuid4().hex[:8], 'displayName': 'Candidate'})
                 assert project.status_code == 201

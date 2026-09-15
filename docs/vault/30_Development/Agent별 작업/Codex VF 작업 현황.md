@@ -1,16 +1,16 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.9"
+version: "1.0.10"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-15T14:35:05+09:00"
+updated: "2026-09-15T15:04:02+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
 
-기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-service-integration, base dd04562. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
+기준 ROADMAP-VIRTUAL-COMPUTER-001/ARCH-WEB-FABRIC-001/GOV-CONTINUOUS-001 1.0.0, integration 원격b9752a8. owner Codex, reviewer Claude(실제 수신·검토 미확인). 현재 branch agent/codex/vf-storage-api, base dd04562. 개별 source SHA/명령/exit code는 연결된 History/Evidence가 정본이다.
 
 | 카드 | 구현·로컬 검증 | CI/검토/운영 | 다음 행동 |
 |---|---|---|---|
@@ -47,3 +47,11 @@ VF-CX-01 진단출력 보강: [[2026-09-15_VF-CX-01_진단출력_보강]]. branc
 ## 서비스 통합 최종 인계
 
 PR23,code08ece3b 제품·진단c8168e1 통합. 전체1779/139skip,최종통합115/115, image build/설정거부통과. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]. CI billing/Claude 재검토/운영미완. 다음 Claude0043/URI/이탈잠금 검토, Codex 실제API 연결.
+
+## VF 저장소 API 착수
+
+2026-09-15T14:59:30+09:00 / Codex / base58f0370 / agent/codex/vf-storage-api. [[2026-09-15_VF-STORAGE-API_Codex]]. 등록자 소유권과 조회전용 dispatch 검증.
+
+## VF 저장소 API 검증·다음 행동
+
+등록자scope·active·메서드경계 구현,123/123·image8/8·문서/ontology통과. [[2026-09-15_VF-STORAGE-API_Codex]]. 다음 Claude 독립검토, Gemini 실제FileExplorer조회연결, Codex replica/ModelManifest 관측API계약. 운영인수/CI별도.

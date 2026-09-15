@@ -27,26 +27,36 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.models.locality import DataReplica
-from ..db.models.storage import DataLocation
+from ..db.models.storage import DataLocation, StorageContribution
 from ..errors import InvError, RES_ARTIFACT_NOT_FOUND
 from ..storage.pathsafe import ParsedUri, parse_uri
 
 
-def resolve_location(session: Session, *, tenant_id: uuid.UUID, uri: str) -> DataLocation:
+def resolve_location(session: Session, *, tenant_id: uuid.UUID, uri: str,
+                     reader_user_id: str | None = None) -> DataLocation:
     """The catalogued :class:`DataLocation` a URI names, within one tenant.
 
     Parses first so a malformed URI is rejected as a value error before any
     lookup, then reads the ``(tenant_id, uri)`` unique row. RLS confines the
     lookup to the caller's tenant; a URI catalogued under another tenant is a
-    not-found here, not another tenant's row.
+    not-found here, not another tenant's row. Public readers also pass their
+    verified user ID: only their active contributions are visible. Omitting
+    that filter is reserved for existing internal tenant maintenance callers.
     """
     parse_uri(uri)  # reject malformed before touching the database
-    location = session.scalar(
-        select(DataLocation).where(
-            DataLocation.tenant_id == tenant_id,
-            DataLocation.uri == uri,
-        )
+    query = select(DataLocation).where(
+        DataLocation.tenant_id == tenant_id,
+        DataLocation.uri == uri,
     )
+    if reader_user_id is not None:
+        query = query.where(DataLocation.contribution_id.in_(
+            select(StorageContribution.contribution_id).where(
+                StorageContribution.tenant_id == tenant_id,
+                StorageContribution.registered_by_user_id == reader_user_id,
+                StorageContribution.status == "active",
+            )
+        ))
+    location = session.scalar(query)
     if location is None:
         raise InvError(RES_ARTIFACT_NOT_FOUND, f"no catalogued location for {uri}")
     return location

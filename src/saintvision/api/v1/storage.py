@@ -15,6 +15,8 @@ from sqlalchemy.orm import Session
 
 from ...config import Settings
 from ...identity.principal import Principal
+from ...errors import InvError, RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA
+from ...services import resolver
 from ...services import storage as storage_service
 from ...services.audit import record_event
 from .. import schemas
@@ -173,6 +175,7 @@ def list_contributions(
     page = storage_service.list_contributions(
         session,
         tenant_id=principal.tenant_id,
+        reader_user_id=principal.user_id,
         node_id=node_id,
         limit=limit,
         cursor=cursor,
@@ -196,6 +199,7 @@ def list_locations(
     page = storage_service.list_locations(
         session,
         tenant_id=principal.tenant_id,
+        reader_user_id=principal.user_id,
         contribution_id=contribution_id,
         kind=kind,
         ready_only=ready_only,
@@ -205,3 +209,25 @@ def list_locations(
         max_limit=settings.page_limit_max,
     )
     return page.to_dict(_location_body)
+
+
+@router.get("/storage/resolve")
+def resolve_uri(
+    uri: str = Query(min_length=1, max_length=2048),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Resolve owned active catalogue metadata; does not grant byte access."""
+    try:
+        location = resolver.resolve_location(
+            session, tenant_id=principal.tenant_id, uri=uri,
+            reader_user_id=principal.user_id,
+        )
+    except ValueError:
+        raise InvError(VAL_SCHEMA, "invalid storage URI") from None
+    except InvError as error:
+        if error.code != RES_ARTIFACT_NOT_FOUND:
+            raise
+        # No existence oracle or reflection of an untrusted URI in diagnostics.
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "data location not found", status=404) from None
+    return {"location": _location_body(location)}
