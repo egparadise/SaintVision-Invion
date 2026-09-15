@@ -45,3 +45,19 @@ source_of_truth: "Git"
 새 image digest를 사용한 실제 server container/최종 경계/정본 migration graph 19 passed, exit0. 0042 제약 아래 기존 pin이 있는 행을0043으로 바꾸는 별도 실 PostgreSQL upgrade 1 passed, exit0: 모든 열 보존 후 stale 전이 및 pin 보존 확인. 전체 회귀는 진행 중이며 이 시점에 통과로 기록하지 않는다.
 
 문서 검사 exit0(467문서), ontology exit0. 전체 Obsidian check는 외부/비관리 문서 충돌로 exit1; 전체 apply 미실행. 이번 신규 History/Evidence만 저장소 export 함수로 check→apply→check, 최초4개 파일 hash 일치/최종pending0/conflict0. 공통 진행판과 기존 문서의 공유본 갱신은 아직 대기다.
+
+
+## Git / CI checkpoint
+
+- 제품08ece3bc4e4b54ce529d8c5e58da9e13d3c8974c commit·push exit0. draft PR23: https://github.com/egparadise/SaintVision-Invion/pull/23 (base agent/codex/vf-cx-05). main/shared integration/운영 배포 미수행.
+- Core34932876860, Docs34932876816, Backend34932876755: 동일 code SHA에서 결제 실패/사용 한도 때문에 job 시작 전 거부. 실제 check annotation4개를 ci-annotations.json으로 보존했다. CI 통과 아님.
+- gh 자체 로그인은 없었으나 이미 push에 사용되는 Git credential manager의 인증을 명령 프로세스 내부에서만 사용해 읽기 전용 CI 조회를 완료했다. 비밀값은 로그/Evidence에 기록하지 않았다.
+
+
+## 전체 회귀 확정
+
+08ece3b 제품 source에서 전체 Windows backend 회귀1779 passed/139 skipped/0 failed/0 errors,561.15초,exit0. 명령은 vf-service-final.json 참조. Node 종속 suite와 Linux recovery_drill은 제외했으며139 skip을 성공으로 세지 않는다. 이 전체 실행의 컨테이너 fixture는 기존vf-cx-04 image이며, 이번 새 image는 별도19개 통과가 정본이다.
+
+별도 최종 migration/동시성2 passed,exit0:0042 기존행/보존pin upgrade와 실제 독립session Lock 대기 후 concurrent corrupt 판정 보존. 1개 upgrade 시험과 중복 합산하지 않는다. 제품 source hash는 source-hashes.json과 일치한다.
+
+다음: 더 최신 진단출력 보강c8168e1을 병합하고 진단·canonical 회귀를 별도로 검증. 위1779개 결과를 이후 도구 변경의 재실행 결과로 표시하지 않는다.
