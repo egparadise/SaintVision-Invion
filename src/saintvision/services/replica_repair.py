@@ -252,7 +252,7 @@ def mark_node_replicas_unavailable(
                 DataReplica.tenant_id == tenant_id,
                 DataReplica.node_id == node_id,
                 DataReplica.state.in_(_LOSABLE_ON_DEPARTURE),
-            )
+            ).order_by(DataReplica.replica_id).with_for_update()
         ).all()
     )
     for replica in replicas:
