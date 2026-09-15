@@ -1,0 +1,86 @@
+---
+doc_id: "HIST-VF-SERVICE-REVIEW-001"
+title: "VF 서비스 독립 검토와 통합"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+updated: "2026-09-15T14:37:19+09:00"
+source_of_truth: "Git"
+---
+
+# VF 서비스 독립 검토와 통합
+
+- 카드 VF-CX-01 후속 / VF-CL-01~04 독립 검토. owner Codex, 원본 작성자 Claude; Codex 수정은 Claude 재검토 pending.
+- base dd04562; branch agent/codex/vf-service-integration; 검토 대상 Claude7ef9a3c.
+- INDEX-PROGRESS-001 1.0.78, WORKBOARD-VF-CODEX-001 1.0.7; GUIDE-001/GOV-AGENT-001/GOV-GIT-001 및 영역 계획1.0.0, ADR-INDEX-001, agent-delivery1.1.0/core-reliability1.0.0 읽음.
+- 루트 integration 진행판은 오래됨. 최신 Codex VF05 Git 기록을 기준으로 기존01~04 구현을 반복하지 않는다.
+- 범위: URI parser/resolver, replica repair, catalogue/model 시험을 최신0042 코어와 대조. 운영DB/credential/실장비 변경 없음.
+- 합격: 격리 PostgreSQL non-owner/RLS, pin 보존과 이탈 처리, URI 왕복, model release gate. 실패는 finding으로 기록한다.
+
+## 독립 재현 결과와 수정
+
+- Claude7ef9a3c 원본 시험: storage catalog/model registry/URI resolver/replica repair 56 passed, exit0, skip0. 격리 PostgreSQL16·Python3.14·non-owner runtime 역할.
+- 독립 경계 시험: 4 failed, exit1. R1: ready replica에 pinned_until을 설정하고 이탈 처리하면 ck_data_replicas_only_ready_replicas_pin CheckViolation으로 transaction 실패. R2: dataset/model URI 끝의 slash를 parser가 받아들이지만 builder가 제거해 왕복 불일치(2건). R3: version에 slash를 허용해 version과 path의 구분이 사라짐.
+- 0043_replica_retention은 기존0042 뒤의 forward migration. 데이터·pin·과거 migration은 보존하고 stale 상태에도 기존 retention pin이 남도록 제약을 변경한다. 실제 운영 DB에는 적용하지 않았다.
+- replica 이탈 writer는 replica_id 순서의 FOR UPDATE로 읽기/쓰기 사이 상태 변경을 직렬화한다. unavailable/corrupt 바이트는 물리 회수 전까지 cache_usage에 남긴다. stale 복제본은 resolver·repair source·eviction 후보에 포함하지 않는다.
+- URI builder는 version/identifier에 모호한 slash를 거부하고 parser는 빈 dataset/model path suffix를 거부한다. 물리 경로의 안전성 검사는 기존 pathsafe/open 경계를 계속 사용한다.
+- 1차 수정 시험: 관련85 passed, exit0. 이후 반복 이탈, retention, cache 용량, resolver/repair/eviction 제외와 추가 identifier 거부를 보강하고 전체 회귀 실행.
+- 원본 서비스 독립 판정: changes requested였으며 이 후보에 Codex 수정 포함. 이 수정에 대한 Claude 독립 재검토는 pending. 작성자 검토를 독립 검토로 세지 않는다.
+
+## 환경 오류
+
+최초 시스템 Python에는 psycopg가 없어 실행되지 않았고, PowerShell 기본 파이프 encoding이 한국어를 손상시켰다. 저장소 .venv Python과 명시적 UTF-8 OutputEncoding으로 재실행하고 착수 문서를 복구했다. 두 초기 실패를 제품 실패/통과 수치에 포함하지 않는다.
+
+## 다음 담당과 미완료
+
+- Codex: 전체 회귀 결과·code SHA·CI·Obsidian 전달 증거 기록.
+- Claude: 0043 pin 제약/이탈 writer와 URI 입력 경계 재검토. resolver/repair는 서비스 함수이며 공개API·전송 실행·ModelManifest 확장 인수는 아직 아니다.
+- 운영 owner: CI billing·실제 원격 연결/5대·SSO/PITR. 기존57.81%, VF 운영인수0/5 유지.
+
+후보 image build exit0: saintvision-backend-candidate:vf-service-integration / sha256:b21d97dcbdaf3d3a602df07ac62e57b7137d22e1c21747711c6691f15de13217. deployment_surface.py --dockerfile deploy/Dockerfile.backend exit0: 설정 없는 canonical factory 거부.
+
+
+## 전달 전 검증
+
+새 image digest를 사용한 실제 server container/최종 경계/정본 migration graph 19 passed, exit0. 0042 제약 아래 기존 pin이 있는 행을0043으로 바꾸는 별도 실 PostgreSQL upgrade 1 passed, exit0: 모든 열 보존 후 stale 전이 및 pin 보존 확인. 전체 회귀는 진행 중이며 이 시점에 통과로 기록하지 않는다.
+
+문서 검사 exit0(467문서), ontology exit0. 전체 Obsidian check는 외부/비관리 문서 충돌로 exit1; 전체 apply 미실행. 이번 신규 History/Evidence만 저장소 export 함수로 check→apply→check, 최초4개 파일 hash 일치/최종pending0/conflict0. 공통 진행판과 기존 문서의 공유본 갱신은 아직 대기다.
+
+
+## Git / CI checkpoint
+
+- 제품08ece3bc4e4b54ce529d8c5e58da9e13d3c8974c commit·push exit0. draft PR23: https://github.com/egparadise/SaintVision-Invion/pull/23 (base agent/codex/vf-cx-05). main/shared integration/운영 배포 미수행.
+- Core34932876860, Docs34932876816, Backend34932876755: 동일 code SHA에서 결제 실패/사용 한도 때문에 job 시작 전 거부. 실제 check annotation4개를 ci-annotations.json으로 보존했다. CI 통과 아님.
+- gh 자체 로그인은 없었으나 이미 push에 사용되는 Git credential manager의 인증을 명령 프로세스 내부에서만 사용해 읽기 전용 CI 조회를 완료했다. 비밀값은 로그/Evidence에 기록하지 않았다.
+
+
+## 전체 회귀 확정
+
+08ece3b 제품 source에서 전체 Windows backend 회귀1779 passed/139 skipped/0 failed/0 errors,561.15초,exit0. 명령은 vf-service-final.json 참조. Node 종속 suite와 Linux recovery_drill은 제외했으며139 skip을 성공으로 세지 않는다. 이 전체 실행의 컨테이너 fixture는 기존vf-cx-04 image이며, 이번 새 image는 별도19개 통과가 정본이다.
+
+별도 최종 migration/동시성2 passed,exit0:0042 기존행/보존pin upgrade와 실제 독립session Lock 대기 후 concurrent corrupt 판정 보존. 1개 upgrade 시험과 중복 합산하지 않는다. 제품 source hash는 source-hashes.json과 일치한다.
+
+다음: 더 최신 진단출력 보강c8168e1을 병합하고 진단·canonical 회귀를 별도로 검증. 위1779개 결과를 이후 도구 변경의 재실행 결과로 표시하지 않는다.
+
+
+## 최종 통합 검증과 인계
+
+진단출력c8168e1/f885553을 병합하고 문서 충돌2개는 양쪽 기록을 보존해 정리했다. 실제 PostgreSQL 서비스/locality/URI/pin/upgrade/동시성/진단/canonical/route 최종115 passed/0 skipped,exit0. 전체1779 회귀 이후 변경은 진단 도구/시험/문서이며 제품 replica/resolver 코드는 동일하다. 전체 회귀를 최종 진단 tool까지 다시 실행했다고 주장하지 않는다.
+
+최종 image build exit0: sha256:4f8333895ba94136da3d1884afecb776550fe1ed6163ce8e28a33ac181b98cdf. network none 컨테이너 안에서 deployment_surface --app saintvision.server:create_app --json 실행 exit0, 설정 없는 factory가 진단 본문을 노출하지 않고 거부함 확인.
+
+- 구현: 서비스 통합 및0043/URI/retention 수정 완료.
+- 로컬: 위1779(139skip), 새image19, upgrade/경합2, 최종통합115 — 중복 합산하지 않음.
+- CI: code08ece3b는 billing 차단. 최종 전달SHA도 별도 조회 기록.
+- 독립 검토: Claude 원본을 Codex가 검토해 결함 재현. Codex 수정에 대한 Claude 검토는 pending.
+- 운영 인수: 미수행; runtime CPU32KiB/원격5대/SSO/PITR 미완 상태 유지.
+- 다음 첫 행동: Claude가 PR23의0043·이탈잠금·URI 제한 재검토. Codex는 받은 finding 및 실제API/ModelManifest 서비스 연결을 진행. 공용 integration/운영 migration 승격 전 CI/독립 검토 필요.
+
+
+## 최종 전달 영수증
+
+- 누적 통합d237d30814457ccc1c5e01dd553fd4e054919621 push exit0, draft PR23 갱신 완료. 제품08ece3b와 진단f885553/c8168e1, 후속 시험5e57f18을 포함한다.
+- d237d30 CI push/PR 각3 run 모두 billing·spending limit으로 시작 전 실패. 실제 annotation8개: Evidence/vf-service-review/ci-merged.json. CI 성공/독립 승인/운영 인수로 올리지 않는다.
+- docs exit0(468문서), ontology exit0, diff exit0. 최종115/115 후 제품 변경 없음.
+- Obsidian 공유 공통 진행판·Codex VF판·ADR·오류 이력을 c8168e1 Git내용과 대조(LF/CRLF만 동일)하고 기존 바이트hash를 확인한 뒤 범위 제한 동기화.16개 관리/13개 export/hash16개 일치/pending0/conflict0. generic Codex 작업판 공유본만 기존Git내용과 달라 보존했으며, 정본Git의 기록과 공통/VF판으로 다음 행동을 전달한다.
+- 이번 영수증과 추가CI/sync JSON은 문서만 변경하며 마지막 push 후 같은 관리 범위로 다시 동기화한다. 원본24개 불변, 원격5대와 운영 변경 미실행. 다음 담당은 Claude(PR23 수정 재검토), Codex(실제 서비스 API·ModelManifest 연결), 운영 owner(CI/SSO/PITR/장비)다.

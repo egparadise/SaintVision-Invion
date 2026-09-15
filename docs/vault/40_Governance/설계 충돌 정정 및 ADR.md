@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.13"
+version: "1.35.14"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-12T16:41:40+09:00"
+updated: "2026-09-15T14:27:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -168,3 +168,8 @@ ADR-094(정지 관측 Node 교체 전 비변경 점검·bounded state digest·�
 ADR-095(기존 container/정책 보존·private durable 단계·same-plan forward 재개·변경 허용 파일 제한·ID 고정·로컬 설치와 운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.8.0과 [[2026-09-12_STORAGE-REPLACE_Codex_검증보고]]를 따른다.
 
 ADR-096(Windows 입력·WSL 고정 private 준비·request SHA 지정 apply·같은 요청 재개·운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.9.0과 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]]를 따른다.
+
+
+## VF 서비스 통합 정정 — 복제본 가용성과 보존 분리
+
+ADR-012를 보강한다. Node 이탈은 복제본을 stale로 만들지만 기존 pinned_until을 삭제하지 않는다. ready/stale에 retention pin을 허용하는 0043 forward migration을 사용하며 stale는 실행·복사 source·eviction 후보가 아니다. 아직 회수되지 않은 stale/corrupt 바이트도 cache 용량에 포함한다. URI version과 식별자에는 경로 구분 slash를 허용하지 않고 parse/build 왕복이 불가능한 빈 suffix는 거부한다. [[2026-09-15_VF-SERVICE-REVIEW_Codex]]의 실제 재현/수정 증거 참조. Codex 수정의 Claude 재검토와 운영 적용은 pending이다.

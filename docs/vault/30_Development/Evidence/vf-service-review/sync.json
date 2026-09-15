@@ -1,0 +1,11 @@
+{
+  "sourceSha": "d237d30814457ccc1c5e01dd553fd4e054919621",
+  "knownBase": "c8168e1; LF/CRLF equivalence verified before adopting exact destination hash",
+  "files": 16,
+  "pendingBefore": 13,
+  "pendingAfter": 0,
+  "conflicts": 0,
+  "unmatchedFilesPreserved": [
+    "30_Development/Agent별 작업/Codex 작업 현황.md"
+  ]
+}

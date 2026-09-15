@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0042_model_retry_lineage",
+  "revision": "0043_replica_retention",
   "referenceSource": "c5f215475b203b1e6731927117093921cda9c183",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
