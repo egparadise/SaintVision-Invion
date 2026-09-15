@@ -9,16 +9,19 @@ from starlette.routing import Match
 class BusinessDispatch:
     def __init__(self, app, business):
         self.app, self.business = app, business
-        from saintvision.api.v1 import projects, settings, adapters, readiness
+        from saintvision.api.v1 import projects, settings, adapters, readiness, storage
         # Read the three declared routers, not FastAPI's lazily included wrapper
         # routes. Keep all deeper execution routes on the kernel application.
         self.routes = [r for module in (projects, settings, adapters) for r in module.router.routes]
         # Run result paths belong to the execution kernel, including first Runs
         # which have no public.runs row. Only workspace readiness is business CRUD.
         self.routes += [r for r in readiness.router.routes if r.path.startswith("/v1/workspaces/")]
+        # Explicit read-only catalogue exposure. Registration/activation/revoke
+        # require their own reviewed mutation authorization boundary.
+        self.routes += [r for r in storage.router.routes if r.methods == {"GET"}]
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] == "http" and any(r.matches(scope)[0] != Match.NONE for r in self.routes):
+        if scope["type"] == "http" and any(r.matches(scope)[0] == Match.FULL for r in self.routes):
             # FastAPI installs its own app reference for dependencies. Restore it
             # when returning so middleware does not retain the other role's app.
             original = scope.get("app")
