@@ -1492,6 +1492,27 @@ class ModelExecutionRef(BaseModel):
     mode: Literal['single-node']
 
 
+class ModelCommitObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    modelId: ModelId
+    version: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
+    manifestHash: constr(pattern=r'^[0-9a-f]{64}$')
+    sourceRunId: RunId
+    committedAt: AwareDatetime
+    commitRecoveryEpoch: UUID
+    format: constr(min_length=1, max_length=64)
+    totalBytes: conint(ge=1, le=1099511627776)
+    shardCount: conint(ge=1, le=1024)
+    licensePolicy: constr(min_length=1, max_length=200)
+    classification: Classification
+    committed: Literal[True]
+    currentAvailability: Literal['unknown']
+    requiresExecutionRevalidation: Literal[True]
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1750,6 +1771,7 @@ class INVCore(
         | ModelReplica
         | ModelRuntimeCompatibility
         | ModelManifest
+        | ModelCommitObservation
     ]
 ):
     root: (
@@ -1790,4 +1812,5 @@ class INVCore(
         | ModelReplica
         | ModelRuntimeCompatibility
         | ModelManifest
+        | ModelCommitObservation
     ) = Field(..., title='INVCore')

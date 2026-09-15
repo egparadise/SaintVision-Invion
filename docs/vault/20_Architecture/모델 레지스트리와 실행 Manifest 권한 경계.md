@@ -1,11 +1,11 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-15T15:12:44+09:00"
+updated: "2026-09-15T15:27:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,7 +20,7 @@ source_of_truth: "Git"
 | public.models/model_versions/lineage | S10 모델 등록·업무 버전·평가/승인 추적 | 커널 manifest 존재, 현재 bytes 일치, 실행 permit |
 | inv.model_manifests/model_shard_locations | tenant/project/model/version별 불변 실행 manifest, source Run 및 DataLocation 버전 참조, 커밋 당시 full-byte 검증 | S10 released 상태, 현재 복제본 가용성, 새 실행 권한 |
 
-inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 공개 API 및 ModelVersion 결속은 아직 미구현이다.
+inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 커밋 요약 GET은 아래1.1.0에 정의한다. ModelVersion 결속은 아직 미구현이다.
 
 ## 정책 필드와 후속 결속 합격 조건
 
@@ -37,3 +37,20 @@ Claude 5189365의 shard 상한 finding은 reviewed SHA d6d9d87에서도 JSON Sch
 0039 이전 분기 문제는 현재 후보116e6e5의 단일0043 migration 체인에서 확인한다. 운영DB의 upgrade 완료를 의미하지 않는다. 기존 Claude 검토의 storage ready 상태와 locality verified_nodes는 동등하지 않다. 후자는 현재 Node/epoch/프로젝트·bytes 검증 등 추가 조건을 요구하므로 ready 행만으로 실행 가능을 표시하지 않는다.
 
 실제 검증과 인계: [[2026-09-15_VF-MODEL-REVIEW_Codex]]. 후속 변경의 독립 재검토는 Claude, API·결속 구현은 Codex/Claude 각 owner 카드로 진행한다.
+
+
+## 커밋 요약 조회 (1.1.0)
+
+GET /v1/projects/{project}/models/{model_id}/versions/{version}/commitment
+
+- canonical inv.app 경로다. storage business router나 inv_app 직접SQL을 통해 kernel 테이블을 열지 않는다. 별도 worker root/verifier 설정이 필요 없다.
+- 현재 검증 principal의 tenant·subject로 kernel can_request grant와 linked business project/user/member의 요청권한을 교차 확인한다. project link가 없는 legacy fallback은 허용하지 않는다. SHARE 잠금을 기존 grant→business 순서로 transaction 종료까지 유지한다.
+- model_id는 ModelId Schema, version은 불변문법/64자 상한이며 latest/current/head를 거부한다. 최신버전 자동선택은 하지 않는다.
+- 현재권한없음403, 인증없음/위조401, 유효한scope에 해당model/version 없음404. 저장된manifest Schema/연속shard/전체길이·digest 불일치는409 MODEL-0001, 저장원문을 오류에 반사하지 않는다.
+- 응답은 ModelCommitObservation Schema다. projectId/modelId/version/manifestHash/sourceRunId/committedAt/commitRecoveryEpoch/format/totalBytes/shardCount/licensePolicy/classification/committed=true를 제공한다.
+- currentAvailability=unknown, requiresExecutionRevalidation=true. committedAt은 DB의 과거커밋시각이고commitRecoveryEpoch도 당시epoch다. 조회시각/현재epoch·새bytes검증으로 표시하지 않는다. 과거node상태나만료lease가조회기록을새실행허가로바꾸지않는다.
+- 저장JSON의자체일관성과기록된digest를대조한다. 데이터베이스관리자의원문+digest동시위조를독립서명으로검증하는API는아니다.
+- shard/replica 상세/nodeId/locationId/root경로/keyRef/worker설정은응답에없다. HTTP cache-control:no-store를유지한다. 조회로commit/idempotency/Run상태/실파일을변경하지않는다.
+- licensePolicy는불변선언이지실제라이선스허가판정이아니다. 공개ModelVersion자동결속/배포/다운로드/현재실행가능판정은여전히후속이다.
+
+검증및인계: [[2026-09-15_VF-MODEL-OBSERVATION_Codex]]. Gemini Model Studio는정확한project/model/version을선택해과거커밋요약으로표시하고실행가능배지를이응답만으로만들지않는다.

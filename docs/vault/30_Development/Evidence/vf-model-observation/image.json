@@ -1,0 +1,6 @@
+{
+  "image": "sha256:1d325403aef4fdc5262227dd34059e44e417816ce754c6e6ea34e3a4dc07257e",
+  "command": "docker build -f deploy/Dockerfile.backend -t saintvision-backend-candidate:vf-model-observation .",
+  "exitCode": 0,
+  "operationalDeployment": false
+}

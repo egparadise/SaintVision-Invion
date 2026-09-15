@@ -5129,6 +5129,94 @@
           "type": "string"
         }
       }
+    },
+    "ModelCommitObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "modelId": {
+          "$ref": "#/$defs/ModelId"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "manifestHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceRunId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "committedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "commitRecoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "totalBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1099511627776
+        },
+        "shardCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "licensePolicy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "restricted"
+          ]
+        },
+        "committed": {
+          "type": "boolean",
+          "const": true
+        },
+        "currentAvailability": {
+          "type": "string",
+          "const": "unknown"
+        },
+        "requiresExecutionRevalidation": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "projectId",
+        "modelId",
+        "version",
+        "manifestHash",
+        "sourceRunId",
+        "committedAt",
+        "commitRecoveryEpoch",
+        "format",
+        "totalBytes",
+        "shardCount",
+        "licensePolicy",
+        "classification",
+        "committed",
+        "currentAvailability",
+        "requiresExecutionRevalidation"
+      ]
     }
   },
   "oneOf": [
@@ -5242,6 +5330,9 @@
     },
     {
       "$ref": "#/$defs/ModelManifest"
+    },
+    {
+      "$ref": "#/$defs/ModelCommitObservation"
     }
   ]
 }

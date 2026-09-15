@@ -1073,3 +1073,21 @@ export interface ModelExecutionRef {
   adapterVersion: "1";
   mode: "single-node";
 }
+
+export interface ModelCommitObservation {
+  projectId: ProjectId;
+  modelId: ModelId;
+  version: string;
+  manifestHash: string;
+  sourceRunId: RunId;
+  committedAt: string;
+  commitRecoveryEpoch: string;
+  format: string;
+  totalBytes: number;
+  shardCount: number;
+  licensePolicy: string;
+  classification: "public" | "internal" | "restricted";
+  committed: true;
+  currentAvailability: "unknown";
+  requiresExecutionRevalidation: true;
+}

@@ -1075,3 +1075,21 @@ type ModelExecutionRef struct {
     AdapterVersion string `json:"adapterVersion"`
     Mode string `json:"mode"`
 }
+
+type ModelCommitObservation struct {
+    ProjectId ProjectId `json:"projectId"`
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    ManifestHash string `json:"manifestHash"`
+    SourceRunId RunId `json:"sourceRunId"`
+    CommittedAt string `json:"committedAt"`
+    CommitRecoveryEpoch string `json:"commitRecoveryEpoch"`
+    Format string `json:"format"`
+    TotalBytes int64 `json:"totalBytes"`
+    ShardCount int64 `json:"shardCount"`
+    LicensePolicy string `json:"licensePolicy"`
+    Classification string `json:"classification"`
+    Committed bool `json:"committed"`
+    CurrentAvailability string `json:"currentAvailability"`
+    RequiresExecutionRevalidation bool `json:"requiresExecutionRevalidation"`
+}

@@ -380,6 +380,14 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     from .storage_view import StorageObservationView
     storage_view = StorageObservationView(database)
 
+    from .model_view import ModelCommitObservation
+    model_view = ModelCommitObservation(database)
+
+    @api.get("/v1/projects/{project}/models/{model_id}/versions/{version}/commitment")
+    def model_commitment(project: str, model_id: str, version: str,
+                         identity=Depends(authenticated)):
+        return model_view.get(identity.principal, project, model_id, version)
+
     @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
     def storage_observation(project: str, run_id: str, request_id: str,
                             identity=Depends(authenticated)):
