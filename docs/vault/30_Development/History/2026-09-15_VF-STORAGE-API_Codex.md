@@ -4,7 +4,7 @@ title: "VF 저장소 조회 API 연결"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-15T14:59:30+09:00"
+updated: "2026-09-15T15:06:37+09:00"
 source_of_truth: "Git"
 ---
 
@@ -31,3 +31,13 @@ source_of_truth: "Git"
 ## 다음 담당
 
 Codex: 같은SHA commit/push/CI·Obsidian·인계. Claude: 등록자scope·메서드dispatch·공개오류재검토. Gemini: 위3개 API를 실제FileExplorer조회/URI입력에 연결 후브라우저검증. CI billing·운영IdP/PITR/5대는운영owner. 기존57.81%/VF운영0/5 유지.
+
+
+## 최종 전달 결과
+
+- 제품b3faf98f9c5c62a831176a85281b875ffd985ddd commit/push exit0. draft PR24: https://github.com/egparadise/SaintVision-Invion/pull/24, base agent/codex/vf-service-integration(PR23). main/공용integration/운영배포 미수행.
+- 동일SHA push CI Docs34935369635/Core34935369650/Backend34935369662, PR CI Core34935399361/Backend34935399363/Docs34935399399 모두 billing/spending limit으로 job 시작 전 실패. 실제 annotation8개는 ci-code.json. 로컬제품실패나CI통과로 해석하지 않는다.
+- 최종 관련123passed/0skip,실제image8passed/0skip,문서470·ontology·diff exit0. 전체1779회귀는 이전PR23 증거이며 이번source에서 다시 실행했다고 주장하지 않는다.
+- 전체sync --check exit1(외부/비관리문서 충돌). 확인된58f0370 공유내용과 LF/CRLF대조 후 공통/VF작업판·오류·새계약/History/Evidence만 check→apply→check:13개export/hash13개일치,pending0/conflict0. 일반Codex작업판 공유본은 baseline과달라 보존; Git정본과공통/VF판에현재상태를기록했다. 최종CI/sync영수증은문서commit뒤같은범위재동기화.
+- 구현/로컬검증 완료,CI blocked,Claude 독립review pending,운영인수 미수행. 다른Agent의수신/검토를대신완료처리하지 않는다.
+- 다음첫행동: Claude는PR24 등록자필터/tenant·GET메서드경계를재검토. Gemini는 FileExplorer를계약3개GET에연결하고실제API브라우저시험. Codex는 replica/ModelManifest 관측API의권한·증거연결을설계/구현. 운영owner는CI/SSO/PITR/5대입력. 기존57.81%/VF운영0/5유지.
