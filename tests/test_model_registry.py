@@ -332,9 +332,10 @@ def _seed_traceable_subjects(owner_engine, registry, user_id):
             text(
                 "INSERT INTO approvals (approval_id, tenant_id, run_id, subject_sha256, decision, "
                 "risk_level, decided_by_user_id, decided_at, expires_at) "
-                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, now(), now() + interval '1 day')"
+                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, :decided, :expires)"
             ),
-            {"a": ids["approval_id"], "t": t, "r": ids["run_id"], "sh": "c" * 64, "u": user_id},
+            {"a": ids["approval_id"], "t": t, "r": ids["run_id"], "sh": "c" * 64, "u": user_id,
+             "decided": NOW - dt.timedelta(minutes=1), "expires": NOW + dt.timedelta(days=1)},
         )
     return ids
 
@@ -393,6 +394,144 @@ def test_release_succeeds_when_verified_pinned_and_fully_traceable(owner_engine,
                     model_version_id=mv.model_version_id, now=NOW,
                 )
                 assert released.stage == "released"
+
+
+def _release_with_subjects(session, owner_engine, registry, user_id, subjects):
+    """Register, fully trace, verify, pin and release one model version. Returns it."""
+    mv = _draft(session, registry)
+    dsv = lineage_service.register_dataset_version(
+        session, tenant_id=registry["tenant_a"], dataset_id=registry["dataset_id"],
+        version="1", content_sha256=SHA, uri="inv://datasets/corpus@1", now=NOW,
+    )
+    commit = lineage_service.register_commit(
+        session, tenant_id=registry["tenant_a"], repository="git@x/repo",
+        commit_sha="a" * 40, now=NOW,
+    )
+    for kind, sid in (
+        ("dataset_version", dsv.dataset_version_id),
+        ("code_commit", commit.commit_id),
+        ("eval_run", subjects["eval_run_id"]),
+        ("approval", subjects["approval_id"]),
+    ):
+        lineage_service.record_lineage(
+            session, tenant_id=registry["tenant_a"], model_version_id=mv.model_version_id,
+            edge=LineageEdge(kind=kind, subject_id=sid), now=NOW,
+        )
+    lineage_service.verify_model_version(
+        session, tenant_id=registry["tenant_a"],
+        model_version_id=mv.model_version_id, content_sha256=SHA, now=NOW,
+    )
+    lineage_service.pin_retention(
+        session, tenant_id=registry["tenant_a"],
+        model_version_id=mv.model_version_id, until=LATER,
+    )
+    lineage_service.release_model_version(
+        session, tenant_id=registry["tenant_a"],
+        model_version_id=mv.model_version_id, now=NOW,
+    )
+    return mv
+
+
+def _deployment_approval(owner_engine, registry, subjects, user_id, *, digest, approval_id):
+    """An approval bound to a specific content digest, for deployment tests."""
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO approvals (approval_id, tenant_id, run_id, subject_sha256, decision, "
+                "risk_level, decided_by_user_id, decided_at, expires_at) "
+                "VALUES (:a, :t, :r, :sh, 'approved', 1, :u, :decided, :expires)"
+            ),
+            {"a": approval_id, "t": registry["tenant_a"], "r": subjects["run_id"],
+             "sh": digest, "u": user_id,
+             "decided": NOW - dt.timedelta(minutes=1), "expires": NOW + dt.timedelta(days=1)},
+        )
+
+
+def test_deploying_a_released_version_pins_the_shipped_digest_and_supersedes(
+    owner_engine, app_sessionmaker, registry
+):
+    from saintvision.services.lineage import record_deployment
+
+    user_id = new_id("user")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO users (user_id, tenant_id, external_subject, display_name, "
+                "status, created_at, updated_at, version) "
+                "VALUES (:u, :t, 'sub', 'U', 'active', now(), now(), 1)"
+            ),
+            {"u": user_id, "t": registry["tenant_a"]},
+        )
+    subjects = _seed_traceable_subjects(owner_engine, registry, user_id)
+    match_id, mismatch_id, second_id = (new_id("approval") for _ in range(3))
+    _deployment_approval(owner_engine, registry, subjects, user_id, digest=SHA, approval_id=match_id)
+    _deployment_approval(owner_engine, registry, subjects, user_id, digest=OTHER_SHA, approval_id=mismatch_id)
+    _deployment_approval(owner_engine, registry, subjects, user_id, digest=SHA, approval_id=second_id)
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, registry["tenant_a"]):
+                mv = _release_with_subjects(session, owner_engine, registry, user_id, subjects)
+
+                # An approval for different content cannot ship this version.
+                with pytest.raises(InvError, match="different content"):
+                    record_deployment(
+                        session, tenant_id=registry["tenant_a"],
+                        model_version_id=mv.model_version_id, environment="pilot",
+                        approval_id=mismatch_id, deployed_by_user_id=user_id, now=NOW,
+                    )
+                # An unknown environment is rejected.
+                with pytest.raises(InvError, match="unknown environment"):
+                    record_deployment(
+                        session, tenant_id=registry["tenant_a"],
+                        model_version_id=mv.model_version_id, environment="production",
+                        approval_id=match_id, deployed_by_user_id=user_id, now=NOW,
+                    )
+                # The matching approval ships it; the digest comes from the version.
+                dep = record_deployment(
+                    session, tenant_id=registry["tenant_a"],
+                    model_version_id=mv.model_version_id, environment="pilot",
+                    approval_id=match_id, deployed_by_user_id=user_id, now=NOW,
+                )
+                assert dep.status == "active"
+                assert dep.deployed_digest == SHA
+                # Deploying again to the same environment supersedes the first.
+                dep2 = record_deployment(
+                    session, tenant_id=registry["tenant_a"],
+                    model_version_id=mv.model_version_id, environment="pilot",
+                    approval_id=second_id, deployed_by_user_id=user_id, now=NOW,
+                )
+                assert dep2.status == "active"
+                session.refresh(dep)
+                assert dep.status == "superseded"
+
+
+def test_a_draft_version_cannot_be_deployed(owner_engine, app_sessionmaker, registry):
+    from saintvision.services.lineage import record_deployment
+
+    user_id = new_id("user")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO users (user_id, tenant_id, external_subject, display_name, "
+                "status, created_at, updated_at, version) "
+                "VALUES (:u, :t, 'sub', 'U', 'active', now(), now(), 1)"
+            ),
+            {"u": user_id, "t": registry["tenant_a"]},
+        )
+    subjects = _seed_traceable_subjects(owner_engine, registry, user_id)
+    approval_id = new_id("approval")
+    _deployment_approval(owner_engine, registry, subjects, user_id, digest=SHA, approval_id=approval_id)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, registry["tenant_a"]):
+                mv = _draft(session, registry)  # never released
+                with pytest.raises(InvError, match="only a released"):
+                    record_deployment(
+                        session, tenant_id=registry["tenant_a"],
+                        model_version_id=mv.model_version_id, environment="pilot",
+                        approval_id=approval_id, deployed_by_user_id=user_id, now=NOW,
+                    )
 
 
 def test_a_non_owner_scoped_to_one_tenant_cannot_see_another_tenants_version(

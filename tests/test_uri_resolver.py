@@ -249,6 +249,34 @@ def test_a_catalogued_uri_with_no_ready_replica_is_not_materialisable(app_sessio
 
 
 @pytest_postgres
+def test_a_public_reader_sees_only_locations_in_their_own_active_contribution(
+    app_sessionmaker, catalogued
+):
+    """Codex's owner-scoping (reviewed): a reader_user_id filters to that user's
+    active contributions, so a non-owner cannot resolve someone else's URI even
+    within the same tenant. Omitting reader_user_id is the internal path."""
+    from saintvision.db.session import tenant_scope
+    from saintvision.errors import InvError
+    from saintvision.services import resolver
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, catalogued["tenant_a"]):
+                # The owner resolves their own contribution's location.
+                owned = resolver.resolve_location(
+                    session, tenant_id=catalogued["tenant_a"], uri=catalogued["uri"],
+                    reader_user_id=catalogued["user_id"],
+                )
+                assert owned.location_id == catalogued["location_id"]
+                # A different reader in the same tenant cannot.
+                with pytest.raises(InvError, match="no catalogued location"):
+                    resolver.resolve_location(
+                        session, tenant_id=catalogued["tenant_a"], uri=catalogued["uri"],
+                        reader_user_id="usr_someone_else",
+                    )
+
+
+@pytest_postgres
 def test_rls_hides_the_location_even_when_the_where_would_match(app_sessionmaker, catalogued):
     """A genuine RLS test, not a WHERE test.
 

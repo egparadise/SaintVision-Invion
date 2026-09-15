@@ -1,0 +1,7 @@
+{
+  "parentReport": "vf-deployment-pass.json",
+  "parentSuiteExitCode": 1,
+  "containerSubsetPassed": 8,
+  "note": "Parent failure was duplicate-record fixture; all 8 actual image cases passed. Product code unchanged after this run.",
+  "image": "sha256:bc1eaf277472f884b7afa444657556e937cb7e6c5276537e6c2ff7b7c97b9ced"
+}
