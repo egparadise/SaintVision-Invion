@@ -28,3 +28,13 @@ source_of_truth: "Git"
 - `python tools/check_docs.py` exit0 (480문서), `python tools/check_ontology.py` exit0. 최종 보고 후 재검사한다.
 - 독립 검토: Gemini/Claude 미수신. CI: push 후 동일 코드 SHA 확인 예정. 운영 인수/실장비/SSO 미완료; 57.81%와 VF 운영 0/5 유지.
 - 다음 첫 행동: Gemini는 Desktop 진입·창 동작·접근성·실제 API 연결 독립 검토, Claude는 조회 경로 권한 계약 검토. Codex는 CI 접수와 범위 제한 Obsidian sync를 마무리한다.
+
+## 전달과 다음 행동
+
+- 코드 SHA `81987d3723e4cfca9d8712196136d39f469b83c7`, origin push exit0. [Draft PR29](https://github.com/egparadise/SaintVision-Invion/pull/29), base PR28. 원본48카드 done 변경 없음.
+- 동일 SHA CI가 접수되었지만 billing/spending limit 사유로 job 실행 전 실패했다. Actions 34954330215(backend), 34954330066(docs), 34954330141(frontend), 34954330009(core); PR 이벤트의 추가 check도 ci.json에 원문 사유와 ID를 보존했다. CI build 성공이 아니다.
+- 전체 Obsidian --check exit1: 기존 외부 편집/관리되지 않은 사본 충돌, 쓰기 없음. Git base7d18b62와 공유본 provenance를 대조한 5파일 scoped check→apply→check는 exit0, 전체 hash 일치/잔여0. 최종 evidence와 보고 갱신을 동일 관리 state로 재동기화한다. 일반 Codex 작업판의 외부 변경은 보존한다.
+- 최종 상태: 구현·로컬 build·242시험·실제 Chromium HTTP-fixture7항목 통과. 독립 review와 실backend E2E/SSO/장비 인수는 대기. 현재 blocking은 CI billing 및 외부 검토/운영 인수다.
+- 이어서 할 첫 행동과 담당: Gemini가 PR29의 Desktop 접근성/창 동작/실backend 응답을 검토하고, Claude가 GET 경로와 actor/project 경계를 독립 검토한다. 계정 관리자는 billing/spending limit를 복구한 뒤 동일 코드 CI를 재실행한다. Codex는 검토 결과를 받아 수정한다.
+
+- 최종 scoped sync: 7파일 hash 일치, pending0/conflict0/exit0. sync receipt 추가 후 보고와 함께 재동기화한다. 최종 docs480/ontology 검사 exit0. 로컬 추가 ready 구현은 전달했고 현재 VF-CX-01~04 독립 검토, CX-05 운영 선행조건을 대기한다.
