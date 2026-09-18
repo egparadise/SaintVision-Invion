@@ -1,0 +1,74 @@
+{
+  "scope": "Windows PowerShell remediated launcher, synthetic native command injection and HTTP stub; no production deployment",
+  "remediation": "VB-LAUNCH-01",
+  "sourceSHA256": "3f684b8b27b9bfe53fd51295d9df31e49ce297f1f64e510ab83ca27517dccb3c",
+  "results": [
+    {
+      "case": "tls-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "honestSummaryBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "tests-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "honestSummaryBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "smoke-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "honestSummaryBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "compose-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "honestSummaryBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs",
+        "docker compose -f docker-compose.prod.yml config --quiet"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "success",
+      "injectedNativeExit": 0,
+      "processExit": 0,
+      "zeroErrorsBanner": false,
+      "honestSummaryBanner": true,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs",
+        "docker compose -f docker-compose.prod.yml config --quiet"
+      ],
+      "sourceUnchanged": true
+    }
+  ]
+}
