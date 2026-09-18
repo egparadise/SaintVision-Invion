@@ -15,6 +15,7 @@ try {
     # Step 1: Generate TLS Certificates
     Write-Host "`n[1/5] Verifying TLS 1.3 Certificate Files on Disk..." -ForegroundColor Yellow
     $certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }
+    Write-Host " Certificate target directory: $certDir" -ForegroundColor DarkGray
     $certFile = Join-Path $certDir "saintvision.crt"
     $keyFile = Join-Path $certDir "saintvision.key"
     $pythonCmd = if (Test-Path ".venv\Scripts\python.exe") { ".venv\Scripts\python.exe" } else { "python" }

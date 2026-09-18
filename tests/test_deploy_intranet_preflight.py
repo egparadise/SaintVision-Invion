@@ -198,6 +198,112 @@ def test_certificate_key_mismatch_fails_preflight(tmp_path: Path) -> None:
     assert "do not match or could not be parsed" in res.stdout or "do not match or could not be parsed" in res.stderr
 
 
+def test_default_certificate_fallback_when_env_unset(tmp_path: Path) -> None:
+    """When SAINTVISION_DEV_CERT_DIR is unset or whitespace, falls back to deploy/certs."""
+    tools_dir = tmp_path / "tools"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    (tools_dir / "generate_tls_cert.py").write_text(
+        "import sys\nfrom pathlib import Path\n"
+        "p = Path('deploy/certs')\np.mkdir(parents=True, exist_ok=True)\n"
+        "(p / 'saintvision.crt').write_bytes(b'default-cert')\n"
+        "(p / 'saintvision.key').write_bytes(b'default-key')\n",
+        encoding="utf-8",
+    )
+    content = DEPLOY_SCRIPT.read_text(encoding="utf-8").replace(
+        "    # Step 2: Run Automated Unit and Protocol Tests",
+        "    throw 'stop after default TLS preflight'\n\n    # Step 2: Run Automated Unit and Protocol Tests",
+    )
+    # Test with empty string environment variable to verify IsNullOrWhiteSpace fallback
+    res = run_ps1_in_dir(
+        content,
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": ""},
+    )
+    assert res.returncode == 1
+    assert "stop after default TLS preflight" in res.stdout or "stop after default TLS preflight" in res.stderr
+    default_dir = tmp_path / "deploy" / "certs"
+    assert (default_dir / "saintvision.crt").is_file()
+    assert (default_dir / "saintvision.key").is_file()
+    assert "Certificate files present and non-empty: deploy/certs" in res.stdout.replace("\\", "/")
+
+
+def test_external_certificate_directory_summary_reporting(tmp_path: Path) -> None:
+    """The preflight summary table explicitly reports the external certificate path instead of deploy/certs."""
+    tools_dir = tmp_path / "tools"
+    certs_dir = tmp_path / "injected_ext_certs"
+    dist_dir = tmp_path / "apps" / "web" / "dist"
+    certs_dir.mkdir(parents=True, exist_ok=True)
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    dist_dir.mkdir(parents=True, exist_ok=True)
+
+    (certs_dir / "saintvision.crt").write_bytes(b"cert-data")
+    (certs_dir / "saintvision.key").write_bytes(b"key-data")
+    (dist_dir / "index.html").write_bytes(b"<html>index</html>")
+
+    orig_content = DEPLOY_SCRIPT.read_text(encoding="utf-8")
+
+    stubbed_content = orig_content.replace(
+        "npm test -- --run",
+        "Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0",
+    ).replace(
+        "npm run build",
+        "New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0",
+    ).replace(
+        "node tools/run_browser_smoke.mjs",
+        "Write-Host 'mock smoke pass'; $global:LASTEXITCODE = 0",
+    ).replace(
+        "docker compose -f docker-compose.prod.yml config --quiet",
+        "Write-Host 'mock docker pass'; $global:LASTEXITCODE = 0",
+    )
+
+    res = run_ps1_in_dir(
+        stubbed_content,
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": str(certs_dir)},
+    )
+
+    assert res.returncode == 0
+    # Must report injected external cert dir in summary table
+    normalized_stdout = res.stdout.replace("\\", "/")
+    assert "[1/5] TLS Certificate Files:       PRESENT & NON-EMPTY" in res.stdout
+    assert "injected_ext_certs/saintvision.crt" in normalized_stdout
+    assert "injected_ext_certs/saintvision.key" in normalized_stdout
+    # Default deploy/certs should not be mentioned in Step 1 summary line
+    for line in res.stdout.splitlines():
+        if "[1/5] TLS Certificate Files:" in line:
+            assert "deploy/certs" not in line.replace("\\", "/")
+    assert not (tmp_path / "deploy" / "certs").exists()
+
+
+def test_external_cert_directory_collisions_are_removed_before_generation(tmp_path: Path) -> None:
+    """Stale directories at external target files must be removed before regeneration."""
+    tools_dir = tmp_path / "tools"
+    certs_dir = tmp_path / "external-stale-certs"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    (certs_dir / "saintvision.crt").mkdir(parents=True, exist_ok=True)
+    (certs_dir / "saintvision.key").mkdir(parents=True, exist_ok=True)
+    mock_generator = tools_dir / "generate_tls_cert.py"
+    mock_generator.write_text(
+        "import os\nfrom pathlib import Path\n"
+        "p=Path(os.environ['SAINTVISION_DEV_CERT_DIR'])\n"
+        "(p/'saintvision.crt').write_bytes(b'cert')\n(p/'saintvision.key').write_bytes(b'key')\n",
+        encoding="utf-8",
+    )
+    content = DEPLOY_SCRIPT.read_text(encoding="utf-8").replace(
+        "    # Step 2: Run Automated Unit and Protocol Tests",
+        "    throw 'stop after external TLS preflight'\n\n    # Step 2: Run Automated Unit and Protocol Tests",
+    )
+    res = run_ps1_in_dir(
+        content,
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": str(certs_dir)},
+    )
+    assert res.returncode == 1
+    assert (certs_dir / "saintvision.crt").is_file()
+    assert (certs_dir / "saintvision.key").is_file()
+    assert "stale TLS directory" in res.stdout
+
+
 def test_missing_cert_file_after_generation_halts_immediately(tmp_path: Path) -> None:
     """VB-LAUNCH-01 negative control: missing cert files after exit 0 must halt at Step 1 with exit 1."""
     tools_dir = tmp_path / "tools"
