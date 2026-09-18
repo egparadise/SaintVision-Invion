@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from pitr_readiness import assess, read_settings  # noqa: E402
 
 
-_POSSIBLE = {"archive_mode": "on", "archive_command": "cp %p /arc/%f", "wal_level": "replica"}
+_POSSIBLE = {"archive_mode": "on", "archive_command": "cp %p /arc/%f", "wal_level": "replica", "archive_library": ""}
 
 
 def test_a_fully_configured_cluster_is_possible():

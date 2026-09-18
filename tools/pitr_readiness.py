@@ -1,141 +1,84 @@
-"""Whether a PostgreSQL is configured for point-in-time recovery -- honestly.
+"""Read-only PITR configuration observation, never a restore acceptance certificate.
 
-VF-CL-04 (operations). The backup *media* and retention are operator decisions;
-this assesses whether the cluster can do PITR at all, which is a configuration
-fact this tool can read and must not paper over.
-
-The three verdicts are kept distinct, because collapsing them is exactly how "no
-PITR" gets mistaken for "recovery is fine":
-
-``possible``
-    ``archive_mode`` is on and an ``archive_command`` is set and ``wal_level`` is
-    at least ``replica``. WAL is being shipped somewhere a base backup can be
-    replayed against.
-``absent``
-    One of those is missing. There is no point-in-time recovery, whatever a
-    nightly ``pg_dump`` might suggest -- a dump restores to the dump's instant,
-    not to an arbitrary point.
-``inconclusive``
-    A setting could not be read. Never reported as ``absent`` (which would read
-    as a checked "no"): an unread setting is an open question, and the tool exits
-    non-zero for it just as it does for ``absent``.
-
-Usage:
-    python tools/pitr_readiness.py --dsn postgresql://.../db
-    python tools/pitr_readiness.py --dsn ... --require-pitr   # exit 1 unless possible
+possible means configuration prerequisites only. Base backup, continuous WAL,
+archive durability and recovery to a target time still require actual evidence.
+Use --dsn-env ENV_NAME; connection strings and archive commands are never emitted.
+--require-pitr fails closed because this tool does not verify recovery evidence.
 """
-
 from __future__ import annotations
-
 import argparse
 import json
-import sys
+import os
 
-#: The settings that decide it, and what each must be.
-REQUIRED = ("archive_mode", "archive_command", "wal_level")
-_WAL_ORDER = ("minimal", "replica", "logical")
-
+REQUIRED = ('archive_mode', 'archive_command', 'archive_library', 'wal_level')
 
 def assess(settings: dict[str, str | None]) -> dict:
-    """Pure verdict over a settings snapshot -- no database, so it is testable.
-
-    ``settings`` maps each name in :data:`REQUIRED` to its value, or ``None`` if
-    it could not be read.
-    """
-    missing_reads = [name for name in REQUIRED if settings.get(name) is None]
-    if missing_reads:
-        return {
-            "verdict": "inconclusive",
-            "reasons": [f"{name} could not be read" for name in missing_reads],
-            "settings": settings,
-        }
-
-    reasons: list[str] = []
-    archive_mode = (settings["archive_mode"] or "").lower()
-    if archive_mode not in ("on", "always"):
-        reasons.append(f"archive_mode is {archive_mode!r}, not on/always")
-
-    command = (settings["archive_command"] or "").strip()
-    # A disabled or empty command ships nothing. PostgreSQL reports the literal
-    # string; an empty or clearly-disabled one is not archiving.
-    if not command or command.lower() in ("(disabled)", "off"):
-        reasons.append("archive_command is empty/disabled, so no WAL is shipped")
-
-    wal_level = (settings["wal_level"] or "").lower()
-    if wal_level not in _WAL_ORDER or _WAL_ORDER.index(wal_level) < _WAL_ORDER.index("replica"):
-        reasons.append(f"wal_level is {wal_level!r}, below 'replica'")
-
-    if reasons:
-        return {"verdict": "absent", "reasons": reasons, "settings": settings}
-    return {"verdict": "possible", "reasons": [], "settings": settings}
-
+    missing = [name for name in REQUIRED if not isinstance(settings.get(name), str)]
+    def status(name):
+        value = settings.get(name)
+        if not isinstance(value, str): return 'unread'
+        if name == 'archive_command' and value.strip().lower() in ('(disabled)','off','/bin/true','true',':','rem'): return 'disabled'
+        return 'configured' if value.strip() else 'unset'
+    mode = settings.get('archive_mode')
+    level = settings.get('wal_level')
+    safe = {'archive_mode': mode if mode in ('on','off','always') else 'unknown',
+            'wal_level': level if level in ('minimal','replica','logical') else 'unknown',
+            'archive_command': status('archive_command'), 'archive_library': status('archive_library')}
+    report = {'verdict': 'inconclusive', 'reasons': [], 'settings': safe,
+              'scope': 'configuration-only', 'pitrVerified': False,
+              'requiresEvidence': ['base-backup', 'continuous-archived-wal', 'target-time-recovery', 'retention-and-media']}
+    if missing:
+        report['reasons'] = [name + ' could not be read' for name in missing]
+        return report
+    reasons = []
+    if mode not in ('on','always'): reasons.append('archive_mode is not on/always')
+    command = settings['archive_command'].strip()
+    library = settings['archive_library'].strip()
+    if command and library:
+        report['reasons'] = ['archive_command and archive_library are both configured']
+        return report
+    if not library and command.lower() in ('','(disabled)','off','/bin/true','true',':','rem'):
+        reasons.append('archive_command is empty/disabled/no-op and archive_library is unset')
+    if level not in ('replica','logical'): reasons.append('wal_level is not replica/logical')
+    report['verdict'] = 'absent' if reasons else 'possible'
+    report['reasons'] = reasons or ['Configuration observed; WAL delivery and recovery have not been verified']
+    return report
 
 def read_settings(dsn: str) -> dict[str, str | None]:
-    """Read the deciding settings from a live cluster, each independently.
-
-    A read that errors yields ``None`` for that setting -- an inconclusive, not a
-    false "off".
-    """
     import psycopg
-
-    out: dict[str, str | None] = {}
-    with psycopg.connect(dsn, connect_timeout=10) as conn:
+    out = {}
+    with psycopg.connect(dsn, connect_timeout=10, autocommit=True,
+                         options='-c default_transaction_read_only=on -c statement_timeout=3000') as conn:
         for name in REQUIRED:
             try:
-                row = conn.execute("SELECT current_setting(%s, true)", (name,)).fetchone()
+                row = conn.execute('SELECT current_setting(%s, true)', (name,)).fetchone()
                 out[name] = row[0] if row else None
-            except Exception:  # noqa: BLE001 - an unread setting is None, not a guess
+            except psycopg.Error:
                 out[name] = None
     return out
 
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dsn", required=True, help="libpq DSN of the cluster to assess")
-    parser.add_argument(
-        "--require-pitr",
-        action="store_true",
-        help="exit non-zero unless the verdict is 'possible' (a deployment gate)",
-    )
-    parser.add_argument("--json", action="store_true")
-    args = parser.parse_args()
-
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument('--dsn-env', default='INV_PITR_DSN', help='Environment variable holding the libpq DSN')
+    parser.add_argument('--require-pitr', action='store_true', help='Require verified recovery; settings alone always fail this gate')
+    parser.add_argument('--json', action='store_true')
+    args, unknown = parser.parse_known_args()
+    if unknown: parser.error("Unsupported arguments; use --dsn-env ENV_NAME")
     try:
-        settings = read_settings(args.dsn)
-    except Exception as error:  # noqa: BLE001
-        report = {
-            "verdict": "inconclusive",
-            "reasons": [f"could not connect: {type(error).__name__}"],
-            "settings": {},
-        }
-    else:
-        report = assess(settings)
-
-    if args.json:
-        print(json.dumps(report, indent=2))
-    else:
-        print(f"PITR: {report['verdict']}")
-        for name, value in report["settings"].items():
-            print(f"  {name} = {value!r}")
-        for reason in report["reasons"]:
-            print(f"  - {reason}")
-        if report["verdict"] == "absent":
-            print(
-                "\nNo point-in-time recovery. A logical dump restores to the dump's "
-                "instant, not to an arbitrary point; do not record this as PITR."
-            )
-        elif report["verdict"] == "inconclusive":
-            print("\nNOT established. An unread setting is an open question, not a 'no'.")
-
-    # 'possible' -> 0. 'absent'/'inconclusive' -> non-zero when a gate is requested;
-    # without the gate the tool still reports and exits 0 for 'possible', 2 otherwise
-    # so a caller can branch without --require-pitr.
-    if report["verdict"] == "possible":
-        return 0
+        dsn = os.environ.get(args.dsn_env)
+        if not dsn: raise ValueError('Connection input unavailable')
+        report = assess(read_settings(dsn))
+    except Exception:
+        report = assess({})
+        report['reasons'] = ['Connection or settings unavailable; private diagnostics suppressed']
     if args.require_pitr:
-        return 1
-    return 2
+        report['reasons'].append('PITR acceptance requires separately verified recovery evidence')
+    if args.json: print(json.dumps(report, indent=2))
+    else:
+        print('PITR configuration: ' + report['verdict'])
+        print('Recovery verified: false')
+        for reason in report['reasons']: print('  - ' + reason)
+    return 1 if args.require_pitr else (0 if report['verdict'] == 'possible' else 2)
 
-
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__':
+    raise SystemExit(main())

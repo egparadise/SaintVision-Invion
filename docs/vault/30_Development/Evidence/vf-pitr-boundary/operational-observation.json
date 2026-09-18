@@ -1,0 +1,23 @@
+{
+  "verdict": "absent",
+  "reasons": [
+    "archive_mode is not on/always",
+    "archive_command is empty/disabled/no-op and archive_library is unset",
+    "PITR acceptance requires separately verified recovery evidence"
+  ],
+  "settings": {
+    "archive_mode": "off",
+    "wal_level": "replica",
+    "archive_command": "disabled",
+    "archive_library": "unset"
+  },
+  "scope": "configuration-only",
+  "pitrVerified": false,
+  "requiresEvidence": [
+    "base-backup",
+    "continuous-archived-wal",
+    "target-time-recovery",
+    "retention-and-media"
+  ],
+  "exitCode": 1
+}

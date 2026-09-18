@@ -1,7 +1,7 @@
 ---
 doc_id: "OPS-VF-CL-04-001"
 title: "VF-CL-04 replica 복구와 PITR 운영 runbook"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
@@ -43,10 +43,10 @@ tags: ["saintvision", "vf-cl-04", "runbook", "replica", "pitr", "operations"]
 
 ## 4. PITR (backup) readiness
 
-- 도구: `python tools/pitr_readiness.py --dsn <libpq DSN> [--require-pitr]`.
-- 판정: possible(archive_mode on + archive_command + wal_level>=replica) / absent(하나라도 결여 → 시점 복구 없음) / inconclusive(설정 미판독 → 미확정, 'no' 아님).
+- 도구: `python tools/pitr_readiness.py --dsn-env INV_PITR_DSN [--require-pitr]`.
+- 판정: possible(archive_mode on/always + command 또는 library + replica/logical WAL 설정 후보) / absent(필수 설정 부재) / inconclusive(미판독 또는 모순). 모든 결과는 설정 관측이며 실제 복구 가능성을 증명하지 않는다.
 - 논리 dump는 PITR이 아니다 -- dump 시점으로만 복원된다. absent를 backup 있음으로 기록하지 않는다.
-- 기본 배포(archive_mode off)는 absent다. PITR을 요구하는 배포는 --require-pitr로 게이트(exit 1 unless possible)한다.
+- 기본 배포(archive_mode off)는 absent다. --require-pitr는 실제 복구 증거가 없는 이 도구에서 항상 exit 1로 인수를 차단한다.
 - backup 매체·보존·오프사이트는 운영자 결정. 이 runbook은 readiness 판정만 제공한다.
 
 ## 5. 하지 않는 것 (경계)
@@ -62,3 +62,12 @@ tags: ["saintvision", "vf-cl-04", "runbook", "replica", "pitr", "operations"]
 - replica_health/locations_needing_repair/fleet_replica_summary/mark_node_replicas_unavailable: throwaway postgres:16 8 시험 통과.
 - pitr_readiness.assess/read_settings: 9 시험 통과(default 클러스터 absent 실측 포함).
 - 로컬 clean-room 검증이며 CI·실장비 인수는 아님.
+
+
+## Codex 통합 정정: 설정 관측과 복구 인수
+
+`--dsn-env INV_PITR_DSN --json`은 환경변수의 연결정보로 읽기전용 점검한다. DSN이나 archive_command/library 원문을 출력하지 않는다. possible은 설정전제 후보만 뜻하며 WAL실제전송/매체/연속성/목표시각복구는미검증이다. `pitrVerified:false`를항상표시하고 `--require-pitr`는설정만으로exit0을반환하지않는다(exit1). 일반관측은 possible0/absent·inconclusive2다.
+
+archive_command 또는 archive_library를관측하고 양쪽설정충돌/미조회는inconclusive다. 설정이되었다고실행하거나명령의안전성을인증하지않는다. pg_dump복원통과도PITR인수가아니다. 운영자는검증된basebackup·연속WAL·target-time복구·보관매체 Evidence를별도로확보한다.
+
+근거: [PostgreSQL16 연속보관](https://www.postgresql.org/docs/16/continuous-archiving.html), [WAL 설정](https://www.postgresql.org/docs/16/runtime-config-wal.html). 검토/재현: [[2026-09-18_VF-PITR-BOUNDARY_Codex]].
