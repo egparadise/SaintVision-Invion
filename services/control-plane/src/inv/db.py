@@ -14,6 +14,7 @@ class BoundDatabase:
         self.recovery_epoch, self.tenant, self.conn = db.recovery_epoch, tenant, conn
         self.shard_recovery_admission = getattr(db, "shard_recovery_admission", False)
         self.business_handoff = getattr(db, "business_handoff", False)
+        self.registry_binding_policy = getattr(db, "registry_binding_policy", None)
 
     @contextmanager
     def transaction(self, tenant):
@@ -23,7 +24,12 @@ class BoundDatabase:
 
 
 class Database:
-    def __init__(self, dsn: str, *, recovery_epoch: str):
+    def __init__(self, dsn: str, *, recovery_epoch: str, registry_binding_policy=None):
+        if registry_binding_policy is not None:
+            from .model_registry_binding import RegistryBindingPolicy
+            if not isinstance(registry_binding_policy, RegistryBindingPolicy):
+                raise ValueError("Operator registry binding policy required")
+        self.registry_binding_policy = registry_binding_policy
         self._dsn = dsn
         self.recovery_epoch = str(UUID(recovery_epoch))
 

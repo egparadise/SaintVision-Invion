@@ -1,0 +1,114 @@
+{
+  "baseSha": "1b39d403e5973eab86ab90ccb2ffb6aae3930a6e",
+  "testFileSha256": "833a3f71be7bd4f5ed26d7453937d1c30c2a94c7c444e464ced0afd93fee2ddd",
+  "suite": "tests/integration/test_model_registry_runtime.py",
+  "command": "python -m pytest tests/integration/test_model_registry_runtime.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 48.36,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 22
+  },
+  "cases": [
+    {
+      "name": "test_bound_registry_reaches_signed_launch[local]",
+      "status": "passed"
+    },
+    {
+      "name": "test_bound_registry_reaches_signed_launch[remote]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retirement_during_read_prevents_commit[local]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retirement_during_read_prevents_commit[remote]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[local-replay]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[local-approval]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[local-dispatch]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[local-claim]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[local-delivery]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[remote-replay]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[remote-approval]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[remote-dispatch]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[remote-claim]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retired_registry_cannot_cross_execution_gate[remote-delivery]",
+      "status": "passed"
+    },
+    {
+      "name": "test_policy_change_after_approval_prevents_claim[local-removed]",
+      "status": "passed"
+    },
+    {
+      "name": "test_policy_change_after_approval_prevents_claim[local-changed]",
+      "status": "passed"
+    },
+    {
+      "name": "test_policy_change_after_approval_prevents_claim[remote-removed]",
+      "status": "passed"
+    },
+    {
+      "name": "test_policy_change_after_approval_prevents_claim[remote-changed]",
+      "status": "passed"
+    },
+    {
+      "name": "test_configured_policy_requires_registry_identity[local]",
+      "status": "passed"
+    },
+    {
+      "name": "test_configured_policy_requires_registry_identity[remote]",
+      "status": "passed"
+    },
+    {
+      "name": "test_enabling_policy_cannot_replay_legacy_freeze[local]",
+      "status": "passed"
+    },
+    {
+      "name": "test_enabling_policy_cannot_replay_legacy_freeze[remote]",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "e3eb2c829b16f35b90d72ea4c34c097a813e23646d5281d4df0bffd7dd042409",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services/control-plane/src/inv/approvals.py": "6f38bcd3fc45a175af62d005b4ec88efe2a39bd061ef9f7ffd742c91ddfb743e",
+    "services/control-plane/src/inv/db.py": "aaf75a12c643ca7a66141d816e7bcdbeeb69e2f1839a2507757de548abe5e46f",
+    "services/control-plane/src/inv/model_runtime.py": "c4736f61791edd51355c33b5e2289184c22f4a5c8eb39f63b663ecf8789aeff8",
+    "services/control-plane/src/inv/model_execution_registry.py": "c4255405a27fca4e72d8e040424fdcd6b3423559b1c4a24d5ce07f4d7b16eae0"
+  },
+  "recordedAtKst": "2026-09-18T13:17:07+09:00"
+}

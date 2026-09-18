@@ -25,6 +25,7 @@ from .model_locality import _capture
 from .model_manifest import ConfiguredModelVerifier, canonical, manifest_copy, rejected
 from .model_remote import ConfiguredRemoteModelReader
 from .model_source import SOURCE_FILE, capture_channels, frozen_sources, source_content, source_records
+from .model_execution_registry import REGISTRY_FILE, current_registry, frozen_registry
 from .node_channels import assert_channel
 from .runs import event
 from .workspace_files import FORMAT, canonical as workspace_canonical
@@ -114,6 +115,7 @@ def approved_model(
         if saved_channels and capture_channels(conn, principal.tenant_id, epoch, current) != saved_channels:
             rejected()
         assert_fences(conn, run["run_id"], proofs)
+    frozen_registry(conn, database, principal, binding, raw, workload["workspaceId"])
     return {
         "startId": ref["inputId"],
         "stepId": ref["inputId"],
@@ -130,7 +132,16 @@ class ModelRuntimeStore:
         self.db, self.verifier = database, verifier
         self.auth = ApprovalStore(database)
 
-    def _scope(self, conn, principal, project, run_id, workload, proofs):
+    def _registry_replay(self, conn, principal, project, run_id, prior):
+        row = conn.execute(
+            "SELECT snapshot,workload FROM inv.model_runtime_inputs WHERE project_id=%s AND run_id=%s",
+            (project, run_id)).fetchone()
+        if not row or row["workload"] != prior["workload"]:
+            rejected()
+        frozen_registry(conn, self.db, principal, bound_input(conn, project, run_id),
+                        bytes(row["snapshot"]), row["workload"]["workspaceId"])
+
+    def _scope(self, conn, principal, project, run_id, workload, proofs, registry_version_id=None):
         run = lock_run(conn, run_id, project)
         require_execution(conn)
         if run["state"] != "planned" or run["attempt"] != 0:
@@ -158,9 +169,10 @@ class ModelRuntimeStore:
             capture_channels(conn, principal.tenant_id, self.db.recovery_epoch, locations)
             if isinstance(self.verifier, ConfiguredRemoteModelReader) else ()
         )
-        return (run["version"], binding, body, locations, channels)
+        registry = current_registry(conn, self.db, principal, binding, registry_version_id)
+        return (run["version"], binding, body, locations, channels, registry)
 
-    def prepare(self, principal, project, run_id, workload, proofs, *, key):
+    def prepare(self, principal, project, run_id, workload, proofs, *, key, registry_version_id=None):
         workload = deepcopy(workload)
         validate_contract("WorkloadSpec", workload)
         proofs = json.loads(canonical(proofs))
@@ -176,6 +188,8 @@ class ModelRuntimeStore:
         ):
             raise DomainError("MODEL-0002", "Independent CPU model file workload required", 422)
         payload = {"runId": run_id, "workload": workload, "fences": proofs}
+        if registry_version_id is not None:
+            payload["registryVersionId"] = registry_version_id
         if isinstance(self.verifier, ConfiguredRemoteModelReader):
             # A local commitment cannot be replayed as remote verification merely
             # by changing the configured provider while retaining the same key.
@@ -185,13 +199,14 @@ class ModelRuntimeStore:
             self.auth._grant(conn, project, principal.subject_id, "can_request")
             if prior is not None:
                 permission(conn, project, principal.subject_id, "can_request", linked=True)
+                self._registry_replay(conn, principal, project, run_id, prior)
                 return prior
             if conn.execute(
                 "SELECT 1 FROM inv.model_runtime_inputs WHERE run_id=%s", (run_id,)
             ).fetchone():
                 raise DomainError("MODEL-0003", "Model runtime input already frozen", 409)
-            captured = self._scope(conn, principal, project, run_id, workload, proofs)
-        _, binding, body, locations, channels = captured
+            captured = self._scope(conn, principal, project, run_id, workload, proofs, registry_version_id)
+        _, binding, body, locations, channels, registry = captured
         if isinstance(self.verifier, ConfiguredRemoteModelReader):
             remote = self.verifier.read(body, locations, channels,
                 tenant_id=principal.tenant_id, recovery_epoch=self.db.recovery_epoch)
@@ -215,6 +230,8 @@ class ModelRuntimeStore:
             rejected()
         # Paths are fixed by this adapter, never copied from Catalog/UI filenames.
         contents = {"model/%04d.bin" % i: value for i, value in chunks.items()}
+        if registry is not None:
+            contents[REGISTRY_FILE] = canonical(registry)
         records = source_records(locations, channels)
         if channels:
             contents[SOURCE_FILE] = source_content(records)
@@ -269,8 +286,9 @@ class ModelRuntimeStore:
                 self.auth._grant(conn, project, principal.subject_id, "can_request")
                 if prior is not None:
                     permission(conn, project, principal.subject_id, "can_request", linked=True)
+                    self._registry_replay(conn, principal, project, run_id, prior)
                     return prior
-                if self._scope(conn, principal, project, run_id, workload, proofs) != captured:
+                if self._scope(conn, principal, project, run_id, workload, proofs, registry_version_id) != captured:
                     rejected()
                 conn.execute(
                     """INSERT INTO inv.model_runtime_inputs

@@ -1,0 +1,58 @@
+{
+  "baseSha": "1b39d403e5973eab86ab90ccb2ffb6aae3930a6e",
+  "testFileSha256": "fb4f685bb7473049e97e9b03dbe258c0d880980d4893f4ec051ddb4696c24fd5",
+  "suite": "tests/integration/test_model_retry.py",
+  "command": "python -m pytest tests/integration/test_model_retry.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 21.02,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 8
+  },
+  "cases": [
+    {
+      "name": "test_retry_uses_new_run_fences_and_requires_new_approval",
+      "status": "passed"
+    },
+    {
+      "name": "test_three_generations_are_a_hard_budget",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[active]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[cancel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[grant]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[bytes]",
+      "status": "passed"
+    },
+    {
+      "name": "test_failed_new_reservation_rolls_back_child_and_lineage",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_retry_is_single_child_and_tenant_private",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "24dda09ba5b8003a94c342274381823730b278abd2eedc3c3139c2ed36f382f8",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services/control-plane/src/inv/approvals.py": "6f38bcd3fc45a175af62d005b4ec88efe2a39bd061ef9f7ffd742c91ddfb743e",
+    "services/control-plane/src/inv/db.py": "aaf75a12c643ca7a66141d816e7bcdbeeb69e2f1839a2507757de548abe5e46f",
+    "services/control-plane/src/inv/model_runtime.py": "c4736f61791edd51355c33b5e2289184c22f4a5c8eb39f63b663ecf8789aeff8",
+    "services/control-plane/src/inv/model_execution_registry.py": "c4255405a27fca4e72d8e040424fdcd6b3423559b1c4a24d5ce07f4d7b16eae0"
+  },
+  "recordedAtKst": "2026-09-18T13:17:07+09:00"
+}

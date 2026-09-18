@@ -436,3 +436,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 후속사용자 clean816346c 두파일17passed/0failed(실Docker포함)수신,R4-01해소확인. 새R5-01/02는해당시험밖의경계로보류유지. Claude e89a415/8c347b7 소스검토배정수신·결과대기.
 
 - VF-CX-02/03 registry 트랜잭션 재검사 구현(base f2297ae), 실제PG 신규7+기존16=23passed/0skip/0failed. 기존 결속만 허용하고 호출자 잠금 유지. frozen workload/승인 연결은 다음 Codex, 독립검토는 Claude 대기. [[2026-09-18_Registry_트랜잭션재검사_Codex]].
+
+- VF-CX-02/03 registry frozen workload·승인/dispatch/delivery/claim 결속 구현(base1b39d40), 실제PG84+오프라인60=144passed/0failed/0skip. policy 제거·변경/retired 거부. 독립검토 Claude 대기, 운영 정책 구성 연결은 후속. 사용자 helper 독립23통과 수신, 외부대기4건 유지. [[2026-09-18_Registry_실행권한결속_Codex]].

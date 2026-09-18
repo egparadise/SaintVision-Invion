@@ -1,0 +1,24 @@
+{
+  "reviewedSha": "d59b8a6",
+  "offline": {
+    "passed": 22,
+    "deselected": 2,
+    "exitCode": 0,
+    "junitSha256": "7a0f6f1d627164bc82916c71f855e1eef4b3d27e4f501b35733c3099a31d9b57"
+  },
+  "isolatedSourceImport": {
+    "selectedFileCount": 499,
+    "files": [
+      "tools/check_kernel_docker.py",
+      "tools/docker_diag.py",
+      "tests/vf_docker.py"
+    ],
+    "pythonIsolated": true,
+    "exitCode": 0
+  },
+  "imageLaneRun": false,
+  "dockerPruneRun": false,
+  "authorReportedPassed": 24,
+  "userIndependentResult": "pending",
+  "r5SourceAndOfflineVerdict": "resolved; final landing awaits reported independent result"
+}

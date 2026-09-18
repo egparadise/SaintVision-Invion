@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.6.2"
+version: "1.7.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -118,3 +118,14 @@ ModelRuntimeStore의 명시 remote reader 경로를 구현했다. 기존 Run/Nod
 ModelRegistryBindingStore.revalidate(conn, ...)는 이미 생성된 불변 결속만 허용한다. bind와 같은 현재 project/business 권한·manifest hash·운영자 policy·registry released/verified/retention 조건을 적용한다. 정확한 registryVersionId와 manifest identity를 요구하며 새 결속을 만들거나 기존 값을 수정하지 않는다. registry SHARE 잠금은 호출자 트랜잭션 종료까지 유지한다. 신뢰된 kernel 트랜잭션 안에서만 호출하며 network I/O를 포함하지 않는다.
 
 실제 PG16에서 신규 7건과 기존 binding 16건을 파일별로 검증했다. 아직 ModelRuntimeStore/승인/dispatch에 연결하지 않았으므로 실행권한 결속 완료는 아니다. 다음 단계는 frozen binding hash와 Run 입력 결속, 현재 policy를 포함한 승인/delivery/claim 재검사다. [[2026-09-18_Registry_트랜잭션재검사_Codex]].
+
+
+## Registry 실행권한 연결 (1.7.0)
+
+기존 1.6.x의 후속 항목을 trusted worker 경로에 구현했다. 운영자는 Database에 명시 RegistryBindingPolicy를 주고 ModelRuntimeStore.prepare에 정확한 registry_version_id를 전달한다. BoundDatabase는 같은 policy를 전달한다. policy 설정 시 registry ID/기존 결속 누락은 거부하며, 명시 ID를 주었는데 policy가 없을 때도 거부한다. 이름·URI·hash로 자동 registry 조회하지 않는다.
+
+읽기 전후 현재 결속/권한/registry stage·verified·retention·policy를 검사하고, canonical binding을 고정 model/registry.json에 포함한다. 전체 snapshot hash가 WorkloadSpec.modelInput.inputSha256와 action_digest에 들어가므로 승인 뒤 binding을 바꾸면 같은 승인으로 사용할 수 없다. 기존 immutable snapshot/schema를 재사용하며 DDL 변경은 없다.
+
+승인 요청, ApprovalStore.dispatch(재호출 포함), DeliveryQueue, ToolGateway.claim은 현재 결속과 frozen bytes를 비교한다. 현재 registry SHARE 잠금은 각 실행 gate 트랜잭션 종료까지 유지한다. policy를 없애서 registry 입력을 kernel-only로 바꾸는 경로는 없다. policy 활성화 뒤 과거 미결속 입력도 거부된다. 승인 요청의 기존 replay는 과거 수신 결과일 뿐 새로운 실행인가가 아니며 dispatch/claim은 항상 다시 검사한다.
+
+policy 미설정의 기존 kernel-only 실행은 registry 승인이라고 표시하지 않는다. 공개 HTTP 설정/운영자 정책 배포는 별도이며 모든 trusted worker가 일관된 현재 policy를 제공해야 한다. 실제 Node 실행/실장비 인수는 이 PG 검증 범위 밖이다. [[2026-09-18_Registry_실행권한결속_Codex]].

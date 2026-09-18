@@ -88,7 +88,7 @@ def preparing(remote, monkeypatch):
     monkeypatch.setattr("inv.model_runtime.event", lambda *a: None)
     monkeypatch.setattr("inv.model_runtime.assert_fences", lambda *a: None)
     state.captured = (1, {"node_id": channels[0].node_id,
-        "manifest_sha256": hashlib.sha256(canonical(body)).hexdigest()}, body, locations, channels)
+        "manifest_sha256": hashlib.sha256(canonical(body)).hexdigest()}, body, locations, channels, None)
     def scope(*args):
         assert state.in_tx
         state.scopes += 1
@@ -155,7 +155,7 @@ def test_admission_rechecks_remote_authority_before_returning_bytes(preparing, m
     row = dict(zip(("tenant_id", "project_id", "run_id", "input_id", "recovery_epoch",
                     "requester_id", "workload", "snapshot", "locations"), args))
     row["workload"], row["locations"] = row["workload"].obj, row["locations"].obj
-    _, binding, body, locations, channels = a.state.captured
+    _, binding, body, locations, channels, _ = a.state.captured
     binding = {**binding, "input": {"leases": []}}
     conn = SimpleNamespace(execute=lambda *a: SimpleNamespace(fetchone=lambda: row))
     monkeypatch.setattr("inv.model_runtime.require_model_reference", lambda *a: None)

@@ -1,0 +1,18 @@
+{
+  "baseSha": "1b39d40",
+  "recordedAtKst": "2026-09-18T13:17:07+09:00",
+  "command": "python -m pytest tests/core/test_model_execution_registry.py tests/core/test_model_source.py tests/core/test_model_remote.py -q --tb=short --junitxml=.work/registry-runtime-offline.xml",
+  "exitCode": 0,
+  "passed": 60,
+  "failed": 0,
+  "skipped": 0,
+  "junitSha256": "2f53f8e47888eebecbedc4cd00b673a2fa2f11145190e7ce4f86633615c0b7c5",
+  "testedWorkingTreeSources": {
+    "services/control-plane/src/inv/approvals.py": "6f38bcd3fc45a175af62d005b4ec88efe2a39bd061ef9f7ffd742c91ddfb743e",
+    "services/control-plane/src/inv/db.py": "aaf75a12c643ca7a66141d816e7bcdbeeb69e2f1839a2507757de548abe5e46f",
+    "services/control-plane/src/inv/model_runtime.py": "c4736f61791edd51355c33b5e2289184c22f4a5c8eb39f63b663ecf8789aeff8",
+    "services/control-plane/src/inv/model_execution_registry.py": "c4255405a27fca4e72d8e040424fdcd6b3423559b1c4a24d5ce07f4d7b16eae0"
+  },
+  "imageLaneRun": false,
+  "scope": "offline; synthetic transport; not equipment acceptance"
+}

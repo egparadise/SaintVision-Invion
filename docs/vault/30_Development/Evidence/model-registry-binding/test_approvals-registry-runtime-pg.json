@@ -1,0 +1,126 @@
+{
+  "baseSha": "1b39d403e5973eab86ab90ccb2ffb6aae3930a6e",
+  "testFileSha256": "84809c2a6f1476f0187e616618ab286d6c3edab5e1967b5483de235452c66291",
+  "suite": "tests/integration/test_approvals.py",
+  "command": "python -m pytest tests/integration/test_approvals.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 24.97,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 25
+  },
+  "cases": [
+    {
+      "name": "test_request_replay_and_scope_are_immutable",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change0]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change2]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change3]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change4]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change5]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change6]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change7]",
+      "status": "passed"
+    },
+    {
+      "name": "test_untrusted_or_weakened_policy_cannot_create_approval[change8]",
+      "status": "passed"
+    },
+    {
+      "name": "test_quorum_and_direct_state_bypass_are_blocked",
+      "status": "passed"
+    },
+    {
+      "name": "test_challenge_is_actor_bound_rotating_and_digest_bound",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_nonce_does_not_consume_vote",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_decision_race_is_exactly_once_and_survives_store_restart",
+      "status": "passed"
+    },
+    {
+      "name": "test_distinct_voters_race_and_dispatch_race_emit_one_command",
+      "status": "passed"
+    },
+    {
+      "name": "test_revoked_grants_stop_dispatch_and_cannot_be_self_restored[requester]",
+      "status": "passed"
+    },
+    {
+      "name": "test_revoked_grants_stop_dispatch_and_cannot_be_self_restored[alice]",
+      "status": "passed"
+    },
+    {
+      "name": "test_content_change_wrong_tenant_and_wrong_project_are_denied",
+      "status": "passed"
+    },
+    {
+      "name": "test_audit_failure_rolls_back_nonce_vote_dispatch_and_outbox[decision]",
+      "status": "passed"
+    },
+    {
+      "name": "test_audit_failure_rolls_back_nonce_vote_dispatch_and_outbox[dispatch]",
+      "status": "passed"
+    },
+    {
+      "name": "test_rejection_is_terminal_and_audited",
+      "status": "passed"
+    },
+    {
+      "name": "test_expiry_closes_pending_or_approved_run_once[False]",
+      "status": "passed"
+    },
+    {
+      "name": "test_expiry_closes_pending_or_approved_run_once[True]",
+      "status": "passed"
+    },
+    {
+      "name": "test_cancelled_run_or_restored_epoch_invalidates_approval[cancel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_cancelled_run_or_restored_epoch_invalidates_approval[epoch]",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "bcecd9ea27fb8cae8a53c5327824d08bb5f9335547fa537b787c6bfec013894f",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services/control-plane/src/inv/approvals.py": "6f38bcd3fc45a175af62d005b4ec88efe2a39bd061ef9f7ffd742c91ddfb743e",
+    "services/control-plane/src/inv/db.py": "aaf75a12c643ca7a66141d816e7bcdbeeb69e2f1839a2507757de548abe5e46f",
+    "services/control-plane/src/inv/model_runtime.py": "c4736f61791edd51355c33b5e2289184c22f4a5c8eb39f63b663ecf8789aeff8",
+    "services/control-plane/src/inv/model_execution_registry.py": "c4255405a27fca4e72d8e040424fdcd6b3423559b1c4a24d5ce07f4d7b16eae0"
+  },
+  "recordedAtKst": "2026-09-18T13:17:07+09:00"
+}

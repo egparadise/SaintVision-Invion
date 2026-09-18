@@ -230,7 +230,7 @@ class ApprovalStore:
 
             require_model_reference(conn, run, workload)
             if "modelInput" in workload:
-                approved_model(conn, run, workload, self.db.recovery_epoch, requester=principal.subject_id)
+                approved_model(conn, run, workload, self.db.recovery_epoch, database=self.db, requester=principal.subject_id)
             changed = self.runs._transition(
                 conn, principal.tenant_id, run, "awaiting_approval", expected_version
             )
@@ -435,6 +435,10 @@ class ApprovalStore:
                 )
             if principal.subject_id != row["requester_id"] or action_hash != row["action_digest"]:
                 raise DomainError("AUTH-0011", "Approval and action do not match", 403)
+            if "modelInput" in workload:
+                from .model_runtime import approved_model
+                approved_model(conn, run, workload, self.db.recovery_epoch,
+                               database=self.db, requester=principal.subject_id)
             if prior is not None:
                 return prior
             self._current(conn, run, row, {"approved"})

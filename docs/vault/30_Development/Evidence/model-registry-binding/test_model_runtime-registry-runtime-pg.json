@@ -1,0 +1,118 @@
+{
+  "baseSha": "1b39d403e5973eab86ab90ccb2ffb6aae3930a6e",
+  "testFileSha256": "860f9986fb5effa083900a4df76c3f529139b61577b334ccbd4dff9bb316c4ed",
+  "suite": "tests/integration/test_model_runtime.py",
+  "command": "python -m pytest tests/integration/test_model_runtime.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 43.08,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 23
+  },
+  "cases": [
+    {
+      "name": "test_frozen_bytes_and_model_hash_are_bound_to_approved_signed_plan",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_is_immutable_idempotent_and_tenant_scoped",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[cancel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[grant]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[lease]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[epoch]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[location]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[root]",
+      "status": "passed"
+    },
+    {
+      "name": "test_freeze_rechecks_authority_after_file_io[node]",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_model_input_cannot_freeze[bytes]",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_model_input_cannot_freeze[missing-proof]",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_model_input_cannot_freeze[stale-proof]",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_model_input_cannot_freeze[foreign-node]",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_model_input_cannot_freeze[gpu]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[cancel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[grant]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[node]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[root]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[fence]",
+      "status": "passed"
+    },
+    {
+      "name": "test_model_admission_rechecks_current_authority[changed-action]",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_freeze_keeps_one_snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "test_queued_model_cannot_start_after_storage_authority_changes",
+      "status": "passed"
+    },
+    {
+      "name": "test_adapter_cannot_commit_inconsistent_frozen_bytes",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "f7b002890d14616396abf00c9b8ff1e35f319a772d9b4b6fadd984ee5edb872f",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services/control-plane/src/inv/approvals.py": "6f38bcd3fc45a175af62d005b4ec88efe2a39bd061ef9f7ffd742c91ddfb743e",
+    "services/control-plane/src/inv/db.py": "aaf75a12c643ca7a66141d816e7bcdbeeb69e2f1839a2507757de548abe5e46f",
+    "services/control-plane/src/inv/model_runtime.py": "c4736f61791edd51355c33b5e2289184c22f4a5c8eb39f63b663ecf8789aeff8",
+    "services/control-plane/src/inv/model_execution_registry.py": "c4255405a27fca4e72d8e040424fdcd6b3423559b1c4a24d5ce07f4d7b16eae0"
+  },
+  "recordedAtKst": "2026-09-18T13:17:07+09:00"
+}
