@@ -1,17 +1,30 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-18T13:40:06+09:00"
+updated: "2026-09-18T14:30:17+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
 개발 기준 코드 d7e7d13, 후속image실행 기준 f4b3f73, 공유 branch integration/all-agents-unified. 사용자 요청에 따른 상태 감사이며 새 제품 구현/운영 재실행은 하지 않았다. 각 행의 SHA·범위에만 결과를 적용한다. 통과 건수는 중복 합산하지 않는다. 작성자 실행, 사용자 독립 실행, Claude 소스 검토, CI, 운영 인수는 서로 대체하지 않는다.
+
+## MJS 검사 수치의 현재 보증 범위
+
+수신 숫자는 실행별 기록으로 보존하되 실제 장비·화면 인수로 승격하지 않는다. [[2026-09-18_MJS_수치인용_정정_Codex]] 및 [[2026-09-18_MJS_후속3도구_감사_Codex]]가 아래 범위의 근거다.
+
+| 수치·도구 | 수치가 보여주는 범위 | 보증하지 않는 것 / 남은 조건 |
+|---|---|---|
+| 2-PC67 checks / verify_two_pc_distributed_execution.mjs | 해당 실행의 HTTP 응답 필드·상태 조건. 감사에서는 합성 fetch로67/67 재현 | 새dispatch와 receipt의run/node/attempt/epoch 결속, artifact bytes/hash, 실제2PC·GPU 학습·브라우저. VB-MJS-03 수정/음성대조 및 실제장비 관측 필요 |
+| browser smoke200/202 checks / run_browser_smoke.mjs | 당시 runner의 HTTP/WebSocket 등 조건 집계. 숫자 자체가 DOM/화면 조작 관측 수는 아님 | UI상수true3건은 관측0인 PASS, 구버전shard2단언은 빈목록가드 없음. shard가드는9251f18 수정/작성자·사용자12회귀 확인, 전체200/202 재실행/재인증 아님. VB-MJS-02 수정 필요 |
+| reconciliation59 checks / reconcile_receipts_evidence.mjs | 감사의 합성 응답+로컬해시 계산으로59/59. 과거보고는 각 실행SHA·입력 범위만 적용 | 실제5화면 DOM관측, working/frozen bytes대조, receipt-shard-output 결속. VB-MJS-03/04/05 수정 필요 |
+| 별도 실제 browser6passed | 합성IdP+실제HTTP+격리PG 기반 해당 브라우저 시나리오 | 위MJS와 다른 harness/분모다. 운영SSO·5대장비·전체UI 인수로 확대하지 않으며 MJS결함으로 자동무효화하지도 않음 |
+
+MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대조군은2PC66/1·reconciliation58/1 exit1이었다. 과거 실제 실행이 mock/조작이었다고 주장하지 않는다. 과거200/202에서 결함단언을 산술로 빼 새합격수로 제시하지 않는다. [[2026-09-18_MJS_빈집합단언_감사수정_Codex]]의 빈배열이 과거실행에 실제발생했는지도 미확인이다.
 
 ## 1. 실제 검증 완료 — 명시한 범위만
 
@@ -62,11 +75,11 @@ source_of_truth: "Git"
 
 | 카드 | 이미 있는 개발 기반 | 운영인수에 추가로 필요한 조건 |
 |---|---|---|
-| VF-CX-01 | canonical factory/실제JWT/PG·route·image 일부단언 | 해당SHA CI·전체image보안단언·운영IdP/HTTPS/역할경계·복구준비, 독립리뷰와 운영자 인수 |
-| VF-CX-02 | ModelManifest/hash/lease·registry binding/정책 검사 | 실제Node 저장·손상/repair/retention·권한거부 증거, 운영policy와profile확정, 전체필수검사/리뷰 |
-| VF-CX-03 | locality/예약·bounded remote 읽기·frozen authority | 실제 장비 topology·현재grant/channel/location·실제전송/스케줄실행·장애경계와 측정값 |
-| VF-CX-04 | CPU32KiB bounded adapter·fence/retry·단일host 격리Node시험 | 실제장비에서 승인/취소/stale permit/Node-loss·대체실행과결과 무결성. 미지원GPU/collective를 합격범위에 포함하지 않음 |
-| VF-CX-05 | 오프라인패키지검사·preflight·복사본migration/복원준비 | 선행카드 인수+5대 전체여정·운영권한/HTTPS·장애복구·AC-12정량증거·사용자 인수 |
+| VF-CX-01 | canonical factory/실제JWT/PG·route·image 일부단언 | 해당SHA CI·전체image보안단언·운영IdP/HTTPS/역할경계·복구준비, 독립리뷰와 운영자 인수. MJS 상태코드/필드 숫자로 인증·역할 인수를 대체하지 않음 |
+| VF-CX-02 | ModelManifest/hash/lease·registry binding/정책 검사 | 실제Node 저장·손상/repair/retention·권한거부 증거, 운영policy와profile확정, 전체필수검사/리뷰. 해시 접두사/string 존재가 아닌 실제 bytes·검증digest 필요 |
+| VF-CX-03 | locality/예약·bounded remote 읽기·frozen authority | 실제 장비 topology·현재grant/channel/location·실제전송/스케줄실행·장애경계와 측정값. 67checks 대신 해당dispatch와 node/receipt identity 결속 증거 필요 |
+| VF-CX-04 | CPU32KiB bounded adapter·fence/retry·단일host 격리Node시험 | 실제장비에서 승인/취소/stale permit/Node-loss·대체실행과결과 무결성. 미지원GPU/collective를 합격범위에 포함하지 않음. receipt의run/node/attempt/epoch·stop·artifact bytes를 대조; 고정receipt나GPU telemetry만으로 실행 인수 금지 |
+| VF-CX-05 | 오프라인패키지검사·preflight·복사본migration/복원준비 | 선행카드 인수+5대 전체여정·운영권한/HTTPS·장애복구·AC-12정량증거·사용자 인수. 200/202·59 숫자 대신 실제화면 조작/재로드·실장비·frozen bytes 증거와 통제된 복원 판정 필요 |
 
 0/5는 위5개 운영인수 카드의 완료0건이다. 구현0%, 모든시험미실행, 또는 실제PC0/5라는 뜻으로 쓰지 않는다. formal48task done0/48과도 다른 분모다. 현재 문서감사로 어느 카드도 done으로 바꾸지 않는다.
 
