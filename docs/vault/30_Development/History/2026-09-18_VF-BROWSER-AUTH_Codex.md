@@ -23,3 +23,10 @@ source_of_truth: "Git"
 - `npm test`:273pass/0skip/exit0, `npm run build`:exit0. 이전271은 프로젝트조회추가2시험 전 수치다. 제거2시험은 신뢰하지 않는JWT로사용자판독하던구현 삭제에 따른것이며 auth-session17개로 대체했다.
 - CI 전용browser lane에 Desktop2+Approval2+fullApp로그인2=6개를 명시하고6pass/0skip을 강제한다. backend/core에서는 동일3파일을 이 job으로 위임한다. CI 결과는 push 후 receipt로 남긴다.
 - 다음ready VF-CX-05: 사용자승인에 따라 운영스냅샷 임시복원·0043업그레이드 리허설까지 이어서 실행했고 통과했다. 보관백업·독립클러스터복원은 별도후속Evidence로 남긴다. source DB변경 없음.
+
+## 전달
+
+- 코드325554cb2b7878bfa6eefd39621e41eaa34cde69 commit/push exit0, [Draft PR32](https://github.com/egparadise/SaintVision-Invion/pull/32). CI6check는billing/spending limit로시작전차단, ci.json에ID/원문보존.
+- 연속수행: [[2026-09-18_VF-RECOVERY-REHEARSAL_Codex]]. 승인확인→실제로그인6여정→보관backup/독립restore까지수행. 독립review·운영SSO·실장비·CI는미완료. 사용자승인을다시요구하지않는다.
+
+- 문서484/ontology/YAML/diff 검사통과. 전체sync check는외부편집충돌로미적용. base54f3206 확인 scoped17파일 hash일치/pending0/conflict0; 일반Codex공유본보존. 최종receipt와보고를같은state로재동기화한다.

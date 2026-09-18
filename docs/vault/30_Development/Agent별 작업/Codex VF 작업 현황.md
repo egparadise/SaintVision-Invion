@@ -125,3 +125,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - PR31/546ec50 push·256시험/build통과, 9월18일 CI6check billing실행전차단 재확인. [[2026-09-18_VF-DESKTOP-LAYOUT_Codex]], Gemini·Claude검토/운영인수미완료.
 
 - 사용자 Codex 영역 후속작업 승인 확인: 반복승인 없이 연속진행. 실제로그인/승인browser 통합착수 base54f3206. [[2026-09-18_VF-BROWSER-AUTH_Codex]].
+
+- PR32/325554c:273시험/build·실HTTP브라우저6통과. 사용자승인 후 보관백업+독립PG복원/0043업그레이드·row보존/권한격리통과. [[2026-09-18_VF-RECOVERY-REHEARSAL_Codex]]. 원격3timeout·CI billing/peer/운영SSO·PITR/5대 인수미완. 승인재요청없이외부조건복구후이어감.
