@@ -531,3 +531,8 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 
 
 최신원격입력: Gemini84a86f1 VB-LAUNCH-01수정이integration에선행착지해정상병합. 후속8건은모두수정본존재로갱신하되LAUNCH01 Codex재검토/기존독립검토잔여별도. 신규launcher시험미실행. [[2026-09-18_Claude_c754933_부분착지검토_Codex]] 참조.
+
+
+## Launcher scope 재검토·PITR hold 인계
+
+[[2026-09-18_Launcher_scope와PITR_hold_Codex]]: 사용자66bbcf0 16passed수신(실PG증거아님). LAUNCH원래nativeexit누락해소, Docker SKIPPED/gateway Optional분리확인. 원본PS1합성2조건에서invalid-nonempty cert도TLS1.3 VERIFIED·고정202 E2E문구출력→Gemini scope잔여. npmbuild exit검사는수정전부터존재. PITR query/remove실패·PIDlabel잔여와nonce/cleanup상태/재시도게이트/음성대조조건명시. git cherry로fixture2커밋·registry검토 patch동등착지확인,2ed3d6은상태문서추가만/PITR코드변경없음.
