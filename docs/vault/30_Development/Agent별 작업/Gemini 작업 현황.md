@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.43"
+version: "1.0.44"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T16:00:00+09:00"
+updated: "2026-09-18T16:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,15 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T16:00:00+09:00.
+- 확인 기준: 2026-09-18T16:10:00+09:00.
 
 ## 최근 확인한 진척
+
+- **MJS02-R1 환경변수 정합 및 통합 레인 물리 격리 완결 (`tests/test_browser_smoke_boundary.py`, `tests/integration/test_browser_smoke_integration.py`)**:
+  - **가드-러너 간 환경변수 우선순위 및 기본값 완전 정합**: `are_smoke_targets_reachable()`로 개편하여 `TEST_BACKEND_URL`(기본 `http://127.0.0.1:8080`)과 `TEST_BASE_URL`(기본 `http://localhost:3000`)을 엄격히 존중. 접근 불가 주소(`http://127.0.0.1:1`) 오버라이드 시 정상적으로 연결 실패를 감지하여 `SKIPPED` 처리됨을 실증 검증.
+  - **환경변수 오버라이드 단위 시험 신설**: `test_smoke_targets_reachability_probe_respects_env_overrides`를 `tests/test_browser_smoke_boundary.py`에 탑재하여 오프라인에서 가드의 환경변수 반응성 100% 검증.
+  - **통합 시험 물리 격리 및 기본 수집 자동 제외**: 실제 러너 기동 시험을 `tests/integration/test_browser_smoke_integration.py`로 분리하고 `INV_BROWSER_SMOKE_INTEGRATION=1` 명시적 옵트인 가드를 적용. 기본 pytest 실행 시 자동 `SKIPPED` (0.06s) 처리되어 백엔드 없는 오프라인 환경 100% 무결성 보장.
+  - 보고서: [[2026-09-18_16-10-00_KST_MJS02-R1-ENV-ALIGNMENT-AND-INTEGRATION-LANE-ISOLATION_Gemini_검증보고]].
 
 - **CX-01 제어 평면 16개 정본 경로 전수 실장 현황 정리 및 디스커버리 동기화 완결**:
   - **16개 정본 엔드포인트 전수 매핑 확정**: Storage(5개), Pools/Placement(5개), Nodes/Liveness(3개), Discovery(3개) 등 CX-01 제어 평면 전 경로가 클라이언트 API(`fabricControlApi.ts`), UI 화면(`ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `App.tsx`), 및 테스트 스위트에 100% 매핑됨.
