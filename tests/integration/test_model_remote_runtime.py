@@ -33,7 +33,7 @@ def test_remote_frozen_input_reaches_approved_admission(remote_runtime):
     assert claim(authorize(remote_runtime)).may_start
 
 
-@pytest.mark.parametrize("assignment", ["enabled=false", "version=version+1"])
+@pytest.mark.parametrize("assignment", ["enabled=false,version=version+1", "version=version+1"])
 def test_channel_changed_during_read_never_commits(remote_runtime, monkeypatch, assignment):
     a = remote_runtime
     original = a.remote_reader.read
@@ -50,8 +50,8 @@ def test_channel_changed_during_read_never_commits(remote_runtime, monkeypatch, 
         assert not c.execute("SELECT 1 FROM inv.model_runtime_inputs WHERE run_id=%s", (a.target,)).fetchone()
 
 
-@pytest.mark.parametrize("assignment", ["enabled=false", "version=version+1",
-    "certificate_not_after=clock_timestamp()-interval '1 second'"])
+@pytest.mark.parametrize("assignment", ["enabled=false,version=version+1", "version=version+1",
+    "certificate_not_after=clock_timestamp()-interval '1 second',version=version+1"])
 def test_channel_change_after_approval_prevents_claim(remote_runtime, assignment):
     a = remote_runtime
     approved = authorize(a)

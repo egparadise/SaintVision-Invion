@@ -1,0 +1,123 @@
+{
+  "baseSha": "8c347b7d1df10fc0d64d3ef83b2eebac1d22441d",
+  "testFileSha256": "18c0b7dedf6ee349c90f959bc1c78f3c3abe6ca709efe8490f2c3e56d09e7f96",
+  "suite": "tests/integration/test_model_locality.py",
+  "command": "python -m pytest tests/integration/test_model_locality.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 76.69,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 26
+  },
+  "cases": [
+    {
+      "name": "test_verified_locality_binds_existing_leases_and_durable_duplicate",
+      "status": "passed"
+    },
+    {
+      "name": "test_manifest_verified_flag_cannot_replace_current_bytes[corrupt]",
+      "status": "passed"
+    },
+    {
+      "name": "test_manifest_verified_flag_cannot_replace_current_bytes[truncated]",
+      "status": "passed"
+    },
+    {
+      "name": "test_manifest_verified_flag_cannot_replace_current_bytes[missing]",
+      "status": "passed"
+    },
+    {
+      "name": "test_manifest_verified_flag_cannot_replace_current_bytes[budget]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[expired]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[future]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[location]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[root]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[membership]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[grant]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[offline]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[scope]",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_authority_or_observation_cannot_reserve[size]",
+      "status": "passed"
+    },
+    {
+      "name": "test_atomic_binding_failure_rolls_back_lease_ledger_and_outbox",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_same_key_reserves_once",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_model_runs_share_existing_resource_ceilings",
+      "status": "passed"
+    },
+    {
+      "name": "test_more_cpu_without_model_copy_cannot_invent_transfer_bandwidth",
+      "status": "passed"
+    },
+    {
+      "name": "test_post_observation_file_change_never_becomes_an_execution_permit",
+      "status": "passed"
+    },
+    {
+      "name": "test_actual_tool_gateway_cannot_ignore_model_input",
+      "status": "passed"
+    },
+    {
+      "name": "test_bound_input_is_immutable_tenant_scoped_and_cannot_be_replaced",
+      "status": "passed"
+    },
+    {
+      "name": "test_unimplemented_modes_are_explicitly_unavailable[tensor-parallel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_unimplemented_modes_are_explicitly_unavailable[pipeline-parallel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_unimplemented_modes_are_explicitly_unavailable[data-parallel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_unimplemented_modes_are_explicitly_unavailable[offload]",
+      "status": "passed"
+    },
+    {
+      "name": "test_unimplemented_modes_are_explicitly_unavailable[request-routing]",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "f80b3defe539e138047f86c1c98cf6bfbdfe1732b3d60d5ef93726ccda8524d3",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false
+}

@@ -1,0 +1,21 @@
+{
+  "reviewedTip": "b809fbe",
+  "method": "mock subprocess; no Docker process/container",
+  "normalStdoutType": "bytes",
+  "timeoutStdoutType": "str",
+  "decodeRaisesAttributeError": true,
+  "accessViolationCommandCalls": 1,
+  "posixKillMisclassified": false,
+  "libpqSyntheticPasswordMasked": true,
+  "r3_01": "specific former overbroad-code retry reproducer fixed",
+  "r2_03": "tested keyword DSN reproducer fixed",
+  "finally": "source now guards cleanup and writes proof after handler; no live runner validation here",
+  "newFinding": "VF-CL-R4-01 timeout stdout/stderr types violate subprocess text-mode contract; prune decode fails and broad wrapper can hide failure",
+  "mergeDecision": "hold entire branch until consistent result types and error visibility fixed",
+  "userReport": {
+    "passed": 11,
+    "failed": 1,
+    "scope": "User-reported 12-case pytest selection; exact selection command not supplied. Failing case: tests/test_check_kernel_docker_hygiene.py::test_prune_removes_old_exited_residue_but_spares_a_recent_one. Includes real Docker per user; not a whole integration-suite result."
+  },
+  "claudeReview": "b809fbe code-path review of standalone model_remote at integration5e4d6ae, no tests run; does not cover8c347b7 authority wiring"
+}

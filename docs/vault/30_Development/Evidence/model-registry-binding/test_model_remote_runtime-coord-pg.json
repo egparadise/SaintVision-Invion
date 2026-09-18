@@ -1,0 +1,43 @@
+{
+  "baseSha": "8c347b7d1df10fc0d64d3ef83b2eebac1d22441d",
+  "testFileSha256": "83a822acd117d23bc6bbdb02984a61a6ead4f18c113baf650cf444d918912e28",
+  "suite": "tests/integration/test_model_remote_runtime.py",
+  "command": "python -m pytest tests/integration/test_model_remote_runtime.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 104.11,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 6
+  },
+  "cases": [
+    {
+      "name": "test_remote_frozen_input_reaches_approved_admission",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_changed_during_read_never_commits[enabled=false,version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_changed_during_read_never_commits[version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_change_after_approval_prevents_claim[enabled=false,version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_change_after_approval_prevents_claim[version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_channel_change_after_approval_prevents_claim[certificate_not_after=clock_timestamp()-interval '1 second',version=version+1]",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "704fa3c54fcdec5884a1023744fc7153c1938a2ca91bc407983dcbcee42092df",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false
+}

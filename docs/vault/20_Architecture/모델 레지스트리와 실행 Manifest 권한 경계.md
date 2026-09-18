@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.6.0"
+version: "1.6.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -110,4 +110,4 @@ ModelRuntimeStore의 명시 remote reader 경로를 구현했다. 기존 Run/Nod
 
 승인 요청은 현재 business permission·channel, delivery/claim은 기존 Node/resource잠금 뒤 Node/Location/현재권한·channel·fence를 재검사한다. 네트워크는 DBtransaction 밖이며 implicit retry나 자동로컬fallback이 없다. RegistryVersion/policy/lifecycle 실행결속은 별도 남은 구현이다.
 
-이 버전은 작업브랜치 후보이며 integration5e4d6ae에는 아직 없다. 132오프라인통과/29실PG시험미실행으로 DB검증까지 착지보류. [[2026-09-18_원격모델권한결속_Codex]].
+최초132오프라인통과/29실PG미실행으로보류했던후보를사용자제공PG16에서재검증했다. 신규원격6+기존runtime23+인접registry/locality/retry50=79passed/0skip, CAS fixture3건수정후모두통과. DB검증보류를해제하고integration반영판정, 독립검토/CI/운영인수는별도대기다. [[2026-09-18_원격모델권한결속_Codex]].

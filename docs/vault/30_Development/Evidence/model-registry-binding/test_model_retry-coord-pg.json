@@ -1,0 +1,51 @@
+{
+  "baseSha": "8c347b7d1df10fc0d64d3ef83b2eebac1d22441d",
+  "testFileSha256": "fb4f685bb7473049e97e9b03dbe258c0d880980d4893f4ec051ddb4696c24fd5",
+  "suite": "tests/integration/test_model_retry.py",
+  "command": "python -m pytest tests/integration/test_model_retry.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 56.71,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 8
+  },
+  "cases": [
+    {
+      "name": "test_retry_uses_new_run_fences_and_requires_new_approval",
+      "status": "passed"
+    },
+    {
+      "name": "test_three_generations_are_a_hard_budget",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[active]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[cancel]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[grant]",
+      "status": "passed"
+    },
+    {
+      "name": "test_retry_cannot_bypass_stop_cancel_grant_or_locality[bytes]",
+      "status": "passed"
+    },
+    {
+      "name": "test_failed_new_reservation_rolls_back_child_and_lineage",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_retry_is_single_child_and_tenant_private",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "61f51a4dc7d2a0a41f795e5bec287af8401bdc4377ee32d8e1b1a7352ec9729e",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false
+}
