@@ -280,20 +280,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       setContributions((prev) => [res.contribution, ...prev]);
       setStorageMessage(`✔ 스토리지 기여 등록 완료 (${res.contribution.contributionId})`);
     } catch (err: any) {
-      // Local addition fallback for immediate UX
-      const fallbackContrib: StorageContribution = {
-        contributionId: `contrib_${Date.now().toString(36)}`,
-        nodeId: newContribNode || nodes[0]?.id || 'nod_01JABCDEF01',
-        declaredPath: newContribPath,
-        normalizedPath: newContribPath.replace(/\\/g, '/'),
-        mode: newContribMode,
-        status: 'active',
-        capacityBytes: newContribCapacityGB * 1024 ** 3,
-        availableBytes: (newContribCapacityGB - 50) * 1024 ** 3,
-        registeredAt: new Date().toISOString(),
-      };
-      setContributions((prev) => [fallbackContrib, ...prev]);
-      setStorageMessage(`✔ 스토리지 기여 로컬 등록 완료 (${fallbackContrib.contributionId})`);
+      const msg = err?.problem?.detail || err?.detail || err?.message || '스토리지 기여 등록 요청 실패';
+      setStorageMessage(`❌ 등록 실패: ${msg}`);
     }
   };
 
@@ -302,9 +290,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       const res = await activateStorageContribution(id);
       setContributions((prev) => prev.map((c) => (c.contributionId === id ? res.contribution : c)));
       setStorageMessage(`✔ 스토리지 활성화 완료 (${id})`);
-    } catch {
-      setContributions((prev) => prev.map((c) => (c.contributionId === id ? { ...c, status: 'active' } : c)));
-      setStorageMessage(`✔ 스토리지 활성화 완료 (${id})`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '활성화 요청 실패';
+      setStorageMessage(`❌ 활성화 실패 (${id}): ${msg}`);
     }
   };
 
@@ -313,9 +301,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       const res = await revokeStorageContribution(id);
       setContributions((prev) => prev.map((c) => (c.contributionId === id ? res.contribution : c)));
       setStorageMessage(`✔ 스토리지 기여 해제 완료 (${id})`);
-    } catch {
-      setContributions((prev) => prev.map((c) => (c.contributionId === id ? { ...c, status: 'revoked' } : c)));
-      setStorageMessage(`✔ 스토리지 기여 해제 완료 (${id})`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '기여 해제 요청 실패';
+      setStorageMessage(`❌ 해제 실패 (${id}): ${msg}`);
     }
   };
 
@@ -324,16 +312,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       const res = await getPoolPlacementPreview(selectedPoolId, placementReq);
       setPlacementPreview(res);
       setPoolMessage(`✔ 배치 미리보기 완료 (적격 노드: ${res.candidateCount}대)`);
-    } catch {
-      setPlacementPreview({
-        poolId: selectedPoolId,
-        candidateCount: 2,
-        candidates: [
-          { nodeId: 'nod_01JABCDEF01', hostname: 'Node-01-WinMain', availableCpuMillicores: 12000, availableRamBytes: 36 * 1024 ** 3, availableGpuDevices: 1, eligible: true },
-          { nodeId: 'nod_01JABCDEF05', hostname: 'Node-05-LinuxTrain', availableCpuMillicores: 10000, availableRamBytes: 24 * 1024 ** 3, availableGpuDevices: 1, eligible: true },
-        ],
-      });
-      setPoolMessage('✔ 배치 미리보기 완료 (적격 노드: 2대)');
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '배치 미리보기 조회 실패';
+      setPoolMessage(`❌ 배치 미리보기 실패: ${msg}`);
     }
   };
 
@@ -350,18 +331,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       });
       setPlanResult(res);
       setPoolMessage(`✔ 분산 배치 계획 수립 완료 (${res.planId})`);
-    } catch {
-      setPlanResult({
-        planId: `plan_${Date.now().toString(36)}`,
-        runId: planRunId,
-        strategy: planStrategy,
-        shardCount: planShardCount,
-        placements: [
-          { shardIndex: 0, nodeId: 'nod_01JABCDEF01', assignedCpuMillicores: 2000, assignedRamBytes: 4 * 1024 ** 3, assignedGpuDevices: 1 },
-          { shardIndex: 1, nodeId: 'nod_01JABCDEF05', assignedCpuMillicores: 2000, assignedRamBytes: 4 * 1024 ** 3, assignedGpuDevices: 1 },
-        ],
-      });
-      setPoolMessage('✔ 분산 배치 계획 수립 완료 (로컬)');
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '분산 배치 계획 수립 실패';
+      setPoolMessage(`❌ 계획 수립 실패: ${msg}`);
     }
   };
 
@@ -371,9 +343,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       await addPoolMember(selectedPoolId, memberNodeToAdd);
       setPoolMembers((prev) => Array.from(new Set([...prev, memberNodeToAdd])));
       setPoolMessage(`✔ 노드 풀 멤버 추가 완료 (${memberNodeToAdd})`);
-    } catch {
-      setPoolMembers((prev) => Array.from(new Set([...prev, memberNodeToAdd])));
-      setPoolMessage(`✔ 노드 풀 멤버 추가 완료 (${memberNodeToAdd})`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '멤버 추가 실패';
+      setPoolMessage(`❌ 멤버 추가 실패: ${msg}`);
     }
   };
 
@@ -382,9 +354,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       await removePoolMember(selectedPoolId, nodeId);
       setPoolMembers((prev) => prev.filter((id) => id !== nodeId));
       setPoolMessage(`✔ 노드 풀 멤버 제거 완료 (${nodeId})`);
-    } catch {
-      setPoolMembers((prev) => prev.filter((id) => id !== nodeId));
-      setPoolMessage(`✔ 노드 풀 멤버 제거 완료 (${nodeId})`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '멤버 제거 실패';
+      setPoolMessage(`❌ 멤버 제거 실패: ${msg}`);
     }
   };
 
@@ -401,9 +373,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       });
       setHeartbeatSeq(res.heartbeatSequence || nextSeq);
       setLivenessMessage(`✔ 하트비트 시퀀스 #${res.heartbeatSequence || nextSeq} 반영 완료`);
-    } catch {
-      setHeartbeatSeq((prev) => prev + 1);
-      setLivenessMessage(`✔ 하트비트 시퀀스 #${heartbeatSeq + 1} 로컬 반영 완료`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '하트비트 전송 실패';
+      setLivenessMessage(`❌ 하트비트 전송 실패: ${msg}`);
     }
   };
 
@@ -411,8 +383,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     try {
       const res = await triggerLivenessSweep();
       setLivenessMessage(`✔ 라이브니스 스윕 완료 (만료 노드: ${res.markedLost}대, 타임아웃: ${res.timeoutSeconds}s)`);
-    } catch {
-      setLivenessMessage('✔ 라이브니스 스윕 완료 (만료 노드: 0대, 클러스터 정상)');
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '라이브니스 스윕 실패';
+      setLivenessMessage(`❌ 라이브니스 스윕 실패: ${msg}`);
     }
   };
 
@@ -433,8 +406,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         '00000000-0000-0000-0000-000000000001'
       );
       setDiscoveryMessage(`✔ 안내 방송 승인됨 (state: ${res.state})`);
-    } catch {
-      setDiscoveryMessage('✔ 안내 방송 전송 완료 (대기열 등록)');
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '안내 방송 전송 실패';
+      setDiscoveryMessage(`❌ 안내 방송 실패: ${msg}`);
     }
   };
 
@@ -444,16 +418,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       setAdmissionResult(res);
       setCandidates((prev) => prev.map((c) => (c.announcementId === id ? { ...c, state: 'admitted' } : c)));
       setDiscoveryMessage(`🎉 후보 승인 완료! 일회용 토큰 발급됨: ${res.bootstrapToken}`);
-    } catch {
-      const fallbackToken: AdmissionResponse = {
-        announcementId: id,
-        bootstrapToken: `btk_${Date.now().toString(36)}_SECRET`,
-        expiresAt: new Date(Date.now() + 600000).toISOString(),
-        next: 'POST /v1/nodes with this token to complete enrollment',
-      };
-      setAdmissionResult(fallbackToken);
-      setCandidates((prev) => prev.map((c) => (c.announcementId === id ? { ...c, state: 'admitted' } : c)));
-      setDiscoveryMessage(`🎉 후보 승인 완료! 일회용 토큰 발급됨: ${fallbackToken.bootstrapToken}`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '후보 승인 실패';
+      setDiscoveryMessage(`❌ 후보 승인 실패: ${msg}`);
     }
   };
 
@@ -462,9 +429,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       await declineDiscoveryCandidate(id, '운영자 수동 거절');
       setCandidates((prev) => prev.map((c) => (c.announcementId === id ? { ...c, state: 'declined' } : c)));
       setDiscoveryMessage(`✔ 후보 거절 완료 (${id})`);
-    } catch {
-      setCandidates((prev) => prev.map((c) => (c.announcementId === id ? { ...c, state: 'declined' } : c)));
-      setDiscoveryMessage(`✔ 후보 거절 완료 (${id})`);
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '후보 거절 실패';
+      setDiscoveryMessage(`❌ 후보 거절 실패: ${msg}`);
     }
   };
 
