@@ -8,7 +8,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[4]
+ROOT = Path(__file__).resolve().parents[5]
 OUT = ROOT / "docs/vault/30_Development/Evidence/verification-boundary-audit/launcher-fix-results.json"
 source = ROOT / "tools/deploy_intranet.ps1"
 results = []
@@ -48,7 +48,10 @@ for case, failed in [
             path = work / ("bin/" + name + ".cmd")
             gen_dist = ""
             if name == "npm" and failed != "npm":
-                gen_dist = 'echo mock-html > "%~dp0..\\apps\\web\\dist\\index.html"\n'
+                gen_dist = (
+                    'if not exist "%~dp0..\\apps\\web\\dist" mkdir "%~dp0..\\apps\\web\\dist"\n'
+                    'echo mock-html > "%~dp0..\\apps\\web\\dist\\index.html"\n'
+                )
 
             script_body = (
                 "@echo off\n"

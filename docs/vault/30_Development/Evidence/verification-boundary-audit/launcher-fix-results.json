@@ -1,7 +1,7 @@
 {
   "scope": "Windows PowerShell remediated launcher, synthetic native command injection and HTTP stub; no production deployment",
   "remediation": "VB-LAUNCH-01",
-  "sourceSHA256": "3f684b8b27b9bfe53fd51295d9df31e49ce297f1f64e510ab83ca27517dccb3c",
+  "sourceSHA256": "ce9a41c68c1b4d16e70a103659b333333a35c5f9222138f749f8f2b40e42a57c",
   "results": [
     {
       "case": "tls-failure",

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.39"
+version: "1.0.40"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T15:15:00+09:00"
+updated: "2026-09-18T15:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,21 +19,28 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T15:15:00+09:00.
+- 확인 기준: 2026-09-18T15:25:00+09:00.
 
 ## 최근 확인한 진척
 
-- **Codex 배포 런처 감사(`VB-LAUNCH-01`, P2) 지적 완전 조치**:
-  - `tools/deploy_intranet.ps1`:
-    - Python 네이티브 CLI 호출 직후 `$LASTEXITCODE -ne 0` 검사 추가 및 terminating throw로 PowerShell Stop 정책과 결속.
-    - `deploy/certs/saintvision.crt`, `saintvision.key` 파일 존재 및 >0 바이트 단언 추가.
-    - `npm run build` 직후 `apps/web/dist/index.html` 파일 존재 및 >0 바이트 단언 추가.
-    - Docker Compose 검증 시 `INV_WEB_AUTH_CONFIG` (슬래시 정규화된 README.md 경로), `INV_CONFIG_VOLUME`, `INV_BUSINESS_DSN` 자동 보완 및 Docker 미설치 환경 분기(`SKIPPED`) 투명화.
-    - 요약 배너를 무조건적인 "ZERO Errors (All Exit Codes 0)"에서 정직한 단계별 요약(`[1/5]`~`[5/5]`, `[OPT]`) 및 `Scope Assurance Boundary`로 전면 교체.
-    - 파이프라인 전체 `try ... catch { throw $_ }` 가드로 상위 호출자 및 호스트 프로세스에 즉시 실패 종료 코드 1 전파.
-  - `tests/test_deploy_intranet_preflight.py`:
-    - 영구 회귀 시험 5건 작성 및 전수 통과 (**5 passed** in 2.49s). 인증서 생성 실패(exit 23) 시 Step 1에서 즉시 exit 1로 중단되고 Step 2(Vitest)로 진행하지 않는 음성 대조군 검증 완료.
-  - `docs/vault/30_Development/Evidence/verification-boundary-audit/launcher-fix-results.json` 실측 증거 기록 완료 (5개 주입 케이스 실측 전수 합격).
+- **Codex 배포 런처 재검토 수용 및 요약 스코프 정합 완결 (`tools/deploy_intranet.ps1`)**:
+  - **TLS 행 스코프 한정**: 비어있지 않은 인증서/키 파일 존재 확인과 암호학적 X.509 파싱·SAN·TLS 1.3 핸드셰이크 협상 미검증을 투명하게 분리 (`[1/5] TLS Certificate Files: PRESENT & NON-EMPTY (...; cryptographic validity & TLS negotiation unverified)`).
+  - **스모크 행 하드코딩 상수 제거**: 스크립트에 박혀 있던 고정 상수 `(202 checks passed)`를 전면 제거하고, 자식 프로세스 정상 종료 사실과 브라우저/물리 노드 인수 미검증을 솔직하게 기록 (`[4/5] API Contract Smoke Suite: PROCESS EXITED 0 (browser/physical-node acceptance unverified)`).
+  - **빌드 산출물 freshness 보장**: `npm run build` 수행 전 기존 `apps/web/dist` 디렉터리를 사전 삭제하여, 이전 실행의 오래된 잔여 산출물이 현재 빌드 증거로 오인되는 위험을 원천 차단 (`[3/5] Production Asset Build: FRESH DIST GENERATED (apps/web/dist/index.html rebuilt cleanly, 746B)`).
+  - **Docker 및 게이트웨이 정직한 분기**: `SYNTAX & GRAPH VALIDATED (...; services not started)`, Docker CLI 부재 시 `SKIPPED`, 게이트웨이 미기동 시 비치명적 `OFFLINE / NOT RUNNING (Optional dev probe)` 유지.
+  - **Scope Assurance Boundary 항목화**: 1~5단계 및 옵션 프로브별로 무엇이 검증되었고 무엇이 미검증인지 구체적으로 명시.
+- **영구 회귀 시험 스위트 대폭 확충 (`tests/test_deploy_intranet_preflight.py`)**:
+  - 10개 시험 전수 통과 (**10 passed in 5.11s**):
+    - 인증서 생성 실패(exit 23) 시 Step 1 즉시 exit 1 중단 및 Step 2 미실행 음성 대조군.
+    - 0바이트 인증서 및 파일 부재 시 Step 1 exit 1 중단.
+    - `dist/index.html` 누락 시 Step 3 exit 1 중단.
+    - 사전 stale `dist/` 파일 청소 및 freshness 보장 실측.
+    - 비어있지 않은 가짜 인증서 주입 시 `PRESENT & NON-EMPTY` 출력 및 `TLS 1.3 Certificates: VERIFIED` 미출력 검증.
+    - 스모크 0 종료 시 `PROCESS EXITED 0` 출력 및 `202 checks passed` 미출력 검증.
+    - Docker 부재 시 `SKIPPED` 출력 및 검증 주장 미출력 검증.
+    - 게이트웨이 오프라인 시 `OFFLINE` 출력 및 정상 exit 0 검증.
+    - 전체 요약 테이블 포맷 및 Scope Assurance Boundary 검증.
+  - `docs/vault/30_Development/Evidence/verification-boundary-audit/launcher-fix-results.json` 실측 증거 갱신.
 - **Codex 검증 경계 감사(`VB-MJS-03`, `VB-MJS-04`, `VB-MJS-05`) 조치 완료 상태 유지**:
   - `verify_two_pc_distributed_execution.mjs`: **79/79 checks PASS** (100%).
   - `reconcile_receipts_evidence.mjs`: **64/64 checks PASS** (100%).
