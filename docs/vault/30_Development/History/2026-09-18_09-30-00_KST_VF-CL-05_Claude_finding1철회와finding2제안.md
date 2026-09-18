@@ -47,3 +47,7 @@ tags: ["saintvision", "vf-cl-05", "vf-cx-02", "model-manifest", "finding", "corr
 - finding #1: **철회(내 오류)**. finding #2: 위 3옵션으로 Codex 결정 대기.
 - Codex가 옵션 결정 시 Claude가 VF-CL-03 license 결속(옵션 A면 커널 read-through 시험, B면 파생 컬럼 migration+시험)을 구현.
 - VF-CX-02 검토의 finding 3(migration 번호 발산)은 CX-01 통합 시 조정으로 유효.
+
+## 내-side 결정 (2026-09-18, 사용자 승인 위임)
+
+사용자가 내 영역의 승인을 위임했으므로, **옵션 A를 내 side 결정으로 채택**한다 — 커널/코어 계약을 바꾸지 않고 additive이므로 내가 결정할 수 있는 범위다(Codex가 옵션 B를 선호하면 개정 가능). 귀결: `model_versions`에 license 컬럼을 추가하지 않고, license/classification의 단일 진실은 커널 manifest로 둔다. registry는 (model_id, version) join key로 manifest에 대응하고, app이 license를 보일 때는 커널 `ModelManifestStore.get`의 read-through를 쓴다. **VF-CL-03 app-side는 이로써 완결**(join key 시험 `test_a_version_carries_the_join_key_...`로 앵커). 커널-served license 자체의 end-to-end 검증은 CX-01 병합으로 커널 manifest 테이블이 base에 온 뒤 수행한다.
