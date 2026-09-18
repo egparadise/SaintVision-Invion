@@ -17,8 +17,17 @@ try {
     $certFile = "deploy/certs/saintvision.crt"
     $keyFile = "deploy/certs/saintvision.key"
 
+    # A failed bind mount can leave a directory where a certificate file must
+    # be. Remove only these exact generated targets before regeneration.
+    foreach ($tlsPath in @($certFile, $keyFile)) {
+        if (Test-Path -LiteralPath $tlsPath -PathType Container) {
+            Write-Host "⚠ Removing stale TLS directory at $tlsPath" -ForegroundColor Yellow
+            Remove-Item -LiteralPath $tlsPath -Recurse -Force
+        }
+    }
+
     $needsGen = $false
-    if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
+    if (-not (Test-Path -LiteralPath $certFile -PathType Leaf) -or -not (Test-Path -LiteralPath $keyFile -PathType Leaf)) {
         $needsGen = $true
     } elseif ((Get-Item $certFile).Length -eq 0 -or (Get-Item $keyFile).Length -eq 0) {
         Write-Host "⚠ Found empty (0-byte) TLS certificate or key, regenerating..." -ForegroundColor Yellow
@@ -35,7 +44,7 @@ try {
     }
 
     # Strict file existence and non-zero byte size assertion
-    if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
+    if (-not (Test-Path -LiteralPath $certFile -PathType Leaf) -or -not (Test-Path -LiteralPath $keyFile -PathType Leaf)) {
         throw "TLS certificate files ($certFile, $keyFile) do not exist after generation step."
     }
 

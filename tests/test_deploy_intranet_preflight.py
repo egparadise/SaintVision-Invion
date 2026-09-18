@@ -104,6 +104,30 @@ def test_cert_generation_empty_file_halts_immediately(tmp_path: Path) -> None:
     assert "[2/5] Running Frontend & Protocol Automated Tests" not in res.stdout
 
 
+def test_cert_directory_collisions_are_removed_before_generation(tmp_path: Path) -> None:
+    """A stale directory at either file target must not block certificate generation."""
+    tools_dir = tmp_path / "tools"
+    certs_dir = tmp_path / "deploy" / "certs"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    (certs_dir / "saintvision.crt").mkdir(parents=True, exist_ok=True)
+    (certs_dir / "saintvision.key").mkdir(parents=True, exist_ok=True)
+    mock_generator = tools_dir / "generate_tls_cert.py"
+    mock_generator.write_text(
+        "from pathlib import Path\n"
+        "p=Path('deploy/certs'); (p/'saintvision.crt').write_bytes(b'cert'); (p/'saintvision.key').write_bytes(b'key')\n",
+        encoding="utf-8",
+    )
+    content = DEPLOY_SCRIPT.read_text(encoding="utf-8").replace(
+        "    # Step 2: Run Automated Unit and Protocol Tests (Vitest)",
+        "    throw 'stop after TLS preflight'\n\n    # Step 2: Run Automated Unit and Protocol Tests (Vitest)",
+    )
+    res = run_ps1_in_dir(content, tmp_path)
+    assert res.returncode == 1
+    assert (certs_dir / "saintvision.crt").is_file()
+    assert (certs_dir / "saintvision.key").is_file()
+    assert "stale TLS directory" in res.stdout
+
+
 def test_missing_cert_file_after_generation_halts_immediately(tmp_path: Path) -> None:
     """VB-LAUNCH-01 negative control: missing cert files after exit 0 must halt at Step 1 with exit 1."""
     tools_dir = tmp_path / "tools"

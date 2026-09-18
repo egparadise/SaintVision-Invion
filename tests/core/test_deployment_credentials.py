@@ -66,3 +66,21 @@ def test_workspace_overlay_requires_external_volume(tmp_path, volume):
     assert "INV_DATABASE_URL" not in backend["environment"]
     mount = next(v for v in backend["volumes"] if v["target"] == "/workspaces")
     assert mount["volume"]["nocopy"] is True
+
+
+def test_tls_file_mounts_never_create_host_directories():
+    import yaml
+
+    compose = yaml.safe_load((ROOT / "docker-compose.prod.yml").read_text(encoding="utf-8"))
+    mounts = compose["services"]["web"]["volumes"]
+    tls = {
+        mount["target"]: mount
+        for mount in mounts
+        if isinstance(mount, dict)
+        and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
+    }
+    assert set(tls) == {"/etc/ssl/certs/saintvision.crt", "/etc/ssl/private/saintvision.key"}
+    for mount in tls.values():
+        assert mount["type"] == "bind"
+        assert mount["read_only"] is True
+        assert mount["bind"]["create_host_path"] is False
