@@ -486,8 +486,8 @@ async function runFullSmokeJourney() {
     const shRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/shards`);
     assert('Shards listing returns HTTP 200', shRes.status === 200);
     const shData = await shRes.json();
-    assert('All shards confirm physical stop receipts', shData.items && shData.items.every((s) => s.physicallyStopped === true));
-    assert('All shards confirm output commitment hashes', shData.items && shData.items.every((s) => typeof s.outputHash === 'string'));
+    assert('All shards confirm physical stop receipts', Array.isArray(shData.items) && shData.items.length === 2 && shData.items.every((s) => s != null && s.physicallyStopped === true));
+    assert('All shards confirm output commitment hashes', Array.isArray(shData.items) && shData.items.length === 2 && shData.items.every((s) => s != null && typeof s.outputHash === 'string'));
 
     // 4. Evidence manifest inspection
     const eviRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/evidence`);

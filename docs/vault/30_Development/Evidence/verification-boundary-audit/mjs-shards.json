@@ -1,0 +1,28 @@
+{
+  "baseSHA": "03f1f7b",
+  "at": "2026-09-18T14:23:57+09:00",
+  "scope": "actual assertion expressions in isolated Node VM; no browser/backend",
+  "node": "v24.17.0",
+  "command": "node --test tests/browser_smoke_assertions.test.mjs",
+  "exitCode": 0,
+  "passed": 12,
+  "failed": 0,
+  "skipped": 0,
+  "everyOccurrences": 5,
+  "everyFiles": 4,
+  "unguardedBefore": 2,
+  "sourceHashes": {
+    "tools/run_browser_smoke.mjs": "a2226ddd33eb1abecc299d30932ac49dcfee95465fc56b22fd2ac6582d9db1c9",
+    "tests/browser_smoke_assertions.test.mjs": "6dc420abe56096c98f76bcf83d47543b1ed131b0189278abd9ba811822abf401"
+  },
+  "additionalFinding": {
+    "id": "VB-MJS-02",
+    "severity": "P2",
+    "status": "unfixed",
+    "observedWithoutUI": [
+      "windowManagerValid=true",
+      "keyboardA11ySupported=true",
+      "layoutPersistenceValid=true"
+    ]
+  }
+}
