@@ -562,3 +562,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 [[2026-09-18_TLS_외부주입_전환준비_Codex]]: 외부 인증서 디렉터리 `SAINTVISION_DEV_CERT_DIR`와 generator `--output-dir`를 구현하고, preflight에 PEM 인증서·개인키 공개키 일치 검증을 추가. 기본 경로 호환, 외부 경로, 누락, 불일치 회귀를 포함해 관련 27 passed. `77c5311` 준비 문서를 구현 상태로 갱신. 실제 Docker `up --no-start`와 인증서 발급은 별도 환경 검증 대기. 삭제·gitignore·이력 재작성은 수행하지 않음.
 
 후속 보강: `verify_tls_cert_pair.py`의 cryptography import를 지연해 사용법 오류는 exit 2, `--help`는 exit 0, 유효 인자에서 의존성 부재는 exit 1로 분리. 관련 회귀 범위는 30 passed. README와 외부 주입 runbook에 clone 초기화 절차가 모두 반영되어 별도 문서 추가는 불필요.
+
+## UI 우선순위 6 fake fallback 경계 감사
+
+`UI-PRIORITY6-FALLBACK-AUDIT-20260919-CODEX`를 기준으로 `apps/web/src`의 화면·route adapter와 관련 시험을 정적 감사했다. ResourceExplorer의 backend 오류 후 합성 후보·capacity·detail 유지(UI-FB-01/P1 후보), PlacementSimulator의 로컬 평가 경계(UI-FB-02/P2), DeveloperStudio의 ResultView 오류 후 artifacts fallback(UI-FB-03/P2 후보)을 기록했다. `apps/web`에서 `npm exec vitest run tests/fabric-control-plane.test.tsx tests/placement-explain.test.ts`는 30 passed이며 mock/순수 계산 범위다. HTTP 실패 주입·브라우저 UI 인수·Gemini 구현은 미검증/대기이고, 다음 담당은 Gemini(구현), Codex(경계 재검토)다.
