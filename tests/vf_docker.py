@@ -42,6 +42,15 @@ def cleanup_owned(name, resources):
             removed = docker_diag.run(["docker", *remove_args], timeout=90, text=True)
             if removed.returncode != 0:
                 incomplete.append((label, docker_diag.describe(removed)))
+                continue
+            # A successful rm command is not proof of removal (the daemon may
+            # have returned before the object disappeared). Confirm absence
+            # through the same ownership-scoped inspect command.
+            confirmed = docker_diag.run(["docker", *inspect_args], timeout=90, text=True)
+            if confirmed.returncode == 0:
+                incomplete.append((label, "removal not confirmed; resource preserved"))
+            elif confirmed.returncode != 1:
+                incomplete.append((label, "removal query failed: " + docker_diag.describe(confirmed)))
         except Exception as exc:  # OSError etc.; never BaseException (skip/interrupt propagate)
             incomplete.append((label, "cleanup error: " + docker_diag.masked_stderr(str(exc))))
     return incomplete

@@ -66,8 +66,13 @@ def test_body_failure_survives_a_cleanup_that_cannot_run(monkeypatch):
 
 
 def test_owned_removed_foreign_preserved_and_rm_failure_recorded(monkeypatch):
+    seen = {}
     def fake(argv, **k):
         if "inspect" in argv:
+            if argv[-1] in ("c", "w"):
+                seen[argv[-1]] = seen.get(argv[-1], 0) + 1
+                if seen[argv[-1]] == 2:
+                    return _cp(argv, 1, out="", err="not found")
             # container is ours; config-volume belongs to another run; working is ours
             owner = {"c": "this-run", "v": "another-run", "w": "this-run"}[argv[-1]]
             return _cp(argv, 0, out=owner)
@@ -86,6 +91,16 @@ def test_cleanup_does_not_swallow_baseexception(monkeypatch):
     monkeypatch.setattr(vf_docker.docker_diag, "run", interrupt)
     with pytest.raises(KeyboardInterrupt):                  # NOT swallowed by except Exception
         cleanup_owned("this-run", _RES)
+
+
+def test_cleanup_records_successful_rm_without_confirmed_absence(monkeypatch):
+    def fake(argv, **k):
+        if "inspect" in argv:
+            return _cp(argv, 0, out="this-run")
+        return _cp(argv, 0)
+    monkeypatch.setattr(vf_docker.docker_diag, "run", fake)
+    incomplete = cleanup_owned("this-run", [("container", ("inspect", "c"), ("rm", "-f", "c"))])
+    assert incomplete == [("container", "removal not confirmed; resource preserved")]
 
 
 def test_cleanup_records_an_oserror_and_continues(monkeypatch):

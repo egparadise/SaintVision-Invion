@@ -296,8 +296,14 @@ def _definer_verdict(dsn: str) -> dict[str, Any]:
     except Exception as error:
         return {"checked": None, "unsafe": None, "error": type(error).__name__}
     unsafe = [f["function"] for f in findings if f["problems"]]
+    catalogue = sorted(
+        f["function"]
+        for f in findings
+        if not f["function"].startswith("<") and "definitionSHA256" in f
+    )
     return {
         "checked": len(findings),
+        "catalogueFunctions": catalogue,
         "unsafe": len(unsafe),
         "functions": unsafe,
         "status": "requires_review" if unsafe else "matches_reviewed_policy",

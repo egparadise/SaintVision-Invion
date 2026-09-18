@@ -11,6 +11,21 @@ from psycopg.rows import dict_row
 from lan_pilot import load
 from migration_graph import chain
 
+# CLI exit contract shared with provision_credentials.py:
+# 0 success, 1 normal pending-migrations result, 2 intentional refusal,
+# 3 database/driver failure, 4 unexpected internal defect.
+EXIT_REFUSED = 2
+EXIT_DATABASE = 3
+EXIT_INTERNAL = 4
+
+
+class MigrationPlanDatabaseError(Exception):
+    """A database/driver failure without DSN or SQL diagnostics."""
+
+    def __init__(self, sqlstate=None):
+        self.sqlstate = sqlstate if isinstance(sqlstate, str) and len(sqlstate) == 5 and sqlstate.isalnum() else "unknown"
+        super().__init__("Migration metadata database operation failed")
+
 
 def gap_plan(current, revisions=None):
     ordered = chain(revisions)
@@ -45,11 +60,14 @@ def gap_plan(current, revisions=None):
 def inspect(state_path):
     state = load(state_path)
     # Explicit metadata-only admin connection; never used for tenant row reads.
-    with psycopg.connect(state["adminDSN"], row_factory=dict_row) as conn:
-        conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
-        conn.execute("SET LOCAL statement_timeout = '2s'")
-        current = [r["version_num"] for r in conn.execute("SELECT version_num FROM public.alembic_version")]
-        stamp = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+    try:
+        with psycopg.connect(state["adminDSN"], row_factory=dict_row) as conn:
+            conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+            conn.execute("SET LOCAL statement_timeout = '2s'")
+            current = [r["version_num"] for r in conn.execute("SELECT version_num FROM public.alembic_version")]
+            stamp = conn.execute("SELECT clock_timestamp() AS now").fetchone()["now"]
+    except psycopg.Error as error:
+        raise MigrationPlanDatabaseError(getattr(error, "sqlstate", None)) from None
     report = gap_plan(current)
     report.update(observedAt=stamp.isoformat(), scope="read-only-admin-migration-metadata")
     return report
@@ -63,9 +81,18 @@ def main():
     try:
         report = inspect(args.state)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    except Exception:
-        print("Migration metadata plan unavailable; no changes authorized.", file=sys.stderr)
-        return 2
+    except MigrationPlanDatabaseError as error:
+        print(json.dumps({"error": "migration_metadata_database_error", "sqlstate": error.sqlstate}), file=sys.stderr)
+        return EXIT_DATABASE
+    except ValueError:
+        print(json.dumps({"error": "migration_metadata_refused"}), file=sys.stderr)
+        return EXIT_REFUSED
+    except (TypeError, KeyError, AttributeError) as error:
+        print(json.dumps({"error": "migration_metadata_internal_error", "errorType": type(error).__name__}), file=sys.stderr)
+        return EXIT_INTERNAL
+    except Exception as error:
+        print(json.dumps({"error": "migration_metadata_internal_error", "errorType": type(error).__name__}), file=sys.stderr)
+        return EXIT_INTERNAL
     print(json.dumps({k: report[k] for k in ("currentHeads", "targetHead", "migrationAuthorized")}))
     return 1 if report["pending"] else 0
 

@@ -17,6 +17,7 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
+POLICY = json.loads((ROOT / "tools" / "definer-policy.json").read_text(encoding="utf-8"))
 SPEC = importlib.util.spec_from_file_location(
     "recovery_drill_test", ROOT / "tools/recovery_drill.py"
 )
@@ -73,6 +74,63 @@ def mutate_restored(monkeypatch, args, mutation):
     monkeypatch.setattr(drill.Postgres, "run", run)
 
 
+def _cleanup_owned_docker_resource(kind, name, label_key, label_value):
+    """Best-effort cleanup that never hides the test body's exception."""
+    inspect_cmd = ["docker", kind, "inspect", name]
+    try:
+        inspected = subprocess.run(inspect_cmd, capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return "query-error"
+    if inspected.returncode != 0:
+        return "confirmed-absent"
+    try:
+        current = json.loads(inspected.stdout)[0]
+        labels = current.get("Config", {}).get("Labels", {}) if kind == "container" else current.get("Labels", {})
+        if labels.get(label_key) != label_value:
+            return "ownership-mismatch"
+    except (ValueError, KeyError, IndexError, TypeError):
+        return "query-error"
+    remove_cmd = ["docker", "rm", "-f", "-v", name] if kind == "container" else ["docker", "network", "rm", name]
+    try:
+        removed = subprocess.run(remove_cmd, capture_output=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        return "remove-error"
+    if removed.returncode != 0:
+        return "remove-error"
+    try:
+        confirmed = subprocess.run(inspect_cmd, capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return "query-error"
+    return "confirmed-removed" if confirmed.returncode != 0 else "remove-error"
+
+
+def test_cleanup_preserves_unowned_resource_and_confirms_owned_removal(monkeypatch):
+    calls = []
+
+    def mismatch(cmd, **kwargs):
+        calls.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, b'[{"Config":{"Labels":{"other":"run"}}}]', b"")
+
+    monkeypatch.setattr(subprocess, "run", mismatch)
+    assert _cleanup_owned_docker_resource("container", "foreign", "owned", "this-run") == "ownership-mismatch"
+    assert len(calls) == 1
+
+    calls.clear()
+    responses = [
+        subprocess.CompletedProcess([], 0, b'[{"Config":{"Labels":{"owned":"this-run"}}}]', b""),
+        subprocess.CompletedProcess([], 0, b"", b""),
+        subprocess.CompletedProcess([], 1, b"[]", b"not found"),
+    ]
+
+    def owned(cmd, **kwargs):
+        calls.append(cmd)
+        return responses.pop(0)
+
+    monkeypatch.setattr(subprocess, "run", owned)
+    assert _cleanup_owned_docker_resource("container", "this-run", "owned", "this-run") == "confirmed-removed"
+    assert len(calls) == 3
+
+
 def test_real_backup_restore_verifies_both_schemas_without_seed_residue(args, monkeypatch):
     before = drill._table_counts(args.source)
     original = drill._service_resumption
@@ -87,7 +145,8 @@ def test_real_backup_restore_verifies_both_schemas_without_seed_residue(args, mo
     assert drill._passed(report)
     assert report["sourceCounts"] == report["targetCounts"] == before
     assert len(report["targetCounts"]) > 100
-    assert report["definerFunctions"]["checked"] == 9
+    assert report["definerFunctions"]["checked"] == len(POLICY["functions"])
+    assert set(report["definerFunctions"]["catalogueFunctions"]) == set(POLICY["functions"])
     assert report["serviceResumption"]["publicRlsScopes"]
     assert report["serviceResumption"]["kernelRlsScopes"]
     assert report["measuredRtoSeconds"] >= 0.15
@@ -164,6 +223,8 @@ def test_tokens_issued_during_restore_block_stale_sequence(args, monkeypatch):
 
 
 def test_future_archive_timestamp_is_not_a_zero_rpo_success(args, tmp_path):
+    if sys.platform != "linux":
+        pytest.skip("Linux private backup path required for saved archive verification")
     backup = tmp_path / "actual.dump"
     args.save_backup = str(backup)
     first = drill.rehearse(args)
@@ -281,11 +342,19 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
     """A separate owned PG server, no published ports or production changes."""
     name = "sv-rpo-" + uuid4().hex[:12]
     base = json.loads(subprocess.check_output(["docker", "inspect", args.docker]))[0]
-    network = next(iter(base["NetworkSettings"]["Networks"]))
-    net = json.loads(subprocess.check_output(["docker", "network", "inspect", network]))[0]
-    assert net.get("Internal") is True
+    network = "sv-rpo-net-" + uuid4().hex[:12]
     label = "ai.saintvision.rpo-test"
+    network_label = "ai.saintvision.rpo-network"
+    network_created = subprocess.run(
+        ["docker", "network", "create", "--internal", "--label", network_label + "=" + network, network],
+        capture_output=True,
+        timeout=20,
+    )
+    if network_created.returncode != 0:
+        pytest.skip("Docker could not create the owned internal network for archiver isolation")
     try:
+        net = json.loads(subprocess.check_output(["docker", "network", "inspect", network]))[0]
+        assert net.get("Internal") is True, "Owned archiver network is not isolated"
         created = subprocess.run(
             [
                 "docker",
@@ -352,20 +421,20 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
             {"recoveryCapability": drill._recovery_capability(dsn)}, 900
         )
     finally:
-        inspected = subprocess.run(["docker", "inspect", name], capture_output=True, timeout=10)
-        if inspected.returncode == 0:
-            current = json.loads(inspected.stdout)[0]
-            assert current["Config"]["Labels"].get(label) == name
-            subprocess.run(
-                ["docker", "rm", "-f", "-v", current["Id"]],
-                capture_output=True,
-                timeout=30,
-                check=True,
-            )
+        cleanup = {
+            "container": _cleanup_owned_docker_resource("container", name, label, name),
+            "network": _cleanup_owned_docker_resource("network", network, network_label, network),
+        }
+        if any(value not in {"confirmed-removed", "confirmed-absent"} for value in cleanup.values()):
+            print("archiver cleanup: " + json.dumps(cleanup, sort_keys=True), file=sys.stderr)
+            if sys.exc_info()[0] is None:
+                pytest.fail("Owned archiver cleanup incomplete: " + json.dumps(cleanup, sort_keys=True))
 
 
 @pytest.mark.parametrize("changed", [False, True])
 def test_saved_backup_is_linked_and_rechecked_before_record(args, tmp_path, changed):
+    if sys.platform != "linux":
+        pytest.skip("Linux private backup path required for saved archive verification")
     from saintvision.ids import new_id
 
     args.save_backup = str(tmp_path / "saved.dump")
@@ -404,6 +473,8 @@ def test_saved_backup_is_linked_and_rechecked_before_record(args, tmp_path, chan
 
 
 def test_ledger_and_drill_rollback_together(args, tmp_path, monkeypatch):
+    if sys.platform != "linux":
+        pytest.skip("Linux private backup path required for rollback verification")
     from saintvision.ids import new_id
     from saintvision.services import pilot
 

@@ -20,6 +20,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import check_kernel_docker as ckd  # noqa: E402
+from vf_docker import cleanup_owned  # noqa: E402
 
 _HAS_DOCKER = shutil.which("docker") is not None
 
@@ -112,7 +113,11 @@ def test_prune_removes_old_exited_residue_but_spares_a_recent_one():
         ckd.prune_stale_kernel_test_residue(min_age_seconds=0)
         assert _present(recent) == "", "prune did not remove old exited residue"
     finally:
-        subprocess.run(["docker", "rm", "-f", recent], capture_output=True, timeout=60)
+        incomplete = cleanup_owned(
+            "probe",
+            [("recent", ("inspect", "--format", '{{index .Config.Labels "ai.saintvision.kernel-test"}}', recent), ("rm", "-f", recent))],
+        )
+        assert not incomplete, "probe cleanup was not confirmed: " + repr(incomplete)
 
 
 @pytest.mark.docker_host
@@ -138,4 +143,12 @@ def test_prune_never_force_removes_a_running_concurrent_container():
         assert _running(concurrent) != "", "prune force-removed a running concurrent kernel-test container"
         assert _running(other_label) != "", "prune removed a running, differently-labelled container"
     finally:
-        subprocess.run(["docker", "rm", "-f", concurrent, other_label], capture_output=True, timeout=60)
+        incomplete = cleanup_owned(
+            "concurrent-run",
+            [("concurrent", ("inspect", "--format", '{{index .Config.Labels "ai.saintvision.kernel-test"}}', concurrent), ("rm", "-f", concurrent))],
+        )
+        incomplete += cleanup_owned(
+            "keep",
+            [("other", ("inspect", "--format", '{{index .Config.Labels "ai.saintvision.configured"}}', other_label), ("rm", "-f", other_label))],
+        )
+        assert not incomplete, "probe cleanup was not confirmed: " + repr(incomplete)
