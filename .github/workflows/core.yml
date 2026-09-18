@@ -1,7 +1,13 @@
 name: Core Build
 on:
   push:
+    branches:
+      - main
+      - integration/all-agents-unified
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
 permissions:
   contents: read
 jobs:
