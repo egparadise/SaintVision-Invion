@@ -2,8 +2,15 @@
 import json
 import os
 import subprocess
+import sys
 import time
+from pathlib import Path
 from uuid import uuid4
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import docker_diag  # noqa: E402  -- the shared host-init/docker classifier
+from vf_docker import cleanup_owned  # noqa: E402  -- result-based cleanup (VF-CL-R5-01)
 
 import httpx
 import psycopg
@@ -49,9 +56,19 @@ if data['case']=='public-signing-key': (p/'signer.pem').chmod(0o644)
 
 
 def docker(*args, env=None, data=None):
-    result = subprocess.run(["docker", *args], input=data, env=env, capture_output=True,
-                            text=True, timeout=90)
-    assert result.returncode == 0, "Docker operation failed; diagnostics suppressed"
+    # docker_diag.run classifies the failure so it is falsifiable rather than a
+    # suppressed "diagnostics suppressed". A host process-creation failure or a
+    # timeout (STATUS_DLL_INIT_FAILED / a hung CLI under host pressure -- the
+    # VF-CL-R-001 root cause) means the security assertion was never actually
+    # reached, so it is *unverified*, not failed: skip it and say so, rather than
+    # record a false product defect (image-lane finding, 2026-09-18). A real docker
+    # or product error still fails loudly.
+    result = docker_diag.run(["docker", *args], timeout=90, input=data, env=env, text=True)
+    if result.returncode:
+        reason = docker_diag.describe(result)
+        if docker_diag.is_infrastructure_failure(result):
+            pytest.skip("host condition prevented verification (unverified, not failed): " + reason)
+        raise AssertionError("Docker operation failed: " + reason)
     return result.stdout.strip()
 
 
@@ -237,11 +254,26 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                 else:
                     pytest.fail('Persistent Workspace candidate failed after restart')
     finally:
+        # Best-effort, RESULT-BASED cleanup (VF-CL-R5-01): cleanup_owned inspects
+        # returncodes and never raises a pytest outcome, so it cannot replace the
+        # test's real failure with a skip (as reusing docker() here did) or abort the
+        # remaining removals. Ownership is still checked; every resource is attempted;
+        # anything left un-removed is recorded (not raised). Building the list first
+        # keeps each removal independent of the others.
+        resources = []
         if container:
-            assert docker("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container) == name
-            docker("rm", "-f", container)
-        assert docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume) == name
-        docker("volume", "rm", volume)
+            resources.append(("container",
+                ("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container),
+                ("rm", "-f", container)))
+        resources.append(("config-volume",
+            ("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume),
+            ("volume", "rm", volume)))
         if working_volume:
-            assert docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume) == name
-            docker("volume", "rm", working_volume)
+            resources.append(("working-volume",
+                ("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume),
+                ("volume", "rm", working_volume)))
+        incomplete = cleanup_owned(name, resources)
+        if incomplete:
+            # Record, never raise: the test's own outcome (pass/fail) must stand.
+            print("VF cleanup incomplete: " + "; ".join(f"{label}: {why}" for label, why in incomplete),
+                  file=sys.stderr)

@@ -54,3 +54,11 @@ Claude의 8c347b7/e89a415 독립 소스 검토 sound/finding 없음 수신 및 �
 R5-01: cleanup_owned는 결과 기반 docker_diag.run을 사용하고 pytest outcome helper 재사용을 제거했다. 본문 AssertionError 유지·모든 자원 시도·미정리 관측·KeyboardInterrupt 전파 회귀가 통과했다. 넓은 Exception 관용은 이 finally cleanup에 한정하며 오류를 기록한다. 사전 prune의 프로그래밍 오류 표면화와 구분한다.
 
 R5-02: 실제 source_files499개에 tools/docker_diag.py·check_kernel_docker.py와 tests/vf_docker.py가 포함됐다. 이 세 파일만 임시 격리 복사한 뒤 python -I에서 import 성공(exit0), 호스트 원본 tools를 경로에 넣지 않았다. Docker build 실행은 아니다. 새 소스/오프라인 blocker 미관측, 사용자가 진행 중이라고 한 독립24건 결과를 기다려 최종 착지 판정한다. 원인 관련 과거 문서의 호스트 압박 인과 표현은 기존 정본의 상관관계 판정을 대체하지 않는다.
+
+## 최종 Claude 착지 판정 및 현재 인계
+
+사용자 clean d59b8a6에서 정확한 세 파일(test_docker_diag/test_check_kernel_docker_hygiene/test_vf_docker)24passed/0failed, 실제Docker포함 독립 결과 수신. 작성자24와 Codex22/2제외를 합산하지 않는다. R2-01/R2-02/R3-01/R2-03/R4-01/R5-01/R5-02 기존 blocker 해소 판정으로 전체 Claude 브랜치를 e2908a5 기반에 병합한다. 조각 추출 없음. 병합 후보에서도 오프라인22passed/2deselected(exit0), 문서521/ontology 통과. 새 blocker 미관측.
+
+제품 registry 실행 연결 구현 SHA e2908a5를 작업 branch와 integration에 push(exit0)했다. Claude merge는 개발 기준선 반영이며 운영 인수가 아니다. 최신 image lane 미검증6건과 business-kernel-role DB role 거부 단언 미검증을 그대로 유지한다. 이 외부 환경 시험을 진단/cleanup 브랜치 착지 조건으로 걸지 않는다. 호스트 NTSTATUS 실패는 관측 사실이지만 OneDrive/handle 압박의 인과 확정은 아니며 기존 정본의 상관관계 판정을 유지한다.
+
+다음 Codex: e2908a5 registry 실행 연결 독립 검토 수신·finding 대응, 운영자 policy 설정의 서비스 진입 경계 검토. 다음 Claude: 이번 registry 변경 독립 검토(이전 8c/e89 sound와 별도). 외부 대기4건/CI/실장비는 계속 미완이며 승인 요청을 반복하지 않는다.

@@ -236,12 +236,12 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | 초기 배정표 작성. 제품 작업 착수는 담당 확인 대기 |
-| 실제 owner / 읽은 진행판 버전 / KST | 담당자 입력 대기 |
-| branch / base SHA / 구현 SHA | 담당자 입력 대기 |
-| 작업한 것 | 담당자 입력 대기 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 담당자 입력 대기 |
-| CI / 독립 reviewer / 운영 인수 | 각 상태를 따로 기록. 현재 전체 인수 완료 아님 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 해당 카드의 선행 조건 참조 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 위 ready 카드부터 하나 선택 후 담당자가 명시 |
-| History / 오류 / Evidence / PR / sync 결과 | 실제 링크와 SHA를 담당자가 기록 |
+| 마지막 작업 / 착수 카드 | VF-CL-R5 수정(R5-01 cleanup skip 은폐·R5-02 격리 source 누락) + 원격 권한 결속/CAS fixture 독립 검토(8c347b7/e89a415) |
+| 실제 owner / 읽은 진행판 버전 / KST | Claude(테스트/운영 문서 owner·독립 검토) / 보강 로드맵 VF-CL / 2026-09-18 22:45 KST |
+| branch / base SHA / 구현 SHA | agent/claude/vf-cl-cx01 / b5f770a / 71fc9f5(image-lane 마무리) → R3 커밋(아래) |
+| 작업한 것 | R3-01: `is_host_process_init_failure` 플랫폼 게이팅 + loader-stage 전용 allowlist{0xC0000142,0xC0000135}, crash(0xC0000005)·signal(−9) 미재시도(변경명령 중복 방지), describe 5범주. R2-03: `masked_stderr`가 URL·libpq(`password=`)·인용값 3형태 마스킹, 오류 종류 보존. finally: cleanup try/except + JSON write를 finally 마지막 무조건 실행(OSError에도 비밀 없는 evidence 기록). +앞 커밋(71fc9f5): retries 2→1, TimeoutExpired 분류, 선행 host 검사, exit 125 미검증, pytest.skip |
+| 확인한 것 / 명령 / exit code / 실제 환경 | `pytest --noconftest tests/test_docker_diag.py tests/test_check_kernel_docker_hygiene.py tests/test_vf_docker.py` → **24 passed**(실 docker; R5-01 cleanup 6종·R5-02 재현성·타입/동시성 포함). R5-02 회귀 non-vacuous 음성 확인. model 검토는 코드 경로·계약·`channel_monotonic` SQL 대조(실 PG 실행은 사용자 75 passed / Codex 79) |
+| CI / 독립 reviewer / 운영 인수 | 단위 24 passed 실측. reviewer=Codex 일관 수정본(R2·R3·타입·R5) 재검토 대기. model 검토 sound 인계 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
+| 다음 카드 / 첫 행동 / 다음 담당 | model 권한 결속/CAS 독립 검토 완료(sound). 남은 것: Codex R5 수정본 재검토·착지, 여유 호스트 image lane 재판별. 담당 Codex(착지)·사용자/CI(재실행) |
+| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_..._근본원인과R2수정.md` v1.4.0; `..._VF-CX_Claude_model_remote독립검토.md`; `..._VF-CX_Claude_원격권한결속과CAS_fixture독립검토.md`. 커밋 56aa7cb·b809fbe·816346c + R5(아래) |

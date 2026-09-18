@@ -16,6 +16,8 @@ import time
 from uuid import uuid4
 import xml.etree.ElementTree as ET
 
+import docker_diag
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
     'test_node_runtime', 'test_node_delivery', 'test_output_ingestion',
@@ -23,26 +25,103 @@ DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
 
 
 def run(args, **kwargs):
-    return subprocess.run([str(v) for v in args], capture_output=True,
-                          timeout=kwargs.pop('timeout', 60), **kwargs)
+    # Delegates to the shared classifier, which retries only a Windows host
+    # process-creation failure (STATUS_DLL_INIT_FAILED) -- the intermittent
+    # VF-CL-R-001 root cause -- and never a real docker error.
+    return docker_diag.run(args, **kwargs)
 
 
 def checked(args, **kwargs):
     result = run(args, **kwargs)
     if result.returncode:
-        raise RuntimeError(f'{Path(str(args[0])).name} exit {result.returncode}; private log inspection required')
+        # describe() names a host-init failure or a timeout as a host condition and
+        # keeps a real docker error's masked stderr -- a raised TimeoutExpired would
+        # otherwise reopen the same unclassified hole the diagnostics restore closed.
+        raise RuntimeError(f'{Path(str(args[0])).name}: {docker_diag.describe(result)}')
     return result.stdout.decode('utf-8', errors='replace').strip()
+
+
+#: A container younger than this may belong to a concurrently-running agent on the
+#: shared host, so it is never a prune target (VF-CL-R2-01). Kernel test runs finish
+#: in minutes; genuine residue is far older.
+PRUNE_MIN_AGE_SECONDS = 1800
+
+
+def _age_seconds(created_iso):
+    """Age of a docker RFC3339 ``.Created`` timestamp, or None if unparseable."""
+    from datetime import datetime, timezone
+    try:
+        text = (created_iso or '').strip().replace('Z', '+00:00')
+        if '.' in text:                       # trim RFC3339Nano to microseconds
+            head, rest = text.split('.', 1)
+            digits = ''
+            index = 0
+            while index < len(rest) and rest[index].isdigit():
+                digits += rest[index]
+                index += 1
+            text = head + '.' + digits[:6] + rest[index:]
+        return (datetime.now(timezone.utc) - datetime.fromisoformat(text)).total_seconds()
+    except Exception:
+        return None
+
+
+def prune_stale_kernel_test_residue(min_age_seconds=PRUNE_MIN_AGE_SECONDS):
+    """Remove old *exited* kernel-test containers and empty networks, safely.
+
+    The per-invocation finally deliberately preserves this run's stopped containers
+    for post-mortem logs, but nothing bounded that: weeks of runs accumulated
+    (VF-CL-R-001 -- ~130 exited ai.saintvision.kernel-test containers exhausted an
+    8 GB host and timed out a separate image lane). This bounds the accumulation
+    without racing a concurrent agent on the shared host (VF-CL-R2-01):
+
+    * only ``exited`` containers are considered -- never ``created`` (a concurrent
+      run may have just created but not yet started one) and never running;
+    * a container younger than ``min_age_seconds`` is skipped, because a concurrent
+      run's containers are recent and its own finally will handle them;
+    * removal is a *non-force* ``docker rm``, which refuses a container that is
+      running, so even a container that starts between listing and removal is safe.
+
+    Networks are removed only when empty (``docker network rm`` refuses one in use).
+    Every step is best-effort; the caller also guards the whole call.
+    """
+    exited = run(['docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.kernel-test',
+                  '--filter', 'status=exited']).stdout.decode('utf-8', 'replace').split()
+    for container in exited:
+        created = run(['docker', 'inspect', '--format', '{{.Created}}', container]
+                      ).stdout.decode('utf-8', 'replace').strip()
+        age = _age_seconds(created)
+        if age is None or age < min_age_seconds:
+            continue                          # too recent -- may belong to a concurrent run
+        run(['docker', 'rm', container])      # NON-force: a running container is refused, never killed
+    for network in run(['docker', 'network', 'ls', '--filter', 'label=ai.saintvision.kernel-test',
+                        '--format', '{{.ID}}']).stdout.decode('utf-8', 'replace').split():
+        run(['docker', 'network', 'rm', network])  # refuses while still in use; ignored
 
 
 def image_id(reference):
     return json.loads(checked(['docker', 'image', 'inspect', reference]))[0]['Id']
 
 
+#: Individually-listed files copied into (and hashed for) the isolated build snapshot.
+#: The ``tools/`` directory is NOT a wholesale prefix below, so every tools module a
+#: copied file imports must be listed here or the isolated snapshot ModuleNotFounds it
+#: (the host build hides this because the original repo is on sys.path). docker_diag.py
+#: was missing (VF-CL-R5-02): check_kernel_docker and the copied test_docker_diag /
+#: hygiene suites import it, and its absence from the manifest also left its changes out
+#: of sourceHashes -- a reproducibility gap. Kept in sync by
+#: test_tools_dependencies_are_packaged_for_the_isolated_build.
+EXACT_SOURCE_FILES = frozenset({
+    'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
+    'tools/docker_diag.py', 'tools/storage_check.py', 'tools/provision_credentials.py', 'tools/operational_readiness.py',
+    'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/recovery_drill.py',
+    'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py',
+    'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py',
+    'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'})
+
+
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
-    exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/storage_check.py', 'tools/provision_credentials.py', 'tools/operational_readiness.py', 'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/recovery_drill.py', 'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
-    return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
+    return sorted(set(p for p in paths if p in EXACT_SOURCE_FILES or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
 def prepare(args):
@@ -149,6 +228,20 @@ def execute(prepared, tests):
     config=dict(adminDSN=f'postgresql://postgres:{password}@{database}:5432/postgres',nodeImage=prepared['nodeImage'],tests=tests)
     (work/'config.json').write_text(json.dumps(config),encoding='utf-8')
     exit_code=None
+    # Bound residue from prior runs before creating this run's containers, so a
+    # host that has accumulated weeks of stopped test containers does not time out
+    # this run (VF-CL-R-001). This run's own resources are created after the prune.
+    # Best-effort (VF-CL-R2-02) for an OPERATIONAL failure only: docker_diag.run
+    # classifies a timeout rather than raising, so the only expected escape is OSError
+    # (e.g. docker unavailable under load); a prune failure then bounds nothing rather
+    # than aborting the run. A programming error (a type/attribute bug) is deliberately
+    # NOT caught here: swallowing one once let a timed-out prune silently no-op and
+    # reintroduce the leak R2-01 fixed, hidden by this very wrapper -- the VF-CL-R-001
+    # masking one layer down. Such a bug must surface, so only OSError is tolerated.
+    try:
+        prune_stale_kernel_test_residue()
+    except OSError:
+        pass
     try:
         checked(['docker','network','create','--internal','--label','ai.saintvision.kernel-test='+name,network])
         checked(['docker','run','-d','--name',database,'--label','ai.saintvision.kernel-test='+name,
@@ -209,10 +302,21 @@ def execute(prepared, tests):
     finally:
         # Stop only containers created and labelled for this invocation. Preserve
         # stopped containers/private logs on failures; no broad name-prefix delete.
+        # Best-effort (VF-CL-R-001): cleanup runs through the non-raising helper and
+        # is wrapped, so a stop or network-release failure under load cannot mask the
+        # original error or skip the remaining cleanup. Residue this leaves stopped
+        # is bounded by the next run's start-of-run prune.
         for target in (runner,database):
-            value=owned(target,name)
-            if value and value['State']['Running']: checked(['docker','stop','--time','10',target],timeout=30)
-        release_network(network, name)
+            try:
+                value=owned(target,name)
+                if value and value['State']['Running']:
+                    run(['docker','stop','--time','10',target],timeout=30)
+            except Exception:
+                pass
+        try:
+            release_network(network, name)
+        except Exception:
+            pass
 
 
 def main():

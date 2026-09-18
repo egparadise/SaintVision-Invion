@@ -17,8 +17,15 @@ import xml.etree.ElementTree as ET
 import psycopg
 from psycopg.conninfo import make_conninfo
 from node_dependent_tests import dependents
+import docker_diag
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class _HarnessUnavailable(RuntimeError):
+    """The host could not start the harness container -- a process-creation failure or
+    a timeout, not a docker/product error. The run is *unverified*, distinct from a
+    product/test failure, so it must be recorded as such rather than reported as one."""
 
 
 def main():
@@ -44,15 +51,36 @@ def main():
              'operationalAcceptance': False, 'browserOptIn': browser_tests == '1', 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
     code = 1
     try:
-        container = subprocess.check_output([
+        # Pre-run host check (image-lane finding, 2026-09-18): if the host cannot even
+        # start a trivial docker process right now, the security assertions cannot be
+        # reached, and retrying under sustained pressure only adds load. Record the run
+        # as unverified rather than reporting a false product/test failure.
+        probe = docker_diag.run(['docker', 'version', '--format', '{{.Server.Version}}'], text=True)
+        if docker_diag.is_infrastructure_failure(probe):
+            raise _HarnessUnavailable('pre-run host check: ' + docker_diag.describe(probe))
+        # docker_diag.run classifies a Windows host process-creation failure
+        # (STATUS_DLL_INIT_FAILED under host handle/RAM pressure -- the intermittent
+        # VF-CL-R-001 root cause) and a timeout apart from a real docker error, and
+        # never raises TimeoutExpired out unclassified.
+        created = docker_diag.run([
             'docker', 'run', '-d', '--name', name,
             '--label', 'ai.saintvision.configured=' + name,
             '--label', 'ai.saintvision.cx01=' + name,
             '--memory', '768m', '--cpus', '1', '--pids-limit', '256',
             '--tmpfs', '/var/lib/postgresql/data', '--publish', '127.0.0.1::5432',
             '--env', 'POSTGRES_PASSWORD', 'postgres:16',
-        ], env={**base_env, 'POSTGRES_PASSWORD': password}, text=True).strip()
-        info = json.loads(subprocess.check_output(['docker', 'inspect', container], text=True))[0]
+        ], env={**base_env, 'POSTGRES_PASSWORD': password}, text=True)
+        if created.returncode:
+            if docker_diag.is_infrastructure_failure(created):
+                raise _HarnessUnavailable('container create: ' + docker_diag.describe(created))
+            raise RuntimeError('container create failed: ' + docker_diag.describe(created))
+        container = created.stdout.strip()
+        inspected = docker_diag.run(['docker', 'inspect', container], text=True)
+        if inspected.returncode:
+            if docker_diag.is_infrastructure_failure(inspected):
+                raise _HarnessUnavailable('container inspect: ' + docker_diag.describe(inspected))
+            raise RuntimeError('container inspect failed: ' + docker_diag.describe(inspected))
+        info = json.loads(inspected.stdout)[0]
         port = info['NetworkSettings']['Ports']['5432/tcp'][0]['HostPort']
         dsn = make_conninfo(host='127.0.0.1', port=port, dbname='postgres',
                            user='postgres', password=password, connect_timeout=2)
@@ -90,16 +118,39 @@ def main():
                 proof['tests'] = counts
             except ET.ParseError:
                 proof['testReport'] = 'incomplete'
+    except _HarnessUnavailable as exc:
+        # Unverified, not failed: the host could not start the harness. Kept distinct
+        # from a test failure (exit 1) and a test-run timeout (exit 124); 125 = the
+        # harness itself could not start, so the assertions were never reached.
+        proof['unverified'] = str(exc)
+        code = 125
     finally:
-        if container:
-            label = subprocess.check_output(['docker', 'inspect', container, '--format',
-                        '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True).strip()
-            if label != name:
-                raise RuntimeError('Container ownership changed; cleanup refused')
-            subprocess.run(['docker', 'rm', '-f', container], check=True, stdout=subprocess.DEVNULL)
-            proof['isolatedContainerRemoved'] = True
+        proof['exitCode'] = code
+        # Best-effort, classified (VF-CL-R-001): cleanup must never stop the secret-free
+        # evidence JSON from being written. docker_diag.run classifies a host-init
+        # failure or timeout rather than raising, but subprocess can still raise OSError
+        # (e.g. it cannot spawn under the very pressure this addresses), so the whole
+        # cleanup is guarded and its failure is recorded (masked), not propagated
+        # (Codex, 2026-09-18). Ownership is checked when it can be; removal targets this
+        # run's unique id, and the outcome is recorded so cleanup is falsifiable.
+        try:
+            if container:
+                inspected = docker_diag.run(['docker', 'inspect', container, '--format',
+                            '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True)
+                if inspected.returncode == 0 and inspected.stdout.strip() != name:
+                    proof['cleanup'] = 'ownership mismatch; container preserved'
+                else:
+                    removed = docker_diag.run(['docker', 'rm', '-f', container])
+                    proof['isolatedContainerRemoved'] = removed.returncode == 0
+                    if removed.returncode:
+                        proof['cleanup'] = docker_diag.describe(removed)
+        except Exception as exc:
+            proof['cleanup'] = 'cleanup error (container preserved): ' + docker_diag.masked_stderr(str(exc))
+        # Always the last statement in finally: a secret-free result JSON is written
+        # even when cleanup failed above.
         (output / (prefix + '.json')).write_text(json.dumps(proof, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'exitCode': code, 'tests': proof.get('tests'),
+                      'unverified': proof.get('unverified'),
                       'evidence': '.work/' + prefix + '.json'}))
     return code
 

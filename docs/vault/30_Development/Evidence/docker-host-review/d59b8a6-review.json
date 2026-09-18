@@ -19,6 +19,22 @@
   "imageLaneRun": false,
   "dockerPruneRun": false,
   "authorReportedPassed": 24,
-  "userIndependentResult": "pending",
-  "r5SourceAndOfflineVerdict": "resolved; final landing awaits reported independent result"
+  "userIndependentResult": {
+    "sha": "d59b8a6",
+    "passed": 24,
+    "failed": 0,
+    "includesRealDocker": true,
+    "suites": [
+      "tests/test_docker_diag.py",
+      "tests/test_check_kernel_docker_hygiene.py",
+      "tests/test_vf_docker.py"
+    ]
+  },
+  "r5SourceAndOfflineVerdict": "resolved; accepted for integration, operational image acceptance remains incomplete",
+  "mergedOffline": {
+    "passed": 22,
+    "deselected": 2,
+    "exitCode": 0,
+    "junitSha256": "1efd32663f05d68c221dfa60220060719195ee76a21364d61723448c0b42beb3"
+  }
 }
