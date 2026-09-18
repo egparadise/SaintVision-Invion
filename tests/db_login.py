@@ -47,8 +47,18 @@ def application_test_engine(database_url, owner_engine):
         engine = create_engine(url, future=True)
         yield engine
     finally:
+        # dispose() failure must NOT skip the DROP ROLE below, or the owned login role
+        # leaks (VB-FIX-02). Attempt dispose, keep any error, always drop the role, then
+        # surface the dispose error (the original body error, if any, stays on its
+        # __context__).
+        dispose_error = None
         if engine is not None:
-            engine.dispose()
+            try:
+                engine.dispose()
+            except Exception as exc:  # noqa: BLE001
+                dispose_error = exc
         assert role.startswith("inv_backend_login_") and len(role) == 50
         with owner_engine.begin() as connection:
             connection.connection.driver_connection.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
+        if dispose_error is not None:
+            raise dispose_error
