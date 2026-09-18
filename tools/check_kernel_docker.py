@@ -102,11 +102,26 @@ def image_id(reference):
     return json.loads(checked(['docker', 'image', 'inspect', reference]))[0]['Id']
 
 
+#: Individually-listed files copied into (and hashed for) the isolated build snapshot.
+#: The ``tools/`` directory is NOT a wholesale prefix below, so every tools module a
+#: copied file imports must be listed here or the isolated snapshot ModuleNotFounds it
+#: (the host build hides this because the original repo is on sys.path). docker_diag.py
+#: was missing (VF-CL-R5-02): check_kernel_docker and the copied test_docker_diag /
+#: hygiene suites import it, and its absence from the manifest also left its changes out
+#: of sourceHashes -- a reproducibility gap. Kept in sync by
+#: test_tools_dependencies_are_packaged_for_the_isolated_build.
+EXACT_SOURCE_FILES = frozenset({
+    'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
+    'tools/docker_diag.py', 'tools/storage_check.py', 'tools/provision_credentials.py', 'tools/operational_readiness.py',
+    'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/recovery_drill.py',
+    'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py',
+    'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py',
+    'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'})
+
+
 def source_files():
     paths = checked(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT).splitlines()
-    exact = {'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
-             'tools/storage_check.py', 'tools/provision_credentials.py', 'tools/operational_readiness.py', 'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/recovery_drill.py', 'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py', 'tools/check_kernel_docker.py', 'tools/migration_graph.py', 'tools/check_migration_upgrade.py', 'deploy/testing/Dockerfile.kernel', 'deploy/testing/Dockerfile.python-node'}
-    return sorted(set(p for p in paths if p in exact or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
+    return sorted(set(p for p in paths if p in EXACT_SOURCE_FILES or p.startswith(('src/', 'services/control-plane/src/', 'services/node-agent/', 'packages/contracts-go/', 'tests/', 'contracts/', 'migrations/'))))
 
 
 def prepare(args):

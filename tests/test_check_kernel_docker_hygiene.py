@@ -35,6 +35,30 @@ def test_checked_raises_with_a_masked_diagnostic_not_a_blank_message():
 import time
 
 
+def test_tools_dependencies_are_packaged_for_the_isolated_build():
+    """VF-CL-R5-02: every tools/ module the orchestrator imports must be in the
+    isolated build's source manifest, or the snapshot ModuleNotFounds it (the host
+    build hides this because the original repo is on sys.path, so the host-based
+    suites pass regardless). docker_diag.py was the omission. This catches it and any
+    future one by walking check_kernel_docker's own imports."""
+    import ast
+
+    source = Path(ckd.__file__).read_text(encoding="utf-8")
+    imported = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            imported.add(node.module.split(".")[0])
+
+    tools_dir = Path(ckd.__file__).parent
+    local_tool_deps = {"tools/%s.py" % name for name in imported if (tools_dir / (name + ".py")).exists()}
+    assert local_tool_deps, "expected at least docker_diag among the orchestrator's tools imports"
+    missing = local_tool_deps - set(ckd.EXACT_SOURCE_FILES)
+    assert not missing, "tools modules imported by check_kernel_docker but absent from the isolated source manifest: " + ", ".join(sorted(missing))
+    assert "tools/docker_diag.py" in ckd.EXACT_SOURCE_FILES
+
+
 def test_run_on_timeout_stays_bytes_so_decode_sites_do_not_crash(monkeypatch):
     """check_kernel_docker calls run() without text= and .decode()s the result. A
     timeout must therefore return bytes, not str, or every decode site (and the build-

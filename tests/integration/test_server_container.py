@@ -8,7 +8,9 @@ from pathlib import Path
 from uuid import uuid4
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import docker_diag  # noqa: E402  -- the shared host-init/docker classifier
+from vf_docker import cleanup_owned  # noqa: E402  -- result-based cleanup (VF-CL-R5-01)
 
 import httpx
 import psycopg
@@ -252,21 +254,26 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                 else:
                     pytest.fail('Persistent Workspace candidate failed after restart')
     finally:
-        # Best-effort cleanup (VF-CL-R-001): ownership is still checked so we never
-        # remove another run's resource, but a check that cannot run under load skips
-        # only that resource rather than aborting the block or masking the test's own
-        # failure. Each removal is independent.
-        def _owned_remove(inspect_args, remove_args):
-            try:
-                if docker(*inspect_args) == name:
-                    docker(*remove_args)
-            except Exception:
-                pass
+        # Best-effort, RESULT-BASED cleanup (VF-CL-R5-01): cleanup_owned inspects
+        # returncodes and never raises a pytest outcome, so it cannot replace the
+        # test's real failure with a skip (as reusing docker() here did) or abort the
+        # remaining removals. Ownership is still checked; every resource is attempted;
+        # anything left un-removed is recorded (not raised). Building the list first
+        # keeps each removal independent of the others.
+        resources = []
         if container:
-            _owned_remove(("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container),
-                          ("rm", "-f", container))
-        _owned_remove(("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume),
-                      ("volume", "rm", volume))
+            resources.append(("container",
+                ("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container),
+                ("rm", "-f", container)))
+        resources.append(("config-volume",
+            ("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume),
+            ("volume", "rm", volume)))
         if working_volume:
-            _owned_remove(("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume),
-                          ("volume", "rm", working_volume))
+            resources.append(("working-volume",
+                ("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume),
+                ("volume", "rm", working_volume)))
+        incomplete = cleanup_owned(name, resources)
+        if incomplete:
+            # Record, never raise: the test's own outcome (pass/fail) must stand.
+            print("VF cleanup incomplete: " + "; ".join(f"{label}: {why}" for label, why in incomplete),
+                  file=sys.stderr)
