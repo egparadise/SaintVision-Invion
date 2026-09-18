@@ -32,9 +32,10 @@ def test_inventory_failure_is_reported_not_as_empty_success(monkeypatch):
         stderr = "volume inventory unavailable"
 
     monkeypatch.setattr(tool, "_run", lambda args: Result())
+    monkeypatch.setattr(tool, "_engine_counts", lambda: (_ for _ in ()).throw(RuntimeError("engine unavailable")))
     resources, unavailable, counts = tool._resources()
     assert resources == []
-    assert {entry["kind"] for entry in unavailable} == {"container", "volume", "network"}
+    assert {entry["kind"] for entry in unavailable} == {"inventory", "container", "volume", "network"}
     assert counts == {}
 
 
@@ -54,6 +55,7 @@ def test_inventory_mismatch_is_unverified_and_delete_aborts(monkeypatch, capsys)
         return Result("")
 
     monkeypatch.setattr(tool, "_run", fake)
+    monkeypatch.setattr(tool, "_engine_counts", lambda: {"container": 1, "volume": 0, "network": 0})
     resources, unavailable, counts = tool._resources()
     assert resources == []
     assert any(entry["kind"] == "container" and "count mismatch" in entry["reason"] for entry in unavailable)
@@ -77,3 +79,17 @@ def test_container_removal_deletes_image_declared_anonymous_volumes(monkeypatch)
     ok, reason = tool._remove({"kind": "container", "id": "owned-container"})
     assert ok and reason == "confirmed-removed"
     assert calls == [["docker", "container", "rm", "-f", "-v", "owned-container"]]
+
+
+def test_symmetric_container_flag_loss_is_detected_by_daemon_count(monkeypatch):
+    class Result:
+        returncode = 0
+        stderr = ""
+        stdout = "one\ntwo\nthree\n"
+
+    monkeypatch.setattr(tool, "_run", lambda args: Result())
+    monkeypatch.setattr(tool, "_engine_counts", lambda: {"container": 53, "volume": 0, "network": 0})
+    resources, unavailable, counts = tool._resources()
+    assert resources == []
+    assert counts["container"] == {"enumerated": 3, "independent": 53}
+    assert any(entry["kind"] == "container" and "count mismatch" in entry["reason"] for entry in unavailable)

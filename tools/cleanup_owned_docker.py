@@ -46,26 +46,67 @@ def _inspect(kind: str, identifier: str):
         return None
 
 
+def _engine_get(path: str):
+    """Read one Docker Engine API endpoint through the CLI's daemon channel."""
+    process = subprocess.Popen(["docker", "system", "dial-stdio"], stdin=subprocess.PIPE,
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    request = f"GET {path} HTTP/1.1\r\nHost: docker\r\nConnection: close\r\n\r\n".encode()
+    stdout, stderr = process.communicate(request, timeout=30)
+    if process.returncode:
+        raise RuntimeError(stderr.decode("utf-8", "replace").strip()[-240:] or "Docker Engine channel failed")
+    header, separator, body = stdout.partition(b"\r\n\r\n")
+    if not separator or not header.startswith(b"HTTP/") or b" 200 " not in header.splitlines()[0]:
+        raise RuntimeError("Docker Engine API request failed")
+    headers = header.lower()
+    if b"transfer-encoding: chunked" in headers:
+        decoded = bytearray()
+        while body:
+            line, _, body = body.partition(b"\r\n")
+            size = int(line.split(b";", 1)[0], 16)
+            if size == 0:
+                break
+            decoded.extend(body[:size])
+            body = body[size + 2:]
+        body = bytes(decoded)
+    return json.loads(body.decode("utf-8"))
+
+
+def _engine_counts():
+    """Return daemon-owned counts, independent of any `docker * ls` flags."""
+    return {
+        "container": len(_engine_get("/containers/json?all=1")),
+        "volume": len((_engine_get("/volumes") or {}).get("Volumes") or []),
+        "network": len(_engine_get("/networks")),
+    }
+
+
 def _resources():
     resources, unavailable, counts = [], [], {}
     specs = {
         # Containers need -a; volumes and networks are already fully listed by
         # their ls commands and reject that flag.
-        "container": (["docker", "container", "ls", "-a", "-q"], ["docker", "container", "ls", "-a", "--format", "{{.ID}}"]),
-        "volume": (["docker", "volume", "ls", "-q"], ["docker", "volume", "ls", "--format", "{{.Name}}"]),
-        "network": (["docker", "network", "ls", "-q"], ["docker", "network", "ls", "--format", "{{.Name}}"]),
+        "container": ["docker", "container", "ls", "-a", "-q"],
+        "volume": ["docker", "volume", "ls", "-q"],
+        "network": ["docker", "network", "ls", "-q"],
     }
-    for kind, (list_args, count_args) in specs.items():
+    try:
+        daemon_counts = _engine_counts()
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError, TypeError, json.JSONDecodeError) as error:
+        daemon_counts = None
+        unavailable.append({"kind": "inventory", "reason": "independent Docker Engine count unavailable: " + str(error)[-240:]})
+    for kind, list_args in specs.items():
         listed = _run(list_args)
-        counted = _run(count_args)
-        if listed.returncode != 0 or counted.returncode != 0:
-            unavailable.append({"kind": kind, "reason": "inventory query failed: " + ((listed.stderr or counted.stderr).strip()[-240:] or "unknown error")})
+        if listed.returncode != 0:
+            unavailable.append({"kind": kind, "reason": "inventory query failed: " + (listed.stderr.strip()[-240:] or "unknown error")})
             continue
         identifiers = [value.strip() for value in listed.stdout.splitlines() if value.strip()]
-        independent = [value.strip() for value in counted.stdout.splitlines() if value.strip()]
-        counts[kind] = {"enumerated": len(identifiers), "independent": len(independent)}
-        if len(identifiers) != len(independent):
-            unavailable.append({"kind": kind, "reason": f"inventory count mismatch: enumerated={len(identifiers)} independent={len(independent)}"})
+        independent = daemon_counts.get(kind) if daemon_counts is not None else None
+        if independent is None:
+            unavailable.append({"kind": kind, "reason": "independent Docker Engine count unavailable"})
+            continue
+        counts[kind] = {"enumerated": len(identifiers), "independent": independent}
+        if len(identifiers) != independent:
+            unavailable.append({"kind": kind, "reason": f"inventory count mismatch: enumerated={len(identifiers)} independent={independent}"})
             continue
         for identifier in identifiers:
             value = _inspect(kind, identifier.strip())
