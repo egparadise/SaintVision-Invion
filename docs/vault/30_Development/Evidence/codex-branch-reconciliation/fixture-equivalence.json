@@ -1,0 +1,9 @@
+{
+  "original": "4da131f:tests/conftest.py",
+  "canonical": "tests/db_login.py",
+  "functionASTIdentical": true,
+  "originalRegressionCases": 2,
+  "canonicalRegressionCases": 3,
+  "canonicalChecksActualGroupPasswordAndRoleFlags": true,
+  "sharedGroupAlterLoginCallsInTests": 0
+}

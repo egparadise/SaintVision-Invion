@@ -1,0 +1,43 @@
+{
+  "command": "python -m pytest -q tests/integration/test_approval_browser.py tests/integration/test_studio_browser.py tests/core/test_identity.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "real kernel FastAPI routes with non-owner PostgreSQL and synthetic JWT; no Node execution",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "browser": "real headless Chromium/Edge; ApprovalCenter harness plus full /studio entry with synthetic PKCE IdP; configured server factory over HTTP",
+  "isolatedContainerRemoved": true,
+  "codeSha": "33d63d52074e11f78065aabaf3af3678c02f8b82",
+  "verifiedKst": "2026-09-15T00:54:21+09:00",
+  "owner": "Codex",
+  "independentReview": "pending",
+  "frontendTests": {
+    "passed": 233,
+    "files": 27,
+    "seconds": 6.61,
+    "exitCode": 0
+  },
+  "browserAndIdentityTests": {
+    "passed": 38,
+    "browserJourneys": 4,
+    "identityTests": 34,
+    "seconds": 64.66,
+    "exitCode": 0
+  },
+  "approvalContractTests": {
+    "passed": 10,
+    "seconds": 4.24,
+    "exitCode": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "viteSeconds": 8.07
+  },
+  "operationalAcceptance": false,
+  "nginxValidation": "configuration edited; Nginx/TLS deployment validation pending",
+  "notes": [
+    "Actual /studio entry, synthetic IdP, real configured API and isolated PostgreSQL; no browser response interception.",
+    "Two full App cases plus two ApprovalCenter component cases.",
+    "No actual Node execution, operational IdP, live DB migration, or independent review."
+  ]
+}

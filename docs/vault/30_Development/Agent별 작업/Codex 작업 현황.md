@@ -403,3 +403,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## 이전 공유판 수신 기록
 
 외부 공유판 원문과 hash는 Evidence/cx01-landing/shared-codex-before.txt 및 shared-codex-proposal.json에 보존했다. 아래 세 항목은 당시 고정 SHA의 기록이며 현재 착지 검증과 구분한다.
+
+- 사용자 후속 브랜치 정리: VF-CX-01/04 기록은 파일동일, dev-environment 수정은 현 helper와AST동일/격리PG3시험통과로중복제외. workspace-bridge 신규36개 기록 수신. [[2026-09-18_Codex_미착지브랜치_정리]]. 다음VF-CX-02/03/05 준비범위 진행.

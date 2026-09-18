@@ -1,0 +1,228 @@
+[
+  {
+    "branch": "agent/codex/vf-cx-01",
+    "commits": [
+      "bf3e510dbc42e92ab0eb4c49194ea09807256bc7"
+    ],
+    "files": [
+      {
+        "path": "docs/vault/30_Development/Evidence/vf-cx-01/final-regression-290aba5.json",
+        "status": "identical"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/vf-cx-01/scoped-obsidian-sync.json",
+        "status": "identical"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_VF-CX-01_Codex_인계.md",
+        "status": "identical"
+      }
+    ]
+  },
+  {
+    "branch": "agent/codex/vf-cx-04",
+    "commits": [
+      "4a06f56f15427dc0ace6b4abfa174530cdebcfd2"
+    ],
+    "files": [
+      {
+        "path": "docs/vault/30_Development/Evidence/vf-cx-04/windows-final-runtime.json",
+        "status": "identical"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_VF-CX-04_Codex_검증보고.md",
+        "status": "identical"
+      }
+    ]
+  },
+  {
+    "branch": "agent/codex/dev-environment",
+    "commits": [
+      "4da131fa24342fafc062fae3bad7a0704b4a64fa"
+    ],
+    "files": [
+      {
+        "path": "tests/conftest.py",
+        "status": "differs"
+      },
+      {
+        "path": "tests/test_role_fixture_preservation.py",
+        "status": "missing"
+      }
+    ]
+  },
+  {
+    "branch": "agent/codex/workspace-bridge",
+    "commits": [
+      "6047846b6c2202fae9a528f526edd8beb85bec67",
+      "5e7670a41960a3b5a3151f6102c7df3f0686a203",
+      "74d1702354b49e45a3fe056a409930583fb4ffdb",
+      "5a03225f1c2303d4c5e427bf410bbf6df60618b5",
+      "1d68a8be062772f6aa39ea1290142d554661434d",
+      "8e7e2c6399853b4aa5f9a3f78eaf555513cf8ef9",
+      "9bb7184eaf794d42c45c940059ea3222f8c326c5"
+    ],
+    "files": [
+      {
+        "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+        "status": "differs"
+      },
+      {
+        "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+        "status": "differs"
+      },
+      {
+        "path": "docs/vault/30_Development/Agent별 작업/Gemini 작업 현황.md",
+        "status": "differs"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/approval-browser-ci-e0b4b4f.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/approval-browser-e0b4b4f.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/approval-browser-e0b4b4f.png",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/approval-browser-sync-5e7670a.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-approval-browser/.gitattributes",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-approval-browser/manifest.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-approval-browser/proposal-1.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-approval-browser/proposal-2.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-approval-browser/proposal-3.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-auth/.gitattributes",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-auth/manifest.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-auth/proposal-1.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-auth/proposal-2.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-auth/proposal-3.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-tls/.gitattributes",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-tls/manifest.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-tls/proposal-1.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-tls/proposal-2.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/obsidian-proposals-20260915-studio-tls/proposal-3.txt",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-auth-33d63d5.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-auth-33d63d5.png",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-auth-ci-33d63d5.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-auth-sync-5a03225.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-tls-89a405a.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-tls-89a405a.png",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-tls-ci-89a405a.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/studio-tls-sync-8e7e2c6.json",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_검증보고.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_오류해결.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_APPROVAL-BROWSER-INTEGRATION_Codex_착수.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-AUTH-ENTRY_Codex_검증보고.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-AUTH-ENTRY_Codex_오류해결.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-AUTH-ENTRY_Codex_착수.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-TLS-PROXY_Codex_검증보고.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-TLS-PROXY_Codex_오류해결.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-09-15_STUDIO-TLS-PROXY_Codex_착수.md",
+        "status": "missing"
+      },
+      {
+        "path": "docs/vault/40_Governance/Agent 인계 대기 목록.md",
+        "status": "differs"
+      }
+    ]
+  }
+]
