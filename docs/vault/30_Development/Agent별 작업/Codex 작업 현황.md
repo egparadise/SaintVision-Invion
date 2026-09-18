@@ -588,3 +588,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 후속: `tools/recovery_drill.py`와 `tests/integration/test_recovery_drill.py`에서 definer 함수 검증을 `tools/definer-policy.json`의 exact signature set으로 결속했다. Windows/Linux 백업 경로·격리 Docker network 전제 미충족 6건은 이유가 보이는 skip으로 분리했다. `7eb0d66`을 integration에 push했고, 실제 Linux/격리 Docker 복원 인수는 여전히 미실행이다.
 
 정정: archiver network의 `Internal=false`는 관찰된 보안 실패이므로 skip하면 안 된다. 시험이 소유 `--internal` 네트워크를 직접 생성하고, 생성 실패만 명시적 skip하며 생성 후 `Internal=false`는 실패하도록 `test_recovery_drill.py`를 수정했다. Linux 백업 경로 조건의 3개 시험군은 플랫폼 전제 skip으로 유지한다.
+
+추가 정정: archiver `finally`의 컨테이너·네트워크 정리를 독립 상태 분류기로 바꿨다. 소유권 불일치 자원은 보존하고, 컨테이너 정리 실패에도 네트워크 정리를 계속하며, cleanup 예외가 본문 예외를 덮지 않는다. 삭제 후 재-inspect와 비소유 보존 합성 회귀시험을 추가했다.

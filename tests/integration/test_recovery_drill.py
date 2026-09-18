@@ -74,6 +74,63 @@ def mutate_restored(monkeypatch, args, mutation):
     monkeypatch.setattr(drill.Postgres, "run", run)
 
 
+def _cleanup_owned_docker_resource(kind, name, label_key, label_value):
+    """Best-effort cleanup that never hides the test body's exception."""
+    inspect_cmd = ["docker", kind, "inspect", name]
+    try:
+        inspected = subprocess.run(inspect_cmd, capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return "query-error"
+    if inspected.returncode != 0:
+        return "confirmed-absent"
+    try:
+        current = json.loads(inspected.stdout)[0]
+        labels = current.get("Config", {}).get("Labels", {}) if kind == "container" else current.get("Labels", {})
+        if labels.get(label_key) != label_value:
+            return "ownership-mismatch"
+    except (ValueError, KeyError, IndexError, TypeError):
+        return "query-error"
+    remove_cmd = ["docker", "rm", "-f", "-v", name] if kind == "container" else ["docker", "network", "rm", name]
+    try:
+        removed = subprocess.run(remove_cmd, capture_output=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        return "remove-error"
+    if removed.returncode != 0:
+        return "remove-error"
+    try:
+        confirmed = subprocess.run(inspect_cmd, capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return "query-error"
+    return "confirmed-removed" if confirmed.returncode != 0 else "remove-error"
+
+
+def test_cleanup_preserves_unowned_resource_and_confirms_owned_removal(monkeypatch):
+    calls = []
+
+    def mismatch(cmd, **kwargs):
+        calls.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, b'[{"Config":{"Labels":{"other":"run"}}}]', b"")
+
+    monkeypatch.setattr(subprocess, "run", mismatch)
+    assert _cleanup_owned_docker_resource("container", "foreign", "owned", "this-run") == "ownership-mismatch"
+    assert len(calls) == 1
+
+    calls.clear()
+    responses = [
+        subprocess.CompletedProcess([], 0, b'[{"Config":{"Labels":{"owned":"this-run"}}}]', b""),
+        subprocess.CompletedProcess([], 0, b"", b""),
+        subprocess.CompletedProcess([], 1, b"[]", b"not found"),
+    ]
+
+    def owned(cmd, **kwargs):
+        calls.append(cmd)
+        return responses.pop(0)
+
+    monkeypatch.setattr(subprocess, "run", owned)
+    assert _cleanup_owned_docker_resource("container", "this-run", "owned", "this-run") == "confirmed-removed"
+    assert len(calls) == 3
+
+
 def test_real_backup_restore_verifies_both_schemas_without_seed_residue(args, monkeypatch):
     before = drill._table_counts(args.source)
     original = drill._service_resumption
@@ -364,21 +421,14 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
             {"recoveryCapability": drill._recovery_capability(dsn)}, 900
         )
     finally:
-        inspected = subprocess.run(["docker", "inspect", name], capture_output=True, timeout=10)
-        if inspected.returncode == 0:
-            current = json.loads(inspected.stdout)[0]
-            assert current["Config"]["Labels"].get(label) == name
-            subprocess.run(
-                ["docker", "rm", "-f", "-v", current["Id"]],
-                capture_output=True,
-                timeout=30,
-                check=True,
-            )
-        network_inspected = subprocess.run(["docker", "network", "inspect", network], capture_output=True, timeout=10)
-        if network_inspected.returncode == 0:
-            network_data = json.loads(network_inspected.stdout)[0]
-            assert network_data["Labels"].get(network_label) == network
-            subprocess.run(["docker", "network", "rm", network], capture_output=True, timeout=20, check=True)
+        cleanup = {
+            "container": _cleanup_owned_docker_resource("container", name, label, name),
+            "network": _cleanup_owned_docker_resource("network", network, network_label, network),
+        }
+        if any(value not in {"confirmed-removed", "confirmed-absent"} for value in cleanup.values()):
+            print("archiver cleanup: " + json.dumps(cleanup, sort_keys=True), file=sys.stderr)
+            if sys.exc_info()[0] is None:
+                pytest.fail("Owned archiver cleanup incomplete: " + json.dumps(cleanup, sort_keys=True))
 
 
 @pytest.mark.parametrize("changed", [False, True])
