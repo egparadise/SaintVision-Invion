@@ -43,3 +43,22 @@ def test_missing_database_password_cannot_fall_back_to_a_default():
                             cwd=ROOT, env=env, capture_output=True, text=True, timeout=20)
     assert result.returncode != 0
     assert 'POSTGRES_PASSWORD' in result.stderr
+
+
+def test_missing_external_cert_dir_cannot_fall_back_to_a_default():
+    # The external TLS directory became a required Compose input (no more ./deploy/certs
+    # default). This negative test is only meaningful if the SAME full env validates while
+    # the variable is present -- otherwise an unrelated missing input, not this one, could
+    # be the real cause of the failure below. So gate on that precondition first, and assert
+    # the eventual failure names THIS variable rather than whichever required input broke first.
+    present = subprocess.run(['docker', 'compose', '-f', 'docker-compose.prod.yml', 'config', '--quiet'],
+                             cwd=ROOT, env=compose_env(), capture_output=True, text=True, timeout=20)
+    assert present.returncode == 0, f'precondition unmet: full synthetic env must validate, got {present.stderr!r}'
+    assert 'SAINTVISION_DEV_CERT_DIR' not in present.stderr, 'variable must not be indicted while it is set'
+
+    env = compose_env()
+    env['SAINTVISION_DEV_CERT_DIR'] = ''
+    result = subprocess.run(['docker', 'compose', '-f', 'docker-compose.prod.yml', 'config', '--quiet'],
+                            cwd=ROOT, env=env, capture_output=True, text=True, timeout=20)
+    assert result.returncode != 0
+    assert 'SAINTVISION_DEV_CERT_DIR' in result.stderr
