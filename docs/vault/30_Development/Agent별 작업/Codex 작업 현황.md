@@ -1,14 +1,18 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.63"
+version: "1.0.64"
 status: "review"
 author: "Codex"
-updated: "2026-09-18T12:19:54+09:00"
+updated: "2026-09-18T13:40:06+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 최신 상태 지도 (기준 d7e7d13)
+
+[[Codex 검증 상태 지도와 재개 조건]]이 현재 검증완료/미검증/외부대기와 재시도조건 정본이다. e2908a5 Claude sound 수신, 11e9f44 설정연결은 로컬46통과/독립검토대기. 기본회귀1eaf285 사용자1179/489skip/2제외/0failed. 최신image는2통과/6미도달실패, business-kernel-role미검증. VF운영인수0/5·formal0/48 유지. 외부4건과 AC-12 운영PITR 적용은 별도대기. 아래 고정SHA별 과거의 완료/차단 표현을 현재상태로 자동승계하지 않는다.
 
 ## CX-01 공유 개발 정본 착지 (2026-09-18)
 
