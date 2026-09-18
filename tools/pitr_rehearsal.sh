@@ -1,28 +1,89 @@
 #!/usr/bin/env bash
 # Physical PITR rehearsal with a STRICT pass gate and OWNED, retry-safe docker use.
 #
-# Proves point-in-time recovery works AND that the exclusion test is meaningful: a
-# physical base backup, record A (before target T1), record B (after T1, CONFIRMED to
-# exist in the source), then a restore of archived WAL to T1 in a separate isolated
-# cluster (same host -- not a separate failure domain) that must PROMOTE and hold A only.
+# Point-in-time recovery is proven AND the exclusion test is kept meaningful: a physical
+# base backup, record A (before target T1), record B (after T1, CONFIRMED present in the
+# source), then a restore of archived WAL to T1 in a separate isolated cluster (same host
+# -- not a separate failure domain) that must PROMOTE and hold A only.
 #
-# Pass gate (PITR-R2-01): every step's exit code is checked; psql ON_ERROR_STOP; A and
-# B confirmed in the SOURCE (else the exclusion test is vacuous -> FAIL); promotion
-# (target reached) enforced before the restore content is judged. Each failure has a
-# distinct exit code (11-14) so the broken step is visible.
-#
-# Docker safety (PITR-R2-02): the container carries a unique owner label; cleanup removes
-# ONLY containers with that label (never a blind rm on a shared name); a container-create
-# failure is retried at most for a transient daemon timeout, and only after removing any
-# partial WE own (never duplicating or touching another run's container); a non-transient
-# failure is reported, not blindly retried; cleanup failures are reported.
-#
-# Negative regression: FAULT injects a broken prerequisite and the gate must FAIL:
+# Pass gate (PITR-R2-01): every step's exit is checked; psql ON_ERROR_STOP; A and B
+# confirmed in the SOURCE (else exclusion is vacuous -> FAIL); promotion enforced before
+# judging the restore. FAULT injects a broken prerequisite and the gate must FAIL:
 #   before-insert | after-insert | basebackup | restore-start | promotion
+#
+# Docker safety (PITR-R2-02): the container is owned by a RANDOM run nonce (not a PID,
+# which can be reused). cleanup_owned distinguishes a QUERY failure from a REMOVE failure
+# from a CONFIRMED absence, and confirms removal by re-query; a container-create is only
+# retried after cleanup CONFIRMS removal (never on an unconfirmed cleanup -> no duplicate)
+# and only for a transient daemon timeout. The teardown result is reported alongside, not
+# in place of, the body result. Set SOURCE_ONLY=1 to source the functions for testing;
+# set DOCKER to a fake CLI to exercise the failure branches.
 set -euo pipefail
 
-NAME="pitr-probe-$$"
-LABEL="ai.saintvision.pitr-rehearsal=$NAME"    # unique owner label for this run
+DOCKER="${DOCKER:-docker}"
+
+# ---- ownership / retry library (testable via SOURCE_ONLY + a fake $DOCKER) ----
+
+transient() { case "$1" in *"i/o timeout"*|*"deadline exceeded"*|*"timeout exceeded"*|*"Cannot connect to the Docker daemon"*) return 0;; *) return 1;; esac; }
+
+# Echo exactly one of: clean | query-error | rm-error
+#   clean       = query succeeded and, after removing any owned container, a re-query
+#                 confirms none remain (also the confirmed-absence case)
+#   query-error = `docker ps` itself failed -> ownership is UNKNOWN, not "absent"
+#   rm-error    = a remove failed, or a post-remove re-query still shows the container
+# Only containers matching this run's unique label are ever considered or removed, so a
+# different owner's or a past run's container is never touched.
+cleanup_owned() {
+    local ids id failed=0 after
+    if ! ids="$("$DOCKER" ps -aq --filter "label=$LABEL" 2>/dev/null)"; then
+        echo "query-error"; return 0
+    fi
+    if [ -n "$ids" ]; then
+        while IFS= read -r id; do
+            [ -z "$id" ] && continue
+            "$DOCKER" rm -f "$id" >/dev/null 2>&1 || failed=1
+        done <<EOF
+$ids
+EOF
+    fi
+    [ "$failed" = 1 ] && { echo "rm-error"; return 0; }
+    if ! after="$("$DOCKER" ps -aq --filter "label=$LABEL" 2>/dev/null)"; then
+        echo "query-error"; return 0          # cannot confirm removal
+    fi
+    [ -n "$after" ] && { echo "rm-error"; return 0; }
+    echo "clean"; return 0
+}
+
+# Create the probe. Retry ONLY a transient daemon timeout, and ONLY after cleanup has
+# CONFIRMED that any partial we own is gone -- an unconfirmed cleanup (query-error /
+# rm-error) must not be followed by another mutating create (would duplicate).
+start_probe() {
+    local attempt out status
+    for attempt in 1 2 3; do
+        if out="$("$DOCKER" run -d --name "$NAME" --label "$LABEL" -e POSTGRES_PASSWORD="$PW" postgres:16-alpine \
+                -c archive_mode=on -c "archive_command=$ACMD" -c archive_timeout=300 \
+                -c wal_level=replica -c shared_buffers=32MB -c max_wal_size=256MB 2>&1)"; then
+            return 0
+        fi
+        echo "  create attempt $attempt failed: $out"
+        status="$(cleanup_owned)"
+        if [ "$status" != clean ]; then
+            echo "  cleanup did not CONFIRM removal ($status); NOT retrying a mutating create"
+            return 1
+        fi
+        transient "$out" || { echo "  non-transient create failure; not retrying"; return 1; }
+        sleep 5
+    done
+    return 1
+}
+
+[ "${SOURCE_ONLY:-}" = 1 ] && return 0
+
+# ---- main ----
+
+RUN="$(head -c16 /dev/urandom | od -An -tx1 | tr -d ' \n')"   # random run nonce (not a PID)
+NAME="pitr-probe-$RUN"
+LABEL="ai.saintvision.pitr-rehearsal.run=$RUN"
 PW="$(head -c8 /dev/urandom | od -An -tx1 | tr -d ' \n')"
 ARCH=/var/lib/postgresql/archive
 FAULT="${FAULT:-}"
@@ -30,64 +91,36 @@ ACMD='if [ -f /var/lib/postgresql/archive/%f ]; then cmp -s %p /var/lib/postgres
 
 fail() { echo "FAIL: $1"; exit 1; }
 
-# Remove ONLY containers this run owns (by unique label). Never a blind rm on the name,
-# so a name collision with another run's container cannot delete it. Reports failure.
-cleanup() {
-  local ids
-  ids="$(docker ps -aq --filter "label=$LABEL" 2>/dev/null || true)"
-  if [ -n "$ids" ]; then
-    docker rm -f $ids >/dev/null 2>&1 || echo "WARN: cleanup could not remove owned container(s) [$ids]"
-  fi
+final_cleanup() {
+    local status
+    status="$(cleanup_owned)"
+    [ "$status" = clean ] || echo "WARN: teardown cleanup did not confirm removal ($status) -- owned container may remain"
 }
-trap cleanup EXIT
+trap final_cleanup EXIT
 
-# Retry a container create ONLY for a transient daemon timeout, and only after removing
-# any partial WE own -- so a retry never duplicates or orphans a container. A
-# non-transient failure (e.g. name already in use by another owner) is reported, not
-# retried; unclassified failures are NOT relabelled "daemon busy".
-transient() { case "$1" in *"i/o timeout"*|*"deadline exceeded"*|*"timeout exceeded"*|*"Cannot connect to the Docker daemon"*) return 0;; *) return 1;; esac; }
-
-start_probe() {
-  local attempt out
-  for attempt in 1 2 3; do
-    if out="$(docker run -d --name "$NAME" --label "$LABEL" -e POSTGRES_PASSWORD="$PW" postgres:16-alpine \
-        -c archive_mode=on -c "archive_command=$ACMD" -c archive_timeout=300 \
-        -c wal_level=replica -c shared_buffers=32MB -c max_wal_size=256MB 2>&1)"; then
-      return 0
-    fi
-    echo "  docker run attempt $attempt failed: $out"
-    cleanup                                  # remove any partial WE own before retrying
-    transient "$out" || return 1             # only retry a transient daemon timeout
-    sleep 5
-  done
-  return 1
-}
-
-echo "== start probe with proposed archiving config (FAULT='${FAULT}') =="
+echo "== start probe with proposed archiving config (run=$RUN FAULT='${FAULT}') =="
 start_probe || fail "probe container did not start (see error above)"
 
-# mkdir is idempotent -> safe to retry a transient timeout
 for attempt in 1 2 3; do
-  docker exec -u root "$NAME" sh -c "mkdir -p $ARCH && chown postgres:postgres $ARCH" && break
-  [ "$attempt" = 3 ] && fail "archive dir setup"; sleep 4
+    "$DOCKER" exec -u root "$NAME" sh -c "mkdir -p $ARCH && chown postgres:postgres $ARCH" && break
+    [ "$attempt" = 3 ] && fail "archive dir setup"; sleep 4
 done
 
 echo "== wait for readiness =="
 ready=no
 for i in $(seq 1 60); do
-  if docker exec -u postgres "$NAME" pg_isready -q; then ready=yes; break; fi
-  sleep 1
+    if "$DOCKER" exec -u postgres "$NAME" pg_isready -q; then ready=yes; break; fi
+    sleep 1
 done
 [ "$ready" = yes ] || fail "probe never became ready"
 
 echo "== (a) real server settings =="
-docker exec -u postgres "$NAME" psql -v ON_ERROR_STOP=1 -tA -c \
-  "SELECT name||'='||setting FROM pg_settings WHERE name IN ('archive_mode','archive_timeout','wal_level')" \
-  || fail "could not read server settings"
+"$DOCKER" exec -u postgres "$NAME" psql -v ON_ERROR_STOP=1 -tA -c \
+    "SELECT name||'='||setting FROM pg_settings WHERE name IN ('archive_mode','archive_timeout','wal_level')" \
+    || fail "could not read server settings"
 
 echo "== (b) PITR round-trip (strict) =="
-# The round-trip is a MUTATING sequence -> run exactly once, never retried.
-docker exec -i -u postgres -e FAULT="$FAULT" "$NAME" sh -s <<'SCRIPT' || fail "round-trip step failed (a prerequisite or restore step returned non-zero -- see markers above)"
+"$DOCKER" exec -i -u postgres -e FAULT="$FAULT" "$NAME" sh -s <<'SCRIPT' || fail "round-trip step failed (a prerequisite or restore step returned non-zero -- see markers above)"
 set -eu
 export PGDATA=/var/lib/postgresql/data
 ARCH=/var/lib/postgresql/archive

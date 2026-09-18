@@ -1,11 +1,11 @@
 ---
 doc_id: "PROPOSAL-CLAUDE-PITR-001"
 title: "운영 compose PITR 변경안·격리 검증·영향 (AC-12 RPO 준비)"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-19T08:00:00+09:00"
+updated: "2026-09-19T13:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal"]
 ---
@@ -58,7 +58,7 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
    - **엄격 합격 게이트(PITR-R2-01)**: `set -euo pipefail`, psql `ON_ERROR_STOP`, 각 단계(basebackup·pg_ctl·docker exec) 종료코드 검사, before/after INSERT 성공 확인, **'after'가 원본에 실제 존재함 확인**(없으면 배제 시험이 vacuous → FAIL), 승격(`pg_is_in_recovery()=f`)을 별도 강제한 뒤에야 복원 결과를 판정. 선행 실패는 vacuous PASS가 아니라 FAIL이 된다.
    - **실증 결과**(probe postgres:16-alpine, 제안 설정): 정상 = `sourceHadAfter=1`, `restoredRows=[before]`, promote, **exit 0 / PASS**.
    - **음성-회귀 매트릭스(PITR-R2-01, Codex 요구)**: 5개 선행 주입 모두 **exit 1 / FAIL**로 각기 다른 게이트가 잡음 — `before-insert`→'before' not in source, `after-insert`→'after' not in source(vacuous 반례), `basebackup`→pg_basebackup 실패, `restore-start`→pg_ctl 실패, `promotion`(target_action=pause)→restore did not promote. 정상만 PASS. 증거 `Evidence/pitr-rehearsal/2026-09-19_physical-pitr-rehearsal.txt`.
-   - **소유권 안전(PITR-R2-02)**: 컨테이너에 고유 owner 라벨을 붙이고 cleanup은 그 라벨의 컨테이너만 제거(공유 이름 blind rm 금지) — 6회 실행에 **잔재 0**. 변경 명령(docker run)은 무차별 재시도하지 않고, 전송 실패는 내 소유 partial 제거 후 transient timeout에만 재시도하며 cleanup 실패를 보고한다.
+   - **소유권 안전(PITR-R2-02, 해소)**: 컨테이너를 **무작위 run nonce** 라벨로 결속(PID 재사용 문제 제거). `cleanup_owned`이 **조회 실패(query-error)·삭제 실패(rm-error)·확정 부재(clean)**를 각각 분리하고 재조회로 삭제를 확인한다(빈 목록 삼킴 없음). 변경 명령(docker run)은 **정리가 확정(clean)되고 transient timeout일 때만** 재시도 — 미확정 정리 뒤에는 재시도하지 않아 중복을 막는다. 다른 owner·과거 run 자원은 고유 nonce 라벨로 건드리지 않는다. 본문 결과와 cleanup 결과는 함께 보존(teardown 실패는 WARN으로 병기, 본문 결과 대체 안 함). **13개 음성 대조군**(`tests/test_pitr_rehearsal_ownership.sh`)이 원본 함수를 fake docker로 대조 — 정상 6회 잔재 0이 실패 분기 검증을 대신하지 않으므로 각 분기를 실증.
    - 운영 배포 없이 격리 컨테이너로 재현 가능(운영 결정은 Tier A/B 활성뿐).
 3. **논리 복원 검증(recovery_drill, 보완적·PITR 아님)** — 별개로 `recovery_drill`은 논리 복원 후 무결성·fencing·app/kernel role 읽기를 검증한다. 유용하나 **물리 PITR도 RPO 증거도 아니다.** `measuredRpoSeconds`는 위 이유로 RPO 지표가 아니다.
 4. **operational-RPO 인증 (현재 gap)** — `--require-operational-rpo`가 통과하려면 도구에 `operationalRpoVerified=True`와 수치 bound를 세우는 인증 경로(아카이브 지연/실패 모니터링, 보관·연속성 검증, off-site 내구성)가 추가돼야 한다. 지금은 없다(§인증 gap).
@@ -79,6 +79,7 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 - **data_checksums**: initdb 시점만 설정 가능. **신규 클러스터**는 override의 `POSTGRES_INITDB_ARGS=--data-checksums`로 켜짐(빈 postgres_data일 때만). **기존 클러스터**는 offline `pg_checksums --enable`(정지→실행→재시작, 다운타임)이 필요. RPO 항목은 아니나, 복구 drill의 원본이 조용히 손상돼 양쪽에서 같게 읽히는 것(CL-07에서 지적)을 막아 drill 증거의 신뢰를 높인다.
 - **재시작 다운타임**: `archive_mode` 변경은 postgres 재시작(짧은 downtime) 동반.
 - **볼륨 소유권 전제**: Tier A는 `wal_archive`를 postgres 런타임 uid 소유로 사전 provision해야 archive_command가 쓸 수 있다(안 하면 pg_wal 적체→디스크 full).
+- **Tier A 한계 요약(문서화된 잔여, production-final 아님)**: ① **single-writer** — retry-safe archive_command(고정 `%f.tmp`+rename)의 안전성은 PostgreSQL **직렬 archiver**(한 번에 한 세그먼트)에 의존한다. 병렬 archiver 가정 하에서는 temp 이름 공유로 안전하지 않다. ② **fsync 부재** — cp/mv가 파일·디렉터리를 fsync하지 않아 호스트 crash 시 마지막 세그먼트를 잃을 수 있다. ③ **same-host** — 아카이브가 DB와 같은 호스트라 호스트 손실 시 동시 소실(DR 아님). 이 셋은 Tier B(wal-g→별도 장애 도메인)로 해소한다.
 
 ## Tier B (내구성 경로) — 도구는 wal-g, 저장소는 **반드시 별도 장애 도메인** (PITR-R1-02 정정)
 

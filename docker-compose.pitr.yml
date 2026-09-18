@@ -26,11 +26,14 @@ services:
       # ack does NOT fail forever and stall WAL; if present but DIFFERENT, fail without
       # overwriting; otherwise copy via a temp file + atomic rename. The naive
       # "test ! -f && cp" fails permanently on any re-call (PostgreSQL's own caveat).
-      # LIMITS (Tier A is a starting point, not production-final): no fsync of the file
-      # or directory (a host crash can still lose the last segment), and the archive
-      # lives on the SAME host as the data (no separate failure domain). For durable,
-      # off-host archiving use Tier B (wal-g -> a genuinely separate object store); see
-      # the proposal doc.
+      # LIMITS (Tier A is a starting point, not production-final):
+      #  - single-writer: the fixed %f.tmp + rename is safe only because PostgreSQL's
+      #    archiver is single-writer (one segment at a time); it is NOT safe under a
+      #    hypothetical parallel archiver sharing the temp name.
+      #  - no fsync of the file or directory (a host crash can still lose the last segment).
+      #  - same-host: the archive lives on the SAME host as the data (no separate failure
+      #    domain). For durable, off-host archiving use Tier B (wal-g -> a genuinely
+      #    separate object store); see the proposal doc.
       - "archive_command=if [ -f /wal_archive/%f ]; then cmp -s %p /wal_archive/%f; else cp %p /wal_archive/%f.tmp && mv /wal_archive/%f.tmp /wal_archive/%f; fi"
       - -c
       # Bound how often a partially-filled segment is CUT and handed to archive_command.
