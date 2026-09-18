@@ -33,9 +33,12 @@ services:
       # the proposal doc.
       - "archive_command=if [ -f /wal_archive/%f ]; then cmp -s %p /wal_archive/%f; else cp %p /wal_archive/%f.tmp && mv /wal_archive/%f.tmp /wal_archive/%f; fi"
       - -c
-      # Bound how long a partially-filled segment waits before it is forced out and
-      # archived. Ceiling on the archived-WAL portion of RPO. 300s gives 3x margin under
-      # a 900s (15 min) target; raise to 600 to halve idle WAL overhead (see impact).
+      # Bound how often a partially-filled segment is CUT and handed to archive_command.
+      # This is NOT an RPO ceiling (PITR-R1-04): actual RPO depends on the cut segment
+      # being durably DELIVERED -- archive_command lag/failure leaves undelivered WAL --
+      # and segment switching has activity conditions. Smaller = more frequent cuts (and
+      # more idle WAL volume); it does not by itself bound data loss. RPO is established
+      # only by a measured recovery drill + archive lag/failure monitoring (see proposal).
       - archive_timeout=300
       - -c
       - wal_level=replica

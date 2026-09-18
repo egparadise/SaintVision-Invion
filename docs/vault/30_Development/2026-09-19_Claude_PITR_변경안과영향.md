@@ -1,11 +1,11 @@
 ---
 doc_id: "PROPOSAL-CLAUDE-PITR-001"
 title: "운영 compose PITR 변경안·격리 검증·영향 (AC-12 RPO 준비)"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-19T06:30:00+09:00"
+updated: "2026-09-19T08:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal"]
 ---
@@ -56,14 +56,16 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 1. **설정 활성**(override) — 필요조건. `pitr_readiness --dsn-env <ENV> --json` verdict = `possible`. *RPO 달성 아님.*
 2. **물리 PITR 리허설 (실증 완료, 엄격 게이트)** — `tools/pitr_rehearsal.sh`. 물리 `pg_basebackup` → 기록 A('before') → **목표시각 T1** → 기록 B('after') → **별도 격리 클러스터**(같은 호스트, 별도 장애 도메인 아님)에서 `restore_command`로 아카이브 WAL을 T1까지 replay → **A 존재·B 부재·목표 도달** 확인.
    - **엄격 합격 게이트(PITR-R2-01)**: `set -euo pipefail`, psql `ON_ERROR_STOP`, 각 단계(basebackup·pg_ctl·docker exec) 종료코드 검사, before/after INSERT 성공 확인, **'after'가 원본에 실제 존재함 확인**(없으면 배제 시험이 vacuous → FAIL), 승격(`pg_is_in_recovery()=f`)을 별도 강제한 뒤에야 복원 결과를 판정. 선행 실패는 vacuous PASS가 아니라 FAIL이 된다.
-   - **실증 결과**(probe postgres:16-alpine, 제안 설정): 정상 실행 = `sourceHadAfter=1`, `restoredRows=[before]`('after' 정확히 제외), `archive recovery complete`→promote, **exit 0 / PASS**. **음성 테스트** `FAULT=after-insert`(after INSERT 누락 주입) = `ASSERT-FAIL: 'after' is not present in the SOURCE` → **exit 1 / FAIL** — Codex가 보인 vacuous-pass 반례를 게이트가 잡음. 증거 `Evidence/pitr-rehearsal/2026-09-19_physical-pitr-rehearsal.txt`.
+   - **실증 결과**(probe postgres:16-alpine, 제안 설정): 정상 = `sourceHadAfter=1`, `restoredRows=[before]`, promote, **exit 0 / PASS**.
+   - **음성-회귀 매트릭스(PITR-R2-01, Codex 요구)**: 5개 선행 주입 모두 **exit 1 / FAIL**로 각기 다른 게이트가 잡음 — `before-insert`→'before' not in source, `after-insert`→'after' not in source(vacuous 반례), `basebackup`→pg_basebackup 실패, `restore-start`→pg_ctl 실패, `promotion`(target_action=pause)→restore did not promote. 정상만 PASS. 증거 `Evidence/pitr-rehearsal/2026-09-19_physical-pitr-rehearsal.txt`.
+   - **소유권 안전(PITR-R2-02)**: 컨테이너에 고유 owner 라벨을 붙이고 cleanup은 그 라벨의 컨테이너만 제거(공유 이름 blind rm 금지) — 6회 실행에 **잔재 0**. 변경 명령(docker run)은 무차별 재시도하지 않고, 전송 실패는 내 소유 partial 제거 후 transient timeout에만 재시도하며 cleanup 실패를 보고한다.
    - 운영 배포 없이 격리 컨테이너로 재현 가능(운영 결정은 Tier A/B 활성뿐).
 3. **논리 복원 검증(recovery_drill, 보완적·PITR 아님)** — 별개로 `recovery_drill`은 논리 복원 후 무결성·fencing·app/kernel role 읽기를 검증한다. 유용하나 **물리 PITR도 RPO 증거도 아니다.** `measuredRpoSeconds`는 위 이유로 RPO 지표가 아니다.
 4. **operational-RPO 인증 (현재 gap)** — `--require-operational-rpo`가 통과하려면 도구에 `operationalRpoVerified=True`와 수치 bound를 세우는 인증 경로(아카이브 지연/실패 모니터링, 보관·연속성 검증, off-site 내구성)가 추가돼야 한다. 지금은 없다(§인증 gap).
 
 ### 물리 PITR 리허설 재현 (활성 없이 격리 실증)
 
-`bash tools/pitr_rehearsal.sh` — probe postgres를 제안 아카이브 설정으로 띄우고 위 A/T1/B → 별도 클러스터 목표시각 복원 → 엄격 게이트로 판정, `PASS`/exit0. **게이트 자체의 유효성**은 `FAULT=after-insert bash tools/pitr_rehearsal.sh`로 확인 — 선행 단계(after INSERT)를 고의로 누락시키면 `FAIL`/exit1이 나야 한다(vacuous PASS 방지). (실 docker 필요. 메모리 압박 하 daemon i/o timeout 시 재시도하거나 여유 호스트에서 수행 — 도구에 재시도 포함.)
+`bash tools/pitr_rehearsal.sh` — 정상 물리 PITR을 엄격 게이트로 판정, `PASS`/exit0. **게이트 유효성**은 `FAULT=<mode> bash tools/pitr_rehearsal.sh`로 확인하며 각 mode는 `FAIL`/exit1이 나야 한다: `before-insert`·`after-insert`·`basebackup`·`restore-start`·`promotion`(선행 실패가 vacuous PASS로 새지 않음을 실증). (실 docker 필요. 메모리 압박 하 daemon i/o timeout 시 도구가 소유 partial 제거 후 transient만 재시도; 여유 호스트에서 수행 가능.)
 
 ### operational-RPO 인증 gap (별도 작업 항목)
 
@@ -71,7 +73,8 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 
 ## 영향 정리 (사용자 판단 근거)
 
-- **WAL 보관 용량**: `archive_timeout=300`은 idle에도 300초마다 16MB 세그먼트를 강제 전환·아카이브 → **최소 ~192MB/시간, ~4.6GB/일(idle floor)**, 부하 시 더 큼. `archive_timeout=600`으로 올리면 idle 오버헤드 절반(900s 목표엔 여전히 여유). `wal_keep_size=1024`(1GB)는 pg_wal에 버퍼를 남겨 짧은 아카이브 지연이 미아카이브 세그먼트를 즉시 재활용하지 않게 한다.
+- **`archive_timeout`은 RPO 상한이 아니다 (PITR-R1-04)**: `archive_timeout`은 **세그먼트가 얼마나 자주 잘려 아카이브 대상이 되는지(cut 주기)**만 bound한다 — **RPO 상한을 보장하지 않는다.** 실제 RPO는 잘린 세그먼트가 **내구 저장소로 실제 전달**되기까지의 지연·실패에 좌우되고(archive_command가 늦거나 실패하면 미전달 WAL이 쌓임), 세그먼트 전환에도 활동 조건이 있다(PG16 문서). 따라서 "archive_timeout=300이면 RPO 900s 여유" 식 표현은 쓰지 않는다. RPO는 §수용 경로의 **측정 복구 drill + 아카이브 지연/실패 모니터링**으로만 확립된다.
+- **WAL 보관 용량(저장 용량 관점)**: `archive_timeout=300`은 idle에도 300초마다 16MB 세그먼트를 잘라 아카이브 → **최소 ~192MB/시간, ~4.6GB/일(idle floor)**, 부하 시 더 큼(이는 저장 용량 산정치이지 RPO 지표가 아니다). `archive_timeout=600`은 idle 저장 오버헤드를 절반으로 줄인다(용량 트레이드오프일 뿐). `wal_keep_size=1024`(1GB)는 pg_wal 버퍼로 짧은 아카이브 지연이 미아카이브 세그먼트를 즉시 재활용하지 않게 한다.
 - **아카이브 대상 저장소 요구**: 아카이브는 연속 증가하므로 **보관/정리 정책 필수** — 유지하는 가장 오래된 base backup보다 오래된 WAL은 삭제(pgbackrest는 자동, 로컬 cp는 수동 cron 필요). 용량 = (base backup 주기 동안의 WAL 생성량) × (보관하는 backup 세대 수) + 여유. Tier A 로컬은 같은 호스트라 호스트 손실 시 data+archive 동시 손실(DR 아님). **기존 same-host minio도 같은 장애 도메인이라 DR이 아니다(PITR-R1-02)** — RPO를 호스트 손실까지 보장하려면 **DB 호스트와 물리적으로 분리된 저장소**(§Tier B의 별도 장애 도메인)와 그 동시 생존 증거가 필요하다.
 - **data_checksums**: initdb 시점만 설정 가능. **신규 클러스터**는 override의 `POSTGRES_INITDB_ARGS=--data-checksums`로 켜짐(빈 postgres_data일 때만). **기존 클러스터**는 offline `pg_checksums --enable`(정지→실행→재시작, 다운타임)이 필요. RPO 항목은 아니나, 복구 drill의 원본이 조용히 손상돼 양쪽에서 같게 읽히는 것(CL-07에서 지적)을 막아 drill 증거의 신뢰를 높인다.
 - **재시작 다운타임**: `archive_mode` 변경은 postgres 재시작(짧은 downtime) 동반.
@@ -95,11 +98,11 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 
 1. 연속 아카이빙 활성 여부(예 시 override 적용).
 2. 아카이브 대상: Tier A 로컬 볼륨 vs Tier B minio(권장).
-3. `archive_timeout` 값(300 vs 600) 및 base backup 주기 → 실제 RPO/용량 결정.
+3. `archive_timeout` 값(300 vs 600, cut 주기·저장 용량 트레이드오프이지 RPO 상한 아님) 및 base backup 주기. 실제 RPO는 내구 전송 + 측정 복구 drill로만 확립(PITR-R1-04).
 4. 아카이브 보관/정리 정책과 용량 배정.
 5. `data_checksums`: 신규 클러스터에 켤지(기존은 다운타임 감수 여부).
 6. 활성 후 **기능 복구 drill**(운영/CI, Linux)으로 PITR 작동 + measuredRpo 증거 생성. (`--require-operational-rpo`는 현재 구조적 fail-closed — 그 통과는 §인증 gap의 별도 작업이 선행.)
 
 ## 다음 담당
 
-- 준비 완료(변경안 파일·격리 gate 검증·영향)는 Claude. **활성·아카이브 대상·주기·복구 drill 실행은 사용자/운영**. 활성 후 복구 drill 증거가 나오면 Claude가 `--require-operational-rpo`로 재확인. 이 항목은 [[2026-09-19_Claude영역_검증상태지도]] §3 운영 인수 트랙.
+- 준비 완료(변경안 파일·격리 gate 검증·영향)는 Claude. **활성·아카이브 대상·주기·복구 drill 실행은 사용자/운영**. 활성 후 **기능 복구 drill**(물리 PITR 리허설 방식) 증거가 나오면 Claude가 확인한다 — `--require-operational-rpo`는 현재 구조적 fail-closed이므로(§수용 경로) 그 gate 통과가 아니라 기능 drill 증거로 확인하며, gate 통과는 §인증 gap의 별도 작업이 선행이다. 이 항목은 [[2026-09-19_Claude영역_검증상태지도]] §3 운영 인수 트랙.
