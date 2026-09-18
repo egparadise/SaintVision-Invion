@@ -1,0 +1,13 @@
+{
+  "sha": "63fb71cb9eeed77d7c1cb015b932c5f14af6d8d9",
+  "scope": "fake Docker only; original cleanup_owned and start_probe via SOURCE_ONLY",
+  "originalOwnerTest": {
+    "checks": 13,
+    "exitCode": 0
+  },
+  "reviewSupplement": {
+    "scenarios": 5,
+    "exitCode": 0,
+    "stdout": "PASS clean: exit=0 runCalls=2 foreign/past preserved, exact filter checked\nPASS query: exit=1 runCalls=1 foreign/past preserved, exact filter checked\nPASS rmfail: exit=1 runCalls=1 foreign/past preserved, exact filter checked\nPASS postquery: exit=1 runCalls=1 foreign/past preserved, exact filter checked\nPASS retained: exit=1 runCalls=1 foreign/past preserved, exact filter checked\n"
+  }
+}
