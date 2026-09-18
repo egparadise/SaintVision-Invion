@@ -1,29 +1,31 @@
-== start probe with proposed archiving config (low shared_buffers for memory pressure) ==
+### NORMAL run (exit 0, PASS) ###
+== start probe with proposed archiving config (FAULT='') ==
 == wait for readiness ==
-/var/run/postgresql:5432 - accepting connections
-== (a) real server settings (SHOW) ==
+== (a) real server settings ==
 archive_mode=on
 archive_timeout=300
 wal_level=replica
-== (b) PITR round-trip ==
-step: base backup
-  basebackup rc=0 ; 
-step: T1=2026-09-18 05:19:53.067748+00 (after 'before', before 'after')
-step: archived WAL files: 6
-step: prepare restore cluster
-step: start restore instance on 5433
+== (b) PITR round-trip (strict) ==
+step: physical base backup
+step: T1=2026-09-18 05:34:50.210139+00
+step: prepare + start restore cluster on 5433
 waiting for server to start....... done
 server started
-  pg_ctl rc=0
-step: in_recovery=f
-restore.log tail:
-cp: can't stat '/var/lib/postgresql/archive/00000001.history': No such file or directory
-2026-09-18 05:20:05.277 UTC [168] LOG:  archive recovery complete
-2026-09-18 05:20:05.282 UTC [166] LOG:  checkpoint starting: end-of-recovery immediate wait
-2026-09-18 05:20:05.339 UTC [166] LOG:  checkpoint complete: wrote 7 buffers (0.2%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.009 s, sync=0.017 s, total=0.062 s; sync files=6, longest=0.005 s, average=0.003 s; distance=32768 kB, estimate=32768 kB; lsn=0/50000F8, redo lsn=0/50000F8
-2026-09-18 05:20:05.346 UTC [165] LOG:  database system is ready to accept connections
-targetTime=2026-09-18 05:19:53.067748+00
-restoredRows=[before]
-== verdict ==
-restored table content = [before]
-PASS: recovered to target time -> 'before' present, 'after' correctly excluded (PITR works, recovery point bounded)
+result: sourceHadAfter=1 targetTime=2026-09-18 05:34:50.210139+00 restoredRows=[before]
+INNER-PASS: source held before+after; restore promoted to T1; restore has before only (after excluded)
+PASS: physical PITR verified -- prerequisites (base backup, before+after in source, promotion) all held, and the restore recovered to T1 with 'before' present and 'after' excluded
+
+### FAULT=after-insert run (exit 1, FAIL -- gate catches the vacuous-pass counterexample) ###
+== start probe with proposed archiving config (FAULT='after-insert') ==
+== wait for readiness ==
+== (a) real server settings ==
+archive_mode=on
+archive_timeout=300
+wal_level=replica
+== (b) PITR round-trip (strict) ==
+step: physical base backup
+step: T1=2026-09-18 05:35:15.313143+00
+INJECT: skipping the 'after' INSERT to simulate a prerequisite failure
+ASSERT-FAIL: 'after' is not present in the SOURCE -> an exclusion result would be vacuous
+FAIL: round-trip step failed (a prerequisite or restore step returned non-zero -- see markers above)
+NORMAL_EXIT=0 FAULT_EXIT=1 (strict gate: prerequisite failure -> FAIL)

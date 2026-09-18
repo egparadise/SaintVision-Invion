@@ -1,11 +1,11 @@
 ---
 doc_id: "PROPOSAL-CLAUDE-PITR-001"
 title: "운영 compose PITR 변경안·격리 검증·영향 (AC-12 RPO 준비)"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-19T05:00:00+09:00"
+updated: "2026-09-19T06:30:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal"]
 ---
@@ -54,15 +54,16 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 따라서 정확한 단계:
 
 1. **설정 활성**(override) — 필요조건. `pitr_readiness --dsn-env <ENV> --json` verdict = `possible`. *RPO 달성 아님.*
-2. **물리 PITR 리허설 (실증 완료)** — `tools/pitr_rehearsal.sh`. 물리 `pg_basebackup` → 기록 A('before') → **목표시각 T1** → 기록 B('after') → **별도 격리 클러스터**에서 `restore_command`로 아카이브 WAL을 T1까지 replay → **A 존재·B 부재·목표 도달** 확인. 이것이 실제 시점 복구가 작동함의 증거다.
-   - **실증 결과**(probe postgres:16-alpine, 제안 설정): `restoredRows=[before]` — 'after'가 목표시각 이후라 정확히 제외됨. `archive recovery complete` → promote. 증거 `docs/vault/30_Development/Evidence/pitr-rehearsal/`.
-   - 이 리허설은 **운영 배포 없이** 격리 컨테이너로 재현 가능(운영 결정은 Tier A/B 활성뿐).
+2. **물리 PITR 리허설 (실증 완료, 엄격 게이트)** — `tools/pitr_rehearsal.sh`. 물리 `pg_basebackup` → 기록 A('before') → **목표시각 T1** → 기록 B('after') → **별도 격리 클러스터**(같은 호스트, 별도 장애 도메인 아님)에서 `restore_command`로 아카이브 WAL을 T1까지 replay → **A 존재·B 부재·목표 도달** 확인.
+   - **엄격 합격 게이트(PITR-R2-01)**: `set -euo pipefail`, psql `ON_ERROR_STOP`, 각 단계(basebackup·pg_ctl·docker exec) 종료코드 검사, before/after INSERT 성공 확인, **'after'가 원본에 실제 존재함 확인**(없으면 배제 시험이 vacuous → FAIL), 승격(`pg_is_in_recovery()=f`)을 별도 강제한 뒤에야 복원 결과를 판정. 선행 실패는 vacuous PASS가 아니라 FAIL이 된다.
+   - **실증 결과**(probe postgres:16-alpine, 제안 설정): 정상 실행 = `sourceHadAfter=1`, `restoredRows=[before]`('after' 정확히 제외), `archive recovery complete`→promote, **exit 0 / PASS**. **음성 테스트** `FAULT=after-insert`(after INSERT 누락 주입) = `ASSERT-FAIL: 'after' is not present in the SOURCE` → **exit 1 / FAIL** — Codex가 보인 vacuous-pass 반례를 게이트가 잡음. 증거 `Evidence/pitr-rehearsal/2026-09-19_physical-pitr-rehearsal.txt`.
+   - 운영 배포 없이 격리 컨테이너로 재현 가능(운영 결정은 Tier A/B 활성뿐).
 3. **논리 복원 검증(recovery_drill, 보완적·PITR 아님)** — 별개로 `recovery_drill`은 논리 복원 후 무결성·fencing·app/kernel role 읽기를 검증한다. 유용하나 **물리 PITR도 RPO 증거도 아니다.** `measuredRpoSeconds`는 위 이유로 RPO 지표가 아니다.
 4. **operational-RPO 인증 (현재 gap)** — `--require-operational-rpo`가 통과하려면 도구에 `operationalRpoVerified=True`와 수치 bound를 세우는 인증 경로(아카이브 지연/실패 모니터링, 보관·연속성 검증, off-site 내구성)가 추가돼야 한다. 지금은 없다(§인증 gap).
 
 ### 물리 PITR 리허설 재현 (활성 없이 격리 실증)
 
-`bash tools/pitr_rehearsal.sh` — probe postgres를 제안 아카이브 설정으로 띄우고 위 A/T1/B → 별도 클러스터 목표시각 복원 → `[before]`만 남는지 검증하고 `PASS`/`FAIL`을 낸다. (실 docker 필요. 메모리 압박 하에서 daemon i/o timeout이 나면 재시도하거나 여유 있는 호스트에서 수행 — 도구에 재시도 포함.)
+`bash tools/pitr_rehearsal.sh` — probe postgres를 제안 아카이브 설정으로 띄우고 위 A/T1/B → 별도 클러스터 목표시각 복원 → 엄격 게이트로 판정, `PASS`/exit0. **게이트 자체의 유효성**은 `FAULT=after-insert bash tools/pitr_rehearsal.sh`로 확인 — 선행 단계(after INSERT)를 고의로 누락시키면 `FAIL`/exit1이 나야 한다(vacuous PASS 방지). (실 docker 필요. 메모리 압박 하 daemon i/o timeout 시 재시도하거나 여유 호스트에서 수행 — 도구에 재시도 포함.)
 
 ### operational-RPO 인증 gap (별도 작업 항목)
 
