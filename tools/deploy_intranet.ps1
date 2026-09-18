@@ -14,8 +14,10 @@ Write-Host "================================================================" -F
 try {
     # Step 1: Generate TLS Certificates
     Write-Host "`n[1/5] Verifying TLS 1.3 Certificate Files on Disk..." -ForegroundColor Yellow
-    $certFile = "deploy/certs/saintvision.crt"
-    $keyFile = "deploy/certs/saintvision.key"
+    $certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }
+    $certFile = Join-Path $certDir "saintvision.crt"
+    $keyFile = Join-Path $certDir "saintvision.key"
+    $pythonCmd = if (Test-Path ".venv\Scripts\python.exe") { ".venv\Scripts\python.exe" } else { "python" }
 
     # A failed bind mount can leave a directory where a certificate file must
     # be. Remove only these exact generated targets before regeneration.
@@ -35,9 +37,8 @@ try {
     }
 
     if ($needsGen) {
-        $pythonCmd = if (Test-Path ".venv\Scripts\python.exe") { ".venv\Scripts\python.exe" } else { "python" }
         Write-Host "Generating TLS certificates via $pythonCmd tools/generate_tls_cert.py..." -ForegroundColor DarkGray
-        & $pythonCmd tools/generate_tls_cert.py
+        & $pythonCmd tools/generate_tls_cert.py --output-dir $certDir
         if ($LASTEXITCODE -ne 0) {
             throw "TLS certificate generation failed with exit code $LASTEXITCODE"
         }
@@ -53,6 +54,11 @@ try {
 
     if ($certItem.Length -eq 0 -or $keyItem.Length -eq 0) {
         throw "TLS certificate files ($($certFile): $($certItem.Length) bytes, $($keyFile): $($keyItem.Length) bytes) must be non-empty (>0 bytes)."
+    }
+
+    & $pythonCmd tools/verify_tls_cert_pair.py --certificate $certFile --private-key $keyFile
+    if ($LASTEXITCODE -ne 0) {
+        throw "TLS certificate and private key do not match or could not be parsed."
     }
 
     Write-Host "✔ Certificate files present and non-empty: $($certFile) ($($certItem.Length) bytes), $($keyFile) ($($keyItem.Length) bytes)" -ForegroundColor Green

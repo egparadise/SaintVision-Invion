@@ -20,6 +20,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 import textwrap
+import os
 from pathlib import Path
 
 import pytest
@@ -38,12 +39,25 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def run_ps1_in_dir(script_content: str, working_dir: Path, timeout: int = 30) -> subprocess.CompletedProcess[str]:
+def run_ps1_in_dir(
+    script_content: str,
+    working_dir: Path,
+    timeout: int = 30,
+    *,
+    env: dict[str, str] | None = None,
+    verifier_content: str | None = None,
+) -> subprocess.CompletedProcess[str]:
     ps_exe = get_powershell_executable()
     assert ps_exe is not None
 
     script_path = working_dir / "deploy_intranet.ps1"
     script_path.write_text(script_content, encoding="utf-8")
+    tools_dir = working_dir / "tools"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    (tools_dir / "verify_tls_cert_pair.py").write_text(
+        verifier_content or "print('synthetic TLS pair match')\n",
+        encoding="utf-8",
+    )
 
     return subprocess.run(
         [ps_exe, "-ExecutionPolicy", "Bypass", "-File", str(script_path)],
@@ -51,6 +65,7 @@ def run_ps1_in_dir(script_content: str, working_dir: Path, timeout: int = 30) ->
         capture_output=True,
         text=True,
         timeout=timeout,
+        env={**os.environ, **(env or {})},
     )
 
 
@@ -126,6 +141,61 @@ def test_cert_directory_collisions_are_removed_before_generation(tmp_path: Path)
     assert (certs_dir / "saintvision.crt").is_file()
     assert (certs_dir / "saintvision.key").is_file()
     assert "stale TLS directory" in res.stdout
+
+
+def test_external_certificate_directory_is_used_for_generation(tmp_path: Path) -> None:
+    """The preflight passes the configured external directory to the generator."""
+    tools_dir = tmp_path / "tools"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    external_dir = tmp_path / "external-certs"
+    (tools_dir / "generate_tls_cert.py").write_text(
+        "import os\nfrom pathlib import Path\n"
+        "p=Path(os.environ['SAINTVISION_DEV_CERT_DIR']); p.mkdir(parents=True, exist_ok=True)\n"
+        "(p/'saintvision.crt').write_bytes(b'cert')\n(p/'saintvision.key').write_bytes(b'key')\n",
+        encoding="utf-8",
+    )
+    content = DEPLOY_SCRIPT.read_text(encoding="utf-8").replace(
+        "    # Step 2: Run Automated Unit and Protocol Tests (Vitest)",
+        "    throw 'stop after external TLS preflight'\n\n    # Step 2: Run Automated Unit and Protocol Tests (Vitest)",
+    )
+    res = run_ps1_in_dir(
+        content,
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": str(external_dir)},
+    )
+    assert res.returncode == 1
+    assert (external_dir / "saintvision.crt").is_file()
+    assert (external_dir / "saintvision.key").is_file()
+    assert not (tmp_path / "deploy" / "certs").exists()
+
+
+def test_missing_external_certificate_fails_explicitly(tmp_path: Path) -> None:
+    tools_dir = tmp_path / "tools"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    (tools_dir / "generate_tls_cert.py").write_text("import sys; sys.exit(0)\n", encoding="utf-8")
+    missing_dir = tmp_path / "missing-certs"
+    res = run_ps1_in_dir(
+        DEPLOY_SCRIPT.read_text(encoding="utf-8"),
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": str(missing_dir)},
+    )
+    assert res.returncode == 1
+    assert "do not exist after generation step" in res.stdout or "do not exist after generation step" in res.stderr
+
+
+def test_certificate_key_mismatch_fails_preflight(tmp_path: Path) -> None:
+    certs_dir = tmp_path / "external-certs"
+    certs_dir.mkdir(parents=True, exist_ok=True)
+    (certs_dir / "saintvision.crt").write_bytes(b"non-empty-cert")
+    (certs_dir / "saintvision.key").write_bytes(b"non-empty-key")
+    res = run_ps1_in_dir(
+        DEPLOY_SCRIPT.read_text(encoding="utf-8"),
+        tmp_path,
+        env={"SAINTVISION_DEV_CERT_DIR": str(certs_dir)},
+        verifier_content="import sys; print('synthetic mismatch'); sys.exit(1)\n",
+    )
+    assert res.returncode == 1
+    assert "do not match or could not be parsed" in res.stdout or "do not match or could not be parsed" in res.stderr
 
 
 def test_missing_cert_file_after_generation_halts_immediately(tmp_path: Path) -> None:
