@@ -23,6 +23,7 @@ import {
   getNodeDetail,
   postNodeHeartbeat,
   triggerLivenessSweep,
+  getDiscoveryCandidates,
   broadcastAnnouncement,
   admitDiscoveryCandidate,
   declineDiscoveryCandidate,
@@ -250,6 +251,17 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     }
   }, [nodes]);
 
+  const loadDiscoveryCandidates = useCallback(async () => {
+    try {
+      const res = await getDiscoveryCandidates();
+      if (res && Array.isArray(res.items) && res.items.length > 0) {
+        setCandidates(res.items);
+      }
+    } catch {
+      // Retain fallback candidates if backend offline
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab === 'storage') {
       loadStorage();
@@ -257,8 +269,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       loadPoolData(selectedPoolId);
     } else if (activeTab === 'nodes' && selectedNodeId) {
       loadNodeDetailData(selectedNodeId);
+    } else if (activeTab === 'discovery') {
+      loadDiscoveryCandidates();
     }
-  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, selectedPoolId, selectedNodeId]);
+  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, loadDiscoveryCandidates, selectedPoolId, selectedNodeId]);
 
   // ---------------------------------------------------------------------------
   // Handlers for Control Plane Mutations
@@ -406,6 +420,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         '00000000-0000-0000-0000-000000000001'
       );
       setDiscoveryMessage(`✔ 안내 방송 승인됨 (state: ${res.state})`);
+      await loadDiscoveryCandidates();
     } catch (err: any) {
       const msg = err?.problem?.detail || err?.detail || err?.message || '안내 방송 전송 실패';
       setDiscoveryMessage(`❌ 안내 방송 실패: ${msg}`);
@@ -1336,8 +1351,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         fontWeight: 600,
                         padding: '2px 6px',
                         borderRadius: '4px',
-                        backgroundColor: cand.state === 'admitted' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(234, 179, 8, 0.2)',
-                        color: cand.state === 'admitted' ? '#34d399' : '#fbbf24',
+                        backgroundColor:
+                          cand.state === 'admitted'
+                            ? 'rgba(16, 185, 129, 0.2)'
+                            : cand.state === 'declined'
+                            ? 'rgba(239, 68, 68, 0.2)'
+                            : 'rgba(234, 179, 8, 0.2)',
+                        color:
+                          cand.state === 'admitted'
+                            ? '#34d399'
+                            : cand.state === 'declined'
+                            ? '#f87171'
+                            : '#fbbf24',
                       }}
                     >
                       {cand.state.toUpperCase()}
@@ -1348,7 +1373,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     자체 보고: {cand.claimedOsType} · {cand.claimedCpuCores}C · {formatBytes(cand.claimedRamBytes)} · {cand.claimedGpuCount} GPU
                   </div>
 
-                  {cand.state === 'pending' && (
+                  {(cand.state === 'pending' || cand.state === 'candidate') && (
                     <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'flex-end' }}>
                       <button
                         type="button"

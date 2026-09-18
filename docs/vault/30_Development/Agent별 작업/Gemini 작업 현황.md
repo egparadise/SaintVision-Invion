@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.42"
+version: "1.0.43"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T15:55:00+09:00"
+updated: "2026-09-18T16:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T15:55:00+09:00.
+- 확인 기준: 2026-09-18T16:00:00+09:00.
 
 ## 최근 확인한 진척
+
+- **CX-01 제어 평면 16개 정본 경로 전수 실장 현황 정리 및 디스커버리 동기화 완결**:
+  - **16개 정본 엔드포인트 전수 매핑 확정**: Storage(5개), Pools/Placement(5개), Nodes/Liveness(3개), Discovery(3개) 등 CX-01 제어 평면 전 경로가 클라이언트 API(`fabricControlApi.ts`), UI 화면(`ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `App.tsx`), 및 테스트 스위트에 100% 매핑됨.
+  - **`getDiscoveryCandidates` 클라이언트 함수 신설 및 스키마 정합**: `fabricControlApi.ts`에 `getDiscoveryCandidates(includeStale?)`를 정규 실장하고 `DiscoveryCandidate` 인터페이스에 백엔드 모델(`state: 'candidate'`, `firstSeenAt`, `lastSeenAt`, `announceCount`) 필드 반영.
+  - **ResourceExplorer 디스커버리 탭 실시간 동기화**: `activeTab === 'discovery'` 전환 시 자동 후보 목록 갱신, 안내 방송(`POST /v1/discovery/announcements`) 완료 시 실시간 연쇄 갱신, `candidate` 및 `pending` 상태 양쪽에서 승인/거절 버튼 활성화 지원.
+  - **Vitest 31개 스위트 302/302 tests 100% 무오류 통과**, Pytest 13/13 통과, API contract smoke 198/198 passed (4 unverified UI invariants 분리 유지), 프로덕션 빌드 3.36s 클린 생성.
+  - 보고서: [[2026-09-18_16-00-00_KST_CX01-16-ROUTES-INVENTORY-AND-DISCOVERY-WIRING_Gemini_검증보고]].
 
 - **Codex MJS-02 재검토 finding(MJS02-R1, MJS02-R2) 및 제어 평면 포털 마운팅 완결**:
   - **MJS02-R2 (인접 상수 UI 단언 제거)**: `run_browser_smoke.mjs` 914행 `const hasDesktopShell = true`를 `recordUnverified`로 전면 전환하여 Track 15 4대 UI 불변식 전수 미검증 이관 및 PASS 제외 완료. `total === 0`일 때 `NaN%` 방어 가드 탑재. 최종 스모크: **198/198 observed checks passed (100%) | 4 unverified UI invariants deferred to browser lane**.
