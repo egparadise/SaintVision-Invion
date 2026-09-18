@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
+import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -72,74 +73,45 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     }
   };
 
+  const runIdentity = useRef('');
+  runIdentity.current = `${run.projectId}:${run.id}`;
+
   useEffect(() => {
     let mounted = true;
-    async function fetchShards() {
-      setIsLoadingShards(true);
-      const prjId = run.projectId || 'prj_01JABCDE';
-      try {
-        const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
-        if (mounted && res) {
-          setShardObservation(res);
-          const shardItems: ShardExecutionItem[] =
-            res.items ||
-            res.shards?.map((m: any) => ({
-              shardId: `shd_${m.index + 1}_${m.runId.slice(-6)}`,
-              runId: m.runId,
-              parentId: run.id,
-              nodeId: m.nodeId,
-              hostname: m.nodeId,
-              attempt: 1,
-              executionState: m.state,
-              physicallyStopped: m.phase === 'stopped',
-              verified: m.evidenceId != null,
-              resourceReleasePending: m.phase === 'stopped' && !res.allPhysicallyStopped,
-              evidenceId: m.evidenceId || undefined,
-            })) ||
-            [];
-          setShards(shardItems);
-        }
-      } catch (err) {
-        console.warn('Live /v1/projects/.../runs/.../shards fetch failed:', err);
-      } finally {
-        if (mounted) setIsLoadingShards(false);
+    setShards([]);
+    setShardObservation(null);
+    setReclaimNotice(null);
+    setIsLoadingShards(true);
+    fetchShardObservation(run.projectId, run.id).then(result => {
+      if (mounted) {
+        setShardObservation(result);
+        setShards(shardRows(result));
       }
-    }
-    fetchShards();
-    return () => {
-      mounted = false;
-    };
+    }).catch(() => {
+      if (mounted) setReclaimNotice('샤드 상태를 확인하지 못했습니다. 권한과 연결 상태를 확인하세요.');
+    }).finally(() => {
+      if (mounted) setIsLoadingShards(false);
+    });
+    return () => { mounted = false; };
   }, [run.id, run.projectId]);
+
+  const refreshShardState = async () => {
+    const identity = `${run.projectId}:${run.id}`;
+    const result = await fetchShardObservation(run.projectId, run.id);
+    if (runIdentity.current !== identity) return;
+    setShardObservation(result);
+    setShards(shardRows(result));
+    setReclaimNotice(shardRefreshNotice(result));
+  };
 
   const handleBulkCancelShards = async () => {
     setIsBulkCancelling(true);
-    const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      await cancelKernelRun(prjId, run.id);
-      setReclaimNotice('⚡ 모든 분산 샤드에 일괄 취소 명령이 원자적으로 전달되었습니다. (자원 반환 대기 중)');
-      const res = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
-      if (res?.items) {
-        setShards(res.items);
-      } else if (res?.shards) {
-        setShards(
-          res.shards.map((m: any) => ({
-            shardId: `shd_${m.index + 1}_${m.runId.slice(-6)}`,
-            runId: m.runId,
-            parentId: run.id,
-            nodeId: m.nodeId,
-            hostname: m.nodeId,
-            attempt: 1,
-            executionState: m.state,
-            physicallyStopped: m.phase === 'stopped',
-            verified: m.evidenceId != null,
-            resourceReleasePending: m.phase === 'stopped' && !res.allPhysicallyStopped,
-            evidenceId: m.evidenceId || undefined,
-          }))
-        );
-      }
+      await cancelKernelRun(run.projectId, run.id);
+      await refreshShardState();
       onRefreshRun?.();
     } catch (e: any) {
-      alert(e.message || '샤드 일괄 취소 실패');
+      alert(e.message || '샤드 취소 또는 상태 확인 실패');
     } finally {
       setIsBulkCancelling(false);
     }
@@ -147,16 +119,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
 
   const handleReclaimResources = async () => {
     setIsReclaiming(true);
-    const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      // Kernel automatically executes reclaim_unclaimed upon containment/cancellation.
-      // Synchronize canonical run and shard observation state.
+      await refreshShardState();
       await onRefreshRun?.();
-      const sRes = await apiClient<ShardObservation>(`/v1/projects/${prjId}/runs/${run.id}/shards`);
-      if (sRes?.items) setShards(sRes.items);
-      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신 및 커널 자동 회수 상태를 성공적으로 동기화하였습니다. (ADR-040/041)');
     } catch (e: any) {
-      alert(e.message || '자원 회수 상태 동기화 실패');
+      setReclaimNotice('샤드 상태 새로고침에 실패했습니다. 마지막 확인 상태를 표시합니다.');
     } finally {
       setIsReclaiming(false);
     }
@@ -257,7 +224,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-              {run.objective}
+              {run.objective ?? '작업 목적 미관측'}
               {run.frozenInputHash && (
                 <span style={{ marginLeft: '12px', color: '#58a6ff', fontFamily: 'monospace' }}>
                   🔒 Frozen: {run.frozenInputHash.slice(0, 18)}... ({run.frozenInputSizeBytes ?? 0} B)
@@ -983,7 +950,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 ) : shards.length === 0 ? (
                   <tr>
                     <td colSpan={8} style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                      등록된 분산 샤드가 없습니다. (단일 노드 실행)
+                      {shardObservation ? '관측된 샤드가 없습니다.' : '샤드 상태가 확인되지 않았습니다.'}
                     </td>
                   </tr>
                 ) : (
@@ -998,7 +965,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                           {s.nodeId}
                         </div>
                       </td>
-                      <td style={{ padding: '10px 12px', fontFamily: 'monospace' }}>#{s.attempt}</td>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace' }}>{s.attempt === undefined ? '미관측' : `#${s.attempt}`}</td>
                       <td style={{ padding: '10px 12px' }}>
                         <span
                           style={{

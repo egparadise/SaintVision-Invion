@@ -1,0 +1,15 @@
+{
+  "command": "python -m pytest -q tests/integration/test_resource_offer_integrity.py",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "actual PostgreSQL definer plus real LeaseStore.release; FastAPI TestClient for offer endpoint",
+  "identity": "synthetic RS256 issuer; no operational SSO claim",
+  "isolatedContainerRemoved": true,
+  "codeSha": "51f4004b7e65328aed30f20763cb96c21ec8ade6",
+  "verifiedKst": "2026-09-12T23:41:42+09:00",
+  "testsPassed": 12,
+  "durationSeconds": 11.67,
+  "warnings": 26,
+  "finding": "F1 not reproduced through current production lock protocol; release blocked then retry succeeded",
+  "migrationAdded": false
+}

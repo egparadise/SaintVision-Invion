@@ -1,0 +1,15 @@
+{
+  "command": "python -m pytest -q tests/integration/test_server_container.py tests/core/test_deployment_credentials.py tests/core/test_server_config_volume.py tests/test_api.py::test_missing_credential_is_refused tests/test_api.py::test_unknown_credential_is_refused",
+  "exitCode": 0,
+  "postgres": "isolated tmpfs cluster; localhost ephemeral port",
+  "http": "candidate Docker image default command, UID65532, readonly root/config, tmpfs workspace",
+  "identity": "synthetic only",
+  "isolatedContainerRemoved": true,
+  "codeSha": "14de71d70db83363c6626028a010a0a152d268d2",
+  "imageId": "sha256:6730c9e66077bdfcbddffe607ee1bfbb9c03874a9bbeb507d836c649f2989ee5",
+  "verifiedKst": "2026-09-12T23:34:12+09:00",
+  "testsPassed": 27,
+  "durationSeconds": 136.75,
+  "warnings": 7,
+  "operatingServiceChanged": false
+}

@@ -1,0 +1,93 @@
+{
+  "version": "1.0.1",
+  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
+  "track": "VF-CX",
+  "owner": "Codex",
+  "acceptanceDenominator": 5,
+  "acceptedCards": 0,
+  "legacyProgressUnchanged": "2775/4800",
+  "cards": [
+    {
+      "id": "VF-CX-01",
+      "title": "Canonical configured control app",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "state": "review",
+      "dependsOn": [],
+      "implemented": "partial",
+      "locallyVerified": "partial",
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false
+    },
+    {
+      "id": "VF-CX-02",
+      "title": "ModelManifest, shard/replica hash commit and fences",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "state": "review",
+      "dependsOn": [
+        "VF-CX-01"
+      ],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false
+    },
+    {
+      "id": "VF-CX-03",
+      "title": "Measured locality and execution placement",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "state": "review",
+      "dependsOn": [
+        "VF-CX-02"
+      ],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false
+    },
+    {
+      "id": "VF-CX-04",
+      "title": "Runtime admission and multi-node recovery",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "state": "review",
+      "dependsOn": [
+        "VF-CX-03"
+      ],
+      "implemented": true,
+      "locallyVerified": true,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false
+    },
+    {
+      "id": "VF-CX-05",
+      "title": "Five physical Node acceptance",
+      "owner": "Codex",
+      "reviewer": "Claude",
+      "state": "blocked",
+      "dependsOn": [
+        "VF-CX-04"
+      ],
+      "implemented": false,
+      "locallyVerified": false,
+      "ciVerified": false,
+      "independentlyReviewed": false,
+      "operationallyAccepted": false,
+      "preflightVerified": true,
+      "blockers": [
+        "remote-node-unreachable-three-probes",
+        "operational-migration-backup-review-required",
+        "W2-W4-acceptance-unverified",
+        "ci-billing",
+        "independent-review-pending"
+      ],
+      "evidence": "docs/vault/30_Development/Evidence/vf-cx-05"
+    }
+  ]
+}

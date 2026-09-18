@@ -1,0 +1,13 @@
+{
+  "sha256": "b651729eec874c947c42ab4a24be493bbe2543bd271bc80f6a20d6fd62a4cbfe",
+  "bytes": 111708260,
+  "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+  "profile": "lan-workspace-v1",
+  "imageCodeSHA": "b6301a9613097122a7574fa647b63d791fe13d2d",
+  "packageCodeSHA": "01236401367c4a430cf73da2b68984ca411e4883",
+  "agentImage": "sha256:153bcae19a2aab26dbaab638ddaa3aa6622a628f99d32c76b3ee711f63473753",
+  "workloadImage": "sha256:f8af70427bcc35f1bebe18f4d121a505eb1a346028596c133fe6cd481a1c6abe",
+  "status": "published-remote-installation-pending",
+  "url": "http://192.168.45.99:18081/workspace-worker.zip",
+  "downloadVerifiedBytes": 111708260
+}

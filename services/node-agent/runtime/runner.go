@@ -128,7 +128,7 @@ func (r *Runner) Execute(ctx context.Context, envelope []byte) (Result, error) {
 }
 
 // Cancel can interrupt an active Execute without acquiring its long-held mutex.
-// It never creates intent or claims that an unseen command physically stopped.
+// An unseen command is durably prohibited before acknowledging non-execution.
 func (r *Runner) Cancel(ctx context.Context, envelope []byte) (Result, error) {
 	permit, err := Verify(envelope, r.config)
 	if err != nil {
@@ -143,8 +143,26 @@ func (r *Runner) Cancel(ctx context.Context, envelope []byte) (Result, error) {
 		}
 		r.activeMutex.Unlock()
 		if r.mutex.TryLock() {
-			r.mutex.Unlock()
-			return r.Observe(ctx, envelope)
+			defer r.mutex.Unlock()
+			if err := ctx.Err(); err != nil {
+				return Result{}, err
+			}
+			prior, receipt, err := r.journal.Get(string(permit.Data.Claim.CommandId))
+			if err != nil {
+				return Result{}, err
+			}
+			if prior == nil {
+				prior, err = r.journal.Reject(permit)
+				if err != nil {
+					return Result{}, err
+				}
+			} else if prior.Hash != permit.Hash {
+				return Result{}, errors.New("NODE-0015: command content differs")
+			}
+			if receipt != nil {
+				return Result{Duplicate: true, Receipt: receipt}, nil
+			}
+			return r.reconcile(*prior, "cancelled")
 		}
 		select {
 		case <-ctx.Done():
@@ -182,13 +200,66 @@ func (r *Runner) Recover(ctx context.Context) ([]Result, error) {
 	}
 	return results, nil
 }
+
+// Retry only observation, within the existing cleanup deadline. A timed-out
+// create may still become visible; absence never authorizes another create/start.
+// Ownership/invalid-response failures remain immediate and cannot prove a stop.
+func (r *Runner) observeCleanup(ctx context.Context, identity string, record Record) (State, error) {
+	for attempt := 0; ; attempt++ {
+		state, err := r.engine.Inspect(ctx, identity, record)
+		if err == nil || attempt == 2 || (!errors.Is(err, ErrAbsent) && !errors.Is(err, ErrEngineUnavailable)) {
+			return state, err
+		}
+		timer := time.NewTimer(50 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return State{}, ctx.Err()
+		case <-timer.C:
+		}
+	}
+}
+
 func (r *Runner) reconcile(record Record, why string) (Result, error) {
+	if record.NeverStarted {
+		claim := record.Claim
+		receipt := contracts.NodeStopReceipt{ReceiptId: uuid(), ClaimId: claim.ClaimId, CommandId: claim.CommandId,
+			TenantId: claim.TenantId, ProjectId: claim.ProjectId, RunId: claim.RunId, NodeId: claim.NodeId,
+			RecoveryEpoch: claim.RecoveryEpoch, PlanDigest: claim.PlanDigest, ContainerId: "", Stopped: true,
+			ProcessStarted: false, ExitCode: -1, Reason: "not_started",
+			FinishedAt: contracts.Timestamp(time.Now().UTC().Format(time.RFC3339Nano)), Allocations: record.Allocations}
+		raw, _ := json.Marshal(receipt)
+		if err := wire.Validate("NodeStopReceipt", raw); err != nil {
+			return Result{}, err
+		}
+		if err := r.journal.Save(receipt); err != nil {
+			return Result{}, errors.New("NODE-0013: receipt persistence failed")
+		}
+		return Result{Receipt: &receipt}, nil
+	}
 	// Cleanup gets its own bounded context after caller cancellation. A timeout or
 	// absent container does not prove the original create/start had no effect.
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
-	state, err := r.engine.Inspect(ctx, record.Name, record)
+	state, err := r.observeCleanup(ctx, record.Name, record)
 	if err != nil {
+		if errors.Is(err, ErrAbsent) {
+			prior, loadErr := r.journal.Prepared(record)
+			if loadErr != nil {
+				return Result{}, loadErr
+			}
+			if prior != nil {
+				// An absent name alone is insufficient. The confirmed stopped ID
+				// must also be absent, fencing every delayed start for that ID.
+				_, idErr := r.observeCleanup(ctx, prior.ContainerId, record)
+				if errors.Is(idErr, ErrAbsent) {
+					if err := r.journal.Save(*prior); err != nil {
+						return Result{}, err
+					}
+					return Result{Receipt: prior}, nil
+				}
+			}
+		}
 		return Result{}, errors.New("NODE-0027: execution uncertain; no stop receipt or automatic retry")
 	}
 	if !stopped(state) {
@@ -196,7 +267,7 @@ func (r *Runner) reconcile(record Record, why string) (Result, error) {
 		ticker := time.NewTicker(50 * time.Millisecond)
 		defer ticker.Stop()
 		for {
-			state, err = r.engine.Inspect(ctx, record.Name, record)
+			state, err = r.observeCleanup(ctx, record.Name, record)
 			if err != nil {
 				return Result{}, errors.New("NODE-0027: stop not verified")
 			}
@@ -226,9 +297,31 @@ func (r *Runner) finish(record Record, state State, why string) (Result, error) 
 	receipt := contracts.NodeStopReceipt{ReceiptId: uuid(), ClaimId: claim.ClaimId, CommandId: claim.CommandId, TenantId: claim.TenantId, ProjectId: claim.ProjectId,
 		RunId: claim.RunId, NodeId: claim.NodeId, RecoveryEpoch: claim.RecoveryEpoch, PlanDigest: claim.PlanDigest, ContainerId: state.ID, Stopped: true, ProcessStarted: didStart,
 		ExitCode: exitCode, Reason: why, FinishedAt: contracts.Timestamp(time.Now().UTC().Format(time.RFC3339Nano)), Allocations: record.Allocations}
+	prepared, err := r.journal.Prepared(record)
+	if err != nil {
+		return Result{}, err
+	}
+	if prepared != nil {
+		if prepared.ContainerId != state.ID {
+			return Result{}, errors.New("NODE-0013: stopped container identity changed")
+		}
+		receipt = *prepared
+	} else if didStart && exitCode == 0 && why == "exited" {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		receipt.Output, err = r.engine.Output(ctx, state.ID, record)
+		cancel()
+		if err != nil {
+			return Result{}, err
+		}
+	}
 	raw, _ := json.Marshal(receipt)
 	if err := wire.Validate("NodeStopReceipt", raw); err != nil {
 		return Result{}, err
+	}
+	if prepared == nil {
+		if err := r.journal.PrepareStop(receipt); err != nil {
+			return Result{}, err
+		}
 	}
 	// Remove the confirmed stopped container before acknowledging. This also
 	// fences a delayed Docker start request: a removed ID cannot start later.

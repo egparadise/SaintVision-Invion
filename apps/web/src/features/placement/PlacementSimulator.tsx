@@ -228,7 +228,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>ℹ️</span>
             <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-              제어 평면 자원 풀(/v1/pools) 어댑터 연결 대기 중 — 5대 노드 물리 토폴로지 기반 결정론적 스케줄링 시뮬레이터가 독립 동작합니다.
+              자원 풀 정보가 없습니다. 현재 관측된 노드 정보로 배치 가능성을 미리 평가합니다.
             </span>
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>로컬 결정론적 평가 활성</span>

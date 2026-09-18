@@ -1,0 +1,451 @@
+{
+  "codeSHA": "f766146f348d1190d25115a570f63e36956d0c25",
+  "scope": "Windows Python boundary tests; Docker responses simulated; not remote acceptance",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[None]",
+      "passed": true
+    },
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[identity]",
+      "passed": true
+    },
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[running]",
+      "passed": true
+    },
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[image]",
+      "passed": true
+    },
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[mount]",
+      "passed": true
+    },
+    {
+      "name": "test_backup_only_permits_name_and_restart_policy_change[args]",
+      "passed": true
+    },
+    {
+      "name": "test_protected_digest_keeps_private_key_changes_visible",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[None]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[ownership]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[privileged]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[restart]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[port]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[capabilities]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[memory]",
+      "passed": true
+    },
+    {
+      "name": "test_replacement_container_requires_exact_transaction_and_limits[identifier]",
+      "passed": true
+    },
+    {
+      "name": "test_oversized_recovery_record_is_rejected_before_writing",
+      "passed": true
+    },
+    {
+      "name": "test_volume_timestamp_is_not_identity_but_other_fields_remain_bound[CreatedAt]",
+      "passed": true
+    },
+    {
+      "name": "test_volume_timestamp_is_not_identity_but_other_fields_remain_bound[Name]",
+      "passed": true
+    },
+    {
+      "name": "test_volume_timestamp_is_not_identity_but_other_fields_remain_bound[Driver]",
+      "passed": true
+    },
+    {
+      "name": "test_volume_timestamp_is_not_identity_but_other_fields_remain_bound[Labels]",
+      "passed": true
+    },
+    {
+      "name": "test_volume_timestamp_is_not_identity_but_other_fields_remain_bound[Mountpoint]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[None]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[running]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[workload]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[exit]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[oom]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[owner]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[shared]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[identity]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[extra]",
+      "passed": true
+    },
+    {
+      "name": "test_only_clean_stopped_owned_observation_container[writable]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[epoch]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[missing]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[traversal]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[permissions]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[link]",
+      "passed": true
+    },
+    {
+      "name": "test_state_archive_rejects_identity_and_unsafe_entries[duplicate]",
+      "passed": true
+    },
+    {
+      "name": "test_state_fingerprint_binds_private_bytes_without_returning_them",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[None]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[container]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[state]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[volume]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[proposal]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_recheck_rejects_every_stale_boundary[authorized]",
+      "passed": true
+    },
+    {
+      "name": "test_capture_detects_changes_during_inspection[None]",
+      "passed": true
+    },
+    {
+      "name": "test_capture_detects_changes_during_inspection[state-write]",
+      "passed": true
+    },
+    {
+      "name": "test_capture_detects_changes_during_inspection[container-restart]",
+      "passed": true
+    },
+    {
+      "name": "test_capture_detects_changes_during_inspection[volume-replaced]",
+      "passed": true
+    },
+    {
+      "name": "test_capture_detects_changes_during_inspection[mount-order]",
+      "passed": true
+    },
+    {
+      "name": "test_mount_is_fixed_readonly_nonrecursive_and_one_argument",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[tenant]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[epoch]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[node]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[endpoint]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[root]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[boolean-version]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[unknown-key]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[hash]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_rejects_wrong_scope_and_mount_shadowing[duplicate]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[root]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[private]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[parent]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[comma]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[relative]",
+      "passed": true
+    },
+    {
+      "name": "test_source_scope_and_changes_are_rejected[replaced]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[writable]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[recursive]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[other-source]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[extra-mount]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[image]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[privileged]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[restart]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[wrong-node]",
+      "passed": true
+    },
+    {
+      "name": "test_container_substitution_never_passes[policy-path]",
+      "passed": true
+    },
+    {
+      "name": "test_policy_archive_and_return_copy_match_without_touching_keys",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[None]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[digest]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[scope]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[duplicate]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[restart]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[acceptance]",
+      "passed": true
+    },
+    {
+      "name": "test_receipt_matches_exact_configuration_and_is_not_operational_acceptance[version]",
+      "passed": true
+    },
+    {
+      "name": "test_different_store_identifier_is_accepted_only_for_identical_image_content",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[layer]",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[entrypoint]",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[env]",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[healthcheck]",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[architecture]",
+      "passed": true
+    },
+    {
+      "name": "test_named_image_cannot_substitute_different_content[invalid-id]",
+      "passed": true
+    },
+    {
+      "name": "test_installer_metadata_upgrade_preserves_existing_identity",
+      "passed": true
+    },
+    {
+      "name": "test_credential_copy_uses_container_owner_and_keeps_host_bytes",
+      "passed": true
+    },
+    {
+      "name": "test_unsafe_credentials_are_rejected_before_docker_copy[missing]",
+      "passed": true
+    },
+    {
+      "name": "test_unsafe_credentials_are_rejected_before_docker_copy[directory]",
+      "passed": true
+    },
+    {
+      "name": "test_unsafe_credentials_are_rejected_before_docker_copy[oversized]",
+      "passed": true
+    },
+    {
+      "name": "test_unsafe_credentials_are_rejected_before_docker_copy[bad-public-key]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[None]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[node]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[epoch]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[volume]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[running]",
+      "passed": true
+    },
+    {
+      "name": "test_repair_only_accepts_assigned_stopped_container[path]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[identity]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[volume]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[private-path]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[duplicate-profile]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[unknown-profile]",
+      "passed": true
+    },
+    {
+      "name": "test_upgrade_rejects_unowned_or_ambiguous_target_without_mutation[absent]",
+      "passed": true
+    },
+    {
+      "name": "test_configuration_check_does_not_change_live_inspection",
+      "passed": true
+    },
+    {
+      "name": "test_owned_workload_blocks_upgrade_even_if_stopped",
+      "passed": true
+    },
+    {
+      "name": "test_completed_upgrade_refuses_automatic_downgrade",
+      "passed": true
+    },
+    {
+      "name": "test_archive_corruption_rejected_before_load",
+      "passed": true
+    }
+  ]
+}

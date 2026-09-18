@@ -1,0 +1,14 @@
+{
+  "environment": "local Vite + headless Chromium; intercepted fixture HTTP, not live backend",
+  "checks": [
+    "empty catalog renders without sample data",
+    "GET observation displays historical result with unknown availability",
+    "input change cancels/ignores previous response",
+    "project switch resets inputs and ignores previous response",
+    "denied URI displays an error without fabricated success",
+    "all fixture HTTP requests are GET; no browser exceptions",
+    "unauthenticated portal does not expose Desktop entry"
+  ],
+  "passed": 7,
+  "pageErrors": []
+}

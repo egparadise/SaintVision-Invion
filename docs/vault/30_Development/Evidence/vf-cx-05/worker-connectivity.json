@@ -1,0 +1,27 @@
+{
+  "scope": "TCP-only availability; no authentication/state mutation",
+  "attempts": [
+    {
+      "at": "2026-09-15T04:02:42.169267+00:00",
+      "host": "192.168.45.225",
+      "port": 18443,
+      "scope": "TCP connect only; no authentication or state mutation",
+      "mTLSVerified": false,
+      "tcpReachable": false
+    },
+    {
+      "at": "2026-09-15T04:06:23.231338+00:00",
+      "host": "192.168.45.225",
+      "port": 18443,
+      "mTLSVerified": false,
+      "tcpReachable": false
+    },
+    {
+      "at": "2026-09-15T04:09:35.950815+00:00",
+      "host": "192.168.45.225",
+      "port": 18443,
+      "mTLSVerified": false,
+      "tcpReachable": false
+    }
+  ]
+}

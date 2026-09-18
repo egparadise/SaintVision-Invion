@@ -1,0 +1,23 @@
+**
+!requirements*.txt
+!pyproject.toml
+!alembic.ini
+!src/
+!src/**
+!services/
+!services/control-plane/
+!services/control-plane/src/
+!services/control-plane/src/**
+!migrations/
+!migrations/**
+!tools/
+!tools/**
+**/__pycache__
+**/*.pyc
+**/.env*
+**/*.pem
+**/*.key
+
+# Synthetic controllers are not part of the deployment surface.
+src/saintvision/demo_server.py
+tools/mock_control_plane.py

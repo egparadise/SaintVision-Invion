@@ -15,6 +15,9 @@ from sqlalchemy.orm import Session
 
 from ...config import Settings
 from ...identity.principal import Principal
+from ...errors import InvError, RES_ARTIFACT_NOT_FOUND, VAL_SCHEMA
+from ...services import resolver
+from ...services.replica_observation import observe_replicas
 from ...services import storage as storage_service
 from ...services.audit import record_event
 from .. import schemas
@@ -80,6 +83,10 @@ def register_contribution(
         payload=body_for_hash,
         now=now,
         ttl_seconds=settings.idempotency_ttl_seconds,
+        # Registering a contribution is tenant-wide: a folder belongs to a
+        # node, not a project. Recorded as None so it collides with other
+        # tenant-wide operations and not with a project's.
+        project_id=None,
     )
     if replayed is not None:
         return replayed
@@ -126,6 +133,7 @@ def register_contribution(
         response_body=body,
         now=now,
         ttl_seconds=settings.idempotency_ttl_seconds,
+        project_id=None,
     )
     return body
 
@@ -168,6 +176,7 @@ def list_contributions(
     page = storage_service.list_contributions(
         session,
         tenant_id=principal.tenant_id,
+        reader_user_id=principal.user_id,
         node_id=node_id,
         limit=limit,
         cursor=cursor,
@@ -191,6 +200,7 @@ def list_locations(
     page = storage_service.list_locations(
         session,
         tenant_id=principal.tenant_id,
+        reader_user_id=principal.user_id,
         contribution_id=contribution_id,
         kind=kind,
         ready_only=ready_only,
@@ -200,3 +210,44 @@ def list_locations(
         max_limit=settings.page_limit_max,
     )
     return page.to_dict(_location_body)
+
+
+@router.get("/storage/resolve")
+def resolve_uri(
+    uri: str = Query(min_length=1, max_length=2048),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Resolve owned active catalogue metadata; does not grant byte access."""
+    try:
+        location = resolver.resolve_location(
+            session, tenant_id=principal.tenant_id, uri=uri,
+            reader_user_id=principal.user_id,
+        )
+    except ValueError:
+        raise InvError(VAL_SCHEMA, "invalid storage URI") from None
+    except InvError as error:
+        if error.code != RES_ARTIFACT_NOT_FOUND:
+            raise
+        # No existence oracle or reflection of an untrusted URI in diagnostics.
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "data location not found", status=404) from None
+    return {"location": _location_body(location)}
+
+
+@router.get("/storage/replica-status")
+def replica_status(
+    uri: str = Query(min_length=1, max_length=2048),
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Recorded states for an owned location; current byte availability is unknown."""
+    try:
+        observation = observe_replicas(
+            session, tenant_id=principal.tenant_id,
+            reader_user_id=principal.user_id, uri=uri,
+        )
+    except ValueError:
+        raise InvError(VAL_SCHEMA, "invalid storage URI") from None
+    return {"observation": schemas.ReplicaObservationResponse.model_validate(
+        observation
+    ).model_dump(by_alias=True, mode="json")}

@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-signed/progress.txt",
+      "externalSHA256": "bade4ffb6f52c63a4fa36b426d20039443a53422106f82a32811a3794e6a9e55"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Claude 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-signed/claude.txt",
+      "externalSHA256": "f1ed2c7ca094f963e080dd6f610cd6096a9b261403063649bf01ae057d087d6e"
+    }
+  ]
+}

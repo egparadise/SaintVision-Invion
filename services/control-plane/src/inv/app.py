@@ -4,8 +4,9 @@ import asyncio
 import json
 import os
 import time
+from contextlib import asynccontextmanager
 from threading import BoundedSemaphore
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.concurrency import run_in_threadpool
@@ -59,8 +60,7 @@ class Boundary:
                 headers[:] = [
                     (k, v)
                     for k, v in headers
-                    if k
-                    not in {b"traceparent", b"cache-control", b"x-content-type-options"}
+                    if k not in {b"traceparent", b"cache-control", b"x-content-type-options"}
                 ]
                 headers.extend(
                     [
@@ -110,10 +110,7 @@ class Boundary:
                 ):
                     raise DomainError("VAL-0003", "Ambiguous request headers", 400)
                 headers[name] = value
-            if (
-                b"origin" in headers
-                and headers[b"origin"].decode("latin1") not in self.origins
-            ):
+            if b"origin" in headers and headers[b"origin"].decode("latin1") not in self.origins:
                 raise DomainError("AUTH-0051", "Browser origin rejected", 403)
             if (
                 scope["path"].startswith("/v1/")
@@ -147,9 +144,7 @@ class Boundary:
                 try:
                     strict_object(body)
                 except (ValueError, TypeError, RecursionError, UnicodeError):
-                    raise DomainError(
-                        "VAL-0003", "Unambiguous JSON object required", 422
-                    ) from None
+                    raise DomainError("VAL-0003", "Unambiguous JSON object required", 422) from None
             sent = False
 
             async def replay():
@@ -168,13 +163,25 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
-def create_app(database=None, tokens=None, *, allowed_origins=()):
+def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None, business=None):
+    @asynccontextmanager
+    async def lifespan(api):
+        if business is None:
+            yield
+        else:
+            async with business.router.lifespan_context(business):
+                yield
+
     api = FastAPI(
         title="Saint Vision INV Control Plane",
         version=__version__,
         docs_url=None,
         redoc_url=None,
+        lifespan=lifespan,
     )
+    if business is not None:
+        from .business_surface import BusinessDispatch
+        api.add_middleware(BusinessDispatch, business=business)
     api.add_middleware(Boundary, origins=allowed_origins)
     control = Control(database) if database else None
 
@@ -184,9 +191,7 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 
     @api.exception_handler(RequestValidationError)
     async def invalid(request, error):
-        return problem(
-            DomainError("VAL-0003", "Invalid request", 422), request.state.trace_id
-        )
+        return problem(DomainError("VAL-0003", "Invalid request", 422), request.state.trace_id)
 
     @api.exception_handler(HTTPException)
     async def http_error(request, error):
@@ -205,11 +210,7 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 
     def key(request):
         value = request.headers.get("idempotency-key")
-        if (
-            not value
-            or len(value) > 200
-            or any(ord(c) < 33 or ord(c) > 126 for c in value)
-        ):
+        if not value or len(value) > 200 or any(ord(c) < 33 or ord(c) > 126 for c in value):
             raise DomainError("VAL-0003", "Idempotency-Key required", 422)
         return value
 
@@ -233,12 +234,126 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
         return {
             "status": "ready",
             "scope": "authenticated-control-api",
-            "executionDispatcher": "not_configured",
+            "executionDispatcher": "external-worker-required" if workspace else "not_configured",
+            "workspaceAdmission": "configured" if workspace else "not_configured",
         }
+
+    @api.get("/v1/session")
+    def session(identity=Depends(authenticated)):
+        # Resource-server identity, not browser-decoded claims or IdP roles.
+        value = {"subjectId": identity.principal.subject_id,
+                 "tenantId": identity.principal.tenant_id,
+                 "expiresAt": identity.expires_at}
+        validate_contract("SessionView", value)
+        return value
 
     @api.get("/v1/projects")
     def projects(identity=Depends(authenticated)):
         return control.projects(identity.principal)
+
+    @api.get("/v1/operations/kill-switch")
+    def kill_status(identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return Containment(database).get(identity.principal)
+
+    @api.post("/v1/operations/containment-approvals", status_code=201)
+    async def propose_containment(request: Request, identity=Depends(authenticated)):
+        from .containment_approvals import ControlApprovals
+
+        return await run_in_threadpool(
+            ControlApprovals(database).propose,
+            identity.principal,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/operations/containment-approvals/{approval_id}")
+    def containment_approval(approval_id: str, identity=Depends(authenticated)):
+        from .containment_approvals import ControlApprovals
+
+        return ControlApprovals(database).get(identity.principal, approval_id)
+
+    @api.post("/v1/operations/containment-approvals/{approval_id}/challenge")
+    async def containment_challenge(
+        approval_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        from .containment_approvals import ControlApprovals
+
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            ControlApprovals(database).challenge, identity.principal, approval_id
+        )
+
+    @api.post("/v1/operations/containment-approvals/{approval_id}/decision")
+    async def decide_containment(
+        approval_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        from .containment_approvals import ControlApprovals
+
+        return await run_in_threadpool(
+            ControlApprovals(database).decide,
+            identity.principal,
+            approval_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.post("/v1/operations/kill-switch", status_code=202)
+    async def kill_switch(request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "kill",
+            await request.json(),
+            key(request),
+        )
+
+    @api.post("/v1/operations/kill-switch/clear")
+    async def clear_kill_switch(request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "clear",
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/nodes/{node_id}/control")
+    def node_control(node_id: str, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return Containment(database).get(identity.principal, node_id)
+
+    @api.post("/v1/nodes/{node_id}/drain", status_code=202)
+    async def drain_node(node_id: str, request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "drain",
+            await request.json(),
+            key(request),
+            node_id,
+        )
+
+    @api.post("/v1/nodes/{node_id}/resume")
+    async def resume_node(node_id: str, request: Request, identity=Depends(authenticated)):
+        from .containment import Containment
+
+        return await run_in_threadpool(
+            Containment(database).change,
+            identity.principal,
+            "resume",
+            await request.json(),
+            key(request),
+            node_id,
+        )
 
     @api.get("/v1/projects/{project}/runs")
     def runs(
@@ -252,18 +367,67 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
     @api.post("/v1/projects/{project}/runs", status_code=201)
     async def create(project: str, request: Request, identity=Depends(authenticated)):
         validate_contract("EmptyRequest", await request.json())
-        return await run_in_threadpool(
-            control.create, identity.principal, project, key(request)
-        )
+        return await run_in_threadpool(control.create, identity.principal, project, key(request))
 
     @api.get("/v1/projects/{project}/runs/{run_id}")
     def run(project: str, run_id: str, identity=Depends(authenticated)):
         return control.get(identity.principal, project, run_id)
 
+    # Both URL forms use the canonical kernel, never public.runs CRUD state.
+    from .result_view import ResultView
+    result_view = ResultView(database)
+
+    from .storage_view import StorageObservationView
+    storage_view = StorageObservationView(database)
+
+    from .model_view import ModelCommitObservation
+    model_view = ModelCommitObservation(database)
+
+    @api.get("/v1/projects/{project}/models/{model_id}/versions/{version}/commitment")
+    def model_commitment(project: str, model_id: str, version: str,
+                         identity=Depends(authenticated)):
+        return model_view.get(identity.principal, project, model_id, version)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
+    def storage_observation(project: str, run_id: str, request_id: str,
+                            identity=Depends(authenticated)):
+        return storage_view.result(identity.principal, project, run_id, request_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/result")
+    @api.get("/v1/runs/{run_id}/result")
+    def run_result(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.result(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts")
+    @api.get("/v1/runs/{run_id}/artifacts")
+    def run_artifacts(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.artifacts(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/artifacts/content")
+    @api.get("/v1/runs/{run_id}/artifacts/content")
+    def run_file(run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)):
+        import hashlib
+        from starlette.responses import Response
+        content = result_view.download(identity.principal, run_id, path, project)
+        return Response(content, media_type="application/octet-stream", headers={
+            "Content-Disposition": 'attachment; filename="artifact.bin"',
+            "X-Content-SHA256": hashlib.sha256(content).hexdigest(),
+            "X-Content-Type-Options": "nosniff",
+        })
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/logs")
+    @api.get("/v1/runs/{run_id}/logs")
+    def run_logs(run_id: str, project: str | None = None, identity=Depends(authenticated)):
+        return result_view.logs(identity.principal, run_id, project)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/attempts")
+    @api.get("/v1/runs/{run_id}/attempts")
+    def run_attempts(run_id: str, project: str | None = None, after: int = 0, limit: int = 50,
+                     identity=Depends(authenticated)):
+        return result_view.attempts(identity.principal, run_id, project, after=after, limit=limit)
+
     @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
-    async def cancel(
-        project: str, run_id: str, request: Request, identity=Depends(authenticated)
-    ):
+    async def cancel(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
         data = await request.json()
         validate_contract("RunCancelInput", data)
         return await run_in_threadpool(
@@ -278,6 +442,30 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
     @api.get("/v1/projects/{project}/nodes")
     def nodes(project: str, identity=Depends(authenticated)):
         return control.nodes(identity.principal, project)
+
+    @api.get("/v1/projects/{project}/capacity")
+    def capacity(project: str, identity=Depends(authenticated)):
+        return control.capacity(identity.principal, project)
+
+    @api.get("/v1/projects/{project}/approvals")
+    def approvals(project: str, after: str | None = None, limit: int = 50,
+                  runId: str | None = None, identity=Depends(authenticated)):
+        return control.list_approvals(identity.principal, project, after=after,
+                                      limit=limit, run_id=runId)
+
+    @api.get("/v1/projects/{project}/approvals/{approval_id}/review")
+    def approval_review(project: str, approval_id: str, identity=Depends(authenticated)):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(control.approvals.review(identity.principal, project, approval_id),
+                            headers={"Cache-Control": "no-store"})
+
+    @api.get("/v1/projects/{project}/approvals/{approval_id}")
+    def approval(project: str, approval_id: str, identity=Depends(authenticated)):
+        return control.get_approval(identity.principal, project, approval_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/shards")
+    def shards(project: str, run_id: str, identity=Depends(authenticated)):
+        return control.shards(identity.principal, project, run_id)
 
     @api.post("/v1/projects/{project}/approvals/{approval_id}/challenge")
     async def challenge(
@@ -313,14 +501,364 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
             key=key(request),
         )
 
-    @api.get("/v1/projects/{project}/runs/{run_id}/events")
-    async def events(
+    def workspace_service():
+        if workspace is None:
+            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)
+        return workspace
+
+    terminal_slots = BoundedSemaphore(32)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/git", status_code=201)
+    async def propose_git(
+        project: str,
+        run_id: str,
+        checkout_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        from .workspace_git import WorkspaceGit
+
+        data = await request.json()
+        return await run_in_threadpool(
+            WorkspaceGit(workspace_service()).propose,
+            identity.principal,
+            project,
+            run_id,
+            checkout_id,
+            data,
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/git/{operation_id}")
+    def get_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).get(identity.principal, project, operation_id)
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/votes")
+    async def vote_git(
+        project: str, operation_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        from .workspace_git import WorkspaceGit
+
+        return await run_in_threadpool(
+            WorkspaceGit(workspace_service()).vote,
+            identity.principal,
+            project,
+            operation_id,
+            await request.json(),
+        )
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/apply")
+    def apply_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).apply(identity.principal, project, operation_id)
+
+    @api.post("/v1/projects/{project}/git/{operation_id}/reconcile")
+    def reconcile_git(project: str, operation_id: str, identity=Depends(authenticated)):
+        from .workspace_git import WorkspaceGit
+
+        return WorkspaceGit(workspace_service()).reconcile(
+            identity.principal, project, operation_id
+        )
+
+    @api.post("/v1/workspaces/{workspace_id}/terminal-tickets", status_code=201)
+    async def terminal_ticket(workspace_id: str, request: Request, identity=Depends(authenticated)):
+        from .terminal import TerminalService
+
+        data = await request.json()
+        return await run_in_threadpool(
+            TerminalService(workspace_service(), allowed_origins).issue,
+            identity,
+            workspace_id,
+            data,
+            request.headers.get("origin", ""),
+        )
+
+    @api.websocket("/v1/workspaces/{workspace_id}/terminals/{session_id}")
+    async def terminal_socket(websocket: WebSocket, workspace_id: str, session_id: str):
+        from .terminal import TerminalService, TerminalText
+        import secrets
+
+        origin = websocket.headers.get("origin", "")
+        if (
+            origin not in allowed_origins
+            or websocket.scope.get("query_string")
+            or websocket.headers.get("sec-websocket-protocol") != "inv-terminal-v1"
+            or len([h for h in websocket.scope["headers"] if h[0] == b"origin"]) != 1
+            or len([h for h in websocket.scope["headers"] if h[0] == b"sec-websocket-protocol"])
+            != 1
+            or sum(len(k) + len(v) for k, v in websocket.scope["headers"]) > 32768
+        ):
+            await websocket.close(code=4403)
+            return
+        if not terminal_slots.acquire(blocking=False):
+            await websocket.close(code=4429)
+            return
+        attachment = None
+        service = None
+        try:
+            service = TerminalService(workspace_service(), allowed_origins)
+            await websocket.accept(subprotocol="inv-terminal-v1")
+            first = await asyncio.wait_for(websocket.receive_text(), timeout=5)
+            if len(first) > 200:
+                raise DomainError("AUTH-0070", "Terminal authentication frame exceeds bound", 403)
+            auth = strict_object(first)
+            if not isinstance(auth, dict) or set(auth) != {"ticket"}:
+                raise DomainError("AUTH-0070", "Single-use terminal ticket required", 403)
+            attachment = await run_in_threadpool(
+                service.redeem, tokens.tenant_id, workspace_id, session_id, auth["ticket"], origin
+            )
+            text = TerminalText()
+            # Start from zero on every attachment; never redact only a suffix
+            # whose secret/escape prefix was seen by a previous connection.
+            data = {
+                "sequence": 0,
+                "cursor": 0,
+                "operation": "poll",
+                "dataBase64": "",
+                "rows": 24,
+                "columns": 80,
+                "nonce": secrets.token_hex(32),
+            }
+            while True:
+                if data["cursor"] != text.cursor:
+                    raise DomainError(
+                        "AUTH-0070", "Terminal cursor must follow acknowledged output", 403
+                    )
+                result = await run_in_threadpool(service.frame, attachment, data)
+                output = text.accept(result)
+                browser_output = {
+                    "sessionId": session_id,
+                    "sequence": result["sequence"],
+                    "cursor": text.cursor,
+                    "text": output,
+                    "outputMode": "redacted-complete-lines",
+                }
+                validate_contract("TerminalBrowserOutput", browser_output)
+                await asyncio.wait_for(
+                    websocket.send_json(browser_output),
+                    timeout=2,
+                )
+                try:
+                    raw = await asyncio.wait_for(websocket.receive_text(), timeout=0.5)
+                    if len(raw) > 8192:
+                        raise DomainError("VAL-0003", "Terminal frame exceeds bound", 422)
+                    data = strict_object(raw)
+                    validate_contract("TerminalFrameInput", data)
+                except asyncio.TimeoutError:
+                    data = {
+                        "sequence": 0,
+                        "cursor": text.cursor,
+                        "operation": "poll",
+                        "dataBase64": "",
+                        "rows": 24,
+                        "columns": 80,
+                        "nonce": secrets.token_hex(32),
+                    }
+        except (WebSocketDisconnect, asyncio.TimeoutError, DomainError, ValueError, TypeError):
+            try:
+                await websocket.close(code=4403)
+            except RuntimeError:
+                pass
+        except Exception:
+            # Never put raw frames, credentials or driver exceptions on the wire.
+            try:
+                await websocket.close(code=1011)
+            except RuntimeError:
+                pass
+        finally:
+            if attachment is not None:
+                try:
+                    await run_in_threadpool(service.release, attachment)
+                except Exception:
+                    pass  # Durable lease expires; this never grants a new execution.
+            terminal_slots.release()
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files")
+    def checkout_files(
+        project: str, run_id: str, checkout_id: str, identity=Depends(authenticated)
+    ):
+        from .workspace_editor import WorkspaceEditor
+
+        return WorkspaceEditor(workspace_service()).get(
+            identity.principal, project, run_id, checkout_id
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files")
+    async def edit_checkout_files(
+        project: str,
+        run_id: str,
+        checkout_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        from .workspace_editor import WorkspaceEditor
+
+        data = await request.json()
+        return await run_in_threadpool(
+            WorkspaceEditor(workspace_service()).edit,
+            identity.principal,
+            project,
+            run_id,
+            checkout_id,
+            data,
+            key(request),
+        )
+
+    def business_service():
+        from .business_handoff import BusinessHandoff
+
+        return BusinessHandoff(workspace_service())
+
+    @api.get("/v1/projects/{project}/permission")
+    def business_permission(project: str, identity=Depends(authenticated)):
+        from .business_auth import permission
+
+        with database.transaction(identity.principal.tenant_id) as conn:
+            effective = control.grant(conn, identity.principal, project)
+            value = permission(conn, project, identity.principal.subject_id, linked=True)
+            return {
+                "projectId": project,
+                "userId": value["userId"],
+                "roleCode": value["roleCode"],
+                "canRequest": effective["can_request"],
+                "canApprove": effective["can_approve"],
+            }
+
+    @api.post("/v1/workspaces/{workspace_id}/edit-lock", status_code=201)
+    async def stop_business_editing(
+        workspace_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().stop,
+            identity.principal,
+            workspace_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.delete("/v1/edit-locks/{lock_id}")
+    async def release_business_editing(
+        lock_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().release, identity.principal, lock_id, key(request)
+        )
+
+    @api.post("/v1/runs/{run_id}/bindings", status_code=201)
+    async def prepare_business_binding(
+        run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            business_service().prepare,
+            identity.principal,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/bindings/{binding_id}")
+    def business_binding(binding_id: str, identity=Depends(authenticated)):
+        return business_service().get(identity.principal, binding_id)
+
+    @api.post("/v1/bindings/{binding_id}/approval")
+    async def business_approval(binding_id: str, request: Request, identity=Depends(authenticated)):
+        return await run_in_threadpool(
+            business_service().approved, identity.principal, binding_id, await request.json()
+        )
+
+    @api.post("/v1/bindings/{binding_id}/enqueue", status_code=202)
+    async def enqueue_business_binding(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            business_service().enqueue, identity.principal, binding_id, key(request)
+        )
+
+    @api.post("/v1/bindings/{binding_id}/reconcile")
+    async def reconcile_business_binding(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        validate_contract("EmptyRequest", await request.json())
+        return await run_in_threadpool(
+            business_service().reconcile, identity.principal, binding_id, key(request)
+        )
+
+    @api.post("/v1/bindings/{binding_id}/state")
+    async def reject_business_state(
+        binding_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        await run_in_threadpool(business_service().get, identity.principal, binding_id)
+        raise DomainError("AUTH-0045", "Binding state is derived from execution evidence", 403)
+
+    def first_workspace_service():
+        from .workspace_start import WorkspaceStart
+
+        return WorkspaceStart(workspace_service())
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/prepare", status_code=201)
+    async def prepare_first_workspace(
         project: str, run_id: str, request: Request, identity=Depends(authenticated)
     ):
-        cursor = request.headers.get("last-event-id")
-        await run_in_threadpool(
-            control.events, identity.principal, project, run_id, cursor
+        return await run_in_threadpool(
+            first_workspace_service().prepare,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
         )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/start/enqueue", status_code=202)
+    async def enqueue_first_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        return await run_in_threadpool(
+            first_workspace_service().enqueue,
+            identity.principal,
+            project,
+            run_id,
+            await request.json(),
+            key(request),
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/starts/{start_id}")
+    def first_workspace_status(
+        project: str, run_id: str, start_id: str, identity=Depends(authenticated)
+    ):
+        return first_workspace_service().get(identity.principal, project, run_id, start_id)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/resume/prepare", status_code=201)
+    async def prepare_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        data = await request.json()
+        return await run_in_threadpool(
+            workspace_service().prepare, identity.principal, project, run_id, data, key(request)
+        )
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/resume/enqueue", status_code=202)
+    async def enqueue_workspace(
+        project: str, run_id: str, request: Request, identity=Depends(authenticated)
+    ):
+        data = await request.json()
+        return await run_in_threadpool(
+            workspace_service().enqueue, identity.principal, project, run_id, data, key(request)
+        )
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/resumptions/{resume_id}")
+    def workspace_status(
+        project: str, run_id: str, resume_id: str, identity=Depends(authenticated)
+    ):
+        return workspace_service().get(identity.principal, project, run_id, resume_id)
+
+    @api.get("/v1/projects/{project}/runs/{run_id}/events")
+    async def events(project: str, run_id: str, request: Request, identity=Depends(authenticated)):
+        cursor = request.headers.get("last-event-id")
+        await run_in_threadpool(control.events, identity.principal, project, run_id, cursor)
         bearer = request.headers["authorization"][7:]
 
         async def stream():
@@ -358,30 +896,54 @@ def create_app(database=None, tokens=None, *, allowed_origins=()):
 app = create_app()
 
 
+def create_configured_app():
+    """Production factory: explicit operator configuration, never seeded demo data."""
+    try:
+        settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
+        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business"}:
+            raise ValueError()
+        identity = AccessTokens(**settings["identity"])
+        database = Database(
+            os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"]
+        )
+        workspace = None
+        if "workspace" in settings:
+            from .workspace_config import configured_workspace
+
+            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])
+        business = None
+        if "business" in settings:
+            if settings["business"] is not True:
+                raise ValueError()
+            from .business_surface import configured_business
+            business = configured_business(database, identity)
+        return create_app(
+            database,
+            identity,
+            allowed_origins=settings.get("allowedOrigins", []),
+            workspace=workspace,
+            business=business,
+        )
+    except Exception:
+        raise RuntimeError(
+            "Explicit Control Plane identity/database/Workspace configuration unavailable"
+        ) from None
+
+
 def main():
     import uvicorn
 
-    try:
-        settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        identity = AccessTokens(**settings["identity"])
-        database = Database(
-            os.environ["INV_RUNTIME_DSN"],
-            recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
-        )
-        configured = create_app(
-            database, identity, allowed_origins=settings.get("allowedOrigins", [])
-        )
-    except Exception:
-        raise SystemExit(
-            "Explicit Control Plane identity/database configuration unavailable"
-        ) from None
     uvicorn.run(
-        configured,
+        create_configured_app(),
         host="127.0.0.1",
         port=8080,
         proxy_headers=False,
         access_log=False,
         limit_concurrency=64,
+        ws="websockets",
+        ws_max_size=8192,
+        ws_max_queue=1,
+        ws_per_message_deflate=False,
         timeout_keep_alive=5,
         h11_max_incomplete_event_size=32768,
     )

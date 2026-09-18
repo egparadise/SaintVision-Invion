@@ -1,0 +1,1988 @@
+{
+  "at": "2026-09-11T05:56:14.537037+00:00",
+  "codeSHA": "01fdb15556cea77b4e6f62a5f09ad45848904e6b",
+  "dirty": false,
+  "sourceHashes": {
+    "alembic.ini": "b98890c04142394f1d282ae2b288cb70667ac00e07b51df3d46084f464e9b094",
+    "contracts/README.md": "1c9e958bc5d0abad8c8d50ff0776b11358bc79eea7746ba7f32caf376cde0444",
+    "contracts/announcement-request.schema.json": "0213fde4612199163aa2371f548aa7c0f420d36e40376da7993bfa3b58c32595",
+    "contracts/contribution-request.schema.json": "aee1aa8e9ad33dde32fac44e229f2ba284e8c9c2c84409ae81c84c3eee582c6c",
+    "contracts/contribution-response.schema.json": "7df475d6c3dc76eb724d5ee1cd0181208bfc0030240c87e1d7467c798499c1fa",
+    "contracts/data-location-response.schema.json": "0e731b5f936a8ffdaec76c0d707d99e0dc839710630132a9681fdb34ff1949e6",
+    "contracts/distributed-plan-request.schema.json": "61bbc8e2d3812820ede3974f107f8f4ea4d40aeb68eca6703608ec00acda42a1",
+    "contracts/heartbeat-request.schema.json": "2318185fd0e5bceca8b4c87a6b12157019438eb12733ad520dfce2072fa2e9ce",
+    "contracts/member-role-request.schema.json": "8a5e7b8bb70667ded8b124fb4366bdf80618f3e75ef45898365888e2cdc88840",
+    "contracts/node-enroll-request.schema.json": "5fc1b513db3beb01738a9cb1f211d194f41cd5e33e7445a218f5ebfbc1650341",
+    "contracts/node-enroll-response.schema.json": "2a6ee9e56f54e4655036076bf1232b973b8a3045c431d49df983e6a24df98748",
+    "contracts/node-response.schema.json": "8c693af2b5434e60ea6e8b993071e2c82a0dba37fa9b5a06020543d0d3eb11a9",
+    "contracts/page-response.schema.json": "ab0da2709b958902a0dc13653a896826ca32243747f3862c88ce8f0d935507b2",
+    "contracts/pool-request.schema.json": "a857fd4c90dabbb73c0baafa2e2a6c1afddd7cd515048aeb40ef91b3584ecaed",
+    "contracts/project-create-request.schema.json": "7b6998d0fd75fd28aab7fedc1a153b5bcfbb71766764e59911043ab9ee9e7fcc",
+    "contracts/project-status-request.schema.json": "85b9e77ec139f665875968bacfe244f9c08e32fd41ee2506d6033316e849b415",
+    "contracts/resource-offer-request.schema.json": "6a40910c2e45075c032f74f4f8a66d8f2cdedefc08b7cedb68c76c954294aab5",
+    "contracts/user-status-request.schema.json": "ff87dab00ab89fcf8c4baf45ace45bb480927323d03adc77e5be1defecd935fe",
+    "contracts/v1alpha1/core.schema.json": "20fab4c3c451e92f4908f0541b296f761ffff06ac34dc21eed8798049fe07449",
+    "contracts/workspace-create-request.schema.json": "e36944667bc394b0d6f022f7c24e4b6b5346d9948d05a88c1303b7f4b4e16f58",
+    "contracts/workspace-status-request.schema.json": "fba04c833a27add2a9b01a0bf40c3c9788f84eda025b2e572525d864bd0b578c",
+    "contracts/workspace-tool-request.schema.json": "7bd68999a03c2973c0fa4154d25c61e0a35a61e3a6ed3017a960a6c1edd6d401",
+    "deploy/testing/Dockerfile.kernel": "4117775e05c304317c42d0d3d79b76ab120a07493ba35ea5a5724383310ff691",
+    "deploy/testing/Dockerfile.python-node": "f27dd93904729b627e52d8f7065d69904c0681ddd14f02624ece69dd471ad4c5",
+    "migrations/env.py": "afbc6166370dbf2548c6c642b705883c7d58d68b5bf2f92c6ee0ffc9dd824e37",
+    "migrations/script.py.mako": "dfa626e0ab391be2470f0c87b432cb45e5bdb5a3f91c019eeec11e15b60185be",
+    "migrations/versions/0001_core.py": "195987cb51e05300c380573113e6c3a6935b0f20289fe4754ba1879c3643397b",
+    "migrations/versions/0001_s02_baseline.py": "3dd001ecf90a527c0b7366e6ca92e1532c68d2ef7786fc53bc2a30305aad3d30",
+    "migrations/versions/0002_approvals.py": "1e739ff23e9efe2d9bd6a6210131628b14368081edf49156d33ba5b0457be21c",
+    "migrations/versions/0002_s03_execution.py": "d7bd063a6ef61248be59058bd9b83954802d5c3cd258684b5540866a3ea98b43",
+    "migrations/versions/0003_s09_context_eval.py": "1034e8f4a43aa7987189f09240141d027af8a8c57e37bf4765db79a288d358ec",
+    "migrations/versions/0003_tool_claims.py": "e54caa69567e22c4bd3dc6df74343de2dbc75878debb16295f57c1cabd48f408",
+    "migrations/versions/0004_node_receipts.py": "7608f48231198eeb5bc7733209e9d3892eff85c9d17661ea3cbd279ca5a95578",
+    "migrations/versions/0004_s10_lineage.py": "97dd0410b7658ed95ff64ea2cf8937fe51525d89fd38ecd6e09acac2279db9bf",
+    "migrations/versions/0005_node_channels.py": "28e6d2e4eefd989345700ab173bf2b2f251bd18d7b09a5665014c18be804f6d0",
+    "migrations/versions/0005_s12_pilot_operations.py": "d88fbabe309bd3d7722a5f6cad5f834d899dd5a7295025c61cc520483009d8e4",
+    "migrations/versions/0006_control_api.py": "3a56f7c3957b7601ef302b0a2b294d681bb0ffcdaf367f3f2f576011f168d424",
+    "migrations/versions/0006_discovery_pools_placement.py": "184e1e6b649fe6b9c82f1fc9563834e2ae7cbdae64199b64f3526379b3224ed4",
+    "migrations/versions/0007_delivery_queue.py": "2779e43e64192da2343d487c8678f60abd92141c90e6758bdbe650a45fa2ec82",
+    "migrations/versions/0007_locality_replicas.py": "e5ee8cb8c6da69ffd32d1e26452226aad9600179e3310f88e8202fed75a2fade",
+    "migrations/versions/0008_node_certificate_lookup.py": "60cacbeae108ba06fb08a5e9b8717398fa439de76e2f8d38f0cc45c10321f926",
+    "migrations/versions/0008_storage.py": "10b817dea51b85cf4250c8a95fcef524e3a0c2df9125a442ef4ade366694789e",
+    "migrations/versions/0009_idempotency_and_inbox_scope.py": "68685343b1b2a366027ad47a0e8a4a21f47e506cef3750a3ab7695ded3edba37",
+    "migrations/versions/0009_node_snapshots.py": "7a5e4d2f88007eb8fe23244a9e163ac8b58199ba9e9f5b4629eb942bae07d7d5",
+    "migrations/versions/0010_canonical_resource_units.py": "fe15d1e0d7204be770802e6106891a816222c8544494da4eae7d7c4f6d1470d5",
+    "migrations/versions/0010_shards.py": "76623ee5e3155cafc15590e40d21ea92eb47b0bf8f7164907ccac743560495b4",
+    "migrations/versions/0011_results.py": "779d153343cbdf86649c25c5ecaaf9d2054772e472dde0053f668a50afe5c5a4",
+    "migrations/versions/0012_workspace_restore.py": "10d95b001b1500ac092c3956c81c65d5d965a4c1de2693900b168e3b25b06481",
+    "migrations/versions/0013_placement_limits.py": "8a7312fc5d5dce3461978466b6abed8fb971faed24a9c81f272be6f663f34bde",
+    "migrations/versions/0014_reservation_aborts.py": "4b20b3916a9b2cbbb7d749b8560f13f2ab4e770359d662716a795f74ce5150be",
+    "migrations/versions/0015_output_ingestions.py": "38ab00f5f4f1391ae63d9c4e9db973991fea75f6c14285cf959e0c16b7adef7b",
+    "migrations/versions/0016_shard_parents.py": "0e049b3d61cff4d62464405484e1014d4e452fb4377a853772e3a450ff0630c7",
+    "migrations/versions/0017_workspace_checkouts.py": "66598cbd9fb20e8825b2f2e3502624524258b45173215361758084d2f3bb65cd",
+    "migrations/versions/0018_workspace_resume.py": "833c62f4d2d72f1b9e5f56bd61811ed47327abc337643c52319dfab9bb720e46",
+    "migrations/versions/0019_workspace_api_integration.py": "2540d0136a8e9b52a309e0ca87400574b2ecdc1ac20ad9a3ce2de3dcda1d0ef5",
+    "migrations/versions/0020_shard_recovery.py": "7414131dddb4033100f384e7306669889a9961f1c4c4e6c10d7e5b96187571c8",
+    "migrations/versions/0021_business_kernel.py": "f43e4d9360f3ce8418227749332b5016e19cf464b258bf013937a0893545b853",
+    "migrations/versions/0022_node_containment.py": "2c6cf62d30e073dc79e74a35b8a55790bbc5fe55a6693ef0cfe23d65e43b77b6",
+    "migrations/versions/0023_containment_approvals.py": "c4adf9ecc74a3454a359029b598474c216e4f7b35e9c71b31f96e7762e34e74f",
+    "migrations/versions/0024_project_kernel_link.py": "53ba01312a23ccff574f2f61fcdff79add1cb35ecb802a4970e984c62502c6a5",
+    "migrations/versions/0025_workspace_start.py": "e98c2710de6484cf067914596d48eeaec39187f0360a8fd6facf96508b2dbbd6",
+    "migrations/versions/0025_workspace_tool_choice.py": "3917f0c0e92adc0e1ab4fbfd895ea583f807b4d813fec813056981798a587dae",
+    "migrations/versions/0026_business_start_merge.py": "f7eb040b9956fcc7cbc0c6582feb2121676679cb86d32981a38340ba6d8c2b79",
+    "migrations/versions/0026_subject_kernel_link.py": "9b0bdc4231d0d64a0c5b9bcc0853b91c58ece2058ad7113a53c4b72889e783a0",
+    "migrations/versions/0027_business_api_guards.py": "bbfa4cff2dafe579b0dc19397e4a551d15b61979178f5aa57edf4c81909e8c3e",
+    "migrations/versions/0028_result_readiness_merge.py": "aa707216fa47c8c45cbf5366beb3e5cb667bd4c3489677d672bb82430dfa260a",
+    "migrations/versions/0028_subject_kernel_link.py": "29ee6bcea7decd54980dad3925a2a0acb406e4994f9a39485d24dfe7d1a24d7e",
+    "migrations/versions/0029_run_outputs.py": "ee5850b4c8a5f7d8817ec8857875cd7582283a988a306ec4ad1a71314dcbe77c",
+    "migrations/versions/0030_apply_resource_offer.py": "d64b698e9dcf1ac0237202ee76bb126439639df60e7e2a6dc4e16b682a4b2f09",
+    "migrations/versions/0030_provisioning_integrity.py": "9e09bf00e76347d4748b09ad752d1376944bb7b5e2245a0cf4c2b6dcf02aff72",
+    "migrations/versions/0031_resource_offer_integrity.py": "0d562a32693efc1ab3c3791cff7ce0210fe63b8c44aa8faa2413e05d44019d06",
+    "packages/contracts-go/contracts.go": "efd2dd156efdafa37edd9a5e6ab3cd02c67c051c986a2819bf60ab9c76b2b554",
+    "packages/contracts-go/go.mod": "bb5f6271d1e4cf852c090adc57abaa235afe1c2e7fbfc28240a8fcc12a8804c3",
+    "pyproject.toml": "ce7b4b09c81b2bda632f25becfae2c767ef83a195d5b7997712e143d2251f4e7",
+    "requirements-backend.txt": "135e7f972b2f0c204ebf6147ad38793472930cec8d2ea0de3e5c641d289d46ae",
+    "requirements-core.txt": "adea81fc8e53aaf03cee1688dd4292fb2bc1e437d2e2d7e37ee91e274a937816",
+    "requirements-test.txt": "a258e73233bd339bed1f68794b9bdad0c124a68683db2cb04c61e69531a860a1",
+    "services/control-plane/src/inv/__init__.py": "a0aa8b14934174410e275d8b85fb745157112a7307c95274f253634d1ab5d28c",
+    "services/control-plane/src/inv/app.py": "d81c6edb2049646a63bb1b676f7034b8ca814d79f9ab2d2929bd082edfc30747",
+    "services/control-plane/src/inv/approvals.py": "f96e2a65ee5f8316d9255f2a982c3e90311fe1ca6b831364c771b0816ed83b42",
+    "services/control-plane/src/inv/business_auth.py": "d0ec2fd23edaba1de27573048e23a530e89158c59da68e70cf8ba5243771b6b0",
+    "services/control-plane/src/inv/business_handoff.py": "5c7ae503c49d6134c4b95f73907d0d655875554bf3995039e7a92b7d7f690272",
+    "services/control-plane/src/inv/business_surface.py": "8a9758da14395d209c027f22a7d68968720bf815853aab382b7f07aebd2a2894",
+    "services/control-plane/src/inv/capacity.py": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+    "services/control-plane/src/inv/containment.py": "9d392d91b1c307819f2a5b37d477940e5e09879a9959ad718acbe159081537ea",
+    "services/control-plane/src/inv/containment_approvals.py": "50994511be45f98c3263bcd7eb226c94aec4203667c8b42f0e1383a81fad1a8e",
+    "services/control-plane/src/inv/contracts.py": "a6362ee619b3ccfcd6a8ea67376fe29762fd253861e355ce82c7addc86e89f4b",
+    "services/control-plane/src/inv/control.py": "abbde604de7c19e890597ffef13402288e40a26f706eed061c8399522c0037c7",
+    "services/control-plane/src/inv/db.py": "6578e7918398a15ae103969fcfb9a2cbeb11a18441f7da2fef540d45b793ea70",
+    "services/control-plane/src/inv/dispatch.py": "0860a7c6af8d1963148b2a15037a1c0e5898ef4e5b076d978d648903014db215",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/generated/__init__.py": "5746db4e562534696ee2637154c696cf8c0c29211b20b2fc79c6329b13aeea0e",
+    "services/control-plane/src/inv/generated/core.schema.json": "20fab4c3c451e92f4908f0541b296f761ffff06ac34dc21eed8798049fe07449",
+    "services/control-plane/src/inv/generated/models.py": "43f894176b786d5662e31c73eafbc2b31bf615f08cc171b4e039c46aac2a879b",
+    "services/control-plane/src/inv/identity.py": "d7355048d9bc9c0a5c02654a3cb9519890e0769d9e9db855e5ee0c3174767a3c",
+    "services/control-plane/src/inv/ids.py": "75b68d62ac922c95ff48fbc70c7b899b7cd27be01268ae85efa177adf0a8c560",
+    "services/control-plane/src/inv/leases.py": "f1761855835a2091431fd7805b3dfada0cb1b880e377255b1c42fa6b4d331401",
+    "services/control-plane/src/inv/migrations/0001_core.sql": "708cf74734471961a49d527d1d2b0d6e4441e00ddf6739795492dfcd8f4063e9",
+    "services/control-plane/src/inv/migrations/0002_approvals.sql": "394c6753fb5c3ea93c8c13db9c38c9d03f96b3f9786f2ec490e8e0591a9fb0de",
+    "services/control-plane/src/inv/migrations/0003_tool_claims.sql": "84884ea924b5481547c345722db1bcfe0086425cd86d2824a57c4d089268c131",
+    "services/control-plane/src/inv/migrations/0004_node_receipts.sql": "999f01ac897cfc772e419a30d4f1a32730864c3dc05e4ad0d8086a2b3efcd490",
+    "services/control-plane/src/inv/migrations/0005_node_channels.sql": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+    "services/control-plane/src/inv/migrations/0006_control_api.sql": "d9284d26f0e23ffe72fe591a132efc07b7384d459ac3ed988cb1326968df6609",
+    "services/control-plane/src/inv/migrations/0007_delivery_queue.sql": "edce4a49c83c40478921f86bff0cb6760639e4e03f8b45b8bb1f2989bcf2e2dd",
+    "services/control-plane/src/inv/migrations/0008_storage.sql": "9a7cfa35ba353fcdc7b03600724c75470220d165ada005648ed5ae30b6a306c4",
+    "services/control-plane/src/inv/migrations/0009_node_snapshots.sql": "799e8f36beeba9f18fd9d5f36d45472c95f8ffb002aa707ccc0cc6adb271d26a",
+    "services/control-plane/src/inv/migrations/0010_shards.sql": "88bd8f268a7c417b01e57dd25b686eed93de6012d7a2b9da55130b47f45b6623",
+    "services/control-plane/src/inv/migrations/0011_results.sql": "b9e5e4b49ae88810554a2d7897e9b611601ea85413932446890950c4511c49c3",
+    "services/control-plane/src/inv/migrations/0012_workspace_restore.sql": "d35d93a055246bdc307f94a9a1b00ad81e85bfc311c295a7a172b2e849df0066",
+    "services/control-plane/src/inv/migrations/0013_placement_limits.sql": "7f1e7699e742d751c8547bfead0777a5fe26da4768b9a9a0219d7cd09e2df71d",
+    "services/control-plane/src/inv/migrations/0014_reservation_aborts.sql": "4591b8b2e02754e7dc5dd9bb821fe7174ff3b021a775debbc064703b9f74470d",
+    "services/control-plane/src/inv/migrations/0015_output_ingestions.sql": "9d2cbba6e05db2e78ec88f6cc8968ea8c015986a7b83629ac6f0fdb0600d583e",
+    "services/control-plane/src/inv/migrations/0016_shard_parents.sql": "979fa577249fb86876405b775fd42948ca5f60af47c8b875b41776711144383d",
+    "services/control-plane/src/inv/migrations/0017_workspace_checkouts.sql": "94022f64274b3f6f8da1e4cc3a461d65c6d3be8fa6b0b231c27202b072d9e465",
+    "services/control-plane/src/inv/migrations/0018_workspace_resume.sql": "e7e42b113060001e052a96365c583c589499580e87d46861161ad7cf4e64c572",
+    "services/control-plane/src/inv/migrations/0019_runtime_role.sql": "7eb1d0b9c6608a8eb2e3d69ee7838dd99daa5124eefd53f8fa0ff0a7490be662",
+    "services/control-plane/src/inv/migrations/0020_shard_recovery.sql": "10fad974bb14b864950db9266b3634a9e314a52fc48d8214cbaabbabf07abc54",
+    "services/control-plane/src/inv/migrations/0021_business_kernel.sql": "494f1e0dc9ead74b964e78b97fae23fa0635b00e7cac238e7a53a43370031fed",
+    "services/control-plane/src/inv/migrations/0022_node_containment.sql": "eaee2ad2a2cac146acf2f4f823ad73e5fb34a0b831bdb6d647c5beafbfed6c22",
+    "services/control-plane/src/inv/migrations/0023_containment_approvals.sql": "0e8deef463f1bd3b77f0d0492031a40c19035d08e9bed22a022d2d443c63e92f",
+    "services/control-plane/src/inv/migrations/0025_workspace_start.sql": "14e0cde39c2492790c77e01557c202fa17fa03488bdcf853aea7dd8a5ae60fec",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+    "services/control-plane/src/inv/node_execution.py": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+    "services/control-plane/src/inv/node_transfer.py": "da9fd86861458a7a3b84ed27d0568df4fb43cdbe0a0cf02ddf016b27715b6fbc",
+    "services/control-plane/src/inv/node_transport.py": "56f74910d7e49f31161fe657c8cba7bc80e7930a50691fb8a139d1c86f4b13df",
+    "services/control-plane/src/inv/object_store.py": "4b50f1eaa87e4e21443f5786fecad3244abfee4162ff91957c65999e4979706c",
+    "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+    "services/control-plane/src/inv/observer_worker.py": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+    "services/control-plane/src/inv/outbox.py": "9af3697c6b28d21d254c266afc738c2af9568d61bb4829ece211523773e3bba7",
+    "services/control-plane/src/inv/output_ingestion.py": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+    "services/control-plane/src/inv/placement.py": "a99b79903544c2169b995b3047032aa28437918cd926e1a03b2102e8a34b35e5",
+    "services/control-plane/src/inv/policy.py": "def0e49991da7e1bf3d33cb44cb1805c50daa46dee0290bd8beb95e005562817",
+    "services/control-plane/src/inv/reservations.py": "f102379382e02421c3912e63b074615fd98e78f2f6179343cf063e98af337aa4",
+    "services/control-plane/src/inv/result_view.py": "debe6fc98a627c20b8cd9cd4bc6a4840d3194a603db0f756c95e908ec86c4cde",
+    "services/control-plane/src/inv/results.py": "46c6454d265301d7e529ba11816c7676fec08f7f357760dd30e964074913999e",
+    "services/control-plane/src/inv/runs.py": "f4bcf054ef61a1f081381e2899ce95527438aa38d550a23a47908e51a7d7d784",
+    "services/control-plane/src/inv/sandbox.py": "9fd4ea21f9701ad484f25dd1bbd65765e8e0b14cb4b5d104e497f0a6e46daa72",
+    "services/control-plane/src/inv/scheduler.py": "69e36fb43d37b0338db065be6e179288f97488f23adcbe8daf9ab9b7765fce0c",
+    "services/control-plane/src/inv/shard_completion.py": "4f20c9fab82c3a33c99f8034cbc945136a47a8a00e2aee4c012ce80dad2de3e4",
+    "services/control-plane/src/inv/shard_recovery.py": "f50941ac9fc5455eea38ac4800dfc93b68dfe37ebb55993a773646df64fdf75c",
+    "services/control-plane/src/inv/shards.py": "8d76126ea45001742b7311f36e91b7c6f3f8f9f6178db5911b2dc56ef4112c6f",
+    "services/control-plane/src/inv/snapshots.py": "0f1a96a5bcd9a7b46015cd26fa7ada03dfc32705b9d6a614244c0a0eb4d1eb7d",
+    "services/control-plane/src/inv/state.py": "83bdb0385c11afee191efc018b847c26fd8c702922762181d7eee20a765e2009",
+    "services/control-plane/src/inv/storage.py": "a6683c05db28d05e357d210421781a4efb0924f6c8e8e804549d52dc4848488f",
+    "services/control-plane/src/inv/tooling.py": "c54639dec3660d6137851b4937e421c93678a1662020e0317a9949cf4dc71fc6",
+    "services/control-plane/src/inv/tracing.py": "5cd71494f3821a42535d93b201291f5805c6db62c9b24cc79935432afe9a5277",
+    "services/control-plane/src/inv/worker.py": "4e32fcfab538cc6208c4934f92071a727e42c256f1a66eec7042e402df6c18d6",
+    "services/control-plane/src/inv/workspace_api.py": "a390936c755bde5f1ed5edaa92ea27d447f6cac81756f4c22703a0a25d308462",
+    "services/control-plane/src/inv/workspace_config.py": "3e85e4917be87a14d5dd43603c444a512e9d8c45bfbcf6b16e6e7bfed5aedfe9",
+    "services/control-plane/src/inv/workspace_files.py": "bbc84661b234ff8ed58a2c0e65969b46d6426aa9f4f81a96a871cfba985d3e9d",
+    "services/control-plane/src/inv/workspace_recovery.py": "840c2407b59d8a0ade213ee8702b22ec5ca9f754919f5d6911ceca5497be791b",
+    "services/control-plane/src/inv/workspace_resume.py": "d4ebce963973fb6cf390c4152072168ca0b03ff288b87937d65b0272a86283a8",
+    "services/control-plane/src/inv/workspace_start.py": "1fb80594bc37e0f7865d5f3f65c51d7ca75bfdf4efe36f18a93b84a21e3a47bc",
+    "services/node-agent/cmd/inv-discover/main.go": "421ff1c2b55e5b02ea129718d57bbc27d92b3f4c780f717201481d06f0831665",
+    "services/node-agent/cmd/inv-node/main.go": "a370f8bec563998e43090ef7cc3fffc04397147c8ed25f45bba9175a40bb413a",
+    "services/node-agent/cmd/inv-supervisor/main_linux.go": "bbb2a02a8b2fb789851b89bb2019699432bdb673731b8763543b676e98d12e7c",
+    "services/node-agent/cmd/inv-supervisor/main_other.go": "d2e97c48326b9df151f935b5bf087edc054b50413469c2ae53491cc80ee4990e",
+    "services/node-agent/cmd/inv-supervisor/output_linux.go": "22dc00ceb15ac4b94e802db7239ff52cc395b77e28efd27d057da3de447a498a",
+    "services/node-agent/cmd/inv-supervisor/output_linux_test.go": "2d341e39926aa917b24ab7b1fc108b978dd9bd1563fbee60102850502c3d684f",
+    "services/node-agent/discovery/announce.go": "6ae172f5856ab99fbf5e8320e7b6e579437fee33a01f615e472a889e8cbfb8b0",
+    "services/node-agent/discovery/announce_test.go": "cbec2560043cf4668bd78856d4cdaa13e616044b0f2697de44197efedfe23cf0",
+    "services/node-agent/go.mod": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990",
+    "services/node-agent/go.sum": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
+    "services/node-agent/internal/wire/core.schema.json": "20fab4c3c451e92f4908f0541b296f761ffff06ac34dc21eed8798049fe07449",
+    "services/node-agent/internal/wire/validate.go": "60315baf3707526d5840fe6473b8498e803b6c95bc4e24998f38bf263071b9ab",
+    "services/node-agent/runtime/cleanup_test.go": "8d7ec2bd46942bda5b553ea9da6e8f63e46941c31ca9eedd90a9981394460f4a",
+    "services/node-agent/runtime/docker.go": "f9af5dfc113a5eecb72d3c66f9affb928897d0d3b5289ab6f504d525c25d3d1c",
+    "services/node-agent/runtime/docker_linux_test.go": "9911199b00e918ffe19a4a7ac5f6f53fa843533bdec957b99e113543fff727ed",
+    "services/node-agent/runtime/docker_test.go": "777d0081b09c59c2803dff6b89bc79661a194c42c7118efd36b79e45b6d57552",
+    "services/node-agent/runtime/journal.go": "100beaf1104072c9f50c5f3a41f2854ffcb5a198ce5e681a906e53ecee54a8ce",
+    "services/node-agent/runtime/lock_linux.go": "11dc4f3e4d6c123b8c62e4ea25f29b051b0284008f9089b07cbb54366debbc76",
+    "services/node-agent/runtime/lock_other.go": "6cb2c3a64503f9c9e0ce8aab2533b9d6fbdaa9c75d248383d95ce5e54a42d82c",
+    "services/node-agent/runtime/permit.go": "374ca3bca2f45dde47a24827d8f19ca35752db6849798d188b2670f5156f5207",
+    "services/node-agent/runtime/permit_test.go": "b30723ddef6844997d928e8cdcca9ad249e15f2f4331fead29babe1cc4a4902f",
+    "services/node-agent/runtime/runner.go": "450fdf1121db04a44dbc9e49a719d3a7fca6a087d68ef2dd26501b3ba3082010",
+    "services/node-agent/runtime/runner_linux_test.go": "07f7feb1bdc391d32e9f519ddf562d65fefd1eeda01fa8f8e8cdf53be889c7af",
+    "services/node-agent/telemetry/sample_linux.go": "0ac19ab585bf545915057726f5f042b589d633385cdf01c5592aa1588c8fea42",
+    "services/node-agent/telemetry/sample_linux_test.go": "e575105d88b78c8ea5620e3783a6c8fd573d1b9dba3eadbb121601d36f739970",
+    "services/node-agent/telemetry/sample_other.go": "f0123818fe2780660037423df195d3d808e9f7ad774df561a2db0f96c21b8994",
+    "services/node-agent/tests/probe/Dockerfile": "41dfd7097436b13bc4830b418fbf999b385e95a8f9bc82d1c229287c4c3e9683",
+    "services/node-agent/tests/probe/main.go": "6805e4a1f4c873e687860c10ccb6c4f85363fea7371c9973b823a8ec54c79ade",
+    "services/node-agent/transfer/chunks_linux.go": "78cfa1031357f3e66feb147783efc2d8e106debc1675eee5b8cd6457615d9eff",
+    "services/node-agent/transfer/chunks_other.go": "4174eae9b2b31f740480e92809e729d0688798020b8324098d1a73e0086e4c20",
+    "services/node-agent/transport/server.go": "3eb389042fb23b0a93c12910506d5c794527ce092bbbb21eb3a28df8abe2c587",
+    "services/node-agent/transport/server_test.go": "c2df78e0e3c2aa91f8ebbe171ca7301fb59dba2a2e2adcf14a90c83dc66a6682",
+    "services/node-agent/transport/trust.go": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+    "services/node-agent/workspace/files_linux.go": "70b44b5bd56d1e3c88783c64bc4c1fc4fee63992af66f3bcdfff9e1950395db5",
+    "services/node-agent/workspace/files_linux_test.go": "945dfca4500e936817a60230cf85aefd7c6282ff65cd16968f898131bbed8d70",
+    "services/node-agent/workspace/manifest.go": "da7eb319bf87037e9930a5d6425a210ed910523b4c9cd0aa188832b2d97574f6",
+    "services/node-agent/workspace/manifest_test.go": "90feaf9dd1c028fed559d765187887184b40c4958ae0c9c94f2d0a51ceee6343",
+    "src/saintvision/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/adapters/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/adapters/agents.py": "96baed966f8974cb86a58b38c3f2d5f2ade7a6cff7ed932dc8dcfab7ace386e1",
+    "src/saintvision/adapters/cli.py": "3cea77068a66ef8bd821440cabc00f1a553f098aeffe7e220e16ce76a495f7f9",
+    "src/saintvision/adapters/conformance.py": "261354c50c6c28b6213ce3c198c271c4e97b2038e09f8a507e5dcdf9a36ef413",
+    "src/saintvision/adapters/contract.py": "05fb00593eed94973eb9e3f41ff1e5f05f660aaa9fd8aef1cd70c4b78a5f99a6",
+    "src/saintvision/adapters/reference.py": "f4a3b75504c7d534c8f2132c2cce07ed9396c75ab9d5d5a6a7b91b6314994c92",
+    "src/saintvision/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/api/app.py": "427bbd2833aa4af2d97137f33e355c711c968fc9a05b548e89d0edf03868e1fb",
+    "src/saintvision/api/deps.py": "c92a5cae842f52bdab41f01cc6544faaa73aa2a422c8d4d0ab199f758dddf979",
+    "src/saintvision/api/schemas.py": "008dbb64c148c7dd705807232a88561bf53b5b663021f972d7786adf9f79ef06",
+    "src/saintvision/api/v1/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/api/v1/adapters.py": "a206fd2cf179fe18895172466471319916160833d351097d37d480e4cc60ee61",
+    "src/saintvision/api/v1/nodes.py": "7458b2e4393b2db49a0e706dd596b73d56b1777d5761e13ba153e9c082c2564f",
+    "src/saintvision/api/v1/pools.py": "2a7f745975398ee5f0b930b966fab71d111f02ef819e9ce42c4daf001e7ca212",
+    "src/saintvision/api/v1/projects.py": "2fbadb306443b2d1e6a52125436de2d46b16e4452231c7495b8871e6f45a800d",
+    "src/saintvision/api/v1/results.py": "7b83474ddb1faf19afda03db688ff005397f415d9ddb9ad60cb9987c192a44ce",
+    "src/saintvision/api/v1/settings.py": "b876f2cedaceedf14f10f7e53c5c8c4b77622f6b8de1c3ec8f1c33e0507b3420",
+    "src/saintvision/api/v1/storage.py": "74fc572058e72483059f09c66f3452463b3044a38419ef8665379817890d33ea",
+    "src/saintvision/config.py": "e082ba7c6e8dd4f049552fae89ccfa8d3d5038db66a35d8e512c7dd16afc86bd",
+    "src/saintvision/db/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/db/base.py": "cc5759005296bd1940764cd41ba536ac83e2df6d2e49f0cb90690ce06bc4f354",
+    "src/saintvision/db/models/__init__.py": "84c22dc4437de2ae9a5e740124dd6fcc796b1bf7793f97c717cf2f43bf7b77d3",
+    "src/saintvision/db/models/artifacts.py": "a64ce7c3bf68716252f4861a77786774441f136798a5d68741030995580d512c",
+    "src/saintvision/db/models/context.py": "deee8cb919fe549c56d4fc4c33f8d76a6d99429a63ce492c67483f6955919c76",
+    "src/saintvision/db/models/discovery.py": "29adb862e2fe98b1c0834ecb7a9a20b6b28513f108005711eca3f00441439b91",
+    "src/saintvision/db/models/evaluation.py": "eaa5e905dddcf92128a93bba180ca8ffdfcea154ee175d249df381ff36e09898",
+    "src/saintvision/db/models/evidence.py": "ec5a8fe56824572704ec135ad70c5ec192ad6fb644179e3b879de196ee8dec9b",
+    "src/saintvision/db/models/execution.py": "963499f7bcc51e2327d56fde47895c8d66e7051aa9ace8b03727a8e2ff0f0c8b",
+    "src/saintvision/db/models/identity.py": "698f1f02be02d407f8d02369782f5750daa3e40da1b45daa6a2777c16b28399d",
+    "src/saintvision/db/models/lineage.py": "76f788c9b58042f14a2b500bd583ed3c694d8a11989111d773cf772357674947",
+    "src/saintvision/db/models/locality.py": "28767380abc4239a6baf1ddefa8a4773932e193df27926018d99021322f8346d",
+    "src/saintvision/db/models/operations.py": "7d08b6ed3f1b48c36f24122371ce2198bc82a6f6ad822e4851164053d638eed1",
+    "src/saintvision/db/models/operations_pilot.py": "d8d5484b0b97a572354aa246ee0acd69a630025120583e043269c48e908ae619",
+    "src/saintvision/db/models/placement.py": "c20d11073734b80e144272e99fa796f3aabb84e7fd3349befb9cda4410bc4a40",
+    "src/saintvision/db/models/resource.py": "0cc3432de2d22af8ee5c8916163d645c175293d5734dcfdf801db8f6c7314466",
+    "src/saintvision/db/models/storage.py": "7e151f863c268277103de86e2480b236af0cf1d3f24f08cf521b3ed93ba931a8",
+    "src/saintvision/db/partitions.py": "ec8ec9066ccf4c5bc2db1c68115110c0f334b8536bd72a5ffe02c60a019324c9",
+    "src/saintvision/db/rls.py": "ced57d4b1cec9b7e584ed8f6499f75f2491c6eb6e88c514c61338ed93b36cf7e",
+    "src/saintvision/db/session.py": "1f81d7666a59433c0fe196e6ec58049f06536cc4a8891de44b95fe66986ea64d",
+    "src/saintvision/demo_server.py": "b32d96ae2577ddde3f94e278a7c016a54c456975916b9d2eb405e02696205dee",
+    "src/saintvision/errors.py": "12532701db4541895f7be951a90fef7fdbdfd0df0b0c62406e7fd76681643de7",
+    "src/saintvision/identity/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/identity/node_auth.py": "8636caa9d5e85074203beed40c00163d58b6943b3ffff73a0b3fe85ac1eaa177",
+    "src/saintvision/identity/oidc.py": "9f6cfc682e89589c47f24b578f532710c25fd914f21d9c8d00d99052dff5489e",
+    "src/saintvision/identity/principal.py": "81e40f98bb2051ae9d298089f9cc4fc155451e305b230c9502a3a22f640aa6fd",
+    "src/saintvision/identity/tokens.py": "86c2168c31612d97d79a82a5e80b334ebc2bd396e9fde81c33b88e560f175b7d",
+    "src/saintvision/ids.py": "1ce336b1e3be0090e506b876ffa568e56de24dad099c62d9402af20dbfd4b2ef",
+    "src/saintvision/observability/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/runs/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/runs/state.py": "0ea52f73695b9c6d2848c42738f5216c8de821a6db8cc91393c01677a72ebea2",
+    "src/saintvision/server.py": "b0ab25d476ff09ce4b819aee12fee18163b9f5acd801e48748bb444103fb312c",
+    "src/saintvision/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/services/audit.py": "3e8c95e872618273b2dfcb49a5075e1c642ecb481108cfe2fe4bd98a49727070",
+    "src/saintvision/services/context.py": "d301a2a0e6f2bd8baf8dd5967afe436ac194c9dfbc8a909c06eca52978f31bb4",
+    "src/saintvision/services/discovery.py": "c5f70957035d12024c7a731207eee14db5638cb5fad423a2dd6753ad82b68271",
+    "src/saintvision/services/eval_execution.py": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+    "src/saintvision/services/evaluation.py": "ec20a729e9c73cb226eaed173651b32126151f82a36838058d63072aef67af02",
+    "src/saintvision/services/evidence.py": "6e300be554f95f3a141a00ae872d8b5535901a48aaa3ea146e26227f525a0c34",
+    "src/saintvision/services/execution_readiness.py": "a584ae44ddf4ff3fc8e96ecb1fb694aeb87bd45b64e2c447a775189ec70586fc",
+    "src/saintvision/services/lineage.py": "d227b3daf46615f9b22dbf167964cdf2c248a51dd269016e66618b25703e28fb",
+    "src/saintvision/services/locality.py": "57fc6ab7662d2f17cb3844aa875d4bd1225795e2d107f1bb31e280b28c11d111",
+    "src/saintvision/services/nodes.py": "7f3ae3044221842e1808816d87bd975b60e4c9d109fd6f8270b1a7cf689c8704",
+    "src/saintvision/services/pagination.py": "cd40895d49965b30b1cbe3c30e1d805060cda1be502ef667097b4cbf4b1d992c",
+    "src/saintvision/services/pilot.py": "e99ba9055d6b9798486ba57571b0e21ea4b9ef29788bf894448a1bc99de9f418",
+    "src/saintvision/services/pools.py": "c6c206a5063f90456993c6639bbddfabc3adae369a835cf64fbfbeb0598bfc67",
+    "src/saintvision/services/projects.py": "d0e90a97b65639cfcd8bf95a8709422b9f241a1fa7fa50bd00ef1f260ab50573",
+    "src/saintvision/services/records.py": "03509c73b49db7588b8af09d56941e7c02472be7d49e4342e0b066e8fe967c09",
+    "src/saintvision/services/results.py": "2c6356b1bdb60c0e71a0a34a71e86a59dd3061189e0a63cc8cf068ecde266494",
+    "src/saintvision/services/runs.py": "6d88a3af3c2aa3b8b7c9b1993b3de8be584baa29446cfffea845d4cb7d41dace",
+    "src/saintvision/services/settings.py": "21ab834ac15d7829bb22ffce77cdc51ac27863bf0fdb83597873fd79443b8fe9",
+    "src/saintvision/services/storage.py": "e446e4ccbcf775a27b98981c5389d695f885765d36f8c610dece141958aa9bd8",
+    "src/saintvision/services/verification.py": "af9b898bb11fcb0c964b3b808314630bdba2423341e6e78cef3294bd7bfc2d50",
+    "src/saintvision/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/saintvision/storage/pathsafe.py": "8265a092594ecdb7ca25919d4ac05a3ccb226cfb4dc9177c39a30deeb855e932",
+    "src/saintvision/units.py": "cb3dd11eefe34e073838aa8b9e033030f47fbf446a7ff6f436806af356011d67",
+    "tests/conftest.py": "80f7711cf08112a8d99a3aefefa6a0e66d77d8317c8547e3e8048506f3cb4bd8",
+    "tests/core/test_approval_contracts.py": "060accc17f3ac11d89d55b84a3f3b9951678d750b39729ecfbc3827544714c63",
+    "tests/core/test_core.py": "c8eb9dedddf3550eea5daa9459a78d48785756b256cc82c92cfa0ddd0a3ef0b3",
+    "tests/core/test_dev_studio.py": "08526980750cba46ca34d847e76ebe81ddbc11f32deb46e9102df6d9ff71ff2c",
+    "tests/core/test_identity.py": "bad7ed67c83029cb9d2ca9de78557a8938eb37dd45909f9621afb9e6bc2dc7e3",
+    "tests/core/test_lan_console.py": "b5e1fbcc69eeb6e8fd5bb58a08350e029af34a850283368c9ccfaf49721465b2",
+    "tests/core/test_lan_execution.py": "62920aef1d1da31cbda70d9db9bdd0ab04e3e6a422c42def26c77c0c1536cd73",
+    "tests/core/test_lan_pki.py": "0309820289ba3966ab285990f32306dc88da499d8b17d6403f97547a2253319b",
+    "tests/core/test_lan_worker_config.py": "1f7e6fd1a9a83fc5182e73259d06d19491e32d1d01b3e8e7c8632a1d0b47760a",
+    "tests/core/test_lan_workspace_upgrade.py": "0ff1440ba6542534321fd932887e1caef71e7f89bdc0ed1872c596ab3d0e7edf",
+    "tests/core/test_node_output.py": "287d8ec0732a604130b12e120d2212d09826d12ba49101aac234d7b6bff740cd",
+    "tests/core/test_node_tls.py": "bdaae315e7fa624228ea3117b8aa1c7e08fc99ea3b8fa1659d0017f75edd13e1",
+    "tests/core/test_run_state_alignment.py": "3380e86deedb6536c201175af12b715a61cc78d76e02ed9735a34c3b151e97a1",
+    "tests/core/test_sandbox_contracts.py": "f032193c6d4f7f0e5a0e60032983aaab98b33c3ea5ba9443d177a6a5217a7851",
+    "tests/core/test_workspace_api_boundary.py": "407cc867511ed15e020f9173d28c4efbd016b47eb6191642bd758890473469c4",
+    "tests/core/test_workspace_manifest.py": "bf7e08913e7e19aff5121c47146af4db545843e1b2595cd11ae369580c6eee5c",
+    "tests/core/test_workspace_resume_contract.py": "94fb73cf0bd4564710a5d71f56176c797cfe15431cf9e89a40173a58851b29a0",
+    "tests/core/test_workspace_start_contract.py": "c5e866500e3f2000666fa17a33ce9dc0fdd529f627a97eaad8378b49beb015d0",
+    "tests/integration/conftest.py": "4c9e9a96d524efe573ae9e2172c68dd180e73e740f2b3fbd57eef747daff5d90",
+    "tests/integration/test_account_production.py": "cbb8bb57a4dea9c073d6cecac1c06a4b6ec0140eb88b11aaf6be964beba0105f",
+    "tests/integration/test_approvals.py": "84809c2a6f1476f0187e616618ab286d6c3edab5e1967b5483de235452c66291",
+    "tests/integration/test_business_handoff.py": "dfbc9cebaf56f20bc8334b3c87f786eeabb89b71637576103608373a27aacab3",
+    "tests/integration/test_containment.py": "7b441d8158cdad28e09df20c6c24c4cd69999ed8dc90a0f3baa21625bbed605e",
+    "tests/integration/test_control_api.py": "51bf75ca11e7f74097777249018a45cd1f337c711476258331575a069c33dd7c",
+    "tests/integration/test_developer_workloads.py": "73634d34f9f5641b993e501ca6db57d6501c12cdafc8acdc86083e40ff13a2a5",
+    "tests/integration/test_dispatch_node.py": "063141aa6a8af0e9f1e00fe466163905a2a12e5359369cb1bc35f859c9e8e12a",
+    "tests/integration/test_dispatch_queue.py": "82d35159a1d0aacbe0d547b92e1af0f64f5b7f1f23731ab01d52049612803fa9",
+    "tests/integration/test_lan_bootstrap.py": "0a7c3374aa8821e605abd114ed7f759f501ba1ce7092206078856400dc04dadd",
+    "tests/integration/test_node_control.py": "a14d9e1f68604d6c0f159354c4677f69d8f9494e60d85c7203a2ede8d8cc8f20",
+    "tests/integration/test_node_delivery.py": "de429e46239e092bf1d76cca02616a3b81400a7f100c0a7dbb33a4b92fd54437",
+    "tests/integration/test_node_extensions.py": "80a7d2e6ec26865039dbfb8e0197b309426f5e6f56fdff73c989b851b0c9419c",
+    "tests/integration/test_node_runtime.py": "51de35a255edb6a335ccfbb52c0da9535060ff065c957b0900c4e4e640da366a",
+    "tests/integration/test_output_ingestion.py": "9e824cc8da8b965c53ca59533fd0b08511da085f1bfe1fff6b698197b1dce67d",
+    "tests/integration/test_placement.py": "cac23327eca9df7b66f6360506d37092619533ce005365267b9029747df3399d",
+    "tests/integration/test_postgres.py": "1e64f18452df9074ec80006a9f5ccbe62fdbb81c9d58fa1dacf3b968eeeaec42",
+    "tests/integration/test_provisioning_integrity.py": "22bc00d5f78e299c4c621089a30c167e2efb49b65f9f29754d9a6b5b0b68d102",
+    "tests/integration/test_reservation_aborts.py": "ec07ce36ba065394ae96e425b5e2fac3ab1d3636ba7e6ea2e089892b0b24cc18",
+    "tests/integration/test_resource_offer_integrity.py": "6f716b2f1034ef3276ee8e6f155a0675641e2aa55b4f9b5f08a472f5b3f83068",
+    "tests/integration/test_result_observation.py": "d48dfeb94fe212b8123008fdc33eacdb009e488fbbbd630220f3143553b46ebb",
+    "tests/integration/test_results.py": "33643aee66dd94eda57865d774c4cdfce38cdd769b57c31a818871a43e7fab52",
+    "tests/integration/test_shard_parent.py": "7ed95bd7709f4c19f18554e75ca5695c3e1c8ea064f3d865027d0a59642d3726",
+    "tests/integration/test_shard_recovery.py": "06fa477b3a3795fb0b815366f845b5a55d2669d17be0b2b54283a72ecd060fb1",
+    "tests/integration/test_shards.py": "c4eb0668bca5ff108b363b30697b36f646ad3e631b7e39fd0726ec65ed8a61c8",
+    "tests/integration/test_snapshots.py": "06137a67afeb8c11ba24d61afea6fc1aad5873a7257e6efb564dcd0096d5dfff",
+    "tests/integration/test_tool_admission.py": "1c22e11dcd9a72831bac8df8593b83cc93683cdb386536b4d9803851e79a4c8c",
+    "tests/integration/test_workspace_api.py": "49090bd4b66a1fb70702420c41b921d402883beaf1daa458d3f5f72037632135",
+    "tests/integration/test_workspace_checkout.py": "46d641356a13a4a765cfd34b583dbbb71ae985c6e3d7a1a3e456f6fee9398f53",
+    "tests/integration/test_workspace_recovery.py": "1937444cecdbcd4d4c9d7562f3b3faa9b3b51cbecaec8eda33564072a171a09a",
+    "tests/integration/test_workspace_resume.py": "5b291b1681097e2e495a6c9658bd5ccb7e009d57845b9be0e765549f3078641b",
+    "tests/integration/test_workspace_start.py": "f13a0de99184a6fec5de1a3639606823fa90db41941c9d437dff6b7a9a5ad9c6",
+    "tests/integration/test_workspace_upgrade.py": "0c42da94e78a99a8f1ba0e35678f77005db834f79ad83c563fbe09f95fe4db99",
+    "tests/jwt_support.py": "ce22c66a0260a1e2f313a52fdfba9869f5e1f88ae1d343995e22f338b5af81a1",
+    "tests/pki_support.py": "62b459d99d5249d37ad88d96f277b88f602bebe20ef0aa26fb6a37955c5e4f36",
+    "tests/test_account_integration.py": "6b1da0f97d640a5bfe0ffd7664ae492fbf71c6ff230023908eca198ad805f0d4",
+    "tests/test_adapters.py": "ff42743cb0ae81d27fcf056e8740f9700b1a844209f2229cda191e4e10f1d544",
+    "tests/test_api.py": "f0cb3f779395336ddd3ded85c1cd742ec927ce5d68ce824a86cf086249d967fe",
+    "tests/test_business_results.py": "52337a569aff0956b16d7510b3780462d36574ded3abf24f6f3c48232aa11647",
+    "tests/test_cli_adapters.py": "28ed8d0621e1de216e38164fc31800edf02256f5a12e2629fa756a1d16941781",
+    "tests/test_context_eval.py": "2323df965ca62a12d04c82c0c475fae8e4fc3132eca3d6a11633a132a072d737",
+    "tests/test_contracts.py": "adc12112398139c33296e5c0a31bb158766b9761bef76c69ed31b5813c37013c",
+    "tests/test_database.py": "114ee02a5c7ea7cca22aeba3453640bb69028e9a1ee7460fc01dccdebfd59550",
+    "tests/test_eval_execution.py": "68bf5f000fad3cf8269130f2e2929c83fa19d3df72fc139585a279787c88af62",
+    "tests/test_execution.py": "c628b5bf1a3136005223b529b8efe14488d423f9022fa1b703552034e31885cd",
+    "tests/test_lineage.py": "41be73ea50e6612690cae6cbfd095d75a31cffe70188ed5d33def834903d39bc",
+    "tests/test_locality.py": "214d7332a2fe9d6d89af11663410a4fc414655fa93a90913788c5e94e4660cb4",
+    "tests/test_login.py": "fcb4b54f34f6ebe505677793d6c27e5f10eea7f5924b0263cfaa1315a7b919ee",
+    "tests/test_migrations.py": "53d7f15185486fac5653bb72260bba4e2331d09e045a9079f0a81363659d5a4f",
+    "tests/test_node_auth.py": "96ea566595871b693f6707e2f809e91373cd7427ca40c3b0db09bb651328e37c",
+    "tests/test_package_surface.py": "ec833b4261bb4b3342b8d2bd348b3b623b1fb558fc535e81770e55f45b32551f",
+    "tests/test_partitions_logic.py": "f52ceb07b67800c537b9da4ad0f58321bb87a15c15420f3460a48abbac76ddc1",
+    "tests/test_pathsafe.py": "8be543da0fa65d40e7164f4c92ba27356e078dd3dca2ef28b71198b6f7b5a5db",
+    "tests/test_pilot.py": "d9c88be6ef001a74a08733a8c7f2df26e20062c6f9f6f7c3a6247d36b261577f",
+    "tests/test_pools.py": "d47bbb27446d5c373025bd94715a48288e2a8e0ddf57013deaa6932f664dcad2",
+    "tests/test_projects.py": "41bdb2b9ea9dd935f18389a18a971da2936f3382348e402d095d2d3a74fe3248",
+    "tests/test_result_readiness.py": "a16019b0b031694a7f9b5c6fca40000dc2082ec4a4685cfb059254cd37767dae",
+    "tests/test_run_state.py": "77c89b27cffc5cc6737ad9c1016066e5fdb9a4e0f428bf6c19a6cf9b8319b4a5",
+    "tests/test_schema_seam.py": "4811217db3f486d81b1a58ee7d3332ce9f1e41f007a85d90a65c91bb3195052f",
+    "tests/test_settings.py": "56865053bdf8b8c2648fe2b96d0246bd1ca36b1dc9776448620b1c84a47c369b",
+    "tests/test_units.py": "3a303556191fd1424a468d73bbe8fa1f968f75e510d173e4fdd6442707e2f350",
+    "tests/test_verification.py": "ea9067e5ef8dae81a0f9db9cb28724cd19336b126e599d8947d96a6359ba8a23",
+    "tools/check_kernel_docker.py": "1746b76046ef0e3bd6e2c9cbe9bf199ab331a87aa7ced9b701c5503f74f8da07",
+    "tools/check_migration_upgrade.py": "f15f13bb761dbafba66cc6aae00572dd666f89ca194d6c1f1cf7bf18df3d6ee3",
+    "tools/kernel_test_entry.py": "2d9594b29c70e3d6b3a76b3875e575ff09c8dd7ea29275690b8d1478f148616c",
+    "tools/migration_graph.py": "18b53d301879b2825c5caa730b5ecf7e298f3dd48ff4c4e1038e2a7664cc9a09",
+    "tools/prepare_git_probe.py": "23e472e2d49ee1ee872708715f882e1a66d737e8abecafa427741424632d4e2e",
+    "tools/provision_account.py": "2dbe6442faa52d29c426dec296ec67004103e877ed04a2d34b916b2dea79acad",
+    "tools/studio_templates.py": "f85ee423d309b1194060d6264b421307f1df836c0589eb1cba29f0e34ec25ee6"
+  },
+  "binaryHashes": {
+    "inv-discover": "4d72bf1113f19010c25d5e63f5956ccec9203627dfae2ac73c90ca7ec0c4a1ab",
+    "inv-node": "f87c607c920818d91956a1cfa5db3c5ab5438510e0f0a30e5d3d0c5305776615",
+    "inv-supervisor": "f4429d1439d72a1c0e76117c448cddd34cac6781fa0cb3f24bfd79c6fc2e4db5",
+    "probe": "0515d29cfa0cba58c87f477f8e184b18843eada646df71ce865c77e57fd4da9b"
+  },
+  "nodeImage": "sha256:d06d9e65cfbed11ddb88ff7b59d48a4a89a9f41ddbd3d888f9a87e85993b83df",
+  "kernelImage": "sha256:aacb943cd9ed0f0c61f84c5b308be32c287dfe915fa6111887e4c7125d528942",
+  "postgresImage": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+  "scope": "local-kernel-tests-synthetic-identity-not-two-physical-pcs",
+  "exitCode": 0,
+  "passed": true,
+  "cases": [
+    {
+      "name": "test_nothing_that_is_missing_is_rendered_as_a_value",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unmeasured_artifact_reports_no_size_rather_than_zero",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_digest_without_a_verification_is_not_verified",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_run_with_no_binding_reports_none_not_an_empty_binding",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_non_member_cannot_read_a_result",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_non_member_cannot_list_artifacts_or_attempts",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_checklist_reports_every_precondition_at_once",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_each_unmet_precondition_names_who_can_lift_it",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_role_check_passes_for_an_owner_and_fails_for_a_viewer",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_operator_link_satisfies_the_kernel_checks",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_checklist_cannot_be_used_to_probe_another_project",
+      "suite": "tests.test_business_results",
+      "status": "passed"
+    },
+    {
+      "name": "test_readiness_uses_business_route_but_results_stay_on_kernel",
+      "suite": "tests.test_result_readiness",
+      "status": "passed"
+    },
+    {
+      "name": "test_readiness_never_probes_control_plane_cli",
+      "suite": "tests.test_result_readiness",
+      "status": "passed"
+    },
+    {
+      "name": "test_subject_and_execution_definers_reject_cross_tenant_and_revocation",
+      "suite": "tests.test_result_readiness",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_v1_routes_and_real_token_errors",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_nonmembers_cannot_list_members_or_permissions",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_project_roles_do_not_grant_global_administration[viewer]",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_project_roles_do_not_grant_global_administration[owner]",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_explicit_grant_is_scoped_and_revocation_is_immediate",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_suspended_token_and_archived_project_report_current_permissions",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_definer_functions_cannot_cross_tenant_scope",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_owner_removal_leaves_an_owner",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_offer_updates_have_one_current_interval",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_published_migration_heads_upgrade_without_rewriting",
+      "suite": "tests.test_account_integration",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_creator_owns_the_project_they_just_made",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_project_created_now_is_visible_now",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_created_project_cannot_execute_yet_and_says_so",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_linked_project_reports_that_it_can_run",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_application_cannot_read_the_link_table_directly",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_duplicate_code_is_refused",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_suspended_user_cannot_create_a_project",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unusable_project_code_is_refused[Team One]",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unusable_project_code_is_refused[a]",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unusable_project_code_is_refused[-leading]",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unusable_project_code_is_refused[trailing-]",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unusable_project_code_is_refused[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_non_member_is_refused_and_told_nothing",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_revoked_membership_stops_working_immediately",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenants_user_cannot_reach_this_project",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_workspace_starts_provisioning_not_ready",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_viewer_may_not_create_a_workspace",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_deleted_workspace_is_not_listed",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_listing_workspaces_requires_membership",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_tool_choice_is_recorded_on_the_workspace",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_tool_with_no_headless_mode_cannot_be_chosen",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unknown_tool_is_refused_when_it_is_written",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_viewer_may_not_choose_the_tool",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_database_refuses_a_tool_name_no_adapter_knows",
+      "suite": "tests.test_projects",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_kernel_reads_the_same_vocabulary",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_setting_a_role_changes_what_the_user_may_do",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_suspending_a_user_denies_them_immediately",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_archiving_a_project_stops_everything_in_it",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_retired_user_cannot_be_brought_back",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_only_an_owner_may_change_settings",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_project_cannot_lose_its_last_owner",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_second_owner_makes_the_first_removable",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_offer_is_superseded_not_edited",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_unit_is_converted_once_at_the_boundary",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_node_cannot_offer_more_than_it_has",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_unit_from_the_wrong_kind_is_refused",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_lowering_an_offer_says_what_it_does_not_do",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_pool_reports_what_was_just_offered",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_offers_are_listed_beside_what_the_machine_actually_has",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_workspace_reaches_deleted_only_through_deleting",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_offer_reaches_what_the_kernel_grants_leases_against",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_offer_below_what_is_already_leased_is_refused",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unobserved_node_is_reported_not_refused",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_applying_an_offer_is_bound_to_the_session_tenant",
+      "suite": "tests.test_settings",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_verified_subject_becomes_the_person_it_belongs_to",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unknown_subject_is_refused_not_created",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_refusal_does_not_confirm_the_token_was_good",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_suspended_account_cannot_sign_in_with_a_still_valid_token",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_suspension_takes_effect_on_the_next_request",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_subject_derivation_matches_the_execution_kernel",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_verifier_reads_membership_from_the_database_not_the_token",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_archived_projects_membership_is_not_carried",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_settings_no_longer_wait_for_a_decision_that_was_made",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_login_is_not_configured_by_halves",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_old_placeholder_points_at_the_real_verifier",
+      "suite": "tests.test_login",
+      "status": "passed"
+    },
+    {
+      "name": "test_enrolled_node_is_registered_and_readable",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_bootstrap_token_cannot_be_used_twice",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_bootstrap_token_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_tokens_tenant_is_binding",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_denials_are_recorded",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenants_node_is_not_listed",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenants_node_is_not_readable_by_id",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_project_scope_is_checked_separately_from_tenancy",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_credential_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_credential_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_heartbeat_advances_and_replays_are_ignored",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_heartbeat_observations_land_in_the_right_partition",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_liveness_sweep_marks_a_silent_node_lost",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_liveness_sweep_does_not_cross_tenants",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_heartbeat_for_a_node_you_are_not_is_refused",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_contribution_is_registered_with_a_normalised_path",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unsafe_contribution_path_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_contribution_registration_is_idempotent",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_key_with_a_different_body_is_a_conflict",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_another_tenant_cannot_see_the_contribution",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_fields_are_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_page_limit_is_capped",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_cursor_is_rejected",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_is_honoured_and_echoed",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_health_reports_unresolved_s01_settings",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_readiness_reports_partition_lead",
+      "suite": "tests.test_api",
+      "status": "passed"
+    },
+    {
+      "name": "test_announcing_creates_a_candidate_and_nothing_else",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_reannouncing_refreshes_one_row",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_reannouncing_does_not_revive_a_declined_candidate",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_same_instance_id_from_a_different_address_is_a_different_candidate",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_candidate_fields_are_marked_as_claims",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_stale_candidate_is_hidden_and_can_be_expired",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_admission_mints_a_token_but_does_not_create_a_node",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_admitting_twice_is_refused",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_database_refuses_an_admitted_state_without_a_node",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_discovery_is_tenant_isolated",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_capacity_reports_the_sum_and_the_single_node_ceiling",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_spare_reflects_current_utilisation",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_node_with_no_fresh_snapshot_counts_as_zero_spare",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_lost_node_does_not_contribute_capacity",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_ranking_puts_the_idlest_node_first",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_shard_larger_than_any_node_has_no_candidate",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_ranking_uses_spare_not_offered",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_gpu_shard_is_not_sent_to_the_node_with_the_most_free_ram",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_splitting_requires_the_workload_to_declare_it",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_declared_split_places_shards_idlest_first",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_one_node_can_hold_several_shards_when_it_has_room",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_partial_placement_is_refused",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_single_node_plan_cannot_have_several_shards",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_database_refuses_a_split_without_the_declaration",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_one_run_has_at_most_one_plan",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_pool_membership_is_idempotent",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_capability_cannot_be_stored_in_the_wrong_unit",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_node_may_not_observe_another_nodes_capability",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_database_refuses_a_foreign_capability_too",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_reported_unit_is_converted_before_it_is_stored",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_an_unconvertible_unit_is_refused_at_the_heartbeat",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_idlest_node_is_the_one_with_the_most_free_bytes",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_database_bounds_shard_count",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_pool_report_states_its_units",
+      "suite": "tests.test_pools",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_partition_is_never_created_before_its_parent[resource_snapshots]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_partition_is_never_created_before_its_parent[audit_events]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_partition_is_never_created_before_its_parent[evidence_envelopes]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_each_partitioned_table_gets_a_four_month_lead[resource_snapshots]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_each_partitioned_table_gets_a_four_month_lead[audit_events]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_each_partitioned_table_gets_a_four_month_lead[evidence_envelopes]",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_default_partition_is_ever_created",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_a_child_table_is_never_created_before_its_parent",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_rls_is_applied_after_the_table_it_protects",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_evidence_is_granted_insert_but_not_update_or_delete",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_migration_reads_the_mutable_partition_constant",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_every_revision_declares_its_predecessor",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_migrations_create_exactly_the_modelled_tables",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_every_tenant_scoped_table_is_policed",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_append_only_tables_are_never_granted_update_or_delete",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_lifecycle_tables_get_column_scoped_update_and_no_delete",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_identity_columns_are_never_grantable",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_migration_graph_has_a_single_integrated_head",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_every_irreversible_revision_says_what_to_do_instead",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_the_downgrade_target_never_crosses_an_irreversible_revision",
+      "suite": "tests.test_migrations",
+      "status": "passed"
+    },
+    {
+      "name": "test_id_is_prefix_and_ulid",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_id_column_width_matches_the_schema",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_entity_kind_is_refused",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod_]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nodx_01ARZ3NDEKTSV4RRFFQ69G5FAV]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[nod_short]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_malformed_ids_are_rejected[NOD_01ARZ3NDEKTSV4RRFFQ69G5FAV]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_ulids_sort_by_creation_time",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_ulid_body_uses_crockford_alphabet_only",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_trace_and_span_ids_are_hex_and_never_zero",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_tenant_id_is_a_uuid",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[VAL-SCHEMA-VAL]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[AUTH-BOOTSTRAP-TOKEN-CONSUMED-AUTH]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[RES-NODE-NOT-FOUND-RES]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[SEC-TENANT-SCOPE-UNSET-SEC]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_category_is_derived_from_the_code[GRAPH-IDEMPOTENCY-CONFLICT-GRAPH]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_unknown_code_family_is_refused",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_problem_carries_every_required_field",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_internal_message_is_withheld_when_not_public",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_retryability_follows_the_category_table",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_limit_defaults_and_clamps",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_limit_below_one_is_rejected",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_cursor_must_be_an_identifier",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_page_reports_a_cursor_only_when_more_rows_exist",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[None-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[garbage-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[00-00000000000000000000000000000000-aaaaaaaaaaaaaaaa-01-True]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_traceparent_parsing[00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01-False]",
+      "suite": "tests.test_contracts",
+      "status": "passed"
+    },
+    {
+      "name": "test_http_offer_sets_one_budget_across_every_slice_and_replay",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_real_leases_prevent_lowering_and_future_reservations_obey_the_budget",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_reservation_and_offer_reduction_cannot_both_spend_the_same_capacity",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[revoke]",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[suspend]",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_administration_is_required_in_http_and_definer[wrong-permission]",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_old_definer_and_direct_kernel_updates_are_unavailable",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_cross_tenant_definer_never_changes_resources",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_gpu_offer_is_intent_until_the_device_identity_can_be_mapped",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_late_business_history_failure_rolls_back_kernel_change",
+      "suite": "tests.integration.test_resource_offer_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_check_is_read_only_and_apply_is_audited_idempotently",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_only_the_explicit_grant_is_inserted[request-expected0]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_only_the_explicit_grant_is_inserted[approve-expected1]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_only_the_explicit_grant_is_inserted[request-and-approve-expected2]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_repeated_apply_cannot_reenable_disabled_authority[business_projects]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_repeated_apply_cannot_reenable_disabled_authority[business_subjects]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_repeated_apply_cannot_reenable_disabled_authority[project_grants]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[subject]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[project]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[user]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[member]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[epoch]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[inverse-mapping]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_invalid_current_preconditions_leave_no_partial_links[other-tenant]",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_existing_grant_scope_is_not_silently_expanded",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_late_database_failure_rolls_back_every_link_and_grant",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_identical_invocations_create_one_grant_and_audit",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_apply_rechecks_suspension_after_waiting_for_the_account_lock",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_cli_check_apply_and_replay_use_the_real_database",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_runtime_database_role_cannot_provision",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_cli_database_error_does_not_print_credentials",
+      "suite": "tests.integration.test_provisioning_integrity",
+      "status": "passed"
+    },
+    {
+      "name": "test_result_and_download_match_actual_node_output_and_current_grant",
+      "suite": "tests.integration.test_result_observation",
+      "status": "passed"
+    },
+    {
+      "name": "test_draft_and_cancelled_run_never_report_success_or_placeholder_output",
+      "suite": "tests.integration.test_result_observation",
+      "status": "passed"
+    },
+    {
+      "name": "test_failed_process_reports_actual_exit_without_success_evidence",
+      "suite": "tests.integration.test_result_observation",
+      "status": "passed"
+    },
+    {
+      "name": "test_queued_cancellation_exposes_tombstone_without_inventing_attempt",
+      "suite": "tests.integration.test_result_observation",
+      "status": "passed"
+    },
+    {
+      "name": "test_physical_stop_is_distinct_from_result_recovery_and_logs_are_redacted",
+      "suite": "tests.integration.test_result_observation",
+      "status": "passed"
+    },
+    {
+      "name": "test_account_project_and_kernel_use_same_identity_and_current_membership",
+      "suite": "tests.integration.test_account_production",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_factory_refuses_different_database_target_before_connecting",
+      "suite": "tests.integration.test_account_production",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_factory_rejects_database_owner",
+      "suite": "tests.integration.test_account_production",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_attempt_executes_frozen_program_with_real_evidence[python]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_attempt_executes_frozen_program_with_real_evidence[ai]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_queue_failure_rolls_back_approval_and_all_leases",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_cancel_before_enqueue_never_reserves_or_executes",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_admission_rechecks_authority_after_observation[grant]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_admission_rechecks_authority_after_observation[node-membership]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_admission_rechecks_authority_after_observation[capacity]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_admission_rechecks_authority_after_observation[kill]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_admission_rechecks_authority_after_observation[runtime]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_input_rejects_invalid_snapshot_without_state_change[scope]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_input_rejects_invalid_snapshot_without_state_change[digest]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_input_rejects_invalid_snapshot_without_state_change[path]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_input_rejects_invalid_snapshot_without_state_change[base64]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_input_rejects_invalid_snapshot_without_state_change[authority]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_prepare_failure_preserves_draft_and_snapshot_idempotency",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_reservations_require_atomic_path",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_approval_cannot_be_consumed_outside_atomic_queue",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_output_recovery_finishes_once_without_reexecution",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_program_failure_has_no_success_evidence",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_queued_cancel_waits_for_actual_node_tombstone",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_first_requested_node_is_explicit_and_never_substituted",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_first_run_uses_current_public_identity_and_real_kernel",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_first_rechecks_revoked_or_changed_intent[member]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_first_rechecks_revoked_or_changed_intent[workload]",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_project_cannot_fallback_to_unmapped_kernel_run",
+      "suite": "tests.integration.test_workspace_start",
+      "status": "passed"
+    },
+    {
+      "name": "test_binding_tracks_real_quorum_queue_receipt_evidence_and_safe_unlock",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_state_and_forged_approval_cannot_release_editing",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_tenant_other_project_and_other_lock_owner_are_denied",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_public_scope_is_required_even_with_matching_tenant",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_files_roll_back_freeze_approval_and_binding",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_registration_failure_rolls_back_real_approval_consumption_and_leases",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_authority_is_rechecked_after_node_observation[requester]",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_authority_is_rechecked_after_node_observation[approver]",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_authority_is_rechecked_after_node_observation[archived]",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_authority_is_rechecked_after_node_observation[mapping]",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_business_authority_is_rechecked_after_node_observation[workload]",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_direct_workspace_admission_cannot_bypass_binding",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_cancel_before_dispatch_unlocks_without_fabricating_a_receipt",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_database_roles_cannot_forge_authority_binding_or_unlock",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_worker_releases_completed_lock_after_requester_revocation",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_queued_cancellation_keeps_lock_until_node_stop_receipt",
+      "suite": "tests.integration.test_business_handoff",
+      "status": "passed"
+    },
+    {
+      "name": "test_http_operator_is_distinct_from_project_roles_and_client_claims",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_control_replay_has_one_version_and_immutable_audit",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_revoked_operator_cannot_replay_or_read",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_gate_serializes_kill_after_prior_admission_and_blocks_later_start",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_kill_barrier_rejects_late_success_and_rolls_back_state",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_kill_reclaims_unclaimed_reservation_and_clear_requires_settlement",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_expired_unclaimed_reservation_is_cleaned_by_delivery_worker",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_parallel_reconciliation_cleans_preexisting_cancelled_reservation_once",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_old_epoch_reservation_remains_reported_without_reconciliation_spin",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_drain_blocks_reservations_and_cleans_unclaimed_without_fabricated_receipt",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_control_and_audit_roll_back_together",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_operator_and_audit_db_privileges_and_tenant_isolation",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_drain_cannot_override_quarantine_or_old_epoch",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_queued_containment_gets_real_no_start_tombstone[kill]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_queued_containment_gets_real_no_start_tombstone[drain]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_control_between_start_reservation_and_preflight_cannot_orphan_command[kill]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_control_between_start_reservation_and_preflight_cannot_orphan_command[drain]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_running_kill_preempts_network_call_and_releases_only_after_real_stop",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_drain_preserves_inflight_execution_and_resume_needs_fresh_probe",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_restart_reconciler_keeps_kill_active_after_operator_is_revoked",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_partition_keeps_resources_until_restarted_node_returns_actual_receipt",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_http_two_person_approval_and_consumption_are_required",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_vote_nonce_content_actor_and_replay_are_bound",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_expiry_and_global_gate_invalidate_approved_control[voter]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_expiry_and_global_gate_invalidate_approved_control[requester]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_expiry_and_global_gate_invalidate_approved_control[expiry]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_expiry_and_global_gate_invalidate_approved_control[gate]",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    },
+    {
+      "name": "test_operator_identity_cannot_be_duplicated_or_requester_vote_reused",
+      "suite": "tests.integration.test_containment",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "sv-kernel-90b59063525e-de126c96d048-runner": true,
+    "sv-kernel-90b59063525e-de126c96d048-db": true,
+    "sv-kernel-90b59063525e-de126c96d048-net": true
+  },
+  "developerWorkloads": [],
+  "firstWorkloads": [
+    {
+      "scope": "first-workspace-synthetic-identity-local-node",
+      "case": "ai",
+      "run": {
+        "runId": "run_01M27GGJH5T76P50NS8NQBF730",
+        "tenantId": "07f3b400-a895-4b7c-ae2b-bcfa58361a92",
+        "projectId": "prj_01M27GGJ6RQXHR6MFF7QKYSPCY",
+        "state": "succeeded",
+        "version": 8,
+        "attempt": 1,
+        "resourceReleasePending": false
+      },
+      "startId": "d90da2e2-162b-438e-a51d-9b9c7c3ae5b0",
+      "commandId": "6db31fca-d322-46de-a28d-e53b0ca16805",
+      "receiptId": "537f024e-87e4-4e8e-a679-c3400d3733bc",
+      "evidenceId": "evd_7TAJ9VXYYBVQQX2SZ56NKY58W8",
+      "exitCode": 0,
+      "activeLeases": 0,
+      "containerAbsent": true,
+      "fileSHA256": {
+        "data/synthetic.csv": "2f99ad445bdae67b7dc87ce9f6ef6af47519d2dcef891b6145ac8ad409f8aa93",
+        "outputs/loss.csv": "08170dc0328b869f8ea85601a9974160766b6b5470366adce5836921cb2a2a86",
+        "outputs/metrics.json": "1ae3e4586969791acc51a1a1ab12544ed6902cc490bd4e26384492c5e31a75cf",
+        "outputs/model.json": "452726ece7f1d699df3d2943ce84de5ac05cf5cd96429a5bfc7a7d70d796d104",
+        "src/train.py": "0819656b55ae8a8a25d6279e1ee37bd2686ed65ca181a0c132291a7f4fa7290d",
+        "tests/test_train.py": "c5cb725995104c49c56c5b05675620f71029f948ad3c7a5efc129e6582c073cc"
+      },
+      "metrics": {
+        "dataset": "synthetic-linear-v1",
+        "trainingRows": 51,
+        "evaluationRows": 50,
+        "epochs": 400,
+        "initialLoss": 6.147429546666666,
+        "finalLoss": 1.7218560389123928e-12,
+        "evaluationMSE": 1.6549685545817483e-12,
+        "device": "cpu"
+      }
+    },
+    {
+      "scope": "first-workspace-synthetic-identity-local-node",
+      "case": "python",
+      "run": {
+        "runId": "run_01M27GGFQE13AAXFHQ7BE5E6WC",
+        "tenantId": "18c1596f-8c0c-4697-976b-9f09c89b58b5",
+        "projectId": "prj_01M27GGFAGZJQJ6W82MBQAEQB9",
+        "state": "succeeded",
+        "version": 8,
+        "attempt": 1,
+        "resourceReleasePending": false
+      },
+      "startId": "43beed32-00f4-4cac-a333-7e5f3533f4fc",
+      "commandId": "a9935beb-e446-4500-ae7a-8563a595ec40",
+      "receiptId": "924c7168-3551-4599-a993-aa9ee28d44dd",
+      "evidenceId": "evd_7XTN3EF63C5JEXN62H7BPFA629",
+      "exitCode": 0,
+      "activeLeases": 0,
+      "containerAbsent": true,
+      "fileSHA256": {
+        "src/app.py": "a1719a9406a1a8721d9dfe41761880ac2f27b82d2a5180cd9924065ae833bec3",
+        "tests/test_app.py": "bd09576c4ed67095e4cc76627fa1270f41ca569ee87db8bcca647fd353bd1aa8"
+      }
+    },
+    {
+      "scope": "first-workspace-synthetic-identity-local-node",
+      "case": "output-recovery",
+      "run": {
+        "runId": "run_01M27GH44TSTBQ5G75WHFME3VN",
+        "tenantId": "513b31c9-7565-41d3-b293-d996824f4052",
+        "projectId": "prj_01M27GH3NHWM9PG48VGSAJSW8D",
+        "state": "succeeded",
+        "version": 8,
+        "attempt": 1,
+        "resourceReleasePending": false
+      },
+      "startId": "8bfed38e-aa90-40cc-91ca-c3080c1509cc",
+      "commandId": "af6b2384-bb86-493a-a6c3-64b2eba01ae3",
+      "receiptId": "5d862a87-fad0-4a30-b8f0-ba073050610b",
+      "evidenceId": "evd_5PQNMCZCMSH353HZK7M6FJEBKQ",
+      "exitCode": 0,
+      "activeLeases": 0,
+      "containerAbsent": true,
+      "fileSHA256": {
+        "data/synthetic.csv": "2f99ad445bdae67b7dc87ce9f6ef6af47519d2dcef891b6145ac8ad409f8aa93",
+        "outputs/loss.csv": "08170dc0328b869f8ea85601a9974160766b6b5470366adce5836921cb2a2a86",
+        "outputs/metrics.json": "1ae3e4586969791acc51a1a1ab12544ed6902cc490bd4e26384492c5e31a75cf",
+        "outputs/model.json": "452726ece7f1d699df3d2943ce84de5ac05cf5cd96429a5bfc7a7d70d796d104",
+        "src/train.py": "0819656b55ae8a8a25d6279e1ee37bd2686ed65ca181a0c132291a7f4fa7290d",
+        "tests/test_train.py": "c5cb725995104c49c56c5b05675620f71029f948ad3c7a5efc129e6582c073cc"
+      },
+      "metrics": {
+        "dataset": "synthetic-linear-v1",
+        "trainingRows": 51,
+        "evaluationRows": 50,
+        "epochs": 400,
+        "initialLoss": 6.147429546666666,
+        "finalLoss": 1.7218560389123928e-12,
+        "evaluationMSE": 1.6549685545817483e-12,
+        "device": "cpu"
+      }
+    },
+    {
+      "scope": "first-workspace-synthetic-identity-local-node",
+      "case": "failure",
+      "run": {
+        "runId": "run_01M27GH6ERY0140CJ378BE1AY1",
+        "tenantId": "45117223-483c-4a98-8a52-be77153e1694",
+        "projectId": "prj_01M27GH62XFQ2PG586QEBAS3SK",
+        "state": "failed",
+        "version": 7,
+        "attempt": 1,
+        "resourceReleasePending": false
+      },
+      "startId": "82fdcb0f-821c-4ced-b524-d23efa963052",
+      "commandId": "d309cb7a-3035-4058-b096-c10400e29bbc",
+      "receiptId": "8d0fef99-f13a-4c2e-9049-d7f3d2a98146",
+      "evidenceId": null,
+      "exitCode": 7,
+      "activeLeases": 0,
+      "containerAbsent": true
+    }
+  ],
+  "privateLogSHA256": "5b9bb24bcd6055a20e1bc5d4da52fb6de0cdaaaac76020bb5538583dc8178cab"
+}

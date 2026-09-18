@@ -1,0 +1,51 @@
+{
+  "codeSHA": "9755c6089e72a4d04e79e3a3218395c12c20241b",
+  "kst": "2026-09-12T02:08:57+09:00",
+  "core": {
+    "cases": 55,
+    "exitCode": 0,
+    "scope": "Windows readiness CLI and recovery verdict/capability",
+    "junitSHA256": "803766da1b96b70368227270d8ae168560b30b26dce6949da757973635b8ae5c"
+  },
+  "originalAcceptance": [
+    {
+      "sourceSHA": "ade5bb82a36b6e83101912c05852c2a293f6b752",
+      "scope": "original pilot_readiness function against disposable PostgreSQL",
+      "case": "expired",
+      "evidenceComplete": true,
+      "blockers": [],
+      "missedTargetCount": 0
+    },
+    {
+      "sourceSHA": "ade5bb82a36b6e83101912c05852c2a293f6b752",
+      "scope": "original pilot_readiness function against disposable PostgreSQL",
+      "case": "metadata-only",
+      "evidenceComplete": true,
+      "blockers": [],
+      "missedTargetCount": 0
+    },
+    {
+      "sourceSHA": "ade5bb82a36b6e83101912c05852c2a293f6b752",
+      "scope": "original pilot_readiness function against disposable PostgreSQL",
+      "case": "missed-target",
+      "evidenceComplete": true,
+      "blockers": [],
+      "missedTargetCount": 1
+    },
+    {
+      "sourceSHA": "ade5bb82a36b6e83101912c05852c2a293f6b752",
+      "scope": "original pilot_readiness function against disposable PostgreSQL",
+      "case": "wrong-criterion",
+      "evidenceComplete": true,
+      "blockers": [],
+      "missedTargetCount": 0
+    }
+  ],
+  "reproductionHarness": {
+    "work": "C:\\Project\\SaintVision-Invion\\.worktrees\\codex-workspace-bridge\\.work\\cx01-d2d46f14e414",
+    "exitCode": 0,
+    "image": "sha256:be2dedd215733ac25f6d3d2413f5f579f35c82bd659e09ef47fc0f2a4bada0eb",
+    "head": "9755c6089e72a4d04e79e3a3218395c12c20241b",
+    "dirty": false
+  }
+}

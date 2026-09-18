@@ -1,0 +1,18 @@
+{
+  "capturedKst": "2026-09-12T01:28:09+09:00",
+  "sourceSHA": "76ba5ba4b5f677640ec1750681aa9b8367ba203a",
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "externalSHA256": "e3d1533a4e7bbaa293fd99cca9d64b6bae0e73934306216e4ac0723e64d28f42",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-provision/progress.txt"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "externalSHA256": "b0740049c0c5cd88f2d48801121ded20b4602e239fcf0e67e3e33c32cce7cea5",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-provision/gemini.txt"
+    }
+  ],
+  "decision": "Preserve complete external proposals; retain canonical newer evidence and reviewer findings. Incorporate author claims separately, not as independent acceptance.",
+  "adoption": "Use exporter adopt-identical only on preserved two-file staging; no destination bytes changed during adoption; then normal check/apply/check of reviewed Git merge."
+}

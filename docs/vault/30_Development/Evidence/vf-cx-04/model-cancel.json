@@ -1,0 +1,41 @@
+{
+  "activeLeases": 0,
+  "case": "cancel",
+  "executionAttempts": 0,
+  "modelInput": {
+    "adapter": "python-files",
+    "adapterVersion": "1",
+    "inputId": "2f40d50b-1406-4221-b6c4-26889dd6f24f",
+    "inputSha256": "1573cf0a875be1fb5dd130915888e08c79c3531babb077d7ba3f9fd6996a98e0",
+    "inputSizeBytes": 899,
+    "manifestHash": "be5f2b95b514dbac5f15cd44427c372953c192ef4aa9fb7a1e262271dab4c742",
+    "mode": "single-node",
+    "modelId": "mdl_01M2HK0ZK4P7GETA6TXRMKCR98",
+    "nodeId": "nod_01M2HK0Z7WM4JKYGRYKKJMXG0R",
+    "runId": "run_01M2HK0ZJ7KVS2ZC9EPNQQD0XE",
+    "version": "1.0.0"
+  },
+  "receipts": [
+    {
+      "authenticatedPeerSHA256": "b9458ed5dcd203ad8a50b74feaf75699f215bf1e1ec22fbdd8f91e69ceed3f41",
+      "commandId": "6a142804-fcca-44be-b2f4-8727237350d7",
+      "exitCode": -1,
+      "nodeId": "nod_01M2HK0Z7WM4JKYGRYKKJMXG0R",
+      "outputHash": null,
+      "processStarted": false,
+      "reason": "not_started",
+      "receiptHash": "3acb15fef94886a7aca708f1e16d96856e541e99956ac0277272f0ff7558f616",
+      "recoveryEpoch": "e9ae9651-570e-466f-abcd-d764a4ca7897"
+    }
+  ],
+  "resultCompletions": 0,
+  "run": {
+    "attempt": 0,
+    "projectId": "prj_01M2HK0Z7W1FPNG1DW4XZ3K31N",
+    "runId": "run_01M2HK0ZJ7KVS2ZC9EPNQQD0XE",
+    "state": "cancelled",
+    "tenantId": "c90246f4-8ec6-4bfd-be82-5a1d83b40443",
+    "version": 6
+  },
+  "scope": "isolated-Go-mTLS-Docker; not physical-PC acceptance"
+}

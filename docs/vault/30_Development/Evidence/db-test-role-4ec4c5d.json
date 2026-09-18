@@ -1,0 +1,11 @@
+{
+  "codeSHA": "4ec4c5df5382a4a43bab99d0feb5290503665721",
+  "dirty": false,
+  "scope": "separate disposable PostgreSQL container; localhost-only ephemeral port",
+  "exitCode": 0,
+  "groupStateUnchanged": true,
+  "temporaryRoleInventoryUnchanged": true,
+  "groupRemainedNoLogin": true,
+  "completedAt": "2026-09-12T11:09:56.203955+00:00",
+  "disposableContainerRemoved": true
+}

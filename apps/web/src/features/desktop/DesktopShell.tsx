@@ -1,3 +1,4 @@
+import { restoreDesktopLayout } from './desktopLayout';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   AppId,
@@ -6,16 +7,13 @@ import {
 } from '@/contracts/virtualFabric';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem } from '@/contracts/types';
 import { DesktopWindowComponent } from './DesktopWindow';
-import { ResourceExplorer } from './ResourceExplorer';
+import { NodeList } from '@/features/nodes/NodeList';
 import { InvFileExplorer } from './InvFileExplorer';
 import { ModelStudioView } from './ModelStudioView';
-import { TerminalSessionView } from './TerminalSessionView';
-import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
-import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
-import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 
 export interface DesktopShellProps {
+  projectId: string;
   nodes: NodeItem[];
   runs: RunItem[];
   approvals: ApprovalItem[];
@@ -141,15 +139,11 @@ const DESKTOP_SHORTCUTS = [
 ];
 
 export const DesktopShell: React.FC<DesktopShellProps> = ({
+  projectId,
+  currentReviewerId,
   nodes,
   runs,
   approvals,
-  workspaces,
-  currentReviewerId,
-  onRefreshNodes,
-  onApprove,
-  onReject,
-  onChangeUser,
   onSwitchToPortalView,
   currentTheme,
   onToggleTheme,
@@ -157,10 +151,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   const [windows, setWindows] = useState<IDesktopWindow[]>(() => {
     try {
       const saved = localStorage.getItem('saintvision_desktop_windows');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
+      return restoreDesktopLayout(saved, DEFAULT_WINDOWS,
+        typeof window === 'undefined' ? 1280 : window.innerWidth,
+        typeof window === 'undefined' ? 800 : window.innerHeight);
     } catch {
       // Fallback
     }
@@ -170,16 +163,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   const [activeWindowId, setActiveWindowId] = useState<string | null>('win_my_computer');
   const [currentTime, setCurrentTime] = useState<string>('');
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
-  const [notifications] = useState<DesktopNotification[]>([
-    {
-      id: 'notif_01',
-      title: '가상 패브릭 준비 완료',
-      message: '5대 노드 (Win 3대, Linux 2대) 텔레메트리 연동이 정상입니다.',
-      level: 'success',
-      timestamp: new Date().toISOString(),
-      read: false,
-    },
-  ]);
+  const [notifications] = useState<DesktopNotification[]>([]);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   // Clock timer
@@ -670,12 +654,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               onToggleMaximize={() => toggleMaximizeWindow(win.id)}
             >
               {win.appId === 'my-computer' && (
-                <ResourceExplorer
-                  nodes={nodes}
-                  onOpenTerminal={() => {
-                    openApp('terminal');
-                  }}
-                />
+                <NodeList nodes={nodes} isLoading={false} error={null} />
               )}
 
               {win.appId === 'file-explorer' && (
@@ -683,34 +662,12 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               )}
 
               {win.appId === 'model-studio' && (
-                <ModelStudioView nodes={nodes} />
+                <ModelStudioView projectId={projectId} />
               )}
 
-              {win.appId === 'terminal' && (
-                <TerminalSessionView
-                  nodes={nodes}
-                  defaultWorkspaceId={workspaces[0]?.id || 'wsp_01JABCDE001'}
-                />
-              )}
-
-              {win.appId === 'developer-studio' && (
-                <DeveloperStudio
-                  nodes={nodes}
-                  runs={runs}
-                  approvals={approvals}
-                  onApprove={onApprove}
-                  onReject={onReject}
-                />
-              )}
-
-              {win.appId === 'approvals' && (
-                <ApprovalCenter
-                  approvals={approvals}
-                  currentUserId={currentReviewerId}
-                  onChangeUser={onChangeUser}
-                  onApprove={onApprove}
-                  onReject={onReject}
-                />
+              {['terminal', 'developer-studio', 'approvals', 'settings'].includes(win.appId) && (
+                <section style={{padding: 24}}><p>이 기능은 포털에서 프로젝트와 세션을 선택한 뒤 이용하세요.</p>
+                  <button onClick={onSwitchToPortalView}>포털로 이동</button></section>
               )}
 
               {win.appId === 'cluster-overview' && (
@@ -726,12 +683,6 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 />
               )}
 
-              {win.appId === 'settings' && (
-                <AdminSecurityConsole
-                  nodes={nodes}
-                  onRefreshNodes={onRefreshNodes}
-                />
-              )}
             </DesktopWindowComponent>
           );
         })}

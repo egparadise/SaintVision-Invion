@@ -79,6 +79,7 @@ export interface WorkloadSpec {
   workspaceStart?: WorkspaceStartRef;
   targetNodeId?: NodeId;
   terminal?: TerminalSpec;
+  modelInput?: ModelExecutionRef;
 }
 
 export interface ResourceLease {
@@ -1006,4 +1007,87 @@ export interface ShardObservation {
   resultManifest: (Array<ShardResultMember> | null);
   resultManifestSha256: (string | null);
   shards: Array<ShardObservedMember>;
+}
+
+export interface ApprovalReviewView {
+  approval: ApprovalView;
+  workload: WorkloadSpec;
+  riskLevel: "L0" | "L1" | "L2";
+  policyDigest: ActionDigest;
+}
+
+export interface SessionView {
+  subjectId: string;
+  tenantId: string;
+  expiresAt: number;
+}
+
+export type ModelId = string;
+
+export interface ModelShard {
+  index: number;
+  offset: number;
+  byteLength: number;
+  sha256: string;
+}
+
+export interface ModelReplica {
+  shardIndex: number;
+  locationId: string;
+  locationVersion: number;
+  nodeId: NodeId;
+  state: "unverified" | "verified" | "unavailable";
+}
+
+export interface ModelRuntimeCompatibility {
+  adapter: string;
+  version: string;
+  modes: Array<"single-node" | "request-routing" | "data-parallel" | "tensor-parallel" | "pipeline-parallel" | "offload">;
+}
+
+export interface ModelManifest {
+  modelId: ModelId;
+  version: string;
+  format: string;
+  totalBytes: number;
+  contentHash: string;
+  shards: Array<ModelShard>;
+  replicas: Array<ModelReplica>;
+  runtimeCompatibility: Array<ModelRuntimeCompatibility>;
+  licensePolicy: string;
+  classification: "public" | "internal" | "restricted";
+  encryption: "none" | "aes256-gcm";
+  keyRef: (string | null);
+}
+
+export interface ModelExecutionRef {
+  inputId: string;
+  runId: RunId;
+  modelId: ModelId;
+  version: string;
+  manifestHash: ActionDigest;
+  inputSha256: ActionDigest;
+  inputSizeBytes: number;
+  nodeId: NodeId;
+  adapter: "python-files";
+  adapterVersion: "1";
+  mode: "single-node";
+}
+
+export interface ModelCommitObservation {
+  projectId: ProjectId;
+  modelId: ModelId;
+  version: string;
+  manifestHash: string;
+  sourceRunId: RunId;
+  committedAt: string;
+  commitRecoveryEpoch: string;
+  format: string;
+  totalBytes: number;
+  shardCount: number;
+  licensePolicy: string;
+  classification: "public" | "internal" | "restricted";
+  committed: true;
+  currentAvailability: "unknown";
+  requiresExecutionRevalidation: true;
 }

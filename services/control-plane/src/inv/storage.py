@@ -39,6 +39,13 @@ def parse_uri(value: str) -> InvURI:
         raise DomainError("SEC-0011", "Unsafe INV path", 403)
     root, *tail = parts
     name, separator, version = root.partition("@")
+    # VF manifests have a distinct immutable ID namespace. Legacy name@semver
+    # URIs retain their existing interpretation; no old subpath is reinterpreted.
+    if parsed.netloc == "models" and re.fullmatch(r"mdl_[0-9A-HJKMNP-TV-Z]{26}", root):
+        if (not tail or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", tail[0])
+                or tail[0] in {"latest", "current", "head"}):
+            raise DomainError("VAL-0010", "An immutable model version is required", 422)
+        return InvURI(parsed.netloc, root, tail[0], "/".join(tail[1:]))
     if parsed.netloc in {"datasets", "models"}:
         if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", name):
             raise DomainError("VAL-0010", "Invalid asset name", 422)

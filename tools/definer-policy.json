@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "revision": "0043_replica_retention",
+  "referenceSource": "c5f215475b203b1e6731927117093921cda9c183",
+  "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
+  "functions": {
+    "public.apply_capability_offer(uuid, character, character, bigint)": {
+      "definitionSHA256": "0c83b0c40f34b726f8c025ec4fe9a02dbe1e38c5de60ec965b3e7f31912fb6b2",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    },
+    "public.apply_resource_offer(uuid, character, text, bigint)": {
+      "definitionSHA256": "3e012fd4694de77e75b89c5f636f00fdc1c0f5283c454bde21295e0a752afcbb",
+      "executeRoles": [],
+      "kind": "retired"
+    },
+    "public.business_admin_allowed(uuid, text, text)": {
+      "definitionSHA256": "1c353d562d327b53f7d6d1424dc911363b8af6c579345b498b44398c1e4c48d4",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    },
+    "public.business_execution_permission(uuid, text, character)": {
+      "definitionSHA256": "fe4b35f87d28c3c55a84588be1696cb54ffe3b208c573f4be266380320c9b4ec",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    },
+    "public.node_by_certificate(character)": {
+      "definitionSHA256": "f8461c2a0de65bab932df2914bfb005a15ee87c6b739c3c1046f59fa97187dc1",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "pre-auth-certificate"
+    },
+    "public.project_kernel_link(uuid, text)": {
+      "definitionSHA256": "5b00c9ee41b5acf0f19382b2cb33a3c07973a70f029e9546a59ba5df51ba2fa8",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    },
+    "public.run_committed_outputs(uuid, text)": {
+      "definitionSHA256": "09203039a0dbfb5b006dff138bc6e6a5f048abeafdb0b22d13f1eba8a0f3d302",
+      "executeRoles": [],
+      "kind": "retired"
+    },
+    "public.subject_kernel_link(uuid, character)": {
+      "definitionSHA256": "fcaa51cd4eaa3a069b750440f3ae10c84d9cdba3b64b37f379ddafcd9d162777",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    },
+    "public.workspace_input_state(uuid, text)": {
+      "definitionSHA256": "b3a89702a0e9eaa82674f038189484bf62a68984cdfccda3f60f4343d8bb863d",
+      "executeRoles": [
+        "inv_app"
+      ],
+      "kind": "tenant-bound"
+    }
+  }
+}

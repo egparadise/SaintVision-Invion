@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-12T06:39:26.429216+00:00",
+  "codeSHA": "9848afb4f17c6f2b589f4a9c894f3532185f7213",
+  "dirty": false,
+  "runtimeCodeSHA": "f9d69a8ed3fde2bc99096b5f551c3e6a5bc386b4",
+  "agentImage": "sha256:dfa9450b4386f9d8dbc60b599d2f3d64d934da95ef166db3dc2f37ceda671a90",
+  "scope": "isolated-real-docker-new-container-installation-synthetic-pki-not-wsl-or-remote-pc",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_real_bundle_mounts_readonly_copies_policy_and_matches_go_receipt",
+      "passed": true
+    },
+    {
+      "name": "test_real_bad_policy_hash_creates_no_node_or_volume",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "deploy/lan/worker_storage.py": "19de8b70f0251e886b386eb4664f2676305efc9b1cb15efc3074412ea9b151f5",
+    "deploy/lan/start-node.sh": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+    "deploy/lan/finish-worker.sh": "586871835bf1cc285c7cec096eefc1750e64b43007e245b320a47cc5bd01dc64",
+    "deploy/lan/Start-Worker.ps1": "733277ee7afc4a092fe7de93ae3968e30ab5bf838f4ba3ab8b01ecd2ddf23bf2",
+    "deploy/lan/worker_config.py": "74977149a13441a2d251e99d1133995a2d48754a04c354b0d97ecd9150f5b1d3",
+    "tools/lan_pilot.py": "b69b4effddbf1e8a9fc73a2da2688fcf87b506e1fac276819cd5d7526f1340e1",
+    "tools/check_storage_bundle.py": "026ede2db3679ab3792ba72f71137493aae0bbad085a07a89d522de6b2dfd957",
+    "tests/integration/test_lan_storage_install.py": "7480177771909f61c68d7ca169758ef24c051850044b3b34929084be54ab43a2"
+  }
+}

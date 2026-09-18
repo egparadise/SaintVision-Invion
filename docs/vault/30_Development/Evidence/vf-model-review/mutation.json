@@ -1,0 +1,6 @@
+{
+  "mutation": "process-local cached Schema: remove shard count and both index maxima",
+  "expectedExit": 1,
+  "actualExit": 1,
+  "sourceFilesModified": false
+}

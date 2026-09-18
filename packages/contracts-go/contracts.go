@@ -77,6 +77,11 @@ type WorkloadSpec struct {
     ImageDigest string `json:"imageDigest"`
     Command []string `json:"command"`
     TimeoutSeconds int64 `json:"timeoutSeconds"`
+    WorkspaceResume *WorkspaceResumeRef `json:"workspaceResume,omitempty"`
+    WorkspaceStart *WorkspaceStartRef `json:"workspaceStart,omitempty"`
+    TargetNodeId *NodeId `json:"targetNodeId,omitempty"`
+    Terminal *TerminalSpec `json:"terminal,omitempty"`
+    ModelInput *ModelExecutionRef `json:"modelInput,omitempty"`
 }
 
 type ResourceLease struct {
@@ -260,6 +265,8 @@ type SandboxLaunchSpec struct {
     NoNewPrivileges bool `json:"noNewPrivileges"`
     Privileged bool `json:"privileged"`
     HostAccess bool `json:"hostAccess"`
+    WorkspaceInput *WorkspaceInput `json:"workspaceInput,omitempty"`
+    Terminal *TerminalSpec `json:"terminal,omitempty"`
 }
 
 type ExecutionClaim struct {
@@ -312,6 +319,7 @@ type NodeStopReceipt struct {
     Reason string `json:"reason"`
     FinishedAt Timestamp `json:"finishedAt"`
     Allocations []NodeAllocation `json:"allocations"`
+    Output *NodeOutput `json:"output,omitempty"`
 }
 
 type NodeExecutionResult struct {
@@ -360,4 +368,728 @@ type ProblemDetails struct {
     TraceId TraceId `json:"traceId"`
     CauseRef *string `json:"causeRef"`
     EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type NodeResourceSnapshot struct {
+    Nonce string `json:"nonce"`
+    TenantId TenantId `json:"tenantId"`
+    NodeId NodeId `json:"nodeId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    ProfileVersion string `json:"profileVersion"`
+    ObservedAt Timestamp `json:"observedAt"`
+    SampleMillis int64 `json:"sampleMillis"`
+    CpuCapacityMillis int64 `json:"cpuCapacityMillis"`
+    CpuBusyMillis int64 `json:"cpuBusyMillis"`
+    MemoryCapacityBytes int64 `json:"memoryCapacityBytes"`
+    MemoryAvailableBytes int64 `json:"memoryAvailableBytes"`
+    OsType string `json:"osType"`
+    AgentVersion string `json:"agentVersion"`
+}
+
+type NodeChunkInput struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+}
+
+type NodeChunkResult struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Offset int64 `json:"offset"`
+    Nonce string `json:"nonce"`
+    DataBase64 string `json:"dataBase64"`
+    ChunkSha256 string `json:"chunkSha256"`
+}
+
+type NodeOutput struct {
+    Data string `json:"data"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+}
+
+type WorkspaceResumeRef struct {
+    ResumeId string `json:"resumeId"`
+    CheckoutId string `json:"checkoutId"`
+    SourceAttempt int64 `json:"sourceAttempt"`
+    SourceStepId string `json:"sourceStepId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    CheckpointAttempt int64 `json:"checkpointAttempt"`
+}
+
+type WorkspaceInput struct {
+    ResumeId *string `json:"resumeId,omitempty"`
+    StepId string `json:"stepId"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+    StartId *string `json:"startId,omitempty"`
+}
+
+type WorkspaceSnapshotFile struct {
+    Path string `json:"path"`
+    Executable bool `json:"executable"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    DataBase64 string `json:"dataBase64"`
+}
+
+type WorkspaceSnapshot struct {
+    Format string `json:"format"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    Directories []string `json:"directories"`
+    Files []WorkspaceSnapshotFile `json:"files"`
+}
+
+type WorkspacePrepareInput struct {
+    CheckoutId string `json:"checkoutId"`
+    ResumeId string `json:"resumeId"`
+    StepId string `json:"stepId"`
+    Workload WorkloadSpec `json:"workload"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type WorkspaceEnqueueInput struct {
+    ResumeId string `json:"resumeId"`
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type ControlRunView struct {
+    RunId RunId `json:"runId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    Attempt int64 `json:"attempt"`
+}
+
+type WorkspaceFrozenFile struct {
+    Path string `json:"path"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Sha256 ActionDigest `json:"sha256"`
+}
+
+type WorkspacePrepareResult struct {
+    ResumeId string `json:"resumeId"`
+    Workload WorkloadSpec `json:"workload"`
+    Approval ApprovalView `json:"approval"`
+    Run ControlRunView `json:"run"`
+}
+
+type WorkspaceResumptionView struct {
+    ResumeId string `json:"resumeId"`
+    Workload WorkloadSpec `json:"workload"`
+    Run ControlRunView `json:"run"`
+    Approval *ApprovalView `json:"approval"`
+    FrozenFiles []WorkspaceFrozenFile `json:"frozenFiles"`
+}
+
+type WorkspaceEnqueueResult struct {
+    ResumeId string `json:"resumeId"`
+    RunId RunId `json:"runId"`
+    CommandId string `json:"commandId"`
+    Accepted bool `json:"accepted"`
+}
+
+type ShardPlanId string
+
+type ShardReplacementIntent struct {
+    NodeId NodeId `json:"nodeId"`
+    Workload WorkloadSpec `json:"workload"`
+}
+
+type ShardRecoveryPrepareInput struct {
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    PlanId ShardPlanId `json:"planId"`
+    Intents []ShardReplacementIntent `json:"intents"`
+}
+
+type ShardRecoveryPreparedMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    Approval ApprovalView `json:"approval"`
+}
+
+type ShardRecoveryPrepared struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    Generation int64 `json:"generation"`
+    Shards []ShardRecoveryPreparedMember `json:"shards"`
+}
+
+type ShardRecoveryEnqueued struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId ShardPlanId `json:"sourcePlanId"`
+    RootPlanId ShardPlanId `json:"rootPlanId"`
+    Generation int64 `json:"generation"`
+    Queued int64 `json:"queued"`
+    Replayed bool `json:"replayed"`
+    ParentRunId RunId `json:"parentRunId"`
+}
+
+type BusinessEditLockInput struct {
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    CheckoutId string `json:"checkoutId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type BusinessBindingInput struct {
+    ProjectId ProjectId `json:"projectId"`
+    LockId string `json:"lockId"`
+    Prepare WorkspacePrepareInput `json:"prepare"`
+}
+
+type BusinessApprovalInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+}
+
+type BusinessBindingView struct {
+    BindingId string `json:"bindingId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    LockId string `json:"lockId"`
+    ResumeId string `json:"resumeId"`
+    CheckoutId string `json:"checkoutId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    BoundRunVersion int64 `json:"boundRunVersion"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    Approval ApprovalView `json:"approval"`
+    State string `json:"state"`
+    Run ControlRunView `json:"run"`
+    CommandId *string `json:"commandId"`
+    Attempt *int64 `json:"attempt"`
+    StopReceiptId *string `json:"stopReceiptId"`
+    DeliveryPhase *string `json:"deliveryPhase"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+    ReleaseAllowed bool `json:"releaseAllowed"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+    ReleasedAt *string `json:"releasedAt"`
+    Workload WorkloadSpec `json:"workload"`
+}
+
+type ContainmentInput struct {
+    ExpectedVersion int64 `json:"expectedVersion"`
+    ReasonCode string `json:"reasonCode"`
+    ApprovalId string `json:"approvalId"`
+}
+
+type ContainmentView struct {
+    NodeId *NodeId `json:"nodeId"`
+    Version int64 `json:"version"`
+    KillSwitchActive bool `json:"killSwitchActive"`
+    NodeStatus *string `json:"nodeStatus"`
+    ActiveLeases int64 `json:"activeLeases"`
+    PendingDeliveries int64 `json:"pendingDeliveries"`
+    UnsettledRuns int64 `json:"unsettledRuns"`
+    Settled bool `json:"settled"`
+}
+
+type ContainmentResult struct {
+    RequestId string `json:"requestId"`
+    Operation string `json:"operation"`
+    Control ContainmentView `json:"control"`
+    ApprovalId string `json:"approvalId"`
+}
+
+type ContainmentProposalInput struct {
+    Operation string `json:"operation"`
+    NodeId *NodeId `json:"nodeId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    ReasonCode string `json:"reasonCode"`
+}
+
+type ContainmentDecisionInput struct {
+    Decision string `json:"decision"`
+    ContentDigest string `json:"contentDigest"`
+    Nonce string `json:"nonce"`
+}
+
+type ContainmentApprovalView struct {
+    ApprovalId string `json:"approvalId"`
+    Operation string `json:"operation"`
+    NodeId *NodeId `json:"nodeId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    GateVersion int64 `json:"gateVersion"`
+    ReasonCode string `json:"reasonCode"`
+    ContentDigest string `json:"contentDigest"`
+    Status string `json:"status"`
+    ExpiresAt string `json:"expiresAt"`
+    RequiredApprovals int64 `json:"requiredApprovals"`
+}
+
+type WorkspaceStartRef struct {
+    StartId string `json:"startId"`
+    StepId string `json:"stepId"`
+    InputSha256 string `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    NodeId NodeId `json:"nodeId"`
+    CpuResourceId ResourceId `json:"cpuResourceId"`
+    MemoryResourceId ResourceId `json:"memoryResourceId"`
+    ProfileVersion string `json:"profileVersion"`
+    PolicyVersion string `json:"policyVersion"`
+}
+
+type WorkspaceStartPrepareInput struct {
+    StepId string `json:"stepId"`
+    Workload WorkloadSpec `json:"workload"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+    SnapshotBase64 string `json:"snapshotBase64"`
+    TargetNodeId NodeId `json:"targetNodeId"`
+}
+
+type WorkspaceStartPrepareResult struct {
+    Workload WorkloadSpec `json:"workload"`
+    Approval ApprovalView `json:"approval"`
+    Run ControlRunView `json:"run"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartView struct {
+    Workload WorkloadSpec `json:"workload"`
+    Run ControlRunView `json:"run"`
+    Approval *ApprovalView `json:"approval"`
+    FrozenFiles []WorkspaceFrozenFile `json:"frozenFiles"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueInput struct {
+    ApprovalId ApprovalId `json:"approvalId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+    StartId string `json:"startId"`
+}
+
+type WorkspaceStartEnqueueResult struct {
+    RunId RunId `json:"runId"`
+    CommandId string `json:"commandId"`
+    Accepted bool `json:"accepted"`
+    StartId string `json:"startId"`
+}
+
+type ResultOutputMetadata struct {
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+    Verified bool `json:"verified"`
+}
+
+type ResultStopReceipt struct {
+    ReceiptId string `json:"receiptId"`
+    ProcessStarted bool `json:"processStarted"`
+    ExitCode int64 `json:"exitCode"`
+    Reason string `json:"reason"`
+    FinishedAt Timestamp `json:"finishedAt"`
+}
+
+type RunResultView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    AttemptCount int64 `json:"attemptCount"`
+    Sealed bool `json:"sealed"`
+    ExecutionConfirmed bool `json:"executionConfirmed"`
+    CommandId *string `json:"commandId"`
+    NodeId *NodeId `json:"nodeId"`
+    StopReceipt *ResultStopReceipt `json:"stopReceipt"`
+    Evidence *EvidenceEnvelope `json:"evidence"`
+    CompletedAt *Timestamp `json:"completedAt"`
+    Output *ResultOutputMetadata `json:"output"`
+    OutputAbsentReason *string `json:"outputAbsentReason"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+}
+
+type RunArtifactFile struct {
+    Path string `json:"path"`
+    ChecksumSha256 string `json:"checksumSha256"`
+    ByteSize int64 `json:"byteSize"`
+    Verified bool `json:"verified"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+}
+
+type RunArtifactList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Artifacts []RunArtifactFile `json:"artifacts"`
+    Count int64 `json:"count"`
+    VerifiedCount int64 `json:"verifiedCount"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunLogView struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Stdout *string `json:"stdout"`
+    Stderr *string `json:"stderr"`
+    Redacted bool `json:"redacted"`
+    Truncated *bool `json:"truncated"`
+    AbsentReason *string `json:"absentReason"`
+}
+
+type RunAttemptObservation struct {
+    AttemptNumber int64 `json:"attemptNumber"`
+    StartedAt *Timestamp `json:"startedAt"`
+    NodeId *NodeId `json:"nodeId"`
+    CommandId *string `json:"commandId"`
+    StopReceiptId *string `json:"stopReceiptId"`
+    ExitCode *int64 `json:"exitCode"`
+    Reason *string `json:"reason"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type RunAttemptList struct {
+    Source string `json:"source"`
+    RunId RunId `json:"runId"`
+    Attempts []RunAttemptObservation `json:"attempts"`
+    Count int64 `json:"count"`
+    NextCursor *int64 `json:"nextCursor"`
+}
+
+type WorkspaceFileEdit struct {
+    Path string `json:"path"`
+    ExpectedSha256 *string `json:"expectedSha256"`
+    DataBase64 *string `json:"dataBase64"`
+    Executable bool `json:"executable"`
+}
+
+type WorkspaceEditInput struct {
+    ExpectedRevision int64 `json:"expectedRevision"`
+    ExpectedSha256 string `json:"expectedSha256"`
+    Changes []WorkspaceFileEdit `json:"changes"`
+}
+
+type WorkspaceEditView struct {
+    CheckoutId string `json:"checkoutId"`
+    Revision int64 `json:"revision"`
+    Sha256 string `json:"sha256"`
+    Snapshot WorkspaceSnapshot `json:"snapshot"`
+}
+
+type TerminalSpec struct {
+    SessionId string `json:"sessionId"`
+    Rows int64 `json:"rows"`
+    Columns int64 `json:"columns"`
+    MaxInputBytes int64 `json:"maxInputBytes"`
+    MaxOutputBytes int64 `json:"maxOutputBytes"`
+}
+
+type TerminalFrameInput struct {
+    Sequence int64 `json:"sequence"`
+    Cursor int64 `json:"cursor"`
+    Operation string `json:"operation"`
+    DataBase64 string `json:"dataBase64"`
+    Rows int64 `json:"rows"`
+    Columns int64 `json:"columns"`
+    Nonce string `json:"nonce"`
+}
+
+type NodeTerminalInput struct {
+    Permit SignedNodePermit `json:"permit"`
+    Frame TerminalFrameInput `json:"frame"`
+}
+
+type NodeTerminalResult struct {
+    CommandId CommandId `json:"commandId"`
+    SessionId string `json:"sessionId"`
+    Sequence int64 `json:"sequence"`
+    Cursor int64 `json:"cursor"`
+    DataBase64 string `json:"dataBase64"`
+    Nonce string `json:"nonce"`
+}
+
+type TerminalTicketInput struct {
+    CommandId CommandId `json:"commandId"`
+}
+
+type TerminalTicketResult struct {
+    Ticket string `json:"ticket"`
+    ExpiresAt string `json:"expiresAt"`
+    SessionId string `json:"sessionId"`
+    WebsocketPath string `json:"websocketPath"`
+}
+
+type RemoteGitProposalInput struct {
+    Alias string `json:"alias"`
+    Mode string `json:"mode"`
+    Commit string `json:"commit"`
+    ExpectedRevision int64 `json:"expectedRevision"`
+    ExpectedSha256 string `json:"expectedSha256"`
+}
+
+type RemoteGitVoteInput struct {
+    ContentDigest string `json:"contentDigest"`
+    Decision string `json:"decision"`
+}
+
+type RemoteGitFileAddition struct {
+    Path string `json:"path"`
+    Contents string `json:"contents"`
+}
+
+type RemoteGitFileDeletion struct {
+    Path string `json:"path"`
+}
+
+type RemoteGitChanges struct {
+    Additions []RemoteGitFileAddition `json:"additions"`
+    Deletions []RemoteGitFileDeletion `json:"deletions"`
+}
+
+type RemoteGitProposal struct {
+    Alias string `json:"alias"`
+    Mode string `json:"mode"`
+    Commit string `json:"commit"`
+    ExpectedRevision int64 `json:"expectedRevision"`
+    ExpectedSha256 string `json:"expectedSha256"`
+    Repository string `json:"repository"`
+    Branch string `json:"branch"`
+    RepositoryFingerprint string `json:"repositoryFingerprint"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    SnapshotSha256 string `json:"snapshotSha256"`
+    Changes *RemoteGitChanges `json:"changes"`
+    OperationId string `json:"operationId"`
+    RequesterId string `json:"requesterId"`
+    RequesterPersonId string `json:"requesterPersonId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    CheckoutId string `json:"checkoutId"`
+    RecoveryEpoch string `json:"recoveryEpoch"`
+    GateVersion int64 `json:"gateVersion"`
+    ExpiresAt string `json:"expiresAt"`
+}
+
+type RemoteGitVoteView struct {
+    ActorId string `json:"actorId"`
+    Decision string `json:"decision"`
+}
+
+type RemoteGitObservation struct {
+    Commit string `json:"commit"`
+    Revision *int64 `json:"revision,omitempty"`
+    Sha256 string `json:"sha256"`
+}
+
+type RemoteGitView struct {
+    OperationId string `json:"operationId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    Phase string `json:"phase"`
+    ContentDigest string `json:"contentDigest"`
+    ExpiresAt string `json:"expiresAt"`
+    RequiredApprovals int64 `json:"requiredApprovals"`
+    Votes []RemoteGitVoteView `json:"votes"`
+    Proposal RemoteGitProposal `json:"proposal"`
+    Snapshot WorkspaceSnapshot `json:"snapshot"`
+    Result *RemoteGitObservation `json:"result"`
+}
+
+type TerminalBrowserOutput struct {
+    SessionId string `json:"sessionId"`
+    Sequence int64 `json:"sequence"`
+    Cursor int64 `json:"cursor"`
+    Text string `json:"text"`
+    OutputMode string `json:"outputMode"`
+}
+
+type NodeStorageChannel struct {
+    Tenant_id TenantId `json:"tenant_id"`
+    Node_id NodeId `json:"node_id"`
+    Recovery_epoch string `json:"recovery_epoch"`
+    Version int64 `json:"version"`
+    Endpoint string `json:"endpoint"`
+    Certificate_sha256 string `json:"certificate_sha256"`
+}
+
+type NodeStorageItem struct {
+    Location_id string `json:"location_id"`
+    Version int64 `json:"version"`
+    Relative_path string `json:"relative_path"`
+    Byte_size int64 `json:"byte_size"`
+    Checksum_sha256 *string `json:"checksum_sha256"`
+}
+
+type NodeStorageChallenge struct {
+    Channel NodeStorageChannel `json:"channel"`
+    Project_id ProjectId `json:"project_id"`
+    Run_id RunId `json:"run_id"`
+    Contribution_id string `json:"contribution_id"`
+    Root_version int64 `json:"root_version"`
+    Catalogued int64 `json:"catalogued"`
+    Items []NodeStorageItem `json:"items"`
+    Nonce string `json:"nonce"`
+    Issued_at int64 `json:"issued_at"`
+    Expires_at int64 `json:"expires_at"`
+}
+
+type NodeStorageSampleInput struct {
+    Challenge string `json:"challenge"`
+}
+
+type NodeStorageSignedSample struct {
+    Payload string `json:"payload"`
+    Signature string `json:"signature"`
+}
+
+type NodeStorageRootConfig struct {
+    Channel NodeStorageChannel `json:"channel"`
+    Contribution_id string `json:"contribution_id"`
+    Root_version int64 `json:"root_version"`
+    Root string `json:"root"`
+}
+
+type RecordedStorageObservation struct {
+    EvidenceId EvidenceId `json:"evidenceId"`
+    CheckId string `json:"checkId"`
+    ObservedAt int64 `json:"observedAt"`
+    IntegrityVerified bool `json:"integrityVerified"`
+    SampleHealthy bool `json:"sampleHealthy"`
+    Sampled int64 `json:"sampled"`
+    Mismatches int64 `json:"mismatches"`
+    Unverifiable int64 `json:"unverifiable"`
+    Examined int64 `json:"examined"`
+    Unsampled int64 `json:"unsampled"`
+}
+
+type StorageObservationView struct {
+    RequestId string `json:"requestId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    RunId RunId `json:"runId"`
+    ContributionId string `json:"contributionId"`
+    Status string `json:"status"`
+    CreatedAt string `json:"createdAt"`
+    ExpiresAt int64 `json:"expiresAt"`
+    CurrentHealth string `json:"currentHealth"`
+    OperationalAcceptanceAssessed bool `json:"operationalAcceptanceAssessed"`
+    Observation *RecordedStorageObservation `json:"observation"`
+}
+
+type ApprovalPage struct {
+    Items []ApprovalView `json:"items"`
+    NextCursor *ApprovalId `json:"nextCursor"`
+}
+
+type ShardObservedMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    Phase string `json:"phase"`
+    State RunState `json:"state"`
+    EvidenceId *EvidenceId `json:"evidenceId"`
+}
+
+type ShardResultMember struct {
+    Index int64 `json:"index"`
+    RunId RunId `json:"runId"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+    ObjectId string `json:"objectId"`
+    Sha256 string `json:"sha256"`
+    SizeBytes int64 `json:"sizeBytes"`
+}
+
+type ShardObservation struct {
+    PlanId ShardPlanId `json:"planId"`
+    SourcePlanId *ShardPlanId `json:"sourcePlanId"`
+    RootPlanId ShardPlanId `json:"rootPlanId"`
+    Generation int64 `json:"generation"`
+    ParentRunId *RunId `json:"parentRunId"`
+    ParentState *RunState `json:"parentState"`
+    AggregateManifestSha256 *string `json:"aggregateManifestSha256"`
+    ShardCount int64 `json:"shardCount"`
+    AllPhysicallyStopped bool `json:"allPhysicallyStopped"`
+    AllSucceeded bool `json:"allSucceeded"`
+    ResultManifest *[]ShardResultMember `json:"resultManifest"`
+    ResultManifestSha256 *string `json:"resultManifestSha256"`
+    Shards []ShardObservedMember `json:"shards"`
+}
+
+type ApprovalReviewView struct {
+    Approval ApprovalView `json:"approval"`
+    Workload WorkloadSpec `json:"workload"`
+    RiskLevel string `json:"riskLevel"`
+    PolicyDigest ActionDigest `json:"policyDigest"`
+}
+
+type SessionView struct {
+    SubjectId string `json:"subjectId"`
+    TenantId string `json:"tenantId"`
+    ExpiresAt int64 `json:"expiresAt"`
+}
+
+type ModelId string
+
+type ModelShard struct {
+    Index int64 `json:"index"`
+    Offset int64 `json:"offset"`
+    ByteLength int64 `json:"byteLength"`
+    Sha256 string `json:"sha256"`
+}
+
+type ModelReplica struct {
+    ShardIndex int64 `json:"shardIndex"`
+    LocationId string `json:"locationId"`
+    LocationVersion int64 `json:"locationVersion"`
+    NodeId NodeId `json:"nodeId"`
+    State string `json:"state"`
+}
+
+type ModelRuntimeCompatibility struct {
+    Adapter string `json:"adapter"`
+    Version string `json:"version"`
+    Modes []string `json:"modes"`
+}
+
+type ModelManifest struct {
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    Format string `json:"format"`
+    TotalBytes int64 `json:"totalBytes"`
+    ContentHash string `json:"contentHash"`
+    Shards []ModelShard `json:"shards"`
+    Replicas []ModelReplica `json:"replicas"`
+    RuntimeCompatibility []ModelRuntimeCompatibility `json:"runtimeCompatibility"`
+    LicensePolicy string `json:"licensePolicy"`
+    Classification string `json:"classification"`
+    Encryption string `json:"encryption"`
+    KeyRef *string `json:"keyRef"`
+}
+
+type ModelExecutionRef struct {
+    InputId string `json:"inputId"`
+    RunId RunId `json:"runId"`
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    ManifestHash ActionDigest `json:"manifestHash"`
+    InputSha256 ActionDigest `json:"inputSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+    NodeId NodeId `json:"nodeId"`
+    Adapter string `json:"adapter"`
+    AdapterVersion string `json:"adapterVersion"`
+    Mode string `json:"mode"`
+}
+
+type ModelCommitObservation struct {
+    ProjectId ProjectId `json:"projectId"`
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    ManifestHash string `json:"manifestHash"`
+    SourceRunId RunId `json:"sourceRunId"`
+    CommittedAt string `json:"committedAt"`
+    CommitRecoveryEpoch string `json:"commitRecoveryEpoch"`
+    Format string `json:"format"`
+    TotalBytes int64 `json:"totalBytes"`
+    ShardCount int64 `json:"shardCount"`
+    LicensePolicy string `json:"licensePolicy"`
+    Classification string `json:"classification"`
+    Committed bool `json:"committed"`
+    CurrentAvailability string `json:"currentAvailability"`
+    RequiresExecutionRevalidation bool `json:"requiresExecutionRevalidation"`
 }

@@ -1,3 +1,4 @@
+import type { ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState, useEffect } from 'react';
 import { ApprovalItem } from '@/contracts/types';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
@@ -6,13 +7,15 @@ import { Button } from '@/shared/ui/Button';
 export interface ApprovalDetailProps {
   approval: ApprovalItem;
   currentUserId: string;
-  onApprove: (approvalId: string, nonce: string) => Promise<void>;
+  reviewedAction?: ReviewedAction;
+  onApprove: (approvalId: string, nonce: string, shown?: ReviewedAction) => Promise<void>;
   onReject: (approvalId: string, reason: string) => Promise<void>;
 }
 
 export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   approval,
   currentUserId,
+  reviewedAction,
   onApprove,
   onReject,
 }) => {
@@ -38,14 +41,14 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
   const isDiffLoadFailed = diffRequired && !hasDiff;
 
   // Two-Person Rule constraint
-  const isRequester = Boolean(approval.requestedBy && approval.requestedBy === currentUserId) || currentUserId === 'usr_requester_alice';
+  const isRequester = Boolean(approval.requestedBy && approval.requestedBy === currentUserId);
   const isFirstApprover = approval.firstApprovedBy === currentUserId;
   const isWaitingSecondApproval = Boolean(approval.firstApprovedBy && !approval.secondApprovedBy);
   const isSelfApprovalBlocked = (isWaitingSecondApproval && isFirstApprover) || isRequester;
 
   const canApprove =
     !isExpired &&
-    Boolean(approval.actionDigest) &&
+    Boolean(currentUserId && reviewedAction && reviewedAction.actionDigest === approval.actionDigest && approval.riskLevel && approval.command) &&
     !isSubmitting &&
     (!diffRequired || hasDiff) &&
     !isSelfApprovalBlocked &&
@@ -61,7 +64,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
     if (!canApprove) return;
     setIsSubmitting(true);
     try {
-      await onApprove(approval.id, approval.nonce);
+      await onApprove(approval.id, approval.nonce ?? '', reviewedAction);
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +105,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <RiskBadge level={approval.riskLevel} />
+          {approval.riskLevel ? <RiskBadge level={approval.riskLevel} /> : <span>위험도 미관측</span>}
           <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
             승인 요청: <code>{approval.id}</code>
           </h2>
@@ -142,6 +145,8 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
       </div>
 
       <div style={{ padding: '24px' }}>
+        {(!approval.riskLevel || !approval.command) && <p role="status">승인할 작업 내용과 위험도를 확인하지 못해 승인이 보류됩니다.</p>}
+        <p>작업 다이제스트: <code>{approval.actionDigest ?? '미관측'}</code> · 필요 승인 수: {approval.requiredApprovals ?? '미관측'}</p>
         {/* Key Execution Metadata Grid */}
         <div
           style={{
@@ -157,28 +162,28 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>실행 대상:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.target} (Node: {approval.nodeId})
+              {approval.target ?? '미관측'} (Node: {approval.nodeId ?? '미관측'})
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>명령 / 도구:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, fontFamily: 'monospace', marginTop: '2px' }}>
-              {approval.command}
+              {approval.command ?? '미관측'}
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>비용 / 잔여 예산:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.estimatedCostKrw.toLocaleString()} KRW 소모 예상 (잔여 {approval.remainingBudgetKrw.toLocaleString()} KRW)
+              {approval.estimatedCostKrw?.toLocaleString() ?? '미관측'} KRW 소모 예상 (잔여 {approval.remainingBudgetKrw?.toLocaleString() ?? '미관측'} KRW)
             </div>
           </div>
 
           <div>
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>영향 반경:</span>
             <div style={{ fontSize: '0.875rem', fontWeight: 600, marginTop: '2px' }}>
-              {approval.blastRadius === 'workspace_isolated' ? '🟢 워크스페이스 격리 유지' : '🔴 호스트 경계 / 외부 영향 가능'}
+              {!approval.blastRadius ? '미관측' : approval.blastRadius === 'workspace_isolated' ? '🟢 워크스페이스 격리 유지' : '🔴 호스트 경계 / 외부 영향 가능'}
             </div>
           </div>
         </div>
@@ -201,7 +206,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
             }}
           >
             <span>⚠️</span>
-            <span>주의: 자동 롤백 절차가 정의되지 않았습니다. 장애 발생 시 수동 조치가 필요합니다.</span>
+            <span>롤백 계획이 이 응답에 포함되어 있지 않습니다.</span>
           </div>
         )}
 
@@ -234,7 +239,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               ? approval.unifiedDiff
               : isDiffLoadFailed
               ? '(L3 고위험 작업의 필수 Diff 데이터를 불러올 수 없습니다)'
-              : '(명령어 실행 및 샌드박스 상태 복구 작업 - 소스 코드 파일 변경 없음)'}
+              : '파일 변경 내역이 이 응답에 포함되어 있지 않습니다.'}
           </pre>
         </div>
 
@@ -249,18 +254,9 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           }}
         >
           <div style={{ marginBottom: '6px' }}>
-            <strong>정책 엔진 재계산 근거:</strong> {approval.policyReason}
+            <strong>정책 버전:</strong> {approval.policyReason}
           </div>
-          {approval.riskLevel === 'L3' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)' }}>
-              <strong>Two-Person Rule 상태:</strong>
-              {approval.firstApprovedBy ? (
-                <span>1차 승인 완료 ({approval.firstApprovedBy}) · 2차 검토 대기</span>
-              ) : (
-                <span>1차 승인 대기 중</span>
-              )}
-            </div>
-          )}
+          {approval.requiredApprovals === 2 && <p>서로 다른 검토자 2인의 승인이 필요합니다. 현재 투표 내역은 이 응답에 포함되지 않습니다.</p>}
           {isRequester && (
             <div style={{ marginTop: '8px', color: 'var(--color-status-offline)', fontWeight: 600 }}>
               요청자 승인 차단: 요청자 본인({currentUserId})은 2인 승인 원칙(Two-Person Rule)에 따라 자체 승인할 수 없습니다.
@@ -278,7 +274,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <Button
             variant="secondary"
             size="md"
-            disabled={isExpired || isSubmitting}
+            disabled={isExpired || isSubmitting || approval.status !== 'pending' || !approval.actionDigest}
             onClick={() => setShowRejectModal(true)}
           >
             반려

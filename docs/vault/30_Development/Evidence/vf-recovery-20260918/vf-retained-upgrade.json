@@ -1,0 +1,205 @@
+{
+  "startedAt": "2026-09-18T01:06:39.666908+00:00",
+  "scope": "same-cluster-snapshot-database-upgrade-rehearsal",
+  "operationalAcceptanceAssessed": false,
+  "sourceDatabaseMutated": false,
+  "retainedBackup": true,
+  "independentClusterRestore": false,
+  "plan": {
+    "currentHeads": [
+      "0023_containment_approvals"
+    ],
+    "targetHead": "0043_replica_retention",
+    "pending": [
+      {
+        "revision": "0024_workspace_bridge",
+        "file": "0024_workspace_bridge.py",
+        "sha256": "45e87511bd14fd6d751b33fb01da533217ef4d3cce6c77237cb33db23f3798d3",
+        "irreversible": true
+      },
+      {
+        "revision": "0025_workspace_start",
+        "file": "0025_workspace_start.py",
+        "sha256": "e98c2710de6484cf067914596d48eeaec39187f0360a8fd6facf96508b2dbbd6",
+        "irreversible": true
+      },
+      {
+        "revision": "0024_project_kernel_link",
+        "file": "0024_project_kernel_link.py",
+        "sha256": "53ba01312a23ccff574f2f61fcdff79add1cb35ecb802a4970e984c62502c6a5",
+        "irreversible": false
+      },
+      {
+        "revision": "0025_workspace_tool_choice",
+        "file": "0025_workspace_tool_choice.py",
+        "sha256": "3917f0c0e92adc0e1ab4fbfd895ea583f807b4d813fec813056981798a587dae",
+        "irreversible": false
+      },
+      {
+        "revision": "0026_business_start_merge",
+        "file": "0026_business_start_merge.py",
+        "sha256": "f7eb040b9956fcc7cbc0c6582feb2121676679cb86d32981a38340ba6d8c2b79",
+        "irreversible": true
+      },
+      {
+        "revision": "0027_business_api_guards",
+        "file": "0027_business_api_guards.py",
+        "sha256": "bbfa4cff2dafe579b0dc19397e4a551d15b61979178f5aa57edf4c81909e8c3e",
+        "irreversible": true
+      },
+      {
+        "revision": "0028_subject_kernel_link",
+        "file": "0028_subject_kernel_link.py",
+        "sha256": "29ee6bcea7decd54980dad3925a2a0acb406e4994f9a39485d24dfe7d1a24d7e",
+        "irreversible": false
+      },
+      {
+        "revision": "0029_run_outputs",
+        "file": "0029_run_outputs.py",
+        "sha256": "ee5850b4c8a5f7d8817ec8857875cd7582283a988a306ec4ad1a71314dcbe77c",
+        "irreversible": false
+      },
+      {
+        "revision": "0030_apply_resource_offer",
+        "file": "0030_apply_resource_offer.py",
+        "sha256": "d64b698e9dcf1ac0237202ee76bb126439639df60e7e2a6dc4e16b682a4b2f09",
+        "irreversible": false
+      },
+      {
+        "revision": "0026_subject_kernel_link",
+        "file": "0026_subject_kernel_link.py",
+        "sha256": "9b0bdc4231d0d64a0c5b9bcc0853b91c58ece2058ad7113a53c4b72889e783a0",
+        "irreversible": false
+      },
+      {
+        "revision": "0028_result_readiness_merge",
+        "file": "0028_result_readiness_merge.py",
+        "sha256": "aa707216fa47c8c45cbf5366beb3e5cb667bd4c3489677d672bb82430dfa260a",
+        "irreversible": true
+      },
+      {
+        "revision": "0030_provisioning_integrity",
+        "file": "0030_provisioning_integrity.py",
+        "sha256": "9e09bf00e76347d4748b09ad752d1376944bb7b5e2245a0cf4c2b6dcf02aff72",
+        "irreversible": true
+      },
+      {
+        "revision": "0031_resource_offer_integrity",
+        "file": "0031_resource_offer_integrity.py",
+        "sha256": "0d562a32693efc1ab3c3791cff7ce0210fe63b8c44aa8faa2413e05d44019d06",
+        "irreversible": true
+      },
+      {
+        "revision": "0031_workspace_input_state",
+        "file": "0031_workspace_input_state.py",
+        "sha256": "8125e1ae1bbc537372ceff1efdbe1f6b07a503ddf2c464c218497ce68611c9a2",
+        "irreversible": false
+      },
+      {
+        "revision": "0032_workspace_readiness_merge",
+        "file": "0032_workspace_readiness_merge.py",
+        "sha256": "b8b902c2683a7e1889cb92de9e1b13d5ebcea63705260ecd4ae2ee37c685eaf7",
+        "irreversible": true
+      },
+      {
+        "revision": "0033_workspace_bridge_merge",
+        "file": "0033_workspace_bridge_merge.py",
+        "sha256": "98aa3e771b6ba66e14a04ef178fab63637160aee6fee5841696efb8132005f2e",
+        "irreversible": true
+      },
+      {
+        "revision": "0034_terminal_frame_intents",
+        "file": "0034_terminal_frame_intents.py",
+        "sha256": "043fa97d73e710eaa2fa0532d8ffe91273e1113694e2cb2f9e920f272eecb4b4",
+        "irreversible": true
+      },
+      {
+        "revision": "0035_credential_registry",
+        "file": "0035_credential_registry.py",
+        "sha256": "07c7fca14947a2e1a869696a4b5f562abac628cb324425882d2cf6859ca4e085",
+        "irreversible": true
+      },
+      {
+        "revision": "0036_recovery_target_outcome",
+        "file": "0036_recovery_target_outcome.py",
+        "sha256": "311d3d0f8a18eed91a3893770a1d88a3df1aa631e1e338228fa9e8bd8b3ca756",
+        "irreversible": true
+      },
+      {
+        "revision": "0037_storage_sample_commit",
+        "file": "0037_storage_sample_commit.py",
+        "sha256": "2d697c7d1221b3659563798efd8e4b03bac644c096e17f32c303bd83f0c92fe3",
+        "irreversible": true
+      },
+      {
+        "revision": "0038_approval_review_snapshot",
+        "file": "0038_approval_review_snapshot.py",
+        "sha256": "f063c8b573e4afacc5e818a536cd3417b56db99417ec77fdc255b26e330f77a1",
+        "irreversible": true
+      },
+      {
+        "revision": "0039_model_manifest",
+        "file": "0039_model_manifest.py",
+        "sha256": "a1d23f1bd41421ec1c1f079b897e23a02a145c50cd9797da40c7f2162603734e",
+        "irreversible": true
+      },
+      {
+        "revision": "0040_model_run_input",
+        "file": "0040_model_run_input.py",
+        "sha256": "a92545fdd2ab3f2dde2ba82b4f512c9cc150e7b86fc9dcba30b1b87a3a6c93bf",
+        "irreversible": true
+      },
+      {
+        "revision": "0041_model_runtime_input",
+        "file": "0041_model_runtime_input.py",
+        "sha256": "c98384e18c3ad93c0a21e503fe5da2d35e10df18cff9d55f21e5ba3abd2a5a39",
+        "irreversible": true
+      },
+      {
+        "revision": "0042_model_retry_lineage",
+        "file": "0042_model_retry_lineage.py",
+        "sha256": "f83efa6dcf75949193ac224107db32558c3825f851a7ba810f610270e380fa61",
+        "irreversible": true
+      },
+      {
+        "revision": "0043_replica_retention",
+        "file": "0043_replica_retention.py",
+        "sha256": "550e4af89c929dbc9e826b32e581a8a3de5d416f6899bdcbeb5776afd56d2997",
+        "irreversible": true
+      }
+    ],
+    "migrationAuthorized": false,
+    "schemaIntegrityAssessed": false,
+    "requiredBeforeApply": [
+      "verified-backup-and-restore",
+      "data-upgrade-rehearsal",
+      "independent-review",
+      "service-compatibility",
+      "maintenance-plan"
+    ]
+  },
+  "archiveSha256": "8a015f905580c2c0f14b2e915685c0f65d405a1c78613abef3ae35cd056276b6",
+  "archiveBytes": 3012574,
+  "retainedBackupReadbackVerified": true,
+  "backupId": "pilot-20260918-7a6fd27d66194be584ac4eca8acabfc6",
+  "offDeviceBackup": false,
+  "encryptedBackup": false,
+  "restoreExactRows": true,
+  "replayExactRows": true,
+  "oldColumnRowsPreserved": true,
+  "sourceTables": 130,
+  "sourceRows": 45183,
+  "finalHeads": [
+    "0043_replica_retention"
+  ],
+  "definer": {
+    "checked": 9,
+    "unsafe": 0,
+    "functions": [],
+    "status": "matches_reviewed_policy",
+    "policy": "tools/definer-policy.json"
+  },
+  "runtimeTransactionPassed": true,
+  "completedAt": "2026-09-18T01:06:57.551508+00:00",
+  "disposableDatabaseRemoved": true
+}

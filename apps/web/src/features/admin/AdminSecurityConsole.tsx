@@ -663,7 +663,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                       )}
                     </div>
                     <div style={{ fontSize: '12px', color: '#8b949e' }}>
-                      OS: {n.os.toUpperCase()} • CPU: {n.cpuCores}C ({n.cpuUsagePercent}%) • RAM: {(n.memoryTotalBytes / 1024 ** 3).toFixed(0)} GiB
+                      {n.telemetryUnavailable ? '자원 정보 미관측' : `OS: ${n.os.toUpperCase()} • CPU: ${n.cpuCores}C (${n.cpuUsagePercent}%) • RAM: ${(n.memoryTotalBytes / 1024 ** 3).toFixed(0)} GiB`}
                       {n.gpuName && ` • GPU: ${n.gpuName}`}
                     </div>
                   </div>

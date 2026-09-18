@@ -37,13 +37,16 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from contextlib import redirect_stderr, redirect_stdout
 import json
+import os
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "services/control-plane/src"))
 
 #: Paths worth asking about without credentials. Health endpoints are here
 #: because what they *claim* matters as much as what the data routes return.
@@ -78,14 +81,13 @@ def obtain(target: str) -> tuple[Any, str]:
     module_name, _, attr = target.partition(":")
     try:
         module = importlib.import_module(module_name)
-    except Exception as error:  # noqa: BLE001
+    except Exception:  # noqa: BLE001
         # Reported, not raised. A tool that tracebacks teaches people to
         # distrust the tool; and "could not import" is a real answer that is
         # not the same as "refuses by design" — it usually means this checkout
         # cannot see a dependency the container would have.
         return None, (
-            f"INCONCLUSIVE: module could not be imported here: "
-            f"{type(error).__name__}: {error}"
+            "INCONCLUSIVE: module could not be imported here; diagnostics suppressed"
         )
     if not attr:
         return None, "no attribute named; nothing to serve"
@@ -97,14 +99,30 @@ def obtain(target: str) -> tuple[Any, str]:
         # deployment would amount to, so the failure is the finding.
         try:
             return candidate(), "factory returned an application with no arguments"
-        except TypeError as error:
-            return None, f"factory refuses to build without arguments: {error}"
-        except Exception as error:  # noqa: BLE001 - any refusal is the answer
-            return None, f"factory refused: {type(error).__name__}: {error}"
+        except TypeError:
+            return None, "factory refuses to build without arguments; diagnostics suppressed"
+        except Exception:  # noqa: BLE001 - any refusal is the answer
+            return None, "factory refused; diagnostics suppressed"
     return candidate, "module-level application object"
 
 
 def inspect(target: str, module_source: str | None) -> dict[str, Any]:
+    # Candidate code and its response bodies are untrusted diagnostic inputs.
+    # Discard Python stdout/stderr, rather than capturing secrets in memory or
+    # copying them into a public Evidence file. This is not an OS sandbox.
+    # The CLI is synchronous. Restore the caller's configuration even if a
+    # probe crashes; otherwise subsequent checks silently lose their DB setup.
+    configuration = {k: v for k, v in os.environ.items() if k.startswith("INV_")}
+    try:
+        with open(os.devnull, "w", encoding="utf-8") as sink:
+            with redirect_stdout(sink), redirect_stderr(sink):
+                return _inspect(target, module_source)
+    finally:
+        _strip_configuration()
+        os.environ.update(configuration)
+
+
+def _inspect(target: str, module_source: str | None) -> dict[str, Any]:
     _strip_configuration()
     app, how = obtain(target)
     report: dict[str, Any] = {
@@ -129,12 +147,21 @@ def inspect(target: str, module_source: str | None) -> dict[str, Any]:
     for path in PROBES:
         try:
             response = client.get(path)
-        except Exception as error:  # noqa: BLE001
-            report["answers"].append({"path": path, "status": type(error).__name__})
+        except Exception:  # noqa: BLE001
+            report["answers"].append({"path": path, "status": "probe-error"})
             continue
         entry = {"path": path, "status": response.status_code}
         if path == "/readyz" and response.status_code < 400:
-            report["claims"] = response.text[:200]
+            # Only the exact readiness field is public, not arbitrary JSON or
+            # strings containing "ready" in an unrelated field.
+            try:
+                body = response.json()
+            except (ValueError, RecursionError):
+                body = None
+            status = body.get("status") if isinstance(body, dict) else None
+            report["claims"] = {
+                "status": status if status in ("ready", "not_ready") else "unknown"
+            }
         if response.status_code < 400:
             entry["bytes"] = len(response.content)
         elif response.status_code in (401, 403):
@@ -151,7 +178,8 @@ def inspect(target: str, module_source: str | None) -> dict[str, Any]:
                 retried = None
             if retried is not None and retried.status_code < 400:
                 entry["acceptsAnyBearerToken"] = True
-                entry["grants"] = retried.text[:160]
+                entry["bearerStatus"] = retried.status_code
+                entry["bearerBytes"] = len(retried.content)
         report["answers"].append(entry)
     return report
 
@@ -167,6 +195,15 @@ def verdict(report: dict[str, Any]) -> list[str]:
         return ["the check did not run: " + report["how"]]
     if not report["obtainable"]:
         return problems
+    failed = [
+        a for a in report["answers"]
+        if not isinstance(a["status"], int) or a["status"] >= 500
+    ]
+    if failed:
+        problems.append(
+            "the check could not evaluate failing probes: "
+            + ", ".join(a["path"] for a in failed)
+        )
     served = [
         a for a in report["answers"]
         if isinstance(a["status"], int) and a["status"] < 400
@@ -177,7 +214,7 @@ def verdict(report: dict[str, Any]) -> list[str]:
             f"{len(served)} data route(s) answer without credentials: "
             + ", ".join(a["path"] for a in served)
         )
-    if report.get("claims") and '"ready"' in report["claims"]:
+    if report.get("claims", {}) and report["claims"].get("status") == "ready":
         problems.append(
             "/readyz reports ready with nothing configured, so readiness does "
             "not mean the process can do its job"
@@ -193,8 +230,8 @@ def verdict(report: dict[str, Any]) -> list[str]:
     for answer in forged:
         problems.append(
             f"{answer['path']} refuses a missing credential and then accepts an "
-            f"arbitrary one: 'Bearer not-a-real-token' returns "
-            f"{answer.get('grants', '')[:120]}"
+            f"arbitrary one: 'Bearer not-a-real-token' returns HTTP "
+            f"{answer['bearerStatus']} (response body omitted)"
         )
     return problems
 
@@ -222,7 +259,8 @@ def main() -> int:
             print(f"no uvicorn target found in {args.dockerfile}")
             return 1
         target = found.group(1) or found.group(2)
-        print(f"{args.dockerfile} serves {target}\n")
+        if not args.json:
+            print(f"{args.dockerfile} serves {target}\n")
 
     source = None
     module_name = target.partition(":")[0]

@@ -1,0 +1,13 @@
+{
+  "tests": 278,
+  "testFiles": 30,
+  "testExitCode": 0,
+  "buildExitCode": 0,
+  "environment": "Windows; Node/Vitest/TypeScript/Vite",
+  "backendImage": "sha256:b93b5ef1f94469bc4b18c1214354249ec9f55974aef30898287f5feac13c1d7e",
+  "imageBuildExitCode": 0,
+  "imageUser": "65532:65532",
+  "unconfiguredImageExitCode": 1,
+  "expectedConfigurationRejection": true,
+  "additionalIntegrationBase": "810ab3b"
+}

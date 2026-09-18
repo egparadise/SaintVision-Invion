@@ -41,6 +41,9 @@ class RunStore:
     def create(self, tenant_id, project_id, *, run_id=None):
         run_id = run_id or new_id("run")
         with self.db.transaction(tenant_id) as conn:
+            from .containment import require_execution
+
+            require_execution(conn)
             row = conn.execute(
                 "INSERT INTO inv.runs(tenant_id,project_id,run_id) VALUES (%s,%s,%s) RETURNING *",
                 (tenant_id, project_id, run_id),
@@ -65,6 +68,10 @@ class RunStore:
         check_transition(row["state"], target, evidence_ready=evidence_ready)
         if row["state"] == target:
             return public(row)
+        if target in {"scheduled", "running", "verifying", "succeeded"}:
+            from .containment import require_execution
+
+            require_execution(conn)
         # State changes revoke execution rights, not physical reservations.
         # Release requires the authenticated Node stop acknowledgement.
         updated = conn.execute(

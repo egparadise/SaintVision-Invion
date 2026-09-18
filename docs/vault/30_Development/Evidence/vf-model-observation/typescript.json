@@ -1,0 +1,5 @@
+{
+  "command": "node C:/Project/SaintVision-Invion/apps/web/node_modules/typescript/bin/tsc --noEmit --skipLibCheck --target ES2022 packages/contracts-ts/src/index.ts",
+  "exitCode": 0,
+  "goCompilation": "not run: go executable unavailable in PATH; generated output reproducibility verified"
+}

@@ -1,0 +1,19 @@
+{
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-lan-migration/proposal-1.txt",
+      "externalSHA256": "199c09dba3a4b470af7899376e295126f76833bf7f4e04bf9fd0e62b7e540318"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-lan-migration/proposal-2.txt",
+      "externalSHA256": "9d51291ffa9df5e0438a33be84d455a4417295a161b00f9f28668b6d88fbc273"
+    },
+    {
+      "relativePath": "40_Governance/Agent 인계 대기 목록.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-lan-migration/proposal-3.txt",
+      "externalSHA256": "fc1a3454075836eb3ac8549752aa9f3b1340ed83e60f4427736b43ebd7dade04"
+    }
+  ]
+}

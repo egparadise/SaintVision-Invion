@@ -36,8 +36,22 @@ jobs:
 
     env:
       INV_ENV: test
-      INV_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      # INV_DATABASE_URL is deliberately NOT set job-wide. Test fixtures that
+      # provision their own database pass INV_MIGRATION_DSN, and an ambient
+      # default in scope for their subprocesses is how migrations end up
+      # applied to the wrong database. The migration steps below set it
+      # themselves.
       INV_TEST_DATABASE_URL: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+      # Codex's suites refuse to skip in CI and want an admin DSN of their own.
+      # Pointing it at this job's database is deliberate: running both halves
+      # against one PostgreSQL is the only way the integration is actually
+      # regression-tested rather than each side passing in its own container.
+      # invowner is this container's superuser, which is what their fixtures
+      # need to provision roles and schemas.
+      INV_TEST_ADMIN_DSN: postgresql://invowner:ci_local_only@localhost:5432/invdev
+      # Role-shape rejection tests mutate cluster-wide role flags. They own a
+      # separate disposable cluster instead of altering the shared service.
+      INV_TEST_ROLE_GUARD_IMAGE: postgres:16
 
     steps:
       - uses: actions/checkout@v4
@@ -45,32 +59,79 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: requirements-backend.txt
+          cache-dependency-path: |
+            requirements-backend.txt
+            requirements-test.txt
+            requirements-core.txt
       - run: python -m pip install -r requirements-backend.txt
 
       - name: Contract schemas match their models
         run: python tools/export_schemas.py --check
 
       - name: Migration renders offline
+        env:
+          # Offline rendering never connects, but alembic still requires a URL
+          # to pick a dialect. Named INV_MIGRATION_DSN like every other step
+          # that targets a specific database.
+          INV_MIGRATION_DSN: postgresql+psycopg://offline:offline@localhost:1/offline
         run: python -m alembic upgrade head --sql > /dev/null
 
-      - name: Migration applies and reverses
-        run: |
-          python -m alembic upgrade head
-          python -m alembic downgrade base
-          python -m alembic upgrade head
+      - name: Migration graph has a single integrated head
+        run: python tools/migration_graph.py
 
+      - name: Migration applies to an empty database
+        env:
+          INV_MIGRATION_DSN: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+        run: python -m alembic upgrade head
+
+      - name: The reversible tail reverses
+        # Not a blind `downgrade base`. Some revisions are deliberately
+        # irreversible — PLAN-DB-001 says an irreversible migration states a
+        # verified restore and forward-fix plan instead of forcing a downgrade,
+        # and 0006_control_api does. Rolling past one is not a test to fix; it
+        # is the thing the plan says not to do. So only the tail above the
+        # newest irreversible revision is exercised, and when there is no such
+        # tail the step says so rather than passing quietly.
+        env:
+          INV_MIGRATION_DSN: postgresql+psycopg://invowner:ci_local_only@localhost:5432/invdev
+        run: |
+          TARGET=$(python tools/migration_graph.py --downgrade-target)
+          HEAD=$(python tools/migration_graph.py --head)
+          if [ "$TARGET" = "$HEAD" ]; then
+            echo "No reversible tail: head ($HEAD) is itself irreversible."
+            echo "Rollback for this chain is by verified restore, not downgrade."
+          else
+            python -m alembic downgrade "$TARGET"
+            python -m alembic upgrade head
+          fi
+
+      # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass
         # as a green build.
-        run: python -m pytest -q --strict-markers
+        # tests/core and tests/integration are NOT excluded wholesale. Running
+        # the business surface and the execution core against one PostgreSQL is
+        # the only place their combined behaviour is exercised at all; excluding
+        # them leaves each half passing in its own container and the seam
+        # between them untested.
+        #
+        # The suites that need the Go agent binary and a built container image
+        # are left to Core Build, which provides both. That list is computed,
+        # not typed: it was three files, then thirteen, and most are reached
+        # transitively through shared fixtures. A hardcoded list here goes stale
+        # silently, and the symptom of a stale ignore list is a test that stops
+        # running rather than an error.
+        run: |
+          IGNORES=$(python tools/node_dependent_tests.py --pytest-args)
+          echo "Left to Core Build (needs the Node runtime):"
+          python tools/node_dependent_tests.py | sed 's/^/  /'
+          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
 
       - name: No PostgreSQL test was skipped
         run: |
-          python -m pytest -q -m postgres --collect-only | tail -1
-          python -m pytest -m postgres -q -rs 2>&1 | tee /tmp/pg.txt
-          if grep -q "skipped" /tmp/pg.txt; then
-            echo "PostgreSQL-backed tests were skipped; refusing to report success."
-            exit 1
-          fi
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('backend-tests.xml').getroot()
+          assert not root.findall('.//skipped'), 'Backend tests must not be skipped'
+          PY

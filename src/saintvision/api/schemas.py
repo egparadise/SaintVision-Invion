@@ -12,6 +12,7 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -122,6 +123,24 @@ class DataLocationResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class RecordedReplicaStates(Strict):
+    ready: int = Field(ge=0)
+    transferring: int = Field(ge=0)
+    stale: int = Field(ge=0)
+    corrupt: int = Field(ge=0)
+    evicted: int = Field(ge=0)
+
+
+class ReplicaObservationResponse(Strict):
+    location_id: str = Field(alias="locationId")
+    location_version: int = Field(ge=1, alias="locationVersion")
+    observed_at: dt.datetime = Field(alias="observedAt")
+    recorded_states: RecordedReplicaStates = Field(alias="recordedStates")
+    total_records: int = Field(ge=0, alias="totalRecords")
+    current_availability: Literal["unknown"] = Field(alias="currentAvailability")
+    requires_execution_revalidation: Literal[True] = Field(alias="requiresExecutionRevalidation")
+
+
 class PageResponse(Strict):
     items: list[dict]
     next_cursor: str | None = Field(default=None, alias="nextCursor")
@@ -171,11 +190,102 @@ class DistributedPlanRequest(Strict):
     strategy: str = Field(pattern="^(single_node|data_parallel|sharded)$")
     shard_count: int = Field(default=1, ge=1, le=1024, alias="shardCount")
     splittable_declared: bool = Field(default=False, alias="splittableDeclared")
-    shard_cpu_cores: float = Field(default=0, ge=0, alias="shardCpuCores")
+    #: In the canonical units, and named after them. These are compared against
+    #: a node's spare capacity, so a field called ``shardCpuCores`` sitting next
+    #: to capacity measured in millicores is an invitation to be wrong by a
+    #: factor of a thousand — see ``saintvision.units``.
+    shard_cpu_millicores: int = Field(default=0, ge=0, alias="shardCpuMillicores")
     shard_ram_bytes: int = Field(default=0, ge=0, alias="shardRamBytes")
-    shard_gpu_count: int = Field(default=0, ge=0, alias="shardGpuCount")
+    shard_gpu_devices: int = Field(default=0, ge=0, alias="shardGpuDevices")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
 HeartbeatRequest.model_rebuild()
+
+
+class MemberRoleRequest(Strict):
+    """Grant or change one project membership.
+
+    The role vocabulary is a contract with the execution kernel, which reads
+    ``public.project_members.role_code`` before it will start anything. A value
+    outside the set saves and then means nothing, so the pattern is closed
+    rather than free text.
+    """
+
+    role_code: str = Field(
+        pattern="^(owner|maintainer|operator|approver|viewer)$", alias="roleCode"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class UserStatusRequest(Strict):
+    status: str = Field(pattern="^(active|suspended|retired)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectStatusRequest(Strict):
+    status: str = Field(pattern="^(active|archived)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceStatusRequest(Strict):
+    status: str = Field(
+        pattern="^(provisioning|ready|suspended|deleting|deleted)$"
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ResourceOfferRequest(Strict):
+    """How much of one capability the platform may use.
+
+    ``unit`` is whatever the calling screen measures in — cores, GiB, devices.
+    It is converted once, here, so two screens describing the same machine
+    cannot store two different numbers.
+    """
+
+    offered_quantity: float = Field(ge=0, alias="offeredQuantity")
+    unit: str = Field(min_length=1, max_length=16)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectCreateRequest(Strict):
+    """Create a project. The caller becomes its owner.
+
+    ``code`` is constrained because it appears in URLs and in operator
+    conversation; a project called "My Project (v2)!" is one nobody can refer to
+    unambiguously.
+    """
+
+    code: str = Field(pattern="^[a-z][a-z0-9-]{1,62}[a-z0-9]$")
+    display_name: str = Field(min_length=1, max_length=200, alias="displayName")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceCreateRequest(Strict):
+    name: str = Field(min_length=2, max_length=128)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceToolRequest(Strict):
+    """Choose the development tool a workspace uses.
+
+    ``null`` clears the choice. The name is one of the adapters the platform
+    knows; ``GET /v1/adapters`` lists them with whether each is usable right
+    now, which is a property of a node rather than of this record.
+    """
+
+    tool_name: str | None = Field(
+        default=None,
+        pattern="^(claude-code|codex-cli|gemini-cli|antigravity)$",
+        alias="toolName",
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)

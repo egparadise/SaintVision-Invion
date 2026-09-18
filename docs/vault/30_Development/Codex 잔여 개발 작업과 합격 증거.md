@@ -1,14 +1,26 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.13.0"
+version: "1.19.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T11:34:00+09:00"
+updated: "2026-09-11T16:59:36+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 잔여 개발 작업과 합격 증거
+
+2026-09-11 Workspace 통합: [[2026-09-11_WORKSPACE-INTEGRATION_Codex_검증보고]]의 clean `c5f2154`에서 editor/PTY/Git를 최신 계정·tenant·자원 kernel에 통합했다. 기본 301개/격리 통합 402개/공개 prior 20개 upgrade·Linux Go 고유 43개를 검증했다. PR19 build-only 유예는 종료했다. 실제 GitHub publication·물리 원격 7개·독립 검토·CI·운영 인수는 남는다. 아래 과거 시험 미수행 문구는 해당 SHA 당시 기록이다.
+
+2026-09-11 tenant/인계 재검토: [[2026-09-11_TENANT-BOUNDARY_Codex_검증보고]]의 f4fe37e에서 원본 0026 누수를 재현하고 후속 적용 guard의 거부를 확인했다. 결과 중복 제거·현재 입력 readiness·0032 이력 병합을 통합했으며 최종 로컬 회귀 305개/18개 migration 경로가 통과했다. #11/#12 중복 draft를 닫았고 #13/15/16/17/18/20의 기존 병합 사실을 확인했다. CI·독립 검토·원격 7개·운영/브라우저 인수와 새 main 반영은 남는다.
+
+2026-09-11 자원 제공량 후속: [[2026-09-11_RESOURCE-OFFER_Codex_검증보고]]의 01fdb15에서 현재 관리자 권한·전체 slice 제공 총량·미반납 예약 잠금·원자 history·0031 이력 병합을 구현했다. clean core 290/격리 통합 297개와 16개 upgrade 경로 통과. 실제 결과 정본과 [[3 Agent 원격 실행과 운영 인수 확정]]을 확정했으며 실제 원격 7개 시험, 운영 계정/Workspace 준비, UI 인수, 독립 검토·CI는 남는다.
+
+2026-09-11 provisioning 후속: [[2026-09-11_PROVISIONING-INTEGRITY_Codex_검증보고]]의 a6054f3에서 Claude 신규 코드를 통합 검토하고 명시적 계정 grant·충돌 거부·원자 감사·0030 이력 병합을 구현했다. clean 통합 283개/14개 upgrade 경로 통과. 운영 provisioning 도구는 준비됐지만 실제 IdP 계정 적용·Workspace/자원 연결(Claude), 실제 worker 설치와 원격 7개 시험(Codex), 실제 UI/브라우저(Gemini)는 남는다. Codex 변경 독립 검토와 CI는 미완료다.
+
+2026-09-11 결과 조회 후속: [[2026-09-11_RESULT-OBSERVATION_Codex_검증보고]]의 8b97c6a에서 실제 kernel Run/receipt/Evidence와 검증된 파일 다운로드·로그·attempt를 연결했다. 0028로 이력을 보존해 병합하고 원격 미관측 도구와 실제 실행 grant를 구분했다. 기본 290/격리 통합 262개 통과. 남은 주 작업은 실제 worker 설치 후 원격 7개 인수(Codex), 독립 검토·운영 identity/Workspace provisioning·제공량 연결(Claude), 실제 API/브라우저 인수(Gemini)다. 전체 task done은 아니다.
+
+2026-09-11 계정 통합 후속: [[2026-09-11_ACCOUNT-KERNEL_Codex_검증보고]]와 [[Codex 계정과 실행 커널 통합 계약]]에서 Claude 서비스/OIDC를 같은 kernel HTTP 경계에 연결하고 별도 관리 권한·현재 tenant/멤버십·Project/Node 직렬화 및 0026/0027 이력 병합을 구현했다. 코드 149b565를 push했으며 로컬 DB/실행 증거를 해당 보고에 고정한다. 운영 계정/subject/project provisioning·public offer↔kernel 자원 연결·Workspace 준비와 결과 조회는 Claude, 실제 API/화면과 [[2026-09-11_GEMINI-ZERO-MOCK_Codex_후속검토]] P1은 Gemini, 실제 원격 설치 확인·장비 시험은 Codex의 다음 작업이다. 독립 Claude 재검토·CI 및 실제 운영 인수는 미완료다. 아래 과거 미연결 문구는 해당 SHA 당시 상태다.
 
 2026-09-11 원격 Node 배포 후속: [[2026-09-11_REMOTE-WORKSPACE_Codex_검증보고]]에서 새 설치본 0123640을 게시하고 기존 identity/key/journal 보존·실패 rollback 3개, 서버 시험 도구 650ca0b의 로컬 실제 실행/취소/출력 복구 7개를 검증했다. Codex의 바로 다음 작업은 [[2026-09-11_REMOTE-WORKSPACE_다른PC설치안내]]의 worker 설치 JSON 확인 후 같은 7개를 실제 192.168.45.225에 실행하는 것이다. 현재 SSH/WinRM 경로 없음·lan-observe-v1이라 실제 원격 설치/실행 완료가 아니다. 기존 운영 DB/gate/권한은 유지하고 장비 시험은 격리 DB에서 수행한다. Claude 운영 identity/업무 API·독립 검토, Gemini 실제 UI 인수와 후속 GPU/장시간·다중 Node 범위는 남는다.
 

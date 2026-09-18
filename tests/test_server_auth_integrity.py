@@ -1,3 +1,4 @@
+"""Quarantined legacy fixture tests: NOT production authentication or DB evidence."""
 """
 Tests for saintvision.server authentication integrity and zero-mock token verification.
 Verifies:
@@ -14,7 +15,7 @@ import secrets
 from fastapi.testclient import TestClient
 import pytest
 
-from saintvision.server import app
+from fixtures.legacy_control import app
 
 
 def _base64url_sha256(verifier: str) -> str:

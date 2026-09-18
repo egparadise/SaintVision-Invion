@@ -1,0 +1,21 @@
+{
+  "endpoint": "192.168.45.225:18443",
+  "attempts": [
+    {
+      "attempt": 1,
+      "reachable": false,
+      "errorType": "TimeoutError"
+    },
+    {
+      "attempt": 2,
+      "reachable": false,
+      "errorType": "TimeoutError"
+    },
+    {
+      "attempt": 3,
+      "reachable": false,
+      "errorType": "TimeoutError"
+    }
+  ],
+  "mutations": false
+}

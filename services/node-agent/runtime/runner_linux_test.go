@@ -19,6 +19,8 @@ type fakeEngine struct {
 	state                               State
 	creates, starts, stops, removes     int
 	lostStart, absent, removeFail, wait bool
+	removeLost                          bool
+	onStart                             func()
 }
 
 func (e *fakeEngine) Create(_ context.Context, r Record, p contracts.SandboxLaunchSpec) (string, error) {
@@ -38,6 +40,9 @@ func (e *fakeEngine) Start(_ context.Context, id string) error {
 		e.state.Status = "running"
 	} else {
 		e.state.Status = "exited"
+	}
+	if e.onStart != nil {
+		e.onStart()
 	}
 	if e.lostStart {
 		return errors.New("lost start ACK")
@@ -64,7 +69,13 @@ func (e *fakeEngine) Remove(_ context.Context, _ string, _ Record) error {
 		return errors.New("late start still running")
 	}
 	e.state = State{}
+	if e.removeLost {
+		return errors.New("lost removal ACK")
+	}
 	return nil
+}
+func (e *fakeEngine) Output(_ context.Context, _ string, _ Record) (*contracts.NodeOutput, error) {
+	return nil, nil // This fake cannot attest real process output.
 }
 func journalFor(t *testing.T, c Config) *Journal {
 	t.Helper()
@@ -247,11 +258,14 @@ func TestTimeoutAndCancellationRequirePhysicalStop(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			if cancelNow {
-				time.AfterFunc(100*time.Millisecond, cancel)
+				// Cancel a RUNNING execution, independent of journal fsync speed.
+				// Pre-start cancellation has separate tombstone/non-execution tests.
+				p.Launch.TimeoutSeconds = 5
+				e.onStart = cancel
 			}
 			result, err := New(c, j, e).Execute(ctx, signed(t, p, k))
-			if err != nil || result.Receipt == nil || result.Receipt.Reason != name || e.stops != 1 || e.removes != 1 {
-				t.Fatal("stop not verified", err)
+			if err != nil || result.Receipt == nil || !result.Receipt.ProcessStarted || result.Receipt.Reason != name || e.starts != 1 || e.stops != 1 || e.removes != 1 {
+				t.Fatalf("stop not verified: err=%v starts=%d stops=%d removes=%d receipt=%+v", err, e.starts, e.stops, e.removes, result.Receipt)
 			}
 		})
 	}
@@ -361,7 +375,106 @@ func TestRemoteCancelCannotStartUnseenPermit(t *testing.T) {
 	c, p, k := fixture(t)
 	e := &fakeEngine{}
 	r := New(c, journalFor(t, c), e)
-	if _, err := r.Cancel(context.Background(), signed(t, p, k)); err == nil || e.creates != 0 {
+	data := signed(t, p, k)
+	result, err := r.Cancel(context.Background(), data)
+	if err != nil || result.Receipt == nil || result.Receipt.Reason != "not_started" || result.Receipt.ContainerId != "" || result.Receipt.ProcessStarted || e.creates != 0 {
 		t.Fatal("unseen cancellation executed")
+	}
+	late, err := r.Execute(context.Background(), data)
+	if err != nil || !late.Duplicate || late.Receipt.ReceiptId != result.Receipt.ReceiptId || e.creates != 0 {
+		t.Fatal("delayed execute escaped cancellation", err)
+	}
+}
+
+func TestCancelTombstoneSurvivesCrashBeforeReceipt(t *testing.T) {
+	c, p, k := fixture(t)
+	j := journalFor(t, c)
+	data := signed(t, p, k)
+	permit, err := Verify(data, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := j.Reject(permit); err != nil {
+		t.Fatal(err)
+	}
+	_ = j.Close()
+	resumed, err := OpenJournal(j.root, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resumed.Close()
+	e := &fakeEngine{absent: true}
+	r := New(c, resumed, e)
+	results, err := r.Recover(context.Background())
+	if err != nil || len(results) != 1 || results[0].Receipt.Reason != "not_started" {
+		t.Fatal("lost tombstone", err)
+	}
+	result, err := r.Execute(context.Background(), data)
+	if err != nil || result.Receipt.ReceiptId != results[0].Receipt.ReceiptId || e.creates != 0 {
+		t.Fatal("crash restarted command", err)
+	}
+}
+
+func TestConcurrentUnseenCancelAndLateExecute(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &fakeEngine{}
+	r := New(c, journalFor(t, c), e)
+	data := signed(t, p, k)
+	first, err := r.Cancel(context.Background(), data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wg sync.WaitGroup
+	for i := 0; i < 16; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			var result Result
+			var err error
+			if i%2 == 0 {
+				result, err = r.Execute(context.Background(), data)
+			} else {
+				result, err = r.Cancel(context.Background(), data)
+			}
+			if err != nil || result.Receipt == nil || result.Receipt.ReceiptId != first.Receipt.ReceiptId {
+				t.Error("receipt changed", err)
+			}
+		}(i)
+	}
+	wg.Wait()
+	if e.creates != 0 {
+		t.Fatal("cancelled permit executed")
+	}
+}
+
+func TestCancelDoesNotTurnAmbiguousIntentIntoNeverStartedProof(t *testing.T) {
+	c, p, k := fixture(t)
+	e := &fakeEngine{absent: true}
+	r := New(c, journalFor(t, c), e)
+	data := signed(t, p, k)
+	if _, err := r.Execute(context.Background(), data); err == nil {
+		t.Fatal("expected ambiguity")
+	}
+	if result, err := r.Cancel(context.Background(), data); err == nil || result.Receipt != nil {
+		t.Fatal("uncertain create incorrectly released")
+	}
+}
+
+func TestCrashAfterRemovalRecoversDurableStoppedCandidate(t *testing.T) {
+	c, p, k := fixture(t)
+	j := journalFor(t, c)
+	e := &fakeEngine{removeLost: true}
+	data := signed(t, p, k)
+	r := New(c, j, e)
+	if result, err := r.Execute(context.Background(), data); err == nil || result.Receipt != nil {
+		t.Fatal("unconfirmed removal acknowledged")
+	}
+	result, err := r.Observe(context.Background(), data)
+	if err != nil || result.Receipt == nil || result.Receipt.Reason != "exited" || e.creates != 1 || e.starts != 1 {
+		t.Fatal("durable stopped candidate not recovered", err)
+	}
+	again, err := r.Execute(context.Background(), data)
+	if err != nil || again.Receipt.ReceiptId != result.Receipt.ReceiptId || e.starts != 1 {
+		t.Fatal("recovery reexecuted", err)
 	}
 }

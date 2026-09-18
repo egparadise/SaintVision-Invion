@@ -1,0 +1,3 @@
+FROM scratch
+COPY inv-node /inv-node
+ENTRYPOINT ["/inv-node"]

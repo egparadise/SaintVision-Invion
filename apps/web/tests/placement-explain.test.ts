@@ -246,4 +246,3 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
     expect(offlineEval?.rejectionReasons.some((r) => r.includes('비정상 (offline)'))).toBe(true);
   });
 });
-

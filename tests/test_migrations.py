@@ -130,19 +130,24 @@ def test_no_migration_reads_the_mutable_partition_constant():
 
 
 def test_every_revision_declares_its_predecessor():
+    import ast
+
     revisions = {}
     for path in sorted(MIGRATIONS.glob("*.py")):
-        source = path.read_text(encoding="utf-8")
-        revision = re.search(r'^revision = "([^"]+)"', source, re.M)
-        down = re.search(r"^down_revision = (None|\"[^\"]+\")", source, re.M)
-        assert revision and down, path.name
-        revisions[revision.group(1)] = down.group(1).strip('"')
-
-    roots = [r for r, d in revisions.items() if d == "None"]
-    assert len(roots) == 1, f"expected exactly one root revision, got {roots}"
+        declarations = {}
+        for node in ast.parse(path.read_text(encoding="utf-8")).body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id in {"revision", "down_revision"}:
+                        declarations[target.id] = ast.literal_eval(node.value)
+        assert set(declarations) == {"revision", "down_revision"}, path.name
+        assert declarations["revision"] not in revisions, path.name
+        revisions[declarations["revision"]] = declarations["down_revision"]
+    assert sum(d is None for d in revisions.values()) == 1
     for revision, down in revisions.items():
-        if down != "None":
-            assert down in revisions, f"{revision} points at a missing revision {down}"
+        parents = () if down is None else (down,) if isinstance(down, str) else down
+        assert isinstance(parents, tuple) and len(set(parents)) == len(parents)
+        assert all(parent in revisions and parent != revision for parent in parents)
 
 
 def test_the_migrations_create_exactly_the_modelled_tables(rendered_sql):
@@ -162,9 +167,7 @@ def test_the_migrations_create_exactly_the_modelled_tables(rendered_sql):
     # Partition children are named <parent>_pYYYYMM and are not modelled
     # separately; alembic owns its own bookkeeping table.
     created = {
-        name
-        for name in created
-        if not re.search(r"_p\d{6}$", name) and name != "alembic_version"
+        name for name in created if not re.search(r"_p\d{6}$", name) and name != "alembic_version"
     }
     modelled = set(Base.metadata.tables)
 
@@ -219,13 +222,11 @@ def test_lifecycle_tables_get_column_scoped_update_and_no_delete(rendered_sql):
     for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
         grants = re.findall(rf"GRANT ([^;]+) ON {table} TO inv_app", rendered_sql)
         assert grants, f"{table}: no grant rendered"
-        assert not any(
-            "DELETE" in g.upper() for g in grants
-        ), f"{table}: DELETE granted"
+        assert not any("DELETE" in g.upper() for g in grants), f"{table}: DELETE granted"
 
         scoped = [g for g in grants if g.upper().startswith("UPDATE (")]
         assert len(scoped) == 1, f"{table}: expected exactly one column-scoped UPDATE"
-        granted = {c.strip() for c in scoped[0][len("UPDATE ("):-1].split(",")}
+        granted = {c.strip() for c in scoped[0][len("UPDATE (") : -1].split(",")}
         assert granted == set(columns), f"{table}: granted {granted}, expected {set(columns)}"
 
         # An unqualified UPDATE would defeat the point entirely.
@@ -244,3 +245,72 @@ def test_identity_columns_are_never_grantable(rendered_sql):
     forbidden = {"content_sha256", "version", "uri", "model_id", "dataset_id", "tenant_id"}
     for table, columns in LIFECYCLE_UPDATE_COLUMNS.items():
         assert not (set(columns) & forbidden), f"{table}: grants an identity column"
+
+
+# --------------------------------------------------------------------------
+# The chain itself, read from source
+# --------------------------------------------------------------------------
+
+
+def test_the_migration_graph_has_a_single_integrated_head():
+    """Two heads mean nobody knows what `head` refers to, and an upgrade picks
+    one of them."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    ordered = migration_graph.chain()
+    assert len(ordered) == len(migration_graph.load())
+    assert ordered[0].down_revision is None
+    seen = set()
+    for revision in ordered:
+        down = revision.down_revision
+        parents = () if down is None else (down,) if isinstance(down, str) else down
+        assert set(parents) <= seen, "Every parent must precede its child"
+        seen.add(revision.revision)
+    referenced = {
+        p
+        for r in ordered
+        for p in (
+            ()
+            if r.down_revision is None
+            else (r.down_revision,) if isinstance(r.down_revision, str) else r.down_revision
+        )
+    }
+    assert seen - referenced == {ordered[-1].revision}
+
+
+def test_every_irreversible_revision_says_what_to_do_instead():
+    """PLAN-DB-001: an irreversible migration states a verified restore and
+    forward-fix plan rather than forcing a downgrade.
+
+    A revision that simply refuses, with no reason recorded, leaves an operator
+    holding a broken rollback and no instruction.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    silent = [r.name for r in migration_graph.load() if r.irreversible and not r.recovery_note]
+    assert silent == [], f"irreversible with no recovery note: {silent}"
+
+
+def test_the_downgrade_target_never_crosses_an_irreversible_revision():
+    """The rollback test must stop where the plan says to stop."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    import migration_graph
+
+    ordered = migration_graph.chain()
+    target = migration_graph.downgrade_target(ordered)
+    if target == "base":
+        assert not any(r.irreversible for r in ordered)
+        return
+
+    index = [r.revision for r in ordered].index(target)
+    # Everything above the target reverses; the target itself does not.
+    assert ordered[index].irreversible
+    assert not any(r.irreversible for r in ordered[index + 1 :])

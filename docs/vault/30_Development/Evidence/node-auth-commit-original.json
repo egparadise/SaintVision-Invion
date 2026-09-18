@@ -1,0 +1,19 @@
+{
+  "originalSHA": "345cc1a9244cbf3b0ec57416cc806043936a40d8",
+  "exitCode": 1,
+  "scope": "Actual disposable PostgreSQL; original ASGI metadata handling and original API function with revocation interleaving; not physical TLS handshake",
+  "cases": [
+    {
+      "name": "test_failed_transport_does_not_authenticate",
+      "status": "failure"
+    },
+    {
+      "name": "test_revocation_before_write_prevents_heartbeat[retired]",
+      "status": "failure"
+    },
+    {
+      "name": "test_revocation_before_write_prevents_heartbeat[rotated]",
+      "status": "failure"
+    }
+  ]
+}

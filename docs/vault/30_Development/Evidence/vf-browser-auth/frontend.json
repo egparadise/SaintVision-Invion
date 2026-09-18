@@ -1,0 +1,14 @@
+{
+  "passed": 273,
+  "skipped": 0,
+  "exitCode": 0,
+  "buildExitCode": 0,
+  "sourceImportedFrom": "89a405a",
+  "restored": [
+    "Login/session",
+    "projectObservation kernel envelope",
+    "ApprovalDetail terminal-state guard",
+    "approval browser harness"
+  ],
+  "independentReview": "pending"
+}

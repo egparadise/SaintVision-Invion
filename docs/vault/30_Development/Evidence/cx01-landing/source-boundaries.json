@@ -1,0 +1,41 @@
+{
+  "candidateBase": "56fe6ca",
+  "integrationBase": "47a423e",
+  "paths": [
+    {
+      "path": "src/saintvision/server.py",
+      "sha256": "b0ab25d476ff09ce4b819aee12fee18163b9f5acd801e48748bb444103fb312c",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "deploy/Dockerfile.backend",
+      "sha256": "19d588a5b2e4856bc0d89ee0af12973908fcfa8647f9720abd2bcdc8ef25ea1d",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "src/saintvision/api/deps.py",
+      "sha256": "5feaaef3efa4cb0c0faa93a510f2280a89d003a33ab9942b4113bf06435c8769",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "src/saintvision/api/v1/storage.py",
+      "sha256": "a7e1a712ba5f037659cde91ddc8b052e2a1aef457af0d08b805cac6bfb0f7d76",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "migrations/versions/0043_replica_retention.py",
+      "sha256": "550e4af89c929dbc9e826b32e581a8a3de5d416f6899bdcbeb5776afd56d2997",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "services/control-plane/src/inv/app.py",
+      "sha256": "8fa54e96222f664e6b158eaf62e5e03a4bdc509660b62e73222a406f2d5e96f3",
+      "unchangedFromCandidateBase": true
+    },
+    {
+      "path": "services/control-plane/src/inv/business_surface.py",
+      "sha256": "9b02abcd4f5e86b04e21618e06a068dc18e733e17a67a99c86bdc51b1489ad52",
+      "unchangedFromCandidateBase": true
+    }
+  ]
+}

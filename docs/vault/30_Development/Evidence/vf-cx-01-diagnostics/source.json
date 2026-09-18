@@ -1,0 +1,9 @@
+{
+  "scope": "VF-CX-01 diagnostic output hardening; no production deployment",
+  "baseSha": "dd0456219faee626e2e36e58ec0437fa08b5ecec",
+  "sourceSha256": {
+    "tools/deployment_surface.py": "943c1b674e28bb4aa5461a9bf12e8acf946695fbebbbea6e210b861559a8e230",
+    "tests/test_deployment_surface.py": "cd544fd6b89334684351da3bbe35b01a54a16b851dc0346746f6ebbad412179f"
+  },
+  "operationalAcceptance": false
+}

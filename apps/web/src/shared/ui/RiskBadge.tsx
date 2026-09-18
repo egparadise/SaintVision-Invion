@@ -32,14 +32,14 @@ const RISK_CONFIG: Record<
   },
   L2: {
     label: 'L2',
-    description: '단일 승인 필요 (주의)',
+    description: '2인 승인 필요 (주의)',
     icon: '⚠️',
     colorVar: 'var(--color-risk-l2)',
     bgVar: 'rgba(245, 158, 11, 0.15)',
   },
   L3: {
     label: 'L3',
-    description: '2인 승인 / 기본 차단 (위험)',
+    description: '기본 차단 (위험)',
     icon: '🛑',
     colorVar: 'var(--color-risk-l3)',
     bgVar: 'rgba(239, 68, 68, 0.15)',
@@ -47,7 +47,8 @@ const RISK_CONFIG: Record<
 };
 
 export const RiskBadge: React.FC<RiskBadgeProps> = ({ level, showDescription = true }) => {
-  const config = RISK_CONFIG[level] || RISK_CONFIG.L0;
+  const config = RISK_CONFIG[level];
+  if (!config) return <span role="status">위험도 미관측</span>;
 
   return (
     <span

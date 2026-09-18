@@ -84,9 +84,11 @@ class DataReplica(Base):
             "state <> 'ready' OR (checksum_sha256 IS NOT NULL AND verified_at IS NOT NULL)",
             name="ready_requires_verification",
         ),
-        # A pin is what stops eviction, so it may only sit on a usable replica.
+        # Node loss invalidates availability, not retention. Preserve a ready
+        # replica's pin when marking it stale so recovery cannot discard it.
         CheckConstraint(
-            "pinned_until IS NULL OR state = 'ready'", name="only_ready_replicas_pin"
+            "pinned_until IS NULL OR state IN ('ready', 'stale')",
+            name="retained_replicas_pin",
         ),
         Index("ix_data_replicas_tenant_id_node_id", "tenant_id", "node_id"),
         Index("ix_data_replicas_tenant_id_location_id", "tenant_id", "location_id"),

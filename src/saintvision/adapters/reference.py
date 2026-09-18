@@ -52,6 +52,19 @@ _PATTERNS: Final[tuple[tuple[str, re.Pattern[str]], ...]] = (
 )
 
 
+def recognised_secrets(content: str) -> tuple[str, ...]:
+    """Labels of the patterns that match, never the text that matched.
+
+    Returning the label and not the match is the point: the caller wants to
+    refuse this content and say why, and putting the matched fragment into an
+    error message or a log is the same leak the refusal exists to prevent.
+
+    Recognising is not proving. An empty result means nothing here matched, not
+    that the content holds no secret, and anything built on it must say so.
+    """
+    return tuple(label for label, pattern in _PATTERNS if pattern.search(content))
+
+
 def redact_text(content: str) -> tuple[str, bool]:
     """Return ``(redacted, changed)``.
 

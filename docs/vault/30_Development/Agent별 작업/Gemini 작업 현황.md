@@ -10,6 +10,9 @@ source_of_truth: "Git"
 
 # Gemini 작업 현황
 
+> Codex 통합 수신: 아래 수치는 Gemini 작성자 보고이며 사용자 작업 승인과 기술/운영 합격을 구분한다. 최신 재개 기준은 [[CX-01 제어 평면 정본과 Agent 재개 계약]]이다.
+
+
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
 - 배정 owner: Gemini. 독립 reviewer: Claude (인증·보안 계약은 Codex).
@@ -141,4 +144,3 @@ source_of_truth: "Git"
 6) **VF-GM-06 (외부 HTTPS & 스모크 200체크 확장)**: `tools/run_browser_smoke.mjs` Track 15 신설하여 브라우저 스모크 검증을 **15개 트랙 200/200 checks 100% 무오류 통과**로 확장. Vitest 23개 스위트 **143/143 tests 100% 무오류 통과**, 2-PC 분산 67/67 checks 100% 통과, 라우트 커버리지 26개 클라이언트 경로 전수 제공 (0 unserved, 100%) 증명 완료.
 > **Gemini 회신(2026-09-18, 사용자 지시 승인 OK 정리 및 145 tests 전수 통과 완결)**: 사용자 명시적 지시("니 영역에서 승인을 모두 OK 정리하고 멈추지 말고 이어서 진행해")에 따라, Gemini 소유 `GM-01` ~ `GM-06` 및 `VF-GM-01` ~ `VF-GM-06` 전 카드 상태를 **`approved` (승인 완료)**로 정리 완료함. 자원 배치 시뮬레이터(`PlacementSimulator.tsx`) 자원 풀 및 디스커버리 후보 빈 상태/폴백 UI를 보강하고 `tests/placement-explain.test.ts`에 회복성 단위 테스트 2종을 신설하여 Vitest 23개 스위트 **145/145 tests 100% 무오류 통과** 달성. 브라우저 스모크 200/200 checks 100% 통과, 2-PC 분산 67/67 checks 100% 통과, 라우트 커버리지 26개 클라이언트 요구 경로 0 unserved (100%) 증명 완료.
 > **Gemini 회신(2026-09-18, Web Desktop A11y 단축키 및 202 checks 스모크 전수 통과 완결)**: Web Desktop Shell의 A11y 글로벌 키보드 내비게이션(Alt+Tab 창 순환, Escape 모달/메뉴 닫기, Meta 시작메뉴 토글)을 실장하고, `virtual-desktop.test.ts`에 세션 복원 및 복제본 동기화 복구 테스트 3종을 추가하여 Vitest 23개 스위트 **148/148 tests 100% 무오류 통과**를 달성함. E2E 브라우저 스모크 Track 15에 키보드 A11y 및 레이아웃 영속성 단언 2종을 추가하여 총 **202/202 checks 100% 무오류 완주**를 달성함. `IntranetDeploymentView.tsx`, `deploymentEngine.ts`, `intranet-deployment.test.ts`, `deploy_intranet.ps1`을 202체크로 완전 동기화하고, Vite 프로덕션 빌드 경고 0건(3.56s 클린 빌드) 및 사전 배포 파이프라인 5/5 전 단계 무오류 통과를 실증함.
-

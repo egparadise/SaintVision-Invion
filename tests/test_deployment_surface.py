@@ -12,6 +12,8 @@ that could not fail on that would be worthless, so it is driven both ways.
 from __future__ import annotations
 
 import sys
+import json
+import subprocess
 import textwrap
 from pathlib import Path
 
@@ -84,8 +86,7 @@ def test_a_factory_that_requires_configuration_is_not_obtainable(module) -> None
     report = inspect(f"{name}:create_app", REFUSES_WITHOUT_CONFIGURATION)
     assert report["obtainable"] is False
     assert "refuses to build without arguments" in report["how"]
-    # The refusal is quoted, so a reader learns what configuration it wanted.
-    assert "engine" in report["how"]
+    assert "diagnostics suppressed" in report["how"]
     assert verdict(report) == []
 
 
@@ -115,11 +116,15 @@ def test_configuration_is_stripped_before_the_import(module, monkeypatch) -> Non
     this machine rather than the deployment.
     """
     monkeypatch.setenv("INV_DATABASE_URL", "postgresql://should-not-survive/x")
-    name = module("surface_env", SERVES_UNCONFIGURED)
-    inspect(f"{name}:app", SERVES_UNCONFIGURED)
+    source = ('import os\nassert "INV_DATABASE_URL" not in os.environ\n'
+              'os.environ["INV_CANDIDATE_ADDED"] = "discard-me"\n'
+              + SERVES_UNCONFIGURED)
+    name = module("surface_env", source)
+    assert inspect(f"{name}:app", source)["obtainable"] is True
     import os
 
-    assert "INV_DATABASE_URL" not in os.environ
+    assert os.environ["INV_DATABASE_URL"] == "postgresql://should-not-survive/x"
+    assert "INV_CANDIDATE_ADDED" not in os.environ
 
 
 def test_a_database_reference_is_noticed(module) -> None:
@@ -178,7 +183,8 @@ def test_a_route_that_accepts_any_bearer_token_is_reported(module) -> None:
     entry = next(a for a in report["answers"] if a["path"] == "/v1/auth/userinfo")
     assert entry["status"] == 401, "it must genuinely refuse the empty case first"
     assert entry["acceptsAnyBearerToken"] is True
-    assert "cluster:admin" in entry["grants"]
+    assert entry["bearerStatus"] == 200
+    assert "grants" not in entry
     assert [p for p in verdict(report) if "arbitrary one" in p]
 
 
@@ -206,3 +212,103 @@ def test_an_unimportable_target_is_inconclusive_not_a_pass(module) -> None:
     assert report["how"].startswith("INCONCLUSIVE")
     problems = verdict(report)
     assert problems and "did not run" in problems[0]
+
+
+@pytest.mark.parametrize("where", ["import", "factory", "typeerror"])
+def test_exception_diagnostics_do_not_publish_sensitive_values(module, where):
+    secret = "synthetic-private-dsn-sentinel"
+    if where == "import":
+        source = f'raise RuntimeError("{secret}")'
+    else:
+        kind = "TypeError" if where == "typeerror" else "RuntimeError"
+        source = f'def create_app():\n    raise {kind}("{secret}")'
+    name = module("surface_secret_" + where, source)
+    report = inspect(f"{name}:create_app", None)
+    assert report["obtainable"] is False
+    assert secret not in json.dumps({**report, "problems": verdict(report)})
+    assert "diagnostics suppressed" in report["how"]
+
+
+def test_candidate_python_output_and_response_bodies_are_not_evidence(module, capsys):
+    secret = "synthetic-response-private-sentinel"
+    source = ACCEPTS_ANY_TOKEN.replace(
+        '{"sub": "usr_admin", "role": "cluster:admin"}',
+        '{"secret": "' + secret + '"}',
+    ) + f'''
+import sys
+print("{secret}")
+print("{secret}", file=sys.stderr)
+@app.get("/readyz")
+def ready():
+    print("{secret}")
+    return {{"status": "ready", "dsn": "{secret}"}}
+'''
+    name = module("surface_secret_response", source)
+    report = inspect(f"{name}:app", None)
+    output = capsys.readouterr()
+    assert secret not in output.out + output.err
+    assert secret not in json.dumps({**report, "problems": verdict(report)})
+    assert report["claims"] == {"status": "ready"}
+    problems = verdict(report)
+    assert any("readyz reports ready" in p for p in problems)
+    assert any("arbitrary one" in p and "HTTP 200" in p for p in problems)
+
+
+@pytest.mark.parametrize("body", [
+    '{"status":"not_ready","detail":"ready"}',
+    '{"status":"private-status-sentinel"}',
+    '["ready"]',
+    '"ready"',
+])
+def test_only_exact_readiness_status_is_reported(module, body):
+    source = f'''
+from fastapi import FastAPI
+from fastapi.responses import Response
+app = FastAPI()
+@app.get("/readyz")
+def ready():
+    return Response({body!r}, media_type="application/json")
+'''
+    name = module("surface_status_" + str(len(body)), source)
+    report = inspect(f"{name}:app", None)
+    assert not any("readyz reports ready" in p for p in verdict(report))
+    assert "private-status-sentinel" not in json.dumps(report)
+
+
+def test_dockerfile_json_cli_is_single_redacted_document(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    module_path = tmp_path / "surface_cli_secret.py"
+    module_path.write_text('print("synthetic-cli-secret")\nraise RuntimeError("synthetic-cli-secret")\n')
+    dockerfile = tmp_path / "Dockerfile"
+    dockerfile.write_text('CMD ["uvicorn", "surface_cli_secret:app"]\n')
+    import os
+    result = subprocess.run(
+        [sys.executable, str(root / "tools/deployment_surface.py"),
+         "--dockerfile", str(dockerfile), "--json"],
+        cwd=root, env={**os.environ, "PYTHONPATH": str(tmp_path)},
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 1
+    assert "synthetic-cli-secret" not in result.stdout + result.stderr
+    report = json.loads(result.stdout)
+    assert report["how"].startswith("INCONCLUSIVE")
+    assert report["problems"]
+
+
+@pytest.mark.parametrize("behavior", [
+    'raise RuntimeError("synthetic-probe-secret")',
+    'return Response("synthetic-probe-secret", status_code=503)',
+])
+def test_failed_probe_is_not_a_security_pass(module, behavior):
+    source = f'''
+from fastapi import FastAPI
+from fastapi.responses import Response
+app = FastAPI()
+@app.get("/v1/projects")
+def projects():
+    {behavior}
+'''
+    name = module("surface_probe_error_" + str(len(behavior)), source)
+    report = inspect(f"{name}:app", None)
+    assert "synthetic-probe-secret" not in json.dumps(report)
+    assert any("failing probes" in p for p in verdict(report))

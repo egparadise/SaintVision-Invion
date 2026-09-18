@@ -1,0 +1,118 @@
+{
+  "observedAt": "2026-09-12T14:31:27.919968+00:00",
+  "scope": "read-only-pilot-storage-inventory",
+  "epochMatches": true,
+  "killSwitch": true,
+  "nodes": [
+    {
+      "nodeId": "nod_01M25VZZFBYQVFGYB11G7HC10J",
+      "address": "192.168.45.225",
+      "status": "online",
+      "fresh": true,
+      "lastSnapshotAt": "2026-09-12T14:31:27.376632+00:00",
+      "profileVersion": "lan-observe-v1",
+      "agentVersion": "0.1.0"
+    }
+  ],
+  "relations": [
+    {
+      "relation": "public.storage_contributions",
+      "present": true,
+      "selectAllowed": false,
+      "schemaUsageAllowed": true,
+      "tableSelectAllowed": false,
+      "requiredColumns": [
+        "tenant_id",
+        "contribution_id",
+        "node_id",
+        "status",
+        "registered_by_user_id",
+        "normalized_path",
+        "version"
+      ],
+      "missingColumns": []
+    },
+    {
+      "relation": "public.storage_checks",
+      "present": true,
+      "selectAllowed": false,
+      "schemaUsageAllowed": true,
+      "tableSelectAllowed": false,
+      "requiredColumns": [],
+      "missingColumns": []
+    },
+    {
+      "relation": "public.data_locations",
+      "present": true,
+      "selectAllowed": false,
+      "schemaUsageAllowed": true,
+      "tableSelectAllowed": false,
+      "requiredColumns": [
+        "tenant_id",
+        "contribution_id",
+        "location_id",
+        "version",
+        "relative_path",
+        "byte_size",
+        "checksum_sha256"
+      ],
+      "missingColumns": []
+    },
+    {
+      "relation": "inv.storage_sample_requests",
+      "present": false,
+      "selectAllowed": null
+    },
+    {
+      "relation": "inv.storage_sample_consumptions",
+      "present": false,
+      "selectAllowed": null
+    }
+  ],
+  "bundles": [
+    {
+      "bundle": "worker",
+      "present": true,
+      "sha256": "f9167bb15402dffc3ba00dc08e8effca7bf0cf4124229ba39f0931240cc3cdd1",
+      "checksumMatches": true,
+      "requiredFiles": {
+        "Replace-Storage.ps1": false,
+        "worker_storage_bridge.py": false,
+        "worker_replace.py": false,
+        "worker_replacement.py": false,
+        "worker_storage.py": false
+      }
+    },
+    {
+      "bundle": "workspace-worker",
+      "present": true,
+      "sha256": "b651729eec874c947c42ab4a24be493bbe2543bd271bc80f6a20d6fd62a4cbfe",
+      "checksumMatches": true,
+      "requiredFiles": {
+        "Replace-Storage.ps1": false,
+        "worker_storage_bridge.py": false,
+        "worker_replace.py": false,
+        "worker_replacement.py": false,
+        "worker_storage.py": false
+      }
+    }
+  ],
+  "operationalAcceptanceAssessed": false,
+  "unverified": [
+    "full-migration-integrity",
+    "storage-owner-project-binding",
+    "remote-windows-wsl-bind-path",
+    "signed-storage-evidence",
+    "remote-seven-workload-tests",
+    "independent-review",
+    "ci"
+  ],
+  "blockers": [
+    "tenant-kill-switch-active-or-unknown",
+    "workspace-profile-not-observed",
+    "storage-relations-missing",
+    "observer-role-cannot-inspect-storage-registration",
+    "public-storage-replacement-bundle-missing"
+  ],
+  "deploymentAuthorized": false
+}

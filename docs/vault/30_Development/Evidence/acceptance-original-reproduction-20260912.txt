@@ -1,0 +1,27 @@
+import ast,json,subprocess
+from pathlib import Path
+import pytest
+import test_pilot as suite
+from saintvision.services import pilot as service
+pytest_plugins=["conftest","test_pilot"]
+
+@pytest.mark.parametrize("fault",[None,"expired","missed-target","wrong-criterion"])
+def test_original_catalog_claim(migrated,app_sessionmaker,pilot,monkeypatch,fault):
+    source=subprocess.check_output(["git","show","ade5bb8:src/saintvision/services/pilot.py"],text=True,encoding="utf-8")
+    fn=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=="pilot_readiness")
+    namespace=dict(vars(service))
+    exec(compile(ast.Module(body=[fn],type_ignores=[]),"original-ade5bb8","exec"),namespace)
+    captured=[]
+    def invoke(*args,**kwargs):
+        result=namespace["pilot_readiness"](*args,**kwargs)
+        captured.append(result)
+        return result
+    monkeypatch.setattr(service,"pilot_readiness",invoke)
+    # Reuse the actual fixture writes; the new assertion expects a field the
+    # original does not have. No original return value is altered.
+    with pytest.raises(KeyError,match="catalogComplete"):
+        suite.test_readiness_catalog_does_not_certify_operating_acceptance(app_sessionmaker,pilot,fault)
+    assert len(captured)==1 and captured[0]["evidenceComplete"] is True
+    if fault=="missed-target":assert captured[0]["drillsMissingTargets"]
+    result=dict(sourceSHA="ade5bb82a36b6e83101912c05852c2a293f6b752",scope="original pilot_readiness function against disposable PostgreSQL",case=fault or "metadata-only",evidenceComplete=captured[0]["evidenceComplete"],blockers=captured[0]["blockers"],missedTargetCount=len(captured[0]["drillsMissingTargets"]))
+    Path(".work/acceptance-original-"+(fault or "metadata-only")+".json").write_text(json.dumps(result,indent=2),encoding="utf-8")

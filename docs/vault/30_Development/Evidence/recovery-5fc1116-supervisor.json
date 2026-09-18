@@ -1,0 +1,9 @@
+{
+  "codeSHA": "5fc1116cd3711ee57a43e4d1ec6dabdf901772f9",
+  "kernelImage": "sha256:b76d76180aa76f2713664c2606978d3dba30dcedef8c9c3efd1e1adc8ef0ba56",
+  "binarySHA256": "45c8cbdea09bf0b79e2cd5d62c89d5c53c21971e14f346482f1b50d6e17fff56",
+  "exitCode": 0,
+  "stdout": "=== RUN   TestTerminalSuccessfulInputReplayDoesNotWriteTwice\n--- PASS: TestTerminalSuccessfulInputReplayDoesNotWriteTwice (0.00s)\n=== RUN   TestTerminalPollDoesNotConsumeSequenceAndBoundsCursor\n--- PASS: TestTerminalPollDoesNotConsumeSequenceAndBoundsCursor (0.00s)\n=== RUN   TestTerminalFailedInputPoisonsSessionWithoutReplay\n--- PASS: TestTerminalFailedInputPoisonsSessionWithoutReplay (0.00s)\nPASS\n",
+  "stderr": "",
+  "scope": "Linux Go supervisor unit tests, not a new physical PTY acceptance"
+}

@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "relativePath": "00_Index/전체 개발 진행 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-view/proposal-1.txt",
+      "externalSHA256": "6b4e5d812230fb764c5180f77ac6f6aae7982ae8c2aad0b17119d0c1c8d576ba"
+    },
+    {
+      "relativePath": "30_Development/Agent별 작업/Gemini 작업 현황.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-view/proposal-2.txt",
+      "externalSHA256": "165801d00d2d26607be1f8fdb983e2dbb0d8cea9a97732bd5848e20b77f330b0"
+    },
+    {
+      "relativePath": "30_Development/History/개발 과정 인덱스.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-view/proposal-3.txt",
+      "externalSHA256": "295a811559625d4b6891b1e9498bf6268c6797da50f841c44972bee12f5c8962"
+    },
+    {
+      "relativePath": "40_Governance/Agent 인계 대기 목록.md",
+      "proposal": "30_Development/Evidence/obsidian-proposals-20260912-storage-view/proposal-4.txt",
+      "externalSHA256": "fa8d3cc10983ac9666cdad9a330aac7cff5fe2b2b9e21bf9900100f1a5c9920b"
+    }
+  ],
+  "status": "external author proposals preserved; not independent approval"
+}

@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	node "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime"
+	"github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
 	transport "github.com/egparadise/SaintVision-Invion/services/node-agent/transport"
 	"io"
 	"net"
@@ -27,6 +28,8 @@ func run() error {
 	var state, socket, key, permit string
 	var recoverOnly, serve bool
 	var listen, tlsCert, tlsKey, clientCA, peerPolicy string
+	var objectRoot string
+	var storagePolicy string
 	flag.StringVar(&config.TenantID, "tenant", "", "verified tenant")
 	flag.StringVar(&config.NodeID, "node", "", "registered Node")
 	flag.StringVar(&config.Epoch, "epoch", "", "operator-provisioned epoch")
@@ -44,6 +47,8 @@ func run() error {
 	flag.StringVar(&tlsKey, "tls-key", "", "private Node TLS key PEM")
 	flag.StringVar(&clientCA, "client-ca", "", "explicit Control Plane client CA PEM")
 	flag.StringVar(&peerPolicy, "peer-policy", "", "versioned local Control Plane allowlist JSON")
+	flag.StringVar(&objectRoot, "objects", "", "optional private read-only content directory; SHA256 filenames")
+	flag.StringVar(&storagePolicy, "storage-policy", "", "optional private approved storage sample configuration")
 	flag.Parse()
 	if serve && (recoverOnly || permit != "") {
 		return fmt.Errorf("NODE-0005: choose one execution mode")
@@ -72,6 +77,14 @@ func run() error {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 	if serve {
+		var objects *transfer.Source
+		if objectRoot != "" {
+			objects, err = transfer.Open(objectRoot)
+			if err != nil {
+				return fmt.Errorf("NODE-0043: object directory unavailable")
+			}
+			defer objects.Close()
+		}
 		authority, err := transport.NewAuthority(config, clientCA, peerPolicy, journal.PinPeerPolicy)
 		if err != nil {
 			return err
@@ -80,16 +93,36 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		var sampler transport.StorageSampler
+		var storageInstallation *node.StoragePolicyPin
+		if storagePolicy != "" {
+			configured, err := transport.NewStorageSampler(config, storagePolicy, tlsConfig, journal.PinStoragePolicy)
+			if err != nil {
+				return err
+			}
+			defer configured.Close()
+			sampler = configured
+			receipt := configured.Installation()
+			storageInstallation = &receipt
+		}
 		listener, err := net.Listen("tcp", listen)
 		if err != nil {
 			return fmt.Errorf("NODE-0042: Node listen failed")
 		}
 		defer listener.Close()
 		// Fixed-format local startup record contains no credential or request data.
-		if err = json.NewEncoder(os.Stdout).Encode(map[string]string{"listening": listener.Addr().String()}); err != nil {
+		startup := map[string]any{"listening": listener.Addr().String()}
+		if storageInstallation != nil {
+			startup["storagePolicy"] = storageInstallation
+			startup["operationalAcceptanceAssessed"] = false
+			startup["tenantId"] = config.TenantID
+			startup["nodeId"] = config.NodeID
+			startup["recoveryEpoch"] = config.Epoch
+		}
+		if err = json.NewEncoder(os.Stdout).Encode(startup); err != nil {
 			return err
 		}
-		return transport.Serve(ctx, listener, tlsConfig, transport.Handler(authority, runner))
+		return transport.Serve(ctx, listener, tlsConfig, transport.HandlerWithStorage(authority, runner, objects, sampler))
 	}
 	if recoverOnly {
 		results, err := runner.Recover(ctx)

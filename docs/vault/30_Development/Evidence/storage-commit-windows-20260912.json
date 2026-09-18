@@ -1,0 +1,96 @@
+{
+  "scope": "Windows actual disposable PostgreSQL; precommit working tree",
+  "baseSHA": "ea5463488ab8724139f6ce5548aeb98ec3e27946",
+  "exitCode": 0,
+  "cases": [
+    {
+      "name": "test_atomic_existing_evidence_and_check_without_run_completion",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_duplicate_has_one_durable_consumption",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_response_cannot_reconsume_nonce",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE inv.project_grants SET enabled=false]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE inv.business_subjects SET enabled=false]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.project_members SET role_code='viewer']",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.storage_contributions SET status='revoked',revoked_at=now()]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.storage_contributions SET version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.storage_contributions SET normalized_path=normalized_path||'/other']",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.nodes SET status='retired']",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE inv.node_channels SET enabled=false,version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE inv.node_channels SET version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE inv.runs SET state='cancelled',version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_authority_and_catalog_changes_reject_without_partial_records[UPDATE public.data_locations SET checksum_sha256=repeat('0',64),version=version+1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_failed_outbox_rolls_back_all_three_records",
+      "status": "passed"
+    },
+    {
+      "name": "test_bad_signature_never_consumes_and_valid_response_can_retry",
+      "status": "passed"
+    },
+    {
+      "name": "test_mismatch_is_recorded_as_failed_observation_not_failed_run",
+      "status": "passed"
+    },
+    {
+      "name": "test_tenant_isolation_and_immutable_history",
+      "status": "passed"
+    },
+    {
+      "name": "test_request_id_cannot_change_sample_limit",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_project_requester_is_not_automatically_folder_owner",
+      "status": "passed"
+    },
+    {
+      "name": "test_expiry_at_final_verification_rolls_back_writes",
+      "status": "passed"
+    },
+    {
+      "name": "test_cross_tenant_accept_cannot_use_known_request_id",
+      "status": "passed"
+    }
+  ],
+  "privateJUnitSHA256": "22bd7fa3ec835dddffeddee865962c9a4944a10b8df0e88ce75a78d9fb0a566b"
+}

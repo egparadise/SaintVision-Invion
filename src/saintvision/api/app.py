@@ -22,8 +22,12 @@ from ..errors import PROBLEM_CONTENT_TYPE, VAL_SCHEMA, InvError
 from ..ids import is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
+from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
+from .v1 import projects as projects_router
+from .v1 import readiness as readiness_router
+from .v1 import settings as settings_router
 from .v1 import storage as storage_router
 
 TRACEPARENT_VERSION = "00"
@@ -85,7 +89,7 @@ def create_app(
 
     @app.middleware("http")
     async def _trace(request: Request, call_next):
-        trace_id = parse_traceparent(request.headers.get("traceparent"))
+        trace_id = getattr(request.state, "trace_id", None) or parse_traceparent(request.headers.get("traceparent"))
         request.state.trace_id = trace_id
         response = await call_next(request)
         response.headers["traceparent"] = f"{TRACEPARENT_VERSION}-{trace_id}-{'0'*16}-01"
@@ -98,6 +102,7 @@ def create_app(
             status_code=error.status or 500,
             content=body,
             media_type=PROBLEM_CONTENT_TYPE,
+            headers={"WWW-Authenticate": "Bearer"} if error.status == 401 else {},
         )
 
     @app.exception_handler(InvError)
@@ -166,4 +171,8 @@ def create_app(
     app.include_router(nodes_router.router)
     app.include_router(storage_router.router)
     app.include_router(pools_router.router)
+    app.include_router(settings_router.router)
+    app.include_router(adapters_router.router)
+    app.include_router(projects_router.router)
+    app.include_router(readiness_router.router)
     return app
