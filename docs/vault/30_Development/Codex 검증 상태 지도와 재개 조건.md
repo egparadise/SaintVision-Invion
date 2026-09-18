@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 - 후속감사8건수정본·명시범위검증존재. review/CI/운영별도. 별도MJS02 UI상수는미수정.
 - FIX02검토·내용착지완료. PITR은Claude cleanup잔여수정대기이며운영조건때문의hold아님.
-- Gemini summary2건대기: TLS파일관측을TLS1.3검증으로표시,고정202/E2E표시. Docker SKIPPED/gateway Optional분리해소.
+- Gemini summary2건 **해소(bcec3e0)**: TLS파일관측·암호미검증 및 smoke exit0·실장비미검증 분리. Codex3034ce0 회귀10passed/5.31초/exit0, 사용자독립10통과와합산금지. Docker없음/gateway실패/invalid nonempty cert/개수미제공 네조건 확인. 실제배포인수아님.
 - image최신4pass/2daemon-timeout fail/2operation-timeout skip. workspace/business-kernel-role둘다skip. host-init0은인과확정아님.
 - 외부5건은§3,미감사/부분감사6영역은위인계. 새감사/동일인수재실행없이사이클종료.
 
