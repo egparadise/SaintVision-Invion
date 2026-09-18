@@ -1,0 +1,30 @@
+{
+  "scope": "only identified resources from this retry; no prune; no operating resources",
+  "results": [
+    {
+      "kind": "container",
+      "id": "0c2d8983159a525b34f4f7b2e93e8b49055e0a25769b5bb21abbf8cbbf7fd953",
+      "exitCode": 0
+    },
+    {
+      "kind": "container",
+      "id": "c3fa8415c32e353ee267394d3af9907e0e0a36507f8dfa8638bca5a1a9984f9d",
+      "exitCode": 0
+    },
+    {
+      "kind": "volume",
+      "name": "sv-server-test-44eb63816e5c486eb039ee20ffc5c4d5",
+      "exitCode": 0
+    },
+    {
+      "kind": "volume",
+      "name": "sv-server-test-eedcdffdc5644d73a60ce5ca1be947c7-working",
+      "exitCode": 0
+    },
+    {
+      "kind": "volume",
+      "name": "sv-server-test-e904c9ef8de9467d892b485780189bc9",
+      "exitCode": 0
+    }
+  ]
+}

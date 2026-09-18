@@ -120,16 +120,5 @@
     "conclusion": "Four formerly failing cases now pass; Docker transport/operation failures persist after cleanup. Three of the original seven remain failed; previously passing writable now fails cleanup. No claim of all-security-assertions verified.",
     "testImplementationChanged": false,
     "claudeOwnedFinding": "VF-CL-R-001 implementation not modified"
-  },
-  "previousAttempts": [
-    "../cx01-image-post-cleanup/before-cleanup.json",
-    "../cx01-image-post-cleanup/attempt1.json"
-  ],
-  "resourceInvestigation": {
-    "cleanupStatus": "user-reported-completed-before-retest",
-    "postCleanupRetest": "4 passed / 4 failed / 0 skipped; exit1",
-    "daemonDownEstablished": false,
-    "resourceExhaustionEstablished": false,
-    "nextAction": "Claude VF-CL-R-001 diagnostic/cleanup test changes; Codex rerun fixed digest after handoff"
   }
 }

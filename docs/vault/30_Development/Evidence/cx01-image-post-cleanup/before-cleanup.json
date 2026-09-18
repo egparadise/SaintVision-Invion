@@ -61,75 +61,62 @@
     "--ignore=tests/integration/test_workspace_resume.py",
     "--ignore=tests/integration/test_workspace_start.py",
     "--ignore=tests/integration/test_workspace_terminal.py",
-    "--junitxml=C:\\Project\\SaintVision-Invion\\.worktrees\\codex-vf-desktop-integration\\.work\\cx01-image-post-cleanup-retry-tests.xml"
+    "--junitxml=C:\\Project\\SaintVision-Invion\\.worktrees\\codex-vf-desktop-integration\\.work\\cx01-image-final-tests.xml"
   ],
   "tests": {
-    "failure": 4,
+    "failure": 7,
     "error": 0,
     "skipped": 0,
-    "passed": 4
+    "passed": 1
   },
   "isolatedContainerRemoved": true,
-  "sourceSha": "90c07c6",
-  "cases": [
+  "limitations": [
     {
-      "case": "healthy",
-      "result": "passed",
-      "failurePhase": null
+      "case": "test_candidate_nonroot_configuration_and_workspace[healthy]",
+      "reason": "docker-daemon-io-timeout"
     },
     {
-      "case": "workspace",
-      "result": "passed",
-      "failurePhase": null
+      "case": "test_candidate_nonroot_configuration_and_workspace[workspace]",
+      "reason": "docker-daemon-io-timeout"
     },
     {
-      "case": "unreadable",
-      "result": "passed",
-      "failurePhase": null
+      "case": "test_candidate_nonroot_configuration_and_workspace[unreadable]",
+      "reason": "docker-resource-cleanup-or-operation-failure"
     },
     {
-      "case": "writable",
-      "result": "failed",
-      "failurePhase": "cleanup-volume-rm-daemon-io-timeout"
+      "case": "test_candidate_nonroot_configuration_and_workspace[public-signing-key]",
+      "reason": "docker-resource-cleanup-or-operation-failure"
     },
     {
-      "case": "public-signing-key",
-      "result": "failed",
-      "failurePhase": "cleanup-container-label-inspect-daemon-io-timeout"
+      "case": "test_candidate_nonroot_configuration_and_workspace[business]",
+      "reason": "docker-daemon-io-timeout"
     },
     {
-      "case": "business",
-      "result": "passed",
-      "failurePhase": null
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-workspace]",
+      "reason": "docker-resource-cleanup-or-operation-failure"
     },
     {
-      "case": "business-workspace",
-      "result": "failed",
-      "failurePhase": "workspace-initializer-docker-run-http500-then-cleanup-volume-in-use"
-    },
-    {
-      "case": "business-kernel-role",
-      "result": "failed",
-      "failurePhase": "startup-state-inspect-timeout90s"
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-kernel-role]",
+      "reason": "docker-resource-cleanup-or-operation-failure"
     }
   ],
-  "assessment": {
-    "productSecurityAssertionFailureObserved": false,
-    "fullImageAcceptance": false,
-    "resourceExhaustionEstablished": false,
-    "conclusion": "Four formerly failing cases now pass; Docker transport/operation failures persist after cleanup. Three of the original seven remain failed; previously passing writable now fails cleanup. No claim of all-security-assertions verified.",
-    "testImplementationChanged": false,
-    "claudeOwnedFinding": "VF-CL-R-001 implementation not modified"
-  },
-  "previousAttempts": [
-    "../cx01-image-post-cleanup/before-cleanup.json",
-    "../cx01-image-post-cleanup/attempt1.json"
-  ],
   "resourceInvestigation": {
-    "cleanupStatus": "user-reported-completed-before-retest",
-    "postCleanupRetest": "4 passed / 4 failed / 0 skipped; exit1",
     "daemonDownEstablished": false,
     "resourceExhaustionEstablished": false,
-    "nextAction": "Claude VF-CL-R-001 diagnostic/cleanup test changes; Codex rerun fixed digest after handoff"
+    "userObservation": "Docker version/info healthy; accumulated stopped test containers and unused build cache; concurrent test suites",
+    "cleanupStatus": "awaiting-explicit-user-confirmation",
+    "proposal": {
+      "exitedTestContainers": 170,
+      "unusedBuildCache": "3.624GB observed",
+      "preserve": [
+        "running containers",
+        "created containers",
+        "other exited containers",
+        "images",
+        "volumes"
+      ]
+    },
+    "postCleanupRetest": "not-run",
+    "nextAction": "On explicit approval revalidate pinned IDs/state, clean approved scope, rerun same image digest lane; compare without erasing prior failures"
   }
 }

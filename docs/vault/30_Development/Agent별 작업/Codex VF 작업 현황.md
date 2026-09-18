@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.20"
+version: "1.0.21"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-18T11:08:50+09:00"
+updated: "2026-09-18T11:52:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -145,4 +145,6 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## 2026-09-18 후속 검토와 인수 준비
 
 - Claude 8bafb60 추가3파일을 Codex 독립 검토, 관련36시험 통과 후 공유 반영. 작성자76과 중복 합산하지 않는다. VF-CX-02/03 관련104시험 통과; VF-CX-05 오프라인 패키지 검사14시험 통과, 실제 인증서/peer policy 유효기간 실패(exit1). [[2026-09-18_VF-CX-020305_인수준비_Codex]].
-- Docker 종료시험170개+미사용 build cache 정리는 사용자 명시 확인 대기. 이전 image1/7실패 유지, CI billing 사용자 조치 대기. 다음 Codex는 승인 시 정리 후 동일 image 재검증, 운영자는 .225 권한/인증서·정책 갱신 준비.
+- Docker 정리는 사용자 완료 보고 수신. 동일 image 재검증4통과/4실패; Docker I/O·HTTP500·정리 오류 잔존. 다음 Claude VF-CL-R-001 진단/정리 개선, Codex 수신 후 재검증. 운영자는 .225 갱신 준비, CI billing 대기.
+
+- [[2026-09-18_IMAGE_정리후재검증_Codex]]: 동일digest·시험소스 재검증, 첫 시도PG inspect timeout/0시험, 두 번째4passed/4failed. 이전7건중4통과/3미완, writable 정리실패 추가. 제품 단언 실패 미관측이나 전체보안검증 미완. DSN finding은 사용자 독립 검증1074/489/0수신.

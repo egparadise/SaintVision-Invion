@@ -1,0 +1,27 @@
+{
+  "baseSha": "90c07c6",
+  "priorTestSha": "8e9f8c8",
+  "files": [
+    {
+      "path": "tests/integration/test_server_container.py",
+      "sha256": "161888b0c5b3eb13cadc0302389787261ce9794e90644366818eb41497dda0d4",
+      "identicalToPrior": true
+    },
+    {
+      "path": "tools/run_vf_security_tests.py",
+      "sha256": "cb1d5289db49b0ae847b6ad25602cd42ce8e80f5dc3823a8f89cc6b713b67d68",
+      "identicalToPrior": true
+    }
+  ],
+  "imageDigest": "sha256:b93b5ef1f94469bc4b18c1214354249ec9f55974aef30898287f5feac13c1d7e",
+  "testImplementationChanged": false,
+  "readOnlyDockerSnapshot": {
+    "context": "default",
+    "images": 160,
+    "containers": 50,
+    "activeContainers": 4,
+    "volumes": 58,
+    "buildCacheReportedSize": "0B",
+    "observedDuringRetry": true
+  }
+}
