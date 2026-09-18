@@ -41,7 +41,9 @@ cleanup_owned() {
     if [ -n "$ids" ]; then
         while IFS= read -r id; do
             [ -z "$id" ] && continue
-            "$DOCKER" rm -f "$id" >/dev/null 2>&1 || failed=1
+            # postgres:16 declares /var/lib/postgresql/data; -v prevents an
+            # anonymous volume from surviving removal of this owned probe.
+            "$DOCKER" rm -f -v "$id" >/dev/null 2>&1 || failed=1
         done <<EOF
 $ids
 EOF
@@ -60,7 +62,8 @@ EOF
 start_probe() {
     local attempt out status
     for attempt in 1 2 3; do
-        if out="$("$DOCKER" run -d --name "$NAME" --label "$LABEL" -e POSTGRES_PASSWORD="$PW" postgres:16-alpine \
+        if out="$("$DOCKER" run -d --name "$NAME" --label "$LABEL" -e POSTGRES_PASSWORD="$PW" \
+                --tmpfs /var/lib/postgresql/data:rw,size=536870912 postgres:16-alpine \
                 -c archive_mode=on -c "archive_command=$ACMD" -c archive_timeout=300 \
                 -c wal_level=replica -c shared_buffers=32MB -c max_wal_size=256MB 2>&1)"; then
             return 0

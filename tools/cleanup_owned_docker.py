@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import json
+import re
 import subprocess
 
 OWNERSHIP_LABELS = (
@@ -28,6 +29,7 @@ EVIDENCE_RETENTION_MINUTES = {
     "ai.saintvision.remote-test": 14 * 24 * 60,
     "ai.saintvision.upgrade-test": 14 * 24 * 60,
 }
+ANONYMOUS_VOLUME_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _run(args):
@@ -76,6 +78,7 @@ def _resources():
             created = value.get("Created") or value.get("CreatedAt")
             resources.append({"kind": kind, "id": value.get("Id", identifier.strip()), "name": name,
                    "labels": labels, "owner": owner, "created": created,
+                   "anonymousVolume": kind == "volume" and bool(ANONYMOUS_VOLUME_PATTERN.fullmatch(name)),
                    "running": bool(value.get("State", {}).get("Running")) if kind == "container" else False,
                    "networkContainers": bool(value.get("Containers")) if kind == "network" else False})
     return resources, unavailable, counts
@@ -94,6 +97,8 @@ def _age_minutes(created: str | None):
 def _eligible(resource, minimum_age):
     if resource["name"].startswith(PROTECTED_PREFIXES):
         return False, "protected project prefix"
+    if resource.get("anonymousVolume"):
+        return False, "anonymous Docker volume; ownership unavailable"
     if not resource["owner"]:
         return False, "ownership label absent"
     age = _age_minutes(resource["created"])
@@ -114,7 +119,10 @@ def _eligible(resource, minimum_age):
 
 def _remove(resource):
     if resource["kind"] == "container":
-        command = ["docker", "container", "rm", "-f", resource["id"]]
+        # -v removes anonymous volumes declared by images (for example
+        # postgres:16's /var/lib/postgresql/data) along with the owned
+        # container, preventing cleanup from creating new orphan volumes.
+        command = ["docker", "container", "rm", "-f", "-v", resource["id"]]
     elif resource["kind"] == "volume":
         command = ["docker", "volume", "rm", resource["id"]]
     else:
@@ -134,7 +142,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     result = {"mode": "delete" if args.delete else "list", "minAgeMinutes": args.min_age_minutes,
               "evidenceRetentionMinutes": EVIDENCE_RETENTION_MINUTES,
-              "removed": [], "retained": []}
+              "removed": [], "retained": [], "anonymousVolumes": []}
     resources, unavailable, counts = _resources()
     result["inventoryCounts"] = counts
     result["unverified"] = unavailable
@@ -145,7 +153,10 @@ def main(argv=None):
     for resource in resources:
         eligible, reason = _eligible(resource, args.min_age_minutes)
         if not eligible:
-            result["retained"].append({"kind": resource["kind"], "name": resource["name"], "reason": reason})
+            entry = {"kind": resource["kind"], "name": resource["name"], "reason": reason}
+            result["retained"].append(entry)
+            if resource.get("anonymousVolume"):
+                result["anonymousVolumes"].append({"name": resource["name"], "reason": reason})
             continue
         if not args.delete:
             result["retained"].append({"kind": resource["kind"], "name": resource["name"], "owner": resource["owner"], "reason": "eligible; deletion requires --delete"})
