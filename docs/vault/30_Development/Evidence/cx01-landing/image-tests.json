@@ -90,12 +90,14 @@
     {
       "case": "writable",
       "result": "failed",
-      "failurePhase": "cleanup-volume-rm-daemon-io-timeout"
+      "failurePhase": "cleanup-volume-rm-daemon-response-io-timeout",
+      "rootCause": "unestablished"
     },
     {
       "case": "public-signing-key",
       "result": "failed",
-      "failurePhase": "cleanup-container-label-inspect-daemon-io-timeout"
+      "failurePhase": "cleanup-container-label-inspect-daemon-response-io-timeout",
+      "rootCause": "unestablished"
     },
     {
       "case": "business",
@@ -130,6 +132,32 @@
     "postCleanupRetest": "4 passed / 4 failed / 0 skipped; exit1",
     "daemonDownEstablished": false,
     "resourceExhaustionEstablished": false,
-    "nextAction": "Claude VF-CL-R-001 diagnostic/cleanup test changes; Codex rerun fixed digest after handoff"
+    "nextAction": "Claude resolve unsafe concurrent prune and diagnostic redaction review findings, add NTSTATUS distinction; then Codex re-review and retest"
+  },
+  "hostFollowup": {
+    "source": "user independent clean-worktree report on Claude 9e69dcc; not independently reproduced by Codex",
+    "exitCodeUnsigned": 3221225794,
+    "exitCodeSigned": -1073741502,
+    "ntstatus": "0xC0000142",
+    "symbol": "STATUS_DLL_INIT_FAILED",
+    "category": "host-process-initialization-failure",
+    "reference": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55",
+    "userMeasurements": {
+      "processes": 380,
+      "availableRamMB": 2224,
+      "oneDriveHandles": 463776,
+      "systemHandles": 7682,
+      "dockerInspectSubsequentSuccesses": 10,
+      "dockerInspectSubsequentAttempts": 10
+    },
+    "oneDriveHandleLeakEstablished": false,
+    "sharedCauseForHttp500Established": false,
+    "businessKernelRoleRejectionVerified": false,
+    "distinctions": {
+      "daemon-response-io-timeout": "Observed stderr Error response from daemon: i/o timeout; response origin, not established root cause",
+      "docker-operation-timeout": "Python TimeoutExpired, no NTSTATUS observed",
+      "docker-stream-upgrade-http500": "CLI ran and received HTTP500; distinct from failure to initialize CLI. Same host pressure plausible but unproven; created initializer remained",
+      "host-process-initialization-failure": "NTSTATUS DLL initialization failure; not a daemon-returned I/O timeout"
+    }
   }
 }

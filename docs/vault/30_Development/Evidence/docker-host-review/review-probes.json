@@ -1,0 +1,43 @@
+{
+  "scope": "mocked review only; no Docker command executed",
+  "reviewedCommit": "911aed8",
+  "createdStateIncluded": true,
+  "forceRemoveWithoutReinspect": true,
+  "pruneTimeoutEscapesBestEffort": true,
+  "libpqPasswordNotMasked": true,
+  "calls": [
+    [
+      "docker",
+      "ps",
+      "-aq",
+      "--filter",
+      "label=ai.saintvision.kernel-test",
+      "--filter",
+      "status=exited",
+      "--filter",
+      "status=created",
+      "--filter",
+      "status=dead"
+    ],
+    [
+      "docker",
+      "rm",
+      "-f",
+      "other-active-run-created-id"
+    ],
+    [
+      "docker",
+      "network",
+      "ls",
+      "--filter",
+      "label=ai.saintvision.kernel-test",
+      "--format",
+      "{{.ID}}"
+    ]
+  ],
+  "imageHelperReview": {
+    "commit": "9e69dcc",
+    "libpqPasswordNotMasked": true,
+    "urlPasswordMasked": true
+  }
+}
