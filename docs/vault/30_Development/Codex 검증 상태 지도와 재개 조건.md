@@ -182,3 +182,5 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## Claude 수정대기 정정 / 사용자 방법론 정정 수신
 
 [[2026-09-18_Claude_대기상태정정과수정인계_Codex]]:2ed3d65는문서1파일뿐/PITR코드변경0. FIX02재검토·내용착지완료, PITR은Codexreview대기가아니라Claude cleanup잔여수정대기. 내용차이8/동등patch3 대조,image workspace skip누락·실PG11오표기·1179실행주체등상태문서정정인계. bb4f4cb Claude sound 문서수신(독립소스검토,런타임별도). 사용자의npm검사시점/16시험합성범위정정수용수신. 동일주입/운영시험반복없음.
+
+MJS-02 인계 구체화(기준8a8e3db): Gemini owner/Codex reviewer. 상수 UI 3건은 API smoke PASS에서 제외·미검증 표기가 최소 수정이며, 실제 browser 관측을 선택하면 항목별 음성 대조가 필요하다. [[2026-09-18_Codex_감사사이클종료와다음세션인계]]의 처리 계획 참조. owner 수신·착수는 미확인. PITR/해당 수정본 대기, 새 감사 없음.
