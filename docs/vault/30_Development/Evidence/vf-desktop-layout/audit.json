@@ -1,0 +1,25 @@
+{
+  "checkedAtKST": "2026-09-18T09:56:47+09:00",
+  "scoreSource": "docs/vault/30_Development/Evidence/development-progress-storage-check-20260912.json",
+  "scoreSourceAsOf": "2026-09-12T11:12:57+09:00",
+  "score": 2775,
+  "maximum": 4800,
+  "progress": 57.8125,
+  "remaining": 42.1875,
+  "registry": {
+    "review": 12,
+    "in_progress": 3,
+    "planned": 33
+  },
+  "registryDone": 0,
+  "vfOperationalAccepted": 0,
+  "vfCodexCards": 5,
+  "newScoreAssessment": false,
+  "testResults": {
+    "baselineFailures": 2,
+    "finalFrontendPassed": 256,
+    "buildExit": 0
+  },
+  "independentReview": "pending",
+  "operationalAcceptance": false
+}
