@@ -237,6 +237,7 @@ def list_contributions(
     session,
     *,
     tenant_id: uuid.UUID,
+    reader_user_id: str | None = None,
     node_id: str | None = None,
     limit: int | None = None,
     cursor: str | None = None,
@@ -246,6 +247,8 @@ def list_contributions(
     effective = clamp_limit(limit, default=default_limit, maximum=max_limit)
     after = validate_cursor(cursor)
     query = select(StorageContribution).where(StorageContribution.tenant_id == tenant_id)
+    if reader_user_id is not None:
+        query = query.where(StorageContribution.registered_by_user_id == reader_user_id)
     if node_id is not None:
         query = query.where(StorageContribution.node_id == node_id)
     if after is not None:
@@ -260,6 +263,7 @@ def list_locations(
     session,
     *,
     tenant_id: uuid.UUID,
+    reader_user_id: str | None = None,
     contribution_id: str | None = None,
     kind: str | None = None,
     ready_only: bool = False,
@@ -271,6 +275,14 @@ def list_locations(
     effective = clamp_limit(limit, default=default_limit, maximum=max_limit)
     after = validate_cursor(cursor)
     query = select(DataLocation).where(DataLocation.tenant_id == tenant_id)
+    if reader_user_id is not None:
+        query = query.where(DataLocation.contribution_id.in_(
+            select(StorageContribution.contribution_id).where(
+                StorageContribution.tenant_id == tenant_id,
+                StorageContribution.registered_by_user_id == reader_user_id,
+                StorageContribution.status == "active",
+            )
+        ))
     if contribution_id is not None:
         query = query.where(DataLocation.contribution_id == contribution_id)
     if kind is not None:
