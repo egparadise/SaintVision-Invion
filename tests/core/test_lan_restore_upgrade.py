@@ -3,7 +3,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
-from rehearse_lan_upgrade import assert_preserved
+from rehearse_lan_upgrade import assert_preserved, failure_report_path
 from rehearse_lan_upgrade import retain_snapshot, read_snapshot
 import hashlib
 import json
@@ -59,3 +59,27 @@ def test_saved_backup_boundaries(tmp_path, fault):
         os.link(directory / "snapshot.dump", directory / "alias.dump")
     with pytest.raises((ValueError, FileNotFoundError)):
         read_snapshot(directory, expected)
+
+
+def test_rehearsal_rejects_existing_success_output(tmp_path, monkeypatch):
+    import rehearse_lan_upgrade as subject
+    output = tmp_path / "run.json"
+    output.write_text("prior-success")
+    monkeypatch.setattr(sys, "argv", ["rehearse_lan_upgrade.py", "--state", "state.json", "--output", str(output)])
+    with pytest.raises(SystemExit) as error:
+        subject.main()
+    assert error.value.code == 2
+    assert output.read_text() == "prior-success"
+
+
+def test_failed_rehearsal_writes_separate_failure_receipt(tmp_path, monkeypatch):
+    import rehearse_lan_upgrade as subject
+    output = tmp_path / "run.json"
+    monkeypatch.setattr(subject, "rehearse", lambda *args: (_ for _ in ()).throw(RuntimeError("injected")))
+    monkeypatch.setattr(sys, "argv", ["rehearse_lan_upgrade.py", "--state", "state.json", "--output", str(output)])
+    assert subject.main() == 2
+    assert not output.exists()
+    receipt = failure_report_path(output)
+    assert receipt.exists()
+    data = json.loads(receipt.read_text())
+    assert data["status"] == "failed" and data["evidenceStatus"] == "failure-receipt"

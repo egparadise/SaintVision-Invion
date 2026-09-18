@@ -12,7 +12,7 @@
 
 ## 개발 TLS 인증서
 
-개발 인증서는 저장소 외부 디렉터리에 둡니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정해야 합니다. 이제 Compose는 이 변수가 없으면 시작하지 않습니다. 이전의 `./deploy/certs` 기본 폴백은 제거됐으므로, 기존에 Compose를 직접 실행하던 개발자도 이 변수 설정이 필요합니다.
+개발 인증서는 저장소 외부 디렉터리 사용을 권장합니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정하십시오. `tools/deploy_intranet.ps1`은 변수가 비어 있으면 호환성을 위해 `deploy/certs`로 폴백하고, 선택한 경로를 Compose에 동일하게 전달합니다. Compose를 직접 실행할 때는 외부 경로를 명시하는 것이 안전합니다. 인증서 파일은 `.gitignore`로 추적하지 않습니다.
 
 환경변수만 설정하고 파일을 만들지 않으면 구형 Compose가 bind 대상에 디렉터리를 만들 수 있습니다. 따라서 직접 Compose를 실행하지 말고 `deploy_intranet.ps1`의 leaf·키 일치 preflight를 먼저 통과시킵니다.
 

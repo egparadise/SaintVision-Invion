@@ -27,6 +27,7 @@ function isValidSha256Digest(val) {
 
 let totalChecks = 0;
 let passedChecks = 0;
+let unverifiedChecks = 0;
 
 function base64Url(buf) {
   return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -50,6 +51,11 @@ function assert(title, condition, extra = '') {
   } else {
     console.error(`  ✖ [FAIL] ${title} ${extra}`);
   }
+}
+
+function unverified(title, reason) {
+  unverifiedChecks++;
+  console.log(`  ◌ [UNVERIFIED] ${title} (${reason})`);
 }
 
 async function runTwoPcVerification() {
@@ -332,16 +338,25 @@ async function runTwoPcVerification() {
       assert('NodeStopReceipt output SHA-256 matches run outputHash', receipt.output?.sha256 === artData.outputHash);
     }
 
-    // Negative controls: strictly verify that identity mismatch & malformed digests are rejected
-    const syntheticMismatchedReceipt = {
-      runId: 'UNRELATED_RUN',
-      nodeId: 'UNRELATED_NODE',
-      attempt: 99,
-      output: { sha256: 'sha256:not-a-digest' },
-    };
-    assert('Negative control: receipt with mismatched runId is strictly rejected', syntheticMismatchedReceipt.runId !== runId);
-    assert('Negative control: receipt with mismatched nodeId is strictly rejected', syntheticMismatchedReceipt.nodeId !== run.nodeId);
-    assert('Negative control: malformed receipt digest (sha256:not-a-digest) is strictly rejected', !isValidSha256Digest(syntheticMismatchedReceipt.output.sha256));
+    // Negative controls must reach a real API rejection path. Local comparisons
+    // of constants or this file's own digest helper are not rejection evidence.
+    const unknownRunId = `${runId}-negative-unknown`;
+    try {
+      const unknownReceiptRes = await fetch(`${BACKEND_URL}/v1/runs/${unknownRunId}/receipts`, { headers: authHeaders() });
+      assert(
+        'Negative control: unknown run receipt query reaches API and is rejected',
+        unknownReceiptRes.status === 404,
+        `(HTTP ${unknownReceiptRes.status})`
+      );
+    } catch (err) {
+      if (err instanceof TypeError && err.cause) {
+        unverified('Negative control: unknown run receipt query', `backend not reachable (${err.message})`);
+      } else {
+        throw err;
+      }
+    }
+    unverified('Negative control: mismatched receipt nodeId', 'no receipt-submission endpoint is exercised by this suite');
+    unverified('Negative control: malformed receipt digest', 'no receipt-submission endpoint is exercised by this suite');
 
     // ---------------------------------------------------------------------------
     // Step 5: GPU 학습 및 다중 Node 작업 확장 검증
@@ -382,6 +397,7 @@ async function runTwoPcVerification() {
     console.log('\n================================================================================');
     if (passedChecks === totalChecks && totalChecks > 0) {
       console.log(`🎉 2-PC Distributed Execution & GPU Scaling Summary: ${passedChecks}/${totalChecks} checks passed (100%)`);
+      console.log(`   Unverified negative controls: ${unverifiedChecks} (excluded from PASS count)`);
       console.log('   All 5 collaborative steps (Codex, Claude, Gemini, 2-PC Execution, GPU Scaling) verified!');
       console.log('   (Control Plane Gateway API Contract Smoke Suite; not physical 5-node hardware acceptance)');
       console.log('================================================================================\n');

@@ -562,3 +562,13 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 [[2026-09-18_TLS_외부주입_전환준비_Codex]]: 외부 인증서 디렉터리 `SAINTVISION_DEV_CERT_DIR`와 generator `--output-dir`를 구현하고, preflight에 PEM 인증서·개인키 공개키 일치 검증을 추가. 기본 경로 호환, 외부 경로, 누락, 불일치 회귀를 포함해 관련 27 passed. `77c5311` 준비 문서를 구현 상태로 갱신. 실제 Docker `up --no-start`와 인증서 발급은 별도 환경 검증 대기. 삭제·gitignore·이력 재작성은 수행하지 않음.
 
 후속 보강: `verify_tls_cert_pair.py`의 cryptography import를 지연해 사용법 오류는 exit 2, `--help`는 exit 0, 유효 인자에서 의존성 부재는 exit 1로 분리. 관련 회귀 범위는 30 passed. README와 외부 주입 runbook에 clone 초기화 절차가 모두 반영되어 별도 문서 추가는 불필요.
+
+## UI 우선순위 6 fake fallback 경계 감사
+
+`UI-PRIORITY6-FALLBACK-AUDIT-20260919-CODEX`를 기준으로 `apps/web/src`의 화면·route adapter와 관련 시험을 정적 감사했다. ResourceExplorer의 backend 오류 후 합성 후보·capacity·detail 유지(UI-FB-01/P1 후보), PlacementSimulator의 로컬 평가 경계(UI-FB-02/P2), DeveloperStudio의 ResultView 오류 후 artifacts fallback(UI-FB-03/P2 후보)을 기록했다. `apps/web`에서 `npm exec vitest run tests/fabric-control-plane.test.tsx tests/placement-explain.test.ts`는 30 passed이며 mock/순수 계산 범위다. HTTP 실패 주입·브라우저 UI 인수·Gemini 구현은 미검증/대기이고, 다음 담당은 Gemini(구현), Codex(경계 재검토)다.
+
+## 우선순위 4 readiness·restore·storage offline 경계 감사
+
+`PRIORITY4-OFFLINE-BOUNDARY-AUDIT-20260919-CODEX`를 기준으로 `operational_readiness.py`, `storage_check.py`, `rehearse_independent_restore.py`, `rehearse_lan_upgrade.py`와 보고서 경계를 대조했다. PR4-01은 기존 성공 output이 실패 실행 뒤 남아 소비자가 stale 보고서를 읽을 수 있는 P2 후보, PR4-02는 independent restore의 finally cleanup 오류가 본문 보고서 생성을 가릴 수 있는 P2 후보다. 기존 stale-output 실패 주입은 exit2/기존 파일 보존까지 확인했지만 소비자 오인은 미재현했고, cleanup 장애 주입은 수행하지 않았다. offline readiness/storage는 DSN 부재로 5 passed/30 skipped이며 성공 위장은 찾지 못했다. 독립 restore 관련 시험은 cryptography 의존성 부재로 collection 불가였다. 다음 owner는 report provenance/cleanup receipt 구현 검토자이며, 실제 restore/LAN 인수는 승인·격리 조건 이후다.
+
+우선순위 4 후속 구현(2026-09-19): `rehearse_lan_upgrade.py`는 기존 output/failure receipt를 선행 거부하고 실패 receipt를 별도 신규 경로에 기록한다. `rehearse_independent_restore.py`는 cleanup query/remove/ownership/confirmed 상태를 본문과 분리하고 cleanup 오류에도 본문 report를 보존한다. 반드시 `.venv/Scripts/python.exe`를 사용했다. 관련 두 파일은 **30 passed**이며, 이전 시스템 Python의 cryptography collection 실패 기록은 인터프리터 오류로 정정했다. 실제 Docker/PostgreSQL 복원과 운영 인수는 미실행이다.
