@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.38"
+version: "1.0.39"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T14:45:00+09:00"
+updated: "2026-09-18T15:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,15 +19,27 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T11:45:00+09:00.
+- 확인 기준: 2026-09-18T15:15:00+09:00.
 
 ## 최근 확인한 진척
 
-- Codex 검증 경계 감사(VB-MJS-03, VB-MJS-04, VB-MJS-05) 지적 3건 완전 조치:
-  - `verify_two_pc_distributed_execution.mjs`: 고정 fixture 탈피, 실제 dispatch `runId` 영수증 조회 및 `receipt.runId`, `nodeId`, `attempt`, `epoch` 엄격 결속, 64-hex SHA-256 강제, 원본 바이트 해시 재계산 대조, 네거티브 컨트롤(식별자/노드 불일치 및 부정형 다이제스트 거부) 추가로 **79/79 checks (100% PASS)** 달성 (이전 67체크에서 결속·재계산·음성대조군 등 +12체크 확충).
-  - `reconcile_receipts_evidence.mjs`: Screen 5의 로컬 문자열 상수 해싱을 제거하고 실제 `currentResume.inputHash` 64-hex 검증, `frozenFiles` 매니페스트 정규화 직렬화 SHA-256 재계산 대조, 작업본 수정 시 동결 스냅샷 불일치 실측, 부정형 다이제스트 거부로 **64/64 checks (100% PASS)** 달성.
-  - 두 러너 공통: 조건부 요약 배너(`passedChecks === totalChecks && totalChecks > 0`) 및 `[API Contract Smoke Suite - Control Plane Gateway & In-Memory Contracts] (Note: Validates HTTP API contracts; not a substitute for physical 5-node acceptance)` 정직한 레이블링 명시 완료.
-- Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**, E2E 브라우저 스모크 **202/202 checks 100% 통과**, Python 커널 코어 510/510 tests 전수 통과, Vite 프로덕션 빌드 0 warning (3.45s 클린 빌드).
+- **Codex 배포 런처 감사(`VB-LAUNCH-01`, P2) 지적 완전 조치**:
+  - `tools/deploy_intranet.ps1`:
+    - Python 네이티브 CLI 호출 직후 `$LASTEXITCODE -ne 0` 검사 추가 및 terminating throw로 PowerShell Stop 정책과 결속.
+    - `deploy/certs/saintvision.crt`, `saintvision.key` 파일 존재 및 >0 바이트 단언 추가.
+    - `npm run build` 직후 `apps/web/dist/index.html` 파일 존재 및 >0 바이트 단언 추가.
+    - Docker Compose 검증 시 `INV_WEB_AUTH_CONFIG` (슬래시 정규화된 README.md 경로), `INV_CONFIG_VOLUME`, `INV_BUSINESS_DSN` 자동 보완 및 Docker 미설치 환경 분기(`SKIPPED`) 투명화.
+    - 요약 배너를 무조건적인 "ZERO Errors (All Exit Codes 0)"에서 정직한 단계별 요약(`[1/5]`~`[5/5]`, `[OPT]`) 및 `Scope Assurance Boundary`로 전면 교체.
+    - 파이프라인 전체 `try ... catch { throw $_ }` 가드로 상위 호출자 및 호스트 프로세스에 즉시 실패 종료 코드 1 전파.
+  - `tests/test_deploy_intranet_preflight.py`:
+    - 영구 회귀 시험 5건 작성 및 전수 통과 (**5 passed** in 2.49s). 인증서 생성 실패(exit 23) 시 Step 1에서 즉시 exit 1로 중단되고 Step 2(Vitest)로 진행하지 않는 음성 대조군 검증 완료.
+  - `docs/vault/30_Development/Evidence/verification-boundary-audit/launcher-fix-results.json` 실측 증거 기록 완료 (5개 주입 케이스 실측 전수 합격).
+- **Codex 검증 경계 감사(`VB-MJS-03`, `VB-MJS-04`, `VB-MJS-05`) 조치 완료 상태 유지**:
+  - `verify_two_pc_distributed_execution.mjs`: **79/79 checks PASS** (100%).
+  - `reconcile_receipts_evidence.mjs`: **64/64 checks PASS** (100%).
+- **프론트엔드 및 브라우저 스모크 검증**:
+  - Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**, E2E 브라우저 스모크 **202/202 checks 100% 통과**, Vite 프로덕션 빌드 클린 생성.
+- 보고서: [[2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고]].
 
 ## 작업 카드 (최초 48개 태스크 중 프론트엔드 범위)
 
