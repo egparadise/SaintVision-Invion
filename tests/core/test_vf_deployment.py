@@ -19,6 +19,7 @@ def compose_env():
     # Explicitly replace every deployment input; never expose ambient operator settings.
     return {**{k: v for k, v in os.environ.items() if not k.startswith(('INV_', 'POSTGRES_', 'MINIO_'))},
         'INV_WEB_AUTH_CONFIG': str(ROOT / 'README.md'), 'INV_CONFIG_VOLUME': 'vf-synthetic-only',
+        'SAINTVISION_DEV_CERT_DIR': 'C:/SaintVision/secrets/synthetic-only',
         'INV_BUSINESS_DSN': 'postgresql+psycopg://synthetic:synthetic@postgres/test',
         'INV_RUNTIME_DSN': 'postgresql://synthetic:synthetic@postgres/test',
         'INV_RECOVERY_EPOCH': '11111111-1111-1111-1111-111111111111',
