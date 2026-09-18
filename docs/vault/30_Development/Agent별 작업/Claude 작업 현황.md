@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 updated: "2026-09-11T18:40:00+09:00"
@@ -12,7 +12,7 @@ source_of_truth: "Git"
 
 [[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
 
-- 배정 owner: Claude. 독립 reviewer: Codex. 현재 카드 수신/착수 여부: **Codex의 초기 정의이며 각 담당 Agent의 수신 확인은 아직 없다**. Codex는 이 문서 작업만 실제 수행 중이다.
+- 배정 owner: Claude. 독립 reviewer: Codex. 최신 수신·착수·독립검토 상태는 아래 SHA별 인계 기록을 따른다.
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill service-integration v1.0.0. 계획: [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
@@ -245,3 +245,10 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
 | 다음 카드 / 첫 행동 / 다음 담당 | model 권한 결속/CAS 독립 검토 완료(sound). 남은 것: Codex R5 수정본 재검토·착지, 여유 호스트 image lane 재판별. 담당 Codex(착지)·사용자/CI(재실행) |
 | History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_..._근본원인과R2수정.md` v1.4.0; `..._VF-CX_Claude_model_remote독립검토.md`; `..._VF-CX_Claude_원격권한결속과CAS_fixture독립검토.md`. 커밋 56aa7cb·b809fbe·816346c + R5(아래) |
+
+
+## Codex 통합 수신 (2026-09-18)
+
+d59b8a6 전체를 b378785로 integration에 반영했다. 사용자독립24passed/0failed(실Docker포함), Codex오프라인22passed/2실Docker제외·격리import통과, 병합후동일22/2. R2~R5 보류해제와 image미검증6건/business-kernel-role미검증 운영인수는 구분한다. 8c347b7/e89a415의 Claude sound 소스검토 수신, 새 e2908a5 registry 실행 연결 독립검토는 다음 Claude(미실시).
+
+동기화 중 외부 공유판 v1.0.10과 Git branch의 과거 v1.0.0 계보 차이를 확인했다. 외부 원문 전체와 hash는 ../Evidence/claude-d59-landing/shared-claude-before.txt 및 shared-proposal.json에 보존했다. 과거 credential/storage/RPO 후속 인계를 삭제하지 않고 제안 원문으로 수신한다. 이 과거 상태를 현재 착지·운영 인수 완료로 자동 적용하지 않는다. 최신 정본은 이 페이지와 [[2026-09-18_Registry_실행권한결속_Codex]]의 고정 SHA 증거다.

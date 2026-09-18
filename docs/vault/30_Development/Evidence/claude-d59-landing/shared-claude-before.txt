@@ -1,0 +1,216 @@
+---
+doc_id: "WORKBOARD-CLAUDE-001"
+title: "Claude 작업 현황"
+version: "1.0.10"
+status: "review"
+author: "Codex"
+updated: "2026-09-12T13:24:54+09:00"
+source_of_truth: "Git"
+---
+
+# Claude 작업 현황
+
+[[전체 개발 진행 현황]] → 이 페이지 → [[Agent 지속 개발 운영 규칙]] 순서로 확인한다. 이 페이지는 현재 후속 카드 목록이며 이전 장문 보고서는 SHA별 근거다.
+
+- 배정 owner: Claude. 독립 reviewer: Codex. 현재 착수/검토 기록은 아래 실제 SHA와 History로 확인한다. 작성자 보고를 독립 승인으로 바꾸지 않는다.
+- 공통 Skill: agent-delivery v1.1.0, 역할 Skill service-integration v1.0.0. 계획: [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]].
+- 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.29.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
+- 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
+
+## 최근 확인한 진척
+
+Codex RPO 검토 인계:4b09dfc timeout=운영RPO, raw archive_command, CLI/record gate 불일치와 실제 pilot met_targets 오류를 b49ecd3/0036에 보완했다. Linux69·core53·upgrade23 실제 통과, 독립 reviewer Claude pending. 8a8f3b4의 기록 fault3개는 최신 Codex 정본에 이미 수정돼 있으며 ledger 신규 연결은 후속 검토다. [[2026-09-12_RPO-CAPABILITY_Codex_검증보고]].
+
+Codex 후속 인계: 보호 credential CLI76ba5ba와 ADR-079의 원자 회전/회수·현재 scope·운영 절차 독립 검토 pending. 기존 backend를 Provider에 연결한다. Claude4b09dfc/c632d3f RPO 변경은 수신했으며 Codex 후속 독립 검토 대상이다. [[2026-09-12_CREDENTIAL-PROVISION_Codex_검증보고]].
+
+Codex 인계 2026-09-12T01:12:51+09:00: Claude dcad652 Context와5995b8b readiness 도구를 수신·검토해0f5f4e8에 보완 통합했다. 기존 원본 검토와 Codex 수정의 독립 승인은 별개다. CL-01의 다음 대상은74012b3/0035·0f5f4e8/ADR-077/078이며, 실제 Linux backend는 Codex가 구현했으므로 재작성하지 않고 CL-05 Provider 연결에 사용한다. 작성자 수정 승인 pending. [[2026-09-12_CREDENTIAL-BACKEND_Codex_검증보고]].
+
+CL-01 (Claude, 2026-09-11): d14db0a 독립 검토 완료. finding 2건(F1 제공량 기록·실제 불일치 재현, F2 PTY 감사 순서)을 Codex에 인계 대기. definer 함수 9개 전수 tenant 결속을 실측으로 확인했다. 전문 [[Claude_CL-01_커널독립검토]].
+
+9995122: 복원에 public+inv 테이블 수·권한 digest 대조를 추가하고 live pg_proc definer 점검 도구를 작성했다. 코드 변경 확인이며 이 문서 작성자가 새 도구를 실운영 검증하거나 독립 승인한 것은 아니다.
+
+0581964 (Claude, 2026-09-11): 복원 시험에 인가 모델·definer 함수·서비스 재개·RLS 실제 작동 검사를 추가했다. policy 122개가 전부 살아 있고 digest까지 동일하면서 두 tenant가 서로 보이는 복원본이 기존 검사를 모두 통과하던 것이 핵심 결함이었다. 남은 object 저장소·journal은 각각 S01 미결정과 원격 설치에 막혀 있다.
+
+c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 검사가 실패할 수 있음을 로컬에서 실증했다. 네 결함 모두 "증거 없는 통과"를 만들고 있었다 — 특히 fencing 조회 실패가 0으로 읽혀 "safe"가 출력되던 건은 복원 수락 여부를 결정하는 검사에서의 거짓 통과였다. 정상 시험 RTO 6.1s·RPO 6.2s, old epoch 시험 exit 1. 역할·RLS·object 저장소·서비스 재개는 아직 검사 밖이므로 전체 복원 합격은 미완료다. reviewer Codex의 독립 확인은 아직 없다.
+
+## 작업 카드
+
+각 카드의 sprint/area/outcome/acceptance는 부모 task에서 상속한다. 원래 task owner를 바꾸지 않는다. CL-01은 독립 검토 업무다. 카드 상태와 원래 48개 task의 최종 done은 별개다. 각 카드의 base/branch와 실제 검증값은 착수 시 담당자가 고정한다.
+
+| 카드 | 우선순위 | 상태 | 부모 task | 범위 |
+|---|---|---|---|---|
+| CL-01 | P0 | in-progress | S01-DB S04-DB S06-BE S06-DB S08-DB | Codex 최신 커널 독립 검토 |
+| CL-02 | P0 | ready | S02-BE S02-DB S02-ST S03-DB | 운영 로그인·권한·Workspace·폴더 적용 |
+| CL-03 | P0 | in-progress | S12-DB S12-ST | 복원 도구의 남은 검증 결함 수정 |
+| CL-04 | P1 | ready | S03-DB S03-ST S09-ST S10-ST | Artifact·모델 바이트 정본과 보존 정리 |
+| CL-05 | P1 | planned | S09-DB S09-ST S10-BE | Context와 실제 Provider/도구 Adapter |
+| CL-06 | P1 | planned | S10-BE S10-DB S10-ST | 실제 학습·평가·MLflow·승인 배포 서비스 |
+| CL-07 | P1 | planned | S12-DB S12-ST | 운영 관측·장시간 시험·복원 절차 인수 |
+
+### CL-01 — Codex 최신 커널 독립 검토
+
+- owner / reviewer: Claude / Codex; status: in-progress(검토 완료, finding 2건 인계 대기); priority: P0.
+- 원래 목표/합격 조건: OUT-01, OUT-04, OUT-06, OUT-08 / AC-01, AC-04, AC-06, AC-08.
+- 검토 SHA: `agent/codex/workspace-bridge` **d14db0a**(카드가 지정한 `c5f2154`를 포함한 현재 head), migration head `0033_workspace_bridge_merge`. 전문은 [[Claude_CL-01_커널독립검토]].
+- 실제 수행: 0028~0033의 적용 함수·grant, reservation/출력, PTY ticket/frame, Git dispatch/current scope를 지정된 범위대로 보았다. 작성자 시험 기록을 승인으로 옮기지 않고, 확인한 것은 직접 조회·실행한 결과만 적었다.
+- **Finding 2건(수정 담당 Codex)**:
+  - **F1 (중간, 재현함)** `apply_capability_offer`가 lease 총량을 서로 다른 snapshot에서 두 번 읽는다. `release()`는 lease 행만 잠그고 자원 행은 잠그지 않으므로 그 사이에 commit된다. 함수 자신의 문장 순서를 두 session으로 재생해 **요청 1000 / 기록 900 / `applied=true`**를 재현했다. `remaining`이 0으로 끝나므로 loop 끝의 검사로는 잡히지 않는다. 방향은 보수적이지만 `public.resource_offers`의 기록과 커널의 실제가 말없이 달라진다.
+  - **F2 (중간)** PTY frame의 sequence·digest 감사가 Node 실행 **뒤에** 있다. 같은 sequence로 내용이 다른 frame을 다시 보내면 Node에서 실행된 뒤 거절되고, 감사 행은 첫 내용의 digest를 유지하며 event는 `if inserted`라 남지 않는다. 실행된 것과 기록된 것이 어긋날 수 있다.
+  - F3(낮음) 폐기된 definer 함수 `run_committed_outputs`·`apply_resource_offer`가 grantee 없이 남는다(`proacl` 실측). F4(정보) `.git` 제외 규칙이 `export_snapshot`과 `git_files`에서 다르다.
+- 실제 검증 증거(로컬 PostgreSQL 16): F1 재현 로그, head DB의 `pg_proc` 전수 판정 **definer 9개 전부 tenant 결속·`search_path` 고정·unsafe 0·오탐 0**, `proacl` 실측, offer 경로와 `lock_resources`(`leases.py:32`)의 잠금 순서 일치 확인, 경합 없는 실행에서 `sum(offered)=요청량` 일치.
+- 확인하여 문제 없던 것: 0029의 처음부터의 tenant binding, 0030의 `subject_kernel_link`가 0026 누수를 막는 정의를 head에서 유지, `inv.account_provisioning_events`의 RLS ENABLE+FORCE·USING/WITH CHECK·immutable trigger·전 role REVOKE, PTY의 Node 호출 전후 이중 권한 확인과 일회용 ticket, `TerminalText`의 상한과 완전 행만 방출, Git의 요청자≠주체 시 `can_approve` 전환(4-eyes)과 snapshot/digest 검증.
+- 남은 문제: F1·F2의 해결 SHA가 아직 없다. 모든 소스 줄의 보안 감사, Node 런타임이 필요한 통합 시험, 2대 이상 실장비 PTY/Git 여정은 이번 범위 밖이며 후자는 원격 설치(.225)가 선행이다.
+- 다음 첫 행동: F1·F2를 Codex에 인계하고, 해결 SHA가 나오면 Claude가 재확인한다. 그동안 Claude는 CL-02 운영 준비를 진행한다.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+### CL-02 — 운영 로그인·권한·Workspace·폴더 적용
+
+- owner / reviewer: Claude / Codex; status: ready; priority: P0.
+- 원래 목표/합격 조건: OUT-02, OUT-03 / AC-02, AC-03.
+- 다음 첫 행동: 현재 CRUD/OIDC/provisioning을 실제 허용 계정·project·Workspace·Node·제공 폴더에 연결한다. 없는 운영 입력은 명시하고 현재 grant 교집합을 시험한다.
+- 필요한 합격 증거: 실제 로그인/권한 거부·public/kernel 매핑·ready Workspace·허용 폴더·Node 제공량 일치. 권한 부여와 실행 admission 구분.
+- 선행/차단과 해소 담당: CX-02 계약 및 운영자 계정/폴더 입력. 로컬 준비/설정 점검은 즉시 가능.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+### CL-03 — 복원 도구의 남은 검증 결함 수정
+
+- owner / reviewer: Claude / Codex; status: in-progress(수행 가능한 범위 완료, 남은 2건은 외부 차단); priority: P0.
+- 원래 목표/합격 조건: OUT-12 / AC-12.
+- 진행 branch/SHA: `review/claude-account-results` c28cdff → 0581964 → dee31e5 (9995122의 후속). push 완료.
+- 실제 수행: 지목된 네 결함을 모두 수정하고, 각 검사가 **실패할 수 있음**을 로컬 PostgreSQL 16에서 실증했다. 통과만 가능한 검사는 아무것도 증명하지 않으므로, 수정마다 거짓 통과를 재현한 뒤 차단을 확인했다.
+  1. fencing 조회 실패→0: 권한 오류로 양쪽이 0을 읽어 advance가 0이 되고 "fencing safe"가 출력됐다. 복원 수락 여부를 결정하는 유일한 검사에서의 거짓 통과다. `_fencing_state`가 컬럼별 오류 종류와 함께 `None`을 돌려주고, unknown이 합격을 차단한다.
+  2. content digest의 public 4개 한정: 실행 기록(`inv.evidence`·`checkpoints`·`node_stop_receipts`·`result_commitments`·`resource_leases`)이 대조 밖이었다. 두 schema를 모두 포함하도록 확장했다.
+  3. 누락 대 누락 동일 처리: 양쪽에 없는 테이블이 같은 값이 되어 통과했고, 빈 테이블과 잃은 테이블이 같은 해시였다. `unreadable:<Exception>`으로 구분해 `tablesUnreadable`에 싣고 `integrityVerified`를 차단한다.
+  4. mtime RPO: 파일 mtime은 복사로 갱신되므로 복구 지점이 아니라 파일시스템을 잰다. archive 헤더의 생성 시각을 읽되, pg_restore가 붙이는 zone 약어를 UTC로 가정하지 않고 `pg_timezone_abbrevs`로 해석한다. 조용히 틀린 offset은 몇 시간 어긋난 복구 지점이기 때문이다.
+  - 추가로, 합격 규칙이 `record()`와 `main()` 두 곳에서 서로 달랐다. 복구 지점을 모르는 시험이 실패로 기록되면서 exit 0이었다. `_passed()` 하나로 합쳤다.
+- 실제 검증 증거(로컬 PostgreSQL 16, 컨테이너 saintvision-lan-db-bff1a31d):
+  - fencing 조회 불가 → `{'sequenceLastValue': None, 'errors': {...: 'UndefinedTable'}}`. 이전 동작은 0/0 → "safe".
+  - `inv.evidence`가 한 필드만 다른 두 DB → row 수는 같고 digest는 `inv.evidence`만 달라짐. (해당 테이블은 `inv.immutable_record()` trigger로 갱신이 막혀 있어, SQL 변조가 아니라 원본·복원본 분기로 재현했다.)
+  - 빈 테이블 `e3b0c442…`(빈 입력의 sha256) vs 삭제된 테이블 `unreadable:UndefinedTable` → 서로 다름. 양쪽 삭제 시 값은 같지만 prefix로 걸러 차단.
+  - backup mtime을 24시간 과거로 강제 → RPO 222s(archive 헤더 기준). mtime 기준이면 86400s였다.
+  - backup 이후 fencing token 7개 발급 → "advance inv.fencing_token_seq by 6", **exit 1**.
+  - 정상 시험: RTO 6.1s, RPO 6.2s, table 1314 / column 7652 권한 일치, **exit 0**. AC-12의 RPO≤15분·RTO≤1시간은 이 값으로 충족한다.
+- 이어서 수행(0581964): 카드가 요구한 역할·RLS·definer 함수·서비스 재개를 복원 시험에 넣었다. 권한 digest만으로는 "누가 무엇을 볼 수 있는가"가 설명되지 않는다 — policy 122개를 모두 되살리고도 격리는 하나도 못 하는 복원본이 기존 검사 전부를 통과한다.
+  - 인가 모델: 역할·역할 소속·`relrowsecurity`/`relforcerowsecurity`·`pg_policies`를 부분별 digest로 대조해, 실패 시 어느 부분이 움직였는지 지목한다.
+  - definer 함수: `tools/check_definer_functions.py`를 **복원된 DB**에 실행한다. definer 함수는 RLS를 우회하고, 과거 두 번의 교차 tenant 결함 모두 `CREATE OR REPLACE`로 고쳤으므로 "지금 그 DB가 어떤 정의를 들고 있는가"는 복원 시점에만 물을 수 있다.
+  - 서비스 재개: 실제 요청이 하는 읽기를 비소유자 역할로 tenant scope 안에서 수행한다. 모델의 두 반쪽을 각각 본다 — `inv_app`은 `public` USAGE로 요청 경로를, `inv`의 실행 기록은 `inv_kernel` 소속으로 접근한다. 한쪽만 보면 접근의 절반을 잃은 DB를 "정상"이라 부른다.
+  - RLS 실제 작동: tenant 두 개를 심고 한 scope로 읽어 다른 tenant의 행이 **보이지 않아야** 통과한다. 항상 rollback하므로 `--keep`에서도 행이 남지 않는다.
+- 추가 검증 증거(각 검사가 실패할 수 있음을 실증):
+  - `public.projects`의 RLS를 끄면 policy 122개가 그대로 나열되고 policy digest도 바이트 동일한데 두 tenant가 모두 보인다 → `rlsScopes` False로 거부. **기존 검사 전부가 "verified"라 부르던 경우다.**
+  - `inv_lan_runtime`의 `inv_kernel` 소속 해제 → memberships digest만 이동.
+  - tenant 인자를 받고 scope에 묶지 않는 definer 함수 추가 → 7개 검사 중 1개 unsafe, 함수명까지 출력.
+  - `inv_kernel`의 `inv` schema USAGE 회수 → `publicRead`는 여전히 True인데 `resumed` False. 요청 경로만 봤다면 "정상"이라 보고했을 것이다.
+  - `inv_app`의 `public.projects` SELECT 회수 → `resumed` False.
+  - 정상 시험: 역할 4·소속 2·policy 122·RLS flag 129, definer 6개 중 unsafe 0, 서비스 재개, exit 0. 원본에는 시험 행이 0개 남았다.
+  - 결함이 아닌 확인: `inv_app`은 `inv.runs`를 읽지 못한다. 복원본과 **원본이 동일하게** 그렇고, 이는 모델이 의도대로 동작하는 것이다(`inv` USAGE는 `inv_kernel` 소유). 이 검사의 첫 판은 역할·테이블 짝을 잘못 잡았고, 원본을 대조해 바로잡았다.
+- 정정(dee31e5): 0581964이 definer 판정을 복원 합격의 관문으로 만들었는데, 그 판정은 Codex가 지적한 대로 문자열 대조 휴리스틱이었다. 확인하려고 만든 네 정의가 **전부 누수인데 전부 통과**했다 — 주석 속 binding, 문자열 리터럴 속 binding, tenant 인자를 `org`로 개명, `search_path = pg_temp, inv`. 약한 검사가 합격을 결정하게 두는 것은 이 카드 내내 제거해 온 바로 그 실패 방식이라 먼저 고쳤다. 실측: 조작 누수 4건 전부 차단, head 6개 오탐 0, 0024 실제 누수 재검출 exit 1, 시험 17개 통과. 남은 한계는 정적 판정이라는 점이며 CX-01/CL-01 검토 범위다.
+- 남은 문제(합격 미충족, 둘 다 **차단**이며 미수행이 아님):
+  - **object 저장소 바이트**: `INV_OBJECT_STORE_ENDPOINT`가 `config.py`의 `S01_PENDING`이다. 확정된 저장소가 없으므로 대조할 대상이 없다. 해소 담당 Codex(S01).
+  - **node 설치 journal**: 원격 호스트(.225)에 있고 DB dump에 들어오지 않는다. 원격 설치가 선행이며 해소 담당은 원격 PC 운영자·Codex다.
+- 선행/차단과 해소 담당: CX-07 복원 계약·Codex 검토. 기존 권한 대조/public+inv count 보완은 인정하되 전체 복원 합격은 미완료.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+- CI: 세 Agent 공통으로 계정 결제·한도 문제로 실행 전에 차단된다. 위 증거는 전부 로컬 실측이며 CI 통과와 동등하지 않다.
+
+### CL-04 — Artifact·모델 바이트 정본과 보존 정리
+
+- owner / reviewer: Claude / Codex; status: ready; priority: P1.
+- 원래 목표/합격 조건: OUT-03, OUT-09, OUT-10 / AC-03, AC-09, AC-10.
+- 다음 첫 행동: public.artifacts 소비자/이력/보존 참조를 조사해 kernel 실제 object bytes로 연결하거나 보존 가능한 전환 migration을 만든다.
+- 필요한 합격 증거: 다운로드 actual bytes/hash·Evidence/model pin·GC/보존·기존 참조 이관 증거. ResultView와 중복 결과 reader 재도입 금지.
+- 선행/차단과 해소 담당: 현재 코드 조사 가능. 테이블/이력을 먼저 삭제하지 않음.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+### CL-05 — Context와 실제 Provider/도구 Adapter
+
+- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- 원래 목표/합격 조건: OUT-09, OUT-10 / AC-09, AC-10.
+- 다음 첫 행동: credential 계약 아래 Context 권한·TTL·redaction과 실제 두 Provider의 실행/취소/collect/attest를 연결한다. Orca/Codex/Claude/Antigravity의 desktop와 headless 지원 범위를 분명히 한다.
+- 필요한 합격 증거: 실제 Provider별 정상·실패·취소·누출 거부·trace/산출물 bytes. 모델 확정 전 vector 차원 고정 금지.
+- 선행/차단과 해소 담당: CX-02 credential 경계. Antigravity 미지원 headless를 실행 가능으로 표시하지 않음.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+### CL-06 — 실제 학습·평가·MLflow·승인 배포 서비스
+
+- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- 원래 목표/합격 조건: OUT-10 / AC-10.
+- 다음 첫 행동: CPU/GPU 학습 결과를 Dataset/commit/image/model bytes·평가·승인·배포 digest로 연결하고 전체 역추적을 구현한다.
+- 필요한 합격 증거: 실제 학습→평가→모델 다운로드→승인→배포/rollback 계보와 참조 보존. 예시 모델/메타데이터만으로 배포 완료 표시 금지.
+- 선행/차단과 해소 담당: CL-04/05, GPU 경로는 CX-06. CPU 경로 구현을 GPU 준비 때문에 멈추지 않음.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+### CL-07 — 운영 관측·장시간 시험·복원 절차 인수
+
+- owner / reviewer: Claude / Codex; status: planned; priority: P1.
+- 원래 목표/합격 조건: OUT-12 / AC-12.
+- 다음 첫 행동: 알람/worker 재시작/partition/보존/백업 매체/WAL·PITR·권한 재검증 절차를 검증하고 Codex·Gemini 릴리스 시험을 지원한다.
+- 필요한 합격 증거: 실제 운영 로그/알람·장시간 표본·전체 복구/사용자 인수와 실패 처리 절차. 작성자와 승인자 구분.
+- 선행/차단과 해소 담당: CL-02/03/06, CX-09와 공동 시나리오. 각각 owner는 유지.
+- 인계: 완료 증거와 남은 실패를 reviewer 및 [[전체 개발 진행 현황]]에 연결한다. 담당자별 실제 수신 확인 전에는 인계 승인으로 표시하지 않는다.
+
+## 작업 후 갱신할 최신 기록
+
+아래 항목은 담당자가 매 작업 단위마다 갱신한다. 상세 기록은 History에 새 페이지로 남기며 이전 검증/실패 이력을 덮어쓰지 않는다.
+
+| 항목 | 현재 기록 |
+|---|---|
+| 마지막 작업 / 착수 카드 | 초기 배정표 작성. 제품 작업 착수는 담당 확인 대기 |
+| 실제 owner / 읽은 진행판 버전 / KST | 담당자 입력 대기 |
+| branch / base SHA / 구현 SHA | 담당자 입력 대기 |
+| 작업한 것 | 담당자 입력 대기 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 담당자 입력 대기 |
+| CI / 독립 reviewer / 운영 인수 | 각 상태를 따로 기록. 현재 전체 인수 완료 아님 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 해당 카드의 선행 조건 참조 |
+| 다음 카드 / 첫 행동 / 다음 담당 | 위 ready 카드부터 하나 선택 후 담당자가 명시 |
+| History / 오류 / Evidence / PR / sync 결과 | 실제 링크와 SHA를 담당자가 기록 |
+
+## 2026-09-11 18:53 Codex 수신·검증·후속 기록
+
+- cdf98ad의 CL-01 독립 검토를 실제 수신했다. 대상 d14db0a, F1/F2 수정 요청이며 5fc1116 승인 아님. 원본 [[Claude_CL-01_커널독립검토]] 보존.
+- dee31e5 복원 도구는 Codex 5fc1116/ADR-073에 통합했다. SQL pattern 감사 대신 단일 9개 policy 감사 유지. 이 최신 변경의 독립 검토를 요청한다.
+- F1은 다음 Codex 수정 대상. F2는 supervisor의 실행 전 sequence/hash guard와 이번 Linux3 회귀를 고려해 중복 실행 단정을 좁히고 intent/응답 유실 감사로 재검토한다.
+- CL-03 남은 범위: 독립 클러스터 role 복원·실제 계정 로그인/업무 재개·object bytes·Node journal/epoch·PITR/SLO. CL-02/04 ready 작업을 계속할 수 있다.
+
+상세: [[2026-09-11_RECOVERY-INTEGRATION_Codex_검증보고]]. 작성자 원래 기록/진척 주장은 보존하며 위 검토와 구분한다.
+
+최종 전달 갱신(2026-09-11T18:58:38+09:00): 구현869d74b/clean 검증b5aef8a Linux64·core22 exit0. 최신 독립 검토는 b5aef8a에 요청한다. 전체 진척57.29%(표시55%), CI·원격 인수 미완료.
+
+
+## Codex 검토 수신 대기 — BACKUP-LEDGER
+
+[[2026-09-12_BACKUP-LEDGER_Codex_검증보고]]: 420b81c/ADR-081 독립 검토 요청 기록. d63717f에서 P1 프로젝트 섞인 직전 snapshot 비교와 disabled 운영자 승인 과장을 실제 DB로 재현했다. P2 관측/기록 시점·동시 순서도 조율한다. 원본 함수 증거를 읽고 수정 후 고정 SHA/명령/결과로 인계한다. ade5bb8 수신은 확인했으나 Codex 독립 검토 미완료.
+
+
+## Codex 수정·검토 수신 대기 — PERMISSION-SNAPSHOT
+
+9755c60/ADR-082/083 독립 검토 요청은 [[2026-09-12_PERMISSION-SNAPSHOT_Codex_검증보고]], [[Codex 권한 관측과 운영 인수 집계 계약]]을 따른다. d63717f 프로젝트/disabled/관측시점 지적을 보완했고 ade5bb8의 만료/목표초과/다른criterion/metadata-only 완료 과장4개를 실제 재현해 수정했다. 별도 collector를 복제하지 말고 정본 서비스·CLI 및 consumer를 조율한다. 실제 검토 수신/승인은 pending.
+
+
+## Codex 백업 verifier 검토 수신 대기
+
+[[2026-09-12_BACKUP-VERIFY_Codex_검증보고]]의 4ddb622/ADR-084 독립 검토 필요. 기존 verification.py의 실제5개 실패를 비교 전 row잠금/baseline, 비교 후 savepoint로 보완했다. 과거 성공 관측과 최근 실패를 구분하며 현재 bytes 정상/운영 인수 완료로 승격하지 않는다. hash_file open-time 경계는 Codex 후속.
+
+
+## 2026-09-12 Node 인증 전달·작성자 외부 보고 수신
+
+Claude의 CL01/02/04/07 후속 조사·00b1159 알람 보고 전체를 [원문/hash](../Evidence/obsidian-proposals-20260912-node-auth/manifest.json)로 보존했다. 알람7개 평가/partition2027-01-01은 작성자 보고이며 이번 Codex에서 독립 검증하지 않았다. permission/backup/storage 판정은 최신 Codex 보완 보고를 따르고 기존 검토 요청은 계속 pending이다.2830887/ADR-087 inbound 인증 오류·회수 경쟁 보강의 독립 검토가 필요하다. storage_check는 read-only이며 --node가 실제 기계를 증명한다는 원본 설명은 ADR-086에서 정정됐다.
+
+
+## 추가 수신·독립 검토 대기 (2026-09-12T12:19:39+09:00)
+
+Codex124fe97 서명 sample/ADR-088: [[2026-09-12_STORAGE-SIGNED-SAMPLE_Codex_검증보고]]:124fe97 실제 ReadRoot sample·불변 Run/ChannelProof/root/catalog/nonce challenge·Ed25519 서명 검증, Windows124/Linux129 통과. 내부 Python 수집/검증 모듈이며 Go 배포·durable nonce·StorageCheck/inv.evidence 원자 기록은 아직 남음. CI 계정 제한/독립 검토/물리 장비 인수 별도, 전체57.81% 유지.
+
+Claude f17ad62 partition runner3파일 변경을 git show로 확인했다. 작성자7시험/실측27개 partition/110→383일 주장은 수신 기록이며 Codex 독립 재현/운영 적용은 하지 않았다. 이전00b1159 알람과 함께 검토 대기. 외부 원문은 Evidence/obsidian-proposals-20260912-storage-signed에 보존했다. 기존 검토 요청 기록을 삭제하지 않는다.
+
+
+## Go Node sample 검토 요청 (2026-09-12T12:57:44+09:00)
+
+[[2026-09-12_STORAGE-NODE-TRANSPORT_Codex_검증보고]]:688678d Go opt-in 폴더 설정/mTLS/실제 서명 sample과 Python 검증 연결. Linux 실제 통합130, Windows98 및 Go 경계 시험 통과. durable challenge/nonce 소비·기존 StorageCheck/Evidence 원자 쓰기는 다음 작업. 운영 .225/Windows native 수집/CI/독립 검토 미완료, 전체57.81% 유지.
+
+현재 독립 검토 대상688678d/ADR-089. 작성자 Codex의 시험은 reviewer 승인과 별개다. Agent 인계 대기 목록 외부 Claude/Gemini 절은 원문을 보존해 수신했으며 기존 보완 SHA의 검토 요청을 삭제하지 않았다.
+
+
+## 외부 후속 인계 수신 (2026-09-12T13:24:54+09:00)
+
+공유본 외부 수정4개를 [원문·SHA256 보존본](../Evidence/obsidian-proposals-20260912-storage-commit/manifest.json)으로 받았다. 정본의 최신 Codex 검증 이력은 유지한다. Claude의 기존 복원/Storage/RPO 정정 및 F1~F4는 고정 SHA별 후속 수정과 대조가 필요하다. Gemini는 GM-03 PTY ticket/Drain 연결과 smoke154/Vitest106/2-PC63/deploy5를 작성자 보고로 추가했다. 이번에는 해당 소스·실장비를 독립 검증하지 않았으며 자동 승인이나 운영2-PC/GPU 성공으로 채택하지 않는다. 원문 시각은 작성자 기재값이며 현재 검증 시각으로 사용하지 않는다.
+
+공통 성숙도는 검증된48행 기준57.81% 유지, Gemini의 기대65.63%는 독립 통합 검토 전이다. 새 Codex fd0c081/0037 저장소 기록은 [[2026-09-12_STORAGE-COMMIT_Codex_검증보고]]를 따른다. 다음 Codex는 sample 조회/운영 설치 계약, Claude는0037 독립 검토, Gemini는 최신 통합 SHA를 명시한 실제 API/브라우저 증거 보완이다. 수신은 다른 Agent 실행 또는 승인을 뜻하지 않는다.
