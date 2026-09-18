@@ -12,7 +12,7 @@
 
 ## 개발 TLS 인증서
 
-개발 인증서는 저장소 외부 디렉터리에 둘 수 있습니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정합니다. 변수를 생략하면 기존 `./deploy/certs` 경로를 사용합니다.
+개발 인증서는 저장소 외부 디렉터리에 둡니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정해야 합니다. Compose는 이 변수가 없으면 시작하지 않습니다.
 
 ```powershell
 python -m venv .venv

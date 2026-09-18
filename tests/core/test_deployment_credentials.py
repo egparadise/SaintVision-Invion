@@ -13,6 +13,7 @@ REQUIRED = {"INV_BUSINESS_DSN": "postgresql+psycopg://example:example@postgres/s
             "INV_CONFIG_VOLUME": "synthetic-config-volume",
             "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
             "POSTGRES_PASSWORD": "synthetic-admin-only", "MINIO_ROOT_USER": "synthetic-admin",
+            "SAINTVISION_DEV_CERT_DIR": "C:/SaintVision/secrets/saintvision-dev",
             "MINIO_ROOT_PASSWORD": "synthetic-storage-only"}
 
 
@@ -86,7 +87,7 @@ def test_tls_file_mounts_never_create_host_directories():
         assert mount["bind"]["create_host_path"] is False
 
 
-def test_tls_file_mounts_accept_external_certificate_directory():
+def test_tls_file_mounts_require_external_certificate_directory():
     import yaml
 
     compose = yaml.safe_load((ROOT / "docker-compose.prod.yml").read_text(encoding="utf-8"))
@@ -97,6 +98,6 @@ def test_tls_file_mounts_accept_external_certificate_directory():
         if isinstance(mount, dict) and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
     }
     assert tls_sources == {
-        "/etc/ssl/certs/saintvision.crt": "${SAINTVISION_DEV_CERT_DIR:-./deploy/certs}/saintvision.crt",
-        "/etc/ssl/private/saintvision.key": "${SAINTVISION_DEV_CERT_DIR:-./deploy/certs}/saintvision.key",
+        "/etc/ssl/certs/saintvision.crt": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.crt",
+        "/etc/ssl/private/saintvision.key": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.key",
     }

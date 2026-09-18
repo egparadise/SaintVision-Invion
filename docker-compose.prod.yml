@@ -11,13 +11,15 @@ services:
       - "8081:80"
     volumes:
       - type: bind
-        source: ${SAINTVISION_DEV_CERT_DIR:-./deploy/certs}/saintvision.crt
+        # Compose v2.15 ignores create_host_path=false; require an explicit
+        # external directory so a missing file cannot become a host directory.
+        source: ${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.crt
         target: /etc/ssl/certs/saintvision.crt
         read_only: true
         bind:
           create_host_path: false
       - type: bind
-        source: ${SAINTVISION_DEV_CERT_DIR:-./deploy/certs}/saintvision.key
+        source: ${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.key
         target: /etc/ssl/private/saintvision.key
         read_only: true
         bind:
