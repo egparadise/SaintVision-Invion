@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-VF-REGISTRY-AUTHORITY-REVIEW-001"
 title: "frozen registry 권한을 approval·dispatch·admission에 결속(e2908a5) 독립 검토 (Claude)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-18T23:30:00+09:00"
+updated: "2026-09-19T09:00:00+09:00"
 branch: "agent/claude/vf-cl-cx01"
 task: "VF-CX (model registry binding)"
 source_of_truth: "Git"
@@ -60,3 +60,15 @@ registry 권한을 frozen 바이트에 CAS로 결속하는, channel/source 패�
 ## 결론·인계
 
 registry 권한 결속은 freeze(canonical binding 기록)→admission(revalidate+byte-CAS, request/grant/claim)→replay 재검증→재scope CAS의 계층이 일관되고, TOCTOU 안전(SHARE 잠금 유지), 무downgrade 양방향, 정책·lifecycle를 admission에서 신선하게 재검사하며, binding은 실행 권한도 volatile 필드도 담지 않는다. 500 누출·권한 우회가 없다. **finding 없음.** Codex에 sound 판정을 인계한다. 실 PG 실행 확인은 Codex 증거/CI가 수행했다.
+
+## 후속 — 11e9f44 "Connect strict operator registry policy to configured control plane" 독립 검토 (2026-09-19)
+
+e2908a5의 `RegistryBindingPolicy`를 operator config에서 제어평면에 연결하는 후속 커밋. 변경: 신규 `model_registry_config.py`(+21), `app.py`(+10), 시험 `test_model_registry_config.py`(+71). **판정: sound, finding 없음.**
+
+- **operator-only 신뢰 경계**: `configured_registry_policy`는 `INV_API_CONFIG`(operator 파일, `trusted_file`+`strict_object`)에서만 온다. docstring "never accepted from a workload"가 코드와 일치 — 요청/workload가 정책을 주입할 수 없다.
+- **엄격 검증**: top-level 키 `{"version","allowed"}` 정확 일치, entry 키 `{"licensePolicy","classification"}` 정확 일치(추가 키 차단), allowed 1..64, 각 str 1..256, 중복 pair 거부(`frozenset` 조용한 축소가 아니라 명시 거부). version 타입/길이는 `RegistryBindingPolicy.__post_init__`가 검증.
+- **fail-closed·무유출**: 잘못된 present 정책 → factory `create_configured_app`의 `except Exception → RuntimeError('configuration unavailable')`로 **서비스 미기동**(legacy None으로 fallback 안 함), 원본 예외 대체로 **config 값 미유출**. 부재 → 명시적 legacy None(e2908a5 current_registry 로직과 정합).
+- **시험 non-vacuous**: 16 거부 케이스(None/False/{}/추가키/version 타입·경계/allowed 빈·과다·중복·잘못된 part 타입·257자/**`executionAuthorized` 몰래 넣기**) + factory가 정책을 공유 Database에 전달·legacy None 유지·잘못된 정책 시 미기동/미fallback/**sensitive-sentinel 미노출**을 실증.
+- **한계**: 이 시험은 DB/Docker 불필요(startup 검증)라 내 환경에서 실행 가능하나, 착지 회귀는 Codex/CI 몫으로 두었다. 코드 경로·계약으로 검증.
+
+결론: operator 정책 config-wiring이 엄격·fail-closed·무유출이며 e2908a5 registry 권한과 정합한다. **finding 없음.** Codex에 sound 인계.
