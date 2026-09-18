@@ -38,6 +38,20 @@ PITR-R2-02 cleanup 코드는 앞서 Codex가 고정 SHA에서 13개 원본 대�
 
 현재 실제 계약 판단은 “6개가 모두 미제공”이 아니다. 세 실제 불일치는 Gemini `bd82947` 이후의 `99ca23e`·`777f309` 계열에서 프론트 계약을 정렬했고, 세 오탐은 `adaec4e`에 근거를 기록했다. 이 문서는 소스 정의와 회귀 시험에 근거한 판단이며, live HTTP 404가 실제로 재현된 운영 인수 증거는 아니다.
 
+## 오늘 최종 회귀와 정정 인계
+
+사용자 실행 `a04c17c`: tests/integration 제외, 기본 `not docker_host`, DSN 없음에서 **1263 passed / 489 skipped / 2 deselected / 0 failed, 74초**. 아침 1074 대비 +189이지만 추가 시험의 기원을 전수 대조하지 않았으므로 감사 회귀 증가로 귀속하지 않는다. 시험 수를 완료율로 해석하지 않는다.
+
+다음 다섯 정정은 후속 기록에 남아 있다.
+
+1. image 4/3/2 변동은 harness와 호스트 조건이 함께 달라 인과 실험이 아니다.
+2. OneDrive handle 감소·host-init 0건은 관측이며 OneDrive 단일 원인으로 확정하지 않는다.
+3. `unreadable`은 이전 실행에서 host-init이 아니라 timeout 범주였다.
+4. npm build nonzero 검사는 기존부터 있었고, `84a86f1`은 dist 존재·크기 검사를 추가했다.
+5. route 도구의 템플릿 리터럴 누락과 설정 문자열 오인은 도구 오탐이다. 구체적으로 (a) template head를 bare collection으로 추출, (b) Claude가 기록한 prefix/스캔 범위 오탐, (c) `deploymentEngine.ts`의 nginx location/upstream 서술 문자열을 클라이언트 API 호출로 오인하는 세 유형이다.
+
+다음 세션은 외부 대기 5건과 미감사 6영역을 기존 조건대로 재개한다. 오늘 추가된 인계는 route 도구 세 오탐 유형을 적용해 같은 조사를 반복하지 않는 것뿐이다. route 계약은 현재 실제 불일치 0건으로 기록하되, live HTTP 운영 인수로 과장하지 않는다.
+
 ## 인계
 
 Claude 문서 정정과 PITR cleanup은 착지했다. 남은 운영 항목은 AC-12 활성/별도 저장소, image lane의 business-kernel-role 미검증, 원격 장비와 CI 외부 조건이다. route coverage의 추가 backend endpoint 구현은 현재 필요하지 않으며, 이후 실제 HTTP 계약 변경이 생길 때 해당 owner가 새 경로와 음성 회귀를 함께 제출한다.
