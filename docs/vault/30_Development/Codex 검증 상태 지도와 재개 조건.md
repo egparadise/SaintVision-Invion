@@ -1,11 +1,11 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-18T15:06:40+09:00"
+updated: "2026-09-18T15:27:25+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,15 +13,25 @@ source_of_truth: "Git"
 
 개발 기준 코드 d7e7d13, 후속image실행 기준 f4b3f73, 공유 branch integration/all-agents-unified. 사용자 요청에 따른 상태 감사이며 새 제품 구현/운영 재실행은 하지 않았다. 각 행의 SHA·범위에만 결과를 적용한다. 통과 건수는 중복 합산하지 않는다. 작성자 실행, 사용자 독립 실행, Claude 소스 검토, CI, 운영 인수는 서로 대체하지 않는다.
 
-## MJS 검사 수치의 현재 보증 범위
+## 오늘 사이클 최종 상태 — 회귀 기준6feccd8
+
+[[2026-09-18_Codex_감사사이클종료와다음세션인계]]이 다음세션 인계 정본이다. 사용자독립실행 **1254passed/489skipped/2deselected/0failed,80초**: integration제외/기본not docker_host/DSN없음.1074대비180증가(1081대비173). 작성자전체재실행0.
+
+- 후속감사8건수정본·명시범위검증존재. review/CI/운영별도. 별도MJS02 UI상수는미수정.
+- FIX02검토·내용착지완료. PITR은Claude cleanup잔여수정대기이며운영조건때문의hold아님.
+- Gemini summary2건대기: TLS파일관측을TLS1.3검증으로표시,고정202/E2E표시. Docker SKIPPED/gateway Optional분리해소.
+- image최신4pass/2daemon-timeout fail/2operation-timeout skip. workspace/business-kernel-role둘다skip. host-init0은인과확정아님.
+- 외부5건은§3,미감사/부분감사6영역은위인계. 새감사/동일인수재실행없이사이클종료.
+
+## MJS 검사 수치의 보증 범위 (과거 실행과 현재 수정 구분)
 
 수신 숫자는 실행별 기록으로 보존하되 실제 장비·화면 인수로 승격하지 않는다. [[2026-09-18_MJS_수치인용_정정_Codex]] 및 [[2026-09-18_MJS_후속3도구_감사_Codex]]가 아래 범위의 근거다.
 
 | 수치·도구 | 수치가 보여주는 범위 | 보증하지 않는 것 / 남은 조건 |
 |---|---|---|
-| 2-PC67 checks / verify_two_pc_distributed_execution.mjs | 해당 실행의 HTTP 응답 필드·상태 조건. 감사에서는 합성 fetch로67/67 재현 | 새dispatch와 receipt의run/node/attempt/epoch 결속, artifact bytes/hash, 실제2PC·GPU 학습·브라우저. VB-MJS-03 수정/음성대조 및 실제장비 관측 필요 |
+| 2-PC67 checks / verify_two_pc_distributed_execution.mjs | 해당 실행의 HTTP 응답 필드·상태 조건. 감사에서는 합성 fetch로67/67 재현 | 새dispatch와 receipt의run/node/attempt/epoch 결속, artifact bytes/hash, 실제2PC·GPU 학습·브라우저. 1ecdb12 수정79/79보고수신. 실제장비관측/음성대조경로review잔여 |
 | browser smoke200/202 checks / run_browser_smoke.mjs | 당시 runner의 HTTP/WebSocket 등 조건 집계. 숫자 자체가 DOM/화면 조작 관측 수는 아님 | UI상수true3건은 관측0인 PASS, 구버전shard2단언은 빈목록가드 없음. shard가드는9251f18 수정/작성자·사용자12회귀 확인, 전체200/202 재실행/재인증 아님. VB-MJS-02 수정 필요 |
-| reconciliation59 checks / reconcile_receipts_evidence.mjs | 감사의 합성 응답+로컬해시 계산으로59/59. 과거보고는 각 실행SHA·입력 범위만 적용 | 실제5화면 DOM관측, working/frozen bytes대조, receipt-shard-output 결속. VB-MJS-03/04/05 수정 필요 |
+| reconciliation59 checks / reconcile_receipts_evidence.mjs | 감사의 합성 응답+로컬해시 계산으로59/59. 과거보고는 각 실행SHA·입력 범위만 적용 | 실제5화면 DOM관측, working/frozen bytes대조, receipt-shard-output 결속. 1ecdb12 수정64/64보고수신. 실제editor/계약review잔여 |
 | 별도 실제 browser6passed | 합성IdP+실제HTTP+격리PG 기반 해당 브라우저 시나리오 | 위MJS와 다른 harness/분모다. 운영SSO·5대장비·전체UI 인수로 확대하지 않으며 MJS결함으로 자동무효화하지도 않음 |
 
 MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대조군은2PC66/1·reconciliation58/1 exit1이었다. 과거 실제 실행이 mock/조작이었다고 주장하지 않는다. 과거200/202에서 결함단언을 산술로 빼 새합격수로 제시하지 않는다. [[2026-09-18_MJS_빈집합단언_감사수정_Codex]]의 빈배열이 과거실행에 실제발생했는지도 미확인이다.
@@ -48,7 +58,7 @@ MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대�
 |---|---|---|
 | 최신 image lane | f4b3f73 harness + b93b5ef1f944… digest:4passed/2failed/2skipped. public-signing-key/business-workspace daemon I/O timeout2, workspace/business-kernel-role operation-timeout2. 해당4건 케이스전체단언 미검증, host-init 관측0 | 아래 호스트 재개 조건 충족 전 추가실행 중단. Codex |
 | business-kernel-role | 잘못된 DB role의 image 기동 거부 단언은 네 실행 모두 미검증 | 전체image실행에서 해당 단언 도달·거부를 별도case evidence로 확인. classifier24통과로 대체 금지 |
-| 나머지489skip | 1eaf285 비integration 실행에서 DB/플랫폼 등 선행조건별 미실행 | 전체가 해소됐다고 하지 않음. 필요 변경별 파일 단위 실PG 검증, skip이유·SHA 기록. Codex |
+| 최신489skip | 사용자6feccd8 비integration/DSN없음의미실행,개별원인분포전수미확인 | 전체가 해소됐다고 하지 않음. 필요 변경별 파일 단위 실PG 검증, skip이유·SHA 기록. Codex |
 | 2deselected Docker host 시험 | 기본 경로에서 의도적 제외. 과거사용자d59실제2건통과와 최신선택에서의 미실행은 별도 | 격리host의 명시 docker_host lane/Core CI에서 실행. 공유host에서 자동prune 금지 |
 | 11e9f44 policy 설정 | 로컬46통과, Claude7e3de2a sound; 운영rollout 미완 | 운영owner rollout 준비. 모든worker에 같은시작policy 전달·구프로세스 종료 계획 필요. hot reload/전역policyepoch 없음 |
 | 공개 registry/runtime 준비 서비스 | trusted worker 및 승인 경계는 구현. 신규 공개 prepare API·대용량/GPU/routing/data/tensor-pipeline은 이 증거에 없음 | 미지원/후속구현과 미검증을 구분. 현재 상태정리 요청에서 새 구현 생성하지 않음 |
