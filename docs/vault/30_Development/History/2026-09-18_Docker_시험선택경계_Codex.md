@@ -46,3 +46,7 @@ Docker CLI를 없다고 모사하고 실제 docker subprocess 호출 시 즉시 
 Evidence/docker-test-selection/verified.json 및 두 probe 원문에 최초 실패/최종 성공, 소스 hash, JUnit hash, 범위를 보존했다. 문서522개/ontology exit0, YAML/TOML parse exit0, git diff --check exit0. 실제host2건은 재실행하지 않았고 이미지 미검증6건/business-kernel-role 미검증도 그대로다. CI는 구성 수정만 했으며 인증/결제 대기와 독립검토·운영 인수는 미완이다.
 
 다음 Claude: e2908a5 registry frozen 입력과 현재 권한 재검사 독립검토 및 이번 시험 배치/CI 선택 경계 검토. 다음 Codex: finding 수신·수정, registry 운영자 정책 구성 연결의 API 경계 검토. 원격 설치/호스트 조치/CI 인증·결제는 사용자 대기4건 유지. 중간 승인 요청 없음.
+
+## 전달 기록
+
+구현3afe227, 작업 branch/integration push exit0. 변경6파일만 Obsidian check→apply→check:6exported/0pending/0conflict,source3afe227. CI조회/실host시험 재실행 없음. 독립검토는 Claude 대기.
