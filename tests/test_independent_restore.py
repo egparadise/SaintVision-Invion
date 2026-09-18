@@ -8,7 +8,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from rehearse_independent_restore import pinned_snapshot, rehearse, main
+from rehearse_independent_restore import pinned_snapshot, rehearse, main, _cleanup_owned
 
 
 @pytest.fixture
@@ -109,3 +109,50 @@ def test_same_size_changed_reread_is_rejected(backup, monkeypatch):
     monkeypatch.setattr(shared.ReadRoot, 'open', changed_bytes)
     with pytest.raises(ValueError, match='bytes changed'):
         shared.read_backup_file(root, 'snapshot.dump')
+
+
+def test_cleanup_remove_failure_is_recorded_without_replacing_body_report(monkeypatch):
+    import types
+    import rehearse_independent_restore as subject
+    calls = iter([types.SimpleNamespace(returncode=0, stdout='owned-run', stderr='')])
+    def docker_stub(*args, **kwargs):
+        if args[0] == 'rm':
+            raise RuntimeError('injected remove failure')
+        return next(calls)
+    monkeypatch.setattr(subject, 'docker', docker_stub)
+    report = {'status': 'failed', 'errorType': 'BodyFailure'}
+    _cleanup_owned('owned-run', report)
+    assert report['status'] == 'failed'
+    assert report['errorType'] == 'BodyFailure'
+    assert report['cleanup']['status'] == 'remove-error'
+
+
+def test_body_failure_report_is_written_even_when_cleanup_failed(monkeypatch, tmp_path):
+    import rehearse_independent_restore as subject
+    output = tmp_path / 'restore-report.json'
+    report = {'status': 'failed', 'failedStage': 'restore',
+              'cleanup': {'status': 'remove-error', 'detail': 'injected'}}
+    monkeypatch.setattr(subject, 'rehearse', lambda *args: (_ for _ in ()).throw(subject.RehearsalFailure(report)))
+    monkeypatch.setattr(sys, 'argv', ['rehearse_independent_restore.py', '--backup', str(tmp_path),
+                                      '--expected-sha256', 'a' * 64, '--output', str(output)])
+    assert subject.main() == 2
+    saved = json.loads(output.read_text())
+    assert saved['status'] == 'failed' and saved['cleanup']['status'] == 'remove-error'
+
+
+@pytest.mark.parametrize('status,stderr', [
+    ('confirmed-removed', 'Error: No such object: owned-run'),
+    ('query-error', 'daemon unavailable'),
+])
+def test_cleanup_distinguishes_post_remove_absence_from_query_error(monkeypatch, status, stderr):
+    import types
+    import rehearse_independent_restore as subject
+    responses = iter([
+        types.SimpleNamespace(returncode=0, stdout='owned-run', stderr=''),
+        types.SimpleNamespace(returncode=0, stdout='', stderr=''),
+        types.SimpleNamespace(returncode=1, stdout='', stderr=stderr),
+    ])
+    monkeypatch.setattr(subject, 'docker', lambda *args, **kwargs: next(responses))
+    report = {'status': 'passed'}
+    _cleanup_owned('owned-run', report)
+    assert report['cleanup']['status'] == status

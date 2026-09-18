@@ -36,6 +36,52 @@ class RehearsalFailure(Exception):
         self.report = report
 
 
+def _missing_container(result):
+    return result.returncode != 0 and "no such object" in (result.stderr or "").lower()
+
+
+def _cleanup_owned(name, report):
+    """Record cleanup independently; never replace the body report."""
+    cleanup = {"status": "query-error", "container": name}
+    try:
+        inspected = docker('inspect', '--format', '{{index .Config.Labels "ai.saintvision.restore"}}', name, check=False)
+    except Exception as error:
+        cleanup.update(errorType=type(error).__name__, detail="ownership query failed")
+        report["cleanup"] = cleanup
+        return
+    if inspected.returncode != 0:
+        cleanup["status"] = "confirmed-absent" if _missing_container(inspected) else "query-error"
+        report["cleanup"] = cleanup
+        return
+    if inspected.stdout.strip() != name:
+        cleanup.update(status="ownership-mismatch", detail="container preserved")
+        report["cleanup"] = cleanup
+        return
+    try:
+        removed = docker('rm', '-f', name, check=False)
+    except Exception as error:
+        cleanup.update(status="remove-error", errorType=type(error).__name__, detail="remove failed")
+        report["cleanup"] = cleanup
+        return
+    if removed.returncode != 0:
+        cleanup.update(status="remove-error", detail="remove failed")
+        report["cleanup"] = cleanup
+        return
+    try:
+        verified = docker('inspect', '--format', '{{index .Config.Labels "ai.saintvision.restore"}}', name, check=False)
+    except Exception as error:
+        cleanup.update(status="query-error", errorType=type(error).__name__, detail="post-remove query failed")
+        report["cleanup"] = cleanup
+        return
+    if _missing_container(verified):
+        cleanup["status"] = "confirmed-removed"
+    elif verified.returncode == 0:
+        cleanup.update(status="remove-error", detail="container still present after remove")
+    else:
+        cleanup.update(status="query-error", detail="post-remove ownership unknown")
+    report["cleanup"] = cleanup
+
+
 def pinned_snapshot(directory, expected_hash):
     if not re.fullmatch('[0-9a-f]{64}', expected_hash):
         raise ValueError('Pinned archive SHA256 required')
@@ -176,12 +222,8 @@ def rehearse(directory, expected_hash, image):
         report.update(status='failed', failedStage=stage, errorType=type(error).__name__)
         raise RehearsalFailure(report) from None
     finally:
-        inspected = docker('inspect', '--format', '{{index .Config.Labels "ai.saintvision.restore"}}', name, check=False)
-        if inspected.returncode == 0:
-            if inspected.stdout.strip() != name:
-                raise RuntimeError('Restore container ownership changed; cleanup refused')
-            docker('rm', '-f', name)
-            report['disposableClusterRemoved'] = True
+        _cleanup_owned(name, report)
+        report['disposableClusterRemoved'] = report.get('cleanup', {}).get('status') == 'confirmed-removed'
 
 
 def main():
@@ -208,7 +250,7 @@ def main():
         json.dump(result, stream, indent=2)
         stream.write('\n')
     print('PASS: independent cluster restore, upgrade/replay, role isolation and runtime DB access')
-    return 0
+    return 0 if result.get('cleanup', {}).get('status') in {'confirmed-removed', 'confirmed-absent'} else 2
 
 
 if __name__ == '__main__':

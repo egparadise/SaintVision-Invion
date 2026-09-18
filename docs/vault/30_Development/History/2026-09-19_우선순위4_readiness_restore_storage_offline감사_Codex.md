@@ -44,7 +44,8 @@ source_of_truth: "Git"
 - 소스 추적: 위 네 도구와 관련 test/report 소비 경로.
 - 기존 실행 증거: stale output 실패 주입은 exit 2와 이전 파일 보존까지 확인됐으나 소비자 오인 미재현.
 - 이번 실행: `python -m pytest -q tests/test_operational_readiness.py tests/test_storage_check_integrity.py` → **5 passed / 30 skipped**, DSN 부재로 DB 시험 미실행.
-- `tests/test_independent_restore.py` 및 `tests/core/test_lan_restore_upgrade.py`는 cryptography 의존성 부재로 collection 단계에서 실행 불가했다. 제품 실패로 세지 않는다.
+- 정정: 앞선 실행은 시스템 `C:\Python314\python.exe`를 사용해 `cryptography`가 없어 collection에 실패했다. 프로젝트 인터프리터 `.venv/Scripts/python.exe`로 다시 실행한 결과 두 파일은 **29 passed**(기존 24개 + 새 회귀 5개)다. 앞선 실행 불가는 제품 상태가 아니라 잘못된 인터프리터 기록이었다.
+- 구현 원복 대조에서 기존 테스트만은 24 passed였고, 새 회귀시험을 원복 코드와 함께 수집하면 새 helper(`_cleanup_owned`, `failure_report_path`)가 없어 collection 단계에서 실패했다. 따라서 새 경계시험이 수정된 구현에 결속돼 있음을 확인했다.
 - 실제 Docker/PostgreSQL restore, LAN report consumer, cleanup fault injection, 운영 인수는 미확인이다.
 
 ## 다음 담당
@@ -53,3 +54,8 @@ source_of_truth: "Git"
 - Codex: 수정본의 stale/cleanup 음성 대조와 evidence 보존 재검토.
 - 운영 복원·LAN 인수는 승인·격리 조건이 충족될 때 별도 수행한다.
 
+## 구현 및 재검증
+
+`rehearse_lan_upgrade.py`는 기존 성공 output과 기존 failure receipt를 시작 시 거부하고, 실패 시 `<stem>.failure<suffix>`를 새 파일로 생성한다. `rehearse_independent_restore.py`는 cleanup을 본문 결과와 분리해 `confirmed-removed`, `confirmed-absent`, `query-error`, `remove-error`, `ownership-mismatch`를 기록하며 cleanup 오류가 본문 report를 대체하지 않는다. 새 회귀시험은 기존 output 보존, failure receipt, remove/query/ownership 대조, 본문 실패 보고서 보존을 포함한다.
+
+`.venv/Scripts/python.exe -m pytest -q tests/test_independent_restore.py tests/core/test_lan_restore_upgrade.py` → **30 passed**. 수정 전 원복 코드와 새 시험을 대조하면 새 helper가 없어 collection 단계에서 실패했다. 실제 Docker/PostgreSQL 복원은 실행하지 않았다.

@@ -29,6 +29,20 @@ from recovery_drill import Postgres, _definer_verdict
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _write_new_json(path, payload):
+    """Create a report exactly once; never overwrite a prior run's evidence."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(payload, stream, indent=2)
+        stream.write("\n")
+
+
+def failure_report_path(output):
+    output = Path(output)
+    return output.with_name(output.stem + ".failure" + output.suffix)
+
+
 def retain_snapshot(directory, archive, manifest):
     """Create a new private directory before any sensitive bytes are written."""
     directory = Path(os.path.abspath(directory))
@@ -241,10 +255,26 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--retain-directory", type=Path, help="New directory under an existing private local parent; never overwrite")
     args = parser.parse_args()
+    failure_output = failure_report_path(args.output)
+    if args.output.exists():
+        parser.error("Use a new report file; existing evidence is preserved")
+    if failure_output.exists():
+        parser.error("Use a new output; existing failure evidence is preserved")
     try:
         report = rehearse(args.state, args.retain_directory)
-        args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    except Exception:
+        _write_new_json(args.output, report)
+    except Exception as error:
+        failure = {
+            "status": "failed",
+            "errorType": type(error).__name__,
+            "scope": "same-cluster-snapshot-database-upgrade-rehearsal",
+            "evidenceStatus": "failure-receipt",
+            "message": "rehearsal failed; diagnostic details suppressed",
+        }
+        try:
+            _write_new_json(failure_output, failure)
+        except FileExistsError:
+            print("Rehearsal failed and its failure receipt already exists; no evidence was overwritten.", file=sys.stderr)
         print("Snapshot upgrade rehearsal failed; source deployment not authorized.", file=sys.stderr)
         return 2
     print("PASS: snapshot restore, old-column row preservation, upgrade/replay and runtime DB transaction")

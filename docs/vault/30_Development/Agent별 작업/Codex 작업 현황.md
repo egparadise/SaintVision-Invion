@@ -570,3 +570,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## 우선순위 4 readiness·restore·storage offline 경계 감사
 
 `PRIORITY4-OFFLINE-BOUNDARY-AUDIT-20260919-CODEX`를 기준으로 `operational_readiness.py`, `storage_check.py`, `rehearse_independent_restore.py`, `rehearse_lan_upgrade.py`와 보고서 경계를 대조했다. PR4-01은 기존 성공 output이 실패 실행 뒤 남아 소비자가 stale 보고서를 읽을 수 있는 P2 후보, PR4-02는 independent restore의 finally cleanup 오류가 본문 보고서 생성을 가릴 수 있는 P2 후보다. 기존 stale-output 실패 주입은 exit2/기존 파일 보존까지 확인했지만 소비자 오인은 미재현했고, cleanup 장애 주입은 수행하지 않았다. offline readiness/storage는 DSN 부재로 5 passed/30 skipped이며 성공 위장은 찾지 못했다. 독립 restore 관련 시험은 cryptography 의존성 부재로 collection 불가였다. 다음 owner는 report provenance/cleanup receipt 구현 검토자이며, 실제 restore/LAN 인수는 승인·격리 조건 이후다.
+
+우선순위 4 후속 구현(2026-09-19): `rehearse_lan_upgrade.py`는 기존 output/failure receipt를 선행 거부하고 실패 receipt를 별도 신규 경로에 기록한다. `rehearse_independent_restore.py`는 cleanup query/remove/ownership/confirmed 상태를 본문과 분리하고 cleanup 오류에도 본문 report를 보존한다. 반드시 `.venv/Scripts/python.exe`를 사용했다. 관련 두 파일은 **30 passed**이며, 이전 시스템 Python의 cryptography collection 실패 기록은 인터프리터 오류로 정정했다. 실제 Docker/PostgreSQL 복원과 운영 인수는 미실행이다.
