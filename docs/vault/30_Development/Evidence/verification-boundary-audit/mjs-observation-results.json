@@ -1,0 +1,417 @@
+{
+  "scope": "counterexample evidence; not product acceptance",
+  "results": [
+    {
+      "file": "verify_two_pc_distributed_execution.mjs",
+      "breakStop": false,
+      "scope": "fully synthetic fetch; no browser, node, GPU, DB, or network",
+      "sourceSha256": "d8a5f840ebe2dfb5f6a8e6ae7970bce4b8f99cb5aad565c8e04b5d01a948e0a8",
+      "passed": 67,
+      "failed": 0,
+      "exitCode": 0,
+      "requests": [
+        {
+          "path": "/v1/health",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/receipts/rcp_01JFAILED_VERIFY",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/auth/token",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/auth/userinfo",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/projects",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/workspaces",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/nodes",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools/pool_01_training/placement-preview",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/projects/prj_saint_mlops/runs",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/projects/prj_saint_mlops/runs",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch/artifacts/download",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch/cancel",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/reset-recovering",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/approvals/approval-synthetic/approve",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/enqueue",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING_EXHAUSTED/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/receipts/rcp_01JSHARD_03",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools/pool_01_training/capacity",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards/cancel-all",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/reclaim-resources",
+          "method": "POST"
+        }
+      ],
+      "summary": [
+        "  ✔ [PASS] Receipt verified is FALSE (ADR-028: business schema check failed) ",
+        "  ✔ [PASS] CORE CONTRACT: exitCode 0 is never treated as verified application success ",
+        "  ✔ [PASS] 2-PC Suite operator identity verified at /v1/auth/userinfo ",
+        "  ✔ [PASS] NodeStopReceipt verified: true ",
+        "🎉 2-PC Distributed Execution & GPU Scaling Summary: 67/67 checks passed (100%)",
+        "   All 5 collaborative steps (Codex, Claude, Gemini, 2-PC Execution, GPU Scaling) verified!"
+      ],
+      "dispatchedRun": "run_synthetic_new_dispatch",
+      "receiptRun": "UNRELATED_RUN",
+      "receiptNode": "UNRELATED_NODE",
+      "outputHash": "sha256:not-a-digest"
+    },
+    {
+      "file": "verify_two_pc_distributed_execution.mjs",
+      "breakStop": true,
+      "scope": "fully synthetic fetch; no browser, node, GPU, DB, or network",
+      "sourceSha256": "d8a5f840ebe2dfb5f6a8e6ae7970bce4b8f99cb5aad565c8e04b5d01a948e0a8",
+      "passed": 66,
+      "failed": 1,
+      "exitCode": 1,
+      "requests": [
+        {
+          "path": "/v1/health",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/receipts/rcp_01JFAILED_VERIFY",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/auth/token",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/auth/userinfo",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/projects",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/workspaces",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/nodes",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools/pool_01_training/placement-preview",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/projects/prj_saint_mlops/runs",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/projects/prj_saint_mlops/runs",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch/artifacts/download",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch/cancel",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_synthetic_new_dispatch",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/reset-recovering",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/approvals/approval-synthetic/approve",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/enqueue",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING_EXHAUSTED/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/receipts/rcp_01JSHARD_03",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/pools/pool_01_training/capacity",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards/cancel-all",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/reclaim-resources",
+          "method": "POST"
+        }
+      ],
+      "summary": [
+        "  ✔ [PASS] Receipt verified is FALSE (ADR-028: business schema check failed) ",
+        "  ✔ [PASS] CORE CONTRACT: exitCode 0 is never treated as verified application success ",
+        "  ✔ [PASS] 2-PC Suite operator identity verified at /v1/auth/userinfo ",
+        "  ✔ [PASS] NodeStopReceipt verified: true ",
+        "🎉 2-PC Distributed Execution & GPU Scaling Summary: 66/67 checks passed (99%)",
+        "   All 5 collaborative steps (Codex, Claude, Gemini, 2-PC Execution, GPU Scaling) verified!"
+      ],
+      "dispatchedRun": "run_synthetic_new_dispatch",
+      "receiptRun": "UNRELATED_RUN",
+      "receiptNode": "UNRELATED_NODE",
+      "outputHash": "sha256:not-a-digest"
+    },
+    {
+      "file": "reconcile_receipts_evidence.mjs",
+      "breakStop": false,
+      "scope": "fully synthetic fetch; no browser, node, GPU, DB, or network",
+      "sourceSha256": "62780f530d78d98a2d22d707049d1082f34fc20e95e20d0cf954fedecc5573fa",
+      "passed": 59,
+      "failed": 0,
+      "exitCode": 0,
+      "requests": [
+        {
+          "path": "/v1/approvals",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/reset-recovering",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/approvals/approval-synthetic",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/cancel",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_SUCCESS/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_SUCCESS",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/nodes",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING_EXHAUSTED",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/receipts",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/reclaim-resources",
+          "method": "POST"
+        }
+      ],
+      "summary": [
+        "  ✔ [PASS] Completed shard shard1 is verified ",
+        "  ✔ [PASS] Completed shard shard2 is verified ",
+        "  ✔ [PASS] Success receipt has verified === true ",
+        "  ✔ [PASS] Contrast receipt has verified === false (Application schema verification failed!) ",
+        "🎉 5-Screen Reconciliation Summary: 59/59 checks passed (100%)",
+        "   All 5 core screens and NodeStopReceipt vs Evidence contrast successfully verified."
+      ],
+      "dispatchedRun": "run_synthetic_new_dispatch",
+      "receiptRun": "UNRELATED_RUN",
+      "receiptNode": "UNRELATED_NODE",
+      "outputHash": "sha256:not-a-digest"
+    },
+    {
+      "file": "reconcile_receipts_evidence.mjs",
+      "breakStop": true,
+      "scope": "fully synthetic fetch; no browser, node, GPU, DB, or network",
+      "sourceSha256": "62780f530d78d98a2d22d707049d1082f34fc20e95e20d0cf954fedecc5573fa",
+      "passed": 58,
+      "failed": 1,
+      "exitCode": 1,
+      "requests": [
+        {
+          "path": "/v1/approvals",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/reset-recovering",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume/prepare",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/approvals/approval-synthetic",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/cancel",
+          "method": "POST"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_SUCCESS/shards",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_SUCCESS",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/nodes",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING_EXHAUSTED",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JRECOVERING/resume",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/receipts",
+          "method": "GET"
+        },
+        {
+          "path": "/v1/runs/run_01JPARENT_ACTIVE/reclaim-resources",
+          "method": "POST"
+        }
+      ],
+      "summary": [
+        "  ✔ [PASS] Completed shard shard1 is verified ",
+        "  ✔ [PASS] Completed shard shard2 is verified ",
+        "  ✔ [PASS] Success receipt has verified === true ",
+        "  ✔ [PASS] Contrast receipt has verified === false (Application schema verification failed!) ",
+        "🎉 5-Screen Reconciliation Summary: 58/59 checks passed (98%)",
+        "   All 5 core screens and NodeStopReceipt vs Evidence contrast successfully verified."
+      ],
+      "dispatchedRun": "run_synthetic_new_dispatch",
+      "receiptRun": "UNRELATED_RUN",
+      "receiptNode": "UNRELATED_NODE",
+      "outputHash": "sha256:not-a-digest"
+    }
+  ]
+}
