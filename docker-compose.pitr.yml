@@ -1,0 +1,55 @@
+# PROPOSAL (opt-in) — continuous WAL archiving for point-in-time recovery (AC-12 RPO).
+#
+# This file changes NOTHING unless explicitly composed on top of the prod definition:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.pitr.yml up -d
+# Enabling continuous archiving is an OPERATIONAL DECISION (it needs durable archive
+# storage and, to actually ACCEPT AC-12, a post-enablement recovery drill that measures
+# a real data-loss interval). Configuration alone is a necessary condition, never proof
+# of a recoverable RPO -- see docs/vault/30_Development/2026-09-19_Claude_PITR_변경안과영향.md.
+#
+# archive_mode is a postmaster setting: applying this override RESTARTS postgres.
+#
+# PREREQUISITE for this Tier-A local archive: pre-provision the external wal_archive
+# volume owned by the postgres image's runtime user (postgres:16-alpine -> uid/gid 70;
+# confirm with `docker run --rm postgres:16-alpine id postgres`), mode 0700, mirroring
+# how server_config / workspace_data are provisioned. Otherwise the archive_command
+# cannot write and WAL will accumulate in pg_wal until the data disk fills.
+services:
+  postgres:
+    command:
+      - postgres
+      - -c
+      - archive_mode=on
+      - -c
+      # Safe local archive: refuse to overwrite an existing segment. NOTE: cp does not
+      # fsync the destination -- a crash can lose the most recently archived segment.
+      # For durable, off-host archiving use Tier B (pgbackrest/wal-g -> the existing
+      # minio S3 endpoint); see the proposal doc.
+      - archive_command=test ! -f /wal_archive/%f && cp %p /wal_archive/%f
+      - -c
+      # Bound how long a partially-filled segment waits before it is forced out and
+      # archived. Ceiling on the archived-WAL portion of RPO. 300s gives 3x margin under
+      # a 900s (15 min) target; raise to 600 to halve idle WAL overhead (see impact).
+      - archive_timeout=300
+      - -c
+      - wal_level=replica
+      - -c
+      # Retain a WAL buffer beyond what archiving needs, so a brief archive stall does
+      # not immediately recycle un-archived segments.
+      - wal_keep_size=1024
+      - -c
+      - full_page_writes=on
+    environment:
+      # Applies ONLY to a fresh initdb (empty postgres_data). data_checksums cannot be
+      # turned on for an already-initialized cluster from here -- that needs an offline
+      # `pg_checksums --enable` (downtime). It is a data-integrity control, not RPO.
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - type: volume
+        source: wal_archive
+        target: /wal_archive
+
+volumes:
+  wal_archive:
+    external: true
+    name: ${INV_WAL_ARCHIVE_VOLUME:?Pre-provision a private WAL archive volume owned by the postgres runtime uid}
