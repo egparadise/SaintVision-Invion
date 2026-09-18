@@ -1,3 +1,4 @@
+import { restoreDesktopLayout } from './desktopLayout';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   AppId,
@@ -150,10 +151,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   const [windows, setWindows] = useState<IDesktopWindow[]>(() => {
     try {
       const saved = localStorage.getItem('saintvision_desktop_windows');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
+      return restoreDesktopLayout(saved, DEFAULT_WINDOWS,
+        typeof window === 'undefined' ? 1280 : window.innerWidth,
+        typeof window === 'undefined' ? 800 : window.innerHeight);
     } catch {
       // Fallback
     }
