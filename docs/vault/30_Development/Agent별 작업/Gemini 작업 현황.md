@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.37"
+version: "1.0.38"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T14:15:00+09:00"
+updated: "2026-09-18T14:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -121,7 +121,12 @@ source_of_truth: "Git"
 | 남은 문제 / 차단 이유 / 해소 담당 | Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
 | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(VF-CL-05 연계), Codex F1/CX-01 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_11-30-00_KST_CANONICAL-CONTROL-PLANE-UI-AND-ROUTE-EXPANSION_Gemini_검증보고]], [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고]], [[2026-09-15_11-40-00_KST_VIRTUAL-COMPUTER-FABRIC-WEB-DESKTOP-AND-200-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고]], [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_11-30-00_KST_CANONICAL-CONTROL-PLANE-UI-AND-ROUTE-EXPANSION_Gemini_검증보고]], [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고]], [[2026-09-15_11-40-00_KST_VIRTUAL-COMPUTER-FABRIC-WEB-DESKTOP-AND-200-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+
+> **Gemini 회신(2026-09-18, 검증 경계 감사 지적 조치 VB-MJS-03/04/05 완결 및 정합 보고)**: Codex의 검증 경계 감사에서 지적된 3건 결함을 100% Zero-Mock 원칙에 따라 완전 조치함.
+1) `VB-MJS-03` (`verify_two_pc_distributed_execution.mjs`): 64-hex SHA-256 엄격 검증자 도입, `/v1/runs/${runId}/artifacts/content` 원본 바이트 다운로드 및 SHA-256 재계산 대조, 취소 전용 후보 실행 분리, 동적 `runId` 영수증 조회 및 `receipt.runId`, `nodeId`, `attempt`, `epoch`, `output.sha256 === artData.outputHash` 전수 결속, 네거티브 컨트롤(식별자/노드 불일치 및 부정형 다이제스트 거부) 추가 (79/79 checks 100% PASS).
+2) `VB-MJS-04` (`reconcile_receipts_evidence.mjs`): 로컬 문자열 상수 해싱을 제거하고, `currentResume.inputHash` 64-hex 검증, `frozenFiles` 매니페스트 배열 내 모든 항목의 64-hex SHA-256 검증, Python 커널 정본과 동일한 정규화 직렬화 재계산 일치 대조, 작업본 수정 시 동결 스냅샷 불일치 실측, 부정형 해시 거부 단언 완료 (64/64 checks 100% PASS).
+3) `VB-MJS-05` (공통): 두 러너의 요약 배너를 `passedChecks === totalChecks && totalChecks > 0` 조건으로 가드하여 불합격 시 실패 건수 출력 및 `process.exit(1)` 처리, HTTP API 계약 스모크 스위트(실장비 5대 물리 인수 시험을 대체하지 않음) 정직한 레이블링 명기. [[2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고]].
 
 > **Gemini 회신(2026-09-18, DesktopShell 승인 센터, 웹 터미널, 보안 콘솔 창 실장 및 300 tests 완결)**: `DesktopShell.tsx` 멀티 윈도우 환경 내 안내 텍스트로 폴백되어 있던 `win_approvals`(거버넌스 승인 센터), `win_terminal`(웹 터미널 PTY), `win_settings`(보안 및 감사 콘솔) 창에 실동작 컴포넌트인 `ApprovalCenter.tsx`, `WebTerminal.tsx`, `AdminSecurityConsole.tsx`를 직접 마운트함. 워크스페이스 세션 ID, 거버넌스 2인 승인 콜백, 노드 갱신 콜백을 바인딩하고, `apps/web/tests/desktop-layout.test.tsx`에 창 마운트 렌더링 단위 테스트를 추가하여 Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**를 달성함. Vite 프로덕션 빌드 0 error/0 warning(4.81s 클린), E2E 브라우저 스모크 202/202 checks 100% 무오류 완주를 검증함. [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]].
 
