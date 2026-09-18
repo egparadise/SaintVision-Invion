@@ -126,21 +126,28 @@ def main():
         code = 125
     finally:
         proof['exitCode'] = code
-        # Best-effort, retried, classified (VF-CL-R-001): a host-init failure to
-        # inspect must not raise out of the finally (masking the test's own result)
-        # or skip removal of this run's own container. Ownership is checked when it
-        # can be, but removal targets this run's unique id, and the outcome is
-        # recorded so the cleanup is falsifiable rather than assumed.
-        if container:
-            inspected = docker_diag.run(['docker', 'inspect', container, '--format',
-                        '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True)
-            if inspected.returncode == 0 and inspected.stdout.strip() != name:
-                proof['cleanup'] = 'ownership mismatch; container preserved'
-            else:
-                removed = docker_diag.run(['docker', 'rm', '-f', container])
-                proof['isolatedContainerRemoved'] = removed.returncode == 0
-                if removed.returncode:
-                    proof['cleanup'] = docker_diag.describe(removed)
+        # Best-effort, classified (VF-CL-R-001): cleanup must never stop the secret-free
+        # evidence JSON from being written. docker_diag.run classifies a host-init
+        # failure or timeout rather than raising, but subprocess can still raise OSError
+        # (e.g. it cannot spawn under the very pressure this addresses), so the whole
+        # cleanup is guarded and its failure is recorded (masked), not propagated
+        # (Codex, 2026-09-18). Ownership is checked when it can be; removal targets this
+        # run's unique id, and the outcome is recorded so cleanup is falsifiable.
+        try:
+            if container:
+                inspected = docker_diag.run(['docker', 'inspect', container, '--format',
+                            '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True)
+                if inspected.returncode == 0 and inspected.stdout.strip() != name:
+                    proof['cleanup'] = 'ownership mismatch; container preserved'
+                else:
+                    removed = docker_diag.run(['docker', 'rm', '-f', container])
+                    proof['isolatedContainerRemoved'] = removed.returncode == 0
+                    if removed.returncode:
+                        proof['cleanup'] = docker_diag.describe(removed)
+        except Exception as exc:
+            proof['cleanup'] = 'cleanup error (container preserved): ' + docker_diag.masked_stderr(str(exc))
+        # Always the last statement in finally: a secret-free result JSON is written
+        # even when cleanup failed above.
         (output / (prefix + '.json')).write_text(json.dumps(proof, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'exitCode': code, 'tests': proof.get('tests'),
                       'unverified': proof.get('unverified'),
