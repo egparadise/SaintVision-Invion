@@ -99,7 +99,9 @@ def test_profile_limits_block_unapproved_execution(launch, change):
 )
 def test_profile_executable_allowlist_is_canonical(launch, executable):
     _, profile = launch
-    with pytest.raises(ValueError):
+    # Every non-canonical executable is rejected with the same message (confirmed by
+    # running); pin it so a rejection for an unrelated ValueError reason cannot pass.
+    with pytest.raises(ValueError, match="Canonical absolute container executable paths required"):
         replace(profile, executables=frozenset({executable}))
 
 

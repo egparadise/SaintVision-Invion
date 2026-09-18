@@ -175,7 +175,18 @@ def test_invalid_current_preconditions_leave_no_partial_links(env, target, probl
             )
         else:
             target = {**target, "tenant": str(env.other)}
-    with pytest.raises(provisioning.ProvisioningRefused):
+    # Per-cause refusal reasons confirmed against real PostgreSQL; pin each so a
+    # precondition refused for a different precondition's reason breaks the test.
+    expected = {
+        "subject": "OIDC subject required",
+        "project": "Active business project required",
+        "user": "OIDC subject required",
+        "member": "does not permit requesting",
+        "epoch": "Recovery epoch must already be provisioned",
+        "inverse-mapping": "subject mapping conflicts or is disabled",
+        "other-tenant": "Business tenant does not exist",
+    }
+    with pytest.raises(provisioning.ProvisioningRefused, match=expected[problem]):
         apply(env, target)
     assert count(env, target, "business_projects") == 0
     assert count(env, target, "account_provisioning_events") == 0

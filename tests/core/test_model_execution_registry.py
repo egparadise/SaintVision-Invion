@@ -36,7 +36,12 @@ def test_frozen_registry_cannot_drop_or_change_binding(monkeypatch,mode):
     elif mode=='partial':content=canonical(dict(registryVersionId='v'*30))
     elif mode=='malformed':content=b'[]'
     else:content=b' '+content
-    with pytest.raises(DomainError):frozen_registry(None,None,None,None,snapshot(content),WORKSPACE)
+    # Confirmed by running: 'missing' (no registry file -> registry_id None) is refused by
+    # current_registry as MODEL-0008 'Required', while changed/partial/malformed/noncanonical
+    # are refused as MODEL-0001 (manifest/verified bytes unavailable). Pinning per case keeps
+    # 'missing' from silently taking the MODEL-0001 path (or any other) and vice-versa.
+    expected='MODEL-0008' if mode=='missing' else 'MODEL-0001'
+    with pytest.raises(DomainError,match=expected):frozen_registry(None,None,None,None,snapshot(content),WORKSPACE)
 
 
 def test_registered_input_does_not_survive_missing_operator_policy():
@@ -48,4 +53,4 @@ def test_bound_database_preserves_operator_policy():
     policy=RegistryBindingPolicy('operator:1',frozenset({('license','classification')}))
     db=Database('not used',recovery_epoch=str(uuid4()),registry_binding_policy=policy)
     assert BoundDatabase(db,'tenant',object()).registry_binding_policy is policy
-    with pytest.raises(ValueError):Database('not used',recovery_epoch=db.recovery_epoch,registry_binding_policy={})
+    with pytest.raises(ValueError,match='Operator registry binding policy required'):Database('not used',recovery_epoch=db.recovery_epoch,registry_binding_policy={})
