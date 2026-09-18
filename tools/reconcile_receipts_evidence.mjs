@@ -23,6 +23,7 @@ function isValidSha256Digest(val) {
 
 let totalChecks = 0;
 let passedChecks = 0;
+let unverifiedChecks = 0;
 
 function assert(title, condition, extra = '') {
   totalChecks++;
@@ -32,6 +33,12 @@ function assert(title, condition, extra = '') {
   } else {
     console.error(`  ✖ [FAIL] ${title} ${extra}`);
   }
+}
+
+function unverified(title, reason, value = undefined) {
+  unverifiedChecks++;
+  console.log(`  ◌ [UNVERIFIED] ${title} (${reason})`);
+  return value;
 }
 
 async function main() {
@@ -167,18 +174,36 @@ async function main() {
     ).join(', ') + ']';
     const computedManifestHash = `sha256:${crypto.createHash('sha256').update(canonicalManifestJson).digest('hex')}`;
     assert('Recomputed frozenFiles manifest SHA-256 matches inputHash', computedManifestHash === currentResume.inputHash);
+    unverified('Manifest order edge', 'only the returned order was compared; reordered input was not sent to the API');
+    unverified('Manifest whitespace edge', 'only one canonical spacing form was recomputed');
+    unverified('Manifest escape/Unicode edge', 'no escaped or Unicode path variant was submitted');
+    unverified('Manifest duplicate-key edge', 'no duplicate-key JSON payload was submitted');
 
-    // Verify modifying working copy yields distinct SHA-256 from frozen snapshot
+    // Verify modifying working copy yields distinct SHA-256 from frozen snapshot.
+    // This is a local derivation, not a server rejection test.
     const serverTsSnapshot = currentResume.frozenFiles.find(f => f.path === 'src/server.ts');
     assert('Frozen snapshot contains src/server.ts', Boolean(serverTsSnapshot));
     if (serverTsSnapshot) {
       const modifiedWorkingCopy = '// Modified working copy for next recovery step\nconsole.log("local edits");\n';
       const modifiedWorkingHash = `sha256:${crypto.createHash('sha256').update(modifiedWorkingCopy).digest('hex')}`;
       assert('Modified working copy content yields different SHA-256 than frozen snapshot', modifiedWorkingHash !== serverTsSnapshot.sha256);
+      unverified('Modified working copy rejection', 'no modified artifact was submitted to an admission endpoint');
     }
 
-    // Negative controls: malformed hash strictly rejected
-    assert('Negative control: malformed inputHash (sha256:not-a-digest) is strictly rejected', !isValidSha256Digest('sha256:not-a-digest'));
+    // Local format check is not an API rejection.
+    unverified('Malformed inputHash rejection', 'isValidSha256Digest is a local helper; no malformed request was submitted');
+
+    // A missing run must reach the real API before a 404 can count as rejection.
+    try {
+      const unknownRunRes = await fetch(`${BACKEND_URL}/v1/runs/run_NON_EXISTENT_RECEIPTS/receipts`);
+      assert('Negative control: unknown run receipt query reaches API and returns HTTP 404', unknownRunRes.status === 404, `(HTTP ${unknownRunRes.status})`);
+    } catch (err) {
+      if (err instanceof TypeError && err.cause) {
+        unverified('Negative control: unknown run receipt query', `backend not reachable (${err.message})`);
+      } else {
+        throw err;
+      }
+    }
 
     // ---------------------------------------------------------------------------
     // Deep Contrast: NodeStopReceipt exitCode: 0 vs Evidence verified: true
@@ -226,6 +251,7 @@ async function main() {
     console.log('\n================================================================================');
     if (passedChecks === totalChecks && totalChecks > 0) {
       console.log(`🎉 5-Screen Reconciliation Summary: ${passedChecks}/${totalChecks} checks passed (100%)`);
+      console.log(`   Unverified boundary checks: ${unverifiedChecks} (excluded from PASS count)`);
       console.log('   All 5 core screens and NodeStopReceipt vs Evidence contrast successfully verified.');
       console.log('   (Control Plane Gateway API Contract Smoke Suite; not physical 5-node hardware acceptance)');
       console.log('================================================================================\n');

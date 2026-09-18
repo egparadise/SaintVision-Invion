@@ -2,7 +2,31 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 const require = createRequire(import.meta.url);
-const [folder, typescript] = process.argv.slice(2);
+const rawArgs = process.argv.slice(2);
+const positional = [];
+let outputPath;
+let selfTest = false;
+for (let i = 0; i < rawArgs.length; i++) {
+  const arg = rawArgs[i];
+  if (arg === '--self-test') {
+    selfTest = true;
+  } else if (arg === '--output' && rawArgs[i + 1]) {
+    outputPath = rawArgs[++i];
+  } else if (arg.startsWith('--output=')) {
+    outputPath = arg.slice('--output='.length);
+  } else if (arg.startsWith('--')) {
+    console.error('Usage error: unknown option. Usage: node tools/reproduce_handoff_review.mjs <folder> <typescript-module> [--output <path>] [--self-test]');
+    process.exit(2);
+  } else {
+    positional.push(arg);
+  }
+}
+if (positional.length !== 2) {
+  console.error('Usage error: expected <folder> and <typescript-module>. Usage: node tools/reproduce_handoff_review.mjs <folder> <typescript-module> [--output <path>] [--self-test]');
+  process.exit(2);
+}
+const [folder, typescript] = positional;
+outputPath ||= path.join(folder, '.work', 'reproduce-handoff', 'frontend.json');
 const ts = require(typescript);
 async function load(relative) {
   const source = fs.readFileSync(path.join(folder, relative), 'utf8');
@@ -13,7 +37,6 @@ const { ReleaseManager } = await load('apps/web/src/features/release/releaseEngi
 const { isTokenValidAndCurrent } = await load('apps/web/src/features/recovery/recoveryEngine.ts');
 const { DeploymentManager } = await load('apps/web/src/features/deployment/deploymentEngine.ts');
 const manager = new ReleaseManager(), deployment = new DeploymentManager();
-const selfTest = process.argv.includes('--self-test');
 const failures = [];
 const unverified = [];
 
@@ -88,5 +111,6 @@ const result = {
   unverified,
   selfTest,
 };
-fs.writeFileSync(path.join(folder, 'frontend.json'), JSON.stringify(result, null, 2));
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
 if (failures.length > 0) process.exitCode = 1;
