@@ -910,9 +910,11 @@ async function runFullSmokeJourney() {
     assert('Windows nodes map to authentic PowerShell PTY session', winShell === 'powershell');
     assert('Linux nodes map to authentic Bash PTY session', linuxShell === 'bash');
 
-    // 6. Web Desktop Viewport & Switcher Verification
-    const hasDesktopShell = true;
-    assert('Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)', hasDesktopShell);
+    // 6. Web Desktop Viewport & Switcher Verification (VB-MJS-02: separate UI lane required)
+    recordUnverified(
+      'Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)',
+      'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
+    );
 
     // 7. Multi-window Manager Traffic Light & Z-Index Invariant (VB-MJS-02: separate UI lane required)
     recordUnverified(
@@ -935,8 +937,9 @@ async function runFullSmokeJourney() {
     // -------------------------------------------------------------------------
     // Summary Dossier
     // -------------------------------------------------------------------------
+    const pct = total > 0 ? Math.round((passed / total) * 100) : 0;
     console.log('\n======================================================================');
-    console.log(`🎉 API Contract Smoke Summary: ${passed}/${total} observed checks passed (${Math.round((passed / total) * 100)}%) | ${unverified} unverified UI invariants deferred to browser lane`);
+    console.log(`🎉 API Contract Smoke Summary: ${passed}/${total} observed checks passed (${pct}%) | ${unverified} unverified UI invariants deferred to browser lane`);
     console.log('======================================================================\n');
 
     if (passed !== total || total === 0) {

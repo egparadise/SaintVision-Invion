@@ -2,6 +2,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {afterEach, expect, it, vi} from 'vitest';
 import {DesktopShell} from '../src/features/desktop/DesktopShell';
+import {Header} from '../src/shared/ui/Header';
 afterEach(() => {vi.unstubAllGlobals();});
 const props = {projectId:'project',nodes:[],runs:[],approvals:[],workspaces:[],currentReviewerId:'user',onRefreshNodes:async()=>{},onApprove:async()=>{},onReject:async()=>{},onChangeUser:()=>{},onSwitchToPortalView:()=>{},currentTheme:'dark' as const,onToggleTheme:()=>{}};
 it.each(['[null]', '[{"id":"win_my_computer","appId":"my-computer","isOpen":true}]'])('recovers malformed stored layout %s', saved => {
@@ -50,5 +51,17 @@ it('renders mounted approval center, terminal, and settings windows when open', 
   expect(markup).toContain('거버넌스 승인 센터');
   expect(markup).toContain('Web Terminal PTY');
   expect(markup).toContain('Docker Socket 노출 여부');
+});
+
+it('renders fabric control plane tab in Header navigation', () => {
+  const markup = renderToStaticMarkup(
+    <Header
+      currentTheme="dark"
+      onToggleTheme={() => {}}
+      activeTab="fabric"
+      onSelectTab={() => {}}
+    />
+  );
+  expect(markup).toContain('가상 패브릭 (CX-01)');
 });
 
