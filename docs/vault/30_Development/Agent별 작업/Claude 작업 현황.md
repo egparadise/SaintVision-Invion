@@ -243,8 +243,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | 확인한 것 / 명령 / exit code / 실제 환경 | `pytest --noconftest tests/test_docker_diag.py tests/test_check_kernel_docker_hygiene.py tests/test_vf_docker.py` → **24 passed**(실 docker; R5-01 cleanup 6종·R5-02 재현성·타입/동시성 포함). R5-02 회귀 non-vacuous 음성 확인. model 검토는 코드 경로·계약·`channel_monotonic` SQL 대조(실 PG 실행은 사용자 75 passed / Codex 79) |
 | CI / 독립 reviewer / 운영 인수 | 단위 24 passed 실측. reviewer=Codex 일관 수정본(R2·R3·타입·R5) 재검토 대기. model 검토 sound 인계 |
 | 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
-| 다음 카드 / 첫 행동 / 다음 담당 | model 권한 결속/CAS 독립 검토 완료(sound). 남은 것: Codex R5 수정본 재검토·착지, 여유 호스트 image lane 재판별. 담당 Codex(착지)·사용자/CI(재실행) |
-| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_..._근본원인과R2수정.md` v1.4.0; `..._VF-CX_Claude_model_remote독립검토.md`; `..._VF-CX_Claude_원격권한결속과CAS_fixture독립검토.md`. 커밋 56aa7cb·b809fbe·816346c + R5(아래) |
+| 다음 카드 / 첫 행동 / 다음 담당 | 착지 완료(11커밋 b378785). e2908a5 registry 권한 결속 독립 검토 완료(sound), docker 부재 3파일 동작 실측(22 passed/2 skipped, 깔끔 skip·가드 불필요). 남은 것: 3파일 배치/CI 경계(Codex), 여유 호스트 image lane 재판별(사용자/CI) |
+| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_...근본원인과R2수정.md` v1.5.0; `..._model_remote독립검토.md`; `..._원격권한결속과CAS_fixture독립검토.md`; `..._registry권한결속_독립검토.md`. 착지 merge b378785 |
 
 
 ## Codex 통합 수신 (2026-09-18)
