@@ -1,0 +1,23 @@
+{
+  "baseSha": "f00341e",
+  "codeSha": "22059e9",
+  "managedFiles": 11,
+  "pending": 0,
+  "preservedExternalEdits": [
+    "30_Development/Agent별 작업/Codex 작업 현황.md"
+  ],
+  "files": [
+    "00_Index/전체 개발 진행 현황.md",
+    "20_Architecture/모델 레지스트리와 실행 Manifest 권한 경계.md",
+    "30_Development/Agent별 작업/Codex VF 작업 현황.md",
+    "30_Development/Evidence/vf-pitr-boundary/baseline.json",
+    "30_Development/Evidence/vf-pitr-boundary/local-tests.json",
+    "30_Development/Evidence/vf-pitr-boundary/operational-observation.json",
+    "30_Development/History/2026-09-15_VF_오류와_해결.md",
+    "30_Development/History/2026-09-18_09-30-00_KST_VF-CL-05_Claude_finding1철회와finding2제안.md",
+    "30_Development/History/2026-09-18_VF-PITR-BOUNDARY_Codex.md",
+    "30_Development/VF-CL-04 replica 복구와 PITR 운영 runbook.md",
+    "30_Development/Evidence/vf-pitr-boundary/ci.json"
+  ],
+  "finalManagedFilesIncludingReceipt": 12
+}

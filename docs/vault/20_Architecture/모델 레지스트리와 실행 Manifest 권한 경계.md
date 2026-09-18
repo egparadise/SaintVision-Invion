@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -66,3 +66,8 @@ record_deployment는신뢰된내부호출자가제공한timezone-aware now의배
 - 기존DB고유제약은유지하며service잠금은동시등록이고유제약예외로실패하지않고직렬대체되도록한다. 원시SQL직접쓰기권한이나운영DB정리를추가하지않았다. 운영사용자·승인scope·실제배포성과확인은별도kernel절차가필요하다.
 
 실제실패재현/동시transaction검증은 [[2026-09-15_VF-DEPLOYMENT-GUARD_Codex]]. Claude독립재검토대상이다.
+
+
+## Claude option A 수신 판정 (1.3.0)
+
+1834ee3의 model_id/version/URI 안정성 시험과 정책선언 소유자를 kernel로 유지하는 방향을 수신했다. 이는 registry→kernel의 권한있는 명시적 결속을 구현하거나 증명한 것이 아니다. 동일 model/version은 프로젝트·tenant·manifestHash·registryVersionId·내용 식별을 생략하는 join key로 사용하지 않는다. public registry와 kernel은 기존 현재권한 API 경계를 유지한다. 자동read-through/배포인가를 추가하지 않았고 UI는 정확한 project/model/version의 과거관측만 제공한다. ModelManifestStore 내부 직접접근을 사용자권한검증의대체로사용하지않는다.

@@ -1,0 +1,12 @@
+{
+  "syntheticDataOnly": true,
+  "originalSource": "521766c",
+  "exitCode": 1,
+  "failed": 4,
+  "findings": [
+    "raw archive command disclosure",
+    "no-op accepted",
+    "archive_library ignored",
+    "configuration confused with recovery evidence"
+  ]
+}
