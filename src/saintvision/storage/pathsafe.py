@@ -245,15 +245,21 @@ def build_uri(kind: str, *, name: str = "", version: str = "", relative_path: st
             raise ValueError(f"{kind} URI requires a name and a version")
         if "@" in name or "/" in name:
             raise ValueError("name must not contain '@' or '/'")
+        if "/" in version:
+            raise ValueError("version must not contain '/'")
         tail = f"/{relative_path}" if relative_path else ""
         return f"inv://{plural}/{name}@{version}{tail}"
     if kind == "artifact":
         if not run_id or not artifact_id:
             raise ValueError("artifact URI requires runId and artifactId")
+        if "/" in run_id or "/" in artifact_id:
+            raise ValueError("artifact identifiers must not contain '/'")
         return f"inv://artifacts/{run_id}/{artifact_id}"
     if kind == "workspace":
         if not workspace_id or not relative_path:
             raise ValueError("workspace URI requires a workspaceId and a relative path")
+        if "/" in workspace_id:
+            raise ValueError("workspace identifier must not contain '/'")
         return f"inv://workspaces/{workspace_id}/{relative_path}"
     raise ValueError(f"unknown URI kind: {kind!r}")
 
@@ -300,7 +306,9 @@ def parse_uri(uri: str) -> ParsedUri:
 
     if namespace in ("datasets", "models"):
         kind = "dataset" if namespace == "datasets" else "model"
-        head, _, relative = rest.partition("/")
+        head, slash, relative = rest.partition("/")
+        if slash and not relative:
+            raise ValueError("empty URI path segment")
         name, at, version = head.partition("@")
         if not at or not name or not version:
             raise ValueError(f"{kind} URI must be inv://{namespace}/<name>@<version>")

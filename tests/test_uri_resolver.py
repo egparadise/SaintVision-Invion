@@ -81,6 +81,21 @@ def test_parse_uri_rejects_malformed(bad):
         parse_uri(bad)
 
 
+@pytest.mark.parametrize(
+    "bad",
+    [
+        dict(kind="dataset", name="x", version="1/2"),
+        dict(kind="artifact", run_id="r/1", artifact_id="a"),
+        dict(kind="workspace", workspace_id="w/s", relative_path="a"),
+    ],
+)
+def test_build_uri_rejects_a_slash_in_an_identifier_or_version(bad):
+    """Codex's build_uri hardening (reviewed): a '/' in a version or identifier
+    would produce a malformed URI, so it is refused at construction."""
+    with pytest.raises(ValueError):
+        build_uri(**bad)
+
+
 def test_parse_uri_reads_dataset_fields():
     parsed = parse_uri("inv://datasets/corpus@7/train/data.bin")
     assert (parsed.kind, parsed.name, parsed.version, parsed.relative_path) == (
