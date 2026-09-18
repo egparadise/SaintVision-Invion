@@ -66,36 +66,5 @@
   "furtherImageRuns": "paused until environment intervention and quiet conditions",
   "runnerExitCode": 1,
   "cleanup": "host process-creation failed (NTSTATUS 0xC0000142); the OS could not start the process -- host resource/handle pressure, not a docker/daemon error",
-  "jsonSHA256": "9783fa43a145c36345b7e0d4b7aec100b7f0a86a507db3d3d51526ca19607d87",
-  "exitCode": 1,
-  "comparison": [
-    {
-      "source": "Codex 90c07c6",
-      "passed": 4,
-      "failed": 4,
-      "evidence": "../cx01-image-post-cleanup/attempt2.json"
-    },
-    {
-      "source": "user 9e69dcc",
-      "passed": 3,
-      "failed": 5,
-      "evidence": "../docker-host-review/coord-postfix-determination.json"
-    },
-    {
-      "source": "user b5f770a",
-      "passed": 2,
-      "failed": 6,
-      "evidence": "../docker-host-review/coord-final-determination.json"
-    }
-  ],
-  "interpretation": {
-    "repeatableFullAcceptanceEstablished": false,
-    "retryRescuedFullLane": false,
-    "hostOnlyCausalExperiment": false,
-    "testHarnessChangedAcrossRuns": true,
-    "rootCauseOfTimeouts": "unestablished",
-    "handlePressureCausality": "plausible, not established by controlled intervention",
-    "cleanupMessage": "preserved runner diagnostic; causal wording is not independently established",
-    "nextAction": "environment owner intervention, record conditions, then one quiet controlled run of an approved harness; business-kernel-role remains unverified"
-  }
+  "jsonSHA256": "9783fa43a145c36345b7e0d4b7aec100b7f0a86a507db3d3d51526ca19607d87"
 }
