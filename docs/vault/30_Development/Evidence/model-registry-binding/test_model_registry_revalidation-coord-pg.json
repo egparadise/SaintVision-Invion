@@ -1,0 +1,51 @@
+{
+  "baseSha": "f2297ae5d2d8f89e430fb11ba18fda3c9c7f2ae5",
+  "testFileSha256": "61e97bd926873a2c98f6fe474602dd20a57f358dbdf0c86ad689c599a7895377",
+  "suite": "tests/integration/test_model_registry_revalidation.py",
+  "command": "python -m pytest tests/integration/test_model_registry_revalidation.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 12.81,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 7
+  },
+  "cases": [
+    {
+      "name": "test_revalidation_does_not_create_missing_binding",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_retains_lifecycle_lock_until_caller_commit",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_refuses_stale_authority_or_identity[permission]",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_refuses_stale_authority_or_identity[policy]",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_refuses_stale_authority_or_identity[pin]",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_refuses_stale_authority_or_identity[content]",
+      "status": "passed"
+    },
+    {
+      "name": "test_revalidation_refuses_stale_authority_or_identity[identity]",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "3c637640873eeb87451f3e47bbf9bebf5e39e83d533e45d0329918ae8ffa9b9b",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services\\control-plane\\src\\inv\\model_registry_binding.py": "7b023b44cd4d5882e641b1ce4f79724313005f5703f920e9f3c7e0ecbf7bebc8"
+  },
+  "recordedAtKst": "2026-09-18T13:09:23+09:00"
+}

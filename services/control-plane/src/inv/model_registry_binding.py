@@ -40,47 +40,9 @@ class ModelRegistryBindingStore:
         self.db, self.policy = database, policy
 
     def bind(self, principal, project, registry_version_id, model_id, version, *, manifest_hash):
-        # There is no model-name/version fallback or implicit registry lookup.
-        if (not isinstance(registry_version_id, str) or len(registry_version_id) != 30
-            or not isinstance(manifest_hash, str) or re.fullmatch('[0-9a-f]{64}', manifest_hash) is None):
-            raise DomainError('MODEL-0008', 'Explicit registry and manifest identity required', 422)
         with self.db.transaction(principal.tenant_id) as conn:
-            ApprovalStore(self.db)._grant(conn, project, principal.subject_id, 'can_request')
-            permission(conn, project, principal.subject_id, 'can_request', linked=True)
-            row = conn.execute(
-                'SELECT manifest,manifest_sha256 FROM inv.model_manifests '
-                'WHERE project_id=%s AND model_id=%s AND version=%s',
-                (project, model_id, version),
-            ).fetchone()
-            if not row or row['manifest_sha256'] != manifest_hash:
-                rejected()
-            body = manifest_copy(row['manifest'])
-            if (body['modelId'] != model_id or body['version'] != version
-                or hashlib.sha256(canonical(body)).hexdigest() != manifest_hash
-                or (body['licensePolicy'], body['classification']) not in self.policy.allowed):
-                rejected()
-            # Locks registry model + exact version through this transaction. The
-            # definer grants no registry UPDATE or blanket SELECT to inv_kernel.
-            registry = conn.execute('SELECT * FROM public.model_registry_snapshot(%s,%s,%s)',
-                (principal.tenant_id, project, registry_version_id)).fetchone()
-            now = conn.execute('SELECT clock_timestamp() AS now').fetchone()['now']
-            if (not registry or registry['stage'] != 'released'
-                or registry['content_hash'] != body['contentHash']
-                or registry['byte_size'] != body['totalBytes']
-                or registry['verified_at'] is None or registry['verified_at'] > now
-                or registry['pinned_until'] is None or registry['pinned_until'] <= now):
-                rejected()
-            binding = {
-                'tenantId': str(principal.tenant_id), 'projectId': project,
-                'registryVersionId': registry_version_id,
-                'registryModelId': registry['registry_model_id'],
-                'registryVersion': registry['registry_version'],
-                'modelId': model_id, 'version': version, 'manifestHash': manifest_hash,
-                'contentHash': body['contentHash'], 'totalBytes': body['totalBytes'],
-                'licensePolicy': body['licensePolicy'], 'classification': body['classification'],
-                'bindingPolicyVersion': self.policy.version, 'bindingPolicyHash': self.policy.digest,
-                'executionAuthorized': False, 'requiresExecutionRevalidation': True,
-            }
+            binding = self._current(conn, principal, project, registry_version_id,
+                                    model_id, version, manifest_hash=manifest_hash)
             conn.execute('''INSERT INTO inv.model_registry_bindings
                 (tenant_id,project_id,registry_version_id,model_id,model_version,manifest_sha256,binding)
                 VALUES(%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING''',
@@ -92,3 +54,61 @@ class ModelRegistryBindingStore:
             if not saved or saved['binding'] != binding:
                 raise DomainError('MODEL-0008', 'Registry identity already bound differently', 409)
             return binding
+
+    def revalidate(self, conn, principal, project, registry_version_id, model_id, version, *, manifest_hash):
+        """Check an existing binding under the caller's transaction and locks.
+
+        This never creates a binding, commits, or grants execution authority.
+        Callers retain the registry SHARE locks until their own transaction ends.
+        """
+        binding = self._current(conn, principal, project, registry_version_id,
+                                model_id, version, manifest_hash=manifest_hash)
+        saved = conn.execute('SELECT binding FROM inv.model_registry_bindings '
+            'WHERE project_id=%s AND registry_version_id=%s',
+            (project, registry_version_id)).fetchone()
+        if not saved or saved['binding'] != binding:
+            raise DomainError('MODEL-0008', 'Current registry binding required', 409)
+        return binding
+
+    def _current(self, conn, principal, project, registry_version_id, model_id, version, *, manifest_hash):
+        # There is no model-name/version fallback or implicit registry lookup.
+        if (not isinstance(registry_version_id, str) or len(registry_version_id) != 30
+            or not isinstance(manifest_hash, str) or re.fullmatch('[0-9a-f]{64}', manifest_hash) is None):
+            raise DomainError('MODEL-0008', 'Explicit registry and manifest identity required', 422)
+        ApprovalStore(self.db)._grant(conn, project, principal.subject_id, 'can_request')
+        permission(conn, project, principal.subject_id, 'can_request', linked=True)
+        row = conn.execute(
+            'SELECT manifest,manifest_sha256 FROM inv.model_manifests '
+            'WHERE project_id=%s AND model_id=%s AND version=%s',
+            (project, model_id, version),
+        ).fetchone()
+        if not row or row['manifest_sha256'] != manifest_hash:
+            rejected()
+        body = manifest_copy(row['manifest'])
+        if (body['modelId'] != model_id or body['version'] != version
+            or hashlib.sha256(canonical(body)).hexdigest() != manifest_hash
+            or (body['licensePolicy'], body['classification']) not in self.policy.allowed):
+            rejected()
+        # Locks registry model + exact version through this transaction. The
+        # definer grants no registry UPDATE or blanket SELECT to inv_kernel.
+        registry = conn.execute('SELECT * FROM public.model_registry_snapshot(%s,%s,%s)',
+            (principal.tenant_id, project, registry_version_id)).fetchone()
+        now = conn.execute('SELECT clock_timestamp() AS now').fetchone()['now']
+        if (not registry or registry['stage'] != 'released'
+            or registry['content_hash'] != body['contentHash']
+            or registry['byte_size'] != body['totalBytes']
+            or registry['verified_at'] is None or registry['verified_at'] > now
+            or registry['pinned_until'] is None or registry['pinned_until'] <= now):
+            rejected()
+        binding = {
+            'tenantId': str(principal.tenant_id), 'projectId': project,
+            'registryVersionId': registry_version_id,
+            'registryModelId': registry['registry_model_id'],
+            'registryVersion': registry['registry_version'],
+            'modelId': model_id, 'version': version, 'manifestHash': manifest_hash,
+            'contentHash': body['contentHash'], 'totalBytes': body['totalBytes'],
+            'licensePolicy': body['licensePolicy'], 'classification': body['classification'],
+            'bindingPolicyVersion': self.policy.version, 'bindingPolicyHash': self.policy.digest,
+            'executionAuthorized': False, 'requiresExecutionRevalidation': True,
+        }
+        return binding

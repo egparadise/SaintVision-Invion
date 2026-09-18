@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.6.1"
+version: "1.6.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -111,3 +111,10 @@ ModelRuntimeStore의 명시 remote reader 경로를 구현했다. 기존 Run/Nod
 승인 요청은 현재 business permission·channel, delivery/claim은 기존 Node/resource잠금 뒤 Node/Location/현재권한·channel·fence를 재검사한다. 네트워크는 DBtransaction 밖이며 implicit retry나 자동로컬fallback이 없다. RegistryVersion/policy/lifecycle 실행결속은 별도 남은 구현이다.
 
 최초132오프라인통과/29실PG미실행으로보류했던후보를사용자제공PG16에서재검증했다. 신규원격6+기존runtime23+인접registry/locality/retry50=79passed/0skip, CAS fixture3건수정후모두통과. DB검증보류를해제하고integration반영판정, 독립검토/CI/운영인수는별도대기다. [[2026-09-18_원격모델권한결속_Codex]].
+
+
+## 호출자 트랜잭션의 registry 재검사 (1.6.2)
+
+ModelRegistryBindingStore.revalidate(conn, ...)는 이미 생성된 불변 결속만 허용한다. bind와 같은 현재 project/business 권한·manifest hash·운영자 policy·registry released/verified/retention 조건을 적용한다. 정확한 registryVersionId와 manifest identity를 요구하며 새 결속을 만들거나 기존 값을 수정하지 않는다. registry SHARE 잠금은 호출자 트랜잭션 종료까지 유지한다. 신뢰된 kernel 트랜잭션 안에서만 호출하며 network I/O를 포함하지 않는다.
+
+실제 PG16에서 신규 7건과 기존 binding 16건을 파일별로 검증했다. 아직 ModelRuntimeStore/승인/dispatch에 연결하지 않았으므로 실행권한 결속 완료는 아니다. 다음 단계는 frozen binding hash와 Run 입력 결속, 현재 policy를 포함한 승인/delivery/claim 재검사다. [[2026-09-18_Registry_트랜잭션재검사_Codex]].

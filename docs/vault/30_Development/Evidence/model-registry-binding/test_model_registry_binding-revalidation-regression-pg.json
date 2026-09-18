@@ -1,0 +1,87 @@
+{
+  "baseSha": "f2297ae5d2d8f89e430fb11ba18fda3c9c7f2ae5",
+  "testFileSha256": "68aa3ac70610d17827ad9dd53dfbcfd0d3064d768400aa5e0a39f969318a8f39",
+  "suite": "tests/integration/test_model_registry_binding.py",
+  "command": "python -m pytest tests/integration/test_model_registry_binding.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 18.75,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 16
+  },
+  "cases": [
+    {
+      "name": "test_explicit_distinct_registry_identity_is_durable_and_not_a_permit",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[stage='retired']",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[stage='draft']",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[content_sha256=repeat('0',64)]",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[byte_size=1]",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[verified_at=clock_timestamp()+interval '1 hour']",
+      "status": "passed"
+    },
+    {
+      "name": "test_registry_mismatch_or_invalid_lifecycle_is_refused[retention_pinned_until=clock_timestamp()-interval '1 second']",
+      "status": "passed"
+    },
+    {
+      "name": "test_replay_checks_revoked_project_permission",
+      "status": "passed"
+    },
+    {
+      "name": "test_no_hash_or_version_name_fallback",
+      "status": "passed"
+    },
+    {
+      "name": "test_changed_policy_cannot_rewrite_binding",
+      "status": "passed"
+    },
+    {
+      "name": "test_disallowed_manifest_policy_cannot_bind",
+      "status": "passed"
+    },
+    {
+      "name": "test_concurrent_duplicate_has_one_immutable_result",
+      "status": "passed"
+    },
+    {
+      "name": "test_snapshot_locks_registry_until_transaction_end",
+      "status": "passed"
+    },
+    {
+      "name": "test_definer_scope_and_privileges",
+      "status": "passed"
+    },
+    {
+      "name": "test_retirement_invalidates_a_previously_successful_binding",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_content_cannot_rebind_to_a_different_kernel_version",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "638e880add00c996ca085662a491e5ab5614d57edd812f85b001315f4968e4bf",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services\\control-plane\\src\\inv\\model_registry_binding.py": "7b023b44cd4d5882e641b1ce4f79724313005f5703f920e9f3c7e0ecbf7bebc8"
+  },
+  "recordedAtKst": "2026-09-18T13:09:23+09:00"
+}
