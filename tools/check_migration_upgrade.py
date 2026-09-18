@@ -13,7 +13,10 @@ from sqlalchemy.engine import URL
 
 
 def main():
-    admin = os.environ["INV_TEST_ADMIN_DSN"]
+    admin = os.environ.get("INV_TEST_ADMIN_DSN")
+    if not admin:
+        print("Migration validation not run: INV_TEST_ADMIN_DSN is absent; disposable PostgreSQL is required.", file=sys.stderr)
+        return 2
     root = Path(__file__).resolve().parents[1]
     # Both paths, because this runs as a standalone script: pytest supplies
     # them from pyproject, and the subprocess it launches inherits neither. The
@@ -179,7 +182,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        raise SystemExit(main())
     except Exception:
         raise SystemExit(
             "Disposable migration validation failed; credential-bearing diagnostics suppressed"

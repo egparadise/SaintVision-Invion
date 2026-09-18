@@ -1,7 +1,7 @@
 """Test fixtures.
 
 Tests that need PostgreSQL are marked ``postgres`` and skip with a stated reason
-when ``INV_TEST_DATABASE_URL`` is absent. A skipped test is reported as
+when ``INV_TEST_ADMIN_DSN`` is absent. A skipped test is reported as
 ``not_run``, never as a pass — the DB behaviour under test (RLS, NULLS NOT
 DISTINCT, partition routing) has no meaningful substitute.
 """
@@ -30,18 +30,25 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def database_url() -> str:
+def test_admin_dsn() -> str:
+    """Shared prerequisite; local absence skips, CI absence fails."""
+    admin = os.environ.get("INV_TEST_ADMIN_DSN")
+    if not admin:
+        if os.environ.get("CI"):
+            pytest.fail("CI requires INV_TEST_ADMIN_DSN for the combined backend suite")
+        pytest.skip("INV_TEST_ADMIN_DSN is absent; PostgreSQL tests not run")
+    return admin
+
+
+@pytest.fixture(scope="session")
+def database_url(test_admin_dsn) -> str:
     # Always allocate our own database. Never DROP SCHEMA in an operator's DB.
     import psycopg
     from psycopg import sql
     from psycopg.conninfo import conninfo_to_dict
     from sqlalchemy.engine import URL
 
-    admin = os.environ.get("INV_TEST_ADMIN_DSN")
-    if not admin:
-        if os.environ.get("CI"):
-            pytest.fail("CI requires INV_TEST_ADMIN_DSN for the combined backend suite")
-        pytest.skip("INV_TEST_ADMIN_DSN is absent; PostgreSQL tests not run")
+    admin = test_admin_dsn
     name = "inv_backend_test_" + uuid.uuid4().hex
     with psycopg.connect(admin, autocommit=True) as conn:
         conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))

@@ -1,0 +1,15 @@
+{
+  "finding": "MIGRATION-PREREQUISITE-001",
+  "baseSha": "74e64373ad1bbb80bfe6f0992f661df70be0eb9a",
+  "command": "python -m pytest -q tests/test_migration_prerequisite.py",
+  "exitCode": 0,
+  "passed": 5,
+  "cases": [
+    "CLI missing DSN exit2",
+    "CLI empty DSN exit2",
+    "present malformed DSN exit1 without secret",
+    "local pytest no DSN skip",
+    "CI pytest no DSN fails prerequisite"
+  ],
+  "independentReview": "pending"
+}

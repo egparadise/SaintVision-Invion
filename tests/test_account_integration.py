@@ -145,6 +145,6 @@ def test_concurrent_offer_updates_have_one_current_interval(app_sessionmaker, ow
         assert len(rows)==2 and rows[0][1]==rows[1][0] and rows[1][1] is None
 
 
-def test_published_migration_heads_upgrade_without_rewriting():
+def test_published_migration_heads_upgrade_without_rewriting(test_admin_dsn):
     result=subprocess.run([sys.executable,'tools/check_migration_upgrade.py'],capture_output=True,timeout=180)
     assert result.returncode==0, 'Disposable migration paths failed; diagnostics withheld'

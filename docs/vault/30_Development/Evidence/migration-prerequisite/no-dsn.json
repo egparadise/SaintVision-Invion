@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Project\\SaintVision-Invion\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "tests",
+    "--ignore=tests/integration",
+    "--junitxml=.work/migration-prerequisite-no-dsn.xml"
+  ],
+  "environment": "INV/CX01/VF variables and CI removed; no database configured",
+  "exitCode": 0,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 489,
+    "passed": 1074
+  }
+}

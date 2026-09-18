@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.59"
+version: "1.0.60"
 status: "review"
 author: "Codex"
-updated: "2026-09-18T11:08:50+09:00"
+updated: "2026-09-18T11:40:58+09:00"
 source_of_truth: "Git"
 ---
 
@@ -410,3 +410,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 
 - Claude 8bafb60 추가3파일을 Codex 독립 검토, 관련36시험 통과 후 공유 반영. 작성자76과 중복 합산하지 않는다. VF-CX-02/03 관련104시험 통과; VF-CX-05 오프라인 패키지 검사14시험 통과, 실제 인증서/peer policy 유효기간 실패(exit1). [[2026-09-18_VF-CX-020305_인수준비_Codex]].
 - Docker 종료시험170개+미사용 build cache 정리는 사용자 명시 확인 대기. 이전 image1/7실패 유지, CI billing 사용자 조치 대기. 다음 Codex는 승인 시 정리 후 동일 image 재검증, 운영자는 .225 권한/인증서·정책 갱신 준비.
+
+- 사용자 finding MIGRATION-PREREQUISITE-001 수용: DSN 부재가 migration 손상 신호로 변환되는 검증 결함 수정·로컬 검증 완료. CLI exit2와 공통 local-skip/CI-fail fixture; 무DSN1074통과/489skip/0실패, 실제PG account·29경로upgrade 포함10통과. [[2026-09-18_마이그레이션_DSN_선행조건_Codex]]. 다음 Codex: 공유 착지·선택 동기화, Claude 수정본 독립검토. CI billing 대기.
