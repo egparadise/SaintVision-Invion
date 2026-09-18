@@ -1,6 +1,7 @@
 """Opt-in candidate image acceptance; only disposable Docker resources are touched."""
 import json
 import os
+import re
 import subprocess
 import time
 from uuid import uuid4
@@ -48,10 +49,25 @@ if data['case']=='public-signing-key': (p/'signer.pem').chmod(0o644)
 '''
 
 
+_DOCKER_CREDENTIAL = re.compile(r'(://[^:@/\s]+:)[^@/\s]+(@)')
+
+
+def _docker_diagnostic(stderr):
+    """A bounded, credential-masked docker stderr (VF-CL-R-001).
+
+    Suppressing it made a daemon timeout indistinguishable from resource
+    exhaustion or a product failure, so the image lane's failures could only be
+    guessed at. Keeping a masked summary makes the classification falsifiable
+    without leaking the synthetic INV_RUNTIME_DSN password.
+    """
+    text = stderr if isinstance(stderr, str) else (stderr or b"").decode("utf-8", "replace")
+    return _DOCKER_CREDENTIAL.sub(r"\1***\2", text).strip()[:400] or "(no stderr)"
+
+
 def docker(*args, env=None, data=None):
     result = subprocess.run(["docker", *args], input=data, env=env, capture_output=True,
                             text=True, timeout=90)
-    assert result.returncode == 0, "Docker operation failed; diagnostics suppressed"
+    assert result.returncode == 0, "Docker operation failed: " + _docker_diagnostic(result.stderr)
     return result.stdout.strip()
 
 
@@ -237,11 +253,21 @@ def test_candidate_nonroot_configuration_and_workspace(env, tmp_path, case, busi
                 else:
                     pytest.fail('Persistent Workspace candidate failed after restart')
     finally:
+        # Best-effort cleanup (VF-CL-R-001): ownership is still checked so we never
+        # remove another run's resource, but a check that cannot run under load skips
+        # only that resource rather than aborting the block or masking the test's own
+        # failure. Each removal is independent.
+        def _owned_remove(inspect_args, remove_args):
+            try:
+                if docker(*inspect_args) == name:
+                    docker(*remove_args)
+            except Exception:
+                pass
         if container:
-            assert docker("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container) == name
-            docker("rm", "-f", container)
-        assert docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume) == name
-        docker("volume", "rm", volume)
+            _owned_remove(("inspect", "--format", '{{index .Config.Labels "ai.saintvision.test"}}', container),
+                          ("rm", "-f", container))
+        _owned_remove(("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', volume),
+                      ("volume", "rm", volume))
         if working_volume:
-            assert docker("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume) == name
-            docker("volume", "rm", working_volume)
+            _owned_remove(("volume", "inspect", "--format", '{{index .Labels "ai.saintvision.test"}}', working_volume),
+                          ("volume", "rm", working_volume))
