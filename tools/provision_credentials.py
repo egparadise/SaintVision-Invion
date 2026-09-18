@@ -58,6 +58,14 @@ class ProvisioningDatabaseError(Exception):
         super().__init__("Credential provisioning database operation failed")
 
 
+class ProvisioningInternalError(Exception):
+    """An unexpected provisioning defect, without carrying secret-bearing text."""
+
+    def __init__(self, error_type):
+        self.error_type = error_type if isinstance(error_type, str) else "Exception"
+        super().__init__("Credential provisioning internal error")
+
+
 def validate_manifest(value, action):
     try:
         required = {"tenant", "project", "subject", "run", "epoch", "credential", "version"}
@@ -315,8 +323,16 @@ def provision(dsn, root, manifest, action, *, apply=False):
                 "reference": f"svcred:1:{m['credential']}:{m['version']}",
                 "executionAuthorized": False,
             }
-    except Exception:
-        raise ProvisioningDenied() from None
+    except ProvisioningDenied:
+        raise
+    except psycopg.Error as error:
+        raise ProvisioningDatabaseError(getattr(error, "sqlstate", None)) from None
+    except Exception as error:
+        # Keep rollback in the connection context manager, but never expose
+        # exception text (it may contain a DSN or a credential).  The type is
+        # sufficient for the caller to distinguish an internal defect from a
+        # policy refusal or a database/driver failure.
+        raise ProvisioningInternalError(type(error).__name__) from None
 
 
 class SafeParser(argparse.ArgumentParser):
@@ -354,6 +370,9 @@ def main():
     except ProvisioningDatabaseError as error:
         print(json.dumps({"error": "credential_provisioning_database_error", "sqlstate": error.sqlstate}))
         return EXIT_DATABASE
+    except ProvisioningInternalError as error:
+        print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": error.error_type}))
+        return EXIT_INTERNAL
     except (TypeError, KeyError, AttributeError) as error:
         print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": type(error).__name__}))
         return EXIT_INTERNAL

@@ -145,7 +145,7 @@ def test_audit_failure_rolls_back_rotation(credential_harness, monkeypatch):
         raise RuntimeError("synthetic-private-detail")
 
     monkeypatch.setattr(admin, "event", fail)
-    with pytest.raises(admin.ProvisioningDenied) as error:
+    with pytest.raises(admin.ProvisioningInternalError) as error:
         call(h, m, "rotate")
     assert "synthetic-private-detail" not in str(error.value)
     assert count(h, "credential_versions", m["version"]) == 0
