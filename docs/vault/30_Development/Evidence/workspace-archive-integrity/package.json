@@ -1,0 +1,32 @@
+{
+  "scope": "offline-package-metadata-and-archive-checksums",
+  "checks": {
+    "archiveChecksum": true,
+    "uniqueMembers": true,
+    "packageScope": true,
+    "identity": true,
+    "certificateBinding": true,
+    "certificateFresh": false,
+    "peerPolicyBinding": true,
+    "peerPolicyFresh": false,
+    "currentInstallers": true,
+    "imageMetadata": true
+  },
+  "imageContentsVerified": false,
+  "installationVerified": false,
+  "mtlsVerified": false,
+  "executionAuthorized": false,
+  "imageArchiveChecksums": {
+    "requested": true,
+    "agent": true,
+    "workload": true,
+    "verified": true,
+    "imageIdentityVerified": false
+  },
+  "metadataConsistent": false,
+  "blockers": [
+    "certificateFresh",
+    "peerPolicyFresh"
+  ],
+  "requestedChecksPassed": false
+}

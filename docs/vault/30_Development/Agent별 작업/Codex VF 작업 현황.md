@@ -148,3 +148,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - Docker 정리는 사용자 완료 보고 수신. 동일 image 재검증4통과/4실패; Docker I/O·HTTP500·정리 오류 잔존. 다음 Claude VF-CL-R-001 진단/정리 개선, Codex 수신 후 재검증. 운영자는 .225 갱신 준비, CI billing 대기.
 
 - [[2026-09-18_IMAGE_정리후재검증_Codex]]: 동일digest·시험소스 재검증, 첫 시도PG inspect timeout/0시험, 두 번째4passed/4failed. 이전7건중4통과/3미완, writable 정리실패 추가. 제품 단언 실패 미관측이나 전체보안검증 미완. DSN finding은 사용자 독립 검증1074/489/0수신.
+
+- [[2026-09-18_Workspace_아카이브무결성_Codex]]: VF-CX-05 오프라인 내부image archive SHA-256 검사 추가(합계8GiB한도),21시험통과·실제2archive일치. 인증서/정책만료로exit1 유지. OneDrive는 쓰기버스트상관으로 정정, 일정누수/NTSTATUS인과미확정. 다음Claude 독립검토/R2수정, Codex 수정수신 후검증.

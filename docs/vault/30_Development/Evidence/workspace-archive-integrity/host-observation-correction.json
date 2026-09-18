@@ -1,0 +1,31 @@
+{
+  "source": "user observations, approximate first two times, KST 2026-09-18",
+  "observations": [
+    {
+      "time": "11:45 approximately",
+      "handles": 463776
+    },
+    {
+      "time": "11:58 approximately",
+      "handles": 476020
+    },
+    {
+      "time": "12:02:27",
+      "handles": 481629
+    },
+    {
+      "time": "12:03:57",
+      "handles": 481600
+    }
+  ],
+  "activeIntervalDelta": 17853,
+  "quiet90SecondDelta": -29,
+  "additionalMeasurements": {
+    "threads": 56,
+    "workingSetMB": 396,
+    "availableRamMB": 2224,
+    "systemHandles": 7682
+  },
+  "assessment": "correlation with Agent write bursts, not established steady leak or cause of process initialization failures",
+  "environmentInterventionBeforeAfterAvailable": false
+}

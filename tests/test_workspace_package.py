@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.x509.oid import NameOID
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from check_workspace_package import INSTALLERS, inspect_package
+from check_workspace_package import INSTALLERS, inspect_package, archive_checksums
 
 NOW = datetime(2026, 9, 18, tzinfo=timezone.utc)
 
@@ -140,3 +140,73 @@ def test_not_yet_valid_certificate_is_not_installation_evidence(package):
     state, source, identity, *_ = package
     report = inspect_package(state, identity, source_root=source, now=NOW - timedelta(days=2))
     assert 'certificateFresh' in report['blockers']
+
+
+def payload_inspect(package, **kwargs):
+    state, source, identity, *_ = package
+    return inspect_package(state, identity, source_root=source, now=NOW,
+                           verify_image_archives=True, **kwargs)
+
+
+def pin_payload(package):
+    # Deliberately not a Docker image: a matching file hash must not certify one.
+    expected = hashlib.sha256(b'not an image; metadata cannot prove contents').hexdigest()
+    package[3]['agent'] = dict(package[3]['agent'], archiveSHA256=expected)
+    package[3]['workload'] = dict(package[3]['workload'], archiveSHA256=expected)
+    package[5]()
+
+
+def test_opt_in_detects_inner_mismatch_even_when_outer_zip_matches(package):
+    assert inspect(package)['metadataConsistent']
+    report = payload_inspect(package)
+    assert report['metadataConsistent']
+    assert not report['requestedChecksPassed']
+    assert report['blockers'] == ['imageArchiveChecksums']
+
+
+def test_matching_payload_hashes_never_certify_docker_image_identity(package):
+    pin_payload(package)
+    report = payload_inspect(package)
+    assert report['requestedChecksPassed']
+    assert report['imageArchiveChecksums']['verified']
+    assert not report['imageArchiveChecksums']['imageIdentityVerified']
+    for name in ('imageContentsVerified', 'installationVerified', 'mtlsVerified', 'executionAuthorized'):
+        assert report[name] is False
+
+
+@pytest.mark.parametrize('kind', ['agent', 'workload'])
+def test_both_payloads_are_independently_required(package, kind):
+    pin_payload(package)
+    package[3][kind]['archiveSHA256'] = '0' * 64
+    package[5]()
+    report = payload_inspect(package)
+    assert not report['imageArchiveChecksums'][kind]
+    assert report['imageArchiveChecksums']['workload' if kind == 'agent' else 'agent']
+    assert not report['requestedChecksPassed']
+
+
+def test_combined_budget_rejects_before_reading_any_image(package, monkeypatch):
+    pin_payload(package)
+    with ZipFile(package[0] / 'public/workspace-worker.zip') as archive:
+        monkeypatch.setattr(archive, 'open', lambda *_: pytest.fail('budget must be checked before reading'))
+        one_size = archive.getinfo('node-agent.tar').file_size
+        with pytest.raises(ValueError, match='budget'):
+            archive_checksums(archive, package[3], one_size)
+
+
+def test_budget_failure_is_fixed_diagnostic_and_keeps_authorization_false(package):
+    pin_payload(package)
+    report = payload_inspect(package, max_image_archive_bytes=1)
+    assert report['inspectionIncomplete']
+    assert report['blockers'] == ['imageArchiveChecksums']
+    assert not report['requestedChecksPassed']
+
+
+def test_expired_credentials_still_block_with_matching_payloads(package):
+    pin_payload(package)
+    package[4]['expiresAt'] = NOW.isoformat()
+    package[5]()
+    report = payload_inspect(package)
+    assert report['imageArchiveChecksums']['verified']
+    assert 'peerPolicyFresh' in report['blockers']
+    assert not report['requestedChecksPassed']

@@ -158,6 +158,8 @@
       "docker-operation-timeout": "Python TimeoutExpired, no NTSTATUS observed",
       "docker-stream-upgrade-http500": "CLI ran and received HTTP500; distinct from failure to initialize CLI. Same host pressure plausible but unproven; created initializer remained",
       "host-process-initialization-failure": "NTSTATUS DLL initialization failure; not a daemon-returned I/O timeout"
-    }
+    },
+    "temporalFollowup": "../workspace-archive-integrity/host-observation-correction.json",
+    "handleTrendAssessment": "Increased during write bursts; declined 29 in a quiet 90-second interval. Correlation only; not an established steady leak or cause."
   }
 }

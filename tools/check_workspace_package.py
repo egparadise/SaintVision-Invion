@@ -1,4 +1,4 @@
-"""Offline metadata inspection of an enrolled Node's existing Workspace package.
+"""Offline metadata and optional archive-checksum inspection of a Workspace package.
 
 Never installs, contacts a Node, changes identity, or certifies image contents/mTLS.
 Only fixed diagnostic keys are emitted; package-controlled values are not echoed.
@@ -14,6 +14,8 @@ from cryptography import x509
 
 ROOT = Path(__file__).resolve().parents[1]
 INSTALLERS = ('worker_config.py', 'worker_workspace.py', 'Enable-Workspace.ps1')
+IMAGE_ARCHIVES = (('agent', 'node-agent.tar'), ('workload', 'workspace-image.tar'))
+MAX_IMAGE_ARCHIVE_BYTES = 8 * 1024**3
 CHECKS = ('archiveChecksum', 'uniqueMembers', 'packageScope', 'identity',
           'certificateBinding', 'certificateFresh', 'peerPolicyBinding', 'peerPolicyFresh',
           'currentInstallers', 'imageMetadata')
@@ -35,12 +37,40 @@ def bounded(archive, name, limit):
     return body
 
 
-def inspect_package(state_path, identity, *, source_root=ROOT, now=None):
+def archive_checksums(archive, manifest, limit):
+    """Bound total decompressed bytes; hash without loading or extracting images."""
+    if type(limit) is not int or not 1 <= limit <= MAX_IMAGE_ARCHIVE_BYTES:
+        raise ValueError('Invalid archive budget')
+    infos = [archive.getinfo(name) for _, name in IMAGE_ARCHIVES]
+    if any(i.is_dir() or i.file_size <= 0 for i in infos) or sum(i.file_size for i in infos) > limit:
+        raise ValueError('Image archive budget exceeded')
+    results = {}
+    remaining = limit
+    for (kind, _), info in zip(IMAGE_ARCHIVES, infos):
+        hashed, count = hashlib.sha256(), 0
+        with archive.open(info) as stream:
+            while chunk := stream.read(min(1024 * 1024, remaining + 1)):
+                remaining -= len(chunk)
+                count += len(chunk)
+                if remaining < 0 or count > info.file_size:
+                    raise ValueError('Image archive budget exceeded')
+                hashed.update(chunk)
+        results[kind] = count == info.file_size and hashed.hexdigest() == manifest[kind]['archiveSHA256']
+    return results
+
+
+def inspect_package(state_path, identity, *, source_root=ROOT, now=None,
+                    verify_image_archives=False, max_image_archive_bytes=MAX_IMAGE_ARCHIVE_BYTES):
     now = now or datetime.now(timezone.utc)
-    report = {'scope': 'offline-package-metadata-only',
+    report = {'scope': ('offline-package-metadata-and-archive-checksums' if verify_image_archives
+                        else 'offline-package-metadata-only'),
               'checks': {name: False for name in CHECKS},
               'imageContentsVerified': False, 'installationVerified': False,
               'mtlsVerified': False, 'executionAuthorized': False}
+    report['imageArchiveChecksums'] = {
+        'requested': verify_image_archives, 'agent': False, 'workload': False,
+        'verified': False, 'imageIdentityVerified': False,
+    }
     checks = report['checks']
     public = state_path / 'public'
     try:
@@ -88,12 +118,19 @@ def inspect_package(state_path, identity, *, source_root=ROOT, now=None):
                 and isinstance(manifest[kind].get('archiveSHA256'), str)
                 and re.fullmatch('[0-9a-f]{64}', manifest[kind]['archiveSHA256']) is not None
                 and filename in names
-                for kind, filename in [('agent', 'node-agent.tar'), ('workload', 'workspace-image.tar')])
+                for kind, filename in IMAGE_ARCHIVES)
+            if verify_image_archives and checks['imageMetadata']:
+                results = archive_checksums(archive, manifest, max_image_archive_bytes)
+                report['imageArchiveChecksums'].update(results)
+                report['imageArchiveChecksums']['verified'] = all(results.values())
     except Exception:
         # ZIP, JSON, filesystem and parser diagnostics may contain private inputs.
         report['inspectionIncomplete'] = True
     report['metadataConsistent'] = all(checks.values())
     report['blockers'] = [name for name, passed in checks.items() if not passed]
+    if verify_image_archives and not report['imageArchiveChecksums']['verified']:
+        report['blockers'].append('imageArchiveChecksums')
+    report['requestedChecksPassed'] = not report['blockers']
     return report
 
 
@@ -101,16 +138,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--verify-image-archives', action='store_true',
+                        help='Stream both archive checksums (8 GiB combined limit); does not verify image identity or execution')
     args = parser.parse_args()
     try:
         from lan_pilot import load
-        report = inspect_package(args.state, load(args.state))
+        report = inspect_package(args.state, load(args.state),
+                                 verify_image_archives=args.verify_image_archives)
         args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     except Exception:
         print('Offline package inspection unavailable; no installation verified.')
         return 2
     print(json.dumps(report))
-    return 0 if report['metadataConsistent'] else 1
+    return 0 if report['requestedChecksPassed'] else 1
 
 
 if __name__ == '__main__':

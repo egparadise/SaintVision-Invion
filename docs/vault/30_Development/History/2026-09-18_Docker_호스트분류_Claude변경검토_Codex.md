@@ -41,3 +41,5 @@ source_of_truth: "Git"
 
 - 구현은 Claude 담당 유지. Codex는83c0163 문서 수신과 근거·분류만 공유 반영한다. 두 fix커밋은 결함 해소 후 Claude 후속SHA를 받아 재검토한다. 사용자 재승인 요청 없이 안전한 부분을 먼저 착지한다.
 - 다음 Claude: R2-01/02/03 + Windows NTSTATUS 분리/읽기 전용 재시도 검토. 다음 Codex: 수정본 검토·같은digest security lane 재실행. CI billing·운영mTLS/5대인수 미완. Docker daemon 다운/제품보안결함/OneDrive 근본원인 어느 것도 현재 결과로 단정하지 않는다.
+
+- 후속 사용자 시계열 정정 수신: [[2026-09-18_Workspace_아카이브무결성_Codex]]. 쓰기구간+17853/조용한90초-29, 일정누수 아닌 버스트상관. 환경조치 전후 인과는 미확정 유지.
