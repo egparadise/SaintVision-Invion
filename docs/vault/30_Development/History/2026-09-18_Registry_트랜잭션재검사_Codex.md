@@ -28,3 +28,9 @@ VF-CX-02/03, owner Codex, reviewer Claude(미실시). base f2297ae, branch agent
 합계 23건은 두 파일 범위이며 전체 스위트/운영 인수 결과가 아니다. image lane·Docker/prune 실행 없음. CI 결제 제한은 사용자 조치 대기, CI 통과로 기록하지 않는다. 독립 검토는 Claude 대기. 신규 원격 설치 권한을 사용하지 않았다.
 
 다음 Codex: registry binding을 frozen workload의 승인 digest에 연결하고 승인/delivery/claim에서 현재 policy와 lifecycle을 재검사. 다음 Claude: 본 helper와 e89a415 orchestration 독립 검토, R5-01/02 수정본 제출. 사용자 R5-01 독립 MRO 실증은 기존 Claude816346c 검토 History에 수신 기록했다. 원격 tip816346c 확인, 새 수정본 미도착으로 전체 브랜치 보류 유지.
+
+## 배포 기록
+
+구현 SHA 0a16658. 작업 branch와 integration/all-agents-unified에 일반 fast-forward push exit0. check_docs exit0(517문서), check_ontology exit0, git diff --check exit0. 변경 정본 7파일만 Obsidian check→apply→check: 7 exported, 0 pending, 0 conflicts(원본 SHA 0a16658). 전체 vault export 없음.
+
+`gh run list --repo egparadise/SaintVision-Invion --branch agent/codex/model-registry-binding --limit 3 --json databaseId,headSha,status,conclusion,url` exit1: 현재 CLI 인증 없음. 따라서 동일 SHA CI ID/상태는 미확인이다. 기존 billing 대기와 구분하며 CI 재실행/비용 조치는 하지 않았다. 개발 integration 반영과 CI·독립 검토·운영 인수는 별도 상태다.
