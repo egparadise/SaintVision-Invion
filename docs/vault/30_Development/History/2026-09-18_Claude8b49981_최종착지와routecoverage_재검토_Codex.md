@@ -52,6 +52,10 @@ PITR-R2-02 cleanup 코드는 앞서 Codex가 고정 SHA에서 13개 원본 대�
 
 다음 세션은 외부 대기 5건과 미감사 6영역을 기존 조건대로 재개한다. 오늘 추가된 인계는 route 도구 세 오탐 유형을 적용해 같은 조사를 반복하지 않는 것뿐이다. route 계약은 현재 실제 불일치 0건으로 기록하되, live HTTP 운영 인수로 과장하지 않는다.
 
+## 호스트 시계열 후속 인계
+
+사용자 보고 handle 시계열은 재시작 직후 `2,421` → 약 1시간 후 `119,773` → 현재 `296,475`이며 현재 가용 RAM은 `1,078MB`다. 과거 `641,442`에서 image host-init 실패가 관측됐다. 재시작은 임시 완화이고 OneDrive 동기화 경로의 vault 쓰기가 계속되는 동안 handle이 재증가할 수 있다. 다음 image lane 전에는 실행 직전 handle 수준·추세, RAM, Docker process 시작 상태, 동시 image 실행 부재를 확인한다. 이 관측은 원인 후보를 강화하지만 OneDrive 단일 원인이나 안전 임계치를 확정하지 않는다. 새 환경 조치 없이 같은 lane을 반복하지 않는다.
+
 ## 인계
 
 Claude 문서 정정과 PITR cleanup은 착지했다. 남은 운영 항목은 AC-12 활성/별도 저장소, image lane의 business-kernel-role 미검증, 원격 장비와 CI 외부 조건이다. route coverage의 추가 backend endpoint 구현은 현재 필요하지 않으며, 이후 실제 HTTP 계약 변경이 생길 때 해당 owner가 새 경로와 음성 회귀를 함께 제출한다.

@@ -1,7 +1,7 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.1"
+version: "1.5.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -190,3 +190,5 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 [[2026-09-18_Claude_대기상태정정과수정인계_Codex]]:2ed3d65는문서1파일뿐/PITR코드변경0. FIX02재검토·내용착지완료, PITR은Codexreview대기가아니라Claude cleanup잔여수정대기. 내용차이8/동등patch3 대조,image workspace skip누락·실PG11오표기·1179실행주체등상태문서정정인계. bb4f4cb Claude sound 문서수신(독립소스검토,런타임별도). 사용자의npm검사시점/16시험합성범위정정수용수신. 동일주입/운영시험반복없음.
 
 MJS-02 인계 구체화(기준8a8e3db): Gemini owner/Codex reviewer. 상수 UI 3건은 API smoke PASS에서 제외·미검증 표기가 최소 수정이며, 실제 browser 관측을 선택하면 항목별 음성 대조가 필요하다. [[2026-09-18_Codex_감사사이클종료와다음세션인계]]의 처리 계획 참조. owner 수신·착수는 미확인. PITR/해당 수정본 대기, 새 감사 없음.
+
+최종 호스트 관측(사용자 보고): OneDrive handle은 재시작 직후 **2,421 → 약 1시간 후 119,773 → 현재 296,475**, 가용 RAM은 현재 **1,078MB**다. 과거 641,442에서 image host-init 실패가 관측된 이력과 함께 다음 재개 조건에 추가한다. 재시작은 임시 완화이며 vault가 OneDrive 동기화 경로에 있는 한 handle이 다시 증가할 수 있다. image lane 재개 전에는 실행 직전 handle 수준과 증가 추세, 가용 RAM, Docker process 시작 상태, 동시 image 실행 부재를 다시 확인한다. 이 시계열은 호스트 압박과 정합하지만 OneDrive 단일 원인이나 안전 임계치를 확정하지 않는다. 추가 image 실행은 새 환경 조치 없이 반복하지 않는다.
