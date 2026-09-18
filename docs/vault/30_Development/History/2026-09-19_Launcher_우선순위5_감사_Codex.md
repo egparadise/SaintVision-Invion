@@ -35,8 +35,8 @@ PowerShell launcher의 `ErrorActionPreference=Stop`, `Test-Path -LiteralPath`, `
 
 ## 회귀 확인
 
-`tests/core/test_launcher_failure_boundaries.py`가 LiveConsole의 Docker start exit guard와 Agent-Shell의 interactive `NoExit` 경계를 고정한다. 이는 실제 Docker/GUI 실행을 대체하지 않는 소스 경계 회귀다.
+`tests/core/test_launcher_failure_boundaries.py`는 C# `docker.exe` shim을 컴파일해 `PATH` 앞에 주입하고, 원본 PowerShell launcher가 실제로 `inspect`와 `start`를 호출했는지 먼저 확인한 뒤 start exit 7 경로를 실행한다. 호출 전제가 성립하지 않으면 `ASSERT-FAIL`로 종료하므로 단순 문자열 검사가 아니다. Agent-Shell의 `NoExit`는 interactive 경계로 문서화하며 완료 신호로 세지 않는다. 이 시험은 실제 Docker daemon·WSL·GUI 운영 인수를 대체하지 않는다.
 
 ## 다음 범위
 
-실제 `docker start` 실패 주입, WSL native exit 전달, Agent GUI 자식 도구 실패, package rollback과 health의 운영 의미는 Docker/WSL/사용자 세션이 격리된 조건에서 별도 검증한다. 현재 확정된 코드 finding은 LiveConsole start exit 미검사이며 수정 후 독립 검토가 필요하다.
+Docker start 실패 주입은 daemon 없이 shim으로 행동 검증을 완료했다. WSL native exit 전달, Agent GUI 자식 도구 실패, package rollback과 health의 운영 의미는 Docker/WSL/사용자 세션이 필요한 별도 운영 검증으로 남긴다.
