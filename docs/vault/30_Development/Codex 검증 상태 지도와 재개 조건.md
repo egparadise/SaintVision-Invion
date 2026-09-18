@@ -34,7 +34,7 @@ MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대�
 | 원격 모델 권한 결속 / 8c347b7→e89a415 | 파일별 실제PG79passed/0skip. CAS fixture 정상화 후 remote6건 도달·통과 | 사용자 명시4파일75통과, Claude c9e6ddf 이전8c/e89 sound 소스검토. 합산하지 않음. [[2026-09-18_원격모델권한결속_Codex]] |
 | 호출자 transaction registry 재검사 / 0a16658→1b39d40 | 실제PG 신규7+기존16=23passed/0skip | 사용자 같은2파일23통과. 기존 binding만 허용·SHARE 잠금 유지. [[2026-09-18_Registry_트랜잭션재검사_Codex]] |
 | frozen registry→승인/dispatch/delivery/claim / e2908a5 | 명시5파일실PG84+오프라인60=144passed | Claude c9e6ddf sound/finding없음 **소스검토**. 원격 전송/실행 장비 인수 아님. [[2026-09-18_Registry_실행권한결속_Codex]] |
-| 운영자 policy 설정 연결 / 11e9f44→d7e7d13 | offline34+실PG 기존catalog API12=46passed/0skip | **이번 설정 변경 독립검토 대기**. 초기 관측용DSN application_name 차이12setup오류 별도 보존. [[2026-09-18_Registry_운영정책설정_Codex]] |
+| 운영자 policy 설정 연결 / 11e9f44→d7e7d13 | offline34+실PG 기존catalog API12=46passed/0skip | **Claude7e3de2a 독립 소스 검토 sound 수신**. 초기 관측용DSN application_name 차이12setup오류 별도 보존. [[2026-09-18_Registry_운영정책설정_Codex]] |
 | Claude diagnostics/cleanup R2~R5 / d59b8a6→b378785 | 사용자독립24passed(실Docker2포함), Codex22passed/실Docker2제외·격리import통과 | 브랜치 blocker 해소. image 보안8케이스 합격 아님. [[2026-09-18_Registry_실행권한결속_Codex]] |
 | 기본 시험 선택 / 3afe227→1eaf285 | 비integration1179passed/489skip/2deselected,66.23초 | 사용자같은선택1179/489/2/0,75초. CI설정은 수정만 했고 CI실행 없음. Claude Docker부재22pass/2skip은 marker분리 전 세파일 시험. [[2026-09-18_Docker_시험선택경계_Codex]] |
 | VF-CX-05 패키지 무결성 / 50fbb1a | offline21passed, 실제패키지2archive hash일치 | certificate/peer policy 만료로 전체exit1. 설치가능/운영인수 아님. [[2026-09-18_Workspace_아카이브무결성_Codex]] |
@@ -50,7 +50,7 @@ MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대�
 | business-kernel-role | 잘못된 DB role의 image 기동 거부 단언은 네 실행 모두 미검증 | 전체image실행에서 해당 단언 도달·거부를 별도case evidence로 확인. classifier24통과로 대체 금지 |
 | 나머지489skip | 1eaf285 비integration 실행에서 DB/플랫폼 등 선행조건별 미실행 | 전체가 해소됐다고 하지 않음. 필요 변경별 파일 단위 실PG 검증, skip이유·SHA 기록. Codex |
 | 2deselected Docker host 시험 | 기본 경로에서 의도적 제외. 과거사용자d59실제2건통과와 최신선택에서의 미실행은 별도 | 격리host의 명시 docker_host lane/Core CI에서 실행. 공유host에서 자동prune 금지 |
-| 11e9f44 policy 설정 | 로컬46통과, 독립검토/운영rollout 미완 | Claude 독립검토. 모든worker에 같은시작policy 전달·구프로세스 종료 계획 필요. hot reload/전역policyepoch 없음 |
+| 11e9f44 policy 설정 | 로컬46통과, Claude7e3de2a sound; 운영rollout 미완 | 운영owner rollout 준비. 모든worker에 같은시작policy 전달·구프로세스 종료 계획 필요. hot reload/전역policyepoch 없음 |
 | 공개 registry/runtime 준비 서비스 | trusted worker 및 승인 경계는 구현. 신규 공개 prepare API·대용량/GPU/routing/data/tensor-pipeline은 이 증거에 없음 | 미지원/후속구현과 미검증을 구분. 현재 상태정리 요청에서 새 구현 생성하지 않음 |
 | .225/실5대 | 18443 연결3회timeout 과거증거, 유효profile/mTLS·장비 실행·이탈/복구 인수 없음 | 운영자 준비 후 아래 단계별 재개. 소프트웨어 mock/loopback시험으로 대체 금지 |
 | AC-12 RPO/PITR | 목표 달성 **미입증**. 최신 운영관측 archive_mode off/pitrVerified false. 백업 직후의 거의0초 간격은 RPO 인수 증거가 아님 | Claude는 사용자 배정 compose변경안·격리리허설·용량/저장소 요구 준비. Codex는 인수지표·증거 독립검토. 실제 적용은 운영자 결정 |
@@ -149,3 +149,8 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## 감사1~5 종합과 누락 없는 상태표
 
 [[검증 경계 감사 종합과 잔여 범위]]이 감사 결과별 owner·수정·검증·잔여 검토 정본이다. 후속8건/초기AUDIT포함10건/MJS01·02포함12개 ID의 분모를 구분. 요청10건 중 사용자 수정·독립검증 확인7/미수정3, 별도MJS01수정·독립실행/MJS02 UI상수 미수정. MJS03~05 최신사용자확인 수신과 Codex계약리뷰잔여는 분리. 우선순위4확정finding추가0, 위험후보보존; 1~5첫표본정리·전수완료아님·6 frontend미착수. 제품/운영 재실행0, 운영0/5유지.
+
+
+## Fixture 수정본 재검토·registry policy 검토 수신
+
+[[2026-09-18_Fixture_a5401a7_재검토_Codex]]: a5401a7 9시험 Codex독립통과(합성DB/engine,실PG0); 사용자의 DSN설정9통과도 실제PG시험은 아님. FIX01 원래경로해소, FIX02 DROP시도해소/동시dispose+DROP 오류누락 P3잔여로전체수정종결보류·미병합. 다음Claude FIX02-R1수정/Codex재검토. 11e9f44는Claude7e3de2a sound 독립소스검토 수신으로대기해소(CI/운영별도). PITR0da140e도착·검토대기.
