@@ -56,3 +56,13 @@ bfb225e는 이미 integration에 들어와 있어 원격 변경을 fast-forward�
 검증: check_docs 552문서 PASS/exit0, check_ontology PASS/exit0. 보존된 MJS 원본구간 harness 재실행 exit0, PITR 보강 재실행 exit0. 이 재실행을 새 독립시험으로 합산하지 않는다. CI는 기존 외부대기로 미실행.
 
 전달 수령증: ccdc41f를 Codex branch/integration에 push exit0. 변경 vault11파일 범위 Obsidian check/apply/check: 9exports,11hash일치,최종0pending/0conflicts. 공유 공통판은 병합된bfb225e와 일치 확인·보존 후 정본 반영. 다음 담당 Gemini MJS02-R1/R2,Claude 기존 문서 정정,Codex 고정SHA 재검토.
+
+## 사용자 독립 실행 후속 수신 (2026-09-18T15:49:31+09:00)
+
+사용자 보고: 현재 tip의 기본 스위트 **1261 passed / 0 failed**, 포트3000/8080에 listener 존재(Get-NetTCPConnection 관측). 정확한 실행 SHA·명령·skip/deselected 수는 이번 메시지에 없으므로 임의 보충하지 않는다. Codex 재실행은 하지 않았다. 개발 Agent가 서버를 띄웠다는 것은 사용자 추정이며 프로세스 소유권 확인으로 승격하지 않는다.
+
+이 보고는 backend가 있는 조건의 성공이며, Codex의 backend 없는 격리 대조(1passed/1failed)를 반박하지 않는다. Node만 검사하는 동일 시험이 주변 서비스 조건에 의존함을 뒷받침한다. 다만 두 실행의 모든 조건을 고정한 인과 실험은 아니다. 실제 runner에는 변경 POST가 있지만 이번 사용자 실행이 어느 자원을 변경했는지는 요청 trace가 없어 특정하지 않는다. CI도 실제 실행 전이므로 'backend 없는 CI 구성에서는 실패 위험'으로 기록하고 모든 CI가 반드시 실패했다고 쓰지 않는다.
+
+사용자가 MJS02-R1/R2를 Gemini에게 전달했다고 보고했으며 Claude에게 문서 정정 diff를 요청할 예정이라고 했다. 각 owner의 착수/완료는 미확인이다. fetch 결과 integration04863a3/Claude63fb71c로 새 수정본 없음. 다음 행동은 Gemini 격리시험·상수잔여 수정본 및 Claude 문서 정정본의 고정SHA 재검토다. 새 감사·기본스위트·live smoke·Docker 실행 없이 대기한다.
+
+후속 수신 검증: check_docs552문서/ontology PASS(exit0); 변경4문서 Obsidian check/apply/check 4exports/0pending/0conflicts. 제품시험·CI 새 실행 없음.
