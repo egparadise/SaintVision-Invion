@@ -1,0 +1,174 @@
+{
+  "baseSHA": "f52b6bd2dfcd40a3d4e7347b07f636b78cb365b6",
+  "scope": "offline actual main with fake external boundaries, and extracted workflow gates; not CI execution",
+  "results": [
+    {
+      "case": "timeout-with-stale-pass",
+      "exitCode": 124,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 1
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit1-with-stale-pass",
+      "exitCode": 1,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 1
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit0-with-stale-pass",
+      "exitCode": 0,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 1
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit0-missing-xml",
+      "exitCode": 0,
+      "tests": null,
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit0-empty-xml",
+      "exitCode": 0,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 0
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit0-malformed-xml",
+      "exitCode": 0,
+      "tests": null,
+      "testReport": "incomplete",
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit5-zero-collection",
+      "exitCode": 5,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 0
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "case": "exit0-partial-one-case",
+      "exitCode": 0,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 1
+      },
+      "testReport": null,
+      "provenanceFields": [],
+      "cleanup": true
+    },
+    {
+      "gate": "backend",
+      "case": "empty",
+      "gateOutcome": "accept",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "backend",
+      "case": "one-pass",
+      "gateOutcome": "accept",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "backend",
+      "case": "one-skip",
+      "gateOutcome": "reject",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "core",
+      "case": "empty",
+      "gateOutcome": "reject",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "core",
+      "case": "one-pass",
+      "gateOutcome": "accept",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "core",
+      "case": "one-skip",
+      "gateOutcome": "reject",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "desktop-browser",
+      "case": "zero-browser",
+      "gateOutcome": "reject",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "desktop-browser",
+      "case": "six-passes-wrong-sha-old-run",
+      "gateOutcome": "accept",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "gate": "desktop-browser",
+      "case": "browser-skip",
+      "gateOutcome": "reject",
+      "scope": "gate only; prior workflow steps not simulated"
+    },
+    {
+      "selectionDirectTransitive": [
+        "tests/integration/test_direct.py",
+        "tests/integration/test_node_runtime.py",
+        "tests/integration/test_transitive.py"
+      ],
+      "missingRoot": [],
+      "scope": "synthetic flat imports; not an actual missing root in repository"
+    }
+  ],
+  "sourceHashes": {
+    "tools/run_vf_security_tests.py": "5b4a9725e75da9af838186fb18bb723411272fc111e063fbedce161704b003ea",
+    "tools/kernel_test_entry.py": "2d9594b29c70e3d6b3a76b3875e575ff09c8dd7ea29275690b8d1478f148616c",
+    "tools/node_dependent_tests.py": "8344924b25b392f65b5430b88fc7b72b622e1d5f6b2f3d0297d14a5b2fd49b47",
+    "tools/check_kernel_docker.py": "9857a3cf5ef2b9b3feb25da30bbafc1cbdfbd70b805667c262b89484802c1a16",
+    ".github/workflows/backend.yml": "5e9f4914b4b2e86333e740569f75d9f00a65b804b826f1534f65f641de6fc917",
+    ".github/workflows/core.yml": "04d16818431fffb844dad1414d6b15d5e6ae23a88a414fda65bcb8e8f19b160e",
+    ".github/workflows/desktop-browser.yml": "0801d1570be32fa3367a88597ad2d18d2c2aea107e9bc9b54b53cb5388d8c2b0",
+    ".github/workflows/docs.yml": "a6e221d0629fa19c553434206ec6993578bcc67c18971f8a788165c02f841838",
+    ".github/workflows/frontend.yml": "7068c04667e997156935943c4350d7b2153c30bd5578d187763441b2a99e65a6"
+  }
+}

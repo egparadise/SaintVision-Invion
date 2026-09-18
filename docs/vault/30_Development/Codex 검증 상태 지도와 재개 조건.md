@@ -1,11 +1,11 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-18T14:30:17+09:00"
+updated: "2026-09-18T14:48:41+09:00"
 source_of_truth: "Git"
 ---
 
@@ -63,7 +63,7 @@ MJS 전체가 실패 불가능하다는 뜻이 아니다. 물리정지false 대�
 |---|---|---|
 | GitHub Actions 결제·지출한도 / 운영자 | 계정 한도 해소 및 runner가 실제 job을 시작할 수 있음 | Codex가 검사할integration SHA를 고정하고 필수workflows 실행 확인. run ID/commit/exit/artifact·선택범위 기록. job시작 전billing 실패는 코드시험실패/통과 어느 것도 아님 |
 | gh CLI 인증 / 운영자 | 저장소의 run/artifact를 읽을 수 있는 인증 복구 | Codex가 동일SHA run상태 조회. 인증은 조회조건이고 결제·CI통과를 대신하지 않음. 현재조회재시도 요청 없음 |
-| 호스트 환경 / 사용자 | 사용자 환경조치 완료 보고, 메모리/핸들·Docker process 시작 상태 관측, 동시agent의image실행이 없는 조용한 구간 확보 | Codex가 **같은 고정 harness SHA·같은image digest**로8케이스를 순차 재실행. 각 보안단언 도달/결과·cleanup미확정·JUnit/JSON·환경조건 기록. b5f770a와최신harness 결과를 섞어 인과판정하지 않음. 8건 도달/통과 전 전체합격 금지 |
+| 호스트 환경 / 사용자 | 사용자 환경조치 완료 보고, 실행 직전 시각·OneDrive handle 수준과 증가 추세·가용RAM·Docker process 시작 상태 관측, 동시agent의image실행이 없는 조용한 구간 확보.119773을안전임계치로가정하지않음 | Codex가 **같은 고정 harness SHA·같은image digest**로8케이스를 순차 재실행. 각 보안단언 도달/결과·cleanup미확정·JUnit/JSON·환경조건 기록. b5f770a와최신harness 결과를 섞어 인과판정하지 않음. 8건 도달/통과 전 전체합격 금지 |
 | 원격192.168.45.225 profile/mTLS / 원격운영자 | 승인된 설치 대상·접근경로와 유효한서버/peer인증서·신뢰root/endpoint/Node/epoch/profile 제공, 장비 접속 가능 | Codex는 읽기전용 preflight→패키지archive/digest/인증서/peer policy검사→fresh mTLS/Node identity확인. 통과 후 승인된 운영계획에 따라 실제workspace/terminal·storage/model·거부·Node이탈/복구를 순서대로 검증. 5대 전체 확인·인수기록 없으면 VF05완료 금지 |
 | AC-12 운영PITR 적용 / 운영자, 준비Claude | 변경안 검토·운영적용 결정, 실제archive저장소/용량·보존기간·키/접근·실패감시·복원대상 확보 | Claude격리리허설을 Codex가 먼저검토. 적용 후 실제설정/연속WAL·basebackup을 확인하고 격리복원대상에서 목표시각 전후transaction으로 도달/제외를 증명. 실패기준시각 대비 복구된 최신 durable transaction 시각의 차이를 RPO로 측정하고 승인된 AC-12 목표와 비교. 복구시작~서비스사용가능 RTO·무결성·tenant권한도 별도 기록 |
 
@@ -123,3 +123,9 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## PITR09db057 gate 재검토
 
 [[2026-09-18_PITR_09db057_재검토_Codex]]: 사용자 실제PG 정상0/after-insert음성1 수신+소스대조로R2-01해소. Codex는PG재실행없음. archive명령 순차4조건 정상,다른writer게시 interleaving은덮어쓰기 관측. 고정tmp논거는전용아카이브·단일writer 한정이며전역직렬성아님. R2-02/R1-04미해소로전체착지보류,다음Claude수정/Codex재검토.
+
+## 최신 API smoke 및 호스트 관측 수신
+
+[[2026-09-18_실행증거집계_감사_Codex]]: 사용자/Gemini1ecdb12 API smoke79/79·reconciliation64/64 보고수신, Codex실HTTP재실행없음. label/조건부배너/추가bytes·digest비교는소스확인,음성대조와실editor관측의계약검토는잔여이므로이전finding전체해소미선언. 앞선67/59는이전SHA감사증거로보존. 검사증가12개를누락조건전체수로해석하지않음.
+
+사용자OneDrive handle2421→약1시간후119773/RAM1665MB관측수신. 호스트재개조건에실행직전level·추세·시각을명시. 누수원인/안전임계치/NTSTATUS인과확정없음. 집계감사AGG01staleXML및AGG02불완전증거exit0 두P2 미수정, 다음Codex수정/Claude검토.
