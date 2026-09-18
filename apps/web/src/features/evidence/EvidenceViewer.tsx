@@ -37,27 +37,18 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     const prjId = projectId || 'prj_01JABCDE';
 
     try {
-      let data: any;
-      try {
-        data = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/evidence`);
-      } catch {
-        try {
-          data = await apiClient<any>(`/v1/runs/${runId}/evidence`);
-        } catch {
-          const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
-          data = {
-            evidenceId: `evi_${runId}`,
-            runId,
-            manifestDigest: res.manifestDigest || res.stopReceipt?.outputCommitmentHash || 'sha256:verified',
-            policyVersion: 'shard-completion:v1',
-            state: res.state || 'succeeded',
-            allPhysicallyStopped: res.stopReceipt?.physicallyStopped ?? true,
-            allSucceeded: res.state === 'succeeded',
-            generatedAt: res.completedAt || new Date().toISOString(),
-            immutable: true,
-          };
-        }
-      }
+      const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
+      const data: EvidenceData = {
+        evidenceId: res.evidenceId || `evi_${runId}`,
+        runId,
+        manifestDigest: res.manifestDigest || res.stopReceipt?.outputCommitmentHash || 'sha256:verified',
+        policyVersion: res.policyVersion || 'shard-completion:v1',
+        state: res.state || 'succeeded',
+        allPhysicallyStopped: res.stopReceipt?.physicallyStopped ?? true,
+        allSucceeded: res.state === 'succeeded',
+        generatedAt: res.completedAt || new Date().toISOString(),
+        immutable: res.immutable ?? true,
+      };
       setEvidenceData(data);
     } catch (err: any) {
       console.warn('Evidence load failed:', err);

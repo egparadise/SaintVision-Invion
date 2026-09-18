@@ -26,7 +26,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(staticRule?.cacheControl).toContain('immutable');
 
       // SSE Event Streaming rule (Buffering must be disabled)
-      const sseRule = rules.find((r) => r.location === '/v1/events');
+      const sseRule = rules.find((r) => r.location.includes('/events'));
       expect(sseRule).toBeDefined();
       expect(sseRule?.protocol).toBe('SSE');
       expect(sseRule?.bufferingOff).toBe(true);

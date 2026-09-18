@@ -2,17 +2,15 @@ import { describe, it, expect } from 'vitest';
 import { EvidenceData } from '../src/features/evidence/EvidenceViewer';
 
 describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () => {
-  it('constructs canonical project-scoped evidence endpoints accurately', () => {
+  it('constructs canonical project-scoped result and evidence resolution endpoints accurately', () => {
     const prjId = 'prj_01JABCDE';
     const runId = 'run_01JSHARD_01';
 
-    const projectEvidencePath = `/v1/projects/${prjId}/runs/${runId}/evidence`;
-    const flatEvidencePath = `/v1/runs/${runId}/evidence`;
     const canonicalResultPath = `/v1/projects/${prjId}/runs/${runId}/result`;
+    const flatResultPath = `/v1/runs/${runId}/result`;
 
-    expect(projectEvidencePath).toBe('/v1/projects/prj_01JABCDE/runs/run_01JSHARD_01/evidence');
-    expect(flatEvidencePath).toBe('/v1/runs/run_01JSHARD_01/evidence');
     expect(canonicalResultPath).toBe('/v1/projects/prj_01JABCDE/runs/run_01JSHARD_01/result');
+    expect(flatResultPath).toBe('/v1/runs/run_01JSHARD_01/result');
   });
 
   it('validates immutable evidence package schema and ADR-012 compliance', () => {

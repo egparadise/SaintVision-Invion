@@ -333,10 +333,10 @@ export async function triggerLivenessSweep(): Promise<{
 export async function getDiscoveryCandidates(
   includeStale: boolean = false
 ): Promise<{ items: DiscoveryCandidate[]; note?: string }> {
-  const query = includeStale ? '?includeStale=true' : '';
-  return apiClient<{ items: DiscoveryCandidate[]; note?: string }>(
-    `/v1/discovery/candidates${query}`
-  );
+  const endpoint = includeStale
+    ? '/v1/discovery/candidates?includeStale=true'
+    : '/v1/discovery/candidates';
+  return apiClient<{ items: DiscoveryCandidate[]; note?: string }>(endpoint);
 }
 
 export async function broadcastAnnouncement(
