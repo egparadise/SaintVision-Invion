@@ -42,3 +42,7 @@ test_storage_catalog_api.py 첫 실행은12 setup errors/0passed(exit1). 내부�
 - 총46건은 명시한4파일 범위다. 문서524/ontology/diff검사exit0. CI조회/실Docker/image lane 실행없음.
 
 다음 Claude: 신규 configured_registry_policy 입력 경계와 create_configured_app policy 전파 독립검토. e2908a5 sound 수신으로 그 구현의 독립소스검토 대기는 해제하되 이번 설정 구현에 확대하지 않는다. 다음 Codex: 독립 finding 대응, 공개 registry/runtime 준비 API 계약 및 application_name 비교 호환성 후속 검토. 운영policy 선정/전역rollout/CI/원격장비는 미완이다.
+
+## 전달 기록
+
+구현11e9f44와Claude문서병합6314c54를 작업branch/integration에 push(exit0). 변경10파일만 Obsidian check→apply→check:10exported/0pending/0conflict,source11e9f44. CI조회/환경조치/실장비배포 없음. 이번 설정 독립검토는 Claude 대기.
