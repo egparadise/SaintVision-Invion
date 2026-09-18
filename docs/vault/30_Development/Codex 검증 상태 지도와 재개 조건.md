@@ -119,3 +119,7 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## MJS 나머지3도구 감사
 
 [[2026-09-18_MJS_후속3도구_감사_Codex]]: 사용자 shard가드12회귀 독립통과 수신. 합성 fetch로2PC67/67·reconcile59/59 exit0(unrelated receipt/invalid digest), 물리정지false 대조군은각1failed/exit1. VB-MJS-03 실행결속/실장비주장P1,04 로컬상수hash를snapshot검증으로표시P2,05 실패시verified문구P2 미수정 인계. handoff재현도구는 scope명시된 관측JSON이며 이번소스검토에서 추가finding없음. 다음 Gemini수정/Codex검토, 실제장비실행0.
+
+## PITR09db057 gate 재검토
+
+[[2026-09-18_PITR_09db057_재검토_Codex]]: 사용자 실제PG 정상0/after-insert음성1 수신+소스대조로R2-01해소. Codex는PG재실행없음. archive명령 순차4조건 정상,다른writer게시 interleaving은덮어쓰기 관측. 고정tmp논거는전용아카이브·단일writer 한정이며전역직렬성아님. R2-02/R1-04미해소로전체착지보류,다음Claude수정/Codex재검토.

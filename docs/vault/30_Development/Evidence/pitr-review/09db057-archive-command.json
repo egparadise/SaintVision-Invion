@@ -1,0 +1,37 @@
+{
+  "candidate": "09db05716a2c66810652a920c6f2c1a0eaa3bfa8",
+  "scope": "exact override command in private temporary directory, Git Bash, no PG/Docker; race is deterministic second-writer interleaving injection",
+  "originalCommand": "if [ -f /wal_archive/%f ]; then cmp -s %p /wal_archive/%f; else cp %p /wal_archive/%f.tmp && mv /wal_archive/%f.tmp /wal_archive/%f; fi",
+  "results": [
+    {
+      "case": "absent",
+      "exitCode": 0,
+      "destination": "A",
+      "stderr": ""
+    },
+    {
+      "case": "identical",
+      "exitCode": 0,
+      "destination": "A",
+      "stderr": ""
+    },
+    {
+      "case": "different",
+      "exitCode": 1,
+      "destination": "B",
+      "stderr": ""
+    },
+    {
+      "case": "stale-temp",
+      "exitCode": 0,
+      "destination": "A",
+      "stderr": ""
+    },
+    {
+      "case": "other-writer-publishes-B-between-copy-and-rename",
+      "exitCode": 0,
+      "destination": "A",
+      "stderr": ""
+    }
+  ]
+}

@@ -490,3 +490,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## MJS 수치 보증 범위 정정
 
 [[2026-09-18_MJS_수치인용_정정_Codex]]: 지도v1.2.0에67/200·202/59 checks의 응답조건·로컬계산 범위와 실제장비/화면 미보증을 명시. 공통판202/202 문구 직접정정, VF01~05 인수조건에 실제bytes/identity/장비·UI 관측 요건 보강. 실제browser6은 별도범위 유지. 운영0/5 변경없음. PITR2468912 보류사유와 다음owner 명시.
+
+## PITR09db057 gate 재검토
+
+[[2026-09-18_PITR_09db057_재검토_Codex]]: 사용자 실제PG 정상0/after-insert음성1 수신+소스대조로R2-01해소. Codex는PG재실행없음. archive명령 순차4조건 정상,다른writer게시 interleaving은덮어쓰기 관측. 고정tmp논거는전용아카이브·단일writer 한정이며전역직렬성아님. R2-02/R1-04미해소로전체착지보류,다음Claude수정/Codex재검토.
