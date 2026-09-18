@@ -11,6 +11,8 @@ import { ResourceExplorer } from './ResourceExplorer';
 import { InvFileExplorer } from './InvFileExplorer';
 import { ModelStudioView } from './ModelStudioView';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
+import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
+import { WebTerminal } from '@/features/terminal/WebTerminal';
 
 export interface DesktopShellProps {
   projectId: string;
@@ -144,6 +146,9 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   nodes,
   runs,
   approvals,
+  workspaces = [],
+  onApprove,
+  onReject,
   onSwitchToPortalView,
   currentTheme,
   onToggleTheme,
@@ -668,7 +673,27 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 <ModelStudioView projectId={projectId} />
               )}
 
-              {['terminal', 'developer-studio', 'approvals', 'settings'].includes(win.appId) && (
+              {win.appId === 'approvals' && (
+                <div style={{ padding: 16, height: '100%', overflow: 'auto' }}>
+                  <ApprovalCenter
+                    approvals={approvals}
+                    currentUserId={currentReviewerId}
+                    onApprove={onApprove}
+                    onReject={onReject}
+                  />
+                </div>
+              )}
+
+              {win.appId === 'terminal' && (
+                <div style={{ height: '100%' }}>
+                  <WebTerminal
+                    workspaceId={workspaces[0]?.id || 'wsp_default'}
+                    sessionId="session_desktop_terminal"
+                  />
+                </div>
+              )}
+
+              {['developer-studio', 'settings'].includes(win.appId) && (
                 <section style={{padding: 24}}><p>이 기능은 포털에서 프로젝트와 세션을 선택한 뒤 이용하세요.</p>
                   <button onClick={onSwitchToPortalView}>포털로 이동</button></section>
               )}
