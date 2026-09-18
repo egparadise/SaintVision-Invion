@@ -1,0 +1,49 @@
+{
+  "reviewedTip": "816346c",
+  "environment": "offline source + mocked failure paths, no Docker",
+  "unitTests": {
+    "passed": 15,
+    "deselectedDockerTests": 2,
+    "exitCode": 0,
+    "junitSha256": "12211dee287d2b3e26d2e95aaf95838be892d57aec4abe4da6883fa8f027e589"
+  },
+  "r4_01": "bytes/text timeout return-type reproducer resolved",
+  "r5_01": {
+    "severity": "P1",
+    "file": "tests/integration/test_server_container.py",
+    "skipIsException": false,
+    "finallyOutcome": "Skipped",
+    "originalOutcomeInContext": "AssertionError",
+    "finding": "cleanup docker() pytest.skip escapes except Exception and replaces original AssertionError; later cleanup is bypassed",
+    "pytestProbe": {
+      "exitCode": 0,
+      "skipped": 1,
+      "passed": 0,
+      "injectedAssertionFailure": true,
+      "junitSha256": "51c0bd12102b0391580cc6cced6cc3f27cf99fbbc020b286b314d707b6df5e6c",
+      "interpretation": "synthetic failure was masked as skipped; not a real observed product security failure"
+    }
+  },
+  "r5_02": {
+    "severity": "P2",
+    "file": "tools/check_kernel_docker.py",
+    "selectedSourceFiles": 496,
+    "newDependencyInSourceManifest": false,
+    "isolatedImportExitCode": 1,
+    "missingDockerDiagReproduced": true,
+    "finding": "new imported module omitted from exact source allowlist for isolated kernel build"
+  },
+  "decision": "hold complete Claude branch; no partial code adoption",
+  "userIndependentValidation": {
+    "reviewedTip": "816346c",
+    "files": [
+      "tests/test_docker_diag.py",
+      "tests/test_check_kernel_docker_hygiene.py"
+    ],
+    "passed": 17,
+    "failed": 0,
+    "environment": "user clean worktree, includes real Docker hygiene tests",
+    "provenance": "user report; not rerun by Codex",
+    "interpretation": "confirms R4-01 fix; does not cover R5-01 failure-preservation composition or R5-02 isolated source packaging"
+  }
+}

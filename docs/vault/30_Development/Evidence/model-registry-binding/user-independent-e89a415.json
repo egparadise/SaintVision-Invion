@@ -1,0 +1,17 @@
+{
+  "sourceSha": "e89a415",
+  "provenance": "user independent clean-worktree execution report; not rerun by Codex in this turn",
+  "receivedAtKst": "2026-09-18T13:02:22+09:00",
+  "files": [
+    "tests/core/test_model_source.py",
+    "tests/core/test_model_remote.py",
+    "tests/integration/test_model_registry_binding.py",
+    "tests/integration/test_model_remote_runtime.py"
+  ],
+  "database": "user-provided disposable PostgreSQL16 port55432; INV_TEST_ADMIN_DSN configured; credentials not recorded",
+  "passed": 75,
+  "failed": 0,
+  "skipped": "not separately reported",
+  "imageLaneRun": false,
+  "landingJudgment": "retain e89a415 integration acceptance for this scope; not whole-suite or operational acceptance"
+}
