@@ -586,3 +586,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 라벨 고정 disposable PostgreSQL 16(`codex-dbtest-20260919-11f6a3b458dc`, port 61902)로 integration 파일을 분할 실행했다. 실제 집계는 432 passed/386 skipped/0 failed이며, 별도 DSN 대상 비-integration은 97 passed/0 failed. skip은 Linux credentials, Linux Docker/Workspace, browser/이미지 opt-in 등 명시된 환경 조건이다. recovery drill은 소유 라벨 조건을 맞춘 뒤 11 passed/7 failed; 5건은 Windows/Linux·Docker network 선행조건, 1건은 definer count 9→10 기대치 drift 후보, 1건은 저장 경로 조건으로 운영 결함 확정하지 않았다. 초기 잘못된 비밀번호 배치는 집계에서 제외했다. 다음은 소유 컨테이너 정리·제거 확인이다.
 
 후속: `tools/recovery_drill.py`와 `tests/integration/test_recovery_drill.py`에서 definer 함수 검증을 `tools/definer-policy.json`의 exact signature set으로 결속했다. Windows/Linux 백업 경로·격리 Docker network 전제 미충족 6건은 이유가 보이는 skip으로 분리했다. `7eb0d66`을 integration에 push했고, 실제 Linux/격리 Docker 복원 인수는 여전히 미실행이다.
+
+정정: archiver network의 `Internal=false`는 관찰된 보안 실패이므로 skip하면 안 된다. 시험이 소유 `--internal` 네트워크를 직접 생성하고, 생성 실패만 명시적 skip하며 생성 후 `Internal=false`는 실패하도록 `test_recovery_drill.py`를 수정했다. Linux 백업 경로 조건의 3개 시험군은 플랫폼 전제 skip으로 유지한다.

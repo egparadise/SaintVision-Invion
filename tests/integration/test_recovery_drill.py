@@ -285,12 +285,19 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
     """A separate owned PG server, no published ports or production changes."""
     name = "sv-rpo-" + uuid4().hex[:12]
     base = json.loads(subprocess.check_output(["docker", "inspect", args.docker]))[0]
-    network = next(iter(base["NetworkSettings"]["Networks"]))
-    net = json.loads(subprocess.check_output(["docker", "network", "inspect", network]))[0]
-    if net.get("Internal") is not True:
-        pytest.skip("Owned internal Docker network required for archiver isolation")
+    network = "sv-rpo-net-" + uuid4().hex[:12]
     label = "ai.saintvision.rpo-test"
+    network_label = "ai.saintvision.rpo-network"
+    network_created = subprocess.run(
+        ["docker", "network", "create", "--internal", "--label", network_label + "=" + network, network],
+        capture_output=True,
+        timeout=20,
+    )
+    if network_created.returncode != 0:
+        pytest.skip("Docker could not create the owned internal network for archiver isolation")
     try:
+        net = json.loads(subprocess.check_output(["docker", "network", "inspect", network]))[0]
+        assert net.get("Internal") is True, "Owned archiver network is not isolated"
         created = subprocess.run(
             [
                 "docker",
@@ -367,6 +374,11 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
                 timeout=30,
                 check=True,
             )
+        network_inspected = subprocess.run(["docker", "network", "inspect", network], capture_output=True, timeout=10)
+        if network_inspected.returncode == 0:
+            network_data = json.loads(network_inspected.stdout)[0]
+            assert network_data["Labels"].get(network_label) == network
+            subprocess.run(["docker", "network", "rm", network], capture_output=True, timeout=20, check=True)
 
 
 @pytest.mark.parametrize("changed", [False, True])

@@ -34,3 +34,5 @@ DSN을 설정해 통합 파일을 단위 배치로 실행했다. 고유 per-run 
 독립 재검증으로 `provision()` catch-all의 실제 붕괴가 `validate_manifest`를 우회한 주입에서 재현됨을 확인했다. `25051e3`는 DB 오류/내부 오류/거부를 올바르게 분리하고 비밀값을 노출하지 않는다.
 
 복원 시험의 definer 기대치는 `tools/definer-policy.json`의 함수 서명 집합을 직접 비교하도록 바꿨다(`7eb0d66`). 정책에 함수가 추가·삭제되면 개수뿐 아니라 정확한 함수 이름 집합 단언이 깨진다. Windows 전용 실행에서 Linux 백업 경로 또는 내부 Docker 네트워크가 없는 경우 6개 경로는 원인 메시지가 있는 `pytest.skip`으로 분리했다. 실제 복원 리허설 재실행은 해당 Linux/격리 Docker 조건에서 필요하다.
+
+후속 검토에서 archiver 네트워크 skip은 잘못된 관찰 결과 은폐임을 확인했다. `test_live_archiver_configuration_cannot_certify_operational_rpo`가 이제 자기 소유의 `docker network create --internal`을 먼저 수행하고, 생성 실패만 skip한다. 생성된 네트워크의 `Internal` 속성이 false이면 보안 발견으로 실패한다. 나머지 Linux 경로 skip은 플랫폼 전제만 검사한다.
