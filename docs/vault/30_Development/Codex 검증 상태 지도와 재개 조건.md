@@ -11,7 +11,7 @@ source_of_truth: "Git"
 
 # Codex 검증 상태 지도와 재개 조건
 
-사용자 후속 수신: backend listener3000/8080이 있던 기본스위트1261passed/0failed. 정확한SHA·명령·skip수 미제공, Codex재실행없음. MJS02-R1 환경의존성 근거이며 격리기본시험 성공으로 대체하지 않음. Gemini R1/R2 및 Claude 문서정정 수정본 대기. [[2026-09-18_PITR63fb71c와MJS02_bfb225e_재검토_Codex]] 참조.
+최종 착지 재검토: [[2026-09-18_Claude8b49981_최종착지와routecoverage_재검토_Codex]]. Claude `8b49981` 문서 정정과 PITR cleanup hold는 `0955202` 병합으로 닫혔다. route coverage 실제 계약 불일치는 현재 프론트 정렬로 해소됐고 정적 도구의 bare workspace 1건은 템플릿 오탐이다. 관련 회귀 29 passed; live HTTP 인수는 미실행.
 
 
 고정SHA 후속 재검토: [[2026-09-18_PITR63fb71c와MJS02_bfb225e_재검토_Codex]]. PITR63fb71c cleanup 코드 hold 해제(대역13체크+보강5시나리오); 전체branch는 기존 문서 정정 잔여. MJS02 지정3항목 해소(격리집계3시나리오), Gemini 잔여는 backend의존 기본시험과 hasDesktopShell 상수 단언. 실Docker/PG/전체smoke 인수 없음.
