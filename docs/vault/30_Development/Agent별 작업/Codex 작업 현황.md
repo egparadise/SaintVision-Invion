@@ -594,3 +594,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## Docker 잔여 provenance 감사
 
 `2026-09-19_docker_residue_provenance_audit_Codex`에 접두사·라벨·생성 경로를 대조했다. `sv-server-test`는 소유 기반 cleanup 경계를 사용하며 공통 `cleanup_owned`에 제거 후 inspect 확인을 추가했다(`7`개 unit pass). `sv-remote-workspace`, `sv-workspace-upgrade`, `saintvision-compat`는 조사 evidence 보존 정책으로 stopped/Created 자원을 남기는 구조라 무기한 retention P2 후보로 기록했다. `sv-bridge-unit` 생성자는 현재 소스에서 찾지 못했다. 이번 감사에서는 Claude 작업 중이므로 삭제하지 않았고, `saintvision-lan-db*`, `saintview-orthanc*`, `svcx01-pgaudit*`는 보존했다.
+
+후속: `tests/test_check_kernel_docker_hygiene.py`의 finally를 공용 `cleanup_owned`로 바꿔 소유 확인·제거 후 inspect를 적용했다. `tools/cleanup_owned_docker.py`를 추가해 30분 age gate, 라벨 소유권, 보호 접두사, 기본 inventory-only, 명시적 `--delete`, 삭제 후 확인을 고정했다. 나열 모드에서 eligible 42개를 확인했지만 삭제는 0건이며, `sv-bridge-unit-*` orphan provenance를 별도 기록했다.
