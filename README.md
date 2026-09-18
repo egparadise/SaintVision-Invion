@@ -12,7 +12,9 @@
 
 ## 개발 TLS 인증서
 
-개발 인증서는 저장소 외부 디렉터리에 둡니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정해야 합니다. Compose는 이 변수가 없으면 시작하지 않습니다.
+개발 인증서는 저장소 외부 디렉터리에 둡니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정해야 합니다. 이제 Compose는 이 변수가 없으면 시작하지 않습니다. 이전의 `./deploy/certs` 기본 폴백은 제거됐으므로, 기존에 Compose를 직접 실행하던 개발자도 이 변수 설정이 필요합니다.
+
+환경변수만 설정하고 파일을 만들지 않으면 구형 Compose가 bind 대상에 디렉터리를 만들 수 있습니다. 따라서 직접 Compose를 실행하지 말고 `deploy_intranet.ps1`의 leaf·키 일치 preflight를 먼저 통과시킵니다.
 
 ```powershell
 python -m venv .venv

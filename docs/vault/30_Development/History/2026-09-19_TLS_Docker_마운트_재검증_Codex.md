@@ -22,3 +22,5 @@ source_of_truth: "Git"
 ## 판정
 
 Docker 버전과 무관하게 환경변수 미설정 직접 Compose 경로가 interpolation 단계에서 중단되고, 외부 파일이 있을 때만 mount가 생성된다. `create_host_path: false`는 지원 버전의 추가 방어로 남아 있지만 단독 보장으로 사용하지 않는다. 원본 `deploy/certs` 파일 삭제 조건은 충족됐다.
+
+잔여 조건도 명시한다. 환경변수가 설정됐지만 파일이 없는 경로는 Compose v2.15에서 디렉터리로 바뀔 수 있으므로, `deploy_intranet.ps1` preflight를 통하지 않은 직접 Compose 실행은 사용하지 않는다. 기본 `./deploy/certs` 폴백은 제거됐고, 환경변수 미설정은 이제 의도적으로 실패한다.
