@@ -1,0 +1,34 @@
+[
+  {
+    "branch": "origin/agent/codex/business-kernel",
+    "reportedTip": "85a3618",
+    "observedTip": "85a3618f201c8d212e680fe7fc5a5b49191a1ee4",
+    "comparison": "origin/integration/all-agents-unified...origin/agent/codex/business-kernel",
+    "contentDeltaFiles": 0,
+    "subject": "Merge pull request #17 from agent/codex/node-containment"
+  },
+  {
+    "branch": "origin/agent/codex/shard-recovery",
+    "reportedTip": "b9c744f",
+    "observedTip": "b9c744fc7a95edb11f83306a43514c4ae9bf2da4",
+    "comparison": "origin/integration/all-agents-unified...origin/agent/codex/shard-recovery",
+    "contentDeltaFiles": 0,
+    "subject": "Merge pull request #16 from agent/codex/business-kernel"
+  },
+  {
+    "branch": "origin/agent/codex/workspace-api",
+    "reportedTip": "bb27909",
+    "observedTip": "bb27909786d84ceb8ae146269808ded9fe7d5a02",
+    "comparison": "origin/integration/all-agents-unified...origin/agent/codex/workspace-api",
+    "contentDeltaFiles": 0,
+    "subject": "Merge pull request #15 from agent/codex/shard-recovery"
+  },
+  {
+    "branch": "origin/agent/codex/workspace-resume",
+    "reportedTip": "0789e17",
+    "observedTip": "0789e1760cec3a7a83ad2300fa151826b0cbc240",
+    "comparison": "origin/integration/all-agents-unified...origin/agent/codex/workspace-resume",
+    "contentDeltaFiles": 0,
+    "subject": "Merge pull request #13 from agent/codex/workspace-api"
+  }
+]

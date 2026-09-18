@@ -1,0 +1,8 @@
+{
+  "scope": "only resources named in owned test logs; labels/image/initializer/mount checked",
+  "removedVolumes": [
+    "sv-server-test-a91f6f337e2445f291cd48cf0b8a4ea3",
+    "sv-server-test-f241e05ee8b446bc89ca5c16b1999613"
+  ],
+  "remaining": []
+}
