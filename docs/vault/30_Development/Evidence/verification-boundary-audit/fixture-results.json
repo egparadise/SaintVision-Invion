@@ -1,0 +1,84 @@
+{
+  "scope": "original fixtures with synthetic external DB/provider boundaries, no live PostgreSQL/Docker",
+  "results": [
+    {
+      "case": "role-setup-failure",
+      "createdDatabase": true,
+      "dropDatabaseAttempted": false,
+      "outcome": "setup error, not PASS",
+      "sqlOperations": [
+        [
+          "CREATE",
+          "DATABASE"
+        ],
+        [
+          "CREATE",
+          "ROLE"
+        ]
+      ]
+    },
+    {
+      "case": "remove_version",
+      "executedSQL": [
+        "DELETE FROM inv.credential_grants WHERE credential_id=%s"
+      ]
+    },
+    {
+      "case": "rebind_destination",
+      "executedSQL": [
+        "UPDATE inv.credential_grants SET enabled=false WHERE credential_id=%s"
+      ]
+    },
+    {
+      "case": "disable",
+      "executedSQL": [
+        "UPDATE inv.credential_grants SET enabled=false WHERE credential_id=%s"
+      ]
+    },
+    {
+      "case": "revoke",
+      "executedSQL": [
+        "UPDATE inv.credential_grants SET revoked_at=clock_timestamp() WHERE credential_id=%s"
+      ]
+    },
+    {
+      "case": "root-missing-dsn",
+      "CI": false,
+      "outcome": "skip"
+    },
+    {
+      "case": "integration-missing-dsn",
+      "CI": false,
+      "outcome": "skip"
+    },
+    {
+      "case": "root-missing-dsn",
+      "CI": true,
+      "outcome": "fail"
+    },
+    {
+      "case": "integration-missing-dsn",
+      "CI": true,
+      "outcome": "fail"
+    },
+    {
+      "case": "dispose-failure",
+      "dropRoleAttempted": false,
+      "originalAssertionInExceptionContext": true,
+      "outcome": "RuntimeError, not PASS",
+      "scope": "synthetic disposal fault, not a real driver failure"
+    },
+    {
+      "case": "mutation-error-before-raises",
+      "outcome": "propagates; not accepted as denial"
+    }
+  ],
+  "baseSHA": "a68efaa",
+  "sourceHashes": {
+    "tests/conftest.py": "98c6aa4f3ec6092d4bdb13650ee99e09f030ccd65bc6a6a42f226cb8443df659",
+    "tests/integration/conftest.py": "4c9e9a96d524efe573ae9e2172c68dd180e73e740f2b3fbd57eef747daff5d90",
+    "tests/db_login.py": "80e41c12aae0d18a34b8de4d81857c16a51ceca0f67e691c4e20d4264b0bd8c3",
+    "tests/credential_conformance.py": "de1f05ccd3834381c749de96533241f0ec60af43933791e07f559e4c6c223079",
+    "tests/integration/test_credential_backend.py": "320b2b6da3f1b70d18739bba95768db96676f88042d4dc35a9e1b13b0c5cdf43"
+  }
+}
