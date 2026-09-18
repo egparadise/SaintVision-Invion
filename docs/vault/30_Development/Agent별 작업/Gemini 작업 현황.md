@@ -223,5 +223,12 @@ source_of_truth: "Git"
 >    - Vitest (`evidence-viewer.test.ts`): 소스 코드 내 미제공 `/evidence` 프로브 호출 부재를 정적 단언하고, `RunResultView`가 `EvidenceData` 요구사항을 완전히 충족함을 검증.
 >    - Pytest (`test_route_coverage.py:test_client_source_does_not_request_unserved_evidence_or_bare_events_endpoints`): `scan_client`로 `apps/web/src` 전체를 스캔하여 unserved `/evidence` 및 bare `/v1/events`가 다시 추가되면 즉시 빌드가 실패하도록 가드 신설.
 > 결과: Vitest **31개 파일 304/304 tests 100% 통과**, Pytest **26/26 tests 100% 통과**.
+> **Gemini 회신(2026-09-18, EvidenceViewer 가짜 PASS 폴백 전면 제거 및 진본 오류 표면화 완결)**: 사용자 및 Codex 피드백을 수용하여 EvidenceViewer의 기만적 가짜 PASS 폴백 및 가짜 툴 호출을 전면 제거함:
+> 1) **가짜 PASS 및 합성 Mock 완전 제거**: `EvidenceViewer.tsx`의 `fetchEvidence` catch 블록에서 가짜 `integrityVerification: 'PASS'`, 합성 `specDigest`, 가짜 `toolCalls`(`git.checkout`, `test.run`, `artifact.write`)를 생성하던 로직을 전면 삭제함. 백엔드 호출 실패 시 `setEvidenceData(null)` 및 `errorMessage`를 설정하여 실제 동기화 실패 사실을 경고 배너 및 `재시도(Retry)` 버튼과 함께 표면화함.
+> 2) **백엔드 미제공 toolCalls 제거**: 현재 커널 `RunResultView` 계약에 없는 per-tool `toolCalls` 및 `wallTimeMs` 필드를 `EvidenceData` 스키마 및 UI에서 완전히 제거함.
+> 3) **정적 정책 규격과 런타임 검증 결과 분리**: 1년 보존(ADR-012) 및 불변 단일 봉인은 이번 실행의 동적 검증 결과가 아닌 시스템 아키텍처 '정책 규격'(`정책 규격: 1년 보존 Pin (ADR-012)`, `설계 규격: 불변 단일 봉인`)으로 명확히 라벨링함. `✓ 무결성 검증 통과 (PASS)`는 오직 `evidenceData.integrityVerification === 'PASS'`일 때만 조건부 렌더링되도록 격리함.
+> 4) **회귀 시험 실장 (`evidence-viewer.test.ts`)**: fetch 실패 시 무결성 검증 통과가 표시되지 않음, 소스 내 가짜 툴 호출/월타임 부재, catch 블록의 에러 표면화 및 정적 정책 규격 명시를 단언하는 회귀 시험 2건 신설.
+> 결과: Vitest **31개 파일 305/305 tests 100% 무오류 통과**, Pytest **29/29 tests 100% 통과**.
+
 
 

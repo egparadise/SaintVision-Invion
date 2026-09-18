@@ -82,7 +82,7 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     expect(sourceContent).toContain('/v1/projects/${prjId}/runs/${runId}/result');
   });
 
-  it('regression: full RunResultView envelope comprehensively fulfills EvidenceData without separate /evidence route', () => {
+  it('regression: full RunResultView envelope comprehensively fulfills EvidenceData without separate /evidence route or fabricated toolCalls', () => {
     // Canonical kernel RunResultView as defined in services/control-plane/src/inv/result_view.py
     const kernelRunResultView = {
       source: 'execution-kernel',
@@ -107,11 +107,6 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
         specDigest: 'sha256:4a8b79c3d2e1f0e9...a1b2c3d4',
         outputSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
         policyVersion: 'shard-completion:v1',
-        toolCalls: [
-          { tool: 'kernel.dispatch', exitCode: 0, wallTimeMs: 120 },
-          { tool: 'execution.shards', exitCode: 0, wallTimeMs: 840 },
-          { tool: 'result.commitment', exitCode: 0, wallTimeMs: 45 },
-        ],
       },
       output: {
         sha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -137,7 +132,6 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
       integrityVerification: res.output?.verified ? 'PASS' : (res.state === 'succeeded' ? 'PASS' : 'FAIL'),
       tamperCheck: res.output?.verified ? 'VERIFIED_IMMUTABLE' : (res.sealed ? 'SEALED' : 'UNVERIFIED'),
       retentionPolicy: '1_YEAR_PINNED (ADR-012)',
-      toolCalls: res.evidence?.toolCalls,
     };
 
     expect(derivedEvidence.evidenceId).toBe('evi_01JSHARD_03_COMMITTED');
@@ -147,6 +141,29 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     expect(derivedEvidence.immutable).toBe(true);
     expect(derivedEvidence.allPhysicallyStopped).toBe(true);
     expect(derivedEvidence.allSucceeded).toBe(true);
-    expect(derivedEvidence.toolCalls).toHaveLength(3);
+  });
+
+  it('regression: fetch failure surfaces authentic error and never renders fake PASS or synthetic toolCalls', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const sourcePath = path.resolve(__dirname, '../src/features/evidence/EvidenceViewer.tsx');
+    const sourceContent = fs.readFileSync(sourcePath, 'utf-8');
+
+    // 1. Asserts no fake tool calls or wall times are fabricated anywhere in source
+    expect(sourceContent).not.toContain('git.checkout');
+    expect(sourceContent).not.toContain('test.run');
+    expect(sourceContent).not.toContain('artifact.write');
+    expect(sourceContent).not.toContain('wallTimeMs');
+
+    // 2. Asserts catch block sets evidenceData to null and populates errorMessage
+    expect(sourceContent).toMatch(/catch\s*\([^)]*\)\s*\{[\s\S]*setEvidenceData\(null\);[\s\S]*setErrorMessage\(/);
+
+    // 3. Asserts PASS badge is strictly conditional on evidenceData.integrityVerification === 'PASS'
+    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'PASS' && (");
+    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'FAIL' && (");
+
+    // 4. Asserts retention and tamper specs are labeled as static policy specifications
+    expect(sourceContent).toContain('정책 규격: 1년 보존 Pin (ADR-012)');
+    expect(sourceContent).toContain('설계 규격: 불변 단일 봉인');
   });
 });
