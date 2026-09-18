@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-GIT-001"
 title: "Git Build Obsidian 운영 절차"
-version: "1.1.0"
+version: "1.1.1"
 status: "baseline"
 author: "Codex"
 updated: "2026-09-11T17:15:06+09:00"
@@ -32,6 +32,8 @@ origin은 **https://github.com/egparadise/SaintVision-Invion.git**이다. 최초
 | 검토·인계 | reviewer 확인, 다음 담당자 연결 | 검토자·결과·next task |
 
 보고서는 코드 SHA를 참조한다. 보고서 후속 commit은 코드 SHA의 검증 결과를 기록한다. 자기 SHA를 본문에 넣고 다시 커밋하는 무한 루프를 만들지 않는다. 후속 보고서 commit도 CI가 검사하며 CI 자체 기록이 마지막 보고서 커밋의 증거다.
+
+2026-09-18부터 push workflow는 `main`과 `integration/all-agents-unified`에서만 자동 실행된다. 개인 Agent branch push 자체는 CI 증거를 만들지 않으며, 개인 변경은 PR을 열거나 갱신해 동일 SHA의 PR workflow를 실행해야 한다. 따라서 `push → CI build` 절차의 CI 증거 위치만 PR 시점으로 이동했고, 구현 완료·인계 판정에 CI run ID와 상태를 요구하는 규칙은 유지된다. 개인 branch push가 성공했다는 사실을 CI 통과로 기록하지 않는다.
 
 ## 현재 사용 가능한 명령
 
