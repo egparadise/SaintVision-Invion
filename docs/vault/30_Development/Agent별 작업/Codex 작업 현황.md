@@ -498,3 +498,8 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## 실행증거 집계 감사·최신 관측
 
 [[2026-09-18_실행증거집계_감사_Codex]]: VF staleXML의과거PASS귀속/불완전증거exit0 두P2 확인. 실제runner외부경계stub·원문CI gate로대조,실제CI/Docker0. Gemini API79/64는보고수신+소스일부확인,독립전체해소미선언. 사용자handle119773/RAM1665MB수신,실행직전handle관측조건강화. 다음Codex집계수정/Claude리뷰.
+
+
+## 실행 증거 집계 수정과 검토 인계
+
+[[2026-09-18_실행증거집계_오류수정_Codex]]: VB-AGG-01/02 고유 run namespace·subprocessExitCode/evidenceStatus 분리·빈/미생성/깨진 XML nonzero·collect-only 거부 구현. offline43passed/2 docker_host 제외, 실제Docker/PG/CI0. 사용자 기존4prefix 비오염 및 coord-business-retry 증거부재 exit1 수신(거짓성공 아님). 다음 Claude 독립검토; 필수suite/SHA provenance 전체보강·CI·운영인수는 별도 미완.

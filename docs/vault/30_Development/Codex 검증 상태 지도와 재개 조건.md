@@ -129,3 +129,8 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 [[2026-09-18_실행증거집계_감사_Codex]]: 사용자/Gemini1ecdb12 API smoke79/79·reconciliation64/64 보고수신, Codex실HTTP재실행없음. label/조건부배너/추가bytes·digest비교는소스확인,음성대조와실editor관측의계약검토는잔여이므로이전finding전체해소미선언. 앞선67/59는이전SHA감사증거로보존. 검사증가12개를누락조건전체수로해석하지않음.
 
 사용자OneDrive handle2421→약1시간후119773/RAM1665MB관측수신. 호스트재개조건에실행직전level·추세·시각을명시. 누수원인/안전임계치/NTSTATUS인과확정없음. 집계감사AGG01staleXML및AGG02불완전증거exit0 두P2 미수정, 다음Codex수정/Claude검토.
+
+
+## 실행 증거 집계 수정과 검토 인계
+
+[[2026-09-18_실행증거집계_오류수정_Codex]]: VB-AGG-01/02 고유 run namespace·subprocessExitCode/evidenceStatus 분리·빈/미생성/깨진 XML nonzero·collect-only 거부 구현. offline43passed/2 docker_host 제외, 실제Docker/PG/CI0. 사용자 기존4prefix 비오염 및 coord-business-retry 증거부재 exit1 수신(거짓성공 아님). 다음 Claude 독립검토; 필수suite/SHA provenance 전체보강·CI·운영인수는 별도 미완.

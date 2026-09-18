@@ -4,6 +4,8 @@ No operational DSN, provider credential or remote Node setting is inherited.
 Node-dependent suites stay in the explicit Node acceptance lane. Skips are counted.
 """
 import json
+import hashlib
+from datetime import datetime, timezone
 import os
 import re
 from pathlib import Path
@@ -28,6 +30,42 @@ class _HarnessUnavailable(RuntimeError):
     product/test failure, so it must be recorded as such rather than reported as one."""
 
 
+def assess_evidence(xml, subprocess_code):
+    """Validate this run's report; completeness of a requested suite is a separate gate."""
+    if not xml.is_file():
+        return {'evidenceStatus': 'missing'}
+    raw = xml.read_bytes()
+    result = {'xmlSha256': hashlib.sha256(raw).hexdigest()}
+    try:
+        root = ET.fromstring(raw)
+        if root.tag not in ('testsuites', 'testsuite'):
+            raise ValueError('not JUnit')
+        cases = root.findall('.//testcase')
+        counts = {tag: sum(c.find(tag) is not None for c in cases)
+                  for tag in ('failure', 'error', 'skipped')}
+        counts['passed'] = sum(not any(c.find(tag) is not None for tag in counts)
+                               for c in cases)
+    except (ET.ParseError, ValueError):
+        return {**result, 'evidenceStatus': 'invalid'}
+    # Parameterized case IDs may contain sensitive input: keep identities private.
+    identities = json.dumps([{'classname': c.get('classname'), 'name': c.get('name')}
+                             for c in cases], ensure_ascii=True).encode('utf-8')
+    xml.with_name('case-identities-private.json').write_bytes(identities)
+    result['caseIdentitiesSha256'] = hashlib.sha256(identities).hexdigest()
+    result['tests'] = counts
+    if not cases:
+        status = 'empty'
+    elif subprocess_code != 0:
+        status = 'partial'
+    elif counts['failure'] or counts['error']:
+        status = 'inconsistent'
+    elif not counts['passed']:
+        status = 'no-executed-tests'
+    else:
+        status = 'complete'
+    return {**result, 'evidenceStatus': status}
+
+
 def main():
     os.chdir(ROOT)
     output = ROOT / '.work'
@@ -43,14 +81,26 @@ def main():
         raise ValueError('VF_BROWSER_TEST must be 0 or 1')
     base_env = {k: v for k, v in os.environ.items()
                 if not k.startswith(('INV_', 'CX01_', 'VF_'))}
-    name = 'sv-container-' + uuid4().hex
+    run_id = uuid4().hex
+    run_dir = output / 'vf-runs' / (prefix + '-' + run_id)
+    run_dir.mkdir(parents=True, exist_ok=False)
+    xml = run_dir / 'tests.xml'
+    name = 'sv-container-' + run_id
     password = secrets.token_urlsafe(32)
     container = None
-    proof = {'exitCode': 1, 'postgres': 'isolated tmpfs PostgreSQL 16; loopback ephemeral port',
+    proof = {'exitCode': 1, 'subprocessExitCode': None, 'evidenceStatus': 'not-run',
+             'runId': run_id, 'startedAt': datetime.now(timezone.utc).isoformat(),
+             'evidencePath': str((run_dir / 'proof.json').relative_to(ROOT)),
+             'xmlPath': str(xml.relative_to(ROOT)),
+             'evidenceScope': 'current invocation JUnit; not expected-suite or operational acceptance', 'postgres': 'isolated tmpfs PostgreSQL 16; loopback ephemeral port',
              'identity': 'synthetic issuer; no operational SSO acceptance',
              'operationalAcceptance': False, 'browserOptIn': browser_tests == '1', 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
     code = 1
     try:
+        if any(arg.split('=', 1)[0] in ('--collect-only', '--co') for arg in sys.argv[1:]):
+            proof['evidenceStatus'] = 'rejected-mode'
+            code = 2
+            return code
         # Pre-run host check (image-lane finding, 2026-09-18): if the host cannot even
         # start a trivial docker process right now, the security assertions cannot be
         # reached, and retrying under sustained pressure only adds load. Record the run
@@ -93,11 +143,10 @@ def main():
                 time.sleep(.2)
         else:
             raise RuntimeError('Isolated PostgreSQL unavailable')
-        xml = output / (prefix + '-tests.xml')
-        command = [sys.executable, '-m', 'pytest', '-q', *(sys.argv[1:] or ['tests']),
+        command = [sys.executable, '-m', 'pytest', '-p', 'tools.vf_execution_guard', '-q', *(sys.argv[1:] or ['tests']),
                    *['--ignore=' + p for p in dependents()], '--junitxml=' + str(xml)]
         proof['command'] = command
-        with (output / (prefix + '-private.log')).open('w', encoding='utf-8') as log:
+        with (run_dir / 'private.log').open('w', encoding='utf-8') as log:
             try:
                 result = subprocess.run(command, env={
                     **base_env, 'INV_TEST_ADMIN_DSN': dsn, 'CX01_CONTAINER': name,
@@ -108,16 +157,10 @@ def main():
                 code = result.returncode
             except subprocess.TimeoutExpired:
                 code = 124
-        proof['exitCode'] = code
-        if xml.exists():
-            try:
-                cases = ET.parse(xml).findall('.//testcase')
-                counts = {tag: sum(c.find(tag) is not None for c in cases)
-                          for tag in ('failure', 'error', 'skipped')}
-                counts['passed'] = len(cases) - sum(counts.values())
-                proof['tests'] = counts
-            except ET.ParseError:
-                proof['testReport'] = 'incomplete'
+        proof['subprocessExitCode'] = code
+        proof.update(assess_evidence(xml, code))
+        if code == 0 and proof['evidenceStatus'] != 'complete':
+            code = 2  # execution evidence unavailable/inconsistent, not a product assertion
     except _HarnessUnavailable as exc:
         # Unverified, not failed: the host could not start the harness. Kept distinct
         # from a test failure (exit 1) and a test-run timeout (exit 124); 125 = the
@@ -146,9 +189,15 @@ def main():
                         proof['cleanup'] = docker_diag.describe(removed)
         except Exception as exc:
             proof['cleanup'] = 'cleanup error (container preserved): ' + docker_diag.masked_stderr(str(exc))
+        proof['finishedAt'] = datetime.now(timezone.utc).isoformat()
         # Always the last statement in finally: a secret-free result JSON is written
         # even when cleanup failed above.
-        (output / (prefix + '.json')).write_text(json.dumps(proof, indent=2) + '\n', encoding='utf-8')
+        encoded = json.dumps(proof, indent=2) + '\n'
+        (run_dir / 'proof.json').write_text(encoded, encoding='utf-8')
+        # Compatibility summary: atomic last-finisher publication, never an XML input.
+        latest_temp = output / (prefix + '-' + run_id + '.tmp')
+        latest_temp.write_text(encoded, encoding='utf-8')
+        latest_temp.replace(output / (prefix + '.json'))
     print(json.dumps({'exitCode': code, 'tests': proof.get('tests'),
                       'unverified': proof.get('unverified'),
                       'evidence': '.work/' + prefix + '.json'}))
