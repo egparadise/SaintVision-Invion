@@ -1,11 +1,11 @@
 ---
 doc_id: "PROPOSAL-CLAUDE-PITR-001"
 title: "운영 compose PITR 변경안·격리 검증·영향 (AC-12 RPO 준비)"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-19T03:30:00+09:00"
+updated: "2026-09-19T05:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal"]
 ---
@@ -47,28 +47,22 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 - `_meets_operational_rpo`는 `operationalRpoVerified is True`와 유한 bound를 요구하므로, **수치 목표에 대해 항상 False**를 반환한다. `--require-operational-rpo` help도 명시한다: "current configuration-only observations cannot satisfy this gate".
 - **결론**: `--require-operational-rpo <N>`는 **활성·drill 성공 후에도 구조적으로 통과하지 못한다(fail-closed)**. 단일 drill의 간격을 운영 보장으로 승격하지 않겠다는 CL-07 통찰이 도구에 그대로 박혀 있다.
 
-따라서 정확한 3단계는 이렇다:
+### 추가 정정 (PITR-R1-01) — 논리 복원과 물리 PITR을 분리한다
 
-1. **설정 활성**(위 override) — 사용자 운영 결정. 활성 후 `pitr_readiness --dsn-env <ENV> --json` verdict = `possible` 확인(필요조건 충족). *이것만으로 RPO 달성 아님.*
-2. **기능 복구 drill (활성 후, 실제로 달성 가능)** — 아래 runbook. `recovery_drill`이 실제 backup을 복원하고 **무결성·fencing·app/kernel role 읽기**를 검증하며 `measuredRpoSeconds`(이 복원의 데이터 손실 간격)·`measuredRtoSeconds`를 기록한다. `_passed`가 True면 **PITR이 실제로 작동함과 측정된 간격**이 증거로 남는다. **이것이 활성 후 얻을 수 있는 실질 증거다.** (backup 경로는 **Linux 전용**·실 디스크 필요 → 이 Windows 개발 환경 실행 불가, 운영/CI 몫.)
-3. **operational-RPO 인증 (현재 gap)** — `--require-operational-rpo`가 통과하려면 도구에 `operationalRpoVerified=True`와 수치 bound를 세우는 **인증 경로**(연속 아카이브 지연/실패 모니터링, 보관·연속성 검증, off-site 내구성)가 추가돼야 한다. 이는 **별도 작업 항목**이며 지금은 존재하지 않는다(§인증 gap).
+지난 판은 `recovery_drill`을 "기능 PITR 성공"으로 불렀는데 **틀렸다.** Codex가 소스로 짚었고 확인했다: `recovery_drill.py`는 **812행 `pg_dump --format=custom` + 858행 `pg_restore`** — **논리 백업/복원**이다. `pg_basebackup`·`restore_command`·`recovery_target`·WAL replay가 **하나도 없다**(grep 0). 그리고 **881행 `measuredRpoSeconds = _recovery_point_age(backup_taken_at, recovery_started_at)`** = 백업 뜬 시각→복원 시작 시각 간격 — 내가 CL-07에서 "서버 설정과 무관하게 거의 0이 나오는, 실패할 수 없는 숫자"라고 정정했던 **바로 그 값**이다. 즉 recovery_drill을 PITR/RPO 증거로 쓰면 내가 고친 함정에 다시 빠진다(이번 세션 세 번째 재발). **논리 복원(recovery_drill)과 물리 PITR(아래 리허설)은 명시적으로 다른 것이다.**
 
-### 인수 runbook — 기능 복구 drill (활성 후, Linux 운영/CI)
+따라서 정확한 단계:
 
-```
-INV_RECOVERY_SOURCE_DSN=<운영 DB libpq DSN(읽기)>          # 복원 대상 원본
-INV_RECOVERY_ADMIN_DSN=<CREATE DATABASE 가능한 DSN>         # 복원 DB 생성
-python tools/recovery_drill.py \
-  --from-backup <이전에 뜬 backup 파일>  \                  # 실제 복구 경로(dump-then-restore 아님)
-  --backup-taken-at <backup 시점 ISO> \
-  --app-role inv_app --kernel-role inv_kernel \
-  --tenant <t> --user <who> --record-dsn <기록 DSN> \        # drill 행 기록(옵션)
-  --json
-```
+1. **설정 활성**(override) — 필요조건. `pitr_readiness --dsn-env <ENV> --json` verdict = `possible`. *RPO 달성 아님.*
+2. **물리 PITR 리허설 (실증 완료)** — `tools/pitr_rehearsal.sh`. 물리 `pg_basebackup` → 기록 A('before') → **목표시각 T1** → 기록 B('after') → **별도 격리 클러스터**에서 `restore_command`로 아카이브 WAL을 T1까지 replay → **A 존재·B 부재·목표 도달** 확인. 이것이 실제 시점 복구가 작동함의 증거다.
+   - **실증 결과**(probe postgres:16-alpine, 제안 설정): `restoredRows=[before]` — 'after'가 목표시각 이후라 정확히 제외됨. `archive recovery complete` → promote. 증거 `docs/vault/30_Development/Evidence/pitr-rehearsal/`.
+   - 이 리허설은 **운영 배포 없이** 격리 컨테이너로 재현 가능(운영 결정은 Tier A/B 활성뿐).
+3. **논리 복원 검증(recovery_drill, 보완적·PITR 아님)** — 별개로 `recovery_drill`은 논리 복원 후 무결성·fencing·app/kernel role 읽기를 검증한다. 유용하나 **물리 PITR도 RPO 증거도 아니다.** `measuredRpoSeconds`는 위 이유로 RPO 지표가 아니다.
+4. **operational-RPO 인증 (현재 gap)** — `--require-operational-rpo`가 통과하려면 도구에 `operationalRpoVerified=True`와 수치 bound를 세우는 인증 경로(아카이브 지연/실패 모니터링, 보관·연속성 검증, off-site 내구성)가 추가돼야 한다. 지금은 없다(§인증 gap).
 
-- exit 0 + `measuredRpoSeconds`/`measuredRtoSeconds` + `integrityVerified`/`fencingVerified` = **기능 PITR 성공 증거**.
-- `--require-operational-rpo <N>`을 붙이면 위 §3 이유로 현재는 통과하지 못한다(의도된 fail-closed). 붙이지 않고 기능 drill 증거를 남기는 것이 활성 직후의 현실적 인수 단계다.
-- 목표 시점(point-in-time) 복원을 시험하려면 §override가 켠 **연속 아카이브 WAL**이 있어야 하며(그래서 활성이 선행), backup 시점 이후 목표 시각까지 replay한다.
+### 물리 PITR 리허설 재현 (활성 없이 격리 실증)
+
+`bash tools/pitr_rehearsal.sh` — probe postgres를 제안 아카이브 설정으로 띄우고 위 A/T1/B → 별도 클러스터 목표시각 복원 → `[before]`만 남는지 검증하고 `PASS`/`FAIL`을 낸다. (실 docker 필요. 메모리 압박 하에서 daemon i/o timeout이 나면 재시도하거나 여유 있는 호스트에서 수행 — 도구에 재시도 포함.)
 
 ### operational-RPO 인증 gap (별도 작업 항목)
 
@@ -77,24 +71,24 @@ python tools/recovery_drill.py \
 ## 영향 정리 (사용자 판단 근거)
 
 - **WAL 보관 용량**: `archive_timeout=300`은 idle에도 300초마다 16MB 세그먼트를 강제 전환·아카이브 → **최소 ~192MB/시간, ~4.6GB/일(idle floor)**, 부하 시 더 큼. `archive_timeout=600`으로 올리면 idle 오버헤드 절반(900s 목표엔 여전히 여유). `wal_keep_size=1024`(1GB)는 pg_wal에 버퍼를 남겨 짧은 아카이브 지연이 미아카이브 세그먼트를 즉시 재활용하지 않게 한다.
-- **아카이브 대상 저장소 요구**: 아카이브는 연속 증가하므로 **보관/정리 정책 필수** — 유지하는 가장 오래된 base backup보다 오래된 WAL은 삭제(pgbackrest는 자동, 로컬 cp는 수동 cron 필요). 용량 = (base backup 주기 동안의 WAL 생성량) × (보관하는 backup 세대 수) + 여유. Tier A 로컬은 같은 호스트라 호스트 손실 시 data+archive 동시 손실(DR 아님) — RPO를 호스트 손실까지 보장하려면 Tier B 필요.
+- **아카이브 대상 저장소 요구**: 아카이브는 연속 증가하므로 **보관/정리 정책 필수** — 유지하는 가장 오래된 base backup보다 오래된 WAL은 삭제(pgbackrest는 자동, 로컬 cp는 수동 cron 필요). 용량 = (base backup 주기 동안의 WAL 생성량) × (보관하는 backup 세대 수) + 여유. Tier A 로컬은 같은 호스트라 호스트 손실 시 data+archive 동시 손실(DR 아님). **기존 same-host minio도 같은 장애 도메인이라 DR이 아니다(PITR-R1-02)** — RPO를 호스트 손실까지 보장하려면 **DB 호스트와 물리적으로 분리된 저장소**(§Tier B의 별도 장애 도메인)와 그 동시 생존 증거가 필요하다.
 - **data_checksums**: initdb 시점만 설정 가능. **신규 클러스터**는 override의 `POSTGRES_INITDB_ARGS=--data-checksums`로 켜짐(빈 postgres_data일 때만). **기존 클러스터**는 offline `pg_checksums --enable`(정지→실행→재시작, 다운타임)이 필요. RPO 항목은 아니나, 복구 drill의 원본이 조용히 손상돼 양쪽에서 같게 읽히는 것(CL-07에서 지적)을 막아 drill 증거의 신뢰를 높인다.
 - **재시작 다운타임**: `archive_mode` 변경은 postgres 재시작(짧은 downtime) 동반.
 - **볼륨 소유권 전제**: Tier A는 `wal_archive`를 postgres 런타임 uid 소유로 사전 provision해야 archive_command가 쓸 수 있다(안 하면 pg_wal 적체→디스크 full).
 
-## Tier B (권장, 내구성 있는 수용) — 이미 있는 minio로 (구체 설계)
+## Tier B (내구성 경로) — 도구는 wal-g, 저장소는 **반드시 별도 장애 도메인** (PITR-R1-02 정정)
 
-compose에 minio(S3 호환)가 이미 있다(`saintvision-minio`, `MINIO_ROOT_*`). WAL·base backup을 minio 버킷으로 보내면 **off-host 내구성 + 자동 보관 정리**를 얻어 호스트 손실까지 RPO를 보장한다. `archive_command`는 postgres 컨테이너 안에서 실행되므로 도구가 그 이미지에 있어야 한다 — **wal-g**(단일 바이너리, pgbackrest보다 단순)를 권장한다.
+**정정(PITR-R1-02)**: 지난 판은 "기존 minio로 보내면 호스트 손실까지 RPO를 보장한다"고 썼는데 **틀렸다.** `docker-compose.prod.yml`의 minio는 **같은 compose의 `minio_data:/data`로 같은 호스트·같은 장애 도메인**이다. S3 API를 쓴다고 내구성이 생기지 않는다 — **같은 호스트가 죽으면 DB와 백업이 함께 사라진다.** 따라서 기존 minio로의 전송은 Tier A와 동일하게 **단일 호스트**이며 DR이 아니다(로컬 디스크 장애·실수 삭제·논리 오류로부터의 복구에는 유효하나 호스트 손실 RPO는 보장 못 함).
 
-- **커스텀 이미지** (lane 후 materialize·빌드): `FROM postgres:16-alpine` + wal-g 바이너리 복사. (빌드·리허설은 docker 필요 → 지금은 설계만.)
-- **compose override env** (minio를 S3로): `AWS_ENDPOINT=http://minio:9000`, `AWS_S3_FORCE_PATH_STYLE=true`, `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`(minio 자격증명 — `MINIO_ROOT_*` 재사용 또는 전용 키 권장), `WALG_S3_PREFIX=s3://<bucket>/pg`.
-- **아카이브**: `-c archive_command='wal-g wal-push %p'`(Tier A의 로컬 cp를 대체). `archive_timeout`·`wal_level`은 Tier A와 동일.
-- **base backup(주기)**: `wal-g backup-push "$PGDATA"`를 주기 실행(cron/systemd timer/주기 job). 주기가 RPO 하한과 아카이브 용량을 함께 결정.
-- **보관 정리(자동)**: `wal-g delete retain FULL <N>` — 유지할 full backup 세대 수 N. 로컬 cp의 수동 cron 불필요.
-- **복원(기능 drill/실복구)**: `wal-g backup-fetch "$PGDATA" LATEST` 후 `restore_command='wal-g wal-fetch %f %p'` + `recovery_target_time`으로 목표 시점 replay.
-- **선행 결정(운영)**: (a) minio 버킷 생성, (b) 전용 S3 키 vs `MINIO_ROOT_*` 재사용, (c) base backup 주기·보관 세대 수. 자격증명·엔드포인트는 운영 결정이라 파일에 박지 않고 env로 주입.
+**실제 off-host 내구성의 요구(별도 정의, 증거 필요)**:
+- **별도 장애 도메인**: DB 호스트와 **물리적으로 분리된** 호스트/저장소(다른 머신, 외부 object store, 또는 원격 지역). 같은 docker host 안의 다른 컨테이너는 해당 안 됨.
+- **DB·백업 동시 생존 조건**: 호스트 손실 시 base backup과 WAL이 **함께 살아남음**을 보이는 증거(예: 저장소가 원격이며 push가 원격에 커밋됨을 확인).
+- **증거**: 원격 저장소로의 실제 push/fetch + 복원 리허설. 이것 없이는 "RPO 보장"을 쓰지 않는다.
+- 이 별도 호스트/원격 저장소 provision은 **운영 결정**이다(내 권한 밖). 기존 same-host minio는 이 요구를 충족하지 못한다.
 
-리허설(커스텀 이미지 빌드 + minio로 push/fetch + `recovery_drill` 기능 drill)은 **PostgreSQL/도구 컨테이너가 필요**하므로 image lane 판별이 끝난 뒤 수행한다(사용자 신호 대기). 그때 Dockerfile·override를 실제 파일로 만들고 검증한다.
+**도구 설계(wal-g, 저장소 대상은 위 별도 도메인으로 지정 시)**: `archive_command`는 postgres 컨테이너 안에서 실행되므로 도구가 그 이미지에 있어야 한다 — **wal-g**(단일 바이너리, retry-safe). 커스텀 이미지 `FROM postgres:16-alpine` + wal-g. env: `AWS_ENDPOINT=<원격 S3 엔드포인트>`, `AWS_S3_FORCE_PATH_STYLE`, `AWS_ACCESS_KEY_ID`/`SECRET`, `WALG_S3_PREFIX=s3://<bucket>/pg`. `archive_command='wal-g wal-push %p'`(retry-safe), `wal-g backup-push "$PGDATA"`(주기), `wal-g delete retain FULL <N>`(자동 보관), 복원 `wal-g backup-fetch ... LATEST` + `restore_command='wal-g wal-fetch %f %p'` + `recovery_target_time`. **엔드포인트를 같은 호스트 minio로 두면 DR이 아니다** — 위 별도 도메인 요구를 반드시 만족시켜야 한다.
+
+리허설(커스텀 이미지 빌드 + 원격 저장소 push/fetch + 물리 PITR)은 도구/저장소 provision이 선행이므로 그 결정 후 수행한다.
 
 ## 사용자 결정 항목 (이 준비가 대기하는 것)
 
