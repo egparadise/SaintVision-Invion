@@ -126,7 +126,7 @@ jobs:
           IGNORES=$(python tools/node_dependent_tests.py --pytest-args)
           echo "Left to Core Build (needs the Node runtime):"
           python tools/node_dependent_tests.py | sed 's/^/  /'
-          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py
+          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
 
       - name: No PostgreSQL test was skipped
         run: |

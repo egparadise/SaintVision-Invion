@@ -90,7 +90,7 @@ jobs:
       - name: Verify bounded shard replacement on two real Nodes
         run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
       - name: Require executed integration evidence
         run: |
           python - <<'PY'

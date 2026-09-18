@@ -50,7 +50,7 @@ it('reads the business project envelope without inventing owner or capacity', as
     createdAt: '2026-09-14', kernelLinked: false, kernelEnabled: false }]);
 });
 it('rejects an unsupported project envelope', async () => {
-  api.mockResolvedValue({ items: [] }); await expect(fetchProjects()).rejects.toThrow();
+  api.mockResolvedValue({ unknown: [] }); await expect(fetchProjects()).rejects.toThrow();
 });
 it('preserves empty workspace lists without sample fallbacks', async () => {
   api.mockResolvedValue({ projectId: 'project', workspaces: [], count: 0 });
@@ -64,4 +64,12 @@ it('encodes project identifiers for the workspace route', async () => {
   api.mockResolvedValue({ projectId: 'a/b', workspaces: [] });
   await fetchProjectWorkspaces('a/b');
   expect(api).toHaveBeenCalledWith('/v1/projects/a%2Fb/workspaces');
+});
+
+it('reads kernel grant catalog without inventing business metadata', async () => {
+  api.mockResolvedValue({ items: [{ projectId: 'actual-project' }] });
+  expect(await fetchProjects()).toEqual([{ id: 'actual-project', name: 'actual-project', createdAt: '' }]);
+});
+it('rejects ambiguous catalog envelopes', async () => {
+  api.mockResolvedValue({ projects: [], items: [] }); await expect(fetchProjects()).rejects.toThrow();
 });

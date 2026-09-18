@@ -96,6 +96,14 @@ def test_full_studio_login_project_approval_and_logout(api, tmp_path, invalid_to
             assert c.execute('SELECT count(*) FROM inv.approval_votes WHERE approval_id=%s', (row['approvalId'],)).fetchone()[0] == 1
         page.evaluate('window.scrollTo(0, 0)')
         page.screenshot(path=str(ROOT/'.work/studio-browser.png'), full_page=True)
+        # Exercise the production Desktop entry with malformed persisted layout.
+        page.evaluate("localStorage.setItem('saintvision_desktop_windows', '[null]')")
+        browser_errors = []
+        page.on('pageerror', lambda error: browser_errors.append(str(error)))
+        page.get_by_role('button', name='Web Desktop으로 전환', exact=True).click()
+        expect(page.get_by_role('dialog', name='내 컴퓨터 (Resource Explorer)')).to_be_visible()
+        page.get_by_role('button', name='📑 클래식 포털 뷰로 전환', exact=True).click()
+        assert not browser_errors
         page.get_by_role('button', name='로그아웃', exact=True).click()
         expect(page.get_by_role('heading', name='SaintVision 로그인')).to_be_visible()
         expect(page.locator('pre').filter(has_text='synthetic-private-command')).to_have_count(0)

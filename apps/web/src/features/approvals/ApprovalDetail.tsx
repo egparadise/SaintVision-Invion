@@ -206,7 +206,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
             }}
           >
             <span>⚠️</span>
-            <span>주의: 자동 롤백 절차가 정의되지 않았습니다. 장애 발생 시 수동 조치가 필요합니다.</span>
+            <span>롤백 계획이 이 응답에 포함되어 있지 않습니다.</span>
           </div>
         )}
 
@@ -239,7 +239,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
               ? approval.unifiedDiff
               : isDiffLoadFailed
               ? '(L3 고위험 작업의 필수 Diff 데이터를 불러올 수 없습니다)'
-              : '(명령어 실행 및 샌드박스 상태 복구 작업 - 소스 코드 파일 변경 없음)'}
+              : '파일 변경 내역이 이 응답에 포함되어 있지 않습니다.'}
           </pre>
         </div>
 
@@ -274,7 +274,7 @@ export const ApprovalDetail: React.FC<ApprovalDetailProps> = ({
           <Button
             variant="secondary"
             size="md"
-            disabled={isExpired || isSubmitting}
+            disabled={isExpired || isSubmitting || approval.status !== 'pending' || !approval.actionDigest}
             onClick={() => setShowRejectModal(true)}
           >
             반려

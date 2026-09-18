@@ -33,7 +33,7 @@ import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 export const App: React.FC = () => {
   const [desktop, setDesktop] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('login');
   const [nodes, setNodes] = useState<NodeItem[]>([]);
   const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -193,6 +193,8 @@ export const App: React.FC = () => {
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedRun = runs.find((r) => r.id === selectedRunId);
+
+  if (!currentUser) return <Login onLoginSuccess={user => { setCurrentUser(user); setActiveTab('dashboard'); }} />;
 
   if (desktop && currentUser && projectId) return <DesktopShell
     key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
