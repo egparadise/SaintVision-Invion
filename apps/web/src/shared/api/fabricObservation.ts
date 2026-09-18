@@ -12,15 +12,18 @@ export const fabricObservation = {
   locations(cursor?: string, signal?: AbortSignal) {
     const query = new URLSearchParams({ limit: '50' });
     if (cursor) query.set('cursor', cursor);
-    return get<Page<Location>>(`/v1/storage/locations?${query}`, signal);
+    const qs = query.toString();
+    return get<Page<Location>>(`/v1/storage/locations${qs ? '?' + qs : ''}`, signal);
   },
   async resolve(uri: string, signal?: AbortSignal) {
-    const result = await get<{location: Location}>(`/v1/storage/resolve?${new URLSearchParams({uri})}`, signal);
+    const qs = new URLSearchParams({ uri }).toString();
+    const result = await get<{location: Location}>(`/v1/storage/resolve${qs ? '?' + qs : ''}`, signal);
     if (result.location?.uri !== uri) throw new Error('URI response mismatch');
     return result.location;
   },
   async replicas(location: Location, signal?: AbortSignal) {
-    const { observation } = await get<{observation: ReplicaObservation}>(`/v1/storage/replica-status?${new URLSearchParams({uri: location.uri})}`, signal);
+    const qs = new URLSearchParams({ uri: location.uri }).toString();
+    const { observation } = await get<{observation: ReplicaObservation}>(`/v1/storage/replica-status${qs ? '?' + qs : ''}`, signal);
     if (observation?.locationId !== location.locationId || observation.currentAvailability !== 'unknown'
       || observation.requiresExecutionRevalidation !== true || !replicaStates.every(state =>
         Number.isSafeInteger(observation.recordedStates?.[state]) && observation.recordedStates[state] >= 0)
