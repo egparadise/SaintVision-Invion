@@ -236,12 +236,12 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-CL-R-001 Codex R3 재검토 blocker 수정 (R3-01 재시도 안전·R2-03 마스킹·finally 결과 보존) |
-| 실제 owner / 읽은 진행판 버전 / KST | Claude(테스트/운영 문서 owner) / 보강 로드맵 VF-CL / 2026-09-18 19:20 KST |
+| 마지막 작업 / 착수 카드 | VF-CL-R-001 사용자 실측 결함 수정 (docker_diag.run timeout 반환 타입 불일치 → AttributeError, best-effort 은폐) |
+| 실제 owner / 읽은 진행판 버전 / KST | Claude(테스트/운영 문서 owner) / 보강 로드맵 VF-CL / 2026-09-18 21:30 KST |
 | branch / base SHA / 구현 SHA | agent/claude/vf-cl-cx01 / b5f770a / 71fc9f5(image-lane 마무리) → R3 커밋(아래) |
 | 작업한 것 | R3-01: `is_host_process_init_failure` 플랫폼 게이팅 + loader-stage 전용 allowlist{0xC0000142,0xC0000135}, crash(0xC0000005)·signal(−9) 미재시도(변경명령 중복 방지), describe 5범주. R2-03: `masked_stderr`가 URL·libpq(`password=`)·인용값 3형태 마스킹, 오류 종류 보존. finally: cleanup try/except + JSON write를 finally 마지막 무조건 실행(OSError에도 비밀 없는 evidence 기록). +앞 커밋(71fc9f5): retries 2→1, TimeoutExpired 분류, 선행 host 검사, exit 125 미검증, pytest.skip |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 순수 로직 직접 실행 통과: 플랫폼 게이팅(off-Windows False), loader-only, crash 변경명령 1회 호출(중복 방지), 시도별 결과 순서 보존, timeout 분류·미재시도, describe 5범주, 마스킹 3형태+오류 보존, finally OSError→마스킹 JSON. 6파일 `py_compile` OK, 잔여 구-시그니처 0. **worktree pytest 미설치**→pytest 스위트 미실행(정직 기록) |
-| CI / 독립 reviewer / 운영 인수 | 미완: pytest 스위트·image lane 재판별은 프로세스 생성 여유 있는 호스트 필요. reviewer=Codex 일관 수정본 재검토 대기 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | **이번엔 pytest 실제 실행**: worktree에 pytest 설치(`--user`) 후 `pytest --noconftest tests/test_docker_diag.py tests/test_check_kernel_docker_hygiene.py` → **17 passed**(실 docker, R2-01 동시성 prune 2종 + timeout 타입 일관성 3경로×2모드 + decode 회귀 포함). 전체 postgres 스위트는 DSN(:55432)+무거운 의존 필요 → CI/사용자 몫 |
+| CI / 독립 reviewer / 운영 인수 | 부분 실측 완료(단위 17 passed). 전체 스위트·image lane 재판별은 여유 호스트+DSN 필요. reviewer=Codex 일관 수정본 재검토 대기 |
 | 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role DB role 거부 포함) **미검증** 유지 — 미도달, 호스트 프로세스 생성 압박(제품 결함 0건). 해소는 사용자 환경(동시 Agent 축소/OneDrive 핸들 완화) 몫 |
 | 다음 카드 / 첫 행동 / 다음 담당 | `model_remote.py` 독립 검토 완료(finding 없음, sound). 남은 것: 여유 호스트에서 image lane 재실행→미검증 6건 판별, pytest 스위트 실행 확인. 담당 사용자/CI(재실행)·Codex(착지) |
-| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_..._근본원인과R2수정.md` v1.2.0; `2026-09-18_20-10-00_KST_VF-CX_Claude_model_remote독립검토.md` v1.0.0. R3 수정 커밋 56aa7cb |
+| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_..._근본원인과R2수정.md` v1.3.0; `..._VF-CX_Claude_model_remote독립검토.md` v1.0.0. 커밋 56aa7cb(R3)·b809fbe(검토)·타입일관성(아래) |

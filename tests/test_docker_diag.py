@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import docker_diag  # noqa: E402
 
@@ -153,3 +155,61 @@ def test_run_classifies_a_timeout_instead_of_raising_and_does_not_retry(monkeypa
 def test_run_default_retry_is_a_single_transient_cushion():
     import inspect
     assert inspect.signature(docker_diag.run).parameters["retries"].default == 1
+
+
+def _fake_subprocess(returncode):
+    """A subprocess.run stand-in that types stdout/stderr per the call's text mode,
+    exactly as the real one does."""
+    def fake(argv, **k):
+        text = bool(k.get("text") or k.get("universal_newlines")
+                    or k.get("encoding") is not None or k.get("errors") is not None)
+        out, err = ("ok", "") if text else (b"ok", b"")
+        return subprocess.CompletedProcess(argv, returncode, stdout=out, stderr=err)
+    return fake
+
+
+@pytest.mark.parametrize("text_mode,typ", [(False, bytes), (True, str)])
+def test_run_return_type_is_consistent_across_paths(monkeypatch, text_mode, typ):
+    """The return type must match the call's mode on EVERY path -- normal, host-init
+    retry, and timeout -- or a bytes-mode caller's .decode()/.write_bytes breaks the
+    moment a timeout occurs (which is exactly when host pressure is worst). This is the
+    check_kernel_docker AttributeError regression."""
+    monkeypatch.setattr(docker_diag, "_on_windows", lambda: True)
+    monkeypatch.setattr(docker_diag.time, "sleep", lambda *_: None)
+    kw = {"text": True} if text_mode else {}
+
+    # Normal path.
+    monkeypatch.setattr(subprocess, "run", _fake_subprocess(0))
+    normal = docker_diag.run(["docker", "ps"], **kw)
+    assert isinstance(normal.stdout, typ) and isinstance(normal.stderr, typ)
+
+    # Host-init failure then success (retry path): the surfaced result matches too.
+    seq = iter([subprocess.CompletedProcess(["docker"], 0xC0000142,
+                                            stdout=("" if text_mode else b""),
+                                            stderr=("" if text_mode else b"")),
+                _fake_subprocess(0)(["docker"], **kw)])
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: next(seq))
+    retried = docker_diag.run(["docker", "ps"], retries=2, **kw)
+    assert retried.returncode == 0
+    assert isinstance(retried.stdout, typ) and isinstance(retried.stderr, typ)
+
+    # Timeout path: the synthesised result matches the call mode.
+    def timeout(argv, **k):
+        raise subprocess.TimeoutExpired(cmd=argv, timeout=1)
+    monkeypatch.setattr(subprocess, "run", timeout)
+    timed = docker_diag.run(["docker", "ps"], timeout=1, **kw)
+    assert timed.returncode == docker_diag.TIMEOUT_RETURNCODE and docker_diag.timed_out(timed)
+    assert isinstance(timed.stdout, typ) and isinstance(timed.stderr, typ)
+
+
+def test_timeout_result_bytes_stdout_can_be_decoded(monkeypatch):
+    """The precise crash: a bytes-mode caller (no text=) decodes the result. On the
+    timeout path this used to be a str -> AttributeError: 'str' has no attribute
+    'decode'. It must be bytes and decode cleanly."""
+    def timeout(argv, **k):
+        raise subprocess.TimeoutExpired(cmd=argv, timeout=1)
+    monkeypatch.setattr(subprocess, "run", timeout)
+    result = docker_diag.run(["docker", "ps"], timeout=1)   # no text= -> bytes contract
+    assert isinstance(result.stdout, bytes) and isinstance(result.stderr, bytes)
+    assert result.stdout.decode("utf-8", "replace") == ""            # would have raised before
+    assert "timed out" in result.stderr.decode("utf-8", "replace")   # the note survives, typed

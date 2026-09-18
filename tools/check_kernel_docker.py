@@ -216,12 +216,16 @@ def execute(prepared, tests):
     # Bound residue from prior runs before creating this run's containers, so a
     # host that has accumulated weeks of stopped test containers does not time out
     # this run (VF-CL-R-001). This run's own resources are created after the prune.
-    # Best-effort (VF-CL-R2-02): the prune sits outside the try below and calls
-    # docker, which can raise TimeoutExpired/OSError under the very pressure it
-    # addresses; a prune failure must bound nothing rather than abort the run.
+    # Best-effort (VF-CL-R2-02) for an OPERATIONAL failure only: docker_diag.run
+    # classifies a timeout rather than raising, so the only expected escape is OSError
+    # (e.g. docker unavailable under load); a prune failure then bounds nothing rather
+    # than aborting the run. A programming error (a type/attribute bug) is deliberately
+    # NOT caught here: swallowing one once let a timed-out prune silently no-op and
+    # reintroduce the leak R2-01 fixed, hidden by this very wrapper -- the VF-CL-R-001
+    # masking one layer down. Such a bug must surface, so only OSError is tolerated.
     try:
         prune_stale_kernel_test_residue()
-    except Exception:
+    except OSError:
         pass
     try:
         checked(['docker','network','create','--internal','--label','ai.saintvision.kernel-test='+name,network])

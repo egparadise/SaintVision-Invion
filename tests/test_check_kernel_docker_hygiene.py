@@ -35,6 +35,29 @@ def test_checked_raises_with_a_masked_diagnostic_not_a_blank_message():
 import time
 
 
+def test_run_on_timeout_stays_bytes_so_decode_sites_do_not_crash(monkeypatch):
+    """check_kernel_docker calls run() without text= and .decode()s the result. A
+    timeout must therefore return bytes, not str, or every decode site (and the build-
+    log write_bytes) raises the moment host pressure causes a timeout -- the exact
+    AttributeError that a best-effort wrapper then silently swallowed (VF-CL-R-001
+    masking one layer down)."""
+    def timeout(argv, **k):
+        raise subprocess.TimeoutExpired(cmd=argv, timeout=1)
+    monkeypatch.setattr(subprocess, "run", timeout)
+    result = ckd.run(["docker", "ps", "-aq"], timeout=1)          # the prune's own call shape
+    assert isinstance(result.stdout, bytes) and isinstance(result.stderr, bytes)
+    assert result.stdout.decode("utf-8", "replace").split() == []  # would have AttributeError'd
+
+
+def test_checked_on_timeout_raises_a_classified_error_not_an_attributeerror(monkeypatch):
+    def timeout(argv, **k):
+        raise subprocess.TimeoutExpired(cmd=argv, timeout=1)
+    monkeypatch.setattr(subprocess, "run", timeout)
+    with pytest.raises(RuntimeError) as exc:
+        ckd.checked(["docker", "inspect", "x"], timeout=1)
+    assert "timed out" in str(exc.value)      # named, not a raw AttributeError
+
+
 def _present(name):
     return subprocess.run(["docker", "ps", "-aq", "--filter", f"name=^{name}$"],
                           capture_output=True, text=True, timeout=30).stdout.strip()

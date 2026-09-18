@@ -146,19 +146,39 @@ def describe(result) -> str:
                             is_timeout=timed_out(result))
 
 
-def _timeout_result(argv, exc, timeout) -> subprocess.CompletedProcess:
+def _text_mode(kwargs) -> bool:
+    """True when subprocess.run would decode stdout/stderr to ``str`` for this call
+    (``text=``/``universal_newlines=``, or an explicit ``encoding``/``errors``)."""
+    return bool(kwargs.get('text') or kwargs.get('universal_newlines')
+                or kwargs.get('encoding') is not None or kwargs.get('errors') is not None)
+
+
+def _timeout_result(argv, exc, timeout, *, text_mode) -> subprocess.CompletedProcess:
     """A classified CompletedProcess standing in for a ``TimeoutExpired`` so a timeout
-    is surfaced as a category, never raised out as an unclassified hole."""
+    is surfaced as a category, never raised out as an unclassified hole -- carrying
+    stdout/stderr in the SAME type ``subprocess.run`` would have returned for this call
+    (bytes unless the call is in text mode).
+
+    The type must match the call: a bytes-mode caller ``.decode()``s the result and a
+    text-mode caller ``.strip()``s it. A mismatch here (str on a bytes call) made a
+    timed-out prune raise ``AttributeError: 'str' has no attribute 'decode'`` under the
+    very host pressure this module exists to handle, and the best-effort wrapper then
+    swallowed it -- reintroducing the leak R2-01 fixed while hiding that it happened.
+    That is the VF-CL-R-001 masking recurring one layer down, so the type is pinned."""
     note = f'timed out after {timeout}s'
-    stderr = getattr(exc, 'stderr', None)
-    if isinstance(stderr, (bytes, bytearray)):
-        stderr = stderr.decode('utf-8', 'replace').strip() or note
-    elif isinstance(stderr, str):
-        stderr = stderr.strip() or note
-    else:
-        stderr = note
-    result = subprocess.CompletedProcess(argv, TIMEOUT_RETURNCODE,
-                                         stdout=getattr(exc, 'stdout', None) or '', stderr=stderr)
+
+    def coerce(value, default):
+        if value is None or value == b'' or value == '':
+            value = default
+        if text_mode:
+            return value.decode('utf-8', 'replace') if isinstance(value, (bytes, bytearray)) else str(value)
+        return bytes(value) if isinstance(value, (bytes, bytearray)) else str(value).encode('utf-8', 'replace')
+
+    result = subprocess.CompletedProcess(
+        argv, TIMEOUT_RETURNCODE,
+        stdout=coerce(getattr(exc, 'stdout', None), ''),
+        stderr=coerce(getattr(exc, 'stderr', None), note),
+    )
     result.timed_out = True
     return result
 
@@ -169,21 +189,22 @@ def run(args, *, retries: int = 1, timeout: int = 60, **kwargs) -> subprocess.Co
 
     A docker error (the command ran and returned a docker exit code) is returned
     as-is -- retrying a real docker failure would just repeat it. A timeout is caught
-    and returned as a classified result (never raised): an escaping ``TimeoutExpired``
-    is exactly the kind of unclassified hole this module removes, and a timeout is not
-    retried (it already spent the full timeout). Only a *loader-stage* host
-    process-creation failure is retried -- and only once by default -- because that
-    process never ran (idempotent, so a mutating command cannot duplicate) and a
-    transient blip can clear. A running-process crash or a POSIX signal is NOT retried:
-    it ran, so a re-run could take a second, duplicating effect.
+    and returned as a classified result (never raised) whose stdout/stderr type matches
+    the call (bytes unless text mode), so every caller's ``.decode()`` or ``.strip()``
+    keeps working; a timeout is not retried (it already spent the full timeout). Only a
+    *loader-stage* host process-creation failure is retried -- and only once by default
+    -- because that process never ran (idempotent, so a mutating command cannot
+    duplicate) and a transient blip can clear. A running-process crash or a POSIX
+    signal is NOT retried: it ran, so a re-run could take a second, duplicating effect.
     """
     argv = [str(v) for v in args]
+    text_mode = _text_mode(kwargs)
 
     def _once():
         try:
             return subprocess.run(argv, capture_output=True, timeout=timeout, **kwargs)
         except subprocess.TimeoutExpired as exc:
-            return _timeout_result(argv, exc, timeout)
+            return _timeout_result(argv, exc, timeout, text_mode=text_mode)
 
     result = _once()
     for attempt in range(retries):
