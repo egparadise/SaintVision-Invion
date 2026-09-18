@@ -1,0 +1,32 @@
+{
+  "base": "56fe6ca",
+  "mergeSha": "fe4c04cf4a40d3241ab699f0584caa71aa336154",
+  "fullCheckExitCode": 1,
+  "managedFiles": 22,
+  "pending": 0,
+  "preservedExternalEdits": [],
+  "files": [
+    "00_Index/전체 개발 진행 현황.md",
+    "30_Development/Agent별 작업/Codex VF 작업 현황.md",
+    "30_Development/Agent별 작업/Codex 작업 현황.md",
+    "30_Development/Agent별 작업/Gemini 작업 현황.md",
+    "30_Development/Evidence/cx01-landing/browser-tests.json",
+    "30_Development/Evidence/cx01-landing/cleanup.json",
+    "30_Development/Evidence/cx01-landing/configured-routes.json",
+    "30_Development/Evidence/cx01-landing/frontend.json",
+    "30_Development/Evidence/cx01-landing/initial-tests.json",
+    "30_Development/Evidence/cx01-landing/landing.json",
+    "30_Development/Evidence/cx01-landing/shared-codex-before.txt",
+    "30_Development/Evidence/cx01-landing/shared-codex-proposal.json",
+    "30_Development/Evidence/cx01-landing/source-boundaries.json",
+    "30_Development/Gemini_GM01-06_프론트엔드_독립검토_인계서.md",
+    "30_Development/History/2026-09-15_VF_오류와_해결.md",
+    "30_Development/History/2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고.md",
+    "30_Development/History/2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고.md",
+    "30_Development/History/2026-09-18_CX-01_정본착지_Codex.md",
+    "30_Development/History/2026-09-18_CX01착지전_공통진행판보존.md",
+    "30_Development/VF-CL CX-01 병합 핸드오프 - Claude 영역.md",
+    "40_Governance/Agent 인계 대기 목록.md",
+    "40_Governance/CX-01 제어 평면 정본과 Agent 재개 계약.md"
+  ]
+}

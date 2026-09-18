@@ -63,7 +63,7 @@
     "--ignore=tests/integration/test_workspace_resume.py",
     "--ignore=tests/integration/test_workspace_start.py",
     "--ignore=tests/integration/test_workspace_terminal.py",
-    "--junitxml=C:\\Project\\SaintVision-Invion\\.worktrees\\codex-vf-desktop-integration\\.work\\cx01-browser-final-tests.xml"
+    "--junitxml=C:\\Project\\SaintVision-Invion\\.worktrees\\codex-vf-desktop-integration\\.work\\cx01-browser-merged-tests.xml"
   ],
   "tests": {
     "failure": 0,
@@ -71,5 +71,7 @@
     "skipped": 0,
     "passed": 6
   },
-  "isolatedContainerRemoved": true
+  "isolatedContainerRemoved": true,
+  "verifiedSourceSha": "8e9f8c8e4d69a441247987a25cbace7b9522eea6",
+  "mergeSha": "fe4c04cf4a40d3241ab699f0584caa71aa336154"
 }

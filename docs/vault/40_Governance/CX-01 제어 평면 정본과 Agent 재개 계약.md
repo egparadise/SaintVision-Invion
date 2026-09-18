@@ -13,7 +13,7 @@ source_of_truth: "Git"
 
 ## 개발 정본과 실행 경계
 
-- 공유 개발 정본: `origin/integration/all-agents-unified`. CX-01 착지 작업 브랜치: `agent/codex/cx-01-canonical-landing`; 실제 병합 SHA/검증/원격 수신은 [[2026-09-18_CX-01_정본착지_Codex]]에 고정한다.
+- 공유 개발 정본: `origin/integration/all-agents-unified`. CX-01 착지 작업 브랜치: `agent/codex/cx-01-canonical-landing`; 병합 완료 SHA `fe4c04cf4a40d3241ab699f0584caa71aa336154` ([PR34](https://github.com/egparadise/SaintVision-Invion/pull/34)). 검증/원격 수신은 [[2026-09-18_CX-01_정본착지_Codex]]에 고정한다.
 - production entrypoint는 `saintvision.server:create_app --factory` → `inv.app.create_configured_app`다. `saintvision.demo_server`는 격리 fixture이며 배포 정본이 아니다.
 - 명시적 identity/database 설정 없이 시작하지 않는다. 임의 Bearer·만료 신뢰·다른 tenant/project·폐기된 권한은 거부한다. readiness와 Workspace 실행 admission은 별도다.
 - kernel `inv_kernel`과 business `inv_app`은 NOLOGIN 그룹이다. 별도 최소권한 로그인/DSN을 쓰며 business dispatch는 같은 요청의 정본 kernel 권한을 통과한다. 테스트 난수 계정을 운영 credential로 사용하지 않는다.

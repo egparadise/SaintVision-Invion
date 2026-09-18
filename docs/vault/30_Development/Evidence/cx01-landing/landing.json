@@ -1,0 +1,73 @@
+{
+  "kst": "2026-09-18T11:17:34+09:00",
+  "pr": "https://github.com/egparadise/SaintVision-Invion/pull/34",
+  "merged": true,
+  "mergeSha": "fe4c04cf4a40d3241ab699f0584caa71aa336154",
+  "base": "integration/all-agents-unified",
+  "headSha": "8e9f8c8e4d69a441247987a25cbace7b9522eea6",
+  "checks": [
+    {
+      "id": 105456678213,
+      "name": "core",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750411/job/105456678213",
+      "annotations": [
+        "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+      ]
+    },
+    {
+      "id": 105456677940,
+      "name": "backend (3.12)",
+      "status": "queued",
+      "conclusion": null,
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750356/job/105456677940",
+      "annotations": []
+    },
+    {
+      "id": 105456677918,
+      "name": "docs",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750399/job/105456677918",
+      "annotations": [
+        "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+      ]
+    },
+    {
+      "id": 105456677709,
+      "name": "desktop-browser",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750357/job/105456677709",
+      "annotations": [
+        "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+      ]
+    },
+    {
+      "id": 105456677686,
+      "name": "frontend",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750364/job/105456677686",
+      "annotations": [
+        "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+      ]
+    },
+    {
+      "id": 105456677659,
+      "name": "backend (3.14)",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/35298750356/job/105456677659",
+      "annotations": [
+        "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+      ]
+    }
+  ]
+}
