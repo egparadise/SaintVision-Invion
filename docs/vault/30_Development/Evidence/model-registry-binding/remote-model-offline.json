@@ -1,0 +1,15 @@
+{
+  "baseSha": "28684ad",
+  "kst": "2026-09-18T12:30:20+09:00",
+  "command": "python -m pytest tests/core/test_model_remote.py tests/core/test_node_chunk.py tests/core/test_model_manifest.py tests/core/test_node_tls.py tests/test_migration_prerequisite.py -q --junitxml=.work/remote-model-offline.xml",
+  "exitCode": 0,
+  "passed": 106,
+  "failed": 0,
+  "skipped": 0,
+  "junitSha256": "610fecdd07e2dc3cb1edcf5500aa3cb5a9a3cb14b2fa885f0ae0a467a6755698",
+  "environment": "local Python; mocked transport and synthetic loopback mTLS; no Docker or remote equipment",
+  "scope": "read-only remote model byte component; not wired to runtime or database authority revalidation",
+  "ci": "billing blocked; not rerun",
+  "independentReview": "pending",
+  "operationalAcceptance": false
+}

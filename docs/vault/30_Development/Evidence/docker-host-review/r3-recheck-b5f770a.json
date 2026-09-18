@@ -1,0 +1,12 @@
+{
+  "reviewedTip": "b5f770a",
+  "method": "source inspection and mocked subprocess; no Docker execution",
+  "dllInitRecognized": true,
+  "accessViolationMisclassified": true,
+  "posixKillMisclassified": true,
+  "mutatingCommandCallsAfterAccessViolation": 2,
+  "libpqSyntheticPasswordUnmasked": true,
+  "r2_01": "source corrected: exited-only, age >=1800s, non-force rm; user reports live concurrency test passed",
+  "r2_02": "pre-prune exceptions caught; runner finally still allows TimeoutExpired/OSError to skip evidence writing",
+  "mergeDecision": "hold R3-01 and R2-03; recognize correct 0xC0000142 diagnostics separately from classifier false positives"
+}

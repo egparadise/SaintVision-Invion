@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -95,3 +95,10 @@ record_deployment는신뢰된내부호출자가제공한timezone-aware now의배
 구현/실제PG증거와 다음담당: [[2026-09-18_모델레지스트리_명시결속_Codex]].
 
 원격 읽기 공통 기반: inv.node_chunk.verified_chunk는 기존 NodeTransfer와 후속 provider가 공유할 bounded 응답 검증이다. Schema·encoded 길이 상한을 decode 전에 확인하고 요청 nonce/offset/size/digest, 정확한 bytes 길이·hash·canonical Base64를 검사한다. 빈/EOF초과 범위는 거부한다. 이 함수는 인증·channel 검증·전체 object hash·DB현재권한 재검사를 대신하지 않는다. NodeTransfer에 연결했으나 모델 원격 provider 자체는 아직 연결하지 않았다. 오프라인79시험통과, 실PG/장비 인수는 별도다.
+
+
+## 원격 읽기 컴포넌트 (1.5.0)
+
+ConfiguredRemoteModelReader는 명시 NodeTLSClient/ChannelProof/LocationSnapshot으로 unencrypted 32KiB 이하 모델을 읽는다. replica최대8개, 기존 TLS호출별40초상한·무재시도. tenant/epoch/채널/위치·manifest identity 사전검사, nonce/범위/길이/각replica와전체hash 검증을 수행한다. caller URL/relative_path 해석, 디스크저장, 실행인가 없음. 불변 RemoteModelBytes에 채널·위치snapshot을 보존해 후속 DB재검사 입력을 제공한다.
+
+read component는 구현했으나 remote provider의 현재권한 DB통합과 ModelRuntimeStore 연결은 미구현이다. 기존 로컬 경로는 그대로이며 자동원격fallback이 없다. 후속 trusted worker가 snapshot 전 권한확인과 읽기 후 channel/Location/policy/registry/fence 재검사를 구현해야 실행에 연결할 수 있다. 106오프라인시험(합성loopback mTLS 포함), 실장비 인수 아님. [[2026-09-18_원격모델읽기_Codex]].
