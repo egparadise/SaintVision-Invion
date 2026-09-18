@@ -1,7 +1,7 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -11,7 +11,7 @@ source_of_truth: "Git"
 
 # Codex 검증 상태 지도와 재개 조건
 
-기준 코드 d7e7d13, 공유 branch integration/all-agents-unified. 사용자 요청에 따른 상태 감사이며 새 제품 구현/운영 재실행은 하지 않았다. 각 행의 SHA·범위에만 결과를 적용한다. 통과 건수는 중복 합산하지 않는다. 작성자 실행, 사용자 독립 실행, Claude 소스 검토, CI, 운영 인수는 서로 대체하지 않는다.
+개발 기준 코드 d7e7d13, 후속image실행 기준 f4b3f73, 공유 branch integration/all-agents-unified. 사용자 요청에 따른 상태 감사이며 새 제품 구현/운영 재실행은 하지 않았다. 각 행의 SHA·범위에만 결과를 적용한다. 통과 건수는 중복 합산하지 않는다. 작성자 실행, 사용자 독립 실행, Claude 소스 검토, CI, 운영 인수는 서로 대체하지 않는다.
 
 ## 1. 실제 검증 완료 — 명시한 범위만
 
@@ -33,8 +33,8 @@ source_of_truth: "Git"
 
 | 항목 | 정확한 현재 상태 | 다음 내부 행동 / 담당 |
 |---|---|---|
-| 최신 image lane | b5f770a harness + b93b5ef1f944… digest:2passed/6failed. unreadable timeout1, writable/public-signing-key/business/business-workspace/business-kernel-role host-init5. 해당6건 보안단언 미도달 | 아래 호스트 재개 조건 충족 전 추가실행 중단. Codex |
-| business-kernel-role | 잘못된 DB role의 image 기동 거부 단언은 세 실행 모두 미검증 | 전체image실행에서 해당 단언 도달·거부를 별도case evidence로 확인. classifier24통과로 대체 금지 |
+| 최신 image lane | f4b3f73 harness + b93b5ef1f944… digest:4passed/2failed/2skipped. public-signing-key/business-workspace daemon I/O timeout2, workspace/business-kernel-role operation-timeout2. 해당4건 케이스전체단언 미검증, host-init 관측0 | 아래 호스트 재개 조건 충족 전 추가실행 중단. Codex |
+| business-kernel-role | 잘못된 DB role의 image 기동 거부 단언은 네 실행 모두 미검증 | 전체image실행에서 해당 단언 도달·거부를 별도case evidence로 확인. classifier24통과로 대체 금지 |
 | 나머지489skip | 1eaf285 비integration 실행에서 DB/플랫폼 등 선행조건별 미실행 | 전체가 해소됐다고 하지 않음. 필요 변경별 파일 단위 실PG 검증, skip이유·SHA 기록. Codex |
 | 2deselected Docker host 시험 | 기본 경로에서 의도적 제외. 과거사용자d59실제2건통과와 최신선택에서의 미실행은 별도 | 격리host의 명시 docker_host lane/Core CI에서 실행. 공유host에서 자동prune 금지 |
 | 11e9f44 policy 설정 | 로컬46통과, 독립검토/운영rollout 미완 | Claude 독립검토. 모든worker에 같은시작policy 전달·구프로세스 종료 계획 필요. hot reload/전역policyepoch 없음 |
@@ -73,3 +73,8 @@ source_of_truth: "Git"
 ## 이번 정리의 검증 및 인계
 
 owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/model-registry-binding. agent-delivery1.1.0 적용. 공통판1.0.96/Codex1.0.63/VF1.0.22, History·image-tests.json·AC-12 registry 기준을 대조했다. 사용자 CL-07 정정·compose관측 수신, compose텍스트 독립확인. CI/Docker/원격/DB 재실행0,제품코드변경0. 다음 Claude: PITR준비안/실측증거 제출, 이번지도 및11e9f44 설정검토. 다음 Codex: 제출증거의 도달여부/실측범위 검토. 외부조건 변화 전 동일인수 재시도를 반복하지 않는다.
+
+
+## 호스트 조치 후 갱신
+
+[[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]]: 사용자OneDrive재시작/조용한구간재검증완료수신. 핸들감소와host-init0회는확인,원인확정은보류. 현재4pass/2daemon-timeout fail/2operation-timeout skip. 호스트조치대기는 '최초조치미실시'에서 '잔여timeout진단/조건개선대기'로갱신한다. Docker사용은허용됐지만추가인수반복실행없음. 최신image-tests.json/이전보존JSON참조. 기존표의호스트재개조건은다음재검증에도적용하며전체image합격/운영0/5는바뀌지않는다.

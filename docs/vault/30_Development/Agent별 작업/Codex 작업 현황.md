@@ -12,7 +12,7 @@ source_of_truth: "Git"
 
 ## 최신 상태 지도 (기준 d7e7d13)
 
-[[Codex 검증 상태 지도와 재개 조건]]이 현재 검증완료/미검증/외부대기와 재시도조건 정본이다. e2908a5 Claude sound 수신, 11e9f44 설정연결은 로컬46통과/독립검토대기. 기본회귀1eaf285 사용자1179/489skip/2제외/0failed. 최신image는2통과/6미도달실패, business-kernel-role미검증. VF운영인수0/5·formal0/48 유지. 외부4건과 AC-12 운영PITR 적용은 별도대기. 아래 고정SHA별 과거의 완료/차단 표현을 현재상태로 자동승계하지 않는다.
+[[Codex 검증 상태 지도와 재개 조건]]이 현재 검증완료/미검증/외부대기와 재시도조건 정본이다. e2908a5 Claude sound 수신, 11e9f44 설정연결은 로컬46통과/독립검토대기. 기본회귀1eaf285 사용자1179/489skip/2제외/0failed. 최신image는f4b3f73에서4통과/2daemon-timeout실패/2operation-timeout skip, business-kernel-role미검증. VF운영인수0/5·formal0/48 유지. 외부4건과 AC-12 운영PITR 적용은 별도대기. 아래 고정SHA별 과거의 완료/차단 표현을 현재상태로 자동승계하지 않는다.
 
 ## CX-01 공유 개발 정본 착지 (2026-09-18)
 
@@ -448,3 +448,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 기본 Docker 의존 분리: 실제prune2건만 docker_host로 기본 deselect, mock22건 유지/Core CI 명시lane 추가. 사용자1157/489/0·62초 수신, 작성자 비integration1179passed/489skip/2deselected/0failed,66.23초. 기존 Compose2건 CLI부재가드 보강, 실제CLI2통과. e2908a5 registry 독립검토는 다음 Claude. [[2026-09-18_Docker_시험선택경계_Codex]].
 
 - 사용자1eaf285 독립1179/489skip/2deselected/0failed(75초), Claude c9e6ddf의 e2908a5 sound 소스검토/부재22pass2skip 수신. registry 운영자 설정 연결 구현, offline34+실PG12=46passed. 최초 관측용DSN application_name 차이12setup오류는 원본DSN재실행으로 분리. 이번 설정 변경 독립검토 Claude 대기. [[2026-09-18_Registry_운영정책설정_Codex]].
+
+- 호스트조치후 사용자image4pass/2fail/2skip(exit1),XML/JSON직접확인. host-init0회/OneDrive인과미확정,잔여timeout4건·business-kernel-role미검증유지. [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]].
