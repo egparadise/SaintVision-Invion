@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { RingBuffer, SseStreamManager } from '../src/shared/realtime/sse-client';
 
 describe('S01-FE: SSE Real-Time Stream Manager & Deduplication', () => {
@@ -41,7 +41,7 @@ describe('S01-FE: SSE Real-Time Stream Manager & Deduplication', () => {
 
   describe('SseStreamManager Event Parsing & Deduplication', () => {
     it('subscribes, parses SSE block, and invokes registered handler', () => {
-      const manager = new SseStreamManager('/v1/events');
+      const manager = new SseStreamManager('/v1/projects/prj_01JABCDE/runs/run_01JSHARD_01/events');
       const handler = vi.fn();
 
       const unsubscribe = manager.on('heartbeat', handler);
@@ -68,7 +68,7 @@ describe('S01-FE: SSE Real-Time Stream Manager & Deduplication', () => {
     });
 
     it('drops duplicate event IDs using the ring buffer', () => {
-      const manager = new SseStreamManager('/v1/events');
+      const manager = new SseStreamManager('/v1/projects/prj_01JABCDE/runs/run_01JSHARD_01/events');
       const handler = vi.fn();
 
       manager.on('status_update', handler);
@@ -84,7 +84,7 @@ describe('S01-FE: SSE Real-Time Stream Manager & Deduplication', () => {
     });
 
     it('cleans up resources upon stop', () => {
-      const manager = new SseStreamManager('/v1/events');
+      const manager = new SseStreamManager('/v1/projects/prj_01JABCDE/runs/run_01JSHARD_01/events');
       manager.stop();
       expect((manager as any).isClosed).toBe(true);
     });

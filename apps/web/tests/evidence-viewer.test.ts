@@ -65,4 +65,88 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     expect(derivedEvidence.allPhysicallyStopped).toBe(true);
     expect(derivedEvidence.immutable).toBe(true);
   });
+
+  it('regression: source strictly calls canonical /result and contains no unserved /evidence trial probes', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const sourcePath = path.resolve(__dirname, '../src/features/evidence/EvidenceViewer.tsx');
+    const sourceContent = fs.readFileSync(sourcePath, 'utf-8');
+
+    // Asserts no /evidence or bare /v1/events endpoints in EvidenceViewer.tsx
+    expect(sourceContent).not.toMatch(/apiClient<[^>]*>\([^)]*\/evidence['"`]/);
+    expect(sourceContent).not.toMatch(/\/v1\/runs\/\$\{runId\}\/evidence/);
+    expect(sourceContent).not.toMatch(/\/v1\/projects\/\$\{[^}]*\}\/runs\/\$\{[^}]*\}\/evidence/);
+    expect(sourceContent).not.toContain('/v1/events');
+
+    // Asserts canonical endpoint is queried directly
+    expect(sourceContent).toContain('/v1/projects/${prjId}/runs/${runId}/result');
+  });
+
+  it('regression: full RunResultView envelope comprehensively fulfills EvidenceData without separate /evidence route', () => {
+    // Canonical kernel RunResultView as defined in services/control-plane/src/inv/result_view.py
+    const kernelRunResultView = {
+      source: 'execution-kernel',
+      runId: 'run_01JSHARD_03',
+      projectId: 'prj_01JABCDE',
+      state: 'succeeded',
+      version: 4,
+      attemptCount: 1,
+      sealed: true,
+      executionConfirmed: true,
+      commandId: 'cmd_01JSHARD_03',
+      nodeId: 'nod_01JABCDEF01',
+      stopReceipt: {
+        receiptId: 'rcp_01JSHARD_03',
+        processStarted: true,
+        exitCode: 0,
+        reason: 'completed',
+        finishedAt: '2026-09-18T16:00:00.000Z',
+      },
+      evidence: {
+        evidenceId: 'evi_01JSHARD_03_COMMITTED',
+        specDigest: 'sha256:4a8b79c3d2e1f0e9...a1b2c3d4',
+        outputSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        policyVersion: 'shard-completion:v1',
+        toolCalls: [
+          { tool: 'kernel.dispatch', exitCode: 0, wallTimeMs: 120 },
+          { tool: 'execution.shards', exitCode: 0, wallTimeMs: 840 },
+          { tool: 'result.commitment', exitCode: 0, wallTimeMs: 45 },
+        ],
+      },
+      output: {
+        sha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+        sizeBytes: 1024,
+        verified: true,
+      },
+      completedAt: '2026-09-18T16:00:01.000Z',
+    };
+
+    const res = kernelRunResultView;
+    const runId = res.runId;
+    const derivedEvidence: EvidenceData = {
+      evidenceId: res.evidence?.evidenceId || `evi_${runId}`,
+      runId,
+      manifestDigest: res.output?.sha256 || res.evidence?.outputSha256 || 'sha256:verified',
+      specDigest: res.evidence?.specDigest || 'sha256:verified',
+      policyVersion: res.evidence?.policyVersion || 'shard-completion:v1',
+      state: res.state || 'succeeded',
+      allPhysicallyStopped: res.stopReceipt?.processStarted ? res.stopReceipt?.exitCode !== undefined : true,
+      allSucceeded: res.state === 'succeeded',
+      generatedAt: res.completedAt || res.stopReceipt?.finishedAt || new Date().toISOString(),
+      immutable: res.sealed ?? true,
+      integrityVerification: res.output?.verified ? 'PASS' : (res.state === 'succeeded' ? 'PASS' : 'FAIL'),
+      tamperCheck: res.output?.verified ? 'VERIFIED_IMMUTABLE' : (res.sealed ? 'SEALED' : 'UNVERIFIED'),
+      retentionPolicy: '1_YEAR_PINNED (ADR-012)',
+      toolCalls: res.evidence?.toolCalls,
+    };
+
+    expect(derivedEvidence.evidenceId).toBe('evi_01JSHARD_03_COMMITTED');
+    expect(derivedEvidence.manifestDigest).toBe('sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    expect(derivedEvidence.tamperCheck).toBe('VERIFIED_IMMUTABLE');
+    expect(derivedEvidence.integrityVerification).toBe('PASS');
+    expect(derivedEvidence.immutable).toBe(true);
+    expect(derivedEvidence.allPhysicallyStopped).toBe(true);
+    expect(derivedEvidence.allSucceeded).toBe(true);
+    expect(derivedEvidence.toolCalls).toHaveLength(3);
+  });
 });

@@ -219,3 +219,15 @@ def test_nonempty_route_comparison_can_pass_or_fail(tmp_path, monkeypatch, capsy
     assert report['assessment'] == 'compared'
     assert report['clientPaths'] == ['/v1/projects']
     assert report['unserved'] == ([] if served else ['/v1/projects'])
+
+
+def test_client_source_does_not_request_unserved_evidence_or_bare_events_endpoints() -> None:
+    """Regression test: client source must never probe non-existent /evidence or bare /v1/events."""
+    from pathlib import Path
+    from route_coverage import scan_client
+
+    client_root = Path(__file__).resolve().parents[1] / "apps" / "web" / "src"
+    paths = scan_client(client_root)
+    assert not any("evidence" in p for p in paths), f"Unserved /evidence path detected: {paths}"
+    assert "/v1/events" not in paths, f"Bare /v1/events detected: {paths}"
+
