@@ -554,3 +554,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## Claude 수정대기 정정 / 사용자 방법론 정정 수신
 
 [[2026-09-18_Claude_대기상태정정과수정인계_Codex]]:2ed3d65는문서1파일뿐/PITR코드변경0. FIX02재검토·내용착지완료, PITR은Codexreview대기가아니라Claude cleanup잔여수정대기. 내용차이8/동등patch3 대조,image workspace skip누락·실PG11오표기·1179실행주체등상태문서정정인계. bb4f4cb Claude sound 문서수신(독립소스검토,런타임별도). 사용자의npm검사시점/16시험합성범위정정수용수신. 동일주입/운영시험반복없음.
+
+## TLS 인증서 마운트·경로 방어
+
+[[2026-09-18_TLS_마운트_경로방어_Codex]]: `65965a3`에서 production Compose 인증서·키 bind를 `create_host_path: false` long syntax로 고정하고, `deploy_intranet.ps1`의 leaf 검사·stale directory 정리와 `generate_tls_cert.py`의 정확한 출력 경로 정리를 구현. 신규 경계시험 2 passed, preflight 11 passed, Compose YAML·문서 검사 통과. 인증서 삭제·gitignore·이력 재작성은 수행하지 않음. 새 개발 인증서 발급·외부 주입은 사용자 결정 대기.
