@@ -590,3 +590,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 정정: archiver network의 `Internal=false`는 관찰된 보안 실패이므로 skip하면 안 된다. 시험이 소유 `--internal` 네트워크를 직접 생성하고, 생성 실패만 명시적 skip하며 생성 후 `Internal=false`는 실패하도록 `test_recovery_drill.py`를 수정했다. Linux 백업 경로 조건의 3개 시험군은 플랫폼 전제 skip으로 유지한다.
 
 추가 정정: archiver `finally`의 컨테이너·네트워크 정리를 독립 상태 분류기로 바꿨다. 소유권 불일치 자원은 보존하고, 컨테이너 정리 실패에도 네트워크 정리를 계속하며, cleanup 예외가 본문 예외를 덮지 않는다. 삭제 후 재-inspect와 비소유 보존 합성 회귀시험을 추가했다.
+
+## Docker 잔여 provenance 감사
+
+`2026-09-19_docker_residue_provenance_audit_Codex`에 접두사·라벨·생성 경로를 대조했다. `sv-server-test`는 소유 기반 cleanup 경계를 사용하며 공통 `cleanup_owned`에 제거 후 inspect 확인을 추가했다(`7`개 unit pass). `sv-remote-workspace`, `sv-workspace-upgrade`, `saintvision-compat`는 조사 evidence 보존 정책으로 stopped/Created 자원을 남기는 구조라 무기한 retention P2 후보로 기록했다. `sv-bridge-unit` 생성자는 현재 소스에서 찾지 못했다. 이번 감사에서는 Claude 작업 중이므로 삭제하지 않았고, `saintvision-lan-db*`, `saintview-orthanc*`, `svcx01-pgaudit*`는 보존했다.
