@@ -450,3 +450,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 사용자1eaf285 독립1179/489skip/2deselected/0failed(75초), Claude c9e6ddf의 e2908a5 sound 소스검토/부재22pass2skip 수신. registry 운영자 설정 연결 구현, offline34+실PG12=46passed. 최초 관측용DSN application_name 차이12setup오류는 원본DSN재실행으로 분리. 이번 설정 변경 독립검토 Claude 대기. [[2026-09-18_Registry_운영정책설정_Codex]].
 
 - 호스트조치후 사용자image4pass/2fail/2skip(exit1),XML/JSON직접확인. host-init0회/OneDrive인과미확정,잔여timeout4건·business-kernel-role미검증유지. [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]].
+
+## PITR 준비안 검토 수신
+
+[[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.

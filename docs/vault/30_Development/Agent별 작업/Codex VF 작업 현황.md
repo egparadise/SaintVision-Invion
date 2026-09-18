@@ -160,3 +160,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 최신 image 독립판별(XML/JSON직접확인): 동일digest3회4/3/2pass,최신2pass/6fail(host-init5/timeout1). 재시도구제실패·전체반복인수미확보, 제품보안단언실패관측0≠미통과합격. business-kernel-role미검증유지. 환경조치후조용한조건까지image추가실행중단;모델결속100PG시험은이미완료. [[2026-09-18_모델레지스트리_명시결속_Codex]].
 
 - 호스트조치후 사용자image4pass/2fail/2skip(exit1),XML/JSON직접확인. host-init0회/OneDrive인과미확정,잔여timeout4건·business-kernel-role미검증유지. [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]].
+
+## PITR 준비안 검토 수신
+
+[[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.

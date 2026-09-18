@@ -78,3 +78,7 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## 호스트 조치 후 갱신
 
 [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]]: 사용자OneDrive재시작/조용한구간재검증완료수신. 핸들감소와host-init0회는확인,원인확정은보류. 현재4pass/2daemon-timeout fail/2operation-timeout skip. 호스트조치대기는 '최초조치미실시'에서 '잔여timeout진단/조건개선대기'로갱신한다. Docker사용은허용됐지만추가인수반복실행없음. 최신image-tests.json/이전보존JSON참조. 기존표의호스트재개조건은다음재검증에도적용하며전체image합격/운영0/5는바뀌지않는다.
+
+## PITR 준비안 검토 수신
+
+[[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.
