@@ -21,3 +21,11 @@ source_of_truth: "Git"
 - DesktopShell이 [null] 또는 위치·크기 없는 창을 복원할 때 SSR crash2건 재현(exit1). restoreDesktopLayout은 크기 제한JSON, 정본ID/app일치, boolean/유한좌표·양수크기, 중복거부를 검사한다. 정본title/icon/params를 유지하고 뷰포트 밖 좌표·크기를 제한한다. 저장소 접근 실패는 기존fallback 유지.
 - Windows `npm test` 최종256pass(신규14)/0skip, exit0. `npm run build` exit0. 실제 browser/HTTP 회귀는 기반7c55fea의2여정이며 이번 변경의 독립 browser 인수로 확대하지 않는다.
 - 다음 첫 행동: Gemini는 손상된 localStorage 후 실제 Desktop 진입/작은화면 접근성 독립검토, Claude는 복원 계약 검토. Codex는 finding을 받아 수정. CI·운영 SSO/PITR·5대 인수는 별도이며 진행률 승격 없음.
+
+## 전달과 현재 차단
+
+- code546ec50e0c1a3d2e378f5d4e8f5b0f5e0c08c0b7 push exit0, [Draft PR31](https://github.com/egparadise/SaintVision-Invion/pull/31), basePR30. docs482/ontology검사 exit0.
+- 9월18일 동일SHA CI 재확인: core35293302188/Desktop35293302174/docs35293302129/backend35293302076/frontend35293302089의6check 모두 billing/spending limit로 실행 전 차단. 기존 차단을 날짜만 갱신한 추정이 아니라 새 receipt를 저장했다.
+- 구현·로컬시험 완료, CI/독립 browser 검토/운영 인수 미완료. 다음 Gemini 복원/접근성 검토, Claude 계약검토, 운영owner billing·SSO/PITR·5대. 진행률 새 승격 없음.
+
+- 전체sync check는 외부편집 충돌 exit1/쓰기없음. baseb947b1c 확인 후 scoped6파일 hash일치/pending0/conflict0, 일반Codex공유본 보존. receipt·최종보고를 동일state로 재동기화한다.
