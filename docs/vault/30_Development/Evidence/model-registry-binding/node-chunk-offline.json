@@ -1,0 +1,16 @@
+{
+  "baseSha": "5b783d20416bd0d3757f22bb138618102ba679b0",
+  "kst": "2026-09-18T12:25:33+09:00",
+  "command": "python -m pytest tests/core/test_node_chunk.py tests/core/test_model_manifest.py tests/core/test_node_tls.py tests/test_migration_prerequisite.py -q --junitxml=.work/node-chunk-offline.xml",
+  "exitCode": 0,
+  "passed": 79,
+  "failed": 0,
+  "skipped": 0,
+  "junitSha256": "d0df4daaec5e56952ad8dc174873e6852ecf2faf7bc4c2156715b00524d93b84",
+  "environment": "local Python; no Docker or remote equipment",
+  "limitations": [
+    "No PostgreSQL NodeTransfer integration rerun",
+    "No remote model provider wiring or execution authorization",
+    "Independent review pending; CI billing pending"
+  ]
+}

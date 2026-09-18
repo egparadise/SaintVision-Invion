@@ -93,3 +93,5 @@ record_deployment는신뢰된내부호출자가제공한timezone-aware now의배
 현재 ConfiguredModelVerifier는 운영자소유 local ReadRoot만 지원한다. 사용자URL이나 registry URI를 네트워크경로로 자동해석하지 않는다. 원격provider의 최소계약은 기존 NodeChannels의 tenant/node/epoch/channelVersion/endpoint/certificate 고정, 트랜잭션밖의 제한된mTLS 스트림·byte/hash검증, 트랜잭션안의 channel/Location/권한 재확인이다. 임의redirect·무제한읽기·caller의verified플래그는 허용하지 않는다. provider완료/장비인수는 아직 미구현·미검증이며 .225의외부권한대기와 구분한다.
 
 구현/실제PG증거와 다음담당: [[2026-09-18_모델레지스트리_명시결속_Codex]].
+
+원격 읽기 공통 기반: inv.node_chunk.verified_chunk는 기존 NodeTransfer와 후속 provider가 공유할 bounded 응답 검증이다. Schema·encoded 길이 상한을 decode 전에 확인하고 요청 nonce/offset/size/digest, 정확한 bytes 길이·hash·canonical Base64를 검사한다. 빈/EOF초과 범위는 거부한다. 이 함수는 인증·channel 검증·전체 object hash·DB현재권한 재검사를 대신하지 않는다. NodeTransfer에 연결했으나 모델 원격 provider 자체는 아직 연결하지 않았다. 오프라인79시험통과, 실PG/장비 인수는 별도다.

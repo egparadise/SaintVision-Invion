@@ -4,16 +4,12 @@ No supplied checksum is accepted as byte evidence. The trusted business adapter
 provides the project catalog digest/size and authorizes reads before calling.
 """
 
-import base64
-import binascii
-import hashlib
 import secrets
 from time import monotonic_ns
-from .errors import DomainError
 from .node_channels import NodeChannels, assert_channel
 from .object_store import PART_BYTES
 
-CHUNK_BYTES = 256 * 1024
+from .node_chunk import CHUNK_BYTES, verified_chunk
 
 
 class NodeTransfer:
@@ -45,24 +41,7 @@ class NodeTransfer:
                     with self.db.transaction(node.tenant_id) as conn:
                         authorize(conn)
                     result = self.client.read_chunk(channel, request)
-                    if any(result[k] != v for k, v in request.items()):
-                        raise DomainError(
-                            "NODE-0052", "Transfer response scope differs", 403
-                        )
-                    try:
-                        chunk = base64.b64decode(result["dataBase64"], validate=True)
-                    except (ValueError, binascii.Error):
-                        raise DomainError(
-                            "NODE-0052", "Invalid transfer bytes", 422
-                        ) from None
-                    if (
-                        len(chunk) != min(CHUNK_BYTES, size - offset)
-                        or hashlib.sha256(chunk).hexdigest() != result["chunkSha256"]
-                        or base64.b64encode(chunk).decode() != result["dataBase64"]
-                    ):
-                        raise DomainError(
-                            "VERIFY-0010", "Transferred chunk differs", 422
-                        )
+                    chunk = verified_chunk(request, result)
                     data.extend(chunk)
                     received += len(chunk)
                 self.snapshots.put_part(
