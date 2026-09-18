@@ -47,18 +47,23 @@ def application_test_engine(database_url, owner_engine):
         engine = create_engine(url, future=True)
         yield engine
     finally:
-        # dispose() failure must NOT skip the DROP ROLE below, or the owned login role
-        # leaks (VB-FIX-02). Attempt dispose, keep any error, always drop the role, then
-        # surface the dispose error (the original body error, if any, stays on its
-        # __context__).
-        dispose_error = None
+        # dispose() failure must NOT skip the DROP ROLE, or the owned login role leaks
+        # (VB-FIX-02). Each teardown step is attempted independently and its error kept;
+        # if both dispose and DROP ROLE fail, BOTH are surfaced (an ExceptionGroup), not
+        # one silently lost. The original body error, if any, stays on __context__.
+        cleanup_errors = []
         if engine is not None:
             try:
                 engine.dispose()
-            except Exception as exc:  # noqa: BLE001
-                dispose_error = exc
+            except Exception as exc:  # noqa: BLE001 -- record; do NOT skip the DROP below
+                cleanup_errors.append(exc)
         assert role.startswith("inv_backend_login_") and len(role) == 50
-        with owner_engine.begin() as connection:
-            connection.connection.driver_connection.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
-        if dispose_error is not None:
-            raise dispose_error
+        try:
+            with owner_engine.begin() as connection:
+                connection.connection.driver_connection.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
+        except Exception as exc:  # noqa: BLE001
+            cleanup_errors.append(exc)
+        if cleanup_errors:
+            if len(cleanup_errors) == 1:
+                raise cleanup_errors[0]
+            raise ExceptionGroup("application_test_engine teardown failed", cleanup_errors)
