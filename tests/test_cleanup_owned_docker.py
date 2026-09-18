@@ -32,6 +32,33 @@ def test_inventory_failure_is_reported_not_as_empty_success(monkeypatch):
         stderr = "volume inventory unavailable"
 
     monkeypatch.setattr(tool, "_run", lambda args: Result())
-    resources, unavailable = tool._resources()
+    resources, unavailable, counts = tool._resources()
     assert resources == []
     assert {entry["kind"] for entry in unavailable} == {"container", "volume", "network"}
+    assert counts == {}
+
+
+def test_inventory_mismatch_is_unverified_and_delete_aborts(monkeypatch, capsys):
+    class Result:
+        returncode = 0
+        stderr = ""
+
+        def __init__(self, stdout):
+            self.stdout = stdout
+
+    def fake(args):
+        if args[:4] == ["docker", "container", "ls", "-a"] and args[-1] == "-q":
+            return Result("one\ntwo\n")
+        if args[:4] == ["docker", "container", "ls", "-a"] and args[-2:] == ["--format", "{{.ID}}"]:
+            return Result("one\n")
+        return Result("")
+
+    monkeypatch.setattr(tool, "_run", fake)
+    resources, unavailable, counts = tool._resources()
+    assert resources == []
+    assert any(entry["kind"] == "container" and "count mismatch" in entry["reason"] for entry in unavailable)
+    assert counts["container"] == {"enumerated": 2, "independent": 1}
+
+    result = tool.main(["--delete"])
+    assert result == 2
+    assert '"deleteAborted": "incomplete inventory; no deletion attempted"' in capsys.readouterr().out

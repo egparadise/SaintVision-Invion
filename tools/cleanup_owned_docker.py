@@ -45,14 +45,27 @@ def _inspect(kind: str, identifier: str):
 
 
 def _resources():
-    resources, unavailable = [], []
-    for kind, list_kind in (("container", "container"), ("volume", "volume"), ("network", "network")):
-        # `docker volume ls` has no `-a` option; volumes are already all listed.
-        listed = _run(["docker", list_kind, "ls", "-q"])
-        if listed.returncode != 0:
-            unavailable.append({"kind": kind, "reason": "inventory query failed: " + (listed.stderr.strip()[-240:] or "unknown error")})
+    resources, unavailable, counts = [], [], {}
+    specs = {
+        # Containers need -a; volumes and networks are already fully listed by
+        # their ls commands and reject that flag.
+        "container": (["docker", "container", "ls", "-a", "-q"], ["docker", "container", "ls", "-a", "--format", "{{.ID}}"]),
+        "volume": (["docker", "volume", "ls", "-q"], ["docker", "volume", "ls", "--format", "{{.Name}}"]),
+        "network": (["docker", "network", "ls", "-q"], ["docker", "network", "ls", "--format", "{{.Name}}"]),
+    }
+    for kind, (list_args, count_args) in specs.items():
+        listed = _run(list_args)
+        counted = _run(count_args)
+        if listed.returncode != 0 or counted.returncode != 0:
+            unavailable.append({"kind": kind, "reason": "inventory query failed: " + ((listed.stderr or counted.stderr).strip()[-240:] or "unknown error")})
             continue
-        for identifier in filter(None, listed.stdout.splitlines()):
+        identifiers = [value.strip() for value in listed.stdout.splitlines() if value.strip()]
+        independent = [value.strip() for value in counted.stdout.splitlines() if value.strip()]
+        counts[kind] = {"enumerated": len(identifiers), "independent": len(independent)}
+        if len(identifiers) != len(independent):
+            unavailable.append({"kind": kind, "reason": f"inventory count mismatch: enumerated={len(identifiers)} independent={len(independent)}"})
+            continue
+        for identifier in identifiers:
             value = _inspect(kind, identifier.strip())
             if value is None:
                 unavailable.append({"kind": kind, "name": identifier.strip(), "reason": "inspect failed"})
@@ -65,7 +78,7 @@ def _resources():
                    "labels": labels, "owner": owner, "created": created,
                    "running": bool(value.get("State", {}).get("Running")) if kind == "container" else False,
                    "networkContainers": bool(value.get("Containers")) if kind == "network" else False})
-    return resources, unavailable
+    return resources, unavailable, counts
 
 
 def _age_minutes(created: str | None):
@@ -122,8 +135,13 @@ def main(argv=None):
     result = {"mode": "delete" if args.delete else "list", "minAgeMinutes": args.min_age_minutes,
               "evidenceRetentionMinutes": EVIDENCE_RETENTION_MINUTES,
               "removed": [], "retained": []}
-    resources, unavailable = _resources()
+    resources, unavailable, counts = _resources()
+    result["inventoryCounts"] = counts
     result["unverified"] = unavailable
+    if args.delete and unavailable:
+        result["deleteAborted"] = "incomplete inventory; no deletion attempted"
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 2
     for resource in resources:
         eligible, reason = _eligible(resource, args.min_age_minutes)
         if not eligible:
