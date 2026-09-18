@@ -58,8 +58,15 @@ def test_sandbox_contract_rejects_host_access_or_isolation_downgrade(
 ):
     workload, profile = launch
     plan = compile_launch(workload, profile)
+    # Positive control: the unmodified compiled plan must validate, so the single field
+    # change below is demonstrably what flips valid->invalid. Without this, a compile_launch
+    # that ever produced a schema-invalid base plan would make every case pass vacuously.
+    validate_contract("SandboxLaunchSpec", plan)
     plan[field] = value
-    with pytest.raises(DomainError):
+    # The SandboxLaunchSpec schema reports every violation as VAL-0002 (no per-field code
+    # exists at this layer), so pin the code: a downgrade that instead tripped some other
+    # DomainError (a different code) can no longer pass as "schema rejected the downgrade".
+    with pytest.raises(DomainError, match="VAL-0002"):
         validate_contract("SandboxLaunchSpec", plan)
 
 
