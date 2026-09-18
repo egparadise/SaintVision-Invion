@@ -1,0 +1,16 @@
+{
+  "baseSHA": "f0074aa",
+  "at": "2026-09-18T14:15:05+09:00",
+  "scope": "offline validation tools; no Docker/DB/operational acceptance",
+  "command": "python -m pytest -q tests/test_deployment_surface.py tests/test_route_coverage.py tests/core/test_recovery_capability.py --junitxml=.work/verification-boundary-fix-tests.xml",
+  "exitCode": 0,
+  "passed": 88,
+  "warnings": 2,
+  "sourceHashes": {
+    "tools/deployment_surface.py": "0342291b9a38e3803aa189ea392d13f880e0b7ed55da502128f700ddc33c5018",
+    "tools/route_coverage.py": "0cf21a76d9a833080987ccafa810760eb03b3033b4076e21124ee6c0185faf18",
+    "tests/test_deployment_surface.py": "e27ef83ae74522a702f74f0d3413f48c0bf0b25645e540855028186a109b0f40",
+    "tests/test_route_coverage.py": "64d89febd28bfa6843a9e684da755be3ffce3c2dbccde2ed536f042c61f68762"
+  },
+  "junitSha256": "ad42b2f731fe65e74f7aa98c8a3e6c5bd19096109f1f2ac9842996a1af0aba8a"
+}

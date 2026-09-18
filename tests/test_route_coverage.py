@@ -71,8 +71,9 @@ def test_empty_source_measurement_never_claims_operating_acceptance(tmp_path, mo
     import json
     import route_coverage
     monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path), '--json'])
-    assert route_coverage.main() == 0
+    assert route_coverage.main() == 2
     output = json.loads(capsys.readouterr().out)
+    assert output['assessment'] == 'inconclusive-no-client-paths'
     assert output['measurement'] == 'source-declarations'
     assert output['operationalAcceptanceAssessed'] is False
     assert 'dynamic prefixes' in output['limitations']
@@ -202,3 +203,19 @@ def test_a_properly_separated_interpolation_still_counts() -> None:
     """The fix must not suppress a legitimate leading-parameter path."""
     source = 'apiClient(`/v1/projects/${prj}/runs`)'
     assert "/v1/projects/{}/runs" in client_paths(source)
+
+
+@pytest.mark.parametrize('served,expected', [(False, 1), (True, 0)])
+def test_nonempty_route_comparison_can_pass_or_fail(tmp_path, monkeypatch, capsys, served, expected):
+    import json
+    import route_coverage
+    (tmp_path / 'client.ts').write_text("fetch('/v1/projects')")
+    if served:
+        (tmp_path / 'api.py').write_text('@api.get("/v1/projects")')
+    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path),
+                                    '--client', str(tmp_path), '--json'])
+    assert route_coverage.main() == expected
+    report = json.loads(capsys.readouterr().out)
+    assert report['assessment'] == 'compared'
+    assert report['clientPaths'] == ['/v1/projects']
+    assert report['unserved'] == ([] if served else ['/v1/projects'])
