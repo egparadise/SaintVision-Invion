@@ -62,3 +62,18 @@ def test_inventory_mismatch_is_unverified_and_delete_aborts(monkeypatch, capsys)
     result = tool.main(["--delete"])
     assert result == 2
     assert '"deleteAborted": "incomplete inventory; no deletion attempted"' in capsys.readouterr().out
+
+
+def test_container_removal_deletes_image_declared_anonymous_volumes(monkeypatch):
+    calls = []
+
+    class Result:
+        returncode = 0
+        stdout = ""
+        stderr = ""
+
+    monkeypatch.setattr(tool, "_run", lambda args: calls.append(args) or Result())
+    monkeypatch.setattr(tool, "_inspect", lambda kind, identifier: None)
+    ok, reason = tool._remove({"kind": "container", "id": "owned-container"})
+    assert ok and reason == "confirmed-removed"
+    assert calls == [["docker", "container", "rm", "-f", "-v", "owned-container"]]

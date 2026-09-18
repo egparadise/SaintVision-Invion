@@ -16,7 +16,7 @@ D="$FAKE_DIR"; cmd="$1"; shift
 line_for() { local f="$1" n; n=$(cat "$D/$f.n" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "$D/$f.n"; sed -n "${n}p" "$D/$f" 2>/dev/null; }
 case "$cmd" in
   ps)  l="$(line_for ps)"; [ "$l" = FAIL ] && exit 1; [ -n "$l" ] && for x in $l; do echo "$x"; done; exit 0 ;;
-  rm)  for a in "$@"; do [ "$a" = -f ] || echo "$a" >> "$D/rm_calls"; done; exit "$(cat "$D/rm_rc" 2>/dev/null || echo 0)" ;;
+  rm)  for a in "$@"; do [ "$a" = -f ] || [ "$a" = -v ] || echo "$a" >> "$D/rm_calls"; done; exit "$(cat "$D/rm_rc" 2>/dev/null || echo 0)" ;;
   run) echo run >> "$D/run_calls"; l="$(line_for run)"; [ -z "$l" ] && l=OK; [ "$l" = OK ] && { echo container-id; exit 0; }; echo "${l#FAIL:}" >&2; exit 1 ;;
   *)   exit 0 ;;
 esac
