@@ -33,3 +33,20 @@ it('rejects duplicate identities and never mutates defaults', () => {
   const result = restoreDesktopLayout(JSON.stringify([defaults[0],defaults[0]]),defaults);
   result[0].position.x=999;expect(defaults[0].position.x).toBe(40);
 });
+
+it('renders mounted approval center and terminal windows when open', () => {
+  const openSaved = JSON.stringify([
+    { id: 'win_approvals', appId: 'approvals', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 11, position: { x: 50, y: 50 }, size: { width: 800, height: 500 } },
+    { id: 'win_terminal', appId: 'terminal', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 12, position: { x: 100, y: 100 }, size: { width: 800, height: 500 } },
+  ]);
+  vi.stubGlobal('localStorage', { getItem: () => openSaved });
+  const markup = renderToStaticMarkup(
+    <DesktopShell
+      {...props}
+      workspaces={[{ id: 'wsp_test', name: 'Workspace Test', status: 'ready' } as any]}
+    />
+  );
+  expect(markup).toContain('거버넌스 승인 센터');
+  expect(markup).toContain('Web Terminal PTY');
+});
+
