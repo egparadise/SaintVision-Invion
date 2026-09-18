@@ -22,6 +22,12 @@ OWNERSHIP_LABELS = (
     "ai.saintvision.upgrade-test",
 )
 PROTECTED_PREFIXES = ("saintvision-lan-db", "saintview-orthanc")
+EVIDENCE_RETENTION_MINUTES = {
+    "ai.saintvision.acceptance": 14 * 24 * 60,
+    "ai.saintvision.developer-studio": 14 * 24 * 60,
+    "ai.saintvision.remote-test": 14 * 24 * 60,
+    "ai.saintvision.upgrade-test": 14 * 24 * 60,
+}
 
 
 def _run(args):
@@ -39,22 +45,27 @@ def _inspect(kind: str, identifier: str):
 
 
 def _resources():
+    resources, unavailable = [], []
     for kind, list_kind in (("container", "container"), ("volume", "volume"), ("network", "network")):
-        listed = _run(["docker", list_kind, "ls", "-a", "-q"] if kind != "network" else ["docker", "network", "ls", "-q"])
+        # `docker volume ls` has no `-a` option; volumes are already all listed.
+        listed = _run(["docker", list_kind, "ls", "-q"])
         if listed.returncode != 0:
+            unavailable.append({"kind": kind, "reason": "inventory query failed: " + (listed.stderr.strip()[-240:] or "unknown error")})
             continue
         for identifier in filter(None, listed.stdout.splitlines()):
             value = _inspect(kind, identifier.strip())
             if value is None:
+                unavailable.append({"kind": kind, "name": identifier.strip(), "reason": "inspect failed"})
                 continue
             name = value.get("Name", "").lstrip("/")
             labels = (value.get("Config", {}).get("Labels", {}) if kind == "container" else value.get("Labels", {})) or {}
             owner = next(((key, labels[key]) for key in OWNERSHIP_LABELS if labels.get(key)), None)
-            created = value.get("Created")
-            yield {"kind": kind, "id": value.get("Id", identifier.strip()), "name": name,
+            created = value.get("Created") or value.get("CreatedAt")
+            resources.append({"kind": kind, "id": value.get("Id", identifier.strip()), "name": name,
                    "labels": labels, "owner": owner, "created": created,
                    "running": bool(value.get("State", {}).get("Running")) if kind == "container" else False,
-                   "networkContainers": bool(value.get("Containers")) if kind == "network" else False}
+                   "networkContainers": bool(value.get("Containers")) if kind == "network" else False})
+    return resources, unavailable
 
 
 def _age_minutes(created: str | None):
@@ -73,8 +84,14 @@ def _eligible(resource, minimum_age):
     if not resource["owner"]:
         return False, "ownership label absent"
     age = _age_minutes(resource["created"])
-    if age is None or age < minimum_age:
-        return False, "younger than age threshold"
+    policy_age = EVIDENCE_RETENTION_MINUTES.get(resource["owner"][0], minimum_age)
+    threshold = max(minimum_age, policy_age)
+    if age is None:
+        return False, "creation age unavailable; preserved"
+    if age < threshold:
+        if policy_age > minimum_age:
+            return False, f"intentional evidence retention; age {age:.0f}m < policy {threshold}m"
+        return False, f"younger than age threshold ({threshold}m)"
     if resource["kind"] == "container" and resource["running"]:
         return False, "running container preserved"
     if resource["kind"] == "network" and resource["networkContainers"]:
@@ -103,14 +120,17 @@ def main(argv=None):
     parser.add_argument("--delete", action="store_true", help="remove eligible resources; default is inventory only")
     args = parser.parse_args(argv)
     result = {"mode": "delete" if args.delete else "list", "minAgeMinutes": args.min_age_minutes,
+              "evidenceRetentionMinutes": EVIDENCE_RETENTION_MINUTES,
               "removed": [], "retained": []}
-    for resource in _resources():
+    resources, unavailable = _resources()
+    result["unverified"] = unavailable
+    for resource in resources:
         eligible, reason = _eligible(resource, args.min_age_minutes)
         if not eligible:
             result["retained"].append({"kind": resource["kind"], "name": resource["name"], "reason": reason})
             continue
         if not args.delete:
-            result["retained"].append({"kind": resource["kind"], "name": resource["name"], "reason": "eligible; deletion requires --delete"})
+            result["retained"].append({"kind": resource["kind"], "name": resource["name"], "owner": resource["owner"], "reason": "eligible; deletion requires --delete"})
             continue
         ok, detail = _remove(resource)
         (result["removed"] if ok else result["retained"]).append({"kind": resource["kind"], "name": resource["name"], "reason": detail})
