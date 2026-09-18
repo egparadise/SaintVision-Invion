@@ -24,21 +24,24 @@ source_of_truth: "Git"
 ## 2. 구현 내역
 
 ### 2.1 `apps/web/src/features/desktop/DesktopShell.tsx`
-- `ApprovalCenter` 및 `WebTerminal` 임포트.
+- `ApprovalCenter`, `WebTerminal`, `AdminSecurityConsole` 임포트.
 - `win.appId === 'approvals'` 창 렌더링:
   - `approvals`, `currentUserId={currentReviewerId}`, `onApprove`, `onReject` prop 바인딩.
   - 내부 스크롤 가능한 컨테이너(`padding: 16, height: '100%', overflow: 'auto'`) 배치.
 - `win.appId === 'terminal'` 창 렌더링:
   - `workspaceId={workspaces[0]?.id || 'wsp_default'}`, `sessionId="session_desktop_terminal"` 바인딩.
   - 전체 높이 PTY 터미널 컨테이너 배치.
+- `win.appId === 'settings'` 창 렌더링:
+  - `nodes`, `onRefreshNodes` 바인딩.
+  - 보안 및 감사 콘솔(`AdminSecurityConsole.tsx`) 스크롤 컨테이너 배치 (감사 로그, 컨테이너 격리, GPU 슬라이싱, 백업/PITR, 노드 드레인 제어).
 - 컴포넌트 인자 destructuring 정합:
-  - `workspaces = []`, `onApprove`, `onReject` 안전한 기본값 및 타입 바인딩.
+  - `workspaces = []`, `onRefreshNodes`, `onApprove`, `onReject` 안전한 기본값 및 타입 바인딩.
   - 미사용 인자 제거로 `tsc -b` TS6133 린트/컴파일 에러 사전 방지.
 
 ### 2.2 `apps/web/tests/desktop-layout.test.tsx` 테스트 신설
-- `renders mounted approval center and terminal windows when open` 단위 테스트 추가:
-  - `localStorage`에 `win_approvals`와 `win_terminal`이 활성화된 레이아웃 모의 주입.
-  - `renderToStaticMarkup` 시 에러 없이 거버넌스 승인 센터 및 Web Terminal PTY 헤더 텍스트가 정상 렌더링됨을 단언.
+- `renders mounted approval center, terminal, and settings windows when open` 단위 테스트 추가:
+  - `localStorage`에 `win_approvals`, `win_terminal`, `win_settings`가 활성화된 레이아웃 모의 주입.
+  - `renderToStaticMarkup` 시 에러 없이 거버넌스 승인 센터, Web Terminal PTY, 보안 및 감사 콘솔(Docker Socket 노출 여부) 헤더 텍스트가 정상 렌더링됨을 단언.
   - Vitest 테스트 총 299개 → **300/300 tests 100% 무오류 통과**.
 
 ---
@@ -47,17 +50,17 @@ source_of_truth: "Git"
 
 1. **Vitest 프론트엔드 테스트**:
    - 명령: `npm --prefix apps/web test -- --run`
-   - 결과: **31개 파일, 300/300 tests 100% 통과 (0 failures, 3.33s)**
+   - 결과: **31개 파일, 300/300 tests 100% 통과 (0 failures, 3.46s)**
 2. **Vite 프로덕션 빌드**:
    - 명령: `npm --prefix apps/web run build`
-   - 결과: **0 error, 0 warning 클린 빌드 (3.67s)**
-   - 자산: `dist/index.html` (0.75 kB), `dist/assets/index-7b9SWJz-.js` (601.00 kB)
+   - 결과: **0 error, 0 warning 클린 빌드 (4.81s)**
+   - 자산: `dist/index.html` (0.75 kB), `dist/assets/index-4ahIxQ9d.js` (601.16 kB)
 3. **E2E 브라우저 스모크 테스트**:
    - 명령: `node tools/run_browser_smoke.mjs`
    - 결과: **15개 트랙 202/202 checks 100% 무오류 완주 (2.6s)**
 4. **문서 및 온톨로지 무결성 검사**:
    - 명령: `tools/check_docs.py`, `tools/check_ontology.py`
-   - 결과: **PASS (528 versioned documents, 48 tasks, DAG 정합성 100%)**
+   - 결과: **PASS (529 versioned documents, 48 tasks, DAG 정합성 100%)**
 
 ---
 

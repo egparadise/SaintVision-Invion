@@ -13,6 +13,7 @@ import { ModelStudioView } from './ModelStudioView';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
+import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 
 export interface DesktopShellProps {
   projectId: string;
@@ -147,6 +148,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   runs,
   approvals,
   workspaces = [],
+  onRefreshNodes,
   onApprove,
   onReject,
   onSwitchToPortalView,
@@ -693,7 +695,16 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 </div>
               )}
 
-              {['developer-studio', 'settings'].includes(win.appId) && (
+              {win.appId === 'settings' && (
+                <div style={{ padding: 16, height: '100%', overflow: 'auto' }}>
+                  <AdminSecurityConsole
+                    nodes={nodes}
+                    onRefreshNodes={onRefreshNodes}
+                  />
+                </div>
+              )}
+
+              {win.appId === 'developer-studio' && (
                 <section style={{padding: 24}}><p>이 기능은 포털에서 프로젝트와 세션을 선택한 뒤 이용하세요.</p>
                   <button onClick={onSwitchToPortalView}>포털로 이동</button></section>
               )}
