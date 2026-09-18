@@ -1,7 +1,7 @@
 ---
 doc_id: "HIST-CODEX-PITR-REVIEW-001"
 title: "Claude PITR 준비안 소스 검토와 보류 조건"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -53,3 +53,11 @@ archive_timeout=300이 완전 idle에도 전환한다는 설명은 틀리다. �
 사용자가 fc1959b 판정에 동의하고 unreadable의 이전 실패가 timeout, writable/business는 host-init이었다고 케이스별 정정했다. OneDrive 단일 원인 확정과 이번 skip만으로 R5-01 본문 실패 보존 검증을 주장한 부분도 철회했다. 기존 판정과 일치하며 새 실행 결과로 합산하지 않는다. 새로운 환경 조치나 진단 없이 동일 image lane을 반복하지 않는다.
 
 fc1959b image 증거/정본 8파일 Obsidian scoped export 완료: 8 exported, 0 pending, 0 conflicts. CI는 결제/CLI 인증 외부 대기이며 재시도하지 않았다.
+
+## 사용자 독립 소스 확인 수신 및 대기
+
+확인 시각 2026-09-18T14:07:20+09:00, base f1bbf1d. 사용자가 R1-01(논리 pg_dump/pg_restore 및 백업 나이 지표), R1-02(same-host MinIO), R1-03(기존 파일 재호출 실패)를 독립 소스로 확인했다고 보고했다. 이는 사용자 소스 검토 수신이며 새 PITR 실행 성공이나 Codex 추가 재현으로 집계하지 않는다. R1-04 용량/timeout 정정도 기존 요청대로 미결이다. 사용자가 Claude에게 전달하고 수정 중이라고 보고했다.
+
+git fetch origin 및 log/diff 확인 exit0: Claude tip 1ff43243c0475a33fab4b1f6cc981f0236c58281은 image 상태 지도 변경이며 PITR 파일은 8c72fbf 이후 수정되지 않았다. 제출 브랜치 보류 유지. f1bbf1d는 integration/all-agents-unified와 작업 branch에 반영됐고 Obsidian 5파일 hash 일치, pending0/conflicts0였다. 이전 integration 단축 ref push는 이름 충돌로 거부됐으며 정확한 integration/all-agents-unified ref로 정상 전달했다.
+
+현재 승인 범위의 다음 Codex 행동은 Claude PITR R1-01~04 수정본·격리 리허설 증거 재검토다. 11e9f44 policy 설정 독립검토도 Claude 대기다. CI 결제/인증, 잔여 timeout 환경 진단, 원격 profile/mTLS, 실제 운영 PITR 적용은 각 담당 조건 대기다. 새 근거 없이 image lane을 반복하지 않고, Claude 구현을 중복 작성하거나 새 카드를 만들지 않는다. 이번 수신은 문서만 변경하며 Docker/DB/CI/원격 실행0, 제품 코드 변경0, 운영인수0/5 유지.
