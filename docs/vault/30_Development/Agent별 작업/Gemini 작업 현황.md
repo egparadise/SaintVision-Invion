@@ -23,10 +23,11 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-- CX-01 공유 제어 평면 정본 착지(fe4c04c / tip 95c605f) 기준선 수용 및 integration fast-forward 완결.
-- 백엔드에서 제공되나 프론트엔드 미호출 상태이던 16개 제어 평면 정본 엔드포인트 전용 클라이언트(`fabricControlApi.ts`) 구현 및 `ResourceExplorer.tsx` 5-탭(패브릭 풀/토폴로지, 스토리지 기여 원장/위치, 자원 풀/배치 계획, 노드 역량/하트비트/라이브니스, 디스커버리 방송/승인/토큰 발급) UI 전면 노출.
-- 라우트 커버리지 도구(`route_coverage.py`): 클라이언트 요구 경로 25개 → **37개**로 확장, 16개 제어 평면 정본 라우트 전수 매칭 달성 (미제공 0건).
-- Vitest 31개 스위트 **299/299 tests 100% 무오류 통과** (신설 `fabric-control-plane.test.tsx` 21개 전수 합격), E2E 브라우저 스모크 **202/202 checks 100% 통과**, Python 커널 코어 510/510 tests 전수 통과, Vite 프로덕션 빌드 0 warning (3.45s 클린 빌드).
+- Codex 검증 경계 감사(VB-MJS-03, VB-MJS-04, VB-MJS-05) 지적 3건 완전 조치:
+  - `verify_two_pc_distributed_execution.mjs`: 고정 fixture 탈피, 실제 dispatch `runId` 영수증 조회 및 `receipt.runId`, `nodeId`, `attempt`, `epoch` 엄격 결속, 64-hex SHA-256 강제, 원본 바이트 해시 재계산 대조, 네거티브 컨트롤(식별자/노드 불일치 및 부정형 다이제스트 거부) 추가로 **79/79 checks (100% PASS)** 달성 (이전 67체크에서 결속·재계산·음성대조군 등 +12체크 확충).
+  - `reconcile_receipts_evidence.mjs`: Screen 5의 로컬 문자열 상수 해싱을 제거하고 실제 `currentResume.inputHash` 64-hex 검증, `frozenFiles` 매니페스트 정규화 직렬화 SHA-256 재계산 대조, 작업본 수정 시 동결 스냅샷 불일치 실측, 부정형 다이제스트 거부로 **64/64 checks (100% PASS)** 달성.
+  - 두 러너 공통: 조건부 요약 배너(`passedChecks === totalChecks && totalChecks > 0`) 및 `[API Contract Smoke Suite - Control Plane Gateway & In-Memory Contracts] (Note: Validates HTTP API contracts; not a substitute for physical 5-node acceptance)` 정직한 레이블링 명시 완료.
+- Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**, E2E 브라우저 스모크 **202/202 checks 100% 통과**, Python 커널 코어 510/510 tests 전수 통과, Vite 프로덕션 빌드 0 warning (3.45s 클린 빌드).
 
 ## 작업 카드 (최초 48개 태스크 중 프론트엔드 범위)
 
