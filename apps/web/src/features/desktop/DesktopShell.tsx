@@ -213,6 +213,34 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
     });
   }, []);
 
+  // Global Keyboard Shortcuts (Alt+Tab window cycling, Escape to close modals, Win/Meta to toggle Start menu)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape: Close Start Menu or Notifications
+      if (e.key === 'Escape') {
+        if (isStartMenuOpen) setIsStartMenuOpen(false);
+        if (isNotifOpen) setIsNotifOpen(false);
+      }
+      // Alt + Tab: Cycle through open windows
+      if (e.altKey && (e.key === 'Tab' || e.code === 'Tab')) {
+        e.preventDefault();
+        const openWindows = windows.filter((w) => w.isOpen && !w.isMinimized);
+        if (openWindows.length > 1) {
+          const currentIndex = openWindows.findIndex((w) => w.id === activeWindowId);
+          const nextIndex = (currentIndex + 1) % openWindows.length;
+          focusWindow(openWindows[nextIndex].id);
+        }
+      }
+      // Meta / Win Key: Toggle Start Menu
+      if (e.key === 'Meta') {
+        setIsStartMenuOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isStartMenuOpen, isNotifOpen, windows, activeWindowId, focusWindow]);
+
   const openApp = useCallback(
     (appId: AppId) => {
       setWindows((prev) => {

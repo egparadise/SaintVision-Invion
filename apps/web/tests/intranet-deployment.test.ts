@@ -125,14 +125,14 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
   });
 
   describe('Preflight Pipeline vs Physical Hardware Acceptance (AC-12 Zero-Mock)', () => {
-    it('returns verified preflight status with 186 checks and pending physical hardware acceptance', () => {
+    it('returns verified preflight status with 202 checks and pending physical hardware acceptance', () => {
       const dm = new DeploymentManager();
       const preflight = dm.getPreflightStatus();
 
       expect(preflight.isPreflightPassed).toBe(true);
       expect(preflight.tlsVerified).toBe(true);
       expect(preflight.nginxRoutingVerified).toBe(true);
-      expect(preflight.smokeChecksCount).toBe(186);
+      expect(preflight.smokeChecksCount).toBe(202);
       expect(preflight.smokePassedRatio).toBe(100.0);
       expect(preflight.physicalHardwareAcceptance).toBe('pending');
 

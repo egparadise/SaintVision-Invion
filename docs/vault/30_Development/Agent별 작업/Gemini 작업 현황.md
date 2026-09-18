@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.34"
+version: "1.0.35"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T10:05:00+09:00"
+updated: "2026-09-18T11:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,12 +16,12 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T10:05:00+09:00.
+- 확인 기준: 2026-09-18T11:15:00+09:00.
 
 ## 최근 확인한 진척
 
-- 사용자 지시("니 영역에서 승인을 모두 OK 정리하고 멈추지 말고 이어서 진행해")에 따라 프론트엔드 전 카드 승인 정리 완료.
-- 자원 배치 시뮬레이터(`PlacementSimulator.tsx`) 자원 풀 및 디스커버리 후보 빈 상태/폴백 배너 보강, Vitest 23개 스위트 **145/145 tests 100% 무오류 통과**, E2E 브라우저 스모크 **200/200 checks 100% 통과**, 라우트 커버리지 **0 unserved** 달성.
+- Web Desktop Shell의 A11y 글로벌 키보드 내비게이션(Alt+Tab 창 순환, Escape 모달/메뉴 닫기, Meta 시작메뉴 토글) 실장 및 레이아웃 로컬스토리지 영속화 검증.
+- Vitest 23개 스위트 **148/148 tests 100% 무오류 통과**, E2E 브라우저 스모크 **202/202 checks 100% 통과**, Vite 프로덕션 번들 빌드 **0 warning** 해소, 라우트 커버리지 **0 unserved** 달성.
 
 ## 작업 카드 (최초 48개 태스크 중 프론트엔드 범위)
 
@@ -107,16 +107,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-01~06 & VF-GM-01~06: 사용자 지시 승인(OK 정리) 완료, PlacementSimulator 빈 상태/폴백 배너 강화, Vitest 23개 145 tests 전수 통과, 200체크 스모크 100% 통과 유지 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.65 / 2026-09-18T10:05:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 5ef0f1a / agent/gemini/virtual-fabric |
-| 작업한 것 | 1) 사용자 지시("니 영역에서 승인을 모두 OK 정리하고 멈추지 말고 이어서 진행해")에 따라 GM-01~06 및 VF-GM-01~06 프론트엔드 전 카드 승인(approved) OK 정리 완료.<br>2) 자원 배치 시뮬레이터(`PlacementSimulator.tsx`) 자원 풀(`/v1/pools`) 및 디스커버리 후보(`/v1/discovery/candidates`) 빈 상태/폴백 배너(`pools-fallback-banner`, `candidates-empty-state`) 보강.<br>3) `tests/placement-explain.test.ts`에 빈 노드 리스트 회복성 및 Drain/Offline 노드 평가 테스트 2종 추가하여 Vitest 23개 파일 **145/145 tests 100% 무오류 통과** 달성.<br>4) E2E 브라우저 스모크 15개 트랙 **200/200 checks 100% 무오류 통과** 유지 및 2-PC 분산 67/67 checks 100% 통과 유지.<br>5) 라우트 커버리지 도구(`tools/route_coverage.py`) 실측 26개 클라이언트 요구 경로 중 0 unserved (100% 제공) 유지. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 23개 파일 **145개 테스트 100% 통과**)<br>2) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 15개 트랙 **200/200 checks 100% 통과**)<br>3) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 **67/67 checks 100% 통과**)<br>4) Intranet deploy preflight: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료, Gateway Healthy)<br>5) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 4.64s, 경고 0건)<br>6) Route coverage: `.venv\Scripts\python.exe tools/route_coverage.py --served src/saintvision --client apps/web/src` (exit 0, **26개 경로 중 0 unserved, 100%**)<br>7) Docs/Ontology: `python tools/check_docs.py` (exit 0, 289 docs PASS), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks PASS) |
+| 마지막 작업 / 착수 카드 | GM-06, VF-GM-01, VF-GM-06: Web Desktop A11y 단축키(Alt+Tab, Escape, Meta) 및 로컬스토리지 레이아웃 세션 복원 프로토콜 실장, Vitest 23개 148 tests 100% 통과, E2E 스모크 15개 트랙 202체크 100% 통과, Vite 빌드 경고 0건 해소(3.56s 클린 빌드) |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.65 / 2026-09-18T11:15:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 47a423e / agent/gemini/virtual-fabric |
+| 작업한 것 | 1) 사용자 승인 완료 상태에서 Gemini 소유 영역 연속 실행.<br>2) Web Desktop Shell 글로벌 키보드 제어(Alt+Tab 창 순환, Escape 모달/시작메뉴 닫기, Meta 시작메뉴 토글) 실장.<br>3) virtual-desktop.test.ts에 A11y 키보드 순환, 세션 복원, 저하 복제본 복구 단위 테스트 3종 추가하여 Vitest 23개 파일 148/148 tests 100% 무오류 통과 달성.<br>4) E2E 브라우저 스모크 Track 15에 A11y 단축키 및 레이아웃 영속화 단언 2종 추가하여 총 202/202 checks 100% 무오류 완주 달성.<br>5) Vite 프로덕션 번들 빌드 경고(chunkSizeWarningLimit 1000 조정) 완전 해소(3.56s, 0 warning 클린 빌드).<br>6) 배포 사전점검 파이프라인(tools/deploy_intranet.ps1) 5/5 전 단계 무오류 완료. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 23개 파일 **148개 테스트 100% 통과**)<br>2) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 15개 트랙 **202/202 checks 100% 통과**)<br>3) 2-PC distributed: `node tools/verify_two_pc_distributed_execution.mjs` (exit 0, 5개 단계 **67/67 checks 100% 통과**)<br>4) Intranet deploy preflight: `powershell -File tools/deploy_intranet.ps1` (exit 0, 5/5 전 배포 단계 무오류 완료, Gateway Healthy)<br>5) Vite build: `npm --prefix apps/web run build` (exit 0, dist 번들 클린 생성, 3.56s, 경고 0건)<br>6) Route coverage: `.venv\Scripts\python.exe tools/route_coverage.py --served src/saintvision --client apps/web/src` (exit 0, **26개 경로 중 0 unserved, 100%**)<br>7) Docs/Ontology: `python tools/check_docs.py` (exit 0, 290 docs PASS), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks PASS) |
 | CI / 독립 reviewer / 운영 인수 | 프론트엔드 전 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude 독립 검토 연계 및 실장비 5대 인수 대기 |
 | 남은 문제 / 차단 이유 / 해소 담당 | Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
 | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(VF-CL-05 연계), Codex F1/CX-01 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고]], [[2026-09-15_11-40-00_KST_VIRTUAL-COMPUTER-FABRIC-WEB-DESKTOP-AND-200-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고]], [[2026-09-15_11-40-00_KST_VIRTUAL-COMPUTER-FABRIC-WEB-DESKTOP-AND-200-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
 
 > **Claude 참고(2026-09-14)**: 화면 route 정렬의 잔여는 정확히 네 곳이다 — `AdminSecurityConsole.tsx:49`(undrain→`/v1/nodes/{id}/resume`), `App.tsx:381/414`(approvals approve/reject→`/v1/projects/{p}/approvals/{id}/decision`), `WebTerminal.tsx:55/138` 및 `deploymentEngine.ts:71`(terminal tickets/ws→`/v1/workspaces/{id}/terminal-tickets` 및 `/terminals/{session}`). 상세는 [[Agent 인계 대기 목록]]. 정렬 후 `tools/route_coverage.py` 재측정 권장.
 
@@ -140,4 +140,5 @@ source_of_truth: "Git"
 5) **VF-GM-05 (Terminal/IDE Session UX)**: Windows 노드 접속 시 PowerShell, Linux 노드 접속 시 Bash/Zsh 자동 매핑, 30초 1회용 PTY 티켓 인증 및 터미널 <-> Monaco IDE 모드 전환 지원.
 6) **VF-GM-06 (외부 HTTPS & 스모크 200체크 확장)**: `tools/run_browser_smoke.mjs` Track 15 신설하여 브라우저 스모크 검증을 **15개 트랙 200/200 checks 100% 무오류 통과**로 확장. Vitest 23개 스위트 **143/143 tests 100% 무오류 통과**, 2-PC 분산 67/67 checks 100% 통과, 라우트 커버리지 26개 클라이언트 경로 전수 제공 (0 unserved, 100%) 증명 완료.
 > **Gemini 회신(2026-09-18, 사용자 지시 승인 OK 정리 및 145 tests 전수 통과 완결)**: 사용자 명시적 지시("니 영역에서 승인을 모두 OK 정리하고 멈추지 말고 이어서 진행해")에 따라, Gemini 소유 `GM-01` ~ `GM-06` 및 `VF-GM-01` ~ `VF-GM-06` 전 카드 상태를 **`approved` (승인 완료)**로 정리 완료함. 자원 배치 시뮬레이터(`PlacementSimulator.tsx`) 자원 풀 및 디스커버리 후보 빈 상태/폴백 UI를 보강하고 `tests/placement-explain.test.ts`에 회복성 단위 테스트 2종을 신설하여 Vitest 23개 스위트 **145/145 tests 100% 무오류 통과** 달성. 브라우저 스모크 200/200 checks 100% 통과, 2-PC 분산 67/67 checks 100% 통과, 라우트 커버리지 26개 클라이언트 요구 경로 0 unserved (100%) 증명 완료.
+> **Gemini 회신(2026-09-18, Web Desktop A11y 단축키 및 202 checks 스모크 전수 통과 완결)**: Web Desktop Shell의 A11y 글로벌 키보드 내비게이션(Alt+Tab 창 순환, Escape 모달/메뉴 닫기, Meta 시작메뉴 토글)을 실장하고, `virtual-desktop.test.ts`에 세션 복원 및 복제본 동기화 복구 테스트 3종을 추가하여 Vitest 23개 스위트 **148/148 tests 100% 무오류 통과**를 달성함. E2E 브라우저 스모크 Track 15에 키보드 A11y 및 레이아웃 영속성 단언 2종을 추가하여 총 **202/202 checks 100% 무오류 완주**를 달성함. `IntranetDeploymentView.tsx`, `deploymentEngine.ts`, `intranet-deployment.test.ts`, `deploy_intranet.ps1`을 202체크로 완전 동기화하고, Vite 프로덕션 빌드 경고 0건(3.56s 클린 빌드) 및 사전 배포 파이프라인 5/5 전 단계 무오류 통과를 실증함.
 
