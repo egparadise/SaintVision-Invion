@@ -49,3 +49,22 @@ def test_missing_connection_configuration_does_not_leak(monkeypatch, capsys):
     output = capsys.readouterr()
     assert "synthetic-private-path" not in output.err + output.out
     assert "credential_provisioning_refused" in output.out
+
+
+@pytest.mark.parametrize("failure,expected,code", [
+    ("db", "credential_provisioning_database_error", 2),
+    ("internal", "credential_provisioning_internal_error", 3),
+])
+def test_unexpected_failures_keep_category_without_secret(monkeypatch, capsys, tmp_path, failure, expected, code):
+    tool = module()
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text("{}")
+    monkeypatch.setenv("INV_CREDENTIAL_ADMIN_DSN", "postgresql://synthetic-secret")
+    if failure == "db":
+        monkeypatch.setattr(tool, "provision", lambda *args, **kwargs: (_ for _ in ()).throw(tool.ProvisioningDatabaseError("08001")))
+    else:
+        monkeypatch.setattr(tool, "provision", lambda *args, **kwargs: (_ for _ in ()).throw(TypeError("synthetic-secret")))
+    monkeypatch.setattr(sys, "argv", ["provision", "register", "--root", "x", "--manifest", str(manifest), "--check"])
+    assert tool.main() == code
+    output = capsys.readouterr()
+    assert expected in output.out and "synthetic-secret" not in output.out + output.err

@@ -33,6 +33,22 @@ def test_inconsistent_metadata_refused(graph, heads):
         gap_plan(heads, graph)
 
 
+@pytest.mark.parametrize("failure,expected,code", [
+    ("db", "migration_metadata_database_error", 2),
+    ("shape", "migration_metadata_internal_error", 3),
+])
+def test_cli_separates_database_and_internal_failures(monkeypatch, capsys, tmp_path, failure, expected, code):
+    import plan_lan_migration as subject
+    if failure == "db":
+        monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(subject.MigrationPlanDatabaseError("08001")))
+    else:
+        monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(TypeError("dsn-value")))
+    monkeypatch.setattr(subject.sys, "argv", ["plan_lan_migration.py", "--state", "state.json", "--output", str(tmp_path / "out.json")])
+    assert subject.main() == code
+    output = capsys.readouterr()
+    assert expected in output.err and "dsn-value" not in output.out + output.err
+
+
 @pytest.mark.postgres
 def test_real_postgres_column_grants(migrated, owner_engine):
     from psycopg.rows import dict_row

@@ -43,6 +43,14 @@ class ProvisioningDenied(Exception):
         super().__init__("Credential provisioning refused")
 
 
+class ProvisioningDatabaseError(Exception):
+    """A database/driver failure, reported without DSNs or SQL text."""
+
+    def __init__(self, sqlstate=None):
+        self.sqlstate = sqlstate if isinstance(sqlstate, str) and re.fullmatch(r"[0-9A-Z]{5}", sqlstate) else "unknown"
+        super().__init__("Credential provisioning database operation failed")
+
+
 def validate_manifest(value, action):
     try:
         required = {"tenant", "project", "subject", "run", "epoch", "credential", "version"}
@@ -94,8 +102,10 @@ def validate_manifest(value, action):
         if action == "rotate" and m["oldVersion"] == m["version"]:
             raise ProvisioningDenied()
         return m
-    except Exception:
-        raise ProvisioningDenied() from None
+    except ProvisioningDenied:
+        raise
+    except psycopg.Error as error:
+        raise ProvisioningDatabaseError(getattr(error, "sqlstate", None)) from None
 
 
 def inspect_existing(provider, file_name):
@@ -331,8 +341,17 @@ def main():
         result = provision(dsn, args.root, manifest, args.action, apply=args.apply)
         print(json.dumps(result))
         return 0
-    except Exception:
+    except ProvisioningDenied:
         print(json.dumps({"error": "credential_provisioning_refused"}))
+        return 2
+    except ProvisioningDatabaseError as error:
+        print(json.dumps({"error": "credential_provisioning_database_error", "sqlstate": error.sqlstate}))
+        return 2
+    except (TypeError, KeyError, AttributeError) as error:
+        print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": type(error).__name__}))
+        return 3
+    except Exception as error:
+        print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": type(error).__name__}))
         return 2
 
 
