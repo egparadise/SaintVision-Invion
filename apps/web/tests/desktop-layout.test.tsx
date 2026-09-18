@@ -34,10 +34,11 @@ it('rejects duplicate identities and never mutates defaults', () => {
   result[0].position.x=999;expect(defaults[0].position.x).toBe(40);
 });
 
-it('renders mounted approval center and terminal windows when open', () => {
+it('renders mounted approval center, terminal, and settings windows when open', () => {
   const openSaved = JSON.stringify([
     { id: 'win_approvals', appId: 'approvals', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 11, position: { x: 50, y: 50 }, size: { width: 800, height: 500 } },
     { id: 'win_terminal', appId: 'terminal', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 12, position: { x: 100, y: 100 }, size: { width: 800, height: 500 } },
+    { id: 'win_settings', appId: 'settings', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 13, position: { x: 150, y: 150 }, size: { width: 800, height: 500 } },
   ]);
   vi.stubGlobal('localStorage', { getItem: () => openSaved });
   const markup = renderToStaticMarkup(
@@ -48,5 +49,6 @@ it('renders mounted approval center and terminal windows when open', () => {
   );
   expect(markup).toContain('거버넌스 승인 센터');
   expect(markup).toContain('Web Terminal PTY');
+  expect(markup).toContain('Docker Socket 노출 여부');
 });
 
