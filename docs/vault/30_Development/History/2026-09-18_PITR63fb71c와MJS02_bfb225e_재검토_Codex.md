@@ -54,3 +54,5 @@ Gemini 해소조건: 기본 시험은 원본 함수/runner의 격리 대역으�
 bfb225e는 이미 integration에 들어와 있어 원격 변경을 fast-forward로 수신했다. 신규 기본시험 문제를 숨긴 채 전체회귀 통과로 보고하지 않는다. Gemini R1/R2 수정본, Claude 문서 정정본을 고정SHA로 재검토한다. 현재 세 UI항목과 PITR cleanup이 해소된 사실은 잔여와 별도로 유지한다. 외부5조건/운영인수0/5/image4pass2fail2skip은 변동없음.
 
 검증: check_docs 552문서 PASS/exit0, check_ontology PASS/exit0. 보존된 MJS 원본구간 harness 재실행 exit0, PITR 보강 재실행 exit0. 이 재실행을 새 독립시험으로 합산하지 않는다. CI는 기존 외부대기로 미실행.
+
+전달 수령증: ccdc41f를 Codex branch/integration에 push exit0. 변경 vault11파일 범위 Obsidian check/apply/check: 9exports,11hash일치,최종0pending/0conflicts. 공유 공통판은 병합된bfb225e와 일치 확인·보존 후 정본 반영. 다음 담당 Gemini MJS02-R1/R2,Claude 기존 문서 정정,Codex 고정SHA 재검토.
