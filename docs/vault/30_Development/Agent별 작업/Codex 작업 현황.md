@@ -536,3 +536,8 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## Launcher scope 재검토·PITR hold 인계
 
 [[2026-09-18_Launcher_scope와PITR_hold_Codex]]: 사용자66bbcf0 16passed수신(실PG증거아님). LAUNCH원래nativeexit누락해소, Docker SKIPPED/gateway Optional분리확인. 원본PS1합성2조건에서invalid-nonempty cert도TLS1.3 VERIFIED·고정202 E2E문구출력→Gemini scope잔여. npmbuild exit검사는수정전부터존재. PITR query/remove실패·PIDlabel잔여와nonce/cleanup상태/재시도게이트/음성대조조건명시. git cherry로fixture2커밋·registry검토 patch동등착지확인,2ed3d6은상태문서추가만/PITR코드변경없음.
+
+
+## Claude 수정대기 정정 / 사용자 방법론 정정 수신
+
+[[2026-09-18_Claude_대기상태정정과수정인계_Codex]]:2ed3d65는문서1파일뿐/PITR코드변경0. FIX02재검토·내용착지완료, PITR은Codexreview대기가아니라Claude cleanup잔여수정대기. 내용차이8/동등patch3 대조,image workspace skip누락·실PG11오표기·1179실행주체등상태문서정정인계. bb4f4cb Claude sound 문서수신(독립소스검토,런타임별도). 사용자의npm검사시점/16시험합성범위정정수용수신. 동일주입/운영시험반복없음.
