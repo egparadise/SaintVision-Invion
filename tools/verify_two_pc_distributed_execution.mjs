@@ -349,7 +349,11 @@ async function runTwoPcVerification() {
         `(HTTP ${unknownReceiptRes.status})`
       );
     } catch (err) {
-      unverified('Negative control: unknown run receipt query', `backend not reachable (${err.message})`);
+      if (err instanceof TypeError && err.cause) {
+        unverified('Negative control: unknown run receipt query', `backend not reachable (${err.message})`);
+      } else {
+        throw err;
+      }
     }
     unverified('Negative control: mismatched receipt nodeId', 'no receipt-submission endpoint is exercised by this suite');
     unverified('Negative control: malformed receipt digest', 'no receipt-submission endpoint is exercised by this suite');
