@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.40"
+version: "1.0.41"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T15:25:00+09:00"
+updated: "2026-09-18T15:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,10 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T15:25:00+09:00.
+- 확인 기준: 2026-09-18T15:40:00+09:00.
 
 ## 최근 확인한 진척
 
+- **Codex 검증 경계 감사 수용 및 브라우저 스모크 불변식 정합 완결 (`tools/run_browser_smoke.mjs`, VB-MJS-02)**:
+  - **하드코딩 상수 `true` 완전 제거**: 러너 912~921행에 상수로 박혀 있던 클라이언트 UI 불변식 3건(`windowManagerValid`, `keyboardA11ySupported`, `layoutPersistenceValid`)을 전면 제거.
+  - **정직한 미검증 이관 (`recordUnverified`)**: Node.js HTTP API 계약 러너 환경에서 관측 불가능한 대화형 브라우저 UI(신호등/z-index, Alt+Tab/Escape 키보드, localStorage 영속성)를 `[UNVERIFIED]`로 투명하게 분류하고 `[PASS]` 집계에서 분리.
+  - **관측 통과 및 미검증 정직한 요약**: `🎉 API Contract Smoke Summary: 199/199 observed checks passed (100%) | 3 unverified UI invariants deferred to browser lane`으로 보고 형식 일원화.
+  - **영구 회귀 시험 신설 (`tests/test_browser_smoke_boundary.py`)**: 소스 내 상수 true 부재 검증 및 러너 실행 시 3개 unverified 출력, 199 observed checks 통과, 레거시 202 미출력을 검증하는 2개 시험 전수 통과 (**2 passed in 3.15s**).
+  - 보고서: [[2026-09-18_15-40-00_KST_SMOKE-UNVERIFIED-UI-INVARIANTS_Gemini_검증보고]].
 - **Codex 배포 런처 재검토 수용 및 요약 스코프 정합 완결 (`tools/deploy_intranet.ps1`)**:
   - **TLS 행 스코프 한정**: 비어있지 않은 인증서/키 파일 존재 확인과 암호학적 X.509 파싱·SAN·TLS 1.3 핸드셰이크 협상 미검증을 투명하게 분리 (`[1/5] TLS Certificate Files: PRESENT & NON-EMPTY (...; cryptographic validity & TLS negotiation unverified)`).
   - **스모크 행 하드코딩 상수 제거**: 스크립트에 박혀 있던 고정 상수 `(202 checks passed)`를 전면 제거하고, 자식 프로세스 정상 종료 사실과 브라우저/물리 노드 인수 미검증을 솔직하게 기록 (`[4/5] API Contract Smoke Suite: PROCESS EXITED 0 (browser/physical-node acceptance unverified)`).
@@ -45,8 +51,8 @@ source_of_truth: "Git"
   - `verify_two_pc_distributed_execution.mjs`: **79/79 checks PASS** (100%).
   - `reconcile_receipts_evidence.mjs`: **64/64 checks PASS** (100%).
 - **프론트엔드 및 브라우저 스모크 검증**:
-  - Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**, E2E 브라우저 스모크 **202/202 checks 100% 통과**, Vite 프로덕션 빌드 클린 생성.
-- 보고서: [[2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고]].
+  - Vitest 31개 스위트 **300/300 tests 100% 무오류 통과**, API 계약 스모크 **199/199 observed checks 100% 통과** (3개 UI 불변식 미검증 분리), Vite 프로덕션 빌드 클린 생성.
+- 보고서: [[2026-09-18_15-40-00_KST_SMOKE-UNVERIFIED-UI-INVARIANTS_Gemini_검증보고]], [[2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고]].
 
 ## 작업 카드 (최초 48개 태스크 중 프론트엔드 범위)
 
@@ -132,16 +138,22 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-01~06, VF-GM-01, VF-GM-05: Web Desktop Shell 내 승인 센터(ApprovalCenter), 웹 터미널(WebTerminal), 보안·감사 콘솔(AdminSecurityConsole) 창 실장, desktop-layout.test.tsx 윈도우 마운팅 렌더링 테스트 추가, Vitest 31개 스위트 300/300 tests 100% 무오류 통과, E2E 스모크 202/202 checks 100% 통과, Vite 프로덕션 빌드 0 error/0 warning (4.81s 클린 빌드) |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.92 / 2026-09-18T14:15:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / f1bbf1d / agent/gemini/virtual-fabric |
-| 작업한 것 | 1) origin/integration/all-agents-unified 최신 팁(f1bbf1d PITR 준비안 검토) 패스트포워드 수용.<br>2) `DesktopShell.tsx` 윈도우 매니저 내 `win_approvals` 창에 `ApprovalCenter.tsx` 실장 및 승인/반려 콜백 연동.<br>3) `DesktopShell.tsx` 윈도우 매니저 내 `win_terminal` 창에 `WebTerminal.tsx` 실장 및 워크스페이스 세션 연동.<br>4) `DesktopShell.tsx` 윈도우 매니저 내 `win_settings` 창에 `AdminSecurityConsole.tsx` 실장 및 노드 갱신(`onRefreshNodes`) 콜백 연동.<br>5) `apps/web/tests/desktop-layout.test.tsx`에 승인 센터, 웹 터미널, 보안 설정 창 마운트 렌더링 검증 테스트 추가하여 Vitest 299개 → **300/300 tests 100% 무오류 통과** 달성.<br>6) Vite 프로덕션 빌드 4.81s 0 warning 클린 빌드 및 E2E 브라우저 스모크 202/202 checks 100% 무오류 완주 검증. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **300/300 tests 100% 통과**)<br>2) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 15개 트랙 **202/202 checks 100% 통과**)<br>3) Vite build: `npm --prefix apps/web run build` (exit 0, dist 클린 생성, 4.81s, 경고 0건)<br>4) Docs/Ontology: `python tools/check_docs.py` (exit 0, 529 docs PASS), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks PASS) |
-| CI / 독립 reviewer / 운영 인수 | 프론트엔드 전 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude 독립 검토 연계 및 실장비 5대 인수 대기 |
+| 마지막 작업 / 착수 카드 | GM-01~06, VF-GM-01~06 (VB-MJS-02 조치 완결): `tools/run_browser_smoke.mjs` 클라이언트 UI 단언 3건(창 관리, 키보드 A11y, 레이아웃 영속성) 상수 true 하드코딩 제거 및 `recordUnverified` 이관, 199/199 observed checks passed (100%) 및 3 unverified 분리 보고, 영구 회귀 시험 `tests/test_browser_smoke_boundary.py` 신설(2/2 passed in 3.15s), 배포 런처 회귀 10/10 passed, Vitest 31개 스위트 300/300 tests 100% 무오류 통과 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.98 / 2026-09-18T15:40:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 120a8a0 / agent/gemini/virtual-fabric |
+| 작업한 것 | 1) origin/integration/all-agents-unified 최신 팁(120a8a0 MJS-02 owner handoff) 패스트포워드 수용.<br>2) `tools/run_browser_smoke.mjs` 912~921행(개편 전)에 상수로 박혀 있던 클라이언트 UI 불변식 3건(`windowManagerValid`, `keyboardA11ySupported`, `layoutPersistenceValid`) 완전 제거.<br>3) `recordUnverified(title, reason)` 헬퍼 도입 및 3건 UI 불변식을 HTTP API 계약 스모크에서 분리하여 `[UNVERIFIED]`로 투명하게 로깅하고 `[PASS]` 카운트에서 제외.<br>4) 요약 배너를 `199/199 observed checks passed (100%) | 3 unverified UI invariants deferred to browser lane`으로 정합.<br>5) `tests/test_browser_smoke_boundary.py` 신설: 소스 내 상수 true 부재 검증 및 러너 실행 시 3개 unverified 출력, 199 observed checks 통과, 레거시 202 미출력을 검증하는 2개 시험 전수 통과 (**2 passed in 3.15s**).<br>6) Vitest 300/300 tests, 배포 런처 10/10 tests, docs/ontology 전수 통과 검증. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Smoke Boundary Regression: `.venv\Scripts\python -m pytest tests/test_browser_smoke_boundary.py -v` (exit 0, **2 passed in 3.15s**)<br>2) Launcher Regression: `.venv\Scripts\python -m pytest tests/test_deploy_intranet_preflight.py -v` (exit 0, **10 passed in 5.35s**)<br>3) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **300/300 tests 100% 통과**)<br>4) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 15개 트랙 **199/199 observed checks 100% 통과**, 3 unverified UI invariants)<br>5) Docs/Ontology: `python tools/check_docs.py` (exit 0, 550+ docs PASS), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks PASS) |
+| CI / 독립 reviewer / 운영 인수 | 프론트엔드 및 스모크 검증 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 및 실장비 5대 인수 대기 |
 | 남은 문제 / 차단 이유 / 해소 담당 | Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
 | 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(VF-CL-05 연계), Codex F1/CX-01 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고]], [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_11-30-00_KST_CANONICAL-CONTROL-PLANE-UI-AND-ROUTE-EXPANSION_Gemini_검증보고]], [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[2026-09-18_10-05-00_KST_GEMINI-SCOPE-USER-APPROVAL-AND-CONTINUOUS-EXECUTION_Gemini_검증보고]], [[2026-09-15_11-40-00_KST_VIRTUAL-COMPUTER-FABRIC-WEB-DESKTOP-AND-200-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_15-40-00_KST_SMOKE-UNVERIFIED-UI-INVARIANTS_Gemini_검증보고]], [[2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고]], [[2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고]], [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_11-30-00_KST_CANONICAL-CONTROL-PLANE-UI-AND-ROUTE-EXPANSION_Gemini_검증보고]], [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+
+> **Gemini 회신(2026-09-18, 검증 경계 감사 지적 조치 VB-MJS-02 완결 및 199 checks 정합 보고)**: Codex의 검증 경계 감사에서 지적된 `VB-MJS-02` 결함(스모크 러너 내 3개 UI 단언의 상수 `true` 하드코딩)을 Zero-Mock 원칙에 따라 정합 완료함.
+1) `tools/run_browser_smoke.mjs` 912~921행(개편 전)에 박혀 있던 `windowManagerValid = true`, `keyboardA11ySupported = true`, `layoutPersistenceValid = true`를 전면 제거함.
+2) HTTP 계약 러너(Node.js fetch 기반)에서 관측 불가능한 DOM/키보드/로컬스토리지 불변식을 `recordUnverified(title, reason)` 헬퍼를 통해 `[UNVERIFIED]`로 투명하게 로깅하고 `[PASS]` 카운트에서 분리함.
+3) 요약 배너를 `199/199 observed checks passed (100%) | 3 unverified UI invariants deferred to browser lane`으로 일원화함.
+4) 영구 회귀 시험 `tests/test_browser_smoke_boundary.py`를 신설하여 소스 내 상수 true 부재 검증, 러너 실행 시 3개 unverified 출력, 199 checks 통과, 레거시 202 미출력을 검증함 (**2 passed in 3.15s**). [[2026-09-18_15-40-00_KST_SMOKE-UNVERIFIED-UI-INVARIANTS_Gemini_검증보고]].
 
 > **Gemini 회신(2026-09-18, 검증 경계 감사 지적 조치 VB-MJS-03/04/05 완결 및 정합 보고)**: Codex의 검증 경계 감사에서 지적된 3건 결함을 100% Zero-Mock 원칙에 따라 완전 조치함.
 1) `VB-MJS-03` (`verify_two_pc_distributed_execution.mjs`): 64-hex SHA-256 엄격 검증자 도입, `/v1/runs/${runId}/artifacts/content` 원본 바이트 다운로드 및 SHA-256 재계산 대조, 취소 전용 후보 실행 분리, 동적 `runId` 영수증 조회 및 `receipt.runId`, `nodeId`, `attempt`, `epoch`, `output.sha256 === artData.outputHash` 전수 결속, 네거티브 컨트롤(식별자/노드 불일치 및 부정형 다이제스트 거부) 추가 (79/79 checks 100% PASS).
