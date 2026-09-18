@@ -221,6 +221,47 @@ def test_a_departed_node_marks_its_copies_stale_and_keeps_the_location(
                 assert still == 1
 
 
+def test_node_loss_on_a_pinned_replica_keeps_the_pin(owner_engine, app_sessionmaker, location):
+    """Node loss invalidates availability, not retention (migration 0043).
+
+    A ready replica held by an active lease (pinned) must survive node loss as a
+    stale-but-pinned row -- otherwise recovery could discard something Evidence
+    depends on. This is the case the original replica_repair missed: marking a
+    pinned ready replica stale used to violate only_ready_replicas_pin; the
+    retained_replicas_pin constraint admits a pinned stale row, so the pin is
+    preserved through the transition.
+    """
+    pinned_until = dt.datetime(2027, 6, 1, tzinfo=UTC)
+    replica_id = new_id("replica")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "INSERT INTO data_replicas (replica_id, tenant_id, location_id, node_id, "
+                "contribution_id, state, local_bytes, checksum_sha256, verified_at, "
+                "pinned_until, last_used_at, created_at) "
+                "VALUES (:r, :t, :l, :n, :c, 'ready', :b, :s, now(), :p, now(), now())"
+            ),
+            {"r": replica_id, "t": location["tenant_a"], "l": location["location_id"],
+             "n": location["nodes"][0], "c": location["contribution_id"],
+             "b": location["bytes"], "s": SHA, "p": pinned_until},
+        )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                marked = replica_repair.mark_node_replicas_unavailable(
+                    session, tenant_id=location["tenant_a"],
+                    node_id=location["nodes"][0], now=NOW,
+                )
+                assert marked == 1
+    with owner_engine.connect() as c:
+        row = c.execute(
+            text("SELECT state, pinned_until FROM data_replicas WHERE replica_id = :r"),
+            {"r": replica_id},
+        ).one()
+    assert row[0] == "stale"
+    assert row[1] is not None
+
+
 def test_fleet_summary_aggregates_classification_across_the_catalogue(
     owner_engine, app_sessionmaker, location
 ):
