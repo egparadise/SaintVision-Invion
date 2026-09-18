@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.19"
+version: "1.0.20"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-18T10:24:56+09:00"
+updated: "2026-09-18T11:08:50+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
+
+## CX-01 공유 개발 정본 착지 (2026-09-18)
+
+- 사용자 우선 지시에 따라 `agent/codex/cx-01-canonical-landing`에서 최신 보안 제어 평면과 공유 integration 47a423e를 병합한다. 현재 검증 중이며 원격 착지 SHA는 [[2026-09-18_CX-01_정본착지_Codex]]에 기록한다.
+- 다음 작업의 계약/branch/필수 migration/Agent별 첫 행동: [[CX-01 제어 평면 정본과 Agent 재개 계약]]. 개별 storage API 파일 복사 대신 deps·0043·서비스가 일치하는 통합 SHA를 사용한다.
+- 사용자 진행 승인은 유효하다. 공유 개발 정본 착지와 main 릴리스/운영 배포/CI/독립검토/5대 인수는 별도 상태다. 다른 Agent 수신은 미확인이다.
+- 아래 과거 항목의 'CX-01 정본 미병합'은 당시 상태다. 최신 착지 결과는 위 History가 우선하며 전체 완료율은 재평가하지 않는다.
+
 
 ## Codex 승인과 연속 진행
 

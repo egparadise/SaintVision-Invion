@@ -151,7 +151,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
       </div>
 
       {/* Resource Pools & Live Capacity Section */}
-      {pools.length > 0 && (
+      {pools.length > 0 ? (
         <div
           style={{
             padding: '16px 20px',
@@ -210,6 +210,28 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
               </div>
             </div>
           )}
+        </div>
+      ) : (
+        <div
+          data-testid="pools-fallback-banner"
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px dashed var(--color-border-subtle)',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>ℹ️</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+              자원 풀 정보가 없습니다. 현재 관측된 노드 정보로 배치 가능성을 미리 평가합니다.
+            </span>
+          </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>로컬 결정론적 평가 활성</span>
         </div>
       )}
 
@@ -409,40 +431,46 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
           <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '12px' }}>
             자원 디스커버리 후보 목록 (/v1/discovery/candidates)
           </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {candidates.map((c) => (
-              <div
-                key={c.nodeId}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '8px 12px',
-                  backgroundColor: 'var(--color-bg-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.75rem',
-                }}
-              >
-                <div>
-                  <strong>{c.hostname}</strong> ({c.os})
-                  <span style={{ color: 'var(--color-text-muted)', marginLeft: '8px' }}>
-                    {c.availableCores} 코어 / {Math.round(c.availableMemoryBytes / 1024 ** 3)} GB 가용
-                  </span>
-                </div>
-                <span
+          {candidates.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {candidates.map((c) => (
+                <div
+                  key={c.nodeId}
                   style={{
-                    padding: '2px 6px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '8px 12px',
+                    backgroundColor: 'var(--color-bg-subtle)',
                     borderRadius: 'var(--radius-sm)',
-                    backgroundColor: c.healthStatus === 'online' ? 'rgba(35, 134, 54, 0.2)' : 'rgba(218, 54, 51, 0.2)',
-                    color: c.healthStatus === 'online' ? 'var(--color-success)' : 'var(--color-danger)',
-                    fontWeight: 600,
+                    fontSize: '0.75rem',
                   }}
                 >
-                  {c.healthStatus}
-                </span>
-              </div>
-            ))}
-          </div>
+                  <div>
+                    <strong>{c.hostname}</strong> ({c.os})
+                    <span style={{ color: 'var(--color-text-muted)', marginLeft: '8px' }}>
+                      {c.availableCores} 코어 / {Math.round(c.availableMemoryBytes / 1024 ** 3)} GB 가용
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      padding: '2px 6px',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: c.healthStatus === 'online' ? 'rgba(35, 134, 54, 0.2)' : 'rgba(218, 54, 51, 0.2)',
+                      color: c.healthStatus === 'online' ? 'var(--color-success)' : 'var(--color-danger)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {c.healthStatus}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p data-testid="candidates-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0' }}>
+              디스커버리 후보 목록 준비 중이거나 노드 등록 대기 중입니다.
+            </p>
+          )}
         </div>
       </div>
     </div>

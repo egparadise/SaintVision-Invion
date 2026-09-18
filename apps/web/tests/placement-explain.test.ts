@@ -205,4 +205,44 @@ describe('S05-FE Placement Engine & Exclusion Explain (AC-05)', () => {
       '서버의 예약 가능량(allocatable) 미확인으로 작업 배치 차단됨'
     );
   });
+
+  it('should safely return empty evaluation when nodes array is empty (resilience)', () => {
+    const req: PlacementRequirement = {
+      requiredCores: 2,
+      requiredMemoryBytes: 4 * 1024 ** 3,
+      requiresGpu: false,
+    };
+    const result = evaluatePlacement([], req);
+    expect(result.selectedNodeId).toBeNull();
+    expect(result.evaluations).toHaveLength(0);
+    expect(result.policyVersion).toBe('POLICY-PLACEMENT-v1.0.0');
+  });
+
+  it('should reject nodes that are currently draining or offline with explicit reason', () => {
+    const drainingNode: NodeItem = {
+      ...mockNodes[0],
+      id: 'nod_draining',
+      isDraining: true,
+      status: 'draining',
+    };
+    const offlineNode: NodeItem = {
+      ...mockNodes[1],
+      id: 'nod_offline',
+      status: 'offline',
+    };
+    const req: PlacementRequirement = {
+      requiredCores: 2,
+      requiredMemoryBytes: 4 * 1024 ** 3,
+      requiresGpu: false,
+    };
+    const result = evaluatePlacement([drainingNode, offlineNode], req);
+    const drainEval = result.evaluations.find((e) => e.nodeId === 'nod_draining');
+    const offlineEval = result.evaluations.find((e) => e.nodeId === 'nod_offline');
+
+    expect(drainEval?.hardFilterPassed).toBe(false);
+    expect(drainEval?.rejectionReasons.some((r) => r.includes('Drain'))).toBe(true);
+
+    expect(offlineEval?.hardFilterPassed).toBe(false);
+    expect(offlineEval?.rejectionReasons.some((r) => r.includes('비정상 (offline)'))).toBe(true);
+  });
 });
