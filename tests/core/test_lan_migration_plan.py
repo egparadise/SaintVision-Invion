@@ -34,19 +34,31 @@ def test_inconsistent_metadata_refused(graph, heads):
 
 
 @pytest.mark.parametrize("failure,expected,code", [
-    ("db", "migration_metadata_database_error", 2),
-    ("shape", "migration_metadata_internal_error", 3),
+    ("denied", "migration_metadata_refused", 2),
+    ("db", "migration_metadata_database_error", 3),
+    ("type", "migration_metadata_internal_error", 4),
+    ("runtime", "migration_metadata_internal_error", 4),
 ])
 def test_cli_separates_database_and_internal_failures(monkeypatch, capsys, tmp_path, failure, expected, code):
     import plan_lan_migration as subject
-    if failure == "db":
+    if failure == "denied":
+        monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(ValueError("synthetic metadata")))
+    elif failure == "db":
         monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(subject.MigrationPlanDatabaseError("08001")))
-    else:
+    elif failure == "type":
         monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(TypeError("dsn-value")))
+    else:
+        monkeypatch.setattr(subject, "inspect", lambda path: (_ for _ in ()).throw(RuntimeError("dsn-value")))
     monkeypatch.setattr(subject.sys, "argv", ["plan_lan_migration.py", "--state", "state.json", "--output", str(tmp_path / "out.json")])
     assert subject.main() == code
     output = capsys.readouterr()
     assert expected in output.err and "dsn-value" not in output.out + output.err
+
+
+def test_migration_exit_codes_are_one_to_one_with_labels():
+    import plan_lan_migration as subject
+    assert len({subject.EXIT_REFUSED, subject.EXIT_DATABASE, subject.EXIT_INTERNAL}) == 3
+    assert subject.EXIT_REFUSED != 1  # pending is the normal business result
 
 
 @pytest.mark.postgres

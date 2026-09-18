@@ -37,6 +37,13 @@ PURPOSES = {
     "backup.restore",
 }
 
+# CLI exit contract shared with plan_lan_migration.py:
+# 0 success, 1 normal business result, 2 intentional refusal,
+# 3 database/driver failure, 4 unexpected internal defect.
+EXIT_REFUSED = 2
+EXIT_DATABASE = 3
+EXIT_INTERNAL = 4
+
 
 class ProvisioningDenied(Exception):
     def __init__(self):
@@ -343,16 +350,16 @@ def main():
         return 0
     except ProvisioningDenied:
         print(json.dumps({"error": "credential_provisioning_refused"}))
-        return 2
+        return EXIT_REFUSED
     except ProvisioningDatabaseError as error:
         print(json.dumps({"error": "credential_provisioning_database_error", "sqlstate": error.sqlstate}))
-        return 2
+        return EXIT_DATABASE
     except (TypeError, KeyError, AttributeError) as error:
         print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": type(error).__name__}))
-        return 3
+        return EXIT_INTERNAL
     except Exception as error:
         print(json.dumps({"error": "credential_provisioning_internal_error", "errorType": type(error).__name__}))
-        return 2
+        return EXIT_INTERNAL
 
 
 if __name__ == "__main__":

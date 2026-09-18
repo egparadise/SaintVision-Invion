@@ -11,6 +11,13 @@ from psycopg.rows import dict_row
 from lan_pilot import load
 from migration_graph import chain
 
+# CLI exit contract shared with provision_credentials.py:
+# 0 success, 1 normal pending-migrations result, 2 intentional refusal,
+# 3 database/driver failure, 4 unexpected internal defect.
+EXIT_REFUSED = 2
+EXIT_DATABASE = 3
+EXIT_INTERNAL = 4
+
 
 class MigrationPlanDatabaseError(Exception):
     """A database/driver failure without DSN or SQL diagnostics."""
@@ -76,16 +83,16 @@ def main():
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     except MigrationPlanDatabaseError as error:
         print(json.dumps({"error": "migration_metadata_database_error", "sqlstate": error.sqlstate}), file=sys.stderr)
-        return 2
+        return EXIT_DATABASE
     except ValueError:
         print(json.dumps({"error": "migration_metadata_refused"}), file=sys.stderr)
-        return 2
+        return EXIT_REFUSED
     except (TypeError, KeyError, AttributeError) as error:
         print(json.dumps({"error": "migration_metadata_internal_error", "errorType": type(error).__name__}), file=sys.stderr)
-        return 3
+        return EXIT_INTERNAL
     except Exception as error:
         print(json.dumps({"error": "migration_metadata_internal_error", "errorType": type(error).__name__}), file=sys.stderr)
-        return 2
+        return EXIT_INTERNAL
     print(json.dumps({k: report[k] for k in ("currentHeads", "targetHead", "migrationAuthorized")}))
     return 1 if report["pending"] else 0
 

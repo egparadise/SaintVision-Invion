@@ -576,3 +576,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## Credential / migration 예외 경계 보강
 
 `CREDENTIAL-MIGRATION-ERROR-BOUNDARY-20260919-CODEX`에서 Claude 인계 finding을 구현했다. `provision_credentials.py`는 denial·DB 오류·내부 오류를 각각 분류하고 값 없이 sqlstate/type만 보고하며, `plan_lan_migration.py`도 metadata refusal·DB 오류·내부 오류를 구분한다. 호출자는 credential integration/CLI와 `rehearse_lan_upgrade.gap_plan`/core 시험으로 확인했다. `.venv\Scripts\python.exe -m pytest -q tests/core/test_credential_provision_cli.py tests/core/test_lan_migration_plan.py`는 16 passed/1 skipped(DSN 부재)다. 원복 대조에서 신규 4개 주입시험이 모두 실패했다. 실제 PostgreSQL 실행은 미수행.
+
+종료 코드 정정(2026-09-19): 독립 검증에서 denial/DB가 둘 다 2이고 internal label이 TypeError=3/RuntimeError=2로 갈린 것을 확인해 공통 계약을 고정했다. 두 CLI는 `0=성공`, `1=정상 pending 업무 결과`, `2=의도된 거부`, `3=DB/driver`, `4=내부 결함`을 사용한다. 같은 JSON 라벨은 같은 코드를 내며 TypeError/RuntimeError는 모두 4다. `.venv\Scripts\python.exe` 기준 22 passed/1 skipped, 원복 대조 신규 종료 코드 6건 실패.
