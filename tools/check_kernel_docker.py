@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import time
@@ -22,6 +23,23 @@ DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
     'test_workspace_resume', 'test_workspace_api', 'test_developer_workloads', 'test_workspace_start', 'test_business_handoff', 'test_shard_recovery', 'test_containment')]
 
 
+#: user:password@ inside a DSN/URL. The kernel DSN carries a synthetic password,
+#: which is why diagnostics were dropped; masking the value keeps the error kind.
+_CREDENTIAL = re.compile(r'(://[^:@/\s]+:)[^@/\s]+(@)')
+
+
+def _masked(stderr):
+    """The docker error kind, with credential values masked (VF-CL-R-001).
+
+    Suppressing the whole message made a daemon timeout indistinguishable from a
+    resource-exhaustion or a product failure, so a failure could only be guessed
+    at. Keeping a bounded, credential-masked stderr makes the classification
+    falsifiable without leaking the synthetic DSN password.
+    """
+    text = stderr.decode('utf-8', errors='replace') if isinstance(stderr, (bytes, bytearray)) else str(stderr or '')
+    return _CREDENTIAL.sub(r'\1***\2', text).strip()[:400] or '(no stderr)'
+
+
 def run(args, **kwargs):
     return subprocess.run([str(v) for v in args], capture_output=True,
                           timeout=kwargs.pop('timeout', 60), **kwargs)
@@ -30,8 +48,31 @@ def run(args, **kwargs):
 def checked(args, **kwargs):
     result = run(args, **kwargs)
     if result.returncode:
-        raise RuntimeError(f'{Path(str(args[0])).name} exit {result.returncode}; private log inspection required')
+        raise RuntimeError(
+            f'{Path(str(args[0])).name} exit {result.returncode}: {_masked(result.stderr)}')
     return result.stdout.decode('utf-8', errors='replace').strip()
+
+
+def prune_stale_kernel_test_residue():
+    """Remove *exited* kernel-test containers and empty networks from prior runs.
+
+    The per-invocation finally deliberately preserves this run's stopped
+    containers for post-mortem logs, but nothing bounded that: weeks of runs
+    accumulated (VF-CL-R-001 -- ~130 exited ai.saintvision.kernel-test containers
+    exhausted an 8 GB host and timed out a separate image lane). Pruning only
+    *non-running* kernel-test-labelled residue at the start of a run bounds the
+    accumulation to the current invocation, while a failed run's artifacts still
+    survive until the next run starts. Running containers are never touched, and
+    this is best-effort -- a prune failure must not abort the run it precedes.
+    """
+    stale = run(['docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.kernel-test',
+                 '--filter', 'status=exited', '--filter', 'status=created',
+                 '--filter', 'status=dead']).stdout.decode('utf-8', 'replace').split()
+    for container in stale:
+        run(['docker', 'rm', '-f', container])
+    for network in run(['docker', 'network', 'ls', '--filter', 'label=ai.saintvision.kernel-test',
+                        '--format', '{{.ID}}']).stdout.decode('utf-8', 'replace').split():
+        run(['docker', 'network', 'rm', network])  # refuses while still in use; ignored
 
 
 def image_id(reference):
@@ -149,6 +190,10 @@ def execute(prepared, tests):
     config=dict(adminDSN=f'postgresql://postgres:{password}@{database}:5432/postgres',nodeImage=prepared['nodeImage'],tests=tests)
     (work/'config.json').write_text(json.dumps(config),encoding='utf-8')
     exit_code=None
+    # Bound residue from prior runs before creating this run's containers, so a
+    # host that has accumulated weeks of stopped test containers does not time out
+    # this run (VF-CL-R-001). This run's own resources are created after the prune.
+    prune_stale_kernel_test_residue()
     try:
         checked(['docker','network','create','--internal','--label','ai.saintvision.kernel-test='+name,network])
         checked(['docker','run','-d','--name',database,'--label','ai.saintvision.kernel-test='+name,
@@ -209,10 +254,21 @@ def execute(prepared, tests):
     finally:
         # Stop only containers created and labelled for this invocation. Preserve
         # stopped containers/private logs on failures; no broad name-prefix delete.
+        # Best-effort (VF-CL-R-001): cleanup runs through the non-raising helper and
+        # is wrapped, so a stop or network-release failure under load cannot mask the
+        # original error or skip the remaining cleanup. Residue this leaves stopped
+        # is bounded by the next run's start-of-run prune.
         for target in (runner,database):
-            value=owned(target,name)
-            if value and value['State']['Running']: checked(['docker','stop','--time','10',target],timeout=30)
-        release_network(network, name)
+            try:
+                value=owned(target,name)
+                if value and value['State']['Running']:
+                    run(['docker','stop','--time','10',target],timeout=30)
+            except Exception:
+                pass
+        try:
+            release_network(network, name)
+        except Exception:
+            pass
 
 
 def main():
