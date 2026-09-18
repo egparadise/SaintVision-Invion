@@ -115,7 +115,10 @@ def test_retired_registry_cannot_cross_execution_gate(registered_runtime,stage):
         attempt=DeliveryQueue(a.e.db).acquire(a.e.tenant,command_id=g.command['commandId'])
         assert attempt is not None and attempt.operation!='execute'
     else:
-        with pytest.raises(DomainError):
+        # A retired registry blocks every execution gate via the same code MODEL-0001
+        # (manifest/verified bytes unavailable); confirmed against real PostgreSQL for all
+        # stages. Pin it so a stage that slipped through with a different DomainError fails.
+        with pytest.raises(DomainError, match="MODEL-0001"):
             if stage=='replay':freeze(a)
             elif stage=='approval':request(g)
             elif stage=='dispatch':dispatch(g,row)

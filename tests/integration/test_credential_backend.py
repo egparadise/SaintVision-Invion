@@ -293,7 +293,16 @@ def test_registry_runtime_cannot_provision_and_other_tenant_cannot_read(credenti
                     ).fetchone()["allowed"]
                     is False
                 )
-    with psycopg.connect(h.e.owner) as c, pytest.raises(psycopg.Error):
+    # The only intended failure is the append-only trigger inv.immutable_record()
+    # (0001_core.sql: RAISE 'immutable record' USING ERRCODE '23514' -> CheckViolation).
+    # content_sha256=repeat('0',64) is a valid column value, so nothing else here should
+    # raise; pin the type AND message so a missing UPDATE grant (InsufficientPrivilege,
+    # 42501), a column typo (UndefinedColumn), or a connection error can no longer pass
+    # this as "immutability enforced". Matches the sibling assertion in
+    # test_provisioning_integrity.py.
+    with psycopg.connect(h.e.owner) as c, pytest.raises(
+        psycopg.errors.CheckViolation, match="immutable record"
+    ):
         c.execute(
             "UPDATE inv.credential_versions SET content_sha256=repeat('0',64) WHERE tenant_id=%s",
             (h.e.tenant,),

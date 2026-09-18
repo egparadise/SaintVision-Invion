@@ -57,6 +57,11 @@ def test_revalidation_refuses_stale_authority_or_identity(registered, change):
                               if change == 'pin' else "content_sha256=repeat('0',64)")
                 c.execute('UPDATE public.model_versions SET '+assignment+' WHERE model_version_id=%s',
                           (a.registry_version,))
+    # Per-cause codes confirmed against real PostgreSQL: a revoked grant is refused as
+    # AUTH-0030, a changed binding policy as MODEL-0008, and pin/content/identity drift as
+    # MODEL-0001. Pinning each stops a case being refused for another case's reason.
+    expected = {'permission': 'AUTH-0030', 'policy': 'MODEL-0008',
+                'pin': 'MODEL-0001', 'content': 'MODEL-0001', 'identity': 'MODEL-0001'}
     with a.e.db.transaction(a.e.tenant) as c:
-        with pytest.raises(DomainError):
+        with pytest.raises(DomainError, match=expected[change]):
             recheck(a, c)

@@ -184,7 +184,18 @@ def main():
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except Exception:
+    except AssertionError:
+        # An assertion is how this tool signals a genuine validation failure.
         raise SystemExit(
             "Disposable migration validation failed; credential-bearing diagnostics suppressed"
+        ) from None
+    except Exception as exc:  # noqa: BLE001
+        # NOT a validation failure. An internal defect (e.g. a KeyError from this
+        # tool's own body, or a psycopg ProgrammingError) must not read as
+        # "validation failed" — that disguises a bug as a rejection. Name the
+        # exception *type* only; a class name carries no credential value, while the
+        # message/args/traceback (which can) stay suppressed.
+        raise SystemExit(
+            f"Disposable migration validation errored: {type(exc).__name__}; "
+            "not a validation result; credential-bearing diagnostics suppressed"
         ) from None

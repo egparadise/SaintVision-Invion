@@ -91,7 +91,13 @@ def test_check_is_read_only_and_apply_is_audited_idempotently(env, target):
         assert c.execute(
             "SELECT has_table_privilege('inv_app','inv.account_provisioning_events','INSERT'),has_table_privilege('inv_kernel','inv.account_provisioning_events','UPDATE'),has_function_privilege('inv_app','public.run_committed_outputs(uuid,text)','EXECUTE')"
         ).fetchone() == (False, False, False)
-    with psycopg.connect(env.owner) as c, pytest.raises(psycopg.errors.CheckViolation):
+    # Pin the append-only trigger's message (inv.immutable_record raises 'immutable record'
+    # at ERRCODE 23514). The row's other CHECKs (reason length 1-300, grant_scope IN(...),
+    # created_links jsonb) are also CheckViolations; match= makes this self-enforcing so a
+    # future value that tripped one of those could not pass as immutability enforcement.
+    with psycopg.connect(env.owner) as c, pytest.raises(
+        psycopg.errors.CheckViolation, match="immutable record"
+    ):
         c.execute(
             "UPDATE inv.account_provisioning_events SET reason=%s WHERE tenant_id=%s",
             ("replace history", target["tenant"]),
@@ -169,7 +175,18 @@ def test_invalid_current_preconditions_leave_no_partial_links(env, target, probl
             )
         else:
             target = {**target, "tenant": str(env.other)}
-    with pytest.raises(provisioning.ProvisioningRefused):
+    # Per-cause refusal reasons confirmed against real PostgreSQL; pin each so a
+    # precondition refused for a different precondition's reason breaks the test.
+    expected = {
+        "subject": "OIDC subject required",
+        "project": "Active business project required",
+        "user": "OIDC subject required",
+        "member": "does not permit requesting",
+        "epoch": "Recovery epoch must already be provisioned",
+        "inverse-mapping": "subject mapping conflicts or is disabled",
+        "other-tenant": "Business tenant does not exist",
+    }
+    with pytest.raises(provisioning.ProvisioningRefused, match=expected[problem]):
         apply(env, target)
     assert count(env, target, "business_projects") == 0
     assert count(env, target, "account_provisioning_events") == 0

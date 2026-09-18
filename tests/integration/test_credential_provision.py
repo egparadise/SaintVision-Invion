@@ -189,7 +189,12 @@ def test_invalid_rotation_leaves_old_grant_and_no_new_version(credential_harness
     elif change == "symlink":
         p.unlink()
         p.symlink_to(h.path)
-    with pytest.raises(admin.ProvisioningDenied):
+    # ProvisioningDenied carries one fixed message for every policy rejection, so per-cause
+    # discrimination is impossible here; the real proof that the right thing happened is the
+    # no-state-change pair below (no new version, secret intact). Pin the message so a
+    # DB/internal failure (now ProvisioningDatabaseError / ProvisioningInternalError after
+    # the 25051e3 split) can no longer pass as a policy denial.
+    with pytest.raises(admin.ProvisioningDenied, match="Credential provisioning refused"):
         call(h, m, "rotate")
     assert count(h, "credential_versions", m["version"]) == 0
     assert read(h, h.reference) == h.secret

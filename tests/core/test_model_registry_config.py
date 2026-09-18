@@ -19,16 +19,27 @@ def test_policy_matches_trusted_worker_policy_and_is_order_independent():
     assert policy == RegistryBindingPolicy('operator:1',frozenset({('synthetic','internal'),('second','public')}))
 
 
-@pytest.mark.parametrize('value', [None, False, {}, {**VALID,'extra':True},
-    {**VALID,'version':True}, {**VALID,'version':''}, {**VALID,'version':'v'*129},
-    {**VALID,'allowed':[]}, {**VALID,'allowed':{}}, {**VALID,'allowed':[VALID['allowed'][0]]*65},
-    {**VALID,'allowed':VALID['allowed']*2}, {**VALID,'allowed':[{}]},
-    {**VALID,'allowed':[{'licensePolicy':[], 'classification':'internal'}]},
-    {**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':False}]},
-    {**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':'x'*257}]},
-    {**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':'internal','executionAuthorized':True}]}])
-def test_invalid_policy_rejected(value):
-    with pytest.raises(ValueError):configured_registry_policy(value)
+# Per-case rejection messages confirmed by running configured_registry_policy against each
+# input; pinning them stops a malformed policy being rejected for the wrong reason.
+@pytest.mark.parametrize('value,expected', [
+    (None, 'Explicit registry policy object required'),
+    (False, 'Explicit registry policy object required'),
+    ({}, 'Explicit registry policy object required'),
+    ({**VALID,'extra':True}, 'Explicit registry policy object required'),
+    ({**VALID,'version':True}, 'Explicit bounded registry binding policy required'),
+    ({**VALID,'version':''}, 'Explicit bounded registry binding policy required'),
+    ({**VALID,'version':'v'*129}, 'Explicit bounded registry binding policy required'),
+    ({**VALID,'allowed':[]}, 'Bounded registry policy allowlist required'),
+    ({**VALID,'allowed':{}}, 'Bounded registry policy allowlist required'),
+    ({**VALID,'allowed':[VALID['allowed'][0]]*65}, 'Bounded registry policy allowlist required'),
+    ({**VALID,'allowed':VALID['allowed']*2}, 'Duplicate registry policy pair'),
+    ({**VALID,'allowed':[{}]}, 'Exact license/classification pair required'),
+    ({**VALID,'allowed':[{'licensePolicy':[], 'classification':'internal'}]}, 'Bounded license/classification strings required'),
+    ({**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':False}]}, 'Bounded license/classification strings required'),
+    ({**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':'x'*257}]}, 'Bounded license/classification strings required'),
+    ({**VALID,'allowed':[{'licensePolicy':'synthetic', 'classification':'internal','executionAuthorized':True}]}, 'Exact license/classification pair required')])
+def test_invalid_policy_rejected(value, expected):
+    with pytest.raises(ValueError, match=expected):configured_registry_policy(value)
 
 
 @pytest.fixture

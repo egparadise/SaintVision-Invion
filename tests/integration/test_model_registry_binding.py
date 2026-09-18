@@ -63,7 +63,11 @@ def test_registry_mismatch_or_invalid_lifecycle_is_refused(registered, assignmen
     a = registered
     with psycopg.connect(a.e.owner) as c:
         c.execute('UPDATE public.model_versions SET '+assignment+' WHERE model_version_id=%s', (a.registry_version,))
-    with pytest.raises(DomainError):
+    # All six lifecycle mutations make bind() refuse via the same code MODEL-0001 (the
+    # mutated version's manifest/verified bytes become unavailable); confirmed by running
+    # against real PostgreSQL. Pin it so a mutation that instead produced some other
+    # DomainError can no longer pass as "binding refused".
+    with pytest.raises(DomainError, match="MODEL-0001"):
         bind(a)
 
 

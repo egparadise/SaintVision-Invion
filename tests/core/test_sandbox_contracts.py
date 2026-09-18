@@ -58,8 +58,15 @@ def test_sandbox_contract_rejects_host_access_or_isolation_downgrade(
 ):
     workload, profile = launch
     plan = compile_launch(workload, profile)
+    # Positive control: the unmodified compiled plan must validate, so the single field
+    # change below is demonstrably what flips valid->invalid. Without this, a compile_launch
+    # that ever produced a schema-invalid base plan would make every case pass vacuously.
+    validate_contract("SandboxLaunchSpec", plan)
     plan[field] = value
-    with pytest.raises(DomainError):
+    # The SandboxLaunchSpec schema reports every violation as VAL-0002 (no per-field code
+    # exists at this layer), so pin the code: a downgrade that instead tripped some other
+    # DomainError (a different code) can no longer pass as "schema rejected the downgrade".
+    with pytest.raises(DomainError, match="VAL-0002"):
         validate_contract("SandboxLaunchSpec", plan)
 
 
@@ -92,7 +99,9 @@ def test_profile_limits_block_unapproved_execution(launch, change):
 )
 def test_profile_executable_allowlist_is_canonical(launch, executable):
     _, profile = launch
-    with pytest.raises(ValueError):
+    # Every non-canonical executable is rejected with the same message (confirmed by
+    # running); pin it so a rejection for an unrelated ValueError reason cannot pass.
+    with pytest.raises(ValueError, match="Canonical absolute container executable paths required"):
         replace(profile, executables=frozenset({executable}))
 
 
