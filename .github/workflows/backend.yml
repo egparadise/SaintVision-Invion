@@ -106,6 +106,7 @@ jobs:
           fi
 
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
+      # pyproject defaults deselect docker_host mutations; Core Build runs that lane explicitly.
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass

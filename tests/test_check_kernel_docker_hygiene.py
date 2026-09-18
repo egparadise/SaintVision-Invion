@@ -92,6 +92,7 @@ def _running(name):
                           capture_output=True, text=True, timeout=30).stdout.strip()
 
 
+@pytest.mark.docker_host
 @pytest.mark.skipif(not _HAS_DOCKER, reason="docker CLI is required")
 def test_prune_removes_old_exited_residue_but_spares_a_recent_one():
     """Age gate (VF-CL-R2-01): a just-exited container may belong to a concurrent
@@ -114,6 +115,7 @@ def test_prune_removes_old_exited_residue_but_spares_a_recent_one():
         subprocess.run(["docker", "rm", "-f", recent], capture_output=True, timeout=60)
 
 
+@pytest.mark.docker_host
 @pytest.mark.skipif(not _HAS_DOCKER, reason="docker CLI is required")
 def test_prune_never_force_removes_a_running_concurrent_container():
     """VF-CL-R2-01: a concurrent run's *running* kernel-test container must survive

@@ -91,6 +91,10 @@ jobs:
         run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
+      - name: Docker host hygiene (explicit lane)
+        # These prune real host residue. Keep them off the default/backend path.
+        # This job already owns a disposable runner with a working Docker daemon.
+        run: python -m pytest tests/test_check_kernel_docker_hygiene.py -m docker_host --strict-markers --junitxml=dist/docker-host-tests.xml
       - name: Require executed integration evidence
         run: |
           python - <<'PY'
@@ -98,6 +102,9 @@ jobs:
           root = ET.parse('dist/core-tests.xml').getroot()
           assert root.findall('.//testcase'), 'No test evidence'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every collected test must run and pass'
+          host = ET.parse('dist/docker-host-tests.xml').getroot()
+          assert len(host.findall('.//testcase')) == 2, 'Both Docker host hygiene cases must execute'
+          assert not any(host.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Docker host lane must run and pass'
           PY
       - run: python -m build services/control-plane --outdir dist
       - run: go test ./...

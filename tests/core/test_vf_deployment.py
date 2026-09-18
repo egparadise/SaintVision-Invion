@@ -3,8 +3,16 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
+import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(autouse=True)
+def require_docker_cli():
+    if not shutil.which("docker"):
+        pytest.skip("Docker CLI is required for Compose configuration validation")
 
 
 def compose_env():

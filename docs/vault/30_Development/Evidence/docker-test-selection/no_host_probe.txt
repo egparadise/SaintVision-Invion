@@ -1,0 +1,15 @@
+import subprocess
+import shutil
+import pytest
+_original = subprocess.run
+_original_which = shutil.which
+
+def guarded(argv, *args, **kwargs):
+    from pathlib import Path
+    if isinstance(argv, (list, tuple)) and Path(str(argv[0])).stem.lower() == "docker":
+        if len(argv) < 3 or argv[1] != "compose" or not any(word in argv for word in ("config", "version")):
+            raise AssertionError("Unexpected Docker host operation in default selection")
+    return _original(argv, *args, **kwargs)
+
+def pytest_configure(config):
+    subprocess.run = guarded
