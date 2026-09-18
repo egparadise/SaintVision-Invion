@@ -578,3 +578,9 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 `CREDENTIAL-MIGRATION-ERROR-BOUNDARY-20260919-CODEX`에서 Claude 인계 finding을 구현했다. `provision_credentials.py`는 denial·DB 오류·내부 오류를 각각 분류하고 값 없이 sqlstate/type만 보고하며, `plan_lan_migration.py`도 metadata refusal·DB 오류·내부 오류를 구분한다. 호출자는 credential integration/CLI와 `rehearse_lan_upgrade.gap_plan`/core 시험으로 확인했다. `.venv\Scripts\python.exe -m pytest -q tests/core/test_credential_provision_cli.py tests/core/test_lan_migration_plan.py`는 16 passed/1 skipped(DSN 부재)다. 원복 대조에서 신규 4개 주입시험이 모두 실패했다. 실제 PostgreSQL 실행은 미수행.
 
 종료 코드 정정(2026-09-19): 독립 검증에서 denial/DB가 둘 다 2이고 internal label이 TypeError=3/RuntimeError=2로 갈린 것을 확인해 공통 계약을 고정했다. 두 CLI는 `0=성공`, `1=정상 pending 업무 결과`, `2=의도된 거부`, `3=DB/driver`, `4=내부 결함`을 사용한다. 같은 JSON 라벨은 같은 코드를 내며 TypeError/RuntimeError는 모두 4다. `.venv\Scripts\python.exe` 기준 22 passed/1 skipped, 원복 대조 신규 종료 코드 6건 실패.
+
+## 2026-09-19 credential catch-all 재수정·일회용 PostgreSQL 재검증
+
+`provision_credentials.py`의 실제 `provision()` 내부 catch-all이 여전히 모든 DB/TypeError/RuntimeError를 `ProvisioningDenied`로 뭉개고 있음을 독립 실측으로 확인해 `25051e3`에서 수정했다. `ProvisioningDenied` 전파, `psycopg.Error`→검증된 sqlstate `ProvisioningDatabaseError`, 기타 예외→타입명만 담은 `ProvisioningInternalError`로 구분하며 context-manager rollback과 비밀 비노출을 유지한다. 플랫폼 비의존 합성 주입 회귀를 추가했다. `.venv\Scripts\python.exe -m pytest -q tests/core/test_credential_provision_cli.py tests/core/test_lan_migration_plan.py`는 24 passed/1 skipped.
+
+라벨 고정 disposable PostgreSQL 16(`codex-dbtest-20260919-11f6a3b458dc`, port 61902)로 integration 파일을 분할 실행했다. 실제 집계는 432 passed/386 skipped/0 failed이며, 별도 DSN 대상 비-integration은 97 passed/0 failed. skip은 Linux credentials, Linux Docker/Workspace, browser/이미지 opt-in 등 명시된 환경 조건이다. recovery drill은 소유 라벨 조건을 맞춘 뒤 11 passed/7 failed; 5건은 Windows/Linux·Docker network 선행조건, 1건은 definer count 9→10 기대치 drift 후보, 1건은 저장 경로 조건으로 운영 결함 확정하지 않았다. 초기 잘못된 비밀번호 배치는 집계에서 제외했다. 다음은 소유 컨테이너 정리·제거 확인이다.
