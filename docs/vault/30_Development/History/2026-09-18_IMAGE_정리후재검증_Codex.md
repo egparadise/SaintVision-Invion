@@ -33,3 +33,5 @@ source_of_truth: "Git"
 
 - Claude VF-CL-R-001: 위 startup-inspect90초/daemon I/O/initializer HTTP500/원래 예외를 가리는 cleanup 오류를 입력으로 진단·정리 개선을 진행한다. Codex가 시험 구현을 중복 수정하지 않았다.
 - 다음 Codex: Claude 변경 수신 후 동일 digest 재검증. CI billing 사용자 대기, 실제 운영mTLS/5대인수 미완. 단순 반복 실행으로 실패를 숨기지 않는다.
+
+- 착지: d0919db를 integration 및 agent/codex/image-post-cleanup에 push exit0. 선택 Obsidian11파일 갱신/충돌0/사후pending0·전체해시일치, sync.json. 문서508·ontology exit0. CI billing 대기는 유지한다.
