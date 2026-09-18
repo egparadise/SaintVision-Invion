@@ -65,3 +65,5 @@ Claude 문서 정정과 PITR cleanup은 착지했다. 남은 운영 항목은 AC
 Claude `350f5d7`의 데이터 충분성 분석과 Gemini `777f309`의 `ResultView` 경로를 대조했다. 신규 `/v1/.../evidence` 백엔드 엔드포인트는 추가하지 않는다. 기존 `/v1/projects/{project}/runs/{run}/result`가 실제 `evidence` 객체(`evidenceId`, timestamp, actor/action, policyDecisionId, input/output SHA, result)와 `stopReceipt`, state, output을 반환하고, `EvidenceViewer`가 이 응답을 사용하므로 핵심 evidence 패키지는 기존 계약으로 충분하다.
 
 다만 `EvidenceViewer`의 fetch 실패 catch가 합성 `specDigest`, `toolCalls`, `integrityVerification: PASS`를 표시하는 것은 별도 진실성 잔여다. per-tool `toolCalls`와 wall time은 현재 백엔드 응답에 없으므로, 백엔드 계약을 늘리거나 프론트가 해당 가짜 패널을 제거해야 한다. retention/tamper는 정적 정책 라벨로 표시하되 per-run 검증 결과처럼 표현하지 않는다. 이 결론은 소스 계약 대조이며 live HTTP 운영 인수는 아니다.
+
+Gemini `341c035`를 재검토했다. `sha256:verified`와 합성 toolCalls/wall time을 제거했고, fetch 실패는 오류 상태로 표면화한다. 무결성 상태는 `output.verified === true`일 때만 PASS, 명시적 false/실패 상태일 때 FAIL, 그 외에는 UNVERIFIED다. 정책 라벨은 동적 결과와 분리됐다. 사용자 독립 Vitest 31파일 307 passed 및 route test 27 passed와 별도로, Codex는 현재 tip에서 `apps/web/tests/evidence-viewer.test.ts` **5 passed**와 `tests/test_route_coverage.py` **26 passed**를 확인했다. 이로써 오늘 열린 evidence 잔여 세 건은 수정·검증 완료로 닫는다. 전체 Vitest 수와 Codex 수를 합산하지 않는다.
