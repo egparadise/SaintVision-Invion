@@ -1,11 +1,11 @@
 ---
 doc_id: "PROPOSAL-CLAUDE-PITR-001"
 title: "운영 compose PITR 변경안·격리 검증·영향 (AC-12 RPO 준비)"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-19T13:00:00+09:00"
+updated: "2026-09-19T15:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal"]
 ---
@@ -74,7 +74,7 @@ tags: ["saintvision", "pitr", "rpo", "ac-12", "operational-readiness", "proposal
 ## 영향 정리 (사용자 판단 근거)
 
 - **`archive_timeout`은 RPO 상한이 아니다 (PITR-R1-04)**: `archive_timeout`은 **세그먼트가 얼마나 자주 잘려 아카이브 대상이 되는지(cut 주기)**만 bound한다 — **RPO 상한을 보장하지 않는다.** 실제 RPO는 잘린 세그먼트가 **내구 저장소로 실제 전달**되기까지의 지연·실패에 좌우되고(archive_command가 늦거나 실패하면 미전달 WAL이 쌓임), 세그먼트 전환에도 활동 조건이 있다(PG16 문서). 따라서 "archive_timeout=300이면 RPO 900s 여유" 식 표현은 쓰지 않는다. RPO는 §수용 경로의 **측정 복구 drill + 아카이브 지연/실패 모니터링**으로만 확립된다.
-- **WAL 보관 용량(저장 용량 관점)**: `archive_timeout=300`은 idle에도 300초마다 16MB 세그먼트를 잘라 아카이브 → **최소 ~192MB/시간, ~4.6GB/일(idle floor)**, 부하 시 더 큼(이는 저장 용량 산정치이지 RPO 지표가 아니다). `archive_timeout=600`은 idle 저장 오버헤드를 절반으로 줄인다(용량 트레이드오프일 뿐). `wal_keep_size=1024`(1GB)는 pg_wal 버퍼로 짧은 아카이브 지연이 미아카이브 세그먼트를 즉시 재활용하지 않게 한다.
+- **WAL 보관 용량(저장 용량 관점, PITR-R1-04 정정)**: `archive_timeout`은 **직전 switch 이후 WAL 활동이 있을 때만** 세그먼트를 강제 전환한다 — **완전 idle 서버는 강제 세그먼트를 만들지 않으므로 "idle floor" 같은 고정 하한은 없다**(앞선 "idle에도 4.6GB/일" 서술은 부정확했다). 다만 강제로 닫힌 세그먼트도 완전한 16MB이므로, **드문드문이라도 쓰기가 있는 서버**에서는 짧은 archive_timeout이 부분만 찬 16MB 세그먼트를 자주 만들어 저장을 부풀린다(PG16 문서 경고). 실제 아카이브 용량 driver는 **쓰기 볼륨 + 보관 정책**(base backup 주기 × WAL 생성률 × 보관 세대 수)이지 archive_timeout이 아니다. `wal_keep_size`는 **아카이빙 안전에 필요하지 않다** — PostgreSQL은 기본적으로 미아카이브 WAL 세그먼트를 아카이브 전까지 재활용하지 않기 때문이다. 이 값은 복제 지연 완충(선택)일 뿐이므로, 아카이빙 근거로 두지 않는다.
 - **아카이브 대상 저장소 요구**: 아카이브는 연속 증가하므로 **보관/정리 정책 필수** — 유지하는 가장 오래된 base backup보다 오래된 WAL은 삭제(pgbackrest는 자동, 로컬 cp는 수동 cron 필요). 용량 = (base backup 주기 동안의 WAL 생성량) × (보관하는 backup 세대 수) + 여유. Tier A 로컬은 같은 호스트라 호스트 손실 시 data+archive 동시 손실(DR 아님). **기존 same-host minio도 같은 장애 도메인이라 DR이 아니다(PITR-R1-02)** — RPO를 호스트 손실까지 보장하려면 **DB 호스트와 물리적으로 분리된 저장소**(§Tier B의 별도 장애 도메인)와 그 동시 생존 증거가 필요하다.
 - **data_checksums**: initdb 시점만 설정 가능. **신규 클러스터**는 override의 `POSTGRES_INITDB_ARGS=--data-checksums`로 켜짐(빈 postgres_data일 때만). **기존 클러스터**는 offline `pg_checksums --enable`(정지→실행→재시작, 다운타임)이 필요. RPO 항목은 아니나, 복구 drill의 원본이 조용히 손상돼 양쪽에서 같게 읽히는 것(CL-07에서 지적)을 막아 drill 증거의 신뢰를 높인다.
 - **재시작 다운타임**: `archive_mode` 변경은 postgres 재시작(짧은 downtime) 동반.

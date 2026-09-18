@@ -46,8 +46,9 @@ services:
       - -c
       - wal_level=replica
       - -c
-      # Retain a WAL buffer beyond what archiving needs, so a brief archive stall does
-      # not immediately recycle un-archived segments.
+      # Optional replication-lag buffer only. It is NOT needed for archiving safety
+      # (PITR-R1-04): PostgreSQL already does not recycle an un-archived WAL segment
+      # until it has been archived, so archiving does not depend on wal_keep_size.
       - wal_keep_size=1024
       - -c
       - full_page_writes=on
