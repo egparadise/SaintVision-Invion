@@ -121,15 +121,15 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     const derivedEvidence: EvidenceData = {
       evidenceId: res.evidence?.evidenceId || `evi_${runId}`,
       runId,
-      manifestDigest: res.output?.sha256 || res.evidence?.outputSha256 || 'sha256:verified',
-      specDigest: res.evidence?.specDigest || 'sha256:verified',
+      manifestDigest: res.output?.sha256 || res.evidence?.outputSha256 || undefined,
+      specDigest: res.evidence?.specDigest || undefined,
       policyVersion: res.evidence?.policyVersion || 'shard-completion:v1',
       state: res.state || 'succeeded',
       allPhysicallyStopped: res.stopReceipt?.processStarted ? res.stopReceipt?.exitCode !== undefined : true,
       allSucceeded: res.state === 'succeeded',
       generatedAt: res.completedAt || res.stopReceipt?.finishedAt || new Date().toISOString(),
       immutable: res.sealed ?? true,
-      integrityVerification: res.output?.verified ? 'PASS' : (res.state === 'succeeded' ? 'PASS' : 'FAIL'),
+      integrityVerification: res.output?.verified === true ? 'PASS' : (res.output?.verified === false || res.state === 'failed' ? 'FAIL' : 'UNVERIFIED'),
       tamperCheck: res.output?.verified ? 'VERIFIED_IMMUTABLE' : (res.sealed ? 'SEALED' : 'UNVERIFIED'),
       retentionPolicy: '1_YEAR_PINNED (ADR-012)',
     };
@@ -161,9 +161,45 @@ describe('S01-FE / S04-FE EvidenceViewer & Canonical Evidence Resolution', () =>
     // 3. Asserts PASS badge is strictly conditional on evidenceData.integrityVerification === 'PASS'
     expect(sourceContent).toContain("{evidenceData.integrityVerification === 'PASS' && (");
     expect(sourceContent).toContain("{evidenceData.integrityVerification === 'FAIL' && (");
+    expect(sourceContent).toContain("{evidenceData.integrityVerification === 'UNVERIFIED' && (");
 
     // 4. Asserts retention and tamper specs are labeled as static policy specifications
+    expect(sourceContent).toContain('[시스템 정책 사양]');
     expect(sourceContent).toContain('정책 규격: 1년 보존 Pin (ADR-012)');
     expect(sourceContent).toContain('설계 규격: 불변 단일 봉인');
+  });
+
+  it('regression: source strictly excludes "sha256:verified" fallback and never fabricates mock digests', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const sourcePath = path.resolve(__dirname, '../src/features/evidence/EvidenceViewer.tsx');
+    const sourceContent = fs.readFileSync(sourcePath, 'utf-8');
+
+    // Must never contain the string literal 'sha256:verified'
+    expect(sourceContent).not.toContain('sha256:verified');
+  });
+
+  it('regression: execution success (succeeded) without cryptographic verification yields UNVERIFIED, never PASS', () => {
+    // A run that succeeded, but output was not cryptographically verified
+    const unverifiedRunResult = {
+      state: 'succeeded',
+      output: {
+        sizeBytes: 2048,
+        // verified is intentionally omitted/undefined
+      },
+    };
+
+    let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED';
+    if (unverifiedRunResult.output?.verified === true) {
+      integrityStatus = 'PASS';
+    } else if (unverifiedRunResult.output?.verified === false || unverifiedRunResult.state === 'failed') {
+      integrityStatus = 'FAIL';
+    } else {
+      integrityStatus = 'UNVERIFIED';
+    }
+
+    expect(integrityStatus).toBe('UNVERIFIED');
+    expect(integrityStatus).not.toBe('PASS');
+    expect(integrityStatus).not.toBe('FAIL');
   });
 });

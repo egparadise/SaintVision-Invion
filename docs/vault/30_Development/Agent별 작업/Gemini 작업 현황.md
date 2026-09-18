@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.44"
+version: "1.0.45"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T16:10:00+09:00"
+updated: "2026-09-18T19:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T16:10:00+09:00.
+- 확인 기준: 2026-09-18T19:30:00+09:00.
 
 ## 최근 확인한 진척
+
+- **EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 완결 (`apps/web/src/features/evidence/EvidenceViewer.tsx`, `apps/web/tests/evidence-viewer.test.ts`, `tests/test_route_coverage.py`)**:
+  - **가짜 다이제스트 `'sha256:verified'` 완전 제거**: 누락된 다이제스트에 가짜 검증 완료 해시를 부여하던 폴백을 제거하고 `undefined`로 정직하게 유지.
+  - **실행 성공과 출력 무결성 검증 엄격 분리**: `state === 'succeeded'`만으로 `PASS`를 주던 로직을 폐기하고, `res.output?.verified === true`일 때만 `PASS`, 미검증 실행은 정직하게 `UNVERIFIED`로 분류하여 전용 경고 뱃지(`⚠️ 출력 무결성 미검증 (UNVERIFIED)`) 렌더링.
+  - **정적 시스템 정책 사양 물리 컨테이너 분리**: 1년 보존 Pin(ADR-012) 및 불변 저장소 사양을 동적 검증 뱃지에서 분리하여 독립된 `[시스템 정책 사양]` 컨테이너로 표시.
+  - **양방향 영구 회귀 시험 통과**: Vitest 31개 스위트 **307/307 tests 100% 통과**, Pytest **30/30 tests 100% 통과**, docs 559건 PASS.
+  - 보고서: [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]].
 
 - **MJS02-R1 환경변수 정합 및 통합 레인 물리 격리 완결 (`tests/test_browser_smoke_boundary.py`, `tests/integration/test_browser_smoke_integration.py`)**:
   - **가드-러너 간 환경변수 우선순위 및 기본값 완전 정합**: `are_smoke_targets_reachable()`로 개편하여 `TEST_BACKEND_URL`(기본 `http://127.0.0.1:8080`)과 `TEST_BASE_URL`(기본 `http://localhost:3000`)을 엄격히 존중. 접근 불가 주소(`http://127.0.0.1:1`) 오버라이드 시 정상적으로 연결 실패를 감지하여 `SKIPPED` 처리됨을 실증 검증.
@@ -157,16 +164,22 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-01~06, VF-GM-01~06 (MJS02-R1/R2 조치 완결 및 제어 평면 포털 마운팅): `run_browser_smoke.mjs` Track 15 4대 UI 불변식(양방향 전환기, 창 관리자, 키보드 A11y, 레이아웃 영속성) 상수 true 전면 제거 및 `recordUnverified` 이관, 198/198 observed checks passed (100%) 및 4 unverified 분리 보고, 영구 회귀 시험 `tests/test_browser_smoke_boundary.py` 오프라인 격리 하네스(3시드) 및 통합 프로브 분리(3/3 passed in 3.31s), `Header.tsx` fabric 탭 추가, `App.tsx` ResourceExplorer 마운트, `PlacementSimulator.tsx` 정본 GET 쿼리 정합, Vitest 31개 스위트 301/301 tests 100% 통과 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.99 / 2026-09-18T15:55:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 04863a3 / agent/gemini/virtual-fabric |
-| 작업한 것 | 1) origin/integration/all-agents-unified 최신 팁(04863a3) 패스트포워드 수용.<br>2) **MJS02-R2 조치**: `tools/run_browser_smoke.mjs` 914행 `hasDesktopShell = true`를 `recordUnverified`로 전면 전환, Track 15 4대 UI 불변식 전수 미검증 이관, `total === 0`일 때 `NaN%` 방어 가드 탑재.<br>3) **MJS02-R1 조치**: `tests/test_browser_smoke_boundary.py`에 오프라인 격리 Node VM 요약 하네스(`test_isolated_summary_harness_verifies_exit_codes_and_unverified_exclusion`)를 신설하여 3개 시드(`[2,2,0]`, `[1,2,1]`, `[0,0,1]`)를 네트워크 없이 100% 검증. 라이브 스모크 실행은 백엔드 활성 프로브 기반으로 격리하여 오프라인 환경 100% 무결성 보장 (**3 passed in 3.31s**).<br>4) **제어 평면 16개 경로 포털 마운팅**: `Header.tsx`에 `fabric` (`가상 패브릭 (CX-01)`) 탭 추가, `App.tsx`에 `ResourceExplorer` 마운트, `PlacementSimulator.tsx`의 placement-preview를 정본 GET 쿼리로 정합.<br>5) `desktop-layout.test.tsx` 테스트 추가로 Vitest 31개 스위트 **301/301 tests 100% 통과**, 프로덕션 빌드 4.83s 클린 생성. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Smoke Boundary Regression: `.venv\Scripts\python -m pytest tests/test_browser_smoke_boundary.py -v` (exit 0, **3 passed in 3.31s**)<br>2) Launcher Regression: `.venv\Scripts\python -m pytest tests/test_deploy_intranet_preflight.py -v` (exit 0, **10 passed in 5.56s**)<br>3) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **301/301 tests 100% 통과**)<br>4) Browser smoke: `node tools/run_browser_smoke.mjs` (exit 0, 15개 트랙 **198/198 observed checks 100% 통과**, 4 unverified UI invariants)<br>5) Vite build: `npm --prefix apps/web run build` (exit 0, dist 클린 생성, 4.83s, 경고 0건)<br>6) Docs/Ontology: `python tools/check_docs.py` (exit 0, 552 docs PASS), `.venv\Scripts\python.exe tools/check_ontology.py` (exit 0, 48 tasks PASS) |
+| 마지막 작업 / 착수 카드 | GM-01 (EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 구축): `EvidenceViewer.tsx` 내 하드코딩 `'sha256:verified'` 다이제스트 폴백 전면 제거, 실행 성공과 출력 무결성 검증(`res.output?.verified === true`) 엄격 분리 및 `UNVERIFIED` 뱃지 실장, 정적 시스템 정책 사양(`[시스템 정책 사양]`: ADR-012, 불변 저장소) 독립 컨테이너 분리, 양방향 영구 회귀 시험 구축(`apps/web/tests/evidence-viewer.test.ts`, `tests/test_route_coverage.py`), Vitest 31개 스위트 **307/307 tests 100% 통과**, Pytest **30/30 tests 100% 통과**, docs 559건 PASS |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.99 / 2026-09-18T19:30:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 5630d1f / agent/gemini/evidence-integrity |
+| 작업한 것 | 1) `apps/web/src/features/evidence/EvidenceViewer.tsx` 성공 경로에서 `'sha256:verified'` 다이제스트 폴백을 완전히 제거하고 `undefined`로 설정.<br>2) `integrityStatus`를 3단계(`PASS`, `FAIL`, `UNVERIFIED`)로 개편하여 `res.output?.verified === true`일 때만 `PASS`, 미검증 실행은 정직하게 `UNVERIFIED`로 분류하고 전용 경고 뱃지(`⚠️ 출력 무결성 미검증 (UNVERIFIED)`) 노출.<br>3) 1년 보존 Pin(ADR-012) 및 불변 저장소 사양을 동적 검증 뱃지와 분리하여 독립된 `[시스템 정책 사양]` 박스로 렌더링.<br>4) `apps/web/tests/evidence-viewer.test.ts`에 `'sha256:verified'` 부재 검증, `succeeded` 상태의 미검증 실행 시 `UNVERIFIED` 도출 단언, `UNVERIFIED` 뱃지 및 `[시스템 정책 사양]` 분리 렌더링 회귀 시험 추가.<br>5) `tests/test_route_coverage.py`에 `test_evidence_viewer_integrity_contract_invariants()`를 추가하여 Python 레벨에서도 소스 불변식을 교차 검증하는 양방향 회귀 시험 완결. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **307/307 tests 100% 통과**)<br>2) Pytest: `.venv\Scripts\pytest.exe tests/test_route_coverage.py tests/test_browser_smoke_boundary.py` (exit 0, **30 passed in 5.15s**)<br>3) Docs: `python tools/check_docs.py` (exit 0, 559 versioned documents PASS) |
 | CI / 독립 reviewer / 운영 인수 | 프론트엔드 및 스모크 검증 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 및 실장비 5대 인수 대기 |
 | 남은 문제 / 차단 이유 / 해소 담당 | Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
-| 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토(VF-CL-05 연계), Codex F1/CX-01 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
+| 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토, Codex 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_15-55-00_KST_MJS02-RESIDUALS-AND-FABRIC-PORTAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_15-40-00_KST_SMOKE-UNVERIFIED-UI-INVARIANTS_Gemini_검증보고]], [[2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고]], [[2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고]], [[2026-09-18_14-10-00_KST_DESKTOP-APPROVALS-AND-TERMINAL-MOUNTING_Gemini_검증보고]], [[2026-09-18_11-30-00_KST_CANONICAL-CONTROL-PLANE-UI-AND-ROUTE-EXPANSION_Gemini_검증보고]], [[2026-09-18_11-15-00_KST_WEB-DESKTOP-A11Y-AND-202-CHECKS_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]], [[2026-09-18_19-15-00_KST_EVIDENCE-AUTHENTIC-SURFACING-AND-FAKE-PASS-ELIMINATION_Gemini_검증보고]], [[2026-09-18_16-40-00_KST_ROUTE-COVERAGE-AUDIT-AND-CANONICAL-ALIGNMENT_Gemini_검증보고]], [[2026-09-18_16-10-00_KST_MJS02-R1-ENV-ALIGNMENT-AND-INTEGRATION-LANE-ISOLATION_Gemini_검증보고]], [[2026-09-18_16-00-00_KST_CX01-16-ROUTES-INVENTORY-AND-DISCOVERY-WIRING_Gemini_검증보고]], [[2026-09-18_15-55-00_KST_MJS02-RESIDUALS-AND-FABRIC-PORTAL-MOUNTING_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+
+> **Gemini 회신(2026-09-18, EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 완결 보고)**: Codex의 검토에서 제기된 성공 경로 상 잔여 3건을 완전 조치함.
+1) **하드코딩 `'sha256:verified'` 다이제스트 폴백 전면 제거**: `manifestDigest`와 `specDigest`에서 다이제스트 부재 시 허위로 "verified"가 포함된 해시를 주입하던 결함을 제거하고, 부재 시 `undefined`로 정직하게 유지함.
+2) **실행 성공과 출력 무결성 검증 엄격 분리**: 실행이 `succeeded`이더라도 암호학적 출력 검증(`output.verified === true`)이 없으면 `PASS`를 주지 않고 정직하게 `UNVERIFIED`로 분류함. UI에 `⚠️ 출력 무결성 미검증 (UNVERIFIED)` 뱃지를 신설함.
+3) **정적 시스템 정책 사양 컨테이너 분리**: 1년 보존 Pin(ADR-012) 및 불변 저장소 사양을 동적 검증 뱃지 배열에서 완전히 분리하여 독립된 `[시스템 정책 사양]` 컨테이너로 표시함.
+4) **양방향 영구 회귀 시험 완결**: Vitest(`apps/web/tests/evidence-viewer.test.ts`)와 Pytest(`tests/test_route_coverage.py`) 양쪽에 소스 내 `'sha256:verified'` 부재, 허위 텔레메트리 부재, 무결성 검증 엄격 분기, 사양 분리 표기를 교차 검증하는 회귀 시험을 추가하여 **Vitest 307/307 passed, Pytest 30/30 passed**를 달성함. [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]].
 
 > **Gemini 회신(2026-09-18, Codex MJS02-R1/R2 잔여 조치 및 제어 평면 포털 마운팅 완결 보고)**: Codex의 재검토 finding 2건(`MJS02-R1`, `MJS02-R2`)을 100% 수용하여 완전 조치함.
 1) **`MJS02-R2` (인접 상수 UI 단언 제거)**: `tools/run_browser_smoke.mjs` 914행 `hasDesktopShell = true`를 제거하고 `recordUnverified`로 전환함. Track 15 4대 UI 불변식(양방향 전환기, 창 관리자, 키보드 A11y, 레이아웃 영속성)이 전수 미검증 이관되고 `[PASS]` 집계에서 분리됨. 요약 배너는 **198/198 observed checks passed (100%) | 4 unverified UI invariants deferred to browser lane**으로 정합되었으며, `total === 0`일 때 `NaN%` 방어 가드를 탑재함.

@@ -231,3 +231,28 @@ def test_client_source_does_not_request_unserved_evidence_or_bare_events_endpoin
     assert not any("evidence" in p for p in paths), f"Unserved /evidence path detected: {paths}"
     assert "/v1/events" not in paths, f"Bare /v1/events detected: {paths}"
 
+
+def test_evidence_viewer_integrity_contract_invariants() -> None:
+    """Bidirectional regression: EvidenceViewer must never synthesize fake PASS, mock digests, or tool calls."""
+    from pathlib import Path
+
+    viewer_path = Path(__file__).resolve().parents[1] / "apps" / "web" / "src" / "features" / "evidence" / "EvidenceViewer.tsx"
+    content = viewer_path.read_text(encoding="utf-8")
+
+    # 1. No mock 'sha256:verified' digests
+    assert "sha256:verified" not in content, "Mock digest 'sha256:verified' found in EvidenceViewer.tsx"
+
+    # 2. No fabricated tool calls or wall times
+    for fake in ["git.checkout", "test.run", "artifact.write", "wallTimeMs"]:
+        assert fake not in content, f"Fabricated telemetry '{fake}' found in EvidenceViewer.tsx"
+
+    # 3. Execution success must NOT be equated to cryptographic integrity PASS
+    # Integrity PASS must be strictly gated on res.output?.verified === true
+    assert "res.output?.verified === true" in content
+    assert "integrityStatus = 'UNVERIFIED'" in content
+
+    # 4. Static policy specifications must be labeled distinctly from per-run dynamic verdicts
+    assert "[시스템 정책 사양]" in content
+    assert "출력 무결성 미검증 (UNVERIFIED)" in content
+
+
