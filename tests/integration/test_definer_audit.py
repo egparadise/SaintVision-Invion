@@ -42,7 +42,7 @@ def mutated(postgres, change, undo):
 
 def test_current_catalogue_matches_complete_policy(postgres):
     findings = audit_tool.audit(postgres.owner)
-    assert len(findings) == 9
+    assert len(findings) == len(audit_tool._policy()["functions"])
     assert not problems(postgres.owner)
     assert sum(f["policyKind"] == "retired" for f in findings) == 2
     result = subprocess.run(
@@ -156,7 +156,7 @@ def test_setting_text_or_unused_lookup_does_not_prove_binding(postgres, body):
         ),
         (
             "UPDATE public.alembic_version SET version_num='unknown'",
-            "UPDATE public.alembic_version SET version_num='0043_replica_retention'",
+            "UPDATE public.alembic_version SET version_num='" + audit_tool._policy()["revision"] + "'",
             "migration_revision_mismatch",
         ),
     ],

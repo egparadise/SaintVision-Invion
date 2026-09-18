@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -20,7 +20,7 @@ source_of_truth: "Git"
 | public.models/model_versions/lineage | S10 모델 등록·업무 버전·평가/승인 추적 | 커널 manifest 존재, 현재 bytes 일치, 실행 permit |
 | inv.model_manifests/model_shard_locations | tenant/project/model/version별 불변 실행 manifest, source Run 및 DataLocation 버전 참조, 커밋 당시 full-byte 검증 | S10 released 상태, 현재 복제본 가용성, 새 실행 권한 |
 
-inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 커밋 요약 GET은 아래1.1.0에 정의한다. ModelVersion 결속은 아직 미구현이다.
+inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 커밋 요약 GET은 아래1.1.0에 정의한다. ModelVersion의 명시적 불변 결속은 아래1.4.0 내부 worker service로 제공한다. HTTP·runtime permit 연결은 아직 없다.
 
 ## 정책 필드와 후속 결속 합격 조건
 
@@ -71,3 +71,25 @@ record_deployment는신뢰된내부호출자가제공한timezone-aware now의배
 ## Claude option A 수신 판정 (1.3.0)
 
 1834ee3의 model_id/version/URI 안정성 시험과 정책선언 소유자를 kernel로 유지하는 방향을 수신했다. 이는 registry→kernel의 권한있는 명시적 결속을 구현하거나 증명한 것이 아니다. 동일 model/version은 프로젝트·tenant·manifestHash·registryVersionId·내용 식별을 생략하는 join key로 사용하지 않는다. public registry와 kernel은 기존 현재권한 API 경계를 유지한다. 자동read-through/배포인가를 추가하지 않았고 UI는 정확한 project/model/version의 과거관측만 제공한다. ModelManifestStore 내부 직접접근을 사용자권한검증의대체로사용하지않는다.
+
+
+## 명시적 registry 결속 (1.4.0, VF-CX-02)
+
+`ModelRegistryBindingStore.bind(principal, project, registry_version_id, model_id, version, manifest_hash=...)`는 명시적 identity의 불변 기록이다. 사용자 입력에서 policy를 받는 HTTP경로는 없고 운영자설정 `RegistryBindingPolicy`가 필수다.
+
+- tenant/project는 현재 kernel can_request와 linked business 사용자/프로젝트 권한을 모두 확인한다. 재호출도 권한을 다시 확인한다.
+- kernel manifest의 Schema·자체model/version·canonical SHA256과 호출자의 정확한hash를 대조한다. registry는 이름/version으로 자동검색하지 않고 정확한model_version_id로 선택한다. 두 체계의 model/version 문자열이 달라도 같은project·contentHash·totalBytes가 명시적으로 확인되면 결속할 수 있다.
+- registry는 released, verified_at <= DB현재시각, retention_pinned_until > DB현재시각을 요구한다. licensePolicy/classification은 운영자허용 pair와 비교하고 policy version/내용hash도 불변 기록한다. 이 pair 허용은 법적라이선스검토/현재실행승인의 대체가 아니다.
+- `public.model_registry_snapshot`은 명시tenant와 현재 inv.tenant_id가 일치할 때만 같은tenant/project/정확한version의 최소필드를 반환한다. public.models/model_versions의 SHARE잠금을 트랜잭션종료까지 유지해 stage/프로젝트/내용의 동시변경을 막는다. kernel에는 함수EXECUTE만 추가하고 public registry 전체SELECT/UPDATE는 추가하지 않는다. PUBLIC/inv_app EXECUTE 없음, 고정pg_catalog search_path.
+- 0044의 inv.model_registry_bindings는 tenant RLS·FK·UPDATE/DELETE불가, tenant/project/registryVersionId당1개의 불변결속이다. 동시동일호출은 같은결과로 수렴하고 다른manifest 또는 policy로 재결속하면409 MODEL-0008. 정책전환/재결속은 별도새계약 없이 자동덮어쓰지 않는다.
+- 응답 executionAuthorized=false/requiresExecutionRevalidation=true. 기존 manifest 관측조회와도 별도다. DB에 기록이 있다는 것만으로 retired/권한철회/정책변경을 무시할 수 없다.
+
+### VF-CX-03 후속 입력 경계
+
+현재 LocalModelObservation/ModelRuntimeStore/WorkloadSpec에는 registryBinding을 전달하지 않는다. 이 작업은 **실행권한을 구성할 identity 기반**을 구현한 것이며 end-to-end registry 실행인가 완료가 아니다. 후속에서는 binding을 정확한Run/예약/frozen manifest에 결속하고 승인대상 digest에 포함한 뒤, dispatch 시점의 현재policy/registry lifecycle/권한과기존fence·Node·bytes를 같은순서로 재검사해야 한다. 선택적 필드로 추가한 뒤 검사를 생략하는 호환경로를 두지 않는다.
+
+### 원격 provider 후속 범위
+
+현재 ConfiguredModelVerifier는 운영자소유 local ReadRoot만 지원한다. 사용자URL이나 registry URI를 네트워크경로로 자동해석하지 않는다. 원격provider의 최소계약은 기존 NodeChannels의 tenant/node/epoch/channelVersion/endpoint/certificate 고정, 트랜잭션밖의 제한된mTLS 스트림·byte/hash검증, 트랜잭션안의 channel/Location/권한 재확인이다. 임의redirect·무제한읽기·caller의verified플래그는 허용하지 않는다. provider완료/장비인수는 아직 미구현·미검증이며 .225의외부권한대기와 구분한다.
+
+구현/실제PG증거와 다음담당: [[2026-09-18_모델레지스트리_명시결속_Codex]].

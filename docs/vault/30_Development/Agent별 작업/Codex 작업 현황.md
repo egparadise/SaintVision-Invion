@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.62"
+version: "1.0.63"
 status: "review"
 author: "Codex"
-updated: "2026-09-18T12:01:19+09:00"
+updated: "2026-09-18T12:19:54+09:00"
 source_of_truth: "Git"
 ---
 
@@ -418,3 +418,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - [[2026-09-18_Docker_호스트분류_Claude변경검토_Codex]]: 사용자 보고0xC0000142를 host-process-initialization-failure로 분리. HTTP500과 동일원인은 미확정, business-kernel-role 거부 미검증 유지. Claude83c0163 문서 채택;911aed8/9e69dcc는 동시prune 강제삭제·timeout전파·DSN마스킹 findings로 보류, 다음 Claude 수정/Codex 재검토.
 
 - [[2026-09-18_Workspace_아카이브무결성_Codex]]: VF-CX-05 오프라인 내부image archive SHA-256 검사 추가(합계8GiB한도),21시험통과·실제2archive일치. 인증서/정책만료로exit1 유지. OneDrive는 쓰기버스트상관으로 정정, 일정누수/NTSTATUS인과미확정. 다음Claude 독립검토/R2수정, Codex 수정수신 후검증.
+
+- [[2026-09-18_모델레지스트리_명시결속_Codex]]: VF-CX-02 명시registryVersionId↔manifest/content/policy 불변결속·현재권한·동시성구현,0044head,격리PG100/100통과. 실행permit연결/원격provider는후속,운영DB미변경. 사용자image XML3pass/host-init3/timeout2 직접확인, business-kernel-role미검증유지. Claude07bae29는과도한NTSTATUS재시도/R2-03미해소로보류.

@@ -1,140 +1,72 @@
 {
-  "exitCode": 1,
-  "postgres": "isolated tmpfs PostgreSQL 16; loopback ephemeral port",
-  "identity": "synthetic issuer; no operational SSO acceptance",
-  "operationalAcceptance": false,
-  "browserOptIn": false,
-  "serverImage": "sha256:b93b5ef1f94469bc4b18c1214354249ec9f55974aef30898287f5feac13c1d7e",
-  "nodeDependentSuitesExcluded": [
-    "tests/integration/test_business_handoff.py",
-    "tests/integration/test_containment.py",
-    "tests/integration/test_developer_workloads.py",
-    "tests/integration/test_dispatch_node.py",
-    "tests/integration/test_model_node.py",
-    "tests/integration/test_node_control.py",
-    "tests/integration/test_node_delivery.py",
-    "tests/integration/test_node_extensions.py",
-    "tests/integration/test_node_runtime.py",
-    "tests/integration/test_node_storage_transport.py",
-    "tests/integration/test_output_ingestion.py",
-    "tests/integration/test_placement.py",
-    "tests/integration/test_result_observation.py",
-    "tests/integration/test_results.py",
-    "tests/integration/test_resume_input_readiness.py",
-    "tests/integration/test_shard_parent.py",
-    "tests/integration/test_shard_recovery.py",
-    "tests/integration/test_shards.py",
-    "tests/integration/test_workspace_api.py",
-    "tests/integration/test_workspace_checkout.py",
-    "tests/integration/test_workspace_recovery.py",
-    "tests/integration/test_workspace_resume.py",
-    "tests/integration/test_workspace_start.py",
-    "tests/integration/test_workspace_terminal.py"
-  ],
-  "command": [
-    "C:\\Project\\SaintVision-Invion\\.venv\\Scripts\\python.exe",
-    "-m",
-    "pytest",
-    "-q",
-    "tests/integration/test_server_container.py",
-    "--ignore=tests/integration/test_business_handoff.py",
-    "--ignore=tests/integration/test_containment.py",
-    "--ignore=tests/integration/test_developer_workloads.py",
-    "--ignore=tests/integration/test_dispatch_node.py",
-    "--ignore=tests/integration/test_model_node.py",
-    "--ignore=tests/integration/test_node_control.py",
-    "--ignore=tests/integration/test_node_delivery.py",
-    "--ignore=tests/integration/test_node_extensions.py",
-    "--ignore=tests/integration/test_node_runtime.py",
-    "--ignore=tests/integration/test_node_storage_transport.py",
-    "--ignore=tests/integration/test_output_ingestion.py",
-    "--ignore=tests/integration/test_placement.py",
-    "--ignore=tests/integration/test_result_observation.py",
-    "--ignore=tests/integration/test_results.py",
-    "--ignore=tests/integration/test_resume_input_readiness.py",
-    "--ignore=tests/integration/test_shard_parent.py",
-    "--ignore=tests/integration/test_shard_recovery.py",
-    "--ignore=tests/integration/test_shards.py",
-    "--ignore=tests/integration/test_workspace_api.py",
-    "--ignore=tests/integration/test_workspace_checkout.py",
-    "--ignore=tests/integration/test_workspace_recovery.py",
-    "--ignore=tests/integration/test_workspace_resume.py",
-    "--ignore=tests/integration/test_workspace_start.py",
-    "--ignore=tests/integration/test_workspace_terminal.py",
-    "--junitxml=C:\\Project\\SaintVision-Invion\\.worktrees\\codex-vf-desktop-integration\\.work\\cx01-image-post-cleanup-retry-tests.xml"
-  ],
-  "tests": {
-    "failure": 4,
-    "error": 0,
-    "skipped": 0,
-    "passed": 4
-  },
-  "isolatedContainerRemoved": true,
-  "sourceSha": "90c07c6",
+  "source": "user clean worktree; XML independently parsed by Codex",
+  "testSourceSha": "9e69dcc",
+  "imageDigest": "sha256:b93b5ef1f94469bc4b18c1214354249ec9f55974aef30898287f5feac13c1d7e",
+  "xmlPath": "C:\\vw\\.work\\coord-postfix-determination-tests.xml",
+  "xmlSHA256": "6e7fd3b2a637ecedfc0148676df048efb0e48856f88bea6388ae1e7a51ee544b",
   "cases": [
     {
-      "case": "healthy",
+      "case": "test_candidate_nonroot_configuration_and_workspace[healthy]",
       "result": "passed",
-      "failurePhase": null
+      "category": "passed",
+      "securityAssertionVerified": true
     },
     {
-      "case": "workspace",
+      "case": "test_candidate_nonroot_configuration_and_workspace[workspace]",
       "result": "passed",
-      "failurePhase": null
+      "category": "passed",
+      "securityAssertionVerified": true
     },
     {
-      "case": "unreadable",
+      "case": "test_candidate_nonroot_configuration_and_workspace[unreadable]",
+      "result": "failed",
+      "category": "docker-operation-timeout",
+      "securityAssertionVerified": false
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[writable]",
       "result": "passed",
-      "failurePhase": null
+      "category": "passed",
+      "securityAssertionVerified": true
     },
     {
-      "case": "writable",
+      "case": "test_candidate_nonroot_configuration_and_workspace[public-signing-key]",
       "result": "failed",
-      "failurePhase": "cleanup-volume-rm-daemon-response-io-timeout",
-      "rootCause": "unestablished"
+      "category": "docker-operation-timeout",
+      "securityAssertionVerified": false
     },
     {
-      "case": "public-signing-key",
+      "case": "test_candidate_nonroot_configuration_and_workspace[business]",
       "result": "failed",
-      "failurePhase": "cleanup-container-label-inspect-daemon-response-io-timeout",
-      "rootCause": "unestablished"
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
     },
     {
-      "case": "business",
-      "result": "passed",
-      "failurePhase": null
-    },
-    {
-      "case": "business-workspace",
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-workspace]",
       "result": "failed",
-      "failurePhase": "workspace-initializer-docker-run-http500-then-cleanup-volume-in-use"
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
     },
     {
-      "case": "business-kernel-role",
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-kernel-role]",
       "result": "failed",
-      "failurePhase": "startup-state-inspect-timeout90s"
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
     }
   ],
-  "assessment": {
-    "productSecurityAssertionFailureObserved": false,
-    "fullImageAcceptance": false,
-    "resourceExhaustionEstablished": false,
-    "conclusion": "Four formerly failing cases now pass; Docker transport/operation failures persist after cleanup. Three of the original seven remain failed; previously passing writable now fails cleanup. No claim of all-security-assertions verified.",
-    "testImplementationChanged": false,
-    "claudeOwnedFinding": "VF-CL-R-001 implementation not modified"
+  "tests": {
+    "passed": 3,
+    "failure": 5,
+    "error": 0,
+    "skipped": 0
   },
-  "previousAttempts": [
-    "../cx01-image-post-cleanup/before-cleanup.json",
-    "../cx01-image-post-cleanup/attempt1.json"
-  ],
-  "resourceInvestigation": {
-    "cleanupStatus": "user-reported-completed-before-retest",
-    "postCleanupRetest": "4 passed / 4 failed / 0 skipped; exit1",
-    "daemonDownEstablished": false,
-    "resourceExhaustionEstablished": false,
-    "nextAction": "Claude resolve unsafe concurrent prune and diagnostic redaction review findings, add NTSTATUS distinction; then Codex re-review and retest"
-  },
-  "hostFollowup": {
+  "fullImageAcceptance": false,
+  "businessKernelRoleRejectionVerified": false,
+  "exitCode": 1,
+  "productSecurityAssertionFailuresObserved": 0,
+  "assertionNonfailureDoesNotMeanPass": true,
+  "previousCodexAttempt": "../cx01-image-post-cleanup/attempt2.json",
+  "previousClassification": {
     "source": "user independent clean-worktree report on Claude 9e69dcc; not independently reproduced by Codex",
     "exitCodeUnsigned": 3221225794,
     "exitCodeSigned": -1073741502,
@@ -161,5 +93,7 @@
     },
     "temporalFollowup": "../workspace-archive-integrity/host-observation-correction.json",
     "handleTrendAssessment": "Increased during write bursts; declined 29 in a quiet 90-second interval. Correlation only; not an established steady leak or cause."
-  }
+  },
+  "retryBranchResult": "pending user report",
+  "interpretation": "Three host-init failures and two operation timeouts in this independent run; timeout root cause remains unestablished. Do not relabel older runs without their exit codes."
 }

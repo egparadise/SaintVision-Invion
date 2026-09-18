@@ -1,0 +1,24 @@
+{
+  "sourceSha": "07bae29",
+  "scope": "mocked process calls only; no docker mutation",
+  "accessViolationClassifiedAsInit": true,
+  "negativeSignalClassifiedAsInit": true,
+  "mutationRetriesAfterAccessViolation": 1,
+  "libpqPasswordStillUnmasked": true,
+  "calls": [
+    [
+      "docker",
+      "run",
+      "--name",
+      "synthetic-review-only",
+      "image"
+    ],
+    [
+      "docker",
+      "run",
+      "--name",
+      "synthetic-review-only",
+      "image"
+    ]
+  ]
+}

@@ -59,6 +59,7 @@ def main():
         "0039_model_manifest",
         "0040_model_run_input",
         "0041_model_runtime_input",
+        "0043_replica_retention",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--from-revision", choices=priors, help="Test one published starting revision; default tests all")

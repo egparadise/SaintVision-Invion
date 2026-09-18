@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0043_replica_retention",
+  "revision": "0044_model_registry_binding",
   "referenceSource": "c5f215475b203b1e6731927117093921cda9c183",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
@@ -62,6 +62,14 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
+    },
+    "public.model_registry_snapshot(uuid, text, text)": {
+      "definitionSHA256": "f14a43282ee565f8e6e4dd5ef0f363e33fe8c062ba47ac63a90a44cd05043af6",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "b6401933d8ca573e49cede31b6e5e44b32dcd3bbc42dd845b3444f99a3ef9d4a"
     }
   }
 }

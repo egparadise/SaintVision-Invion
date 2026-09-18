@@ -1,0 +1,63 @@
+{
+  "source": "user clean worktree; XML independently parsed by Codex",
+  "testSourceSha": "9e69dcc",
+  "imageDigest": "sha256:b93b5ef1f94469bc4b18c1214354249ec9f55974aef30898287f5feac13c1d7e",
+  "xmlPath": "C:\\vw\\.work\\coord-postfix-determination-tests.xml",
+  "xmlSHA256": "6e7fd3b2a637ecedfc0148676df048efb0e48856f88bea6388ae1e7a51ee544b",
+  "cases": [
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[healthy]",
+      "result": "passed",
+      "category": "passed",
+      "securityAssertionVerified": true
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[workspace]",
+      "result": "passed",
+      "category": "passed",
+      "securityAssertionVerified": true
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[unreadable]",
+      "result": "failed",
+      "category": "docker-operation-timeout",
+      "securityAssertionVerified": false
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[writable]",
+      "result": "passed",
+      "category": "passed",
+      "securityAssertionVerified": true
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[public-signing-key]",
+      "result": "failed",
+      "category": "docker-operation-timeout",
+      "securityAssertionVerified": false
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[business]",
+      "result": "failed",
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-workspace]",
+      "result": "failed",
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
+    },
+    {
+      "case": "test_candidate_nonroot_configuration_and_workspace[business-kernel-role]",
+      "result": "failed",
+      "category": "host-process-initialization-failure",
+      "securityAssertionVerified": false
+    }
+  ],
+  "tests": {
+    "passed": 3,
+    "failed": 5
+  },
+  "fullImageAcceptance": false,
+  "businessKernelRoleRejectionVerified": false
+}
