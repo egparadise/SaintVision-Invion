@@ -1,5 +1,5 @@
 {
-  "tests": 275,
+  "tests": 278,
   "testFiles": 30,
   "testExitCode": 0,
   "buildExitCode": 0,
@@ -8,5 +8,6 @@
   "imageBuildExitCode": 0,
   "imageUser": "65532:65532",
   "unconfiguredImageExitCode": 1,
-  "expectedConfigurationRejection": true
+  "expectedConfigurationRejection": true,
+  "additionalIntegrationBase": "810ab3b"
 }

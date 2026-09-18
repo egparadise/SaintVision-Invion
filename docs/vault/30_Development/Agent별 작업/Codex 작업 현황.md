@@ -403,5 +403,3 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## 이전 공유판 수신 기록
 
 외부 공유판 원문과 hash는 Evidence/cx01-landing/shared-codex-before.txt 및 shared-codex-proposal.json에 보존했다. 아래 세 항목은 당시 고정 SHA의 기록이며 현재 착지 검증과 구분한다.
-
-

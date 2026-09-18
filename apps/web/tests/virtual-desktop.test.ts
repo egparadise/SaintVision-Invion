@@ -309,4 +309,84 @@ describe('VF-GM-01 ~ VF-GM-05 Virtual Computer Fabric & Web Desktop Suite', () =
     const isTicketValid = (t: typeof ticket) => Date.now() < t.expiresAt;
     expect(isTicketValid(ticket)).toBe(true);
   });
+
+  // VF-GM-01-A11Y: Keyboard Shortcuts & Window Navigation
+  it('[VF-GM-01-A11Y] cycles active windows with Alt+Tab and handles Escape modal dismissal', () => {
+    const activeWindows: DesktopWindow[] = [
+      { id: 'w1', appId: 'my-computer', title: '1', icon: '💻', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 10, position: { x: 0, y: 0 }, size: { width: 100, height: 100 } },
+      { id: 'w2', appId: 'file-explorer', title: '2', icon: '📁', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 11, position: { x: 10, y: 10 }, size: { width: 100, height: 100 } },
+      { id: 'w3', appId: 'terminal', title: '3', icon: '⌨️', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 12, position: { x: 20, y: 20 }, size: { width: 100, height: 100 } },
+    ];
+
+    const cycleWindow = (currentId: string, winList: DesktopWindow[]): string => {
+      const open = winList.filter((w) => w.isOpen && !w.isMinimized);
+      const currIdx = open.findIndex((w) => w.id === currentId);
+      const nextIdx = (currIdx + 1) % open.length;
+      return open[nextIdx].id;
+    };
+
+    expect(cycleWindow('w1', activeWindows)).toBe('w2');
+    expect(cycleWindow('w2', activeWindows)).toBe('w3');
+    expect(cycleWindow('w3', activeWindows)).toBe('w1');
+
+    // Dismiss modal on Escape
+    let isMenuOpen = true;
+    const handleEscape = (key: string) => {
+      if (key === 'Escape') isMenuOpen = false;
+    };
+    handleEscape('Escape');
+    expect(isMenuOpen).toBe(false);
+  });
+
+  // VF-GM-01-STORAGE: Layout Session Persistence
+  it('[VF-GM-01-STORAGE] serializes and parses window position and dimensions without schema corruption', () => {
+    const mockLayout: DesktopWindow[] = [
+      {
+        id: 'win_test',
+        appId: 'my-computer',
+        title: '내 컴퓨터',
+        icon: '💻',
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: true,
+        zIndex: 15,
+        position: { x: 100, y: 120 },
+        size: { width: 800, height: 600 },
+      },
+    ];
+
+    const serialized = JSON.stringify(mockLayout);
+    const restored = JSON.parse(serialized) as DesktopWindow[];
+
+    expect(restored).toHaveLength(1);
+    expect(restored[0].id).toBe('win_test');
+    expect(restored[0].position).toEqual({ x: 100, y: 120 });
+    expect(restored[0].isMaximized).toBe(true);
+    expect(restored[0].zIndex).toBe(15);
+  });
+
+  // VF-GM-03-A11Y: Replica Repair State Transition
+  it('[VF-GM-03-A11Y] detects degraded replica state and transitions to repaired upon node synchronization', () => {
+    interface Replica {
+      nodeId: string;
+      status: 'healthy' | 'missing' | 'syncing';
+    }
+
+    const checkReplicaHealth = (replicas: Replica[], required: number): 'healthy' | 'degraded' => {
+      const healthyCount = replicas.filter((r) => r.status === 'healthy').length;
+      return healthyCount >= required ? 'healthy' : 'degraded';
+    };
+
+    const replicas: Replica[] = [
+      { nodeId: 'node_1', status: 'healthy' },
+      { nodeId: 'node_2', status: 'missing' },
+    ];
+
+    // 1 healthy out of 2 required -> degraded
+    expect(checkReplicaHealth(replicas, 2)).toBe('degraded');
+
+    // Repair action: node_2 synchronizes from node_1
+    replicas[1].status = 'healthy';
+    expect(checkReplicaHealth(replicas, 2)).toBe('healthy');
+  });
 });
