@@ -99,5 +99,24 @@
       "case": "test_candidate_nonroot_configuration_and_workspace[business-kernel-role]",
       "reason": "docker-resource-cleanup-or-operation-failure"
     }
-  ]
+  ],
+  "resourceInvestigation": {
+    "daemonDownEstablished": false,
+    "resourceExhaustionEstablished": false,
+    "userObservation": "Docker version/info healthy; accumulated stopped test containers and unused build cache; concurrent test suites",
+    "cleanupStatus": "awaiting-explicit-user-confirmation",
+    "proposal": {
+      "exitedTestContainers": 170,
+      "unusedBuildCache": "3.624GB observed",
+      "preserve": [
+        "running containers",
+        "created containers",
+        "other exited containers",
+        "images",
+        "volumes"
+      ]
+    },
+    "postCleanupRetest": "not-run",
+    "nextAction": "On explicit approval revalidate pinned IDs/state, clean approved scope, rerun same image digest lane; compare without erasing prior failures"
+  }
 }
