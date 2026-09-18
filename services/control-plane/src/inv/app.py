@@ -900,11 +900,17 @@ def create_configured_app():
     """Production factory: explicit operator configuration, never seeded demo data."""
     try:
         settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business"}:
+        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business", "modelRegistryPolicy"}:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
+        registry_policy = None
+        if "modelRegistryPolicy" in settings:
+            from .model_registry_config import configured_registry_policy
+
+            registry_policy = configured_registry_policy(settings["modelRegistryPolicy"])
         database = Database(
-            os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"]
+            os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
+            registry_binding_policy=registry_policy,
         )
         workspace = None
         if "workspace" in settings:

@@ -1,0 +1,67 @@
+{
+  "baseSha": "6314c54804e25ff9f8857c978c56b16425e1c6fe",
+  "testFileSha256": "843c815a9c18c4ce719a14414ac972ecd41d343463469fc61624023cac97d922",
+  "suite": "tests/integration/test_storage_catalog_api.py",
+  "command": "python -m pytest tests/integration/test_storage_catalog_api.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 1,
+  "seconds": 63.51,
+  "tests": {
+    "failure": 0,
+    "error": 12,
+    "skipped": 0,
+    "passed": 0
+  },
+  "cases": [
+    {
+      "name": "test_owner_resolves_actual_catalogue_and_lists_only_owned_rows",
+      "status": "error"
+    },
+    {
+      "name": "test_same_tenant_nonowner_unknown_and_other_tenant_are_not_disclosed",
+      "status": "error"
+    },
+    {
+      "name": "test_current_contribution_revocation_hides_locations_but_keeps_owner_status",
+      "status": "error"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[None]",
+      "status": "error"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[forged-admin]",
+      "status": "error"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[unlinked]",
+      "status": "error"
+    },
+    {
+      "name": "test_user_suspension_revokes_existing_valid_token",
+      "status": "error"
+    },
+    {
+      "name": "test_read_routes_do_not_forward_storage_mutations",
+      "status": "error"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[not-an-inv-uri-secret]",
+      "status": "error"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[inv://models/a@1/]",
+      "status": "error"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "status": "error"
+    },
+    {
+      "name": "test_pagination_and_forged_cursor_stay_with_current_owner",
+      "status": "error"
+    }
+  ],
+  "junitSha256": "bf38b9a62147c930fb929c0c6745a6fa0b573f9f5c83f6c427ee4bb496be8dc0",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false
+}

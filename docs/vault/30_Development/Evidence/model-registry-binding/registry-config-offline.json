@@ -1,0 +1,15 @@
+{
+  "baseSha": "1eaf285",
+  "reviewDocsMerge": "6314c54",
+  "sourceHashes": {
+    "services\\control-plane\\src\\inv\\app.py": "5cb33d097d85dceb5aec5aa7acf30e90a64fce10df6b63ef2ad05cf473ccf52f",
+    "services\\control-plane\\src\\inv\\model_registry_config.py": "05a2e2f679d6791759f7720422149b3d7a4ccdc21ac3c74b96e71b8a01db5994"
+  },
+  "command": "python -m pytest tests/core/test_model_registry_config.py tests/core/test_model_execution_registry.py tests/core/test_workspace_api_boundary.py -q --tb=short",
+  "passed": 34,
+  "failed": 0,
+  "skipped": 0,
+  "exitCode": 0,
+  "junitSha256": "6be71c2ca5dcd5dde0783c857fa6b8087e765baeffdc89405065d841f76d886c",
+  "imageLaneRun": false
+}
