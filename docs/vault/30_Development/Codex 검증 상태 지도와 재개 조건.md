@@ -82,3 +82,7 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 ## PITR 준비안 검토 수신
 
 [[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.
+
+## 검증 경계 표본 감사
+
+[[2026-09-18_검증경계_표본감사_Codex]]: tools51/tests179파일 패턴 검색, 합성 CLI9관측으로 deployment_surface의 factory 오류/attr 부재 성공 처리와 위조 Bearer probe 예외 누락 P2 두 건 확인. 빈 route 입력은 P3 보강 후보. 기존 offline73시험 통과가 이 미검증 경로를 대체하지 않음. 다음 Codex: VB-AUDIT-01/02 수정; Claude: 독립 검토/PITR 수정본. 이번 감사는 미수정 finding이며 Docker/DB 실행 없음.

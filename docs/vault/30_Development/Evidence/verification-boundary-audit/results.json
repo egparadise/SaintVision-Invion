@@ -1,0 +1,264 @@
+{
+  "baseSHA": "484c408fa4d06bae3eaec2178289330717e07aae",
+  "scope": "synthetic offline audit, not operational acceptance",
+  "sourceHashes": {
+    "tools/deployment_surface.py": "943c1b674e28bb4aa5461a9bf12e8acf946695fbebbbea6e210b861559a8e230",
+    "tools/route_coverage.py": "a1e6b406356ecca7c92134727bb8bf1cc1a1bc773d56f5b88f60c57913f6cab0",
+    "tests/test_deployment_surface.py": "cd544fd6b89334684351da3bbe35b01a54a16b851dc0346746f6ebbad412179f",
+    "tests/test_route_coverage.py": "6a1dd3a91ccb0982649565261f29c3df61e56e43d37782fedb92e95515bea3d6",
+    "tests/integration/test_snapshots.py": "06137a67afeb8c11ba24d61afea6fc1aad5873a7257e6efb564dcd0096d5dfff"
+  },
+  "scannedPythonFiles": {
+    "tools": 51,
+    "tests": 179
+  },
+  "syntacticCandidates": [
+    {
+      "path": "tests/integration/test_snapshots.py",
+      "line": 67,
+      "pattern": "same operand syntax"
+    }
+  ],
+  "observations": [
+    {
+      "case": "lazy_missing_dependency",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "lazy_missing_dependency:create_app",
+        "obtainable": false,
+        "how": "factory refused; diagnostics suppressed",
+        "answers": [],
+        "claims": null,
+        "routes": null,
+        "problems": []
+      }
+    },
+    {
+      "case": "factory_body_typeerror",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "factory_body_typeerror:create_app",
+        "obtainable": false,
+        "how": "factory refuses to build without arguments; diagnostics suppressed",
+        "answers": [],
+        "claims": null,
+        "routes": null,
+        "problems": []
+      }
+    },
+    {
+      "case": "missing_entrypoint",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "missing_entrypoint:app",
+        "obtainable": false,
+        "how": "missing_entrypoint has no 'app'",
+        "answers": [],
+        "claims": null,
+        "routes": null,
+        "problems": []
+      }
+    },
+    {
+      "case": "required_arguments_control",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "required_arguments_control:create_app",
+        "obtainable": false,
+        "how": "factory refuses to build without arguments; diagnostics suppressed",
+        "answers": [],
+        "claims": null,
+        "routes": null,
+        "problems": []
+      }
+    },
+    {
+      "case": "module_import_failure_control",
+      "exitCode": 1,
+      "expectedObservedExit": 1,
+      "report": {
+        "target": "module_import_failure_control:app",
+        "obtainable": false,
+        "how": "INCONCLUSIVE: module could not be imported here; diagnostics suppressed",
+        "answers": [],
+        "claims": null,
+        "routes": null,
+        "problems": [
+          "the check did not run: INCONCLUSIVE: module could not be imported here; diagnostics suppressed"
+        ]
+      }
+    },
+    {
+      "case": "forged_probe_exception",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "forged_probe_exception:app",
+        "obtainable": true,
+        "how": "module-level application object",
+        "answers": [
+          {
+            "path": "/readyz",
+            "status": 404
+          },
+          {
+            "path": "/v1/auth/userinfo",
+            "status": 404
+          },
+          {
+            "path": "/healthz",
+            "status": 404
+          },
+          {
+            "path": "/v1/approvals",
+            "status": 401
+          },
+          {
+            "path": "/v1/runs",
+            "status": 404
+          },
+          {
+            "path": "/v1/projects",
+            "status": 404
+          },
+          {
+            "path": "/v1/nodes",
+            "status": 404
+          },
+          {
+            "path": "/v1/admin/audit-logs",
+            "status": 404
+          }
+        ],
+        "claims": null,
+        "routes": 5,
+        "problems": []
+      }
+    },
+    {
+      "case": "forged_probe_success_control",
+      "exitCode": 1,
+      "expectedObservedExit": 1,
+      "report": {
+        "target": "forged_probe_success_control:app",
+        "obtainable": true,
+        "how": "module-level application object",
+        "answers": [
+          {
+            "path": "/readyz",
+            "status": 404
+          },
+          {
+            "path": "/v1/auth/userinfo",
+            "status": 404
+          },
+          {
+            "path": "/healthz",
+            "status": 404
+          },
+          {
+            "path": "/v1/approvals",
+            "status": 401,
+            "acceptsAnyBearerToken": true,
+            "bearerStatus": 200,
+            "bearerBytes": 12
+          },
+          {
+            "path": "/v1/runs",
+            "status": 404
+          },
+          {
+            "path": "/v1/projects",
+            "status": 404
+          },
+          {
+            "path": "/v1/nodes",
+            "status": 404
+          },
+          {
+            "path": "/v1/admin/audit-logs",
+            "status": 404
+          }
+        ],
+        "claims": null,
+        "routes": 5,
+        "problems": [
+          "/v1/approvals refuses a missing credential and then accepts an arbitrary one: 'Bearer not-a-real-token' returns HTTP 200 (response body omitted)"
+        ]
+      }
+    },
+    {
+      "case": "forged_probe_denied_control",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "target": "forged_probe_denied_control:app",
+        "obtainable": true,
+        "how": "module-level application object",
+        "answers": [
+          {
+            "path": "/readyz",
+            "status": 404
+          },
+          {
+            "path": "/v1/auth/userinfo",
+            "status": 404
+          },
+          {
+            "path": "/healthz",
+            "status": 404
+          },
+          {
+            "path": "/v1/approvals",
+            "status": 401
+          },
+          {
+            "path": "/v1/runs",
+            "status": 404
+          },
+          {
+            "path": "/v1/projects",
+            "status": 404
+          },
+          {
+            "path": "/v1/nodes",
+            "status": 404
+          },
+          {
+            "path": "/v1/admin/audit-logs",
+            "status": 404
+          }
+        ],
+        "claims": null,
+        "routes": 5,
+        "problems": []
+      }
+    },
+    {
+      "case": "empty_route_inputs",
+      "exitCode": 0,
+      "expectedObservedExit": 0,
+      "report": {
+        "servedByTree": {
+          "C:\\Users\\egpar\\AppData\\Local\\Temp\\verification-audit-c_7_yxk4\\server": []
+        },
+        "clientPaths": [],
+        "unserved": [],
+        "measurement": "source-declarations",
+        "operationalAcceptanceAssessed": false,
+        "limitations": "Static path shapes only; dynamic prefixes may be omitted. HTTP methods, payloads, authentication, live availability and operating acceptance are not verified."
+      }
+    }
+  ],
+  "existingTests": {
+    "command": "python -m pytest -q tests/test_deployment_surface.py tests/test_route_coverage.py tests/core/test_recovery_capability.py --junitxml=.work/verification-audit-tests.xml",
+    "exitCode": 0,
+    "passed": 73,
+    "warnings": 2,
+    "junitSha256": "960f2c80d323f525932ba349b396799bb67efed765683a149149ae9dc5019d96"
+  }
+}
