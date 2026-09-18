@@ -7,7 +7,7 @@ import {
 } from '@/contracts/virtualFabric';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem } from '@/contracts/types';
 import { DesktopWindowComponent } from './DesktopWindow';
-import { NodeList } from '@/features/nodes/NodeList';
+import { ResourceExplorer } from './ResourceExplorer';
 import { InvFileExplorer } from './InvFileExplorer';
 import { ModelStudioView } from './ModelStudioView';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
@@ -654,7 +654,10 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               onToggleMaximize={() => toggleMaximizeWindow(win.id)}
             >
               {win.appId === 'my-computer' && (
-                <NodeList nodes={nodes} isLoading={false} error={null} />
+                <ResourceExplorer
+                  nodes={nodes}
+                  onOpenTerminal={() => openApp('terminal')}
+                />
               )}
 
               {win.appId === 'file-explorer' && (
