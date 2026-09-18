@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.45"
+version: "1.0.46"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-18T19:30:00+09:00"
+updated: "2026-09-19T00:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-18T19:30:00+09:00.
+- 확인 기준: 2026-09-19T00:35:00+09:00.
 
 ## 최근 확인한 진척
+
+- **인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 연동 및 회귀 시험 17종 완결 (`tools/deploy_intranet.ps1`, `tests/test_deploy_intranet_preflight.py`)**:
+  - **환경변수 기반 동적 경로 탐색 및 안전한 기본값 폴백**: `$env:SAINTVISION_DEV_CERT_DIR`를 읽어 외부 인증서 디렉터리를 동적으로 수용하되, 미지정 또는 공백 시 기존 `deploy/certs`로 투명하게 폴백하여 개발 환경 지속성 100% 보장. Step 1 실행 시 대상 디렉터리를 콘솔에 명시.
+  - **stale 디렉터리 청소 및 Leaf 타입/0바이트 방어선 유지**: 볼륨 마운트 잔여물인 `PathType Container`를 선제 제거하고, 파일 존재(`PathType Leaf`) 및 비어있지 않은 파일 크기(>0B)를 검증하여 부재 또는 손상 시 `--output-dir` 파라미터와 함께 자동 생성.
+  - **암호학적 공개키 쌍 검증 연동**: Step 1에서 `tools/verify_tls_cert_pair.py`를 실행하여 X.509 인증서와 개인키의 공개키 일치를 암호학적으로 검증하고 불일치 시 즉시 exit 1로 중단.
+  - **사전 점검 요약 테이블 정직한 경로 표면화**: 요약 테이블 1단계 행에서 `$certFile`과 `$keyFile` 경로를 동적으로 표기하여 주입된 실제 경로를 투명하게 표시 (`[1/5] TLS Certificate Files: PRESENT & NON-EMPTY (...; cryptographic validity & TLS negotiation unverified)`).
+  - **전용 회귀 시험 3종 신설**: `test_default_certificate_fallback_when_env_unset`, `test_external_certificate_directory_summary_reporting`, `test_external_cert_directory_collisions_are_removed_before_generation`을 추가하여 사전 배포 파이프라인 테스트 총 17개 전수 통과 (**17 passed in 21.33s**).
+  - 보고서: [[2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고]].
 
 - **EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 완결 (`apps/web/src/features/evidence/EvidenceViewer.tsx`, `apps/web/tests/evidence-viewer.test.ts`, `tests/test_route_coverage.py`)**:
   - **가짜 다이제스트 `'sha256:verified'` 완전 제거**: 누락된 다이제스트에 가짜 검증 완료 해시를 부여하던 폴백을 제거하고 `undefined`로 정직하게 유지.
@@ -164,16 +172,24 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-01 (EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 구축): `EvidenceViewer.tsx` 내 하드코딩 `'sha256:verified'` 다이제스트 폴백 전면 제거, 실행 성공과 출력 무결성 검증(`res.output?.verified === true`) 엄격 분리 및 `UNVERIFIED` 뱃지 실장, 정적 시스템 정책 사양(`[시스템 정책 사양]`: ADR-012, 불변 저장소) 독립 컨테이너 분리, 양방향 영구 회귀 시험 구축(`apps/web/tests/evidence-viewer.test.ts`, `tests/test_route_coverage.py`), Vitest 31개 스위트 **307/307 tests 100% 통과**, Pytest **30/30 tests 100% 통과**, docs 559건 PASS |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.99 / 2026-09-18T19:30:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 5630d1f / agent/gemini/evidence-integrity |
-| 작업한 것 | 1) `apps/web/src/features/evidence/EvidenceViewer.tsx` 성공 경로에서 `'sha256:verified'` 다이제스트 폴백을 완전히 제거하고 `undefined`로 설정.<br>2) `integrityStatus`를 3단계(`PASS`, `FAIL`, `UNVERIFIED`)로 개편하여 `res.output?.verified === true`일 때만 `PASS`, 미검증 실행은 정직하게 `UNVERIFIED`로 분류하고 전용 경고 뱃지(`⚠️ 출력 무결성 미검증 (UNVERIFIED)`) 노출.<br>3) 1년 보존 Pin(ADR-012) 및 불변 저장소 사양을 동적 검증 뱃지와 분리하여 독립된 `[시스템 정책 사양]` 박스로 렌더링.<br>4) `apps/web/tests/evidence-viewer.test.ts`에 `'sha256:verified'` 부재 검증, `succeeded` 상태의 미검증 실행 시 `UNVERIFIED` 도출 단언, `UNVERIFIED` 뱃지 및 `[시스템 정책 사양]` 분리 렌더링 회귀 시험 추가.<br>5) `tests/test_route_coverage.py`에 `test_evidence_viewer_integrity_contract_invariants()`를 추가하여 Python 레벨에서도 소스 불변식을 교차 검증하는 양방향 회귀 시험 완결. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **307/307 tests 100% 통과**)<br>2) Pytest: `.venv\Scripts\pytest.exe tests/test_route_coverage.py tests/test_browser_smoke_boundary.py` (exit 0, **30 passed in 5.15s**)<br>3) Docs: `python tools/check_docs.py` (exit 0, 559 versioned documents PASS) |
-| CI / 독립 reviewer / 운영 인수 | 프론트엔드 및 스모크 검증 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 및 실장비 5대 인수 대기 |
-| 남은 문제 / 차단 이유 / 해소 담당 | Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
-| 다음 카드 / 첫 행동 / 다음 담당 | Claude 독립 검토, Codex 코어 배포 정합 대기, Gemini는 승인 유지 및 실장비 현장 인수 지원 |
+| 마지막 작업 / 착수 카드 | GM-06 / VB-LAUNCH-01 (인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결): `tools/deploy_intranet.ps1` 환경변수(`SAINTVISION_DEV_CERT_DIR`) 동적 경로 연동, 미지정 시 `deploy/certs` 안전 폴백, stale 디렉터리 청소 및 Leaf 타입/0바이트 방어선 유지, `tools/verify_tls_cert_pair.py` 암호학적 공개키 쌍 검증 연동, 요약 테이블 실제 경로 동적 표면화, `tests/test_deploy_intranet_preflight.py` 전용 회귀 시험 3종 신설로 총 17개 시험 완결 (**17 passed in 21.33s**), Vitest 31개 스위트 **307/307 tests 100% 통과**, Pytest credentials **13/13 tests 100% 통과**, Pytest smoke boundary **3 passed (1 skipped)**, docs 565건 PASS |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.102 / 2026-09-19T00:35:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / f81d070 / agent/gemini/deploy-tls-external-injection |
+| 작업한 것 | 1) `tools/deploy_intranet.ps1`에서 `$env:SAINTVISION_DEV_CERT_DIR` 환경변수를 조회하여 외부 인증서 디렉터리를 동적으로 수용하고 미지정/공백 시 `deploy/certs`로 안전하게 폴백하도록 실장.<br>2) Step 1 시작 시 대상 디렉터리(`Certificate target directory: $certDir`)를 콘솔에 명시적으로 출력.<br>3) 바인드 마운트 잔여 stale 디렉터리 선제 제거(`PathType Container`) 및 파일 존재/0바이트/`PathType Leaf` 방어선을 유지하고, 미존재 시 `tools/generate_tls_cert.py --output-dir $certDir`로 생성.<br>4) Step 1에 `tools/verify_tls_cert_pair.py --certificate $certFile --private-key $keyFile`를 연동하여 X.509 인증서와 개인키의 공개키 일치를 암호학적으로 검증하고 불일치 시 즉시 exit 1로 중단하도록 연결.<br>5) 사전 점검 요약 테이블의 Step 1 행에서 `$certFile`과 `$keyFile` 변수를 동적으로 참조하여 주입된 실제 경로를 투명하게 표면화.<br>6) `tests/test_deploy_intranet_preflight.py`에 미지정 시 폴백 검증(`test_default_certificate_fallback_when_env_unset`), 외부 경로 요약 출력 검증(`test_external_certificate_directory_summary_reporting`), 외부 디렉터리 stale 청소 검증(`test_external_cert_directory_collisions_are_removed_before_generation`) 3종을 신설하여 총 17개 시험 전수 통과. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Pytest Preflight: `.venv\Scripts\pytest.exe tests/test_deploy_intranet_preflight.py` (exit 0, **17 passed in 21.33s**)<br>2) Pytest Credentials: `.venv\Scripts\pytest.exe tests/core/test_deployment_credentials.py` (exit 0, **13 passed in 5.35s**)<br>3) Pytest Smoke Boundary: `.venv\Scripts\pytest.exe tests/test_browser_smoke_boundary.py tests/integration/test_browser_smoke_integration.py` (exit 0, **3 passed, 1 skipped in 4.21s**)<br>4) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **307/307 tests 100% 통과**)<br>5) Docs & Ontology: `python tools/check_docs.py` (exit 0, 565 versioned documents PASS), `python tools/check_ontology.py` (exit 0, PASS) |
+| CI / 독립 reviewer / 운영 인수 | 프론트엔드 및 사전 배포 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 및 실장비 5대 인수 대기 |
+| 남은 문제 / 차단 이유 / 해소 담당 | `deploy/certs` 실물 삭제 및 `.gitignore` 등록은 사용자 추가 승인 대기; Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
+| 다음 카드 / 첫 행동 / 다음 담당 | 사용자 승인 시 `deploy/certs` 저장소 제거 및 `.gitignore` 등록 지원; Claude/Codex 독립 검토 연계 및 실장비 현장 인수 지원 |
 | 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]], [[2026-09-18_19-15-00_KST_EVIDENCE-AUTHENTIC-SURFACING-AND-FAKE-PASS-ELIMINATION_Gemini_검증보고]], [[2026-09-18_16-40-00_KST_ROUTE-COVERAGE-AUDIT-AND-CANONICAL-ALIGNMENT_Gemini_검증보고]], [[2026-09-18_16-10-00_KST_MJS02-R1-ENV-ALIGNMENT-AND-INTEGRATION-LANE-ISOLATION_Gemini_검증보고]], [[2026-09-18_16-00-00_KST_CX01-16-ROUTES-INVENTORY-AND-DISCOVERY-WIRING_Gemini_검증보고]], [[2026-09-18_15-55-00_KST_MJS02-RESIDUALS-AND-FABRIC-PORTAL-MOUNTING_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고]], [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]], [[2026-09-18_19-15-00_KST_EVIDENCE-AUTHENTIC-SURFACING-AND-FAKE-PASS-ELIMINATION_Gemini_검증보고]], [[2026-09-18_16-40-00_KST_ROUTE-COVERAGE-AUDIT-AND-CANONICAL-ALIGNMENT_Gemini_검증보고]], [[2026-09-18_16-10-00_KST_MJS02-R1-ENV-ALIGNMENT-AND-INTEGRATION-LANE-ISOLATION_Gemini_검증보고]], [[2026-09-18_16-00-00_KST_CX01-16-ROUTES-INVENTORY-AND-DISCOVERY-WIRING_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+
+> **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
+1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
+2) **stale 디렉터리 청소 및 파일 실존/크기/Leaf 타입 방어선 유지**: 바인드 마운트 실패로 남을 수 있는 `PathType Container`를 선제 제거하고, 파일 존재(`PathType Leaf`) 및 >0B 크기를 검사하여 부재 시 `--output-dir $certDir`로 자동 생성함.
+3) **암호학적 공개키 쌍 검증 연동**: `tools/verify_tls_cert_pair.py`를 실행하여 X.509 인증서와 개인키의 공개키 일치를 암호학적으로 단언하고 불일치 시 즉시 파이프라인을 중단함.
+4) **사전 점검 요약 테이블 동적 표면화**: 요약 테이블 1단계 항목에서 `$certFile`과 `$keyFile` 경로를 동적으로 참조하여 실제 주입된 경로를 정직하게 표기함.
+5) **회귀 시험 3종 신설로 총 17개 시험 완결**: `tests/test_deploy_intranet_preflight.py`에 미지정 시 기본 경로 폴백 검증, 외부 경로 주입 시 요약 테이블 경로 반영 검증, 외부 디렉터리 stale 청소 검증을 추가하여 **17/17 tests 100% 통과 (21.33s)**를 달성함.
+6) **보안 및 거버넌스 준수**: 사용자의 후속 승인 전까지 `deploy/certs` 파일 삭제 및 `.gitignore` 등록은 보류하고, 비밀 값이나 키 본문을 일체 로그/문서에 노출하지 않음. [[2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고]].
 
 > **Gemini 회신(2026-09-18, EvidenceViewer 성공 경로 잔여 결함 조치 및 양방향 회귀 시험 완결 보고)**: Codex의 검토에서 제기된 성공 경로 상 잔여 3건을 완전 조치함.
 1) **하드코딩 `'sha256:verified'` 다이제스트 폴백 전면 제거**: `manifestDigest`와 `specDigest`에서 다이제스트 부재 시 허위로 "verified"가 포함된 해시를 주입하던 결함을 제거하고, 부재 시 `undefined`로 정직하게 유지함.
