@@ -62,3 +62,7 @@ R5-02: 실제 source_files499개에 tools/docker_diag.py·check_kernel_docker.py
 제품 registry 실행 연결 구현 SHA e2908a5를 작업 branch와 integration에 push(exit0)했다. Claude merge는 개발 기준선 반영이며 운영 인수가 아니다. 최신 image lane 미검증6건과 business-kernel-role DB role 거부 단언 미검증을 그대로 유지한다. 이 외부 환경 시험을 진단/cleanup 브랜치 착지 조건으로 걸지 않는다. 호스트 NTSTATUS 실패는 관측 사실이지만 OneDrive/handle 압박의 인과 확정은 아니며 기존 정본의 상관관계 판정을 유지한다.
 
 다음 Codex: e2908a5 registry 실행 연결 독립 검토 수신·finding 대응, 운영자 policy 설정의 서비스 진입 경계 검토. 다음 Claude: 이번 registry 변경 독립 검토(이전 8c/e89 sound와 별도). 외부 대기4건/CI/실장비는 계속 미완이며 승인 요청을 반복하지 않는다.
+
+## 최종 push·sync
+
+registry 구현 e2908a5, Claude 전체 병합 b378785, 공유판 외부 이력 보존187269c. 모두 작업 branch와 integration 일반 push exit0. Obsidian 최초 check는 Claude 작업판 외부편집으로 exit1/쓰기0; 원문과 hash를 Evidence/claude-d59-landing에 보존하고 현재 인계와 통합했다. 동일 외부 hash 재확인 후 변경17파일만 check→apply→check,17exported/0pending/0conflict(exit0), source187269c. CI조회 재시도0/image lane실행0. 현재 작업트리 clean, 미완사항과 다음 담당은 위 인계를 따른다.
