@@ -186,8 +186,7 @@ async function main() {
     if (serverTsSnapshot) {
       const modifiedWorkingCopy = '// Modified working copy for next recovery step\nconsole.log("local edits");\n';
       const modifiedWorkingHash = `sha256:${crypto.createHash('sha256').update(modifiedWorkingCopy).digest('hex')}`;
-      assert('Modified working copy content yields different SHA-256 than frozen snapshot', modifiedWorkingHash !== serverTsSnapshot.sha256);
-      unverified('Modified working copy rejection', 'no modified artifact was submitted to an admission endpoint');
+      unverified('Modified working copy hash differs from frozen snapshot', 'local hash derivation only; no modified artifact was submitted to an admission endpoint', modifiedWorkingHash !== serverTsSnapshot.sha256);
     }
 
     // Local format check is not an API rejection.
