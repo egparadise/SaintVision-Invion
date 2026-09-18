@@ -141,3 +141,8 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - PITR 후속: Claude 4 commit 통합, 비밀출력·설정/복구 판정 경계 수정. 격리 PG16 관련 40/40 통과, 운영 archive_mode off 실측. [[2026-09-18_VF-PITR-BOUNDARY_Codex]]. CI/Claude 독립검토/운영인수는 별도 미완료. 다음 Claude는 수정본 독립검토, Codex는 실제 WAL·목표시각 복구 증거 확보 가능한 환경에서 후속 검증. 기존 잔여 42.1875%, VF 운영인수 0/5 유지.
 
 - 사용자 후속 브랜치 정리: VF-CX-01/04 기록은 파일동일, dev-environment 수정은 현 helper와AST동일/격리PG3시험통과로중복제외. workspace-bridge 신규36개 기록 수신. [[2026-09-18_Codex_미착지브랜치_정리]]. 다음VF-CX-02/03/05 준비범위 진행.
+
+## 2026-09-18 후속 검토와 인수 준비
+
+- Claude 8bafb60 추가3파일을 Codex 독립 검토, 관련36시험 통과 후 공유 반영. 작성자76과 중복 합산하지 않는다. VF-CX-02/03 관련104시험 통과; VF-CX-05 오프라인 패키지 검사14시험 통과, 실제 인증서/peer policy 유효기간 실패(exit1). [[2026-09-18_VF-CX-020305_인수준비_Codex]].
+- Docker 종료시험170개+미사용 build cache 정리는 사용자 명시 확인 대기. 이전 image1/7실패 유지, CI billing 사용자 조치 대기. 다음 Codex는 승인 시 정리 후 동일 image 재검증, 운영자는 .225 권한/인증서·정책 갱신 준비.
