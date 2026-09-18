@@ -478,3 +478,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## MJS 빈집합 단언 수정
 
 [[2026-09-18_MJS_빈집합단언_감사수정_Codex]]: shard2단언에 배열/고정2개 가드,실제문장 offline Node12시험 통과. .mjs4파일 every5곳 중 나머지3곳 개수가드 확인. 추가 VB-MJS-02 UI const true PASS3건(P2) 미수정, Gemini 실제 UI 검증 보강/Codex review 인계. 과거 full smoke 실입력은 미확인. Claude PITR a681da3 도착, 다음 재검토 대상.
+
+## PITR a681da3 재검토
+
+[[2026-09-18_PITR_a681da3_재검토_Codex]]: 물리복원 경로/MinIO 정정 확인, Claude 성공텍스트 수신(사용자·Codex 실PG 재실행 없음). R2-01 after INSERT 실패 후 PASS 합성재현(P1), R2-02 변경명령 무차별재시도/소유권없는cleanup(P2), 기존R1-04 설명미해소로 전체착지 보류. 다음 Claude 수정/증거, Codex 재검토. shard9251f18 수정은 별개 착지.
