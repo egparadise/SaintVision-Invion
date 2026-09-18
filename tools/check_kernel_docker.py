@@ -34,8 +34,10 @@ def run(args, **kwargs):
 def checked(args, **kwargs):
     result = run(args, **kwargs)
     if result.returncode:
-        raise RuntimeError(
-            f'{Path(str(args[0])).name}: {docker_diag.describe_failure(result.returncode, result.stderr)}')
+        # describe() names a host-init failure or a timeout as a host condition and
+        # keeps a real docker error's masked stderr -- a raised TimeoutExpired would
+        # otherwise reopen the same unclassified hole the diagnostics restore closed.
+        raise RuntimeError(f'{Path(str(args[0])).name}: {docker_diag.describe(result)}')
     return result.stdout.decode('utf-8', errors='replace').strip()
 
 

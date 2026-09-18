@@ -236,12 +236,12 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | 초기 배정표 작성. 제품 작업 착수는 담당 확인 대기 |
-| 실제 owner / 읽은 진행판 버전 / KST | 담당자 입력 대기 |
-| branch / base SHA / 구현 SHA | 담당자 입력 대기 |
-| 작업한 것 | 담당자 입력 대기 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 담당자 입력 대기 |
-| CI / 독립 reviewer / 운영 인수 | 각 상태를 따로 기록. 현재 전체 인수 완료 아님 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 해당 카드의 선행 조건 참조 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 위 ready 카드부터 하나 선택 후 담당자가 명시 |
-| History / 오류 / Evidence / PR / sync 결과 | 실제 링크와 SHA를 담당자가 기록 |
+| 마지막 작업 / 착수 카드 | VF-CL-R-001 image lane 판별 후속 마무리 (재시도 정책·TimeoutExpired gap·미검증 기록) |
+| 실제 owner / 읽은 진행판 버전 / KST | Claude(테스트/운영 문서 owner) / 보강 로드맵 VF-CL / 2026-09-18 17:40 KST |
+| branch / base SHA / 구현 SHA | agent/claude/vf-cl-cx01 / b5f770a / 커밋 예정(아래 세션) |
+| 작업한 것 | (1) `docker_diag.run` 기본 retries 2→1(지속적 압박에선 재시도 무익·역효과, 최소 일시적 완충만); (2) `TimeoutExpired`를 분류된 결과(rc 124+`.timed_out`)로 잡아 raw 전파 폐쇄, `is_infrastructure_failure`로 host-init+timeout=미검증 통합; (3) 러너 선행 host 검사+`_HarnessUnavailable`(exit 125)로 미검증을 실패(1)·시험timeout(124)과 분리, `test_server_container.docker()`는 infra 실패 시 `pytest.skip`(미검증을 미검증으로); (4) VF-CL-R-001 문서 1.1.0 마무리 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | `docker_diag` 순수 로직 직접 실행 통과(timeout 미재시도·분류, host-init만 재시도, retries==1, infra 판별 분리, describe 3범주); 변경 6파일 `py_compile` OK; 잔여 2-arg `describe_failure` 호출부 0. **본 worktree pytest 미설치**라 pytest 스위트 미실행(정직 기록) |
+| CI / 독립 reviewer / 운영 인수 | 미완: pytest 스위트·image lane 재판별은 프로세스 생성 여유 있는 호스트 필요. reviewer=Codex 착지 대기 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role DB role 거부 포함) **미검증** 유지 — 미도달, 호스트 프로세스 생성 압박이 원인(제품 결함 0건). 해소는 사용자 환경(동시 Agent 축소/OneDrive 핸들 완화) 몫 |
+| 다음 카드 / 첫 행동 / 다음 담당 | 여유 호스트에서 image lane 재실행→미검증 6건 판별; Codex 본 마무리 검토·착지. 담당 사용자/CI·Codex |
+| History / 오류 / Evidence / PR / sync 결과 | History: `2026-09-18_15-30-00_KST_VF-CL-R-001_Claude_근본원인과R2수정.md` v1.1.0. 커밋 SHA는 커밋 후 기록 |

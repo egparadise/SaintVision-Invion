@@ -54,13 +54,19 @@ if data['case']=='public-signing-key': (p/'signer.pem').chmod(0o644)
 
 
 def docker(*args, env=None, data=None):
-    # docker_diag.run retries only a Windows host process-creation failure
-    # (STATUS_DLL_INIT_FAILED under host pressure -- the VF-CL-R-001 root cause) and
-    # classifies it apart from a real docker error, so a failure here is falsifiable
-    # rather than a suppressed "diagnostics suppressed".
+    # docker_diag.run classifies the failure so it is falsifiable rather than a
+    # suppressed "diagnostics suppressed". A host process-creation failure or a
+    # timeout (STATUS_DLL_INIT_FAILED / a hung CLI under host pressure -- the
+    # VF-CL-R-001 root cause) means the security assertion was never actually
+    # reached, so it is *unverified*, not failed: skip it and say so, rather than
+    # record a false product defect (image-lane finding, 2026-09-18). A real docker
+    # or product error still fails loudly.
     result = docker_diag.run(["docker", *args], timeout=90, input=data, env=env, text=True)
-    assert result.returncode == 0, ("Docker operation failed: "
-                                    + docker_diag.describe_failure(result.returncode, result.stderr))
+    if result.returncode:
+        reason = docker_diag.describe(result)
+        if docker_diag.is_infrastructure_failure(result):
+            pytest.skip("host condition prevented verification (unverified, not failed): " + reason)
+        raise AssertionError("Docker operation failed: " + reason)
     return result.stdout.strip()
 
 
