@@ -15,6 +15,10 @@ try {
     # Step 1: Generate TLS Certificates
     Write-Host "`n[1/5] Verifying TLS 1.3 Certificate Files on Disk..." -ForegroundColor Yellow
     $certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }
+    # Compose interpolation must validate the same resolved directory used by
+    # generation and pair verification; otherwise the fallback succeeds here
+    # but Step 5 fails on the required SAINTVISION_DEV_CERT_DIR variable.
+    $env:SAINTVISION_DEV_CERT_DIR = $certDir
     Write-Host " Certificate target directory: $certDir" -ForegroundColor DarkGray
     $certFile = Join-Path $certDir "saintvision.crt"
     $keyFile = Join-Path $certDir "saintvision.key"

@@ -21,6 +21,19 @@ def test_live_console_docker_start_failure_stops_before_listeners(tmp_path: Path
     if not powershell or not Path(csc).exists():
         pytest.skip("Windows PowerShell and csc.exe are required")
 
+    missing_prerequisites = [
+        path for path in (
+            ROOT / ".venv" / "Scripts" / "python.exe",
+            ROOT / "apps" / "web" / "node_modules" / "vite" / "bin" / "vite.js",
+        )
+        if not path.is_file()
+    ]
+    if missing_prerequisites:
+        pytest.skip(
+            "launcher prerequisites absent; Docker shim injection is not reached: "
+            + ", ".join(str(path) for path in missing_prerequisites)
+        )
+
     shim_dir = tmp_path / "shim"
     state_dir = tmp_path / "state"
     shim_dir.mkdir()

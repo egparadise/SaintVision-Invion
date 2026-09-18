@@ -253,7 +253,7 @@ def test_external_certificate_directory_summary_reporting(tmp_path: Path) -> Non
         "Write-Host 'mock smoke pass'; $global:LASTEXITCODE = 0",
     ).replace(
         "docker compose -f docker-compose.prod.yml config --quiet",
-        "Write-Host 'mock docker pass'; $global:LASTEXITCODE = 0",
+        f"if ($env:SAINTVISION_DEV_CERT_DIR -ne '{str(certs_dir).replace(chr(39), chr(39) + chr(39))}') {{ throw 'resolved certificate directory was not exported to Compose' }}; Write-Host 'mock docker pass'; $global:LASTEXITCODE = 0",
     )
 
     res = run_ps1_in_dir(

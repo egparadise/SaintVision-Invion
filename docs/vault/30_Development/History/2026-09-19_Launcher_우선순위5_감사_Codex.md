@@ -40,3 +40,11 @@ PowerShell launcher의 `ErrorActionPreference=Stop`, `Test-Path -LiteralPath`, `
 ## 다음 범위
 
 Docker start 실패 주입은 daemon 없이 shim으로 행동 검증을 완료했다. WSL native exit 전달, Agent GUI 자식 도구 실패, package rollback과 health의 운영 의미는 Docker/WSL/사용자 세션이 필요한 별도 운영 검증으로 남긴다.
+
+## 후속 정정 및 검증
+
+독립 검토에서 launcher 선행 파일(`.venv/Scripts/python.exe`, `apps/web/node_modules/vite/bin/vite.js`)이 없는 fresh checkout에서는 Docker shim까지 도달할 수 없다는 점을 확인했다. 행동 시험은 이 조건을 명시적 사유가 포함된 `pytest.skip`으로 처리하고, 두 파일이 존재하는데 shim 호출이 없을 때만 `ASSERT-FAIL`로 남긴다. 따라서 환경 미설치와 제품 동작 실패를 구분한다.
+
+또한 `tools/deploy_intranet.ps1`은 Step 1에서 선택한 `$certDir`을 `$env:SAINTVISION_DEV_CERT_DIR`에 반영한다. 인증서 경로를 `deploy/certs`로 폴백한 경우에도 Step 5의 Compose required-variable 검증이 같은 경로를 사용한다. 외부 경로 시험은 Compose 단계에서 환경변수 전달을 확인하도록 고정했다.
+
+검증: `python -m pytest -q tests/core/test_launcher_failure_boundaries.py tests/test_deploy_intranet_preflight.py` → **18 passed**; `git diff --check` → **PASS**.
