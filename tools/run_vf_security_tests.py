@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 import psycopg
 from psycopg.conninfo import make_conninfo
 from node_dependent_tests import dependents
+import docker_diag
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,15 +45,26 @@ def main():
              'operationalAcceptance': False, 'browserOptIn': browser_tests == '1', 'serverImage': server_image, 'nodeDependentSuitesExcluded': dependents()}
     code = 1
     try:
-        container = subprocess.check_output([
+        # docker_diag.run retries only a Windows host process-creation failure
+        # (STATUS_DLL_INIT_FAILED under host handle/RAM pressure -- the intermittent
+        # VF-CL-R-001 root cause), never a real docker error, and classifies the two.
+        created = docker_diag.run([
             'docker', 'run', '-d', '--name', name,
             '--label', 'ai.saintvision.configured=' + name,
             '--label', 'ai.saintvision.cx01=' + name,
             '--memory', '768m', '--cpus', '1', '--pids-limit', '256',
             '--tmpfs', '/var/lib/postgresql/data', '--publish', '127.0.0.1::5432',
             '--env', 'POSTGRES_PASSWORD', 'postgres:16',
-        ], env={**base_env, 'POSTGRES_PASSWORD': password}, text=True).strip()
-        info = json.loads(subprocess.check_output(['docker', 'inspect', container], text=True))[0]
+        ], env={**base_env, 'POSTGRES_PASSWORD': password}, text=True)
+        if created.returncode:
+            raise RuntimeError('container create failed: '
+                               + docker_diag.describe_failure(created.returncode, created.stderr))
+        container = created.stdout.strip()
+        inspected = docker_diag.run(['docker', 'inspect', container], text=True)
+        if inspected.returncode:
+            raise RuntimeError('container inspect failed: '
+                               + docker_diag.describe_failure(inspected.returncode, inspected.stderr))
+        info = json.loads(inspected.stdout)[0]
         port = info['NetworkSettings']['Ports']['5432/tcp'][0]['HostPort']
         dsn = make_conninfo(host='127.0.0.1', port=port, dbname='postgres',
                            user='postgres', password=password, connect_timeout=2)
@@ -91,13 +103,21 @@ def main():
             except ET.ParseError:
                 proof['testReport'] = 'incomplete'
     finally:
+        # Best-effort, retried, classified (VF-CL-R-001): a host-init failure to
+        # inspect must not raise out of the finally (masking the test's own result)
+        # or skip removal of this run's own container. Ownership is checked when it
+        # can be, but removal targets this run's unique id, and the outcome is
+        # recorded so the cleanup is falsifiable rather than assumed.
         if container:
-            label = subprocess.check_output(['docker', 'inspect', container, '--format',
-                        '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True).strip()
-            if label != name:
-                raise RuntimeError('Container ownership changed; cleanup refused')
-            subprocess.run(['docker', 'rm', '-f', container], check=True, stdout=subprocess.DEVNULL)
-            proof['isolatedContainerRemoved'] = True
+            inspected = docker_diag.run(['docker', 'inspect', container, '--format',
+                        '{{index .Config.Labels "ai.saintvision.configured"}}'], text=True)
+            if inspected.returncode == 0 and inspected.stdout.strip() != name:
+                proof['cleanup'] = 'ownership mismatch; container preserved'
+            else:
+                removed = docker_diag.run(['docker', 'rm', '-f', container])
+                proof['isolatedContainerRemoved'] = removed.returncode == 0
+                if removed.returncode:
+                    proof['cleanup'] = docker_diag.describe_failure(removed.returncode, removed.stderr)
         (output / (prefix + '.json')).write_text(json.dumps(proof, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'exitCode': code, 'tests': proof.get('tests'),
                       'evidence': '.work/' + prefix + '.json'}))

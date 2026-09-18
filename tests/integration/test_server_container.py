@@ -1,10 +1,14 @@
 """Opt-in candidate image acceptance; only disposable Docker resources are touched."""
 import json
 import os
-import re
 import subprocess
+import sys
 import time
+from pathlib import Path
 from uuid import uuid4
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+import docker_diag  # noqa: E402  -- the shared host-init/docker classifier
 
 import httpx
 import psycopg
@@ -49,25 +53,14 @@ if data['case']=='public-signing-key': (p/'signer.pem').chmod(0o644)
 '''
 
 
-_DOCKER_CREDENTIAL = re.compile(r'(://[^:@/\s]+:)[^@/\s]+(@)')
-
-
-def _docker_diagnostic(stderr):
-    """A bounded, credential-masked docker stderr (VF-CL-R-001).
-
-    Suppressing it made a daemon timeout indistinguishable from resource
-    exhaustion or a product failure, so the image lane's failures could only be
-    guessed at. Keeping a masked summary makes the classification falsifiable
-    without leaking the synthetic INV_RUNTIME_DSN password.
-    """
-    text = stderr if isinstance(stderr, str) else (stderr or b"").decode("utf-8", "replace")
-    return _DOCKER_CREDENTIAL.sub(r"\1***\2", text).strip()[:400] or "(no stderr)"
-
-
 def docker(*args, env=None, data=None):
-    result = subprocess.run(["docker", *args], input=data, env=env, capture_output=True,
-                            text=True, timeout=90)
-    assert result.returncode == 0, "Docker operation failed: " + _docker_diagnostic(result.stderr)
+    # docker_diag.run retries only a Windows host process-creation failure
+    # (STATUS_DLL_INIT_FAILED under host pressure -- the VF-CL-R-001 root cause) and
+    # classifies it apart from a real docker error, so a failure here is falsifiable
+    # rather than a suppressed "diagnostics suppressed".
+    result = docker_diag.run(["docker", *args], timeout=90, input=data, env=env, text=True)
+    assert result.returncode == 0, ("Docker operation failed: "
+                                    + docker_diag.describe_failure(result.returncode, result.stderr))
     return result.stdout.strip()
 
 

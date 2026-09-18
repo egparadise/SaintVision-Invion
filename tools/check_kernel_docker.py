@@ -10,12 +10,13 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import time
 from uuid import uuid4
 import xml.etree.ElementTree as ET
+
+import docker_diag
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
@@ -23,53 +24,73 @@ DEFAULT_TESTS = ['tests/integration/' + name + '.py' for name in (
     'test_workspace_resume', 'test_workspace_api', 'test_developer_workloads', 'test_workspace_start', 'test_business_handoff', 'test_shard_recovery', 'test_containment')]
 
 
-#: user:password@ inside a DSN/URL. The kernel DSN carries a synthetic password,
-#: which is why diagnostics were dropped; masking the value keeps the error kind.
-_CREDENTIAL = re.compile(r'(://[^:@/\s]+:)[^@/\s]+(@)')
-
-
-def _masked(stderr):
-    """The docker error kind, with credential values masked (VF-CL-R-001).
-
-    Suppressing the whole message made a daemon timeout indistinguishable from a
-    resource-exhaustion or a product failure, so a failure could only be guessed
-    at. Keeping a bounded, credential-masked stderr makes the classification
-    falsifiable without leaking the synthetic DSN password.
-    """
-    text = stderr.decode('utf-8', errors='replace') if isinstance(stderr, (bytes, bytearray)) else str(stderr or '')
-    return _CREDENTIAL.sub(r'\1***\2', text).strip()[:400] or '(no stderr)'
-
-
 def run(args, **kwargs):
-    return subprocess.run([str(v) for v in args], capture_output=True,
-                          timeout=kwargs.pop('timeout', 60), **kwargs)
+    # Delegates to the shared classifier, which retries only a Windows host
+    # process-creation failure (STATUS_DLL_INIT_FAILED) -- the intermittent
+    # VF-CL-R-001 root cause -- and never a real docker error.
+    return docker_diag.run(args, **kwargs)
 
 
 def checked(args, **kwargs):
     result = run(args, **kwargs)
     if result.returncode:
         raise RuntimeError(
-            f'{Path(str(args[0])).name} exit {result.returncode}: {_masked(result.stderr)}')
+            f'{Path(str(args[0])).name}: {docker_diag.describe_failure(result.returncode, result.stderr)}')
     return result.stdout.decode('utf-8', errors='replace').strip()
 
 
-def prune_stale_kernel_test_residue():
-    """Remove *exited* kernel-test containers and empty networks from prior runs.
+#: A container younger than this may belong to a concurrently-running agent on the
+#: shared host, so it is never a prune target (VF-CL-R2-01). Kernel test runs finish
+#: in minutes; genuine residue is far older.
+PRUNE_MIN_AGE_SECONDS = 1800
 
-    The per-invocation finally deliberately preserves this run's stopped
-    containers for post-mortem logs, but nothing bounded that: weeks of runs
-    accumulated (VF-CL-R-001 -- ~130 exited ai.saintvision.kernel-test containers
-    exhausted an 8 GB host and timed out a separate image lane). Pruning only
-    *non-running* kernel-test-labelled residue at the start of a run bounds the
-    accumulation to the current invocation, while a failed run's artifacts still
-    survive until the next run starts. Running containers are never touched, and
-    this is best-effort -- a prune failure must not abort the run it precedes.
+
+def _age_seconds(created_iso):
+    """Age of a docker RFC3339 ``.Created`` timestamp, or None if unparseable."""
+    from datetime import datetime, timezone
+    try:
+        text = (created_iso or '').strip().replace('Z', '+00:00')
+        if '.' in text:                       # trim RFC3339Nano to microseconds
+            head, rest = text.split('.', 1)
+            digits = ''
+            index = 0
+            while index < len(rest) and rest[index].isdigit():
+                digits += rest[index]
+                index += 1
+            text = head + '.' + digits[:6] + rest[index:]
+        return (datetime.now(timezone.utc) - datetime.fromisoformat(text)).total_seconds()
+    except Exception:
+        return None
+
+
+def prune_stale_kernel_test_residue(min_age_seconds=PRUNE_MIN_AGE_SECONDS):
+    """Remove old *exited* kernel-test containers and empty networks, safely.
+
+    The per-invocation finally deliberately preserves this run's stopped containers
+    for post-mortem logs, but nothing bounded that: weeks of runs accumulated
+    (VF-CL-R-001 -- ~130 exited ai.saintvision.kernel-test containers exhausted an
+    8 GB host and timed out a separate image lane). This bounds the accumulation
+    without racing a concurrent agent on the shared host (VF-CL-R2-01):
+
+    * only ``exited`` containers are considered -- never ``created`` (a concurrent
+      run may have just created but not yet started one) and never running;
+    * a container younger than ``min_age_seconds`` is skipped, because a concurrent
+      run's containers are recent and its own finally will handle them;
+    * removal is a *non-force* ``docker rm``, which refuses a container that is
+      running, so even a container that starts between listing and removal is safe.
+
+    Networks are removed only when empty (``docker network rm`` refuses one in use).
+    Every step is best-effort; the caller also guards the whole call.
     """
-    stale = run(['docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.kernel-test',
-                 '--filter', 'status=exited', '--filter', 'status=created',
-                 '--filter', 'status=dead']).stdout.decode('utf-8', 'replace').split()
-    for container in stale:
-        run(['docker', 'rm', '-f', container])
+    exited = run(['docker', 'ps', '-aq', '--filter', 'label=ai.saintvision.kernel-test',
+                  '--filter', 'status=exited']).stdout.decode('utf-8', 'replace').split()
+    for container in exited:
+        created = run(['docker', 'inspect', '--format', '{{.Created}}', container]
+                      ).stdout.decode('utf-8', 'replace').strip()
+        age = _age_seconds(created)
+        if age is None or age < min_age_seconds:
+            continue                          # too recent -- may belong to a concurrent run
+        run(['docker', 'rm', container])      # NON-force: a running container is refused, never killed
     for network in run(['docker', 'network', 'ls', '--filter', 'label=ai.saintvision.kernel-test',
                         '--format', '{{.ID}}']).stdout.decode('utf-8', 'replace').split():
         run(['docker', 'network', 'rm', network])  # refuses while still in use; ignored
@@ -193,7 +214,13 @@ def execute(prepared, tests):
     # Bound residue from prior runs before creating this run's containers, so a
     # host that has accumulated weeks of stopped test containers does not time out
     # this run (VF-CL-R-001). This run's own resources are created after the prune.
-    prune_stale_kernel_test_residue()
+    # Best-effort (VF-CL-R2-02): the prune sits outside the try below and calls
+    # docker, which can raise TimeoutExpired/OSError under the very pressure it
+    # addresses; a prune failure must bound nothing rather than abort the run.
+    try:
+        prune_stale_kernel_test_residue()
+    except Exception:
+        pass
     try:
         checked(['docker','network','create','--internal','--label','ai.saintvision.kernel-test='+name,network])
         checked(['docker','run','-d','--name',database,'--label','ai.saintvision.kernel-test='+name,
