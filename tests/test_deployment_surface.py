@@ -312,3 +312,64 @@ def projects():
     report = inspect(f"{name}:app", None)
     assert "synthetic-probe-secret" not in json.dumps(report)
     assert any("failing probes" in p for p in verdict(report))
+
+
+@pytest.mark.parametrize("source,attr,expected", [
+    ('def create_app():\n    import synthetic_missing_dependency_xyz\n', 'create_app', 1),
+    ('import synthetic_missing_dependency_xyz\n', 'create_app', 1),
+    ('def create_app():\n    raise TypeError("private-body-error")\n', 'create_app', 1),
+    ('def create_app():\n    return None\n', 'create_app', 1),
+    ('value = 1\n', 'app', 1),
+    ('value = 1\n', '', 1),
+    ('def create_app(*, config):\n    raise AssertionError("body must not run")\n', 'create_app', 0),
+])
+def test_factory_boundary_cli(tmp_path, source, attr, expected):
+    import os
+    root = Path(__file__).resolve().parents[1]
+    (tmp_path / 'factory_boundary.py').write_text(source)
+    result = subprocess.run(
+        [sys.executable, str(root / 'tools/deployment_surface.py'),
+         '--app', 'factory_boundary:' + attr, '--json'],
+        cwd=root, env={**os.environ, 'PYTHONPATH': str(tmp_path)},
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == expected
+    report = json.loads(result.stdout)
+    assert bool(report['problems']) is bool(expected)
+    assert report['how'].startswith('INCONCLUSIVE') is bool(expected)
+    assert 'private-body-error' not in result.stdout + result.stderr
+    assert 'body must not run' not in result.stdout + result.stderr
+
+
+@pytest.mark.parametrize('status', ['exception', 503, 404, 200, 401, 403])
+def test_forged_probe_outcome_is_preserved(module, status, monkeypatch, capsys):
+    action = ('raise RuntimeError("private-bearer-error")' if status == 'exception'
+              else f'return JSONResponse({{}}, status_code={status})')
+    source = f"""
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+app = FastAPI()
+@app.get('/v1/approvals')
+def approvals(request: Request):
+    if not request.headers.get('authorization'):
+        return JSONResponse({{}}, status_code=401)
+    {action}
+"""
+    name = module('forged_boundary_' + str(status), source)
+    report = inspect(name + ':app', None)
+    answer = next(a for a in report['answers'] if a['path'] == '/v1/approvals')
+    assert answer['status'] == 401
+    assert answer['bearerStatus'] == ('probe-error' if status == 'exception' else status)
+    problems = verdict(report)
+    assert bool(problems) is (status not in (401, 403))
+    assert bool(answer.get('acceptsAnyBearerToken')) is (status == 200)
+    assert 'private-bearer-error' not in json.dumps(report)
+    if status in ('exception', 503, 404):
+        assert any('could not establish forged Bearer rejection' in p for p in problems)
+
+    from deployment_surface import main
+    monkeypatch.setattr(sys, 'argv', ['deployment_surface.py', '--app', name + ':app', '--json'])
+    assert main() == (0 if status in (401, 403) else 1)
+    output = capsys.readouterr()
+    assert 'private-bearer-error' not in output.out + output.err
+    assert json.loads(output.out)['answers'] == report['answers']

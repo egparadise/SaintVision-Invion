@@ -109,23 +109,27 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
   // Request real placement preview from backend endpoint
   useEffect(() => {
     let isMounted = true;
+    const query = new URLSearchParams({
+      cpuMillicores: String(requirement.requiredCores * 1000),
+      ramBytes: String(requirement.requiredMemoryBytes),
+      gpuDevices: String(requirement.requiresGpu ? 1 : 0),
+    });
     apiClient<{
       poolId: string;
-      selectedNodeId: string | null;
-      explanation: string;
-      shards: ShardItem[];
-    }>(`/v1/pools/${selectedPoolId}/placement-preview`, {
-      method: 'POST',
-      body: JSON.stringify({
-        ...requirement,
-        fencedNodeIds: Array.from(fencedNodeIds),
-      }),
-    })
+      candidates: { nodeId: string; hostname: string; eligible?: boolean; availableCpuMillicores?: number }[];
+      candidateCount: number;
+    }>(`/v1/pools/${selectedPoolId}/placement-preview?${query.toString()}`)
       .then((res) => {
         if (isMounted) {
-          setServerExplanation(res.explanation);
-          if (res.shards) {
-            setServerShards(res.shards);
+          setServerExplanation(`적격 노드 ${res.candidateCount}대 확인 (풀: ${res.poolId})`);
+          if (res.candidates) {
+            setServerShards(
+              res.candidates.map((c, idx) => ({
+                shardId: `shd_${selectedPoolId}_${idx + 1}`,
+                targetNodeId: c.nodeId || c.hostname,
+                status: c.eligible !== false ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
+              }))
+            );
           }
         }
       })
@@ -136,7 +140,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
     return () => {
       isMounted = false;
     };
-  }, [requirement, fencedNodeIds, selectedPoolId]);
+  }, [requirement, selectedPoolId]);
 
   const activePool = pools.find((p) => p.id === selectedPoolId) || pools[0];
   const explainResult: PlacementExplainResult = localExplainResult;

@@ -1,0 +1,31 @@
+{
+  "reviewedSHA": "a5401a7",
+  "scope": "original db_login from git, fake owner/engine; no real DB",
+  "case": "body+dispose+drop-failure",
+  "calls": [
+    [
+      "CREATE",
+      "ROLE"
+    ],
+    [
+      "GRANT",
+      "\"inv_app\""
+    ],
+    [
+      "DROP",
+      "ROLE"
+    ]
+  ],
+  "exceptionChain": [
+    {
+      "type": "ValueError",
+      "message": "injected drop failure"
+    },
+    {
+      "type": "AssertionError",
+      "message": "original body failure"
+    }
+  ],
+  "disposeErrorPreserved": false,
+  "existingRegression": "9 passed, --noconftest, no DSN required"
+}

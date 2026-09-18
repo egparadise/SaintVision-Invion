@@ -16,6 +16,7 @@ import {
   getNodeDetail,
   postNodeHeartbeat,
   triggerLivenessSweep,
+  getDiscoveryCandidates,
   broadcastAnnouncement,
   admitDiscoveryCandidate,
   declineDiscoveryCandidate,
@@ -302,7 +303,18 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
       expect(res.markedLost).toBe(0);
     });
 
-    it('14. broadcastAnnouncement sends announcement payload and tenant header', async () => {
+    it('14. getDiscoveryCandidates queries candidates list with optional includeStale', async () => {
+      mockApi.mockResolvedValueOnce({ items: [], note: 'Unverified' });
+      const res = await getDiscoveryCandidates();
+      expect(mockApi).toHaveBeenCalledWith('/v1/discovery/candidates');
+      expect(res.items).toEqual([]);
+
+      mockApi.mockResolvedValueOnce({ items: [], note: 'Unverified' });
+      await getDiscoveryCandidates(true);
+      expect(mockApi).toHaveBeenCalledWith('/v1/discovery/candidates?includeStale=true');
+    });
+
+    it('14b. broadcastAnnouncement sends announcement payload and tenant header', async () => {
       mockApi.mockResolvedValueOnce({ accepted: true, state: 'registered' });
       const res = await broadcastAnnouncement(
         {

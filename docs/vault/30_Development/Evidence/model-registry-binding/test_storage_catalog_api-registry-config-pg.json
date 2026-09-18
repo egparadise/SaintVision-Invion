@@ -1,0 +1,72 @@
+{
+  "baseSha": "6314c54804e25ff9f8857c978c56b16425e1c6fe",
+  "testFileSha256": "843c815a9c18c4ce719a14414ac972ecd41d343463469fc61624023cac97d922",
+  "suite": "tests/integration/test_storage_catalog_api.py",
+  "command": "python -m pytest tests/integration/test_storage_catalog_api.py -q --tb=short --junitxml=<local-private-report>",
+  "exitCode": 0,
+  "seconds": 12.35,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "passed": 12
+  },
+  "cases": [
+    {
+      "name": "test_owner_resolves_actual_catalogue_and_lists_only_owned_rows",
+      "status": "passed"
+    },
+    {
+      "name": "test_same_tenant_nonowner_unknown_and_other_tenant_are_not_disclosed",
+      "status": "passed"
+    },
+    {
+      "name": "test_current_contribution_revocation_hides_locations_but_keeps_owner_status",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[None]",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[forged-admin]",
+      "status": "passed"
+    },
+    {
+      "name": "test_missing_forged_and_unprovisioned_identities_are_refused[unlinked]",
+      "status": "passed"
+    },
+    {
+      "name": "test_user_suspension_revokes_existing_valid_token",
+      "status": "passed"
+    },
+    {
+      "name": "test_read_routes_do_not_forward_storage_mutations",
+      "status": "passed"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[not-an-inv-uri-secret]",
+      "status": "passed"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[inv://models/a@1/]",
+      "status": "passed"
+    },
+    {
+      "name": "test_bad_uri_is_bounded_and_not_reflected[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "status": "passed"
+    },
+    {
+      "name": "test_pagination_and_forged_cursor_stay_with_current_owner",
+      "status": "passed"
+    }
+  ],
+  "junitSha256": "0f9d632161f57443e77a37b752dc6c538a1a92a64d362326f7fab524ce878ce4",
+  "database": "user-provided disposable PostgreSQL 16; unique fixture DB/login; credentials omitted",
+  "imageLaneRun": false,
+  "testedWorkingTreeSources": {
+    "services\\control-plane\\src\\inv\\app.py": "5cb33d097d85dceb5aec5aa7acf30e90a64fce10df6b63ef2ad05cf473ccf52f",
+    "services\\control-plane\\src\\inv\\model_registry_config.py": "05a2e2f679d6791759f7720422149b3d7a4ccdc21ac3c74b96e71b8a01db5994"
+  },
+  "dsnCondition": "User-provided original DSN; no added application_name; credentials omitted"
+}

@@ -21,6 +21,7 @@ const BACKEND_URL = process.env.TEST_BACKEND_URL || 'http://127.0.0.1:8080';
 
 let passed = 0;
 let total = 0;
+let unverified = 0;
 
 function assert(title, condition, extra = '') {
   total++;
@@ -30,6 +31,11 @@ function assert(title, condition, extra = '') {
   } else {
     console.error(`  ✖ [FAIL] ${title} ${extra}`);
   }
+}
+
+function recordUnverified(title, reason) {
+  unverified++;
+  console.log(`  ℹ [UNVERIFIED] ${title} (${reason})`);
 }
 
 function base64Url(buf) {
@@ -486,8 +492,8 @@ async function runFullSmokeJourney() {
     const shRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/shards`);
     assert('Shards listing returns HTTP 200', shRes.status === 200);
     const shData = await shRes.json();
-    assert('All shards confirm physical stop receipts', shData.items && shData.items.every((s) => s.physicallyStopped === true));
-    assert('All shards confirm output commitment hashes', shData.items && shData.items.every((s) => typeof s.outputHash === 'string'));
+    assert('All shards confirm physical stop receipts', Array.isArray(shData.items) && shData.items.length === 2 && shData.items.every((s) => s != null && s.physicallyStopped === true));
+    assert('All shards confirm output commitment hashes', Array.isArray(shData.items) && shData.items.length === 2 && shData.items.every((s) => s != null && typeof s.outputHash === 'string'));
 
     // 4. Evidence manifest inspection
     const eviRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JPARENT_SUCCESS/evidence`);
@@ -904,30 +910,39 @@ async function runFullSmokeJourney() {
     assert('Windows nodes map to authentic PowerShell PTY session', winShell === 'powershell');
     assert('Linux nodes map to authentic Bash PTY session', linuxShell === 'bash');
 
-    // 6. Web Desktop Viewport & Switcher Verification
-    const hasDesktopShell = true;
-    assert('Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)', hasDesktopShell);
+    // 6. Web Desktop Viewport & Switcher Verification (VB-MJS-02: separate UI lane required)
+    recordUnverified(
+      'Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)',
+      'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
+    );
 
-    // 7. Multi-window Manager Traffic Light & Z-Index Invariant
-    const windowManagerValid = true;
-    assert('Window Manager enforces traffic lights, z-index elevation, and minimize/maximize', windowManagerValid);
+    // 7. Multi-window Manager Traffic Light & Z-Index Invariant (VB-MJS-02: separate UI lane required)
+    recordUnverified(
+      'Window Manager enforces traffic lights, z-index elevation, and minimize/maximize',
+      'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
+    );
 
     // 8. Desktop Shell Keyboard Navigation & A11y Shortcut Protocol (Alt+Tab, Escape)
-    const keyboardA11ySupported = true;
-    assert('Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol', keyboardA11ySupported);
+    recordUnverified(
+      'Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol',
+      'Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke'
+    );
 
     // 9. Window Layout State Persistence Protocol (localStorage invariant)
-    const layoutPersistenceValid = true;
-    assert('Desktop window manager enforces local storage layout serialization protocol', layoutPersistenceValid);
+    recordUnverified(
+      'Desktop window manager enforces local storage layout serialization protocol',
+      'Requires browser localStorage persistence lane; unverified in HTTP API contract smoke'
+    );
 
     // -------------------------------------------------------------------------
     // Summary Dossier
     // -------------------------------------------------------------------------
+    const pct = total > 0 ? Math.round((passed / total) * 100) : 0;
     console.log('\n======================================================================');
-    console.log(`🎉 Full E2E Browser Journey Smoke Summary: ${passed}/${total} checks passed (${Math.round((passed / total) * 100)}%)`);
+    console.log(`🎉 API Contract Smoke Summary: ${passed}/${total} observed checks passed (${pct}%) | ${unverified} unverified UI invariants deferred to browser lane`);
     console.log('======================================================================\n');
 
-    if (passed !== total) {
+    if (passed !== total || total === 0) {
       process.exit(1);
     }
   } catch (err) {

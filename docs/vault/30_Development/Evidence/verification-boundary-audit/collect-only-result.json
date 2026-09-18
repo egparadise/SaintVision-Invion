@@ -1,0 +1,6 @@
+{
+  "scope": "real pytest collection only in temp directory; assertion intentionally not executed",
+  "exitCode": 0,
+  "junitCases": 0,
+  "stdout": "test_probe.py::test_probe\n\n1 test collected in 0.05s\n"
+}

@@ -1,0 +1,72 @@
+{
+  "scope": "Windows PowerShell original script, synthetic native command results and HTTP stub; no deployment",
+  "sourceSHA256": "cceea8c409d91482ba548536beb7bed95ce3dcc5129d5a448b1b616e9c696aba",
+  "results": [
+    {
+      "case": "tls-failure",
+      "injectedNativeExit": 23,
+      "processExit": 0,
+      "zeroErrorsBanner": true,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs",
+        "docker compose -f docker-compose.prod.yml config --quiet"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "tests-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "smoke-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "compose-failure",
+      "injectedNativeExit": 23,
+      "processExit": 1,
+      "zeroErrorsBanner": false,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs",
+        "docker compose -f docker-compose.prod.yml config --quiet"
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "case": "success",
+      "injectedNativeExit": 0,
+      "processExit": 0,
+      "zeroErrorsBanner": true,
+      "trace": [
+        "python tools/generate_tls_cert.py",
+        "npm test -- --run",
+        "npm run build",
+        "node tools/run_browser_smoke.mjs",
+        "docker compose -f docker-compose.prod.yml config --quiet"
+      ],
+      "sourceUnchanged": true
+    }
+  ]
+}

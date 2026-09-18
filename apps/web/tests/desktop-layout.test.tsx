@@ -2,6 +2,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {afterEach, expect, it, vi} from 'vitest';
 import {DesktopShell} from '../src/features/desktop/DesktopShell';
+import {Header} from '../src/shared/ui/Header';
 afterEach(() => {vi.unstubAllGlobals();});
 const props = {projectId:'project',nodes:[],runs:[],approvals:[],workspaces:[],currentReviewerId:'user',onRefreshNodes:async()=>{},onApprove:async()=>{},onReject:async()=>{},onChangeUser:()=>{},onSwitchToPortalView:()=>{},currentTheme:'dark' as const,onToggleTheme:()=>{}};
 it.each(['[null]', '[{"id":"win_my_computer","appId":"my-computer","isOpen":true}]'])('recovers malformed stored layout %s', saved => {
@@ -33,3 +34,34 @@ it('rejects duplicate identities and never mutates defaults', () => {
   const result = restoreDesktopLayout(JSON.stringify([defaults[0],defaults[0]]),defaults);
   result[0].position.x=999;expect(defaults[0].position.x).toBe(40);
 });
+
+it('renders mounted approval center, terminal, and settings windows when open', () => {
+  const openSaved = JSON.stringify([
+    { id: 'win_approvals', appId: 'approvals', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 11, position: { x: 50, y: 50 }, size: { width: 800, height: 500 } },
+    { id: 'win_terminal', appId: 'terminal', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 12, position: { x: 100, y: 100 }, size: { width: 800, height: 500 } },
+    { id: 'win_settings', appId: 'settings', isOpen: true, isMinimized: false, isMaximized: false, zIndex: 13, position: { x: 150, y: 150 }, size: { width: 800, height: 500 } },
+  ]);
+  vi.stubGlobal('localStorage', { getItem: () => openSaved });
+  const markup = renderToStaticMarkup(
+    <DesktopShell
+      {...props}
+      workspaces={[{ id: 'wsp_test', name: 'Workspace Test', status: 'ready' } as any]}
+    />
+  );
+  expect(markup).toContain('거버넌스 승인 센터');
+  expect(markup).toContain('Web Terminal PTY');
+  expect(markup).toContain('Docker Socket 노출 여부');
+});
+
+it('renders fabric control plane tab in Header navigation', () => {
+  const markup = renderToStaticMarkup(
+    <Header
+      currentTheme="dark"
+      onToggleTheme={() => {}}
+      activeTab="fabric"
+      onSelectTab={() => {}}
+    />
+  );
+  expect(markup).toContain('가상 패브릭 (CX-01)');
+});
+

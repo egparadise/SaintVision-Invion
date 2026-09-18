@@ -13,3 +13,6 @@ build/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+
+/deploy/certs/saintvision.crt
+/deploy/certs/saintvision.key

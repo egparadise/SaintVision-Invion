@@ -10,6 +10,22 @@
 - [원문 반영 목록](docs/vault/00_Index/원문%20분석%20및%20반영%20목록.md)
 - Git origin: https://github.com/egparadise/SaintVision-Invion.git
 
+## 개발 TLS 인증서
+
+개발 인증서는 저장소 외부 디렉터리에 둡니다. clone 후 `requirements-core.txt`를 설치하고 인증서를 준비한 다음 `SAINTVISION_DEV_CERT_DIR`를 설정해야 합니다. 이제 Compose는 이 변수가 없으면 시작하지 않습니다. 이전의 `./deploy/certs` 기본 폴백은 제거됐으므로, 기존에 Compose를 직접 실행하던 개발자도 이 변수 설정이 필요합니다.
+
+환경변수만 설정하고 파일을 만들지 않으면 구형 Compose가 bind 대상에 디렉터리를 만들 수 있습니다. 따라서 직접 Compose를 실행하지 말고 `deploy_intranet.ps1`의 leaf·키 일치 preflight를 먼저 통과시킵니다.
+
+```powershell
+python -m venv .venv
+.\\.venv\\Scripts\\python.exe -m pip install -r requirements-core.txt
+.\\.venv\\Scripts\\python.exe tools/generate_tls_cert.py --output-dir C:\\SaintVision\\secrets\\saintvision-dev
+$env:SAINTVISION_DEV_CERT_DIR = 'C:\\SaintVision\\secrets\\saintvision-dev'
+powershell -ExecutionPolicy Bypass -File tools/deploy_intranet.ps1
+```
+
+전환·검증·롤백의 전체 절차는 [개발 TLS 인증서 외부 주입 전환 준비](docs/vault/30_Development/History/2026-09-18_TLS_%EC%99%B8%EB%B6%80%EC%A3%BC%EC%9E%85_%EC%A0%84%ED%99%98%EC%A4%80%EB%B9%84_Codex.md)를 따른다.
+
 ## 검증·동기화
 
 ```powershell

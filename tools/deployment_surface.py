@@ -39,6 +39,7 @@ from __future__ import annotations
 import argparse
 from contextlib import redirect_stderr, redirect_stdout
 import json
+import inspect as signature_inspection
 import os
 import re
 import sys
@@ -90,19 +91,28 @@ def obtain(target: str) -> tuple[Any, str]:
             "INCONCLUSIVE: module could not be imported here; diagnostics suppressed"
         )
     if not attr:
-        return None, "no attribute named; nothing to serve"
+        return None, "INCONCLUSIVE: no attribute named; nothing to inspect"
     candidate = getattr(module, attr, None)
     if candidate is None:
-        return None, f"{module_name} has no {attr!r}"
+        return None, f"INCONCLUSIVE: {module_name} has no {attr!r}"
     if callable(candidate) and not hasattr(candidate, "routes"):
-        # A factory. Calling it with nothing is exactly what a misconfigured
-        # deployment would amount to, so the failure is the finding.
+        # Binding is checked before execution: a TypeError from the body is
+        # an implementation failure, not evidence of required configuration.
         try:
-            return candidate(), "factory returned an application with no arguments"
+            signature = signature_inspection.signature(candidate)
+        except Exception:
+            return None, "INCONCLUSIVE: factory signature unavailable; diagnostics suppressed"
+        try:
+            signature.bind()
         except TypeError:
             return None, "factory refuses to build without arguments; diagnostics suppressed"
-        except Exception:  # noqa: BLE001 - any refusal is the answer
-            return None, "factory refused; diagnostics suppressed"
+        try:
+            application = candidate()
+        except Exception:
+            return None, "INCONCLUSIVE: factory execution failed; diagnostics suppressed"
+        if application is None:
+            return None, "INCONCLUSIVE: factory returned no application; diagnostics suppressed"
+        return application, "factory returned an application with no arguments"
     return candidate, "module-level application object"
 
 
@@ -175,7 +185,10 @@ def _inspect(target: str, module_source: str | None) -> dict[str, Any]:
                     path, headers={"Authorization": "Bearer not-a-real-token"}
                 )
             except Exception:  # noqa: BLE001
+                entry["bearerStatus"] = "probe-error"
                 retried = None
+            else:
+                entry["bearerStatus"] = retried.status_code
             if retried is not None and retried.status_code < 400:
                 entry["acceptsAnyBearerToken"] = True
                 entry["bearerStatus"] = retried.status_code
@@ -226,6 +239,17 @@ def verdict(report: dict[str, Any]) -> list[str]:
         )
     if report.get("declaresAuthentication") is False:
         problems.append("the module declares no authentication of its own")
+    incomplete_bearer = [
+        a for a in report["answers"]
+        if "bearerStatus" in a
+        and a["bearerStatus"] not in (401, 403)
+        and not a.get("acceptsAnyBearerToken")
+    ]
+    if incomplete_bearer:
+        problems.append(
+            "the check could not establish forged Bearer rejection: "
+            + ", ".join(a["path"] for a in incomplete_bearer)
+        )
     forged = [a for a in report["answers"] if a.get("acceptsAnyBearerToken")]
     for answer in forged:
         problems.append(

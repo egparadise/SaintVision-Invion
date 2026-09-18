@@ -22,8 +22,11 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "services/control-plane/src", "tests"]
-addopts = "-ra"
+# Host Docker mutations are an explicit lane, including on machines with a CLI.
+# Select with -m docker_host; marker selection on the command line overrides this.
+addopts = "-ra -m 'not docker_host'"
 markers = [
+    "docker_host: real Docker host operations; explicit isolated-host lane (-m docker_host)",
     "postgres: requires a live PostgreSQL instance (INV_TEST_DATABASE_URL or isolated PG)",
     "credential_model: synthetic conformance model and deliberately faulty models, not backend acceptance",
     "credential_backend: implementation-owned real credential backend conformance, synthetic credentials only",

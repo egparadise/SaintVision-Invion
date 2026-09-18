@@ -164,12 +164,14 @@ def main() -> int:
     served = set().union(*per_tree.values()) if per_tree else set()
     wanted = scan_client(args.client)
     missing = sorted(wanted - served)
+    exit_code = 2 if not wanted else (1 if missing else 0)
 
     if args.json:
         print(json.dumps(
             {
                 "servedByTree": {k: sorted(v) for k, v in per_tree.items()},
                 "clientPaths": sorted(wanted),
+                "assessment": "inconclusive-no-client-paths" if not wanted else "compared",
                 "unserved": missing,
                 "measurement": "configured-factory" if args.configured_surface else "source-declarations",
                 "operationalAcceptanceAssessed": False,
@@ -177,7 +179,7 @@ def main() -> int:
             },
             indent=2,
         ))
-        return 1 if missing else 0
+        return exit_code
 
     for root, routes in per_tree.items():
         print(f"  {len(routes):4} routes  {root}")
@@ -186,8 +188,10 @@ def main() -> int:
     print(f"  {len(missing):4} unserved\n")
     for path in missing:
         print(f"    {path}")
+    if not wanted:
+        print('INCONCLUSIVE: no client paths discovered; coverage was not assessed.')
     print('\n' + LIMITATION)
-    return 1 if missing else 0
+    return exit_code
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ REQUIRED = {"INV_BUSINESS_DSN": "postgresql+psycopg://example:example@postgres/s
             "INV_CONFIG_VOLUME": "synthetic-config-volume",
             "INV_WEB_AUTH_CONFIG": "./synthetic-auth-config.js",
             "POSTGRES_PASSWORD": "synthetic-admin-only", "MINIO_ROOT_USER": "synthetic-admin",
+            "SAINTVISION_DEV_CERT_DIR": "C:/SaintVision/secrets/saintvision-dev",
             "MINIO_ROOT_PASSWORD": "synthetic-storage-only"}
 
 
@@ -66,3 +67,37 @@ def test_workspace_overlay_requires_external_volume(tmp_path, volume):
     assert "INV_DATABASE_URL" not in backend["environment"]
     mount = next(v for v in backend["volumes"] if v["target"] == "/workspaces")
     assert mount["volume"]["nocopy"] is True
+
+
+def test_tls_file_mounts_never_create_host_directories():
+    import yaml
+
+    compose = yaml.safe_load((ROOT / "docker-compose.prod.yml").read_text(encoding="utf-8"))
+    mounts = compose["services"]["web"]["volumes"]
+    tls = {
+        mount["target"]: mount
+        for mount in mounts
+        if isinstance(mount, dict)
+        and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
+    }
+    assert set(tls) == {"/etc/ssl/certs/saintvision.crt", "/etc/ssl/private/saintvision.key"}
+    for mount in tls.values():
+        assert mount["type"] == "bind"
+        assert mount["read_only"] is True
+        assert mount["bind"]["create_host_path"] is False
+
+
+def test_tls_file_mounts_require_external_certificate_directory():
+    import yaml
+
+    compose = yaml.safe_load((ROOT / "docker-compose.prod.yml").read_text(encoding="utf-8"))
+    mounts = compose["services"]["web"]["volumes"]
+    tls_sources = {
+        mount["target"]: mount["source"]
+        for mount in mounts
+        if isinstance(mount, dict) and mount.get("target", "").endswith(("saintvision.crt", "saintvision.key"))
+    }
+    assert tls_sources == {
+        "/etc/ssl/certs/saintvision.crt": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.crt",
+        "/etc/ssl/private/saintvision.key": "${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.key",
+    }

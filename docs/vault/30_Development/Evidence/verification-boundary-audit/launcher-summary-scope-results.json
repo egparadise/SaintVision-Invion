@@ -1,0 +1,35 @@
+{
+  "baseSHA": "66bbcf0",
+  "scope": "original PS1 with native and HTTP/command-discovery stubs; no real network/Docker/deployment",
+  "sourceSHA256": "3f684b8b27b9bfe53fd51295d9df31e49ce297f1f64e510ab83ca27517dccb3c",
+  "results": [
+    {
+      "dockerCommandAvailable": false,
+      "processExit": 0,
+      "summaryRows": [
+        "[1/5] TLS 1.3 Certificates:        VERIFIED (deploy/certs/saintvision.crt: 24B, deploy/certs/saintvision.key: 24B)",
+        "[2/5] Frontend & Protocol Tests:    VERIFIED (apps/web unit/protocol tests passed)",
+        "[3/5] Production Asset Build:       VERIFIED (dist/index.html present, 18B)",
+        "[4/5] E2E Browser Smoke Suite:      VERIFIED (202 checks passed)",
+        "[5/5] Compose Production Graph:     SKIPPED (Docker CLI not detected on host)",
+        "[OPT] Live Gateway Probe:           OFFLINE / NOT RUNNING (Optional dev probe)"
+      ],
+      "inputs": "nonempty invalid cert/key and old synthetic HTML; native npm/node/docker exit0; gateway throws",
+      "sourceByteIdentical": true
+    },
+    {
+      "dockerCommandAvailable": true,
+      "processExit": 0,
+      "summaryRows": [
+        "[1/5] TLS 1.3 Certificates:        VERIFIED (deploy/certs/saintvision.crt: 24B, deploy/certs/saintvision.key: 24B)",
+        "[2/5] Frontend & Protocol Tests:    VERIFIED (apps/web unit/protocol tests passed)",
+        "[3/5] Production Asset Build:       VERIFIED (dist/index.html present, 18B)",
+        "[4/5] E2E Browser Smoke Suite:      VERIFIED (202 checks passed)",
+        "[5/5] Compose Production Graph:     VERIFIED (docker-compose.prod.yml valid)",
+        "[OPT] Live Gateway Probe:           OFFLINE / NOT RUNNING (Optional dev probe)"
+      ],
+      "inputs": "nonempty invalid cert/key and old synthetic HTML; native npm/node/docker exit0; gateway throws",
+      "sourceByteIdentical": true
+    }
+  ]
+}

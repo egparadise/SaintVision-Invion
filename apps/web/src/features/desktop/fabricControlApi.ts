@@ -122,7 +122,8 @@ export interface NodeDetailResponse {
 export interface DiscoveryCandidate {
   announcementId: string;
   sourceIp: string;
-  claimedInstanceId: string;
+  claimedInstanceId?: string;
+  instanceId?: string;
   claimedHostname: string;
   claimedOsType: string;
   claimedOsVersion?: string;
@@ -130,10 +131,13 @@ export interface DiscoveryCandidate {
   claimedCpuCores: number;
   claimedRamBytes: number;
   claimedGpuCount: number;
-  claimedLabels: Record<string, string>;
+  claimedLabels?: Record<string, string>;
   verified: boolean;
-  state: 'pending' | 'admitted' | 'declined';
-  announcedAt: string;
+  state: 'pending' | 'candidate' | 'admitted' | 'declined' | string;
+  announcedAt?: string;
+  firstSeenAt?: string;
+  lastSeenAt?: string;
+  announceCount?: number;
 }
 
 export interface AdmissionResponse {
@@ -325,6 +329,15 @@ export async function triggerLivenessSweep(): Promise<{
 // -----------------------------------------------------------------------------
 // 4. Discovery Announcements & Candidate Admission APIs
 // -----------------------------------------------------------------------------
+
+export async function getDiscoveryCandidates(
+  includeStale: boolean = false
+): Promise<{ items: DiscoveryCandidate[]; note?: string }> {
+  const endpoint = includeStale
+    ? '/v1/discovery/candidates?includeStale=true'
+    : '/v1/discovery/candidates';
+  return apiClient<{ items: DiscoveryCandidate[]; note?: string }>(endpoint);
+}
 
 export async function broadcastAnnouncement(
   data: {

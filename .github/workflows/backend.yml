@@ -1,7 +1,13 @@
 name: Backend Build
 on:
   push:
+    branches:
+      - main
+      - integration/all-agents-unified
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
 permissions:
   contents: read
 jobs:
@@ -106,6 +112,7 @@ jobs:
           fi
 
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
+      # pyproject defaults deselect docker_host mutations; Core Build runs that lane explicitly.
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass

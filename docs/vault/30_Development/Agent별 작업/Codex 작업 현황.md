@@ -1,14 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.63"
+version: "1.0.64"
 status: "review"
 author: "Codex"
-updated: "2026-09-18T12:19:54+09:00"
+updated: "2026-09-18T13:40:06+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+최종 착지 재검토: [[2026-09-18_Claude8b49981_최종착지와routecoverage_재검토_Codex]]. Claude `8b49981` 문서 정정과 PITR cleanup hold를 integration merge `0955202`로 반영했다. 최신 사용자 회귀는 `a04c17c`에서 1263/489/2/0(74초)이며 증가분 기원은 미대조다. 감사 12개 ID는 수정·검증 기록을 보유하고 route 실제 계약 불일치는 현재 0건이다. live HTTP 인수는 별도다.
+
+
+고정SHA 후속 재검토: [[2026-09-18_PITR63fb71c와MJS02_bfb225e_재검토_Codex]]. PITR63fb71c cleanup 코드 hold 해제(대역13체크+보강5시나리오); 전체branch는 기존 문서 정정 잔여. MJS02 지정3항목 해소(격리집계3시나리오), Gemini 잔여는 backend의존 기본시험과 hasDesktopShell 상수 단언. 실Docker/PG/전체smoke 인수 없음.
+
+
+## 오늘 감사 사이클 종료
+
+MJS-02 인계 구체화(기준8a8e3db): Gemini owner/Codex reviewer. 상수 UI 3건은 API smoke PASS에서 제외·미검증 표기가 최소 수정이며, 실제 browser 관측을 선택하면 항목별 음성 대조가 필요하다. [[2026-09-18_Codex_감사사이클종료와다음세션인계]]의 처리 계획 참조. owner 수신·착수는 미확인. PITR/해당 수정본 대기, 새 감사 없음.
+
+
+[[2026-09-18_Codex_감사사이클종료와다음세션인계]]: 사용자6feccd8 회귀1254/489skip/2제외/0failed(80초),1074대비180증가. 지도v1.5.0. FIX02검토·착지완료/PITR은Claude cleanup잔여수정대기. Gemini summary2건은bcec3e0 소스재검토·Codex10passed로해소. 별도MJS02/기존review/부분감사6영역/외부5조건을다음세션으로인계. 새감사·운영재실행없이종료.
+
+## 최신 상태 지도 (기준 d7e7d13)
+
+[[Codex 검증 상태 지도와 재개 조건]]이 현재 검증완료/미검증/외부대기와 재시도조건 정본이다. e2908a5 Claude sound 수신, 11e9f44 설정연결은 로컬46통과/Claude7e3de2a 독립소스검토 sound(수신). 기본회귀1eaf285 사용자1179/489skip/2제외/0failed. 최신image는f4b3f73에서4통과/2daemon-timeout실패/2operation-timeout skip, business-kernel-role미검증. VF운영인수0/5·formal0/48 유지. 외부4건과 AC-12 운영PITR 적용은 별도대기. 아래 고정SHA별 과거의 완료/차단 표현을 현재상태로 자동승계하지 않는다.
 
 ## CX-01 공유 개발 정본 착지 (2026-09-18)
 
@@ -27,7 +44,7 @@ source_of_truth: "Git"
 
 ## 2026-09-18 현재 확인
 
-- 기존 점수2775/4800: **진척57.81%, 잔여42.19%**. 9월12일 점수 정본 재합산이며 최신 구현을 재평가한 수치는 아니다. 공식done0/48, 새 VF Codex 운영인수0/5는 별도.
+- 2026-09-18 재채점: **2800/4800 = 58.33%, 잔여41.67%**. 기존 48 task 동일가중 산식을 유지하고 S11-DB만 50→75로 갱신했다(물리 PITR 양·음성 게이트). formal 0/48과 VF 운영인수 0/5는 별도 분모이며 CI·전체 독립검토·운영 PITR 적용이 남아 있다. [[2026-09-18_Codex_진척률재채점]]
 - PR30 실제Desktop→HTTP→PG: 관련57/브라우저2 통과. 이후 신규 검토commit 없음. 이번 Desktop 저장배치 crash2건 재현·수정, 프런트엔드256시험/build통과. [[2026-09-18_VF-DESKTOP-LAYOUT_Codex]].
 - 다음: Gemini·Claude 이번변경 독립검토, 운영owner CI billing·SSO/PITR·5대 인수. 아래 이전 기록은 당시 상태이며 최신 합격 증거와 구분한다.
 
@@ -440,3 +457,108 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - VF-CX-02/03 registry frozen workload·승인/dispatch/delivery/claim 결속 구현(base1b39d40), 실제PG84+오프라인60=144passed/0failed/0skip. policy 제거·변경/retired 거부. 독립검토 Claude 대기, 운영 정책 구성 연결은 후속. 사용자 helper 독립23통과 수신, 외부대기4건 유지. [[2026-09-18_Registry_실행권한결속_Codex]].
 
 - Claude d59b8a6 전체 착지 보류해제: 사용자독립24/작성자24, Codex오프라인22+실Docker2제외와 격리import통과(미합산). R2~R5 blocker 해소. image미검증6/business-kernel-role 미검증은 운영인수 항목으로 유지. e2908a5 registry 실행결속은 별도 독립검토대기. [[2026-09-18_Registry_실행권한결속_Codex]].
+
+- 기본 Docker 의존 분리: 실제prune2건만 docker_host로 기본 deselect, mock22건 유지/Core CI 명시lane 추가. 사용자1157/489/0·62초 수신, 작성자 비integration1179passed/489skip/2deselected/0failed,66.23초. 기존 Compose2건 CLI부재가드 보강, 실제CLI2통과. e2908a5 registry 독립검토는 다음 Claude. [[2026-09-18_Docker_시험선택경계_Codex]].
+
+- 사용자1eaf285 독립1179/489skip/2deselected/0failed(75초), Claude c9e6ddf의 e2908a5 sound 소스검토/부재22pass2skip 수신. registry 운영자 설정 연결 구현, offline34+실PG12=46passed. 최초 관측용DSN application_name 차이12setup오류는 원본DSN재실행으로 분리. 이번 설정 변경 독립검토 Claude 대기. [[2026-09-18_Registry_운영정책설정_Codex]].
+
+- 호스트조치후 사용자image4pass/2fail/2skip(exit1),XML/JSON직접확인. host-init0회/OneDrive인과미확정,잔여timeout4건·business-kernel-role미검증유지. [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]].
+
+## PITR 준비안 검토 수신
+
+[[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.
+
+### PITR 독립 확인 수신·수정본 대기
+
+사용자가 R1-01~03 소스 근거를 독립 확인했고 Claude 수정 중이라고 보고했다. 원격 1ff4324는 image 지도만 갱신, PITR 수정본 미도착. [[2026-09-18_PITR_준비안_검토_Codex]]에 수신·대기 조건 기록. 다음 Codex: R1-01~04 수정본/격리 증거 재검토. 현재 새로 착수할 Codex ready 작업 없음; 동일 lane 반복 없이 대기.
+
+## 검증 경계 표본 감사
+
+[[2026-09-18_검증경계_표본감사_Codex]]: tools51/tests179파일 패턴 검색, 합성 CLI9관측으로 deployment_surface의 factory 오류/attr 부재 성공 처리와 위조 Bearer probe 예외 누락 P2 두 건 확인. 빈 route 입력은 P3 보강 후보. 기존 offline73시험 통과가 이 미검증 경로를 대체하지 않음. 다음 Codex: VB-AUDIT-01/02 수정; Claude: 독립 검토/PITR 수정본. 이번 감사는 미수정 finding이며 Docker/DB 실행 없음.
+
+## 검증 경계 finding 수정
+
+[[2026-09-18_검증경계_오류분류수정_Codex]]: VB-AUDIT-01/02 로컬 수정·offline88시험 통과, Claude 독립검토 대기. factory 인자 결속과 본문 오류 분리, 위조 Bearer 검사 미완료 nonzero, 빈 route 입력 P3는 exit2 미판정으로 보강. 과거 감사의 미수정 표기는 당시 상태. 운영인수/CI·실장비 미완 상태 유지.
+
+### 검증 도구 수정 독립 확인 수신
+
+[[2026-09-18_검증경계_오류분류수정_Codex]]: 사용자 bb4f4cb VB-AUDIT-01 세 경로 독립 재현 수신. VB-AUDIT-02/P3는 작성자88시험 범위이며 사용자/Claude 독립검토 미수신. Claude tip1ff4324로 PITR 수정본 대기. 다음 Codex: 수정본 재검토; 동일 image lane 반복 없음.
+
+## 검증 감사 잔여 범위와 독립 재현 수신
+
+[[2026-09-18_검증경계_후속감사범위_Codex]]: VB-AUDIT-02 사용자 clean worktree 두 앱(RuntimeError→exit1,실제401→exit0) 독립 재현 수신. VB01/02는 작성자 시험+사용자 명시 경로 독립 실행 확인, Claude 소스검토 대기; P3는 사용자 판단 동의. 미감사 영역6종과 다음 실패 대조군 정리. 우선순위1 Python검색 밖 .mjs 인수 스크립트,2 실행/증거/CI 집계 경계. 새 finding/추가 운영실행 없음.
+
+## MJS 빈집합 단언 수정
+
+[[2026-09-18_MJS_빈집합단언_감사수정_Codex]]: shard2단언에 배열/고정2개 가드,실제문장 offline Node12시험 통과. .mjs4파일 every5곳 중 나머지3곳 개수가드 확인. 추가 VB-MJS-02 UI const true PASS3건(P2) 미수정, Gemini 실제 UI 검증 보강/Codex review 인계. 과거 full smoke 실입력은 미확인. Claude PITR a681da3 도착, 다음 재검토 대상.
+
+## PITR a681da3 재검토
+
+[[2026-09-18_PITR_a681da3_재검토_Codex]]: 물리복원 경로/MinIO 정정 확인, Claude 성공텍스트 수신(사용자·Codex 실PG 재실행 없음). R2-01 after INSERT 실패 후 PASS 합성재현(P1), R2-02 변경명령 무차별재시도/소유권없는cleanup(P2), 기존R1-04 설명미해소로 전체착지 보류. 다음 Claude 수정/증거, Codex 재검토. shard9251f18 수정은 별개 착지.
+
+## MJS 나머지3도구 감사
+
+[[2026-09-18_MJS_후속3도구_감사_Codex]]: 사용자 shard가드12회귀 독립통과 수신. 합성 fetch로2PC67/67·reconcile59/59 exit0(unrelated receipt/invalid digest), 물리정지false 대조군은각1failed/exit1. VB-MJS-03 실행결속/실장비주장P1,04 로컬상수hash를snapshot검증으로표시P2,05 실패시verified문구P2 미수정 인계. handoff재현도구는 scope명시된 관측JSON이며 이번소스검토에서 추가finding없음. 다음 Gemini수정/Codex검토, 실제장비실행0.
+
+## MJS 수치 보증 범위 정정
+
+[[2026-09-18_MJS_수치인용_정정_Codex]]: 지도v1.2.0에67/200·202/59 checks의 응답조건·로컬계산 범위와 실제장비/화면 미보증을 명시. 공통판202/202 문구 직접정정, VF01~05 인수조건에 실제bytes/identity/장비·UI 관측 요건 보강. 실제browser6은 별도범위 유지. 운영0/5 변경없음. PITR2468912 보류사유와 다음owner 명시.
+
+## PITR09db057 gate 재검토
+
+[[2026-09-18_PITR_09db057_재검토_Codex]]: 사용자 실제PG 정상0/after-insert음성1 수신+소스대조로R2-01해소. Codex는PG재실행없음. archive명령 순차4조건 정상,다른writer게시 interleaving은덮어쓰기 관측. 고정tmp논거는전용아카이브·단일writer 한정이며전역직렬성아님. R2-02/R1-04미해소로전체착지보류,다음Claude수정/Codex재검토.
+
+## 실행증거 집계 감사·최신 관측
+
+[[2026-09-18_실행증거집계_감사_Codex]]: VF staleXML의과거PASS귀속/불완전증거exit0 두P2 확인. 실제runner외부경계stub·원문CI gate로대조,실제CI/Docker0. Gemini API79/64는보고수신+소스일부확인,독립전체해소미선언. 사용자handle119773/RAM1665MB수신,실행직전handle관측조건강화. 다음Codex집계수정/Claude리뷰.
+
+
+## 실행 증거 집계 수정과 검토 인계
+
+[[2026-09-18_실행증거집계_오류수정_Codex]]: VB-AGG-01/02 고유 run namespace·subprocessExitCode/evidenceStatus 분리·빈/미생성/깨진 XML nonzero·collect-only 거부 구현. offline43passed/2 docker_host 제외, 실제Docker/PG/CI0. 사용자 기존4prefix 비오염 및 coord-business-retry 증거부재 exit1 수신(거짓성공 아님). 다음 Claude 독립검토; 필수suite/SHA provenance 전체보강·CI·운영인수는 별도 미완.
+
+
+## Fixture 표본 감사 및 집계수정 독립 실행 수신
+
+[[2026-09-18_Fixture_검증경계_감사_Codex]]: VB-AGG 사용자 collect-only exit2/고유디렉터리 독립실행 수신, Claude 검토대기. 실제fixture 합성경계11관측으로 VB-FIX-01 setup 부분할당 DB잔재(P2), VB-FIX-02 dispose실패시 role정리 생략(P3) 확인·미수정. 성공 위장은 아님. credential action별 grant회수는 기존명시계약이므로 오탐 제외. offline47passed/실DB3skip, Docker/PG/CI0. 다음Claude fixture수정/AGG검토, Codex재검토.
+
+
+## Launcher와 운영 증거 경계 감사
+
+[[2026-09-18_Launcher와운영증거_경계감사_Codex]]: 원본PS1+native대역5조건에서 인증서생성exit23→전체exit0/All Exit Codes 0 재현, VB-LAUNCH-01 P2 미수정/Gemini owner·Codex reviewer. 운영증거5관측: LAN실패exit2에이전JSON보존 위험후보, 독립복원기존output거부/빈storage false 정상. 기존시험5passed/DB30skip, 실제배포/Docker/PG0. Claude PITR/fixture구현 중복없음. 다음 수정본검토·잔여후보대조, 운영0/5유지.
+
+
+## 감사1~5 종합과 누락 없는 상태표
+
+[[검증 경계 감사 종합과 잔여 범위]]이 감사 결과별 owner·수정·검증·잔여 검토 정본이다. 후속8건/초기AUDIT포함10건/MJS01·02포함12개 ID의 분모를 구분. 요청10건 중 사용자 수정·독립검증 확인7/미수정3, 별도MJS01수정·독립실행/MJS02 UI상수 미수정. MJS03~05 최신사용자확인 수신과 Codex계약리뷰잔여는 분리. 우선순위4확정finding추가0, 위험후보보존; 1~5첫표본정리·전수완료아님·6 frontend미착수. 제품/운영 재실행0, 운영0/5유지.
+
+
+## Fixture 수정본 재검토·registry policy 검토 수신
+
+[[2026-09-18_Fixture_a5401a7_재검토_Codex]]: a5401a7 9시험 Codex독립통과(합성DB/engine,실PG0); 사용자의 DSN설정9통과도 실제PG시험은 아님. FIX01 원래경로해소, FIX02 DROP시도해소/동시dispose+DROP 오류누락 P3잔여로전체수정종결보류·미병합. 다음Claude FIX02-R1수정/Codex재검토. 11e9f44는Claude7e3de2a sound 독립소스검토 수신으로대기해소(CI/운영별도). PITR0da140e도착·검토대기.
+
+
+## Claude fixture 해소·독립커밋 착지 / PITR 잔여
+
+[[2026-09-18_Claude_c754933_부분착지검토_Codex]]: c754933 새2건은DROP단독/양쪽실패, 원본11passed·통합32passed(합성,실PG0). FIX01/02해소, a5401a7/c754933/7e3de2a 원본커밋을0a65313/f7a46da/495df5c로반영. PITR원본함수에서cleanup조회실패은폐/제거실패후재시도 재현,PID label잔여로전체브랜치보류. 후속8건중코드미수정LAUNCH01만맞지만별도MJS02·review·PITR잔여는유지. 다음Claude PITR보강/Gemini LAUNCH01·MJS02/Codex재검토.
+
+
+최신원격입력: Gemini84a86f1 VB-LAUNCH-01수정이integration에선행착지해정상병합. 후속8건은모두수정본존재로갱신하되LAUNCH01 Codex재검토/기존독립검토잔여별도. 신규launcher시험미실행. [[2026-09-18_Claude_c754933_부분착지검토_Codex]] 참조.
+
+
+## Launcher scope 재검토·PITR hold 인계
+
+[[2026-09-18_Launcher_scope와PITR_hold_Codex]]: 사용자66bbcf0 16passed수신(실PG증거아님). LAUNCH원래nativeexit누락해소, Docker SKIPPED/gateway Optional분리확인. 원본PS1합성2조건에서invalid-nonempty cert도TLS1.3 VERIFIED·고정202 E2E문구출력→Gemini scope잔여. npmbuild exit검사는수정전부터존재. PITR query/remove실패·PIDlabel잔여와nonce/cleanup상태/재시도게이트/음성대조조건명시. git cherry로fixture2커밋·registry검토 patch동등착지확인,2ed3d6은상태문서추가만/PITR코드변경없음.
+
+
+## Claude 수정대기 정정 / 사용자 방법론 정정 수신
+
+[[2026-09-18_Claude_대기상태정정과수정인계_Codex]]:2ed3d65는문서1파일뿐/PITR코드변경0. FIX02재검토·내용착지완료, PITR은Codexreview대기가아니라Claude cleanup잔여수정대기. 내용차이8/동등patch3 대조,image workspace skip누락·실PG11오표기·1179실행주체등상태문서정정인계. bb4f4cb Claude sound 문서수신(독립소스검토,런타임별도). 사용자의npm검사시점/16시험합성범위정정수용수신. 동일주입/운영시험반복없음.
+
+## TLS 인증서 마운트·경로 방어
+
+[[2026-09-18_TLS_마운트_경로방어_Codex]]: `65965a3`에서 production Compose 인증서·키 bind를 `create_host_path: false` long syntax로 고정하고, `deploy_intranet.ps1`의 leaf 검사·stale directory 정리와 `generate_tls_cert.py`의 정확한 출력 경로 정리를 구현. 신규 경계시험 2 passed, preflight 11 passed, Compose YAML·문서 검사 통과. 인증서 삭제·gitignore·이력 재작성은 수행하지 않음. 새 개발 인증서 발급·외부 주입은 사용자 결정 대기.
+
+[[2026-09-18_TLS_외부주입_전환준비_Codex]]: 외부 인증서 디렉터리 `SAINTVISION_DEV_CERT_DIR`와 generator `--output-dir`를 구현하고, preflight에 PEM 인증서·개인키 공개키 일치 검증을 추가. 기본 경로 호환, 외부 경로, 누락, 불일치 회귀를 포함해 관련 27 passed. `77c5311` 준비 문서를 구현 상태로 갱신. 실제 Docker `up --no-start`와 인증서 발급은 별도 환경 검증 대기. 삭제·gitignore·이력 재작성은 수행하지 않음.
+
+후속 보강: `verify_tls_cert_pair.py`의 cryptography import를 지연해 사용법 오류는 exit 2, `--help`는 exit 0, 유효 인자에서 의존성 부재는 exit 1로 분리. 관련 회귀 범위는 30 passed. README와 외부 주입 runbook에 clone 초기화 절차가 모두 반영되어 별도 문서 추가는 불필요.

@@ -1,0 +1,98 @@
+{
+  "baseSha": "0c50f57",
+  "sourceHashes": {
+    "pyproject.toml": "6d7bebc5e042365de7753e9fd3b37c1e2845cfa0a19e447415b76de34e29e793",
+    ".github/workflows/core.yml": "04d16818431fffb844dad1414d6b15d5e6ae23a88a414fda65bcb8e8f19b160e",
+    ".github/workflows/backend.yml": "5e9f4914b4b2e86333e740569f75d9f00a65b804b826f1534f65f641de6fc917",
+    "tests/test_check_kernel_docker_hygiene.py": "79588f782ab9f53a209d6de9d95b23b25c0d4c187951f65863f03a6569cb1d45",
+    "tests/core/test_vf_deployment.py": "4f01473a69287279c4dbc2ca38b865fd98a61d88b8e4a8830be99f12d467095d"
+  },
+  "reports": [
+    {
+      "name": "docker-selection-offline",
+      "exitCode": 0,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 22
+      },
+      "junitSha256": "7fe9f516e69b29475f2444513915f208338b94fbeec372c53de337ed13aa43b5",
+      "failures": []
+    },
+    {
+      "name": "nonintegration-default-selection",
+      "exitCode": 1,
+      "counts": {
+        "failure": 2,
+        "error": 0,
+        "skipped": 500,
+        "passed": 1166
+      },
+      "junitSha256": "546ceba52f032b51fd6594d6353567d462ceff96f89405865f5e91a637ce70ac",
+      "failures": [
+        "tests.core.test_vf_deployment::test_internal_services_are_not_published_on_all_interfaces",
+        "tests.core.test_vf_deployment::test_missing_database_password_cannot_fall_back_to_a_default"
+      ]
+    },
+    {
+      "name": "compose-cli-absent",
+      "exitCode": 0,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 2,
+        "passed": 0
+      },
+      "junitSha256": "b3f3fab2372581fad82645cea41c885d45d8be32a734d083fac0344baf1c8e67",
+      "failures": []
+    },
+    {
+      "name": "compose-cli-present",
+      "exitCode": 0,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 2
+      },
+      "junitSha256": "3f2b4cf2f9cea895753edd4324db7c83f73797dd167b2d9c33e0c65d354ef8ba",
+      "failures": []
+    },
+    {
+      "name": "nonintegration-host-separated",
+      "exitCode": 0,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 489,
+        "passed": 1179
+      },
+      "junitSha256": "ec8695ea77a68bcf737c939f3364ac53eb9d6d95ffc647bb747fe14b407b6ca9",
+      "failures": []
+    }
+  ],
+  "finalSeconds": 66.23,
+  "finalDeselected": 2,
+  "explicitHostCollectOnly": {
+    "selected": 2,
+    "deselected": 22,
+    "exitCode": 0
+  },
+  "dockerHostCommandsExecuted": false,
+  "composeConfigExecuted": true,
+  "ciExecuted": false,
+  "userReport": {
+    "sha": "0c50f57",
+    "passed": 1157,
+    "skipped": 489,
+    "failed": 0,
+    "seconds": 62,
+    "excluded": [
+      "tests/integration",
+      "tests/test_docker_diag.py",
+      "tests/test_check_kernel_docker_hygiene.py",
+      "tests/test_vf_docker.py"
+    ]
+  }
+}

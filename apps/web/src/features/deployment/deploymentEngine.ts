@@ -60,8 +60,8 @@ export class DeploymentManager {
       upgradeHeader: false,
     },
     {
-      location: '/v1/events',
-      targetUpstream: 'http://pacs-backend:8080/v1/events',
+      location: '/v1/projects/{project}/runs/{runId}/events',
+      targetUpstream: 'http://pacs-backend:8080/v1/projects/.../events',
       protocol: 'SSE',
       bufferingOff: true,
       cacheControl: 'no-cache, no-transform',
@@ -213,8 +213,8 @@ export class DeploymentManager {
     }
 
     # SSE Event Streaming (Buffering Disabled)
-    location /v1/events {
-        proxy_pass http://pacs-backend:8080/v1/events;
+    location ~ ^/v1/projects/[^/]+/runs/[^/]+/events {
+        proxy_pass http://pacs-backend:8080;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
         proxy_buffering off;

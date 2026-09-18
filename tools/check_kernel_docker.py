@@ -112,6 +112,7 @@ def image_id(reference):
 #: test_tools_dependencies_are_packaged_for_the_isolated_build.
 EXACT_SOURCE_FILES = frozenset({
     'pyproject.toml', 'alembic.ini', 'requirements-core.txt', 'requirements-test.txt', 'requirements-backend.txt',
+    'tools/run_vf_security_tests.py', 'tools/vf_execution_guard.py', 'tools/node_dependent_tests.py',
     'tools/docker_diag.py', 'tools/storage_check.py', 'tools/provision_credentials.py', 'tools/operational_readiness.py',
     'tools/check_subject_tenant.py', 'tools/check_definer_functions.py', 'tools/definer-policy.json', 'tools/recovery_drill.py',
     'tools/provision_account.py', 'tools/prepare_git_probe.py', 'tools/kernel_test_entry.py', 'tools/studio_templates.py',

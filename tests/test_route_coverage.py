@@ -71,8 +71,9 @@ def test_empty_source_measurement_never_claims_operating_acceptance(tmp_path, mo
     import json
     import route_coverage
     monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path), '--json'])
-    assert route_coverage.main() == 0
+    assert route_coverage.main() == 2
     output = json.loads(capsys.readouterr().out)
+    assert output['assessment'] == 'inconclusive-no-client-paths'
     assert output['measurement'] == 'source-declarations'
     assert output['operationalAcceptanceAssessed'] is False
     assert 'dynamic prefixes' in output['limitations']
@@ -202,3 +203,56 @@ def test_a_properly_separated_interpolation_still_counts() -> None:
     """The fix must not suppress a legitimate leading-parameter path."""
     source = 'apiClient(`/v1/projects/${prj}/runs`)'
     assert "/v1/projects/{}/runs" in client_paths(source)
+
+
+@pytest.mark.parametrize('served,expected', [(False, 1), (True, 0)])
+def test_nonempty_route_comparison_can_pass_or_fail(tmp_path, monkeypatch, capsys, served, expected):
+    import json
+    import route_coverage
+    (tmp_path / 'client.ts').write_text("fetch('/v1/projects')")
+    if served:
+        (tmp_path / 'api.py').write_text('@api.get("/v1/projects")')
+    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path),
+                                    '--client', str(tmp_path), '--json'])
+    assert route_coverage.main() == expected
+    report = json.loads(capsys.readouterr().out)
+    assert report['assessment'] == 'compared'
+    assert report['clientPaths'] == ['/v1/projects']
+    assert report['unserved'] == ([] if served else ['/v1/projects'])
+
+
+def test_client_source_does_not_request_unserved_evidence_or_bare_events_endpoints() -> None:
+    """Regression test: client source must never probe non-existent /evidence or bare /v1/events."""
+    from pathlib import Path
+    from route_coverage import scan_client
+
+    client_root = Path(__file__).resolve().parents[1] / "apps" / "web" / "src"
+    paths = scan_client(client_root)
+    assert not any("evidence" in p for p in paths), f"Unserved /evidence path detected: {paths}"
+    assert "/v1/events" not in paths, f"Bare /v1/events detected: {paths}"
+
+
+def test_evidence_viewer_integrity_contract_invariants() -> None:
+    """Bidirectional regression: EvidenceViewer must never synthesize fake PASS, mock digests, or tool calls."""
+    from pathlib import Path
+
+    viewer_path = Path(__file__).resolve().parents[1] / "apps" / "web" / "src" / "features" / "evidence" / "EvidenceViewer.tsx"
+    content = viewer_path.read_text(encoding="utf-8")
+
+    # 1. No mock 'sha256:verified' digests
+    assert "sha256:verified" not in content, "Mock digest 'sha256:verified' found in EvidenceViewer.tsx"
+
+    # 2. No fabricated tool calls or wall times
+    for fake in ["git.checkout", "test.run", "artifact.write", "wallTimeMs"]:
+        assert fake not in content, f"Fabricated telemetry '{fake}' found in EvidenceViewer.tsx"
+
+    # 3. Execution success must NOT be equated to cryptographic integrity PASS
+    # Integrity PASS must be strictly gated on res.output?.verified === true
+    assert "res.output?.verified === true" in content
+    assert "integrityStatus = 'UNVERIFIED'" in content
+
+    # 4. Static policy specifications must be labeled distinctly from per-run dynamic verdicts
+    assert "[시스템 정책 사양]" in content
+    assert "출력 무결성 미검증 (UNVERIFIED)" in content
+
+

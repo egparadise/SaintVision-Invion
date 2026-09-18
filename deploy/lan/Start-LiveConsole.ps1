@@ -21,7 +21,12 @@ $svDatabase = & docker.exe inspect $svState.container | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or $svDatabase[0].Config.Labels.'ai.saintvision.pilot' -ne $svState.epoch) {
     throw 'Start Docker Desktop and check the existing pilot database. No database will be reset.'
 }
-if (-not $svDatabase[0].State.Running) { & docker.exe start $svState.container | Out-Null }
+if (-not $svDatabase[0].State.Running) {
+    & docker.exe start $svState.container | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Docker start failed for the owned pilot database (exit $LASTEXITCODE). No listeners were started."
+    }
+}
 
 function Start-SvListener([int]$Port,[string]$Expected,[string]$Executable,[string[]]$Arguments,[string]$Directory,[string]$LogName) {
     $svListening = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1

@@ -1,0 +1,8 @@
+{
+  "candidateSHA": "a681da31ee99422eb1ef9d6455f28495291c368b",
+  "scope": "extracted after INSERT and final verdict; stub psql failure and fixed restored ROWS, no actual PostgreSQL or Docker",
+  "script": "set -u\nFAIL=0\npsql() { return 1; }\npsql -q -c \"INSERT INTO t VALUES('after')\"\ninsert_rc=$?\nprintf \"injectedAfterInsertExit=%s\\n\" \"$insert_rc\"\nROWS=before\nif [ \"$ROWS\" = \"before\" ]; then\n  echo \"PASS: recovered to target time -> 'before' present, 'after' correctly excluded (PITR works, recovery point bounded)\"\nelse\n  echo \"INCONCLUSIVE/FAIL: expected [before], got [$ROWS]\"; FAIL=1\nfi\nexit $FAIL\n",
+  "exitCode": 0,
+  "stdout": "injectedAfterInsertExit=1\nPASS: recovered to target time -> 'before' present, 'after' correctly excluded (PITR works, recovery point bounded)\n",
+  "stderr": ""
+}

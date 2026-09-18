@@ -1,4 +1,5 @@
 import { DesktopShell } from '@/features/desktop/DesktopShell';
+import { ResourceExplorer } from '@/features/desktop/ResourceExplorer';
 import { approveReviewed, type ReviewedAction } from '@/shared/api/approvalReview';
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from '@/shared/ui/Header';
@@ -353,6 +354,20 @@ export const App: React.FC = () => {
               </div>
             )}
           </div>
+        )}
+
+        {/* Tab 2.1: Virtual Fabric & Control Plane Explorer (CX-01) */}
+        {activeTab === 'fabric' && (
+          <ResourceExplorer
+            nodes={measuredNodes}
+            onSelectNode={(id) => {
+              setSelectedNodeId(id);
+              setActiveTab('nodes');
+            }}
+            onOpenTerminal={() => {
+              setActiveTab('terminal');
+            }}
+          />
         )}
 
         {/* Tab 2.5: Workspaces (S03-FE) */}

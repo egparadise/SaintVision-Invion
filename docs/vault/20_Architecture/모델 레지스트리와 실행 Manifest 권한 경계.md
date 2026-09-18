@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.7.0"
+version: "1.8.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -129,3 +129,23 @@ ModelRegistryBindingStore.revalidate(conn, ...)는 이미 생성된 불변 결�
 승인 요청, ApprovalStore.dispatch(재호출 포함), DeliveryQueue, ToolGateway.claim은 현재 결속과 frozen bytes를 비교한다. 현재 registry SHARE 잠금은 각 실행 gate 트랜잭션 종료까지 유지한다. policy를 없애서 registry 입력을 kernel-only로 바꾸는 경로는 없다. policy 활성화 뒤 과거 미결속 입력도 거부된다. 승인 요청의 기존 replay는 과거 수신 결과일 뿐 새로운 실행인가가 아니며 dispatch/claim은 항상 다시 검사한다.
 
 policy 미설정의 기존 kernel-only 실행은 registry 승인이라고 표시하지 않는다. 공개 HTTP 설정/운영자 정책 배포는 별도이며 모든 trusted worker가 일관된 현재 policy를 제공해야 한다. 실제 Node 실행/실장비 인수는 이 PG 검증 범위 밖이다. [[2026-09-18_Registry_실행권한결속_Codex]].
+
+
+## 운영자 설정 연결 (1.8.0)
+
+INV_API_CONFIG의 modelRegistryPolicy를 생산 factory가 읽어 승인/dispatch와 공유하는 Database에 전달한다. trusted_file의 크기·파일 경계와 strict_object의 중복JSON키 거부를 그대로 적용한다. 아래는 문법 예시이며 운영 허용 결정을 제공하지 않는다.
+
+```json
+{
+  "modelRegistryPolicy": {
+    "version": "operator-policy:1",
+    "allowed": [
+      {"licensePolicy": "synthetic-example", "classification": "internal"}
+    ]
+  }
+}
+```
+
+기존 identity 등 필수 설정과 함께 사용한다. policy가 없으면 기존 kernel-only 모드, 존재하지만 잘못되면 시작 거부다. null/빈allowed/중복pair/unknown key는 fail-closed다. 실제 registry-bound 입력은 기존대로 현재 typed policy가 없는 프로세스에서 거부된다. trusted worker도 configured_registry_policy로 동일 정책을 파싱할 수 있다.
+
+정책 변경은 프로세스별 시작 설정이며 전역 hot reload가 아니다. 모든 worker/승인/delivery 프로세스의 같은 정책 배포·구프로세스 종료는 운영 책임이다. 이 코드 변경은 운영 허용pair 선정·정책 rollout·실장비 배포를 수행하지 않는다. e2908a5 실행결속의 Claude sound 검토는 수신했으며 이번 설정 연결의 독립 검토는 별도다. [[2026-09-18_Registry_운영정책설정_Codex]].

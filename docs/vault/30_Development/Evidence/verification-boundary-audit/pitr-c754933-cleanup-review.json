@@ -1,0 +1,28 @@
+{
+  "reviewedSHA": "c754933",
+  "scope": "original shell prefix/functions; docker and sleep shell stubs, no Docker or PostgreSQL",
+  "results": [
+    {
+      "case": "cleanup-list-failure",
+      "exitCode": 0,
+      "stdout": "CLEANUP_RETURNED_SUCCESS\n",
+      "operations": [
+        "ps",
+        "ps"
+      ]
+    },
+    {
+      "case": "retry-after-remove-failure",
+      "exitCode": 0,
+      "stdout": "  docker run attempt 1 failed: i/o timeout\nWARN: cleanup could not remove owned container(s) [owned-partial-id]\nSTART_RETURNED_SUCCESS\nWARN: cleanup could not remove owned container(s) [owned-partial-id]\n",
+      "operations": [
+        "run",
+        "ps",
+        "rm",
+        "run",
+        "ps",
+        "rm"
+      ]
+    }
+  ]
+}

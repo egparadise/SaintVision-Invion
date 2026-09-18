@@ -1,6 +1,9 @@
 name: Frontend Build & Test
 on:
   push:
+    branches:
+      - main
+      - integration/all-agents-unified
     paths:
       - 'apps/web/**'
       - '.github/workflows/frontend.yml'
@@ -8,6 +11,9 @@ on:
     paths:
       - 'apps/web/**'
       - '.github/workflows/frontend.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
 permissions:
   contents: read
 

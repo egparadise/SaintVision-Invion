@@ -1,0 +1,15 @@
+import subprocess
+import shutil
+import pytest
+_original = subprocess.run
+_original_which = shutil.which
+
+def guarded(argv, *args, **kwargs):
+    from pathlib import Path
+    if isinstance(argv, (list, tuple)) and Path(str(argv[0])).stem.lower() == "docker":
+        raise AssertionError("Unexpected real Docker call in offline selection")
+    return _original(argv, *args, **kwargs)
+
+def pytest_configure(config):
+    subprocess.run = guarded
+    shutil.which = lambda cmd, *a, **k: None if str(cmd).lower() in {"docker", "docker.exe"} else _original_which(cmd, *a, **k)

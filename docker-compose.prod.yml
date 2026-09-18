@@ -10,8 +10,20 @@ services:
       - "8443:443"
       - "8081:80"
     volumes:
-      - ./deploy/certs/saintvision.crt:/etc/ssl/certs/saintvision.crt:ro
-      - ./deploy/certs/saintvision.key:/etc/ssl/private/saintvision.key:ro
+      - type: bind
+        # Compose v2.15 ignores create_host_path=false; require an explicit
+        # external directory so a missing file cannot become a host directory.
+        source: ${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.crt
+        target: /etc/ssl/certs/saintvision.crt
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${SAINTVISION_DEV_CERT_DIR:?Set an existing external development TLS certificate directory}/saintvision.key
+        target: /etc/ssl/private/saintvision.key
+        read_only: true
+        bind:
+          create_host_path: false
       - type: bind
         source: ${INV_WEB_AUTH_CONFIG:?Set an existing public OAuth configuration JavaScript file}
         target: /usr/share/nginx/html/auth-config.js

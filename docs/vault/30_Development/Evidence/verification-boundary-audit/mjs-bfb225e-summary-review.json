@@ -1,0 +1,65 @@
+{
+  "scope": "exact helper and UI/summary slice, no HTTP or full-run acceptance",
+  "results": [
+    {
+      "seed": {
+        "passed": 2,
+        "total": 2
+      },
+      "result": {
+        "passed": 2,
+        "total": 2,
+        "unverified": 3
+      },
+      "exit": 0,
+      "logs": [
+        "  ℹ [UNVERIFIED] Window Manager enforces traffic lights, z-index elevation, and minimize/maximize (Requires interactive DOM browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol (Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Desktop window manager enforces local storage layout serialization protocol (Requires browser localStorage persistence lane; unverified in HTTP API contract smoke)",
+        "\n======================================================================",
+        "🎉 API Contract Smoke Summary: 2/2 observed checks passed (100%) | 3 unverified UI invariants deferred to browser lane",
+        "======================================================================\n"
+      ]
+    },
+    {
+      "seed": {
+        "passed": 1,
+        "total": 2
+      },
+      "result": {
+        "passed": 1,
+        "total": 2,
+        "unverified": 3
+      },
+      "exit": 1,
+      "logs": [
+        "  ℹ [UNVERIFIED] Window Manager enforces traffic lights, z-index elevation, and minimize/maximize (Requires interactive DOM browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol (Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Desktop window manager enforces local storage layout serialization protocol (Requires browser localStorage persistence lane; unverified in HTTP API contract smoke)",
+        "\n======================================================================",
+        "🎉 API Contract Smoke Summary: 1/2 observed checks passed (50%) | 3 unverified UI invariants deferred to browser lane",
+        "======================================================================\n"
+      ]
+    },
+    {
+      "seed": {
+        "passed": 0,
+        "total": 0
+      },
+      "result": {
+        "passed": 0,
+        "total": 0,
+        "unverified": 3
+      },
+      "exit": 1,
+      "logs": [
+        "  ℹ [UNVERIFIED] Window Manager enforces traffic lights, z-index elevation, and minimize/maximize (Requires interactive DOM browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol (Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke)",
+        "  ℹ [UNVERIFIED] Desktop window manager enforces local storage layout serialization protocol (Requires browser localStorage persistence lane; unverified in HTTP API contract smoke)",
+        "\n======================================================================",
+        "🎉 API Contract Smoke Summary: 0/0 observed checks passed (NaN%) | 3 unverified UI invariants deferred to browser lane",
+        "======================================================================\n"
+      ]
+    }
+  ]
+}

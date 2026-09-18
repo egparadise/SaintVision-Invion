@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import datetime as dt
 import ipaddress
+import shutil
+import argparse
 from pathlib import Path
 
 from cryptography import x509
@@ -19,6 +21,15 @@ def generate_certificates(output_dir: Path) -> tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
     cert_path = output_dir / "saintvision.crt"
     key_path = output_dir / "saintvision.key"
+
+    # Docker/Compose may leave a host directory at a file mount target when a
+    # source file was absent. Remove only these two exact generated targets so
+    # the next generation attempt can restore the expected file shape.
+    for path in (cert_path, key_path):
+        if path.is_symlink() or path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            shutil.rmtree(path)
 
     print(f"Generating 2048-bit RSA private key...")
     private_key = rsa.generate_private_key(
@@ -82,5 +93,12 @@ def generate_certificates(output_dir: Path) -> tuple[Path, Path]:
 
 
 if __name__ == "__main__":
-    certs_dir = Path("deploy/certs")
-    generate_certificates(certs_dir)
+    parser = argparse.ArgumentParser(description="Generate development TLS certificate and key")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("deploy/certs"),
+        help="directory for saintvision.crt and saintvision.key (default: deploy/certs)",
+    )
+    args = parser.parse_args()
+    generate_certificates(args.output_dir)

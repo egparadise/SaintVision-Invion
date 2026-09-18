@@ -1,0 +1,15 @@
+{
+  "baseSHA": "933209a",
+  "scope": "offline author execution; Docker/PG boundaries synthetic; real pytest execution guard subprocess",
+  "passed": 43,
+  "deselected": 2,
+  "exitCode": 0,
+  "independentReview": "pending Claude",
+  "sourceHashes": {
+    "tools/run_vf_security_tests.py": "f5f4f28dd056c985b646e8ec7380b6a41325962c0b64f8f82c50e0c490900de3",
+    "tools/vf_execution_guard.py": "d461590f489392d962dbeb9b4d38c00d1d0ab2e2ff9cbc3e759fff52283c04b7",
+    "tools/check_kernel_docker.py": "b8f453540c3773ecbe0f661e965275b850b38196cc57bb9e8aaab847f3f55734",
+    "tests/test_vf_evidence.py": "2072ef1d5a64c4d3d2b78ea47d50e4c1121ddbea267bd3a9ba9879eab7848a4f",
+    ".github/workflows/desktop-browser.yml": "44edba8fb0fe7fc28d298f9cffa59d8ed89bbc5111a2707a9d08e2a91ddc2431"
+  }
+}

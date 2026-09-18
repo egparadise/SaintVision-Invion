@@ -1,14 +1,18 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.22"
+version: "1.0.23"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-18T12:19:54+09:00"
+updated: "2026-09-18T13:40:06+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex VF 작업 현황
+
+## 최신 상태 지도 (기준 d7e7d13)
+
+[[Codex 검증 상태 지도와 재개 조건]]이 현재 검증완료/미검증/외부대기와 재시도조건 정본이다. e2908a5 Claude sound 수신, 11e9f44 설정연결은 로컬46통과/독립검토대기. 기본회귀1eaf285 사용자1179/489skip/2제외/0failed. 최신image는f4b3f73에서4통과/2daemon-timeout실패/2operation-timeout skip, business-kernel-role미검증. VF운영인수0/5·formal0/48 유지. 외부4건과 AC-12 운영PITR 적용은 별도대기. 아래 고정SHA별 과거의 완료/차단 표현을 현재상태로 자동승계하지 않는다.
 
 ## CX-01 공유 개발 정본 착지 (2026-09-18)
 
@@ -27,7 +31,7 @@ source_of_truth: "Git"
 
 ## 2026-09-18 현재 확인
 
-- 기존 점수2775/4800: **진척57.81%, 잔여42.19%**. 9월12일 점수 정본 재합산이며 최신 구현을 재평가한 수치는 아니다. 공식done0/48, 새 VF Codex 운영인수0/5는 별도.
+- 2026-09-18 재채점: **2800/4800 = 58.33%, 잔여41.67%**. 48 task 동일가중 산식을 유지하고 S11-DB의 물리 PITR 양·음성 게이트만 50→75로 반영했다. formal 0/48과 VF 운영인수 0/5는 별도 분모다. [[2026-09-18_Codex_진척률재채점]]
 - PR30 실제Desktop→HTTP→PG: 관련57/브라우저2 통과. 이후 신규 검토commit 없음. 이번 Desktop 저장배치 crash2건 재현·수정, 프런트엔드256시험/build통과. [[2026-09-18_VF-DESKTOP-LAYOUT_Codex]].
 - 다음: Gemini·Claude 이번변경 독립검토, 운영owner CI billing·SSO/PITR·5대 인수. 아래 이전 기록은 당시 상태이며 최신 합격 증거와 구분한다.
 
@@ -154,3 +158,13 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - [[2026-09-18_모델레지스트리_명시결속_Codex]]: VF-CX-02 명시registryVersionId↔manifest/content/policy 불변결속·현재권한·동시성구현,0044head,격리PG100/100통과. 실행permit연결/원격provider는후속,운영DB미변경. 사용자image XML3pass/host-init3/timeout2 직접확인, business-kernel-role미검증유지. Claude07bae29는과도한NTSTATUS재시도/R2-03미해소로보류.
 
 - 최신 image 독립판별(XML/JSON직접확인): 동일digest3회4/3/2pass,최신2pass/6fail(host-init5/timeout1). 재시도구제실패·전체반복인수미확보, 제품보안단언실패관측0≠미통과합격. business-kernel-role미검증유지. 환경조치후조용한조건까지image추가실행중단;모델결속100PG시험은이미완료. [[2026-09-18_모델레지스트리_명시결속_Codex]].
+
+- 호스트조치후 사용자image4pass/2fail/2skip(exit1),XML/JSON직접확인. host-init0회/OneDrive인과미확정,잔여timeout4건·business-kernel-role미검증유지. [[2026-09-18_IMAGE_OneDrive재시작후판별_Codex]].
+
+## PITR 준비안 검토 수신
+
+[[2026-09-18_PITR_준비안_검토_Codex]]: Claude 8c72fbf 검토 결과 R1-01~04 수정 전 착지 보류. 논리 복원을 PITR로 간주한 판정, same-host MinIO의 off-host 보장, archive 재시도·용량 설명을 수정해야 한다. 따라서 남은 사항이 모두 외부 조치인 것은 아니다. 다음 내부 담당 Claude: 준비안/격리 PITR 증거 보강; Codex: 수정본 재검토. Docker 실행/운영 적용 없음. 사용자 image 방법론 정정 수신, 동일 lane 반복 없음.
+
+## MJS 수치 보증 범위 정정
+
+[[2026-09-18_MJS_수치인용_정정_Codex]]: 지도v1.2.0에67/200·202/59 checks의 응답조건·로컬계산 범위와 실제장비/화면 미보증을 명시. 공통판202/202 문구 직접정정, VF01~05 인수조건에 실제bytes/identity/장비·UI 관측 요건 보강. 실제browser6은 별도범위 유지. 운영0/5 변경없음. PITR2468912 보류사유와 다음owner 명시.
