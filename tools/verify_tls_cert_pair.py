@@ -5,11 +5,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from cryptography import x509
-from cryptography.hazmat.primitives import serialization
-
-
 def verify_pair(certificate_path: Path, private_key_path: Path) -> None:
+    from cryptography import x509
+    from cryptography.hazmat.primitives import serialization
+
     certificate = x509.load_pem_x509_certificate(certificate_path.read_bytes())
     private_key = serialization.load_pem_private_key(private_key_path.read_bytes(), password=None)
     certificate_public = certificate.public_key().public_bytes(

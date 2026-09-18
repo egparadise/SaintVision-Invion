@@ -560,3 +560,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 [[2026-09-18_TLS_마운트_경로방어_Codex]]: `65965a3`에서 production Compose 인증서·키 bind를 `create_host_path: false` long syntax로 고정하고, `deploy_intranet.ps1`의 leaf 검사·stale directory 정리와 `generate_tls_cert.py`의 정확한 출력 경로 정리를 구현. 신규 경계시험 2 passed, preflight 11 passed, Compose YAML·문서 검사 통과. 인증서 삭제·gitignore·이력 재작성은 수행하지 않음. 새 개발 인증서 발급·외부 주입은 사용자 결정 대기.
 
 [[2026-09-18_TLS_외부주입_전환준비_Codex]]: 외부 인증서 디렉터리 `SAINTVISION_DEV_CERT_DIR`와 generator `--output-dir`를 구현하고, preflight에 PEM 인증서·개인키 공개키 일치 검증을 추가. 기본 경로 호환, 외부 경로, 누락, 불일치 회귀를 포함해 관련 27 passed. `77c5311` 준비 문서를 구현 상태로 갱신. 실제 Docker `up --no-start`와 인증서 발급은 별도 환경 검증 대기. 삭제·gitignore·이력 재작성은 수행하지 않음.
+
+후속 보강: `verify_tls_cert_pair.py`의 cryptography import를 지연해 사용법 오류는 exit 2, `--help`는 exit 0, 유효 인자에서 의존성 부재는 exit 1로 분리. 관련 회귀 범위는 30 passed. README와 외부 주입 runbook에 clone 초기화 절차가 모두 반영되어 별도 문서 추가는 불필요.
