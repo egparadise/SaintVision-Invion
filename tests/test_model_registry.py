@@ -534,6 +534,29 @@ def test_a_draft_version_cannot_be_deployed(owner_engine, app_sessionmaker, regi
                     )
 
 
+def test_a_version_carries_the_join_key_the_kernel_manifest_is_addressed_by(app_sessionmaker, registry):
+    """Finding #2, option A (Claude's side): the registry relates to the kernel
+    manifest by (model_id, version), and license/classification stay kernel-owned.
+
+    So the app side carries a stable (model_id, version) and a uri whose version
+    segment agrees with it -- the address the kernel's ModelManifestStore.get is
+    keyed by. No license column is added here; that value lives in the manifest,
+    which deployment admission enforces. This test pins the join key the
+    read-through depends on; the kernel-served license itself is exercised where
+    the kernel runs, not on this base.
+    """
+    from saintvision.storage.pathsafe import parse_uri
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, registry["tenant_a"]):
+                mv = _draft(session, registry, version="7")
+                assert mv.model_id == registry["model_id"]
+                assert mv.version == "7"
+                # The uri's version segment is the same join dimension.
+                assert parse_uri(mv.uri).version == mv.version
+
+
 def test_a_non_owner_scoped_to_one_tenant_cannot_see_another_tenants_version(
     owner_engine, app_sessionmaker, registry
 ):
