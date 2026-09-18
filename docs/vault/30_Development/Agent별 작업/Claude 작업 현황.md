@@ -244,7 +244,7 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 | CI / 독립 reviewer / 운영 인수 | 단위 24 passed 실측. reviewer=Codex 일관 수정본(R2·R3·타입·R5) 재검토 대기. model 검토 sound 인계 |
 | 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
 | 다음 카드 / 첫 행동 / 다음 담당 | 착지 완료(11커밋 b378785). e2908a5 registry 권한 결속 독립 검토 완료(sound), docker 부재 3파일 동작 실측(22 passed/2 skipped, 깔끔 skip·가드 불필요). 남은 것: 3파일 배치/CI 경계(Codex), 여유 호스트 image lane 재판별(사용자/CI) |
-| History / 오류 / Evidence / PR / sync 결과 | History: `..._VF-CL-R-001_...근본원인과R2수정.md` v1.5.0; `..._model_remote독립검토.md`; `..._원격권한결속과CAS_fixture독립검토.md`; `..._registry권한결속_독립검토.md`. 착지 merge b378785 |
+| History / 오류 / Evidence / PR / sync 결과 | **상태 지도(단일 참조)**: [[2026-09-19_Claude영역_검증상태지도]] — 검증완료/미검증(정확히 기록)/외부대기 구분, image lane 6건 재실행 조건·명령 포함. History: `..._VF-CL-R-001_...근본원인과R2수정.md` v1.5.0; `..._model_remote독립검토.md`; `..._원격권한결속과CAS_fixture독립검토.md`; `..._registry권한결속_독립검토.md`. 착지 merge b378785 |
 
 
 ## Codex 통합 수신 (2026-09-18)

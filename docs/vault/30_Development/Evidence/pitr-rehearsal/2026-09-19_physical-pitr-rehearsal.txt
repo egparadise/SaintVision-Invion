@@ -1,0 +1,28 @@
+# Physical PITR rehearsal — strict-gate negative-regression matrix (PITR-R2-01/R2-02)
+# tool: tools/pitr_rehearsal.sh ; normal must PASS/exit0, each injected fault must FAIL/exit1
+# R2-02: owned-label cleanup -> 0 leftover containers across all 6 runs
+
+normal exit=0  PASS:
+before-insert exit=1  FAIL:
+after-insert exit=1  FAIL:
+basebackup exit=1  FAIL:
+restore-start exit=1  FAIL:
+promotion exit=1  FAIL:
+
+## which gate caught each fault
+- before-insert: INJECT: skipping 'before' INSERT  =>  ASSERT-FAIL: 'before' not committed in source
+- after-insert: INJECT: skipping 'after' INSERT  =>  ASSERT-FAIL: 'after' is not present in the SOURCE -> an exclusion result would be vacuous
+- basebackup: INJECT: base backup to an unwritable path (simulate basebackup failure)  =>  pg_basebackup: error: could not
+- restore-start: INJECT: invalid port -> pg_ctl start fails  =>  step returned non-zero (set -e / ON_ERROR_STOP)
+- promotion: INJECT: recovery_target_action=pause (never promotes)  =>  ASSERT-FAIL: restore did not promote / target time not reached (state=t)
+
+## normal run detail (success rehearsal)
+archive_mode=on
+archive_timeout=300
+wal_level=replica
+step: physical base backup
+step: T1=2026-09-18 05:43:35.201279+00
+step: prepare + start restore cluster on 5433
+result: sourceHadAfter=1 targetTime=2026-09-18 05:43:35.201279+00 restoredRows=[before]
+INNER-PASS: source held before+after; restore promoted to T1; restore has before only (after excluded)
+PASS: physical PITR verified -- prerequisites (base backup, before+after in source, promotion) all held, and the restore recovered to T1 with 'before' present and 'after' excluded

@@ -1,0 +1,68 @@
+# PROPOSAL (opt-in) — continuous WAL archiving for point-in-time recovery (AC-12 RPO).
+#
+# This file changes NOTHING unless explicitly composed on top of the prod definition:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.pitr.yml up -d
+# Enabling continuous archiving is an OPERATIONAL DECISION (it needs durable archive
+# storage and, to actually ACCEPT AC-12, a post-enablement recovery drill that measures
+# a real data-loss interval). Configuration alone is a necessary condition, never proof
+# of a recoverable RPO -- see docs/vault/30_Development/2026-09-19_Claude_PITR_변경안과영향.md.
+#
+# archive_mode is a postmaster setting: applying this override RESTARTS postgres.
+#
+# PREREQUISITE for this Tier-A local archive: pre-provision the external wal_archive
+# volume owned by the postgres image's runtime user (postgres:16-alpine -> uid/gid 70;
+# confirm with `docker run --rm postgres:16-alpine id postgres`), mode 0700, mirroring
+# how server_config / workspace_data are provisioned. Otherwise the archive_command
+# cannot write and WAL will accumulate in pg_wal until the data disk fills.
+services:
+  postgres:
+    command:
+      - postgres
+      - -c
+      - archive_mode=on
+      - -c
+      # RETRY-SAFE local archive (VF/PITR-R1-03): if the segment is already present and
+      # identical, succeed (idempotent) -- so a re-call after a crash-between-copy-and-
+      # ack does NOT fail forever and stall WAL; if present but DIFFERENT, fail without
+      # overwriting; otherwise copy via a temp file + atomic rename. The naive
+      # "test ! -f && cp" fails permanently on any re-call (PostgreSQL's own caveat).
+      # LIMITS (Tier A is a starting point, not production-final):
+      #  - single-writer: the fixed %f.tmp + rename is safe only because PostgreSQL's
+      #    archiver is single-writer (one segment at a time); it is NOT safe under a
+      #    hypothetical parallel archiver sharing the temp name.
+      #  - no fsync of the file or directory (a host crash can still lose the last segment).
+      #  - same-host: the archive lives on the SAME host as the data (no separate failure
+      #    domain). For durable, off-host archiving use Tier B (wal-g -> a genuinely
+      #    separate object store); see the proposal doc.
+      - "archive_command=if [ -f /wal_archive/%f ]; then cmp -s %p /wal_archive/%f; else cp %p /wal_archive/%f.tmp && mv /wal_archive/%f.tmp /wal_archive/%f; fi"
+      - -c
+      # Bound how often a partially-filled segment is CUT and handed to archive_command.
+      # This is NOT an RPO ceiling (PITR-R1-04): actual RPO depends on the cut segment
+      # being durably DELIVERED -- archive_command lag/failure leaves undelivered WAL --
+      # and segment switching has activity conditions. Smaller = more frequent cuts (and
+      # more idle WAL volume); it does not by itself bound data loss. RPO is established
+      # only by a measured recovery drill + archive lag/failure monitoring (see proposal).
+      - archive_timeout=300
+      - -c
+      - wal_level=replica
+      - -c
+      # Optional replication-lag buffer only. It is NOT needed for archiving safety
+      # (PITR-R1-04): PostgreSQL already does not recycle an un-archived WAL segment
+      # until it has been archived, so archiving does not depend on wal_keep_size.
+      - wal_keep_size=1024
+      - -c
+      - full_page_writes=on
+    environment:
+      # Applies ONLY to a fresh initdb (empty postgres_data). data_checksums cannot be
+      # turned on for an already-initialized cluster from here -- that needs an offline
+      # `pg_checksums --enable` (downtime). It is a data-integrity control, not RPO.
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - type: volume
+        source: wal_archive
+        target: /wal_archive
+
+volumes:
+  wal_archive:
+    external: true
+    name: ${INV_WAL_ARCHIVE_VOLUME:?Pre-provision a private WAL archive volume owned by the postgres runtime uid}
