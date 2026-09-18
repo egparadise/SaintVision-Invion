@@ -15,6 +15,12 @@ import crypto from 'node:crypto';
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 const BACKEND_URL = process.env.TEST_BACKEND_URL || 'http://127.0.0.1:8080';
 
+const SHA256_HEX_REGEX = /^sha256:[a-f0-9]{64}$/;
+
+function isValidSha256Digest(val) {
+  return typeof val === 'string' && SHA256_HEX_REGEX.test(val);
+}
+
 let totalChecks = 0;
 let passedChecks = 0;
 
@@ -31,6 +37,8 @@ function assert(title, condition, extra = '') {
 async function main() {
   console.log('================================================================================');
   console.log('🏛️ SaintVision 5-Screen Kernel Results & Evidence Deep Reconciliation');
+  console.log('   [API Contract Smoke Suite - Control Plane Gateway & In-Memory Contracts]');
+  console.log('   (Note: Validates HTTP API contracts; not a substitute for physical 5-node acceptance)');
   console.log(`   Frontend Host: ${BASE_URL}`);
   console.log(`   Kernel Host:   ${BACKEND_URL}`);
   console.log('================================================================================\n');
@@ -146,14 +154,31 @@ async function main() {
     const resumeSpecRes = await fetch(`${BACKEND_URL}/v1/runs/run_01JRECOVERING/resume`);
     assert('GET /v1/runs/run_01JRECOVERING/resume returns valid spec', resumeSpecRes.status === 200);
     const currentResume = await resumeSpecRes.json();
-    assert('Resume state contains frozen inputHash', currentResume.inputHash.startsWith('sha256:'));
+    assert('Resume state contains valid 64-hex SHA-256 inputHash', isValidSha256Digest(currentResume.inputHash));
 
-    // Verify hash changes when content changes (Myers diff & immutable snapshot distinction)
-    const originalContent = 'version: "1.0.0"\npolicy:\n  name: "Two-Person Rule"';
-    const modifiedContent = 'version: "1.0.1"\npolicy:\n  name: "Two-Person Rule - Modified"';
-    const origHash = crypto.createHash('sha256').update(originalContent).digest('hex');
-    const modHash = crypto.createHash('sha256').update(modifiedContent).digest('hex');
-    assert('Working copy content edit yields different hash than frozen snapshot', origHash !== modHash);
+    // Frozen snapshot manifest integrity
+    assert('Resume state contains non-empty frozenFiles manifest array', Array.isArray(currentResume.frozenFiles) && currentResume.frozenFiles.length > 0);
+    const allFilesValid = currentResume.frozenFiles.every(f => Boolean(f.path) && f.size > 0 && isValidSha256Digest(f.sha256));
+    assert('All frozen snapshot files have valid paths, sizes and 64-hex SHA-256 digests', allFilesValid);
+
+    // Recompute manifest hash from frozen snapshot files matching Python kernel json.dumps(frozen_files, sort_keys=True)
+    const canonicalManifestJson = '[' + currentResume.frozenFiles.map(f =>
+      `{"path": "${f.path}", "sha256": "${f.sha256}", "size": ${f.size}}`
+    ).join(', ') + ']';
+    const computedManifestHash = `sha256:${crypto.createHash('sha256').update(canonicalManifestJson).digest('hex')}`;
+    assert('Recomputed frozenFiles manifest SHA-256 matches inputHash', computedManifestHash === currentResume.inputHash);
+
+    // Verify modifying working copy yields distinct SHA-256 from frozen snapshot
+    const serverTsSnapshot = currentResume.frozenFiles.find(f => f.path === 'src/server.ts');
+    assert('Frozen snapshot contains src/server.ts', Boolean(serverTsSnapshot));
+    if (serverTsSnapshot) {
+      const modifiedWorkingCopy = '// Modified working copy for next recovery step\nconsole.log("local edits");\n';
+      const modifiedWorkingHash = `sha256:${crypto.createHash('sha256').update(modifiedWorkingCopy).digest('hex')}`;
+      assert('Modified working copy content yields different SHA-256 than frozen snapshot', modifiedWorkingHash !== serverTsSnapshot.sha256);
+    }
+
+    // Negative controls: malformed hash strictly rejected
+    assert('Negative control: malformed inputHash (sha256:not-a-digest) is strictly rejected', !isValidSha256Digest('sha256:not-a-digest'));
 
     // ---------------------------------------------------------------------------
     // Deep Contrast: NodeStopReceipt exitCode: 0 vs Evidence verified: true
@@ -172,7 +197,7 @@ async function main() {
       assert('Success receipt has physicallyStopped === true', successReceipt.physicallyStopped === true);
       assert('Success receipt has verified === true', successReceipt.verified === true);
       assert('Success receipt has resourceReclaimed === true', successReceipt.resourceReclaimed === true);
-      assert('Success receipt has valid output SHA-256', successReceipt.output.sha256.startsWith('sha256:'));
+      assert('Success receipt has valid output SHA-256', isValidSha256Digest(successReceipt.output?.sha256));
     }
 
     // 2. Failure execution receipt (exit 0 BUT verified false)
@@ -199,11 +224,15 @@ async function main() {
     // Summary
     // ---------------------------------------------------------------------------
     console.log('\n================================================================================');
-    console.log(`🎉 5-Screen Reconciliation Summary: ${passedChecks}/${totalChecks} checks passed (${Math.round((passedChecks / totalChecks) * 100)}%)`);
-    console.log('   All 5 core screens and NodeStopReceipt vs Evidence contrast successfully verified.');
-    console.log('================================================================================\n');
-
-    if (passedChecks !== totalChecks) {
+    if (passedChecks === totalChecks && totalChecks > 0) {
+      console.log(`🎉 5-Screen Reconciliation Summary: ${passedChecks}/${totalChecks} checks passed (100%)`);
+      console.log('   All 5 core screens and NodeStopReceipt vs Evidence contrast successfully verified.');
+      console.log('   (Control Plane Gateway API Contract Smoke Suite; not physical 5-node hardware acceptance)');
+      console.log('================================================================================\n');
+    } else {
+      console.error(`❌ 5-Screen Reconciliation FAILED: ${totalChecks - passedChecks} failed out of ${totalChecks} checks (${passedChecks}/${totalChecks} passed).`);
+      console.error('   Verification incomplete or boundary audit assertions failed.');
+      console.log('================================================================================\n');
       process.exit(1);
     }
   } catch (err) {
