@@ -1,0 +1,33 @@
+{
+  "scope": "offline original functions; synthetic rehearsal/record data; no operational acceptance",
+  "results": [
+    {
+      "case": "lan-failed-reuse",
+      "exitCode": 2,
+      "oldSuccessfulReportUnchanged": true,
+      "scope": "nonzero preserved; no downstream false acceptance demonstrated"
+    },
+    {
+      "case": "independent-existing-report",
+      "exitCode": 2,
+      "rehearsalCalled": false
+    },
+    {
+      "case": "storage-empty-sample",
+      "sampleHealthy": false,
+      "sampled": 0
+    },
+    {
+      "case": "readiness-catalog-gate",
+      "syntheticEvidenceComplete": false,
+      "exitCode": 1,
+      "scope": "record completeness, not physical recovery"
+    },
+    {
+      "case": "readiness-catalog-gate",
+      "syntheticEvidenceComplete": true,
+      "exitCode": 0,
+      "scope": "record completeness, not physical recovery"
+    }
+  ]
+}
