@@ -59,3 +59,9 @@ PITR-R2-02 cleanup 코드는 앞서 Codex가 고정 SHA에서 13개 원본 대�
 ## 인계
 
 Claude 문서 정정과 PITR cleanup은 착지했다. 남은 운영 항목은 AC-12 활성/별도 저장소, image lane의 business-kernel-role 미검증, 원격 장비와 CI 외부 조건이다. route coverage의 추가 backend endpoint 구현은 현재 필요하지 않으며, 이후 실제 HTTP 계약 변경이 생길 때 해당 owner가 새 경로와 음성 회귀를 함께 제출한다.
+
+## Evidence 계약 최종 결론
+
+Claude `350f5d7`의 데이터 충분성 분석과 Gemini `777f309`의 `ResultView` 경로를 대조했다. 신규 `/v1/.../evidence` 백엔드 엔드포인트는 추가하지 않는다. 기존 `/v1/projects/{project}/runs/{run}/result`가 실제 `evidence` 객체(`evidenceId`, timestamp, actor/action, policyDecisionId, input/output SHA, result)와 `stopReceipt`, state, output을 반환하고, `EvidenceViewer`가 이 응답을 사용하므로 핵심 evidence 패키지는 기존 계약으로 충분하다.
+
+다만 `EvidenceViewer`의 fetch 실패 catch가 합성 `specDigest`, `toolCalls`, `integrityVerification: PASS`를 표시하는 것은 별도 진실성 잔여다. per-tool `toolCalls`와 wall time은 현재 백엔드 응답에 없으므로, 백엔드 계약을 늘리거나 프론트가 해당 가짜 패널을 제거해야 한다. retention/tamper는 정적 정책 라벨로 표시하되 per-run 검증 결과처럼 표현하지 않는다. 이 결론은 소스 계약 대조이며 live HTTP 운영 인수는 아니다.
