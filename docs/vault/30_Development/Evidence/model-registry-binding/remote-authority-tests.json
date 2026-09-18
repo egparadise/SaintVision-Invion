@@ -1,0 +1,19 @@
+{
+  "baseSha": "5e4d6ae",
+  "kst": "2026-09-18T12:39:00+09:00",
+  "command": "python -m pytest tests/core/test_model_source.py tests/core/test_model_remote.py tests/core/test_model_manifest.py tests/core/test_node_chunk.py tests/core/test_node_tls.py tests/test_migration_prerequisite.py tests/integration/test_model_remote_runtime.py tests/integration/test_model_runtime.py -q --junitxml=.work/remote-authority-tests.xml",
+  "exitCode": 0,
+  "tests": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 29,
+    "passed": 132
+  },
+  "junitSha256": "3730797d83586bfb215a686992a56dff4175d4d9bbc49e5d495e9f134ddd47ae",
+  "environment": "local Python, synthetic transport/loopback mTLS, fake database orchestration; no Docker",
+  "postgres": "not run: INV_TEST_ADMIN_DSN absent; new remote 6 and existing runtime 23 skipped",
+  "integrationLanding": "held pending PostgreSQL authority/locking validation",
+  "ci": "billing blocked; not rerun",
+  "independentReview": "pending",
+  "operationalAcceptance": false
+}

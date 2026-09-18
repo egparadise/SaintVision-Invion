@@ -1,7 +1,7 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.5.0"
+version: "1.6.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
@@ -102,3 +102,12 @@ record_deployment는신뢰된내부호출자가제공한timezone-aware now의배
 ConfiguredRemoteModelReader는 명시 NodeTLSClient/ChannelProof/LocationSnapshot으로 unencrypted 32KiB 이하 모델을 읽는다. replica최대8개, 기존 TLS호출별40초상한·무재시도. tenant/epoch/채널/위치·manifest identity 사전검사, nonce/범위/길이/각replica와전체hash 검증을 수행한다. caller URL/relative_path 해석, 디스크저장, 실행인가 없음. 불변 RemoteModelBytes에 채널·위치snapshot을 보존해 후속 DB재검사 입력을 제공한다.
 
 read component는 구현했으나 remote provider의 현재권한 DB통합과 ModelRuntimeStore 연결은 미구현이다. 기존 로컬 경로는 그대로이며 자동원격fallback이 없다. 후속 trusted worker가 snapshot 전 권한확인과 읽기 후 channel/Location/policy/registry/fence 재검사를 구현해야 실행에 연결할 수 있다. 106오프라인시험(합성loopback mTLS 포함), 실장비 인수 아님. [[2026-09-18_원격모델읽기_Codex]].
+
+
+## 원격 권한 재검사와 frozen 입력 결속 후보 (1.6.0)
+
+ModelRuntimeStore의 명시 remote reader 경로를 구현했다. 기존 Run/Node/resource/grant/Location capture 뒤 현재채널을 고정하고, 네트워크밖 transaction 경계 전후 snapshot을 비교한다. 채널 provenance는 불변 runtime locations와 model/source.json의 hash로 서로 결속하고 전체 snapshot inputSha256를 통해 기존 workload 승인digest에 포함한다. 원문 endpoint/relative_path를 실행 환경에 제공하지 않는다. 채널marker 일부삭제/전체삭제/변조의 local fallback은 거부한다. 원격 sourceMode를 idempotency payload에 포함한다.
+
+승인 요청은 현재 business permission·channel, delivery/claim은 기존 Node/resource잠금 뒤 Node/Location/현재권한·channel·fence를 재검사한다. 네트워크는 DBtransaction 밖이며 implicit retry나 자동로컬fallback이 없다. RegistryVersion/policy/lifecycle 실행결속은 별도 남은 구현이다.
+
+이 버전은 작업브랜치 후보이며 integration5e4d6ae에는 아직 없다. 132오프라인통과/29실PG시험미실행으로 DB검증까지 착지보류. [[2026-09-18_원격모델권한결속_Codex]].

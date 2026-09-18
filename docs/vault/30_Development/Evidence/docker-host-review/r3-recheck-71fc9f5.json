@@ -1,0 +1,11 @@
+{
+  "reviewedTip": "71fc9f5",
+  "method": "mocked subprocess; no Docker or real credentials",
+  "accessViolationMisclassified": true,
+  "posixKillMisclassified": true,
+  "mutatingCommandCallsAfterAccessViolation": 2,
+  "libpqSyntheticPasswordUnmasked": true,
+  "osErrorStillPropagates": true,
+  "timeoutNowClassified": true,
+  "mergeDecision": "hold R3-01/R2-03 and finally proof preservation"
+}

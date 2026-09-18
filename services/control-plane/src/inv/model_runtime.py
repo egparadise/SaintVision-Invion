@@ -3,12 +3,12 @@
 This is not PyTorch/vLLM/GPU or collective support. No host mount or execution
 approval is granted by prepare(). The same verified bytes are frozen and then
 carried in the existing initialized-workspace permit. Current grants, Node and
-Lease fences are rechecked at ToolGateway admission.
+Lease fences are rechecked at ToolGateway admission. Explicit remote readers
+also freeze channel provenance and recheck it at delivery and admission.
 """
 
 import base64
 from copy import deepcopy
-from dataclasses import asdict
 import hashlib
 import json
 from uuid import uuid4
@@ -23,6 +23,9 @@ from .errors import DomainError
 from .leases import assert_fences, lock_resources, lock_run
 from .model_locality import _capture
 from .model_manifest import ConfiguredModelVerifier, canonical, manifest_copy, rejected
+from .model_remote import ConfiguredRemoteModelReader
+from .model_source import SOURCE_FILE, capture_channels, frozen_sources, source_content, source_records
+from .node_channels import assert_channel
 from .runs import event
 from .workspace_files import FORMAT, canonical as workspace_canonical
 from .workspace_resume import bounded_snapshot
@@ -83,6 +86,20 @@ def approved_model(
     ):
         raise DomainError("MODEL-0006", "Frozen model action, Node or epoch differs", 403)
     principal = Principal(str(row["tenant_id"]), row["requester_id"])
+    raw = bytes(row["snapshot"])
+    bounded_snapshot(raw, workload["workspaceId"])
+    if len(raw) != ref["inputSizeBytes"] or hashlib.sha256(raw).hexdigest() != ref["inputSha256"]:
+        rejected()
+    saved_locations, saved_channels = frozen_sources(
+        raw, workload["workspaceId"], row["locations"], principal.tenant_id, epoch
+    )
+    if saved_channels and node_id is None:
+        # Approval creation holds Run/grants, not the allocation's Node locks.
+        # Check business permission and only channels here; delivery/claim below
+        # rechecks the complete current Node/Location scope after Node locking.
+        permission(conn, workload["projectId"], principal.subject_id, "can_request", linked=True)
+        for channel in saved_channels:
+            assert_channel(conn, channel)
     if node_id is not None:
         if node_id != binding["node_id"] or proofs != {
             l["leaseId"]: l["fencingToken"] for l in binding["input"]["leases"]
@@ -92,13 +109,11 @@ def approved_model(
         current = _capture(
             conn, database, principal, workload["projectId"], manifest(conn, binding)
         )
-        if [asdict(location) for location in current] != row["locations"]:
+        if current != saved_locations:
+            rejected()
+        if saved_channels and capture_channels(conn, principal.tenant_id, epoch, current) != saved_channels:
             rejected()
         assert_fences(conn, run["run_id"], proofs)
-    raw = bytes(row["snapshot"])
-    bounded_snapshot(raw, workload["workspaceId"])
-    if len(raw) != ref["inputSizeBytes"] or hashlib.sha256(raw).hexdigest() != ref["inputSha256"]:
-        rejected()
     return {
         "startId": ref["inputId"],
         "stepId": ref["inputId"],
@@ -110,7 +125,7 @@ def approved_model(
 
 class ModelRuntimeStore:
     def __init__(self, database, verifier):
-        if not isinstance(verifier, ConfiguredModelVerifier):
+        if not isinstance(verifier, (ConfiguredModelVerifier, ConfiguredRemoteModelReader)):
             raise ValueError("Operator-configured model byte verifier required")
         self.db, self.verifier = database, verifier
         self.auth = ApprovalStore(database)
@@ -139,7 +154,11 @@ class ModelRuntimeStore:
         locations = _capture(conn, self.db, principal, project, body)
         self.auth._grant(conn, project, principal.subject_id, "can_request")
         permission(conn, project, principal.subject_id, "can_request", linked=True)
-        return (run["version"], binding, body, locations)
+        channels = (
+            capture_channels(conn, principal.tenant_id, self.db.recovery_epoch, locations)
+            if isinstance(self.verifier, ConfiguredRemoteModelReader) else ()
+        )
+        return (run["version"], binding, body, locations, channels)
 
     def prepare(self, principal, project, run_id, workload, proofs, *, key):
         workload = deepcopy(workload)
@@ -157,18 +176,30 @@ class ModelRuntimeStore:
         ):
             raise DomainError("MODEL-0002", "Independent CPU model file workload required", 422)
         payload = {"runId": run_id, "workload": workload, "fences": proofs}
+        if isinstance(self.verifier, ConfiguredRemoteModelReader):
+            # A local commitment cannot be replayed as remote verification merely
+            # by changing the configured provider while retaining the same key.
+            payload["sourceMode"] = "node-mtls-v1"
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
             self.auth._grant(conn, project, principal.subject_id, "can_request")
             if prior is not None:
+                permission(conn, project, principal.subject_id, "can_request", linked=True)
                 return prior
             if conn.execute(
                 "SELECT 1 FROM inv.model_runtime_inputs WHERE run_id=%s", (run_id,)
             ).fetchone():
                 raise DomainError("MODEL-0003", "Model runtime input already frozen", 409)
             captured = self._scope(conn, principal, project, run_id, workload, proofs)
-        _, binding, body, locations = captured
-        verified, chunks = self.verifier.freeze(body, locations)
+        _, binding, body, locations, channels = captured
+        if isinstance(self.verifier, ConfiguredRemoteModelReader):
+            remote = self.verifier.read(body, locations, channels,
+                tenant_id=principal.tenant_id, recovery_epoch=self.db.recovery_epoch)
+            if remote.locations != locations or remote.channels != channels:
+                rejected()
+            verified, chunks = remote.manifest_hash, dict(enumerate(remote.shards))
+        else:
+            verified, chunks = self.verifier.freeze(body, locations)
         if (
             verified != hashlib.sha256(canonical(body)).hexdigest()
             or set(chunks) != set(range(len(body["shards"])))
@@ -184,6 +215,9 @@ class ModelRuntimeStore:
             rejected()
         # Paths are fixed by this adapter, never copied from Catalog/UI filenames.
         contents = {"model/%04d.bin" % i: value for i, value in chunks.items()}
+        records = source_records(locations, channels)
+        if channels:
+            contents[SOURCE_FILE] = source_content(records)
         contents["model/manifest.json"] = canonical(
             {
                 "modelId": body["modelId"],
@@ -234,6 +268,7 @@ class ModelRuntimeStore:
                 prior = self.auth._ledger(conn, principal, project, OPERATION, key, payload)
                 self.auth._grant(conn, project, principal.subject_id, "can_request")
                 if prior is not None:
+                    permission(conn, project, principal.subject_id, "can_request", linked=True)
                     return prior
                 if self._scope(conn, principal, project, run_id, workload, proofs) != captured:
                     rejected()
@@ -250,7 +285,7 @@ class ModelRuntimeStore:
                         principal.subject_id,
                         Jsonb(frozen),
                         raw,
-                        Jsonb([asdict(location) for location in locations]),
+                        Jsonb(records),
                     ),
                 )
                 result = {"runId": run_id, "workload": frozen, "requiresApproval": True}

@@ -2,7 +2,8 @@
 
 Trusted callers capture authorized channel/location snapshots before reading and
 must recheck them inside their commit transaction afterwards. No database lock
-is held here. This reader is deliberately not wired into ModelRuntimeStore.
+is held here. ModelRuntimeStore supplies that capture/recheck orchestration;
+this reader remains independently incapable of issuing execution authority.
 """
 
 from dataclasses import dataclass

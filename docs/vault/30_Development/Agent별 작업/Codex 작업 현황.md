@@ -426,3 +426,5 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 - 원격 읽기 기반: NodeTransfer의 bounded chunk 검증 공통화·공격 입력 회귀 포함 오프라인79통과, Docker/실장비 실행 없음. 사용자 독립 5b783d2 전체비integration1081/489/0·DSN exit2 유지 수신. provider/runtime 결속·PG통합재실행/Claude검토 미완료. [[2026-09-18_모델레지스트리_명시결속_Codex]].
 
 - 원격모델 bounded reader 구현·합성loopback mTLS 포함106시험통과, runtime/DB현재권한 연결은 후속. Claude b5f770a 재검토: R2-01/사전prune R2-02 수정인정, R3-01 오분류·변경명령재시도/R2-03 libpq미마스킹 재현으로전체착지보류. [[2026-09-18_원격모델읽기_Codex]].
+
+- **미착지 후보** 원격권한 snapshot 전후검사·frozen source hash·승인/delivery/claim 결속 구현.132passed/29PGskip(DSN없음), 실제DB검증전 integration5e4d6ae유지. Claude71fc9f5 timeout개선인정/R3-01·R2-03·OSError잔여로보류. [[2026-09-18_원격모델권한결속_Codex]].
