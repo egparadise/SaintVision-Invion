@@ -566,3 +566,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 ## UI 우선순위 6 fake fallback 경계 감사
 
 `UI-PRIORITY6-FALLBACK-AUDIT-20260919-CODEX`를 기준으로 `apps/web/src`의 화면·route adapter와 관련 시험을 정적 감사했다. ResourceExplorer의 backend 오류 후 합성 후보·capacity·detail 유지(UI-FB-01/P1 후보), PlacementSimulator의 로컬 평가 경계(UI-FB-02/P2), DeveloperStudio의 ResultView 오류 후 artifacts fallback(UI-FB-03/P2 후보)을 기록했다. `apps/web`에서 `npm exec vitest run tests/fabric-control-plane.test.tsx tests/placement-explain.test.ts`는 30 passed이며 mock/순수 계산 범위다. HTTP 실패 주입·브라우저 UI 인수·Gemini 구현은 미검증/대기이고, 다음 담당은 Gemini(구현), Codex(경계 재검토)다.
+
+## 우선순위 4 readiness·restore·storage offline 경계 감사
+
+`PRIORITY4-OFFLINE-BOUNDARY-AUDIT-20260919-CODEX`를 기준으로 `operational_readiness.py`, `storage_check.py`, `rehearse_independent_restore.py`, `rehearse_lan_upgrade.py`와 보고서 경계를 대조했다. PR4-01은 기존 성공 output이 실패 실행 뒤 남아 소비자가 stale 보고서를 읽을 수 있는 P2 후보, PR4-02는 independent restore의 finally cleanup 오류가 본문 보고서 생성을 가릴 수 있는 P2 후보다. 기존 stale-output 실패 주입은 exit2/기존 파일 보존까지 확인했지만 소비자 오인은 미재현했고, cleanup 장애 주입은 수행하지 않았다. offline readiness/storage는 DSN 부재로 5 passed/30 skipped이며 성공 위장은 찾지 못했다. 독립 restore 관련 시험은 cryptography 의존성 부재로 collection 불가였다. 다음 owner는 report provenance/cleanup receipt 구현 검토자이며, 실제 restore/LAN 인수는 승인·격리 조건 이후다.
