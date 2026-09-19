@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.68"
+version: "1.0.69"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T16:48:40+09:00"
+updated: "2026-09-19T17:24:47+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-19 recovery fixture 경계 후속(`aeec9b3`): 사용자/Claude 1차 회귀 checkout `53f81ba`는 이 수정 전이다(각 commit 시각 03:17:18 / 16:49:32 KST). Claude 1차 `2180/2/18/417`은 JUnit 부재로 provisional. Codex `.venv\\Scripts\\python.exe` 실PG16 실행은 CX01 unset에서 18 reasoned skip, owned container 지정 시 12 fixture body pass·4 Linux skip·2 archiver readiness failure. 전체 파일 clean pass 아님. cleanup-owned Docker allowlist에 빠졌던 `rpo-test`, `rpo-network` 추가; 26 label literal inventory test의 negative control은 exit1, 복구된 cleanup/recovery 17 tests pass. Claude `--junitxml` full rerun 대기. [[2026-09-19_recovery_drill_Docker_전제_skip_경계_Codex]]
 
 최종 착지 재검토: [[2026-09-18_Claude8b49981_최종착지와routecoverage_재검토_Codex]]. Claude `8b49981` 문서 정정과 PITR cleanup hold를 integration merge `0955202`로 반영했다. 최신 사용자 회귀는 `a04c17c`에서 1263/489/2/0(74초)이며 증가분 기원은 미대조다. 감사 12개 ID는 수정·검증 기록을 보유하고 route 실제 계약 불일치는 현재 0건이다. live HTTP 인수는 별도다.
 

@@ -16,11 +16,21 @@ import subprocess
 OWNERSHIP_LABELS = (
     "ai.saintvision.acceptance",
     "ai.saintvision.bridge-test",
+    "ai.saintvision.codex-db-test",
+    "ai.saintvision.configured",
+    "ai.saintvision.cx01",
     "ai.saintvision.developer-studio",
+    "ai.saintvision.guard",
     "ai.saintvision.kernel-test",
+    "ai.saintvision.pitr-rehearsal.run",
     "ai.saintvision.remote-test",
+    "ai.saintvision.restore",
+    "ai.saintvision.rpo-network",
+    "ai.saintvision.rpo-test",
+    "ai.saintvision.storage-test",
     "ai.saintvision.test",
     "ai.saintvision.upgrade-test",
+    "ai.saintvision.web-test",
 )
 PROTECTED_PREFIXES = ("saintvision-lan-db", "saintview-orthanc")
 EVIDENCE_RETENTION_MINUTES = {

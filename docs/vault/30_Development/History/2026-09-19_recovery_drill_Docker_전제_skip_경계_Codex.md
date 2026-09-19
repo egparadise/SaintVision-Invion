@@ -1,10 +1,10 @@
 ---
 doc_id: "RECOVERY-DRILL-DOCKER-PREREQUISITE-20260919-CODEX"
 title: "test_recovery_drill Docker 선행조건 skip/실패 경계"
-version: "1.0.0"
+version: "1.1.0"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-19T16:48:40+09:00"
+updated: "2026-09-19T17:24:47+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 ---
@@ -36,3 +36,30 @@ source_of_truth: "Git"
 ## 남은 확인과 담당
 
 Codex: Claude 전체 회귀 종료 후, 적법하게 소유가 확인된 disposable PostgreSQL container와 `CX01_CONTAINER`를 지정해 수정 후 18개 recovery cases를 실행한다. 누락/부재 환경에서는 같은 18개 fixture cases가 setup error가 아니라 개별 reasoned skips로 나타나는지, 기존 container가 있으나 미소유 라벨이면 실패하는지, 알려진 own label이면 본문이 실제 실행되는지 결과 JUnit과 명령에서 확인한다. CI, 운영 DB, 다른 프로젝트 container는 사용하지 않는다.
+
+## 2026-09-19 post-fix 실DB 실행 및 cleanup-label backstop
+
+### 기준선의 귀속
+
+- Claude 1차 회귀는 사용자 보고상 checkout `53f81ba`에서 실행됐고, 사용자 보고 집계는 `2180 passed / 2 failed / 18 errors / 417 skipped`였다. 해당 집계에는 JUnit artifact가 없어 **전수 집계로 확정하지 않는다**. `53f81ba`(커밋 시각 03:17:18 KST)는 `aeec9b3`(16:49:32 KST)보다 앞선 SHA다. 보고된 checkout SHA 기준으로 해당 실행은 수정 전이다. 실제 pytest 프로세스 시작 시각은 artifact가 없어 독립 대조할 수 없다.
+- 사용자가 전한 별도 재실행의 `8 passed`는 setup 문제가 사라졌다는 사용자 보고로만 기록하며, 본 문서의 Codex 실행 수치와 합산하지 않는다.
+
+### Codex 실행 기록
+
+- 실행 날짜: 2026-09-19 KST. 전용 컨테이너는 `codex-recovery-3292177c0a28`, PostgreSQL 16, 임시 data 경로는 tmpfs, loopback 임의 host port. owner labels는 `ai.saintvision.codex-db-test=<container>` 및 `ai.saintvision.created-by=codex`. 실행 뒤 `docker inspect`가 `No such object`를 반환해 해당 임시 컨테이너 부재를 확인했다. Docker daemon은 cleanup 직후 한 차례 I/O timeout을 반환했으므로 확인을 재시도해 부재를 확정했다.
+- Interpreter: `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe` 9.1.1.
+- 전제 미충족 실행: `INV_TEST_ADMIN_DSN`은 disposable PG를 가리키고 `CX01_CONTAINER`는 unset. 명령은 `.venv\Scripts\python.exe -m pytest -q tests/integration/test_recovery_drill.py --junitxml=.work/recovery-aeec9b3-no-identity.xml`, exit 0. JUnit 파일 시각 17:18:03 KST: 19 tests, 1 passed (standalone cleanup-helper test), 18 skipped, 0 failures, 0 errors. 18개의 skip 사유는 모두 `CX01_CONTAINER is unset`; DSN host에서 container 이름을 추정하지 않았다.
+- 소유 전제 충족 실행: 같은 disposable PG, `CX01_CONTAINER=codex-recovery-3292177c0a28`, 명령은 `.venv\Scripts\python.exe -m pytest -q tests/integration/test_recovery_drill.py --junitxml=.work/recovery-aeec9b3-owned.xml`, exit 1. JUnit 파일 시각 17:19:58 KST: 19 tests, 13 passed, 4 skipped, 2 failures, 0 errors. 18개 DB/owner fixture test 중 12개 본문이 통과했고 4개는 Linux private-backup/rollback 전제 때문에 명시 skip됐다. 나머지 2개 `test_live_archiver_configuration_cannot_certify_operational_rpo[/bin/true|/bin/false]`는 별도 internal-network archiver fixture의 readiness timeout에서 실패했다. 이 두 건은 제품 assertion 결과가 아니다. 근본 원인은 이 실행만으로 확정하지 않으며 후속 환경/fixture 진단 대상이다.
+- 별도 소유 경계 시험: `.venv\Scripts\python.exe -m pytest -q tests/test_recovery_drill_prerequisites.py`는 해당 시험군에 포함되어 11건 통과했다. 사용자도 aeec9b3의 여섯 시나리오를 독립 행동 검증했고, missing/absent/daemon unavailable은 서로 다른 skip이며 unowned/unknown inspect는 failure라고 보고했다. 그 사용자 실행은 Codex JUnit에 합산하지 않는다.
+
+### cleanup label allowlist gap
+
+- 소스 코드 라벨 literal 전수 스캔에서 cleanup allowlist에 없던 `ai.saintvision.rpo-test`와 `ai.saintvision.rpo-network`를 찾았다. 이 라벨을 가진 recovery archiver 컨테이너와 격리 네트워크는 fixture teardown이 비정상 종료할 때 cleanup backstop에 보이지 않았다.
+- `tools/cleanup_owned_docker.py`의 `OWNERSHIP_LABELS`에 두 라벨과 기타 임시 테스트 자원 라벨을 추가했다. 현재 literal 26개는 cleanup eligible 17개와 runtime/metadata 보존 9개로 명시 분류된다. `config`는 private material을 보관할 수 있는 명시적 volume에 쓰이므로 정리 허용하지 않는다. `node`, `pilot`, `command`, `storage-replace`, `upgrade`, `supervisor`, `output`, `created-by`도 cleanup 소유권으로 취급하지 않는다.
+- `tests/test_cleanup_owned_docker_label_inventory.py`가 Git 추적 파일 중 Python/PowerShell/shell/JS/MJS/YAML 소스 전체를 훑어 literal label 전체가 allowlist 또는 명시 보존 set에 분류되는지 확인한다. `rpo-test`를 allowlist에서 임시 제거한 음성 대조에서 시험은 exit 1로 실패했고, 복구 후 cleanup/recovery 경계 시험은 17 passed였다.
+- 이 스캔은 Git 추적 소스의 literal label 문자열에 대한 정적 인벤토리이며, 런타임에서 조합되는 문자열이나 저장소 밖에서 만든 자원까지 증명하지 않는다. 실제 자원 삭제는 수행하지 않았다.
+
+### 아직 남은 것
+
+- Claude의 `--junitxml` 전체 회귀 재실행은 진행 중이며 산출물은 아직 확인하지 않았다. 사용자가 보고한 2180/2/18/417 집계는 artifact가 도착할 때까지 확정 집계로 인용하지 않는다.
+- 이 Codex 실행은 수정 후 `test_recovery_drill` setup errors가 사라짐을 실제 JUnit으로 확인했다. 전체 파일은 archiver readiness 두 건 때문에 깨끗한 pass가 아니며, 그 원인을 제품 결함이나 Docker 환경 중 하나로 섣불리 단정하지 않는다.
