@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from raises_no_skip import raises_without_skip
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import vf_docker  # noqa: E402
@@ -60,7 +61,7 @@ def test_body_failure_survives_a_cleanup_that_cannot_run(monkeypatch):
         finally:
             recorded["incomplete"] = cleanup_owned("this-run", _RES)
 
-    with pytest.raises(AssertionError, match="real product assertion failed"):
+    with raises_without_skip(AssertionError, match="real product assertion failed"):
         body()
     assert len(recorded["incomplete"]) == 3               # cleanup still attempted everything
 
@@ -89,7 +90,7 @@ def test_cleanup_does_not_swallow_baseexception(monkeypatch):
     def interrupt(argv, **k):
         raise KeyboardInterrupt()
     monkeypatch.setattr(vf_docker.docker_diag, "run", interrupt)
-    with pytest.raises(KeyboardInterrupt):                  # NOT swallowed by except Exception
+    with raises_without_skip(KeyboardInterrupt):             # NOT swallowed by except Exception
         cleanup_owned("this-run", _RES)
 
 

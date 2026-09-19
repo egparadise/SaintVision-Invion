@@ -21,13 +21,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
 import check_kernel_docker as ckd  # noqa: E402
 from vf_docker import cleanup_owned  # noqa: E402
+from raises_no_skip import raises_without_skip  # noqa: E402
 
 _HAS_DOCKER = shutil.which("docker") is not None
 
 
 def test_checked_raises_with_a_masked_diagnostic_not_a_blank_message():
     # A guaranteed-failing docker-ish command; the message must carry the kind.
-    with pytest.raises(RuntimeError) as exc:
+    with raises_without_skip(RuntimeError) as exc:
         ckd.checked([sys.executable, "-c", "import sys; sys.stderr.write('boom-detail'); sys.exit(3)"])
     assert "exit 3" in str(exc.value)
     assert "boom-detail" in str(exc.value)       # diagnostic no longer suppressed
@@ -78,7 +79,7 @@ def test_checked_on_timeout_raises_a_classified_error_not_an_attributeerror(monk
     def timeout(argv, **k):
         raise subprocess.TimeoutExpired(cmd=argv, timeout=1)
     monkeypatch.setattr(subprocess, "run", timeout)
-    with pytest.raises(RuntimeError) as exc:
+    with raises_without_skip(RuntimeError) as exc:
         ckd.checked(["docker", "inspect", "x"], timeout=1)
     assert "timed out" in str(exc.value)      # named, not a raw AttributeError
 

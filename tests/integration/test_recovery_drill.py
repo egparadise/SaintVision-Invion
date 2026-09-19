@@ -17,6 +17,7 @@ from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 import pytest
 from recovery_drill_prerequisites import resolve_owned_postgres_container
+from raises_no_skip import raises_without_skip
 
 ROOT = Path(__file__).resolve().parents[2]
 POLICY = json.loads((ROOT / "tools" / "definer-policy.json").read_text(encoding="utf-8"))
@@ -600,7 +601,7 @@ def test_ledger_and_drill_rollback_together(args, tmp_path, monkeypatch):
         raise RuntimeError("injected after drill flush")
 
     monkeypatch.setattr(pilot, "record_recovery_drill", fail)
-    with pytest.raises(RuntimeError, match="injected"):
+    with raises_without_skip(RuntimeError, match="injected"):
         drill.record(report, args)
     with psycopg.connect(args.source) as conn:
         for table in ("backup_records", "recovery_drills"):

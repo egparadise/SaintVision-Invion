@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.70"
+version: "1.0.71"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T18:56:00+09:00"
+updated: "2026-09-19T19:12:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-19 skip-as-failure 경계 후속: 공용 `raises_without_skip`이 직접 및 `BaseExceptionGroup` 내부 pytest skip을 예상 오류를 대체하는 실패로 만든다. 일곱 파일의 원래 `pytest.raises` 35곳 중 실제 skip 기대 7곳은 보존하고 실패 기대 28곳을 보호했으며, helper 자체를 검사하는 두 개 회귀를 추가했다. pure four modules reject any module-level skip; integration modules retain Linux/PG skips and guard only error expectations. Seven named files were run/injection-checked; exact scope and KST evidence: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 
 2026-09-19 recovery/JUnit 후속: Claude checkout `40e921b`의 5개 배치 JUnit 산술 합 2628/2192/1/0/435이며 단일 실행 아님. Full collect 177개 시험 파일과 batch manifest union 187개가 누락 0/중복 0으로 대조됐다. 이전 432/386/0는 manifest 없는 선택 배치 집계로 철회됐고, 421/386/18은 해당 과거 JUnit의 실제 값으로만 보존한다. `aeec9b3`는 18 setup errors를 이유 있는 skips로 전환했다. Codex는 archiver `/bin/true`와 `/bin/false`를 실제 PG16/Docker로 재실행해 running+ready+no host port 상태에서 각각 skip, 별도 exited/FATAL PG negative control에서 failure를 확인했다. `.venv\\Scripts\\python.exe -m pytest -q tests/test_recovery_drill_prerequisites.py`: 19 passed. [[2026-09-19_archiver_readiness_boundary_Codex]]
 

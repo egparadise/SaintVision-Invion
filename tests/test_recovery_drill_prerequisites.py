@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from recovery_drill_prerequisites import resolve_owned_postgres_container
+from raises_no_skip import raises_without_skip
 
 
 def _inspect_result(labels):
@@ -101,8 +102,24 @@ def test_unknown_spawn_error_is_not_hidden_as_environment_skip(monkeypatch):
     def broken(*args, **kwargs):
         raise OSError("internal probe failure")
 
-    with pytest.raises(pytest.fail.Exception, match=r"process failed unexpectedly \(OSError\)"):
+    with raises_without_skip(pytest.fail.Exception, r"process failed unexpectedly \(OSError\)"):
         resolve_owned_postgres_container(run=broken, which=lambda _: "docker.exe")
+
+
+def test_failure_expectation_turns_direct_pytest_skip_into_failure():
+    with pytest.raises(pytest.fail.Exception, match="unexpected skip while expecting AssertionError"):
+        with raises_without_skip(AssertionError):
+            pytest.skip("injected skip in a failure assertion")
+
+
+def test_failure_expectation_turns_grouped_pytest_skip_into_failure():
+    grouped = BaseExceptionGroup(
+        "injected teardown group",
+        [RuntimeError("cleanup error"), pytest.skip.Exception("injected grouped skip")],
+    )
+    with pytest.raises(pytest.fail.Exception, match="unexpected skip while expecting ExceptionGroup"):
+        with raises_without_skip(ExceptionGroup):
+            raise grouped
 
 
 def test_known_codex_disposable_owner_label_allows_test_body(monkeypatch):
@@ -129,7 +146,7 @@ def test_foreign_or_unrecognized_owner_label_is_a_failure_not_a_skip(monkeypatch
     monkeypatch.setenv("CX01_CONTAINER", "other-project-pg")
     result = _inspect_result({"com.example.owner": "another-project"})
 
-    with pytest.raises(pytest.fail.Exception, match="unowned/foreign resource"):
+    with raises_without_skip(pytest.fail.Exception, "unowned/foreign resource"):
         resolve_owned_postgres_container(
             run=lambda *args, **kwargs: result,
             which=lambda _: "docker.exe",
@@ -140,7 +157,7 @@ def test_codex_label_without_creator_attestation_is_not_owned(monkeypatch):
     monkeypatch.setenv("CX01_CONTAINER", "other-project-pg")
     result = _inspect_result({"ai.saintvision.codex-db-test": "some-run"})
 
-    with pytest.raises(pytest.fail.Exception, match="unowned/foreign resource"):
+    with raises_without_skip(pytest.fail.Exception, "unowned/foreign resource"):
         resolve_owned_postgres_container(
             run=lambda *args, **kwargs: result,
             which=lambda _: "docker.exe",
@@ -209,7 +226,7 @@ def test_exited_archiver_with_startup_error_is_failure_not_skip():
         "FATAL: data directory permission denied",
     )
 
-    with pytest.raises(AssertionError, match=r"startup failed:.*exitCode=1.*FATAL: data directory permission denied"):
+    with raises_without_skip(AssertionError, r"startup failed:.*exitCode=1.*FATAL: data directory permission denied"):
         classify(name, run=run)
 
 
@@ -220,7 +237,7 @@ def test_postgresql_error_marker_cannot_be_overridden_by_a_later_ready_line():
         "FATAL: startup configuration failed\ndatabase system is ready to accept connections",
     )
 
-    with pytest.raises(AssertionError, match="PostgreSQL startup reported an error: FATAL:"):
+    with raises_without_skip(AssertionError, "PostgreSQL startup reported an error: FATAL:"):
         classify(name, run=run)
 
 
@@ -231,7 +248,7 @@ def test_restarted_archiver_is_failure_even_if_latest_logs_include_ready():
         "database system is ready to accept connections",
     )
 
-    with pytest.raises(AssertionError, match=r"startup failed:.*restartCount=2"):
+    with raises_without_skip(AssertionError, r"startup failed:.*restartCount=2"):
         classify(name, run=run)
 
 
@@ -242,7 +259,7 @@ def test_running_archiver_without_ready_or_error_marker_is_unclassified_failure(
         "database system is starting",
     )
 
-    with pytest.raises(AssertionError, match="neither PostgreSQL-ready nor a startup-error marker"):
+    with raises_without_skip(AssertionError, "neither PostgreSQL-ready nor a startup-error marker"):
         classify(name, run=run)
 
 
@@ -253,7 +270,7 @@ def test_archiver_inspect_or_logs_failure_is_not_misreported_as_network_skip():
         "database system is ready to accept connections",
         inspect_return=1,
     )
-    with pytest.raises(AssertionError, match="docker inspect returned 1"):
+    with raises_without_skip(AssertionError, "docker inspect returned 1"):
         classify(name, run=run)
 
     name, run = _archiver_probe(
@@ -261,7 +278,7 @@ def test_archiver_inspect_or_logs_failure_is_not_misreported_as_network_skip():
         "database system is ready to accept connections",
         logs_return=1,
     )
-    with pytest.raises(AssertionError, match="docker logs returned 1"):
+    with raises_without_skip(AssertionError, "docker logs returned 1"):
         classify(name, run=run)
 
 
@@ -271,7 +288,7 @@ def test_archiver_classifier_command_spawn_failures_are_not_skips():
     def inspect_timeout(argv, **kwargs):
         raise TimeoutError("inspect timeout detail suppressed")
 
-    with pytest.raises(AssertionError, match=r"docker inspect failed \(TimeoutError\)"):
+    with raises_without_skip(AssertionError, r"docker inspect failed \(TimeoutError\)"):
         classify("sv-rpo-test", run=inspect_timeout)
 
     name, unused = _archiver_probe(
@@ -284,7 +301,7 @@ def test_archiver_classifier_command_spawn_failures_are_not_skips():
             return unused(argv, **kwargs)
         raise TimeoutError("logs timeout detail suppressed")
 
-    with pytest.raises(AssertionError, match=r"docker logs failed \(TimeoutError\)"):
+    with raises_without_skip(AssertionError, r"docker logs failed \(TimeoutError\)"):
         classify(name, run=logs_timeout)
 
 
@@ -296,5 +313,5 @@ def test_ready_archiver_with_published_host_port_is_failure_not_internal_network
         port_bindings={"5432/tcp": [{"HostIp": "127.0.0.1", "HostPort": "54321"}]},
     )
 
-    with pytest.raises(AssertionError, match="with a published host port, but host connection still failed"):
+    with raises_without_skip(AssertionError, "with a published host port, but host connection still failed"):
         classify(name, run=run)

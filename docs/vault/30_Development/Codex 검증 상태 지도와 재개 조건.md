@@ -1,15 +1,17 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.4"
+version: "1.5.5"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-19T18:56:00+09:00"
+updated: "2026-09-19T19:12:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+2026-09-19 추가 검증 경계: pytest의 `Skipped`는 `BaseException`이라 실패 기대 `pytest.raises`가 skip을 초록 통과 대신 test skip으로 노출할 수 있다. seven scoped files now use `raises_without_skip`; four environment-independent modules reject any skip report; two integration files keep valid prerequisites skips and guard only failure assertions. Direct and grouped skip injections, module-level skip mutations, and target-helper rollback contrasts failed visibly. See [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 
 최종 착지 재검토: [[2026-09-18_Claude8b49981_최종착지와routecoverage_재검토_Codex]]. Claude `8b49981` 문서 정정과 PITR cleanup hold는 `0955202` 병합으로 닫혔다. 최신 사용자 회귀는 최종 tip에서 **1264 passed / 489 skipped / 2 deselected / 0 failed, 69초**다(tests/integration 제외·기본 not docker_host·DSN 없음). 1074 대비 +190이나 추가 시험의 기원을 전수 대조하지 않아 감사 회귀 증가로 귀속하지 않는다. 감사 12개 ID와 341c035 evidence 잔여 3건은 모두 수정·명시 범위 검증 기록을 보유한다. route coverage 실제 계약 불일치는 현재 프론트 정렬로 해소됐고 정적 도구의 bare workspace 1건은 오탐이다. 관련 회귀 29 passed; live HTTP 인수는 미실행.
 
