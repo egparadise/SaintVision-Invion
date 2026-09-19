@@ -61,5 +61,11 @@ Codex: Claude 전체 회귀 종료 후, 적법하게 소유가 확인된 disposa
 
 ### 아직 남은 것
 
-- Claude의 `--junitxml` 전체 회귀 재실행은 진행 중이며 산출물은 아직 확인하지 않았다. 사용자가 보고한 2180/2/18/417 집계는 artifact가 도착할 때까지 확정 집계로 인용하지 않는다.
+- 시점 정정: Claude 후속 `--junitxml` 산출물이 도착했다. 수정 전 checkout `53f81ba`의 `2180/2/18/417`은 JUnit 없는 당시 터미널 요약으로만 보존하며 최신 전체 회귀 근거로 쓰지 않는다. `40e921b` 다섯 JUnit/여섯 manifest는 2628 tests / 2192 passed / 1 failure / 0 errors / 435 skipped의 **5배치 산술 합**이다. 인터프리터·실행 시각·완전성 대조: [[2026-09-19_archiver_readiness_boundary_Codex]].
 - 이 Codex 실행은 수정 후 `test_recovery_drill` setup errors가 사라짐을 실제 JUnit으로 확인했다. 전체 파일은 archiver readiness 두 건 때문에 깨끗한 pass가 아니며, 그 원인을 제품 결함이나 Docker 환경 중 하나로 섣불리 단정하지 않는다.
+
+## 최종 archiver 분류 확인 (2026-09-19)
+
+- 실제 disposable PostgreSQL 16과 Docker로 `/bin/true` 및 `/bin/false` parameter를 각 1회 실행했다. `.venv\Scripts\python.exe -m pytest -q -rs tests/integration/test_recovery_drill.py::test_live_archiver_configuration_cannot_certify_operational_rpo --junitxml=.work/archiver-classification-verified-270d9156e645.xml`, JUnit 시작 18:45:41 KST, duration 69.315초, exit 0. 두 parameter 모두 실제 inspect에서 running/재시작 없음/exitCode 0, logs에서 PostgreSQL ready, host port binding 없음이 확인돼 각각 사유가 명시된 skip으로 분류됐다.
+- 반대 경로도 실제 Docker로 확인했다. PostgreSQL 16 startup parameter를 의도적으로 깨서 만든 컨테이너는 exited/exit 1/FATAL 로그였고 분류기는 skip이 아니라 실패를 냈다. 소유 라벨 재확인 후 제거 및 inspect absent를 확인했다. [[2026-09-19_archiver_readiness_boundary_Codex]].
+- Docker 없이 분류 회귀를 `.venv\Scripts\python.exe -m pytest -q tests/test_recovery_drill_prerequisites.py`로 다시 실행해 19 passed/exit 0을 확인했다. 테스트는 inspect/logs 호출 실패, 재시작 이력, ready+published port, 판별 불가 상태도 따로 다룬다.

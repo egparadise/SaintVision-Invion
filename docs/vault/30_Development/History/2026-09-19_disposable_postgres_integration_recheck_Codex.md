@@ -17,7 +17,7 @@
 
 ## PostgreSQL 실행 결과
 
-DSN을 설정해 통합 파일을 단위 배치로 실행했다. 고유 per-run DB 생성/마이그레이션 경로는 실제 PostgreSQL 16에서 동작했다. 완료된 배치의 합계는 `432 passed / 386 skipped / 0 failed`이며, skip은 Linux Docker/Workspace/credential/browser opt-in 등 명시된 선행조건 때문이다. 별도 non-integration DSN 대상은 `97 passed / 0 failed` (`54 + 43`)였다.
+당시 선택된 완료 배치의 합계를 `432 passed / 386 skipped / 0 failed`로 보고했다. 뒤의 감사에서 manifest 부재와 JUnit setup errors가 확인되어 이 aggregate는 철회됐다. 별도 non-integration DSN 대상 `97 passed / 0 failed` (`54 + 43`)는 별도 run 기록이며 integration 전체 집계와 합산하지 않는다.
 
 추가로 `test_recovery_drill.py`는 소유 container 라벨 요구를 맞춘 뒤 `11 passed / 7 failed`를 관측했다. 실패는 제품 결함으로 확정하지 않았다:
 
@@ -41,10 +41,10 @@ DSN을 설정해 통합 파일을 단위 배치로 실행했다. 고유 per-run 
 
 ## 감사 정정 — 통합 JUnit 집계와 실패 분리
 
-기존 `432 passed / 386 skipped / 0 failed` 문구는 선택된 성공 배치의 집계라고 적혀 있지만, 해당 배치의 정확한 파일 목록/집계 manifest가 이 문서에 없어 전체 integration 결과로 재현할 수 없다. 로컬 `.work` JUnit을 사후 대조한 결과를 별도 실행으로 보존한다:
+기존 `432 passed / 386 skipped / 0 failed`는 선택 배치라는 설명만 있고 당시 파일 목록/manifest가 없어 재현 불가라 철회했다. 로컬 `.work` JUnit을 사후 대조해 825건 중 421 passed, 386 skipped, 18 setup errors임을 별도 확인했다. 후속 40e921b의 artifact-backed 5-batch 결과는 이 문서의 정정과 [[2026-09-19_archiver_readiness_boundary_Codex]]에 기록한다. 이전 실행과 후속 실행은 합산하지 않는다. 당시 로컬 JUnit은:
 
 - `.work/codex-dbtest-integration.xml` (2026-09-19 02:04 KST): 825 collected, 421 passed, 386 skipped, 18 setup errors. 18건 모두 `test_recovery_drill`의 disposable PostgreSQL 컨테이너 inspect/소유 라벨 선행조건 실패로 본문 assertion에 도달하지 못했다.
 - `.work/codex-dbtest-recovery.xml`: 동일 18건이 잘못된 container owner label로 setup 단계에서 실패했다.
 - `.work/codex-dbtest-recovery2.xml`: 수정된 owner 경로에서 18건 중 11 passed / 7 failed. 실패는 definer 기대치 1, internal network 격리 2, Linux 전용/절대 backup 경로 4다. 후속 코드가 definer 집합을 정책에 연결하고 network 소유·격리 선행조건을 고쳤지만, 이 7건 전체를 수정 후 실제 PostgreSQL로 재실행한 JUnit은 이 감사에서 찾지 못했다.
 
-따라서 432/386/0을 전체 통합 인수나 완결된 단일 실행으로 인용하지 않는다. 해당 숫자는 작성 당시 보고된 선택 배치 요약으로만 남기며, 배치 manifest가 없으므로 현재 감사의 독립 판정은 “집계 범위 미확정”이다. `.work` JUnit은 로컬·미추적 자료이며 이 감사에서 Docker/PostgreSQL을 재실행하지 않았다. 실행 작성자 Codex, 사용자 독립 검증, Claude의 별도 소스/테스트 검토를 서로 합산하지 않는다.
+정정: 당시 `432/386/0` 보고는 전체 integration 근거로 사용하지 않는다. 실제 JUnit 사후 파싱값은 421 passed / 386 skipped / 18 setup errors였다. 이후 최신 코드 SHA `40e921b`에서 Claude가 실행한 **5개 배치 산술 합**은 2628 tests / 2192 passed / 1 failure / 0 errors / 435 skipped이며, manifest 집합 대조로 누락 0·중복 0임을 사용자와 Codex가 각각 확인했다. 이 값은 여전히 단일 실행이 아니며 이전 Codex 실행과 합산하지 않는다. 인터프리터, KST timestamps, 배치 JUnit/manifest 경로와 180초 timeout 관찰은 [[2026-09-19_archiver_readiness_boundary_Codex]]에 정정 근거와 함께 기록했다.

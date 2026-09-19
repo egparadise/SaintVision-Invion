@@ -1,0 +1,23 @@
+Archiver readiness classification - actual dead-container negative control
+Date: 2026-09-19 (KST)
+Verifier: Codex
+Interpreter: C:\Project\SaintVision-Invion\.venv\Scripts\python.exe
+
+Disposable resource:
+- Container: codex-archiver-dead-270d9156e645
+- Ownership label: ai.saintvision.rpo-test=codex-archiver-dead-270d9156e645
+- Image: postgres:16 (sha256:80f4c7a5e91618546dce5b4fe60cf03b14c0f9efa7e40157278d122772ced8d2)
+- Data path: tmpfs; no anonymous volume
+
+Injected startup fault:
+- postgres -c codex_invalid_startup_parameter=on
+- docker inspect: Status=exited, Running=false, Restarting=false, RestartCount=0, ExitCode=1
+- docker logs: FATAL, unrecognized configuration parameter (no credentials present)
+
+Classifier result:
+- _classify_archiver_connection_failure raised an assertion failure with the observed exited state, exit code, and sanitized FATAL diagnostic.
+- It did not return pytest.skip.
+
+Cleanup:
+- docker rm -f -v returned exit 0 after the ownership label was rechecked.
+- Exact-name docker inspect then confirmed absence.

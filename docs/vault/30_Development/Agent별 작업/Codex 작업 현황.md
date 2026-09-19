@@ -1,16 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.69"
+version: "1.0.70"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T17:24:47+09:00"
+updated: "2026-09-19T18:56:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-2026-09-19 recovery fixture 경계 후속(`aeec9b3`): 사용자/Claude 1차 회귀 checkout `53f81ba`는 이 수정 전이다(각 commit 시각 03:17:18 / 16:49:32 KST). Claude 1차 `2180/2/18/417`은 JUnit 부재로 provisional. Codex `.venv\\Scripts\\python.exe` 실PG16 실행은 CX01 unset에서 18 reasoned skip, owned container 지정 시 12 fixture body pass·4 Linux skip·2 archiver readiness failure. 전체 파일 clean pass 아님. cleanup-owned Docker allowlist에 빠졌던 `rpo-test`, `rpo-network` 추가; 26 label literal inventory test의 negative control은 exit1, 복구된 cleanup/recovery 17 tests pass. Claude `--junitxml` full rerun 대기. [[2026-09-19_recovery_drill_Docker_전제_skip_경계_Codex]]
+2026-09-19 recovery/JUnit 후속: Claude checkout `40e921b`의 5개 배치 JUnit 산술 합 2628/2192/1/0/435이며 단일 실행 아님. Full collect 177개 시험 파일과 batch manifest union 187개가 누락 0/중복 0으로 대조됐다. 이전 432/386/0는 manifest 없는 선택 배치 집계로 철회됐고, 421/386/18은 해당 과거 JUnit의 실제 값으로만 보존한다. `aeec9b3`는 18 setup errors를 이유 있는 skips로 전환했다. Codex는 archiver `/bin/true`와 `/bin/false`를 실제 PG16/Docker로 재실행해 running+ready+no host port 상태에서 각각 skip, 별도 exited/FATAL PG negative control에서 failure를 확인했다. `.venv\\Scripts\\python.exe -m pytest -q tests/test_recovery_drill_prerequisites.py`: 19 passed. [[2026-09-19_archiver_readiness_boundary_Codex]]
 
 최종 착지 재검토: [[2026-09-18_Claude8b49981_최종착지와routecoverage_재검토_Codex]]. Claude `8b49981` 문서 정정과 PITR cleanup hold를 integration merge `0955202`로 반영했다. 최신 사용자 회귀는 `a04c17c`에서 1263/489/2/0(74초)이며 증가분 기원은 미대조다. 감사 12개 ID는 수정·검증 기록을 보유하고 route 실제 계약 불일치는 현재 0건이다. live HTTP 인수는 별도다.
 
@@ -585,7 +585,7 @@ VF-STORAGE-API 최종: b3faf98/PR24,123시험·image8시험통과,CI6run billing
 
 `provision_credentials.py`의 실제 `provision()` 내부 catch-all이 여전히 모든 DB/TypeError/RuntimeError를 `ProvisioningDenied`로 뭉개고 있음을 독립 실측으로 확인해 `25051e3`에서 수정했다. `ProvisioningDenied` 전파, `psycopg.Error`→검증된 sqlstate `ProvisioningDatabaseError`, 기타 예외→타입명만 담은 `ProvisioningInternalError`로 구분하며 context-manager rollback과 비밀 비노출을 유지한다. 플랫폼 비의존 합성 주입 회귀를 추가했다. `.venv\Scripts\python.exe -m pytest -q tests/core/test_credential_provision_cli.py tests/core/test_lan_migration_plan.py`는 24 passed/1 skipped.
 
-라벨 고정 disposable PostgreSQL 16(`codex-dbtest-20260919-11f6a3b458dc`, port 61902)로 integration 파일을 분할 실행했다. 실제 집계는 432 passed/386 skipped/0 failed이며, 별도 DSN 대상 비-integration은 97 passed/0 failed. skip은 Linux credentials, Linux Docker/Workspace, browser/이미지 opt-in 등 명시된 환경 조건이다. recovery drill은 소유 라벨 조건을 맞춘 뒤 11 passed/7 failed; 5건은 Windows/Linux·Docker network 선행조건, 1건은 definer count 9→10 기대치 drift 후보, 1건은 저장 경로 조건으로 운영 결함 확정하지 않았다. 초기 잘못된 비밀번호 배치는 집계에서 제외했다. 다음은 소유 컨테이너 정리·제거 확인이다.
+정정 기록: 당시 `432 passed/386 skipped/0 failed`는 선택 배치 보고였으나 정확한 manifest가 없어 철회했다. 사후 확인한 그 별도 JUnit은 825 collected, 421 passed, 386 skipped, 18 setup errors였다. 최신 전체 코드 회귀는 Claude `40e921b`의 5개 JUnit 배치 산술 합 2628 tests / 2192 passed / 1 failure / 0 errors / 435 skipped이며 단일 실행은 아니다. Full collect 177 test-bearing files와 배치 manifest union 187 paths는 누락 0·중복 0이고 추가 10개는 support modules다. command/interpreter/KST/artifacts와 correction rationale: [[2026-09-19_archiver_readiness_boundary_Codex]]. 별도 DSN 대상 non-integration `97 passed/0 failed`와 초기 비밀번호 배치는 별도 실행으로 유지한다. 당시 recovery drill 11 passed/7 failed도 최신 시험수에 합산하지 않는다.
 
 후속: `tools/recovery_drill.py`와 `tests/integration/test_recovery_drill.py`에서 definer 함수 검증을 `tools/definer-policy.json`의 exact signature set으로 결속했다. Windows/Linux 백업 경로·격리 Docker network 전제 미충족 6건은 이유가 보이는 skip으로 분리했다. `7eb0d66`을 integration에 push했고, 실제 Linux/격리 Docker 복원 인수는 여전히 미실행이다.
 
