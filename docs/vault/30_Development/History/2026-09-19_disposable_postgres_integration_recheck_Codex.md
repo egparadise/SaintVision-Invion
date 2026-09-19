@@ -38,3 +38,13 @@ DSN을 설정해 통합 파일을 단위 배치로 실행했다. 고유 per-run 
 후속 검토에서 archiver 네트워크 skip은 잘못된 관찰 결과 은폐임을 확인했다. `test_live_archiver_configuration_cannot_certify_operational_rpo`가 이제 자기 소유의 `docker network create --internal`을 먼저 수행하고, 생성 실패만 skip한다. 생성된 네트워크의 `Internal` 속성이 false이면 보안 발견으로 실패한다. 나머지 Linux 경로 skip은 플랫폼 전제만 검사한다.
 
 추가 보강: archiver 시험의 `finally` 정리를 `_cleanup_owned_docker_resource`로 분리했다. 컨테이너와 네트워크를 각각 query-error/confirmed-absent/ownership-mismatch/remove-error/confirmed-removed로 분류하고, 한 단계 실패해도 다음 단계를 시도한다. 소유권 불일치 자원은 보존하며, 삭제 후 재-inspect로 제거를 확인한다. cleanup 오류는 본문 예외가 진행 중이면 stderr에만 기록해 본문 실패를 대체하지 않는다. 합성 회귀시험은 비소유 보존과 정상 제거 확인을 모두 포함한다.
+
+## 감사 정정 — 통합 JUnit 집계와 실패 분리
+
+기존 `432 passed / 386 skipped / 0 failed` 문구는 선택된 성공 배치의 집계라고 적혀 있지만, 해당 배치의 정확한 파일 목록/집계 manifest가 이 문서에 없어 전체 integration 결과로 재현할 수 없다. 로컬 `.work` JUnit을 사후 대조한 결과를 별도 실행으로 보존한다:
+
+- `.work/codex-dbtest-integration.xml` (2026-09-19 02:04 KST): 825 collected, 421 passed, 386 skipped, 18 setup errors. 18건 모두 `test_recovery_drill`의 disposable PostgreSQL 컨테이너 inspect/소유 라벨 선행조건 실패로 본문 assertion에 도달하지 못했다.
+- `.work/codex-dbtest-recovery.xml`: 동일 18건이 잘못된 container owner label로 setup 단계에서 실패했다.
+- `.work/codex-dbtest-recovery2.xml`: 수정된 owner 경로에서 18건 중 11 passed / 7 failed. 실패는 definer 기대치 1, internal network 격리 2, Linux 전용/절대 backup 경로 4다. 후속 코드가 definer 집합을 정책에 연결하고 network 소유·격리 선행조건을 고쳤지만, 이 7건 전체를 수정 후 실제 PostgreSQL로 재실행한 JUnit은 이 감사에서 찾지 못했다.
+
+따라서 432/386/0을 전체 통합 인수나 완결된 단일 실행으로 인용하지 않는다. 해당 숫자는 작성 당시 보고된 선택 배치 요약으로만 남기며, 배치 manifest가 없으므로 현재 감사의 독립 판정은 “집계 범위 미확정”이다. `.work` JUnit은 로컬·미추적 자료이며 이 감사에서 Docker/PostgreSQL을 재실행하지 않았다. 실행 작성자 Codex, 사용자 독립 검증, Claude의 별도 소스/테스트 검토를 서로 합산하지 않는다.

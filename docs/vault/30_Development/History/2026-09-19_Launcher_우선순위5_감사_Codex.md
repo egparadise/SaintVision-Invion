@@ -48,3 +48,9 @@ Docker start 실패 주입은 daemon 없이 shim으로 행동 검증을 완료�
 또한 `tools/deploy_intranet.ps1`은 Step 1에서 선택한 `$certDir`을 `$env:SAINTVISION_DEV_CERT_DIR`에 반영한다. 인증서 경로를 `deploy/certs`로 폴백한 경우에도 Step 5의 Compose required-variable 검증이 같은 경로를 사용한다. 외부 경로 시험은 Compose 단계에서 환경변수 전달을 확인하도록 고정했다.
 
 검증: `python -m pytest -q tests/core/test_launcher_failure_boundaries.py tests/test_deploy_intranet_preflight.py` → **18 passed**; `git diff --check` → **PASS**.
+
+## 감사 정정 — 인터프리터·되돌림 근거
+
+위 첫 검증 명령은 bare `python`이라 어느 인터프리터가 실행됐는지 이 문서만으로 확정할 수 없다. 이 결과를 프로젝트 venv 실행으로 소급 표기하지 않는다. 2026-09-19 감사자가 명시적으로 `.venv\Scripts\python.exe -m pytest -q tests/core/test_launcher_failure_boundaries.py tests/test_deploy_intranet_preflight.py`를 재실행해 **exit 0, 18 passed in 21.61s**를 확인했다. 이는 현재 통합 코드의 재검증이다.
+
+처음 Docker start 실패 주입을 실장비 필요/미검증으로 분류한 기록은 정정한다. 제품 Docker daemon은 필요하지 않다. C# `docker.exe` shim을 PATH 앞에 두고 원본 PowerShell launcher를 실행하는 격리 주입이 가능하며, 시험은 실제 `inspect`/`start` shim 호출 marker를 확인한다. 사용자는 LASTEXITCODE guard를 제거한 되돌림에서 시험 실패, 선행 Vite 파일을 숨긴 상태에서 사유가 출력되는 skip을 독립 재현했다. 따라서 shim 실패 주입은 확인됨, 실제 Docker·WSL·GUI 인수는 미검증이다. 작성자 Codex의 실행과 사용자 독립 재현은 별도 근거다.

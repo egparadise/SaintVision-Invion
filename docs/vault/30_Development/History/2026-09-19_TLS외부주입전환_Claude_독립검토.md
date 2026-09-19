@@ -43,3 +43,9 @@ README@integration이 clone→`requirements-core` 설치→`generate_tls_cert.py
 2. `deploy_intranet.ps1` preflight를 leaf-파일 + crt/key 쌍 검증으로 강화(Gemini)해 README의 "leaf·키 일치" 주장과 일치.
 3. line17 `deploy/certs` 폴백 정리(모순 제거; Codex/Gemini).
 Claude는 검토·기록까지 수행. 교차 영역/분기 구현은 하지 않는다.
+
+## Codex 감사 정정 — 낡은 분기에서 나온 preflight finding
+
+이 문서의 “`deploy_intranet.ps1`은 `Test-Path` 존재 확인뿐이며 leaf·crt/key 검증이 없다” 및 폴백 모순 finding은 현재 integration 기준에 대한 판정으로는 **철회**한다. 사용자가 지적한 통합 소스를 재확인하면 `Test-Path -PathType Leaf`, 0-byte 검사, `verify_tls_cert_pair.py` 호출이 존재하고, `02ed2ee`는 선택한 `certDir`를 Compose 환경에 전달한다. Claude 검토가 더 이른 분기/시점의 코드를 기준으로 작성되어 현재 통합본을 잘못 서술했다. 이 항목은 제품 결함이나 open finding으로 집계하지 않는다. 원문 판단은 검토 이력으로 보존한다.
+
+작성자/검토자/시점을 분리한다: 원 작성자는 Claude, Git commit은 `6bfcca7` (`2026-09-19T01:17:33+09:00`), 해당 커밋 문서의 `updated` frontmatter는 `2026-09-20T00:30:00+09:00`로 Git 기록과 맞지 않는다. 날짜를 조용히 덮어쓰지 않고 이 불일치를 기록한다. 본 정정은 Codex의 통합 소스 대조이며 실제 배포 실행이나 독립 Claude 재검토를 뜻하지 않는다.
