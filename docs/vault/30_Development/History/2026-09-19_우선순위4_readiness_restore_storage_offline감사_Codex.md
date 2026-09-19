@@ -59,3 +59,9 @@ source_of_truth: "Git"
 `rehearse_lan_upgrade.py`는 기존 성공 output과 기존 failure receipt를 시작 시 거부하고, 실패 시 `<stem>.failure<suffix>`를 새 파일로 생성한다. `rehearse_independent_restore.py`는 cleanup을 본문 결과와 분리해 `confirmed-removed`, `confirmed-absent`, `query-error`, `remove-error`, `ownership-mismatch`를 기록하며 cleanup 오류가 본문 report를 대체하지 않는다. 새 회귀시험은 기존 output 보존, failure receipt, remove/query/ownership 대조, 본문 실패 보고서 보존을 포함한다.
 
 `.venv/Scripts/python.exe -m pytest -q tests/test_independent_restore.py tests/core/test_lan_restore_upgrade.py` → **30 passed**. 수정 전 원복 코드와 새 시험을 대조하면 새 helper가 없어 collection 단계에서 실패했다. 실제 Docker/PostgreSQL 복원은 실행하지 않았다.
+
+## 감사 정정 — 인터프리터 및 되돌림 대조 강도
+
+초기 항목의 `python -m pytest ... tests/test_operational_readiness.py tests/test_storage_check_integrity.py` 기록은 실행 파일을 고정하지 않아 당시 interpreter provenance를 확정할 수 없다. 2026-09-19 감사자가 `.venv\Scripts\python.exe -m pytest -q tests/test_operational_readiness.py tests/test_storage_check_integrity.py`로 다시 돌려 **5 passed, 30 skipped, exit 0**을 확인했다. 모든 skip은 `INV_TEST_ADMIN_DSN` 부재로 PostgreSQL 본문이 실행되지 않은 사유다. 현재 수정 후 두 restore/LAN 파일은 `.venv\Scripts\python.exe -m pytest -q tests/test_independent_restore.py tests/core/test_lan_restore_upgrade.py`로 **30 passed, exit 0**을 재확인했다.
+
+앞서 기록한 수정 전 대조는 새 helper import가 없어 collection 단계에서 실패한 것이다. 이는 “원복 상태에서 시험이 실행되어 제품 불변식을 반증했다”는 assertion-level 되돌림 대조가 아니다. 근거 강도는 collection-level 결속 확인이며, 본문 동작을 원복해 새 assertion이 실패하는 대조는 미수행으로 유지한다. 실제 Docker/PostgreSQL 복원·cleanup fault injection·운영 인수도 미검증이다.

@@ -20,6 +20,9 @@ def test_volume_created_at_is_aged_and_evidence_policy_is_longer():
         "networkContainers": False,
     }
     assert tool._eligible(value, 30) == (True, "eligible")
+    anonymous = dict(value, name="a" * 64, owner=None, anonymousVolume=True)
+    eligible, reason = tool._eligible(anonymous, 30)
+    assert not eligible and "preserve by explicit user decision" in reason
     recent = dict(value, created="2999-01-01T00:00:00Z")
     eligible, reason = tool._eligible(recent, 30)
     assert not eligible and "intentional evidence retention" in reason
