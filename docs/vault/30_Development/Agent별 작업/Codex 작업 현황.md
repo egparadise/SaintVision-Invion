@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.65"
+version: "1.0.66"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T16:33:51+09:00"
+updated: "2026-09-19T16:39:02+09:00"
 source_of_truth: "Git"
 ---
 
@@ -623,4 +623,4 @@ Snapshot: 69 volumes, 64-hex Docker-generated names, no owner labels. UTC Create
 
 ## 2026-09-19 Audit-of-audit handoff
 
-Reviewed today's 20 changed paths exhaustively (15 detailed audit/evidence records plus 5 index/workboard/rollup/README records). Corrections AOA-01..08 are recorded in [[2026-09-19_감사에대한감사_Codex]]; prior incorrect claims remain traceable in Git/history and are not silently erased. Local rechecks used .venv\\Scripts\\python.exe; tools/check_docs.py passed (24 original hashes, 578 versioned documents, 48 tasks, 12 outcomes). No Docker, PostgreSQL, live backend, CI, GUI, or device acceptance was rerun. Next action: carry forward only the explicitly listed external/platform/operational unverified items; do not repeat their acceptance runs before prerequisites change.
+Reviewed today's 20 changed paths exhaustively (15 detailed audit/evidence records plus 5 index/workboard/rollup/README records). Corrections AOA-01..09 are recorded in [[2026-09-19_감사에대한감사_Codex]]; prior incorrect claims remain traceable in Git/history and are not silently erased. Local rechecks used .venv\\Scripts\\python.exe; tools/check_docs.py passed (24 original hashes, 578 versioned documents, 48 tasks, 12 outcomes). No Docker, PostgreSQL, live backend, CI, GUI, or device acceptance was rerun. Next action: carry forward only the explicitly listed external/platform/operational unverified items; do not repeat their acceptance runs before prerequisites change.
