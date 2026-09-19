@@ -155,3 +155,146 @@ def test_recognized_cx01_label_is_accepted(monkeypatch):
         run=lambda *args, **kwargs: result,
         which=lambda _: "docker.exe",
     ) == "cx01-pg"
+
+
+def _archiver_failure_classifier():
+    module = runpy.run_path(
+        str(Path(__file__).resolve().parent / "integration" / "test_recovery_drill.py")
+    )
+    return module["_classify_archiver_connection_failure"]
+
+
+def _archiver_probe(state, logs, *, inspect_return=0, logs_return=0, port_bindings=None):
+    name = "sv-rpo-test"
+    payload = [{
+        "Config": {"Labels": {"ai.saintvision.rpo-test": name}},
+        "State": state,
+        "RestartCount": state.get("RestartCount", 0),
+        "HostConfig": {"PortBindings": port_bindings or {}},
+    }]
+
+    def run(argv, **kwargs):
+        if argv[1] == "inspect":
+            return SimpleNamespace(
+                returncode=inspect_return,
+                stdout=json.dumps(payload).encode(),
+                stderr=b"inspect failed" if inspect_return else b"",
+            )
+        if argv[1] == "logs":
+            return SimpleNamespace(
+                returncode=logs_return,
+                stdout=logs.encode(),
+                stderr=b"logs failed" if logs_return else b"",
+            )
+        raise AssertionError("unexpected Docker command: " + " ".join(argv))
+
+    return name, run
+
+
+def test_running_ready_internal_archiver_is_a_reasoned_host_network_skip():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is ready to accept connections",
+    )
+
+    with pytest.raises(pytest.skip.Exception, match="internal network has no published host port"):
+        classify(name, run=run)
+
+
+def test_exited_archiver_with_startup_error_is_failure_not_skip():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "exited", "Running": False, "Restarting": False, "ExitCode": 1, "RestartCount": 0},
+        "FATAL: data directory permission denied",
+    )
+
+    with pytest.raises(AssertionError, match=r"startup failed:.*exitCode=1.*FATAL: data directory permission denied"):
+        classify(name, run=run)
+
+
+def test_postgresql_error_marker_cannot_be_overridden_by_a_later_ready_line():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "FATAL: startup configuration failed\ndatabase system is ready to accept connections",
+    )
+
+    with pytest.raises(AssertionError, match="PostgreSQL startup reported an error: FATAL:"):
+        classify(name, run=run)
+
+
+def test_restarted_archiver_is_failure_even_if_latest_logs_include_ready():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 2},
+        "database system is ready to accept connections",
+    )
+
+    with pytest.raises(AssertionError, match=r"startup failed:.*restartCount=2"):
+        classify(name, run=run)
+
+
+def test_running_archiver_without_ready_or_error_marker_is_unclassified_failure():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is starting",
+    )
+
+    with pytest.raises(AssertionError, match="neither PostgreSQL-ready nor a startup-error marker"):
+        classify(name, run=run)
+
+
+def test_archiver_inspect_or_logs_failure_is_not_misreported_as_network_skip():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is ready to accept connections",
+        inspect_return=1,
+    )
+    with pytest.raises(AssertionError, match="docker inspect returned 1"):
+        classify(name, run=run)
+
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is ready to accept connections",
+        logs_return=1,
+    )
+    with pytest.raises(AssertionError, match="docker logs returned 1"):
+        classify(name, run=run)
+
+
+def test_archiver_classifier_command_spawn_failures_are_not_skips():
+    classify = _archiver_failure_classifier()
+
+    def inspect_timeout(argv, **kwargs):
+        raise TimeoutError("inspect timeout detail suppressed")
+
+    with pytest.raises(AssertionError, match=r"docker inspect failed \(TimeoutError\)"):
+        classify("sv-rpo-test", run=inspect_timeout)
+
+    name, unused = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is ready to accept connections",
+    )
+
+    def logs_timeout(argv, **kwargs):
+        if argv[1] == "inspect":
+            return unused(argv, **kwargs)
+        raise TimeoutError("logs timeout detail suppressed")
+
+    with pytest.raises(AssertionError, match=r"docker logs failed \(TimeoutError\)"):
+        classify(name, run=logs_timeout)
+
+
+def test_ready_archiver_with_published_host_port_is_failure_not_internal_network_skip():
+    classify = _archiver_failure_classifier()
+    name, run = _archiver_probe(
+        {"Status": "running", "Running": True, "Restarting": False, "ExitCode": 0, "RestartCount": 0},
+        "database system is ready to accept connections",
+        port_bindings={"5432/tcp": [{"HostIp": "127.0.0.1", "HostPort": "54321"}]},
+    )
+
+    with pytest.raises(AssertionError, match="with a published host port, but host connection still failed"):
+        classify(name, run=run)

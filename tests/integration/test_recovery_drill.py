@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
@@ -99,6 +100,111 @@ def _cleanup_owned_docker_resource(kind, name, label_key, label_value):
     except (OSError, subprocess.TimeoutExpired):
         return "query-error"
     return "confirmed-removed" if confirmed.returncode != 0 else "remove-error"
+
+
+def _classify_archiver_connection_failure(name, run=subprocess.run):
+    """Distinguish archiver startup failure from host access to an internal network."""
+    try:
+        inspected = run(["docker", "inspect", name], capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise AssertionError(
+            "Cannot classify owned archiver readiness: docker inspect failed "
+            f"({type(exc).__name__})"
+        ) from None
+    if inspected.returncode != 0:
+        raise AssertionError(
+            "Cannot classify owned archiver readiness: docker inspect returned "
+            f"{inspected.returncode}"
+        )
+    try:
+        container = json.loads(inspected.stdout)[0]
+        labels = container["Config"]["Labels"]
+        state = container["State"]
+        if labels.get("ai.saintvision.rpo-test") != name:
+            raise AssertionError("Owned archiver readiness inspect found an ownership mismatch")
+        status = state["Status"]
+        running = state["Running"]
+        restarting = state["Restarting"]
+        exit_code = state["ExitCode"]
+        restart_count = container["RestartCount"]
+        port_bindings = container.get("HostConfig", {}).get("PortBindings") or {}
+    except (ValueError, KeyError, IndexError, TypeError) as exc:
+        raise AssertionError(
+            "Cannot classify owned archiver readiness: malformed docker inspect "
+            f"({type(exc).__name__})"
+        ) from None
+
+    try:
+        logs = run(["docker", "logs", "--tail", "200", name], capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise AssertionError(
+            "Cannot classify owned archiver startup: docker logs failed "
+            f"({type(exc).__name__})"
+        ) from None
+    if logs.returncode != 0:
+        raise AssertionError(
+            "Cannot classify owned archiver startup: docker logs returned "
+            f"{logs.returncode}"
+        )
+
+    log_text = (logs.stdout or b"").decode("utf-8", errors="replace")
+    log_text += "\n" + (logs.stderr or b"").decode("utf-8", errors="replace")
+    diagnostic = next(
+        (
+            line.strip()
+            for line in reversed(log_text.splitlines())
+            if re.search(r"\b(FATAL|PANIC|ERROR)\b", line, re.IGNORECASE)
+        ),
+        None,
+    )
+    if diagnostic:
+        # Keep useful startup context while suppressing credential-like values.
+        diagnostic = re.sub(r"(?i)(password\s*[=:]\s*)\S+", r"\1<redacted>", diagnostic)
+        diagnostic = re.sub(
+            r"(?i)(postgres(?:ql)?://)[^/@\s]+:[^/@\s]+@",
+            r"\1<redacted>@",
+            diagnostic,
+        )
+        diagnostic = re.sub(r"-----BEGIN [^-]+-----.*?-----END [^-]+-----", "<redacted-key>", diagnostic)
+        diagnostic = diagnostic[:500]
+
+    if status != "running" or not running or restarting or restart_count:
+        if diagnostic:
+            detail = "; startupLog=" + diagnostic
+        elif re.search(r"database system is ready to accept connections", log_text, re.IGNORECASE):
+            detail = "; PostgreSQL-ready marker present"
+        else:
+            detail = "; PostgreSQL-ready marker absent"
+        raise AssertionError(
+            "Owned archiver startup failed: "
+            f"status={status}, running={running}, restarting={restarting}, "
+            f"restartCount={restart_count}, exitCode={exit_code}{detail}"
+        )
+
+    ready = re.search(r"database system is ready to accept connections", log_text, re.IGNORECASE)
+    if diagnostic:
+        raise AssertionError(
+            "Owned archiver PostgreSQL startup reported an error: " + diagnostic
+        )
+    if ready and not any(port_bindings.values()):
+        pytest.skip(
+            "Docker inspect state confirms status=running, running=True, "
+            f"restarting=False, restartCount={restart_count}, exitCode={exit_code}; "
+            "PostgreSQL-ready log marker is present; "
+            "hostPortPublished=False. This test's Docker internal network has no "
+            "published host port, so host pytest cannot reach the container by "
+            "Docker-only name"
+        )
+    if ready and any(port_bindings.values()):
+        raise AssertionError(
+            "Owned archiver is running and PostgreSQL reports ready with a published "
+            "host port, but host connection still failed"
+        )
+
+    raise AssertionError(
+        "Cannot classify owned archiver readiness: container is running, but logs "
+        "contain neither PostgreSQL-ready nor a startup-error marker"
+    )
 
 
 def test_cleanup_preserves_unowned_resource_and_confirms_owned_removal(monkeypatch):
@@ -388,7 +494,7 @@ def test_live_archiver_configuration_cannot_certify_operational_rpo(args, archiv
                 break
             except psycopg.OperationalError:
                 if time.monotonic() > deadline:
-                    raise AssertionError("Owned archiver not ready") from None
+                    _classify_archiver_connection_failure(name)
                 time.sleep(0.1)
         capability = drill._recovery_capability(dsn)
         assert capability["archivingConfigured"] is True
