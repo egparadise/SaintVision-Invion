@@ -1,11 +1,11 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.2"
+version: "1.5.3"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-18T15:27:25+09:00"
+updated: "2026-09-19T17:24:47+09:00"
 source_of_truth: "Git"
 ---
 
@@ -192,3 +192,10 @@ owner Codex, reviewer Claude(지도 자체는미검토), branch agent/codex/mode
 MJS-02 인계 구체화(기준8a8e3db): Gemini owner/Codex reviewer. 상수 UI 3건은 API smoke PASS에서 제외·미검증 표기가 최소 수정이며, 실제 browser 관측을 선택하면 항목별 음성 대조가 필요하다. [[2026-09-18_Codex_감사사이클종료와다음세션인계]]의 처리 계획 참조. owner 수신·착수는 미확인. PITR/해당 수정본 대기, 새 감사 없음.
 
 최종 호스트 관측(사용자 보고): OneDrive handle은 재시작 직후 **2,421 → 약 1시간 후 119,773 → 현재 296,475**, 가용 RAM은 현재 **1,078MB**다. 과거 641,442에서 image host-init 실패가 관측된 이력과 함께 다음 재개 조건에 추가한다. 재시작은 임시 완화이며 vault가 OneDrive 동기화 경로에 있는 한 handle이 다시 증가할 수 있다. image lane 재개 전에는 실행 직전 handle 수준과 증가 추세, 가용 RAM, Docker process 시작 상태, 동시 image 실행 부재를 다시 확인한다. 이 시계열은 호스트 압박과 정합하지만 OneDrive 단일 원인이나 안전 임계치를 확정하지 않는다. 추가 image 실행은 새 환경 조치 없이 반복하지 않는다.
+
+## 2026-09-19 recovery fixture와 cleanup backstop 최신 상태
+
+- 코드 기준 `aeec9b3`는 Claude 1차 전체 회귀의 보고 checkout `53f81ba`보다 뒤다(커밋 시각 03:17:18 대 16:49:32 KST). 따라서 Claude 1차에서 보고된 recovery 18 errors는 수정 전 기준이다. 그 집계에는 JUnit 산출물이 없어 전체 숫자는 재실행 XML 도착 전 확정하지 않는다.
+- Codex의 `.venv\\Scripts\\python.exe -m pytest -q tests/integration/test_recovery_drill.py` 실제 disposable PostgreSQL 16 결과: `CX01_CONTAINER` unset 시 19 tests 중 18 reasoned skips/1 standalone pass/0 error/failure(exit 0); 명시된 owner-label container 시 13 passed/4 Linux-only skips/2 archiver fixture readiness failures/0 errors(exit 1). 18개의 DB fixture tests 중 12 본문 pass, 4 플랫폼 skip, 2 준비 timeout이며 full test file clean-pass는 아니다. 상세 JUnit 경로·시각은 [[2026-09-19_recovery_drill_Docker_전제_skip_경계_Codex]].
+- 정리 도구 allowlist의 실제 누락 `ai.saintvision.rpo-test`와 `ai.saintvision.rpo-network`를 포함해 literal label inventory를 보강했다. 신규 policy test는 26개 코드 label literal의 cleanup eligibility 또는 explicit non-cleanup 분류를 검증한다. rpo-test 누락 변이에서 exit 1, 복구 후 cleanup/recovery unit 17 passed. 삭제는 실행하지 않았다.
+- 외부 차단은 그대로 분리: CI billing/gh 인증, Gemini 인증, 타 플랫폼 조건, 원격 실장비 및 AC-12 운영 PITR. Claude의 full `--junitxml` 재실행은 artifact 대기 중이다.
