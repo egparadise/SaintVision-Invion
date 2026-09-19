@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.66"
+version: "1.0.68"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T16:39:02+09:00"
+updated: "2026-09-19T16:48:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -624,3 +624,7 @@ Snapshot: 69 volumes, 64-hex Docker-generated names, no owner labels. UTC Create
 ## 2026-09-19 Audit-of-audit handoff
 
 Reviewed today's 20 changed paths exhaustively (15 detailed audit/evidence records plus 5 index/workboard/rollup/README records). Corrections AOA-01..09 are recorded in [[2026-09-19_감사에대한감사_Codex]]; prior incorrect claims remain traceable in Git/history and are not silently erased. Local rechecks used .venv\\Scripts\\python.exe; tools/check_docs.py passed (24 original hashes, 578 versioned documents, 48 tasks, 12 outcomes). No Docker, PostgreSQL, live backend, CI, GUI, or device acceptance was rerun. Next action: carry forward only the explicitly listed external/platform/operational unverified items; do not repeat their acceptance runs before prerequisites change.
+
+## 2026-09-19 test_recovery_drill fixture boundary
+
+AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CONTAINER caused the DSN host 127.0.0.1 to be incorrectly used as a Docker name; a separate run found our disposable codex-db-test container but the old label allowlist rejected it. tests/recovery_drill_prerequisites.py now skips missing/unreachable prerequisites with distinct reasons, accepts only explicit recognized owned-test labels, and fails for present but unowned containers. Venv offline fixture tests: 11 passed; integration file collection: 19 tests (18 use this fixture, 1 cleanup helper test does not). Full PostgreSQL test-body run remains pending while Claude's current regression is active. Next: after it ends, compare its baseline JUnit with the old 18-case result, then execute post-fix recovery cases only against a newly verified disposable container, recording command, interpreter, KST time and JUnit results.

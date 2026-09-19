@@ -15,6 +15,7 @@ import psycopg
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 import pytest
+from recovery_drill_prerequisites import resolve_owned_postgres_container
 
 ROOT = Path(__file__).resolve().parents[2]
 POLICY = json.loads((ROOT / "tools" / "definer-policy.json").read_text(encoding="utf-8"))
@@ -28,11 +29,7 @@ SPEC.loader.exec_module(drill)
 @pytest.fixture
 def args(postgres):
     admin = os.environ["INV_TEST_ADMIN_DSN"]
-    container = os.getenv("CX01_CONTAINER") or conninfo_to_dict(admin)["host"]
-    inspect = subprocess.run(["docker", "inspect", container], capture_output=True, timeout=20)
-    assert inspect.returncode == 0, "Disposable PostgreSQL container unavailable"
-    labels = json.loads(inspect.stdout)[0]["Config"]["Labels"]
-    assert labels.get("ai.saintvision.cx01") or labels.get("ai.saintvision.kernel-test")
+    container = resolve_owned_postgres_container()
     source_name = conninfo_to_dict(postgres.owner)["dbname"]
     assert source_name.startswith("inv_test_")
     yield SimpleNamespace(
