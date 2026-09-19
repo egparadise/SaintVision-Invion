@@ -647,3 +647,10 @@ Claude ?? Docker ?? ?? ? ?? inventory? ????. Docker Engine ?? count? ?? ??? cont
 ## 2026-09-19 Audit Summary Final Update
 
 The latest priority 1-6 state is in the final status table of the verification-boundary summary. Execution, injection, rollback comparison and source-review evidence remain separated. Gemini authentication, 69 anonymous Docker volumes and orphan-resource provenance are explicit handoff items.
+
+
+## Anonymous Docker volume decision (2026-09-19)
+
+User decision is complete: preserve all 69 currently inventoried anonymous volumes. Do not propose or perform their cleanup unless the user explicitly changes this decision. Reasons: known upstream PostgreSQL launch paths now use tmpfs or explicit named volumes; about 3.7 GiB is not urgent; anonymous volumes lack ownership proof and deletion is irreversible. `cleanup_owned_docker.py` remains fail-closed and now identifies this as `preserve-by-user-decision`.
+
+Snapshot: 69 volumes, 64-hex Docker-generated names, no owner labels. UTC CreatedAt distribution: 2026-09-09 (4), 2026-09-11 (1), 2026-09-14 (9), 2026-09-15 (20), 2026-09-18 (35). Three are attached at `/var/lib/postgresql/data` to `/saintvision-inv-db`, `/saintvision-core-test-20260909`, `/inv-codex-core-pg`, all `pgvector/pgvector:pg16`; the other 66 were unconnected at snapshot time. Codex measurement: sum of individually rounded `SIZE` entries from `docker system df -v`, unit-converted, 3.843 GiB. User independent measurement: approximately 3.665 GiB from `docker system df -v`. Record both methods; do not force equality. `docker volume inspect` supplied CreatedAt; container `inspect` supplied image/mount linkage.

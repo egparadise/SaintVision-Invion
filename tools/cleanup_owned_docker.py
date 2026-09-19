@@ -139,7 +139,7 @@ def _eligible(resource, minimum_age):
     if resource["name"].startswith(PROTECTED_PREFIXES):
         return False, "protected project prefix"
     if resource.get("anonymousVolume"):
-        return False, "anonymous Docker volume; ownership unavailable"
+        return False, "anonymous Docker volume; preserve by explicit user decision (ownership unavailable)"
     if not resource["owner"]:
         return False, "ownership label absent"
     age = _age_minutes(resource["created"])
@@ -183,6 +183,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
     result = {"mode": "delete" if args.delete else "list", "minAgeMinutes": args.min_age_minutes,
               "evidenceRetentionMinutes": EVIDENCE_RETENTION_MINUTES,
+              "anonymousVolumePolicy": {
+                  "status": "preserve-by-user-decision",
+                  "decision": "Preserve the currently inventoried anonymous Docker volumes; do not delete without a new explicit user instruction.",
+                  "ownership": "unproven; 64-hex Docker-generated names carry no run ownership label",
+              },
               "removed": [], "retained": [], "anonymousVolumes": []}
     resources, unavailable, counts = _resources()
     result["inventoryCounts"] = counts
