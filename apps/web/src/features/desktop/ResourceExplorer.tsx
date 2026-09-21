@@ -1021,6 +1021,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               data-testid="register-contribution-btn"
               onClick={handleRegisterContribution}
               disabled={nodes.length === 0}
+              aria-disabled={nodes.length === 0}
+              aria-describedby={nodes.length === 0 ? 'storage-no-nodes-notice' : undefined}
+              title={nodes.length === 0 ? '등록 가능한 온라인 노드가 없습니다 (운영자 조치 필요).' : '기여 등록 제출'}
               style={{
                 marginTop: '12px',
                 padding: '6px 14px',
@@ -1037,6 +1040,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             </button>
             {nodes.length === 0 && (
               <div
+                id="storage-no-nodes-notice"
+                role="alert"
                 data-testid="storage-no-nodes-notice"
                 style={{ marginTop: '8px', fontSize: '0.75rem', color: '#f87171' }}
               >
@@ -1206,6 +1211,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 data-testid="fetch-storage-observation-btn"
                 onClick={handleFetchStorageObservation}
                 disabled={isLoadingObservation || !projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()}
+                aria-disabled={isLoadingObservation || !projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()}
+                aria-describedby={(!projectId?.trim() || !runId?.trim()) ? 'storage-observation-context-warning' : undefined}
+                title={(!projectId?.trim() || !runId?.trim()) ? '프로젝트 및 실행 컨텍스트가 필요합니다 (사용자 조치 필요).' : !sampleRequestId.trim() ? '샘플 요청 ID가 필요합니다.' : '샘플 관측 조회'}
                 style={{
                   padding: '6px 14px',
                   fontSize: '0.75rem',
@@ -1223,6 +1231,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
             {(!projectId?.trim() || !runId?.trim()) && (
               <div
+                id="storage-observation-context-warning"
+                role="alert"
                 data-testid="storage-observation-context-warning"
                 style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px', lineHeight: '1.4' }}
               >
@@ -1557,6 +1567,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 data-testid="create-plan-btn"
                 onClick={handleCreatePlan}
                 disabled={!planRunId.trim()}
+                aria-disabled={!planRunId.trim()}
+                aria-describedby={!planRunId.trim() ? 'plan-run-id-user-action-notice' : undefined}
+                title={!planRunId.trim() ? '승인된 분산 실행 Run ID(planRunId)가 필요합니다 (사용자 조치 필요).' : '계획 확정 및 샤드 할당'}
                 style={{
                   marginTop: '10px',
                   padding: '6px 12px',
@@ -1573,6 +1586,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
               {!planRunId.trim() && (
                 <div
+                  id="plan-run-id-user-action-notice"
+                  role="alert"
                   data-testid="plan-run-id-user-action-notice"
                   style={{ marginTop: '6px', fontSize: '0.6875rem', color: '#fed7aa' }}
                 >
@@ -1706,6 +1721,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             </h3>
             {(!tenantId || !tenantId.trim()) && (
               <div
+                id="discovery-tenant-required-notice"
+                role="alert"
+                aria-live="assertive"
                 data-testid="discovery-tenant-required-notice"
                 style={{
                   padding: '8px 12px',
@@ -1745,6 +1763,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 data-testid="broadcast-announcement-btn"
                 onClick={handleBroadcastAnnouncement}
                 disabled={!tenantId || !tenantId.trim()}
+                aria-disabled={!tenantId || !tenantId.trim()}
+                aria-describedby={!tenantId || !tenantId.trim() ? 'discovery-tenant-required-notice' : undefined}
+                title={!tenantId || !tenantId.trim() ? '인증된 세션 테넌트(tenantId)가 필요합니다 (사용자 조치 필요).' : '안내 방송 브로드캐스트'}
                 style={{
                   padding: '6px 12px',
                   fontSize: '0.75rem',
@@ -1827,6 +1848,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             {candidatesState === 'success' && candidates.length === 0 && (
               <div
                 data-testid="discovery-empty-state"
+                role="status"
+                aria-live="polite"
                 style={{
                   padding: '24px',
                   backgroundColor: '#1e293b',

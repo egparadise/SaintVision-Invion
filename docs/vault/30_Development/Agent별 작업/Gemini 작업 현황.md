@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.70"
+version: "1.0.71"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T21:48:00+09:00"
+updated: "2026-09-21T22:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T21:05:00+09:00.
+- 확인 기준: 2026-09-21T22:15:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 접근성 상태 역할 분리, 비색상 단서, 비활성 버튼 고지 및 DOM 검증 완결 (`ResourceExplorer.tsx`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `ModelLineageView.tsx`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `PlacementSimulator.tsx`, `accessibility-status-and-guards.test.tsx`)**:
+  - **스크린 리더 상태 역할 엄격 분리 (Role Separation)**:
+    - `role="alert"` (`aria-live="assertive"`): 즉각적 주의 요함 (해시 불일치 `integrity-mismatch-banner`, 테넌트 미식별 차단 `discovery-tenant-required-notice`, 노드 부재 `storage-no-nodes-notice` / `no-surviving-nodes-notice` / `terminal-empty-nodes-notice`, 컨텍스트 누락 `checkout-context-warning` / `storage-observation-context-warning` / `plan-run-id-user-action-notice` / `approval-input-user-action-notice` / `terminal-command-required-notice` / `terminal-no-workspace-notice`).
+    - `role="status"` (`aria-live="polite"`): 일반 상태 전이 (검증 통과 `verified`, 로딩 중, 정상 대기 빈 상태 `discovery-empty-state` / `preview-empty-state` / `candidates-empty-state`, 복구 성공 알림 `repair-action-success` / `shard-repair-success`, 터미널 연결 상태 `terminal-connection-status`).
+    - 무결성 뱃지(`integrity-badge`)의 동적 역할 전이 실장: 미검증 시 `role="status"` (polite) -> 해시 변조 검증 실패 시 `role="alert"` (assertive) -> 검증 통과 시 `role="status"` (polite).
+  - **색상만으로 구별되는 요소 방지 (Non-color-only Defense)**:
+    - 초록/빨강 색각 이상자를 위해 뱃지 및 상태 표시에 텍스트 라벨(`[저하]`/`[정상]`, `[VERIFIED]`, `[TAMPERED]`, `[UNVERIFIED]`) 및 `aria-label` 병행 제공.
+  - **비활성화(Disabled) 버튼 이유 전달**:
+    - 조건부 차단된 액션 버튼(`broadcast-announcement-btn`, `register-contribution-btn`, `fetch-storage-observation-btn`, `create-plan-btn`, `load-checkout-btn`, `lineage-deploy-btn`, `terminal-reconnect-btn`, `terminal-error-retry-btn`)에 `aria-disabled="true"`, `aria-describedby="<notice-id>"`, `title` 속성을 연동하여 초점을 이동하는 스크린 리더 사용자에게 차단 이유와 해결 경로 전달.
+  - **DOM 단위 테스트 신설 및 전체 검증 실적**:
+    - `tests/accessibility-status-and-guards.test.tsx` 16개 테스트 신설 및 **16/16 passed 100%**.
+    - Vitest 57개 파일 **543/543 passed 100%** (순증 +16 passed), Vite 프로덕션 빌드 exit 0 (3.84s, 96 modules).
+    - `check_frontend_integrity.py` 80개 파일 0 violations (PASS) 및 음성 대조(`--test-negative`) PASS.
+    - check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면_접근성_상태역할_비색상단서_비활성버튼_고지_Gemini]].
 
 - **화면 차단·미검증·미노출 상태의 3대 해결경로 분류정합 완결 (`ResourceExplorer.tsx`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `ModelLineageView.tsx`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `PlacementSimulator.tsx`, `resource-explorer-dom.test.tsx`)**:
   - **전체 화면 차단 요소 대상 3대 해결경로(Resolution Pathways Tri-Classification) 전수 분류 및 안내 정합**:

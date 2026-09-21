@@ -132,7 +132,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   // Filter files by current namespace / URI
   const filteredFiles = useMemo(() => {
     return files.filter((f) => {
-      if (activeNamespace && f.namespace !== activeNamespace) return false;
+      const fileNs = f.namespace || (f.uri?.startsWith('inv://') ? (f.uri.replace('inv://', '').split('/')[0] as InvNamespace) : undefined);
+      if (activeNamespace && fileNs && fileNs !== activeNamespace) return false;
       if (currentUri && currentUri !== `inv://${activeNamespace}`) {
         return f.uri.startsWith(currentUri) || f.uri === currentUri;
       }
@@ -500,6 +501,17 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               data-testid="load-checkout-btn"
               onClick={handleLoadCheckout}
               disabled={checkoutLoading || !projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()}
+              aria-disabled={checkoutLoading || !projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()}
+              aria-describedby={(!projectId?.trim() || !runId?.trim()) ? 'checkout-context-warning' : undefined}
+              title={
+                checkoutLoading
+                  ? '체크아웃 파일 로딩 중입니다.'
+                  : (!projectId?.trim() || !runId?.trim())
+                  ? '프로젝트 및 실행(Run) 컨텍스트가 필요합니다 (사용자 조치 필요).'
+                  : !inputCheckoutId.trim()
+                  ? '체크아웃 ID를 입력해야 로드할 수 있습니다 (사용자 조치 필요).'
+                  : '체크아웃 파일 로드'
+              }
               style={{
                 padding: '4px 12px',
                 fontSize: '0.75rem',
@@ -517,6 +529,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         )}
         {activeNamespace === 'workspaces' && (!projectId?.trim() || !runId?.trim()) && (
           <div
+            id="checkout-context-warning"
+            role="alert"
             data-testid="checkout-context-warning"
             style={{ fontSize: '0.6875rem', color: '#fbbf24', padding: '0 4px', lineHeight: '1.4' }}
           >
@@ -583,6 +597,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     <div style={{ textAlign: 'right', fontSize: '0.75rem' }}>
                       <div style={{ color: '#94a3b8' }}>{formatBytes(file.sizeBytes)}</div>
                       <span
+                        aria-label={`복제본 상태: ${file.requiredReplicas}개 중 ${healthy}개 가용 (${degraded ? '저하' : '정상'})`}
                         style={{
                           fontSize: '0.6875rem',
                           fontWeight: 600,
@@ -592,7 +607,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                           color: degraded ? '#f87171' : '#34d399',
                         }}
                       >
-                        {healthy}/{file.requiredReplicas} 복제본
+                        {healthy}/{file.requiredReplicas} 복제본 ({degraded ? '저하' : '정상'})
                       </span>
                     </div>
                   </div>
@@ -646,6 +661,16 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 {/* Tri-State Badge */}
                 <span
                   data-testid="integrity-badge"
+                  role={
+                    integrityState.status === 'mismatch' || integrityState.status === 'error'
+                      ? 'alert'
+                      : 'status'
+                  }
+                  aria-live={
+                    integrityState.status === 'mismatch' || integrityState.status === 'error'
+                      ? 'assertive'
+                      : 'polite'
+                  }
                   style={{
                     fontSize: '0.75rem',
                     fontWeight: 700,
@@ -750,6 +775,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 data-testid="verify-integrity-btn"
                 onClick={handleVerifyIntegrity}
                 disabled={integrityState.status === 'verifying'}
+                aria-disabled={integrityState.status === 'verifying'}
+                title={integrityState.status === 'verifying' ? '무결성 해시 계산 진행 중입니다.' : 'SHA-256 무결성 검증 실행'}
                 style={{
                   marginTop: '10px',
                   padding: '6px 14px',
@@ -867,7 +894,8 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
 
               {repairState.repairMessage && (
                 <div
-                  role={repairState.repairMessage.startsWith('⚠️') ? 'alert' : undefined}
+                  role={repairState.repairMessage.startsWith('⚠️') ? 'alert' : 'status'}
+                  aria-live={repairState.repairMessage.startsWith('⚠️') ? 'assertive' : 'polite'}
                   data-testid={
                     repairState.repairMessage.startsWith('⚠️') ? 'repair-action-warning' : 'repair-action-success'
                   }
@@ -889,6 +917,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
 
               {survivingNodes.length === 0 ? (
                 <div
+                  id="no-surviving-nodes-notice"
                   role="alert"
                   data-testid="no-surviving-nodes-notice"
                   style={{

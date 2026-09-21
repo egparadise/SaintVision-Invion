@@ -294,12 +294,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       variant="primary"
                       data-testid="lineage-deploy-btn"
                       disabled={!approvalInput.trim()}
+                      aria-disabled={!approvalInput.trim()}
+                      aria-describedby={!approvalInput.trim() ? 'approval-input-user-action-notice' : undefined}
+                      title={!approvalInput.trim() ? '승인 번호(approvalId)를 입력해야 배포할 수 있습니다 (사용자 조치 필요).' : '게이트 배포 시도'}
                       onClick={() => handleDeploy(selectedModel.modelId)}
                     >
                       게이트 배포 시도
                     </Button>
                     {!approvalInput.trim() && (
                       <span
+                        id="approval-input-user-action-notice"
+                        role="alert"
                         data-testid="approval-input-user-action-notice"
                         style={{ fontSize: '11px', color: '#fed7aa', marginLeft: '4px' }}
                       >

@@ -54,8 +54,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         }}
       >
         <div
+          id="terminal-empty-nodes-notice"
           data-testid="terminal-empty-nodes-notice"
-          role="status"
+          role="alert"
           style={{
             padding: '16px',
             backgroundColor: '#1e293b',

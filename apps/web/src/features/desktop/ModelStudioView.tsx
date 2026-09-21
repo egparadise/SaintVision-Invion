@@ -381,6 +381,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           </p>
           <p
             data-testid="model-verification-notice"
+            role="status"
             style={{
               margin: 0,
               fontSize: '0.8125rem',
@@ -472,6 +473,8 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           {repairState.message && repairState.message.includes('✔') && (
             <div
               data-testid="shard-repair-success"
+              role="status"
+              aria-live="polite"
               style={{
                 padding: '8px 12px',
                 backgroundColor: 'rgba(16, 185, 129, 0.15)',

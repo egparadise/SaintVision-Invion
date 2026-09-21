@@ -582,7 +582,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
           )}
 
           {previewState === 'success' && serverShards.length === 0 && (
-            <p data-testid="preview-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            <p data-testid="preview-empty-state" role="status" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
               가용 샤드가 없습니다. 👉 <strong>[사용자 조치 필요]</strong>: 상단 슬라이더에서 모델 크기 또는 샤드 수를 조절하거나 자원 풀 요건을 변경하십시오.
             </p>
           )}
@@ -660,7 +660,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
           )}
 
           {candidatesState === 'success' && candidates.length === 0 && (
-            <p data-testid="candidates-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0', lineHeight: '1.4' }}>
+            <p data-testid="candidates-empty-state" role="status" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0', lineHeight: '1.4' }}>
               승인 대기 중인 디스커버리 후보가 없습니다.<br />
               <span style={{ fontSize: '0.6875rem', color: '#93c5fd' }}>
                 🛠️ <strong>[운영자 조치 필요]</strong>: 신규 머신 등록은 클러스터 인프라 운영자에게 요청하십시오 (Node 운영 런북 'docs/vault/20_Operations/노드 운영 런북.md'의 'saint operator issue-grant' 참조).
