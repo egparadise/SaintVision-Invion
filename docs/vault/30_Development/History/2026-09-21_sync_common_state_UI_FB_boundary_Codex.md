@@ -1,10 +1,10 @@
 ---
 doc_id: "SYNC-COMMON-STATE-UI-FB-BOUNDARY-20260921-CODEX"
 title: "Obsidian 공용 worktree state와 UI-FB 경계 최종 재검토"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:38:00+09:00"
+updated: "2026-09-21T12:52:00+09:00"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "git-worktree", "UI-FB", "mutation-testing", "verification-boundary"]
 ---
@@ -42,7 +42,13 @@ same = True
 
 `tools/test_sync.py::test_default_state_is_shared_by_linked_worktrees`는 임시 Git repo와 linked worktree를 실제로 만들고 같은 common state 경로 및 서로 다른 git-path 경로를 비교한다. `--git-path` 구현으로 되돌린 mutation에서는 해당 시험이 assertion에서 실패(exit 1)했다. 수정본 전체 `tools/test_sync.py`: 14 passed; unittest가 추가 보고한 하위 cases 5 passed.
 
-주 checkout migration 직후 check는 `1372 managed / 10 pending / 0 conflicts`였다. 최신 paired 실행 시점은 main HEAD b5ea2a5에서 1373 managed/5 pending/0 conflicts, C:\vw HEAD 507a486에서 1373/3/0이며 두 CLI 모두 exit 0이다. 양쪽은 같은 `.git/obsidian-sync-state.json`을 공유한다. 두 checkout의 문서 snapshot이 달라 pending 수는 같은 기준의 비교가 아니며, 두 check 모두 vault에 쓰지 않았다. 이전 1373/0/0 및 6/5 결과는 중간 측정이다. C:\vw 검사는 main `.venv\Scripts\python.exe`로 `C:\vw\tools\sync_obsidian.py --check`를 실행했다.
+주 checkout migration 직후 check는 `1372 managed / 10 pending / 0 conflicts`였다. 당시 paired 실행의 main 6 및 C:\vw 3 pending, 이후 main 6 및 C:\vw 5 pending은 모두 서로 다른 문서 snapshot의 중간 측정이므로 최종 비교값으로 쓰지 않는다.
+
+### 사용자 최신 paired check 및 export — 2026-09-21
+
+사용자가 두 checkout을 같은 `b5ea2a5` snapshot으로 맞춘 뒤 각각 `tools/sync_obsidian.py --check`를 실행했다. 두 결과 모두 **1373 managed / 6 pending / 0 conflicts**, exit 0이었다. 사용자가 이 시점의 6 pending 문서를 `--apply`해 exit 0, `EXPORTED 6 files; all 1373 destination hashes match`를 확인했다. 적용 뒤 read-only `--check`는 **1373 managed / 0 pending / 0 conflicts**였고 vault 전체는 1,384 files였다. 따라서 기존 6/5, 7 no-baseline, 1373/0/0의 중간 관측을 대체하는 현재 안정 기준은 `b5ea2a5: 1373/0/0`이다.
+
+실행자는 사용자다. 최신 메시지는 명령과 결과를 제공하지만 정확한 Python 실행 경로와 실행 시각은 제공하지 않으므로 이를 추정하지 않는다. 이 구간은 사용자가 보고한 CLI 실측이며 Codex가 실행한 것으로 표시하지 않는다.
 
 ## UI-FB-01/02/03 fixed-tip 경계 재검토
 
@@ -62,12 +68,17 @@ same = True
 
 Codex는 다음 mutation을 수행했다. component의 `if (isRouteNotFoundError(err))`를 `if (true)`로 바꿔 모든 ResultView 오류에 artifacts fallback을 허용한 뒤 `npm exec vitest -- run tests/developer-studio.test.ts`를 실행했다. 13건 모두 통과(exit 0)했다. 원복했다. 따라서 helper의 분류시험은 존재하지만 component 요청 전이와 fallback 금지 계약을 고정하지 못한다. Gemini는 실제 component/effect test에서 401, 403, 5xx, malformed JSON/network rejection 각각에 대해 artifacts endpoint 호출 0회, 오류 노출, artifact verified 상태 부재를 고정하고, route-only 404에서는 허용된 fallback 및 UNVERIFIED 표시를 대조해야 한다. 이 finding 해소와 mutation failure 전까지 FB-03 승인을 보류한다.
 
-## 공통 mock/backend response 계약 제안
+## Discovery candidates mock/backend response 계약 — 구현 완료, 단일 endpoint 범위
 
-모든 UI mock을 live backend에 묶지 않는다. 기존 backend Pydantic strict response model → JSON Schema/OpenAPI export drift gate를 response envelope까지 확장하고, frontend types/fixtures는 같은 schema에서 생성하거나 검사한다. DB 없는 provider serialization test가 실제 FastAPI response shape를 검증하고, adapter/component tests는 canonical fixture로 변환·오류 처리를 검증한다. `route_coverage.py`는 path-shape 범위로 유지하며 method/response schema 검사로 오해하지 않는다. 이 안은 제안이며 이 작업에서 구현하지 않았다.
+첫 slice는 `GET /v1/discovery/candidates` 한 endpoint다. Backend `DiscoveryCandidatesResponse` / `DiscoveryCandidateResponse`가 strict Pydantic wire contract이고 `tools/export_schemas.py`가 JSON Schema를 생성한다. `apps/web/scripts/discovery-contracts.mjs`는 해당 JSON Schema에서 TypeScript response type을 생성하거나 `--check`로 drift를 거부한다. API adapter는 generated wire type을 사용하며 ResourceExplorer의 post-action `admitted`/`declined` 상태는 더 넓은 UI-only state type으로 분리한다.
+
+`contracts/fixtures/discovery-candidates-response.json`은 backend provider test와 Vitest mock이 함께 쓰는 canonical response다. DB 없이 FastAPI router를 mount하고 auth/session/time dependencies 및 discovery service를 대역 주입해 실제 response-model serialization을 검사한다. Pydantic exact property-set/strict validation과 Ajv JSON Schema validation은 누락, 추가 속성, `verified: true`, 잘못된 `state`를 거부한다. 프런트 build는 generated type을 소비하고 frontend workflow의 `contracts:check`는 schema/type drift를 거부한다. 이 경로는 live backend나 DB를 요구하지 않는다.
+
+`route_coverage.py`는 registered/client path shape만 검사한다. HTTP method와 payload schema를 다시 검사하지 않으며 response 계약은 위 Pydantic/JSON Schema/fixture gate가 담당한다. 기존 source 문자열 기반 discovery response invariant test는 제거하고 실행 가능한 provider/fixture test로 대체했다. 다른 adapter로 확장하는 것은 별도 slice다.
 
 ## 다음 담당과 첫 행동
 
 - Gemini: UI-FB-03 component fallback test를 보강한 fixed SHA를 제공한다.
 - Codex: 그 SHA에서 401/403/5xx/parse/network 및 genuine 404의 호출 전이를 재검토한다. browser/live backend acceptance는 별도 owner 조건이 준비될 때만 판정한다.
-- Obsidian: 공용 Git common-dir state로 전환 완료. 최종 read-only check는 main 6, `C:\vw` 5 pending exports / 모두 0 conflicts였다. 두 checkout의 문서 snapshot이 달라 pending 수를 동일한 상태의 비교로 해석하지 않는다. 둘 다 `--apply`하지 않았다. 다음 동기화는 일반 `--check` 후 승인된 정책에 따른 절차로 진행한다.
+- Obsidian: 사용자 paired check는 두 checkout 모두 동일 `b5ea2a5`에서 1373/6/0이었다. 사용자는 6개를 적용해 모든 1373 destination hash 일치와 사후 1373/0/0을 확인했고 vault는 1,384개 파일이다. 이전 6/5는 중간 snapshot 측정이다. 다음 문서 변경은 새 pending export이며, 이 기존 적용을 반복하지 않는다.
+- Codex: discovery candidates contract slice 구현 후 Claude 독립 리뷰로 인계한다. UI-FB-03 component error/fallback test는 Gemini owner 대기이고 브라우저 acceptance와 분리한다.

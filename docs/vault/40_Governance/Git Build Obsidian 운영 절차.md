@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-GIT-001"
 title: "Git Build Obsidian 운영 절차"
-version: "1.1.1"
+version: "1.1.2"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-11T17:15:06+09:00"
+updated: "2026-09-21T12:52:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -54,7 +54,9 @@ gh run list --repo egparadise/SaintVision-Invion --limit 5
 
 `docs/vault`만 내보내고 `.obsidian` 설정·미관리 파일은 건드리지 않는다. 최초 기존 파일은 캡처한 원문 hash와 일치할 때만 안내문을 추가한 사본으로 갱신한다. 이후 마지막 export hash와 다른 Obsidian 파일을 발견하면 전체 쓰기 전 중단한다. Obsidian의 수정을 변경 제안으로 Git에 수동 반영하고 재검증한다. 충돌 자동 덮어쓰기·폴더 삭제·양방향 자동 병합은 하지 않는다.
 
-동기화 state는 로컬 `.work/obsidian-sync-state.json`에 둔다. 새 환경은 `--adopt-identical`로 현재 Git 사본과 정확히 일치하는 파일만 인수한다. 모든 쓰기는 지정 vault 내부 경로를 확인하고 파일별 임시 파일 후 원자 교체한다. OneDrive 동시 편집 충돌 시 보존된 원문과 hash로 복구한다.
+동기화 state 기본 경로는 현재 linked worktree의 `git rev-parse --git-common-dir` 아래 `obsidian-sync-state.json`이다. Git common-dir은 연결된 checkout들이 공유하므로 단일 Obsidian vault의 baseline도 worktree별로 갈라지지 않는다. 파일은 저장소 metadata에 있어 커밋되지 않으며 `.work` 정리에 지워지지 않는다. 새 환경/기존 state 이전은 먼저 `--check`로 destination hash를 검증하고, `--adopt-identical`은 현재 Git 사본과 정확히 같은 파일만 baseline에 기록한다. 충돌 해결은 `--resolve-conflicts-from`의 명시 목록에 포함된 현재 충돌만 허용한다. 모든 쓰기는 지정 vault 내부 경로를 확인하고 파일별 임시 파일 후 원자 교체한다. OneDrive 동시 편집 충돌 시 보존된 원문과 hash로 복구한다.
+
+2026-09-21 사용자 확인 기준: 두 checkout을 같은 `b5ea2a5`로 맞춘 paired `--check`는 각각 1373 managed/6 pending/0 conflicts였다. 사용자가 6개를 적용한 뒤 1373 destination hashes 일치와 사후 1373/0/0을 확인했다. Vault는 1384개 파일이다. 이전 checkout별 6/5 pending 관측은 snapshot 차이가 있는 중간 상태였다.
 
 ## 실패·재시도
 

@@ -171,6 +171,34 @@ class AnnouncementRequest(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class DiscoveryCandidateResponse(Strict):
+    """One unverified announcement offered for operator admission."""
+
+    announcement_id: str = Field(alias="announcementId")
+    instance_id: str = Field(alias="instanceId")
+    source_ip: str = Field(alias="sourceIp")
+    claimed_hostname: str = Field(alias="claimedHostname")
+    claimed_os_type: str = Field(alias="claimedOsType")
+    claimed_cpu_cores: int = Field(ge=0, alias="claimedCpuCores")
+    claimed_ram_bytes: int = Field(ge=0, alias="claimedRamBytes")
+    claimed_gpu_count: int = Field(ge=0, alias="claimedGpuCount")
+    first_seen_at: dt.datetime = Field(alias="firstSeenAt")
+    last_seen_at: dt.datetime = Field(alias="lastSeenAt")
+    announce_count: int = Field(ge=1, alias="announceCount")
+    stale: bool
+    state: Literal["candidate"]
+    verified: Literal[False]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DiscoveryCandidatesResponse(Strict):
+    items: list[DiscoveryCandidateResponse]
+    note: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class PoolRequest(Strict):
     project_id: str = Field(max_length=30, alias="projectId")
     name: str = Field(min_length=1, max_length=128)

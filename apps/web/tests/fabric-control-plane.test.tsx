@@ -23,6 +23,7 @@ import {
 } from '../src/features/desktop/fabricControlApi';
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import { NodeItem } from '../src/contracts/types';
+import { discoveryCandidatesFixture } from './fixtures/discovery-candidates';
 
 vi.mock('../src/shared/api/client', () => ({
   apiClient: vi.fn(),
@@ -304,12 +305,12 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
     });
 
     it('14. getDiscoveryCandidates queries candidates list with optional includeStale', async () => {
-      mockApi.mockResolvedValueOnce({ items: [], note: 'Unverified' });
+      mockApi.mockResolvedValueOnce(discoveryCandidatesFixture);
       const res = await getDiscoveryCandidates();
       expect(mockApi).toHaveBeenCalledWith('/v1/discovery/candidates');
-      expect(res.items).toEqual([]);
+      expect(res).toEqual(discoveryCandidatesFixture);
 
-      mockApi.mockResolvedValueOnce({ items: [], note: 'Unverified' });
+      mockApi.mockResolvedValueOnce(discoveryCandidatesFixture);
       await getDiscoveryCandidates(true);
       expect(mockApi).toHaveBeenCalledWith('/v1/discovery/candidates?includeStale=true');
     });

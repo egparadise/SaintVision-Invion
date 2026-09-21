@@ -25,6 +25,10 @@
  */
 
 import { apiClient } from '@/shared/api/client';
+import type {
+  DiscoveryCandidateResponse,
+  DiscoveryCandidatesResponse,
+} from '@/contracts/discovery-candidates-response';
 
 export interface StorageContribution {
   contributionId: string;
@@ -119,27 +123,11 @@ export interface NodeDetailResponse {
   capabilities: NodeCapability[];
 }
 
-export interface DiscoveryCandidate {
-  announcementId: string;
-  sourceIp: string;
-  claimedInstanceId?: string;
-  instanceId?: string;
-  claimedHostname: string;
-  claimedOsType: string;
-  claimedOsVersion?: string;
-  claimedAgentVersion?: string;
-  claimedCpuCores: number;
-  claimedRamBytes: number;
-  claimedGpuCount: number;
-  claimedLabels?: Record<string, string>;
+/** UI state grows as admission actions complete; the wire response stays candidate-only. */
+export type DiscoveryCandidate = Omit<DiscoveryCandidateResponse, 'state' | 'verified'> & {
+  state: 'pending' | 'candidate' | 'admitted' | 'declined';
   verified: boolean;
-  state: 'pending' | 'candidate' | 'admitted' | 'declined' | string;
-  announcedAt?: string;
-  firstSeenAt?: string;
-  lastSeenAt?: string;
-  announceCount?: number;
-  stale?: boolean;
-}
+};
 
 export interface AdmissionResponse {
   announcementId: string;
@@ -333,11 +321,11 @@ export async function triggerLivenessSweep(): Promise<{
 
 export async function getDiscoveryCandidates(
   includeStale: boolean = false
-): Promise<{ items: DiscoveryCandidate[]; note?: string }> {
+): Promise<DiscoveryCandidatesResponse> {
   const endpoint = includeStale
     ? '/v1/discovery/candidates?includeStale=true'
     : '/v1/discovery/candidates';
-  return apiClient<{ items: DiscoveryCandidate[]; note?: string }>(endpoint);
+  return apiClient<DiscoveryCandidatesResponse>(endpoint);
 }
 
 export async function broadcastAnnouncement(

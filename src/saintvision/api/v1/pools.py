@@ -83,13 +83,15 @@ def announce(
     return {"accepted": True, "state": state}
 
 
-@router.get("/discovery/candidates")
+@router.get(
+    "/discovery/candidates", response_model=schemas.DiscoveryCandidatesResponse
+)
 def list_candidates(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
     now: dt.datetime = Depends(get_now),
     include_stale: bool = Query(default=False, alias="includeStale"),
-) -> dict:
+) -> schemas.DiscoveryCandidatesResponse:
     """Machines a person can choose to admit.
 
     Every self-reported field is named ``claimed*`` and every row carries
@@ -99,10 +101,10 @@ def list_candidates(
     items = discovery_service.list_candidates(
         session, tenant_id=principal.tenant_id, now=now, include_stale=include_stale
     )
-    return {
-        "items": items,
-        "note": "All claimed* values are self-reported by the machine and unverified.",
-    }
+    return schemas.DiscoveryCandidatesResponse(
+        items=items,
+        note="All claimed* values are self-reported by the machine and unverified.",
+    )
 
 
 @router.post("/discovery/candidates/{announcement_id}/admission", status_code=201)

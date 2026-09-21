@@ -6,10 +6,12 @@ on:
       - integration/all-agents-unified
     paths:
       - 'apps/web/**'
+      - 'contracts/**'
       - '.github/workflows/frontend.yml'
   pull_request:
     paths:
       - 'apps/web/**'
+      - 'contracts/**'
       - '.github/workflows/frontend.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,6 +37,10 @@ jobs:
       - name: Run Vitest Unit Tests
         working-directory: apps/web
         run: npm run test
+
+      - name: Check generated discovery contract type
+        working-directory: apps/web
+        run: npm run contracts:check
 
       - name: TypeScript Check & Production Build
         working-directory: apps/web

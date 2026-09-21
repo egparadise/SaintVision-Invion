@@ -1,17 +1,21 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.16"
+version: "1.5.20"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T12:38:00+09:00"
+updated: "2026-09-21T13:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
-2026-09-21 Obsidian state split corrected: user apply/check was valid in C:\vw but `--git-path` kept a separate main-checkout baseline. The original 1370-entry state passed pre-migration check (1372 managed/10 pending/0 conflict). Latest read-only checks: main HEAD b5ea2a5 returned 1373/6/0; C:\vw HEAD 507a486 returned 1373/3/0; both exit 0. Both resolve to `C:\Project\SaintVision-Invion\.git\obsidian-sync-state.json`; document snapshots differ, so pending counts are not a like-for-like comparison. `tools/test_sync.py` linked-worktree regression fails if reverted to `--git-path`; 14 passed, 5 subtests. No pending vault files were applied. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
+2026-09-21 최신 Obsidian 결과: 사용자는 두 checkout을 모두 `b5ea2a5`로 고정한 paired `--check`에서 각각 1373 managed/6 pending/0 conflicts를 확인했다. 6개를 적용해 exit 0, 1373 destination hashes 일치, 사후 check 1373/0/0 및 당시 vault 1384 files를 확인했다. 이후 `a39fc13`의 14개 regression evidence와 Codex 문서를 함께 동기화해 1388 managed/0 pending/0 conflicts로 끝났다. Vault recursive count 1399는 managed count와 범위가 다르다. 6/5 pending은 다른 snapshot에 대한 과거 중간 관측이며 현재 기준이 아니다. 최신 기록은 [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]] 및 [[2026-09-21_discovery_candidates_response_contract_Codex]].
+
+2026-09-21 mock/API 계약 첫 slice: `/v1/discovery/candidates` wire response를 strict Pydantic→JSON Schema→generated TypeScript로 연결했고 shared fixture를 FastAPI provider 및 frontend Ajv/Pydantic test에서 검증한다. fixture/schema/type drift 변형이 각각 거부됨을 확인했다. Python contract+route tests 36 passed, Vitest 전체 34 files/332 passed, production build 통과. route coverage는 path-only. 다른 adapter 확장은 미착수다. 코드 독립 검토 Claude 대기. UI-FB-03 component transition은 Gemini 대기이며 브라우저 인수와 별개다. Obsidian 최종 check는 1374/0/0이다.
+
+2026-09-21 Obsidian state split corrected (historical intermediate check): user apply/check was valid in C:\vw but `--git-path` kept a separate main-checkout baseline. The original 1370-entry state passed pre-migration check (1372 managed/10 pending/0 conflict). At this earlier point, main HEAD b5ea2a5 returned 1373/6/0 and C:\vw HEAD 507a486 returned 1373/3/0; both exit 0. Both resolve to the common `.git\obsidian-sync-state.json`; document snapshots differ, so pending counts are not a like-for-like comparison. `tools/test_sync.py` linked-worktree regression fails if reverted to `--git-path`; 14 passed, 5 subtests. No pending vault files were applied at that historical point; later paired apply and final check are recorded above. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
 
 2026-09-21 UI-FB review: FB-01 is approved on user's three matched DOM mutants failing (empty requery, error requery, error render guard). FB-02 component boundary is approved: 9 placement tests passed and replacing the local UNVERIFIED badge with “server verified” failed the corresponding test. FB-03 source path is narrow, but its current 13 helper tests all passed when Codex mutated the component branch to send every ResultView error to artifacts fallback; component-level regression remains required. Browser/live backend acceptance remains separate. Mock/backend schema proposal is recorded. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
 

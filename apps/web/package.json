@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "contracts:generate": "node scripts/discovery-contracts.mjs --write",
+    "contracts:check": "node scripts/discovery-contracts.mjs --check"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",
@@ -24,7 +26,10 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "happy-dom": "^20.14.5",
+    "json-schema-to-typescript": "^16.0.0",
     "typescript": "^5.7.3",
     "vite": "^6.2.0",
     "vitest": "^3.0.5"

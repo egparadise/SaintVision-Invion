@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "announcementId": "ann_contract_fixture_01",
+      "instanceId": "node-contract-fixture-01",
+      "sourceIp": "192.0.2.41",
+      "claimedHostname": "fixture-node",
+      "claimedOsType": "linux",
+      "claimedCpuCores": 8,
+      "claimedRamBytes": 34359738368,
+      "claimedGpuCount": 1,
+      "firstSeenAt": "2026-09-21T08:00:00Z",
+      "lastSeenAt": "2026-09-21T08:05:00Z",
+      "announceCount": 3,
+      "stale": false,
+      "state": "candidate",
+      "verified": false
+    }
+  ],
+  "note": "All claimed* values are self-reported by the machine and unverified."
+}

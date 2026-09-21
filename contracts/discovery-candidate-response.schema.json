@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One unverified announcement offered for operator admission.",
+  "properties": {
+    "announceCount": {
+      "minimum": 1,
+      "title": "Announcecount",
+      "type": "integer"
+    },
+    "announcementId": {
+      "title": "Announcementid",
+      "type": "string"
+    },
+    "claimedCpuCores": {
+      "minimum": 0,
+      "title": "Claimedcpucores",
+      "type": "integer"
+    },
+    "claimedGpuCount": {
+      "minimum": 0,
+      "title": "Claimedgpucount",
+      "type": "integer"
+    },
+    "claimedHostname": {
+      "title": "Claimedhostname",
+      "type": "string"
+    },
+    "claimedOsType": {
+      "title": "Claimedostype",
+      "type": "string"
+    },
+    "claimedRamBytes": {
+      "minimum": 0,
+      "title": "Claimedrambytes",
+      "type": "integer"
+    },
+    "firstSeenAt": {
+      "format": "date-time",
+      "title": "Firstseenat",
+      "type": "string"
+    },
+    "instanceId": {
+      "title": "Instanceid",
+      "type": "string"
+    },
+    "lastSeenAt": {
+      "format": "date-time",
+      "title": "Lastseenat",
+      "type": "string"
+    },
+    "sourceIp": {
+      "title": "Sourceip",
+      "type": "string"
+    },
+    "stale": {
+      "title": "Stale",
+      "type": "boolean"
+    },
+    "state": {
+      "const": "candidate",
+      "title": "State",
+      "type": "string"
+    },
+    "verified": {
+      "const": false,
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "announcementId",
+    "instanceId",
+    "sourceIp",
+    "claimedHostname",
+    "claimedOsType",
+    "claimedCpuCores",
+    "claimedRamBytes",
+    "claimedGpuCount",
+    "firstSeenAt",
+    "lastSeenAt",
+    "announceCount",
+    "stale",
+    "state",
+    "verified"
+  ],
+  "title": "DiscoveryCandidateResponse",
+  "type": "object"
+}

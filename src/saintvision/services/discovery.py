@@ -199,6 +199,7 @@ def list_candidates(
             "lastSeenAt": row.last_seen_at,
             "announceCount": row.announce_count,
             "stale": row.last_seen_at < cutoff,
+            "state": row.state,
             "verified": False,
         }
         for row in rows
