@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.79"
+version: "1.0.80"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T00:43:00+09:00"
+updated: "2026-09-22T01:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,26 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T00:43:00+09:00.
+- 확인 기준: 2026-09-22T01:00:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 8차: 백엔드 진실 시각(Truth Time) 실배선 및 화면 조회 시각(Query Time) 분리 완결 (`ClusterOverview.tsx`, `ResourceExplorer.tsx`, `RunDetail.tsx`, `RunList.tsx`, `ApprovalCenter.tsx`, `ModelStudioView.tsx`, `EvidenceViewer.tsx`, `truth-time-and-freshness-axis.test.tsx`)**:
+  - **Claude 백엔드 축 감사 전면 수용 및 사실/판단 분리 (`34ef753e`, `2026-09-22_응답_관측시각_신선도_백엔드축_Claude.md`)**:
+    1. **진실 시각(Truth Time) 실배선**:
+       - 물리 노드: `lastHeartbeatAt` 생존 신호 시각 표출 (`ClusterOverview`, `ResourceExplorer`).
+       - 스토리지/복제본: 요청 생성 시각(`createdAt`) 및 표본 관측 시각(`observedAt`) 표출 (`ResourceExplorer`). **[건강 단언 유보 불변식]**: `currentHealth: "unknown"`, `operationalAcceptanceAssessed: false` 계약에 따라 `storage-observation-health-disclaimer`("건강 상태 단언 유보 고지 · 분산 실행 시점 재검증 필수")를 명시하여 "지금 건강" 오독을 원천 차단.
+       - 실행 결과: 종단(`succeeded` / `failed`) 상태일 때 `completedAt` / `updatedAt` 표출 (`RunDetail`, `RunList`).
+       - 모델 커밋: `committedAt` 진실 시각 표출 (`ModelStudioView`). 부재 시 가짜 현재 시각(`new Date().toISOString()`)을 합성하던 타임스탬프 위조 소거.
+       - 실행 시도: 항목별 `startedAt` 진실 시각 표출 (`RunDetail` Attempts 탭).
+    2. **진실 시각 미제공 대상의 조회 시점(화면 확인) 명시**:
+       - 실시간 커널 로그(`RunLogView`), 산출물 목록(`RunArtifactList`), 분산 샤드 원장(`ShardObservation`), 라이브 실행 상태: 백엔드가 `observedAt`를 주지 않으므로 조회 시각을 데이터 시각인 양 꾸미지 않고 `[화면 확인 기준]` 스냅샷임을 정직하게 못 박음.
+    3. **사실(Fact) vs 판단(Judgement)의 엄격한 분리**:
+       - 기준 없는 주관적 낙인("오래된 정보 주의", "신선도 저하 주의")을 전면 소거하고 "동기화 실패 사실"과 "화면 확인 시점 스냅샷 시각"을 건조하게 제시.
+    4. **EvidenceViewer alert() 소거**: 브라우저 팝업을 소거하고 `copy-evidence-success`(`role="status"`) 인라인 피드백 실장, `generatedAt` 위조 차단.
+  - **신규 DOM 단위 테스트 10종 구축 및 3대 돌연변이(M20~M22) 실측 사살**: `apps/web/tests/truth-time-and-freshness-axis.test.tsx` (10/10 passed). M20(하트비트 조회 시각 둔갑) 사살, M21(스토리지 건전성 단언 유보 누락) 사살, M22(샤드/로그 화면 확인 기준 누락) 사살.
+  - Vitest **67개 파일 607/607 passed 100%** (순증 +10 passed), Vite 프로덕션 빌드 exit 0 (4.02s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_진실시각_실배선_및_조회시각_분리_Gemini]].
 
 - **화면 결함 6대 부류 치유 트랙 7차: 대시보드(ClusterOverview) 및 Run 목록 신선도 지표화, 에러 은폐 차단 및 RunDetail alert() 소거 완결 (`ClusterOverview.tsx`, `RunList.tsx`, `RunDetail.tsx`, `App.tsx`, `dashboard-runlist-freshness-wiring.test.tsx`)**:
   - **ClusterOverview 대시보드 장애 은폐 차단 & 신선도 지표화 (Priority 13-16)**: 노드 동기화 실패 시 정상 0대 빈 상태로 둘러대던 결함을 치유. `nodesState === 'error'`일 때 `cluster-overview-fetch-error`(`role="alert"`, "정상 0대 아님" 명시 및 재시도 버튼) 전용 에러 뷰를 표출하고, 정상 0대일 때만 `cluster-overview-empty-state`(`role="status"`)를 표출하여 엄격 분리. 상단 헤더에 `cluster-freshness-indicator`(`role="status"`, `🔄 자동 갱신 (5초 주기) · 최근 관측: HH:mm:ss`) 및 수동 `cluster-refresh-btn` 실장. 폴링 실패 시 기존 캐시 노드가 있으면 `cluster-stale-warning`(`role="alert"`) 표출.

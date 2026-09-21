@@ -15,7 +15,7 @@ export interface ClusterOverviewProps {
 
 export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   nodes,
-  runs,
+  runs = [],
   pendingApprovalsCount,
   onNavigate,
   nodesState = 'idle',
@@ -91,7 +91,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
             data-testid="cluster-freshness-indicator"
             style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '12px' }}
           >
-            최근 동기화: {lastFetchedAt.toLocaleTimeString('ko-KR')}
+            화면 확인: {lastFetchedAt.toLocaleTimeString('ko-KR')}
           </div>
         )}
       </section>
@@ -116,8 +116,8 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
               fontSize: '0.8125rem',
             }}
           >
-            ⚠️ [동기화 지연 / 오래된 정보 주의] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
-            현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 최신 자원 상태와 다를 수 있습니다.
+            ⚠️ [동기화 실패] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
+            현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 화면 확인 시점 스냅샷입니다.
           </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -135,7 +135,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                 border: '1px solid var(--color-border-subtle)',
               }}
             >
-              🔄 클러스터 자동 갱신 (5초 주기) · 최근 관측: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+              🔄 클러스터 자동 갱신 (5초 주기) · 화면 확인: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
             </span>
             {onRefresh && (
               <button
@@ -157,8 +157,16 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
             )}
           </div>
         </div>
-        <p role="status">자원 합계를 확인할 수 없습니다. 미관측 정보가 있습니다.</p>
-        <ul>{nodes.map(node => <li key={node.id}>{node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}</li>)}</ul>
+        <ul>
+          {nodes.map(node => (
+            <li key={node.id} data-testid={`node-item-${node.id}`}>
+              {node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}
+              <span data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginLeft: '8px' }}>
+                마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
+              </span>
+            </li>
+          ))}
+        </ul>
         <p>표시된 노드 {nodes.length}대 · 활성 실행 {runs.filter(run => run.state === 'running').length}건</p>
       </section>
     );
@@ -211,8 +219,8 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
             fontSize: '0.8125rem',
           }}
         >
-          ⚠️ [동기화 지연 / 오래된 정보 주의] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
-          현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 최신 자원 상태와 다를 수 있습니다.
+          ⚠️ [동기화 실패] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
+          현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 화면 확인 시점 스냅샷입니다.
         </div>
       )}
 
@@ -245,7 +253,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                 border: '1px solid var(--color-border-subtle)',
               }}
             >
-              🔄 자동 갱신 (5초 주기) · 최근 관측: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+              🔄 자동 갱신 (5초 주기) · 화면 확인: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
             </span>
             {onRefresh && (
               <button
@@ -483,6 +491,9 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                     {(node.os ? node.os.toUpperCase() : 'LINUX')} · {node.cpuCores}C / {Math.round(node.memoryTotalBytes / 1024 ** 3)}G
                     {node.gpuCount > 0 && ` · ${node.gpuName}`}
+                    <div data-testid={`node-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginTop: '2px' }}>
+                      마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
+                    </div>
                   </div>
                 </div>
 

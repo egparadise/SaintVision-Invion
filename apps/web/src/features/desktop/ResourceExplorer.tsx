@@ -617,7 +617,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             }}
           >
             🔄 <strong>클러스터 노드 동기화 (5초 주기)</strong>
-            {lastFetchedAt && <span> · 최종 관측: {lastFetchedAt.toLocaleTimeString()}</span>}
+            {lastFetchedAt && <span> · 화면 확인: {lastFetchedAt.toLocaleTimeString('ko-KR')}</span>}
           </div>
 
           <button
@@ -1096,6 +1096,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         <div data-testid={`node-storage-${node.id}`}>스토리지: {formatBytes(node.storageTotalBytes)}</div>
                       </div>
 
+                      <div data-testid={`node-card-heartbeat-${node.id}`} style={{ fontSize: '0.6875rem', color: '#64748b', marginTop: '4px' }}>
+                        마지막 하트비트: {node.heartbeatAt ? new Date(node.heartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}
+                      </div>
+
                       <div
                         data-testid={`node-utilization-status-${node.id}`}
                         role="status"
@@ -1514,6 +1518,33 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   </div>
                 </div>
 
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', fontSize: '0.6875rem', color: '#94a3b8' }}>
+                  <div data-testid="storage-observation-created-at">
+                    요청 생성 시각: <strong>{storageObservation.createdAt}</strong>
+                  </div>
+                  {storageObservation.observation && (
+                    <div data-testid="storage-observation-observed-at">
+                      표본 관측 시각: <strong>{new Date(storageObservation.observation.observedAt * 1000).toLocaleString('ko-KR')}</strong>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  role="status"
+                  data-testid="storage-observation-health-disclaimer"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                    border: '1px solid rgba(234, 179, 8, 0.25)',
+                    color: '#fde047',
+                    fontSize: '0.6875rem',
+                    lineHeight: '1.4',
+                  }}
+                >
+                  ⚠️ <strong>[건강 상태 단언 유보 고지]</strong>: 위 관측 시각은 스토리지 표본 무결성 검증 시점이며 현 시점 라이브 가용성을 보증하지 않습니다. ADR-028/041 계약에 따라 <code>currentHealth: &quot;unknown&quot;</code> 및 <code>operationalAcceptanceAssessed: false</code>로 유지되며, 분산 실행 시점 재검증이 필수적입니다.
+                </div>
+
                 {storageObservation.observation ? (
                   <div
                     data-testid="storage-observation-detail"
@@ -1926,11 +1957,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
                 🔍 노드 상세 및 자원 역량 (GET /v1/nodes/{nodeDetail.node.nodeId}) {isLoadingNodeDetail && <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>(조회 중...)</span>}
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', fontSize: '0.75rem', marginBottom: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', fontSize: '0.75rem', marginBottom: '14px' }}>
                 <div>호스트: <strong>{nodeDetail.node.hostname}</strong></div>
                 <div>OS: <strong>{nodeDetail.node.osType}</strong></div>
                 <div>하트비트 시퀀스: <strong>#{nodeDetail.node.heartbeatSequence}</strong></div>
                 <div>상태: <strong style={{ color: '#34d399' }}>{nodeDetail.node.status}</strong></div>
+                <div data-testid="node-detail-last-heartbeat">
+                  마지막 하트비트: <strong style={{ color: '#60a5fa' }}>{nodeDetail.node.lastHeartbeatAt ? new Date(nodeDetail.node.lastHeartbeatAt).toLocaleTimeString('ko-KR') : '미관측 (Heartbeat Absent)'}</strong>
+                </div>
               </div>
 
               <div

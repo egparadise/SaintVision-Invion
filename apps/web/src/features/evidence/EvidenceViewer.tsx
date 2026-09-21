@@ -34,6 +34,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
   const [evidenceData, setEvidenceData] = useState<EvidenceData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const fetchEvidence = React.useCallback(async () => {
     if (!projectId || !projectId.trim()) {
@@ -43,14 +44,13 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     }
     setIsLoading(true);
     setErrorMessage(null);
-    const prjId = projectId.trim();
-
     try {
+      const prjId = projectId.trim();
       const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
-      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED';
-      if (res.output?.verified === true) {
+      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'PASS';
+      if (res.sealed && res.output?.sha256) {
         integrityStatus = 'PASS';
-      } else if (res.output?.verified === false || res.state === 'failed') {
+      } else if (res.outputAbsentReason) {
         integrityStatus = 'FAIL';
       } else {
         integrityStatus = 'UNVERIFIED';
@@ -66,7 +66,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
         state: res.state || 'succeeded',
         allPhysicallyStopped: res.stopReceipt?.physicallyStopped ?? (res.stopReceipt?.processStarted ? res.stopReceipt?.exitCode !== undefined : true),
         allSucceeded: res.state === 'succeeded',
-        generatedAt: res.completedAt || res.stopReceipt?.finishedAt || new Date().toISOString(),
+        generatedAt: res.completedAt || res.stopReceipt?.finishedAt || undefined,
         immutable: res.sealed ?? true,
         integrityVerification: integrityStatus,
         policySpecifications: {
@@ -213,16 +213,25 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               )}
             </div>
 
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(evidenceData, null, 2));
-                alert('Evidence JSON이 클립보드에 복사되었습니다.');
-              }}
-            >
-              Evidence JSON 복사
-            </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {copySuccess && (
+                <span role="status" data-testid="copy-evidence-success" style={{ fontSize: '0.75rem', color: '#10b981' }}>
+                  ✓ 클립보드에 복사되었습니다
+                </span>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                data-testid="copy-evidence-json-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(evidenceData, null, 2));
+                  setCopySuccess(true);
+                  setTimeout(() => setCopySuccess(false), 2500);
+                }}
+              >
+                Evidence JSON 복사
+              </Button>
+            </div>
           </div>
 
           {/* Static System Architecture Policy Specifications (Design Requirements, Not Per-Run Dynamic Tests) */}

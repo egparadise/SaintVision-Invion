@@ -176,7 +176,7 @@ describe('대시보드(ClusterOverview) 및 RunList/RunDetail 신선도·정직�
       const staleWarning = container.querySelector('[data-testid="cluster-stale-warning"]');
       expect(staleWarning).not.toBeNull();
       expect(staleWarning?.getAttribute('role')).toBe('alert');
-      expect(staleWarning?.textContent).toContain('동기화 지연 / 오래된 정보 주의');
+      expect(staleWarning?.textContent).toContain('동기화 실패');
       expect(staleWarning?.textContent).toContain('Heartbeat Timeout');
     });
   });
@@ -268,7 +268,7 @@ describe('대시보드(ClusterOverview) 및 RunList/RunDetail 신선도·정직�
       const staleWarning = container.querySelector('[data-testid="run-stale-warning"]');
       expect(staleWarning).not.toBeNull();
       expect(staleWarning?.getAttribute('role')).toBe('alert');
-      expect(staleWarning?.textContent).toContain('동기화 지연 / 오래된 정보 주의');
+      expect(staleWarning?.textContent).toContain('동기화 실패');
       expect(staleWarning?.textContent).toContain('Postgres Read Replica Timeout');
     });
   });

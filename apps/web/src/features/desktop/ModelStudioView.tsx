@@ -351,14 +351,14 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           <h3 style={{ margin: 0, fontSize: '1.125rem' }}>
             {result.modelId} · {result.version}
           </h3>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
-            커밋 시각: {result.committedAt || new Date().toISOString()}
+          <p data-testid="model-committed-at" style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
+            커밋 시각: {result.committedAt ? result.committedAt : '미관측 (CommittedAt Absent)'}
           </p>
           <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8', fontFamily: 'monospace' }}>
             Manifest SHA-256: {result.manifestHash || result.contentHash}
           </p>
           <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
-            원본 Run: {result.sourceRunId || 'run_source_verified'}
+            원본 Run: {result.sourceRunId ? result.sourceRunId : '미지정 (Run ID Absent)'}
           </p>
           <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
             {result.format} · {result.totalBytes} bytes · {result.shardCount || result.shards?.length || 1} shards

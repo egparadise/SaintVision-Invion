@@ -152,10 +152,10 @@ describe('화면 결함 6대 부류 치유 트랙 6차: 시간 경과 묵인 및
       const staleWarning = container.querySelector('[data-testid="approval-stale-warning"]');
       expect(staleWarning).not.toBeNull();
       expect(staleWarning?.getAttribute('role')).toBe('alert');
-      expect(staleWarning?.textContent).toContain('승인 목록 동기화 실패 (신선도 저하 주의)');
+      expect(staleWarning?.textContent).toContain('승인 목록 동기화 실패');
       expect(staleWarning?.textContent).toContain('503 Service Unavailable: Gateway Timeout');
-      expect(staleWarning?.textContent).toContain(testTimestamp.toLocaleTimeString());
-      expect(staleWarning?.textContent).toContain('과거 스냅샷');
+      expect(staleWarning?.textContent).toContain(testTimestamp.toLocaleTimeString('ko-KR'));
+      expect(staleWarning?.textContent).toContain('화면 확인 시점 스냅샷');
     });
 
     it('동기화 실패 시 안건이 0개일 때 허위 0건 EmptyState 대신 에러 상태(role="alert")를 표출한다', async () => {

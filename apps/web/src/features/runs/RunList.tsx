@@ -64,8 +64,8 @@ export const RunList: React.FC<RunListProps> = ({
             fontSize: '0.8125rem',
           }}
         >
-          ⚠️ [동기화 지연 / 오래된 정보 주의] Run 작업 목록 동기화에 실패했습니다 ({runError || '통신 오류'}).
-          현재 표시된 목록은 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 이미 완료되었거나 취소되었을 수 있습니다.
+          ⚠️ [동기화 실패] Run 작업 목록 동기화에 실패했습니다 ({runError || '통신 오류'}).
+          현재 표시된 목록은 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 화면 확인 시점 스냅샷입니다.
         </div>
       )}
 
@@ -85,7 +85,7 @@ export const RunList: React.FC<RunListProps> = ({
                 border: '1px solid var(--color-border-subtle)',
               }}
             >
-              🔄 자동 갱신 (5초 주기) · 최근 동기화: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+              🔄 자동 갱신 (5초 주기) · 화면 확인: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
             </span>
             {onRefresh && (
               <button
@@ -335,7 +335,14 @@ export const RunList: React.FC<RunListProps> = ({
                     {run.requestedBy ?? '미관측'}
                   </td>
                   <td style={{ padding: '12px 16px', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
-                    {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측'}
+                    <div data-testid={`run-created-at-${run.id}`}>
+                      생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측'}
+                    </div>
+                    {(run.state === 'succeeded' || run.state === 'failed') && (
+                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? '#10b981' : '#f85149', marginTop: '2px' }}>
+                        종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측'}
+                      </div>
+                    )}
                   </td>
                 </tr>
               );

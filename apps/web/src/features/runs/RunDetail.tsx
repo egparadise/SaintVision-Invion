@@ -335,6 +335,16 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 </span>
               )}
             </p>
+            <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', display: 'flex', gap: '12px' }}>
+              <span data-testid="run-detail-created-at">
+                생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측 (CreatedAt Absent)'}
+              </span>
+              {(run.state === 'succeeded' || run.state === 'failed') && (
+                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? '#34d399' : '#f87171' }}>
+                  종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측 (UpdatedAt Absent)'}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -840,6 +850,22 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             overflowY: 'auto',
           }}
         >
+          <div
+            role="status"
+            data-testid="logs-query-time-notice"
+            style={{
+              padding: '6px 12px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '4px',
+              fontSize: '0.75rem',
+              color: '#93c5fd',
+              marginBottom: '10px',
+            }}
+          >
+            ℹ️ <strong>[화면 확인 기준]</strong> 실시간 커널 로그는 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 수신 시점 기준입니다.
+          </div>
+
           <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>[Run Kernel Logs: /v1/projects/{run.projectId || '(none)'}/runs/{run.id}/logs]</span>
             {logView && (
@@ -920,6 +946,22 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             border: '1px solid var(--color-border-subtle)',
           }}
         >
+          <div
+            role="status"
+            data-testid="artifacts-query-time-notice"
+            style={{
+              padding: '8px 12px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              color: '#93c5fd',
+              marginBottom: '14px',
+            }}
+          >
+            ℹ️ <strong>[화면 확인 기준]</strong> 산출물 목록은 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 조회 시점 기준입니다.
+          </div>
+
           <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, marginBottom: '16px' }}>생성된 아티팩트 목록</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {(((run as any).artifacts && (run as any).artifacts.length > 0)
@@ -1012,6 +1054,22 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             border: '1px solid var(--color-border-subtle)',
           }}
         >
+          <div
+            role="status"
+            data-testid="shards-query-time-notice"
+            style={{
+              padding: '8px 12px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              color: '#93c5fd',
+              marginBottom: '16px',
+            }}
+          >
+            ℹ️ <strong>[화면 확인 기준]</strong> 분산 샤드 실행 원장은 백엔드 관측 시각(observedAt) 미노출 상태이며, 표시된 정보는 화면 조회 시점 기준 스냅샷입니다.
+          </div>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
               <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>

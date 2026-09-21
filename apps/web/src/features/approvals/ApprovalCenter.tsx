@@ -78,7 +78,7 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
             }}
           >
             <span>🔄 <strong>자동 갱신 (5초 주기)</strong></span>
-            {lastFetchedAt && <span>· 최근 동기화: {lastFetchedAt.toLocaleTimeString()}</span>}
+            {lastFetchedAt && <span>· 화면 확인: {lastFetchedAt.toLocaleTimeString('ko-KR')}</span>}
           </div>
 
           {onRefresh && (
@@ -126,11 +126,11 @@ export const ApprovalCenter: React.FC<ApprovalCenterProps> = ({
           }}
         >
           <div>
-            ⚠️ <strong>승인 목록 동기화 실패 (신선도 저하 주의)</strong>: 최신 승인 안건을 서버에서 조회하지 못했습니다 ({approvalError || '서버 응답 오류'}).
+            ⚠️ <strong>승인 목록 동기화 실패</strong>: 최신 승인 안건을 서버에서 조회하지 못했습니다 ({approvalError || '서버 응답 오류'}).
           </div>
           <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fed7aa' }}>
             {lastFetchedAt
-              ? `현재 표시 중인 목록은 ${lastFetchedAt.toLocaleTimeString()} 시점의 과거 스냅샷입니다. 이미 다른 검토자가 처리했거나 만료되었을 수 있으니 작업 전 반드시 새로고침을 확인하십시오.`
+              ? `현재 표시 중인 목록은 ${lastFetchedAt.toLocaleTimeString('ko-KR')} 화면 확인 시점 스냅샷입니다.`
               : '현재 유효한 승인 스냅샷이 없습니다. 서버 연결 상태를 확인하고 새로고침을 시도하십시오.'}
           </div>
         </div>
