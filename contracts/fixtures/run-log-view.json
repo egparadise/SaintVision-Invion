@@ -1,0 +1,9 @@
+{
+  "source": "execution-kernel",
+  "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+  "stdout": "Compiled 12 modules.\n",
+  "stderr": "",
+  "redacted": false,
+  "truncated": false,
+  "absentReason": null
+}
