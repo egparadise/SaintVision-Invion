@@ -41,7 +41,8 @@ The central header line was removed from `artifact_content_response` as a negati
 
 ## Provenance
 
-- Base/code-under-test SHA: `3ebbe960f8136318a16427c248d8345172805a12`.
+- Base SHA: `3ebbe960f8136318a16427c248d8345172805a12`.
+- Implementation SHA: `b9f8212a2124a852aeaaf95a8e435e475d803cdb`, pushed to `agent/codex/artifact-content-header-audit` and fast-forwarded to `integration/all-agents-unified`.
 - Branch: `agent/codex/artifact-content-header-audit`.
 - Worktree: `C:/Project/SaintVision-Invion`.
 - Interpreter: `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe`, Python 3.14.6.
@@ -49,8 +50,10 @@ The central header line was removed from `artifact_content_response` as a negati
 - Initial pass run before the negative control, KST `2026-09-22 02:42:15`: `.venv/Scripts/python.exe tools/provenance.py --executor Codex -- .venv/Scripts/python.exe -m pytest -q tests/core/test_artifact_content_contract.py`; exit 0, 13 passed, 2 warnings.
 - Header-removal mutation, KST `2026-09-22 02:43:26`: `.venv/Scripts/python.exe tools/provenance.py --executor Codex -- .venv/Scripts/python.exe -m pytest -q 'tests/core/test_artifact_content_contract.py::test_artifact_content_route_returns_raw_bytes_bound_to_contract_headers'`; exit 1, 4 failed as expected, 2 warnings. The production line was restored immediately afterward.
 - Post-restoration pass, KST `2026-09-22 02:44:07`: same full-file command, exit 0, 13 passed, 2 warnings. `check_docs.py` and `check_ontology.py` also exited 0. `sync_obsidian.py --check` exited 0 with 1500 managed files, 3 pending exports, 0 conflicts; these are the three task documentation files listed in this work item.
+- Post-commit pass at implementation SHA, KST `2026-09-22 02:45:20`: same full-file command, exit 0, 13 passed, 2 warnings. Provenance recorded a dirty worktree because another worker had modified `apps/web/src/shared/ui/Header.tsx`; that file was not part of this commit and was left untouched. The implementation commit was pushed to the task branch and fast-forwarded to integration. Integration advanced immediately afterward with a separate Claude documentation commit; the Codex follow-up record was replayed on that new tip in an isolated worktree.
+- Final integrated-candidate pass, KST `2026-09-22 02:47:09`: from clean detached worktree `C:/Project/SaintVision-Invion/.worktrees/codex-artifact-header-final`, provenance SHA `69a583d208eb3cde0fa109f03ee2dc61b25a3d7e`, the full focused test file exited 0 with 13 passed and 2 warnings. `check_docs.py` exited 0 (701 versioned documents). `sync_obsidian.py --check` reported 1501 managed files, 2 pending exports, 0 conflicts after the newer upstream docs landed. Those plus the updated audit history were then exported: 3 files, all 1501 destination hashes match; a final check returned 0 pending/0 conflicts.
 - Executor: Codex, author-run; independent review pending. This is not browser acceptance or deployed HTTP verification.
 
 ## Next action
 
-Complete the three pending Obsidian exports, then commit/push and request independent review at the resulting integration SHA.
+Request independent review at the final integration SHA carrying this audit. Browser/deployed HTTP acceptance remains a separate boundary.

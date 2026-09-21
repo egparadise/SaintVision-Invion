@@ -12,7 +12,7 @@ source_of_truth: "Git"
 
 ## 2026-09-22 Artifact download SHA-256 header 경로 감사
 
-- 작업 카드 `THREAD-2026-09-22-ARTIFACT-CONTENT-HEADER-AUDIT`; owner Codex, 독립 reviewer pending. Base SHA `3ebbe960f8136318a16427c248d8345172805a12`; branch `agent/codex/artifact-content-header-audit`.
+- 작업 카드 `THREAD-2026-09-22-ARTIFACT-CONTENT-HEADER-AUDIT`; owner Codex, 독립 reviewer pending. Base SHA `3ebbe960f8136318a16427c248d8345172805a12`; implementation SHA `b9f8212a2124a852aeaaf95a8e435e475d803cdb`; branch `agent/codex/artifact-content-header-audit`, fast-forwarded to integration. Final test worktree had one unrelated `apps/web/src/shared/ui/Header.tsx` modification by another worker; it was left untouched.
 - 제품 control-plane에서 `/artifacts/content` 라우트 두 개를 전수 확인했다. 프로젝트 경로와 run 경로는 같은 `run_file` handler이며, 둘 다 materialized bytes를 `artifact_content_response`에 전달한다. 이 함수는 바이트 길이와 SHA-256을 먼저 확인한 뒤 항상 `X-Content-SHA256`을 붙인다. 다운로드 서비스는 검증된 workspace output을 반환하고 스트리밍·오브젝트 스토리지 우회·Range/조건부 응답 분기를 쓰지 않는다. Boundary의 `no-store`도 유지된다.
 - `tests/core/test_artifact_content_contract.py`를 확장해 두 라우트 별칭의 일반 요청과 Range+If-None-Match 요청을 검증하고, 제품의 모든 `/artifacts/content` 경로가 정확히 이 두 alias이며 동일 handler인지 고정했다. Range/조건부 헤더는 현재 전부 200 full-body 응답이며 Content-Range/ETag는 없다. `artifact_content_response`에서 SHA 헤더를 제거한 변형은 네 성공 케이스 전부를 실패시켰고 복원 후 13 passed다.
 - 별도 격리 레거시 fixture `tests/fixtures/legacy_control.py`에도 같은 URL 모양의 두 route가 있지만, 그것은 `X-Checksum-SHA256`을 내며 production control-plane이 아니다. `rg`로 확인한 import자는 quarantined `tests/test_server_project_api.py`와 `tests/test_server_auth_integrity.py`뿐이다. 실제 배포가 이 fixture 서버를 대상으로 하는지는 이 감사에서 확인하지 않았으므로 제품 근거로 섞지 않는다. Gemini UI 파일은 수정하지 않았다.
