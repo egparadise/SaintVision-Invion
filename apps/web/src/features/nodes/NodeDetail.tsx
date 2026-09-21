@@ -202,14 +202,25 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div>
               [{new Date(node.heartbeatAt).toLocaleTimeString()}]{' '}
-              <span style={{ color: node.status === 'online' ? '#3fb950' : node.status === 'degraded' ? '#d29922' : '#f85149', fontWeight: 600 }}>
-                {node.status === 'online' ? 'Heartbeat OK' : node.status === 'degraded' ? 'Heartbeat Warning (Degraded)' : 'Heartbeat FAILED (Offline)'}
+              <span style={{
+                color: node.status === 'online' ? '#3fb950' : node.status === 'degraded' || node.status === 'unknown' ? '#d29922' : '#f85149',
+                fontWeight: 600
+              }}>
+                {node.status === 'online'
+                  ? 'Heartbeat OK'
+                  : node.status === 'degraded'
+                  ? 'Heartbeat Warning (Degraded)'
+                  : node.status === 'lost'
+                  ? 'Heartbeat LOST (노드 단절)'
+                  : node.status === 'unknown'
+                  ? 'Heartbeat UNKNOWN (미확인 상태)'
+                  : 'Heartbeat FAILED (Offline)'}
               </span>{' '}
               - CPU {node.cpuUsagePercent}% | RAM {((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%
               {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} ({node.status === 'online' ? 'mTLS 텔레메트리 수신' : '통신 상태 확인 필요'})
             </div>
             <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>
-              • 상태: <strong>{node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음
+              • 상태: <strong>{node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음
             </div>
           </div>
         </div>

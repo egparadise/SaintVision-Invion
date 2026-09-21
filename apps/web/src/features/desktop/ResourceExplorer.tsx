@@ -1080,11 +1080,21 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                               fontWeight: 600,
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              backgroundColor: node.status === 'online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                              color: node.status === 'online' ? '#34d399' : '#f87171',
+                              backgroundColor:
+                                node.status === 'online'
+                                  ? 'rgba(16, 185, 129, 0.15)'
+                                  : node.status === 'unknown'
+                                  ? 'rgba(234, 179, 8, 0.15)'
+                                  : 'rgba(239, 68, 68, 0.15)',
+                              color:
+                                node.status === 'online'
+                                  ? '#34d399'
+                                  : node.status === 'unknown'
+                                  ? '#fbbf24'
+                                  : '#f87171',
                             }}
                           >
-                            {node.status.toUpperCase()}
+                            {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
                           </span>
                         </div>
                       </div>

@@ -12,16 +12,26 @@ export function observedNode(value: object): NodeItem {
   const heartbeat = raw.lastHeartbeatAt ?? raw.heartbeatAt;
   const os = raw.osType ?? raw.os;
   const statuses = ['online', 'degraded', 'offline', 'draining', 'enrolling', 'retired'];
+  const rawStatus = typeof raw.status === 'string' ? raw.status : '';
+  let mappedStatus: NodeStatus;
+  if (rawStatus === 'lost') {
+    mappedStatus = 'lost';
+  } else if (statuses.includes(rawStatus)) {
+    mappedStatus = rawStatus as NodeStatus;
+  } else {
+    // 모르는 상태(예: 백엔드 active 또는 미정합 어휘)를 조용히 enrolling으로 꾸미지 않고 unknown으로 명시
+    mappedStatus = 'unknown';
+  }
   const valid = metrics.every(key => Number.isFinite(number(key))) &&
     typeof heartbeat === 'string' && Number.isFinite(Date.parse(heartbeat)) &&
-    (os === 'windows' || os === 'linux') && statuses.includes(String(raw.status)) && !!(raw.nodeId ?? raw.id) &&
+    (os === 'windows' || os === 'linux') && statuses.includes(rawStatus) && !!(raw.nodeId ?? raw.id) &&
     number('cpuUsagePercent') <= 100 && number('memoryUsedBytes') <= number('memoryTotalBytes') &&
     number('storageUsedBytes') <= number('storageTotalBytes') &&
     (number('gpuCount') === 0 || (Number.isFinite(number('gpuVramTotalBytes')) &&
       number('gpuVramUsedBytes') <= number('gpuVramTotalBytes')));
   return {
     id: String(raw.nodeId ?? raw.id ?? ''), hostname: String(raw.hostname ?? raw.nodeId ?? raw.id ?? ''),
-    status: (['online', 'degraded', 'offline', 'draining', 'enrolling', 'retired'].includes(String(raw.status)) ? raw.status : 'enrolling') as NodeItem['status'],
+    status: mappedStatus,
     os: os === 'linux' ? 'linux' : 'windows', telemetryUnavailable: !valid,
     cpuCores: number('cpuCores'), cpuUsagePercent: number('cpuUsagePercent'),
     memoryTotalBytes: number('memoryTotalBytes'), memoryUsedBytes: number('memoryUsedBytes'),

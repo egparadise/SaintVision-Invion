@@ -155,7 +155,7 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
       vi.restoreAllMocks();
     });
 
-    it('서버 X-Content-SHA256 헤더와 일치할 때만 [무결성 검증 완료]를 표출하고 파일을 다운로드한다', async () => {
+    it('서버 X-Content-SHA256 헤더와 일치할 때만 [전송 확인 완료]를 표출하고 파일을 다운로드한다', async () => {
       const headers = new Headers();
       headers.set('x-content-sha256', sampleContentSha256);
       headers.set('content-disposition', 'attachment; filename="verified-output.dcm"');
@@ -198,15 +198,16 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
       const notice = container.querySelector('[data-testid="studio-action-notice"]');
       expect(notice).not.toBeNull();
       expect(notice?.getAttribute('role')).toBe('status');
-      expect(notice?.textContent).toContain('[무결성 검증 완료]');
+      expect(notice?.textContent).toContain('[전송 확인 완료]');
       expect(notice?.textContent).toContain('verified-output.dcm');
-      expect(notice?.textContent).toContain('SHA-256 일치');
+      expect(notice?.textContent).toContain('수신 바이트와 서버 헤더 일치');
+      expect(notice?.textContent).toContain('저장소 원본 대조 아님');
 
       // createObjectURL 호출되어 브라우저 다운로드 트리거됨
       expect(window.URL.createObjectURL).toHaveBeenCalled();
     });
 
-    it('서버 X-Content-SHA256 헤더와 불일치 시 조용히 넘기지 않고 [무결성 검증 실패](role=alert)를 표출하며 다운로드를 차단한다', async () => {
+    it('서버 X-Content-SHA256 헤더와 불일치 시 조용히 넘기지 않고 [전송 불일치 · 저장 차단](role=alert)을 표출하며 다운로드를 차단한다', async () => {
       const headers = new Headers();
       headers.set('x-content-sha256', corruptedSha256); // Tampered / Corrupted checksum
       headers.set('content-disposition', 'attachment; filename="tampered-file.dcm"');
@@ -248,16 +249,15 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
       const notice = container.querySelector('[data-testid="studio-action-notice"]');
       expect(notice).not.toBeNull();
       expect(notice?.getAttribute('role')).toBe('alert');
-      expect(notice?.textContent).toContain('[무결성 검증 실패]');
+      expect(notice?.textContent).toContain('[전송 불일치 · 저장 차단]');
       expect(notice?.textContent).toContain('tampered-file.dcm');
-      expect(notice?.textContent).toContain('불일치');
-      expect(notice?.textContent).toContain('손상 위험으로 저장이 중단되었습니다');
+      expect(notice?.textContent).toContain('전송 중 손상 위험으로 파일 저장을 차단했습니다');
 
       // createObjectURL이 호출되지 않아 손상 파일 저장이 차단됨
       expect(window.URL.createObjectURL).not.toHaveBeenCalled();
     });
 
-    it('서버 X-Content-SHA256 필수 헤더 부재 시 조용히 강등하지 않고 [무결성 검증 실패 · 필수 헤더 누락](role=alert)으로 차단한다', async () => {
+    it('서버 X-Content-SHA256 필수 헤더 부재 시 조용히 강등하지 않고 [전송 헤더 누락 · 저장 차단](role=alert)으로 차단한다', async () => {
       const headers = new Headers(); // No x-content-sha256 header (header stripping scenario)
 
       window.fetch = vi.fn().mockResolvedValue({
@@ -297,9 +297,9 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
       const notice = container.querySelector('[data-testid="studio-action-notice"]');
       expect(notice).not.toBeNull();
       expect(notice?.getAttribute('role')).toBe('alert');
-      expect(notice?.textContent).toContain('[무결성 검증 실패 · 필수 헤더 누락]');
-      expect(notice?.textContent).toContain('계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다');
-      expect(notice?.textContent).toContain('다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다');
+      expect(notice?.textContent).toContain('[전송 헤더 누락 · 저장 차단]');
+      expect(notice?.textContent).toContain('전송 검증용 필수 헤더(X-Content-SHA256)가 없습니다');
+      expect(notice?.textContent).toContain('전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다');
 
       // 조용한 강등 방지: createObjectURL 호출되지 않고 저장 차단됨
       expect(window.URL.createObjectURL).not.toHaveBeenCalled();

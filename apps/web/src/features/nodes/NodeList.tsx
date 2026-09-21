@@ -177,15 +177,69 @@ export const NodeList: React.FC<NodeListProps> = ({
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {nodes.map((node) => {
-          if (node.telemetryUnavailable) return <div key={node.id} role="status">
-            <strong>{node.hostname}</strong> — 자원 정보 미관측 · 실행 대상에서 제외
-          </div>;
+          if (node.telemetryUnavailable) return (
+            <div
+              key={node.id}
+              role={node.status === 'lost' ? 'alert' : 'status'}
+              data-testid={`node-card-${node.id}`}
+              style={{
+                padding: '20px',
+                backgroundColor: 'var(--color-bg-surface)',
+                borderRadius: 'var(--radius-lg)',
+                border: `1px solid ${node.status === 'lost' ? '#ef4444' : node.status === 'unknown' ? '#f59e0b' : 'var(--color-border-subtle)'}`,
+                boxShadow: 'var(--shadow-sm)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{node.hostname}</h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+                    {node.id} · {node.os.toUpperCase()}
+                  </span>
+                </div>
+                <span
+                  data-testid={`node-status-badge-${node.id}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-text-muted)',
+                    backgroundColor: 'var(--color-bg-subtle)',
+                    border: `1px solid ${node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-border-subtle)'}`,
+                  }}
+                >
+                  <span style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-text-muted)',
+                  }} />
+                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : 'var(--color-text-muted)', lineHeight: 1.4 }}>
+                {node.status === 'lost'
+                  ? '🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다. 제어 평면 연결이 끊어졌으므로 즉시 인프라 점검이 필요합니다.'
+                  : node.status === 'unknown'
+                  ? '⚠️ 서버에서 관측된 노드 상태를 화면에서 해석할 수 없습니다 (미확인 상태 · 조용한 합류 둔갑 차단).'
+                  : '자원 정보 미관측 · 실행 대상에서 제외'}
+              </p>
+            </div>
+          );
 
           const statusColor =
             node.status === 'online'
               ? 'var(--color-status-online)'
               : node.status === 'degraded'
               ? 'var(--color-status-degraded)'
+              : node.status === 'lost'
+              ? '#f85149'
+              : node.status === 'unknown'
+              ? '#d29922'
               : 'var(--color-status-offline)';
 
           const ramUsedGb = (node.memoryUsedBytes / (1024 ** 3)).toFixed(1);
@@ -230,7 +284,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                   }}
                 >
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: statusColor }} />
-                  {node.status.toUpperCase()}
+                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
                 </span>
               </div>
 

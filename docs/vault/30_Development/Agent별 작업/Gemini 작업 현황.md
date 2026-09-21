@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.92"
+version: "1.0.93"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T03:30:00+09:00"
+updated: "2026-09-22T03:42:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,38 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T03:30:00+09:00.
+- 확인 기준: 2026-09-22T03:42:00+09:00.
+
+## 세션 랩업: 산출물 다운로드 전송 검증 문구 좁힘 & 노드 lost/unknown 조용한 합류 둔갑 차단 및 Chrome 153 실측 완결
+
+- **산출물 다운로드 표시 문구 사실대로 정직화 (`DeveloperStudio.tsx`)**:
+  - Codex의 PostgreSQL 16/Uvicorn 실측 결과, `/artifacts/content`는 저장 디스크의 스냅샷 파일을 읽지 않고 DB의 불변 영수증 바이트(`stop_receipt`)로 본문과 `X-Content-SHA256` 헤더를 생성함이 입증됨 (스냅샷 파일을 변조해도 HTTP는 원본 영수증 바이트를 반환).
+  - 프런트엔드가 실제로 보장하는 것은 "서버가 보낸 바이트가 전송 중에 바뀌지 않았다는 전송 확인"이지 저장소의 원본 무결성이 아님.
+  - 기존의 과장된 `[무결성 검증 완료]` 문구를 폐기하고 `[전송 확인 완료] 산출물 파일 '...' (... Bytes, 수신 바이트와 서버 헤더 일치 · 저장소 원본 대조 아님) 다운로드 완료.`로 사실대로 좁힘.
+  - 헤더 누락 시 `[전송 헤더 누락 · 저장 차단]`, 체크섬 불일치 시 `[전송 불일치 · 저장 차단]`으로 문구 정직화.
+  - 단위 테스트 `artifact-content-download-integrity.test.tsx` 6개 단언 갱신 (6/6 passed).
+- **노드 상태 lost 및 unknown 어휘 분리 및 조용한 합류 둔갑 차단**:
+  - 백엔드 DB CHECK 어휘(`enrolling`, `active`, `draining`, `lost`, `retired`)와 화면 어휘 간 불일치 중 즉시 조치 가능한 2건 선제 반영:
+    ① **죽은 노드(`lost`)의 합류 중(`enrolling`) 둔갑 차단**: `NodeList.tsx`에서 빨간색 `LOST (단절)` 뱃지와 `role="alert"` 경고 배너 표출.
+    ② **모르는 값(`active` 등)의 조용한 `enrolling` 둔갑 차단**: 모르는 어휘를 만났을 때 조용히 합류 중으로 바꾸지 않고 `UNKNOWN (미확인)` 뱃지와 `role="status"` "해석할 수 없는 미확인 상태 · 조용한 합류 둔갑 차단" 배너 표출.
+  - `NodeDetail.tsx`, `ClusterOverview.tsx`, `ResourceExplorer.tsx`에 `lost`, `unknown` 뱃지 및 색상 분기 일관 적용.
+  - 신규 가드 테스트 `apps/web/tests/node-status-lost-unknown-guard.test.tsx` 작성 (6/6 passed).
+  - **돌연변이 사살**: `nodeObservation.ts`에서 `mappedStatus = 'enrolling'`으로 돌연변이 주입 시 2 failed로 즉시 사살(KILLED) 실측 후 원복.
+- **실제 Google Chrome 153 (Blink 엔진) 실측 수용 완결**:
+  - `scratch/verify_narrowed_notices_and_node_status_chrome.py` 구동:
+    1. 실제 Chrome 153 DOM에서 `lost` 노드가 `LOST (단절)` 뱃지와 `role="alert"`로 렌더링됨 확인.
+    2. 미해석 어휘 `active` 노드가 `UNKNOWN (미확인)` 뱃지와 `role="status"`로 렌더링됨 확인.
+    3. 안전한 노드 상태 스크린샷 캡처: `scratch/real_chrome_node_status_lost_unknown.png`.
+    4. `DeveloperStudio` Step 4에서 산출물 바이트 다운로드 클릭 시 `[전송 확인 완료]` 및 "저장소 원본 대조 아님" 고지 렌더링 확인 (과장 문구 부재 단언).
+    5. 안전한 전송 확인 배너 스크린샷 캡처: `scratch/real_chrome_narrowed_transmission_notice.png`.
+    6. 필수 헤더 누락 시 `[전송 헤더 누락 · 저장 차단]` 표출 및 파일 다운로드 차단 확인.
+    7. 실측 결과 JSON: `scratch/chrome_narrowed_notices_and_node_status_acceptance_result.json` (`passed: true`).
+- **게이트 통과**:
+  - Vitest **73개 파일 642/642 passed 100%** (순증 +1 파일, +6 passed).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 39 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: 710 versioned documents, 48 tasks, 12 outcomes PASS.
+- 보고서: [[2026-09-22_전송검증_문구좁힘_및_노드_lost_unknown_정직화_Chrome153_Gemini]].
 
 ## 세션 랩업: ApprovalReviewPanel 비동기 전이 DOM 검속 & Google Chrome 153 실측 수용 완결
 

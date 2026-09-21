@@ -30,7 +30,15 @@ export type ErrorCategory =
   | 'SEC'
   | 'BUDGET';
 
-export type NodeStatus = 'online' | 'degraded' | 'offline' | 'draining' | 'enrolling' | 'retired';
+export type NodeStatus =
+  | 'online'
+  | 'degraded'
+  | 'offline'
+  | 'draining'
+  | 'enrolling'
+  | 'retired'
+  | 'lost'
+  | 'unknown';
 
 /** Canonical server error envelope; never maintain a parallel hand-written wire shape. */
 export type ProblemDetails = CanonicalProblemDetails;

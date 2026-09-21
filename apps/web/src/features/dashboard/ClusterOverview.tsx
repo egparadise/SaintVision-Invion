@@ -501,10 +501,15 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                   style={{
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: node.status === 'online' ? 'var(--color-status-online)' : 'var(--color-status-offline)',
+                    color:
+                      node.status === 'online'
+                        ? 'var(--color-status-online)'
+                        : node.status === 'degraded' || node.status === 'unknown'
+                        ? '#d29922'
+                        : 'var(--color-status-offline)',
                   }}
                 >
-                  ● {node.status.toUpperCase()}
+                  ● {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
                 </span>
               </div>
             ))}

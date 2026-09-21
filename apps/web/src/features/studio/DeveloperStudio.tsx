@@ -197,13 +197,15 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     };
   }, [selectedWorkspaceId, selectedProjectId, projects]);
 
-  // Update selected run if initialRunId changes
+  // Update selected run if initialRunId changes or runs arrive asynchronously
   useEffect(() => {
     if (initialRunId) {
       setActiveRunId(initialRunId);
       setCurrentStep(4);
+    } else if (!activeRunId && runs.length > 0 && runs[0].id) {
+      setActiveRunId(runs[0].id);
     }
-  }, [initialRunId]);
+  }, [initialRunId, runs, activeRunId]);
 
   // Update selected node if initialNodeId changes
   useEffect(() => {
@@ -627,12 +629,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           {
             timestamp: new Date().toLocaleTimeString(),
             level: 'SUCCESS',
-            message: `[Artifact File] Verified raw file bytes downloaded for '${filePath}' (${verification.blob.size.toLocaleString()} Bytes, SHA-256 일치: ${verification.calculatedSha256})`,
+            message: `[Artifact File] Server wire transmission verified for '${filePath}' (${verification.blob.size.toLocaleString()} Bytes, wire SHA-256 matched, storage snapshot unverified)`,
           },
         ]);
         setStudioActionNotice({
           type: 'status',
-          message: `[무결성 검증 완료] 산출물 파일 '${verification.fileName}' (${verification.blob.size.toLocaleString()} Bytes, SHA-256 일치) 다운로드 완료.`,
+          message: `[전송 확인 완료] 산출물 파일 '${verification.fileName}' (${verification.blob.size.toLocaleString()} Bytes, 수신 바이트와 서버 헤더 일치 · 저장소 원본 대조 아님) 다운로드 완료.`,
         });
       } else if (verification.integrity === 'mismatch') {
         setLogs((prev) => [
@@ -640,12 +642,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           {
             timestamp: new Date().toLocaleTimeString(),
             level: 'ERROR',
-            message: `[Artifact File Integrity Mismatch] Checksum mismatch for '${filePath}': expected ${verification.expectedSha256}, got ${verification.calculatedSha256}`,
+            message: `[Artifact File Transmission Mismatch] Checksum mismatch for '${filePath}': expected ${verification.expectedSha256}, got ${verification.calculatedSha256}`,
           },
         ]);
         setStudioActionNotice({
           type: 'error',
-          message: `[무결성 검증 실패] 산출물 파일 '${verification.fileName}'의 수신 바이트 체크섬(${verification.calculatedSha256})이 서버 헤더(X-Content-SHA256: ${verification.expectedSha256})와 불일치합니다. 전송 중 손상 위험으로 저장이 중단되었습니다.`,
+          message: `[전송 불일치 · 저장 차단] 산출물 파일 '${verification.fileName}'의 수신 바이트 체크섬(${verification.calculatedSha256})이 서버 전송 헤더(X-Content-SHA256: ${verification.expectedSha256})와 다릅니다. 전송 중 손상 위험으로 파일 저장을 차단했습니다.`,
         });
       } else {
         // Unverified: X-Content-SHA256 header missing from server response.
@@ -657,12 +659,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           {
             timestamp: new Date().toLocaleTimeString(),
             level: 'ERROR',
-            message: `[Artifact File Integrity Failed] Mandatory X-Content-SHA256 header missing from server response for '${filePath}'`,
+            message: `[Artifact File Transmission Failed] Mandatory X-Content-SHA256 header missing from server response for '${filePath}'`,
           },
         ]);
         setStudioActionNotice({
           type: 'error',
-          message: `[무결성 검증 실패 · 필수 헤더 누락] 서버 응답에 계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다. 다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다.`,
+          message: `[전송 헤더 누락 · 저장 차단] 서버 응답에 전송 검증용 필수 헤더(X-Content-SHA256)가 없습니다. 전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다.`,
         });
       }
     } catch (err: any) {
