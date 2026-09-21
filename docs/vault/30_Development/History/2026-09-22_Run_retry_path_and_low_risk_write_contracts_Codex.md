@@ -59,9 +59,9 @@ tags: ["run", "retry", "response-contract", "static-audit"]
 - Schema: `tools/export_schemas.py`가 새 7 schema를 생성해 총 56개. final code SHA에서 `tools/export_schemas.py --check` exit 0, 56/56 일치.
 - 계약 사슬: final code SHA에서 `tools/check_contract_bindings.py` exit 0, 46 fixtures 각각 시험 참조 및 12 kernel serving-anchor tests.
 - 문서 게이트: 최종 작업 문서를 포함한 tree에서 `tools/check_docs.py` exit 0 (24 original hashes, 717 versioned docs); `tools/check_ontology.py` exit 0. `tools/sync_obsidian.py --check`는 1518 managed, 3 pending, 0 conflicts로 exit 0; read-only, apply하지 않았다.
-- Provenance wrapper는 실행 당시 `working_tree_clean: NO`라고 기록했다. 변경은 보고서와 진행판 세 문서이며 제품/시험 소스는 final code SHA에 커밋돼 있었다. `git diff --check`도 통과했다. 브랜치는 fetch 시각의 integration `167a7f1f` 위에 2 commits 앞섰으며, 이후 remote 이동 여부는 아직 재확인하지 않았다.
+- Provenance wrapper는 실행 당시 `working_tree_clean: YES`, integration `1212f8b6` 대비 ahead 3으로 기록했다. 검증 후 세 커밋을 fast-forward로 push했고 origin integration과 local HEAD가 모두 `f2d86db5a848b75c905e0b5d8dfa826cf63be887`임을 다시 fetch해 확인했다(0 ahead/behind, clean). 작성자 검증이며 Claude 독립 검토는 아직 아니다.
 
 ## 다음 담당
 
 - 사용자/업무 owner: 일반 ModelRetry를 제품에 노출할지와 owner/API authority 결정. WorkspaceResume와 ShardRecovery는 각각 별도 좁은 정책이다.
-- Codex: 문서 갱신 커밋 후 최신 integration fetch, 개인 index로 자기 파일만 착지, rev-range 확인, 그 뒤 Claude 독립 검토를 요청한다.
+- 다음 담당 Claude: 착지 SHA `f2d86db5`의 응답 모델·route anchor·announcement 네 상태 허용을 독립 검토한다. Browser/운영 HTTP/PG 검증은 이번 단순 응답 변경에 포함되지 않았다.
