@@ -1,7 +1,8 @@
 import { ModelLineage, ProviderAdapterConformance } from '@/contracts/types';
 import { computeSha256 } from '../editor/diffEngine';
 
-const INITIAL_LINEAGES: ModelLineage[] = [
+// Test-only mock fixtures for local gate/conformance unit tests (never used as real production state)
+export const TEST_FIXTURE_LINEAGES: ModelLineage[] = [
   {
     modelId: 'mod_pacs_seg_v2',
     modelName: 'SaintVision PACS Lesion Segmentation',
@@ -47,7 +48,12 @@ const INITIAL_LINEAGES: ModelLineage[] = [
 ];
 
 export class MlopsManager {
-  private lineages: ModelLineage[] = [...INITIAL_LINEAGES];
+  // Real backend has no HTTP lineage API; default is strictly empty (zero fake syntheses)
+  private lineages: ModelLineage[];
+
+  constructor(initialLineages: ModelLineage[] = []) {
+    this.lineages = [...initialLineages];
+  }
 
   getLineages(): ModelLineage[] {
     return [...this.lineages];

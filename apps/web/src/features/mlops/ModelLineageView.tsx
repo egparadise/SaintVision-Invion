@@ -3,10 +3,16 @@ import { ModelLineage } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { MlopsManager } from './mlopsEngine';
 
-export const ModelLineageView: React.FC = () => {
-  const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager());
+export interface ModelLineageViewProps {
+  initialLineages?: ModelLineage[];
+}
+
+export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
+  initialLineages = [],
+}) => {
+  const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
-  const [selectedModelId, setSelectedModelId] = useState<string>('mod_pacs_seg_v2');
+  const [selectedModelId, setSelectedModelId] = useState<string>(lineages[0]?.modelId || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [approvalInput, setApprovalInput] = useState('apr_01JXYZ889900');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -55,6 +61,23 @@ export const ModelLineageView: React.FC = () => {
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Honest Notice: Backend Lineage & Evaluation Scores Not Exposed via HTTP */}
+      <div
+        data-testid="lineage-unexposed-notice"
+        role="status"
+        style={{
+          padding: '14px 18px',
+          borderRadius: '8px',
+          backgroundColor: 'rgba(234, 179, 8, 0.12)',
+          border: '1px solid #eab308',
+          color: '#fde047',
+          fontSize: '0.8125rem',
+          lineHeight: 1.5,
+        }}
+      >
+        <strong>⚠️ 모델 계보 및 평가 점수 미노출 (백엔드 HTTP API 부재):</strong> 실제 계보 데이터는 saintvision 내부 서비스(services/lineage.py)에만 존재하며 HTTP 서빙 엔드포인트가 제공되지 않습니다. 의사결정 왜곡을 방지하기 위해 가짜 계보 및 평가 점수(Accuracy/F1)의 합성을 전면 차단하고 미노출 상태를 유지합니다. (엔드포인트 신설: Codex 레인 인계)
+      </div>
+
       {/* Top MLOps & AC-10 Metrics Banner */}
       <div
         style={{
@@ -73,24 +96,28 @@ export const ModelLineageView: React.FC = () => {
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>End-to-End 모델 계보 역추적</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            100% 추적 가능
+          <div style={{ fontSize: '20px', fontWeight: 700, color: lineages.length > 0 ? '#3fb950' : '#f59e0b', marginTop: '4px' }}>
+            {lineages.length > 0 ? '추적 가능' : '미노출 (API 부재)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Dataset → Commit → Run → Eval → Approval</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {lineages.length > 0 ? 'Dataset → Commit → Run → Eval → Approval' : '서버 계보 앵커 부재 · 신설 대기'}
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>프로덕션 배포 게이트 기준</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
             Accuracy ≥ 85.0%
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>2인 승인 ID 필수 충족</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {lineages.length > 0 ? '2인 승인 ID 필수 충족' : '평가 점수 부재로 게이트 대기'}
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>등록 모델 수</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#f0f6fc', marginTop: '4px' }}>
-            {lineages.length} 개 모델
+            {lineages.length} 개 모델 {lineages.length === 0 && <span style={{ fontSize: '14px', color: '#f59e0b' }}>(미노출)</span>}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
             {lineages.filter((m) => m.status === 'deployed').length}개 Deployed, {lineages.filter((m) => m.status === 'staging').length}개 Staging
@@ -159,149 +186,177 @@ export const ModelLineageView: React.FC = () => {
         </form>
       </div>
 
-      {/* Model Selection Tabs */}
-      <div style={{ display: 'flex', gap: '10px' }}>
-        {lineages.map((model) => {
-          const isSelected = model.modelId === selectedModelId;
-          return (
-            <button
-              key={model.modelId}
-              type="button"
-              onClick={() => setSelectedModelId(model.modelId)}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '6px',
-                border: isSelected ? '1px solid #58a6ff' : '1px solid #30363d',
-                backgroundColor: isSelected ? '#1f242c' : '#161b22',
-                color: isSelected ? '#58a6ff' : '#c9d1d9',
-                cursor: 'pointer',
-                fontWeight: isSelected ? 600 : 400,
-                fontSize: '13px',
-              }}
-            >
-              {model.modelName} (v{model.version})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* End-to-End Lineage Provenance Flow Graph */}
-      <div
-        style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
-          borderRadius: '8px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              [{selectedModel.modelName}] End-to-End 계보 추적 그래프
-            </h3>
-            <span style={{ fontSize: '12px', color: '#8b949e' }}>
-              Model ID: <code>{selectedModel.modelId}</code> • Status: <strong>{selectedModel.status.toUpperCase()}</strong>
-            </span>
-          </div>
-
-          {selectedModel.status === 'staging' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input
-                type="text"
-                value={approvalInput}
-                onChange={(e) => setApprovalInput(e.target.value)}
-                placeholder="Approval ID (apr_...)"
-                style={{
-                  padding: '6px 10px',
-                  backgroundColor: '#0d1117',
-                  border: '1px solid #30363d',
-                  borderRadius: '4px',
-                  color: '#c9d1d9',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-mono, monospace)',
-                }}
-              />
-              <Button size="sm" variant="primary" onClick={() => handleDeploy(selectedModel.modelId)}>
-                게이트 배포 시도
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Horizontal Lineage Pipeline Nodes */}
+      {/* Model Selection Tabs or Empty State */}
+      {lineages.length === 0 ? (
         <div
+          data-testid="lineage-empty-state"
+          role="status"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            gap: '12px',
+            backgroundColor: '#161b22',
+            border: '1px solid #30363d',
+            borderRadius: '8px',
+            padding: '48px 24px',
+            textAlign: 'center',
+            color: '#94a3b8',
           }}
         >
-          {/* Node 1: Dataset Digest */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>1. DATASET DIGEST</div>
-            <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.datasetDigest ? selectedModel.datasetDigest.slice(0, 16) + '...' : '미지정'}
-            </div>
-            <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
-              {selectedModel.datasetDigest ? 'SHA-256 Verified' : '미검증'}
-            </div>
-          </div>
-
-          {/* Node 2: Source Git Commit */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>2. SOURCE COMMIT</div>
-            <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.sourceCommitSha ? selectedModel.sourceCommitSha.slice(0, 12) : '미지정'}
-            </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>
-              {selectedModel.sourceCommitSha ? 'Git Signed SHA' : '커밋 없음'}
-            </div>
-          </div>
-
-          {/* Node 3: Training Run ID */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>3. TRAINING RUN</div>
-            <div style={{ fontSize: '12px', color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.trainingRunId || '미실행'}
-            </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime</div>
-          </div>
-
-          {/* Node 4: Evaluation Score */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION</div>
-            <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
-              Acc: {selectedModel.evalAccuracy !== undefined ? (selectedModel.evalAccuracy * 100).toFixed(1) + '%' : '미평가'}
-            </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
-              F1 Score: {selectedModel.evalF1Score !== undefined ? selectedModel.evalF1Score.toFixed(3) : 'N/A'}
-            </div>
-          </div>
-
-          {/* Node 5: Governance Approval */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>5. APPROVAL</div>
-            <div style={{ fontSize: '12px', color: selectedModel.approvalId ? '#3fb950' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.approvalId ? selectedModel.approvalId : 'None (Pending)'}
-            </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Two-Person Rule</div>
-          </div>
-
-          {/* Node 6: Deployment Digest */}
-          <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>6. DEPLOYMENT DIGEST</div>
-            <div style={{ fontSize: '12px', color: selectedModel.deploymentDigest ? '#58a6ff' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
-              {selectedModel.deploymentDigest ? selectedModel.deploymentDigest.slice(0, 16) + '...' : 'Not deployed'}
-            </div>
-            <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
-              {selectedModel.deploymentDigest ? 'Production Live' : 'Pending Gate'}
-            </div>
-          </div>
+          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📊</div>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: '#f0f6fc' }}>
+            등록된 모델 계보 및 평가 점수 데이터가 없습니다.
+          </h3>
+          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#8b949e', maxWidth: '600px', display: 'inline-block' }}>
+            현재 백엔드(saintvision)의 모델 계보 데이터는 내부 서비스에만 위치하며 클라이언트 조회용 HTTP 엔드포인트가 부재합니다. 신뢰할 수 없는 가짜 평가 점수(Accuracy/F1)의 임의 합성을 차단하기 위해 미노출로 표시합니다.
+          </p>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Model Selection Tabs */}
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {lineages.map((model) => {
+              const isSelected = model.modelId === selectedModelId;
+              return (
+                <button
+                  key={model.modelId}
+                  type="button"
+                  onClick={() => setSelectedModelId(model.modelId)}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: isSelected ? '1px solid #58a6ff' : '1px solid #30363d',
+                    backgroundColor: isSelected ? '#1f242c' : '#161b22',
+                    color: isSelected ? '#58a6ff' : '#c9d1d9',
+                    cursor: 'pointer',
+                    fontWeight: isSelected ? 600 : 400,
+                    fontSize: '13px',
+                  }}
+                >
+                  {model.modelName} (v{model.version})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* End-to-End Lineage Provenance Flow Graph */}
+          {selectedModel && (
+            <div
+              style={{
+                backgroundColor: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: '8px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
+                    [{selectedModel.modelName}] End-to-End 계보 추적 그래프
+                  </h3>
+                  <span style={{ fontSize: '12px', color: '#8b949e' }}>
+                    Model ID: <code>{selectedModel.modelId}</code> • Status: <strong>{selectedModel.status.toUpperCase()}</strong>
+                  </span>
+                </div>
+
+                {selectedModel.status === 'staging' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="text"
+                      value={approvalInput}
+                      onChange={(e) => setApprovalInput(e.target.value)}
+                      placeholder="Approval ID (apr_...)"
+                      style={{
+                        padding: '6px 10px',
+                        backgroundColor: '#0d1117',
+                        border: '1px solid #30363d',
+                        borderRadius: '4px',
+                        color: '#c9d1d9',
+                        fontSize: '12px',
+                        fontFamily: 'var(--font-mono, monospace)',
+                      }}
+                    />
+                    <Button size="sm" variant="primary" onClick={() => handleDeploy(selectedModel.modelId)}>
+                      게이트 배포 시도
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Horizontal Lineage Pipeline Nodes */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(6, 1fr)',
+                  gap: '12px',
+                }}
+              >
+                {/* Node 1: Dataset Digest */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>1. DATASET DIGEST</div>
+                  <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                    {selectedModel.datasetDigest ? selectedModel.datasetDigest.slice(0, 16) + '...' : '미지정'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+                    {selectedModel.datasetDigest ? 'SHA-256 Verified' : '미검증'}
+                  </div>
+                </div>
+
+                {/* Node 2: Source Git Commit */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>2. SOURCE COMMIT</div>
+                  <div style={{ fontSize: '12px', color: '#58a6ff', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                    {selectedModel.sourceCommitSha ? selectedModel.sourceCommitSha.slice(0, 12) : '미지정'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>
+                    {selectedModel.sourceCommitSha ? 'Git Signed SHA' : '커밋 없음'}
+                  </div>
+                </div>
+
+                {/* Node 3: Training Run ID */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>3. TRAINING RUN</div>
+                  <div style={{ fontSize: '12px', color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                    {selectedModel.trainingRunId || '미실행'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime</div>
+                </div>
+
+                {/* Node 4: Evaluation Score */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION</div>
+                  <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
+                    Acc: {selectedModel.evalAccuracy !== undefined ? (selectedModel.evalAccuracy * 100).toFixed(1) + '%' : '미평가'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>
+                    F1 Score: {selectedModel.evalF1Score !== undefined ? selectedModel.evalF1Score.toFixed(3) : 'N/A'}
+                  </div>
+                </div>
+
+                {/* Node 5: Governance Approval */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>5. APPROVAL</div>
+                  <div style={{ fontSize: '12px', color: selectedModel.approvalId ? '#3fb950' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                    {selectedModel.approvalId ? selectedModel.approvalId : 'None (Pending)'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Two-Person Rule</div>
+                </div>
+
+                {/* Node 6: Deployment Digest */}
+                <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>6. DEPLOYMENT DIGEST</div>
+                  <div style={{ fontSize: '12px', color: selectedModel.deploymentDigest ? '#58a6ff' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
+                    {selectedModel.deploymentDigest ? selectedModel.deploymentDigest.slice(0, 16) + '...' : 'Not deployed'}
+                  </div>
+                  <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+                    {selectedModel.deploymentDigest ? 'Production Live' : 'Pending Gate'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Multi-Provider Adapter Conformance Table (AC-10) */}
       <div

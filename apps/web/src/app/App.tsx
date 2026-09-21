@@ -501,7 +501,11 @@ export const App: React.FC = () => {
                 30초 1회용 티켓으로 인증된 PTY 양방향 터미널 세션입니다. (접근성 대체 텍스트 뷰 지원)
               </p>
             </div>
-            <WebTerminal workspaceId="wsp-saint-pilot" sessionId="sid_terminal_01" />
+            <WebTerminal
+              workspaceId={selectedWorkspaceId || workspaces[0]?.id || 'wsp-saint-pilot'}
+              sessionId="sid_terminal_01"
+              commandId={selectedRunId || runs.find((r) => r.state === 'scheduled' || r.state === 'verifying')?.id || null}
+            />
           </div>
         )}
 

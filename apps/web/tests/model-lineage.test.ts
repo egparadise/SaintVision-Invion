@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import { MlopsManager } from '../src/features/mlops/mlopsEngine';
+// @vitest-environment happy-dom
+import React, { act } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { MlopsManager, TEST_FIXTURE_LINEAGES } from '../src/features/mlops/mlopsEngine';
+import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -30,9 +34,21 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
     });
   });
 
-  describe('Reverse Lineage Traceability Query (AC-10 역추적)', () => {
-    it('reversely traces model lineage from deployment digest to root dataset and commit', () => {
+  describe('Zero-Synthesis Invariant: Default Unexposed State when Backend API is Absent', () => {
+    it('initializes MlopsManager with empty lineages by default without synthesizing fake evaluation scores', () => {
       const mlops = new MlopsManager();
+      expect(mlops.getLineages()).toEqual([]);
+      expect(mlops.queryLineage('anything')).toBeUndefined();
+
+      const deployResult = mlops.deployModel({ modelId: 'any', approvalId: 'apr_123' });
+      expect(deployResult.success).toBe(false);
+      expect(deployResult.error).toContain('Model not found');
+    });
+  });
+
+  describe('Reverse Lineage Traceability Query (AC-10 역추적 - Test Fixtures)', () => {
+    it('reversely traces model lineage from deployment digest to root dataset and commit', () => {
+      const mlops = new MlopsManager(TEST_FIXTURE_LINEAGES);
 
       // Query by deployment digest
       const digest = 'sha256:4a8b2c1d9f3e5a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b';
@@ -48,7 +64,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
     });
 
     it('reversely traces model lineage from git commit SHA to deployed model', () => {
-      const mlops = new MlopsManager();
+      const mlops = new MlopsManager(TEST_FIXTURE_LINEAGES);
 
       // Query by commit SHA
       const commitSha = '39699e9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f';
@@ -61,9 +77,9 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
     });
   });
 
-  describe('Gated Model Deployment (AC-10)', () => {
+  describe('Gated Model Deployment (AC-10 - Test Fixtures)', () => {
     it('blocks deployment if accuracy is below 85% threshold or approval is missing', () => {
-      const mlops = new MlopsManager();
+      const mlops = new MlopsManager(TEST_FIXTURE_LINEAGES);
       const targetModelId = 'mod_experimental_vit_v3'; // Acc: 81.2% (< 85%)
 
       // 1. Missing approval ID -> blocked
@@ -91,6 +107,48 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       expect(attempt3.success).toBe(true);
       expect(attempt3.deployedModel?.deploymentDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
       expect(attempt3.deployedModel?.status).toBe('deployed');
+    });
+  });
+
+  describe('ModelLineageView DOM & Zero-Synthesis Verification', () => {
+    let container: HTMLDivElement;
+    let root: Root;
+
+    beforeEach(() => {
+      (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+      container = document.createElement('div');
+      document.body.appendChild(container);
+      root = createRoot(container);
+    });
+
+    afterEach(() => {
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    });
+
+    it('renders honest unexposed notice and empty state when backend HTTP lineage API is absent', async () => {
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView));
+      });
+
+      // Invariant 1: Unexposed notice banner is present with role="status"
+      const notice = container.querySelector('[data-testid="lineage-unexposed-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.getAttribute('role')).toBe('status');
+      expect(notice?.textContent).toContain('모델 계보 및 평가 점수 미노출 (백엔드 HTTP API 부재)');
+      expect(notice?.textContent).toContain('가짜 계보 및 평가 점수(Accuracy/F1)의 합성을 전면 차단');
+
+      // Invariant 2: Empty state is rendered instead of fake pipeline graph
+      const emptyState = container.querySelector('[data-testid="lineage-empty-state"]');
+      expect(emptyState).not.toBeNull();
+      expect(emptyState?.textContent).toContain('등록된 모델 계보 및 평가 점수 데이터가 없습니다');
+
+      // Invariant 3: Fake evaluation scores (0.812 etc.) MUST NOT appear anywhere in the DOM
+      expect(container.textContent).not.toContain('81.2%');
+      expect(container.textContent).not.toContain('0.812');
+      expect(container.textContent).not.toContain('94.8%');
     });
   });
 });
