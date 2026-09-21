@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from raises_no_skip import raises_without_skip
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -53,7 +54,7 @@ def test_dispose_failure_still_drops_role_and_preserves_body_error(monkeypatch):
     engine = FakeEngine(fail_dispose=True)
     monkeypatch.setattr(db_login, "create_engine", lambda *a, **k: engine)
 
-    with pytest.raises(RuntimeError, match="injected dispose failure") as exc:
+    with raises_without_skip(RuntimeError, match="injected dispose failure") as exc:
         with db_login.application_test_engine(URL, owner) as produced:
             assert produced is engine
             raise AssertionError("real body failure")
@@ -80,7 +81,7 @@ def test_drop_role_failure_alone_surfaces(monkeypatch):
     owner = FakeOwnerEngine(fail_drop=True)
     engine = FakeEngine(fail_dispose=False)
     monkeypatch.setattr(db_login, "create_engine", lambda *a, **k: engine)
-    with pytest.raises(RuntimeError, match="injected DROP ROLE failure"):
+    with raises_without_skip(RuntimeError, match="injected DROP ROLE failure"):
         with db_login.application_test_engine(URL, owner):
             pass
     assert engine.disposed is True  # dispose still ran
@@ -92,7 +93,7 @@ def test_dispose_and_drop_role_both_fail_preserve_both(monkeypatch):
     engine = FakeEngine(fail_dispose=True)
     monkeypatch.setattr(db_login, "create_engine", lambda *a, **k: engine)
 
-    with pytest.raises(ExceptionGroup) as exc:
+    with raises_without_skip(ExceptionGroup, match="application_test_engine teardown failed") as exc:
         with db_login.application_test_engine(URL, owner):
             raise AssertionError("real body failure")
 

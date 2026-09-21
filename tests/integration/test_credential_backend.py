@@ -14,6 +14,7 @@ from uuid import uuid4
 import psycopg
 import pytest
 from credential_conformance import CredentialConformance
+from raises_no_skip import raises_without_skip
 from saintvision.credentials.contract import CredentialContext, CredentialDenied
 from saintvision.credentials.linux_file import LinuxFileCredentials
 from inv.credential_registry import PostgresCredentialRegistry
@@ -225,7 +226,7 @@ def test_substitution_during_real_read_is_rejected(credential_harness, monkeypat
 
     monkeypatch.setattr(os, "read", swap)
     calls = []
-    with pytest.raises(CredentialDenied):
+    with raises_without_skip(CredentialDenied):
         handle.use(lambda secret: calls.append(True))
     assert changed and not calls
 
@@ -251,7 +252,7 @@ def test_committed_revocation_during_read_prevents_callback(credential_harness, 
             h.mutate("revoke")  # A separate PostgreSQL connection commits.
         finally:
             resume.set()
-        with pytest.raises(CredentialDenied):
+        with raises_without_skip(CredentialDenied):
             future.result(timeout=5)
     assert calls == []
 
@@ -274,7 +275,7 @@ def test_admitted_callback_does_not_lock_out_revocation(credential_harness):
         finally:
             finish.set()
         assert future.result(timeout=5) == "already-admitted"
-    with pytest.raises(CredentialDenied):
+    with raises_without_skip(CredentialDenied):
         handle.use(lambda secret: None)
 
 
@@ -300,7 +301,7 @@ def test_registry_runtime_cannot_provision_and_other_tenant_cannot_read(credenti
     # 42501), a column typo (UndefinedColumn), or a connection error can no longer pass
     # this as "immutability enforced". Matches the sibling assertion in
     # test_provisioning_integrity.py.
-    with psycopg.connect(h.e.owner) as c, pytest.raises(
+    with psycopg.connect(h.e.owner) as c, raises_without_skip(
         psycopg.errors.CheckViolation, match="immutable record"
     ):
         c.execute(
@@ -328,12 +329,12 @@ def test_current_execution_gate_invalidates_credential(credential_harness, chang
                 "UPDATE inv.runs SET state='cancelled',version=version+1 WHERE run_id=%s",
                 (h.context.run_id,),
             )
-    with pytest.raises(CredentialDenied):
+    with raises_without_skip(CredentialDenied):
         handle.use(lambda secret: None)
     if change == "epoch":
         # Even a newly constructed service at the new epoch cannot reuse old grants.
         provider = LinuxFileCredentials(
             h.root, PostgresCredentialRegistry(Database(h.e.runtime, recovery_epoch=new_epoch))
         )
-        with pytest.raises(CredentialDenied):
+        with raises_without_skip(CredentialDenied):
             provider.resolve(h.reference, h.context, h.purpose, h.destination)

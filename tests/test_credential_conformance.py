@@ -7,6 +7,7 @@ model states, not OS operations; a real backend must supply a separate harness.
 import pytest
 from credential_conformance import CredentialConformance
 from saintvision.credentials.contract import CredentialContext, CredentialDenied
+from raises_no_skip import raises_without_skip
 
 pytestmark = pytest.mark.credential_model
 
@@ -111,12 +112,12 @@ class TestCredentialContractModel(CredentialConformance):
     ],
 )
 def test_conformance_detects_deliberate_fault(bug, method, args):
-    with pytest.raises((AssertionError, pytest.fail.Exception)):
+    with raises_without_skip((AssertionError, pytest.fail.Exception)):
         getattr(CredentialConformance(), method)(ModelHarness(bug), *args)
 
 
 def test_conformance_detects_secret_in_exception_chain(caplog, capsys):
-    with pytest.raises(AssertionError):
+    with raises_without_skip(AssertionError):
         CredentialConformance().test_backend_error_is_safe_in_trace_and_logs(
             ModelHarness("leak_exception"), caplog, capsys
         )

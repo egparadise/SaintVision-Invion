@@ -13,6 +13,7 @@ import os
 import uuid
 import secrets
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, text
@@ -27,6 +28,31 @@ APP_ROLE = "inv_app"
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "postgres: requires a live PostgreSQL instance")
+
+
+_NO_SKIP_TEST_MODULES = {
+    (Path(__file__).resolve().parent / name).resolve()
+    for name in (
+        "test_recovery_drill_prerequisites.py",
+        "test_db_login_teardown.py",
+        "test_vf_docker.py",
+        "test_credential_conformance.py",
+    )
+}
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Pure model/monkeypatch guard files have no valid skip condition."""
+    outcome = yield
+    report = outcome.get_result()
+    if report.skipped and Path(str(item.path)).resolve() in _NO_SKIP_TEST_MODULES:
+        report.outcome = "failed"
+        report.longrepr = (
+            f"Unexpected skip in {Path(str(item.path)).name}; "
+            "this module is isolated and must fail visibly instead. "
+            f"Original skip: {report.longrepr}"
+        )
 
 
 @pytest.fixture(scope="session")
