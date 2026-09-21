@@ -1,0 +1,33 @@
+{
+  "approval": {
+    "approvalId": "apr_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "requesterId": "synthetic-requester",
+    "actionDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "policyVersion": "synthetic-policy-v1",
+    "requiredApprovals": 2,
+    "status": "pending",
+    "expiresAt": "2099-01-01T00:00:00Z",
+    "runVersion": 4
+  },
+  "workload": {
+    "apiVersion": "inv.saintvision.ai/v1alpha1",
+    "kind": "Workload",
+    "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "tenantId": "00000000-0000-4000-8000-000000000041",
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "resources": {
+      "cpuMillis": 1000,
+      "memoryBytes": 1024,
+      "gpuCount": 0,
+      "minVramBytes": 0
+    },
+    "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "command": ["echo", "two words", "<script>"],
+    "timeoutSeconds": 30
+  },
+  "riskLevel": "L2",
+  "policyDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

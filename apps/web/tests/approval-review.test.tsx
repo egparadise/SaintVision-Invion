@@ -5,22 +5,24 @@ import type { ApprovalItem } from '../src/contracts/types';
 import { apiClient } from '../src/shared/api/client';
 import { approveReviewed, fetchApprovalReview, reviewedAction, reviewIdentity, type ApprovalReview } from '../src/shared/api/approvalReview';
 import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
+import { approvalReviewFixture } from './fixtures/approval-review';
 vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'unique-test-key' }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
-const item = (): ApprovalItem => ({ id: 'approval', projectId: 'project', runId: 'run',
-  actionDigest: 'a'.repeat(64), boundRunVersion: 4, requestedBy: 'requester', requiredApprovals: 2,
-  policyReason: 'policy-1', expiresAt: '2099-01-01T00:00:00Z', status: 'pending' });
-const review = (): ApprovalReview => ({ approval: { approvalId: 'approval', projectId: 'project', runId: 'run',
-  actionDigest: 'a'.repeat(64), runVersion: 4, requesterId: 'requester', requiredApprovals: 2,
-  policyVersion: 'policy-1', expiresAt: '2099-01-01T00:00:00Z', status: 'pending' },
-  workload: { projectId: 'project', workspaceId: 'workspace', command: ['echo', 'two words', '<script>'],
-    imageDigest: 'sha256:'+'b'.repeat(64), resources: { cpuMillis: 1000, memoryBytes: 1024, gpuCount: 0, minVramBytes: 0 }, timeoutSeconds: 30 },
-  riskLevel: 'L2', policyDigest: 'c'.repeat(64) });
+const item = (): ApprovalItem => ({ id: approvalReviewFixture.approval.approvalId,
+  projectId: approvalReviewFixture.approval.projectId, runId: approvalReviewFixture.approval.runId,
+  actionDigest: approvalReviewFixture.approval.actionDigest, boundRunVersion: approvalReviewFixture.approval.runVersion,
+  requestedBy: approvalReviewFixture.approval.requesterId,
+  requiredApprovals: approvalReviewFixture.approval.requiredApprovals,
+  policyReason: approvalReviewFixture.approval.policyVersion,
+  expiresAt: approvalReviewFixture.approval.expiresAt, status: approvalReviewFixture.approval.status });
+const review = (): ApprovalReview => structuredClone(approvalReviewFixture);
 it('reads only the project-scoped review and preserves argument boundaries', async () => {
   api.mockResolvedValue(review()); const result = await fetchApprovalReview(item());
   expect(result.workload.command).toEqual(['echo','two words','<script>']);
-  expect(api).toHaveBeenCalledExactlyOnceWith('/v1/projects/project/approvals/approval/review');
+  expect(api).toHaveBeenCalledExactlyOnceWith(
+    `/v1/projects/${approvalReviewFixture.approval.projectId}/approvals/${approvalReviewFixture.approval.approvalId}/review`,
+  );
 });
 it.each([{ approvalId: 'other' }, { projectId: 'other' }, { runId: 'other' },
   { actionDigest: 'b'.repeat(64) }, { runVersion: 5 }, { requesterId: 'other' },

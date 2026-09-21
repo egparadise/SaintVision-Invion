@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.0.1"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T16:01:00+09:00"
+updated: "2026-09-21T16:16:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,7 +18,7 @@ Inventory scope is `apps/web/src/shared/api` excluding the common transport `cli
 | Priority / adapter | User-facing surface | Bound response groups | Still unbound and what can quietly break |
 |---|---|---|---|
 | P1 `projectObservation.ts` | App project selection; DeveloperStudio workspace picker | Workspace list and execution-readiness responses are bound in this slice | Project list still accepts two historical envelopes (`projects` and `items`). If a producer silently changes either shape, App can lose the selectable project list or fall back to ID-only names. Keep the two variants distinct until their backend ownership is resolved. |
-| P1 `approvalReview.ts` | ApprovalReviewPanel before a person approves an action | None | A changed workload, action digest, policy digest, expiry, or status shape can prevent review or misrepresent what the approval is bound to. Existing runtime identity checks fail closed, but mocks are not pinned to a shared provider fixture. |
+| P1 `approvalReview.ts` | ApprovalReviewPanel before a person approves an action | `ApprovalReviewView` approval/workload/risk/policy digest | Challenge and decision mutation responses remain unbound. Review payload is now generated-type and fixture-bound; a server-contract change still requires deliberate fixture updates and both consumer/provider verification. |
 | P1 `kernelMutations.ts` | Approval challenge/decision and run-version writes | None | Changed nonce/version/result envelopes can strand a legitimate two-person approval or cause a UI to report an outdated action result. This is a control boundary, so preserve fail-closed runtime checks while adding shared fixtures. |
 | P1 direct screen consumers (not counted as modules) | DeveloperStudio, RunDetail, EvidenceViewer | None beyond the separate discovery/storage/workspace slices | Run result, artifacts, artifact content, and run creation use screen-local response types or `any`. A response change can hide output, attach the wrong artifact, or let a success-shaped fallback look like verified evidence. UI-FB-03 separately remains pending component transition tests. |
 | P2 `runApprovalObservation.ts` | App run list and approval queue | None | Missing or renamed run/approval fields can empty the queue or suppress actions. The adapter has runtime checks, but mocks do not share a backend-derived contract. |
@@ -31,11 +31,12 @@ Inventory scope is `apps/web/src/shared/api` excluding the common transport `cli
 
 ## Selection and implementation
 
-Selected the workspace list plus execution-readiness response, the first ranked user flow. The list populates DeveloperStudio's workspace choice; readiness explains whether a run can proceed and who resolves each missing precondition. Shape drift can remove a user's workspace or change the visible execution gate.
+Selected the workspace list plus execution-readiness response, then the approval review payload. The list populates DeveloperStudio's workspace choice; readiness explains whether a run can proceed and who resolves each missing precondition. Approval review is a human control boundary: workload/action binding, policy digest, expiry, and approval state must agree before a person can approve.
 
 - `ProjectWorkspacesResponse` now strictly models `projectId`, `workspaces`, and `count`; each row carries IDs, lifecycle status, node/tool selections, creation time, and allowed next transitions.
 - `WorkspaceExecutionReadinessResponse` fixes the false/non-admission semantics as literals (`executable: false`, readiness `unknown`, admission required) and types the per-check remediation/input fields. The route uses `response_model_exclude_unset=True` to retain the existing distinction between absent optional fields and explicit null values.
 - Both routes share exact JSON fixtures with FastAPI provider serialization tests and Vitest/Ajv tests. TypeScript consumers use generated models instead of their local workspace/readiness copies. Two additional response schemas are exported with the existing Pydantic schema inventory; the TypeScript generator checks all generated API response types together.
+- Approval review now uses the existing canonical `contracts/v1alpha1/core.schema.json` `$defs/ApprovalReviewView`, generated TypeScript `ApprovalReviewView`, and generated Pydantic `ApprovalReviewView`. A synthetic shared fixture is validated by Ajv against the canonical schema and by the generated provider model; the approval-review adapter mock reads the same fixture. The live route already calls `validate_contract("ApprovalReviewView", result)`; its DB-backed HTTP test remains a separate integration check.
 - Database-backed route logic was not exercised. Provider serialization was exercised in an isolated FastAPI app with service returns replaced by the shared fixtures; this validates serialization and schema binding, not database semantics or live HTTP deployment.
 
 ## Required rollback/mutation checks
@@ -62,4 +63,14 @@ Implementation and the map were committed as `e460296eaa4cc6da7349fe50cd0cf452dd
 
 ## Review and next actions
 
-Owner Codex; independent reviewer Claude pending. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory and priority proposal, not a claim that every endpoint shape is now covered. Next slices, by visible/control impact: approval review and kernel mutation responses; run-result/artifact responses (coordinate with Gemini UI-FB-03); dual-envelope project list; run/approval queues; placement/storage adjuncts; shard/node observations. PostgreSQL DSN absence leaves database-backed integration outside this verification. No CI, browser/operational acceptance, or independent review is claimed.
+Owner Codex; independent reviewer Claude pending. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory and priority proposal, not a claim that every endpoint shape is now covered. Workspace list/readiness, discovery candidates, storage contributions/locations, and approval review are bound. Next slices, by visible/control impact: kernel challenge/decision mutations; run-result/artifact responses (coordinate with Gemini UI-FB-03); dual-envelope project list; run/approval queues; placement/storage adjuncts; shard/node observations. PostgreSQL DSN absence leaves database-backed integration outside this verification. No CI, browser/operational acceptance, or independent review is claimed.
+
+## 2026-09-21 CI Linux and Node-runtime readiness check
+
+The three test-side CI-fail gates reported by Claude were confirmed in source: root PostgreSQL gate (`tests/conftest.py`), integration PostgreSQL gate (`tests/integration/conftest.py`), and Node-runtime opt-in (`tests/integration/test_node_runtime.py`). The user's all-five-workflow Ubuntu runner observation is consistent with the checked workflow files. In `core.yml`, a prior step builds `inv-node` from checked-out Go source and creates `inv-node-test:$GITHUB_SHA` locally from the checked-in probe/supervisor sources plus the runner's Git binary; it sets `INV_NODE_BINARY`, image ID `INV_NODE_IMAGE`, and `INV_RUN_NODE_TESTS=1` through `GITHUB_ENV` before the integration test steps. A PostgreSQL 16 service and `INV_TEST_ADMIN_DSN` are also configured. This is source-level CI preparation, not an executed Actions run; Billing still blocks runtime confirmation. “Node” here is the SaintVision Go node-agent executable, not the JavaScript Node.js binary.
+
+Cross-checking the workflow layer also found `desktop-browser.yml` provisions its browser opt-in and asserts the expected browser result. The three image/installer acceptance gates still not provisioned by any workflow are the web-container image, workspace-upgrade agent image, and LAN-storage source root. They remain deliberate opt-in/operations scope, not a claim of CI coverage. The Linux chmod/POSIX tests are expected to leave their `skipif` markers on Ubuntu and run, subject to suite selection. Reported classification is based on source inspection and user/Claude findings; no workflow was executed here.
+
+At 16:15 KST on base `71bdb078c25056dc7fc675378825c40a739cd9a7`, Codex bound approval review as the next P1 response slice. Shared fixture `contracts/fixtures/approval-review-response.json` is consumed by the frontend adapter mock and Ajv schema test and validated against generated Pydantic `ApprovalReviewView`; the adapter now imports the generated TypeScript response type. Provenance-wrapped `.venv/Scripts/python.exe -m pytest -q --tb=short tests/core/test_approval_review_response_contract.py` exited 0 (3 passed); provenance-wrapped full Vitest from `apps/web` exited 0 (37 files, 342 passed); `tsc -b`, schema export check, and Vite production build exited 0. The app-level test run emitted three existing Ajv strict-schema warnings from unrelated `WorkspaceSpec` conditionals. PostgreSQL DSN was absent. No DB-backed API, CI, live HTTP, or browser acceptance is claimed. An initial Vitest invocation from repository root failed to resolve the app's `@/` alias; rerunning from `apps/web` passed. An initial exact model roundtrip assertion included unset nullable defaults; using `exclude_unset=True` to match the actual response serialization made the provider fixture test pass. No result above is an independent review.
+
+Mutation evidence on the same dirty base: replacing the shared fixture's valid `policyDigest` with a malformed value caused the generated-provider pytest and the frontend contract/adapter Vitest invocation to exit 1. The fixture was restored. These negative controls establish that a changed fixture is rejected on both sides; they do not simulate a live provider response. The canonical schema is the generator source for the TS/Pydantic/Go artifacts, and its generation/check path remains the definition-change drift guard.
