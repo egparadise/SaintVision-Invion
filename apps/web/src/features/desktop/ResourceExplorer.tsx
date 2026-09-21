@@ -28,10 +28,14 @@ import {
   admitDiscoveryCandidate,
   declineDiscoveryCandidate,
 } from './fabricControlApi';
+import { fetchStorageObservation } from '@/shared/api/storageObservation';
+import type { StorageObservationView } from '@/contracts/types';
 
 export interface ResourceExplorerProps {
   nodes: NodeItem[];
   tenantId?: string;
+  projectId?: string;
+  runId?: string;
   initialTab?: 'overview' | 'storage' | 'pools' | 'nodes' | 'discovery';
   onSelectNode?: (nodeId: string) => void;
   onOpenTerminal?: (nodeId: string) => void;
@@ -43,11 +47,14 @@ export interface ResourceExplorerProps {
   initialPoolCapacityError?: string | null;
   initialNodeDetail?: NodeDetailResponse | null;
   initialNodeDetailError?: string | null;
+  initialSampleRequestId?: string;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   nodes,
   tenantId,
+  projectId,
+  runId,
   initialTab = 'overview',
   onSelectNode,
   onOpenTerminal,
@@ -59,6 +66,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialPoolCapacityError,
   initialNodeDetail,
   initialNodeDetailError,
+  initialSampleRequestId,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
   const [filterMode, setFilterMode] = useState<'all' | 'schedulable' | 'gpu' | 'observe'>('all');
@@ -76,6 +84,29 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [newContribNode, setNewContribNode] = useState(nodes[0]?.id || '');
   const [newContribMode, setNewContribMode] = useState<'read_write' | 'read_only'>('read_write');
   const [newContribCapacityGB, setNewContribCapacityGB] = useState(500);
+
+  // Storage Observation State (StorageObservationView)
+  const [sampleRequestId, setSampleRequestId] = useState(initialSampleRequestId || '');
+  const [storageObservation, setStorageObservation] = useState<StorageObservationView | null>(null);
+  const [isLoadingObservation, setIsLoadingObservation] = useState(false);
+  const [observationError, setObservationError] = useState<string | null>(null);
+
+  const handleFetchStorageObservation = async () => {
+    if (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) {
+      setObservationError('프로젝트 ID, Run ID 및 요청 ID가 필요합니다.');
+      return;
+    }
+    setIsLoadingObservation(true);
+    setObservationError(null);
+    try {
+      const obs = await fetchStorageObservation(projectId.trim(), runId.trim(), sampleRequestId.trim());
+      setStorageObservation(obs);
+    } catch (err: any) {
+      setObservationError(err?.message || '스토리지 샘플 관측 조회 실패');
+    } finally {
+      setIsLoadingObservation(false);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // 2. Pools State
@@ -1128,6 +1159,166 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <div style={{ color: '#64748b', fontSize: '0.6875rem', marginTop: '2px', fontFamily: 'monospace' }}>SHA: {loc.checksumSha256 || '미생성'}</div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Storage Observation Section (StorageObservationView) */}
+          <div
+            data-testid="storage-observation-section"
+            style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}
+          >
+            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 8px 0' }}>
+              🔬 스토리지 샘플 무결성 관측 (StorageObservationView)
+            </h3>
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 12px 0' }}>
+              노드 에이전트가 기록한 스토리지 점유 증명(verify_sample) 관측 결과를 대조합니다. currentHealth는 서버 정의에 따라 "unknown"으로 보존되며, 임의의 "healthy" 상태를 합성하지 않습니다.
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+              <input
+                type="text"
+                data-testid="storage-sample-req-input"
+                value={sampleRequestId}
+                onChange={(e) => setSampleRequestId(e.target.value)}
+                placeholder="샘플 요청 ID (예: 66666666-6666-4666-8666-666666666666)"
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  borderRadius: '4px',
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  color: '#f8fafc',
+                  fontSize: '0.75rem',
+                  fontFamily: 'monospace',
+                }}
+              />
+              <button
+                type="button"
+                data-testid="fetch-storage-observation-btn"
+                onClick={handleFetchStorageObservation}
+                disabled={isLoadingObservation || !projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()}
+                style={{
+                  padding: '6px 14px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  borderRadius: '4px',
+                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '#475569' : '#3b82f6',
+                  color: '#ffffff',
+                  border: 'none',
+                  cursor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isLoadingObservation ? '조회 중...' : '샘플 관측 조회'}
+              </button>
+            </div>
+
+            {(!projectId?.trim() || !runId?.trim()) && (
+              <div
+                data-testid="storage-observation-context-warning"
+                style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px' }}
+              >
+                ⚠️ 활성 프로젝트/실행(Run) 컨텍스트가 없어 스토리지 샘플 조회가 비활성화되었습니다 (근거 없는 호출 방지).
+              </div>
+            )}
+
+            {observationError && (
+              <div
+                role="alert"
+                data-testid="storage-observation-error"
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.75rem',
+                  marginBottom: '10px',
+                }}
+              >
+                ❌ {observationError}
+              </div>
+            )}
+
+            {storageObservation && (
+              <div
+                data-testid="storage-observation-container"
+                style={{
+                  padding: '12px',
+                  borderRadius: '6px',
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>요청 ID: <code data-testid="storage-observation-req-id" style={{ color: '#38bdf8' }}>{storageObservation.requestId}</code></span>
+                  <span
+                    data-testid="storage-observation-status"
+                    style={{
+                      fontWeight: 600,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: storageObservation.status === 'recorded' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                      color: storageObservation.status === 'recorded' ? '#34d399' : '#fbbf24',
+                    }}
+                  >
+                    상태: {storageObservation.status}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
+                  <div>
+                    현재 건전성:{' '}
+                    <strong data-testid="storage-observation-health" style={{ color: '#94a3b8' }}>
+                      {storageObservation.currentHealth}
+                    </strong>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748b', marginLeft: '4px' }}>(불변 unknown)</span>
+                  </div>
+                  <div>
+                    운영 인수 평가:{' '}
+                    <strong data-testid="storage-observation-acceptance" style={{ color: '#94a3b8' }}>
+                      {storageObservation.operationalAcceptanceAssessed ? 'true' : 'false (미평가)'}
+                    </strong>
+                  </div>
+                </div>
+
+                {storageObservation.observation ? (
+                  <div
+                    data-testid="storage-observation-detail"
+                    style={{
+                      marginTop: '6px',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>
+                        무결성 증명:{' '}
+                        <strong data-testid="storage-observation-integrity" style={{ color: '#34d399' }}>
+                          {storageObservation.observation.integrityVerified ? '무결성 확인됨 (VERIFIED)' : '미확인'}
+                        </strong>
+                      </span>
+                      <span>
+                        증거 ID: <code data-testid="storage-observation-evidence">{storageObservation.observation.evidenceId}</code>
+                      </span>
+                    </div>
+                    <div data-testid="storage-observation-counts" style={{ color: '#94a3b8' }}>
+                      표본수: {storageObservation.observation.sampled} · 검사: {storageObservation.observation.examined} · 불일치: {storageObservation.observation.mismatches} · 검증불가: {storageObservation.observation.unverifiable} · 미표본: {storageObservation.observation.unsampled}
+                    </div>
+                  </div>
+                ) : (
+                  <div data-testid="storage-observation-empty" style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                    관측 결과 없음 (status: {storageObservation.status})
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.65"
+version: "1.0.66"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T20:15:00+09:00"
+updated: "2026-09-21T20:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,24 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T20:15:00+09:00.
+- 확인 기준: 2026-09-21T20:30:00+09:00.
 
 ## 최근 확인한 진척
+
+- **WorkspaceEditView 실바이트 해시 검증 개통, StorageObservationView 스토리지 샘플 무결성 배선 및 엄격한 3갈래 불변식 확립 (`InvFileExplorer.tsx`, `DesktopShell.tsx`, `ResourceExplorer.tsx`, `storageObservation.ts`, `types.ts`, `tests/storage-observation-contract.test.ts`, `tests/inv-file-explorer-dom.test.tsx`, `tests/resource-explorer-dom.test.tsx`)**:
+  - **진정한 무결성 검증(`verified` / PASS) 경로 개통 (VF-GM-03)**: 커널의 `WorkspaceEditView`(`workspace_editor._view()`가 실 체크아웃 바이트의 `sha256` digest 및 `dataBase64` 제공)를 `InvFileExplorer`에 정식 연동. `DesktopShell`에서 `checkoutId` prop 주입 및 `InvFileExplorer` UI에서 동적 체크아웃 입력/로드 바(`workspace-checkout-bar`, `checkout-id-input`, `load-checkout-btn`)를 제공하여 실제 바이트를 디코딩하고 클라이언트 측 WebCrypto SHA-256을 계산하여 기대 체크섬과 대조하는 실체적 검증을 개통.
+  - **엄격한 3갈래(Tri-State) 불변식 보존**:
+    - `calculatedSha256(actualBytes) === serverExpectedHash`: 유일하게 `verified` (`PASS` / `data-testid="integrity-status-verified"`)로 전이.
+    - 해시 불일치 (서버 해시 변조 또는 본문 바이트 변조): 즉시 `mismatch` (`data-testid="integrity-status-mismatch"`, `data-testid="integrity-mismatch-banner"`)로 전이되며 결코 `verified`가 되지 않음.
+    - 서버 실패, 기대 체크섬 부재, 바이트 부재, 데모 데이터: 즉시 `unverified` (`data-testid="integrity-status-unverified"`) 유지 및 정직한 거절 안내문 표출.
+  - **StorageObservationView 스토리지 기여 샘플 무결성 배선 (VF-GM-02/03)**: `ResourceExplorer.tsx` Tab 2(스토리지) 하단에 `StorageObservationView` 전용 관측 카드(`storage-observation-section`)를 신설하고 API 어댑터(`shared/api/storageObservation.ts`)를 연결. 서버 정의 불변 제약(`currentHealth: "unknown"`, `operationalAcceptanceAssessed: false`, `observation.integrityVerified: true`)을 정직하게 렌더링하고 `projectId`/`runId` 부재 시 0-call 가드 적용.
+  - **4대 돌연변이 실측 사살 (KILLED)**:
+    - 돌연변이 1: 서버 체크섬 변조 시 mismatch 탐지 사살 (`[VF-GM-03-MUTATION-PROOF-HASH]`).
+    - 돌연변이 2: 본문 바이트 임의 변조 시 mismatch 탐지 사살 (`[VF-GM-03-MUTATION-PROOF-BYTES]`).
+    - 돌연변이 3: 데모 데이터에 대한 조기 합격 처리 사살 (`[VF-GM-03-BEFORE-AFTER-VERIFY]`).
+    - 돌연변이 4: 스토리지 샘플의 currentHealth를 healthy로 둔갑시키는 합성 사살 (`storage-observation-contract.test.ts`).
+  - **검증 실적**: Vitest 56개 파일 **523/523 passed 100%** (from 510 to 523, net +13 tests; `inv-file-explorer-dom.test.tsx` 19 passed, `resource-explorer-dom.test.tsx` 20 passed, `storage-observation-contract.test.ts` 7 passed), Vite 프로덕션 빌드 exit 0 (3.32s, 96 modules), Pytest core 17 passed, check_docs/ontology/Obsidian PASS.
+  - 보고서: [[2026-09-21_WorkspaceEditView_StorageObservationView_무결성배선_Gemini]].
 
 - **디스커버리 테넌트 격리 실배선, 네트워크 0호출 가드 및 UI 전수 가짜 식별자 소거 완결 (`ResourceExplorer.tsx`, `DesktopShell.tsx`, `App.tsx`, `ModelLineageView.tsx`, `AdminSecurityConsole.tsx`, `PlacementSimulator.tsx`, `DistributedRecoveryView.tsx`, `MonacoWorkspaceEditor.tsx`, `TerminalSessionView.tsx`, `EvidenceViewer.tsx`, `RunDetail.tsx`, `DeveloperStudio.tsx`, `tests/resource-explorer-dom.test.tsx`, `tests/model-lineage.test.ts`)**:
   - **디스커버리 테넌트 경계 실배선 및 0-call 가드**: Codex의 `POST /v1/discovery/announcements` 테넌트 경계(`X-Inv-Tenant == principal.tenant_id`) 강화에 맞춰 `ResourceExplorer.tsx:420`의 하드코딩 `'00000000-0000-0000-0000-000000000001'`를 전면 폐기하고 상위 `App.tsx`/`DesktopShell.tsx`에서 인증된 세션의 `currentUser.tenantId`를 주입하도록 배선. `tenantId` 부재 시 네트워크 요청을 1건도 발생시키지 않고(0 network calls) `data-testid="discovery-tenant-required-notice"`를 정직 표출하며 브로드캐스트 버튼을 비활성화(`disabled={!tenantId}`).

@@ -18,6 +18,7 @@ import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 export interface DesktopShellProps {
   projectId: string;
   tenantId?: string;
+  checkoutId?: string;
   nodes: NodeItem[];
   runs: RunItem[];
   approvals: ApprovalItem[];
@@ -145,6 +146,7 @@ const DESKTOP_SHORTCUTS = [
 export const DesktopShell: React.FC<DesktopShellProps> = ({
   projectId,
   tenantId,
+  checkoutId,
   currentReviewerId,
   nodes,
   runs,
@@ -668,6 +670,8 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 <ResourceExplorer
                   nodes={nodes}
                   tenantId={tenantId}
+                  projectId={projectId}
+                  runId={runs[0]?.id}
                   onOpenTerminal={() => openApp('terminal')}
                 />
               )}
@@ -676,6 +680,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                 <InvFileExplorer
                   projectId={projectId}
                   runId={runs[0]?.id}
+                  checkoutId={checkoutId}
                   clusterNodes={nodes}
                 />
               )}
