@@ -336,6 +336,10 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         >
           <span>
             ⚠️ <strong>[승인 명령 부재]</strong> 유효한 승인 명령 신원(commandId)이 없어 30초 일회용 PTY 티켓을 발급하지 않았습니다. (위조 식별자 합성 방지)
+            <br />
+            <span style={{ fontSize: '0.75rem', color: '#fed7aa' }}>
+              👉 <strong>[사용자 조치 필요]</strong>: 상단 '승인 실행(Run)' 드롭다운에서 실행을 선택하거나 '승인 명령 ID' 입력창에 유효한 commandId(예: cmd_...)를 입력하십시오.
+            </span>
           </span>
         </div>
       )}
@@ -358,7 +362,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         >
           <span>
             ❌ {lastError?.includes('AUTH-0070')
-              ? '[AUTH-0070 권한 없음 / 실행 만료]: 유효한 승인 실행이 아니거나 세션이 만료되었습니다. (티켓 발급 거부)'
+              ? '[AUTH-0070 권한 없음 / 실행 만료]: 유효한 승인 실행이 아니거나 세션이 만료되었습니다. (티켓 발급 거부) 🛠️ [운영자 조치 필요]: 관리자/운영자에게 해당 실행(Run) 승인 또는 리스 연장을 요청하십시오.'
               : lastError?.includes('VAL-0002')
               ? '[VAL-0002 계약 검증 실패]: 요청 계약 형식이 유효하지 않습니다.'
               : (lastError || '30초 일회용 PTY 티켓 발급 또는 연결 실패')}

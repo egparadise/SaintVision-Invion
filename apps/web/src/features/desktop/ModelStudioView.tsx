@@ -141,7 +141,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
         setRepairState({
           repairingShardIndex: shardIndex,
           message: null,
-          error: '서버에 온디맨드 샤드 복구 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)',
+          error: '서버에 온디맨드 샤드 복구 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행) ℹ️ [제품 기능 미제공]: 분산 샤드 온디맨드 복구 API는 현재 백엔드 제품 사양에 구현되어 있지 않습니다. 일시적 네트워크 장애가 아니므로 재시도해도 복구되지 않습니다.',
         });
         return;
       }
@@ -388,6 +388,10 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             }}
           >
             무결성 상태: 검증 라우트 부재 (내부 verify만 존재) · 실행 재검증 필요 (requiresExecutionRevalidation: true)
+            <br />
+            <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+              ℹ️ <strong>[제품 기능 미제공 (원격 검증 라우트 부재)]</strong>: 원격 HTTP 모델 검증 API는 현재 백엔드에서 서빙되지 않으며 커널 내부 검증만 존재합니다. 모델 무결성을 갱신하려면 작업 공간 실행(Run)을 통해 재검증을 수행하십시오.
+            </span>
           </p>
         </article>
       )}

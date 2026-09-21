@@ -823,6 +823,7 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(createPlanBtn).not.toBeNull();
       expect(createPlanBtn?.disabled).toBe(true);
       expect(createPlanBtn?.textContent).toContain('승인 Run ID 필요');
+      expect(container.querySelector('[data-testid="plan-run-id-user-action-notice"]')?.textContent).toContain('[사용자 조치 필요]');
     });
 
     it('proves register-contribution-btn is disabled when cluster has no nodes', async () => {
@@ -834,6 +835,7 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(registerBtn).not.toBeNull();
       expect(registerBtn?.disabled).toBe(true);
       expect(registerBtn?.textContent).toContain('등록 가능 노드 없음');
+      expect(container.querySelector('[data-testid="storage-no-nodes-notice"]')?.textContent).toContain('[운영자 조치 필요]');
     });
 
     it('proves storage-observation-section renders and enforces anti-synthesis unknown health with genuine counts', async () => {
@@ -932,6 +934,7 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       const warning = container.querySelector('[data-testid="storage-observation-context-warning"]');
       expect(warning).not.toBeNull();
       expect(warning?.textContent).toContain('활성 프로젝트/실행(Run) 컨텍스트가 없어');
+      expect(warning?.textContent).toContain('[사용자 조치 필요]');
 
       const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="fetch-storage-observation-btn"]');
       expect(fetchBtn?.disabled).toBe(true);
@@ -975,6 +978,7 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(emptyState?.textContent).toContain('후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙)');
       expect(emptyState?.textContent).toContain('saint operator issue-grant');
       expect(emptyState?.textContent).toContain('일회용 자격증명');
+      expect(emptyState?.textContent).toContain('[운영자 조치 필요]');
 
       // 2. Negative controls: Error banner, tenant missing warning, and admission buttons MUST NOT exist
       expect(container.querySelector('[data-testid="discovery-error-banner"]')).toBeNull();
@@ -1035,6 +1039,7 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(tenantNotice).not.toBeNull();
       expect(tenantNotice?.textContent).toContain('인증된 세션 테넌트 식별자(tenantId)가 없어');
       expect(tenantNotice?.textContent).toContain('위조 테넌트 합성 및 후보 한도 소진 방지');
+      expect(tenantNotice?.textContent).toContain('[사용자 조치 필요]');
 
       // 2. Broadcast button MUST be disabled
       const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');

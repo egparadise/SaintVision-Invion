@@ -515,9 +515,13 @@ export const App: React.FC = () => {
                     border: '1px solid var(--color-border-subtle)',
                     borderRadius: '6px',
                     color: 'var(--color-text-muted)',
+                    lineHeight: '1.4',
                   }}
                 >
-                  ⚠️ 등록되거나 선택된 워크스페이스가 없습니다. 터미널 세션을 시작할 수 없습니다. (유효 워크스페이스 필요)
+                  <div>⚠️ 등록되거나 선택된 워크스페이스가 없습니다. 터미널 세션을 시작할 수 없습니다. (유효 워크스페이스 필요)</div>
+                  <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fed7aa' }}>
+                    👉 <strong>[사용자 조치 필요]</strong>: 상단 작업 공간 메뉴에서 워크스페이스를 선택하거나 새로 생성하십시오.
+                  </div>
                 </div>
               ) : (
                 <>

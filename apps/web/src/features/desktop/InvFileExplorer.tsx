@@ -225,7 +225,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             expectedHash: selectedFile.contentHash,
             calculatedHash: null,
             lastVerifiedAt: null,
-            integrityError: '데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지)',
+            integrityError: '데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지) 👉 [사용자 조치 필요]: 상단 커널 체크아웃 바에서 유효한 체크아웃 ID를 로드하십시오.',
           });
           return;
         }
@@ -239,7 +239,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
           expectedHash: selectedFile.contentHash,
           calculatedHash: null,
           lastVerifiedAt: null,
-          integrityError: '파일 본문 바이트(content) 또는 검증 어댑터가 부재하여 무결성을 검증할 수 없습니다.',
+          integrityError: '파일 본문 바이트(content) 또는 검증 어댑터가 부재하여 무결성을 검증할 수 없습니다. 👉 [사용자 조치 필요]: 상단 커널 체크아웃 바에서 파일을 로드하거나 프로젝트/실행을 연결하십시오.',
         });
         return;
       }
@@ -323,7 +323,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         setRepairState({
           isRepairing: false,
           repairMessage: null,
-          repairError: '서버에 온디맨드 복구 실행 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)',
+          repairError: '서버에 온디맨드 복구 실행 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행) ℹ️ [제품 기능 미제공]: 파일 복제본 온디맨드 복구 API는 현재 백엔드 커널 사양에 구현되어 있지 않습니다. 일시적 시스템 장애가 아니므로 재시도해도 복구되지 않으며, 향후 커널 복구 기능 지원 시 제공될 예정입니다.',
         });
         return;
       }
@@ -518,9 +518,12 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         {activeNamespace === 'workspaces' && (!projectId?.trim() || !runId?.trim()) && (
           <div
             data-testid="checkout-context-warning"
-            style={{ fontSize: '0.6875rem', color: '#fbbf24', padding: '0 4px' }}
+            style={{ fontSize: '0.6875rem', color: '#fbbf24', padding: '0 4px', lineHeight: '1.4' }}
           >
-            ⚠️ 활성 프로젝트/실행(Run) 정보가 없어 커널 체크아웃 조회가 제한됩니다 (근거 없는 호출 방지).
+            <div>⚠️ 활성 프로젝트/실행(Run) 정보가 없어 커널 체크아웃 조회가 제한됩니다 (근거 없는 호출 방지).</div>
+            <div style={{ color: '#fed7aa', marginTop: '2px' }}>
+              👉 <strong>[사용자 조치 필요]</strong>: 상단 메뉴에서 프로젝트 및 실행(Run)을 선택하면 커널 체크아웃 조회가 활성화됩니다.
+            </div>
           </div>
         )}
       </div>
@@ -895,9 +898,13 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                     border: '1px solid rgba(239, 68, 68, 0.3)',
                     color: '#f87171',
                     fontSize: '0.75rem',
+                    lineHeight: '1.4',
                   }}
                 >
-                  ⚠️ 생존 노드 없음 (복구 불가 - 복제본을 수용할 가용 노드가 없습니다)
+                  <div>⚠️ 생존 노드 없음 (복구 불가 - 복제본을 수용할 가용 노드가 없습니다)</div>
+                  <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: '#fca5a5' }}>
+                    🛠️ <strong>[운영자 조치 필요]</strong>: 복제본을 배치할 수 있는 정상 스케줄링 가능 노드가 없습니다. 인프라 운영자에게 추가 노드 투입 또는 오프라인 노드 복구를 요청하십시오.
+                  </div>
                 </div>
               ) : (
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

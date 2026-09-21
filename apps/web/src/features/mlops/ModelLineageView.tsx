@@ -82,7 +82,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           lineHeight: 1.5,
         }}
       >
-        <strong>⚠️ 모델 계보 및 평가 점수 미노출 (백엔드 HTTP API 부재):</strong> 실제 계보 데이터는 saintvision 내부 서비스(services/lineage.py)에만 존재하며 HTTP 서빙 엔드포인트가 제공되지 않습니다. 의사결정 왜곡을 방지하기 위해 가짜 계보 및 평가 점수(Accuracy/F1)의 합성을 전면 차단하고 미노출 상태를 유지합니다. (엔드포인트 신설: Codex 레인 인계)
+        <div>
+          <strong>⚠️ 모델 계보 및 평가 점수 미노출 (백엔드 HTTP API 부재) ℹ️ [제품 기능 미제공]:</strong> 실제 계보 데이터는 saintvision 내부 서비스(services/lineage.py)에만 존재하며 외부 HTTP 서빙 엔드포인트가 제공되지 않습니다.
+        </div>
+        <div style={{ marginTop: '4px', fontSize: '0.75rem', color: '#fed7aa' }}>
+          의사결정 왜곡을 방지하기 위해 가짜 계보 및 평가 점수(Accuracy/F1)의 합성을 전면 차단하고 미노출 상태를 유지합니다. (엔드포인트 신설: Codex 레인 인계)
+        </div>
       </div>
 
       {/* Top MLOps & AC-10 Metrics Banner */}
@@ -293,6 +298,14 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     >
                       게이트 배포 시도
                     </Button>
+                    {!approvalInput.trim() && (
+                      <span
+                        data-testid="approval-input-user-action-notice"
+                        style={{ fontSize: '11px', color: '#fed7aa', marginLeft: '4px' }}
+                      >
+                        👉 <strong>[사용자 조치 필요]</strong>: 승인 번호(apr_...)를 입력해야 배포 시도가 활성화됩니다.
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

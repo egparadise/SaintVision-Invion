@@ -69,6 +69,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         >
           <span data-testid="terminal-no-nodes-notice">
             ℹ️ 등록된 클러스터 노드가 없습니다. PTY 터미널 세션을 생성할 수 없습니다.
+            <span style={{ marginLeft: '8px', color: '#fed7aa', fontSize: '0.8125rem' }}>
+              🛠️ <strong>[운영자 조치 필요]</strong>: 클러스터에 등록된 온라인 노드가 없습니다. 인프라 운영자에게 노드 편입(Node 온보딩)을 요청하십시오.
+            </span>
           </span>
         </div>
       </div>
