@@ -11,10 +11,9 @@ import os
 from pathlib import Path
 import subprocess
 from uuid import uuid4
+from acceptance_evidence import case_mode_drift, EXPECTED_NODE_DOCKER_COMPAT_MODES
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
 def command(args, **kwargs):
     return subprocess.run([str(a) for a in args], capture_output=True, text=True,
                           encoding='utf-8', errors='replace', timeout=kwargs.pop('timeout', 180), **kwargs)
@@ -59,7 +58,10 @@ def main():
     # Keep this stopped test runner and its evidence for review. Never remove a
     # container selected by name prefix or touch an existing workload/DB.
     cases = [line.strip() for line in log.splitlines() if 'api=v1.' in line and 'outputSHA256=' in line]
-    passed = result.returncode == 0 and stopped and len(cases) == 4
+    drift = case_mode_drift(EXPECTED_NODE_DOCKER_COMPAT_MODES, cases)
+    passed = result.returncode == 0 and stopped and drift == {
+        "missing": [], "unexpected": [], "duplicates": []
+    }
     evidence = dict(at=datetime.now(timezone.utc).isoformat(), passed=passed,
                     scope='local-node-component-acceptance-not-production-run',
                     codeSHA=checked(['git', 'rev-parse', 'HEAD'], cwd=ROOT),
@@ -67,6 +69,7 @@ def main():
                     binarySHA256=hashlib.sha256((work/'runtime.test').read_bytes()).hexdigest(),
                     probeImage=args.image, testImage=test_image, testContainer=name,
                     exitCode=result.returncode, stopped=stopped, cases=cases,
+                    caseModeDrift=drift,
                     passedTests=sum(line.startswith('--- PASS:') for line in log.splitlines()),
                     logSHA256=hashlib.sha256(log.encode()).hexdigest(), log=str(work/'tests.log'))
     (work / 'evidence.json').write_text(json.dumps(evidence, indent=2), encoding='utf-8')

@@ -6,6 +6,8 @@ from datetime import datetime,timezone
 import xml.etree.ElementTree as ET
 root=Path(__file__).resolve().parents[1];sys.path.insert(0,str(root/'tools'))
 from lan_pilot import run,private_directory
+from acceptance_evidence import case_name_drift, EXPECTED_WORKSPACE_UPGRADE_CASE_NAMES
+
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--prepared',type=Path,required=True)
 parser.add_argument('--agent-image',required=True)
@@ -26,9 +28,11 @@ try:
     run(['docker','cp',tag+':/evidence/upgrade.xml',work/'upgrade.xml'])
     xml=ET.parse(work/'upgrade.xml')
     cases=[dict(name=c.get('name'),passed=not any(c.find(x) is not None for x in ('failure','error','skipped'))) for c in xml.iter('testcase')]
+    drift=case_name_drift(EXPECTED_WORKSPACE_UPGRADE_CASE_NAMES, (c['name'] for c in cases))
     proof=dict(at=datetime.now(timezone.utc).isoformat(),codeSHA=run(['git','rev-parse','HEAD'],cwd=root),
                dirty=bool(run(['git','status','--porcelain'],cwd=root)),scope='local-real-docker-installer-synthetic-pki',
                agentImage=agent,nodeImage=p['nodeImage'],runtimeImageCodeSHA=p['codeSHA'],exitCode=result.returncode,cases=cases,
+               caseNameDrift=drift,
                sourceHashes={f:hashlib.sha256((root/f).read_bytes()).hexdigest() for f in ('deploy/lan/worker_workspace.py','deploy/lan/worker_config.py','tests/integration/test_workspace_upgrade.py')})
     (work/'evidence.json').write_text(json.dumps(proof,indent=2)+'\n')
     print(json.dumps(dict(evidence=str(work/'evidence.json'),exitCode=result.returncode,cases=cases)),flush=True)
@@ -37,5 +41,5 @@ finally:
     assert inspected['Config']['Labels']['ai.saintvision.upgrade-test']==tag
     if inspected['State']['Running']:run(['docker','stop',tag])
     assert not json.loads(run(['docker','inspect',tag]))[0]['State']['Running']
-if result.returncode or len(cases)!=3 or not all(c['passed'] for c in cases):
+if result.returncode or drift != {'missing': [], 'unexpected': [], 'duplicates': []} or not all(c['passed'] for c in cases):
     raise SystemExit(1)

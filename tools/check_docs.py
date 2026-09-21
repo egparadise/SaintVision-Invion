@@ -76,6 +76,8 @@ def validate(root=ROOT):
     outcomes = {o['id']: o for o in registry['outcomes']}
     if len(task_ids) != len(tasks):
         errors.append('Duplicate task IDs')
+    # Deliberate governance baseline, not a derived count: accidental task or
+    # outcome deletion/addition must trigger an explicit registry review.
     if len(tasks) != 48 or len(outcomes) != 12:
         errors.append('Baseline must contain 48 tasks and 12 outcomes')
     for task in tasks:

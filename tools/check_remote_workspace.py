@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from lan_pilot import ROOT, load, runtime, tls, run, private_directory
 from lan_pki import ca_pair,issue,pem,private_pem,fingerprint
+from acceptance_evidence import case_name_drift, EXPECTED_REMOTE_WORKSPACE_CASE_NAMES
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 from inv.ids import new_id
@@ -164,12 +165,16 @@ def main():
         (work/'runner.log').write_bytes(result.stdout+result.stderr)
         run(['docker','cp',name+'-runner:/evidence',work/'evidence'],timeout=30)
         report=json.loads((work/'evidence/remote-report.json').read_text())
-        completed=result.returncode==0 and report['passed'] and len(report['tests'])==7 and all(t['passed'] and t['activeLeases']==0 for t in report['tests'])
+        case_drift=case_name_drift(EXPECTED_REMOTE_WORKSPACE_CASE_NAMES,
+                                   (t.get('test') for t in report['tests']))
+        completed=(result.returncode==0 and report['passed']
+                   and case_drift=={'missing':[],'unexpected':[],'duplicates':[]}
+                   and all(t['passed'] and t['activeLeases']==0 for t in report['tests']))
         public=dict(at=datetime.now(timezone.utc).isoformat(),codeSHA=run(['git','rev-parse','HEAD'],cwd=ROOT),
                     dirty=bool(run(['git','status','--porcelain'],cwd=ROOT)),runtimeImageCodeSHA=prepared['codeSHA'],
                     entrySHA256=hashlib.sha256((ROOT/'tools/remote_workspace_entry.py').read_bytes()).hexdigest(),
                     operatingBefore=before,operatingAfter=boundary(state) if state else None,
-                    exitCode=result.returncode,passed=completed,report=report)
+                    exitCode=result.returncode,passed=completed,caseNameDrift=case_drift,report=report)
         (work/'result.json').write_text(json.dumps(public,indent=2)+'\n',encoding='utf-8')
         print(json.dumps({'passed':completed,'cases':len(report['tests']),'evidence':str(work/'result.json'),'scope':config['scope']}),flush=True)
         return 0 if completed else 1

@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.132"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T23:19:00+09:00"
+updated: "2026-09-21T23:31:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,14 @@ source_of_truth: "Git"
 - 실측 중 definer 정책이 revision 0044에 남아 있고 migration 0045의 `consume_discovery_issue_budget(uuid)`가 빠져 있어 실제 audit baseline이 실패함을 확인했다. 정책을 현 head/digest/grant로 갱신했다. `test_migration_role_guard.py`의 0037 하드코딩도 Alembic current head 비교로 바꿨다.
 - 새 recovery-record 시험은 integrity 실패인데 plausible RPO/RTO 값이 있는 경우 ledger outcome=`failed`, measured RPO/RTO=NULL을 확인한다. 측정치 유무만으로 record하도록 가드를 약화시킨 변형에서 1 failed/exit 1, 복구 후 exact merged SHA `7779d8cf8126f6a17ba41e34bf9ef97282ab3d68`에서 선택 suite 89 passed/0 skipped/0 failed, 1 warning (28.47s). 프로젝트 Python 3.14.6; disposable PostgreSQL 16, owner label 확인·정리 확인. 상세 명령과 분류는 [[2026-09-21_회귀가드회수_Codex]].
 - 현재 CI 미실행. Independent review pending. 다음 별도 기능 카드는 GOV-ALERT-001 evaluator 구현/시험 설계이며, `test_alarm_check.py`만 이식하지 않는다.
+
+## 2026-09-21 시험·워크플로·도구 변경연동 하드코딩 감사
+
+- 기준은 local integration `938ea1b1d797e7c2ed4a81e9920cdab0cb9f620b`; branch `agent/codex/hardcoded-value-audit`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-hardcoded-value-audit`. 주 checkout은 Claude의 미커밋 변경이 있어 수정하지 않았다.
+- `tests` 221 / `tools` 66 / workflows 5개 파일을 후보 검색했다. ontology ownership query의 48행은 task registry의 outcome edge 수에서 유도하고 task별 edge를 비교하게 했다. Workspace-upgrade 3, Node Docker compatibility 4, remote-workspace 7의 evidence 검사는 count 대신 독립적인 정확한 case/mode 집합, 누락·추가·중복 검사가 되게 했다.
+- 고정 baseline(48 task/12 outcome), browser canonical journey, 11 run states, curated 역사적 migration priors, semantic query fixture cardinalities는 목적이 독립 수용 기준 또는 역사적 fixture라 고정 유지하고 바뀌는 시점을 기록했다. migration current head는 이미 Alembic graph에서 유도된다.
+- `.venv` focused evidence inventory 시험 4 passed, `check_docs.py` 및 `check_ontology.py` exit 0, 관련 checker `py_compile` exit 0. Docker/Go/PostgreSQL acceptance와 hosted CI는 실행하지 않았다. 작성자 검증만 완료, independent review/CI 미완. 상세 조사 범위·후보별 촉발점·한계는 [[2026-09-21_하드코딩_변경연동값_감사_Codex]].
+- 다음: 최종 SHA에서 checks 재실행 → integration 반영 후 same-SHA review/CI. 그리고 migration 지원 prior를 새로 공개할 때 curated matrix를 확인한다.
 
 ## 2026-09-21 CI 검사 배선, issuer 쿼터 경계, Node 응답 계약
 

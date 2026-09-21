@@ -25,11 +25,23 @@ for graph in [schema,data]:
                 assert term in defined, f'Undefined project term: {term}'
 ok,_,report=validate(data,shacl_graph=shapes,ont_graph=schema,inference='rdfs')
 assert ok, report
-expected={'ownership.rq':48,'dataset-locality.rq':1,'model-lineage.rq':1,'retry-fencing.rq':1}
+registry=json.loads((root/'docs/task-registry.json').read_text('utf-8'))
+tasks=registry['tasks']
+# ownership.rq returns one row per task/outcome edge. Derive that cardinality
+# from the registry, the source of truth for those edges, instead of copying
+# today's count here. The edge set itself is checked below for each task.
+expected={
+    'ownership.rq':sum(len(task['outcome_ids']) for task in tasks),
+    # These are intentional semantic fixture invariants: each example query
+    # currently has exactly one demonstrated result, and a changed example
+    # should require an explicit review of that fixture.
+    'dataset-locality.rq':1,
+    'model-lineage.rq':1,
+    'retry-fencing.rq':1,
+}
 for filename,count in expected.items():
     results=list((schema+data).query((folder/'queries'/filename).read_text('utf-8')))
     assert len(results)==count, f'{filename}: expected {count}, got {len(results)}'
-registry=json.loads((root/'docs/task-registry.json').read_text('utf-8'))
 assert len(list(data.subjects(RDF.type,dev.DevelopmentTask)))==len(registry['tasks'])
 for task in registry['tasks']:
     node=res[task['task_id']]
@@ -37,6 +49,7 @@ for task in registry['tasks']:
     assert (node,dev.reviewedBy,res['agent-'+task['reviewer']]) in data
     assert (node,sv.status,Literal(task['status'])) in data
     assert set(data.objects(node,dev.dependsOn))=={res[d] for d in task['depends_on']}
+    assert set(data.objects(node,dev.realizes))=={res[o] for o in task['outcome_ids']}
 for test in ['missing_owner','self_review','succeeded_without_evidence','ready_without_checksum']:
     bad=Graph()
     for triple in data: bad.add(triple)

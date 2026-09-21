@@ -29,6 +29,10 @@ def main():
     from migration_graph import chain
 
     expected_head = chain()[-1].revision
+    # These are curated published starting states whose data-preservation paths
+    # matter. They are intentionally not every historical Alembic node: adding
+    # a migration does not make it a supported external starting state by itself.
+    # Extend this matrix when a new prior schema state is published for upgrade.
     priors = (
         "0018_workspace_resume",
         "0010_canonical_resource_units",
