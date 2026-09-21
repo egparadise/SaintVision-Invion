@@ -294,6 +294,30 @@ def test_discovery_issuer_is_a_separate_nonlogin_role_with_scoped_table_privileg
     assert "token_sha256 = nullif(current_setting('inv.discovery_token_sha256',true),'')" in rendered_sql
 
 
+def test_discovery_issuer_budget_is_database_enforced_and_audited(rendered_sql):
+    assert "CREATE TABLE discovery_credential_issue_budgets" in rendered_sql
+    assert re.search(
+        r"CREATE FUNCTION consume_discovery_issue_budget\(p_tenant_id uuid\).*?"
+        r"SECURITY DEFINER.*?SET search_path = pg_catalog, public.*?"
+        r"IF used > 10 THEN.*?ERRCODE = 'P0001'",
+        rendered_sql,
+        re.IGNORECASE | re.DOTALL,
+    )
+    assert "issue_timestamps timestamptz[] NOT NULL" in rendered_sql
+    assert "REVOKE ALL ON FUNCTION consume_discovery_issue_budget(uuid) FROM PUBLIC" in rendered_sql
+    assert "GRANT EXECUTE ON FUNCTION consume_discovery_issue_budget(uuid) TO inv_discovery_issuer" in rendered_sql
+    assert "REVOKE ALL ON FUNCTION enforce_discovery_issuer_budget() FROM PUBLIC" in rendered_sql
+    assert "CREATE TRIGGER tr_discovery_issuer_budget" in rendered_sql
+    assert "CREATE ROLE inv_discovery_issuer_guard NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE" in rendered_sql
+    assert "inv_discovery_issuer_guard has members; refusing budget-function ownership" in rendered_sql
+    assert "ALTER FUNCTION consume_discovery_issue_budget(uuid) OWNER TO inv_discovery_issuer_guard" in rendered_sql
+    assert "IF current_user = 'inv_discovery_issuer' THEN" in rendered_sql
+    assert "IF NEW.issued_by <> session_user THEN" in rendered_sql
+    assert "pg_has_role(session_user, 'inv_discovery_issuer', 'MEMBER')" in rendered_sql
+    assert "interval '24 hours'" in rendered_sql
+    assert "'issuer_role_insert', NEW.issued_at" in rendered_sql
+
+
 # --------------------------------------------------------------------------
 # The chain itself, read from source
 # --------------------------------------------------------------------------

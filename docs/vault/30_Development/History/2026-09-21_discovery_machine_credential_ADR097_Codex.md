@@ -1,11 +1,11 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-IMPLEMENTATION-CODEX-001"
 title: "ADR-097 discovery credential issuer implementation and verification"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "pending"
-updated: "2026-09-21T21:14:00+09:00"
+updated: "2026-09-21T21:46:00+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "security", "evidence"]
 ---
@@ -35,6 +35,16 @@ tags: ["discovery", "credential", "security", "evidence"]
 이 E2E는 실제 PostgreSQL과 FastAPI HTTP TestClient를 통과했지만 실제 `inv-discover` executable, 조직이 승인한 보호 전달 채널, 물리 Node 환경변수 주입, human-operated approval UI, one-time enrollment exchange, node mTLS까지 실행한 것은 아니다. `go` compiler가 이 호스트에서 제공되지 않아 Go build/test는 실행할 수 없었다. 따라서 issue-to-HTTP-announcement 기능 경로는 복구됐으나 실제 노드 전체 온보딩 운영 인수는 미완료다. 승인된 조직 전달 채널을 운영자가 확보하지 못하면 새 노드는 계속 차단된다.
 
 Node operator instructions: `[[Codex Node와 저장소 Adapter 실행 안내]]`. Decision record: `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]`.
+
+## Issuer quota decision and validation boundary (2026-09-21)
+
+An unlimited operator issuer can still consume the tenant's 500-candidate capacity by using distinct installation IDs. Operator trust changes the threat actor but does not remove accidental bulk issuance or a compromised issuer login. A tenant-scoped throttle is therefore warranted. The current migration source enforces at most 10 issuer-role inserts per tenant in a rolling 24-hour period. A SECURITY INVOKER trigger checks the actual SQL role and actor/session match, records metadata, and calls a fixed-search-path SECURITY DEFINER budget helper. The helper owner is a NOLOGIN guard role with only budget-table privileges; no login is a member. The helper atomically prunes/adds tenant issue timestamps and refuses the 11th insert. The CLI maps the trigger's stable SQLSTATE to a redacted refusal. Direct SQL under the issuer role is intended to be subject to the same trigger. This slows burst exhaustion but does not prevent a persistent authorized operator from reaching 500 candidates over multiple days; operator membership remains narrow and queue monitoring is still required.
+
+An earlier DB run caught that a SECURITY DEFINER trigger treated a superuser test login as an issuer and wrongly blocked service inserts. The final design uses a SECURITY INVOKER trigger plus a restricted NOLOGIN budget-helper owner. On 2026-09-21 at approximately 21:41 KST, at integration SHA `c08967c772037ff8bf480f5b4cd718a6ec922de5` with the quota changes uncommitted in the worktree, the full integration file passed against a fresh PostgreSQL 16 container: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`, exit 0, 4 passed/7 warnings. The run covered the 10 allowed issues, CLI refusal of issue 11, direct issuer-role SQL refusal, and persisted credential/audit/budget counts of 10. Only an owned, randomly named/labeled container was used (768 MiB cap, tmpfs data, loopback-only random port); its label/name-filtered inventory was empty after cleanup and Docker returned to 48 containers.
+
+At approximately 21:43 KST, the SQL threshold was temporarily mutated from 10 to 100 and the budget test was run against another owned PostgreSQL 16 container. It failed at the expected `CLI must refuse the 11th tenant issuance` assertion (exit 1), proving the test detects a disabled/effectively bypassed quota. The source was restored byte-for-byte; the container was removed and its owned inventory returned zero. The clean-threshold rerun above then passed. Before that final successful run, low-memory preflights correctly declined to start containers; those attempts are not test failures. Latest focused unit/migration/contract run used the project Python and passed 39 tests; `check_docs.py`, `check_ontology.py`, and `git diff --check` passed. This is PostgreSQL-backed validation of the final quota SQL, not CI or physical-node acceptance.
+
+Exact final wrapped-run provenance: 2026-09-21 21:47:26 KST, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-terminal-pty-contract`, branch `agent/codex/terminal-pty-contract`, HEAD/integration SHA `c08967c772037ff8bf480f5b4cd718a6ec922de5`, dirty tree (quota source/tests/docs intentionally uncommitted at that instant), `.venv/Scripts/python.exe` 3.14.6, Node v24.17.0, Windows 11, PostgreSQL DSN set for the test invocation, Docker present, Go absent. Command: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe tools/provenance.py -- C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`; wrapper exit 0; child exit 0, 4 passed/7 warnings in 6.80s. The provenance wrapper's default executor field reported Windows account `egpar`; the command was launched by Codex in this session. The wrapper confirms this was the same source tree as integration before the quota delta was committed, not a clean fixed-SHA build.
 
 ## Post-run harness redaction correction (2026-09-21 21:04 KST)
 

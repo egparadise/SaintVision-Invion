@@ -26,7 +26,24 @@ def upgrade():
         RAISE EXCEPTION 'inv_discovery_issuer already has members; review membership before migration';
       END IF;
     END $$;
+    DO $$ BEGIN
+      CREATE ROLE inv_discovery_issuer_guard NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+        NOINHERIT NOBYPASSRLS;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END $$;
+    ALTER ROLE inv_discovery_issuer_guard NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
+      NOINHERIT NOBYPASSRLS;
+    DO $$ BEGIN
+      IF EXISTS (
+        SELECT 1 FROM pg_auth_members m
+        JOIN pg_roles granted_role ON granted_role.oid = m.roleid
+        WHERE granted_role.rolname = 'inv_discovery_issuer_guard'
+      ) THEN
+        RAISE EXCEPTION 'inv_discovery_issuer_guard has members; refusing budget-function ownership';
+      END IF;
+    END $$;
     GRANT USAGE ON SCHEMA public TO inv_discovery_issuer;
+    GRANT USAGE, CREATE ON SCHEMA public TO inv_discovery_issuer_guard;
     GRANT SELECT(tenant_id) ON public.tenants TO inv_discovery_issuer;
 
     CREATE TABLE discovery_machine_credentials (
@@ -104,6 +121,86 @@ def upgrade():
       inv_discovery_issuer;
     GRANT SELECT, INSERT ON discovery_credential_events TO inv_app;
     GRANT INSERT ON discovery_credential_events TO inv_discovery_issuer;
+    CREATE TABLE discovery_credential_issue_budgets (
+      tenant_id uuid PRIMARY KEY REFERENCES tenants(tenant_id),
+      issue_timestamps timestamptz[] NOT NULL
+    );
+    REVOKE ALL ON discovery_credential_issue_budgets FROM PUBLIC, inv_app, inv_kernel,
+      inv_discovery_issuer, inv_discovery_issuer_guard;
+    GRANT SELECT (tenant_id, issue_timestamps), INSERT
+      ON discovery_credential_issue_budgets TO inv_discovery_issuer_guard;
+    GRANT UPDATE (issue_timestamps)
+      ON discovery_credential_issue_budgets TO inv_discovery_issuer_guard;
+
+    CREATE FUNCTION consume_discovery_issue_budget(p_tenant_id uuid)
+    RETURNS integer
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path = pg_catalog, public
+    AS $$
+    DECLARE used integer;
+    BEGIN
+      IF NOT pg_has_role(session_user, 'inv_discovery_issuer', 'MEMBER') THEN
+        RAISE EXCEPTION 'not an authorized discovery issuer'
+          USING ERRCODE = '42501';
+      END IF;
+      INSERT INTO public.discovery_credential_issue_budgets
+        (tenant_id, issue_timestamps)
+      VALUES (p_tenant_id, ARRAY[clock_timestamp()])
+      ON CONFLICT (tenant_id) DO UPDATE SET
+        issue_timestamps = array_append(
+          ARRAY(
+            SELECT recent.stamp
+            FROM unnest(public.discovery_credential_issue_budgets.issue_timestamps) AS recent(stamp)
+            WHERE recent.stamp >= clock_timestamp() - interval '24 hours'
+            ORDER BY recent.stamp
+          ),
+          clock_timestamp()
+        )
+      RETURNING cardinality(issue_timestamps) INTO used;
+      IF used > 10 THEN
+        RAISE EXCEPTION 'tenant discovery issuance limit reached'
+          USING ERRCODE = 'P0001';
+      END IF;
+      RETURN used;
+    END
+    $$;
+    GRANT inv_discovery_issuer_guard TO CURRENT_USER;
+    ALTER FUNCTION consume_discovery_issue_budget(uuid) OWNER TO inv_discovery_issuer_guard;
+    REVOKE CREATE ON SCHEMA public FROM inv_discovery_issuer_guard;
+    REVOKE inv_discovery_issuer_guard FROM CURRENT_USER;
+    REVOKE ALL ON FUNCTION consume_discovery_issue_budget(uuid) FROM PUBLIC;
+    GRANT EXECUTE ON FUNCTION consume_discovery_issue_budget(uuid) TO inv_discovery_issuer;
+
+    -- Enforce the budget for every issuer-role INSERT, including direct SQL.
+    -- Invoker identity distinguishes an operator SET ROLE from service inserts.
+    CREATE FUNCTION enforce_discovery_issuer_budget()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    SET search_path = pg_catalog, public
+    AS $$
+    BEGIN
+      IF current_user = 'inv_discovery_issuer' THEN
+        IF NEW.issued_by <> session_user THEN
+          RAISE EXCEPTION 'issuer actor must match the database login'
+            USING ERRCODE = '42501';
+        END IF;
+        PERFORM public.consume_discovery_issue_budget(NEW.tenant_id);
+        INSERT INTO public.discovery_credential_events
+          (event_id, tenant_id, credential_id, installation_id, actor,
+           event_type, outcome, reason_code, occurred_at)
+        VALUES
+          (gen_random_uuid(), NEW.tenant_id, NEW.credential_id,
+           NEW.installation_id, NEW.issued_by, 'issued', 'allow',
+           'issuer_role_insert', NEW.issued_at);
+      END IF;
+      RETURN NEW;
+    END
+    $$;
+    CREATE TRIGGER tr_discovery_issuer_budget
+      BEFORE INSERT ON discovery_machine_credentials
+      FOR EACH ROW EXECUTE FUNCTION enforce_discovery_issuer_budget();
+    REVOKE ALL ON FUNCTION enforce_discovery_issuer_budget() FROM PUBLIC;
     """)
 
 

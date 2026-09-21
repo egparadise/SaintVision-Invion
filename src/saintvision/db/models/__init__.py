@@ -31,7 +31,11 @@ from .discovery import (
     ResourcePool,
     ResourcePoolMember,
 )
-from .discovery_credentials import DiscoveryCredentialEvent, DiscoveryMachineCredential
+from .discovery_credentials import (
+    DiscoveryCredentialEvent,
+    DiscoveryMachineCredential,
+    DiscoveryCredentialIssueBudget,
+)
 from .evaluation import (
     EVAL_CATEGORIES,
     EVAL_OUTCOMES,

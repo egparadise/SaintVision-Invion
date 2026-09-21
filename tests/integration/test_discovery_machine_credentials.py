@@ -353,3 +353,107 @@ def test_cli_requires_explicit_database_issuer_membership(
     finally:
         with owner_engine.begin() as connection:
             connection.exec_driver_sql(f'DROP ROLE "{login}"')
+
+
+def test_discovery_issuer_budget_blocks_cli_and_direct_sql_beyond_ten_per_tenant(
+    owner_engine, database_url, two_tenants
+):
+    import psycopg
+
+    from tools import discovery_credential
+    from saintvision.services.discovery_credentials import new_secret
+
+    tenant, _ = two_tenants
+    login = "dcr_budget_" + uuid4().hex[:16]
+    password = secrets.token_hex(32)
+    with owner_engine.begin() as connection:
+        connection.exec_driver_sql(
+            f'CREATE ROLE "{login}" LOGIN NOSUPERUSER NOBYPASSRLS '
+            f"NOCREATEDB NOCREATEROLE NOREPLICATION NOINHERIT PASSWORD '{password}'"
+        )
+        connection.exec_driver_sql(f'GRANT inv_discovery_issuer TO "{login}"')
+    dsn = make_url(database_url).set(
+        drivername="postgresql", username=login, password=password
+    ).render_as_string(hide_password=False)
+    environment = {discovery_credential.ISSUER_DSN_ENV: dsn}
+    try:
+        for index in range(10):
+            output, error = Tty(), io.StringIO()
+            result = discovery_credential.run(
+                [
+                    "issue", "--tenant", str(tenant),
+                    "--installation", f"budget-install-{index}", "--apply",
+                ],
+                environ=environment,
+                output=output,
+                error=error,
+            )
+            if result != discovery_credential.EXIT_OK:
+                pytest.fail("issuer budget rejected an issuance below its limit", pytrace=False)
+            if error.getvalue():
+                pytest.fail("successful issuance wrote diagnostics", pytrace=False)
+            if len([line for line in output.getvalue().splitlines() if line.startswith("dsc1_")]) != 1:
+                pytest.fail("successful issuance must reveal one bearer", pytrace=False)
+
+        blocked_output, blocked_error = Tty(), io.StringIO()
+        blocked = discovery_credential.run(
+            ["issue", "--tenant", str(tenant), "--installation", "budget-overflow", "--apply"],
+            environ=environment,
+            output=blocked_output,
+            error=blocked_error,
+        )
+        if blocked != discovery_credential.EXIT_REFUSED:
+            pytest.fail("CLI must refuse the 11th tenant issuance", pytrace=False)
+        if blocked_error.getvalue() != (
+            "REFUSED tenant discovery issuance limit reached (10 per rolling 24 hours)\n"
+        ):
+            pytest.fail("quota refusal must report only its stable non-secret reason", pytrace=False)
+        _require_secret_absent("dsc1_", blocked_output.getvalue(), "quota refusal revealed a bearer")
+
+        # The DB trigger must also stop an issuer-role SQL client that bypasses
+        # the CLI, and leave both the credential and audit count at the limit.
+        raw_token = new_secret()
+        try:
+            with psycopg.connect(dsn) as connection:
+                connection.execute("SET ROLE inv_discovery_issuer")
+                connection.execute(
+                    "INSERT INTO discovery_machine_credentials "
+                    "(credential_id, tenant_id, installation_id, scope, token_sha256, issued_by, "
+                    "issued_at, expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (
+                        new_id("discovery_credential"), tenant, "direct-sql-overflow",
+                        "discovery:announce", token_sha256(raw_token), login,
+                        datetime.now(timezone.utc), datetime.now(timezone.utc) + timedelta(minutes=15),
+                    ),
+                )
+        except psycopg.Error as exc:
+            if exc.sqlstate != "P0001":
+                pytest.fail("direct SQL was not rejected by the quota trigger", pytrace=False)
+        else:
+            pytest.fail("direct SQL bypassed the tenant issuance budget", pytrace=False)
+        _require_secret_absent(raw_token, blocked_error.getvalue(), "raw test bearer appeared in diagnostics")
+
+        with owner_engine.connect() as connection:
+            issued_count = connection.execute(
+                text(
+                    "SELECT count(*) FROM discovery_machine_credentials "
+                    "WHERE tenant_id=:tenant AND issued_by=:actor"
+                ),
+                {"tenant": tenant, "actor": login},
+            ).scalar_one()
+            event_count = connection.execute(
+                text(
+                    "SELECT count(*) FROM discovery_credential_events "
+                    "WHERE tenant_id=:tenant AND actor=:actor AND event_type='issued'"
+                ),
+                {"tenant": tenant, "actor": login},
+            ).scalar_one()
+            budget_count = connection.execute(
+                text("SELECT cardinality(issue_timestamps) FROM discovery_credential_issue_budgets WHERE tenant_id=:tenant"),
+                {"tenant": tenant},
+            ).scalar_one()
+        assert issued_count == event_count == budget_count == 10
+    finally:
+        with owner_engine.begin() as connection:
+            connection.exec_driver_sql(f'REVOKE inv_discovery_issuer FROM "{login}"')
+            connection.exec_driver_sql(f'DROP ROLE "{login}"')

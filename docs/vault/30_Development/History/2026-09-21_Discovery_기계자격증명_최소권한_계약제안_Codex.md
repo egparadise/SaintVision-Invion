@@ -1,23 +1,23 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-ADR-001"
 title: "Discovery machine credential least-privilege contract"
-version: "1.1.0"
+version: "1.1.1"
 status: "accepted"
 author: "Codex"
 reviewer: "pending"
 mapped_at_sha: "462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e"
-updated: "2026-09-21T21:02:00+09:00"
+updated: "2026-09-21T21:46:00+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "tenant", "bootstrap", "security"]
 ---
 
 # ADR-097: tenant-bound discovery credential
 
-**Status:** Accepted for the interim operator-CLI path. Implementation is present in this branch; real Node binary/physical-node onboarding and protected delivery-channel acceptance remain unverified.
+**Status:** Accepted for the interim operator-CLI path. CLI issuance is in integration; the rolling issuance quota is PostgreSQL-tested in this branch and pending its follow-up commit/integration. Real Node binary/physical-node onboarding and protected delivery-channel acceptance remain unverified.
 **Date:** 2026-09-21 KST
 **Decision:** The user approved an operator CLI as the temporary credential issuer. Operators bind a credential to one tenant and installation, then inject it through an approved protected delivery path. Issuance authority remains with designated operators. A future protected tenant-operator API is an open long-term decision; this acceptance does not choose it.
 **Deciders:** User (operational path decision); Codex (security/contract implementation); designated Identity/operations owners (operator account and delivery-channel operation)
-**Base:** branch `agent/codex/terminal-pty-contract`, anchor commit `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`
+**Base:** branch `agent/codex/terminal-pty-contract`, operator CLI anchor `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`; current integration `c08967c772037ff8bf480f5b4cd718a6ec922de5`
 
 ## Decision
 
@@ -69,7 +69,7 @@ This credential is not node mTLS identity, the later one-time enrollment token, 
 - The announcement route has a dedicated discovery-only verifier branch; it does not pass this credential through `get_principal`. Ordinary protected routes continue to use their own user/node authentication. If carried in `Authorization: Bearer`, shared proxy/access logs must redact that header.
 - It cannot list candidates, admit/decline them, mint enrollment tokens, enroll Nodes, read tenant/project data, create workloads, request PTY tickets, or call other user APIs. Other endpoints continue to require their own OIDC principal or enrolled-node mTLS contract; the discovery secret must not be accepted as a `Principal`.
 - A stolen credential can create or refresh the one linked candidate and lie in that candidate's self-reported fields until expiry/revocation. It cannot create multiple candidates or refresh arbitrary installations. The human admission step must verify the expected installation out of band; a candidate is not proof of machine identity. This residual spoof/substitution risk must be visible to the admitting operator.
-- The server enforces one announcement per credential per 30 seconds. A configurable issuance-count rate limit per tenant/operator is not implemented; one active grant per tenant/installation and explicit operator DB-role membership are the current controls. Add a rate limit before broadening issuer membership. Never log the raw secret or put it in argv, URL, error, evidence, or database plaintext.
+- The server enforces one announcement per credential per 30 seconds. Because an issuer can choose many installation IDs, unlimited credential issuance could still fill a tenant's 500-candidate allowance, even though each bearer is tenant/install-bound. The DB trigger now allows at most 10 issuer-role credential inserts per tenant in any rolling 24 hours, atomically across concurrent CLI/direct-SQL writers. This limits operator mistakes and burst compromise; it does not stop a persistent authorized issuer from reaching the 500-candidate ceiling over multiple days. Keep issuer membership narrow and monitor the audit/candidate queues. Never log the raw secret or put it in argv, URL, error, evidence, or database plaintext.
 
 ### Secret format, expiry, and use
 
@@ -108,7 +108,7 @@ The temporary route is operator CLI issuance and protected out-of-band delivery 
 3. **Expiry/use (decided):** 15-minute grant, one linked candidate, 30-second minimum interval; no long-lived renewal.
 4. **Rotation (decided):** operator re-issue atomically revokes the previous grant for that tenant/installation.
 5. **Revocation (decided):** durable `revoked_at`; explicit operator revoke and admission/decline revoke linked credentials.
-6. **Audit (decided):** append-only metadata events for issue, revoke, accepted refresh, admission and denial; raw bearer is excluded. Per-operator issuance rate cap remains a follow-up.
+6. **Audit and issuance budget (decided):** append-only metadata events for issue, revoke, accepted refresh, admission and denial; raw bearer is excluded. The database enforces 10 issuer-role issues per tenant per rolling 24 hours, including inserts that bypass the CLI. This is burst control, not a complete defense against sustained abuse; raising the limit requires a reviewed operational decision.
 7. **Issuer:** accepted interim choice is operator CLI using explicit membership in the dedicated `inv_discovery_issuer` DB role. A protected tenant-operator API remains open as the long-term option. A normal project-member role or workstation access alone is insufficient.
 8. **Delivery:** existing approved secret manager/service injection if Identity/operations confirms one, otherwise a narrowly controlled out-of-band handoff. The repository currently proves neither channel exists.
 9. **Temporary anonymous endpoint:** not recommended and not included. The existing tenant-spoofing/candidate-cap attack would return.
@@ -119,8 +119,9 @@ The temporary route is operator CLI issuance and protected out-of-band delivery 
 - Mutation controls prove removing each tenant/scope/use/expiry check makes its corresponding test fail.
 - A matching bearer can refresh only its linked candidate. An HTTP attempt to list candidates with that same discovery bearer is 403; exhaustive probing of every other API route was not part of this run.
 - Issuer authorization, token secrecy, API first announcement, candidate admission, automatic and explicit revocation, expiry, and safe audit metadata are exercised against a disposable PostgreSQL and the FastAPI HTTP boundary. Unit guard-removal controls also prove tenant, expiry, and revocation checks.
+- Issuance-budget integration exhausts 10 tenant issues, verifies the 11th CLI request is refused without revealing a secret, then attempts a direct issuer-role SQL insert and confirms the database trigger refuses it with no extra credential/audit/budget row. This closes the CLI-bypass path. A persistent authorized issuer can still add up to 10 per tenant per 24 hours and eventually hit the candidate ceiling.
 - Not yet evidenced: actual `inv-discover` binary execution, physical Node service secret injection through the organization's approved protected channel, one-time enrollment exchange on a real Node, and enrolled-node mTLS. Therefore the protocol/CLI implementation is ready for controlled operator testing, but real-node onboarding is not yet declared operationally restored.
 
 ## Current implementation evidence and limitations
 
-Implementation in this branch adds migration `0045_discovery_machine_cred`, the `inv_discovery_issuer` role, issuer CLI, digest-only credential/event tables, scoped announcement verification, rotation, explicit revocation, and admission/decline revocation. Disposable PostgreSQL HTTP integration exercises CLI dry-run/issue/revoke, successful first announcement and refresh, admission revocation, explicit revocation, cross-tenant/install/expiry denial, and no-candidate-on-denial. The Python guard suite was mutation-tested by removing tenant, expiry, and revocation checks separately; each corresponding test failed, then the source was restored. Go compilation/runtime and physical Node onboarding were not run because Go is unavailable on this development host. No production credential was issued.
+Implementation in this branch adds migration `0045_discovery_machine_cred`, the `inv_discovery_issuer` role, issuer CLI, digest-only credential/event tables, a DB-enforced per-tenant rolling issue budget, scoped announcement verification, rotation, explicit revocation, and admission/decline revocation. Disposable PostgreSQL HTTP integration exercises CLI dry-run/issue/revoke, successful first announcement and refresh, admission revocation, explicit revocation, cross-tenant/install/expiry denial, budget exhaustion, direct-SQL denial, and no-candidate-on-denial. The Python guard suite was mutation-tested by removing tenant, expiry, and revocation checks separately; each corresponding test failed, then the source was restored. Go compilation/runtime and physical Node onboarding were not run because Go is unavailable on this development host. No production credential was issued.

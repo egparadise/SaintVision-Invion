@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import uuid
 
-from sqlalchemy import CheckConstraint, Index, String, text
+from sqlalchemy import ARRAY, CheckConstraint, DateTime, Index, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -68,3 +69,14 @@ class DiscoveryCredentialEvent(Base):
     outcome: Mapped[str] = mapped_column(String(8))
     reason_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
     occurred_at: Mapped[Utc] = mapped_column(server_default=text("clock_timestamp()"))
+
+
+class DiscoveryCredentialIssueBudget(Base):
+    """Internal tenant-scoped rolling issue window; mutated by the DB trigger."""
+
+    __tablename__ = "discovery_credential_issue_budgets"
+
+    tenant_id: Mapped[TenantId] = mapped_column(primary_key=True)
+    issue_timestamps: Mapped[list[dt.datetime]] = mapped_column(
+        ARRAY(DateTime(timezone=True))
+    )

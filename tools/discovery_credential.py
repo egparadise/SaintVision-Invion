@@ -135,17 +135,6 @@ def _issue(conn, *, tenant, installation, actor, secret, now):
             last_announcement_at,
         ),
     )
-    _event(
-        conn,
-        tenant=tenant,
-        credential=credential_id,
-        installation=installation,
-        actor=actor,
-        kind="issued",
-        outcome="allow",
-        reason="operator_cli",
-        now=now,
-    )
     return credential_id, expires
 
 
@@ -259,6 +248,9 @@ def run(argv=None, *, environ=None, connect=None, output=None, error=None) -> in
 
             if isinstance(exc, psycopg.Error):
                 state = getattr(exc, "sqlstate", None)
+                if state == "P0001":
+                    error.write("REFUSED tenant discovery issuance limit reached (10 per rolling 24 hours)\n")
+                    return EXIT_REFUSED
                 state = state if isinstance(state, str) and re.fullmatch(r"[0-9A-Z]{5}", state) else "unknown"
                 error.write(f"DATABASE ERROR sqlstate={state}\n")
                 return EXIT_DATABASE

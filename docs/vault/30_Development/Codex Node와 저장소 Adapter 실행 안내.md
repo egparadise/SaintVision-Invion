@@ -32,6 +32,8 @@ python tools/discovery_credential.py issue --tenant <tenant-uuid> --installation
 python tools/discovery_credential.py issue --tenant <tenant-uuid> --installation <stable-installation-id> --apply
 ```
 
+The database limits issuer-role issuance to **10 credentials per tenant in any rolling 24-hour period**. Re-issues count too, even when they rotate an earlier grant. The limit is enforced by a database trigger, so direct SQL cannot bypass it; after the limit is reached, wait until an earlier issue leaves the 24-hour window. This controls accidental/burst flooding but does not prevent a persistent authorized operator from accumulating candidates across multiple days. Keep issuer-role membership restricted and review the candidate queue.
+
 CLI는 DB commit 뒤 bearer를 stdout에 한 번만 보여주며, 발급 레코드에는 SHA-256 digest만 저장한다. 화면 공유·터미널 녹화·로그 수집을 끄고 즉시 승인된 보호 전달 경로로 옮긴다. 원문을 티켓, 채팅, 셸 인자, 캡처 또는 보고서에 복사하지 않는다. CLI 출력의 비밀은 다시 조회할 수 없으므로 잃어버리면 같은 설치 ID로 재발급한다. 재발급은 이전 미폐기 자격증명을 먼저 폐기한다.
 
 Node 서비스의 보호된 환경 주입 경로에 `INV_DISCOVERY_BEARER_TOKEN`을 설정하고 실제 endpoint, CA, 비밀이 아닌 tenant UUID와 installation ID를 지정한다. 새 자격증명은 `inv-discover`가 읽는 기존 환경변수 계약을 사용한다.

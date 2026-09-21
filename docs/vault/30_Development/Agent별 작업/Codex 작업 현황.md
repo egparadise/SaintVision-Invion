@@ -1,22 +1,31 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.123"
+version: "1.0.124"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T21:14:00+09:00"
+updated: "2026-09-21T21:46:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
+## 2026-09-21 ADR-097 issuer quota follow-up
+
+- User's interim operator-CLI issuance decision and Claude review of commit `a533b4b` are now present at integration SHA `c08967c772037ff8bf480f5b4cd718a6ec922de5` (fast-forward push confirmed). This is the CLI/review baseline; the following quota hardening remains a separate uncommitted change until its commit is created.
+- Decision: the trusted issuer can still use distinct installation IDs to cause up to 500 open candidates. DBA-granted membership and audit reduce the actor set but do not prevent repeated operator error or a compromised issuer login. Adopt DB-enforced tenant limit 10 issuer-role issues per rolling 24h. It slows burst exhaustion but a persistent authorized issuer can still reach the cap over multiple days.
+- Final rolling-window SQL was exercised on a newly owned PostgreSQL 16 container at integration base SHA `c08967c...`: full integration file 4 passed/7 warnings, exit 0, including ten issues, CLI refusal on issue 11, direct SQL refusal, and credential/audit/budget cardinality all 10. A threshold 10→100 mutation caused the quota test to fail at the expected issue-11 refusal assertion (1 failed/exit 1); source restored byte-for-byte and clean-threshold rerun passed. Containers were owned by exact name+label and removed; Docker returned to 48 containers.
+- Project interpreter: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` (3.14.6). Core/migration/response-contract tests: 39 passed/2 warnings. `check_docs.py`, `check_ontology.py`, and `git diff --check` exit 0. The final SQL test is a local PostgreSQL result, not CI or physical Node acceptance.
+- Next: commit only the quota/migration/test/docs delta, push the branch, and fast-forward integration after another fetch; run focused migration checks on integration SHA. Go binary/physical-node onboarding and the organization's protected delivery channel remain operationally unverified. The long-term protected issuer API remains an open decision.
+
 ## 2026-09-21 ADR-097 운영자 CLI 임시 발급 경로
 
 - 사용자 결정으로 ADR-097을 Accepted로 올려, 운영자 CLI가 tenant+installation 결속 `discovery:announce` 자격증명을 임시 발급하도록 구현했다. `inv_discovery_issuer`는 NOLOGIN 최소 권한 DB role이며, 지정된 운영자 로그인만 DBA가 멤버로 부여한다. 원문은 commit 뒤 interactive stdout에서 한 번만 보이고 DB/audit에는 SHA-256 digest와 비밀 아닌 메타데이터만 남긴다. 15분 만료, 30초 공지 간격, 재발급 회전 폐기, 명시 폐기와 승인/거절 시 자동 폐기를 구현했다. 승인된 보호 전달 채널의 실제 이름/설정은 저장소에서 확인되지 않아 운영 전제다.
+- 발급 권한이 있는 운영자의 실수/계정 탈취도 tenant 후보 500건 한도를 소진할 수 있으므로, DB 트리거에서 tenant별 rolling 24시간 최대 10회로 제한했다. 동시 issuer 세션과 직접 SQL도 DB 경계에서 제한되고 감사된다. 이 제한은 burst 억제이지 장기 악용 방지는 아니므로 500 후보 한도는 여전히 별도 hard stop이며 발급자 수를 좁게 유지하고 후보 큐를 감시해야 한다.
 - PostgreSQL 16 임시 Docker 컨테이너(768 MiB 제한, tmpfs DB, 고유 Codex 라벨)로 CLI 발급→실제 FastAPI 공지 및 linked-candidate 갱신→admission 자동 폐기→명시적 폐기와 403을 실행 확인했다. 일반 후보 조회 API에 동일 discovery bearer를 보내면 403이며, 타 tenant·잘못된 설치 ID·만료·폐기는 HTTP 403/no candidate였다. issuer 멤버십이 없는 실제 PostgreSQL login은 거부됐고 자격증명 row는 생성되지 않았다. tenant/expiry/revocation 각 가드를 단독 제거한 변형은 각각 targeted unit test를 실패시킨 뒤 복구했다.
-- 최종 명령 `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`; 2026-09-21 21:00:30 KST, 기준 SHA `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`, Python 3.14.6, Docker present/Go absent, test-only PostgreSQL DSN set, exit 0, 3 passed/7 warnings. 실행 전 가용 RAM 1,412,576 KiB, Docker Server 20.10.22; 소유 컨테이너 `sv-discovery-adr097-b14efe7dfd02`는 제거 후 inspect 부재로 확인했다. 실제 `inv-discover` 바이너리/물리 Node 발급-공지-enrollment-mTLS는 Go compiler 부재로 미실행이다. 승인된 조직 전달 채널도 저장소에서 특정되지 않아 미확인이다. 따라서 CLI→HTTP API E2E는 확인됐고 운영 Node onboarding 전체는 아직 인수되지 않았다.
+- quota의 초기 DB 구현은 PostgreSQL에서 4 integration tests 통과(10건 허용, 11번째 CLI와 직접 issuer-role SQL 거부, counts=10)했다. 이후 코드를 더 엄격한 rolling 24h timestamp 배열 및 멤버 없는 NOLOGIN guard function owner로 강화했다. 이 최신 migration은 아직 DB에서 실행하지 않았다. 마지막 RAM은 918,116 KiB(<1 GiB 안전 바닥)라 컨테이너를 띄우지 않았고, 최신 소스 기반 focused/migration 39 tests는 통과했다. 따라서 현재 quota migration의 DB runtime은 미검증으로 분리한다. 실제 `inv-discover` 바이너리/물리 Node 발급-공지-enrollment-mTLS는 Go compiler 부재로 미실행이고 승인된 조직 전달 채널도 확인되지 않았다.
 - Node runbook을 operator role grant, DSN 환경주입, dry-run/issue, one-time secret protected handoff, Node env injection, 후보 수동 확인, admission 자동 폐기, 긴급 revoke까지 이어지게 고쳤다. 장기 protected issuer API는 열린 결정이다. 상세: `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]` 및 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
-- 최종 export에서 Obsidian `sync_obsidian.py --apply`를 수행하고 뒤이은 `--check`는 1439 managed/0 pending/0 conflicts, exit 0이었다. 보호 전달 채널 미지정, 실제 Go Node 바이너리 미빌드/미실행, operator 발급 건수 제한 미구현은 다음 운영/보안 확인으로 남긴다.
+- 최종 export에서 Obsidian `sync_obsidian.py --apply`를 수행하고 뒤이은 `--check`는 1439 managed/0 pending/0 conflicts, exit 0이었다. 보호 전달 채널 미지정, 실제 Go Node 바이너리 미빌드/미실행, quota hardening의 DB runtime 재검증은 남는다.
 - 보안 정정: 첫 실패 테스트의 assertion 출력에 disposable DB 합성 bearer 원문이 노출됐다. 해당 컨테이너 삭제 및 15분 TTL 종료 후, 테스트 코드는 값 없는 실패 메시지를 사용하도록 수정했다. 21:04 KST RAM 645,764 KiB preflight에서는 DB를 띄우지 않았으나, 이후 21:12 KST 1,607,300 KiB에서 출력 보호 변경을 포함한 통합시험을 disposable PostgreSQL로 재실행해 3 passed/7 warnings, exit 0을 확인했다. 고유 컨테이너는 소유 라벨 확인 후 제거 및 inspect 부재까지 확인했다. 자세한 경계 기록은 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
 
 ## 2026-09-21 Codex 계약 서빙 앵커 버킷 감사
