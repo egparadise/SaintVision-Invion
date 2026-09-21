@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.137"
+version: "1.0.138"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T00:18:19+09:00"
+updated: "2026-09-22T00:20:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,7 +13,7 @@ source_of_truth: "Git"
 ## 2026-09-22 고위험 쓰기 응답 결속 및 시각 스큐 규격 현실화
 
 - Claude 위험도 목록 `7d75f810`에서 HIGH 네 경로를 골라 `ProjectCreateResponse`, `DiscoveryAdmissionResponse`, `MemberRoleResultResponse`, `ResourceOfferResultResponse`를 정의하고 해당 POST/PUT 라우트에 FastAPI `response_model`을 붙였다. 실제 service body에서 조건부 `kernelNote`/`kernelReason`, nullable 필드와 types를 확인했으며, role/boolean/numeric/string 출력은 coercion되지 않도록 strict 원시 타입을 쓴다. synthetic fixture 4개와 현재 모델에서 자동 생성된 4개 JSON Schema를 추가했다.
-- 각 라우트 정상 응답, service 반환의 타입 위반 거부(HTTP 500), model fixture 일치, 실제 nullable/비-nullable 경계를 TestClient로 고정했다. 지정 venv의 focused suite 51 passed, 스키마 45개 `--check` 통과. 네 `response_model` 선언을 한꺼번에 제거한 대조는 negative test 4개가 정확히 실패(exit 1)했고 복원 후 다시 통과했다. 후속으로 admission 통합 시험을 서비스 직접 호출에서 실제 FastAPI admission HTTP 요청으로 바꿨고, disposable PostgreSQL 16에서 해당 한 경로가 1 passed임을 확인했다. 네 write response 중 나머지 세 경로는 여전히 mock service 반환 기준이다. 상세 provenance/자원 정리: [[2026-09-22_discovery_admission_write_response_real_pg_Codex]].
+- 각 라우트 정상 응답, service 반환의 타입 위반 거부(HTTP 500), model fixture 일치, 실제 nullable/비-nullable 경계를 TestClient로 고정했다. 지정 venv의 focused suite 51 passed, 스키마 45개 `--check` 통과. 네 `response_model` 선언을 한꺼번에 제거한 대조는 negative test 4개가 정확히 실패(exit 1)했다. 후속 disposable PostgreSQL 16 검증에서 후보 admission과 멤버 역할 변경을 실제 HTTP route/service/DB 응답으로 확인했다(2 passed). 프로젝트 생성과 자원 제공량 변경은 아직 mock service 반환 기준이다. 상세 provenance/자원 정리: [[2026-09-22_discovery_admission_write_response_real_pg_Codex]].
 - 스큐 드리프트는 커널의 5초 런타임 적격성 필터를 유지하고 GOV-ALERT-001 라우팅 알람을 계속 governance-gated로 분리했다. ±5초 실측 보정, 통지 채널과 응답 담당이 미정이라 ERR-DESIGN-007 전체 채택으로 취급하지 않는다. 상세 근거/다음 후보: [[2026-09-22_write_route_response_binding_Codex]].
 - 다음 행동: 현재 통합 SHA에서 별도 reviewer가 PG-backed admission 단계까지 고정 SHA 검토; 이후 MED-HIGH 상태/스토리지/노드 쓰기 경로를 순서대로 측정·결속; 장비 시계 보정과 알람 라우팅 결정은 운영 인수 이후.
 
