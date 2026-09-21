@@ -13,7 +13,7 @@ source_of_truth: "Git"
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 
 - `TerminalTicketInput`/`TerminalTicketResult` 기존 정본을 프런트가 따르도록 공유 요청·응답 fixture와 contract-only `terminalTicket` adapter를 추가했다. `TerminalTicketAuthFrame`을 JSON Schema에 명시하고 WebSocket 입구에서 검증하며, 응답 `websocketPath`는 workspace/session 경로 형식으로 제한한다. 어댑터는 티켓을 URL에 넣지 않고 `inv-terminal-v1` 첫 인증 프레임으로만 내보낸다. `WebTerminal` 화면이나 사용자 흐름은 Codex가 수정하지 않았다.
-- 구현 중 `agent/codex/terminal-pty-contract`, base integration SHA `b49b38d`, 앞선 ProblemDetails/NodeStopReceipt 계약 SHA `2f41851`를 포함했다. 원격 integration이 작업 중 `944d529` 및 `dff6223`까지 전진해 두 tip을 모두 병합했고 현재 후보는 `c073b9c`다. 구현·양방향 변형·현재 tip 검증을 마친 뒤 이 후보를 integration에 fast-forward push한다. Claude 독립 리뷰는 착지를 막지 않고 해당 integration SHA를 대상으로 후속한다.
+- `agent/codex/terminal-pty-contract` 후보를 현재 원격 integration `dff6223`에 fast-forward push했고, 제품 및 문서 결과는 integration SHA `76bd8a0`에 있다. 원격 착지 후 Claude 독립 리뷰는 이 SHA를 대상으로 진행한다.
 - Gemini 전달 대기(사용자 릴레이): 빈 노드에서는 ticket 발급을 시작하지 말 것. 현재 API는 workspace/session만으로 발급하지 않고 명시적 `commandId`가 필요하다. UI는 선택된 실행의 commandId로 새 adapter를 호출하고, 반환된 `websocketPath` 및 subprotocol을 사용해 query string 없는 연결을 열며 첫 frame으로 adapter auth frame을 보내야 한다. 이 화면 통합은 Codex 범위가 아니다.
 - focused Python/Vitest/schema/build/docs 결과와 명령은 `[[2026-09-21_terminal_ticket_contract_Codex]]` 참조. 실제 DB-backed PTY, live WebSocket/browser, CI, Claude 독립 검토는 별도 미확인이다.
 - 최신 화면 코드는 Gemini 소유로 두고 소스 경계에서만 인계 finding을 남겼다: `TerminalSessionView`가 고정 placeholder `commandId`를 전달하고, `WebTerminal`은 응답 타입을 인라인 정의하며 잘못된/누락 `websocketPath`를 합성 경로로 대체하고 ticket 앞 12자를 로그에 남긴다. 계약 전용 `terminalTicket` adapter를 화면이 아직 사용하지 않는다. 이는 Codex의 소스 검토이며, Gemini의 UI 테스트·독립 DOM/browser 승인이 아니다. 화면 소유자는 선택된 실행 commandId 사용, adapter wiring, 경로 fallback 제거, ticket 전체/부분 로그 제거를 검토한다.
