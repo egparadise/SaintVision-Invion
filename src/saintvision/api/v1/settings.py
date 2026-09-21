@@ -229,7 +229,10 @@ def set_project_status(
     return {"projectId": project.project_id, "status": project.status}
 
 
-@router.put("/workspaces/{workspace_id}/status")
+@router.put(
+    "/workspaces/{workspace_id}/status",
+    response_model=schemas.WorkspaceStatusResponse,
+)
 def set_workspace_status(
     workspace_id: str,
     payload: schemas.WorkspaceStatusRequest,

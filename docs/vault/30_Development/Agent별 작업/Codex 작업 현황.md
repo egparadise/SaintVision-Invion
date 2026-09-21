@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.138"
+version: "1.0.140"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T00:20:36+09:00"
+updated: "2026-09-22T00:38:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,10 +12,11 @@ source_of_truth: "Git"
 
 ## 2026-09-22 고위험 쓰기 응답 결속 및 시각 스큐 규격 현실화
 
-- Claude 위험도 목록 `7d75f810`에서 HIGH 네 경로를 골라 `ProjectCreateResponse`, `DiscoveryAdmissionResponse`, `MemberRoleResultResponse`, `ResourceOfferResultResponse`를 정의하고 해당 POST/PUT 라우트에 FastAPI `response_model`을 붙였다. 실제 service body에서 조건부 `kernelNote`/`kernelReason`, nullable 필드와 types를 확인했으며, role/boolean/numeric/string 출력은 coercion되지 않도록 strict 원시 타입을 쓴다. synthetic fixture 4개와 현재 모델에서 자동 생성된 4개 JSON Schema를 추가했다.
-- 각 라우트 정상 응답, service 반환의 타입 위반 거부(HTTP 500), model fixture 일치, 실제 nullable/비-nullable 경계를 TestClient로 고정했다. 지정 venv의 focused suite 51 passed, 스키마 45개 `--check` 통과. 네 `response_model` 선언을 한꺼번에 제거한 대조는 negative test 4개가 정확히 실패(exit 1)했다. 후속 disposable PostgreSQL 16 검증에서 후보 admission과 멤버 역할 변경을 실제 HTTP route/service/DB 응답으로 확인했다(2 passed). 프로젝트 생성과 자원 제공량 변경은 아직 mock service 반환 기준이다. 상세 provenance/자원 정리: [[2026-09-22_discovery_admission_write_response_real_pg_Codex]].
+- Claude 위험도 목록 `7d75f810`의 HIGH 네 경로에 `ProjectCreateResponse`, `DiscoveryAdmissionResponse`, `MemberRoleResultResponse`, `ResourceOfferResultResponse`를 정의하고 POST/PUT 라우트에 strict FastAPI `response_model`을 붙였다. 조건부 `kernelNote`/`kernelReason`, nullable 필드와 실제 service 타입을 반영했다. 네 응답의 nullable/타입 경계 및 malformed service body HTTP 500을 TestClient로 고정하고, 네 선언을 제거한 대조에서는 네 negative test가 실패했다.
+- 새 Claude 위험 재판정 `9454962`에 따라 `PUT /workspaces/{id}/status`도 HIGH로 올려 `WorkspaceStatusResponse`를 추가했다. status와 `allowedNext` 원소는 workspace lifecycle Literal로 제한하고, 독립 core 시험은 전체 전이 그래프와 상태 집합을 비교한다. `provisioning → ready` 실 PG 전이에서 다음 전이 집합 `deleting/suspended`도 고정했다.
+- 프로젝트 생성과 제공량 변경은 추가 서비스 없이 disposable PostgreSQL fixtures로 실측 가능했다. PostgreSQL 16에서 기존 네 HIGH 응답과 workspace status 응답 전부를 실제 HTTP route/service/DB 왕복으로 확인했다: admission, project create, member role change, resource offer, workspace transition 합계 5 passed/0 skipped/0 failed/errors. 제공량 경로는 실제 `apply_capability_offer`를 불렀으나 inv kernel resource가 없는 케이스여서 `appliedToKernel=false/resource_not_registered`를 확인했다. 적용 성공(등록 kernel resource 존재) 분기는 별도 미검증이다. 명령/provenance/컨테이너 소유·정리: [[2026-09-22_write_response_real_pg_Codex]].
 - 스큐 드리프트는 커널의 5초 런타임 적격성 필터를 유지하고 GOV-ALERT-001 라우팅 알람을 계속 governance-gated로 분리했다. ±5초 실측 보정, 통지 채널과 응답 담당이 미정이라 ERR-DESIGN-007 전체 채택으로 취급하지 않는다. 상세 근거/다음 후보: [[2026-09-22_write_route_response_binding_Codex]].
-- 다음 행동: 현재 통합 SHA에서 별도 reviewer가 PG-backed admission 단계까지 고정 SHA 검토; 이후 MED-HIGH 상태/스토리지/노드 쓰기 경로를 순서대로 측정·결속; 장비 시계 보정과 알람 라우팅 결정은 운영 인수 이후.
+- 다음 행동: 통합에 착지된 response schemas, 5개 PG-backed route 시험, workspace transition graph를 별도 reviewer가 고정 SHA로 검토. 이번 slice에서 프로젝트 생성·자원 제공량 변경은 mock-only가 아니라 실 PG로 확인했다. 남은 근거는 제공량의 kernel-apply 성공 분기, hosted CI, 운영 HTTP/browser 인수다. 장비 시계 보정과 알람 라우팅 결정은 운영 인수 이후.
 
 ## 2026-09-21 미병합 branch의 회귀 가드 5건 재평가·회수
 

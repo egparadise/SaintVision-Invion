@@ -183,6 +183,21 @@ class WorkspaceSummaryResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+WorkspaceStatusName = Literal[
+    "provisioning", "ready", "suspended", "deleting", "deleted"
+]
+
+
+class WorkspaceStatusResponse(Strict):
+    """Workspace lifecycle result, including the next legal transition choices."""
+
+    workspace_id: StrictStr = Field(alias="workspaceId")
+    status: WorkspaceStatusName
+    allowed_next: list[WorkspaceStatusName] = Field(alias="allowedNext")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ProjectWorkspacesResponse(Strict):
     project_id: str = Field(alias="projectId")
     workspaces: list[WorkspaceSummaryResponse]

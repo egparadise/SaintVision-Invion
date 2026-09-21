@@ -30,6 +30,7 @@ CASES = [
     ("admission", "discovery-admission-response.json", schemas.DiscoveryAdmissionResponse),
     ("member", "member-role-result-response.json", schemas.MemberRoleResultResponse),
     ("offer", "resource-offer-result-response.json", schemas.ResourceOfferResultResponse),
+    ("workspace-status", "workspace-status-response.json", schemas.WorkspaceStatusResponse),
 ]
 
 
@@ -73,6 +74,17 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
         monkeypatch.setattr(settings_routes.settings_service, "set_member_role", lambda *_a, **_k: service_result)
         app.include_router(settings_routes.router)
         return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/projects/prj_contract_create/members/usr_contract_member", {"roleCode": "operator"}
+    if kind == "workspace-status":
+        monkeypatch.setattr(
+            settings_routes.settings_service,
+            "set_workspace_status",
+            lambda *_a, **_k: SimpleNamespace(
+                workspace_id="wsp_contract_status", status=service_result["status"]
+            ),
+        )
+        app.include_router(settings_routes.router)
+        request_status = service_result.get("_request_status", "ready")
+        return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/workspaces/wsp_contract_status/status", {"status": request_status}
 
     monkeypatch.setattr(settings_routes.settings_service, "set_resource_offer", lambda *_a, **_k: service_result)
     app.include_router(settings_routes.router)
@@ -133,6 +145,7 @@ def test_high_risk_write_route_refuses_invalid_service_response(monkeypatch, kin
         "admission": ("bootstrapToken", 9),
         "member": ("canApprove", "yes"),
         "offer": ("previousOfferedQuantity", "unknown"),
+        "workspace-status": ("status", "made-up"),
     }[kind]
     broken[invalid_field[0]] = invalid_field[1]
     client, method, path, request_body = _client(monkeypatch, kind, broken)
@@ -164,3 +177,47 @@ def test_high_risk_write_contract_rejects_wrong_field_types(filename, model, fie
     payload[field] = value
     with pytest.raises(ValidationError):
         model.model_validate(payload)
+
+
+def test_workspace_status_allowed_next_matches_the_lifecycle_graph():
+    from saintvision.services.settings import WORKSPACE_TRANSITIONS
+
+    expected = {
+        "provisioning": {"ready", "deleting"},
+        "ready": {"suspended", "deleting"},
+        "suspended": {"ready", "deleting"},
+        "deleting": {"deleted"},
+        "deleted": set(),
+    }
+    observed = {state: set(next_states) for state, next_states in WORKSPACE_TRANSITIONS.items()}
+    assert observed == expected
+    assert set(observed) == {"provisioning", "ready", "suspended", "deleting", "deleted"}
+    assert all(target in observed for targets in observed.values() for target in targets)
+
+
+@pytest.mark.parametrize(
+    "status,expected_allowed_next",
+    [
+        ("provisioning", ["deleting", "ready"]),
+        ("ready", ["deleting", "suspended"]),
+        ("suspended", ["deleting", "ready"]),
+        ("deleting", ["deleted"]),
+        ("deleted", []),
+    ],
+)
+def test_workspace_status_route_reports_exact_allowed_next_for_each_state(
+    monkeypatch, status, expected_allowed_next
+):
+    payload = _fixture("workspace-status-response.json")
+    payload["status"] = status
+    payload["_request_status"] = status
+    client, method, path, request_body = _client(monkeypatch, "workspace-status", payload)
+
+    response = _request(client, method, path, request_body)
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "workspaceId": "wsp_contract_status",
+        "status": status,
+        "allowedNext": expected_allowed_next,
+    }

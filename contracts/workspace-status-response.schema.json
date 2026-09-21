@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Workspace lifecycle result, including the next legal transition choices.",
+  "properties": {
+    "allowedNext": {
+      "items": {
+        "enum": [
+          "provisioning",
+          "ready",
+          "suspended",
+          "deleting",
+          "deleted"
+        ],
+        "type": "string"
+      },
+      "title": "Allowednext",
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "provisioning",
+        "ready",
+        "suspended",
+        "deleting",
+        "deleted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "workspaceId": {
+      "title": "Workspaceid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workspaceId",
+    "status",
+    "allowedNext"
+  ],
+  "title": "WorkspaceStatusResponse",
+  "type": "object"
+}

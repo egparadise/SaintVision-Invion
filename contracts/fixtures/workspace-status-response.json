@@ -1,0 +1,8 @@
+{
+  "workspaceId": "wsp_contract_status",
+  "status": "ready",
+  "allowedNext": [
+    "deleting",
+    "suspended"
+  ]
+}
