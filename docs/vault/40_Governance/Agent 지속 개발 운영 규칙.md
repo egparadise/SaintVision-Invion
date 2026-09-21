@@ -4,7 +4,7 @@ title: "Agent 지속 개발 운영 규칙"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T17:13:25+09:00"
+updated: "2026-09-21T14:05:43+09:00"
 source_of_truth: "Git"
 ---
 
@@ -66,3 +66,9 @@ Obsidian: check → apply → check, pending/conflict·파일 hash 확인
 ## 5. 문서가 오래된 branch에서의 진입
 
 공유 조회 경로는 `C:\Users\egpar\OneDrive - Inviz\15.Vibe Cording\Obsidian\SaintVision-Invion\00_Index\전체 개발 진행 현황.md`다. 파일이 없다면 Git의 최신 진행 문서 commit을 찾아 읽는다. 이 초기 진행판은 `agent/codex/workspace-bridge`에 전달하며 이후 병합 위치는 최신 인계 기록을 따른다. 최신 문서를 읽었다는 사실과 제품 코드를 통합했다는 사실은 다르다.
+
+## External memory references
+
+Obsidian-style wiki links are reserved for pages stored under `docs/vault`. Agent memory files outside the repository are not vault pages: refer to them as inline-code literals with the `memory:<slug>` prefix, and label them as external. Do not use wiki-link syntax for those references; `check_docs.py` validates wiki links against repository files only.
+
+For PowerShell-generated documentation, do not pipe non-ASCII source literals into a native process while `$OutputEncoding` is `us-ascii`. Resolve page paths/stems from Git or filesystem metadata, or use an explicitly UTF-8-safe file/API path, then run `tools/check_docs.py` to validate the resulting target.

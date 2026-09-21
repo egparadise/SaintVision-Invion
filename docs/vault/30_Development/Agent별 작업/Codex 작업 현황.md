@@ -4,13 +4,13 @@ title: "Codex 작업 현황"
 version: "1.0.90"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T13:58:52+09:00"
+updated: "2026-09-21T14:05:43+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-2026-09-21 DSN ?? ?? ?? ??: origin integration? Codex ???? ?? ???? ??? ???. ?? ?? ???? fast-forward?? ?? tip `5c7ce9d`? 7? ??? ????. ?? tip?? proposal-3 22? ?? ??/28 URI/0 ???? ????? ????, secret guard ? ?? preflight 22 passed. ?? `check_docs.py`? DSN ?? ?? ??, ?? ??? ?? broken wiki link 4??? ????. ?? 24? ??? ???? `.env.example` ????? 2, ephemeral CI 6, ?? ?? 13, ?? ?? DB ?? 1, config-only fallback 2? ???. fallback 2?? `***` ????. DB ???? ?????? ??? CI ??? ?? ???. ??: [[2026-09-21_????DSN_???_Codex]]
+Integration DSN landing and check_docs correction: `5c7ce9d` carried the merge without conflicts; integration is pushed. On the checked integration source, `proposal-3.txt` has 22 tracked files/28 URI occurrences/0 unmasked passwords and the guard/preflight tests passed 22. A follow-up found the link string corruption introduced in `b569318` by non-ASCII text through a Windows PowerShell native pipe; the filename itself was intact. Claude memory slugs were external references, not vault pages; these are now visibly marked `memory:<slug>`. Current full `check_docs.py` passes. Earlier checker evidence is corrected in the linked history.
 
 2026-09-21 완료·push: 공개 `proposal-3.txt` 노출 14개(28개 비밀번호)를 `***`로 가리고, JUnit 증거 2회와 운영 절차 1회도 마스킹했다. `.venv\Scripts\python.exe -m pytest -q tests/test_check_docs_secret_guard.py` 3 passed, `tools/check_docs.py`와 `tools/check_ontology.py` PASS. 안전한 tracked scan상 마스크 후 문서 0건, 나머지 24개 URI는 테스트/임시 CI/로컬 개발 기본값으로 target 비밀번호와 일치하지 않는다. `sync_obsidian --apply`는 20개+2개, 최종 `--check`는 1390/0/0. 코드·문서 변경은 `5b6bfca`로 원격 push했다. 상세: [[2026-09-21_공개제안DSN_마스킹_Codex]]. 다음: DB 소유자 자격증명 유효성·회전 판단; 과거 public Git 이력 노출은 남는다.
 
