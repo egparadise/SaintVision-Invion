@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.154"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T04:21:00+09:00"
+updated: "2026-09-22T04:24:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 
 - 작업 `THREAD-2026-09-22-ENUM-OPEN-DOMAIN-REVIEW`; owner Codex, reviewer Claude. 기준 integration SHA `640d0119eb3276dd4873ac8f1a7bebea25eef316`; branch `agent/codex/enum-contract-exception-review`; 격리 worktree 사용.
 - 오늘 좁힌 세 status 계약은 제외하고 기존 API의 열거/패턴 도메인을 소스·DB 제약·생성 타입·소비 경로로 대조했다. 현재 잘못 닫힌 값은 찾지 못했다. capability kind와 placement strategy는 외부/사용자 입력 및 확장 후보지만 모르는 값으로 동작할 수 없어 fail-closed 유지가 맞다. OS type도 경로 안전성 때문에 현재 지원 OS만 허용해야 한다.
-- Node의 좁은 wire status를 화면 projection으로 전달할 때 현재 `active`가 `unknown`이 되는 잔여 불일치를 확인해 Gemini 재검증 대상으로 남겼다. 규칙 7은 미지값을 안전히 보존할 수 있는 opaque code와 실행/권한에 쓰여 거부해야 하는 control value를 구분해야 한다. 규칙 정본은 Claude 소유라 수정하지 않았다.
+- Node의 좁은 wire status를 화면 projection으로 전달할 때 현재 `active`가 `unknown`이 되는 잔여 불일치를 확인해 Gemini 재검증 대상으로 남겼다. Claude가 후속 `447a65e9`에서 규칙 7에 내부 폐쇄/외부 확장 구분과 DB CHECK의 현재성 조건을 반영했다. control input은 미지원 시 명시적으로 거부되어야 하며 capability kind/strategy를 넓힐 근거는 없다는 해석을 기록했다. 공통 정본은 수정하지 않았다.
 - `.venv/Scripts/python.exe` (Python 3.14.6)에서 workspace/node/write response 계약시험 74 passed, export_schemas 56/56 통과. DB·CI·실 Node·브라우저는 미실행. 전체 범위와 근거: [[2026-09-22_좁은계약_외부확장도메인_역검토_Codex]]. 리뷰와 reviewer 상태는 pending.
 
 ## 2026-09-22 Run retry 경로 감사와 저위험 쓰기 응답 결속
