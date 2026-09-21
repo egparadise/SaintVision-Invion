@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.84"
+version: "1.0.85"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:43:00+09:00"
+updated: "2026-09-22T01:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,30 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:43:00+09:00.
+- 확인 기준: 2026-09-22T01:47:00+09:00.
+
+## 세션 랩업: 오늘 밤 화면 결함 치유 10대 축 완결 총괄 및 이어가기
+
+- **오늘 밤 완결된 화면 10대 치유 축**:
+  1. **합성 제거 (Anti-Synthesis)**: `mlopsEngine.ts` 가짜 모델 계보 제거, `StorageObservationView` 임의 healthy 합성 금지, `RunDetail.tsx` 가짜 SSE 로그 날조 제거, `DeveloperStudio.tsx` fallback runId 및 현재 시각 합성 전소.
+  2. **죽은 방어 살리기 (0-Call Without Basis)**: 필수 인자(`tenantId`, `activeRunId`, 승인 토큰) 부재 시 네트워크 호출 0회 차단 (`ResourceExplorer`, `WebTerminal`, `ModelLineageView`, `DeveloperStudio`).
+  3. **조기 성공 표시 제거 (No Premature Success)**: 소켓 연결 전 `Connected` 출력 제거, 티켓 로깅 차단(Zero-Leak), 가짜 복구 타이머 제거, 롤백 허위 축하 배너 소거(`[모의 시뮬레이션]` 정직화).
+  4. **가짜 식별자 전면 소거 (No Synthetic Placeholders)**: `00000000-...`, `run_01J...`, `apr_...`, `prj_...`, `wsp_...`, `usr_admin_01`, `usr_operator_lead` 전소 및 실제 세션/컨텍스트 실배선.
+  5. **엄격한 3상태 무결성 (Strict Tri-State: unverified ≠ verified)**: `InvFileExplorer`에서 실제 커널 체크아웃 바이트 WebCrypto SHA-256 대조 기반 `verified` | `mismatch` | `unverified` 3상태 확립.
+  6. **캐시/실패 은폐 차단 (Never Mask Fresh Failures)**: 노드/Run/안건 동기화 실패 시 정상 0건 둔갑 차단 및 `role="alert"` 전용 에러 뷰 분리, 폴링 실패 시 `stale-warning` 배너 표출.
+  7. **시간 신선도 지표화 및 진실 시각 실배선 (Freshness & Truth Time)**: 백엔드 9/9 신선도 필드 실배선(`stateUpdatedAt`, `stateAsOf`, `completedAt` 등), 진실 시각/조회 시각 분리, 오독 방지 부인 고지 결속.
+  8. **허위 미구현(Class 3) 전수 소거 및 실배선 (Honest Capability & Unimplemented Cleanup)**: `RunDetail.tsx` Tab 3 Fallback 아티팩트 다운로드를 실제 커널 엔드포인트(`getArtifactDownloadUrl`)로 실배선 및 `[모의 고지]`, `다운로드 (API 미노출)` 허위 라벨 완전 소거, `MonacoWorkspaceEditor.tsx` 저장 API 실재와 컨텍스트 미연결 정직화.
+  9. **브라우저 alert() 18개소 전소 (Zero Alert Invariant)**: 화면 전역의 브라우저 블로킹 다이얼로그 전소, WAI-ARIA `role="alert"` / `role="status"` 인라인 배너로 전환.
+  10. **웹 접근성 (WCAG 2.1 AA / WAI-ARIA)**: 스크린 리더 상태 역할 엄격 분리, 비색상 텍스트 단서 병행, 조건부 비활성 버튼에 `aria-disabled="true"`, `aria-describedby`, `title` 결속.
+- **자동화 도구 및 거버넌스 고정**:
+  - `tools/check_frontend_integrity.py`: 5대 규칙 ➔ **7대 규칙**으로 확장, 81개 소스 파일 전수 **0 violations**, `--test-negative` (10개 케이스) PASS, 4대 돌연변이(Mutation A~D) 전수 실측 사살(KILLED) 후 원복 실증.
+  - `화면_개발_정직성_지침_및_사례집.md` (v1.1.0): 7대 원칙 및 **9대 구조적 한계(스캐너가 못 잡는 것과 사람 판단의 영역)** 명시.
+- **남은 미결 (Current Blockers & Unverified Areas)**:
+  1. **실 브라우저 E2E 인수 (Real Browser Acceptance)**: Playwright / 실제 브라우저 환경 및 사용자 육안 인수 미실시 (로컬 Vitest 69개 파일 620/620 DOM 레벨 테스트 100% 통과 상태).
+  2. **CI 워크플로우 미개방 (CI Unopened)**: GitHub Actions 외부 러너 및 원격 CI 파이프라인 미실행 (로컬 모든 게이트 도구 전수 통과 상태).
+- **다음 화면 첫 행동 (Next First Action)**:
+  - **Claude가 제안한 `WorkspaceSummaryResponse`의 `status`/`allowedNext` 정밀 enum(`WorkspaceStatusName`) 프론트엔드 TS 타입 재생성 및 계약 결속 정합(`contracts:check`)부터 착수.**
+  - 보고서: [[2026-09-22_오늘밤_화면결함치유_10대축_총괄정리_및_이어가기_Gemini]].
 
 ## 최근 확인한 진척
 
