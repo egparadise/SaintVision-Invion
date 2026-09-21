@@ -108,6 +108,7 @@ export const App: React.FC = () => {
   const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
   const [studioWorkspaceId, setStudioWorkspaceId] = useState<string | null>(null);
   const [studioRunId, setStudioRunId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const handleOpenStudio = (opts: { step?: 1 | 2 | 3 | 4; nodeId?: string; workspaceId?: string; runId?: string }) => {
     if (opts.step) setStudioStep(opts.step);
@@ -240,6 +241,7 @@ export const App: React.FC = () => {
 
   const handleApprove = async (approvalId: string, _nonce: string, shown?: ReviewedAction) => {
     try {
+      setActionError(null);
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
       await approveReviewed(approval, shown);
@@ -248,13 +250,14 @@ export const App: React.FC = () => {
     } catch (err: any) {
       console.error('Backend approval API failed:', err);
       const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
-      alert(`승인 처리 실패: ${errMsg}`);
+      setActionError(`승인 처리 실패: ${errMsg}`);
       throw err;
     }
   };
 
   const handleReject = async (approvalId: string, _reason: string) => {
     try {
+      setActionError(null);
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval) throw new Error('승인 요청을 새로고침하세요.');
       await decideApproval(approval, 'reject');
@@ -263,19 +266,20 @@ export const App: React.FC = () => {
     } catch (err: any) {
       console.error('Backend approval reject API failed:', err);
       const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
-      alert(`승인 반려 실패: ${errMsg}`);
+      setActionError(`승인 반려 실패: ${errMsg}`);
       throw err;
     }
   };
 
   const handleCancelRun = async (runId: string, _reason: string) => {
     try {
+      setActionError(null);
       const targetRun = runs.find((r) => r.id === runId);
       await cancelKernelRun(targetRun?.projectId, runId);
       await fetchRuns();
     } catch (err) {
       console.warn('Backend run cancellation API error:', err);
-      alert('취소를 확인하지 못했습니다. 실행 상태를 새로고침한 뒤 확인하세요.');
+      setActionError('취소를 확인하지 못했습니다. 실행 상태를 새로고침한 뒤 확인하세요.');
       throw err;
     }
   };
@@ -283,19 +287,63 @@ export const App: React.FC = () => {
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedRun = runs.find((r) => r.id === selectedRunId);
 
+  const globalErrorBanner = actionError ? (
+    <div
+      role="alert"
+      data-testid="app-global-action-error"
+      style={{
+        padding: '10px 16px',
+        backgroundColor: '#fee2e2',
+        color: '#991b1b',
+        borderBottom: '1px solid #f87171',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontWeight: 500,
+        fontSize: '0.875rem',
+        zIndex: 1000,
+      }}
+    >
+      <span>{actionError}</span>
+      <button
+        type="button"
+        data-testid="app-global-action-error-dismiss"
+        onClick={() => setActionError(null)}
+        style={{
+          marginLeft: '12px',
+          padding: '2px 8px',
+          border: '1px solid #dc2626',
+          borderRadius: '4px',
+          backgroundColor: '#ffffff',
+          color: '#991b1b',
+          cursor: 'pointer',
+          fontSize: '0.75rem',
+        }}
+      >
+        닫기
+      </button>
+    </div>
+  ) : null;
+
   if (!currentUser) return <Login onLoginSuccess={user => { setCurrentUser(user); setActiveTab('dashboard'); }} />;
 
-  if (desktop && currentUser && projectId) return <DesktopShell
-    key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
-    tenantId={currentUser.tenantId}
-    nodes={nodes} runs={runs} approvals={approvals} workspaces={workspaces}
-    currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
-    onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
-    onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
-    onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />;
+  if (desktop && currentUser && projectId) return (
+    <>
+      {globalErrorBanner}
+      <DesktopShell
+        key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
+        tenantId={currentUser.tenantId}
+        nodes={nodes} runs={runs} approvals={approvals} workspaces={workspaces}
+        currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
+        onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
+        onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
+        onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+    </>
+  );
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {globalErrorBanner}
       <Header
         onSwitchToDesktop={currentUser && projectId ? () => setDesktop(true) : undefined}
         currentTheme={theme}

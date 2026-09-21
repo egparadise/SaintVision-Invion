@@ -23,6 +23,9 @@ export const NodeList: React.FC<NodeListProps> = ({
   onSelectNode,
   onOpenStudio,
 }) => {
+  const [showInstallGuide, setShowInstallGuide] = React.useState(false);
+  const [copiedGuide, setCopiedGuide] = React.useState(false);
+
   // State 1: Forbidden (403)
   if (isForbidden) {
     return (
@@ -62,11 +65,14 @@ export const NodeList: React.FC<NodeListProps> = ({
               backgroundColor: 'var(--color-bg-surface)',
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
             }}
           >
-            <Skeleton width="60%" height="1.25rem" style={{ marginBottom: '12px' }} />
-            <Skeleton width="40%" height="0.875rem" style={{ marginBottom: '16px' }} />
-            <Skeleton width="100%" height="0.75rem" style={{ marginBottom: '8px' }} />
+            <Skeleton width="60%" height="1.25rem" />
+            <Skeleton width="40%" height="0.875rem" />
+            <Skeleton width="80%" height="1rem" />
             <Skeleton width="90%" height="0.75rem" />
           </div>
         ))}
@@ -77,13 +83,85 @@ export const NodeList: React.FC<NodeListProps> = ({
   // State 4: Empty
   if (nodes.length === 0) {
     return (
-      <EmptyState
-        title="등록된 Node가 없습니다"
-        description="SaintVision Agent 데몬을 PC에 실행하여 클러스터에 합류시키십시오."
-        icon="🖥️"
-        actionLabel="Node Agent 설치 안내"
-        onAction={() => alert('Agent 설치 가이드: python -m saintvision.agent --bootstrap')}
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <EmptyState
+          title="등록된 Node가 없습니다"
+          description="SaintVision Agent 데몬을 PC에 실행하여 클러스터에 합류시키십시오. 아래 설치 안내를 확인하세요."
+          icon="🖥️"
+          actionLabel={showInstallGuide ? '설치 가이드 접기' : 'Node Agent 설치 안내'}
+          onAction={() => setShowInstallGuide((prev) => !prev)}
+        />
+        {showInstallGuide && (
+          <div
+            role="status"
+            data-testid="node-agent-install-guide"
+            style={{
+              padding: '16px 20px',
+              backgroundColor: 'var(--color-bg-surface)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border-subtle)',
+              maxWidth: '600px',
+              margin: '0 auto',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: 600 }}>
+              Node Agent 데몬 부트스트랩 가이드
+            </h4>
+            <p style={{ margin: '0 0 12px 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+              터미널에서 아래 명령을 실행하여 현재 시스템을 클러스터 작업 노드로 등록하십시오:
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <code
+                style={{
+                  flex: 1,
+                  padding: '8px 12px',
+                  backgroundColor: 'var(--color-bg-code, #1e1e1e)',
+                  color: '#4ade80',
+                  borderRadius: '4px',
+                  fontSize: '0.875rem',
+                  fontFamily: 'monospace',
+                }}
+              >
+                python -m saintvision.agent --bootstrap
+              </code>
+              <button
+                type="button"
+                data-testid="copy-agent-bootstrap-btn"
+                onClick={() => {
+                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    navigator.clipboard.writeText('python -m saintvision.agent --bootstrap');
+                  }
+                  setCopiedGuide(true);
+                  setTimeout(() => setCopiedGuide(false), 3000);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'var(--color-bg-surface-hover, #2d3748)',
+                  color: 'var(--color-text-primary, #fff)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.8125rem',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {copiedGuide ? '✓ 복사됨' : '📋 명령어 복사'}
+              </button>
+            </div>
+            {copiedGuide && (
+              <span
+                role="status"
+                data-testid="node-agent-copy-feedback"
+                style={{ display: 'block', marginTop: '8px', fontSize: '0.75rem', color: '#4ade80' }}
+              >
+                설치 명령어가 클립보드에 복사되었습니다.
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     );
   }
 

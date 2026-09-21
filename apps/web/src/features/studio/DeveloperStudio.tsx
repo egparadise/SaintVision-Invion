@@ -142,6 +142,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
+  const [studioActionNotice, setStudioActionNotice] = useState<{
+    type: 'error' | 'status' | 'info';
+    message: string;
+  } | null>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   // Load Projects and Workspaces from API
@@ -434,7 +438,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     if (!activeRunId) return;
 
     if (currentRun?.state === 'running') {
-      alert('실행 진행 중인 작업의 아티팩트는 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.');
+      setStudioActionNotice({
+        type: 'info',
+        message: '실행 진행 중인 작업의 아티팩트는 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.',
+      });
       return;
     }
 
@@ -442,7 +449,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     try {
       let serverPayload: any = null;
       if (!selectedProjectId) {
-        alert('선택된 프로젝트가 없어 아티팩트를 다운로드할 수 없습니다.');
+        setStudioActionNotice({
+          type: 'error',
+          message: '선택된 프로젝트가 없어 아티팩트를 다운로드할 수 없습니다.',
+        });
         setIsDownloadingArtifact(false);
         return;
       }
@@ -461,7 +471,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           };
           setArtifactData(serverPayload);
         } else {
-          alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
+          setStudioActionNotice({
+            type: 'error',
+            message: '서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)',
+          });
           return;
         }
       } catch (err: any) {
@@ -473,17 +486,26 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               serverPayload = { ...fallback, fallbackUsed: true };
               setArtifactData(serverPayload);
             } else {
-              alert('레거시 산출물 목록이 비어 있거나 산출물을 찾을 수 없습니다.');
+              setStudioActionNotice({
+                type: 'error',
+                message: '레거시 산출물 목록이 비어 있거나 산출물을 찾을 수 없습니다.',
+              });
               return;
             }
           } catch (fallbackErr: any) {
             const fbMsg = fallbackErr?.problem?.detail || fallbackErr?.message || '레거시 경로 조회 실패';
-            alert(`레거시 아티팩트 목록 조회 실패: ${fbMsg}`);
+            setStudioActionNotice({
+              type: 'error',
+              message: `레거시 아티팩트 목록 조회 실패: ${fbMsg}`,
+            });
             return;
           }
         } else {
           const errMsg = err?.problem?.detail || err?.message || `HTTP ${err?.problem?.status || err?.status || '오류'}`;
-          alert(`산출물 검증 및 다운로드 요청 실패 (${err?.problem?.code || err?.code || 'ERR'}): ${errMsg}`);
+          setStudioActionNotice({
+            type: 'error',
+            message: `산출물 검증 및 다운로드 요청 실패 (${err?.problem?.code || err?.code || 'ERR'}): ${errMsg}`,
+          });
           return;
         }
       }
@@ -491,7 +513,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       const effectivePayload = serverPayload;
 
       if (!effectivePayload || !effectivePayload.outputHash) {
-        alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
+        setStudioActionNotice({
+          type: 'error',
+          message: '서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)',
+        });
         return;
       }
 
@@ -524,9 +549,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact] Result manifest downloaded for run '${activeRunId}' (${artifactMeta.manifest.outputDigest.substring(0, 19)}...)` },
       ]);
+      setStudioActionNotice({
+        type: 'status',
+        message: `[다운로드 완료] 실행 '${activeRunId}' 결과 아티팩트 매니페스트가 성공적으로 다운로드되었습니다.`,
+      });
     } catch (err: any) {
       console.error('Artifact download failed:', err);
-      alert(`아티팩트 다운로드 실패: ${err.message || '네트워크 오류'}`);
+      setStudioActionNotice({
+        type: 'error',
+        message: `아티팩트 다운로드 실패: ${err.message || '네트워크 오류'}`,
+      });
     } finally {
       setIsDownloadingArtifact(false);
     }
@@ -539,7 +571,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     const fileName = filePath.split('/').pop() || 'artifact.txt';
 
     if (currentRun?.state === 'running') {
-      alert('실행 진행 중인 작업의 산출물 파일은 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.');
+      setStudioActionNotice({
+        type: 'info',
+        message: '실행 진행 중인 작업의 산출물 파일은 다운로드할 수 없습니다. 실행 완료 후 다시 시도하십시오.',
+      });
       return;
     }
 
@@ -551,7 +586,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         headers['Authorization'] = `Bearer ${token}`;
       }
       if (!selectedProjectId) {
-        alert('선택된 프로젝트가 없어 파일을 다운로드할 수 없습니다.');
+        setStudioActionNotice({
+          type: 'error',
+          message: '선택된 프로젝트가 없어 파일을 다운로드할 수 없습니다.',
+        });
         setIsDownloadingArtifact(false);
         return;
       }
@@ -576,9 +614,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact File] Raw file bytes downloaded for '${filePath}' (${blob.size.toLocaleString()} Bytes)` },
       ]);
+      setStudioActionNotice({
+        type: 'status',
+        message: `[다운로드 완료] 산출물 파일 '${fileName}' (${blob.size.toLocaleString()} Bytes)이 성공적으로 다운로드되었습니다.`,
+      });
     } catch (err: any) {
       console.error('Raw artifact download failed:', err);
-      alert(`산출물 파일 바이트 다운로드 실패: ${err?.message || '서버 오류'}`);
+      setStudioActionNotice({
+        type: 'error',
+        message: `산출물 파일 바이트 다운로드 실패: ${err?.message || '서버 오류'}`,
+      });
     } finally {
       setIsDownloadingArtifact(false);
     }
@@ -621,9 +666,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Resume Prepared] ADR-044 Frozen Input Hash locked. Approval step created (Attempt bound: 1..3).` },
       ]);
+      setStudioActionNotice({
+        type: 'status',
+        message: 'ADR-044 Frozen Input Hash 고정 및 복구 단계가 준비되었습니다.',
+      });
       onRefreshRuns?.();
     } catch (err: any) {
-      alert(err.problem?.detail || err.message || '재개 준비 실패');
+      setStudioActionNotice({
+        type: 'error',
+        message: `재개 준비 실패: ${err.problem?.detail || err.message || '서버 오류'}`,
+      });
     }
   };
 
@@ -650,14 +702,24 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         setSelectedReceipt(receipt);
         setReceiptModalOpen(true);
         setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
+        setStudioActionNotice({
+          type: 'status',
+          message: '✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하였습니다.',
+        });
       } else {
         setSelectedReceipt(null);
-        alert(`물리 정지 영수증(NodeStopReceipt) 조회 실패: 해당 실행(${activeRunId || '미지정'})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`);
+        setStudioActionNotice({
+          type: 'info',
+          message: `물리 정지 영수증(NodeStopReceipt) 안내: 해당 실행(${activeRunId || '미지정'})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`,
+        });
       }
     } catch (err: any) {
       console.warn('Failed to fetch NodeStopReceipt:', err);
       const errMsg = err?.detail || err?.message || 'RES-RECEIPT-404';
-      alert(`물리 정지 영수증(NodeStopReceipt) 조회 실패: 해당 실행(${activeRunId})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다. (${errMsg})`);
+      setStudioActionNotice({
+        type: 'error',
+        message: `물리 정지 영수증(NodeStopReceipt) 조회 실패: 해당 실행(${activeRunId})의 영수증 조회 중 오류가 발생했습니다. (${errMsg})`,
+      });
     } finally {
       setIsLoadingReceipt(false);
     }
@@ -795,6 +857,61 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           })}
         </div>
       </div>
+
+      {studioActionNotice && (
+        <div
+          role={studioActionNotice.type === 'error' ? 'alert' : 'status'}
+          data-testid="studio-action-notice"
+          style={{
+            marginBottom: '20px',
+            padding: '12px 18px',
+            backgroundColor:
+              studioActionNotice.type === 'error'
+                ? 'rgba(239, 68, 68, 0.15)'
+                : studioActionNotice.type === 'status'
+                ? 'rgba(34, 197, 94, 0.15)'
+                : 'rgba(59, 130, 246, 0.15)',
+            border: `1px solid ${
+              studioActionNotice.type === 'error'
+                ? '#ef4444'
+                : studioActionNotice.type === 'status'
+                ? '#22c55e'
+                : '#3b82f6'
+            }`,
+            borderRadius: 'var(--radius-md)',
+            color:
+              studioActionNotice.type === 'error'
+                ? '#fca5a5'
+                : studioActionNotice.type === 'status'
+                ? '#86efac'
+                : '#93c5fd',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+          }}
+        >
+          <span>{studioActionNotice.message}</span>
+          <button
+            type="button"
+            data-testid="studio-action-notice-dismiss"
+            onClick={() => setStudioActionNotice(null)}
+            style={{
+              marginLeft: '12px',
+              padding: '2px 8px',
+              backgroundColor: 'transparent',
+              border: '1px solid currentColor',
+              borderRadius: '4px',
+              color: 'inherit',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+            }}
+          >
+            닫기
+          </button>
+        </div>
+      )}
 
       {/* STEP 1: 프로젝트 & 워크스페이스 선택 */}
       {currentStep === 1 && (
@@ -1879,7 +1996,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   data-testid="artifact-action-download-btn"
                   onClick={handleDownloadArtifact}
                   disabled={isDownloadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
-                  title="실행 결과 아티팩트 매니페스트 및 Evidence를 다운로드합니다"
+                  title={
+                    currentRun?.state === 'running'
+                      ? '실행 진행 중인 작업의 아티팩트는 다운로드할 수 없습니다 (실행 완료 후 활성화)'
+                      : !artifactData?.outputHash
+                      ? '생성된 산출물 다이제스트가 없어 다운로드할 수 없습니다'
+                      : '실행 결과 아티팩트 매니페스트 및 Evidence를 다운로드합니다'
+                  }
                 >
                   {isDownloadingArtifact ? '⏳ 다운로드 중...' : '📥 결과 다운로드 (Artifact)'}
                 </Button>
@@ -2100,7 +2223,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   data-testid="artifact-raw-download-btn"
                   onClick={() => handleDownloadRawFile()}
                   disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
-                  title="실행 커널이 생성한 실제 산출물 파일 바이트를 다운로드합니다"
+                  title={
+                    currentRun?.state === 'running'
+                      ? '실행 진행 중인 작업의 산출물 파일은 다운로드할 수 없습니다 (실행 완료 후 활성화)'
+                      : !artifactData?.outputHash
+                      ? '산출물 다이제스트가 아직 준비되지 않았습니다'
+                      : '실행 커널이 생성한 실제 산출물 파일 바이트를 다운로드합니다'
+                  }
                 >
                   {isDownloadingArtifact ? '⏳ 다운로드 중...' : '📥 결과 파일 다운로드 (Bytes)'}
                 </Button>
@@ -2110,7 +2239,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   data-testid="artifact-meta-download-btn"
                   onClick={handleDownloadArtifact}
                   disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
-                  title="실행 영수증과 검증 다이제스트를 포함한 JSON 매니페스트를 다운로드합니다"
+                  title={
+                    currentRun?.state === 'running'
+                      ? '실행 진행 중인 작업의 아티팩트는 다운로드할 수 없습니다 (실행 완료 후 활성화)'
+                      : !artifactData?.outputHash
+                      ? '산출물 다이제스트가 아직 준비되지 않았습니다'
+                      : '실행 영수증과 검증 다이제스트를 포함한 JSON 매니페스트를 다운로드합니다'
+                  }
                 >
                   📜 영수증 메타 (.json)
                 </Button>

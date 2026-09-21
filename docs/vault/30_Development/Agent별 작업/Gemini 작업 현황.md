@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.80"
+version: "1.0.81"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:00:00+09:00"
+updated: "2026-09-22T01:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:00:00+09:00.
+- 확인 기준: 2026-09-22T01:25:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 9차: 브라우저 alert() 18개소 전소 및 3분류(오류·성공·미구현) 정직화 완결 (`App.tsx`, `NodeList.tsx`, `DeveloperStudio.tsx`, `alert-elimination-and-unimplemented-audit.test.tsx`, `developer-studio-dom.test.tsx`)**:
+  - **Zero Alert Invariant**: 프론트엔드 전역(`apps/web/src`)의 브라우저 블로킹 `alert(` 호출 18개소 전소(0건 달성).
+  - **3대 분류 판정 및 정직화**:
+    1. **Class 1 (오류 알림, 11개소)**: 승인 처리/반려/취소 실패, 프로젝트 부재, 산출물 수신/다운로드/API 실패 등 ➔ WAI-ARIA `role="alert"` 인라인 에러 배너(`app-global-action-error`, `studio-action-notice`)로 전환.
+    2. **Class 2 (성공/완료 알림, 3개소)**: 아티팩트 다운로드 완료, 원시 파일 바이트 다운로드 완료, 복구 단계 준비 완료 ➔ WAI-ARIA `role="status"` 인라인 상태 피드백으로 전환.
+    3. **Class 3 (미구현 / 뒤가 없는 기능 / 동작 불가 가드, 4개소 전수 집계)**:
+       - `NodeList.tsx` L85: 노드 0대 시 빈 상태 허위 alert 팝업 소거 ➔ 사전 안내 명시 및 인라인 부트스트랩 가이드(`node-agent-install-guide`, `role="status"`, CLI 명령어 및 복사 피드백).
+       - `DeveloperStudio.tsx` L437: 실행 중 아티팩트 다운로드 시도 ➔ 버튼 사전 비활성화(`disabled`) 및 `title`에 차단 사유 사전 고지.
+       - `DeveloperStudio.tsx` L542: 실행 중 원시 파일 바이트 다운로드 시도 ➔ 버튼 사전 비활성화(`disabled`) 및 `title`에 차단 사유 사전 고지.
+       - `DeveloperStudio.tsx` L655: NodeStopReceipt 영수증 미발행/서버 미보관 ➔ 치명적 에러가 아닌 차분한 상태 안내(`role="status"`, `studio-action-notice`).
+  - **테스트 및 검증**:
+    - 신규 DOM 단위 테스트 6종 (`alert-elimination-and-unimplemented-audit.test.tsx`, M23/M24 사살, 6/6 passed).
+    - 기존 DOM 단위 테스트 8종 정합 (`developer-studio-dom.test.tsx`, 18/18 passed).
+    - Vitest **68개 파일 613/613 passed 100%** (순증 +6 passed), Vite 프로덕션 빌드 exit 0 (3.21s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_alert소거_및_미구현기능_3분류정직화_Gemini]].
 
 - **화면 결함 6대 부류 치유 트랙 8차: 백엔드 진실 시각(Truth Time) 실배선 및 화면 조회 시각(Query Time) 분리 완결 (`ClusterOverview.tsx`, `ResourceExplorer.tsx`, `RunDetail.tsx`, `RunList.tsx`, `ApprovalCenter.tsx`, `ModelStudioView.tsx`, `EvidenceViewer.tsx`, `truth-time-and-freshness-axis.test.tsx`)**:
   - **Claude 백엔드 축 감사 전면 수용 및 사실/판단 분리 (`34ef753e`, `2026-09-22_응답_관측시각_신선도_백엔드축_Claude.md`)**:

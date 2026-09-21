@@ -606,10 +606,12 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
 
     // MUST NOT call /artifacts when /result fails with 401
     expect(artifactsCalls).toBe(0);
-    // User must be alerted of authorization failure; stale cache MUST NOT be downloaded
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (NET-401): User session expired or invalid token')
-    );
+    // User must be alerted of authorization failure via studio-action-notice; stale cache MUST NOT be downloaded
+    const notice1 = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice1).not.toBeNull();
+    expect(notice1?.getAttribute('role')).toBe('alert');
+    expect(notice1?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-401): User session expired or invalid token');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -628,19 +630,17 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
       if (endpoint.endsWith('/result')) {
         if (initialMount) {
+          initialMount = false;
           return result200 as any;
         }
         throw err403;
       }
-      if (endpoint.endsWith('/artifacts')) {
+      if (endpoint.includes('/artifacts')) {
         artifactsCalls++;
-        return sampleFallbackArtifactList as any;
+        return legacyArtifacts200 as any;
       }
       if (endpoint.includes('/workspaces')) {
         return { projectId: sampleProject.id, workspaces: [] } as any;
-      }
-      if (endpoint.includes('/runs/')) {
-        return sampleRun as any;
       }
       return {} as any;
     });
@@ -660,9 +660,6 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    initialMount = false;
-    artifactsCalls = 0;
-
     const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
     expect(downloadBtn).not.toBeNull();
     expect(downloadBtn.disabled).toBe(false);
@@ -675,9 +672,11 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (SEC-403): Insufficient permissions to export artifacts')
-    );
+    const notice1b = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice1b).not.toBeNull();
+    expect(notice1b?.getAttribute('role')).toBe('alert');
+    expect(notice1b?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (SEC-403): Insufficient permissions to export artifacts');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -743,9 +742,11 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (NET-500): Database connection failed')
-    );
+    const notice2 = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice2).not.toBeNull();
+    expect(notice2?.getAttribute('role')).toBe('alert');
+    expect(notice2?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-500): Database connection failed');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -804,9 +805,11 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (ERR): Network request failed')
-    );
+    const notice3 = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice3).not.toBeNull();
+    expect(notice3?.getAttribute('role')).toBe('alert');
+    expect(notice3?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (ERR): Network request failed');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -872,9 +875,11 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (RES-RUN-404): Specified run does not exist or has been purged')
-    );
+    const notice4 = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice4).not.toBeNull();
+    expect(notice4?.getAttribute('role')).toBe('alert');
+    expect(notice4?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (RES-RUN-404): Specified run does not exist or has been purged');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -1009,9 +1014,11 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(1);
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('레거시 아티팩트 목록 조회 실패: Storage volume unmounted')
-    );
+    const notice6 = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(notice6).not.toBeNull();
+    expect(notice6?.getAttribute('role')).toBe('alert');
+    expect(notice6?.textContent).toContain('레거시 아티팩트 목록 조회 실패: Storage volume unmounted');
+    expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
@@ -1056,10 +1063,12 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    // Alert must be called with failure explanation
-    expect(window.alert).toHaveBeenCalledWith(
-      expect.stringContaining('물리 정지 영수증(NodeStopReceipt) 조회 실패')
-    );
+    // Notice banner must be rendered with role="status" explaining missing receipt
+    const receiptNotice = container.querySelector('[data-testid="studio-action-notice"]');
+    expect(receiptNotice).not.toBeNull();
+    expect(receiptNotice?.getAttribute('role')).toBe('status');
+    expect(receiptNotice?.textContent).toContain('물리 정지 영수증(NodeStopReceipt) 안내');
+    expect(window.alert).not.toHaveBeenCalled();
 
     // Modal and fake reclaim notice must NOT be rendered
     expect(container.querySelector('[data-testid="receipt-modal"]')).toBeNull();
@@ -1164,10 +1173,12 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      // Honest alert must be invoked
-      expect(window.alert).toHaveBeenCalledWith(
-        expect.stringContaining('산출물 파일 바이트 다운로드 실패: HTTP 500: Internal Server Error')
-      );
+      // Honest role="alert" notice banner must be invoked
+      const rawNotice = container.querySelector('[data-testid="studio-action-notice"]');
+      expect(rawNotice).not.toBeNull();
+      expect(rawNotice?.getAttribute('role')).toBe('alert');
+      expect(rawNotice?.textContent).toContain('산출물 파일 바이트 다운로드 실패: HTTP 500: Internal Server Error');
+      expect(window.alert).not.toHaveBeenCalled();
       // createObjectURL should NOT have been called to synthesize a fake blob from local file
       expect(window.URL.createObjectURL).not.toHaveBeenCalled();
     } finally {
