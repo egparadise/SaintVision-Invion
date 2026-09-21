@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Adapter"
+    },
+    "measurementScope": {
+      "const": "workspace-node",
+      "title": "Measurementscope",
+      "type": "string"
+    },
+    "nodeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nodeid"
+    },
+    "ready": {
+      "title": "Ready",
+      "type": "boolean"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "state": {
+      "const": "unknown",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "adapter",
+    "nodeId",
+    "ready",
+    "state",
+    "measurementScope",
+    "reason"
+  ],
+  "title": "WorkspaceToolReadinessResponse",
+  "type": "object"
+}

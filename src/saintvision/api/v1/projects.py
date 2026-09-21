@@ -174,7 +174,10 @@ def create_workspace(
     return body
 
 
-@router.put("/workspaces/{workspace_id}/tool")
+@router.put(
+    "/workspaces/{workspace_id}/tool",
+    response_model=schemas.WorkspaceToolResultResponse,
+)
 def set_workspace_tool(
     workspace_id: str,
     payload: schemas.WorkspaceToolRequest,

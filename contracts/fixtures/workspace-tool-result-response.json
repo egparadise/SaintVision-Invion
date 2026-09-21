@@ -1,0 +1,18 @@
+{
+  "workspaceId": "wsp_contract_tool",
+  "projectId": "prj_contract_tool",
+  "name": "Contract Tool Workspace",
+  "status": "ready",
+  "nodeId": "node_contract_tool",
+  "toolName": "codex-cli",
+  "createdAt": "2026-09-22T09:00:00Z",
+  "allowedNext": ["deleting", "suspended"],
+  "toolReadiness": {
+    "adapter": "codex-cli",
+    "nodeId": "node_contract_tool",
+    "ready": false,
+    "state": "unknown",
+    "measurementScope": "workspace-node",
+    "reason": "Fresh authenticated Node tool observation is required"
+  }
+}

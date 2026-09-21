@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "WorkspaceToolReadinessResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Adapter"
+        },
+        "measurementScope": {
+          "const": "workspace-node",
+          "title": "Measurementscope",
+          "type": "string"
+        },
+        "nodeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Nodeid"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "state": {
+          "const": "unknown",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter",
+        "nodeId",
+        "ready",
+        "state",
+        "measurementScope",
+        "reason"
+      ],
+      "title": "WorkspaceToolReadinessResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Workspace tool choice and its explicitly unmeasured current readiness.",
+  "properties": {
+    "allowedNext": {
+      "items": {
+        "enum": [
+          "provisioning",
+          "ready",
+          "suspended",
+          "deleting",
+          "deleted"
+        ],
+        "type": "string"
+      },
+      "title": "Allowednext",
+      "type": "array"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "nodeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nodeid"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "provisioning",
+        "ready",
+        "suspended",
+        "deleting",
+        "deleted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "toolName": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Toolname"
+    },
+    "toolReadiness": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkspaceToolReadinessResponse"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "workspaceId": {
+      "title": "Workspaceid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workspaceId",
+    "projectId",
+    "name",
+    "status",
+    "nodeId",
+    "toolName",
+    "createdAt",
+    "allowedNext",
+    "toolReadiness"
+  ],
+  "title": "WorkspaceToolResultResponse",
+  "type": "object"
+}

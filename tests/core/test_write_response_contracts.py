@@ -44,6 +44,16 @@ CASES = [
         "storage-contribution-registration-response.json",
         schemas.ContributionRegistrationResponse,
     ),
+    (
+        "contribution-activation",
+        "storage-contribution-registration-response.json",
+        schemas.ContributionRegistrationResponse,
+    ),
+    (
+        "contribution-revoke",
+        "storage-contribution-registration-response.json",
+        schemas.ContributionRegistrationResponse,
+    ),
 ]
 
 
@@ -159,8 +169,10 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             request_body,
         )
 
-    if kind == "contribution-registration":
+    if kind in {"contribution-registration", "contribution-activation", "contribution-revoke"}:
         contribution_data = service_result["contribution"]
+        if service_result.get("_invalid_nested_contribution"):
+            contribution_data = {**contribution_data, "unexpected": "must be rejected"}
         contribution = SimpleNamespace(
             contribution_id=contribution_data["contributionId"],
             node_id=contribution_data["nodeId"],
@@ -174,37 +186,57 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
                 contribution_data["registeredAt"].replace("Z", "+00:00")
             ),
         )
-        replay = service_result.get("_replay")
-        if replay is None and "unexpected" in service_result:
-            replay = {
-                "contribution": contribution_data,
-                "unexpected": service_result["unexpected"],
-            }
-        monkeypatch.setattr(
-            storage_routes, "replay_or_reserve", lambda *_a, **_k: replay
-        )
-        monkeypatch.setattr(
-            storage_routes.storage_service,
-            "register_contribution",
-            lambda *_a, **_k: contribution,
-        )
         monkeypatch.setattr(
             storage_routes, "_contribution_body", lambda _value: contribution_data
         )
-        monkeypatch.setattr(storage_routes, "record_event", lambda *_a, **_k: None)
-        monkeypatch.setattr(storage_routes, "store_idempotent_response", lambda *_a, **_k: None)
         app.include_router(storage_routes.router)
-        request_body = {
-            "nodeId": contribution_data["nodeId"],
-            "declaredPath": contribution_data["declaredPath"],
-            "mode": contribution_data["mode"],
-            "capacityBytes": contribution_data["capacityBytes"],
-            "availableBytes": contribution_data["availableBytes"],
-        }
+        if kind == "contribution-registration":
+            replay = service_result.get("_replay")
+            if replay is None and "unexpected" in service_result:
+                replay = {
+                    "contribution": contribution_data,
+                    "unexpected": service_result["unexpected"],
+                }
+            monkeypatch.setattr(
+                storage_routes, "replay_or_reserve", lambda *_a, **_k: replay
+            )
+            monkeypatch.setattr(
+                storage_routes.storage_service,
+                "register_contribution",
+                lambda *_a, **_k: contribution,
+            )
+            monkeypatch.setattr(storage_routes, "record_event", lambda *_a, **_k: None)
+            monkeypatch.setattr(storage_routes, "store_idempotent_response", lambda *_a, **_k: None)
+            method, path = "POST", "/v1/storage/contributions"
+        elif kind == "contribution-activation":
+            monkeypatch.setattr(
+                storage_routes.storage_service,
+                "activate_contribution",
+                lambda *_a, **_k: contribution,
+            )
+            method, path = "POST", "/v1/storage/contributions/stc_contract/activation"
+        else:
+            monkeypatch.setattr(
+                storage_routes.storage_service,
+                "revoke_contribution",
+                lambda *_a, **_k: contribution,
+            )
+            method, path = "DELETE", "/v1/storage/contributions/stc_contract"
+        request_body = (
+            {
+                "nodeId": contribution_data["nodeId"],
+                "declaredPath": contribution_data["declaredPath"],
+                "mode": contribution_data["mode"],
+                "capacityBytes": contribution_data["capacityBytes"],
+                "availableBytes": contribution_data["availableBytes"],
+            }
+            if kind == "contribution-registration"
+            else {}
+        )
         return (
             TestClient(app, raise_server_exceptions=False),
-            "POST",
-            "/v1/storage/contributions",
+            method,
+            path,
             request_body,
         )
 
@@ -284,6 +316,8 @@ def test_high_risk_write_route_refuses_invalid_service_response(monkeypatch, kin
         "workspace-status": ("status", "made-up"),
         "node-enroll": ("unexpected", "must be rejected"),
         "contribution-registration": ("unexpected", "must be rejected"),
+        "contribution-activation": ("_invalid_nested_contribution", True),
+        "contribution-revoke": ("_invalid_nested_contribution", True),
     }[kind]
     broken[invalid_field[0]] = invalid_field[1]
     client, method, path, request_body = _client(monkeypatch, kind, broken)

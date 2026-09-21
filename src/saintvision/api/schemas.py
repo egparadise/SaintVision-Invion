@@ -209,6 +209,33 @@ class WorkspaceStatusResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class WorkspaceToolReadinessResponse(Strict):
+    adapter: str | None
+    node_id: str | None = Field(alias="nodeId")
+    ready: bool
+    state: Literal["unknown"]
+    measurement_scope: Literal["workspace-node"] = Field(alias="measurementScope")
+    reason: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceToolResultResponse(Strict):
+    """Workspace tool choice and its explicitly unmeasured current readiness."""
+
+    workspace_id: str = Field(alias="workspaceId")
+    project_id: str = Field(alias="projectId")
+    name: str
+    status: WorkspaceStatusName
+    node_id: str | None = Field(alias="nodeId")
+    tool_name: str | None = Field(alias="toolName")
+    created_at: dt.datetime = Field(alias="createdAt")
+    allowed_next: list[WorkspaceStatusName] = Field(alias="allowedNext")
+    tool_readiness: WorkspaceToolReadinessResponse | None = Field(alias="toolReadiness")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ProjectWorkspacesResponse(Strict):
     project_id: str = Field(alias="projectId")
     workspaces: list[WorkspaceSummaryResponse]

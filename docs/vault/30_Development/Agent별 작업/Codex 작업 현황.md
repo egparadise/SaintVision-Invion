@@ -1,14 +1,32 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.148"
+version: "1.0.151"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T02:56:00+09:00"
+updated: "2026-09-22T03:37:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 Workspace snapshot reader 감사
+
+- 요청: 저장된 `inv.workspace-output` snapshot 파일을 실제로 읽는 경로가 있는지 확인. Owner Codex; SHA `993cfaf068f3da1df09f402399e75ea3aa55711d`.
+- 판정: 후속 읽기 구현은 있지만 현재 tracked product tree의 운영 경로에는 연결되지 않았다. `configured_workspace`는 `WorkspaceAPI`만 조립하고 restore/checkout route가 없다. resume prepare는 `workspace_checkouts` 행을 요구하는데 그 row writer인 `WorkspaceRecovery.checkout`은 제품 composition에서 생성·호출되지 않는다. queue/event 소비자도 찾지 못했다. 따라서 completion 시 receipt와 대조하는 읽기 외에 저장 workspace-output의 운영 consumer는 현재 없다.
+- 근거/경계: tests를 제외한 `git grep`와 설정→route→필수 checkout row→writer 흐름을 정적으로 대조했다. `SnapshotStore.restore`/WorkspaceRecovery 복구는 integration tests와 격리 acceptance 도구에서만 호출된다. 제품 운영 연결 부재는 tracked tree 기준 확인이며 미추적 외부 wrapper는 미확인이다. 이 작업에서 실행 시험은 하지 않았다.
+- 변경/안전: 제품 코드·provider wiring 변경 없음, 사용자 결정 선점 없음, `.work` 잔여 삭제 없음. 근거와 검색 범위: [[2026-09-22_workspace_snapshot_reader_inventory_Codex]].
+- 문서 게이트: SHA `993cfaf068f3da1df09f402399e75ea3aa55711d`, `C:\Python314\python.exe tools/check_docs.py` exit 0; `sync_obsidian.py --check` exit 0, 1508 managed/4 pending/0 conflicts (read-only). Pending를 apply하지 않았다.
+- 다음: 제품/운영 owner 결정 필요 — recovery wiring을 제품 route/worker에 연결하거나, 연결 전 저장·pin을 유지할 근거와 용량 정책을 정한다. artifact GET 정본 선택도 별도 사용자 결정이다. 제품 코드·provider wiring 변경과 `.work` 정리는 없었다.
+
+## 2026-09-22 contribution lifecycle·workspace-tool 응답 결속
+
+- `register_contribution`·`activate_contribution`·`revoke_contribution`의 반환 shape가 동일한 `{contribution: ContributionResponse}`임을 확인하고 activation/revoke에 registration과 같은 strict response_model을 연결했다. 각각의 response_model 제거 변형에서 invalid-response 시험이 1 failed로 깨졌다.
+- 남은 raw-dict 쓰기 중 가장 풍부한 workspace-tool 응답을 별도 `WorkspaceToolResultResponse`로 결속했다. 모델/fixture/route 시험과 JSON Schema 생성이 추가됐고, readiness 필드의 extra 주입은 500으로 거부된다. route 앵커 제거 대조도 시험을 실패시켰다.
+- Provenance 고정 SHA `1381e2c2147d3f0846aef44277745d21bbb5d0ed`; 당시 `integration/all-agents-unified`는 fetch된 origin보다 1 커밋 뒤, 공유 워킹 트리는 다른 작업자의 프런트 변경 등으로 dirty였다. `.venv/Scripts/python.exe`로 두 계약 시험 파일 65 passed, `export_schemas.py --check` 49 schemas, `check_contract_bindings.py` 39 fixtures/12 kernel anchors 통과, `git diff --check` 통과. 03:34:47 KST 재실행은 service 시험 포함 65 passed/1 skipped; 유일한 skip은 `INV_TEST_ADMIN_DSN` 부재다.
+- 미결속 저위험 raw-dict 쓰기는 heartbeat, liveness sweep, announcement/decline, member removal, user/project status 7개다. 새 handle을 만들지 않는 수령증/상태 응답이다. 완료 처리하지 않고 다음 Codex 카드로 남긴다. CI·독립 검토·실 PostgreSQL workspace-tool 검증도 pending.
+- Evidence: [[2026-09-22_Contribution_lifecycle_and_workspace_tool_response_contract_Codex]].
+- 후속 문서 게이트(최신 base 재검사): `check_docs.py`·`check_ontology.py` exit 0; `sync_obsidian.py --check` exit 0 (1512 managed, 4 pending, 0 conflicts; no writes). 상세 KST/provenance는 History에 기록.
 
 ## 2026-09-22 Artifact download SHA-256 header 경로 감사
 
@@ -19,6 +37,15 @@ source_of_truth: "Git"
 - 세부 소스 범위·명령·provenance·검증 한계는 [[2026-09-22_artifact_content_header_path_audit_Codex]].
 - Uvicorn 0.52.4를 ephemeral localhost 포트에 띄우고 실제 `urllib` HTTP로 두 alias를 확인했다. 두 응답 모두 200, 본문 34바이트, `x-content-sha256`의 값이 받은 본문 해시와 일치했고 서버 종료를 확인했다. 앱의 `ResultView.download`는 합성 fixture로 대체했으므로 DB/파일 읽기와 배포 프록시는 범위 밖이다. 상세 provenance: History 참조.
 - 다음 담당: Claude가 고정 integration SHA에서 독립 검토. 이 근거는 local Uvicorn/HTTP까지이며 실제 배포 프록시와 브라우저 인수는 아니다.
+
+### 후속: 실제 PostgreSQL·저장 파일·Uvicorn HTTP
+
+- 앞선 34-byte synthetic Uvicorn 증거는 이번 실제 경로 시험으로 대체된다. 현재 integration `a0839b4a2aa3f22bd6872bfbe50d339bfccd1d92`에서 실제 PostgreSQL 16과 synthetic Node 실행·output ingestion·Linux LocalObjects 저장을 거쳐 Uvicorn 0.52.4 실제 TCP 요청을 보냈다. 임시 통합 시험 JUnit은 1 passed, 0 failed/errors/skipped다.
+- 응답 파일 바이트는 실제 저장 snapshot에서 독립적으로 읽은 `outputs/metrics.json` 및 manifest SHA와 같고, wire `x-content-sha256`도 해당 바이트와 같다.
+- 부정 대조에서 저장 snapshot 파일을 변조하자 실제 디스크 해시가 DB metadata와 어긋났지만 HTTP는 여전히 200으로 DB stop receipt의 원본 바이트를 반환했다. 따라서 현재 라우트는 파일을 읽지 않고 receipt 바이트로 내용을 구성한다. DB 기록 해시 UPDATE 대조는 불변성 trigger가 거부했다. 파일 변조를 감지하는 HTTP 보장이나 파일 기반 다운로드는 검증/승인되지 않았다.
+- 실행은 임시 disposable PostgreSQL과 owned Linux runner에서 했고 둘 다 제거 후 label 조회 0이다. 보호 컨테이너 세 개가 계속 실행 중임을 확인했다. 전체 소스·명령·환경·정확한 경계는 [[2026-09-22_artifact_download_real_pg_uvicorn_source_boundary_Codex]]. JUnit: `docs/vault/30_Development/Evidence/artifact-download-real-pg-uvicorn.xml`.
+- 문서 사후 검사: ontology exit 0. 최초 `check_docs.py`는 별도 Claude 인계 문서의 memory link 6건에서 exit 1이었고, Claude 소유 변경 후 재실행은 24 hashes/706 documents로 exit 0이다. 최종 `sync_obsidian.py --check`는 1507 files, 3 pending, 0 conflicts (read-only), `git diff --check`와 시험 파일 원복 대조도 exit 0이다. Pending exports는 적용하지 않았다.
+- 다음 행동: Codex가 receipt-authoritative와 physical-file-authoritative 중 artifact GET의 정본을 결과/복구 계약에 맞춰 정리한다. 파일 원본이 요구되면 output provider/공유 저장 경로 구성과 변조 시 HTTP 거부를 구현·시험한다. 브라우저·배포 proxy/TLS/CDN 인수는 별도다.
 ---
 
 ## 2026-09-22 후속 요청 핸들 쓰기 응답 결속

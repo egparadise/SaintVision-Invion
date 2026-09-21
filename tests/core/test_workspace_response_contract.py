@@ -31,6 +31,7 @@ def _fixture(name: str) -> dict:
         ("project-list-response.json", schemas.ProjectListResponse),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse),
         ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse),
+        ("workspace-tool-result-response.json", schemas.WorkspaceToolResultResponse),
     ],
 )
 def test_shared_workspace_fixture_matches_strict_response_model(filename, model):
@@ -189,3 +190,41 @@ def test_create_workspace_response_model_rejects_contract_violation(monkeypatch)
         "/v1/projects/prj_contract/workspaces", json={"name": "Contract Create Workspace"}
     )
     assert response.status_code == 500  # FastAPI ResponseValidationError, not a 201
+
+
+def _tool_app(monkeypatch, service_return):
+    monkeypatch.setattr(
+        projects.project_service, "set_workspace_tool", lambda *_a, **_k: service_return
+    )
+    monkeypatch.setattr(projects, "record_event", lambda *_a, **_k: None)
+    principal = Principal(
+        user_id="usr_workspace_contract",
+        tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"),
+        external_subject="workspace-contract",
+    )
+    app = FastAPI()
+    app.include_router(projects.router)
+    app.dependency_overrides[get_principal] = lambda: principal
+    app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_now] = lambda: dt.datetime(
+        2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
+    )
+    return app
+
+
+def test_workspace_tool_route_serializes_shared_fixture(monkeypatch):
+    payload = _fixture("workspace-tool-result-response.json")
+    response = TestClient(_tool_app(monkeypatch, payload)).put(
+        "/v1/workspaces/wsp_contract_tool/tool", json={"toolName": "codex-cli"}
+    )
+    assert response.status_code == 200
+    assert response.json() == payload
+
+
+def test_workspace_tool_route_rejects_invalid_readiness(monkeypatch):
+    payload = _fixture("workspace-tool-result-response.json")
+    payload["toolReadiness"]["inventedReady"] = True
+    response = TestClient(
+        _tool_app(monkeypatch, payload), raise_server_exceptions=False
+    ).put("/v1/workspaces/wsp_contract_tool/tool", json={"toolName": "codex-cli"})
+    assert response.status_code == 500

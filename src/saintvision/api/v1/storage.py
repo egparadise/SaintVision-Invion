@@ -142,7 +142,10 @@ def register_contribution(
     return body
 
 
-@router.post("/storage/contributions/{contribution_id}/activation")
+@router.post(
+    "/storage/contributions/{contribution_id}/activation",
+    response_model=schemas.ContributionRegistrationResponse,
+)
 def activate_contribution(
     contribution_id: str,
     principal: Principal = Depends(get_principal),
@@ -154,7 +157,10 @@ def activate_contribution(
     return {"contribution": _contribution_body(contribution)}
 
 
-@router.delete("/storage/contributions/{contribution_id}")
+@router.delete(
+    "/storage/contributions/{contribution_id}",
+    response_model=schemas.ContributionRegistrationResponse,
+)
 def revoke_contribution(
     contribution_id: str,
     principal: Principal = Depends(get_principal),
