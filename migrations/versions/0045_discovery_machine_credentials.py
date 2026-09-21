@@ -174,6 +174,10 @@ def upgrade():
 
     -- Enforce the budget for every issuer-role INSERT, including direct SQL.
     -- Invoker identity distinguishes an operator SET ROLE from service inserts.
+    -- Scope boundary: superusers and the table owner can INSERT outside this role
+    -- path and bypass this quota. They are privileged administration identities,
+    -- not ordinary issuers, and are outside the quota threat model. Restrict and
+    -- audit those identities separately; do not treat this quota as a superuser cap.
     CREATE FUNCTION enforce_discovery_issuer_budget()
     RETURNS trigger
     LANGUAGE plpgsql

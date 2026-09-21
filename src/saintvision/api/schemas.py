@@ -78,6 +78,35 @@ class NodeResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class NodePageResponse(Strict):
+    """Tenant-scoped node inventory page; telemetry is intentionally absent."""
+
+    items: list[NodeResponse]
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class NodeCapability(Strict):
+    capability_id: str = Field(alias="capabilityId", max_length=30)
+    kind: str = Field(pattern="^(cpu|gpu|ram|disk)$")
+    device_index: int | None = Field(alias="deviceIndex", ge=0)
+    vendor: str | None = Field(max_length=64)
+    model: str | None = Field(max_length=128)
+    total_quantity: float = Field(alias="totalQuantity", ge=0)
+    unit: str = Field(min_length=1, max_length=16)
+    divisible: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class NodeDetailResponse(Strict):
+    node: NodeResponse
+    capabilities: list[NodeCapability]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class NodeEnrollResponse(Strict):
     node: NodeResponse
 

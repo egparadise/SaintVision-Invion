@@ -1,0 +1,26 @@
+{
+  "node": {
+    "nodeId": "nod_contract_worker",
+    "hostname": "worker-contract",
+    "osType": "linux",
+    "osVersion": "test-os",
+    "agentVersion": "test-agent",
+    "status": "online",
+    "enrolledAt": "2026-09-21T09:00:00Z",
+    "lastHeartbeatAt": "2026-09-21T09:05:00Z",
+    "heartbeatSequence": 12,
+    "labels": {"pool": "test"}
+  },
+  "capabilities": [
+    {
+      "capabilityId": "cap_contract_cpu",
+      "kind": "cpu",
+      "deviceIndex": null,
+      "vendor": null,
+      "model": null,
+      "totalQuantity": 8,
+      "unit": "cores",
+      "divisible": true
+    }
+  ]
+}

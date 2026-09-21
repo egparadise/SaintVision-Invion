@@ -26,6 +26,7 @@ import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
+import type { NodePageResponse } from '@/contracts/node-page-response';
 import { fetchProjects } from '@/shared/api/projectObservation';
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
@@ -94,7 +95,7 @@ export const App: React.FC = () => {
     if (!currentUser) return;
     const scope = scopeRef.current;
     try {
-      const page = await apiClient<{ items: Record<string, unknown>[] }>('/v1/nodes');
+      const page = await apiClient<NodePageResponse>('/v1/nodes');
       if (scopeRef.current === scope) setNodes(page.items.map(observedNode));
     } catch {
       if (scopeRef.current === scope) setNodes([]);

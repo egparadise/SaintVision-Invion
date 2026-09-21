@@ -44,6 +44,8 @@ const contracts = [
   { schema: 'pool-member-response', output: 'pool-member-response' },
   { schema: 'pool-member-removal-response', output: 'pool-member-removal-response' },
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
+  { schema: 'node-page-response', output: 'node-page-response' },
+  { schema: 'node-detail-response', output: 'node-detail-response' },
 ];
 const mode = process.argv[2];
 

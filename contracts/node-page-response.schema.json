@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "NodeResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "agentVersion": {
+          "title": "Agentversion",
+          "type": "string"
+        },
+        "enrolledAt": {
+          "format": "date-time",
+          "title": "Enrolledat",
+          "type": "string"
+        },
+        "heartbeatSequence": {
+          "title": "Heartbeatsequence",
+          "type": "integer"
+        },
+        "hostname": {
+          "title": "Hostname",
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels",
+          "type": "object"
+        },
+        "lastHeartbeatAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lastheartbeatat"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "osType": {
+          "title": "Ostype",
+          "type": "string"
+        },
+        "osVersion": {
+          "title": "Osversion",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "nodeId",
+        "hostname",
+        "osType",
+        "osVersion",
+        "agentVersion",
+        "status",
+        "enrolledAt",
+        "heartbeatSequence"
+      ],
+      "title": "NodeResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Tenant-scoped node inventory page; telemetry is intentionally absent.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/NodeResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nextcursor"
+    }
+  },
+  "required": [
+    "items",
+    "nextCursor"
+  ],
+  "title": "NodePageResponse",
+  "type": "object"
+}

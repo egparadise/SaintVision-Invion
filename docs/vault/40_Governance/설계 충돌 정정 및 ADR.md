@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.16"
+version: "1.35.17"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-21T20:03:00+09:00"
+updated: "2026-09-21T22:33:42+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -169,7 +169,7 @@ ADR-095(기존 container/정책 보존·private durable 단계·same-plan forwar
 
 ADR-096(Windows 입력·WSL 고정 private 준비·request SHA 지정 apply·같은 요청 재개·운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.9.0과 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]]를 따른다.
 
-ADR-097 proposal(tenant/install binding·discovery 전용 scope·15분 bounded refresh credential·운영자 발급·digest 저장·회전/폐기/감사)은 [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]에 둔다. 사용자 결정과 issuer 권한, 실제 발급·배포 구현은 미완료다. 현 anonymous endpoint를 재개하지 않으며 신규 무자격 Node onboarding은 안전한 scoped credential path가 구현·인수될 때까지 차단 상태다.
+ADR-097은 사용자 승인으로 **임시 운영자 CLI 발급 경로를 Accepted**로 채택했다(tenant/install binding, `discovery:announce` 최소 scope, 15분 만료, digest-only 저장, 회전·폐기·감사 및 tenant별 10회/24h issuer-role DB 제한). 발급 CLI와 테스트된 PostgreSQL 경계는 통합에 있다. 보호 전달 채널을 통한 실제 Node 바이너리/물리 장비 온보딩은 운영 인수 전이며, 장기 protected issuer API는 미결정이다. 익명 discovery endpoint는 재개하지 않는다. 상세 결정과 남은 인수 범위는 [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]] 참조.
 
 
 ## VF 서비스 통합 정정 — 복제본 가용성과 보존 분리

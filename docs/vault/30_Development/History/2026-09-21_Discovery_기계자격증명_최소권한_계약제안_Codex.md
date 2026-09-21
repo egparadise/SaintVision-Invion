@@ -1,12 +1,12 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-ADR-001"
 title: "Discovery machine credential least-privilege contract"
-version: "1.1.2"
+version: "1.1.3"
 status: "accepted"
 author: "Codex"
 reviewer: "pending"
 mapped_at_sha: "462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e"
-updated: "2026-09-21T21:52:00+09:00"
+updated: "2026-09-21T22:33:42+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "tenant", "bootstrap", "security"]
 ---
@@ -70,6 +70,8 @@ This credential is not node mTLS identity, the later one-time enrollment token, 
 - It cannot list candidates, admit/decline them, mint enrollment tokens, enroll Nodes, read tenant/project data, create workloads, request PTY tickets, or call other user APIs. Other endpoints continue to require their own OIDC principal or enrolled-node mTLS contract; the discovery secret must not be accepted as a `Principal`.
 - A stolen credential can create or refresh the one linked candidate and lie in that candidate's self-reported fields until expiry/revocation. It cannot create multiple candidates or refresh arbitrary installations. The human admission step must verify the expected installation out of band; a candidate is not proof of machine identity. This residual spoof/substitution risk must be visible to the admitting operator.
 - The server enforces one announcement per credential per 30 seconds. Because an issuer can choose many installation IDs, unlimited credential issuance could still fill a tenant's 500-candidate allowance, even though each bearer is tenant/install-bound. The DB trigger now allows at most 10 issuer-role credential inserts per tenant in any rolling 24 hours, atomically across concurrent CLI/direct-SQL writers. This limits operator mistakes and burst compromise; it does not stop a persistent authorized issuer from reaching the 500-candidate ceiling over multiple days. Keep issuer membership narrow and monitor the audit/candidate queues. Never log the raw secret or put it in argv, URL, error, evidence, or database plaintext.
+- **Quota boundary:** the trigger charges only inserts executed with `current_user = inv_discovery_issuer`, which covers the named issuer login and `SET ROLE inv_discovery_issuer` direct-SQL path. A PostgreSQL superuser or the owner of `discovery_machine_credentials` can issue an INSERT outside that role identity and bypass the quota. This is intentional: those cluster/database administration identities are outside the ordinary issuer threat model. Restrict and audit them separately; the 10/24h control is not a cap on privileged database administration. This boundary is also stated beside the migration trigger so future reviewers do not mistake the role-scoped check for a universal database limit.
+- PostgreSQL quota evidence includes sequential 10+1 CLI and direct-SQL denial plus a 12-worker barrier-start race test: exactly 10 issuance transactions succeed, two are refused, and the committed credential, issued-event, and rolling-budget timestamp counts are each exactly 10. This directly verifies the tenant budget-row serialization and that rejected trigger exceptions roll back their timestamp append. The concurrent integration case passed on an owned disposable PostgreSQL 16 container; it is not a hosted-CI run.
 
 ### Secret format, expiry, and use
 

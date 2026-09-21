@@ -34,6 +34,7 @@ import type { DistributedPlanResponse } from '@/contracts/distributed-plan-respo
 export type { DistributedPlanResponse };
 import type { PoolMemberResponse } from '@/contracts/pool-member-response';
 import type { PoolMemberRemovalResponse } from '@/contracts/pool-member-removal-response';
+import type { NodeCapability as NodeCapabilityWire, NodeDetailResponse as NodeDetailWireResponse } from '@/contracts/node-detail-response';
 
 export type StorageContribution = ContributionResponse;
 export type StorageLocation = DataLocationResponse;
@@ -54,32 +55,8 @@ export interface PlacementPreviewResponse {
   candidateCount: number;
 }
 
-export interface NodeCapability {
-  capabilityId: string;
-  kind: string;
-  deviceIndex: number | null;
-  vendor: string | null;
-  model: string | null;
-  totalQuantity: number;
-  unit: string;
-  divisible: boolean;
-}
-
-export interface NodeDetailResponse {
-  node: {
-    nodeId: string;
-    hostname: string;
-    osType: string;
-    osVersion: string;
-    agentVersion: string;
-    status: string;
-    enrolledAt: string;
-    lastHeartbeatAt: string;
-    heartbeatSequence: number;
-    labels: Record<string, string>;
-  };
-  capabilities: NodeCapability[];
-}
+export type NodeCapability = NodeCapabilityWire;
+export type NodeDetailResponse = NodeDetailWireResponse;
 
 /** UI state grows as admission actions complete; the wire response stays candidate-only. */
 export type DiscoveryCandidate = Omit<DiscoveryCandidateResponse, 'state' | 'verified'> & {

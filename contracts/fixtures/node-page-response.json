@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "nodeId": "nod_contract_worker",
+      "hostname": "worker-contract",
+      "osType": "linux",
+      "osVersion": "test-os",
+      "agentVersion": "test-agent",
+      "status": "online",
+      "enrolledAt": "2026-09-21T09:00:00Z",
+      "lastHeartbeatAt": "2026-09-21T09:05:00Z",
+      "heartbeatSequence": 12,
+      "labels": {"pool": "test"}
+    }
+  ],
+  "nextCursor": null
+}

@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "NodeCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilityId": {
+          "maxLength": 30,
+          "title": "Capabilityid",
+          "type": "string"
+        },
+        "deviceIndex": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Deviceindex"
+        },
+        "divisible": {
+          "title": "Divisible",
+          "type": "boolean"
+        },
+        "kind": {
+          "pattern": "^(cpu|gpu|ram|disk)$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model"
+        },
+        "totalQuantity": {
+          "minimum": 0,
+          "title": "Totalquantity",
+          "type": "number"
+        },
+        "unit": {
+          "maxLength": 16,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "vendor": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vendor"
+        }
+      },
+      "required": [
+        "capabilityId",
+        "kind",
+        "deviceIndex",
+        "vendor",
+        "model",
+        "totalQuantity",
+        "unit",
+        "divisible"
+      ],
+      "title": "NodeCapability",
+      "type": "object"
+    },
+    "NodeResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "agentVersion": {
+          "title": "Agentversion",
+          "type": "string"
+        },
+        "enrolledAt": {
+          "format": "date-time",
+          "title": "Enrolledat",
+          "type": "string"
+        },
+        "heartbeatSequence": {
+          "title": "Heartbeatsequence",
+          "type": "integer"
+        },
+        "hostname": {
+          "title": "Hostname",
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Labels",
+          "type": "object"
+        },
+        "lastHeartbeatAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lastheartbeatat"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "osType": {
+          "title": "Ostype",
+          "type": "string"
+        },
+        "osVersion": {
+          "title": "Osversion",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "nodeId",
+        "hostname",
+        "osType",
+        "osVersion",
+        "agentVersion",
+        "status",
+        "enrolledAt",
+        "heartbeatSequence"
+      ],
+      "title": "NodeResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "items": {
+        "$ref": "#/$defs/NodeCapability"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "node": {
+      "$ref": "#/$defs/NodeResponse"
+    }
+  },
+  "required": [
+    "node",
+    "capabilities"
+  ],
+  "title": "NodeDetailResponse",
+  "type": "object"
+}

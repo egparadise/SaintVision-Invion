@@ -7,6 +7,8 @@ import io
 import os
 import re
 import secrets
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from uuid import uuid4
 
 import pytest
@@ -453,6 +455,74 @@ def test_discovery_issuer_budget_blocks_cli_and_direct_sql_beyond_ten_per_tenant
                 {"tenant": tenant},
             ).scalar_one()
         assert issued_count == event_count == budget_count == 10
+    finally:
+        with owner_engine.begin() as connection:
+            connection.exec_driver_sql(f'REVOKE inv_discovery_issuer FROM "{login}"')
+            connection.exec_driver_sql(f'DROP ROLE "{login}"')
+
+
+def test_concurrent_discovery_issuance_serializes_at_tenant_limit_without_consuming_extra_slots(
+    owner_engine, database_url, two_tenants
+):
+    """Concurrent callers get exactly ten grants; rejected trigger writes roll back budget slots."""
+    from tools import discovery_credential
+
+    tenant, _ = two_tenants
+    login = "dcr_race_" + uuid4().hex[:16]
+    password = secrets.token_hex(32)
+    with owner_engine.begin() as connection:
+        connection.exec_driver_sql(
+            f'CREATE ROLE "{login}" LOGIN PASSWORD \'{password}\' NOSUPERUSER NOBYPASSRLS '
+            "NOCREATEDB NOCREATEROLE NOREPLICATION NOINHERIT"
+        )
+        connection.exec_driver_sql(f'GRANT inv_discovery_issuer TO "{login}"')
+    dsn = make_url(database_url).set(
+        drivername="postgresql", username=login, password=password
+    ).render_as_string(hide_password=False)
+    environment = {discovery_credential.ISSUER_DSN_ENV: dsn}
+    start_together = Barrier(12)
+
+    def attempt(index):
+        output, error = Tty(), io.StringIO()
+        start_together.wait(timeout=15)
+        code = discovery_credential.run(
+            ["issue", "--tenant", str(tenant), "--installation", f"parallel-{index}", "--apply"],
+            environ=environment,
+            output=output,
+            error=error,
+        )
+        if code == discovery_credential.EXIT_OK:
+            assert len([line for line in output.getvalue().splitlines() if line.startswith("dsc1_")]) == 1
+            assert not error.getvalue()
+        else:
+            _require_secret_absent("dsc1_", output.getvalue(), "refused concurrent issuance revealed a bearer")
+        return code, error.getvalue()
+
+    try:
+        with ThreadPoolExecutor(max_workers=12) as executor:
+            results = list(executor.map(attempt, range(12)))
+
+        codes = [code for code, _ in results]
+        assert codes.count(discovery_credential.EXIT_OK) == 10
+        assert codes.count(discovery_credential.EXIT_REFUSED) == 2
+        assert all(not error or error == (
+            "REFUSED tenant discovery issuance limit reached (10 per rolling 24 hours)\n"
+        ) for _, error in results)
+
+        with owner_engine.connect() as connection:
+            issued = connection.execute(text(
+                "SELECT count(*) FROM discovery_machine_credentials "
+                "WHERE tenant_id=:tenant AND issued_by=:actor"
+            ), {"tenant": tenant, "actor": login}).scalar_one()
+            audit = connection.execute(text(
+                "SELECT count(*) FROM discovery_credential_events "
+                "WHERE tenant_id=:tenant AND actor=:actor AND event_type='issued'"
+            ), {"tenant": tenant, "actor": login}).scalar_one()
+            consumed = connection.execute(text(
+                "SELECT cardinality(issue_timestamps) FROM discovery_credential_issue_budgets "
+                "WHERE tenant_id=:tenant"
+            ), {"tenant": tenant}).scalar_one()
+        assert issued == audit == consumed == 10
     finally:
         with owner_engine.begin() as connection:
             connection.exec_driver_sql(f'REVOKE inv_discovery_issuer FROM "{login}"')

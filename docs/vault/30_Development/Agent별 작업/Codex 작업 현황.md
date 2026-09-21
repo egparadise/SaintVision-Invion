@@ -1,21 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.129"
+version: "1.0.130"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T22:09:00+09:00"
+updated: "2026-09-21T22:33:42+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 CI 검사 배선, issuer 쿼터 경계, Node 응답 계약
+
+- `.github/workflows/docs.yml`에서 `check_contract_bindings.py`와 `check_frontend_integrity.py`를 자동 실행하게 했다. PostgreSQL CI 설정 소스상 backend `invowner`와 core `postgres`는 공식 서비스 이미지의 bootstrap superuser이며 통합 fixture가 요구하는 DB/role 생성 권한이 있다. hosted runner 실실행은 결제 대기다.
+- ADR-097 및 0045 migration 주석에 쿼터 범위를 명시했다: `inv_discovery_issuer`와 `SET ROLE` 직접 SQL 경로는 10회/tenant/24h 제한을 받으며 PostgreSQL superuser와 credential 테이블 소유자는 해당 역할 바깥이라 쿼터 밖이다. 그 특권 계정은 별도로 제한·감사해야 한다.
+- 12 worker barrier 동시 발급 시험을 추가했다. disposable PostgreSQL 16 실측에서 10 성공·2 안정 거부, credential/audit/budget timestamp 각 10개를 확인했다. `.venv/Scripts/python.exe -m pytest -q tests/integration/test_discovery_machine_credentials.py`: 5 passed, 0 skipped, 0 failed/errors; 소유 라벨 확인 후 시험 컨테이너 제거 및 잔존 0 확인. 사유·명령·환경은 History 참조.
+- Node list/detail를 strict FastAPI response model, 공유 fixture, JSON Schema/생성 TS, Python provider와 frontend conformance 시험으로 묶었다. DB-free provider route 9 passed. fixtures에 telemetry를 합성하지 않았고 기존 `nodeObservation`에서 unavailable semantics를 유지한다. 합성 `nextCursor` 이름 변형은 Python과 Vitest 양쪽에서 실패해 원복했다.
+- 로컬 검증: 전체 Core 778 passed/4 선행조건 skip/0 fail(errors 포함), Vitest 58 files/545 passed, TypeScript/Vite build 성공, schema 41, TS API contracts 16, bindings 29 fixtures/11 anchors, frontend integrity 0 violations, docs/ontology 통과. 엄격 nested capability schema 반영 후에는 focused node contract 9 passed와 schema/type generation check를 재실행했다. 전체 provenance/경계는 `[[2026-09-21_web_response_contract_map_workspace_Codex]]`.
+- 다음 담당/행동: Claude fixed-SHA 독립 검토는 integration 착지 SHA 대상으로 대기. hosted Actions는 결제 복구 후 `docs`, `backend`, `core` 순으로 실행해 신규 게이트와 실제 PG role 권한을 확인한다. Gemini는 이 Node API slice에서 화면 변경을 하지 않았으며 브라우저 인수는 별도다.
 
 ## 2026-09-21 통합 migration-head 회귀 및 응답 계약 결정
 
 - Claude fixed-SHA 보고에서 통합 Core의 단일 실패를 확인: `test_integrated_migration_keeps_both_published_histories`의 기대 head가 0044에 고정되어 0045에서 실패했다. 0045는 정상 head다. 시험은 Alembic `ScriptDirectory.get_current_head()`와 migration_graph AST head를 비교하고, rollback target은 현재 irreversible/merge 경계에서 유도한다. 메모리상 synthetic future reversible migration도 추가해 새 tip을 따라가며 rollback target을 보존하는지 검사한다.
 - 수정 전 0044 literal 변형은 1 failed/exit 1 (`0045_discovery_machine_cred != 0044_model_registry_binding`), 수정 후 integration exact tip `a1833e3`에서 Core 전체는 769 passed / 4 reasoned skips / 0 failed / 0 errors다. Claude 기준선 770 passed/1 failed/4 skipped와 pass 하나 차이는 제거된 legacy project provider fixture 케이스다. Python은 `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6. 최종 provenance와 skip 이유는 History에 기록했다.
 - LegacyProjectCatalogResponse는 `/v1/projects` 외 별도 producer·운영 호환 구성이 검색되지 않아 dead server contract로 판정해 API schema/fixture/test/generated types와 프런트 fallback을 제거했다. 이전 envelope를 허위 프로젝트 메타데이터로 바꾸지 않고 거부하는 DOM 없는 adapter 회귀를 고정했다.
-- `GET /v1/nodes`와 `GET /v1/nodes/{node_id}`는 실제 소비자가 있지만 unmodeled dict다. Node list page와 detail+capability를 한 response-contract slice로 묶는 것을 다음 Codex 작업으로 결정했다. 엄격 response model/fixture/generated type/provider test를 추가하되, 현재 NodeResponse 밖의 telemetry를 합성하지 않고 화면 의미 변경은 Gemini에 남긴다.
+- `GET /v1/nodes`와 `GET /v1/nodes/{node_id}`의 미계약 응답은 다음 Codex 작업으로 지정됐으며, 이번 후속에서 strict page/detail/capability response model, generated schema/type, shared fixture, DB-free provider/frontend conformance 시험으로 묶었다. telemetry는 계속 wire contract 밖에 있고 Gemini 소유의 화면 동작 변경은 하지 않았다.
 - 상세 근거와 검증 경계: `[[2026-09-21_web_response_contract_map_workspace_Codex]]`. Integration landing 완료. 다음 Codex 작업: node list/detail response-contract slice; strict route response model과 fixture/provider test부터 추가하되 화면 변화는 Gemini 소유로 둔다.
 
 ## 2026-09-21 ADR-097 issuer quota follow-up

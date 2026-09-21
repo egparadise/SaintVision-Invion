@@ -4,7 +4,10 @@ const metrics = ['cpuCores', 'cpuUsagePercent', 'memoryTotalBytes', 'memoryUsedB
   'gpuCount', 'storageTotalBytes', 'storageUsedBytes'] as const;
 
 /** Missing values stay unavailable; NaN is internal and never a displayed measurement. */
-export function observedNode(raw: Record<string, unknown>): NodeItem {
+export function observedNode(value: object): NodeItem {
+  // Both untrusted legacy row objects and the strict generated NodeResponse
+  // enter this projection. Fields absent from the wire remain unavailable.
+  const raw = value as Record<string, unknown>;
   const number = (key: string) => typeof raw[key] === 'number' && Number.isFinite(raw[key]) && raw[key] >= 0 ? raw[key] as number : Number.NaN;
   const heartbeat = raw.lastHeartbeatAt ?? raw.heartbeatAt;
   const os = raw.osType ?? raw.os;

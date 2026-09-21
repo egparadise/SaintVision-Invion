@@ -243,7 +243,7 @@ def sweep_liveness(
     }
 
 
-@router.get("/nodes")
+@router.get("/nodes", response_model=schemas.NodePageResponse)
 def list_nodes(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
@@ -264,7 +264,7 @@ def list_nodes(
     return page.to_dict(_node_body)
 
 
-@router.get("/nodes/{node_id}")
+@router.get("/nodes/{node_id}", response_model=schemas.NodeDetailResponse)
 def get_node(
     node_id: str,
     principal: Principal = Depends(get_principal),
