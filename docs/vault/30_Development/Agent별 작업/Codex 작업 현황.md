@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.143"
+version: "1.0.144"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T01:18:02+09:00"
+updated: "2026-09-22T01:53:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 Artifact content response contract
+
+- 작업 카드 `THREAD-2026-09-22-ARTIFACT-CONTENT-CONTRACT`; owner Codex, reviewer/독립 검토 pending. 구현 branch `agent/codex/artifact-content-contract`, 기준 `8cb1251572de743ef14c6c8ec85dde3d7de65676`, 코드 SHA `65aec0ccbd276e35bd4707b93965b0b1b786debe`.
+- Raw artifact body bytes의 content type/length/SHA-256/disposition/nosniff와 manifest `RunArtifactFile` 메타데이터를 canonical 계약·공유 fixture·backend serving validator·frontend 계약 검사에 결속했다. 변형 시험에서 serving validator 제거 시 실패, canonical schema 변형 시 frontend 및 생성 후 backend 검사 실패를 확인했다.
+- 코드 SHA clean worktree에서 Python core 13 passed, 계약 바인딩 검사 36 fixture/12 serving anchors, Vitest 6 passed, contracts:check 16 type/schema 통과, web build exit 0. PostgreSQL integration 1건은 `INV_TEST_ADMIN_DSN` 부재로 명시적 skip이며 DB-backed 경로는 미검증. 상세 provenance, 명령, 되돌림 대조: [[2026-09-22_artifact_content_contract_Codex]].
+- `agent/codex/response-freshness`는 커밋 내용이 이미 integration에 보존된 것을 확인하고, 이력 불일치 원격 ref를 삭제한 뒤 clean worktree/local ref를 정리했다. 강제 갱신은 하지 않았다.
+- 다음: integration 결과를 기준으로 독립 검토, disposable PostgreSQL integration 실행. node usage 모델 결정과 Go T1-3는 이 카드 범위 밖의 대기 항목.
+---
 
 ## 2026-09-22 Run / shard / artifact / log 신선도 계약
 
