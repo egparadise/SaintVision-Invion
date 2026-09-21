@@ -154,6 +154,7 @@ export interface InvFileItem {
   classification: 'public' | 'internal' | 'confidential' | 'restricted';
   updatedAt: string;
   content?: string | Uint8Array;
+  source?: 'kernel-checkout' | 'demo' | 'user';
 }
 
 export interface InvDriveSummary {

@@ -625,6 +625,7 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
       ...sampleDegradedFile,
       content: rawContent,
       contentHash: computedHash,
+      source: 'kernel-checkout',
     };
 
     await act(async () => {
@@ -646,6 +647,50 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
     const badge = container.querySelector('[data-testid="integrity-badge"]');
     expect(badge?.textContent).toContain('검증 통과 (VERIFIED)');
     expect(container.querySelector('[data-testid="calculated-hash"]')?.textContent).toBe(computedHash);
+
+    const fileSourceBadge = container.querySelector('[data-testid="file-source-badge"]');
+    expect(fileSourceBadge?.textContent).toContain('커널 체크아웃 (WorkspaceEditView 실 바이트)');
+  });
+
+  it('[VF-GM-03-DEMO-FILE-UNVERIFIED] strictly refuses verification for demo/unconnected files and retains unverified status', async () => {
+    const rawContent = 'DEMO-DATA-NOT-CONNECTED';
+    const computedHash = await calculateSha256(rawContent);
+
+    const demoFile: InvFileItem = {
+      ...sampleDegradedFile,
+      content: rawContent,
+      contentHash: computedHash,
+      source: 'demo',
+    };
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[demoFile]}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await Promise.resolve();
+    });
+
+    const badge = container.querySelector('[data-testid="integrity-badge"]');
+    expect(badge?.textContent).toBe('미검증 (UNVERIFIED)');
+    expect(badge?.textContent).not.toContain('검증 통과 (VERIFIED)');
+
+    const actionError = container.querySelector('[data-testid="integrity-action-error"]');
+    expect(actionError).not.toBeNull();
+    expect(actionError?.getAttribute('role')).toBe('alert');
+    expect(actionError?.textContent).toContain(
+      '데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지)'
+    );
+
+    const fileSourceBadge = container.querySelector('[data-testid="file-source-badge"]');
+    expect(fileSourceBadge?.textContent).toContain('로컬/데모 (실제 저장소 미연결 · 무결성 검증 유보)');
   });
 
   it('[VF-GM-03-ABSENT-REPAIR-ADAPTER] displays honest error alert without synthesizing repaired replicas when onRepairReplicas is absent', async () => {
@@ -671,7 +716,7 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
     const repairError = container.querySelector('[data-testid="repair-action-error"]');
     expect(repairError).not.toBeNull();
     expect(repairError?.getAttribute('role')).toBe('alert');
-    expect(repairError?.textContent).toContain('서버 복구 어댑터(onRepairReplicas)가 연결되지 않아 복구를 수행할 수 없습니다.');
+    expect(repairError?.textContent).toContain('서버에 온디맨드 복구 실행 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)');
 
     expect(container.querySelector('[data-testid="repair-action-success"]')).toBeNull();
     expect(container.querySelector('[data-testid="replica-degradation-badge"]')).not.toBeNull();

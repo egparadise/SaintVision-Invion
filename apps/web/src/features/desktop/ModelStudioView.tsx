@@ -141,7 +141,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
         setRepairState({
           repairingShardIndex: shardIndex,
           message: null,
-          error: '서버 샤드 복구 어댑터(onRepairShard)가 연결되지 않아 복구를 수행할 수 없습니다.',
+          error: '서버에 온디맨드 샤드 복구 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)',
         });
         return;
       }
@@ -379,6 +379,16 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
               ? '알 수 없음 (unknown) · 실행 재검증 필요 (requiresExecutionRevalidation: true)'
               : '관측 완료 · 분산 패브릭 연동'}
           </p>
+          <p
+            data-testid="model-verification-notice"
+            style={{
+              margin: 0,
+              fontSize: '0.8125rem',
+              color: '#f59e0b',
+            }}
+          >
+            무결성 상태: 검증 라우트 부재 (내부 verify만 존재) · 실행 재검증 필요 (requiresExecutionRevalidation: true)
+          </p>
         </article>
       )}
 
@@ -399,7 +409,7 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
             gap: '8px',
           }}
         >
-          <span>ℹ️ (개별 샤드 및 복제본 위치 관측 데이터가 없습니다. 실행 재검증 후 수집됩니다.)</span>
+          <span>ℹ️ (개별 샤드 및 per-shard 복제본 건강 관측 데이터가 백엔드에 부재합니다. 실행 재검증 후 수집됩니다.)</span>
         </div>
       )}
 

@@ -517,11 +517,17 @@ describe('VF-GM-04: Model Studio DOM Harness & ADR-041 Guarantees', () => {
     expect(availStatus?.textContent).toContain('실행 재검증 필요');
     expect(availStatus?.textContent).not.toContain('관측 완료 · 분산 패브릭 연동');
 
+    // Invariant 1b: Explicit verification absence notice
+    const verifyNotice = container.querySelector('[data-testid="model-verification-notice"]');
+    expect(verifyNotice).not.toBeNull();
+    expect(verifyNotice?.textContent).toContain('무결성 상태: 검증 라우트 부재 (내부 verify만 존재)');
+    expect(verifyNotice?.textContent).toContain('실행 재검증 필요 (requiresExecutionRevalidation: true)');
+
     // Invariant 2: Unobserved shards notice MUST be displayed with role="status"
     const unobservedNotice = container.querySelector('[data-testid="unobserved-shards-notice"]');
     expect(unobservedNotice).not.toBeNull();
     expect(unobservedNotice?.getAttribute('role')).toBe('status');
-    expect(unobservedNotice?.textContent).toContain('개별 샤드 및 복제본 위치 관측 데이터가 없습니다');
+    expect(unobservedNotice?.textContent).toContain('개별 샤드 및 per-shard 복제본 건강 관측 데이터가 백엔드에 부재합니다');
 
     // Invariant 3: Shards matrix section MUST NOT exist (no fabricated shards)
     expect(container.querySelector('[data-testid="shards-matrix-section"]')).toBeNull();
@@ -551,7 +557,7 @@ describe('VF-GM-04: Model Studio DOM Harness & ADR-041 Guarantees', () => {
     const repairError = container.querySelector('[data-testid="shard-repair-error"]');
     expect(repairError).not.toBeNull();
     expect(repairError?.getAttribute('role')).toBe('alert');
-    expect(repairError?.textContent).toContain('서버 샤드 복구 어댑터(onRepairShard)가 연결되지 않아 복구를 수행할 수 없습니다.');
+    expect(repairError?.textContent).toContain('서버에 온디맨드 샤드 복구 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)');
 
     expect(container.querySelector('[data-testid="shard-repair-success"]')).toBeNull();
   });

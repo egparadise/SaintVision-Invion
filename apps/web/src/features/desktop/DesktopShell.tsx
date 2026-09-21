@@ -670,7 +670,11 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               )}
 
               {win.appId === 'file-explorer' && (
-                <InvFileExplorer clusterNodes={nodes} />
+                <InvFileExplorer
+                  projectId={projectId}
+                  runId={runs[0]?.id}
+                  clusterNodes={nodes}
+                />
               )}
 
               {win.appId === 'model-studio' && (
