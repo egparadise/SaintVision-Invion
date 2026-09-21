@@ -15,6 +15,8 @@ tags: ["contract", "workspace", "enum-tightening", "cross-lane-coupling", "green
 
 # WorkspaceSummaryResponse status/allowedNext 좁힘 — 검증 완료, 착지 보류
 
+> **갱신(2026-09-22): 착지 완료.** Gemini가 `DeveloperStudio.tsx`의 `'active'` 죽은 분기를 소거하고 5상태 전부 결속(Chrome에서 ready=초록 rgb63,185,80 확인, tsc EXIT 0, vitest 631)한 tip에서 vw를 재동기하고 `tsc -b --force EXIT 0`으로 **RED 2건 소거를 직접 확인**한 뒤, 내 5파일을 개인 index로 착지했다(commit `a5b08d32`, rev-range 검증=내 5파일만). 순서 지킴(Gemini 프런트 먼저 → 내 계약 좁힘). 이하 본문은 착지 전 판정 기록이다.
+
 ## 무엇을 했나 (내 레인: 백엔드 계약)
 [[2026-09-22_set_workspace_status_후속확인_잔여와레인_Claude]]가 권고로 남긴 잔여 1건을 착수했다. §0(이어가기)의 "다음 첫 행동"이며, 그 문서가 미착수로 둔 유일한 사유(`vw`에 `json-schema-to-typescript` 부재)를 이 세션에서 해소했다 — 메인 트리 `apps/web/node_modules`를 vw의 `apps/web/node_modules`로 **junction** 걸어 TS 생성·tsc·vitest 툴체인을 vw(clean tip)에서 사용 가능하게 만들었다.
 
