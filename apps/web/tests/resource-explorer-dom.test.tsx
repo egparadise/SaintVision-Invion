@@ -944,4 +944,155 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(fetchSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('Discovery Empty-State Tri-Partition & Architectural Rule Notice (UI-FB-03)', () => {
+    it('State 1 (Clean Zero Candidates): renders discovery-empty-state with truthful operator CLI credential rule notice, suppressing error banner', async () => {
+      const pending = deferred<any>();
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockReturnValue(pending.promise);
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // Initially in loading state
+      expect(container.querySelector('[data-testid="discovery-loading"]')).not.toBeNull();
+
+      // Query returns 0 items cleanly
+      await act(async () => {
+        pending.resolve({ items: [] });
+      });
+
+      // 1. discovery-empty-state MUST be rendered
+      const emptyState = container.querySelector('[data-testid="discovery-empty-state"]');
+      expect(emptyState).not.toBeNull();
+      expect(emptyState?.textContent).toContain('승인 대기 중인 디스커버리 후보가 없습니다');
+      expect(emptyState?.textContent).toContain('후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙)');
+      expect(emptyState?.textContent).toContain('saint operator issue-grant');
+      expect(emptyState?.textContent).toContain('일회용 자격증명');
+
+      // 2. Negative controls: Error banner, tenant missing warning, and admission buttons MUST NOT exist
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).toBeNull();
+      expect(container.querySelector('[data-testid="discovery-tenant-required-notice"]')).toBeNull();
+      expect(container.textContent).not.toContain('승인 & 토큰 발급');
+    });
+
+    it('State 2 (Query Failure): renders discovery-error-banner with role="alert" and retry button, suppressing empty-state and candidate cards', async () => {
+      const pending = deferred<any>();
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockReturnValue(pending.promise);
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // Query fails with 503 error
+      await act(async () => {
+        pending.reject(new Error('503 Service Unavailable: Discovery daemon unreachable'));
+      });
+
+      // 1. Error banner MUST be rendered with role="alert"
+      const errorBanner = container.querySelector('[data-testid="discovery-error-banner"]');
+      expect(errorBanner).not.toBeNull();
+      expect(errorBanner?.getAttribute('role')).toBe('alert');
+      expect(errorBanner?.textContent).toContain('디스커버리 서비스 연결 오류');
+      expect(errorBanner?.textContent).toContain('503 Service Unavailable: Discovery daemon unreachable');
+
+      // 2. Retry button MUST exist
+      expect(container.querySelector('[data-testid="discovery-retry-btn"]')).not.toBeNull();
+
+      // 3. Negative controls: discovery-empty-state and candidate rows MUST NOT exist
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).toBeNull();
+      expect(container.textContent).not.toContain('saint operator issue-grant');
+      expect(container.textContent).not.toContain('승인 & 토큰 발급');
+    });
+
+    it('State 3 (Session Tenant Missing): renders discovery-tenant-required-notice, disables broadcast button, and enforces 0 network calls', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement');
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            // tenantId is omitted
+          />
+        );
+      });
+
+      // 1. Tenant required barrier notice MUST appear
+      const tenantNotice = container.querySelector('[data-testid="discovery-tenant-required-notice"]');
+      expect(tenantNotice).not.toBeNull();
+      expect(tenantNotice?.textContent).toContain('인증된 세션 테넌트 식별자(tenantId)가 없어');
+      expect(tenantNotice?.textContent).toContain('위조 테넌트 합성 및 후보 한도 소진 방지');
+
+      // 2. Broadcast button MUST be disabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(true);
+
+      // 3. Attempting to click disabled button MUST produce exactly 0 network calls (zero-call guard)
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('Tri-Partition Re-query Transition: proves State 1 (clean empty) <-> State 2 (error) mutual exclusion across live state transitions', async () => {
+      let callCount = 0;
+      const firstCall = deferred<any>();
+      const secondCall = deferred<any>();
+
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? firstCall.promise : secondCall.promise;
+      });
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // 1. Resolve first call with empty array -> State 1 (Clean Empty)
+      await act(async () => {
+        firstCall.resolve({ items: [] });
+      });
+
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).toBeNull();
+
+      // 2. Click refresh -> initiate second query
+      const refreshBtn = container.querySelector<HTMLButtonElement>('[data-testid="discovery-refresh-btn"]');
+      expect(refreshBtn).not.toBeNull();
+      await act(async () => {
+        refreshBtn!.click();
+      });
+
+      // 3. Reject second call -> Transition from State 1 to State 2 (Error)
+      await act(async () => {
+        secondCall.reject(new Error('500 Internal Discovery Failure'));
+      });
+
+      // Error banner MUST appear and empty state MUST be removed
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).toBeNull();
+    });
+  });
 });

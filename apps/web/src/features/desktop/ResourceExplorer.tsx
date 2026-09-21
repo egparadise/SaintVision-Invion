@@ -1801,8 +1801,29 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {candidatesState === 'success' && candidates.length === 0 && (
-              <div data-testid="discovery-empty-state" style={{ padding: '24px', textAlign: 'center', color: '#64748b', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px dashed #334155' }}>
-                ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다.
+              <div
+                data-testid="discovery-empty-state"
+                style={{
+                  padding: '24px',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px dashed #334155',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
+                  ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다. (0 Candidates Pending)
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', maxWidth: '640px', margin: '0 auto' }}>
+                  <strong>후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙):</strong><br />
+                  테넌트 격리 및 무단 노드 오염 방지 정책에 따라, 운영자 CLI(<code>saint operator issue-grant</code>)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다.
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                  신규 머신 부트스트랩 및 안내 방송 수신 대기 중 · 상단 '새로고침' 버튼으로 갱신 가능
+                </div>
               </div>
             )}
 

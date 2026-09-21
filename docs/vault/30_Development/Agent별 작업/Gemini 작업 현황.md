@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.68"
+version: "1.0.69"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T20:55:00+09:00"
+updated: "2026-09-21T21:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,22 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T20:55:00+09:00.
+- 확인 기준: 2026-09-21T21:05:00+09:00.
 
 ## 최근 확인한 진척
+
+- **디스커버리 3대 빈 상태 분리, 운영자 자격 규칙 고지 및 DOM 돌연변이 실측 사살 완결 (`ResourceExplorer.tsx`, `resource-explorer-dom.test.tsx`)**:
+  - **디스커버리 3대 빈 상태 엄격 분리 (Empty-State Tri-Partition)**:
+    - **State 1 (정상 조회 빈 상태)**: `candidatesState === 'success' && candidates.length === 0`일 때 `data-testid="discovery-empty-state"`를 렌더링. 시스템 아키텍처 규칙("테넌트 격리 정책에 따라 운영자 CLI(`saint operator issue-grant`)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다. 신규 머신 부트스트랩 대기 중")을 정직하게 고지하고 에러 배너 및 테넌트 미식별 경고를 완전 배제.
+    - **State 2 (서비스 연결 실패)**: `candidatesState === 'error'`일 때 `role="alert"` 속성의 `data-testid="discovery-error-banner"` 및 `data-testid="discovery-retry-btn"` 표출. 잔여 후보 및 조작 버튼 완전 소거, 빈 상태 안내문 배제.
+    - **State 3 (세션 테넌트 미식별 차단)**: `!tenantId || !tenantId.trim()`일 때 `data-testid="discovery-tenant-required-notice"` 표출, 안내 방송 버튼 비활성화(`disabled`), 클릭 시도 시 네트워크 0회 호출 가드(0 network calls) 엄격 집행.
+  - **DOM 단위 테스트 및 3대 돌연변이 실측 사살 (전수 KILLED)**:
+    - M1 (State 2 에러 배너 무력화): 5개 테스트 실패 (`expected null not to be null`), 사살 후 원복.
+    - M2 (State 1 운영자 자격증명 규칙 고지 문구 제거): State 1 테스트 실패 (`expected '...' to contain '후보 목록이 비어 있는 이유'`), 사살 후 원복.
+    - M3 (State 3 테넌트 부재 시 브로드캐스트 활성화 변조): 2개 테스트 실패 (`expected false to be true`), 사살 후 원복.
+  - **검증 실적**: Vitest 56개 파일 **527/527 passed 100%** (from 523 to 527, net +4 passed; `resource-explorer-dom.test.tsx` 24/24 passed), Vite 프로덕션 빌드 exit 0 (3.32s, 96 modules), Pytest discovery contract 8 passed, `check_frontend_integrity.py` 0 violations & `--test-negative` PASS, check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_디스커버리_3대빈상태분리_운영자자격규칙고지_Gemini]].
+
 
 - **화면 정직성 스캐너 6대 한계 명시 및 5대 규칙 양방향 실측 사살 완결 (`check_frontend_integrity.py`, `화면_개발_정직성_지침_및_사례집.md`)**:
   - **스캐너 6대 구조적 한계(What this scanner does NOT check) 명시**: 도구 소스 상단 독스트링 및 거버넌스 문서 섹션 3.2에 (1) 동적 변수 조립/계산식 가짜 값, (2) 오늘 목록에 없는 신규 형태 합성 식별자, (3) 특정 컴포넌트 타겟팅 규칙의 새 파일 미추적, (4) 소스 어휘 존재 vs 런타임 데이터 흐름, (5) 모양만 유효한 임의 식별자의 실존성, (6) 비-텍스트적/시각적 조기 성공 표출 한계를 명문화하여 "검사 초록이 완벽한 안전을 뜻하지 않음"을 선언.
