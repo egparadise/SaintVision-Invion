@@ -699,6 +699,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                     defaultNodeId={nodes.find((n) => !n.observationOnly && n.schedulable !== false)?.id || nodes[0]?.id}
                     defaultWorkspaceId={workspaces[0]?.id || 'wsp_default'}
                     projectId={projectId}
+                    commandId={runs.find((r) => r.state === 'scheduled' || r.state === 'verifying')?.id || runs[0]?.id || null}
                   />
                 </div>
               )}

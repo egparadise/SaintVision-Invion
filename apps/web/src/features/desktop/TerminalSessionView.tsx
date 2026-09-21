@@ -10,6 +10,7 @@ export interface TerminalSessionViewProps {
   defaultWorkspaceId?: string;
   projectId?: string;
   initialMode?: 'terminal' | 'ide';
+  commandId?: string | null;
   onCreateSessionError?: (err: string) => void;
 }
 
@@ -28,8 +29,16 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
   defaultWorkspaceId = 'wsp_01JABCDE001',
   projectId = 'prj_01JABCDE',
   initialMode = 'terminal',
+  commandId,
   onCreateSessionError,
 }) => {
+  const [activeCommandId, setActiveCommandId] = useState<string>(commandId ?? '');
+
+  React.useEffect(() => {
+    if (commandId !== undefined) {
+      setActiveCommandId(commandId ?? '');
+    }
+  }, [commandId]);
   if (!nodes || nodes.length === 0) {
     return (
       <div
@@ -357,6 +366,25 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '0.6875rem' }}>명령 ID:</span>
+            <input
+              type="text"
+              data-testid="terminal-command-id-input"
+              value={activeCommandId}
+              onChange={(e) => setActiveCommandId(e.target.value)}
+              placeholder="승인 commandId..."
+              style={{
+                backgroundColor: '#0f172a',
+                border: '1px solid #334155',
+                borderRadius: '4px',
+                color: '#f8fafc',
+                fontSize: '0.6875rem',
+                padding: '2px 6px',
+                width: '130px',
+              }}
+            />
+          </div>
           <button
             type="button"
             data-testid="switch-mode-btn"
@@ -386,7 +414,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             <WebTerminal
               workspaceId={activeSession.workspaceId}
               sessionId={activeSession.id}
-              commandId="11111111-1111-4111-8111-111111111111"
+              commandId={activeCommandId.trim() ? activeCommandId.trim() : undefined}
             />
           </div>
         ) : (

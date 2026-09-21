@@ -108,10 +108,10 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
       if (endpoint.includes('/terminal-tickets')) {
         return {
-          ticket: 'tkt_30s_test_token_valid_00000000000000000000000000000000000000000000',
+          ticket: 'a000000000000000000000000000000000000000000000000000000000000001',
           expiresAt: '2026-09-21T12:00:30Z',
-          sessionId: 'sess_test_01',
-          websocketPath: '/v1/workspaces/wsp_core_01/terminals/sess_test_01',
+          sessionId: '33333333-3333-4333-8333-333333333333',
+          websocketPath: '/v1/workspaces/wsp_core_01/terminals/33333333-3333-4333-8333-333333333333',
         };
       }
       return {};
@@ -145,6 +145,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
           nodes={mockNodes}
           defaultNodeId="nod_01"
           defaultWorkspaceId="wsp_core_01"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
     });
@@ -163,6 +164,11 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     // Ticket security badge
     const ticketBadge = container.querySelector('[data-testid="pty-ticket-badge"]');
     expect(ticketBadge?.textContent).toContain('30초 암호학적 1회용 PTY 티켓');
+
+    // Command ID input must reflect the provided authorized commandId
+    const cmdInput = container.querySelector<HTMLInputElement>('[data-testid="terminal-command-id-input"]');
+    expect(cmdInput).not.toBeNull();
+    expect(cmdInput?.value).toBe('22222222-2222-4222-8222-222222222222');
   });
 
   // ---------------------------------------------------------------------------
@@ -174,7 +180,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
       root.render(
         <WebTerminal
           workspaceId="wsp_core_01"
-          sessionId="sess_test_01"
+          sessionId="33333333-3333-4333-8333-333333333333"
           commandId="22222222-2222-4222-8222-222222222222"
         />
       );
@@ -197,12 +203,12 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     const ws = MockWebSocket.lastInstance;
     expect(ws).not.toBeNull();
     expect(ws!.url).not.toContain('?ticket=');
-    expect(ws!.url).toContain('/v1/workspaces/wsp_core_01/terminals/sess_test_01');
+    expect(ws!.url).toContain('/v1/workspaces/wsp_core_01/terminals/33333333-3333-4333-8333-333333333333');
     expect(ws!.protocols).toEqual(['inv-terminal-v1']);
 
     // Canonical initial auth frame: { ticket: ... }
     expect(ws!.sentMessages).toContainEqual(
-      JSON.stringify({ ticket: 'tkt_30s_test_token_valid_00000000000000000000000000000000000000000000' })
+      JSON.stringify({ ticket: 'a000000000000000000000000000000000000000000000000000000000000001' })
     );
 
     const statusBadge = container.querySelector('[data-testid="terminal-connection-status"]');
@@ -222,7 +228,8 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
       root.render(
         <WebTerminal
           workspaceId="wsp_core_01"
-          sessionId="sess_test_fail"
+          sessionId="33333333-3333-4333-8333-333333333333"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
       await new Promise((r) => setTimeout(r, 50));
@@ -239,10 +246,10 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
 
     // Now mock recovery on retry with canonical TerminalTicketResult
     vi.spyOn(client, 'apiClient').mockResolvedValueOnce({
-      ticket: 'tkt_fresh_30s_00000000000000000000000000000000000000000000000000000000',
+      ticket: 'b000000000000000000000000000000000000000000000000000000000000002',
       expiresAt: '2026-09-21T12:01:00Z',
-      sessionId: 'sess_fresh_01',
-      websocketPath: '/v1/workspaces/wsp_core_01/terminals/sess_fresh_01',
+      sessionId: '44444444-4444-4444-8444-444444444444',
+      websocketPath: '/v1/workspaces/wsp_core_01/terminals/44444444-4444-4444-8444-444444444444',
     });
 
     await act(async () => {
@@ -268,6 +275,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
         <WebTerminal
           workspaceId="wsp_core_01"
           sessionId="sess_offline"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
       await new Promise((r) => setTimeout(r, 50));
@@ -299,6 +307,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
         <WebTerminal
           workspaceId="wsp_core_01"
           sessionId="sess_a11y"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
       await new Promise((r) => setTimeout(r, 50));
@@ -474,6 +483,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
         <WebTerminal
           workspaceId="wsp_core_01"
           sessionId="sess_recon"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
       await new Promise((r) => setTimeout(r, 50));
@@ -496,5 +506,92 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
 
     const statusBadge = container.querySelector('[data-testid="terminal-connection-status"]');
     expect(statusBadge?.textContent).toBe('(connected)');
+  });
+
+  // ---------------------------------------------------------------------------
+  // 11. Absence / Placeholder Command Rejection Guard (Zero Network Calls)
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-NO-COMMAND-NO-TICKET] rejects ticket issuance and suppresses network calls when commandId is absent or placeholder UUID', async () => {
+    const apiSpy = vi.spyOn(client, 'apiClient');
+
+    // Case A: commandId prop omitted entirely
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_core_01"
+          sessionId="sess_no_cmd"
+        />
+      );
+    });
+
+    expect(apiSpy).not.toHaveBeenCalled();
+    const notice = container.querySelector('[data-testid="terminal-command-required-notice"]');
+    expect(notice).not.toBeNull();
+    expect(notice?.getAttribute('role')).toBe('alert');
+    expect(notice?.textContent).toContain('승인 명령 부재');
+    expect(container.querySelector('[data-testid="terminal-connection-status"]')?.textContent).toBe('(disconnected)');
+
+    // Reconnect click without commandId MUST NOT issue network calls
+    const reconBtn = container.querySelector<HTMLButtonElement>('[data-testid="terminal-reconnect-btn"]');
+    await act(async () => {
+      reconBtn?.click();
+    });
+    expect(apiSpy).not.toHaveBeenCalled();
+
+    // Case B: placeholder UUID '11111111-1111-4111-8111-111111111111'
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_core_01"
+          sessionId="sess_placeholder_cmd"
+          commandId="11111111-1111-4111-8111-111111111111"
+        />
+      );
+    });
+
+    expect(apiSpy).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-testid="terminal-command-required-notice"]')).not.toBeNull();
+  });
+
+  // ---------------------------------------------------------------------------
+  // 12. TerminalSessionView Command Prop & Input Wiring
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-SESSION-VIEW-COMMAND-WIRING] TerminalSessionView wires commandId from props and allows manual input', async () => {
+    const apiSpy = vi.spyOn(client, 'apiClient');
+
+    // Initial render without commandId: renders required notice, 0 ticket calls
+    await act(async () => {
+      root.render(
+        <TerminalSessionView
+          nodes={mockNodes}
+          defaultNodeId="nod_01"
+        />
+      );
+    });
+
+    expect(apiSpy).not.toHaveBeenCalled();
+    const notice = container.querySelector('[data-testid="terminal-command-required-notice"]');
+    expect(notice).not.toBeNull();
+
+    const cmdInput = container.querySelector<HTMLInputElement>('[data-testid="terminal-command-id-input"]');
+    expect(cmdInput).not.toBeNull();
+    expect(cmdInput?.value).toBe('');
+
+    // Typing an authorized commandId into the input triggers ticket request
+    await act(async () => {
+      setInputValue(cmdInput!, '55555555-5555-4555-8555-555555555555');
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 60));
+    });
+
+    expect(apiSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/workspaces/wsp_01JABCDE001/terminal-tickets'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ commandId: '55555555-5555-4555-8555-555555555555' }),
+      })
+    );
   });
 });

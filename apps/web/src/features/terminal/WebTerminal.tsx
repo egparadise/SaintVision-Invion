@@ -1,19 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { WsTerminalClient } from '@/shared/realtime/ws-terminal';
-import { apiClient } from '@/shared/api/client';
+import { issueTerminalTicket, terminalTicketHandshake } from '@/shared/api/terminalTicket';
+
+export const PLACEHOLDER_COMMAND_ID = '11111111-1111-4111-8111-111111111111';
+
+export function isAuthorizedCommandId(id?: string | null): id is string {
+  if (!id || typeof id !== 'string') return false;
+  const trimmed = id.trim();
+  if (!trimmed || trimmed === PLACEHOLDER_COMMAND_ID) return false;
+  return true;
+}
 
 export interface WebTerminalProps {
   workspaceId: string;
   sessionId: string;
-  commandId?: string;
+  commandId?: string | null;
   onClose?: () => void;
 }
 
 export const WebTerminal: React.FC<WebTerminalProps> = ({
   workspaceId,
   sessionId,
-  commandId = '11111111-1111-4111-8111-111111111111',
+  commandId,
   onClose,
 }) => {
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
@@ -37,6 +46,20 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
 
     const initTerminal = async () => {
+      // Security Invariant: PTY ticket is an authorized execution credential.
+      // If there is no real authorized commandId, do NOT request a ticket at all (zero network calls).
+      if (!isAuthorizedCommandId(commandId)) {
+        setConnectionStatus('disconnected');
+        setLastError(null);
+        setTerminalOutput((prev) => [
+          ...prev,
+          '⚠️ [보안 차단]: 유효한 승인 명령 신원(commandId)이 지정되지 않았습니다.',
+          '보안 정책에 따라 백엔드 티켓 발급 요청(POST /v1/workspaces/.../terminal-tickets)을 수행하지 않고 중단했습니다.',
+          '상위 실행 파이프라인에서 승인된 명령을 선택하거나 유효한 commandId를 입력하십시오. (위조 식별자 합성 방지)',
+        ]);
+        return;
+      }
+
       try {
         setConnectionStatus('connecting');
         setLastError(null);
@@ -44,28 +67,16 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           ...prev,
           `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
         ]);
-        // Canonical TerminalTicketInput: strictly requires commandId
-        const ticketData = await apiClient<{
-          ticket: string;
-          expiresAt: string;
-          sessionId: string;
-          websocketPath: string;
-        }>(
-          `/v1/workspaces/${workspaceId}/terminal-tickets`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ commandId }),
-          }
-        );
-        const ticket = ticketData.ticket;
+        // Canonical TerminalTicketInput: strictly requires authorized commandId
+        const ticketData = await issueTerminalTicket(workspaceId, { commandId });
         if (!active) return;
 
-        const targetWsPath = ticketData.websocketPath || `/v1/workspaces/${workspaceId}/terminals/${sessionId}`;
-        const finalWsUrl = `${wsProtocol}//${wsHost}${targetWsPath}`;
+        const handshake = terminalTicketHandshake(ticketData);
+        const finalWsUrl = `${wsProtocol}//${wsHost}${handshake.websocketPath}`;
 
         setTerminalOutput((prev) => [
           ...prev,
-          `[확인] 일회용 티켓(${ticket.slice(0, 12)}...) 획득 성공 (유효기간: 30초). PTY 세션 연결 중...`,
+          `[확인] 일회용 티켓(${ticketData.ticket.slice(0, 12)}...) 획득 성공 (유효기간: 30초). PTY 세션 연결 중...`,
         ]);
 
         const client = new WsTerminalClient(
@@ -88,7 +99,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         );
 
         clientRef.current = client;
-        client.connect(ticket);
+        client.connect(handshake.authFrame.ticket);
       } catch (err: any) {
         if (!active) return;
         const msg = err?.message || String(err);
@@ -108,7 +119,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       clientRef.current?.disconnect();
       clientRef.current = null;
     };
-  }, [sessionId, workspaceId]);
+  }, [sessionId, workspaceId, commandId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -122,6 +133,12 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
 
+    if (!isAuthorizedCommandId(commandId)) {
+      setConnectionStatus('disconnected');
+      setDisconnectedCmdAlert('유효한 승인 명령(commandId)이 없어 새 PTY 티켓을 발급받을 수 없습니다. (위조 식별자 합성 차단)');
+      return;
+    }
+
     try {
       setConnectionStatus('connecting');
       setLastError(null);
@@ -130,25 +147,13 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         ...prev,
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
       ]);
-      const ticketData = await apiClient<{
-        ticket: string;
-        expiresAt: string;
-        sessionId: string;
-        websocketPath: string;
-      }>(
-        `/v1/workspaces/${workspaceId}/terminal-tickets`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ commandId }),
-        }
-      );
-      const ticket = ticketData.ticket;
-      const targetWsPath = ticketData.websocketPath || `/v1/workspaces/${workspaceId}/terminals/${sessionId}`;
-      const finalWsUrl = `${wsProtocol}//${wsHost}${targetWsPath}`;
+      const ticketData = await issueTerminalTicket(workspaceId, { commandId });
+      const handshake = terminalTicketHandshake(ticketData);
+      const finalWsUrl = `${wsProtocol}//${wsHost}${handshake.websocketPath}`;
 
       setTerminalOutput((prev) => [
         ...prev,
-        `[확인] 신규 일회용 티켓(${ticket.slice(0, 12)}...) 획득 완료. 재연결 진행.`,
+        `[확인] 신규 일회용 티켓(${ticketData.ticket.slice(0, 12)}...) 획득 완료. 재연결 진행.`,
       ]);
 
       const client = new WsTerminalClient(
@@ -169,7 +174,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       );
 
       clientRef.current = client;
-      client.connect(ticket);
+      client.connect(handshake.authFrame.ticket);
     } catch (err: any) {
       const msg = err?.message || String(err);
       setConnectionStatus('error');
@@ -290,6 +295,29 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           )}
         </div>
       </div>
+
+      {/* Missing Authorized Command Notice Banner */}
+      {!isAuthorizedCommandId(commandId) && (
+        <div
+          role="alert"
+          data-testid="terminal-command-required-notice"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#1c1917',
+            color: '#fb923c',
+            fontSize: '0.8125rem',
+            borderBottom: '1px solid #ea580c',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+          }}
+        >
+          <span>
+            ⚠️ <strong>[승인 명령 부재]</strong> 유효한 승인 명령 신원(commandId)이 없어 30초 일회용 PTY 티켓을 발급하지 않았습니다. (위조 식별자 합성 방지)
+          </span>
+        </div>
+      )}
 
       {/* Ticket / Connection Error Alert Banner */}
       {connectionStatus === 'error' && (

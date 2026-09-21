@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.62"
+version: "1.0.63"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:35:00+09:00"
+updated: "2026-09-21T19:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:35:00+09:00.
+- 확인 기준: 2026-09-21T19:45:00+09:00.
 
 ## 최근 확인한 진척
+
+- **모델 계보 및 평가 점수 가상 합성 차단과 PTY commandId 보안 인가 정합 (`ModelLineageView.tsx`, `mlopsEngine.ts`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `DesktopShell.tsx`, `App.tsx`, `tests/model-lineage.test.ts`, `tests/terminal-session-dom.test.tsx`)**:
+  - **모델 계보 가짜 평가 점수(Acc 81.2% 등) 합성 차단**: `mlopsEngine.ts`의 `INITIAL_LINEAGES`를 테스트 전용 `TEST_FIXTURE_LINEAGES`로 격리하고 기본 생성자를 빈 배열(`[]`)로 전환. `ModelLineageView`에 `data-testid="lineage-unexposed-notice"`(`role="status"`) 및 `lineage-empty-state`를 신설하여 백엔드 HTTP 서빙 API 부재를 정직하게 고지하고 의사결정 왜곡 원천 차단 (Codex 엔드포인트 신설 인계).
+  - **PTY commandId 가짜 자리표시자 제거 및 0 network calls 보안 가드**: `WebTerminal.tsx` 및 `TerminalSessionView.tsx`에서 자리표시자 UUID `'11111111-1111-4111-8111-111111111111'`를 전면 제거. 승인된 commandId 부재 시 티켓 요청을 일절 수행하지 않고(0 network calls) `data-testid="terminal-command-required-notice"`(`role="alert"`) 배너 표출. Codex 정본 어댑터(`issueTerminalTicket`, `terminalTicketHandshake`) 결속. 상위 `DesktopShell`/`App`에서 active/pending commandId 배선 및 `terminal-command-id-input` 수동 입력 지원.
+  - **3대 돌연변이 실측 사살 (KILLED)**: 자리표시자 폴백 복원 시 `terminal-command-required-notice` 누락 및 0호출 위반 실패, 65자 비규격 티켓 반환 시 `parseTerminalTicketResult` 계약 검증 실패, `MlopsManager` 기본값 합성 복원 시 `lineage-empty-state` 누락 실패 실측 사살.
+  - **검증 실적**: Vitest 55개 파일 **501/501 passed 100%** (from 499 to 501, net +2 tests; `model-lineage.test.ts` 6 passed, `terminal-session-dom.test.tsx` 12 passed), Vite 프로덕션 빌드 exit 0 (3.82s, 95 modules), Pytest core 742 passed/3 skipped (37.75s), check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_lineage_평가점수합성차단_및_PTY_commandId보안정합_Gemini]].
 
 - **WorkspaceEditView 무결성 실바이트 원천 배선 및 온디맨드 복구/검증 API 부재 정직 반영 (`InvFileExplorer.tsx`, `DesktopShell.tsx`, `ModelStudioView.tsx`, `workspaceEditObservation.ts`, `workspace-edit-view-contract.test.ts`)**:
   - **데모 데이터 무결성 착시 원천 차단 및 WorkspaceEditView 배선 (VF-GM-03)**: `DesktopShell 673`에서 `InvFileExplorer`에 `projectId`, `runId`, `checkoutId`를 배선하고 `fetchWorkspaceEditView`로 실제 체크아웃 바이트를 로드하도록 연동. 실제 커널 체크아웃 바이트 미연결 또는 데모 데이터(`source !== 'kernel-checkout'`)인 경우 검증을 엄격히 거부하고 `unverified` 유지 및 안내문 표출 (`데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지)`).
