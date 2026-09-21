@@ -1,0 +1,13 @@
+{
+  "contribution": {
+    "contributionId": "sc_contract_fixture",
+    "nodeId": "nod_contract_fixture",
+    "declaredPath": "C:\\data",
+    "normalizedPath": "C:/data",
+    "mode": "read_only",
+    "status": "pending",
+    "capacityBytes": 1073741824,
+    "availableBytes": null,
+    "registeredAt": "2026-09-21T08:00:00Z"
+  }
+}

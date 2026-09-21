@@ -45,7 +45,9 @@ def _node_body(node) -> dict:
     ).model_dump(by_alias=True, mode="json")
 
 
-@router.post("/nodes", status_code=201)
+@router.post(
+    "/nodes", status_code=201, response_model=schemas.NodeEnrollResponse
+)
 def enroll_node(
     request: Request,
     payload: schemas.NodeEnrollRequest,

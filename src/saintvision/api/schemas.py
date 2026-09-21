@@ -135,6 +135,14 @@ class ContributionResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ContributionRegistrationResponse(Strict):
+    """Registration handle and normalized storage path returned to the caller."""
+
+    contribution: ContributionResponse
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class DataLocationResponse(Strict):
     location_id: str = Field(alias="locationId")
     contribution_id: str = Field(alias="contributionId")

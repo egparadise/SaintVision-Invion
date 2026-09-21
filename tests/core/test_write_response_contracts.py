@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 import uuid
+from contextlib import nullcontext
 
 import pytest
 from fastapi import FastAPI
@@ -15,7 +16,13 @@ from pydantic import ValidationError
 
 from saintvision.api import schemas
 from saintvision.api.deps import get_now, get_principal, get_session, get_settings
-from saintvision.api.v1 import pools, projects, settings as settings_routes
+from saintvision.api.v1 import (
+    nodes as node_routes,
+    pools,
+    projects,
+    settings as settings_routes,
+)
+from saintvision.api.v1 import storage as storage_routes
 from saintvision.identity.principal import Principal
 
 FIXTURES = Path(__file__).resolve().parents[2] / "contracts" / "fixtures"
@@ -31,6 +38,12 @@ CASES = [
     ("member", "member-role-result-response.json", schemas.MemberRoleResultResponse),
     ("offer", "resource-offer-result-response.json", schemas.ResourceOfferResultResponse),
     ("workspace-status", "workspace-status-response.json", schemas.WorkspaceStatusResponse),
+    ("node-enroll", "node-enroll-response.json", schemas.NodeEnrollResponse),
+    (
+        "contribution-registration",
+        "storage-contribution-registration-response.json",
+        schemas.ContributionRegistrationResponse,
+    ),
 ]
 
 
@@ -47,7 +60,8 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
         2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
     )
     app.dependency_overrides[get_settings] = lambda: SimpleNamespace(
-        bootstrap_token_ttl_seconds=900
+        bootstrap_token_ttl_seconds=900,
+        idempotency_ttl_seconds=600,
     )
 
     if kind == "project":
@@ -86,13 +100,131 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
         request_status = service_result.get("_request_status", "ready")
         return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/workspaces/wsp_contract_status/status", {"status": request_status}
 
+    if kind == "node-enroll":
+        node_data = service_result["node"]
+        node = SimpleNamespace(
+            node_id=node_data["nodeId"],
+            hostname=node_data["hostname"],
+            os_type=node_data["osType"],
+            os_version=node_data["osVersion"],
+            agent_version=node_data["agentVersion"],
+            status=node_data["status"],
+            enrolled_at=dt.datetime.fromisoformat(
+                node_data["enrolledAt"].replace("Z", "+00:00")
+            ),
+            last_heartbeat_at=dt.datetime.fromisoformat(
+                node_data["lastHeartbeatAt"].replace("Z", "+00:00")
+            ),
+            heartbeat_sequence=node_data["heartbeatSequence"],
+            labels=node_data["labels"],
+        )
+
+        class FakeSession:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def begin(self):
+                return nullcontext()
+
+        monkeypatch.setattr(
+            node_routes, "make_session_factory", lambda _engine: FakeSession
+        )
+        monkeypatch.setattr(node_routes, "tenant_scope", lambda *_args: nullcontext())
+        monkeypatch.setattr(
+            node_routes.node_service, "enroll_node", lambda *_a, **_k: node
+        )
+        monkeypatch.setattr(node_routes, "record_event", lambda *_a, **_k: None)
+        if service_result.get("_invalid_nested_node") or "unexpected" in service_result:
+            valid_node = dict(node_data)
+            valid_node["unexpected"] = "must be rejected"
+            monkeypatch.setattr(node_routes, "_node_body", lambda _node: valid_node)
+        app.state.engine = object()
+        app.include_router(node_routes.router)
+        request_body = {
+            "bootstrapToken": "synthetic-bootstrap-token",
+            "hostname": "worker-contract",
+            "osType": "linux",
+            "osVersion": "test-os",
+            "agentVersion": "test-agent",
+            "capabilities": [],
+            "labels": {},
+        }
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "POST",
+            "/v1/nodes",
+            request_body,
+        )
+
+    if kind == "contribution-registration":
+        contribution_data = service_result["contribution"]
+        contribution = SimpleNamespace(
+            contribution_id=contribution_data["contributionId"],
+            node_id=contribution_data["nodeId"],
+            declared_path=contribution_data["declaredPath"],
+            normalized_path=contribution_data["normalizedPath"],
+            mode=contribution_data["mode"],
+            status=contribution_data["status"],
+            capacity_bytes=contribution_data["capacityBytes"],
+            available_bytes=contribution_data["availableBytes"],
+            registered_at=dt.datetime.fromisoformat(
+                contribution_data["registeredAt"].replace("Z", "+00:00")
+            ),
+        )
+        replay = service_result.get("_replay")
+        if replay is None and "unexpected" in service_result:
+            replay = {
+                "contribution": contribution_data,
+                "unexpected": service_result["unexpected"],
+            }
+        monkeypatch.setattr(
+            storage_routes, "replay_or_reserve", lambda *_a, **_k: replay
+        )
+        monkeypatch.setattr(
+            storage_routes.storage_service,
+            "register_contribution",
+            lambda *_a, **_k: contribution,
+        )
+        monkeypatch.setattr(
+            storage_routes, "_contribution_body", lambda _value: contribution_data
+        )
+        monkeypatch.setattr(storage_routes, "record_event", lambda *_a, **_k: None)
+        monkeypatch.setattr(storage_routes, "store_idempotent_response", lambda *_a, **_k: None)
+        app.include_router(storage_routes.router)
+        request_body = {
+            "nodeId": contribution_data["nodeId"],
+            "declaredPath": contribution_data["declaredPath"],
+            "mode": contribution_data["mode"],
+            "capacityBytes": contribution_data["capacityBytes"],
+            "availableBytes": contribution_data["availableBytes"],
+        }
+        return (
+            TestClient(app, raise_server_exceptions=False),
+            "POST",
+            "/v1/storage/contributions",
+            request_body,
+        )
+
     monkeypatch.setattr(settings_routes.settings_service, "set_resource_offer", lambda *_a, **_k: service_result)
     app.include_router(settings_routes.router)
-    return TestClient(app, raise_server_exceptions=False), "PUT", "/v1/capabilities/cap_contract_cpu/offer", {"offeredQuantity": 4000, "unit": "millicores"}
+    return (
+        TestClient(app, raise_server_exceptions=False),
+        "PUT",
+        "/v1/capabilities/cap_contract_cpu/offer",
+        {"offeredQuantity": 4000, "unit": "millicores"},
+    )
 
 
 def _request(client: TestClient, method: str, path: str, body: dict):
-    return client.request(method, path, json=body)
+    headers = (
+        {"X-Inv-Tenant": "00000000-0000-4000-8000-000000000041"}
+        if path == "/v1/nodes"
+        else None
+    )
+    return client.request(method, path, json=body, headers=headers)
 
 
 @pytest.mark.parametrize("kind,filename,model", CASES)
@@ -131,7 +263,11 @@ def test_high_risk_write_route_serves_the_measured_fixture(monkeypatch, kind, fi
     payload = _fixture(filename)
     client, method, path, request_body = _client(monkeypatch, kind, payload)
     response = _request(client, method, path, request_body)
-    expected_status = 201 if kind in {"project", "admission"} else 200
+    expected_status = (
+        201
+        if kind in {"project", "admission", "node-enroll", "contribution-registration"}
+        else 200
+    )
     assert response.status_code == expected_status
     assert response.json() == payload
     model.model_validate(response.json())
@@ -146,6 +282,8 @@ def test_high_risk_write_route_refuses_invalid_service_response(monkeypatch, kin
         "member": ("canApprove", "yes"),
         "offer": ("previousOfferedQuantity", "unknown"),
         "workspace-status": ("status", "made-up"),
+        "node-enroll": ("unexpected", "must be rejected"),
+        "contribution-registration": ("unexpected", "must be rejected"),
     }[kind]
     broken[invalid_field[0]] = invalid_field[1]
     client, method, path, request_body = _client(monkeypatch, kind, broken)

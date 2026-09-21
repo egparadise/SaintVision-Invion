@@ -62,7 +62,11 @@ def _location_body(location) -> dict:
     ).model_dump(by_alias=True, mode="json")
 
 
-@router.post("/storage/contributions", status_code=201)
+@router.post(
+    "/storage/contributions",
+    status_code=201,
+    response_model=schemas.ContributionRegistrationResponse,
+)
 def register_contribution(
     request: Request,
     payload: schemas.ContributionRequest,
