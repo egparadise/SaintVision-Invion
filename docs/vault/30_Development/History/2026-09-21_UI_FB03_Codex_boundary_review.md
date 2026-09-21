@@ -1,11 +1,11 @@
 ---
 doc_id: "UI-FB03-CODEX-REVIEW-001"
 title: "UI-FB-03 DeveloperStudio boundary review"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "pending Gemini follow-up"
-updated: "2026-09-21T16:49:00+09:00"
+updated: "2026-09-21T16:59:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -26,7 +26,8 @@ This is a review finding, not a UI code change by Codex. Gemini owns implementat
 ## Evidence
 
 - Source-reviewed: result-first route and `isRouteNotFoundError` guard; cached `artifactData` fallback; two download buttons and new DOM probes.
-- Executed: from `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration/apps/web`, `npm test -- --run tests/developer-studio-dom.test.tsx` exited 0: 1 file, 13 passed. Start time shown by Vitest: 2026-09-21 16:48:02 KST. This was a dirty merge candidate based on local `d590b4a` plus incoming `5e2a533`; it was not run through `tools/provenance.py`, and no fixed merged SHA existed yet.
+- Executed before the later error-exposure probe: from `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration/apps/web`, `npm test -- --run tests/developer-studio-dom.test.tsx` exited 0: 1 file, 13 passed. Start time shown by Vitest: 2026-09-21 16:48:02 KST. This was a dirty merge candidate based on local `d590b4a` plus incoming `5e2a533`; it was not run through `tools/provenance.py`, and no fixed merged SHA existed yet.
+- Falsifiability probe at clean SHA `28fd8dba5ffed0b442e428f31c2d8416743cacab`: temporarily added `expect(window.alert).toHaveBeenCalled()` to the existing successful-mount-then-401 download case. The focused test failed exactly there (1 failed/12 skipped, exit 1): no error was surfaced. Removed the temporary assertion; restored focused DOM suite then passed all 13 at 16:59:26 KST through the provenance wrapper. Working tree returned clean. This behavior confirms the cached `artifactData` fallback is live, not merely a source-level possibility.
 - Not run: full Vitest after `5e2a533`, browser acceptance, live HTTP, deployed backend, or Actions.
 
 ## Handoff

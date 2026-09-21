@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.101"
+version: "1.0.102"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T16:50:00+09:00"
+updated: "2026-09-21T16:59:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -718,6 +718,6 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 
 - Response-contract map: eight functional shared adapters are inventoried. Workspace/readiness, discovery candidates, storage lists, approval review, and kernel approval challenge/decision are bound to canonical/generated shapes and shared fixtures. Remaining unbound groups are project-list legacy envelopes, run/result/artifact, run/approval queue, placement/pool/mutation, storage resolve/replica/model, shards, and node observations. Order by user-facing/control impact is in [[2026-09-21_web_response_contract_map_workspace_Codex]]. Targeted fixed-SHA kernel/approval tests: 9 passed; full Vitest: 39 files/359 passed; schema 28 and TS response types 7 passed; `tsc -b`/Vite build/docs/ontology passed at `0c248976430aac1d91fa14f7ea63f80c757997eb`.
 - CI/Linux: user confirms all five workflows are Ubuntu. The selected POSIX/Linux tests should execute there. Source inspection confirms root/integration PostgreSQL gates and Node-runtime are CI-fail gates; core workflow supplies PostgreSQL 16 and builds/provides the Go node-agent binary/image with `INV_RUN_NODE_TESTS=1`. Codex prepared backend/core/browser image lanes in 9a361fe. After Claude's correction, the browser CI gate compares five normalized journey names and docker-host compares two case names; both require zero skips/failures/errors. YAML parse and collect-only (browser 6 items/5 journeys; docker-host 2 cases) passed. Actions remain unexecuted because billing is blocked; public image/package pulls and hosted runner behavior remain unverified.
-- UI-FB-03: reviewed Gemini `5e2a533`; focused DOM suite is 13 passed and full Vitest includes it. Review remains pending: `handleDownloadArtifact` can reuse an earlier successful `artifactData` after a non-route `/result` failure, with no visible click-time error. New tests assert route fallback call counts but not visible error/no new download. Gemini owns the follow-up; Codex does not edit the UI.
+- UI-FB-03: reviewed Gemini `5e2a533`; focused DOM suite is 13 passed and full Vitest includes it. Review remains pending: after a successful mount, a click-time 401 produced no alert; a temporary alert assertion failed and was removed. `handleDownloadArtifact` reuses earlier `artifactData` after non-route `/result` failure. Gemini owns the follow-up; Codex does not edit the UI.
 - Provenance: latest fixed-SHA verification is recorded in the contract map History. PostgreSQL DSN absent, and this result is not CI, live HTTP, or browser acceptance. An initial wrapper call used a relative venv path and exited 127; the absolute project interpreter invocation passed and is the only positive evidence.
 - Obsidian: after docs/ontology passed, the final authorized sync exported 2 files with all 1405 destination hashes matching; paired check was 1405 managed/0 pending/0 conflicts (16:52 KST).
