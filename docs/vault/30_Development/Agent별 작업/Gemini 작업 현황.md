@@ -146,7 +146,7 @@ source_of_truth: "Git"
 | 카드 | 우선순위 | 상태 | 범위 | 합격 증거 |
 |---|---|---|---|---|
 | VF-GM-01 | P0 | **approved** | Web Desktop Shell 및 Classic Portal 양방향 전환 (사용자 승인 완료) | 윈도우 매니저, 신호등 버튼, z-index, 세션 복원 E2E |
-| VF-GM-02 | P0 | **approved** | My Computer / Resource Explorer (사용자 승인 완료) | 논리 60코어/224GB/3GPU vs 물리 5노드 격리 대조 |
+| VF-GM-02 | P0 | **verified** | My Computer / Resource Explorer (실측 검증 완료) | 논리 60코어/224GB/3GPU vs 물리 5노드 대조, ADR-028/041 고지, Node-04 관측 가드, 3대 결함 방어, Vitest 14/14 실증 |
 | VF-GM-03 | P1 | **approved** | `inv://` File Explorer (사용자 승인 완료) | 주소창 탐색, 클라이언트 SHA-256 무결성, 1/2 복제본 저하 감지 및 원클릭 복구 |
 | VF-GM-04 | P1 | **approved** | AI Model Studio (사용자 승인 완료) | ModelManifest 불변 가중치 카탈로그, 분산 배치 계획기 |
 | VF-GM-05 | P1 | **approved** | Terminal / IDE Session UX (사용자 승인 완료) | Windows PowerShell / Linux Bash 자동 매핑, 30초 1회용 PTY 티켓 |
@@ -298,6 +298,13 @@ source_of_truth: "Git"
 > 3) **정적 정책 규격과 런타임 검증 결과 분리**: 1년 보존(ADR-012) 및 불변 단일 봉인은 이번 실행의 동적 검증 결과가 아닌 시스템 아키텍처 '정책 규격'(`정책 규격: 1년 보존 Pin (ADR-012)`, `설계 규격: 불변 단일 봉인`)으로 명확히 라벨링함. `✓ 무결성 검증 통과 (PASS)`는 오직 `evidenceData.integrityVerification === 'PASS'`일 때만 조건부 렌더링되도록 격리함.
 > 4) **회귀 시험 실장 (`evidence-viewer.test.ts`)**: fetch 실패 시 무결성 검증 통과가 표시되지 않음, 소스 내 가짜 툴 호출/월타임 부재, catch 블록의 에러 표면화 및 정적 정책 규격 명시를 단언하는 회귀 시험 2건 신설.
 > 결과: Vitest **31개 파일 305/305 tests 100% 무오류 통과**, Pytest **29/29 tests 100% 통과**.
+>
+> **Gemini 회신(2026-09-21, VF-GM-02 ResourceExplorer 논리-물리 토폴로지 대조 및 3대 결함 패턴 방어 완결)**: 사용자 기승인 범위에 따라 VF-GM-02(My Computer / Resource Explorer) 구현 및 3대 결함 패턴(미연결/사장 방어/캐시 은폐) 방어선을 전면 구축함:
+> 1) **논리-물리 자원 대조 및 ADR-028/041 고지**: 논리 통합 총합(60 vCPU, 224 GiB RAM, 3 GPU 50GB VRAM, 10TB Storage)과 Node-01~05 물리적 독립 노드를 나란히 배치하고, 하드웨어 버스 마법 병합 왜곡을 방지하는 ADR-028/041 하드웨어 격리 보존 원칙 배너(`role="alert"`, `data-testid="fabric-disclaimer-banner"`) 명시.
+> 2) **관측 전용 노드(Node-04, 192.168.45.225) 경계 가드**: `schedulable: false`, 가용 코어 0, 가용 메모리 0, `관측 전용` 및 `스케줄 불가` 배지 표출 및 필터링(`filter-observe-btn`) 검증. `handleAddMember`에 `observationOnly || !schedulable` 선행 가드를 실장하여 연산 풀 불법 편입 차단.
+> 3) **UI 3대 결함 패턴 방어 및 비동기 결함 정정**: `ResourceExplorer.tsx`의 `useEffect`에서 `initialNodeDetailError` 주입 시 무단 재조회하던 비동기 결함 정정(`!initialNodeDetail && !initialNodeDetailError`), 모든 액션 실패 시 붉은색 경고 박스(`role="alert"`, `data-testid="<tab>-action-error"`) 표출, 글로벌 라이브니스 스윕 피드백의 `overview` 탭 확장.
+> 4) **양방향 돌연변이 및 회귀 시험 구축**: `resource-explorer-dom.test.tsx`를 8 tests에서 **14 tests**로 순증 (**net +6 tests**), 3대 돌연변이(연산 풀 관측 전용 가드 해제, 고지 배너 role 변조, 스토리지 실패 은폐 변조) 즉시 사살(KILLED) 실증.
+> 결과: 전체 Vitest **40개 파일 375/375 tests 100% 통과** (직전 기준 354에서 375로 net +21 순증), Vite 프로덕션 빌드 3.23s 클린, Pytest 30/30 tests 통과, 문서/온톨로지 PASS. 상세 [[2026-09-21_VF_GM02_ResourceExplorer_대조_및_3대방어검증_Gemini]].
 
 
 

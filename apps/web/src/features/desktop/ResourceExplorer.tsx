@@ -259,7 +259,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         loadPoolData(selectedPoolId);
       }
     } else if (activeTab === 'nodes' && selectedNodeId) {
-      if (!initialNodeDetail) {
+      if (!initialNodeDetail && !initialNodeDetailError) {
         loadNodeDetailData(selectedNodeId);
       }
     } else if (activeTab === 'discovery') {
@@ -267,7 +267,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         loadDiscoveryCandidates();
       }
     }
-  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, loadDiscoveryCandidates, selectedPoolId, selectedNodeId, initialCandidatesState, initialPoolCapacityState, initialNodeDetail]);
+  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, loadDiscoveryCandidates, selectedPoolId, selectedNodeId, initialCandidatesState, initialPoolCapacityState, initialNodeDetail, initialNodeDetailError]);
 
   // ---------------------------------------------------------------------------
   // Handlers for Control Plane Mutations
@@ -348,6 +348,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
   const handleAddMember = async () => {
     if (!memberNodeToAdd) return;
+    const targetNode = nodes.find((n) => n.id === memberNodeToAdd);
+    if (targetNode?.observationOnly || targetNode?.schedulable === false) {
+      setPoolMessage(`❌ 멤버 추가 거부: 노드 '${targetNode?.hostname || memberNodeToAdd}'은(는) 관측 전용(schedulable: false)이므로 연산 풀에 편입할 수 없습니다.`);
+      return;
+    }
     try {
       await addPoolMember(selectedPoolId, memberNodeToAdd);
       setPoolMembers((prev) => Array.from(new Set([...prev, memberNodeToAdd])));
@@ -503,6 +508,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button
             type="button"
+            data-testid="liveness-sweep-btn"
             onClick={handleLivenessSweep}
             style={{
               padding: '6px 12px',
@@ -577,24 +583,68 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         })}
       </div>
 
-      {/* Feedback Messages */}
+      {/* Feedback Messages with Honest Error/Success Distinction & role="alert" */}
       {storageMessage && activeTab === 'storage' && (
-        <div style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontSize: '0.75rem' }}>
+        <div
+          role={storageMessage.startsWith('❌') ? 'alert' : undefined}
+          data-testid={storageMessage.startsWith('❌') ? 'storage-action-error' : 'storage-action-success'}
+          style={{
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: storageMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+            color: storageMessage.startsWith('❌') ? '#fca5a5' : '#34d399',
+            border: storageMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)',
+            fontSize: '0.75rem',
+          }}
+        >
           {storageMessage}
         </div>
       )}
       {poolMessage && activeTab === 'pools' && (
-        <div style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: 'rgba(59, 130, 246, 0.2)', color: '#93c5fd', fontSize: '0.75rem' }}>
+        <div
+          role={poolMessage.startsWith('❌') ? 'alert' : undefined}
+          data-testid={poolMessage.startsWith('❌') ? 'pool-action-error' : 'pool-action-success'}
+          style={{
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: poolMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+            color: poolMessage.startsWith('❌') ? '#fca5a5' : '#93c5fd',
+            border: poolMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(59, 130, 246, 0.3)',
+            fontSize: '0.75rem',
+          }}
+        >
           {poolMessage}
         </div>
       )}
-      {livenessMessage && activeTab === 'nodes' && (
-        <div style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.75rem' }}>
+      {livenessMessage && (activeTab === 'nodes' || activeTab === 'overview') && (
+        <div
+          role={livenessMessage.startsWith('❌') ? 'alert' : undefined}
+          data-testid={livenessMessage.startsWith('❌') ? 'liveness-action-error' : 'liveness-action-success'}
+          style={{
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: livenessMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+            color: livenessMessage.startsWith('❌') ? '#fca5a5' : '#fbbf24',
+            border: livenessMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(245, 158, 11, 0.3)',
+            fontSize: '0.75rem',
+          }}
+        >
           {livenessMessage}
         </div>
       )}
       {discoveryMessage && activeTab === 'discovery' && (
-        <div style={{ padding: '8px 12px', borderRadius: '6px', backgroundColor: 'rgba(168, 85, 247, 0.2)', color: '#c084fc', fontSize: '0.75rem' }}>
+        <div
+          role={discoveryMessage.startsWith('❌') ? 'alert' : undefined}
+          data-testid={discoveryMessage.startsWith('❌') ? 'discovery-action-error' : 'discovery-action-success'}
+          style={{
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: discoveryMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(168, 85, 247, 0.2)',
+            color: discoveryMessage.startsWith('❌') ? '#fca5a5' : '#c084fc',
+            border: discoveryMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(168, 85, 247, 0.3)',
+            fontSize: '0.75rem',
+          }}
+        >
           {discoveryMessage}
         </div>
       )}
@@ -607,6 +657,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           {/* Architecture Disclaimer */}
           <div
             role="alert"
+            data-testid="fabric-disclaimer-banner"
             style={{
               padding: '12px 16px',
               borderRadius: '8px',
@@ -634,7 +685,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               gap: '14px',
             }}
           >
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div
+              data-testid="logical-vcpu-card"
+              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+            >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 vCPU 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {logicalSummary.totalCores} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>Cores</span>
@@ -644,7 +698,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
             </div>
 
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div
+              data-testid="logical-ram-card"
+              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+            >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 통합 RAM 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {formatBytes(logicalSummary.totalMemoryBytes)}
@@ -654,7 +711,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
             </div>
 
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div
+              data-testid="logical-gpu-card"
+              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+            >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 가속기 풀 (GPU)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {logicalSummary.totalGpuCount} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>장 (독립)</span>
@@ -664,7 +724,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
             </div>
 
-            <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div
+              data-testid="logical-storage-card"
+              style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}
+            >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>분산 패브릭 스토리지 (inv://)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
                 {formatBytes(logicalSummary.totalStorageBytes)}
@@ -695,6 +758,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <button
                       key={filter.id}
                       type="button"
+                      data-testid={`filter-${filter.id}-btn`}
                       onClick={() => setFilterMode(filter.id)}
                       style={{
                         padding: '4px 8px',
@@ -721,6 +785,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 return (
                   <div
                     key={node.id}
+                    data-testid={`node-card-${node.id}`}
                     onClick={() => {
                       setSelectedNodeId(node.id);
                       onSelectNode?.(node.id);
@@ -736,20 +801,56 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
-                        <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>{node.id}</div>
+                        <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                          {node.id} {node.ipAddress ? `· ${node.ipAddress}` : ''}
+                        </div>
                       </div>
-                      <span
-                        style={{
-                          fontSize: '0.6875rem',
-                          fontWeight: 600,
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          backgroundColor: node.status === 'online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                          color: node.status === 'online' ? '#34d399' : '#f87171',
-                        }}
-                      >
-                        {node.status.toUpperCase()}
-                      </span>
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        {node.observationOnly && (
+                          <span
+                            data-testid={`observe-only-badge-${node.id}`}
+                            style={{
+                              fontSize: '0.6875rem',
+                              fontWeight: 600,
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: 'rgba(234, 179, 8, 0.2)',
+                              color: '#fbbf24',
+                              border: '1px solid rgba(234, 179, 8, 0.4)',
+                            }}
+                          >
+                            관측 전용
+                          </span>
+                        )}
+                        {node.schedulable === false && (
+                          <span
+                            data-testid={`unschedulable-badge-${node.id}`}
+                            style={{
+                              fontSize: '0.6875rem',
+                              fontWeight: 600,
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                              color: '#f87171',
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                            }}
+                          >
+                            스케줄 불가
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: 600,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: node.status === 'online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                            color: node.status === 'online' ? '#34d399' : '#f87171',
+                          }}
+                        >
+                          {node.status.toUpperCase()}
+                        </span>
+                      </div>
                     </div>
 
                     <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
@@ -823,6 +924,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <label style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>대상 물리 노드</label>
                 <select
                   value={newContribNode}
+                  data-testid="storage-node-select"
                   onChange={(e) => setNewContribNode(e.target.value)}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 >
@@ -839,6 +941,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <input
                   type="text"
                   value={newContribPath}
+                  data-testid="storage-path-input"
                   onChange={(e) => setNewContribPath(e.target.value)}
                   style={{ width: '100%', padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
                 />
@@ -869,6 +972,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
             <button
               type="button"
+              data-testid="register-contribution-btn"
               onClick={handleRegisterContribution}
               style={{
                 marginTop: '12px',
@@ -1094,17 +1198,23 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
               <select
                 value={memberNodeToAdd}
+                data-testid="pool-member-select"
                 onChange={(e) => setMemberNodeToAdd(e.target.value)}
                 style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
               >
                 {nodes.map((n) => (
-                  <option key={n.id} value={n.id}>
-                    {n.hostname} ({n.id})
+                  <option
+                    key={n.id}
+                    value={n.id}
+                    disabled={n.observationOnly || n.schedulable === false}
+                  >
+                    {n.hostname} ({n.id}){n.observationOnly ? ' [관측 전용 - 편입 불가]' : ''}
                   </option>
                 ))}
               </select>
               <button
                 type="button"
+                data-testid="add-pool-member-btn"
                 onClick={handleAddMember}
                 style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#3b82f6', color: '#ffffff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
               >
@@ -1256,6 +1366,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               <label style={{ fontSize: '0.75rem', color: '#94a3b8' }}>검사 노드:</label>
               <select
                 value={selectedNodeId || ''}
+                data-testid="node-selector"
                 onChange={(e) => setSelectedNodeId(e.target.value)}
                 style={{ padding: '6px', borderRadius: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#f8fafc', fontSize: '0.75rem' }}
               >
@@ -1270,6 +1381,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 type="button"
+                data-testid="send-heartbeat-btn"
                 onClick={handleSendHeartbeat}
                 style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
               >
