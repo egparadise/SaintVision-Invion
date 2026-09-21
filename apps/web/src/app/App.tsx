@@ -63,6 +63,10 @@ export const App: React.FC = () => {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [evidenceRunId, setEvidenceRunId] = useState<string | null>(null);
   const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
+  const [approvalsState, setApprovalsState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [runsState, setRunsState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [lastNodesFetchedAt, setLastNodesFetchedAt] = useState<Date | null>(null);
+  const [lastApprovalsFetchedAt, setLastApprovalsFetchedAt] = useState<Date | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [nodeError, setNodeError] = useState<string | null>(null);
@@ -125,6 +129,7 @@ export const App: React.FC = () => {
       if (scopeRef.current === scope) {
         setNodes(page.items.map(observedNode));
         setNodesState('success');
+        setLastNodesFetchedAt(new Date());
         setNodeError(null);
       }
     } catch (err: any) {
@@ -140,11 +145,20 @@ export const App: React.FC = () => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
     const scope = scopeRef.current;
     const request = ++runRequest.current;
+    setRunsState('loading');
     try {
       const items = await fetchObservedRuns(projectId);
-      if (scopeRef.current === scope && request === runRequest.current) { setRuns(items); setRunError(null); }
+      if (scopeRef.current === scope && request === runRequest.current) {
+        setRuns(items);
+        setRunsState('success');
+        setRunError(null);
+      }
     } catch {
-      if (scopeRef.current === scope && request === runRequest.current) { setRuns([]); setRunError('Run 목록을 확인하지 못했습니다.'); }
+      if (scopeRef.current === scope && request === runRequest.current) {
+        setRuns([]);
+        setRunsState('error');
+        setRunError('Run 목록을 확인하지 못했습니다.');
+      }
     }
   }, [currentUser, projectId]);
 
@@ -152,11 +166,21 @@ export const App: React.FC = () => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
     const scope = scopeRef.current;
     const request = ++approvalRequest.current;
+    setApprovalsState('loading');
     try {
       const items = await fetchObservedApprovals(projectId);
-      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals(items); setApprovalError(null); }
+      if (scopeRef.current === scope && request === approvalRequest.current) {
+        setApprovals(items);
+        setApprovalsState('success');
+        setLastApprovalsFetchedAt(new Date());
+        setApprovalError(null);
+      }
     } catch {
-      if (scopeRef.current === scope && request === approvalRequest.current) { setApprovals([]); setApprovalError('승인 목록을 확인하지 못했습니다.'); }
+      if (scopeRef.current === scope && request === approvalRequest.current) {
+        setApprovals([]);
+        setApprovalsState('error');
+        setApprovalError('승인 목록을 확인하지 못했습니다.');
+      }
     }
   }, [currentUser, projectId]);
 
@@ -447,6 +471,7 @@ export const App: React.FC = () => {
             nodesError={nodeError}
             onRetryNodes={fetchNodes}
             tenantId={currentUser?.tenantId}
+            lastFetchedAt={lastNodesFetchedAt}
             onSelectNode={(id) => {
               setSelectedNodeId(id);
               setActiveTab('nodes');
@@ -577,7 +602,7 @@ export const App: React.FC = () => {
             ) : (
               <RunList
                 runs={runs}
-                isLoading={false}
+                isLoading={runsState === 'loading'}
                 onSelectRun={(id) => setSelectedRunId(id)}
                 onCreateRun={() => alert('새 Run 요청 폼')}
               />
@@ -593,6 +618,10 @@ export const App: React.FC = () => {
             currentUserId={currentUser?.id ?? ''}
             onApprove={handleApprove}
             onReject={handleReject}
+            approvalsState={approvalsState}
+            approvalError={approvalError}
+            lastFetchedAt={lastApprovalsFetchedAt}
+            onRefresh={fetchApprovals}
           />
         )}
 

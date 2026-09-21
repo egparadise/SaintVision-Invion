@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.77"
+version: "1.0.78"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T00:26:00+09:00"
+updated: "2026-09-22T00:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T00:26:00+09:00.
+- 확인 기준: 2026-09-22T00:35:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6번째 부류 치유 트랙: 시간 경과 묵인 및 신선도 은폐 차단, 승인 대기열 및 클러스터 노드 신선도 지표화 완결 (`App.tsx`, `ApprovalCenter.tsx`, `ResourceExplorer.tsx`, `freshness-and-staleness-wiring.test.tsx`)**:
+  - **ApprovalCenter 신선도 지표화 & Stale 캐시 은폐 차단 (Priority 11)**: 상단에 `approval-freshness-indicator`(`role="status"`, `🔄 자동 갱신 (5초 주기) · 최근 동기화: HH:mm:ss`) 및 수동 `approval-refresh-btn` 실장. 폴링 실패 시 과거 스냅샷을 최신인 양 침묵하지 않고 `approval-stale-warning`(`role="alert"`, 과거 스냅샷 시각 명시 및 처리 전 새로고침 안내) 표출. 서버 장애 시 안건 0개일 때 허위 `EmptyState`("대기 중인 거버넌스 승인 안건 없음") 둔갑을 원천 차단하고 `approval-fetch-error-state`(`role="alert"`, `이는 '대기 안건 0건'(정상 0건 아님)이며, 미확인된 고위험 안건이 대기 중일 수 있습니다.` 고지 및 재시도 버튼) 전용 에러 뷰 분리.
+  - **ResourceExplorer 노드 관측 시각 지표화 & 수동 탭 스냅샷 고지 (Priority 12)**: 상단 헤더에 `node-freshness-notice`(`role="status"`, `🔄 클러스터 노드 동기화 (5초 주기) · 최종 관측: HH:mm:ss`) 투명 표출. 노드 자동 폴링과 달리 1회만 조회되는 정적 스냅샷 탭인 Tab 1(풀 관리)에 `pool-tab-manual-refresh-notice`(`role="status"`, `[스냅샷 모드 · 수동 갱신]`) 및 새로고침 버튼 실장, Tab 5(디스커버리)에 `discovery-tab-manual-refresh-notice`(`role="status"`, `[스냅샷 모드 · 수동 갱신]`) 및 새로고침 버튼 실장.
+  - **신규 DOM 단위 테스트 8종 구축 및 3대 돌연변이(M13, M14, M15) 실측 사살**: `apps/web/tests/freshness-and-staleness-wiring.test.tsx` (8/8 passed). M13(Stale 경고 배너 억제) 사살, M14(에러 시 EmptyState 둔갑 회귀) 사살, M15(수동 갱신 탭 스냅샷 고지 누락) 사살.
+  - Vitest **65개 파일 588/588 passed 100%** (순증 +8 passed), Vite 프로덕션 빌드 exit 0 (4.01s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_시간경과_신선도은폐차단_및_승인_노드_동기화표시_Gemini]].
 
 - **화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 전수 감사, 실패 은폐 차단 및 비상정지·배포 모의 정직화 완결 (`ResourceExplorer.tsx`, `AdminSecurityConsole.tsx`, `ModelLineageView.tsx`, `write-actions-integrity-wiring.test.tsx`)**:
   - **ResourceExplorer 실패 은폐 차단 및 모달 규격화 (Priority 8)**: Tab 5 디스커버리(`admitDiscoveryCandidate`, `declineDiscoveryCandidate`, `broadcastAnnouncement`) 및 Tab 1 풀 관리(`handleAddMember`, `handleRemoveMember`, `handleCreatePlan`) 실패 시 에러가 화면에서 실종되던 결함을 치유. 상단 및 인라인 메시지 배너에 `role="alert"`(실패 시) 및 `role="status"`(성공 시) 명시. 일회용 토큰 모달에 `data-testid="admission-result-modal"`, `role="status"` 부여. 승인/거부 버튼에 `admit-candidate-btn`, `decline-candidate-btn` testid 부여.

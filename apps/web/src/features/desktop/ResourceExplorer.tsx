@@ -51,6 +51,7 @@ export interface ResourceExplorerProps {
   initialNodeDetail?: NodeDetailResponse | null;
   initialNodeDetailError?: string | null;
   initialSampleRequestId?: string;
+  lastFetchedAt?: Date | null;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
@@ -73,6 +74,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialNodeDetail,
   initialNodeDetailError,
   initialSampleRequestId,
+  lastFetchedAt = null,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
   const [filterMode, setFilterMode] = useState<'all' | 'schedulable' | 'gpu' | 'observe'>('all');
@@ -600,8 +602,24 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           </div>
         </div>
 
-        {/* Global Cluster Sweep Button */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        {/* Freshness Indicator & Global Cluster Sweep Button */}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div
+            role="status"
+            data-testid="node-freshness-notice"
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              fontSize: '0.75rem',
+              color: '#93c5fd',
+            }}
+          >
+            🔄 <strong>클러스터 노드 동기화 (5초 주기)</strong>
+            {lastFetchedAt && <span> · 최종 관측: {lastFetchedAt.toLocaleTimeString()}</span>}
+          </div>
+
           <button
             type="button"
             data-testid="liveness-sweep-btn"
@@ -1540,6 +1558,33 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* ======================================================================= */}
       {activeTab === 'pools' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Manual Refresh & Snapshot Notice */}
+          <div
+            role="status"
+            data-testid="pool-tab-manual-refresh-notice"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              backgroundColor: 'rgba(59, 130, 246, 0.08)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              color: '#93c5fd',
+              fontSize: '0.75rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>ℹ️ <strong>[스냅샷 모드 · 수동 갱신]</strong>: 본 탭의 자원 풀 용량 및 멤버 배치는 실시간 자동 폴링되지 않는 정적 스냅샷입니다.</span>
+            <button
+              type="button"
+              data-testid="pool-manual-refresh-btn"
+              onClick={() => loadPoolData(selectedPoolId)}
+              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              🔄 풀 새로고침
+            </button>
+          </div>
+
           {/* Pool Capacity Card */}
           <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -1938,6 +1983,33 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* ======================================================================= */}
       {activeTab === 'discovery' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Manual Refresh & Snapshot Notice */}
+          <div
+            role="status"
+            data-testid="discovery-tab-manual-refresh-notice"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              backgroundColor: 'rgba(168, 85, 247, 0.08)',
+              border: '1px solid rgba(168, 85, 247, 0.25)',
+              color: '#d8b4fe',
+              fontSize: '0.75rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>ℹ️ <strong>[스냅샷 모드 · 수동 갱신]</strong>: 승인 대기 중인 디스커버리 후보 목록은 실시간 자동 폴링되지 않는 스냅샷입니다.</span>
+            <button
+              type="button"
+              data-testid="discovery-tab-top-refresh-btn"
+              onClick={loadDiscoveryCandidates}
+              style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f8fafc', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              🔄 후보 새로고침
+            </button>
+          </div>
+
           {/* Announcement Broadcast Form */}
           <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
