@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.151"
+version: "1.0.152"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T03:37:00+09:00"
+updated: "2026-09-22T03:55:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 Control-plane 제품 경로 도달성 감사
+
+- 기준 `0d5b82591286975c226097f14cb4f309ca306629`, owner Codex; 정적 조사만 수행하고 제품 경로를 연결하지 않았다.
+- WorkspaceRecovery의 제품 미연결은 기존 사용자 결정 대기로 재확인했다. 새 후보는 ModelRetryStore/Placement/scheduler: 구현과 DB 시험은 있으나 app/worker entrypoint에서 호출되지 않고, architecture 문서도 endpoint/auth binding을 후속으로 남긴다. 사용자/업무 owner의 노출 결정이 필요하다.
+- NodeTransfer와 PostgresCredentialRegistry는 Node executor/runtime adapter 미구현으로 문서상 의도된 integration gate다. Outbox broker helper는 호출되지 않지만 DB outbox→`/events` 제품 경로는 연결돼 있다. generated Pydantic models 미사용은 JSON Schema 정본 규칙상 의도적이다.
+- 69개 비-`__init__` 모듈의 AST import 폐포는 61개 도달/8개 수동 확인 후보였다. 최신 integration SHA `5bb87e7e` 위 문서 게이트: check_docs / ontology / git diff 0, Obsidian read-only 1516 managed/7 pending/0 conflicts. 상세 판정과 범위: [[2026-09-22_ControlPlane_제품경로_도달성_감사_Codex]]. 제품시험/DB/HTTP/CI를 실행하지 않았고 외부 wrapper는 미확인이다.
+- 다음: 사용자/집계 담당이 모델 재시도 진입점을 제품에 노출할지/owner를 결정. Claude 독립 검토 요청은 이번 감사에서 보내지 않았다.
 
 ## 2026-09-22 Workspace snapshot reader 감사
 
