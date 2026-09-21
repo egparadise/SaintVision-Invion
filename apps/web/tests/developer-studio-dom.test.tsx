@@ -43,6 +43,9 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
 
   beforeEach(() => {
     (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+    window.URL.createObjectURL = vi.fn(() => 'blob:mock');
+    window.URL.revokeObjectURL = vi.fn();
+    window.alert = vi.fn();
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
@@ -509,3 +512,356 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     expect(container.textContent).toContain('✓ 산출물 검증 완료 (Output Verified)');
   });
 });
+
+describe('handleDownloadArtifact route-404 fallback and non-route error guards (UI-FB-03 Download Probe)', () => {
+  let container: HTMLDivElement;
+  let root: Root;
+
+  const result200 = {
+    runId: 'run_fb03',
+    output: {
+      sha256: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+      sizeBytes: 4096,
+    },
+    evidence: {
+      evidenceId: 'evi_verified_canonical_01',
+    },
+    stopReceipt: {
+      exitCode: 0,
+    },
+    completedAt: '2026-09-21T10:00:05Z',
+  };
+
+  beforeEach(() => {
+    (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+    window.URL.createObjectURL = vi.fn(() => 'blob:mock');
+    window.URL.revokeObjectURL = vi.fn();
+    window.alert = vi.fn();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    vi.restoreAllMocks();
+  });
+
+  it('Download Scenario 1: 401 Unauthorized during download probe -> NO fallback to /artifacts (0 calls)', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const err401 = {
+      problem: {
+        status: 401,
+        code: 'NET-401',
+        title: 'Unauthorized',
+        detail: 'User session expired or invalid token',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw err401;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    // User triggers download action
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // MUST NOT call /artifacts when /result fails with 401
+    expect(artifactsCalls).toBe(0);
+  });
+
+  it('Download Scenario 2: 500 Internal Server Error during download probe -> NO fallback to /artifacts (0 calls)', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const err500 = {
+      problem: {
+        status: 500,
+        code: 'NET-500',
+        title: 'Internal Server Error',
+        detail: 'Database connection failed',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw err500;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(artifactsCalls).toBe(0);
+  });
+
+  it('Download Scenario 3: Network rejection during download probe -> NO fallback to /artifacts (0 calls)', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const errNetwork = new Error('Network request failed');
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw errNetwork;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(artifactsCalls).toBe(0);
+  });
+
+  it('Download Scenario 4: App-level 404 (RES-RUN-404) during download probe -> STRICTLY NO fallback to /artifacts (0 calls)', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const errApp404 = {
+      problem: {
+        status: 404,
+        code: 'RES-RUN-404',
+        title: 'Run Not Found',
+        detail: 'Specified run does not exist or has been purged',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw errApp404;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(artifactsCalls).toBe(0);
+  });
+
+  it('Download Scenario 5: Route-only 404 (detail=Not Found) during download probe -> triggers fallback to /artifacts (1 call)', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const errRoute404 = {
+      problem: {
+        status: 404,
+        detail: 'Not Found',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw errRoute404;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // Route-only 404 must trigger fallback to /artifacts exactly once
+    expect(artifactsCalls).toBe(1);
+  });
+});
+
