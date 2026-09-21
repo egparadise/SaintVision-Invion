@@ -146,24 +146,104 @@ def test_concurrent_offer_updates_have_one_current_interval(app_sessionmaker, ow
         assert len(rows)==2 and rows[0][1]==rows[1][0] and rows[1][1] is None
 
 
+def _terminate_process_tree(proc):
+    # A wall-clock timeout must reclaim the *whole* tree, not just the direct child.
+    # check_migration_upgrade.py launches `alembic upgrade` as a grandchild and waits on
+    # it; killing only the child (Windows TerminateProcess) orphans that grandchild, which
+    # keeps a live backend on the in-flight database and so makes it indistinguishable from
+    # a database a concurrent run is legitimately using. Kill the tree first, so every
+    # surviving inv_upgrade_test_ backend afterwards provably belongs to someone else.
+    if os.name == 'nt':
+        subprocess.run(['taskkill', '/F', '/T', '/PID', str(proc.pid)], capture_output=True)
+    else:
+        import signal
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            proc.kill()
+    try:
+        proc.wait(timeout=15)
+    except subprocess.TimeoutExpired:
+        pass
+
+
+def _reclaim_orphaned_upgrade_databases(admin_dsn):
+    """After a timeout kills the tool's process tree, its finally never ran (the DROP DATABASE
+    WITH (FORCE) at tools/check_migration_upgrade.py:178), so the disposable databases it
+    created -- inv_upgrade_test_<uuid4 hex>, 49 chars -- are orphaned. Reclaim them from the
+    parent by owned prefix, but only ones with no live backend (their owner tree is dead) and
+    old enough that a concurrent run cannot have just created one it is about to connect to --
+    the same ownership + age guard used for Docker resources. Returns a reason-visible summary
+    string so the skip is never silent."""
+    import psycopg
+    from psycopg import sql
+    min_age = float(os.environ.get('INV_MIGRATION_RECLAIM_MIN_AGE', '5'))
+    reclaimed, in_use, too_new, note = 0, 0, 0, ''
+    try:
+        with psycopg.connect(admin_dsn, autocommit=True) as conn:
+            try:
+                rows = conn.execute(
+                    "SELECT d.datname,"
+                    " EXTRACT(EPOCH FROM (now() - (pg_stat_file('base/'||d.oid||'/PG_VERSION', true)).modification)),"
+                    " (SELECT count(*) FROM pg_stat_activity a WHERE a.datname = d.datname)"
+                    " FROM pg_database d WHERE d.datname LIKE 'inv_upgrade_test_%'").fetchall()
+            except psycopg.Error:
+                # pg_stat_file needs a superuser/pg_read_server_files admin DSN; degrade to a
+                # liveness-only guard rather than skipping cleanup, and say so in the reason.
+                rows = [(n, None, b) for n, b in conn.execute(
+                    "SELECT d.datname,"
+                    " (SELECT count(*) FROM pg_stat_activity a WHERE a.datname = d.datname)"
+                    " FROM pg_database d WHERE d.datname LIKE 'inv_upgrade_test_%'").fetchall()]
+                note += ' age-unavailable:liveness-only'
+            for name, age, backends in rows:
+                if not (name.startswith('inv_upgrade_test_') and len(name) == 49):
+                    continue
+                try:
+                    int(name[len('inv_upgrade_test_'):], 16)
+                except ValueError:
+                    continue
+                if backends:
+                    in_use += 1
+                    continue
+                if age is not None and age < min_age:
+                    too_new += 1
+                    continue
+                conn.execute(sql.SQL('DROP DATABASE {} WITH (FORCE)').format(sql.Identifier(name)))
+                reclaimed += 1
+    except Exception as exc:  # noqa: BLE001 -- cleanup failure must not mask the timeout skip
+        note += f' reclaim-error:{type(exc).__name__}'
+    left = in_use + too_new
+    detail = f'reclaimed {reclaimed}, left {left}'
+    if left:
+        detail += f' ({in_use} in-use, {too_new} too-new for concurrent-run safety)'
+    return detail + note
+
+
 def test_published_migration_heads_upgrade_without_rewriting(test_admin_dsn):
     # check_migration_upgrade.py replays every published prior in its own fresh disposable
-    # database, so its runtime is O(published priors) and grows as revisions accumulate
-    # (measured ~200s idle -- already over the old fixed 180s). A wall-clock timeout is
-    # therefore an *incomplete run that never reached its assertions*, not a migration defect:
-    # a real defect makes the tool exit non-zero well before the budget. Keep the two signals
-    # distinct so a slow host cannot masquerade as "migrations broken" (and, conversely, a real
-    # break can never be dismissed as "probably just load"). A non-zero exit fails; running out
-    # of the generous, tunable budget is a reason-visible skip, not a failure.
+    # database, so its runtime is O(published priors x revisions-to-head) and grows as
+    # revisions accumulate (measured ~200s idle -- already over the old fixed 180s). A
+    # wall-clock timeout is therefore an *incomplete run that never reached its assertions*,
+    # not a migration defect: a real defect makes the tool exit non-zero well before the
+    # budget. Keep the two signals distinct so a slow host cannot masquerade as "migrations
+    # broken" (and, conversely, a real break can never be dismissed as "probably just load").
+    # A non-zero exit fails; running out of the generous, tunable budget is a reason-visible
+    # skip. Because the skip is quiet where a failure was loud, the timeout path now owns the
+    # cleanup the child's finally can no longer do: kill the whole tree and reclaim the
+    # orphaned disposable databases, reporting the count so the skip stays honest.
     budget = int(os.environ.get('INV_MIGRATION_CHECK_TIMEOUT', '600'))
+    popen_kwargs = {} if os.name == 'nt' else {'start_new_session': True}
+    proc = subprocess.Popen(
+        [sys.executable, 'tools/check_migration_upgrade.py'],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, **popen_kwargs)
     try:
-        result = subprocess.run(
-            [sys.executable, 'tools/check_migration_upgrade.py'],
-            capture_output=True, timeout=budget)
+        proc.communicate(timeout=budget)
     except subprocess.TimeoutExpired:
+        _terminate_process_tree(proc)
+        cleanup = _reclaim_orphaned_upgrade_databases(test_admin_dsn)
         pytest.skip(
             f'Disposable migration validation did not complete within {budget}s and never '
             'reached its assertions -- the check is O(published priors) and this is an '
-            'incomplete run, not a migration defect. Raise INV_MIGRATION_CHECK_TIMEOUT or '
-            'make the tool incremental.')
-    assert result.returncode == 0, 'Disposable migration paths failed; diagnostics withheld'
+            f'incomplete run, not a migration defect. Orphaned-database cleanup: {cleanup}. '
+            'Raise INV_MIGRATION_CHECK_TIMEOUT or make the tool incremental.')
+    assert proc.returncode == 0, 'Disposable migration paths failed; diagnostics withheld'
