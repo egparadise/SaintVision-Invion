@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.100"
+version: "1.0.101"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:42:00+09:00"
+updated: "2026-09-22T04:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,23 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:42:00+09:00.
+- 확인 기준: 2026-09-22T04:55:00+09:00.
+
+## 세션 랩업: 화면별 실제 브라우저(Chrome 153) 대 실제 백엔드(Uvicorn) 실측 경계 총괄 및 검속 도구 확장 가이드
+
+- **화면별 실측 경계(단단함 vs 무름) 전수 분리 확립**:
+  - **산출물 다운로드 (Step 4)**: 실제 Chrome 153(WebCrypto SHA-256 + 50B 네이티브 다운로드) ↔ 실제 Uvicorn 0.52.4(wire 헤더 직렬화) 종단간 연결 완료. **(가장 단단함, 전수 실측 완료)**.
+  - **노드 인벤토리 (`NodeList`)**: 실제 Chrome 153 표출 완료(`ACTIVE (활성 · 헬스 미결정)` 청록 뱃지, 정책 배너, `LOST` 적색 뱃지 실측) ↔ 네트워크는 정본 스키마 모의 응답. **(중간 층, 백엔드 데몬 미연결)**.
+  - **작업공간 목록 (`WorkspaceList`)**: 실제 Chrome 153 표출 완료(5대 계약 상태 및 미확인 상태 실측) ↔ 네트워크는 모의 응답. **(중간 층, 컨테이너 오케스트레이션 미연결)**.
+  - **승인 센터 (`ApprovalCenter`)**: 실제 Chrome 153 표출 완료(스냅샷, 정책 다이제스트, 승인 확정 버튼) ↔ wire 모의 roundtrip. **(중간 층, DB 원장 미연결)**.
+  - **가상 패브릭 (`ResourceExplorer`)**: 실제 Chrome 153 표출 완료(후보 노드 카드, 토큰 발급 모달) ↔ 네트워크 모의 응답. **(중간 층, LAN 브로드캐스트 미연결)**.
+  - **파일 탐색기 / 에디터 (`InvFileExplorer` / `MonacoWorkspaceEditor`)**: 실제 Chrome 153 WebCrypto 실측 ↔ 네트워크 모의 응답. **(중간 층, 서버 파일시스템 미연결)**.
+  - **불변 증거 뷰어 (`EvidenceViewer`)**: 파이썬 계약 시험 및 Vitest DOM 가드(3/3 passed) 통과 ↔ 실제 Chrome 브라우저 스크린샷 미확보. **(무른 층, 브라우저 실측 대기)**.
+  - **실행 상세 / 샤드 원장 (`RunDetail`)**: Vitest 19개 단위 테스트 통과 ↔ 브라우저 및 백엔드 미연결. **(무른 층)**.
+- **정식 검속 도구(`tools/run_real_browser_acceptance.py`) 확장 가이드 확립**:
+  - 현재 역량: Uvicorn 0.52.4 ↔ Vite 프록시 ↔ Chrome 153 E2E 파이프라인에서 산출물 다운로드 3대 시나리오(`verified`, `mismatch`, `missing-header`) 전수 검속.
+  - 다음 작업자를 위한 확장 3단계(Uvicorn 앱 라우트 마운트 → Playwright 탭 네비게이션 시나리오 및 data-testid 단언 추가 → 돌연변이 사살 실증) 공식 문서화.
+- 보고서: [[2026-09-22_화면별_실제브라우저_대_실제백엔드_실측경계_및_도구확장_Gemini]].
 
 ## 세션 랩업: NodeResponse active 계약 인식 및 EvidenceViewer 허위 PASS 차단·verified 게이트 복구
 
