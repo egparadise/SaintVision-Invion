@@ -76,6 +76,7 @@ Codex가 observation-only guard 조건을 `if (false)`로 변이하고 실행했
 - Claude 문서 전용 commit이 integration에 들어온 뒤 d0d41c3 기준으로 4개 DOM 파일을 재실행했다. `apps/web` cwd에서 4 files/44 tests passed (exit 0, 18:32:01 KST). 검사는 문서 편집이 있는 worktree에서 수행했지만 소스 파일은 HEAD와 동일했다.
 - `check_docs.py`는 `.venv/Scripts/python.exe` 절대 경로로 exit 0, 626 versioned docs (18:32 KST); `check_ontology.py` 같은 interpreter로 exit 0 (RDF/SHACL 포함). `sync_obsidian.py --check`는 d416fe5 시점에 1418 managed / 5 pending / 0 conflicts로 exit 0; 이 review 문서 추가 이후 동기화 검사는 아직 재실행하지 않았다.
 - 최종 clean documentation-review SHA `095d3151d8b2c2408f5dbea6b6e3d585c5374b3a`에서 provenance command를 재실행했다: 네 DOM 파일 44 passed, `check_docs.py` 626 versioned docs, `check_ontology.py` RDF/SHACL, 모두 exit 0 (18:33:32 KST). Obsidian read-only check는 1419 managed / 4 pending exports / 0 conflicts로 exit 0이며 쓰기는 하지 않았다. 이 SHA는 Codex 리뷰 문서 커밋을 포함하고 UI 소스는 바꾸지 않는다.
+- 이후 승인된 문서 동기화를 실행해 4개 파일을 내보냈고 1419 destination hashes가 모두 일치했다. Unmanaged files는 건드리지 않았다. 후속 read-only check는 1419 managed / 0 pending / 0 conflicts, exit 0이다.
 - No full Vitest, browser, live HTTP, authenticated backend, Docker, physical node, or PTY acceptance was performed for this review. Component DOM tests are not browser or operational acceptance.
 
 ## Next actions

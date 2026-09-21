@@ -17,6 +17,7 @@ source_of_truth: "Git"
 - Provenance-wrapped 4 DOM files/44 tests passed. Hash-comparison 무력화 mutation은 assertion line 269에서, PTY observation guard 우회는 line 327에서 각각 실패했다. 변경은 원복했고 앱 소스는 clean. `check_docs.py`/`check_ontology.py`도 project `.venv`로 통과했다. 초기 root-cwd alias resolution 실패는 잘못된 작업 디렉터리 invocation으로 분류했으며 apps/web cwd 재실행에서 통과했다.
 - 상세 Evidence와 조치 인계: [[2026-09-21_VF_GM02-05_Codex_boundary_review]]. 구현자 Gemini에게 UI 결함을 인계하며 Codex는 screen code를 수정하지 않았다. Browser/실 HTTP/장비 인수는 미실행.
 - Clean documentation-review SHA `095d3151d8b2c2408f5dbea6b6e3d585c5374b3a`에서 재실행: 4 DOM files/44 passed, check_docs 626, check_ontology RDF/SHACL 모두 exit 0; Obsidian read-only 1419 managed/4 pending/0 conflicts.
+- History/workboard 동기화: 4개 파일 export, destination hash 1419/1419 일치; 후속 Obsidian check 1419 managed/0 pending/0 conflict.
 
 ## 2026-09-21 재개: integration 선행 병합, UI-FB-03, 응답 계약 slice
 
