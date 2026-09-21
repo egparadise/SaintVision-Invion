@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.12"
+version: "1.1.13"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T18:14:00+09:00"
+updated: "2026-09-21T18:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -158,3 +158,9 @@ Gemini's `39af7ca` VF-GM-05 terminal/PTY/accessibility landing was observed on `
 UI-FB-03 independent DOM-boundary review: on the Codex branch before the latest Gemini merge, provenance at fixed `e3a707b29d94545d76af7ced95d295a3572e9ccf`, Windows 11, Node v24.17.0, Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, executor Codex, KST 18:12:23–18:13:09, `apps/web/tests/developer-studio-dom.test.tsx` passed 18. The test includes the prior successful `/result` mount followed by a click-time 401; it asserts no `/artifacts` fallback and no Blob download while surfacing the error. Mutation proof: restoring both swallowed non-route errors and `serverPayload || artifactData` made that one test fail (exit 1); restoring only the cache expression while preserving the immediate error return passed, showing the guard depends on the full error path. Both mutations were reverted and the source diff is clean. This approves only the component DOM boundary. Gemini's reported mutation suite was reviewed but not re-executed; browser acceptance, live HTTP and physical-node operation remain outside this evidence.
 
 After merging `c192cdc`, fixed branch SHA `8b59e9c3685af94032c1b997e7160a513540957b` provenance at 18:13:50 KST: full Vitest 45 files/413 passed; Python `-m pytest tests/core/test_pool_placement_response_contract.py tests/core/test_run_log_contract.py` 20 passed (2 Starlette deprecation warnings); `export_schemas.py --check` matched 41 schemas; `api-response-contracts.mjs --check` matched 15 generated TS response types. The remote integration advanced concurrently to `39af7ca` while these checks ran, so these results are branch evidence before that terminal UI commit, not integration evidence. Latest `39af7ca` must be tested at integration SHA after landing. No live DB, hosted CI, browser, or HTTP run is claimed. Claude fixed-SHA review remains pending.
+
+## Integration landing and fixed-tip verification
+
+After Gemini's VF-GM-05 commit `39af7ca` landed, Codex merged it together with Claude `c192cdc` and fast-forwarded the Codex contract branch to integration. Final pushed integration SHA is `d438db89c18abc0fa5ab58215364871b8418301f`; provenance checks ran from a clean detached worktree exactly equal to `origin/integration/all-agents-unified`, Windows 11, KST 18:16:52–18:17:29, Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node v24.17.0, executor Codex; postgres DSN absent, Docker present, Go absent. Results: full Vitest 46 files/423 passed; `tests/core/test_pool_placement_response_contract.py tests/core/test_run_log_contract.py` 20 passed (2 Starlette deprecation warnings); `export_schemas.py --check` 41 match; API response TypeScript check 15 match; Vite build, `check_docs.py` (622 versioned documents), `check_ontology.py`, and `sync_obsidian.py --check` (1415 managed/0 pending/0 conflicts) all exit 0. `tsc -b` passed when run from `apps/web` via `npm exec -- tsc -b`. Two invalid invocations were not counted as successful checks: running tsc from repository root returned TS5083 (no root tsconfig), and invoking the Windows `.bin/tsc` shim directly through the provenance wrapper returned WinError 193; corrected invocation passed.
+
+The earlier UI-FB-03 DOM review and mutation check applies to the unchanged `beff6c1` implementation present in this integration ancestry: the focused DOM file had 18 passing cases, and restoring the swallowed-error plus cached-payload fallback made the click-time 401 test fail (exit 1). This is component DOM evidence only. No hosted Actions, live PostgreSQL, HTTP service, browser acceptance, or physical-node operation was performed. Claude fixed-SHA review remains pending.
