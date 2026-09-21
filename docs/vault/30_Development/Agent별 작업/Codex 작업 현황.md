@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.132"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T23:36:32+09:00"
+updated: "2026-09-21T23:38:10+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,7 +22,7 @@ source_of_truth: "Git"
 - 시작 기준 local integration `938ea1b1d797e7c2ed4a81e9920cdab0cb9f620b`; 작업 전 origin이 `a451d69f514a57fa16a8f7add432127a36250e7b`로 전진해 branch를 그 위로 rebase했다. 검증 SHA `90283729084b5a47dfe719c2a7638b978158a826`; branch `agent/codex/hardcoded-value-audit`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-hardcoded-value-audit`. 주 checkout은 Claude의 미커밋 변경이 있어 수정하지 않았다.
 - `tests` 221 / `tools` 66 / workflows 5개 파일을 후보 검색했다. ontology ownership query의 48행은 task registry의 outcome edge 수에서 유도하고 task별 edge를 비교하게 했다. Workspace-upgrade 3, Node Docker compatibility 4, remote-workspace 7의 evidence 검사는 count 대신 독립적인 정확한 case/mode 집합, 누락·추가·중복 검사가 되게 했다.
 - 고정 baseline(48 task/12 outcome), browser canonical journey, 11 run states, curated 역사적 migration priors, semantic query fixture cardinalities는 목적이 독립 수용 기준 또는 역사적 fixture라 고정 유지하고 바뀌는 시점을 기록했다. migration current head는 이미 Alembic graph에서 유도된다.
-- provenance-wrapped final checks at `9028372`: `.venv` focused evidence inventory 4 passed; `check_docs.py` 24 source hashes/665 docs exit 0; `check_ontology.py` exit 0; related checker `py_compile` exit 0; `sync_obsidian.py --apply` exported 6 files and final `--check` was 1458 managed/0 pending/0 conflicts. Docker/Go/PostgreSQL acceptance and hosted CI were not run. Writer validation only; independent review and CI remain pending. Detailed scope, triggers, and limits: [[2026-09-21_하드코딩_변경연동값_감사_Codex]].
+- Provenance-wrapped checks at `38088b0` (2026-09-21 23:37:50 KST): `.venv` focused evidence inventory 4 passed; `check_docs.py` 24 source hashes/666 docs exit 0; `check_ontology.py` exit 0; related checker `py_compile` exit 0. Final Obsidian sync exported 3 files; `--check` was 1459 managed/0 pending/0 conflicts. Docker/Go/PostgreSQL acceptance and hosted CI were not run. Writer validation only; independent review and CI remain pending. Detailed scope, triggers, and limits: [[2026-09-21_하드코딩_변경연동값_감사_Codex]].
 - 다음: 최종 SHA에서 checks 재실행 → integration 반영 후 same-SHA review/CI. 그리고 migration 지원 prior를 새로 공개할 때 curated matrix를 확인한다.
 
 ## 2026-09-21 CI 검사 배선, issuer 쿼터 경계, Node 응답 계약
