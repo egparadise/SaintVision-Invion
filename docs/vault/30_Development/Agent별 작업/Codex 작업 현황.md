@@ -1,14 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.158"
+version: "1.0.159"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T04:51:00+09:00"
+updated: "2026-09-22T05:02:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 strict response producer-shape self-audit
+
+- Audited all 19 response-model classes added/narrowed today against producer branches and fixtures. No live producer shape was found that the strict model rejects; found and corrected the Node enrollment fixture (actual new enrollment is heartbeat sequence 0 / null timestamp), and expanded shape tests for project-link, workspace-tool null/unassigned-node, and contribution status x nullable-capacity outputs.
+- Focused `.venv` run at integration SHA `f0183360`: 101 passed, 2 PostgreSQL-gated skips (`INV_TEST_ADMIN_DSN` absent). This is not live-DB verification; see [[2026-09-22_response_model_shape_self_audit_Codex]]. Independent review pending.
 
 ## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
 

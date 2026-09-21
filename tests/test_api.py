@@ -151,6 +151,8 @@ def test_enrolled_node_is_registered_and_readable(client, app_engine, seeded):
     assert response.status_code == 201, response.text
     enrolled = schemas.NodeEnrollResponse.model_validate(response.json())
     node_id = enrolled.node.node_id
+    assert enrolled.node.last_heartbeat_at is None
+    assert enrolled.node.heartbeat_sequence == 0
     assert response.headers["Location"] == f"/v1/nodes/{node_id}"
 
     listed = client.get("/v1/nodes", headers={"Authorization": "Bearer token-a"})

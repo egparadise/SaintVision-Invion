@@ -221,6 +221,33 @@ def test_workspace_tool_route_serializes_shared_fixture(monkeypatch):
     assert response.json() == payload
 
 
+def test_workspace_tool_route_preserves_null_choice_and_readiness(monkeypatch):
+    """Clearing the tool is a real producer branch, not a missing response."""
+    payload = _fixture("workspace-tool-result-response.json")
+    payload["toolName"] = None
+    payload["toolReadiness"] = None
+    response = TestClient(_tool_app(monkeypatch, payload)).put(
+        "/v1/workspaces/wsp_contract_tool/tool", json={"toolName": None}
+    )
+    assert response.status_code == 200
+    assert response.json() == payload
+    assert "toolName" in response.json()
+    assert "toolReadiness" in response.json()
+
+
+def test_workspace_tool_route_allows_selected_tool_without_assigned_node(monkeypatch):
+    """A saved choice does not imply the workspace already has a node."""
+    payload = _fixture("workspace-tool-result-response.json")
+    payload["nodeId"] = None
+    payload["toolReadiness"]["nodeId"] = None
+    response = TestClient(_tool_app(monkeypatch, payload)).put(
+        "/v1/workspaces/wsp_contract_tool/tool", json={"toolName": "codex-cli"}
+    )
+    assert response.status_code == 200
+    assert response.json() == payload
+    assert response.json()["toolReadiness"]["ready"] is False
+
+
 def test_workspace_tool_route_rejects_invalid_readiness(monkeypatch):
     payload = _fixture("workspace-tool-result-response.json")
     payload["toolReadiness"]["inventedReady"] = True

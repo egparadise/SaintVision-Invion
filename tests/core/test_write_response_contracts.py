@@ -122,8 +122,12 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             enrolled_at=dt.datetime.fromisoformat(
                 node_data["enrolledAt"].replace("Z", "+00:00")
             ),
-            last_heartbeat_at=dt.datetime.fromisoformat(
-                node_data["lastHeartbeatAt"].replace("Z", "+00:00")
+            last_heartbeat_at=(
+                dt.datetime.fromisoformat(
+                    node_data["lastHeartbeatAt"].replace("Z", "+00:00")
+                )
+                if node_data["lastHeartbeatAt"] is not None
+                else None
             ),
             heartbeat_sequence=node_data["heartbeatSequence"],
             labels=node_data["labels"],
@@ -333,6 +337,70 @@ def test_project_create_preserves_conditional_absence_of_kernel_note(monkeypatch
     assert response.status_code == 201
     assert response.json() == payload
     assert "kernelNote" not in response.json()
+
+
+@pytest.mark.parametrize(
+    ("linked", "enabled", "note_expected"),
+    [(False, False, True), (True, False, True), (True, True, False)],
+)
+def test_project_create_model_accepts_each_kernel_link_producer_branch(
+    monkeypatch, linked, enabled, note_expected
+):
+    """The note is emitted for both blocked states and omitted when executable."""
+    project = SimpleNamespace(
+        project_id="prj_branch_contract",
+        code="branch-contract",
+        display_name="Branch contract",
+        status="active",
+        created_at=dt.datetime(2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc),
+    )
+    session = SimpleNamespace(
+        execute=lambda *_args, **_kwargs: SimpleNamespace(scalar_one=lambda: 1)
+    )
+    monkeypatch.setattr(
+        projects.project_service,
+        "kernel_link",
+        lambda *_args, **_kwargs: {
+            "kernelLinked": linked,
+            "kernelEnabled": enabled,
+        },
+    )
+
+    body = projects.project_service.project_body(
+        session, project, tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041")
+    )
+    schemas.ProjectCreateResponse.model_validate(body)
+    assert ("kernelNote" in body) is note_expected
+
+
+@pytest.mark.parametrize("status", ["pending", "active", "revoked"])
+@pytest.mark.parametrize(
+    ("capacity_bytes", "available_bytes"),
+    [(None, None), (1024, None), (None, 512), (1024, 512)],
+)
+def test_contribution_body_serializes_every_nullable_status_shape(
+    status, capacity_bytes, available_bytes
+):
+    contribution = SimpleNamespace(
+        contribution_id="stc_shape_contract",
+        node_id="node_shape_contract",
+        declared_path="C:\\data",
+        normalized_path="C:/data",
+        mode="read_only",
+        status=status,
+        capacity_bytes=capacity_bytes,
+        available_bytes=available_bytes,
+        registered_at=dt.datetime(2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc),
+    )
+
+    body = storage_routes._contribution_body(contribution)
+    parsed = schemas.ContributionRegistrationResponse.model_validate(
+        {"contribution": body}
+    )
+    assert parsed.contribution.status == status
+    assert parsed.contribution.capacity_bytes == capacity_bytes
+    assert parsed.contribution.available_bytes == available_bytes
+    assert "capacityBytes" in body and "availableBytes" in body
 
 
 @pytest.mark.parametrize(
