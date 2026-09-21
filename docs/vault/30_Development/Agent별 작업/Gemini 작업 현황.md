@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.103"
+version: "1.0.104"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T08:30:00+09:00"
+updated: "2026-09-22T08:36:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,19 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T08:30:00+09:00.
+- 확인 기준: 2026-09-22T08:36:00+09:00.
+
+## 세션 랩업: S01-FE 증거 꾸러미(체크리스트) 완결 및 Codex 검토/판정 인계
+
+- **S01-FE 고유 범위 정합 및 증거 꾸러미 구축**:
+  - 사용자 지시(S01-DB 닫힘 방식 준용 및 S01-FE 증거 체크리스트 구축)에 따라 S01-FE 고유 범위인 **"사용자 여정·디자인 토큰·화면 상태 명세"**에 맞추어 이미 확보된 실물 증거들을 전수 연결하고, 범위 밖 기능(물리 장비, 사내 DNS/TLS, hosted CI)을 정직하게 분리한 체크리스트 보고서 작성.
+  - **정본 명세 최신화**: [[Gemini Frontend 상세 아키텍처 및 화면 명세]] (SPEC-FRONTEND-001)을 v1.1.0으로 갱신하여 13개 화면 상세 테이블 및 승인 경로(`/decision`), Node 5대 상태, Workspace 5대 상태, Evidence 4대 상태를 정본 계약과 100% 일치시킴.
+  - **요구 증거 3대 축 전수 충족 확인**:
+    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/653 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
+    2. **설계 검토**: SPEC-FRONTEND-001 v1.1.0, Codex 1차 회신(FR-01~07) 지적 사항 전수 해결 대조표 완비, Claude 3건 독립 검토 완료.
+    3. **인벤토리 보고**: 13개 화면, 30개 디자인 토큰, 5대 공통 화면 상태, OUT-01/AC-01 미확인 값 명시 완결.
+  - **Codex 인계**: owner Gemini는 직접 `task-registry.json`을 닫지 않고, reviewer인 Codex에게 검토 및 최종 판정을 인계.
+- **보고서**: [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]].
 
 ## 세션 랩업: EvidenceViewer RUN_FAILED 상태 분리와 RunDetail 시간 부인 고지 Chrome 153 실측 완결
 

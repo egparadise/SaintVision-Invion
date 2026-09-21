@@ -1,10 +1,10 @@
 ---
 doc_id: "SPEC-FRONTEND-001"
 title: "Gemini Frontend 상세 아키텍처 및 화면 명세"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-09T16:55:00+09:00"
+updated: "2026-09-22T08:35:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "frontend", "design-tokens", "s01-fe"]
@@ -188,17 +188,17 @@ CSS 커스텀 프로퍼티를 원천으로 하며, 의미 기반(semantic) 네�
 |---|---|---|---|---|---|---|
 | 01 | `/login` | 로그인 화면 | `POST /v1/auth/token` | None | 익명 | • Loading: IdP 리다이렉트 스켈레톤<br>• Empty: N/A<br>• Error: IdP 인증 실패 및 네트워크 오류 코드 안내<br>• PKCE 플로우, 세션 만료 시 리다이렉트 |
 | 02 | `/` | 클러스터 개요 | `GET /v1/resource-graph` | SSE (`cluster.stats`) | `project:read` | • 5개 노드 자원 게이지 (CPU/GPU/RAM/VRAM/Storage)<br>• Partial: 일부 노드 메트릭 수집 지연 시 경고 뱃지 표시 |
-| 03 | `/nodes` | Node 인벤토리 | `GET /v1/nodes` | SSE (`node.state`) | `node:read` | • 노드 목록, 상태(Online/Degraded/Offline), 하트비트 시각<br>• Empty: "등록된 Node가 없습니다. 에이전트 등록 명령 복사" |
+| 03 | `/nodes` | Node 인벤토리 | `GET /v1/nodes` | SSE (`node.state`) | `node:read` | • 노드 목록, 5대 계약 상태(`enrolling`, `active`, `draining`, `lost`, `retired`) 및 미지(`unknown`) 정직화, 하트비트 시각<br>• Empty: "등록된 Node가 없습니다. 에이전트 등록 명령 복사" |
 | 04 | `/nodes/{nodeId}` | Node 상세 정보 | `GET /v1/nodes/{id}`<br>`GET /v1/resources/snapshot?nodeId=` | SSE (`node.lease`) | `node:read` | • Capability, 하드웨어 사양, 활성 Lease, Snapshot 타임라인<br>• Error: 만료되었거나 이탈한 노드 명시 |
 | 05 | `/projects` | 프로젝트 목록 | `GET /v1/projects` | None | `project:read` | • 프로젝트 카드 목록, 소유자, 활성 워크스페이스 수<br>• Empty: "프로젝트 생성" CTA 버튼 |
-| 06 | `/projects/{id}/workspaces` | Workspace 목록·생성 | `GET/POST /v1/workspaces` | SSE (`workspace.state`) | `workspace:write` | • 격리 워크스페이스 목록, 상태, 사용 자원 한도<br>• 폼: 템플릿 선택, 허용 노드 선택, 네트워크 정책 설정 |
+| 06 | `/projects/{id}/workspaces` | Workspace 목록·생성 | `GET/POST /v1/workspaces` | SSE (`workspace.state`) | `workspace:write` | • 격리 워크스페이스 목록, 5대 계약 상태(`provisioning`, `ready`, `suspended`, `deleting`, `deleted`), 사용 자원 한도<br>• 폼: 템플릿 선택, 허용 노드 선택, 네트워크 정책 설정 |
 | 07 | `/workspaces/{id}/editor` | 파일 편집기 및 Diff | `GET/PUT /v1/workspaces/{id}/files` | None | `workspace:write` | • Monaco Editor 파일 트리 탐색<br>• 저장 시 ETag 충돌 방지 및 실시간 외부 변경 알림 |
 | 08 | `/workspaces/{id}/terminal` | 웹 터미널 | WS `/v1/workspaces/{id}/terminals/{sid}` | WebSocket (PTY) | `workspace:exec` | • xterm.js 기반 양방향 PTY 셸<br>• 30초 1회용 티켓 인증, 세션 재연결, 텍스트 대체 로그 링크 |
 | 09 | `/runs` | Run 목록 | `GET /v1/runs?cursor=&status=` | SSE (`run.state`) | `run:read` | • 11개 상태 필터, 프로젝트/노드 필터, 검색<br>• Empty: "실행된 Run이 없습니다" |
-| 10 | `/runs/{runId}` | Run 상세 (4개 탭) | `GET /v1/runs/{id}`<br>`GET /v1/runs/{id}/explain` | SSE (`run.log`, `run.state`) | `run:read` | • 탭1: 상태 전이 타임라인<br>• 탭2: SSE 스트리밍 실시간 로그<br>• 탭3: 아티팩트 다운로드<br>• 탭4: 자원 배치 Explain |
-| 11 | `/runs/{runId}/evidence` | 증거(Evidence) 패키지 | `GET /v1/runs/{id}/evidence` | None | `audit:read` | • 실행 무결성 해시, 입력/출력 검증, 불변 증거 JSON 뷰어<br>• Forbidden: 감사 권한 필요 403 안내 |
+| 10 | `/runs/{runId}` | Run 상세 (4개 탭) | `GET /v1/runs/{id}`<br>`GET /v1/runs/{id}/explain` | SSE (`run.log`, `run.state`) | `run:read` | • 탭1: 상태 전이 타임라인<br>• 탭2: SSE 스트리밍 실시간 로그<br>• 탭3: 아티팩트 다운로드<br>• 탭4: 자원 배치 Explain<br>• 4대 시간 표시 및 부인 고지(로그 캡처, 산출물, 샤드 원장) |
+| 11 | `/runs/{runId}/evidence` | 증거(Evidence) 패키지 | `GET /v1/runs/{id}/evidence` | None | `audit:read` | • 실행 무결성 해시, 입력/출력 검증, 불변 증거 JSON 뷰어<br>• 4대 상태 분리: `PASS`, `UNVERIFIED`, `RUN_FAILED`(실행 실패·출력 부재), `FAIL`(무결성 실패)<br>• Forbidden: 감사 권한 필요 403 안내 |
 | 12 | `/approvals` | 승인 대기 목록 | `GET /v1/approvals?status=pending` | SSE (`approval.created`) | `approval:decide` | • 긴급도/만료 임박순 정렬 승인 대기 카드<br>• Empty: "대기 중인 승인 요청이 없습니다" (정상 상태) |
-| 13 | `/approvals/{approvalId}` | **승인 상세 (최우선)** | `GET /v1/approvals/{id}`<br>`POST /v1/approvals/{id}/decide` | SSE (`approval.updated`) | `approval:decide` | • 명령/도구 diff, 반경, 비용, 롤백 유무, 카운트다운 타이머<br>• Two-Person Rule 1/2 승인 상태 및 자가 승인 방지 |
+| 13 | `/approvals/{approvalId}` | **승인 상세 (최우선)** | `GET /v1/approvals/{id}`<br>`POST /v1/approvals/{id}/decision` | SSE (`approval.updated`) | `approval:decide` | • 명령/도구 diff, 반경, 비용, 롤백 유무, 카운트다운 타이머<br>• Two-Person Rule 1/2 승인 상태 및 자가 승인 방지, One-time Nonce 동봉 |
 
 ---
 
@@ -234,7 +234,7 @@ CSS 커스텀 프로퍼티를 원천으로 하며, 의미 기반(semantic) 네�
 ### 4.2 승인 안전장치 및 클라이언트 인터랙션 규칙
 
 1. **Diff 미로드 시 승인 완전 차단**: Diff 로딩 실패 또는 부분 유실 시 승인 버튼은 `disabled` 상태를 유지하며 "Diff 로딩 실패로 인해 승인할 수 없습니다" 경고를 띄운다.
-2. **One-Time Nonce 발급**: 승인 상세 화면 진입 시 발급된 `approvalNonce`를 `POST /v1/approvals/{id}/decide` 페이로드에 필수 동봉한다. 네트워크 지연 등으로 인한 더블 클릭 시 2회차 요청은 즉각 거절된다.
+2. **One-Time Nonce 발급**: 승인 상세 화면 진입 시 발급된 `approvalNonce`를 `POST /v1/approvals/{id}/decision` 페이로드에 필수 동봉한다. 네트워크 지연 등으로 인한 더블 클릭 시 2회차 요청은 즉각 거절된다.
 3. **만료 카운트다운 및 타이머 동기화**: 서버의 `expiresAt` 시각과 클라이언트 시계 차이를 서버 핑으로 보정하며, 남은 시간 60초 미만 시 붉은색 점멸 경고를 노출한다. 0초 도달 시 모든 버튼은 비활성화된다.
 4. **Two-Person Rule (상호 견제)**: 정책상 2인 승인이 요구되는 경우, 로그인한 사용자가 1차 승인자 ID와 일치하면 2차 승인 버튼이 비활성화되고 "다른 승인자의 검토가 필요합니다" 툴팁이 노출된다.
 5. **롤백 부재 시 시각적 경고**: `spec.rollbackPlan`이 비어 있는 경우 붉은색 아웃라인 배너로 "주의: 자동 롤백 절차가 정의되지 않았습니다"를 명시한다.
