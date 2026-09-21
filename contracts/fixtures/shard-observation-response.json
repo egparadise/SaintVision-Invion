@@ -1,0 +1,33 @@
+{
+  "planId": "shard_plan_0123456789ABCDEF",
+  "sourcePlanId": null,
+  "rootPlanId": "shard_plan_0123456789ABCDEF",
+  "generation": 1,
+  "parentRunId": "run_0123456789ABCDEFGHJKMNPQRS",
+  "parentState": "succeeded",
+  "aggregateManifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "shardCount": 1,
+  "allPhysicallyStopped": true,
+  "allSucceeded": true,
+  "resultManifest": [
+    {
+      "index": 0,
+      "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+      "evidenceId": "evd_0123456789ABCDEFGHJKMNPQRS",
+      "objectId": "44444444-4444-4444-8444-444444444444",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sizeBytes": 2048
+    }
+  ],
+  "resultManifestSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "shards": [
+    {
+      "index": 0,
+      "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+      "nodeId": "nod_0123456789ABCDEFGHJKMNPQRS",
+      "phase": "stopped",
+      "state": "succeeded",
+      "evidenceId": "evd_0123456789ABCDEFGHJKMNPQRS"
+    }
+  ]
+}
