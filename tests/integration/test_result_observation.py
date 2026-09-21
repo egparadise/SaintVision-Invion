@@ -53,12 +53,17 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
     assert result["source"] == "execution-kernel"
     assert result["state"] == "succeeded" and result["sealed"] and result["executionConfirmed"]
     assert result["attemptCount"] == 1 and not result["resourceReleasePending"]
+    assert result["stateUpdatedAt"]
     with a.e.db.transaction(a.e.tenant) as c:
         row = c.execute(
-            "SELECT evidence_id FROM inv.result_completions WHERE command_id=%s",
+            "SELECT evidence_id,completed_at FROM inv.result_completions WHERE command_id=%s",
             (a.enqueued["commandId"],),
         ).fetchone()
+        saved_run = c.execute(
+            "SELECT updated_at FROM inv.runs WHERE run_id=%s", (a.run["runId"],)
+        ).fetchone()
         assert result["evidence"]["evidenceId"] == row["evidence_id"]
+        assert result["stateUpdatedAt"] == saved_run["updated_at"].isoformat()
         facts = ResultView._current(
             c, c.execute("SELECT * FROM inv.runs WHERE run_id=%s", (a.run["runId"],)).fetchone()
         )
@@ -67,6 +72,7 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
     assert a.http.get(alias + "/result", headers=a.headers()).json() == result
     artifacts = _get(a, "/artifacts").json()
     assert artifacts["count"] > 0 and artifacts["count"] == artifacts["verifiedCount"]
+    assert artifacts["completedAt"] == row["completed_at"].isoformat()
     item = next(f for f in artifacts["artifacts"] if f["path"] == "outputs/metrics.json")
     response = _get(a, "/artifacts/content", params={"path": item["path"]})
     assert len(response.content) == item["byteSize"]
@@ -77,7 +83,9 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
     )
     assert response.headers["content-disposition"].startswith("attachment;")
     assert json.loads(response.content)["evaluationMSE"] < 1e-8
-    assert _get(a, "/logs").json()["stdout"] is not None
+    logs = _get(a, "/logs").json()
+    assert logs["stdout"] is not None
+    assert logs["completedAt"] == row["completed_at"].isoformat()
     attempts = _get(a, "/attempts").json()
     assert attempts["count"] == 1 and attempts["attempts"][0]["evidenceId"] == row["evidence_id"]
     assert _get(a, "/attempts?after=1").json()["count"] == 0
@@ -124,8 +132,11 @@ def test_draft_and_cancelled_run_never_report_success_or_placeholder_output(firs
     body = _get(a, "/result").json()
     assert body["state"] == "draft" and body["output"] is None and body["evidence"] is None
     assert not body["sealed"] and not body["executionConfirmed"] and body["commandId"] is None
-    assert _get(a, "/artifacts").json()["artifacts"] == []
-    assert _get(a, "/logs").json()["stdout"] is None
+    assert body["stateUpdatedAt"]
+    artifacts = _get(a, "/artifacts").json()
+    assert artifacts["artifacts"] == [] and artifacts["completedAt"] is None
+    logs = _get(a, "/logs").json()
+    assert logs["stdout"] is None and logs["completedAt"] is None
     assert _get(a, "/attempts").json()["attempts"] == []
     response = a.http.post(
         a.url + "/cancel",

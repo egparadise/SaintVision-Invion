@@ -228,13 +228,15 @@ def test_workspace_status_response_allowed_next_matches_real_lifecycle_state(
     assert saved_status == parsed.status
 
 
+@pytest.mark.parametrize("register_kernel_resource", [False, True])
 def test_resource_offer_write_response_matches_real_postgres_state(
-    owner_engine, app_engine, two_tenants
+    owner_engine, app_engine, two_tenants, register_kernel_resource
 ):
     tenant_id, _ = two_tenants
     owner_id = new_id("user")
     node_id = new_id("node")
     capability_id = new_id("capability")
+    kernel_resource_id = new_id("run").replace("run_", "res_")
     now = dt.datetime.now(dt.timezone.utc)
     with owner_engine.begin() as connection:
         _insert_user(connection, tenant_id, owner_id, "offer-owner", now)
@@ -268,6 +270,36 @@ def test_resource_offer_write_response_matches_real_postgres_state(
                 "now": now,
             },
         )
+        if register_kernel_resource:
+            # The application capability and kernel resource are separate facts.
+            # Seed both so this case reaches the applied=true branch instead of
+            # only proving the honest `resource_not_registered` response.
+            connection.execute(
+                text(
+                    "INSERT INTO inv.tenants (tenant_id, name) VALUES (:tenant_id, 'offer-test') "
+                    "ON CONFLICT (tenant_id) DO NOTHING"
+                ),
+                {"tenant_id": tenant_id},
+            )
+            connection.execute(
+                text(
+                    "INSERT INTO inv.nodes (tenant_id, node_id, status) "
+                    "VALUES (:tenant_id, :node_id, 'online')"
+                ),
+                {"tenant_id": tenant_id, "node_id": node_id},
+            )
+            connection.execute(
+                text(
+                    "INSERT INTO inv.resources "
+                    "(tenant_id, resource_id, node_id, kind, capacity, offered) "
+                    "VALUES (:tenant_id, :resource_id, :node_id, 'cpu', 16000, 1000)"
+                ),
+                {
+                    "tenant_id": tenant_id,
+                    "resource_id": kernel_resource_id,
+                    "node_id": node_id,
+                },
+            )
 
     principal = Principal(
         user_id=owner_id,
@@ -290,9 +322,16 @@ def test_resource_offer_write_response_matches_real_postgres_state(
     assert parsed.offered_quantity == 8000
     assert parsed.total_quantity == 16000
     assert parsed.previous_offered_quantity is None
-    assert parsed.applied_to_kernel is False
-    assert parsed.kernel_reason_code == "resource_not_registered"
-    assert "kernelReason" in payload
+    if register_kernel_resource:
+        assert parsed.applied_to_kernel is True
+        assert parsed.kernel_resource_ids == [kernel_resource_id]
+        assert parsed.kernel_capacity == 16000
+        assert parsed.kernel_reason_code is None
+        assert "kernelReason" not in payload
+    else:
+        assert parsed.applied_to_kernel is False
+        assert parsed.kernel_reason_code == "resource_not_registered"
+        assert "kernelReason" in payload
     with owner_engine.connect() as connection:
         saved = connection.execute(
             text(
@@ -303,3 +342,13 @@ def test_resource_offer_write_response_matches_real_postgres_state(
         ).mappings().one()
     assert saved["offered_quantity"] == parsed.offered_quantity
     assert saved["effective_to"] is None
+    if register_kernel_resource:
+        with owner_engine.connect() as connection:
+            applied = connection.execute(
+                text(
+                    "SELECT offered FROM inv.resources "
+                    "WHERE tenant_id=:tenant_id AND resource_id=:resource_id"
+                ),
+                {"tenant_id": tenant_id, "resource_id": kernel_resource_id},
+            ).scalar_one()
+        assert applied == parsed.offered_quantity == 8000

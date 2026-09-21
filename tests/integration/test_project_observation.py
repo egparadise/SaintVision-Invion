@@ -47,6 +47,26 @@ def test_approval_pages_detail_filter_and_no_private_payload(api):
     assert 'nonce' not in first.text and 'workload' not in first.text
 
 
+def test_run_result_and_empty_views_expose_durable_state_time_not_read_time(api):
+    a = api
+    run_id = a.run['runId']
+    with a.e.db.transaction(a.e.tenant) as c:
+        updated_at = c.execute(
+            'SELECT updated_at FROM inv.runs WHERE run_id=%s', (run_id,)
+        ).fetchone()['updated_at']
+
+    base = a.url + '/runs/' + run_id
+    result = a.client.get(base + '/result', headers=a.headers()).json()
+    artifacts = a.client.get(base + '/artifacts', headers=a.headers()).json()
+    logs = a.client.get(base + '/logs', headers=a.headers()).json()
+    validate_contract('RunResultView', result)
+    validate_contract('RunArtifactList', artifacts)
+    validate_contract('RunLogView', logs)
+    assert result['stateUpdatedAt'] == updated_at.isoformat()
+    assert artifacts['completedAt'] is None and artifacts['artifacts'] == []
+    assert logs['completedAt'] is None and logs['stdout'] is None and logs['stderr'] is None
+
+
 @pytest.mark.parametrize('params', [{'limit': 0}, {'limit': 201}, {'after': ''},
                                   {'after': 'bad'}, {'runId': 'bad'}])
 def test_approval_pagination_rejects_invalid_input(api, params):
@@ -97,6 +117,14 @@ def test_shard_view_and_parent_cancel_use_actual_durable_admission(api, gateway)
     assert response.status_code == 200
     validate_contract('ShardObservation', response.json())
     assert response.json() == runtime.status(a.e.tenant, a.e.project, 'browser-observation')
+    with psycopg.connect(a.e.owner) as c:
+        latest_run_update = c.execute(
+            """SELECT max(r.updated_at) FROM inv.runs r WHERE r.tenant_id=%s AND r.run_id IN (
+                 SELECT run_id FROM inv.shard_commands WHERE tenant_id=%s AND plan_id=%s
+                 UNION SELECT run_id FROM inv.shard_parents WHERE tenant_id=%s AND plan_id=%s)""",
+            (a.e.tenant, a.e.tenant, 'browser-observation', a.e.tenant, 'browser-observation'),
+        ).fetchone()[0]
+    assert response.json()['stateAsOf'] == latest_run_update.isoformat()
     assert response.json()['shards'][0]['runId'] == a.run['runId']
     assert not response.json()['allSucceeded'] and not response.json()['allPhysicallyStopped']
     assert response.json()['resultManifest'] is None

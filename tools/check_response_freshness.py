@@ -14,8 +14,8 @@ freshness-critical and belongs in this map -- that is human judgment, and a new 
 map is silently unchecked (the same forgets-limitation as the migration prior list). So this check is
 a floor, not a ceiling: it holds the known set and must be reviewed when responses are added.
 
-Report-only: ShardObservation is a known pending gap (observedAt recommended to Codex); a gate would
-fail on it. Present/missing is printed for review.
+Report-only: source timestamps are kept distinct by field name and checked independently. Missing
+fields are printed for review; a gate is not implied by declaring a response freshness-critical.
 """
 from __future__ import annotations
 
@@ -30,14 +30,15 @@ SCHEMAS = ROOT / "src" / "saintvision" / "api" / "schemas.py"
 # INDEPENDENT pinned map: freshness-critical response -> the time field it must carry, and where.
 # Curated by hand (which responses are freshness-critical is judgment). Reviewed when responses are
 # added. "kernel" = core.schema.json $def; "saintvision" = a schemas.py class.
-REQUIRED_TIME_FIELD = {
-    ("kernel", "RunResultView"): "completedAt",            # terminal state truth-time
+REQUIRED_TIME_FIELDS = {
+    ("kernel", "RunResultView"): ("completedAt", "stateUpdatedAt"),  # output completion + durable state change
     ("kernel", "ModelCommitObservation"): "committedAt",
     ("kernel", "StorageObservationView"): "createdAt",
     ("saintvision", "NodeResponse"): "lastHeartbeatAt",    # node liveness truth-time
     ("saintvision", "ReplicaObservationResponse"): "observedAt",
-    # Known GAP (freshness-critical, no time field yet -- recommended to Codex, kernel lane):
-    ("kernel", "ShardObservation"): "observedAt",
+    ("kernel", "ShardObservation"): "stateAsOf",           # max durable parent/member Run update, not query time
+    ("kernel", "RunArtifactList"): "completedAt",          # attempt result completion, nullable before completion
+    ("kernel", "RunLogView"): "completedAt",               # same immutable result-completion record
 }
 
 
@@ -60,12 +61,14 @@ def saintvision_fields(name: str) -> set[str]:
 
 def check() -> tuple[list[str], list[str]]:
     present, missing = [], []
-    for (source, name), field in sorted(REQUIRED_TIME_FIELD.items()):
+    for (source, name), configured_fields in sorted(REQUIRED_TIME_FIELDS.items()):
+        fields_required = (
+            (configured_fields,) if isinstance(configured_fields, str) else configured_fields
+        )
         fields = kernel_fields(name) if source == "kernel" else saintvision_fields(name)
-        if field in fields:
-            present.append(f"{source}:{name}.{field}")
-        else:
-            missing.append(f"{source}:{name}.{field}")
+        for field in fields_required:
+            target = f"{source}:{name}.{field}"
+            (present if field in fields else missing).append(target)
     return present, missing
 
 
@@ -73,7 +76,7 @@ def main() -> int:
     present, missing = check()
     print(
         f"REPORT check_response_freshness (advisory): "
-        f"{len(present)}/{len(present) + len(missing)} freshness-critical responses carry their time field."
+        f"{len(present)}/{len(present) + len(missing)} curated freshness-field checks are present."
     )
     for p in present:
         print(f"  ok      {p}")

@@ -121,6 +121,8 @@ class ResultView:
                     "state": run["state"],
                     "version": run["version"],
                     "attemptCount": run["attempt"],
+                    # Durable state-change time, not the time this HTTP read ran.
+                    "stateUpdatedAt": _time(run["updated_at"]),
                     "sealed": artifact is not None,
                     "executionConfirmed": bool(receipt and receipt["processStarted"]),
                     "commandId": str(row["command_id"]) if row else None,
@@ -185,6 +187,7 @@ class ResultView:
                 {
                     "source": "execution-kernel",
                     "runId": run_id,
+                    "completedAt": _time(row["completed_at"]) if row else None,
                     "artifacts": items,
                     "count": len(items),
                     "verifiedCount": len(items),
@@ -214,6 +217,7 @@ class ResultView:
             result = {
                 "source": "execution-kernel",
                 "runId": run_id,
+                "completedAt": _time(row["completed_at"]) if row else None,
                 "stdout": None,
                 "stderr": None,
                 "redacted": False,

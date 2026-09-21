@@ -3181,6 +3181,7 @@
         "state",
         "version",
         "attemptCount",
+        "stateUpdatedAt",
         "sealed",
         "executionConfirmed",
         "commandId",
@@ -3215,6 +3216,10 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "stateUpdatedAt": {
+          "$ref": "#/$defs/Timestamp",
+          "description": "Durable latest inv.runs.updated_at for this Run state; not the HTTP read time."
         },
         "sealed": {
           "type": "boolean"
@@ -3264,6 +3269,7 @@
           ]
         },
         "completedAt": {
+          "description": "Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.",
           "anyOf": [
             {
               "$ref": "#/$defs/Timestamp"
@@ -3338,6 +3344,7 @@
       "required": [
         "source",
         "runId",
+        "completedAt",
         "artifacts",
         "count",
         "verifiedCount",
@@ -3350,6 +3357,17 @@
         },
         "runId": {
           "$ref": "#/$defs/RunId"
+        },
+        "completedAt": {
+          "description": "Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "artifacts": {
           "type": "array",
@@ -3387,6 +3405,7 @@
       "required": [
         "source",
         "runId",
+        "completedAt",
         "stdout",
         "stderr",
         "redacted",
@@ -3400,6 +3419,17 @@
         },
         "runId": {
           "$ref": "#/$defs/RunId"
+        },
+        "completedAt": {
+          "description": "Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "stdout": {
           "anyOf": [
@@ -4780,6 +4810,17 @@
             }
           ]
         },
+        "stateAsOf": {
+          "description": "Latest durable inv.runs.updated_at among the parent and shard Runs represented here; not the HTTP read time, a shared database snapshot, or the update time of linked receipt/storage rows.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "aggregateManifestSha256": {
           "anyOf": [
             {
@@ -4842,6 +4883,7 @@
         "generation",
         "parentRunId",
         "parentState",
+        "stateAsOf",
         "aggregateManifestSha256",
         "shardCount",
         "allPhysicallyStopped",

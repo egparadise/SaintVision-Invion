@@ -4,7 +4,7 @@ Why this matters (VF-GM-04): RunDetail.tsx fetches this response and shardObserv
 projects it into the shards table -- deriving `verified`, `physicallyStopped`, and shard identity from
 the member fields. The UI must show only what the kernel actually observed, not synthesize shards or
 healthy replicas the backend did not report. This fixture pins the observed shape: what ShardObservation
-guarantees (13 envelope fields) and what each observed member guarantees (ShardObservedMember: index,
+guarantees (14 envelope fields) and what each observed member guarantees (ShardObservedMember: index,
 runId, nodeId, phase, state, evidenceId) versus the result manifest members (ShardResultMember). With a
 shared example, the frontend can validate against the mirrored schema and stop inventing fields.
 
@@ -13,6 +13,7 @@ uses an invalid row from the fake database boundary to prove the provider invoke
 the contract validator before returning a response.
 """
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -34,7 +35,7 @@ def test_shared_fixture_matches_kernel_contract():
 
 
 def test_every_envelope_field_is_load_bearing():
-    # All 13 ShardObservation fields are required (additionalProperties:false), including the ones whose
+    # All 14 ShardObservation fields are required (additionalProperties:false), including the ones whose
     # value may be null (sourcePlanId/parentRunId/parentState/aggregateManifestSha256/resultManifest/
     # resultManifestSha256) -- required means the key must be present. Dropping any must be rejected.
     value = _fixture()
@@ -103,6 +104,7 @@ def test_shard_runtime_status_is_anchored_before_serving(monkeypatch):
                                 "phase": "stopped",
                                 "receipt": {"stopped": True},
                                 "state": "not-a-run-state",
+                                "run_updated_at": datetime(2026, 9, 22, tzinfo=timezone.utc),
                                 "evidence_id": None,
                                 "object_id": None,
                                 "content_hash": None,

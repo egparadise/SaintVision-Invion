@@ -90,7 +90,7 @@ def _stub_scope(monkeypatch, run):
     monkeypatch.setattr(ResultView, "_output", staticmethod(lambda row: None))
 
 
-_RUN = {"project_id": "prj_x", "state": "succeeded", "version": 1, "attempt": 1}
+_RUN = {"project_id": "prj_x", "state": "succeeded", "version": 1, "attempt": 1, "updated_at": _dt.datetime(2026, 9, 22, tzinfo=_dt.timezone.utc)}
 
 
 def test_result_view_result_anchors_run_result_view(monkeypatch):

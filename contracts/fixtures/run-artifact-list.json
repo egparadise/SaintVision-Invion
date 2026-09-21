@@ -1,6 +1,7 @@
 {
   "source": "execution-kernel",
   "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+  "completedAt": "2026-09-22T00:00:00+00:00",
   "artifacts": [
     {
       "path": "output.json",

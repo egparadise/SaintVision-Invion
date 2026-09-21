@@ -267,12 +267,12 @@ class ShardRuntime:
             (project, plan_id),
         ).fetchone()
         parent = conn.execute(
-            "SELECT r.run_id,r.state,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
+            "SELECT r.run_id,r.state,r.updated_at,c.manifest_hash FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id) LEFT JOIN inv.shard_completions c ON (p.tenant_id,p.project_id,p.plan_id)=(c.tenant_id,c.project_id,c.plan_id) WHERE p.project_id=%s AND p.plan_id=%s",
             (project, plan_id),
         ).fetchone()
         rows = conn.execute(
             """SELECT s.shard_index,s.run_id,s.node_id,s.command_id,d.phase,r.envelope AS receipt,
-          u.state,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
+          u.state,u.updated_at AS run_updated_at,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state AS object_state
           FROM inv.shard_commands s JOIN inv.execution_deliveries d USING(tenant_id,command_id)
           LEFT JOIN inv.node_stop_receipts r USING(tenant_id,command_id)
           JOIN inv.runs u ON (s.tenant_id,s.run_id)=(u.tenant_id,u.run_id)
@@ -310,6 +310,19 @@ class ShardRuntime:
             "generation": lineage["generation"] if lineage else 1,
             "parentRunId": parent["run_id"] if parent else None,
             "parentState": parent["state"] if parent else None,
+            # Latest durable run-state update represented here, not the HTTP
+            # read time. This does not date delivery, receipt, or object rows.
+            "stateAsOf": max(
+                (
+                    value
+                    for value in (
+                        parent["updated_at"] if parent else None,
+                        *(r["run_updated_at"] for r in rows),
+                    )
+                    if value is not None
+                ),
+                default=None,
+            ),
             "aggregateManifestSha256": parent["manifest_hash"] if parent else None,
             "shardCount": plan["shard_count"],
             "allPhysicallyStopped": len(rows) == plan["shard_count"]
@@ -329,6 +342,8 @@ class ShardRuntime:
                 for r in rows
             ],
         }
+        if result["stateAsOf"] is not None:
+            result["stateAsOf"] = result["stateAsOf"].isoformat()
         validate_contract("ShardObservation", result)
         return result
 

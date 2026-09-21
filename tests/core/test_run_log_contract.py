@@ -33,7 +33,7 @@ def test_shared_fixture_matches_kernel_contract():
 
 
 def test_every_top_level_field_is_load_bearing():
-    # RunLogView requires all seven fields; dropping any must be rejected -- otherwise the fixture (and the
+    # RunLogView requires all eight fields; dropping any must be rejected -- otherwise the fixture (and the
     # frontend log panel that reads its shape) could pass while the response silently lost a field.
     value = _fixture()
     for field in list(value):

@@ -931,13 +931,20 @@ class RunResultView(BaseModel):
     state: RunState
     version: conint(ge=1, le=9007199254740991)
     attemptCount: conint(ge=0, le=9007199254740991)
+    stateUpdatedAt: Timestamp = Field(
+        ...,
+        description='Durable latest inv.runs.updated_at for this Run state; not the HTTP read time.',
+    )
     sealed: bool
     executionConfirmed: bool
     commandId: UUID | None
     nodeId: NodeId | None
     stopReceipt: ResultStopReceipt | None
     evidence: EvidenceEnvelope | None
-    completedAt: Timestamp | None
+    completedAt: Timestamp | None = Field(
+        ...,
+        description='Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.',
+    )
     output: ResultOutputMetadata | None
     outputAbsentReason: constr(max_length=1024) | None
     resourceReleasePending: bool
@@ -960,6 +967,10 @@ class RunArtifactList(BaseModel):
     )
     source: Literal['execution-kernel']
     runId: RunId
+    completedAt: Timestamp | None = Field(
+        ...,
+        description='Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.',
+    )
     artifacts: list[RunArtifactFile] = Field(..., max_length=2048)
     count: conint(ge=0, le=9007199254740991)
     verifiedCount: conint(ge=0, le=9007199254740991)
@@ -972,6 +983,10 @@ class RunLogView(BaseModel):
     )
     source: Literal['execution-kernel']
     runId: RunId
+    completedAt: Timestamp | None = Field(
+        ...,
+        description='Time the current attempt result was committed (inv.result_completions.completed_at); null when no result has been committed.',
+    )
     stdout: constr(max_length=65536) | None
     stderr: constr(max_length=65536) | None
     redacted: bool
@@ -1386,6 +1401,10 @@ class ShardObservation(BaseModel):
     generation: conint(ge=1, le=3)
     parentRunId: RunId | None
     parentState: RunState | None
+    stateAsOf: Timestamp | None = Field(
+        ...,
+        description='Latest durable inv.runs.updated_at among the parent and shard Runs represented here; not the HTTP read time, a shared database snapshot, or the update time of linked receipt/storage rows.',
+    )
     aggregateManifestSha256: constr(pattern=r'^[0-9a-f]{64}$') | None
     shardCount: conint(ge=1, le=16)
     allPhysicallyStopped: bool

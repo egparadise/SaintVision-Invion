@@ -700,6 +700,7 @@ type RunResultView struct {
     State RunState `json:"state"`
     Version int64 `json:"version"`
     AttemptCount int64 `json:"attemptCount"`
+    StateUpdatedAt Timestamp `json:"stateUpdatedAt"`
     Sealed bool `json:"sealed"`
     ExecutionConfirmed bool `json:"executionConfirmed"`
     CommandId *string `json:"commandId"`
@@ -723,6 +724,7 @@ type RunArtifactFile struct {
 type RunArtifactList struct {
     Source string `json:"source"`
     RunId RunId `json:"runId"`
+    CompletedAt *Timestamp `json:"completedAt"`
     Artifacts []RunArtifactFile `json:"artifacts"`
     Count int64 `json:"count"`
     VerifiedCount int64 `json:"verifiedCount"`
@@ -732,6 +734,7 @@ type RunArtifactList struct {
 type RunLogView struct {
     Source string `json:"source"`
     RunId RunId `json:"runId"`
+    CompletedAt *Timestamp `json:"completedAt"`
     Stdout *string `json:"stdout"`
     Stderr *string `json:"stderr"`
     Redacted bool `json:"redacted"`
@@ -1011,6 +1014,7 @@ type ShardObservation struct {
     Generation int64 `json:"generation"`
     ParentRunId *RunId `json:"parentRunId"`
     ParentState *RunState `json:"parentState"`
+    StateAsOf *Timestamp `json:"stateAsOf"`
     AggregateManifestSha256 *string `json:"aggregateManifestSha256"`
     ShardCount int64 `json:"shardCount"`
     AllPhysicallyStopped bool `json:"allPhysicallyStopped"`

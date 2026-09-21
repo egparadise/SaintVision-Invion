@@ -5,6 +5,7 @@
   "generation": 1,
   "parentRunId": "run_0123456789ABCDEFGHJKMNPQRS",
   "parentState": "succeeded",
+  "stateAsOf": "2026-09-22T00:00:00+00:00",
   "aggregateManifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "shardCount": 1,
   "allPhysicallyStopped": true,

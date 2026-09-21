@@ -698,6 +698,7 @@ export interface RunResultView {
   state: RunState;
   version: number;
   attemptCount: number;
+  stateUpdatedAt: Timestamp;
   sealed: boolean;
   executionConfirmed: boolean;
   commandId: (string | null);
@@ -721,6 +722,7 @@ export interface RunArtifactFile {
 export interface RunArtifactList {
   source: "execution-kernel";
   runId: RunId;
+  completedAt: (Timestamp | null);
   artifacts: Array<RunArtifactFile>;
   count: number;
   verifiedCount: number;
@@ -730,6 +732,7 @@ export interface RunArtifactList {
 export interface RunLogView {
   source: "execution-kernel";
   runId: RunId;
+  completedAt: (Timestamp | null);
   stdout: (string | null);
   stderr: (string | null);
   redacted: boolean;
@@ -1009,6 +1012,7 @@ export interface ShardObservation {
   generation: number;
   parentRunId: (RunId | null);
   parentState: (RunState | null);
+  stateAsOf: (Timestamp | null);
   aggregateManifestSha256: (string | null);
   shardCount: number;
   allPhysicallyStopped: boolean;
