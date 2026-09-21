@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, RunLogView, RunAttemptList, ShardObservation } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunAttemptList, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
@@ -51,7 +51,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
   const [isPreparingResume, setIsPreparingResume] = useState(false);
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
-  const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceipt | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [logView, setLogView] = useState<RunLogView | null>(null);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
@@ -183,15 +183,15 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     setIsLoadingReceipt(true);
     const prjId = run.projectId || 'prj_01JABCDE';
     try {
-      let receipt: NodeStopReceipt | null = null;
+      let receipt: NodeStopReceiptView | null = null;
       if (run.stopReceipt && ((run.stopReceipt as any).receiptId === receiptId || !receiptId)) {
-        receipt = run.stopReceipt as NodeStopReceipt;
+        receipt = run.stopReceipt as NodeStopReceiptView;
       }
       if (!receipt) {
         try {
           const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${run.id}/result`);
           if (resultRes?.stopReceipt) {
-            receipt = resultRes.stopReceipt as NodeStopReceipt;
+            receipt = resultRes.stopReceipt as NodeStopReceiptView;
           }
         } catch {
           // Result not yet available or receipt not present in ResultView

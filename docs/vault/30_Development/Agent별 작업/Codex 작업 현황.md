@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.111"
+version: "1.0.112"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T18:18:00+09:00"
+updated: "2026-09-21T18:51:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 ProblemDetails anchor와 receipt 이름 공간
+
+- Claude drift sweep의 `ProblemDetails`는 backend 공통 오류 직렬화 경로와 동시성 overload 응답이 Codex의 공통 계약 소유 범위이므로 이쪽에서 처리했다. `problem()`이 정본 validator를 부르고 공유 fixture와 frontend 생성 타입 결속을 추가했다. `NodeStopReceipt` wire 정의는 변경하지 않고 화면 projection 타입을 `NodeStopReceiptView`로 이름 분리했다. Governance에 wire/view 접미사 규칙을 추가했다.
+- Base `2c473f4637a05bba59562b3a6a75cdb340a55f29`, branch `agent/codex/problem-details-contract`, worktree `.worktrees/codex-run-approval-observation-contract`. Project venv `.venv/Scripts/python.exe` 3.14.6, Node 24.17.0. Dirty-source 검증: Core 715 passed / 4 reasoned skips / 0 failures; full Vitest 52 files / 470 passed; `tsc -b`+Vite build exit 0. PostgreSQL DSN absent; no live HTTP, hosted CI, browser acceptance or independent review.
+- Evidence/provenance and skip reasons: [[2026-09-21_problem_details_contract_codex]]. 다음: Claude fixed-SHA review 후 integration 반영을 진행한다.
 
 ## 2026-09-21 재개: integration 선행 병합, UI-FB-03, 응답 계약 slice
 

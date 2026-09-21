@@ -5,7 +5,7 @@ import {
   NodeItem,
   RunItem,
   ProjectItem,
-  NodeStopReceipt,
+  NodeStopReceiptView,
   PlacementRequirement,
   ApprovalItem,
   WorkspaceReadiness,
@@ -139,7 +139,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceipt | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
@@ -616,16 +616,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const handleInspectReceipt = async (receiptId: string) => {
     setIsLoadingReceipt(true);
     try {
-      let receipt: NodeStopReceipt | null = null;
+      let receipt: NodeStopReceiptView | null = null;
       if (liveRun?.stopReceipt && ((liveRun.stopReceipt as any).receiptId === receiptId || !receiptId)) {
-        receipt = liveRun.stopReceipt as NodeStopReceipt;
+        receipt = liveRun.stopReceipt as NodeStopReceiptView;
       }
       if (!receipt && activeRunId) {
         const prjId = selectedProjectId;
         try {
           const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
           if (resultRes?.stopReceipt) {
-            receipt = resultRes.stopReceipt as NodeStopReceipt;
+            receipt = resultRes.stopReceipt as NodeStopReceiptView;
           }
         } catch {
           // Result not yet available or receipt not present in ResultView

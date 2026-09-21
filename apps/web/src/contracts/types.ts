@@ -3,6 +3,8 @@
  * Synchronized with src/saintvision/errors.py, ids.py, and PLAN-FRONTEND-001.
  */
 
+import type { ProblemDetails as CanonicalProblemDetails } from '../../../../packages/contracts-ts/src';
+
 export type RunState =
   | 'draft'
   | 'validated'
@@ -32,19 +34,8 @@ export type RiskLevel = 'L0' | 'L1' | 'L2' | 'L3';
 
 export type NodeStatus = 'online' | 'degraded' | 'offline' | 'draining' | 'enrolling' | 'retired';
 
-export interface ProblemDetails {
-  type: string;
-  title: string;
-  status: number;
-  detail: string;
-  instance?: string;
-  code: string;
-  category: ErrorCategory;
-  retryable: boolean;
-  traceId: string;
-  causeRef?: string;
-  evidenceId?: string;
-}
+/** Canonical server error envelope; local client failures use the same wire shape. */
+export type ProblemDetails = CanonicalProblemDetails;
 
 export interface NodeItem {
   telemetryUnavailable?: boolean;
@@ -172,7 +163,7 @@ export interface RunItem {
   nodeId?: string;
   entrypoint?: string;
   leaseId?: string;
-  stopReceipt?: NodeStopReceipt;
+  stopReceipt?: NodeStopReceiptView;
 }
 
 export interface WorkspaceResumeSpec {
@@ -193,7 +184,8 @@ export interface WorkspaceResumeSpec {
   createdAt: string;
 }
 
-export interface NodeStopReceipt {
+/** UI projection of stop evidence; distinct from the NodeStopReceipt wire contract. */
+export interface NodeStopReceiptView {
   receiptId: string;
   runId: string;
   nodeId: string;
@@ -226,7 +218,7 @@ export interface ShardExecutionItem {
   evidenceId?: string;
   exitCode?: number;
   receiptId?: string;
-  receipt?: NodeStopReceipt;
+  receipt?: NodeStopReceiptView;
 }
 
 export interface DistributedPlanItem {
@@ -519,7 +511,7 @@ export interface RunResultView {
   executionConfirmed: boolean;
   commandId: string | null;
   nodeId: string | null;
-  stopReceipt: NodeStopReceipt | {
+  stopReceipt: NodeStopReceiptView | {
     receiptId: string;
     processStarted?: boolean;
     exitCode: number;

@@ -336,14 +336,16 @@ export const App: React.FC = () => {
                   error={
                     nodeSimState === 'error'
                       ? {
-                          type: 'https://saintvision.invenio/problems/service-unavailable',
+                          type: 'about:blank',
                           title: 'Node Registry 통신 실패',
                           status: 503,
                           detail: '백엔드 노드 레지스트리 서비스 응답이 지연되고 있습니다. 잠시 후 재시도하십시오.',
-                          code: 'RES-NODE-TIMEOUT',
+                          code: 'RES-0001',
                           category: 'RES',
                           retryable: true,
-                          traceId: 'trace_simulation_987654',
+                          traceId: '0123456789abcdef0123456789abcdef',
+                          causeRef: null,
+                          evidenceId: null,
                         }
                       : null
                   }

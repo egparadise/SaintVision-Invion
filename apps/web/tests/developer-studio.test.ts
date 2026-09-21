@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { evaluatePlacement } from '../src/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '../src/features/editor/diffEngine';
-import { NodeItem, PlacementRequirement, NodeStopReceipt, RunItem, ApprovalItem } from '../src/contracts/types';
+import { NodeItem, PlacementRequirement, NodeStopReceiptView, RunItem, ApprovalItem } from '../src/contracts/types';
 import { isRouteNotFoundError } from '../src/shared/api/client';
 
 const TEST_NODES: NodeItem[] = [
@@ -165,7 +165,7 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
   });
 
   it('Step 4: verifies ADR-028/041 NodeStopReceipt vs Evidence separation rule', () => {
-    const receipt: NodeStopReceipt = {
+    const receipt: NodeStopReceiptView = {
       receiptId: 'rcp_01JABCDEF_TEST',
       runId: 'run_01JABCDE0001',
       nodeId: 'nod_01JABCDEF01',
@@ -312,7 +312,7 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
 
   it('Step 4 & Zero-Mock: strictly prevents synthesizing fake NodeStopReceipt on fetch failure', () => {
     // When receipt fetch returns 404 or fails, receipt must NOT be forged with fake hashes
-    let selectedReceipt: NodeStopReceipt | null = null;
+    let selectedReceipt: NodeStopReceiptView | null = null;
     let errorMessage: string | null = null;
 
     const simulateReceiptFetchError = (err: { detail: string; status: number }) => {
@@ -426,7 +426,7 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
       // Generic FastAPI unmapped 404
       expect(isRouteNotFoundError({ status: 404, problem: { detail: 'Not Found' } })).toBe(true);
       // Client synthesized network 404
-      expect(isRouteNotFoundError({ status: 404, problem: { code: 'NET-404' } })).toBe(true);
+      expect(isRouteNotFoundError({ status: 404, problem: { code: 'NET-0404' } })).toBe(true);
       // Generic 404 without code
       expect(isRouteNotFoundError({ status: 404 })).toBe(true);
     });
@@ -445,5 +445,3 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
     });
   });
 });
-
-

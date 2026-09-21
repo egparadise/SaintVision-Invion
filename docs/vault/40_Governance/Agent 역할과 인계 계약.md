@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-AGENT-001"
 title: "Agent 역할과 인계 계약"
-version: "1.1.2"
+version: "1.1.3"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-21T18:14:00+09:00"
+updated: "2026-09-21T18:47:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -26,6 +26,8 @@ Codex는 공통 계약 통합 책임자다. Claude는 중간 난도 구현과 �
 ## Frontend와 API 계약의 경계
 
 Codex는 canonical API 응답 스키마·생성 타입·backend 경계 검증·공유 fixture와 계약 적합성 시험을 소유하고, Gemini는 `apps/web` 화면·상태·렌더링·접근성·브라우저 동작을 소유하며, Codex의 `apps/web` 수정은 계약 전용 adapter/type/conformance-test 변경으로 제한하고 화면 동작 변경은 Gemini 인계로 분리한다.
+
+계약 타입 이름은 wire 의미를 보존한다. 화면에 필요한 축약·집계·표시 투영은 wire 타입 이름을 재사용하지 말고 `View` 또는 `Projection` 접미사를 붙이며, wire와 화면 사이의 변환 책임을 adapter에 둔다. 예: canonical `NodeStopReceipt` wire와 프런트 `NodeStopReceiptView`는 같은 개념으로 취급하지 않는다.
 
 ## 시작 시 읽을 Context
 

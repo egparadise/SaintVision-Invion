@@ -5,21 +5,23 @@ import { ProblemDetails, ApprovalItem } from '../src/contracts/types';
 describe('RFC 9457 ProblemDetails & ApiError', () => {
   it('should instantiate ApiError with proper properties', () => {
     const problem: ProblemDetails = {
-      type: 'https://saintvision.invenio/problems/approval-expired',
+      type: 'about:blank',
       title: 'Approval Request Expired',
       status: 409,
       detail: 'The approval request apr_01JXYZ987654 has expired after 15 minutes.',
-      code: 'GOV-APPR-EXPIRED',
+      code: 'GOV-0001',
       category: 'SEC',
       retryable: false,
       traceId: '4bf92f3577b34da6a3ce929d0e0e4736',
+      causeRef: null,
+      evidenceId: null,
     };
 
     const err = new ApiError(problem);
     expect(err.name).toBe('ApiError');
     expect(err.message).toBe(problem.detail);
     expect(err.problem.status).toBe(409);
-    expect(err.problem.code).toBe('GOV-APPR-EXPIRED');
+    expect(err.problem.code).toBe('GOV-0001');
     expect(err.problem.retryable).toBe(false);
   });
 });

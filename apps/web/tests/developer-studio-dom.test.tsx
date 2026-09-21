@@ -4,10 +4,10 @@ import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import * as client from '../src/shared/api/client';
-import type { ProjectItem, RunItem, NodeStopReceipt } from '../src/contracts/types';
+import type { ProjectItem, RunItem, NodeStopReceiptView } from '../src/contracts/types';
 import { runResultViewFixture, runArtifactListFixture } from './fixtures/run-result';
 
-const sampleReceipt: NodeStopReceipt = {
+const sampleReceipt: NodeStopReceiptView = {
   receiptId: 'rcp_fb03',
   runId: 'run_fb03',
   nodeId: 'nod_01JABCDEF01',
@@ -250,7 +250,7 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     const errParse = {
       problem: {
         status: 500,
-        code: 'NET-PARSE',
+        code: 'NET-0001',
         title: 'Communication Failure',
         detail: 'Failed to parse error response from server.',
       },

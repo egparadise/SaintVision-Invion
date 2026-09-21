@@ -21,19 +21,26 @@ from .tracing import request_trace, nonzero_id
 
 
 def problem(error, trace_id=None):
+    body = {
+        "type": "about:blank",
+        "title": "Request rejected",
+        "status": error.status,
+        "code": error.code,
+        "category": error.code.split("-", 1)[0],
+        # Error details are already intentionally safe for clients. Bound them to
+        # the canonical wire limit so a long internal message cannot break error
+        # serialization while the ProblemDetails contract is being enforced.
+        "detail": str(error.detail)[:1000],
+        "retryable": bool(error.retryable),
+        "traceId": trace_id or nonzero_id(16),
+        "causeRef": None,
+        "evidenceId": None,
+    }
+    # Keep one backend anchor for domain errors, FastAPI errors, capacity
+    # rejection, and the middleware's sanitized internal-error response.
+    validate_contract("ProblemDetails", body)
     return JSONResponse(
-        {
-            "type": "about:blank",
-            "title": "Request rejected",
-            "status": error.status,
-            "code": error.code,
-            "category": error.code.split("-", 1)[0],
-            "detail": error.detail,
-            "retryable": error.retryable,
-            "traceId": trace_id or nonzero_id(16),
-            "causeRef": None,
-            "evidenceId": None,
-        },
+        body,
         status_code=error.status,
         headers={
             "Cache-Control": "no-store",

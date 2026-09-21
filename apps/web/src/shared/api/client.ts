@@ -22,6 +22,49 @@ export function generateSpanId(): string {
     .join('');
 }
 
+function localProblem(
+  status: number,
+  title: string,
+  detail: string,
+  traceId: string,
+  retryable: boolean,
+): ProblemDetails {
+  const safeStatus = Number.isInteger(status) && status >= 400 && status <= 599 ? status : 500;
+  return {
+    type: 'about:blank',
+    title: title.slice(0, 200) || 'Request rejected',
+    status: safeStatus,
+    code: `NET-${String(safeStatus).padStart(4, '0')}`,
+    category: 'NET',
+    detail: detail.slice(0, 1000),
+    retryable,
+    traceId,
+    causeRef: null,
+    evidenceId: null,
+  };
+}
+
+const PROBLEM_DETAIL_KEYS = new Set([
+  'type', 'title', 'status', 'code', 'category', 'detail', 'retryable',
+  'traceId', 'causeRef', 'evidenceId',
+]);
+
+function isProblemDetails(value: unknown): value is ProblemDetails {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const problem = value as Record<string, unknown>;
+  return Object.keys(problem).every((key) => PROBLEM_DETAIL_KEYS.has(key)) &&
+    problem.type === 'about:blank' &&
+    typeof problem.title === 'string' && problem.title.length > 0 && problem.title.length <= 200 &&
+    Number.isInteger(problem.status) && Number(problem.status) >= 400 && Number(problem.status) <= 599 &&
+    typeof problem.code === 'string' && /^[A-Z]+-[0-9]{4}$/.test(problem.code) &&
+    typeof problem.category === 'string' && /^[A-Z]+$/.test(problem.category) &&
+    typeof problem.detail === 'string' && problem.detail.length <= 1000 &&
+    typeof problem.retryable === 'boolean' &&
+    typeof problem.traceId === 'string' && /^[0-9a-f]{32}$/.test(problem.traceId) &&
+    (problem.causeRef === null || (typeof problem.causeRef === 'string' && problem.causeRef.length > 0 && problem.causeRef.length <= 200)) &&
+    (problem.evidenceId === null || (typeof problem.evidenceId === 'string' && /^evd_[0-9A-HJKMNP-TV-Z]{26}$/.test(problem.evidenceId)));
+}
+
 let inMemoryAuthToken: string | null = null;
 
 /**
@@ -87,15 +130,17 @@ export function isRouteNotFoundError(err: any): boolean {
     return false;
   }
   // Generic Starlette / FastAPI unmapped route response: {"detail": "Not Found"}
-  // or network-level client synth 404: code === "NET-404"
-  return problem?.detail === 'Not Found' || problem?.code === 'NET-404' || !problem?.code;
+  // or network-level client synth 404: code === "NET-0404"
+  return problem?.detail === 'Not Found' || problem?.code === 'NET-0404' || !problem?.code;
 }
 
 /**
  * Robust fetch wrapper with W3C traceparent injection, Bearer auth, and RFC 9457 Problem Details error handling.
  */
 export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const traceId = options.traceId || generateTraceId();
+  const traceId = options.traceId && /^[0-9a-f]{32}$/.test(options.traceId)
+    ? options.traceId
+    : generateTraceId();
   const spanId = generateSpanId();
   const traceparent = `00-${traceId}-${spanId}-01`;
 
@@ -121,30 +166,40 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
     try {
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/problem+json') || contentType.includes('application/json')) {
-        problem = await response.json();
+        const payload: unknown = await response.json();
+        if (isProblemDetails(payload)) {
+          problem = payload;
+        } else {
+          const detail =
+            payload && typeof payload === 'object' &&
+            typeof (payload as Record<string, unknown>).detail === 'string'
+              ? (payload as Record<string, string>).detail
+              : response.statusText || 'Server returned an invalid error response.';
+          problem = localProblem(
+            response.status,
+            'Request rejected',
+            detail,
+            traceId,
+            response.status >= 500,
+          );
+        }
       } else {
-        problem = {
-          type: 'https://saintvision.invenio/problems/http-error',
-          title: response.statusText || 'HTTP Error',
-          status: response.status,
-          detail: await response.text(),
-          code: `NET-${response.status}`,
-          category: 'NET',
-          retryable: response.status >= 500,
+        problem = localProblem(
+          response.status,
+          response.statusText || 'HTTP Error',
+          await response.text(),
           traceId,
-        };
+          response.status >= 500,
+        );
       }
     } catch {
-      problem = {
-        type: 'https://saintvision.invenio/problems/unknown',
-        title: 'Communication Failure',
-        status: response.status,
-        detail: 'Failed to parse error response from server.',
-        code: 'NET-PARSE',
-        category: 'NET',
-        retryable: true,
+      problem = localProblem(
+        response.status,
+        'Communication Failure',
+        'Failed to parse error response from server.',
         traceId,
-      };
+        true,
+      );
     }
     throw new ApiError(problem);
   }

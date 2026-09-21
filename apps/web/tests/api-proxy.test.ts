@@ -59,13 +59,16 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
 
   it('correctly parses RFC 9457 problem details when receiving 4xx/5xx responses', async () => {
     const problemPayload: ProblemDetails = {
-      type: 'https://saintvision.invenio/problems/node-not-found',
+      type: 'about:blank',
       title: 'Node Not Found',
       status: 404,
       detail: "Node with ID 'nod_999' was not found.",
-      code: 'RES-NODE-404',
+      code: 'RES-0004',
       category: 'RES',
       traceId: '762e595b40778bb35b693b8c852117b2',
+      retryable: false,
+      causeRef: null,
+      evidenceId: null,
     };
 
     const mockResponse = {
@@ -85,7 +88,7 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
       expect(err).toBeInstanceOf(ApiError);
       const apiErr = err as ApiError;
       expect(apiErr.problem.status).toBe(404);
-      expect(apiErr.problem.code).toBe('RES-NODE-404');
+      expect(apiErr.problem.code).toBe('RES-0004');
       expect(apiErr.problem.category).toBe('RES');
       expect(apiErr.problem.detail).toContain('nod_999');
     } finally {
@@ -99,6 +102,12 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
         type: 'about:blank',
         title: 'Not Found',
         status: 404,
+        code: 'NET-0404',
+        category: 'NET',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
         detail: 'Not Found',
       });
       expect(isRouteNotFoundError(err)).toBe(true);
@@ -109,7 +118,12 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
         type: 'about:blank',
         title: 'Not Found',
         status: 404,
-        code: 'NET-404',
+        code: 'NET-0404',
+        category: 'NET',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
         detail: 'Network 404',
       });
       expect(isRouteNotFoundError(err)).toBe(true);
@@ -117,37 +131,56 @@ describe('API Client W3C Trace Context & RFC 9457 Conformance', () => {
 
     it('distinguishes entity/resource RES-RUN-404 from route not found', () => {
       const err = new ApiError({
-        type: 'https://saintvision.invenio/problems/run-not-found',
+        type: 'about:blank',
         title: 'Run Not Found',
         status: 404,
-        code: 'RES-RUN-404',
+        code: 'RES-0004',
         category: 'RES',
         detail: 'Run run_123 does not exist or is masked',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
       });
       expect(isRouteNotFoundError(err)).toBe(false);
     });
 
     it('distinguishes SEC-TWO-PERSON-403, VAL-400, SEC-STATE-409 from route not found', () => {
       const err403 = new ApiError({
-        type: 'https://saintvision.invenio/problems/forbidden',
+        type: 'about:blank',
         title: 'Forbidden',
         status: 403,
-        code: 'SEC-TWO-PERSON-403',
+        code: 'SEC-0003',
+        category: 'SEC',
         detail: 'Proposer cannot approve',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
       });
       const err409 = new ApiError({
-        type: 'https://saintvision.invenio/problems/conflict',
+        type: 'about:blank',
         title: 'Conflict',
         status: 409,
-        code: 'SEC-STATE-409',
+        code: 'SEC-0004',
+        category: 'SEC',
         detail: 'Run not in resumable state',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
       });
       const err500 = new ApiError({
-        type: 'https://saintvision.invenio/problems/internal',
+        type: 'about:blank',
         title: 'Internal Server Error',
         status: 500,
-        code: 'SYS-500',
+        code: 'SYS-0500',
+        category: 'SYS',
         detail: 'Internal server error',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
       });
 
       expect(isRouteNotFoundError(err403)).toBe(false);

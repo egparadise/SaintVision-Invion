@@ -1,0 +1,12 @@
+{
+  "type": "about:blank",
+  "title": "Request rejected",
+  "status": 429,
+  "code": "RES-0007",
+  "category": "RES",
+  "detail": "Request capacity reached",
+  "retryable": true,
+  "traceId": "0123456789abcdef0123456789abcdef",
+  "causeRef": null,
+  "evidenceId": null
+}
