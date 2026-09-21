@@ -92,7 +92,8 @@ def test_real_bytes_commit_and_restart_duplicate_are_durable(model):
 def test_caller_verified_flag_does_not_make_corrupt_bytes_committable(model):
     a = model
     (a.root / "data.bin").write_bytes(b"corrupt data")
-    with pytest.raises(DomainError):
+    # Corrupt bytes fail the manifest re-check (MODEL-0001), confirmed vs real PG (ZZPROBE).
+    with pytest.raises(DomainError, match="MODEL-0001"):
         commit(a)
     assert count(a) == 0
 
@@ -179,7 +180,13 @@ def test_authority_and_catalog_are_rechecked_after_file_io(model, monkeypatch, f
         return result
 
     monkeypatch.setattr(a.verifier, "verify", verify)
-    with pytest.raises(DomainError):
+    # Per-fault refusal codes confirmed vs real PG (ZZPROBE): a revoked grant is AUTH-0030, a lapsed
+    # lease LEASE-0002, a rolled epoch LEASE-0004; the rest re-check the manifest (MODEL-0001). A bare
+    # raises let an authorization/lease refusal masquerade as a manifest one.
+    expected = {"cancel": "MODEL-0001", "version": "MODEL-0001", "grant": "AUTH-0030",
+                "lease": "LEASE-0002", "epoch": "LEASE-0004", "location": "MODEL-0001",
+                "contribution": "MODEL-0001", "lost-node": "MODEL-0001"}
+    with pytest.raises(DomainError, match=expected[fault]):
         commit(a)
     assert count(a) == 0
 
@@ -193,7 +200,8 @@ def test_stale_or_missing_fence_cannot_even_start_file_io(model, monkeypatch, st
 
     monkeypatch.setattr(a.verifier, "verify", forbidden)
     a.proofs = {key: value + "0" for key, value in a.proofs.items()} if stale else {}
-    with pytest.raises(DomainError):
+    # A stale and a missing fence are both refused as LEASE-0002 before any file I/O (ZZPROBE, real PG).
+    with pytest.raises(DomainError, match="LEASE-0002"):
         commit(a)
     assert count(a) == 0
 
@@ -203,7 +211,8 @@ def test_manifest_rls_and_immutable_reference_protect_existing_catalog(model):
     commit(a)
     with a.e.db.transaction(a.e.other) as c:
         assert c.execute("SELECT count(*) AS n FROM inv.model_manifests").fetchone()["n"] == 0
-    with pytest.raises(DomainError):
+    # Reading another tenant's manifest is refused as AUTH-0030 (permission), confirmed vs real PG.
+    with pytest.raises(DomainError, match="AUTH-0030"):
         a.store.get(
             Principal(a.e.other, "unrelated"), a.e.project, a.body["modelId"], a.body["version"]
         )
