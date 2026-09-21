@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.15"
+version: "1.1.16"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T22:08:00+09:00"
+updated: "2026-09-21T22:09:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -182,3 +182,4 @@ The earlier UI-FB-03 DOM review and mutation check applies to the unchanged `bef
 - Replaced the literal head with an independent Alembic `ScriptDirectory.get_current_head()` read from this checkout's `alembic.ini`, compared to `tools/migration_graph.py`'s parsed graph. The rollback boundary is derived from current irreversible/merge metadata rather than repeating the old head literal. A synthetic future reversible revision verifies the graph follows a new tip while preserving the rollback boundary.
 - Provenance at clean integration candidate `0340545bdc527fbfcee3edd853cb42cfdf7b6bd4` (branch `agent/codex/terminal-pty-contract`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-terminal-pty-contract`), KST 22:05:03–22:05:29, executor Codex: project interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6; Node v24.17.0; Windows 11; PostgreSQL DSN absent, Docker/Node present, Go absent. Full `tests/core` passed 769, skipped 4, failed 0, errors 0 in 36.70s (2 warnings). One fewer pass than Claude's pre-fix 770 is the removed legacy project provider fixture case; the migration-head regression now passes. The two focused frontend files passed 29. `check_docs.py` (657 versioned documents), `check_ontology.py`, `check_contract_bindings.py` (27 fixtures/11 kernel anchors), Pydantic schema export check (39), API TypeScript contract check (14), and `git diff --check` passed. Obsidian read-only check: 1450 managed / 6 pending / 0 conflicts; no export yet. Core skips were PostgreSQL DSN absent (1), launcher per-worktree Python prerequisite absent (1), and explicit candidate image absent (2); none is counted as a pass. A stale 0044 literal mutation failed (1 failed, exit 1) and was restored. The synthetic future reversible revision followed the new tip in memory. No database upgrade, hosted CI, live HTTP, browser, or physical-node acceptance is claimed. This SHA is a locally verified candidate; push/integration landing follows.
 - No repository-wide automatic map from changed migration/schema files to all semantically affected tests was found. Current control is to run migration-graph, schema-export, contract-binding, and affected boundary suites from the candidate merged tree; a dependency-to-test impact index remains a tooling proposal, not an existing capability.
+- **Integration landing and exact-tip rerun:** commit `a1833e32e6e1baaae4c07981b42bdb5fa56b742e` was pushed fast-forward to `origin/integration/all-agents-unified`; the push included fix `aed446e`, integration docs commit `7711c8a`, and Codex report commit `a1833e3`. At KST 22:07:51, provenance-wrapped `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/core` ran on clean SHA `a1833e3`, exactly equal to the remote integration tip: 769 passed, 4 skipped, 0 failed, 0 errors, 2 warnings (39.38s). Skips: PostgreSQL DSN absent (1), worktree-local launcher Python prerequisite absent (1), pinned candidate image absent (2). Thus Claude's 1 failure is gone on the integration tip. The one-pass delta from Claude's baseline is the removed legacy-project provider-fixture test. The full core run does not cover DB integration or hosted CI.
