@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-RESPONSE-SHAPE-AUDIT-2026-09-22"
 title: "Strict response model producer-shape self-audit"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T05:02:00+09:00"
+updated: "2026-09-22T05:06:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -35,7 +35,7 @@ At integration SHA `1c68b32beff0e09d6cc5cf48ca55e173502fb0e4`, `.venv/Scripts/py
 
 `python -m pytest -q tests/core/test_write_response_contracts.py tests/core/test_workspace_response_contract.py tests/core/test_low_risk_write_response_contracts.py tests/test_projects.py::test_the_tool_choice_is_recorded_on_the_workspace tests/test_api.py::test_enrolled_node_is_registered_and_readable`
 
-Repeated on the clean integration tip at 2026-09-22 05:04:32 KST. Result: exit 0, 101 passed, 2 skipped. Both skips were explicitly caused by absent `INV_TEST_ADMIN_DSN` (workspace-tool producer and real node-enrollment API tests); therefore their DB-backed actual output remains unverified in this run. A separate run of `tests/integration/test_write_response_contract_real_pg.py` also exited 0 with all 6 cases skipped for the same reason. At the same SHA, `check_contract_bindings.py` passed (46 fixtures/12 serving anchors), `check_docs.py` passed (731 versioned documents), and `check_ontology.py` passed. `sync_obsidian.py --check` was read-only and reported 21 pending exports, 0 conflicts; no apply was performed. No deployed HTTP/browser run was performed.
+Repeated on the clean integration tip at 2026-09-22 05:04:32 KST. Result: exit 0, 101 passed, 2 skipped. Both skips were explicitly caused by absent `INV_TEST_ADMIN_DSN` (workspace-tool producer and real node-enrollment API tests); therefore their DB-backed actual output remains unverified in this run. A separate run of `tests/integration/test_write_response_contract_real_pg.py` also exited 0 with all 5 PostgreSQL cases skipped for the same reason (rerun at 2026-09-22 05:05:55 KST). At the same SHA, `check_contract_bindings.py` passed (46 fixtures/12 serving anchors), `check_docs.py` passed (731 versioned documents), and `check_ontology.py` passed. `sync_obsidian.py --check` was read-only and reported 21 pending exports, 0 conflicts; no apply was performed. No deployed HTTP/browser run was performed.
 
 The first attempted run used system `C:\Python314\python.exe` and failed collection because its dependencies were unavailable; rerunning with the repository `.venv` succeeded. The failed attempt is an environment/interpreter mismatch, not a product test failure.
 
