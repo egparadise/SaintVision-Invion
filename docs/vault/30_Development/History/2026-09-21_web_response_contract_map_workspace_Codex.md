@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.10"
+version: "1.1.11"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T17:43:00+09:00"
+updated: "2026-09-21T17:49:00+09:00"
 source_of_truth: "Git"
 ---
 

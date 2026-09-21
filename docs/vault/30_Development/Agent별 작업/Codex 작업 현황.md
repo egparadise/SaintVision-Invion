@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.107"
+version: "1.0.108"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T17:43:00+09:00"
+updated: "2026-09-21T17:49:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -752,3 +752,4 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - The slice is committed as code `e7fc7a8` plus docs `7c3b1d3`, rebased on Claude `5914f04`; final SHA and clean-tree checks are recorded in the dedicated History page. At 17:42:43 KST, clean-tree provenance checks passed provider pytest 7, Claude run-result pytest 4, full Vitest 41 files/381, schema 32, API types 9, TypeScript build, docs (615 pages), ontology and generation. DSN absent, Go absent.
 - `5914f04` adds backend run-result/artifact-list contract; Gemini frontend generated-type/Ajv fixture wiring remains pending, and artifact-content is unbound. This corrects the older “all result/artifact unbound” statement.
 - Obsidian latest committed check found 1408 managed/2 pending/0 conflicts before final record updates. Paired sync status is in dedicated History. Next: push branch and request Claude fixed-SHA review; then take placement preview/pool/mutation as next Codex response contract. PostgreSQL/CI/browser/operational gates remain separate.
+- Latest integration `8fd49a5` (VF-GM-03) is included as the base of final verification. At clean branch HEAD `f350155`, provider tests 7 + 4 passed, full Vitest 42 files/391 passed, response schemas 32, response types 9, `tsc -b`, Vite build, docs (616), ontology and SHACL passed; complete provenance is in `2026-09-21_run-approval-page-contract_Codex`. This feature branch is three commits ahead of integration; push/Claude review pending. Last sync snapshot after the rebase was 1409 managed/2 pending/0 conflicts, to be resolved after this record update.
