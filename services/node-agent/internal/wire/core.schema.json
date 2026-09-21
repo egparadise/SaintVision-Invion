@@ -2111,6 +2111,33 @@
         "attempt"
       ]
     },
+    "ControlRunPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ControlRunView"
+          },
+          "maxItems": 200
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ]
+    },
     "WorkspaceFrozenFile": {
       "type": "object",
       "additionalProperties": false,

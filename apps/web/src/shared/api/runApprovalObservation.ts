@@ -1,13 +1,11 @@
-import type { ApprovalItem, ApprovalPage, RunItem, RunState } from '@/contracts/types';
+import type { ApprovalItem, RunItem, RunState } from '@/contracts/types';
+import type { ApprovalPage as KernelApprovalPage, ControlRunPage } from '@/contracts/kernel-observation';
 import { apiClient } from './client';
 const states: RunState[] = ['draft', 'validated', 'planned', 'awaiting_approval', 'scheduled',
   'running', 'verifying', 'recovering', 'succeeded', 'failed', 'cancelled'];
-export interface KernelRun {
-  runId: string; tenantId: string; projectId: string; state: RunState; version: number; attempt: number;
-}
 export async function fetchObservedRuns(projectId: string): Promise<RunItem[]> {
-  const page = await apiClient<{ items: KernelRun[] }>(`/v1/projects/${encodeURIComponent(projectId)}/runs`);
-  if (!Array.isArray(page.items)) throw new Error('Run 응답 형식 불일치');
+  const page = await apiClient<ControlRunPage>(`/v1/projects/${encodeURIComponent(projectId)}/runs`);
+  if (!Array.isArray(page.items) || (page.nextCursor !== null && typeof page.nextCursor !== 'string')) throw new Error('Run 응답 형식 불일치');
   return page.items.map(run => {
     if (run.projectId !== projectId || !run.runId || !states.includes(run.state) ||
         !Number.isSafeInteger(run.version) || run.version < 1 ||
@@ -16,8 +14,8 @@ export async function fetchObservedRuns(projectId: string): Promise<RunItem[]> {
   });
 }
 export async function fetchObservedApprovals(projectId: string): Promise<ApprovalItem[]> {
-  const page = await apiClient<ApprovalPage>(`/v1/projects/${encodeURIComponent(projectId)}/approvals`);
-  if (!Array.isArray(page.items)) throw new Error('승인 응답 형식 불일치');
+  const page = await apiClient<KernelApprovalPage>(`/v1/projects/${encodeURIComponent(projectId)}/approvals`);
+  if (!Array.isArray(page.items) || (page.nextCursor !== null && typeof page.nextCursor !== 'string')) throw new Error('승인 응답 형식 불일치');
   return page.items.map(item => {
     if (item.projectId !== projectId || !item.approvalId || !item.runId || !item.requesterId ||
         !item.actionDigest || ![1, 2].includes(item.requiredApprovals) ||

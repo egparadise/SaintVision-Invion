@@ -466,6 +466,11 @@ type ControlRunView struct {
     Attempt int64 `json:"attempt"`
 }
 
+type ControlRunPage struct {
+    Items []ControlRunView `json:"items"`
+    NextCursor *RunId `json:"nextCursor"`
+}
+
 type WorkspaceFrozenFile struct {
     Path string `json:"path"`
     SizeBytes int64 `json:"sizeBytes"`

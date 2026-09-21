@@ -676,6 +676,14 @@ class ControlRunView(BaseModel):
     attempt: conint(ge=0, le=9007199254740991)
 
 
+class ControlRunPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    items: list[ControlRunView] = Field(..., max_length=200)
+    nextCursor: RunId | None
+
+
 class WorkspaceFrozenFile(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

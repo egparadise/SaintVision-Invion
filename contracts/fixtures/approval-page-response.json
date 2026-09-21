@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "approvalId": "apr_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "requesterId": "usr_contract_requester",
+      "actionDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "policyVersion": "policy-v1",
+      "requiredApprovals": 1,
+      "status": "pending",
+      "expiresAt": "2026-09-21T08:00:00+00:00",
+      "runVersion": 3
+    }
+  ],
+  "nextCursor": null
+}

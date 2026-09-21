@@ -102,10 +102,12 @@ class Control:
                 "SELECT * FROM inv.runs WHERE project_id=%s AND (%s::text IS NULL OR run_id>%s) ORDER BY run_id LIMIT %s",
                 (project, after, after, limit + 1),
             ).fetchall()
-            return {
+            result = {
                 "items": [public(r) for r in rows[:limit]],
                 "nextCursor": rows[limit - 1]["run_id"] if len(rows) > limit else None,
             }
+            validate_contract("ControlRunPage", result)
+            return result
 
     def list_approvals(self, principal, project, *, after=None, limit=50, run_id=None):
         from .approvals import view
@@ -125,10 +127,12 @@ class Control:
                 ORDER BY approval_id LIMIT %s""",
                 (project, after, after, run_id, run_id, limit + 1),
             ).fetchall()
-            return {
+            result = {
                 "items": [view(row) for row in rows[:limit]],
                 "nextCursor": rows[limit - 1]["approval_id"] if len(rows) > limit else None,
             }
+            validate_contract("ApprovalPage", result)
+            return result
 
     def get_approval(self, principal, project, approval_id):
         from .approvals import view

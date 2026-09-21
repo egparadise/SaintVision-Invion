@@ -464,6 +464,11 @@ export interface ControlRunView {
   attempt: number;
 }
 
+export interface ControlRunPage {
+  items: Array<ControlRunView>;
+  nextCursor: (RunId | null);
+}
+
 export interface WorkspaceFrozenFile {
   path: string;
   sizeBytes: number;
