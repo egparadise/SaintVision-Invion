@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.74"
+version: "1.0.75"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T10:46:00+09:00"
+updated: "2026-09-21T10:56:13+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 Obsidian state 및 SSR 감사: `sync_obsidian.py`는 `--adopt-identical` 해시를 conflict exit 전 metadata에 원자 저장하고 기본 state를 현재 worktree Git metadata에 둔다. `.venv\\Scripts\\python.exe -m pytest -q tools/test_sync.py` 5 passed; 제거 대조에서 adoption 회귀 하나가 fail. `apps/web/tests`에 static SSR 사용 7파일/27호출을 목록화했다. 두 UI 상태 스위트의 “query/fetch” 이름은 state props 주입일 뿐 effect 실행이 아님을 기록했다. Gemini 인계; UI tests 코드는 수정하지 않음. 다음: docs 검사 후 이 변경 commit/push. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 
 2026-09-21 UI-FB fixed-SHA 경계 재검토: Gemini 구현 `c6dc915`에 대해 Vitest 322 및 route coverage 28 통과를 확인하고 네 가지 FB-01 되돌림 대조를 수행했다. 유령 초기값 복원은 기존 idle 시험을 실패시켰지만 catch에서 목록 비우기 제거, 빈 응답 회귀 복원, error 상태 guard 제거는 26/26 통과했다. 이 공백과 FB-02 local eligible 문구, FB-03 Output Verified 표시, 오류 배너 접근성 및 실제 component fetch 분기 시험 부족을 finding으로 기록했다. 구현 owner Gemini; Codex 승인 대기. 상세 및 실행 범위: [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 

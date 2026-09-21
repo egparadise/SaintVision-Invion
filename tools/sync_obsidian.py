@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import tempfile
 
@@ -13,15 +14,40 @@ ROOT = Path(__file__).resolve().parents[1]
 class ConflictsDetected(Exception):
     """Destination files diverged from the tracked baseline.
 
-    This is a *diagnostic result*, not a crash: no writes were performed and the
+    This is a *diagnostic result*, not a crash: no vault files were written; an
+    explicitly requested identical-file baseline may have been persisted, and the
     caller decides how to surface it. It is deliberately distinct from the
     ValueErrors that signal a usage/configuration error (unsafe path, wrong
     state vault, mid-run change), so the exit code can tell them apart.
     """
 
-    def __init__(self, conflicts):
+    def __init__(self, conflicts, adopted=()):
         self.conflicts = conflicts  # list of (rel, reason)
-        super().__init__(f'{len(conflicts)} unmanaged destination collisions; no writes performed')
+        self.adopted = tuple(adopted)
+        super().__init__(f'{len(conflicts)} unmanaged destination collisions; no vault files written')
+
+
+def default_state_path(root=None):
+    """Keep export state in this worktree's Git metadata, outside cleanup dirs."""
+    root = Path(root or ROOT).resolve()
+    result = subprocess.run(
+        ['git', 'rev-parse', '--git-path', 'obsidian-sync-state.json'],
+        cwd=root, check=True, capture_output=True, text=True)
+    path = Path(result.stdout.strip())
+    return path if path.is_absolute() else root / path
+
+
+def _write_state(state_path, state):
+    """Atomically persist local export metadata without touching vault files."""
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.obsidian-sync-state-', dir=state_path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as stream:
+            stream.write(json.dumps(state, ensure_ascii=False, indent=2) + '\n')
+        os.replace(temporary, state_path)
+    finally:
+        if Path(temporary).exists():
+            Path(temporary).unlink()
 
 
 def sha(path):
@@ -61,7 +87,7 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
     state = json.loads(state_path.read_text('utf-8')) if state_path.is_file() else {'vault': str(destination), 'files': {}}
     if Path(state['vault']).resolve() != destination:
         raise ValueError('State belongs to another vault; use a separate --state path')
-    changes, expected, conflicts = [], {}, []
+    changes, expected, conflicts, adopted = [], {}, [], []
     paths = sorted(p for p in source.rglob('*') if p.is_file())
     for path in paths:
         if not path.resolve().is_relative_to(source):
@@ -73,17 +99,24 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
         known = state['files'].get(rel, original_hashes.get(rel))
         if current == wanted:
             # Identical copies may be adopted without rewriting any destination bytes.
-            if adopt or rel in state['files'] or current is None or current == known:
+            if adopt:
+                state['files'][rel] = wanted
+                adopted.append(rel)
+            elif rel in state['files'] or current is None or current == known:
                 state['files'][rel] = wanted
             continue
         if current is not None and current != known:
             conflicts.append((rel, _conflict_reason(current, wanted, known)))
         else:
             changes.append((path, target, rel, wanted))
+    # Identical-file adoption changes metadata only. Persist it even if unrelated
+    # destination edits abort this run, so the next run has a usable baseline.
+    if adopted:
+        _write_state(state_path, state)
     if conflicts:
-        # A diagnostic outcome, not a crash: no writes have happened at this point
-        # (this is before any mutation), so both --check and --apply stay fail-closed.
-        raise ConflictsDetected(conflicts)
+        # A diagnostic outcome, not a crash. No vault content changed; only the
+        # explicitly requested baseline above may have been saved.
+        raise ConflictsDetected(conflicts, adopted)
     if not apply:
         print(f'CHECK: {len(paths)} managed files, {len(changes)} pending exports, 0 conflicts. No writes.')
         return len(changes)
@@ -109,20 +142,18 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
                 Path(temporary).unlink()
         state['files'][rel] = wanted
         # Save progress per file so an interrupted export can be resumed.
-        state_path.parent.mkdir(parents=True, exist_ok=True)
-        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        _write_state(state_path, state)
     for path in paths:
         rel = path.relative_to(source).as_posix()
         if sha(contained(destination, rel)) != sha(path):
             raise ValueError(f'Post-export hash mismatch: {rel}')
         state['files'][rel] = sha(path)
-    state_path.parent.mkdir(parents=True, exist_ok=True)
-    state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    _write_state(state_path, state)
     print(f'EXPORTED: {len(changes)} files; all {len(paths)} destination hashes match. Unmanaged files untouched.')
     return len(changes)
 
 
-def _report_conflicts(conflicts, out_path):
+def _report_conflicts(conflicts, out_path, adopted=()):
     """Group conflicts by reason, print a summary, and write the full list to a file.
 
     Returns the exit code (3): a judgment result (collisions), distinct from a
@@ -131,7 +162,9 @@ def _report_conflicts(conflicts, out_path):
     counts = {}
     for _, reason in conflicts:
         counts[reason] = counts.get(reason, 0) + 1
-    print(f'CONFLICTS: {len(conflicts)} unmanaged destination collisions; no writes performed.', file=sys.stderr)
+    print(f'CONFLICTS: {len(conflicts)} unmanaged destination collisions; no vault files written.', file=sys.stderr)
+    if adopted:
+        print(f'  ADOPTED: {len(adopted)} identical-file hashes recorded in local state before abort.', file=sys.stderr)
     print('  grouped by reason:', file=sys.stderr)
     for reason, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
         print(f'    {n:6}  {reason}', file=sys.stderr)
@@ -139,13 +172,14 @@ def _report_conflicts(conflicts, out_path):
     out_path.write_text(
         json.dumps(
             {'reasonCounts': counts,
-             'conflicts': [{'path': rel, 'reason': reason} for rel, reason in conflicts]},
+             'conflicts': [{'path': rel, 'reason': reason} for rel, reason in conflicts],
+             'adoptedIdentical': list(adopted)},
             ensure_ascii=False, indent=2) + '\n',
         encoding='utf-8')
     print(f'  full list ({len(conflicts)}): {out_path}', file=sys.stderr)
     print('  no-baseline = the tool has no manifest/state record for these; it cannot tell a real '
-          'edit from an un-recorded prior sync. Establish a state baseline before --apply.',
-          file=sys.stderr)
+          'edit from an un-recorded prior sync. --adopt-identical records only matching files; '
+          'it does not resolve divergent files.', file=sys.stderr)
     return 3
 
 
@@ -155,20 +189,25 @@ def main(argv=None):
     action.add_argument('--check', action='store_true')
     action.add_argument('--apply', action='store_true')
     parser.add_argument('--vault', type=Path)
-    parser.add_argument('--state', type=Path, default=ROOT / '.work/obsidian-sync-state.json')
+    parser.add_argument('--state', type=Path, default=None)
     parser.add_argument('--conflicts-out', type=Path, default=ROOT / '.work/obsidian-sync-conflicts.json')
     parser.add_argument('--adopt-identical', action='store_true')
     args = parser.parse_args(argv)
+    try:
+        state_path = args.state or default_state_path()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f'Git metadata state path unavailable ({type(exc).__name__}); provide --state explicitly.', file=sys.stderr)
+        return 1
     try:
         manifest = json.loads((ROOT / 'docs/source-manifest.json').read_text('utf-8'))
     except (OSError, ValueError) as exc:
         print(f'Manifest unavailable ({type(exc).__name__}); cannot sync.', file=sys.stderr)
         return 1
     try:
-        export(ROOT / 'docs/vault', args.vault or Path(manifest['vault']), args.state,
+        export(ROOT / 'docs/vault', args.vault or Path(manifest['vault']), state_path,
                {item['path']: item['sha256'] for item in manifest['files']}, args.apply, args.adopt_identical)
     except ConflictsDetected as detected:
-        return _report_conflicts(detected.conflicts, args.conflicts_out)
+        return _report_conflicts(detected.conflicts, args.conflicts_out, detected.adopted)
     except ValueError as exc:
         # Usage/configuration/mid-run error -- distinct from a conflict diagnostic.
         print(f'Sync error ({type(exc).__name__}): {exc}', file=sys.stderr)
