@@ -68,14 +68,14 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       onRefreshNodes();
     }
   };
+
+  const gpuNodes = nodes.filter((n) => n.gpuName && n.gpuCount > 0);
   const [bypassRiskLevel, setBypassRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L2');
   const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);
-  const [selectedGpuNodeId, setSelectedGpuNodeId] = useState<string>('nod_01JABCDEF01');
+  const [selectedGpuNodeId, setSelectedGpuNodeId] = useState<string>(() => gpuNodes[0]?.id || '');
   const [gpuResult, setGpuResult] = useState<SyntheticGpuResult | null>(null);
   const [isGpuRunning, setIsGpuRunning] = useState(false);
   const [showKillSwitchModal, setShowKillSwitchModal] = useState(false);
-
-  const gpuNodes = nodes.filter((n) => n.gpuName && n.gpuCount > 0);
 
   const refreshState = () => {
     setStatus(secManager.getStatus());
@@ -114,6 +114,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   // 4. Run Synthetic GPU Benchmark
   const handleRunGpuBenchmark = () => {
     const targetNode = gpuNodes.find((n) => n.id === selectedGpuNodeId) || gpuNodes[0];
+    if (!targetNode) return;
     setIsGpuRunning(true);
     setGpuResult(null);
 
@@ -491,8 +492,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <label style={{ fontSize: '13px', color: '#8b949e' }}>대상 GPU 노드:</label>
             <select
+              data-testid="gpu-node-select"
               value={selectedGpuNodeId}
               onChange={(e) => setSelectedGpuNodeId(e.target.value)}
+              disabled={gpuNodes.length === 0}
               style={{
                 padding: '8px 12px',
                 backgroundColor: '#0d1117',
@@ -502,17 +505,43 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 fontSize: '13px',
               }}
             >
-              {gpuNodes.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.hostname} — {n.gpuName} ({Math.round((n.gpuVramTotalBytes || 0) / 1024 ** 3)}GB VRAM)
-                </option>
-              ))}
+              {gpuNodes.length === 0 ? (
+                <option value="">(클러스터 내 가용 GPU 노드 없음)</option>
+              ) : (
+                gpuNodes.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.hostname} — {n.gpuName} ({Math.round((n.gpuVramTotalBytes || 0) / 1024 ** 3)}GB VRAM)
+                  </option>
+                ))
+              )}
             </select>
 
-            <Button size="sm" variant="primary" onClick={handleRunGpuBenchmark} disabled={isGpuRunning}>
+            <Button
+              size="sm"
+              variant="primary"
+              data-testid="run-gpu-benchmark-btn"
+              onClick={handleRunGpuBenchmark}
+              disabled={isGpuRunning || gpuNodes.length === 0}
+            >
               {isGpuRunning ? '합성 GPU 벤치마크 실행 중...' : '합성 GPU 벤치마크 실행'}
             </Button>
           </div>
+
+          {gpuNodes.length === 0 && (
+            <div
+              data-testid="no-gpu-nodes-notice"
+              style={{
+                padding: '8px 12px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid #ef4444',
+                color: '#fca5a5',
+              }}
+            >
+              ⚠️ 클러스터 내에 가용한 GPU 노드가 없습니다. (위조 노드 합성 차단)
+            </div>
+          )}
 
           {gpuResult && (
             <div

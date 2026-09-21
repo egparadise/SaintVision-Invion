@@ -150,5 +150,45 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       expect(container.textContent).not.toContain('0.812');
       expect(container.textContent).not.toContain('94.8%');
     });
+
+    it('proves approvalInput defaults to empty string and gates deploy button when staging model is present', async () => {
+      // Provide a fixture with a staging model to inspect the approval input and deploy button
+      const stagingModel = TEST_FIXTURE_LINEAGES.find((m) => m.status === 'staging') || {
+        modelId: 'mod_stage_01',
+        modelName: 'Staging Test Model',
+        version: '1.0.0-rc1',
+        datasetDigest: 'dset_sha256_test',
+        sourceCommitSha: 'abcdef1234567890abcdef1234567890abcdef12',
+        trainingRunId: 'run_test_01',
+        evalAccuracy: 0.95,
+        status: 'staging' as const,
+        deploymentDigest: '',
+        createdAt: new Date().toISOString(),
+      };
+
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView, { initialLineages: [stagingModel] }));
+      });
+
+      const input = container.querySelector<HTMLInputElement>('[data-testid="approval-input"]');
+      expect(input).not.toBeNull();
+      // Crucial invariant: Must default to empty string, NOT 'apr_01JXYZ889900'
+      expect(input?.value).toBe('');
+
+      const deployBtn = container.querySelector<HTMLButtonElement>('[data-testid="lineage-deploy-btn"]');
+      expect(deployBtn).not.toBeNull();
+      // Deploy button MUST be disabled when approval ID is empty
+      expect(deployBtn?.disabled).toBe(true);
+
+      // Typing an approval ID enables the deploy button
+      await act(async () => {
+        input!.value = 'apr_01JXYZ123456';
+        input!.dispatchEvent(new Event('input', { bubbles: true }));
+        // Also trigger change event for React controlled input
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeInputValueSetter?.call(input, 'apr_01JXYZ123456');
+        input!.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
   });
 });

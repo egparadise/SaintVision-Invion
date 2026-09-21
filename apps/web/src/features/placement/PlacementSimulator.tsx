@@ -64,7 +64,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
   const [preferredOs, setPreferredOs] = useState<'windows' | 'linux' | undefined>(undefined);
-  const [localityNodeId, setLocalityNodeId] = useState<string>('nod_01JABCDEF01');
+  const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes[0]?.id || '');
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend state
@@ -72,7 +72,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolsState || 'idle');
   const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
 
-  const [selectedPoolId, setSelectedPoolId] = useState<string>('pool_01_training');
+  const [selectedPoolId, setSelectedPoolId] = useState<string>(() => initialPools?.[0]?.id || '');
   const [candidates, setCandidates] = useState<CandidateItem[]>(initialCandidates || []);
   const [candidatesState, setCandidatesState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialCandidatesState || 'idle');
   const [candidatesError, setCandidatesError] = useState<string | null>(initialCandidatesError || null);
@@ -88,6 +88,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
     apiClient<{ items: PoolItem[] }>('/v1/pools')
       .then((res) => {
         setPools(res.items || []);
+        if (res.items && res.items.length > 0) {
+          setSelectedPoolId((prev) => prev || res.items[0].id);
+        }
         setPoolsState('success');
       })
       .catch((err) => {
@@ -151,6 +154,13 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   );
 
   const loadPlacementPreview = () => {
+    if (!selectedPoolId || !selectedPoolId.trim()) {
+      setServerShards([]);
+      setServerExplanation(null);
+      setPreviewState('idle');
+      setPreviewError(null);
+      return;
+    }
     setPreviewState('loading');
     setPreviewError(null);
     const query = new URLSearchParams({
@@ -188,7 +198,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
   // Request real placement preview from backend endpoint
   useEffect(() => {
-    if (initialPreviewState === undefined) {
+    if (initialPreviewState === undefined && selectedPoolId && selectedPoolId.trim()) {
       loadPlacementPreview();
     }
   }, [requirement, selectedPoolId]);
@@ -465,6 +475,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               데이터 원본 지역성 노드
             </label>
             <select
+              data-testid="locality-node-select"
               value={localityNodeId}
               onChange={(e) => setLocalityNodeId(e.target.value)}
               style={{
@@ -477,6 +488,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 fontSize: '0.8125rem',
               }}
             >
+              <option value="">-- 데이터 지역성 선택 안 함 (None) --</option>
               {nodes.map((n) => (
                 <option key={n.id} value={n.id}>
                   {n.hostname} ({n.os.toUpperCase()})

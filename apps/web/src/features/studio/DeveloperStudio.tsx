@@ -268,8 +268,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     let mounted = true;
     setIsLoadingArtifact(true);
 
-    // Query canonical Kernel ResultView (/v1/projects/{prjId}/runs/{id}/result) as the source of truth
-    const prjId = selectedProjectId || 'prj_01JABCDE';
+    if (!selectedProjectId) {
+      setIsLoadingArtifact(false);
+      setArtifactData(null);
+      setArtifactError('선택된 프로젝트 식별자가 없어 실행 결과 아티팩트를 조회할 수 없습니다.');
+      return;
+    }
+    const prjId = selectedProjectId;
     setArtifactError(null);
     apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`)
       .then((res) => {
@@ -379,7 +384,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           workspaceId: selectedWorkspaceId,
           objective: runObjective,
           requestedBy: currentUser?.id,
-          targetNodeId: selectedNodeId || 'nod_01JABCDEF01',
+          targetNodeId: selectedNodeId || undefined,
           entrypoint: activeFile.path,
           files: files.map((f) => ({ path: f.path, content: f.content, size: f.content.length })),
           resourceRequests: {
@@ -404,7 +409,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state '${res.state}'` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${res.nodeId || selectedNodeId || 'nod_01JABCDEF01'}' (Headroom & Lease verified)` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${res.nodeId || selectedNodeId || '(자동 할당)'}' (Headroom & Lease verified)` },
         { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.path}' inside 0600 process isolation sandbox...` },
       ]);
 
@@ -436,7 +441,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     setIsDownloadingArtifact(true);
     try {
       let serverPayload: any = null;
-      const prjId = selectedProjectId || 'prj_01JABCDE';
+      if (!selectedProjectId) {
+        alert('선택된 프로젝트가 없어 아티팩트를 다운로드할 수 없습니다.');
+        setIsDownloadingArtifact(false);
+        return;
+      }
+      const prjId = selectedProjectId;
       try {
         const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
         if (res && res.output) {
@@ -540,7 +550,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const prjId = selectedProjectId || 'prj_01JABCDE';
+      if (!selectedProjectId) {
+        alert('선택된 프로젝트가 없어 파일을 다운로드할 수 없습니다.');
+        setIsDownloadingArtifact(false);
+        return;
+      }
+      const prjId = selectedProjectId;
       const res = await fetch(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`, {
         headers,
       });
@@ -1464,7 +1479,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <div>
                 <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Step 3: Studio 코드 편집 & 격리 실행 파라미터</h2>
                 <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                  대상 노드: <strong>{selectedNodeId || 'nod_01JABCDEF01'}</strong> · 워크스페이스: <strong>{selectedWorkspaceId}</strong>
+                  대상 노드: <strong>{selectedNodeId || '(자동 배치)'}</strong> · 워크스페이스: <strong>{selectedWorkspaceId}</strong>
                 </span>
               </div>
 
@@ -1838,7 +1853,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </div>
                 {/* Node binding & Schedulable capacity note */}
                 <div style={{ display: 'flex', gap: '12px', marginTop: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
-                  <span>🖥️ 바인딩 노드: <strong>{currentRun?.nodeId || selectedNodeId || 'nod_01JABCDEF01'}</strong> ({boundNode?.hostname || 'Node-01-WinMain'})</span>
+                  <span>🖥️ 바인딩 노드: <strong>{currentRun?.nodeId || selectedNodeId || '(미정)'}</strong> ({boundNode?.hostname || '미확인'})</span>
                   <span>📦 파일: <code>{activeFile.path}</code></span>
                   <span>🔒 격리: <code>0600 sandbox</code></span>
                   <span style={{ color: boundNode?.observationOnly ? '#d29922' : (boundNode?.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)'), fontWeight: 600 }}>

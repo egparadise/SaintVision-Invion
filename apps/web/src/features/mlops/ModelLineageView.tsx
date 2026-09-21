@@ -14,7 +14,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
   const [selectedModelId, setSelectedModelId] = useState<string>(lineages[0]?.modelId || '');
   const [searchQuery, setSearchQuery] = useState('');
-  const [approvalInput, setApprovalInput] = useState('apr_01JXYZ889900');
+  const [approvalInput, setApprovalInput] = useState('');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const conformances = mlopsManager.verifyProviderConformances();
@@ -40,6 +40,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   };
 
   const handleDeploy = (modelId: string) => {
+    if (!approvalInput.trim()) {
+      setActionNotice({
+        type: 'error',
+        text: '🛑 배포 게이트 차단: 승인 식별자(approvalId)가 입력되지 않았습니다. (위조 번호 승인 게이트 통과 방지)',
+      });
+      return;
+    }
     const res = mlopsManager.deployModel({
       modelId,
       approvalId: approvalInput.trim(),
@@ -263,9 +270,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <input
                       type="text"
+                      data-testid="approval-input"
                       value={approvalInput}
                       onChange={(e) => setApprovalInput(e.target.value)}
-                      placeholder="Approval ID (apr_...)"
+                      placeholder="승인 식별자 입력 (apr_...)"
                       style={{
                         padding: '6px 10px',
                         backgroundColor: '#0d1117',
@@ -276,7 +284,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                         fontFamily: 'var(--font-mono, monospace)',
                       }}
                     />
-                    <Button size="sm" variant="primary" onClick={() => handleDeploy(selectedModel.modelId)}>
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      data-testid="lineage-deploy-btn"
+                      disabled={!approvalInput.trim()}
+                      onClick={() => handleDeploy(selectedModel.modelId)}
+                    >
                       게이트 배포 시도
                     </Button>
                   </div>

@@ -36,9 +36,14 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchEvidence = React.useCallback(async () => {
+    if (!projectId || !projectId.trim()) {
+      setIsLoading(false);
+      setErrorMessage('프로젝트 식별자(projectId)가 제공되지 않아 증적을 조회할 수 없습니다. (위조 식별자 합성 차단)');
+      return;
+    }
     setIsLoading(true);
     setErrorMessage(null);
-    const prjId = projectId || 'prj_01JABCDE';
+    const prjId = projectId.trim();
 
     try {
       const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);

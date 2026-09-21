@@ -19,7 +19,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
   });
 
   const [resilientNodes, setResilientNodes] = useState<ResilientNodeState[]>(recoveryManager.getNodes());
-  const [selectedNodeId, setSelectedNodeId] = useState<string>(nodes[0]?.id || 'nod_01JABCDEF01');
+  const [selectedNodeId, setSelectedNodeId] = useState<string>(() => nodes[0]?.id || '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [checkouts, setCheckouts] = useState<
     Array<{
@@ -32,20 +32,18 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       status: 'active' | 'reclaimed';
       createdAt: string;
     }>
-  >([
-    {
-      checkoutId: 'chk_01JABCDEF01',
-      nodeId: 'nod_01JABCDEF01',
-      inode: 'ino_49152',
-      permissions: '0600 (read/write)',
-      checkpointSha: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
-      epoch: 1,
-      status: 'active',
-      createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    },
-  ]);
+  >([]);
+
+  const selectedNode = resilientNodes.find((n) => n.nodeId === selectedNodeId) || resilientNodes[0];
 
   const handleCreateCheckout = () => {
+    if (!selectedNode) {
+      setActionNotice({
+        type: 'error',
+        text: '❌ 체크아웃 생성 실패: 선택된 유효 대상 노드가 없습니다. (위조 노드 합성 방지)',
+      });
+      return;
+    }
     const curToken = selectedNode.fencingToken;
     const chkId = `chk_${Date.now().toString(36)}`;
     const newChk = {
@@ -64,8 +62,6 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       text: `✓ ADR-043 Writable Generation 생성 완료: ${newChk.checkoutId} (inode: ${newChk.inode}, 권한: 0600, Epoch: ${newChk.epoch})`,
     });
   };
-
-  const selectedNode = resilientNodes.find((n) => n.nodeId === selectedNodeId) || resilientNodes[0];
 
   const refreshState = () => {
     setResilientNodes(recoveryManager.getNodes());
@@ -437,25 +433,46 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
               격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
             </p>
           </div>
-          <Button variant="secondary" size="sm" onClick={handleCreateCheckout}>
+          <Button
+            variant="secondary"
+            size="sm"
+            data-testid="create-checkout-btn"
+            disabled={!selectedNode}
+            onClick={handleCreateCheckout}
+          >
             + 새 수정 가능 작업 사본 체크아웃 (Working Generation)
           </Button>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-              <th style={{ padding: '8px' }}>Checkout ID</th>
-              <th style={{ padding: '8px' }}>Target Node</th>
-              <th style={{ padding: '8px' }}>Directory Inode</th>
-              <th style={{ padding: '8px' }}>POSIX Permissions</th>
-              <th style={{ padding: '8px' }}>Checkpoint Hash</th>
-              <th style={{ padding: '8px' }}>Fencing Epoch</th>
-              <th style={{ padding: '8px' }}>Status</th>
-              <th style={{ padding: '8px' }}>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
+        {checkouts.length === 0 ? (
+          <div
+            data-testid="recovery-no-checkouts"
+            style={{
+              padding: '24px',
+              textAlign: 'center',
+              color: '#8b949e',
+              fontSize: '13px',
+              backgroundColor: '#0d1117',
+              borderRadius: '6px',
+            }}
+          >
+            활성화된 수정 가능 세대(Working Generation) 체크아웃이 없습니다.
+          </div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                <th style={{ padding: '8px' }}>Checkout ID</th>
+                <th style={{ padding: '8px' }}>Target Node</th>
+                <th style={{ padding: '8px' }}>Directory Inode</th>
+                <th style={{ padding: '8px' }}>POSIX Permissions</th>
+                <th style={{ padding: '8px' }}>Checkpoint Hash</th>
+                <th style={{ padding: '8px' }}>Fencing Epoch</th>
+                <th style={{ padding: '8px' }}>Status</th>
+                <th style={{ padding: '8px' }}>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
             {checkouts.map((chk) => (
               <tr key={chk.checkoutId} style={{ borderBottom: '1px solid #21262d' }}>
                 <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>
@@ -489,6 +506,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             ))}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );

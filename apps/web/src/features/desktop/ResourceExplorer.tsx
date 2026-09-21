@@ -31,6 +31,7 @@ import {
 
 export interface ResourceExplorerProps {
   nodes: NodeItem[];
+  tenantId?: string;
   initialTab?: 'overview' | 'storage' | 'pools' | 'nodes' | 'discovery';
   onSelectNode?: (nodeId: string) => void;
   onOpenTerminal?: (nodeId: string) => void;
@@ -46,6 +47,7 @@ export interface ResourceExplorerProps {
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   nodes,
+  tenantId,
   initialTab = 'overview',
   onSelectNode,
   onOpenTerminal,
@@ -82,11 +84,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [poolCapacity, setPoolCapacity] = useState<PoolCapacity | null>(initialPoolCapacity || null);
   const [poolCapacityState, setPoolCapacityState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolCapacityState || 'idle');
   const [poolCapacityError, setPoolCapacityError] = useState<string | null>(initialPoolCapacityError || null);
-  const [poolMembers, setPoolMembers] = useState<string[]>(['nod_01JABCDEF01', 'nod_01JABCDEF02']);
+  const [poolMembers, setPoolMembers] = useState<string[]>([]);
   const [memberNodeToAdd, setMemberNodeToAdd] = useState(nodes[0]?.id || '');
   const [placementReq, setPlacementReq] = useState({ cpuMillicores: 2000, ramBytes: 4 * 1024 ** 3, gpuDevices: 1 });
   const [placementPreview, setPlacementPreview] = useState<PlacementPreviewResponse | null>(null);
-  const [planRunId, setPlanRunId] = useState('run_01JABCDEF_DEMO');
+  const [planRunId, setPlanRunId] = useState('');
   const [planStrategy, setPlanStrategy] = useState<'binpack' | 'spread'>('spread');
   const [planShardCount, setPlanShardCount] = useState(2);
   const [planResult, setPlanResult] = useState<DistributedPlanResponse | null>(null);
@@ -274,11 +276,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   // ---------------------------------------------------------------------------
 
   const handleRegisterContribution = async () => {
+    const targetNodeId = newContribNode || nodes[0]?.id;
+    if (!targetNodeId) {
+      setStorageMessage('❌ 스토리지 기여 등록 실패: 등록할 유효한 대상 노드가 없습니다. (위조 노드 합성 차단)');
+      return;
+    }
     try {
       const idempotencyKey = `idemp_contrib_${Date.now()}`;
       const res = await registerStorageContribution(
         {
-          nodeId: newContribNode || nodes[0]?.id || 'nod_01JABCDEF01',
+          nodeId: targetNodeId,
           declaredPath: newContribPath,
           mode: newContribMode,
           capacityBytes: newContribCapacityGB * 1024 ** 3,
@@ -328,9 +335,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   };
 
   const handleCreatePlan = async () => {
+    if (!planRunId.trim()) {
+      setPoolMessage('❌ 분산 배치 계획 수립 실패: 유효한 승인 실행 ID(runId)를 입력해야 합니다. (위조 식별자 합성 방지)');
+      return;
+    }
     try {
       const res = await createPoolPlan(selectedPoolId, {
-        runId: planRunId,
+        runId: planRunId.trim(),
         strategy: planStrategy,
         shardCount: planShardCount,
         shardCpuMillicores: placementReq.cpuMillicores,
@@ -404,6 +415,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   };
 
   const handleBroadcastAnnouncement = async () => {
+    if (!tenantId || !tenantId.trim()) {
+      setDiscoveryMessage('⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송을 전송할 수 없습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)');
+      return;
+    }
     try {
       const res = await broadcastAnnouncement(
         {
@@ -417,7 +432,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           gpuCount: announcementOs === 'windows' ? 1 : 0,
           labels: { role: 'worker', network: 'intranet' },
         },
-        '00000000-0000-0000-0000-000000000001'
+        tenantId.trim()
       );
       setDiscoveryMessage(`✔ 안내 방송 승인됨 (state: ${res.state})`);
       await loadDiscoveryCandidates();
@@ -974,19 +989,20 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               type="button"
               data-testid="register-contribution-btn"
               onClick={handleRegisterContribution}
+              disabled={nodes.length === 0}
               style={{
                 marginTop: '12px',
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                backgroundColor: '#3b82f6',
+                backgroundColor: nodes.length > 0 ? '#3b82f6' : '#475569',
                 color: '#ffffff',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: nodes.length > 0 ? 'pointer' : 'not-allowed',
               }}
             >
-              기여 등록 제출
+              {nodes.length > 0 ? '기여 등록 제출' : '등록 가능 노드 없음 (제출 차단)'}
             </button>
           </div>
 
@@ -1305,8 +1321,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   <label style={{ color: '#94a3b8' }}>Run ID</label>
                   <input
                     type="text"
+                    data-testid="plan-run-id-input"
                     value={planRunId}
                     onChange={(e) => setPlanRunId(e.target.value)}
+                    placeholder="승인 Run ID 입력..."
                     style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
                   />
                 </div>
@@ -1334,10 +1352,21 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
               <button
                 type="button"
+                data-testid="create-plan-btn"
                 onClick={handleCreatePlan}
-                style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                disabled={!planRunId.trim()}
+                style={{
+                  marginTop: '10px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  backgroundColor: planRunId.trim() ? '#8b5cf6' : '#475569',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: planRunId.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
-                계획 확정 및 샤드 할당
+                {planRunId.trim() ? '계획 확정 및 샤드 할당' : '승인 Run ID 필요 (생성 불가)'}
               </button>
 
               {planResult && (
@@ -1464,6 +1493,22 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
               📡 미등록 머신 안내 방송 전송 (POST /v1/discovery/announcements)
             </h3>
+            {(!tenantId || !tenantId.trim()) && (
+              <div
+                data-testid="discovery-tenant-required-notice"
+                style={{
+                  padding: '8px 12px',
+                  marginBottom: '12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.75rem',
+                }}
+              >
+                ⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송 전송이 비활성화되었습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)
+              </div>
+            )}
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <input
                 type="text"
@@ -1482,8 +1527,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </select>
               <button
                 type="button"
+                data-testid="broadcast-announcement-btn"
                 onClick={handleBroadcastAnnouncement}
-                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                disabled={!tenantId || !tenantId.trim()}
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  backgroundColor: tenantId && tenantId.trim() ? '#3b82f6' : '#475569',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: tenantId && tenantId.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
                 안내 방송 브로드캐스트
               </button>

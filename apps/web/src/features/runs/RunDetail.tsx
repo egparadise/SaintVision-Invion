@@ -61,9 +61,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [attemptError, setAttemptError] = useState<string | null>(null);
 
   const handlePrepareResume = async () => {
+    if (!run.projectId) {
+      setResumeNotice('❌ 재개 준비 실패: 실행에 연결된 프로젝트 식별자가 없습니다. (위조 식별자 합성 방지)');
+      return;
+    }
     setIsPreparingResume(true);
     try {
-      const prjId = run.projectId || 'prj_01JABCDE';
+      const prjId = run.projectId;
       const idempotencyKey = `idmp_resume_prep_${run.id}`;
       // Canonical kernel endpoint: /v1/projects/{project}/runs/{runId}/resume/prepare
       await apiClient(`/v1/projects/${prjId}/runs/${run.id}/resume/prepare`, {
@@ -73,9 +77,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       setResumeNotice(
         `✓ ADR-044 Workspace 재개 준비 완료: 불변 스냅샷 해시가 고정되었으며 Attempt #${(run.attempt ?? 1) + 1} 승인 요청이 발행되었습니다.`
       );
-      onRefreshRun?.();
-    } catch (e: any) {
-      alert(e.problem?.detail || e.message || '재개 준비 실패');
+    } catch (err: any) {
+      const msg = err?.problem?.detail || err?.detail || err?.message || '재개 준비 요청 실패';
+      setResumeNotice(`❌ 재개 준비 실패: ${msg}`);
     } finally {
       setIsPreparingResume(false);
     }
@@ -106,9 +110,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   useEffect(() => {
     let mounted = true;
     if (activeTab === 'logs') {
+      if (!run.projectId) {
+        setIsLoadingLogs(false);
+        setLogError('실행에 연결된 프로젝트 식별자(projectId)가 없어 로그를 조회할 수 없습니다.');
+        return;
+      }
       setIsLoadingLogs(true);
       setLogError(null);
-      fetchRunLogs(run.projectId || 'prj_01JABCDE', run.id)
+      fetchRunLogs(run.projectId, run.id)
         .then((res) => {
           if (mounted) setLogView(res);
         })
@@ -127,9 +136,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   useEffect(() => {
     let mounted = true;
     if (activeTab === 'attempts') {
+      if (!run.projectId) {
+        setIsLoadingAttempts(false);
+        setAttemptError('실행에 연결된 프로젝트 식별자(projectId)가 없어 시도 이력을 조회할 수 없습니다.');
+        return;
+      }
       setIsLoadingAttempts(true);
       setAttemptError(null);
-      fetchRunAttempts(run.projectId || 'prj_01JABCDE', run.id)
+      fetchRunAttempts(run.projectId, run.id)
         .then((res) => {
           if (mounted) setAttemptList(res);
         })
@@ -181,13 +195,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
 
   const handleInspectReceipt = async (receiptId: string) => {
     setIsLoadingReceipt(true);
-    const prjId = run.projectId || 'prj_01JABCDE';
+    const prjId = run.projectId;
     try {
       let receipt: NodeStopReceiptView | null = null;
       if (run.stopReceipt && ((run.stopReceipt as any).receiptId === receiptId || !receiptId)) {
         receipt = run.stopReceipt as NodeStopReceiptView;
       }
-      if (!receipt) {
+      if (!receipt && prjId) {
         try {
           const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${run.id}/result`);
           if (resultRes?.stopReceipt) {
@@ -772,7 +786,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           }}
         >
           <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>[Run Kernel Logs: /v1/projects/{run.projectId || 'prj_01JABCDE'}/runs/{run.id}/logs]</span>
+            <span>[Run Kernel Logs: /v1/projects/{run.projectId || '(none)'}/runs/{run.id}/logs]</span>
             {logView && (
               <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
                 출처: {logView.source}

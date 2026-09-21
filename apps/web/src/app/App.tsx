@@ -199,6 +199,7 @@ export const App: React.FC = () => {
 
   if (desktop && currentUser && projectId) return <DesktopShell
     key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
+    tenantId={currentUser.tenantId}
     nodes={nodes} runs={runs} approvals={approvals} workspaces={workspaces}
     currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
     onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
@@ -362,6 +363,7 @@ export const App: React.FC = () => {
         {activeTab === 'fabric' && (
           <ResourceExplorer
             nodes={measuredNodes}
+            tenantId={currentUser?.tenantId}
             onSelectNode={(id) => {
               setSelectedNodeId(id);
               setActiveTab('nodes');
@@ -395,7 +397,7 @@ export const App: React.FC = () => {
             )}
 
             <WorkspaceCreateModal
-              projectId="prj_01JABCDE"
+              projectId={projectId}
               availableNodes={nodes}
               isOpen={isCreateModalOpen}
               onClose={() => setIsCreateModalOpen(false)}
@@ -414,8 +416,8 @@ export const App: React.FC = () => {
         {/* Tab 2.5: Development Workspace Editor (S06-FE) */}
         {activeTab === 'editor' && (
           <MonacoWorkspaceEditor
-            workspaceId={selectedWorkspaceId || 'wsp_01JABCDE'}
-            projectId="prj_01JABCDE"
+            workspaceId={selectedWorkspaceId || ''}
+            projectId={projectId}
           />
         )}
 

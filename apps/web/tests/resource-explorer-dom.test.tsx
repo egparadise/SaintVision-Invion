@@ -747,4 +747,92 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
     expect(container.textContent).toContain('Ryzen 9 7950X');
     expect(container.textContent).toContain('AMD');
   });
+
+  describe('Discovery Tenant Boundary Enforcement & Zero-Call Invariant', () => {
+    it('suppresses discovery announcement (0 network calls) and disables broadcast button when tenantId is missing', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement').mockResolvedValue({
+        state: 'announced',
+        announcementId: 'ann_dummy_01',
+      } as any);
+
+      // Render with NO tenantId
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="discovery" />);
+      });
+
+      // 1. Honest notice MUST be rendered
+      const notice = container.querySelector('[data-testid="discovery-tenant-required-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.textContent).toContain('인증된 세션 테넌트 식별자(tenantId)가 없어');
+
+      // 2. Broadcast button MUST be disabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(true);
+
+      // 3. Attempting to click disabled button MUST produce exactly 0 network calls
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('enables broadcast button and passes authenticated tenantId in announcement when provided', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement').mockResolvedValue({
+        state: 'announced',
+        announcementId: 'ann_live_123',
+      } as any);
+
+      // Render with authenticated tenantId
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="discovery" tenantId="ten_authenticated_corp" />);
+      });
+
+      // 1. Notice MUST NOT be rendered
+      expect(container.querySelector('[data-testid="discovery-tenant-required-notice"]')).toBeNull();
+
+      // 2. Broadcast button MUST be enabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(false);
+
+      // 3. Clicking button calls broadcastAnnouncement with the exact authenticated tenantId
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(1);
+      expect(broadcastSpy).toHaveBeenCalledWith(expect.any(Object), 'ten_authenticated_corp');
+    });
+
+    it('proves planRunId defaults to empty string and gates create-plan-btn', async () => {
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="pools" />);
+      });
+
+      const planRunInput = container.querySelector<HTMLInputElement>('[data-testid="plan-run-id-input"]');
+      expect(planRunInput).not.toBeNull();
+      // Crucial: Must default to empty string, NOT 'run_01JABCDEF_DEMO'
+      expect(planRunInput?.value).toBe('');
+
+      const createPlanBtn = container.querySelector<HTMLButtonElement>('[data-testid="create-plan-btn"]');
+      expect(createPlanBtn).not.toBeNull();
+      expect(createPlanBtn?.disabled).toBe(true);
+      expect(createPlanBtn?.textContent).toContain('승인 Run ID 필요');
+    });
+
+    it('proves register-contribution-btn is disabled when cluster has no nodes', async () => {
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[]} initialTab="storage" />);
+      });
+
+      const registerBtn = container.querySelector<HTMLButtonElement>('[data-testid="register-contribution-btn"]');
+      expect(registerBtn).not.toBeNull();
+      expect(registerBtn?.disabled).toBe(true);
+      expect(registerBtn?.textContent).toContain('등록 가능 노드 없음');
+    });
+  });
 });

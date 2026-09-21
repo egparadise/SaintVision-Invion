@@ -567,6 +567,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
         <TerminalSessionView
           nodes={mockNodes}
           defaultNodeId="nod_01"
+          defaultWorkspaceId="wsp_0123456789ABCDEFGHJKMNPQRS"
         />
       );
     });
@@ -772,6 +773,7 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
           nodes={mockNodes}
           runs={mockRuns}
           defaultNodeId="nod_01"
+          defaultWorkspaceId="wsp_0123456789ABCDEFGHJKMNPQRS"
         />
       );
     });

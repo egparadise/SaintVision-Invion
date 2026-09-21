@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.64"
+version: "1.0.65"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:55:00+09:00"
+updated: "2026-09-21T20:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,22 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:55:00+09:00.
+- 확인 기준: 2026-09-21T20:15:00+09:00.
 
 ## 최근 확인한 진척
+
+- **디스커버리 테넌트 격리 실배선, 네트워크 0호출 가드 및 UI 전수 가짜 식별자 소거 완결 (`ResourceExplorer.tsx`, `DesktopShell.tsx`, `App.tsx`, `ModelLineageView.tsx`, `AdminSecurityConsole.tsx`, `PlacementSimulator.tsx`, `DistributedRecoveryView.tsx`, `MonacoWorkspaceEditor.tsx`, `TerminalSessionView.tsx`, `EvidenceViewer.tsx`, `RunDetail.tsx`, `DeveloperStudio.tsx`, `tests/resource-explorer-dom.test.tsx`, `tests/model-lineage.test.ts`)**:
+  - **디스커버리 테넌트 경계 실배선 및 0-call 가드**: Codex의 `POST /v1/discovery/announcements` 테넌트 경계(`X-Inv-Tenant == principal.tenant_id`) 강화에 맞춰 `ResourceExplorer.tsx:420`의 하드코딩 `'00000000-0000-0000-0000-000000000001'`를 전면 폐기하고 상위 `App.tsx`/`DesktopShell.tsx`에서 인증된 세션의 `currentUser.tenantId`를 주입하도록 배선. `tenantId` 부재 시 네트워크 요청을 1건도 발생시키지 않고(0 network calls) `data-testid="discovery-tenant-required-notice"`를 정직 표출하며 브로드캐스트 버튼을 비활성화(`disabled={!tenantId}`).
+  - **모델 배포 게이트 가짜 승인 ID(`apr_01JXYZ889900`) 소거**: `ModelLineageView.tsx`의 `approvalInput`을 빈 문자열(`''`)로 초기화하고, 승인 식별자 미입력 시 `data-testid="lineage-deploy-btn"` 버튼을 비활성화(`disabled={!approvalInput.trim()}`)하여 위조 승인 통과 착시를 근절.
+  - **UI 5대 대상 하드코딩 자리표시자 전수 소거 및 비활성화 가드 확립**:
+    - `AdminSecurityConsole.tsx`: `selectedGpuNodeId`의 `'nod_01JABCDEF01'` 기본값을 `gpuNodes[0]?.id || ''`로 변경, GPU 노드 부재 시 벤치마크 실행 버튼 disabled 및 안내 배너 표출.
+    - `PlacementSimulator.tsx`: `localityNodeId`의 `'nod_01JABCDEF01'` 기본값을 `nodes[0]?.id || ''`로 변경하고 None 옵션 추가. `selectedPoolId`의 `'pool_01_training'` 하드코딩을 제거하고 풀 부재 시 미리보기 API 호출 차단.
+    - `DistributedRecoveryView.tsx`: `selectedNodeId`의 `'nod_01JABCDEF01'` 및 `checkouts`의 가짜 `chk_01JABCDEF01` 요소를 전면 소거하여 빈 배열(`[]`)로 초기화. 체크아웃 부재 시 `recovery-no-checkouts` 빈 상태 표출 및 노드 부재 시 생성 버튼 disabled.
+    - `ResourceExplorer.tsx`: `planRunId`의 `'run_01JABCDEF_DEMO'`를 `''`로 초기화하고 Run ID 미입력 시 계획 확정 버튼 disabled. `poolMembers`의 가짜 노드 2개를 제거(`[]`), 스토리지 기여 시 노드 부재 시 제출 버튼 disabled.
+    - `TerminalSessionView.tsx`, `MonacoWorkspaceEditor.tsx`, `EvidenceViewer.tsx`, `RunDetail.tsx`, `DeveloperStudio.tsx`: `defaultWorkspaceId` 및 `projectId`의 `'wsp_0123456789ABCDEFGHJKMNPQRS'` / `'prj_01JABCDE'` / `'nod_01JABCDEF01'` 폴백을 전수 소거하고, 프로젝트/노드 미지정 시 API 호출을 즉시 차단하여 백엔드 fail-closed 에러 노이즈 방지.
+  - **3대 돌연변이 실측 사살 (KILLED)**: 테넌트 누락 시 브로드캐스트 0호출 위반 사살, 승인 ID 미입력 시 배포 버튼 활성화 위반 사살, 계획 수립 Run ID 부재 시 버튼 활성화 위반 사살.
+  - **검증 실적**: Vitest 55개 파일 **510/510 passed 100%** (from 505 to 510, net +5 tests), Vite 프로덕션 빌드 exit 0 (3.85s, 95 modules), Pytest core 5 passed, check_docs/ontology/Obsidian PASS.
+  - 보고서: [[2026-09-21_디스커버리_테넌트격리_및_UI입력_가짜값_전면소거_Gemini]].
 
 - **PTY 보안 경계, 토큰 제로 누설, 사전 연결 허위 성공 제거, 정합 WorkspaceId 및 승인 Run 선택기 완결 (`WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `tests/terminal-session-dom.test.tsx`)**:
   - **1회용 PTY 인증 토큰 제로 누설 (Zero-Leak)**: `WebTerminal.tsx`에서 `${ticketData.ticket.slice(0, 12)}...` 로그 출력을 전면 제거. 단일 사용 티켓은 실제 WebSocket 인증 헤더/프레임(`authFrame = { ticket }`)으로 쓰이는 권한 증표이므로 어떤 조각(slice/prefix)도 UI 텍스트에 남기지 않고 순수 상태 메시지(`[확인] 30초 일회용 티켓 발급 완료`)만 출력하도록 교정.

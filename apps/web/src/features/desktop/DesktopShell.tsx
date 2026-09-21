@@ -17,6 +17,7 @@ import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 
 export interface DesktopShellProps {
   projectId: string;
+  tenantId?: string;
   nodes: NodeItem[];
   runs: RunItem[];
   approvals: ApprovalItem[];
@@ -143,6 +144,7 @@ const DESKTOP_SHORTCUTS = [
 
 export const DesktopShell: React.FC<DesktopShellProps> = ({
   projectId,
+  tenantId,
   currentReviewerId,
   nodes,
   runs,
@@ -665,6 +667,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               {win.appId === 'my-computer' && (
                 <ResourceExplorer
                   nodes={nodes}
+                  tenantId={tenantId}
                   onOpenTerminal={() => openApp('terminal')}
                 />
               )}
@@ -697,7 +700,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
                   <TerminalSessionView
                     nodes={nodes}
                     defaultNodeId={nodes.find((n) => !n.observationOnly && n.schedulable !== false)?.id || nodes[0]?.id}
-                    defaultWorkspaceId={workspaces[0]?.id || 'wsp_default'}
+                    defaultWorkspaceId={workspaces[0]?.id || ''}
                     projectId={projectId}
                     commandId={runs.find((r) => r.state === 'scheduled' || r.state === 'verifying')?.id || runs[0]?.id || null}
                   />
