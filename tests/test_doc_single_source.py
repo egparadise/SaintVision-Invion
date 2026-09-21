@@ -50,3 +50,25 @@ def test_dated_and_frozen_docs_are_excluded_from_scope():
 def test_frontmatter_and_headings_are_not_substantive():
     body = "# 제목 헤딩은 실질 라인이 아니다 충분히 길어도 제외되어야 한다 최소 길이 초과 확인용 문장이다\n| 표 | 행 |\n> 인용문도 제외 대상이며 길이가 길어도 실질 라인 아님 최소 길이 초과"
     assert substantive_lines(f"---\ndoc_id: X\nupdated: 2026-09-22\n---\n\n{body}\n") == set()
+
+
+# --- ratchet mode: gate on the delta, not the backlog ---
+import check_doc_single_source as _c  # noqa: E402
+
+
+def test_ratchet_passes_when_current_equals_baseline(monkeypatch):
+    monkeypatch.setattr(_c, "flagged_pairs", lambda files: {("A.md", "B.md"): ["x"]})
+    monkeypatch.setattr(_c, "read_baseline", lambda: {"A.md || B.md"})
+    assert _c.run_ratchet([]) == 0
+
+
+def test_ratchet_fails_on_a_new_pair_regression(monkeypatch):
+    monkeypatch.setattr(_c, "flagged_pairs", lambda files: {("A.md", "B.md"): ["x"], ("C.md", "D.md"): ["y"]})
+    monkeypatch.setattr(_c, "read_baseline", lambda: {"A.md || B.md"})  # C||D is NEW
+    assert _c.run_ratchet([]) == 1
+
+
+def test_ratchet_fails_on_a_stale_baseline_entry(monkeypatch):
+    monkeypatch.setattr(_c, "flagged_pairs", lambda files: {("A.md", "B.md"): ["x"]})
+    monkeypatch.setattr(_c, "read_baseline", lambda: {"A.md || B.md", "E.md || F.md"})  # E||F stale
+    assert _c.run_ratchet([]) == 1

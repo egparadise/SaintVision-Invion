@@ -27,6 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VAULT = ROOT / "docs" / "vault"
+BASELINE = ROOT / "tools" / "baselines" / "doc_single_source_pairs.txt"
 
 MIN_LINE = 80          # substantive: shorter lines are boilerplate/rule one-liners
 PAIR_THRESHOLD = 3     # report a doc-pair only if it shares at least this many substantive lines
@@ -80,32 +81,85 @@ def find_cross_doc_dups(files: list[Path]) -> dict[str, set[str]]:
     return {line: docs for line, docs in line_docs.items() if len(docs) >= 2}
 
 
-def main() -> int:
-    files = [p for p in VAULT.rglob("*.md") if p.is_file()]
+def flagged_pairs(files: list[Path]) -> dict[tuple[str, str], list[str]]:
+    """Doc-pairs sharing >= PAIR_THRESHOLD substantive lines, mapped to those lines."""
     dups = find_cross_doc_dups(files)
-
-    # Aggregate to doc-pairs: the actionable unit is "these two docs share N lines -> consolidate".
     pair_lines: dict[tuple[str, str], list[str]] = defaultdict(list)
     for line, docs in dups.items():
         ordered = sorted(docs)
         for i in range(len(ordered)):
             for j in range(i + 1, len(ordered)):
                 pair_lines[(ordered[i], ordered[j])].append(line)
+    return {pair: lines for pair, lines in pair_lines.items() if len(lines) >= PAIR_THRESHOLD}
 
-    flagged = {pair: lines for pair, lines in pair_lines.items() if len(lines) >= PAIR_THRESHOLD}
+
+def _pair_key(a: str, b: str) -> str:
+    return f"{a} || {b}"
+
+
+def read_baseline() -> set[str]:
+    """Accepted pairs, one 'A || B' per non-comment line. Missing file => empty (nothing accepted)."""
+    if not BASELINE.is_file():
+        return set()
+    out = set()
+    for raw in BASELINE.read_text(encoding="utf-8").splitlines():
+        s = raw.strip()
+        if s and not s.startswith("#"):
+            out.add(s)
+    return out
+
+
+def run_report(files: list[Path]) -> int:
+    flagged = flagged_pairs(files)
     print(
         f"REPORT check_doc_single_source (advisory, never fails): "
-        f"{len(dups)} substantive lines duplicated across living docs; "
-        f"{len(flagged)} doc-pairs share >= {PAIR_THRESHOLD} lines."
+        f"{sum(len(v) for v in flagged.values())} shared lines across {len(flagged)} doc-pairs "
+        f"(>= {PAIR_THRESHOLD} each)."
     )
     for (a, b), lines in sorted(flagged.items(), key=lambda kv: -len(kv[1])):
         print(f"  - {a}  <->  {b}: {len(lines)} shared substantive lines")
     if flagged:
-        print(
-            "  (rule 5: prefer one source + [[links]]. Each pair is a divergence risk -- consolidate, "
-            "or confirm one is a deliberate index summary. Advisory only.)"
-        )
+        print("  (rule 5: prefer one source + [[links]]. Advisory only.)")
     return 0
+
+
+def run_ratchet(files: list[Path]) -> int:
+    """Gate on the DELTA, not the backlog. Fail on a pair not in the baseline (regression) AND on a
+    baseline entry that no longer occurs (stale -> must be removed, ratcheting the floor down). Both
+    require editing the baseline file, so every change to the accepted set is a visible commit line."""
+    current = {_pair_key(a, b) for (a, b) in flagged_pairs(files)}
+    baseline = read_baseline()
+    new = sorted(current - baseline)
+    stale = sorted(baseline - current)
+    if not new and not stale:
+        print(f"PASS check_doc_single_source --ratchet: {len(current)} pairs, all in baseline, none stale.")
+        return 0
+    if new:
+        print(f"FAIL (regression): {len(new)} NEW duplicate doc-pair(s) not in the baseline:")
+        for p in new:
+            print(f"  + {p}")
+        print("  Consolidate to one source (rule 5), or -- if deliberate -- add the named line to")
+        print(f"  {BASELINE.relative_to(ROOT)} (a visible, reviewable raise of the floor).")
+    if stale:
+        print(f"FAIL (stale baseline): {len(stale)} baseline pair(s) no longer occur -- remove them to")
+        print(f"  ratchet the floor down (leaving slack lets it regress silently):")
+        for p in stale:
+            print(f"  - {p}")
+    return 1
+
+
+def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--ratchet",
+        action="store_true",
+        help="gate mode: fail on a new pair (regression) or a stale baseline entry (ratchet-down)",
+    )
+    args = parser.parse_args()
+    files = [p for p in VAULT.rglob("*.md") if p.is_file()]
+    return run_ratchet(files) if args.ratchet else run_report(files)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+# Ratchet baseline for check_doc_single_source --ratchet (rule-5 divergence surface).
+# Each line is an ACCEPTED duplicate doc-pair (living docs sharing >= PAIR_THRESHOLD substantive lines).
+# --ratchet FAILS on a pair NOT listed here (a NEW regression) AND on a listed pair that no longer
+# occurs (STALE -> remove it, ratcheting the floor down). Both directions require editing THIS file,
+# so every change to the accepted set is a visible, reviewable line in the commit diff. Raising the
+# floor = adding a named line here (not a silent number bump). Lower it whenever a pair is fixed.
+Agent 인계 대기 목록.md || Codex VF 작업 현황.md
+Agent 인계 대기 목록.md || Codex 작업 현황.md
+Agent 인계 대기 목록.md || 개발 과정 인덱스.md
+Claude 작업 현황.md || Codex 작업 현황.md
+Claude 작업 현황.md || Gemini 작업 현황.md
+Claude 작업 현황.md || Orca 작업 현황.md
+Codex VF 작업 현황.md || Codex 작업 현황.md
+Codex VF 작업 현황.md || 전체 개발 진행 현황.md
+Codex 검증 상태 지도와 재개 조건.md || Codex 작업 현황.md
+Codex 검증 상태 지도와 재개 조건.md || 검증 경계 감사 종합과 잔여 범위.md
+Codex 검증 상태 지도와 재개 조건.md || 전체 개발 진행 현황.md
+Codex 작업 현황.md || Gemini 작업 현황.md
+Codex 작업 현황.md || Orca 작업 현황.md
+Codex 작업 현황.md || 개발 과정 인덱스.md
+Codex 작업 현황.md || 검증 경계 감사 종합과 잔여 범위.md
+Codex 작업 현황.md || 전체 개발 진행 현황.md
+Gemini 작업 현황.md || Orca 작업 현황.md
+검증 경계 감사 종합과 잔여 범위.md || 전체 개발 진행 현황.md
