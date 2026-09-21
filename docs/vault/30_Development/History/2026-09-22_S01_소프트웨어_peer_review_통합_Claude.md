@@ -52,4 +52,15 @@ S01-DB는 **물리 장비 의존이 없어** 셋 중 닫기에 가장 가깝다.
 
 **S01-DB 닫는 길**: (a) 위 기록 갱신(0001~0006→0045, 오늘 계약 스위트 첨부) + (b) 이 peer-review 통합 + (c) **실 PG 실행 증거**(Codex 현재 PG 작업·CI 첫 실행 — **사용자 물리 입력 대기 아님**). ST와 달리 **장비 값 없이 닫힘 경로가 있다.** closing은 (c)가 서면 **Codex(owner)가 절차대로.**
 
+## Codex 실 PostgreSQL 실행 증거 (2026-09-22)
+
+- **대상**: `tests/test_pools.py` 전체 34건. 앞서 DSN 부재로 34건이 skip 되었던 S05/S07 배치·lease 경로를 실제 PostgreSQL에서 재실행했다.
+- **기준**: integration 작업 트리 `codex/integration-merge`, 실행 HEAD `a8c979d0e87262a3cf215ddc5d136ec7c6d14cf6`, 워킹 트리 clean 확인 후 실행.
+- **명령**: `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe -m pytest -q tests/test_pools.py --tb=short`
+- **실행 시각(KST)**: 2026-09-22 08:27:11 시작, 08:27:33 종료. **인터프리터**: `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe`. **exit code**: `0`.
+- **결과**: `34 passed, 0 failed, 0 errors, 0 skipped` (21.07초). Alembic 경고 1건은 실패가 아닌 deprecation warning이다.
+- **환경**: 소유 라벨 `ai.saintvision.owner=codex`, 작업 라벨 `ai.saintvision.task=s05-pools-pg`를 붙인 일회용 `postgres:16` 컨테이너를 사용했다. 데이터 디렉터리는 anonymous volume 대신 tmpfs였고, synthetic 자격증명은 실행 환경에만 주입했다.
+- **정리**: 실행 전후 Docker 자원은 containers 48→48, volumes 79→79, networks 11→11이었다. 라벨을 JSON inspect로 확인한 뒤 해당 컨테이너만 제거했으며 잔여 컨테이너는 0개다.
+- **범위**: 이 결과는 `test_pools.py`의 실제 PostgreSQL 경로가 현재 SHA에서 통과했다는 증거이며 S01-DB의 실 PG 증거 공백을 채운다. 독립 검토, hosted CI 실행, 운영 인수 및 물리 장비 검증까지 완료했다는 뜻은 아니다.
+
 관련: [[2026-09-22_S01_기반셋_왜안닫혔나_검토_Claude]] · [[Codex 잔여 개발 작업과 합격 증거]] · [[사용자_결정대기_브리프_2026-09-22]].
