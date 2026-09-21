@@ -1090,6 +1090,13 @@ class TerminalTicketInput(BaseModel):
     commandId: CommandId
 
 
+class TerminalTicketAuthFrame(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ticket: constr(pattern=r'^[0-9a-f]{64}$')
+
+
 class TerminalTicketResult(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1097,7 +1104,10 @@ class TerminalTicketResult(BaseModel):
     ticket: constr(pattern=r'^[0-9a-f]{64}$')
     expiresAt: AwareDatetime
     sessionId: UUID
-    websocketPath: constr(max_length=500)
+    websocketPath: constr(
+        pattern=r'^/v1/workspaces/wsp_[0-9A-HJKMNP-TV-Z]{26}/terminals/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+        max_length=500,
+    )
 
 
 class Mode(StrEnum):

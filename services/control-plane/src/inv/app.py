@@ -614,6 +614,7 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
             auth = strict_object(first)
             if not isinstance(auth, dict) or set(auth) != {"ticket"}:
                 raise DomainError("AUTH-0070", "Single-use terminal ticket required", 403)
+            validate_contract("TerminalTicketAuthFrame", auth)
             attachment = await run_in_threadpool(
                 service.redeem, tokens.tenant_id, workspace_id, session_id, auth["ticket"], origin
             )

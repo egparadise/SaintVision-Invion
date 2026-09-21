@@ -3839,6 +3839,19 @@
       ],
       "additionalProperties": false
     },
+    "TerminalTicketAuthFrame": {
+      "type": "object",
+      "properties": {
+        "ticket": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "ticket"
+      ],
+      "additionalProperties": false
+    },
     "TerminalTicketResult": {
       "type": "object",
       "properties": {
@@ -3856,6 +3869,7 @@
         },
         "websocketPath": {
           "type": "string",
+          "pattern": "^/v1/workspaces/wsp_[0-9A-HJKMNP-TV-Z]{26}/terminals/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
           "maxLength": 500
         }
       },

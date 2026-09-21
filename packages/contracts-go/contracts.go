@@ -814,6 +814,10 @@ type TerminalTicketInput struct {
     CommandId CommandId `json:"commandId"`
 }
 
+type TerminalTicketAuthFrame struct {
+    Ticket string `json:"ticket"`
+}
+
 type TerminalTicketResult struct {
     Ticket string `json:"ticket"`
     ExpiresAt string `json:"expiresAt"`

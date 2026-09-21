@@ -812,6 +812,10 @@ export interface TerminalTicketInput {
   commandId: CommandId;
 }
 
+export interface TerminalTicketAuthFrame {
+  ticket: string;
+}
+
 export interface TerminalTicketResult {
   ticket: string;
   expiresAt: string;
