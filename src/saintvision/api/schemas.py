@@ -320,7 +320,8 @@ class DiscoveryAdmissionResponse(Strict):
 
 class DiscoveryAnnouncementResponse(Strict):
     accepted: Literal[True]
-    state: Literal["candidate"]
+    # Refresh does not revive or rewrite an existing admitted/declined/expired row.
+    state: Literal["candidate", "admitted", "declined", "expired"]
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 

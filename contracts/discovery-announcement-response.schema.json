@@ -8,7 +8,12 @@
       "type": "boolean"
     },
     "state": {
-      "const": "candidate",
+      "enum": [
+        "candidate",
+        "admitted",
+        "declined",
+        "expired"
+      ],
       "title": "State",
       "type": "string"
     }

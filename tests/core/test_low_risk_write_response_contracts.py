@@ -52,3 +52,11 @@ def test_low_risk_write_fixtures_reject_unknown_response_fields(_router, _method
     payload["inventedReceipt"] = True
     with pytest.raises(ValidationError):
         model.model_validate(payload)
+
+
+@pytest.mark.parametrize("state", ["candidate", "admitted", "declined", "expired"])
+def test_discovery_announcement_response_preserves_existing_non_candidate_state(state):
+    # Refreshing an existing discovery row must not pretend an operator decision
+    # was undone; the service can return any current lifecycle state unchanged.
+    payload = {"accepted": True, "state": state}
+    assert schemas.DiscoveryAnnouncementResponse.model_validate(payload).state == state
