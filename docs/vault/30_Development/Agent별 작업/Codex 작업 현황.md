@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.144"
+version: "1.0.145"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T01:53:00+09:00"
+updated: "2026-09-22T02:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 후속 요청 핸들 쓰기 응답 결속
+
+- 작업 카드 `THREAD-2026-09-22-WRITE-RESPONSE-FOLLOWUPS`; owner Codex, reviewer pending. Base `aa67de8c6f6a79798cebe58f685456939d70cdf7`, code SHA `f0a96dc81dae0bcb7741ea76c8a2c254f2a566fe`, branch `agent/codex/write-response-followup-contracts`.
+- `POST /nodes`의 NodeEnrollResponse route anchor와 `POST /storage/contributions`의 ContributionRegistrationResponse wrapper/schema/route anchor를 추가했다. 후자는 raw idempotency replay도 응답 계약 검증 아래 둔다. 다음 요청의 대상을 만드는 후속 핸들 응답은 이 두 건을 추가 결속해 상위 잔여가 없다고 판정했다. 하위 status/receipt와 usability 응답은 새 대상을 발급하지 않아 유지한다.
+- pinned code SHA에서 `tests/core/test_write_response_contracts.py` 33 passed, `export_schemas.py --check` 47 schema pass. 두 response_model 제거 변형은 각각 invalid response를 201으로 반환해 해당 시험 실패. 실제 DB API 시험 3건은 DSN 부재로 각각 skip이며 live DB 검증은 pending.
+- 상세 목록·provenance·변형 대조·범위: [[2026-09-22_write_response_followups_Codex]]. 이전 `response-freshness` 이력불일치 ref는 integration 내용 확인 후 삭제됐으며 local/remote refs와 worktree가 없다. 다른 Agent 자원은 정리하지 않았다.
+- 다음 담당: Claude 고정-SHA 독립 검토; PostgreSQL DSN 준비 시 세 API integration case 실행.
+---
 
 ## 2026-09-22 Artifact content response contract
 
