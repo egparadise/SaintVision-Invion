@@ -263,6 +263,51 @@ def test_liveness_sweep_marks_departed_node_replicas_stale(
     assert row[1] == "stale"
 
 
+def test_liveness_sweep_rolls_back_node_and_replica_on_repair_failure(
+    owner_engine, app_sessionmaker, location, monkeypatch
+):
+    """A failed replica transition cannot leave the Node lost by itself."""
+    _add_replica(owner_engine, location, 0, "ready")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "UPDATE nodes SET enrolled_at=:old, last_heartbeat_at=:old "
+                "WHERE node_id=:n"
+            ),
+            {
+                "old": NOW - dt.timedelta(minutes=2),
+                "n": location["nodes"][0],
+            },
+        )
+
+    def fail_repair(*_args, **_kwargs):
+        raise RuntimeError("synthetic replica repair failure")
+
+    monkeypatch.setattr(replica_repair, "mark_node_replicas_unavailable", fail_repair)
+    with pytest.raises(RuntimeError, match="synthetic replica repair failure"):
+        with app_sessionmaker() as session:
+            with session.begin():
+                with tenant_scope(session, location["tenant_a"]):
+                    node_service.mark_lost_nodes(
+                        session,
+                        tenant_id=location["tenant_a"],
+                        now=NOW,
+                        timeout_seconds=60,
+                    )
+
+    with owner_engine.connect() as c:
+        row = c.execute(
+            text(
+                "SELECT n.status, r.state "
+                "FROM nodes n JOIN data_replicas r ON r.node_id=n.node_id "
+                "WHERE n.node_id=:n"
+            ),
+            {"n": location["nodes"][0]},
+        ).one()
+    assert row[0] == "active"
+    assert row[1] == "ready"
+
+
 def test_node_loss_on_a_pinned_replica_keeps_the_pin(owner_engine, app_sessionmaker, location):
     """Node loss invalidates availability, not retention (migration 0043).
 
