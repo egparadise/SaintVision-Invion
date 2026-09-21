@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.96"
+version: "1.0.97"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:18:00+09:00"
+updated: "2026-09-22T04:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,26 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:18:00+09:00.
+- 확인 기준: 2026-09-22T04:22:00+09:00.
+
+## 세션 랩업: 도구와 증거 분리(run_real_browser_acceptance.py 승격), 운영 가이드 확립 및 착지 전 tsc 게이트 영구 고정
+
+- **도구(Tool)와 증거(Evidence)의 정직한 분리**:
+  - `scratch/`에 임시로 존재하던 실제 Uvicorn-Chrome 종단간 검증 스크립트를 정식 CLI 도구인 `tools/run_real_browser_acceptance.py`로 승격하여 저장소에 영구 보존.
+  - 일회성 증거 파일(스크린샷, 바이너리, 결과 JSON)은 `.gitignore`에 등록된 `scratch/`에 격리 보관하고 저장소에 커밋하지 않음 (도구와 증거 분리).
+- **실제 브라우저 및 백엔드 종단간 실측 운영 가이드 확립**:
+  - `docs/vault/30_Development/실제_브라우저_백엔드_종단간_실측_운영_가이드.md` 작성.
+  - 무겁고 느린 브라우저 실측을 매 커밋 CI에 강제하지 않고 마일스톤/감사 시 온디맨드로 실행하는 운영 방침 정립.
+  - 다음 사람의 시간을 아끼기 위해 오늘 규명된 6대 장애 요인(Gotchas: PYTHONPATH, FastAPI 라우터 등록 순서, Crockford Base32 ID 및 17개 필수 필드 계약 스키마, UI 스텝 선택자, 불변 체크섬 검증, Vitest 타입 검사 누락) 및 해결책을 명문화.
+- **착지 전 필수 확인 목록에 `tsc` 영구 고정**:
+  - `GEMINI.md`: 프런트엔드 착지 전 `cd apps/web && npx tsc -b` 및 `npm run build` 필수 실측 규칙 명시.
+  - `docs/vault/40_Governance/검증검사도구_목록.md`: `npx tsc -b` / `npm run build`를 **게이트**로, `tools/run_real_browser_acceptance.py`를 **온디맨드 실측 도구**로 카탈로그에 등록.
+- **실측 검증**:
+  - `tools/run_real_browser_acceptance.py --help`: 정상 동작 (CLI 파라미터 파싱 확인).
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (Vite 프로덕션 빌드 통과).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 46 fixtures / 12 serving anchors PASS.
 
 ## 세션 랩업: nodeObservation.ts TS2304 NodeStatus 미import 결함 즉시 치유 및 tsc 실측 완결
 
