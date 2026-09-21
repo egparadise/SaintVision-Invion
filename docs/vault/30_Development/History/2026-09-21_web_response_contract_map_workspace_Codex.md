@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T16:16:00+09:00"
+updated: "2026-09-21T16:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -71,6 +71,8 @@ The three test-side CI-fail gates reported by Claude were confirmed in source: r
 
 Cross-checking the workflow layer also found `desktop-browser.yml` provisions its browser opt-in and asserts the expected browser result. The three image/installer acceptance gates still not provisioned by any workflow are the web-container image, workspace-upgrade agent image, and LAN-storage source root. They remain deliberate opt-in/operations scope, not a claim of CI coverage. The Linux chmod/POSIX tests are expected to leave their `skipif` markers on Ubuntu and run, subject to suite selection. Reported classification is based on source inspection and user/Claude findings; no workflow was executed here.
 
-At 16:15 KST on base `71bdb078c25056dc7fc675378825c40a739cd9a7`, Codex bound approval review as the next P1 response slice. Shared fixture `contracts/fixtures/approval-review-response.json` is consumed by the frontend adapter mock and Ajv schema test and validated against generated Pydantic `ApprovalReviewView`; the adapter now imports the generated TypeScript response type. Provenance-wrapped `.venv/Scripts/python.exe -m pytest -q --tb=short tests/core/test_approval_review_response_contract.py` exited 0 (3 passed); provenance-wrapped full Vitest from `apps/web` exited 0 (37 files, 342 passed); `tsc -b`, schema export check, and Vite production build exited 0. The app-level test run emitted three existing Ajv strict-schema warnings from unrelated `WorkspaceSpec` conditionals. PostgreSQL DSN was absent. No DB-backed API, CI, live HTTP, or browser acceptance is claimed. An initial Vitest invocation from repository root failed to resolve the app's `@/` alias; rerunning from `apps/web` passed. An initial exact model roundtrip assertion included unset nullable defaults; using `exclude_unset=True` to match the actual response serialization made the provider fixture test pass. No result above is an independent review.
+At 16:15 KST on base `71bdb078c25056dc7fc675378825c40a739cd9a7`, Codex bound approval review as the next P1 response slice. Shared fixture `contracts/fixtures/approval-review-response.json` is consumed by the frontend adapter mock and Ajv schema test and validated against generated Pydantic `ApprovalReviewView`; the adapter now imports the generated TypeScript response type. The initial dirty-base Python selection passed 3; full Vitest passed 37 files/342; `tsc -b`, schema export check, and Vite production build exited 0. The app-level test run emitted three existing Ajv strict-schema warnings from unrelated `WorkspaceSpec` conditionals. PostgreSQL DSN was absent. No DB-backed API, CI, live HTTP, or browser acceptance is claimed. An initial Vitest invocation from repository root failed to resolve the app's `@/` alias; rerunning from `apps/web` passed. An initial exact model roundtrip assertion included unset nullable defaults; using `exclude_unset=True` to match the actual response serialization made the provider fixture test pass. No result above is an independent review.
 
 Mutation evidence on the same dirty base: replacing the shared fixture's valid `policyDigest` with a malformed value caused the generated-provider pytest and the frontend contract/adapter Vitest invocation to exit 1. The fixture was restored. These negative controls establish that a changed fixture is rejected on both sides; they do not simulate a live provider response. The canonical schema is the generator source for the TS/Pydantic/Go artifacts, and its generation/check path remains the definition-change drift guard.
+
+The code/map commit is `d22cc8c2490db2395d07db368688a541c0daaf8b`. On this exact clean SHA, provenance-wrapped checks at 16:20:42–16:20:56 KST reconfirmed provider 3 passed, schema export 28 match, full Vitest exit 0 (37 files/342 tests), `tsc -b`, Vite build, `check_docs.py`, and `check_ontology.py` exit 0. The full suite emitted only the three Ajv strict-schema warnings noted above. Obsidian sync first reported 1 pending export after merging upstream audit docs; at 16:21:22 `--apply` exported 1 file with all 1402 destination hashes matching, and the 16:21:26 paired `--check` was 1402 managed / 0 pending / 0 conflicts, exit 0. Current checked source was four commits ahead of integration; this work has not been merged there. CI execution remains billing-blocked.
