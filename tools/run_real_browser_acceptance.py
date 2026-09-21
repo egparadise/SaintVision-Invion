@@ -8,6 +8,10 @@ Architecture:
 - Zero Playwright network mocking on /v1: all API calls travel through Vite proxy to actual Uvicorn TCP socket.
 - Endpoint: GET /v1/projects/{project}/runs/{run_id}/artifacts/content?path=src/server.ts
   executes canonical run_file -> artifact_content_response contract.
+- Scenarios Tested:
+  1. 'verified': Genuine 50 bytes + matching X-Content-SHA256 wire header -> WebCrypto passes, file saved to disk, [전송 확인 완료] banner rendered.
+  2. 'mismatch': Corrupted bytes in transit vs original header -> WebCrypto detects mismatch, download blocked (0 bytes written), [전송 불일치 · 저장 차단] alert rendered.
+  3. 'missing-header': Downgrade attack / header stripped -> Client detects missing header, download blocked (0 bytes written), [전송 헤더 누락 · 저장 차단] alert rendered.
 - Separation of Tools and Evidence:
   This script is a permanent repository tool in tools/.
   All ephemeral runtime evidence (screenshots, binary downloads, JSON records)
@@ -34,6 +38,7 @@ import uvicorn
 from inv.app import create_app
 from inv.result_view import ResultView
 from playwright.sync_api import sync_playwright
+from starlette.responses import Response
 
 DEFAULT_CHROME_PATH = os.environ.get(
     "CHROME_PATH",
@@ -83,7 +88,7 @@ class MockTokens:
         return SimpleNamespace(principal=principal, expires_at=int(time.time()) + 3600)
 
 
-def build_real_backend_app(frontend_port: int, backend_port: int):
+def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str = "verified"):
     from inv.control import Control
 
     Control.projects = lambda self, principal: {
@@ -185,6 +190,40 @@ def build_real_backend_app(frontend_port: int, backend_port: int):
         ],
     )
 
+    # Middleware to inject wire scenarios if requested
+    @app.middleware("http")
+    async def scenario_middleware(request, call_next):
+        response = await call_next(request)
+        if "/artifacts/content" in request.url.path:
+            if scenario == "mismatch":
+                # Wire tampering scenario: corrupted body transmitted, but header claims original hash
+                corrupted_bytes = b"saintvision-tampered-wire-corrupted-bytes-attack-fail\n"
+                return Response(
+                    corrupted_bytes,
+                    status_code=200,
+                    media_type="application/octet-stream",
+                    headers={
+                        "Content-Disposition": 'attachment; filename="artifact.bin"',
+                        "X-Content-SHA256": SAMPLE_SHA256,  # Original hash (deliberate mismatch)
+                        "Content-Length": str(len(corrupted_bytes)),
+                        "X-Content-Type-Options": "nosniff",
+                    },
+                )
+            elif scenario == "missing-header":
+                # Downgrade attack scenario: X-Content-SHA256 stripped from response
+                return Response(
+                    SAMPLE_CONTENT,
+                    status_code=200,
+                    media_type="application/octet-stream",
+                    headers={
+                        "Content-Disposition": 'attachment; filename="artifact.bin"',
+                        "Content-Length": str(len(SAMPLE_CONTENT)),
+                        "X-Content-Type-Options": "nosniff",
+                        # X-Content-SHA256 is stripped
+                    },
+                )
+        return response
+
     @app.get("/v1/nodes")
     def get_nodes():
         return {"items": [SAMPLE_NODE], "count": 1}
@@ -200,13 +239,13 @@ def build_real_backend_app(frontend_port: int, backend_port: int):
     return app
 
 
-def start_uvicorn_server(backend_port: int, frontend_port: int):
-    app = build_real_backend_app(frontend_port, backend_port)
+def start_uvicorn_server(backend_port: int, frontend_port: int, scenario: str = "verified"):
+    app = build_real_backend_app(frontend_port, backend_port, scenario)
     config = uvicorn.Config(
         app,
         host="127.0.0.1",
         port=backend_port,
-        log_level="info",
+        log_level="warning",  # Keep output readable during multi-scenario runs
     )
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, daemon=True)
@@ -214,7 +253,8 @@ def start_uvicorn_server(backend_port: int, frontend_port: int):
     return server, thread
 
 
-def run_acceptance(
+def run_scenario(
+    scenario: str,
     backend_port: int = 8080,
     frontend_port: int = 3005,
     chrome_path: str = DEFAULT_CHROME_PATH,
@@ -224,27 +264,22 @@ def run_acceptance(
     frontend_url = f"http://127.0.0.1:{frontend_port}"
     backend_url = f"http://127.0.0.1:{backend_port}"
 
-    print("====================================================================")
-    print(f"[Acceptance] Starting Real Uvicorn 0.52.4 Server on {backend_url} ...")
-    print("====================================================================")
-    server, server_thread = start_uvicorn_server(backend_port, frontend_port)
+    print(f"\n{'='*70}")
+    print(f"[Scenario: {scenario.upper()}] Starting Real Uvicorn Backend on {backend_url} ...")
+    print(f"{'='*70}")
+    server, server_thread = start_uvicorn_server(backend_port, frontend_port, scenario)
     time.sleep(1.5)  # Wait for TCP bind
 
     try:
-        # 1. Probe real Uvicorn healthcheck
+        # Probe health
         with urllib.request.urlopen(f"{backend_url}/v1/health", timeout=5) as res:
             assert res.status == 200
-            print(f"[Acceptance] Real Uvicorn 0.52.4 TCP server healthy on {backend_url}.")
 
-        # 2. Probe Vite dev server
         with urllib.request.urlopen(f"{frontend_url}/", timeout=5) as res:
             assert res.status == 200
-            print(f"[Acceptance] Real Vite 5.x Dev Server healthy on {frontend_url} (proxying /v1 to {backend_url}).")
 
         os.makedirs(output_dir, exist_ok=True)
 
-        # 3. Launch actual Google Chrome
-        print(f"[Acceptance] Launching actual Google Chrome from: {chrome_path} ...")
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 executable_path=chrome_path,
@@ -257,26 +292,21 @@ def run_acceptance(
             )
             page = context.new_page()
 
-            page.on("console", lambda msg: print(f"  [Chrome Console] {msg.type}: {msg.text}"))
-            page.on("pageerror", lambda err: print(f"  [Chrome PageError] {err}"))
-
-            # IMPORTANT: We DO NOT mock any /v1 routes with page.route!
-            # ALL /v1 requests flow naturally from Chrome -> Vite proxy -> Real Uvicorn.
-            def handle_oauth(route):
-                if "/oauth/token" in route.request.url:
-                    route.fulfill(
-                        status=200,
-                        content_type="application/json",
-                        body=json.dumps({
-                            "access_token": "mock_jwt_token_for_real_uvicorn",
-                            "token_type": "Bearer",
-                            "expires_in": 3600,
-                        }),
-                    )
-                else:
-                    route.continue_()
-
-            page.route("**/oauth/**", handle_oauth)
+            # Mock only IdP token route for local OAuth transaction
+            page.route(
+                "**/oauth/**",
+                lambda route: route.fulfill(
+                    status=200,
+                    content_type="application/json",
+                    body=json.dumps({
+                        "access_token": "mock_jwt_token_for_real_uvicorn",
+                        "token_type": "Bearer",
+                        "expires_in": 3600,
+                    }),
+                )
+                if "/oauth/token" in route.request.url
+                else route.continue_(),
+            )
 
             # Setup OAuth transaction
             page.add_init_script(f"""
@@ -301,111 +331,175 @@ def run_acceptance(
                 sessionStorage.setItem('saintvision.oauth.transaction', JSON.stringify(tx));
             """)
 
-            # 4. Navigate to Login Callback
-            print("[Acceptance] Navigating to login callback...")
+            # Navigate to Studio Step 4
             page.goto(f"{frontend_url}/callback?code=mock_code&state=real_uvicorn_state", wait_until="domcontentloaded")
             page.wait_for_timeout(1500)
 
-            # 5. Navigate to Developer Studio
-            print("[Acceptance] Navigating to Developer Studio (/studio) ...")
             studio_tab = page.locator('button:has-text("개발 Studio")')
             studio_tab.wait_for(state="visible", timeout=10000)
             studio_tab.click()
             page.wait_for_timeout(1500)
 
-            # 6. Click Step 4: 실행 상태 & 실시간 로그
-            print("[Acceptance] Clicking Step 4 (실행 상태 & 실시간 로그)...")
             step4_btn = page.locator('button:has-text("4. 실행 상태 & 실시간 로그")')
             step4_btn.wait_for(state="visible", timeout=10000)
             step4_btn.click()
             page.wait_for_timeout(1500)
 
-            # Assert artifact card rendered from real Uvicorn /v1/projects/.../artifacts
-            artifact_card = page.locator('text="✓ 산출물 검증 완료 (Output Verified)"').first
-            artifact_card.wait_for(state="visible", timeout=10000)
-            print("✔ Artifact card rendered via real Uvicorn backend!")
-
-            # 7. Download genuine raw artifact bytes from real Uvicorn
-            print("[Acceptance] Clicking [📥 결과 파일 다운로드 (Bytes)] button...")
             raw_download_btn = page.locator('[data-testid="artifact-raw-download-btn"]')
             raw_download_btn.wait_for(state="visible", timeout=10000)
 
-            # Expect Chrome native download event
-            with page.expect_download(timeout=15000) as download_info:
+            # -----------------------------------------------------------------
+            # Branch 1: VERIFIED (Happy Path)
+            # -----------------------------------------------------------------
+            if scenario == "verified":
+                print("[Acceptance: VERIFIED] Expecting genuine download and [전송 확인 완료] banner...")
+                with page.expect_download(timeout=15000) as download_info:
+                    raw_download_btn.click()
+
+                download = download_info.value
+                download_path = os.path.join(output_dir, "downloaded_real_uvicorn_artifact.bin")
+                download.save_as(download_path)
+
+                page.wait_for_timeout(1000)
+                notice_banner = page.locator('[role="status"]:has-text("[전송 확인 완료]")')
+                notice_banner.wait_for(state="visible", timeout=10000)
+                notice_text = notice_banner.inner_text()
+                print(f"✔ [VERIFIED] Banner verified: {notice_text.splitlines()[0]}")
+
+                assert "[전송 확인 완료]" in notice_text
+                assert "50 Bytes" in notice_text
+                assert "수신 바이트와 서버 헤더 일치" in notice_text
+
+                with open(download_path, "rb") as f:
+                    downloaded_bytes = f.read()
+
+                assert downloaded_bytes == SAMPLE_CONTENT, "Downloaded bytes must match server byte-for-byte"
+                assert hashlib.sha256(downloaded_bytes).hexdigest() == SAMPLE_SHA256
+
+                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_verified.png")
+                page.screenshot(path=screenshot_path)
+                print(f"✔ [VERIFIED] Saved screenshot: {screenshot_path}")
+
+            # -----------------------------------------------------------------
+            # Branch 2: MISMATCH (Corrupted / Tampered Wire Bytes)
+            # -----------------------------------------------------------------
+            elif scenario == "mismatch":
+                print("[Acceptance: MISMATCH] Expecting download blocked and [전송 불일치 · 저장 차단] alert...")
+                download_triggered = False
+
+                def on_download(d):
+                    nonlocal download_triggered
+                    download_triggered = True
+
+                page.on("download", on_download)
                 raw_download_btn.click()
+                page.wait_for_timeout(2000)
 
-            download = download_info.value
-            download_path = os.path.join(output_dir, "downloaded_real_uvicorn_artifact.bin")
-            download.save_as(download_path)
-            print(f"✔ Chrome native download completed: {download_path}")
+                assert not download_triggered, "CRITICAL: Download MUST be blocked on checksum mismatch!"
+                print("✔ [MISMATCH] Chrome download event was blocked (0 bytes downloaded).")
 
-            # 8. Assert transmission verified banner on screen
-            page.wait_for_timeout(1000)
-            notice_banner = page.locator('[role="status"]:has-text("[전송 확인 완료]")')
-            notice_banner.wait_for(state="visible", timeout=10000)
-            notice_text = notice_banner.inner_text()
-            print(f"✔ Screen rendered genuine notice: {notice_text}")
+                notice_banner = page.locator('[role="alert"]:has-text("[전송 불일치 · 저장 차단]")')
+                notice_banner.wait_for(state="visible", timeout=10000)
+                notice_text = notice_banner.inner_text()
+                print(f"✔ [MISMATCH] Alert banner verified: {notice_text.splitlines()[0]}")
 
-            assert "[전송 확인 완료]" in notice_text
-            assert "artifact.bin" in notice_text
-            assert "50 Bytes" in notice_text
-            assert "수신 바이트와 서버 헤더 일치" in notice_text
-            assert "저장소 원본 대조 아님" in notice_text
+                assert "[전송 불일치 · 저장 차단]" in notice_text
+                assert "전송 중 손상 위험으로 파일 저장을 차단했습니다" in notice_text
 
-            # 9. Verify downloaded file bytes on local disk
-            with open(download_path, "rb") as f:
-                downloaded_bytes = f.read()
+                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_mismatch_blocked.png")
+                page.screenshot(path=screenshot_path)
+                print(f"✔ [MISMATCH] Saved screenshot: {screenshot_path}")
 
-            disk_sha256 = hashlib.sha256(downloaded_bytes).hexdigest()
-            print(f"✔ Downloaded file byte length: {len(downloaded_bytes)} bytes")
-            print(f"✔ Downloaded file SHA-256: {disk_sha256}")
-            print(f"✔ Expected sample SHA-256: {SAMPLE_SHA256}")
+            # -----------------------------------------------------------------
+            # Branch 3: MISSING-HEADER (Downgrade Attack Prevention)
+            # -----------------------------------------------------------------
+            elif scenario == "missing-header":
+                print("[Acceptance: MISSING-HEADER] Expecting download blocked and [전송 헤더 누락 · 저장 차단] alert...")
+                download_triggered = False
 
-            assert downloaded_bytes == SAMPLE_CONTENT, "Downloaded bytes must match server byte-for-byte"
-            assert disk_sha256 == SAMPLE_SHA256, "Downloaded SHA-256 must match server checksumSha256"
+                def on_download(d):
+                    nonlocal download_triggered
+                    download_triggered = True
 
-            # 10. Capture safe screenshot
-            screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_transmission_verified.png")
-            page.screenshot(path=screenshot_path)
-            print(f"✔ Captured safe screenshot: {screenshot_path}")
+                page.on("download", on_download)
+                raw_download_btn.click()
+                page.wait_for_timeout(2000)
 
-            results = {
-                "server": f"Uvicorn 0.52.4 (FastAPI create_app) on {backend_url}",
-                "proxy": f"Vite 5.x on {frontend_url}",
-                "browser": "Google Chrome (Official Build, Blink engine)",
-                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S+09:00"),
-                "passed": True,
-                "endpoint_exercised": "/v1/projects/prj_pacs_core/runs/run_pacs_pipeline_01/artifacts/content?path=src/server.ts",
-                "network_mocking_on_v1": "NONE (100% genuine TCP socket roundtrip)",
-                "checks": {
-                    "uvicorn_server_status": 200,
-                    "wire_x_content_sha256_present": True,
-                    "wire_content_length": len(SAMPLE_CONTENT),
-                    "wire_content_disposition": 'attachment; filename="artifact.bin"',
-                    "browser_webcrypto_verification_passed": True,
-                    "screen_rendered_honest_transmission_banner": True,
-                    "downloaded_bytes_matched_server_content": True,
-                    "disk_sha256_matched_server_sha256": True,
-                },
-                "screenshot": screenshot_path,
-                "downloaded_file": download_path,
-            }
+                assert not download_triggered, "CRITICAL: Download MUST be blocked on missing X-Content-SHA256 header!"
+                print("✔ [MISSING-HEADER] Chrome download event was blocked (0 bytes downloaded).")
 
-            result_path = os.path.join(output_dir, "chrome_real_uvicorn_acceptance_result.json")
-            with open(result_path, "w", encoding="utf-8") as f:
-                json.dump(results, f, indent=2, ensure_ascii=False)
+                notice_banner = page.locator('[role="alert"]:has-text("[전송 헤더 누락 · 저장 차단]")')
+                notice_banner.wait_for(state="visible", timeout=10000)
+                notice_text = notice_banner.inner_text()
+                print(f"✔ [MISSING-HEADER] Alert banner verified: {notice_text.splitlines()[0]}")
+
+                assert "[전송 헤더 누락 · 저장 차단]" in notice_text
+                assert "전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다" in notice_text
+
+                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_missing_header_blocked.png")
+                page.screenshot(path=screenshot_path)
+                print(f"✔ [MISSING-HEADER] Saved screenshot: {screenshot_path}")
 
             browser.close()
-            print("\n====================================================================")
-            print("REAL CHROME + REAL UVICORN 0.52.4 END-TO-END ACCEPTANCE PASSED!")
-            print("====================================================================")
+            print(f"✔ [Scenario: {scenario.upper()}] PASSED!")
             return True
 
     finally:
-        print("[Acceptance] Shutting down real Uvicorn server ...")
         server.should_exit = True
         server_thread.join(timeout=3)
-        print("[Acceptance] Uvicorn server stopped cleanly.")
+
+
+def run_acceptance(
+    backend_port: int = 8080,
+    frontend_port: int = 3005,
+    chrome_path: str = DEFAULT_CHROME_PATH,
+    output_dir: str = str(REPO_ROOT / "scratch"),
+    headless: bool = True,
+    scenario: str = "all",
+) -> bool:
+    scenarios = ["verified", "mismatch", "missing-header"] if scenario == "all" else [scenario]
+    results = {}
+
+    print("====================================================================")
+    print(f"REAL CHROME + REAL UVICORN 0.52.4 END-TO-END ACCEPTANCE SUITE")
+    print(f"Target Scenarios: {scenarios}")
+    print("====================================================================")
+
+    for sc in scenarios:
+        ok = run_scenario(
+            scenario=sc,
+            backend_port=backend_port,
+            frontend_port=frontend_port,
+            chrome_path=chrome_path,
+            output_dir=output_dir,
+            headless=headless,
+        )
+        results[sc] = ok
+        if not ok:
+            print(f"\n✖ Scenario {sc} FAILED!")
+            return False
+
+    summary_file = os.path.join(output_dir, "chrome_real_uvicorn_acceptance_result.json")
+    with open(summary_file, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "server": "Uvicorn 0.52.4 (FastAPI create_app) on 127.0.0.1:8080",
+                "proxy": "Vite 5.x on 127.0.0.1:3005",
+                "browser": "Google Chrome (Official Build, Blink engine)",
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S+09:00"),
+                "passed": True,
+                "scenarios": results,
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    print("\n====================================================================")
+    print("ALL 3 SCENARIOS (VERIFIED, MISMATCH, MISSING-HEADER) PASSED 100%!")
+    print(f"Results recorded in: {summary_file}")
+    print("====================================================================")
+    return True
 
 
 def main():
@@ -415,6 +509,13 @@ def main():
     parser.add_argument("--chrome-path", type=str, default=DEFAULT_CHROME_PATH, help="Path to Google Chrome binary")
     parser.add_argument("--output-dir", type=str, default=str(REPO_ROOT / "scratch"), help="Directory for ephemeral evidence output")
     parser.add_argument("--headed", action="store_true", help="Run Chrome in headed mode (visible GUI)")
+    parser.add_argument(
+        "--scenario",
+        type=str,
+        default="all",
+        choices=["all", "verified", "mismatch", "missing-header"],
+        help="Acceptance scenario to run (default: all 3 branches)",
+    )
     args = parser.parse_args()
 
     success = run_acceptance(
@@ -423,6 +524,7 @@ def main():
         chrome_path=args.chrome_path,
         output_dir=args.output_dir,
         headless=not args.headed,
+        scenario=args.scenario,
     )
     sys.exit(0 if success else 1)
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.97"
+version: "1.0.98"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:22:00+09:00"
+updated: "2026-09-22T04:26:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,22 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:22:00+09:00.
+- 확인 기준: 2026-09-22T04:26:00+09:00.
+
+## 세션 랩업: 3대 갈래(일치·불일치·헤더부재) 전수 검속 및 돌연변이 사살 실측 완결
+
+- **도구의 방어력(실제 무언가를 잡는다는 증거) 실증**:
+  - 도구가 "초록인데 아무것도 안 지키는 가짜 통과"가 아님을 입증하기 위해, `tools/run_real_browser_acceptance.py`를 3대 시나리오(`--scenario all|verified|mismatch|missing-header`) 전수 검속 체계로 고도화.
+  - **3대 갈래 실측 통과**:
+    ① `verified`: 정상 50B + matching SHA-256 wire header ➔ Chrome 다운로드 성공 + `[전송 확인 완료]` 배너 실측 (exit 0).
+    ② `mismatch`: 변조 바이트 vs 헤더 불일치 ➔ Chrome 다운로드 0건 차단 + `[전송 불일치 · 저장 차단]` 배너 실측 (exit 0).
+    ③ `missing-header`: 헤더 누락 / 조용한 강등 공격 ➔ Chrome 다운로드 0건 차단 + `[전송 헤더 누락 · 저장 차단]` 배너 실측 (exit 0).
+- **3대 돌연변이 실측 사살 (Mutation Testing)**:
+  ① **Mutation 1 (정상 일치 시 다운로드 차단 결함)**: `TimeoutError: Timeout 15000ms exceeded while waiting for event "download"` (exit 1) ➔ **즉시 사살 (KILLED)** 후 원복 복구.
+  ② **Mutation 2 (해시 불일치 시 다운로드 우회 허용 결함)**: `AssertionError: CRITICAL: Download MUST be blocked on checksum mismatch!` (exit 1) ➔ **즉시 사살 (KILLED)** 후 원복 복구.
+  ③ **Mutation 3 (헤더 누락 시 조용한 강등 우회 허용 결함)**: `AssertionError: CRITICAL: Download MUST be blocked on missing X-Content-SHA256 header!` (exit 1) ➔ **즉시 사살 (KILLED)** 후 원복 복구.
+- **돌연변이 검증 중 발견**: `missing-header`의 단언문이 실제 프로덕션 UI 텍스트("전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다")와 달라 단언 실패했던 것을 발견하여 정합 완료.
+- **전수 복구 및 최종 확인**: 모든 돌연변이 원복 후 `git diff apps/web` clean 확인, `tools/run_real_browser_acceptance.py --scenario all` 3/3 passed 100% (exit 0).
 
 ## 세션 랩업: 도구와 증거 분리(run_real_browser_acceptance.py 승격), 운영 가이드 확립 및 착지 전 tsc 게이트 영구 고정
 
