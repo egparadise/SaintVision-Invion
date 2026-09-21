@@ -255,6 +255,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span
             data-testid="connection-status-dot"
+            aria-hidden="true"
             style={{
               width: '10px',
               height: '10px',
@@ -277,6 +278,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             </span>{' '}
             <span
               data-testid="terminal-connection-status"
+              role="status"
+              aria-live="polite"
               style={{ fontSize: '0.75rem', color: '#8b949e' }}
             >
               ({connectionStatus})
@@ -289,6 +292,9 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             data-testid="terminal-reconnect-btn"
             variant="secondary"
             size="sm"
+            aria-disabled={!isAuthorizedCommandId(commandId)}
+            aria-describedby={!isAuthorizedCommandId(commandId) ? 'terminal-command-required-notice' : undefined}
+            title={!isAuthorizedCommandId(commandId) ? '승인된 실행(commandId)이 필요합니다 (사용자 조치 필요).' : '재접속 (새 티켓)'}
             style={{ fontSize: '0.75rem', padding: '2px 8px' }}
             onClick={handleReconnect}
           >
@@ -320,6 +326,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       {/* Missing Authorized Command Notice Banner */}
       {!isAuthorizedCommandId(commandId) && (
         <div
+          id="terminal-command-required-notice"
           role="alert"
           data-testid="terminal-command-required-notice"
           style={{
@@ -372,6 +379,9 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             data-testid="terminal-error-retry-btn"
             onClick={handleReconnect}
             disabled={!isAuthorizedCommandId(commandId)}
+            aria-disabled={!isAuthorizedCommandId(commandId)}
+            aria-describedby={!isAuthorizedCommandId(commandId) ? 'terminal-command-required-notice' : undefined}
+            title={!isAuthorizedCommandId(commandId) ? '승인된 실행(commandId)을 선택해야 재시도할 수 있습니다 (사용자 조치 필요).' : '새 티켓으로 재시도'}
             style={{
               padding: '2px 8px',
               backgroundColor: isAuthorizedCommandId(commandId) ? '#ef4444' : '#6b7280',

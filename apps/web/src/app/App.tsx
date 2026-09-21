@@ -508,6 +508,8 @@ export const App: React.FC = () => {
 
               {!currentWorkspace ? (
                 <div
+                  id="terminal-no-workspace-notice"
+                  role="alert"
                   data-testid="terminal-no-workspace-notice"
                   style={{
                     padding: '16px',
