@@ -1,19 +1,21 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.11"
+version: "1.5.13"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T12:08:00+09:00"
+updated: "2026-09-21T12:03:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
-2026-09-21 sync explicit conflict resolution: `--resolve-conflicts-from` is path-specific and apply-only. Temporary-repo behavior and rollback control passed; no shared vault writes. Waiting for user-provided exact path list before applying. [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]]
+2026-09-21 sync explicit conflict resolution: `549e697` path-specific apply-only resolver passed 13 temp-repo tests; stale membership mutation failed its regression. User backed up vault, applied 14 listed conflicts (exit 0), preserved index content and at that time reported 1370/0/0. After this turn's doc edits Codex read-only `--check` returned 7 no-baseline/exit 1 and wrote no vault files. The latest 7 paths are not to be overwritten without review. Resolver code is verified; latest docs sync is not clean. [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]]
 
 2026-09-21 UI-FB-01 refinement: user mutation on `84f26ca` restored `items.length > 0` and all five DOM plus 26 fabric tests still passed. This is untested stale-list behavior, not proof of a UI product defect: the current source removes the guard, while tests fail to pin it. Gemini handoff requires sequential non-empty→empty and non-empty→error fetches plus error-with-candidate guard mutation, each failing under its matched mutant. Independent approval remains pending. Backend contract drift proposal is recorded in UI history. [[2026-09-21_UI_FB_contract_readiness_review_Codex]]
+
+2026-09-21 current handoff: Gemini actionable UI-FB-01 negative controls and remaining FB-02/03 boundary checks; external CI billing/auth; platform/DSN-dependent integration cases; authorized restore/real-node/AC-12 operational acceptance. Existing 69 anonymous Docker volumes remain preserved by completed user decision. Today's claims corrected in [[2026-09-21_하루정정대장과_감사잔여_Codex]].
 
 2026-09-21 sync EOL: 비교는 CRLF→LF 정규화 SHA, 쓰기는 source 원본 바이트 유지. index 흡수 `7404a6a` 뒤 sync check 14 no-baseline/0 both-diverged. Claude는 남은 14를 SAFE(old 10 + whitespace 4)로 판정했으나 Codex는 그 git-history 근거를 재실행하지 않았고 `--apply`도 미실행. 683개 synthetic fixture rollback은 683 conflict로 실패 확인. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]]
 

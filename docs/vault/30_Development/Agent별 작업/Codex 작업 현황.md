@@ -1,18 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.77"
+version: "1.0.79"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:08:00+09:00"
+updated: "2026-09-21T12:03:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-2026-09-21 sync explicit resolver: `tools/sync_obsidian.py --apply --resolve-conflicts-from PATHS_FILE`은 UTF-8 경로 목록에 있는 **현재 충돌만** 저장소 바이트로 교체한다. 오래된/non-conflict 경로는 쓰기 전에 거부한다. 임시 저장소 시험 13 passed, stale guard 제거 mutation은 전용 시험을 실패시켰다. 실제 14개 공유 vault 경로 목록은 아직 없으므로 실제 `--apply`하지 않았다. 다음: 사용자 목록을 확인한 뒤 백업/현재 `--check` 대조, 목록 경로만 적용. 상세: [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]].
+2026-09-21 sync explicit resolver(구현 당시 상태): `tools/sync_obsidian.py --apply --resolve-conflicts-from PATHS_FILE`은 UTF-8 경로 목록에 있는 **현재 충돌만** 저장소 바이트로 교체한다. 오래된/non-conflict 경로는 쓰기 전에 거부한다. 임시 저장소 시험 13 passed, stale guard 제거 mutation은 전용 시험을 실패시켰다. 당시 공유 vault 미적용 상태였고, 사용자 완료 실행은 아래에 따로 기록한다. 상세: [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]].
 
 2026-09-21 UI-FB-01 새 DOM 시험 계약: 사용자 변형 실측상 `84f26ca` 단일 fetch 시험은 `items.length > 0` 회귀를 잡지 못했다. Gemini 인계 요구는 후보 있음→두 번째 빈 응답, 후보 있음→두 번째 오류 응답, error 상태+후보 데이터 3개 DOM scenario와 각 해당 mutant failure다. `apps/web` 코드는 수정하지 않았고 독립 검토 pending. mock response shape/backend drift에는 OpenAPI/Pydantic 단일 계약 생성 및 consumer/provider 양쪽 검증을 제안했다. [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
+
+2026-09-21 sync 사용자 실행: backup 뒤 14 explicit conflict paths 적용 exit 0, 당시 후속 check 1370/0/0. 549e697 구현은 venv 13 passed 및 stale membership guard mutation failure. 이후 이 checkout의 문서 변경 뒤 read-only check는 7 no-baseline/exit 1, 미적용이다. 이 7개는 사용자 검토·명시 경로가 확인되기 전에는 쓰지 않는다. 오늘 보고 정정/owner 분류: [[2026-09-21_하루정정대장과_감사잔여_Codex]].
+
+2026-09-21 response contract 설계 제안: `/v1/discovery/candidates`의 `dict` response와 frontend 수기 interface를 단일 contract로 잇는 것이 목표다. Pydantic `Strict` response schema→기존 `contracts/*.schema.json` export/check→generated TS/client fixture, DB 없는 FastAPI provider serialization test와 adapter fixture validation을 제안했다. route_coverage는 path coverage로 유지. 아직 구현·task owner 지정하지 않음.
 
 2026-09-21 sync EOL: LF/CRLF만 정규화하는 SHA 비교를 추가했다. 실제 바이트를 보존하고 683 fixture에서 667 EOL-only false conflict를 제거했으며 정규화 rollback 시험은 683 대 16 차이로 실패한다. 원격 `7404a6a`의 사용자 index 흡수 후 공유 vault `--check`는 14 no-baseline(Claude는 SAFE old residue 10 + whitespace 4 판정), 0 both-diverged다. Claude의 SAFE 근거는 Codex가 재실행하지 않았고 apply도 하지 않았다. 상세: [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 

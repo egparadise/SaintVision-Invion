@@ -6,7 +6,7 @@ status: "review"
 author: "Codex"
 reviewer: "Pending"
 base_commit: "d0d1322"
-updated: "2026-09-21T12:08:00+09:00"
+updated: "2026-09-21T12:03:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["UI-FB", "contract", "frontend", "verification-boundary"]
@@ -114,6 +114,10 @@ Gemini 구현 commit을 확인해 이 SHA의 소스와 회귀 증거를 검토�
 
 ### Mock 응답 shape와 실제 backend 계약
 
-adapter 시험이 `apiClient`를 mock하면서 expected response shape를 시험 안에서 직접 만들고 같은 mock 값을 반환하는 방식은 consumer와 provider를 독립적으로 대조하지 않는다. 권고 계약은 한 쪽만 source of truth가 되는 것이다: backend의 OpenAPI/Pydantic response schema에서 TypeScript 타입 또는 JSON Schema fixture를 생성하고, (1) client adapter test는 응답을 그 schema로 검증하며, (2) backend provider test는 실제 route response가 같은 schema를 만족하는지 검증한다. 생성 산출물의 drift 자체도 CI에서 검사한다. live backend 시험이 환경상 skip되더라도 provider schema 생성/검증은 backend 소스 또는 OpenAPI snapshot에서 실행할 수 있어야 한다. hand-written mock fixture가 contract 정의 역할까지 겸하게 두지 않는다.
+저장소에는 이미 사용할 기반이 있다. `src/saintvision/api/schemas.py`의 Pydantic `Strict` 모델에서 `tools/export_schemas.py`가 `contracts/*.schema.json`을 만들고 `.github/workflows/backend.yml`에서 `--check`한다. 별도로 `tools/route_coverage.py`는 FastAPI `api.openapi()['paths']`와 client 경로 shape를 대조한다. 다만 현재 route coverage는 스스로 밝히듯 path shape만 확인하고 method/body/response payload는 검사하지 않는다. `/v1/discovery/candidates`는 현재 untyped `dict` 응답이고 frontend의 `DiscoveryCandidate`도 별도 TS interface다. `tests/test_route_coverage.py::test_discovery_candidate_schema_contract_invariants`는 source text의 필드 문자열을 대조하지만 실제 route serialization이나 fixture의 JSON Schema 유효성을 실행하지 않는다.
+
+권고는 이 인프라를 재사용하는 점진적 계약이다. (1) 실제 공개 응답을 `Strict` Pydantic response/envelope model로 정의하고 route의 `response_model`에 연결한다. (2) 기존 `export_schemas.py --check`가 그 모델에서 canonical JSON Schema를 생성/검증하도록 한다. (3) frontend가 사용하는 TS 응답 타입은 이 schema 또는 OpenAPI에서 생성해 수기 interface 복제를 줄이고, adapter 시험용 공유 JSON fixture를 같은 schema로 검증한다. mock은 backend 정의를 복제한 또 하나의 진실이 되지 않는다. (4) 저비용 provider contract 시험은 DB 없는 FastAPI TestClient/dependency override로 실제 route handler의 serialized response가 같은 schema를 만족하는지 검사한다. DB 의존 통합 시험은 별도 lane으로 둔다. (5) schema/type generation drift는 기존 backend CI gate에 두고, frontend adapter tests는 generated type와 canonical fixture를 사용한다.
+
+`route_coverage.py`는 계속 URL shape의 미제공/오탐을 찾는 역할을 맡기고 payload 계약 검사와 합치지 않는다. 필요하면 OpenAPI operation의 method·response schema 참조를 adapter 선언과 대조하는 별도 `api_contract_coverage` gate를 인접 추가한다. 그러면 경로 누락은 route coverage가, 응답 shape drift는 schema/provider/adapter contract가 각각 잡는다. 이 방안은 설계 제안이며 이번 작업에서 구현·시험을 추가하지 않았다.
 
 역할 경계: 이 표는 Gemini 전달용 finding이다. Codex는 Antigravity에 직접 보내지 않았고 UI 구현·시험을 수정하지 않았다. Gemini가 위 세 변형을 통과시키고 fixed SHA를 제공한 뒤 Codex가 독립 재검토한다.
