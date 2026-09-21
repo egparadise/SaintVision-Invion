@@ -24,17 +24,17 @@ tags: ["api-contract", "problem-details", "type-drift", "verification"]
 
 ## 검증 기록
 
-아래 시험은 Codex가 dirty source를 사용해 직접 실행했다. 당시 checkout은 `agent/codex/problem-details-contract`, HEAD `2c473f4637a05bba59562b3a6a75cdb340a55f29`, integration과 동기화 상태였으며 구현 파일은 아직 미커밋이었다. 정확한 provenance header의 명령·exit code·환경은 해당 실행 시점 출력에 기록됐다.
+검증은 Codex가 직접 실행했다. 최종 소스 SHA `450971485eb2075b924e3e5b53ad3ed9c6d272c6`, branch `agent/codex/problem-details-contract`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-run-approval-observation-contract`, clean status이며 원격 integration `b49b38d`를 포함한다. 프로젝트 venv Python 3.14.6, Node 24.17.0, Windows 11; PostgreSQL DSN은 없다. 각 결과의 provenance header에는 절대 인터프리터, 명령, exit code와 KST 시각이 찍혔다.
 
 | KST | 명령 | 결과 | 실행 범위 |
 |---|---|---|---|
-| 18:48:02 | `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe -m pytest tests/core -q` (`PYTHONPATH=services/control-plane/src`) | exit 0; 715 passed, 4 skipped, 0 failed, 0 errors | 1 DSN 부재, 1 launcher prerequisite 부재, 2 opt-in local image 부재로 이유가 보이는 skip |
-| 18:52:58 | `npm test` (`apps/web`) | exit 0; 52 files, 470 passed | 전체 Vitest; browser/실 HTTP 인수 아님 |
-| 18:52:41–18:52:52 | `npm run build` (`apps/web`) | exit 0 | `tsc -b`와 Vite production build |
-| 18:51:53–18:51:54 | `python tools/export_schemas.py --check`; `npm --prefix apps/web run contracts:check` | 둘 다 exit 0; 41 schema와 15 API 응답 타입 동기화 | 변경 없는 생성 산출물도 drift 없는지 확인 |
-| 18:51 | `python tools/check_docs.py`; `python tools/check_ontology.py` | 둘 다 exit 0; 문서 629개, ontology/SHACL checks 통과 | 이력·진행판·거버넌스 링크 및 task mapping 검사 |
+| 18:55:06 | `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe -m pytest tests/core -q` (`PYTHONPATH=services/control-plane/src`) | exit 0; 720 passed, 4 skipped, 0 failed, 0 errors | 1 DSN 부재, 1 launcher prerequisite 부재, 2 opt-in local image 부재로 이유가 보이는 skip |
+| 18:55:45 | `npm test` (`apps/web`) | exit 0; 52 files, 470 passed | 전체 Vitest; browser/실 HTTP 인수 아님 |
+| 18:55:56 | `npm run build` (`apps/web`) | exit 0 | `tsc -b`와 Vite production build |
+| 18:56:18–18:56:20 | `python tools/export_schemas.py --check`; `npm --prefix apps/web run contracts:check` | 둘 다 exit 0; 41 schema와 15 API 응답 타입 동기화 | 변경 없는 생성 산출물도 drift 없는지 확인 |
+| 18:56:23–18:56:24 | `python tools/check_docs.py`; `python tools/check_ontology.py` | 둘 다 exit 0; 문서 630개, ontology/SHACL checks 통과 | 이력·진행판·거버넌스 링크 및 task mapping 검사 |
 
-새 Python 시험은 실제 middleware의 503 오류와 강제 포화 429 오류에서 공통 validator가 호출되는지 spy로 확인하며, 장문 detail이 계약 상한 아래로 잘리는지도 검증한다. validator 호출을 제거한 되돌림 대조에서는 spy 단언이 실패했고 복원 후 통과했다. 프런트 계약 시험은 shared JSON fixture를 canonical JSON Schema로 검사하고 nullable required 필드 제거를 거부한다. 추가 API client 대조는 canonical 응답, text 실패, malformed JSON, 비정본 JSON을 다룬다. 해당 변경에서 full Vitest 최초 실행은 integration보다 2 commit 뒤진 `d0d41c3` tree에서 RunLogView DOM 시험 6개가 실패했다. 최신 `2c473f4` integration으로 fast-forward한 뒤 같은 영역이 포함된 전체 Vitest가 통과했으므로 stale-tree 결과는 제품 회귀로 집계하지 않았다.
+새 Python 시험은 실제 middleware의 503 오류와 강제 포화 429 오류에서 공통 validator가 호출되는지 spy로 확인하며, 장문 detail이 계약 상한 아래로 잘리는지도 검증한다. validator 호출을 제거한 되돌림 대조에서는 spy 단언이 실패했고 복원 후 통과했다. 프런트 계약 시험은 shared JSON fixture를 canonical JSON Schema로 검사하고 nullable required 필드 제거를 거부한다. 추가 API client 대조는 canonical 응답, text 실패, malformed JSON, 비정본 JSON을 다룬다. 변경 중 full Vitest 최초 실행은 integration보다 2 commit 뒤진 `d0d41c3` tree에서 RunLogView DOM 시험 6개가 실패했다. 최신 base로 fast-forward 및 shard-observation 통합 후 고정 SHA `4509714`에서 전체 Vitest 470개가 통과했으므로 stale-tree 실패는 제품 회귀로 집계하지 않았다.
 
 ## 범위와 남은 검토
 
