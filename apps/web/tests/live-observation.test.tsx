@@ -7,7 +7,7 @@ import { apiClient } from '../src/shared/api/client';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { ClusterOverview } from '../src/features/dashboard/ClusterOverview';
-import { projectWorkspacesFixture } from './fixtures/workspace-catalog';
+import { legacyProjectCatalogFixture, projectListFixture, projectWorkspacesFixture } from './fixtures/workspace-catalog';
 vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn() }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
@@ -45,13 +45,20 @@ it('renders missing telemetry without NaN or fabricated resource totals', () => 
   }
 });
 it('reads the business project envelope without inventing owner or capacity', async () => {
-  api.mockResolvedValue({ projects: [{ projectId: 'project', displayName: '실제 프로젝트',
-    createdAt: '2026-09-14', kernelLinked: false, kernelEnabled: false }], count: 1 });
-  expect(await fetchProjects()).toEqual([{ id: 'project', name: '실제 프로젝트',
-    createdAt: '2026-09-14', kernelLinked: false, kernelEnabled: false }]);
+  api.mockResolvedValue(projectListFixture);
+  expect(await fetchProjects()).toEqual([{ id: 'prj_contract', name: 'Contract Demo',
+    createdAt: '2026-09-21T06:00:00Z', kernelLinked: false, kernelEnabled: false }]);
 });
 it('rejects an unsupported project envelope', async () => {
   api.mockResolvedValue({ unknown: [] }); await expect(fetchProjects()).rejects.toThrow();
+});
+it('rejects a project list whose declared count disagrees with its rows', async () => {
+  api.mockResolvedValue({ ...projectListFixture, count: 0 });
+  await expect(fetchProjects()).rejects.toThrow('프로젝트 응답 형식 불일치');
+});
+it('does not map a canonical project row missing its display name', async () => {
+  api.mockResolvedValue({ ...projectListFixture, projects: [{ ...projectListFixture.projects[0], displayName: '' }] });
+  await expect(fetchProjects()).rejects.toThrow('프로젝트 응답 필드 누락');
 });
 it('maps the shared workspace response fixture without inventing fields', async () => {
   api.mockResolvedValue(projectWorkspacesFixture);
@@ -68,8 +75,8 @@ it('encodes project identifiers for the workspace route', async () => {
 });
 
 it('reads kernel grant catalog without inventing business metadata', async () => {
-  api.mockResolvedValue({ items: [{ projectId: 'actual-project' }] });
-  expect(await fetchProjects()).toEqual([{ id: 'actual-project', name: 'actual-project', createdAt: '' }]);
+  api.mockResolvedValue(legacyProjectCatalogFixture);
+  expect(await fetchProjects()).toEqual([{ id: 'prj_legacy_contract', name: 'prj_legacy_contract', createdAt: '' }]);
 });
 it('rejects ambiguous catalog envelopes', async () => {
   api.mockResolvedValue({ projects: [], items: [] }); await expect(fetchProjects()).rejects.toThrow();

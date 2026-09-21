@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Historic kernel catalog row accepted only by the frontend adapter.",
+  "properties": {
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId"
+  ],
+  "title": "LegacyProjectCatalogItemResponse",
+  "type": "object"
+}

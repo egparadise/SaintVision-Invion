@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.102"
+version: "1.0.103"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T16:59:00+09:00"
+updated: "2026-09-21T17:11:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 Core CI red-green correction and project-list contract
+
+- `core.yml` general pytest now excludes `tests/integration/test_workspace_upgrade.py` and `tests/integration/test_lan_storage_install.py`, matching their dedicated image-provisioned Core lane. Before correction, both files ran 15 tests, all skipped for absent opt-in owned Docker storage image; the Core no-skip JUnit gate exited 1. After correction, directory-level `--collect-only` over `tests` with the Core ignore set collected 2666/2668 and explicitly contained neither module. A positive control JUnit of six passed cases was accepted by the same no-skip gate. This proves the local collection/gate wiring, not full Core green or hosted CI.
+- Bound the P1 `projectObservation.ts` project chooser: canonical business `projects/count` and compatibility-only historical `items` envelopes have separate strict Pydantic contracts, JSON Schemas, generated TS types and shared fixtures. `/v1/projects` now declares its strict response model. Provider tests and frontend adapter/schema tests consume the shared fixture. Failure if unbound: project choices can disappear or show IDs as display names.
+- Provenance red/green: base `6cff94dca899a130fc733841e4fed765a5524708`, branch `agent/codex/workspace-response-contract-map`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, dirty source during measurement; Python absolute project venv 3.14.6, Node v24.17.0, Windows 11, PostgreSQL DSN absent/Docker present. Before JUnit: 15 skipped/0 failure/0 error and exact no-skip check exit 1. After exclusion: 2666/2668 collected, both image modules absent. Positive-control JUnit: 6 passed/0 skipped/failure/error, exact evidence check exit 0. Provenance artifacts are in `.work/core-image-optin-before.xml`, `.work/core-after-positive-control.xml`, and `.work/core-after-collect.txt` (ignored local evidence). These are local targeted checks, not Actions.
+- Response tests: provider `tests/core/test_workspace_response_contract.py` 18 passed. Focused Vitest after final edits: 30 passed. Temporary required model-field mutation failed two provider assertions and made schema export check exit 1; removing `displayName` from the fixture failed three provider cases and two frontend cases. Both mutations were restored. See [[2026-09-21_web_response_contract_map_workspace_Codex]] for command timestamps and exact commit provenance.
+- Remaining contract map: screen-local run/result/artifact, run/approval queue, placement/pool/mutation, storage resolve/replica/model, shard and node response shapes. UI-FB-03 independent approval and actual browser acceptance remain separate. CI remains billing-blocked; no full Core Actions execution claimed.
 
 ## 2026-09-21 CI image-lane preflight preparation
 

@@ -162,6 +162,50 @@ class ProjectWorkspacesResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ProjectListItemResponse(Strict):
+    """Business project row shown in the project selector."""
+
+    project_id: str = Field(alias="projectId")
+    code: str
+    display_name: str = Field(alias="displayName")
+    status: str
+    member_count: int = Field(ge=0, alias="memberCount")
+    created_at: dt.datetime = Field(alias="createdAt")
+    kernel_linked: bool = Field(alias="kernelLinked")
+    kernel_enabled: bool = Field(alias="kernelEnabled")
+    kernel_note: str | None = Field(default=None, alias="kernelNote")
+    role_code: str = Field(alias="roleCode")
+    can_request: bool = Field(alias="canRequest")
+    can_approve: bool = Field(alias="canApprove")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectListResponse(Strict):
+    """Canonical business API envelope for GET /v1/projects."""
+
+    projects: list[ProjectListItemResponse]
+    count: int = Field(ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LegacyProjectCatalogItemResponse(Strict):
+    """Historic kernel catalog row accepted only by the frontend adapter."""
+
+    project_id: str = Field(alias="projectId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LegacyProjectCatalogResponse(Strict):
+    """Historic `items` envelope; the business API does not emit this shape."""
+
+    items: list[LegacyProjectCatalogItemResponse]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ExecutionReadinessCheckResponse(Strict):
     check: str
     satisfied: bool

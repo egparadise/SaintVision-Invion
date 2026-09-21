@@ -27,6 +27,8 @@ def _fixture(name: str) -> dict:
 @pytest.mark.parametrize(
     ("filename", "model"),
     [
+        ("project-list-response.json", schemas.ProjectListResponse),
+        ("legacy-project-catalog-response.json", schemas.LegacyProjectCatalogResponse),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse),
         ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse),
     ],
@@ -40,6 +42,9 @@ def test_shared_workspace_fixture_matches_strict_response_model(filename, model)
 @pytest.mark.parametrize(
     ("filename", "model", "mutate"),
     [
+        ("project-list-response.json", schemas.ProjectListResponse, "missing-project-name"),
+        ("project-list-response.json", schemas.ProjectListResponse, "extra-project-field"),
+        ("legacy-project-catalog-response.json", schemas.LegacyProjectCatalogResponse, "missing-project-id"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-page-count"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "extra-page-field"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-workspace-field"),
@@ -52,7 +57,13 @@ def test_shared_workspace_fixture_matches_strict_response_model(filename, model)
 )
 def test_workspace_contract_rejects_shared_fixture_shape_drift(filename, model, mutate):
     payload = _fixture(filename)
-    if mutate == "missing-page-count":
+    if mutate == "missing-project-name":
+        payload["projects"][0].pop("displayName")
+    elif mutate == "extra-project-field":
+        payload["projects"][0]["inventedStatus"] = "ready"
+    elif mutate == "missing-project-id":
+        payload["items"][0].pop("projectId")
+    elif mutate == "missing-page-count":
         payload.pop("count")
     elif mutate == "extra-page-field":
         payload["fakeCount"] = 2
@@ -76,13 +87,16 @@ def test_workspace_contract_rejects_shared_fixture_shape_drift(filename, model, 
 @pytest.mark.parametrize(
     ("path", "filename", "service"),
     [
+        ("/v1/projects", "project-list-response.json", "project-list"),
         ("/v1/projects/prj_contract/workspaces", "project-workspaces-response.json", "workspaces"),
         ("/v1/workspaces/wsp_contract/execution-readiness", "workspace-execution-readiness-response.json", "readiness"),
     ],
 )
 def test_fastapi_workspace_routes_serialize_the_shared_fixture(monkeypatch, path, filename, service):
     payload = _fixture(filename)
-    if service == "workspaces":
+    if service == "project-list":
+        monkeypatch.setattr(projects.project_service, "list_projects", lambda *_args, **_kwargs: payload["projects"])
+    elif service == "workspaces":
         monkeypatch.setattr(projects.project_service, "list_workspaces", lambda *_args, **_kwargs: payload["workspaces"])
     else:
         monkeypatch.setattr(readiness.readiness_service, "workspace_readiness", lambda *_args, **_kwargs: payload)
@@ -102,9 +116,9 @@ def test_fastapi_workspace_routes_serialize_the_shared_fixture(monkeypatch, path
 
     assert response.status_code == 200
     assert response.json() == payload
-    model = (
-        schemas.ProjectWorkspacesResponse
-        if service == "workspaces"
-        else schemas.WorkspaceExecutionReadinessResponse
-    )
+    model = {
+        "project-list": schemas.ProjectListResponse,
+        "workspaces": schemas.ProjectWorkspacesResponse,
+        "readiness": schemas.WorkspaceExecutionReadinessResponse,
+    }[service]
     model.model_validate(response.json())

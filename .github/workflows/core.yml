@@ -105,10 +105,20 @@ jobs:
         run: python -m pytest tests/integration/test_business_handoff.py -x -q --junitxml=dist/business-handoff-tests.xml -o faulthandler_timeout=45
       - name: Verify bounded shard replacement on two real Nodes
         run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
+      - name: Run provisioned LAN installer acceptance
+        run: python -m pytest -q tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=dist/lan-installer-tests.xml -o faulthandler_timeout=45
+      - name: Require executed LAN installer evidence
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/lan-installer-tests.xml').getroot()
+          assert root.findall('.//testcase'), 'No LAN installer test evidence'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every provisioned LAN installer test must run and pass'
+          PY
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
-      # The built web-container acceptance is owned by desktop-browser.yml;
-      # Core runs the two LAN installer opt-ins provisioned above.
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py
+      # Web-container acceptance belongs to desktop-browser.yml. The two LAN
+      # image-opt-in suites run in the explicit provisioned step above.
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
       - name: Docker host hygiene (explicit lane)
         # These prune real host residue. Keep them off the default/backend path.
         # This job already owns a disposable runner with a working Docker daemon.

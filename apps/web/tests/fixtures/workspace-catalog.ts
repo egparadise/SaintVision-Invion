@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import type { ProjectWorkspacesResponse } from '@/contracts/project-workspaces-response';
 import type { WorkspaceExecutionReadinessResponse } from '@/contracts/workspace-execution-readiness-response';
+import type { ProjectListResponse } from '@/contracts/project-list-response';
+import type { LegacyProjectCatalogResponse } from '@/contracts/legacy-project-catalog-response';
 
 function readFixture<T>(name: string): T {
   return JSON.parse(readFileSync(
@@ -10,6 +12,8 @@ function readFixture<T>(name: string): T {
 }
 
 export const projectWorkspacesFixture = readFixture<ProjectWorkspacesResponse>('project-workspaces-response');
+export const projectListFixture = readFixture<ProjectListResponse>('project-list-response');
+export const legacyProjectCatalogFixture = readFixture<LegacyProjectCatalogResponse>('legacy-project-catalog-response');
 export const workspaceExecutionReadinessFixture = readFixture<WorkspaceExecutionReadinessResponse>(
   'workspace-execution-readiness-response',
 );

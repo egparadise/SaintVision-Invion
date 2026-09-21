@@ -1,0 +1,19 @@
+{
+  "projects": [
+    {
+      "projectId": "prj_contract",
+      "code": "contract-demo",
+      "displayName": "Contract Demo",
+      "status": "active",
+      "memberCount": 1,
+      "createdAt": "2026-09-21T06:00:00Z",
+      "kernelLinked": false,
+      "kernelEnabled": false,
+      "kernelNote": "An operator links this project.",
+      "roleCode": "owner",
+      "canRequest": true,
+      "canApprove": true
+    }
+  ],
+  "count": 1
+}

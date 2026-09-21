@@ -32,7 +32,7 @@ from ..deps import get_now, get_principal, get_session
 router = APIRouter(prefix="/v1", tags=["projects"])
 
 
-@router.get("/projects")
+@router.get("/projects", response_model=schemas.ProjectListResponse)
 def list_projects(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),

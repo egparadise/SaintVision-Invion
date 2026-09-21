@@ -1,0 +1,36 @@
+{
+  "$defs": {
+    "LegacyProjectCatalogItemResponse": {
+      "additionalProperties": false,
+      "description": "Historic kernel catalog row accepted only by the frontend adapter.",
+      "properties": {
+        "projectId": {
+          "title": "Projectid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "projectId"
+      ],
+      "title": "LegacyProjectCatalogItemResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Historic `items` envelope; the business API does not emit this shape.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/LegacyProjectCatalogItemResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "LegacyProjectCatalogResponse",
+  "type": "object"
+}

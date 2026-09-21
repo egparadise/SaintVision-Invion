@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.4"
+version: "1.1.5"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T16:58:00+09:00"
+updated: "2026-09-21T17:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,7 +17,7 @@ Inventory scope is `apps/web/src/shared/api` excluding the common transport `cli
 
 | Priority / adapter | User-facing surface | Bound response groups | Still unbound and what can quietly break |
 |---|---|---|---|
-| P1 `projectObservation.ts` | App project selection; DeveloperStudio workspace picker | Workspace list and execution-readiness responses are bound in this slice | Project list still accepts two historical envelopes (`projects` and `items`). If a producer silently changes either shape, App can lose the selectable project list or fall back to ID-only names. Keep the two variants distinct until their backend ownership is resolved. |
+| P1 `projectObservation.ts` | App project selection; DeveloperStudio workspace picker | Business project list plus separate historic catalog envelope, workspace list, and execution-readiness responses | Bound in the 2026-09-21 follow-up below. |
 | P1 `approvalReview.ts` | ApprovalReviewPanel before a person approves an action | `ApprovalReviewView` approval/workload/risk/policy digest | The review payload and challenge/decision flow are generated-type and shared-fixture bound. Run-version reads and cancellation responses remain outside this adapter's contract. |
 | P1 `kernelMutations.ts` | Approval challenge/decision and run-version writes | Approval challenge response (`ApprovalChallenge`) and decision response (`ApprovalView`) | Run GET version envelope and cancel response remain handwritten/unbound. A changed run-version or cancellation envelope could suppress cancellation or misreport its result. |
 | P1 direct screen consumers (not counted as modules) | DeveloperStudio, RunDetail, EvidenceViewer | None beyond the separate discovery/storage/workspace slices | Run result, artifacts, artifact content, and run creation use screen-local response types or `any`. A response change can hide output, attach the wrong artifact, or let a success-shaped fallback look like verified evidence. UI-FB-03 mount tests exist; click-time non-route failure can still reuse cached `artifactData` without surfacing the failure, so Gemini follow-up and Codex review remain pending. |
@@ -63,7 +63,21 @@ Implementation and the map were committed as `e460296eaa4cc6da7349fe50cd0cf452dd
 
 ## Review and next actions
 
-Owner Codex; independent reviewer Claude pending. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory and priority proposal, not a claim that every endpoint shape is now covered. Workspace list/readiness, discovery candidates, storage contributions/locations, approval review, and approval challenge/decision are bound. Next slices, by visible/control impact: run-result/artifact responses (coordinate with Gemini UI-FB-03); dual-envelope project list; run/approval queues; placement/storage adjuncts; shard/node observations. PostgreSQL DSN absence leaves database-backed integration outside this verification. No CI, browser/operational acceptance, or independent review is claimed.
+Owner Codex; independent reviewer Claude pending. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory and priority proposal, not a claim that every endpoint shape is now covered. Workspace list/readiness, discovery candidates, storage contributions/locations, approval review, approval challenge/decision, and project-list envelopes are bound. Next slices, by visible/control impact: run-result/artifact responses (coordinate with Gemini UI-FB-03); run/approval queues; placement/storage adjuncts; shard/node observations. PostgreSQL DSN absence leaves database-backed integration outside this verification. No CI, browser/operational acceptance, or independent review is claimed.
+
+## 2026-09-21 Core image-opt-in exclusions and project-list response contract
+
+The Core general pytest command omitted `test_workspace_upgrade.py` and `test_lan_storage_install.py`, although backend's opt-in image lane excluded both and Core's JUnit gate rejects any skip. On the pre-edit source `6cff94dca899a130fc733841e4fed765a5524708`, project-interpreter pytest against those two modules produced 15 skipped, 0 failures/errors; every skip said `Opt-in owned Docker storage installer test`. Parsing that JUnit with the exact Core requirement (“at least one testcase; zero failure/error/skipped”) exited 1. This is the red side: without the exclusions these two modules make Core's no-skip gate red in an environment lacking their image prerequisites.
+
+`core.yml` now excludes both modules from its general pytest collection and runs them explicitly in a preceding owned-LAN acceptance step, after building the required images/source root. That step writes its own JUnit and requires nonempty testcases with zero failure/error/skip, so the exclusions do not silently drop coverage. On the dirty implementation tree, project-interpreter `pytest --collect-only -q tests` with the exact six Core `--ignore` paths exited 0 and collected 2666/2668 tests (two deselected); an explicit output assertion confirmed neither module was collected in the general suite. A separate positive-control JUnit from `tests/core/test_kernel_mutation_response_contract.py` contained six passed, zero failures/errors/skips, and the exact Core no-skip evidence assertion exited 0. This is a green proof of general-suite exclusion plus the evidence gate; the explicit Linux/Docker LAN acceptance step was not run on this Windows host and GitHub Actions remains billing-blocked.
+
+The P1 `projectObservation.ts` slice now binds both accepted envelopes separately. The actual `GET /v1/projects` route emits `ProjectListResponse` (`projects`, `count`, and strict business project rows) and has that FastAPI response model. The adapter's historic `items[{projectId}]` form is separately typed/validated as `LegacyProjectCatalogResponse`; the current business route does not emit it, so it remains compatibility-only rather than being represented as a second backend route. The same two repository fixtures feed the Pydantic provider tests and frontend adapter; the frontend also validates each fixture against the generated schema. A changed business row can no longer silently remove the display name from the project chooser, and the legacy ID-only mapping cannot be mistaken for the richer business response.
+
+Negative controls were restored before the positive run. Adding a required `contractProbe` to the provider row made the Python fixture/route selection fail (2 failures) and `export_schemas.py --check` fail with two stale schemas. Removing `displayName` from the shared fixture made the Python selection fail (3 failures) and the frontend contract/adapter run fail (2 failures; the remaining 28 passed). These are rollback/mutation checks, distinct from the restored positive test results. Restored-source checks: provider contract file 18 passed; focused Vitest set and the project response contract suite are recorded at the final-source SHA below.
+
+Failure if left unbound: a project-list shape drift can leave the application with no selectable project, or make its ID appear to be the human-readable project name. The remaining inventory still includes screen-local run/result/artifact, run/approval queue, placement and pool/mutation, resolve/replica/model, shard, and node observations. UI-FB-03 remains a separate screen boundary; browser acceptance is not implied by Vitest.
+
+At the time of this entry's local checks, source was based on `6cff94dca899a130fc733841e4fed765a5524708`, branch `agent/codex/workspace-response-contract-map`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, dirty with the listed source/fixture changes. Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6; Node `C:/Program Files/nodejs/node.exe` v24.17.0; Windows 11; Docker present, PostgreSQL DSN absent; executor Codex. The red gate was provenance-wrapped at 17:08:14 KST; the pytest collection exclusion was provenance-wrapped at 17:08:29; the 6-pass JUnit control at 17:08:19 and its exact gate at 17:08:39. Positive final-source commands and their exact SHA/clean status are appended after commit. The explicit image-backed acceptance lane remains unexecuted here; no CI, PostgreSQL integration, live HTTP, browser acceptance, or independent review is claimed.
 
 ## 2026-09-21 approval challenge/decision response contract
 
