@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-SHARED-WORKTREE-INDEX-001"
 title: "공유 worktree 다중 에이전트 커밋 규칙 — 개인 index + rev-range 검증 (셋 다 준수)"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
@@ -71,7 +71,11 @@ R1~R5는 **커밋**을 덮는다. **측정**엔 규칙이 없어 오늘 여러 �
 - **R6-a 주 워크트리에서 측정하지 마라**: `provenance.working_tree_clean=YES`가 아니면 결과 불신. 주 트리는 뒤처지고 dirty를 이고 있어 틀린 상태를 보인다.
 - **R6-b 전용 detached 워크트리를 origin tip 정확 SHA에 고정**: `git fetch` → `git -C <측정트리> checkout --detach <tip-SHA>` → `status --porcelain`이 **빈 출력** 확인 후 측정. 잰 **SHA를 결과에 명시**(tip은 세션 중 이동).
 - **R6-c 짧은 경로·full checkout**: 실 파일 필요한 시험은 longpaths 짧은 경로에서 full checkout(sparse는 collection 에러).
-- **R6-d 측정 워크트리 하나를 재사용**(예 `C:/vw`): 매번 `fetch`+`checkout --detach <tip>`로 갱신. 측정 트리를 늘리면 grep 오염·혼동만 커진다.
+- **R6-d 측정 워크트리는 하나로 재사용하되 소유자를 명시한다** (오늘 충돌: 감시자와 작업자가 같은 `C:/vw`를 써 checkout이 막힘 — 개인-index 커밋은 그 트리 HEAD를 안 옮겨 커밋본이 그대로 dirty/untracked로 남기 때문. 공유 트리 문제의 측정-트리 변형).
+  - **소유**: `C:/vw` = **Claude 전용**. 소유자만 그 HEAD를 옮기고(`checkout --detach <tip>`) `clean`한다. 남은 그 트리를 checkout·clean하지 않는다(오늘처럼 막히거나, 개인-index로 이미 origin에 있으나 HEAD-lag로 dirty하게 보이는 파일을 날릴 위험).
+  - **읽기엔 트리가 필요 없다**: 다른 사람은 `git show origin/<branch>:<path>`(origin 참조)로 읽는다 — checkout 불요.
+  - **실행이 필요한 제2자**는 **별도 소유 트리**를 쓴다(예 코디네이터 실행용 `C:/run-user`). 남의 측정 트리를 공유하지 않는다. 측정 트리를 늘리면 grep 오염이 커지므로 **1인 1트리**로 제한하고 소유를 박는다.
+  - **소유자 위생**: 개인-index 커밋 후 측정 트리를 `checkout --force --detach <tip>`로 재동기화해 committed-but-dirty-looking 적체를 남기지 않는다(다음 사람이 안 막히게).
 - **R6-e 정리 원칙**: 형제 워크트리 삭제 전 `dirty=0` 확인. `ahead>0` 브랜치는 워크트리만 제거하고 **브랜치 ref 보존**(미병합 커밋 보유). 삭제는 소유자만. 워크트리 제거 ≠ 브랜치·커밋 삭제(제거는 체크아웃·미커밋만 버림).
 
 ## 상세 근거
