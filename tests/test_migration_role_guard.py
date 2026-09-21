@@ -96,6 +96,10 @@ def test_unsafe_predecessor_refused_before_schema_write(guard_database, role, fl
 def test_absent_then_safe_groups_allow_real_upgrade_and_replay(guard_database):
     assert upgrade(guard_database) == (0, False)
     assert upgrade(guard_database) == (0, False)
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    current_head = ScriptDirectory.from_config(Config(str(ROOT / "alembic.ini"))).get_current_head()
     with psycopg.connect(guard_database) as conn:
-        assert conn.execute('SELECT version_num FROM public.alembic_version').fetchone() == ('0037_storage_sample_commit',)
+        assert conn.execute('SELECT version_num FROM public.alembic_version').fetchone() == (current_head,)
         assert conn.execute("SELECT count(*) FROM pg_roles WHERE rolname IN ('inv_app','inv_kernel') AND NOT (rolcanlogin OR rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole OR rolreplication)").fetchone() == (2,)

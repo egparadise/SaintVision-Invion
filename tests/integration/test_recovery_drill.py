@@ -382,6 +382,50 @@ def test_actual_drill_result_can_be_recorded_through_pilot_service(args, uri):
     assert row[3]["notVerified"] == report["notVerified"]
 
 
+def test_failed_integrity_drill_is_recorded_without_measurements(args):
+    """An unsuccessful restore must not leave plausible RPO/RTO numbers in the ledger."""
+    from saintvision.ids import new_id
+
+    args.tenant, args.user = str(uuid4()), new_id("user")
+    with psycopg.connect(args.source) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES (%s,%s,'failed recovery test')",
+            (args.tenant, "failed-recovery-" + args.tenant),
+        )
+        conn.execute(
+            "INSERT INTO public.users(user_id,tenant_id,external_subject,display_name) "
+            "VALUES (%s,%s,%s,'test operator')",
+            (args.user, args.tenant, "failed-recovery-" + args.tenant),
+        )
+
+    report = {
+        "restoreExitCode": 0,
+        "measuredRpoSeconds": 6,
+        "measuredRtoSeconds": 9,
+        "fencingVerified": True,
+        "fencingNote": "synthetic test result",
+        "integrityVerified": False,
+        "backupSha256": "a" * 64,
+        "backupBytes": 1024,
+        "scope": "database_rehearsal",
+        "notVerified": [],
+        "tablesWithDifferentCounts": ["synthetic_mismatch"],
+        "tablesWithDifferentContent": [],
+        "fencingAdvanceRequired": 0,
+        "recoveryCapability": {"operationalRpoVerified": False},
+    }
+    drill_id = drill.record(report, args)
+
+    with psycopg.connect(args.source) as conn:
+        row = conn.execute(
+            "SELECT outcome, measured_rpo_seconds, measured_rto_seconds, integrity_verified "
+            "FROM public.recovery_drills WHERE drill_id=%s",
+            (drill_id,),
+        ).fetchone()
+    assert not drill._passed(report)
+    assert row == ("failed", None, None, False)
+
+
 def test_cli_and_database_record_refuse_unverified_operational_target(args):
     from saintvision.ids import new_id
 

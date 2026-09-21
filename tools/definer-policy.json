@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": "0044_model_registry_binding",
-  "referenceSource": "c5f215475b203b1e6731927117093921cda9c183",
+  "revision": "0045_discovery_machine_cred",
+  "referenceSource": "8b8ed816f41af79c2cc6b8b3e08a6c74b4a75a5c",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
     "public.apply_capability_offer(uuid, character, character, bigint)": {
@@ -29,6 +29,13 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
+    },
+    "public.consume_discovery_issue_budget(uuid)": {
+      "definitionSHA256": "1a0023dfe5facae4b793ed74b885af498520b7c29c7ca3b0edef0dd9c476322f",
+      "executeRoles": [
+        "inv_discovery_issuer"
+      ],
+      "kind": "issuer-quota"
     },
     "public.node_by_certificate(character)": {
       "definitionSHA256": "f8461c2a0de65bab932df2914bfb005a15ee87c6b739c3c1046f59fa97187dc1",
