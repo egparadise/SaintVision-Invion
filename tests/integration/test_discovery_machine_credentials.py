@@ -17,10 +17,11 @@ from sqlalchemy import text
 from sqlalchemy.engine import make_url
 
 from saintvision.api.app import create_app
+from saintvision.api.deps import get_principal
+from saintvision.api.schemas import DiscoveryAdmissionResponse
 from saintvision.config import Settings
-from saintvision.db.session import tenant_scope
 from saintvision.identity.discovery_credentials import token_sha256
-from saintvision.identity.principal import StaticPrincipalVerifier
+from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 from saintvision.ids import new_id
 from saintvision.services import discovery as discovery_service
 from saintvision.services.discovery_credentials import issue
@@ -86,7 +87,7 @@ def _issue_owner(owner_engine, tenant, installation, now=NOW):
 
 
 def test_cli_credential_is_digest_only_and_works_from_issue_to_admission(
-    owner_engine, app_engine, app_sessionmaker, database_url, two_tenants, caplog
+    owner_engine, app_engine, database_url, two_tenants, caplog
 ):
     from tools import discovery_credential
 
@@ -173,24 +174,36 @@ def test_cli_credential_is_digest_only_and_works_from_issue_to_admission(
             assert linked.status_code == 202, linked.text
             assert linked.json()["state"] == "candidate"
 
-        with app_sessionmaker() as session, session.begin():
-            with tenant_scope(session, tenant_a):
-                bootstrap = discovery_service.admit_candidate(
-                    session,
-                    tenant_id=tenant_a,
-                    announcement_id=candidate.get("announcementId", ""),
-                    admitted_by_user_id=new_id("user"),
-                    now=now[0],
-                )
-                assert bootstrap.secret
-                active = session.execute(
+        # Exercise the real route, session dependency, PostgreSQL service, and
+        # FastAPI response_model together. Only the user identity is supplied
+        # by the test; the admission result is produced from migrated PG state.
+        principal = Principal(
+            user_id=new_id("user"),
+            tenant_id=tenant_a,
+            external_subject="synthetic-admission-operator",
+        )
+        app.dependency_overrides[get_principal] = lambda: principal
+        with TestClient(app, raise_server_exceptions=False, client=("10.2.0.17", 51003)) as client:
+            admission = client.post(
+                f"/v1/discovery/candidates/{candidate['announcementId']}/admission"
+            )
+            assert admission.status_code == 201, "real PostgreSQL admission route must succeed"
+            payload = admission.json()
+            parsed = DiscoveryAdmissionResponse.model_validate(payload)
+            assert parsed.announcement_id == candidate["announcementId"]
+            assert len(parsed.bootstrap_token) >= 16
+            assert parsed.expires_at > now[0]
+            assert parsed.next == "POST /v1/nodes with this token to complete enrollment"
+            _require_secret_absent(token, caplog.text, "discovery bearer appeared in application logs")
+            with owner_engine.connect() as connection:
+                active = connection.execute(
                     text(
                         "SELECT count(*) FROM discovery_machine_credentials "
                         "WHERE credential_id=:id AND revoked_at IS NULL"
                     ),
                     {"id": credential_id},
                 ).scalar_one()
-                assert active == 0
+            assert active == 0
 
         revoke_out, revoke_err = io.StringIO(), io.StringIO()
         assert discovery_credential.run(
