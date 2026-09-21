@@ -395,11 +395,75 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
       expect(markup).toContain('하트비트 시퀀스 전송 (POST /v1/nodes/');
     });
 
-    it('renders Discovery tab with candidate admission controls', () => {
+    it('renders Discovery tab in idle state showing idle notice without admission controls', () => {
       const markup = renderToStaticMarkup(<ResourceExplorer nodes={sampleNodes} initialTab="discovery" />);
       expect(markup).toContain('미등록 머신 안내 방송 전송 (POST /v1/discovery/announcements)');
       expect(markup).toContain('승인 대기 중인 디스커버리 후보');
+      expect(markup).toContain('디스커버리 후보 조회가 대기 상태입니다');
+      expect(markup).not.toContain('승인 &amp; 토큰 발급');
+    });
+
+    it('renders Discovery tab in empty state truthfully after successful empty query', () => {
+      const markup = renderToStaticMarkup(
+        <ResourceExplorer nodes={sampleNodes} initialTab="discovery" initialCandidatesState="success" initialCandidates={[]} />
+      );
+      expect(markup).toContain('승인 대기 중인 디스커버리 후보가 없습니다');
+      expect(markup).not.toContain('승인 &amp; 토큰 발급');
+    });
+
+    it('renders Discovery tab with candidate admission controls when candidates exist', () => {
+      const sampleCandidates = [
+        {
+          announcementId: 'ann_test_01',
+          claimedHostname: 'Node-06-EdgeWorker',
+          sourceIp: '192.168.1.106',
+          state: 'pending' as const,
+          claimedCpuCores: 8,
+          claimedRamBytes: 32 * 1024 ** 3,
+          claimedGpuCount: 1,
+          claimedOsType: 'windows' as const,
+          firstSeenAt: '2026-09-18T00:00:00Z',
+          lastSeenAt: '2026-09-18T00:00:00Z',
+          verified: false,
+        },
+      ];
+      const markup = renderToStaticMarkup(
+        <ResourceExplorer nodes={sampleNodes} initialTab="discovery" initialCandidates={sampleCandidates} />
+      );
+      expect(markup).toContain('승인 대기 중인 디스커버리 후보');
+      expect(markup).toContain('Node-06-EdgeWorker');
       expect(markup).toContain('승인 &amp; 토큰 발급');
+      expect(markup).toContain('거부 (DELETE /candidates/');
+    });
+
+    it('renders Discovery error banner and suppresses admission buttons on error', () => {
+      const markup = renderToStaticMarkup(
+        <ResourceExplorer
+          nodes={sampleNodes}
+          initialTab="discovery"
+          initialCandidatesState="error"
+          initialCandidatesError="디스커버리 엔드포인트 503 Service Unavailable"
+        />
+      );
+      expect(markup).toContain('디스커버리 서비스 연결 오류');
+      expect(markup).toContain('디스커버리 엔드포인트 503 Service Unavailable');
+      expect(markup).toContain('재시도 (Retry)');
+      expect(markup).not.toContain('승인 &amp; 토큰 발급');
+    });
+
+    it('renders Pool capacity error banner and suppresses fake capacity fallback on error', () => {
+      const markup = renderToStaticMarkup(
+        <ResourceExplorer
+          nodes={sampleNodes}
+          initialTab="pools"
+          initialPoolCapacityState="error"
+          initialPoolCapacityError="풀 메트릭 서비스 500 Internal Error"
+        />
+      );
+      expect(markup).toContain('자원 풀 용량 조회 실패');
+      expect(markup).toContain('풀 메트릭 서비스 500 Internal Error');
+      expect(markup).toContain('재시도 (Retry)');
+      expect(markup).not.toContain('총 제공량 (Total Offered)');
     });
   });
 });

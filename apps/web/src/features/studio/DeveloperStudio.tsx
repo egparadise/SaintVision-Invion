@@ -14,7 +14,7 @@ import {
 } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
-import { apiClient, getAuthToken } from '@/shared/api/client';
+import { apiClient, getAuthToken, isRouteNotFoundError } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
@@ -124,8 +124,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     verifiedEvidenceId?: string;
     exitCode?: number | null;
     exportedAt?: string;
+    fallbackUsed?: boolean;
   } | null>(null);
   const [isLoadingArtifact, setIsLoadingArtifact] = useState<boolean>(false);
+  const [artifactError, setArtifactError] = useState<string | null>(null);
   const [showArtifactInspector, setShowArtifactInspector] = useState<boolean>(false);
   const [logs, setLogs] = useState<Array<{ timestamp: string; level: 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS'; message: string }>>([
   ]);
@@ -265,6 +267,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
     // Query canonical Kernel ResultView (/v1/projects/{prjId}/runs/{id}/result) as the source of truth
     const prjId = selectedProjectId || 'prj_01JABCDE';
+    setArtifactError(null);
     apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`)
       .then((res) => {
         if (!mounted) return;
@@ -276,25 +279,41 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             verifiedEvidenceId: res.evidence?.evidenceId || undefined,
             exitCode: res.stopReceipt?.exitCode ?? null,
             exportedAt: res.completedAt || new Date().toISOString(),
+            fallbackUsed: false,
           });
         } else {
-          apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
-            .then((data) => {
-              if (mounted && data) setArtifactData(data);
-            })
-            .catch(() => {
-              if (mounted) setArtifactData(null);
-            });
+          // 2xx response but no output field -> output not generated; strictly NO fallback to /artifacts
+          setArtifactData(null);
         }
       })
-      .catch(() => {
-        apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
-          .then((data) => {
-            if (mounted && data) setArtifactData(data);
-          })
-          .catch(() => {
-            if (mounted) setArtifactData(null);
-          });
+      .catch((err) => {
+        if (!mounted) return;
+        if (isRouteNotFoundError(err)) {
+          // Route Not Found (404) -> Fall back to legacy /artifacts endpoint
+          apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
+            .then((data) => {
+              if (mounted && data) setArtifactData({ ...data, fallbackUsed: true });
+            })
+            .catch((fallbackErr) => {
+              if (mounted) {
+                setArtifactData(null);
+                setArtifactError(fallbackErr?.message || '산출물 목록 조회 실패');
+              }
+            });
+        } else {
+          // Non-404 error (401, 403, 500, network error, parse error) -> DO NOT mask with fallback, report honestly!
+          setArtifactData(null);
+          const errorMsg = err?.problem?.detail || err?.message || `ResultView 조회 실패 (${err?.problem?.status || err?.status || '오류'})`;
+          setArtifactError(errorMsg);
+          setLogs((prev) => [
+            ...prev,
+            {
+              timestamp: new Date().toLocaleTimeString(),
+              level: 'ERROR',
+              message: `[ResultView] 조회 실패: ${errorMsg}`,
+            },
+          ]);
+        }
       })
       .finally(() => {
         if (mounted) {
@@ -1963,10 +1982,26 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, margin: 0 }}>
                   📦 실행 산출물 및 불변 증거 (Output Artifact & Verified Evidence)
                 </h3>
+                {artifactData?.fallbackUsed && (
+                  <span
+                    data-testid="artifact-fallback-badge"
+                    style={{
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(234, 179, 8, 0.15)',
+                      border: '1px solid rgba(234, 179, 8, 0.3)',
+                      color: '#fbbf24',
+                      fontSize: '0.6875rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    404 호환 폴백: /artifacts
+                  </span>
+                )}
                 <span
                   style={{
                     padding: '2px 8px',
@@ -2023,6 +2058,23 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </Button>
               </div>
             </div>
+
+            {artifactError && (
+              <div
+                data-testid="artifact-error-banner"
+                style={{
+                  padding: '10px 14px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid #ef4444',
+                  borderRadius: 'var(--radius-md)',
+                  color: '#fca5a5',
+                  marginBottom: '16px',
+                  fontSize: '0.8125rem',
+                }}
+              >
+                ⚠️ 산출물 조회 오류: {artifactError}
+              </div>
+            )}
 
             {/* 4-Column Key Verification Evidence Grid */}
             <div

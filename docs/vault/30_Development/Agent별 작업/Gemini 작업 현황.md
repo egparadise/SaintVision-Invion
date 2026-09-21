@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.46"
+version: "1.0.47"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-19T00:35:00+09:00"
+updated: "2026-09-21T10:41:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-19T00:35:00+09:00.
+- 확인 기준: 2026-09-21T10:41:00+09:00.
 
 ## 최근 확인한 진척
+
+- **UI 우선순위 6 가짜 폴백 제거 및 상태 수명주기 정직성 구현 완결 (`UI-FB-01`, `UI-FB-02`, `UI-FB-03`)**:
+  - **`ResourceExplorer.tsx` (UI-FB-01)**: 합성 후보 `ann_node06_unverified` 기본값 제거, 풀 용량 조회 실패 시 합성 48코어/192GiB/3GPU 제거 및 에러 배너 노출, 노드 상세 실패 시 가짜 DDR4/AMD/NVIDIA 역량 합성 제거, 스토리지 오류 배너(`storage-error-banner`) 및 디스커버리 4-상태(`idle`, `loading`, `success-empty`, `error`) 분리 완결. 오류 상태 시 운영 버튼(`승인 & 토큰 발급`, `거부`) 완전 차단.
+  - **`PlacementSimulator.tsx` (UI-FB-02)**: 상단 헤더에 `[로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)]` 뱃지 고정 노출, 풀/프리뷰/디스커버리 4-상태 수명주기 관리, 배치 프리뷰 실패 시 가짜 샤드 상태 합성 금지 및 `preview-error-banner` 표면화.
+  - **`DeveloperStudio.tsx` (UI-FB-03)**: `isRouteNotFoundError(err)` 유틸리티를 통한 엄격한 미매핑 404 라우트 폴백 가드 탑재, 2xx 응답(산출물 미생성) 및 401/403/500/네트워크 오류 시 `/artifacts` 광범위 폴백 전면 차단, 404 폴백 적용 시 `artifact-fallback-badge` 표기 및 실제 오류 발생 시 `artifact-error-banner` 정직한 표면화.
+  - **검증 실적**: Vitest 32개 파일 **322/322 passed 100%**, Pytest `test_route_coverage.py` 및 `test_deploy_intranet_preflight.py` **45/45 passed 100%**, docs 무결성 PASS.
+  - 보고서: [[2026-09-21_UI_우선순위6_가짜폴백제거_Gemini_검증보고]].
 
 - **인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 연동 및 회귀 시험 17종 완결 (`tools/deploy_intranet.ps1`, `tests/test_deploy_intranet_preflight.py`)**:
   - **환경변수 기반 동적 경로 탐색 및 안전한 기본값 폴백**: `$env:SAINTVISION_DEV_CERT_DIR`를 읽어 외부 인증서 디렉터리를 동적으로 수용하되, 미지정 또는 공백 시 기존 `deploy/certs`로 투명하게 폴백하여 개발 환경 지속성 100% 보장. Step 1 실행 시 대상 디렉터리를 콘솔에 명시.

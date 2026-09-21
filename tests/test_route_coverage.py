@@ -256,3 +256,38 @@ def test_evidence_viewer_integrity_contract_invariants() -> None:
     assert "출력 무결성 미검증 (UNVERIFIED)" in content
 
 
+def test_ui_priority_6_fallback_boundary_invariants() -> None:
+    """UI Priority 6 regression: zero mock data fallbacks in ResourceExplorer, PlacementSimulator, and DeveloperStudio."""
+    from pathlib import Path
+
+    web_src = Path(__file__).resolve().parents[1] / "apps" / "web" / "src"
+
+    # 1. UI-FB-01 ResourceExplorer: No synthetic candidate in initial state, no fake capacity/capabilities fallback
+    re_path = web_src / "features" / "desktop" / "ResourceExplorer.tsx"
+    re_content = re_path.read_text(encoding="utf-8")
+    assert "ann_node06_unverified" not in re_content, "Synthetic candidate 'ann_node06_unverified' found in ResourceExplorer.tsx"
+    assert "totalOfferedCores: 48" not in re_content, "Synthetic 48-core pool fallback found in ResourceExplorer.tsx"
+    assert "totalOfferedRamBytes: 192 * 1024 ** 3" not in re_content, "Synthetic 192GiB RAM pool fallback found in ResourceExplorer.tsx"
+    assert "vendor: 'DDR4/DDR5'" not in re_content, "Synthetic RAM vendor fallback found in ResourceExplorer.tsx"
+    assert "vendor: 'AMD/Intel'" not in re_content, "Synthetic CPU vendor fallback found in ResourceExplorer.tsx"
+    assert "discovery-error-banner" in re_content, "Missing discovery-error-banner in ResourceExplorer.tsx"
+    assert "discovery-empty-state" in re_content, "Missing discovery-empty-state in ResourceExplorer.tsx"
+    assert "pool-capacity-error" in re_content, "Missing pool-capacity-error in ResourceExplorer.tsx"
+
+    # 2. UI-FB-02 PlacementSimulator: UNVERIFIED local evaluation label and preview error banner
+    ps_path = web_src / "features" / "placement" / "PlacementSimulator.tsx"
+    ps_content = ps_path.read_text(encoding="utf-8")
+    assert "UNVERIFIED: 로컬 시뮬레이션 전용" in ps_content, "Missing UNVERIFIED local simulation label in PlacementSimulator.tsx"
+    assert "preview-error-banner" in ps_content, "Missing preview-error-banner in PlacementSimulator.tsx"
+    assert "pools-error-banner" in ps_content, "Missing pools-error-banner in PlacementSimulator.tsx"
+    assert "서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다" in ps_content, "Missing fake shard prevention message in PlacementSimulator.tsx"
+
+    # 3. UI-FB-03 DeveloperStudio: ResultView fallback gated strictly on isRouteNotFoundError
+    ds_path = web_src / "features" / "studio" / "DeveloperStudio.tsx"
+    ds_content = ds_path.read_text(encoding="utf-8")
+    assert "isRouteNotFoundError" in ds_content, "Missing isRouteNotFoundError import or usage in DeveloperStudio.tsx"
+    assert "isRouteNotFoundError(err)" in ds_content, "ResultView catch must test isRouteNotFoundError(err)"
+    assert "artifact-error-banner" in ds_content, "Missing artifact-error-banner in DeveloperStudio.tsx"
+    assert "artifact-fallback-badge" in ds_content, "Missing artifact-fallback-badge in DeveloperStudio.tsx"
+
+

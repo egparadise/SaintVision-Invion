@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.72"
+version: "1.0.73"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T10:32:00+09:00"
+updated: "2026-09-21T10:39:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 UI-FB 인계 계약 점검: 기존 UI-FB-01/02/03 계약은 방향은 맞지만 pass/fail을 구현자가 추측할 여지가 있어 v1.1.0 부록으로 보강했다. success-empty는 성공 응답 후에만, idle/pending은 오류/빈 성공과 분리; UI-FB-01 storage error 표시 및 sentinel pending/empty 대조; UI-FB-02 local-unverified/server admission 구분; UI-FB-03 route-only 404 fallback을 정확히 정의했다. 확인 당시 ResourceExplorer/test 파일은 unstaged 상태여서 fixed-SHA 판정하지 않았다. 화면 코드는 수정하지 않음. 다음: Gemini fixed SHA 수신 후 phantom-target/negative control 중심 Codex review. [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 
 2026-09-21 이어서 실행: tip `08f2a4d`에서 `.venv\\Scripts\\python.exe -m pytest -q tests/ --ignore=tests/integration -m "not docker_host"` 결과 **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초, exit 0. 별도 PostgreSQL DSN은 없고 Docker 사전관측 가용 RAM 788MB라 이번에는 disposable DB를 띄우지 않았다. 두 integration 파일의 66개 환경 skip은 미실행 유지. 다음: 격리 DB와 충분한 자원 조건에서만 해당 통합군 재개. 상세: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 

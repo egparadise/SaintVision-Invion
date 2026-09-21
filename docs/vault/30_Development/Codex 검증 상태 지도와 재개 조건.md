@@ -1,15 +1,17 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.6"
+version: "1.5.7"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T10:31:00+09:00"
+updated: "2026-09-21T10:39:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+2026-09-21 UI-FB 구현대기 계약 갱신: Gemini owner의 UI-FB-01/02/03 계약을 v1.1.0 부록으로 구체화했다. 공유 규칙은 idle/pending ≠ 성공 empty, fetch/parse/API 실패는 접근 가능한 error, local simulation은 server admission과 비결속. 구체 경계는 FB-01 sentinel 및 storage error, FB-02 local-unverified, FB-03 `isRouteNotFoundError`만 artifacts fallback이다. 당시 화면/test unstaged diff는 fixed SHA 구현 근거가 아니며 아직 코드 판정/수정하지 않았다. 다음 담당 Gemini 구현·시험, 그 후 Codex fixed-SHA 경계 검토. [[2026-09-21_UI_FB_contract_readiness_review_Codex]]
 
 2026-09-21 재개 관측: tip `08f2a4d` 기본 비통합·비Dockerhost 회귀 **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초. 별도 PG DSN 없음, Docker daemon은 응답했으나 가용 RAM 788MB라 새 disposable DB를 시작하지 않음. integration의 66 skip은 Windows Linux-backend 및 PostgreSQL 선행조건 미충족으로 미실행이다. 이후 해당 선행조건이 충족된 격리 환경에서만 재개한다. 상세: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 
