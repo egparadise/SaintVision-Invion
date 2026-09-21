@@ -1,18 +1,18 @@
 ---
 doc_id: "SYNC-STATE-AND-SSR-AUDIT-20260921-CODEX"
-title: "Obsidian 동기화 state 영속화 및 Static Markup 시험 방식 감사"
-version: "1.0.0"
+title: "Obsidian 동기화 상태·EOL 및 Static Markup 시험 방식 감사"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Pending"
-base_commit: "4706e89"
-updated: "2026-09-21T10:59:15+09:00"
+base_commit: "d230b21"
+updated: "2026-09-21T11:05:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "export-state", "frontend-tests", "renderToStaticMarkup"]
 ---
 
-# Obsidian 동기화 state 영속화 및 Static Markup 시험 방식 감사
+# Obsidian 동기화 상태·EOL 및 Static Markup 시험 방식 감사
 
 ## 범위
 
@@ -39,6 +39,15 @@ tags: ["sync-obsidian", "export-state", "frontend-tests", "renderToStaticMarkup"
 - 별도 회귀에서 state path가 `.git` metadata 아래이고 `.work` 밖임을 확인한 뒤 임시 `.work` 디렉터리를 삭제해도 state 파일이 남음을 확인했다.
 - 되돌림 대조: 충돌 보고 전 `_write_state` 호출을 제거하자 새 CLI 회귀가 **1 failed**로 깨졌다(기대 state 부재). 원복 뒤 전체 sync 시험은 5 passed다.
 - 모든 CLI/state 시험은 임시 Git repo와 임시 vault를 썼다. 실제 공유 Obsidian vault는 수정하지 않았고 이 worktree의 `.git/obsidian-sync-state.json`도 만들지 않았다. `--apply`나 실제 vault sync는 실행하지 않았다.
+
+## EOL 비교 보강 (d230b21 이후)
+
+- 원인: exporter의 `sha()`는 raw byte를 비교해 CRLF/LF만 다른 파일도 수정된 파일처럼 판단했다. 비교에는 CRLF만 LF로 치환한 SHA-256을 쓰고, 복사/내보내기 바이트는 계속 저장소 원본 그대로 둔다. 새 state 값은 정규화 해시다. 기존 raw-byte manifest/state 해시는 raw 또는 정규화 해시 중 하나가 맞으면 baseline으로 인정해 전환 시의 오분류를 피한다.
+- `.venv\\Scripts\\python.exe -m pytest -q tools/test_sync.py`: **8 passed**, exit 0. EOL-only 파일은 충돌 없이 비교되고 state에 정규화 해시가 남으며 destination 바이트는 CRLF 그대로인 것을 확인했다. 두 쪽에서 실내용이 달라진 파일은 `both-diverged`로 계속 충돌한다.
+- 683개 합성 충돌 fixture는 667개의 EOL-only 파일과 14개의 무기준선 실내용 차이, 2개의 양쪽 변경으로 구성한다. 현재 구현은 **16 conflict (14 no-baseline, 2 both-diverged)**를 낸다. 정규화 코드를 제거하는 되돌림 대조에서는 시험이 **683 conflict** 대 16 기대값 차이로 실패했다. 수정 후 되돌림 대조로 보호되는 것을 확인했다.
+- 실제 공유 vault의 read-only `.venv\\Scripts\\python.exe tools/sync_obsidian.py --check`는 exit 3, **16 conflict (14 no-baseline, 2 both-diverged)**를 보고했다. 이 실행 직전 이 worktree에 state가 없음을 확인했다. `--check`는 vault 파일을 쓰지 않았고 진단 JSON만 `.work`에 갱신했다.
+- 비교 기준을 되돌린 추가 실측에서는 이 worktree의 실제 vault가 **675** 충돌(673 no-baseline, 2 both-diverged)이었다. 이는 사용자가 보고한 이전 시점의 683과 다르므로 그 수치를 이 worktree의 재현 결과라고 합치지 않는다. 683→16은 고정 합성 fixture에서의 되돌림 증거이고, 현재 live check는 16이다.
+- `--apply`는 실행하지 않았다. 남은 16건의 내용 판정 및 사용자 vault 변경은 이 작업 범위에 포함하지 않는다.
 
 ## `renderToStaticMarkup` 시험 인벤토리
 

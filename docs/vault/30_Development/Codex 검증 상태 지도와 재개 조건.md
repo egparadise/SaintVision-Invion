@@ -1,15 +1,17 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.9"
+version: "1.5.10"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T10:56:13+09:00"
+updated: "2026-09-21T11:05:40+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+2026-09-21 sync EOL: 비교는 CRLF→LF 정규화 SHA, 쓰기는 source 원본 바이트 유지. sync check는 현재 16건(14 no-baseline/2 both-diverged); 사용자/Claude가 판정할 내용 잔여로 `--apply`하지 않음. 683개 synthetic fixture 되돌림은 683 conflict로 실패 확인. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]]
 
 2026-09-21 sync/UI 시험방법 후속: sync baseline adoption이 충돌 시에도 metadata-only로 보존되고 기본 state가 `.git`/worktree metadata에 있다. 임시 CLI/cleanup 테스트 5 passed 및 rollback-fail 근거. `apps/web/tests` 정적 SSR 인벤토리 7파일·27호출, UI-FB 두 suite는 fetch/effect가 아닌 상태 prop 렌더다. Gemini test-method handoff 기록: [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 

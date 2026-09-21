@@ -54,6 +54,19 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
 
 
+def sync_sha(path):
+    """Hash comparison content with CRLF normalized to LF; never writes bytes."""
+    if not path.is_file():
+        return None
+    content = path.read_bytes().replace(b'\r\n', b'\n')
+    return hashlib.sha256(content).hexdigest()
+
+
+def _matches_baseline(path, known):
+    """Accept normalized hashes and legacy raw-byte state/manifest hashes."""
+    return known is not None and known in (sha(path), sync_sha(path))
+
+
 def contained(root, relative):
     candidate = root / relative
     resolved = candidate.resolve()
@@ -62,7 +75,7 @@ def contained(root, relative):
     return candidate
 
 
-def _conflict_reason(current, wanted, known):
+def _conflict_reason(known, source_matches_baseline):
     # Same collision the tool always refused to overwrite, now labelled so the
     # 'why' is legible instead of an opaque 675-line dump.
     if known is None:
@@ -70,14 +83,12 @@ def _conflict_reason(current, wanted, known):
         # to decide whether the destination bytes are a real user edit or just an
         # un-recorded prior sync. Fail-closed and report it as such.
         return 'no-baseline'
-    if wanted == known:
+    if source_matches_baseline:
         # Source matches the baseline but the destination changed -> a genuine
         # external (vault-side) edit.
         return 'destination-edited'
-    if current != wanted:
-        # Source and destination both moved away from the baseline.
-        return 'both-diverged'
-    return 'other'
+    # Source and destination both moved away from the baseline.
+    return 'both-diverged'
 
 
 def export(source, destination, state_path, original_hashes, apply=False, adopt=False):
@@ -94,7 +105,8 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
             raise ValueError('Source symlink outside source root')
         rel = path.relative_to(source).as_posix()
         target = contained(destination, rel)
-        current, wanted = sha(target), sha(path)
+        current, wanted = sync_sha(target), sync_sha(path)
+        current_raw = sha(target)
         expected[rel] = current
         known = state['files'].get(rel, original_hashes.get(rel))
         if current == wanted:
@@ -102,11 +114,12 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
             if adopt:
                 state['files'][rel] = wanted
                 adopted.append(rel)
-            elif rel in state['files'] or current is None or current == known:
+            elif (rel in state['files'] or current is None
+                  or _matches_baseline(target, known) or _matches_baseline(path, known)):
                 state['files'][rel] = wanted
             continue
-        if current is not None and current != known:
-            conflicts.append((rel, _conflict_reason(current, wanted, known)))
+        if current_raw is not None and not _matches_baseline(target, known):
+            conflicts.append((rel, _conflict_reason(known, _matches_baseline(path, known))))
         else:
             changes.append((path, target, rel, wanted))
     # Identical-file adoption changes metadata only. Persist it even if unrelated
@@ -123,18 +136,18 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
     destination.mkdir(parents=True, exist_ok=True)
     # Preflight every file again before the first mutation.
     for rel, before in expected.items():
-        if sha(contained(destination, rel)) != before:
+        if sync_sha(contained(destination, rel)) != before:
             raise ValueError(f'Changed during preflight: {rel}; no writes performed')
     for path, target, rel, wanted in changes:
         contained(destination, rel)
         target.parent.mkdir(parents=True, exist_ok=True)
-        if sha(target) != expected[rel]:
+        if sync_sha(target) != expected[rel]:
             raise ValueError(f'Changed during export: {rel}; prior exported files preserved')
         fd, temporary = tempfile.mkstemp(prefix='.inv-sync-', dir=target.parent)
         try:
             with os.fdopen(fd, 'wb') as stream:
                 stream.write(path.read_bytes())
-            if sha(target) != expected[rel]:
+            if sync_sha(target) != expected[rel]:
                 raise ValueError(f'Concurrent edit: {rel}')
             os.replace(temporary, target)
         finally:
@@ -145,9 +158,9 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
         _write_state(state_path, state)
     for path in paths:
         rel = path.relative_to(source).as_posix()
-        if sha(contained(destination, rel)) != sha(path):
+        if sync_sha(contained(destination, rel)) != sync_sha(path):
             raise ValueError(f'Post-export hash mismatch: {rel}')
-        state['files'][rel] = sha(path)
+        state['files'][rel] = sync_sha(path)
     _write_state(state_path, state)
     print(f'EXPORTED: {len(changes)} files; all {len(paths)} destination hashes match. Unmanaged files untouched.')
     return len(changes)

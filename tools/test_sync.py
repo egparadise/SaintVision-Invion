@@ -1,6 +1,7 @@
 """Meaningful file-safety checks for the Obsidian exporter."""
 from pathlib import Path
 import json
+import hashlib
 import shutil
 import subprocess
 import tempfile
@@ -8,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 import sync_obsidian
-from sync_obsidian import ConflictsDetected, default_state_path, export, sha
+from sync_obsidian import ConflictsDetected, default_state_path, export, sha, sync_sha
 
 
 class SyncTests(unittest.TestCase):
@@ -95,6 +96,78 @@ class SyncTests(unittest.TestCase):
             (dst/'a.md').write_text('original', encoding='utf-8')
             before = sha(dst/'a.md')
             self.assertEqual(export(src,dst,state,{'a.md':before},True), 1)
+
+    def test_check_normalizes_crlf_without_rewriting_destination_bytes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            src, dst, state = base/'src', base/'dst', base/'state.json'
+            src.mkdir(); dst.mkdir()
+            source_bytes = b'first line\nsecond line\n'
+            destination_bytes = b'first line\r\nsecond line\r\n'
+            (src/'note.md').write_bytes(source_bytes)
+            (dst/'note.md').write_bytes(destination_bytes)
+
+            self.assertNotEqual(sha(src/'note.md'), sha(dst/'note.md'))
+            self.assertEqual(sync_sha(src/'note.md'), sync_sha(dst/'note.md'))
+            self.assertEqual(export(src, dst, state, {'note.md': sha(src/'note.md')}), 0)
+            self.assertFalse(state.exists())
+            self.assertEqual((dst/'note.md').read_bytes(), destination_bytes)
+
+            self.assertEqual(export(src, dst, state, {'note.md': sha(src/'note.md')}, apply=True), 0)
+            saved = json.loads(state.read_text('utf-8'))
+            self.assertEqual(saved['files']['note.md'], sync_sha(src/'note.md'))
+            self.assertEqual((dst/'note.md').read_bytes(), destination_bytes)
+
+    def test_eol_normalization_does_not_hide_real_two_sided_edits(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            src, dst, state = base/'src', base/'dst', base/'state.json'
+            src.mkdir(); dst.mkdir()
+            baseline = b'original\n'
+            (src/'note.md').write_bytes(b'source edit\n')
+            destination_bytes = b'original\r\nvault edit\r\n'
+            (dst/'note.md').write_bytes(destination_bytes)
+            state.write_text(json.dumps({
+                'vault': str(dst.resolve()),
+                'files': {'note.md': hashlib.sha256(baseline).hexdigest()},
+            }), encoding='utf-8')
+
+            with self.assertRaises(ConflictsDetected) as raised:
+                export(src, dst, state, {})
+
+            self.assertEqual(raised.exception.conflicts, [('note.md', 'both-diverged')])
+            self.assertEqual((dst/'note.md').read_bytes(), destination_bytes)
+
+    def test_large_collision_set_keeps_only_non_eol_differences(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            src, dst, state = base/'src', base/'dst', base/'state.json'
+            src.mkdir(); dst.mkdir()
+            original_hashes = {}
+            for index in range(683):
+                rel = f'note-{index:03}.md'
+                if index < 667:
+                    source_bytes = b'same content\nsecond line\n'
+                    destination_bytes = b'same content\r\nsecond line\r\n'
+                elif index < 681:
+                    source_bytes = b'repository version\n'
+                    destination_bytes = b'user version\r\n'
+                else:
+                    baseline = b'original baseline\n'
+                    source_bytes = b'repository edit\n'
+                    destination_bytes = b'vault edit\r\n'
+                    original_hashes[rel] = hashlib.sha256(baseline).hexdigest()
+                (src/rel).write_bytes(source_bytes)
+                (dst/rel).write_bytes(destination_bytes)
+
+            with self.assertRaises(ConflictsDetected) as raised:
+                export(src, dst, state, original_hashes)
+
+            conflicts = raised.exception.conflicts
+            reasons = {reason: sum(1 for _, item_reason in conflicts if item_reason == reason)
+                       for reason in {item_reason for _, item_reason in conflicts}}
+            self.assertEqual(len(conflicts), 16)
+            self.assertEqual(reasons, {'no-baseline': 14, 'both-diverged': 2})
 
 
 if __name__ == '__main__':

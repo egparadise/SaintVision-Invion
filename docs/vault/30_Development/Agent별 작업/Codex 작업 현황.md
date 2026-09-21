@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.75"
+version: "1.0.76"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T10:56:13+09:00"
+updated: "2026-09-21T11:05:40+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 sync EOL: LF/CRLF만 정규화하는 SHA 비교를 추가했다. 실제 바이트를 보존하고 683 fixture에서 667 EOL-only false conflict를 제거했으며 남은 16건(14 no-baseline, 2 both-diverged)을 확인했다. 정규화를 되돌리면 동일 시험이 683 대 16으로 실패한다. 공유 vault에는 `--check`만 했고 apply는 하지 않았다. 상세: [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 
 2026-09-21 Obsidian state 및 SSR 감사: `sync_obsidian.py`는 `--adopt-identical` 해시를 conflict exit 전 metadata에 원자 저장하고 기본 state를 현재 worktree Git metadata에 둔다. `.venv\\Scripts\\python.exe -m pytest -q tools/test_sync.py` 5 passed; 제거 대조에서 adoption 회귀 하나가 fail. `apps/web/tests`에 static SSR 사용 7파일/27호출을 목록화했다. 두 UI 상태 스위트의 “query/fetch” 이름은 state props 주입일 뿐 effect 실행이 아님을 기록했다. Gemini 인계; UI tests 코드는 수정하지 않음. 다음: docs 검사 후 이 변경 commit/push. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 
