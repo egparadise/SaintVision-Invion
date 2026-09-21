@@ -1,0 +1,17 @@
+{
+  "projectId": "prj_0123456789ABCDEFGHJKMNPQRS",
+  "modelId": "mdl_0123456789ABCDEFGHJKMNPQRS",
+  "version": "1.0.0",
+  "manifestHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sourceRunId": "run_0123456789ABCDEFGHJKMNPQRS",
+  "committedAt": "2026-09-21T12:00:00Z",
+  "commitRecoveryEpoch": "33333333-3333-4333-8333-333333333333",
+  "format": "safetensors",
+  "totalBytes": 1024,
+  "shardCount": 1,
+  "licensePolicy": "apache-2.0",
+  "classification": "internal",
+  "committed": true,
+  "currentAvailability": "unknown",
+  "requiresExecutionRevalidation": true
+}
