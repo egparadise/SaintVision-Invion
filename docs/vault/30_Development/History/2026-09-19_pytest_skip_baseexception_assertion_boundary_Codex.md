@@ -1,16 +1,22 @@
 ---
 doc_id: "TEST-SKIP-ASSERTION-BOUNDARY-CODEX-001"
 title: "pytest skip BaseException assertion boundary 보강"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 base_commit: "8c15e1a"
 source_of_truth: "Git"
-updated: "2026-09-19T19:12:00+09:00"
+updated: "2026-09-21T10:31:00+09:00"
 tags: ["pytest", "skip", "BaseException", "test-boundary"]
 ---
 
 # pytest skip assertion 경계 보강
+
+## 2026-09-21 후속 회귀
+
+- 현재 `integration/all-agents-unified` tip `08f2a4d`에서 `.venv\\Scripts\\python.exe -m pytest -q tests/ --ignore=tests/integration -m "not docker_host"`를 실행했다. **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초, exit 0. 이 명령은 integration 디렉터리와 docker_host 시험을 제외하므로 PostgreSQL 통합 실행 증거가 아니다. 두 경고는 httpx/Starlette TestClient deprecation이다.
+- 선행조건 확인(읽기 전용): `docker info` exit 0, daemon 20.10.22, 총 컨테이너 48·실행 중 3; Windows 호스트 가용 RAM 788MB. 별도 disposable PostgreSQL DSN은 없었다. 운영/보호 컨테이너는 건드리지 않았고, 이 자원 상태에서 새 DB 컨테이너를 띄우지 않았다. 따라서 integration의 66개 환경 skip은 그대로 미실행이다.
+- 실행은 2026-09-21 KST에 완료 관측 **10:31**. 테스트 종료 코드와 수는 위 pytest 출력에서 확인했다. 다음 단계는 격리된 disposable PostgreSQL과 충분한 여유가 제공될 때 두 integration 파일을 재실행하는 것이다; 현재 구현/테스트 변경은 추가하지 않았다.
 
 ## 발견과 수정
 

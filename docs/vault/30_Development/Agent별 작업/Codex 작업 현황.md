@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.71"
+version: "1.0.72"
 status: "review"
 author: "Codex"
-updated: "2026-09-19T19:12:00+09:00"
+updated: "2026-09-21T10:32:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 이어서 실행: tip `08f2a4d`에서 `.venv\\Scripts\\python.exe -m pytest -q tests/ --ignore=tests/integration -m "not docker_host"` 결과 **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초, exit 0. 별도 PostgreSQL DSN은 없고 Docker 사전관측 가용 RAM 788MB라 이번에는 disposable DB를 띄우지 않았다. 두 integration 파일의 66개 환경 skip은 미실행 유지. 다음: 격리 DB와 충분한 자원 조건에서만 해당 통합군 재개. 상세: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 
 2026-09-19 skip-as-failure 경계 후속: 공용 `raises_without_skip`이 직접 및 `BaseExceptionGroup` 내부 pytest skip을 예상 오류를 대체하는 실패로 만든다. 일곱 파일의 원래 `pytest.raises` 35곳 중 실제 skip 기대 7곳은 보존하고 실패 기대 28곳을 보호했으며, helper 자체를 검사하는 두 개 회귀를 추가했다. pure four modules reject any module-level skip; integration modules retain Linux/PG skips and guard only error expectations. Seven named files were run/injection-checked; exact scope and KST evidence: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 
