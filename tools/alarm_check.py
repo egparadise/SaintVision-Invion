@@ -112,6 +112,21 @@ def partition_alarm(table: str, latest_bound: dt.datetime | None, now: dt.dateti
     return count_alarm(f"{table} partition 잔여", "P1/P2", "DB 운영", 0, where)
 
 
+def coverage_summary(evaluated: int, not_evaluable: int, gated: int) -> str:
+    """Describe observation coverage without inventing a spec row count.
+
+    GOV-ALERT-001 contains condition rows that collapse into the same runtime
+    data family (for example partition runway thresholds and duplicate
+    severity rows).  Counting the collapsed runtime entries as if they were
+    the specification's rows produces a false denominator.  Report the three
+    observable buckets instead.
+    """
+    return (
+        f"{evaluated} evaluated data families; {not_evaluable} conditions not "
+        f"evaluated here; {gated} governance-gated conditions"
+    )
+
+
 # --- Thin database layer: measure, then hand each measurement to the deciders ---
 
 def evaluate(dsn: str, tenant: str | None, now: dt.datetime) -> dict[str, Any]:
@@ -194,10 +209,8 @@ def evaluate(dsn: str, tenant: str | None, now: dt.datetime) -> dict[str, Any]:
             for name, severity, reason in GOVERNANCE_GATED
         ],
         # Never "healthy". This tool saw part of the table.
-        "coverage": (
-            f"{len(alarms)} of "
-            f"{len(alarms) + len(NOT_EVALUABLE) + len(GOVERNANCE_GATED)} alarm conditions "
-            f"in GOV-ALERT-001 were evaluated here"
+        "coverage": coverage_summary(
+            len(alarms), len(NOT_EVALUABLE), len(GOVERNANCE_GATED)
         ),
     }
 

@@ -10,6 +10,12 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
+## 2026-09-22 GOV-ALERT-001 커버리지 표기 정정
+
+- `tools/alarm_check.py`의 기존 `coverage`가 규격 20개 행과 축약된 런타임 데이터 가족을 하나의 분모로 섞어 `4 of 16`처럼 표시하는 것을 발견했다. 규격 조건을 모두 평가한다고 오해할 수 있어, 평가 가족·평가 불가 조건·governance-gated 조건을 분리해 출력하도록 수정했다.
+- `tests/test_alarm_check.py`에 범위 표기 단언을 추가했다. `.venv\Scripts\python.exe -m pytest -q tests/test_alarm_check.py`는 수정 후 12 passed/exit 0, 기존 분모 변형은 1 failed/11 passed/exit 1, 원복 후 12 passed/exit 0이다. `git diff --check`도 exit 0이다.
+- 제품 알람 조건·라우팅·스큐 governance 결정은 변경하지 않았다. PostgreSQL 평가, 알람 전달, CI 및 Claude 독립 검토는 미실행/pending이다. Evidence: [[2026-09-22_alarm_coverage_summary_Codex]].
+
 ## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
 
 - 작업 `THREAD-2026-09-22-PRECI-CROSS-LANE-PROPOSAL`; owner Codex, governance owner/reviewer Claude (수용 대기). 기준 integration SHA `2867ddbb78af0efdc46288b3c26a316e41ad719e`.
