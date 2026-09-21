@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.141"
+version: "1.0.142"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T01:11:58+09:00"
+updated: "2026-09-22T01:14:26+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,6 +16,7 @@ source_of_truth: "Git"
 - 출처 감사 결과: 라이브 Run 상태의 진실 시각은 이미 갱신되는 `inv.runs.updated_at`이고 응답이 이를 누락했다. `ShardObservation`은 parent/member Runs의 `updated_at`을 저장하고 쿼리 가능하지만 서빙하지 않았다. `RunArtifactList`와 `RunLogView`에는 독립적인 artifact/log capture 시각이 없고, 둘 다 읽고 있던 `result_completions.completed_at`만 출력 가능한 영속 시각이다. 따라서 각각 `stateUpdatedAt`, nullable `stateAsOf`(parent/member 최대값이며 단일 DB snapshot 아님), nullable `completedAt`을 계약과 응답에 연결했다. HTTP/query 시각을 데이터 진실 시각으로 사용하지 않는다.
 - disposable PostgreSQL 16 실측: 실 자원 등록 시 `appliedToKernel=true`, resource ID/capacity 및 DB `offered=8000`을 HTTP 응답과 대조했고, 등록되지 않은 제어 경로의 `false/resource_not_registered`도 함께 확인했다. `ShardObservation.stateAsOf`와 `RunResultView.stateUpdatedAt`을 DB 저장 `updated_at`과 비교했다. 결과 4 passed, 0 skip, 0 failed/errors. 상세 소유/정리/명령은 [[2026-09-22_response_freshness_asof_Codex]].
 - 현재 확인: 전체 Vitest 67 files/607 passed; focused core 18 passed; schema exporter 46, freshness pinned map 9/9, bindings 35 fixture / 11 serving anchor; docs/ontology 통과. 재검증 시각, 명령, 환경 및 제한은 History에 기록. PostgreSQL은 실행 가능한 disposable 환경에서 직접 돌렸고 Go compile, production HTTP, browser acceptance는 주장하지 않는다. Gemini UI 연결은 integration `597ef148`에 있으나 이 작성자 검증은 독립 UI review가 아니다.
+- 착지/재검증: `f1d95466ac6b46fad4f110f94ca9fb0bf5354414`를 작업 브랜치와 integration에 push했다. 이 exact SHA에서 clean-tree provenance로 실 PostgreSQL 16 focused 4 passed/0 skipped, core 18 passed, Vitest 607/607, build, 16 web contracts, schema 46, freshness 9/9, bindings 35/11, docs 686/ontology, Obsidian 1483/0/0을 확인했다. 별도 reviewer는 아직 pending이다.
 - 다음 행동: 고정 integration SHA에서 별도 reviewer가 backend response semantics와 실 PG 증거를 확인한다. Gemini/운영은 `stateAsOf`가 서로 다른 Run row의 최신 시각이지 공통 snapshot 시각이 아님을 보존하고, artifact/log의 `completedAt`을 실제 capture 시각처럼 표시하지 않아야 한다.
 
 ## 2026-09-22 고위험 쓰기 응답 결속 및 시각 스큐 규격 현실화
