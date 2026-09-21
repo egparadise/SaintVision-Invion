@@ -139,3 +139,16 @@ assert journeys == EXPECTED_JOURNEYS, f'browser journeys drifted: {journeys ^ EX
 - **③(하드코딩 개수)** — **유효 지시는 위 「## ③ [v1.3.0 정정]」 섹션 하나뿐이다**(browser 여정 이름 집합 대조 + docker-host 케이스 이름 집합 대조, 실제 정본 이름 박음). 이전에 여기 있던 `passed>0` 안은 **철회됨**(삭제 탐지력 상실 — 그 섹션 참조). Codex는 그 섹션의 문안을 적용한다.
 
 reviewer: Codex. apps/web 미접촉, tests 미수정(전부 소스-읽기/실측, img_probe.xml 삭제).
+
+## 후속 — 오늘 생긴 시험·검사의 CI 배선 점검 (2026-09-21, 측정 tip `8c50cf6`, 워크플로 소스 대조)
+아침 ①③ 이후 오늘 새 시험·검사가 여럿 생겼다(계약 시험, `test_serving_anchors`, discovery 자격증명 시험, 검사 도구 `check_contract_bindings`·`check_frontend_integrity`). CI에서 실제로 도는지 [측정].
+- **오늘 생긴 시험 = 수집·실행됨**: 계약 시험·`test_serving_anchors`·discovery 자격증명 unit은 `tests/core` → backend.yml(`--strict-markers` full pytest)·core.yml(core-tests full pytest)이 수집. discovery **PG integration**(`tests/integration/test_discovery_machine_credentials.py`, `pytestmark=pytest.mark.postgres`)은 **`postgres` 마커가 pyproject.toml에 등록됨**(strict-markers 안전) + backend·core에 **PG 서비스 존재·`-m "not postgres"` 필터 없음** → CI에서 **실행**. **아침류(skip→no-skip RED) 재발 없음**: no-skip 단언은 `dist/lan-installer-tests.xml`(LAN 2개)에만 국한, 오늘 새 시험은 그 junit에 안 들어감.
+- **미배선 = 로컬 전용(배선 필요)**: **`check_contract_bindings.py`·`check_frontend_integrity.py`는 어느 워크플로에도 없다.** check_docs·check_ontology는 docs.yml에 있으나 이 둘은 빠짐 → 사람이 기억해야만 도는 검사(=결국 안 돌게 됨).
+- **Codex 인계 문안(YAML=Codex 소관, 내가 안 고침)**: 두 도구 **stdlib만**(re/pathlib/argparse/sys, 추가 deps 0) → `docs.yml`의 `- run: python tools/check_ontology.py` 다음에 두 줄 추가(전체 checkout이라 tests/·contracts/·apps/web 입력 다 있음):
+  ```yaml
+        - run: python tools/check_contract_bindings.py
+        - run: python tools/check_frontend_integrity.py
+  ```
+  게이트 안전성: check_contract_bindings의 dead-contract는 **report-only(exit 0)**라 CI를 빨갛게 안 함(하드 게이트=fixture-커버리지·서빙앵커-커버리지). check_frontend_integrity는 위반 시 nonzero=게이트. 대안으로 backend.yml도 가능하나 docs.yml이 structural 검사(check_docs/ontology)와 co-locate라 권장.
+- **CI-red 잔여([추정], 실 CI 시점 확인)**: discovery integration이 `CREATE ROLE`·`GRANT inv_discovery_issuer`를 수행 → CI DB 로그인이 CREATEROLE/superuser여야 함. 기존 role 생성 마이그레이션(inv_app 등)이 CI서 통과하므로 가능성 높으나 미측정. 실 CI에서 확인.
+- reviewer: Codex(위 문안 적용). 이번에도 워크플로 미접촉·문안만.
