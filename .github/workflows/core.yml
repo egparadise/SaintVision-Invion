@@ -121,7 +121,11 @@ jobs:
           assert root.findall('.//testcase'), 'No test evidence'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every collected test must run and pass'
           host = ET.parse('dist/docker-host-tests.xml').getroot()
-          assert host.findall('.//testcase'), 'No Docker host hygiene evidence'
+          host_cases = {case.get('name') for case in host.findall('.//testcase')}
+          assert host_cases == {
+              'test_prune_never_force_removes_a_running_concurrent_container',
+              'test_prune_removes_old_exited_residue_but_spares_a_recent_one',
+          }, f'docker-host case set drifted: {host_cases}'
           assert not any(host.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Docker host lane must run and pass'
           PY
       - run: python -m build services/control-plane --outdir dist

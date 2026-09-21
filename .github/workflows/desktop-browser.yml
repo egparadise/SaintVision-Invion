@@ -47,10 +47,10 @@ jobs:
           VF_BROWSER_TEST: '1'
           VF_EVIDENCE_PREFIX: vf-desktop-browser-ci
         run: python tools/run_vf_security_tests.py tests/integration/test_desktop_browser.py tests/integration/test_approval_browser.py tests/integration/test_studio_browser.py
-      - name: Require all six browser journeys to execute
+      - name: Require every canonical browser journey to execute
         run: |
           python - <<'PY'
-          import json
+          import json, re
           from pathlib import Path
           proof = json.loads(Path('.work/vf-desktop-browser-ci.json').read_text())
           assert proof['browserOptIn'] and proof['exitCode'] == 0
@@ -58,6 +58,16 @@ jobs:
           counts = proof['tests']
           assert counts['passed'] > 0 and all(counts[key] == 0 for key in ('failure', 'error', 'skipped'))
           assert proof['isolatedContainerRemoved']
+          cases = json.loads(Path(proof['xmlPath']).with_name('case-identities-private.json').read_text())
+          journeys = {re.sub(r'\[.*\]$', '', case['name']) for case in cases}
+          expected = {
+              'test_actual_browser_quorum_snapshot_and_no_duplicate_vote',
+              'test_actual_browser_stale_run_and_revoked_review_are_rejected',
+              'test_browser_real_catalogue_owner_scope_and_revocation',
+              'test_browser_real_committed_model_and_current_permission',
+              'test_full_studio_login_project_approval_and_logout',
+          }
+          assert journeys == expected, f'browser journey set drifted: {journeys ^ expected}'
           PY
       - name: Test built frontend proxy image and TLS boundary
         run: python -m pytest -q --strict-markers tests/integration/test_web_container.py --junitxml=.work/web-container-tests.xml
