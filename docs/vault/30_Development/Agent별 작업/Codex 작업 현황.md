@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.133"
+version: "1.0.135"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T23:49:29+09:00"
+updated: "2026-09-21T23:52:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,11 +19,12 @@ source_of_truth: "Git"
 
 ## 2026-09-21 시험·워크플로·도구 변경연동 하드코딩 감사
 
-- 시작 기준 local integration `938ea1b1d797e7c2ed4a81e9920cdab0cb9f620b`; 작업 전 origin이 `a451d69f514a57fa16a8f7add432127a36250e7b`로 전진해 branch를 그 위로 rebase했다. 검증 SHA `90283729084b5a47dfe719c2a7638b978158a826`; branch `agent/codex/hardcoded-value-audit`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-hardcoded-value-audit`. 주 checkout은 Claude의 미커밋 변경이 있어 수정하지 않았다.
-- `tests` 221 / `tools` 66 / workflows 5개 파일을 후보 검색했다. ontology ownership query의 48행은 task registry의 outcome edge 수에서 유도하고 task별 edge를 비교하게 했다. Workspace-upgrade 3, Node Docker compatibility 4, remote-workspace 7의 evidence 검사는 count 대신 독립적인 정확한 case/mode 집합, 누락·추가·중복 검사가 되게 했다.
+- 시작 기준 local integration `938ea1b1d797e7c2ed4a81e9920cdab0cb9f620b`; 조사 중 integration이 `a451d69`, `a342f88`, `8da7791`, `7d75f81`로 전진해 매번 rebase했다. 최종 branch `agent/codex/hardcoded-value-audit`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-hardcoded-value-audit`. 감사 조사 당시 220 tests/66 tools/workflows 5개를 검색했고, helper 자체 시험 1개를 추가했다. 주 checkout의 타 agent 미커밋 변경은 수정하지 않았다.
+- ontology ownership query의 48행은 task registry의 outcome edge 수에서 유도하고 task별 edge를 비교하게 했다. Workspace-upgrade 3, Node Docker compatibility 4, remote-workspace 7의 evidence 검사는 count 대신 독립적인 정확한 case/mode 집합, 누락·추가·중복 검사가 되게 했다.
 - 고정 baseline(48 task/12 outcome), browser canonical journey, 11 run states, curated 역사적 migration priors, semantic query fixture cardinalities는 목적이 독립 수용 기준 또는 역사적 fixture라 고정 유지하고 바뀌는 시점을 기록했다. migration current head는 이미 Alembic graph에서 유도된다.
 - Final provenance-wrapped checks at `2ee96ecca1cf82b953bda6aec3c2ca77b81e937d` passed: focused evidence inventory 4 passed; `check_docs.py` 24 source hashes/668 docs; `check_ontology.py`; related checker `py_compile` all exit 0. Python was `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6 on Windows 11; executor Codex; clean worktree; KST 2026-09-21 23:49:28. At measurement the branch was 3 commits ahead of integration `7d75f81033c0601364c76e47cacb3de11bd96b13`. Obsidian sync receipt is in History. Hosted CI was not run; independent review remains pending. Detailed scope, triggers, and limits: [[2026-09-21_하드코딩_변경연동값_감사_Codex]].
-- 다음: latest audited commit을 integration에 fast-forward하고 same-SHA 독립 검토를 요청한다. 새 migration revision이 외부 upgrade prior로 지원되는 시점마다 curated prior matrix를 확인한다.
+- `05c250e23c674a5a6ca72f83aaa848962323934f`를 integration에 fast-forward push했고, 후속 fetch에서 local HEAD와 원격 tip의 exact SHA 일치를 확인했다. 같은 SHA에서 focused 4 passed, docs 668, ontology, py_compile, Obsidian 1461/0/0이다. hosted CI 실행과 별도 reviewer의 고정 SHA 검토는 아직 pending이며, 작업 완료로 처리하지 않는다.
+- 다음 첫 행동: 별도 reviewer가 integration SHA `05c250e23c674a5a6ca72f83aaa848962323934f`에서 후보 분류 및 변형 가드를 독립 검토한다. CI가 열리면 docs 및 관련 제품 workflow 실행. 새 migration revision이 외부 upgrade prior로 지원되는 시점마다 curated prior matrix를 확인한다.
 
 ## 2026-09-21 CI 검사 배선, issuer 쿼터 경계, Node 응답 계약
 

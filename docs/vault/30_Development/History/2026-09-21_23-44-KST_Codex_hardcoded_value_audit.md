@@ -4,7 +4,7 @@ title: "변경연동 하드코딩 감사 검증 및 인계"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T23:44:40+09:00"
+updated: "2026-09-21T23:52:38+09:00"
 source_of_truth: "Git"
 ---
 
@@ -32,3 +32,5 @@ Docker acceptance, PostgreSQL migration rehearsal, Go build/live acceptance, hos
 Obsidian provenance-wrapped sequence at the report-edit tree: initial `--check` exit 0 (1461 managed/4 pending/0 conflicts); `--apply` exit 0 (4 files exported, all 1461 destination hashes match); `--check` exit 0 (1461/0/0). A subsequent evidence-count correction produced 5 pending/0 conflicts; the approved apply was run and the final `--check` again reported 1461 managed/0 pending/0 conflicts. Main-checkout vault was the destination; unmanaged files untouched.
 
 After integration advanced from `8da7791` to `7d75f81` during push, the branch was rebased (no conflicts) and the entire listed check set was rerun clean at `2ee96ecca1cf82b953bda6aec3c2ca77b81e937d` (KST 23:49:28-29); all outcomes remained identical. This audit is author-verified only. Integration landing, independent review, hosted CI, and runtime acceptance remain separate states.
+
+The validated branch landed by fast-forward at integration SHA `05c250e23c674a5a6ca72f83aaa848962323934f`. After push, `git fetch` confirmed `HEAD == origin/integration/all-agents-unified` and a clean worktree. The final five provenance-wrapped checks were rerun on this SHA at KST 23:50:44: focused test 4 passed; docs 668 documents; ontology, py_compile, and Obsidian check (1461/0/0) all exit 0. Hosted CI and independent review remain pending.
