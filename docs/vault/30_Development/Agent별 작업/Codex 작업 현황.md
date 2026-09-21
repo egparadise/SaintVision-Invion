@@ -1,26 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.79"
+version: "1.0.80"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:03:00+09:00"
+updated: "2026-09-21T12:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
+2026-09-21 공용 sync state migration 완료: `default_state_path()`는 `git-common-dir` 사용. main/C:\vw 동일 state path, 기존 1370-entry state는 migration 전 1372/10/0 check 후 보존 이전, migration 직후 check도 동일. 이번 문서 갱신 후 check는 1373/11/0, exit 0이며 vault write는 없다. `tools/test_sync.py` 14 passed/5 subtests; `--git-path` 되돌림에서 신규 linked-worktree test 실패. UI-FB-01/02 component boundary는 승인; FB-03은 all-errors-to-artifact mutant가 기존 13 helper test에서 살아남아 Gemini component-level test 대기. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
+
 2026-09-21 sync explicit resolver(구현 당시 상태): `tools/sync_obsidian.py --apply --resolve-conflicts-from PATHS_FILE`은 UTF-8 경로 목록에 있는 **현재 충돌만** 저장소 바이트로 교체한다. 오래된/non-conflict 경로는 쓰기 전에 거부한다. 임시 저장소 시험 13 passed, stale guard 제거 mutation은 전용 시험을 실패시켰다. 당시 공유 vault 미적용 상태였고, 사용자 완료 실행은 아래에 따로 기록한다. 상세: [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]].
 
 2026-09-21 UI-FB-01 새 DOM 시험 계약: 사용자 변형 실측상 `84f26ca` 단일 fetch 시험은 `items.length > 0` 회귀를 잡지 못했다. Gemini 인계 요구는 후보 있음→두 번째 빈 응답, 후보 있음→두 번째 오류 응답, error 상태+후보 데이터 3개 DOM scenario와 각 해당 mutant failure다. `apps/web` 코드는 수정하지 않았고 독립 검토 pending. mock response shape/backend drift에는 OpenAPI/Pydantic 단일 계약 생성 및 consumer/provider 양쪽 검증을 제안했다. [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 
-2026-09-21 sync 사용자 실행: backup 뒤 14 explicit conflict paths 적용 exit 0, 당시 후속 check 1370/0/0. 549e697 구현은 venv 13 passed 및 stale membership guard mutation failure. 이후 이 checkout의 문서 변경 뒤 read-only check는 7 no-baseline/exit 1, 미적용이다. 이 7개는 사용자 검토·명시 경로가 확인되기 전에는 쓰지 않는다. 오늘 보고 정정/owner 분류: [[2026-09-21_하루정정대장과_감사잔여_Codex]].
+2026-09-21 sync 사용자 실행: backup 뒤 14 explicit conflict paths 적용 exit 0, 당시 C:\\vw 후속 check 1370/0/0. 뒤이어 주 checkout에서 관측한 7 no-baseline은 실제 vault 충돌이 아니라 worktree별 state 위치 결함이었다. 기존 1370-entry를 migration 전 1372/10/0으로 검증해 common-dir에 옮긴 뒤 동일 check를 확인했다. 최신 docs 편집 후 현재 check는 1373 managed/11 pending/0 conflicts, exit 0이며 `--apply`하지 않았다. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]] [[2026-09-21_하루정정대장과_감사잔여_Codex]].
 
 2026-09-21 response contract 설계 제안: `/v1/discovery/candidates`의 `dict` response와 frontend 수기 interface를 단일 contract로 잇는 것이 목표다. Pydantic `Strict` response schema→기존 `contracts/*.schema.json` export/check→generated TS/client fixture, DB 없는 FastAPI provider serialization test와 adapter fixture validation을 제안했다. route_coverage는 path coverage로 유지. 아직 구현·task owner 지정하지 않음.
 
 2026-09-21 sync EOL: LF/CRLF만 정규화하는 SHA 비교를 추가했다. 실제 바이트를 보존하고 683 fixture에서 667 EOL-only false conflict를 제거했으며 정규화 rollback 시험은 683 대 16 차이로 실패한다. 원격 `7404a6a`의 사용자 index 흡수 후 공유 vault `--check`는 14 no-baseline(Claude는 SAFE old residue 10 + whitespace 4 판정), 0 both-diverged다. Claude의 SAFE 근거는 Codex가 재실행하지 않았고 apply도 하지 않았다. 상세: [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
 
-2026-09-21 Obsidian state 및 SSR 감사: `sync_obsidian.py`는 `--adopt-identical` 해시를 conflict exit 전 metadata에 원자 저장하고 기본 state를 현재 worktree Git metadata에 둔다. `.venv\\Scripts\\python.exe -m pytest -q tools/test_sync.py` 초기 5 passed, 이후 EOL 회귀 추가 후 8 passed; 두 rollback 대조 모두 회귀 시험을 실패시켰다. `apps/web/tests`에 static SSR 사용 7파일/27호출을 목록화했다. 두 UI 상태 스위트의 “query/fetch” 이름은 state props 주입일 뿐 effect 실행이 아님을 기록했다. UI tests 코드는 수정하지 않음. 최신 근거는 이 문서와 상태 지도에 기록. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]].
+2026-09-21 Obsidian state 및 SSR 감사: `sync_obsidian.py`는 `--adopt-identical` 해시를 conflict exit 전 metadata에 원자 저장하고 기본 state를 현재 worktree Git metadata에 둔다. `.venv\\Scripts\\python.exe -m pytest -q tools/test_sync.py` 초기 5 passed, 이후 EOL 회귀 추가 후 8 passed; 두 rollback 대조 모두 회귀 시험을 실패시켰다. `apps/web/tests`에 static SSR 사용 7파일/27호출을 목록화했다. 두 UI 상태 스위트의 “query/fetch” 이름은 state props 주입일 뿐 effect 실행이 아님을 기록했다. UI tests 코드는 수정하지 않음. **정정:** 당시 state가 worktree별 `--git-path`에 있어 공유 vault 하나의 baseline으로는 부적절했다. 현재 기본은 common-dir이며 migration은 별도 이력 참조. [[2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex]] [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]].
 
 2026-09-21 UI-FB fixed-SHA 경계 재검토: Gemini 구현 `c6dc915`에 대해 Vitest 322 및 route coverage 28 통과를 확인하고 네 가지 FB-01 되돌림 대조를 수행했다. 유령 초기값 복원은 기존 idle 시험을 실패시켰지만 catch에서 목록 비우기 제거, 빈 응답 회귀 복원, error 상태 guard 제거는 26/26 통과했다. 이 공백과 FB-02 local eligible 문구, FB-03 Output Verified 표시, 오류 배너 접근성 및 실제 component fetch 분기 시험 부족을 finding으로 기록했다. 구현 owner Gemini; Codex 승인 대기. 상세 및 실행 범위: [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 

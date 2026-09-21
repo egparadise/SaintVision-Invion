@@ -29,13 +29,15 @@ class ConflictsDetected(Exception):
 
 
 def default_state_path(root=None):
-    """Keep export state in this worktree's Git metadata, outside cleanup dirs."""
+    """Keep one export baseline in shared Git metadata for the single vault."""
     root = Path(root or ROOT).resolve()
     result = subprocess.run(
-        ['git', 'rev-parse', '--git-path', 'obsidian-sync-state.json'],
+        ['git', 'rev-parse', '--git-common-dir'],
         cwd=root, check=True, capture_output=True, text=True)
-    path = Path(result.stdout.strip())
-    return path if path.is_absolute() else root / path
+    common_dir = Path(result.stdout.strip())
+    if not common_dir.is_absolute():
+        common_dir = root / common_dir
+    return common_dir.resolve() / 'obsidian-sync-state.json'
 
 
 def _write_state(state_path, state):
