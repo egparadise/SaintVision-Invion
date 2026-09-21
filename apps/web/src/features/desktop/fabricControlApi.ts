@@ -138,6 +138,7 @@ export interface DiscoveryCandidate {
   firstSeenAt?: string;
   lastSeenAt?: string;
   announceCount?: number;
+  stale?: boolean;
 }
 
 export interface AdmissionResponse {

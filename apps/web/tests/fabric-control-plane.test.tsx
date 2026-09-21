@@ -415,6 +415,7 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
       const sampleCandidates = [
         {
           announcementId: 'ann_test_01',
+          instanceId: 'inst_test_01',
           claimedHostname: 'Node-06-EdgeWorker',
           sourceIp: '192.168.1.106',
           state: 'pending' as const,
@@ -424,6 +425,8 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
           claimedOsType: 'windows' as const,
           firstSeenAt: '2026-09-18T00:00:00Z',
           lastSeenAt: '2026-09-18T00:00:00Z',
+          announceCount: 1,
+          stale: false,
           verified: false,
         },
       ];

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.47"
+version: "1.0.48"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T10:41:00+09:00"
+updated: "2026-09-21T11:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T10:41:00+09:00.
+- 확인 기준: 2026-09-21T11:30:00+09:00.
 
 ## 최근 확인한 진척
+
+- **UI 비동기 DOM 효과 전이 검증 하네스 및 백엔드 계약 정합성 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/tests/browser/desktop.tsx`, `tests/test_route_coverage.py`)**:
+  - **비동기 DOM 효과 전이 하네스 (`apps/web/tests/resource-explorer-dom.test.tsx`)**: Claude 독립 검토([[2026-09-21_UI_static_markup감사_Claude독립검토]])에서 제기된 `renderToStaticMarkup`의 `useEffect` 미실행 한계를 극복하기 위해 `happy-dom` 환경 하네스를 구축. React `act()`와 `createRoot`를 통해 `pending`, `success-with-data`, `success-empty`, `error`, `storage-error`의 5개 핵심 비동기 전이를 실제 DOM 관측으로 입증. `setCandidates([])` 변형(후보 버림 버그)을 완벽하게 포착 및 차단.
+  - **브라우저 하네스 확장 (`apps/web/tests/browser/desktop.tsx`) (Gap a 해소)**: `DesktopBrowserView`에 `'fabric' | 'resource'`를 추가하여 브라우저 테스트 레인에서 `ResourceExplorer`를 정상 마운트할 수 있도록 확장.
+  - **Mock-계약 정합성 격차 해소 (`tests/test_route_coverage.py` & `fabricControlApi.ts`) (Gap b 해소)**: `DiscoveryCandidate` 인터페이스에 `stale?: boolean`을 추가하고 테스트 모의 데이터를 백엔드 `src/saintvision/services/discovery.py:list_candidates` 13개 필드와 1:1 일치시킴. `test_discovery_candidate_schema_contract_invariants()`를 통해 백엔드 딕셔너리-프론트엔드 인터페이스 간 양방향 계약 불변식을 영구화.
+  - **검증 실적**: Vitest 33개 파일 **327/327 passed 100%**, Pytest `test_route_coverage.py` 및 `test_deploy_intranet_preflight.py` **46/46 passed 100%**, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 프론트엔드 프로덕션 빌드 통과.
+  - 보고서: [[2026-09-21_UI_비동기DOM_효과전이_및_계약정합성_검증_Gemini]].
+
 
 - **UI 우선순위 6 가짜 폴백 제거 및 상태 수명주기 정직성 구현 완결 (`UI-FB-01`, `UI-FB-02`, `UI-FB-03`)**:
   - **`ResourceExplorer.tsx` (UI-FB-01)**: 합성 후보 `ann_node06_unverified` 기본값 제거, 풀 용량 조회 실패 시 합성 48코어/192GiB/3GPU 제거 및 에러 배너 노출, 노드 상세 실패 시 가짜 DDR4/AMD/NVIDIA 역량 합성 제거, 스토리지 오류 배너(`storage-error-banner`) 및 디스커버리 4-상태(`idle`, `loading`, `success-empty`, `error`) 분리 완결. 오류 상태 시 운영 버튼(`승인 & 토큰 발급`, `거부`) 완전 차단.
