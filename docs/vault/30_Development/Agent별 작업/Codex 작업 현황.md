@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.90"
+version: "1.0.91"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T14:05:43+09:00"
+updated: "2026-09-21T14:14:13+09:00"
 source_of_truth: "Git"
 ---
 
@@ -656,3 +656,11 @@ Reviewed today's 20 changed paths exhaustively (15 detailed audit/evidence recor
 ## 2026-09-19 test_recovery_drill fixture boundary
 
 AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CONTAINER caused the DSN host 127.0.0.1 to be incorrectly used as a Docker name; a separate run found our disposable codex-db-test container but the old label allowlist rejected it. tests/recovery_drill_prerequisites.py now skips missing/unreachable prerequisites with distinct reasons, accepts only explicit recognized owned-test labels, and fails for present but unowned containers. Venv offline fixture tests: 11 passed; integration file collection: 19 tests (18 use this fixture, 1 cleanup helper test does not). Full PostgreSQL test-body run remains pending while Claude's current regression is active. Next: after it ends, compare its baseline JUnit with the old 18-case result, then execute post-fix recovery cases only against a newly verified disposable container, recording command, interpreter, KST time and JUnit results.
+
+## Integration tip verification audit
+
+- Direct audit SHA: `cb505f6697beffe78a1cbdaee027f415003c55d3`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`.
+- Docs, ontology, schema export, contract check after `npm ci`, sync check, Vitest and Python suite passed. Python: 1338 passed / 1315 skipped / 2 deselected / 0 failed; skips are chiefly absent PostgreSQL DSN, opt-in browser lanes, Linux-only paths, and explicit local image/tool prerequisites.
+- `route_coverage.py` CLI returned 1 for the known static `/v1/workspaces` configuration-string false positive; its regression tests passed 28. This is not live API acceptance. Obsidian check is read-only and reports 1 pending export.
+- Exact commands, exit codes, runtime identity, scope and evidence: [[2026-09-21_integration-tip-verification_Codex]].
+- Reporting rule: attach full SHA, branch, checkout path, exact command/cwd, runtime, KST start/end, direct exit, counts/reasons, artifact, and executor/reviewer identity to every verification claim.
