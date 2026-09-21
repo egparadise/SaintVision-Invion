@@ -1,12 +1,12 @@
 ---
 doc_id: "CODEX-RESPONSE-FRESHNESS-ASOF-001"
 title: "Run, shard, artifact, and log truth-time audit and contract update"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "pending"
 base_sha: "94fbf7e8fc6d35e87731ec4d52e6509fccaf6f1a"
-updated: "2026-09-22T01:14:26+09:00"
+updated: "2026-09-22T01:18:02+09:00"
 source_of_truth: "Git"
 tags: ["freshness", "timestamps", "contracts", "postgresql"]
 ---
@@ -39,6 +39,7 @@ The initial PG checks ran on the dirty author worktree based on `afe8b71ee9c9ecd
 - At 2026-09-22 01:03 KST (dirty worktree, base `94fbf7e8`): `tools/export_schemas.py --check` exit 0 (46 schemas); `tools/check_response_freshness.py` exit 0 (9/9 curated checks); `tests/test_response_freshness.py` 2 passed; `tools/check_contract_bindings.py` exit 0 (35 fixtures, 11 response anchors). Schema descriptions were regenerated from the canonical schema and exporter check passed again.
 - After fast-forwarding `bbfb42b6` and `4fbe9991`, `sync_obsidian.py --check` at 2026-09-22 01:10:54 found 3 pending exports and 0 conflicts. `--apply` at 01:11:37 exported exactly 3 files and matched 1483 destination hashes. The post-apply check at 01:11:47 reported 1483 managed files, 0 pending exports, 0 conflicts, exit 0.
 - Final committed-source confirmation: after commit/push `f1d95466ac6b46fad4f110f94ca9fb0bf5354414`, the worktree was clean and matched `origin/integration/all-agents-unified`. At 01:13:54 KST, with the project's absolute Python interpreter and a fresh owned PostgreSQL 16 container (`sv-codex-response-freshness-f1d95466`, labels `ai.saintvision.owner=codex`, `ai.saintvision.task=response-freshness-f1d95466`), the same three selected integration tests ran: exit 0, 4 passed, 0 skipped, 7 warnings. This re-proved `appliedToKernel=true` and `false`, DB persistence of the kernel offer, shard `stateAsOf`, Run `stateUpdatedAt`, and null artifact/log completion time when there is no result. `docker rm --force --volumes` was followed by container-list absence confirmation. No other Docker resource was targeted.
+- Follow-up isolating the questioned success branch: on exact clean/in-sync integration SHA `2158f03011da99037fce92a31c4567ebea5f6da0`, at 01:18:02 KST, ran `.venv/Scripts/python.exe -m pytest 'tests/integration/test_write_response_contract_real_pg.py::test_resource_offer_write_response_matches_real_postgres_state[True]' -q` through `tools/provenance.py`. The disposable PostgreSQL 16 fixture reached the real PUT route: HTTP returned `appliedToKernel=true`, the expected kernel resource ID/capacity, no refusal reason, and the test read back `inv.resources.offered=8000`. Exit 0, 1 passed, 0 skipped, 5 warnings. Container `sv-codex-applied-true-confirm-20260922` with the Codex task label was removed; a container-list query by its full ID confirmed absence. This is author-side execution, not independent review.
 - On the clean committed SHA `f1d95466`, at 01:14:26 KST with `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6 and Node 24.17.0, provenance-wrapped checks all exited 0: focused core 18 passed; schema export 46; freshness 9/9; binding 35 fixtures/11 anchors; docs 686 documents/48 tasks/12 outcomes; ontology; full Vitest 607/607, 0 failed/0 pending; Vite build; web contract check 16/16; Obsidian 1483 managed/0 pending/0 conflicts. `git status --porcelain` was empty at invocation. This confirms the prior dirty-tree results on the pushed SHA.
 - The result-output positive-completion HTTP test lives in the Linux-only Workspace execution lane. This Windows host did not run that lane. The persisted source field and nullable behavior are source-confirmed, while a non-null `completedAt` from an end-to-end executed process was not newly measured here. The fixture/schema and core conformance are checked; do not upgrade that to a live process result.
 - Provenance environment: worktree `C:/Project/SaintVision-Invion/.worktrees/codex-response-freshness`, branch `agent/codex/response-freshness`, Windows 11, executor Codex, interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node `v24.17.0`. PG commands had `postgres_dsn=set`; static/core commands had it absent. Go compiler was absent, so no Go compile is claimed. No browser or live production HTTP acceptance was run.
