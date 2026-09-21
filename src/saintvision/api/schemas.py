@@ -178,22 +178,22 @@ class DataLocationPageResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+WorkspaceStatusName = Literal[
+    "provisioning", "ready", "suspended", "deleting", "deleted"
+]
+
+
 class WorkspaceSummaryResponse(Strict):
     workspace_id: str = Field(alias="workspaceId")
     project_id: str = Field(alias="projectId")
     name: str
-    status: str
+    status: WorkspaceStatusName
     node_id: str | None = Field(alias="nodeId")
     tool_name: str | None = Field(alias="toolName")
     created_at: dt.datetime = Field(alias="createdAt")
-    allowed_next: list[str] = Field(alias="allowedNext")
+    allowed_next: list[WorkspaceStatusName] = Field(alias="allowedNext")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-
-WorkspaceStatusName = Literal[
-    "provisioning", "ready", "suspended", "deleting", "deleted"
-]
 
 
 class WorkspaceStatusResponse(Strict):

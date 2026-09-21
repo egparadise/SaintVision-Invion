@@ -4,6 +4,13 @@
   "properties": {
     "allowedNext": {
       "items": {
+        "enum": [
+          "provisioning",
+          "ready",
+          "suspended",
+          "deleting",
+          "deleted"
+        ],
         "type": "string"
       },
       "title": "Allowednext",
@@ -34,6 +41,13 @@
       "type": "string"
     },
     "status": {
+      "enum": [
+        "provisioning",
+        "ready",
+        "suspended",
+        "deleting",
+        "deleted"
+      ],
       "title": "Status",
       "type": "string"
     },

@@ -2,12 +2,12 @@
 
 export type Count = number;
 export type Projectid = string;
-export type Allowednext = string[];
+export type Allowednext = ('provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted')[];
 export type Createdat = string;
 export type Name = string;
 export type Nodeid = string | null;
 export type Projectid1 = string;
-export type Status = string;
+export type Status = 'provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted';
 export type Toolname = string | null;
 export type Workspaceid = string;
 export type Workspaces = WorkspaceSummaryResponse[];

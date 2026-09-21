@@ -1,11 +1,11 @@
 /* Generated from contracts/workspace-summary-response.schema.json. Do not edit by hand. */
 
-export type Allowednext = string[];
+export type Allowednext = ('provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted')[];
 export type Createdat = string;
 export type Name = string;
 export type Nodeid = string | null;
 export type Projectid = string;
-export type Status = string;
+export type Status = 'provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted';
 export type Toolname = string | null;
 export type Workspaceid = string;
 
