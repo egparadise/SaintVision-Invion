@@ -27,10 +27,27 @@ import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
 import { apiClient, clearAuthToken } from '@/shared/api/client';
 import type { NodePageResponse } from '@/contracts/node-page-response';
-import { fetchProjects } from '@/shared/api/projectObservation';
+import type { WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
+import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@/shared/api/projectObservation';
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
+
+function toWorkspaceItem(w: WorkspaceSummaryResponse): WorkspaceItem {
+  return {
+    id: w.workspaceId,
+    projectId: w.projectId,
+    name: w.name,
+    targetNodeId: w.nodeId ?? null,
+    isolationMode: 'process_sandbox',
+    allowedPaths: ['./workspace'],
+    prohibitedPaths: ['/etc', 'C:\\Windows', '..'],
+    cpuLimitCores: 4,
+    memoryLimitBytes: 8 * 1024 ** 3,
+    status: w.status,
+    createdAt: w.createdAt,
+  };
+}
 
 export const App: React.FC = () => {
   const [desktop, setDesktop] = useState(false);
@@ -48,9 +65,14 @@ export const App: React.FC = () => {
   const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
   const [runError, setRunError] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
+  const [nodeError, setNodeError] = useState<string | null>(null);
+  const [nodesState, setNodesState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
+  const [workspacesState, setWorkspacesState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const activeProject = useRef('');
   const runRequest = useRef(0);
   const approvalRequest = useRef(0);
+  const workspaceRequest = useRef(0);
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
 
@@ -62,7 +84,7 @@ export const App: React.FC = () => {
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
     activeProject.current = id;
-    setRunError(null); setApprovalError(null);
+    setRunError(null); setApprovalError(null); setWorkspaceError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -91,13 +113,26 @@ export const App: React.FC = () => {
   };
 
   const fetchNodes = React.useCallback(async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setNodesState('idle');
+      return;
+    }
     const scope = scopeRef.current;
+    setNodesState('loading');
+    setNodeError(null);
     try {
       const page = await apiClient<NodePageResponse>('/v1/nodes');
-      if (scopeRef.current === scope) setNodes(page.items.map(observedNode));
-    } catch {
-      if (scopeRef.current === scope) setNodes([]);
+      if (scopeRef.current === scope) {
+        setNodes(page.items.map(observedNode));
+        setNodesState('success');
+        setNodeError(null);
+      }
+    } catch (err: any) {
+      if (scopeRef.current === scope) {
+        setNodes([]);
+        setNodesState('error');
+        setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
+      }
     }
   }, [currentUser]);
 
@@ -125,6 +160,31 @@ export const App: React.FC = () => {
     }
   }, [currentUser, projectId]);
 
+  const fetchWorkspaces = React.useCallback(async () => {
+    if (!currentUser || !projectId || activeProject.current !== projectId) {
+      setWorkspacesState('idle');
+      return;
+    }
+    const scope = scopeRef.current;
+    const request = ++workspaceRequest.current;
+    setWorkspacesState('loading');
+    setWorkspaceError(null);
+    try {
+      const items = await fetchProjectWorkspaces(projectId);
+      if (scopeRef.current === scope && request === workspaceRequest.current) {
+        setWorkspaces(items.map(toWorkspaceItem));
+        setWorkspacesState('success');
+        setWorkspaceError(null);
+      }
+    } catch (err: any) {
+      if (scopeRef.current === scope && request === workspaceRequest.current) {
+        setWorkspaces([]);
+        setWorkspacesState('error');
+        setWorkspaceError(err?.message || 'Workspace 목록을 확인하지 못했습니다.');
+      }
+    }
+  }, [currentUser, projectId]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -134,7 +194,8 @@ export const App: React.FC = () => {
     fetchNodes();
     fetchRuns();
     fetchApprovals();
-  }, [fetchNodes, fetchRuns, fetchApprovals]);
+    fetchWorkspaces();
+  }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
 
   // Periodic Telemetry Sync (Genuine Server Polling, Zero Synthetic Fluctuations)
   useEffect(() => {
@@ -142,9 +203,10 @@ export const App: React.FC = () => {
       fetchNodes();
       fetchRuns();
       fetchApprovals();
+      fetchWorkspaces();
     }, 5000);
     return () => clearInterval(interval);
-  }, [fetchNodes, fetchRuns, fetchApprovals]);
+  }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -236,6 +298,8 @@ export const App: React.FC = () => {
           <option value="">프로젝트 선택</option>
           {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
         </select>{projectError && <span role="alert">{projectError}</span>}</label>}
+        {nodeError && <p role="alert" data-testid="app-node-error">{nodeError}</p>}
+        {workspaceError && <p role="alert" data-testid="app-workspace-error">{workspaceError}</p>}
         {runError && <p role="alert">{runError}</p>}
         {approvalError && <p role="alert">{approvalError}</p>}
         {/* Tab 1: Dashboard */}
@@ -332,7 +396,7 @@ export const App: React.FC = () => {
 
                 <NodeList
                   nodes={nodeSimState === 'normal' ? nodes : []}
-                  isLoading={nodeSimState === 'loading'}
+                  isLoading={nodeSimState === 'loading' || nodesState === 'loading'}
                   isForbidden={nodeSimState === 'forbidden'}
                   error={
                     nodeSimState === 'error'
@@ -348,9 +412,25 @@ export const App: React.FC = () => {
                           causeRef: null,
                           evidenceId: null,
                         }
+                      : nodeError
+                      ? {
+                          type: 'about:blank',
+                          title: '노드 레지스트리 조회 실패',
+                          status: 500,
+                          detail: nodeError,
+                          code: 'RES-0001',
+                          category: 'RES',
+                          retryable: true,
+                          traceId: 'err-fetch-nodes',
+                          causeRef: null,
+                          evidenceId: null,
+                        }
                       : null
                   }
-                  onRefresh={() => setNodeSimState('normal')}
+                  onRefresh={() => {
+                    setNodeSimState('normal');
+                    fetchNodes();
+                  }}
                   onSelectNode={(id) => setSelectedNodeId(id)}
                   onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
                 />
@@ -363,6 +443,9 @@ export const App: React.FC = () => {
         {activeTab === 'fabric' && (
           <ResourceExplorer
             nodes={nodes}
+            nodesState={nodesState}
+            nodesError={nodeError}
+            onRetryNodes={fetchNodes}
             tenantId={currentUser?.tenantId}
             onSelectNode={(id) => {
               setSelectedNodeId(id);
@@ -377,6 +460,23 @@ export const App: React.FC = () => {
         {/* Tab 2.5: Workspaces (S03-FE) */}
         {activeTab === 'workspaces' && (
           <div>
+            {workspaceError && (
+              <div
+                role="alert"
+                data-testid="workspace-error-banner"
+                style={{
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid #ef4444',
+                  borderRadius: 'var(--radius-md)',
+                  color: '#fca5a5',
+                  fontSize: '0.875rem',
+                  marginBottom: '16px',
+                }}
+              >
+                ⚠️ {workspaceError}
+              </div>
+            )}
             {selectedWorkspaceId && executionResult ? (
               <ExecutionResultView
                 result={executionResult}
@@ -390,6 +490,7 @@ export const App: React.FC = () => {
               <WorkspaceList
                 workspaces={workspaces}
                 nodes={nodes}
+                isLoading={workspacesState === 'loading'}
                 onCreateWorkspace={() => setIsCreateModalOpen(true)}
                 onSelectWorkspace={(wspId) => setSelectedWorkspaceId(wspId)}
                 onOpenStudio={(wspId) => handleOpenStudio({ step: 1, workspaceId: wspId })}
@@ -398,16 +499,17 @@ export const App: React.FC = () => {
 
             <WorkspaceCreateModal
               projectId={projectId}
-              availableNodes={nodes}
               isOpen={isCreateModalOpen}
               onClose={() => setIsCreateModalOpen(false)}
               onCreate={async (newWsp) => {
-                const created: WorkspaceItem = {
-                  ...newWsp,
-                  id: `wsp_${Date.now().toString(36)}`,
-                  createdAt: new Date().toISOString(),
-                };
-                setWorkspaces((prev) => [created, ...prev]);
+                try {
+                  const created = await createProjectWorkspace(projectId, newWsp.name);
+                  await fetchWorkspaces();
+                  setSelectedWorkspaceId(created.workspaceId);
+                } catch (err: any) {
+                  setWorkspaceError(err?.message || 'Workspace 생성 실패');
+                  throw err;
+                }
               }}
             />
           </div>

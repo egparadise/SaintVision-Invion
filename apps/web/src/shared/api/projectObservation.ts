@@ -27,3 +27,18 @@ export async function fetchProjectWorkspaces(projectId: string): Promise<Project
   }
   return page.workspaces;
 }
+
+export async function createProjectWorkspace(projectId: string, name: string): Promise<WorkspaceSummaryResponse> {
+  const body = await apiClient<WorkspaceSummaryResponse>(
+    `/v1/projects/${encodeURIComponent(projectId)}/workspaces`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }
+  );
+  if (!body.workspaceId || body.projectId !== projectId || body.name !== name) {
+    throw new Error('Workspace 생성 응답 불일치');
+  }
+  return body;
+}
+

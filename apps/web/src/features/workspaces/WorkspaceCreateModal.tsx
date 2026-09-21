@@ -1,80 +1,45 @@
 import React, { useState } from 'react';
-import { NodeItem, WorkspaceItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 
 export interface WorkspaceCreateModalProps {
   projectId: string;
-  availableNodes: NodeItem[];
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (workspace: Omit<WorkspaceItem, 'id' | 'createdAt'>) => Promise<void>;
+  onCreate: (workspace: { name: string }) => Promise<void>;
 }
 
 export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
   projectId,
-  availableNodes,
   isOpen,
   onClose,
   onCreate,
 }) => {
   const [name, setName] = useState('');
-  const [targetNodeId, setTargetNodeId] = useState(availableNodes[0]?.id || '');
-  const [isolationMode, setIsolationMode] = useState<'process_sandbox' | 'container_isolated'>('process_sandbox');
-  const [allowedPaths, setAllowedPaths] = useState('./workspace, ./data');
-  const [cpuLimit, setCpuLimit] = useState(4);
-  const [ramLimitGb, setRamLimitGb] = useState(8);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const validatePaths = (pathsStr: string): string | null => {
-    const paths = pathsStr.split(',').map((p) => p.trim());
-    for (const p of paths) {
-      if (p.includes('..')) {
-        return '상위 디렉터리 탐색(Path Traversal "..")은 보안 정책(ADR-005)에 의해 엄격히 금지됩니다.';
-      }
-      if (p === '/' || p === '\\' || /^[a-zA-Z]:\\?$/.test(p)) {
-        return '루트 파일시스템 전체 경로는 작업공간으로 지정할 수 없습니다.';
-      }
-    }
-    return null;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim()) {
-      setError('작업공간 이름을 입력하십시오.');
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2) {
+      setError('작업공간 명칭은 최소 2자 이상이어야 합니다 (백엔드 스키마 제약: 2–128자).');
       return;
     }
-
-    const pathError = validatePaths(allowedPaths);
-    if (pathError) {
-      setError(pathError);
-      return;
-    }
-
-    const selectedNode = availableNodes.find((n) => n.id === targetNodeId);
-    if (selectedNode && cpuLimit > selectedNode.cpuCores) {
-      setError(`요청 CPU 코어(${cpuLimit})가 대상 노드 가용 코어(${selectedNode.cpuCores})를 초과합니다.`);
+    if (trimmedName.length > 128) {
+      setError('작업공간 명칭은 최대 128자 이하여야 합니다.');
       return;
     }
 
     setIsSubmitting(true);
     try {
       await onCreate({
-        projectId,
-        name: name.trim(),
-        targetNodeId,
-        isolationMode,
-        allowedPaths: allowedPaths.split(',').map((p) => p.trim()),
-        prohibitedPaths: ['/etc', 'C:\\Windows', '..', '/var/run', 'C:\\Program Files'],
-        cpuLimitCores: cpuLimit,
-        memoryLimitBytes: ramLimitGb * 1024 ** 3,
-        status: 'active',
+        name: trimmedName,
       });
+      setName('');
       onClose();
     } catch (err: any) {
       setError(err.message || '작업공간 생성에 실패했습니다.');
@@ -109,15 +74,16 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
           boxShadow: 'var(--shadow-md)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>격리 Workspace 생성 (S03-FE)</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>작업공간 생성 (Workspace Provisioning)</h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-              프로젝트: <code>{projectId}</code> · 물리 노드 샌드박스 할당
+              프로젝트: <code>{projectId}</code> · 백엔드 초기 레코드 등록
             </p>
           </div>
           <button
             onClick={onClose}
+            aria-label="닫기"
             style={{
               background: 'none',
               border: 'none',
@@ -128,6 +94,32 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
           >
             ✕
           </button>
+        </div>
+
+        {/* 정직한 단계 안내 배너: 생성은 provisioning 레코드 등록이며, 노드/자원/체크아웃은 별도 커널 prepare 단계임 */}
+        <div
+          role="status"
+          data-testid="workspace-create-phase-notice"
+          style={{
+            padding: '12px 14px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.8125rem',
+            lineHeight: '1.5',
+            color: 'var(--color-text-secondary)',
+            marginBottom: '16px',
+          }}
+        >
+          <div style={{ fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+            📌 생성 단계 안내 (Phase Notice)
+          </div>
+          <div>
+            작업공간 생성(POST /v1/projects/.../workspaces)은 <strong>프로비저닝(provisioning)</strong> 초기 레코드만 등록합니다.
+          </div>
+          <div style={{ marginTop: '4px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            * 물리 노드 배치, CPU/RAM 자원 할당, 실행 도구 바인딩 및 파일 체크아웃은 생성 스키마에 포함되지 않으며, 생성 완료 후 <strong>실행(Run) 준비(prepare) 커널 단계</strong>에서 수행됩니다.
+          </div>
         </div>
 
         {error && (
@@ -149,127 +141,22 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
-              Workspace 명칭
+            <label
+              htmlFor="wsp-name-input"
+              style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}
+            >
+              Workspace 명칭 (필수)
             </label>
             <input
+              id="wsp-name-input"
+              data-testid="workspace-name-input"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: wsp-pacs-core-sandbox"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-strong)',
-                backgroundColor: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '0.875rem',
-              }}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
-              대상 물리 노드 선택 (Windows 3대 / Linux 2대)
-            </label>
-            <select
-              value={targetNodeId}
-              onChange={(e) => setTargetNodeId(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border-strong)',
-                backgroundColor: 'var(--color-bg-subtle)',
-                color: 'var(--color-text-primary)',
-                fontSize: '0.875rem',
-              }}
-            >
-              {availableNodes.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.hostname} ({n.os.toUpperCase()}, {n.cpuCores} Cores, {(n.memoryTotalBytes / 1024 ** 3).toFixed(0)} GB
-                  {n.gpuCount > 0 ? `, ${n.gpuName}` : ''})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
-                격리 모드 (Isolation)
-              </label>
-              <select
-                value={isolationMode}
-                onChange={(e) => setIsolationMode(e.target.value as any)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--color-border-strong)',
-                  backgroundColor: 'var(--color-bg-subtle)',
-                  color: 'var(--color-text-primary)',
-                  fontSize: '0.875rem',
-                }}
-              >
-                <option value="process_sandbox">프로세스 샌드박스 (기본)</option>
-                <option value="container_isolated">컨테이너 완전 격리</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
-                CPU / RAM 할당 한도
-              </label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  type="number"
-                  min={1}
-                  max={32}
-                  value={cpuLimit}
-                  onChange={(e) => setCpuLimit(Number(e.target.value))}
-                  title="CPU 코어 수"
-                  style={{
-                    width: '50%',
-                    padding: '8px 8px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--color-border-strong)',
-                    backgroundColor: 'var(--color-bg-subtle)',
-                    color: 'var(--color-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                />
-                <input
-                  type="number"
-                  min={1}
-                  max={128}
-                  value={ramLimitGb}
-                  onChange={(e) => setRamLimitGb(Number(e.target.value))}
-                  title="RAM GiB"
-                  style={{
-                    width: '50%',
-                    padding: '8px 8px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--color-border-strong)',
-                    backgroundColor: 'var(--color-bg-subtle)',
-                    color: 'var(--color-text-primary)',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
-              허용 작업 경로 (Allowed Paths, 쉼표 구분)
-            </label>
-            <input
-              type="text"
-              value={allowedPaths}
-              onChange={(e) => setAllowedPaths(e.target.value)}
-              placeholder="./src, ./data, ./output"
+              minLength={2}
+              maxLength={128}
+              required
               style={{
                 width: '100%',
                 padding: '8px 12px',
@@ -281,16 +168,16 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
               }}
             />
             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px', display: 'block' }}>
-              * 금지 경로: 시스템 디렉터리(`C:\Windows`, `/etc`), 상위 탐색(`..`)은 자동 차단됩니다.
+              * 2–128자의 고유한 작업공간 식별 명칭을 입력하십시오.
             </span>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
             <Button variant="secondary" size="md" type="button" onClick={onClose} disabled={isSubmitting}>
               취소
             </Button>
-            <Button variant="primary" size="md" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? '생성 중...' : 'Workspace 생성'}
+            <Button variant="primary" size="md" type="submit" disabled={isSubmitting} data-testid="workspace-submit-btn">
+              {isSubmitting ? '생성 중...' : 'Workspace 생성 (Provisioning)'}
             </Button>
           </div>
         </form>
@@ -298,3 +185,4 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
     </div>
   );
 };
+

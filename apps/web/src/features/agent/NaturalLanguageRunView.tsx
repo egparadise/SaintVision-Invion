@@ -75,13 +75,36 @@ export const NaturalLanguageRunView: React.FC = () => {
     if (!activeRequest) return;
     setActiveRequest({ ...activeRequest, status: 'completed' });
     setActionNotice({
-      type: 'success',
-      text: `🎉 코드 Diff가 성공적으로 승인 및 적용되었습니다!`,
+      type: 'info',
+      text: `ℹ️ 코드 Diff 모의 적용 완료: 백엔드 코드 패치 API가 미노출 상태이므로 실제 작업공간 파일시스템에는 기록되지 않았습니다.`,
     });
   };
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* AC-09 Agent API Unexposed Governance Notice */}
+      <div
+        data-testid="agent-unexposed-notice"
+        role="status"
+        aria-live="polite"
+        style={{
+          padding: '16px 20px',
+          backgroundColor: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: '8px',
+          color: '#cbd5e1',
+        }}
+      >
+        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#93c5fd', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>ℹ️</span>
+          <span>자연어 에이전트 실행 및 골든 평가 제어기 (API 미노출)</span>
+        </div>
+        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px', lineHeight: '1.5' }}>
+          현재 SaintVision 백엔드에는 자연어 에이전트 자율 실행 및 코드 diff 자동 패치 엔드포인트(<code>/v1/agent/*</code>)가 배선되어 있지 않습니다.
+          아래 표시된 유효율 및 코딩 성공률은 백엔드 실측 관측치가 아닌 AC-09 클라이언트 테스트 픽스처 모의 수치이며, 실제 백엔드 에이전트 계약 수립 전까지는 클라이언트 측 보안 규칙(AC-09 프롬프트 유출 사전 차단 등) 검증 및 사전 모의 용도로만 제한 동작합니다.
+        </div>
+      </div>
+
       {/* AC-09 Golden Eval Top KPIs Banner */}
       <div
         style={{
@@ -91,19 +114,19 @@ export const NaturalLanguageRunView: React.FC = () => {
         }}
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Prompt 100건 유효율 (AC-09)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Prompt 100건 유효율 (AC-09 픽스처)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
             {goldenMetric.promptValidityRate.toFixed(1)}% ({goldenMetric.promptValid}/{goldenMetric.promptTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (달성)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥99% (로컬 시뮬레이션)</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>코딩 과제 30건 성공률 (AC-09)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>코딩 과제 30건 성공률 (AC-09 픽스처)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
             {goldenMetric.codingSuccessRate.toFixed(1)}% ({goldenMetric.codingTasksPassed}/{goldenMetric.codingTasksTotal})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (달성)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>목표: ≥70% (로컬 시뮬레이션)</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -111,15 +134,15 @@ export const NaturalLanguageRunView: React.FC = () => {
           <div style={{ fontSize: '24px', fontWeight: 700, color: goldenMetric.secretLeaksDetected === 0 ? '#3fb950' : '#f85149', marginTop: '4px' }}>
             {goldenMetric.secretLeaksDetected} 건 ({goldenMetric.secretLeaksDetected === 0 ? '완전 차단' : '누출 감지'})
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-09 Zero Leakage 기준</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>AC-09 Zero Leakage 로컬 규칙</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>테넌트 잔여 예산 쿼터</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>테넌트 잔여 예산 쿼터 (로컬 가상값)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
             {currentBudget.toLocaleString()} KRW
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>작업 요청 시 실시간 차감</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>작업 요청 시 실시간 차감 (모의)</div>
         </div>
       </div>
 

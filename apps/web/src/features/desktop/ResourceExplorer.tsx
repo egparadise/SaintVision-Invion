@@ -33,6 +33,9 @@ import type { StorageObservationView } from '@/contracts/types';
 
 export interface ResourceExplorerProps {
   nodes: NodeItem[];
+  nodesState?: 'idle' | 'loading' | 'success' | 'error';
+  nodesError?: string | null;
+  onRetryNodes?: () => void;
   tenantId?: string;
   projectId?: string;
   runId?: string;
@@ -52,6 +55,9 @@ export interface ResourceExplorerProps {
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   nodes,
+  nodesState = 'success',
+  nodesError = null,
+  onRetryNodes,
   tenantId,
   projectId,
   runId,
@@ -781,7 +787,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 vCPU 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalCores > 0 ? (
+                {nodesError ? (
+                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                ) : logicalSummary.totalCores > 0 ? (
                   <>{logicalSummary.totalCores} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>Cores</span></>
                 ) : (
                   '용량 미확인'
@@ -798,7 +806,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 통합 RAM 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalMemoryBytes > 0 ? formatBytes(logicalSummary.totalMemoryBytes) : '용량 미확인'}
+                {nodesError ? (
+                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                ) : logicalSummary.totalMemoryBytes > 0 ? (
+                  formatBytes(logicalSummary.totalMemoryBytes)
+                ) : (
+                  '용량 미확인'
+                )}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
                 스케줄 가용: <strong>{formatBytes(logicalSummary.allocatableMemoryBytes)}</strong> · 점유: <span data-testid="logical-ram-used">{logicalSummary.usedMemoryBytes !== null ? formatBytes(logicalSummary.usedMemoryBytes) : '미제공 (API 미노출)'}</span>
@@ -811,7 +825,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 가속기 풀 (GPU)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalGpuCount > 0 ? (
+                {nodesError ? (
+                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                ) : logicalSummary.totalGpuCount > 0 ? (
                   <>{logicalSummary.totalGpuCount} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>장 (독립)</span></>
                 ) : (
                   '없음 (0장)'
@@ -828,7 +844,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>분산 패브릭 스토리지 (inv://)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalStorageBytes > 0 ? formatBytes(logicalSummary.totalStorageBytes) : '용량 미확인'}
+                {nodesError ? (
+                  <span style={{ fontSize: '1.125rem', color: '#f87171' }}>조회 실패</span>
+                ) : logicalSummary.totalStorageBytes > 0 ? (
+                  formatBytes(logicalSummary.totalStorageBytes)
+                ) : (
+                  '용량 미확인'
+                )}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
                 점유: <span data-testid="logical-storage-used">{logicalSummary.usedStorageBytes !== null ? formatBytes(logicalSummary.usedStorageBytes) : '미제공 (API 미노출)'}</span>
@@ -877,148 +899,247 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
-              {filteredNodes.map((node) => {
-                const isSelected = selectedNodeId === node.id;
-                return (
-                  <div
-                    key={node.id}
-                    data-testid={`node-card-${node.id}`}
-                    onClick={() => {
-                      setSelectedNodeId(node.id);
-                      onSelectNode?.(node.id);
-                    }}
+            {nodesError && (
+              <div
+                role="alert"
+                data-testid="nodes-fetch-error-banner"
+                style={{
+                  padding: '16px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid #ef4444',
+                  borderRadius: '8px',
+                  color: '#fca5a5',
+                  marginBottom: '16px',
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>
+                  ⚠️ 물리 노드 레지스트리(GET /v1/nodes) 통신 오류
+                </div>
+                <div style={{ fontSize: '0.75rem', marginTop: '4px' }}>
+                  {nodesError}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '4px' }}>
+                  ⚠️ 주의: 노드 목록이 비어 있는 것은 클러스터 노드가 제거된 것이 아니라, 제어 평면 API 조회가 실패한 것입니다. 섣부른 노드 재등록이나 장애 조치를 수행하지 마십시오.
+                </div>
+                {onRetryNodes && (
+                  <button
+                    type="button"
+                    data-testid="nodes-retry-btn"
+                    onClick={onRetryNodes}
                     style={{
-                      padding: '14px',
-                      backgroundColor: isSelected ? '#1e293b' : '#0f172a',
-                      borderRadius: '8px',
-                      border: isSelected ? '1.5px solid #3b82f6' : '1px solid #334155',
+                      marginTop: '10px',
+                      padding: '6px 12px',
+                      fontSize: '0.75rem',
+                      backgroundColor: '#334155',
+                      color: '#f8fafc',
+                      border: '1px solid #475569',
+                      borderRadius: '4px',
                       cursor: 'pointer',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
-                        <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
-                          {node.id} {node.ipAddress ? `· ${node.ipAddress}` : ''}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                        {node.observationOnly && (
-                          <span
-                            data-testid={`observe-only-badge-${node.id}`}
-                            style={{
-                              fontSize: '0.6875rem',
-                              fontWeight: 600,
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              backgroundColor: 'rgba(234, 179, 8, 0.2)',
-                              color: '#fbbf24',
-                              border: '1px solid rgba(234, 179, 8, 0.4)',
-                            }}
-                          >
-                            관측 전용
-                          </span>
-                        )}
-                        {node.schedulable === false && (
-                          <span
-                            data-testid={`unschedulable-badge-${node.id}`}
-                            style={{
-                              fontSize: '0.6875rem',
-                              fontWeight: 600,
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                              color: '#f87171',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
-                            }}
-                          >
-                            스케줄 불가
-                          </span>
-                        )}
-                        <span
-                          style={{
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            backgroundColor: node.status === 'online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                            color: node.status === 'online' ? '#34d399' : '#f87171',
-                          }}
-                        >
-                          {node.status.toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
+                    노드 목록 재조회 (Retry)
+                  </button>
+                )}
+              </div>
+            )}
 
-                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                      <div data-testid={`node-cpu-${node.id}`}>CPU: {typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores) ? `${node.cpuCores}C` : '용량 미확인'} ({typeof node.allocatableCores === 'number' && Number.isFinite(node.allocatableCores) ? `${node.allocatableCores} 가용` : '0 가용'})</div>
-                      <div data-testid={`node-ram-${node.id}`}>RAM: {formatBytes(node.memoryTotalBytes)}</div>
-                      <div data-testid={`node-gpu-${node.id}`}>GPU: {typeof node.gpuCount === 'number' && Number.isFinite(node.gpuCount) ? (node.gpuCount === 0 ? '없음 (0대)' : `${node.gpuName || 'GPU'} (${node.gpuCount}대)`) : '장치 미확인'}</div>
-                      <div data-testid={`node-storage-${node.id}`}>스토리지: {formatBytes(node.storageTotalBytes)}</div>
-                    </div>
+            {!nodesError && nodesState === 'loading' && (
+              <div
+                data-testid="nodes-loading-state"
+                style={{
+                  padding: '24px',
+                  textAlign: 'center',
+                  color: '#94a3b8',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px solid #334155',
+                }}
+              >
+                물리 노드 목록을 조회하는 중입니다...
+              </div>
+            )}
 
+            {!nodesError && nodesState === 'idle' && (
+              <div
+                data-testid="nodes-idle-state"
+                style={{
+                  padding: '24px',
+                  textAlign: 'center',
+                  color: '#64748b',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                }}
+              >
+                노드 조회가 대기 상태입니다.
+              </div>
+            )}
+
+            {!nodesError && nodesState !== 'loading' && nodesState !== 'idle' && filteredNodes.length === 0 && (
+              <div
+                data-testid="nodes-empty-state"
+                role="status"
+                aria-live="polite"
+                style={{
+                  padding: '24px',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px dashed #334155',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
+                  ℹ️ 등록된 물리 노드가 없습니다 (정상 조회 결과: 0대).
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '6px' }}>
+                  클러스터에 등록된 활성 노드가 존재하지 않거나 현재 선택된 필터 조건에 부합하는 노드가 없습니다.
+                </div>
+              </div>
+            )}
+
+            {!nodesError && filteredNodes.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '12px' }}>
+                {filteredNodes.map((node) => {
+                  const isSelected = selectedNodeId === node.id;
+                  return (
                     <div
-                      data-testid={`node-utilization-status-${node.id}`}
-                      role="status"
+                      key={node.id}
+                      data-testid={`node-card-${node.id}`}
+                      onClick={() => {
+                        setSelectedNodeId(node.id);
+                        onSelectNode?.(node.id);
+                      }}
                       style={{
-                        marginTop: '8px',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        backgroundColor: 'rgba(51, 65, 85, 0.5)',
-                        border: '1px solid #334155',
-                        fontSize: '0.6875rem',
-                        color: '#94a3b8',
+                        padding: '14px',
+                        backgroundColor: isSelected ? '#1e293b' : '#0f172a',
+                        borderRadius: '8px',
+                        border: isSelected ? '1.5px solid #3b82f6' : '1px solid #334155',
+                        cursor: 'pointer',
                       }}
                     >
-                      📊 자원 사용률: {node.telemetryUnavailable ? '미제공 (HTTP 읽기 경로 부재)' : `CPU ${node.cpuUsagePercent ?? 0}% · RAM ${formatBytes(node.memoryUsedBytes)}`}
-                    </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
+                          <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                            {node.id} {node.ipAddress ? `· ${node.ipAddress}` : ''}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          {node.observationOnly && (
+                            <span
+                              data-testid={`observe-only-badge-${node.id}`}
+                              style={{
+                                fontSize: '0.6875rem',
+                                fontWeight: 600,
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(234, 179, 8, 0.2)',
+                                color: '#fbbf24',
+                                border: '1px solid rgba(234, 179, 8, 0.4)',
+                              }}
+                            >
+                              관측 전용
+                            </span>
+                          )}
+                          {node.schedulable === false && (
+                            <span
+                              data-testid={`unschedulable-badge-${node.id}`}
+                              style={{
+                                fontSize: '0.6875rem',
+                                fontWeight: 600,
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                color: '#f87171',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                              }}
+                            >
+                              스케줄 불가
+                            </span>
+                          )}
+                          <span
+                            style={{
+                              fontSize: '0.6875rem',
+                              fontWeight: 600,
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              backgroundColor: node.status === 'online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                              color: node.status === 'online' ? '#34d399' : '#f87171',
+                            }}
+                          >
+                            {node.status.toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
 
-                    <div style={{ display: 'flex', gap: '6px', marginTop: '10px', justifyContent: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedNodeId(node.id);
-                          setActiveTab('nodes');
-                        }}
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+                        <div data-testid={`node-cpu-${node.id}`}>CPU: {typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores) ? `${node.cpuCores}C` : '용량 미확인'} ({typeof node.allocatableCores === 'number' && Number.isFinite(node.allocatableCores) ? `${node.allocatableCores} 가용` : '0 가용'})</div>
+                        <div data-testid={`node-ram-${node.id}`}>RAM: {formatBytes(node.memoryTotalBytes)}</div>
+                        <div data-testid={`node-gpu-${node.id}`}>GPU: {typeof node.gpuCount === 'number' && Number.isFinite(node.gpuCount) ? (node.gpuCount === 0 ? '없음 (0대)' : `${node.gpuName || 'GPU'} (${node.gpuCount}대)`) : '장치 미확인'}</div>
+                        <div data-testid={`node-storage-${node.id}`}>스토리지: {formatBytes(node.storageTotalBytes)}</div>
+                      </div>
+
+                      <div
+                        data-testid={`node-utilization-status-${node.id}`}
+                        role="status"
                         style={{
+                          marginTop: '8px',
                           padding: '4px 8px',
-                          fontSize: '0.6875rem',
-                          backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                          color: '#60a5fa',
-                          border: '1px solid rgba(59, 130, 246, 0.3)',
                           borderRadius: '4px',
-                          cursor: 'pointer',
+                          backgroundColor: 'rgba(51, 65, 85, 0.5)',
+                          border: '1px solid #334155',
+                          fontSize: '0.6875rem',
+                          color: '#94a3b8',
                         }}
                       >
-                        ⚙️ 상세 진단
-                      </button>
-                      {onOpenTerminal && (
+                        📊 자원 사용률: {node.telemetryUnavailable ? '미제공 (HTTP 읽기 경로 부재)' : `CPU ${node.cpuUsagePercent ?? 0}% · RAM ${formatBytes(node.memoryUsedBytes)}`}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '6px', marginTop: '10px', justifyContent: 'flex-end' }}>
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onOpenTerminal(node.id);
+                            setSelectedNodeId(node.id);
+                            setActiveTab('nodes');
                           }}
                           style={{
                             padding: '4px 8px',
                             fontSize: '0.6875rem',
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            color: '#e2e8f0',
-                            border: '1px solid #334155',
+                            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                            color: '#60a5fa',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
                             borderRadius: '4px',
                             cursor: 'pointer',
                           }}
                         >
-                          ⌨️ 터미널
+                          ⚙️ 상세 진단
                         </button>
-                      )}
+                        {onOpenTerminal && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onOpenTerminal(node.id);
+                            }}
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '0.6875rem',
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              color: '#e2e8f0',
+                              border: '1px solid #334155',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            ⌨️ 터미널
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

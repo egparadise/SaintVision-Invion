@@ -82,13 +82,13 @@ export interface WorkspaceItem {
   id: string; // wsp_...
   projectId: string;
   name: string;
-  targetNodeId: string;
+  targetNodeId: string | null;
   isolationMode: 'process_sandbox' | 'container_isolated';
   allowedPaths: string[];
   prohibitedPaths: string[];
   cpuLimitCores: number;
   memoryLimitBytes: number;
-  status: 'active' | 'suspended' | 'terminating' | 'reclaimed';
+  status: 'provisioning' | 'ready' | 'active' | 'suspended' | 'terminating' | 'reclaimed' | string;
   createdAt: string;
 }
 

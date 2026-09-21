@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.72"
+version: "1.0.73"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T23:00:00+09:00"
+updated: "2026-09-21T23:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T23:00:00+09:00.
+- 확인 기준: 2026-09-21T23:50:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 5대 부류 치유 트랙 1차: 노드 에러 은폐 차단, 작업공간 백엔드 실배선, 자연어 가상 KPI 합성 및 조기 성공 배너 치유 (`App.tsx`, `ResourceExplorer.tsx`, `WorkspaceList.tsx`, `projectObservation.ts`, `types.ts`, `NaturalLanguageRunView.tsx`, `node-fetch-error-workspace-wiring.test.tsx`)**:
+  - **1. 노드 API 실패 시 에러 은폐 차단 및 정상 빈 클러스터 분리 (Priority 1)**: `App.tsx`에서 `fetchNodes` 실패 시 `setNodes([])`로만 처리해 클러스터가 0대 빈 상태(정상 빈 클러스터)로 오인되던 결함을 치유. `nodesState: 'idle' | 'loading' | 'success' | 'error'` 및 `nodeError`를 신설하여 상단 배너(`<p role="alert" data-testid="app-node-error">`) 및 `ResourceExplorer`에 전달. `ResourceExplorer.tsx` 논리 자원 카드 4종에 에러 발생 시 `조회 실패`를 명시(0 Cores 왜곡 차단)하고, 물리 노드 목록에 `nodes-fetch-error-banner`(`role="alert"`) 및 재시도 버튼 배치. 정상 0대일 때만 `nodes-empty-state`(`role="status"`, "등록된 물리 노드가 없습니다 (정상 조회 결과: 0대)") 표출.
+  - **2. 작업공간 생성 가짜 ID 합성 제거 및 백엔드 실배선 (Priority 2)**: `App.tsx`의 `wsp_${Date.now()}` 가짜 ID 및 `status: 'active'` 조기 성공 클라이언트 합성 전면 제거. `shared/api/projectObservation.ts`에 `createProjectWorkspace(projectId, name)` 구현 (`POST /v1/projects/{projectId}/workspaces`). `types.ts` `WorkspaceItem` 상태에 `provisioning` 확장. `WorkspaceList.tsx`에서 `provisioning` 상태를 "프로비저닝 중 (Provisioning)" (warning 색상)으로 정직 표기하고, 정상 0개 빈 상태(`workspaces-empty-state`, `role="status"`) 및 에러 상태를 분리.
+  - **3. 자연어 뷰 가상 KPI 99% 달성 합성 및 조기 성공 배너 치유 (Priority 3)**: `NaturalLanguageRunView.tsx` 상단에 `agent-unexposed-notice`(`role="status"`, "자연어 에이전트 실행 및 골든 평가 제어기 (API 미노출)") 신설. 골든 평가 99% 달성 지표 라벨을 `[AC-09 픽스처 (로컬 시뮬레이션)]`으로 정직 표기. 코드 Diff 적용 축하 배너(`🎉 코드 Diff가 성공적으로 승인 및 적용되었습니다!`)를 "모의 적용 완료 (백엔드 코드 패치 API 미노출 상태로 실제 파일시스템 미반영)" 안내문으로 대체.
+  - **4. 단위 테스트 및 3대 돌연변이 실측 사살 (전수 KILLED)**: `apps/web/tests/node-fetch-error-workspace-wiring.test.tsx` 8/8 passed. M1(노드 에러 은폐 회귀) 사살, M2(작업공간 provisioning 조기 성공 active 회귀) 사살, M3(자연어 코드 Diff 허위 축하 배너 회귀) 사살. Vitest **60개 테스트 파일 559/559 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.71s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면결함_5대부류_치유_노드에러은폐_작업공간실배선_자연어KPI_Gemini]].
+
 
 - **노드 정적 용량(Capacity) vs 동적 실시간 사용률(Utilization) 엄격 분리, 텔레메트리 부재 정직 반영 및 클러스터 생존성 보존 (`ResourceExplorer.tsx`, `virtualFabric.ts`, `App.tsx`, `node-telemetry-capacity-distinction.test.tsx`)**:
   - **클러스터 조용한 전멸 방지 (`App.tsx`)**: 백엔드가 평면 텔레메트리를 반환하지 않을 때 `measuredNodes` 필터링으로 인해 노드가 0대로 전락하던 결함을 치유(`nodes={nodes}` 전달)하여 클러스터 물리 노드 생존성을 보존.
