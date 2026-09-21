@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
-import { NodeItem } from '@/contracts/types';
+import { NodeItem, RunItem } from '@/contracts/types';
 import { TerminalShellType } from '@/contracts/virtualFabric';
 
 export interface TerminalSessionViewProps {
   nodes?: NodeItem[];
+  runs?: RunItem[];
   defaultNodeId?: string;
   defaultWorkspaceId?: string;
   projectId?: string;
@@ -25,8 +26,9 @@ interface ActiveSessionTab {
 
 export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
   nodes = [],
+  runs = [],
   defaultNodeId,
-  defaultWorkspaceId = 'wsp_01JABCDE001',
+  defaultWorkspaceId = 'wsp_0123456789ABCDEFGHJKMNPQRS',
   projectId = 'prj_01JABCDE',
   initialMode = 'terminal',
   commandId,
@@ -104,7 +106,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         nodeId: secondaryNode.id,
         shellType: secIsWin ? 'powershell' : 'bash',
         mode: 'terminal',
-        workspaceId: `${defaultWorkspaceId}_02`,
+        workspaceId: defaultWorkspaceId,
       });
     }
 
@@ -366,6 +368,31 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {runs && runs.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '0.6875rem' }}>승인 Run:</span>
+              <select
+                data-testid="terminal-run-select"
+                value={activeCommandId}
+                onChange={(e) => setActiveCommandId(e.target.value)}
+                style={{
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  borderRadius: '4px',
+                  color: '#f8fafc',
+                  fontSize: '0.6875rem',
+                  padding: '2px 6px',
+                }}
+              >
+                <option value="">-- 승인 Run 선택 --</option>
+                {runs.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.id} ({r.state})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ fontSize: '0.6875rem' }}>명령 ID:</span>
             <input
@@ -413,8 +440,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
           >
             <WebTerminal
               workspaceId={activeSession.workspaceId}
-              sessionId={activeSession.id}
-              commandId={activeCommandId.trim() ? activeCommandId.trim() : undefined}
+              commandId={activeCommandId.trim() ? activeCommandId.trim() : null}
             />
           </div>
         ) : (

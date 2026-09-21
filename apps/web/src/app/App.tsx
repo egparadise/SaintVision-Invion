@@ -493,21 +493,67 @@ export const App: React.FC = () => {
         )}
 
         {/* Tab 5: Terminal */}
-        {activeTab === 'terminal' && (
-          <div>
-            <div style={{ marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>격리 웹 터미널 (xterm.js + WebSocket)</h2>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                30초 1회용 티켓으로 인증된 PTY 양방향 터미널 세션입니다. (접근성 대체 텍스트 뷰 지원)
-              </p>
+        {activeTab === 'terminal' && (() => {
+          const currentWorkspace = workspaces.find((w) => w.id === selectedWorkspaceId) || workspaces[0];
+          return (
+            <div>
+              <div style={{ marginBottom: '20px' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>격리 웹 터미널 (xterm.js + WebSocket)</h2>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                  30초 1회용 티켓으로 인증된 PTY 양방향 터미널 세션입니다. (접근성 대체 텍스트 뷰 지원)
+                </p>
+              </div>
+
+              {!currentWorkspace ? (
+                <div
+                  data-testid="terminal-no-workspace-notice"
+                  style={{
+                    padding: '16px',
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: '6px',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
+                  ⚠️ 등록되거나 선택된 워크스페이스가 없습니다. 터미널 세션을 시작할 수 없습니다. (유효 워크스페이스 필요)
+                </div>
+              ) : (
+                <>
+                  <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <label htmlFor="app-terminal-run-select" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                      승인 실행(Run):
+                    </label>
+                    <select
+                      id="app-terminal-run-select"
+                      data-testid="app-terminal-run-select"
+                      value={selectedRunId || ''}
+                      onChange={(e) => setSelectedRunId(e.target.value || null)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        backgroundColor: 'var(--color-bg-surface)',
+                        color: 'var(--color-text-primary)',
+                        border: '1px solid var(--color-border-subtle)',
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      <option value="">-- 승인 실행 선택 안 함 (대기 상태) --</option>
+                      {runs.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.id} ({r.state})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <WebTerminal
+                    workspaceId={currentWorkspace.id}
+                    commandId={selectedRunId || null}
+                  />
+                </>
+              )}
             </div>
-            <WebTerminal
-              workspaceId={selectedWorkspaceId || workspaces[0]?.id || 'wsp-saint-pilot'}
-              sessionId="sid_terminal_01"
-              commandId={selectedRunId || runs.find((r) => r.state === 'scheduled' || r.state === 'verifying')?.id || null}
-            />
-          </div>
-        )}
+          );
+        })()}
 
         {/* Tab 6: Login */}
         {activeTab === 'login' && (
