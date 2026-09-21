@@ -98,7 +98,7 @@ export interface WorkspaceItem {
   prohibitedPaths: string[];
   cpuLimitCores: number;
   memoryLimitBytes: number;
-  status: WorkspaceStatusName | 'active' | 'terminating' | 'reclaimed' | string;
+  status: WorkspaceStatusName;
   createdAt: string;
 }
 

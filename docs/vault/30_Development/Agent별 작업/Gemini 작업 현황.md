@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.98"
+version: "1.0.99"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:26:00+09:00"
+updated: "2026-09-22T04:33:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,39 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:26:00+09:00.
+- 확인 기준: 2026-09-22T04:33:00+09:00.
+
+## 세션 랩업: WorkspaceItem 잉여 어휘 소거 및 WorkspaceList 5대 상태 정직화와 Chrome 153 실측 수용
+
+- **`WorkspaceItem.status` 잉여 어휘 소거 및 정본 계약 일원화 (`contracts/types.ts`)**:
+  - Claude의 부류 훑기([[2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude]] §C) 권고 수용: 프런트엔드가 상상하던 잉여 어휘(`active`, `terminating`, `reclaimed`, `string`)를 완전 소거하고 백엔드 5대 정본 계약인 `WorkspaceStatusName`(`'provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted'`)으로 좁힘.
+- **`WorkspaceList.tsx` 죽은 레거시 분기 소거 및 미확인 상태 정직 고지**:
+  - `statusConfig`의 타입을 `Record<WorkspaceStatusName, ...>`로 명시하고 죽은 호환 분기(`active`, `terminating`, `reclaimed`)를 영구 제거.
+  - 미지의 상태 유입 시 조용히 둔갑하지 않고 `미확인 상태 (${wsp.status})` 뱃지로 정직하게 표출.
+- **`workspace-execution.test.ts` 계약 정합**:
+  - 초기 목 상태를 `'active'`에서 `'ready'`로, 자원 회수 상태를 `'reclaimed'`에서 백엔드 정본 계약인 `'deleted'`로 교정.
+- **신규 회귀 방어 테스트 (`tests/workspace-list-5state-contract.test.tsx`, 2/2 passed)**:
+  - 5대 계약 상태별 한글 라벨 렌더링 및 가상 어휘(`reclaimed`) 부재 단언.
+  - 미확인 미래 확장 상태(`migrating_cluster`) 유입 시 조용한 강등 없이 `미확인 상태 (migrating_cluster)` 표출 단언.
+- **돌연변이 사살 (Mutation Testing)**:
+  - `workspace-execution.test.ts`에 `'active'` 주입 시 TS2322로 즉시 사살 (KILLED).
+  - `workspace-execution.test.ts`에 `'reclaimed'` 주입 시 TS2322로 즉시 사살 (KILLED).
+- **실제 Google Chrome 153 (Blink 엔진) 실측 수용**:
+  - `scratch/verify_workspace_list_status_chrome.py` 구동:
+    1. 실제 Chrome 153에서 `/callback` PKCE 세션 완료 후 `Workspaces (S03)` 탭 진입.
+    2. 5대 상태(`ready`, `provisioning`, `suspended`, `deleting`, `deleted`) 뱃지 렌더링 실측.
+    3. 미지의 상태(`unknown_future_status`) 유입 시 `미확인 상태 (unknown_future_status)` 정직 표출 실측.
+    4. 안전한 스크린샷 증거: `scratch/real_chrome_workspace_list_5states.png`.
+    5. 실측 결과 레코드: `scratch/chrome_workspace_list_acceptance_result.json` (`passed: true`).
+- **게이트 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (3.37s).
+  - Vitest **74개 파일 648/648 passed 100%** (순증 +1 파일, +2 passed).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 46 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: 24 hashes, 722 versioned documents PASS.
+  - `check_doc_single_source.py --ratchet`: 18 pairs PASS.
+- 보고서: [[2026-09-22_WorkspaceItem_잉여어휘소거_및_WorkspaceList_5대상태정직화_Chrome153_Gemini]].
 
 ## 세션 랩업: 3대 갈래(일치·불일치·헤더부재) 전수 검속 및 돌연변이 사살 실측 완결
 

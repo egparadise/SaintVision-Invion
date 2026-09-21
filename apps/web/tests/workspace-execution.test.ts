@@ -12,7 +12,7 @@ describe('S03-FE Workspace Isolation & Execution Results (AC-03)', () => {
     prohibitedPaths: ['/etc', 'C:\\Windows', '..', '/var/run'],
     cpuLimitCores: 4,
     memoryLimitBytes: 8 * 1024 ** 3,
-    status: 'active',
+    status: 'ready',
     createdAt: new Date().toISOString(),
   };
 
@@ -71,13 +71,13 @@ describe('S03-FE Workspace Isolation & Execution Results (AC-03)', () => {
   it('should verify resource reclamation upon execution termination (AC-03)', () => {
     expect(sampleExecution.resourceReclaimed).toBe(true);
 
-    const markWorkspaceReclaimed = (wsp: WorkspaceItem): WorkspaceItem => ({
+    const markWorkspaceDeleted = (wsp: WorkspaceItem): WorkspaceItem => ({
       ...wsp,
-      status: 'reclaimed',
+      status: 'deleted',
     });
 
-    const reclaimed = markWorkspaceReclaimed(sampleWorkspace);
-    expect(reclaimed.status).toBe('reclaimed');
+    const deleted = markWorkspaceDeleted(sampleWorkspace);
+    expect(deleted.status).toBe('deleted');
   });
 
   it('should distinguish exit code 0 as success and non-zero as failure', () => {
