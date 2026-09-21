@@ -54,7 +54,26 @@ def _tool_version(name, *ver_args):
         return path, None
 
 
-def collect(executor=None):
+def _integration_distance(ref, do_fetch):
+    """How far THIS tree is from the integration tip -- the gap that stayed invisible all of
+    2026-09-21 because the main checkout sat ~12 commits behind and nobody printed it. Measured
+    LOCALLY against the last-fetched ref by default (no network); `--fetch` refreshes first."""
+    mode = 'local (last fetch)'
+    if do_fetch:
+        frc, _, _ = _git('fetch', 'origin', '--quiet')
+        mode = 'fetched' if frc == 0 else 'local (fetch failed)'
+    rc, isha, _ = _git('rev-parse', ref)
+    if rc != 0:
+        return {'integration_ref': ref, 'integration_sha': None, 'integration_check_mode': mode,
+                'in_sync': None, 'behind': None, 'ahead': None}
+    _, behind, _ = _git('rev-list', '--count', f'HEAD..{ref}')
+    _, ahead, _ = _git('rev-list', '--count', f'{ref}..HEAD')
+    behind, ahead = int(behind or 0), int(ahead or 0)
+    return {'integration_ref': ref, 'integration_sha': isha, 'integration_check_mode': mode,
+            'in_sync': (behind == 0 and ahead == 0), 'behind': behind, 'ahead': ahead}
+
+
+def collect(executor=None, integration_ref='origin/integration/all-agents-unified', do_fetch=False):
     rc, sha, _ = _git('rev-parse', 'HEAD')
     _, branch, _ = _git('rev-parse', '--abbrev-ref', 'HEAD')
     _, toplevel, _ = _git('rev-parse', '--show-toplevel')
@@ -71,12 +90,15 @@ def collect(executor=None):
     go_path, go_ver = _tool_version('go', 'version')
     kst = datetime.timezone(datetime.timedelta(hours=9))
     now = datetime.datetime.now(tz=kst)
+    integ = _integration_distance(integration_ref, do_fetch)
 
     return {
         # --- required ---
         'commit_sha': sha,
         'branch': branch,
         'worktree_path': toplevel,
+        # --- distance to the integration tip (the gap that hid all day) ---
+        **integ,
         'working_tree_clean_status': status_clean,          # git status --porcelain empty
         'content_clean_diff': content_clean,                # git diff --quiet HEAD
         'eol_or_untracked_only': (not status_clean) and content_clean,
@@ -107,6 +129,17 @@ def render_text(p):
         f"worktree_path:       {p['worktree_path']}",
         f"working_tree_clean:  {clean}   (git status --porcelain)",
     ]
+    if p.get('integration_sha') is None:
+        lines.append(f"integration_sync:    UNKNOWN   (ref {p['integration_ref']} not found locally; pass --fetch or --integration-ref)")
+    elif p['in_sync']:
+        lines.append(f"integration_sync:    IN SYNC   (== {p['integration_ref']} @{p['integration_sha'][:12]}; {p['integration_check_mode']})")
+    else:
+        state = []
+        if p['behind']:
+            state.append(f"BEHIND {p['behind']}")
+        if p['ahead']:
+            state.append(f"AHEAD {p['ahead']}")
+        lines.append(f"integration_sync:    {' '.join(state)}   (vs {p['integration_ref']} @{p['integration_sha'][:12]}; {p['integration_check_mode']}) -- results from this tree may NOT reflect integration")
     if not p['working_tree_clean_status']:
         lines.append(f"  content_clean:     {'YES' if p['content_clean_diff'] else 'NO'}   (git diff --quiet HEAD; EOL-normalized)")
         if p['eol_or_untracked_only']:
@@ -132,11 +165,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--json', action='store_true', help='emit JSON')
     parser.add_argument('--executor', help='who ran this (stamped into the header)')
+    parser.add_argument('--integration-ref', default='origin/integration/all-agents-unified',
+                        help='ref to measure distance to (default: origin/integration/all-agents-unified)')
+    parser.add_argument('--fetch', action='store_true',
+                        help='refresh the integration ref over the network before measuring (default: local last-fetch)')
     parser.add_argument('command', nargs=argparse.REMAINDER,
                         help='after `--`, a command to run WITHOUT a pipe and self-identify')
     args = parser.parse_args()
 
-    prov = collect(executor=args.executor)
+    prov = collect(executor=args.executor, integration_ref=args.integration_ref, do_fetch=args.fetch)
     cmd = args.command[1:] if args.command and args.command[0] == '--' else args.command
 
     if cmd:
