@@ -1,0 +1,30 @@
+{
+  "workspaceId": "wsp_contract",
+  "projectId": "prj_contract",
+  "executable": false,
+  "scope": "workspace-preconditions-not-execution-admission",
+  "nodeReadiness": "unknown",
+  "admissionRequired": true,
+  "checks": [
+    {
+      "check": "project_linked_to_kernel",
+      "satisfied": false,
+      "detail": "the execution kernel acts only on projects an operator has linked",
+      "resolvedBy": "operator",
+      "remedy": "ask the operator to enable this project for managed execution"
+    },
+    {
+      "check": "input_prepared",
+      "satisfied": false,
+      "detail": "no pending input in the current recovery epoch belongs to this workspace and project",
+      "resolvedBy": "requester",
+      "remedy": "prepare files before requesting execution",
+      "snapshotBytes": null,
+      "maxSnapshotBytes": 65536,
+      "maxContentBytes": 32768,
+      "runId": null
+    }
+  ],
+  "blockedBy": ["operator", "requester"],
+  "summary": "7 of 7 preconditions are unmet; Node validation and execution admission are required."
+}

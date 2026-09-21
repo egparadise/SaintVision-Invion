@@ -109,7 +109,9 @@ def read_project(
     return body
 
 
-@router.get("/projects/{project_id}/workspaces")
+@router.get(
+    "/projects/{project_id}/workspaces", response_model=schemas.ProjectWorkspacesResponse
+)
 def list_workspaces(
     project_id: str,
     principal: Principal = Depends(get_principal),

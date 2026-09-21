@@ -1,10 +1,8 @@
 import type { ProjectItem } from '@/contracts/types';
+import type { ProjectWorkspacesResponse, WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
 import { apiClient } from './client';
 
-export interface ProjectWorkspace {
-  workspaceId: string; projectId: string; name: string;
-  status: string; nodeId: string | null; toolName: string | null; createdAt: string;
-}
+export type ProjectWorkspace = WorkspaceSummaryResponse;
 export async function fetchProjects(): Promise<ProjectItem[]> {
   const page = await apiClient<{ items?: Array<{ projectId: string }>; projects?: Array<{
     projectId: string; displayName: string; createdAt: string;
@@ -24,7 +22,7 @@ export async function fetchProjects(): Promise<ProjectItem[]> {
   });
 }
 export async function fetchProjectWorkspaces(projectId: string): Promise<ProjectWorkspace[]> {
-  const page = await apiClient<{ projectId: string; workspaces: ProjectWorkspace[] }>(
+  const page = await apiClient<ProjectWorkspacesResponse>(
     `/v1/projects/${encodeURIComponent(projectId)}/workspaces`);
   if (page.projectId !== projectId || !Array.isArray(page.workspaces) ||
       page.workspaces.some(w => w.projectId !== projectId || !w.workspaceId)) {

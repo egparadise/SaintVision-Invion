@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_contract",
+  "workspaces": [
+    {
+      "workspaceId": "wsp_contract",
+      "projectId": "prj_contract",
+      "name": "Contract Workspace",
+      "status": "ready",
+      "nodeId": "node_contract",
+      "toolName": "claude-code",
+      "createdAt": "2026-09-21T06:00:00Z",
+      "allowedNext": ["deleting", "suspended"]
+    }
+  ],
+  "count": 1
+}

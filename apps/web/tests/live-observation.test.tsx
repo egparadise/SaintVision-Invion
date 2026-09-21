@@ -7,6 +7,7 @@ import { apiClient } from '../src/shared/api/client';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { ClusterOverview } from '../src/features/dashboard/ClusterOverview';
+import { projectWorkspacesFixture } from './fixtures/workspace-catalog';
 vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn() }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
@@ -52,16 +53,16 @@ it('reads the business project envelope without inventing owner or capacity', as
 it('rejects an unsupported project envelope', async () => {
   api.mockResolvedValue({ unknown: [] }); await expect(fetchProjects()).rejects.toThrow();
 });
-it('preserves empty workspace lists without sample fallbacks', async () => {
-  api.mockResolvedValue({ projectId: 'project', workspaces: [], count: 0 });
-  expect(await fetchProjectWorkspaces('project')).toEqual([]);
+it('maps the shared workspace response fixture without inventing fields', async () => {
+  api.mockResolvedValue(projectWorkspacesFixture);
+  expect(await fetchProjectWorkspaces('prj_contract')).toEqual(projectWorkspacesFixture.workspaces);
 });
 it('rejects workspaces belonging to another project', async () => {
   api.mockResolvedValue({ projectId: 'project', workspaces: [{ workspaceId: 'workspace', projectId: 'other' }] });
   await expect(fetchProjectWorkspaces('project')).rejects.toThrow();
 });
 it('encodes project identifiers for the workspace route', async () => {
-  api.mockResolvedValue({ projectId: 'a/b', workspaces: [] });
+  api.mockResolvedValue({ ...projectWorkspacesFixture, projectId: 'a/b', workspaces: [] });
   await fetchProjectWorkspaces('a/b');
   expect(api).toHaveBeenCalledWith('/v1/projects/a%2Fb/workspaces');
 });

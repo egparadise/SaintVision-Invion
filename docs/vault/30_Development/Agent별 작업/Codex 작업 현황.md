@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.95"
+version: "1.0.97"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T15:06:00+09:00"
+updated: "2026-09-21T16:04:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 response contract inventory and workspace slice
+
+- Added an eight-module adapter inventory ranked by visible failure impact. It marks partial versus absent contract bindings and names the quiet failure each unbound shape can cause. Screen-local endpoints remain separately counted; discovery and storage are partial, and workspace list/readiness are now bound. This does not claim full adapter coverage.
+- Bound project workspace listing and execution-readiness through strict provider models, generated JSON Schema and TypeScript, shared repository fixtures, FastAPI serialization tests, and frontend Ajv/consumer tests. The dual-envelope project list remains explicitly unbound.
+- Rollback evidence: adding a required provider field caused the provider fixture test and schema drift check to fail; removing `allowedNext` from the shared fixture caused Python fixture validation and frontend Vitest to exit nonzero. Restored both mutations.
+- Provenance at dirty base `4384bf7d7a29f988f06a7e21b2a97b7a6d559c65`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, branch `integration/all-agents-unified`: Python 3.14.6 via `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`; Node v24.17.0 via `C:/Program Files/nodejs/node.exe`; KST 15:59:54–15:59:55; DSN absent. Provenance-wrapped commands: workspace pytest 12 passed; focused Vitest 29 passed; schema export check 28 match; TS response generator 7 match; `tsc -b` exit 0. CI, live HTTP, browser acceptance, DB integration, and independent review remain pending. Full mutation/test detail is in [[2026-09-21_web_response_contract_map_workspace_Codex]].
+- Latest check set after fast-forwarding to base `512daf7924e4...` (branch/worktree unchanged; dirty source slice), provenance-wrapped from 16:03:39 KST: Python contract 12 passed; full Vitest 36 files/340 passed; schema export 28 match; TypeScript response contract generator 7 match; `tsc -b`, `check_docs.py`, `check_ontology.py`, and Vite build exit 0. Python DSN absent. Prior source mutation checks and sync apply/check are itemized in the History record. No DB-backed integration, CI, live HTTP, browser acceptance, or independent review was run.
+- Next: Claude fixed-SHA independent contract review; then rank and bind approval review/kernel mutation responses. Coordinate run-result/artifact contracts with Gemini's pending UI-FB-03 work. Do not treat route coverage as response-shape coverage.
 
 ## 2026-09-21 storage response contracts 확장
 

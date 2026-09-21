@@ -141,6 +141,55 @@ class DataLocationPageResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class WorkspaceSummaryResponse(Strict):
+    workspace_id: str = Field(alias="workspaceId")
+    project_id: str = Field(alias="projectId")
+    name: str
+    status: str
+    node_id: str | None = Field(alias="nodeId")
+    tool_name: str | None = Field(alias="toolName")
+    created_at: dt.datetime = Field(alias="createdAt")
+    allowed_next: list[str] = Field(alias="allowedNext")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectWorkspacesResponse(Strict):
+    project_id: str = Field(alias="projectId")
+    workspaces: list[WorkspaceSummaryResponse]
+    count: int = Field(ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ExecutionReadinessCheckResponse(Strict):
+    check: str
+    satisfied: bool
+    detail: str
+    resolved_by: str | None = Field(default=None, alias="resolvedBy")
+    remedy: str | None = None
+    snapshot_bytes: int | None = Field(default=None, alias="snapshotBytes")
+    max_snapshot_bytes: int | None = Field(default=None, alias="maxSnapshotBytes")
+    max_content_bytes: int | None = Field(default=None, alias="maxContentBytes")
+    run_id: str | None = Field(default=None, alias="runId")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class WorkspaceExecutionReadinessResponse(Strict):
+    workspace_id: str = Field(alias="workspaceId")
+    project_id: str = Field(alias="projectId")
+    executable: Literal[False]
+    scope: Literal["workspace-preconditions-not-execution-admission"]
+    node_readiness: Literal["unknown"] = Field(alias="nodeReadiness")
+    admission_required: Literal[True] = Field(alias="admissionRequired")
+    checks: list[ExecutionReadinessCheckResponse]
+    blocked_by: list[str] = Field(alias="blockedBy")
+    summary: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class RecordedReplicaStates(Strict):
     ready: int = Field(ge=0)
     transferring: int = Field(ge=0)
