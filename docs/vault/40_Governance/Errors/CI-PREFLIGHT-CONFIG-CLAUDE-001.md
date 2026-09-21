@@ -1,11 +1,11 @@
 ---
 doc_id: "CI-PREFLIGHT-CONFIG-CLAUDE-001"
 title: "CI 사전 점검 — 결제 열기 전 설정-원인 빨간불 제거. 발견·인계(워크플로는 Codex)"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T20:00:00+09:00"
+updated: "2026-09-21T20:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handoff-codex"]
@@ -61,8 +61,46 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 
 즉 "go 1.27.1 미출시"는 (3)이었는데 내가 (1)처럼 근거로 썼다. 올바른 행동은 `go-version` 같은 항목을 만나면 **먼저 go.dev/dl을 조회**(2)한 뒤 판정하는 것이다. (버전 pin·외부 이미지 태그·패키지 가용성이 이 부류다.)
 
+**규칙 보강 (4) — 빈 결과는 사실이 아니다 (측정 도구가 조용히 실패한다):** 아무것도 안 나왔다는 것은 "없다"일 수도, "명령이 실패했다"일 수도 있다. 사용자가 방금 워크플로의 node_dependent 사용 여부를 훑다가 **빈 결과를 얻었는데**, 원인은 Git Bash 경로 변환이 `origin/branch:path` 인자를 역슬래시·세미콜론으로 망가뜨려 `git show`가 전부 실패했고 stderr를 버려 조용히 빈 결과가 된 것이었다(`MSYS2_ARG_CONV_EXCL='*'`로 다시 하니 backend.yml이 그 목록을 쓴다는 판정이 맞았다). 오늘 파이프 뒤 종료코드로 한 번, 경로 변환으로 또 한 번 — **뿌리가 같다: 측정 도구 자체가 조용히 실패**. 그래서 빈 결과를 사실로 읽기 전에 **① 반드시 무언가를 찾아야 하는 대조군에서 같은 명령이 도는지, ② 종료코드·stderr가 성공인지**를 확인한다. (측정으로 확정하기 전 계측을 확정한다 — `memory:empty-output-is-not-evidence`.)
+
+## v1.2.0 — ① 배선→통과 실증 (before-red / after-green) + Codex 적용 패치문안
+①은 "junit 22/22 skip"까지만 [측정]했었다 — 그건 배선(skip이 있다)이지 **통과 실패(워크플로가 실제로 RED)**를 보인 게 아니다. 오늘의 배선≠통과 구별대로, 워크플로의 **단언 단계 코드를 그대로 그 junit에 먹여** 실패까지 보이고, 수정 후 통과까지 보였다.
+
+**실증 (workflow의 실제 단언 코드로, .venv 실행):**
+| | junit | `backend.yml` 단언(`assert not findall('.//skipped')`) | `core.yml` 단언(`testcase 있음 + failure/error/skipped 없음`) |
+|---|---|---|---|
+| **BEFORE**(통과대역 `test_model_execution_registry` 7 + 3 image 파일) | testcases=29, skipped=22 | `AssertionError` **exit 1 (RED)** | `AssertionError` **exit 1 (RED)** |
+| **AFTER**(3 image 파일 수집 제외) | testcases=7, skipped=0 | **exit 0 (GREEN)** | **exit 0 (GREEN)** |
+
+기계 증명: `pytest tests/integration --collect-only --ignore=<3 image 파일>` → 그 3파일 항목 **22→0**(기본 비명시 수집에서 제거됨, browser가 이미 그렇게 제외되는 것과 동일). 즉 **수정안(수집 제외)이 그 RED의 원인을 실제로 없앤다** — 고치기 전 빨강·고친 뒤 초록 양쪽 확인.
+
+**수정 조합 판단(근거와 함께 — Codex 최종 결정)**: browser 3파일은 이미 backend·core **양쪽에서 typed `--ignore`**로 제외돼 있다. image 3파일도 **같은 패턴으로 양쪽에 `--ignore` 추가**가 최소·정합(ⓐ). 주의: `core.yml`은 `node_dependent_tests.py` 목록을 **안 쓰므로**(browser만 하드코딩 --ignore) core는 반드시 명시 --ignore가 필요하다 — 즉 ⓑ(computed)만으로는 core를 못 덮는다. computed 순정 경로(ⓑ)를 원하면: `node_dependent_tests.py`는 "test_node_runtime 도달"만 계산하므로 image-env(`INV_WEB_IMAGE`/`INV_UPGRADE_AGENT_IMAGE`/`INV_STORAGE_SOURCE_ROOT`) skipif를 계산하는 **분류를 내가(Claude) 추가**하고 **core.yml도 그 목록을 채택**해야 완결된다(더 큰 변경). **내 권고: ⓐ(양쪽 --ignore, browser와 동일 패턴)** — 최소 변경이고 이미 존재하는 browser 처리와 정확히 같은 형태다. 도구의 "computed, not typed" 선호가 걸리나, browser가 이미 typed --ignore이므로 새 안티패턴을 들이는 게 아니라 기존 제외를 확장하는 것뿐이다.
+
+**Codex 적용 패치문안 ⓐ (양쪽 --ignore 추가):**
+- `backend.yml` Tests 스텝의 pytest 줄 끝에 추가:
+  ```
+  --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
+  ```
+- `core.yml` 최종 `python -m pytest --junitxml=dist/core-tests.xml …` 줄 끝에 **같은 3개 --ignore** 추가.
+(둘 다 이미 browser 3개 --ignore가 붙어 있는 그 자리에 나란히.)
+
+## ③ Codex 적용 패치문안 (하드코딩 개수 → 마법 숫자 제거)
+선례: 오늘 definer 함수 개수를 9-vs-10에서 하드코딩 대신 수집/정책 대조로 바꾼 것과 같은 형태.
+- `desktop-browser.yml` "Require all six browser journeys" 스텝:
+  - OLD: `assert proof['tests'] == {'failure': 0, 'error': 0, 'skipped': 0, 'passed': 6}`
+  - NEW:
+    ```
+    t = proof['tests']
+    assert t['skipped'] == 0 and t['failure'] == 0 and t['error'] == 0 and t['passed'] > 0
+    ```
+  (browserOptIn·exitCode==0·subprocessExitCode==0·evidenceStatus=='complete'·isolatedContainerRemoved 단언은 유지 — 6만 완화.)
+- `core.yml` "Require executed integration evidence" 스텝의 docker-host 줄:
+  - OLD: `assert len(host.findall('.//testcase')) == 2, 'Both Docker host hygiene cases must execute'`
+  - NEW: `assert host.findall('.//testcase'), 'Docker host lane must execute at least one case'`
+  (바로 다음의 `assert not any(... failure/error/skipped)`가 유지되어 "≥1개 돌고 전부 통과, skip 없음"을 함께 보장 — 마법 숫자 2만 제거.)
+
 ## 인계
-워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **②는 철회. ①③만 인계**:
+워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **②는 철회. ①③만 인계**(위 패치문안·판단 재료 첨부):
 - **①(image-opt-in skip → no-skipped RED)** — [측정]된 사실. **재현법 함께 인계**: `.venv python -m pytest tests/integration/test_web_container.py tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=<path>` → junit `testcases=22, skipped=22, failure=0, error=0`; 이 3파일은 node_dependent 목록에 없어 backend(`$IGNORES`+browser)·core(browser만) collect에 포함됨. **수정안 2개**: ⓐ 워크플로에서 browser처럼 제외(`--ignore=…`) — **Codex 소관**; ⓑ `node_dependent_tests.py`(**Claude 소관**)에 이 opt-in-이미지 부류를 추가해 backend에서 자동 제외 — 단 core.yml은 그 목록을 안 쓰므로 core는 별도 제외 필요. Codex가 어느 쪽이 정합적인지 판단하고, ⓑ면 내가 확장한다.
 - **③(하드코딩 개수)** — [측정]상 browser 6·docker-host 2는 현재 일치하나 리터럴이라 코드 변경 시 어긋난다. `skipped==0 and failure==0 and error==0 and passed>0`로(마법 숫자 제거+조용한 skip 차단). **선례**: 오늘 definer 함수 개수를 9-vs-10에서 하드코딩 대신 수집/정책 대조로 바꾼 것과 같은 형태 — 그 선례를 근거로 단다.
 
