@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.60"
+version: "1.0.61"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:55:00+09:00"
+updated: "2026-09-21T19:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:55:00+09:00.
+- 확인 기준: 2026-09-21T19:15:00+09:00.
 
 ## 최근 확인한 진척
+
+- **생성 타입 전면 전환, ApprovalPage·ApprovalView 및 RunArtifactList 이중 정의 해소 완결 (`apps/web/src/contracts/types.ts`, `RunDetail.tsx`, `DeveloperStudio.tsx`)**:
+  - **RunArtifactList 및 RunArtifactFile 생성 타입 전환**: `types.ts`의 수기 `RunArtifactItem` 및 `RunArtifactList`를 전면 폐기하고 `packages/contracts-ts`의 `RunArtifactList`, `RunArtifactFile` 생성 타입 re-export로 정합. 호환용 `export type RunArtifactItem = RunArtifactFile;` 별칭 제공.
+  - **ApprovalPage & ApprovalView 이중 정의 해소 및 일원화**: `types.ts`의 수기 인터페이스(`nextCursor: string | null`, 수기 string items)를 전면 삭제하고 `packages/contracts-ts`의 `ApprovalPage`(`nextCursor: ApprovalId | null`), `ApprovalView`, `ApprovalId`를 re-export하여 `kernel-observation.ts`와 완벽 일원화. `ControlRunPage`, `ControlRunView`도 `types.ts` re-export 목록에 편입.
+  - **RunResultView, RunState, RiskLevel, ShardPlanId 생성 타입 전환**: 수기 `RunResultView`(stopReceipt가 NodeStopReceipt로 비표준 유니온되던 형태)를 폐기하고 `ResultStopReceipt`, `ResultOutputMetadata` 기반 정본 생성 타입으로 전환. `RunDetail.tsx(194)` 및 `DeveloperStudio.tsx(628)`에서 `resultRes.stopReceipt as unknown as NodeStopReceipt`로 정확한 경계 명시.
+  - **types.ts 전체 43개 타입 전수 훑기 완료**: 커널 계약 대응 17개 전수 생성 타입 전환 완료, 의도적 수기 유지 2개(`ProblemDetails`=Codex 에러경로 정합 레인, `NodeStopReceipt`=노드 원본영수증 vs UI 화면 ViewModel 개념분리), UI 전용 ViewModel 24개 분류 명시.
+  - **검증 실적**: Vitest 52개 파일 **475/475 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.44s, 93 modules), Pytest 19 passed (0.69s), check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini]].
+
 
 - **VF-GM-03·04·05 Codex 경계 결함 치유, 미관측 상태 날조 배제 및 ModelCommitObservation 프론트 계약 결속 완결 (`TerminalSessionView.tsx`, `WebTerminal.tsx`, `ws-terminal.ts`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `apps/web/src/contracts/types.ts`, `tests/model-commit-observation-contract.test.ts`)**:
   - **Priority 1 (VF-GM-05 PTY & TerminalSessionView)**: PTY 일회용 티켓 요청을 `TerminalTicketInput: { commandId }` strict schema로 정합, `TerminalTicketResult` (`ticket`, `expiresAt`, `sessionId`, `websocketPath`) 수신 연동, WebSocket `['inv-terminal-v1']` 서브프로토콜 지정 및 쿼리 파라미터 완전 제거, 최초 프레임 `{ ticket }` 전송 완비. `nodes.length === 0`일 때 가상 노드 날조 세션 생성을 전면 폐기하고 0 활성 세션, 0 PTY 마운트, 0 티켓 API 호출 및 `data-testid="terminal-empty-nodes-notice"` 정직 렌더링 실증.
