@@ -1,12 +1,12 @@
 ---
 doc_id: "UI-FB-CONTRACT-REVIEW-20260921-CODEX"
 title: "UI-FB 계약 구현 준비도 재검토"
-version: "1.1.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Pending"
 base_commit: "d0d1322"
-updated: "2026-09-21T10:46:00+09:00"
+updated: "2026-09-21T12:08:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["UI-FB", "contract", "frontend", "verification-boundary"]
@@ -95,3 +95,25 @@ Gemini 구현 commit을 확인해 이 SHA의 소스와 회귀 증거를 검토�
 6. **오류 접근성/일관성**: 세 컴포넌트에서 조사한 오류 배너는 `role="alert"` 또는 `aria-live`를 갖지 않는다. pass/fail 계약의 접근 가능한 오류 알림 요건을 충족하도록 고치고, 다른 UI 문구를 동일하게 만들 필요는 없지만 loading/empty/error의 의미와 접근성은 일관되게 검사한다.
 
 재검토 경계: vitest 및 Python 시험은 실행했으나 browser, live HTTP, backend 장애 주입, 실제 운영 화면은 실행하지 않았다. Gemini가 위 잔여를 fixed SHA로 반영한 뒤 Codex가 다시 검토한다. Gemini 실행 보고서의 `reviewer: Codex` / `status: approved` / “100% 완료” 표현은 이 검토를 반영한 승인이 아니다. Codex 독립 판정은 위 finding이 닫히기 전까지 **pending**이다.
+
+## `84f26ca` DOM harness 및 연속 조회 잔여 — 사용자 변형 증거
+
+사용자가 제공한 실측을 기록한다(이 단락의 테스트 재실행자는 사용자이며 Codex는 해당 변형을 다시 돌리지 않았다). `84f26ca`는 `happy-dom`을 추가했고 `ResourceExplorer`를 `tests/browser/desktop.tsx` 및 `resource-explorer-dom.test.tsx`에 마운트해 이전에 없던 effect 구동 lane을 만들었다. 사용자는 DOM 시험 5건과 `fabric-control-plane.test.tsx` 26건 통과를 보고했다. 이어 `items.length > 0` 조건을 복원했을 때에도 5+26건이 모두 통과했고 소스를 원복했으며 트리는 clean이라고 보고했다. 새 lane의 방향은 개선됐지만 정상 성공-empty가 **기존 후보에서 재조회하는 전이**로 고정되지는 않았다.
+
+### Gemini 전달용 구체 계약
+
+각 케이스는 같은 컴포넌트를 실제 사용자 경로로 두 번 조회해야 한다(버튼·탭·props 기반 재조회 중 구현에 맞는 경로는 Gemini가 선택). 단일 최초 조회는 기존 목록 잔류 mutant를 구분하지 못한다.
+
+| DOM 시나리오 | 응답 순서 및 최종 합격 | 함께 주입할 mutant | mutant가 시험에서 실패해야 하는 이유 |
+|---|---|---|---|
+| 후보 있음 → 정상 빈 응답 | 1차 GET이 pending 후보 1개를 반환한다. 그 row와 승인/거부 버튼이 보이는 것을 먼저 확인한다. 2차 GET은 `{items: []}`다. 이후 기존 row/버튼이 사라지고 success-empty 상태가 보인다. | `setCandidates` 갱신을 `items.length > 0` 조건 안으로 되돌린다. | 2차 응답 후 첫 후보가 남으므로 row/button 부재 및 empty 상태 단언이 실패한다. |
+| 후보 있음 → 재조회 오류 | 1차 GET에서 후보 row/운영 버튼을 확인한다. 2차 GET은 401/5xx 또는 network rejection이다. 최종 화면에 error alert가 있고 row/버튼은 없어야 한다. | catch에서 `setCandidates([])` 제거. | stale 후보와 운영 버튼이 남아 clear/button 부재 단언이 실패한다. |
+| error + 후보 데이터 | 실패 직후 목록이 이미 빈 상황만 검사하지 않는다. error 상태 전이와 함께 후보 1개를 남기는 harness/state fixture를 만들어 error가 버튼을 억제하는지 본다. | error-state의 후보 목록 렌더 가드 제거. | 데이터가 있어도 error 상태 자체가 운영 버튼을 숨겨야 하므로 mutant에서 버튼이 나타나 시험이 실패한다. |
+
+각 mutant를 개별 적용해 대응하는 DOM 시험이 실패함을 Gemini가 확인하고, 원복 후 같은 시험이 통과해야 한다. 시험이 통과했다는 수치만으로는 완료가 아니다. 현 판정은 제품 코드 방향이 맞더라도 이 세 회귀 조건을 고정하지 못한 **UI-FB-01 독립 검토 pending**이다.
+
+### Mock 응답 shape와 실제 backend 계약
+
+adapter 시험이 `apiClient`를 mock하면서 expected response shape를 시험 안에서 직접 만들고 같은 mock 값을 반환하는 방식은 consumer와 provider를 독립적으로 대조하지 않는다. 권고 계약은 한 쪽만 source of truth가 되는 것이다: backend의 OpenAPI/Pydantic response schema에서 TypeScript 타입 또는 JSON Schema fixture를 생성하고, (1) client adapter test는 응답을 그 schema로 검증하며, (2) backend provider test는 실제 route response가 같은 schema를 만족하는지 검증한다. 생성 산출물의 drift 자체도 CI에서 검사한다. live backend 시험이 환경상 skip되더라도 provider schema 생성/검증은 backend 소스 또는 OpenAPI snapshot에서 실행할 수 있어야 한다. hand-written mock fixture가 contract 정의 역할까지 겸하게 두지 않는다.
+
+역할 경계: 이 표는 Gemini 전달용 finding이다. Codex는 Antigravity에 직접 보내지 않았고 UI 구현·시험을 수정하지 않았다. Gemini가 위 세 변형을 통과시키고 fixed SHA를 제공한 뒤 Codex가 독립 재검토한다.

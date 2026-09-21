@@ -1,5 +1,5 @@
 """Conservative one-way export; never deletes files or overwrites unknown edits."""
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import argparse
 import hashlib
 import json
@@ -14,17 +14,18 @@ ROOT = Path(__file__).resolve().parents[1]
 class ConflictsDetected(Exception):
     """Destination files diverged from the tracked baseline.
 
-    This is a *diagnostic result*, not a crash: no vault files were written; an
-    explicitly requested identical-file baseline may have been persisted, and the
-    caller decides how to surface it. It is deliberately distinct from the
+    This is a *diagnostic result*, not a crash: unlisted vault files were not
+    written; explicitly listed resolutions and identical-file metadata may have
+    been persisted. The caller decides how to surface it. It is deliberately distinct from the
     ValueErrors that signal a usage/configuration error (unsafe path, wrong
     state vault, mid-run change), so the exit code can tell them apart.
     """
 
-    def __init__(self, conflicts, adopted=()):
+    def __init__(self, conflicts, adopted=(), resolved=()):
         self.conflicts = conflicts  # list of (rel, reason)
         self.adopted = tuple(adopted)
-        super().__init__(f'{len(conflicts)} unmanaged destination collisions; no vault files written')
+        self.resolved = tuple(resolved)
+        super().__init__(f'{len(conflicts)} unmanaged destination collisions remain')
 
 
 def default_state_path(root=None):
@@ -67,6 +68,31 @@ def _matches_baseline(path, known):
     return known is not None and known in (sha(path), sync_sha(path))
 
 
+def read_conflict_paths(path):
+    """Read canonical docs/vault-relative paths, one UTF-8 line per file."""
+    lines = Path(path).read_text(encoding='utf-8-sig').splitlines()
+    selected = []
+    seen = set()
+    for line_number, rel in enumerate(lines, start=1):
+        if not rel:
+            continue
+        pure = PurePosixPath(rel)
+        parts = rel.split('/')
+        if (rel != rel.strip() or '\\' in rel or pure.is_absolute()
+                or PureWindowsPath(rel).drive
+                or any(part in ('', '.', '..') for part in parts)
+                or any(part.lower() == '.obsidian' for part in parts)
+                or pure.as_posix() != rel):
+            raise ValueError(f'Invalid repository-relative path on line {line_number}')
+        if rel in seen:
+            raise ValueError(f'Duplicate conflict path on line {line_number}')
+        seen.add(rel)
+        selected.append(rel)
+    if not selected:
+        raise ValueError('Conflict path list is empty')
+    return tuple(selected)
+
+
 def contained(root, relative):
     candidate = root / relative
     resolved = candidate.resolve()
@@ -91,14 +117,40 @@ def _conflict_reason(known, source_matches_baseline):
     return 'both-diverged'
 
 
-def export(source, destination, state_path, original_hashes, apply=False, adopt=False):
+def _replace_from_source(source_path, target, expected_source_raw, expected_target_raw):
+    """Atomically write source bytes only if neither side changed since scan."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.inv-sync-', dir=target.parent)
+    try:
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(source_path.read_bytes())
+        if sha(source_path) != expected_source_raw:
+            raise ValueError('Source changed during export; no replacement performed')
+        if sha(target) != expected_target_raw:
+            raise ValueError('Destination changed during export; no replacement performed')
+        os.replace(temporary, target)
+    finally:
+        if Path(temporary).exists():
+            Path(temporary).unlink()
+
+
+def export(source, destination, state_path, original_hashes, apply=False, adopt=False,
+           resolve_conflicts=None):
+    if resolve_conflicts is not None and not apply:
+        raise ValueError('Conflict path resolution requires apply=True')
+    if resolve_conflicts is not None and not resolve_conflicts:
+        raise ValueError('Conflict resolution list is empty')
+    if resolve_conflicts is not None and any(not isinstance(rel, str) for rel in resolve_conflicts):
+        raise ValueError('Conflict resolution paths must be strings')
     source, destination = source.resolve(), destination.resolve()
     if source == destination or source.is_relative_to(destination) or destination.is_relative_to(source):
         raise ValueError('Source and destination must be separate trees')
     state = json.loads(state_path.read_text('utf-8')) if state_path.is_file() else {'vault': str(destination), 'files': {}}
     if Path(state['vault']).resolve() != destination:
         raise ValueError('State belongs to another vault; use a separate --state path')
-    changes, expected, conflicts, adopted = [], {}, [], []
+    changes, expected, expected_raw, source_raw, conflicts, adopted = [], {}, {}, {}, [], []
+    if resolve_conflicts is not None and len(resolve_conflicts) != len(set(resolve_conflicts)):
+        raise ValueError('Conflict resolution list contains duplicate paths')
     paths = sorted(p for p in source.rglob('*') if p.is_file())
     for path in paths:
         if not path.resolve().is_relative_to(source):
@@ -107,6 +159,8 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
         target = contained(destination, rel)
         current, wanted = sync_sha(target), sync_sha(path)
         current_raw = sha(target)
+        expected_raw[rel] = current_raw
+        source_raw[rel] = sha(path)
         expected[rel] = current
         known = state['files'].get(rel, original_hashes.get(rel))
         if current == wanted:
@@ -122,6 +176,36 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
             conflicts.append((rel, _conflict_reason(known, _matches_baseline(path, known))))
         else:
             changes.append((path, target, rel, wanted))
+    resolved_changes = []
+    if resolve_conflicts is not None:
+        current_conflicts = {rel: reason for rel, reason in conflicts}
+        stale = sorted(set(resolve_conflicts) - set(current_conflicts))
+        if stale:
+            raise ValueError('Resolution list includes paths that are not current conflicts: '
+                             + ', '.join(stale))
+        requested = set(resolve_conflicts)
+        resolved_changes = [
+            (source / rel, contained(destination, rel), rel, sync_sha(source / rel))
+            for rel in resolve_conflicts]
+        unresolved = [(rel, reason) for rel, reason in conflicts if rel not in requested]
+        if unresolved:
+            # A partial resolution writes only explicitly listed conflicts. It does not
+            # export unrelated pending files, and the unresolved set still returns 3.
+            for _, target, rel, _ in resolved_changes:
+                if sha(target) != expected_raw[rel] or sha(source / rel) != source_raw[rel]:
+                    raise ValueError(f'Conflict changed after scan: {rel}; no files written')
+            for path, target, rel, wanted in resolved_changes:
+                _replace_from_source(path, target, source_raw[rel], expected_raw[rel])
+                state['files'][rel] = wanted
+                _write_state(state_path, state)
+            raise ConflictsDetected(unresolved, adopted, resolve_conflicts)
+        # All current conflicts are explicitly named. They can join ordinary pending
+        # exports, which retain the normal all-files preflight before the first write.
+        for path, target, rel, _ in resolved_changes:
+            if sha(target) != expected_raw[rel] or sha(path) != source_raw[rel]:
+                raise ValueError(f'Conflict changed after scan: {rel}; no files written')
+        changes.extend(resolved_changes)
+        conflicts = []
     # Identical-file adoption changes metadata only. Persist it even if unrelated
     # destination edits abort this run, so the next run has a usable baseline.
     if adopted:
@@ -140,22 +224,14 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
             raise ValueError(f'Changed during preflight: {rel}; no writes performed')
     for path, target, rel, wanted in changes:
         contained(destination, rel)
-        target.parent.mkdir(parents=True, exist_ok=True)
         if sync_sha(target) != expected[rel]:
             raise ValueError(f'Changed during export: {rel}; prior exported files preserved')
-        fd, temporary = tempfile.mkstemp(prefix='.inv-sync-', dir=target.parent)
-        try:
-            with os.fdopen(fd, 'wb') as stream:
-                stream.write(path.read_bytes())
-            if sync_sha(target) != expected[rel]:
-                raise ValueError(f'Concurrent edit: {rel}')
-            os.replace(temporary, target)
-        finally:
-            if Path(temporary).exists():
-                Path(temporary).unlink()
+        _replace_from_source(path, target, source_raw[rel], expected_raw[rel])
         state['files'][rel] = wanted
         # Save progress per file so an interrupted export can be resumed.
         _write_state(state_path, state)
+        if resolve_conflicts is not None and rel in resolve_conflicts:
+            print(f'RESOLVED APPROVED CONFLICT: {rel}')
     for path in paths:
         rel = path.relative_to(source).as_posix()
         if sync_sha(contained(destination, rel)) != sync_sha(path):
@@ -166,7 +242,7 @@ def export(source, destination, state_path, original_hashes, apply=False, adopt=
     return len(changes)
 
 
-def _report_conflicts(conflicts, out_path, adopted=()):
+def _report_conflicts(conflicts, out_path, adopted=(), resolved=()):
     """Group conflicts by reason, print a summary, and write the full list to a file.
 
     Returns the exit code (3): a judgment result (collisions), distinct from a
@@ -175,7 +251,15 @@ def _report_conflicts(conflicts, out_path, adopted=()):
     counts = {}
     for _, reason in conflicts:
         counts[reason] = counts.get(reason, 0) + 1
-    print(f'CONFLICTS: {len(conflicts)} unmanaged destination collisions; no vault files written.', file=sys.stderr)
+    if resolved:
+        print(f'RESOLVED: {len(resolved)} explicitly approved paths were written from the repository.',
+              file=sys.stderr)
+        for rel in resolved:
+            print(f'  RESOLVED: {rel}', file=sys.stderr)
+    print(f'CONFLICTS: {len(conflicts)} unmanaged destination collisions remain; '
+          + ('no vault files written.' if not resolved else
+             'only listed conflicts were written; pending exports were skipped.'),
+          file=sys.stderr)
     if adopted:
         print(f'  ADOPTED: {len(adopted)} identical-file hashes recorded in local state before abort.', file=sys.stderr)
     print('  grouped by reason:', file=sys.stderr)
@@ -186,7 +270,8 @@ def _report_conflicts(conflicts, out_path, adopted=()):
         json.dumps(
             {'reasonCounts': counts,
              'conflicts': [{'path': rel, 'reason': reason} for rel, reason in conflicts],
-             'adoptedIdentical': list(adopted)},
+             'adoptedIdentical': list(adopted),
+             'resolvedFromRepository': list(resolved)},
             ensure_ascii=False, indent=2) + '\n',
         encoding='utf-8')
     print(f'  full list ({len(conflicts)}): {out_path}', file=sys.stderr)
@@ -205,7 +290,11 @@ def main(argv=None):
     parser.add_argument('--state', type=Path, default=None)
     parser.add_argument('--conflicts-out', type=Path, default=ROOT / '.work/obsidian-sync-conflicts.json')
     parser.add_argument('--adopt-identical', action='store_true')
+    parser.add_argument('--resolve-conflicts-from', type=Path, metavar='PATHS_FILE',
+                        help='--apply only: UTF-8 file with one current docs/vault-relative conflict path per line')
     args = parser.parse_args(argv)
+    if args.resolve_conflicts_from is not None and not args.apply:
+        parser.error('--resolve-conflicts-from requires --apply')
     try:
         state_path = args.state or default_state_path()
     except (OSError, subprocess.CalledProcessError) as exc:
@@ -217,12 +306,15 @@ def main(argv=None):
         print(f'Manifest unavailable ({type(exc).__name__}); cannot sync.', file=sys.stderr)
         return 1
     try:
+        resolution_paths = (read_conflict_paths(args.resolve_conflicts_from)
+                            if args.resolve_conflicts_from is not None else None)
         export(ROOT / 'docs/vault', args.vault or Path(manifest['vault']), state_path,
-               {item['path']: item['sha256'] for item in manifest['files']}, args.apply, args.adopt_identical)
+               {item['path']: item['sha256'] for item in manifest['files']}, args.apply,
+               args.adopt_identical, resolution_paths)
     except ConflictsDetected as detected:
-        return _report_conflicts(detected.conflicts, args.conflicts_out, detected.adopted)
-    except ValueError as exc:
-        # Usage/configuration/mid-run error -- distinct from a conflict diagnostic.
+        return _report_conflicts(detected.conflicts, args.conflicts_out, detected.adopted,
+                                 detected.resolved)
+    except (OSError, ValueError) as exc:
         print(f'Sync error ({type(exc).__name__}): {exc}', file=sys.stderr)
         return 1
     return 0

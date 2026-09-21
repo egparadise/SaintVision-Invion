@@ -2,6 +2,8 @@
 from pathlib import Path
 import json
 import hashlib
+from contextlib import redirect_stdout
+from io import StringIO
 import shutil
 import subprocess
 import tempfile
@@ -13,6 +15,27 @@ from sync_obsidian import ConflictsDetected, default_state_path, export, sha, sy
 
 
 class SyncTests(unittest.TestCase):
+    def _cli_repo(self, temp, source_files, destination_files, original_files=()):
+        root = Path(temp) / 'repo'
+        source = root / 'docs' / 'vault'
+        destination = Path(temp) / 'external-vault'
+        source.mkdir(parents=True)
+        destination.mkdir()
+        subprocess.run(['git', 'init', '-q'], cwd=root, check=True)
+        for rel, content in source_files.items():
+            target = source / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        for rel, content in destination_files.items():
+            target = destination / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(content)
+        original_hashes = [
+            {'path': rel, 'sha256': sha(destination / rel)} for rel in original_files]
+        (root / 'docs' / 'source-manifest.json').write_text(
+            json.dumps({'vault': str(destination), 'files': original_hashes}), encoding='utf-8')
+        return root, source, destination
+
     def test_export_is_idempotent_and_preserves_unmanaged_files(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
@@ -168,6 +191,114 @@ class SyncTests(unittest.TestCase):
                        for reason in {item_reason for _, item_reason in conflicts}}
             self.assertEqual(len(conflicts), 16)
             self.assertEqual(reasons, {'no-baseline': 14, 'both-diverged': 2})
+
+    def test_explicit_resolution_writes_only_listed_conflicts_and_keeps_exit_three(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, destination = self._cli_repo(temp, {
+                'approved.md': b'repository approved bytes\n',
+                'remaining.md': b'repository remaining bytes\n',
+                'pending.md': b'new pending export\n',
+            }, {
+                'approved.md': b'vault edit approved\r\n',
+                'remaining.md': b'vault edit remaining\r\n',
+            })
+            paths_file = Path(temp) / 'approved-paths.txt'
+            paths_file.write_text('approved.md\n', encoding='utf-8')
+            remaining_before = (destination / 'remaining.md').read_bytes()
+
+            with patch.object(sync_obsidian, 'ROOT', root):
+                exit_code = sync_obsidian.main([
+                    '--apply', '--vault', str(destination),
+                    '--resolve-conflicts-from', str(paths_file)])
+
+            self.assertEqual(exit_code, 3)
+            self.assertEqual((destination / 'approved.md').read_bytes(),
+                             (source / 'approved.md').read_bytes())
+            self.assertEqual((destination / 'remaining.md').read_bytes(), remaining_before)
+            self.assertFalse((destination / 'pending.md').exists())
+            report = json.loads((root / '.work' / 'obsidian-sync-conflicts.json').read_text('utf-8'))
+            self.assertEqual(report['resolvedFromRepository'], ['approved.md'])
+            self.assertEqual([item['path'] for item in report['conflicts']], ['remaining.md'])
+            self.assertEqual(json.loads(default_state_path(root).read_text('utf-8'))['files'], {
+                'approved.md': sync_sha(source / 'approved.md')})
+
+    def test_resolution_list_rejects_a_path_that_is_not_a_current_conflict(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, destination = self._cli_repo(temp, {
+                'stale.md': b'repository updated bytes\n',
+                'real-conflict.md': b'repository conflict version\n',
+            }, {
+                'stale.md': b'baseline bytes\n',
+                'real-conflict.md': b'unmanaged vault bytes\r\n',
+            }, original_files=('stale.md',))
+            paths_file = Path(temp) / 'stale-path.txt'
+            paths_file.write_text('stale.md\n', encoding='utf-8')
+            stale_before = (destination / 'stale.md').read_bytes()
+            conflict_before = (destination / 'real-conflict.md').read_bytes()
+
+            with patch.object(sync_obsidian, 'ROOT', root):
+                exit_code = sync_obsidian.main([
+                    '--apply', '--vault', str(destination),
+                    '--resolve-conflicts-from', str(paths_file)])
+
+            self.assertEqual(exit_code, 1)
+            self.assertEqual((destination / 'stale.md').read_bytes(), stale_before)
+            self.assertEqual((destination / 'real-conflict.md').read_bytes(), conflict_before)
+            self.assertFalse(default_state_path(root).exists())
+
+    def test_resolving_all_listed_conflicts_updates_state_and_rerun_is_clean(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, destination = self._cli_repo(temp, {
+                'one.md': b'repository one\n',
+                'two.md': b'repository two\n',
+            }, {
+                'one.md': b'vault one\r\n',
+                'two.md': b'vault two\r\n',
+            })
+            paths_file = Path(temp) / 'all-paths.txt'
+            paths_file.write_text('one.md\ntwo.md\n', encoding='utf-8')
+            output = StringIO()
+            with patch.object(sync_obsidian, 'ROOT', root):
+                with redirect_stdout(output):
+                    exit_code = sync_obsidian.main([
+                        '--apply', '--vault', str(destination),
+                        '--resolve-conflicts-from', str(paths_file)])
+                check_code = sync_obsidian.main(['--check', '--vault', str(destination)])
+                stale_list_code = sync_obsidian.main([
+                    '--apply', '--vault', str(destination),
+                    '--resolve-conflicts-from', str(paths_file)])
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(check_code, 0)
+            self.assertEqual(stale_list_code, 1)
+            self.assertIn('RESOLVED APPROVED CONFLICT: one.md', output.getvalue())
+            self.assertIn('RESOLVED APPROVED CONFLICT: two.md', output.getvalue())
+            for rel in ('one.md', 'two.md'):
+                self.assertEqual((destination / rel).read_bytes(), (source / rel).read_bytes())
+            state = json.loads(default_state_path(root).read_text('utf-8'))
+            self.assertEqual(state['files'], {
+                'one.md': sync_sha(source / 'one.md'),
+                'two.md': sync_sha(source / 'two.md'),
+            })
+
+    def test_conflict_path_file_rejects_unsafe_and_duplicate_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path_file = Path(temp) / 'paths.txt'
+            for contents in ('../outside.md\n', '/absolute.md\n', 'C:/outside.md\n',
+                             'a\\b.md\n', 'same.md\nsame.md\n'):
+                with self.subTest(contents=contents):
+                    path_file.write_text(contents, encoding='utf-8')
+                    with self.assertRaises(ValueError):
+                        sync_obsidian.read_conflict_paths(path_file)
+
+    def test_conflict_resolution_option_is_apply_only(self):
+        with tempfile.TemporaryDirectory() as temp:
+            paths_file = Path(temp) / 'paths.txt'
+            paths_file.write_text('note.md\n', encoding='utf-8')
+            with self.assertRaises(SystemExit) as raised:
+                sync_obsidian.main([
+                    '--check', '--resolve-conflicts-from', str(paths_file)])
+            self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == '__main__':
