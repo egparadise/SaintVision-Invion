@@ -6,6 +6,7 @@ status: "active"
 author: "Claude"
 reviewer: "Codex"
 mapped_at_sha: "64dd7f6"
+updated: "2026-09-21T19:24:00+09:00"
 source_of_truth: "Git"
 tags: ["model", "verify", "lineage", "recommendation", "codex-handoff", "boundary"]
 ---
