@@ -1,7 +1,7 @@
 ---
 doc_id: "SYNC-OBSIDIAN-BLOCKED-CLAUDE-001"
 title: "sync_obsidian.py --check 차단 조사 — 683 충돌 사유별 분류·근본원인·도구 진단 수정. --apply 미실행"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
@@ -96,3 +96,43 @@ tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 - **판단 대상이 683 → 실질 2 건으로 좁혀졌다.** 681 no-baseline 은 판단 불필요(전부 benign artifact). **오직 both-diverged 2 건만** 사용자 판단이 필요하며, 그것은 **덮어쓰기가 아니라 병합**(저장소 내용 + 사용자 index 추가분)이어야 한다.
 - **681 block 의 근본 원인**: sync 가 `sha256(raw bytes)` 로 비교하는데 vault 는 CRLF(Windows/OneDrive), 저장소는 LF(`.gitattributes eol=lf`) → 672 EOL + 4 trailing + 5 정확 = 681 이 전부 **공백/EOL artifact 로 충돌 처리**된다. **권고(Codex, 도구 소유)**: 비교 시 **EOL 정규화**(git 처럼)하면 681 no-baseline 충돌이 사라지고, 남는 것은 both-diverged 2 건뿐이다 — 이것이 unblock 의 핵심 경로다.
 - **제약 준수**: vault 읽기만, 쓰기 0, `--apply` 미실행. 실제 처리(681 덮어쓰기/EOL 정규화, both-diverged 2 건 병합)는 이 보고를 사용자가 보고 판단한 뒤에 한다.
+
+## v1.3.0 — 683 전체 내용 판정표 (2026-09-21). vault 읽기 전용
+
+사용자 정정 접수: 내 v1.2.0 "681 전부 benign, 진짜 편집 2건"은 부정확했다. 내 방법이 "vault 내용이 **어느** 저장소 버전과 일치하는가"라, **과거 버전과 일치하는 old 잔재**(현재 repo와는 내용이 다름)를 EOL 잔재로 뭉뚱그렸다. 사용자의 "현재 repo 대비 실제 내용 차이"가 더 정밀하다. 683 전체를 EOL 정규화 후 현재 repo와 비교하니 **내용이 실제로 다른 것이 16건**이다(나머지 ~667은 순수 CRLF↔LF, 내용 동일).
+
+각 파일의 vault-only 줄이 **과거 어느 커밋에 존재했는지**(잔재) **존재한 적 없는지**(사용자 편집)를 git 이력으로 판별했다. 세 부류로 정리하며 **판별 불가를 안전 쪽에 섞지 않았다.**
+
+| 판정 | 파일 | vault-only/repo-only | 근거 |
+|---|---|---|---|
+| **MERGE 필요** | `00_Index/Overview.md` | +6/-0 | vault-only 줄이 이력에 없음=사용자 편집 |
+| **MERGE 필요** | `00_Index/SaintVision INV 개발 설계 인덱스.md` | +2/-0 | vault-only 줄이 이력에 없음=사용자 편집 |
+| SAFE(덮어쓰기) | `30_Development/Agent별 작업/Codex 작업 현황.md` | +3/-85 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Agent별 작업/Gemini 작업 현황.md` | +12/-71 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/검증 경계 감사 종합과 잔여 범위.md` | +7/-64 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `00_Index/전체 개발 진행 현황.md` | +5/-26 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Claude_CL-01_커널독립검토.md` | +3/-24 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Codex 검증 상태 지도와 재개 조건.md` | +2/-20 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Agent별 작업/Orca 작업 현황.md` | +11/-4 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `40_Governance/Git Build Obsidian 운영 절차.md` | +1/-3 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Agent별 작업/Claude 작업 현황.md` | +1/-1 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(덮어쓰기) | `30_Development/Agent별 작업/Codex VF 작업 현황.md` | +1/-1 | vault=과거 커밋 버전과 정확 일치(깨끗한 old) |
+| SAFE(공백) | `00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md` | +1/-0 | 끝 빈 줄만 |
+| SAFE(공백) | `20_Architecture/웹 단일 가상 컴퓨터와 분산 모델 Fabric 보강 설계.md` | +1/-0 | 끝 빈 줄만 |
+| SAFE(공백) | `30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md` | +1/-0 | 끝 빈 줄만 |
+| SAFE(공백) | `40_Governance/Agent 연속 실행과 최종 보고 정책.md` | +1/-0 | 끝 빈 줄만 |
+
+**요약: SAFE 14(old 잔재 10 + 공백 4) · MERGE 2 · 판별불가 0.**
+
+### MERGE 2건 (사용자 index 편집 — 보존 필요, 덮어쓰기 금지)
+- `00_Index/Overview.md` (+6/-0): vault-only 줄 = `## 2026-09-15 보강 설계` + 위키링크 3개(`[[2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스]]`, `[[웹 단일 가상 컴퓨터와 분산 모델 Fabric 보강 설계]]`, `[[57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵]]`). 이력에 없음 = 사용자가 vault 에서 추가.
+- `00_Index/SaintVision INV 개발 설계 인덱스.md` (+2/-0): vault-only 줄 = `## 2026-09-15 승인 보강 트랙` + 진입점 안내 문단(위키링크 포함). 이력에 없음 = 사용자 편집.
+- 병합 방식: 저장소 최신 내용 + 위 vault-only 줄을 함께 보존. 통째 덮어쓰면 index 소실.
+
+### 사용자 지목 '가장 위험' 파일 확정
+- `00_Index/전체 개발 진행 현황.md` (+5/-26): vault 내용이 **커밋 `e0b025e`(2026-09-18 18:58) 버전과 통째로 정확 일치**. 즉 사용자 편집 줄이 섞이지 않은 **깨끗한 old 스냅샷**이고 +5/-26은 09-18→현재의 버전 drift 다. **SAFE(덮어쓰기 안전)** — 혼합 아님. (SAFE-remnant 10건 모두 같은 논리: vault 전체가 과거 한 버전과 정확 일치.)
+
+### 전망 · 근본원인 (EOL 권고는 Codex 소관, 나는 도구 미수정)
+- **EOL 정규화가 적용되면 683 → 16(내용차이)로 줄고, 그중 실제 사용자 판단 대상은 MERGE 2건뿐**(SAFE 14는 기계적: old 잔재 덮어쓰기/공백). 사용자 판단 규모 = **2 파일**.
+- 근본원인 재확인: vault=CRLF, repo=LF(`.gitattributes eol=lf`)라 sync 의 `sha256(raw)` 비교가 ~667 순수-EOL + 10 old잔재 + 4 공백 + 2 편집을 모두 충돌로 처리. EOL 정규화 비교로 바꾸면 순수-EOL 667 이 사라지고 위 16 만 남는다(권고, Codex).
+- **제약 준수**: vault 읽기만, 쓰기 0, `--apply` 미실행. 실제 처리(SAFE 14 덮어쓰기, MERGE 2 병합)는 사용자 판단 후.
