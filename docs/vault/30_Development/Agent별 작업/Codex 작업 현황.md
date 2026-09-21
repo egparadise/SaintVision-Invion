@@ -1,14 +1,18 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.121"
+version: "1.0.122"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T20:03:00+09:00"
+updated: "2026-09-21T20:18:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 Codex 계약 서빙 앵커 버킷 감사
+
+- 기준 SHA `6403611e1ffdb64e313b9ef5c9eabef56fcee11b`에서 ControlRunPage/ApprovalPage/ApprovalReviewView/ApprovalChallenge/TerminalTicketResult의 수동 앵커 5개가 유효 결과 시험만으로는 보호되지 않음을 확인했다. invalid serving output 시험을 추가했고 각 `validate_contract` 제거 변형이 targeted test를 실패시켜 현재 Bucket 2 5개 → Bucket 1 5개다. pool/capacity/placement/mutation/plan의 FastAPI response_model 6개도 metadata 및 5개 실제 malformed route response 거부 시험으로 검사했다. 이 Codex 범위의 확인되지 않은 Bucket 2는 11개에서 0개가 됐다. Claude 전체 7개 커널 결속 등은 별도 미결이다. 실행·변형 결과와 경계: `[[2026-09-21_Codex_계약서빙앵커_버킷감사]]`.
 
 ## 2026-09-21 ShardObservation 앵커 및 모델 관측 노출 판정
 

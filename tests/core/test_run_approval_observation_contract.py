@@ -15,6 +15,7 @@ from pydantic import ValidationError
 from inv.approvals import view
 from inv.control import Control
 from inv.contracts import validate_contract
+from inv.errors import DomainError
 from inv.generated.models import ApprovalPage, ControlRunPage
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -142,3 +143,49 @@ def test_approval_view_is_the_same_projection_used_by_approval_listing():
         "bound_run_version": approval["runVersion"],
     }
     assert view(row) == approval
+
+
+@pytest.mark.parametrize(
+    ("method", "contract", "row_field", "bad_value"),
+    [
+        ("list_runs", "ControlRunPage", "state", "not-a-run-state"),
+        ("list_approvals", "ApprovalPage", "status", "not-an-approval-state"),
+    ],
+)
+def test_listing_serving_path_rejects_invalid_response_before_return(
+    monkeypatch, method, contract, row_field, bad_value
+):
+    """A fixture-only test must not be the only protection for the runtime anchor."""
+    if contract == "ControlRunPage":
+        expected = fixture("control-run-page-response.json")["items"][0]
+        row = {
+            "run_id": expected["runId"],
+            "tenant_id": uuid.UUID(expected["tenantId"]),
+            "project_id": expected["projectId"],
+            "state": expected["state"],
+            "version": expected["version"],
+            "attempt": expected["attempt"],
+        }
+        principal = SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"]))
+        project = expected["projectId"]
+    else:
+        expected = fixture("approval-page-response.json")["items"][0]
+        row = {
+            "approval_id": expected["approvalId"],
+            "run_id": expected["runId"],
+            "project_id": expected["projectId"],
+            "requester_id": expected["requesterId"],
+            "action_digest": expected["actionDigest"],
+            "policy_version": expected["policyVersion"],
+            "required_approvals": expected["requiredApprovals"],
+            "status": expected["status"],
+            "expires_at": datetime.fromisoformat(expected["expiresAt"].replace("Z", "+00:00")),
+            "bound_run_version": expected["runVersion"],
+        }
+        principal = SimpleNamespace(tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"))
+        project = expected["projectId"]
+    row[row_field] = bad_value
+    control = _control_with_rows(monkeypatch, [row])
+
+    with pytest.raises(DomainError, match="VAL-0002"):
+        getattr(control, method)(principal, project)

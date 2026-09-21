@@ -10,6 +10,7 @@ import uuid
 
 import pytest
 from fastapi import FastAPI
+from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
@@ -32,13 +33,83 @@ def fixture(name: str) -> dict:
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
 
-def client() -> TestClient:
+def client(*, raise_server_exceptions: bool = True) -> TestClient:
     app = FastAPI()
     app.include_router(pools.router)
     app.dependency_overrides[pools.get_principal] = lambda: PRINCIPAL
     app.dependency_overrides[pools.get_session] = lambda: object()
     app.dependency_overrides[pools.get_now] = lambda: NOW
-    return TestClient(app)
+    return TestClient(app, raise_server_exceptions=raise_server_exceptions)
+
+
+def test_all_pool_and_placement_serving_routes_declare_response_contracts():
+    expected = {
+        ("POST", "/v1/pools"): schemas.PoolCreatedResponse,
+        ("PUT", "/v1/pools/{pool_id}/members/{node_id}"): schemas.PoolMemberResponse,
+        ("DELETE", "/v1/pools/{pool_id}/members/{node_id}"): schemas.PoolMemberRemovalResponse,
+        ("GET", "/v1/pools/{pool_id}/capacity"): schemas.PoolCapacityResponse,
+        ("GET", "/v1/pools/{pool_id}/placement-preview"): schemas.PlacementPreviewResponse,
+        ("POST", "/v1/pools/{pool_id}/plans"): schemas.DistributedPlanResponse,
+    }
+    actual = {}
+    for route in pools.router.routes:
+        if isinstance(route, APIRoute):
+            for method in route.methods or ():
+                actual[(method, route.path)] = route.response_model
+    for key, model in expected.items():
+        assert actual[key] is model, f"missing FastAPI response_model anchor: {key}"
+
+
+@pytest.mark.parametrize("route_name", ["capacity", "placement", "create", "remove", "plan"])
+def test_response_model_rejects_invalid_values_from_real_pool_routes(monkeypatch, route_name):
+    """Exercise FastAPI response validation on the actual serving endpoints."""
+    payload = fixture("pool-capacity-response.json")
+    if route_name == "capacity":
+        payload.pop("units")
+        monkeypatch.setattr(pools.pool_service, "pool_capacity", lambda *_args, **_kwargs: payload)
+        response = client(raise_server_exceptions=False).get("/v1/pools/pool_contract_training/capacity")
+    elif route_name == "placement":
+        candidate = fixture("placement-preview-response.json")["candidates"][0]
+        candidate["spare"] = None
+        monkeypatch.setattr(pools.pool_service, "rank_idle_first", lambda *_args, **_kwargs: [candidate])
+        response = client(raise_server_exceptions=False).get(
+            "/v1/pools/pool_contract_training/placement-preview"
+        )
+    elif route_name == "create":
+        monkeypatch.setattr(pools.project_service, "require_project_access", lambda *_args, **_kwargs: None)
+        monkeypatch.setattr(
+            pools.pool_service, "create_pool",
+            lambda *_args, **_kwargs: SimpleNamespace(pool_id="pool_contract_training", name=None),
+        )
+        response = client(raise_server_exceptions=False).post(
+            "/v1/pools", json={"projectId": "prj_contract", "name": "training"}
+        )
+    elif route_name == "remove":
+        monkeypatch.setattr(pools.pool_service, "remove_member", lambda *_args, **_kwargs: "not-a-bool")
+        response = client(raise_server_exceptions=False).delete(
+            "/v1/pools/pool_contract_training/members/nod_contract_worker"
+        )
+    else:
+        plan_payload = fixture("distributed-plan-response.json")
+        plan = SimpleNamespace(
+            plan_id=plan_payload["planId"], run_id=plan_payload["runId"],
+            strategy="not-a-strategy", shard_count=plan_payload["shardCount"],
+        )
+        placements = [
+            SimpleNamespace(
+                shard_index=item["shardIndex"], node_id=item["nodeId"],
+                assigned_cpu_millicores=item["assignedCpuMillicores"],
+                assigned_ram_bytes=item["assignedRamBytes"],
+                assigned_gpu_devices=item["assignedGpuDevices"],
+            ) for item in plan_payload["placements"]
+        ]
+        monkeypatch.setattr(pools.pool_service, "plan_distributed_run", lambda *_args, **_kwargs: (plan, placements))
+        response = client(raise_server_exceptions=False).post(
+            "/v1/pools/pool_contract_training/plans",
+            json={"runId": plan_payload["runId"], "strategy": "single_node", "shardCount": 1,
+                  "splittableDeclared": True},
+        )
+    assert response.status_code == 500
 
 
 @pytest.mark.parametrize(
