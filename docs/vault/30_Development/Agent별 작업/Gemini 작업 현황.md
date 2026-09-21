@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.61"
+version: "1.0.62"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:15:00+09:00"
+updated: "2026-09-21T19:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:15:00+09:00.
+- 확인 기준: 2026-09-21T19:35:00+09:00.
 
 ## 최근 확인한 진척
+
+- **WorkspaceEditView 무결성 실바이트 원천 배선 및 온디맨드 복구/검증 API 부재 정직 반영 (`InvFileExplorer.tsx`, `DesktopShell.tsx`, `ModelStudioView.tsx`, `workspaceEditObservation.ts`, `workspace-edit-view-contract.test.ts`)**:
+  - **데모 데이터 무결성 착시 원천 차단 및 WorkspaceEditView 배선 (VF-GM-03)**: `DesktopShell 673`에서 `InvFileExplorer`에 `projectId`, `runId`, `checkoutId`를 배선하고 `fetchWorkspaceEditView`로 실제 체크아웃 바이트를 로드하도록 연동. 실제 커널 체크아웃 바이트 미연결 또는 데모 데이터(`source !== 'kernel-checkout'`)인 경우 검증을 엄격히 거부하고 `unverified` 유지 및 안내문 표출 (`데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지)`).
+  - **온디맨드 복구 실행 API 부재 정직 표출 (VF-GM-03/04)**: 커널/saintvision에 온디맨드 복구 엔드포인트가 부재함을 확인하고, 어댑터 미전달 시 가상 정상 복제본 합성을 전면 금지하며 정직한 에러 알림(`role="alert"`) 표출 (`서버에 온디맨드 복구 실행 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)` / `서버에 온디맨드 샤드 복구 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)`).
+  - **Per-Shard 복제본 건강 관측 및 모델 검증 라우트 부재 명시 (VF-GM-04)**: `ShardObservation`에는 per-shard 복제본 관측 데이터가 없음을 안내문으로 고지하고, 모델 검증 라우트 부재(`무결성 상태: 검증 라우트 부재 (내부 verify만 존재) · 실행 재검증 필요 (requiresExecutionRevalidation: true)`)를 명시.
+  - **Ajv 2020 계약 결속**: `apps/web/tests/workspace-edit-view-contract.test.ts` 7 passed 신설.
+  - **검증 실적**: Vitest 55개 파일 **497/497 passed 100%** (단독 구현 53파일 483 passed에서 Codex PTY/ProblemDetails 병합 후 55파일 497 passed), Vite 프로덕션 빌드 exit 0 (3.21s, 94 modules), Pytest 19 passed (0.84s), check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_무결성_원천_WorkspaceEditView_배선_및_온디맨드복구API부재_반영_Gemini]].
 
 - **생성 타입 전면 전환, ApprovalPage·ApprovalView 및 RunArtifactList 이중 정의 해소 완결 (`apps/web/src/contracts/types.ts`, `RunDetail.tsx`, `DeveloperStudio.tsx`)**:
   - **RunArtifactList 및 RunArtifactFile 생성 타입 전환**: `types.ts`의 수기 `RunArtifactItem` 및 `RunArtifactList`를 전면 폐기하고 `packages/contracts-ts`의 `RunArtifactList`, `RunArtifactFile` 생성 타입 re-export로 정합. 호환용 `export type RunArtifactItem = RunArtifactFile;` 별칭 제공.

@@ -1,8 +1,12 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { InvFileItem, InvReplicaLocation, InvNamespace } from '@/contracts/virtualFabric';
 import { NodeItem } from '@/contracts/types';
+import { fetchWorkspaceEditView, mapWorkspaceFilesToInvItems } from '@/shared/api/workspaceEditObservation';
 
 export interface InvFileExplorerProps {
+  projectId?: string;
+  runId?: string;
+  checkoutId?: string;
   initialUri?: string;
   initialNamespace?: InvNamespace;
   initialFiles?: InvFileItem[];
@@ -26,6 +30,9 @@ export async function calculateSha256(content: string | Uint8Array): Promise<str
 }
 
 export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
+  projectId,
+  runId,
+  checkoutId,
   initialUri = 'inv://models',
   initialNamespace = 'models',
   initialFiles = [],
@@ -39,6 +46,36 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   const [files, setFiles] = useState<InvFileItem[]>(initialFiles);
   const [selectedFile, setSelectedFile] = useState<InvFileItem | null>(initialFiles[0] || null);
   const [targetNodeId, setTargetNodeId] = useState<string>('');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const loadCheckoutFiles = useCallback(async (pId: string, rId: string, cId: string) => {
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    try {
+      const view = await fetchWorkspaceEditView(pId, rId, cId);
+      const invFiles = mapWorkspaceFilesToInvItems(view);
+      setFiles((prev) => {
+        const nonWorkspace = prev.filter((f) => f.namespace !== 'workspaces');
+        return [...nonWorkspace, ...invFiles];
+      });
+      if (invFiles.length > 0) {
+        setSelectedFile(invFiles[0]);
+        setCurrentUri(invFiles[0].uri);
+        setActiveNamespace('workspaces');
+      }
+    } catch (err: any) {
+      setCheckoutError(err?.message || '체크아웃 파일 조회 실패');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (projectId && runId && checkoutId) {
+      loadCheckoutFiles(projectId, runId, checkoutId);
+    }
+  }, [projectId, runId, checkoutId, loadCheckoutFiles]);
 
   // ---------------------------------------------------------------------------
   // Integrity Verification State (Strict Tri-State: unverified | verified | mismatch | error)
@@ -168,6 +205,17 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         // Strict equality comparison
         isMatch = res.matches && calculated.toLowerCase() === selectedFile.contentHash.toLowerCase();
       } else if (selectedFile.content) {
+        if (selectedFile.source !== 'kernel-checkout') {
+          // Honest refusal: cannot verify in-memory demo or unconnected data as real storage integrity
+          setIntegrityState({
+            status: 'unverified',
+            expectedHash: selectedFile.contentHash,
+            calculatedHash: null,
+            lastVerifiedAt: null,
+            integrityError: '데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다. (미검증 유지)',
+          });
+          return;
+        }
         // Genuine client-side SHA-256 computation over actual file bytes
         calculated = await calculateSha256(selectedFile.content);
         isMatch = calculated.toLowerCase() === selectedFile.contentHash.toLowerCase();
@@ -262,7 +310,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         setRepairState({
           isRepairing: false,
           repairMessage: null,
-          repairError: '서버 복구 어댑터(onRepairReplicas)가 연결되지 않아 복구를 수행할 수 없습니다.',
+          repairError: '서버에 온디맨드 복구 실행 API가 부재하여 복구를 수행할 수 없습니다. (복구 불가 / 미수행)',
         });
         return;
       }
@@ -403,6 +451,17 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
           })}
         </div>
       </div>
+
+      {checkoutLoading && (
+        <div data-testid="checkout-loading" style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#38bdf8' }}>
+          ⏳ 커널 체크아웃 파일(WorkspaceEditView) 불러오는 중...
+        </div>
+      )}
+      {checkoutError && (
+        <div role="alert" data-testid="checkout-error" style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#f87171' }}>
+          ⚠️ 체크아웃 파일 로드 오류: {checkoutError}
+        </div>
+      )}
 
       {/* 3. Main Split View: File List on Left, Detail & Integrity & Replicas on Right */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flex: 1 }}>
@@ -546,6 +605,20 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               </div>
 
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div>
+                  파일 출처:{' '}
+                  <span
+                    data-testid="file-source-badge"
+                    style={{
+                      color: selectedFile.source === 'kernel-checkout' ? '#34d399' : '#fbbf24',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedFile.source === 'kernel-checkout'
+                      ? '커널 체크아웃 (WorkspaceEditView 실 바이트)'
+                      : '로컬/데모 (실제 저장소 미연결 · 무결성 검증 유보)'}
+                  </span>
+                </div>
                 <div>
                   카탈로그 기대 해시: <code data-testid="expected-hash" style={{ color: '#38bdf8' }}>{selectedFile.contentHash || '미등록'}</code>
                 </div>

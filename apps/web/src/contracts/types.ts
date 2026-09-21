@@ -514,6 +514,9 @@ import type {
   ShardObservedMember,
   ShardResultMember,
   ShardObservation,
+  WorkspaceEditView,
+  WorkspaceSnapshot,
+  WorkspaceSnapshotFile,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -536,6 +539,9 @@ export type {
   ShardObservedMember,
   ShardResultMember,
   ShardObservation,
+  WorkspaceEditView,
+  WorkspaceSnapshot,
+  WorkspaceSnapshotFile,
 };
 
 export type RunArtifactItem = RunArtifactFile;
