@@ -61,7 +61,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `🚀 [${res.deployedModel?.modelName}] 프로덕션 배포 완료! 생성 Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 검증 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
@@ -140,6 +140,8 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       {/* Action Notification Banner */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          data-testid={`lineage-action-${actionNotice.type}-banner`}
           style={{
             padding: '12px 18px',
             borderRadius: '6px',

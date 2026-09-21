@@ -101,7 +101,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   // 2. Test Docker Socket Mount
   const handleTestMount = (e: React.FormEvent) => {
     e.preventDefault();
-    const res = secManager.validateMountPath(mountTestPath, actor || 'usr_security_auditor');
+    if (!actor) {
+      setMountTestResult('🛑 ACCESS DENIED: 인증된 관리자 세션 식별자(actor)가 없어 마운트 경로 검증을 수행할 수 없습니다. (위조 식별자 합성 차단)');
+      return;
+    }
+    const res = secManager.validateMountPath(mountTestPath, actor);
     refreshState();
     if (!res.allowed) {
       setMountTestResult(`🛑 ACCESS DENIED: ${res.reason}`);
@@ -112,7 +116,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   // 3. Test Approval Bypass
   const handleTestBypass = () => {
-    const res = secManager.validateExecutionApproval(bypassRiskLevel, undefined, actor || 'usr_bypass_tester');
+    if (!actor) {
+      setBypassTestResult('🛑 BYPASS BLOCKED: 인증된 관리자 세션 식별자(actor)가 없어 승인 우회 검증을 수행할 수 없습니다. (위조 식별자 합성 차단)');
+      return;
+    }
+    const res = secManager.validateExecutionApproval(bypassRiskLevel, undefined, actor);
     refreshState();
     if (!res.allowed) {
       setBypassTestResult(`🛑 BYPASS BLOCKED: ${res.reason}`);
@@ -153,6 +161,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {/* Emergency Kill Switch Banner if Active */}
       {status.emergencyKillSwitchActive && (
         <div
+          role="alert"
+          data-testid="kill-switch-active-banner"
           style={{
             backgroundColor: 'rgba(248, 81, 73, 0.2)',
             border: '2px solid #f85149',
@@ -165,10 +175,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         >
           <div>
             <div style={{ color: '#f85149', fontWeight: 'bold', fontSize: '16px' }}>
-              🚨 EMERGENCY KILL SWITCH ACTIVE — ALL RUNNING WORKLOADS ISOLATED
+              🚨 [모의 시뮬레이션] EMERGENCY KILL SWITCH ACTIVE — LOCAL SECURITY ENGINE ISOLATION
             </div>
             <div style={{ color: '#c9d1d9', fontSize: '13px', marginTop: '4px' }}>
-              Execution engines paused. Network egress isolated. Deactivate kill switch to resume cluster dispatch.
+              로컬 보안 통제 엔진이 모의 격리 상태입니다. (백엔드 제어 평면 비상 정지 API 미노출 상태로 실제 물리 노드에는 전달되지 않는 로컬 모의 동작)
             </div>
           </div>
           <Button variant="danger" size="sm" onClick={() => setShowKillSwitchModal(true)}>
@@ -307,6 +317,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           size="sm"
           variant={status.emergencyKillSwitchActive ? 'secondary' : 'danger'}
           onClick={() => setShowKillSwitchModal(true)}
+          disabled={!actor}
+          aria-disabled={!actor}
+          title={!actor ? '관리자 세션 식별자(actor)가 필요합니다.' : undefined}
+          data-testid="emergency-kill-switch-toggle-btn"
         >
           {status.emergencyKillSwitchActive ? 'Kill Switch 해제' : '🚨 긴급 Kill Switch 발동'}
         </Button>
@@ -441,6 +455,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
             {mountTestResult && (
               <div
+                data-testid="mount-test-result"
                 style={{
                   padding: '10px 14px',
                   borderRadius: '6px',
@@ -494,13 +509,14 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 <option value="L2">L2 (중위험, 승인 ID 필수)</option>
                 <option value="L3">L3 (고위험, 2인 승인 필수)</option>
               </select>
-              <Button size="sm" variant="secondary" onClick={handleTestBypass}>
+              <Button size="sm" variant="secondary" onClick={handleTestBypass} data-testid="test-bypass-btn">
                 우회 실행 시험
               </Button>
             </div>
 
             {bypassTestResult && (
               <div
+                data-testid="bypass-test-result"
                 style={{
                   padding: '10px 14px',
                   borderRadius: '6px',
@@ -770,6 +786,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {/* Emergency Kill Switch Confirmation Modal */}
       {showKillSwitchModal && (
         <div
+          data-testid="kill-switch-modal"
           style={{
             position: 'fixed',
             inset: 0,
@@ -784,7 +801,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           <div
             style={{
               width: '100%',
-              maxWidth: '500px',
+              maxWidth: '520px',
               backgroundColor: '#161b22',
               border: '2px solid #f85149',
               borderRadius: '8px',
@@ -795,12 +812,27 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             }}
           >
             <h3 style={{ margin: 0, color: '#f85149', fontSize: '18px' }}>
-              {status.emergencyKillSwitchActive ? 'Kill Switch 비활성화 확인' : '🚨 긴급 Kill Switch 발동 확인'}
+              {status.emergencyKillSwitchActive ? 'Kill Switch 비활성화 확인' : '🚨 [모의 시뮬레이션] 긴급 Kill Switch 발동 확인'}
             </h3>
+            <div
+              role="status"
+              data-testid="kill-switch-mock-notice"
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(234, 179, 8, 0.15)',
+                border: '1px solid #eab308',
+                color: '#fde047',
+                fontSize: '12px',
+                lineHeight: '1.5',
+              }}
+            >
+              ⚠️ <strong>[모의 시뮬레이션 고지]</strong>: 백엔드 제어 평면 비상 정지 API가 현재 미노출 상태입니다. 본 기능은 프론트엔드 보안 엔진의 로컬 에뮬레이션 상태를 토글하며, 실제 클러스터 물리 노드 작업이나 외부 네트워크를 중단시키지 않습니다.
+            </div>
             <p style={{ margin: 0, color: '#c9d1d9', fontSize: '13px', lineHeight: '20px' }}>
               {status.emergencyKillSwitchActive
-                ? 'Kill Switch를 해제하면 클러스터의 작업 디스패치가 재개됩니다.'
-                : 'Kill Switch를 발동하면 5개 노드에서 실행 중인 모든 작업이 즉시 중단되고 네트워크 이그레스가 차단됩니다.'}
+                ? 'Kill Switch를 해제하면 클러스터 보안 엔진 모의 작업 디스패치가 재개됩니다.'
+                : 'Kill Switch를 발동하면 프론트엔드 보안 통제 계층에서 모든 모의 작업 디스패치가 일시 중지됩니다.'}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <Button size="sm" variant="secondary" onClick={() => setShowKillSwitchModal(false)}>
@@ -810,6 +842,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 size="sm"
                 variant={status.emergencyKillSwitchActive ? 'primary' : 'danger'}
                 onClick={handleConfirmKillSwitch}
+                data-testid="kill-switch-confirm-btn"
               >
                 {status.emergencyKillSwitchActive ? '해제 실행' : '긴급 발동 확정'}
               </Button>

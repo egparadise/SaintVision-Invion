@@ -682,7 +682,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       {/* Feedback Messages with Honest Error/Success Distinction & role="alert" */}
       {storageMessage && activeTab === 'storage' && (
         <div
-          role={storageMessage.startsWith('❌') ? 'alert' : undefined}
+          role={storageMessage.startsWith('❌') ? 'alert' : 'status'}
           data-testid={storageMessage.startsWith('❌') ? 'storage-action-error' : 'storage-action-success'}
           style={{
             padding: '8px 12px',
@@ -698,7 +698,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       )}
       {poolMessage && activeTab === 'pools' && (
         <div
-          role={poolMessage.startsWith('❌') ? 'alert' : undefined}
+          role={poolMessage.startsWith('❌') ? 'alert' : 'status'}
           data-testid={poolMessage.startsWith('❌') ? 'pool-action-error' : 'pool-action-success'}
           style={{
             padding: '8px 12px',
@@ -714,7 +714,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       )}
       {livenessMessage && (activeTab === 'nodes' || activeTab === 'overview') && (
         <div
-          role={livenessMessage.startsWith('❌') ? 'alert' : undefined}
+          role={livenessMessage.startsWith('❌') ? 'alert' : 'status'}
           data-testid={livenessMessage.startsWith('❌') ? 'liveness-action-error' : 'liveness-action-success'}
           style={{
             padding: '8px 12px',
@@ -730,14 +730,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
       )}
       {discoveryMessage && activeTab === 'discovery' && (
         <div
-          role={discoveryMessage.startsWith('❌') ? 'alert' : undefined}
-          data-testid={discoveryMessage.startsWith('❌') ? 'discovery-action-error' : 'discovery-action-success'}
+          role={discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'alert' : 'status'}
+          data-testid={discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'discovery-action-error' : 'discovery-action-success'}
           style={{
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: discoveryMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(168, 85, 247, 0.2)',
-            color: discoveryMessage.startsWith('❌') ? '#fca5a5' : '#c084fc',
-            border: discoveryMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(168, 85, 247, 0.3)',
+            backgroundColor: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(168, 85, 247, 0.2)',
+            color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '#fca5a5' : '#c084fc',
+            border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(168, 85, 247, 0.3)',
             fontSize: '0.75rem',
           }}
         >
@@ -1607,6 +1607,24 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
           </div>
 
+          {/* Inline Pool Action Banner */}
+          {poolMessage && (
+            <div
+              role={poolMessage.startsWith('❌') ? 'alert' : 'status'}
+              data-testid={poolMessage.startsWith('❌') ? 'pool-action-error-banner-inline' : 'pool-action-success-banner-inline'}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                backgroundColor: poolMessage.startsWith('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                color: poolMessage.startsWith('❌') ? '#fca5a5' : '#93c5fd',
+                border: poolMessage.startsWith('❌') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(59, 130, 246, 0.3)',
+                fontSize: '0.8125rem',
+              }}
+            >
+              {poolMessage}
+            </div>
+          )}
+
           {/* Pool Member Management */}
           <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
@@ -1987,9 +2005,31 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             </div>
           </div>
 
+          {/* Inline Discovery Action Banner */}
+          {discoveryMessage && (
+            <div
+              role={discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'alert' : 'status'}
+              data-testid={discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'discovery-action-error-banner-inline' : 'discovery-action-success-banner-inline'}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                backgroundColor: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                color: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '#fca5a5' : '#34d399',
+                border: discoveryMessage.startsWith('❌') || discoveryMessage.startsWith('⚠️') ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)',
+                fontSize: '0.8125rem',
+              }}
+            >
+              {discoveryMessage}
+            </div>
+          )}
+
           {/* Admission Token Result Modal / Alert */}
           {admissionResult && (
-            <div style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981' }}>
+            <div
+              role="status"
+              data-testid="admission-result-modal"
+              style={{ padding: '14px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981' }}
+            >
               <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#34d399' }}>
                 🎉 일회용 부트스트랩 토큰 발급 완료 (Bootstrap Token Minted)
               </div>
@@ -2124,6 +2164,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'flex-end' }}>
                       <button
                         type="button"
+                        data-testid="decline-candidate-btn"
                         onClick={() => handleDeclineCandidate(cand.announcementId)}
                         style={{ padding: '4px 8px', fontSize: '0.6875rem', backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '4px', cursor: 'pointer' }}
                       >
@@ -2131,6 +2172,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                       </button>
                       <button
                         type="button"
+                        data-testid="admit-candidate-btn"
                         onClick={() => handleAdmitCandidate(cand.announcementId)}
                         style={{ padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}
                       >

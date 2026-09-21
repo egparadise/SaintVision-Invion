@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.76"
+version: "1.0.77"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T00:13:00+09:00"
+updated: "2026-09-22T00:26:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T00:13:00+09:00.
+- 확인 기준: 2026-09-22T00:26:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 전수 감사, 실패 은폐 차단 및 비상정지·배포 모의 정직화 완결 (`ResourceExplorer.tsx`, `AdminSecurityConsole.tsx`, `ModelLineageView.tsx`, `write-actions-integrity-wiring.test.tsx`)**:
+  - **ResourceExplorer 실패 은폐 차단 및 모달 규격화 (Priority 8)**: Tab 5 디스커버리(`admitDiscoveryCandidate`, `declineDiscoveryCandidate`, `broadcastAnnouncement`) 및 Tab 1 풀 관리(`handleAddMember`, `handleRemoveMember`, `handleCreatePlan`) 실패 시 에러가 화면에서 실종되던 결함을 치유. 상단 및 인라인 메시지 배너에 `role="alert"`(실패 시) 및 `role="status"`(성공 시) 명시. 일회용 토큰 모달에 `data-testid="admission-result-modal"`, `role="status"` 부여. 승인/거부 버튼에 `admit-candidate-btn`, `decline-candidate-btn` testid 부여.
+  - **AdminSecurityConsole 위조 actor 합성 원천 차단 및 Kill Switch 모의 고지 (Priority 9)**: `handleTestMount` 및 `handleTestBypass`에서 `actor || 'usr_security_auditor'`, `actor || 'usr_bypass_tester'` 가짜 식별자 합성을 전면 제거하고 세션 부재 시 즉시 차단 메시지 표출. 비상 정지(Kill Switch) 토글 버튼에 `disabled={!actor}` 가드 집행. 활성 배너(`kill-switch-active-banner`, `role="alert"`) 및 모달(`kill-switch-mock-notice`, `role="status"`)에 `[모의 시뮬레이션]` 및 제어 평면 비상 정지 API 미노출 상태임을 정직하게 고지.
+  - **ModelLineageView 배포 모의 시뮬레이션 정직 고지 (Priority 10)**: 백엔드 배포 서빙 API 부재 상태에서 표출되던 허위 축하 배너(`🚀 [모델명] 프로덕션 배포 완료!`)를 소거하고, `✔ [모의 시뮬레이션] [모델명] 로컬 배포 게이트 검증 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영)`으로 정직화. 배너에 `role="status"`, `data-testid="lineage-action-success-banner"` 부여.
+  - **신규 DOM 단위 테스트 8종 구축 및 2대 돌연변이(M11, M12) 실측 사살**: `apps/web/tests/write-actions-integrity-wiring.test.tsx` (8/8 passed). M11(승인 실패 에러 배너 억제) 사살, M12(미인증 시 가짜 actor 합성 우회) 사살.
+  - Vitest **64개 파일 580/580 passed 100%** (순증 +8 passed), Vite 프로덕션 빌드 exit 0 (3.50s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_쓰기동작_실패은폐차단_및_비상정지_배포모의고지_Gemini]].
 
 - **화면 결함 5대 부류 치유 트랙 4차: IntranetDeploymentView 운영자 행위자 실배선/미인증 차단 및 ReleaseCandidateView 롤백 모의 고지 완결 (`IntranetDeploymentView.tsx`, `ReleaseCandidateView.tsx`, `App.tsx`, `deployment-release-integrity-wiring.test.tsx`)**:
   - **운영자 가짜 식별자 소거 및 세션 실배선 (Priority 7-A)**: `IntranetDeploymentView.tsx` 내 `usr_operator_lead` 하드코딩 식별자를 전면 소거하고 `currentUser?.id`를 `operatorId`로 실배선. `App.tsx`에서 `currentUser={currentUser}` 결속. 세션 부재(`!currentUser`) 시 `deployment-auth-required-notice`(`role="alert"`) 표출 및 서명 버튼 `disabled`/`aria-disabled="true"` 차단 가드 집행. 상단에 `deployment-unexposed-notice`(`role="status"`, "백엔드 배포 API 미노출") 배치 및 서명 완료 통지를 `[모의 시뮬레이션]` 규격으로 정직화.
