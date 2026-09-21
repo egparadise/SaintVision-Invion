@@ -713,6 +713,14 @@ type RunResultView struct {
     ResourceReleasePending bool `json:"resourceReleasePending"`
 }
 
+type ArtifactContentResponse struct {
+    StatusCode int64 `json:"statusCode"`
+    ContentType string `json:"contentType"`
+    ContentDisposition string `json:"contentDisposition"`
+    Artifact RunArtifactFile `json:"artifact"`
+    ContentTypeOptions string `json:"contentTypeOptions"`
+}
+
 type RunArtifactFile struct {
     Path string `json:"path"`
     ChecksumSha256 string `json:"checksumSha256"`

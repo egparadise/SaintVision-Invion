@@ -1759,6 +1759,17 @@ class WorkspaceStartView(BaseModel):
     startId: UUID
 
 
+class ArtifactContentResponse(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    statusCode: Literal[200]
+    contentType: Literal['application/octet-stream']
+    contentDisposition: Literal['attachment; filename="artifact.bin"']
+    artifact: RunArtifactFile
+    contentTypeOptions: Literal['nosniff']
+
+
 class ApprovalReviewView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

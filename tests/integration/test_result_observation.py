@@ -10,6 +10,7 @@ import pytest
 
 from inv.dispatch import DeliveryWorker
 from inv.approvals import Principal
+from inv.contracts import validate_contract
 from inv.errors import DomainError
 from inv.output_ingestion import OutputIngestion
 from inv.result_view import ResultView
@@ -82,6 +83,17 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
         == response.headers["x-content-sha256"]
     )
     assert response.headers["content-disposition"].startswith("attachment;")
+    validate_contract(
+        "ArtifactContentResponse",
+        {
+            "statusCode": response.status_code,
+            "contentType": response.headers["content-type"],
+            "contentDisposition": response.headers["content-disposition"],
+            "artifact": item,
+            "contentTypeOptions": response.headers["x-content-type-options"],
+        },
+    )
+    assert response.headers["cache-control"] == "no-store"
     assert json.loads(response.content)["evaluationMSE"] < 1e-8
     logs = _get(a, "/logs").json()
     assert logs["stdout"] is not None

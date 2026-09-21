@@ -50,6 +50,41 @@ def problem(error, trace_id=None):
     )
 
 
+def artifact_content_response(content: bytes, artifact: dict):
+    """Build a raw artifact response from schema-checked transport metadata.
+
+    The body remains opaque bytes; the contract binds status and HTTP headers to
+    the digest and byte length of those exact bytes.
+    """
+    import hashlib
+    from starlette.responses import Response
+
+    if (
+        len(content) != artifact.get("byteSize")
+        or hashlib.sha256(content).hexdigest() != artifact.get("checksumSha256")
+    ):
+        raise DomainError("VERIFY-0023", "Committed artifact bytes differ")
+    response = {
+        "statusCode": 200,
+        "contentType": "application/octet-stream",
+        "contentDisposition": 'attachment; filename="artifact.bin"',
+        "artifact": artifact,
+        "contentTypeOptions": "nosniff",
+    }
+    validate_contract("ArtifactContentResponse", response)
+    return Response(
+        content,
+        status_code=response["statusCode"],
+        media_type=response["contentType"],
+        headers={
+            "Content-Disposition": response["contentDisposition"],
+            "X-Content-SHA256": response["artifact"]["checksumSha256"],
+            "Content-Length": str(response["artifact"]["byteSize"]),
+            "X-Content-Type-Options": response["contentTypeOptions"],
+        },
+    )
+
+
 class Boundary:
     def __init__(self, app, origins):
         self.app, self.origins = app, frozenset(origins)
@@ -413,14 +448,8 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     @api.get("/v1/projects/{project}/runs/{run_id}/artifacts/content")
     @api.get("/v1/runs/{run_id}/artifacts/content")
     def run_file(run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)):
-        import hashlib
-        from starlette.responses import Response
-        content = result_view.download(identity.principal, run_id, path, project)
-        return Response(content, media_type="application/octet-stream", headers={
-            "Content-Disposition": 'attachment; filename="artifact.bin"',
-            "X-Content-SHA256": hashlib.sha256(content).hexdigest(),
-            "X-Content-Type-Options": "nosniff",
-        })
+        download = result_view.download(identity.principal, run_id, path, project)
+        return artifact_content_response(download["content"], download["artifact"])
 
     @api.get("/v1/projects/{project}/runs/{run_id}/logs")
     @api.get("/v1/runs/{run_id}/logs")

@@ -205,7 +205,23 @@ class ResultView:
             files = self._files(row, self._output(row))
             if files is None or path not in files[1]:
                 raise DomainError("RES-0004", "Committed output file unavailable", 404)
-            return files[1][path]
+            file = next(item for item in files[0]["files"] if item["path"] == path)
+            content = files[1][path]
+            if (
+                len(content) != file["sizeBytes"]
+                or hashlib.sha256(content).hexdigest() != file["sha256"]
+            ):
+                raise DomainError("VERIFY-0023", "Committed artifact bytes differ")
+            return {
+                "content": content,
+                "artifact": {
+                    "path": file["path"],
+                    "checksumSha256": file["sha256"],
+                    "byteSize": file["sizeBytes"],
+                    "verified": True,
+                    "evidenceId": str(row["evidence_id"]),
+                },
+            }
 
     def logs(self, principal, run_id, project=None):
         from saintvision.adapters.reference import redact_text

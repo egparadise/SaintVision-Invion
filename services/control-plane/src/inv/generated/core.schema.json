@@ -3305,6 +3305,39 @@
         }
       }
     },
+    "ArtifactContentResponse": {
+      "description": "Internal response envelope for a raw artifact download. The HTTP body is the opaque artifact bytes described by artifact; the digest and byteSize must match those exact bytes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statusCode",
+        "contentType",
+        "contentDisposition",
+        "artifact",
+        "contentTypeOptions"
+      ],
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "const": 200
+        },
+        "contentType": {
+          "type": "string",
+          "const": "application/octet-stream"
+        },
+        "contentDisposition": {
+          "type": "string",
+          "const": "attachment; filename=\"artifact.bin\""
+        },
+        "artifact": {
+          "$ref": "#/$defs/RunArtifactFile"
+        },
+        "contentTypeOptions": {
+          "type": "string",
+          "const": "nosniff"
+        }
+      }
+    },
     "RunArtifactFile": {
       "type": "object",
       "additionalProperties": false,

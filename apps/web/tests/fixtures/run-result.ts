@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { RunResultView, RunArtifactList } from '../../../../packages/contracts-ts/src';
+import type { ArtifactContentResponse, RunResultView, RunArtifactList } from '../../../../packages/contracts-ts/src';
 
 function getFixturePath(relativePath: string): string {
   try {
@@ -26,3 +26,6 @@ export const runResultViewFixture = JSON.parse(readFileSync(resultPath, 'utf8'))
 
 const artifactListPath = getFixturePath('../../../../contracts/fixtures/run-artifact-list.json');
 export const runArtifactListFixture = JSON.parse(readFileSync(artifactListPath, 'utf8')) as RunArtifactList;
+
+const artifactContentPath = getFixturePath('../../../../contracts/fixtures/artifact-content-response.json');
+export const artifactContentResponseFixture = JSON.parse(readFileSync(artifactContentPath, 'utf8')) as ArtifactContentResponse;

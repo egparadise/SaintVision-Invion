@@ -1,0 +1,13 @@
+{
+  "statusCode": 200,
+  "contentType": "application/octet-stream",
+  "contentDisposition": "attachment; filename=\"artifact.bin\"",
+  "artifact": {
+    "path": "outputs/metrics.json",
+    "checksumSha256": "f2d0ed2b0424686c6ef54d6bc84596355385f25a3daa90b8c3784fb3b2c9719e",
+    "byteSize": 34,
+    "verified": true,
+    "evidenceId": "evd_00000000000000000000000000"
+  },
+  "contentTypeOptions": "nosniff"
+}

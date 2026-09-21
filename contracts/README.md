@@ -6,4 +6,6 @@ Use `python tools/generate_contracts.py` then commit all generated outputs. CI r
 
 The initial bundle establishes contracts for Claude service implementation and Gemini API integration. It does not imply that mutation endpoints, OIDC, Node execution or the full UI exist.
 
+The raw kernel artifact download route returns `application/octet-stream`, not JSON. `ArtifactContentResponse` therefore contracts its HTTP status/headers and embeds the existing `RunArtifactFile` metadata; the exact response bytes must match that record's `checksumSha256` and `byteSize`.
+
 `credential-reference.schema.json` defines the version-pinned internal credential reference (ADR-075). It adds no public API authority and does not implement a secret resolver. Authorization and resolution are server-side obligations in the operating credential contract.

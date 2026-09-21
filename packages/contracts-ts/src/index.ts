@@ -711,6 +711,14 @@ export interface RunResultView {
   resourceReleasePending: boolean;
 }
 
+export interface ArtifactContentResponse {
+  statusCode: 200;
+  contentType: "application/octet-stream";
+  contentDisposition: "attachment; filename=\"artifact.bin\"";
+  artifact: RunArtifactFile;
+  contentTypeOptions: "nosniff";
+}
+
 export interface RunArtifactFile {
   path: string;
   checksumSha256: string;
