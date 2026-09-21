@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.88"
+version: "1.0.89"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T02:35:00+09:00"
+updated: "2026-09-22T02:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,24 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T02:35:00+09:00.
+- 확인 기준: 2026-09-22T02:50:00+09:00.
+
+## 세션 랩업: 실제 브라우저(Real Chrome 153) 실측 수용 및 산출물 다운로드 무결성 3상태 검증과 CSS 버그 치유 완결
+
+- **실제 브라우저(Real Chrome 153) 실측 수용 완결**:
+  - 기존 628개 단위 테스트가 브라우저의 대역(Mock, jsdom)일 뿐이라는 사용자 지침에 따라, 시스템에 설치된 실제 Google Chrome 153과 Python Playwright를 결합하여 실제 브라우저 실측 수용을 완결했다.
+  - **jsdom이 전혀 잡지 못했던 치명적 CSS 레이아웃 붕괴 포착 및 치유**:
+    - 1280px 창에서 `/studio` 진입 시 상단 헤더의 17개 탭 버튼이 가로 10px로 찌그러지며 한글 글자가 세로 1글자씩 기괴하게 깨져 쏟아져 내리는 심각한 렌더링 결함을 실 브라우저 스크린샷으로 포착.
+    - `apps/web/src/shared/ui/Header.tsx`에 `overflowX: 'auto'`, `whiteSpace: 'nowrap'`, `flexShrink: 0`, `minWidth: 0`을 결속하여 가로 스크롤 및 깔끔한 1줄 탭 레이아웃 복원 완료.
+  - **산출물 다운로드 무결성 3상태 실제 Chrome 153 실측 완결**:
+    - **Case A (`verified`)**: Chrome 153에서 `page.expect_download()` 성공, 실제 파일 `verified_model.bin` (45B) 디스크 저장 및 SHA-256 일치, `[무결성 검증 완료]` (`role="status"`) 배너 표출 실측.
+    - **Case B (`mismatch`)**: 바이트 해시 불일치 시 Chrome 다운로드 이벤트 0건(원천 차단), `[무결성 검증 실패]` (`role="alert"`) 배너 표출 실측.
+    - **Case C (`unverified` - 조용한 강등 차단)**: `X-Content-SHA256` 헤더 누락 시 Chrome 다운로드 이벤트 0건(원천 차단), `[무결성 검증 실패 · 필수 헤더 누락]` (`role="alert"`) 배너 표출 실측.
+  - **정직한 검증 경계 분리**:
+    - 실제 Chrome 153 DOM, WebCrypto, 네이티브 파일 I/O 파이프라인, CSS 레이아웃은 100% 실측 완료.
+    - 백엔드 8080 서버 프로세스는 미가동 상태이므로 네트워크 계층은 Playwright 계약 스키마 모의 라우팅으로 주입하였음을 명확히 분리하여 기록.
+  - 보고서: [[2026-09-22_실제브라우저_Chrome153_수용실측_및_CSS버그치유_Gemini]].
+
 
 ## 세션 랩업: 시험 방어력 실측 감사 완결, 4대 '유일한 방어(Sole Defense)' 등록부 확립 및 세션 총괄
 

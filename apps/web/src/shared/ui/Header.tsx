@@ -92,8 +92,8 @@ export const Header: React.FC<HeaderProps> = ({
         zIndex: 50,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
           <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-brand-primary)' }}>
             SaintVision
           </span>
@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
-        <nav style={{ display: 'flex', gap: '8px' }}>
+        <nav style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 1, minWidth: 0, scrollbarWidth: 'none' }}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -126,6 +126,8 @@ export const Header: React.FC<HeaderProps> = ({
                   background: 'none',
                   cursor: 'pointer',
                   borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {tab.label}
@@ -135,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0, whiteSpace: 'nowrap' }}>
         <div
           style={{
             display: 'flex',
