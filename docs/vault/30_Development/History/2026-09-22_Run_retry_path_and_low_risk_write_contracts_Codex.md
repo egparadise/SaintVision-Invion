@@ -52,14 +52,14 @@ tags: ["run", "retry", "response-contract", "static-audit"]
 ## 검증 provenance
 
 - 수행: Codex 작성자 실행. 독립 검토, hosted CI, PostgreSQL 통합, HTTP, UI 인수는 미실시.
-- 정적 감사 기준: HEAD `044c343a518f7ec9f8ae83fd436a8a1da67486bd`. 구현 착수 당시 origin은 `d45435be560180156bad16b5716272f9e814b89a`였고, 통합에 추가된 계약 정정 `167a7f1f`를 포함하도록 재기반했다. 최종 코드 SHA `22ecafcf583b3c251b552d3df73dacbca65d828f`, branch `agent/codex/contribution-lifecycle-contracts`, 격리 worktree `C:/Users/egpar/AppData/Local/Temp/sv-codex-contract-land-20260922`.
+- 정적 감사 기준: HEAD `044c343a518f7ec9f8ae83fd436a8a1da67486bd`. 구현 착수 당시 origin은 `d45435be560180156bad16b5716272f9e814b89a`였고, 통합에 추가된 계약 정정 `167a7f1f`를 포함하도록 재기반했다. 최종 코드 commit `d901a0d1`, 검증 tree SHA `f2d86db5a848b75c905e0b5d8dfa826cf63be887`, branch `agent/codex/contribution-lifecycle-contracts`, 격리 worktree `C:/Users/egpar/AppData/Local/Temp/sv-codex-contract-land-20260922`.
 - Interpreter: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`, Python 3.14.6. Node v24.17.0. 최종 재검증 KST 2026-09-22 04:05–04:06.
-- 계약 회귀: final code SHA `22ecafcf`, `tools/provenance.py -- C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest tests/core/test_low_risk_write_response_contracts.py tests/core/test_node_page_detail_response_contract.py tests/core/test_pool_placement_response_contract.py tests/core/test_workspace_response_contract.py -q` → exit 0, **77 passed**, 2 dependency deprecation warnings. Executor egpar/Codex 작성자.
+- 계약 회귀: verification tree SHA `f2d86db5`, `tools/provenance.py -- C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest tests/core/test_low_risk_write_response_contracts.py tests/core/test_node_page_detail_response_contract.py tests/core/test_pool_placement_response_contract.py tests/core/test_workspace_response_contract.py -q` → exit 0, **77 passed**, 2 dependency deprecation warnings. Executor egpar/Codex 작성자.
 - Route-detach 되돌림 대조: 일곱 route의 `response_model`을 각각 메모리에서 제거했을 때 anchor invariant가 일곱 번 모두 실패를 감지했다. 각 값을 즉시 복원했고 실행 종료 code 0이다. 이 대조는 선언 앵커 검사의 감지력을 검증하며 별도 운영 서버/DB 동작 증거가 아니다.
 - Schema: `tools/export_schemas.py`가 새 7 schema를 생성해 총 56개. final code SHA에서 `tools/export_schemas.py --check` exit 0, 56/56 일치.
 - 계약 사슬: final code SHA에서 `tools/check_contract_bindings.py` exit 0, 46 fixtures 각각 시험 참조 및 12 kernel serving-anchor tests.
 - 문서 게이트: 최종 작업 문서를 포함한 tree에서 `tools/check_docs.py` exit 0 (24 original hashes, 717 versioned docs); `tools/check_ontology.py` exit 0. `tools/sync_obsidian.py --check`는 1518 managed, 3 pending, 0 conflicts로 exit 0; read-only, apply하지 않았다.
-- Provenance wrapper는 실행 당시 `working_tree_clean: YES`, integration `1212f8b6` 대비 ahead 3으로 기록했다. 검증 후 세 커밋을 fast-forward로 push했고 origin integration과 local HEAD가 모두 `f2d86db5a848b75c905e0b5d8dfa826cf63be887`임을 다시 fetch해 확인했다(0 ahead/behind, clean). 작성자 검증이며 Claude 독립 검토는 아직 아니다.
+- Provenance wrapper는 실행 당시 `working_tree_clean: YES`, integration `1212f8b6` 대비 ahead 3으로 기록했다. 세 커밋을 fast-forward한 뒤 증거 문서만 갱신했고, 현재 origin integration/local HEAD는 `a8ad24d42c98eb10542422eccc5047ade01755f0`으로 일치한다(0 ahead/behind, clean). 작성자 검증이며 Claude 독립 검토는 아직 아니다.
 
 ## 다음 담당
 
