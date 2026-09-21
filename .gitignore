@@ -16,3 +16,5 @@ build/
 
 /deploy/certs/saintvision.crt
 /deploy/certs/saintvision.key
+
+scratch/

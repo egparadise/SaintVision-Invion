@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.91"
+version: "1.0.92"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T03:20:00+09:00"
+updated: "2026-09-22T03:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,35 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T03:20:00+09:00.
+- 확인 기준: 2026-09-22T03:30:00+09:00.
+
+## 세션 랩업: ApprovalReviewPanel 비동기 전이 DOM 검속 & Google Chrome 153 실측 수용 완결
+
+- **`.gitignore`에 `scratch/` 등록 및 보안 주의사항 명시**:
+  - 로컬 브라우저 실측 산출물(스크린샷, JSON 등)이 실수로 커밋되는 위험을 원천 차단하기 위해 `.gitignore`에 `scratch/` 등록.
+  - 실제 서버/운영 환경 검증 시 일회용 부트스트랩 토큰 및 일회용 비밀이 표출되는 화면은 스크린샷 이미지로 저장하지 않아야 함을 스크립트에 주의사항으로 명시.
+- **헤더 대소문자 wire 규격 확인 보고**:
+  - `apps/web/src/shared/api/runArtifactObservation.ts`는 네이티브 Fetch API의 `res.headers.get('x-content-sha256')`을 사용하므로 RFC 표준에 따라 wire 상의 소문자, 대문자, 혼합 케이스를 100% 안전하게 판독함을 확인.
+- **`ApprovalReviewPanel` 비동기 fetch 전이 DOM 테스트 보강 (`apps/web/tests/approval-review-panel-dom.test.tsx`, 4/4 passed)**:
+  - 기존 `approval-review.test.tsx`가 `renderToStaticMarkup` SSR에서 props 주입에만 의존하던 맹점을 해소하고 `ApprovalReviewPanel`의 실제 비동기 전이(`fetchApprovalReview` → `setLoaded` → `reviewedAction` 주입)와 승인 버튼 활성화 게이트를 커버.
+  - 로딩 상태 표출(disabled), 성공 전이 및 명령어 인자 이스케이프 표출(`["echo", "two words", "<script>"]`), 정책 다이제스트 렌더링, 실패 전이(`role="alert"`) 및 `다시 조회` 복구, 다이제스트 불일치 시 승인 차단(tamper boundary guard) 검증.
+  - **돌연변이 사살(Mutation KILLED)**: `ApprovalReviewPanel.tsx` L31에서 위조 다이제스트를 강제 주입하는 결함을 주입했을 때 Test 4가 즉시 실패(`AssertionError: expected false to be true`)함을 실측하고 원복.
+- **실제 Google Chrome 153 (Blink 엔진) 실측 수용 완결**:
+  - Vite 3005 개발 서버에서 실제 Chrome 153 브라우저를 띄워 전체 유저 저니 실측:
+    1. 실제 PKCE 세션 인증 완료 및 대시보드 진입.
+    2. 상단 헤더의 `승인 센터` 탭 버튼 클릭하여 `거버넌스 승인 센터 (S04-FE)` 마운트 확인.
+    3. `ApprovalReviewPanel`이 정본 계약 fixture(`contracts/fixtures/approval-review-response.json`)를 비동기 fetch하여 `승인할 작업 스냅샷`과 명령어 인자 배열(`<pre>` 태그 내 이스케이프) 및 정책 다이제스트 렌더링 확인.
+    4. Chrome Blink 엔진에서 `승인 확정` 버튼 활성화(`disabled=false`) 실측.
+    5. 공개 검토용 안전한 작업 스냅샷 화면 캡처 (`scratch/real_chrome_approval_review_snapshot.png`).
+    6. `승인 확정` 버튼 클릭 시 Chrome 네이티브 Fetch를 통해 `POST .../challenge` (nonce 발급) → `POST .../decision` (승인 확정) → 신선한 목록 갱신(`/approvals`, `/runs`)이 차례대로 호출되어 왕복 완결됨을 확인 (`challenge_called: true, decision_called: true`).
+    7. 검증 결과 JSON: `scratch/chrome_approval_review_acceptance_result.json` (`passed: true`).
+- **게이트 통과**:
+  - Vitest **72개 파일 636/636 passed 100%** (순증 +1 파일, +4 passed).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 38 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: 707 versioned documents, 48 tasks, 12 outcomes PASS.
+  - `check_doc_single_source.py --ratchet`: 18 pairs PASS.
+- 보고서: [[2026-09-22_ApprovalReviewPanel_비동기전이와_Chrome153_실측수용_Gemini]].
 
 ## 세션 랩업: ResourceExplorer 디스커버리 전이 실측과 Google Chrome 153 브라우저 수용 완결
 
