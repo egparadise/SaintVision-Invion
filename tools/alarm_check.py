@@ -63,17 +63,18 @@ NOT_EVALUABLE: tuple[tuple[str, str, str], ...] = (
 )
 
 #: Alarms whose data exists but which GOV-ALERT-001 has NOT activated. The spec
-#: says the node clock-skew alarm activates only when ERR-DESIGN-007 is adopted;
-#: yet the kernel already stores ``clock_skew_seconds`` and excludes nodes with
-#: ``abs(skew) > 5`` in scheduler/placement/leases. Reality has moved past the
-#: spec's "pending" note. Reconciling that is a governance decision (change the
-#: spec, then activate here) — it is recorded, not silently decided by this tool.
+#: excludes nodes with missing/non-finite/abs(skew)>5 measurements from runtime
+#: eligibility. That safety filter is distinct from an operator-routed alarm:
+#: ±5 seconds is not calibrated against pilot hardware, and the alert channel
+#: and responders remain unknown. The guard stays active; this alarm stays gated
+#: until those governance inputs are adopted.
 GOVERNANCE_GATED: tuple[tuple[str, str, str], ...] = (
     (
         "Node 시각 스큐 한도 초과",
         "P2",
-        "GOV-ALERT-001 gates this on ERR-DESIGN-007 adoption; the kernel already "
-        "implements clock_skew_seconds>5 operationally — spec activation decision pending",
+        "Runtime eligibility already excludes missing/non-finite/abs(skew)>5 nodes; "
+        "the routed alarm remains gated until the ±5s threshold is calibrated and "
+        "channel/responders are decided under ERR-DESIGN-007",
     ),
 )
 

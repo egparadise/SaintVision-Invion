@@ -1,0 +1,11 @@
+{
+  "projectId": "prj_contract_create",
+  "code": "contract-create",
+  "displayName": "Contract Create",
+  "status": "active",
+  "memberCount": 1,
+  "createdAt": "2026-09-22T09:00:00Z",
+  "kernelLinked": false,
+  "kernelEnabled": false,
+  "kernelNote": "This project is not connected to the execution kernel yet."
+}

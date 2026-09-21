@@ -49,7 +49,12 @@ def list_projects(
     return {"projects": items, "count": len(items)}
 
 
-@router.post("/projects", status_code=201)
+@router.post(
+    "/projects",
+    status_code=201,
+    response_model=schemas.ProjectCreateResponse,
+    response_model_exclude_unset=True,
+)
 def create_project(
     payload: schemas.ProjectCreateRequest,
     request: Request,

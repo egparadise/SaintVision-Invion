@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Body returned after creating a project (without list-only permissions).",
+  "properties": {
+    "code": {
+      "title": "Code",
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "displayName": {
+      "title": "Displayname",
+      "type": "string"
+    },
+    "kernelEnabled": {
+      "title": "Kernelenabled",
+      "type": "boolean"
+    },
+    "kernelLinked": {
+      "title": "Kernellinked",
+      "type": "boolean"
+    },
+    "kernelNote": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kernelnote"
+    },
+    "memberCount": {
+      "minimum": 0,
+      "title": "Membercount",
+      "type": "integer"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "code",
+    "displayName",
+    "status",
+    "memberCount",
+    "createdAt",
+    "kernelLinked",
+    "kernelEnabled"
+  ],
+  "title": "ProjectCreateResponse",
+  "type": "object"
+}

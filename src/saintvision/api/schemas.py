@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 
 class Strict(BaseModel):
@@ -215,6 +215,71 @@ class ProjectListResponse(Strict):
 
     projects: list[ProjectListItemResponse]
     count: int = Field(ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectCreateResponse(Strict):
+    """Body returned after creating a project (without list-only permissions)."""
+
+    project_id: StrictStr = Field(alias="projectId")
+    code: StrictStr
+    display_name: StrictStr = Field(alias="displayName")
+    status: StrictStr
+    member_count: StrictInt = Field(ge=0, alias="memberCount")
+    created_at: dt.datetime = Field(alias="createdAt")
+    kernel_linked: StrictBool = Field(alias="kernelLinked")
+    kernel_enabled: StrictBool = Field(alias="kernelEnabled")
+    kernel_note: StrictStr | None = Field(default=None, alias="kernelNote")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DiscoveryAdmissionResponse(Strict):
+    """One-time enrollment credential returned after an operator admits a node."""
+
+    announcement_id: StrictStr = Field(alias="announcementId")
+    bootstrap_token: StrictStr = Field(min_length=16, max_length=256, alias="bootstrapToken")
+    expires_at: dt.datetime = Field(alias="expiresAt")
+    next: StrictStr
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class MemberRoleResultResponse(Strict):
+    """Effective permissions after a membership role change."""
+
+    project_id: StrictStr = Field(alias="projectId")
+    user_id: StrictStr = Field(alias="userId")
+    role_code: StrictStr = Field(alias="roleCode")
+    project_status: StrictStr = Field(alias="projectStatus")
+    user_status: StrictStr = Field(alias="userStatus")
+    can_request: StrictBool = Field(alias="canRequest")
+    can_approve: StrictBool = Field(alias="canApprove")
+    can_administer: StrictBool = Field(alias="canAdminister")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ResourceOfferResultResponse(Strict):
+    """Canonical offer and whether the execution kernel accepted it."""
+
+    capability_id: StrictStr = Field(alias="capabilityId")
+    node_id: StrictStr = Field(alias="nodeId")
+    kind: Literal["cpu", "gpu", "ram", "disk"]
+    unit: StrictStr
+    offered_quantity: StrictFloat = Field(alias="offeredQuantity")
+    total_quantity: StrictFloat = Field(alias="totalQuantity")
+    previous_offered_quantity: StrictFloat | None = Field(alias="previousOfferedQuantity")
+    effective_from: dt.datetime = Field(alias="effectiveFrom")
+    note: StrictStr
+    applied_to_kernel: StrictBool = Field(alias="appliedToKernel")
+    kernel_resource_ids: list[StrictStr] = Field(alias="kernelResourceIds")
+    kernel_resource_id: StrictStr | None = Field(alias="kernelResourceId")
+    kernel_capacity: StrictFloat | None = Field(alias="kernelCapacity")
+    kernel_reason_code: StrictStr | None = Field(alias="kernelReasonCode")
+    execution_ready: StrictBool = Field(alias="executionReady")
+    kernel_reason: StrictStr | None = Field(default=None, alias="kernelReason")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 

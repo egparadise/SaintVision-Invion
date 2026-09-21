@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Canonical offer and whether the execution kernel accepted it.",
+  "properties": {
+    "appliedToKernel": {
+      "title": "Appliedtokernel",
+      "type": "boolean"
+    },
+    "capabilityId": {
+      "title": "Capabilityid",
+      "type": "string"
+    },
+    "effectiveFrom": {
+      "format": "date-time",
+      "title": "Effectivefrom",
+      "type": "string"
+    },
+    "executionReady": {
+      "title": "Executionready",
+      "type": "boolean"
+    },
+    "kernelCapacity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Kernelcapacity"
+    },
+    "kernelReason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kernelreason"
+    },
+    "kernelReasonCode": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Kernelreasoncode"
+    },
+    "kernelResourceId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Kernelresourceid"
+    },
+    "kernelResourceIds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Kernelresourceids",
+      "type": "array"
+    },
+    "kind": {
+      "enum": [
+        "cpu",
+        "gpu",
+        "ram",
+        "disk"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "note": {
+      "title": "Note",
+      "type": "string"
+    },
+    "offeredQuantity": {
+      "title": "Offeredquantity",
+      "type": "number"
+    },
+    "previousOfferedQuantity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Previousofferedquantity"
+    },
+    "totalQuantity": {
+      "title": "Totalquantity",
+      "type": "number"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "capabilityId",
+    "nodeId",
+    "kind",
+    "unit",
+    "offeredQuantity",
+    "totalQuantity",
+    "previousOfferedQuantity",
+    "effectiveFrom",
+    "note",
+    "appliedToKernel",
+    "kernelResourceIds",
+    "kernelResourceId",
+    "kernelCapacity",
+    "kernelReasonCode",
+    "executionReady"
+  ],
+  "title": "ResourceOfferResultResponse",
+  "type": "object"
+}

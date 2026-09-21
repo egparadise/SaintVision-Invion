@@ -1,0 +1,17 @@
+{
+  "capabilityId": "cap_contract_cpu",
+  "nodeId": "node_contract",
+  "kind": "cpu",
+  "unit": "millicores",
+  "offeredQuantity": 4000,
+  "totalQuantity": 8000,
+  "previousOfferedQuantity": null,
+  "effectiveFrom": "2026-09-22T09:00:00Z",
+  "note": "The offer is a ceiling the platform may use, not a promise.",
+  "appliedToKernel": true,
+  "kernelResourceIds": ["res_contract_cpu"],
+  "kernelResourceId": "res_contract_cpu",
+  "kernelCapacity": 8000,
+  "kernelReasonCode": null,
+  "executionReady": false
+}

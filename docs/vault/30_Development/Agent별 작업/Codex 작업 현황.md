@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.135"
+version: "1.0.136"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T23:52:38+09:00"
+updated: "2026-09-22T00:09:30+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 고위험 쓰기 응답 결속 및 시각 스큐 규격 현실화
+
+- Claude 위험도 목록 `7d75f810`에서 HIGH 네 경로를 골라 `ProjectCreateResponse`, `DiscoveryAdmissionResponse`, `MemberRoleResultResponse`, `ResourceOfferResultResponse`를 정의하고 해당 POST/PUT 라우트에 FastAPI `response_model`을 붙였다. 실제 service body에서 조건부 `kernelNote`/`kernelReason`, nullable 필드와 types를 확인했으며, role/boolean/numeric/string 출력은 coercion되지 않도록 strict 원시 타입을 쓴다. synthetic fixture 4개와 현재 모델에서 자동 생성된 4개 JSON Schema를 추가했다.
+- 각 라우트 정상 응답, service 반환의 타입 위반 거부(HTTP 500), model fixture 일치, 실제 nullable/비-nullable 경계를 TestClient로 고정했다. 지정 venv의 focused suite 51 passed, 스키마 45개 `--check` 통과. 네 `response_model` 선언을 한꺼번에 제거한 대조는 negative test 4개가 정확히 실패(exit 1)했고 복원 후 다시 통과했다. 이는 mock service+FastAPI route serialization 근거이며 PostgreSQL 통합은 아니다.
+- 스큐 드리프트는 커널의 5초 런타임 적격성 필터를 유지하고 GOV-ALERT-001 라우팅 알람을 계속 governance-gated로 분리했다. ±5초 실측 보정, 통지 채널과 응답 담당이 미정이라 ERR-DESIGN-007 전체 채택으로 취급하지 않는다. 상세 근거/다음 후보: [[2026-09-22_write_route_response_binding_Codex]].
+- 다음 행동: 현 통합 고정 SHA에서 독립 검토; 이후 MED-HIGH 상태/스토리지/노드 쓰기 경로를 순서대로 측정·결속; 장비 시계 보정과 알람 라우팅 결정은 운영 인수 이후.
 
 ## 2026-09-21 미병합 branch의 회귀 가드 5건 재평가·회수
 

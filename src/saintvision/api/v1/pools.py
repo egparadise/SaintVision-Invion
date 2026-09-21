@@ -238,7 +238,11 @@ def list_candidates(
     )
 
 
-@router.post("/discovery/candidates/{announcement_id}/admission", status_code=201)
+@router.post(
+    "/discovery/candidates/{announcement_id}/admission",
+    status_code=201,
+    response_model=schemas.DiscoveryAdmissionResponse,
+)
 def admit(
     request: Request,
     announcement_id: str,

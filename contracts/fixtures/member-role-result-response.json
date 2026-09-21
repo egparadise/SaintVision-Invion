@@ -1,0 +1,10 @@
+{
+  "projectId": "prj_contract_create",
+  "userId": "usr_contract_member",
+  "roleCode": "operator",
+  "projectStatus": "active",
+  "userStatus": "active",
+  "canRequest": true,
+  "canApprove": false,
+  "canAdminister": false
+}

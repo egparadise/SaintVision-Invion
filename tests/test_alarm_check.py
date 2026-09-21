@@ -90,7 +90,9 @@ def test_not_evaluable_still_lists_the_traffic_and_metric_alarms():
 
 
 def test_clock_skew_is_governance_gated_not_silently_dropped():
-    # The spec gates it; the kernel implements it. It must be recorded, not fired
-    # and not silently omitted — that drift is a decision, not this tool's to make.
-    gated = {row[0] for row in GOVERNANCE_GATED}
+    # Runtime eligibility filtering is active, but the routed alarm is gated
+    # until the threshold and response path are accepted.
+    gated = {row[0]: row[2] for row in GOVERNANCE_GATED}
     assert "Node 시각 스큐 한도 초과" in gated
+    assert "Runtime eligibility already excludes" in gated["Node 시각 스큐 한도 초과"]
+    assert "channel/responders are decided" in gated["Node 시각 스큐 한도 초과"]

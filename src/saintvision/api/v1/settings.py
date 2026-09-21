@@ -96,7 +96,10 @@ def list_members(
     }
 
 
-@router.put("/projects/{project_id}/members/{user_id}")
+@router.put(
+    "/projects/{project_id}/members/{user_id}",
+    response_model=schemas.MemberRoleResultResponse,
+)
 def set_member_role(
     project_id: str,
     user_id: str,
@@ -279,7 +282,11 @@ def read_node_offers(
     }
 
 
-@router.put("/capabilities/{capability_id}/offer")
+@router.put(
+    "/capabilities/{capability_id}/offer",
+    response_model=schemas.ResourceOfferResultResponse,
+    response_model_exclude_unset=True,
+)
 def set_resource_offer(
     capability_id: str,
     payload: schemas.ResourceOfferRequest,

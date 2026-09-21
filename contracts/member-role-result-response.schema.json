@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Effective permissions after a membership role change.",
+  "properties": {
+    "canAdminister": {
+      "title": "Canadminister",
+      "type": "boolean"
+    },
+    "canApprove": {
+      "title": "Canapprove",
+      "type": "boolean"
+    },
+    "canRequest": {
+      "title": "Canrequest",
+      "type": "boolean"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "projectStatus": {
+      "title": "Projectstatus",
+      "type": "string"
+    },
+    "roleCode": {
+      "title": "Rolecode",
+      "type": "string"
+    },
+    "userId": {
+      "title": "Userid",
+      "type": "string"
+    },
+    "userStatus": {
+      "title": "Userstatus",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "userId",
+    "roleCode",
+    "projectStatus",
+    "userStatus",
+    "canRequest",
+    "canApprove",
+    "canAdminister"
+  ],
+  "title": "MemberRoleResultResponse",
+  "type": "object"
+}

@@ -1,0 +1,6 @@
+{
+  "announcementId": "ann_contract_candidate",
+  "bootstrapToken": "synthetic-bootstrap-token-never-valid",
+  "expiresAt": "2026-09-22T09:15:00Z",
+  "next": "POST /v1/nodes with this token to complete enrollment"
+}
