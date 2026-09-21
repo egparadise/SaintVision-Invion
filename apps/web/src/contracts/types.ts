@@ -142,6 +142,8 @@ export interface RunItem {
   requestedBy?: string;
   createdAt?: string;
   updatedAt?: string;
+  stateUpdatedAt?: string;
+  completedAt?: string | null;
   parentId?: string;
   childRunIds?: string[];
   resourceReleasePending?: boolean;

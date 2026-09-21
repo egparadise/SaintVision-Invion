@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunAttemptList, ShardObservation } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunArtifactList, RunAttemptList, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
 import { fetchRunLogs } from '@/shared/api/runLogObservation';
+import { fetchRunArtifacts, getArtifactDownloadUrl } from '@/shared/api/runArtifactObservation';
 import { fetchRunAttempts } from '@/shared/api/runAttemptObservation';
 
 export interface RunDetailProps {
@@ -56,6 +57,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [logView, setLogView] = useState<RunLogView | null>(null);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const [logError, setLogError] = useState<string | null>(null);
+  const [artifactList, setArtifactList] = useState<RunArtifactList | null>(null);
+  const [isLoadingArtifacts, setIsLoadingArtifacts] = useState(false);
+  const [artifactError, setArtifactError] = useState<string | null>(null);
+  const [runResult, setRunResult] = useState<RunResultView | null>(null);
   const [attemptList, setAttemptList] = useState<RunAttemptList | null>(null);
   const [isLoadingAttempts, setIsLoadingAttempts] = useState(false);
   const [attemptError, setAttemptError] = useState<string | null>(null);
@@ -128,6 +133,47 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         })
         .finally(() => {
           if (mounted) setIsLoadingLogs(false);
+        });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [activeTab, run.id, run.projectId]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!run.projectId) return;
+    apiClient<RunResultView>(`/v1/projects/${encodeURIComponent(run.projectId)}/runs/${encodeURIComponent(run.id)}/result`)
+      .then((res) => {
+        if (mounted && res) setRunResult(res);
+      })
+      .catch(() => {
+        // RunResultView might not exist yet if run is still running or pending
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [run.id, run.projectId]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (activeTab === 'artifacts') {
+      if (!run.projectId) {
+        setIsLoadingArtifacts(false);
+        setArtifactError('실행에 연결된 프로젝트 식별자(projectId)가 없어 산출물을 조회할 수 없습니다.');
+        return;
+      }
+      setIsLoadingArtifacts(true);
+      setArtifactError(null);
+      fetchRunArtifacts(run.projectId, run.id)
+        .then((res) => {
+          if (mounted) setArtifactList(res);
+        })
+        .catch((err) => {
+          if (mounted) setArtifactError(err?.message || '산출물 조회 실패');
+        })
+        .finally(() => {
+          if (mounted) setIsLoadingArtifacts(false);
         });
     }
     return () => {
@@ -335,11 +381,20 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 </span>
               )}
             </p>
-            <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', display: 'flex', gap: '12px' }}>
+            <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <span data-testid="run-detail-created-at">
                 생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측 (CreatedAt Absent)'}
               </span>
-              {(run.state === 'succeeded' || run.state === 'failed') && (
+              {(run.stateUpdatedAt || runResult?.stateUpdatedAt || run.updatedAt) && (
+                <span data-testid="run-state-updated-at" style={{ color: '#60a5fa' }}>
+                  실행 상태 갱신: {new Date(run.stateUpdatedAt || runResult?.stateUpdatedAt || run.updatedAt!).toLocaleString('ko-KR')}
+                </span>
+              )}
+              {(runResult?.completedAt || run.completedAt) ? (
+                <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? '#34d399' : '#f87171' }}>
+                  실행 완료 시각: {new Date(runResult?.completedAt || run.completedAt!).toLocaleString('ko-KR')}
+                </span>
+              ) : (run.state === 'succeeded' || run.state === 'failed') && (
                 <span data-testid="run-detail-completed-at" style={{ color: run.state === 'succeeded' ? '#34d399' : '#f87171' }}>
                   종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측 (UpdatedAt Absent)'}
                 </span>
@@ -850,28 +905,53 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             overflowY: 'auto',
           }}
         >
-          <div
-            role="status"
-            data-testid="logs-query-time-notice"
-            style={{
-              padding: '6px 12px',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '4px',
-              fontSize: '0.75rem',
-              color: '#93c5fd',
-              marginBottom: '10px',
-            }}
-          >
-            ℹ️ <strong>[화면 확인 기준]</strong> 실시간 커널 로그는 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 수신 시점 기준입니다.
-          </div>
+          {logView?.completedAt ? (
+            <div
+              role="status"
+              data-testid="logs-freshness-banner"
+              style={{
+                padding: '6px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '4px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '10px',
+              }}
+            >
+              ℹ️ <strong>[실행 완료 시각]</strong> <span data-testid="log-completed-at">{new Date(logView.completedAt).toLocaleString('ko-KR')}</span> (커널 결과 완료 커밋 시각이며, 실시간 로그 캡처나 화면 갱신 시각이 아닙니다)
+            </div>
+          ) : (
+            <div
+              role="status"
+              data-testid="logs-query-time-notice"
+              style={{
+                padding: '6px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '4px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '10px',
+              }}
+            >
+              ℹ️ <strong>[화면 확인 기준]</strong> 실시간 커널 로그는 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 수신 시점 기준입니다.
+            </div>
+          )}
 
           <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>[Run Kernel Logs: /v1/projects/{run.projectId || '(none)'}/runs/{run.id}/logs]</span>
             {logView && (
-              <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
-                출처: {logView.source}
-              </span>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+                  출처: {logView.source}
+                </span>
+                {logView.completedAt && (
+                  <span data-testid="log-completed-at-badge" style={{ fontSize: '0.75rem', color: '#38bdf8' }}>
+                    완료 커밋: {new Date(logView.completedAt).toLocaleString('ko-KR')}
+                  </span>
+                )}
+              </div>
             )}
           </div>
 
@@ -939,6 +1019,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       {/* Tab 3: Artifacts */}
       {activeTab === 'artifacts' && (
         <div
+          data-testid="run-detail-artifacts-panel"
           style={{
             padding: '24px',
             backgroundColor: 'var(--color-bg-surface)',
@@ -946,66 +1027,149 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             border: '1px solid var(--color-border-subtle)',
           }}
         >
-          <div
-            role="status"
-            data-testid="artifacts-query-time-notice"
-            style={{
-              padding: '8px 12px',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              color: '#93c5fd',
-              marginBottom: '14px',
-            }}
-          >
-            ℹ️ <strong>[화면 확인 기준]</strong> 산출물 목록은 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 조회 시점 기준입니다.
+          {artifactList?.completedAt ? (
+            <div
+              role="status"
+              data-testid="artifacts-freshness-banner"
+              style={{
+                padding: '8px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '14px',
+              }}
+            >
+              ℹ️ <strong>[실행 완료 시각]</strong> <span data-testid="artifact-completed-at">{new Date(artifactList.completedAt).toLocaleString('ko-KR')}</span> (커널 결과 완료 커밋 시각이며, 파일 다운로드 또는 화면 조회 시각이 아닙니다)
+            </div>
+          ) : (
+            <div
+              role="status"
+              data-testid="artifacts-query-time-notice"
+              style={{
+                padding: '8px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '14px',
+              }}
+            >
+              ℹ️ <strong>[화면 확인 기준]</strong> 산출물 목록은 백엔드 관측 시각(observedAt) 미노출 상태이며, 화면 조회 시점 기준입니다.
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, margin: 0 }}>생성된 아티팩트 목록</h3>
+            {artifactList && (
+              <span data-testid="run-artifacts-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+                출처: {artifactList.source} (총 {artifactList.count}건 / 검증: {artifactList.verifiedCount}건)
+              </span>
+            )}
           </div>
 
-          <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, marginBottom: '16px' }}>생성된 아티팩트 목록</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {(((run as any).artifacts && (run as any).artifacts.length > 0)
-              ? ((run as any).artifacts as Array<{ name: string; size: string; sha: string }>)
-              : [
-                  { name: 'test-report-summary.json', size: '24.8 KiB', sha: 'a3f91c...89d1' },
-                  { name: 'build-output-manifest.tar.gz', size: '4.2 MiB', sha: '7b2210...fe45' },
-                  { name: 'model-evaluation-metrics.csv', size: '112 KiB', sha: '99e34a...12cc' },
-                ]
-            ).map((art: { name: string; size: string; sha: string }) => (
-              <div
-                key={art.name}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 16px',
-                  backgroundColor: 'var(--color-bg-canvas)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--color-border-subtle)',
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>📄 {art.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
-                    크기: {art.size} · SHA-256: {art.sha}
-                  </div>
-                </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  data-testid={`download-artifact-${art.name}`}
-                  onClick={() =>
-                    setActionNotice({
-                      type: 'info',
-                      message: `ℹ️ [모의 고지] '${art.name}' (서버 아티팩트 파일 스트림 다운로드 API 미노출 상태)`,
-                    })
-                  }
+          {isLoadingArtifacts && !((run as any).artifacts) && (
+            <div data-testid="artifacts-loading" style={{ color: 'var(--color-text-muted)', padding: '16px 0' }}>
+              ⏳ 커널 산출물 목록 조회 중...
+            </div>
+          )}
+
+          {artifactError && !((run as any).artifacts) && (
+            <div role="alert" data-testid="artifacts-error" style={{ color: '#f85149', padding: '8px 12px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '12px' }}>
+              ⚠️ 산출물 목록 조회 실패: {artifactError}
+            </div>
+          )}
+
+          {/* Actual Artifacts List from API */}
+          {artifactList && artifactList.artifacts.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {artifactList.artifacts.map((art) => (
+                <div
+                  key={art.path}
+                  data-testid={`artifact-row-${art.path}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 16px',
+                    backgroundColor: 'var(--color-bg-canvas)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border-subtle)',
+                  }}
                 >
-                  다운로드 (API 미노출)
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>📄 {art.path}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+                      크기: {art.byteSize.toLocaleString()} B · SHA-256: {art.checksumSha256 ? `${art.checksumSha256.slice(0, 16)}...` : '-'}
+                      {art.evidenceId && <span> · 증거: {art.evidenceId}</span>}
+                    </div>
+                  </div>
+                  <a
+                    href={run.projectId ? getArtifactDownloadUrl(run.projectId, run.id, art.path) : '#'}
+                    download={art.path}
+                    data-testid={`download-artifact-${art.path}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <Button variant="secondary" size="sm">
+                      📥 다운로드
+                    </Button>
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : artifactList && artifactList.artifacts.length === 0 ? (
+            <div data-testid="artifacts-empty" style={{ color: 'var(--color-text-muted)', padding: '24px 0', textAlign: 'center' }}>
+              {artifactList.absentReason || '(생성된 산출물이 없습니다.)'}
+            </div>
+          ) : (
+            /* Fallback for pre-loaded run.artifacts or mock data */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {(((run as any).artifacts && (run as any).artifacts.length > 0)
+                ? ((run as any).artifacts as Array<{ name: string; size: string; sha: string }>)
+                : [
+                    { name: 'test-report-summary.json', size: '24.8 KiB', sha: 'a3f91c...89d1' },
+                    { name: 'build-output-manifest.tar.gz', size: '4.2 MiB', sha: '7b2210...fe45' },
+                    { name: 'model-evaluation-metrics.csv', size: '112 KiB', sha: '99e34a...12cc' },
+                  ]
+              ).map((art: { name: string; size: string; sha: string }) => (
+                <div
+                  key={art.name}
+                  data-testid={`artifact-row-${art.name}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 16px',
+                    backgroundColor: 'var(--color-bg-canvas)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border-subtle)',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>📄 {art.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
+                      크기: {art.size} · SHA-256: {art.sha}
+                    </div>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    data-testid={`download-artifact-${art.name}`}
+                    onClick={() =>
+                      setActionNotice({
+                        type: 'info',
+                        message: `ℹ️ [모의 고지] '${art.name}' (서버 아티팩트 파일 스트림 다운로드 API 미노출 상태)`,
+                      })
+                    }
+                  >
+                    다운로드 (API 미노출)
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -1054,21 +1218,39 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             border: '1px solid var(--color-border-subtle)',
           }}
         >
-          <div
-            role="status"
-            data-testid="shards-query-time-notice"
-            style={{
-              padding: '8px 12px',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              color: '#93c5fd',
-              marginBottom: '16px',
-            }}
-          >
-            ℹ️ <strong>[화면 확인 기준]</strong> 분산 샤드 실행 원장은 백엔드 관측 시각(observedAt) 미노출 상태이며, 표시된 정보는 화면 조회 시점 기준 스냅샷입니다.
-          </div>
+          {shardObservation?.stateAsOf ? (
+            <div
+              role="status"
+              data-testid="shards-freshness-banner"
+              style={{
+                padding: '8px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '16px',
+              }}
+            >
+              ℹ️ <strong>[샤드 상태 기준]</strong> <span data-testid="shard-state-as-of">{new Date(shardObservation.stateAsOf).toLocaleString('ko-KR')}</span> (포함된 Run 행들의 최신 DB 갱신 시각 기준이며, 단일 공통 스냅샷이나 조회 시각이 아닙니다)
+            </div>
+          ) : (
+            <div
+              role="status"
+              data-testid="shards-query-time-notice"
+              style={{
+                padding: '8px 12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                color: '#93c5fd',
+                marginBottom: '16px',
+              }}
+            >
+              ℹ️ <strong>[화면 확인 기준]</strong> 분산 샤드 실행 원장은 백엔드 관측 시각(observedAt) 미노출 상태이며, 표시된 정보는 화면 조회 시점 기준 스냅샷입니다.
+            </div>
+          )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
@@ -1133,6 +1315,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 shard-completion:v1
               </div>
             </div>
+            {shardObservation?.stateAsOf && (
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>샤드 상태 기준 (stateAsOf)</div>
+                <div data-testid="shard-state-as-of-card" style={{ fontSize: '0.8125rem', fontWeight: 600, fontFamily: 'monospace' }}>
+                  {new Date(shardObservation.stateAsOf).toLocaleString('ko-KR')}
+                </div>
+              </div>
+            )}
             {shardObservation && (
               <div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>커널 분산 계획 ID (Gen)</div>

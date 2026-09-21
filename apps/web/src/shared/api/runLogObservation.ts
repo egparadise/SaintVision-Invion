@@ -30,5 +30,9 @@ export async function fetchRunLogs(projectId: string, runId: string): Promise<Ru
     throw new Error('RunLogView absentReason 계약 불일치');
   }
 
+  if (result.completedAt !== undefined && result.completedAt !== null && typeof result.completedAt !== 'string') {
+    throw new Error('RunLogView completedAt 계약 불일치');
+  }
+
   return result;
 }

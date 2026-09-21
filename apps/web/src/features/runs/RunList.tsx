@@ -338,7 +338,16 @@ export const RunList: React.FC<RunListProps> = ({
                     <div data-testid={`run-created-at-${run.id}`}>
                       생성: {run.createdAt ? new Date(run.createdAt).toLocaleString('ko-KR') : '미관측'}
                     </div>
-                    {(run.state === 'succeeded' || run.state === 'failed') && (
+                    {run.stateUpdatedAt && (
+                      <div data-testid={`run-state-updated-at-${run.id}`} style={{ fontSize: '0.75rem', color: '#60a5fa', marginTop: '2px' }}>
+                        상태 갱신: {new Date(run.stateUpdatedAt).toLocaleString('ko-KR')}
+                      </div>
+                    )}
+                    {run.completedAt ? (
+                      <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? '#10b981' : '#f85149', marginTop: '2px' }}>
+                        실행 완료: {new Date(run.completedAt).toLocaleString('ko-KR')}
+                      </div>
+                    ) : (run.state === 'succeeded' || run.state === 'failed') && (
                       <div data-testid={`run-completed-at-${run.id}`} style={{ fontSize: '0.75rem', color: run.state === 'succeeded' ? '#10b981' : '#f85149', marginTop: '2px' }}>
                         종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측'}
                       </div>

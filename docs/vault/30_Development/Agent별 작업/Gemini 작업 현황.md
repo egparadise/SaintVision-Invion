@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.81"
+version: "1.0.82"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:25:00+09:00"
+updated: "2026-09-22T01:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,26 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:25:00+09:00.
+- 확인 기준: 2026-09-22T01:30:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 10차: 백엔드 내구성 시각 필드 3종(stateUpdatedAt, stateAsOf, completedAt) 정직한 UI 실배선 및 신선도 오독 차단 완결 (`RunDetail.tsx`, `RunList.tsx`, `DeveloperStudio.tsx`, `runArtifactObservation.ts`, `runLogObservation.ts`, `response-freshness-wiring.test.tsx`)**:
+  - **Codex 백엔드 응답 시각 정합 커밋 전면 수용 (`f1d95466`, `2026-09-22_response_freshness_asof_Codex.md`)**:
+    1. **`RunResultView.stateUpdatedAt` (required `Timestamp`)**: `inv.runs.updated_at` 기반. 실행 상태가 마지막으로 DB에 갱신된 시각 (HTTP read time 아님). ➔ 고유 라벨: **`실행 상태 갱신`** (`data-testid="run-state-updated-at"`). `RunDetail` 헤더, `RunList` 각 행(`data-testid="run-state-updated-at-${run.id}"`), `DeveloperStudio` Step 4 헤더(`data-testid="studio-run-state-updated-at"`)에 전면 실배선.
+    2. **`ShardObservation.stateAsOf` (nullable `Timestamp`)**: 응답에 포함된 parent 및 member Run들의 최신 `updated_at`. ➔ 고유 라벨: **`샤드 상태 기준`** (`data-testid="shard-state-as-of"`). `RunDetail` Tab 5 샤드 원장 배너 및 Aggregate Manifest Card(`data-testid="shard-state-as-of-card"`)에 표출하고 "단일 공통 스냅샷이나 조회 시각이 아닙니다"라는 한정된 의미 명시.
+    3. **`RunArtifactList.completedAt` & `RunLogView.completedAt` (nullable `Timestamp`)**: `inv.result_completions.completed_at` 기반. 결과가 커밋된 실행 완료 시각. ➔ 고유 라벨: **`실행 완료 시각`** (`data-testid="artifact-completed-at"`, `data-testid="log-completed-at"`).
+  - **엄격한 금기 사항 및 오독 방지 불변식 실현**:
+    - `completedAt`을 "로그 수집 시각", "로그 캡처 시각", "산출물 다운로드 시각", "화면 마지막 확인 시각", "신선도 갱신 시각"으로 오인시키는 라벨링 원천 배제.
+    - 세 시각 필드를 "갱신됨"이나 "최종 확인" 같은 모호한 단일 어휘로 뭉뚱그리지 않고 출처를 담은 고유 라벨 부여.
+    - `DeveloperStudio.tsx`에서 `completedAt` 부재 시 `new Date().toISOString()`으로 현재 시각을 지어내던 타임스탬프 위조 소거.
+  - **실제 API 연동 및 아티팩트 다운로드 실배선**:
+    - `shared/api/runArtifactObservation.ts` 신규 작성: `/v1/projects/{project}/runs/{run_id}/artifacts` 호출 및 런타임 검증, `getArtifactDownloadUrl` 제공.
+    - `RunDetail` Tab 3에 실제 산출물 파일 목록 및 커널 스트림 다운로드 버튼 실배선.
+  - **테스트 및 검증**:
+    - 신규 단위 테스트 7종 (`response-freshness-wiring.test.tsx`, 7/7 passed 100%).
+    - Vitest **69개 파일 620/620 passed 100%** (순증 +7 passed), Vite 프로덕션 빌드 exit 0 (3.61s), `check_frontend_integrity.py` 81개 파일 0 violations (PASS), web contracts:check 16/16 PASS, check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_백엔드시각_3종_정직한UI실배선_Gemini]].
 
 - **화면 결함 6대 부류 치유 트랙 9차: 브라우저 alert() 18개소 전소 및 3분류(오류·성공·미구현) 정직화 완결 (`App.tsx`, `NodeList.tsx`, `DeveloperStudio.tsx`, `alert-elimination-and-unimplemented-audit.test.tsx`, `developer-studio-dom.test.tsx`)**:
   - **Zero Alert Invariant**: 프론트엔드 전역(`apps/web/src`)의 브라우저 블로킹 `alert(` 호출 18개소 전소(0건 달성).

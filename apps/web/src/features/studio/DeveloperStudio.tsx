@@ -122,6 +122,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     workspaceId?: string;
     entrypoint?: string;
     state?: string;
+    stateUpdatedAt?: string;
+    completedAt?: string | null;
     outputHash?: string;
     outputSizeBytes?: number;
     verifiedEvidenceId?: string;
@@ -286,11 +288,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         if (res && res.output) {
           setArtifactData({
             runId: res.runId,
+            stateUpdatedAt: res.stateUpdatedAt,
+            completedAt: res.completedAt,
             outputHash: res.output.sha256,
             outputSizeBytes: res.output.sizeBytes,
             verifiedEvidenceId: res.evidence?.evidenceId || undefined,
             exitCode: res.stopReceipt?.exitCode ?? null,
-            exportedAt: res.completedAt || new Date().toISOString(),
+            exportedAt: res.completedAt || undefined,
             fallbackUsed: false,
           });
         } else {
@@ -304,7 +308,17 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           // Route Not Found (404) -> Fall back to legacy /artifacts endpoint
           apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`)
             .then((data) => {
-              if (mounted && data) setArtifactData({ ...data, fallbackUsed: true });
+              if (mounted && data) {
+                setArtifactData({
+                  runId: data.runId,
+                  completedAt: data.completedAt,
+                  outputHash: data.artifacts?.[0]?.checksumSha256,
+                  outputSizeBytes: data.artifacts?.[0]?.byteSize,
+                  verifiedEvidenceId: data.artifacts?.[0]?.evidenceId,
+                  exportedAt: data.completedAt || undefined,
+                  fallbackUsed: true,
+                });
+              }
             })
             .catch((fallbackErr) => {
               if (mounted) {
@@ -1973,6 +1987,16 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   <span>🖥️ 바인딩 노드: <strong>{currentRun?.nodeId || selectedNodeId || '(미정)'}</strong> ({boundNode?.hostname || '미확인'})</span>
                   <span>📦 파일: <code>{activeFile.path}</code></span>
                   <span>🔒 격리: <code>0600 sandbox</code></span>
+                  {(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt) && (
+                    <span data-testid="studio-run-state-updated-at" style={{ color: '#58a6ff' }}>
+                      실행 상태 갱신: {new Date(currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt!).toLocaleString('ko-KR')}
+                    </span>
+                  )}
+                  {artifactData?.completedAt && (
+                    <span data-testid="studio-run-completed-at" style={{ color: '#3fb950' }}>
+                      실행 완료 시각: {new Date(artifactData.completedAt).toLocaleString('ko-KR')}
+                    </span>
+                  )}
                   <span style={{ color: boundNode?.observationOnly ? '#d29922' : (boundNode?.allocatableCores !== undefined ? '#3fb950' : 'var(--color-text-muted)'), fontWeight: 600 }}>
                     ⚡ 노드 예약가능량: {boundNode?.observationOnly ? '0C (차단)' : (boundNode?.allocatableCores !== undefined ? `${boundNode.allocatableCores}C` : '미확인 (선택 불가)')}
                   </span>
@@ -2398,6 +2422,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       runId: activeRunId,
                       projectId: selectedProjectId,
                       workspaceId: selectedWorkspaceId,
+                      stateUpdatedAt: currentRun?.stateUpdatedAt || artifactData?.stateUpdatedAt || null,
+                      completedAt: artifactData?.completedAt || null,
                       exportedAt: artifactData?.exportedAt || null,
                       manifest: artifactData ? {
                         entrypoint: artifactData.entrypoint || activeFile.path,
