@@ -316,10 +316,23 @@ def mark_lost_nodes(
         select(Node).where(Node.tenant_id == tenant_id, Node.status == "active")
     ).all()
     changed = 0
+    # Node loss is also a storage event.  Keep the catalogue and its manifests,
+    # but make copies on the departed node unavailable in the same transaction
+    # as the liveness transition.  Without this call the replica repair service
+    # existed only as a directly-tested helper and placement could continue to
+    # count a lost node's copy as ready.
+    from .replica_repair import mark_node_replicas_unavailable
+
     for node in nodes:
         last_seen = node.last_heartbeat_at or node.enrolled_at
         if last_seen < cutoff:
             node.status = "lost"
+            mark_node_replicas_unavailable(
+                session,
+                tenant_id=tenant_id,
+                node_id=node.node_id,
+                now=now,
+            )
             changed += 1
     if changed:
         session.flush()

@@ -1,6 +1,6 @@
 """Frontend Integrity Scanner for SaintVision Web Client.
 
-Seven structural checks, no human judgment required:
+Eight structural checks, no human judgment required:
 
   (1) Prohibited Placeholder Identifiers:
       Detects hardcoded dummy UUIDs or synthetic test IDs in production source files:
@@ -42,6 +42,14 @@ Seven structural checks, no human judgment required:
       invoke or bind backend APIs (e.g. getArtifactDownloadUrl, saveWorkspaceEditView)
       while claiming the API is unexposed or uncallable ('API 미노출', '미구현').
       Also forbids known false-unimplemented claims.
+
+  (8) Integrity PASS Gate (shape-based, file-agnostic):
+      Any component computing an integrity PASS/UNVERIFIED verdict must default to the
+      non-positive value and gate PASS on an explicit verification signal
+      (.verified / verified === true), never on execution-success or hash-presence.
+      Unlike Rule 4 (bound to InvFileExplorer.tsx), this follows the *shape* to any file:
+      the EvidenceViewer.tsx fake-PASS regression escaped Rule 4 precisely because it
+      was a different file; a shape-based check catches the disease wherever it appears.
 
 What this scanner does NOT check (needs human judgment / runtime testing -- see governance doc):
 
@@ -268,6 +276,43 @@ def check_tristate_verification(files: list[Path]) -> list[str]:
     return errors
 
 
+# Rule 8 (shape-based, not file-targeted): any component that computes an integrity
+# PASS/UNVERIFIED verdict must default to the non-positive value and gate PASS on an
+# explicit verification signal. Rule 4 was bound to InvFileExplorer.tsx only, so the
+# same disease in another file (EvidenceViewer.tsx: default 'PASS', PASS on sealed+hash
+# instead of verified===true) escaped it and had to be caught by a Python route test in
+# a lane the frontend owner does not run. This rule follows the *shape* to any file.
+INTEGRITY_DEFAULT_TO_POSITIVE_REGEX = re.compile(
+    r"\blet\s+\w+\s*:\s*[^=;\n]*['\"]UNVERIFIED['\"][^=;\n]*=\s*['\"](?:PASS|verified)['\"]"
+)
+INTEGRITY_VERIFIED_GATE_REGEX = re.compile(r"\.verified\b|verified\s*===\s*true")
+
+
+def check_integrity_pass_gate(files: list[Path]) -> list[str]:
+    """Rule 8: integrity PASS must rest on real verification, in ANY component (file-agnostic)."""
+    errors: list[str] = []
+    for p in files:
+        text = p.read_text(encoding="utf-8")
+        rel = p.relative_to(ROOT)
+        has_positive = ("'PASS'" in text) or ('"PASS"' in text)
+        has_unknown = ("'UNVERIFIED'" in text) or ('"UNVERIFIED"' in text)
+        if not (has_positive and has_unknown):
+            continue  # not an integrity PASS/UNVERIFIED verdict component
+        # (a) honest default is the non-positive value, never PASS/verified
+        m = INTEGRITY_DEFAULT_TO_POSITIVE_REGEX.search(text)
+        if m:
+            line_no = text[: m.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-8 Integrity Gate] {rel}:{line_no} default-initializes an integrity status to PASS/verified; honest default is UNVERIFIED"
+            )
+        # (b) PASS must be gated on an explicit verification signal, not execution-success/hash-presence
+        if not INTEGRITY_VERIFIED_GATE_REGEX.search(text):
+            errors.append(
+                f"[RULE-8 Integrity Gate] {rel} computes an integrity PASS/UNVERIFIED verdict but has no explicit verification gate (.verified / verified === true)"
+            )
+    return errors
+
+
 def check_zero_call_guards(files: list[Path]) -> list[str]:
     errors: list[str] = []
     explorer_file = WEB_SRC / "features" / "desktop" / "ResourceExplorer.tsx"
@@ -362,12 +407,13 @@ def run_checks(verbose: bool = True) -> list[str]:
     all_errors.extend(check_zero_call_guards(files))
     all_errors.extend(check_synthetic_timestamps(files))
     all_errors.extend(check_unimplemented_consistency(files))
+    all_errors.extend(check_integrity_pass_gate(files))
 
     return all_errors
 
 
 def run_negative_control() -> bool:
-    """Verify scanner catches intentional mutations across all 5 rules (bidirectional negative control)."""
+    """Verify scanner catches intentional mutations across all 8 rules (bidirectional negative control)."""
     # Test 1 (Rule 1): Catches standard prohibited placeholders
     dummy_text_1 = "const tenant = '00000000-0000-0000-0000-000000000001';"
     errs_1 = []
@@ -419,6 +465,15 @@ def run_negative_control() -> bool:
     has_contra = any(api_token in dummy_contra_bad and regex.search(dummy_contra_bad) for api_token, regex, desc in WIRING_CONTRADICTION_PATTERNS)
     assert has_contra, "Negative control failed: Rule 7 wiring contradiction not caught"
 
+    # Test 11 (Rule 8 Integrity Gate, shape-based): catches the EvidenceViewer-class regression in any file
+    dummy_int_default_bad = "let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'PASS';"
+    assert INTEGRITY_DEFAULT_TO_POSITIVE_REGEX.search(dummy_int_default_bad) is not None, \
+        "Negative control failed: Rule 8 default-to-PASS integrity status not caught"
+    # PASS gated on sealed+hash (no verification signal) must be detectable as a missing gate
+    dummy_int_nogate_bad = "if (res.sealed && res.output?.sha256) { integrityStatus = 'PASS'; }"
+    assert INTEGRITY_VERIFIED_GATE_REGEX.search(dummy_int_nogate_bad) is None, \
+        "Negative control failed: Rule 8 missing verification gate not detectable"
+
     return True
 
 
@@ -432,9 +487,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_negative:
-        print("Running negative control sensitivity tests across all 7 integrity rules...")
+        print("Running negative control sensitivity tests across all 8 integrity rules...")
         if run_negative_control():
-            print("✔ Negative control passed: Scanner successfully detects mutations across all 7 rules.")
+            print("✔ Negative control passed: Scanner successfully detects mutations across all 8 rules.")
             sys.exit(0)
         else:
             print("❌ Negative control failed.")
@@ -448,7 +503,7 @@ def main() -> None:
             print(f"  - {err}")
         sys.exit(1)
     else:
-        print("\n✔ Frontend Integrity Check Passed: All 7 integrity rules satisfied (0 violations).")
+        print("\n✔ Frontend Integrity Check Passed: All 8 integrity rules satisfied (0 violations).")
         sys.exit(0)
 
 

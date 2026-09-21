@@ -1,14 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.158"
+version: "1.0.160"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T04:51:00+09:00"
+updated: "2026-09-22T05:08:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 GOV-ALERT-001 ???? ?? ??
+
+- `tools/alarm_check.py`? ?? `coverage`? ?? 20? ?? ??? ??? ??? ??? ??? ??? ?? `4 of 16`?? ???? ?? ????. ?? ??? ?? ????? ??? ? ??, ?? ????? ?? ???governance-gated ??? ??? ????? ????.
+- `tests/test_alarm_check.py`? ?? ?? ??? ????. `.venv\Scripts\python.exe -m pytest -q tests/test_alarm_check.py`? ?? ? 12 passed/exit 0, ?? ?? ??? 1 failed/11 passed/exit 1, ?? ? 12 passed/exit 0??. `git diff --check`? exit 0??.
+- ?? ?? ????????? governance ??? ???? ???. PostgreSQL ??, ?? ??, CI ? Claude ?? ??? ???/pending??. Evidence: [[2026-09-22_alarm_coverage_summary_Codex]].
+
+## 2026-09-22 strict response producer-shape self-audit
+
+- **Closed (Codex author work):** source-audited the 19 response models added/narrowed tonight; no producer shape was found that the strict models reject. Corrected the impossible Node enrollment fixture and added branch-shape coverage for project kernel-link outputs, cleared/unassigned workspace tools, and contribution status ? nullable-capacity combinations. Named the broader class `schema-valid but producer-unreachable fixture state`; examples are Claude's impossible Node `online` fixture and this audit's enrollment heartbeat sequence/timestamp mismatch. The current binding checker validates fixture references and serving anchors, not producer reachability. See [[2026-09-22_response_model_shape_self_audit_Codex]].
+- **Verified:** integration SHA `9dbf9915` is the recorded clean test tip. Focused suite: 101 passed, 2 PostgreSQL-gated skips because `INV_TEST_ADMIN_DSN` is absent; DB-backed producer output therefore remains unverified. `check_docs` passed. Obsidian read-only check had pending exports and was not applied.
+- **Independent review pending:** Claude review of this audit and its added tests.
+- **Decision pending:** whether to add a generic producer-reachability check for fixtures. No implementation or further fixture scan was started; this requires a design decision.
 
 ## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
 

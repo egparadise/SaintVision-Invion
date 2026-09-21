@@ -16,7 +16,7 @@ from inv.approvals import view
 from inv.control import Control
 from inv.contracts import validate_contract
 from inv.errors import DomainError
-from inv.generated.models import ApprovalPage, ControlRunPage
+from inv.generated.models import ApprovalPage, ControlRunDetail, ControlRunPage
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "contracts" / "fixtures"
@@ -65,6 +65,9 @@ class _Rows:
     def fetchall(self):
         return self.rows
 
+    def fetchone(self):
+        return self.rows[0] if self.rows else None
+
 
 class _Connection:
     def __init__(self, rows):
@@ -104,6 +107,93 @@ def test_run_listing_provider_returns_the_shared_control_page_fixture(monkeypatc
         SimpleNamespace(tenant_id=uuid.UUID(run["tenantId"])), run["projectId"]
     )
     assert result == expected
+
+
+def test_control_run_view_fixture_is_the_single_run_contract():
+    """The single-run/create projection uses the same canonical wire view."""
+    payload = fixture("control-run-page-response.json")["items"][0]
+    validate_contract("ControlRunView", payload)
+
+
+def test_control_run_detail_fixture_matches_the_get_response_contract():
+    payload = fixture("control-run-detail-response.json")
+    validate_contract("ControlRunDetail", payload)
+    assert ControlRunDetail.model_validate(payload).model_dump(mode="json") == payload
+
+
+def test_control_run_detail_rejects_missing_release_hint():
+    payload = fixture("control-run-detail-response.json")
+    payload.pop("resourceReleasePending")
+    with pytest.raises(ValidationError):
+        ControlRunDetail.model_validate(payload)
+
+
+def test_single_run_anchor_rejects_an_invalid_state(monkeypatch):
+    """Removing the get() anchor must make this serving-path test fail."""
+    expected = fixture("control-run-page-response.json")["items"][0]
+    row = {
+        "run_id": expected["runId"],
+        "tenant_id": uuid.UUID(expected["tenantId"]),
+        "project_id": expected["projectId"],
+        "state": "not-a-run-state",
+        "version": expected["version"],
+        "attempt": expected["attempt"],
+    }
+
+    class _GetConnection(_Connection):
+        def execute(self, sql, *_args, **_kwargs):
+            if "SELECT * FROM inv.runs" in sql:
+                return _Rows([row])
+            return _Rows([{"n": 0}])
+
+    class _GetDatabase(_Database):
+        def __init__(self):
+            self.connection = _GetConnection([row])
+
+    control = Control(_GetDatabase())
+    monkeypatch.setattr(control, "grant", lambda *_args, **_kwargs: None)
+    with pytest.raises(DomainError, match="ControlRunDetail: invalid contract"):
+        control.get(
+            SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"])),
+            expected["projectId"],
+            expected["runId"],
+        )
+
+
+def test_run_creation_anchor_rejects_an_invalid_state(monkeypatch):
+    """The POST producer is anchored before its event/outbox side effects."""
+    expected = fixture("control-run-page-response.json")["items"][0]
+    row = {
+        "run_id": expected["runId"],
+        "tenant_id": uuid.UUID(expected["tenantId"]),
+        "project_id": expected["projectId"],
+        "state": "not-a-run-state",
+        "version": expected["version"],
+        "attempt": expected["attempt"],
+    }
+
+    class _CreateConnection:
+        def execute(self, sql, *_args, **_kwargs):
+            if "INSERT INTO inv.runs" in sql:
+                return _Rows([row])
+            return _Rows([])
+
+    class _CreateDatabase:
+        @contextmanager
+        def transaction(self, _tenant_id):
+            yield _CreateConnection()
+
+    control = Control(_CreateDatabase())
+    monkeypatch.setattr(control, "grant", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(control.approvals, "_ledger", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(control.approvals, "_save", lambda *_args, **_kwargs: row)
+    monkeypatch.setattr("inv.containment.require_execution", lambda _conn: None)
+    with pytest.raises(DomainError, match="ControlRunView: invalid contract"):
+        control.create(
+            SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"])),
+            expected["projectId"],
+            "idem-1",
+        )
 
 
 def test_approval_listing_provider_returns_the_shared_approval_page_fixture(monkeypatch):

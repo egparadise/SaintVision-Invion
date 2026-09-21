@@ -402,15 +402,24 @@ def test_the_tool_choice_is_recorded_on_the_workspace(app_sessionmaker, people):
                     created_by_user_id=people["alice"], now=NOW,
                 )
                 assert workspace["toolName"] is None
+                cleared = project_service.set_workspace_tool(
+                    session, tenant_id=people["tenant_a"],
+                    workspace_id=workspace["workspaceId"],
+                    tool_name=None, acting_user_id=people["alice"],
+                )
+                assert cleared["toolName"] is None
+                assert cleared["toolReadiness"] is None
                 chosen = project_service.set_workspace_tool(
                     session, tenant_id=people["tenant_a"],
                     workspace_id=workspace["workspaceId"],
                     tool_name="claude-code", acting_user_id=people["alice"],
                 )
     assert chosen["toolName"] == "claude-code"
+    assert chosen["nodeId"] is None
     # Usability is reported beside the choice, because it is a fact about a
     # machine right now rather than about this record.
     assert chosen["toolReadiness"]["adapter"] == "claude-code"
+    assert chosen["toolReadiness"]["nodeId"] is None
 
 
 def test_a_tool_with_no_headless_mode_cannot_be_chosen(app_sessionmaker, people):

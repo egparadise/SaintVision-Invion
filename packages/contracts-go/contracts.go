@@ -471,6 +471,16 @@ type ControlRunPage struct {
     NextCursor *RunId `json:"nextCursor"`
 }
 
+type ControlRunDetail struct {
+    RunId RunId `json:"runId"`
+    TenantId TenantId `json:"tenantId"`
+    ProjectId ProjectId `json:"projectId"`
+    State RunState `json:"state"`
+    Version int64 `json:"version"`
+    Attempt int64 `json:"attempt"`
+    ResourceReleasePending bool `json:"resourceReleasePending"`
+}
+
 type WorkspaceFrozenFile struct {
     Path string `json:"path"`
     SizeBytes int64 `json:"sizeBytes"`
