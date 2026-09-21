@@ -1,0 +1,63 @@
+---
+doc_id: "VERIFICATION-PROVENANCE-RULE-001"
+title: "검증 보고 provenance 규칙 — 강제 형식과 생성 도구"
+version: "1.0.0"
+status: "active"
+author: "Claude"
+reviewer: "Codex"
+updated: "2026-09-21T14:30:00+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+tags: ["governance", "verification", "provenance", "reproducibility", "reporting-rule"]
+---
+
+# 검증 보고 provenance 규칙
+
+**적용: 다음 세션부터, 모든 "검사 통과/실패" 보고에 강제.** 권고로만 두면 다음 사람이 안 읽어 없는 것과 같다 — 2026-09-21 하루 종일 아무도 pass-report에 tip을 안 박아 브랜치-통합 괴리(check_docs가 각자 브랜치엔 green·통합엔 broken)를 못 봤다. 이 규칙은 그 형식을 확정하고 **기계적으로 생성하는 도구**(`tools/provenance.py`)를 제공해, 사람이 손으로 적어 빠뜨리는 것을 막는다.
+
+이 규칙은 Codex의 보고 규칙 제안([[2026-09-21_integration-tip-verification_Codex]] 9항)을 **운영 표준으로 승격**하고, 빠진 세 가지(A clean 상태·측정법, B 환경 지문/생략목록, C 신뢰 계측)를 더하며, 도구로 강제한다. 중복이 아니라 그 제안의 실행 형태다.
+
+## 강제 형식
+
+### 필수 항목 (없으면 그 보고는 통합 상태를 보증하지 못함)
+| 항목 | 획득 명령 |
+|---|---|
+| 1. commit_sha (full) | `git rev-parse HEAD` |
+| 2. branch | `git rev-parse --abbrev-ref HEAD` (detached면 `(detached@<sha>)`) |
+| 3. worktree_path | `git rev-parse --show-toplevel` |
+| 4. **working_tree_clean** | `git status --porcelain` 빈값 = clean. **단 EOL 드리프트 게이트는 `git diff --exit-code`로 판정** — Windows에서 `git status`는 CRLF를 "수정됨"으로 오탐한다(2026-09-21 `models.py` 실증). "clean을 어느 명령으로 쟀는가"가 결과를 바꾸므로 명시한다. |
+| 5. interpreter (절대경로) | 실제 실행 인터프리터. python이면 `sys.executable`(bare `python`과 `.venv`를 혼동 불가), shell 도구면 `which <tool>`의 절대경로 |
+| 6. runtime version | `python --version` / `node --version` / `go version` 중 해당 |
+| 7. timestamp KST | 시작·종료 시각 |
+| 8. 검사별 결과 | **정확한 명령 + 작업 디렉터리 + 직접 종료코드(파이프로 가리지 말 것) + pass/fail/skip/deselected 수 + skip 사유** |
+| 9. executor + 검토자 동일인 여부 | 실행자와 검토자가 다른 사람이라야 독립 검증(Codex 9항) |
+
+### 선택/조건부 항목
+- **환경 지문 + "안 돌린/skip한 검사와 그 이유"** (필수에 준함): 이 호스트가 PG/Docker/Go/browser 게이트를 돌릴 수 있는지(`INV_TEST_ADMIN_DSN` 유무, `docker`/`go`/`node` 존재). Windows "전부 통과"가 그 게이트를 통째로 생략했다면 CI 통과와 다르다 — 무엇을 생략했는지 표면에 있어야 한다.
+- **artifact 경로** (junit xml 등) 해당 시.
+- **단일 실행 vs 배치 산술 합** 라벨: 여러 배치 합이면 한 실행처럼 인용하지 말 것(JUnit 432/2628 함정).
+
+## 생성 도구 — 손으로 적지 말 것
+```
+python tools/provenance.py                 # 필수 1~7·9 + 환경 지문을 현재 실행 환경에서 생성 → 보고에 붙여넣기
+python tools/provenance.py --json          # JSON
+python tools/provenance.py --executor NAME # 실행자 각인
+python tools/provenance.py -- <검사 명령>   # 헤더 + 그 검사를 파이프 없이 실행해 종료코드·출력꼬리까지 자기 정체성으로 출력(항목 8), 검사의 종료코드로 종료
+```
+도구는 (4)를 `git status --porcelain`과 `git diff --quiet HEAD` 양쪽으로 재서 **status-dirty·content-clean이면 EOL/untracked 산물**임을 명시하고, (5)를 `sys.executable`로, (8)의 종료코드를 subprocess 반환값으로 직접 잡아 `| tail`류 파이프 마스킹을 원천 차단한다.
+
+## 검사 자기-출력에 대한 판단 (사용자 part 3)
+검사 도구마다 자기 정체성을 뱉게 고치는 것은 python·go·npm 다언어라 침습적이다. **현실적 강제점은 wrap 모드**(`provenance.py -- <검사>`)다 — 언어 무관, 검사 도구 무수정, 종료코드를 파이프 없이 캡처. 따라서 보고되는 검사는 wrap으로 돌리는 것을 표준으로 한다. (최다 사용 게이트가 한 줄 정체성을 추가로 찍는 것은 선택적 보강일 뿐 필수 아님.)
+
+## 검증 (되돌림 대조 포함, 2026-09-21 실측)
+`tools/provenance.py`를 오늘 우리가 쓴 방식으로 검증했다:
+- **두 워크트리에서 다른 값**: `.worktrees/claude-cx01`(SHA b2c2080) vs 주 checkout(SHA 5c7ce9d) — commit_sha·worktree_path·branch 모두 다르게 출력.
+- **dirty 트리**: 추적 파일 내용 변경 시 `working_tree_clean=NO`·`content_clean=NO`, 원복 시 복귀.
+- **EOL 케이스**: 추적 파일을 CRLF로 바꾸면 `status=NO`이나 `content=YES` + "EOL/untracked 산물" note — 실 드리프트와 구분. 원복.
+- **wrap 종료코드**: 검사 exit 1이면 wrapper도 1, exit 0이면 0 (파이프 없이 확인). 종료코드 라인은 이후 `| grep`에도 안 가림.
+
+## 왜 규칙으로 올리는가
+2026-09-21 우리가 틀린 경우가 전부 이 항목 중 하나가 빠져서였다(인터프리터=5, 시점/트리=1·4, clean=4, 실행위치=3). 상호 정정 루프는 오류를 잡는 데는 탁월했으나 **인스턴스만 고치고 convention을 안 고쳐 같은 유형이 재발**했다. 이 문서와 도구는 사후 정정을 **예방**으로 바꾸기 위한 것이다. 관련: `memory:pass-report-provenance-rule`, `memory:wrong-interpreter-fakes-unrunnable`.
+
+## 인계
+Codex: 9항 제안자로서 이 표준·도구가 그 제안을 온전히 담는지, 더한 A/B/C가 충분한지 경계 재검토. 표준 채택 후 각 agent의 보고 템플릿([[Agent 연속 실행과 최종 보고 정책]] 계열)에 `provenance.py` 출력 첨부를 반영.
