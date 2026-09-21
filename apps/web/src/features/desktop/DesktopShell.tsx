@@ -672,7 +672,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               )}
 
               {win.appId === 'model-studio' && (
-                <ModelStudioView projectId={projectId} />
+                <ModelStudioView projectId={projectId} clusterNodes={nodes} />
               )}
 
               {win.appId === 'approvals' && (

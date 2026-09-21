@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.53"
+version: "1.0.55"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T17:40:00+09:00"
+updated: "2026-09-21T18:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T17:40:00+09:00.
+- 확인 기준: 2026-09-21T18:05:00+09:00.
 
 ## 최근 확인한 진척
+
+- **VF-GM-04 Model Studio 샤드·복제본 매트릭스, ADR-041 네트워크 제약 경고 및 노드 적격성 실행 계획기 완결 (`apps/web/src/features/desktop/ModelStudioView.tsx`, `DesktopShell.tsx`, `apps/web/tests/model-studio-dom.test.tsx`)**:
+  - **모델 매니페스트 쿼리 및 메타데이터 정합성**: `projectId`, `modelId`, `version` 3개 필드 기반 조회, 정적 마크업 계약(`'정확한 모델 ID'`, 초기 빈 마운트 시 하드코딩 샘플 배제) 준수.
+  - **샤드 및 복제본 패브릭 매트릭스 (Matrix)**: 샤드별 byteRange, 레이어 매핑, 노드별 복제본 상태(정상/누락), 저하 상태 감지 시 `replica-degraded-badge` (`role="alert"`), 생존 적격 노드(surviving eligible nodes) 계산.
+  - **샤드 복구 방어선**: 생존 적격 노드 0개 시 복구 버튼 비활성화 및 `no-surviving-repair-nodes` (`role="alert"`), 복구 실패 시 `shard-repair-error-alert` (`role="alert"`), 부분 복구(1/2) 시 `shard-repair-warning-alert` (`role="alert"`), 2/2 정상 복구 시에만 성공 배너 표출.
+  - **ADR-041 LAN 제약 및 실행 계획기**: 5대 실행 모드 지원, `tensor_pipeline_parallel` 선택 및 복수 노드 할당 시 All-Reduce 레이턴시 경고 배너(`data-testid="tensor-parallel-lan-warning"`, `role="alert"`), 관측 전용 노드(Node-04) 연산 할당 완전 배제 및 비활성화, VRAM 부족 시 `data-testid="plan-infeasible-alert"` (`role="alert"`).
+  - **4대 돌연변이 실측 사살 (KILLED)**: ADR-041 LAN 경고 우회, Node-04 관측 가드 우회, VRAM 부족 허위 성공, 복구 실패 무시 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 43개 파일 **399/399 passed 100%** (from 389 to 399, net +10 tests 순증), Vite 프로덕션 빌드 3.52s 클린 번들링, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]].
+
+- **RunResultView 및 RunArtifactList 커널 공유 Fixture 프론트엔드 계약 결속 및 Ajv 검증 완결 (`apps/web/tests/fixtures/run-result.ts`, `apps/web/tests/run-result-contract.test.ts`, `apps/web/tests/developer-studio-dom.test.tsx`)**:
+  - Claude가 인계한 커널 계약 공유 픽스처(`run-result-view.json`, `run-artifact-list.json`)를 프론트엔드에 전면 결속.
+  - `run-result-contract.test.ts` (4 tests 신설): `contracts/v1alpha1/core.schema.json`의 `$defs/RunResultView` 및 `$defs/RunArtifactList`를 Ajv 2020으로 검증하고 필수 필드(`output`, `artifacts`) 제거 시 검증 실패 단언(양방향 실측 확인).
+  - `developer-studio-dom.test.tsx`: `sampleFallbackArtifactList` 및 `result200`을 공유 픽스처 기반으로 교체하여 **Mock == Contract** 달성 (18 DOM tests 100% 통과 유지).
+  - 검증 실적: Vitest 42개 파일 **389/389 passed 100%** (from 385 to 389, net +4 tests), Vite 프로덕션 빌드 3.57s 클린, Pytest 34 passed, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]].
 
 - **VF-GM-03 inv:// File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증, 삼태 상태 분리, 신규 실패 은폐 제거, 복제본 저하 감지 및 생존 노드 기반 정직한 복구 가드 완결 (`apps/web/src/features/desktop/InvFileExplorer.tsx`, `DesktopShell.tsx`, `apps/web/tests/inv-file-explorer-dom.test.tsx`)**:
   - **4대 네임스페이스 탐색**: `inv://models`, `inv://datasets`, `inv://workspaces`, `inv://artifacts` 주소 표시줄 내비게이션, 주소 직접 입력 이동, 퀵 네비게이션 버튼 및 빈 상태(`등록된 파일이 없습니다.`) 무결 렌더링.
@@ -229,16 +245,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-GM-03 (`inv://` File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증, 삼태 상태 분리, 신규 실패 은폐 제거, 복제본 저하 감지 및 생존 노드 기반 정직한 복구 가드 완결): `apps/web/src/features/desktop/InvFileExplorer.tsx`, `DesktopShell.tsx`, `apps/web/tests/inv-file-explorer-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 41개 파일 **385/385 tests 100% 통과** (from 375 to 385, net +10 tests), Vite 프로덕션 빌드 3.23s 클린, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS (614 documents), `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.103 / 2026-09-21T17:40:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 686eecf / agent/gemini/vf-gm-03-file-explorer |
-| 작업한 것 | 1) `InvFileExplorer.tsx`: 4대 네임스페이스(`models`, `datasets`, `workspaces`, `artifacts`) 주소창 내비게이션, 직접 주소 입력, 퀵 네비게이션 버튼, 빈 상태 렌더링.<br>2) 클라이언트 실측 SHA-256 무결성 검증 및 카탈로그 기대 해시 대조, 불일치 시 `role="alert"`와 `integrity-mismatch-banner`를 통한 `TAMPERED` 알림 표출.<br>3) 엄밀한 삼태(Tri-State: `UNVERIFIED` vs `VERIFIED` vs `MISMATCH`) 분리, 카탈로그 체크섬 부재 시 정직하게 `UNVERIFIED` 유지.<br>4) 신규 실패 은폐 방지: 재검증 실패 시 이전 `VERIFIED` 상태 즉시 파기 및 `integrity-action-error` (`role="alert"`) 표면화.<br>5) 정직한 복제본 저하 감지 및 복구 가드: `healthy < required` 시 `replica-degradation-badge` (`role="alert"`), 관측 전용 노드(Node-04) 생존 노드 제외 및 0 생존 노드 시 복구 버튼 비활성화, 복구 실패 시 `repair-action-error`, 부분 복구 시 `repair-action-warning`, 완전 복구 시 `repair-action-success`.<br>6) `DesktopShell.tsx`: `clusterNodes={nodes}`를 `<InvFileExplorer />`에 전달.<br>7) `apps/web/tests/inv-file-explorer-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 41개 파일 **385/385 tests 100% 통과**, from 375 to 385 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.23s 클린)<br>3) Pytest: `.venv\Scripts\pytest.exe tests/test_route_coverage.py` (exit 0, 30 passed in 0.88s)<br>4) Docs & Ontology: `check_docs.py` (exit 0, 614 documents PASS), `check_ontology.py` (exit 0, PASS)<br>5) Mutation Testing: 4대 돌연변이(해시 비교 생략, 체크섬 부재를 검증으로 합치, 재검증 실패 은폐, 복구 실패/부분복구 거짓 성공) 100% 사살 실측 |
+| 마지막 작업 / 착수 카드 | VF-GM-04 (Model Studio: 샤드 및 복제본 매트릭스, 생존 노드 기반 복구 방어, ADR-041 네트워크 제약 경고, Node-04 관측 전용 배제, VRAM 수용성 판정 및 4대 돌연변이 사살 실측 완료): `apps/web/src/features/desktop/ModelStudioView.tsx`, `DesktopShell.tsx`, `apps/web/tests/model-studio-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 43개 파일 **399/399 tests 100% 통과** (from 389 to 399, net +10 tests), Vite 프로덕션 빌드 3.52s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.146 / 2026-09-21T18:05:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 7ab955b / agent/gemini/vf-gm-04-model-studio |
+| 작업한 것 | 1) `ModelStudioView.tsx`: 모델 Manifest 쿼리, 샤드별 byteRange/레이어/복제본 상태 매트릭스 표출, 저하 감지 시 `replica-degraded-badge` (`role="alert"`).<br>2) 생존 노드 기반 복구 방어: 관측 전용 노드 배제 및 생존 노드 0개 시 복구 차단, 복구 실패 시 `shard-repair-error-alert` (`role="alert"`), 부분 복구 시 `shard-repair-warning-alert` (`role="alert"`), 2/2 정상 복구 시에만 성공 배너 표출.<br>3) ADR-041 LAN 제약 경고: `tensor_pipeline_parallel` 및 다중 노드 할당 시 All-Reduce 병목 경고 배너(`role="alert"`).<br>4) 관측 전용 노드(Node-04) 연산 할당 완전 배제: 체크박스 disabled 및 `node-ineligible-badge` (`role="alert"`).<br>5) VRAM 수용성 판정: 할당 VRAM 부족 시 `plan-infeasible-alert` (`role="alert"`).<br>6) `DesktopShell.tsx`: `clusterNodes={nodes}` 주입 결속.<br>7) `apps/web/tests/model-studio-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 43개 파일 **399/399 tests 100% 통과**, from 389 to 399 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.52s 클린)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(ADR-041 LAN 경고 우회, Node-04 관측 가드 우회, VRAM 부족 허위 성공, 복구 실패 무시) 100% 사살 실측 |
 | CI / 독립 reviewer / 운영 인수 | 프론트엔드 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Codex·Claude 독립 검토 연계 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 수 기가바이트 대용량 모델 가중치 파일 청크 스트리밍 해싱의 Web Worker 분리, 물리 노드 간 실물 분산 복제 소켓 연동은 백엔드 및 브라우저 인수 레인 이관 |
-| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-04` (Model Studio: 단일 가상 GPU/vCPU 연산 뷰 & 다중 노드 실물 분산 매핑) / Gemini (Antigravity) |
-| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 85.0%** (1,020/1,200점, VF-GM-01~03 완결)<br>**단일 가상 컴퓨터 보강 트랙: 50.0%** (VF-GM-01, 02, 03 완료 / 6개 카드) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]], [[2026-09-21_VF_GM02_ResourceExplorer_대조_및_3대방어검증_Gemini]], [[2026-09-21_UI_FB03_DeveloperStudio_DOM_라우트404폴백검증_Gemini]] |
+| 남은 문제 / 차단 이유 / 해소 담당 | 물리 노드 간 고속 인터커넥트(NVLink/InfiniBand) 실물 패킷 전송 및 실시간 GPU VRAM 동기화는 백엔드 및 실장비 인수 레인 이관 |
+| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-05` (Terminal/IDE Web Session UX: PTY 스트림 연결, 세션 복원, 접속 불능 방어, Monaco 에디터 결합) / Gemini (Antigravity) |
+| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 88.0%** (1,056/1,200점, VF-GM-01~04 완결)<br>**단일 가상 컴퓨터 보강 트랙: 66.7%** (VF-GM-01, 02, 03, 04 완료 / 6개 카드) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]], [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]], [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]] |
 
 > **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
 1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
@@ -331,7 +347,11 @@ source_of_truth: "Git"
 > 5) **정직한 복제본 저하 감지 및 복구 가드 (Requirement 4)**: `healthyReplicas < requiredReplicas`일 때 `replica-degradation-badge` (`role="alert"`), 관측 전용 노드(Node-04)를 생존 노드에서 배제, 생존 노드가 0개일 때 복구 버튼 비활성화 및 `no-surviving-nodes-notice` (`role="alert"`), 복구 실패 시 `repair-action-error`, 부분 복구(1/2) 시 거짓 성공 대신 `repair-action-warning`, 완전 복구(2/2) 시에만 `repair-action-success` 배너 및 `replica-healthy-badge` 복원.
 > 6) **4대 돌연변이 실측 사살 (KILLED)**: 해시 비교 생략, 체크섬 부재를 검증으로 합치, 재검증 실패 시 이전 성공 은폐 보존, 복구 실패 및 부분 복구 거짓 성공 등 4개 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **41개 파일 385/385 tests 100% 통과** (from 375 to 385, net +10 tests 순증), Vite 프로덕션 빌드 3.23s 클린 생성, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS (614 documents), `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]].
-
-
-
-
+>
+> **Gemini 회신(2026-09-21, VF-GM-04 Model Studio 샤드·복제본 매트릭스, ADR-041 네트워크 제약 경고 및 노드 적격성 실행 계획기 완결)**: 사용자 기승인 범위에 따라 VF-GM-04(Model Studio) 구현 및 샤드 매트릭스·ADR-041 실행 계획기 방어선을 전면 구축함:
+> 1) **모델 매니페스트 쿼리 및 정적 마크업 불변식**: `projectId`, `modelId`, `version` 기반 쿼리, `safetensors` 포맷, 바이트 크기, 해시 및 `'정확한 모델 ID'` 정적 마크업 불변식 준수.
+> 2) **샤드 및 복제본 패브릭 매트릭스**: 샤드별 byteRange, 레이어 매핑, 복제본 정상/누락 추적, 저하 감지 시 `replica-degraded-badge` (`role="alert"`), 생존 적격 노드 계산.
+> 3) **생존 노드 기반 복구 가드**: 관측 전용 노드 배제 및 생존 노드 0개 시 복구 차단(`no-surviving-repair-nodes`, `role="alert"`), 복구 실패 시 `shard-repair-error-alert` (`role="alert"`), 부분 복구(1/2) 시 `shard-repair-warning-alert` (`role="alert"`), 2/2 정상 복구 시에만 성공 배너 표출.
+> 4) **ADR-041 LAN 제약 및 실행 계획기**: `tensor_pipeline_parallel` 선택 및 복수 노드 할당 시 All-Reduce 병목 경고 배너(`data-testid="tensor-parallel-lan-warning"`, `role="alert"`), 관측 전용 노드(Node-04) 연산 할당 완전 배제 및 체크박스 disabled, VRAM 부족 시 `data-testid="plan-infeasible-alert"` (`role="alert"`).
+> 5) **4대 돌연변이 실측 사살 (KILLED)**: ADR-041 LAN 경고 우회, Node-04 관측 가드 우회, VRAM 부족 허위 성공, 복구 실패 무시 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+> 결과: 전체 Vitest **43개 파일 399/399 tests 100% 통과** (from 389 to 399, net +10 tests 순증), Vite 프로덕션 빌드 3.52s 클린 번들링, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]].

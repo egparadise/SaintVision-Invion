@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import * as client from '../src/shared/api/client';
 import type { ProjectItem, RunItem, NodeStopReceipt } from '../src/contracts/types';
+import { runResultViewFixture, runArtifactListFixture } from './fixtures/run-result';
 
 const sampleReceipt: NodeStopReceipt = {
   receiptId: 'rcp_fb03',
@@ -34,19 +35,19 @@ const sampleRun: RunItem = {
   finishedAt: '2026-09-21T10:00:05Z',
 };
 
+// Bound to kernel contract shared fixture contracts/fixtures/run-artifact-list.json
 const sampleFallbackArtifactList = {
+  ...runArtifactListFixture,
   runId: 'run_fb03',
-  outputHash: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-  outputSizeBytes: 2048,
-  verifiedEvidenceId: 'evi_legacy_fb03',
-  items: [
-    {
-      name: 'model_output.bin',
-      path: 'dist/model_output.bin',
-      sizeBytes: 2048,
-      sha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    },
-  ],
+  outputHash: runArtifactListFixture.artifacts[0]?.checksumSha256,
+  outputSizeBytes: runArtifactListFixture.artifacts[0]?.byteSize,
+  verifiedEvidenceId: runArtifactListFixture.artifacts[0]?.evidenceId,
+  items: runArtifactListFixture.artifacts.map((a) => ({
+    name: a.path,
+    path: a.path,
+    sizeBytes: a.byteSize,
+    sha256: a.checksumSha256,
+  })),
 };
 
 describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', () => {
@@ -472,18 +473,8 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
   it('Scenario 8: Canonical /result 200 OK -> NO fallback to /artifacts, renders Output Verified badge, NO fallback badge or error banner', async () => {
     let artifactsCalls = 0;
     const result200 = {
+      ...runResultViewFixture,
       runId: 'run_fb03',
-      output: {
-        sha256: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
-        sizeBytes: 4096,
-      },
-      evidence: {
-        evidenceId: 'evi_verified_canonical_01',
-      },
-      stopReceipt: {
-        exitCode: 0,
-      },
-      completedAt: '2026-09-21T10:00:05Z',
     };
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
@@ -529,18 +520,8 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
   let root: Root;
 
   const result200 = {
+    ...runResultViewFixture,
     runId: 'run_fb03',
-    output: {
-      sha256: 'sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
-      sizeBytes: 4096,
-    },
-    evidence: {
-      evidenceId: 'evi_verified_canonical_01',
-    },
-    stopReceipt: {
-      exitCode: 0,
-    },
-    completedAt: '2026-09-21T10:00:05Z',
   };
 
   beforeEach(() => {
