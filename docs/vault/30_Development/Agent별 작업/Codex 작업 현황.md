@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.111"
+version: "1.0.112"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T18:18:00+09:00"
+updated: "2026-09-21T18:34:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 Gemini VF-GM-02~05 독립 경계 검토
+
+- Gemini 화면 구현을 수정하지 않고 integration fixed SHA `d0d41c30a0ee9a0106f89049654c8743c6cf030f`에서 경계 검토했다. VF-GM-03과 VF-GM-05는 깊게 확인하고 각 핵심 mutation을 직접 재현해 시험 실패를 확인했다. 직접 mutation은 바로 앞 UI 코드 SHA `d416fe50a2816cc3ad891d682f4e1e073a312f49`에서 수행됐고 그 뒤 통합 커밋은 문서 전용이었다. VF-GM-04는 backend summary contract와 화면 shard synthesis를 대조했다. VF-GM-02는 얕은 소스/DOM pass 확인이며 exhaustive approval이 아니다.
+- VF-GM-03 승인 보류: DesktopShell은 file bytes, verifier, repair adapter를 연결하지 않는다. 기본 검증은 URI+checksum을 해시하고 callback 부재 복구는 성공을 합성한다. VF-GM-05 승인 보류: POST payload/result/WebSocket 경로·인증 전송이 canonical server contract와 다르며 빈 노드가 fake active PTY를 만든다. VF-GM-04 승인 보류: 요약 응답의 `unknown` availability에서 UI가 healthy replica/shards를 합성하고 repair fallback도 성공을 합성한다.
+- Provenance-wrapped 4 DOM files/44 tests passed. Hash-comparison 무력화 mutation은 assertion line 269에서, PTY observation guard 우회는 line 327에서 각각 실패했다. 변경은 원복했고 앱 소스는 clean. `check_docs.py`/`check_ontology.py`도 project `.venv`로 통과했다. 초기 root-cwd alias resolution 실패는 잘못된 작업 디렉터리 invocation으로 분류했으며 apps/web cwd 재실행에서 통과했다.
+- 상세 Evidence와 조치 인계: [[2026-09-21_VF_GM02-05_Codex_boundary_review]]. 구현자 Gemini에게 UI 결함을 인계하며 Codex는 screen code를 수정하지 않았다. Browser/실 HTTP/장비 인수는 미실행.
 
 ## 2026-09-21 재개: integration 선행 병합, UI-FB-03, 응답 계약 slice
 
