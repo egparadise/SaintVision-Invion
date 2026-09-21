@@ -555,7 +555,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.13: Intranet HTTPS Deployment & Operator Training (S12-FE) */}
         {activeTab === 'deployment' && (
-          <IntranetDeploymentView clusterNodes={nodes} />
+          <IntranetDeploymentView clusterNodes={nodes} currentUser={currentUser} />
         )}
 
         {/* Tab 3: Runs & Evidence */}

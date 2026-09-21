@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { NodeItem } from '@/contracts/types';
 import { DeploymentManager } from './deploymentEngine';
 
 export interface IntranetDeploymentViewProps {
   clusterNodes?: NodeItem[];
+  currentUser?: { id: string; name: string; role: string } | null;
 }
 
-export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ clusterNodes }) => {
+export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ clusterNodes, currentUser }) => {
   const [manager] = useState<DeploymentManager>(() => new DeploymentManager());
   const [tls] = useState(manager.getTlsDetails());
   const [nginxRules] = useState(manager.getNginxRules());
@@ -15,10 +16,20 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
   const nodes = clusterNodes ? manager.reconcileLiveClusterNodes(clusterNodes) : manager.getNodeVerifications();
   const [manifest, setManifest] = useState(manager.getReleaseManifest());
   const [trainingSteps, setTrainingSteps] = useState(manager.getTrainingSteps());
-  const [operatorId, setOperatorId] = useState('usr_operator_lead');
+  const [operatorId, setOperatorId] = useState<string>(currentUser ? currentUser.id : '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  useEffect(() => {
+    if (currentUser?.id) {
+      setOperatorId(currentUser.id);
+    }
+  }, [currentUser]);
+
   const handleSignOff = () => {
+    if (!operatorId.trim()) {
+      setActionNotice({ type: 'error', text: '서명 실패: 운영자 계정 식별자가 지정되지 않았습니다. 로그인이 필요합니다.' });
+      return;
+    }
     const res = manager.signOffRelease(operatorId);
     if (!res.success) {
       setActionNotice({ type: 'error', text: `서명 실패: ${res.error}` });
@@ -26,7 +37,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
       setManifest(res.manifest);
       setActionNotice({
         type: 'success',
-        text: `✔ [AC-12] 최종 프로덕션 릴리스 [${res.manifest.version}]에 대한 운영자 [${operatorId}]의 인수가 승인되었습니다.`,
+        text: `✔ [모의 시뮬레이션] 최종 프로덕션 릴리스 [${res.manifest.version}]에 대한 운영자 [${operatorId}]의 인수가 로컬 시뮬레이션 승인되었습니다. (백엔드 배포 API 미노출)`,
       });
     }
   };
@@ -44,6 +55,43 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Unexposed Deployment Notice Banner */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="deployment-unexposed-notice"
+        style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(56, 139, 253, 0.12)',
+          borderBottom: '1px solid #30363d',
+          borderRadius: '6px',
+          color: '#58a6ff',
+          fontSize: '12px',
+        }}
+      >
+        ℹ️ <strong>내부망 HTTPS 배포 및 운영 인수 시뮬레이터 (백엔드 배포 API 미노출)</strong>: 실제 온프레미스 컨테이너 프로비저닝 및 Nginx TLS 실서버 바인딩은 CI/CD 인프라 파이프라인에서 수행되며, 본 화면은 AC-12 운영 인수 절차 검증을 위한 클라이언트 인메모리 시뮬레이션입니다.
+      </div>
+
+      {/* Auth Session Required Alert Banner */}
+      {!currentUser && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          data-testid="deployment-auth-required-notice"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'rgba(248, 81, 73, 0.15)',
+            border: '1px solid #f85149',
+            borderRadius: '6px',
+            color: '#f85149',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}
+        >
+          🛑 <strong>인증 필요</strong>: 로그인된 운영자 세션이 없습니다. 프로덕션 운영 인수 서명을 수행하려면 유효한 운영자 계정으로 로그인해야 합니다.
+        </div>
+      )}
+
       {/* AC-12 Top Metrics Banner */}
       <div
         style={{
@@ -61,11 +109,11 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>5대 노드 전수 여정·Smoke 검증</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>5대 노드 여정 검증 [AC-12 기준 규격]</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
             100% (5/5 PASSED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Windows 3대 + Linux 2대 통합 여정</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Windows 3대 + Linux 2대 통합 여정 규격</div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -460,6 +508,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <input
               type="text"
+              data-testid="deployment-operator-id-input"
               value={operatorId}
               onChange={(e) => setOperatorId(e.target.value)}
               placeholder="운영자 계정 ID"
@@ -473,9 +522,18 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               }}
             />
             <Button
+              data-testid="deployment-signoff-btn"
               variant={manifest.operatorSignOff ? 'secondary' : 'primary'}
               onClick={handleSignOff}
-              disabled={manifest.operatorSignOff}
+              disabled={manifest.operatorSignOff || !operatorId.trim()}
+              title={
+                !operatorId.trim()
+                  ? '운영자 계정 로그인이 필요합니다'
+                  : manifest.operatorSignOff
+                  ? '이미 인수가 서명되었습니다'
+                  : '프로덕션 운영 인수를 로컬 시뮬레이션 서명합니다'
+              }
+              aria-disabled={manifest.operatorSignOff || !operatorId.trim() ? 'true' : 'false'}
             >
               {manifest.operatorSignOff ? '✔ 서명 완료됨' : '최종 운영 인수 서명'}
             </Button>

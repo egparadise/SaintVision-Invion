@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.75"
+version: "1.0.76"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T00:07:00+09:00"
+updated: "2026-09-22T00:13:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T00:07:00+09:00.
+- 확인 기준: 2026-09-22T00:13:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 5대 부류 치유 트랙 4차: IntranetDeploymentView 운영자 행위자 실배선/미인증 차단 및 ReleaseCandidateView 롤백 모의 고지 완결 (`IntranetDeploymentView.tsx`, `ReleaseCandidateView.tsx`, `App.tsx`, `deployment-release-integrity-wiring.test.tsx`)**:
+  - **운영자 가짜 식별자 소거 및 세션 실배선 (Priority 7-A)**: `IntranetDeploymentView.tsx` 내 `usr_operator_lead` 하드코딩 식별자를 전면 소거하고 `currentUser?.id`를 `operatorId`로 실배선. `App.tsx`에서 `currentUser={currentUser}` 결속. 세션 부재(`!currentUser`) 시 `deployment-auth-required-notice`(`role="alert"`) 표출 및 서명 버튼 `disabled`/`aria-disabled="true"` 차단 가드 집행. 상단에 `deployment-unexposed-notice`(`role="status"`, "백엔드 배포 API 미노출") 배치 및 서명 완료 통지를 `[모의 시뮬레이션]` 규격으로 정직화.
+  - **롤백 모의 고지 및 허위 축하 배너 소거 (Priority 7-B)**: `ReleaseCandidateView.tsx` 상단에 `release-unexposed-notice`(`role="status"`) 신설. 롤백 실행 시 과거의 허위 완료 배너(`... 캐시 무효화 및 무중단 상태가 확인되었습니다`)를 완전 소거하고 `✔ [모의 시뮬레이션] AC-11 롤백 절차 검증 완료 (백엔드 릴리스 제어 API 미노출 상태로 실제 인프라 및 CDN 캐시 미반영)`으로 정직 고지.
+  - **신규 DOM 단위 테스트 3종 구축 및 2대 돌연변이(M9, M10) 실측 사살**: `apps/web/tests/deployment-release-integrity-wiring.test.tsx` (3/3 passed). M9(미인증 경고 배너 억제) 사살, M10(롤백 허위 축하 배너 회귀) 사살.
+  - Vitest **63개 파일 572/572 passed 100%** (순증 +3 passed), Vite 프로덕션 빌드 exit 0 (3.64s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_배포운영사인오프_실배선_및_롤백모의고지_Gemini]].
 
 - **화면 결함 5대 부류 치유 트랙 3차: MonacoWorkspaceEditor 커널 체크아웃 파일 저장 실배선, 인메모리 은폐 차단 및 PTY 모의 고지 완결 (`MonacoWorkspaceEditor.tsx`, `workspaceEditObservation.ts`, `monaco-workspace-editor-wiring.test.tsx`)**:
   - **파일 저장 캐시/로컬 은폐(False Persistence) 치유**: 에디터 내 백엔드 파일 저장 엔드포인트(`POST /v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files`)를 실배선(`saveWorkspaceEditView`). `runId`와 `checkoutId` 주입 시 실제 커널에 저장하고 Revision/SHA를 갱신하며 `editor-save-success-notice`(`role="status"`) 표출. 백엔드 실패 시 `editor-save-error-banner`(`role="alert"`)로 에러 은폐 차단.

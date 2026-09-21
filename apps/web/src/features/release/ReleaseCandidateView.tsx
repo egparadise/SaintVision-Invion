@@ -35,13 +35,30 @@ export const ReleaseCandidateView: React.FC = () => {
       setCandidates(releaseManager.getReleaseCandidates());
       setActionNotice({
         type: 'success',
-        text: `✔ AC-11 롤백 검증 완료! 활성 버전이 [${targetTag}] (Build ${res.activeCandidate?.buildSha})로 즉시 전환되었으며, 캐시 무효화 및 무중단 상태가 확인되었습니다.`,
+        text: `✔ [모의 시뮬레이션] AC-11 롤백 절차 검증 완료: 로컬 활성 버전이 [${targetTag}] (Build ${res.activeCandidate?.buildSha})로 전환되었습니다. (백엔드 릴리스 제어 API 미노출 상태로 실제 인프라 및 CDN 캐시 미반영)`,
       });
     }
   };
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Unexposed Release Notice Banner */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="release-unexposed-notice"
+        style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(56, 139, 253, 0.12)',
+          borderBottom: '1px solid #30363d',
+          borderRadius: '6px',
+          color: '#58a6ff',
+          fontSize: '12px',
+        }}
+      >
+        ℹ️ <strong>릴리스 후보(RC) 및 무중단 롤백 제어기 (백엔드 배포 API 미노출)</strong>: 실제 프로덕션 트래픽 스위칭 및 CDN 캐시 무효화는 배포 오케스트레이터에서 수행되며, 본 화면은 AC-11 롤백 수명주기 및 SLO 검증을 위한 클라이언트 인메모리 시뮬레이션입니다.
+      </div>
+
       {/* AC-11 Top Metrics Banner */}
       <div
         style={{
