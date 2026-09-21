@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.103"
+version: "1.0.106"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T17:18:00+09:00"
+updated: "2026-09-21T17:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 Integration 확인, UI-FB-03 review, run/approval contract follow-up
+
+- 요청 순서대로 `agent/codex/workspace-response-contract-map`을 integration에 fast-forward하고 push했다: `beff6c1` → `614501a`; 이후 최신 integration tip은 `686eecf`. 기존 통합 worktree의 uncommitted `ResourceExplorer.tsx` 변경은 건드리지 않았다. `core.yml`은 현재 integration content에서 ignore 6개(브라우저 3 + image-opt-in 3)를 PyYAML로 재파싱했다. `export_schemas.py --check` 32 schemas, app `contracts:check` 9 generated types, provider contract group 27 passed를 확인했다.
+- UI-FB-03: Gemini `beff6c1`에서 click-time 401이 캐시 성공을 재사용하지 않고 alert 후 중단되는지 소스와 DOM 시험으로 검토했다. 정상 로드 후 클릭 401 상주 test가 no `/artifacts`, alert, no `createObjectURL`을 단언한다. `developer-studio-dom.test.tsx`: 18 passed. Codex가 확인한 범위는 happy-dom/소스이며 browser/live HTTP/실제 파일 쓰기는 아님. Gemini가 기록한 mutation 결과는 확인했지만 Codex가 변형을 직접 재실행하지 않았다.
+- 다음 계약 지도 slice는 `runApprovalObservation.ts`의 run/approval pages. API list는 App의 작업/승인 큐를 그리며, 누락/rename이 화면에서 빈 큐나 사라진 승인 행처럼 조용히 보일 수 있었다. 기존 `ApprovalPage`를 재사용하고 `ControlRunPage`를 canonical core schema에 추가했다. Provider는 `validate_contract`로 반환 전에 strict 검증하고 frontend adapter는 생성된 core schema TS type 및 동일 fixture를 사용한다. Route coverage path-only 검사는 변경하지 않았다.
+- Base `686eecff924a5527e537c26228e2db87c00106ff`, branch `agent/codex/run-approval-observation-contract`, worktree `.worktrees/codex-run-approval-observation-contract`; project Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node 24.17.0, Windows 11, PostgreSQL DSN absent, Docker present, Go absent. At 17:36:06 KST provenance-wrapped provider pytest passed 7; schema check passed 32; app API response type check passed 9; core contract generation, check_docs (614 versioned documents), ontology/SHACL and read-only Obsidian check (1407 managed/5 pending/0 conflicts) exited 0. At 17:36:35 KST, from `apps/web`, provenance-wrapped full Vitest passed 41 files/381 tests, `tsc -b` and Vite build exited 0. Core YAML structural parse found six ignore arguments and verified both image-lane files remain separately wired. These ran on dirty implementation/docs source based on integration 686, not on a final commit SHA.
+- Negative control: removing `nextCursor` from shared run fixture made provider test exit 1 and frontend Ajv fixture test exit 1; restored afterward. Removing `ControlRunPage.required.nextCursor` and regenerating changed generated Pydantic, TypeScript, Go, and packaged schema outputs; snapshots were restored and generator rerun. This proves fixture and schema drift are visible; it is not a live DB or live HTTP check. The first full Vitest attempt exposed three old mocks missing the now-required `nextCursor`; mock fixtures were updated, and the full suite then passed 381.
+- Remaining: PostgreSQL/live endpoint integration unavailable (DSN absent); Go tests unavailable (Go absent); Claude fixed-SHA review pending; Actions billing blocker; browser/physical operational acceptance separate. Next first action: commit/push this contract slice and hand off for Claude fixed-SHA review. Run/result/artifact wire responses remain the next top screen-level contract gap.
 
 ## 2026-09-21 Core CI red-green correction and project-list contract
 
@@ -734,3 +743,10 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - UI-FB-03: reviewed Gemini `5e2a533`; focused DOM suite is 13 passed and full Vitest includes it. Review remains pending: after a successful mount, a click-time 401 produced no alert; a temporary alert assertion failed and was removed. `handleDownloadArtifact` reuses earlier `artifactData` after non-route `/result` failure. Gemini owns the follow-up; Codex does not edit the UI.
 - Provenance: latest fixed-SHA verification is recorded in the contract map History. PostgreSQL DSN absent, and this result is not CI, live HTTP, or browser acceptance. An initial wrapper call used a relative venv path and exited 127; the absolute project interpreter invocation passed and is the only positive evidence.
 - Obsidian: after docs/ontology passed, the final authorized sync exported 2 files with all 1405 destination hashes matching; paired check was 1405 managed/0 pending/0 conflicts (16:52 KST).
+## 2026-09-21 통합 CI 수정 확인, UI-FB-03 검토, run/approval 계약
+
+- `agent/codex/workspace-response-contract-map`의 fast-forward 착지를 `614501a`에서 확인했고 통합에 push했다. 이후 통합은 동시 착지로 `686eecff924a5527e537c26228e2db87c00106ff`까지 전진했다. 그 기준 core workflow에 ignore 6개가 있고 LAN image 두 시험은 전용 lane에 남는다. 두 LAN 파일 일반 수집 결과는 앞서 15/15 skip, 전용 6-case passing JUnit 대조는 게이트를 통과한 바 있다. Schema 32/32 및 API response TS 9/9 체크는 통합 내용에서 exit 0.
+- Gemini `beff6c1` UI-FB-03을 Codex 독립 DOM 경계에서 승인했다. 이전 성공 로드 뒤 클릭-time 401이 캐시를 재사용하지 않으며, 상주 사례가 fallback 호출 0·오류 표시·Blob 생성 0을 검증한다. 18 DOM case pass는 `614501a`에서 실행. Gemini의 mutant 증거는 검토했으나 Codex가 재실행하지 않음. 브라우저 인수 아님.
+- 다음 계약 slice `runApprovalObservation.ts`는 `ControlRunPage` 및 기존 `ApprovalPage`와 공유 fixture, Python provider validation, frontend Ajv/adapter mapping을 연결했다. Base `686eecff924a5527e537c26228e2db87c00106ff`; branch `agent/codex/run-approval-observation-contract`; dirty-base provenance at 17:36 KST, executor Codex, Windows 11, Python `.venv/Scripts/python.exe` 3.14.6, Node v24.17.0, PG DSN absent, Docker present, Go absent. Provider 7 passed; full Vitest 41 files/381 passed; `tsc -b`, Vite build, schema check 32, API type check 9, docs (614 documents), ontology, and contract generation all exit 0. Shared-fixture missing-cursor mutation fails on both backend and frontend. No DB/CI/live HTTP/browser/Go compilation. Obsidian read-only check: 1407 managed/5 pending/0 conflicts; final paired sync pending.
+- At 17:39 KST the task tree observed Claude's `5914f04` arriving on integration. It binds canonical backend run-result and artifact-list schemas/fixtures; Gemini frontend generated-type/Ajv fixture wiring is pending, and artifact-content remains unbound. This supersedes the older map statement that all run-result/artifact responses were unbound.
+- Next: finish docs sync, push this contract slice, and request Claude fixed-SHA independent review. Then take placement preview/pool/mutation as the next Codex contract based on visible control impact; Gemini completes the run-result/artifact frontend handoff independently. PostgreSQL/CI/browser/operational gates remain separate.

@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.6"
+version: "1.1.9"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T17:18:00+09:00"
+updated: "2026-09-21T17:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,8 +20,8 @@ Inventory scope is `apps/web/src/shared/api` excluding the common transport `cli
 | P1 `projectObservation.ts` | App project selection; DeveloperStudio workspace picker | Business project list plus separate historic catalog envelope, workspace list, and execution-readiness responses | Bound in the 2026-09-21 follow-up below. |
 | P1 `approvalReview.ts` | ApprovalReviewPanel before a person approves an action | `ApprovalReviewView` approval/workload/risk/policy digest | The review payload and challenge/decision flow are generated-type and shared-fixture bound. Run-version reads and cancellation responses remain outside this adapter's contract. |
 | P1 `kernelMutations.ts` | Approval challenge/decision and run-version writes | Approval challenge response (`ApprovalChallenge`) and decision response (`ApprovalView`) | Run GET version envelope and cancel response remain handwritten/unbound. A changed run-version or cancellation envelope could suppress cancellation or misreport its result. |
-| P1 direct screen consumers (not counted as modules) | DeveloperStudio, RunDetail, EvidenceViewer | None beyond the separate discovery/storage/workspace slices | Run result, artifacts, artifact content, and run creation use screen-local response types or `any`. A response change can hide output, attach the wrong artifact, or let a success-shaped fallback look like verified evidence. UI-FB-03 mount tests exist; click-time non-route failure can still reuse cached `artifactData` without surfacing the failure, so Gemini follow-up and Codex review remain pending. |
-| P2 `runApprovalObservation.ts` | App run list and approval queue | None | Missing or renamed run/approval fields can empty the queue or suppress actions. The adapter has runtime checks, but mocks do not share a backend-derived contract. |
+| P1 direct screen consumers (not counted as modules) | DeveloperStudio, RunDetail, EvidenceViewer | UI-FB-03 click-time failure/fallback behavior fixed at `beff6c1` and covered by 18 DOM cases; backend run-result and artifact-list schemas/fixtures added by Claude `5914f04` | Gemini frontend generated-type/Ajv fixture wiring and replacement of FB-03 self-shaped mocks are pending; artifact-content response remains unbound. Schema drift can hide output or misstate evidence. UI-FB-03 component DOM boundary is Codex-reviewed; browser and live HTTP acceptance remain separate. |
+| P2 `runApprovalObservation.ts` | App run list and approval queue | `ControlRunPage` and `ApprovalPage` bound to canonical core schema, generated Pydantic/TypeScript, shared fixture, provider projection and frontend Ajv/adapter tests | List envelopes and row fields are bound. Approval detail/review is a separate contract slice; live DB-backed list HTTP remains integration scope. |
 | P2 `fabricControlApi.ts` | ResourceExplorer and PlacementSimulator | Discovery candidates; storage contribution and location lists | Pool capacity, placement preview, plans, nodes, and mutation responses remain handwritten. A changed candidate capacity/eligibility shape can show misleading placement choices or lose capacity context. |
 | P2 `fabricObservation.ts` | Storage/model observation surfaces | Storage locations | Resolve, replica status, and model commitment remain handwritten. A shape drift can make a location appear unresolved, make replica state unknown, or omit the model commitment cue. |
 | P2 `shardObservation.ts` | RunDetail distributed shard section | None | A renamed shard state/evidence field can render incomplete progress or omit stopped/evidence status. Runtime parent-run checks remain, but fixture/provider parity is absent. |
@@ -63,7 +63,13 @@ Implementation and the map were committed as `e460296eaa4cc6da7349fe50cd0cf452dd
 
 ## Review and next actions
 
-Owner Codex; independent reviewer Claude pending. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory and priority proposal, not a claim that every endpoint shape is now covered. Workspace list/readiness, discovery candidates, storage contributions/locations, approval review, approval challenge/decision, and project-list envelopes are bound. Next slices, by visible/control impact: run-result/artifact responses (coordinate with Gemini UI-FB-03); run/approval queues; placement/storage adjuncts; shard/node observations. PostgreSQL DSN absence leaves database-backed integration outside this verification. No CI, browser/operational acceptance, or independent review is claimed.
+Owner Codex; independent reviewer Claude pending for the map/contract slice. The map covers eight functional shared adapter modules, plus separately listed screen-local API consumers; it is an inventory, not a claim that every endpoint is covered. Workspace list/readiness, discovery candidates, storage contributions/locations, approval review/challenge/decision, project-list envelopes, and run/approval list pages are bound. Remaining slices by visible/control impact: direct run result/artifact/content responses; placement/pool/mutation and storage resolve/replica/model; shard/node observations. PostgreSQL DSN absence leaves DB-backed list integration outside this verification. CI and browser/operational acceptance are separate.
+
+## 2026-09-21 UI-FB-03 review closure and run/approval page contract slice
+
+Codex reviewed Gemini's UI-FB-03 implementation at `beff6c1` and approved the component DOM boundary. At integration SHA `614501a`, the focused 18-case DeveloperStudio DOM suite passed. The persistent “successful initial load, then click-time 401” case asserts no `/artifacts` fallback, visible error, and no Blob URL; source now returns on non-route errors and no longer falls back to cached `artifactData`. Gemini's report contains the mutation evidence; Codex inspected but did not rerun those probes. This is not browser acceptance or live HTTP. Full evidence: [[2026-09-21_UI_FB03_Codex_boundary_review]].
+
+Next selected contract: `runApprovalObservation.ts`, whose run list and pending-approval list directly control App queues. Before binding, a wire-shape change could empty a queue or omit/incorrectly expose an approval. Existing canonical `ApprovalPage` is reused and `ControlRunPage` is added to `core.schema.json`; both producers validate their returned pages, generated Pydantic/TypeScript and a shared fixture are used, and frontend adapter tests validate/consume those same fixtures. At dirty source based on integration `686eecff924a5527e537c26228e2db87c00106ff`, provenance-wrapped checks on 2026-09-21 at 17:36 KST used Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6 and Node v24.17.0. Provider pytest passed 7 with 0 skips; full Vitest passed 381 across 41 files; `tsc -b`, Vite build, schema export 32, API response type check 9, core contract generation, docs (614 versioned pages), ontology and SHACL all exited 0. Core workflow structural check found six ignores including both dedicated image-lane suites. Removing the shared fixture cursor made backend and frontend tests fail; removing the canonical schema cursor changed the generated Pydantic, TS, Go and packaged schema files. No DB/live-HTTP test, GitHub Actions, browser acceptance, or Go compilation is claimed; PostgreSQL DSN is absent and Go unavailable. The run/approval list slice is local-verified pending Claude review. Full provenance: [[2026-09-21_run-approval-page-contract_Codex]].
 
 ## 2026-09-21 Core image-opt-in exclusions and project-list response contract
 
