@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-VERIFICATION-RULES-AXES-CANON-001"
 title: "검증 규칙·축 정본 — 6규칙·3축(실물성→정직함→신선도)·6층·축별 도구"
-version: "1.2.0"
+version: "1.2.1"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
@@ -29,7 +29,7 @@ tags: ["governance", "verification", "rules", "axes", "canon"]
    - **예외 실례(2026-09-22, 열어 둠 정당)**: `DiscoveryGrantRejected.reason_code` — allowlist로 실제 값 보존하되 미지 코드는 `grant_rejected` 안전망(조용한 성공 치환 아님). 내 조용한-강등 훑기에서 이를 "결함 아님"으로 닫은 판정이 이 예외와 일치한다.
    - 근거: [[2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude]] · [[2026-09-22_조용한강등_미지값을기본값으로_훑기_Claude]]. (초판의 무조건 "불변" 문구는 내부-폐쇄 조건이 빠져 너무 넓었다 — Codex 검토와 사용자 자기정정으로 보강.)
 
-8. **여러 착지가 쌓이면 마지막 상태에서 전수 검증(지시 없이도)**: 각 agent가 자기 조각만 검증하면 **조각-사이 깨짐**은 아무의 조각 검증에도 안 잡힌다(특히 한 레인의 가드가 다른 레인 언어/도구에 살 때). N건 착지 뒤엔 clean 워크트리를 origin tip에 detach 고정→`status --porcelain` 빈 것 확인→SHA 못 박고→**백엔드 게이트+CI-스코프 pytest+contracts:check+tsc -b --force+vite build+vitest 전부**→빨간 것은 귀속 갈라 처리. 못 돈 것(Go/PG/브라우저/CI)은 not_run으로 정직히. **실례(2026-09-22)**: 마감 실행에서 EvidenceViewer 가짜 PASS 회귀가 오직 전수로만 드러났다(파이썬 가드가 화면 레인 밖 → Gemini vitest 646 통과가 정직했는데도 integration에 red). 조각 검증만으로는 영영 안 나왔을 것. [[2026-09-22_통합_전수검증_마무리_및_EvidenceViewer_가짜PASS_회귀_Claude]].
+8. **여러 착지가 쌓이면 마지막 상태에서 전수 검증(지시 없이도)**: 각 agent가 자기 조각만 검증하면 **조각-사이 깨짐**은 아무의 조각 검증에도 안 잡힌다(특히 한 레인의 가드가 다른 레인 언어/도구에 살 때). N건 착지 뒤엔 clean 워크트리를 origin tip에 detach 고정→`status --porcelain` 빈 것 확인→SHA 못 박고→**백엔드 게이트+CI-스코프 pytest+contracts:check+tsc -b --force+vite build+vitest 전부**→빨간 것은 귀속 갈라 처리. 못 돈 것(Go/PG/브라우저/CI)은 not_run으로 정직히. **실례(2026-09-22)**: 마감 실행에서 EvidenceViewer 가짜 PASS 회귀가 오직 전수로만 드러났다(파이썬 가드가 화면 레인 밖 → Gemini vitest 646 통과가 정직했는데도 integration에 red). 조각 검증만으로는 영영 안 나왔을 것. [[2026-09-22_통합_전수검증_마무리_및_EvidenceViewer_가짜PASS_회귀_Claude]]. **CI 개방 전** per-change 범위별(누적 아닌 개별 변경) 임시 절차 — 특히 "네 레인 고쳤으면 다른 레인 가드도" — 는 [[CI개방전_임시_교차레인_검증절차]](임시; CI 실제 가동 확인 시 삭제).
 
 ## 3축 (거시 차원) — 전제 사슬
 **쓰기 실물성 → 읽기 정직함 → 시간 신선도.** 아래가 위의 전제.
