@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.123"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T21:06:00+09:00"
+updated: "2026-09-21T21:14:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,7 +17,7 @@ source_of_truth: "Git"
 - 최종 명령 `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`; 2026-09-21 21:00:30 KST, 기준 SHA `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`, Python 3.14.6, Docker present/Go absent, test-only PostgreSQL DSN set, exit 0, 3 passed/7 warnings. 실행 전 가용 RAM 1,412,576 KiB, Docker Server 20.10.22; 소유 컨테이너 `sv-discovery-adr097-b14efe7dfd02`는 제거 후 inspect 부재로 확인했다. 실제 `inv-discover` 바이너리/물리 Node 발급-공지-enrollment-mTLS는 Go compiler 부재로 미실행이다. 승인된 조직 전달 채널도 저장소에서 특정되지 않아 미확인이다. 따라서 CLI→HTTP API E2E는 확인됐고 운영 Node onboarding 전체는 아직 인수되지 않았다.
 - Node runbook을 operator role grant, DSN 환경주입, dry-run/issue, one-time secret protected handoff, Node env injection, 후보 수동 확인, admission 자동 폐기, 긴급 revoke까지 이어지게 고쳤다. 장기 protected issuer API는 열린 결정이다. 상세: `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]` 및 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
 - 최종 export에서 Obsidian `sync_obsidian.py --apply`를 수행하고 뒤이은 `--check`는 1439 managed/0 pending/0 conflicts, exit 0이었다. 보호 전달 채널 미지정, 실제 Go Node 바이너리 미빌드/미실행, operator 발급 건수 제한 미구현은 다음 운영/보안 확인으로 남긴다.
-- 보안 정정: 첫 실패 테스트의 assertion 출력에 disposable DB 합성 bearer 원문이 노출됐다. 해당 컨테이너 삭제 및 15분 TTL 종료 후, 테스트 코드는 값 없는 실패 메시지를 사용하도록 수정했다. 최신 test-only 출력 보호 변경은 2026-09-21 21:04 KST RAM 645,764 KiB(<1 GiB) preflight로 PostgreSQL 재실행을 시작하지 않았으며, `py_compile`, 3개 collect-only, 비DB focused 40 passed는 통과했다. 자세한 경계 기록은 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
+- 보안 정정: 첫 실패 테스트의 assertion 출력에 disposable DB 합성 bearer 원문이 노출됐다. 해당 컨테이너 삭제 및 15분 TTL 종료 후, 테스트 코드는 값 없는 실패 메시지를 사용하도록 수정했다. 21:04 KST RAM 645,764 KiB preflight에서는 DB를 띄우지 않았으나, 이후 21:12 KST 1,607,300 KiB에서 출력 보호 변경을 포함한 통합시험을 disposable PostgreSQL로 재실행해 3 passed/7 warnings, exit 0을 확인했다. 고유 컨테이너는 소유 라벨 확인 후 제거 및 inspect 부재까지 확인했다. 자세한 경계 기록은 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
 
 ## 2026-09-21 Codex 계약 서빙 앵커 버킷 감사
 

@@ -28,9 +28,14 @@ import {
   admitDiscoveryCandidate,
   declineDiscoveryCandidate,
 } from './fabricControlApi';
+import { fetchStorageObservation } from '@/shared/api/storageObservation';
+import type { StorageObservationView } from '@/contracts/types';
 
 export interface ResourceExplorerProps {
   nodes: NodeItem[];
+  tenantId?: string;
+  projectId?: string;
+  runId?: string;
   initialTab?: 'overview' | 'storage' | 'pools' | 'nodes' | 'discovery';
   onSelectNode?: (nodeId: string) => void;
   onOpenTerminal?: (nodeId: string) => void;
@@ -42,10 +47,14 @@ export interface ResourceExplorerProps {
   initialPoolCapacityError?: string | null;
   initialNodeDetail?: NodeDetailResponse | null;
   initialNodeDetailError?: string | null;
+  initialSampleRequestId?: string;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   nodes,
+  tenantId,
+  projectId,
+  runId,
   initialTab = 'overview',
   onSelectNode,
   onOpenTerminal,
@@ -57,6 +66,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialPoolCapacityError,
   initialNodeDetail,
   initialNodeDetailError,
+  initialSampleRequestId,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
   const [filterMode, setFilterMode] = useState<'all' | 'schedulable' | 'gpu' | 'observe'>('all');
@@ -75,6 +85,29 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [newContribMode, setNewContribMode] = useState<'read_write' | 'read_only'>('read_write');
   const [newContribCapacityGB, setNewContribCapacityGB] = useState(500);
 
+  // Storage Observation State (StorageObservationView)
+  const [sampleRequestId, setSampleRequestId] = useState(initialSampleRequestId || '');
+  const [storageObservation, setStorageObservation] = useState<StorageObservationView | null>(null);
+  const [isLoadingObservation, setIsLoadingObservation] = useState(false);
+  const [observationError, setObservationError] = useState<string | null>(null);
+
+  const handleFetchStorageObservation = async () => {
+    if (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) {
+      setObservationError('프로젝트 ID, Run ID 및 요청 ID가 필요합니다.');
+      return;
+    }
+    setIsLoadingObservation(true);
+    setObservationError(null);
+    try {
+      const obs = await fetchStorageObservation(projectId.trim(), runId.trim(), sampleRequestId.trim());
+      setStorageObservation(obs);
+    } catch (err: any) {
+      setObservationError(err?.message || '스토리지 샘플 관측 조회 실패');
+    } finally {
+      setIsLoadingObservation(false);
+    }
+  };
+
   // ---------------------------------------------------------------------------
   // 2. Pools State
   // ---------------------------------------------------------------------------
@@ -82,11 +115,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [poolCapacity, setPoolCapacity] = useState<PoolCapacity | null>(initialPoolCapacity || null);
   const [poolCapacityState, setPoolCapacityState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolCapacityState || 'idle');
   const [poolCapacityError, setPoolCapacityError] = useState<string | null>(initialPoolCapacityError || null);
-  const [poolMembers, setPoolMembers] = useState<string[]>(['nod_01JABCDEF01', 'nod_01JABCDEF02']);
+  const [poolMembers, setPoolMembers] = useState<string[]>([]);
   const [memberNodeToAdd, setMemberNodeToAdd] = useState(nodes[0]?.id || '');
   const [placementReq, setPlacementReq] = useState({ cpuMillicores: 2000, ramBytes: 4 * 1024 ** 3, gpuDevices: 1 });
   const [placementPreview, setPlacementPreview] = useState<PlacementPreviewResponse | null>(null);
-  const [planRunId, setPlanRunId] = useState('run_01JABCDEF_DEMO');
+  const [planRunId, setPlanRunId] = useState('');
   const [planStrategy, setPlanStrategy] = useState<'binpack' | 'spread'>('spread');
   const [planShardCount, setPlanShardCount] = useState(2);
   const [planResult, setPlanResult] = useState<DistributedPlanResponse | null>(null);
@@ -274,11 +307,16 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   // ---------------------------------------------------------------------------
 
   const handleRegisterContribution = async () => {
+    const targetNodeId = newContribNode || nodes[0]?.id;
+    if (!targetNodeId) {
+      setStorageMessage('❌ 스토리지 기여 등록 실패: 등록할 유효한 대상 노드가 없습니다. (위조 노드 합성 차단)');
+      return;
+    }
     try {
       const idempotencyKey = `idemp_contrib_${Date.now()}`;
       const res = await registerStorageContribution(
         {
-          nodeId: newContribNode || nodes[0]?.id || 'nod_01JABCDEF01',
+          nodeId: targetNodeId,
           declaredPath: newContribPath,
           mode: newContribMode,
           capacityBytes: newContribCapacityGB * 1024 ** 3,
@@ -328,9 +366,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   };
 
   const handleCreatePlan = async () => {
+    if (!planRunId.trim()) {
+      setPoolMessage('❌ 분산 배치 계획 수립 실패: 유효한 승인 실행 ID(runId)를 입력해야 합니다. (위조 식별자 합성 방지)');
+      return;
+    }
     try {
       const res = await createPoolPlan(selectedPoolId, {
-        runId: planRunId,
+        runId: planRunId.trim(),
         strategy: planStrategy,
         shardCount: planShardCount,
         shardCpuMillicores: placementReq.cpuMillicores,
@@ -404,6 +446,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   };
 
   const handleBroadcastAnnouncement = async () => {
+    if (!tenantId || !tenantId.trim()) {
+      setDiscoveryMessage('⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송을 전송할 수 없습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)');
+      return;
+    }
     try {
       const res = await broadcastAnnouncement(
         {
@@ -417,7 +463,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           gpuCount: announcementOs === 'windows' ? 1 : 0,
           labels: { role: 'worker', network: 'intranet' },
         },
-        '00000000-0000-0000-0000-000000000001'
+        tenantId.trim()
       );
       setDiscoveryMessage(`✔ 안내 방송 승인됨 (state: ${res.state})`);
       await loadDiscoveryCandidates();
@@ -974,19 +1020,20 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               type="button"
               data-testid="register-contribution-btn"
               onClick={handleRegisterContribution}
+              disabled={nodes.length === 0}
               style={{
                 marginTop: '12px',
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 borderRadius: '6px',
-                backgroundColor: '#3b82f6',
+                backgroundColor: nodes.length > 0 ? '#3b82f6' : '#475569',
                 color: '#ffffff',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: nodes.length > 0 ? 'pointer' : 'not-allowed',
               }}
             >
-              기여 등록 제출
+              {nodes.length > 0 ? '기여 등록 제출' : '등록 가능 노드 없음 (제출 차단)'}
             </button>
           </div>
 
@@ -1112,6 +1159,166 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     <div style={{ color: '#64748b', fontSize: '0.6875rem', marginTop: '2px', fontFamily: 'monospace' }}>SHA: {loc.checksumSha256 || '미생성'}</div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Storage Observation Section (StorageObservationView) */}
+          <div
+            data-testid="storage-observation-section"
+            style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}
+          >
+            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 8px 0' }}>
+              🔬 스토리지 샘플 무결성 관측 (StorageObservationView)
+            </h3>
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 12px 0' }}>
+              노드 에이전트가 기록한 스토리지 점유 증명(verify_sample) 관측 결과를 대조합니다. currentHealth는 서버 정의에 따라 "unknown"으로 보존되며, 임의의 "healthy" 상태를 합성하지 않습니다.
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '12px' }}>
+              <input
+                type="text"
+                data-testid="storage-sample-req-input"
+                value={sampleRequestId}
+                onChange={(e) => setSampleRequestId(e.target.value)}
+                placeholder="샘플 요청 ID (예: 66666666-6666-4666-8666-666666666666)"
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  borderRadius: '4px',
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  color: '#f8fafc',
+                  fontSize: '0.75rem',
+                  fontFamily: 'monospace',
+                }}
+              />
+              <button
+                type="button"
+                data-testid="fetch-storage-observation-btn"
+                onClick={handleFetchStorageObservation}
+                disabled={isLoadingObservation || !projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()}
+                style={{
+                  padding: '6px 14px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  borderRadius: '4px',
+                  backgroundColor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? '#475569' : '#3b82f6',
+                  color: '#ffffff',
+                  border: 'none',
+                  cursor: (!projectId?.trim() || !runId?.trim() || !sampleRequestId.trim()) ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isLoadingObservation ? '조회 중...' : '샘플 관측 조회'}
+              </button>
+            </div>
+
+            {(!projectId?.trim() || !runId?.trim()) && (
+              <div
+                data-testid="storage-observation-context-warning"
+                style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px' }}
+              >
+                ⚠️ 활성 프로젝트/실행(Run) 컨텍스트가 없어 스토리지 샘플 조회가 비활성화되었습니다 (근거 없는 호출 방지).
+              </div>
+            )}
+
+            {observationError && (
+              <div
+                role="alert"
+                data-testid="storage-observation-error"
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.75rem',
+                  marginBottom: '10px',
+                }}
+              >
+                ❌ {observationError}
+              </div>
+            )}
+
+            {storageObservation && (
+              <div
+                data-testid="storage-observation-container"
+                style={{
+                  padding: '12px',
+                  borderRadius: '6px',
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>요청 ID: <code data-testid="storage-observation-req-id" style={{ color: '#38bdf8' }}>{storageObservation.requestId}</code></span>
+                  <span
+                    data-testid="storage-observation-status"
+                    style={{
+                      fontWeight: 600,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: storageObservation.status === 'recorded' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                      color: storageObservation.status === 'recorded' ? '#34d399' : '#fbbf24',
+                    }}
+                  >
+                    상태: {storageObservation.status}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
+                  <div>
+                    현재 건전성:{' '}
+                    <strong data-testid="storage-observation-health" style={{ color: '#94a3b8' }}>
+                      {storageObservation.currentHealth}
+                    </strong>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748b', marginLeft: '4px' }}>(불변 unknown)</span>
+                  </div>
+                  <div>
+                    운영 인수 평가:{' '}
+                    <strong data-testid="storage-observation-acceptance" style={{ color: '#94a3b8' }}>
+                      {storageObservation.operationalAcceptanceAssessed ? 'true' : 'false (미평가)'}
+                    </strong>
+                  </div>
+                </div>
+
+                {storageObservation.observation ? (
+                  <div
+                    data-testid="storage-observation-detail"
+                    style={{
+                      marginTop: '6px',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>
+                        무결성 증명:{' '}
+                        <strong data-testid="storage-observation-integrity" style={{ color: '#34d399' }}>
+                          {storageObservation.observation.integrityVerified ? '무결성 확인됨 (VERIFIED)' : '미확인'}
+                        </strong>
+                      </span>
+                      <span>
+                        증거 ID: <code data-testid="storage-observation-evidence">{storageObservation.observation.evidenceId}</code>
+                      </span>
+                    </div>
+                    <div data-testid="storage-observation-counts" style={{ color: '#94a3b8' }}>
+                      표본수: {storageObservation.observation.sampled} · 검사: {storageObservation.observation.examined} · 불일치: {storageObservation.observation.mismatches} · 검증불가: {storageObservation.observation.unverifiable} · 미표본: {storageObservation.observation.unsampled}
+                    </div>
+                  </div>
+                ) : (
+                  <div data-testid="storage-observation-empty" style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                    관측 결과 없음 (status: {storageObservation.status})
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1305,8 +1512,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   <label style={{ color: '#94a3b8' }}>Run ID</label>
                   <input
                     type="text"
+                    data-testid="plan-run-id-input"
                     value={planRunId}
                     onChange={(e) => setPlanRunId(e.target.value)}
+                    placeholder="승인 Run ID 입력..."
                     style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
                   />
                 </div>
@@ -1334,10 +1543,21 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
               <button
                 type="button"
+                data-testid="create-plan-btn"
                 onClick={handleCreatePlan}
-                style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                disabled={!planRunId.trim()}
+                style={{
+                  marginTop: '10px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  backgroundColor: planRunId.trim() ? '#8b5cf6' : '#475569',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: planRunId.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
-                계획 확정 및 샤드 할당
+                {planRunId.trim() ? '계획 확정 및 샤드 할당' : '승인 Run ID 필요 (생성 불가)'}
               </button>
 
               {planResult && (
@@ -1464,6 +1684,22 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
               📡 미등록 머신 안내 방송 전송 (POST /v1/discovery/announcements)
             </h3>
+            {(!tenantId || !tenantId.trim()) && (
+              <div
+                data-testid="discovery-tenant-required-notice"
+                style={{
+                  padding: '8px 12px',
+                  marginBottom: '12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.75rem',
+                }}
+              >
+                ⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송 전송이 비활성화되었습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)
+              </div>
+            )}
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <input
                 type="text"
@@ -1482,8 +1718,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </select>
               <button
                 type="button"
+                data-testid="broadcast-announcement-btn"
                 onClick={handleBroadcastAnnouncement}
-                style={{ padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                disabled={!tenantId || !tenantId.trim()}
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  backgroundColor: tenantId && tenantId.trim() ? '#3b82f6' : '#475569',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: tenantId && tenantId.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
                 안내 방송 브로드캐스트
               </button>
@@ -1555,8 +1801,29 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {candidatesState === 'success' && candidates.length === 0 && (
-              <div data-testid="discovery-empty-state" style={{ padding: '24px', textAlign: 'center', color: '#64748b', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px dashed #334155' }}>
-                ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다.
+              <div
+                data-testid="discovery-empty-state"
+                style={{
+                  padding: '24px',
+                  backgroundColor: '#1e293b',
+                  borderRadius: '8px',
+                  border: '1px dashed #334155',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
+                  ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다. (0 Candidates Pending)
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', maxWidth: '640px', margin: '0 auto' }}>
+                  <strong>후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙):</strong><br />
+                  테넌트 격리 및 무단 노드 오염 방지 정책에 따라, 운영자 CLI(<code>saint operator issue-grant</code>)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다.
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
+                  신규 머신 부트스트랩 및 안내 방송 수신 대기 중 · 상단 '새로고침' 버튼으로 갱신 가능
+                </div>
               </div>
             )}
 

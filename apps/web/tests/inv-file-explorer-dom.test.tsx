@@ -3,6 +3,7 @@ import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { InvFileExplorer, calculateSha256 } from '../src/features/desktop/InvFileExplorer';
+import * as wsEditApi from '../src/shared/api/workspaceEditObservation';
 import { InvFileItem, InvReplicaLocation } from '../src/contracts/virtualFabric';
 import { NodeItem } from '../src/contracts/types';
 
@@ -738,5 +739,226 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
         configurable: true,
       });
     }
+  });
+
+  // ---------------------------------------------------------------------------
+  // 8. WorkspaceEditView Genuine Integrity Verification & Mutation Proofs
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-03-BEFORE-AFTER-VERIFY] demonstrates Before (unconnected demo file remains unverified) vs After (genuine kernel checkout byte hash matches and is marked VERIFIED)', async () => {
+    // 1. BEFORE: Unconnected demo file
+    const demoContent = "print('demo-unconnected')\n";
+    const demoHash = await calculateSha256(demoContent);
+    const demoFile: InvFileItem = {
+      ...sampleDegradedFile,
+      content: demoContent,
+      contentHash: demoHash,
+      source: 'demo',
+    };
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[demoFile]}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    expect(verifyBtn).not.toBeNull();
+
+    await act(async () => {
+      verifyBtn!.click();
+      await Promise.resolve();
+    });
+
+    // BEFORE GUARANTEE: Invariant holds -- demo files NEVER get marked verified under any circumstance
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain('미검증 (UNVERIFIED)');
+    expect(container.querySelector('[data-testid="integrity-status-verified"]')).toBeNull();
+    expect(container.querySelector('[data-testid="integrity-action-error"]')?.textContent).toContain(
+      '데모/미연결 데이터: 실제 저장소 바이트(WorkspaceEditView)가 연결되지 않아 무결성을 검증할 수 없습니다.'
+    );
+
+    // 2. AFTER: Genuine Kernel Checkout with matching byte hash
+    const genuineContent = "print('genuine-verified')\n";
+    const genuineHash = await calculateSha256(genuineContent);
+    const genuineFile: InvFileItem = {
+      ...sampleDegradedFile,
+      content: genuineContent,
+      contentHash: genuineHash,
+      source: 'kernel-checkout',
+    };
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          key="after-genuine"
+          initialFiles={[genuineFile]}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    const verifyBtnAfter = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtnAfter!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // AFTER GUARANTEE: Genuine checkout byte equality transitions to VERIFIED
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain('검증 통과 (VERIFIED)');
+    expect(container.querySelector('[data-testid="integrity-status-verified"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="calculated-hash"]')?.textContent).toBe(genuineHash);
+    expect(container.querySelector('[data-testid="integrity-mismatch-banner"]')).toBeNull();
+  });
+
+  it('[VF-GM-03-MUTATION-PROOF-HASH] proves Mutation 1: Server fixture hash mismatch strictly fails and triggers TAMPERED alert (NEVER verified)', async () => {
+    // In canonical fixture workspace-edit-view-response.json:
+    // dataBase64 = "cHJpbnQoJ2hlbGxvJykK" -> "print('hello')\n" -> sha256 = "03e693d9f2f687e0f40e36a8df7fcb4d1c22974012b7c2a55c000eb30f305824"
+    // But fixture sha256 = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" (mismatch / tampered)
+    const fixtureFiles = wsEditApi.mapWorkspaceFilesToInvItems({
+      checkoutId: '55555555-5555-4555-8555-555555555555',
+      revision: 1,
+      sha256: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      snapshot: {
+        format: 'workspace-snapshot:1',
+        workspaceId: 'wsp_0123456789ABCDEFGHJKMNPQRS',
+        directories: ['src'],
+        files: [
+          {
+            path: 'src/main.py',
+            executable: false,
+            sha256: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+            sizeBytes: 15,
+            dataBase64: 'cHJpbnQoJ2hlbGxvJykK',
+          },
+        ],
+      },
+    });
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={fixtureFiles}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // MUTATION DETECTED: Hashes differ -> MUST be mismatch / tampered, NEVER verified
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain(
+      '검증 실패 (해시 불일치 / TAMPERED)'
+    );
+    expect(container.querySelector('[data-testid="integrity-status-verified"]')).toBeNull();
+    expect(container.querySelector('[data-testid="integrity-status-mismatch"]')).not.toBeNull();
+
+    const mismatchBanner = container.querySelector('[data-testid="integrity-mismatch-banner"]');
+    expect(mismatchBanner).not.toBeNull();
+    expect(mismatchBanner?.textContent).toContain('무결성 검증 실패: 계산된 해시가 카탈로그 체크섬과 불일치합니다 (변조 감지)');
+  });
+
+  it('[VF-GM-03-MUTATION-PROOF-BYTES] proves Mutation 2: Tampered file byte content produces mismatch even when expected hash is valid', async () => {
+    const originalContent = "print('hello')\n";
+    const validHash = await calculateSha256(originalContent);
+
+    // Tampered bytes injected in transit
+    const tamperedContent = "print('hacked')\n";
+
+    const tamperedFile: InvFileItem = {
+      ...sampleDegradedFile,
+      content: tamperedContent,
+      contentHash: validHash, // Expects original hash
+      source: 'kernel-checkout',
+    };
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[tamperedFile]}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain(
+      '검증 실패 (해시 불일치 / TAMPERED)'
+    );
+    expect(container.querySelector('[data-testid="integrity-status-verified"]')).toBeNull();
+    expect(container.querySelector('[data-testid="integrity-status-mismatch"]')).not.toBeNull();
+  });
+
+  it('[VF-GM-03-CHECKOUT-INPUT-LOAD] loads checkout files through UI input and verifies loaded file integrity', async () => {
+    const canonicalContent = "print('hello')\n";
+    const canonicalHash = await calculateSha256(canonicalContent);
+
+    const mockCheckoutView = {
+      checkoutId: '55555555-5555-4555-8555-555555555555',
+      revision: 1,
+      sha256: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      snapshot: {
+        format: 'workspace-snapshot:1' as const,
+        workspaceId: 'wsp_0123456789ABCDEFGHJKMNPQRS',
+        directories: ['src'],
+        files: [
+          {
+            path: 'src/main.py',
+            executable: false,
+            sha256: canonicalHash, // Correct matching hash
+            sizeBytes: 15,
+            dataBase64: 'cHJpbnQoJ2hlbGxvJykK',
+          },
+        ],
+      },
+    };
+
+    const fetchSpy = vi.spyOn(wsEditApi, 'fetchWorkspaceEditView').mockResolvedValue(mockCheckoutView);
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          projectId="prj_0123456789ABCDEFGHJKMNPQRS"
+          runId="run_0123456789ABCDEFGHJKMNPQRS"
+          checkoutId="55555555-5555-4555-8555-555555555555"
+          clusterNodes={clusterNodesFixture}
+          initialNamespace="workspaces"
+        />
+      );
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'prj_0123456789ABCDEFGHJKMNPQRS',
+      'run_0123456789ABCDEFGHJKMNPQRS',
+      '55555555-5555-4555-8555-555555555555'
+    );
+
+    // File from checkout is loaded and selected
+    expect(container.textContent).toContain('main.py');
+    expect(container.querySelector('[data-testid="file-source-badge"]')?.textContent).toContain(
+      '커널 체크아웃 (WorkspaceEditView 실 바이트)'
+    );
+
+    // Click verify on loaded file
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    // Verification PASSES genuinely
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain('검증 통과 (VERIFIED)');
+    expect(container.querySelector('[data-testid="integrity-status-verified"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="calculated-hash"]')?.textContent).toBe(canonicalHash);
   });
 });

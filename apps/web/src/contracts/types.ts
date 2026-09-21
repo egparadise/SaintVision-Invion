@@ -7,11 +7,15 @@ import type {
   ProblemDetails as CanonicalProblemDetails,
   RunState,
   RiskLevel,
+  StorageObservationView,
+  RecordedStorageObservation,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
   RunState,
   RiskLevel,
+  StorageObservationView,
+  RecordedStorageObservation,
 };
 
 export type ErrorCategory =

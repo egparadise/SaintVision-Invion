@@ -41,8 +41,8 @@ interface MonacoWorkspaceEditorProps {
 }
 
 export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
-  workspaceId = 'wsp_saint_core_01',
-  projectId = 'prj_01JABCDE',
+  workspaceId = '',
+  projectId = '',
 }) => {
   const [files, setFiles] = useState<EditorFile[]>(INITIAL_FILES);
   const [activeFilePath, setActiveFilePath] = useState<string>('src/server.ts');
@@ -724,17 +724,19 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 newCommit.stagedFiles.includes(f.path) ? { ...f, isDirty: false } : f
               )
             );
-            try {
-              await apiClient(`/v1/projects/${projectId}/runs`, {
-                method: 'POST',
-                body: JSON.stringify({
-                  objective: `Git Commit [${newCommit.commitId.slice(0, 7)}]: ${newCommit.message}`,
-                  stagedFiles: newCommit.stagedFiles,
-                  treeHash: newCommit.treeHash,
-                }),
-              });
-            } catch (err) {
-              console.warn('Backend run trigger fallback on Git commit:', err);
+            if (projectId && projectId.trim()) {
+              try {
+                await apiClient(`/v1/projects/${projectId.trim()}/runs`, {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    objective: `Git Commit [${newCommit.commitId.slice(0, 7)}]: ${newCommit.message}`,
+                    stagedFiles: newCommit.stagedFiles,
+                    treeHash: newCommit.treeHash,
+                  }),
+                });
+              } catch (err) {
+                console.warn('Backend run trigger fallback on Git commit:', err);
+              }
             }
             setShowCommitModal(false);
           }}

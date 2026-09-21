@@ -48,6 +48,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   const [targetNodeId, setTargetNodeId] = useState<string>('');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [inputCheckoutId, setInputCheckoutId] = useState<string>(checkoutId || '');
 
   const loadCheckoutFiles = useCallback(async (pId: string, rId: string, cId: string) => {
     setCheckoutLoading(true);
@@ -72,10 +73,22 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   }, []);
 
   useEffect(() => {
+    if (checkoutId) {
+      setInputCheckoutId(checkoutId);
+    }
+  }, [checkoutId]);
+
+  useEffect(() => {
     if (projectId && runId && checkoutId) {
       loadCheckoutFiles(projectId, runId, checkoutId);
     }
   }, [projectId, runId, checkoutId, loadCheckoutFiles]);
+
+  const handleLoadCheckout = useCallback(() => {
+    const cid = inputCheckoutId.trim();
+    if (!projectId?.trim() || !runId?.trim() || !cid) return;
+    loadCheckoutFiles(projectId.trim(), runId.trim(), cid);
+  }, [projectId, runId, inputCheckoutId, loadCheckoutFiles]);
 
   // ---------------------------------------------------------------------------
   // Integrity Verification State (Strict Tri-State: unverified | verified | mismatch | error)
@@ -204,7 +217,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         calculated = res.calculatedHash;
         // Strict equality comparison
         isMatch = res.matches && calculated.toLowerCase() === selectedFile.contentHash.toLowerCase();
-      } else if (selectedFile.content) {
+      } else if (typeof selectedFile.content === 'string') {
         if (selectedFile.source !== 'kernel-checkout') {
           // Honest refusal: cannot verify in-memory demo or unconnected data as real storage integrity
           setIntegrityState({
@@ -450,6 +463,66 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             );
           })}
         </div>
+
+        {activeNamespace === 'workspaces' && (
+          <div
+            data-testid="workspace-checkout-bar"
+            style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              padding: '8px 12px',
+              backgroundColor: '#1e293b',
+              borderRadius: '6px',
+              border: '1px solid #334155',
+            }}
+          >
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>커널 체크아웃:</span>
+            <input
+              type="text"
+              data-testid="checkout-id-input"
+              value={inputCheckoutId}
+              onChange={(e) => setInputCheckoutId(e.target.value)}
+              placeholder="체크아웃 ID (예: 55555555-5555-4555-8555-555555555555)"
+              style={{
+                flex: 1,
+                padding: '4px 8px',
+                borderRadius: '4px',
+                backgroundColor: '#0f172a',
+                border: '1px solid #334155',
+                color: '#f8fafc',
+                fontSize: '0.75rem',
+                fontFamily: 'monospace',
+              }}
+            />
+            <button
+              type="button"
+              data-testid="load-checkout-btn"
+              onClick={handleLoadCheckout}
+              disabled={checkoutLoading || !projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()}
+              style={{
+                padding: '4px 12px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderRadius: '4px',
+                backgroundColor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? '#475569' : '#3b82f6',
+                color: '#ffffff',
+                border: 'none',
+                cursor: (!projectId?.trim() || !runId?.trim() || !inputCheckoutId.trim()) ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {checkoutLoading ? '로딩 중...' : '체크아웃 파일 로드'}
+            </button>
+          </div>
+        )}
+        {activeNamespace === 'workspaces' && (!projectId?.trim() || !runId?.trim()) && (
+          <div
+            data-testid="checkout-context-warning"
+            style={{ fontSize: '0.6875rem', color: '#fbbf24', padding: '0 4px' }}
+          >
+            ⚠️ 활성 프로젝트/실행(Run) 정보가 없어 커널 체크아웃 조회가 제한됩니다 (근거 없는 호출 방지).
+          </div>
+        )}
       </div>
 
       {checkoutLoading && (
@@ -596,6 +669,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                         : 'rgba(234, 179, 8, 0.4)',
                   }}
                 >
+                  <span data-testid={`integrity-status-${integrityState.status}`} style={{ display: 'none' }} />
                   {integrityState.status === 'verified' && '검증 통과 (VERIFIED)'}
                   {integrityState.status === 'unverified' && '미검증 (UNVERIFIED)'}
                   {integrityState.status === 'verifying' && '계산 중... (VERIFYING)'}

@@ -4,6 +4,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import * as fabricApi from '../src/features/desktop/fabricControlApi';
+import * as storageObsApi from '../src/shared/api/storageObservation';
 import { NodeItem } from '../src/contracts/types';
 
 const sampleNodes: NodeItem[] = [
@@ -746,5 +747,352 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
     expect(container.textContent).toContain('하드웨어 Capabilities 원장:');
     expect(container.textContent).toContain('Ryzen 9 7950X');
     expect(container.textContent).toContain('AMD');
+  });
+
+  describe('Discovery Tenant Boundary Enforcement & Zero-Call Invariant', () => {
+    it('suppresses discovery announcement (0 network calls) and disables broadcast button when tenantId is missing', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement').mockResolvedValue({
+        state: 'announced',
+        announcementId: 'ann_dummy_01',
+      } as any);
+
+      // Render with NO tenantId
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="discovery" />);
+      });
+
+      // 1. Honest notice MUST be rendered
+      const notice = container.querySelector('[data-testid="discovery-tenant-required-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.textContent).toContain('인증된 세션 테넌트 식별자(tenantId)가 없어');
+
+      // 2. Broadcast button MUST be disabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(true);
+
+      // 3. Attempting to click disabled button MUST produce exactly 0 network calls
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('enables broadcast button and passes authenticated tenantId in announcement when provided', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement').mockResolvedValue({
+        state: 'announced',
+        announcementId: 'ann_live_123',
+      } as any);
+
+      // Render with authenticated tenantId
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="discovery" tenantId="ten_authenticated_corp" />);
+      });
+
+      // 1. Notice MUST NOT be rendered
+      expect(container.querySelector('[data-testid="discovery-tenant-required-notice"]')).toBeNull();
+
+      // 2. Broadcast button MUST be enabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(false);
+
+      // 3. Clicking button calls broadcastAnnouncement with the exact authenticated tenantId
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(1);
+      expect(broadcastSpy).toHaveBeenCalledWith(expect.any(Object), 'ten_authenticated_corp');
+    });
+
+    it('proves planRunId defaults to empty string and gates create-plan-btn', async () => {
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="pools" />);
+      });
+
+      const planRunInput = container.querySelector<HTMLInputElement>('[data-testid="plan-run-id-input"]');
+      expect(planRunInput).not.toBeNull();
+      // Crucial: Must default to empty string, NOT 'run_01JABCDEF_DEMO'
+      expect(planRunInput?.value).toBe('');
+
+      const createPlanBtn = container.querySelector<HTMLButtonElement>('[data-testid="create-plan-btn"]');
+      expect(createPlanBtn).not.toBeNull();
+      expect(createPlanBtn?.disabled).toBe(true);
+      expect(createPlanBtn?.textContent).toContain('승인 Run ID 필요');
+    });
+
+    it('proves register-contribution-btn is disabled when cluster has no nodes', async () => {
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={[]} initialTab="storage" />);
+      });
+
+      const registerBtn = container.querySelector<HTMLButtonElement>('[data-testid="register-contribution-btn"]');
+      expect(registerBtn).not.toBeNull();
+      expect(registerBtn?.disabled).toBe(true);
+      expect(registerBtn?.textContent).toContain('등록 가능 노드 없음');
+    });
+
+    it('proves storage-observation-section renders and enforces anti-synthesis unknown health with genuine counts', async () => {
+      const mockObservation = {
+        requestId: '66666666-6666-4666-8666-666666666666',
+        tenantId: '00000000-0000-4000-8000-000000000001',
+        projectId: 'prj_0123456789ABCDEFGHJKMNPQRS',
+        runId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        contributionId: 'stc_0123456789ABCDEFGHJKMNPQRS',
+        status: 'recorded' as const,
+        createdAt: '2026-09-21T12:00:00Z',
+        expiresAt: 1790000000,
+        currentHealth: 'unknown' as const,
+        operationalAcceptanceAssessed: false as const,
+        observation: {
+          evidenceId: 'evd_0123456789ABCDEFGHJKMNPQRS',
+          checkId: 'chk_0123456789ABCDEFGHJKMNPQRS',
+          observedAt: 1790000000,
+          integrityVerified: true as const,
+          sampleHealthy: true,
+          sampled: 10,
+          mismatches: 0,
+          unverifiable: 0,
+          examined: 10,
+          unsampled: 0,
+        },
+      };
+
+      const fetchSpy = vi.spyOn(storageObsApi, 'fetchStorageObservation').mockResolvedValue(mockObservation);
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="storage"
+            projectId="prj_0123456789ABCDEFGHJKMNPQRS"
+            runId="run_0123456789ABCDEFGHJKMNPQRS"
+            initialSampleRequestId="66666666-6666-4666-8666-666666666666"
+          />
+        );
+      });
+
+      const section = container.querySelector('[data-testid="storage-observation-section"]');
+      expect(section).not.toBeNull();
+
+      const input = container.querySelector<HTMLInputElement>('[data-testid="storage-sample-req-input"]');
+      const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="fetch-storage-observation-btn"]');
+      expect(input).not.toBeNull();
+      expect(fetchBtn).not.toBeNull();
+      expect(input?.value).toBe('66666666-6666-4666-8666-666666666666');
+      expect(fetchBtn?.disabled).toBe(false);
+
+      // Click fetch button
+      await act(async () => {
+        fetchBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'prj_0123456789ABCDEFGHJKMNPQRS',
+        'run_0123456789ABCDEFGHJKMNPQRS',
+        '66666666-6666-4666-8666-666666666666'
+      );
+
+      // Invariant: currentHealth MUST remain "unknown" (never "healthy")
+      const healthElem = container.querySelector('[data-testid="storage-observation-health"]');
+      expect(healthElem?.textContent).toBe('unknown');
+
+      // Invariant: operationalAcceptanceAssessed MUST be false
+      const acceptanceElem = container.querySelector('[data-testid="storage-observation-acceptance"]');
+      expect(acceptanceElem?.textContent).toContain('false');
+
+      // Integrity verified is PASS
+      const integrityElem = container.querySelector('[data-testid="storage-observation-integrity"]');
+      expect(integrityElem?.textContent).toContain('무결성 확인됨 (VERIFIED)');
+
+      // Counts rendered accurately
+      const countsElem = container.querySelector('[data-testid="storage-observation-counts"]');
+      expect(countsElem?.textContent).toContain('표본수: 10');
+      expect(countsElem?.textContent).toContain('불일치: 0');
+    });
+
+    it('proves storage-observation disables fetch when projectId or runId is absent (0 network calls guard)', async () => {
+      const fetchSpy = vi.spyOn(storageObsApi, 'fetchStorageObservation');
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="storage"
+            // projectId and runId absent
+          />
+        );
+      });
+
+      const warning = container.querySelector('[data-testid="storage-observation-context-warning"]');
+      expect(warning).not.toBeNull();
+      expect(warning?.textContent).toContain('활성 프로젝트/실행(Run) 컨텍스트가 없어');
+
+      const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="fetch-storage-observation-btn"]');
+      expect(fetchBtn?.disabled).toBe(true);
+
+      // Attempting to click disabled button must not call API
+      await act(async () => {
+        fetchBtn!.click();
+      });
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Discovery Empty-State Tri-Partition & Architectural Rule Notice (UI-FB-03)', () => {
+    it('State 1 (Clean Zero Candidates): renders discovery-empty-state with truthful operator CLI credential rule notice, suppressing error banner', async () => {
+      const pending = deferred<any>();
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockReturnValue(pending.promise);
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // Initially in loading state
+      expect(container.querySelector('[data-testid="discovery-loading"]')).not.toBeNull();
+
+      // Query returns 0 items cleanly
+      await act(async () => {
+        pending.resolve({ items: [] });
+      });
+
+      // 1. discovery-empty-state MUST be rendered
+      const emptyState = container.querySelector('[data-testid="discovery-empty-state"]');
+      expect(emptyState).not.toBeNull();
+      expect(emptyState?.textContent).toContain('승인 대기 중인 디스커버리 후보가 없습니다');
+      expect(emptyState?.textContent).toContain('후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙)');
+      expect(emptyState?.textContent).toContain('saint operator issue-grant');
+      expect(emptyState?.textContent).toContain('일회용 자격증명');
+
+      // 2. Negative controls: Error banner, tenant missing warning, and admission buttons MUST NOT exist
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).toBeNull();
+      expect(container.querySelector('[data-testid="discovery-tenant-required-notice"]')).toBeNull();
+      expect(container.textContent).not.toContain('승인 & 토큰 발급');
+    });
+
+    it('State 2 (Query Failure): renders discovery-error-banner with role="alert" and retry button, suppressing empty-state and candidate cards', async () => {
+      const pending = deferred<any>();
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockReturnValue(pending.promise);
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // Query fails with 503 error
+      await act(async () => {
+        pending.reject(new Error('503 Service Unavailable: Discovery daemon unreachable'));
+      });
+
+      // 1. Error banner MUST be rendered with role="alert"
+      const errorBanner = container.querySelector('[data-testid="discovery-error-banner"]');
+      expect(errorBanner).not.toBeNull();
+      expect(errorBanner?.getAttribute('role')).toBe('alert');
+      expect(errorBanner?.textContent).toContain('디스커버리 서비스 연결 오류');
+      expect(errorBanner?.textContent).toContain('503 Service Unavailable: Discovery daemon unreachable');
+
+      // 2. Retry button MUST exist
+      expect(container.querySelector('[data-testid="discovery-retry-btn"]')).not.toBeNull();
+
+      // 3. Negative controls: discovery-empty-state and candidate rows MUST NOT exist
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).toBeNull();
+      expect(container.textContent).not.toContain('saint operator issue-grant');
+      expect(container.textContent).not.toContain('승인 & 토큰 발급');
+    });
+
+    it('State 3 (Session Tenant Missing): renders discovery-tenant-required-notice, disables broadcast button, and enforces 0 network calls', async () => {
+      const broadcastSpy = vi.spyOn(fabricApi, 'broadcastAnnouncement');
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            // tenantId is omitted
+          />
+        );
+      });
+
+      // 1. Tenant required barrier notice MUST appear
+      const tenantNotice = container.querySelector('[data-testid="discovery-tenant-required-notice"]');
+      expect(tenantNotice).not.toBeNull();
+      expect(tenantNotice?.textContent).toContain('인증된 세션 테넌트 식별자(tenantId)가 없어');
+      expect(tenantNotice?.textContent).toContain('위조 테넌트 합성 및 후보 한도 소진 방지');
+
+      // 2. Broadcast button MUST be disabled
+      const broadcastBtn = container.querySelector<HTMLButtonElement>('[data-testid="broadcast-announcement-btn"]');
+      expect(broadcastBtn).not.toBeNull();
+      expect(broadcastBtn?.disabled).toBe(true);
+
+      // 3. Attempting to click disabled button MUST produce exactly 0 network calls (zero-call guard)
+      await act(async () => {
+        broadcastBtn!.click();
+        await Promise.resolve();
+      });
+
+      expect(broadcastSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('Tri-Partition Re-query Transition: proves State 1 (clean empty) <-> State 2 (error) mutual exclusion across live state transitions', async () => {
+      let callCount = 0;
+      const firstCall = deferred<any>();
+      const secondCall = deferred<any>();
+
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? firstCall.promise : secondCall.promise;
+      });
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // 1. Resolve first call with empty array -> State 1 (Clean Empty)
+      await act(async () => {
+        firstCall.resolve({ items: [] });
+      });
+
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).toBeNull();
+
+      // 2. Click refresh -> initiate second query
+      const refreshBtn = container.querySelector<HTMLButtonElement>('[data-testid="discovery-refresh-btn"]');
+      expect(refreshBtn).not.toBeNull();
+      await act(async () => {
+        refreshBtn!.click();
+      });
+
+      // 3. Reject second call -> Transition from State 1 to State 2 (Error)
+      await act(async () => {
+        secondCall.reject(new Error('500 Internal Discovery Failure'));
+      });
+
+      // Error banner MUST appear and empty state MUST be removed
+      expect(container.querySelector('[data-testid="discovery-error-banner"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="discovery-empty-state"]')).toBeNull();
+    });
   });
 });

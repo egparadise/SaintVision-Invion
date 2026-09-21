@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.64"
+version: "1.0.69"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:55:00+09:00"
+updated: "2026-09-21T21:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,76 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:55:00+09:00.
+- 확인 기준: 2026-09-21T21:05:00+09:00.
 
 ## 최근 확인한 진척
+
+- **디스커버리 3대 빈 상태 분리, 운영자 자격 규칙 고지 및 DOM 돌연변이 실측 사살 완결 (`ResourceExplorer.tsx`, `resource-explorer-dom.test.tsx`)**:
+  - **디스커버리 3대 빈 상태 엄격 분리 (Empty-State Tri-Partition)**:
+    - **State 1 (정상 조회 빈 상태)**: `candidatesState === 'success' && candidates.length === 0`일 때 `data-testid="discovery-empty-state"`를 렌더링. 시스템 아키텍처 규칙("테넌트 격리 정책에 따라 운영자 CLI(`saint operator issue-grant`)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다. 신규 머신 부트스트랩 대기 중")을 정직하게 고지하고 에러 배너 및 테넌트 미식별 경고를 완전 배제.
+    - **State 2 (서비스 연결 실패)**: `candidatesState === 'error'`일 때 `role="alert"` 속성의 `data-testid="discovery-error-banner"` 및 `data-testid="discovery-retry-btn"` 표출. 잔여 후보 및 조작 버튼 완전 소거, 빈 상태 안내문 배제.
+    - **State 3 (세션 테넌트 미식별 차단)**: `!tenantId || !tenantId.trim()`일 때 `data-testid="discovery-tenant-required-notice"` 표출, 안내 방송 버튼 비활성화(`disabled`), 클릭 시도 시 네트워크 0회 호출 가드(0 network calls) 엄격 집행.
+  - **DOM 단위 테스트 및 3대 돌연변이 실측 사살 (전수 KILLED)**:
+    - M1 (State 2 에러 배너 무력화): 5개 테스트 실패 (`expected null not to be null`), 사살 후 원복.
+    - M2 (State 1 운영자 자격증명 규칙 고지 문구 제거): State 1 테스트 실패 (`expected '...' to contain '후보 목록이 비어 있는 이유'`), 사살 후 원복.
+    - M3 (State 3 테넌트 부재 시 브로드캐스트 활성화 변조): 2개 테스트 실패 (`expected false to be true`), 사살 후 원복.
+  - **검증 실적**: Vitest 56개 파일 **527/527 passed 100%** (from 523 to 527, net +4 passed; `resource-explorer-dom.test.tsx` 24/24 passed), Vite 프로덕션 빌드 exit 0 (3.32s, 96 modules), Pytest discovery contract 8 passed, `check_frontend_integrity.py` 0 violations & `--test-negative` PASS, check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_디스커버리_3대빈상태분리_운영자자격규칙고지_Gemini]].
+
+
+- **화면 정직성 스캐너 6대 한계 명시 및 5대 규칙 양방향 실측 사살 완결 (`check_frontend_integrity.py`, `화면_개발_정직성_지침_및_사례집.md`)**:
+  - **스캐너 6대 구조적 한계(What this scanner does NOT check) 명시**: 도구 소스 상단 독스트링 및 거버넌스 문서 섹션 3.2에 (1) 동적 변수 조립/계산식 가짜 값, (2) 오늘 목록에 없는 신규 형태 합성 식별자, (3) 특정 컴포넌트 타겟팅 규칙의 새 파일 미추적, (4) 소스 어휘 존재 vs 런타임 데이터 흐름, (5) 모양만 유효한 임의 식별자의 실존성, (6) 비-텍스트적/시각적 조기 성공 표출 한계를 명문화하여 "검사 초록이 완벽한 안전을 뜻하지 않음"을 선언.
+  - **5대 규칙 양방향 돌연변이 실측 사살 (6대 결함 전수 KILLED)**:
+    - M1 (Rule 1): `ResourceExplorer.tsx:2` 가짜 테넌트 UUID 주입 -> exit 1 사살.
+    - M2 (Rule 1): `TerminalSessionView.tsx:2` 미인가 컴포넌트 commandId 자리표시자 주입 -> exit 1 사살.
+    - M3 (Rule 2): `ResourceExplorer.tsx:449` 안내 방송 테넌트 0-call 가드 무력화 -> 함수 본문 스코프 가드 검사 규칙 강화 후 exit 1 사살.
+    - M4 (Rule 3): `WebTerminal.tsx:30` 소켓 연결 전 초기 버퍼 Connected 주입 -> exit 1 사살.
+    - M5 (Rule 3): `WebTerminal.tsx:78` 일회용 티켓 콘솔 로깅 주입 -> exit 1 사살.
+    - M6 (Rule 4): `InvFileExplorer.tsx:258` else 블록에서 mismatch를 verified로 조작 -> else 분기 상태 검사 규칙 강화 후 exit 1 사살.
+  - **검증 실적**: 6대 실측 돌연변이 전수 사살 및 원복 완료, `check_frontend_integrity.py` PASS (0 violations), 5대 규칙 내장 음성 대조(`--test-negative`) PASS, Vitest 56개 파일 **523/523 passed 100%**, Vite 프로덕션 빌드 exit 0, check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면정직성_스캐너_한계명시_및_5대규칙_양방향실측_Gemini]].
+
+
+- **화면 개발 정직성 5대 원칙 수립, 자동 검사 도구 구축, 전체 감사 지도 및 디스커버리 CLI 연동 예측 완결 (`화면_개발_정직성_지침_및_사례집.md`, `check_frontend_integrity.py`, `DeveloperStudio.tsx`, `RunDetail.tsx`, `mlopsEngine.ts`, `fixtures/model-lineage.ts`, `model-lineage.test.ts`)**:
+  - **화면 개발 정직성 5대 핵심 원칙 거버넌스 확립 ([[화면_개발_정직성_지침_및_사례집]])**:
+    - ① 백엔드가 주지 않는 것을 만들지 않는다 (Never Synthesize): `mlopsEngine.ts` 가짜 점수(0.812) 소거, `StorageObservationView` unknown 강제, `RunDetail.tsx` 가짜 SSE 스트림 제거 -> 빈 상태 정합, `DeveloperStudio.tsx` fallback runId 제거.
+    - ② 부를 근거가 없으면 부르지 않는다 (0-Calls Without Basis): `ResourceExplorer.tsx:420` 하드코딩 테넌트 UUID 제거 및 0-call 가드, `WebTerminal.tsx` 가짜 commandId 0-call 가드, `ModelLineageView.tsx` 빈 approvalInput/planRunId 가드, `DeveloperStudio.tsx` 영수증 조회 0-call 가드.
+    - ③ 일어나지 않은 일을 일어났다고 표시하지 않는다 (No Premature Success): `WebTerminal.tsx` 소켓 연결 전 Connected 표출 제거, 티켓 로깅 제로 누설(Zero-Leak), `InvFileExplorer.tsx` 가짜 복구 타이머 제거.
+    - ④ 검증 못 함과 검증 통과를 같게 표시하지 않는다 (Strict Tri-State): `InvFileExplorer.tsx` 실제 체크아웃 바이트 기반 3갈래(`verified` | `mismatch` | `unverified`) 유지, `ModelStudioView.tsx` 검증 라우트 부재 시 정직한 거절.
+    - ⑤ 실패를 캐시나 이전 결과로 가리지 않는다 (Never Mask Fresh Failures): `DeveloperStudio.tsx` 다운로드 프로브 404 전용 폴백(500/401 에러 경고), `InvFileExplorer.tsx` 503 에러 시 이전 검증 상태 즉시 무효화.
+  - **자동화 정적 구조 검사기 구축 (`tools/check_frontend_integrity.py`)**: 80개 프로덕션 소스 파일을 전수 검사하여 금지된 자리표시자, 조기 연결 문구, 티켓/토큰 로깅, 3상태 불변식, 0-call 가드를 자동 검증. 음성 대조(`--test-negative`)를 통해 고의 결함 사살 실증 완료.
+  - **전체 화면 감사 지도 및 디스커버리 CLI 연동 예측 수립**: 감사 완료 영역과 미감사 영역을 명문화하고, Codex 운영자 CLI(`saint operator issue-grant`) 연동 시 `discovery-empty-state`에서 실시간 후보 카드로의 유기적 전환 시퀀스 설계.
+  - **검증 실적**: `check_frontend_integrity.py` PASS (0 violations), negative control PASS, Vitest 56개 파일 **523/523 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.63s, 96 modules), check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면정직성_5대원칙_자동검사도구_감사지도_Gemini]].
+
+
+- **WorkspaceEditView 실바이트 해시 검증 개통, StorageObservationView 스토리지 샘플 무결성 배선 및 엄격한 3갈래 불변식 확립 (`InvFileExplorer.tsx`, `DesktopShell.tsx`, `ResourceExplorer.tsx`, `storageObservation.ts`, `types.ts`, `tests/storage-observation-contract.test.ts`, `tests/inv-file-explorer-dom.test.tsx`, `tests/resource-explorer-dom.test.tsx`)**:
+  - **진정한 무결성 검증(`verified` / PASS) 경로 개통 (VF-GM-03)**: 커널의 `WorkspaceEditView`(`workspace_editor._view()`가 실 체크아웃 바이트의 `sha256` digest 및 `dataBase64` 제공)를 `InvFileExplorer`에 정식 연동. `DesktopShell`에서 `checkoutId` prop 주입 및 `InvFileExplorer` UI에서 동적 체크아웃 입력/로드 바(`workspace-checkout-bar`, `checkout-id-input`, `load-checkout-btn`)를 제공하여 실제 바이트를 디코딩하고 클라이언트 측 WebCrypto SHA-256을 계산하여 기대 체크섬과 대조하는 실체적 검증을 개통.
+  - **엄격한 3갈래(Tri-State) 불변식 보존**:
+    - `calculatedSha256(actualBytes) === serverExpectedHash`: 유일하게 `verified` (`PASS` / `data-testid="integrity-status-verified"`)로 전이.
+    - 해시 불일치 (서버 해시 변조 또는 본문 바이트 변조): 즉시 `mismatch` (`data-testid="integrity-status-mismatch"`, `data-testid="integrity-mismatch-banner"`)로 전이되며 결코 `verified`가 되지 않음.
+    - 서버 실패, 기대 체크섬 부재, 바이트 부재, 데모 데이터: 즉시 `unverified` (`data-testid="integrity-status-unverified"`) 유지 및 정직한 거절 안내문 표출.
+  - **StorageObservationView 스토리지 기여 샘플 무결성 배선 (VF-GM-02/03)**: `ResourceExplorer.tsx` Tab 2(스토리지) 하단에 `StorageObservationView` 전용 관측 카드(`storage-observation-section`)를 신설하고 API 어댑터(`shared/api/storageObservation.ts`)를 연결. 서버 정의 불변 제약(`currentHealth: "unknown"`, `operationalAcceptanceAssessed: false`, `observation.integrityVerified: true`)을 정직하게 렌더링하고 `projectId`/`runId` 부재 시 0-call 가드 적용.
+  - **4대 돌연변이 실측 사살 (KILLED)**:
+    - 돌연변이 1: 서버 체크섬 변조 시 mismatch 탐지 사살 (`[VF-GM-03-MUTATION-PROOF-HASH]`).
+    - 돌연변이 2: 본문 바이트 임의 변조 시 mismatch 탐지 사살 (`[VF-GM-03-MUTATION-PROOF-BYTES]`).
+    - 돌연변이 3: 데모 데이터에 대한 조기 합격 처리 사살 (`[VF-GM-03-BEFORE-AFTER-VERIFY]`).
+    - 돌연변이 4: 스토리지 샘플의 currentHealth를 healthy로 둔갑시키는 합성 사살 (`storage-observation-contract.test.ts`).
+  - **검증 실적**: Vitest 56개 파일 **523/523 passed 100%** (from 510 to 523, net +13 tests; `inv-file-explorer-dom.test.tsx` 19 passed, `resource-explorer-dom.test.tsx` 20 passed, `storage-observation-contract.test.ts` 7 passed), Vite 프로덕션 빌드 exit 0 (3.32s, 96 modules), Pytest core 17 passed, check_docs/ontology/Obsidian PASS.
+  - 보고서: [[2026-09-21_WorkspaceEditView_StorageObservationView_무결성배선_Gemini]].
+
+- **디스커버리 테넌트 격리 실배선, 네트워크 0호출 가드 및 UI 전수 가짜 식별자 소거 완결 (`ResourceExplorer.tsx`, `DesktopShell.tsx`, `App.tsx`, `ModelLineageView.tsx`, `AdminSecurityConsole.tsx`, `PlacementSimulator.tsx`, `DistributedRecoveryView.tsx`, `MonacoWorkspaceEditor.tsx`, `TerminalSessionView.tsx`, `EvidenceViewer.tsx`, `RunDetail.tsx`, `DeveloperStudio.tsx`, `tests/resource-explorer-dom.test.tsx`, `tests/model-lineage.test.ts`)**:
+  - **디스커버리 테넌트 경계 실배선 및 0-call 가드**: Codex의 `POST /v1/discovery/announcements` 테넌트 경계(`X-Inv-Tenant == principal.tenant_id`) 강화에 맞춰 `ResourceExplorer.tsx:420`의 하드코딩 `'00000000-0000-0000-0000-000000000001'`를 전면 폐기하고 상위 `App.tsx`/`DesktopShell.tsx`에서 인증된 세션의 `currentUser.tenantId`를 주입하도록 배선. `tenantId` 부재 시 네트워크 요청을 1건도 발생시키지 않고(0 network calls) `data-testid="discovery-tenant-required-notice"`를 정직 표출하며 브로드캐스트 버튼을 비활성화(`disabled={!tenantId}`).
+  - **모델 배포 게이트 가짜 승인 ID(`apr_01JXYZ889900`) 소거**: `ModelLineageView.tsx`의 `approvalInput`을 빈 문자열(`''`)로 초기화하고, 승인 식별자 미입력 시 `data-testid="lineage-deploy-btn"` 버튼을 비활성화(`disabled={!approvalInput.trim()}`)하여 위조 승인 통과 착시를 근절.
+  - **UI 5대 대상 하드코딩 자리표시자 전수 소거 및 비활성화 가드 확립**:
+    - `AdminSecurityConsole.tsx`: `selectedGpuNodeId`의 `'nod_01JABCDEF01'` 기본값을 `gpuNodes[0]?.id || ''`로 변경, GPU 노드 부재 시 벤치마크 실행 버튼 disabled 및 안내 배너 표출.
+    - `PlacementSimulator.tsx`: `localityNodeId`의 `'nod_01JABCDEF01'` 기본값을 `nodes[0]?.id || ''`로 변경하고 None 옵션 추가. `selectedPoolId`의 `'pool_01_training'` 하드코딩을 제거하고 풀 부재 시 미리보기 API 호출 차단.
+    - `DistributedRecoveryView.tsx`: `selectedNodeId`의 `'nod_01JABCDEF01'` 및 `checkouts`의 가짜 `chk_01JABCDEF01` 요소를 전면 소거하여 빈 배열(`[]`)로 초기화. 체크아웃 부재 시 `recovery-no-checkouts` 빈 상태 표출 및 노드 부재 시 생성 버튼 disabled.
+    - `ResourceExplorer.tsx`: `planRunId`의 `'run_01JABCDEF_DEMO'`를 `''`로 초기화하고 Run ID 미입력 시 계획 확정 버튼 disabled. `poolMembers`의 가짜 노드 2개를 제거(`[]`), 스토리지 기여 시 노드 부재 시 제출 버튼 disabled.
+    - `TerminalSessionView.tsx`, `MonacoWorkspaceEditor.tsx`, `EvidenceViewer.tsx`, `RunDetail.tsx`, `DeveloperStudio.tsx`: `defaultWorkspaceId` 및 `projectId`의 `'wsp_0123456789ABCDEFGHJKMNPQRS'` / `'prj_01JABCDE'` / `'nod_01JABCDEF01'` 폴백을 전수 소거하고, 프로젝트/노드 미지정 시 API 호출을 즉시 차단하여 백엔드 fail-closed 에러 노이즈 방지.
+  - **3대 돌연변이 실측 사살 (KILLED)**: 테넌트 누락 시 브로드캐스트 0호출 위반 사살, 승인 ID 미입력 시 배포 버튼 활성화 위반 사살, 계획 수립 Run ID 부재 시 버튼 활성화 위반 사살.
+  - **검증 실적**: Vitest 55개 파일 **510/510 passed 100%** (from 505 to 510, net +5 tests), Vite 프로덕션 빌드 exit 0 (3.85s, 95 modules), Pytest core 5 passed, check_docs/ontology/Obsidian PASS.
+  - 보고서: [[2026-09-21_디스커버리_테넌트격리_및_UI입력_가짜값_전면소거_Gemini]].
 
 - **PTY 보안 경계, 토큰 제로 누설, 사전 연결 허위 성공 제거, 정합 WorkspaceId 및 승인 Run 선택기 완결 (`WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `tests/terminal-session-dom.test.tsx`)**:
   - **1회용 PTY 인증 토큰 제로 누설 (Zero-Leak)**: `WebTerminal.tsx`에서 `${ticketData.ticket.slice(0, 12)}...` 로그 출력을 전면 제거. 단일 사용 티켓은 실제 WebSocket 인증 헤더/프레임(`authFrame = { ticket }`)으로 쓰이는 권한 증표이므로 어떤 조각(slice/prefix)도 UI 텍스트에 남기지 않고 순수 상태 메시지(`[확인] 30초 일회용 티켓 발급 완료`)만 출력하도록 교정.
