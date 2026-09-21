@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-2026-09-22-WRITE-RESPONSE-FOLLOWUPS-CODEX"
 title: "후속 요청 핸들을 만드는 쓰기 응답 추가 결속"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T02:20:00+09:00"
+updated: "2026-09-22T02:31:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -64,3 +64,14 @@ source_of_truth: "Git"
 1. Claude가 integration의 최종 landed SHA에서 node enrollment 및 contribution registration response binding을 독립 검토한다.
 2. disposable PostgreSQL 16+ DSN을 사용할 수 있을 때 위 세 DB-backed API cases를 실행한다. DSN 부재 skip은 성공으로 집계하지 않는다.
 3. 이 기준에서 상위 응답은 닫았다. 하위 receipt/status 응답은 현 증거로 우선순위를 유지하고, 화면에서 새 후속 handle 소비가 발견되면 다시 올린다.
+
+## PostgreSQL API 실측 및 응답 계약 되돌림 대조
+
+- 작업 카드 `THREAD-2026-09-22-WRITE-RESPONSE-FOLLOWUPS`; owner Codex, reviewer pending. 이 후속은 integration 기준 `b3a14db6286cbcb037ff8aa423c961ce1f2420c7`에서 `agent/codex/write-response-followup-postgres` 브랜치로 진행했다. 실행 위치 `C:/Project/SaintVision-Invion`; Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6; Windows 11; executor Codex.
+- 세 API 시험은 이전 DSN 부재 skip에서 실제 PostgreSQL 실행으로 바뀌었다. 기존 node enrollment/readback, contribution normalized-path, contribution idempotency 시험에 성공 응답의 canonical Pydantic 검증을 넣었다. 같은 contribution POST를 반복해 DB에 저장된 두 번째 replay도 같은 contract 객체임을 확인한다.
+- DB 경로의 응답모델 anchor도 각각 검증했다. 노드 시험은 실제 enrollment을 수행하고 DB commit 후 route 응답에 합성 미지원 필드를 주입해 `ResponseValidationError`를 기대하며, owner connection으로 실제 node row가 남았음을 확인한다. contribution 시험은 실제 첫 등록과 durable idempotency row를 만든 뒤 그 행의 응답 객체만 추가 필드로 변형하고 동일 요청의 DB replay를 실행해 `ResponseValidationError`를 기대한다. 이 두 대조는 응답 모델 제거 시 실제 DB 시험 자체가 실패하는지를 확인한다.
+- KST 2026-09-22 02:28:44 및 02:29:59에 다음 명령을 `tools/provenance.py --executor Codex --`로 감싸 실행했다: `.venv/Scripts/python.exe -m pytest -q -rs tests/test_api.py::test_enrolled_node_is_registered_and_readable tests/test_api.py::test_node_enrollment_db_route_rejects_invalid_response_shape tests/test_api.py::test_contribution_is_registered_with_a_normalised_path tests/test_api.py::test_contribution_registration_is_idempotent tests/test_api.py::test_db_idempotency_replay_is_checked_by_response_contract`. 최종 exit 0: **5 passed, 0 skipped, 0 failed/errors** (13 framework warnings). PostgreSQL 16 `pgvector/pgvector:pg16` disposable 컨테이너와 fixture가 생성한 전용 `inv_backend_test_<random>` 데이터베이스를 사용했다. DSN 원문이나 인증 정보는 기록하지 않았다.
+- 실 DB 되돌림 대조: 02:29:28에 `/nodes` `NodeEnrollResponse` anchor만 제거하자 `test_node_enrollment_db_route_rejects_invalid_response_shape`가 **1 failed**(pytest exit 1)했다. 복원 후 02:29:45에 contribution `ContributionRegistrationResponse` anchor만 제거하자 `test_db_idempotency_replay_is_checked_by_response_contract`가 **1 failed**(pytest exit 1)했다. 두 anchor를 복구한 최종 명령은 5/5 통과했다. 따라서 기존 idempotency DB 경로뿐 아니라 replay 응답 계약도 실제 경로에서 보호된다.
+- 자원 격리/정리: 이름 `sv-codex-write-pg-c07b13e5bc4f4de3871df2b4ea72b06a`, image `pgvector/pgvector:pg16`, data 디렉터리 tmpfs, `127.0.0.1` 임시 포트. `ai.saintvision.owner=codex`와 고유 `ai.saintvision.write-response-db` 라벨 및 컨테이너 ID/생성 시각을 inspect해 소유를 확인한 뒤 해당 컨테이너만 제거했다. 제거 후 같은 ID inspect 결과 부재, daemon 수 48→49→48이었다. 보호 자원 `saintvision-lan-db-bff1a31d`, `saintview-orthanc`, `saintview-orthanc-h1`, `saintview-orthanc-h2`는 확인 당시 기존 상태 그대로였다.
+- 동시 편집 경계: provenance에서 다른 agent의 미커밋 UI 파일들이 관측됐다. 이 실행은 이를 수정하거나 stage하지 않았고, 이 작업의 소유 파일만 변경 대상으로 삼았다. 기록 시점의 worktree는 공유 UI 변경 때문에 clean이 아니었다. 이 PG 증거는 작성자 실행이며 독립 검토, hosted CI, 운영 HTTP 인수로 표시하지 않는다.
+- 결론: `NodeEnrollResponse`와 `ContributionRegistrationResponse`는 기존 세 DB 사례에서 실 PostgreSQL 서비스/HTTP 경로를 통과했고, 성공 객체와 저장된 재생 객체를 확인했다. 계약 anchor를 제거하면 두 신규 DB 부정 대조가 각각 실패하므로 세 개의 과거 skip은 이제 실행 근거로 대체됐다.

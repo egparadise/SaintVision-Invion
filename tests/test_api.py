@@ -13,9 +13,11 @@ import uuid
 
 import pytest
 from fastapi.testclient import TestClient
+from fastapi.exceptions import ResponseValidationError
 from sqlalchemy import text
 
 from saintvision.api.app import create_app
+from saintvision.api import schemas
 from saintvision.config import Settings
 from saintvision.db.session import tenant_scope
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
@@ -147,7 +149,8 @@ def test_enrolled_node_is_registered_and_readable(client, app_engine, seeded):
         headers={"X-Inv-Tenant": str(seeded["tenant_a"])},
     )
     assert response.status_code == 201, response.text
-    node_id = response.json()["node"]["nodeId"]
+    enrolled = schemas.NodeEnrollResponse.model_validate(response.json())
+    node_id = enrolled.node.node_id
     assert response.headers["Location"] == f"/v1/nodes/{node_id}"
 
     listed = client.get("/v1/nodes", headers={"Authorization": "Bearer token-a"})
@@ -158,6 +161,38 @@ def test_enrolled_node_is_registered_and_readable(client, app_engine, seeded):
     assert detail.status_code == 200
     kinds = sorted(c["kind"] for c in detail.json()["capabilities"])
     assert kinds == ["gpu", "ram"]
+
+
+def test_node_enrollment_db_route_rejects_invalid_response_shape(
+    client, app_engine, owner_engine, seeded, monkeypatch
+):
+    """Exercise response validation after a real PostgreSQL enrollment commit."""
+    from saintvision.api.v1 import nodes as node_routes
+
+    secret = mint_token(app_engine, seeded["tenant_a"], seeded["user_a"])
+    hostname = "db-response-contract-" + uuid.uuid4().hex[:12]
+    build_node_body = node_routes._node_body
+
+    def unexpected_field(node):
+        body = build_node_body(node)
+        body["unexpected"] = "injected-contract-violation"
+        return body
+
+    monkeypatch.setattr(node_routes, "_node_body", unexpected_field)
+    with pytest.raises(ResponseValidationError):
+        client.post(
+            "/v1/nodes",
+            json=enroll_payload(secret, hostname),
+            headers={"X-Inv-Tenant": str(seeded["tenant_a"])},
+        )
+
+    # Serialization failed only after the real route wrote the node and audit row.
+    with owner_engine.connect() as connection:
+        persisted = connection.execute(
+            text("SELECT hostname FROM nodes WHERE tenant_id=:tenant AND hostname=:hostname"),
+            {"tenant": seeded["tenant_a"], "hostname": hostname},
+        ).scalar_one()
+    assert persisted == hostname
 
 
 # --------------------------------------------------------------------------
@@ -470,9 +505,10 @@ def test_contribution_is_registered_with_a_normalised_path(client, app_engine, s
         headers={"Authorization": "Bearer token-a"},
     )
     assert response.status_code == 201, response.text
-    contribution = response.json()["contribution"]
-    assert contribution["normalizedPath"] == "/srv/inv/share"
-    assert contribution["status"] == "pending"
+    registration = schemas.ContributionRegistrationResponse.model_validate(response.json())
+    contribution = registration.contribution
+    assert contribution.normalized_path == "/srv/inv/share"
+    assert contribution.status == "pending"
 
 
 def test_unsafe_contribution_path_is_rejected(client, app_engine, seeded):
@@ -494,12 +530,52 @@ def test_contribution_registration_is_idempotent(client, app_engine, seeded):
     first = client.post("/v1/storage/contributions", json=body, headers=headers)
     second = client.post("/v1/storage/contributions", json=body, headers=headers)
     assert first.status_code == 201
+    first_contract = schemas.ContributionRegistrationResponse.model_validate(first.json())
+    second_contract = schemas.ContributionRegistrationResponse.model_validate(second.json())
+    assert second_contract == first_contract
     assert second.json() == first.json()
 
     listed = client.get(
         "/v1/storage/contributions", headers={"Authorization": "Bearer token-a"}
     )
     assert len(listed.json()["items"]) == 1
+
+
+def test_db_idempotency_replay_is_checked_by_response_contract(
+    client, app_engine, owner_engine, seeded
+):
+    """A corrupt durable replay must fail at the route response-model boundary."""
+    from saintvision.api.schemas import ContributionRegistrationResponse
+
+    node_id = register_node(client, app_engine, seeded)
+    body = {"nodeId": node_id, "declaredPath": "/srv/inv/replay-contract"}
+    key = "db-contract-" + uuid.uuid4().hex
+    headers = {"Authorization": "Bearer token-a", "Idempotency-Key": key}
+    first = client.post("/v1/storage/contributions", json=body, headers=headers)
+    assert first.status_code == 201, first.text
+    valid = ContributionRegistrationResponse.model_validate(first.json())
+    assert valid.contribution.normalized_path == "/srv/inv/replay-contract"
+
+    # Corrupt only this test's durable response, then exercise the actual DB replay.
+    # If the route response_model is removed, the second request returns this body.
+    with owner_engine.begin() as connection:
+        changed = connection.execute(
+            text(
+                "UPDATE idempotency_records "
+                "SET response_body = response_body || CAST(:extra AS jsonb) "
+                "WHERE tenant_id=:tenant AND endpoint=:endpoint AND idempotency_key=:key"
+            ),
+            {
+                "extra": '{"unexpected":"injected-contract-violation"}',
+                "tenant": seeded["tenant_a"],
+                "endpoint": "POST /v1/storage/contributions",
+                "key": key,
+            },
+        )
+        assert changed.rowcount == 1
+
+    with pytest.raises(ResponseValidationError):
+        client.post("/v1/storage/contributions", json=body, headers=headers)
 
 
 def test_same_key_with_a_different_body_is_a_conflict(client, app_engine, seeded):
