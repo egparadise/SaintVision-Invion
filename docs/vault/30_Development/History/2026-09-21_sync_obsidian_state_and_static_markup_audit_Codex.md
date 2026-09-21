@@ -6,7 +6,7 @@ status: "review"
 author: "Codex"
 reviewer: "Pending"
 base_commit: "d230b21"
-updated: "2026-09-21T11:05:40+09:00"
+updated: "2026-09-21T11:08:18+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "export-state", "frontend-tests", "renderToStaticMarkup"]
@@ -48,6 +48,10 @@ tags: ["sync-obsidian", "export-state", "frontend-tests", "renderToStaticMarkup"
 - 실제 공유 vault의 read-only `.venv\\Scripts\\python.exe tools/sync_obsidian.py --check`는 exit 3, **16 conflict (14 no-baseline, 2 both-diverged)**를 보고했다. 이 실행 직전 이 worktree에 state가 없음을 확인했다. `--check`는 vault 파일을 쓰지 않았고 진단 JSON만 `.work`에 갱신했다.
 - 비교 기준을 되돌린 추가 실측에서는 이 worktree의 실제 vault가 **675** 충돌(673 no-baseline, 2 both-diverged)이었다. 이는 사용자가 보고한 이전 시점의 683과 다르므로 그 수치를 이 worktree의 재현 결과라고 합치지 않는다. 683→16은 고정 합성 fixture에서의 되돌림 증거이고, 현재 live check는 16이다.
 - `--apply`는 실행하지 않았다. 남은 16건의 내용 판정 및 사용자 vault 변경은 이 작업 범위에 포함하지 않는다.
+
+### Claude index 흡수 후 최신 read-only check
+
+Claude의 원격 commit `7404a6a`가 Overview와 설계 인덱스의 사용자 편집을 저장소 정본에 흡수한 뒤 같은 `--check`를 다시 실행했다. 결과는 **14 no-baseline, 0 both-diverged**, exit 3이다. 이 2건 감소는 EOL 정규화가 아니라 해당 index 편집의 저장소 흡수다. Claude의 `SYNC-OBSIDIAN-BLOCKED-CLAUDE-001` v1.4.0은 남은 14건을 SAFE(old residue 10, whitespace-only 4)로 판정했다. 그 이력 대조를 Codex가 다시 실행한 것은 아니므로 독립 확인으로 세지 않는다. `--apply`는 여전히 실행하지 않았다.
 
 ## `renderToStaticMarkup` 시험 인벤토리
 
