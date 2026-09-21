@@ -1,7 +1,7 @@
 ---
 doc_id: "SYNC-OBSIDIAN-BLOCKED-CLAUDE-001"
 title: "sync_obsidian.py --check 차단 조사 — 683 충돌 사유별 분류·근본원인·도구 진단 수정. --apply 미실행"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
@@ -136,3 +136,25 @@ tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 - **EOL 정규화가 적용되면 683 → 16(내용차이)로 줄고, 그중 실제 사용자 판단 대상은 MERGE 2건뿐**(SAFE 14는 기계적: old 잔재 덮어쓰기/공백). 사용자 판단 규모 = **2 파일**.
 - 근본원인 재확인: vault=CRLF, repo=LF(`.gitattributes eol=lf`)라 sync 의 `sha256(raw)` 비교가 ~667 순수-EOL + 10 old잔재 + 4 공백 + 2 편집을 모두 충돌로 처리. EOL 정규화 비교로 바꾸면 순수-EOL 667 이 사라지고 위 16 만 남는다(권고, Codex).
 - **제약 준수**: vault 읽기만, 쓰기 0, `--apply` 미실행. 실제 처리(SAFE 14 덮어쓰기, MERGE 2 병합)는 사용자 판단 후.
+
+## v1.4.0 — MERGE 2건을 저장소로 흡수 (2026-09-21). 저장소만 수정, vault 미접촉
+
+사용자 승인대로 MERGE 2건의 vault-only 편집을 **저장소 문서에 흡수**했다(vault→repo 정본화). 방향: vault 에만 있던 사용자 index 편집을 저장소에 넣으면 저장소가 정본이 되고, 이후 sync 가 repo→vault 단방향으로 흘러 **충돌이 구조적으로 사라진다.** **vault 에는 쓰지 않았다 — 저장소만 고쳤다.**
+
+### 실행 + 조건 검증
+두 파일 모두 vault=현재repo+추가만(`insert`만, `delete/replace=0`)이 재확인되어, 저장소 파일을 **vault 내용(CRLF→LF)** 으로 만들었다:
+- **조건1 (verbatim)**: 사용자 줄을 그대로 옮김. 다듬지 않음.
+  - `Overview.md` 추가: `## 2026-09-15 보강 설계` + 위키링크 5개(`[[2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스]]`, `[[웹 단일 가상 컴퓨터와 분산 모델 Fabric 보강 설계]]`, `[[57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵]]`, `[[Agent 연속 실행과 최종 보고 정책]]`, `[[SaintVision_INV_한눈에_보는_비전_2026-09-15.png]]`). *애초 파악한 3개 외 2개(Agent 정책·비전 이미지)가 더 있었고 모두 verbatim 포함.*
+  - `SaintVision INV 개발 설계 인덱스.md` 추가: `## 2026-09-15 승인 보강 트랙` + 진입점 안내 문단.
+- **조건2 (저장소 내용 무손실)**: 손실된 기존 저장소 줄 = **0** (추가만).
+- **조건3 (repo-LF == vault-LF)**: 두 파일 모두 **diff 0**. → content-diff 소멸 = SAFE 전환.
+- **조건4 (위키링크 실재)**: 5개 대상 전부 저장소에 존재(PNG 는 `docs/vault/90_Assets/`). **`check_docs.py` PASS**(exit 0, 587 문서·위키링크 검사 통과) — 깨진 링크 0.
+- **조건5 (vault 미접촉)**: OneDrive vault 파일 해시 불변, vault 총 1307 파일 유지. 나는 저장소 워크트리의 `docs/vault/` 만 썼고 OneDrive 경로는 읽기만 했다.
+
+### 판정 갱신 · 전망 확인
+- **MERGE 2 → 0.** 이제 content-diff 는 **14 건(SAFE-remnant 10 + ws 4), 전부 SAFE.** 사용자 보존 판단이 필요한 파일은 **0.**
+- **전망(사용자 질문) 확인**: 사용자 판단 대상이 사라졌다. 이후 절차는 전부 기계적이다:
+  1. Codex 가 **EOL 정규화 비교**를 넣으면 ~669 순수-EOL 충돌이 사라진다(내용 동일).
+  2. 남는 14 SAFE(old 잔재 10 + 공백 4)는 **증거로 안전 확정**(vault 전체가 과거 버전과 정확 일치 / 공백뿐)이라 **repo→vault 덮어쓰기로 기계적 해소** — 사용자 판단 불요.
+  - 즉 **이 흡수 + EOL 정규화 + SAFE 기계적 덮어쓰기**로 sync 가 사용자 판단 없이 돌게 된다. 사용자 전망이 맞다. (엄밀히는 EOL 정규화만으로 14 가 사라지진 않고 기계적 덮어쓰기가 필요하나, 그 14 는 판단이 아니라 기계 처리다.)
+- **아직 남은 것**: EOL 정규화는 Codex 소관(도구 미수정). state 비휘발성 이전도 Codex. 실제 sync 실행(`--apply`)은 그 둘이 반영된 뒤.
