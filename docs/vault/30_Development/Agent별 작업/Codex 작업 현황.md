@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.130"
+version: "1.0.131"
 status: "review"
 author: "Codex"
 updated: "2026-09-21T22:33:42+09:00"
@@ -19,6 +19,7 @@ source_of_truth: "Git"
 - 로컬 검증: 전체 Core 778 passed/4 선행조건 skip/0 fail(errors 포함), Vitest 58 files/545 passed, TypeScript/Vite build 성공, schema 41, TS API contracts 16, bindings 29 fixtures/11 anchors, frontend integrity 0 violations, docs/ontology 통과. 엄격 nested capability schema 반영 후에는 focused node contract 9 passed와 schema/type generation check를 재실행했다. 전체 provenance/경계는 `[[2026-09-21_web_response_contract_map_workspace_Codex]]`.
 - 다음 담당/행동: Claude fixed-SHA 독립 검토는 integration 착지 SHA 대상으로 대기. hosted Actions는 결제 복구 후 `docs`, `backend`, `core` 순으로 실행해 신규 게이트와 실제 PG role 권한을 확인한다. Gemini는 이 Node API slice에서 화면 변경을 하지 않았으며 브라우저 인수는 별도다.
 - Fixed SHA candidate `6f638e30dc8087b81eddf58c6019c314b5f3dac5`는 Claude 최신 integration review `9ed6df9`와 Codex 구현을 병합한 clean tree에서 Core 778/4 skips/0 fail, Vitest 545, build 및 docs/schema/binding/frontend checks를 통과했다. PostgreSQL 동시성 대조는 별도 소유 PG16 컨테이너에서 5 integration tests passed. 상세 provenance/skip 분포는 History; hosted CI billing과 browser/device acceptance는 미완.
+- **Node telemetry 층위 정정 (integration `775ff825`, 2026-09-21 22:41:59 KST, 소스 판독):** list는 heartbeat/identity만, detail의 `capabilities`는 정적 선언(capacity/unit/device metadata)이다. 인증 heartbeat로 수집한 동적 `ResourceSnapshot.used_quantity`는 placement 내부에서 읽지만 현재 이를 반환하는 HTTP read route는 없다. 따라서 기존 “telemetry가 capabilities로 노출된다”는 해석은 바로잡는다. 현재 strict node detail 계약은 정적 capability 용도로 유지하고, UI가 사용량을 원하면 인증·신선도·부재 의미를 갖는 별도 read contract가 필요하다. 평면 metrics 또는 capability 관측 중 어느 모델로 수렴할지는 사용자 결정이며 여기서 선점하지 않는다. 화면 의미는 Gemini 소관. 상세 근거는 History의 node telemetry clarification 부록.
 
 ## 2026-09-21 통합 migration-head 회귀 및 응답 계약 결정
 
