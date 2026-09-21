@@ -1,6 +1,6 @@
 """Frontend Integrity Scanner for SaintVision Web Client.
 
-Five structural checks, no human judgment required:
+Seven structural checks, no human judgment required:
 
   (1) Prohibited Placeholder Identifiers:
       Detects hardcoded dummy UUIDs or synthetic test IDs in production source files:
@@ -31,6 +31,18 @@ Five structural checks, no human judgment required:
       Ensures security-sensitive mutation APIs (handleBroadcastAnnouncement) enforce
       mandatory identity parameters (tenantId) before calling the network.
 
+  (6) Synthetic Timestamp Fallback & Qualification Invariant:
+      Prevents forging missing backend timestamps with current client time
+      ('|| new Date().toISOString()', '|| Date.now()'). Also enforces that
+      freshness-critical timestamps (stateAsOf, completedAt) carry explicit semantic
+      qualification disclaimers so users do not misread them as real-time snapshots.
+
+  (7) Honest Capability & Unimplemented Consistency Invariant:
+      Prevents contradictory or false 'unimplemented' labels. Detects files that
+      invoke or bind backend APIs (e.g. getArtifactDownloadUrl, saveWorkspaceEditView)
+      while claiming the API is unexposed or uncallable ('API 미노출', '미구현').
+      Also forbids known false-unimplemented claims.
+
 What this scanner does NOT check (needs human judgment / runtime testing -- see governance doc):
 
   (1) Dynamically constructed / variable-interpolated fake values:
@@ -54,6 +66,19 @@ What this scanner does NOT check (needs human judgment / runtime testing -- see 
   (6) Visual / Non-textual indicators of premature success:
       Detects specific text tokens in initial output/state, but cannot evaluate CSS color classes
       (e.g. green badges) or SVG icons that might visually convey 'success' before async confirmation.
+  (7) Temporal truth and clock skew of timestamps:
+      The scanner verifies that timestamp fields have explanatory labels and lack client-side synthesis,
+      but cannot verify whether the timestamp reflects actual DB commit time, whether backend clocks
+      have drifted (>5s skew), or whether an observed replica is truly healthy. That requires backend
+      truth audits and real DB/PG16 integration testing.
+  (8) Backend route existence vs client unimplemented claim:
+      When a screen states '미제공 (API 미노출)', the scanner cannot autonomously verify whether the
+      backend actually lacks the endpoint (e.g. /v1/recovery/* absent) or whether the frontend falsely
+      labeled an existing route as unexposed. That requires route-table cross-checking (Claude's backend audit lane).
+  (9) Lifecycle condition guard vs feature absence:
+      A button disabled because a run is in progress ('running') or requiring out-of-band operator CLI
+      action is often mistakenly called 'unimplemented' by frontend authors. Distinguishing valid
+      lifecycle guards from missing endpoints requires workflow domain knowledge beyond static regex.
 """
 from __future__ import annotations
 
@@ -94,6 +119,34 @@ CREDENTIAL_LOG_REGEX = re.compile(
     r"console\.(?:log|info|warn|error)\([^)]*\b(?:ticketData\.ticket|terminalTicket\.ticket|bootstrapToken)\b[^)]*\)",
     re.IGNORECASE,
 )
+
+# Rule 6: Synthetic timestamp fallback regex (e.g. res.completedAt || new Date().toISOString())
+SYNTHETIC_TIMESTAMP_FALLBACK_REGEX = re.compile(
+    r"\b(?:completedAt|stateUpdatedAt|stateAsOf|lastHeartbeatAt|observedAt|committedAt|exportedAt)\b\s*\|\|\s*(?:new\s+Date\(\)(?:\.toISOString\(\))?|Date\.now\(\))",
+    re.IGNORECASE,
+)
+
+# Rule 7: Known false unimplemented / unexposed notices strictly forbidden in production UI
+FORBIDDEN_FALSE_UNEXPOSED_NOTICES = [
+    ("서버 아티팩트 파일 스트림 다운로드 API 미노출 상태", "False unexposed artifact download API claim"),
+    ("다운로드 (API 미노출)", "False unexposed download button label"),
+    ("인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)", "False unexposed editor save API claim"),
+    ("로컬 인메모리 버퍼에 저장합니다 (백엔드 저장 API 미노출)", "False unexposed editor save button tooltip"),
+]
+
+# Rule 7: Contradiction patterns where an API route/helper is wired/imported but marked unimplemented
+WIRING_CONTRADICTION_PATTERNS = [
+    (
+        "getArtifactDownloadUrl",
+        re.compile(r"아티팩트.*다운로드\s*API\s*미노출|다운로드\s*\(API\s*미노출\)", re.IGNORECASE),
+        "Contradiction: imports getArtifactDownloadUrl but claims artifact download API is unexposed",
+    ),
+    (
+        "saveWorkspaceEditView",
+        re.compile(r"저장\s*API\s*미노출|백엔드\s*저장\s*API\s*미노출", re.IGNORECASE),
+        "Contradiction: wires saveWorkspaceEditView but claims backend save API is unexposed",
+    ),
+]
 
 
 def get_production_source_files() -> list[Path]:
@@ -236,6 +289,66 @@ def check_zero_call_guards(files: list[Path]) -> list[str]:
     return errors
 
 
+def check_synthetic_timestamps(files: list[Path]) -> list[str]:
+    """Rule 6: Detect synthetic timestamp fallbacks (e.g. res.completedAt || new Date().toISOString())
+    and verify qualification disclaimers for freshness-critical timestamps in core views."""
+    errors: list[str] = []
+    for p in files:
+        text = p.read_text(encoding="utf-8")
+        rel = p.relative_to(ROOT)
+
+        # 1. Detect synthetic current-time fallback on backend timestamp variables
+        matches = SYNTHETIC_TIMESTAMP_FALLBACK_REGEX.finditer(text)
+        for m in matches:
+            line_no = text[: m.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-6 Synthetic Timestamp] {rel}:{line_no} forges backend timestamp with client current time: '{m.group(0)}'"
+            )
+
+        # 2. Check semantic qualification disclaimers in RunDetail.tsx
+        if p.name == "RunDetail.tsx":
+            # stateAsOf must be qualified with disclaimer preventing reading as single common snapshot
+            if "stateAsOf" in text and "단일 공통 스냅샷" not in text:
+                errors.append(
+                    f"[RULE-6 Freshness Qualification] {rel} renders stateAsOf but lacks qualification disclaimer ('단일 공통 스냅샷이나 조회 시각이 아닙니다')"
+                )
+            # completedAt in artifact/log tabs must disclaim that it is not capture/download time
+            if "completedAt" in text and ("로그 캡처" not in text or "다운로드" not in text):
+                errors.append(
+                    f"[RULE-6 Freshness Qualification] {rel} renders completedAt but lacks disclaimer ('로그 캡처나 다운로드 시각이 아닙니다')"
+                )
+    return errors
+
+
+def check_unimplemented_consistency(files: list[Path]) -> list[str]:
+    """Rule 7: Detect false unimplemented notices and wiring contradictions where an API
+    is imported/bound while simultaneously claiming to be unexposed or unimplemented."""
+    errors: list[str] = []
+    for p in files:
+        text = p.read_text(encoding="utf-8")
+        rel = p.relative_to(ROOT)
+
+        # 1. Check known false unimplemented notices
+        for token, desc in FORBIDDEN_FALSE_UNEXPOSED_NOTICES:
+            if token in text:
+                for line_no, line in enumerate(text.splitlines(), start=1):
+                    if token in line:
+                        errors.append(
+                            f"[RULE-7 Honest Capability] {rel}:{line_no} contains false unimplemented claim: '{token}' ({desc})"
+                        )
+
+        # 2. Check wiring-unimplemented contradictions
+        for api_token, regex, desc in WIRING_CONTRADICTION_PATTERNS:
+            if api_token in text and regex.search(text):
+                m = regex.search(text)
+                assert m is not None
+                line_no = text[: m.start()].count("\n") + 1
+                errors.append(
+                    f"[RULE-7 Contradiction] {rel}:{line_no} {desc}"
+                )
+    return errors
+
+
 def run_checks(verbose: bool = True) -> list[str]:
     files = get_production_source_files()
     if verbose:
@@ -247,6 +360,8 @@ def run_checks(verbose: bool = True) -> list[str]:
     all_errors.extend(check_ticket_logging(files))
     all_errors.extend(check_tristate_verification(files))
     all_errors.extend(check_zero_call_guards(files))
+    all_errors.extend(check_synthetic_timestamps(files))
+    all_errors.extend(check_unimplemented_consistency(files))
 
     return all_errors
 
@@ -285,6 +400,25 @@ def run_negative_control() -> bool:
     m_tri = re.search(r"isMatch\s*\?\s*['\"]verified['\"]\s*:\s*['\"]verified['\"]", dummy_tristate_bad)
     assert m_tri is not None, "Negative control failed: Rule 4 bogus ternary not caught"
 
+    # Test 7 (Rule 6 Synthetic Timestamp): Catches || new Date().toISOString() on timestamp field
+    dummy_ts_bad = "const exportedAt = res.completedAt || new Date().toISOString();"
+    m_ts = SYNTHETIC_TIMESTAMP_FALLBACK_REGEX.search(dummy_ts_bad)
+    assert m_ts is not None, "Negative control failed: Rule 6 synthetic timestamp fallback not caught"
+
+    # Test 8 (Rule 6 Qualification): Catches stateAsOf lacking qualification disclaimer
+    dummy_stateasof_bad = "<div>기준 시각: {stateAsOf}</div>"
+    assert "단일 공통 스냅샷" not in dummy_stateasof_bad, "Negative control failed: Rule 6 qualification absence not caught"
+
+    # Test 9 (Rule 7 False Notice): Catches known false unexposed notice
+    dummy_notice_bad = "<button>다운로드 (API 미노출)</button>"
+    errs_7 = [token for token, desc in FORBIDDEN_FALSE_UNEXPOSED_NOTICES if token in dummy_notice_bad]
+    assert len(errs_7) > 0, "Negative control failed: Rule 7 false unexposed notice not caught"
+
+    # Test 10 (Rule 7 Contradiction): Catches wiring contradiction (imports getArtifactDownloadUrl but claims API 미노출)
+    dummy_contra_bad = "import { getArtifactDownloadUrl } from './runArtifactObservation';\nconst notice = '서버 아티팩트 파일 스트림 다운로드 API 미노출 상태';"
+    has_contra = any(api_token in dummy_contra_bad and regex.search(dummy_contra_bad) for api_token, regex, desc in WIRING_CONTRADICTION_PATTERNS)
+    assert has_contra, "Negative control failed: Rule 7 wiring contradiction not caught"
+
     return True
 
 
@@ -298,9 +432,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_negative:
-        print("Running negative control sensitivity tests across all 5 integrity rules...")
+        print("Running negative control sensitivity tests across all 7 integrity rules...")
         if run_negative_control():
-            print("✔ Negative control passed: Scanner successfully detects mutations across all 5 rules.")
+            print("✔ Negative control passed: Scanner successfully detects mutations across all 7 rules.")
             sys.exit(0)
         else:
             print("❌ Negative control failed.")
@@ -314,7 +448,7 @@ def main() -> None:
             print(f"  - {err}")
         sys.exit(1)
     else:
-        print("\n✔ Frontend Integrity Check Passed: All 5 integrity rules satisfied (0 violations).")
+        print("\n✔ Frontend Integrity Check Passed: All 7 integrity rules satisfied (0 violations).")
         sys.exit(0)
 
 

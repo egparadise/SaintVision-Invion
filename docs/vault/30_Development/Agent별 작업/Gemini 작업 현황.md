@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.83"
+version: "1.0.84"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:36:00+09:00"
+updated: "2026-09-22T01:43:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,32 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:36:00+09:00.
+- 확인 기준: 2026-09-22T01:43:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 12차: 화면 정직성 스캐너 7대 규칙 확장, 구조적 한계(7~9) 명시 및 4대 돌연변이 양방향 실측 사살 완결 (`check_frontend_integrity.py`, `DeveloperStudio.tsx`, `화면_개발_정직성_지침_및_사례집.md`)**:
+  - **사용자 지침 수용**: 신선도(Time Freshness) 및 허위 미구현(False Unimplemented) 신규 결함 부류를 정적 스캐너 규칙으로 승격하고, 정적 규칙으로 검증 불가능한 영역(시각 참값, 백엔드 라우트 실재성, 수명주기 가드 vs 미구현)을 9대 구조적 한계로 명확히 분리 확립.
+  - **규칙 6: Synthetic Timestamp Fallback & Qualification Invariant (신선도 지어내기 차단 및 한정 고지)**:
+    - 백엔드 타임스탬프 필드에 대해 `|| new Date().toISOString()` 또는 `|| Date.now()`로 클라이언트 현재 시각을 합성하여 없는 시각을 위조하는 패턴 탐지(`SYNTHETIC_TIMESTAMP_FALLBACK_REGEX`).
+    - `DeveloperStudio.tsx`의 잔여 합성 타임스탬프(`exportedAt: res.completedAt || new Date().toISOString()`) 전면 소거 ➔ `res.completedAt || null`로 정직화.
+    - `RunDetail.tsx` 등 핵심 뷰에서 `stateAsOf` 렌더링 시 "단일 공통 스냅샷이나 조회 시각이 아닙니다", `completedAt` 렌더링 시 "로그 캡처나 다운로드 시각이 아닙니다"라는 오독 방지 부인 고지 결속 여부 검사.
+  - **규칙 7: Honest Capability & Unimplemented Consistency Invariant (허위 미구현 모순 차단)**:
+    - 오늘 적발된 허위 미노출/모의 고지 문구 4종(`서버 아티팩트 파일 스트림 다운로드 API 미노출 상태`, `다운로드 (API 미노출)` 등)을 금지 목록(`FORBIDDEN_FALSE_UNEXPOSED_NOTICES`)에 영구 등록.
+    - 파일 내 API 엔드포인트/헬퍼(`getArtifactDownloadUrl`, `saveWorkspaceEditView`)가 배선되어 있으면서 "API 미노출"이나 "미구현"이라고 표기하는 모순 패턴 탐지(`WIRING_CONTRADICTION_PATTERNS`).
+  - **스캐너 9대 구조적 한계 및 사람 판단 영역 확립**:
+    - 거버넌스 문서(`화면_개발_정직성_지침_및_사례집.md` v1.1.0)에 한계 (7) 타임스탬프 시간적 진실성/클록 스큐, (8) 백엔드 라우트 실재성 vs 클라이언트 미구현 라벨 대조, (9) 수명주기 조건 미충족/대역외 안내의 미구현 둔갑을 명시.
+  - **4대 돌연변이 양방향 실측 사살 (KILLED)**:
+    - Mutation A (Rule 6 Synthetic Fallback in DeveloperStudio): exit 1 사살 확인 후 원복.
+    - Mutation B (Rule 6 Qualification Absence in RunDetail): exit 1 사살 확인 후 원복.
+    - Mutation C (Rule 7 False Notice in RunDetail): exit 1 사살 확인 후 원복.
+    - Mutation D (Rule 7 Wiring Contradiction in MonacoWorkspaceEditor): exit 1 사살 확인 후 원복.
+  - **테스트 및 검증**:
+    - `check_frontend_integrity.py`: 81개 파일 전수 통과 (**0 violations**, All 7 integrity rules satisfied).
+    - `check_frontend_integrity.py --test-negative`: 7대 규칙 전수 음성 대조 PASS.
+    - Vitest **69개 파일 620/620 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.86s), check_contract_bindings PASS, check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_화면정직성스캐너_7대규칙확장_및_양방향실측_Gemini]].
+
 
 - **화면 결함 6대 부류 치유 트랙 11차: 허위 미구현(Class 3) 표기 전수 재감사, 산출물 다운로드 실제 커널 엔드포인트 실배선 및 에디터 컨텍스트 정직화 완결 (`RunDetail.tsx`, `MonacoWorkspaceEditor.tsx`, `dashboard-runlist-freshness-wiring.test.tsx`, `defect-recovery-admin-recovery-editor.test.tsx`, `monaco-workspace-editor-wiring.test.tsx`)**:
   - **Claude 백엔드 대조 감사 커밋 전면 수용 (`52a3eea4`, `2026-09-22_미구현목록_백엔드대조_남은구현범위_Claude.md`)**:

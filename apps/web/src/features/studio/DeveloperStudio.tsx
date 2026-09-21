@@ -128,7 +128,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     outputSizeBytes?: number;
     verifiedEvidenceId?: string;
     exitCode?: number | null;
-    exportedAt?: string;
+    exportedAt?: string | null;
     fallbackUsed?: boolean;
   } | null>(null);
   const [isLoadingArtifact, setIsLoadingArtifact] = useState<boolean>(false);
@@ -480,7 +480,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             outputSizeBytes: res.output.sizeBytes,
             verifiedEvidenceId: res.evidence?.evidenceId || undefined,
             exitCode: res.stopReceipt?.exitCode ?? null,
-            exportedAt: res.completedAt || new Date().toISOString(),
+            exportedAt: res.completedAt || null,
             fallbackUsed: false,
           };
           setArtifactData(serverPayload);
@@ -538,7 +538,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         runId: activeRunId,
         projectId: selectedProjectId,
         workspaceId: selectedWorkspaceId,
-        exportedAt: effectivePayload.exportedAt || new Date().toISOString(),
+        exportedAt: effectivePayload.exportedAt || null,
         manifest: {
           entrypoint: effectivePayload.entrypoint || activeFile.path,
           filesCount: files.length,
