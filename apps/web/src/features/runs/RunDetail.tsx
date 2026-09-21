@@ -59,6 +59,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [attemptList, setAttemptList] = useState<RunAttemptList | null>(null);
   const [isLoadingAttempts, setIsLoadingAttempts] = useState(false);
   const [attemptError, setAttemptError] = useState<string | null>(null);
+  const [actionNotice, setActionNotice] = useState<{ type: 'error' | 'success' | 'info'; message: string } | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const handlePrepareResume = async () => {
     if (!run.projectId) {
@@ -175,7 +177,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       await refreshShardState();
       onRefreshRun?.();
     } catch (e: any) {
-      alert(e.message || '샤드 취소 또는 상태 확인 실패');
+      setActionNotice({ type: 'error', message: `❌ 샤드 취소 또는 상태 확인 실패: ${e.message || '서버 응답 오류'}` });
     } finally {
       setIsBulkCancelling(false);
     }
@@ -212,11 +214,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         }
       }
       if (!receipt) {
-        alert(`물리 정지 영수증(NodeStopReceipt)을 조회할 수 없습니다. 실행(${run.id})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`);
+        setActionNotice({
+          type: 'info',
+          message: `ℹ️ 물리 정지 영수증(NodeStopReceipt) 조회: 실행(${run.id})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`,
+        });
       }
       setSelectedReceipt(receipt);
     } catch (e: any) {
-      alert(e.message || '영수증 조회 실패');
+      setActionNotice({ type: 'error', message: `❌ 영수증 조회 실패: ${e.message || '통신 오류'}` });
     } finally {
       setIsLoadingReceipt(false);
     }
@@ -228,11 +233,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const handleCancelSubmit = async () => {
     if (!onCancelRun) return;
     setIsCancelling(true);
+    setCancelError(null);
     try {
       await onCancelRun(run.id, cancelReason);
       setShowCancelModal(false);
+      setActionNotice({ type: 'success', message: `✓ Run (${run.id}) 취소 요청이 전달되었습니다.` });
     } catch (e: any) {
-      alert(e.message || '취소 실패');
+      setCancelError(e.message || '취소 실패');
     } finally {
       setIsCancelling(false);
     }
@@ -240,6 +247,36 @@ export const RunDetail: React.FC<RunDetailProps> = ({
 
   return (
     <div>
+      {/* Action Feedback Notice Banner */}
+      {actionNotice && (
+        <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          data-testid={`run-action-${actionNotice.type}-notice`}
+          style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            backgroundColor: actionNotice.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+            border: `1px solid ${actionNotice.type === 'error' ? '#ef4444' : '#3b82f6'}`,
+            borderRadius: 'var(--radius-md)',
+            color: actionNotice.type === 'error' ? '#fca5a5' : '#93c5fd',
+            fontSize: '0.875rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{actionNotice.message}</span>
+          <button
+            type="button"
+            data-testid="close-action-notice-btn"
+            onClick={() => setActionNotice(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem' }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -391,6 +428,24 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                 <option value="security_concern">보안 격리 위반 의심 (security_concern)</option>
               </select>
             </div>
+
+            {cancelError && (
+              <div
+                role="alert"
+                data-testid="cancel-modal-error"
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid #ef4444',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#fca5a5',
+                  fontSize: '0.8125rem',
+                  marginTop: '12px',
+                }}
+              >
+                ❌ 취소 요청 실패: {cancelError}
+              </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
               <Button variant="secondary" size="md" onClick={() => setShowCancelModal(false)} disabled={isCancelling}>
@@ -867,11 +922,14 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         >
           <h3 style={{ fontSize: '1.0625rem', fontWeight: 600, marginBottom: '16px' }}>생성된 아티팩트 목록</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { name: 'test-report-summary.json', size: '24.8 KiB', sha: 'a3f91c...89d1' },
-              { name: 'build-output-manifest.tar.gz', size: '4.2 MiB', sha: '7b2210...fe45' },
-              { name: 'model-evaluation-metrics.csv', size: '112 KiB', sha: '99e34a...12cc' },
-            ].map((art) => (
+            {(((run as any).artifacts && (run as any).artifacts.length > 0)
+              ? ((run as any).artifacts as Array<{ name: string; size: string; sha: string }>)
+              : [
+                  { name: 'test-report-summary.json', size: '24.8 KiB', sha: 'a3f91c...89d1' },
+                  { name: 'build-output-manifest.tar.gz', size: '4.2 MiB', sha: '7b2210...fe45' },
+                  { name: 'model-evaluation-metrics.csv', size: '112 KiB', sha: '99e34a...12cc' },
+                ]
+            ).map((art: { name: string; size: string; sha: string }) => (
               <div
                 key={art.name}
                 style={{
@@ -890,8 +948,18 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                     크기: {art.size} · SHA-256: {art.sha}
                   </div>
                 </div>
-                <Button variant="secondary" size="sm" onClick={() => alert(`${art.name} 다운로드 요청`)}>
-                  다운로드
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  data-testid={`download-artifact-${art.name}`}
+                  onClick={() =>
+                    setActionNotice({
+                      type: 'info',
+                      message: `ℹ️ [모의 고지] '${art.name}' (서버 아티팩트 파일 스트림 다운로드 API 미노출 상태)`,
+                    })
+                  }
+                >
+                  다운로드 (API 미노출)
                 </Button>
               </div>
             ))}

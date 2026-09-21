@@ -7,6 +7,10 @@ export interface RunListProps {
   isLoading: boolean;
   onSelectRun?: (runId: string) => void;
   onCreateRun?: () => void;
+  runsState?: 'idle' | 'loading' | 'success' | 'error';
+  runError?: string | null;
+  lastFetchedAt?: Date | null;
+  onRefresh?: () => void;
 }
 
 const RUN_STATE_CONFIG: Record<
@@ -31,6 +35,10 @@ export const RunList: React.FC<RunListProps> = ({
   isLoading,
   onSelectRun,
   onCreateRun,
+  runsState = 'idle',
+  runError = null,
+  lastFetchedAt = null,
+  onRefresh,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<RunState | 'ALL'>('ALL');
 
@@ -41,10 +49,64 @@ export const RunList: React.FC<RunListProps> = ({
 
   return (
     <div>
+      {/* Stale Warning Banner when polling failed with cached runs */}
+      {runsState === 'error' && runs.length > 0 && (
+        <div
+          role="alert"
+          data-testid="run-stale-warning"
+          style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #ef4444',
+            borderRadius: 'var(--radius-md)',
+            color: '#fca5a5',
+            fontSize: '0.8125rem',
+          }}
+        >
+          ⚠️ [동기화 지연 / 오래된 정보 주의] Run 작업 목록 동기화에 실패했습니다 ({runError || '통신 오류'}).
+          현재 표시된 목록은 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 이미 완료되었거나 취소되었을 수 있습니다.
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Run 작업 목록 ({runs.length}건)</h2>
-          <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Run 작업 목록 ({runs.length}건)</h2>
+            <span
+              role="status"
+              data-testid="run-list-freshness-indicator"
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              🔄 자동 갱신 (5초 주기) · 최근 동기화: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+            </span>
+            {onRefresh && (
+              <button
+                type="button"
+                data-testid="run-list-refresh-btn"
+                onClick={() => onRefresh()}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                새로고침
+              </button>
+            )}
+          </div>
+          <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '4px' }}>
             11개 단일 수명주기 상태 및 실시간 SSE 동기화
           </span>
         </div>
@@ -125,6 +187,50 @@ export const RunList: React.FC<RunListProps> = ({
               <tr>
                 <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                   Run 목록을 불러오는 중입니다...
+                </td>
+              </tr>
+            ) : runsState === 'error' && runs.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ padding: '32px 16px', textAlign: 'center' }}>
+                  <div
+                    role="alert"
+                    data-testid="run-fetch-error-state"
+                    style={{
+                      padding: '24px 20px',
+                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid #ef4444',
+                      borderRadius: 'var(--radius-md)',
+                      maxWidth: '540px',
+                      margin: '0 auto',
+                    }}
+                  >
+                    <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>⚠️</div>
+                    <div style={{ fontSize: '1rem', fontWeight: 600, color: '#fca5a5', marginBottom: '6px' }}>
+                      Run 작업 목록 동기화 실패
+                    </div>
+                    <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', margin: '0 0 16px 0' }}>
+                      서버와 통신할 수 없어 Run 작업 목록을 조회하지 못했습니다 ({runError || '오류 발생'}). 이는 '작업 0건'(정상 0건 아님)이며, 실행 중인 작업이 서버에서 구동 중일 수 있습니다.
+                    </p>
+                    {onRefresh && (
+                      <button
+                        type="button"
+                        data-testid="run-error-retry-btn"
+                        onClick={() => onRefresh()}
+                        style={{
+                          padding: '6px 14px',
+                          backgroundColor: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '0.8125rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        다시 시도
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : filteredRuns.length === 0 ? (

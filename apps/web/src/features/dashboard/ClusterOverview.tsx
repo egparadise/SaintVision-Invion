@@ -7,6 +7,10 @@ export interface ClusterOverviewProps {
   runs: RunItem[];
   pendingApprovalsCount: number;
   onNavigate: (tab: string) => void;
+  nodesState?: 'idle' | 'loading' | 'success' | 'error';
+  nodeError?: string | null;
+  lastFetchedAt?: Date | null;
+  onRefresh?: () => void;
 }
 
 export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
@@ -14,13 +18,151 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   runs,
   pendingApprovalsCount,
   onNavigate,
+  nodesState = 'idle',
+  nodeError = null,
+  lastFetchedAt = null,
+  onRefresh,
 }) => {
-  if (!nodes.length || nodes.some(node => node.telemetryUnavailable)) return <section>
-    <h1>분산 Node 클러스터 개요</h1>
-    <p role="status">자원 합계를 확인할 수 없습니다. 미관측 정보가 있습니다.</p>
-    <ul>{nodes.map(node => <li key={node.id}>{node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}</li>)}</ul>
-    <p>표시된 노드 {nodes.length}대 · 활성 실행 {runs.filter(run => run.state === 'running').length}건</p>
-  </section>;
+  // 1. 에러 상태이면서 노드가 0대인 경우: 정상 0대 빈 상태로 둔갑하지 않고 즉시 에러 표출
+  if (nodesState === 'error' && nodes.length === 0) {
+    return (
+      <section
+        role="alert"
+        data-testid="cluster-overview-fetch-error"
+        style={{
+          padding: '40px 20px',
+          textAlign: 'center',
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid #ef4444',
+          borderRadius: 'var(--radius-lg)',
+          margin: '20px 0',
+        }}
+      >
+        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⚠️</div>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#fca5a5', margin: '0 0 8px 0' }}>
+          클러스터 노드 동기화 실패
+        </h1>
+        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: '0 auto 16px auto', maxWidth: '500px' }}>
+          서버와 통신할 수 없어 클러스터 노드 정보를 조회하지 못했습니다 ({nodeError || '오류 발생'}). 이는 '노드 0대'(정상 0대 아님)이며, 물리 노드가 정상 가동 중일 수 있습니다.
+        </p>
+        {onRefresh && (
+          <button
+            type="button"
+            data-testid="cluster-error-retry-btn"
+            onClick={() => onRefresh()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#ef4444',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        )}
+      </section>
+    );
+  }
+
+  // 2. 정상 조회 결과 노드가 0대인 경우 (정상 빈 클러스터)
+  if (nodes.length === 0 && (nodesState === 'success' || nodesState === 'idle')) {
+    return (
+      <section
+        role="status"
+        data-testid="cluster-overview-empty-state"
+        style={{
+          padding: '40px 20px',
+          textAlign: 'center',
+          backgroundColor: 'var(--color-bg-surface)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--color-border-subtle)',
+          margin: '20px 0',
+        }}
+      >
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>분산 Node 클러스터 개요</h1>
+        <p style={{ color: 'var(--color-text-muted)', marginTop: '8px' }}>
+          등록된 노드가 없습니다 (정상 조회 결과: 0대). 관리자 승인을 통해 노드를 온보딩하세요.
+        </p>
+        {lastFetchedAt && (
+          <div
+            data-testid="cluster-freshness-indicator"
+            style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '12px' }}
+          >
+            최근 동기화: {lastFetchedAt.toLocaleTimeString('ko-KR')}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // 3. 텔레메트리 미제공/미관측 노드가 포함된 경우
+  if (nodes.some(node => node.telemetryUnavailable)) {
+    return (
+      <section>
+        {nodesState === 'error' && (
+          <div
+            role="alert"
+            data-testid="cluster-stale-warning"
+            style={{
+              padding: '12px 16px',
+              marginBottom: '16px',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid #ef4444',
+              borderRadius: 'var(--radius-md)',
+              color: '#fca5a5',
+              fontSize: '0.8125rem',
+            }}
+          >
+            ⚠️ [동기화 지연 / 오래된 정보 주의] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
+            현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 최신 자원 상태와 다를 수 있습니다.
+          </div>
+        )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h1>분산 Node 클러스터 개요</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span
+              role="status"
+              data-testid="cluster-freshness-indicator"
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                padding: '3px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              🔄 클러스터 자동 갱신 (5초 주기) · 최근 관측: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+            </span>
+            {onRefresh && (
+              <button
+                type="button"
+                data-testid="cluster-refresh-btn"
+                onClick={() => onRefresh()}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '3px 8px',
+                  backgroundColor: 'var(--color-bg-surface)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                새로고침
+              </button>
+            )}
+          </div>
+        </div>
+        <p role="status">자원 합계를 확인할 수 없습니다. 미관측 정보가 있습니다.</p>
+        <ul>{nodes.map(node => <li key={node.id}>{node.hostname} — {node.telemetryUnavailable ? '자원 미관측' : '자원 관측됨'}</li>)}</ul>
+        <p>표시된 노드 {nodes.length}대 · 활성 실행 {runs.filter(run => run.state === 'running').length}건</p>
+      </section>
+    );
+  }
   // Aggregate Cluster Metrics
   const totalCores = nodes.reduce((acc, n) => acc + n.cpuCores, 0);
   const avgCpuUsage = Math.round(
@@ -54,6 +196,26 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
 
   return (
     <div>
+      {/* Stale Warning Banner when polling failed with cached nodes */}
+      {nodesState === 'error' && (
+        <div
+          role="alert"
+          data-testid="cluster-stale-warning"
+          style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #ef4444',
+            borderRadius: 'var(--radius-md)',
+            color: '#fca5a5',
+            fontSize: '0.8125rem',
+          }}
+        >
+          ⚠️ [동기화 지연 / 오래된 정보 주의] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
+          현재 표시된 노드 정보는 {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '과거'} 기준 스냅샷이며, 최신 자원 상태와 다를 수 있습니다.
+        </div>
+      )}
+
       {/* Top Banner: Status & Quick Action */}
       <div
         style={{
@@ -69,8 +231,42 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
         }}
       >
         <div>
-          <h1 style={{ fontSize: '1.375rem', fontWeight: 700 }}>분산 Node 클러스터 개요</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, margin: 0 }}>분산 Node 클러스터 개요</h1>
+            <span
+              role="status"
+              data-testid="cluster-freshness-indicator"
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--color-text-muted)',
+                backgroundColor: 'var(--color-bg-subtle)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
+              🔄 자동 갱신 (5초 주기) · 최근 관측: {lastFetchedAt ? lastFetchedAt.toLocaleTimeString('ko-KR') : '동기화 중...'}
+            </span>
+            {onRefresh && (
+              <button
+                type="button"
+                data-testid="cluster-refresh-btn"
+                onClick={() => onRefresh()}
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-secondary)',
+                }}
+              >
+                새로고침
+              </button>
+            )}
+          </div>
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', margin: 0 }}>
             관측된 노드 (온라인 {onlineNodes}/{nodes.length}대, 활성 실행 {runningRuns}건)
           </p>
         </div>
@@ -285,7 +481,7 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{node.hostname}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                    {node.os.toUpperCase()} · {node.cpuCores}C / {Math.round(node.memoryTotalBytes / 1024 ** 3)}G
+                    {(node.os ? node.os.toUpperCase() : 'LINUX')} · {node.cpuCores}C / {Math.round(node.memoryTotalBytes / 1024 ** 3)}G
                     {node.gpuCount > 0 && ` · ${node.gpuName}`}
                   </div>
                 </div>

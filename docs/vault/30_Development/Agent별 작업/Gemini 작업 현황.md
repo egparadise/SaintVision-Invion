@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.78"
+version: "1.0.79"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T00:35:00+09:00"
+updated: "2026-09-22T00:43:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T00:35:00+09:00.
+- 확인 기준: 2026-09-22T00:43:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 7차: 대시보드(ClusterOverview) 및 Run 목록 신선도 지표화, 에러 은폐 차단 및 RunDetail alert() 소거 완결 (`ClusterOverview.tsx`, `RunList.tsx`, `RunDetail.tsx`, `App.tsx`, `dashboard-runlist-freshness-wiring.test.tsx`)**:
+  - **ClusterOverview 대시보드 장애 은폐 차단 & 신선도 지표화 (Priority 13-16)**: 노드 동기화 실패 시 정상 0대 빈 상태로 둘러대던 결함을 치유. `nodesState === 'error'`일 때 `cluster-overview-fetch-error`(`role="alert"`, "정상 0대 아님" 명시 및 재시도 버튼) 전용 에러 뷰를 표출하고, 정상 0대일 때만 `cluster-overview-empty-state`(`role="status"`)를 표출하여 엄격 분리. 상단 헤더에 `cluster-freshness-indicator`(`role="status"`, `🔄 자동 갱신 (5초 주기) · 최근 관측: HH:mm:ss`) 및 수동 `cluster-refresh-btn` 실장. 폴링 실패 시 기존 캐시 노드가 있으면 `cluster-stale-warning`(`role="alert"`) 표출.
+  - **RunList 작업 목록 에러 은폐 차단 & 신선도 지표화 (Priority 17-18)**: Run 동기화 실패 시 "해당 상태의 Run이 없습니다" 정상 0건 빈 상태로 둔갑하던 결함을 치유. `runsState === 'error'`일 때 테이블 내부에 `run-fetch-error-state`(`role="alert"`, "작업 0건(정상 0건 아님)" 명시 및 재시도 버튼)를 표출. 상단 헤더에 `run-list-freshness-indicator`(`role="status"`, `🔄 자동 갱신 (5초 주기) · 최근 동기화: HH:mm:ss`) 및 새로고침 버튼 실장. 폴링 실패 시 `run-stale-warning`(`role="alert"`) 표출.
+  - **RunDetail alert() 소거 및 정직한 DOM 피드백 배너 (Priority 19)**: 브라우저 블로킹을 유발하고 스크린 리더에서 실종되던 `alert()` 호출을 전면 소거. 상단에 `run-action-${type}-notice`(`role={type === 'error' ? 'alert' : 'status'}`) 배너를 신설하여 샤드 취소/영수증 조회 실패를 정직하게 표출. 아티팩트 다운로드 버튼의 허위 팝업을 소거하고 `다운로드 (API 미노출)`로 정직화하여 클릭 시 인라인 배너(`role="status"`) 표출. 취소 모달 내부에 `cancel-modal-error`(`role="alert"`) 인라인 에러 배너 실장.
+  - **App.tsx 신선도 결속 및 Studio 전환 실배선**: `lastRunsFetchedAt` 실배선 및 컴포넌트 결속. `onCreateRun`의 가짜 alert 창을 `handleOpenStudio({ step: 3 })`로 실배선하여 새 Run 버튼 클릭 시 Developer Studio의 코드 편집 & 실행 단계로 전환.
+  - **신규 DOM 단위 테스트 9종 구축 및 4대 돌연변이(M16~M19) 실측 사살**: `apps/web/tests/dashboard-runlist-freshness-wiring.test.tsx` (9/9 passed). M16(대시보드 에러 시 정상 0대 둔갑) 사살, M17(Run 목록 에러 시 정상 0건 둔갑) 사살, M18(Run 목록 Stale 경고 억제) 사살, M19(취소 실패 시 인라인 에러 누락) 사살.
+  - Vitest **66개 파일 597/597 passed 100%** (순증 +9 passed), Vite 프로덕션 빌드 exit 0 (3.55s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_대시보드_Run목록_신선도지표화_및_alert소거_Gemini]].
 
 - **화면 결함 6번째 부류 치유 트랙: 시간 경과 묵인 및 신선도 은폐 차단, 승인 대기열 및 클러스터 노드 신선도 지표화 완결 (`App.tsx`, `ApprovalCenter.tsx`, `ResourceExplorer.tsx`, `freshness-and-staleness-wiring.test.tsx`)**:
   - **ApprovalCenter 신선도 지표화 & Stale 캐시 은폐 차단 (Priority 11)**: 상단에 `approval-freshness-indicator`(`role="status"`, `🔄 자동 갱신 (5초 주기) · 최근 동기화: HH:mm:ss`) 및 수동 `approval-refresh-btn` 실장. 폴링 실패 시 과거 스냅샷을 최신인 양 침묵하지 않고 `approval-stale-warning`(`role="alert"`, 과거 스냅샷 시각 명시 및 처리 전 새로고침 안내) 표출. 서버 장애 시 안건 0개일 때 허위 `EmptyState`("대기 중인 거버넌스 승인 안건 없음") 둔갑을 원천 차단하고 `approval-fetch-error-state`(`role="alert"`, `이는 '대기 안건 0건'(정상 0건 아님)이며, 미확인된 고위험 안건이 대기 중일 수 있습니다.` 고지 및 재시도 버튼) 전용 에러 뷰 분리.

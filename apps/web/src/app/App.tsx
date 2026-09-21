@@ -67,6 +67,7 @@ export const App: React.FC = () => {
   const [runsState, setRunsState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [lastNodesFetchedAt, setLastNodesFetchedAt] = useState<Date | null>(null);
   const [lastApprovalsFetchedAt, setLastApprovalsFetchedAt] = useState<Date | null>(null);
+  const [lastRunsFetchedAt, setLastRunsFetchedAt] = useState<Date | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [nodeError, setNodeError] = useState<string | null>(null);
@@ -151,6 +152,7 @@ export const App: React.FC = () => {
       if (scopeRef.current === scope && request === runRequest.current) {
         setRuns(items);
         setRunsState('success');
+        setLastRunsFetchedAt(new Date());
         setRunError(null);
       }
     } catch {
@@ -332,6 +334,10 @@ export const App: React.FC = () => {
             nodes={nodes}
             runs={runs}
             pendingApprovalsCount={approvals.filter((a) => a.status === 'pending').length}
+            nodesState={nodesState}
+            nodeError={nodeError}
+            lastFetchedAt={lastNodesFetchedAt}
+            onRefresh={fetchNodes}
             onNavigate={(tab) => {
               setActiveTab(tab);
               setSelectedNodeId(null);
@@ -604,7 +610,11 @@ export const App: React.FC = () => {
                 runs={runs}
                 isLoading={runsState === 'loading'}
                 onSelectRun={(id) => setSelectedRunId(id)}
-                onCreateRun={() => alert('새 Run 요청 폼')}
+                onCreateRun={() => handleOpenStudio({ step: 3 })}
+                runsState={runsState}
+                runError={runError}
+                lastFetchedAt={lastRunsFetchedAt}
+                onRefresh={fetchRuns}
               />
             )}
           </div>
