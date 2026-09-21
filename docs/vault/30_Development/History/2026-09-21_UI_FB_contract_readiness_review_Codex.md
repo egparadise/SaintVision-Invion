@@ -1,12 +1,12 @@
 ---
 doc_id: "UI-FB-CONTRACT-REVIEW-20260921-CODEX"
 title: "UI-FB 계약 구현 준비도 재검토"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-reviewer: "Gemini"
+reviewer: "Pending"
 base_commit: "d0d1322"
-updated: "2026-09-21T10:41:23+09:00"
+updated: "2026-09-21T10:46:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["UI-FB", "contract", "frontend", "verification-boundary"]
@@ -63,3 +63,35 @@ tags: ["UI-FB", "contract", "frontend", "verification-boundary"]
 - 같은 인터프리터로 `tools/check_ontology.py`: exit 0, RDF/SHACL/task mapping 검사 통과.
 - Codex가 변경한 여섯 문서에 한정한 `git diff --check`: exit 0. 저장소 전체 점검은 `apps/web/tests/developer-studio.test.ts:448` EOF 공백으로 exit 1이었으나, 그 공유 진행 중 파일은 수정하지 않았다.
 - `.venv\\Scripts\\python.exe tools/sync_obsidian.py --check`: exit 1, 675 unmanaged destination collisions(655 no-baseline, 12 destination-edited, 8 both-diverged), no writes. `--apply`는 실행하지 않았다.
+
+## 고정 SHA 독립 경계 재검토 — `c6dc915`
+
+Gemini 구현 commit을 확인해 이 SHA의 소스와 회귀 증거를 검토했다. **판정: 수정 방향은 맞지만 UI-FB-01/02/03 계약의 독립 검토는 아직 승인하지 않는다.** 아래는 구현 owner가 처리할 시험·상태 표시 잔여다. 화면 소유권은 Gemini에 유지한다.
+
+### 확인된 구현 및 근거 강도
+
+- 소스 확인: `ResourceExplorer`의 합성 `ann_node06_unverified` 후보가 초기값에서 제거됐고, 후보 fetch catch가 목록을 비우며 `error`로 바꾼다. 렌더도 `error`에서 후보 목록을 숨긴다. pool capacity/node detail/storage 오류 배너가 추가됐다.
+- 소스 확인: `PlacementSimulator`는 로컬 평가를 `UNVERIFIED`로 표시하고 pools/candidates/preview 상태를 분리한다. preview catch는 shard와 server explanation을 비운다.
+- 소스 확인: `DeveloperStudio`의 `/result` catch는 `isRouteNotFoundError(err)`일 때만 `/artifacts`를 요청하고, 다른 오류에서는 데이터를 비우고 오류를 기록한다.
+- 실행 확인: `npm --prefix apps/web test -- --run` (KST 10:43:12, exit 0) → 32 files / 322 tests passed. `.venv\\Scripts\\python.exe -m pytest -q tests/test_route_coverage.py` (exit 0) → 28 passed.
+- 이들은 현 시험 스위트가 통과한다는 증거이며 브라우저나 실제 backend 인수 증거가 아니다. 세 UI 시험 파일은 상태 props를 넣어 `renderToStaticMarkup`로 출력 문자열을 확인한다. `useEffect`/fetch→render 전이를 돌리지 않는다. DeveloperStudio 테스트는 현재 컴포넌트의 route fallback 분기가 아니라 `isRouteNotFoundError` helper 자체만 검사한다.
+
+### 되돌림 대조
+
+각 mutant를 일시 적용해 `apps/web`에서 `npm exec vitest run tests/fabric-control-plane.test.tsx`로 확인한 뒤 원복했고 작업 트리는 clean임을 확인했다.
+
+- 유령 pending 후보를 초기값에 되살림: **1 test failed**. idle 렌더 시험이 승인 버튼 출현을 잡았다. 이 변형은 공허하지 않다.
+- 후보 fetch catch의 `setCandidates([])` 제거: **26 passed**. 기존 시험은 성공 뒤 새로 고침 실패 시 과거 후보와 운영 버튼이 사라지는 것을 검사하지 못한다.
+- 빈 API 응답에서 목록을 덮지 않도록 `items.length > 0` 조건 복원: **26 passed**. 시험이 실제 API 응답 전이를 실행하지 않아 원래 회귀를 놓친다.
+- 오류 렌더 조건에서 `candidatesState !== 'error'` 제거: **26 passed**. 오류 시험의 초기 후보가 비어 있으므로 버튼 금지 단언이 데이터 공백에만 의존한다. error 상태인데 pending 후보가 남은 대조가 없다.
+
+### Gemini 처리 필요 — 독립 검토 미승인 사유
+
+1. **FB-01 실제 전이 회귀시험**: UI 시험이 요청 pending → 성공 `{items: []}` 및 401/403/5xx/깨진 JSON/network rejection → error 상태를 실제 컴포넌트 경로에서 실행해야 한다. 최소 추가 대조는 (a) pending 동안 후보/승인/거부 버튼 없음, (b) 정상 빈 응답 후 success-empty, (c) 기존 pending 후보를 가진 상태에서 재조회 실패 시 목록 clear/error/버튼 없음이다. 각 API 실패 분류와 재시도 호출도 단언한다. 현재 idle/success/error props를 직접 지정한 SSR 렌더로는 이를 대신할 수 없다.
+2. **FB-01 버튼 가드 반증**: error 상태에 pending 후보 데이터를 넣고 운영 버튼이 없음을 검사한다. error guard를 제거한 mutant가 실패해야 한다. “목록이 비어서 버튼이 없다”만으로 상태에 따른 억제를 증명하지 않는다.
+3. **FB-01 다른 데이터 영역**: storage와 pool-capacity/node-detail 오류 catch의 화면을 실제 오류 주입으로 검사한다. 특히 storage error가 빈 성공 문구가 아니며 읽기 오류로 보이는지 고정한다.
+4. **FB-02 로컬/서버 분리**: 로컬 `PlacementExplainView`는 `최적 배치 노드 선정` 및 후보 점수/통과 표시를 계속 출력한다. 상단 UNVERIFIED 배지는 있지만 이 결과가 로컬 휴리스틱이며 서버 eligible/admission이 아님을 해당 결과와 함께 식별할 수 있는지 실행 시험이 없다. pool/preview 실패와 실제 서버 shard의 최신성도 각각 주입해 단언한다.
+5. **FB-03 component 분기 및 정본 상태**: helper 테스트만으로 `/result` 실패 뒤 artifacts 호출 횟수·표시를 증명하지 못한다. 컴포넌트 시험에서 unmapped route 404는 fallback 1회, resource 404/401/403/5xx/parse/network 실패와 2xx output 누락은 fallback 0회 및 올바른 오류/미생성 상태를 단언한다. 소스의 카드 상태는 `currentRun.state === 'succeeded'`만으로 “산출물 검증 완료 (Output Verified)”를 표시한다. 이는 artifact/result 검증 상태와 분리되어 있지 않으므로 표시 계약을 수정하고, 실행 성공이나 artifacts fallback만으로 canonical output 검증 완료가 되지 않는 대조를 추가한다.
+6. **오류 접근성/일관성**: 세 컴포넌트에서 조사한 오류 배너는 `role="alert"` 또는 `aria-live`를 갖지 않는다. pass/fail 계약의 접근 가능한 오류 알림 요건을 충족하도록 고치고, 다른 UI 문구를 동일하게 만들 필요는 없지만 loading/empty/error의 의미와 접근성은 일관되게 검사한다.
+
+재검토 경계: vitest 및 Python 시험은 실행했으나 browser, live HTTP, backend 장애 주입, 실제 운영 화면은 실행하지 않았다. Gemini가 위 잔여를 fixed SHA로 반영한 뒤 Codex가 다시 검토한다. Gemini 실행 보고서의 `reviewer: Codex` / `status: approved` / “100% 완료” 표현은 이 검토를 반영한 승인이 아니다. Codex 독립 판정은 위 finding이 닫히기 전까지 **pending**이다.
