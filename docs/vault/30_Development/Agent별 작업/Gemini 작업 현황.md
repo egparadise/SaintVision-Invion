@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.50"
+version: "1.0.51"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T16:35:00+09:00"
+updated: "2026-09-21T16:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,18 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T16:35:00+09:00.
+- 확인 기준: 2026-09-21T16:45:00+09:00.
 
 ## 최근 확인한 진척
 
 - **UI-FB-03 DeveloperStudio 라우트 404 폴백 DOM 하네스 및 양방향 돌연변이 실증 완결 (`apps/web/tests/developer-studio-dom.test.tsx`, `apps/web/src/features/studio/DeveloperStudio.tsx`)**:
-  - **다운로드 핸들러 잔여 및 마운트 2회 호출 결함 교정 (`DeveloperStudio.tsx`)**: `handleDownloadArtifact`에서 `/artifacts`를 직접 호출하던 잔여를 캐시된 `artifactData` 우선 재사용 및 canonical `/result` 후 404 폴백으로 정합. 또한 `liveRun` 초기 상태가 `null`이어서 마운트 시 `[activeRunId, liveRun?.state]`에 의해 아티팩트 조회가 2회 연속 실행되던 결함을 `runs` 목록 매칭으로 초기화하여 1회 정규 호출로 완벽 안정화.
-  - **happy-dom 기반 DOM 통합 시험 스위트 신설 (8개 테스트)**: `isRouteNotFoundError` 판별 함수를 실물로 유지한 채 `apiClient` 모의 하네스를 구축하여 Claude 시험 스펙의 7개 오류 시나리오(401, 403, 500, NET-PARSE, Network, App-level 404 RES-RUN-404, Route-only 404)와 1개 canonical /result 200 OK 경로를 전수 검증.
-  - **양방향 돌연변이 실증 (Mutation Testing Proof)**:
-    - **돌연변이 1 (`if (true)`)**: 비-라우트 오류 무단 폴백 시뮬레이션 시 시나리오 1~6 (특히 app-level 404) **6개 테스트 전수 실패 (6 failed | 2 passed)** 로 결함 즉각 포착 입증.
-    - **돌연변이 2 (`if (false)`)**: 폴백 누락 시뮬레이션 시 시나리오 7 **1개 테스트 실패 (1 failed | 7 passed)** 로 필수 폴백 결함 포착 입증.
-    - 정규 코드 복원 시 **8/8 전수 통과 (100%)**.
-  - **검증 실적**: Vitest 36개 파일 **344/344 passed 100%**, 프론트엔드 프로덕션 빌드 4.59s 클린 생성, Pytest `test_route_coverage.py` **30/30 passed 100%**, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS.
+  - **다운로드 핸들러 방어선(L454) 실측 및 DOM 트리거 하네스 완결**: 초기 상태에서 L454에 `if (true)` 및 `if (false)` 주입 시 아무런 시험도 깨지지 않던 사장 상태(기존 L439 캐시 우선 우회 및 버튼 비활성화로 인한 미도달)를 실측 규명. `handleDownloadArtifact`가 항상 서버 canonical `/result`를 우선 질의하고 `isRouteNotFoundError` 평가를 거쳐 `/artifacts`로 폴백하도록 정합한 뒤, 다운로드 버튼(`artifact-meta-download-btn`) 클릭 액션을 발동시키는 DOM 테스트 5종을 신설.
+  - **양대 경로 양방향 돌연변이 실증 (2-Path Mutation Testing Proof)**:
+    - **경로 A (마운트 효과 L294)**: `if (true)` 주입 시 시나리오 1~6 6건 전수 실패 (`AssertionError: expected 1 to be +0`), `if (false)` 주입 시 시나리오 7 1건 실패 (`AssertionError: expected +0 to be 1`).
+    - **경로 B (다운로드 액션 L454)**: `if (true)` 주입 시 다운로드 시나리오 1~4 4건 전수 실패 (`AssertionError: expected 1 to be +0`), `if (false)` 주입 시 다운로드 시나리오 5 1건 실패 (`AssertionError: expected +0 to be 1`).
+    - 정규 코드 복원 시 전체 13개 DOM 테스트 전수 통과 (13/13).
+  - **검증 실적**: Vitest 36개 파일 **349/349 passed 100%** (+5건 순증), 프론트엔드 프로덕션 빌드 4.02s 클린 생성, Pytest `test_route_coverage.py` **30/30 passed 100%**, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS.
   - 보고서: [[2026-09-21_UI_FB03_DeveloperStudio_DOM_라우트404폴백검증_Gemini]].
 
 - **UI 연속 재조회 전이 회귀·접근성 role=alert·산출물 무결성 검증 엄격 분리 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/src/features/desktop/ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `DeveloperStudio.tsx`, `tests/test_route_coverage.py`)**:

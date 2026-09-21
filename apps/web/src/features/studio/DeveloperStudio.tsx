@@ -435,35 +435,35 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
     setIsDownloadingArtifact(true);
     try {
-      let effectivePayload: any = artifactData;
-      if (!effectivePayload) {
-        const prjId = selectedProjectId || 'prj_01JABCDE';
-        try {
-          const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
-          if (res && res.output) {
-            effectivePayload = {
-              runId: res.runId,
-              outputHash: res.output.sha256,
-              outputSizeBytes: res.output.sizeBytes,
-              verifiedEvidenceId: res.evidence?.evidenceId || undefined,
-              exitCode: res.stopReceipt?.exitCode ?? null,
-              exportedAt: res.completedAt || new Date().toISOString(),
-              fallbackUsed: false,
-            };
-          }
-        } catch (err: any) {
-          if (isRouteNotFoundError(err)) {
-            try {
-              const fallback = await apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
-              if (fallback) {
-                effectivePayload = { ...fallback, fallbackUsed: true };
-              }
-            } catch {
-              // Fallback failed
+      let serverPayload: any = null;
+      const prjId = selectedProjectId || 'prj_01JABCDE';
+      try {
+        const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
+        if (res && res.output) {
+          serverPayload = {
+            runId: res.runId,
+            outputHash: res.output.sha256,
+            outputSizeBytes: res.output.sizeBytes,
+            verifiedEvidenceId: res.evidence?.evidenceId || undefined,
+            exitCode: res.stopReceipt?.exitCode ?? null,
+            exportedAt: res.completedAt || new Date().toISOString(),
+            fallbackUsed: false,
+          };
+        }
+      } catch (err: any) {
+        if (isRouteNotFoundError(err)) {
+          try {
+            const fallback = await apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
+            if (fallback) {
+              serverPayload = { ...fallback, fallbackUsed: true };
             }
+          } catch {
+            // Fallback failed
           }
         }
       }
+
+      const effectivePayload = serverPayload || artifactData;
 
       if (!effectivePayload || !effectivePayload.outputHash) {
         alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
@@ -1850,6 +1850,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="secondary"
                   size="sm"
+                  data-testid="artifact-action-download-btn"
                   onClick={handleDownloadArtifact}
                   disabled={isDownloadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
                   title="실행 결과 아티팩트 매니페스트 및 Evidence를 다운로드합니다"
@@ -2077,6 +2078,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="secondary"
                   size="sm"
+                  data-testid="artifact-meta-download-btn"
                   onClick={handleDownloadArtifact}
                   disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
                   title="실행 영수증과 검증 다이제스트를 포함한 JSON 매니페스트를 다운로드합니다"
