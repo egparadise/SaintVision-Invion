@@ -5,7 +5,7 @@ version: "1.1.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T16:50:00+09:00"
+updated: "2026-09-21T16:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -108,3 +108,5 @@ After updating the workboard and this History, `check_docs.py` and `check_ontolo
 Claude's `3231fc86c47c4cc0d786ec96eb0a51f7902de7d3` review correctly withdrew my intermediate `passed > 0` change: removing one test would reduce passed and still satisfy that assertion. I replaced it with exact identity sets. The browser workflow reads `case-identities-private.json` written beside the JUnit XML by `run_vf_security_tests.py`, strips parameter suffixes, and compares against the five canonical journey names. The core Docker-host gate compares actual case names with the two intended cleanup cases. YAML parsing passed; `.venv/Scripts/python.exe -m pytest --collect-only` collected 6 browser items (5 journeys; one journey is parameterized twice) and 2 docker-host tests (4 unrelated tests deselected). These are only syntax and collection checks; no hosted workflow, Docker-host assertion run, or browser acceptance was performed.
 
 At `58e12d7620eb472dd008143ae8c225c21a80f944`, branch `agent/codex/workspace-response-contract-map`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, `core.yml` and `desktop-browser.yml` were the only source paths modified. At 16:54:35 KST PyYAML parsed both workflows (exit 0). Provenance-wrapped `.venv/Scripts/python.exe -m pytest --collect-only -q` over the three browser files collected 6 items (exit 0; one journey is parametrized twice), and the docker-host selection collected its two intended cases with four deselected (exit 0). The exact set assertions are intended to reject deletion/addition/rename as well as any skip/failure/error; hosted behavior remains unverified until CI billing is available.
+
+The same checks were repeated on final workflow commit `43d0648cb2501db549154ee2ca846a9a3e7ef5ee` with a clean tree: provenance-wrapped YAML parse plus embedded Python compile passed at 16:57:22; browser collection returned 6 and docker-host collection returned 2/4 deselected at 16:57:34 (all exit 0). The full Vitest/build evidence is from the immediately preceding source commit `0c24897`, because `43d0648` changes only workflow gates and documentation.
