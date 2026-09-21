@@ -112,7 +112,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
   // Step 4: Active Run, Live Logs, Cancellation, Receipts & Artifacts
   const [activeRunId, setActiveRunId] = useState<string | null>(initialRunId || (runs[0]?.id ?? null));
-  const [liveRun, setLiveRun] = useState<RunItem | null>(null);
+  const [liveRun, setLiveRun] = useState<RunItem | null>(() => {
+    const targetId = initialRunId || runs[0]?.id;
+    return targetId ? runs.find((r) => r.id === targetId) || null : null;
+  });
   const [artifactData, setArtifactData] = useState<{
     runId: string;
     projectId?: string;
@@ -432,15 +435,35 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
     setIsDownloadingArtifact(true);
     try {
-      let serverPayload: any = null;
-      try {
+      let effectivePayload: any = artifactData;
+      if (!effectivePayload) {
         const prjId = selectedProjectId || 'prj_01JABCDE';
-        serverPayload = await apiClient<any>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
-      } catch {
-        // Fallback to cached artifactData
+        try {
+          const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
+          if (res && res.output) {
+            effectivePayload = {
+              runId: res.runId,
+              outputHash: res.output.sha256,
+              outputSizeBytes: res.output.sizeBytes,
+              verifiedEvidenceId: res.evidence?.evidenceId || undefined,
+              exitCode: res.stopReceipt?.exitCode ?? null,
+              exportedAt: res.completedAt || new Date().toISOString(),
+              fallbackUsed: false,
+            };
+          }
+        } catch (err: any) {
+          if (isRouteNotFoundError(err)) {
+            try {
+              const fallback = await apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
+              if (fallback) {
+                effectivePayload = { ...fallback, fallbackUsed: true };
+              }
+            } catch {
+              // Fallback failed
+            }
+          }
+        }
       }
-
-      const effectivePayload = serverPayload || artifactData;
 
       if (!effectivePayload || !effectivePayload.outputHash) {
         alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
