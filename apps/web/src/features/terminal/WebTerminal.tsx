@@ -6,12 +6,14 @@ import { apiClient } from '@/shared/api/client';
 export interface WebTerminalProps {
   workspaceId: string;
   sessionId: string;
+  commandId?: string;
   onClose?: () => void;
 }
 
 export const WebTerminal: React.FC<WebTerminalProps> = ({
   workspaceId,
   sessionId,
+  commandId = '11111111-1111-4111-8111-111111111111',
   onClose,
 }) => {
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
@@ -33,7 +35,6 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     let active = true;
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
-    const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
 
     const initTerminal = async () => {
       try {
@@ -43,15 +44,24 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           ...prev,
           `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
         ]);
-        const ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+        // Canonical TerminalTicketInput: strictly requires commandId
+        const ticketData = await apiClient<{
+          ticket: string;
+          expiresAt: string;
+          sessionId: string;
+          websocketPath: string;
+        }>(
           `/v1/workspaces/${workspaceId}/terminal-tickets`,
           {
             method: 'POST',
-            body: JSON.stringify({ workspaceId, sessionId }),
+            body: JSON.stringify({ commandId }),
           }
         );
-        const ticket = ticketData.ticketId;
+        const ticket = ticketData.ticket;
         if (!active) return;
+
+        const targetWsPath = ticketData.websocketPath || `/v1/workspaces/${workspaceId}/terminals/${sessionId}`;
+        const finalWsUrl = `${wsProtocol}//${wsHost}${targetWsPath}`;
 
         setTerminalOutput((prev) => [
           ...prev,
@@ -59,7 +69,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         ]);
 
         const client = new WsTerminalClient(
-          wsUrl,
+          finalWsUrl,
           (data) => {
             const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
             if (lines.length > 0) {
@@ -111,7 +121,6 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     }
     const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');
-    const wsUrl = `${wsProtocol}//${wsHost}/v1/terminal/ws`;
 
     try {
       setConnectionStatus('connecting');
@@ -121,14 +130,21 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         ...prev,
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
       ]);
-      const ticketData = await apiClient<{ ticketId: string; ptyWsUrl?: string }>(
+      const ticketData = await apiClient<{
+        ticket: string;
+        expiresAt: string;
+        sessionId: string;
+        websocketPath: string;
+      }>(
         `/v1/workspaces/${workspaceId}/terminal-tickets`,
         {
           method: 'POST',
-          body: JSON.stringify({ workspaceId, sessionId }),
+          body: JSON.stringify({ commandId }),
         }
       );
-      const ticket = ticketData.ticketId;
+      const ticket = ticketData.ticket;
+      const targetWsPath = ticketData.websocketPath || `/v1/workspaces/${workspaceId}/terminals/${sessionId}`;
+      const finalWsUrl = `${wsProtocol}//${wsHost}${targetWsPath}`;
 
       setTerminalOutput((prev) => [
         ...prev,
@@ -136,7 +152,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       ]);
 
       const client = new WsTerminalClient(
-        wsUrl,
+        finalWsUrl,
         (data) => {
           const lines = data.split(/\r?\n/).filter((l) => l.length > 0);
           if (lines.length > 0) {

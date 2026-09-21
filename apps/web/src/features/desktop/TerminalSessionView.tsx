@@ -30,39 +30,46 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
   initialMode = 'terminal',
   onCreateSessionError,
 }) => {
-  const isNodesEmpty = !nodes || nodes.length === 0;
-  const fallbackNode: NodeItem = useMemo(
-    () => ({
-      id: defaultNodeId || 'nod_01JABCDEF01',
-      hostname: 'Node-01 (Virtual)',
-      ipAddress: '127.0.0.1',
-      os: 'windows',
-      role: 'worker',
-      status: 'online',
-      schedulable: true,
-      observationOnly: false,
-      cpuCores: 8,
-      cpuUsagePercent: 10,
-      memoryTotalBytes: 32 * 1024 * 1024 * 1024,
-      memoryUsedBytes: 8 * 1024 * 1024 * 1024,
-      gpuCount: 0,
-      gpuUsagePercent: 0,
-      storageTotalBytes: 500 * 1024 * 1024 * 1024,
-      storageUsedBytes: 100 * 1024 * 1024 * 1024,
-      uptimeSeconds: 3600,
-      heartbeatAt: new Date().toISOString(),
-      agentVersion: '1.0.0',
-    }),
-    [defaultNodeId]
-  );
-  const effectiveNodes = isNodesEmpty ? [fallbackNode] : nodes;
+  if (!nodes || nodes.length === 0) {
+    return (
+      <div
+        data-testid="terminal-session-view-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          backgroundColor: 'var(--color-bg-surface, #0f172a)',
+          color: 'var(--color-text-primary, #f8fafc)',
+        }}
+      >
+        <div
+          data-testid="terminal-empty-nodes-notice"
+          role="status"
+          style={{
+            padding: '16px',
+            backgroundColor: '#1e293b',
+            color: '#94a3b8',
+            fontSize: '0.875rem',
+            borderBottom: '1px solid #334155',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span data-testid="terminal-no-nodes-notice">
+            ℹ️ 등록된 클러스터 노드가 없습니다. PTY 터미널 세션을 생성할 수 없습니다.
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   // Filter eligible (schedulable & non-observation) nodes for initial sessions
-  const eligibleNodes = effectiveNodes.filter((n) => !n.observationOnly && n.schedulable !== false);
+  const eligibleNodes = nodes.filter((n) => !n.observationOnly && n.schedulable !== false);
   const primaryNode =
-    (defaultNodeId ? effectiveNodes.find((n) => n.id === defaultNodeId) : null) ||
+    (defaultNodeId ? nodes.find((n) => n.id === defaultNodeId) : null) ||
     eligibleNodes[0] ||
-    effectiveNodes[0];
+    nodes[0];
 
   const initialSessions: ActiveSessionTab[] = useMemo(() => {
     const list: ActiveSessionTab[] = [];
@@ -273,25 +280,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         </div>
       </div>
 
-      {/* Empty Nodes Notice Banner */}
-      {isNodesEmpty && (
-        <div
-          data-testid="terminal-empty-nodes-notice"
-          role="status"
-          style={{
-            padding: '6px 16px',
-            backgroundColor: '#1e293b',
-            color: '#94a3b8',
-            fontSize: '0.75rem',
-            borderBottom: '1px solid #334155',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <span>ℹ️ 등록된 클러스터 노드가 없습니다 (가상 기본 PTY 세션으로 동작 중).</span>
-        </div>
-      )}
+
 
       {/* Observation node error alert */}
       {sessionError && (
@@ -397,6 +386,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             <WebTerminal
               workspaceId={activeSession.workspaceId}
               sessionId={activeSession.id}
+              commandId="11111111-1111-4111-8111-111111111111"
             />
           </div>
         ) : (

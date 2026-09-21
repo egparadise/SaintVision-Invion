@@ -1,0 +1,19 @@
+{
+  "checkoutId": "55555555-5555-4555-8555-555555555555",
+  "revision": 1,
+  "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "snapshot": {
+    "format": "workspace-snapshot:1",
+    "workspaceId": "wsp_0123456789ABCDEFGHJKMNPQRS",
+    "directories": ["src"],
+    "files": [
+      {
+        "path": "src/main.py",
+        "executable": false,
+        "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "sizeBytes": 15,
+        "dataBase64": "cHJpbnQoJ2hlbGxvJykK"
+      }
+    ]
+  }
+}

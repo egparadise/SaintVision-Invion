@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.59"
+version: "1.0.60"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T18:40:00+09:00"
+updated: "2026-09-21T19:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T18:40:00+09:00.
+- 확인 기준: 2026-09-21T19:55:00+09:00.
 
 ## 최근 확인한 진척
+
+- **VF-GM-03·04·05 Codex 경계 결함 치유, 미관측 상태 날조 배제 및 ModelCommitObservation 프론트 계약 결속 완결 (`TerminalSessionView.tsx`, `WebTerminal.tsx`, `ws-terminal.ts`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `apps/web/src/contracts/types.ts`, `tests/model-commit-observation-contract.test.ts`)**:
+  - **Priority 1 (VF-GM-05 PTY & TerminalSessionView)**: PTY 일회용 티켓 요청을 `TerminalTicketInput: { commandId }` strict schema로 정합, `TerminalTicketResult` (`ticket`, `expiresAt`, `sessionId`, `websocketPath`) 수신 연동, WebSocket `['inv-terminal-v1']` 서브프로토콜 지정 및 쿼리 파라미터 완전 제거, 최초 프레임 `{ ticket }` 전송 완비. `nodes.length === 0`일 때 가상 노드 날조 세션 생성을 전면 폐기하고 0 활성 세션, 0 PTY 마운트, 0 티켓 API 호출 및 `data-testid="terminal-empty-nodes-notice"` 정직 렌더링 실증.
+  - **Priority 2 (VF-GM-03 InvFileExplorer)**: `selectedFile.uri + selectedFile.contentHash` 순환 해싱을 전면 폐기하고 실제 파일 본문 바이트(`selectedFile.content`) 또는 `onVerifyIntegrity` 어댑터 기반 검증으로 개편. 바이트/어댑터 부재 시 `unverified` 유지 및 명시적 거절 에러 표출. WebCrypto 부재 시 64개 0 반환을 폐기하고 예외 발생. `onRepairReplicas` 부재 시 정상 복제본 합성 성공 시뮬레이션을 전면 제거하고 정직한 에러 알림(`role="alert"`) 표출.
+  - **Priority 3 (VF-GM-04 ModelStudio)**: `ModelCommitObservation` 요약 응답에 `shards`가 없을 때 가상 샤드/정상 복제본을 합성하던 로직을 전면 제거하고 `data-testid="unobserved-shards-notice"` 표출. 가용성 상태를 정직한 `현재 가용성: 알 수 없음 (unknown) · 실행 재검증 필요`로 전환. `onRepairShard` 부재 시 성공 시뮬레이션 제거 및 정직한 에러 표출.
+  - **ModelCommitObservation 공유 픽스처 프론트 계약 결속**: Claude가 백엔드에 묶은 `contracts/fixtures/model-commit-observation-response.json`을 프론트엔드 Ajv 2020으로 검증하는 `tests/model-commit-observation-contract.test.ts` 5 passed 신설. 생성 타입 re-export(`RunLogView`, `RunAttemptObservation`, `RunAttemptList`, `TerminalTicketInput`, `TerminalTicketResult`)로 수기 타입 드리프트 근원 제거.
+  - **5대 돌연변이 실측 사살 (KILLED)**: 빈 노드 PTY 조기반환 가드 주석, 바이트 부재 시 허위 verified 조작, WebCrypto 부재 시 64개 0 반환 복원, 요약 관측치 허위 가용성 표출, 샤드 복구 로컬 시뮬레이션 복원 등 5대 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 52개 파일 **475/475 passed 100%** (from 464 to 475, net +11 tests 순증; `terminal-session-dom.test.tsx` 10 passed, `inv-file-explorer-dom.test.tsx` 14 passed, `model-studio-dom.test.tsx` 12 passed, `model-commit-observation-contract.test.ts` 5 passed), Vite 프로덕션 빌드 exit 0 (3.41s, 93 modules), Pytest 11 passed (0.58s), check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini]].
 
 - **RunAttemptList 커널 공유 Fixture 프론트엔드 계약 결속, RunDetail 실배선 및 Ajv 검증 완결 (`apps/web/src/contracts/types.ts`, `runAttemptObservation.ts`, `RunDetail.tsx`, `run-attempt-contract.test.ts`, `run-detail-attempts-dom.test.tsx`)**:
   - **Claude 인계 수용 및 수기 드리프트 4종 전수 정정**: `types.ts`의 `RunAttemptList.source: 'execution-kernel'` const 고정, `nextCursor` 및 attempt 5개 필드(`commandId`, `stopReceiptId`, `exitCode`, `reason`, `evidenceId`) required nullable 정합, 특히 `startedAt`과 `nodeId`를 `string | null`로 확장하여 미배정/대기 attempt 시 프론트 크래시 결함 원천 해소. 추가로 `RunResultView` 및 `RunArtifactList`의 잔여 수기 드리프트도 완전 정합.

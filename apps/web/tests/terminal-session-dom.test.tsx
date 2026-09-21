@@ -13,6 +13,7 @@ class MockWebSocket {
   static OPEN = 1;
   static CLOSED = 3;
   url: string;
+  protocols?: string | string[];
   readyState = 1;
   onopen: (() => void) | null = null;
   onmessage: ((ev: any) => void) | null = null;
@@ -20,8 +21,12 @@ class MockWebSocket {
   onclose: (() => void) | null = null;
   sentMessages: string[] = [];
 
-  constructor(url: string) {
+  static lastInstance: MockWebSocket | null = null;
+
+  constructor(url: string, protocols?: string | string[]) {
     this.url = url;
+    this.protocols = protocols;
+    MockWebSocket.lastInstance = this;
     queueMicrotask(() => {
       if (this.onopen) this.onopen();
     });
@@ -102,7 +107,12 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
       if (endpoint.includes('/terminal-tickets')) {
-        return { ticketId: 'tkt_30s_test_token_valid', ptyWsUrl: 'ws://localhost:8080/v1/terminal/ws' };
+        return {
+          ticket: 'tkt_30s_test_token_valid_00000000000000000000000000000000000000000000',
+          expiresAt: '2026-09-21T12:00:30Z',
+          sessionId: 'sess_test_01',
+          websocketPath: '/v1/workspaces/wsp_core_01/terminals/sess_test_01',
+        };
       }
       return {};
     });
@@ -158,12 +168,14 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
   // ---------------------------------------------------------------------------
   // 2. Ticket Issuance & WebSocket Connection
   // ---------------------------------------------------------------------------
-  it('[VF-GM-05-TICKET-CONNECT] requests 30s one-time PTY ticket and establishes connected WebSocket state', async () => {
+  it('[VF-GM-05-TICKET-CONNECT] requests 30s one-time PTY ticket and establishes connected WebSocket state with canonical subprotocol & auth frame', async () => {
+    const apiSpy = vi.spyOn(client, 'apiClient');
     await act(async () => {
       root.render(
         <WebTerminal
           workspaceId="wsp_core_01"
           sessionId="sess_test_01"
+          commandId="22222222-2222-4222-8222-222222222222"
         />
       );
     });
@@ -171,6 +183,27 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     await act(async () => {
       await new Promise((r) => setTimeout(r, 60));
     });
+
+    // Canonical TerminalTicketInput: strictly commandId
+    expect(apiSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/workspaces/wsp_core_01/terminal-tickets'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ commandId: '22222222-2222-4222-8222-222222222222' }),
+      })
+    );
+
+    // Canonical WebSocket: no query string, subprotocol 'inv-terminal-v1'
+    const ws = MockWebSocket.lastInstance;
+    expect(ws).not.toBeNull();
+    expect(ws!.url).not.toContain('?ticket=');
+    expect(ws!.url).toContain('/v1/workspaces/wsp_core_01/terminals/sess_test_01');
+    expect(ws!.protocols).toEqual(['inv-terminal-v1']);
+
+    // Canonical initial auth frame: { ticket: ... }
+    expect(ws!.sentMessages).toContainEqual(
+      JSON.stringify({ ticket: 'tkt_30s_test_token_valid_00000000000000000000000000000000000000000000' })
+    );
 
     const statusBadge = container.querySelector('[data-testid="terminal-connection-status"]');
     expect(statusBadge?.textContent).toBe('(connected)');
@@ -204,10 +237,12 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     const retryBtn = container.querySelector<HTMLButtonElement>('[data-testid="terminal-error-retry-btn"]');
     expect(retryBtn).not.toBeNull();
 
-    // Now mock recovery on retry
+    // Now mock recovery on retry with canonical TerminalTicketResult
     vi.spyOn(client, 'apiClient').mockResolvedValueOnce({
-      ticketId: 'tkt_fresh_30s',
-      ptyWsUrl: 'ws://localhost:8080/v1/terminal/ws',
+      ticket: 'tkt_fresh_30s_00000000000000000000000000000000000000000000000000000000',
+      expiresAt: '2026-09-21T12:01:00Z',
+      sessionId: 'sess_fresh_01',
+      websocketPath: '/v1/workspaces/wsp_core_01/terminals/sess_fresh_01',
     });
 
     await act(async () => {
@@ -412,9 +447,10 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // 9. Safe Empty State
+  // 9. Safe Empty State & Zero API Calls
   // ---------------------------------------------------------------------------
-  it('[VF-GM-05-EMPTY-NODES] renders safe empty fallback when cluster nodes array is empty', async () => {
+  it('[VF-GM-05-EMPTY-NODES] renders safe empty fallback when cluster nodes array is empty and makes 0 ticket API calls', async () => {
+    const apiSpy = vi.spyOn(client, 'apiClient');
     await act(async () => {
       root.render(<TerminalSessionView nodes={[]} />);
     });
@@ -422,6 +458,11 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     const emptyNotice = container.querySelector('[data-testid="terminal-empty-nodes-notice"]');
     expect(emptyNotice).not.toBeNull();
     expect(emptyNotice?.textContent).toContain('등록된 클러스터 노드가 없습니다');
+    expect(container.querySelector('[data-testid="terminal-no-nodes-notice"]')).not.toBeNull();
+
+    // Invariant: empty nodes MUST NOT mount active terminal or make ticket API calls
+    expect(container.querySelector('[data-testid="active-terminal-container"]')).toBeNull();
+    expect(apiSpy).not.toHaveBeenCalled();
   });
 
   // ---------------------------------------------------------------------------

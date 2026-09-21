@@ -3,7 +3,7 @@ import { WsTerminalClient } from '../src/shared/realtime/ws-terminal';
 import { apiClient } from '../src/shared/api/client';
 
 describe('S01-FE: WebSocket Terminal PTY Client', () => {
-  it('connects with 30s one-time ticket query parameter', () => {
+  it('connects with inv-terminal-v1 subprotocol and sends initial ticket frame', () => {
     const onData = vi.fn();
     const onStatus = vi.fn();
 
@@ -13,6 +13,7 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
     class MockWebSocket {
       static OPEN = 1;
       url: string;
+      protocols?: string | string[];
       readyState = 1; // OPEN
       onopen: (() => void) | null = null;
       onmessage: ((ev: any) => void) | null = null;
@@ -20,8 +21,9 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
       onclose: (() => void) | null = null;
       sentMessages: string[] = [];
 
-      constructor(url: string) {
+      constructor(url: string, protocols?: string | string[]) {
         this.url = url;
+        this.protocols = protocols;
       }
 
       send(data: string) {
@@ -41,16 +43,19 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
 
       expect(onStatus).toHaveBeenCalledWith('connecting');
       const wsInstance = (client as any).ws as MockWebSocket;
-      expect(wsInstance.url).toBe('ws://localhost:8080/v1/terminal/ws?ticket=ticket_xyz_123');
+      expect(wsInstance.url).toBe('ws://localhost:8080/v1/terminal/ws');
+      expect(wsInstance.protocols).toEqual(['inv-terminal-v1']);
 
-      // Trigger open
+      // Trigger open sends initial ticket authentication frame
       wsInstance.onopen!();
       expect(onStatus).toHaveBeenCalledWith('connected');
+      expect(wsInstance.sentMessages).toHaveLength(1);
+      expect(JSON.parse(wsInstance.sentMessages[0])).toEqual({ ticket: 'ticket_xyz_123' });
 
       // Send input with monotonic sequence
       client.sendInput('ls -la\n');
-      expect(wsInstance.sentMessages).toHaveLength(1);
-      expect(JSON.parse(wsInstance.sentMessages[0])).toEqual({
+      expect(wsInstance.sentMessages).toHaveLength(2);
+      expect(JSON.parse(wsInstance.sentMessages[1])).toEqual({
         type: 'data',
         payload: 'ls -la\n',
         sequence: 1,
@@ -59,8 +64,8 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
 
       // Send second input with incremented sequence
       client.sendInput('pwd\n');
-      expect(wsInstance.sentMessages).toHaveLength(2);
-      expect(JSON.parse(wsInstance.sentMessages[1])).toEqual({
+      expect(wsInstance.sentMessages).toHaveLength(3);
+      expect(JSON.parse(wsInstance.sentMessages[2])).toEqual({
         type: 'data',
         payload: 'pwd\n',
         sequence: 2,
@@ -69,8 +74,8 @@ describe('S01-FE: WebSocket Terminal PTY Client', () => {
 
       // Send resize
       client.sendResize(120, 40);
-      expect(wsInstance.sentMessages).toHaveLength(3);
-      expect(JSON.parse(wsInstance.sentMessages[2])).toEqual({
+      expect(wsInstance.sentMessages).toHaveLength(4);
+      expect(JSON.parse(wsInstance.sentMessages[3])).toEqual({
         type: 'resize',
         cols: 120,
         rows: 40,

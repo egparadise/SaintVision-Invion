@@ -3,7 +3,6 @@ import { fabricObservation as api } from '@/shared/api/fabricObservation';
 import { NodeItem } from '@/contracts/types';
 import {
   ModelManifest,
-  ModelShard,
   ExecutionPlanMode,
   ExecutionPlan,
 } from '@/contracts/virtualFabric';
@@ -97,47 +96,14 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
     }
   };
 
-  // Convert result to ModelManifest-like structure if needed
+  // Only recognize ModelManifest when genuine shards array is provided
   const modelManifest: ModelManifest | null = useMemo(() => {
     if (!result) return null;
-    if (result.shards) return result as ModelManifest;
-    // Synthesize shard details if queried from basic api.model
-    const shardCount = result.shardCount || 1;
-    const totalBytes = result.totalBytes || 0;
-    const shardSize = Math.floor(totalBytes / shardCount);
-    const shards: ModelShard[] = Array.from({ length: shardCount }).map((_, idx) => ({
-      shardIndex: idx,
-      shardId: `shd_${result.modelId}_${idx}`,
-      byteRange: `${idx * shardSize}-${(idx + 1) * shardSize - 1}`,
-      layers: `layer.${idx * 4}-${idx * 4 + 3}`,
-      contentHash: result.manifestHash || 'sha256:0000',
-      sizeBytes: shardSize,
-      replicas: [
-        {
-          nodeId: clusterNodes[0]?.id || 'nod_01',
-          nodeHostname: clusterNodes[0]?.hostname || 'Node-01-WinMain',
-          status: 'healthy',
-        },
-      ],
-    }));
-    return {
-      modelId: result.modelId,
-      name: result.modelId,
-      version: result.version,
-      format: result.format || 'safetensors',
-      totalBytes,
-      contentHash: result.manifestHash || '0000',
-      shards,
-      runtimeCompatibility: ['vllm', 'onnxruntime'],
-      licensePolicy: result.licensePolicy || 'internal',
-      classification: result.classification || 'confidential',
-      encryption: { enabled: false },
-      supportedModes: ['single_node', 'request_routing', 'data_parallel', 'tensor_pipeline_parallel', 'cpu_gpu_offload'],
-      status: 'committed',
-      createdAt: result.committedAt || new Date().toISOString(),
-      updatedAt: result.committedAt || new Date().toISOString(),
-    };
-  }, [result, clusterNodes]);
+    if (result.shards && Array.isArray(result.shards) && result.shards.length > 0) {
+      return result as ModelManifest;
+    }
+    return null;
+  }, [result]);
 
   // Shard Repair Logic
   const handleRepairShard = async (shardIndex: number) => {
@@ -171,18 +137,16 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
 
     try {
       const targetNode = surviving[0];
-      let res: { success: boolean; repairedReplicas: any[]; message?: string };
-      if (onRepairShard) {
-        res = await onRepairShard(modelManifest.modelId, shardIndex, targetNode.id);
-      } else {
-        // Default local simulation
-        const updatedReplicas = shard.replicas.map((r) =>
-          r.status !== 'healthy'
-            ? { ...r, nodeId: targetNode.id, nodeHostname: targetNode.hostname, status: 'healthy' as const }
-            : r
-        );
-        res = { success: true, repairedReplicas: updatedReplicas, message: '샤드 복구 완료' };
+      if (!onRepairShard) {
+        setRepairState({
+          repairingShardIndex: shardIndex,
+          message: null,
+          error: '서버 샤드 복구 어댑터(onRepairShard)가 연결되지 않아 복구를 수행할 수 없습니다.',
+        });
+        return;
       }
+
+      const res = await onRepairShard(modelManifest.modelId, shardIndex, targetNode.id);
 
       if (!res.success) {
         setRepairState({
@@ -402,10 +366,41 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
           <p style={{ margin: 0, fontSize: '0.8125rem', color: '#94a3b8' }}>
             라이선스: {result.licensePolicy} · 분류: {result.classification}
           </p>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#38bdf8' }}>
-            현재 가용성: 관측 완료 · 분산 패브릭 연동
+          <p
+            data-testid="model-availability-status"
+            style={{
+              margin: 0,
+              fontSize: '0.8125rem',
+              color: result.currentAvailability === 'unknown' ? '#f59e0b' : '#38bdf8',
+            }}
+          >
+            현재 가용성:{' '}
+            {result.currentAvailability === 'unknown'
+              ? '알 수 없음 (unknown) · 실행 재검증 필요 (requiresExecutionRevalidation: true)'
+              : '관측 완료 · 분산 패브릭 연동'}
           </p>
         </article>
+      )}
+
+      {/* Unobserved Shards Notice when queried without shards */}
+      {result && (!modelManifest || !modelManifest.shards || modelManifest.shards.length === 0) && (
+        <div
+          data-testid="unobserved-shards-notice"
+          role="status"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: '#1e293b',
+            borderRadius: '8px',
+            border: '1px solid #334155',
+            color: '#94a3b8',
+            fontSize: '0.8125rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>ℹ️ (개별 샤드 및 복제본 위치 관측 데이터가 없습니다. 실행 재검증 후 수집됩니다.)</span>
+        </div>
       )}
 
       {/* Shard & Replica Fabric Matrix */}

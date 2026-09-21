@@ -37,10 +37,17 @@ export class WsTerminalClient {
     this.isClosed = false;
     this.onStatus('connecting');
 
-    const urlWithTicket = `${this.wsUrl}?ticket=${encodeURIComponent(oneTimeTicket)}`;
-    this.ws = new WebSocket(urlWithTicket);
+    // Canonical WebSocket: no query string, strict 'inv-terminal-v1' subprotocol
+    this.ws = new WebSocket(this.wsUrl, ['inv-terminal-v1']);
 
     this.ws.onopen = () => {
+      // First frame MUST be { ticket } authentication frame
+      try {
+        this.ws?.send(JSON.stringify({ ticket: oneTimeTicket }));
+      } catch (err) {
+        this.onStatus('error');
+        return;
+      }
       this.onStatus('connected');
     };
 
