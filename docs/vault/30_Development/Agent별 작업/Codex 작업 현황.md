@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.108"
+version: "1.0.109"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T17:49:00+09:00"
+updated: "2026-09-21T18:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,9 +13,10 @@ source_of_truth: "Git"
 ## 2026-09-21 Integration 확인, UI-FB-03 review, run/approval contract follow-up
 
 - 역할 경계를 `Agent 역할과 인계 계약`에 명시했다: Codex는 canonical 응답 스키마·생성 타입·backend validation·공유 fixture/적합성 시험을 소유하고, Gemini는 화면/UI 동작·접근성·브라우저를 소유한다. Codex의 `apps/web` 변경은 계약 전용 adapter/type/conformance tests에 한정되며, 표시·상태 동작은 Gemini 인계 대상이다.
-- Gemini-first prerequisite is satisfied on remote integration: `7ab955b` contains the RunResult/Artifact frontend fixture binding and `3e9903f` is the subsequent Gemini Model Studio landing. This branch's `3052038` is still 4 commits ahead and 3 behind latest integration `3e9903f`; merge latest integration into this branch, rerun validations, then push and advance integration.
+- Gemini-first order is satisfied: remote integration has RunResult/Artifact frontend fixture binding `7ab955b` before Gemini Model Studio `3e9903f`. Both are now merged into Codex branch; merge SHA `5c6c3b6eeea6ce54e7142352eded3dea7563a3fa` is clean. On that fixed SHA at 18:07:37–18:07:39 KST, provenance-wrapped pool pytest passed 17 (2 deprecation warnings), full Vitest 45 files/413 passed, `tsc -b`, Vite build, schema export 41, API TS type check 15, `check_docs.py` (619 docs), `check_ontology.py`, and Obsidian read-only check 1412/4/0 all exited 0. Python `.venv` 3.14.6; Node 24.17.0; DSN absent, Docker present, Go absent. Codex branch is ahead of integration by six commits and not pushed to integration yet; next: push the branch, advance integration fast-forward, then verify integration SHA directly.
 - Already-committed Codex contract-only frontend paths to hand off to Gemini: `apps/web/src/contracts/kernel-observation.ts`, `apps/web/src/shared/api/runApprovalObservation.ts`, `apps/web/tests/run-approval-observation.test.tsx`, `apps/web/tests/run-approval-observation-contract.test.ts`. These are wire adapter/types/conformance tests and contain no screen rendering change.
 - The next response slice now binds pool capacity, placement-preview wire output, plan response, and pool create/member add/member remove responses. A pre-existing wire mismatch was found: backend preview candidate has `spare`/`headroom`, while ResourceExplorer expected `available*`/`eligible`; the contract adapter translates the backend wire shape to that view. `PlacementSimulator` remains a direct, self-shaped preview consumer and still sends visible `binpack`/`spread` request values while the backend accepts `single_node`/`data_parallel`/`sharded`. Do not guess a UI mapping; hand this decision and generated-type wiring to Gemini.
+- Obsidian delivery for this evidence update: `--apply` at 18:09:05 KST exported 5 files with all 1412 destination hashes matching; paired `--check` at 18:09:17 returned 1412 managed / 0 pending / 0 conflicts. No writes to unmanaged files.
 
 - 요청 순서대로 `agent/codex/workspace-response-contract-map`을 integration에 fast-forward하고 push했다: `beff6c1` → `614501a`; integration은 이후 `686eecf`와 Claude `5914f04`로 전진했다. 기존 통합 worktree의 uncommitted `ResourceExplorer.tsx` 변경은 건드리지 않았다. `core.yml` ignore 6개는 `686eecf`에서 확인했다. Schema 32, app response type 9, provider group 27 checks도 integration-derived content에서 통과했다.
 - UI-FB-03: Gemini `beff6c1`에서 click-time 401이 캐시 성공을 재사용하지 않고 alert 후 중단되는지 소스와 DOM 시험으로 검토했다. 정상 로드 후 클릭 401 상주 test가 no `/artifacts`, alert, no `createObjectURL`을 단언한다. `developer-studio-dom.test.tsx`: 18 passed. Codex가 확인한 범위는 happy-dom/소스이며 browser/live HTTP/실제 파일 쓰기는 아님. Gemini가 기록한 mutation 결과는 확인했지만 Codex가 변형을 직접 재실행하지 않았다.
