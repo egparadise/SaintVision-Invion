@@ -530,7 +530,7 @@ CONNECTED as inv_app to saintvision_lan using the password from deploy/init-db.s
   public.tenants readable: 0 row(s)   ← RLS는 정상 작동(scope 미설정이라 0행)
 ```
 
-RLS는 살아 있다. 문제는 **접속 자체가 된다**는 것이고, 그 비밀번호가 저장소에 있다는 것이다. `docker-compose.prod.yml:30`도 같은 값을 쓴다(`INV_DATABASE_URL=postgresql://inv_app:apptestonly@...`).
+RLS는 살아 있다. 문제는 **접속 자체가 된다**는 것이고, 그 비밀번호가 저장소에 있다는 것이다. `docker-compose.prod.yml:30`도 같은 값을 쓴다(`INV_DATABASE_URL=postgresql://inv_app:***@...`).
 
 **설계와 어긋나는 지점.** migration `0001_s02_baseline.py:461`은 `inv_app`을 이렇게 만든다:
 
@@ -555,7 +555,7 @@ inv_app_676598fab9e441bbbedb inherits inv_kernel   (배포별 생성)
 2. 앱은 `lan_pilot.py`가 이미 하는 방식대로 **난수 비밀번호를 가진 배포별 login 역할**로 접속하고, 그 역할이 `inv_kernel`을 상속한다.
 3. 그때까지 `apptestonly`는 **유출된 자격증명으로 취급한다.** 저장소에 있고 실제로 동작한다.
 
-확인 방법: `psycopg.connect("postgresql://inv_app:apptestonly@127.0.0.1:55440/saintvision_lan")`.
+확인 방법: `psycopg.connect("postgresql://inv_app:***@127.0.0.1:55440/saintvision_lan")`.
 
 ### B-9 후속 — 원인 mechanism을 고치고, 탐지를 상시화했다 (`87eeb71`)
 

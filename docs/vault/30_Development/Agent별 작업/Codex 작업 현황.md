@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.87"
+version: "1.0.88"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T13:04:00+09:00"
+updated: "2026-09-21T13:34:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 완료·push 대기: 공개 `proposal-3.txt` 노출 14개(28개 비밀번호)를 `***`로 가리고, JUnit 증거 2회와 운영 절차 1회도 마스킹했다. `.venv\Scripts\python.exe -m pytest -q tests/test_check_docs_secret_guard.py` 3 passed, `tools/check_docs.py`와 `tools/check_ontology.py` PASS. 안전한 tracked scan상 마스크 후 문서 0건, 나머지 24개 URI는 테스트/임시 CI/로컬 개발 기본값으로 target 비밀번호와 일치하지 않는다. `sync_obsidian --apply` 20개와 후속 2개를 내보냈고, 최종 `--check`는 1390/0/0. 상세: [[2026-09-21_공개제안DSN_마스킹_Codex]]. 다음 Codex: commit/push. DB 비밀 유효성·회전은 미확인, 과거 public Git 이력은 그대로 남는다.
 
 2026-09-21 최신 결과: Obsidian은 사용자가 두 checkout을 같은 `b5ea2a5`로 맞춰 실행한 paired `--check`에서 각각 1373 managed/6 pending/0 conflicts(exit 0)였다. 사용자 `--apply`는 6 files export 및 1373 destination hash 일치를 보고했고 사후 check는 1373/0/0, 당시 vault 1384 files다. 이후 remote `a39fc13`에서 온 14개 regression evidence와 Codex 문서를 합친 18 files를 추가 동기화했고 1388 managed hash 일치, 사후 check 1388/0/0이다. 별도 recursive vault file count는 1399로 managed count와 다른 범위다. 이전 6/5는 snapshot이 다른 중간 측정이다. Codex는 사용자 실행과 본인 실행을 구분한다. `GET /v1/discovery/candidates` 계약 first slice는 `8532f705ecd2a53b0688f6bada6895b1efe403d5`로 구현·커밋했고 `agent/codex/discovery-candidates-contract`에 push했다. Python contract+route 36 passed, Vitest 전체 34 files/332 passed, schema/type checks, Vite build, check_docs/ontology 통과. Claude 독립 리뷰 대기. UI-FB-03은 Gemini 구현 대기이며 브라우저 인수 아님. 상세: [[2026-09-21_discovery_candidates_response_contract_Codex]].
 

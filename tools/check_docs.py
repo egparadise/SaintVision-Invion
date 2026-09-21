@@ -5,6 +5,16 @@ import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
+PASSWORD_BEARING_POSTGRES_DSN = re.compile(
+    r'(?i)(?:postgres(?:ql)?(?:\+[a-z0-9_]+)?|postgres)://[^:/@\s]+:'
+    r'(?!(?:\*{3,}|<redacted>|\[redacted\]|redacted)(?=@))[^@/\s?#]+@'
+)
+DOC_TEXT_SUFFIXES = {'.md', '.txt', '.json', '.jsonl', '.xml', '.yaml', '.yml', '.csv', '.log'}
+
+
+def password_bearing_postgres_dsn_count(text):
+    """Count credential-bearing PostgreSQL URIs, excluding explicit mask markers."""
+    return len(PASSWORD_BEARING_POSTGRES_DSN.findall(text))
 
 
 def validate(root=ROOT):
@@ -17,6 +27,20 @@ def validate(root=ROOT):
             errors.append(f'Original source changed: {item["path"]}')
     files = list(vault.rglob('*'))
     targets = {p.name for p in files if p.is_file()} | {p.stem for p in files if p.is_file()}
+    for path in files:
+        if not path.is_file() or path.suffix.lower() not in DOC_TEXT_SUFFIXES:
+            continue
+        try:
+            content = path.read_text('utf-8-sig')
+        except UnicodeDecodeError:
+            errors.append(f'Unreadable UTF-8 document: {path.relative_to(vault)}')
+            continue
+        dsn_count = password_bearing_postgres_dsn_count(content)
+        if dsn_count:
+            errors.append(
+                f'Password-bearing PostgreSQL DSN must be redacted '
+                f'({dsn_count} occurrence(s)): {path.relative_to(vault)}'
+            )
     ids = {}
     count = 0
     for path in files:
