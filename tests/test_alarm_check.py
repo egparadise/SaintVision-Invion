@@ -96,3 +96,17 @@ def test_clock_skew_is_governance_gated_not_silently_dropped():
     assert "Node 시각 스큐 한도 초과" in gated
     assert "Runtime eligibility already excludes" in gated["Node 시각 스큐 한도 초과"]
     assert "channel/responders are decided" in gated["Node 시각 스큐 한도 초과"]
+
+
+def test_partition_alarm_fires_as_the_clock_advances_same_bound():
+    """Time axis, PG-free: with a FIXED partition bound, advancing 'now' must flip quiet->firing.
+
+    This is the clock-advance shape revival cannot do at a single instant. The bound does not
+    change; only the clock does. A tool that ignored elapsed time would stay quiet and fail here.
+    """
+    bound = dt.datetime(2026, 11, 1, tzinfo=dt.timezone.utc)  # fixed partition upper bound
+    t_early = dt.datetime(2026, 8, 1, tzinfo=dt.timezone.utc)  # ~92 days of runway -> quiet
+    t_late = dt.datetime(2026, 10, 20, tzinfo=dt.timezone.utc)  # ~12 days -> P1 fires
+    assert partition_alarm("evidence_envelopes", bound, t_early)["firing"] is False
+    fired = partition_alarm("evidence_envelopes", bound, t_late)
+    assert fired["firing"] is True and fired["severity"] == "P1"
