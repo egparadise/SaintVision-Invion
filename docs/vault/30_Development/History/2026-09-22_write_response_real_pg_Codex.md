@@ -5,7 +5,7 @@ version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "pending"
-updated: "2026-09-22T00:40:09+09:00"
+updated: "2026-09-22T00:43:36+09:00"
 source_of_truth: "Git"
 tags: ["postgresql", "discovery", "response-model", "provenance"]
 ---
@@ -48,6 +48,13 @@ tags: ["postgresql", "discovery", "response-model", "provenance"]
 - 이 History 문서의 마지막 문구를 정리한 뒤 00:36:13 KST에 재동기화했다: `--check`에서 1 pending/0 conflicts, `--apply` 1 file 및 destination hashes 일치, 후속 `--check` 1473 managed/0 pending/0 conflicts. 각 exit 0.
 - 최신 integration `5eb308507c8119ed639df221f3910d835132d932`를 받아온 뒤 Obsidian은 1474 managed/4 pending/0 conflicts였다. 00:39:20 KST에 `--apply`가 4개 파일을 export하고 전체 destination hash를 맞췄고, `--check`는 1474 managed/0 pending/0 conflicts, exit 0을 반환했다. worktree-relative `.venv`로 먼저 호출한 시도는 command-not-found로 도구가 시작되지 않아 절대 경로 프로젝트 interpreter로 재실행했다.
 - 이후 History 문구 수정으로 1건 pending이 생긴 것을 00:40:09 KST에 다시 apply/check했다. 1 file exported, 모든 destination hash 일치, 1474 managed/0 pending/0 conflicts; 두 명령 exit 0.
+
+### Clean integration commit run
+
+- Clean integration candidate SHA `827777e446ec466019b1b3ebb27ed8573a799b86`에서 2026-09-22 00:43:36 KST에 위 PG command를 다시 실행했다. Provenance는 clean worktree, Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Windows 11, executor Codex, `INV_TEST_ADMIN_DSN=set`, Docker present를 기록했다. Result exit 0: `5 passed, 13 warnings in 6.59s`.
+- 소유 자원은 `sv-codex-write-responses-pg-7dbd6d2589b0471a802d161d68eae2e1`, label `ai.saintvision.owner=codex`, `ai.saintvision.write-response-test=codex-write-responses-7dbd6d2589b0471a802d161d68eae2e1`였다. PostgreSQL 16 data directory는 tmpfs, host binding은 `127.0.0.1`의 임시 포트였다. Docker daemon container count는 48→49→48. label/ID를 재확인해 제거했고 이후 `docker ps -aq --no-trunc --filter id=<id>`에서 absent를 확인했다.
+- 실행 중 provenance의 cached remote ref는 `34ef753e3853e661f59e0867688719cf2a360f2f`로 1 commit 앞서 있었다. 이후 `git diff 827777e..34ef753`에서 변경이 Claude History 문서 2개에만 있음을 확인했고, backend/service/API는 변하지 않았다. 로컬을 그 tip에 fast-forward했다. 따라서 위 실행은 실제 착지 코드 SHA에서 clean tree로 실행됐으며, current integration tip과의 차이는 문서뿐이다.
+- 앞선 PG launcher 시도 중 한 번은 cleanup의 예상 no-such-object 확인이 PowerShell 오류로 처리되어 최종 pytest report를 확보하지 못해 증거에서 제외했다. 다음 시도는 published-port 조회 문제로 setup exit 2였고 시험은 시작하지 않았다. port binding을 별도 probe로 확인하고 위 clean run에서 최종 판정했다. 각 시도 후 해당 고유 컨테이너가 없어졌고 daemon count는 48로 복귀했다.
 
 ## 판정과 남은 범위
 
