@@ -504,12 +504,14 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
                     color:
                       node.status === 'online'
                         ? 'var(--color-status-online)'
+                        : node.status === 'active'
+                        ? '#38bdf8'
                         : node.status === 'degraded' || node.status === 'unknown'
                         ? '#d29922'
                         : 'var(--color-status-offline)',
                   }}
                 >
-                  ● {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
+                  ● {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
                 </span>
               </div>
             ))}

@@ -47,10 +47,10 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     try {
       const prjId = projectId.trim();
       const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
-      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'PASS';
-      if (res.sealed && res.output?.sha256) {
+      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'UNVERIFIED';
+      if (res.output?.verified === true) {
         integrityStatus = 'PASS';
-      } else if (res.outputAbsentReason) {
+      } else if (res.output?.verified === false || res.outputAbsentReason || res.state === 'failed') {
         integrityStatus = 'FAIL';
       } else {
         integrityStatus = 'UNVERIFIED';
@@ -233,6 +233,32 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               </Button>
             </div>
           </div>
+
+          {/* Unverified explanation banner when sealed & hash exist but verified is not true */}
+          {evidenceData.integrityVerification === 'UNVERIFIED' && (
+            <div
+              data-testid="evidence-unverified-notice"
+              style={{
+                marginBottom: '16px',
+                padding: '10px 14px',
+                backgroundColor: 'rgba(234, 179, 8, 0.08)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid rgba(234, 179, 8, 0.3)',
+                fontSize: '0.8125rem',
+                color: '#d97706',
+              }}
+            >
+              {evidenceData.manifestDigest && evidenceData.immutable ? (
+                <span>
+                  ℹ️ <strong>봉인 및 해시 계산 완료 (SEALED):</strong> 출력 해시(SHA-256)가 계산되고 실행이 봉인되었으나, 독립적 암호학적 대조(verified)가 수행되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 표기됩니다. (해시 존재 ≠ 무결성 검증 통과)
+                </span>
+              ) : (
+                <span>
+                  ⚠️ 출력 검증 정보가 확인되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 유지됩니다.
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Static System Architecture Policy Specifications (Design Requirements, Not Per-Run Dynamic Tests) */}
           <div

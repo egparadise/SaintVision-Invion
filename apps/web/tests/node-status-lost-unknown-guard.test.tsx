@@ -31,11 +31,11 @@ describe('Node Status: Lost & Unknown Guard (조용한 합류 둔갑 차단)', (
       expect(mapped.schedulable).toBe(false);
     });
 
-    it('백엔드의 미정합 어휘(active)를 조용히 enrolling으로 바꾸지 않고 unknown으로 명시한다', () => {
+    it('백엔드 계약의 정상 가동 노드(active)를 unknown으로 버리지 않고 active로 정확히 인식한다', () => {
       const rawActive = {
         nodeId: 'nod_pacs_worker_active_01',
         hostname: 'pacs-worker-active-01',
-        status: 'active', // 백엔드 DB CHECK 어휘이나 화면이 아직 어휘 정합 전인 미지의 상태
+        status: 'active', // 백엔드 NodeResponse 정본 계약 5대 상태 중 하나
         os: 'linux',
         heartbeatAt: '2026-09-22T03:00:00Z',
         cpuCores: 16,
@@ -44,14 +44,14 @@ describe('Node Status: Lost & Unknown Guard (조용한 합류 둔갑 차단)', (
         memoryUsedBytes: 24000000000,
         storageTotalBytes: 2199023255552,
         storageUsedBytes: 500000000000,
-        gpuCount: 1,
+        gpuCount: 0,
       };
 
       const mapped = observedNode(rawActive);
-      expect(mapped.status).toBe('unknown');
+      expect(mapped.status).toBe('active');
+      expect(mapped.status).not.toBe('unknown');
       expect(mapped.status).not.toBe('enrolling');
-      expect(mapped.telemetryUnavailable).toBe(true);
-      expect(mapped.schedulable).toBe(false);
+      expect(mapped.telemetryUnavailable).toBe(false);
     });
 
     it('임의의 알 수 없는 상태도 그럴듯하게 enrolling으로 꾸미지 않고 unknown으로 매핑한다', () => {
@@ -145,11 +145,45 @@ describe('Node Status: Lost & Unknown Guard (조용한 합류 둔갑 차단)', (
       expect(card?.textContent).toContain('통신이 두절되어 상태가 유실(Lost)되었습니다');
     });
 
+    it('active 노드를 렌더링할 때 unknown으로 위장하지 않고 [ACTIVE (활성 · 헬스 미결정)]과 정책 결정 대기 고지를 표출한다', async () => {
+      const activeNode = observedNode({
+        nodeId: 'nod_active_01',
+        hostname: 'active-production-node',
+        status: 'active', // 백엔드 NodeResponse 정본 계약 5대 상태 중 하나
+        os: 'linux',
+        heartbeatAt: '2026-09-22T03:00:00Z',
+        cpuCores: 16,
+        cpuUsagePercent: 50,
+        memoryTotalBytes: 68719476736,
+        memoryUsedBytes: 30000000000,
+        storageTotalBytes: 2199023255552,
+        storageUsedBytes: 500000000000,
+        gpuCount: 0,
+      });
+
+      await act(async () => {
+        root.render(<NodeList nodes={[activeNode]} />);
+      });
+
+      const card = container.querySelector('[data-testid="node-card-nod_active_01"]');
+      expect(card).not.toBeNull();
+
+      const badge = container.querySelector('[data-testid="node-status-badge-nod_active_01"]');
+      expect(badge?.textContent).toContain('ACTIVE (활성 · 헬스 미결정)');
+      expect(badge?.textContent).not.toContain('ENROLLING');
+      expect(badge?.textContent).not.toContain('합류 중');
+      expect(badge?.textContent).not.toContain('UNKNOWN');
+
+      const notice = container.querySelector('[data-testid="node-active-status-notice-nod_active_01"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.textContent).toContain('계약 상태: active (정상 가동 노드 · liveness 및 헬스 초록 표기 정책은 사용자 결정 대기 중)');
+    });
+
     it('unknown 노드를 렌더링할 때 합류 중으로 위장하지 않고 [UNKNOWN (미확인)]과 조용한 합류 둔갑 차단 고지를 표출한다', async () => {
       const unknownNode = observedNode({
-        nodeId: 'nod_active_01',
-        hostname: 'active-unmapped-node',
-        status: 'active', // 아직 어휘 정합 전인 미지의 상태
+        nodeId: 'nod_unknown_01',
+        hostname: 'unknown-unmapped-node',
+        status: 'unrecognized_future_state', // 계약에도 없고 뷰에도 없는 진짜 미지의 상태
         os: 'linux',
         heartbeatAt: '2026-09-22T03:00:00Z',
         cpuCores: 16,
@@ -165,14 +199,15 @@ describe('Node Status: Lost & Unknown Guard (조용한 합류 둔갑 차단)', (
         root.render(<NodeList nodes={[unknownNode]} />);
       });
 
-      const card = container.querySelector('[data-testid="node-card-nod_active_01"]');
+      const card = container.querySelector('[data-testid="node-card-nod_unknown_01"]');
       expect(card).not.toBeNull();
       expect(card?.getAttribute('role')).toBe('status');
 
-      const badge = container.querySelector('[data-testid="node-status-badge-nod_active_01"]');
+      const badge = container.querySelector('[data-testid="node-status-badge-nod_unknown_01"]');
       expect(badge?.textContent).toContain('UNKNOWN (미확인)');
       expect(badge?.textContent).not.toContain('ENROLLING');
       expect(badge?.textContent).not.toContain('합류 중');
+      expect(badge?.textContent).not.toContain('ACTIVE');
 
       expect(card?.textContent).toContain('서버에서 관측된 노드 상태를 화면에서 해석할 수 없습니다');
       expect(card?.textContent).toContain('조용한 합류 둔갑 차단');

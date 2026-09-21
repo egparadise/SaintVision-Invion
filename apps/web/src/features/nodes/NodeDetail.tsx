@@ -203,11 +203,13 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
             <div>
               [{new Date(node.heartbeatAt).toLocaleTimeString()}]{' '}
               <span style={{
-                color: node.status === 'online' ? '#3fb950' : node.status === 'degraded' || node.status === 'unknown' ? '#d29922' : '#f85149',
+                color: node.status === 'online' ? '#3fb950' : node.status === 'active' ? '#38bdf8' : node.status === 'degraded' || node.status === 'unknown' ? '#d29922' : '#f85149',
                 fontWeight: 600
               }}>
                 {node.status === 'online'
                   ? 'Heartbeat OK'
+                  : node.status === 'active'
+                  ? 'Heartbeat ACTIVE (계약 상태 · 헬스 미결정)'
                   : node.status === 'degraded'
                   ? 'Heartbeat Warning (Degraded)'
                   : node.status === 'lost'
@@ -217,10 +219,10 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({ node, onBack, onOpenStud
                   : 'Heartbeat FAILED (Offline)'}
               </span>{' '}
               - CPU {node.cpuUsagePercent}% | RAM {((node.memoryUsedBytes / node.memoryTotalBytes) * 100).toFixed(0)}%
-              {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} ({node.status === 'online' ? 'mTLS 텔레메트리 수신' : '통신 상태 확인 필요'})
+              {node.gpuCount > 0 ? ` | GPU ${node.gpuVramUsedBytes && node.gpuVramTotalBytes ? ((node.gpuVramUsedBytes / node.gpuVramTotalBytes) * 100).toFixed(0) : 0}%` : ''} ({node.status === 'online' ? 'mTLS 텔레메트리 수신' : node.status === 'active' ? '계약 상태 active 수신' : '통신 상태 확인 필요'})
             </div>
             <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.6875rem' }}>
-              • 상태: <strong>{node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음
+              • 상태: <strong>{node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}</strong> | 하트비트 원본 시각: {node.heartbeatAt} | 모의 지터: 없음
             </div>
           </div>
         </div>

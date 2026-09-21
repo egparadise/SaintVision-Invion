@@ -38,6 +38,7 @@ export type NodeStatus =
   | 'enrolling'
   | 'retired'
   | 'lost'
+  | 'active'
   | 'unknown';
 
 /** Canonical server error envelope; never maintain a parallel hand-written wire shape. */

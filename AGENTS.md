@@ -59,6 +59,7 @@
 - `pytest tests/core/test_serving_anchors.py`(backend/core 스위트가 수집) — 커널 응답 서빙앵커 무게. **게이트**.
 - `python tools/check_doc_single_source.py --ratchet` — 살아있는 문서 간 중복(rule5 분기). **ratchet**(새 중복만 막고 기존 백로그는 통과; 기본 실행은 report-only).
 - `python tools/check_response_freshness.py` — 신선도-중요 응답의 관측시각 필드 유무. **report-only**(안 막음 → `$GITHUB_STEP_SUMMARY`로 봄).
+- `pytest tests/test_route_coverage.py` — 화면-백엔드 라우트 커버리지 및 EvidenceViewer 무결성 불변식(허위 PASS 차단·verified 게이트 등). **게이트**.
 
 검증 검사 도구 **전체 목록**(무엇을·게이트등급·실행법·실패 시 대응)은 `docs/vault/40_Governance/검증검사도구_목록.md`. 검증 규칙·축 정본은 `docs/vault/40_Governance/검증규칙과_세축_canon.md`.
 

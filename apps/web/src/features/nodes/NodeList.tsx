@@ -207,25 +207,27 @@ export const NodeList: React.FC<NodeListProps> = ({
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    color: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-text-muted)',
+                    color: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-text-muted)',
                     backgroundColor: 'var(--color-bg-subtle)',
-                    border: `1px solid ${node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-border-subtle)'}`,
+                    border: `1px solid ${node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-border-subtle)'}`,
                   }}
                 >
                   <span style={{
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : 'var(--color-text-muted)',
+                    backgroundColor: node.status === 'lost' ? '#f85149' : node.status === 'unknown' ? '#d29922' : node.status === 'active' ? '#38bdf8' : 'var(--color-text-muted)',
                   }} />
-                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
+                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : 'var(--color-text-muted)', lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : node.status === 'active' ? '#7dd3fc' : 'var(--color-text-muted)', lineHeight: 1.4 }}>
                 {node.status === 'lost'
                   ? '🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다. 제어 평면 연결이 끊어졌으므로 즉시 인프라 점검이 필요합니다.'
                   : node.status === 'unknown'
                   ? '⚠️ 서버에서 관측된 노드 상태를 화면에서 해석할 수 없습니다 (미확인 상태 · 조용한 합류 둔갑 차단).'
+                  : node.status === 'active'
+                  ? 'ℹ️ 계약 상태: active (정상 가동 노드 · liveness 및 헬스 초록 표기 정책은 사용자 결정 대기 중).'
                   : '자원 정보 미관측 · 실행 대상에서 제외'}
               </p>
             </div>
@@ -234,6 +236,8 @@ export const NodeList: React.FC<NodeListProps> = ({
           const statusColor =
             node.status === 'online'
               ? 'var(--color-status-online)'
+              : node.status === 'active'
+              ? '#38bdf8'
               : node.status === 'degraded'
               ? 'var(--color-status-degraded)'
               : node.status === 'lost'
@@ -250,6 +254,7 @@ export const NodeList: React.FC<NodeListProps> = ({
           return (
             <div
               key={node.id}
+              data-testid={`node-card-${node.id}`}
               onClick={() => onSelectNode?.(node.id)}
               style={{
                 padding: '20px',
@@ -270,6 +275,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                 </div>
 
                 <span
+                  data-testid={`node-status-badge-${node.id}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -284,7 +290,7 @@ export const NodeList: React.FC<NodeListProps> = ({
                   }}
                 >
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: statusColor }} />
-                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status.toUpperCase()}
+                  {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
                 </span>
               </div>
 
@@ -341,6 +347,25 @@ export const NodeList: React.FC<NodeListProps> = ({
                   }}
                 >
                   ⚠️ 관측 전용 (192.168.45.225 - 원격 프로필 미설치)
+                </div>
+              )}
+
+              {node.status === 'active' && (
+                <div
+                  role="status"
+                  data-testid={`node-active-status-notice-${node.id}`}
+                  style={{
+                    marginTop: '8px',
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    color: '#38bdf8',
+                    fontSize: '0.6875rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  ℹ️ 계약 상태: active (정상 가동 노드 · liveness 및 헬스 초록 표기 정책은 사용자 결정 대기 중)
                 </div>
               )}
 

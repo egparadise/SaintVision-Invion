@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.99"
+version: "1.0.100"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:33:00+09:00"
+updated: "2026-09-22T04:42:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:33:00+09:00.
+- 확인 기준: 2026-09-22T04:42:00+09:00.
+
+## 세션 랩업: NodeResponse active 계약 인식 및 EvidenceViewer 허위 PASS 차단·verified 게이트 복구
+
+- **NodeResponse.status 5대 계약 어휘 전수 대조 및 active 정합**:
+  - 백엔드 DB CHECK 계약 5대 상태(`enrolling`, `active`, `draining`, `lost`, `retired`) 중 화면이 못 알아보던 상태 전수 대조 결과: **정확히 1개(`active`)**.
+  - `active`를 미지(`unknown`)로 버리지 않고 정본 계약 상태로 인식(`types.ts`, `nodeObservation.ts`).
+  - 사용자의 건강함(초록색) 정책 결정 대기 상태를 앞지르지 않고, 중립 청록색(`#38bdf8`) 뱃지(`ACTIVE (활성 · 헬스 미결정)`) 및 안내 배너(`data-testid="node-active-status-notice-..."`)로 정직하게 고지.
+  - 실제 Google Chrome 153 브라우저 E2E 실측 통과 및 스크린샷 획득 (`scratch/real_chrome_active_node_status.png`).
+- **EvidenceViewer 허위 PASS 결함 치유 및 verified 게이트 복구**:
+  - `tests/test_route_coverage.py`의 `test_evidence_viewer_integrity_contract_invariants` 실패 원인 규명: Truth Time 작업(`597ef148`) 당시 `integrityStatus` 기본값이 `'PASS'`로 들어가고 `sealed && sha256`만으로 `PASS`를 판정하던 암호학적 가드 누락 결함 치유.
+  - 기본값을 `UNVERIFIED`로 변경하고, 오직 `res.output?.verified === true`일 때만 `PASS`로 승격.
+  - 봉인 및 해시 계산 완료되었으나 암호학적 대조가 미수행된 상태에 대한 정직한 설명 배너(`data-testid="evidence-unverified-notice"`) 표출.
+  - 파이썬 회귀 시험(`pytest tests/test_route_coverage.py`) **30/30 passed** 실측.
+  - Vitest DOM 가드 테스트(`apps/web/tests/evidence-viewer-integrity-guard.test.tsx`, 3/3 passed) 신설.
+- **거버넌스 및 규칙 반영**:
+  - `GEMINI.md`, `AGENTS.md`, `검증검사도구_목록.md`: 화면 변경 시 파이썬 회귀 시험(`pytest tests/test_route_coverage.py`) 필수 게이트화.
+- **게이트 통과 실측**:
+  - `pytest tests/test_route_coverage.py`: 30 passed in 1.05s.
+  - `npx tsc -b`: exit code 0 (오류 0건).
+  - Vitest **75개 파일 652/652 passed 100%** (순증 +1 파일, +4 passed).
+  - `npm run build`: Vite 번들 성공 (3.73s).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 46 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: PASS.
+  - `check_doc_single_source.py --ratchet`: PASS.
+- 보고서: [[2026-09-22_NodeResponse_active_상태인식_및_EvidenceViewer_무결성PASS_가드복구_Gemini]].
+
 
 ## 세션 랩업: WorkspaceItem 잉여 어휘 소거 및 WorkspaceList 5대 상태 정직화와 Chrome 153 실측 수용
 
