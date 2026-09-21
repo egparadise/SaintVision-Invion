@@ -1,14 +1,16 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.72"
+version: "1.0.74"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T10:32:00+09:00"
+updated: "2026-09-21T10:46:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+2026-09-21 UI-FB fixed-SHA 경계 재검토: Gemini 구현 `c6dc915`에 대해 Vitest 322 및 route coverage 28 통과를 확인하고 네 가지 FB-01 되돌림 대조를 수행했다. 유령 초기값 복원은 기존 idle 시험을 실패시켰지만 catch에서 목록 비우기 제거, 빈 응답 회귀 복원, error 상태 guard 제거는 26/26 통과했다. 이 공백과 FB-02 local eligible 문구, FB-03 Output Verified 표시, 오류 배너 접근성 및 실제 component fetch 분기 시험 부족을 finding으로 기록했다. 구현 owner Gemini; Codex 승인 대기. 상세 및 실행 범위: [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 
 2026-09-21 이어서 실행: tip `08f2a4d`에서 `.venv\\Scripts\\python.exe -m pytest -q tests/ --ignore=tests/integration -m "not docker_host"` 결과 **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초, exit 0. 별도 PostgreSQL DSN은 없고 Docker 사전관측 가용 RAM 788MB라 이번에는 disposable DB를 띄우지 않았다. 두 integration 파일의 66개 환경 skip은 미실행 유지. 다음: 격리 DB와 충분한 자원 조건에서만 해당 통합군 재개. 상세: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 

@@ -34,6 +34,14 @@ export interface ResourceExplorerProps {
   initialTab?: 'overview' | 'storage' | 'pools' | 'nodes' | 'discovery';
   onSelectNode?: (nodeId: string) => void;
   onOpenTerminal?: (nodeId: string) => void;
+  initialCandidates?: DiscoveryCandidate[];
+  initialCandidatesState?: 'idle' | 'loading' | 'success' | 'error';
+  initialCandidatesError?: string | null;
+  initialPoolCapacity?: PoolCapacity | null;
+  initialPoolCapacityState?: 'idle' | 'loading' | 'success' | 'error';
+  initialPoolCapacityError?: string | null;
+  initialNodeDetail?: NodeDetailResponse | null;
+  initialNodeDetailError?: string | null;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
@@ -41,6 +49,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   initialTab = 'overview',
   onSelectNode,
   onOpenTerminal,
+  initialCandidates,
+  initialCandidatesState,
+  initialCandidatesError,
+  initialPoolCapacity,
+  initialPoolCapacityState,
+  initialPoolCapacityError,
+  initialNodeDetail,
+  initialNodeDetailError,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'storage' | 'pools' | 'nodes' | 'discovery'>(initialTab);
   const [filterMode, setFilterMode] = useState<'all' | 'schedulable' | 'gpu' | 'observe'>('all');
@@ -52,6 +68,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [contributions, setContributions] = useState<StorageContribution[]>([]);
   const [locations, setLocations] = useState<StorageLocation[]>([]);
   const [isLoadingStorage, setIsLoadingStorage] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const [storageMessage, setStorageMessage] = useState<string | null>(null);
   const [newContribPath, setNewContribPath] = useState('C:\\SaintVision\\StorageData');
   const [newContribNode, setNewContribNode] = useState(nodes[0]?.id || '');
@@ -62,7 +79,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   // 2. Pools State
   // ---------------------------------------------------------------------------
   const [selectedPoolId, setSelectedPoolId] = useState('pool-default');
-  const [poolCapacity, setPoolCapacity] = useState<PoolCapacity | null>(null);
+  const [poolCapacity, setPoolCapacity] = useState<PoolCapacity | null>(initialPoolCapacity || null);
+  const [poolCapacityState, setPoolCapacityState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolCapacityState || 'idle');
+  const [poolCapacityError, setPoolCapacityError] = useState<string | null>(initialPoolCapacityError || null);
   const [poolMembers, setPoolMembers] = useState<string[]>(['nod_01JABCDEF01', 'nod_01JABCDEF02']);
   const [memberNodeToAdd, setMemberNodeToAdd] = useState(nodes[0]?.id || '');
   const [placementReq, setPlacementReq] = useState({ cpuMillicores: 2000, ramBytes: 4 * 1024 ** 3, gpuDevices: 1 });
@@ -76,32 +95,18 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   // ---------------------------------------------------------------------------
   // 3. Nodes Telemetry & Liveness State
   // ---------------------------------------------------------------------------
-  const [nodeDetail, setNodeDetail] = useState<NodeDetailResponse | null>(null);
+  const [nodeDetail, setNodeDetail] = useState<NodeDetailResponse | null>(initialNodeDetail || null);
   const [isLoadingNodeDetail, setIsLoadingNodeDetail] = useState(false);
+  const [nodeDetailError, setNodeDetailError] = useState<string | null>(initialNodeDetailError || null);
   const [heartbeatSeq, setHeartbeatSeq] = useState(1);
   const [livenessMessage, setLivenessMessage] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
-  // 4. Discovery State
+  // 4. Discovery State (Truthful zero-mock initialization: empty array by default)
   // ---------------------------------------------------------------------------
-  const [candidates, setCandidates] = useState<DiscoveryCandidate[]>([
-    {
-      announcementId: 'ann_node06_unverified',
-      sourceIp: '192.168.45.226',
-      claimedInstanceId: 'inst_node06',
-      claimedHostname: 'Node-06-EdgeWorker',
-      claimedOsType: 'linux',
-      claimedOsVersion: 'Ubuntu 24.04 LTS',
-      claimedAgentVersion: '0.1.0',
-      claimedCpuCores: 8,
-      claimedRamBytes: 32 * 1024 ** 3,
-      claimedGpuCount: 0,
-      claimedLabels: { role: 'edge', zone: 'internal' },
-      verified: false,
-      state: 'pending',
-      announcedAt: new Date().toISOString(),
-    },
-  ]);
+  const [candidates, setCandidates] = useState<DiscoveryCandidate[]>(initialCandidates || []);
+  const [candidatesState, setCandidatesState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialCandidatesState || 'idle');
+  const [candidatesError, setCandidatesError] = useState<string | null>(initialCandidatesError || null);
   const [admissionResult, setAdmissionResult] = useState<AdmissionResponse | null>(null);
   const [announcementHostname, setAnnouncementHostname] = useState('Node-07-Candidate');
   const [announcementOs, setAnnouncementOs] = useState<'windows' | 'linux'>('windows');
@@ -186,79 +191,62 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
   const loadStorage = useCallback(async () => {
     setIsLoadingStorage(true);
+    setStorageError(null);
     try {
       const [contribRes, locRes] = await Promise.all([
-        getStorageContributions().catch(() => ({ items: [], nextCursor: null })),
-        getStorageLocations().catch(() => ({ items: [], nextCursor: null })),
+        getStorageContributions(),
+        getStorageLocations(),
       ]);
-      setContributions(contribRes.items);
-      setLocations(locRes.items);
-    } catch {
-      // Fallback state
+      setContributions(contribRes?.items || []);
+      setLocations(locRes?.items || []);
+    } catch (err: any) {
+      setContributions([]);
+      setLocations([]);
+      setStorageError(err?.message || '스토리지 백엔드에 연결할 수 없습니다. (오프라인 또는 오류)');
     } finally {
       setIsLoadingStorage(false);
     }
   }, []);
 
   const loadPoolData = useCallback(async (poolId: string) => {
+    setPoolCapacityState('loading');
+    setPoolCapacityError(null);
     try {
       const cap = await getPoolCapacity(poolId);
       setPoolCapacity(cap);
-    } catch {
-      // Set sensible fallback for UI demonstration
-      setPoolCapacity({
-        totalOffered: { cpuMillicores: 48000, ramBytes: 192 * 1024 ** 3, gpuDevices: 3 },
-        largestSingleNode: { cpuMillicores: 16000, ramBytes: 64 * 1024 ** 3, gpuDevices: 1 },
-        spareNow: { cpuMillicores: 32000, ramBytes: 120 * 1024 ** 3, gpuDevices: 2 },
-        units: { cpu: 'millicores', ram: 'bytes', gpu: 'devices' },
-      });
+      setPoolCapacityState('success');
+    } catch (err: any) {
+      setPoolCapacity(null);
+      setPoolCapacityError(err?.message || `자원 풀 '${poolId}'의 용량 정보를 조회할 수 없습니다. (오프라인 또는 오류)`);
+      setPoolCapacityState('error');
     }
   }, []);
 
   const loadNodeDetailData = useCallback(async (nodeId: string) => {
     setIsLoadingNodeDetail(true);
+    setNodeDetailError(null);
     try {
       const detail = await getNodeDetail(nodeId);
       setNodeDetail(detail);
-    } catch {
-      // Fallback from nodes prop
-      const n = nodes.find((x) => x.id === nodeId);
-      if (n) {
-        setNodeDetail({
-          node: {
-            nodeId: n.id,
-            hostname: n.hostname,
-            osType: n.os,
-            osVersion: 'Canonical',
-            agentVersion: '0.1.0',
-            status: n.status,
-            enrolledAt: new Date().toISOString(),
-            lastHeartbeatAt: n.heartbeatAt || new Date().toISOString(),
-            heartbeatSequence: 10,
-            labels: { env: 'production', role: n.observationOnly ? 'observation' : 'compute' },
-          },
-          capabilities: [
-            { capabilityId: 'cap_cpu', kind: 'cpu', deviceIndex: null, vendor: 'AMD/Intel', model: 'x86_64', totalQuantity: n.cpuCores, unit: 'cores', divisible: true },
-            { capabilityId: 'cap_ram', kind: 'ram', deviceIndex: null, vendor: 'DDR4/DDR5', model: 'Memory', totalQuantity: n.memoryTotalBytes, unit: 'bytes', divisible: true },
-            ...(n.gpuCount > 0
-              ? [{ capabilityId: 'cap_gpu_0', kind: 'gpu', deviceIndex: 0, vendor: 'NVIDIA', model: n.gpuName || 'GPU', totalQuantity: 1, unit: 'devices', divisible: false }]
-              : []),
-          ],
-        });
-      }
+    } catch (err: any) {
+      setNodeDetail(null);
+      setNodeDetailError(err?.message || `노드 '${nodeId}'의 상세 및 역량 정보를 조회할 수 없습니다. (오프라인 또는 오류)`);
     } finally {
       setIsLoadingNodeDetail(false);
     }
-  }, [nodes]);
+  }, []);
 
   const loadDiscoveryCandidates = useCallback(async () => {
+    setCandidatesState('loading');
+    setCandidatesError(null);
     try {
       const res = await getDiscoveryCandidates();
-      if (res && Array.isArray(res.items) && res.items.length > 0) {
-        setCandidates(res.items);
-      }
-    } catch {
-      // Retain fallback candidates if backend offline
+      setCandidates(res?.items || []);
+      setCandidatesState('success');
+    } catch (err: any) {
+      setCandidates([]);
+      setCandidatesError(err?.message || '디스커버리 서비스에 연결할 수 없습니다. (오프라인 또는 오류)');
+      setCandidatesState('error');
     }
   }, []);
 
@@ -906,11 +894,39 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </button>
             </div>
 
-            {contributions.length === 0 ? (
-              <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1e293b', borderRadius: '8px', color: '#94a3b8', fontSize: '0.75rem' }}>
+            {storageError && (
+              <div
+                data-testid="storage-error-banner"
+                style={{
+                  padding: '12px 14px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid #ef4444',
+                  borderRadius: '6px',
+                  color: '#fca5a5',
+                  marginBottom: '10px',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 스토리지 정보 조회 실패</div>
+                <div style={{ marginTop: '2px' }}>{storageError}</div>
+                <button
+                  type="button"
+                  data-testid="storage-retry-btn"
+                  onClick={loadStorage}
+                  style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  재시도 (Retry)
+                </button>
+              </div>
+            )}
+
+            {!storageError && !isLoadingStorage && contributions.length === 0 && (
+              <div data-testid="storage-empty-state" style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1e293b', borderRadius: '8px', color: '#94a3b8', fontSize: '0.75rem' }}>
                 등록된 스토리지 기여가 없습니다. 상단 폼에서 폴더를 기여하세요.
               </div>
-            ) : (
+            )}
+
+            {!storageError && contributions.length > 0 && (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', backgroundColor: '#1e293b', borderRadius: '8px', overflow: 'hidden' }}>
                 <thead>
                   <tr style={{ backgroundColor: 'rgba(0,0,0,0.3)', textAlign: 'left', color: '#94a3b8' }}>
@@ -1015,7 +1031,28 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               </div>
             </div>
 
-            {poolCapacity && (
+            {poolCapacityState === 'loading' && (
+              <div data-testid="pool-capacity-loading" style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
+                자원 풀 용량 정보를 조회 중입니다...
+              </div>
+            )}
+
+            {poolCapacityState === 'error' && (
+              <div data-testid="pool-capacity-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#fca5a5' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 자원 풀 용량 조회 실패</div>
+                <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{poolCapacityError}</div>
+                <button
+                  type="button"
+                  data-testid="pool-capacity-retry"
+                  onClick={() => loadPoolData(selectedPoolId)}
+                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  재시도 (Retry)
+                </button>
+              </div>
+            )}
+
+            {poolCapacity && poolCapacityState !== 'error' && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                 <div style={{ padding: '10px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
                   <div style={{ fontSize: '0.6875rem', color: '#94a3b8' }}>총 제공량 (Total Offered)</div>
@@ -1234,7 +1271,30 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           </div>
 
           {/* Detailed Hardware Capabilities */}
-          {nodeDetail && (
+          {isLoadingNodeDetail && (
+            <div data-testid="node-detail-loading" style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155', color: '#94a3b8', textAlign: 'center' }}>
+              노드 상세 정보를 조회 중입니다...
+            </div>
+          )}
+
+          {nodeDetailError && !isLoadingNodeDetail && (
+            <div data-testid="node-detail-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 노드 상세 정보 조회 실패</div>
+              <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{nodeDetailError}</div>
+              {selectedNodeId && (
+                <button
+                  type="button"
+                  data-testid="node-detail-retry"
+                  onClick={() => loadNodeDetailData(selectedNodeId)}
+                  style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  재시도 (Retry)
+                </button>
+              )}
+            </div>
+          )}
+
+          {nodeDetail && !nodeDetailError && (
             <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
                 🔍 노드 상세 및 자원 역량 (GET /v1/nodes/{nodeDetail.node.nodeId}) {isLoadingNodeDetail && <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>(조회 중...)</span>}
@@ -1337,8 +1397,42 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
               * 모든 claimed* 수치는 머신 자체 보고값이며 미검증 상태(verified: false)입니다.
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
-              {candidates.map((cand) => (
+            {candidatesState === 'loading' && (
+              <div data-testid="discovery-loading" style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+                디스커버리 후보 목록을 조회하는 중입니다...
+              </div>
+            )}
+
+            {candidatesState === 'error' && (
+              <div data-testid="discovery-error-banner" style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 디스커버리 서비스 연결 오류</div>
+                <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{candidatesError}</div>
+                <button
+                  type="button"
+                  data-testid="discovery-retry-btn"
+                  onClick={loadDiscoveryCandidates}
+                  style={{ marginTop: '10px', padding: '6px 12px', fontSize: '0.75rem', backgroundColor: '#334155', color: '#f8fafc', border: '1px solid #475569', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  재시도 (Retry)
+                </button>
+              </div>
+            )}
+
+            {candidatesState === 'idle' && (
+              <div data-testid="discovery-idle-state" style={{ padding: '20px', textAlign: 'center', color: '#64748b', backgroundColor: '#1e293b', borderRadius: '8px' }}>
+                디스커버리 후보 조회가 대기 상태입니다.
+              </div>
+            )}
+
+            {candidatesState === 'success' && candidates.length === 0 && (
+              <div data-testid="discovery-empty-state" style={{ padding: '24px', textAlign: 'center', color: '#64748b', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px dashed #334155' }}>
+                ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다.
+              </div>
+            )}
+
+            {candidatesState !== 'error' && candidates.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
+                {candidates.map((cand) => (
                 <div key={cand.announcementId} style={{ padding: '14px', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
@@ -1394,6 +1488,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 </div>
               ))}
             </div>
+          )}
           </div>
         </div>
       )}

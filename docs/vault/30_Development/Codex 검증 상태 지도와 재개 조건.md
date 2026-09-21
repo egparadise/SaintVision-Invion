@@ -1,15 +1,17 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.6"
+version: "1.5.8"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T10:31:00+09:00"
+updated: "2026-09-21T10:46:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+2026-09-21 UI-FB 구현 `c6dc915` 경계 재검토: 세 컴포넌트의 방향과 작성자 회귀시험은 확인했고 Vitest 322/route coverage 28이 통과한다. 다만 fetch→render 전이를 실제 실행하지 않는 SSR 시험 및 되돌림 대조 3건 통과, 오류 알림 접근성, PlacementSimulator local eligible 인상, DeveloperStudio `currentRun.succeeded`만으로 `Output Verified`를 표시하는 잔여가 있다. UI-FB 독립 검토 pending. Gemini가 finding을 수정한 고정 SHA에서 재개한다. [[2026-09-21_UI_FB_contract_readiness_review_Codex]]
 
 2026-09-21 재개 관측: tip `08f2a4d` 기본 비통합·비Dockerhost 회귀 **1324 passed / 489 skipped / 2 deselected / 0 failed**, 105.48초. 별도 PG DSN 없음, Docker daemon은 응답했으나 가용 RAM 788MB라 새 disposable DB를 시작하지 않음. integration의 66 skip은 Windows Linux-backend 및 PostgreSQL 선행조건 미충족으로 미실행이다. 이후 해당 선행조건이 충족된 격리 환경에서만 재개한다. 상세: [[2026-09-19_pytest_skip_baseexception_assertion_boundary_Codex]].
 

@@ -7,6 +7,15 @@ import { PlacementExplainView } from './PlacementExplainView';
 
 export interface PlacementSimulatorProps {
   nodes: NodeItem[];
+  initialPools?: PoolItem[];
+  initialPoolsState?: 'idle' | 'loading' | 'success' | 'error';
+  initialPoolsError?: string | null;
+  initialPreviewState?: 'idle' | 'loading' | 'success' | 'error';
+  initialPreviewError?: string | null;
+  initialServerShards?: ShardItem[];
+  initialCandidates?: CandidateItem[];
+  initialCandidatesState?: 'idle' | 'loading' | 'success' | 'error';
+  initialCandidatesError?: string | null;
 }
 
 interface PoolItem {
@@ -39,7 +48,18 @@ interface ShardItem {
   status: string;
 }
 
-export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes }) => {
+export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
+  nodes,
+  initialPools,
+  initialPoolsState,
+  initialPoolsError,
+  initialPreviewState,
+  initialPreviewError,
+  initialServerShards,
+  initialCandidates,
+  initialCandidatesState,
+  initialCandidatesError,
+}) => {
   const [requiredCores, setRequiredCores] = useState<number>(4);
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
@@ -48,34 +68,58 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend state
-  const [pools, setPools] = useState<PoolItem[]>([]);
+  const [pools, setPools] = useState<PoolItem[]>(initialPools || []);
+  const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolsState || 'idle');
+  const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
+
   const [selectedPoolId, setSelectedPoolId] = useState<string>('pool_01_training');
-  const [candidates, setCandidates] = useState<CandidateItem[]>([]);
-  const [serverShards, setServerShards] = useState<ShardItem[]>([]);
+  const [candidates, setCandidates] = useState<CandidateItem[]>(initialCandidates || []);
+  const [candidatesState, setCandidatesState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialCandidatesState || 'idle');
+  const [candidatesError, setCandidatesError] = useState<string | null>(initialCandidatesError || null);
+
+  const [serverShards, setServerShards] = useState<ShardItem[]>(initialServerShards || []);
   const [serverExplanation, setServerExplanation] = useState<string | null>(null);
+  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPreviewState || 'idle');
+  const [previewError, setPreviewError] = useState<string | null>(initialPreviewError || null);
+
+  const loadPools = () => {
+    setPoolsState('loading');
+    setPoolsError(null);
+    apiClient<{ items: PoolItem[] }>('/v1/pools')
+      .then((res) => {
+        setPools(res.items || []);
+        setPoolsState('success');
+      })
+      .catch((err) => {
+        setPools([]);
+        setPoolsError(err?.message || '자원 풀 목록을 조회할 수 없습니다. (오프라인 또는 오류)');
+        setPoolsState('error');
+      });
+  };
+
+  const loadCandidates = () => {
+    setCandidatesState('loading');
+    setCandidatesError(null);
+    apiClient<{ items: CandidateItem[] }>('/v1/discovery/candidates')
+      .then((res) => {
+        setCandidates(res.items || []);
+        setCandidatesState('success');
+      })
+      .catch((err) => {
+        setCandidates([]);
+        setCandidatesError(err?.message || '디스커버리 후보 목록을 조회할 수 없습니다. (오프라인 또는 오류)');
+        setCandidatesState('error');
+      });
+  };
 
   // Fetch live resource pools & discovery candidates from backend
   useEffect(() => {
-    let isMounted = true;
-    apiClient<{ items: PoolItem[] }>('/v1/pools')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setPools(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/pools fetch fallback:', err));
-
-    apiClient<{ items: CandidateItem[] }>('/v1/discovery/candidates')
-      .then((res) => {
-        if (isMounted && res.items?.length > 0) {
-          setCandidates(res.items);
-        }
-      })
-      .catch((err) => console.warn('Live /v1/discovery/candidates fetch fallback:', err));
-
-    return () => {
-      isMounted = false;
-    };
+    if (initialPools === undefined && initialPoolsState === undefined) {
+      loadPools();
+    }
+    if (initialCandidates === undefined && initialCandidatesState === undefined) {
+      loadCandidates();
+    }
   }, []);
 
   const handleToggleFence = (nodeId: string) => {
@@ -106,9 +150,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
     [nodes, requirement, fencedNodeIds]
   );
 
-  // Request real placement preview from backend endpoint
-  useEffect(() => {
-    let isMounted = true;
+  const loadPlacementPreview = () => {
+    setPreviewState('loading');
+    setPreviewError(null);
     const query = new URLSearchParams({
       cpuMillicores: String(requirement.requiredCores * 1000),
       ramBytes: String(requirement.requiredMemoryBytes),
@@ -120,26 +164,33 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
       candidateCount: number;
     }>(`/v1/pools/${selectedPoolId}/placement-preview?${query.toString()}`)
       .then((res) => {
-        if (isMounted) {
-          setServerExplanation(`적격 노드 ${res.candidateCount}대 확인 (풀: ${res.poolId})`);
-          if (res.candidates) {
-            setServerShards(
-              res.candidates.map((c, idx) => ({
-                shardId: `shd_${selectedPoolId}_${idx + 1}`,
-                targetNodeId: c.nodeId || c.hostname,
-                status: c.eligible !== false ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
-              }))
-            );
-          }
+        setServerExplanation(`적격 노드 ${res.candidateCount}대 확인 (풀: ${res.poolId})`);
+        if (res.candidates) {
+          setServerShards(
+            res.candidates.map((c, idx) => ({
+              shardId: `shd_${selectedPoolId}_${idx + 1}`,
+              targetNodeId: c.nodeId || c.hostname,
+              status: c.eligible !== false ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
+            }))
+          );
+        } else {
+          setServerShards([]);
         }
+        setPreviewState('success');
       })
       .catch((err) => {
-        console.warn('Backend placement-preview fallback to deterministic engine:', err);
+        setServerShards([]);
+        setServerExplanation(null);
+        setPreviewError(err?.message || `서버 배치 미리보기 실패: 풀 '${selectedPoolId}' 연결 불가`);
+        setPreviewState('error');
       });
+  };
 
-    return () => {
-      isMounted = false;
-    };
+  // Request real placement preview from backend endpoint
+  useEffect(() => {
+    if (initialPreviewState === undefined) {
+      loadPlacementPreview();
+    }
   }, [requirement, selectedPoolId]);
 
   const activePool = pools.find((p) => p.id === selectedPoolId) || pools[0];
@@ -148,14 +199,61 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
   return (
     <div>
       <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>설명 가능한 자원 배치 시뮬레이터 (S05-FE)</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>설명 가능한 자원 배치 시뮬레이터 (S05-FE)</h2>
+          <span
+            data-testid="local-simulation-badge"
+            style={{
+              padding: '3px 8px',
+              borderRadius: '4px',
+              backgroundColor: 'rgba(234, 179, 8, 0.15)',
+              border: '1px solid rgba(234, 179, 8, 0.3)',
+              color: '#fbbf24',
+              fontSize: '0.6875rem',
+              fontWeight: 600,
+            }}
+          >
+            로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)
+          </span>
+        </div>
         <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
           5개 분산 노드 대상 Hard Filter 검사 및 다기준 가중치 산정에 따른 결정론적 자원 스케줄링 (AC-05)
         </p>
       </div>
 
       {/* Resource Pools & Live Capacity Section */}
-      {pools.length > 0 ? (
+      {poolsState === 'loading' && (
+        <div data-testid="pools-loading" style={{ padding: '16px', backgroundColor: 'var(--color-bg-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-subtle)', marginBottom: '20px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
+          자원 풀 목록을 조회 중입니다...
+        </div>
+      )}
+
+      {poolsState === 'error' && (
+        <div
+          data-testid="pools-error-banner"
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid #ef4444',
+            color: '#fca5a5',
+            marginBottom: '20px',
+          }}
+        >
+          <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 자원 풀 연동 실패</div>
+          <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{poolsError}</div>
+          <button
+            type="button"
+            data-testid="pools-retry-btn"
+            onClick={loadPools}
+            style={{ marginTop: '8px', padding: '4px 10px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            재시도 (Retry)
+          </button>
+        </div>
+      )}
+
+      {poolsState !== 'loading' && poolsState !== 'error' && pools.length > 0 && (
         <div
           style={{
             padding: '16px 20px',
@@ -215,7 +313,35 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
             </div>
           )}
         </div>
-      ) : (
+      )}
+
+      {poolsState === 'idle' && (
+        <div
+          data-testid="pools-idle-banner"
+          style={{
+            padding: '14px 18px',
+            backgroundColor: 'var(--color-bg-subtle)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px dashed var(--color-border-subtle)',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>ℹ️</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+              자원 풀 연동 대기 중입니다.
+            </span>
+          </div>
+          <span style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+            [로컬 결정론적 평가 (UNVERIFIED)]
+          </span>
+        </div>
+      )}
+
+      {poolsState === 'success' && pools.length === 0 && (
         <div
           data-testid="pools-fallback-banner"
           style={{
@@ -235,7 +361,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
               자원 풀 정보가 없습니다. 현재 관측된 노드 정보로 배치 가능성을 미리 평가합니다.
             </span>
           </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>로컬 결정론적 평가 활성</span>
+          <span style={{ fontSize: '0.75rem', color: '#fbbf24', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+            [로컬 결정론적 평가 (UNVERIFIED)]
+          </span>
         </div>
       )}
 
@@ -399,7 +527,51 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
           <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '12px' }}>
             분산 데이터 샤드 배치 상태 (/v1/pools/{selectedPoolId}/placement-preview)
           </h4>
-          {serverShards.length > 0 ? (
+          {previewState === 'loading' && (
+            <div data-testid="preview-loading" style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem' }}>
+              서버 배치 미리보기 조회 중...
+            </div>
+          )}
+
+          {previewState === 'error' && (
+            <div
+              data-testid="preview-error-banner"
+              style={{
+                padding: '12px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid #ef4444',
+                borderRadius: '6px',
+                color: '#fca5a5',
+                fontSize: '0.75rem',
+              }}
+            >
+              <div style={{ fontWeight: 600 }}>⚠️ 서버 배치 미리보기 실패</div>
+              <div style={{ marginTop: '2px' }}>{previewError}</div>
+              <div style={{ fontSize: '0.6875rem', color: '#f87171', marginTop: '4px' }}>
+                서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다.
+              </div>
+              <button
+                type="button"
+                data-testid="preview-retry-btn"
+                onClick={loadPlacementPreview}
+                style={{ marginTop: '8px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                재시도 (Retry)
+              </button>
+            </div>
+          )}
+
+          {previewState === 'idle' && (
+            <p data-testid="preview-idle-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+              서버 배치 미리보기 요청 대기 중입니다.
+            </p>
+          )}
+
+          {previewState === 'success' && serverShards.length === 0 && (
+            <p data-testid="preview-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>가용 샤드가 없습니다.</p>
+          )}
+
+          {previewState !== 'error' && serverShards.length > 0 && (
             <table style={{ width: '100%', fontSize: '0.8125rem', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left' }}>
@@ -418,8 +590,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
                 ))}
               </tbody>
             </table>
-          ) : (
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>샤드 계획 준비 중...</p>
           )}
         </div>
 
@@ -435,7 +605,50 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
           <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '12px' }}>
             자원 디스커버리 후보 목록 (/v1/discovery/candidates)
           </h4>
-          {candidates.length > 0 ? (
+          {candidatesState === 'loading' && (
+            <div data-testid="candidates-loading" style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem' }}>
+              디스커버리 후보 목록 조회 중...
+            </div>
+          )}
+
+          {candidatesState === 'idle' && (
+            <p data-testid="candidates-idle-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+              디스커버리 후보 목록 조회 대기 중입니다.
+            </p>
+          )}
+
+          {candidatesState === 'error' && (
+            <div
+              data-testid="candidates-error-banner"
+              style={{
+                padding: '10px 12px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid #ef4444',
+                borderRadius: '6px',
+                color: '#fca5a5',
+                fontSize: '0.75rem',
+              }}
+            >
+              <div style={{ fontWeight: 600 }}>⚠️ 디스커버리 후보 조회 실패</div>
+              <div style={{ marginTop: '2px' }}>{candidatesError}</div>
+              <button
+                type="button"
+                data-testid="candidates-retry-btn"
+                onClick={loadCandidates}
+                style={{ marginTop: '6px', padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: '#334155', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                재시도 (Retry)
+              </button>
+            </div>
+          )}
+
+          {candidatesState === 'success' && candidates.length === 0 && (
+            <p data-testid="candidates-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0' }}>
+              승인 대기 중인 디스커버리 후보가 없습니다.
+            </p>
+          )}
+
+          {candidatesState !== 'error' && candidates.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {candidates.map((c) => (
                 <div
@@ -470,10 +683,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({ nodes })
                 </div>
               ))}
             </div>
-          ) : (
-            <p data-testid="candidates-empty-state" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '8px 0' }}>
-              디스커버리 후보 목록 준비 중이거나 노드 등록 대기 중입니다.
-            </p>
           )}
         </div>
       </div>
