@@ -131,6 +131,13 @@
           "type": "string"
         },
         "status": {
+          "enum": [
+            "enrolling",
+            "active",
+            "draining",
+            "lost",
+            "retired"
+          ],
           "title": "Status",
           "type": "string"
         }

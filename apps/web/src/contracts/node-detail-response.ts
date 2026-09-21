@@ -17,7 +17,7 @@ export type Lastheartbeatat = string | null;
 export type Nodeid = string;
 export type Ostype = string;
 export type Osversion = string;
-export type Status = string;
+export type Status = 'enrolling' | 'active' | 'draining' | 'lost' | 'retired';
 
 export interface NodeDetailResponse {
   capabilities: Capabilities;

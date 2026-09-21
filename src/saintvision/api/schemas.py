@@ -63,13 +63,16 @@ class ObservationPayload(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+NodeStatusName = Literal["enrolling", "active", "draining", "lost", "retired"]
+
+
 class NodeResponse(Strict):
     node_id: str = Field(alias="nodeId")
     hostname: str
     os_type: str = Field(alias="osType")
     os_version: str = Field(alias="osVersion")
     agent_version: str = Field(alias="agentVersion")
-    status: str
+    status: NodeStatusName
     enrolled_at: dt.datetime = Field(alias="enrolledAt")
     last_heartbeat_at: dt.datetime | None = Field(default=None, alias="lastHeartbeatAt")
     heartbeat_sequence: int = Field(alias="heartbeatSequence")

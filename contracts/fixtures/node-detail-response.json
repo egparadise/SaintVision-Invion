@@ -5,7 +5,7 @@
     "osType": "linux",
     "osVersion": "test-os",
     "agentVersion": "test-agent",
-    "status": "online",
+    "status": "active",
     "enrolledAt": "2026-09-21T09:00:00Z",
     "lastHeartbeatAt": "2026-09-21T09:05:00Z",
     "heartbeatSequence": 12,
