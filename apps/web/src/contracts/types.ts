@@ -3,20 +3,16 @@
  * Synchronized with src/saintvision/errors.py, ids.py, and PLAN-FRONTEND-001.
  */
 
-import type { ProblemDetails as CanonicalProblemDetails } from '../../../../packages/contracts-ts/src';
+import type {
+  ProblemDetails as CanonicalProblemDetails,
+  RunState,
+  RiskLevel,
+} from '../../../../packages/contracts-ts/src/index';
 
-export type RunState =
-  | 'draft'
-  | 'validated'
-  | 'planned'
-  | 'awaiting_approval'
-  | 'scheduled'
-  | 'running'
-  | 'verifying'
-  | 'recovering'
-  | 'succeeded'
-  | 'failed'
-  | 'cancelled';
+export type {
+  RunState,
+  RiskLevel,
+};
 
 export type ErrorCategory =
   | 'VAL'
@@ -30,11 +26,9 @@ export type ErrorCategory =
   | 'SEC'
   | 'BUDGET';
 
-export type RiskLevel = 'L0' | 'L1' | 'L2' | 'L3';
-
 export type NodeStatus = 'online' | 'degraded' | 'offline' | 'draining' | 'enrolling' | 'retired';
 
-/** Canonical server error envelope; local client failures use the same wire shape. */
+/** Canonical server error envelope; never maintain a parallel hand-written wire shape. */
 export type ProblemDetails = CanonicalProblemDetails;
 
 export interface NodeItem {
@@ -184,7 +178,7 @@ export interface WorkspaceResumeSpec {
   createdAt: string;
 }
 
-/** UI projection of stop evidence; distinct from the NodeStopReceipt wire contract. */
+/** UI projection of stop evidence; distinct from the canonical NodeStopReceipt wire contract. */
 export interface NodeStopReceiptView {
   receiptId: string;
   runId: string;
@@ -500,98 +494,49 @@ export interface TrainingModuleStep {
   status: 'pending' | 'completed';
 }
 
-export interface RunResultView {
-  source: 'execution-kernel';
-  runId: string;
-  projectId: string;
-  state: RunState;
-  version: number;
-  attemptCount: number;
-  sealed: boolean;
-  executionConfirmed: boolean;
-  commandId: string | null;
-  nodeId: string | null;
-  stopReceipt: NodeStopReceiptView | {
-    receiptId: string;
-    processStarted?: boolean;
-    exitCode: number;
-    reason?: string;
-    finishedAt?: string;
-    physicallyStopped?: boolean;
-    resourceReclaimed?: boolean;
-    verified?: boolean;
-  } | null;
-  evidence: {
-    evidenceId?: string;
-    [key: string]: any;
-  } | null;
-  completedAt: string | null;
-  output: {
-    sha256: string;
-    sizeBytes: number;
-    verified: boolean;
-  } | null;
-  outputAbsentReason: string | null;
-  resourceReleasePending: boolean;
-}
-
-export interface RunArtifactItem {
-  path: string;
-  checksumSha256: string;
-  byteSize: number;
-  verified: boolean;
-  evidenceId?: string;
-}
-
-export interface RunArtifactList {
-  source: 'execution-kernel';
-  runId: string;
-  artifacts: RunArtifactItem[];
-  count: number;
-  verifiedCount: number;
-  absentReason: string | null;
-}
-
 import type {
+  RunResultView,
+  ResultStopReceipt,
+  ResultOutputMetadata,
+  RunArtifactList,
+  RunArtifactFile,
   RunLogView,
   RunAttemptObservation,
   RunAttemptList,
   TerminalTicketInput,
   TerminalTicketResult,
-} from '../../../../packages/contracts-ts/src/index';
-
-export type {
-  RunLogView,
-  RunAttemptObservation,
-  RunAttemptList,
-  TerminalTicketInput,
-  TerminalTicketResult,
-};
-
-export type RunAttemptItem = RunAttemptObservation;
-
-export interface ApprovalView {
-  approvalId: string;
-  runId: string;
-  projectId: string;
-  requesterId: string;
-  actionDigest: string;
-  policyVersion: string;
-  requiredApprovals: 1 | 2;
-  status: 'pending' | 'approved' | 'rejected' | 'expired' | 'dispatched';
-  expiresAt: string;
-  runVersion: number;
-}
-
-export interface ApprovalPage {
-  items: ApprovalView[];
-  nextCursor: string | null;
-}
-
-export type ShardPlanId = string;
-
-export type {
+  ApprovalView,
+  ApprovalPage,
+  ApprovalId,
+  ControlRunPage,
+  ControlRunView,
+  ShardPlanId,
   ShardObservedMember,
   ShardResultMember,
   ShardObservation,
 } from '../../../../packages/contracts-ts/src/index';
+
+export type {
+  RunResultView,
+  ResultStopReceipt,
+  ResultOutputMetadata,
+  RunArtifactList,
+  RunArtifactFile,
+  RunLogView,
+  RunAttemptObservation,
+  RunAttemptList,
+  TerminalTicketInput,
+  TerminalTicketResult,
+  ApprovalView,
+  ApprovalPage,
+  ApprovalId,
+  ControlRunPage,
+  ControlRunView,
+  ShardPlanId,
+  ShardObservedMember,
+  ShardResultMember,
+  ShardObservation,
+};
+
+export type RunArtifactItem = RunArtifactFile;
+export type RunAttemptItem = RunAttemptObservation;

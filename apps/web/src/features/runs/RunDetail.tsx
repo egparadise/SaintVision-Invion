@@ -191,7 +191,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         try {
           const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${run.id}/result`);
           if (resultRes?.stopReceipt) {
-            receipt = resultRes.stopReceipt as NodeStopReceiptView;
+            receipt = resultRes.stopReceipt as unknown as NodeStopReceiptView;
           }
         } catch {
           // Result not yet available or receipt not present in ResultView
