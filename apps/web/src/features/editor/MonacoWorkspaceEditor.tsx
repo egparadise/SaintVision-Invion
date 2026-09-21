@@ -253,6 +253,27 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         overflow: 'hidden',
       }}
     >
+      {/* Unexposed Storage Persistence Notice Banner */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="editor-unexposed-notice"
+        style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(56, 139, 253, 0.12)',
+          borderBottom: '1px solid #30363d',
+          color: '#58a6ff',
+          fontSize: '12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span>
+          ℹ️ <strong>인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)</strong>: 실제 워크스페이스 바이트 영속화는 커널 <code>WorkspaceEditView</code> 계약을 거쳐야 하며, 현재 에디터의 저장·Diff·Git 커밋은 로컬 브라우저 샌드박스 모의 동작입니다.
+        </span>
+      </div>
+
       {/* Top Main Toolbar */}
       <div
         style={{
@@ -308,8 +329,10 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
             variant="secondary"
             onClick={handleSaveFile}
             disabled={!activeFile.isDirty && !simulateConflictOnSave}
+            title="로컬 인메모리 버퍼에 저장합니다 (백엔드 저장 API 미노출)"
+            data-testid="editor-save-btn"
           >
-            Save File (If-Match)
+            Save File (Local Sandbox)
           </Button>
 
           <Button size="sm" variant="primary" onClick={() => setShowCommitModal(true)}>

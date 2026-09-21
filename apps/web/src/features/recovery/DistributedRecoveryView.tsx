@@ -45,21 +45,21 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       return;
     }
     const curToken = selectedNode.fencingToken;
-    const chkId = `chk_${Date.now().toString(36)}`;
+    const chkId = `sim_chk_${checkouts.length + 1}`;
     const newChk = {
       checkoutId: chkId,
       nodeId: selectedNode.nodeId,
-      inode: `ino_${49152 + checkouts.length}`,
+      inode: `sim_ino_${49152 + checkouts.length}`,
       permissions: '0600 (read/write)',
-      checkpointSha: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+      checkpointSha: 'sim_sha256_mock_checkpoint',
       epoch: curToken.epoch,
       status: 'active' as const,
       createdAt: new Date().toISOString(),
     };
     setCheckouts((prev) => [newChk, ...prev]);
     setActionNotice({
-      type: 'success',
-      text: `✓ ADR-043 Writable Generation 생성 완료: ${newChk.checkoutId} (inode: ${newChk.inode}, 권한: 0600, Epoch: ${newChk.epoch})`,
+      type: 'info',
+      text: `ℹ️ [모의 시뮬레이션] ADR-043 Writable Generation 생성: ${newChk.checkoutId} (모의 inode: ${newChk.inode}, 권한: 0600, Epoch: ${newChk.epoch}) — 백엔드 파일시스템에는 기록되지 않습니다.`,
     });
   };
 
@@ -126,6 +126,24 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Unexposed API Simulation Notice Banner */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="recovery-unexposed-notice"
+        style={{
+          padding: '12px 16px',
+          backgroundColor: 'rgba(56, 139, 253, 0.15)',
+          border: '1px solid #388bfd',
+          borderRadius: '6px',
+          color: '#58a6ff',
+          fontSize: '13px',
+          lineHeight: '1.5',
+        }}
+      >
+        ℹ️ <strong>분산 장애 복구 및 펜싱 시뮬레이션 제어기 (API 미노출)</strong>: 현재 SaintVision 백엔드에는 분산 펜싱 토큰 갱신 및 파일시스템 체크아웃 생성 엔드포인트(/v1/recovery/*)가 배선되어 있지 않습니다. 아래의 노드 격리, Fencing Epoch 전이 및 체크아웃 목록은 장애 복구 프로토콜(ADR-043)을 검증하기 위한 클라이언트 인메모리 시뮬레이션입니다.
+      </div>
+
       {/* KPI Top Banner (AC-07 Invariants) */}
       <div
         style={{

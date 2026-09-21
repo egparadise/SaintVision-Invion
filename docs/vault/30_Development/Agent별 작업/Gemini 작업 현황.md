@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.73"
+version: "1.0.74"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T23:50:00+09:00"
+updated: "2026-09-21T23:57:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T23:50:00+09:00.
+- 확인 기준: 2026-09-21T23:57:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 5대 부류 치유 트랙 2차: 관리자 콘솔 행위자 실배선, 분산 복구 모의 고지, 에디터 샌드박스 고지 및 브라우저 여정 정본 고정값 감사 완결 (`AdminSecurityConsole.tsx`, `DistributedRecoveryView.tsx`, `MonacoWorkspaceEditor.tsx`, `App.tsx`, `defect-recovery-admin-recovery-editor.test.tsx`)**:
+  - **Priority 4: 관리자 콘솔 행위자 실배선 & 0-call 가드**: `AdminSecurityConsole.tsx`에서 `usr_admin_01` 하드코딩 식별자를 전면 소거하고 `currentUser?.id`를 `actor`로 실배선. 세션 부재 시 `data-testid="admin-auth-required-notice"`(`role="alert"`) 표출 및 노드 격리(Drain)/비상 정지(Kill Switch)의 네트워크 0회 호출 가드 집행. Mutation 5 실측 사살.
+  - **Priority 5: 분산 복구 모의 고지 & 가짜 SHA/inode 합성 제거**: `DistributedRecoveryView.tsx` 상단에 `recovery-unexposed-notice`(`role="status"`, 백엔드 복구 API 미노출 및 클라이언트 인메모리 시뮬레이션 명시) 신설. 체크아웃 생성 시 `sim_chk_...`, `sim_ino_...`, `sim_sha256_mock_checkpoint`로 전환하고 `[모의 시뮬레이션]` 안내문으로 정직 고지.
+  - **Priority 6: 에디터 로컬 샌드박스 고지**: `MonacoWorkspaceEditor.tsx` 상단에 `editor-unexposed-notice`(`role="status"`, 백엔드 저장 API 미노출 및 커널 `WorkspaceEditView` 계약 필요 명시) 신설. 저장 버튼 라벨을 `Save File (Local Sandbox)`로 변경 및 툴팁 고지.
+  - **브라우저 여정 정본 독립 고정값 감사 수용**: `.github/workflows/desktop-browser.yml`의 5대 canonical browser journey 목록이 시험 대상에서 유도되지 않고 계약 수용 범위 자체를 표현하는 "독립 정본 집합"으로 고정되어 있음을 확인. 시험 삭제 시 게이트가 함께 줄어드는 무력화 차단 실증 및 잔여 위험 명시.
+  - Vitest **61개 파일 565/565 passed 100%** (순증 +5 passed), Vite 프로덕션 빌드 exit 0 (5.76s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면결함_5대부류_치유_2차_관리자행위자_분산복구모의_에디터샌드박스_Gemini]].
 
 - **화면 결함 5대 부류 치유 트랙 1차: 노드 에러 은폐 차단, 작업공간 백엔드 실배선, 자연어 가상 KPI 합성 및 조기 성공 배너 치유 (`App.tsx`, `ResourceExplorer.tsx`, `WorkspaceList.tsx`, `projectObservation.ts`, `types.ts`, `NaturalLanguageRunView.tsx`, `node-fetch-error-workspace-wiring.test.tsx`)**:
   - **1. 노드 API 실패 시 에러 은폐 차단 및 정상 빈 클러스터 분리 (Priority 1)**: `App.tsx`에서 `fetchNodes` 실패 시 `setNodes([])`로만 처리해 클러스터가 0대 빈 상태(정상 빈 클러스터)로 오인되던 결함을 치유. `nodesState: 'idle' | 'loading' | 'success' | 'error'` 및 `nodeError`를 신설하여 상단 배너(`<p role="alert" data-testid="app-node-error">`) 및 `ResourceExplorer`에 전달. `ResourceExplorer.tsx` 논리 자원 카드 4종에 에러 발생 시 `조회 실패`를 명시(0 Cores 왜곡 차단)하고, 물리 노드 목록에 `nodes-fetch-error-banner`(`role="alert"`) 및 재시도 버튼 배치. 정상 0대일 때만 `nodes-empty-state`(`role="status"`, "등록된 물리 노드가 없습니다 (정상 조회 결과: 0대)") 표출.

@@ -4,16 +4,20 @@ import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
-interface AdminSecurityConsoleProps {
+export interface AdminSecurityConsoleProps {
   nodes: NodeItem[];
   onRefreshNodes?: () => void;
+  currentUser?: { id: string; name: string; role: string; tenantId?: string } | null;
 }
 
-export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes, onRefreshNodes }) => {
+export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ nodes, onRefreshNodes, currentUser }) => {
   const [secManager] = useState<SecurityControlManager>(() => new SecurityControlManager());
   const [activeSubTab, setActiveSubTab] = useState<'audit' | 'isolation' | 'gpu' | 'backup' | 'drain'>('audit');
   const [status, setStatus] = useState(secManager.getStatus());
   const [auditLogs, setAuditLogs] = useState(secManager.getAuditLogs());
+  const [drainError, setDrainError] = useState<string | null>(null);
+
+  const actor = currentUser?.id?.trim() || null;
 
   // Interactive states
   const [ledgerVerification, setLedgerVerification] = useState<{ isValid: boolean; checked: number } | null>(null);
@@ -35,33 +39,39 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   }, [nodes]);
 
   const handleToggleDrain = async (nodeId: string, currentDrained: boolean) => {
+    if (!actor) {
+      setDrainError('인증된 관리자 세션이 없습니다. 노드 격리(Drain) 명령은 로그인된 관리자 식별자(actor)가 필수입니다.');
+      return;
+    }
+    setDrainError(null);
+
     if (currentDrained) {
-      secManager.undrainNode(nodeId, 'usr_admin_01');
+      secManager.undrainNode(nodeId, actor);
       refreshState();
       try {
         await apiClient(`/v1/nodes/${nodeId}/resume`, {
           method: 'POST',
-          body: JSON.stringify({ actor: 'usr_admin_01' }),
+          body: JSON.stringify({ actor }),
         });
       } catch (err: any) {
         console.error('Failed to sync node resume to control plane:', err);
-        secManager.drainNode(nodeId, 'usr_admin_01', 'Reverting failed undrain action');
+        secManager.drainNode(nodeId, actor, 'Reverting failed undrain action');
         refreshState();
-        alert(`노드 재개 동기화 실패: ${err?.message || '제어 평면 오류'}`);
+        setDrainError(`노드 재개 동기화 실패: ${err?.message || '제어 평면 오류'}`);
       }
     } else {
-      secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');
+      secManager.drainNode(nodeId, actor, 'Admin manual maintenance and isolation protocol');
       refreshState();
       try {
         await apiClient(`/v1/nodes/${nodeId}/drain`, {
           method: 'POST',
-          body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Admin manual maintenance and isolation protocol' }),
+          body: JSON.stringify({ actor, reason: 'Admin manual maintenance and isolation protocol' }),
         });
       } catch (err: any) {
         console.error('Failed to sync node drain to control plane:', err);
-        secManager.undrainNode(nodeId, 'usr_admin_01');
+        secManager.undrainNode(nodeId, actor);
         refreshState();
-        alert(`노드 격리(Drain) 동기화 실패: ${err?.message || '제어 평면 오류'}`);
+        setDrainError(`노드 격리(Drain) 동기화 실패: ${err?.message || '제어 평면 오류'}`);
       }
     }
     if (onRefreshNodes) {
@@ -91,7 +101,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   // 2. Test Docker Socket Mount
   const handleTestMount = (e: React.FormEvent) => {
     e.preventDefault();
-    const res = secManager.validateMountPath(mountTestPath, 'usr_security_auditor');
+    const res = secManager.validateMountPath(mountTestPath, actor || 'usr_security_auditor');
     refreshState();
     if (!res.allowed) {
       setMountTestResult(`🛑 ACCESS DENIED: ${res.reason}`);
@@ -102,7 +112,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   // 3. Test Approval Bypass
   const handleTestBypass = () => {
-    const res = secManager.validateExecutionApproval(bypassRiskLevel, undefined, 'usr_bypass_tester');
+    const res = secManager.validateExecutionApproval(bypassRiskLevel, undefined, actor || 'usr_bypass_tester');
     refreshState();
     if (!res.allowed) {
       setBypassTestResult(`🛑 BYPASS BLOCKED: ${res.reason}`);
@@ -128,7 +138,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   // 5. Toggle Emergency Kill Switch
   const handleConfirmKillSwitch = () => {
-    secManager.toggleEmergencyKillSwitch('usr_admin_01', 'Admin manual emergency intervention');
+    if (!actor) {
+      setDrainError('비상 정지(Kill Switch) 명령을 실행하려면 인증된 관리자 식별자(actor)가 필수입니다.');
+      setShowKillSwitchModal(false);
+      return;
+    }
+    secManager.toggleEmergencyKillSwitch(actor, 'Admin manual emergency intervention');
     setShowKillSwitchModal(false);
     refreshState();
   };
@@ -159,6 +174,41 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           <Button variant="danger" size="sm" onClick={() => setShowKillSwitchModal(true)}>
             Deactivate Kill Switch
           </Button>
+        </div>
+      )}
+
+      {/* Admin Session Actor Missing Notice */}
+      {!actor && (
+        <div
+          role="alert"
+          data-testid="admin-auth-required-notice"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(248, 81, 73, 0.15)',
+            border: '1px solid #f85149',
+            borderRadius: '6px',
+            color: '#f85149',
+            fontSize: '13px',
+          }}
+        >
+          ⚠️ <strong>인증된 관리자 세션 부재</strong>: 관리자 세션 식별자(actor)가 확인되지 않았습니다. 노드 격리(Drain) 및 비상 정지(Kill Switch)와 같은 제어 평면 변경 작업이 차단됩니다.
+        </div>
+      )}
+
+      {drainError && (
+        <div
+          role="alert"
+          data-testid="admin-drain-error-banner"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(248, 81, 73, 0.15)',
+            border: '1px solid #f85149',
+            borderRadius: '6px',
+            color: '#f85149',
+            fontSize: '13px',
+          }}
+        >
+          ❌ {drainError}
         </div>
       )}
 
