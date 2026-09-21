@@ -61,12 +61,38 @@ Claude의 독립 검토 보고서(`2026-09-22_Codex_artifact_content_결속_독�
 
 ---
 
-## 4. 전체 검증 결과
+## 5. 백엔드 계약 실측 및 조용한 강등(Downgrade Attack) 방지 차단 완결
+
+### 1) 백엔드 계약 직접 실측 결과 (추측 배제)
+- `contracts/v1alpha1/core.schema.json` (L3308~3350 `ArtifactContentResponse` & `RunArtifactFile`):
+  - `ArtifactContentResponse` 스키마는 `statusCode`, `contentType`, `contentDisposition`, `artifact`, `contentTypeOptions`를 **필수(required)**로 선언.
+  - `$defs/RunArtifactFile` 스키마는 `path`, `checksumSha256`, `byteSize`, `verified`, `evidenceId`를 **필수(required)**로 선언.
+- `services/control-plane/src/inv/app.py` (L74~85 `artifact_content_response`):
+  - `validate_contract("ArtifactContentResponse", response)` 검증 통과 후,
+  - `headers["X-Content-SHA256"] = response["artifact"]["checksumSha256"]`로 **조건문 없이 무조건 100% 주입**됨.
+- `tests/core/test_artifact_content_contract.py` (L137):
+  - `assert response.headers["x-content-sha256"] == hashlib.sha256(response.content).hexdigest()`로 고정 검증.
+- **결론**: 백엔드 계약에서 `X-Content-SHA256` 헤더는 **항상 붙으며, 부재하는 정상 시나리오는 결코 존재하지 않는다**.
+
+### 2) 조용한 강등 방지(Anti-Downgrade) 설계 및 실배선
+- **문제점**: 헤더 부재(`unverified`) 시 다운로드를 허용하면, 공격자가 파일 변조 후 `X-Content-SHA256` 헤더만 스트리핑(탈락)하여 무결성 검사를 우회하는 **조용한 강등 공격(Downgrade Attack)**에 노출됨.
+- **차단 조치**:
+  - `unverified`를 정상 완료로 간주하지 않고 **치명적 무결성 실패(`role="alert"`)**로 승격.
+  - `DeveloperStudio.tsx`: 헤더 부재 시 `createObjectURL`을 아예 호출하지 않고 **다운로드를 전면 차단**.
+  - 에러 메시지: `[무결성 검증 실패 · 필수 헤더 누락] 서버 응답에 계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다. 다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다.`
+- **테스트 결속**:
+  - `apps/web/tests/artifact-content-download-integrity.test.tsx` Test 6 갱신:
+    - 헤더 누락 시 `notice.getAttribute('role') === 'alert'` 단언.
+    - `window.URL.createObjectURL`이 호출되지 않고 저장이 차단됨(`not.toHaveBeenCalled()`)을 단언.
+
+---
+
+## 6. 전체 검증 결과 (최종)
 
 - `tools/check_frontend_integrity.py`: 82개 파일 **0 violations (All 7 rules PASS)**.
-- `tools/check_contract_bindings.py`: 36 fixtures / 12 serving anchors PASS.
+- `tools/check_contract_bindings.py`: 38 fixtures / 12 serving anchors PASS.
 - `tools/check_doc_single_source.py --ratchet`: 18 pairs PASS.
 - `tools/check_docs.py`: 698 documents PASS.
 - `tools/check_ontology.py`: PASS.
-- `npm test` (apps/web): **70개 파일 628/628 passed (100% PASS)** (순증 +1 파일, +6 passed).
-- `npm run build` (apps/web): Vite production build exit 0 (4.70s).
+- `npm test` (apps/web): **70개 파일 628/628 passed (100% PASS)**.
+- `npm run build` (apps/web): Vite production build exit 0 (3.52s).

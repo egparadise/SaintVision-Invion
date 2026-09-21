@@ -53,10 +53,15 @@ export function getArtifactDownloadUrl(projectId: string, runId: string, path: s
 
 /**
  * Downloads artifact content from kernel endpoint and verifies its SHA-256 against X-Content-SHA256 header.
+ *
+ * Backend Contract Guarantee (contracts/v1alpha1/core.schema.json, inv.app.artifact_content_response):
+ * - Under the ArtifactContentResponse contract, HTTP 200 raw artifact responses ALWAYS include X-Content-SHA256.
+ * - An absent header indicates a contract violation or an in-transit header stripping / downgrade attack.
+ *
  * Strictly implements tri-state integrity verification:
- * - 'verified': Header exists and matches calculated SHA-256
- * - 'mismatch': Header exists and does NOT match calculated SHA-256 (corrupted/tampered)
- * - 'unverified': Header is missing (cannot verify)
+ * - 'verified': Header exists and matches calculated SHA-256 -> Safe to download.
+ * - 'mismatch': Header exists and does NOT match calculated SHA-256 -> Block download (corrupted/tampered bytes).
+ * - 'unverified': Header is missing -> Block download (contract violation / prevented downgrade attack).
  */
 export async function downloadAndVerifyArtifact(
   projectId: string,

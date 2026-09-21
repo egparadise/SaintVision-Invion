@@ -648,26 +648,21 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           message: `[무결성 검증 실패] 산출물 파일 '${verification.fileName}'의 수신 바이트 체크섬(${verification.calculatedSha256})이 서버 헤더(X-Content-SHA256: ${verification.expectedSha256})와 불일치합니다. 전송 중 손상 위험으로 저장이 중단되었습니다.`,
         });
       } else {
-        const url = URL.createObjectURL(verification.blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = verification.fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
+        // Unverified: X-Content-SHA256 header missing from server response.
+        // Under the ArtifactContentResponse contract, this header is mandatory.
+        // To prevent downgrade attacks (stripping the header to bypass integrity checks),
+        // file download is strictly BLOCKED with an alert banner.
         setLogs((prev) => [
           ...prev,
           {
             timestamp: new Date().toLocaleTimeString(),
-            level: 'WARN',
-            message: `[Artifact File] Raw file bytes downloaded for '${filePath}' without server checksum header (Unverified)`,
+            level: 'ERROR',
+            message: `[Artifact File Integrity Failed] Mandatory X-Content-SHA256 header missing from server response for '${filePath}'`,
           },
         ]);
         setStudioActionNotice({
-          type: 'status',
-          message: `[다운로드 완료 · 무결성 미검증] 산출물 파일 '${verification.fileName}' (${verification.blob.size.toLocaleString()} Bytes) 다운로드 완료 (서버 X-Content-SHA256 헤더 부재로 무결성 미검증).`,
+          type: 'error',
+          message: `[무결성 검증 실패 · 필수 헤더 누락] 서버 응답에 계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다. 다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다.`,
         });
       }
     } catch (err: any) {

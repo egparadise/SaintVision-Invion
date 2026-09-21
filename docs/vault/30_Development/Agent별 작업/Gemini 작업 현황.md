@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.87"
+version: "1.0.88"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T02:26:00+09:00"
+updated: "2026-09-22T02:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T02:20:00+09:00.
+- 확인 기준: 2026-09-22T02:35:00+09:00.
 
 ## 세션 랩업: 시험 방어력 실측 감사 완결, 4대 '유일한 방어(Sole Defense)' 등록부 확립 및 세션 총괄
 
@@ -49,7 +49,7 @@ source_of_truth: "Git"
   - `tools/check_frontend_integrity.py`: 5대 규칙 ➔ **7대 규칙**으로 확장, 81개 소스 파일 전수 **0 violations**, `--test-negative` (10개 케이스) PASS, 4대 돌연변이(Mutation A~D) 전수 실측 사살(KILLED) 후 원복 실증.
   - `화면_개발_정직성_지침_및_사례집.md` (v1.1.0): 7대 원칙 및 **9대 구조적 한계(스캐너가 못 잡는 것과 사람 판단의 영역)** 명시.
 - **남은 미결 (Current Blockers & Unverified Areas)**:
-  1. **실 브라우저 E2E 인수 (Real Browser Acceptance)**: Playwright / 실제 브라우저 환경 및 사용자 육안 인수 미실시 (로컬 Vitest 69개 파일 620/620 DOM 레벨 테스트 100% 통과 상태).
+  1. **실 브라우저 E2E 인수 (Real Browser Acceptance)**: Playwright / 실제 브라우저 환경 및 사용자 육안 인수 미실시 (로컬 Vitest 70개 파일 628/628 DOM 레벨 테스트 100% 통과 상태).
   2. **CI 워크플로우 미개방 (CI Unopened)**: GitHub Actions 외부 러너 및 원격 CI 파이프라인 미실행 (로컬 모든 게이트 도구 전수 통과 상태).
 - **다음 화면 첫 행동 (Next First Action)**:
   - **Claude가 제안한 `WorkspaceSummaryResponse`의 `status`/`allowedNext` 정밀 enum(`WorkspaceStatusName`) 프론트엔드 TS 타입 재생성 및 계약 결속 정합(`contracts:check`)부터 착수.**
@@ -57,22 +57,25 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-- **화면 결함 치유 트랙 14차: 산출물 다운로드 X-Content-SHA256 무결성 검증 실배선 및 삼분할(검증됨·불일치·미검증) 정직화 (`DeveloperStudio.tsx`, `runArtifactObservation.ts`, `crypto.ts`, `artifact-content-download-integrity.test.tsx`)**:
-  - **사용자 지침 및 Claude 독립 검토 수용**: Claude의 아티팩트 결속 독립 검토(`2026-09-22_Codex_artifact_content_결속_독립검토_Claude.md`)에서 지적된 "화면의 `X-Content-SHA256` 헤더 미활용 및 파일명 미채택"을 치유하여, 다운로드한 바이트가 서버가 보낸 것과 일치하는지 클라이언트 WebCrypto SHA-256 검증을 실배선했다.
-  - **엄격한 3상태 무결성 (Strict Tri-State) 확립**:
-    1. **`verified` (검증됨)**: 계산된 바이트 SHA-256 === `X-Content-SHA256` 헤더. `[무결성 검증 완료] 산출물 파일 '${fileName}' (${size} Bytes, SHA-256 일치) 다운로드 완료.` (`role="status"`) 표출 및 파일 다운로드 트리거.
-    2. **`mismatch` (불일치)**: 바이트 해시와 헤더 불일치 시 조용히 넘기지 않고 `[무결성 검증 실패] 산출물 파일 '${fileName}'의 수신 바이트 체크섬이 서버 헤더(X-Content-SHA256)와 불일치합니다. 전송 중 손상 위험으로 저장이 중단되었습니다.` (`role="alert"`) 즉각 표출 및 **파일 다운로드 차단(createObjectURL 미호출)**.
-    3. **`unverified` (미검증)**: 서버 응답에 `X-Content-SHA256` 헤더 부재 시 조작 없이 `[다운로드 완료 · 무결성 미검증]` (`role="status"`)으로 건조하게 고지.
-  - **Content-Disposition 파싱 및 공통 WebCrypto 유틸리티**:
-    - `apps/web/src/shared/utils/crypto.ts` 신설(`calculateSha256`) 및 `InvFileExplorer.tsx` 공통 통합.
-    - `runArtifactObservation.ts` 내 `downloadAndVerifyArtifact` 구축으로 서버 제공 파일명 및 해시 검증 자동화.
+- **화면 결함 치유 트랙 14차: 산출물 다운로드 X-Content-SHA256 무결성 검증 실배선 및 조용한 강등(Downgrade Attack) 방지 차단 완결 (`DeveloperStudio.tsx`, `runArtifactObservation.ts`, `crypto.ts`, `artifact-content-download-integrity.test.tsx`)**:
+  - **백엔드 계약 직접 실측 규명 (추측 배제)**:
+    - `contracts/v1alpha1/core.schema.json` L3308 `ArtifactContentResponse` & `$defs/RunArtifactFile`: `checksumSha256` 필수(required).
+    - `services/control-plane/src/inv/app.py` L74~85: 계약 검증 후 `headers["X-Content-SHA256"] = response["artifact"]["checksumSha256"]` 무조건 주입.
+    - `tests/core/test_artifact_content_contract.py` L137: 바이트 해시와 헤더 일치 고정 단언.
+    - **판정**: 백엔드 계약 상 `X-Content-SHA256`은 **항상 100% 붙으며, 부재하는 정상 시나리오는 존재하지 않음**.
+  - **조용한 강등 방지(Anti-Downgrade Attack) 설계 및 실배선**:
+    - 헤더 부재 시 다운로드를 허용하면 공격자가 헤더를 스트리핑하여 검증을 우회할 수 있으므로, **헤더 누락 시에도 다운로드를 전면 차단 (`createObjectURL` 미호출)**하도록 강화.
+    - 1. **`verified` (검증됨)**: 계산된 바이트 SHA-256 === `X-Content-SHA256` 헤더. `[무결성 검증 완료]` (`role="status"`) 표출 및 파일 다운로드 허용.
+    - 2. **`mismatch` (불일치)**: 바이트 해시 불일치 시 `[무결성 검증 실패]` (`role="alert"`) 즉각 표출 및 **파일 다운로드 차단(createObjectURL 미호출)**.
+    - 3. **`unverified` (헤더 누락/조용한 강등 시도)**: `[무결성 검증 실패 · 필수 헤더 누락] 서버 응답에 계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다. 다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다.` (`role="alert"`) 즉각 표출 및 **파일 다운로드 전면 차단(createObjectURL 미호출)**.
   - **신규 단위 테스트 6종 및 돌연변이 실측 사살 (KILLED)**:
     - `apps/web/tests/artifact-content-download-integrity.test.tsx` (6/6 passed 100%).
-    - 돌연변이(불일치 검증을 제거하고 무조건 verified로 통과시키는 변형) 주입 시 2 failed로 즉시 사살(KILLED) 후 원복 확인.
+    - Test 6: 헤더 누락 시 `role="alert"` 표출 및 `createObjectURL` 미호출(차단) 고정 단언.
+    - 돌연변이(불일치 우회 변형) 주입 시 2 failed로 즉시 사살(KILLED) 후 원복 확인.
   - **테스트 및 게이트 통과**:
     - `check_frontend_integrity.py`: 82개 파일 전수 통과 (**0 violations**, All 7 integrity rules satisfied).
-    - `check_contract_bindings.py`: 36 fixtures / 12 serving anchors PASS.
-    - Vitest **70개 파일 628/628 passed 100%** (순증 +1 파일, +6 passed), Vite 프로덕션 빌드 exit 0 (4.70s).
+    - `check_contract_bindings.py`: 38 fixtures / 12 serving anchors PASS.
+    - Vitest **70개 파일 628/628 passed 100%** (순증 +1 파일, +6 passed), Vite 프로덕션 빌드 exit 0 (3.52s).
   - 보고서: [[2026-09-22_산출물_X_Content_SHA256_무결성검증_실배선_Gemini]].
 
 - **화면 결함 치유 트랙 13차: 시험 방어력 실측 감사 완결 및 4대 '유일한 방어(Sole Defense)' 등록부 확립 (69개 파일 622개 테스트 실측 감사)**:

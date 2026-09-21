@@ -257,8 +257,8 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
       expect(window.URL.createObjectURL).not.toHaveBeenCalled();
     });
 
-    it('서버 X-Content-SHA256 헤더가 부재할 경우 [다운로드 완료 · 무결성 미검증]으로 정직하게 고지한다', async () => {
-      const headers = new Headers(); // No x-content-sha256 header
+    it('서버 X-Content-SHA256 필수 헤더 부재 시 조용히 강등하지 않고 [무결성 검증 실패 · 필수 헤더 누락](role=alert)으로 차단한다', async () => {
+      const headers = new Headers(); // No x-content-sha256 header (header stripping scenario)
 
       window.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -293,15 +293,16 @@ describe('산출물 바이트 다운로드 X-Content-SHA256 무결성 검증 및
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      // role="status"로 미검증 사실 고지
+      // role="alert"로 계약 필수 헤더 누락 및 다운그레이드 방지 차단 고지
       const notice = container.querySelector('[data-testid="studio-action-notice"]');
       expect(notice).not.toBeNull();
-      expect(notice?.getAttribute('role')).toBe('status');
-      expect(notice?.textContent).toContain('[다운로드 완료 · 무결성 미검증]');
-      expect(notice?.textContent).toContain('서버 X-Content-SHA256 헤더 부재');
+      expect(notice?.getAttribute('role')).toBe('alert');
+      expect(notice?.textContent).toContain('[무결성 검증 실패 · 필수 헤더 누락]');
+      expect(notice?.textContent).toContain('계약 필수 무결성 헤더(X-Content-SHA256)가 누락되었습니다');
+      expect(notice?.textContent).toContain('다운그레이드 공격 및 전송 손상 방지를 위해 저장이 차단되었습니다');
 
-      // 다운로드는 진행됨
-      expect(window.URL.createObjectURL).toHaveBeenCalled();
+      // 조용한 강등 방지: createObjectURL 호출되지 않고 저장 차단됨
+      expect(window.URL.createObjectURL).not.toHaveBeenCalled();
     });
   });
 });
