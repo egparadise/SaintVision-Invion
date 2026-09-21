@@ -118,8 +118,9 @@ try {
         $authConfigPath = if (Test-Path "README.md") { ((Resolve-Path "README.md").Path -replace '\\', '/') } else { "README.md" }
         if (-not $env:INV_WEB_AUTH_CONFIG) { $env:INV_WEB_AUTH_CONFIG = $authConfigPath }
         if (-not $env:INV_CONFIG_VOLUME) { $env:INV_CONFIG_VOLUME = "saintvision-config-preflight" }
-        if (-not $env:INV_BUSINESS_DSN) { $env:INV_BUSINESS_DSN = "postgresql+psycopg://preflight:preflight@postgres/saintvision" }
-        if (-not $env:INV_RUNTIME_DSN) { $env:INV_RUNTIME_DSN = "postgresql://preflight-kernel:preflight@postgres/saintvision" }
+        # DSN values below are placeholders for docker compose config --quiet; this script does not connect to PostgreSQL.
+        if (-not $env:INV_BUSINESS_DSN) { $env:INV_BUSINESS_DSN = "postgresql+psycopg://preflight:***@postgres/saintvision" }
+        if (-not $env:INV_RUNTIME_DSN) { $env:INV_RUNTIME_DSN = "postgresql+psycopg://preflight:***@postgres/saintvision" }
         if (-not $env:INV_RECOVERY_EPOCH) { $env:INV_RECOVERY_EPOCH = "11111111-1111-4111-8111-111111111111" }
         if (-not $env:POSTGRES_PASSWORD) { $env:POSTGRES_PASSWORD = "preflight-postgres-password" }
         if (-not $env:MINIO_ROOT_USER) { $env:MINIO_ROOT_USER = "preflight-minio-user" }

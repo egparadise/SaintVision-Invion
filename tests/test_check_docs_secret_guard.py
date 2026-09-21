@@ -15,13 +15,22 @@ def test_explicitly_redacted_dsn_and_passwordless_uri_are_allowed():
     text = '\n'.join(
         [
             'postgresql://operator:***@db.internal:5432/app',
+            'postgresql://inv_app:CHANGE_ME@localhost:55432/invdev',
             'postgresql://operator@db.internal:5432/app',
         ]
     )
     assert password_bearing_postgres_dsn_count(text) == 0
 
 
-def test_document_validation_rejects_passworded_dsn_in_vault(tmp_path):
+@pytest.mark.parametrize(
+    'relative_path',
+    [
+        'docs/vault/Evidence/proposal.txt',
+        '.env.example',
+        'tools/deploy_intranet.ps1',
+    ],
+)
+def test_validation_rejects_passworded_dsn_in_docs_and_runtime_configs(tmp_path, relative_path):
     vault = tmp_path / 'docs' / 'vault'
     vault.mkdir(parents=True)
     (vault / 'index.md').write_text(
@@ -31,9 +40,9 @@ def test_document_validation_rejects_passworded_dsn_in_vault(tmp_path):
         encoding='utf-8',
     )
     (vault / 'contract.md').write_text('contract target\n', encoding='utf-8')
-    evidence = vault / 'Evidence'
-    evidence.mkdir()
-    (evidence / 'proposal.txt').write_text(
+    bad_config = tmp_path / relative_path
+    bad_config.parent.mkdir(parents=True, exist_ok=True)
+    bad_config.write_text(
         'dsn=postgresql://operator:sample-secret@db.internal:5432/app\n',
         encoding='utf-8',
     )

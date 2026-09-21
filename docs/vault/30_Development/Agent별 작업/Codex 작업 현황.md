@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.89"
+version: "1.0.90"
 status: "review"
 author: "Codex"
 updated: "2026-09-21T13:39:00+09:00"

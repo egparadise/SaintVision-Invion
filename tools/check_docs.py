@@ -7,9 +7,10 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 PASSWORD_BEARING_POSTGRES_DSN = re.compile(
     r'(?i)(?:postgres(?:ql)?(?:\+[a-z0-9_]+)?|postgres)://[^:/@\s]+:'
-    r'(?!(?:\*{3,}|<redacted>|\[redacted\]|redacted)(?=@))[^@/\s?#]+@'
+    r'(?!(?:\*{3,}|<redacted>|\[redacted\]|redacted|change[_-]?me)(?=@))[^@/\s?#]+@'
 )
 DOC_TEXT_SUFFIXES = {'.md', '.txt', '.json', '.jsonl', '.xml', '.yaml', '.yml', '.csv', '.log'}
+SECRET_BEARING_CONFIG_PATHS = ('.env.example', 'tools/deploy_intranet.ps1')
 
 
 def password_bearing_postgres_dsn_count(text):
@@ -27,19 +28,27 @@ def validate(root=ROOT):
             errors.append(f'Original source changed: {item["path"]}')
     files = list(vault.rglob('*'))
     targets = {p.name for p in files if p.is_file()} | {p.stem for p in files if p.is_file()}
-    for path in files:
-        if not path.is_file() or path.suffix.lower() not in DOC_TEXT_SUFFIXES:
-            continue
+    scan_targets = [
+        (path, path.relative_to(vault))
+        for path in files
+        if path.is_file() and path.suffix.lower() in DOC_TEXT_SUFFIXES
+    ]
+    scan_targets.extend(
+        (root / relative, Path(relative))
+        for relative in SECRET_BEARING_CONFIG_PATHS
+        if (root / relative).is_file()
+    )
+    for path, display_path in scan_targets:
         try:
             content = path.read_text('utf-8-sig')
         except UnicodeDecodeError:
-            errors.append(f'Unreadable UTF-8 document: {path.relative_to(vault)}')
+            errors.append(f'Unreadable UTF-8 document/config: {display_path}')
             continue
         dsn_count = password_bearing_postgres_dsn_count(content)
         if dsn_count:
             errors.append(
                 f'Password-bearing PostgreSQL DSN must be redacted '
-                f'({dsn_count} occurrence(s)): {path.relative_to(vault)}'
+                f'({dsn_count} occurrence(s)): {display_path}'
             )
     ids = {}
     count = 0
