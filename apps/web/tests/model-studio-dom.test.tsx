@@ -476,4 +476,83 @@ describe('VF-GM-04: Model Studio DOM Harness & ADR-041 Guarantees', () => {
     expect(feasibleBadge?.textContent).toContain('배치 가능 (Feasible)');
     expect(container.querySelector('[data-testid="plan-infeasible-alert"]')).toBeNull();
   });
+
+  // ---------------------------------------------------------------------------
+  // 5. Defensive Honesty: Summary Observation & Absent Repair Adapter
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-04-SUMMARY-HONESTY] renders honest unknown availability and unobserved shards notice without fabricating shards', async () => {
+    // ModelCommitObservation summary without shards
+    const summaryCommitObservation = {
+      projectId: 'prj_01',
+      modelId: 'med-cxr-seg',
+      version: '2.1.0',
+      manifestHash: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      sourceRunId: 'run_train_01',
+      committedAt: '2026-09-21T12:00:00Z',
+      commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+      format: 'safetensors',
+      totalBytes: 1024 * 1024 * 1024,
+      shardCount: 1,
+      licensePolicy: 'apache-2.0',
+      classification: 'internal',
+      committed: true,
+      currentAvailability: 'unknown',
+      requiresExecutionRevalidation: true,
+    };
+
+    await act(async () => {
+      root.render(
+        <ModelStudioView
+          projectId="prj_01"
+          initialModel={summaryCommitObservation as any}
+          clusterNodes={clusterNodesFixture}
+        />
+      );
+    });
+
+    // Invariant 1: Availability status MUST indicate unknown and revalidation requirement
+    const availStatus = container.querySelector('[data-testid="model-availability-status"]');
+    expect(availStatus).not.toBeNull();
+    expect(availStatus?.textContent).toContain('알 수 없음 (unknown)');
+    expect(availStatus?.textContent).toContain('실행 재검증 필요');
+    expect(availStatus?.textContent).not.toContain('관측 완료 · 분산 패브릭 연동');
+
+    // Invariant 2: Unobserved shards notice MUST be displayed with role="status"
+    const unobservedNotice = container.querySelector('[data-testid="unobserved-shards-notice"]');
+    expect(unobservedNotice).not.toBeNull();
+    expect(unobservedNotice?.getAttribute('role')).toBe('status');
+    expect(unobservedNotice?.textContent).toContain('개별 샤드 및 복제본 위치 관측 데이터가 없습니다');
+
+    // Invariant 3: Shards matrix section MUST NOT exist (no fabricated shards)
+    expect(container.querySelector('[data-testid="shards-matrix-section"]')).toBeNull();
+  });
+
+  it('[VF-GM-04-ABSENT-REPAIR-ADAPTER] surfaces honest error alert without simulating repair success when onRepairShard is absent', async () => {
+    await act(async () => {
+      root.render(
+        <ModelStudioView
+          projectId="prj_01"
+          initialModel={sampleModel}
+          clusterNodes={clusterNodesFixture}
+          // onRepairShard intentionally omitted
+        />
+      );
+    });
+
+    const repairBtn = container.querySelector<HTMLButtonElement>('[data-testid="repair-shard-0-btn"]');
+    expect(repairBtn).not.toBeNull();
+
+    await act(async () => {
+      repairBtn!.click();
+      await Promise.resolve();
+    });
+
+    // Invariant: without adapter, must show honest error and NOT simulate success
+    const repairError = container.querySelector('[data-testid="shard-repair-error"]');
+    expect(repairError).not.toBeNull();
+    expect(repairError?.getAttribute('role')).toBe('alert');
+    expect(repairError?.textContent).toContain('서버 샤드 복구 어댑터(onRepairShard)가 연결되지 않아 복구를 수행할 수 없습니다.');
+
+    expect(container.querySelector('[data-testid="shard-repair-success"]')).toBeNull();
+  });
 });

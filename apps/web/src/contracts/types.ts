@@ -560,36 +560,23 @@ export interface RunArtifactList {
   absentReason: string | null;
 }
 
-export interface RunLogView {
-  source: 'execution-kernel';
-  runId: string;
-  stdout: string | null;
-  stderr: string | null;
-  redacted: boolean;
-  truncated: boolean | null;
-  absentReason: string | null;
-}
+import type {
+  RunLogView,
+  RunAttemptObservation,
+  RunAttemptList,
+  TerminalTicketInput,
+  TerminalTicketResult,
+} from '../../../../packages/contracts-ts/src/index';
 
-export interface RunAttemptObservation {
-  attemptNumber: number;
-  startedAt: string | null;
-  nodeId: string | null;
-  commandId: string | null;
-  stopReceiptId: string | null;
-  exitCode: number | null;
-  reason: string | null;
-  evidenceId: string | null;
-}
+export type {
+  RunLogView,
+  RunAttemptObservation,
+  RunAttemptList,
+  TerminalTicketInput,
+  TerminalTicketResult,
+};
 
 export type RunAttemptItem = RunAttemptObservation;
-
-export interface RunAttemptList {
-  source: 'execution-kernel';
-  runId: string;
-  attempts: RunAttemptItem[];
-  count: number;
-  nextCursor: number | null;
-}
 
 export interface ApprovalView {
   approvalId: string;
@@ -611,38 +598,8 @@ export interface ApprovalPage {
 
 export type ShardPlanId = string;
 
-export interface ShardObservedMember {
-  index: number;
-  runId: string;
-  nodeId: string;
-  phase: 'queued' | 'uncertain' | 'stopped';
-  state: RunState;
-  evidenceId: string | null;
-}
-
-export interface ShardResultMember {
-  index: number;
-  runId: string;
-  evidenceId: string;
-  objectId: string;
-  sha256: string;
-  sizeBytes: number;
-}
-
-export interface ShardObservation {
-  planId: ShardPlanId;
-  sourcePlanId: ShardPlanId | null;
-  rootPlanId: ShardPlanId;
-  generation: number;
-  parentRunId: string | null;
-  parentState: RunState | null;
-  aggregateManifestSha256: string | null;
-  shardCount: number;
-  allPhysicallyStopped: boolean;
-  allSucceeded: boolean;
-  resultManifest: ShardResultMember[] | null;
-  resultManifestSha256: string | null;
-  shards: ShardObservedMember[];
-  items?: ShardExecutionItem[];
-  total?: number;
-}
+export type {
+  ShardObservedMember,
+  ShardResultMember,
+  ShardObservation,
+} from '../../../../packages/contracts-ts/src/index';

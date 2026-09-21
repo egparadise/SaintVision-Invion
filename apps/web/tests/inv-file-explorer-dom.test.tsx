@@ -2,7 +2,7 @@
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
+import { InvFileExplorer, calculateSha256 } from '../src/features/desktop/InvFileExplorer';
 import { InvFileItem, InvReplicaLocation } from '../src/contracts/virtualFabric';
 import { NodeItem } from '../src/contracts/types';
 
@@ -582,5 +582,116 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
     // Healthy badge MUST appear and degradation badge MUST be gone
     expect(container.querySelector('[data-testid="replica-healthy-badge"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="replica-degradation-badge"]')).toBeNull();
+  });
+
+  // ---------------------------------------------------------------------------
+  // 6. Byte Source / Verifier Absence & Actual Byte Hash Verification
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-03-ABSENT-BYTES-REFUSAL] marks status unverified and displays honest refusal when file content and verifier adapter are both absent', async () => {
+    // sampleDegradedFile has contentHash but NO content bytes
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[sampleDegradedFile]}
+          clusterNodes={clusterNodesFixture}
+          // onVerifyIntegrity intentionally omitted
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    expect(verifyBtn).not.toBeNull();
+
+    await act(async () => {
+      verifyBtn!.click();
+      await Promise.resolve();
+    });
+
+    // Invariant: Without bytes or adapter, status MUST remain unverified, NEVER verified
+    const badge = container.querySelector('[data-testid="integrity-badge"]');
+    expect(badge?.textContent).toBe('미검증 (UNVERIFIED)');
+
+    const actionError = container.querySelector('[data-testid="integrity-action-error"]');
+    expect(actionError).not.toBeNull();
+    expect(actionError?.getAttribute('role')).toBe('alert');
+    expect(actionError?.textContent).toContain('파일 본문 바이트(content) 또는 검증 어댑터가 부재하여 무결성을 검증할 수 없습니다.');
+  });
+
+  it('[VF-GM-03-BYTE-VERIFY-MATCH] computes genuine SHA-256 over file content bytes without onVerifyIntegrity adapter', async () => {
+    const rawContent = 'INV-FABRIC-REAL-BYTES-TEST';
+    const computedHash = await calculateSha256(rawContent);
+
+    const fileWithContent: InvFileItem = {
+      ...sampleDegradedFile,
+      content: rawContent,
+      contentHash: computedHash,
+    };
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[fileWithContent]}
+          clusterNodes={clusterNodesFixture}
+          // onVerifyIntegrity intentionally omitted to force client-side byte hash computation
+        />
+      );
+    });
+
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    const badge = container.querySelector('[data-testid="integrity-badge"]');
+    expect(badge?.textContent).toContain('검증 통과 (VERIFIED)');
+    expect(container.querySelector('[data-testid="calculated-hash"]')?.textContent).toBe(computedHash);
+  });
+
+  it('[VF-GM-03-ABSENT-REPAIR-ADAPTER] displays honest error alert without synthesizing repaired replicas when onRepairReplicas is absent', async () => {
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[sampleDegradedFile]}
+          clusterNodes={clusterNodesFixture}
+          // onRepairReplicas intentionally omitted
+        />
+      );
+    });
+
+    const repairBtn = container.querySelector<HTMLButtonElement>('[data-testid="repair-replicas-btn"]');
+    expect(repairBtn).not.toBeNull();
+
+    await act(async () => {
+      repairBtn!.click();
+      await Promise.resolve();
+    });
+
+    // Invariant: without adapter, must show honest error and NOT synthesize fake healthy replicas
+    const repairError = container.querySelector('[data-testid="repair-action-error"]');
+    expect(repairError).not.toBeNull();
+    expect(repairError?.getAttribute('role')).toBe('alert');
+    expect(repairError?.textContent).toContain('서버 복구 어댑터(onRepairReplicas)가 연결되지 않아 복구를 수행할 수 없습니다.');
+
+    expect(container.querySelector('[data-testid="repair-action-success"]')).toBeNull();
+    expect(container.querySelector('[data-testid="replica-degradation-badge"]')).not.toBeNull();
+  });
+
+  it('[VF-GM-03-WEBCRYPTO-ABSENT] throws explicit error when WebCrypto API is unavailable rather than returning 64 zeroes', async () => {
+    const originalCrypto = globalThis.crypto;
+    try {
+      // Mock missing crypto.subtle
+      Object.defineProperty(globalThis, 'crypto', {
+        value: {},
+        configurable: true,
+      });
+
+      await expect(calculateSha256('test')).rejects.toThrow('WebCrypto API가 지원되지 않아 무결성을 검증할 수 없습니다.');
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', {
+        value: originalCrypto,
+        configurable: true,
+      });
+    }
   });
 });

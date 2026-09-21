@@ -45,6 +45,7 @@ it('renders mounted approval center, terminal, and settings windows when open', 
   const markup = renderToStaticMarkup(
     <DesktopShell
       {...props}
+      nodes={[{ id: 'nod_01', hostname: 'Node-01-WinMain', os: 'windows', status: 'online', schedulable: true, observationOnly: false } as any]}
       workspaces={[{ id: 'wsp_test', name: 'Workspace Test', status: 'ready' } as any]}
     />
   );

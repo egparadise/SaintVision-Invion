@@ -153,6 +153,7 @@ export interface InvFileItem {
   isPinned: boolean;
   classification: 'public' | 'internal' | 'confidential' | 'restricted';
   updatedAt: string;
+  content?: string | Uint8Array;
 }
 
 export interface InvDriveSummary {

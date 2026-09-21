@@ -22,7 +22,7 @@ export async function calculateSha256(content: string | Uint8Array): Promise<str
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
-  return '0000000000000000000000000000000000000000000000000000000000000000';
+  throw new Error('WebCrypto API가 지원되지 않아 무결성을 검증할 수 없습니다.');
 }
 
 export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
@@ -167,11 +167,20 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
         calculated = res.calculatedHash;
         // Strict equality comparison
         isMatch = res.matches && calculated.toLowerCase() === selectedFile.contentHash.toLowerCase();
-      } else {
-        // Genuine client-side SHA-256 computation
-        calculated = await calculateSha256(selectedFile.uri + selectedFile.contentHash);
-        // Genuine comparison against expected contentHash
+      } else if (selectedFile.content) {
+        // Genuine client-side SHA-256 computation over actual file bytes
+        calculated = await calculateSha256(selectedFile.content);
         isMatch = calculated.toLowerCase() === selectedFile.contentHash.toLowerCase();
+      } else {
+        // Honest refusal: cannot verify without bytes or verification adapter
+        setIntegrityState({
+          status: 'unverified',
+          expectedHash: selectedFile.contentHash,
+          calculatedHash: null,
+          lastVerifiedAt: null,
+          integrityError: '파일 본문 바이트(content) 또는 검증 어댑터가 부재하여 무결성을 검증할 수 없습니다.',
+        });
+        return;
       }
 
       // Requirement 1 & 2: Mismatch must NEVER be marked verified
@@ -249,30 +258,16 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
 
     try {
       const targetId = targetNodeId || survivingNodes[0]?.id;
-      let repairResult: { success: boolean; repairedReplicas: InvReplicaLocation[]; message?: string };
-
-      if (onRepairReplicas) {
-        repairResult = await onRepairReplicas(selectedFile.uri, targetId);
-      } else {
-        // Default local repair simulation
-        const targetNode = clusterNodes.find((n) => n.id === targetId);
-        const updated = selectedFile.replicas.map((r) =>
-          r.status !== 'healthy'
-            ? {
-                ...r,
-                nodeId: targetId,
-                nodeHostname: targetNode?.hostname || targetId,
-                status: 'healthy' as const,
-                updatedAt: new Date().toISOString(),
-              }
-            : r
-        );
-        repairResult = {
-          success: true,
-          repairedReplicas: updated,
-          message: '복제본 복구 완료',
-        };
+      if (!onRepairReplicas) {
+        setRepairState({
+          isRepairing: false,
+          repairMessage: null,
+          repairError: '서버 복구 어댑터(onRepairReplicas)가 연결되지 않아 복구를 수행할 수 없습니다.',
+        });
+        return;
       }
+
+      const repairResult = await onRepairReplicas(selectedFile.uri, targetId);
 
       // Case A: Repair failed on server
       if (!repairResult.success) {
@@ -582,7 +577,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
               )}
 
               {/* Requirement 3: Error Banner */}
-              {integrityState.status === 'error' && (
+              {integrityState.integrityError && (
                 <div
                   role="alert"
                   data-testid="integrity-action-error"
