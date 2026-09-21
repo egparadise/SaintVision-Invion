@@ -1,4 +1,4 @@
-import type { NodeItem } from '@/contracts/types';
+import type { NodeItem, NodeStatus } from '@/contracts/types';
 
 const metrics = ['cpuCores', 'cpuUsagePercent', 'memoryTotalBytes', 'memoryUsedBytes',
   'gpuCount', 'storageTotalBytes', 'storageUsedBytes'] as const;

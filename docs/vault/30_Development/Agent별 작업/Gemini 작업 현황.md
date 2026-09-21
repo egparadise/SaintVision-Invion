@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.95"
+version: "1.0.96"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:15:00+09:00"
+updated: "2026-09-22T04:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,21 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:15:00+09:00.
+- 확인 기준: 2026-09-22T04:18:00+09:00.
+
+## 세션 랩업: nodeObservation.ts TS2304 NodeStatus 미import 결함 즉시 치유 및 tsc 실측 완결
+
+- **TS2304 빌드 결함 즉각 치유 (`nodeObservation.ts`)**:
+  - `827f1756` 커밋에서 노드 상태 lost 및 unknown 어휘 정직화 시 `nodeObservation.ts` 1행에서 `NodeItem`만 import하고 `NodeStatus`를 누락하여 `tsc -b` 시 TS2304(Cannot find name 'NodeStatus') 2건 발생.
+  - `import type { NodeItem, NodeStatus } from '@/contracts/types';`로 import를 즉시 보정하여 오류 0건으로 완전 해소.
+- **착지 전 필수 검증 교훈 수용**:
+  - Vitest는 esbuild 기반 트랜스파일러로 구동되어 타입 오류를 검증하지 못하므로, "단위 시험 646 passed 초록"이라도 타입 검사가 깨질 수 있음을 확인.
+  - 향후 프런트엔드 착지 전 확인 목록에 `tsc -b`와 `npm run build`를 필수 관문으로 고정.
+- **실측 검증**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건 클린 통과).
+  - `npm run build`: exit code 0 (4.45s, Vite 프로덕션 번들 정상 출력).
+  - Vitest **73개 파일 646/646 passed 100%**.
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
 
 ## 세션 랩업: 실제 Uvicorn 0.52.4 백엔드와 실제 Google Chrome 153 종단간 연결 실측 완결
 
