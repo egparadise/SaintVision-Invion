@@ -5,14 +5,15 @@ import { apiClient } from '../src/shared/api/client';
 import { fabricObservation as fabric } from '../src/shared/api/fabricObservation';
 import { InvFileExplorer } from '../src/features/desktop/InvFileExplorer';
 import { ModelStudioView } from '../src/features/desktop/ModelStudioView';
+import { storageLocationsFixture } from './fixtures/storage-catalog';
 vi.mock('../src/shared/api/client', () => ({apiClient: vi.fn()}));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
-const location = {locationId: 'loc1', uri: 'inv://my-folder/a b#x', byteSize: 0, checksumSha256: null};
-const observation = {locationId: 'loc1', observedAt: '2026-09-15T00:00:00Z', recordedStates: {ready: 2, transferring: 0, stale: 1, corrupt: 0, evicted: 3}, totalRecords: 6, currentAvailability: 'unknown', requiresExecutionRevalidation: true};
+const location = {...storageLocationsFixture.items[0], uri: 'inv://my-folder/a b#x'};
+const observation = {locationId: location.locationId, observedAt: '2026-09-15T00:00:00Z', recordedStates: {ready: 2, transferring: 0, stale: 1, corrupt: 0, evicted: 3}, totalRecords: 6, currentAvailability: 'unknown', requiresExecutionRevalidation: true};
 it('encodes URI and cursor, uses GET without caching, and propagates cancellation', async () => {
   const signal = new AbortController().signal;
-  api.mockResolvedValueOnce({items: [], nextCursor: null}).mockResolvedValueOnce({location}).mockResolvedValueOnce({observation});
+  api.mockResolvedValueOnce(storageLocationsFixture).mockResolvedValueOnce({location}).mockResolvedValueOnce({observation});
   await fabric.locations('a+b/=', signal); await fabric.resolve(location.uri, signal); await fabric.replicas(location, signal);
   expect(api.mock.calls[0][0]).toBe('/v1/storage/locations?limit=50&cursor=a%2Bb%2F%3D');
   expect(new URL(api.mock.calls[1][0], 'https://test').searchParams.get('uri')).toBe(location.uri);

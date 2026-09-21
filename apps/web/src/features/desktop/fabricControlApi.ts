@@ -25,35 +25,12 @@
  */
 
 import { apiClient } from '@/shared/api/client';
-import type {
-  DiscoveryCandidateResponse,
-  DiscoveryCandidatesResponse,
-} from '@/contracts/discovery-candidates-response';
+import type { ContributionPageResponse, ContributionResponse } from '@/contracts/contribution-page-response';
+import type { DataLocationPageResponse, DataLocationResponse } from '@/contracts/data-location-page-response';
+import type { DiscoveryCandidateResponse, DiscoveryCandidatesResponse } from '@/contracts/discovery-candidates-response';
 
-export interface StorageContribution {
-  contributionId: string;
-  nodeId: string;
-  declaredPath: string;
-  normalizedPath: string;
-  mode: 'read_write' | 'read_only';
-  status: 'active' | 'revoked';
-  capacityBytes: number;
-  availableBytes: number;
-  registeredAt: string;
-}
-
-export interface StorageLocation {
-  locationId: string;
-  contributionId: string;
-  uri: string;
-  kind: string;
-  relativePath: string;
-  byteSize: number;
-  checksumSha256: string | null;
-  ready: boolean;
-  verifiedAt: string;
-  retentionPinnedUntil: string | null;
-}
+export type StorageContribution = ContributionResponse;
+export type StorageLocation = DataLocationResponse;
 
 export interface PoolCapacity {
   totalOffered: { cpuMillicores: number; ramBytes: number; gpuDevices: number };
@@ -142,10 +119,10 @@ export interface AdmissionResponse {
 
 export async function getStorageContributions(
   nodeId?: string
-): Promise<{ items: StorageContribution[]; nextCursor: string | null }> {
+): Promise<ContributionPageResponse> {
   const base = '/v1/storage/contributions';
   const url = nodeId ? `${base}?nodeId=${encodeURIComponent(nodeId)}` : base;
-  return apiClient<{ items: StorageContribution[]; nextCursor: string | null }>(url);
+  return apiClient<ContributionPageResponse>(url);
 }
 
 export async function registerStorageContribution(
@@ -195,10 +172,10 @@ export async function revokeStorageContribution(
 
 export async function getStorageLocations(
   contributionId?: string
-): Promise<{ items: StorageLocation[]; nextCursor: string | null }> {
+): Promise<DataLocationPageResponse> {
   const base = '/v1/storage/locations';
   const url = contributionId ? `${base}?contributionId=${encodeURIComponent(contributionId)}` : base;
-  return apiClient<{ items: StorageLocation[]; nextCursor: string | null }>(url);
+  return apiClient<DataLocationPageResponse>(url);
 }
 
 // -----------------------------------------------------------------------------

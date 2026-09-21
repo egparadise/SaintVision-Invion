@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "locationId": "loc_contract_fixture",
+      "contributionId": "sc_contract_fixture",
+      "uri": "inv://dataset/sample/v1/data.csv",
+      "kind": "dataset",
+      "relativePath": "data.csv",
+      "byteSize": 0,
+      "checksumSha256": null,
+      "ready": false,
+      "verifiedAt": null,
+      "retentionPinnedUntil": null
+    }
+  ],
+  "nextCursor": "loc_contract_fixture"
+}

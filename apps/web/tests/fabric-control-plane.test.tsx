@@ -24,6 +24,7 @@ import {
 import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import { NodeItem } from '../src/contracts/types';
 import { discoveryCandidatesFixture } from './fixtures/discovery-candidates';
+import { storageContributionsFixture, storageLocationsFixture } from './fixtures/storage-catalog';
 
 vi.mock('../src/shared/api/client', () => ({
   apiClient: vi.fn(),
@@ -80,15 +81,14 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
 
   describe('Storage Control Plane Endpoints (1-5)', () => {
     it('1. getStorageContributions fetches contributions with optional nodeId filter', async () => {
-      const mockResult = { items: [], nextCursor: null };
-      mockApi.mockResolvedValueOnce(mockResult);
+      mockApi.mockResolvedValueOnce(storageContributionsFixture);
 
       const res = await getStorageContributions('nod_01JABCDEF01');
       expect(mockApi).toHaveBeenCalledWith('/v1/storage/contributions?nodeId=nod_01JABCDEF01');
-      expect(res).toEqual(mockResult);
+      expect(res).toEqual(storageContributionsFixture);
 
-      mockApi.mockResolvedValueOnce(mockResult);
-      await getStorageContributions();
+      mockApi.mockResolvedValueOnce(storageContributionsFixture);
+      expect(await getStorageContributions()).toEqual(storageContributionsFixture);
       expect(mockApi).toHaveBeenCalledWith('/v1/storage/contributions');
     });
 
@@ -174,12 +174,12 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
     });
 
     it('5. getStorageLocations encodes contributionId parameter', async () => {
-      mockApi.mockResolvedValueOnce({ items: [], nextCursor: null });
-      await getStorageLocations('sc_test1');
+      mockApi.mockResolvedValueOnce(storageLocationsFixture);
+      expect(await getStorageLocations('sc_test1')).toEqual(storageLocationsFixture);
       expect(mockApi).toHaveBeenCalledWith('/v1/storage/locations?contributionId=sc_test1');
 
-      mockApi.mockResolvedValueOnce({ items: [], nextCursor: null });
-      await getStorageLocations();
+      mockApi.mockResolvedValueOnce(storageLocationsFixture);
+      expect(await getStorageLocations()).toEqual(storageLocationsFixture);
       expect(mockApi).toHaveBeenCalledWith('/v1/storage/locations');
     });
   });

@@ -123,6 +123,24 @@ class DataLocationResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class ContributionPageResponse(Strict):
+    """Paginated storage contributions returned to the Resource Explorer."""
+
+    items: list[ContributionResponse]
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DataLocationPageResponse(Strict):
+    """Paginated catalog locations returned to the Resource Explorer."""
+
+    items: list[DataLocationResponse]
+    next_cursor: str | None = Field(alias="nextCursor")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class RecordedReplicaStates(Strict):
     ready: int = Field(ge=0)
     transferring: int = Field(ge=0)

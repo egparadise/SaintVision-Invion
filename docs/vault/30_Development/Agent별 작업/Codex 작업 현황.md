@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.94"
+version: "1.0.95"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T14:40:00+09:00"
+updated: "2026-09-21T15:06:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 storage response contracts 확장
+
+- `GET /v1/storage/contributions`와 `GET /v1/storage/locations`의 페이지 envelope를 strict Pydantic 응답 모델로 고정했다. JSON Schema와 TypeScript 타입을 생성하고 provider 직렬화 시험 및 frontend adapter/mock가 같은 저장소 fixture를 읽도록 연결했다. ResourceExplorer에서 nullable 용량 표시도 반영했다.
+- 계약/fixture mutation 대조는 base `3f83e3fe271c5d95d3aceed499dcbd74ee4765f9`의 dirty worktree에서 15:04 KST에 실행했다. 최종 긍정 검증은 commit `9ff829859b6771fbccac58c2d0089bf6738edb53`의 clean worktree에서 15:07 KST에 다시 실행했다. Branch `integration/all-agents-unified`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node 24.17.0이다. 그 SHA에서 response contract pytest 12 passed; schema export check 24 schemas match; frontend contract generator 3/3 match; Vitest 35 files/336 passed; TypeScript `tsc -b` exit 0이다. Vite build는 같은 구현의 최초 dirty-tree run에서 exit 0이며, final clean-SHA rerun 전이다. 명령별 provenance는 [[2026-09-21_storage_list_response_contract_Codex]]에 있다.
+- 양방향 mutation: 페이지 모델에 필수 필드를 추가하면 provider shared-fixture 테스트가 실패하고 `export_schemas.py --check`가 stale schema로 실패했다. 반대로 shared fixture 필드를 제거하면 Python 모델 검증과 Vitest/Ajv fixture 검증이 실패했다. 각 변형은 검증 뒤 원복했다.
+- 한계: DB DSN은 absent라 DB 의존 storage integration 시험은 이 결과에 포함되지 않았고, CI·live HTTP·브라우저 인수·독립 리뷰도 아직 없다. 구현은 local verified/review pending이며 done이 아니다. 다음 owner는 Claude 독립 계약 검토; 다음 contract 후보는 화면 영향도에 따라 선정한다. 전체 route coverage는 endpoint 발견 검사이며 응답 shape 계약의 대체물이 아니다.
 
 ## 2026-09-21 최종 마감 상태
 

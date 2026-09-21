@@ -1,7 +1,7 @@
 import { apiClient } from './client';
 import type { ModelCommitObservation } from '../../../../../packages/contracts-ts/src';
-export interface Location { locationId: string; uri: string; byteSize: number; checksumSha256: string | null }
-export interface Page<T> { items: T[]; nextCursor: string | null }
+import type { DataLocationPageResponse, DataLocationResponse } from '@/contracts/data-location-page-response';
+export type Location = DataLocationResponse;
 export const replicaStates = ['ready', 'transferring', 'stale', 'corrupt', 'evicted'] as const;
 export interface ReplicaObservation {
   locationId: string; observedAt: string; recordedStates: Record<typeof replicaStates[number], number>;
@@ -13,7 +13,7 @@ export const fabricObservation = {
     const query = new URLSearchParams({ limit: '50' });
     if (cursor) query.set('cursor', cursor);
     const qs = query.toString();
-    return get<Page<Location>>(`/v1/storage/locations${qs ? '?' + qs : ''}`, signal);
+    return get<DataLocationPageResponse>(`/v1/storage/locations${qs ? '?' + qs : ''}`, signal);
   },
   async resolve(uri: string, signal?: AbortSignal) {
     const qs = new URLSearchParams({ uri }).toString();

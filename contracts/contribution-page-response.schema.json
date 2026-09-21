@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "ContributionResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "availableBytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Availablebytes"
+        },
+        "capacityBytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capacitybytes"
+        },
+        "contributionId": {
+          "title": "Contributionid",
+          "type": "string"
+        },
+        "declaredPath": {
+          "title": "Declaredpath",
+          "type": "string"
+        },
+        "mode": {
+          "title": "Mode",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "normalizedPath": {
+          "title": "Normalizedpath",
+          "type": "string"
+        },
+        "registeredAt": {
+          "format": "date-time",
+          "title": "Registeredat",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contributionId",
+        "nodeId",
+        "declaredPath",
+        "normalizedPath",
+        "mode",
+        "status",
+        "registeredAt"
+      ],
+      "title": "ContributionResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Paginated storage contributions returned to the Resource Explorer.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ContributionResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nextcursor"
+    }
+  },
+  "required": [
+    "items",
+    "nextCursor"
+  ],
+  "title": "ContributionPageResponse",
+  "type": "object"
+}

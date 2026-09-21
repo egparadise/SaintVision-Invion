@@ -177,7 +177,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     });
   }, [nodes, filterMode]);
 
-  const formatBytes = (bytes: number) => {
+  const formatBytes = (bytes: number | null | undefined) => {
+    if (bytes === null || bytes === undefined) return '미확인';
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];

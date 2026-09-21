@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "contracts:generate": "node scripts/discovery-contracts.mjs --write",
-    "contracts:check": "node scripts/discovery-contracts.mjs --check"
+    "contracts:generate": "node scripts/api-response-contracts.mjs --write",
+    "contracts:check": "node scripts/api-response-contracts.mjs --check"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",

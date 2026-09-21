@@ -164,7 +164,9 @@ def revoke_contribution(
     return {"contribution": _contribution_body(contribution)}
 
 
-@router.get("/storage/contributions")
+@router.get(
+    "/storage/contributions", response_model=schemas.ContributionPageResponse
+)
 def list_contributions(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
@@ -186,7 +188,7 @@ def list_contributions(
     return page.to_dict(_contribution_body)
 
 
-@router.get("/storage/locations")
+@router.get("/storage/locations", response_model=schemas.DataLocationPageResponse)
 def list_locations(
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),

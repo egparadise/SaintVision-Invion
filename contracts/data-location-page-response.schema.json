@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "DataLocationResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "byteSize": {
+          "title": "Bytesize",
+          "type": "integer"
+        },
+        "checksumSha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksumsha256"
+        },
+        "contributionId": {
+          "title": "Contributionid",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "locationId": {
+          "title": "Locationid",
+          "type": "string"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "relativePath": {
+          "title": "Relativepath",
+          "type": "string"
+        },
+        "retentionPinnedUntil": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retentionpinneduntil"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "verifiedAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifiedat"
+        }
+      },
+      "required": [
+        "locationId",
+        "contributionId",
+        "uri",
+        "kind",
+        "relativePath",
+        "byteSize",
+        "ready"
+      ],
+      "title": "DataLocationResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Paginated catalog locations returned to the Resource Explorer.",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/DataLocationResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nextcursor"
+    }
+  },
+  "required": [
+    "items",
+    "nextCursor"
+  ],
+  "title": "DataLocationPageResponse",
+  "type": "object"
+}
