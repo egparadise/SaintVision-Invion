@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.122"
+version: "1.0.123"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T20:18:00+09:00"
+updated: "2026-09-21T21:06:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 ADR-097 운영자 CLI 임시 발급 경로
+
+- 사용자 결정으로 ADR-097을 Accepted로 올려, 운영자 CLI가 tenant+installation 결속 `discovery:announce` 자격증명을 임시 발급하도록 구현했다. `inv_discovery_issuer`는 NOLOGIN 최소 권한 DB role이며, 지정된 운영자 로그인만 DBA가 멤버로 부여한다. 원문은 commit 뒤 interactive stdout에서 한 번만 보이고 DB/audit에는 SHA-256 digest와 비밀 아닌 메타데이터만 남긴다. 15분 만료, 30초 공지 간격, 재발급 회전 폐기, 명시 폐기와 승인/거절 시 자동 폐기를 구현했다. 승인된 보호 전달 채널의 실제 이름/설정은 저장소에서 확인되지 않아 운영 전제다.
+- PostgreSQL 16 임시 Docker 컨테이너(768 MiB 제한, tmpfs DB, 고유 Codex 라벨)로 CLI 발급→실제 FastAPI 공지 및 linked-candidate 갱신→admission 자동 폐기→명시적 폐기와 403을 실행 확인했다. 일반 후보 조회 API에 동일 discovery bearer를 보내면 403이며, 타 tenant·잘못된 설치 ID·만료·폐기는 HTTP 403/no candidate였다. issuer 멤버십이 없는 실제 PostgreSQL login은 거부됐고 자격증명 row는 생성되지 않았다. tenant/expiry/revocation 각 가드를 단독 제거한 변형은 각각 targeted unit test를 실패시킨 뒤 복구했다.
+- 최종 명령 `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`; 2026-09-21 21:00:30 KST, 기준 SHA `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`, Python 3.14.6, Docker present/Go absent, test-only PostgreSQL DSN set, exit 0, 3 passed/7 warnings. 실행 전 가용 RAM 1,412,576 KiB, Docker Server 20.10.22; 소유 컨테이너 `sv-discovery-adr097-b14efe7dfd02`는 제거 후 inspect 부재로 확인했다. 실제 `inv-discover` 바이너리/물리 Node 발급-공지-enrollment-mTLS는 Go compiler 부재로 미실행이다. 승인된 조직 전달 채널도 저장소에서 특정되지 않아 미확인이다. 따라서 CLI→HTTP API E2E는 확인됐고 운영 Node onboarding 전체는 아직 인수되지 않았다.
+- Node runbook을 operator role grant, DSN 환경주입, dry-run/issue, one-time secret protected handoff, Node env injection, 후보 수동 확인, admission 자동 폐기, 긴급 revoke까지 이어지게 고쳤다. 장기 protected issuer API는 열린 결정이다. 상세: `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]` 및 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
+- 최종 export에서 Obsidian `sync_obsidian.py --apply`를 수행하고 뒤이은 `--check`는 1439 managed/0 pending/0 conflicts, exit 0이었다. 보호 전달 채널 미지정, 실제 Go Node 바이너리 미빌드/미실행, operator 발급 건수 제한 미구현은 다음 운영/보안 확인으로 남긴다.
+- 보안 정정: 첫 실패 테스트의 assertion 출력에 disposable DB 합성 bearer 원문이 노출됐다. 해당 컨테이너 삭제 및 15분 TTL 종료 후, 테스트 코드는 값 없는 실패 메시지를 사용하도록 수정했다. 최신 test-only 출력 보호 변경은 2026-09-21 21:04 KST RAM 645,764 KiB(<1 GiB) preflight로 PostgreSQL 재실행을 시작하지 않았으며, `py_compile`, 3개 collect-only, 비DB focused 40 passed는 통과했다. 자세한 경계 기록은 `[[2026-09-21_discovery_machine_credential_ADR097_Codex]]`.
 
 ## 2026-09-21 Codex 계약 서빙 앵커 버킷 감사
 
@@ -20,9 +29,8 @@ source_of_truth: "Git"
 - 모델 verify HTTP 관측과 온디맨드 재검증은 현재 미노출로 결정했다. DB에는 immutable commit만 있고 마지막 검증 결과/카운트 receipt가 저장되지 않으며 locality 검증은 요청·주체·epoch에 결합된 임시 결과다. 이를 현재 무결성으로 노출하지 않는다. 별도 lineage route도 아직 만들지 않는다. SaintVision `trace_model`은 실데이터를 갖지만 HTTP auth/tenant scope 및 공개 필드 계약이 미정이다. 화면은 합성 lineage/eval 점수 대신 명시적 미노출 상태를 유지한다.
 - 검증은 Windows 주 checkout의 프로젝트 Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`로 이 worktree의 소스를 대상으로 한다. worktree-local venv는 없어 provenance wrapper의 첫 실행은 launch exit 127이었고, 이를 시험 실패로 집계하지 않았다. PostgreSQL-backed test, live route 및 browser acceptance는 실행하지 않았다. reviewer pending.
 - Claude `85868a7`의 discovery tenant 최고위험 finding을 소스에서 확인했다. 기존 announcement route는 principal 없이 caller `X-Inv-Tenant`를 RLS scope에 사용했고 Node Agent 시험은 bearer가 없음을 기대했다. 후보 row만 쓰더라도 타 tenant 후보 주입 및 후보 500 한도 소진이 가능했다. route가 이제 `get_principal`을 요구하고 header mismatch를 DB 접근 전에 `AUTH-TENANT-SCOPE` 403으로 거부한다. Node Agent `inv-discover`는 `INV_DISCOVERY_BEARER_TOKEN` 환경 자격증명을 보내도록 수정했고 runbook을 갱신했다. FastAPI TestClient에서 다른 tenant 403/no DB call, 무인증 401을 확인했고 tenant compare 제거 변형은 mismatch 시험을 실패시켰다. discovery+shard suite 8 passed; check_docs 639 versioned documents 통과.
-- 화면 소유 인계: `ResourceExplorer.tsx`의 기존 하드코딩 tenant UUID는 backend에서 거부된다. Gemini가 세션 principal tenant를 전달하도록 wiring해야 한다. 운영 Node Agent bearer 발급/주입은 아직 설정되지 않았다. Go compiler 부재로 Go package/CLI 시험은 미실행이며 PostgreSQL-backed 저장 통합/운영 HTTP도 미검증이다. model verify 및 lineage endpoint는 저장·권한 근거가 부족해 계속 미노출로 판정했다.
-- 설계 영향 후속 확인: 무인증 공지는 원래 “미등록 Node가 먼저 후보를 알릴 수 있는 유일 경로”라는 최소 권한 설계였다. 인증 요구는 임의 cross-tenant 후보 주입/tenant 후보 한도 소진을 막지만, 아직 machine/discovery credential 발급·IdP service identity·secret 배포 절차가 없어 새 무자격 Node의 첫 공지를 막는다. 후보 admission token은 공지 뒤 발급되므로 해결책이 아니다. 신규 무인증 Node onboarding은 지원 절차가 정해질 때까지 차단 상태로 기록했고 anonymous endpoint를 재개하지 않기로 했다. 다음 owner: Codex가 tenant-bound scoped credential 계약 설계, Identity/운영 담당자가 발급·주입·회전 절차 결정. 상세 근거: History와 `[[Codex Node와 저장소 Adapter 실행 안내]]`.
-- Proposed ADR-097 `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]`: tenant+installation-bound, `discovery:announce` only, 15-minute opaque credential that refreshes one candidate at 30-second cadence; admission/revoke ends it. Issuer API/CLI, digest persistence, revoke/audit and secure delivery are not implemented; new uncredentialed Node onboarding remains blocked. User decision pending; Identity/operations must confirm issuer authority and secret delivery channel. The proposal lists leak impact and testable acceptance evidence.
+- 과거 상태 기록(20:18 snapshot, 아래 ADR-097 Accepted 항목으로 대체): 당시 `ResourceExplorer.tsx`의 tenant UUID는 Gemini가 session principal tenant로 교체해야 했고 bearer issuer 및 PostgreSQL 저장/운영 HTTP는 아직 구현 전이었다. 이후 operator CLI 발급부터 FastAPI 공지까지 실제 PostgreSQL로 검증했다. Go compiler 부재에 따른 `inv-discover` 바이너리/Node 시험 미실행과 보호 전달 채널 미확인은 여전히 남는다. model verify 및 lineage endpoint 미노출 판단은 유지한다.
+- 과거의 Proposed ADR-097 및 “user decision pending” 문구는 20:18 시점 상태로 보존한다. 사용자가 같은 날 운영자 CLI 임시 경로를 승인했고 아래 20:49 항목에서 발급/폐기/만료 구현과 검증을 기록했으므로 현재 상태로 읽지 않는다. 장기 protected API만 열린 결정이다.
 
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 

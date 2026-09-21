@@ -1,10 +1,10 @@
 ---
 doc_id: "NODE-STORAGE-RUNBOOK-001"
 title: "Codex Node와 저장소 Adapter 실행 안내"
-version: "1.0.3"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T20:03:00+09:00"
+updated: "2026-09-21T21:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,9 +14,27 @@ source_of_truth: "Git"
 
 ## 공지와 등록 후 관측
 
-CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보만 만들며 admission은 하지 않는다. `POST /v1/discovery/announcements`는 이제 인증 principal을 요구하고 `X-Inv-Tenant`가 그 principal의 tenant와 같아야 한다. Node Agent 실행 환경에 해당 tenant로 인증되는 `INV_DISCOVERY_BEARER_TOKEN`을 보안된 secret manager/service environment로 주입한다. 토큰을 CLI 인자, 저장소, 로그 또는 보고서에 넣지 않는다. 실제 endpoint, 해당 CA, 비밀이 아닌 tenant UUID와 안정적인 installation ID를 지정한다.
+CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보만 만들며 admission은 하지 않는다. `POST /v1/discovery/announcements`는 기존 OIDC principal 또는 제한된 `discovery:announce` 기계 자격증명을 요구한다. 기계 자격증명은 발급 시 tenant와 안정적인 installation ID에 결속되고, `X-Inv-Tenant`는 기록된 tenant와 일치해야 한다. 만료는 15분이며 30초보다 잦은 공지는 거부된다. 자격증명은 후보를 하나만 만들거나 갱신할 수 있고, 실제 기기 정체를 증명하지 않는다.
 
-> **온보딩 차단 조건:** 위 문장은 자격증명 전달 위치만 설명하며 발급 절차를 제공하지 않는다. 저장소에는 미등록 Node용 discovery bearer 발급/배포 절차가 없고, 후보 admission의 one-time `bootstrapToken`은 최초 공지 뒤에 발급되므로 이를 대체하지 않는다. 유효한 tenant-mapped OIDC access token을 미리 주입하지 못한 새 Node는 후보로 나타나지 않는다. 권고된 operator-issued, installation-bound, 15분 bounded-refresh credential 절차도 제안 단계이며 구현되지 않았다. 발급자와 승인된 secret 전달 절차가 확정·구현되기 전까지 이 안내를 완결된 신규 Node bootstrap 절차로 사용하지 않는다. 임의 user token을 장기 기계 자격증명으로 취급하거나 익명 route를 임시 재개하지 않는다. 선택지와 합격 증거: [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]].
+### 운영자 임시 발급 절차
+
+ADR-097에 따라 임시 발급자는 운영자 CLI이며 발급 권한은 운영자에게 남는다. DB 관리자는 지정된 운영자 로그인에만 `inv_discovery_issuer` 멤버십을 부여한다. 역할은 `NOLOGIN`이고 CLI는 접속 계정이 이 역할의 멤버인지 확인한 뒤 해당 역할로 전환한다. 일반 개발자 계정·프로젝트 멤버·호스트 로컬 접근만으로는 발급할 수 없다. 이 역할은 현재 모든 tenant의 발급·폐기 권한을 가지므로 승인된 소수 운영자만 받아야 한다.
+
+운영자는 승인된 비밀 저장소/환경 주입으로 전용 DSN을 `INV_DISCOVERY_ISSUER_DSN`에 제공한다. DSN이나 비밀 값을 셸 명령, 저장소, 기록 문서 또는 로그에 직접 입력하지 않는다. 먼저 해당 tenant와 설치 ID로 사전 검사를 실행한다.
+
+```bash
+python tools/discovery_credential.py issue --tenant <tenant-uuid> --installation <stable-installation-id>
+```
+
+사전 검사가 통과하면 비공개·비녹화 대화형 터미널에서 `--apply`를 붙여 발급한다.
+
+```bash
+python tools/discovery_credential.py issue --tenant <tenant-uuid> --installation <stable-installation-id> --apply
+```
+
+CLI는 DB commit 뒤 bearer를 stdout에 한 번만 보여주며, 발급 레코드에는 SHA-256 digest만 저장한다. 화면 공유·터미널 녹화·로그 수집을 끄고 즉시 승인된 보호 전달 경로로 옮긴다. 원문을 티켓, 채팅, 셸 인자, 캡처 또는 보고서에 복사하지 않는다. CLI 출력의 비밀은 다시 조회할 수 없으므로 잃어버리면 같은 설치 ID로 재발급한다. 재발급은 이전 미폐기 자격증명을 먼저 폐기한다.
+
+Node 서비스의 보호된 환경 주입 경로에 `INV_DISCOVERY_BEARER_TOKEN`을 설정하고 실제 endpoint, CA, 비밀이 아닌 tenant UUID와 installation ID를 지정한다. 새 자격증명은 `inv-discover`가 읽는 기존 환경변수 계약을 사용한다.
 
 ```bash
 inv-discover --endpoint "$INV_DISCOVERY_ENDPOINT" --ca "$INV_DISCOVERY_CA_FILE" \
@@ -24,6 +42,16 @@ inv-discover --endpoint "$INV_DISCOVERY_ENDPOINT" --ca "$INV_DISCOVERY_CA_FILE" 
 ```
 
 프로세스 환경에 `INV_DISCOVERY_BEARER_TOKEN`을 안전하게 설정해야 하며, 값 자체를 명령행에 쓰지 않는다. `--once`를 생략하면 30초 간격으로 공지한다. bootstrap token·인증서·Node role은 이 공지의 결과가 아니다. 기존 Node 실행 CLI의 명시적 tenant/node/epoch/profile/image/executable/state/public-key/mTLS 설정이 별도로 필요하다. 운영 등록 토큰과 CA 발급 경로도 별도 미완료다.
+
+운영자는 후보가 표시되면 installation ID와 관측 정보를 물리 기기와 별도로 대조한 뒤 기존 admission 절차를 수행한다. 승인/거절 시 연결된 discovery 자격증명은 자동 폐기된다. 사고 대응 또는 계획된 폐기에는 발급 때 기록한 비밀이 아닌 credential ID를 사용한다.
+
+```bash
+python tools/discovery_credential.py revoke --tenant <tenant-uuid> --credential-id <dcr-credential-id> --apply
+```
+
+만료 자격증명은 API에서 자동 거부되며 만료 이력은 감사 목적으로 남는다. 재발급은 같은 tenant/installation의 이전 grant를 회전 폐기한다. DB 기록에는 원문 bearer가 없다.
+
+> **운영 경계:** 코드와 임시 CLI/API 경로는 disposable PostgreSQL에서 검증됐다. 실제 조직 승인 전달 채널, 실제 `inv-discover` 바이너리/물리 Node 발급부터 공지, admission 뒤 one-time enrollment 교환과 mTLS까지는 이 문서 갱신에서 실행하지 않았다. 운영자가 승인된 보호 전달 채널을 확보하지 못하면 신규 Node 온보딩은 여전히 차단이다. 사용자 승인으로 운영자 CLI를 임시 선택했고, 보호된 tenant-operator API는 장기 결정으로 열려 있다. 상세 근거: [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]].
 
 설치한 Python package의 `inv-observer-worker`는 `INV_OBSERVER_CONFIG` JSON 파일을 읽는다. 파일의 키는 `tenantId`, `tls`이고 tls는 `ca_file`, `certificate_file`, `key_file`이다. 현재 등록 Node CA와 CP client cert/key를 사용한다. `INV_RUNTIME_DSN`은 비owner·NOBYPASSRLS service role, `INV_RECOVERY_EPOCH`는 운영자가 검증한 현재 UUID다. 비밀은 Git/CLI 출력/보고서에 넣지 않는다.
 

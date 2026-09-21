@@ -1,35 +1,48 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-ADR-001"
-title: "Discovery machine credential least-privilege contract proposal"
-version: "1.0.0"
-status: "proposed"
+title: "Discovery machine credential least-privilege contract"
+version: "1.1.0"
+status: "accepted"
 author: "Codex"
 reviewer: "pending"
-mapped_at_sha: "a1d72856feb6a8421ddea1601edc27ee9c9f57c5"
-updated: "2026-09-21T20:03:00+09:00"
+mapped_at_sha: "462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e"
+updated: "2026-09-21T21:02:00+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "tenant", "bootstrap", "security"]
 ---
 
-# ADR-097 proposal: tenant-bound discovery credential
+# ADR-097: tenant-bound discovery credential
 
-**Status:** Proposed; user decision pending. This is a contract/design proposal, not an implemented or operational credential workflow.
+**Status:** Accepted for the interim operator-CLI path. Implementation is present in this branch; real Node binary/physical-node onboarding and protected delivery-channel acceptance remain unverified.
 **Date:** 2026-09-21 KST
-**Deciders:** User; Codex (security/contract design); Identity and operations owners (issuer and delivery procedure)
-**Base:** integration `a1d72856feb6a8421ddea1601edc27ee9c9f57c5`
+**Decision:** The user approved an operator CLI as the temporary credential issuer. Operators bind a credential to one tenant and installation, then inject it through an approved protected delivery path. Issuance authority remains with designated operators. A future protected tenant-operator API is an open long-term decision; this acceptance does not choose it.
+**Deciders:** User (operational path decision); Codex (security/contract implementation); designated Identity/operations owners (operator account and delivery-channel operation)
+**Base:** branch `agent/codex/terminal-pty-contract`, anchor commit `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`
+
+## Decision
+
+Adopt a per-installation, tenant-bound, short-lived `discovery:announce` grant issued by `tools/discovery_credential.py`. The operator CLI is the interim issuer; a protected API remains a later decision. The first-contact endpoint is not anonymous. The credential may only create or refresh its one linked unverified candidate, and normal OIDC authorization remains required for candidate review/admission and all other APIs.
+
+Issuance requires a named PostgreSQL login explicitly granted membership in the `inv_discovery_issuer` database role. The role itself is `NOLOGIN`, `NOSUPERUSER`, `NOCREATEDB`, `NOCREATEROLE`, `NOINHERIT`, and `NOBYPASSRLS`; it can read tenant identifiers and perform only the credential/event operations needed by the CLI. Database administration grants membership to individually designated operators. Local access to the CLI or workstation alone is not issuer authorization. This issuer role is currently cross-tenant, so membership must remain restricted to named operators approved to provision any tenant; tenant-specific issuer delegation is not implemented.
+
+The CLI reads `INV_DISCOVERY_ISSUER_DSN` from the process environment. It supports a read-only preflight and requires `--apply` to write. It rejects issuance unless stdout is an interactive terminal. After the transaction commits it displays the bearer exactly once alongside a non-secret credential ID and expiry; the raw token is never written to the repository, database, argv, audit event, diagnostic, or application log. Operators must not run the command in a recorded/shared terminal and must transfer the visible value immediately through the organization-approved protected channel. The repository does not name or verify that channel; if an approved channel is unavailable, onboarding remains blocked.
+
+The bearer has 256 bits of randomness, is stored only as SHA-256 digest, expires after 15 minutes, and is rate-limited to one announcement per 30 seconds. Re-issue atomically revokes the previous active grant for that tenant/installation. Operators can revoke by tenant and credential ID; admission and decline revoke outstanding linked credentials. Expired rows remain as audit/history records and fail authorization. The server returns the same 403 for unknown, mismatched, expired, and revoked grants while storing only safe reason codes in audit metadata.
+
+This grants no proof of physical identity. A thief can falsify self-reported fields and refresh only the one bound candidate until expiry/revocation. They cannot create another candidate, act for another tenant/install, list/admit candidates, mint enrollment credentials, enroll a node, access project data, or call ordinary user APIs. Operators must independently verify the claimed machine before admission.
 
 ## Context
 
-The discovery announcement was intentionally anonymous so an unregistered Node could announce before it had an identity. The handler only wrote an unverified candidate, but the caller chose `X-Inv-Tenant`; an unauthenticated caller could insert candidates into another tenant and consume that tenant's 500-candidate limit. The current security fix binds announcements to an authenticated principal's tenant. It also means a new machine without a pre-provisioned OIDC user access token cannot make its first announcement.
+The discovery announcement was intentionally anonymous so an unregistered Node could announce before it had an identity. The handler only wrote an unverified candidate, but the caller chose `X-Inv-Tenant`; an unauthenticated caller could insert candidates into another tenant and consume that tenant's 500-candidate limit. The earlier security fix bound the endpoint to an authenticated principal's tenant, which closed that cross-tenant write but also blocked first contact by a machine without a pre-provisioned OIDC token. This decision adds a separate machine-credential branch limited to first-contact announcements.
 
-The repository has a one-time **enrollment** bootstrap token, but it is issued only after a candidate exists and is approved. It cannot authenticate the first discovery request. There is no repository implementation for issuing a discovery machine credential, registering an IdP service identity, or delivering/rotating such a secret. The Node runbook's secret-manager instruction describes a destination only, not an issuer or operational procedure.
+The one-time **enrollment** bootstrap token is issued only after a candidate exists and is approved, so it cannot authenticate the first discovery request. At proposal time, the repository lacked a discovery issuer. This branch now implements the scoped CLI and credential persistence; there is still no IdP service identity, organization-specific protected delivery channel, or long-term protected issuer API.
 
 ## Goals and non-goals
 
 - Let an operator-authorized, not-yet-enrolled machine create one candidate in exactly one tenant without reopening anonymous cross-tenant writes.
 - Keep announcement data explicitly self-reported and unverified; discovery must not enroll, admit, execute, or grant access.
 - A leaked discovery credential must not act as a user credential or work on any other API.
-- Define an implementable interim path. Do not claim the current branch already supports it.
+- Implement the accepted interim operator-CLI path and state the remaining real-node/delivery boundaries without claiming production onboarding acceptance.
 
 This credential is not node mTLS identity, the later one-time enrollment token, a user OIDC token, or proof that the machine's claimed hostname/capabilities are true.
 
@@ -53,10 +66,10 @@ This credential is not node mTLS identity, the later one-time enrollment token, 
 ### Scope and leak impact
 
 - Scope is exactly `discovery:announce` for the bound tenant and installation, on `POST /v1/discovery/announcements` only.
-- The announcement route needs a dedicated discovery-credential verifier/dependency; do not pass this credential through `get_principal` or accept it on ordinary user routes. If carried in `Authorization: Bearer`, ensure shared proxy/access logs redact that header.
+- The announcement route has a dedicated discovery-only verifier branch; it does not pass this credential through `get_principal`. Ordinary protected routes continue to use their own user/node authentication. If carried in `Authorization: Bearer`, shared proxy/access logs must redact that header.
 - It cannot list candidates, admit/decline them, mint enrollment tokens, enroll Nodes, read tenant/project data, create workloads, request PTY tickets, or call other user APIs. Other endpoints continue to require their own OIDC principal or enrolled-node mTLS contract; the discovery secret must not be accepted as a `Principal`.
 - A stolen credential can create or refresh the one linked candidate and lie in that candidate's self-reported fields until expiry/revocation. It cannot create multiple candidates or refresh arbitrary installations. The human admission step must verify the expected installation out of band; a candidate is not proof of machine identity. This residual spoof/substitution risk must be visible to the admitting operator.
-- Rate-limit issuance per tenant/issuer and announcement attempts per source/token. Never log the raw secret or put it in argv, URL, error, evidence, or database plaintext.
+- The server enforces one announcement per credential per 30 seconds. A configurable issuance-count rate limit per tenant/operator is not implemented; one active grant per tenant/installation and explicit operator DB-role membership are the current controls. Add a rate limit before broadening issuer membership. Never log the raw secret or put it in argv, URL, error, evidence, or database plaintext.
 
 ### Secret format, expiry, and use
 
@@ -66,44 +79,48 @@ This credential is not node mTLS identity, the later one-time enrollment token, 
 
 ### Issuance, rotation, revocation, and audit
 
-- Issuer must be an explicitly authorized tenant operator, separate from a normal project member. The precise permission source is open: a tenant-level operator grant/API, or an audited operator CLI backed by a dedicated provisioning identity. Do not equate any valid OIDC user with permission to issue machine credentials.
-- On issuance, record credential ID, tenant, installation ID, exact scope, issuer, issue/expiry time, and state. Show the secret once through an approved protected channel. No issuance API/CLI exists today.
+- Issuer must be explicitly authorized and separate from a normal project member. The accepted interim authority is membership in the dedicated `inv_discovery_issuer` PostgreSQL role, granted by a database administrator to named operator logins. A future tenant-level operator grant/API remains open. Do not equate a valid OIDC user or local CLI access with issuance authority.
+- On issuance, record credential ID, tenant, installation ID, exact scope, issuer, issue/expiry time, and state. The CLI shows the secret once in interactive stdout after commit; operators then use an approved protected channel. No secret is stored for later retrieval.
 - Re-issue by atomically revoking any unused credential for the same tenant/installation and creating a new credential. Revoke by credential ID; consumption, expiry, and revocation are terminal. Successful admission/enrollment should revoke any outstanding grants for that installation.
 - Audit issue, revoke, each accepted refresh, expiry, rejection, issuer, tenant, credential ID, installation ID, timestamps, and outcome. Never include raw token bytes. Rejections must not reveal whether another tenant's credential exists.
 
 ## Minimum interim onboarding path
 
-This is the smallest path recommended to unblock the first Node without an anonymous endpoint; **none of these credential-issuer steps are implemented yet**:
+The interim path is implemented in this branch except for an actual Node binary/physical-node exercise and an organization-specific protected handoff channel:
 
 1. Operator verifies the tenant and assigns/generates the stable installation ID for the physical machine.
-2. An authorized issuer creates a tenant + installation bound, `discovery:announce` credential with 15-minute expiry. A future protected CLI is the shortest implementation option; a tenant-operator API is preferable once the operator permission model exists. Both must store only the digest and audit issuance. It can refresh one linked candidate at most once per 30 seconds.
-3. Deliver the one-time secret directly through a protected operator channel and load it in the Node service environment as `INV_DISCOVERY_BEARER_TOKEN`. Do not paste it into a shell command, CLI option, source, ordinary ticket, or log.
+2. A database administrator provisions a named operator login and grants it membership in `inv_discovery_issuer`. The operator receives its DSN through the approved secret manager/environment injection as `INV_DISCOVERY_ISSUER_DSN`; do not put DSN contents in shell history, a script, source, or report. Run the CLI preflight, then issue with `--apply` in a private, non-recorded interactive terminal:
+   `python tools/discovery_credential.py issue --tenant <tenant-uuid> --installation <stable-installation-id> --apply`
+   The command shows the bearer once after commit. Keep the non-secret `credentialId` and `expiresAt` for lifecycle actions; never copy the bearer into a log or ticket.
+3. Deliver the bearer only through the organization's approved protected channel and inject it into the Node service environment as `INV_DISCOVERY_BEARER_TOKEN`. Do not put the secret in a command argument, source, ordinary ticket, terminal transcript, screenshot, or log.
 4. Run the agent's normal 30-second announcement loop with the short-lived credential. It can create/update only one explicitly unverified candidate until expiry or revocation. Stop the loop when the candidate is under review or enrollment completes.
 5. An authenticated tenant operator checks the candidate's installation ID and observed source details against the physical machine out of band, then uses the existing candidate admission path. The returned one-time **enrollment** token is delivered to that machine and exchanged at `POST /v1/nodes`; the machine then uses its enrolled node credential/mTLS. These are separate grants and must not be conflated.
-6. Revoke the discovery credential at admission (or on denial); confirm no secret appears in logs. If step 2–3 cannot be performed with an approved issuer/channel, the node remains blocked; do not fall back to anonymous announcement or a long-lived human token.
+6. Admission/decline revokes the linked grant. For an incident or planned retirement, an authorized operator can revoke it explicitly:
+   `python tools/discovery_credential.py revoke --tenant <tenant-uuid> --credential-id <dcr-credential-id> --apply`
+   Expired grants are rejected without cleanup jobs; their metadata remains for audit, and a re-issue rotates/revokes an older grant. Confirm no bearer appears in service logs. If an approved issuer login or protected delivery channel is unavailable, the node remains blocked; do not fall back to anonymous announcement or a long-lived human token.
 
-The interim route is operator issuance and secure out-of-band delivery of a per-installation, short-lived scoped credential, not the current code's generic OIDC bearer environment variable. It becomes an executable procedure only after the issuer, persistence/validation, CLI or API, audit, Node client behavior, and protected delivery channel are implemented and tested. The real Identity/operations owner must confirm whether a suitable secure delivery channel already exists.
+The temporary route is operator CLI issuance and protected out-of-band delivery of a per-installation, short-lived scoped credential. The long-term protected issuer API remains an open decision. The actual approved delivery channel is still an operational prerequisite not identifiable from this repository.
 
-## Alternatives and decisions for the user
+## Decision record and remaining long-term choices
 
-1. **Tenant binding:** trust `X-Inv-Tenant` (reject); require a current user OIDC principal and derive tenant from it (secure for interactive callers, but does not solve an unregistered machine); or bind tenant in the machine grant and require the header to match it (recommend for machine onboarding).
-2. **Scope:** reuse a user's general OIDC bearer (reject for unattended Nodes); create a tenant-wide service identity (broader than needed); or grant only `discovery:announce` for one installation (recommend).
-3. **Expiry/use:** single request then consume (narrowest, but candidate becomes stale after 300 seconds unless the operator acts promptly); short-lived 15-minute grant with 30-second refreshes for one linked candidate (recommend); long-lived/no-expiry renewal (reject).
-4. **Rotation:** automatically refresh using the same credential (easy but extends exposure); or operator re-issues a replacement that atomically revokes the previous grant (recommend initially).
-5. **Revocation:** stateless/self-contained credential with expiry-only revocation (simple, but leaked token remains usable); or durable credential state with `revoked_at` and admission-linked revoke (recommend for prompt response).
-6. **Audit:** infrastructure logs only (may miss tenant-level actor context); or append-only business audit for issue, revoke, accepted refresh and denial with token ID but no secret (recommend; security logs may supplement).
-7. **Issuer:** protected operator API (recommended long-term, but needs a tenant-operator authority) or operator CLI (shortest interim implementation, but requires a dedicated provisioning identity and auditable host controls). A normal project-member role is not sufficient by itself.
+1. **Tenant binding (decided):** bind tenant in the machine grant and require `X-Inv-Tenant` to match it.
+2. **Scope (decided):** allow only `discovery:announce` for one installation; do not reuse a user's general OIDC bearer.
+3. **Expiry/use (decided):** 15-minute grant, one linked candidate, 30-second minimum interval; no long-lived renewal.
+4. **Rotation (decided):** operator re-issue atomically revokes the previous grant for that tenant/installation.
+5. **Revocation (decided):** durable `revoked_at`; explicit operator revoke and admission/decline revoke linked credentials.
+6. **Audit (decided):** append-only metadata events for issue, revoke, accepted refresh, admission and denial; raw bearer is excluded. Per-operator issuance rate cap remains a follow-up.
+7. **Issuer:** accepted interim choice is operator CLI using explicit membership in the dedicated `inv_discovery_issuer` DB role. A protected tenant-operator API remains open as the long-term option. A normal project-member role or workstation access alone is insufficient.
 8. **Delivery:** existing approved secret manager/service injection if Identity/operations confirms one, otherwise a narrowly controlled out-of-band handoff. The repository currently proves neither channel exists.
 9. **Temporary anonymous endpoint:** not recommended and not included. The existing tenant-spoofing/candidate-cap attack would return.
 
-## Acceptance evidence required before calling onboarding restored
+## Acceptance evidence and remaining boundary
 
 - Cross-tenant mismatch, wrong installation ID, expired, revoked, random, and wrong-scope credentials fail before candidate write; a matching grant can refresh only the same linked candidate and cannot create another row, including after source IP changes.
 - Mutation controls prove removing each tenant/scope/use/expiry check makes its corresponding test fail.
-- A stolen-grant simulation can create at most the one bound unverified candidate and cannot call list/admission/enrollment/other tenant endpoints.
-- Issuer authorization, token secrecy in logs/CLI/audit, secure delivery, one-time enrollment exchange, revocation, and audit are exercised end-to-end in the chosen operator channel.
-- New Node journey succeeds from no prior identity through discovery, human admission, bootstrap-token exchange, and enrolled-node authentication. Until all steps are evidenced, onboarding stays blocked/unverified.
+- A matching bearer can refresh only its linked candidate. An HTTP attempt to list candidates with that same discovery bearer is 403; exhaustive probing of every other API route was not part of this run.
+- Issuer authorization, token secrecy, API first announcement, candidate admission, automatic and explicit revocation, expiry, and safe audit metadata are exercised against a disposable PostgreSQL and the FastAPI HTTP boundary. Unit guard-removal controls also prove tenant, expiry, and revocation checks.
+- Not yet evidenced: actual `inv-discover` binary execution, physical Node service secret injection through the organization's approved protected channel, one-time enrollment exchange on a real Node, and enrolled-node mTLS. Therefore the protocol/CLI implementation is ready for controlled operator testing, but real-node onboarding is not yet declared operationally restored.
 
 ## Current implementation evidence and limitations
 
-At base `a1d72856feb6a8421ddea1601edc27ee9c9f57c5`, the API requires a principal and enforces tenant equality; `inv-discover` sends `INV_DISCOVERY_BEARER_TOKEN` as Authorization Bearer. Focused TestClient proves cross-tenant 403/no DB call and missing credential 401, with guard-removal rollback failure. This does not prove issuance, machine scope, real OIDC/IdP delivery, or successful first-time Node onboarding. Go build/test was not run because Go is absent on the development host. No new code or credential was created as part of this proposal.
+Implementation in this branch adds migration `0045_discovery_machine_cred`, the `inv_discovery_issuer` role, issuer CLI, digest-only credential/event tables, scoped announcement verification, rotation, explicit revocation, and admission/decline revocation. Disposable PostgreSQL HTTP integration exercises CLI dry-run/issue/revoke, successful first announcement and refresh, admission revocation, explicit revocation, cross-tenant/install/expiry denial, and no-candidate-on-denial. The Python guard suite was mutation-tested by removing tenant, expiry, and revocation checks separately; each corresponding test failed, then the source was restored. Go compilation/runtime and physical Node onboarding were not run because Go is unavailable on this development host. No production credential was issued.

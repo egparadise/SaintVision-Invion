@@ -31,6 +31,7 @@ from .discovery import (
     ResourcePool,
     ResourcePoolMember,
 )
+from .discovery_credentials import DiscoveryCredentialEvent, DiscoveryMachineCredential
 from .evaluation import (
     EVAL_CATEGORIES,
     EVAL_OUTCOMES,
@@ -139,6 +140,8 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "project_members",
     "nodes",
     "node_bootstrap_tokens",
+    "discovery_machine_credentials",
+    "discovery_credential_events",
     "node_capabilities",
     "resource_offers",
     "resource_snapshots",
@@ -207,6 +210,7 @@ PARTITIONED_TABLES: dict[str, str] = {
 APPEND_ONLY_TABLES: tuple[str, ...] = (
     "audit_events",
     "evidence_envelopes",
+    "discovery_credential_events",
     # A sealed RunRecord is the account of what happened; rewriting one
     # after the fact is exactly what it exists to prevent.
     "run_records",
@@ -228,6 +232,11 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
 LIFECYCLE_UPDATE_COLUMNS: dict[str, tuple[str, ...]] = {
     "dataset_versions": ("retention_pinned_until",),
     "model_versions": ("stage", "verified_at", "retention_pinned_until"),
+    "discovery_machine_credentials": (
+        "revoked_at",
+        "announcement_id",
+        "last_announcement_at",
+    ),
 }
 
 __all__ = [
@@ -316,6 +325,8 @@ __all__ = [
     "CONTRIBUTION_MODES",
     "CONTRIBUTION_STATUSES",
     "DataLocation",
+    "DiscoveryCredentialEvent",
+    "DiscoveryMachineCredential",
     "IdempotencyRecord",
     "LOCATION_KINDS",
     "NODE_STATUSES",

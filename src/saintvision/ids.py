@@ -76,6 +76,7 @@ PREFIXES: Final[dict[str, str]] = {
     "permission_snapshot": "psn",
     # discovery, pools and distributed placement
     "announcement": "anc",
+    "discovery_credential": "dcr",
     "pool": "pol",
     "plan": "pln",
     "replica": "rep",

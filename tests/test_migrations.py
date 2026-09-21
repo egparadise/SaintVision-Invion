@@ -247,6 +247,53 @@ def test_identity_columns_are_never_grantable(rendered_sql):
         assert not (set(columns) & forbidden), f"{table}: grants an identity column"
 
 
+def test_discovery_issuer_is_a_separate_nonlogin_role_with_scoped_table_privileges(rendered_sql):
+    role = re.search(
+        r"CREATE ROLE inv_discovery_issuer([^;]+);", rendered_sql, re.IGNORECASE
+    )
+    assert role, "discovery issuer role is not created"
+    flags = role.group(1).upper()
+    for flag in ("NOLOGIN", "NOSUPERUSER", "NOBYPASSRLS", "NOCREATEDB", "NOCREATEROLE", "NOINHERIT"):
+        assert flag in flags, f"issuer role lacks {flag}"
+    assert re.search(
+        r"ALTER ROLE inv_discovery_issuer([^;]+);", rendered_sql, re.IGNORECASE
+    )
+    assert re.search(
+        r"GRANT SELECT \(credential_id, tenant_id, installation_id, scope, issued_by,\s*"
+        r"issued_at, expires_at, revoked_at, announcement_id, last_announcement_at\)\s*"
+        r"ON discovery_machine_credentials TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    )
+    assert not re.search(
+        r"GRANT SELECT[^;]*token_sha256[^;]*TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    ), "issuer does not need to read credential digests"
+    assert re.search(
+        r"GRANT UPDATE \(revoked_at\) ON discovery_machine_credentials TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    )
+    assert not re.search(
+        r"GRANT (?:[^;]*,\s*)?DELETE[^;]*ON discovery_machine_credentials TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    )
+    assert re.search(
+        r"GRANT INSERT ON discovery_credential_events TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    )
+    assert not re.search(
+        r"GRANT (?:SELECT|UPDATE|DELETE)[^;]*ON discovery_credential_events TO inv_discovery_issuer",
+        rendered_sql,
+        re.IGNORECASE,
+    ), "issuer only appends audit events; it must not read or alter them"
+    assert "inv_discovery_issuer already has members; review membership before migration" in rendered_sql
+    assert "token_sha256 = nullif(current_setting('inv.discovery_token_sha256',true),'')" in rendered_sql
+
+
 # --------------------------------------------------------------------------
 # The chain itself, read from source
 # --------------------------------------------------------------------------

@@ -82,6 +82,7 @@ def record_announcement(
     source_ip: str,
     announcement: Announcement,
     now: dt.datetime,
+    linked_announcement_id: str | None = None,
 ) -> NodeAnnouncement:
     """Record or refresh a candidate.
 
@@ -94,6 +95,36 @@ def record_announcement(
     re-announcing does not undo a person's decision.
     """
     announcement.validate()
+
+    if linked_announcement_id is not None:
+        existing = session.scalar(
+            select(NodeAnnouncement)
+            .where(
+                NodeAnnouncement.tenant_id == tenant_id,
+                NodeAnnouncement.announcement_id == linked_announcement_id,
+                NodeAnnouncement.instance_id == announcement.instance_id,
+            )
+            .with_for_update()
+        )
+        if existing is not None:
+            if existing.state != "candidate":
+                raise InvError("AUTH-INVALID-CREDENTIAL", "discovery credential is not valid", 403)
+            # A machine grant owns this link. Address changes update the same
+            # candidate instead of creating another row.
+            existing.source_ip = source_ip
+            existing.last_seen_at = now
+            existing.announce_count += 1
+            existing.claimed_hostname = announcement.hostname
+            existing.claimed_os_type = announcement.os_type
+            existing.claimed_os_version = announcement.os_version
+            existing.claimed_agent_version = announcement.agent_version
+            existing.claimed_cpu_cores = announcement.cpu_cores
+            existing.claimed_ram_bytes = announcement.ram_bytes
+            existing.claimed_gpu_count = announcement.gpu_count
+            existing.claimed_labels = announcement.labels or {}
+            session.flush()
+            return existing
+        raise InvError("AUTH-INVALID-CREDENTIAL", "discovery credential is not valid", 403)
 
     existing = session.scalar(
         select(NodeAnnouncement).where(
@@ -267,6 +298,13 @@ def admit_candidate(
     # see complete_admission. A token that is never redeemed must not leave a
     # record claiming the machine joined.
     row.admitted_by_user_id = admitted_by_user_id
+    revoke_announcement_credentials(
+        session,
+        tenant_id=tenant_id,
+        announcement_id=announcement_id,
+        now=now,
+        event_type="admitted",
+    )
     session.flush()
     return issued
 
@@ -286,6 +324,13 @@ def complete_admission(
     row.state = "admitted"
     row.admitted_node_id = node_id
     row.decided_at = now
+    revoke_announcement_credentials(
+        session,
+        tenant_id=tenant_id,
+        announcement_id=announcement_id,
+        now=now,
+        event_type="admitted",
+    )
     session.flush()
     return row
 
@@ -307,5 +352,50 @@ def decline_candidate(
     row.state = "declined"
     row.decided_at = now
     row.decline_reason = reason
+    revoke_announcement_credentials(
+        session,
+        tenant_id=tenant_id,
+        announcement_id=announcement_id,
+        now=now,
+        event_type="revoked",
+    )
     session.flush()
     return row
+
+
+def revoke_announcement_credentials(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    announcement_id: str,
+    now: dt.datetime,
+    event_type: str = "revoked",
+) -> int:
+    """End every linked discovery grant and record metadata without secrets."""
+    from ..db.models import DiscoveryCredentialEvent, DiscoveryMachineCredential
+
+    grants = session.scalars(
+        select(DiscoveryMachineCredential)
+        .where(
+            DiscoveryMachineCredential.tenant_id == tenant_id,
+            DiscoveryMachineCredential.announcement_id == announcement_id,
+            DiscoveryMachineCredential.revoked_at.is_(None),
+        )
+        .with_for_update()
+    ).all()
+    for grant in grants:
+        grant.revoked_at = now
+        session.add(
+            DiscoveryCredentialEvent(
+                event_id=uuid.uuid4(),
+                tenant_id=tenant_id,
+                credential_id=grant.credential_id,
+                installation_id=grant.installation_id,
+                actor="admission",
+                event_type=event_type,
+                outcome="allow",
+                reason_code="candidate_admitted" if event_type == "admitted" else "candidate_declined",
+                occurred_at=now,
+            )
+        )
+    return len(grants)

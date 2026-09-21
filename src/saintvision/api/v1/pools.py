@@ -1,9 +1,10 @@
 """Discovery, pool and placement endpoints.
 
-An agent may announce before node enrollment, but its tenant must come from an
-authenticated principal. The announcement remains deliberately least-powerful:
-it writes only a candidate row. Admission and everything that changes what runs
-where require a user credential.
+An agent may announce before node enrollment using either an authenticated
+principal or a narrow tenant/installation-bound discovery grant. The
+announcement remains deliberately least-powerful: it writes only one
+unverified candidate. Admission and everything that changes what runs where
+still require a user credential.
 """
 
 from __future__ import annotations
@@ -12,11 +13,18 @@ import datetime as dt
 import uuid
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from ...config import Settings
+from ...db.models import DiscoveryCredentialEvent, DiscoveryMachineCredential, NodeAnnouncement
 from ...db.session import make_session_factory, tenant_scope
-from ...errors import AUTH_TENANT_SCOPE, VAL_SCHEMA, InvError
+from ...errors import AUTH_INVALID_CREDENTIAL, AUTH_TENANT_SCOPE, VAL_SCHEMA, InvError
+from ...identity.discovery_credentials import (
+    reject_discovery_credential,
+    token_sha256,
+    validate_discovery_grant,
+)
 from ...identity.principal import Principal
 from ...services import discovery as discovery_service
 from ...services import pools as pool_service
@@ -41,18 +49,138 @@ def announce(
     request: Request,
     payload: schemas.AnnouncementRequest,
     tenant: str = Header(alias="X-Inv-Tenant"),
-    principal: Principal = Depends(get_principal),
+    authorization: str | None = Header(default=None),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """A Node Agent announces itself on the internal network.
 
-    The caller must authenticate into the tenant it announces for. The row it
-    writes is still only a candidate that a person must admit. The source
-    address is taken from the connection rather than the body — a field the
-    announcer controls cannot be part of its own identity.
+    An interactive caller's principal or a machine grant bound to one tenant
+    supplies the authority; the caller-controlled tenant header is only a
+    consistency assertion for the machine path. The row is still only a
+    candidate that a person must admit. The source address is taken from the
+    connection rather than the body — a field the announcer controls cannot
+    be part of its own identity.
 
     The response deliberately carries no platform detail.
     """
+    source_ip = request.client.host if request.client else "0.0.0.0"
+
+    bearer = (
+        authorization.split(" ", 1)[1].strip()
+        if authorization and authorization.lower().startswith("bearer ")
+        else None
+    )
+    if bearer and bearer.startswith("dsc1_"):
+        digest = token_sha256(bearer)
+        factory = make_session_factory(request.app.state.engine)
+        denied = False
+        response_state: str | None = None
+        with factory() as session:
+            with session.begin():
+                # Digest-scoped lookup obtains tenant identity from the grant;
+                # the caller's tenant header is checked only after this read.
+                session.execute(
+                    text("SELECT set_config('inv.discovery_token_sha256', :digest, true)"),
+                    {"digest": digest},
+                )
+                grant = session.scalar(
+                    select(DiscoveryMachineCredential)
+                    .where(DiscoveryMachineCredential.token_sha256 == digest)
+                    .with_for_update()
+                )
+                if grant is None:
+                    denied = True
+                else:
+                    tenant_id = grant.tenant_id
+                    with tenant_scope(session, tenant_id):
+                        grant_data = {
+                            "token_sha256": grant.token_sha256,
+                            "tenant_id": grant.tenant_id,
+                            "installation_id": grant.installation_id,
+                            "scope": grant.scope,
+                            "revoked_at": grant.revoked_at,
+                            "expires_at": grant.expires_at,
+                            "last_announcement_at": grant.last_announcement_at,
+                        }
+                        try:
+                            validate_discovery_grant(
+                                grant_data,
+                                token=bearer,
+                                asserted_tenant=tenant,
+                                installation_id=payload.instance_id,
+                                now=now,
+                            )
+                            if grant.announcement_id is None:
+                                prior = session.scalar(
+                                    select(NodeAnnouncement).where(
+                                        NodeAnnouncement.tenant_id == tenant_id,
+                                        NodeAnnouncement.instance_id == payload.instance_id,
+                                        NodeAnnouncement.source_ip == source_ip,
+                                    )
+                                )
+                                if prior is not None and prior.state != "candidate":
+                                    reject_discovery_credential()
+                            row = discovery_service.record_announcement(
+                                session,
+                                tenant_id=tenant_id,
+                                source_ip=source_ip,
+                                announcement=discovery_service.Announcement(
+                                    instance_id=payload.instance_id,
+                                    hostname=payload.hostname,
+                                    os_type=payload.os_type,
+                                    os_version=payload.os_version,
+                                    agent_version=payload.agent_version,
+                                    cpu_cores=payload.cpu_cores,
+                                    ram_bytes=payload.ram_bytes,
+                                    gpu_count=payload.gpu_count,
+                                    labels=payload.labels,
+                                ),
+                                now=now,
+                                linked_announcement_id=grant.announcement_id,
+                            )
+                            if row.state != "candidate":
+                                reject_discovery_credential()
+                            grant.announcement_id = row.announcement_id
+                            grant.last_announcement_at = now
+                            response_state = row.state
+                            session.add(
+                                DiscoveryCredentialEvent(
+                                    event_id=uuid.uuid4(),
+                                    tenant_id=tenant_id,
+                                    credential_id=grant.credential_id,
+                                    installation_id=grant.installation_id,
+                                    actor="machine",
+                                    event_type="announced",
+                                    outcome="allow",
+                                    reason_code="discovery_refresh",
+                                    occurred_at=now,
+                                )
+                            )
+                        except InvError as error:
+                            if error.code != AUTH_INVALID_CREDENTIAL:
+                                raise
+                            denied = True
+                            session.add(
+                                DiscoveryCredentialEvent(
+                                    event_id=uuid.uuid4(),
+                                    tenant_id=tenant_id,
+                                    credential_id=grant.credential_id,
+                                    installation_id=grant.installation_id,
+                                    actor="machine",
+                                    event_type="denied",
+                                    outcome="deny",
+                                    reason_code=getattr(error, "reason_code", "grant_rejected"),
+                                    occurred_at=now,
+                                )
+                            )
+        if denied:
+            reject_discovery_credential()
+        return {"accepted": True, "state": response_state}
+
+    # Existing interactive/OIDC callers keep their current contract. This
+    # discovery-only credential is not accepted by get_principal or any other
+    # route.
+    principal = get_principal(request, authorization)
     tenant_id = _tenant(tenant)
     if tenant_id != principal.tenant_id:
         raise InvError(
@@ -60,7 +188,6 @@ def announce(
             "X-Inv-Tenant does not match the authenticated principal",
             403,
         )
-    source_ip = request.client.host if request.client else "0.0.0.0"
 
     factory = make_session_factory(request.app.state.engine)
     with factory() as session:
