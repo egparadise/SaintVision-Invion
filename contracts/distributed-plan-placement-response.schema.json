@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignedCpuMillicores": {
+      "minimum": 0,
+      "title": "Assignedcpumillicores",
+      "type": "integer"
+    },
+    "assignedGpuDevices": {
+      "minimum": 0,
+      "title": "Assignedgpudevices",
+      "type": "integer"
+    },
+    "assignedRamBytes": {
+      "minimum": 0,
+      "title": "Assignedrambytes",
+      "type": "integer"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "shardIndex": {
+      "minimum": 0,
+      "title": "Shardindex",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "shardIndex",
+    "nodeId",
+    "assignedCpuMillicores",
+    "assignedRamBytes",
+    "assignedGpuDevices"
+  ],
+  "title": "DistributedPlanPlacementResponse",
+  "type": "object"
+}

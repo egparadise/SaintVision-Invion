@@ -28,49 +28,30 @@ import { apiClient } from '@/shared/api/client';
 import type { ContributionPageResponse, ContributionResponse } from '@/contracts/contribution-page-response';
 import type { DataLocationPageResponse, DataLocationResponse } from '@/contracts/data-location-page-response';
 import type { DiscoveryCandidateResponse, DiscoveryCandidatesResponse } from '@/contracts/discovery-candidates-response';
+import type { PoolCapacityResponse } from '@/contracts/pool-capacity-response';
+import type { PlacementPreviewResponse as PlacementPreviewWireResponse } from '@/contracts/placement-preview-response';
+import type { DistributedPlanResponse } from '@/contracts/distributed-plan-response';
+export type { DistributedPlanResponse };
+import type { PoolMemberResponse } from '@/contracts/pool-member-response';
+import type { PoolMemberRemovalResponse } from '@/contracts/pool-member-removal-response';
 
 export type StorageContribution = ContributionResponse;
 export type StorageLocation = DataLocationResponse;
 
-export interface PoolCapacity {
-  totalOffered: { cpuMillicores: number; ramBytes: number; gpuDevices: number };
-  largestSingleNode: { cpuMillicores: number; ramBytes: number; gpuDevices: number };
-  spareNow: { cpuMillicores: number; ramBytes: number; gpuDevices: number };
-  units?: Record<string, string>;
-}
+export type PoolCapacity = PoolCapacityResponse;
 
-export interface PlacementCandidate {
-  nodeId: string;
-  hostname: string;
-  availableCpuMillicores: number;
-  availableRamBytes: number;
-  availableGpuDevices: number;
-  eligible: boolean;
-  rejectionReasons?: string[];
-}
-
+/** UI view mapped from the generated placement-preview wire contract. */
 export interface PlacementPreviewResponse {
   poolId: string;
-  candidates: PlacementCandidate[];
+  candidates: Array<{
+    nodeId: string;
+    hostname: string;
+    availableCpuMillicores: number;
+    availableRamBytes: number;
+    availableGpuDevices: number;
+    eligible: true;
+  }>;
   candidateCount: number;
-  units?: Record<string, string>;
-}
-
-export interface DistributedPlanPlacement {
-  shardIndex: number;
-  nodeId: string;
-  assignedCpuMillicores: number;
-  assignedRamBytes: number;
-  assignedGpuDevices: number;
-}
-
-export interface DistributedPlanResponse {
-  planId: string;
-  runId: string;
-  strategy: string;
-  shardCount: number;
-  units?: Record<string, string>;
-  placements: DistributedPlanPlacement[];
 }
 
 export interface NodeCapability {
@@ -200,13 +181,28 @@ export async function getPoolPlacementPreview(
     params.set('gpuDevices', requirements.gpuDevices.toString());
   const qs = params.toString();
   const url = qs ? `${base}?${qs}` : base;
-  return apiClient<PlacementPreviewResponse>(url);
+  const response = await apiClient<PlacementPreviewWireResponse>(url);
+  return {
+    poolId: response.poolId,
+    candidateCount: response.candidateCount,
+    candidates: response.candidates.map((candidate) => ({
+      nodeId: candidate.nodeId,
+      hostname: candidate.hostname,
+      availableCpuMillicores: candidate.spare.cpuMillicores,
+      availableRamBytes: candidate.spare.ramBytes,
+      availableGpuDevices: candidate.spare.gpuDevices,
+      eligible: true,
+    })),
+  };
 }
 
 export async function createPoolPlan(
   poolId: string,
   data: {
     runId: string;
+    // UI vocabulary currently differs from the backend request enum. Keep this
+    // input boundary explicit until Gemini maps the visible choices to domain
+    // strategies; response typing remains generated and strict.
     strategy: 'binpack' | 'spread';
     shardCount: number;
     shardCpuMillicores: number;
@@ -232,8 +228,8 @@ export async function createPoolPlan(
 export async function addPoolMember(
   poolId: string,
   nodeId: string
-): Promise<{ poolId: string; nodeId: string; member: boolean }> {
-  return apiClient<{ poolId: string; nodeId: string; member: boolean }>(
+): Promise<PoolMemberResponse> {
+  return apiClient<PoolMemberResponse>(
     `/v1/pools/${poolId}/members/${nodeId}`,
     {
       method: 'PUT',
@@ -244,8 +240,8 @@ export async function addPoolMember(
 export async function removePoolMember(
   poolId: string,
   nodeId: string
-): Promise<{ poolId: string; nodeId: string; removed: boolean }> {
-  return apiClient<{ poolId: string; nodeId: string; removed: boolean }>(
+): Promise<PoolMemberRemovalResponse> {
+  return apiClient<PoolMemberRemovalResponse>(
     `/v1/pools/${poolId}/members/${nodeId}`,
     {
       method: 'DELETE',

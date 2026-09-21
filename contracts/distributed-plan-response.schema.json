@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "DistributedPlanPlacementResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "assignedCpuMillicores": {
+          "minimum": 0,
+          "title": "Assignedcpumillicores",
+          "type": "integer"
+        },
+        "assignedGpuDevices": {
+          "minimum": 0,
+          "title": "Assignedgpudevices",
+          "type": "integer"
+        },
+        "assignedRamBytes": {
+          "minimum": 0,
+          "title": "Assignedrambytes",
+          "type": "integer"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "shardIndex": {
+          "minimum": 0,
+          "title": "Shardindex",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "shardIndex",
+        "nodeId",
+        "assignedCpuMillicores",
+        "assignedRamBytes",
+        "assignedGpuDevices"
+      ],
+      "title": "DistributedPlanPlacementResponse",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "placements": {
+      "items": {
+        "$ref": "#/$defs/DistributedPlanPlacementResponse"
+      },
+      "title": "Placements",
+      "type": "array"
+    },
+    "planId": {
+      "title": "Planid",
+      "type": "string"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    },
+    "shardCount": {
+      "minimum": 1,
+      "title": "Shardcount",
+      "type": "integer"
+    },
+    "strategy": {
+      "enum": [
+        "single_node",
+        "data_parallel",
+        "sharded"
+      ],
+      "title": "Strategy",
+      "type": "string"
+    },
+    "units": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Units",
+      "type": "object"
+    }
+  },
+  "required": [
+    "planId",
+    "runId",
+    "strategy",
+    "shardCount",
+    "units",
+    "placements"
+  ],
+  "title": "DistributedPlanResponse",
+  "type": "object"
+}

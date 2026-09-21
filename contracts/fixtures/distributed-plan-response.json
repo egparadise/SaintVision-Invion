@@ -1,0 +1,23 @@
+{
+  "planId": "plan_contract_training",
+  "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "strategy": "sharded",
+  "shardCount": 2,
+  "units": { "cpu": "millicores", "ram": "bytes", "disk": "bytes", "gpu": "devices" },
+  "placements": [
+    {
+      "shardIndex": 0,
+      "nodeId": "nod_contract_worker",
+      "assignedCpuMillicores": 2000,
+      "assignedRamBytes": 4294967296,
+      "assignedGpuDevices": 1
+    },
+    {
+      "shardIndex": 1,
+      "nodeId": "nod_contract_worker",
+      "assignedCpuMillicores": 2000,
+      "assignedRamBytes": 4294967296,
+      "assignedGpuDevices": 1
+    }
+  ]
+}

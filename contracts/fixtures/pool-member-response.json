@@ -1,0 +1,5 @@
+{
+  "poolId": "pool_contract_training",
+  "nodeId": "nod_contract_worker",
+  "member": true
+}

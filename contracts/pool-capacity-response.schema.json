@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "PoolCapacityNodeResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "title": "Hostname",
+          "type": "string"
+        },
+        "measured": {
+          "title": "Measured",
+          "type": "boolean"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "offered": {
+          "$ref": "#/$defs/PoolResourceAmounts"
+        },
+        "spare": {
+          "$ref": "#/$defs/PoolResourceAmounts"
+        },
+        "used": {
+          "$ref": "#/$defs/PoolResourceAmounts"
+        }
+      },
+      "required": [
+        "nodeId",
+        "hostname",
+        "offered",
+        "used",
+        "spare",
+        "measured"
+      ],
+      "title": "PoolCapacityNodeResponse",
+      "type": "object"
+    },
+    "PoolResourceAmounts": {
+      "additionalProperties": false,
+      "properties": {
+        "cpuMillicores": {
+          "minimum": 0,
+          "title": "Cpumillicores",
+          "type": "number"
+        },
+        "gpuDevices": {
+          "minimum": 0,
+          "title": "Gpudevices",
+          "type": "number"
+        },
+        "ramBytes": {
+          "minimum": 0,
+          "title": "Rambytes",
+          "type": "number"
+        }
+      },
+      "required": [
+        "cpuMillicores",
+        "ramBytes",
+        "gpuDevices"
+      ],
+      "title": "PoolResourceAmounts",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activeMemberCount": {
+      "minimum": 0,
+      "title": "Activemembercount",
+      "type": "integer"
+    },
+    "largestSingleNode": {
+      "$ref": "#/$defs/PoolResourceAmounts"
+    },
+    "memberCount": {
+      "minimum": 0,
+      "title": "Membercount",
+      "type": "integer"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/PoolCapacityNodeResponse"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "note": {
+      "title": "Note",
+      "type": "string"
+    },
+    "poolId": {
+      "title": "Poolid",
+      "type": "string"
+    },
+    "spareNow": {
+      "$ref": "#/$defs/PoolResourceAmounts"
+    },
+    "totalOffered": {
+      "$ref": "#/$defs/PoolResourceAmounts"
+    },
+    "units": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Units",
+      "type": "object"
+    },
+    "unmeasuredNodes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unmeasurednodes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "poolId",
+    "name",
+    "memberCount",
+    "activeMemberCount",
+    "totalOffered",
+    "largestSingleNode",
+    "spareNow",
+    "unmeasuredNodes",
+    "nodes",
+    "units",
+    "note"
+  ],
+  "title": "PoolCapacityResponse",
+  "type": "object"
+}

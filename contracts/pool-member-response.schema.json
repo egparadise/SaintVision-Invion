@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "member": {
+      "const": true,
+      "title": "Member",
+      "type": "boolean"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "poolId": {
+      "title": "Poolid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "poolId",
+    "nodeId",
+    "member"
+  ],
+  "title": "PoolMemberResponse",
+  "type": "object"
+}

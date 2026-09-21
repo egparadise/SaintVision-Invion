@@ -42,6 +42,12 @@ const contracts = [
     schema: 'workspace-execution-readiness-response',
     output: 'workspace-execution-readiness-response',
   },
+  { schema: 'pool-capacity-response', output: 'pool-capacity-response' },
+  { schema: 'placement-preview-response', output: 'placement-preview-response' },
+  { schema: 'pool-created-response', output: 'pool-created-response' },
+  { schema: 'pool-member-response', output: 'pool-member-response' },
+  { schema: 'pool-member-removal-response', output: 'pool-member-removal-response' },
+  { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
 ];
 const mode = process.argv[2];
 

@@ -1,0 +1,13 @@
+{
+  "poolId": "pool_contract_training",
+  "candidates": [
+    {
+      "nodeId": "nod_contract_worker",
+      "hostname": "worker-contract",
+      "spare": { "cpuMillicores": 3000, "ramBytes": 8589934592, "gpuDevices": 1 },
+      "headroom": 2.5
+    }
+  ],
+  "candidateCount": 1,
+  "units": { "cpu": "millicores", "ram": "bytes", "disk": "bytes", "gpu": "devices" }
+}

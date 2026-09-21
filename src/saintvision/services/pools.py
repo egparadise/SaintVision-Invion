@@ -406,10 +406,11 @@ def rank_idle_first(
             continue
         # Score on the least-loaded dimension that the shard actually needs, so
         # a GPU job is not sent to the node with the most free RAM.
-        headroom = min(
-            (entry.spare[kind] / need if need else float("inf"))
-            for kind, need in wanted.items()
-        )
+        ratios = [entry.spare[kind] / need for kind, need in wanted.items() if need > 0]
+        # With no requested resource dimension there is no meaningful ratio.
+        # A finite neutral score keeps the default preview a valid JSON response
+        # and preserves the node-id tie break below.
+        headroom = min(ratios) if ratios else 0.0
         candidates.append(
             {
                 "nodeId": entry.node_id,

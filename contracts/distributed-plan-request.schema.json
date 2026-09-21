@@ -39,7 +39,11 @@
       "type": "boolean"
     },
     "strategy": {
-      "pattern": "^(single_node|data_parallel|sharded)$",
+      "enum": [
+        "single_node",
+        "data_parallel",
+        "sharded"
+      ],
       "title": "Strategy",
       "type": "string"
     }

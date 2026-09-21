@@ -1,0 +1,22 @@
+{
+  "poolId": "pool_contract_training",
+  "name": "Training",
+  "memberCount": 2,
+  "activeMemberCount": 1,
+  "totalOffered": { "cpuMillicores": 8000, "ramBytes": 17179869184, "gpuDevices": 2 },
+  "largestSingleNode": { "cpuMillicores": 6000, "ramBytes": 12884901888, "gpuDevices": 2 },
+  "spareNow": { "cpuMillicores": 3000, "ramBytes": 8589934592, "gpuDevices": 1 },
+  "unmeasuredNodes": [],
+  "nodes": [
+    {
+      "nodeId": "nod_contract_worker",
+      "hostname": "worker-contract",
+      "offered": { "cpuMillicores": 6000, "ramBytes": 12884901888, "gpuDevices": 2 },
+      "used": { "cpuMillicores": 3000, "ramBytes": 4294967296, "gpuDevices": 1 },
+      "spare": { "cpuMillicores": 3000, "ramBytes": 8589934592, "gpuDevices": 1 },
+      "measured": true
+    }
+  ],
+  "units": { "cpu": "millicores", "ram": "bytes", "disk": "bytes", "gpu": "devices" },
+  "note": "Total is the pool sum; a single task is limited by largestSingleNode."
+}

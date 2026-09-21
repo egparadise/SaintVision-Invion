@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    },
+    "poolId": {
+      "title": "Poolid",
+      "type": "string"
+    },
+    "removed": {
+      "title": "Removed",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "poolId",
+    "nodeId",
+    "removed"
+  ],
+  "title": "PoolMemberRemovalResponse",
+  "type": "object"
+}

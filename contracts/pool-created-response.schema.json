@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "poolId": {
+      "title": "Poolid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "poolId",
+    "name"
+  ],
+  "title": "PoolCreatedResponse",
+  "type": "object"
+}

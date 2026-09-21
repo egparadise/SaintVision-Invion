@@ -318,6 +318,103 @@ class PoolRequest(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class PoolResourceAmounts(Strict):
+    cpu_millicores: float = Field(ge=0, alias="cpuMillicores")
+    ram_bytes: float = Field(ge=0, alias="ramBytes")
+    gpu_devices: float = Field(ge=0, alias="gpuDevices")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolCapacityNodeResponse(Strict):
+    node_id: str = Field(alias="nodeId")
+    hostname: str
+    offered: PoolResourceAmounts
+    used: PoolResourceAmounts
+    spare: PoolResourceAmounts
+    measured: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolCapacityResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    name: str
+    member_count: int = Field(ge=0, alias="memberCount")
+    active_member_count: int = Field(ge=0, alias="activeMemberCount")
+    total_offered: PoolResourceAmounts = Field(alias="totalOffered")
+    largest_single_node: PoolResourceAmounts = Field(alias="largestSingleNode")
+    spare_now: PoolResourceAmounts = Field(alias="spareNow")
+    unmeasured_nodes: list[str] = Field(alias="unmeasuredNodes")
+    nodes: list[PoolCapacityNodeResponse]
+    units: dict[str, str]
+    note: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PlacementPreviewCandidateResponse(Strict):
+    node_id: str = Field(alias="nodeId")
+    hostname: str
+    spare: PoolResourceAmounts
+    headroom: float = Field(ge=0, allow_inf_nan=False)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PlacementPreviewResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    candidates: list[PlacementPreviewCandidateResponse]
+    candidate_count: int = Field(ge=0, alias="candidateCount")
+    units: dict[str, str]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolCreatedResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    name: str
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolMemberResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    node_id: str = Field(alias="nodeId")
+    member: Literal[True]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolMemberRemovalResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    node_id: str = Field(alias="nodeId")
+    removed: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DistributedPlanPlacementResponse(Strict):
+    shard_index: int = Field(ge=0, alias="shardIndex")
+    node_id: str = Field(alias="nodeId")
+    assigned_cpu_millicores: int = Field(ge=0, alias="assignedCpuMillicores")
+    assigned_ram_bytes: int = Field(ge=0, alias="assignedRamBytes")
+    assigned_gpu_devices: int = Field(ge=0, alias="assignedGpuDevices")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DistributedPlanResponse(Strict):
+    plan_id: str = Field(alias="planId")
+    run_id: str = Field(alias="runId")
+    strategy: Literal["single_node", "data_parallel", "sharded"]
+    shard_count: int = Field(ge=1, alias="shardCount")
+    units: dict[str, str]
+    placements: list[DistributedPlanPlacementResponse]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class DistributedPlanRequest(Strict):
     """How to spread one Run over a pool.
 
@@ -326,7 +423,7 @@ class DistributedPlanRequest(Strict):
     """
 
     run_id: str = Field(max_length=30, alias="runId")
-    strategy: str = Field(pattern="^(single_node|data_parallel|sharded)$")
+    strategy: Literal["single_node", "data_parallel", "sharded"]
     shard_count: int = Field(default=1, ge=1, le=1024, alias="shardCount")
     splittable_declared: bool = Field(default=False, alias="splittableDeclared")
     #: In the canonical units, and named after them. These are compared against

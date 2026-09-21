@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "PlacementPreviewCandidateResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "headroom": {
+          "minimum": 0,
+          "title": "Headroom",
+          "type": "number"
+        },
+        "hostname": {
+          "title": "Hostname",
+          "type": "string"
+        },
+        "nodeId": {
+          "title": "Nodeid",
+          "type": "string"
+        },
+        "spare": {
+          "$ref": "#/$defs/PoolResourceAmounts"
+        }
+      },
+      "required": [
+        "nodeId",
+        "hostname",
+        "spare",
+        "headroom"
+      ],
+      "title": "PlacementPreviewCandidateResponse",
+      "type": "object"
+    },
+    "PoolResourceAmounts": {
+      "additionalProperties": false,
+      "properties": {
+        "cpuMillicores": {
+          "minimum": 0,
+          "title": "Cpumillicores",
+          "type": "number"
+        },
+        "gpuDevices": {
+          "minimum": 0,
+          "title": "Gpudevices",
+          "type": "number"
+        },
+        "ramBytes": {
+          "minimum": 0,
+          "title": "Rambytes",
+          "type": "number"
+        }
+      },
+      "required": [
+        "cpuMillicores",
+        "ramBytes",
+        "gpuDevices"
+      ],
+      "title": "PoolResourceAmounts",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidateCount": {
+      "minimum": 0,
+      "title": "Candidatecount",
+      "type": "integer"
+    },
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/PlacementPreviewCandidateResponse"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "poolId": {
+      "title": "Poolid",
+      "type": "string"
+    },
+    "units": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Units",
+      "type": "object"
+    }
+  },
+  "required": [
+    "poolId",
+    "candidates",
+    "candidateCount",
+    "units"
+  ],
+  "title": "PlacementPreviewResponse",
+  "type": "object"
+}

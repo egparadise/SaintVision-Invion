@@ -86,7 +86,10 @@ def main() -> int:
             if not target.exists() or target.read_text(encoding="utf-8") != rendered:
                 drift.append(target.name)
         else:
-            target.write_text(rendered, encoding="utf-8")
+            # Keep generated schema bytes aligned with .gitattributes (LF on disk).
+            # Path.write_text translates ``\n`` to CRLF on Windows and leaves every
+            # schema dirty after a successful generation even when content matches.
+            target.write_bytes(rendered.encode("utf-8"))
 
     if args.check:
         if drift:

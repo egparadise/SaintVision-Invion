@@ -170,7 +170,7 @@ def decline(
     return {"announcementId": row.announcement_id, "state": row.state}
 
 
-@router.post("/pools", status_code=201)
+@router.post("/pools", status_code=201, response_model=schemas.PoolCreatedResponse)
 def create_pool(
     payload: schemas.PoolRequest,
     response: Response,
@@ -200,7 +200,11 @@ def create_pool(
     return {"poolId": pool.pool_id, "name": pool.name}
 
 
-@router.put("/pools/{pool_id}/members/{node_id}", status_code=200)
+@router.put(
+    "/pools/{pool_id}/members/{node_id}",
+    status_code=200,
+    response_model=schemas.PoolMemberResponse,
+)
 def add_member(
     pool_id: str,
     node_id: str,
@@ -219,7 +223,10 @@ def add_member(
     return {"poolId": pool_id, "nodeId": node_id, "member": True}
 
 
-@router.delete("/pools/{pool_id}/members/{node_id}")
+@router.delete(
+    "/pools/{pool_id}/members/{node_id}",
+    response_model=schemas.PoolMemberRemovalResponse,
+)
 def remove_member(
     pool_id: str,
     node_id: str,
@@ -232,7 +239,7 @@ def remove_member(
     return {"poolId": pool_id, "nodeId": node_id, "removed": removed}
 
 
-@router.get("/pools/{pool_id}/capacity")
+@router.get("/pools/{pool_id}/capacity", response_model=schemas.PoolCapacityResponse)
 def pool_capacity(
     pool_id: str,
     principal: Principal = Depends(get_principal),
@@ -251,7 +258,10 @@ def pool_capacity(
     )
 
 
-@router.get("/pools/{pool_id}/placement-preview")
+@router.get(
+    "/pools/{pool_id}/placement-preview",
+    response_model=schemas.PlacementPreviewResponse,
+)
 def placement_preview(
     pool_id: str,
     principal: Principal = Depends(get_principal),
@@ -281,7 +291,11 @@ def placement_preview(
     }
 
 
-@router.post("/pools/{pool_id}/plans", status_code=201)
+@router.post(
+    "/pools/{pool_id}/plans",
+    status_code=201,
+    response_model=schemas.DistributedPlanResponse,
+)
 def create_plan(
     pool_id: str,
     payload: schemas.DistributedPlanRequest,

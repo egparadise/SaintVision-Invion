@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-AGENT-001"
 title: "Agent 역할과 인계 계약"
-version: "1.1.0"
+version: "1.1.1"
 status: "baseline"
 author: "Codex"
 updated: "2026-09-11T17:15:06+09:00"
@@ -22,6 +22,10 @@ tags: ["saintvision", "final-plan"]
 | 디자인·Frontend·웹 배포 | Gemini | Claude, 보안 경계는 Codex | Antigravity에서 실행·브라우저 검증 |
 
 Codex는 공통 계약 통합 책임자다. Claude는 중간 난도 구현과 독립 검토를 소유한다. Gemini는 디자인 결정과 Frontend·웹 배포를 소유한다. 개발 Agent 역할은 제품 내부 Supervisor/Executor/Verifier와 혼동하지 않는다.
+
+## Frontend와 API 계약의 경계
+
+Codex는 canonical API 응답 스키마·생성 타입·backend 경계 검증·공유 fixture와 계약 적합성 시험을 소유하고, Gemini는 `apps/web` 화면·상태·렌더링·접근성·브라우저 동작을 소유하며, Codex의 `apps/web` 수정은 계약 전용 adapter/type/conformance-test 변경으로 제한하고 화면 동작 변경은 Gemini 인계로 분리한다.
 
 ## 시작 시 읽을 Context
 
