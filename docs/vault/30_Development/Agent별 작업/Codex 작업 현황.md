@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.103"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T17:11:00+09:00"
+updated: "2026-09-21T17:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,6 +17,11 @@ source_of_truth: "Git"
 - Provenance red/green: base `6cff94dca899a130fc733841e4fed765a5524708`, branch `agent/codex/workspace-response-contract-map`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, dirty source during measurement; Python absolute project venv 3.14.6, Node v24.17.0, Windows 11, PostgreSQL DSN absent/Docker present. Before JUnit: 15 skipped/0 failure/0 error and exact no-skip check exit 1. After exclusion: 2666/2668 collected, both image modules absent. Positive-control JUnit: 6 passed/0 skipped/failure/error, exact evidence check exit 0. Provenance artifacts are in `.work/core-image-optin-before.xml`, `.work/core-after-positive-control.xml`, and `.work/core-after-collect.txt` (ignored local evidence). These are local targeted checks, not Actions.
 - Response tests: provider `tests/core/test_workspace_response_contract.py` 18 passed. Focused Vitest after final edits: 30 passed. Temporary required model-field mutation failed two provider assertions and made schema export check exit 1; removing `displayName` from the fixture failed three provider cases and two frontend cases. Both mutations were restored. See [[2026-09-21_web_response_contract_map_workspace_Codex]] for command timestamps and exact commit provenance.
 - Remaining contract map: screen-local run/result/artifact, run/approval queue, placement/pool/mutation, storage resolve/replica/model, shard and node response shapes. UI-FB-03 independent approval and actual browser acceptance remain separate. CI remains billing-blocked; no full Core Actions execution claimed.
+
+## 2026-09-21 fixed-SHA completion
+
+- Final code+integration merge SHA `6573e57f61522a9c4d39e422a5c5a639200ccdba`, branch `agent/codex/workspace-response-contract-map`, clean checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`. At 17:16:42–17:17:30 KST, project Python venv `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6 and Node 24.17.0 were used; Windows 11, DSN absent, Docker present. Provider contract 18 passed; all Vitest 40 files/369 tests passed; TS build and Vite build exit 0; 32 Pydantic JSON Schemas and 9 generated TS API response contracts match. `check_docs.py`, `check_ontology.py`, Core YAML parse/order/structure, and tests-directory collect-only assertions exited 0. Core collection: 2666/2668; both LAN image modules were asserted absent from general collection. A six-pass positive JUnit control had zero skip/failure/error and passed the same Core evidence assertion. The 15-skip pre-edit module JUnit failed that gate (red control). See History for exact prior/final SHAs and mutation evidence.
+- Obsidian paired check/apply is recorded after the final History update. GitHub Actions was not executed (billing blocker); LAN Docker acceptance itself needs the Ubuntu/Linux image lane and remains unexecuted here. No PostgreSQL integration, deployed live HTTP, browser acceptance, or independent review is claimed. Branch is local-ahead of latest observed integration; push follows after final records and checks.
 
 ## 2026-09-21 CI image-lane preflight preparation
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.5"
+version: "1.1.6"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T17:10:00+09:00"
+updated: "2026-09-21T17:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -78,6 +78,14 @@ Negative controls were restored before the positive run. Adding a required `cont
 Failure if left unbound: a project-list shape drift can leave the application with no selectable project, or make its ID appear to be the human-readable project name. The remaining inventory still includes screen-local run/result/artifact, run/approval queue, placement and pool/mutation, resolve/replica/model, shard, and node observations. UI-FB-03 remains a separate screen boundary; browser acceptance is not implied by Vitest.
 
 At the time of this entry's local checks, source was based on `6cff94dca899a130fc733841e4fed765a5524708`, branch `agent/codex/workspace-response-contract-map`, checkout `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, dirty with the listed source/fixture changes. Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6; Node `C:/Program Files/nodejs/node.exe` v24.17.0; Windows 11; Docker present, PostgreSQL DSN absent; executor Codex. The red gate was provenance-wrapped at 17:08:14 KST; the pytest collection exclusion was provenance-wrapped at 17:08:29; the 6-pass JUnit control at 17:08:19 and its exact gate at 17:08:39. Positive final-source commands and their exact SHA/clean status are appended after commit. The explicit image-backed acceptance lane remains unexecuted here; no CI, PostgreSQL integration, live HTTP, browser acceptance, or independent review is claimed.
+
+## 2026-09-21 final fixed-SHA evidence
+
+Source commit `9c717c2` was merged with the latest observed integration `beff6c1` (Gemini UI-FB-03 follow-up and Claude PG test provenance); common progress-page conflict was resolved by preserving both records and retaining Codex version metadata. Final source and merge SHA is `6573e57f61522a9c4d39e422a5c5a639200ccdba`, branch `agent/codex/workspace-response-contract-map`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`. Provenance records a clean tree at the source checks, Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node `C:/Program Files/nodejs/node.exe` v24.17.0, Windows 11, executor Codex; PostgreSQL DSN absent, Docker present. Latest observed integration ref was `beff6c1aefed`; this branch was 17 commits ahead at check time.
+
+At 17:16:42 KST, provider/route contract pytest exited 0 (18 passed, two dependency deprecation warnings). At 17:16:44, full Vitest exited 0 (40 files/369 tests passed). TypeScript `tsc -b` and Vite production build exited 0. JSON Schema drift check passed 32/32; API TS contract check passed 9/9. `check_docs.py`, `check_ontology.py`, YAML parse/order assertions and `git diff --check` exited 0. At 17:17:15–17:17:30, Core general `pytest --collect-only` exited 0 (2666/2668, two deselected) and an explicit assertion verified neither `test_workspace_upgrade.py` nor `test_lan_storage_install.py` was collected. The Core YAML was parsed and structurally checked: image build precedes the dedicated two-file LAN acceptance command and its nonempty, no-failure/error/skip JUnit gate; both files are ignored only in the general collection. A separate six-case passing JUnit (6 passed, 0 skipped/failures/errors) passed the exact Core evidence assertion. These establish config and gate behavior only: the actual LAN Docker image tests were not run on this Windows host; no complete Core suite, hosted Actions, live API, browser/field acceptance, PostgreSQL integration, or independent review is claimed.
+
+Positive code checks on this SHA were clean-tree checks. Following the final doc update, only documentation files change; docs/ontology and paired Obsidian checks are to be rerun on the documentation commit. The source test SHA above remains the exact code under test.
 
 ## 2026-09-21 approval challenge/decision response contract
 
