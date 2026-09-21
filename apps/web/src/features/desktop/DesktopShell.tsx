@@ -146,7 +146,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
   currentReviewerId,
   nodes,
   runs,
-  approvals,
+  approvals = [],
   workspaces = [],
   onRefreshNodes,
   onApprove,
@@ -285,6 +285,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
     <div
       role="application"
       aria-label="SaintVision Web Desktop Virtual Computer"
+      data-testid="desktop-shell-container"
       style={{
         position: 'fixed',
         top: 0,
@@ -370,6 +371,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
           {/* Switch to Classic Portal Button */}
           <button
             type="button"
+            data-testid="desktop-mode-switcher"
             onClick={onSwitchToPortalView}
             style={{
               padding: '3px 8px',
@@ -747,6 +749,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
         <div
           role="toolbar"
           aria-label="Desktop Application Dock"
+          data-testid="desktop-taskbar"
           style={{
             pointerEvents: 'auto',
             display: 'flex',

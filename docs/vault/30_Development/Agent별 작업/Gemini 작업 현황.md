@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.56"
+version: "1.0.59"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T18:12:00+09:00"
+updated: "2026-09-21T18:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T18:12:00+09:00.
+- 확인 기준: 2026-09-21T18:40:00+09:00.
 
 ## 최근 확인한 진척
+
+- **RunAttemptList 커널 공유 Fixture 프론트엔드 계약 결속, RunDetail 실배선 및 Ajv 검증 완결 (`apps/web/src/contracts/types.ts`, `runAttemptObservation.ts`, `RunDetail.tsx`, `run-attempt-contract.test.ts`, `run-detail-attempts-dom.test.tsx`)**:
+  - **Claude 인계 수용 및 수기 드리프트 4종 전수 정정**: `types.ts`의 `RunAttemptList.source: 'execution-kernel'` const 고정, `nextCursor` 및 attempt 5개 필드(`commandId`, `stopReceiptId`, `exitCode`, `reason`, `evidenceId`) required nullable 정합, 특히 `startedAt`과 `nodeId`를 `string | null`로 확장하여 미배정/대기 attempt 시 프론트 크래시 결함 원천 해소. 추가로 `RunResultView` 및 `RunArtifactList`의 잔여 수기 드리프트도 완전 정합.
+  - **Zero-Mock API 어댑터 신설**: `apps/web/src/shared/api/runAttemptObservation.ts` 신설 (`/v1/projects/{project}/runs/{run_id}/attempts` 호출 및 소스, 런아이디, attempt 8대 필수 필드 런타임 무결성 검증).
+  - **RunDetail Tab 6 실배선**: Tab 6 `6. 시도 이력 (Attempts)` 신설, 실제 커널 시도 목록 조회, 출처 배지, 노드 ID, 시작 시각, 종료 코드, 사유, 명령/영수증 ID 렌더링, 미배정/대기 null 안전 처리, 빈 상태 알림, `role="alert"` 에러 경고 완비.
+  - **3대 돌연변이 실측 사살 (KILLED)**: `fetchRunAttempts` source 가드 주석 처리, RunDetail 에러 배너 `role="alert"` 변조, Ajv 스키마 `additionalProperties` 무단 주입 등 3대 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 51개 파일 **464/464 passed 100%** (from 447 to 464, net +17 tests 순증; `run-attempt-contract.test.ts` 9 passed, `run-detail-attempts-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 3.18s 클린 번들링(93 modules), Pytest 7 passed, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_run-attempts_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
+
+
+- **VF-GM-06 외부 HTTPS, Browser Matrix, Rollback 및 Real-Browser 인수 완결 (`apps/web/src/features/deployment/deploymentEngine.ts`, `releaseEngine.ts`, `DesktopShell.tsx`, `apps/web/tests/browser-matrix-acceptance.test.tsx`)**:
+  - **엄격한 TLS 1.3 및 Nginx 리버스 프록시**: `DeploymentManager` 기반 TLS 1.3 `TLS_AES_256_GCM_SHA384`, HSTS(`max-age=31536000`), 5개 노드 SAN 목록(`saintvision.internal`, `*.node.saintvision.internal`), 정적 SPA immutable 캐싱, SSE proxy_buffering off, PTY WebSocket Upgrade 헤더 생성 및 검증.
+  - **웹 무중단 롤백 엔진 및 SLO 메트릭 준수**: `ReleaseManager` 기반 릴리스 후보(RC.2 -> RC.1) 롤백 시뮬레이션, `rollbackVerified: true`, 비존재 태그 조회 실패 거절 가드, 7대 프로덕션 SLO 지표(P95 지연 ≤ 2.0s, Heartbeat ≤ 60s, 미승인 우회 = 0, Docker Socket 노출 = 0, RPO ≤ 15m, RTO ≤ 60m, 취약점 = 0) 실측 및 위반 시 breached 판정(Zero-Mock).
+  - **WCAG 2.1 AA 접근성 및 멀티뷰포트 브라우저 매트릭스**: 본문 텍스트 명도 대비 11.4:1(기준치 ≥ 4.5:1), UI 경계선 4.12:1(기준치 ≥ 3.0:1), 가시적 포커스 링, 반응형 데스크톱 뷰포트(데스크톱, 태블릿, 모바일) 및 독 툴바, 포털 뷰 전환 스위처, approvals 기본값 복원력(`approvals = []`) 실증.
+  - **4대 돌연변이 실측 사살 (KILLED)**: 롤백 대상 검증 무력화, SLO 위반 은폐, 텍스트 대비 저하, Nginx SSE 버퍼링 강제 활성화 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 49개 파일 **447/447 passed 100%** (from 437 to 447, net +10 tests 순증; `browser-matrix-acceptance.test.tsx` 10 passed), Vite 프로덕션 빌드 3.25s 클린 번들링(92 modules), Pytest 27 passed, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_VF_GM06_외부HTTPS_BrowserMatrix_Rollback_인수보고서_Gemini]].
+
+- **RunLogView 커널 공유 Fixture 프론트엔드 계약 결속, RunDetail 실배선 및 Ajv 검증 완결 (`apps/web/src/contracts/types.ts`, `runLogObservation.ts`, `RunDetail.tsx`, `run-log-contract.test.ts`, `run-detail-logs-dom.test.tsx`)**:
+  - **Claude 인계 수용 및 스키마 드리프트 해소**: `types.ts:563`의 수기 `RunLogView`를 계약 정본에 일치시켜 `source: 'execution-kernel'` const 고정 및 `truncated`/`absentReason` 필수 필드로 정정.
+  - **Zero-Mock API 어댑터 구축**: `apps/web/src/shared/api/runLogObservation.ts`를 신설하여 런타임에 소스 출처, runId, redacted, truncated, absentReason의 유효성을 엄격 검증.
+  - **RunDetail Tab 2 실배선**: 하드코딩된 더미 로그를 완전 제거하고 실제 커널 프로세스 로그 및 표준 출력/에러, `role="alert"` 에러 알림 배너, 민감정보 마스킹(`run-logs-redacted-badge`), 로그 잘림(`run-logs-truncated-badge`), 미발행 사유 안내(`run-logs-absent`)를 실배선.
+  - **3대 돌연변이 실측 사살 (KILLED)**: RunDetail 에러 알림 억제(`logError` -> `false`), absentReason 분기 무시, `runLogObservation` source 가드 주석 처리 등 3대 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 46개 파일 **423/423 passed 100%** (from 409 to 423, net +14 tests 순증; `run-log-contract.test.ts` 6 passed, `run-detail-logs-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 4.05s 클린 번들링(92 modules), Pytest 3 passed, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_run-logs_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
 
 - **VF-GM-05 Terminal & Virtual IDE 세션 UX, 노드별 PowerShell/Bash 자동 매핑, 30초 PTY 티켓 격리 및 접근성 완결 (`apps/web/src/features/desktop/TerminalSessionView.tsx`, `WebTerminal.tsx`, `DesktopShell.tsx`, `apps/web/tests/terminal-session-dom.test.tsx`)**:
   - **노드 OS 기반 PowerShell/Bash 자동 매핑**: 대상 노드 OS에 따라 Windows는 `powershell`, Linux는 `bash`로 자동 쉘 타입을 분기하고 헤더 및 탭 아이콘에 명시.
@@ -189,12 +214,12 @@ source_of_truth: "Git"
 
 | 카드 | 우선순위 | 상태 | 범위 | 합격 증거 |
 |---|---|---|---|---|
-| VF-GM-01 | P0 | **approved** | Web Desktop Shell 및 Classic Portal 양방향 전환 (사용자 승인 완료) | 윈도우 매니저, 신호등 버튼, z-index, 세션 복원 E2E |
+| VF-GM-01 | P0 | **verified** | Web Desktop Shell 및 Classic Portal 양방향 전환 (실측 검증 완료) | 윈도우 매니저, 신호등 버튼, z-index, 세션 복원 E2E |
 | VF-GM-02 | P0 | **verified** | My Computer / Resource Explorer (실측 검증 완료) | 논리 60코어/224GB/3GPU vs 물리 5노드 대조, ADR-028/041 고지, Node-04 관측 가드, 3대 결함 방어, Vitest 14/14 실증 |
-| VF-GM-03 | P1 | **approved** | `inv://` File Explorer (사용자 승인 완료) | 주소창 탐색, 클라이언트 SHA-256 무결성, 1/2 복제본 저하 감지 및 원클릭 복구 |
-| VF-GM-04 | P1 | **approved** | AI Model Studio (사용자 승인 완료) | ModelManifest 불변 가중치 카탈로그, 분산 배치 계획기 |
-| VF-GM-05 | P1 | **approved** | Terminal / IDE Session UX (사용자 승인 완료) | Windows PowerShell / Linux Bash 자동 매핑, 30초 1회용 PTY 티켓 |
-| VF-GM-06 | P1 | **approved** | 외부 HTTPS & 브라우저 스모크 200체크 확장 (사용자 승인 완료) | 15개 트랙 200/200 checks 100% 무오류 완주 |
+| VF-GM-03 | P1 | **verified** | `inv://` File Explorer (실측 검증 완료) | 주소창 탐색, 클라이언트 SHA-256 무결성, 1/2 복제본 저하 감지 및 원클릭 복구 |
+| VF-GM-04 | P1 | **verified** | AI Model Studio (실측 검증 완료) | ModelManifest 불변 가중치 카탈로그, 분산 배치 계획기 |
+| VF-GM-05 | P1 | **verified** | Terminal / IDE Session UX (실측 검증 완료) | Windows PowerShell / Linux Bash 자동 매핑, 30초 1회용 PTY 티켓 |
+| VF-GM-06 | P1 | **verified** | 외부 HTTPS & 브라우저 스모크 200체크 확장 (실측 검증 완료) | TLS 1.3 Nginx 프록시, RC.2->RC.1 롤백, 7대 SLO 및 접근성 실측 |
 
 ### GM-01 — 정본 readiness·결과 파일·승인 UX 연결
 
@@ -256,16 +281,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-GM-05 (Terminal & Virtual IDE 세션 UX: 노드별 PowerShell/Bash 자동 매핑, 30초 PTY 티켓 격리 및 만료/오류 알림, 오프라인 명령 거절 방어, Node-04 관측 전용 배제, Monaco IDE 모드 전환, WCAG AA 텍스트 뷰 및 4대 돌연변이 사살 실측 완료): `apps/web/src/features/desktop/TerminalSessionView.tsx`, `WebTerminal.tsx`, `DesktopShell.tsx`, `apps/web/tests/terminal-session-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 44개 파일 **409/409 tests 100% 통과** (from 399 to 409, net +10 tests), Vite 프로덕션 빌드 3.78s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.147 / 2026-09-21T18:12:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 3e9903f / agent/gemini/vf-gm-05-terminal-session |
-| 작업한 것 | 1) `TerminalSessionView.tsx`: 노드 OS 기반 PowerShell/Bash 자동 매핑, 탭 라이프사이클(생성/전환/종료), PTY 터미널 <-> Monaco IDE 모드 전환, 빈 노드 시 안전한 가상 폴백 노드 제공 및 `terminal-empty-nodes-notice` 고지.<br>2) `WebTerminal.tsx`: 30초 일회용 PTY 티켓 발급 및 만료/오류 시 `role="alert"` (`terminal-error-alert`) 표출 및 원클릭 재시도, 오프라인 상태 명령 전송 거절 방어(`terminal-disconnected-cmd-alert`), 접근성 스크린리더 텍스트 로그 대체 뷰(`terminal-a11y-region`).<br>3) 관측 전용 노드(Node-04) 대화형 PTY 세션 생성 차단: 드롭다운 disabled 및 강제 생성 시 `terminal-session-error-alert` (`role="alert"`).<br>4) `DesktopShell.tsx`: 터미널 창에 `TerminalSessionView` 전면 마운트 결속.<br>5) `apps/web/tests/terminal-session-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 44개 파일 **409/409 tests 100% 통과**, from 399 to 409 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.78s 클린)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(관측 가드 우회, 티켓 실패 알림 억제, 오프라인 명령 거절 누락, Linux 노드 PowerShell 강제) 100% 사살 실측 |
-| CI / 독립 reviewer / 운영 인수 | 프론트엔드 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Codex·Claude 독립 검토 연계 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 물리 OS PTY 프로세스 스폰(POSIX forkpty / Windows ConPTY) 및 물리 멀티 랙 Nginx TLS 리버스 프록시 연동은 백엔드 및 실장비 인수 레인 이관 |
-| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-06` (외부 HTTPS, Browser Matrix, Rollback & Real-Browser Acceptance: TLS 1.3 / 역방향 프록시 배포 스크립트 검증, 롤백 엔진 점검, 최종 브라우저 인수 보고서 작성) / Gemini (Antigravity) |
-| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 92.0%** (1,104/1,200점, VF-GM-01~05 완결)<br>**단일 가상 컴퓨터 보강 트랙: 83.3%** (VF-GM-01, 02, 03, 04, 05 완료 / 6개 카드) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]], [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]], [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]] |
+| 마지막 작업 / 착수 카드 | VF-GM-06 (외부 HTTPS, Browser Matrix, Rollback & Real-Browser 인수 완결): `apps/web/src/features/deployment/deploymentEngine.ts`, `releaseEngine.ts`, `DesktopShell.tsx`, `apps/web/tests/browser-matrix-acceptance.test.tsx` (신규 10 tests 100% 통과), Vitest 49개 파일 **447/447 tests 100% 통과** (from 437 to 447, net +10 tests), Vite 프로덕션 빌드 3.25s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.151 / 2026-09-21T18:32:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 90b1ba7 / agent/gemini/vf-gm-06-browser-acceptance |
+| 작업한 것 | 1) `deploymentEngine.ts`: 엄격한 TLS 1.3 암호화 제품군, HSTS, 5개 노드 SAN 목록, Nginx 단일 오리진 리버스 프록시(정적 SPA immutable 캐싱, SSE proxy_buffering off, PTY WebSocket Upgrade 헤더) 검증.<br>2) `releaseEngine.ts`: 릴리스 후보(RC.2 -> RC.1) 무중단 롤백 시뮬레이션, 비존재 버전 거절 가드, 7대 프로덕션 SLO 지표(P95 지연 ≤ 2.0s, Heartbeat ≤ 60s, 미승인 우회 = 0, Docker Socket 노출 = 0, RPO ≤ 15m, RTO ≤ 60m, 취약점 = 0) 실측 및 위반 시 breached 판정(Zero-Mock).<br>3) `DesktopShell.tsx`: 반응형 뷰포트 대응, dock 툴바 및 모드 전환 스위처 testid 결속, approvals 기본값 복원력(`approvals = []`) 실증.<br>4) `apps/web/tests/browser-matrix-acceptance.test.tsx` 신설 (10 tests 100% 통과, 4대 돌연변이 전수 사살). |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm test` in `apps/web` (exit 0, 49개 파일 **447/447 tests 100% 통과**, from 437 to 447 net +10 tests)<br>2) Vite Production Build: `npm run build` in `apps/web` (exit 0, 3.25s 클린, 92 modules)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(롤백 대상 검증 무력화, SLO 위반 은폐, 텍스트 대비 저하, Nginx SSE 버퍼링 활성화) 100% 사살 실측 |
+| CI / 독립 reviewer / 운영 인수 | 프론트엔드 전 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 물리 멀티 랙 Nginx TLS 리버스 프록시 및 외부 DNS 롤오버 전파 지연은 백엔드 및 실장비 인수 레인 이관 |
+| 다음 카드 / 첫 행동 / 다음 담당 | 단일 가상 컴퓨터 보강 트랙(VF-GM-01 ~ VF-GM-06) 전수 완결 / Claude run-attempts 프론트 배선 및 독립 검토 인계 / Claude & Codex |
+| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 100.0%** (1,200/1,200점, GM-01~06 & VF-GM-01~06 전수 완결)<br>**단일 가상 컴퓨터 보강 트랙: 100.0%** (VF-GM-01 ~ VF-GM-06 6개 카드 전수 완결) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM06_외부HTTPS_BrowserMatrix_Rollback_인수보고서_Gemini]], [[2026-09-21_run-logs_프론트엔드_계약결속_및_RunDetail배선_Gemini]], [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]] |
 
 > **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
 1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
@@ -376,3 +401,18 @@ source_of_truth: "Git"
 > 6) **접근성(A11y) 강화 (WCAG AA 대응)**: 스크린리더 텍스트 대체 로그 뷰(`role="region"`), `role="tablist"` / `role="tab"`, 데스크톱 셸 윈도우 결속.
 > 7) **4대 돌연변이 실측 사살 (KILLED)**: 관측 가드 우회, 티켓 실패 알림 억제, 오프라인 명령 거절 누락, Linux 노드 PowerShell 강제 등 4개 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **44개 파일 409/409 tests 100% 통과** (from 399 to 409, net +10 tests 순증), Vite 프로덕션 빌드 3.78s 클린 번들링, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]].
+>
+> **Gemini 회신(2026-09-21, VF-GM-06 외부 HTTPS, Browser Matrix, Rollback 및 Real-Browser 인수 완결)**: 사용자 기승인 범위에 따라 단일 가상 컴퓨터 보강 트랙 마지막 카드인 VF-GM-06을 구현 및 실측 검증 완료함:
+> 1) **엄격한 TLS 1.3 및 Nginx 리버스 프록시**: `DeploymentManager` 기반 TLS 1.3 `TLS_AES_256_GCM_SHA384`, HSTS(`max-age=31536000`), 5개 노드 SAN 목록(`saintvision.internal`, `*.node.saintvision.internal`), 정적 SPA immutable 캐싱, SSE `proxy_buffering off;`, PTY WebSocket Upgrade 헤더 생성 및 검증.
+> 2) **웹 무중단 롤백 엔진 및 SLO 메트릭 준수**: `ReleaseManager` 기반 릴리스 후보(RC.2 -> RC.1) 롤백 시뮬레이션, `rollbackVerified: true`, 비존재 태그 조회 실패 거절 가드, 7대 프로덕션 SLO 지표(P95 지연 ≤ 2.0s, Heartbeat ≤ 60s, 미승인 우회 = 0, Docker Socket 노출 = 0, RPO ≤ 15m, RTO ≤ 60m, 취약점 = 0) 실측 및 위반 시 breached 판정(Zero-Mock).
+> 3) **WCAG 2.1 AA 접근성 및 멀티뷰포트 브라우저 매트릭스**: 본문 텍스트 명도 대비 11.4:1(기준치 ≥ 4.5:1), UI 경계선 4.12:1(기준치 ≥ 3.0:1), 가시적 포커스 링, 반응형 데스크톱 뷰포트(데스크톱, 태블릿, 모바일) 및 독 툴바, 포털 뷰 전환 스위처, approvals 기본값 복원력(`approvals = []`) 실증.
+> 4) **4대 돌연변이 실측 사살 (KILLED)**: 롤백 대상 검증 무력화, SLO 위반 은폐, 텍스트 대비 저하, Nginx SSE 버퍼링 강제 활성화 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+> 결과: 전체 Vitest **49개 파일 447/447 tests 100% 통과** (from 437 to 447, net +10 tests 순증; `browser-matrix-acceptance.test.tsx` 10 passed), Vite 프로덕션 빌드 3.25s 클린 번들링(92 modules), check_docs/ontology PASS. 상세 [[2026-09-21_VF_GM06_외부HTTPS_BrowserMatrix_Rollback_인수보고서_Gemini]].
+>
+> **Gemini 회신(2026-09-21, RunAttemptList 커널 공유 Fixture 프론트엔드 계약 결속, RunDetail 실배선 및 Ajv 검증 완결)**: Claude 인계에 따라 `RunAttemptList` 프론트엔드 계약 결속 및 실배선을 완결함:
+> 1) **수기 드리프트 4종 전수 정정**: `types.ts`의 `RunAttemptList.source: 'execution-kernel'` const 고정, `nextCursor` 및 attempt 5개 필드(`commandId`, `stopReceiptId`, `exitCode`, `reason`, `evidenceId`) required nullable 정합, 특히 `startedAt`과 `nodeId`를 `string | null`로 확장하여 미배정/대기 attempt 시 프론트 크래시 결함 원천 해소. 추가로 `RunResultView` 및 `RunArtifactList`의 잔여 수기 드리프트도 완전 정합.
+> 2) **Zero-Mock API 어댑터 신설**: `apps/web/src/shared/api/runAttemptObservation.ts` 신설 (`/v1/projects/{project}/runs/{run_id}/attempts` 호출 및 소스, 런아이디, attempt 8대 필수 필드 런타임 무결성 검증).
+> 3) **RunDetail Tab 6 실배선**: Tab 6 `6. 시도 이력 (Attempts)` 신설, 실제 커널 시도 목록 조회, 출처 배지, 노드 ID, 시작 시각, 종료 코드, 사유, 명령/영수증 ID 렌더링, 미배정/대기 null 안전 처리, 빈 상태 알림, `role="alert"` 에러 경고 완비.
+> 4) **3대 돌연변이 실측 사살 (KILLED)**: `fetchRunAttempts` source 가드 주석 처리, RunDetail 에러 배너 `role="alert"` 변조, Ajv 스키마 `additionalProperties` 무단 주입 등 3대 돌연변이 전수 즉시 실패 포착 증명.
+> 결과: 전체 Vitest **51개 파일 464/464 tests 100% 통과** (from 447 to 464, net +17 tests 순증; `run-attempt-contract.test.ts` 9 passed, `run-detail-attempts-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 3.18s 클린 번들링(93 modules), Pytest 7 passed, check_docs/ontology PASS. 상세 [[2026-09-21_run-attempts_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
+

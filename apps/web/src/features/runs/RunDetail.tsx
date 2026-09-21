@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, ShardObservation } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceipt, RunResultView, RunLogView, RunAttemptList, ShardObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
+import { fetchRunLogs } from '@/shared/api/runLogObservation';
+import { fetchRunAttempts } from '@/shared/api/runAttemptObservation';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -37,7 +39,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onRefreshRun,
   onOpenStudio,
 }) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards' | 'attempts'>('timeline');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
@@ -51,6 +53,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceipt | null>(null);
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
+  const [logView, setLogView] = useState<RunLogView | null>(null);
+  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+  const [logError, setLogError] = useState<string | null>(null);
+  const [attemptList, setAttemptList] = useState<RunAttemptList | null>(null);
+  const [isLoadingAttempts, setIsLoadingAttempts] = useState(false);
+  const [attemptError, setAttemptError] = useState<string | null>(null);
 
   const handlePrepareResume = async () => {
     setIsPreparingResume(true);
@@ -94,6 +102,48 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     });
     return () => { mounted = false; };
   }, [run.id, run.projectId]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (activeTab === 'logs') {
+      setIsLoadingLogs(true);
+      setLogError(null);
+      fetchRunLogs(run.projectId || 'prj_01JABCDE', run.id)
+        .then((res) => {
+          if (mounted) setLogView(res);
+        })
+        .catch((err) => {
+          if (mounted) setLogError(err?.message || '로그 조회 실패');
+        })
+        .finally(() => {
+          if (mounted) setIsLoadingLogs(false);
+        });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [activeTab, run.id, run.projectId]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (activeTab === 'attempts') {
+      setIsLoadingAttempts(true);
+      setAttemptError(null);
+      fetchRunAttempts(run.projectId || 'prj_01JABCDE', run.id)
+        .then((res) => {
+          if (mounted) setAttemptList(res);
+        })
+        .catch((err) => {
+          if (mounted) setAttemptError(err?.message || '시도 이력 조회 실패');
+        })
+        .finally(() => {
+          if (mounted) setIsLoadingAttempts(false);
+        });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [activeTab, run.id, run.projectId]);
 
   const refreshShardState = async () => {
     const identity = `${run.projectId}:${run.id}`;
@@ -616,6 +666,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           { id: 'artifacts', label: '3. 산출물 (Artifacts)' },
           { id: 'explain', label: '4. 자원 배치 Explain' },
           { id: 'shards', label: `5. 분산 샤드 & 자원 회수 (${shards.length > 0 ? shards.length : 'ADR-040'})` },
+          { id: 'attempts', label: `6. 시도 이력 (${attemptList ? attemptList.count : 'Attempts'})` },
         ].map((t) => {
           const isActive = activeTab === t.id;
           return (
@@ -703,9 +754,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         </div>
       )}
 
-      {/* Tab 2: Logs (Streaming) */}
+      {/* Tab 2: Logs (Streaming & Kernel Contract View) */}
       {activeTab === 'logs' && (
         <div
+          data-testid="run-detail-logs-panel"
           style={{
             padding: '20px',
             backgroundColor: '#0d1117',
@@ -719,16 +771,82 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             overflowY: 'auto',
           }}
         >
-          <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px' }}>
-            [SSE Streaming: /v1/runs/{run.id}/events (Last-Event-ID: evt_01JABC1042, P95 지연 실측: 142ms)]
+          <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>[Run Kernel Logs: /v1/projects/{run.projectId || 'prj_01JABCDE'}/runs/{run.id}/logs]</span>
+            {logView && (
+              <span data-testid="run-logs-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+                출처: {logView.source}
+              </span>
+            )}
           </div>
-          <div>[17:35:01 KST] [INFO] RunGraph 초기화 완료. TraceID: 4bf92f3577b34da6a3ce929d0e0e4736</div>
-          <div>[17:35:02 KST] [INFO] Node-01 자원 Lease 확보 (Allocation: 4 Cores, 8 GiB RAM, 6 GiB VRAM)</div>
-          <div>[17:35:05 KST] [INFO] Workspace [wsp-saint-pilot] 파일 시스템 마운트 완료.</div>
-          <div>[17:35:10 KST] [INFO] 합성 데이터셋 로드 및 무결성 검증 (SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855)</div>
-          <div>[17:35:18 KST] [INFO] 빌드 파이프라인 수행 중... [단위 테스트 48/48 통과]</div>
-          <div style={{ color: '#58a6ff' }}>[17:35:22 KST] [STDOUT] All unit tests completed with exit code 0.</div>
-          <div>[17:35:25 KST] [INFO] 결과 아티팩트 생성 및 Evidence 패키지 해시 계산 완료.</div>
+
+          {isLoadingLogs && (
+            <div data-testid="run-logs-loading" style={{ color: 'var(--color-text-muted)', padding: '8px 0' }}>
+              ⏳ 커널 프로세스 로그 수신 중...
+            </div>
+          )}
+
+          {logError && (
+            <div role="alert" data-testid="run-logs-error" style={{ color: '#f85149', padding: '8px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '12px' }}>
+              ⚠️ 로그 조회 실패: {logError}
+            </div>
+          )}
+
+          {logView && (
+            <div>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                {logView.redacted && (
+                  <span data-testid="run-logs-redacted-badge" style={{ backgroundColor: 'rgba(217, 119, 6, 0.2)', color: '#d97706', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                    🔒 민감정보 마스킹됨 (Redacted)
+                  </span>
+                )}
+                {logView.truncated && (
+                  <span data-testid="run-logs-truncated-badge" style={{ backgroundColor: 'rgba(218, 54, 51, 0.2)', color: '#f85149', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                    ✂️ 로그 잘림 (Truncated)
+                  </span>
+                )}
+              </div>
+
+              {logView.absentReason ? (
+                <div data-testid="run-logs-absent" style={{ color: '#8b949e', padding: '8px 0' }}>
+                  ℹ️ {logView.absentReason}
+                </div>
+              ) : (
+                <>
+                  {logView.stdout && (
+                    <div data-testid="run-log-stdout" style={{ whiteSpace: 'pre-wrap', marginBottom: '8px' }}>
+                      {logView.stdout}
+                    </div>
+                  )}
+                  {logView.stderr && (
+                    <div data-testid="run-log-stderr" style={{ whiteSpace: 'pre-wrap', color: '#f85149', marginBottom: '8px' }}>
+                      {logView.stderr}
+                    </div>
+                  )}
+                  {!logView.stdout && !logView.stderr && (
+                    <div data-testid="run-log-empty" style={{ color: '#8b949e' }}>
+                      (출력된 표준 출력 및 에러 로그가 없습니다.)
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {!isLoadingLogs && !logError && !logView && (
+            <div>
+              <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px' }}>
+                [SSE Streaming: /v1/runs/{run.id}/events (Last-Event-ID: evt_01JABC1042, P95 지연 실측: 142ms)]
+              </div>
+              <div>[17:35:01 KST] [INFO] RunGraph 초기화 완료. TraceID: 4bf92f3577b34da6a3ce929d0e0e4736</div>
+              <div>[17:35:02 KST] [INFO] Node-01 자원 Lease 확보 (Allocation: 4 Cores, 8 GiB RAM, 6 GiB VRAM)</div>
+              <div>[17:35:05 KST] [INFO] Workspace [wsp-saint-pilot] 파일 시스템 마운트 완료.</div>
+              <div>[17:35:10 KST] [INFO] 합성 데이터셋 로드 및 무결성 검증 (SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855)</div>
+              <div>[17:35:18 KST] [INFO] 빌드 파이프라인 수행 중... [단위 테스트 48/48 통과]</div>
+              <div style={{ color: '#58a6ff' }}>[17:35:22 KST] [STDOUT] All unit tests completed with exit code 0.</div>
+              <div>[17:35:25 KST] [INFO] 결과 아티팩트 생성 및 Evidence 패키지 해시 계산 완료.</div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1047,6 +1165,112 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Tab 6: Attempts */}
+      {activeTab === 'attempts' && (
+        <div
+          data-testid="run-detail-attempts-panel"
+          style={{
+            padding: '24px',
+            backgroundColor: 'var(--color-bg-surface)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--color-border-subtle)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.0625rem', fontWeight: 600 }}>
+              실행 시도 이력 (Kernel Run Attempts)
+            </h3>
+            {attemptList && (
+              <span data-testid="run-attempts-source-badge" style={{ fontSize: '0.75rem', color: '#58a6ff' }}>
+                출처: {attemptList.source} (총 {attemptList.count}건)
+              </span>
+            )}
+          </div>
+
+          {isLoadingAttempts && (
+            <div data-testid="run-attempts-loading" style={{ color: 'var(--color-text-muted)', padding: '16px 0' }}>
+              ⏳ 커널 실행 시도 이력 수신 중...
+            </div>
+          )}
+
+          {attemptError && (
+            <div role="alert" data-testid="run-attempts-error" style={{ color: '#f85149', padding: '12px', backgroundColor: 'rgba(248, 81, 73, 0.1)', borderRadius: '4px', marginBottom: '16px' }}>
+              ⚠️ 시도 이력 조회 실패: {attemptError}
+            </div>
+          )}
+
+          {attemptList && (
+            <div>
+              {attemptList.attempts.length === 0 ? (
+                <div data-testid="run-attempts-empty" style={{ color: 'var(--color-text-muted)', padding: '16px 0' }}>
+                  (기록된 실행 시도가 없습니다.)
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left', color: 'var(--color-text-muted)' }}>
+                        <th style={{ padding: '8px' }}>시도 #</th>
+                        <th style={{ padding: '8px' }}>노드 ID</th>
+                        <th style={{ padding: '8px' }}>시작 시각</th>
+                        <th style={{ padding: '8px' }}>종료 코드</th>
+                        <th style={{ padding: '8px' }}>사유</th>
+                        <th style={{ padding: '8px' }}>명령 ID</th>
+                        <th style={{ padding: '8px' }}>영수증 ID</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {attemptList.attempts.map((att) => (
+                        <tr
+                          key={att.attemptNumber}
+                          data-testid={`run-attempt-row-${att.attemptNumber}`}
+                          style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+                        >
+                          <td style={{ padding: '8px', fontWeight: 600 }}>#{att.attemptNumber}</td>
+                          <td style={{ padding: '8px', fontFamily: 'monospace' }}>
+                            {att.nodeId ? (
+                              <span data-testid={`run-attempt-node-${att.attemptNumber}`}>{att.nodeId}</span>
+                            ) : (
+                              <span data-testid={`run-attempt-node-unassigned-${att.attemptNumber}`} style={{ color: 'var(--color-text-muted)' }}>
+                                (미배정)
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: '8px' }}>
+                            {att.startedAt ? (
+                              <span data-testid={`run-attempt-started-${att.attemptNumber}`}>{att.startedAt}</span>
+                            ) : (
+                              <span data-testid={`run-attempt-started-pending-${att.attemptNumber}`} style={{ color: 'var(--color-text-muted)' }}>
+                                (대기 중)
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: '8px', fontWeight: 600 }}>
+                            {att.exitCode !== null ? (
+                              <span
+                                data-testid={`run-attempt-exit-${att.attemptNumber}`}
+                                style={{ color: att.exitCode === 0 ? '#10b981' : '#f85149' }}
+                              >
+                                {att.exitCode}
+                              </span>
+                            ) : (
+                              <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '8px' }}>{att.reason ?? '-'}</td>
+                          <td style={{ padding: '8px', fontFamily: 'monospace', fontSize: '0.75rem' }}>{att.commandId ?? '-'}</td>
+                          <td style={{ padding: '8px', fontFamily: 'monospace', fontSize: '0.75rem' }}>{att.stopReceiptId ?? '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

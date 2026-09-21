@@ -509,7 +509,7 @@ export interface TrainingModuleStep {
 }
 
 export interface RunResultView {
-  source: 'execution-kernel' | string;
+  source: 'execution-kernel';
   runId: string;
   projectId: string;
   state: RunState;
@@ -517,9 +517,9 @@ export interface RunResultView {
   attemptCount: number;
   sealed: boolean;
   executionConfirmed: boolean;
-  commandId?: string | null;
-  nodeId?: string | null;
-  stopReceipt?: NodeStopReceipt | {
+  commandId: string | null;
+  nodeId: string | null;
+  stopReceipt: NodeStopReceipt | {
     receiptId: string;
     processStarted?: boolean;
     exitCode: number;
@@ -529,18 +529,18 @@ export interface RunResultView {
     resourceReclaimed?: boolean;
     verified?: boolean;
   } | null;
-  evidence?: {
+  evidence: {
     evidenceId?: string;
     [key: string]: any;
   } | null;
-  completedAt?: string | null;
-  output?: {
+  completedAt: string | null;
+  output: {
     sha256: string;
     sizeBytes: number;
     verified: boolean;
   } | null;
-  outputAbsentReason?: string | null;
-  resourceReleasePending?: boolean;
+  outputAbsentReason: string | null;
+  resourceReleasePending: boolean;
 }
 
 export interface RunArtifactItem {
@@ -552,41 +552,43 @@ export interface RunArtifactItem {
 }
 
 export interface RunArtifactList {
-  source: 'execution-kernel' | string;
+  source: 'execution-kernel';
   runId: string;
   artifacts: RunArtifactItem[];
   count: number;
   verifiedCount: number;
-  absentReason?: string | null;
+  absentReason: string | null;
 }
 
 export interface RunLogView {
-  source: 'execution-kernel' | string;
+  source: 'execution-kernel';
   runId: string;
   stdout: string | null;
   stderr: string | null;
   redacted: boolean;
-  truncated?: boolean | null;
-  absentReason?: string | null;
+  truncated: boolean | null;
+  absentReason: string | null;
 }
 
-export interface RunAttemptItem {
+export interface RunAttemptObservation {
   attemptNumber: number;
-  startedAt: string;
-  nodeId: string;
-  commandId?: string | null;
-  stopReceiptId?: string | null;
-  exitCode?: number | null;
-  reason?: string | null;
-  evidenceId?: string | null;
+  startedAt: string | null;
+  nodeId: string | null;
+  commandId: string | null;
+  stopReceiptId: string | null;
+  exitCode: number | null;
+  reason: string | null;
+  evidenceId: string | null;
 }
+
+export type RunAttemptItem = RunAttemptObservation;
 
 export interface RunAttemptList {
-  source: 'execution-kernel' | string;
+  source: 'execution-kernel';
   runId: string;
   attempts: RunAttemptItem[];
   count: number;
-  nextCursor?: number | null;
+  nextCursor: number | null;
 }
 
 export interface ApprovalView {
