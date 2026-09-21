@@ -205,6 +205,32 @@ def test_a_properly_separated_interpolation_still_counts() -> None:
     assert "/v1/projects/{}/runs" in client_paths(source)
 
 
+def test_interpolated_path_head_is_not_a_separate_endpoint_but_query_head_is() -> None:
+    """A variable path segment must not invent its parent route; query assembly may keep a complete route head."""
+    workspace_call = 'apiClient(`/v1/workspaces/${workspaceId}/terminal-tickets`)'
+    assert client_paths(workspace_call) == {"/v1/workspaces/{}/terminal-tickets"}
+
+    query_call = "get(`/v1/storage/resolve${qs ? '?' + qs : ''}`)"
+    assert client_paths(query_call) == {"/v1/storage/resolve"}
+
+
+def test_nginx_location_declarations_are_not_client_calls() -> None:
+    """Deployment route metadata may resemble a path but is not an API request."""
+    source = '''
+    const rules = [{ location: '/v1/workspaces/{id}/terminals/{sessionId}' }];
+    const nginx = `
+      location ~ ^/v1/workspaces/[^/]+/terminals/ {
+        proxy_pass http://pacs-backend:8080;
+      }
+    `;
+    '''
+    assert client_paths(source) == set()
+
+    # A real request to the same route family remains visible.
+    actual_call = source + "\nfetch('/v1/workspaces')"
+    assert "/v1/workspaces" in client_paths(actual_call)
+
+
 @pytest.mark.parametrize('served,expected', [(False, 1), (True, 0)])
 def test_nonempty_route_comparison_can_pass_or_fail(tmp_path, monkeypatch, capsys, served, expected):
     import json
@@ -302,5 +328,4 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     # Truthful verification status: Output Verified must require verifiedEvidenceId and not fallbackUsed
     assert "Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed" in ds_content
     assert "출력 무결성 미검증 (Completed / UNVERIFIED)" in ds_content
-
 

@@ -79,6 +79,12 @@ _PREFIX = re.compile(r"APIRouter\([^)]*prefix\s*=\s*[\"']([^\"']+)", re.DOTALL)
 #: Literal paths in client source, including the head of an interpolated one.
 _CLIENT = re.compile(r"""[\"'`](/v1/[A-Za-z0-9_\-/{}$:.]*)[\"'`]""")
 _CLIENT_HEAD = re.compile(r"""[\"'`](/v1/[^\"'`]*?)\$\{""")
+# Client trees also contain deployment descriptions. A quoted ``location``
+# property is configuration data, not a request made by the browser.
+_DEPLOYMENT_LOCATION_FIELD = re.compile(r"\blocation\s*:\s*[\"'`]$")
+# The Nginx template in deploymentEngine.ts uses directive lines such as
+# ``location ~ ^/v1/...``. Keep those shapes out of the client-request set.
+_NGINX_LOCATION_DIRECTIVE = re.compile(r"^\s*location\s+(?:~\s*)?\^?\s*$")
 #: A template hole glued directly onto a path segment, e.g. ``${prj}runs`` where
 #: ``prj`` already ends in ``projects/<id>/``. The leftover ``{}runs`` is a tool
 #: artefact, not a path the SPA asks for.
@@ -112,8 +118,31 @@ def client_paths(text: str) -> set[str]:
     where ``prj`` already ends in ``projects/<id>/``) is a tool artefact rather
     than a request, so it is dropped too rather than reported as unserved.
     """
-    found = {normalise(m) for m in _CLIENT.findall(text)}
-    found |= {normalise(m) for m in _CLIENT_HEAD.findall(text)}
+    def is_deployment_location(match: re.Match[str]) -> bool:
+        line_start = text.rfind("\n", 0, match.start(1)) + 1
+        prefix = text[line_start:match.start(1)]
+        return bool(
+            _DEPLOYMENT_LOCATION_FIELD.search(prefix)
+            or _NGINX_LOCATION_DIRECTIVE.fullmatch(prefix)
+        )
+
+    # Full literal/template matches retain the path after interpolation. Do not
+    # treat a quoted Nginx ``location`` field as a browser request.
+    found = {
+        normalise(match.group(1))
+        for match in _CLIENT.finditer(text)
+        if not is_deployment_location(match)
+    }
+
+    # Some templates splice query strings after a complete endpoint, e.g.
+    # ``/v1/storage/resolve${query}``; the fallback is useful there. But a head
+    # ending in ``/`` before an interpolated path segment is only a prefix, not
+    # a separate endpoint (``/v1/workspaces/${id}/terminal-tickets``).
+    for match in _CLIENT_HEAD.finditer(text):
+        head = match.group(1)
+        if head.endswith("/") or is_deployment_location(match):
+            continue
+        found.add(normalise(head))
     return {
         p
         for p in found

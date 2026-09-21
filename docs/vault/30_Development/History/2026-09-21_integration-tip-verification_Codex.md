@@ -1,10 +1,10 @@
 ---
 doc_id: "INTEGRATION-TIP-VERIFICATION-20260921-CODEX"
 title: "Integration tip verification audit"
-version: "1.1.0"
+version: "1.2.0"
 status: "complete"
 author: "Codex"
-updated: "2026-09-21T14:40:00+09:00"
+updated: "2026-09-21T14:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -44,11 +44,19 @@ Claude's separate clean worktree rerun at the code SHA `cb505f6697beffe78a1cbdae
 
 ## Route result interpretation
 
-The CLI exit 1 is a current direct observation, not a new backend outage finding. `/v1/workspaces` is sourced from nginx deployment configuration text in `deploymentEngine.ts`; the frontend makes workspace subroute calls, whose backend routes are present. `tests/test_route_coverage.py` passes 28 cases. The static scanner limitation and the test result must remain separate from live HTTP/browser acceptance.
+The exit 1 above is a historical direct observation on `cb505f6`, not a current backend outage finding. The initial explanation that Nginx configuration text directly produced bare `/v1/workspaces` was incomplete. Source tracing showed `_CLIENT_HEAD` truncated `/v1/workspaces/${workspaceId}/...` before its dynamic segment and invented the bare parent path. `deploymentEngine.ts` also contains deployment-only `location` declarations, but those generated a different false candidate. The frontend's actual workspace child routes are served.
+
+### Route coverage correction on the current integration tip
+
+At `b23431538eaa4944e7386529923a6031865c6e30` (2026-09-21 14:49 KST), Codex changed `client_paths()` to exclude incomplete slash-terminated template heads while retaining complete heads followed by query interpolation, and to distinguish quoted `location:` fields/Nginx directives from client requests. The exact command was run through `tools/provenance.py` with the absolute project interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`, without a pipe. `tests/test_route_coverage.py` returned **30 passed, exit 0**; route CLI `--served src/saintvision --served services/control-plane/src --client apps/web/src --json` returned **exit 0**, `unserved: []` (31 client path shapes). Provenance: integration branch and worktree `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, Windows 11, Python 3.14.6, Node v24.17.0, DSN absent, Docker present; the tree was dirty only for this fix and its evidence/docs. The run was at 14:49:35 KST.
+
+Rollback controls were paired with their regression tests on the same `b234315` tree: at 14:51:07 KST, removing the slash-terminated-head filter made `test_interpolated_path_head_is_not_a_separate_endpoint_but_query_head_is` fail (exit 1); at 14:51:20, disabling deployment-location filtering made `test_nginx_location_declarations_are_not_client_calls` fail (exit 1). The exact source was restored after each probe. At 14:51:28, the synthetic genuinely-unserved comparison returned 2 passed (exit 0), including its expected nonzero CLI branch. These are static source-shape checks, not live HTTP or browser acceptance.
+
+Documentation gates on the dirty implementation/evidence tree at 14:50:36 KST, each run through the same provenance wrapper and absolute interpreter, returned exit 0: `tools/check_docs.py` (24 original hashes, 606 versioned documents, links and registries), `tools/check_ontology.py` (48 task mappings, SHACL and mirror checks), and `tools/sync_obsidian.py --check` (1398 managed, 6 pending, 0 conflicts). The authorized `tools/sync_obsidian.py --apply` at 14:50:43 returned exit 0 and exported exactly 6 files with all destination hashes matching. A read-only post-apply check at 14:50:51 returned exit 0: 1398 managed, 0 pending, 0 conflicts. `git diff --check` also returned 0. No whole Python suite, browser, live HTTP, or production acceptance was run for this small scanner change.
 
 ## Prior reports versus this audit
 
-Earlier pass reports from other branches or snapshots are not counted as current-tip evidence. This audit directly ran the named checks on `cb505f6`. `check_docs.py` failed on the integration snapshot after `5c7ce9d` because four wiki links pointed to memory-only targets; `b728ad0` changed those references to explicit `memory:` slugs and restored the check. On `cb505f6`, `check_docs.py` directly passed. Separately, `b728ad0` introduced a question-mark-corrupted progress summary sentence; its file stem and wikilink were intact. This audit records and fixes that prose corruption. The route coverage CLI remains a known static false positive as described above.
+Earlier pass reports from other branches or snapshots are not counted as current-tip evidence. This audit directly ran the named checks on `cb505f6`. `check_docs.py` failed on the integration snapshot after `5c7ce9d` because four wiki links pointed to memory-only targets; `b728ad0` changed those references to explicit `memory:` slugs and restored the check. On `cb505f6`, `check_docs.py` directly passed. Separately, `b728ad0` introduced a question-mark-corrupted progress summary sentence; its file stem and wikilink were intact. This audit records and fixes that prose corruption. The route false positive was subsequently corrected and rechecked on `b234315` as recorded above.
 
 ## Reporting rule proposed
 
