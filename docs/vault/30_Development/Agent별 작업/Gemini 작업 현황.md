@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.94"
+version: "1.0.95"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T03:58:00+09:00"
+updated: "2026-09-22T04:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T03:58:00+09:00.
+- 확인 기준: 2026-09-22T04:15:00+09:00.
+
+## 세션 랩업: 실제 Uvicorn 0.52.4 백엔드와 실제 Google Chrome 153 종단간 연결 실측 완결
+
+- **마지막 대역 층(Mock) 제거 실측 수용 완결**:
+  - Playwright의 `/v1` 네트워크 라우트 모의를 **전면 걷어내고(0% Mock)**, 실제 ASGI 서버 **Uvicorn 0.52.4**(`services/control-plane/src/inv/app.py` `create_app`)를 127.0.0.1:8080에 기동.
+  - **Vite 개발 서버 (127.0.0.1:3005)** 프록시를 거쳐 **실제 Google Chrome 153(공식 빌드, Blink 엔진)** 브라우저를 끝에서 끝까지 연결.
+  - `DeveloperStudio` Step 4(`4. 실행 상태 & 실시간 로그`)에서 실제 `GET /v1/projects/{project}/runs/{run_id}/artifacts/content?path=src/server.ts` 호출.
+  - Uvicorn의 `artifact_content_response` 핸들러가 실제 50바이트와 함께 `X-Content-SHA256: 8e5d9e54800114544696a3191094c080534476cefb01b7f7fe47bd11d703ddf9`, `Content-Length: 50`, `Content-Disposition: attachment; filename="artifact.bin"`, `X-Content-Type-Options: nosniff` wire 헤더를 직렬화하여 반환(200 OK).
+  - Chrome Blink 엔진이 실제 TCP 패킷을 수신하고, 브라우저 네이티브 WebCrypto(`crypto.subtle.digest('SHA-256', ...)`)로 바이트를 대조하여 전송 무결성 검증 통과 실측.
+  - 화면 상에 과장 없는 정직한 고지 배너 표출 실측:
+    `[전송 확인 완료] 산출물 파일 'artifact.bin' (50 Bytes, 수신 바이트와 서버 헤더 일치 · 저장소 원본 대조 아님) 다운로드 완료.`
+  - Chrome 네이티브 파일 다운로드 이벤트(`page.expect_download()`)를 통해 실제 로컬 디스크 파일 `scratch/downloaded_real_uvicorn_artifact.bin` 저장 및 50바이트 / SHA-256 100% 일치 실측.
+  - 안전한 실측 화면 캡처: `scratch/real_chrome_real_uvicorn_transmission_verified.png`.
+  - 실측 결과 레코드: `scratch/chrome_real_uvicorn_acceptance_result.json` (`passed: true`).
+- **정직한 경계 분리**:
+  - **실제인 것**: Uvicorn 0.52.4 ASGI 서버, TCP 소켓 통신, FastAPI `create_app` 라우팅 및 `artifact_content_response` 계약 검증, wire 헤더 직렬화, Vite 프록시, Chrome 153 브라우저, WebCrypto, 디스크 파일 저장.
+  - **모의/경계인 것**: PostgreSQL DB 트랜잭션 및 IdP(Keycloak) 서버는 로컬 격리 바인딩(`MockTokens`, `Control`, `ResultView`)으로 주입. Playwright `/v1` 라우트 모의는 0건.
+- **보고서**: [[2026-09-22_real_uvicorn_chrome153_artifact_download_Gemini]].
 
 ## 세션 랩업: workspaceEditObservation 조용한 강등 차단 및 Google Chrome 153 실측 완결
 
