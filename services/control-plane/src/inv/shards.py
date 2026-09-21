@@ -13,6 +13,7 @@ from uuid import UUID
 from psycopg.types.json import Jsonb
 from .approvals import ApprovalStore, digest
 from .control import Control
+from .contracts import validate_contract
 from .errors import DomainError
 from .leases import lock_run, lock_resources
 from .tooling import ToolGateway
@@ -302,7 +303,7 @@ class ShardRuntime:
             if succeeded
             else None
         )
-        return {
+        result = {
             "planId": plan_id,
             "sourcePlanId": lineage["source_plan_id"] if lineage else None,
             "rootPlanId": lineage["root_plan_id"] if lineage else plan_id,
@@ -328,6 +329,8 @@ class ShardRuntime:
                 for r in rows
             ],
         }
+        validate_contract("ShardObservation", result)
+        return result
 
     @staticmethod
     def _lock_members(conn, project, plan_id):

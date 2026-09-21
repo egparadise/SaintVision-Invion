@@ -8,16 +8,16 @@ guarantees (13 envelope fields) and what each observed member guarantees (ShardO
 runId, nodeId, phase, state, evidenceId) versus the result manifest members (ShardResultMember). With a
 shared example, the frontend can validate against the mirrored schema and stop inventing fields.
 
-NOTE (handed to Codex): unlike result_view, ShardRuntime._status() returns this response WITHOUT calling
-validate_contract("ShardObservation", ...) -- the /shards endpoint is served with no backend contract
-anchor. shards.py is the shard recovery/concurrency runtime (Codex lane); adding that anchor there is
-recommended to make this a two-sided binding. This test binds fixture<->schema meanwhile.
+The serving path is also anchored in ``ShardRuntime._status``. The final test below
+uses an invalid row from the fake database boundary to prove the provider invokes
+the contract validator before returning a response.
 """
 import json
 from pathlib import Path
 
 import pytest
 
+from inv import shards as shards_module
 from inv.contracts import validate_contract
 from inv.errors import DomainError
 
@@ -69,3 +69,66 @@ def test_member_state_must_be_a_run_state():
     broken["shards"][0]["state"] = "not-a-run-state"
     with pytest.raises(DomainError, match="VAL-0002"):
         validate_contract("ShardObservation", broken)
+
+
+def test_shard_runtime_status_is_anchored_before_serving(monkeypatch):
+    """The served projection must fail closed if its backend state violates the contract."""
+
+    class Result:
+        def __init__(self, *, one=None, many=None):
+            self.one = one
+            self.many = many
+
+        def fetchone(self):
+            return self.one
+
+        def fetchall(self):
+            return self.many
+
+    class Connection:
+        def __init__(self):
+            fixture = _fixture()
+            self.results = iter(
+                [
+                    Result(one={"shard_count": 1}),
+                    Result(one=None),
+                    Result(one=None),
+                    Result(
+                        many=[
+                            {
+                                "shard_index": 0,
+                                "run_id": fixture["shards"][0]["runId"],
+                                "node_id": fixture["shards"][0]["nodeId"],
+                                "command_id": "11111111-1111-4111-8111-111111111111",
+                                "phase": "stopped",
+                                "receipt": {"stopped": True},
+                                "state": "not-a-run-state",
+                                "evidence_id": None,
+                                "object_id": None,
+                                "content_hash": None,
+                                "size_bytes": None,
+                                "object_state": None,
+                            }
+                        ]
+                    ),
+                ]
+            )
+
+        def execute(self, *_args):
+            return next(self.results)
+
+    validations = []
+    real_validate = validate_contract
+
+    def recording_validate(name, value):
+        validations.append(name)
+        return real_validate(name, value)
+
+    monkeypatch.setattr(shards_module, "validate_contract", recording_validate, raising=False)
+
+    with pytest.raises(DomainError, match="VAL-0002"):
+        shards_module.ShardRuntime._status(
+            Connection(), "prj_0123456789ABCDEFGHJKMNPQRS", _fixture()["planId"]
+        )
+
+    assert validations == ["ShardObservation"]

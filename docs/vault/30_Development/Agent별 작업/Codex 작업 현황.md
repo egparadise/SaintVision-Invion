@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.117"
+version: "1.0.118"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:42:00+09:00"
+updated: "2026-09-21T19:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 ShardObservation 앵커 및 모델 관측 노출 판정
+
+- `ShardRuntime._status`가 응답을 반환하기 전에 `validate_contract("ShardObservation", result)`를 실행하도록 앵커를 추가했다. invalid shard state를 fake DB에서 반환하는 회귀시험으로 서빙 경계 호출과 거부를 고정했다. focused 결과는 6 passed이며 앵커 제거 변형은 이 시험 하나가 `DID NOT RAISE DomainError`로 실패했다. 상세 판정과 검증 경계는 `[[2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex]]` 참조.
+- 모델 verify HTTP 관측과 온디맨드 재검증은 현재 미노출로 결정했다. DB에는 immutable commit만 있고 마지막 검증 결과/카운트 receipt가 저장되지 않으며 locality 검증은 요청·주체·epoch에 결합된 임시 결과다. 이를 현재 무결성으로 노출하지 않는다. 별도 lineage route도 아직 만들지 않는다. SaintVision `trace_model`은 실데이터를 갖지만 HTTP auth/tenant scope 및 공개 필드 계약이 미정이다. 화면은 합성 lineage/eval 점수 대신 명시적 미노출 상태를 유지한다.
+- 검증은 Windows 주 checkout의 프로젝트 Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`로 이 worktree의 소스를 대상으로 한다. worktree-local venv는 없어 provenance wrapper의 첫 실행은 launch exit 127이었고, 이를 시험 실패로 집계하지 않았다. PostgreSQL-backed test, live route 및 browser acceptance는 실행하지 않았다. reviewer pending.
 
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 
