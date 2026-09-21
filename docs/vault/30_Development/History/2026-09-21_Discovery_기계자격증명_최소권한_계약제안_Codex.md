@@ -1,23 +1,23 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-ADR-001"
 title: "Discovery machine credential least-privilege contract"
-version: "1.1.1"
+version: "1.1.2"
 status: "accepted"
 author: "Codex"
 reviewer: "pending"
 mapped_at_sha: "462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e"
-updated: "2026-09-21T21:46:00+09:00"
+updated: "2026-09-21T21:52:00+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "tenant", "bootstrap", "security"]
 ---
 
 # ADR-097: tenant-bound discovery credential
 
-**Status:** Accepted for the interim operator-CLI path. CLI issuance is in integration; the rolling issuance quota is PostgreSQL-tested in this branch and pending its follow-up commit/integration. Real Node binary/physical-node onboarding and protected delivery-channel acceptance remain unverified.
+**Status:** Accepted for the interim operator-CLI path. The CLI and the PostgreSQL-tested rolling issuance quota are in integration at `6dcd09dd69729e7651aae62b54bb6fd2d3858636`. Real Node binary/physical-node onboarding and protected delivery-channel acceptance remain unverified.
 **Date:** 2026-09-21 KST
 **Decision:** The user approved an operator CLI as the temporary credential issuer. Operators bind a credential to one tenant and installation, then inject it through an approved protected delivery path. Issuance authority remains with designated operators. A future protected tenant-operator API is an open long-term decision; this acceptance does not choose it.
 **Deciders:** User (operational path decision); Codex (security/contract implementation); designated Identity/operations owners (operator account and delivery-channel operation)
-**Base:** branch `agent/codex/terminal-pty-contract`, operator CLI anchor `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`; current integration `c08967c772037ff8bf480f5b4cd718a6ec922de5`
+**Base:** branch `agent/codex/terminal-pty-contract`, operator CLI anchor `462304bbf4f7d0fdce7c3ee4ee10cd9d8224698e`; current integration `6dcd09dd69729e7651aae62b54bb6fd2d3858636`
 
 ## Decision
 

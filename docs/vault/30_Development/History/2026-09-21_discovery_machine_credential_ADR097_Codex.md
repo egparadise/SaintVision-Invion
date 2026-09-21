@@ -1,11 +1,11 @@
 ---
 doc_id: "DISCOVERY-MACHINE-CREDENTIAL-IMPLEMENTATION-CODEX-001"
 title: "ADR-097 discovery credential issuer implementation and verification"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 reviewer: "pending"
-updated: "2026-09-21T21:46:00+09:00"
+updated: "2026-09-21T21:53:00+09:00"
 source_of_truth: "Git"
 tags: ["discovery", "credential", "security", "evidence"]
 ---
@@ -45,6 +45,10 @@ An earlier DB run caught that a SECURITY DEFINER trigger treated a superuser tes
 At approximately 21:43 KST, the SQL threshold was temporarily mutated from 10 to 100 and the budget test was run against another owned PostgreSQL 16 container. It failed at the expected `CLI must refuse the 11th tenant issuance` assertion (exit 1), proving the test detects a disabled/effectively bypassed quota. The source was restored byte-for-byte; the container was removed and its owned inventory returned zero. The clean-threshold rerun above then passed. Before that final successful run, low-memory preflights correctly declined to start containers; those attempts are not test failures. Latest focused unit/migration/contract run used the project Python and passed 39 tests; `check_docs.py`, `check_ontology.py`, and `git diff --check` passed. This is PostgreSQL-backed validation of the final quota SQL, not CI or physical-node acceptance.
 
 Exact final wrapped-run provenance: 2026-09-21 21:47:26 KST, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-terminal-pty-contract`, branch `agent/codex/terminal-pty-contract`, HEAD/integration SHA `c08967c772037ff8bf480f5b4cd718a6ec922de5`, dirty tree (quota source/tests/docs intentionally uncommitted at that instant), `.venv/Scripts/python.exe` 3.14.6, Node v24.17.0, Windows 11, PostgreSQL DSN set for the test invocation, Docker present, Go absent. Command: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe tools/provenance.py -- C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q --tb=short tests/integration/test_discovery_machine_credentials.py`; wrapper exit 0; child exit 0, 4 passed/7 warnings in 6.80s. The provenance wrapper's default executor field reported Windows account `egpar`; the command was launched by Codex in this session. The wrapper confirms this was the same source tree as integration before the quota delta was committed, not a clean fixed-SHA build.
+
+## Integration landing and fixed-tip checks (2026-09-21 21:52 KST)
+
+Quota code was committed as `8b8ed81` and pushed in merge commit `6dcd09dd69729e7651aae62b54bb6fd2d3858636` to `origin/integration/all-agents-unified`; the merged base also includes concurrent Gemini screen-state commit `1f8415d`. The remote ref was re-read after push and matched local HEAD exactly. At that integration SHA, the focused suite `tests/core/test_discovery_credentials.py tests/test_migrations.py tests/core/test_discovery_response_contract.py` ran through `tools/provenance.py --executor Codex`, using `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6. At 21:52:07 KST it passed 39 tests/2 warnings, exit 0. Working tree was dirty only because progress/ADR documents were being updated. `check_docs.py`, `check_ontology.py`, and `git diff --check` then all returned exit 0. This fixed-tip check did not rerun database integration; final SQL evidence is the PostgreSQL 16 run at parent source SHA `c08967c` recorded above, where the same migration/test changes were present but uncommitted. Independent Claude review of quota-specific SQL remains pending; Claude's prior `a533b4b` review covered the issuance CLI but predates the quota implementation.
 
 ## Post-run harness redaction correction (2026-09-21 21:04 KST)
 

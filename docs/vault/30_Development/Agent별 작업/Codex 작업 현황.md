@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.124"
+version: "1.0.126"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T21:46:00+09:00"
+updated: "2026-09-21T21:53:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,11 +12,12 @@ source_of_truth: "Git"
 
 ## 2026-09-21 ADR-097 issuer quota follow-up
 
-- User's interim operator-CLI issuance decision and Claude review of commit `a533b4b` are now present at integration SHA `c08967c772037ff8bf480f5b4cd718a6ec922de5` (fast-forward push confirmed). This is the CLI/review baseline; the following quota hardening remains a separate uncommitted change until its commit is created.
+- User's interim operator-CLI issuance decision and Claude review of commit `a533b4b` are integrated. The DB quota hardening is commit `8b8ed81`; integration SHA `6dcd09dd69729e7651aae62b54bb6fd2d3858636` includes it and the intervening Gemini screen-state commit.
 - Decision: the trusted issuer can still use distinct installation IDs to cause up to 500 open candidates. DBA-granted membership and audit reduce the actor set but do not prevent repeated operator error or a compromised issuer login. Adopt DB-enforced tenant limit 10 issuer-role issues per rolling 24h. It slows burst exhaustion but a persistent authorized issuer can still reach the cap over multiple days.
-- Final rolling-window SQL was exercised on a newly owned PostgreSQL 16 container at integration base SHA `c08967c...`: full integration file 4 passed/7 warnings, exit 0, including ten issues, CLI refusal on issue 11, direct SQL refusal, and credential/audit/budget cardinality all 10. A threshold 10→100 mutation caused the quota test to fail at the expected issue-11 refusal assertion (1 failed/exit 1); source restored byte-for-byte and clean-threshold rerun passed. Containers were owned by exact name+label and removed; Docker returned to 48 containers.
+- Final rolling-window SQL was exercised on a newly owned PostgreSQL 16 container at integration base SHA `c08967c...`: full integration file 4 passed/7 warnings, exit 0, including ten issues, CLI refusal on issue 11, direct SQL refusal, and credential/audit/budget cardinality all 10. A threshold 10→100 mutation caused the quota test to fail at the expected issue-11 refusal assertion (1 failed/exit 1); source restored byte-for-byte and clean-threshold rerun passed. Containers were owned by exact name+label and removed; Docker returned to 48 containers. The quota patch was then pushed with the merge at integration `6dcd09d...`.
 - Project interpreter: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` (3.14.6). Core/migration/response-contract tests: 39 passed/2 warnings. `check_docs.py`, `check_ontology.py`, and `git diff --check` exit 0. The final SQL test is a local PostgreSQL result, not CI or physical Node acceptance.
-- Next: commit only the quota/migration/test/docs delta, push the branch, and fast-forward integration after another fetch; run focused migration checks on integration SHA. Go binary/physical-node onboarding and the organization's protected delivery channel remain operationally unverified. The long-term protected issuer API remains an open decision.
+- At integration `6dcd09dd69729e7651aae62b54bb6fd2d3858636`, the provenance-wrapped focused unit/migration/response-contract run passed 39 tests/2 warnings, exit 0; docs and ontology checks passed at the same tree. Exact header and command are recorded in the ADR-097 History page. Obsidian export/check is current at 1450 managed/0 pending/0 conflicts.
+- Next: obtain a separate fixed-SHA independent review of the quota migration/test commit `8b8ed81`. Go binary/physical-node onboarding and the organization's protected delivery channel remain operationally unverified. The long-term protected issuer API remains an open decision.
 
 ## 2026-09-21 ADR-097 운영자 CLI 임시 발급 경로
 
