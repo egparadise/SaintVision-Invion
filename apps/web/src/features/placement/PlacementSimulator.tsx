@@ -230,6 +230,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
       {poolsState === 'error' && (
         <div
+          role="alert"
           data-testid="pools-error-banner"
           style={{
             padding: '14px 18px',
@@ -535,6 +536,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
           {previewState === 'error' && (
             <div
+              role="alert"
               data-testid="preview-error-banner"
               style={{
                 padding: '12px',
@@ -619,6 +621,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
           {candidatesState === 'error' && (
             <div
+              role="alert"
               data-testid="candidates-error-banner"
               style={{
                 padding: '10px 12px',

@@ -254,13 +254,19 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     if (activeTab === 'storage') {
       loadStorage();
     } else if (activeTab === 'pools') {
-      loadPoolData(selectedPoolId);
+      if (!initialPoolCapacityState) {
+        loadPoolData(selectedPoolId);
+      }
     } else if (activeTab === 'nodes' && selectedNodeId) {
-      loadNodeDetailData(selectedNodeId);
+      if (!initialNodeDetail) {
+        loadNodeDetailData(selectedNodeId);
+      }
     } else if (activeTab === 'discovery') {
-      loadDiscoveryCandidates();
+      if (!initialCandidatesState) {
+        loadDiscoveryCandidates();
+      }
     }
-  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, loadDiscoveryCandidates, selectedPoolId, selectedNodeId]);
+  }, [activeTab, loadStorage, loadPoolData, loadNodeDetailData, loadDiscoveryCandidates, selectedPoolId, selectedNodeId, initialCandidatesState, initialPoolCapacityState, initialNodeDetail]);
 
   // ---------------------------------------------------------------------------
   // Handlers for Control Plane Mutations
@@ -896,6 +902,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
             {storageError && (
               <div
+                role="alert"
                 data-testid="storage-error-banner"
                 style={{
                   padding: '12px 14px',
@@ -1038,7 +1045,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {poolCapacityState === 'error' && (
-              <div data-testid="pool-capacity-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#fca5a5' }}>
+              <div role="alert" data-testid="pool-capacity-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '6px', color: '#fca5a5' }}>
                 <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 자원 풀 용량 조회 실패</div>
                 <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{poolCapacityError}</div>
                 <button
@@ -1278,7 +1285,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
           )}
 
           {nodeDetailError && !isLoadingNodeDetail && (
-            <div data-testid="node-detail-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+            <div role="alert" data-testid="node-detail-error" style={{ padding: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
               <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 노드 상세 정보 조회 실패</div>
               <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{nodeDetailError}</div>
               {selectedNodeId && (
@@ -1390,9 +1397,19 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
 
           {/* Candidates List */}
           <div>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: '0 0 10px 0' }}>
-              📋 승인 대기 중인 디스커버리 후보 (Discovery Candidates)
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
+                📋 승인 대기 중인 디스커버리 후보 (Discovery Candidates)
+              </h3>
+              <button
+                type="button"
+                data-testid="discovery-refresh-btn"
+                onClick={loadDiscoveryCandidates}
+                style={{ padding: '3px 8px', fontSize: '0.6875rem', backgroundColor: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                🔄 새로고침
+              </button>
+            </div>
             <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginBottom: '8px' }}>
               * 모든 claimed* 수치는 머신 자체 보고값이며 미검증 상태(verified: false)입니다.
             </div>
@@ -1404,7 +1421,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             )}
 
             {candidatesState === 'error' && (
-              <div data-testid="discovery-error-banner" style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
+              <div role="alert" data-testid="discovery-error-banner" style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#fca5a5' }}>
                 <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>⚠️ 디스커버리 서비스 연결 오류</div>
                 <div style={{ fontSize: '0.75rem', marginTop: '2px' }}>{candidatesError}</div>
                 <button
