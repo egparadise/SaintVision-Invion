@@ -1,11 +1,11 @@
 ---
 doc_id: "LINUX-GATE-AUDIT-CLAUDE-001"
 title: "Linux 전용 분류 검증 감사 — 왜 Linux인가, 소스 근거인가 추정인가. 3부류"
-version: "1.1.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T17:10:00+09:00"
+updated: "2026-09-21T18:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["verification-boundary", "linux-gate", "skipif", "audit", "measure-not-guess", "node-runtime"]
@@ -93,6 +93,57 @@ PG-only로 보이던 후보(resume_input_readiness·business_handoff·output_ing
 - **강제(빨간불로 눈에 띔)**: ② node-runtime 계열 — CI가 node-agent opt-in을 안 켜면 실패하므로 잊힐 수 없다.
 - **여전히 남음(수동 opt-in 필요, 조용히 skip)**: browser·web image·upgrade image·lan_storage(`INV_STORAGE_SOURCE_ROOT`).
 - **전제**: 러너가 Linux여야 함. Windows CI면 전부 조용히 skip.
+
+## v1.2.0 정정 — 러너는 ubuntu-latest 확정, 그리고 enforcement는 워크플로도 한다 (내 v1.1.0 오류 정정. 전부 소스-읽기)
+**[소스-읽기, 미실행]** `.github/workflows` 다섯(backend·core·desktop-browser·docs·frontend) **전부 `runs-on: ubuntu-latest`** — 러너 OS가 Linux로 확정됐다. 그러니 v1.1.0의 "Linux CI 경우"가 조건이 아니라 **실제**다.
+
+그런데 v1.1.0에서 나는 **test-side 게이트(fixture CI-fail)만 보고 워크플로가 opt-in env를 켜는 것을 놓쳐** 두 가지를 틀리게 적었다. 정정한다(조용히 지우지 않는다):
+- **틀림①: "node-runtime 계열 → RED unless opt-in".** 실은 **`core.yml`이 node-agent를 빌드하고 opt-in을 켠다**: `go build … inv-node`(L60) → `docker build … inv-node-test`(L66) → `INV_NODE_IMAGE`/`INV_NODE_BINARY`/`INV_RUN_NODE_TESTS=1`(L67-69). 즉 node-runtime 계열은 **CI에서 실제로 실행·검증된다**(빨간불 아님).
+- **틀림②: "browser → 여전히 skip, 미검증".** 실은 **`desktop-browser.yml`이 실행·강제한다**: `VF_BROWSER_TEST=1` → `run_vf_security_tests.py`가 `INV_BROWSER_TEST=1`을 시험 subprocess에 전달(L153) → desktop/approval/studio browser 3파일 실행, 그리고 **"6 passed / 0 skipped / container removed"를 단언**하는 검증 스텝이 있어 하나라도 skip이면 빨간불. **browser 인수는 CI에서 검증된다.**
+
+**교훈(오늘 반복된 것)**: enforcement 층이 둘이다 — **test-side**(fixture `pytest.fail` on CI: PG·node-runtime)와 **workflow-side**(워크플로가 env를 켜고 결과를 단언: node-image build, browser 6-passed assert). 내가 test-side만 보고 "미검증"이라 단정한 것은 오늘 우리가 계속 경계한 "신호가 무엇에 대한 것인지 못 박기 전에 결론" 그대로다. 워크플로까지 읽어야 실제 커버리지가 보인다.
+
+## CI를 열면 무엇이 검증되고 무엇이 남나 (확정)
+**[소스-읽기]** 러너 ubuntu-latest 확정 하에:
+
+**자동 검증됨(워크플로가 제공)**:
+- PG 스위트 — 워크플로가 `INV_TEST_ADMIN_DSN` 설정 + fixture CI-fail.
+- ① chmod/POSIX 계열 — Linux 러너 + PG.
+- ② node-runtime 계열 — `core.yml`이 node-agent build + `INV_RUN_NODE_TESTS=1`.
+- **browser 인수**(desktop/approval/studio) — `desktop-browser.yml`이 실행 + "6 passed/0 skipped" 단언.
+
+**여전히 미검증 (어느 워크플로도 opt-in을 안 켬)** — 오직 **이미지/설치 acceptance 셋**:
+| 파일 | 무엇을 검증 | 필요한 opt-in |
+|---|---|---|
+| test_web_container | 빌드된 **frontend 컨테이너 이미지** + TLS + 실 proxy 소켓 | `INV_WEB_IMAGE`(빌드된 web 이미지) |
+| test_workspace_upgrade | 실 **Docker 설치 프로그램** upgrade/rollback | `INV_UPGRADE_AGENT_IMAGE` + Linux |
+| test_lan_storage_install | 패키징된 **LAN storage 설치**(Bash+Docker+Go receipt) | `INV_STORAGE_SOURCE_ROOT` + Linux |
+
+**의도 vs 누락 판정: 의도.** 근거: (a) 사유가 "Explicit built image opt-in required"/"Opt-in … acceptance"로 명시적 opt-in을 표방, (b) `core.yml`은 node/backend 이미지를 빌드하면서 **web-container/installer 이미지는 의도적으로 안 빌드**한다(선택적 누락이 아니라 범위 밖), (c) 검증상태지도가 이미지/물리 acceptance를 **"운영 인수(별도 트랙) … 원격 설치/운영 결정 선행"**으로 분류([[2026-09-19_Claude영역_검증상태지도]]). 즉 이 셋은 **비싼 빌드 산출물/설치 프로그램 acceptance라 CI 기본이 아니라 운영 트랙으로 의도적으로 분리**된 것이다.
+
+**CI-fail을 추가하는 것이 맞나: 아니다.** node-runtime엔 fixture CI-fail이 있지만 **동시에 `core.yml`이 제공**하기에 유효하다. 이미지 셋에 test-side CI-fail만 추가하면 **제공 워크플로가 없어 CI가 그냥 빨간불**이 된다(비싼 이미지 빌드를 강제). 올바른 선택지는 둘: ⓐ 의도된 수동 opt-in으로 두되 무엇이 남는지 문서화(현재), 또는 ⓑ web-container/installer 이미지를 빌드해 env를 켜는 워크플로를 추가(빌드 비용·시간·안정성 비용을 감수하는 운영 결정). **판단 근거**: 검증상태지도가 이미 이를 별도 운영 트랙으로 두었으므로 ⓐ가 현 설계와 정합하고, ⓑ는 사용자가 그 acceptance를 CI에 상시 포함하기로 결정할 때의 비용 트레이드다.
+
+**남는 것을 검증하려면**: 각 이미지/설치 산출물을 빌드(frontend 컨테이너 이미지 / installer 이미지 / storage source 트리)하고 해당 env를 워크플로나 수동 실행에서 설정. 이는 browser처럼 전용 워크플로(예: `web-container.yml`)로 만들면 CI에 편입된다 — 비용 결정.
+
+## v1.3.0 정정 — "워크플로 존재 ≠ 통과". 그리고 6-여정 단계 비공허 확인 (전부 소스-읽기)
+v1.2.0에서 나는 "자동 검증됨"이라 썼는데 그것은 과장이다. **[소스-읽기, 미실행]**
+
+**(가) 6-여정 단계는 공허하지 않다.** `desktop-browser.yml`의 "Require all six browser journeys to execute"는 `.work/vf-desktop-browser-ci.json`을 읽어 `tests == {failure:0, error:0, skipped:0, passed:6}` 등을 단언한다. 그 `tests` 카운트는 **자기보고가 아니라** `tools/run_vf_security_tests.py:assess_evidence`가 **실제 pytest가 낸 `--junitxml` XML을 파싱**(`<testcase>`별 failure/error/skipped 태그 집계 + `passed`=태그없음, 그리고 xml SHA256 기록)해서 만든다. 그리고 그 pytest는 `INV_BROWSER_TEST=1`을 자식 env로 받아 실행된다. 따라서 opt-in이 안 실려 browser 시험이 **skip되면 junit에 `skipped>0`로 잡혀 `passed:6/skipped:0` 단언이 실패**한다 — 조용한 skip을 구조적으로 막는다. (사용자 우려대로 "실행됐다고 기록된 것"이 문제였다면 공허했겠으나, junit은 pytest가 실행 중 쓰는 실행 기록이라 '기록 vs 실제'가 여기서는 일치한다.)
+
+**(나) 그러나 "워크플로가 있다"와 "그 워크플로가 통과한다"는 다르다 — 이것이 핵심.** CI 결제 미해결로 **이 워크플로들은 한 번도 실행된 적이 없다.** 그러므로 browser·node-runtime·PG·chmod 계열은 **"실제 검증됨"이 아니라 "검증되도록 배선됨(wired), 단 아직 안 돎"**이다. 첫 CI 실행에서 그 워크플로들이 실제로 성공하는지는 **아무도 모른다**. v1.2.0의 "자동 검증됨"을 이 표현으로 정정한다. 오늘 우리가 계속 지킨 "검사가 존재한다 ≠ 검사가 돌아 통과했다"의 또 한 사례이고, 내가 같은 슬립을 했다.
+
+### 두 축으로 다시 정리 (배선 여부 × 실행 여부)
+| 계열 | 배선(워크플로가 opt-in 제공+단언?) | 실행/통과 |
+|---|---|---|
+| PG 스위트 | **배선됨** (workflows set INV_TEST_ADMIN_DSN + fixture CI-fail) | **미실행** (CI 한 번도 안 돎) |
+| ① chmod/POSIX | **배선됨** (Linux 러너 + PG) | 미실행 |
+| ② node-runtime | **배선됨** (`core.yml` node-agent build + `INV_RUN_NODE_TESTS=1`) | 미실행 |
+| browser 인수 | **배선됨** (`desktop-browser.yml` VF_BROWSER_TEST→INV_BROWSER_TEST, **비공허** 6/0 단언) | 미실행 |
+| image/installer 3파일 | **미배선** (어느 워크플로도 INV_WEB_IMAGE/INV_UPGRADE_AGENT_IMAGE/INV_STORAGE_SOURCE_ROOT 안 켬) | 미실행 |
+
+**정확한 현재 상태**: 실제로 통과가 확인된 것은 **없다**(CI 미실행). 첫 CI 실행 시 — 그 실행이 성공한다면 — **배선된 것들**(PG·chmod·node-runtime·browser)이 검증되고, **미배선 image/installer 3파일은 여전히 skip**으로 남는다. 즉 "열어도 미검증으로 남는다"는 결론은 **image/installer에만** 좁혀지고, browser/node-runtime에는 뒤집힌다(배선됨) — 다만 그 배선이 통과하는지는 첫 실행이 증명해야 한다.
+
+**실행 vs 읽기 명시**: 이 감사(v1.0.0~v1.3.0)의 워크플로·harness·assess_evidence 판정은 **전부 소스-읽기**다. 이 Windows 호스트에서 browser(playwright/chromium)·image(빌드된 컨테이너)·설치 acceptance는 **실행하지 않았다**(실행 불가). 앞서 funnel/exec-registry에서 일회용 PG로 **실제 실행**한 것과는 성격이 다르다 — 그 구분을 유지한다.
 
 ## 다음 사람에게 (환경 준비 기준)
 - **①은 격리 Linux 호스트**가 실제로 필요하다(POSIX 권한/파일 backend).
