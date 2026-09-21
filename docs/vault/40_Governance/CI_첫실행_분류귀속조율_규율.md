@@ -50,5 +50,13 @@ tags: ["governance", "ci", "first-run", "triage", "attribution", "coordination",
 - **담당**: governance/집계 owner(Orca; 세션 없으면 Codex)가 수행.
 - **행동(한 커밋)**: 안정화 근거(run URL·SHA)를 History에 기록 + **이 문서 삭제**. 이후엔 [[검증규칙과_세축_canon]] 규칙 8(전수 검증)과 통상 per-push CI가 대신한다. 조건 충족 후에도 남아 있으면 그 자체가 규칙 위반(임시가 영구가 되는 것을 막는다 — [[CI개방전_임시_교차레인_검증절차]]와 같은 패턴).
 
+## frontend.yml 경로 필터 — 구멍과 all-5-same-SHA 규칙 (사용자가 짚음)
+다섯 중 **frontend.yml만 경로 필터**가 있다: `apps/web/**` · `contracts/**` · `frontend.yml`. 나머지 넷은 브랜치 push면 무조건 뜬다.
+- **결과(확인됨)**: 문서만 바꾼 push(예: `c205f5ac`)는 프런트가 **안 뜬다** → Codex 종료 조건("같은 SHA에서 다섯 전부 완료")을 **문서-only push로는 영원히 못 채운다.** 우리는 문서를 자주 고친다(오늘 밤 착지 절반 이상 문서).
+  - **규칙**: 다섯을 **같은 SHA에서** 받으려면 그 push가 **프런트 경로를 하나는 건드려야** 한다(`apps/web/**` 또는 `contracts/**` 또는 `frontend.yml`). 종료 조건 검증용 SHA·첫-실행 all-5 확인 SHA는 이 조건을 만족해야 한다.
+  - **다음 push 만들기**: 빈 커밋은 **마지막 수단**. 실제 필요한 프런트-경로 변경이 있으면 그것을 쓴다(gh 인증 후 Codex machinery와 조율).
+- **필터 자체는 옳은가 — 확인 결과**: 현재는 **live 구멍 없음**. 프런트 의존 뿌리 = `apps/web/**`(생성 TS 포함)+`contracts/**`(Ajv가 읽는 스키마)로 **둘 다 필터 안**이다(apps/web tsconfig는 self-contained·`packages/` 미import 확인). 백엔드 스키마만 바뀌고 `contracts/`가 안 바뀌는 경우는 backend.yml `export_schemas --check`가 drift로 잡아 **contracts/ 재생성을 강제** → 그게 필터를 켠다. 즉 프런트를 깰 수 있는 계약 변경은 반드시 `contracts/`나 `apps/web`을 건드린다.
+- **그러나 잠재 위험(오늘 밤 부류의 CI-필터판)**: 필터는 **경로 기반**이지 의미 기반이 아니다. 미래에 프런트가 **필터 밖 경로**(예: `packages/contracts-ts`, 루트 config)를 의존하기 시작하면 그 변경이 프런트를 깨도 frontend.yml이 **조용히 안 뜬다** — 스캐너 Rule 4가 파일지정이라 EvidenceViewer를 놓친 것과 같은 모양. **불변식**: 필터의 경로 목록은 프런트의 실제 의존 뿌리를 덮어야 한다; 프런트가 새 외부 경로를 import하면 필터를 함께 확장(또는 그 import를 apps/web 안으로). 지금은 안전, 앞으로 감시.
+
 ## 경계
 실행은 gh 인증 후. 이 문서는 triage/조율 규율이고, 무엇이 언제 도나·증거 수집은 Codex machinery. 첫 실행 전 세운 예측이므로, 실제 결과가 이 분류와 어긋나면 결과를 따르고 이 문서를 고친다(예측을 결과로 우기지 않는다). 관련: [[CI개방전_임시_교차레인_검증절차]] · [[2026-09-22_통합_전수검증_마무리_및_EvidenceViewer_가짜PASS_회귀_Claude]] · [[검증규칙과_세축_canon]].
