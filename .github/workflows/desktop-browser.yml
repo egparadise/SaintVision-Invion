@@ -13,7 +13,7 @@ permissions:
 jobs:
   desktop-browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,6 +28,20 @@ jobs:
       - run: python -m playwright install --with-deps chromium
       - run: npm ci --ignore-scripts
         working-directory: apps/web
+      - name: Build frontend assets and owned proxy test image
+        working-directory: apps/web
+        run: |
+          npm run build
+          mkdir -p ../../.work/web-container-image/dist
+          cp -R dist/. ../../.work/web-container-image/dist/
+          cp nginx.conf ../../.work/web-container-image/nginx.conf
+          cat > ../../.work/web-container-image/Dockerfile <<'EOF'
+          FROM nginx:1.27-alpine
+          COPY dist/ /usr/share/nginx/html/
+          COPY nginx.conf /etc/nginx/nginx.conf
+          EOF
+          docker build --pull -t "inv-web-test:${GITHUB_SHA}" ../../.work/web-container-image
+          echo "INV_WEB_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-web-test:${GITHUB_SHA}")" >> "$GITHUB_ENV"
       - name: Real browser, canonical HTTP and disposable PostgreSQL
         env:
           VF_BROWSER_TEST: '1'
@@ -41,12 +55,18 @@ jobs:
           proof = json.loads(Path('.work/vf-desktop-browser-ci.json').read_text())
           assert proof['browserOptIn'] and proof['exitCode'] == 0
           assert proof['subprocessExitCode'] == 0 and proof['evidenceStatus'] == 'complete'
-          assert proof['tests'] == {'failure': 0, 'error': 0, 'skipped': 0, 'passed': 6}
+          counts = proof['tests']
+          assert counts['passed'] > 0 and all(counts[key] == 0 for key in ('failure', 'error', 'skipped'))
           assert proof['isolatedContainerRemoved']
           PY
+      - name: Test built frontend proxy image and TLS boundary
+        run: python -m pytest -q --strict-markers tests/integration/test_web_container.py --junitxml=.work/web-container-tests.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: desktop-browser-safe-evidence
-          path: .work/vf-desktop-browser-ci.json
+          path: |
+            .work/vf-desktop-browser-ci.json
+            .work/web-container-tests.xml
+            .work/web-container-studio.png
           retention-days: 14

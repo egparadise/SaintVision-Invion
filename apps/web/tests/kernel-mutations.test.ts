@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '@/shared/api/client';
 import { cancelKernelRun, decideApproval } from '@/shared/api/kernelMutations';
+import { approvalReviewFixture } from './fixtures/approval-review';
+import { approvalChallengeFixture } from './fixtures/approval-challenge';
 
 vi.mock('@/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'test-intent-key' }));
 const api = vi.mocked(apiClient);
@@ -8,12 +10,21 @@ beforeEach(() => api.mockReset());
 
 describe('kernel mutation contracts', () => {
   it.each(['approve', 'reject'] as const)('%s obtains a challenge before deciding', async decision => {
-    api.mockResolvedValueOnce({ nonce: 'issued-nonce' }).mockResolvedValueOnce({ status: 'pending' });
-    await decideApproval({ id: 'approval', projectId: 'project', actionDigest: 'displayed-digest' }, decision);
+    api.mockResolvedValueOnce(approvalChallengeFixture).mockResolvedValueOnce(approvalReviewFixture.approval);
+    const result = await decideApproval({
+      id: approvalChallengeFixture.approvalId,
+      projectId: approvalReviewFixture.approval.projectId,
+      actionDigest: approvalReviewFixture.approval.actionDigest,
+    }, decision);
+    expect(result).toEqual(approvalReviewFixture.approval);
     expect(api.mock.calls).toEqual([
-      ['/v1/projects/project/approvals/approval/challenge', { method: 'POST', body: '{}' }],
-      ['/v1/projects/project/approvals/approval/decision', {
-        method: 'POST', body: JSON.stringify({ decision, nonce: 'issued-nonce', actionDigest: 'displayed-digest' }),
+      [`/v1/projects/${approvalReviewFixture.approval.projectId}/approvals/${approvalChallengeFixture.approvalId}/challenge`, { method: 'POST', body: '{}' }],
+      [`/v1/projects/${approvalReviewFixture.approval.projectId}/approvals/${approvalChallengeFixture.approvalId}/decision`, {
+        method: 'POST', body: JSON.stringify({
+          decision,
+          nonce: approvalChallengeFixture.nonce,
+          actionDigest: approvalReviewFixture.approval.actionDigest,
+        }),
         idempotencyKey: 'test-intent-key',
       }],
     ]);
@@ -21,9 +32,14 @@ describe('kernel mutation contracts', () => {
 
   it('preserves the reviewed digest while the challenge is outstanding', async () => {
     const intent = { id: 'approval', projectId: 'project', actionDigest: 'reviewed' };
-    api.mockImplementationOnce(async () => { intent.actionDigest = 'changed'; return { nonce: 'nonce' }; });
+    api.mockImplementationOnce(async () => {
+      intent.actionDigest = 'changed';
+      return approvalChallengeFixture;
+    }).mockResolvedValueOnce(approvalReviewFixture.approval);
     await decideApproval(intent, 'approve');
-    expect(JSON.parse(api.mock.calls[1][1]!.body as string).actionDigest).toBe('reviewed');
+    expect(JSON.parse(api.mock.calls[1][1]!.body as string)).toEqual({
+      decision: 'approve', nonce: approvalChallengeFixture.nonce, actionDigest: 'reviewed',
+    });
   });
 
   it.each([undefined, ''])('refuses missing action digest %s before requesting a challenge', async actionDigest => {

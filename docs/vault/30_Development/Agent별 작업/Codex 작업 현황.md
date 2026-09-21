@@ -1,14 +1,30 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.98"
+version: "1.0.100"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T16:16:00+09:00"
+updated: "2026-09-21T16:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 CI image-lane preflight preparation
+
+- Claude preflight's actionable setting failures were prepared: backend no longer collects three opt-in image suites without prerequisites; Core builds a checkout-derived `inv-node` agent image and supplies workspace-upgrade/storage image IDs and a temporary source root; desktop-browser builds the web proxy image from the completed Vite assets and executes its container/TLS tests. The static test-count literals were removed from browser and docker-host proof checks.
+- Node-runtime prerequisites are already built in `core.yml`: checked-out Go `inv-node`, repository-built isolated runtime image, `INV_NODE_BINARY`, immutable `INV_NODE_IMAGE`, `INV_RUN_NODE_TESTS=1`, and PostgreSQL 16. This does not use a private prebuilt artifact. The Python test workload and web proxy use public `python:3.12-slim` and `nginx:1.27-alpine`; npm/Playwright and Docker image pulls require hosted-runner network access.
+- Three workflow YAMLs parse and the structural check confirms provisioning/order/ownership. GitHub Actions was not run (billing blocked), so workflow runtime remains unverified. No additional workflow changes are justified until the first actual run supplies evidence.
+
+## 2026-09-21 kernel approval mutation response contract
+
+- `ApprovalChallenge`와 `ApprovalView` 응답을 canonical core schema, 생성 Pydantic/TypeScript 모델, 공유 fixture에 결속했다. backend challenge 및 fresh/idempotent decision 반환도 runtime validation한다. `kernelMutations.ts`는 생성 request/response 타입을 쓰고 adapter test는 실제 저장소 fixture를 사용한다. run GET/version 및 cancellation response는 아직 미계약이다.
+- Provenance at dirty base `41fe0cb6695a15954a39db1ab6ad977a046ca21e`; branch `agent/codex/workspace-response-contract-map`; worktree `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`; Python `.venv/Scripts/python.exe` 3.14.6; Node `C:/Program Files/nodejs/node.exe` v24.17.0; Codex executor; DSN absent. Python focused tests: 19 passed/25 skipped, all skips require disposable PostgreSQL. Full Vitest: 38 files/346 passed. `tsc -b`, Vite build, API TS contract check (7) and canonical contract generation exited 0. Valid missing-`expiresAt` fixture mutation failed both provider pytest and Vitest; restored fixture passed. First mutation attempt was malformed JSON (trailing comma) and is not counted as schema rejection evidence.
+- Integration DB bodies (25) were not executed, no CI/live HTTP/browser acceptance, no independent review. Next: Codex handles direct run/result/artifact contract with Gemini coordination for UI-FB-03; Claude fixed-SHA review remains pending. Detailed commands and caveats: [[2026-09-21_web_response_contract_map_workspace_Codex]].
+
+## CI Node-runtime preparation status
+
+Source inspection confirmed `core.yml` already compiles the checked-in Go `inv-node`, builds the isolated runtime image from repository sources, sets `INV_NODE_BINARY`, `INV_NODE_IMAGE` and `INV_RUN_NODE_TESTS=1`, and provides PostgreSQL 16. Thus no additional workflow change is needed to prepare this lane. This is configuration evidence only; Actions remains billing-blocked and was not executed. JavaScript Node.js is distinct from the Go node-agent.
 
 ## 2026-09-21 approval-review 계약 slice 및 CI 준비 판독
 

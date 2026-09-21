@@ -124,7 +124,10 @@ jobs:
         # between them untested.
         #
         # The suites that need the Go agent binary and a built container image
-        # are left to Core Build, which provides both. That list is computed,
+        # are left to Core Build, which provides both. Their three image-only
+        # acceptance files are likewise run by Core (workspace/storage) or the
+        # browser workflow (web container), not collected here without opt-ins.
+        # The Node-runtime list is computed,
         # not typed: it was three files, then thirteen, and most are reached
         # transitively through shared fixtures. A hardcoded list here goes stale
         # silently, and the symptom of a stale ignore list is a test that stops
@@ -133,7 +136,7 @@ jobs:
           IGNORES=$(python tools/node_dependent_tests.py --pytest-args)
           echo "Left to Core Build (needs the Node runtime):"
           python tools/node_dependent_tests.py | sed 's/^/  /'
-          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
+          python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
 
       - name: No PostgreSQL test was skipped
         run: |
