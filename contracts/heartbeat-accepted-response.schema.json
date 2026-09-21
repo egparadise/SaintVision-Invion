@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "applied": {
+      "title": "Applied",
+      "type": "boolean"
+    },
+    "heartbeatSequence": {
+      "minimum": 0,
+      "title": "Heartbeatsequence",
+      "type": "integer"
+    },
+    "nodeId": {
+      "title": "Nodeid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "nodeId",
+    "applied",
+    "heartbeatSequence"
+  ],
+  "title": "HeartbeatAcceptedResponse",
+  "type": "object"
+}

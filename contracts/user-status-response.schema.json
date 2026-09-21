@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "enum": [
+        "active",
+        "suspended",
+        "retired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "userId": {
+      "title": "Userid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "userId",
+    "status"
+  ],
+  "title": "UserStatusResponse",
+  "type": "object"
+}

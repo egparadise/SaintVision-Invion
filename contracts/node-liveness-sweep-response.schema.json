@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "markedLost": {
+      "minimum": 0,
+      "title": "Markedlost",
+      "type": "integer"
+    },
+    "timeoutSeconds": {
+      "exclusiveMinimum": 0,
+      "title": "Timeoutseconds",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "markedLost",
+    "timeoutSeconds"
+  ],
+  "title": "NodeLivenessSweepResponse",
+  "type": "object"
+}

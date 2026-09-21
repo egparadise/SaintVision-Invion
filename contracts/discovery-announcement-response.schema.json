@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted": {
+      "const": true,
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "state": {
+      "const": "candidate",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "accepted",
+    "state"
+  ],
+  "title": "DiscoveryAnnouncementResponse",
+  "type": "object"
+}

@@ -44,7 +44,11 @@ def _tenant(value: str) -> uuid.UUID:
         raise InvError(VAL_SCHEMA, "X-Inv-Tenant must be a UUID") from None
 
 
-@router.post("/discovery/announcements", status_code=202)
+@router.post(
+    "/discovery/announcements",
+    status_code=202,
+    response_model=schemas.DiscoveryAnnouncementResponse,
+)
 def announce(
     request: Request,
     payload: schemas.AnnouncementRequest,
@@ -287,7 +291,10 @@ def admit(
     }
 
 
-@router.delete("/discovery/candidates/{announcement_id}")
+@router.delete(
+    "/discovery/candidates/{announcement_id}",
+    response_model=schemas.DiscoveryDeclineResponse,
+)
 def decline(
     announcement_id: str,
     principal: Principal = Depends(get_principal),

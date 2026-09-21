@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.152"
+version: "1.0.153"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T03:55:00+09:00"
+updated: "2026-09-22T04:02:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 Run retry 경로 감사와 저위험 쓰기 응답 결속
+
+- 제품 소스 정적 조사에서 일반 failed Run을 재실행하는 경로는 발견되지 않았다. DeliveryQueue는 기존 command 전달/receipt 관찰을, OutputIngestion은 같은 결과 receipt 수집을 재시도한다. Run-list의 재시도 버튼은 조회만 새로 한다. WorkspaceResume는 recovering workspace Run의 frozen checkout·새 step·approval에 한정된 continuation이고, ShardRecovery는 새 child Run/approval을 만드는 별도 capability지만 현재 app/worker 진입점이 없다. ModelRetryStore도 server-internal 구현이며 제품 route/worker에서 호출되지 않는다. 어떤 retry도 연결하지 않았다.
+- 사용자 저위험으로 분류된 일곱 raw-dict write를 strict response_model/fixture/schema로 결속했다: heartbeat, liveness sweep, discovery announce/decline, member removal, user status, project status. 각 route anchor 제거 대조 7/7 감지. 관련 core 계약 시험 73 passed; schema 56/56; check_docs/ontology 통과. Obsidian read-only check는 1516 managed/2 pending/0 conflicts이며 apply하지 않았다.
+- History: [[2026-09-22_Run_retry_path_and_low_risk_write_contracts_Codex]]. Base `044c343a`; origin integration은 `d45435be`로 앞서 있어 rebase/최신 SHA 재검증/착지/Claude 독립 검토가 pending이다. 이번 작업은 작성자 검증만이며 PG·CI·제품 런타임 실행은 하지 않았다.
 
 ## 2026-09-22 Control-plane 제품 경로 도달성 감사
 

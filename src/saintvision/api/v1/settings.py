@@ -130,7 +130,11 @@ def set_member_role(
     return result
 
 
-@router.delete("/projects/{project_id}/members/{user_id}", status_code=200)
+@router.delete(
+    "/projects/{project_id}/members/{user_id}",
+    status_code=200,
+    response_model=schemas.ProjectMemberRemovalResponse,
+)
 def remove_member(
     project_id: str,
     user_id: str,
@@ -162,7 +166,7 @@ def remove_member(
 # --------------------------------------------------------------------------
 
 
-@router.put("/users/{user_id}/status")
+@router.put("/users/{user_id}/status", response_model=schemas.UserStatusResponse)
 def set_user_status(
     user_id: str,
     payload: schemas.UserStatusRequest,
@@ -201,7 +205,7 @@ def set_user_status(
     return {"userId": user.user_id, "status": user.status}
 
 
-@router.put("/projects/{project_id}/status")
+@router.put("/projects/{project_id}/status", response_model=schemas.ProjectStatusResponse)
 def set_project_status(
     project_id: str,
     payload: schemas.ProjectStatusRequest,

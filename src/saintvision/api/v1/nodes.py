@@ -122,7 +122,11 @@ def enroll_node(
     return body
 
 
-@router.post("/nodes/{node_id}/heartbeats", status_code=202)
+@router.post(
+    "/nodes/{node_id}/heartbeats",
+    status_code=202,
+    response_model=schemas.HeartbeatAcceptedResponse,
+)
 def post_heartbeat(
     request: Request,
     node_id: str,
@@ -202,7 +206,11 @@ def post_heartbeat(
     return result
 
 
-@router.post("/nodes/liveness-sweeps", status_code=200)
+@router.post(
+    "/nodes/liveness-sweeps",
+    status_code=200,
+    response_model=schemas.NodeLivenessSweepResponse,
+)
 def sweep_liveness(
     request: Request,
     principal: Principal = Depends(get_principal),

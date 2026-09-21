@@ -55,6 +55,21 @@ class HeartbeatRequest(Strict):
     observations: list["ObservationPayload"] = Field(default_factory=list, max_length=256)
 
 
+class HeartbeatAcceptedResponse(Strict):
+    node_id: StrictStr = Field(alias="nodeId")
+    applied: StrictBool
+    heartbeat_sequence: StrictInt = Field(ge=0, alias="heartbeatSequence")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class NodeLivenessSweepResponse(Strict):
+    marked_lost: StrictInt = Field(ge=0, alias="markedLost")
+    timeout_seconds: StrictInt = Field(gt=0, alias="timeoutSeconds")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ObservationPayload(Strict):
     capability_id: str = Field(max_length=30, alias="capabilityId")
     used_quantity: float = Field(ge=0, alias="usedQuantity")
@@ -299,6 +314,28 @@ class DiscoveryAdmissionResponse(Strict):
     bootstrap_token: StrictStr = Field(min_length=16, max_length=256, alias="bootstrapToken")
     expires_at: dt.datetime = Field(alias="expiresAt")
     next: StrictStr
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DiscoveryAnnouncementResponse(Strict):
+    accepted: Literal[True]
+    state: Literal["candidate"]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class DiscoveryDeclineResponse(Strict):
+    announcement_id: StrictStr = Field(alias="announcementId")
+    state: Literal["declined"]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectMemberRemovalResponse(Strict):
+    project_id: StrictStr = Field(alias="projectId")
+    user_id: StrictStr = Field(alias="userId")
+    removed: Literal[True]
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -597,8 +634,22 @@ class UserStatusRequest(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class UserStatusResponse(Strict):
+    user_id: StrictStr = Field(alias="userId")
+    status: Literal["active", "suspended", "retired"]
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class ProjectStatusRequest(Strict):
     status: str = Field(pattern="^(active|archived)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ProjectStatusResponse(Strict):
+    project_id: StrictStr = Field(alias="projectId")
+    status: Literal["active", "archived"]
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 

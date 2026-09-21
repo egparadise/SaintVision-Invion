@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "announcementId": {
+      "title": "Announcementid",
+      "type": "string"
+    },
+    "state": {
+      "const": "declined",
+      "title": "State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "announcementId",
+    "state"
+  ],
+  "title": "DiscoveryDeclineResponse",
+  "type": "object"
+}
