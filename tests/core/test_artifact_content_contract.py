@@ -123,11 +123,33 @@ def test_artifact_content_contract_rejects_transport_drift(mutate):
         validate_contract("ArtifactContentResponse", payload)
 
 
-def test_artifact_content_route_returns_raw_bytes_bound_to_contract_headers(client):
-    response = client.get(
+@pytest.mark.parametrize(
+    "route_path",
+    [
         "/v1/runs/run_00000000000000000000000000/artifacts/content",
+        "/v1/projects/project_00000000000000000000000000/runs/run_00000000000000000000000000/artifacts/content",
+    ],
+    ids=["run-alias", "project-run-alias"],
+)
+@pytest.mark.parametrize(
+    "request_headers",
+    [
+        {"Authorization": "Bearer contract-test"},
+        {
+            "Authorization": "Bearer contract-test",
+            "Range": "bytes=0-3",
+            "If-None-Match": "*",
+        },
+    ],
+    ids=["ordinary-full-response", "range-and-conditional-ignored"],
+)
+def test_artifact_content_route_returns_raw_bytes_bound_to_contract_headers(
+    client, route_path, request_headers
+):
+    response = client.get(
+        route_path,
         params={"path": "outputs/metrics.json"},
-        headers={"Authorization": "Bearer contract-test"},
+        headers=request_headers,
     )
 
     assert response.status_code == 200
@@ -138,6 +160,8 @@ def test_artifact_content_route_returns_raw_bytes_bound_to_contract_headers(clie
     assert int(response.headers["content-length"]) == len(response.content)
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["cache-control"] == "no-store"
+    assert "content-range" not in response.headers
+    assert "etag" not in response.headers
     observed = {
         "statusCode": response.status_code,
         "contentType": response.headers["content-type"],
@@ -147,6 +171,22 @@ def test_artifact_content_route_returns_raw_bytes_bound_to_contract_headers(clie
     }
     validate_contract("ArtifactContentResponse", observed)
     assert observed == _fixture()
+
+
+def test_artifact_content_routes_are_only_aliases_of_one_response_handler(client):
+    expected = {
+        "/v1/runs/{run_id}/artifacts/content",
+        "/v1/projects/{project}/runs/{run_id}/artifacts/content",
+    }
+    routes = [
+        route
+        for route in client.app.routes
+        if "/artifacts/content" in getattr(route, "path", "")
+    ]
+
+    assert len(routes) == 2
+    assert {route.path for route in routes} == expected
+    assert len({route.endpoint for route in routes}) == 1
 
 
 def test_artifact_content_route_refuses_contract_invalid_response_metadata(client, monkeypatch):
