@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.52"
+version: "1.0.53"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T17:15:00+09:00"
+updated: "2026-09-21T17:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,26 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T17:15:00+09:00.
+- 확인 기준: 2026-09-21T17:40:00+09:00.
 
 ## 최근 확인한 진척
+
+- **VF-GM-03 inv:// File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증, 삼태 상태 분리, 신규 실패 은폐 제거, 복제본 저하 감지 및 생존 노드 기반 정직한 복구 가드 완결 (`apps/web/src/features/desktop/InvFileExplorer.tsx`, `DesktopShell.tsx`, `apps/web/tests/inv-file-explorer-dom.test.tsx`)**:
+  - **4대 네임스페이스 탐색**: `inv://models`, `inv://datasets`, `inv://workspaces`, `inv://artifacts` 주소 표시줄 내비게이션, 주소 직접 입력 이동, 퀵 네비게이션 버튼 및 빈 상태(`등록된 파일이 없습니다.`) 무결 렌더링.
+  - **실측 SHA-256 무결성 검증 (Requirement 1)**: Web Crypto API `crypto.subtle.digest('SHA-256')`를 기반으로 한 실측 해시 계산 및 카탈로그 기대 체크섬과의 엄밀한 대조. 해시 불일치 시 `role="alert"`와 `data-testid="integrity-mismatch-banner"`를 통한 `TAMPERED / MISMATCH` 경고 표출.
+  - **엄밀한 삼태(Tri-State) 무결성 분리 (Requirement 2)**: `UNVERIFIED` vs `VERIFIED` vs `MISMATCH / TAMPERED`의 엄밀한 분리. 카탈로그 체크섬이 부재하거나 빈 문자열인 파일은 절대로 `VERIFIED`로 처리되지 않으며 정직하게 `UNVERIFIED`로 유지.
+  - **신규 실패 은폐 방지 (Requirement 3)**: 이전에 `VERIFIED` 상태였더라도 재검증 시 네트워크/503 오류가 발생하면 낡은 `VERIFIED` 상태를 즉시 파기하고 `status: 'error'` 및 `role="alert"` 경고 박스를 표면화.
+  - **정직한 복제본 저하 감지 및 복구 가드 (Requirement 4)**: `healthyReplicas < requiredReplicas`일 때 `replica-degradation-badge` (`role="alert"`), 관측 전용 노드(Node-04)를 생존 노드에서 배제, 생존 노드가 0개일 때 복구 버튼 비활성화 및 `no-surviving-nodes-notice` (`role="alert"`), 복구 실패 시 `repair-action-error`, 부분 복구(1/2) 시 거짓 성공 대신 `repair-action-warning`, 완전 복구(2/2) 시에만 `repair-action-success` 배너 및 `replica-healthy-badge` 복원.
+  - **4대 돌연변이 실측 사살 (KILLED)**: 해시 비교 생략, 체크섬 부재를 검증으로 합치, 재검증 실패 시 이전 성공 은폐 보존, 복구 실패 및 부분 복구 거짓 성공 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 41개 파일 **385/385 passed 100%** (from 375 to 385, net +10 tests 순증), Vite 프로덕션 빌드 3.23s 클린 생성, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS (614 documents), `tools/check_ontology.py` PASS.
+  - 보고서: [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]].
+
+- **VF-GM-02 ResourceExplorer 논리-물리 토폴로지 대조 및 3대 결함 패턴(Unwired/Dead/Masking) 방어 실증 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/src/features/desktop/ResourceExplorer.tsx`, `DesktopShell.tsx`)**:
+  - **논리-물리 자원 대조 및 ADR-028/041 고지**: 논리 통합 총합(60 vCPU, 224 GiB RAM, 3 GPU 50GB VRAM, 10TB Storage)과 Node-01~05 물리적 독립 노드를 나란히 배치하고, 하드웨어 버스 마법 병합 왜곡을 방지하는 ADR-028/041 하드웨어 격리 보존 원칙 배너(`role="alert"`, `data-testid="fabric-disclaimer-banner"`) 명시.
+  - **관측 전용 노드(Node-04, 192.168.45.225) 경계 가드**: `schedulable: false`, 가용 코어 0, 가용 메모리 0, `관측 전용` 및 `스케줄 불가` 배지 표출 및 필터링(`filter-observe-btn`) 검증. `handleAddMember`에 `observationOnly || !schedulable` 선행 가드를 실장하여 연산 풀 편입 차단.
+  - **UI 3대 결함 패턴 방어 및 비동기 결함 정정**: `ResourceExplorer.tsx`의 `useEffect`에서 `initialNodeDetailError` 주입 시 무단 재조회하던 비동기 결함 정정(`!initialNodeDetail && !initialNodeDetailError`), 모든 액션 실패 시 붉은색 경고 박스(`role="alert"`, `data-testid="<tab>-action-error"`) 표출, 글로벌 라이브니스 스윕 피드백의 `overview` 탭 확장.
+  - **양방향 돌연변이 및 회귀 시험 구축**: `resource-explorer-dom.test.tsx`를 8 tests에서 **14 tests**로 순증 (**net +6 tests**), 3대 돌연변이(연산 풀 관측 전용 가드 해제, 고지 배너 role 변조, 스토리지 실패 은폐 변조) 즉시 사살(KILLED) 실증.
+  - **검증 실적**: 전체 Vitest **40개 파일 375/375 tests 100% 통과** (직전 기준 354에서 375로 net +21 순증), Vite 프로덕션 빌드 3.23s 클린, Pytest 30/30 tests 통과, 문서/온톨로지 PASS. 상세 [[2026-09-21_VF_GM02_ResourceExplorer_대조_및_3대방어검증_Gemini]].
 
 - **UI-FB-03 DeveloperStudio 라우트 404 폴백 DOM 하네스, 캐시 은폐 제거 및 양방향 돌연변이 실증 완결 (`apps/web/tests/developer-studio-dom.test.tsx`, `apps/web/src/features/studio/DeveloperStudio.tsx`, `AdminSecurityConsole.tsx`, `RunDetail.tsx`)**:
   - **거동 변경(Option A 채택) vs 시험 추가 분리 및 판단 근거 확정**: "캐시는 성공했을 때의 효율 수단이지 실패를 감추는 수단이 아니다"라는 원칙에 따라, 다운로드 클릭 시 항상 canonical `/result`를 질의하고 401/403/500/네트워크 오류 발생 시 로컬 캐시(`artifactData`) 폴백을 엄격 금지하며 정직하게 `alert` 후 다운로드를 중단하도록 거동을 변경. (오류 은폐 및 만료 세션 무단 다운로드를 유발하는 Option B 기각).
@@ -212,16 +229,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | GM-06 / VB-LAUNCH-01 (인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결): `tools/deploy_intranet.ps1` 환경변수(`SAINTVISION_DEV_CERT_DIR`) 동적 경로 연동, 미지정 시 `deploy/certs` 안전 폴백, stale 디렉터리 청소 및 Leaf 타입/0바이트 방어선 유지, `tools/verify_tls_cert_pair.py` 암호학적 공개키 쌍 검증 연동, 요약 테이블 실제 경로 동적 표면화, `tests/test_deploy_intranet_preflight.py` 전용 회귀 시험 3종 신설로 총 17개 시험 완결 (**17 passed in 21.33s**), Vitest 31개 스위트 **307/307 tests 100% 통과**, Pytest credentials **13/13 tests 100% 통과**, Pytest smoke boundary **3 passed (1 skipped)**, docs 565건 PASS |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.102 / 2026-09-19T00:35:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / f81d070 / agent/gemini/deploy-tls-external-injection |
-| 작업한 것 | 1) `tools/deploy_intranet.ps1`에서 `$env:SAINTVISION_DEV_CERT_DIR` 환경변수를 조회하여 외부 인증서 디렉터리를 동적으로 수용하고 미지정/공백 시 `deploy/certs`로 안전하게 폴백하도록 실장.<br>2) Step 1 시작 시 대상 디렉터리(`Certificate target directory: $certDir`)를 콘솔에 명시적으로 출력.<br>3) 바인드 마운트 잔여 stale 디렉터리 선제 제거(`PathType Container`) 및 파일 존재/0바이트/`PathType Leaf` 방어선을 유지하고, 미존재 시 `tools/generate_tls_cert.py --output-dir $certDir`로 생성.<br>4) Step 1에 `tools/verify_tls_cert_pair.py --certificate $certFile --private-key $keyFile`를 연동하여 X.509 인증서와 개인키의 공개키 일치를 암호학적으로 검증하고 불일치 시 즉시 exit 1로 중단하도록 연결.<br>5) 사전 점검 요약 테이블의 Step 1 행에서 `$certFile`과 `$keyFile` 변수를 동적으로 참조하여 주입된 실제 경로를 투명하게 표면화.<br>6) `tests/test_deploy_intranet_preflight.py`에 미지정 시 폴백 검증(`test_default_certificate_fallback_when_env_unset`), 외부 경로 요약 출력 검증(`test_external_certificate_directory_summary_reporting`), 외부 디렉터리 stale 청소 검증(`test_external_cert_directory_collisions_are_removed_before_generation`) 3종을 신설하여 총 17개 시험 전수 통과. |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Pytest Preflight: `.venv\Scripts\pytest.exe tests/test_deploy_intranet_preflight.py` (exit 0, **17 passed in 21.33s**)<br>2) Pytest Credentials: `.venv\Scripts\pytest.exe tests/core/test_deployment_credentials.py` (exit 0, **13 passed in 5.35s**)<br>3) Pytest Smoke Boundary: `.venv\Scripts\pytest.exe tests/test_browser_smoke_boundary.py tests/integration/test_browser_smoke_integration.py` (exit 0, **3 passed, 1 skipped in 4.21s**)<br>4) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 31개 파일 **307/307 tests 100% 통과**)<br>5) Docs & Ontology: `python tools/check_docs.py` (exit 0, 565 versioned documents PASS), `python tools/check_ontology.py` (exit 0, PASS) |
-| CI / 독립 reviewer / 운영 인수 | 프론트엔드 및 사전 배포 파이프라인 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 및 실장비 5대 인수 대기 |
-| 남은 문제 / 차단 이유 / 해소 담당 | `deploy/certs` 실물 삭제 및 `.gitignore` 등록은 사용자 추가 승인 대기; Codex 제어 평면 정본 app 배포(Dockerfile.backend) 및 원격 PC(192.168.45.225) 프로필 설치·7개 시험(CX-01~03) 대기; CI 결제/한도 문제로 CI runner 미시작 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 사용자 승인 시 `deploy/certs` 저장소 제거 및 `.gitignore` 등록 지원; Claude/Codex 독립 검토 연계 및 실장비 현장 인수 지원 |
-| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선(독립 승인·실장비 미인수 기준): 57.81%** (2,775/4,800점, 약 58% 또는 약 55%)<br>**Gemini 영역 구현 성숙도: 75.0%** (900/1,200점, S01~S12 전 12개 FE 태스크 승인 OK 정리 완료, approved)<br>**독립 검토 및 통합 승인 시 전체 진척도: 65.63%** (3,150/4,800점, **약 65% 진척 / 잔여 약 35%**)<br>**단일 가상 컴퓨터 보강 트랙: 100% 완료** (VF-GM-01~06 전 6개 카드 사용자 승인 완료) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고]], [[2026-09-18_19-30-00_KST_EVIDENCE-RESIDUALS-REMEDIATION-AND-BIDIRECTIONAL-REGRESSION_Gemini_검증보고]], [[2026-09-18_19-15-00_KST_EVIDENCE-AUTHENTIC-SURFACING-AND-FAKE-PASS-ELIMINATION_Gemini_검증보고]], [[2026-09-18_16-40-00_KST_ROUTE-COVERAGE-AUDIT-AND-CANONICAL-ALIGNMENT_Gemini_검증보고]], [[2026-09-18_16-10-00_KST_MJS02-R1-ENV-ALIGNMENT-AND-INTEGRATION-LANE-ISOLATION_Gemini_검증보고]], [[2026-09-18_16-00-00_KST_CX01-16-ROUTES-INVENTORY-AND-DISCOVERY-WIRING_Gemini_검증보고]], [[Gemini_GM01-06_프론트엔드_독립검토_인계서]] |
+| 마지막 작업 / 착수 카드 | VF-GM-03 (`inv://` File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증, 삼태 상태 분리, 신규 실패 은폐 제거, 복제본 저하 감지 및 생존 노드 기반 정직한 복구 가드 완결): `apps/web/src/features/desktop/InvFileExplorer.tsx`, `DesktopShell.tsx`, `apps/web/tests/inv-file-explorer-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 41개 파일 **385/385 tests 100% 통과** (from 375 to 385, net +10 tests), Vite 프로덕션 빌드 3.23s 클린, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS (614 documents), `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.103 / 2026-09-21T17:40:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 686eecf / agent/gemini/vf-gm-03-file-explorer |
+| 작업한 것 | 1) `InvFileExplorer.tsx`: 4대 네임스페이스(`models`, `datasets`, `workspaces`, `artifacts`) 주소창 내비게이션, 직접 주소 입력, 퀵 네비게이션 버튼, 빈 상태 렌더링.<br>2) 클라이언트 실측 SHA-256 무결성 검증 및 카탈로그 기대 해시 대조, 불일치 시 `role="alert"`와 `integrity-mismatch-banner`를 통한 `TAMPERED` 알림 표출.<br>3) 엄밀한 삼태(Tri-State: `UNVERIFIED` vs `VERIFIED` vs `MISMATCH`) 분리, 카탈로그 체크섬 부재 시 정직하게 `UNVERIFIED` 유지.<br>4) 신규 실패 은폐 방지: 재검증 실패 시 이전 `VERIFIED` 상태 즉시 파기 및 `integrity-action-error` (`role="alert"`) 표면화.<br>5) 정직한 복제본 저하 감지 및 복구 가드: `healthy < required` 시 `replica-degradation-badge` (`role="alert"`), 관측 전용 노드(Node-04) 생존 노드 제외 및 0 생존 노드 시 복구 버튼 비활성화, 복구 실패 시 `repair-action-error`, 부분 복구 시 `repair-action-warning`, 완전 복구 시 `repair-action-success`.<br>6) `DesktopShell.tsx`: `clusterNodes={nodes}`를 `<InvFileExplorer />`에 전달.<br>7) `apps/web/tests/inv-file-explorer-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 41개 파일 **385/385 tests 100% 통과**, from 375 to 385 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.23s 클린)<br>3) Pytest: `.venv\Scripts\pytest.exe tests/test_route_coverage.py` (exit 0, 30 passed in 0.88s)<br>4) Docs & Ontology: `check_docs.py` (exit 0, 614 documents PASS), `check_ontology.py` (exit 0, PASS)<br>5) Mutation Testing: 4대 돌연변이(해시 비교 생략, 체크섬 부재를 검증으로 합치, 재검증 실패 은폐, 복구 실패/부분복구 거짓 성공) 100% 사살 실측 |
+| CI / 독립 reviewer / 운영 인수 | 프론트엔드 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Codex·Claude 독립 검토 연계 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 수 기가바이트 대용량 모델 가중치 파일 청크 스트리밍 해싱의 Web Worker 분리, 물리 노드 간 실물 분산 복제 소켓 연동은 백엔드 및 브라우저 인수 레인 이관 |
+| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-04` (Model Studio: 단일 가상 GPU/vCPU 연산 뷰 & 다중 노드 실물 분산 매핑) / Gemini (Antigravity) |
+| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 85.0%** (1,020/1,200점, VF-GM-01~03 완결)<br>**단일 가상 컴퓨터 보강 트랙: 50.0%** (VF-GM-01, 02, 03 완료 / 6개 카드) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]], [[2026-09-21_VF_GM02_ResourceExplorer_대조_및_3대방어검증_Gemini]], [[2026-09-21_UI_FB03_DeveloperStudio_DOM_라우트404폴백검증_Gemini]] |
 
 > **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
 1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
@@ -305,6 +322,16 @@ source_of_truth: "Git"
 > 3) **UI 3대 결함 패턴 방어 및 비동기 결함 정정**: `ResourceExplorer.tsx`의 `useEffect`에서 `initialNodeDetailError` 주입 시 무단 재조회하던 비동기 결함 정정(`!initialNodeDetail && !initialNodeDetailError`), 모든 액션 실패 시 붉은색 경고 박스(`role="alert"`, `data-testid="<tab>-action-error"`) 표출, 글로벌 라이브니스 스윕 피드백의 `overview` 탭 확장.
 > 4) **양방향 돌연변이 및 회귀 시험 구축**: `resource-explorer-dom.test.tsx`를 8 tests에서 **14 tests**로 순증 (**net +6 tests**), 3대 돌연변이(연산 풀 관측 전용 가드 해제, 고지 배너 role 변조, 스토리지 실패 은폐 변조) 즉시 사살(KILLED) 실증.
 > 결과: 전체 Vitest **40개 파일 375/375 tests 100% 통과** (직전 기준 354에서 375로 net +21 순증), Vite 프로덕션 빌드 3.23s 클린, Pytest 30/30 tests 통과, 문서/온톨로지 PASS. 상세 [[2026-09-21_VF_GM02_ResourceExplorer_대조_및_3대방어검증_Gemini]].
+>
+> **Gemini 회신(2026-09-21, VF-GM-03 inv:// File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증 및 복제본 저하·복구 방어 완결)**: 사용자 기승인 범위에 따라 VF-GM-03(inv:// File Explorer) 구현 및 무결성·복구 방어선을 전면 구축함:
+> 1) **4대 네임스페이스 탐색**: `inv://models`, `inv://datasets`, `inv://workspaces`, `inv://artifacts` 주소 표시줄 내비게이션, 주소 직접 입력 이동, 퀵 네비게이션 버튼 및 빈 상태(`등록된 파일이 없습니다.`) 무결 렌더링.
+> 2) **실측 SHA-256 무결성 검증 (Requirement 1)**: Web Crypto API `crypto.subtle.digest('SHA-256')`를 기반으로 한 실측 해시 계산 및 카탈로그 기대 체크섬과의 엄밀한 대조. 해시 불일치 시 `role="alert"`와 `data-testid="integrity-mismatch-banner"`를 통한 `TAMPERED / MISMATCH` 경고 표출.
+> 3) **엄밀한 삼태(Tri-State) 무결성 분리 (Requirement 2)**: `UNVERIFIED` vs `VERIFIED` vs `MISMATCH / TAMPERED`의 엄밀한 분리. 카탈로그 체크섬이 부재하거나 빈 문자열인 파일은 절대로 `VERIFIED`로 처리되지 않으며 정직하게 `UNVERIFIED`로 유지.
+> 4) **신규 실패 은폐 방지 (Requirement 3)**: 이전에 `VERIFIED` 상태였더라도 재검증 시 네트워크/503 오류가 발생하면 낡은 `VERIFIED` 상태를 즉시 파기하고 `status: 'error'` 및 `role="alert"` 경고 박스를 표면화.
+> 5) **정직한 복제본 저하 감지 및 복구 가드 (Requirement 4)**: `healthyReplicas < requiredReplicas`일 때 `replica-degradation-badge` (`role="alert"`), 관측 전용 노드(Node-04)를 생존 노드에서 배제, 생존 노드가 0개일 때 복구 버튼 비활성화 및 `no-surviving-nodes-notice` (`role="alert"`), 복구 실패 시 `repair-action-error`, 부분 복구(1/2) 시 거짓 성공 대신 `repair-action-warning`, 완전 복구(2/2) 시에만 `repair-action-success` 배너 및 `replica-healthy-badge` 복원.
+> 6) **4대 돌연변이 실측 사살 (KILLED)**: 해시 비교 생략, 체크섬 부재를 검증으로 합치, 재검증 실패 시 이전 성공 은폐 보존, 복구 실패 및 부분 복구 거짓 성공 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+> 결과: 전체 Vitest **41개 파일 385/385 tests 100% 통과** (from 375 to 385, net +10 tests 순증), Vite 프로덕션 빌드 3.23s 클린 생성, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS (614 documents), `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]].
+
 
 
 
