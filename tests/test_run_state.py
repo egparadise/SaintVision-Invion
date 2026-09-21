@@ -66,6 +66,16 @@ def test_terminal_states_go_nowhere(state):
     assert is_terminal(state)
 
 
+def test_failed_run_is_terminal_and_cannot_enter_a_retry_transition():
+    """A retry feature must change this contract deliberately, not appear silently."""
+    assert is_terminal(RunState.FAILED)
+    assert reachable_from(RunState.FAILED) == frozenset()
+    for retry_target in (RunState.SCHEDULED, RunState.RUNNING, RunState.RECOVERING):
+        assert not can_transition(RunState.FAILED, retry_target)
+        with pytest.raises(InvError, match="not a legal transition"):
+            assert_transition(RunState.FAILED, retry_target)
+
+
 def test_the_happy_path_is_walkable():
     path = [
         RunState.DRAFT,

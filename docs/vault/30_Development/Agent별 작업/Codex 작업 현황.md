@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.154"
+version: "1.0.155"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T04:24:00+09:00"
+updated: "2026-09-22T04:27:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 부재 주장 회귀 가드
+
+- 작업 `THREAD-2026-09-22-NEGATIVE-CLAIM-GUARDS`; owner Codex, reviewer Claude pending. 기준 integration `23f76b9172c7a5e85527a4ef1d692e66299e3ebd`; branch `agent/codex/negative-claim-regression-guards`; 격리 worktree 사용.
+- `failed`가 terminal이며 재시도 간선이 없다는 상태기계 불변식을 `test_failed_run_is_terminal_and_cannot_enter_a_retry_transition`로 명시했다. capability kind·Node OS·placement strategy는 현재 지원값과 외부 미지원 sentinel을 각각 시험해 새 값을 무심코 열거나 현재값을 제거하지 못하게 했다. 제품 코드는 바꾸지 않았다.
+- 지원값과 미지원 sentinel을 request 및 대응 response 모델 양쪽에서 고정했다. 여섯 변형을 각각 주입해 guard가 죽는 것을 확인했다: failed→scheduled 허용, request의 `npu` capability 허용, response kind의 `npu` 허용, `freebsd` OS 허용, request의 `automatic` strategy 허용, response strategy의 `automatic` 허용. 각 변형에서 해당 시험이 exit 1로 실패했고 원복했다. 기준 focused suite는 99 passed, 2 deprecation warnings.
+- History `[[2026-09-22_부재주장_회귀가드_Codex]]`에 명령·환경·돌연변이·남은 범위를 기록했다. 이번 카드의 작성자 검증 완료, 독립 검토 대기. PostgreSQL·CI·실 Node 실행은 하지 않았다.
+- 다음: Claude가 integration SHA의 새 guard와 돌연변이 근거를 독립 검토한다. 사용자 결정 대기 항목은 capability별 동적 사용량 모델, artifact GET의 영수증/저장파일 정본, WorkspaceRecovery 운영 연결 및 보존 정책, 시계 스큐 알람 기준·대응 경로, discovery credential의 승인된 비밀 전달 경로다. Hosted CI는 결제 복구 대기이며 실제 Go/장비 인수는 툴체인·장비 조건 대기다. 각 상세 상태는 아래 기존 카드 및 공통 진행판을 기준으로 다시 확인한다.
 
 ## 2026-09-22 좁은 계약의 외부·확장 도메인 역검토
 
