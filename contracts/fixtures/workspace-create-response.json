@@ -1,0 +1,10 @@
+{
+  "workspaceId": "wsp_contract_create",
+  "projectId": "prj_contract",
+  "name": "Contract Create Workspace",
+  "status": "provisioning",
+  "nodeId": null,
+  "toolName": null,
+  "createdAt": "2026-09-21T12:00:00Z",
+  "allowedNext": ["deleting", "ready"]
+}

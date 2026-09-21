@@ -126,7 +126,11 @@ def list_workspaces(
     return {"projectId": project_id, "workspaces": items, "count": len(items)}
 
 
-@router.post("/projects/{project_id}/workspaces", status_code=201)
+@router.post(
+    "/projects/{project_id}/workspaces",
+    status_code=201,
+    response_model=schemas.WorkspaceSummaryResponse,
+)
 def create_workspace(
     project_id: str,
     payload: schemas.WorkspaceCreateRequest,
