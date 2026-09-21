@@ -148,6 +148,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   // ---------------------------------------------------------------------------
   // Honest Aggregate Logical Pool (Zero-Mock calculation from live nodes)
   // ---------------------------------------------------------------------------
+  // Summary Calculation (Strict Distinction: Static Capacity vs Dynamic Utilization)
+  // ---------------------------------------------------------------------------
   const logicalSummary: LogicalResourceSummary = useMemo(() => {
     let totalCores = 0;
     let allocatableCores = 0;
@@ -162,38 +164,80 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
     let usedStorageBytes = 0;
     let onlineNodeCount = 0;
 
+    let hasKnownCores = false;
+    let hasKnownAllocatableCores = false;
+    let hasKnownUsedCores = false;
+    let hasKnownMemory = false;
+    let hasKnownAllocatableMemory = false;
+    let hasKnownUsedMemory = false;
+    let hasKnownGpu = false;
+    let hasKnownStorage = false;
+    let hasKnownUsedStorage = false;
+
     for (const node of nodes) {
       if (node.status === 'online' || node.status === 'draining') {
         onlineNodeCount++;
       }
-      totalCores += node.cpuCores;
-      allocatableCores += node.allocatableCores ?? 0;
-      usedCores += (node.cpuCores * (node.cpuUsagePercent || 0)) / 100;
+      if (typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores) && node.cpuCores > 0) {
+        totalCores += node.cpuCores;
+        hasKnownCores = true;
+      }
+      if (typeof node.allocatableCores === 'number' && Number.isFinite(node.allocatableCores)) {
+        allocatableCores += node.allocatableCores;
+        hasKnownAllocatableCores = true;
+      }
+      // Dynamic utilization is ONLY counted if node has finite non-negative usage and telemetry is NOT marked unavailable
+      if (!node.telemetryUnavailable && typeof node.cpuUsagePercent === 'number' && Number.isFinite(node.cpuUsagePercent) && typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores)) {
+        usedCores += (node.cpuCores * node.cpuUsagePercent) / 100;
+        hasKnownUsedCores = true;
+      }
 
-      totalMemoryBytes += node.memoryTotalBytes;
-      allocatableMemoryBytes += node.allocatableMemoryBytes ?? 0;
-      usedMemoryBytes += node.memoryUsedBytes;
+      if (typeof node.memoryTotalBytes === 'number' && Number.isFinite(node.memoryTotalBytes) && node.memoryTotalBytes > 0) {
+        totalMemoryBytes += node.memoryTotalBytes;
+        hasKnownMemory = true;
+      }
+      if (typeof node.allocatableMemoryBytes === 'number' && Number.isFinite(node.allocatableMemoryBytes)) {
+        allocatableMemoryBytes += node.allocatableMemoryBytes;
+        hasKnownAllocatableMemory = true;
+      }
+      if (!node.telemetryUnavailable && typeof node.memoryUsedBytes === 'number' && Number.isFinite(node.memoryUsedBytes)) {
+        usedMemoryBytes += node.memoryUsedBytes;
+        hasKnownUsedMemory = true;
+      }
 
-      totalGpuCount += node.gpuCount || 0;
-      totalGpuVramBytes += node.gpuVramTotalBytes || 0;
-      usedGpuVramBytes += node.gpuVramUsedBytes || 0;
+      if (typeof node.gpuCount === 'number' && Number.isFinite(node.gpuCount)) {
+        totalGpuCount += node.gpuCount;
+        hasKnownGpu = true;
+      }
+      if (typeof node.gpuVramTotalBytes === 'number' && Number.isFinite(node.gpuVramTotalBytes)) {
+        totalGpuVramBytes += node.gpuVramTotalBytes;
+      }
+      if (!node.telemetryUnavailable && typeof node.gpuVramUsedBytes === 'number' && Number.isFinite(node.gpuVramUsedBytes)) {
+        usedGpuVramBytes += node.gpuVramUsedBytes;
+      }
 
-      totalStorageBytes += node.storageTotalBytes;
-      usedStorageBytes += node.storageUsedBytes;
+      if (typeof node.storageTotalBytes === 'number' && Number.isFinite(node.storageTotalBytes) && node.storageTotalBytes > 0) {
+        totalStorageBytes += node.storageTotalBytes;
+        hasKnownStorage = true;
+      }
+      if (!node.telemetryUnavailable && typeof node.storageUsedBytes === 'number' && Number.isFinite(node.storageUsedBytes)) {
+        usedStorageBytes += node.storageUsedBytes;
+        hasKnownUsedStorage = true;
+      }
     }
 
     return {
-      totalCores,
-      allocatableCores,
-      usedCores: Math.round(usedCores * 10) / 10,
-      totalMemoryBytes,
-      allocatableMemoryBytes,
-      usedMemoryBytes,
-      totalGpuCount,
-      totalGpuVramBytes,
-      usedGpuVramBytes,
-      totalStorageBytes,
-      usedStorageBytes,
+      totalCores: hasKnownCores ? totalCores : 0,
+      allocatableCores: hasKnownAllocatableCores ? allocatableCores : 0,
+      usedCores: hasKnownUsedCores ? Math.round(usedCores * 10) / 10 : null,
+      totalMemoryBytes: hasKnownMemory ? totalMemoryBytes : 0,
+      allocatableMemoryBytes: hasKnownAllocatableMemory ? allocatableMemoryBytes : 0,
+      usedMemoryBytes: hasKnownUsedMemory ? usedMemoryBytes : null,
+      totalGpuCount: hasKnownGpu ? totalGpuCount : 0,
+      totalGpuVramBytes: hasKnownGpu ? totalGpuVramBytes : 0,
+      usedGpuVramBytes: !hasKnownGpu || totalGpuCount === 0 ? 0 : (usedGpuVramBytes > 0 ? usedGpuVramBytes : null),
+      totalStorageBytes: hasKnownStorage ? totalStorageBytes : 0,
+      usedStorageBytes: hasKnownUsedStorage ? usedStorageBytes : null,
       onlineNodeCount,
       totalNodeCount: nodes.length,
       disclaimer:
@@ -211,7 +255,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   }, [nodes, filterMode]);
 
   const formatBytes = (bytes: number | null | undefined) => {
-    if (bytes === null || bytes === undefined) return '미확인';
+    if (bytes === null || bytes === undefined || !Number.isFinite(bytes)) return '미확인';
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
@@ -737,10 +781,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 vCPU 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalCores} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>Cores</span>
+                {logicalSummary.totalCores > 0 ? (
+                  <>{logicalSummary.totalCores} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>Cores</span></>
+                ) : (
+                  '용량 미확인'
+                )}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-                스케줄 가용: <strong>{logicalSummary.allocatableCores} Cores</strong> · 실시간 점유: {logicalSummary.usedCores} Cores
+                스케줄 가용: <strong>{logicalSummary.allocatableCores > 0 ? `${logicalSummary.allocatableCores} Cores` : '0 Cores'}</strong> · 실시간 점유: <span data-testid="logical-vcpu-used">{logicalSummary.usedCores !== null ? `${logicalSummary.usedCores} Cores` : '미제공 (API 미노출)'}</span>
               </div>
             </div>
 
@@ -750,10 +798,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 통합 RAM 풀</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {formatBytes(logicalSummary.totalMemoryBytes)}
+                {logicalSummary.totalMemoryBytes > 0 ? formatBytes(logicalSummary.totalMemoryBytes) : '용량 미확인'}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-                스케줄 가용: <strong>{formatBytes(logicalSummary.allocatableMemoryBytes)}</strong> · 점유: {formatBytes(logicalSummary.usedMemoryBytes)}
+                스케줄 가용: <strong>{formatBytes(logicalSummary.allocatableMemoryBytes)}</strong> · 점유: <span data-testid="logical-ram-used">{logicalSummary.usedMemoryBytes !== null ? formatBytes(logicalSummary.usedMemoryBytes) : '미제공 (API 미노출)'}</span>
               </div>
             </div>
 
@@ -763,7 +811,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>논리 가속기 풀 (GPU)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {logicalSummary.totalGpuCount} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>장 (독립)</span>
+                {logicalSummary.totalGpuCount > 0 ? (
+                  <>{logicalSummary.totalGpuCount} <span style={{ fontSize: '0.875rem', fontWeight: 400 }}>장 (독립)</span></>
+                ) : (
+                  '없음 (0장)'
+                )}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
                 총 VRAM: <strong>{formatBytes(logicalSummary.totalGpuVramBytes)}</strong>
@@ -776,10 +828,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>분산 패브릭 스토리지 (inv://)</div>
               <div style={{ fontSize: '1.5rem', fontWeight: 700, marginTop: '6px' }}>
-                {formatBytes(logicalSummary.totalStorageBytes)}
+                {logicalSummary.totalStorageBytes > 0 ? formatBytes(logicalSummary.totalStorageBytes) : '용량 미확인'}
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-                점유: {formatBytes(logicalSummary.usedStorageBytes)}
+                점유: <span data-testid="logical-storage-used">{logicalSummary.usedStorageBytes !== null ? formatBytes(logicalSummary.usedStorageBytes) : '미제공 (API 미노출)'}</span>
               </div>
             </div>
           </div>
@@ -900,10 +952,26 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     </div>
 
                     <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
-                      <div>CPU: {node.cpuCores}C ({node.allocatableCores ?? 0} 가용)</div>
-                      <div>RAM: {formatBytes(node.memoryTotalBytes)}</div>
-                      <div>GPU: {node.gpuCount > 0 ? `${node.gpuName || 'GPU'} (${node.gpuCount})` : '없음'}</div>
-                      <div>스토리지: {formatBytes(node.storageTotalBytes)}</div>
+                      <div data-testid={`node-cpu-${node.id}`}>CPU: {typeof node.cpuCores === 'number' && Number.isFinite(node.cpuCores) ? `${node.cpuCores}C` : '용량 미확인'} ({typeof node.allocatableCores === 'number' && Number.isFinite(node.allocatableCores) ? `${node.allocatableCores} 가용` : '0 가용'})</div>
+                      <div data-testid={`node-ram-${node.id}`}>RAM: {formatBytes(node.memoryTotalBytes)}</div>
+                      <div data-testid={`node-gpu-${node.id}`}>GPU: {typeof node.gpuCount === 'number' && Number.isFinite(node.gpuCount) ? (node.gpuCount === 0 ? '없음 (0대)' : `${node.gpuName || 'GPU'} (${node.gpuCount}대)`) : '장치 미확인'}</div>
+                      <div data-testid={`node-storage-${node.id}`}>스토리지: {formatBytes(node.storageTotalBytes)}</div>
+                    </div>
+
+                    <div
+                      data-testid={`node-utilization-status-${node.id}`}
+                      role="status"
+                      style={{
+                        marginTop: '8px',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        backgroundColor: 'rgba(51, 65, 85, 0.5)',
+                        border: '1px solid #334155',
+                        fontSize: '0.6875rem',
+                        color: '#94a3b8',
+                      }}
+                    >
+                      📊 자원 사용률: {node.telemetryUnavailable ? '미제공 (HTTP 읽기 경로 부재)' : `CPU ${node.cpuUsagePercent ?? 0}% · RAM ${formatBytes(node.memoryUsedBytes)}`}
                     </div>
 
                     <div style={{ display: 'flex', gap: '6px', marginTop: '10px', justifyContent: 'flex-end' }}>
@@ -1679,6 +1747,23 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 <div>OS: <strong>{nodeDetail.node.osType}</strong></div>
                 <div>하트비트 시퀀스: <strong>#{nodeDetail.node.heartbeatSequence}</strong></div>
                 <div>상태: <strong style={{ color: '#34d399' }}>{nodeDetail.node.status}</strong></div>
+              </div>
+
+              <div
+                data-testid="capabilities-static-capacity-notice"
+                role="status"
+                style={{
+                  padding: '8px 12px',
+                  marginBottom: '12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  color: '#93c5fd',
+                  fontSize: '0.75rem',
+                  lineHeight: '1.4',
+                }}
+              >
+                ℹ️ <strong>정적 용량과 사용률 구별 고지</strong>: 아래 원장의 수량은 노드가 등록(Enrollment) 시점에 신고한 <strong>정적 하드웨어 총용량(Total Capacity)</strong>입니다. 실시간 동적 사용량(Used Quantity)은 백엔드 내부에서만 수집되며 현재 외부에 노출되는 HTTP 읽기 라우트가 부재(미제공)하여 표시되지 않습니다.
               </div>
 
               <div style={{ fontWeight: 600, fontSize: '0.75rem', marginBottom: '6px', color: '#94a3b8' }}>하드웨어 Capabilities 원장:</div>

@@ -58,7 +58,6 @@ export const App: React.FC = () => {
   const [projectId, setProjectId] = useState('');
   const [projectError, setProjectError] = useState<string | null>(null);
   const scopeRef = useRef(0);
-  const measuredNodes = nodes.filter(node => !node.telemetryUnavailable);
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
@@ -259,7 +258,7 @@ export const App: React.FC = () => {
           <DeveloperStudio
             key={projectId}
             project={selectedProject}
-            nodes={measuredNodes}
+            nodes={nodes}
             runs={runs}
             approvals={approvals}
             currentUser={currentUser}
@@ -363,7 +362,7 @@ export const App: React.FC = () => {
         {/* Tab 2.1: Virtual Fabric & Control Plane Explorer (CX-01) */}
         {activeTab === 'fabric' && (
           <ResourceExplorer
-            nodes={measuredNodes}
+            nodes={nodes}
             tenantId={currentUser?.tenantId}
             onSelectNode={(id) => {
               setSelectedNodeId(id);
@@ -424,7 +423,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.7: Resource Placement Simulator (S05-FE) */}
         {activeTab === 'placement' && (
-          <PlacementSimulator nodes={measuredNodes} />
+          <PlacementSimulator nodes={nodes} />
         )}
 
         {/* Tab 2.8: Distributed Recovery & Resilience (S07-FE) */}

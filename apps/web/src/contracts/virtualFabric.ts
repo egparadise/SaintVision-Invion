@@ -69,15 +69,15 @@ export interface VirtualDesktopState {
 export interface LogicalResourceSummary {
   totalCores: number;
   allocatableCores: number;
-  usedCores: number;
+  usedCores: number | null;
   totalMemoryBytes: number;
   allocatableMemoryBytes: number;
-  usedMemoryBytes: number;
+  usedMemoryBytes: number | null;
   totalGpuCount: number;
   totalGpuVramBytes: number;
-  usedGpuVramBytes: number;
+  usedGpuVramBytes: number | null;
   totalStorageBytes: number;
-  usedStorageBytes: number;
+  usedStorageBytes: number | null;
   onlineNodeCount: number;
   totalNodeCount: number;
   disclaimer: string;

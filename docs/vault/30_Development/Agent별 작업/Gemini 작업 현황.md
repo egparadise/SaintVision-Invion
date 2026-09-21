@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.71"
+version: "1.0.72"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T22:15:00+09:00"
+updated: "2026-09-21T23:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T22:15:00+09:00.
+- 확인 기준: 2026-09-21T23:00:00+09:00.
 
 ## 최근 확인한 진척
+
+- **노드 정적 용량(Capacity) vs 동적 실시간 사용률(Utilization) 엄격 분리, 텔레메트리 부재 정직 반영 및 클러스터 생존성 보존 (`ResourceExplorer.tsx`, `virtualFabric.ts`, `App.tsx`, `node-telemetry-capacity-distinction.test.tsx`)**:
+  - **클러스터 조용한 전멸 방지 (`App.tsx`)**: 백엔드가 평면 텔레메트리를 반환하지 않을 때 `measuredNodes` 필터링으로 인해 노드가 0대로 전락하던 결함을 치유(`nodes={nodes}` 전달)하여 클러스터 물리 노드 생존성을 보존.
+  - **정적 용량 vs 동적 사용률 엄격 분리 (`ResourceExplorer.tsx`, `virtualFabric.ts`)**: 결측된 동적 점유량을 `0 Cores`나 `0 B`로 왜곡하여 100% 유휴 상태라는 착시를 주지 않고, `LogicalResourceSummary`를 nullable(`number | null`)로 전환하여 `미제공 (API 미노출)`으로 명확히 고지.
+  - **엄격한 3분할(Tri-Distinction) 및 NaN 방어**: "0 (없음: 0대)" vs "모른다 (미확인: unobserved/NaN)" vs "미제공 (unprovided: HTTP API 미노출)"의 3분할을 확립하고, NaN 결측 시 `formatBytes`가 `'NaN undefined'`를 내뿜지 않도록 방어. 물리 노드 카드에 `📊 자원 사용률: 미제공 (HTTP 읽기 경로 부재)`(`role="status"`) 배너 배치.
+  - **Tab 4 Capabilities 표 상단 고지**: 등록(Enrollment) 시점의 정적 하드웨어 총용량(Total Capacity)과 실시간 동적 사용량의 HTTP 미제공 상태를 못 박는 안내 배너(`data-testid="capabilities-static-capacity-notice"`, `role="status"`)를 배치.
+  - **DOM 단위 테스트 및 3대 돌연변이 실측 사살 (전수 KILLED)**: `node-telemetry-capacity-distinction.test.tsx` 신설 (6/6 passed), M1(결측 사용률 0 기본화)·M2(GPU NaN을 0대로 오인)·M3(formatBytes NaN 방어 제거) 3대 돌연변이 전수 실측 사살.
+  - Vitest **59개 파일 551/551 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.66s), check_frontend_integrity 80개 파일 0 violations (PASS), 음성 대조 PASS, check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_노드_용량과사용률_구별고지_및_텔레메트리부재정직반영_Gemini]].
 
 - **화면 접근성 상태 역할 분리, 비색상 단서, 비활성 버튼 고지 및 DOM 검증 완결 (`ResourceExplorer.tsx`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `ModelLineageView.tsx`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `PlacementSimulator.tsx`, `accessibility-status-and-guards.test.tsx`)**:
   - **스크린 리더 상태 역할 엄격 분리 (Role Separation)**:
