@@ -1,11 +1,11 @@
 ---
 doc_id: "LINUX-GATE-AUDIT-CLAUDE-001"
 title: "Linux 전용 분류 검증 감사 — 왜 Linux인가, 소스 근거인가 추정인가. 3부류"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T16:40:00+09:00"
+updated: "2026-09-21T17:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["verification-boundary", "linux-gate", "skipif", "audit", "measure-not-guess", "node-runtime"]
@@ -65,6 +65,34 @@ PG-only로 보이던 후보(resume_input_readiness·business_handoff·output_ing
 
 ### ③ 다시 보니 Linux 불필요 (지금 처리 가능)
 **없음.** PG-only로 보이던 후보는 측정 결과 모두 `node_runtime` Docker 게이트를 갖고 있었다. 오늘 funnel처럼 억지로 채우지 않는다 — "없으면 없다고 보고".
+
+## v1.1.0 보강 — CI가 열리면 무엇이 자동 강제되나 (CI-fail 분기. 내가 v1.0.0에서 놓친 것)
+`node_runtime` fixture에는 **CI 분기**가 있다(놓쳤다): `INV_RUN_NODE_TESTS != "1"`일 때 로컬이면 `pytest.skip`이지만 **CI면 `pytest.fail("CI must enable real Node execution tests")`**. 즉 이 항목들은 CI에서 조용히 건너뛰어지지 않고 **강제된다**. 우리가 오늘 여러 곳에 만든 "전제 불충족 vs 실제 결함" 구분층이 여기엔 **원래부터** 있었다.
+
+**전수 확인 — CI-fail(skip 아닌 fail) 분기를 가진 게이트는 정확히 셋뿐**:
+| 게이트 | 위치 | CI에서 강제하는 전제 |
+|---|---|---|
+| PG (combined) | `tests/conftest.py:64` | `INV_TEST_ADMIN_DSN` |
+| PG (integration) | `tests/integration/conftest.py:29` | `INV_TEST_ADMIN_DSN` |
+| node-runtime | `tests/integration/test_node_runtime.py:50` | `INV_RUN_NODE_TESTS`(+binary+image) |
+
+그 외 게이트 — `sys.platform != linux` marker, browser opt-in(`INV_BROWSER_TEST`), image opt-in(`INV_WEB_IMAGE`/`INV_UPGRADE_AGENT_IMAGE`), `INV_STORAGE_SOURCE_ROOT` — 에는 **CI-fail이 없다**(CI에서도 그냥 skip). 이 차이가 사용자에게 의미 있다.
+
+**핵심 변수: CI 러너의 OS.** `sys.platform != linux` marker는 collection 시점에 평가되고 **skip일 뿐 fail하지 않는다**(marker가 skip하면 fixture는 실행조차 안 됨 → node-runtime의 CI-fail도 안 터진다). 그래서:
+
+### CI가 **Linux 러너**로 열리면
+- **① chmod/POSIX 계열 → 자동 실행·검증.** `sys.platform==linux`라 marker 통과 + PG는 위 CI-fail이 강제 → 별도 opt-in 없이 **돈다**. (즉 이 Linux 항목들은 영원히 미검증이 아니라 **Linux CI가 열리는 순간 자동 검증된다**.)
+- **② node-runtime 계열 → 강제(RED unless opt-in).** marker 통과 → fixture 실행 → `INV_RUN_NODE_TESTS=1`+node binary+image 없으면 **pytest.fail(빨간불)**. 조용히 skip 불가 — CI가 node-agent 런타임을 반드시 제공해야 한다.
+- **browser/image/lan_storage → 여전히 skip.** opt-in skipif(CI-fail 없음)라 env 없으면 CI에서도 skip, 빨간불 아님 → **열려도 미검증으로 남는다**(누가 env를 켜야 검증).
+
+### CI가 **비-Linux 러너**(예: Windows)로 열리면
+- Linux 계열 전부 `sys.platform != linux` marker로 **조용히 skip**(fail 없음). node-runtime CI-fail도 collection 전 skip이라 **안 터진다**. 즉 **아무것도 자동 검증 안 되고 빨간불도 없다** — 오늘 우리가 경계한 "초록이나 미커버" 형태. **CI 러너가 Linux여야** 이 항목들이 실제로 강제된다.
+
+**요약(사용자용) — CI 결제 해결 후 (Linux CI 가정)**:
+- **자동 검증**: ① chmod/POSIX 계열(PG만 있으면, PG는 CI-fail로 강제됨).
+- **강제(빨간불로 눈에 띔)**: ② node-runtime 계열 — CI가 node-agent opt-in을 안 켜면 실패하므로 잊힐 수 없다.
+- **여전히 남음(수동 opt-in 필요, 조용히 skip)**: browser·web image·upgrade image·lan_storage(`INV_STORAGE_SOURCE_ROOT`).
+- **전제**: 러너가 Linux여야 함. Windows CI면 전부 조용히 skip.
 
 ## 다음 사람에게 (환경 준비 기준)
 - **①은 격리 Linux 호스트**가 실제로 필요하다(POSIX 권한/파일 backend).
