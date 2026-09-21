@@ -1,11 +1,11 @@
 ---
 doc_id: "SYNC-OBSIDIAN-BLOCKED-CLAUDE-001"
 title: "sync_obsidian.py --check 차단 조사 — 683 충돌 사유별 분류·근본원인·도구 진단 수정. --apply 미실행"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T10:00:00+09:00"
+updated: "2026-09-21T14:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 ---
@@ -68,3 +68,31 @@ tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 - **충돌 683 그대로**(681 no-baseline + 2 both-diverged), **67 pending**(오늘 새 문서 포함, vault 미도달 실측 확인).
 - **apply 는 충돌 0 이어야 열린다.** 613 흡수는 충돌을 0 으로 못 만들었으므로 **apply 는 여전히 닫혀 있고 67 pending 은 여전히 막혀 있다. 이번 흡수는 unblock 전망을 개선하지 못했다.**
 - **unblock 경로**: 681 no-baseline 은 파일별 판단(vault 편집 보존 vs repo 로 덮어쓰기), 2 both-diverged 는 수동 재조정 — 모두 사용자 판단 영역이며 이번에 손대지 않았다. 그 판단으로 충돌이 0 이 되어야 오늘 문서가 vault 에 도달한다.
+
+## v1.2.0 — 681 no-baseline 증거 기반 판별 (2026-09-21). vault 읽기 전용
+
+사용자 승인대로 681 no-baseline 충돌을 **사람 판단에서 증거 기반 판별**로 바꿨다. **vault 에는 어떤 쓰기도 하지 않았다**(git hash-object 로 읽기만).
+
+### 방법 (경로 무관 content 대조 — rename 자연 해소)
+각 vault 파일의 내용 해시(`git hash-object --stdin`)를 **저장소 전체 blob 집합 5117 개**(`git cat-file --batch-all-objects`)와 대조했다. 사용자가 준 경로별 `git log` 대조보다 강하다: 내용이 저장소 어디에든(rename 포함) 존재했으면 sync 잔재로 확정되므로 category3(rename 판별 실패)가 사라진다. 애매한 경우는 실제 `diff` 로 ground-truth 확인.
+
+### 결과 — 681 전부 benign, 진짜 내용 편집 0
+| 부류 | 수 | 성격 | 처리 |
+|---|---|---|---|
+| category1 (raw blob 일치) | **5** | vault 바이트가 저장소 blob과 정확 일치 = sync 잔재 | 덮어써도 무손실 |
+| category1-EOL (LF 정규화 후 일치) | **672** | vault 는 CRLF(Windows/OneDrive 변환), 텍스트는 저장소 버전과 **정확 일치** | 덮어써도 무손실(EOL만 복원) |
+| category2 (어느 정규화로도 불일치) | **4** | 실제 `diff` 확인 결과 **EOF 빈 줄 1개만 추가**(내용 동일) | benign, 무손실 |
+| category3 (판별 실패) | **0** | — | — |
+- **진짜 사용자 내용 편집 = 0.** 681 은 전부 EOL(672)·trailing 빈 줄(4)·정확 일치(5) artifact 다. 어느 것을 저장소 버전으로 덮어써도 **사용자 내용 손실이 없다**.
+- category2 4 건: `2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md`, `웹 단일 가상 컴퓨터와 분산 모델 Fabric 보강 설계.md`, `57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md`, `Agent 연속 실행과 최종 보고 정책.md` — 각각 repo 대비 **끝 빈 줄 1개 차이뿐**.
+
+### 진짜 편집은 no-baseline 이 아니라 both-diverged 2 건에 있다 (범위 밖이나 확인)
+같은 content 대조를 2 both-diverged(manifest 파일)에 적용하니 **이력 불일치 = 진짜 vault 편집**이었다:
+- `00_Index/Overview.md`: vault 에 **8 줄 추가** — `## 2026-09-15 보강 설계` 섹션 + Obsidian 위키링크 3 개(`[[2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스]]`, `[[웹 단일 가상 컴퓨터와 분산 모델 Fabric 보강 설계]]`, `[[57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵]]`).
+- `00_Index/SaintVision INV 개발 설계 인덱스.md`: vault 에 **4 줄 추가** — `## 2026-09-15 승인 보강 트랙` 섹션 + 위키링크.
+- 이는 **사용자가 vault 에서 직접 만든 index 편집**(저장소에 없음)이다. **덮어쓰면 소실된다.** 위키링크가 위 category2 파일 3 개를 가리키는 것으로 보아, 사용자가 그 문서들을 vault index 에 연결한 것이다.
+
+### 요지 · 근본 원인 · 전망
+- **판단 대상이 683 → 실질 2 건으로 좁혀졌다.** 681 no-baseline 은 판단 불필요(전부 benign artifact). **오직 both-diverged 2 건만** 사용자 판단이 필요하며, 그것은 **덮어쓰기가 아니라 병합**(저장소 내용 + 사용자 index 추가분)이어야 한다.
+- **681 block 의 근본 원인**: sync 가 `sha256(raw bytes)` 로 비교하는데 vault 는 CRLF(Windows/OneDrive), 저장소는 LF(`.gitattributes eol=lf`) → 672 EOL + 4 trailing + 5 정확 = 681 이 전부 **공백/EOL artifact 로 충돌 처리**된다. **권고(Codex, 도구 소유)**: 비교 시 **EOL 정규화**(git 처럼)하면 681 no-baseline 충돌이 사라지고, 남는 것은 both-diverged 2 건뿐이다 — 이것이 unblock 의 핵심 경로다.
+- **제약 준수**: vault 읽기만, 쓰기 0, `--apply` 미실행. 실제 처리(681 덮어쓰기/EOL 정규화, both-diverged 2 건 병합)는 이 보고를 사용자가 보고 판단한 뒤에 한다.
