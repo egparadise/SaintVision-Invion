@@ -78,6 +78,11 @@ integration_sync:    BEHIND 7   (vs origin/integration/all-agents-unified @89c6b
 
 **교훈(다음 사람에게)**: 함정을 진단하고 그것을 막으려 만든 도구조차 같은 함정에 빠졌다는 것은, 이 함정이 **얼마나 빠지기 쉬운지**를 보여준다. 신호를 낼 때마다 "이건 어느 시점/어느 트리/어느 인터프리터의 신호인가"를 묻는 습관이 규칙보다 먼저다. 도구는 그 습관을 강제하는 수단일 뿐, 도구 자신도 예외가 아니다.
 
+### 후속 — 라벨이 가리키는 대안이 실제로 동작해야 한다
+위 as-of 라벨은 bare 모드에서 "실행 시점 환경은 `provenance.py -- <cmd>`로"라고 안내한다. 그런데 그 대안을 그대로 돌려 보니 **Windows에서 죽었다**: `.venv/Scripts/python.exe`처럼 **슬래시 포함 상대경로**를 `subprocess`(shell 없음, CreateProcess)가 못 찾아 `FileNotFoundError [WinError 2]`가 났고, 도구가 그 예외를 **못 잡고 raw 크래시**했다. 즉 **한계를 라벨로 밝히고 대안을 가리켰지만 그 대안이 막혀 있었다** — 각주는 있는데 넘을 길은 없는 상태. 오늘의 권고 vs 강제 논리의 연장이다(대안을 "가리키는 것"과 "실제로 통하게 하는 것"은 다르다).
+
+**고침**(도구): wrap 모드가 `cmd[0]`을 해석한다 — 경로면 절대경로로(존재 확인, Windows면 `.exe` 보정), bare 이름이면 `shutil.which`로(PATHEXT 적용). 그래도 못 찾으면 raw traceback 대신 **exit 127 + "could not launch command … Pass an absolute path or a PATH-resolvable name"**로 정직하게 실패한다. 검증: 존재하는 forward-slash 상대경로(`../../.venv/Scripts/python.exe`)·bare `python`·절대경로 모두 exit 0로 동작, 없는 명령은 clean 127, 그리고 오늘 상황 재현(PG 올린 채 wrap → `postgres_dsn=set/at check invocation`, PG 내린 뒤 bare → `absent/report-time snapshot`)으로 **대안이 실제로 통함**을 확인했다. (주의: worktree에는 `.venv`가 없다 — venv는 주 체크아웃에 있으므로 worktree에서의 `.venv/...` 상대경로는 존재하지 않는다. 이제 그 경우도 crash가 아니라 안내 메시지로 실패한다.)
+
 ## 주 체크아웃·워크트리 동기 규약 (재발 방지)
 위 실증의 물리적 원인 — 주 체크아웃이 통합보다 뒤처짐 — 을 재발하지 않게 하는 규약이다.
 

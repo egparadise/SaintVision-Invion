@@ -66,6 +66,23 @@ def _env_gates():
     }
 
 
+def _resolve_executable(name):
+    """Make wrap mode robust on Windows. CreateProcess (subprocess with shell=False) does not
+    find a RELATIVE path that uses forward slashes -- e.g. .venv/Scripts/python.exe -- so the
+    label's own advice (`provenance.py -- <cmd>`) died with WinError 2. Resolve cmd[0] to an
+    absolute path when it names a file, or via PATH (PATHEXT-aware) when it's a bare name; an
+    absolute path with forward slashes is already tolerated by Windows."""
+    has_sep = (os.sep in name) or (os.altsep is not None and os.altsep in name)
+    if has_sep:
+        cand = os.path.abspath(name)
+        if os.path.isfile(cand):
+            return cand
+        if os.name == 'nt' and os.path.isfile(cand + '.exe'):
+            return cand + '.exe'
+        return cand  # not found; let subprocess raise, caught and reported cleanly below
+    return shutil.which(name) or name
+
+
 def _integration_distance(ref, do_fetch):
     """How far THIS tree is from the integration tip -- the gap that stayed invisible all of
     2026-09-21 because the main checkout sat ~12 commits behind and nobody printed it. Measured
@@ -199,7 +216,19 @@ def main():
         # and warn if they changed while the check ran (a divergence is itself worth knowing).
         prov['env_context'] = 'at check invocation (same process/shell as the check)'
         pre = {k: prov[k] for k in ('gate_postgres_dsn', 'gate_docker', 'gate_go', 'gate_node')}
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = [_resolve_executable(cmd[0])] + cmd[1:]      # relative/venv/forward-slash safe
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+        except (FileNotFoundError, OSError) as exc:
+            # The wrapped command could not be launched. Report it cleanly instead of a raw
+            # traceback, so the alternative the label points at fails loudly, not silently.
+            print(render_text(prov))
+            print(f"command:             {' '.join(cmd)}")
+            print(f"command_cwd:         {os.getcwd()}")
+            print("exit_code:           127")
+            print(f"error:               could not launch command -- {type(exc).__name__}: {exc}. "
+                  "Pass an absolute path or a PATH-resolvable name.")
+            return 127
         post = _env_gates()
         diffs = [f"{k.replace('gate_', '')}: {pre[k]}->{post[k]}" for k in pre if pre[k] != post[k]]
         if diffs:
