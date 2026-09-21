@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-VERIFICATION-RULES-AXES-CANON-001"
 title: "검증 규칙·축 정본 — 6규칙·3축(실물성→정직함→신선도)·6층·축별 도구"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
@@ -21,6 +21,7 @@ tags: ["governance", "verification", "rules", "axes", "canon"]
 4. **커밋은 개인 index + rev-range 검증**: 공유 index/HEAD 미접촉, origin tip에 내 파일만. [[공유워크트리_개인index_커밋규칙]].
 5. **유효한 것은 한 곳에서 읽히게(단일 소스)**: 복사하면 분기한다. 링크로 참조. (이 정본이 그 자기적용.)
 6. **처방 전 질문 — 표현인가 계산인가**: 값이 계약을 **표현**하면 독립 고정(+잔여위험 명시), 계약에서 **계산**되면 유도. **계산이면 원천이 검사 대상 밖인지도 확인** — 원천이 대상 안이면 원천이 틀려도 기대값이 같이 틀려 항상 통과. [[2026-09-21_유도처방_한계_내산출물_재점검_Claude]].
+7. **느슨한 계약은 숨긴다 — 참 도메인이 있으면 좁혀 사실을 적는다**: 응답 필드가 loose `str`인데 원천(DB CHECK 등)이 참 도메인을 정해두면 계약은 오늘의 사실을 안 적고 있는 것이다. 좁힘은 새 설계를 고르는 게 아니라 **이미 참인 것을 기록**하는 것이고, 미래 결정이 어디로 가든 그 도메인은 불변(다른 표시가 필요하면 그건 **새 필드**가 됨). 느슨하면 아무도 못 물어봐서 틀린 가정이 숨는다 — **좁혀서야 드러난다.** rule 6의 이웃이나 대상이 검사 기대값이 아니라 **계약 타입 자체**. **실례(2026-09-22, 같은 근거로 세 번)**: `WorkspaceSummaryResponse.status`(loose→좁히니 화면 `status==='active'` 죽은 분기 노출, 정상 노드가 회색이던 실결함) · `NodeResponse.status`(좁히니 계약 fixture 셋의 impossible `"online"` + 매퍼가 active를 enrolling으로 강등하던 것 노출) · `ContributionResponse.status/mode`. [[2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude]].
 
 ## 3축 (거시 차원) — 전제 사슬
 **쓰기 실물성 → 읽기 정직함 → 시간 신선도.** 아래가 위의 전제.
@@ -31,6 +32,7 @@ tags: ["governance", "verification", "rules", "axes", "canon"]
 
 ## 6층 (미시 실패 모드 — "있다 ≠ 작동한다")
 초록≠도달 / 배선≠통과 / 통과했으나 다른 이유 / 방어가 엉뚱한 것 / 계약 있으나 서빙 미강제(앵커 없음) / 앵커 있으나 무게 없음. **6층은 3축이 깨지는 방식이다.**
+- **변형: 대표 경로만 검증되고 다른 서빙 경로는 미검증** — 같은 shape가 한 경로에선 생성자/response_model로 검증되나 다른 경로(idempotency replay·별칭 라우트·활성화/철회)는 우회한다. 대표 경로만 보면 통과처럼 보인다. **실례(2026-09-22)**: contribution idempotency replay가 저장 dict를 그대로 반환해 생성자 검증 **우회**(Codex 발견); `activate`/`revoke`가 등록에서만 검증되던 body를 미검증 반환(Claude 발견→Codex가 세 lifecycle 라우트에 같은 response_model 결속). **점검**: 대표 경로가 아니라 **실제 서빙 경로마다** 계약이 강제되는지 본다.
 
 ## 축별 도구 (무엇이 잡나 — 도구가 다르다)
 | 축 | 잘 잡는 도구 | 약한 도구 |
@@ -38,6 +40,13 @@ tags: ["governance", "verification", "rules", "axes", "canon"]
 | 쓰기 실물성 | 되살림(response_model/가드 제거→시험 깨짐) + 실측(body↔schema, 프런트 POST 여부) | — |
 | 읽기 정직함 | 대조군·실측(전수 grep→측정, 실제 경로 추적) + 되살림(서빙앵커) + report-only 검사 | 초록 카운트만 보기 |
 | 시간 신선도 | 소스 스키마검토(시각필드 유무·기록 유무) + 독립검토(시각의 의미) + 순수함수 시계전진 | **되살림 약함**(한순간 실행이라 시간경과 못 만듦) |
+
+## 조용한 강등 금지 — 모름을 아는 것처럼 바꾸지 마라 (읽기 정직함의 한 갈래)
+읽은 값이 예상 밖일 때 오류/모름 대신 **그럴듯한 기본값**으로 바꾸면 이상이 정상으로 보인다. 오늘 밤 **세 번 같은 모양**: 건너뛰기가 통과처럼(PG skip) · 헤더 부재가 정상처럼(X-Content-SHA256 미대조) · 미지 status가 known처럼(enrolling). 매퍼·변환기·파서에서 특히 나온다.
+- **규칙**: 예상 밖 값은 **오류를 내거나 모른다고 표시**하라. 값을 지어내 known으로 위장하지 말 것.
+- **부분 정직이 더 함정**: 한 필드는 모름으로 표시하고 다른 필드는 위장하면, 보는 사람이 그 표시를 믿어 위장까지 믿는다. **실례(2026-09-22)**: `observedNode`가 `telemetryUnavailable=true`(정직)로 두면서 `status`는 미지값을 `'enrolling'`으로 **위장**(거짓) → 정상 노드가 회색·미가용으로. 또 `workspaceEdit`의 `workspaceId || 'default-workspace'`(부재를 그럴듯한 id로, URI에 박힘)·base64 디코드 실패→raw를 "내용"으로.
+- **정석(반대 예, 2026-09-22)**: `WorkspaceToolReadinessResponse.state: Literal["unknown"]`(미측정을 unknown으로 명시) · `cli.py`가 파싱 실패를 `LoginState.UNKNOWN`+이유로 · `linux_file`이 예외를 기본값 아닌 `CredentialDenied`로 fail-closed.
+- 실례 목록: [[2026-09-22_조용한강등_미지값을기본값으로_훑기_Claude]].
 
 ## 검사 등급·게이트 승격 (오늘 밤 추가)
 - **세 등급**: **게이트**(실패=CI 막힘) / **ratchet**(델타만 막음: 새 위반·stale에 실패, 백로그는 통과) / **report-only**(안 막음, `$GITHUB_STEP_SUMMARY`로 가시화).
