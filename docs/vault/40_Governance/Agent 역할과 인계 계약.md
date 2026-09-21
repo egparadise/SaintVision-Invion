@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-AGENT-001"
 title: "Agent 역할과 인계 계약"
-version: "1.1.1"
+version: "1.1.2"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-21T18:08:00+09:00"
+updated: "2026-09-21T18:14:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]

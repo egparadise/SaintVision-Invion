@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.109"
+version: "1.0.110"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T18:08:00+09:00"
+updated: "2026-09-21T18:14:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 재개: integration 선행 병합, UI-FB-03, 응답 계약 slice
+
+- Gemini VF-GM-05 `39af7ca`를 먼저 포함하도록 최신 integration을 Codex 작업 브랜치에 병합했다. Claude run-log 계약 `c192cdc`도 포함한다. 병합 중 공통 진행판 충돌은 양쪽 기록을 보존해 합쳤다. Codex 브랜치/통합 push 및 통합 tip 재검증이 다음 단계이며, 아직 통합 착지 완료로 표기하지 않는다.
+- UI-FB-03: `apps/web/tests/developer-studio-dom.test.tsx`의 이전 성공 로드 후 다운로드 401 시나리오를 직접 실행했다. 전체 DOM 파일 18 passed. `handleDownloadArtifact`에서 오류를 삼키고 `serverPayload || artifactData`로 낡은 캐시를 재사용하는 변형을 넣으면 해당 시험이 실패했다. 캐시 fallback만 복원하고 오류 즉시 반환을 유지한 단일 변형은 통과했으므로 그 시험은 결함을 막는 두 조건의 조합을 검증한다. 변형은 원복했다. 근거는 컴포넌트 DOM 경계이며 실제 브라우저/HTTP 인수는 아니다.
+- Codex 응답 계약 slice는 run/approval 관찰, pool capacity, placement preview, pool create/member mutations와 distributed plan 응답을 canonical schema·생성 타입·공유 fixture·backend 및 frontend conformance test에 연결했다. 프런트 표시/요청 의미의 변경은 Gemini 소관이다. PlacementSimulator의 `binpack`/`spread`와 backend strategy enum 간 매핑은 추측하지 않고 Gemini 인계에 남겼다.
+- Codex가 만든 프런트 계약 경로를 Gemini에 인계한다: `apps/web/src/contracts/kernel-observation.ts`, `apps/web/src/shared/api/runApprovalObservation.ts`, `apps/web/tests/run-approval-observation.test.tsx`, `apps/web/tests/run-approval-observation-contract.test.ts`. 이들은 adapter/type/conformance 범위이며 화면 렌더링을 바꾸지 않는다.
+- 최신 provenance 고정 SHA와 통합 위치 검증은 History `2026-09-21_web_response_contract_map_workspace_Codex.md`에 이어 기록한다. Claude의 fixed-SHA 독립 검토는 대기 중이며, CI/실제 DB·HTTP/browser/장비 검증으로 과장하지 않는다.
 
 ## 2026-09-21 Integration 확인, UI-FB-03 review, run/approval contract follow-up
 
