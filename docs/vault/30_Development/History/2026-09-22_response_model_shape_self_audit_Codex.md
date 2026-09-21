@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-RESPONSE-SHAPE-AUDIT-2026-09-22"
 title: "Strict response model producer-shape self-audit"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T05:06:00+09:00"
+updated: "2026-09-22T05:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -28,6 +28,17 @@ No currently produced response branch was found that the bound model rejects. St
 - Workspace summaries require `nodeId` and `toolName` keys and allow null values; create and populated-list fixtures exercise the all-null and populated cases. Workspace status tests enumerate all five lifecycle states and exact outgoing transition sets. Discovery announcement schema tests enumerate all four response states; the machine-credential route itself only returns `candidate` and rejects refreshes in other states.
 
 The contract allows `ProjectCreateResponse.kernelNote` to be explicitly null although its current producer emits either a string or omits the key. This is a permissive schema shape, not an unaccepted producer output or current 500 risk; it was left unchanged because the response is intentionally optional and the broader nullable contract is already consumed by validation tests.
+
+## Named failure class: schema-valid but producer-unreachable fixture state
+
+This class is a fixture whose fields and values pass the declared schema but whose combination cannot be emitted by the real producer. A green schema round-trip proves shape compatibility only; it does not prove the fixture describes a reachable product state.
+
+Two examples known from tonight's work:
+
+1. Claude's Node fixture used status `online`, a value the business Node producer/DB state vocabulary did not emit. It was found by comparing the fixture to the producer's actual state domain; tightening `NodeResponse.status` to the backend domain then made the contract test reject that value.
+2. The Node enrollment fixture in this audit used a non-null `lastHeartbeatAt` and `heartbeatSequence: 12`. Enrollment initializes those as null and 0. Both values were individually schema-valid, so ordinary model validation could not detect the impossible combination. The fixture is now corrected to null/0.
+
+Current guard status: `tools/check_contract_bindings.py` checks that every fixture is referenced by a test and that applicable serving anchors have tests; it does not compare fixture values or combinations with producer paths or database constraints. Strict model round-trips catch an out-of-domain value only when the schema encodes that domain (as with the narrowed Node status); they do not catch producer reachability constraints absent from the schema (as with enrollment timestamp/sequence). No generic producer-reachability fixture check was found in the inspected checker. Whether to add such a mechanism is left as a design decision; no new checker or broad fixture sweep was undertaken here.
 
 ## Verification
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.159"
+version: "1.0.160"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T05:02:00+09:00"
+updated: "2026-09-22T05:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,8 +12,10 @@ source_of_truth: "Git"
 
 ## 2026-09-22 strict response producer-shape self-audit
 
-- Audited all 19 response-model classes added/narrowed today against producer branches and fixtures. No live producer shape was found that the strict model rejects; found and corrected the Node enrollment fixture (actual new enrollment is heartbeat sequence 0 / null timestamp), and expanded shape tests for project-link, workspace-tool null/unassigned-node, and contribution status x nullable-capacity outputs.
-- Focused `.venv` run at clean integration SHA `1c68b32b` (2026-09-22 05:04:32 KST): 101 passed, 2 PostgreSQL-gated skips (`INV_TEST_ADMIN_DSN` absent). This is not live-DB verification; see [[2026-09-22_response_model_shape_self_audit_Codex]]. Independent review pending.
+- **Closed (Codex author work):** source-audited the 19 response models added/narrowed tonight; no producer shape was found that the strict models reject. Corrected the impossible Node enrollment fixture and added branch-shape coverage for project kernel-link outputs, cleared/unassigned workspace tools, and contribution status ? nullable-capacity combinations. Named the broader class `schema-valid but producer-unreachable fixture state`; examples are Claude's impossible Node `online` fixture and this audit's enrollment heartbeat sequence/timestamp mismatch. The current binding checker validates fixture references and serving anchors, not producer reachability. See [[2026-09-22_response_model_shape_self_audit_Codex]].
+- **Verified:** integration SHA `9dbf9915` is the recorded clean test tip. Focused suite: 101 passed, 2 PostgreSQL-gated skips because `INV_TEST_ADMIN_DSN` is absent; DB-backed producer output therefore remains unverified. `check_docs` passed. Obsidian read-only check had pending exports and was not applied.
+- **Independent review pending:** Claude review of this audit and its added tests.
+- **Decision pending:** whether to add a generic producer-reachability check for fixtures. No implementation or further fixture scan was started; this requires a design decision.
 
 ## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
 
