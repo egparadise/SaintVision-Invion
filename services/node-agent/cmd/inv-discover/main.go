@@ -24,11 +24,15 @@ func run() error {
 	var endpoint, tenant, instance, caFile string
 	var once bool
 	flag.StringVar(&endpoint, "endpoint", "", "explicit HTTPS announcement endpoint")
-	flag.StringVar(&tenant, "tenant", "", "candidate tenant, never an authenticated identity")
+	flag.StringVar(&tenant, "tenant", "", "target tenant (must match the bearer credential)")
 	flag.StringVar(&instance, "instance", "", "operator-stable installation identifier")
 	flag.StringVar(&caFile, "ca", "", "explicit discovery server CA PEM")
 	flag.BoolVar(&once, "once", false, "announce once")
 	flag.Parse()
+	bearer := strings.TrimSpace(os.Getenv("INV_DISCOVERY_BEARER_TOKEN"))
+	if bearer == "" || strings.ContainsAny(bearer, "\r\n") {
+		return fmt.Errorf("tenant discovery credential unavailable")
+	}
 	ca, err := os.ReadFile(caFile)
 	if err != nil || len(ca) > 65536 {
 		return fmt.Errorf("CA unavailable")
@@ -50,7 +54,7 @@ func run() error {
 		}
 	}
 	for {
-		err = discovery.Send(ctx, endpoint, tenant, ca, a)
+		err = discovery.Send(ctx, endpoint, tenant, "Bearer "+bearer, ca, a)
 		if once {
 			return err
 		}

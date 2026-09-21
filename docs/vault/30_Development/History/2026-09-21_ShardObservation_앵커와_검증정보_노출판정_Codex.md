@@ -21,6 +21,14 @@ tags: ["shards", "contract", "model-verification", "lineage", "boundary"]
 
 작성자 로컬 검증: `tests/core/test_shard_observation_contract.py` 6 passed. 테스트는 PostgreSQL/Docker 없이 실행된다. 독립 검토는 미완료다.
 
+## Discovery tenant 경계 확인 및 보강
+
+Claude의 `85868a7` 문서에서 발견한 기존 경로는 `POST /v1/discovery/announcements`가 `X-Inv-Tenant`를 인증 확인 없이 `tenant_scope`와 후보 기록 함수에 직접 전달했다. handler 시그니처에 `get_principal`이 없었고 Node Agent wire 시험은 `Authorization`이 비어 있음을 기대했다. 발표는 실제 Node 생성/등록 권한을 주지 않는 후보 row였지만 임의 tenant에 후보를 심거나 tenant별 후보 한도(500)를 소진하는 cross-tenant write/DoS가 가능했다.
+
+수정은 요청 인증 principal을 요구하고 header tenant가 principal tenant와 다르면 `AUTH-TENANT-SCOPE` 403으로 DB factory/session 생성 전에 거부한다. Node Agent `inv-discover`는 tenant 인증 bearer credential을 `INV_DISCOVERY_BEARER_TOKEN` 환경에서만 읽어 전송하며 토큰을 인자나 로그로 내보내지 않는다. 운영 환경에 그 credential을 주입하는 일은 별도 provisioning 필요다. Gemini 소유 `ResourceExplorer`의 하드코딩 tenant UUID는 이 검증을 통과하지 않으므로 실제 세션 tenant로 바꿔야 한다. UI 수정은 이 커밋에 포함하지 않는다.
+
+증거: FastAPI `TestClient`로 실제 route에 인증 principal A + header tenant B 요청을 보내 403과 `record_announcement` 미호출을 확인한다. 인증 없이 header만 보낸 요청은 401이다. tenant 비교 guard를 제거한 되돌림 대조에서는 mismatch 시험이 500/403 불일치로 실패했고, 복구 후 discovery+shard targeted suite 8 passed다. Go compiler/test runner는 이 호스트에 없어 Node Agent 변경을 실행 검증하지 못했다. PostgreSQL DSN도 없어 DB-backed 후보 저장과 운영 credential 발급은 미실행이다.
+
 ## 모델 바이트 검증 HTTP 노출 결정
 
 **현재는 마지막 모델 무결성 결과를 HTTP로 노출하지 않는다. 온디맨드 재검증 endpoint도 추가하지 않는다.** 조사 근거:
@@ -40,4 +48,4 @@ UI는 이 결정을 반영해 실제 backend 응답이 없는 상태를 “미�
 
 ## 근거 범위
 
-소스 대조는 `model_commit.py`, `model_locality.py`, `model_view.py`, migration `0039_model_manifest.py`, SaintVision `services/lineage.py`, API router 목록과 Claude 인계 문서를 대상으로 했다. 모델 검증이나 lineage endpoint는 추가하지 않았다. DB-backed model/locality와 SaintVision API 시험 및 브라우저 인수는 실행하지 않았다.
+소스 대조는 `model_commit.py`, `model_locality.py`, `model_view.py`, migration `0039_model_manifest.py`, SaintVision `services/lineage.py`, API router 목록과 Claude 인계 문서를 대상으로 했다. 모델 검증이나 lineage endpoint는 추가하지 않았고, discovery 기존 route의 tenant authorization은 보강했다. DB-backed model/locality와 discovery 저장 통합 및 SaintVision API 운영 시험, Go build와 브라우저 인수는 실행하지 않았다.

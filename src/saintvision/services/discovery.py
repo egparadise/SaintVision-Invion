@@ -36,7 +36,7 @@ from ..ids import new_id
 
 
 class CandidateFlood(InvError):
-    """Too many candidates. Announcing is unauthenticated, so it is capped."""
+    """Too many candidates in a tenant's authenticated discovery queue."""
 
     def __init__(self, count: int) -> None:
         super().__init__(

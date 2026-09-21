@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -30,9 +31,9 @@ var tenantID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 
 // Announcement grants no admission, certificate, offer, placement or execution.
 // TLS server trust is explicit, with no proxy, redirect or automatic retries.
-func Send(ctx context.Context, endpoint, tenant string, ca []byte, a Announcement) error {
+func Send(ctx context.Context, endpoint, tenant, authorization string, ca []byte, a Announcement) error {
 	u, err := url.Parse(endpoint)
-	if err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil || u.Path != "/v1/discovery/announcements" || u.RawPath != "" || u.RawQuery != "" || u.Fragment != "" || !tenantID.MatchString(tenant) {
+	if err != nil || u.Scheme != "https" || u.Host == "" || u.User != nil || u.Path != "/v1/discovery/announcements" || u.RawPath != "" || u.RawQuery != "" || u.Fragment != "" || !tenantID.MatchString(tenant) || !strings.HasPrefix(authorization, "Bearer ") || strings.TrimSpace(strings.TrimPrefix(authorization, "Bearer ")) == "" || strings.ContainsAny(authorization, "\r\n") {
 		return errors.New("discovery configuration rejected")
 	}
 	if len(a.InstanceID) < 1 || len(a.InstanceID) > 128 || len(a.Hostname) < 1 || len(a.Hostname) > 253 || (a.OSType != "linux" && a.OSType != "windows") || len(a.OSVersion) > 64 || len(a.AgentVersion) > 64 || a.CPUCores < 0 || a.RAMBytes < 0 || a.GPUCount < 0 {
@@ -54,6 +55,7 @@ func Send(ctx context.Context, endpoint, tenant string, ca []byte, a Announcemen
 		return errors.New("discovery request rejected")
 	}
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", authorization)
 	request.Header.Set("X-Inv-Tenant", tenant)
 	response, err := client.Do(request)
 	if err != nil {

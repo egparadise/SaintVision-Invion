@@ -42,8 +42,8 @@ POOL_STATUSES = ("active", "archived")
 #: should not keep appearing as if it were there.
 ANNOUNCEMENT_TTL_SECONDS = 300
 
-#: Cap per tenant. One machine announcing thousands of identities would
-#: otherwise fill the table, and discovery is unauthenticated by nature.
+#: Cap per tenant. Even authenticated callers must not be able to fill the
+#: candidate table with thousands of claimed identities.
 MAX_CANDIDATES_PER_TENANT = 500
 
 

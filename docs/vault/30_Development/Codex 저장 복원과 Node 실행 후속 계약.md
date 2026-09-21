@@ -1,10 +1,10 @@
 ---
 doc_id: "STORAGE-NODE-CONTRACT-001"
 title: "Codex 저장 복원과 Node 실행 후속 계약"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T03:15:23+09:00"
+updated: "2026-09-21T19:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -42,7 +42,7 @@ Storage 구현 `f4e33b958379e058196135d737539a3cee9d0a85`: Core #34386900927 / D
 
 ## ADR-035: 공지·실측 관측·전송·독립 샤드
 
-- `inv-discover`는 명시적 HTTPS endpoint·CA·tenant·stable installation ID로 Claude의 `/v1/discovery/announcements` camelCase 계약에 공지한다. 30초 주기 또는 `--once`, 5초 timeout, proxy/redirect 금지. OS/CPU/RAM은 미검증 자기 보고이며 GPU 미측정은 labels에 명시한다. bootstrap token 소비나 Node 인증서 발급·등록 승인·Offer 편입을 자동 수행하지 않는다. Claude 실제 서버와의 통합은 adapter owner 검증 대기다.
+- `inv-discover`는 명시적 HTTPS endpoint·CA·tenant·stable installation ID와 `INV_DISCOVERY_BEARER_TOKEN`으로 `/v1/discovery/announcements`에 공지한다. 서버는 인증 principal의 tenant와 header를 대조하며 다르면 DB 쓰기 전에 거부한다. 30초 주기 또는 `--once`, 5초 timeout, proxy/redirect 금지. OS/CPU/RAM은 미검증 자기 보고이며 GPU 미측정은 labels에 명시한다. bootstrap token 소비나 Node 인증서 발급·등록 승인·Offer 편입을 자동 수행하지 않는다. 실제 운영 credential 발급/주입은 운영자 설정이 필요하다.
 - 등록된 `inv-node`의 `/v1/snapshots`는 기존 pinned mTLS, Node/tenant/epoch 및 일회 nonce를 사용한다. Linux `/proc/stat` 150ms CPU delta와 `/proc/meminfo` MemAvailable을 읽고 CPU millis/메모리 bytes로 반환한다. guest double-count를 피한다. 읽기 실패/불완전한 counter는 여유 0의 실측으로 꾸미지 않고 요청을 거절한다. 이 snapshot은 Offer·GPU/VRAM·격리 capability 증명이 아니다.
 - `inv-observer-worker`는 명시적 tenant/DSN/epoch/TLS로 최대 5개 등록 채널을 5 worker에서 조회한다. 시작/끝 offline sweep, 5초 I/O와 5초 반복 대기, nonce/순서/clock/현재 인증서 검증 및 snapshot 저장을 묶는다. 60초 stale threshold는 sweep 주기와 함께 측정해야 하며 실장비 이탈 ≤60초 SLO를 아직 증명하지 않는다. Node 실종은 Lease 물리 반환 근거가 아니다.
 - 인증된 `/v1/projects/{project}/capacity`는 project_nodes 허용 목록의 CPU/memory만 totalOffered/largestSingleNode/spareNow로 제공한다. 15초 이내 관측과 current channel·epoch, 활성 Lease를 검사한다. host busy와 Lease를 별도로 차감하여 보수적인 여유를 계산한다. 단일 노드 최대치는 자원 차원별 값으로 동시에 해당 조합을 만족하는 Node를 보장하지 않는다. 예약 시에는 기존 Scheduler/Lease 잠금을 재실행한다.

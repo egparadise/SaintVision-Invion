@@ -1,10 +1,10 @@
 ---
 doc_id: "NODE-STORAGE-RUNBOOK-001"
 title: "Codex Node와 저장소 Adapter 실행 안내"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T03:15:23+09:00"
+updated: "2026-09-21T19:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,14 +14,14 @@ source_of_truth: "Git"
 
 ## 공지와 등록 후 관측
 
-CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보 표시만 한다. Claude의 공지 API adapter가 준비된 경우 실제 endpoint와 해당 CA, 비밀이 아닌 tenant UUID/안정적인 installation ID를 지정한다.
+CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보만 만들며 admission은 하지 않는다. `POST /v1/discovery/announcements`는 이제 인증 principal을 요구하고 `X-Inv-Tenant`가 그 principal의 tenant와 같아야 한다. Node Agent 실행 환경에 해당 tenant로 인증되는 `INV_DISCOVERY_BEARER_TOKEN`을 보안된 secret manager/service environment로 주입한다. 토큰을 CLI 인자, 저장소, 로그 또는 보고서에 넣지 않는다. 실제 endpoint, 해당 CA, 비밀이 아닌 tenant UUID와 안정적인 installation ID를 지정한다.
 
 ```bash
 inv-discover --endpoint "$INV_DISCOVERY_ENDPOINT" --ca "$INV_DISCOVERY_CA_FILE" \
   --tenant "$INV_TENANT_ID" --instance "$INV_INSTALLATION_ID" --once
 ```
 
-`--once`를 생략하면 30초 간격으로 공지한다. bootstrap token·인증서·Node role은 이 공지의 결과가 아니다. 기존 Node 실행 CLI의 명시적 tenant/node/epoch/profile/image/executable/state/public-key/mTLS 설정이 별도로 필요하다. 운영 등록 토큰과 CA 발급 경로는 Claude와 연결해야 한다.
+프로세스 환경에 `INV_DISCOVERY_BEARER_TOKEN`을 안전하게 설정해야 하며, 값 자체를 명령행에 쓰지 않는다. `--once`를 생략하면 30초 간격으로 공지한다. bootstrap token·인증서·Node role은 이 공지의 결과가 아니다. 기존 Node 실행 CLI의 명시적 tenant/node/epoch/profile/image/executable/state/public-key/mTLS 설정이 별도로 필요하다. 운영 등록 토큰과 CA 발급 경로는 Claude와 연결해야 한다.
 
 설치한 Python package의 `inv-observer-worker`는 `INV_OBSERVER_CONFIG` JSON 파일을 읽는다. 파일의 키는 `tenantId`, `tls`이고 tls는 `ca_file`, `certificate_file`, `key_file`이다. 현재 등록 Node CA와 CP client cert/key를 사용한다. `INV_RUNTIME_DSN`은 비owner·NOBYPASSRLS service role, `INV_RECOVERY_EPOCH`는 운영자가 검증한 현재 UUID다. 비밀은 Git/CLI 출력/보고서에 넣지 않는다.
 

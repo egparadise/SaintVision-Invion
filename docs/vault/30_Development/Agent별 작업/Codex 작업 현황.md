@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.118"
+version: "1.0.119"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:38:00+09:00"
+updated: "2026-09-21T19:47:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -15,6 +15,8 @@ source_of_truth: "Git"
 - `ShardRuntime._status`가 응답을 반환하기 전에 `validate_contract("ShardObservation", result)`를 실행하도록 앵커를 추가했다. invalid shard state를 fake DB에서 반환하는 회귀시험으로 서빙 경계 호출과 거부를 고정했다. focused 결과는 6 passed이며 앵커 제거 변형은 이 시험 하나가 `DID NOT RAISE DomainError`로 실패했다. 상세 판정과 검증 경계는 `[[2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex]]` 참조.
 - 모델 verify HTTP 관측과 온디맨드 재검증은 현재 미노출로 결정했다. DB에는 immutable commit만 있고 마지막 검증 결과/카운트 receipt가 저장되지 않으며 locality 검증은 요청·주체·epoch에 결합된 임시 결과다. 이를 현재 무결성으로 노출하지 않는다. 별도 lineage route도 아직 만들지 않는다. SaintVision `trace_model`은 실데이터를 갖지만 HTTP auth/tenant scope 및 공개 필드 계약이 미정이다. 화면은 합성 lineage/eval 점수 대신 명시적 미노출 상태를 유지한다.
 - 검증은 Windows 주 checkout의 프로젝트 Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`로 이 worktree의 소스를 대상으로 한다. worktree-local venv는 없어 provenance wrapper의 첫 실행은 launch exit 127이었고, 이를 시험 실패로 집계하지 않았다. PostgreSQL-backed test, live route 및 browser acceptance는 실행하지 않았다. reviewer pending.
+- Claude `85868a7`의 discovery tenant 최고위험 finding을 소스에서 확인했다. 기존 announcement route는 principal 없이 caller `X-Inv-Tenant`를 RLS scope에 사용했고 Node Agent 시험은 bearer가 없음을 기대했다. 후보 row만 쓰더라도 타 tenant 후보 주입 및 후보 500 한도 소진이 가능했다. route가 이제 `get_principal`을 요구하고 header mismatch를 DB 접근 전에 `AUTH-TENANT-SCOPE` 403으로 거부한다. Node Agent `inv-discover`는 `INV_DISCOVERY_BEARER_TOKEN` 환경 자격증명을 보내도록 수정했고 runbook을 갱신했다. FastAPI TestClient에서 다른 tenant 403/no DB call, 무인증 401을 확인했고 tenant compare 제거 변형은 mismatch 시험을 실패시켰다. discovery+shard suite 8 passed; check_docs 639 versioned documents 통과.
+- 화면 소유 인계: `ResourceExplorer.tsx`의 기존 하드코딩 tenant UUID는 backend에서 거부된다. Gemini가 세션 principal tenant를 전달하도록 wiring해야 한다. 운영 Node Agent bearer 발급/주입은 아직 설정되지 않았다. Go compiler 부재로 Go package/CLI 시험은 미실행이며 PostgreSQL-backed 저장 통합/운영 HTTP도 미검증이다. model verify 및 lineage endpoint는 저장·권한 근거가 부족해 계속 미노출로 판정했다.
 
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 

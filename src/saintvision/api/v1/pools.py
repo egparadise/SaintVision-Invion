@@ -1,9 +1,9 @@
 """Discovery, pool and placement endpoints.
 
-The announcement endpoint is the only one here that an unenrolled machine may
-call, and it is deliberately the least powerful: it writes a candidate row and
-returns nothing about the platform. Everything that changes what runs where
-requires a user credential.
+An agent may announce before node enrollment, but its tenant must come from an
+authenticated principal. The announcement remains deliberately least-powerful:
+it writes only a candidate row. Admission and everything that changes what runs
+where require a user credential.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from ...config import Settings
 from ...db.session import make_session_factory, tenant_scope
-from ...errors import VAL_SCHEMA, InvError
+from ...errors import AUTH_TENANT_SCOPE, VAL_SCHEMA, InvError
 from ...identity.principal import Principal
 from ...services import discovery as discovery_service
 from ...services import pools as pool_service
@@ -41,21 +41,25 @@ def announce(
     request: Request,
     payload: schemas.AnnouncementRequest,
     tenant: str = Header(alias="X-Inv-Tenant"),
+    principal: Principal = Depends(get_principal),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """A Node Agent announces itself on the internal network.
 
-    Unenrolled machines call this, so it grants nothing: the row it writes is a
-    candidate a person must still admit. The source address is taken from the
-    connection rather than the body — a field the announcer controls cannot be
-    part of its own identity.
+    The caller must authenticate into the tenant it announces for. The row it
+    writes is still only a candidate that a person must admit. The source
+    address is taken from the connection rather than the body — a field the
+    announcer controls cannot be part of its own identity.
 
-    The response deliberately carries no platform detail. An unauthenticated
-    caller learns only that the announcement was accepted.
+    The response deliberately carries no platform detail.
     """
     tenant_id = _tenant(tenant)
-    request.state.actor_type = "node"
-    request.state.tenant_id = tenant_id
+    if tenant_id != principal.tenant_id:
+        raise InvError(
+            AUTH_TENANT_SCOPE,
+            "X-Inv-Tenant does not match the authenticated principal",
+            403,
+        )
     source_ip = request.client.host if request.client else "0.0.0.0"
 
     factory = make_session_factory(request.app.state.engine)
