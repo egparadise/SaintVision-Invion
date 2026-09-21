@@ -124,13 +124,17 @@ class ContributionRequest(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+ContributionMode = Literal["read_only", "read_write"]
+ContributionStatusName = Literal["pending", "active", "revoked"]
+
+
 class ContributionResponse(Strict):
     contribution_id: str = Field(alias="contributionId")
     node_id: str = Field(alias="nodeId")
     declared_path: str = Field(alias="declaredPath")
     normalized_path: str = Field(alias="normalizedPath")
-    mode: str
-    status: str
+    mode: ContributionMode
+    status: ContributionStatusName
     capacity_bytes: int | None = Field(default=None, alias="capacityBytes")
     available_bytes: int | None = Field(default=None, alias="availableBytes")
     registered_at: dt.datetime = Field(alias="registeredAt")

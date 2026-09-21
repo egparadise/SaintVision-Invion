@@ -35,6 +35,10 @@
       "type": "string"
     },
     "mode": {
+      "enum": [
+        "read_only",
+        "read_write"
+      ],
       "title": "Mode",
       "type": "string"
     },
@@ -52,6 +56,11 @@
       "type": "string"
     },
     "status": {
+      "enum": [
+        "pending",
+        "active",
+        "revoked"
+      ],
       "title": "Status",
       "type": "string"
     }

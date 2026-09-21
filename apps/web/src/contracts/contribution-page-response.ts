@@ -4,11 +4,11 @@ export type Availablebytes = number | null;
 export type Capacitybytes = number | null;
 export type Contributionid = string;
 export type Declaredpath = string;
-export type Mode = string;
+export type Mode = 'read_only' | 'read_write';
 export type Nodeid = string;
 export type Normalizedpath = string;
 export type Registeredat = string;
-export type Status = string;
+export type Status = 'pending' | 'active' | 'revoked';
 export type Items = ContributionResponse[];
 export type Nextcursor = string | null;
 
