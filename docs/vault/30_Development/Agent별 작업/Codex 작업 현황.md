@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.116"
+version: "1.0.117"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:30:00+09:00"
+updated: "2026-09-21T19:42:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,11 +13,12 @@ source_of_truth: "Git"
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 
 - `TerminalTicketInput`/`TerminalTicketResult` 기존 정본을 프런트가 따르도록 공유 요청·응답 fixture와 contract-only `terminalTicket` adapter를 추가했다. `TerminalTicketAuthFrame`을 JSON Schema에 명시하고 WebSocket 입구에서 검증하며, 응답 `websocketPath`는 workspace/session 경로 형식으로 제한한다. 어댑터는 티켓을 URL에 넣지 않고 `inv-terminal-v1` 첫 인증 프레임으로만 내보낸다. `WebTerminal` 화면이나 사용자 흐름은 Codex가 수정하지 않았다.
-- `agent/codex/terminal-pty-contract` 후보를 현재 원격 integration `dff6223`에 fast-forward push했고, 제품 및 문서 결과는 integration SHA `76bd8a0`에 있다. 원격 착지 후 Claude 독립 리뷰는 이 SHA를 대상으로 진행한다.
+- `agent/codex/terminal-pty-contract` 후보를 integration에 fast-forward 반영했다. PTY no-row 회귀시험 `4ee1085`와 integration의 WorkspaceEditView 변화 및 Claude 보고서를 병합한 현재 Codex 후보는 `3412694`다. Claude의 `65f7b9a` 보고서는 ProblemDetails/NodeStopReceiptView 등 지정 계약은 sound로 판정했지만 PTY는 명시적으로 검토 범위 밖에 두었다. 따라서 PTY 독립 검토는 아직 없고, Gemini 화면 소유 경계도 Codex 승인으로 바뀌지 않는다.
 - Gemini 전달 대기(사용자 릴레이): 빈 노드에서는 ticket 발급을 시작하지 말 것. 현재 API는 workspace/session만으로 발급하지 않고 명시적 `commandId`가 필요하다. UI는 선택된 실행의 commandId로 새 adapter를 호출하고, 반환된 `websocketPath` 및 subprotocol을 사용해 query string 없는 연결을 열며 첫 frame으로 adapter auth frame을 보내야 한다. 이 화면 통합은 Codex 범위가 아니다.
 - focused Python/Vitest/schema/build/docs 결과와 명령은 `[[2026-09-21_terminal_ticket_contract_Codex]]` 참조. 실제 DB-backed PTY, live WebSocket/browser, CI, Claude 독립 검토는 별도 미확인이다.
 - 최신 화면 코드는 Gemini 소유로 두고 소스 경계에서만 인계 finding을 남겼다: `TerminalSessionView`가 고정 placeholder `commandId`를 전달하고, `WebTerminal`은 응답 타입을 인라인 정의하며 잘못된/누락 `websocketPath`를 합성 경로로 대체하고 ticket 앞 12자를 로그에 남긴다. 계약 전용 `terminalTicket` adapter를 화면이 아직 사용하지 않는다. 이는 Codex의 소스 검토이며, Gemini의 UI 테스트·독립 DOM/browser 승인이 아니다. 화면 소유자는 선택된 실행 commandId 사용, adapter wiring, 경로 fallback 제거, ticket 전체/부분 로그 제거를 검토한다.
 - 보안 경계 후속 확인: placeholder UUID는 형식만 유효하며 권한을 만들지 않는다. `TerminalService._current`에서 requester가 소유한 기존 승인 실행/현재 attempt/실행 상태/node/lease/terminal capability/project membership/workspace를 확인한 뒤에만 ticket insert가 가능하다. 없는 command row는 `403 AUTH-0070` ProblemDetails다. UUID가 실제 권한 있는 실행 row와 일치해야만 발급 가능하므로 화면은 합성 ID를 보내면 안 된다. 이 no-row 경로를 fake DB로 고정했고 focused 시험은 14 passed다. live DB 경로는 PostgreSQL DSN absent로 미확인이다. Gemini의 오류/사용 불가 UI 합격 기준은 History에 기록했다.
+- Latest-source provenance (`3412694`, 2026-09-21 19:31:41 KST, clean worktree `C:/Project/SaintVision-Invion/.worktrees/codex-terminal-pty-contract`, project Python `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6, Node 24.17.0): terminal-ticket authority + terminal contract + ProblemDetails tests 14 passed, full Vitest 55 files/497 passed, check_docs 636 versioned documents all exit 0. DSN absent; no live ticket/HTTP/WebSocket test.
 
 ## 2026-09-21 ProblemDetails anchor와 receipt 이름 공간
 

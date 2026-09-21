@@ -5,6 +5,7 @@ version: "1.0.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex(피검토)"
+updated: "2026-09-21T19:43:00+09:00"
 source_of_truth: "Git"
 tags: ["independent-review", "codex", "ProblemDetails", "fixed-sha"]
 ---
