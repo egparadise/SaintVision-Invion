@@ -2009,21 +2009,25 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     backgroundColor:
-                      currentRun?.state === 'succeeded'
+                      currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
                         ? 'rgba(46, 160, 67, 0.2)'
                         : currentRun?.state === 'running'
                         ? 'rgba(56, 139, 253, 0.2)'
                         : 'rgba(210, 153, 34, 0.2)',
                     color:
-                      currentRun?.state === 'succeeded'
+                      currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
                         ? '#3fb950'
                         : currentRun?.state === 'running'
                         ? '#58a6ff'
                         : '#d29922',
                   }}
                 >
-                  {currentRun?.state === 'succeeded'
+                  {currentRun?.state === 'succeeded' && Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed
                     ? '✓ 산출물 검증 완료 (Output Verified)'
+                    : artifactData?.fallbackUsed
+                    ? '⚠️ 산출물 아티팩트 폴백 (Artifact Fallback / UNVERIFIED)'
+                    : currentRun?.state === 'succeeded'
+                    ? '⚠️ 실행 완료 · 출력 무결성 미검증 (Completed / UNVERIFIED)'
                     : currentRun?.state === 'running'
                     ? '⏳ 실행 중 - 산출물 생성 대기'
                     : '⚠️ 실행 종료/스냅샷 확보'}
@@ -2061,6 +2065,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
             {artifactError && (
               <div
+                role="alert"
                 data-testid="artifact-error-banner"
                 style={{
                   padding: '10px 14px',

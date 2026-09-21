@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.48"
+version: "1.0.49"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T11:30:00+09:00"
+updated: "2026-09-21T12:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T11:30:00+09:00.
+- 확인 기준: 2026-09-21T12:05:00+09:00.
 
 ## 최근 확인한 진척
+
+- **UI 연속 재조회 전이 회귀·접근성 role=alert·산출물 무결성 검증 엄격 분리 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/src/features/desktop/ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `DeveloperStudio.tsx`, `tests/test_route_coverage.py`)**:
+  - **연속 재조회 전이 DOM 테스트 3종 신설 및 돌연변이 대조 실증**: 기존 후보가 존재하는 상태에서 2차 재조회(refresh)가 실행되는 실 사용자 수명주기 경로를 검증. 3개 돌연변이(1. `setCandidates`를 `items.length > 0` 안으로 되돌림, 2. catch 블록에서 `setCandidates([])` 제거, 3. `candidatesState !== 'error'` 렌더 가드 제거)를 실제 주입하여 각각 대응하는 DOM 테스트가 즉시 **FAIL**로 회귀를 정확히 포착함을 실증.
+  - **접근성 `role="alert"` 전면 적용**: `ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `DeveloperStudio.tsx` 내 8개 오류 배너(`storage-error-banner`, `pool-capacity-error`, `node-detail-error`, `discovery-error-banner`, `pools-error-banner`, `preview-error-banner`, `candidates-error-banner`, `artifact-error-banner`)에 `role="alert"` 표준 속성을 탑재.
+  - **산출물 무결성 검증 완료 뱃지 엄격 분리 (`DeveloperStudio.tsx`)**: 단순히 `currentRun?.state === 'succeeded'`인 것만으로 "산출물 검증 완료 (Output Verified)"를 주장하던 결함을 제거. 실제 암호학적 증거 ID(`verifiedEvidenceId`)가 존재하고 폴백이 아닐 때만 `✓ 산출물 검증 완료 (Output Verified)`로 표시하고, 폴백은 `⚠️ 산출물 아티팩트 폴백 (Artifact Fallback / UNVERIFIED)`, 미검증 성공은 `⚠️ 실행 완료 · 출력 무결성 미검증 (Completed / UNVERIFIED)`으로 정직하게 분리.
+  - **검증 실적**: Vitest 33개 파일 **330/330 passed 100%**, Pytest `test_route_coverage.py` 및 `test_deploy_intranet_preflight.py` **46/46 passed 100%**, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 프론트엔드 프로덕션 빌드 통과.
+  - 보고서: [[2026-09-21_UI_연속조회_접근성_및_산출물검증상태_완결_Gemini]].
+
 
 - **UI 비동기 DOM 효과 전이 검증 하네스 및 백엔드 계약 정합성 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/tests/browser/desktop.tsx`, `tests/test_route_coverage.py`)**:
   - **비동기 DOM 효과 전이 하네스 (`apps/web/tests/resource-explorer-dom.test.tsx`)**: Claude 독립 검토([[2026-09-21_UI_static_markup감사_Claude독립검토]])에서 제기된 `renderToStaticMarkup`의 `useEffect` 미실행 한계를 극복하기 위해 `happy-dom` 환경 하네스를 구축. React `act()`와 `createRoot`를 통해 `pending`, `success-with-data`, `success-empty`, `error`, `storage-error`의 5개 핵심 비동기 전이를 실제 DOM 관측으로 입증. `setCandidates([])` 변형(후보 버림 버그)을 완벽하게 포착 및 차단.

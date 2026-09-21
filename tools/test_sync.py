@@ -110,6 +110,46 @@ class SyncTests(unittest.TestCase):
             shutil.rmtree(work)
             self.assertTrue(state_path.is_file())
 
+    def test_default_state_is_shared_by_linked_worktrees(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            root = base / 'repo'
+            linked = base / 'linked'
+            root.mkdir()
+            subprocess.run(['git', 'init', '-q'], cwd=root, check=True)
+            subprocess.run([
+                'git', '-c', 'user.name=Sync test', '-c',
+                'user.email=sync-test@example.invalid', 'commit',
+                '--allow-empty', '-m', 'initialize worktree test',
+            ], cwd=root, check=True, capture_output=True, text=True)
+            subprocess.run([
+                'git', 'worktree', 'add', '-q', '-b', 'linked-test',
+                str(linked),
+            ], cwd=root, check=True)
+
+            main_state = default_state_path(root).resolve()
+            linked_state = default_state_path(linked).resolve()
+            common_dir = Path(subprocess.run(
+                ['git', 'rev-parse', '--git-common-dir'], cwd=root,
+                check=True, capture_output=True, text=True).stdout.strip())
+            if not common_dir.is_absolute():
+                common_dir = root / common_dir
+
+            self.assertEqual(main_state, linked_state)
+            self.assertEqual(main_state, (common_dir.resolve() / 'obsidian-sync-state.json').resolve())
+
+            # A regression to --git-path would make these worktree-local paths
+            # differ, so this equality is the behavior contract under test.
+            local_state_paths = []
+            for worktree in (root, linked):
+                git_path = Path(subprocess.run(
+                    ['git', 'rev-parse', '--git-path', 'obsidian-sync-state.json'],
+                    cwd=worktree, check=True, capture_output=True,
+                    text=True).stdout.strip())
+                local_state_paths.append(
+                    git_path if git_path.is_absolute() else worktree / git_path)
+            self.assertNotEqual(local_state_paths[0].resolve(), local_state_paths[1].resolve())
+
     def test_original_hash_allows_initial_navigation_update(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)

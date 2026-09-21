@@ -53,6 +53,10 @@ tags: ["sync-obsidian", "export-state", "frontend-tests", "renderToStaticMarkup"
 
 Claude의 원격 commit `7404a6a`가 Overview와 설계 인덱스의 사용자 편집을 저장소 정본에 흡수한 뒤 같은 `--check`를 다시 실행했다. 결과는 **14 no-baseline, 0 both-diverged**, exit 3이다. 이 2건 감소는 EOL 정규화가 아니라 해당 index 편집의 저장소 흡수다. Claude의 `SYNC-OBSIDIAN-BLOCKED-CLAUDE-001` v1.4.0은 남은 14건을 SAFE(old residue 10, whitespace-only 4)로 판정했다. 그 이력 대조를 Codex가 다시 실행한 것은 아니므로 독립 확인으로 세지 않는다. `--apply`는 여전히 실행하지 않았다.
 
+### 사용자 승인 경로 해소 완료 수신
+
+위 문장은 당시 관측 상태다. 이후 사용자가 vault 전체를 백업한 뒤 14개 현재 충돌을 모두 explicit path list에 넣어 `--apply --adopt-identical --resolve-conflicts-from`을 실행했다고 보고했다(exit 0). 88개 기록 파일과 vault 총 파일 수 1307→1381을 보고했으며, 사용자 설계 index 절도 유지됐다. 후속 `--check` 결과는 1370 managed / 0 pending / 0 conflicts, exit 0이다. Codex는 실제 apply를 재실행하지 않았다. 이전의 Claude SAFE 분류는 소급해 Codex 독립 history verification으로 바뀌지 않는다. 도구의 안전, 실행 및 post-check는 [명시 경로 해소 기록](2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex.md)에 분리돼 있다.
+
 ## `renderToStaticMarkup` 시험 인벤토리
 
 ### 전수 방법과 개수

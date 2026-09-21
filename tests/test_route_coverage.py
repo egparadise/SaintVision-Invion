@@ -273,6 +273,11 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     assert "discovery-error-banner" in re_content, "Missing discovery-error-banner in ResourceExplorer.tsx"
     assert "discovery-empty-state" in re_content, "Missing discovery-empty-state in ResourceExplorer.tsx"
     assert "pool-capacity-error" in re_content, "Missing pool-capacity-error in ResourceExplorer.tsx"
+    # Accessibility: role="alert" on all error banners
+    assert 'role="alert" data-testid="discovery-error-banner"' in re_content
+    assert 'role="alert"\n                data-testid="storage-error-banner"' in re_content or 'role="alert" data-testid="storage-error-banner"' in re_content
+    assert 'role="alert" data-testid="pool-capacity-error"' in re_content
+    assert 'role="alert" data-testid="node-detail-error"' in re_content
 
     # 2. UI-FB-02 PlacementSimulator: UNVERIFIED local evaluation label and preview error banner
     ps_path = web_src / "features" / "placement" / "PlacementSimulator.tsx"
@@ -281,14 +286,22 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     assert "preview-error-banner" in ps_content, "Missing preview-error-banner in PlacementSimulator.tsx"
     assert "pools-error-banner" in ps_content, "Missing pools-error-banner in PlacementSimulator.tsx"
     assert "서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다" in ps_content, "Missing fake shard prevention message in PlacementSimulator.tsx"
+    # Accessibility: role="alert" on placement error banners
+    assert 'role="alert"' in ps_content
+    assert 'pools-error-banner' in ps_content
+    assert 'candidates-error-banner' in ps_content
 
-    # 3. UI-FB-03 DeveloperStudio: ResultView fallback gated strictly on isRouteNotFoundError
+    # 3. UI-FB-03 DeveloperStudio: ResultView fallback gated strictly on isRouteNotFoundError & Output Verified gated on evidence
     ds_path = web_src / "features" / "studio" / "DeveloperStudio.tsx"
     ds_content = ds_path.read_text(encoding="utf-8")
     assert "isRouteNotFoundError" in ds_content, "Missing isRouteNotFoundError import or usage in DeveloperStudio.tsx"
     assert "isRouteNotFoundError(err)" in ds_content, "ResultView catch must test isRouteNotFoundError(err)"
     assert "artifact-error-banner" in ds_content, "Missing artifact-error-banner in DeveloperStudio.tsx"
     assert "artifact-fallback-badge" in ds_content, "Missing artifact-fallback-badge in DeveloperStudio.tsx"
+    assert 'role="alert"' in ds_content
+    # Truthful verification status: Output Verified must require verifiedEvidenceId and not fallbackUsed
+    assert "Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed" in ds_content
+    assert "출력 무결성 미검증 (Completed / UNVERIFIED)" in ds_content
 
 
 def test_discovery_candidate_schema_contract_invariants() -> None:

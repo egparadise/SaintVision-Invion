@@ -1,12 +1,12 @@
 ---
 doc_id: "SYNC-OBSIDIAN-EXPLICIT-CONFLICT-RESOLUTION-20260921-CODEX"
 title: "Obsidian 동기화 명시 경로 충돌 해소"
-version: "1.0.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Pending"
 base_commit: "84f26ca"
-updated: "2026-09-21T12:08:00+09:00"
+updated: "2026-09-21T12:03:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "conflict-resolution", "file-safety"]
@@ -38,6 +38,16 @@ tags: ["sync-obsidian", "conflict-resolution", "file-safety"]
 - 되돌림 대조: 현재 충돌 여부 검사를 제거한 변형에서 `test_resolution_list_rejects_a_path_that_is_not_a_current_conflict`가 실패했다. `stale.md`가 실제로 덮어써지고 3으로 귀결되는 변형을 해당 시험이 탐지했다. 변형을 원복하고 전체 13시험을 다시 통과시켰다.
 - 실제 사용자 vault 적용, 실제 14경로 목록 처리, GitHub Actions 및 Obsidian 열기는 실행하지 않았다.
 
-## 다음 행동
+## 사용자 실행 완료 수신 — 공유 vault 안정 상태
 
-Codex가 사용자로부터 정확한 승인 경로 목록을 받은 뒤 목록 파일을 확인한다. 공유 vault 전체 백업과 실행 전 `--check` 결과를 보존하고, 목록 대상만 처리한다. 잔여 충돌이 있으면 exit 3을 그대로 보고하며 임의로 목록을 확대하지 않는다. 사용자는 목록을 제공하기 전까지 본 기능을 실제 vault에 적용하지 않는다.
+사용자가 vault 전체 백업 후 승인한 현재 충돌 14경로를 목록으로 전달해 실행했다고 보고했다. 실행 명령은 `.venv\\Scripts\\python.exe tools/sync_obsidian.py --apply --adopt-identical --resolve-conflicts-from <14-path-list>`이며 exit 0이다. Codex는 이 명령을 재실행하지 않았다.
+
+- 사용자 보고: 88개 파일 기록, vault 총 파일 수 1307→1381. 이 두 카운터의 관계와 최종 managed 개수 차이는 제공된 보고만으로 재구성하지 않는다.
+- 실제 내용 도달 예: `SYNC-OBSIDIAN-BLOCKED-CLAUDE-001.md`, `2026-09-19_감사에대한감사_Codex.md`가 vault에서 확인됐다.
+- 사용자의 `Overview.md` 안 `2026-09-15` 설계 보강 문단이 그대로 보존됐다. 이는 사용자가 백업과 대상 목록을 준비한 뒤 실행한 보존 확인이다.
+- 후속 `--check`: exit 0, **1370 managed files / 0 pending / 0 conflicts**. Obsidian 동기화는 현재 안정 상태다.
+- 다음 문서는 현재 clean check 이후 별도 동기화 주기를 따른다. Codex의 resolver 변경 및 시험은 `549e697`에 있고, 공유 vault를 이 작업에서 별도로 다시 쓰지 않았다.
+
+### 이번 정본 문서화 뒤 Codex read-only 재확인
+
+Codex는 이어서 새 기록·진행판 변경 후 `.venv\\Scripts\\python.exe tools/sync_obsidian.py --check`를 실행했다. 이 checkout의 Git metadata state 기준으로 **7 no-baseline 충돌, exit 1**이 나왔고 파일은 쓰지 않았다. 목록은 전체 진행 현황, Codex 작업 현황, 검증 상태 지도, 이 sync 기록, 이전 sync/SSR 감사 기록, UI-FB 검토 기록, 검증 경계 종합이다. 사용자 이전의 1370/0/0 결과는 그 실행 시점에 대한 유효한 사용자 보고지만, 이후 이 문서 변경까지 반영된 최신 clean 상태라고 확대하지 않는다. 이 7건은 현재 충돌 여부와 사용자 vault의 최신 편집을 확인하기 전에는 새로 덮어쓰지 않는다. 새 check 결과 보고서만 `.work/obsidian-sync-conflicts.json`에 생성됐다.
