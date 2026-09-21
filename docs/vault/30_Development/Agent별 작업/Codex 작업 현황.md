@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.131"
+version: "1.0.132"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T22:33:42+09:00"
+updated: "2026-09-21T23:19:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 미병합 branch의 회귀 가드 5건 재평가·회수
+
+- Claude의 미병합 감사 `0979fe6`을 기준으로 `test_definer_rules.py`, `test_recovery_capability.py`, `test_recovery_drill_record.py`, `test_role_shape.py`, `test_alarm_check.py`를 현재 통합 구현과 각각 대조했다. 무조건 cherry-pick하지 않았다. 기존의 더 현재적인 guard로 대체된 3건은 옮기지 않았고, recovery recording의 현재 빠진 실패 무결성 속성 1건만 통합 DB 시험으로 다시 작성했다. alarm guard는 evaluator 함수가 없는 상태라 적용 불가로 남겼고 알람 기능 자체를 완료로 세지 않았다.
+- 실측 중 definer 정책이 revision 0044에 남아 있고 migration 0045의 `consume_discovery_issue_budget(uuid)`가 빠져 있어 실제 audit baseline이 실패함을 확인했다. 정책을 현 head/digest/grant로 갱신했다. `test_migration_role_guard.py`의 0037 하드코딩도 Alembic current head 비교로 바꿨다.
+- 새 recovery-record 시험은 integrity 실패인데 plausible RPO/RTO 값이 있는 경우 ledger outcome=`failed`, measured RPO/RTO=NULL을 확인한다. 측정치 유무만으로 record하도록 가드를 약화시킨 변형에서 1 failed/exit 1, 복구 후 exact merged SHA `7779d8cf8126f6a17ba41e34bf9ef97282ab3d68`에서 선택 suite 89 passed/0 skipped/0 failed, 1 warning (28.47s). 프로젝트 Python 3.14.6; disposable PostgreSQL 16, owner label 확인·정리 확인. 상세 명령과 분류는 [[2026-09-21_회귀가드회수_Codex]].
+- 현재 CI 미실행. Independent review pending. 다음 별도 기능 카드는 GOV-ALERT-001 evaluator 구현/시험 설계이며, `test_alarm_check.py`만 이식하지 않는다.
 
 ## 2026-09-21 CI 검사 배선, issuer 쿼터 경계, Node 응답 계약
 
