@@ -308,20 +308,14 @@ describe('대시보드(ClusterOverview) 및 RunList/RunDetail 신선도·정직�
         artifactTab?.click();
       });
 
-      // 다운로드 버튼 확인
-      const downloadBtn = container.querySelector('[data-testid="download-artifact-inference_output.dcm"]') as HTMLButtonElement;
-      expect(downloadBtn).not.toBeNull();
-      expect(downloadBtn.textContent).toContain('API 미노출');
-
-      // 클릭 시 브라우저 alert가 아닌 action notice 배너 표출
-      await act(async () => {
-        downloadBtn.click();
-      });
-
-      const notice = container.querySelector('[data-testid="run-action-info-notice"]');
-      expect(notice).not.toBeNull();
-      expect(notice?.getAttribute('role')).toBe('status');
-      expect(notice?.textContent).toContain('서버 아티팩트 파일 스트림 다운로드 API 미노출 상태');
+      // 다운로드 링크(실배선) 확인
+      const downloadAnchor = container.querySelector('[data-testid="download-artifact-inference_output.dcm"]') as HTMLAnchorElement;
+      expect(downloadAnchor).not.toBeNull();
+      expect(downloadAnchor.tagName.toLowerCase()).toBe('a');
+      expect(downloadAnchor.getAttribute('href')).toContain(`/v1/projects/${dummyRuns[0].projectId}/runs/${dummyRuns[0].id}/artifacts/content?path=inference_output.dcm`);
+      expect(downloadAnchor.getAttribute('download')).toBe('inference_output.dcm');
+      expect(downloadAnchor.textContent).toContain('다운로드');
+      expect(downloadAnchor.textContent).not.toContain('API 미노출');
     });
 
     it('취소 요청 실패 시 취소 모달 내부에 cancel-modal-error(role=alert)를 정직하게 표출한다', async () => {

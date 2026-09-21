@@ -178,7 +178,7 @@ describe('화면 결함 5대 부류 치유 트랙 3차: MonacoWorkspaceEditor �
 
       // 1. 상단 안내 및 버튼 라벨 확인
       const topNotice = container.querySelector('[data-testid="editor-unexposed-notice"]');
-      expect(topNotice?.textContent).toContain('인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)');
+      expect(topNotice?.textContent).toContain('인메모리 워크스페이스 에디터 (체크아웃 컨텍스트 미연결)');
 
       const saveBtn = container.querySelector('[data-testid="editor-save-btn"]') as HTMLButtonElement;
       expect(saveBtn.textContent?.trim()).toBe('Save File (Local Sandbox)');

@@ -1153,19 +1153,28 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                       크기: {art.size} · SHA-256: {art.sha}
                     </div>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
+                  <a
+                    href={run.projectId ? getArtifactDownloadUrl(run.projectId, run.id, art.name) : '#'}
+                    download={art.name}
                     data-testid={`download-artifact-${art.name}`}
-                    onClick={() =>
-                      setActionNotice({
-                        type: 'info',
-                        message: `ℹ️ [모의 고지] '${art.name}' (서버 아티팩트 파일 스트림 다운로드 API 미노출 상태)`,
-                      })
-                    }
+                    style={{ textDecoration: 'none' }}
+                    onClick={(e) => {
+                      if (!run.projectId) {
+                        e.preventDefault();
+                        setActionNotice({
+                          type: 'info',
+                          message: `ℹ️ 프로젝트 ID 부재: 커널 아티팩트 다운로드를 위한 프로젝트 컨텍스트가 필요합니다.`,
+                        });
+                      }
+                    }}
                   >
-                    다운로드 (API 미노출)
-                  </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                    >
+                      📥 다운로드
+                    </Button>
+                  </a>
                 </div>
               ))}
             </div>

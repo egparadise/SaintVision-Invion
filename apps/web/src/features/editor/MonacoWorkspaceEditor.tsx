@@ -344,7 +344,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
             </>
           ) : (
             <>
-              ℹ️ <strong>인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)</strong>: 실제 워크스페이스 바이트 영속화는 커널 <code>WorkspaceEditView</code> 계약을 거쳐야 하며, 현재 에디터의 저장·Diff·Git 커밋은 로컬 브라우저 샌드박스 모의 동작입니다.
+              ℹ️ <strong>인메모리 워크스페이스 에디터 (체크아웃 컨텍스트 미연결)</strong>: 실제 워크스페이스 바이트 영속화는 커널 <code>WorkspaceEditView</code> 계약(<code>projectId/runId/checkoutId</code>)을 거쳐 서버에 저장되며, 현재는 체크아웃 컨텍스트가 연결되지 않아 로컬 브라우저 인메모리 버퍼 샌드박스로 동작합니다.
             </>
           )}
         </span>
@@ -461,7 +461,7 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
             title={
               projectId && runId && checkoutId
                 ? '커널 체크아웃 파일 저장 API(POST /v1/projects/.../files)로 전송합니다'
-                : '로컬 인메모리 버퍼에 저장합니다 (백엔드 저장 API 미노출)'
+                : '로컬 인메모리 버퍼에 저장합니다 (체크아웃 컨텍스트 미연결 · 커널 저장 시 runId/checkoutId 필요)'
             }
             data-testid="editor-save-btn"
           >

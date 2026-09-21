@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.82"
+version: "1.0.83"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:30:00+09:00"
+updated: "2026-09-22T01:36:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:30:00+09:00.
+- 확인 기준: 2026-09-22T01:36:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 6대 부류 치유 트랙 11차: 허위 미구현(Class 3) 표기 전수 재감사, 산출물 다운로드 실제 커널 엔드포인트 실배선 및 에디터 컨텍스트 정직화 완결 (`RunDetail.tsx`, `MonacoWorkspaceEditor.tsx`, `dashboard-runlist-freshness-wiring.test.tsx`, `defect-recovery-admin-recovery-editor.test.tsx`, `monaco-workspace-editor-wiring.test.tsx`)**:
+  - **Claude 백엔드 대조 감사 커밋 전면 수용 (`52a3eea4`, `2026-09-22_미구현목록_백엔드대조_남은구현범위_Claude.md`)**:
+    - "없는 기능이라 막아둔 것인데 실은 있는 기능이었으면 지금 화면의 표시는 거짓" 원칙에 입각하여 전수 재감사 실시 (실제 백엔드 라우트 실재 확인, 진짜 누락 0건).
+  - **`RunDetail.tsx` Tab 3 Fallback 아티팩트 다운로드 실배선 및 허위 문구 완전 소거**:
+    - `(run as any).artifacts` fallback 항목의 다운로드 버튼을 실제 커널 다운로드 URL(`getArtifactDownloadUrl(run.projectId, run.id, art.name)`)을 가리키는 `<a>` 태그로 전면 실배선.
+    - 허위 문구 `[모의 고지] ... (서버 아티팩트 파일 스트림 다운로드 API 미노출 상태)` 및 버튼 텍스트 `다운로드 (API 미노출)` 완전 소거 ➔ 정직한 `📥 다운로드` 버튼으로 통일.
+    - 프로젝트 ID 부재 시에만 컨텍스트 필요 인라인 안내 제공.
+  - **`MonacoWorkspaceEditor.tsx` 에디터 저장 라벨 정직화**:
+    - 커널 저장 엔드포인트(`POST /v1/projects/{projectId}/runs/{runId}/checkouts/{checkoutId}/files`)가 이미 실재하므로, 허위의 `(백엔드 저장 API 미노출)` 라벨을 완전 소거.
+    - `(체크아웃 컨텍스트 미연결)`로 정정하여 `runId/checkoutId` 컨텍스트가 없을 때 로컬 인메모리 버퍼 샌드박스로 동작함을 정직하게 고지.
+  - **테스트 및 게이트 검증**:
+    - `tests/dashboard-runlist-freshness-wiring.test.tsx` 등 관련 테스트 단언문을 실배선 및 정직 고지에 맞게 동기화.
+    - Vitest **69개 파일 620/620 passed 100%**, Vite 프로덕션 빌드 exit 0, `check_frontend_integrity.py` 81개 파일 0 violations (PASS), check_contract_bindings PASS, check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_허위미구현소거_및_산출물다운로드_실배선_Gemini]].
+
 
 - **화면 결함 6대 부류 치유 트랙 10차: 백엔드 내구성 시각 필드 3종(stateUpdatedAt, stateAsOf, completedAt) 정직한 UI 실배선 및 신선도 오독 차단 완결 (`RunDetail.tsx`, `RunList.tsx`, `DeveloperStudio.tsx`, `runArtifactObservation.ts`, `runLogObservation.ts`, `response-freshness-wiring.test.tsx`)**:
   - **Codex 백엔드 응답 시각 정합 커밋 전면 수용 (`f1d95466`, `2026-09-22_response_freshness_asof_Codex.md`)**:

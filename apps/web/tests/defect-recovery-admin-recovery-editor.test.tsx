@@ -190,13 +190,13 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const notice = container.querySelector('[data-testid="editor-unexposed-notice"]');
       expect(notice).not.toBeNull();
       expect(notice?.getAttribute('role')).toBe('status');
-      expect(notice?.textContent).toContain('인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)');
-      expect(notice?.textContent).toContain('WorkspaceEditView 계약을 거쳐야 하며');
+      expect(notice?.textContent).toContain('인메모리 워크스페이스 에디터 (체크아웃 컨텍스트 미연결)');
+      expect(notice?.textContent).toContain('WorkspaceEditView 계약');
 
       const saveBtn = container.querySelector('[data-testid="editor-save-btn"]');
       expect(saveBtn).not.toBeNull();
       expect(saveBtn?.textContent).toContain('Save File (Local Sandbox)');
-      expect(saveBtn?.getAttribute('title')).toContain('백엔드 저장 API 미노출');
+      expect(saveBtn?.getAttribute('title')).toContain('체크아웃 컨텍스트 미연결');
     });
   });
 });
