@@ -1,0 +1,16 @@
+{
+  "source": "execution-kernel",
+  "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+  "artifacts": [
+    {
+      "path": "output.json",
+      "checksumSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "byteSize": 1024,
+      "verified": true,
+      "evidenceId": "evd_0123456789ABCDEFGHJKMNPQRS"
+    }
+  ],
+  "count": 1,
+  "verifiedCount": 1,
+  "absentReason": null
+}
