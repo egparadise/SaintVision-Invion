@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.85"
+version: "1.0.86"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T01:47:00+09:00"
+updated: "2026-09-22T02:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,10 +19,21 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T01:47:00+09:00.
+- 확인 기준: 2026-09-22T02:20:00+09:00.
 
-## 세션 랩업: 오늘 밤 화면 결함 치유 10대 축 완결 총괄 및 이어가기
+## 세션 랩업: 시험 방어력 실측 감사 완결, 4대 '유일한 방어(Sole Defense)' 등록부 확립 및 세션 총괄
 
+- **시험 방어력 역방향 실측 감사 (Inverse Mutation & Skip Analysis) 완결**:
+  - 오늘 밤 추가된 핵심 프론트엔드 테스트들이 실제 회귀 결함에 대해 실질적인 방어력(무게)을 지니는지 69개 테스트 파일(622개 테스트) 전수를 대상으로 역방향 실측 감사를 완결했다.
+  - **4대 유일한 방어 (Sole Defense) 등록부 확립 (절대 임의 수정·삭제·약화 불가)**:
+    1. **Sole Defense #1 (쓰기 실배선)**: `MonacoWorkspaceEditor.tsx` 커널 체크아웃 파일 저장(`saveWorkspaceEditView`) 실배선 및 페이로드 계약 단언 (`tests/monaco-workspace-editor-wiring.test.tsx`). 스킵 시 백엔드 미호출 회귀 620/620 passed 무사통과 실증 ➔ 유일 방패 확정.
+    2. **Sole Defense #2 (허위 미구현 소거 & 다운로드 실배선)**: `RunDetail.tsx` Tab 3 Fallback 산출물 다운로드 실제 커널 엔드포인트(`getArtifactDownloadUrl`) `<a>` 링크 및 `download` 속성 단언 (`tests/dashboard-runlist-freshness-wiring.test.tsx`). 스킵 시 'API 미노출' 버튼 격하 회귀 621/621 passed 무사통과 실증 ➔ 유일 방패 확정.
+    3. **Sole Defense #3 (시간 신선도 한정 고지 & 스냅샷 왜곡 차단)**: `RunDetail.tsx` Tab 5 `ShardObservation.stateAsOf` "단일 공통 스냅샷이나 조회 시각이 아닙니다" 정직 고지 및 왜곡 부인 단언 (`tests/response-freshness-wiring.test.tsx`). 스킵 시 비동기 샤드 시각의 단일 스냅샷 사칭 왜곡 621/621 passed 무사통과 실증 ➔ 유일 방패 확정.
+    4. **Sole Defense #4 (대시보드 노드 장애 은폐 차단)**: `ClusterOverview.tsx` 노드 0대 동기화 실패 시 정상 0대 빈 상태 둔갑 차단 및 `cluster-overview-fetch-error(role=alert)` 표출 단언 (`tests/dashboard-runlist-freshness-wiring.test.tsx`). 스킵 시 에러 은폐 회귀 621/621 passed 무사통과 실증 ➔ 유일 방패 확정.
+  - **다층 중복 방어 (Multi-layered Defense) 식별 및 안전망 보존**:
+    - 과거 캐시 보유 중 동기화 실패 경고(`cluster-stale-warning`, `run-stale-warning`): 대시보드 맥락과 시간 진실성 축(`truth-time-and-freshness-axis.test.tsx`) 양쪽에서 2중 교차 방어 확인.
+    - 브라우저 `alert()` 원천 차단: 정적 분석 CI 게이트(`check_frontend_integrity.py` Rule 4)와 동적 렌더링 DOM 배너 단언의 정적·동적 2계층 방어 확인. 중복 방어는 결코 낭비가 아니므로 전원 보존.
+  - 보고서: [[2026-09-22_시험방어력_실측감사_유일방어목록_Gemini]].
 - **오늘 밤 완결된 화면 10대 치유 축**:
   1. **합성 제거 (Anti-Synthesis)**: `mlopsEngine.ts` 가짜 모델 계보 제거, `StorageObservationView` 임의 healthy 합성 금지, `RunDetail.tsx` 가짜 SSE 로그 날조 제거, `DeveloperStudio.tsx` fallback runId 및 현재 시각 합성 전소.
   2. **죽은 방어 살리기 (0-Call Without Basis)**: 필수 인자(`tenantId`, `activeRunId`, 승인 토큰) 부재 시 네트워크 호출 0회 차단 (`ResourceExplorer`, `WebTerminal`, `ModelLineageView`, `DeveloperStudio`).
@@ -45,6 +56,22 @@ source_of_truth: "Git"
   - 보고서: [[2026-09-22_오늘밤_화면결함치유_10대축_총괄정리_및_이어가기_Gemini]].
 
 ## 최근 확인한 진척
+
+- **화면 결함 치유 트랙 13차: 시험 방어력 실측 감사 완결 및 4대 '유일한 방어(Sole Defense)' 등록부 확립 (69개 파일 622개 테스트 실측 감사)**:
+  - **사용자 지침 수용**: 오늘 밤 추가된 핵심 프론트엔드 테스트들이 실제 회귀 결함에 대해 실질적인 방어력(무게)을 지니는지 역방향 실측 감사(결함 주입 후 테스트를 스킵하여 타 시험의 대체 방어 여부 판별)를 완결.
+  - **4대 유일한 방어 (Sole Defense) 실증 및 등록부 확립 (절대 임의 수정·삭제·약화 불가)**:
+    1. **Sole Defense #1 (MonacoWorkspaceEditor 커널 저장 실배선)**: `saveWorkspaceEditView` API 호출 생략 및 로컬 가짜 성공 반환 결함(Defect D1) 주입 후 P6-A/B 스킵 시 전체 69개 파일 620/620 passed 100% 통과 실증 ➔ 테스트 복원 시 즉시 사살(Killed). 에디터 저장 실배선의 유일 방패로 등록.
+    2. **Sole Defense #2 (RunDetail 산출물 다운로드 실배선 및 허위 미구현 방지)**: Tab 3 아티팩트 다운로드 실제 `<a>` 링크(`getArtifactDownloadUrl`)를 'API 미노출' 버튼으로 회귀(Defect D2) 주입 후 P19 스킵 시 전체 69개 파일 621/621 passed 100% 통과 실증 ➔ 테스트 복원 시 `expected button to be a`로 즉시 사살(Killed). 산출물 다운로드 실배선의 유일 방패로 등록.
+    3. **Sole Defense #3 (ShardObservation stateAsOf 시간 왜곡 차단 및 한정 고지)**: Tab 5 샤드 시각의 "단일 공통 스냅샷이나 조회 시각이 아닙니다"를 "단일 공통 스냅샷입니다"로 왜곡(Defect D3) 주입 후 Section 2 스킵 시 전체 69개 파일 621/621 passed 100% 통과 실증 ➔ 테스트 복원 시 즉시 사살(Killed). 시간 진실성 의미론의 유일 방패로 등록.
+    4. **Sole Defense #4 (ClusterOverview 노드 장애 은폐 차단)**: 노드 0대 통신 실패 시 에러 배너를 우회하고 정상 0대 빈 상태로 둔갑(Defect D4) 주입 후 P13-16 스킵 시 전체 69개 파일 621/621 passed 100% 통과 실증 ➔ 테스트 복원 시 `expected null not to be null`로 즉시 사살(Killed). 대시보드 장애 은폐 차단의 유일 방패로 등록.
+  - **다층 중복 방어 (Multi-layered Defense) 식별**:
+    - 과거 캐시 보유 중 동기화 실패 경고(`cluster-stale-warning`, `run-stale-warning`): 대시보드 개요 맥락과 시간 축(`truth-time-and-freshness-axis.test.tsx`) 맥락에서 2중 교차 방어 확인.
+    - 브라우저 `alert()` 원천 소거: CI 게이트(`check_frontend_integrity.py` Rule 4)와 DOM 렌더링 배너 단언의 정적·동적 2계층 방어 확인. 중복 방어는 다층 안전망이므로 일체 삭제하지 않고 보존.
+  - **테스트 및 게이트 통과**:
+    - `check_frontend_integrity.py`: 81개 파일 전수 통과 (**0 violations**, All 7 integrity rules satisfied).
+    - `check_contract_bindings.py`: 36 fixtures / 12 serving anchors PASS.
+    - Vitest **69개 파일 622/622 passed 100%**, Vite 프로덕션 빌드 exit 0.
+  - 보고서: [[2026-09-22_시험방어력_실측감사_유일방어목록_Gemini]].
 
 - **화면 결함 6대 부류 치유 트랙 12차: 화면 정직성 스캐너 7대 규칙 확장, 구조적 한계(7~9) 명시 및 4대 돌연변이 양방향 실측 사살 완결 (`check_frontend_integrity.py`, `DeveloperStudio.tsx`, `화면_개발_정직성_지침_및_사례집.md`)**:
   - **사용자 지침 수용**: 신선도(Time Freshness) 및 허위 미구현(False Unimplemented) 신규 결함 부류를 정적 스캐너 규칙으로 승격하고, 정적 규칙으로 검증 불가능한 영역(시각 참값, 백엔드 라우트 실재성, 수명주기 가드 vs 미구현)을 9대 구조적 한계로 명확히 분리 확립.
