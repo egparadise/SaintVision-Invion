@@ -96,7 +96,7 @@ def test_retirement_during_read_prevents_commit(registered_runtime,monkeypatch):
         retire(a)
         return result
     monkeypatch.setattr(provider,method,read)
-    with pytest.raises(DomainError):freeze(a)
+    with pytest.raises(DomainError, match="MODEL-0001"):freeze(a)  # code confirmed vs real PG (ZZPROBE)
     with a.e.db.transaction(a.e.tenant) as c:
         assert not c.execute('SELECT 1 FROM inv.model_runtime_inputs WHERE run_id=%s',(a.target,)).fetchone()
 
@@ -130,12 +130,12 @@ def test_policy_change_after_approval_prevents_claim(registered_runtime,policy):
     a=registered_runtime
     g=authorize(a)
     a.e.db.registry_binding_policy=None if policy=='removed' else RegistryBindingPolicy('execution:2',a.policy.allowed)
-    with pytest.raises(DomainError):claim(g)
+    with pytest.raises(DomainError, match="MODEL-0008"):claim(g)  # code confirmed vs real PG (ZZPROBE)
 
 
 def test_configured_policy_requires_registry_identity(registered_runtime):
     a=registered_runtime
-    with pytest.raises(DomainError):
+    with pytest.raises(DomainError, match="MODEL-0008"):  # code confirmed vs real PG (ZZPROBE)
         a.runtime_store.prepare(a.principal,a.e.project,a.target,a.raw_workload,a.runtime_proofs,key='missing')
 
 
@@ -144,5 +144,5 @@ def test_enabling_policy_cannot_replay_legacy_freeze(registered_runtime):
     a.e.db.registry_binding_policy=None
     a.runtime_store.prepare(a.principal,a.e.project,a.target,a.raw_workload,a.runtime_proofs,key='legacy')
     a.e.db.registry_binding_policy=a.policy
-    with pytest.raises(DomainError):
+    with pytest.raises(DomainError, match="MODEL-0008"):  # code confirmed vs real PG (ZZPROBE)
         a.runtime_store.prepare(a.principal,a.e.project,a.target,a.raw_workload,a.runtime_proofs,key='legacy')

@@ -76,15 +76,25 @@ def test_replay_checks_revoked_project_permission(registered):
     bind(a)
     with psycopg.connect(a.e.owner) as c:
         c.execute('UPDATE inv.project_grants SET can_request=false WHERE project_id=%s', (a.e.project,))
-    with pytest.raises(DomainError):
+    # Revoking can_request refuses via AUTH-0030 (permission), not a manifest code; confirmed
+    # against real PostgreSQL. Pinned so a regression that refused for the wrong reason (or a
+    # different DomainError) can no longer pass as "permission replay checked".
+    with pytest.raises(DomainError, match="AUTH-0030"):
         bind(a)
 
 
 def test_no_hash_or_version_name_fallback(registered):
     a = registered
-    for kwargs in [dict(registry_version_id=new_id('model_version')), dict(manifest_hash='0'*64),
-                   dict(principal=Principal(a.e.other, a.principal.subject_id))]:
-        with pytest.raises(DomainError):
+    # Per-case codes confirmed against real PostgreSQL: a wrong registry version id and a wrong
+    # manifest hash both refuse via MODEL-0001 (manifest/bytes unavailable), but a foreign-tenant
+    # principal refuses via AUTH-0030 (permission). A bare raises(DomainError) let an
+    # authorization refusal masquerade as a manifest refusal (and vice versa); pin each cause.
+    for kwargs, expected in [
+        (dict(registry_version_id=new_id('model_version')), 'MODEL-0001'),
+        (dict(manifest_hash='0'*64), 'MODEL-0001'),
+        (dict(principal=Principal(a.e.other, a.principal.subject_id)), 'AUTH-0030'),
+    ]:
+        with pytest.raises(DomainError, match=expected):
             bind(a, **kwargs)
 
 
@@ -99,7 +109,9 @@ def test_changed_policy_cannot_rewrite_binding(registered):
 def test_disallowed_manifest_policy_cannot_bind(registered):
     a = registered
     a.bindings = ModelRegistryBindingStore(a.e.db, RegistryBindingPolicy('deny', frozenset({('other','other')})))
-    with pytest.raises(DomainError):
+    # A deny policy refuses via MODEL-0001 (confirmed against real PostgreSQL); pinned so the
+    # refusal cannot be satisfied by an unrelated DomainError.
+    with pytest.raises(DomainError, match="MODEL-0001"):
         bind(a)
 
 
@@ -150,7 +162,9 @@ def test_retirement_invalidates_a_previously_successful_binding(registered):
     bind(a)
     with psycopg.connect(a.e.owner) as c:
         c.execute("UPDATE public.model_versions SET stage='retired' WHERE model_version_id=%s", (a.registry_version,))
-    with pytest.raises(DomainError):
+    # Retiring the registry version invalidates re-binding via MODEL-0001 (confirmed against real
+    # PostgreSQL); pinned so retirement cannot be "checked" by any other DomainError.
+    with pytest.raises(DomainError, match="MODEL-0001"):
         bind(a)
 
 
