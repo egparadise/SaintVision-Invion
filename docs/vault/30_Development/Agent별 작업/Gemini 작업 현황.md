@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.53"
+version: "1.0.54"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T17:40:00+09:00"
+updated: "2026-09-21T17:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,16 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T17:40:00+09:00.
+- 확인 기준: 2026-09-21T17:55:00+09:00.
 
 ## 최근 확인한 진척
+
+- **RunResultView 및 RunArtifactList 커널 공유 Fixture 프론트엔드 계약 결속 및 Ajv 검증 완결 (`apps/web/tests/fixtures/run-result.ts`, `apps/web/tests/run-result-contract.test.ts`, `apps/web/tests/developer-studio-dom.test.tsx`)**:
+  - Claude가 인계한 커널 계약 공유 픽스처(`run-result-view.json`, `run-artifact-list.json`)를 프론트엔드에 전면 결속.
+  - `run-result-contract.test.ts` (4 tests 신설): `contracts/v1alpha1/core.schema.json`의 `$defs/RunResultView` 및 `$defs/RunArtifactList`를 Ajv 2020으로 검증하고 필수 필드(`output`, `artifacts`) 제거 시 검증 실패 단언(양방향 실측 확인).
+  - `developer-studio-dom.test.tsx`: `sampleFallbackArtifactList` 및 `result200`을 공유 픽스처 기반으로 교체하여 **Mock == Contract** 달성 (18 DOM tests 100% 통과 유지).
+  - 검증 실적: Vitest 42개 파일 **389/389 passed 100%** (from 385 to 389, net +4 tests), Vite 프로덕션 빌드 3.57s 클린, Pytest 34 passed, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]].
 
 - **VF-GM-03 inv:// File Explorer 네임스페이스 탐색, 실측 SHA-256 무결성 검증, 삼태 상태 분리, 신규 실패 은폐 제거, 복제본 저하 감지 및 생존 노드 기반 정직한 복구 가드 완결 (`apps/web/src/features/desktop/InvFileExplorer.tsx`, `DesktopShell.tsx`, `apps/web/tests/inv-file-explorer-dom.test.tsx`)**:
   - **4대 네임스페이스 탐색**: `inv://models`, `inv://datasets`, `inv://workspaces`, `inv://artifacts` 주소 표시줄 내비게이션, 주소 직접 입력 이동, 퀵 네비게이션 버튼 및 빈 상태(`등록된 파일이 없습니다.`) 무결 렌더링.
