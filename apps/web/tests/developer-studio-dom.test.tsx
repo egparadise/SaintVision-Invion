@@ -4,7 +4,19 @@ import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import * as client from '../src/shared/api/client';
-import type { ProjectItem, RunItem } from '../src/contracts/types';
+import type { ProjectItem, RunItem, NodeStopReceipt } from '../src/contracts/types';
+
+const sampleReceipt: NodeStopReceipt = {
+  receiptId: 'rcp_fb03',
+  runId: 'run_fb03',
+  nodeId: 'nod_01JABCDEF01',
+  commandId: 'cmd_01',
+  exitCode: 0,
+  physicallyStopped: true,
+  resourceReclaimed: true,
+  verified: true,
+  stoppedAt: '2026-09-21T10:00:05Z',
+};
 
 const sampleProject: ProjectItem = {
   id: 'prj_test_fb03',
@@ -614,9 +626,82 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
 
     // MUST NOT call /artifacts when /result fails with 401
     expect(artifactsCalls).toBe(0);
+    // User must be alerted of authorization failure; stale cache MUST NOT be downloaded
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (NET-401): User session expired or invalid token')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('Download Scenario 2: 500 Internal Server Error during download probe -> NO fallback to /artifacts (0 calls)', async () => {
+  it('Download Scenario 1b: 403 Forbidden during download probe -> NO fallback to /artifacts, alerts user, NO silent cache download', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const err403 = {
+      problem: {
+        status: 403,
+        code: 'SEC-403',
+        title: 'Forbidden',
+        detail: 'Insufficient permissions to export artifacts',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw err403;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        return sampleFallbackArtifactList as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(artifactsCalls).toBe(0);
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (SEC-403): Insufficient permissions to export artifacts')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+  });
+
+  it('Download Scenario 2: 500 Internal Server Error during download probe -> NO fallback to /artifacts (0 calls), alerts user, NO silent cache download', async () => {
     let artifactsCalls = 0;
     let initialMount = true;
     const err500 = {
@@ -678,9 +763,13 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (NET-500): Database connection failed')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('Download Scenario 3: Network rejection during download probe -> NO fallback to /artifacts (0 calls)', async () => {
+  it('Download Scenario 3: Network rejection during download probe -> NO fallback to /artifacts (0 calls), alerts user, NO silent cache download', async () => {
     let artifactsCalls = 0;
     let initialMount = true;
     const errNetwork = new Error('Network request failed');
@@ -735,9 +824,13 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (ERR): Network request failed')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('Download Scenario 4: App-level 404 (RES-RUN-404) during download probe -> STRICTLY NO fallback to /artifacts (0 calls)', async () => {
+  it('Download Scenario 4: App-level 404 (RES-RUN-404) during download probe -> STRICTLY NO fallback to /artifacts (0 calls), alerts user, NO silent cache download', async () => {
     let artifactsCalls = 0;
     let initialMount = true;
     const errApp404 = {
@@ -799,9 +892,13 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     });
 
     expect(artifactsCalls).toBe(0);
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('산출물 검증 및 다운로드 요청 실패 (RES-RUN-404): Specified run does not exist or has been purged')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('Download Scenario 5: Route-only 404 (detail=Not Found) during download probe -> triggers fallback to /artifacts (1 call)', async () => {
+  it('Download Scenario 5: Route-only 404 (detail=Not Found) during download probe -> triggers fallback to /artifacts (1 call) and downloads manifest', async () => {
     let artifactsCalls = 0;
     let initialMount = true;
     const errRoute404 = {
@@ -862,6 +959,240 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
 
     // Route-only 404 must trigger fallback to /artifacts exactly once
     expect(artifactsCalls).toBe(1);
+    expect(window.alert).not.toHaveBeenCalled();
+    expect(window.URL.createObjectURL).toHaveBeenCalled();
+  });
+
+  it('Download Scenario 6: Route-only 404 but legacy fallback ALSO fails -> alerts user, NO silent cache download', async () => {
+    let artifactsCalls = 0;
+    let initialMount = true;
+    const errRoute404 = {
+      problem: {
+        status: 404,
+        detail: 'Not Found',
+      },
+    };
+    const errFallback500 = {
+      problem: {
+        status: 500,
+        detail: 'Storage volume unmounted',
+      },
+    };
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        if (initialMount) {
+          return result200 as any;
+        }
+        throw errRoute404;
+      }
+      if (endpoint.endsWith('/artifacts')) {
+        artifactsCalls++;
+        throw errFallback500;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    initialMount = false;
+    artifactsCalls = 0;
+
+    const downloadBtn = container.querySelector('[data-testid="artifact-meta-download-btn"]') as HTMLButtonElement;
+    expect(downloadBtn).not.toBeNull();
+    expect(downloadBtn.disabled).toBe(false);
+
+    await act(async () => {
+      downloadBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    expect(artifactsCalls).toBe(1);
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('레거시 아티팩트 목록 조회 실패: Storage volume unmounted')
+    );
+    expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+  });
+
+  it('Receipt Scenario 1: Missing receipt in liveRun and /result -> triggers alert, modal & reclaim notice NOT rendered', async () => {
+    const { stopReceipt: _unused, ...noReceiptResult } = result200;
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        return noReceiptResult as any; // stopReceipt is strictly undefined
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any; // stopReceipt is undefined
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    const inspectBtn = container.querySelector('[data-testid="inspect-receipt-btn"]') as HTMLButtonElement;
+    expect(inspectBtn).not.toBeNull();
+    expect(inspectBtn.disabled).toBe(false);
+
+    await act(async () => {
+      inspectBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // Alert must be called with failure explanation
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining('물리 정지 영수증(NodeStopReceipt) 조회 실패')
+    );
+
+    // Modal and fake reclaim notice must NOT be rendered
+    expect(container.querySelector('[data-testid="receipt-modal"]')).toBeNull();
+    expect(container.querySelector('[data-testid="reclaim-notice-banner"]')).toBeNull();
+  });
+
+  it('Receipt Scenario 2: Valid receipt in /result -> opens receipt-modal and renders reclaim-notice-banner', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        return {
+          ...result200,
+          stopReceipt: sampleReceipt,
+        } as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    await act(async () => {
+      root.render(
+        <DeveloperStudio
+          project={sampleProject}
+          nodes={[]}
+          runs={[sampleRun]}
+          initialStep={4}
+          initialRunId="run_fb03"
+        />
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    const inspectBtn = container.querySelector('[data-testid="inspect-receipt-btn"]') as HTMLButtonElement;
+    expect(inspectBtn).not.toBeNull();
+
+    await act(async () => {
+      inspectBtn.click();
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    // Modal and reclaim notice must be rendered
+    expect(container.querySelector('[data-testid="receipt-modal"]')).not.toBeNull();
+    const banner = container.querySelector('[data-testid="reclaim-notice-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다');
+  });
+
+  it('Raw File Download Scenario: Server failure during raw download -> triggers honest alert, no fake local content synthesized', async () => {
+    vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+      if (endpoint.endsWith('/result')) {
+        return result200 as any;
+      }
+      if (endpoint.includes('/workspaces')) {
+        return { projectId: sampleProject.id, workspaces: [] } as any;
+      }
+      if (endpoint.includes('/runs/')) {
+        return sampleRun as any;
+      }
+      return {} as any;
+    });
+
+    // Mock global fetch to simulate 500 error
+    const originalFetch = window.fetch;
+    window.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+    } as any);
+
+    try {
+      await act(async () => {
+        root.render(
+          <DeveloperStudio
+            project={sampleProject}
+            nodes={[]}
+            runs={[sampleRun]}
+            initialStep={4}
+            initialRunId="run_fb03"
+          />
+        );
+      });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+
+      const rawDownloadBtn = container.querySelector('[data-testid="artifact-raw-download-btn"]') as HTMLButtonElement;
+      expect(rawDownloadBtn).not.toBeNull();
+      expect(rawDownloadBtn.disabled).toBe(false);
+
+      await act(async () => {
+        rawDownloadBtn.click();
+      });
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+
+      // Honest alert must be invoked
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('산출물 파일 바이트 다운로드 실패: HTTP 500: Internal Server Error')
+      );
+      // createObjectURL should NOT have been called to synthesize a fake blob from local file
+      expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+    } finally {
+      window.fetch = originalFetch;
+    }
   });
 });
 
