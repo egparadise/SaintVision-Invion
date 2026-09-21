@@ -22,6 +22,7 @@ from saintvision.db.session import tenant_scope
 from saintvision.errors import InvError
 from saintvision.ids import new_id
 from saintvision.services import replica_repair
+from saintvision.services import nodes as node_service
 
 pytestmark = pytest.mark.postgres
 
@@ -219,6 +220,47 @@ def test_a_departed_node_marks_its_copies_stale_and_keeps_the_location(
                     {"l": location["location_id"]},
                 ).scalar_one()
                 assert still == 1
+
+
+def test_liveness_sweep_marks_departed_node_replicas_stale(
+    owner_engine, app_sessionmaker, location
+):
+    """The product loss path must invoke replica repair, not only the helper."""
+    _add_replica(owner_engine, location, 0, "ready")
+    with owner_engine.begin() as c:
+        c.execute(
+            text(
+                "UPDATE nodes SET enrolled_at=:old, last_heartbeat_at=:old "
+                "WHERE node_id=:n"
+            ),
+            {
+                "old": NOW - dt.timedelta(minutes=2),
+                "n": location["nodes"][0],
+            },
+        )
+
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, location["tenant_a"]):
+                assert node_service.mark_lost_nodes(
+                    session,
+                    tenant_id=location["tenant_a"],
+                    now=NOW,
+                    timeout_seconds=60,
+                ) == 1
+
+    with owner_engine.connect() as c:
+        row = c.execute(
+            text(
+                "SELECT n.status, r.state "
+                "FROM nodes n JOIN data_replicas r ON r.node_id=n.node_id "
+                "WHERE n.node_id=:n AND r.replica_id IN "
+                "(SELECT replica_id FROM data_replicas WHERE node_id=:n)"
+            ),
+            {"n": location["nodes"][0]},
+        ).one()
+    assert row[0] == "lost"
+    assert row[1] == "stale"
 
 
 def test_node_loss_on_a_pinned_replica_keeps_the_pin(owner_engine, app_sessionmaker, location):
