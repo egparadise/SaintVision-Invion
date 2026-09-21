@@ -1,7 +1,7 @@
 ---
 doc_id: "FUNNEL-REMAINDER-PG-ONLY-CLAUDE-001"
 title: "파라미터 funnel 잔여 — PG 전용 항목 처리(ZZPROBE 실측). Linux 필요 항목 분리·인계"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
@@ -73,6 +73,38 @@ v1.0.0에서 "exit 4 = 수집/usage 오류, 별도 조사 필요, Linux 아님�
 실제 파일은 **PG 불필요**(postgres 마커·psycopg 없음, core 테스트). provenance 래핑 모드로 실행해 확인: `env_gates postgres_dsn=absent / as-of at check invocation`, **7 passed exit 0**. parametrized 5-case(`missing→MODEL-0008`, 그 외→`MODEL-0001`)는 이미 per-case match가 있었고, **bare funnel은 L48 하나**(`test_registered_input_does_not_survive_missing_operator_policy`)뿐이었다. ZZPROBE로 실제 코드 `MODEL-0008: Configured policy and exact registry binding required` 확정 → `match="MODEL-0008"` 적용, 재실행 7 passed. bare raises 잔여 0.
 
 **분류 정정**: 이 항목은 "미확정/조사 필요"가 아니라 **PG-free core, 처리 완료**다. Linux 필요 아님. (실행 시점 환경이 보고에 자동 기록됨 — 오늘 고친 wrap 모드의 첫 실사용.)
+
+## v1.2.0 — model_commit·model_locality per-case funnel (ZZPROBE, 양방향 돌연변이)
+binding·runtime에 이어 PG-only 계열 2파일을 더 처리했다. 이번엔 funnel이 **@parametrize 테스트에 박혀 case별로 코드가 섞여** 있어(uniform이면 거짓 실패), case별 `expected` 매핑으로 붙였다. 실 PG(내 라벨 `svcx01-funnel3`)로 ZZPROBE→적용→재실행, 그리고 **양방향 돌연변이로 판정**(한 case 기대코드만 틀리게 → 그 case만 깨짐).
+
+**`test_model_commit.py`** (4 funnel → 17 passed):
+| 위치 | case | 실측 코드 |
+|---|---|---|
+| caller_verified(corrupt bytes) | 단일 | MODEL-0001 |
+| authority_and_catalog[fault] | cancel/version/location/contribution/lost-node | MODEL-0001 |
+| " | **grant** | **AUTH-0030** |
+| " | **lease** | **LEASE-0002** |
+| " | **epoch** | **LEASE-0004** |
+| stale_or_missing_fence[False/True] | 둘 다 | LEASE-0002 |
+| manifest_rls(store.get 타 tenant) | 단일 | AUTH-0030 |
+
+**`test_model_locality.py`** (4 funnel → 26 passed):
+| 위치 | case | 실측 코드 |
+|---|---|---|
+| manifest_verified[corrupt/truncated/missing/budget] | 4종 | MODEL-0001 |
+| changed_authority[expired/future] | | MODEL-0005 |
+| " | location/root/offline | MODEL-0001 |
+| " | **membership** | **RES-0003** |
+| " | **grant** | **AUTH-0030** |
+| " | **scope/size** | **AUTH-0011** |
+| atomic_binding(주입) | 단일 | MODEL-0005(주입값) |
+| bound_input(outsider) | 단일 | AUTH-0030 |
+
+**고가치**: bare `raises(DomainError)`가 authority[8]·changed_authority[9]에서 **인가(AUTH-0030/0011)·리스(LEASE-000x)·멤버십(RES-0003)·모델(MODEL-000x) 거부를 한 funnel로 뭉갰다** — 한 원인의 회귀가 다른 원인으로 위장 통과할 수 있었다. per-case로 못 박음.
+
+**판정(양방향 돌연변이, 실측)**: grant 기대코드를 `AUTH-0030→ZZ-9999`로 바꾸니 **grant case만 실패(1 failed, 7 passed)**; membership을 `RES-0003→ZZ-9999`로 바꾸니 **membership만 실패(1 failed, 8 passed)**. 전부/아무것도 아니므로 case별로 매칭이 작동함을 확증. 원복 후 43 passed. `.venv`, 파이프 없이 exit, Docker baseline 48/79/11 복원, 보호 컨테이너 미접촉.
+
+**남은 PG-only funnel**(같은 방법, 다음): test_control_api·test_approvals·test_containment·test_dispatch_queue·test_model_registry_revalidation·test_lan_bootstrap 등.
 
 ## 인계
 tests/는 Claude 소유라 직접 처리. reviewer: Codex — 특히 binding L87 per-case 분할의 코드 매핑(AUTH-0030 vs MODEL-0001)이 소스와 정합하는지, 남은 PG-only funnel을 같은 방법으로 이어갈지 경계 검토. apps/web 미접촉.

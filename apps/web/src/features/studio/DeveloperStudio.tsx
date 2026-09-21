@@ -449,21 +449,36 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
             exportedAt: res.completedAt || new Date().toISOString(),
             fallbackUsed: false,
           };
+          setArtifactData(serverPayload);
+        } else {
+          alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
+          return;
         }
       } catch (err: any) {
         if (isRouteNotFoundError(err)) {
           try {
             const fallback = await apiClient<RunArtifactList>(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts`);
-            if (fallback) {
+            const fallbackAny = fallback as any;
+            if (fallback && (fallbackAny.outputHash || (fallback.artifacts && fallback.artifacts.length > 0) || fallbackAny.items?.length > 0)) {
               serverPayload = { ...fallback, fallbackUsed: true };
+              setArtifactData(serverPayload);
+            } else {
+              alert('레거시 산출물 목록이 비어 있거나 산출물을 찾을 수 없습니다.');
+              return;
             }
-          } catch {
-            // Fallback failed
+          } catch (fallbackErr: any) {
+            const fbMsg = fallbackErr?.problem?.detail || fallbackErr?.message || '레거시 경로 조회 실패';
+            alert(`레거시 아티팩트 목록 조회 실패: ${fbMsg}`);
+            return;
           }
+        } else {
+          const errMsg = err?.problem?.detail || err?.message || `HTTP ${err?.problem?.status || err?.status || '오류'}`;
+          alert(`산출물 검증 및 다운로드 요청 실패 (${err?.problem?.code || err?.code || 'ERR'}): ${errMsg}`);
+          return;
         }
       }
 
-      const effectivePayload = serverPayload || artifactData;
+      const effectivePayload = serverPayload;
 
       if (!effectivePayload || !effectivePayload.outputHash) {
         alert('서버로부터 유효한 실행 결과 아티팩트를 수신하지 못했습니다. (실행 진행 중이거나 산출물이 아직 생성되지 않았습니다)');
@@ -547,17 +562,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact File] Raw file bytes downloaded for '${filePath}' (${blob.size.toLocaleString()} Bytes)` },
       ]);
     } catch (err: any) {
-      console.error('Raw artifact download failed, falling back to local cached content:', err);
-      const fileObj = files.find((f) => f.path === filePath) || activeFile;
-      const blob = new Blob([fileObj.content], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      console.error('Raw artifact download failed:', err);
+      alert(`산출물 파일 바이트 다운로드 실패: ${err?.message || '서버 오류'}`);
     } finally {
       setIsDownloadingArtifact(false);
     }
@@ -615,7 +621,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         receipt = liveRun.stopReceipt as NodeStopReceipt;
       }
       if (!receipt && activeRunId) {
-        const prjId = selectedProject?.id || 'prj_01JABCDE';
+        const prjId = selectedProjectId;
         try {
           const resultRes = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${activeRunId}/result`);
           if (resultRes?.stopReceipt) {
@@ -625,9 +631,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           // Result not yet available or receipt not present in ResultView
         }
       }
-      setSelectedReceipt(receipt);
-      setReceiptModalOpen(true);
-      setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
+      if (receipt) {
+        setSelectedReceipt(receipt);
+        setReceiptModalOpen(true);
+        setReclaimNotice('✓ 분산 노드로부터 NodeStopReceipt 수신을 확인하고 Lease 자원을 회수하였습니다. (ADR-040/041)');
+      } else {
+        setSelectedReceipt(null);
+        alert(`물리 정지 영수증(NodeStopReceipt) 조회 실패: 해당 실행(${activeRunId || '미지정'})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`);
+      }
     } catch (err: any) {
       console.warn('Failed to fetch NodeStopReceipt:', err);
       const errMsg = err?.detail || err?.message || 'RES-RECEIPT-404';
@@ -1870,6 +1881,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="secondary"
                   size="sm"
+                  data-testid="inspect-receipt-btn"
                   onClick={() => handleInspectReceipt(`rcp_${activeRunId || '01JABCDEF'}`)}
                   disabled={isLoadingReceipt}
                 >
@@ -1908,6 +1920,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
             {reclaimNotice && (
               <div
+                data-testid="reclaim-notice-banner"
                 style={{
                   marginTop: '12px',
                   padding: '8px 12px',
@@ -2069,6 +2082,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="primary"
                   size="sm"
+                  data-testid="artifact-raw-download-btn"
                   onClick={() => handleDownloadRawFile()}
                   disabled={isDownloadingArtifact || isLoadingArtifact || currentRun?.state === 'running' || !artifactData?.outputHash}
                   title="실행 커널이 생성한 실제 산출물 파일 바이트를 다운로드합니다"
@@ -2458,6 +2472,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       {receiptModalOpen && selectedReceipt && (
         <div
           role="dialog"
+          data-testid="receipt-modal"
           aria-labelledby="receipt-title"
           aria-modal="true"
           style={{

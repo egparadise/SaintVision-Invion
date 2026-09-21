@@ -125,7 +125,8 @@ def test_manifest_verified_flag_cannot_replace_current_bytes(locality, kind):
         a.verifier.max_read_bytes = 1
     else:
         (a.root / "data.bin").write_bytes(b"corrupt data" if kind == "corrupt" else b"cut")
-    with pytest.raises(DomainError):
+    # corrupt/truncated/missing/budget all fail the byte re-check as MODEL-0001 (ZZPROBE, real PG).
+    with pytest.raises(DomainError, match="MODEL-0001"):
         reserve(a)
     no_reservation(a)
 
@@ -156,7 +157,14 @@ def test_changed_authority_or_observation_cannot_reserve(locality, kind):
         }
         with psycopg.connect(a.e.owner) as c:
             c.execute(queries[kind], (a.e.tenant,))
-    with pytest.raises(DomainError):
+    # Per-kind refusal codes confirmed vs real PG (ZZPROBE): a stale/future observation is MODEL-0005,
+    # a revoked grant AUTH-0030, a dropped membership RES-0003, an out-of-scope/oversize request
+    # AUTH-0011; location/root/offline version bumps re-check the model (MODEL-0001). A bare raises
+    # conflated authorization, lease-window, membership and model refusals into one.
+    expected = {"expired": "MODEL-0005", "future": "MODEL-0005", "location": "MODEL-0001",
+                "root": "MODEL-0001", "membership": "RES-0003", "grant": "AUTH-0030",
+                "offline": "MODEL-0001", "scope": "AUTH-0011", "size": "AUTH-0011"}
+    with pytest.raises(DomainError, match=expected[kind]):
         reserve(a, measured)
     no_reservation(a)
 
@@ -169,7 +177,9 @@ def test_atomic_binding_failure_rolls_back_lease_ledger_and_outbox(locality, mon
         raise DomainError("MODEL-0005", "Injected binding failure")
 
     monkeypatch.setattr(LocalModelObservation, "bind", fail)
-    with pytest.raises(DomainError):
+    # The injected bind failure is MODEL-0005 (the fail() above raises it); pin it so the rollback
+    # assertions below cannot be reached by some other DomainError.
+    with pytest.raises(DomainError, match="MODEL-0005"):
         reserve(a, measured)
     no_reservation(a)
     with a.e.db.transaction(a.e.tenant) as c:
@@ -332,7 +342,8 @@ def test_bound_input_is_immutable_tenant_scoped_and_cannot_be_replaced(locality)
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         with a.e.db.transaction(a.e.tenant) as c:
             c.execute("DELETE FROM inv.model_run_inputs WHERE run_id=%s", (a.target,))
-    with pytest.raises(DomainError):
+    # An outsider principal is refused as AUTH-0030 (permission), confirmed vs real PG (ZZPROBE).
+    with pytest.raises(DomainError, match="AUTH-0030"):
         reserve(a, measured, principal=Principal(a.e.tenant, "outsider"))
 
 
