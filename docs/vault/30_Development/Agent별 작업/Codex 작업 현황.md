@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.147"
+version: "1.0.148"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T02:43:00+09:00"
+updated: "2026-09-22T02:56:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -17,7 +17,8 @@ source_of_truth: "Git"
 - `tests/core/test_artifact_content_contract.py`를 확장해 두 라우트 별칭의 일반 요청과 Range+If-None-Match 요청을 검증하고, 제품의 모든 `/artifacts/content` 경로가 정확히 이 두 alias이며 동일 handler인지 고정했다. Range/조건부 헤더는 현재 전부 200 full-body 응답이며 Content-Range/ETag는 없다. `artifact_content_response`에서 SHA 헤더를 제거한 변형은 네 성공 케이스 전부를 실패시켰고 복원 후 13 passed다.
 - 별도 격리 레거시 fixture `tests/fixtures/legacy_control.py`에도 같은 URL 모양의 두 route가 있지만, 그것은 `X-Checksum-SHA256`을 내며 production control-plane이 아니다. `rg`로 확인한 import자는 quarantined `tests/test_server_project_api.py`와 `tests/test_server_auth_integrity.py`뿐이다. 실제 배포가 이 fixture 서버를 대상으로 하는지는 이 감사에서 확인하지 않았으므로 제품 근거로 섞지 않는다. Gemini UI 파일은 수정하지 않았다.
 - 세부 소스 범위·명령·provenance·검증 한계는 [[2026-09-22_artifact_content_header_path_audit_Codex]].
-- 다음 담당: Claude가 고정 integration SHA에서 독립 검토. 현재 근거는 제품 소스 감사와 FastAPI TestClient이며 실제 브라우저/배포 HTTP 인수는 아니다.
+- Uvicorn 0.52.4를 ephemeral localhost 포트에 띄우고 실제 `urllib` HTTP로 두 alias를 확인했다. 두 응답 모두 200, 본문 34바이트, `x-content-sha256`의 값이 받은 본문 해시와 일치했고 서버 종료를 확인했다. 앱의 `ResultView.download`는 합성 fixture로 대체했으므로 DB/파일 읽기와 배포 프록시는 범위 밖이다. 상세 provenance: History 참조.
+- 다음 담당: Claude가 고정 integration SHA에서 독립 검토. 이 근거는 local Uvicorn/HTTP까지이며 실제 배포 프록시와 브라우저 인수는 아니다.
 ---
 
 ## 2026-09-22 후속 요청 핸들 쓰기 응답 결속
