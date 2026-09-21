@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.19.0"
+version: "1.20.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-11T16:59:36+09:00"
+updated: "2026-09-22T08:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -49,11 +49,13 @@ source_of_truth: "Git"
 
 현재 제품은 5대 PC의 자원을 내부망 웹에서 안전하게 사용하는 개발·실행 환경을 목표로 한다. 코드/CI가 존재하는 kernel과 제품 전체 합격을 구분한다. baseline registry v1.0.0의 48 task와 12 Outcome은 선행·실장비·독립 검토 조건 없이 done으로 올리지 않는다. 이 표는 미구현을 숨기거나 다음 세션에 작업 승인을 다시 받기 위한 목록이 아니다.
 
+**2026-09-22 S01-DB closure:** task registry의 `S01-DB`는 계약 검증·설계 검토·인벤토리 보고와 실제 PostgreSQL 34건(0 skip)을 모두 기록했으므로 `done`으로 갱신했다. 이는 S01-BE/S01-ST와 전체 S01의 완료를 의미하지 않는다.
+
 owner Codex / reviewer Claude / task control-integration follow-up. 입력 GUIDE-001, PLAN-BACKEND/DB/STORAGE-001 v1.0.0, ADR-INDEX-001 v1.6.0. 현재 구현 HEAD는 이 문서와 연결한 History 검증 보고서로 고정한다. 작성자 자기 검증과 peer review를 혼동하지 않는다.
 
 | 배정 task | 현재 확보한 kernel/증거 | 남은 구현 또는 합격 증거 |
 |---|---|---|
-| S01-BE/DB/ST | 정본 Schema, migrations 0001~0006, 강제 RLS, ID/권한/오류·trace 계약, package/CI/ontology | 실장비 5대·허용 폴더/자원·IdP/CA/DNS·Storage 제품 선택 및 운영 연결, peer review |
+| S01-BE/DB/ST | 정본 Schema, migration head 0045, 강제 RLS, ID/권한/오류·trace 계약, package/CI/ontology | 실장비 5대·허용 폴더/자원·IdP/CA/DNS·Storage 제품 선택 및 운영 연결, peer review |
 | S03-BE | 사전 승인 policy, 일회 ToolGateway, signed permit, Linux Docker 격리·정지 receipt | 업무 Workspace adapter, Windows driver/ACL, 운영 profile 및 실제 사용자 여정 |
 | S04-BE/DB | 권한 있는 승인 challenge/decision·cancel API, 원자 ledger/outbox, bounded SSE/cursor, Node control cancel | workflow plan/approval request/dispatch daemon과 UI 통합, 오류·취소의 종단 자동 진행 |
 | S04-ST | checksum/path 검증 함수, 합성 bytes 시험 | 제품 object storage의 resumable multipart, 중단/재개/동시 finalize/실제 checksum 검증 |

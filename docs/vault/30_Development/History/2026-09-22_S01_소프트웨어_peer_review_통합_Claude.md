@@ -45,12 +45,23 @@ S01-DB는 **물리 장비 의존이 없어** 셋 중 닫기에 가장 가깝다.
 
 | 증거 | 있음? | 어디 | 없는 것 |
 |---|---|---|---|
-| 계약 검증 | ✅ 소프트웨어분 | tests/core 계약시험 · `export_schemas --check`(56) · `check_contract_bindings`(46/12) · `contracts:check`(16) · CI-스코프 백엔드 **1622 passed @`0b7d51ed`** | **실 PG 실행 증거**(로컬 skip 1008). ← **사용자 대기 아님**: Codex 현재 실PG 복제본 전이 작업 + CI 첫 실행이 채움 |
+| 계약 검증 | ✅ | tests/core 계약시험 · `export_schemas --check`(56) · `check_contract_bindings`(46/12) · `contracts:check`(16) · CI-스코프 백엔드 **1622 passed @`0b7d51ed`** · `tests/test_pools.py` 실 PG **34 passed, 0 skip** | — |
 | 설계 검토 | ✅ 소프트웨어분 | 마이그레이션 **단일 head 0045**(`migration_graph.py`, reversible-tail) · 상태기계/DB CHECK 도메인 전수(retry 검토) · ID 스킴(`new_id`) · **이 peer-review 통합 문서** | 전용 **ERD 문서 없음**(설계는 contract_ref "DB 최종 개발 계획"에). DoD가 standalone ERD를 요구하면 그건 미작성 |
 | 인벤토리 보고 | ✅ | schema·ID·state 인벤토리(위 소스·문서) | — |
-| (기록) | ⚠ stale | Codex 합격증거 doc의 `migrations 0001~0006` | **실제 0045로 갱신 필요**(내가 그 doc 안 고침 — owner 기록) |
+| (기록) | ✅ 갱신 | Codex 합격증거 doc의 **migration head 0045** | stale 표기 제거. 현재 head와 기록을 일치시킴. |
 
-**S01-DB 닫는 길**: (a) 위 기록 갱신(0001~0006→0045, 오늘 계약 스위트 첨부) + (b) 이 peer-review 통합 + (c) **실 PG 실행 증거**(Codex 현재 PG 작업·CI 첫 실행 — **사용자 물리 입력 대기 아님**). ST와 달리 **장비 값 없이 닫힘 경로가 있다.** closing은 (c)가 서면 **Codex(owner)가 절차대로.**
+**S01-DB 닫힘 판정**: (a) migration head 0045와 계약 스위트가 기록됨, (b) 이 peer-review 통합이 있음, (c) 아래 실제 PG 실행 증거가 있음. 세 요구 증거가 모두 충족되어 S01-DB를 닫을 수 있다. 이는 S01-BE/ST, 전체 S01, hosted CI, 운영 인수의 완료를 뜻하지 않는다.
+
+### S01-DB 증거별 판정
+
+| 요구 증거 | 충족 근거 | 위치/범위 | 판정 |
+|---|---|---|---|
+| 계약 검증 | 계약 시험, `export_schemas --check`, `check_contract_bindings`, `contracts:check`, `tests/test_pools.py` 실 PG 34건 | 현재 integration SHA `c4ba25ad`; 이 문서의 아래 실행 기록 | 충족 |
+| 설계 검토 | Claude peer review 통합, migration 단일 head 0045, 상태기계·DB CHECK·ID 스킴 검토 | 이 문서 상단 종합 및 관련 History 문서 | 충족 |
+| 인벤토리 보고 | Schema·ID·상태·migration 인벤토리 | Codex 합격증거 문서와 본 체크리스트 | 충족 |
+| 실 PostgreSQL 경로 | `tests/test_pools.py`: 34 passed, 0 failed, 0 errors, 0 skipped | 2026-09-22 08:27 KST, 아래 실행 기록 | 충족 |
+
+**미충족 항목: 없음(S01-DB 범위).** 독립 검토·hosted CI·운영 인수·물리 장비는 S01-DB 요구 증거가 아니거나 별도 범위이며, 이 판정에 포함하지 않는다.
 
 ## Codex 실 PostgreSQL 실행 증거 (2026-09-22)
 
