@@ -1,11 +1,11 @@
 ---
 doc_id: "CI-PREFLIGHT-CONFIG-CLAUDE-001"
 title: "CI 사전 점검 — 결제 열기 전 설정-원인 빨간불 제거. 발견·인계(워크플로는 Codex)"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T20:40:00+09:00"
+updated: "2026-09-21T21:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handoff-codex"]
@@ -49,6 +49,8 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 
 **그리고 나의 ② 슬립은 다른 급이다(구별해 기록).** 지금까지의 미끄러짐은 전부 **대리 신호를 목표로 착각**(초록≠도달, 배선≠통과, tip/트리/인터프리터 못 박기)하는 형태였고, 공통 처방은 "저장소·아티팩트를 한 층 더 본다"였다. 그런데 ②는 **내 지식 경계를 세계의 경계로 착각**한 것이라, **저장소를 아무리 읽어도 못 잡는다.** 처방이 다르다 — 안이 아니라 **밖(go.dev)을 조회**해야 한다. 그래서 위 v1.1.0에 3-갈래 규칙([측정]/[외부조회]/[미확인추정])을 별도로 세웠다. 사용자의 세 슬립과 같은 급의 사례로 나란히 남긴다.
 
+**v1.3.0 추가 — 사용자의 5번째, 그리고 워크플로 자체의 미끄러짐.** ③를 다듬다 사용자가 browser 파일의 `def test`를 세어 **5**라 보고 단언의 `6`과 안 맞는다고 의심했다 — **틀렸다**(실 수집 6, 내 실측이 옳았다: 한 함수가 `invalid_token`으로 2항목). **함수 정의라는 대리 지표를 수집 항목이라는 목표로 센 것** — 오늘 우리가 남에게 계속 지적한 형태를 사용자가 다섯 번째로 한 것이다. 그런데 그 오류가 **진짜**를 드러냈다: 6은 여정 수가 아니라 항목 수이고, **단계명 "six journeys"는 여정을 말하나 실제로는 항목을 센다** — 이름-vs-세는대상 미끄러짐이 워크플로에 박혀 있었다. 그리고 나도 여기서 미끄러졌다: ③ 문안을 "숫자 폐기(`passed>0`)"로 냈는데, 그건 **삭제 탐지력을 버리고** 내가 인용한 definer 선례(숫자를 **유도**로 바꿈)와 반대였다. 셋 다 같은 축이다 — **대리(함수정의/개수/`passed>0`)를 목표(여정 집합/유도된 진실)로 착각**. 처방도 하나 — 진실의 원천(여정 이름 집합)에서 유도한다.
+
 ## v1.1.0 정정 — ②는 빨간불 아님, 그리고 외부 사실 3-갈래 규칙
 **②를 철회한다.** 사용자가 go.dev 배포 목록을 조회하니 **`go1.27.1`·`go1.27.0`이 stable**로 있고 `1.27rc1~rc3`도 있다. 오늘은 2026-09-21이고 Go는 반년 주기라 1.27은 이미 나왔다. 그러니 `core.yml:39 go-version: '1.27.1'`은 정상이고 setup-go가 받아온다. **② 삭제.**
 
@@ -84,20 +86,50 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 - `core.yml` 최종 `python -m pytest --junitxml=dist/core-tests.xml …` 줄 끝에 **같은 3개 --ignore** 추가.
 (둘 다 이미 browser 3개 --ignore가 붙어 있는 그 자리에 나란히.)
 
-## ③ Codex 적용 패치문안 (하드코딩 개수 → 마법 숫자 제거)
-선례: 오늘 definer 함수 개수를 9-vs-10에서 하드코딩 대신 수집/정책 대조로 바꾼 것과 같은 형태.
-- `desktop-browser.yml` "Require all six browser journeys" 스텝:
-  - OLD: `assert proof['tests'] == {'failure': 0, 'error': 0, 'skipped': 0, 'passed': 6}`
-  - NEW:
-    ```
-    t = proof['tests']
-    assert t['skipped'] == 0 and t['failure'] == 0 and t['error'] == 0 and t['passed'] > 0
-    ```
-  (browserOptIn·exitCode==0·subprocessExitCode==0·evidenceStatus=='complete'·isolatedContainerRemoved 단언은 유지 — 6만 완화.)
-- `core.yml` "Require executed integration evidence" 스텝의 docker-host 줄:
-  - OLD: `assert len(host.findall('.//testcase')) == 2, 'Both Docker host hygiene cases must execute'`
-  - NEW: `assert host.findall('.//testcase'), 'Docker host lane must execute at least one case'`
-  (바로 다음의 `assert not any(... failure/error/skipped)`가 유지되어 "≥1개 돌고 전부 통과, skip 없음"을 함께 보장 — 마법 숫자 2만 제거.)
+## ③ [v1.3.0 정정] 유도로 간다 — 숫자를 버리지 말고 진실의 원천에서 유도
+**내 v1.2.0 문안(`passed>0`)을 철회한다.** 그건 조용한 skip은 막지만 **삭제 탐지력을 잃는다**: 누가 여정을 하나 지우면 항목이 6→5, `skipped==0`, `passed>0`이라 그대로 초록 — 삭제가 안 보인다. 그리고 definer 선례와 어긋난다. definer에서 한 것은 **숫자를 버린 게 아니라 박은 숫자를 수집 결과·정책 파일이라는 진실의 원천에서 유도**하도록 바꾼 것이다. 내 문안은 유도가 아니라 폐기였다 — 선례를 인용하고 선례와 다른 짓을 했다.
+
+**그 과정에서 드러난 진짜(이름 vs 세는 대상)**: browser는 **여정 5개**인데 **수집 항목 6개**다(`test_full_studio_login_project_approval_and_logout`가 `invalid_token` 두 값으로 parametrize돼 2항목). 그런데 단계명은 "**Require all six browser journeys to execute**" — **여정 여섯을 요구한다고 적혔으나 실제 세는 것은 여정이 아니라 수집 항목**이다. 이름이 주장하는 것과 세는 대상이 다르다 — 워크플로 자체의 경계·귀속 미끄러짐.
+
+**택: (b) 여정 이름 집합을 진실의 원천으로.** (a)수집수==passed는 마법 숫자를 없애나 삭제 시 양쪽이 같이 줄어 못 잡는다. (b)는 **삭제·이름변경·skip을 다 잡고** 단계명의 "여정"과도 맞는다(parametrize로 항목이 갈라져도 여정 수 불변). definer의 정책-파일 = 진실의 원천과 같은 형태다. 여정 이름(구분 함수명)이 그 원천이다.
+
+**Codex 적용 문안 — desktop-browser.yml "Require … browser journeys" 스텝** (단계명도 함께 고침: "six"는 틀림 → 숫자 대신 정본 집합):
+```python
+import json, re
+from pathlib import Path
+proof = json.loads(Path('.work/vf-desktop-browser-ci.json').read_text())
+assert proof['browserOptIn'] and proof['exitCode'] == 0
+assert proof['subprocessExitCode'] == 0 and proof['evidenceStatus'] == 'complete'
+assert proof['isolatedContainerRemoved']
+t = proof['tests']
+assert t['failure'] == 0 and t['error'] == 0 and t['skipped'] == 0, t
+# journey = 구분되는 test 함수(파라미터 접미사 제거). 6은 항목 수, 여정은 5.
+cases = json.loads(Path(proof['xmlPath']).with_name('case-identities-private.json').read_text())
+journeys = {re.sub(r'\[.*\]$', '', c['name']) for c in cases}
+EXPECTED_JOURNEYS = {
+    'test_actual_browser_quorum_snapshot_and_no_duplicate_vote',
+    'test_actual_browser_stale_run_and_revoked_review_are_rejected',
+    'test_browser_real_catalogue_owner_scope_and_revocation',
+    'test_browser_real_committed_model_and_current_permission',
+    'test_full_studio_login_project_approval_and_logout',
+}
+assert journeys == EXPECTED_JOURNEYS, f'browser journeys drifted: {journeys ^ EXPECTED_JOURNEYS}'
+```
+단계명: `Require all six browser journeys to execute` → `Require every canonical browser journey to execute`(또는 `all five …`). 이제 여정 삭제(집합 부족)·추가(집합 초과)·이름변경(불일치)·skip(`skipped==0`)이 전부 RED. (harness가 `case-identities-private.json`을 junit 옆에 쓰고 proof에 `xmlPath`가 있어 워크플로가 읽을 수 있다; `evidenceStatus=='complete'`면 그 파일이 존재.)
+
+**Codex 적용 문안 — core.yml docker-host 줄** (같은 유도):
+- OLD: `assert len(host.findall('.//testcase')) == 2, 'Both Docker host hygiene cases must execute'`
+- NEW:
+  ```python
+  host_cases = {c.get('name') for c in host.findall('.//testcase')}
+  assert host_cases == {
+      'test_prune_never_force_removes_a_running_concurrent_container',
+      'test_prune_removes_old_exited_residue_but_spares_a_recent_one',
+  }, f'docker-host cases drifted: {host_cases}'
+  ```
+  (바로 다음의 `assert not any(... failure/error/skipped)` 유지 — 돌고 통과·skip 없음을 함께 보장.)
+
+**주(선택)**: 두 `EXPECTED_*` 집합은 워크플로 인라인이지만 definer식으로 작은 정책 파일(예: `tools/definer-policy.json` 계열)로 빼면 단일 원천이 된다 — 인라인은 최소 변경, Codex 판단.
 
 ## 인계
 워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **②는 철회. ①③만 인계**(위 패치문안·판단 재료 첨부):
