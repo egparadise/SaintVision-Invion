@@ -22,6 +22,7 @@ from alarm_check import (  # noqa: E402
     GOVERNANCE_GATED,
     NOT_EVALUABLE,
     count_alarm,
+    coverage_summary,
     partition_alarm,
 )
 
@@ -96,6 +97,12 @@ def test_clock_skew_is_governance_gated_not_silently_dropped():
     assert "Node 시각 스큐 한도 초과" in gated
     assert "Runtime eligibility already excludes" in gated["Node 시각 스큐 한도 초과"]
     assert "channel/responders are decided" in gated["Node 시각 스큐 한도 초과"]
+
+
+def test_coverage_does_not_claim_a_spec_row_denominator_for_collapsed_families():
+    summary = coverage_summary(4, len(NOT_EVALUABLE), len(GOVERNANCE_GATED))
+    assert summary == "4 evaluated data families; 11 conditions not evaluated here; 1 governance-gated conditions"
+    assert " of " not in summary
 
 
 def test_partition_alarm_fires_as_the_clock_advances_same_bound():
