@@ -142,7 +142,7 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
 
     # Bind result, download and artifacts on ResultView so canonical handlers use them
     def mock_result(self, principal, run_id, project=None):
-        if scenario == "evidence-failed":
+        if scenario == "evidence-run-failed":
             return {
                 "source": "execution-kernel",
                 "runId": run_id,
@@ -151,15 +151,41 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
                 "version": 1,
                 "attemptCount": 1,
                 "stateUpdatedAt": "2026-09-22T04:00:00Z",
+                "sealed": False,
+                "executionConfirmed": True,
+                "commandId": "00000000-0000-4000-8000-000000000002",
+                "nodeId": None,
+                "stopReceipt": {"exitCode": 137, "reason": "OOMKilled"},
+                "evidence": None,
+                "completedAt": "2026-09-22T04:00:00Z",
+                "output": None,
+                "outputAbsentReason": "Process killed before output commit (OOMKilled)",
+                "resourceReleasePending": False,
+            }
+        elif scenario == "evidence-failed":
+            return {
+                "source": "execution-kernel",
+                "runId": run_id,
+                "projectId": project or "prj_pacs_core",
+                "state": "succeeded",
+                "version": 1,
+                "attemptCount": 1,
+                "stateUpdatedAt": "2026-09-22T04:00:00Z",
                 "sealed": True,
                 "executionConfirmed": True,
                 "commandId": "00000000-0000-4000-8000-000000000002",
                 "nodeId": None,
-                "stopReceipt": {"exitCode": 1},
-                "evidence": None,
+                "stopReceipt": {"exitCode": 0},
+                "evidence": {
+                    "evidenceId": "evd_00000000000000000000000000",
+                },
                 "completedAt": "2026-09-22T04:00:00Z",
-                "output": None,
-                "outputAbsentReason": "Execution aborted due to verification failure",
+                "output": {
+                    "sha256": SAMPLE_SHA256,
+                    "sizeBytes": len(SAMPLE_CONTENT),
+                    "verified": False,
+                },
+                "outputAbsentReason": None,
                 "resourceReleasePending": False,
             }
         elif scenario == "evidence-unverified":
@@ -225,6 +251,53 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
     ResultView.download = lambda self, principal, run_id, path, project=None: {
         "content": SAMPLE_CONTENT,
         "artifact": SAMPLE_ARTIFACT,
+    }
+
+    ResultView.logs = lambda self, principal, run_id, project=None: {
+        "source": "execution-kernel",
+        "runId": "run_pacs_pipeline_01",
+        "completedAt": "2026-09-22T04:00:00Z",
+        "stdout": "[Kernel] Task run_pacs_pipeline_01 initialized.\n[Kernel] Loading model weights from storage...\n[Kernel] Model weights loaded (PACS v2.4).\n[Kernel] Inference batch processed: 128 items.\n[Kernel] Output written to /tmp/inv_output/metrics.json.\n[Kernel] Process completed with exit code 0.",
+        "stderr": "",
+        "redacted": False,
+        "truncated": False,
+        "absentReason": None,
+    }
+
+    from inv.control import Control
+    Control.shards = lambda self, principal, project, run_id: {
+        "planId": "shard_plan_pacs_inference_01",
+        "sourcePlanId": None,
+        "rootPlanId": "shard_plan_pacs_inference_01",
+        "generation": 1,
+        "parentRunId": "run_pacs_pipeline_01",
+        "parentState": "succeeded",
+        "stateAsOf": "2026-09-22T04:00:00+00:00",
+        "aggregateManifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "shardCount": 1,
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "resultManifest": [
+            {
+                "index": 0,
+                "runId": "run_pacs_pipeline_01",
+                "evidenceId": "evd_00000000000000000000000000",
+                "objectId": "44444444-4444-4444-8444-444444444444",
+                "sha256": SAMPLE_SHA256,
+                "sizeBytes": len(SAMPLE_CONTENT),
+            }
+        ],
+        "resultManifestSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "shards": [
+            {
+                "index": 0,
+                "runId": "run_pacs_pipeline_01",
+                "nodeId": "nod_worker_gpu_01",
+                "phase": "stopped",
+                "state": "succeeded",
+                "evidenceId": "evd_00000000000000000000000000",
+            }
+        ],
     }
 
     app = create_app(
@@ -386,7 +459,100 @@ def run_scenario(
             # -----------------------------------------------------------------
             # EvidenceViewer & RunDetail Acceptance Scenarios
             # -----------------------------------------------------------------
-            if scenario.startswith("evidence-"):
+            if scenario == "rundetail-times":
+                print(f"\n[Acceptance: RUNDETAIL-TIMES] Navigating to Runs tab...")
+                runs_tab = page.locator('button:has-text("Runs 실행")')
+                runs_tab.wait_for(state="visible", timeout=10000)
+                runs_tab.click()
+                page.wait_for_timeout(1500)
+
+                # Click the Run row to open RunDetail
+                print("[Acceptance] Selecting Run 'run_pacs_pipeline_01' in RunList...")
+                run_row = page.locator('tr:has-text("run_pacs_pipeline_01")')
+                run_row.wait_for(state="visible", timeout=10000)
+                run_row.click()
+                page.wait_for_timeout(1500)
+
+                # 1. Header timestamps verification
+                print("[Acceptance] Verifying RunDetail Header Timestamps...")
+                created_at_span = page.locator('[data-testid="run-detail-created-at"]')
+                created_at_span.wait_for(state="visible", timeout=10000)
+                state_updated_at_span = page.locator('[data-testid="run-state-updated-at"]')
+                completed_at_span = page.locator('[data-testid="run-detail-completed-at"]')
+
+                created_text = created_at_span.inner_text()
+                updated_text = state_updated_at_span.inner_text()
+                completed_text = completed_at_span.inner_text()
+                print(f"✔ [Header Times] Created: '{created_text}', StateUpdated: '{updated_text}', Completed: '{completed_text}'")
+                assert "생성:" in created_text
+                assert "실행 상태 갱신:" in updated_text
+                assert "실행 완료 시각:" in completed_text
+
+                header_screenshot = os.path.join(output_dir, "real_chrome_rundetail_header_times.png")
+                page.screenshot(path=header_screenshot)
+                print(f"✔ [Header Times] Screenshot: {header_screenshot}")
+
+                # 2. Tab 2: Logs tab negation notice
+                print("[Acceptance] Testing Tab 2 (2. 실시간 SSE 로그) time notice...")
+                logs_tab_btn = page.locator('button:has-text("2. 실시간 SSE 로그")')
+                logs_tab_btn.wait_for(state="visible", timeout=10000)
+                logs_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                logs_banner = page.locator('[data-testid="logs-freshness-banner"]')
+                logs_banner.wait_for(state="visible", timeout=10000)
+                logs_banner_text = logs_banner.inner_text()
+                print(f"✔ [Tab 2 Logs Banner] Text: {logs_banner_text}")
+                assert "실행 완료 시각" in logs_banner_text
+                assert "커널 결과 완료 커밋 시각이며, 실시간 로그 캡처나 화면 갱신 시각이 아닙니다" in logs_banner_text
+
+                box_logs = logs_banner.bounding_box()
+                assert box_logs is not None and box_logs["height"] >= 20 and box_logs["width"] >= 250, "Logs banner must be clearly rendered"
+                tab2_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab2_logs_freshness.png")
+                page.screenshot(path=tab2_screenshot)
+                print(f"✔ [Tab 2 Logs Banner] Screenshot: {tab2_screenshot}")
+
+                # 3. Tab 3: Artifacts tab negation notice
+                print("[Acceptance] Testing Tab 3 (3. 산출물 (Artifacts)) time notice...")
+                artifacts_tab_btn = page.locator('button:has-text("3. 산출물 (Artifacts)")')
+                artifacts_tab_btn.wait_for(state="visible", timeout=10000)
+                artifacts_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                art_banner = page.locator('[data-testid="artifacts-freshness-banner"]')
+                art_banner.wait_for(state="visible", timeout=10000)
+                art_banner_text = art_banner.inner_text()
+                print(f"✔ [Tab 3 Artifacts Banner] Text: {art_banner_text}")
+                assert "실행 완료 시각" in art_banner_text
+                assert "커널 결과 완료 커밋 시각이며, 파일 다운로드 또는 화면 조회 시각이 아닙니다" in art_banner_text
+
+                box_art = art_banner.bounding_box()
+                assert box_art is not None and box_art["height"] >= 20 and box_art["width"] >= 250, "Artifacts banner must be clearly rendered"
+                tab3_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab3_artifacts_freshness.png")
+                page.screenshot(path=tab3_screenshot)
+                print(f"✔ [Tab 3 Artifacts Banner] Screenshot: {tab3_screenshot}")
+
+                # 4. Tab 5: Shards tab negation notice
+                print("[Acceptance] Testing Tab 5 (5. 분산 샤드 & 자원 회수) time notice...")
+                shards_tab_btn = page.locator('button:has-text("5. 분산 샤드")')
+                shards_tab_btn.wait_for(state="visible", timeout=10000)
+                shards_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                shards_banner = page.locator('[data-testid="shards-freshness-banner"]')
+                shards_banner.wait_for(state="visible", timeout=10000)
+                shards_banner_text = shards_banner.inner_text()
+                print(f"✔ [Tab 5 Shards Banner] Text: {shards_banner_text}")
+                assert "샤드 상태 기준" in shards_banner_text
+                assert "포함된 Run 행들의 최신 DB 갱신 시각 기준이며, 단일 공통 스냅샷이나 조회 시각이 아닙니다" in shards_banner_text
+
+                box_shards = shards_banner.bounding_box()
+                assert box_shards is not None and box_shards["height"] >= 20 and box_shards["width"] >= 250, "Shards banner must be clearly rendered"
+                tab5_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab5_shards_freshness.png")
+                page.screenshot(path=tab5_screenshot)
+                print(f"✔ [Tab 5 Shards Banner] Screenshot: {tab5_screenshot}")
+
+            elif scenario.startswith("evidence-"):
                 print(f"\n[Acceptance: {scenario.upper()}] Navigating to Runs tab...")
                 runs_tab = page.locator('button:has-text("Runs 실행")')
                 runs_tab.wait_for(state="visible", timeout=10000)
@@ -453,14 +619,42 @@ def run_scenario(
                     page.screenshot(path=screenshot_path)
                     print(f"✔ [evidence-unverified] UNVERIFIED banner verified! Saved: {screenshot_path}")
 
+                elif scenario == "evidence-run-failed":
+                    print("[Acceptance: evidence-run-failed] Checking RUN_FAILED badge & process failure notice banner...")
+                    run_failed_badge = page.locator('[data-testid="evidence-status-run-failed"]')
+                    run_failed_badge.wait_for(state="visible", timeout=10000)
+                    assert "실행 실패 · 출력 부재 (RUN_FAILED)" in run_failed_badge.inner_text()
+
+                    notice_banner = page.locator('[data-testid="evidence-run-failed-notice"]')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [evidence-run-failed] Notice banner: {notice_text.splitlines()[0]}")
+                    assert "작업 실행 실패 (RUN_FAILED)" in notice_text
+                    assert "프로세스 실행 자체의 미완료 또는 실패" in notice_text
+
+                    # Ensure PASS badge and misleading FAIL badge are NOT present
+                    assert page.locator('[data-testid="evidence-status-pass"]').count() == 0
+                    assert page.locator('[data-testid="evidence-status-fail"]').count() == 0
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_evidence_run_failed.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [evidence-run-failed] RUN_FAILED verified! Saved: {screenshot_path}")
+
                 elif scenario == "evidence-failed":
-                    print("[Acceptance: evidence-failed] Checking FAIL badge...")
-                    fail_badge = page.locator('span:has-text("✗ 출력 무결성 검증 실패 (FAIL)")')
+                    print("[Acceptance: evidence-failed] Checking FAIL badge & cryptographic warning banner...")
+                    fail_badge = page.locator('[data-testid="evidence-status-fail"]')
                     fail_badge.wait_for(state="visible", timeout=10000)
-                    assert fail_badge.is_visible()
+                    assert "출력 무결성 검증 실패 (FAIL)" in fail_badge.inner_text()
+
+                    notice_banner = page.locator('[data-testid="evidence-failed-notice"]')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [evidence-failed] Notice banner: {notice_text.splitlines()[0]}")
+                    assert "출력 무결성 검증 실패 (FAIL)" in notice_text
+                    assert "위조 또는 전송 중 변조 가능성" in notice_text
 
                     # Ensure PASS badge is NOT present
-                    assert page.locator('span:has-text("✓ 출력 무결성 검증 통과 (PASS)")').count() == 0
+                    assert page.locator('[data-testid="evidence-status-pass"]').count() == 0
 
                     screenshot_path = os.path.join(output_dir, "real_chrome_evidence_failed.png")
                     page.screenshot(path=screenshot_path)
@@ -605,12 +799,19 @@ def run_acceptance(
             "missing-header",
             "evidence-verified",
             "evidence-unverified",
+            "evidence-run-failed",
             "evidence-failed",
+            "rundetail-times",
         ]
     elif scenario == "all-artifacts":
         scenarios = ["verified", "mismatch", "missing-header"]
     elif scenario == "all-evidence":
-        scenarios = ["evidence-verified", "evidence-unverified", "evidence-failed"]
+        scenarios = [
+            "evidence-verified",
+            "evidence-unverified",
+            "evidence-run-failed",
+            "evidence-failed",
+        ]
     else:
         scenarios = [scenario]
 
@@ -678,9 +879,11 @@ def main():
             "missing-header",
             "evidence-verified",
             "evidence-unverified",
+            "evidence-run-failed",
             "evidence-failed",
+            "rundetail-times",
         ],
-        help="Acceptance scenario to run (default: all 6 branches)",
+        help="Acceptance scenario to run (default: all 8 branches)",
     )
     args = parser.parse_args()
 

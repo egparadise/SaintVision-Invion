@@ -17,7 +17,7 @@ export interface EvidenceData {
   manifestDigest?: string;
   specDigest?: string;
   policyVersion?: string;
-  integrityVerification: 'PASS' | 'FAIL' | 'UNVERIFIED';
+  integrityVerification: 'PASS' | 'FAIL' | 'UNVERIFIED' | 'RUN_FAILED';
   policySpecifications?: {
     retention: string;
     tamperProtection: string;
@@ -48,11 +48,20 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     try {
       const prjId = projectId.trim();
       const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
-      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'UNVERIFIED';
+      let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' | 'RUN_FAILED' = 'UNVERIFIED';
       if (res.output?.verified === true) {
         integrityStatus = 'PASS';
-      } else if (res.output?.verified === false || res.state === 'failed') {
+      } else if (res.output && res.output.verified === false) {
+        // [계약 방어]: core.schema.json에서 ResultOutputMetadata.verified는 현재 "const": true 이므로
+        // 정상 백엔드 응답에서 verified === false는 도달할 수 없습니다.
+        // 다만 향후 계약이 boolean으로 확장되어 서버가 무결성 실패를 200 OK로 전달하거나,
+        // 프록시/모의 환경에서 명시적 false가 주입될 경우를 대비한 선제적 방어 분기입니다.
         integrityStatus = 'FAIL';
+      } else if (res.state === 'failed') {
+        // [실행 실패 분리]: 실행 자체가 실패한 경우, 출력물이 손상된 것이 아니라
+        // 프로세스 비정상 종료로 인해 검증할 출력물 대상 자체가 생성되지 않은 상태입니다.
+        // 이를 '출력 무결성 검증 실패(FAIL)'로 왜곡하지 않고 정직하게 '실행 실패(RUN_FAILED)'로 분리합니다.
+        integrityStatus = 'RUN_FAILED';
       } else {
         integrityStatus = 'UNVERIFIED';
       }
@@ -170,6 +179,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               )}
               {evidenceData.integrityVerification === 'FAIL' && (
                 <span
+                  data-testid="evidence-status-fail"
                   style={{
                     padding: '4px 10px',
                     borderRadius: 'var(--radius-sm)',
@@ -183,8 +193,25 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
                   ✗ 출력 무결성 검증 실패 (FAIL)
                 </span>
               )}
+              {evidenceData.integrityVerification === 'RUN_FAILED' && (
+                <span
+                  data-testid="evidence-status-run-failed"
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    backgroundColor: 'rgba(248, 81, 73, 0.15)',
+                    color: 'var(--color-status-error)',
+                    border: '1px solid var(--color-status-error)',
+                  }}
+                >
+                  ✗ 실행 실패 · 출력 부재 (RUN_FAILED)
+                </span>
+              )}
               {evidenceData.integrityVerification === 'UNVERIFIED' && (
                 <span
+                  data-testid="evidence-status-unverified"
                   style={{
                     padding: '4px 10px',
                     borderRadius: 'var(--radius-sm)',
@@ -235,6 +262,58 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               </Button>
             </div>
           </div>
+
+          {/* Run Failed explanation banner: Distinguishes process execution failure from output tampering */}
+          {evidenceData.integrityVerification === 'RUN_FAILED' && (
+            <div
+              role="status"
+              data-testid="evidence-run-failed-notice"
+              style={{
+                marginBottom: '16px',
+                padding: '10px 14px',
+                backgroundColor: 'rgba(248, 81, 73, 0.08)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid rgba(248, 81, 73, 0.3)',
+                fontSize: '0.8125rem',
+                color: '#f87171',
+              }}
+            >
+              <div>
+                <p style={{ margin: '0 0 6px 0' }}>
+                  ℹ️ <strong>작업 실행 실패 (RUN_FAILED):</strong> 프로세스 비정상 종료(exitCode 비정상 또는 커널 중단)로 인해 검증할 대상 산출물이 생성되지 않았습니다.
+                </p>
+                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.9 }}>
+                  👉 <strong>상태 안내:</strong> 이 판정은 저장소 출력물의 암호학적 다이제스트 손상/변조가 아니라, <strong>프로세스 실행 자체의 미완료 또는 실패</strong>를 의미합니다. 상세 원인은 상단 뒤로가기 후 <strong>2. 실시간 SSE 로그</strong> 및 종료 영수증을 확인하십시오.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Cryptographic Tampering / Verification FAIL banner */}
+          {evidenceData.integrityVerification === 'FAIL' && (
+            <div
+              role="alert"
+              data-testid="evidence-failed-notice"
+              style={{
+                marginBottom: '16px',
+                padding: '10px 14px',
+                backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-status-error)',
+                fontSize: '0.8125rem',
+                color: 'var(--color-status-error)',
+              }}
+            >
+              <div>
+                <p style={{ margin: '0 0 6px 0' }}>
+                  🚨 <strong>출력 무결성 검증 실패 (FAIL):</strong> 산출물 메타데이터가 존재하나 암호학적 영수증 또는 체크섬 검증에 실패했습니다.
+                </p>
+                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.9 }}>
+                  👉 <strong>보안 경고:</strong> 저장된 산출물 바이트의 위조 또는 전송 중 변조 가능성이 있습니다. 해당 산출물의 다운로드 및 후속 사용을 즉각 중단하십시오.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Unverified explanation banner when sealed & hash exist but verified is not true */}
           {evidenceData.integrityVerification === 'UNVERIFIED' && (

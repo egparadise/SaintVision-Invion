@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.102"
+version: "1.0.103"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T08:15:00+09:00"
+updated: "2026-09-22T08:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,37 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T08:15:00+09:00.
+- 확인 기준: 2026-09-22T08:30:00+09:00.
+
+## 세션 랩업: EvidenceViewer RUN_FAILED 상태 분리와 RunDetail 시간 부인 고지 Chrome 153 실측 완결
+
+- **실행 실패와 출력 무결성 실패의 정직한 분리 (`EvidenceViewer.tsx`)**:
+  - `state === 'failed'`일 때 "출력 무결성 검증 실패 (FAIL)"로 왜곡하던 기존 증상을 치유. 실행 실패(비정상 프로세스 종료로 산출물 부재)와 무결성 검증 실패(산출물 바이트 위조/손상)를 명확히 분리.
+  - 신규 상태 `RUN_FAILED` (`✗ 실행 실패 · 출력 부재`) 및 안내 배너("저장소 출력물 손상이 아닌 프로세스 비정상 종료") 확립.
+  - `res.output && res.output.verified === false`: `FAIL` (출력 다이제스트 불일치/손상 경고 배너).
+  - `res.output?.verified === true`: `PASS` (출력 무결성 통과).
+  - 죽은 분기(`res.output.verified === false`)의 계약적 맥락(`core.schema.json`의 `const true` 제약과 방어적 목적) 주석 공식화.
+- **RunDetail 시간 표시 및 부인 고지 문장 Chrome 153 브라우저 실측 완결**:
+  - 헤더 3대 시간(생성, 갱신, 완료) 겹침 없이 렌더링 확인.
+  - Tab 2 실시간 SSE 로그 시각 부인 고지 `(실시간 로그 캡처나 화면 갱신 시각이 아닙니다)` 잘림 없이 표출 확인.
+  - Tab 3 산출물 시각 부인 고지 `(파일 다운로드 또는 화면 조회 시각이 아닙니다)` 표출 확인.
+  - Tab 5 샤드 시각 부인 고지 `(단일 공통 스냅샷이나 조회 시각이 아닙니다)` 표출 확인.
+- **검속 도구(`tools/run_real_browser_acceptance.py`) 8대 시나리오 체제 완비**:
+  - `--scenario rundetail-times` 및 `--scenario evidence-run-failed` 신설.
+  - 실제 Uvicorn 0.52.4 ↔ Vite ↔ Chrome 153 종단간 파이프라인에서 8대 시나리오 100% 통과 실측 (`scratch/chrome_real_uvicorn_acceptance_result.json`).
+- **신규 스크린샷 증거 획득**:
+  - `scratch/real_chrome_rundetail_header_times.png`
+  - `scratch/real_chrome_rundetail_tab2_logs_freshness.png`
+  - `scratch/real_chrome_rundetail_tab3_artifacts_freshness.png`
+  - `scratch/real_chrome_rundetail_tab5_shards_freshness.png`
+  - `scratch/real_chrome_evidence_run_failed.png`
+- **게이트 검증 실측**:
+  - `pytest tests/test_route_coverage.py`: 30 passed in 1.00s.
+  - `cd apps/web && npx tsc -b && npm run build`: exit code 0.
+  - Vitest: 75개 파일 **653/653 passed 100%** (순증 +1 passed).
+  - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `python tools/check_contract_bindings.py`: 46 fixtures / 12 anchors PASS.
+- **보고서**: [[2026-09-22_EvidenceViewer_RUN_FAILED분리와_RunDetail_시간부인고지_Chrome153_실측_Gemini]].
 
 ## 세션 랩업: EvidenceViewer 및 RunDetail 실제 브라우저(Chrome 153) 실측 완결 및 경계 표 무른 칸 메우기
 
