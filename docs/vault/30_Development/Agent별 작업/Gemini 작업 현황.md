@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.90"
+version: "1.0.91"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T03:03:00+09:00"
+updated: "2026-09-22T03:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,30 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T03:03:00+09:00.
+- 확인 기준: 2026-09-22T03:20:00+09:00.
+
+## 세션 랩업: ResourceExplorer 디스커버리 전이 실측과 Google Chrome 153 브라우저 수용 완결
+
+- **Codex Uvicorn wire 소문자 헤더 확인 완료**:
+  - `apps/web/src/shared/api/runArtifactObservation.ts`는 Fetch API의 `res.headers` 인스턴스(네이티브 Headers)의 `.get()`을 사용하므로 HTTP 스펙에 따라 대소문자 구분 없이 wire 상의 `x-content-sha256`을 100% 안전하게 읽음 확인.
+- **Claude 독립 검토 인계 수용: `ResourceExplorer` 비동기 전이 및 mock-계약 gap 해소**:
+  - 기존 `fabric-control-plane.test.tsx`가 `renderToStaticMarkup` SSR에서 props 주입에만 의존하여 실제 fetch 전이 결함을 잡지 못하던 맹점과, DOM 테스트가 임의 shape 객체를 주입하던 gap을 해소.
+  - 정본 계약 fixture `contracts/fixtures/discovery-candidates-response.json` (`ann_contract_fixture_01`, `fixture-node`, 8C, 32GB, 1 GPU, `state: 'candidate'`)를 직접 결속하는 DOM 테스트 `it('proves canonical contract fixture binding: renders exact wire candidate and admission controls with state="candidate"')` 추가.
+  - **돌연변이 사살(Mutation KILLED)**: `ResourceExplorer.tsx` L330의 `setCandidates(res?.items || [])`를 `setCandidates([])`로 변형 시 4개 테스트 동시 실패(KILLED) 실측.
+- **실제 Google Chrome 153 (Blink 엔진) 실측 수용 완결**:
+  - Vite 3005 개발 서버에서 실제 Chrome 153 브라우저를 기동하여 전체 유저 저니 실측:
+    1. 실제 PKCE 세션 인증 완료 및 대시보드 진입.
+    2. 상단 헤더 `가상 패브릭 (CX-01)` 클릭하여 `ResourceExplorer` 정상 마운트.
+    3. `5. 📡 디스커버리 & 후보 승인` 탭 클릭 시 `GET /v1/discovery/candidates` 호출되어 `fixture-node` 카드, IP `192.0.2.41`, `ann_contract_fixture_01`, `CANDIDATE` 뱃지, `자체 보고: linux · 8C · 32 GB · 1 GPU`, `승인 & 토큰 발급` 및 `거부` 버튼 렌더링 확인 (스크린샷: `scratch/real_chrome_discovery_candidates.png`).
+    4. `승인 & 토큰 발급` 버튼 클릭 시 `POST /v1/discovery/candidates/ann_contract_fixture_01/admission` 호출 및 `🎉 일회용 부트스트랩 토큰 발급 완료` 모달 내 `btk_chrome_153_verified_token_777` 토큰 표출 실측 (스크린샷: `scratch/real_chrome_discovery_admission_minted.png`).
+    5. `2. 💾 스토리지 기여 원장` 탭 클릭 시 `C:\SaintVision\StorageData` 테이블 렌더링 실측 (스크린샷: `scratch/real_chrome_storage_contributions.png`).
+    6. 검증 결과 JSON: `scratch/chrome_discovery_acceptance_result.json` (`passed: true`).
+- **게이트 통과**:
+  - Vitest **71개 파일 632/632 passed 100%** (순증 +1 passed).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 38 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: 706 versioned documents, 48 tasks, 12 outcomes PASS.
+- 보고서: [[2026-09-22_ResourceExplorer_Discovery_전이와_Chrome153_실측수용_Gemini]].
 
 ## 세션 랩업: Workspace status 'active' 죽은 분기 소거, 백엔드 5대 계약 정합 및 Chrome 153 실측 완결
 

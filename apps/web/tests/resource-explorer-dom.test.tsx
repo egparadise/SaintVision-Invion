@@ -6,6 +6,7 @@ import { ResourceExplorer } from '../src/features/desktop/ResourceExplorer';
 import * as fabricApi from '../src/features/desktop/fabricControlApi';
 import * as storageObsApi from '../src/shared/api/storageObservation';
 import { NodeItem } from '../src/contracts/types';
+import { discoveryCandidatesFixture } from './fixtures/discovery-candidates';
 
 const sampleNodes: NodeItem[] = [
   {
@@ -1098,6 +1099,51 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       // Error banner MUST appear and empty state MUST be removed
       expect(container.querySelector('[data-testid="discovery-error-banner"]')).not.toBeNull();
       expect(container.querySelector('[data-testid="discovery-empty-state"]')).toBeNull();
+    });
+
+    it('proves canonical contract fixture binding: renders exact wire candidate and admission controls with state="candidate"', async () => {
+      vi.spyOn(fabricApi, 'getDiscoveryCandidates').mockResolvedValue(discoveryCandidatesFixture);
+      const admitSpy = vi.spyOn(fabricApi, 'admitDiscoveryCandidate').mockResolvedValue({
+        announcementId: 'ann_contract_fixture_01',
+        bootstrapToken: 'btk_canonical_fixture_token_abc123',
+        expiresAt: '2026-09-22T10:00:00Z',
+        next: 'bootstrap_and_enroll',
+      });
+
+      await act(async () => {
+        root.render(
+          <ResourceExplorer
+            nodes={sampleNodes}
+            initialTab="discovery"
+            tenantId="ten_authenticated_corp"
+          />
+        );
+      });
+
+      // 1. Verify exact wire contract values rendered
+      expect(container.textContent).toContain('fixture-node');
+      expect(container.textContent).toContain('192.0.2.41');
+      expect(container.textContent).toContain('ann_contract_fixture_01');
+      expect(container.textContent).toContain('CANDIDATE');
+      expect(container.textContent).toContain('linux · 8C · 32 GB · 1 GPU');
+
+      // 2. Candidate state admission button MUST be present
+      const admitBtn = container.querySelector<HTMLButtonElement>('[data-testid="admit-candidate-btn"]');
+      const declineBtn = container.querySelector<HTMLButtonElement>('[data-testid="decline-candidate-btn"]');
+      expect(admitBtn).not.toBeNull();
+      expect(declineBtn).not.toBeNull();
+      expect(admitBtn?.textContent).toContain('승인 & 토큰 발급');
+
+      // 3. Click admit and verify admission result modal appears
+      await act(async () => {
+        admitBtn!.click();
+      });
+
+      expect(admitSpy).toHaveBeenCalledWith('ann_contract_fixture_01');
+      const modal = container.querySelector('[data-testid="admission-result-modal"]');
+      expect(modal).not.toBeNull();
+      expect(modal?.textContent).toContain('일회용 부트스트랩 토큰 발급 완료');
+      expect(modal?.textContent).toContain('btk_canonical_fixture_token_abc123');
     });
   });
 });

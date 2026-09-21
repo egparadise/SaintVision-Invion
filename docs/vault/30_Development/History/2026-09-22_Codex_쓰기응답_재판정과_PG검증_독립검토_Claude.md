@@ -16,7 +16,7 @@ tags: ["independent-review", "write-response-contract", "absence-claim", "postgr
 
 # 독립검토 — 쓰기응답 재판정과 PostgreSQL 실측
 
-Codex는 작성자 실행이라 명시했고 독립검토를 인계했다. 두 초점(사용자 지정)을 origin/integration 착지본에서 내 손으로 확인했다. 검토는 diverged 워크트리가 아니라 origin 참조로 읽었다([[judge-integration-files-from-origin-not-worktree]]).
+Codex는 작성자 실행이라 명시했고 독립검토를 인계했다. 두 초점(사용자 지정)을 origin/integration 착지본에서 내 손으로 확인했다. 검토는 diverged 워크트리가 아니라 origin 참조로 읽었다(`judge-integration-files-from-origin-not-worktree`).
 
 ## 초점 1 — 목록을 닫은 근거(부재 주장) : **성립**
 Codex 규칙 = 응답의 값이 다음 요청의 대상·입력·경로를 정하는 새 id·handle·전이집합·경로를 내는가. `src/saintvision/api/v1/*`의 **모든 쓰기 라우트를 전수로 직접 읽어** 규칙을 적용했다(표를 믿지 않고 각 return 본문 확인).
@@ -36,7 +36,7 @@ Codex 규칙 = 응답의 값이 다음 요청의 대상·입력·경로를 정�
 ## 초점 2 — PG 시험이 다른 환경에서 무엇을 하는가(조용한 건너뛰기 우려) : **보호가 견고히 배선됨(일회성 실측 아님)**
 사용자 우려 = 컨테이너 없는 곳에서 조용히 skip하면 시험이 아니라 Codex의 한 번짜리 실측이다. **설계상 조용한 skip이 green으로 통과 불가**:
 
-- `tests/conftest.py::test_admin_dsn`: 로컬 DSN 부재 → `pytest.skip(사유 명시)`; **CI 부재 → `pytest.fail("CI requires INV_TEST_ADMIN_DSN")`**. 문서: skip은 not_run, never pass. 로컬 사유는 pyproject `addopts="-ra"`로 **화면에 보인다**([[skip-inherits-the-guard-fail-provided]]·[[passing-but-never-reached-trap]] 형태를 막음).
+- `tests/conftest.py::test_admin_dsn`: 로컬 DSN 부재 → `pytest.skip(사유 명시)`; **CI 부재 → `pytest.fail("CI requires INV_TEST_ADMIN_DSN")`**. 문서: skip은 not_run, never pass. 로컬 사유는 pyproject `addopts="-ra"`로 **화면에 보인다**(`skip-inherits-the-guard-fail-provided`·`passing-but-never-reached-trap` 형태를 막음).
 - `.github/workflows/backend.yml`: 실 `postgres:16` 서비스 + `INV_TEST_ADMIN_DSN` 제공 → 시험 **실행**. pytest 호출에 `-m "not postgres"` **없음**(docker_host만 배제) → 수집. `tests/test_api.py`는 sibling-import 없어 node-dependent/ignore 아님 → 포함. 주석: "Without it the suite would skip and report a false green."
 - **이중 반-거짓초록 가드**: (1) conftest CI-fail, (2) 마지막 스텝이 junit에서 `.//skipped` 발견 시 build fail("Backend tests must not be skipped").
 - **시험 자체가 무게를 진다(실행 시 진짜)**: node DB 거부 = `_node_body`에 unexpected 주입 → `pytest.raises(ResponseValidationError)` + **owner_engine으로 node row 실제 커밋 확인**(mock 아닌 실 PG 경로). idempotency replay = **durable `idempotency_records` 행을 UPDATE로 오염(rowcount==1)** 후 같은 키 재요청으로 replay 경로 태워 `pytest.raises(ResponseValidationError)`. 앵커 제거 시 둘 다 깨짐(Codex 되살림 주장과 일치).
@@ -50,4 +50,4 @@ Codex 규칙 = 응답의 값이 다음 요청의 대상·입력·경로를 정�
 ## 결론
 두 Codex 주장 모두 독립검토로 성립. **수정 필요한 결함 없음.** 유일한 실질 잔여는 **CI 개방(사용자 결정 ①)** — 그 전까지 PG 시험의 자동 강제는 없고 재실행은 PG DSN 수동 제공이 필요하다(Codex가 이미 정직히 라벨). 경미 계약위생 잔여(미결속 쓰기 raw dict, activation/revoke 비대칭)는 하위 우선순위로 유지.
 
-관련: [[2026-09-21_이어가기_상태와규칙_Claude]] · [[skip-inherits-the-guard-fail-provided]] · [[passing-but-never-reached-trap]] · [[empty-output-is-not-evidence]] · [[검증규칙과_세축_canon]]
+관련: [[2026-09-21_이어가기_상태와규칙_Claude]] · `skip-inherits-the-guard-fail-provided` · `passing-but-never-reached-trap` · `empty-output-is-not-evidence` · [[검증규칙과_세축_canon]]
