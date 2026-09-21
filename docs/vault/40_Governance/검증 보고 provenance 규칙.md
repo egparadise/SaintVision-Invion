@@ -66,6 +66,18 @@ integration_sync:    BEHIND 7   (vs origin/integration/all-agents-unified @89c6b
 ```
 **아침부터 이 한 줄이 있었다면 첫 보고에서 괴리를 봤을 것이다.** "도구가 유용하다"는 추상적 주장보다 이 사례가 규칙을 정당화한다 — provenance를 안 찍으면 어느 트리의 어느 시점인지가 보이지 않고, 뒤처진 트리의 통과를 통합 통과로 오독한다.
 
+## 주 체크아웃·워크트리 동기 규약 (재발 방지)
+위 실증의 물리적 원인 — 주 체크아웃이 통합보다 뒤처짐 — 을 재발하지 않게 하는 규약이다.
+
+**오늘 이 문제가 실제로 만든 결과**(추상적 권고보다 이 근거가 설득력 있다): `check_docs.py`가 통합에서 broken이었는데 각 agent 브랜치에선 green이라 **하루 종일 아무도 몰랐다**. 그리고 나는 **두 번 엉뚱한(뒤처진) 트리에서 측정**했다. 원인은 하나 — 주 체크아웃(`C:/Project/SaintVision-Invion`)이 통합보다 8커밋 뒤처졌는데(BEHIND 8) 아무도 그 거리를 안 찍었다. 사람이 저장소를 열거나 도구를 돌릴 때 기본으로 가는 곳이 바로 거기다.
+
+**규약(3방향 조합, 판단 결과):**
+1. **주 체크아웃은 참조 전용, 항상 통합 tip과 동기.** agent는 `C:/Project/SaintVision-Invion`을 작업 공간으로 쓰지 않는다 — 각자 `.worktrees/<name>`에서 작업한다. 주 체크아웃은 통합 tip에 **detached로 맞춰 두어**(브랜치 ref는 건드리지 않음) 사람이 열거나 도구를 돌릴 때 통합 상태를 보게 한다. (2026-09-21 조치: 주 체크아웃을 `agent/codex/discovery-candidates-contract`@5c7ce9d에서 통합 tip `5c1e9ef`로 detached 갱신, 브랜치 ref 보존, 미커밋 없어 손실 0, 갱신 후 `integration_sync: IN SYNC` 확인.)
+2. **tripwire = provenance 도구의 integration_sync.** 뒤처진 트리에서 검사를 돌리면 `BEHIND N` + "results from this tree may NOT reflect integration"이 **첫 보고에 뜬다.** 그래서 보고 검사는 `provenance.py`를 거쳐 돌린다(위 규칙). 이것이 규약 위반을 잡는 탐지기다.
+3. **조건부 자동화는 가드 필수(선택).** 주 체크아웃 자동 갱신을 두려면 **clean이고 detached/참조 상태이며 최근 활동이 없을 때만** 통합 tip으로 ff한다. **미커밋 변경이나 활성 브랜치가 있는 트리는 절대 자동 갱신하지 않는다** — 오늘 `codex-public-dsn-integration` 워크트리가 integration 브랜치에 미커밋 6건을 들고 활성 작업 중이었다. 가드 없이 자동화했으면 그 작업을 파괴했을 것이다. 자동화 실장은 이 가드를 갖춘 뒤에만.
+
+**요지**: 사람이 매번 기억해서 갱신하면 또 뒤처진다. 그래서 (1) 주 체크아웃을 참조로 고정하고, (2) 거리를 모든 보고에 자동으로 박아 위반을 즉시 보이게 하고, (3) 자동화하려면 활성 트리를 파괴하지 않는 가드를 건다.
+
 ## 왜 규칙으로 올리는가
 2026-09-21 우리가 틀린 경우가 전부 이 항목 중 하나가 빠져서였다(인터프리터=5, 시점/트리=1·4, clean=4, 실행위치=3). 상호 정정 루프는 오류를 잡는 데는 탁월했으나 **인스턴스만 고치고 convention을 안 고쳐 같은 유형이 재발**했다. 이 문서와 도구는 사후 정정을 **예방**으로 바꾸기 위한 것이다. 관련: `memory:pass-report-provenance-rule`, `memory:wrong-interpreter-fakes-unrunnable`.
 
