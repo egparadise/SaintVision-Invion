@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-REVIEW-VITEST-MIGRATION-TIMEOUT-20260921"
 title: "Vitest moderate audit와 migration-head timeout 독립 검토"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "pending"
-updated: "2026-09-21T13:14:00+09:00"
+updated: "2026-09-21T13:24:00+09:00"
 source_of_truth: "Git"
 tags: ["security-review", "npm-audit", "vitest", "migration", "timeout"]
 ---
@@ -31,6 +31,10 @@ tags: ["security-review", "npm-audit", "vitest", "migration", "timeout"]
 - 수정이 필요하면 `vitest`를 최소 수정 안정판 `4.1.11` 이상으로 올린다. npm audit의 `fixAvailable=5.0.1`은 최신 제안이며, advisory의 최소 고정판 `4.1.11`과 구분한다.
 - 이것은 3→4 메이저 업그레이드다. 현재 Node `v24.17.0`, Vite 해석 버전 `6.4.3`은 Vitest 4의 공식 최소조건(Node 20+, Vite 6+)을 만족한다. 현재 테스트는 `describe`/`it`/`expect`/`vi.mock` 같은 기본 API, Node 실행 및 `happy-dom`을 사용하고 Vitest browser mode, 커버리지 provider, 내부 `vite-node` API 사용은 발견하지 않았다. 따라서 검토한 소스에는 알려진 V4 제거 API와의 직접 충돌이 없다.
 - 그럼에도 메이저 업그레이드의 동작 호환성을 실행으로 증명하지 않았다. 적용 전후 `npm test`, `npm run build`를 비교해야 한다. 이 검토에서는 dependency를 바꾸지 않았다.
+
+### 후속 조치 — 패치 적용 및 로컬 검증
+
+같은 날 이어서 `apps/web/package.json`을 `vitest: 4.1.11`로 고정하고 lockfile을 갱신했다. `npm ci` 재설치가 exit 0이었고 `@vitest/mocker`도 4.1.11로 설치됐다. 이후 `npm audit --json`은 exit 0 / vulnerabilities 0, `npm test -- --reporter=dot`은 34 files / 332 tests passed / exit 0, `npm run build`는 Vite 6.4.3 / 90 modules / exit 0이다. 따라서 확인한 테스트 API 및 빌드와의 호환성은 lockfile clean install 후 로컬에서 확인됐다. 운영 CI와 독립 검토는 별도다. 이 조치로 이 기록의 npm audit 로컬 잔여는 닫혔다.
 
 ## migration-head timeout SHA 79487cb
 
@@ -65,15 +69,19 @@ non-zero exit를 failure로 남기고 timeout을 완료되지 않은 검사로 �
 
 | 명령/입력 | 결과 | 범위 |
 |---|---|---|
-| `cd apps/web; npm audit --json` | exit 1; moderate 2 | 두 이름은 동일 GHSA를 지칭 |
+| `cd apps/web; npm audit --json` (패치 전) | exit 1; moderate 2 | 두 이름은 동일 GHSA를 지칭 |
 | `cd apps/web; npm audit --omit=dev --json` | exit 0; 0 vulnerabilities | production dependency set |
-| `cd apps/web; npm ls vitest @vitest/mocker --all` | Vitest 3.2.7 / mocker 3.2.7 | dependency ancestry |
+| `cd apps/web; npm ls vitest @vitest/mocker --all` (패치 전) | Vitest 3.2.7 / mocker 3.2.7 | dependency ancestry |
 | `cd apps/web; npm run build` | exit 0; Vite 6.4.3, 90 modules | production build; dist search had no Vitest marker |
 | `node --version`; `npm view vitest@4.1.11 peerDependencies engines` | Node 24.17.0; Vite ^6/^7/^8, Node 20/22/24+ | candidate compatibility metadata |
+| `cd apps/web; npm audit --json` (패치 후) | exit 0; 0 vulnerabilities | lockfile including dev dependencies |
+| `cd apps/web; npm ci` (패치 후) | exit 0; 128 packages audited, 0 vulnerabilities | lockfile clean install |
+| `cd apps/web; npm test -- --reporter=dot` | exit 0; 34 files / 332 tests passed | Vitest 4.1.11 |
+| `cd apps/web; npm run build` (패치 후) | exit 0; Vite 6.4.3, 90 modules | production build |
 | `& .\\.venv\\Scripts\\python.exe -c "...migration_graph.chain()..."` | exit 0; 60 graph revisions, head `0044_model_registry_binding` | source graph only, no PostgreSQL |
 | AST count of `check_migration_upgrade.py` `priors` tuple | exit 0; 30 selected prior starts | source only |
 
 ## 다음 담당
 
-- npm dependency 변경은 Codex review 결과 공유 후 별도 dependency task로 owner 지정; 이 문서에서는 dependency를 변경하지 않았다.
+- Vitest 취약점 dependency remediation은 로컬로 수정·검증 완료; 동일 SHA 독립 검토와 CI 실행은 외부 대기다.
 - migration timeout 문구/cleanup hardening 및 incremental prototype은 migration tool owner가 수행하고 Codex가 고정 SHA로 독립 검토한다. 실제 PostgreSQL proof에는 소유를 명시한 disposable DB만 사용한다.

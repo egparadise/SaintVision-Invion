@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-VF-CODEX-001"
 title: "Codex VF 작업 현황"
-version: "1.0.24"
+version: "1.0.25"
 status: "in_progress"
 author: "Codex"
-updated: "2026-09-21T13:14:00+09:00"
+updated: "2026-09-21T13:24:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,7 +12,7 @@ source_of_truth: "Git"
 
 ## 2026-09-21 보안·migration timeout 독립 검토
 
-- `npm audit` moderate 2건은 Vitest 3.2.7와 하위 `@vitest/mocker`가 함께 보고한 동일 GHSA 하나다. 현재 production dependency/bundle에는 없음. 수정은 Vitest 4.1.11+ 메이저 업그레이드 후보이며 아직 적용하지 않았다. [[2026-09-21_Vitest_audit와_migration_timeout_독립검토_Codex]]
+- `npm audit` moderate 2건은 Vitest 3.2.7와 하위 `@vitest/mocker`가 함께 보고한 동일 GHSA 하나였다. Vitest 4.1.11 고정 후 `npm ci` 재설치, `npm audit` 0 vulnerabilities, Vitest 34 files/332 tests, Vite build 통과. 로컬 수정 완료, CI·독립검토는 별도 대기. [[2026-09-21_Vitest_audit와_migration_timeout_독립검토_Codex]]
 - Claude `79487cb`의 600초 timeout은 현재 보고된 211초 idle/324초 부하 대비 단기 예산으로 수용 가능하나, Codex DB 재현은 DSN 부재로 미실행. timeout이 hang형 migration 결함도 skip할 수 있고 외부 종료로 cleanup이 보장되지 않는 잔여가 있어 timeout-as-skip 의미와 자원 회수 hardening은 미승인/후속 검토다.
 
 ## 최신 상태 지도 (기준 d7e7d13)
