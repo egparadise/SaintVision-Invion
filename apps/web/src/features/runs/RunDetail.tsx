@@ -848,17 +848,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           )}
 
           {!isLoadingLogs && !logError && !logView && (
-            <div>
-              <div style={{ color: '#8b949e', borderBottom: '1px solid #21262d', paddingBottom: '8px', marginBottom: '12px' }}>
-                [SSE Streaming: /v1/runs/{run.id}/events (Last-Event-ID: evt_01JABC1042, P95 지연 실측: 142ms)]
-              </div>
-              <div>[17:35:01 KST] [INFO] RunGraph 초기화 완료. TraceID: 4bf92f3577b34da6a3ce929d0e0e4736</div>
-              <div>[17:35:02 KST] [INFO] Node-01 자원 Lease 확보 (Allocation: 4 Cores, 8 GiB RAM, 6 GiB VRAM)</div>
-              <div>[17:35:05 KST] [INFO] Workspace [wsp-saint-pilot] 파일 시스템 마운트 완료.</div>
-              <div>[17:35:10 KST] [INFO] 합성 데이터셋 로드 및 무결성 검증 (SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855)</div>
-              <div>[17:35:18 KST] [INFO] 빌드 파이프라인 수행 중... [단위 테스트 48/48 통과]</div>
-              <div style={{ color: '#58a6ff' }}>[17:35:22 KST] [STDOUT] All unit tests completed with exit code 0.</div>
-              <div>[17:35:25 KST] [INFO] 결과 아티팩트 생성 및 Evidence 패키지 해시 계산 완료.</div>
+            <div data-testid="run-logs-none" style={{ color: '#8b949e', padding: '16px 0', textAlign: 'center' }}>
+              기록된 실행 로그가 없습니다. (서버 응답 없음)
             </div>
           )}
         </div>

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.66"
+version: "1.0.67"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T20:30:00+09:00"
+updated: "2026-09-21T20:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,22 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T20:30:00+09:00.
+- 확인 기준: 2026-09-21T20:45:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 개발 정직성 5대 원칙 수립, 자동 검사 도구 구축, 전체 감사 지도 및 디스커버리 CLI 연동 예측 완결 (`화면_개발_정직성_지침_및_사례집.md`, `check_frontend_integrity.py`, `DeveloperStudio.tsx`, `RunDetail.tsx`, `mlopsEngine.ts`, `fixtures/model-lineage.ts`, `model-lineage.test.ts`)**:
+  - **화면 개발 정직성 5대 핵심 원칙 거버넌스 확립 ([[화면_개발_정직성_지침_및_사례집]])**:
+    - ① 백엔드가 주지 않는 것을 만들지 않는다 (Never Synthesize): `mlopsEngine.ts` 가짜 점수(0.812) 소거, `StorageObservationView` unknown 강제, `RunDetail.tsx` 가짜 SSE 스트림 제거 -> 빈 상태 정합, `DeveloperStudio.tsx` fallback runId 제거.
+    - ② 부를 근거가 없으면 부르지 않는다 (0-Calls Without Basis): `ResourceExplorer.tsx:420` 하드코딩 테넌트 UUID 제거 및 0-call 가드, `WebTerminal.tsx` 가짜 commandId 0-call 가드, `ModelLineageView.tsx` 빈 approvalInput/planRunId 가드, `DeveloperStudio.tsx` 영수증 조회 0-call 가드.
+    - ③ 일어나지 않은 일을 일어났다고 표시하지 않는다 (No Premature Success): `WebTerminal.tsx` 소켓 연결 전 Connected 표출 제거, 티켓 로깅 제로 누설(Zero-Leak), `InvFileExplorer.tsx` 가짜 복구 타이머 제거.
+    - ④ 검증 못 함과 검증 통과를 같게 표시하지 않는다 (Strict Tri-State): `InvFileExplorer.tsx` 실제 체크아웃 바이트 기반 3갈래(`verified` | `mismatch` | `unverified`) 유지, `ModelStudioView.tsx` 검증 라우트 부재 시 정직한 거절.
+    - ⑤ 실패를 캐시나 이전 결과로 가리지 않는다 (Never Mask Fresh Failures): `DeveloperStudio.tsx` 다운로드 프로브 404 전용 폴백(500/401 에러 경고), `InvFileExplorer.tsx` 503 에러 시 이전 검증 상태 즉시 무효화.
+  - **자동화 정적 구조 검사기 구축 (`tools/check_frontend_integrity.py`)**: 80개 프로덕션 소스 파일을 전수 검사하여 금지된 자리표시자, 조기 연결 문구, 티켓/토큰 로깅, 3상태 불변식, 0-call 가드를 자동 검증. 음성 대조(`--test-negative`)를 통해 고의 결함 사살 실증 완료.
+  - **전체 화면 감사 지도 및 디스커버리 CLI 연동 예측 수립**: 감사 완료 영역과 미감사 영역을 명문화하고, Codex 운영자 CLI(`saint operator issue-grant`) 연동 시 `discovery-empty-state`에서 실시간 후보 카드로의 유기적 전환 시퀀스 설계.
+  - **검증 실적**: `check_frontend_integrity.py` PASS (0 violations), negative control PASS, Vitest 56개 파일 **523/523 passed 100%**, Vite 프로덕션 빌드 exit 0 (3.63s, 96 modules), check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면정직성_5대원칙_자동검사도구_감사지도_Gemini]].
+
 
 - **WorkspaceEditView 실바이트 해시 검증 개통, StorageObservationView 스토리지 샘플 무결성 배선 및 엄격한 3갈래 불변식 확립 (`InvFileExplorer.tsx`, `DesktopShell.tsx`, `ResourceExplorer.tsx`, `storageObservation.ts`, `types.ts`, `tests/storage-observation-contract.test.ts`, `tests/inv-file-explorer-dom.test.tsx`, `tests/resource-explorer-dom.test.tsx`)**:
   - **진정한 무결성 검증(`verified` / PASS) 경로 개통 (VF-GM-03)**: 커널의 `WorkspaceEditView`(`workspace_editor._view()`가 실 체크아웃 바이트의 `sha256` digest 및 `dataBase64` 제공)를 `InvFileExplorer`에 정식 연동. `DesktopShell`에서 `checkoutId` prop 주입 및 `InvFileExplorer` UI에서 동적 체크아웃 입력/로드 바(`workspace-checkout-bar`, `checkout-id-input`, `load-checkout-btn`)를 제공하여 실제 바이트를 디코딩하고 클라이언트 측 WebCrypto SHA-256을 계산하여 기대 체크섬과 대조하는 실체적 검증을 개통.

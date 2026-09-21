@@ -2,7 +2,8 @@
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { MlopsManager, TEST_FIXTURE_LINEAGES } from '../src/features/mlops/mlopsEngine';
+import { MlopsManager } from '../src/features/mlops/mlopsEngine';
+import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {

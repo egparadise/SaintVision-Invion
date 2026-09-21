@@ -1794,7 +1794,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>
-                    실행 세션: <code>{activeRunId || 'run_01JABCDE0001'}</code>
+                    실행 세션: <code>{activeRunId || '미지정'}</code>
                   </h2>
                   <span
                     style={{
@@ -1897,8 +1897,8 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                   variant="secondary"
                   size="sm"
                   data-testid="inspect-receipt-btn"
-                  onClick={() => handleInspectReceipt(`rcp_${activeRunId || '01JABCDEF'}`)}
-                  disabled={isLoadingReceipt}
+                  onClick={() => activeRunId && handleInspectReceipt(`rcp_${activeRunId}`)}
+                  disabled={isLoadingReceipt || !activeRunId}
                 >
                   🧾 영수증 & Evidence 대조
                 </Button>
