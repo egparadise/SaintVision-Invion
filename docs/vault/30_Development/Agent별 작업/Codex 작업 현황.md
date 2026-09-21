@@ -4,7 +4,7 @@ title: "Codex 작업 현황"
 version: "1.0.137"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T00:16:21+09:00"
+updated: "2026-09-22T00:18:19+09:00"
 source_of_truth: "Git"
 ---
 

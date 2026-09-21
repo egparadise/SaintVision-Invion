@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 reviewer: "pending"
-updated: "2026-09-22T00:16:21+09:00"
+updated: "2026-09-22T00:18:19+09:00"
 source_of_truth: "Git"
 tags: ["postgresql", "discovery", "response-model", "provenance"]
 ---
@@ -26,7 +26,7 @@ tags: ["postgresql", "discovery", "response-model", "provenance"]
 - 실행 시각: 2026-09-22 00:16:21 KST. 당시 코드 SHA는 위의 `a7b6b1a...`; 수정 중인 시험 파일 하나가 있어 working tree는 dirty였고 통합 tip과 SHA는 일치했다.
 - 환경: PostgreSQL 16 disposable container `sv-codex-admission-pg-2ebcee305fd0485fb87beae44ff65620`. 컨테이너에 `ai.saintvision.owner=codex` 및 고유 `ai.saintvision.write-response-test=codex-admission-2ebcee305fd0485fb87beae44ff65620` 소유 라벨을 붙였다. 데이터 경로는 tmpfs라 익명 볼륨을 만들지 않았다. 비밀번호 없는 trust 인증은 loopback의 임시 published port만 사용했다. DSN은 테스트 프로세스 환경변수로만 전달했고 문서·출력에 기록하지 않았다.
 - Docker 정리: 시작 48 containers, 실행 중 49, 종료 후 48. 정리 전 정확한 소유 라벨을 inspect했고, 제거 뒤 같은 이름의 container가 더는 inspect되지 않는 것을 확인했다.
-- 첫 시도는 worktree 내부에 없는 `.venv` 상대경로를 호출해 pytest가 시작되지 않았다. 이를 통과/실패 시험으로 세지 않고, 주 checkout의 절대 프로젝트 interpreter를 사용해 provenance wrapper로 다시 실행했다. 첫 시도 때 만든 컨테이너도 이후 소유 라벨을 재확인하고 제거했다.
+- 첫 시도는 worktree 내부에 없는 `.venv` 상대경로를 호출해 pytest가 시작되지 않았다. 이를 통과/실패 시험으로 세지 않았다. 첫 시도 컨테이너는 같은 스크립트가 생성한 GUID 포함 이름으로 그 실행에서만 추적해 제거했지만, 그때 Docker inspect 템플릿 오류로 라벨을 다시 읽어 확인하지 못했다. 이 절차는 증거로 세지 않는다. 두 번째 provenance 실행에서는 라벨 JSON을 성공적으로 inspect해 일치한 뒤 제거하고 제거 여부까지 확인했다.
 
 ## 판정과 남은 범위
 
