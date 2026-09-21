@@ -1,11 +1,11 @@
 ---
 doc_id: "LINUX-GATE-AUDIT-CLAUDE-001"
 title: "Linux 전용 분류 검증 감사 — 왜 Linux인가, 소스 근거인가 추정인가. 3부류"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T17:40:00+09:00"
+updated: "2026-09-21T18:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["verification-boundary", "linux-gate", "skipif", "audit", "measure-not-guess", "node-runtime"]
@@ -124,6 +124,26 @@ PG-only로 보이던 후보(resume_input_readiness·business_handoff·output_ing
 **CI-fail을 추가하는 것이 맞나: 아니다.** node-runtime엔 fixture CI-fail이 있지만 **동시에 `core.yml`이 제공**하기에 유효하다. 이미지 셋에 test-side CI-fail만 추가하면 **제공 워크플로가 없어 CI가 그냥 빨간불**이 된다(비싼 이미지 빌드를 강제). 올바른 선택지는 둘: ⓐ 의도된 수동 opt-in으로 두되 무엇이 남는지 문서화(현재), 또는 ⓑ web-container/installer 이미지를 빌드해 env를 켜는 워크플로를 추가(빌드 비용·시간·안정성 비용을 감수하는 운영 결정). **판단 근거**: 검증상태지도가 이미 이를 별도 운영 트랙으로 두었으므로 ⓐ가 현 설계와 정합하고, ⓑ는 사용자가 그 acceptance를 CI에 상시 포함하기로 결정할 때의 비용 트레이드다.
 
 **남는 것을 검증하려면**: 각 이미지/설치 산출물을 빌드(frontend 컨테이너 이미지 / installer 이미지 / storage source 트리)하고 해당 env를 워크플로나 수동 실행에서 설정. 이는 browser처럼 전용 워크플로(예: `web-container.yml`)로 만들면 CI에 편입된다 — 비용 결정.
+
+## v1.3.0 정정 — "워크플로 존재 ≠ 통과". 그리고 6-여정 단계 비공허 확인 (전부 소스-읽기)
+v1.2.0에서 나는 "자동 검증됨"이라 썼는데 그것은 과장이다. **[소스-읽기, 미실행]**
+
+**(가) 6-여정 단계는 공허하지 않다.** `desktop-browser.yml`의 "Require all six browser journeys to execute"는 `.work/vf-desktop-browser-ci.json`을 읽어 `tests == {failure:0, error:0, skipped:0, passed:6}` 등을 단언한다. 그 `tests` 카운트는 **자기보고가 아니라** `tools/run_vf_security_tests.py:assess_evidence`가 **실제 pytest가 낸 `--junitxml` XML을 파싱**(`<testcase>`별 failure/error/skipped 태그 집계 + `passed`=태그없음, 그리고 xml SHA256 기록)해서 만든다. 그리고 그 pytest는 `INV_BROWSER_TEST=1`을 자식 env로 받아 실행된다. 따라서 opt-in이 안 실려 browser 시험이 **skip되면 junit에 `skipped>0`로 잡혀 `passed:6/skipped:0` 단언이 실패**한다 — 조용한 skip을 구조적으로 막는다. (사용자 우려대로 "실행됐다고 기록된 것"이 문제였다면 공허했겠으나, junit은 pytest가 실행 중 쓰는 실행 기록이라 '기록 vs 실제'가 여기서는 일치한다.)
+
+**(나) 그러나 "워크플로가 있다"와 "그 워크플로가 통과한다"는 다르다 — 이것이 핵심.** CI 결제 미해결로 **이 워크플로들은 한 번도 실행된 적이 없다.** 그러므로 browser·node-runtime·PG·chmod 계열은 **"실제 검증됨"이 아니라 "검증되도록 배선됨(wired), 단 아직 안 돎"**이다. 첫 CI 실행에서 그 워크플로들이 실제로 성공하는지는 **아무도 모른다**. v1.2.0의 "자동 검증됨"을 이 표현으로 정정한다. 오늘 우리가 계속 지킨 "검사가 존재한다 ≠ 검사가 돌아 통과했다"의 또 한 사례이고, 내가 같은 슬립을 했다.
+
+### 두 축으로 다시 정리 (배선 여부 × 실행 여부)
+| 계열 | 배선(워크플로가 opt-in 제공+단언?) | 실행/통과 |
+|---|---|---|
+| PG 스위트 | **배선됨** (workflows set INV_TEST_ADMIN_DSN + fixture CI-fail) | **미실행** (CI 한 번도 안 돎) |
+| ① chmod/POSIX | **배선됨** (Linux 러너 + PG) | 미실행 |
+| ② node-runtime | **배선됨** (`core.yml` node-agent build + `INV_RUN_NODE_TESTS=1`) | 미실행 |
+| browser 인수 | **배선됨** (`desktop-browser.yml` VF_BROWSER_TEST→INV_BROWSER_TEST, **비공허** 6/0 단언) | 미실행 |
+| image/installer 3파일 | **미배선** (어느 워크플로도 INV_WEB_IMAGE/INV_UPGRADE_AGENT_IMAGE/INV_STORAGE_SOURCE_ROOT 안 켬) | 미실행 |
+
+**정확한 현재 상태**: 실제로 통과가 확인된 것은 **없다**(CI 미실행). 첫 CI 실행 시 — 그 실행이 성공한다면 — **배선된 것들**(PG·chmod·node-runtime·browser)이 검증되고, **미배선 image/installer 3파일은 여전히 skip**으로 남는다. 즉 "열어도 미검증으로 남는다"는 결론은 **image/installer에만** 좁혀지고, browser/node-runtime에는 뒤집힌다(배선됨) — 다만 그 배선이 통과하는지는 첫 실행이 증명해야 한다.
+
+**실행 vs 읽기 명시**: 이 감사(v1.0.0~v1.3.0)의 워크플로·harness·assess_evidence 판정은 **전부 소스-읽기**다. 이 Windows 호스트에서 browser(playwright/chromium)·image(빌드된 컨테이너)·설치 acceptance는 **실행하지 않았다**(실행 불가). 앞서 funnel/exec-registry에서 일회용 PG로 **실제 실행**한 것과는 성격이 다르다 — 그 구분을 유지한다.
 
 ## 다음 사람에게 (환경 준비 기준)
 - **①은 격리 Linux 호스트**가 실제로 필요하다(POSIX 권한/파일 backend).
