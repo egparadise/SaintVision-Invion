@@ -22,12 +22,17 @@ from sqlalchemy.orm import Session
 
 from ...identity.principal import Principal
 from ...services import execution_readiness as readiness_service
+from .. import schemas
 from ..deps import get_principal, get_session
 
 router = APIRouter(prefix="/v1", tags=["readiness"])
 
 
-@router.get("/workspaces/{workspace_id}/execution-readiness")
+@router.get(
+    "/workspaces/{workspace_id}/execution-readiness",
+    response_model=schemas.WorkspaceExecutionReadinessResponse,
+    response_model_exclude_unset=True,
+)
 def read_execution_readiness(
     workspace_id: str,
     principal: Principal = Depends(get_principal),

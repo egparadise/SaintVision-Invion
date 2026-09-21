@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.51"
+version: "1.0.52"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T16:45:00+09:00"
+updated: "2026-09-21T17:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,17 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T16:45:00+09:00.
+- 확인 기준: 2026-09-21T17:15:00+09:00.
 
 ## 최근 확인한 진척
 
-- **UI-FB-03 DeveloperStudio 라우트 404 폴백 DOM 하네스 및 양방향 돌연변이 실증 완결 (`apps/web/tests/developer-studio-dom.test.tsx`, `apps/web/src/features/studio/DeveloperStudio.tsx`)**:
-  - **다운로드 핸들러 방어선(L454) 실측 및 DOM 트리거 하네스 완결**: 초기 상태에서 L454에 `if (true)` 및 `if (false)` 주입 시 아무런 시험도 깨지지 않던 사장 상태(기존 L439 캐시 우선 우회 및 버튼 비활성화로 인한 미도달)를 실측 규명. `handleDownloadArtifact`가 항상 서버 canonical `/result`를 우선 질의하고 `isRouteNotFoundError` 평가를 거쳐 `/artifacts`로 폴백하도록 정합한 뒤, 다운로드 버튼(`artifact-meta-download-btn`) 클릭 액션을 발동시키는 DOM 테스트 5종을 신설.
-  - **양대 경로 양방향 돌연변이 실증 (2-Path Mutation Testing Proof)**:
-    - **경로 A (마운트 효과 L294)**: `if (true)` 주입 시 시나리오 1~6 6건 전수 실패 (`AssertionError: expected 1 to be +0`), `if (false)` 주입 시 시나리오 7 1건 실패 (`AssertionError: expected +0 to be 1`).
-    - **경로 B (다운로드 액션 L454)**: `if (true)` 주입 시 다운로드 시나리오 1~4 4건 전수 실패 (`AssertionError: expected 1 to be +0`), `if (false)` 주입 시 다운로드 시나리오 5 1건 실패 (`AssertionError: expected +0 to be 1`).
-    - 정규 코드 복원 시 전체 13개 DOM 테스트 전수 통과 (13/13).
-  - **검증 실적**: Vitest 36개 파일 **349/349 passed 100%** (+5건 순증), 프론트엔드 프로덕션 빌드 4.02s 클린 생성, Pytest `test_route_coverage.py` **30/30 passed 100%**, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS.
+- **UI-FB-03 DeveloperStudio 라우트 404 폴백 DOM 하네스, 캐시 은폐 제거 및 양방향 돌연변이 실증 완결 (`apps/web/tests/developer-studio-dom.test.tsx`, `apps/web/src/features/studio/DeveloperStudio.tsx`, `AdminSecurityConsole.tsx`, `RunDetail.tsx`)**:
+  - **거동 변경(Option A 채택) vs 시험 추가 분리 및 판단 근거 확정**: "캐시는 성공했을 때의 효율 수단이지 실패를 감추는 수단이 아니다"라는 원칙에 따라, 다운로드 클릭 시 항상 canonical `/result`를 질의하고 401/403/500/네트워크 오류 발생 시 로컬 캐시(`artifactData`) 폴백을 엄격 금지하며 정직하게 `alert` 후 다운로드를 중단하도록 거동을 변경. (오류 은폐 및 만료 세션 무단 다운로드를 유발하는 Option B 기각).
+  - **Codex 경계 검토 지적사항(401 세션 만료 시 캐시 데이터가 오류를 가리는 결함) 완제**: 비-라우트 오류 시 `effectivePayload = serverPayload || artifactData`로 빠져나가던 결함을 `effectivePayload = serverPayload` 단일화 및 catch 즉시 alert+return으로 차단. 상주 시험 6종(`Download Scenario 1 [401]`, `1b [403]`, `2 [500]`, `3 [Net]`, `4 [App-404]`, `6 [Fallback Fail]`)을 신설하여 오류 노출(`window.alert`)과 조용한 캐시 다운로드 방지(`URL.createObjectURL` 미호출)를 단언.
+  - **양방향 돌연변이 실증 매트릭스 18종 완결**:
+    - 마운트 효과(L294): `if (true)` 주입 시 6건 실패, `if (false)` 주입 시 1건 실패.
+    - 다운로드 폴백(L458): `if (true)` 주입 시 5건 실패, `if (false)` 주입 시 1건 실패.
+    - 다운로드 캐시 은폐(L474~480): 에러 삼킴 및 캐시 폴백 주입 시 다운로드 5개 시나리오 동시 실패.
+    - 영수증 대조 분기(L620): `if (true)` 시 영수증 부재 실패 포착, `if (false)` 시 유효 영수증 누락 포착.
+    - 정규 복원 시 18개 DOM 테스트 전수 통과 (18/18).
+  - **18개 기능 디렉터리, 55개 파일 전수 죽은 방어 훑기(Dead Defense Audit) 완결**:
+    - `DeveloperStudio.tsx`: 영수증 부재 시 허위 "Lease 자원 회수" 배너 노출 제거, 원본 바이트 다운로드 실패 시 에디터 소스 위장 제거.
+    - `AdminSecurityConsole.tsx`: 노드 drain/resume 실패 시 낙관적 로컬 상태 롤백 및 alert 표출.
+    - `RunDetail.tsx`: 영수증 부재 시 alert 안내 표출.
+    - `ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `ApprovalDetail.tsx`: 외부 가드 및 에러 상태 렌더링 무결성 확인.
+  - **검증 실적**: Vitest 36개 파일 **354/354 passed 100%** (+10건 순증), Vite 프로덕션 빌드 6.33s 클린 생성, Pytest `test_route_coverage.py` 30 passed, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS.
   - 보고서: [[2026-09-21_UI_FB03_DeveloperStudio_DOM_라우트404폴백검증_Gemini]].
 
 - **UI 연속 재조회 전이 회귀·접근성 role=alert·산출물 무결성 검증 엄격 분리 완결 (`apps/web/tests/resource-explorer-dom.test.tsx`, `apps/web/src/features/desktop/ResourceExplorer.tsx`, `PlacementSimulator.tsx`, `DeveloperStudio.tsx`, `tests/test_route_coverage.py`)**:

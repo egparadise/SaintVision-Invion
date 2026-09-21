@@ -1,4 +1,9 @@
 import { apiClient, generateTraceId } from './client';
+import type {
+  ApprovalChallenge,
+  ApprovalDecisionInput,
+  ApprovalView,
+} from '../../../../../packages/contracts-ts/src';
 
 interface ApprovalIntent {
   id: string;
@@ -16,13 +21,14 @@ export async function decideApproval(intent: ApprovalIntent, decision: 'approve'
   const base = `${scope(intent.projectId)}/approvals/${encodeURIComponent(intent.id)}`;
   const actionDigest = intent.actionDigest;
   if (!actionDigest) throw new Error('승인 내용을 새로고침한 뒤 다시 시도하세요.');
-  const challenge = await apiClient<{ nonce: string }>(`${base}/challenge`, {
+  const challenge = await apiClient<ApprovalChallenge>(`${base}/challenge`, {
     method: 'POST', body: JSON.stringify({}),
   });
   if (!challenge?.nonce) throw new Error('승인 확인 정보를 받지 못했습니다.');
-  return apiClient(`${base}/decision`, {
+  const input: ApprovalDecisionInput = { decision, nonce: challenge.nonce, actionDigest };
+  return apiClient<ApprovalView>(`${base}/decision`, {
     method: 'POST',
-    body: JSON.stringify({ decision, nonce: challenge.nonce, actionDigest }),
+    body: JSON.stringify(input),
     idempotencyKey: generateTraceId(),
   });
 }

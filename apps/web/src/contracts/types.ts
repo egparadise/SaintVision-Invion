@@ -87,31 +87,7 @@ export interface ProjectItem {
   kernelEnabled?: boolean;
 }
 
-export type ReadinessResolver = 'operator' | 'project owner' | 'node owner' | 'requester';
-
-export interface ExecutionReadinessCheck {
-  check: string;
-  satisfied: boolean;
-  detail: string;
-  resolvedBy?: ReadinessResolver;
-  remedy?: string;
-  snapshotBytes?: number | null;
-  maxSnapshotBytes?: number;
-  maxContentBytes?: number;
-  runId?: string | null;
-}
-
-export interface WorkspaceReadiness {
-  workspaceId: string;
-  projectId: string;
-  executable: boolean;
-  scope: string;
-  nodeReadiness: string;
-  admissionRequired: boolean;
-  checks: ExecutionReadinessCheck[];
-  blockedBy: ReadinessResolver[];
-  summary: string;
-}
+export type { WorkspaceExecutionReadinessResponse as WorkspaceReadiness } from './workspace-execution-readiness-response';
 
 export interface WorkspaceItem {
   id: string; // wsp_...

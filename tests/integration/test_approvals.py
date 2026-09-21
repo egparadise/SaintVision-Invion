@@ -92,7 +92,7 @@ def challenge(a, row, actor="alice"):
 
 
 def decide(a, row, actor, nonce, *, decision="approve", key=None, digest=None):
-    return a.store.decide(
+    result = a.store.decide(
         a.people[actor],
         a.e.project,
         row["approvalId"],
@@ -101,6 +101,8 @@ def decide(a, row, actor, nonce, *, decision="approve", key=None, digest=None):
         action_digest=digest or row["actionDigest"],
         key=key or "decision:" + actor,
     )
+    validate_contract("ApprovalView", result)
+    return result
 
 
 def approved(a):

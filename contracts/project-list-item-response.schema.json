@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Business project row shown in the project selector.",
+  "properties": {
+    "canApprove": {
+      "title": "Canapprove",
+      "type": "boolean"
+    },
+    "canRequest": {
+      "title": "Canrequest",
+      "type": "boolean"
+    },
+    "code": {
+      "title": "Code",
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "displayName": {
+      "title": "Displayname",
+      "type": "string"
+    },
+    "kernelEnabled": {
+      "title": "Kernelenabled",
+      "type": "boolean"
+    },
+    "kernelLinked": {
+      "title": "Kernellinked",
+      "type": "boolean"
+    },
+    "kernelNote": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kernelnote"
+    },
+    "memberCount": {
+      "minimum": 0,
+      "title": "Membercount",
+      "type": "integer"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "roleCode": {
+      "title": "Rolecode",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "projectId",
+    "code",
+    "displayName",
+    "status",
+    "memberCount",
+    "createdAt",
+    "kernelLinked",
+    "kernelEnabled",
+    "roleCode",
+    "canRequest",
+    "canApprove"
+  ],
+  "title": "ProjectListItemResponse",
+  "type": "object"
+}

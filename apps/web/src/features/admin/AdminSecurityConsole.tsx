@@ -43,8 +43,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           method: 'POST',
           body: JSON.stringify({ actor: 'usr_admin_01' }),
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to sync node resume to control plane:', err);
+        secManager.drainNode(nodeId, 'usr_admin_01', 'Reverting failed undrain action');
+        refreshState();
+        alert(`노드 재개 동기화 실패: ${err?.message || '제어 평면 오류'}`);
       }
     } else {
       secManager.drainNode(nodeId, 'usr_admin_01', 'Admin manual maintenance and isolation protocol');
@@ -54,8 +57,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           method: 'POST',
           body: JSON.stringify({ actor: 'usr_admin_01', reason: 'Admin manual maintenance and isolation protocol' }),
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to sync node drain to control plane:', err);
+        secManager.undrainNode(nodeId, 'usr_admin_01');
+        refreshState();
+        alert(`노드 격리(Drain) 동기화 실패: ${err?.message || '제어 평면 오류'}`);
       }
     }
     if (onRefreshNodes) {

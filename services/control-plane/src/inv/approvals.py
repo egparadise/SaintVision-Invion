@@ -320,11 +320,13 @@ class ApprovalStore:
                     row["expires_at"],
                 ),
             ).fetchone()
-            return {
+            response = {
                 "approvalId": approval_id,
                 "nonce": nonce,
                 "expiresAt": result["expires_at"].isoformat(),
             }
+            validate_contract("ApprovalChallenge", response)
+            return response
 
     def decide(self, principal, project_id, approval_id, decision, nonce, *, action_digest, key):
         validate_contract(
@@ -343,6 +345,7 @@ class ApprovalStore:
             run, row = self._locked(conn, approval_id, project_id)
             self._grant(conn, project_id, principal.subject_id, "can_approve")
             if prior is not None:
+                validate_contract("ApprovalView", prior)
                 return prior
             self._current(conn, run, row, {"pending"})
             if decision == "approve":
@@ -396,7 +399,9 @@ class ApprovalStore:
             self._audit(conn, principal, row, "rejected" if decision == "reject" else "approved")
             if decision == "reject":
                 self.runs._transition(conn, principal.tenant_id, run, "failed", run["version"])
-            return self._save(conn, project_id, "approval.decide", key, view(row))
+            response = self._save(conn, project_id, "approval.decide", key, view(row))
+            validate_contract("ApprovalView", response)
+            return response
 
     def dispatch(self, principal, project_id, approval_id, workload, *, key):
         validate_contract("WorkloadSpec", workload)

@@ -18,6 +18,30 @@ const contracts = [
     schema: 'data-location-page-response',
     output: 'data-location-page-response',
   },
+  {
+    schema: 'project-list-response',
+    output: 'project-list-response',
+  },
+  {
+    schema: 'legacy-project-catalog-response',
+    output: 'legacy-project-catalog-response',
+  },
+  {
+    schema: 'project-workspaces-response',
+    output: 'project-workspaces-response',
+  },
+  {
+    schema: 'workspace-summary-response',
+    output: 'workspace-summary-response',
+  },
+  {
+    schema: 'execution-readiness-check-response',
+    output: 'execution-readiness-check-response',
+  },
+  {
+    schema: 'workspace-execution-readiness-response',
+    output: 'workspace-execution-readiness-response',
+  },
 ];
 const mode = process.argv[2];
 

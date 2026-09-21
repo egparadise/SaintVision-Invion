@@ -147,6 +147,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           // Result not yet available or receipt not present in ResultView
         }
       }
+      if (!receipt) {
+        alert(`물리 정지 영수증(NodeStopReceipt)을 조회할 수 없습니다. 실행(${run.id})의 영수증이 아직 발행되지 않았거나 서버에 보관되어 있지 않습니다.`);
+      }
       setSelectedReceipt(receipt);
     } catch (e: any) {
       alert(e.message || '영수증 조회 실패');

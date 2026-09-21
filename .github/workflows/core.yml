@@ -78,6 +78,16 @@ jobs:
           python_base=$(docker image inspect --format '{{index .RepoDigests 0}}' python:3.12-slim)
           docker build --pull=false --build-arg "PYTHON_IMAGE=$python_base" -f deploy/testing/Dockerfile.python-node -t "inv-python-node:$GITHUB_SHA" .work/node-image
           echo "INV_PYTHON_NODE_IMAGE=$(docker image inspect --format '{{.Id}}' "inv-python-node:$GITHUB_SHA")" >> "$GITHUB_ENV"
+      - name: Build owned LAN installer image and provide storage source root
+        run: |
+          mkdir -p .work/lan-node-image .work/storage-source
+          cp dist/inv-node .work/lan-node-image/inv-node
+          cp deploy/lan/Dockerfile.node .work/lan-node-image/Dockerfile
+          docker build --network=none --pull=false -t "inv-lan-node-test:$GITHUB_SHA" .work/lan-node-image
+          image_id=$(docker image inspect --format '{{.Id}}' "inv-lan-node-test:$GITHUB_SHA")
+          echo "INV_UPGRADE_AGENT_IMAGE=$image_id" >> "$GITHUB_ENV"
+          echo "INV_STORAGE_AGENT_IMAGE=$image_id" >> "$GITHUB_ENV"
+          echo "INV_STORAGE_SOURCE_ROOT=$GITHUB_WORKSPACE/.work/storage-source" >> "$GITHUB_ENV"
       - name: Build production API image and require explicit configuration
         run: |
           docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
@@ -95,8 +105,20 @@ jobs:
         run: python -m pytest tests/integration/test_business_handoff.py -x -q --junitxml=dist/business-handoff-tests.xml -o faulthandler_timeout=45
       - name: Verify bounded shard replacement on two real Nodes
         run: python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45
+      - name: Run provisioned LAN installer acceptance
+        run: python -m pytest -q tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=dist/lan-installer-tests.xml -o faulthandler_timeout=45
+      - name: Require executed LAN installer evidence
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/lan-installer-tests.xml').getroot()
+          assert root.findall('.//testcase'), 'No LAN installer test evidence'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every provisioned LAN installer test must run and pass'
+          PY
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py
+      # Web-container acceptance belongs to desktop-browser.yml. The two LAN
+      # image-opt-in suites run in the explicit provisioned step above.
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
       - name: Docker host hygiene (explicit lane)
         # These prune real host residue. Keep them off the default/backend path.
         # This job already owns a disposable runner with a working Docker daemon.
@@ -109,7 +131,11 @@ jobs:
           assert root.findall('.//testcase'), 'No test evidence'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every collected test must run and pass'
           host = ET.parse('dist/docker-host-tests.xml').getroot()
-          assert len(host.findall('.//testcase')) == 2, 'Both Docker host hygiene cases must execute'
+          host_cases = {case.get('name') for case in host.findall('.//testcase')}
+          assert host_cases == {
+              'test_prune_never_force_removes_a_running_concurrent_container',
+              'test_prune_removes_old_exited_residue_but_spares_a_recent_one',
+          }, f'docker-host case set drifted: {host_cases}'
           assert not any(host.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Docker host lane must run and pass'
           PY
       - run: python -m build services/control-plane --outdir dist

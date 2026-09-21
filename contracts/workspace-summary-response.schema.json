@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowedNext": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowednext",
+      "type": "array"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "nodeId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Nodeid"
+    },
+    "projectId": {
+      "title": "Projectid",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "toolName": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Toolname"
+    },
+    "workspaceId": {
+      "title": "Workspaceid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workspaceId",
+    "projectId",
+    "name",
+    "status",
+    "nodeId",
+    "toolName",
+    "createdAt",
+    "allowedNext"
+  ],
+  "title": "WorkspaceSummaryResponse",
+  "type": "object"
+}

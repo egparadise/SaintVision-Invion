@@ -1,13 +1,8 @@
-import type { ApprovalItem, ApprovalView, RiskLevel } from '@/contracts/types';
+import type { ApprovalItem } from '@/contracts/types';
+import type { ApprovalReviewView } from '../../../../../packages/contracts-ts/src';
 import { apiClient } from './client';
 import { decideApproval } from './kernelMutations';
-export interface ApprovalReview {
-  approval: ApprovalView;
-  workload: { projectId: string; workspaceId: string; command: string[]; imageDigest: string;
-    resources: Record<string, number>; timeoutSeconds: number; [key: string]: unknown };
-  riskLevel: Exclude<RiskLevel, 'L3'>;
-  policyDigest: string;
-}
+export type ApprovalReview = ApprovalReviewView;
 export interface ReviewedAction { approvalId: string; projectId: string; actionDigest: string; runVersion: number }
 const sha256 = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 export function reviewIdentity(item: ApprovalItem): string {
@@ -28,7 +23,7 @@ export async function fetchApprovalReview(item: ApprovalItem): Promise<ApprovalR
       !Array.isArray(w.command) || !w.command.length || w.command.some(arg => typeof arg !== 'string') ||
       typeof w.imageDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(w.imageDigest) ||
       !Number.isSafeInteger(w.timeoutSeconds) || w.timeoutSeconds < 1 || !w.resources ||
-      ['cpuMillis','memoryBytes','gpuCount','minVramBytes'].some(k =>
+      (['cpuMillis','memoryBytes','gpuCount','minVramBytes'] as const).some(k =>
         typeof w.resources[k] !== 'number' || !Number.isFinite(w.resources[k]) || w.resources[k] < 0)) {
     throw new Error('표시할 승인 내용이 현재 안건과 일치하지 않습니다. 목록을 새로고침하세요.');
   }
