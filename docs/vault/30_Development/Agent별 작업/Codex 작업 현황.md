@@ -18,6 +18,7 @@ source_of_truth: "Git"
 - Node list/detail를 strict FastAPI response model, 공유 fixture, JSON Schema/생성 TS, Python provider와 frontend conformance 시험으로 묶었다. DB-free provider route 9 passed. fixtures에 telemetry를 합성하지 않았고 기존 `nodeObservation`에서 unavailable semantics를 유지한다. 합성 `nextCursor` 이름 변형은 Python과 Vitest 양쪽에서 실패해 원복했다.
 - 로컬 검증: 전체 Core 778 passed/4 선행조건 skip/0 fail(errors 포함), Vitest 58 files/545 passed, TypeScript/Vite build 성공, schema 41, TS API contracts 16, bindings 29 fixtures/11 anchors, frontend integrity 0 violations, docs/ontology 통과. 엄격 nested capability schema 반영 후에는 focused node contract 9 passed와 schema/type generation check를 재실행했다. 전체 provenance/경계는 `[[2026-09-21_web_response_contract_map_workspace_Codex]]`.
 - 다음 담당/행동: Claude fixed-SHA 독립 검토는 integration 착지 SHA 대상으로 대기. hosted Actions는 결제 복구 후 `docs`, `backend`, `core` 순으로 실행해 신규 게이트와 실제 PG role 권한을 확인한다. Gemini는 이 Node API slice에서 화면 변경을 하지 않았으며 브라우저 인수는 별도다.
+- Fixed SHA candidate `6f638e30dc8087b81eddf58c6019c314b5f3dac5`는 Claude 최신 integration review `9ed6df9`와 Codex 구현을 병합한 clean tree에서 Core 778/4 skips/0 fail, Vitest 545, build 및 docs/schema/binding/frontend checks를 통과했다. PostgreSQL 동시성 대조는 별도 소유 PG16 컨테이너에서 5 integration tests passed. 상세 provenance/skip 분포는 History; hosted CI billing과 browser/device acceptance는 미완.
 
 ## 2026-09-21 통합 migration-head 회귀 및 응답 계약 결정
 
