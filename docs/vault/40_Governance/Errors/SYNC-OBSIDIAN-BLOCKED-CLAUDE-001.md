@@ -1,11 +1,11 @@
 ---
 doc_id: "SYNC-OBSIDIAN-BLOCKED-CLAUDE-001"
 title: "sync_obsidian.py --check 차단 조사 — 683 충돌 사유별 분류·근본원인·도구 진단 수정. --apply 미실행"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-20T17:00:00+09:00"
+updated: "2026-09-21T10:00:00+09:00"
 source_of_truth: "Git"
 tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 ---
@@ -45,3 +45,26 @@ tags: ["saintvision", "sync", "obsidian", "vault", "diagnosis", "no-apply"]
 2. **683 충돌 개별 판단**: 681 no-baseline은 대부분 착시지만 일부가 진짜 vault 편집일 수 있으니, 사용자가 `.work/obsidian-sync-conflicts.json` 목록을 보고 **vault 편집분을 보존할지** 결정한 뒤 진행. **2 both-diverged(Overview.md·설계인덱스)는 반드시 수동 재조정**(vault 편집 가능성).
 3. all-or-nothing 완화(선택): 충돌이 있어도 **깨끗한 신규 파일만 내보내는 모드**가 있으면 오늘 새 문서는 즉시 도달 가능 — 설계 결정(Codex/사용자).
 **어느 것도 vault 편집분을 덮어쓸 수 있으므로, 원인이 분명해지고 사용자가 판단한 뒤에만 실제 sync를 한다. 덮어쓰기는 되돌릴 수 없다.**
+
+## v1.1.0 — 사용자 승인 "613 동일분 흡수" 실행 결과 (2026-09-21)
+
+사용자가 **repo·vault 내용이 이미 동일한 파일만 baseline 으로 흡수**(쓰기 없음)하는 방안을 승인해 실행했다. **vault 에는 어떤 쓰기도 하지 않았다.**
+
+### 실행 전 검증 (지시대로 목록 먼저)
+- **hash 동일 = 613** (양쪽 존재+해시 동일, 이중 검증, 불일치 0). both-diverged 2 건(`Overview.md`, `SaintVision INV 개발 설계 인덱스.md`)은 **대상에서 제외**(해시 동일 아님).
+- **핵심 정정**: `identical ∩ conflicts = 0`(서로소 실측). **613 은 애초에 충돌이 아니라 이미-동일 버킷이다.** 따라서 흡수해도 683 충돌은 줄지 않는다. v1.0.0 및 이전 보고의 "동일분을 흡수하면 충돌에서 빠진다"는 **부정확했고 여기서 정정한다.**
+- **조건 5 확인**: 도구 `--check --adopt-identical` 은 exit 3 이며 **state 파일조차 쓰지 않는다**(state write 는 `--apply` 경로에만). `--apply --adopt-identical` 은 충돌에서 먼저 중단. → **도구의 adopt-identical 은 충돌이 있으면 baseline 을 지속시키지 못한다**(adopt 에도 닭-달걀).
+
+### 흡수 실행 + 검증
+- 도구가 못 하므로 **`.work/obsidian-sync-state.json` state 파일을 직접 생성**(613 hash-동일 항목만; vault 아님, repo-side tracking JSON). `state['vault']` 가 대상 vault 로 해석돼 도구가 정상 수용(재-check 시 vault-mismatch 오류 없음).
+- **vault 무변경 실측**: 흡수 전후 vault 파일 수 1307 동일·샘플 해시 불변 → **vault 쓰기 0**(조건 5 충족: baseline 기록만).
+- **흡수 후 재-check: 683 충돌 그대로**(681 no-baseline + 2 both-diverged). 예측·실측 일치 — 흡수는 현재 충돌을 **줄이지 않았다**.
+
+### state 파일 / 닭-달걀 / 위치
+- **state 파일이 이제 생겼다**(613 baseline). 닭-달걀의 '달걀'은 마련됐으나 **도구만으로는 여전히 못 만든다**(조건 5) — 내가 우회 생성. **도구 결함(권고·Codex)**: adopt-identical 이 충돌 존재 시에도 hash-동일분 state 를 **충돌 abort 이전에 지속**시키게 고쳐야 도구만으로 baseline 을 세울 수 있다.
+- **위치 = `.work/obsidian-sync-state.json`(휘발성)**. 다음 `.work` 정리 때 사라진다. **권고(실행 안 함)**: state 를 **비휘발성 경로**(repo 밖 사용자 지정 또는 안정 위치, `--state` 로 지정 가능)로 두어야 흡수가 지속된다. *위치 변경은 사용자 판단 영역이라 권고까지만.*
+
+### 남은 상태 · apply 전망 (정직)
+- **충돌 683 그대로**(681 no-baseline + 2 both-diverged), **67 pending**(오늘 새 문서 포함, vault 미도달 실측 확인).
+- **apply 는 충돌 0 이어야 열린다.** 613 흡수는 충돌을 0 으로 못 만들었으므로 **apply 는 여전히 닫혀 있고 67 pending 은 여전히 막혀 있다. 이번 흡수는 unblock 전망을 개선하지 못했다.**
+- **unblock 경로**: 681 no-baseline 은 파일별 판단(vault 편집 보존 vs repo 로 덮어쓰기), 2 both-diverged 는 수동 재조정 — 모두 사용자 판단 영역이며 이번에 손대지 않았다. 그 판단으로 충돌이 0 이 되어야 오늘 문서가 vault 에 도달한다.
