@@ -1,11 +1,11 @@
 ---
 doc_id: "CI-PREFLIGHT-CONFIG-CLAUDE-001"
 title: "CI 사전 점검 — 결제 열기 전 설정-원인 빨간불 제거. 발견·인계(워크플로는 Codex)"
-version: "1.3.0"
+version: "1.3.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T21:20:00+09:00"
+updated: "2026-09-21T21:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handoff-codex"]
@@ -34,7 +34,7 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 ### ③ 하드코딩된 개수 — 파일에서 세지 않고 박아둠
 - `desktop-browser.yml`: `assert proof['tests'] == {failure:0, error:0, skipped:0, passed:6}` — **6은 워크플로에 박힌 리터럴**. 현재 실측 **6 tests collected**로 일치하나, browser 여정이 하나 추가/삭제되면 어긋나 **비-결함 RED**. 오늘 definer에서 9-vs-10으로 겪은 형태.
 - `core.yml`: `assert len(host.findall('.//testcase')) == 2` — docker-host hygiene 케이스 **2도 리터럴**. 현재 **2 collected**로 일치하나 동일 취약.
-- **수정안(Codex, definer식)**: 리터럴 대신 **수집 결과/정책과 대조**. 최소 변경은 `skipped==0 and failure==0 and error==0 and passed>0`(마법 숫자 제거 — `skipped==0`이 이미 "조용한 skip 없음"을 보장하므로 개수 고정의 이득이 작다). 또는 collect-only 개수와 대조. (browser의 `browserOptIn`·`exitCode==0`·`isolatedContainerRemoved`·junit-파싱 비공허성은 유지 — 6만 완화.)
+- **수정안**: 아래 「## ③ [v1.3.0 정정]」 참조(유도 방식 — 이름 집합 대조). ~~최소 변경 `passed>0`~~ 안은 철회됨(삭제 탐지력 상실). *(이 취약 항목의 진단은 유효; 유효 수정안은 v1.3.0 섹션 한 곳.)*
 
 ## 비-문제 (한 층 더 확인해 걸러낸 것 — 나의 near-slip 포함)
 사용자 교훈("불일치로 보이면 한 층 더: 워킹디렉터리·env 변환·래퍼·조건 분기") 그대로, 아래는 처음엔 의심했으나 다음 층에서 무해로 확정:
@@ -64,6 +64,8 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 즉 "go 1.27.1 미출시"는 (3)이었는데 내가 (1)처럼 근거로 썼다. 올바른 행동은 `go-version` 같은 항목을 만나면 **먼저 go.dev/dl을 조회**(2)한 뒤 판정하는 것이다. (버전 pin·외부 이미지 태그·패키지 가용성이 이 부류다.)
 
 **규칙 보강 (4) — 빈 결과는 사실이 아니다 (측정 도구가 조용히 실패한다):** 아무것도 안 나왔다는 것은 "없다"일 수도, "명령이 실패했다"일 수도 있다. 사용자가 방금 워크플로의 node_dependent 사용 여부를 훑다가 **빈 결과를 얻었는데**, 원인은 Git Bash 경로 변환이 `origin/branch:path` 인자를 역슬래시·세미콜론으로 망가뜨려 `git show`가 전부 실패했고 stderr를 버려 조용히 빈 결과가 된 것이었다(`MSYS2_ARG_CONV_EXCL='*'`로 다시 하니 backend.yml이 그 목록을 쓴다는 판정이 맞았다). 오늘 파이프 뒤 종료코드로 한 번, 경로 변환으로 또 한 번 — **뿌리가 같다: 측정 도구 자체가 조용히 실패**. 그래서 빈 결과를 사실로 읽기 전에 **① 반드시 무언가를 찾아야 하는 대조군에서 같은 명령이 도는지, ② 종료코드·stderr가 성공인지**를 확인한다. (측정으로 확정하기 전 계측을 확정한다 — `memory:empty-output-is-not-evidence`.)
+
+**규칙 보강 (5) — 정정은 결론이 읽히는 모든 자리를 고쳐야 끝난다 (문서 층위의 배선≠통과):** 정정문을 쓰는 것으로 끝내지 말고, 그 결론이 **인용·요약된 자리를 전부 찾아 함께 고친다**. 문서 안에서 결론이 두 번 이상 적히면 갱신 안 된 사본이 남고, **행동하는 쪽은 대개 요약(인계 목록)을 읽는다** — 그러면 정정을 기록해도 행동 대상은 정정 이전을 지시한다("고쳤는데 고친 것이 읽히는 자리에 없음"). 오늘 하루 쫓은 "초록≠도달, 배선≠통과"가 문서 층위로 한 번 더 나온 형태다(이 문서 자체가 v1.3.0에서 그랬다 — 정정은 별도 섹션에, 인계 목록엔 철회된 `passed>0`이 남아 Codex가 그것을 집어갈 뻔했다; 사용자가 문안을 직접 열어 잡았다). **처방: 유효 지시는 한 곳에만 두고 나머지는 그곳을 가리키게 한다.** 인계 문서는 "유효 수정안 = 한 섹션" 원칙으로 쓴다.
 
 ## v1.2.0 — ① 배선→통과 실증 (before-red / after-green) + Codex 적용 패치문안
 ①은 "junit 22/22 skip"까지만 [측정]했었다 — 그건 배선(skip이 있다)이지 **통과 실패(워크플로가 실제로 RED)**를 보인 게 아니다. 오늘의 배선≠통과 구별대로, 워크플로의 **단언 단계 코드를 그대로 그 junit에 먹여** 실패까지 보이고, 수정 후 통과까지 보였다.
@@ -134,6 +136,6 @@ assert journeys == EXPECTED_JOURNEYS, f'browser journeys drifted: {journeys ^ EX
 ## 인계
 워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **②는 철회. ①③만 인계**(위 패치문안·판단 재료 첨부):
 - **①(image-opt-in skip → no-skipped RED)** — [측정]된 사실. **재현법 함께 인계**: `.venv python -m pytest tests/integration/test_web_container.py tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=<path>` → junit `testcases=22, skipped=22, failure=0, error=0`; 이 3파일은 node_dependent 목록에 없어 backend(`$IGNORES`+browser)·core(browser만) collect에 포함됨. **수정안 2개**: ⓐ 워크플로에서 browser처럼 제외(`--ignore=…`) — **Codex 소관**; ⓑ `node_dependent_tests.py`(**Claude 소관**)에 이 opt-in-이미지 부류를 추가해 backend에서 자동 제외 — 단 core.yml은 그 목록을 안 쓰므로 core는 별도 제외 필요. Codex가 어느 쪽이 정합적인지 판단하고, ⓑ면 내가 확장한다.
-- **③(하드코딩 개수)** — [측정]상 browser 6·docker-host 2는 현재 일치하나 리터럴이라 코드 변경 시 어긋난다. `skipped==0 and failure==0 and error==0 and passed>0`로(마법 숫자 제거+조용한 skip 차단). **선례**: 오늘 definer 함수 개수를 9-vs-10에서 하드코딩 대신 수집/정책 대조로 바꾼 것과 같은 형태 — 그 선례를 근거로 단다.
+- **③(하드코딩 개수)** — **유효 지시는 위 「## ③ [v1.3.0 정정]」 섹션 하나뿐이다**(browser 여정 이름 집합 대조 + docker-host 케이스 이름 집합 대조, 실제 정본 이름 박음). 이전에 여기 있던 `passed>0` 안은 **철회됨**(삭제 탐지력 상실 — 그 섹션 참조). Codex는 그 섹션의 문안을 적용한다.
 
 reviewer: Codex. apps/web 미접촉, tests 미수정(전부 소스-읽기/실측, img_probe.xml 삭제).
