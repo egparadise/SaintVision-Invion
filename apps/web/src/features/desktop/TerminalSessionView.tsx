@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { MonacoWorkspaceEditor } from '@/features/editor/MonacoWorkspaceEditor';
 import { NodeItem } from '@/contracts/types';
 import { TerminalShellType } from '@/contracts/virtualFabric';
 
 export interface TerminalSessionViewProps {
-  nodes: NodeItem[];
+  nodes?: NodeItem[];
   defaultNodeId?: string;
   defaultWorkspaceId?: string;
+  projectId?: string;
+  initialMode?: 'terminal' | 'ide';
+  onCreateSessionError?: (err: string) => void;
 }
 
 interface ActiveSessionTab {
@@ -20,42 +23,107 @@ interface ActiveSessionTab {
 }
 
 export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
-  nodes,
-  defaultNodeId = 'nod_01JABCDEF01',
+  nodes = [],
+  defaultNodeId,
   defaultWorkspaceId = 'wsp_01JABCDE001',
+  projectId = 'prj_01JABCDE',
+  initialMode = 'terminal',
+  onCreateSessionError,
 }) => {
-  const [sessions, setSessions] = useState<ActiveSessionTab[]>([
-    {
-      id: 'sess_win_01',
-      title: 'Node-01 (PowerShell)',
-      nodeId: defaultNodeId,
-      shellType: 'powershell',
-      mode: 'terminal',
+  const isNodesEmpty = !nodes || nodes.length === 0;
+  const fallbackNode: NodeItem = useMemo(
+    () => ({
+      id: defaultNodeId || 'nod_01JABCDEF01',
+      hostname: 'Node-01 (Virtual)',
+      ipAddress: '127.0.0.1',
+      os: 'windows',
+      role: 'worker',
+      status: 'online',
+      schedulable: true,
+      observationOnly: false,
+      cpuCores: 8,
+      cpuUsagePercent: 10,
+      memoryTotalBytes: 32 * 1024 * 1024 * 1024,
+      memoryUsedBytes: 8 * 1024 * 1024 * 1024,
+      gpuCount: 0,
+      gpuUsagePercent: 0,
+      storageTotalBytes: 500 * 1024 * 1024 * 1024,
+      storageUsedBytes: 100 * 1024 * 1024 * 1024,
+      uptimeSeconds: 3600,
+      heartbeatAt: new Date().toISOString(),
+      agentVersion: '1.0.0',
+    }),
+    [defaultNodeId]
+  );
+  const effectiveNodes = isNodesEmpty ? [fallbackNode] : nodes;
+
+  // Filter eligible (schedulable & non-observation) nodes for initial sessions
+  const eligibleNodes = effectiveNodes.filter((n) => !n.observationOnly && n.schedulable !== false);
+  const primaryNode =
+    (defaultNodeId ? effectiveNodes.find((n) => n.id === defaultNodeId) : null) ||
+    eligibleNodes[0] ||
+    effectiveNodes[0];
+
+  const initialSessions: ActiveSessionTab[] = useMemo(() => {
+    const list: ActiveSessionTab[] = [];
+    const isWin = primaryNode.os === 'windows';
+    const shell: TerminalShellType = isWin ? 'powershell' : 'bash';
+
+    list.push({
+      id: 'sess_init_01',
+      title: `${primaryNode.hostname} (${initialMode === 'ide' ? 'IDE' : isWin ? 'PowerShell' : 'Bash'})`,
+      nodeId: primaryNode.id,
+      shellType: shell,
+      mode: initialMode,
       workspaceId: defaultWorkspaceId,
-    },
-    {
-      id: 'sess_linux_05',
-      title: 'Node-05 (Bash / Linux)',
-      nodeId: 'nod_01JABCDEF05',
-      shellType: 'bash',
-      mode: 'terminal',
-      workspaceId: 'wsp_01JABCDE002',
-    },
-  ]);
+    });
 
-  const [activeSessionId, setActiveSessionId] = useState<string>(sessions[0].id);
+    // Add secondary linux session if another eligible node exists
+    const secondaryNode = eligibleNodes.find((n) => n.id !== primaryNode.id);
+    if (secondaryNode) {
+      const secIsWin = secondaryNode.os === 'windows';
+      list.push({
+        id: 'sess_init_02',
+        title: `${secondaryNode.hostname} (${secIsWin ? 'PowerShell' : 'Bash'})`,
+        nodeId: secondaryNode.id,
+        shellType: secIsWin ? 'powershell' : 'bash',
+        mode: 'terminal',
+        workspaceId: `${defaultWorkspaceId}_02`,
+      });
+    }
 
-  const activeSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
-  const activeNode = nodes.find((n) => n.id === activeSession.nodeId) || nodes[0];
+    return list;
+  }, [primaryNode, defaultWorkspaceId, initialMode, eligibleNodes]);
+
+  const [sessions, setSessions] = useState<ActiveSessionTab[]>(initialSessions);
+  const [activeSessionId, setActiveSessionId] = useState<string>(
+    initialSessions[0]?.id || 'sess_init_01'
+  );
+  const [sessionError, setSessionError] = useState<string | null>(null);
+
+  const activeSession =
+    sessions.find((s) => s.id === activeSessionId) || sessions[0] || initialSessions[0];
+  const activeNode =
+    nodes.find((n) => n.id === activeSession.nodeId) || primaryNode;
 
   const handleCreateSession = (mode: 'terminal' | 'ide', targetNodeId: string) => {
     const node = nodes.find((n) => n.id === targetNodeId) || nodes[0];
+
+    // Observation-only / unschedulable node guard (ADR-028 & ADR-041)
+    if (mode === 'terminal' && (node.observationOnly || node.schedulable === false)) {
+      const err = `노드 ${node.hostname}은(는) 관측 전용 노드로 대화형 PTY 세션을 생성할 수 없습니다.`;
+      setSessionError(err);
+      onCreateSessionError?.(err);
+      return;
+    }
+
+    setSessionError(null);
     const isWin = node.os === 'windows';
     const shellType: TerminalShellType = isWin ? 'powershell' : 'bash';
-    const newId = `sess_${Date.now().toString(36)}`;
+    const newId = `sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
     const newTab: ActiveSessionTab = {
       id: newId,
-      title: `${node.hostname} (${mode === 'ide' ? 'IDE' : shellType})`,
+      title: `${node.hostname} (${mode === 'ide' ? 'IDE' : isWin ? 'PowerShell' : 'Bash'})`,
       nodeId: node.id,
       shellType,
       mode,
@@ -75,8 +143,16 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
     }
   };
 
+  const handleToggleMode = () => {
+    const nextMode = activeSession.mode === 'terminal' ? 'ide' : 'terminal';
+    setSessions((prev) =>
+      prev.map((s) => (s.id === activeSession.id ? { ...s, mode: nextMode } : s))
+    );
+  };
+
   return (
     <div
+      data-testid="terminal-session-view-container"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -87,6 +163,8 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
     >
       {/* Session Top Bar / Tabs */}
       <div
+        role="tablist"
+        aria-label="PTY 및 IDE 활성 세션 탭"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -104,6 +182,9 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             return (
               <div
                 key={sess.id}
+                role="tab"
+                aria-selected={isActive}
+                data-testid={`session-tab-${sess.id}`}
                 onClick={() => setActiveSessionId(sess.id)}
                 style={{
                   display: 'flex',
@@ -125,6 +206,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
                   <button
                     type="button"
                     title="세션 종료"
+                    data-testid={`close-session-${sess.id}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCloseSession(sess.id);
@@ -149,6 +231,7 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
         {/* New Session Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <select
+            data-testid="new-session-select"
             onChange={(e) => {
               if (e.target.value) {
                 const [mode, nId] = e.target.value.split(':');
@@ -169,15 +252,79 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
             <option value="" disabled>
               ➕ 새 세션 열기...
             </option>
-            {nodes.map((n) => (
-              <option key={`term:${n.id}`} value={`terminal:${n.id}`}>
-                ⌨️ 터미널: {n.hostname} ({n.os === 'windows' ? 'PowerShell' : 'Bash'})
-              </option>
-            ))}
-            <option value={`ide:${defaultNodeId}`}>📝 웹 IDE (Monaco Workspace Editor)</option>
+            {nodes.map((n) => {
+              const isObs = n.observationOnly || n.schedulable === false;
+              return (
+                <option
+                  key={`term:${n.id}`}
+                  value={`terminal:${n.id}`}
+                  disabled={isObs}
+                  data-testid={`option-node-${n.id}`}
+                >
+                  ⌨️ 터미널: {n.hostname} ({n.os === 'windows' ? 'PowerShell' : 'Bash'})
+                  {isObs ? ' [관측 전용 - PTY 불가]' : ''}
+                </option>
+              );
+            })}
+            <option value={`ide:${primaryNode.id}`} data-testid="option-ide-mode">
+              📝 웹 IDE (Monaco Workspace Editor)
+            </option>
           </select>
         </div>
       </div>
+
+      {/* Empty Nodes Notice Banner */}
+      {isNodesEmpty && (
+        <div
+          data-testid="terminal-empty-nodes-notice"
+          role="status"
+          style={{
+            padding: '6px 16px',
+            backgroundColor: '#1e293b',
+            color: '#94a3b8',
+            fontSize: '0.75rem',
+            borderBottom: '1px solid #334155',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span>ℹ️ 등록된 클러스터 노드가 없습니다 (가상 기본 PTY 세션으로 동작 중).</span>
+        </div>
+      )}
+
+      {/* Observation node error alert */}
+      {sessionError && (
+        <div
+          role="alert"
+          data-testid="terminal-session-error-alert"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#7f1d1d',
+            color: '#fecaca',
+            fontSize: '0.8125rem',
+            borderBottom: '1px solid #ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>🚫 {sessionError}</span>
+          <button
+            type="button"
+            onClick={() => setSessionError(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#fecaca',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Session Header Info */}
       <div
@@ -194,25 +341,37 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span>
-            대상 노드: <strong style={{ color: 'var(--color-text-primary)' }}>{activeNode.hostname}</strong> ({activeNode.ipAddress || '127.0.0.1'})
+            대상 노드:{' '}
+            <strong
+              data-testid="active-node-hostname"
+              style={{ color: 'var(--color-text-primary, #f8fafc)' }}
+            >
+              {activeNode.hostname}
+            </strong>{' '}
+            ({activeNode.ipAddress || '127.0.0.1'})
           </span>
           <span>
-            쉘 유형: <strong style={{ color: '#38bdf8' }}>{activeSession.shellType.toUpperCase()}</strong>
+            쉘 유형:{' '}
+            <strong
+              data-testid="active-shell-type"
+              style={{ color: activeSession.shellType === 'powershell' ? '#38bdf8' : '#4ade80' }}
+            >
+              {activeSession.shellType.toUpperCase()}
+            </strong>
           </span>
           <span>
-            인증: <strong>30초 암호학적 1회용 PTY 티켓 (mTLS 격리)</strong>
+            인증:{' '}
+            <strong data-testid="pty-ticket-badge" style={{ color: '#fbbf24' }}>
+              30초 암호학적 1회용 PTY 티켓 (mTLS 격리)
+            </strong>
           </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             type="button"
-            onClick={() => {
-              const newMode = activeSession.mode === 'terminal' ? 'ide' : 'terminal';
-              setSessions((prev) =>
-                prev.map((s) => (s.id === activeSession.id ? { ...s, mode: newMode } : s))
-              );
-            }}
+            data-testid="switch-mode-btn"
+            onClick={handleToggleMode}
             style={{
               padding: '2px 8px',
               borderRadius: '4px',
@@ -231,19 +390,25 @@ export const TerminalSessionView: React.FC<TerminalSessionViewProps> = ({
       {/* Session Active Body */}
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {activeSession.mode === 'terminal' ? (
-          <div style={{ flex: 1, padding: '16px', overflow: 'auto' }}>
+          <div
+            data-testid="active-terminal-container"
+            style={{ flex: 1, padding: '16px', overflow: 'auto' }}
+          >
             <WebTerminal
               workspaceId={activeSession.workspaceId}
               sessionId={activeSession.id}
             />
           </div>
         ) : (
-          <MonacoWorkspaceEditor
-            workspaceId={activeSession.workspaceId}
-            projectId="prj_01JABCDE"
-          />
+          <div data-testid="active-ide-container" style={{ flex: 1, overflow: 'hidden' }}>
+            <MonacoWorkspaceEditor
+              workspaceId={activeSession.workspaceId}
+              projectId={projectId}
+            />
+          </div>
         )}
       </div>
     </div>
   );
 };
+
