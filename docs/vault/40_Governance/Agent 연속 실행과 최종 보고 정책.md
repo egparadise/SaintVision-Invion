@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-CONTINUOUS-001"
 title: "Agent 연속 실행과 최종 보고 정책"
-version: "1.0.0"
+version: "1.1.0"
 status: "accepted"
 author: "Codex"
-updated: "2026-09-15T11:20:06+09:00"
+updated: "2026-09-21T14:33:00+09:00"
 source_of_truth: "Git and Obsidian paired update"
 tags: ["saintvision", "agents", "autonomy", "governance"]
 ---
@@ -81,3 +81,16 @@ flowchart LR
 - 새 권한이 필요한 blocker에서는 그 결정만 묻는다.
 - 완료 보고는 성공뿐 아니라 미실측·미검토·미배포를 명시한다.
 
+## 검증 결과의 재현 가능한 귀속
+
+모든 검사 결과와 “통과” 주장은 실행 대상과 조건을 식별할 수 있어야 한다. 한 줄 요약의 pass 수만으로는 검증 범위를 보증하지 않는다. 같은 커밋도 checkout, 인터프리터, 서비스·환경 변수 및 opt-in 조건에 따라 실제 실행 집합이 달라질 수 있으므로 다음 항목을 함께 기록한다.
+
+- 전체 commit SHA와 branch 이름, 실행 checkout/worktree의 절대 경로, 실행 전후 `git status --porcelain` 출력에 따른 clean/dirty 여부. dirty라면 변경 경로와 그 변경이 검사 입력에 포함됐는지 적는다. 줄바꿈 정규화가 status 결과에 영향을 줄 수 있는 생성 산출물은 `git diff --exit-code` 또는 해당 canonical drift gate도 함께 확인하고 측정법을 기록한다.
+- 명령 전체와 working directory, interpreter/runtime의 절대 경로와 버전. PowerShell 등 셸의 변수를 썼으면 최종 확장된 명령 또는 그 변수를 설정한 값을 기록한다.
+- 결과에 영향을 주는 환경 지문: OS/runner, 필요한 daemon·DB·browser·image의 가용 여부, opt-in·credential·DSN의 설정 여부(비밀 값은 기록 금지). 실행하지 못한 전체 lane과 skip/deselect 원인을 함께 밝힌다.
+- KST 시작·종료 시각과 직접 관측한 종료 코드. 종료 코드는 파이프 뒤 값이 아니라 실행 직후 셸의 process exit 값을 기록한다.
+- 테스트의 passed, failed, error, skipped, deselected 수를 각각 기록하고 skip 사유를 분포 또는 범주별 수로 함께 적는다. skip/deselect는 통과 수에 합치지 않으며, 전제 미충족 때문에 실행하지 않은 범위와 실제 판정된 범위를 분리한다.
+- JUnit, JSON, 로그 등 산출물이 있으면 저장소 내 경로와 그 SHA/실행 ID를 적는다. 산출물이 없으면 직접 console 결과라고 표시한다. 분할 실행은 batch별 결과와 산술 합계를 구분하고, 합계를 단일 실행처럼 쓰지 않는다.
+- 실행자와 독립 검토자를 따로 표시한다. 작성자의 실행·자기 검토·다른 Agent의 고정 SHA 재검토·CI 결과·브라우저/실장비 운영 인수는 서로 대체할 수 없다.
+
+다른 branch, SHA 또는 worktree에서 얻은 결과는 현재 integration의 직접 결과로 인용하지 않는다. 결과 보고에는 `direct on <full SHA>` 또는 `reported from <branch/SHA>`처럼 근거 위치를 표시한다. 관련 입력이나 문서를 바꾼 뒤에는 그 변경을 포함한 최종 SHA에서 영향을 받는 검사를 다시 실행한다. 스킵 비율이 큰 경우 pass 수와 함께 skip 분포를 앞에 밝혀 실제 실행 범위가 축소된 사실을 드러낸다. 실행 결과는 pipeline/formatter에 의존해 exit code를 바꾸지 않는다. 셸이 제공하는 process exit 값을 직접 캡처하고, summary parser를 썼다면 원본 artifact와 파서 범위를 함께 보존한다.

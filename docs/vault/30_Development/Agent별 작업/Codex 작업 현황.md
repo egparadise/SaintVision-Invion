@@ -1,14 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.91"
+version: "1.0.94"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T14:14:13+09:00"
+updated: "2026-09-21T14:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 최종 마감 상태
+
+- Current integration tip before this documentation update: `03e0c6117ae90d16bee94514345312eb7f4afecc`; original product-suite verification ran at `cb505f6697beffe78a1cbdaee027f415003c55d3` in `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`. Claude's later commits added `tools/provenance.py`, its reporting rule, and the reference-only main-checkout sync convention; the tool was directly exercised at 5c1e9ef and document gates are rerun at 03e0c61. Do not attribute the old full suite to 03e0c61.
+- Direct Python regression: `1338 passed / 1315 skipped / 2 deselected / 0 failed`; JUnit SHA and skip-reason distribution are in the integration audit. Claude independently reran the same code SHA in another clean worktree with identical results. Route coverage CLI exit 1 is the known `/v1/workspaces` static configuration-string false positive; route coverage regression tests 28 passed.
+- Pending owner order: Codex route scanner false-positive fix; Gemini UI-FB-03 component transition tests and fixed-SHA handoff; CI only after Billing/`gh` auth; PostgreSQL/Linux/browser lanes when their prerequisites exist; approved AC-12 and physical-device acceptance separately. Public DSN credential validity/rotation remains with its owner. Anonymous Docker volumes remain user-decided preserve; do not reopen without explicit direction.
+- Governance reporting policy is now v1.1.0 and requires SHA, branch, checkout, clean/dirty status, exact command/cwd, absolute interpreter/runtime and version, KST start/end, direct exit code, pass/fail/error/skip/deselected distribution, artifacts and executor/reviewer identities.
+- `ROUTE-COV-FP-01` is a separate Codex local-ready finding: route CLI exit 1 is caused by `/v1/workspaces` extracted from nginx config text, not a client request. Its route regression is 28 passed; the scanner false positive remains to be fixed or explicitly surfaced. Skip distribution in the full Python run: PostgreSQL DSN 1046, Linux 225, Docker/image 34, browser 7, other host/tool 3; 2 docker_host tests were deselected.
+- Final correction register and Codex collaboration perspective: [[2026-09-21_하루정정대장과_감사잔여_Codex]]. Independent Claude view: [[2026-09-21_통합tip검사_독립대조_Claude]]. Detailed direct check evidence: [[2026-09-21_integration-tip-verification_Codex]].
 
 Integration DSN landing and check_docs correction: `5c7ce9d` carried the merge without conflicts; integration is pushed. On the checked integration source, `proposal-3.txt` has 22 tracked files/28 URI occurrences/0 unmasked passwords and the guard/preflight tests passed 22. A follow-up found the link string corruption introduced in `b569318` by non-ASCII text through a Windows PowerShell native pipe; the filename itself was intact. Claude memory slugs were external references, not vault pages; these are now visibly marked `memory:<slug>`. Current full `check_docs.py` passes. Earlier checker evidence is corrected in the linked history.
 

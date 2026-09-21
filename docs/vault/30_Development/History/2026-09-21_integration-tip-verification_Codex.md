@@ -1,10 +1,10 @@
 ---
 doc_id: "INTEGRATION-TIP-VERIFICATION-20260921-CODEX"
 title: "Integration tip verification audit"
-version: "1.0.0"
+version: "1.1.0"
 status: "complete"
 author: "Codex"
-updated: "2026-09-21T14:14:13+09:00"
+updated: "2026-09-21T14:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 
 All direct checks below ran in `C:/Project/SaintVision-Invion/.worktrees/codex-public-dsn-integration`, branch `integration/all-agents-unified`, HEAD `cb505f6697beffe78a1cbdaee027f415003c55d3`, on Windows PowerShell, during 2026-09-21 14:07-14:12 KST. Python commands used `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` (project Python 3.14). Frontend commands ran in `apps/web` with Node v24.17.0 and npm.
 
-The full Python suite started at 14:10:07 KST and finished after 94.81 seconds. Results were captured from direct console output; no JUnit artifact was generated. No command was piped when capturing its exit code; PowerShell `$LASTEXITCODE` was printed immediately after each external command.
+The first full Python suite started at 14:10:07 KST and finished after 94.81 seconds. That run's result was captured from direct console output without a JUnit artifact. No command was piped when capturing its exit code; PowerShell `$LASTEXITCODE` was printed immediately after each external command.
 
 ## Direct results on this integration tip
 
@@ -32,7 +32,15 @@ The full Python suite started at 14:10:07 KST and finished after 94.81 seconds. 
 
 ## Python skips and limits
 
-The 1315 skips are not passing tests. They include PostgreSQL cases gated by absent `INV_TEST_ADMIN_DSN`, explicit browser-smoke/approval opt-ins, Linux-only execution paths on this Windows host, and tool prerequisites not present in this worktree (the launcher-injection case checks for this checkout's `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`, while tests were invoked with the root checkout's interpreter). Two image tests require an explicitly pinned local candidate image. The individual pytest skip reasons were emitted by `-ra`; no live PostgreSQL, browser acceptance, Docker-host lane, or physical-device acceptance is claimed here.
+The 1315 skips are not passing tests. The first run reported the individual pytest reasons through `-ra`; no live PostgreSQL, browser acceptance, Docker-host lane, or physical-device acceptance is claimed.
+
+## Skip distribution capture and independent rerun
+
+To preserve the skip distribution, the suite was rerun at 2026-09-21 14:26:53-14:28:19 KST with a JUnit artifact. At test start, HEAD was `b2c20808142d55e3cd79237bf051d6e2891aecbd` (Claude's documentation-only independent audit had fast-forwarded after code tip `cb505f6`); `git status --porcelain` showed four modified documentation files and no source/test changes. The `.work` output is ignored. Command from the worktree root: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest -q tests --junitxml=.work/pytest-skip-distribution-cb505f6.xml`; direct exit 0, 85.16s. The XML SHA-256 is `7fa83def326155e3ac24aeee57d95fadf561025754daa9e21a7ca12383026380`.
+
+The JUnit suite recorded 2653 collected cases: 1338 passed, 1315 skipped, 0 failed, 0 errors. Two cases were deselected by the configured `not docker_host` marker and are not part of that XML count. Skip distribution: **1046 PostgreSQL DSN gated** (587 require a disposable PostgreSQL 16+ DSN and 459 report `INV_TEST_ADMIN_DSN` absent); **225 Linux-only**; **34 Docker/image prerequisites or explicit opt-ins** (13 local PostgreSQL image, 12 owned storage installer opt-in, 7 built-image opt-in, 2 pinned local candidate image); **7 browser opt-ins** (4 browser test, 2 browser acceptance, 1 browser smoke); **3 other host prerequisites** (launcher shim's worktree-local venv absent, Antigravity absent, Windows symlink privilege absent). These are skip reasons, not test passes.
+
+Claude's separate clean worktree rerun at the code SHA `cb505f6697beffe78a1cbdaee027f415003c55d3` independently reported the same command's 1338/1315/2/0 result. See [[2026-09-21_통합tip검사_독립대조_Claude]]. The 423-skip Claude batch result is a different run selection/environment and is not comparable to the full Windows suite; same code SHA alone does not fix the execution set.
 
 ## Route result interpretation
 
@@ -44,7 +52,15 @@ Earlier pass reports from other branches or snapshots are not counted as current
 
 ## Reporting rule proposed
 
-Every verification claim should identify: (1) full commit SHA and branch, (2) checkout/worktree path, (3) exact command and working directory, (4) interpreter/runtime version, (5) KST start and finish time, (6) direct exit code, (7) pass/fail/skip/deselected counts with skip reasons, (8) artifact path where applicable, and (9) whether the executor and reviewer are the same person. A report from another branch, an earlier SHA, or a different worktree must be labeled as such. After a relevant change, rerun the affected checks at the resulting SHA before calling that SHA verified.
+The original nine-item proposal was expanded after Claude's independent review. The accepted rule is now in [[Agent 연속 실행과 최종 보고 정책]] v1.1.0: full SHA/branch/worktree, measured clean-or-dirty status (`git status --porcelain`, plus canonical diff checks where EOL can mislead), exact command/cwd, absolute interpreter/runtime and version, environment fingerprint and omitted lanes, KST start/end, direct unpiped exit code, separate pass/fail/error/skip/deselected totals with skip distribution, artifact path/hash, and executor/reviewer identity. Reports from another branch/SHA/worktree remain explicitly attributed; affected checks rerun at the resulting final SHA.
+
+## Documentation closeout checks
+
+After the final six documentation paths were edited at HEAD `b2c20808142d55e3cd79237bf051d6e2891aecbd`, the project venv Python ran `tools/check_docs.py` (exit 0, 604 versioned documents), `tools/check_ontology.py` (exit 0), `tools/sync_obsidian.py --check` (exit 0, 1396 managed/6 pending/0 conflicts), and `git diff --check` (exit 0). The six pending document exports were then applied; the sync tool reported every destination hash matched. A following `--check` returned 1396 managed/0 pending/0 conflicts, exit 0. These document checks ran on a dirty-doc worktree; the only changed tracked paths were the six Markdown records, and the Python/Vitest product results above remain attributed to the earlier clean code SHA and the separately described dirty-doc JUnit rerun.
+
+The origin integration branch advanced by Claude's provenance utility and rule commits `89c6bc3` and `5c1e9ef`; `git merge --ff-only` brought this worktree to `5c1e9ef2e13f20262feeb8323fd7c870d81dfbb9`. At 2026-09-21 14:36 KST, `tools/provenance.py --json` directly reported this SHA in sync with origin and a dirty documentation-only worktree. The tool's wrap mode was exercised. A first wrapped command used bare `python tools/check_ontology.py`, which failed because that system interpreter lacked `rdflib`; this was a caller interpreter error. Repeating through the wrapper with the absolute project interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` returned exit 0 and ontology PASS. The correction is in the daily ledger. Post-merge `check_docs.py` passed with 605 versioned documents. A post-merge sync check reported 1397 managed/1 pending/0 conflicts; the remaining pending record came from the newly merged Claude provenance doc and is included in the final export. Full Python/Vitest suites were not rerun at `5c1e9ef`; their results remain directly attributed to `cb505f6`.
+
+The integration branch then advanced once more to `03e0c6117ae90d16bee94514345312eb7f4afecc` with Claude's documentation-only main-checkout sync convention. It separates the main checkout from agent worktrees, recommends reference-only use, and documents a tripwire/guarded automation; no product code changed. Final validators were rerun at this SHA. The full Python/Vitest regression was not rerun at `03e0c61`; it remains attributed to `cb505f6`.
 
 ## Integration progress-board text correction
 
