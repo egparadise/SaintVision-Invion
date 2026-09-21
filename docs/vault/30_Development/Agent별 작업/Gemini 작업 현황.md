@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.104"
+version: "1.0.105"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T08:36:00+09:00"
+updated: "2026-09-22T08:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T08:36:00+09:00.
+- 확인 기준: 2026-09-22T08:55:00+09:00.
+
+## 세션 랩업: S01-FE Codex 2차 검토 지적사항(Vitest 수치 재현성 규명 및 DeveloperStudio 정본 Run 계약 전환) 완결과 인계
+
+- **Vitest 수치(652 vs 653) 원인 규명 및 SHA 결속 완결**:
+  - 커밋 `d3c72f6e`: 75개 파일 **652 passed** (`evidence-viewer-integrity-guard.test.tsx` 3개 테스트 보유 시점).
+  - 커밋 `b3c5ebd5` & `4fb03378`: 75개 파일 **653 passed** (`evidence-viewer-integrity-guard.test.tsx`에 `Test 4: verified === false FAIL 뱃지 및 위조 경고 배너` 1건 추가 시점).
+  - Codex가 `d3c72f6e` 기준 또는 Test 4 이전 환경에서 돌려 652가 나온 원인을 완벽히 규명하고, 현재 tip 실측(**75 files passed, 653 passed in 13.05s**)과 커밋 SHA provenance를 [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]] §4.1에 명시.
+- **DeveloperStudio Run API 3곳 수기 타입 ➔ 정본 생성 타입(`ControlRunView`) 전면 전환**:
+  - `apps/web/src/contracts/kernel-observation.ts`: `packages/contracts-ts`의 정본 생성 타입 `ControlRunView` re-export 추가.
+  - `apps/web/src/features/studio/DeveloperStudio.tsx`:
+    - Line 230 (`refreshActiveRun` 수동 새로고침): `apiClient<ControlRunView>`로 전환 및 `effectiveRunId`(`data.runId ?? data.id`)를 `RunItem`으로 투영.
+    - Line 247 (`poll` 활성 실행 주기적 폴링): `apiClient<ControlRunView>`로 전환 및 `effectiveRunId`를 `RunItem`으로 투영.
+    - Line 402 (`handleDispatchRun` POST 생성): `apiClient<ControlRunView>`로 전환 및 `res.runId`를 `effectiveRunId`로 안전하게 취득.
+- **백엔드 정본 스키마 및 서빙 앵커 갭 규명 (Codex 계약 영역 인계)**:
+  - `POST /v1/projects/{project}/runs`: 와이어 응답 객체는 `core.schema.json`의 `$defs/ControlRunView`와 100% 일치하나, `control.create`에 `validate_contract("ControlRunView", result)` 서빙 앵커가 누락됨.
+  - `GET /v1/projects/{project}/runs/{run_id}`: `control.get`은 `{**public(row), "resourceReleasePending": bool(active)}`를 반환함. 현재 `core.schema.json`의 `ControlRunView`는 `additionalProperties: false`이며 `resourceReleasePending` 필드가 없어 단일 Run 조회 전용 정본 스키마가 `core.schema.json`에 미정의 상태이며 서빙 앵커도 부재함.
+  - 지침에 따라 계약 생성 및 백엔드 앵커 결속은 Codex에게 정식 인계.
+- **게이트 검증 실측 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (프로덕션 번들 빌드 성공).
+  - `npm run test` (Vitest): **75개 파일 653/653 passed 100%**.
+  - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `python tools/check_contract_bindings.py`: 46 fixtures / 12 anchors PASS.
+  - `pytest tests/test_route_coverage.py`: 30 passed in 1.26s.
+  - `python tools/check_doc_single_source.py --ratchet`: PASS.
+  - `python tools/check_docs.py`: PASS.
+- **보고서**: [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]] §4, §5.
 
 ## 세션 랩업: S01-FE 증거 꾸러미(체크리스트) 완결 및 Codex 검토/판정 인계
 

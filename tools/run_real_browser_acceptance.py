@@ -75,12 +75,120 @@ SAMPLE_NODE = {
     "gpuVramUsedBytes": 20000000000,
 }
 
+SAMPLE_NODES_5STATES = [
+    {
+        "nodeId": "nod_active_01",
+        "hostname": "pacs-worker-active",
+        "status": "active",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 16,
+        "cpuUsagePercent": 42,
+        "memoryTotalBytes": 68719476736,
+        "memoryUsedBytes": 24000000000,
+        "storageTotalBytes": 2199023255552,
+        "storageUsedBytes": 600000000000,
+        "gpuCount": 1,
+        "gpuName": "NVIDIA A100",
+        "gpuVramTotalBytes": 85899345920,
+        "gpuVramUsedBytes": 32000000000,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+        "allocatableCores": 14,
+        "allocatableMemoryBytes": 60000000000,
+    },
+    {
+        "nodeId": "nod_enrolling_02",
+        "hostname": "pacs-worker-enrolling",
+        "status": "enrolling",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 8,
+        "cpuUsagePercent": 15,
+        "memoryTotalBytes": 34359738368,
+        "memoryUsedBytes": 8000000000,
+        "storageTotalBytes": 1099511627776,
+        "storageUsedBytes": 200000000000,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+    {
+        "nodeId": "nod_draining_03",
+        "hostname": "pacs-worker-draining",
+        "status": "draining",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 16,
+        "cpuUsagePercent": 10,
+        "memoryTotalBytes": 68719476736,
+        "memoryUsedBytes": 8000000000,
+        "storageTotalBytes": 2199023255552,
+        "storageUsedBytes": 200000000000,
+        "gpuCount": 0,
+        "isDraining": True,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+    },
+    {
+        "nodeId": "nod_lost_04",
+        "hostname": "pacs-worker-lost",
+        "status": "lost",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T03:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T03:00:00Z",
+        "cpuCores": 8,
+        "cpuUsagePercent": 0,
+        "memoryTotalBytes": 34359738368,
+        "memoryUsedBytes": 0,
+        "storageTotalBytes": 1099511627776,
+        "storageUsedBytes": 0,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+    {
+        "nodeId": "nod_retired_05",
+        "hostname": "pacs-worker-retired",
+        "status": "retired",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-20T00:00:00Z",
+        "lastHeartbeatAt": "2026-09-20T00:00:00Z",
+        "cpuCores": 4,
+        "cpuUsagePercent": 0,
+        "memoryTotalBytes": 17179869184,
+        "memoryUsedBytes": 0,
+        "storageTotalBytes": 500000000000,
+        "storageUsedBytes": 0,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+]
+
 VALID_SUBJECT_ID = "oidc:" + "a" * 64
 VALID_TENANT_ID = "00000000-0000-4000-8000-000000000001"
 
 
 class MockTokens:
+    def __init__(self, scenario: str = "verified"):
+        self.scenario = scenario
+
     def verify(self, token):
+        if self.scenario == "s02-auth-failure" or token == "invalid_token":
+            raise ValueError("AUTH-0050: Invalid or expired access token")
         principal = SimpleNamespace(
             subject_id=VALID_SUBJECT_ID,
             tenant_id=VALID_TENANT_ID,
@@ -302,7 +410,7 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
 
     app = create_app(
         database=object(),
-        tokens=MockTokens(),
+        tokens=MockTokens(scenario),
         allowed_origins=[
             f"http://127.0.0.1:{frontend_port}",
             f"http://localhost:{frontend_port}",
@@ -347,6 +455,8 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
 
     @app.get("/v1/nodes")
     def get_nodes():
+        if scenario == "s02-nodes-journey":
+            return {"items": SAMPLE_NODES_5STATES, "count": len(SAMPLE_NODES_5STATES)}
         return {"items": [SAMPLE_NODE], "count": 1}
 
     @app.get("/v1/projects/prj_pacs_core/workspaces")
@@ -668,6 +778,150 @@ def run_scenario(
                 print("✔ [Navigation] Returned to RunDetail successfully!")
 
             # -----------------------------------------------------------------
+            # S02-FE Scenarios: Login Success, Auth Failure, Nodes Journey
+            # -----------------------------------------------------------------
+            elif scenario == "s02-login-success":
+                print(f"\n[Acceptance: S02-LOGIN-SUCCESS] Verifying OIDC session completion & Studio/Dashboard mount...")
+                # Verify Header is mounted
+                header_title = page.locator('span:has-text("SaintVision")')
+                header_title.wait_for(state="visible", timeout=10000)
+
+                # Verify user profile in Header
+                user_badge = page.locator('span:has-text("👤")')
+                user_badge.wait_for(state="visible", timeout=10000)
+                user_text = user_badge.inner_text()
+                print(f"✔ [S02-LOGIN-SUCCESS] User badge: {user_text}")
+
+                # Verify Logout button
+                logout_btn = page.locator('button:has-text("로그아웃")')
+                logout_btn.wait_for(state="visible", timeout=10000)
+                assert logout_btn.is_visible()
+
+                # Verify core navigation tabs exist
+                assert page.locator('button:has-text("Nodes 인벤토리")').is_visible()
+                assert page.locator('button:has-text("클러스터 개요")').is_visible()
+
+                screenshot_path = os.path.join(output_dir, "real_chrome_s02_login_success.png")
+                page.screenshot(path=screenshot_path)
+                print(f"✔ [S02-LOGIN-SUCCESS] Login success verified! Saved: {screenshot_path}")
+
+            elif scenario == "s02-auth-failure":
+                print(f"\n[Acceptance: S02-AUTH-FAILURE] Testing Layer 1: Resource Server 401 AUTH-0050 rejection...")
+                # Part A: 401 rejection from Uvicorn
+                alert_401 = page.locator('[role="alert"]:has-text("서버가 인증 토큰을 허용하지 않았습니다.")')
+                alert_401.wait_for(state="visible", timeout=10000)
+                assert alert_401.is_visible()
+                print(f"✔ [S02-AUTH-FAILURE] Part A 401 alert: {alert_401.inner_text()}")
+
+                # Verify Login page elements remain intact
+                assert page.locator('h1:has-text("SaintVision 로그인")').is_visible()
+                assert page.locator('button:has-text("조직 계정으로 로그인")').is_visible()
+
+                screenshot_401 = os.path.join(output_dir, "real_chrome_s02_auth_failure_401.png")
+                page.screenshot(path=screenshot_401)
+                print(f"✔ [S02-AUTH-FAILURE] Part A 401 screenshot saved: {screenshot_401}")
+
+                # Part B: IdP error callback rejection (/callback?error=access_denied)
+                print("\n[Acceptance: S02-AUTH-FAILURE] Testing Layer 2: IdP protocol rejection callback (/callback?error=access_denied)...")
+                page.evaluate(f"""() => {{
+                    const tx = {{
+                        state: 'idp_error_state',
+                        verifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+                        createdAt: Date.now(),
+                        redirectUri: '{frontend_url}/callback',
+                        config: {{
+                            idpAuthorizeUrl: '{frontend_url}/oauth/authorize',
+                            idpTokenUrl: '{frontend_url}/oauth/token',
+                            clientId: 'saintvision-web',
+                            scope: 'openid profile email'
+                        }}
+                    }};
+                    sessionStorage.setItem('saintvision.oauth.transaction', JSON.stringify(tx));
+                }}""")
+                page.goto(f"{frontend_url}/callback?error=access_denied&state=idp_error_state", wait_until="domcontentloaded")
+                page.wait_for_timeout(1000)
+
+                alert_idp = page.locator('[role="alert"]:has-text("인증 제공자가 로그인을 완료하지 못했습니다.")')
+                alert_idp.wait_for(state="visible", timeout=10000)
+                assert alert_idp.is_visible()
+                print(f"✔ [S02-AUTH-FAILURE] Part B IdP error alert: {alert_idp.inner_text()}")
+
+                screenshot_idp = os.path.join(output_dir, "real_chrome_s02_auth_failure_idp.png")
+                page.screenshot(path=screenshot_idp)
+                print(f"✔ [S02-AUTH-FAILURE] Part B IdP callback error screenshot saved: {screenshot_idp}")
+
+            elif scenario == "s02-nodes-journey":
+                print(f"\n[Acceptance: S02-NODES-JOURNEY] Navigating to Nodes 인벤토리 tab...")
+                nodes_tab = page.locator('button:has-text("Nodes 인벤토리")')
+                nodes_tab.wait_for(state="visible", timeout=10000)
+                nodes_tab.click()
+                page.wait_for_timeout(1500)
+
+                # Verify NodeList with 5 canonical states
+                inventory_header = page.locator('h2:has-text("Node 인벤토리 (5대)")')
+                inventory_header.wait_for(state="visible", timeout=10000)
+                assert inventory_header.is_visible()
+
+                badge_active = page.locator('[data-testid="node-status-badge-nod_active_01"]')
+                badge_active.wait_for(state="visible", timeout=10000)
+                assert "ACTIVE (활성 · 헬스 미결정)" in badge_active.inner_text()
+
+                badge_enrolling = page.locator('[data-testid="node-status-badge-nod_enrolling_02"]')
+                badge_enrolling.wait_for(state="visible", timeout=10000)
+                assert "ENROLLING" in badge_enrolling.inner_text()
+
+                badge_draining = page.locator('[data-testid="node-status-badge-nod_draining_03"]')
+                badge_draining.wait_for(state="visible", timeout=10000)
+                assert "DRAINING" in badge_draining.inner_text()
+
+                badge_lost = page.locator('[data-testid="node-status-badge-nod_lost_04"]')
+                badge_lost.wait_for(state="visible", timeout=10000)
+                assert "LOST (단절)" in badge_lost.inner_text()
+
+                badge_retired = page.locator('[data-testid="node-status-badge-nod_retired_05"]')
+                badge_retired.wait_for(state="visible", timeout=10000)
+                assert "RETIRED" in badge_retired.inner_text()
+
+                # Verify alert banner on lost node
+                lost_card = page.locator('[data-testid="node-card-nod_lost_04"]')
+                assert "🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다" in lost_card.inner_text()
+
+                screenshot_list = os.path.join(output_dir, "real_chrome_s02_nodes_list.png")
+                page.screenshot(path=screenshot_list)
+                print(f"✔ [S02-NODES-JOURNEY] 5 canonical states verified! Saved: {screenshot_list}")
+
+                # Click node card for nod_active_01
+                print("[Acceptance: S02-NODES-JOURNEY] Clicking pacs-worker-active node card...")
+                active_card = page.locator('[data-testid="node-card-nod_active_01"]')
+                active_card.click()
+                page.wait_for_timeout(1500)
+
+                # Verify NodeDetail mounted
+                detail_header = page.locator('h2:has-text("Node 상세 정보: pacs-worker-active (nod_active_01)")')
+                detail_header.wait_for(state="visible", timeout=10000)
+                assert detail_header.is_visible()
+
+                # Verify Hardware capability details
+                assert page.locator('text=x86_64 (16 코어)').is_visible()
+                assert page.locator('text=NVIDIA A100').is_visible()
+
+                screenshot_detail = os.path.join(output_dir, "real_chrome_s02_node_detail.png")
+                page.screenshot(path=screenshot_detail)
+                print(f"✔ [S02-NODES-JOURNEY] NodeDetail verified! Saved: {screenshot_detail}")
+
+                # Return to NodeList
+                print("[Acceptance: S02-NODES-JOURNEY] Clicking '← 인벤토리로 돌아가기'...")
+                back_btn = page.locator('button:has-text("← 인벤토리로 돌아가기")')
+                back_btn.wait_for(state="visible", timeout=10000)
+                back_btn.click()
+                page.wait_for_timeout(1500)
+
+                inventory_header.wait_for(state="visible", timeout=10000)
+                screenshot_return = os.path.join(output_dir, "real_chrome_s02_nodes_return.png")
+                page.screenshot(path=screenshot_return)
+                print(f"✔ [S02-NODES-JOURNEY] Returned to inventory verified! Saved: {screenshot_return}")
+
+            # -----------------------------------------------------------------
             # DeveloperStudio Step 4 Artifact Download Scenarios
             # -----------------------------------------------------------------
             else:
@@ -802,6 +1056,9 @@ def run_acceptance(
             "evidence-run-failed",
             "evidence-failed",
             "rundetail-times",
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
         ]
     elif scenario == "all-artifacts":
         scenarios = ["verified", "mismatch", "missing-header"]
@@ -811,6 +1068,12 @@ def run_acceptance(
             "evidence-unverified",
             "evidence-run-failed",
             "evidence-failed",
+        ]
+    elif scenario == "all-s02":
+        scenarios = [
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
         ]
     else:
         scenarios = [scenario]
@@ -874,6 +1137,7 @@ def main():
             "all",
             "all-artifacts",
             "all-evidence",
+            "all-s02",
             "verified",
             "mismatch",
             "missing-header",
@@ -882,8 +1146,11 @@ def main():
             "evidence-run-failed",
             "evidence-failed",
             "rundetail-times",
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
         ],
-        help="Acceptance scenario to run (default: all 8 branches)",
+        help="Acceptance scenario to run (default: all 11 branches)",
     )
     args = parser.parse_args()
 
