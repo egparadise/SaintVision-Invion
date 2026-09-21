@@ -1,10 +1,10 @@
 ---
 doc_id: "SYNC-COMMON-STATE-UI-FB-BOUNDARY-20260921-CODEX"
 title: "Obsidian 공용 worktree state와 UI-FB 경계 최종 재검토"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:40:00+09:00"
+updated: "2026-09-21T12:38:00+09:00"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "git-worktree", "UI-FB", "mutation-testing", "verification-boundary"]
 ---
@@ -42,7 +42,7 @@ same = True
 
 `tools/test_sync.py::test_default_state_is_shared_by_linked_worktrees`는 임시 Git repo와 linked worktree를 실제로 만들고 같은 common state 경로 및 서로 다른 git-path 경로를 비교한다. `--git-path` 구현으로 되돌린 mutation에서는 해당 시험이 assertion에서 실패(exit 1)했다. 수정본 전체 `tools/test_sync.py`: 14 passed; unittest가 추가 보고한 하위 cases 5 passed.
 
-주 checkout의 migration 직후 `--check`는 `1372 managed / 10 pending / 0 conflicts`였다. 동일 코드 tip `507a486`에서 main은 exit 0, `1373 managed / 6 pending / 0 conflicts`, `C:\vw`는 exit 0, `1373 managed / 5 pending / 0 conflicts`였다. 차이는 main에서 이 history 문서를 추가로 수정한 한 파일이며 state 공유 자체의 차이는 아니다. 두 곳은 같은 common-dir state를 읽고 `--check`는 vault에 쓰지 않는다. `C:\vw`의 이전 `1373 / 0 / 0`은 먼저 확인한 중간 시점 결과이며 최종 결과가 아니다. 실행은 main의 `.venv\Scripts\python.exe`로 `C:\vw\tools\sync_obsidian.py --check`를 호출했다. `C:\vw` 자체 Python 환경은 실행되지 않았다. 문서 snapshot을 동일하게 맞춘 뒤 양쪽 check를 다시 대조한다.
+주 checkout migration 직후 check는 `1372 managed / 10 pending / 0 conflicts`였다. 최신 paired 실행 시점은 main HEAD b5ea2a5에서 1373 managed/5 pending/0 conflicts, C:\vw HEAD 507a486에서 1373/3/0이며 두 CLI 모두 exit 0이다. 양쪽은 같은 `.git/obsidian-sync-state.json`을 공유한다. 두 checkout의 문서 snapshot이 달라 pending 수는 같은 기준의 비교가 아니며, 두 check 모두 vault에 쓰지 않았다. 이전 1373/0/0 및 6/5 결과는 중간 측정이다. C:\vw 검사는 main `.venv\Scripts\python.exe`로 `C:\vw\tools\sync_obsidian.py --check`를 실행했다.
 
 ## UI-FB-01/02/03 fixed-tip 경계 재검토
 
@@ -70,4 +70,4 @@ Codex는 다음 mutation을 수행했다. component의 `if (isRouteNotFoundError
 
 - Gemini: UI-FB-03 component fallback test를 보강한 fixed SHA를 제공한다.
 - Codex: 그 SHA에서 401/403/5xx/parse/network 및 genuine 404의 호출 전이를 재검토한다. browser/live backend acceptance는 별도 owner 조건이 준비될 때만 판정한다.
-- Obsidian: 공용 Git common-dir state로 전환 완료. 동일 코드 tip에서 main은 6, `C:\vw`는 5 pending exports / 모두 0 conflicts였으며 차이는 main에서 수정 중인 history 문서 1건이다. 둘 다 `--apply` 없이 유지한다. 다음 동기화는 일반 `--check` 후 승인된 정책에 따른 절차로 진행한다.
+- Obsidian: 공용 Git common-dir state로 전환 완료. 최종 read-only check는 main 6, `C:\vw` 5 pending exports / 모두 0 conflicts였다. 두 checkout의 문서 snapshot이 달라 pending 수를 동일한 상태의 비교로 해석하지 않는다. 둘 다 `--apply`하지 않았다. 다음 동기화는 일반 `--check` 후 승인된 정책에 따른 절차로 진행한다.

@@ -1,17 +1,17 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.15"
+version: "1.5.16"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T12:24:00+09:00"
+updated: "2026-09-21T12:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
-2026-09-21 Obsidian state split corrected: user apply/check was valid in C:\vw but `--git-path` kept a separate main-checkout baseline. The original 1370-entry state passed pre-migration check (1372 managed/10 pending/0 conflict). At code tip `507a486`, actual main and C:\vw CLI checks returned 1373/6/0 and 1373/5/0 (exit 0); the one pending-count difference is a local main history-document edit absent from C:\vw, not a state-path difference. Both resolve to `C:\Project\SaintVision-Invion\.git\obsidian-sync-state.json`. `tools/test_sync.py` has a linked-worktree regression and fails if state returns to `--git-path`; 14 passed, 5 subtests. No pending vault files were applied. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
+2026-09-21 Obsidian state split corrected: user apply/check was valid in C:\vw but `--git-path` kept a separate main-checkout baseline. The original 1370-entry state passed pre-migration check (1372 managed/10 pending/0 conflict). Latest read-only checks: main HEAD b5ea2a5 returned 1373/6/0; C:\vw HEAD 507a486 returned 1373/3/0; both exit 0. Both resolve to `C:\Project\SaintVision-Invion\.git\obsidian-sync-state.json`; document snapshots differ, so pending counts are not a like-for-like comparison. `tools/test_sync.py` linked-worktree regression fails if reverted to `--git-path`; 14 passed, 5 subtests. No pending vault files were applied. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
 
 2026-09-21 UI-FB review: FB-01 is approved on user's three matched DOM mutants failing (empty requery, error requery, error render guard). FB-02 component boundary is approved: 9 placement tests passed and replacing the local UNVERIFIED badge with “server verified” failed the corresponding test. FB-03 source path is narrow, but its current 13 helper tests all passed when Codex mutated the component branch to send every ResultView error to artifacts fallback; component-level regression remains required. Browser/live backend acceptance remains separate. Mock/backend schema proposal is recorded. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
 

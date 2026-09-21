@@ -1,22 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.81"
+version: "1.0.82"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:24:00+09:00"
+updated: "2026-09-21T12:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-2026-09-21 공용 sync state migration 완료: `default_state_path()`는 `git-common-dir` 사용. main/C:\vw가 같은 `.git/obsidian-sync-state.json`을 읽는다. 기존 1370-entry state는 이전 전 1372/10/0으로 검사한 뒤 이동했다. 현재 main은 1373/6/0, C:\vw는 1373/5/0 (같은 507a486 코드 tip, main에만 미커밋 history 한 파일 수정)이고 둘 다 exit 0이다. 동일 문서 snapshot으로 맞춘 후 final paired check 예정. Vault write는 없다. `tools/test_sync.py` 14 passed/5 subtests; `--git-path` 되돌림에서 신규 linked-worktree test 실패. UI-FB-01/02 component boundary는 승인; FB-03은 all-errors-to-artifact mutant가 기존 13 helper test에서 살아남아 Gemini component-level test 대기. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
+2026-09-21 공용 sync state migration 완료: `default_state_path()`는 `git-common-dir` 사용. main/C:\vw가 같은 `.git/obsidian-sync-state.json`을 읽는다. 기존 1370-entry state는 이전 전 1372/10/0으로 검사한 뒤 이동했다. 최신 read-only check: main 1373/6/0, C:\vw 1373/3/0 (둘 다 exit 0, HEAD 각각 b5ea2a5/507a486). 문서 snapshot이 달라 pending 수를 같은 기준으로 비교하지 않는다. 두 쪽 모두 conflict 0, vault write 없음. `tools/test_sync.py` 14 passed/5 subtests; `--git-path` 되돌림에서 신규 linked-worktree test 실패. UI-FB-01/02 component boundary는 승인; FB-03은 all-errors-to-artifact mutant가 기존 13 helper test에서 살아남아 Gemini component-level test 대기. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]]
 
 2026-09-21 sync explicit resolver(구현 당시 상태): `tools/sync_obsidian.py --apply --resolve-conflicts-from PATHS_FILE`은 UTF-8 경로 목록에 있는 **현재 충돌만** 저장소 바이트로 교체한다. 오래된/non-conflict 경로는 쓰기 전에 거부한다. 임시 저장소 시험 13 passed, stale guard 제거 mutation은 전용 시험을 실패시켰다. 당시 공유 vault 미적용 상태였고, 사용자 완료 실행은 아래에 따로 기록한다. 상세: [[2026-09-21_sync_obsidian_explicit_conflict_resolution_Codex]].
 
 2026-09-21 UI-FB-01 새 DOM 시험 계약: 사용자 변형 실측상 `84f26ca` 단일 fetch 시험은 `items.length > 0` 회귀를 잡지 못했다. Gemini 인계 요구는 후보 있음→두 번째 빈 응답, 후보 있음→두 번째 오류 응답, error 상태+후보 데이터 3개 DOM scenario와 각 해당 mutant failure다. `apps/web` 코드는 수정하지 않았고 독립 검토 pending. mock response shape/backend drift에는 OpenAPI/Pydantic 단일 계약 생성 및 consumer/provider 양쪽 검증을 제안했다. [[2026-09-21_UI_FB_contract_readiness_review_Codex]].
 
-2026-09-21 sync 사용자 실행: backup 뒤 14 explicit conflict paths 적용 exit 0, 당시 C:\\vw 후속 check 1370/0/0. 뒤이어 주 checkout에서 관측한 7 no-baseline은 실제 vault 충돌이 아니라 worktree별 state 위치 결함이었다. 기존 1370-entry를 migration 전 1372/10/0으로 검증해 common-dir에 옮긴 뒤 동일 check를 확인했다. main과 C:\\vw를 tip 507a486에 맞춘 뒤 CLI check 모두 1373/5/0, exit 0이며 `--apply`하지 않았다. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]] [[2026-09-21_하루정정대장과_감사잔여_Codex]].
+2026-09-21 sync 사용자 실행: backup 뒤 14 explicit conflict paths 적용 exit 0, 당시 C:\\vw 후속 check 1370/0/0. 뒤이어 주 checkout에서 관측한 7 no-baseline은 실제 vault 충돌이 아니라 worktree별 state 위치 결함이었다. 기존 1370-entry를 migration 전 1372/10/0으로 검증해 common-dir에 옮겼다. 최종 main b5ea2a5 check는 1373/6/0, C:\\vw 507a486 check는 1373/3/0, 둘 다 exit 0/conflicts 0이다. 문서 snapshot 차이로 pending 수를 동일조건 비교로 쓰지 않는다. `--apply`하지 않았다. [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]] [[2026-09-21_하루정정대장과_감사잔여_Codex]].
 
 2026-09-21 response contract 설계 제안: `/v1/discovery/candidates`의 `dict` response와 frontend 수기 interface를 단일 contract로 잇는 것이 목표다. Pydantic `Strict` response schema→기존 `contracts/*.schema.json` export/check→generated TS/client fixture, DB 없는 FastAPI provider serialization test와 adapter fixture validation을 제안했다. route_coverage는 path coverage로 유지. 아직 구현·task owner 지정하지 않음.
 
