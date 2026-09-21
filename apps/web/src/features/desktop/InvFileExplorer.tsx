@@ -19,15 +19,8 @@ export interface InvFileExplorerProps {
   ) => Promise<{ success: boolean; repairedReplicas: InvReplicaLocation[]; message?: string }>;
 }
 
-export async function calculateSha256(content: string | Uint8Array): Promise<string> {
-  const data = typeof content === 'string' ? new TextEncoder().encode(content) : content;
-  if (typeof globalThis.crypto?.subtle?.digest === 'function') {
-    const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', data as unknown as BufferSource);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-  }
-  throw new Error('WebCrypto API가 지원되지 않아 무결성을 검증할 수 없습니다.');
-}
+import { calculateSha256 } from '@/shared/utils/crypto';
+export { calculateSha256 };
 
 export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   projectId,

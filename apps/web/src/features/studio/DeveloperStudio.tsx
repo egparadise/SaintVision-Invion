@@ -18,6 +18,7 @@ import { apiClient, getAuthToken, isRouteNotFoundError } from '@/shared/api/clie
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
+import { downloadAndVerifyArtifact } from '@/shared/api/runArtifactObservation';
 
 export interface DeveloperStudioProps {
   project: ProjectItem;
@@ -578,11 +579,11 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     }
   };
 
-  // Raw Output Artifact File Bytes Download handler (GM-01)
+  // Raw Output Artifact File Bytes Download handler (GM-01) with X-Content-SHA256 integrity verification
   const handleDownloadRawFile = async (targetPath?: string) => {
     if (!activeRunId) return;
     const filePath = targetPath || artifactData?.entrypoint || activeFile.path;
-    const fileName = filePath.split('/').pop() || 'artifact.txt';
+    const initialFileName = filePath.split('/').pop() || 'artifact.txt';
 
     if (currentRun?.state === 'running') {
       setStudioActionNotice({
@@ -592,46 +593,83 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       return;
     }
 
+    if (!selectedProjectId) {
+      setStudioActionNotice({
+        type: 'error',
+        message: '선택된 프로젝트가 없어 파일을 다운로드할 수 없습니다.',
+      });
+      return;
+    }
+
     setIsDownloadingArtifact(true);
     try {
-      const headers: Record<string, string> = {};
       const token = getAuthToken();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      if (!selectedProjectId) {
+      const verification = await downloadAndVerifyArtifact(
+        selectedProjectId,
+        activeRunId,
+        filePath,
+        initialFileName,
+        token
+      );
+
+      if (verification.integrity === 'verified') {
+        const url = URL.createObjectURL(verification.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = verification.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        setLogs((prev) => [
+          ...prev,
+          {
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'SUCCESS',
+            message: `[Artifact File] Verified raw file bytes downloaded for '${filePath}' (${verification.blob.size.toLocaleString()} Bytes, SHA-256 일치: ${verification.calculatedSha256})`,
+          },
+        ]);
+        setStudioActionNotice({
+          type: 'status',
+          message: `[무결성 검증 완료] 산출물 파일 '${verification.fileName}' (${verification.blob.size.toLocaleString()} Bytes, SHA-256 일치) 다운로드 완료.`,
+        });
+      } else if (verification.integrity === 'mismatch') {
+        setLogs((prev) => [
+          ...prev,
+          {
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'ERROR',
+            message: `[Artifact File Integrity Mismatch] Checksum mismatch for '${filePath}': expected ${verification.expectedSha256}, got ${verification.calculatedSha256}`,
+          },
+        ]);
         setStudioActionNotice({
           type: 'error',
-          message: '선택된 프로젝트가 없어 파일을 다운로드할 수 없습니다.',
+          message: `[무결성 검증 실패] 산출물 파일 '${verification.fileName}'의 수신 바이트 체크섬(${verification.calculatedSha256})이 서버 헤더(X-Content-SHA256: ${verification.expectedSha256})와 불일치합니다. 전송 중 손상 위험으로 저장이 중단되었습니다.`,
         });
-        setIsDownloadingArtifact(false);
-        return;
-      }
-      const prjId = selectedProjectId;
-      const res = await fetch(`/v1/projects/${prjId}/runs/${activeRunId}/artifacts/content?path=${encodeURIComponent(filePath)}`, {
-        headers,
-      });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      } else {
+        const url = URL.createObjectURL(verification.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = verification.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
-      setLogs((prev) => [
-        ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Artifact File] Raw file bytes downloaded for '${filePath}' (${blob.size.toLocaleString()} Bytes)` },
-      ]);
-      setStudioActionNotice({
-        type: 'status',
-        message: `[다운로드 완료] 산출물 파일 '${fileName}' (${blob.size.toLocaleString()} Bytes)이 성공적으로 다운로드되었습니다.`,
-      });
+        setLogs((prev) => [
+          ...prev,
+          {
+            timestamp: new Date().toLocaleTimeString(),
+            level: 'WARN',
+            message: `[Artifact File] Raw file bytes downloaded for '${filePath}' without server checksum header (Unverified)`,
+          },
+        ]);
+        setStudioActionNotice({
+          type: 'status',
+          message: `[다운로드 완료 · 무결성 미검증] 산출물 파일 '${verification.fileName}' (${verification.blob.size.toLocaleString()} Bytes) 다운로드 완료 (서버 X-Content-SHA256 헤더 부재로 무결성 미검증).`,
+        });
+      }
     } catch (err: any) {
       console.error('Raw artifact download failed:', err);
       setStudioActionNotice({
