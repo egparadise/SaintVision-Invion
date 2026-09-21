@@ -684,6 +684,19 @@ class ControlRunPage(BaseModel):
     nextCursor: RunId | None
 
 
+class ControlRunDetail(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    tenantId: TenantId
+    projectId: ProjectId
+    state: RunState
+    version: conint(ge=1, le=9007199254740991)
+    attempt: conint(ge=0, le=9007199254740991)
+    resourceReleasePending: bool
+
+
 class WorkspaceFrozenFile(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

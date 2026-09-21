@@ -469,6 +469,16 @@ export interface ControlRunPage {
   nextCursor: (RunId | null);
 }
 
+export interface ControlRunDetail {
+  runId: RunId;
+  tenantId: TenantId;
+  projectId: ProjectId;
+  state: RunState;
+  version: number;
+  attempt: number;
+  resourceReleasePending: boolean;
+}
+
 export interface WorkspaceFrozenFile {
   path: string;
   sizeBytes: number;

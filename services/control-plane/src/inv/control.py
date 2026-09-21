@@ -62,6 +62,7 @@ class Control:
             self.grant(conn, principal, project, "can_request")
             prior = self.approvals._ledger(conn, principal, project, "api.run.create", key, {})
             if prior is not None:
+                validate_contract("ControlRunView", prior)
                 return prior
             from .containment import require_execution
 
@@ -71,6 +72,7 @@ class Control:
                 (principal.tenant_id, project, new_id("run")),
             ).fetchone()
             result = public(row)
+            validate_contract("ControlRunView", result)
             event(conn, principal.tenant_id, row["run_id"], "inv.run.created", result)
             return self.approvals._save(conn, project, "api.run.create", key, result)
 
@@ -89,7 +91,9 @@ class Control:
                 (run_id=%s OR run_id IN (SELECT s.run_id FROM inv.shard_commands s JOIN inv.shard_parents p USING(tenant_id,project_id,plan_id) WHERE p.run_id=%s))""",
                 (run_id, run_id),
             ).fetchone()["n"]
-            return {**public(row), "resourceReleasePending": bool(active)}
+            result = {**public(row), "resourceReleasePending": bool(active)}
+            validate_contract("ControlRunDetail", result)
+            return result
 
     def list_runs(self, principal, project, *, after=None, limit=50):
         if after:

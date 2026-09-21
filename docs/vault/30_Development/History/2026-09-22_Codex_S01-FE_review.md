@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 reviewer: "Codex (independent reviewer)"
-updated: "2026-09-22T08:50:00+09:00"
+updated: "2026-09-22T09:18:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["S01", "S01-FE", "review", "frontend", "contracts"]
@@ -42,6 +42,34 @@ tags: ["S01", "S01-FE", "review", "frontend", "contracts"]
 2. `node-page-response.json`, `node-detail-response.json`, `node-enroll-response.json`은 backend `_node_body`와 enrollment/heartbeat 의미에 맞는 값이다. 새 enrollment의 `lastHeartbeatAt=null`, `heartbeatSequence=0`도 producer와 일치한다. 현재 확인한 공유 fixture에서 producer가 만들 수 없는 상태는 발견하지 못했다.
 3. `NodeItem`은 평면 telemetry를 포함한 화면 projection이다. backend NodeResponse가 동적 telemetry를 제공하지 않는다는 사실을 `observedNode`가 `telemetryUnavailable`로 표시하므로, 이 projection 자체를 wire 계약으로 세지 않는다. 다만 이 구분은 화면 계약 문서에 계속 유지돼야 한다.
 4. 후속 계약 위험: `DeveloperStudio.tsx`가 `/v1/projects/{project}/runs` 세 경로에서 정본 생성 타입이 아닌 수기 `RunItem`으로 `apiClient` 응답을 받는다. 해당 run 응답의 canonical schema/serving anchor가 이 검토 범위에서 확인되지 않았다. Gemini에 전달할 계약 결속 후보이며, S01-FE를 닫기 전에 수치·소유 범위를 정리해야 한다.
+
+## Run API 계약 확인 (Codex 후속 확인)
+
+소스와 서빙 경계를 다시 대조한 결과, 새 스키마를 만들 필요는 없었다.
+
+- 정본 wire view는 `contracts/v1alpha1/core.schema.json#/$defs/ControlRunView`다.
+- 단일 조회의 `resourceReleasePending`까지 포함한 전체 응답은 새로 추가한
+  `#/$defs/ControlRunDetail`이다. `contracts/fixtures/control-run-detail-response.json`이
+  실제 `public(row)` + 운영 힌트 모양을 고정한다.
+- 목록은 `#/$defs/ControlRunPage`이며 생성 TypeScript는
+  `packages/contracts-ts/src/index.ts`의 `ControlRunView`/`ControlRunPage`,
+  Python 생성 모델은 `services/control-plane/src/inv/generated/models.py`에 있다.
+- `GET /v1/projects/{project}/runs`는 `Control.list_runs`에서 이미
+  `validate_contract("ControlRunPage", result)`를 호출한다.
+- `POST /v1/projects/{project}/runs`는 `ControlRunView`,
+  `GET /v1/projects/{project}/runs/{run_id}`는 `ControlRunDetail`을 반환하는 실제
+  control-plane 경로다. 생성·재생·단일 조회 모두 `public(row)` 결과를 앵커링한다.
+- 앵커 회귀 대조: `test_single_run_anchor_rejects_an_invalid_state`와
+  `test_run_creation_anchor_rejects_an_invalid_state`는 각각 단일 조회/생성 앵커를
+  제거하면 `DID NOT RAISE DomainError`로 실패한다. 두 앵커를 복원한 뒤 전체 파일은
+  `12 passed`다. `ControlRunDetail` 누락 필드와 fixture 적합성까지 포함한 현재
+  계약 시험은 `14 passed`다.
+  (Python `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe`,
+  `PYTHONPATH=services/control-plane/src`, 2026-09-22 09:17 KST).
+
+Gemini 전달 사항: `DeveloperStudio.tsx`의 세 호출은 `RunItem` 수기 타입을 응답 타입으로
+  사용하지 말고 위 `ControlRunView`/`ControlRunPage`와 계약 전용 adapter를 사용해야 한다.
+  `RunItem`은 화면 projection으로만 남겨야 한다. 이 검토에서 화면 코드는 수정하지 않았다.
 
 ## 범위 경계
 
