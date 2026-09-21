@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.113"
+version: "1.0.114"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T18:58:21+09:00"
+updated: "2026-09-21T19:12:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-21 PTY 티켓 wire 계약 및 인계
+
+- `TerminalTicketInput`/`TerminalTicketResult` 기존 정본을 프런트가 따르도록 공유 요청·응답 fixture와 contract-only `terminalTicket` adapter를 추가했다. `TerminalTicketAuthFrame`을 JSON Schema에 명시하고 WebSocket 입구에서 검증하며, 응답 `websocketPath`는 workspace/session 경로 형식으로 제한한다. 어댑터는 티켓을 URL에 넣지 않고 `inv-terminal-v1` 첫 인증 프레임으로만 내보낸다. `WebTerminal` 화면이나 사용자 흐름은 Codex가 수정하지 않았다.
+- 구현 중 `agent/codex/terminal-pty-contract`, base integration SHA `b49b38d`, 앞선 ProblemDetails/NodeStopReceipt 계약 SHA `2f41851`를 별도 worktree로 fast-forward 병합했다. terminal 검증·commit 이후 사용자 승인에 따라 integration ref를 fast-forward 할 계획이며 Claude 독립 리뷰는 그 SHA 대상으로 후속한다.
+- Gemini 전달 대기(사용자 릴레이): 빈 노드에서는 ticket 발급을 시작하지 말 것. 현재 API는 workspace/session만으로 발급하지 않고 명시적 `commandId`가 필요하다. UI는 선택된 실행의 commandId로 새 adapter를 호출하고, 반환된 `websocketPath` 및 subprotocol을 사용해 query string 없는 연결을 열며 첫 frame으로 adapter auth frame을 보내야 한다. 이 화면 통합은 Codex 범위가 아니다.
+- focused Python/Vitest/schema/build/docs 결과와 명령은 `[[2026-09-21_terminal_ticket_contract_Codex]]` 참조. 실제 DB-backed PTY, live WebSocket/browser, CI, Claude 독립 검토는 별도 미확인이다.
 
 ## 2026-09-21 ProblemDetails anchor와 receipt 이름 공간
 
