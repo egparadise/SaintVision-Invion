@@ -80,12 +80,15 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {workspaces.map((wsp) => {
             const statusConfig: Record<string, { label: string; bg: string; color: string; border: string }> = {
+              ready: { label: '준비 완료 (Ready)', bg: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-brand-success, #34d399)', border: 'rgba(16, 185, 129, 0.3)' },
               provisioning: { label: '프로비저닝 중 (Provisioning)', bg: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-brand-warning, #f59e0b)', border: 'rgba(245, 158, 11, 0.3)' },
-              ready: { label: '준비됨 (Ready)', bg: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' },
-              active: { label: '활성 (Active)', bg: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-brand-success, #34d399)', border: 'rgba(16, 185, 129, 0.3)' },
               suspended: { label: '일시 중단 (Suspended)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
-              terminating: { label: '종료 중 (Terminating)', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' },
-              reclaimed: { label: '회수됨 (Reclaimed)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
+              deleting: { label: '삭제 중 (Deleting)', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' },
+              deleted: { label: '삭제됨 (Deleted)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
+              // 레거시 상태 호환
+              active: { label: '준비 완료 (Ready)', bg: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-brand-success, #34d399)', border: 'rgba(16, 185, 129, 0.3)' },
+              terminating: { label: '삭제 중 (Deleting)', bg: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: 'rgba(239, 68, 68, 0.3)' },
+              reclaimed: { label: '회수/삭제됨 (Reclaimed)', bg: 'var(--color-bg-subtle)', color: 'var(--color-text-muted)', border: 'var(--color-border-subtle)' },
             };
             const cfg = statusConfig[wsp.status] || {
               label: wsp.status,

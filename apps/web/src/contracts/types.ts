@@ -78,6 +78,8 @@ export interface ProjectItem {
 
 export type { WorkspaceExecutionReadinessResponse as WorkspaceReadiness } from './workspace-execution-readiness-response';
 
+export type WorkspaceStatusName = 'provisioning' | 'ready' | 'suspended' | 'deleting' | 'deleted';
+
 export interface WorkspaceItem {
   id: string; // wsp_...
   projectId: string;
@@ -88,7 +90,7 @@ export interface WorkspaceItem {
   prohibitedPaths: string[];
   cpuLimitCores: number;
   memoryLimitBytes: number;
-  status: 'provisioning' | 'ready' | 'active' | 'suspended' | 'terminating' | 'reclaimed' | string;
+  status: WorkspaceStatusName | 'active' | 'terminating' | 'reclaimed' | string;
   createdAt: string;
 }
 

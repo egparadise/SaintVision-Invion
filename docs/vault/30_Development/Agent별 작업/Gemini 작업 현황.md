@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.89"
+version: "1.0.90"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T02:50:00+09:00"
+updated: "2026-09-22T03:03:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,28 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T02:50:00+09:00.
+- 확인 기준: 2026-09-22T03:03:00+09:00.
+
+## 세션 랩업: Workspace status 'active' 죽은 분기 소거, 백엔드 5대 계약 정합 및 Chrome 153 실측 완결
+
+- **Claude 백엔드 계약 좁힘 인계 수용 및 'active' 죽은 분기 소거**:
+  - Claude의 `WorkspaceSummaryResponse.status` enum 좁힘(`provisioning | ready | suspended | deleting | deleted`)에 따라 `DeveloperStudio.tsx`의 `wsp.status === 'active'` 죽은 분기를 소거하고 백엔드 5대 계약에 대한 완전한 렌더링 스타일 맵을 구축했다.
+  - 실제 정상 가동 준비가 완료된 `ready` 작업공간이 회색으로 죽어 나오던 심각한 UX 왜곡 결함을 치유하고 선명한 초록색(`rgba(46, 160, 67, 0.2)` 배경, `#3fb950` 글자)으로 복원했다.
+  - `provisioning`(주황), `suspended`(회색), `deleting`(빨강), `deleted`(음소거 회색)의 5대 상태를 전수 구별 렌더링하도록 정합했다.
+  - `WorkspaceList.tsx`의 왜곡(ready 파랑, active 초록)을 교정하여 `ready`를 초록색 `준비 완료 (Ready)`로 정합하고 `deleting`/`deleted`를 추가했다.
+  - `types.ts`에 `WorkspaceStatusName` 정본 유니온 타입을 정의하고, `developer-studio.test.ts` mock의 `'active'`를 백엔드 계약인 `'ready'`로 정합했다.
+- **실제 Google Chrome 153 (Blink 엔진) 실측 수용**:
+  - Vite 3005 개발 서버에서 실제 Chrome 153 프로세스를 띄워 `/studio`에서 `ready` 작업공간(`PACS Accelerated Inference (Ready)`)의 계산된 CSS를 Blink 엔진에서 직접 실측:
+    `color: rgb(63, 185, 80)` (`#3fb950`), `backgroundColor: rgba(46, 160, 67, 0.2)`로 초록색 표출을 100% 실측 단언 성공.
+  - 스크린샷 증거: `scratch/real_chrome_workspace_ready_green.png`.
+- **게이트 통과**:
+  - Vitest **71개 파일 631/631 passed 100%** (순증 +1 파일, +3 passed, `developer-studio-workspace-status.test.tsx`).
+  - `tsc -b`: exit 0 (타입 오류 0건).
+  - Vite 프로덕션 빌드: exit 0 (3.72s).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 38 fixtures / 12 serving anchors PASS.
+- 보고서: [[2026-09-22_Workspace_ready_상태초록색정합_및_Chrome153_실측_Gemini]].
+
 
 ## 세션 랩업: 실제 브라우저(Real Chrome 153) 실측 수용 및 산출물 다운로드 무결성 3상태 검증과 CSS 버그 치유 완결
 

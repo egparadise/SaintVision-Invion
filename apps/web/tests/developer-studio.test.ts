@@ -386,7 +386,7 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
         {
           check: 'workspace_ready',
           satisfied: true,
-          detail: "the workspace status is 'active'",
+          detail: "the workspace status is 'ready'",
           resolvedBy: 'project owner',
         },
         {

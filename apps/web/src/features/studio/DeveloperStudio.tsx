@@ -1084,12 +1084,36 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <strong style={{ fontSize: '0.875rem' }}>{wsp.name}</strong>
                       <span
+                        data-testid={`studio-wsp-status-${wsp.workspaceId}`}
                         style={{
                           fontSize: '0.6875rem',
                           padding: '2px 6px',
                           borderRadius: 'var(--radius-sm)',
-                          backgroundColor: wsp.status === 'active' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(139, 148, 158, 0.2)',
-                          color: wsp.status === 'active' ? '#3fb950' : 'var(--color-text-muted)',
+                          border: `1px solid ${
+                            wsp.status === 'ready'
+                              ? 'rgba(46, 160, 67, 0.4)'
+                              : wsp.status === 'provisioning'
+                              ? 'rgba(210, 153, 34, 0.4)'
+                              : wsp.status === 'deleting'
+                              ? 'rgba(248, 81, 73, 0.4)'
+                              : 'rgba(139, 148, 158, 0.3)'
+                          }`,
+                          backgroundColor:
+                            wsp.status === 'ready'
+                              ? 'rgba(46, 160, 67, 0.2)'
+                              : wsp.status === 'provisioning'
+                              ? 'rgba(210, 153, 34, 0.2)'
+                              : wsp.status === 'deleting'
+                              ? 'rgba(248, 81, 73, 0.2)'
+                              : 'rgba(139, 148, 158, 0.2)',
+                          color:
+                            wsp.status === 'ready'
+                              ? '#3fb950'
+                              : wsp.status === 'provisioning'
+                              ? '#d29922'
+                              : wsp.status === 'deleting'
+                              ? '#f85149'
+                              : 'var(--color-text-muted)',
                         }}
                       >
                         {wsp.status}
