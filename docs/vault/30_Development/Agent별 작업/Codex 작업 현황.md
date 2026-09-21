@@ -13,7 +13,7 @@ source_of_truth: "Git"
 ## 2026-09-22 strict response producer-shape self-audit
 
 - Audited all 19 response-model classes added/narrowed today against producer branches and fixtures. No live producer shape was found that the strict model rejects; found and corrected the Node enrollment fixture (actual new enrollment is heartbeat sequence 0 / null timestamp), and expanded shape tests for project-link, workspace-tool null/unassigned-node, and contribution status x nullable-capacity outputs.
-- Focused `.venv` run at integration SHA `f0183360`: 101 passed, 2 PostgreSQL-gated skips (`INV_TEST_ADMIN_DSN` absent). This is not live-DB verification; see [[2026-09-22_response_model_shape_self_audit_Codex]]. Independent review pending.
+- Focused `.venv` run at clean integration SHA `1c68b32b` (2026-09-22 05:04:32 KST): 101 passed, 2 PostgreSQL-gated skips (`INV_TEST_ADMIN_DSN` absent). This is not live-DB verification; see [[2026-09-22_response_model_shape_self_audit_Codex]]. Independent review pending.
 
 ## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
 
