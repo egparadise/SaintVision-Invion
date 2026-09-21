@@ -6,7 +6,7 @@ import { act } from 'react';
 import { TerminalSessionView } from '../src/features/desktop/TerminalSessionView';
 import { WebTerminal } from '../src/features/terminal/WebTerminal';
 import * as client from '../src/shared/api/client';
-import { NodeItem } from '../src/contracts/types';
+import { NodeItem, RunItem } from '../src/contracts/types';
 
 // Mock WebSocket
 class MockWebSocket {
@@ -107,11 +107,13 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
 
     vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
       if (endpoint.includes('/terminal-tickets')) {
+        const match = endpoint.match(/\/v1\/workspaces\/([^/]+)\/terminal-tickets/);
+        const wsp = match ? decodeURIComponent(match[1]) : 'wsp_core_01';
         return {
           ticket: 'a000000000000000000000000000000000000000000000000000000000000001',
           expiresAt: '2026-09-21T12:00:30Z',
           sessionId: '33333333-3333-4333-8333-333333333333',
-          websocketPath: '/v1/workspaces/wsp_core_01/terminals/33333333-3333-4333-8333-333333333333',
+          websocketPath: `/v1/workspaces/${wsp}/terminals/33333333-3333-4333-8333-333333333333`,
         };
       }
       return {};
@@ -587,10 +589,213 @@ describe('VF-GM-05: Terminal & Virtual IDE Web Session UX DOM Harness', () => {
     });
 
     expect(apiSpy).toHaveBeenCalledWith(
-      expect.stringContaining('/v1/workspaces/wsp_01JABCDE001/terminal-tickets'),
+      expect.stringContaining('/v1/workspaces/wsp_0123456789ABCDEFGHJKMNPQRS/terminal-tickets'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ commandId: '55555555-5555-4555-8555-555555555555' }),
+      })
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // 13. Pre-Connect Truth-in-State UX (No premature connected status or shell prompt)
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-PRE-CONNECT-TRUTH] does not display connected text or interactive prompt prior to WebSocket connection', async () => {
+    class DelayedWebSocket {
+      static OPEN = 1;
+      static CLOSED = 3;
+      url: string;
+      protocols?: string | string[];
+      readyState = 1;
+      onopen: (() => void) | null = null;
+      onmessage: ((ev: any) => void) | null = null;
+      onerror: ((err: any) => void) | null = null;
+      onclose: (() => void) | null = null;
+      sentMessages: string[] = [];
+      static lastInstance: DelayedWebSocket | null = null;
+
+      constructor(url: string, protocols?: string | string[]) {
+        this.url = url;
+        this.protocols = protocols;
+        DelayedWebSocket.lastInstance = this;
+        // Deliberately do NOT auto-call onopen in constructor
+      }
+
+      send(data: string) {
+        this.sentMessages.push(data);
+      }
+
+      close() {
+        this.readyState = DelayedWebSocket.CLOSED;
+        if (this.onclose) this.onclose();
+      }
+    }
+
+    const orig = globalThis.WebSocket;
+    globalThis.WebSocket = DelayedWebSocket as any;
+
+    try {
+      await act(async () => {
+        root.render(
+          <WebTerminal
+            workspaceId="wsp_0123456789ABCDEFGHJKMNPQRS"
+            commandId="22222222-2222-4222-8222-222222222222"
+          />
+        );
+      });
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 60));
+      });
+
+      // While connecting / awaiting open, container MUST NOT show Connected or prompt
+      expect(container.textContent).not.toContain('Connected via secure WebSocket');
+      expect(container.textContent).not.toContain('saintvision@wsp_0123456789ABCDEFGHJKMNPQRS:~$');
+      expect(container.textContent).toContain('대기 중: 승인된 실행 명령(commandId) 및 30초 일회용 티켓 검증 대기...');
+
+      // Now trigger onopen
+      await act(async () => {
+        DelayedWebSocket.lastInstance?.onopen?.();
+        await new Promise((r) => setTimeout(r, 20));
+      });
+
+      // NOW it must contain Connected and shell prompt
+      expect(container.textContent).toContain('Connected via secure WebSocket with 30s one-time ticket.');
+      expect(container.textContent).toContain('saintvision@wsp_0123456789ABCDEFGHJKMNPQRS:~$');
+    } finally {
+      globalThis.WebSocket = orig;
+    }
+  });
+
+  // ---------------------------------------------------------------------------
+  // 14. Zero Ticket / Token Credential Leak in DOM Output
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-ZERO-TICKET-LEAK] verifies zero ticket tokens, prefixes or slices are leaked into DOM logs or accessible text', async () => {
+    const secretTicket = 'a000000000000000000000000000000000000000000000000000000000000001';
+    const secretPrefix = secretTicket.slice(0, 12);
+
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_0123456789ABCDEFGHJKMNPQRS"
+          commandId="22222222-2222-4222-8222-222222222222"
+        />
+      );
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 60));
+    });
+
+    // Verify session ID from server is displayed in the badge
+    const sessBadge = container.querySelector('[data-testid="terminal-session-id"]');
+    expect(sessBadge?.textContent).toBe('(세션: 33333333-3333-4333-8333-333333333333)');
+
+    // Verify entire container text content contains NO part of the secret ticket
+    expect(container.textContent).not.toContain(secretTicket);
+    expect(container.textContent).not.toContain(secretPrefix);
+    expect(container.textContent).toContain('[확인] 30초 일회용 티켓 발급 완료');
+
+    // Toggle accessible view and check log text
+    const a11yToggle = container.querySelector<HTMLButtonElement>('[data-testid="terminal-toggle-a11y-btn"]');
+    await act(async () => {
+      a11yToggle?.click();
+    });
+
+    const a11yLog = container.querySelector('[data-testid="terminal-a11y-output"]');
+    expect(a11yLog).not.toBeNull();
+    expect(a11yLog?.textContent).not.toContain(secretTicket);
+    expect(a11yLog?.textContent).not.toContain(secretPrefix);
+  });
+
+  // ---------------------------------------------------------------------------
+  // 15. Honest 403 AUTH-0070 Problem Details Surfacing & Gated Retry
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-AUTH-0070-SURFACING] surfaces AUTH-0070 execution expired/unauthorized error and gates retry', async () => {
+    vi.spyOn(client, 'apiClient').mockRejectedValueOnce(
+      new Error('403 Forbidden: AUTH-0070 권한 없음 또는 만료된 실행')
+    );
+
+    await act(async () => {
+      root.render(
+        <WebTerminal
+          workspaceId="wsp_0123456789ABCDEFGHJKMNPQRS"
+          commandId="expired-cmd-001"
+        />
+      );
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 60));
+    });
+
+    const errAlert = container.querySelector('[data-testid="terminal-error-alert"]');
+    expect(errAlert).not.toBeNull();
+    expect(errAlert?.textContent).toContain('AUTH-0070 권한 없음 / 실행 만료');
+    expect(container.querySelector('[data-testid="terminal-connection-status"]')?.textContent).toBe('(error)');
+
+    // Must NOT render false connection success text
+    expect(container.textContent).not.toContain('Connected via secure WebSocket');
+
+    // Retry button exists and is active because commandId was provided
+    const retryBtn = container.querySelector<HTMLButtonElement>('[data-testid="terminal-error-retry-btn"]');
+    expect(retryBtn).not.toBeNull();
+    expect(retryBtn?.disabled).toBe(false);
+    expect(retryBtn?.textContent).toBe('새 티켓으로 재시도');
+  });
+
+  // ---------------------------------------------------------------------------
+  // 16. TerminalSessionView Run Selector & Ticket Binding
+  // ---------------------------------------------------------------------------
+  it('[VF-GM-05-RUN-SELECTOR-WIRING] selects approved run from dropdown and triggers ticket request', async () => {
+    const apiSpy = vi.spyOn(client, 'apiClient');
+    const mockRuns: RunItem[] = [
+      {
+        id: 'run_approved_001',
+        projectId: 'prj_01',
+        state: 'scheduled',
+        step: 'build',
+        progress: 0,
+      },
+      {
+        id: 'run_approved_002',
+        projectId: 'prj_01',
+        state: 'verifying',
+        step: 'test',
+        progress: 50,
+      },
+    ];
+
+    await act(async () => {
+      root.render(
+        <TerminalSessionView
+          nodes={mockNodes}
+          runs={mockRuns}
+          defaultNodeId="nod_01"
+        />
+      );
+    });
+
+    // Run selector rendered
+    const runSelect = container.querySelector<HTMLSelectElement>('[data-testid="terminal-run-select"]');
+    expect(runSelect).not.toBeNull();
+    expect(runSelect?.options.length).toBe(3); // default + 2 runs
+
+    // Select second run
+    await act(async () => {
+      runSelect!.value = 'run_approved_002';
+      runSelect!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 60));
+    });
+
+    expect(apiSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/workspaces/wsp_0123456789ABCDEFGHJKMNPQRS/terminal-tickets'),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ commandId: 'run_approved_002' }),
       })
     );
   });

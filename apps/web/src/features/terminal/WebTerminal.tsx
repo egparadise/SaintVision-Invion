@@ -14,7 +14,7 @@ export function isAuthorizedCommandId(id?: string | null): id is string {
 
 export interface WebTerminalProps {
   workspaceId: string;
-  sessionId: string;
+  sessionId?: string | null;
   commandId?: string | null;
   onClose?: () => void;
 }
@@ -25,12 +25,11 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   commandId,
   onClose,
 }) => {
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(sessionId || null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([
-    'SaintVision Web Terminal PTY (Session: ' + sessionId + ')',
-    'Connected via secure WebSocket with 30s one-time ticket.',
-    'Type commands below or use the accessibility text log view.',
+    `SaintVision Web Terminal PTY (Workspace: ${workspaceId || '미지정'})`,
+    '대기 중: 승인된 실행 명령(commandId) 및 30초 일회용 티켓 검증 대기...',
     '------------------------------------------------------------',
-    'saintvision@wsp-saint-pilot:~$ ',
   ]);
   const [currentInput, setCurrentInput] = useState('');
   const [isAccessibleView, setIsAccessibleView] = useState(false);
@@ -53,9 +52,9 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         setLastError(null);
         setTerminalOutput((prev) => [
           ...prev,
-          '⚠️ [보안 차단]: 유효한 승인 명령 신원(commandId)이 지정되지 않았습니다.',
-          '보안 정책에 따라 백엔드 티켓 발급 요청(POST /v1/workspaces/.../terminal-tickets)을 수행하지 않고 중단했습니다.',
-          '상위 실행 파이프라인에서 승인된 명령을 선택하거나 유효한 commandId를 입력하십시오. (위조 식별자 합성 방지)',
+          '⚠️ [승인 실행 필요]: 유효한 승인 명령 신원(commandId)이 지정되지 않았습니다.',
+          '보안 정책: 백엔드 티켓 발급 요청(POST /terminal-tickets) 및 WebSocket 연결을 수행하지 않고 중단했습니다.',
+          '상위 파이프라인에서 승인된 실행(Approved Execution)을 선택하십시오. (위조 식별자 합성 방지)',
         ]);
         return;
       }
@@ -70,13 +69,15 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         // Canonical TerminalTicketInput: strictly requires authorized commandId
         const ticketData = await issueTerminalTicket(workspaceId, { commandId });
         if (!active) return;
+        setActiveSessionId(ticketData.sessionId);
 
         const handshake = terminalTicketHandshake(ticketData);
         const finalWsUrl = `${wsProtocol}//${wsHost}${handshake.websocketPath}`;
 
+        // SECURITY INVARIANT: NEVER log ticketData.ticket or its slice/prefix!
         setTerminalOutput((prev) => [
           ...prev,
-          `[확인] 일회용 티켓(${ticketData.ticket.slice(0, 12)}...) 획득 성공 (유효기간: 30초). PTY 세션 연결 중...`,
+          '[확인] 30초 일회용 티켓 발급 완료 (유효기간: 30초). PTY WebSocket 연결 시도 중...',
         ]);
 
         const client = new WsTerminalClient(
@@ -93,6 +94,12 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
               if (status === 'connected') {
                 setLastError(null);
                 setDisconnectedCmdAlert(null);
+                // ONLY append Connected message and shell prompt after connection is actually established!
+                setTerminalOutput((prev) => [
+                  ...prev,
+                  'Connected via secure WebSocket with 30s one-time ticket.',
+                  `saintvision@${workspaceId}:~$ `,
+                ]);
               }
             }
           }
@@ -104,10 +111,11 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         if (!active) return;
         const msg = err?.message || String(err);
         setConnectionStatus('error');
-        setLastError(`30초 일회용 PTY 티켓 발급 실패: ${msg}`);
+        setLastError(msg);
         setTerminalOutput((prev) => [
           ...prev,
-          `❌ [티켓 발급 실패]: ${msg}. 재접속 버튼으로 다시 시도하십시오.`,
+          `❌ [티켓 발급 실패]: ${msg}`,
+          '보안 거부: 승인되지 않은 명령이거나 실행 권한이 만료되었습니다. (가상 터미널 표출 차단)',
         ]);
       }
     };
@@ -135,7 +143,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
 
     if (!isAuthorizedCommandId(commandId)) {
       setConnectionStatus('disconnected');
-      setDisconnectedCmdAlert('유효한 승인 명령(commandId)이 없어 새 PTY 티켓을 발급받을 수 없습니다. (위조 식별자 합성 차단)');
+      setDisconnectedCmdAlert('승인된 실행(commandId)이 선택되지 않아 새 PTY 티켓을 발급받을 수 없습니다. 상단에서 실행을 선택하십시오.');
       return;
     }
 
@@ -148,12 +156,14 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
       ]);
       const ticketData = await issueTerminalTicket(workspaceId, { commandId });
+      setActiveSessionId(ticketData.sessionId);
       const handshake = terminalTicketHandshake(ticketData);
       const finalWsUrl = `${wsProtocol}//${wsHost}${handshake.websocketPath}`;
 
+      // SECURITY INVARIANT: NEVER log ticketData.ticket or its slice/prefix!
       setTerminalOutput((prev) => [
         ...prev,
-        `[확인] 신규 일회용 티켓(${ticketData.ticket.slice(0, 12)}...) 획득 완료. 재연결 진행.`,
+        '[확인] 신규 30초 일회용 티켓 발급 완료. 재연결 진행 중...',
       ]);
 
       const client = new WsTerminalClient(
@@ -169,6 +179,11 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           if (status === 'connected') {
             setLastError(null);
             setDisconnectedCmdAlert(null);
+            setTerminalOutput((prev) => [
+              ...prev,
+              'Connected via secure WebSocket with 30s one-time ticket.',
+              `saintvision@${workspaceId}:~$ `,
+            ]);
           }
         }
       );
@@ -178,7 +193,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     } catch (err: any) {
       const msg = err?.message || String(err);
       setConnectionStatus('error');
-      setLastError(`신규 일회용 티켓 발급 및 재연결 실패: ${msg}`);
+      setLastError(msg);
       setTerminalOutput((prev) => [
         ...prev,
         `❌ [재접속 실패]: ${msg}`,
@@ -203,9 +218,9 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       setDisconnectedCmdAlert(alertMsg);
       setTerminalOutput((prev) => [
         ...prev,
-        `saintvision@wsp-saint-pilot:~$ ${cmd}`,
+        `saintvision@${workspaceId}:~$ ${cmd}`,
         `🛑 [전송 불가]: ${alertMsg}`,
-        'saintvision@wsp-saint-pilot:~$ ',
+        `saintvision@${workspaceId}:~$ `,
       ]);
     }
   };
@@ -254,6 +269,12 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           />
           <span>
             PTY Web Terminal: <code>{workspaceId}</code>{' '}
+            <span
+              data-testid="terminal-session-id"
+              style={{ fontSize: '0.75rem', color: '#8b949e' }}
+            >
+              (세션: {activeSessionId || '미발급'})
+            </span>{' '}
             <span
               data-testid="terminal-connection-status"
               style={{ fontSize: '0.75rem', color: '#8b949e' }}
@@ -335,23 +356,30 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             justifyContent: 'space-between',
           }}
         >
-          <span>❌ {lastError || '30초 일회용 PTY 티켓 발급 또는 연결 실패'}</span>
+          <span>
+            ❌ {lastError?.includes('AUTH-0070')
+              ? '[AUTH-0070 권한 없음 / 실행 만료]: 유효한 승인 실행이 아니거나 세션이 만료되었습니다. (티켓 발급 거부)'
+              : lastError?.includes('VAL-0002')
+              ? '[VAL-0002 계약 검증 실패]: 요청 계약 형식이 유효하지 않습니다.'
+              : (lastError || '30초 일회용 PTY 티켓 발급 또는 연결 실패')}
+          </span>
           <button
             type="button"
             data-testid="terminal-error-retry-btn"
             onClick={handleReconnect}
+            disabled={!isAuthorizedCommandId(commandId)}
             style={{
               padding: '2px 8px',
-              backgroundColor: '#ef4444',
+              backgroundColor: isAuthorizedCommandId(commandId) ? '#ef4444' : '#6b7280',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer',
+              cursor: isAuthorizedCommandId(commandId) ? 'pointer' : 'not-allowed',
               fontSize: '0.75rem',
               fontWeight: 600,
             }}
           >
-            새 티켓으로 재시도
+            {isAuthorizedCommandId(commandId) ? '새 티켓으로 재시도' : '실행 선택 후 재시도'}
           </button>
         </div>
       )}
@@ -440,7 +468,12 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             onSubmit={handleCommandSubmit}
             style={{ display: 'flex', marginTop: '4px' }}
           >
-            <span style={{ color: '#58a6ff' }}>saintvision@wsp-saint-pilot:~$ &nbsp;</span>
+            <span style={{ color: connectionStatus === 'connected' ? '#58a6ff' : '#8b949e' }}>
+              {connectionStatus === 'connected'
+                ? `saintvision@${workspaceId || 'terminal'}:~$ `
+                : `[${connectionStatus}] $ `}
+              &nbsp;
+            </span>
             <input
               data-testid="terminal-command-input"
               type="text"

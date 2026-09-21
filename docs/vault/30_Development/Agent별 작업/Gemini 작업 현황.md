@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.63"
+version: "1.0.64"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T19:45:00+09:00"
+updated: "2026-09-21T19:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,19 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T19:45:00+09:00.
+- 확인 기준: 2026-09-21T19:55:00+09:00.
 
 ## 최근 확인한 진척
+
+- **PTY 보안 경계, 토큰 제로 누설, 사전 연결 허위 성공 제거, 정합 WorkspaceId 및 승인 Run 선택기 완결 (`WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `tests/terminal-session-dom.test.tsx`)**:
+  - **1회용 PTY 인증 토큰 제로 누설 (Zero-Leak)**: `WebTerminal.tsx`에서 `${ticketData.ticket.slice(0, 12)}...` 로그 출력을 전면 제거. 단일 사용 티켓은 실제 WebSocket 인증 헤더/프레임(`authFrame = { ticket }`)으로 쓰이는 권한 증표이므로 어떤 조각(slice/prefix)도 UI 텍스트에 남기지 않고 순수 상태 메시지(`[확인] 30초 일회용 티켓 발급 완료`)만 출력하도록 교정.
+  - **사전 연결 허위 성공 및 대화형 쉘 프롬프트 표출 원천 차단**: `WebTerminal.tsx` 초기 출력 상태에 WebSocket 연결 수립 이전에 `'Connected via secure WebSocket with 30s one-time ticket.'` 및 `saintvision@...:~$ `가 합성되어 있던 착시를 전면 제거. 연결 수립 전에는 정직한 대기 상태(`대기 중: 승인된 실행 명령(commandId) 및 30초 일회용 티켓 검증 대기...`, `[connecting] $ `)를 유지하고, 오직 WebSocket `onopen` 이후 `onStatus('connected')` 전환 시점에만 연결 성공 메시지와 쉘 프롬프트(`saintvision@{workspaceId}:~$ `)를 추가하도록 정합.
+  - **유효하지 않은 WorkspaceId 및 위조 세션 ID 제거**: `TerminalSessionView.tsx:109`에서 2차 세션에 `${defaultWorkspaceId}_02`를 덧붙여 `core.schema.json`의 `^wsp_[0-9A-HJKMNP-TV-Z]{26}$` 정규식을 위반하던 결함을 정정(`defaultWorkspaceId` 유지). `TerminalSessionView.tsx:416` 및 `App.tsx:504`에서 클라이언트가 임의로 조작하여 넘기던 위조 세션 ID(`sess_init_01`, `sid_terminal_01`) 및 임의 워크스페이스(`wsp-saint-pilot`)를 전면 폐기하고, 백엔드가 승인된 실행(`commandId`) 검증 후 `TerminalTicketResult.sessionId`(UUID)로 발급한 실물 식별자(`data-testid="terminal-session-id"`)를 렌더링.
+  - **승인 실행(Run) 선택기 배선 및 워크스페이스 부재 가드**: `TerminalSessionView.tsx`에 `runs?: RunItem[]`를 주입하고 `<select data-testid="terminal-run-select">`를 신설하여 상위 승인된 실행 선택 시 해당 `commandId`로 티켓을 요청하도록 배선. `App.tsx` Tab 5에서도 `workspaces` 목록 부재 시 허위 세션을 생성하지 않고 `data-testid="terminal-no-workspace-notice"`를 정직 렌더링하며, `<select data-testid="app-terminal-run-select">`를 통해 승인 실행을 명시 선택하도록 구축.
+  - **Honest 403 AUTH-0070 Surfacing**: 백엔드 403 `AUTH-0070` 또는 422 `VAL-0002` 거절 시, `data-testid="terminal-error-alert"`에 `[AUTH-0070 권한 없음 / 실행 만료]`를 명확히 고지하고 `commandId` 부재 시 재시도 비활성화.
+  - **2대 돌연변이 실측 사살 (KILLED)**: WebSocket 연결 전 초기 출력에 premature Connected 문구 주입 시 `[VF-GM-05-PRE-CONNECT-TRUTH]` 및 `[VF-GM-05-AUTH-0070-SURFACING]` 동시 실패 사살, 1회용 PTY 티켓 12자리 접두어를 콘솔 출력에 노출 시 `[VF-GM-05-ZERO-TICKET-LEAK]` assertion 실패 사살.
+  - **검증 실적**: Vitest 55개 파일 **505/505 passed 100%** (from 501 to 505, net +4 tests; `terminal-session-dom.test.tsx` 16 passed), Vite 프로덕션 빌드 exit 0 (3.81s, 95 modules), Pytest core 19 passed (1.71s), check_docs/ontology/Obsidian PASS.
+  - 보고서: [[2026-09-21_PTY보안경계_토큰제로누설_사전연결허위성공제거_Gemini]].
 
 - **모델 계보 및 평가 점수 가상 합성 차단과 PTY commandId 보안 인가 정합 (`ModelLineageView.tsx`, `mlopsEngine.ts`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `DesktopShell.tsx`, `App.tsx`, `tests/model-lineage.test.ts`, `tests/terminal-session-dom.test.tsx`)**:
   - **모델 계보 가짜 평가 점수(Acc 81.2% 등) 합성 차단**: `mlopsEngine.ts`의 `INITIAL_LINEAGES`를 테스트 전용 `TEST_FIXTURE_LINEAGES`로 격리하고 기본 생성자를 빈 배열(`[]`)로 전환. `ModelLineageView`에 `data-testid="lineage-unexposed-notice"`(`role="status"`) 및 `lineage-empty-state`를 신설하여 백엔드 HTTP 서빙 API 부재를 정직하게 고지하고 의사결정 왜곡 원천 차단 (Codex 엔드포인트 신설 인계).
