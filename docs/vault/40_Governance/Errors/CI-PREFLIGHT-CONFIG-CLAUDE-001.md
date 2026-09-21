@@ -1,11 +1,11 @@
 ---
 doc_id: "CI-PREFLIGHT-CONFIG-CLAUDE-001"
 title: "CI 사전 점검 — 결제 열기 전 설정-원인 빨간불 제거. 발견·인계(워크플로는 Codex)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T19:20:00+09:00"
+updated: "2026-09-21T20:00:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handoff-codex"]
@@ -26,9 +26,8 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 - **결과**: 첫 CI 실행에서 backend·core 둘 다 이 22 skip으로 **no-skipped 단언 실패 → RED**. 실제 결함이 아니라 설정 불일치(image 시험이 추가/게이트됐으나 워크플로의 collect·단언이 그에 맞춰 안 됨; CI가 한 번도 안 돌아 미노출).
 - **수정안(Codex)**: 이 셋은 의도된 별도 opt-in 트랙(이미지/설치 acceptance)이므로 **browser처럼 backend·core collect에서 제외**하는 것이 정합(`--ignore=tests/integration/test_web_container.py …`), 또는 `node_dependent_tests.py`류 제외 목록에 추가(그 도구는 Claude 소관 — 원하면 내가 확장), 또는 워크플로가 해당 이미지를 빌드해 env를 켠다(더 큰 변경·비용). 별도 트랙 설계상 **제외**가 최소·정합.
 
-### ② [소스-읽기] go-version 1.27.1이 floor를 초과·미출시
-- `core.yml` `setup-go go-version: '1.27.1'`. `services/node-agent/go.mod`·`packages/contracts-go/go.mod`는 **`go 1.23`**만 요구(하위호환이라 상위 toolchain은 무방). 그러나 **1.27.1은 Jan 2026 지식 기준 미출시** 버전이라, CI 실행 시 setup-go가 못 받으면 **core.yml이 setup에서 RED**.
-- **수정안(Codex)**: floor를 넘는 특정 미래 패치 고정은 취약 — 출시된 버전(예: `'1.23'`/`'1.24.x'`/`'stable'`)으로. (주의: CI가 1.27.1 출시 이후 돈다면 무해 — 그러나 특정 미래 패치 고정 자체가 취약.)
+### ② [철회 — v1.1.0 정정] go-version 1.27.1은 빨간불 아님
+**철회한다.** 아래 v1.1.0 정정 참조. Go 1.27.1은 출시된 최신 stable이라 `core.yml:39`은 정상이다. Codex 인계 목록에서 제외.
 
 ## 취약(현재는 맞으나 드리프트 시 빨간불 — definer 9-vs-10 형태)
 
@@ -48,5 +47,23 @@ tags: ["ci", "preflight", "config", "workflows", "boundary-attribution", "handof
 ## 오늘의 형태 (기록)
 경계·귀속 미끄러짐이 **셋 모두에게** 나왔다. 사용자는 오늘 세 번(변수명→변환층, 엉뚱한 워크트리→뒤처짐, 경로→working-directory) 불일치를 의심했다가 문맥 확인 후 정정했다 — 틀린 의심이 워크플로 구조 확인으로 이어진 경우다(옳았던 것으로 적지 않는다). 나도 강제층을 한쪽만 보고 단정했다가 정정했고, 이번 A·B도 한 층 더 안 봤으면 오탐할 뻔했다. **교훈: 불일치로 보이면 한 층 더(working-dir/변환/래퍼/조건 가드/정책 파일)를 확인한 뒤 결론.** 이번 ①은 반대로 여러 층을 확인하고도 남은 **진짜 설정 불일치**다 — 오탐과 진탐을 가르는 것이 바로 그 "한 층 더".
 
+**그리고 나의 ② 슬립은 다른 급이다(구별해 기록).** 지금까지의 미끄러짐은 전부 **대리 신호를 목표로 착각**(초록≠도달, 배선≠통과, tip/트리/인터프리터 못 박기)하는 형태였고, 공통 처방은 "저장소·아티팩트를 한 층 더 본다"였다. 그런데 ②는 **내 지식 경계를 세계의 경계로 착각**한 것이라, **저장소를 아무리 읽어도 못 잡는다.** 처방이 다르다 — 안이 아니라 **밖(go.dev)을 조회**해야 한다. 그래서 위 v1.1.0에 3-갈래 규칙([측정]/[외부조회]/[미확인추정])을 별도로 세웠다. 사용자의 세 슬립과 같은 급의 사례로 나란히 남긴다.
+
+## v1.1.0 정정 — ②는 빨간불 아님, 그리고 외부 사실 3-갈래 규칙
+**②를 철회한다.** 사용자가 go.dev 배포 목록을 조회하니 **`go1.27.1`·`go1.27.0`이 stable**로 있고 `1.27rc1~rc3`도 있다. 오늘은 2026-09-21이고 Go는 반년 주기라 1.27은 이미 나왔다. 그러니 `core.yml:39 go-version: '1.27.1'`은 정상이고 setup-go가 받아온다. **② 삭제.**
+
+**왜 틀렸나(중요)**: 나는 "Jan 2026 지식 기준 미출시"라고 적었다. 그건 **저장소를 읽은 게 아니라 내 지식 시점을 세계의 상태로 놓은 것**이다. "소스-읽기 유력"으로 정직하게 표시했지만, **표시만으로는 부족하다 — 저장소 밖의 사실은 소스-읽기로 확인되지 않는다.** 그리고 이건 다른 것들과 달리 **저장소를 아무리 읽어도 스스로 못 잡는다. 반드시 바깥을 조회**해야 한다.
+
+**규칙(앞으로) — 외부 사실에 기대는 판단은 3-갈래로 분리해 적는다:**
+1. **[측정]** 저장소에서 실측한 것(예: junit 22/22 skip). 근거로 쓴다.
+2. **[외부조회]** go.dev·PyPI·릴리스 목록 등 바깥을 조회해 확인한 것(예: go1.27.1 stable — 사용자 go.dev 조회). 근거로 쓴다.
+3. **[미확인추정]** 내 지식에서 나온 것. **근거로 쓰지 말고 조회 대상으로만 남긴다.** 외부 버전/가용성/현재-세계-상태 판단은 전부 여기서 시작해 (2)로 승격돼야 근거가 된다.
+
+즉 "go 1.27.1 미출시"는 (3)이었는데 내가 (1)처럼 근거로 썼다. 올바른 행동은 `go-version` 같은 항목을 만나면 **먼저 go.dev/dl을 조회**(2)한 뒤 판정하는 것이다. (버전 pin·외부 이미지 태그·패키지 가용성이 이 부류다.)
+
 ## 인계
-워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **①②③ 수정은 Codex 소관으로 인계** — 위 수정안 참조. `node_dependent_tests.py`(Claude 소관)로 ①을 처리하는 선택지면 내가 확장 가능. reviewer: Codex. apps/web 미접촉, tests 미수정(전부 소스-읽기/실측, img_probe.xml 삭제).
+워크플로 YAML(`.github/workflows/*`)은 CI 인프라로 Codex가 저자였다(DSN 마스킹·node-runtime). **②는 철회. ①③만 인계**:
+- **①(image-opt-in skip → no-skipped RED)** — [측정]된 사실. **재현법 함께 인계**: `.venv python -m pytest tests/integration/test_web_container.py tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=<path>` → junit `testcases=22, skipped=22, failure=0, error=0`; 이 3파일은 node_dependent 목록에 없어 backend(`$IGNORES`+browser)·core(browser만) collect에 포함됨. **수정안 2개**: ⓐ 워크플로에서 browser처럼 제외(`--ignore=…`) — **Codex 소관**; ⓑ `node_dependent_tests.py`(**Claude 소관**)에 이 opt-in-이미지 부류를 추가해 backend에서 자동 제외 — 단 core.yml은 그 목록을 안 쓰므로 core는 별도 제외 필요. Codex가 어느 쪽이 정합적인지 판단하고, ⓑ면 내가 확장한다.
+- **③(하드코딩 개수)** — [측정]상 browser 6·docker-host 2는 현재 일치하나 리터럴이라 코드 변경 시 어긋난다. `skipped==0 and failure==0 and error==0 and passed>0`로(마법 숫자 제거+조용한 skip 차단). **선례**: 오늘 definer 함수 개수를 9-vs-10에서 하드코딩 대신 수집/정책 대조로 바꾼 것과 같은 형태 — 그 선례를 근거로 단다.
+
+reviewer: Codex. apps/web 미접촉, tests 미수정(전부 소스-읽기/실측, img_probe.xml 삭제).
