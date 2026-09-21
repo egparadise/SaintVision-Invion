@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EditorFile, GitCommitRecord, FileDiffResult } from '@/contracts/types';
+import { EditorFile, GitCommitRecord, FileDiffResult, WorkspaceEditView } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
+import { saveWorkspaceEditView } from '@/shared/api/workspaceEditObservation';
 import { computeSha256, computeDiff } from './diffEngine';
 import { SessionRecoveryManager, CommandLogEntry } from './sessionRecovery';
 import { DiffViewer } from './DiffViewer';
@@ -35,14 +36,24 @@ const INITIAL_FILES: EditorFile[] = [
   },
 ];
 
-interface MonacoWorkspaceEditorProps {
+export interface MonacoWorkspaceEditorProps {
   workspaceId?: string;
   projectId?: string;
+  runId?: string;
+  checkoutId?: string;
+  currentRevision?: number;
+  currentSha256?: string;
+  onSaveSuccess?: (result: WorkspaceEditView) => void;
 }
 
 export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
   workspaceId = '',
   projectId = '',
+  runId = '',
+  checkoutId = '',
+  currentRevision = 0,
+  currentSha256 = '',
+  onSaveSuccess,
 }) => {
   const [files, setFiles] = useState<EditorFile[]>(INITIAL_FILES);
   const [activeFilePath, setActiveFilePath] = useState<string>('src/server.ts');
@@ -114,6 +125,12 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
     terminalBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [commandHistory]);
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<{ type: 'success' | 'warning'; message: string } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [revision, setRevision] = useState<number>(currentRevision);
+  const [serverSha256, setServerSha256] = useState<string>(currentSha256);
+
   // Handle File Content Change
   const handleContentChange = (newContent: string) => {
     setFiles((prev) =>
@@ -127,8 +144,10 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
     );
   };
 
-  // Handle File Save with ETag / Concurrency check
-  const handleSaveFile = () => {
+  // Handle File Save with ETag / Concurrency check & Backend wiring
+  const handleSaveFile = async () => {
+    setSaveError(null);
+    setSaveNotice(null);
     const baseContent = baseContents[activeFile.path];
     const currentContent = activeFile.content;
 
@@ -141,7 +160,52 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
       return;
     }
 
-    // Normal save: update baseContent and ETag
+    // 1. If real backend scope (projectId, runId, checkoutId) is provided, wire to kernel API
+    if (projectId && runId && checkoutId) {
+      setIsSaving(true);
+      try {
+        const expectedSha = baseContent ? computeSha256(baseContent) : null;
+        const b64Data =
+          typeof globalThis.btoa === 'function'
+            ? globalThis.btoa(currentContent)
+            : Buffer.from(currentContent).toString('base64');
+
+        const editResult = await saveWorkspaceEditView(projectId, runId, checkoutId, {
+          expectedRevision: revision,
+          expectedSha256: serverSha256 || computeSha256(currentContent),
+          changes: [
+            {
+              path: activeFile.path,
+              expectedSha256: expectedSha,
+              dataBase64: b64Data,
+              executable: false,
+            },
+          ],
+        });
+
+        const newEtag = computeSha256(currentContent);
+        setBaseContents((prev) => ({ ...prev, [activeFile.path]: currentContent }));
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.path === activeFile.path ? { ...f, etag: newEtag, isDirty: false } : f
+          )
+        );
+        setRevision(editResult.revision);
+        setServerSha256(editResult.sha256);
+        setSaveNotice({
+          type: 'success',
+          message: `✔ 커널 체크아웃 파일 저장 완료 (Revision: ${editResult.revision}, SHA: ${editResult.sha256.slice(0, 8)})`,
+        });
+        onSaveSuccess?.(editResult);
+      } catch (err: any) {
+        setSaveError(err?.message || '커널 체크아웃 저장에 실패했습니다.');
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
+
+    // 2. Unconnected context: update local memory only, but honestly notify user
     const newEtag = computeSha256(currentContent);
     setBaseContents((prev) => ({ ...prev, [activeFile.path]: currentContent }));
     setFiles((prev) =>
@@ -149,6 +213,10 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         f.path === activeFile.path ? { ...f, etag: newEtag, isDirty: false } : f
       )
     );
+    setSaveNotice({
+      type: 'warning',
+      message: '⚠️ 체크아웃 컨텍스트(runId/checkoutId)가 연결되지 않아 서버에 영속 저장되지 않았습니다. (로컬 브라우저 샌드박스 메모리에만 임시 보존됨)',
+    });
   };
 
   // Conflict Resolution Handlers
@@ -260,9 +328,9 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         data-testid="editor-unexposed-notice"
         style={{
           padding: '8px 16px',
-          backgroundColor: 'rgba(56, 139, 253, 0.12)',
+          backgroundColor: projectId && runId && checkoutId ? 'rgba(46, 160, 67, 0.12)' : 'rgba(56, 139, 253, 0.12)',
           borderBottom: '1px solid #30363d',
-          color: '#58a6ff',
+          color: projectId && runId && checkoutId ? '#3fb950' : '#58a6ff',
           fontSize: '12px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -270,9 +338,70 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
         }}
       >
         <span>
-          ℹ️ <strong>인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)</strong>: 실제 워크스페이스 바이트 영속화는 커널 <code>WorkspaceEditView</code> 계약을 거쳐야 하며, 현재 에디터의 저장·Diff·Git 커밋은 로컬 브라우저 샌드박스 모의 동작입니다.
+          {projectId && runId && checkoutId ? (
+            <>
+              🟢 <strong>커널 체크아웃 실배선 모드</strong>: <code>POST /v1/projects/{projectId}/runs/{runId}/checkouts/{checkoutId}/files</code> 계약을 통해 서버 영속 저장이 수행됩니다.
+            </>
+          ) : (
+            <>
+              ℹ️ <strong>인메모리 워크스페이스 에디터 (백엔드 저장 API 미노출)</strong>: 실제 워크스페이스 바이트 영속화는 커널 <code>WorkspaceEditView</code> 계약을 거쳐야 하며, 현재 에디터의 저장·Diff·Git 커밋은 로컬 브라우저 샌드박스 모의 동작입니다.
+            </>
+          )}
         </span>
       </div>
+
+      {/* Save Result Banners (Success / Warning / Error) */}
+      {saveError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          data-testid="editor-save-error-banner"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'rgba(248, 81, 73, 0.15)',
+            borderBottom: '1px solid #f85149',
+            color: '#f85149',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}
+        >
+          ❌ 저장 오류: {saveError}
+        </div>
+      )}
+      {saveNotice && saveNotice.type === 'warning' && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          data-testid="editor-context-notice"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'rgba(227, 179, 65, 0.15)',
+            borderBottom: '1px solid #e3b341',
+            color: '#e3b341',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}
+        >
+          {saveNotice.message}
+        </div>
+      )}
+      {saveNotice && saveNotice.type === 'success' && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-testid="editor-save-success-notice"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'rgba(46, 160, 67, 0.15)',
+            borderBottom: '1px solid #2ea043',
+            color: '#3fb950',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}
+        >
+          {saveNotice.message}
+        </div>
+      )}
 
       {/* Top Main Toolbar */}
       <div
@@ -328,11 +457,19 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
             size="sm"
             variant="secondary"
             onClick={handleSaveFile}
-            disabled={!activeFile.isDirty && !simulateConflictOnSave}
-            title="로컬 인메모리 버퍼에 저장합니다 (백엔드 저장 API 미노출)"
+            disabled={(!activeFile.isDirty && !simulateConflictOnSave) || isSaving}
+            title={
+              projectId && runId && checkoutId
+                ? '커널 체크아웃 파일 저장 API(POST /v1/projects/.../files)로 전송합니다'
+                : '로컬 인메모리 버퍼에 저장합니다 (백엔드 저장 API 미노출)'
+            }
             data-testid="editor-save-btn"
           >
-            Save File (Local Sandbox)
+            {isSaving
+              ? 'Saving...'
+              : projectId && runId && checkoutId
+              ? 'Save File (Kernel)'
+              : 'Save File (Local Sandbox)'}
           </Button>
 
           <Button size="sm" variant="primary" onClick={() => setShowCommitModal(true)}>
@@ -602,9 +739,24 @@ export const MonacoWorkspaceEditor: React.FC<MonacoWorkspaceEditorProps> = ({
                 fontSize: '12px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 600, color: '#f0f6fc' }}>
                   Web Terminal PTY ({sessionState.cols}x{sessionState.rows})
+                </span>
+                <span
+                  data-testid="editor-terminal-mock-notice"
+                  role="status"
+                  aria-live="polite"
+                  style={{
+                    fontSize: '11px',
+                    color: '#e3b341',
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(227, 179, 65, 0.15)',
+                    border: '1px solid rgba(227, 179, 65, 0.3)',
+                  }}
+                >
+                  [로컬 에뮬레이션 · 독립 PTY 미연결]
                 </span>
                 <span
                   style={{

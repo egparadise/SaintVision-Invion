@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.74"
+version: "1.0.75"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T23:57:00+09:00"
+updated: "2026-09-22T00:07:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,17 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T23:57:00+09:00.
+- 확인 기준: 2026-09-22T00:07:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 결함 5대 부류 치유 트랙 3차: MonacoWorkspaceEditor 커널 체크아웃 파일 저장 실배선, 인메모리 은폐 차단 및 PTY 모의 고지 완결 (`MonacoWorkspaceEditor.tsx`, `workspaceEditObservation.ts`, `monaco-workspace-editor-wiring.test.tsx`)**:
+  - **파일 저장 캐시/로컬 은폐(False Persistence) 치유**: 에디터 내 백엔드 파일 저장 엔드포인트(`POST /v1/projects/{project}/runs/{run_id}/checkouts/{checkout_id}/files`)를 실배선(`saveWorkspaceEditView`). `runId`와 `checkoutId` 주입 시 실제 커널에 저장하고 Revision/SHA를 갱신하며 `editor-save-success-notice`(`role="status"`) 표출. 백엔드 실패 시 `editor-save-error-banner`(`role="alert"`)로 에러 은폐 차단.
+  - **체크아웃 컨텍스트 미연결 시 네트워크 0회 호출 및 로컬 메모리 임시 보존 경고**: `runId`/`checkoutId` 부재 시 네트워크 호출을 0회로 원천 차단하고 `editor-context-notice`(`role="alert"`, "서버에 영속 저장되지 않고 로컬 브라우저 샌드박스 메모리에만 임시 보존됨")를 표출하여 창 닫기 시 작업 증발 오판을 원천 방어.
+  - **터미널 PTY 로컬 에뮬레이션 모의 고지**: 실제 원격 셸이 아닌 로컬 에뮬레이터임을 밝히는 `editor-terminal-mock-notice`(`role="status"`, `[로컬 에뮬레이션 · 독립 PTY 미연결]`)를 터미널 헤더에 상시 노출.
+  - **신규 DOM 단위 테스트 4종 구축 및 2대 돌연변이(M7, M8) 실측 사살**: `apps/web/tests/monaco-workspace-editor-wiring.test.tsx` (4/4 passed). M7(백엔드 저장 배선 무력화) 사살, M8(미연결 시 경고 배너 억제) 사살.
+  - Vitest **62개 파일 569/569 passed 100%** (순증 +4 passed), Vite 프로덕션 빌드 exit 0 (3.62s), `check_frontend_integrity.py` 80개 파일 0 violations (PASS), check_docs / check_ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-22_에디터저장_백엔드실배선_및_터미널모의고지_Gemini]].
 
 - **화면 결함 5대 부류 치유 트랙 2차: 관리자 콘솔 행위자 실배선, 분산 복구 모의 고지, 에디터 샌드박스 고지 및 브라우저 여정 정본 고정값 감사 완결 (`AdminSecurityConsole.tsx`, `DistributedRecoveryView.tsx`, `MonacoWorkspaceEditor.tsx`, `App.tsx`, `defect-recovery-admin-recovery-editor.test.tsx`)**:
   - **Priority 4: 관리자 콘솔 행위자 실배선 & 0-call 가드**: `AdminSecurityConsole.tsx`에서 `usr_admin_01` 하드코딩 식별자를 전면 소거하고 `currentUser?.id`를 `actor`로 실배선. 세션 부재 시 `data-testid="admin-auth-required-notice"`(`role="alert"`) 표출 및 노드 격리(Drain)/비상 정지(Kill Switch)의 네트워크 0회 호출 가드 집행. Mutation 5 실측 사살.

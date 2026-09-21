@@ -47,6 +47,52 @@ export async function fetchWorkspaceEditView(
   return result;
 }
 
+export interface WorkspaceFileChange {
+  path: string;
+  expectedSha256: string | null;
+  dataBase64: string | null;
+  executable: boolean;
+}
+
+export interface WorkspaceEditPayload {
+  expectedRevision: number;
+  expectedSha256: string;
+  changes: WorkspaceFileChange[];
+}
+
+export async function saveWorkspaceEditView(
+  projectId: string,
+  runId: string,
+  checkoutId: string,
+  payload: WorkspaceEditPayload,
+  signal?: AbortSignal
+): Promise<WorkspaceEditView> {
+  if (!projectId || !runId || !checkoutId) {
+    throw new Error('프로젝트 ID, Run ID, Checkout ID를 확인하세요.');
+  }
+
+  const path = [projectId, runId, checkoutId].map(encodeURIComponent);
+  const result = await apiClient<WorkspaceEditView>(
+    `/v1/projects/${path[0]}/runs/${path[1]}/checkouts/${path[2]}/files`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      signal,
+    }
+  );
+
+  if (
+    !result ||
+    result.checkoutId !== checkoutId ||
+    typeof result.revision !== 'number' ||
+    !HEX_64_REGEX.test(result.sha256)
+  ) {
+    throw new Error('WorkspaceEditView 응답 계약 불일치');
+  }
+
+  return result;
+}
+
 export function mapWorkspaceFilesToInvItems(
   editView: WorkspaceEditView
 ): InvFileItem[] {
