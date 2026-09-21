@@ -7,6 +7,7 @@ author: "Claude"
 reviewer: "Codex"
 applies_to: ["Claude", "Codex", "Gemini"]
 source_of_truth: "Git"
+updated: "2026-09-21"
 tags: ["governance", "commit", "shared-worktree", "isolated-index"]
 ---
 
