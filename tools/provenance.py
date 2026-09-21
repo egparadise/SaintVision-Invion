@@ -54,6 +54,18 @@ def _tool_version(name, *ver_args):
         return path, None
 
 
+def _env_gates():
+    """The environment gates AT THE MOMENT THIS IS CALLED. env_gates is a signal, and today's
+    whole lesson is that a signal must say *what time* it is about -- so callers stamp the moment:
+    bare mode = report time; wrap mode = the check's own invocation (same process as the check)."""
+    return {
+        'gate_postgres_dsn': 'set' if os.environ.get('INV_TEST_ADMIN_DSN') else 'absent',
+        'gate_docker': 'present' if shutil.which('docker') else 'absent',
+        'gate_go': 'present' if shutil.which('go') else 'absent',
+        'gate_node': 'present' if shutil.which('node') else 'absent',
+    }
+
+
 def _integration_distance(ref, do_fetch):
     """How far THIS tree is from the integration tip -- the gap that stayed invisible all of
     2026-09-21 because the main checkout sat ~12 commits behind and nobody printed it. Measured
@@ -112,10 +124,11 @@ def collect(executor=None, integration_ref='origin/integration/all-agents-unifie
         'os_platform': platform.platform(),
         'runtime_node': node_ver,
         'runtime_go': go_ver,
-        'gate_postgres_dsn': 'set' if os.environ.get('INV_TEST_ADMIN_DSN') else 'absent',
-        'gate_docker': 'present' if shutil.which('docker') else 'absent',
-        'gate_go': 'present' if go_path else 'absent',
-        'gate_node': 'present' if node_path else 'absent',
+        **_env_gates(),
+        # env_gates default to the report-time snapshot; wrap mode overrides this to the check's
+        # own invocation so a torn-down PG (or a DSN set only in the check's shell) cannot be
+        # misread as the environment the check actually ran in.
+        'env_context': 'report-time snapshot -- NOT necessarily a check runtime; run `provenance.py -- <cmd>` for a check\'s own environment',
         'cwd': os.getcwd(),
     }
 
@@ -156,8 +169,11 @@ def render_text(p):
         f"executor:            {p['executor']}   (reviewer must be a different person for independent verification)",
         f"os_platform:         {p['os_platform']}",
         f"env_gates:           postgres_dsn={p['gate_postgres_dsn']}; docker={p['gate_docker']}; go={p['gate_go']}; node={p['gate_node']}",
-        f"cwd:                 {p['cwd']}",
+        f"  as-of:             {p.get('env_context', 'report-time snapshot')}",
     ]
+    if p.get('env_changed'):
+        lines.append(f"  WARNING env changed during check: {p['env_changed']} -- the check ran under the 'at check start' values above")
+    lines.append(f"cwd:                 {p['cwd']}")
     return '\n'.join(lines)
 
 
@@ -177,8 +193,17 @@ def main():
     cmd = args.command[1:] if args.command and args.command[0] == '--' else args.command
 
     if cmd:
-        # Wrap mode: run the check directly, capture its exit without pipe-masking.
+        # Wrap mode: env_gates in `prov` were captured just now, in THIS process, immediately
+        # before the check runs -- i.e. the check's own invocation environment, not a later
+        # report-time snapshot. Stamp that, run the check without a pipe, then re-read the gates
+        # and warn if they changed while the check ran (a divergence is itself worth knowing).
+        prov['env_context'] = 'at check invocation (same process/shell as the check)'
+        pre = {k: prov[k] for k in ('gate_postgres_dsn', 'gate_docker', 'gate_go', 'gate_node')}
         result = subprocess.run(cmd, capture_output=True, text=True)
+        post = _env_gates()
+        diffs = [f"{k.replace('gate_', '')}: {pre[k]}->{post[k]}" for k in pre if pre[k] != post[k]]
+        if diffs:
+            prov['env_changed'] = '; '.join(diffs)
         tail = '\n'.join((result.stdout + result.stderr).splitlines()[-5:])
         if args.json:
             prov.update({'command': cmd, 'command_cwd': os.getcwd(),

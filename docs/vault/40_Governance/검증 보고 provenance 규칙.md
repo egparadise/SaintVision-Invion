@@ -66,6 +66,18 @@ integration_sync:    BEHIND 7   (vs origin/integration/all-agents-unified @89c6b
 ```
 **아침부터 이 한 줄이 있었다면 첫 보고에서 괴리를 봤을 것이다.** "도구가 유용하다"는 추상적 주장보다 이 사례가 규칙을 정당화한다 — provenance를 안 찍으면 어느 트리의 어느 시점인지가 보이지 않고, 뒤처진 트리의 통과를 통합 통과로 오독한다.
 
+## env_gates의 시점 — 도구가 자기 함정에 빠졌던 사례 (기록)
+오늘 진단한 핵심 함정은 **경계·귀속 미끄러짐 — 신호가 무엇에 대한 신호인지 못 박지 않는 것**이었다. 그런데 그 진단으로 만든 이 도구가 **정확히 같은 함정**을 갖고 있었다. funnel 작업 보고에서 `env_gates`가 `postgres_dsn=absent`로 찍혔는데, 실제 시험 실행 중에는 일회용 PG의 DSN이 설정돼 있었다 — 보고를 **PG 철거 후 별도 shell에서 bare로** 생성했기 때문이다. 즉 `env_gates`가 **실행 시점이 아니라 보고 시점**을 반영했고, 읽는 사람은 "그 검사가 돌던 환경"으로 오독한다. 내가 각주로 밝혔지만 **각주는 강제가 아니다**(권고 vs 강제와 같은 논리) — 다음 사람이 안 읽으면 없는 것과 같다.
+
+**고침**(도구에 강제):
+- **bare 모드**: `env_gates` 아래 `as-of: report-time snapshot -- NOT necessarily a check runtime; run provenance.py -- <cmd> ...` 라벨을 박는다. 시점을 못 박아 오독을 막고 올바른 사용(wrap)을 가리킨다.
+- **wrap 모드**(`-- <cmd>`): env_gates를 **검사 실행 직전, 같은 프로세스에서** 캡처하므로 `as-of: at check invocation (same process/shell as the check)`로 찍는다 — 검사의 실제 실행 환경이다.
+- **전후 변화 경고**: wrap이 검사 실행 전/후 gate를 비교해 달라졌으면 `WARNING env changed during check: ...`를 띄운다(검사가 서비스를 내리는 등 환경을 바꾸면 그 자체가 알아야 할 정보).
+
+**검증**(오늘 상황 재현): PG 올린 채 `provenance.py -- pytest ...` → `postgres_dsn=set / as-of at check invocation`; PG 내린 뒤 DSN 없는 shell에서 bare → `postgres_dsn=absent / as-of report-time snapshot`. 실행 시점이 제대로 기록된다.
+
+**교훈(다음 사람에게)**: 함정을 진단하고 그것을 막으려 만든 도구조차 같은 함정에 빠졌다는 것은, 이 함정이 **얼마나 빠지기 쉬운지**를 보여준다. 신호를 낼 때마다 "이건 어느 시점/어느 트리/어느 인터프리터의 신호인가"를 묻는 습관이 규칙보다 먼저다. 도구는 그 습관을 강제하는 수단일 뿐, 도구 자신도 예외가 아니다.
+
 ## 주 체크아웃·워크트리 동기 규약 (재발 방지)
 위 실증의 물리적 원인 — 주 체크아웃이 통합보다 뒤처짐 — 을 재발하지 않게 하는 규약이다.
 
