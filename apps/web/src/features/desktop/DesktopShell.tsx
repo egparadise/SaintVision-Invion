@@ -12,7 +12,7 @@ import { InvFileExplorer } from './InvFileExplorer';
 import { ModelStudioView } from './ModelStudioView';
 import { ClusterOverview } from '@/features/dashboard/ClusterOverview';
 import { ApprovalCenter } from '@/features/approvals/ApprovalCenter';
-import { WebTerminal } from '@/features/terminal/WebTerminal';
+import { TerminalSessionView } from './TerminalSessionView';
 import { AdminSecurityConsole } from '@/features/admin/AdminSecurityConsole';
 
 export interface DesktopShellProps {
@@ -688,9 +688,11 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
 
               {win.appId === 'terminal' && (
                 <div style={{ height: '100%' }}>
-                  <WebTerminal
-                    workspaceId={workspaces[0]?.id || 'wsp_default'}
-                    sessionId="session_desktop_terminal"
+                  <TerminalSessionView
+                    nodes={nodes}
+                    defaultNodeId={nodes.find((n) => !n.observationOnly && n.schedulable !== false)?.id || nodes[0]?.id}
+                    defaultWorkspaceId={workspaces[0]?.id || 'wsp_default'}
+                    projectId={projectId}
                   />
                 </div>
               )}

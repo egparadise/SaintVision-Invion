@@ -24,6 +24,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
   const [currentInput, setCurrentInput] = useState('');
   const [isAccessibleView, setIsAccessibleView] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [disconnectedCmdAlert, setDisconnectedCmdAlert] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<WsTerminalClient | null>(null);
 
@@ -36,6 +38,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     const initTerminal = async () => {
       try {
         setConnectionStatus('connecting');
+        setLastError(null);
         setTerminalOutput((prev) => [
           ...prev,
           `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,
@@ -64,7 +67,13 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             }
           },
           (status) => {
-            if (active) setConnectionStatus(status);
+            if (active) {
+              setConnectionStatus(status);
+              if (status === 'connected') {
+                setLastError(null);
+                setDisconnectedCmdAlert(null);
+              }
+            }
           }
         );
 
@@ -72,10 +81,12 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         client.connect(ticket);
       } catch (err: any) {
         if (!active) return;
+        const msg = err?.message || String(err);
         setConnectionStatus('error');
+        setLastError(`30초 일회용 PTY 티켓 발급 실패: ${msg}`);
         setTerminalOutput((prev) => [
           ...prev,
-          `❌ [티켓 발급 실패]: ${err.message || err}. 재접속 버튼으로 다시 시도하십시오.`,
+          `❌ [티켓 발급 실패]: ${msg}. 재접속 버튼으로 다시 시도하십시오.`,
         ]);
       }
     };
@@ -104,6 +115,8 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
 
     try {
       setConnectionStatus('connecting');
+      setLastError(null);
+      setDisconnectedCmdAlert(null);
       setTerminalOutput((prev) => [
         ...prev,
         `[안내] 신규 30초 일회용 티켓으로 PTY WebSocket 재접속을 요청합니다...`,
@@ -132,16 +145,22 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         },
         (status) => {
           setConnectionStatus(status);
+          if (status === 'connected') {
+            setLastError(null);
+            setDisconnectedCmdAlert(null);
+          }
         }
       );
 
       clientRef.current = client;
       client.connect(ticket);
     } catch (err: any) {
+      const msg = err?.message || String(err);
       setConnectionStatus('error');
+      setLastError(`신규 일회용 티켓 발급 및 재연결 실패: ${msg}`);
       setTerminalOutput((prev) => [
         ...prev,
-        `❌ [재접속 실패]: ${err.message || err}`,
+        `❌ [재접속 실패]: ${msg}`,
       ]);
     }
   };
@@ -156,12 +175,15 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
     // Send command to live WebSocket
     if (clientRef.current && connectionStatus === 'connected') {
       clientRef.current.sendInput(cmd + '\r');
+      setDisconnectedCmdAlert(null);
     } else {
       // Truthful error notice if disconnected (Zero-Mock: never fabricate fake exit codes)
+      const alertMsg = `PTY 터미널 세션이 오프라인 상태(${connectionStatus})입니다. 명령 '${cmd}'을(를) 전송할 수 없습니다. [재접속] 버튼으로 새 티켓을 발급받으세요.`;
+      setDisconnectedCmdAlert(alertMsg);
       setTerminalOutput((prev) => [
         ...prev,
         `saintvision@wsp-saint-pilot:~$ ${cmd}`,
-        `🛑 [전송 불가]: PTY 터미널 세션이 오프라인 상태(${connectionStatus})입니다. [재접속] 버튼을 눌러 새 티켓으로 접속하세요.`,
+        `🛑 [전송 불가]: ${alertMsg}`,
         'saintvision@wsp-saint-pilot:~$ ',
       ]);
     }
@@ -169,6 +191,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
 
   return (
     <div
+      data-testid="web-terminal-container"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -195,6 +218,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span
+            data-testid="connection-status-dot"
             style={{
               width: '10px',
               height: '10px',
@@ -209,12 +233,18 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           />
           <span>
             PTY Web Terminal: <code>{workspaceId}</code>{' '}
-            <span style={{ fontSize: '0.75rem', color: '#8b949e' }}>({connectionStatus})</span>
+            <span
+              data-testid="terminal-connection-status"
+              style={{ fontSize: '0.75rem', color: '#8b949e' }}
+            >
+              ({connectionStatus})
+            </span>
           </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button
+            data-testid="terminal-reconnect-btn"
             variant="secondary"
             size="sm"
             style={{ fontSize: '0.75rem', padding: '2px 8px' }}
@@ -223,6 +253,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
             🔄 재접속 (새 티켓)
           </Button>
           <Button
+            data-testid="terminal-toggle-a11y-btn"
             variant="ghost"
             size="sm"
             style={{ color: '#c9d1d9', fontSize: '0.75rem', padding: '2px 8px' }}
@@ -232,6 +263,7 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           </Button>
           {onClose && (
             <Button
+              data-testid="terminal-close-btn"
               variant="ghost"
               size="sm"
               style={{ color: '#f85149', fontSize: '0.75rem', padding: '2px 8px' }}
@@ -243,10 +275,81 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
         </div>
       </div>
 
+      {/* Ticket / Connection Error Alert Banner */}
+      {connectionStatus === 'error' && (
+        <div
+          role="alert"
+          data-testid="terminal-error-alert"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#7f1d1d',
+            color: '#fecaca',
+            fontSize: '0.8125rem',
+            borderBottom: '1px solid #ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>❌ {lastError || '30초 일회용 PTY 티켓 발급 또는 연결 실패'}</span>
+          <button
+            type="button"
+            data-testid="terminal-error-retry-btn"
+            onClick={handleReconnect}
+            style={{
+              padding: '2px 8px',
+              backgroundColor: '#ef4444',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}
+          >
+            새 티켓으로 재시도
+          </button>
+        </div>
+      )}
+
+      {/* Disconnected Command Rejection Alert Banner */}
+      {disconnectedCmdAlert && (
+        <div
+          role="alert"
+          data-testid="terminal-disconnected-cmd-alert"
+          style={{
+            padding: '6px 16px',
+            backgroundColor: '#451a03',
+            color: '#fde68a',
+            fontSize: '0.75rem',
+            borderBottom: '1px solid #d97706',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>⚠️ {disconnectedCmdAlert}</span>
+          <button
+            type="button"
+            onClick={() => setDisconnectedCmdAlert(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#fde68a',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Terminal Content Area */}
       {isAccessibleView ? (
         <div
           role="region"
+          data-testid="terminal-a11y-region"
           aria-label="텍스트 로그 대체 뷰"
           tabIndex={0}
           style={{
@@ -266,12 +369,16 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           <p style={{ color: '#8b949e', marginBottom: '16px' }}>
             스크린리더 및 텍스트 브라우저를 위한 순수 텍스트 로그 출력 모드입니다.
           </p>
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+          <pre
+            data-testid="terminal-a11y-output"
+            style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.8125rem' }}
+          >
             {terminalOutput.join('\n')}
           </pre>
         </div>
       ) : (
         <div
+          data-testid="terminal-raw-stream"
           style={{
             flex: 1,
             padding: '16px',
@@ -284,9 +391,14 @@ export const WebTerminal: React.FC<WebTerminalProps> = ({
           {terminalOutput.map((line, idx) => (
             <div key={idx}>{line}</div>
           ))}
-          <form onSubmit={handleCommandSubmit} style={{ display: 'flex', marginTop: '4px' }}>
+          <form
+            data-testid="terminal-command-form"
+            onSubmit={handleCommandSubmit}
+            style={{ display: 'flex', marginTop: '4px' }}
+          >
             <span style={{ color: '#58a6ff' }}>saintvision@wsp-saint-pilot:~$ &nbsp;</span>
             <input
+              data-testid="terminal-command-input"
               type="text"
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}

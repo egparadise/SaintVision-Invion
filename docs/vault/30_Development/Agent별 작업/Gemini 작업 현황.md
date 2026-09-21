@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.55"
+version: "1.0.56"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T18:05:00+09:00"
+updated: "2026-09-21T18:12:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,20 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T18:05:00+09:00.
+- 확인 기준: 2026-09-21T18:12:00+09:00.
 
 ## 최근 확인한 진척
+
+- **VF-GM-05 Terminal & Virtual IDE 세션 UX, 노드별 PowerShell/Bash 자동 매핑, 30초 PTY 티켓 격리 및 접근성 완결 (`apps/web/src/features/desktop/TerminalSessionView.tsx`, `WebTerminal.tsx`, `DesktopShell.tsx`, `apps/web/tests/terminal-session-dom.test.tsx`)**:
+  - **노드 OS 기반 PowerShell/Bash 자동 매핑**: 대상 노드 OS에 따라 Windows는 `powershell`, Linux는 `bash`로 자동 쉘 타입을 분기하고 헤더 및 탭 아이콘에 명시.
+  - **30초 암호학적 PTY 티켓 격리 및 정직한 오류 알림**: 제어 평면 일회용 티켓 발급 연동, 만료/거부 시 `role="alert"` (`data-testid="terminal-error-alert"`) 및 원클릭 재시도 제공.
+  - **오프라인 상태 명령 전송 거절 방어 (Zero-Mock)**: PTY 미연결 상태에서 명령 입력 시 허위 종료 코드 조작을 전면 금지하고 `role="alert"` (`data-testid="terminal-disconnected-cmd-alert"`) 표출.
+  - **관측 전용 노드(Node-04) 대화형 PTY 세션 생성 원천 차단**: 옵션 disabled 및 시도 시 `role="alert"` (`data-testid="terminal-session-error-alert"`) 표출.
+  - **PTY 터미널 <-> Monaco IDE 모드 전환**: `data-testid="switch-mode-btn"`을 통한 터미널과 가상 IDE 에디터 간 매끄러운 탭 모드 전환.
+  - **접근성(A11y) 강화 (WCAG AA 대응)**: 스크린리더 텍스트 대체 로그 뷰(`role="region"`), `role="tablist"` / `role="tab"`, 데스크톱 셸 윈도우 결속.
+  - **4대 돌연변이 실측 사살 (KILLED)**: 관측 가드 우회, 티켓 실패 알림 억제, 오프라인 명령 거절 누락, Linux 노드 PowerShell 강제 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+  - **검증 실적**: Vitest 44개 파일 **409/409 passed 100%** (from 399 to 409, net +10 tests 순증), Vite 프로덕션 빌드 3.78s 클린 번들링, check_docs/ontology PASS.
+  - 보고서: [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]].
 
 - **VF-GM-04 Model Studio 샤드·복제본 매트릭스, ADR-041 네트워크 제약 경고 및 노드 적격성 실행 계획기 완결 (`apps/web/src/features/desktop/ModelStudioView.tsx`, `DesktopShell.tsx`, `apps/web/tests/model-studio-dom.test.tsx`)**:
   - **모델 매니페스트 쿼리 및 메타데이터 정합성**: `projectId`, `modelId`, `version` 3개 필드 기반 조회, 정적 마크업 계약(`'정확한 모델 ID'`, 초기 빈 마운트 시 하드코딩 샘플 배제) 준수.
@@ -245,16 +256,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-GM-04 (Model Studio: 샤드 및 복제본 매트릭스, 생존 노드 기반 복구 방어, ADR-041 네트워크 제약 경고, Node-04 관측 전용 배제, VRAM 수용성 판정 및 4대 돌연변이 사살 실측 완료): `apps/web/src/features/desktop/ModelStudioView.tsx`, `DesktopShell.tsx`, `apps/web/tests/model-studio-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 43개 파일 **399/399 tests 100% 통과** (from 389 to 399, net +10 tests), Vite 프로덕션 빌드 3.52s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.146 / 2026-09-21T18:05:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 7ab955b / agent/gemini/vf-gm-04-model-studio |
-| 작업한 것 | 1) `ModelStudioView.tsx`: 모델 Manifest 쿼리, 샤드별 byteRange/레이어/복제본 상태 매트릭스 표출, 저하 감지 시 `replica-degraded-badge` (`role="alert"`).<br>2) 생존 노드 기반 복구 방어: 관측 전용 노드 배제 및 생존 노드 0개 시 복구 차단, 복구 실패 시 `shard-repair-error-alert` (`role="alert"`), 부분 복구 시 `shard-repair-warning-alert` (`role="alert"`), 2/2 정상 복구 시에만 성공 배너 표출.<br>3) ADR-041 LAN 제약 경고: `tensor_pipeline_parallel` 및 다중 노드 할당 시 All-Reduce 병목 경고 배너(`role="alert"`).<br>4) 관측 전용 노드(Node-04) 연산 할당 완전 배제: 체크박스 disabled 및 `node-ineligible-badge` (`role="alert"`).<br>5) VRAM 수용성 판정: 할당 VRAM 부족 시 `plan-infeasible-alert` (`role="alert"`).<br>6) `DesktopShell.tsx`: `clusterNodes={nodes}` 주입 결속.<br>7) `apps/web/tests/model-studio-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 43개 파일 **399/399 tests 100% 통과**, from 389 to 399 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.52s 클린)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(ADR-041 LAN 경고 우회, Node-04 관측 가드 우회, VRAM 부족 허위 성공, 복구 실패 무시) 100% 사살 실측 |
+| 마지막 작업 / 착수 카드 | VF-GM-05 (Terminal & Virtual IDE 세션 UX: 노드별 PowerShell/Bash 자동 매핑, 30초 PTY 티켓 격리 및 만료/오류 알림, 오프라인 명령 거절 방어, Node-04 관측 전용 배제, Monaco IDE 모드 전환, WCAG AA 텍스트 뷰 및 4대 돌연변이 사살 실측 완료): `apps/web/src/features/desktop/TerminalSessionView.tsx`, `WebTerminal.tsx`, `DesktopShell.tsx`, `apps/web/tests/terminal-session-dom.test.tsx` (신규 10 DOM tests 100% 통과), Vitest 44개 파일 **409/409 tests 100% 통과** (from 399 to 409, net +10 tests), Vite 프로덕션 빌드 3.78s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.147 / 2026-09-21T18:12:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / 3e9903f / agent/gemini/vf-gm-05-terminal-session |
+| 작업한 것 | 1) `TerminalSessionView.tsx`: 노드 OS 기반 PowerShell/Bash 자동 매핑, 탭 라이프사이클(생성/전환/종료), PTY 터미널 <-> Monaco IDE 모드 전환, 빈 노드 시 안전한 가상 폴백 노드 제공 및 `terminal-empty-nodes-notice` 고지.<br>2) `WebTerminal.tsx`: 30초 일회용 PTY 티켓 발급 및 만료/오류 시 `role="alert"` (`terminal-error-alert`) 표출 및 원클릭 재시도, 오프라인 상태 명령 전송 거절 방어(`terminal-disconnected-cmd-alert`), 접근성 스크린리더 텍스트 로그 대체 뷰(`terminal-a11y-region`).<br>3) 관측 전용 노드(Node-04) 대화형 PTY 세션 생성 차단: 드롭다운 disabled 및 강제 생성 시 `terminal-session-error-alert` (`role="alert"`).<br>4) `DesktopShell.tsx`: 터미널 창에 `TerminalSessionView` 전면 마운트 결속.<br>5) `apps/web/tests/terminal-session-dom.test.tsx` 신설 (10 DOM tests 100% 통과). |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm --prefix apps/web test -- --run` (exit 0, 44개 파일 **409/409 tests 100% 통과**, from 399 to 409 net +10 tests)<br>2) Vite Production Build: `npm --prefix apps/web run build` (exit 0, 3.78s 클린)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(관측 가드 우회, 티켓 실패 알림 억제, 오프라인 명령 거절 누락, Linux 노드 PowerShell 강제) 100% 사살 실측 |
 | CI / 독립 reviewer / 운영 인수 | 프론트엔드 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Codex·Claude 독립 검토 연계 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 물리 노드 간 고속 인터커넥트(NVLink/InfiniBand) 실물 패킷 전송 및 실시간 GPU VRAM 동기화는 백엔드 및 실장비 인수 레인 이관 |
-| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-05` (Terminal/IDE Web Session UX: PTY 스트림 연결, 세션 복원, 접속 불능 방어, Monaco 에디터 결합) / Gemini (Antigravity) |
-| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 88.0%** (1,056/1,200점, VF-GM-01~04 완결)<br>**단일 가상 컴퓨터 보강 트랙: 66.7%** (VF-GM-01, 02, 03, 04 완료 / 6개 카드) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]], [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]], [[2026-09-21_VF_GM03_InvFileExplorer_무결성_및_복구방어_Gemini]] |
+| 남은 문제 / 차단 이유 / 해소 담당 | 물리 OS PTY 프로세스 스폰(POSIX forkpty / Windows ConPTY) 및 물리 멀티 랙 Nginx TLS 리버스 프록시 연동은 백엔드 및 실장비 인수 레인 이관 |
+| 다음 카드 / 첫 행동 / 다음 담당 | `VF-GM-06` (외부 HTTPS, Browser Matrix, Rollback & Real-Browser Acceptance: TLS 1.3 / 역방향 프록시 배포 스크립트 검증, 롤백 엔진 점검, 최종 브라우저 인수 보고서 작성) / Gemini (Antigravity) |
+| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 92.0%** (1,104/1,200점, VF-GM-01~05 완결)<br>**단일 가상 컴퓨터 보강 트랙: 83.3%** (VF-GM-01, 02, 03, 04, 05 완료 / 6개 카드) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]], [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]], [[2026-09-21_run결과_artifacts_프론트엔드_계약결속_완결_Gemini]] |
 
 > **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
 1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
@@ -355,3 +366,13 @@ source_of_truth: "Git"
 > 4) **ADR-041 LAN 제약 및 실행 계획기**: `tensor_pipeline_parallel` 선택 및 복수 노드 할당 시 All-Reduce 병목 경고 배너(`data-testid="tensor-parallel-lan-warning"`, `role="alert"`), 관측 전용 노드(Node-04) 연산 할당 완전 배제 및 체크박스 disabled, VRAM 부족 시 `data-testid="plan-infeasible-alert"` (`role="alert"`).
 > 5) **4대 돌연변이 실측 사살 (KILLED)**: ADR-041 LAN 경고 우회, Node-04 관측 가드 우회, VRAM 부족 허위 성공, 복구 실패 무시 등 4개 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **43개 파일 399/399 tests 100% 통과** (from 389 to 399, net +10 tests 순증), Vite 프로덕션 빌드 3.52s 클린 번들링, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM04_ModelStudio_샤드매트릭스_및_ADR041계획기_Gemini]].
+>
+> **Gemini 회신(2026-09-21, VF-GM-05 Terminal & Virtual IDE 세션 UX, 노드별 PowerShell/Bash 자동 매핑, 30초 PTY 티켓 격리 및 접근성 완결)**: 사용자 기승인 범위에 따라 VF-GM-05(Terminal & Virtual IDE Session UX) 구현 및 보안·접근성 방어선을 전면 구축함:
+> 1) **노드 OS 기반 PowerShell/Bash 자동 매핑**: 대상 노드 OS에 따라 Windows는 `powershell`, Linux는 `bash`로 자동 분기하고 헤더 및 탭에 정직하게 표시.
+> 2) **30초 암호학적 일회용 PTY 티켓 격리 및 정직한 오류 알림**: 제어 평면 일회용 티켓 발급 연동, 만료/거부 시 숨김 없는 `role="alert"` (`data-testid="terminal-error-alert"`) 표출 및 원클릭 재시도 제공.
+> 3) **오프라인 상태 명령 전송 거절 방어 (Zero-Mock)**: PTY 미연결 상태에서 명령 입력 시 허위 종료 코드(exit 0) 조작을 전면 금지하고 `role="alert"` (`data-testid="terminal-disconnected-cmd-alert"`) 경고 표출.
+> 4) **관측 전용 노드(Node-04) 대화형 PTY 세션 생성 원천 차단**: 옵션 disabled 및 시도 시 `role="alert"` (`data-testid="terminal-session-error-alert"`) 표출.
+> 5) **터미널 <-> Monaco IDE 모드 전환**: `data-testid="switch-mode-btn"`을 통한 PTY 터미널과 가상 IDE 에디터 간 매끄러운 탭 모드 전환.
+> 6) **접근성(A11y) 강화 (WCAG AA 대응)**: 스크린리더 텍스트 대체 로그 뷰(`role="region"`), `role="tablist"` / `role="tab"`, 데스크톱 셸 윈도우 결속.
+> 7) **4대 돌연변이 실측 사살 (KILLED)**: 관측 가드 우회, 티켓 실패 알림 억제, 오프라인 명령 거절 누락, Linux 노드 PowerShell 강제 등 4개 돌연변이 전수 즉시 실패 포착 증명.
+> 결과: 전체 Vitest **44개 파일 409/409 tests 100% 통과** (from 399 to 409, net +10 tests 순증), Vite 프로덕션 빌드 3.78s 클린 번들링, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS. 상세 [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]].
