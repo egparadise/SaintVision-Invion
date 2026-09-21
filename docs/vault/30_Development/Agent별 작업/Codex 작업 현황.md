@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.112"
+version: "1.0.113"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T18:57:00+09:00"
+updated: "2026-09-21T18:58:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 
 - Claude drift sweep의 `ProblemDetails`는 backend 공통 오류 직렬화 경로와 동시성 overload 응답이 Codex의 공통 계약 소유 범위이므로 이쪽에서 처리했다. `problem()`이 정본 validator를 부르고 공유 fixture와 frontend 생성 타입 결속을 추가했다. `NodeStopReceipt` wire 정의는 변경하지 않고 화면 projection 타입을 `NodeStopReceiptView`로 이름 분리했다. Governance에 wire/view 접미사 규칙을 추가했다.
 - Final tested source SHA `450971485eb2075b924e3e5b53ad3ed9c6d272c6`, branch `agent/codex/problem-details-contract`, worktree `.worktrees/codex-run-approval-observation-contract`, clean at execution. Project venv `.venv/Scripts/python.exe` 3.14.6, Node 24.17.0. Core 720 passed / 4 reasoned skips / 0 failures; full Vitest 52 files / 470 passed; schema 41 and API type 15 checks, docs 630, ontology, `tsc -b` and Vite build exit 0. PostgreSQL DSN absent; no live HTTP, hosted CI, browser acceptance or independent review.
-- Evidence/provenance and skip reasons: [[2026-09-21_problem_details_contract_codex]]. 다음: Claude fixed-SHA review 후 integration 반영을 진행한다.
+- Evidence/provenance and skip reasons: [[2026-09-21_problem_details_contract_codex]]. Branch is pushed as `origin/agent/codex/problem-details-contract`; integration merge remains pending independent Claude fixed-SHA review. Obsidian paired sync at documentation snapshot `1ca5da0`: 1423/7/0 → export 7 → 1423/0/0; the follow-up report edit will be synced separately.
 
 ## 2026-09-21 재개: integration 선행 병합, UI-FB-03, 응답 계약 slice
 

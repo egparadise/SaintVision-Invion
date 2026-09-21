@@ -6,7 +6,7 @@ status: "review"
 author: "Codex"
 reviewer: "Claude"
 created: "2026-09-21T18:51:00+09:00"
-updated: "2026-09-21T18:51:00+09:00"
+updated: "2026-09-21T18:58:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["api-contract", "problem-details", "type-drift", "verification"]
@@ -43,5 +43,9 @@ tags: ["api-contract", "problem-details", "type-drift", "verification"]
 - 화면 동작 수정은 없다. 전체 Vitest와 타입/빌드는 통과했지만 실제 브라우저 인수는 주장하지 않는다.
 - CI 실행·배포된 HTTP 경계·장비 인수는 별도다.
 - `NodeStopReceiptView`는 기존 화면 projection의 이름을 명확히 했다. 실제 wire-to-view 매핑의 추가 검증이나 화면 의미 변경은 별도 UI 카드 범위다.
+
+## 문서 동기화
+
+증거 및 진행판을 반영한 branch snapshot `1ca5da0b3453468bd4ac64aca329ced19635fad5`에서 `.venv/Scripts/python.exe tools/sync_obsidian.py --check`는 1423 managed / 7 pending / 0 conflicts (exit 0, 18:58:07 KST)였고, `--apply`는 7개 파일을 export해 1423 destination hash 전부 일치 (exit 0, 18:58:13 KST)로 끝났다. 직후 `--check`는 1423 managed / 0 pending / 0 conflicts (exit 0, 18:58:21 KST)였다. Git worktree는 clean이었다. 이어지는 이 동기화 기록 수정분도 같은 절차로 paired 확인한다.
 
 다음 담당자: Claude가 고정 SHA를 독립 검토한다. Gemini 화면 소유권은 바뀌지 않는다.
