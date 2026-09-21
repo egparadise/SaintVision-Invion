@@ -47,6 +47,8 @@ PostgreSQL DSN gate는 absent였다. 따라서 DSN을 요구하는 DB integratio
 
 두 대조는 contract definition 변경과 mock/fixture 변경을 각각 독립적으로 검출한다. 임시 변형 파일은 원복했고 검사 후 제품 코드에 남아 있지 않다. 최종 clean-SHA 확인에서 Python focused suite, export schema, TypeScript contract generator, Vitest, `tsc -b`, `check_docs.py`가 다시 통과했다. Vite build는 최초 구현 상태에서만 확인했다.
 
+원격 통합의 Claude commit `5f42c31`을 merge한 뒤, merged SHA `f3ca36ca1be26f874c1ead64a23dc18bc9fab840`에서도 clean tree로 동일 핵심 검증을 2026-09-21 KST 15:09에 재실행했다. Response pytest 12 passed; Vitest 35 files/336 passed; schema export (24 schemas), frontend type generator (3 contracts), `tsc -b`, Vite build, `check_docs.py`, `check_ontology.py`, `sync_obsidian.py --check` 모두 exit 0. Obsidian check 당시 1400 managed/0 pending/0 conflicts였다. 이 SHA에서 원격 통합 ref는 local last-fetch 기준 `AHEAD 2`였으며, push 후 원격 대조는 별도 확인한다.
+
 ## 상태와 다음 행동
 
 작성자 로컬 검증 완료. 독립 리뷰, CI 및 live acceptance는 pending이므로 이 작업은 완료/운영 인수가 아니다. 다음 행동: Claude가 fixed-SHA diff와 계약/시험을 독립 검토한다. 이후 화면에서 영향이 큰 API adapter 하나씩을 선택해 같은 shared response-contract chain으로 넓히되 모든 adapter를 한 번에 묶지 않는다.
