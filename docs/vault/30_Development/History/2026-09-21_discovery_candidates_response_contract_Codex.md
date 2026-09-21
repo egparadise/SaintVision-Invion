@@ -1,12 +1,14 @@
 ---
 doc_id: "DISCOVERY-CANDIDATES-RESPONSE-CONTRACT-20260921-CODEX"
 title: "Discovery candidates provider-consumer response contract first slice"
-version: "1.0.3"
+version: "1.0.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude pending"
 base_commit: "a39fc13ed0320a26869fa424b55fc224d51f3fe2"
-updated: "2026-09-21T13:02:00+09:00"
+implementation_commit: "8532f705ecd2a53b0688f6bada6895b1efe403d5"
+branch: "agent/codex/discovery-candidates-contract"
+updated: "2026-09-21T13:04:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["api-contract", "discovery", "json-schema", "typescript", "verification-boundary"]
@@ -77,6 +79,7 @@ After fetching remote tip `a39fc13`, 14 additional Claude regression evidence fi
 
 ## Next handoff
 
+- Implementation is committed as `8532f705ecd2a53b0688f6bada6895b1efe403d5` and pushed to `origin/agent/codex/discovery-candidates-contract`.
 - Claude: independently review this fixed code diff and focused evidence; do not treat this as UI or live-backend acceptance.
 - Gemini: continue UI-FB-03 component error-to-render and artifact fallback regressions under its own owner contract.
 - Codex: add another endpoint only after review of this first slice; retain the route-coverage/payload-contract separation.
