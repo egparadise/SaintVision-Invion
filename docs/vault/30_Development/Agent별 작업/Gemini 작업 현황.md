@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.101"
+version: "1.0.102"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:55:00+09:00"
+updated: "2026-09-22T08:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,30 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:55:00+09:00.
+- 확인 기준: 2026-09-22T08:15:00+09:00.
+
+## 세션 랩업: EvidenceViewer 및 RunDetail 실제 브라우저(Chrome 153) 실측 완결 및 경계 표 무른 칸 메우기
+
+- **경계 표 가장 무른 칸(`EvidenceViewer` / `RunDetail`) 로컬 실측 YES 승격**:
+  - `tools/run_real_browser_acceptance.py`를 확장하여 Uvicorn 0.52.4 ↔ Vite ↔ Google Chrome 153 환경에서 총 6대 종단간 시나리오 파이프라인 구축.
+  - **백엔드/커널 실측 규명**: `core.schema.json` 및 `services/control-plane/src/inv/result_view.py` 전수 대조 결과, 정상 커밋된 실행에서 `output.verified === true`가 const true로 확실하게 반환됨을 증명.
+  - **3대 무결성 상태 전수 실측**:
+    1. `PASS`: `✓ 출력 무결성 검증 통과 (PASS)` 녹색 뱃지 및 `[시스템 정책 사양]` 실측 (`real_chrome_evidence_verified_pass.png`).
+    2. `UNVERIFIED`: 산출물 미커밋 실행(`outputAbsentReason` 부여) 시 `⚠️ 출력 무결성 미검증 (UNVERIFIED)` 호박색 뱃지 및 사유·권장조치 배너 실측 (`real_chrome_evidence_unverified_notice.png`).
+    3. `FAIL`: `✗ 출력 무결성 검증 실패 (FAIL)` 적색 뱃지 실측 (`real_chrome_evidence_failed.png`).
+  - **화면 간 연결 실측**:
+    - `Header.tsx`의 `Runs 실행` 탭 ➔ `RunDetail` 타임라인 마운트 실측 (`real_chrome_rundetail_timeline.png`).
+    - `RunDetail`의 `🔍 불변 증거 열람` 클릭 ➔ `EvidenceViewer` 진입 및 `← 이전으로 돌아가기` 왕복 내비게이션 완결 실측.
+- **잠복 결함 2건 발견 및 박멸**:
+  - `apps/web/src/app/App.tsx`: `EvidenceViewer` 호출 시 `projectId` 누락으로 실제 UI 진입 시 발생하던 "프로젝트 식별자 부재" 크래시 버그 치유.
+  - `apps/web/src/features/evidence/EvidenceViewer.tsx`: `outputAbsentReason`이 존재할 때 무조건 `FAIL`로 왜곡 표출되던 결함을 제거하고, 정상적인 `UNVERIFIED` 및 명확한 안내 배너로 교정.
+- **실측 증거 파일 완비**:
+  - `scratch/real_chrome_rundetail_timeline.png`
+  - `scratch/real_chrome_evidence_verified_pass.png`
+  - `scratch/real_chrome_evidence_unverified_notice.png`
+  - `scratch/real_chrome_evidence_failed.png`
+  - `scratch/chrome_real_uvicorn_acceptance_result.json` (6대 시나리오 100% true).
+- **보고서**: [[2026-09-22_화면별_실제브라우저_대_실제백엔드_실측경계_및_도구확장_Gemini]].
 
 ## 세션 랩업: 화면별 실제 브라우저(Chrome 153) 대 실제 백엔드(Uvicorn) 실측 경계 총괄 및 검속 도구 확장 가이드
 

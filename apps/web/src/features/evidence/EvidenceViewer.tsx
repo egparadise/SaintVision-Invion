@@ -28,6 +28,7 @@ export interface EvidenceData {
   allPhysicallyStopped?: boolean;
   allSucceeded?: boolean;
   immutable?: boolean;
+  outputAbsentReason?: string | null;
 }
 
 export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId, onBack }) => {
@@ -50,7 +51,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
       let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' = 'UNVERIFIED';
       if (res.output?.verified === true) {
         integrityStatus = 'PASS';
-      } else if (res.output?.verified === false || res.outputAbsentReason || res.state === 'failed') {
+      } else if (res.output?.verified === false || res.state === 'failed') {
         integrityStatus = 'FAIL';
       } else {
         integrityStatus = 'UNVERIFIED';
@@ -69,6 +70,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
         generatedAt: res.completedAt || res.stopReceipt?.finishedAt || undefined,
         immutable: res.sealed ?? true,
         integrityVerification: integrityStatus,
+        outputAbsentReason: res.outputAbsentReason || null,
         policySpecifications: {
           retention: '1_YEAR_PINNED (ADR-012)',
           tamperProtection: 'IMMUTABLE_STORAGE_APPEND_ONLY',
@@ -249,13 +251,23 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
               }}
             >
               {evidenceData.manifestDigest && evidenceData.immutable ? (
-                <span>
-                  ℹ️ <strong>봉인 및 해시 계산 완료 (SEALED):</strong> 출력 해시(SHA-256)가 계산되고 실행이 봉인되었으나, 독립적 암호학적 대조(verified)가 수행되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 표기됩니다. (해시 존재 ≠ 무결성 검증 통과)
-                </span>
+                <div>
+                  <p style={{ margin: '0 0 6px 0' }}>
+                    ℹ️ <strong>봉인 및 해시 계산 완료 (SEALED):</strong> 출력 해시(SHA-256)가 계산되고 실행이 봉인되었으나, 독립적 암호학적 대조(verified)가 수행되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 표기됩니다. (해시 존재 ≠ 무결성 검증 통과)
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.9 }}>
+                    👉 <strong>권장 조치:</strong> 산출물 원본의 무결성을 확인하려면 산출물 다운로드 시 WebCrypto 전송 대조를 수행하거나, 노드 완료 영수증(NodeStopReceipt)의 불변 다이제스트를 대조하십시오.
+                  </p>
+                </div>
               ) : (
-                <span>
-                  ⚠️ 출력 검증 정보가 확인되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 유지됩니다.
-                </span>
+                <div>
+                  <p style={{ margin: '0 0 6px 0' }}>
+                    ⚠️ <strong>출력 검증 정보 부재:</strong> {evidenceData.outputAbsentReason ? `${evidenceData.outputAbsentReason} · ` : ''}출력 검증 정보가 확인되지 않아 <strong>미검증 (UNVERIFIED)</strong> 상태로 유지됩니다.
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.9 }}>
+                    👉 <strong>권장 조치:</strong> 실행이 진행 중이거나 산출물 커밋 전일 수 있습니다. 실행 완료 후 다시 조회하거나 결과 뷰(/result) 동기화 상태를 확인하십시오.
+                  </p>
+                </div>
               )}
             </div>
           )}
