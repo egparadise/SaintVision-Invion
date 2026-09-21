@@ -190,22 +190,6 @@ class ProjectListResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
-class LegacyProjectCatalogItemResponse(Strict):
-    """Historic kernel catalog row accepted only by the frontend adapter."""
-
-    project_id: str = Field(alias="projectId")
-
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-
-class LegacyProjectCatalogResponse(Strict):
-    """Historic `items` envelope; the business API does not emit this shape."""
-
-    items: list[LegacyProjectCatalogItemResponse]
-
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-
 class ExecutionReadinessCheckResponse(Strict):
     check: str
     satisfied: bool

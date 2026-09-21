@@ -23,10 +23,6 @@ const contracts = [
     output: 'project-list-response',
   },
   {
-    schema: 'legacy-project-catalog-response',
-    output: 'legacy-project-catalog-response',
-  },
-  {
     schema: 'project-workspaces-response',
     output: 'project-workspaces-response',
   },

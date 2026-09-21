@@ -2,14 +2,13 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { legacyProjectCatalogFixture, projectListFixture } from './fixtures/workspace-catalog';
+import { projectListFixture } from './fixtures/workspace-catalog';
 
 const ajv = new Ajv2020({ allErrors: true });
 addFormats(ajv);
 const root = new URL('../../../contracts/', import.meta.url);
 const schema = (name: string) => JSON.parse(readFileSync(new URL(`${name}.schema.json`, root), 'utf8'));
 const validateBusinessList = ajv.compile(schema('project-list-response'));
-const validateLegacyCatalog = ajv.compile(schema('legacy-project-catalog-response'));
 
 describe('project picker response contracts shared with provider fixtures', () => {
   it('accepts the canonical projects envelope against backend schema', () => {
@@ -22,8 +21,4 @@ describe('project picker response contracts shared with provider fixtures', () =
     expect(validateBusinessList(changed)).toBe(false);
   });
 
-  it('accepts the legacy catalog envelope as a separate shape', () => {
-    expect(validateLegacyCatalog(legacyProjectCatalogFixture), JSON.stringify(validateLegacyCatalog.errors)).toBe(true);
-    expect(validateBusinessList(legacyProjectCatalogFixture)).toBe(false);
-  });
 });

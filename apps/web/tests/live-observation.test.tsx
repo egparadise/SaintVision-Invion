@@ -7,7 +7,7 @@ import { apiClient } from '../src/shared/api/client';
 import { NodeList } from '../src/features/nodes/NodeList';
 import { NodeDetail } from '../src/features/nodes/NodeDetail';
 import { ClusterOverview } from '../src/features/dashboard/ClusterOverview';
-import { legacyProjectCatalogFixture, projectListFixture, projectWorkspacesFixture } from './fixtures/workspace-catalog';
+import { projectListFixture, projectWorkspacesFixture } from './fixtures/workspace-catalog';
 vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn() }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
@@ -52,6 +52,10 @@ it('reads the business project envelope without inventing owner or capacity', as
 it('rejects an unsupported project envelope', async () => {
   api.mockResolvedValue({ unknown: [] }); await expect(fetchProjects()).rejects.toThrow();
 });
+it('rejects the unserved legacy catalog envelope instead of fabricating project metadata', async () => {
+  api.mockResolvedValue({ items: [{ projectId: 'prj_legacy_contract' }] });
+  await expect(fetchProjects()).rejects.toThrow('프로젝트 응답 형식 불일치');
+});
 it('rejects a project list whose declared count disagrees with its rows', async () => {
   api.mockResolvedValue({ ...projectListFixture, count: 0 });
   await expect(fetchProjects()).rejects.toThrow('프로젝트 응답 형식 불일치');
@@ -74,10 +78,6 @@ it('encodes project identifiers for the workspace route', async () => {
   expect(api).toHaveBeenCalledWith('/v1/projects/a%2Fb/workspaces');
 });
 
-it('reads kernel grant catalog without inventing business metadata', async () => {
-  api.mockResolvedValue(legacyProjectCatalogFixture);
-  expect(await fetchProjects()).toEqual([{ id: 'prj_legacy_contract', name: 'prj_legacy_contract', createdAt: '' }]);
-});
 it('rejects ambiguous catalog envelopes', async () => {
   api.mockResolvedValue({ projects: [], items: [] }); await expect(fetchProjects()).rejects.toThrow();
 });

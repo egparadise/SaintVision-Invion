@@ -28,7 +28,6 @@ def _fixture(name: str) -> dict:
     ("filename", "model"),
     [
         ("project-list-response.json", schemas.ProjectListResponse),
-        ("legacy-project-catalog-response.json", schemas.LegacyProjectCatalogResponse),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse),
         ("workspace-execution-readiness-response.json", schemas.WorkspaceExecutionReadinessResponse),
     ],
@@ -44,7 +43,6 @@ def test_shared_workspace_fixture_matches_strict_response_model(filename, model)
     [
         ("project-list-response.json", schemas.ProjectListResponse, "missing-project-name"),
         ("project-list-response.json", schemas.ProjectListResponse, "extra-project-field"),
-        ("legacy-project-catalog-response.json", schemas.LegacyProjectCatalogResponse, "missing-project-id"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-page-count"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "extra-page-field"),
         ("project-workspaces-response.json", schemas.ProjectWorkspacesResponse, "missing-workspace-field"),
@@ -61,8 +59,6 @@ def test_workspace_contract_rejects_shared_fixture_shape_drift(filename, model, 
         payload["projects"][0].pop("displayName")
     elif mutate == "extra-project-field":
         payload["projects"][0]["inventedStatus"] = "ready"
-    elif mutate == "missing-project-id":
-        payload["items"][0].pop("projectId")
     elif mutate == "missing-page-count":
         payload.pop("count")
     elif mutate == "extra-page-field":

@@ -17,12 +17,12 @@ Two structural checks, no human judgment required:
       path builds or serves: zero serving references (`validate_contract`/`_checked`, response_model,
       schemas.X/models.X use, .model_validate) and not composed as another schema's field type. Catches
       the purest exists-vs-works gap (schema+fixture+green test, yet nothing produces the response --
-      e.g. LegacyProjectCatalogResponse). LIMITATION: serving detection is pattern/grep based, so a
+      e.g. a bound response model with no producer). LIMITATION: serving detection is pattern/grep based, so a
       contract served only through fully dynamic construction that never names the type could read as
       dead (false positive). To avoid crying wolf it is (a) conservative -- any naming or nested-field
       reference counts as alive; (b) restricted to real contract types; (c) report-only (never fails the
       gate), since the fix is a human decision (wire the endpoint vs remove the contract). Verified both
-      ways: it flags LegacyProjectCatalogResponse and does NOT flag live or nested-item contracts.
+      ways: it flagged the now-removed legacy project envelope and does NOT flag live or nested-item contracts.
 
 What this does NOT check (needs human judgment -- see the governance doc): whether a serving-anchor test
 actually exercises the path and fails when the anchor is removed (bears-weight); whether an anchor sits

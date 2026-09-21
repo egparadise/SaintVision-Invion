@@ -34,15 +34,22 @@ def test_workspace_api_inputs_reject_implicit_or_client_supplied_authority():
 
 def test_integrated_migration_keeps_both_published_histories():
     import sys
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
 
-    path = Path(__file__).resolve().parents[2] / "tools/migration_graph.py"
+    root = Path(__file__).resolve().parents[2]
+    path = root / "tools/migration_graph.py"
     spec = importlib.util.spec_from_file_location("workspace_migration_graph", path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     revisions = module.load()
     ordered = module.chain(revisions)
-    assert ordered[-1].revision == "0044_model_registry_binding"
+    alembic_config = Config(str(root / "alembic.ini"))
+    alembic_config.set_main_option("script_location", str(root / "migrations"))
+    alembic_config.set_main_option("path_separator", "os")
+    alembic_head = ScriptDirectory.from_config(alembic_config).get_current_head()
+    assert ordered[-1].revision == alembic_head
     parents = {r.revision: r.down_revision for r in revisions}
     assert parents["0008_node_certificate_lookup"] == "0006_control_api"
     assert parents["0007_delivery_queue"] == "0006_control_api"
@@ -75,7 +82,17 @@ def test_integrated_migration_keeps_both_published_histories():
         "0024_workspace_bridge",
         "0032_workspace_readiness_merge",
     }
-    assert module.downgrade_target(revisions) == "0044_model_registry_binding"
+    irreversible_boundaries = [
+        revision.revision
+        for revision in ordered
+        if revision.irreversible or isinstance(revision.down_revision, tuple)
+    ]
+    expected_downgrade_target = irreversible_boundaries[-1] if irreversible_boundaries else "base"
+    assert module.downgrade_target(revisions) == expected_downgrade_target
+    future = replace(ordered[-1], revision="future_reversible_smoke", down_revision=alembic_head,
+                     irreversible=False)
+    assert module.chain(revisions + [future])[-1].revision == future.revision
+    assert module.downgrade_target(revisions + [future]) == expected_downgrade_target
     published_prefix = ordered[:next(i for i, r in enumerate(ordered)
                                     if r.revision == "0019_workspace_api_integration")]
     with pytest.raises(ValueError, match="unmerged"):
