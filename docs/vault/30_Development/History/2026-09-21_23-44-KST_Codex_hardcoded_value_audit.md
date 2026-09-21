@@ -31,4 +31,4 @@ Docker acceptance, PostgreSQL migration rehearsal, Go build/live acceptance, hos
 
 Obsidian provenance-wrapped sequence at the report-edit tree: initial `--check` exit 0 (1461 managed/4 pending/0 conflicts); `--apply` exit 0 (4 files exported, all 1461 destination hashes match); `--check` exit 0 (1461/0/0). A subsequent evidence-count correction produced 5 pending/0 conflicts; the approved apply was run and the final `--check` again reported 1461 managed/0 pending/0 conflicts. Main-checkout vault was the destination; unmanaged files untouched.
 
-Integration 착지 이후 독립 reviewer는 landed SHA를 대상으로 감사와 변형 시험을 검토한다. CI/운영 인수 상태는 미완료로 유지한다.
+After integration advanced from `8da7791` to `7d75f81` during push, the branch was rebased (no conflicts) and the entire listed check set was rerun clean at `2ee96ecca1cf82b953bda6aec3c2ca77b81e937d` (KST 23:49:28-29); all outcomes remained identical. This audit is author-verified only. Integration landing, independent review, hosted CI, and runtime acceptance remain separate states.
