@@ -6,7 +6,7 @@ status: "active"
 author: "Codex"
 reviewer: "pending"
 mapped_at_sha: "b08b2273995a96cefccaaa55709b13c8c78e9b08"
-updated: "2026-09-21T19:54:00+09:00"
+updated: "2026-09-21T20:03:00+09:00"
 source_of_truth: "Git"
 tags: ["shards", "contract", "model-verification", "lineage", "boundary"]
 ---
@@ -35,7 +35,7 @@ Claude의 `85868a7` 문서에서 발견한 기존 경로는 `POST /v1/discovery/
 
 **기능 영향:** 현재 변경 상태에서는 유효한 tenant-mapped OIDC access token을 미리 주입한 Node만 discovery 공지를 할 수 있다. 그런 토큰을 갖지 않은 새 Node는 후보로 발견되지 않으며 이후 admission/enrollment 절차에도 도달할 수 없다. 따라서 문서화된 기존 “미등록 기계가 먼저 공지” 흐름은 인증 bootstrap 선행조건이 정의될 때까지 운영상 막혀 있다. 이번 TestClient 증명은 서버의 tenant 거부를 검증했을 뿐 실제 IdP 발급, 무인증 새 Node 온보딩, 운영 secret 전달은 검증하지 않았다.
 
-**소유자와 다음 결정:** Codex가 scoped machine/discovery credential의 발급·검증 계약(tenant binding, 최소 scope, 만료·회전·폐기, 감사)을 설계하고, Identity/운영 담당자가 IdP 발급 및 secret manager/service deployment 전달 절차를 확정해야 한다. 그 전까지 운영 문서상 신규 무인증 Node onboarding은 차단/미지원으로 표시한다. 임시 anonymous endpoint를 다시 열지 않는다. 기능을 임시로 살리려면 승인된 대안으로 별도 일회용 tenant-bound discovery credential을 마련해야 한다. 임의 사용자 access token을 장기 Node 자격증명으로 재사용하는 것은 지원 절차로 간주하지 않는다.
+**후속 설계:** 권고 계약·선택지·유출 효과·최소 온보딩 경로를 [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]에 Proposed ADR-097로 작성했다. 권고는 tenant+installation에 묶인 `discovery:announce` 전용 15분 credential이며 하나의 candidate row만 30초 간격으로 refresh할 수 있고 admission/revoke 때 종료한다. 최초 검토 메모의 one-use 안은 현재 300초 freshness보다 운영자 확인 시간이 지나치게 짧아져 최종 제안에서 bounded refresh로 조정했다. digest-only 저장, 설치별 row 제한, 감사, 운영자 발급 및 secret delivery가 필요하다. 사용자 결정과 구현 전이므로 신규 무자격 Node onboarding은 아직 차단이다. Identity/운영은 issuer 권한과 비밀 전달 채널을 결정해야 하며 anonymous endpoint는 임시 재개하지 않는다.
 
 증거: FastAPI `TestClient`로 실제 route에 인증 principal A + header tenant B 요청을 보내 403과 `record_announcement` 미호출을 확인한다. 인증 없이 header만 보낸 요청은 401이다. tenant 비교 guard를 제거한 되돌림 대조에서는 mismatch 시험이 500/403 불일치로 실패했고, 복구 후 discovery+shard targeted suite 8 passed다. Go compiler/test runner는 이 호스트에 없어 Node Agent 변경을 실행 검증하지 못했다. PostgreSQL DSN도 없어 DB-backed 후보 저장과 운영 credential 발급은 미실행이다.
 

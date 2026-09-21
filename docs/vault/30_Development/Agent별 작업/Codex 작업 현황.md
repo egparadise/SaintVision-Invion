@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.120"
+version: "1.0.121"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:54:00+09:00"
+updated: "2026-09-21T20:03:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,7 @@ source_of_truth: "Git"
 - Claude `85868a7`의 discovery tenant 최고위험 finding을 소스에서 확인했다. 기존 announcement route는 principal 없이 caller `X-Inv-Tenant`를 RLS scope에 사용했고 Node Agent 시험은 bearer가 없음을 기대했다. 후보 row만 쓰더라도 타 tenant 후보 주입 및 후보 500 한도 소진이 가능했다. route가 이제 `get_principal`을 요구하고 header mismatch를 DB 접근 전에 `AUTH-TENANT-SCOPE` 403으로 거부한다. Node Agent `inv-discover`는 `INV_DISCOVERY_BEARER_TOKEN` 환경 자격증명을 보내도록 수정했고 runbook을 갱신했다. FastAPI TestClient에서 다른 tenant 403/no DB call, 무인증 401을 확인했고 tenant compare 제거 변형은 mismatch 시험을 실패시켰다. discovery+shard suite 8 passed; check_docs 639 versioned documents 통과.
 - 화면 소유 인계: `ResourceExplorer.tsx`의 기존 하드코딩 tenant UUID는 backend에서 거부된다. Gemini가 세션 principal tenant를 전달하도록 wiring해야 한다. 운영 Node Agent bearer 발급/주입은 아직 설정되지 않았다. Go compiler 부재로 Go package/CLI 시험은 미실행이며 PostgreSQL-backed 저장 통합/운영 HTTP도 미검증이다. model verify 및 lineage endpoint는 저장·권한 근거가 부족해 계속 미노출로 판정했다.
 - 설계 영향 후속 확인: 무인증 공지는 원래 “미등록 Node가 먼저 후보를 알릴 수 있는 유일 경로”라는 최소 권한 설계였다. 인증 요구는 임의 cross-tenant 후보 주입/tenant 후보 한도 소진을 막지만, 아직 machine/discovery credential 발급·IdP service identity·secret 배포 절차가 없어 새 무자격 Node의 첫 공지를 막는다. 후보 admission token은 공지 뒤 발급되므로 해결책이 아니다. 신규 무인증 Node onboarding은 지원 절차가 정해질 때까지 차단 상태로 기록했고 anonymous endpoint를 재개하지 않기로 했다. 다음 owner: Codex가 tenant-bound scoped credential 계약 설계, Identity/운영 담당자가 발급·주입·회전 절차 결정. 상세 근거: History와 `[[Codex Node와 저장소 Adapter 실행 안내]]`.
+- Proposed ADR-097 `[[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]]`: tenant+installation-bound, `discovery:announce` only, 15-minute opaque credential that refreshes one candidate at 30-second cadence; admission/revoke ends it. Issuer API/CLI, digest persistence, revoke/audit and secure delivery are not implemented; new uncredentialed Node onboarding remains blocked. User decision pending; Identity/operations must confirm issuer authority and secret delivery channel. The proposal lists leak impact and testable acceptance evidence.
 
 ## 2026-09-21 PTY 티켓 wire 계약 및 인계
 

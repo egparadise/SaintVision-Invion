@@ -1,10 +1,10 @@
 ---
 doc_id: "NODE-STORAGE-RUNBOOK-001"
 title: "Codex Node와 저장소 Adapter 실행 안내"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:54:00+09:00"
+updated: "2026-09-21T20:03:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,7 +16,7 @@ source_of_truth: "Git"
 
 CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보만 만들며 admission은 하지 않는다. `POST /v1/discovery/announcements`는 이제 인증 principal을 요구하고 `X-Inv-Tenant`가 그 principal의 tenant와 같아야 한다. Node Agent 실행 환경에 해당 tenant로 인증되는 `INV_DISCOVERY_BEARER_TOKEN`을 보안된 secret manager/service environment로 주입한다. 토큰을 CLI 인자, 저장소, 로그 또는 보고서에 넣지 않는다. 실제 endpoint, 해당 CA, 비밀이 아닌 tenant UUID와 안정적인 installation ID를 지정한다.
 
-> **온보딩 차단 조건:** 위 문장은 자격증명 전달 위치만 설명하며 발급 절차를 제공하지 않는다. 저장소에는 미등록 Node용 discovery bearer 발급/배포 절차가 없고, 후보 admission의 one-time `bootstrapToken`은 최초 공지 뒤에 발급되므로 이를 대체하지 않는다. 유효한 tenant-mapped OIDC access token을 미리 주입하지 못한 새 Node는 후보로 나타나지 않는다. 자격증명 발급자와 운영 secret 전달 절차가 확정되기 전까지 이 안내를 완결된 신규 Node bootstrap 절차로 사용하지 않는다. 임의 user token을 장기 기계 자격증명으로 취급하거나 익명 route를 임시 재개하지 않는다. 추적: [[2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex]].
+> **온보딩 차단 조건:** 위 문장은 자격증명 전달 위치만 설명하며 발급 절차를 제공하지 않는다. 저장소에는 미등록 Node용 discovery bearer 발급/배포 절차가 없고, 후보 admission의 one-time `bootstrapToken`은 최초 공지 뒤에 발급되므로 이를 대체하지 않는다. 유효한 tenant-mapped OIDC access token을 미리 주입하지 못한 새 Node는 후보로 나타나지 않는다. 권고된 operator-issued, installation-bound, 15분 bounded-refresh credential 절차도 제안 단계이며 구현되지 않았다. 발급자와 승인된 secret 전달 절차가 확정·구현되기 전까지 이 안내를 완결된 신규 Node bootstrap 절차로 사용하지 않는다. 임의 user token을 장기 기계 자격증명으로 취급하거나 익명 route를 임시 재개하지 않는다. 선택지와 합격 증거: [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]].
 
 ```bash
 inv-discover --endpoint "$INV_DISCOVERY_ENDPOINT" --ca "$INV_DISCOVERY_CA_FILE" \
