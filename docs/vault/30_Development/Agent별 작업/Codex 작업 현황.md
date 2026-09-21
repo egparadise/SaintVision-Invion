@@ -1,14 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.157"
+version: "1.0.158"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T04:38:00+09:00"
+updated: "2026-09-22T04:51:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 CI 개방 전 조건부 수동 교차 검증 절차 제안
+
+- 작업 `THREAD-2026-09-22-PRECI-CROSS-LANE-PROPOSAL`; owner Codex, governance owner/reviewer Claude (수용 대기). 기준 integration SHA `2867ddbb78af0efdc46288b3c26a316e41ad719e`.
+- 변경 범위에 따라 Vitest/Python UI guard, schema/fixture/backend contract, PostgreSQL API, Chromium/proxy를 선택하는 제안을 History에 작성했다. 문서-only, 화면, 계약, route/DB/security, browser/proxy, 누적 integration/handoff별 trigger와 정확한 최종 SHA·provenance·skip 분포 요구를 적었고 모든 suite를 매번 돌리지는 않도록 했다.
+- 임시 절차 종료는 결제 복구만으로 하지 않는다. 같은 integration SHA에서 `docs/backend/core/frontend/desktop-browser` 다섯 hosted workflow가 실제 완료되고, 기대 테스트가 실행되고, 금지 skip/error/failure가 없으며 evidence를 남긴 뒤 수동 전체 교차 절차를 해제하도록 제안했다. workflow 누락/비활성 시 해당 lane 수동 실행 재개 조건도 포함했다.
+- 이 내용은 **제안**이며 Claude 소유 정본을 편집하지 않았다. Claude 수용 전 효력 없음. Evidence: [[2026-09-22_CI개방전_조건부_수동검증절차_제안_Codex]].
+- 이 카드 닫힘: 교차 레인 목록 완료; 최초 Python guard red 및 Gemini fix 후 Python guard green을 각각 기록; latest Gemini DOM 3-case는 소스 확인만 했고 Codex Vitest 재실행/독립 승인 없음. Hosted CI 미실행.
+- 대기: (1) Claude의 절차 제안/작업판 수용, (2) Claude independent review of Codex contract/guard work as assigned. 사용자 결정 대기: capability별 동적 node usage 계약; artifact GET의 receipt/file 정본; WorkspaceRecovery 제품 연결·보존 정책; 시계 skew alarm threshold/owner/routing; discovery credential 안전 전달 경로; Node `active` 상태 의미/표시 정책. 외부/환경 대기: GitHub Actions 결제, Go toolchain 및 실 Node 인수. 상세 범위는 해당 History와 기존 결정 대기 목록에서 확인한다.
+- 다음 담당: Claude가 제안 문서를 검토해 정본에 반영하거나 수정 요청/기각한다. CI 복구 후 최초 동일-SHA 5-workflow 실행 evidence를 집계한다. 문서 검사 외 제품·DB·Vitest·browser 시험은 실행하지 않았다.
 
 ## 2026-09-22 프런트·백엔드 검증 레인 교차 가드 목록
 
