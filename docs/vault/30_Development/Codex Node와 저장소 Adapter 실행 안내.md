@@ -1,10 +1,10 @@
 ---
 doc_id: "NODE-STORAGE-RUNBOOK-001"
 title: "Codex Node와 저장소 Adapter 실행 안내"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T19:47:00+09:00"
+updated: "2026-09-21T19:54:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,12 +16,14 @@ source_of_truth: "Git"
 
 CI artifact에 `inv-discover`, `inv-node`, Python wheel이 들어간다. 공지는 미등록 후보만 만들며 admission은 하지 않는다. `POST /v1/discovery/announcements`는 이제 인증 principal을 요구하고 `X-Inv-Tenant`가 그 principal의 tenant와 같아야 한다. Node Agent 실행 환경에 해당 tenant로 인증되는 `INV_DISCOVERY_BEARER_TOKEN`을 보안된 secret manager/service environment로 주입한다. 토큰을 CLI 인자, 저장소, 로그 또는 보고서에 넣지 않는다. 실제 endpoint, 해당 CA, 비밀이 아닌 tenant UUID와 안정적인 installation ID를 지정한다.
 
+> **온보딩 차단 조건:** 위 문장은 자격증명 전달 위치만 설명하며 발급 절차를 제공하지 않는다. 저장소에는 미등록 Node용 discovery bearer 발급/배포 절차가 없고, 후보 admission의 one-time `bootstrapToken`은 최초 공지 뒤에 발급되므로 이를 대체하지 않는다. 유효한 tenant-mapped OIDC access token을 미리 주입하지 못한 새 Node는 후보로 나타나지 않는다. 자격증명 발급자와 운영 secret 전달 절차가 확정되기 전까지 이 안내를 완결된 신규 Node bootstrap 절차로 사용하지 않는다. 임의 user token을 장기 기계 자격증명으로 취급하거나 익명 route를 임시 재개하지 않는다. 추적: [[2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex]].
+
 ```bash
 inv-discover --endpoint "$INV_DISCOVERY_ENDPOINT" --ca "$INV_DISCOVERY_CA_FILE" \
   --tenant "$INV_TENANT_ID" --instance "$INV_INSTALLATION_ID" --once
 ```
 
-프로세스 환경에 `INV_DISCOVERY_BEARER_TOKEN`을 안전하게 설정해야 하며, 값 자체를 명령행에 쓰지 않는다. `--once`를 생략하면 30초 간격으로 공지한다. bootstrap token·인증서·Node role은 이 공지의 결과가 아니다. 기존 Node 실행 CLI의 명시적 tenant/node/epoch/profile/image/executable/state/public-key/mTLS 설정이 별도로 필요하다. 운영 등록 토큰과 CA 발급 경로는 Claude와 연결해야 한다.
+프로세스 환경에 `INV_DISCOVERY_BEARER_TOKEN`을 안전하게 설정해야 하며, 값 자체를 명령행에 쓰지 않는다. `--once`를 생략하면 30초 간격으로 공지한다. bootstrap token·인증서·Node role은 이 공지의 결과가 아니다. 기존 Node 실행 CLI의 명시적 tenant/node/epoch/profile/image/executable/state/public-key/mTLS 설정이 별도로 필요하다. 운영 등록 토큰과 CA 발급 경로도 별도 미완료다.
 
 설치한 Python package의 `inv-observer-worker`는 `INV_OBSERVER_CONFIG` JSON 파일을 읽는다. 파일의 키는 `tenantId`, `tls`이고 tls는 `ca_file`, `certificate_file`, `key_file`이다. 현재 등록 Node CA와 CP client cert/key를 사용한다. `INV_RUNTIME_DSN`은 비owner·NOBYPASSRLS service role, `INV_RECOVERY_EPOCH`는 운영자가 검증한 현재 UUID다. 비밀은 Git/CLI 출력/보고서에 넣지 않는다.
 
