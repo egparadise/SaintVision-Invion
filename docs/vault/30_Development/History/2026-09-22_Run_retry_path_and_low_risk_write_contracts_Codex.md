@@ -47,20 +47,21 @@ tags: ["run", "retry", "response-contract", "static-audit"]
 6. `PUT /users/{user_id}/status` — `UserStatusResponse`
 7. `PUT /projects/{project_id}/status` — `ProjectStatusResponse`
 
-각 모델은 strict/extra-forbid이고 상태와 고정 수령 필드는 제한 타입으로 표현했다. Route에 FastAPI `response_model`을 붙이고 공유 fixture와 회귀시험을 추가했다. 응답의 handle이 없으므로 후속-handle 고위험 범위를 넓히지 않는다.
+각 모델은 strict/extra-forbid이고 상태와 고정 수령 필드는 제한 타입으로 표현했다. Discovery announce는 새 row만 `candidate`지만 기존 admitted/declined/expired row를 다시 announce하면 서비스가 결정을 되살리지 않고 기존 상태를 그대로 응답할 수 있으므로 네 상태를 허용한다. 네 상태가 모두 roundtrip하는 시험도 추가했다. Route에 FastAPI `response_model`을 붙이고 공유 fixture와 회귀시험을 추가했다. 응답의 handle이 없으므로 후속-handle 고위험 범위를 넓히지 않는다.
 
 ## 검증 provenance
 
 - 수행: Codex 작성자 실행. 독립 검토, hosted CI, PostgreSQL 통합, HTTP, UI 인수는 미실시.
-- 최초 기준/구현 전: HEAD `044c343a518f7ec9f8ae83fd436a8a1da67486bd`, branch `agent/codex/contribution-lifecycle-contracts`, 격리 worktree `C:/Users/egpar/AppData/Local/Temp/sv-codex-contract-land-20260922`; 조사 시작 시 porcelain clean. 이후 작업물은 이 branch의 uncommitted 변경이다.
-- Interpreter: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`, Python 3.14.6. Node v24.17.0. 조사 및 변경 검증 시간은 KST 2026-09-22 03:55–04:02.
-- 계약 회귀: `python -m pytest tests/core/test_low_risk_write_response_contracts.py tests/core/test_node_page_detail_response_contract.py tests/core/test_pool_placement_response_contract.py tests/core/test_workspace_response_contract.py -q` → exit 0, **73 passed**, 2 dependency deprecation warnings.
+- 정적 감사 기준: HEAD `044c343a518f7ec9f8ae83fd436a8a1da67486bd`. 구현 착수 당시 origin은 `d45435be560180156bad16b5716272f9e814b89a`였고, 통합에 추가된 계약 정정 `167a7f1f`를 포함하도록 재기반했다. 최종 코드 SHA `22ecafcf583b3c251b552d3df73dacbca65d828f`, branch `agent/codex/contribution-lifecycle-contracts`, 격리 worktree `C:/Users/egpar/AppData/Local/Temp/sv-codex-contract-land-20260922`.
+- Interpreter: `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe`, Python 3.14.6. Node v24.17.0. 최종 재검증 KST 2026-09-22 04:05–04:06.
+- 계약 회귀: final code SHA `22ecafcf`, `tools/provenance.py -- C:/Project/SaintVision-Invion/.venv/Scripts/python.exe -m pytest tests/core/test_low_risk_write_response_contracts.py tests/core/test_node_page_detail_response_contract.py tests/core/test_pool_placement_response_contract.py tests/core/test_workspace_response_contract.py -q` → exit 0, **77 passed**, 2 dependency deprecation warnings. Executor egpar/Codex 작성자.
 - Route-detach 되돌림 대조: 일곱 route의 `response_model`을 각각 메모리에서 제거했을 때 anchor invariant가 일곱 번 모두 실패를 감지했다. 각 값을 즉시 복원했고 실행 종료 code 0이다. 이 대조는 선언 앵커 검사의 감지력을 검증하며 별도 운영 서버/DB 동작 증거가 아니다.
-- Schema: `tools/export_schemas.py`가 새 7 schema를 생성해 총 56개. `tools/export_schemas.py --check` exit 0, 56/56 일치.
-- 문서 게이트: `tools/check_docs.py` exit 0 (24 original hashes, 715 versioned docs); `tools/check_ontology.py` exit 0. `tools/sync_obsidian.py --check`는 1516 managed, 2 pending, 0 conflicts로 exit 0; read-only, apply하지 않았다.
-- 모든 결과는 integration tip이 아닌 위 로컬 구현 기준에서 측정했다. 이후 origin integration은 `d45435be560180156bad16b5716272f9e814b89a`로 이동해 현재 브랜치보다 1 commit 앞서 있다. 해당 tip 재기반 및 재검증은 아직 안 됐으므로 이 기록은 통합 착지/최종 검증을 뜻하지 않는다.
+- Schema: `tools/export_schemas.py`가 새 7 schema를 생성해 총 56개. final code SHA에서 `tools/export_schemas.py --check` exit 0, 56/56 일치.
+- 계약 사슬: final code SHA에서 `tools/check_contract_bindings.py` exit 0, 46 fixtures 각각 시험 참조 및 12 kernel serving-anchor tests.
+- 문서 게이트: 최종 작업 문서를 포함한 tree에서 `tools/check_docs.py` exit 0 (24 original hashes, 717 versioned docs); `tools/check_ontology.py` exit 0. `tools/sync_obsidian.py --check`는 1518 managed, 3 pending, 0 conflicts로 exit 0; read-only, apply하지 않았다.
+- Provenance wrapper는 실행 당시 `working_tree_clean: NO`라고 기록했다. 변경은 보고서와 진행판 세 문서이며 제품/시험 소스는 final code SHA에 커밋돼 있었다. `git diff --check`도 통과했다. 브랜치는 fetch 시각의 integration `167a7f1f` 위에 2 commits 앞섰으며, 이후 remote 이동 여부는 아직 재확인하지 않았다.
 
 ## 다음 담당
 
 - 사용자/업무 owner: 일반 ModelRetry를 제품에 노출할지와 owner/API authority 결정. WorkspaceResume와 ShardRecovery는 각각 별도 좁은 정책이다.
-- Codex: 최신 integration 위 재기반 후 새 일곱 계약 시험·schema 검증 재실행, 개인 index로 자기 파일만 착지하고 rev-range 확인. Claude의 독립 검토는 착지 SHA를 대상으로 요청한다.
+- Codex: 문서 갱신 커밋 후 최신 integration fetch, 개인 index로 자기 파일만 착지, rev-range 확인, 그 뒤 Claude 독립 검토를 요청한다.
