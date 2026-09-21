@@ -4,7 +4,7 @@ title: "Obsidian 공용 worktree state와 UI-FB 경계 최종 재검토"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T12:10:00+09:00"
+updated: "2026-09-21T12:20:00+09:00"
 source_of_truth: "Git"
 tags: ["sync-obsidian", "git-worktree", "UI-FB", "mutation-testing", "verification-boundary"]
 ---
@@ -42,7 +42,7 @@ same = True
 
 `tools/test_sync.py::test_default_state_is_shared_by_linked_worktrees`는 임시 Git repo와 linked worktree를 실제로 만들고 같은 common state 경로 및 서로 다른 git-path 경로를 비교한다. `--git-path` 구현으로 되돌린 mutation에서는 해당 시험이 assertion에서 실패(exit 1)했다. 수정본 전체 `tools/test_sync.py`: 14 passed; unittest가 추가 보고한 하위 cases 5 passed.
 
-주 checkout의 `--check`에서 pending 10은 남지만 conflict 0이다. 이는 새 문서 동기화를 실행했다는 뜻이 아니며 pending을 vault로 쓰지 않았다. `C:\vw`의 로컬 `.venv\Scripts\python.exe`는 OS가 실행 파일로 인정하지 않아 그 checkout에서 CLI check는 시작되지 않았다. 대신 main venv에서 두 checkout root를 넣어 기본 경로를 직접 계산했고 동일한 common state를 확인했다.
+주 checkout의 migration 직후 `--check`는 `1372 managed / 10 pending / 0 conflicts`였다. 문서 갱신 후 main check는 최신 문서 기준 `1373 / 5 / 0`, 실제 `C:\vw` CLI check는 `1373 / 0 / 0`이며 둘 다 pending을 vault에 쓰지 않았다. `C:\vw` checkout은 시작 시 `f5bb37c` detached였으나 clean 여부를 확인한 뒤 새 commit `710be37`로 fast-forward했다. main venv로 실제 `C:\vw\tools\sync_obsidian.py --check`를 실행해 exit 0, `1373 managed / 0 pending / 0 conflicts`를 확인했다. C:\vw worktree도 실행 후 clean이다. 따라서 두 실제 CLI entry point가 현재 공용 baseline을 읽는다.
 
 ## UI-FB-01/02/03 fixed-tip 경계 재검토
 
@@ -70,4 +70,4 @@ Codex는 다음 mutation을 수행했다. component의 `if (isRouteNotFoundError
 
 - Gemini: UI-FB-03 component fallback test를 보강한 fixed SHA를 제공한다.
 - Codex: 그 SHA에서 401/403/5xx/parse/network 및 genuine 404의 호출 전이를 재검토한다. browser/live backend acceptance는 별도 owner 조건이 준비될 때만 판정한다.
-- Obsidian: 공용 Git common-dir state로 전환 완료. 현재 10 pending exports는 `--apply` 없이 유지한다. 다음 동기화는 일반 `--check` 후 승인된 정책에 따른 절차로 진행한다.
+- Obsidian: 공용 Git common-dir state로 전환 완료. 주 checkout의 2 pending exports와 C:\vw의 0 pending exports는 `--apply` 없이 유지한다. 다음 동기화는 일반 `--check` 후 승인된 정책에 따른 절차로 진행한다.
