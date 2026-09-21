@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.127"
+version: "1.0.128"
 status: "review"
 author: "Codex"
-updated: "2026-09-21T22:01:00+09:00"
+updated: "2026-09-21T22:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,10 +13,10 @@ source_of_truth: "Git"
 ## 2026-09-21 통합 migration-head 회귀 및 응답 계약 결정
 
 - Claude fixed-SHA 보고에서 통합 Core의 단일 실패를 확인: `test_integrated_migration_keeps_both_published_histories`의 기대 head가 0044에 고정되어 0045에서 실패했다. 0045는 정상 head다. 시험은 Alembic `ScriptDirectory.get_current_head()`와 migration_graph AST head를 비교하고, rollback target은 현재 irreversible/merge 경계에서 유도한다. 메모리상 synthetic future reversible migration도 추가해 새 tip을 따라가며 rollback target을 보존하는지 검사한다.
-- Project venv `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6에서 targeted 시험은 수정본 1 passed/exit 0, 이전 0044 literal로 되돌린 시험은 예상대로 1 failed/exit 1 (`0045_discovery_machine_cred != 0044_model_registry_binding`)이었다. 원복 후 재통과. Claude의 full core 770/1/4는 기준선이며 Codex는 아직 전체 core를 재실행하지 않았다.
+- 수정 전 0044 literal 변형은 1 failed/exit 1 (`0045_discovery_machine_cred != 0044_model_registry_binding`), 수정 후 Core 전체는 769 passed / 4 reasoned skips / 0 failed / 0 errors다. Claude 기준선 770 passed/1 failed/4 skipped와 pass 하나 차이는 제거된 legacy project provider fixture 케이스다. Python은 `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6. 최종 SHA provenance와 skip 이유는 History에 기록했다.
 - LegacyProjectCatalogResponse는 `/v1/projects` 외 별도 producer·운영 호환 구성이 검색되지 않아 dead server contract로 판정해 API schema/fixture/test/generated types와 프런트 fallback을 제거했다. 이전 envelope를 허위 프로젝트 메타데이터로 바꾸지 않고 거부하는 DOM 없는 adapter 회귀를 고정했다.
 - `GET /v1/nodes`와 `GET /v1/nodes/{node_id}`는 실제 소비자가 있지만 unmodeled dict다. Node list page와 detail+capability를 한 response-contract slice로 묶는 것을 다음 Codex 작업으로 결정했다. 엄격 response model/fixture/generated type/provider test를 추가하되, 현재 NodeResponse 밖의 telemetry를 합성하지 않고 화면 의미 변경은 Gemini에 남긴다.
-- 상세 근거와 현재 변경/검증 경계: `[[2026-09-21_web_response_contract_map_workspace_Codex]]`. 다음: core boundary 파일 및 docs/contracts 체크를 마치고 이 수정 SHA에서 보고한다; 이어 node list/detail contract slice.
+- 상세 근거와 현재 변경/검증 경계: `[[2026-09-21_web_response_contract_map_workspace_Codex]]`. 다음: 이 candidate를 integration에 fast-forward 반영하고 같은 SHA를 원격 기준에서 다시 확인한다; 이어 node list/detail contract slice.
 
 ## 2026-09-21 ADR-097 issuer quota follow-up
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "API-RESPONSE-CONTRACT-MAP-001"
 title: "Frontend response contract map and workspace slice"
-version: "1.1.14"
+version: "1.1.15"
 status: "review"
 author: "Codex"
 reviewer: "Claude (pending)"
-updated: "2026-09-21T22:01:00+09:00"
+updated: "2026-09-21T22:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -180,5 +180,5 @@ The earlier UI-FB-03 DOM review and mutation check applies to the unchanged `bef
 - **Evidence boundary:** legacy deletion has focused provider and frontend tests; node consumer/producer facts above are source inspection only. No live database, deployed HTTP, browser, or physical node was exercised. Node contract implementation is scheduled, not claimed complete.
 - **Migration head regression:** Claude's fixed-SHA sweep found `tests/core/test_workspace_api_boundary.py::test_integrated_migration_keeps_both_published_histories` still expected `0044_model_registry_binding`. Integration `6dcd09d` adds `0045_discovery_machine_cred`; the migration graph is valid. Claude observed Core 770 passed / 1 failed / 4 skipped; this entry records the focused correction, not a rerun of that full suite.
 - Replaced the literal head with an independent Alembic `ScriptDirectory.get_current_head()` read from this checkout's `alembic.ini`, compared to `tools/migration_graph.py`'s parsed graph. The rollback boundary is derived from current irreversible/merge metadata rather than repeating the old head literal. A synthetic future reversible revision verifies the graph follows a new tip while preserving the rollback boundary.
-- Provenance on the integration-derived `cd2b8b1517bd75848f45e45a2e41c68f88a8ac91` checkout: project interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6. The focused regression passed (1 passed, exit 0); a deliberate stale-literal mutation failed at the head comparison (`0045_discovery_machine_cred != 0044_model_registry_binding`, 1 failed, exit 1); after restoration, `tests/core/test_workspace_api_boundary.py` passed 4 (2 existing deprecation warnings), and the combined boundary/response-contract selection passed 20 (3 warnings). The test also builds a synthetic future revision in memory. No database upgrade or CI execution is claimed. Final SHA/clean-tree provenance is pending.
+- Provenance at clean integration candidate `0340545bdc527fbfcee3edd853cb42cfdf7b6bd4` (branch `agent/codex/terminal-pty-contract`, worktree `C:/Project/SaintVision-Invion/.worktrees/codex-terminal-pty-contract`), KST 22:05:03–22:05:29, executor Codex: project interpreter `C:/Project/SaintVision-Invion/.venv/Scripts/python.exe` 3.14.6; Node v24.17.0; Windows 11; PostgreSQL DSN absent, Docker/Node present, Go absent. Full `tests/core` passed 769, skipped 4, failed 0, errors 0 in 36.70s (2 warnings). One fewer pass than Claude's pre-fix 770 is the removed legacy project provider fixture case; the migration-head regression now passes. The two focused frontend files passed 29. `check_docs.py` (657 versioned documents), `check_ontology.py`, `check_contract_bindings.py` (27 fixtures/11 kernel anchors), Pydantic schema export check (39), API TypeScript contract check (14), and `git diff --check` passed. Obsidian read-only check: 1450 managed / 6 pending / 0 conflicts; no export yet. Core skips were PostgreSQL DSN absent (1), launcher per-worktree Python prerequisite absent (1), and explicit candidate image absent (2); none is counted as a pass. A stale 0044 literal mutation failed (1 failed, exit 1) and was restored. The synthetic future reversible revision followed the new tip in memory. No database upgrade, hosted CI, live HTTP, browser, or physical-node acceptance is claimed. This SHA is a locally verified candidate; push/integration landing follows.
 - No repository-wide automatic map from changed migration/schema files to all semantically affected tests was found. Current control is to run migration-graph, schema-export, contract-binding, and affected boundary suites from the candidate merged tree; a dependency-to-test impact index remains a tooling proposal, not an existing capability.
