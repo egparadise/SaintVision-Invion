@@ -27,6 +27,8 @@ export async function fetchWorkspaceEditView(
     !HEX_64_REGEX.test(result.sha256) ||
     !result.snapshot ||
     result.snapshot.format !== 'workspace-snapshot:1' ||
+    typeof result.snapshot.workspaceId !== 'string' ||
+    !result.snapshot.workspaceId.trim() ||
     !Array.isArray(result.snapshot.files)
   ) {
     throw new Error('WorkspaceEditView 응답 계약 불일치');
@@ -85,7 +87,11 @@ export async function saveWorkspaceEditView(
     !result ||
     result.checkoutId !== checkoutId ||
     typeof result.revision !== 'number' ||
-    !HEX_64_REGEX.test(result.sha256)
+    !HEX_64_REGEX.test(result.sha256) ||
+    !result.snapshot ||
+    result.snapshot.format !== 'workspace-snapshot:1' ||
+    typeof result.snapshot.workspaceId !== 'string' ||
+    !result.snapshot.workspaceId.trim()
   ) {
     throw new Error('WorkspaceEditView 응답 계약 불일치');
   }
@@ -96,17 +102,22 @@ export async function saveWorkspaceEditView(
 export function mapWorkspaceFilesToInvItems(
   editView: WorkspaceEditView
 ): InvFileItem[] {
-  const wsId = editView.snapshot.workspaceId || 'default-workspace';
+  const wsId = editView.snapshot?.workspaceId;
+  if (!wsId || typeof wsId !== 'string' || !wsId.trim()) {
+    throw new Error('WorkspaceSnapshot에 유효한 workspaceId가 누락되었습니다. (조용한 기본값 강등 금지)');
+  }
   return editView.snapshot.files.map((f: WorkspaceSnapshotFile) => {
     let decodedContent: string | undefined;
+    let decodeError: string | undefined;
     try {
       if (typeof globalThis.atob === 'function') {
         decodedContent = globalThis.atob(f.dataBase64);
       } else {
         decodedContent = Buffer.from(f.dataBase64, 'base64').toString('utf8');
       }
-    } catch {
-      decodedContent = f.dataBase64;
+    } catch (err: any) {
+      decodedContent = undefined;
+      decodeError = `Base64 디코딩 실패: ${err?.message || '인코딩 손상 또는 바이너리 데이터'}. 원본 바이트를 텍스트로 해석할 수 없습니다.`;
     }
 
     return {
@@ -126,6 +137,7 @@ export function mapWorkspaceFilesToInvItems(
       updatedAt: new Date().toISOString(),
       content: decodedContent,
       source: 'kernel-checkout',
+      decodeError,
     };
   });
 }

@@ -155,6 +155,7 @@ export interface InvFileItem {
   updatedAt: string;
   content?: string | Uint8Array;
   source?: 'kernel-checkout' | 'demo' | 'user';
+  decodeError?: string;
 }
 
 export interface InvDriveSummary {

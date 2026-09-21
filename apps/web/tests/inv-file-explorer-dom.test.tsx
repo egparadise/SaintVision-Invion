@@ -961,4 +961,55 @@ describe('VF-GM-03: inv:// File Explorer DOM Harness & Defensive Guarantees', ()
     expect(container.querySelector('[data-testid="integrity-status-verified"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="calculated-hash"]')?.textContent).toBe(canonicalHash);
   });
+
+  it('[VF-GM-03-DECODE-ERROR-GUARD] proves base64 decode error renders alert banner and blocks verification as error', async () => {
+    const brokenFile = wsEditApi.mapWorkspaceFilesToInvItems({
+      checkoutId: '55555555-5555-4555-8555-555555555555',
+      revision: 1,
+      sha256: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      snapshot: {
+        format: 'workspace-snapshot:1',
+        workspaceId: 'wsp_0123456789ABCDEFGHJKMNPQRS',
+        directories: ['src'],
+        files: [
+          {
+            path: 'src/corrupted.bin',
+            executable: false,
+            sha256: '1111111111111111111111111111111111111111111111111111111111111111',
+            sizeBytes: 100,
+            dataBase64: '!!!illegal-non-base64-character-sequence!!!',
+          },
+        ],
+      },
+    })[0];
+
+    await act(async () => {
+      root.render(
+        <InvFileExplorer
+          initialFiles={[brokenFile]}
+          clusterNodes={clusterNodesFixture}
+          initialNamespace="workspaces"
+        />
+      );
+    });
+
+    // 1. Decode error banner is displayed with role="alert"
+    const decodeBanner = container.querySelector('[data-testid="file-decode-error-banner"]');
+    expect(decodeBanner).not.toBeNull();
+    expect(decodeBanner?.getAttribute('role')).toBe('alert');
+    expect(decodeBanner?.textContent).toContain('파일 본문 디코딩 실패 (Base64 손상 또는 미지원 형식)');
+    expect(decodeBanner?.textContent).toContain('사용자 조치 필요');
+
+    // 2. Click verify button -> strictly blocks and transitions to error (NEVER verified, NEVER calculating fake hash)
+    const verifyBtn = container.querySelector<HTMLButtonElement>('[data-testid="verify-integrity-btn"]');
+    await act(async () => {
+      verifyBtn!.click();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    expect(container.querySelector('[data-testid="integrity-badge"]')?.textContent).toContain('검증 오류 (ERROR)');
+    const errorBanner = container.querySelector('[data-testid="integrity-action-error"]');
+    expect(errorBanner).not.toBeNull();
+    expect(errorBanner?.textContent).toContain('본문 Base64 디코딩 실패로 무결성을 검증할 수 없습니다');
+  });
 });

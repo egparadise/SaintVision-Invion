@@ -191,6 +191,18 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
     }));
 
     try {
+      // Decode failure blocks verification: cannot verify un-decoded base64 bytes as file content
+      if (selectedFile.decodeError) {
+        setIntegrityState({
+          status: 'error',
+          expectedHash: selectedFile.contentHash,
+          calculatedHash: null,
+          lastVerifiedAt: null,
+          integrityError: `본문 Base64 디코딩 실패로 무결성을 검증할 수 없습니다: ${selectedFile.decodeError}`,
+        });
+        return;
+      }
+
       // Missing expected checksum is strictly UNVERIFIED, never VERIFIED
       if (!selectedFile.contentHash || selectedFile.contentHash.trim() === '') {
         setIntegrityState({
@@ -641,6 +653,33 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
                 {selectedFile.isPinned ? '📌 고정(Pinned - GC 면제)' : '임시 저장'}
               </div>
             </div>
+
+            {/* Decode Error Warning Banner */}
+            {selectedFile.decodeError && (
+              <div
+                role="alert"
+                data-testid="file-decode-error-banner"
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.75rem',
+                  lineHeight: '1.5',
+                }}
+              >
+                <div>
+                  <strong>⚠️ 파일 본문 디코딩 실패 (Base64 손상 또는 미지원 형식)</strong>
+                </div>
+                <div style={{ marginTop: '4px', color: '#fecaca' }}>
+                  {selectedFile.decodeError}
+                </div>
+                <div style={{ marginTop: '6px', fontSize: '0.6875rem', color: '#fed7aa' }}>
+                  👉 <strong>[사용자 조치 필요]</strong>: 원본 데이터가 손상되었거나 텍스트 디코딩이 불가능한 바이너리 파일입니다. 체크아웃을 다시 시도하거나 원본 바이너리 다운로드 경로를 사용하십시오.
+                </div>
+              </div>
+            )}
 
             {/* Integrity Verification Card (Requirement 1 & 2) */}
             <div

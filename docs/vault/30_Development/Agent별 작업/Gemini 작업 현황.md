@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.93"
+version: "1.0.94"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T03:42:00+09:00"
+updated: "2026-09-22T03:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,32 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T03:42:00+09:00.
+- 확인 기준: 2026-09-22T03:58:00+09:00.
+
+## 세션 랩업: workspaceEditObservation 조용한 강등 차단 및 Google Chrome 153 실측 완결
+
+- **`workspaceId` 빈 값 살아있는 강등 차단 (`workspaceEditObservation.ts`)**:
+  - 사전 확인: `core.schema.json`에는 `workspaceId`가 필수 규격(`^wsp_[0-9A-HJKMNP-TV-Z]{26}$`)이나, 기존 프런트엔드 수동 가드에서 누락되어 있어 실제 런타임에서 빈 값이 들어와도 통과하여 `'default-workspace'`로 채워지던 살아 있는 강등(Silent Fallback)이었음을 규명.
+  - 조치: `fetchWorkspaceEditView` 및 `saveWorkspaceEditView`에 `typeof result.snapshot.workspaceId !== 'string' || !result.snapshot.workspaceId.trim()` 검증 가드를 추가하여 즉시 throw 처리하고, `mapWorkspaceFilesToInvItems`에서 `|| 'default-workspace'` 강등 기본값을 영구 제거.
+- **Base64 디코딩 실패 시 정직한 에러 처리 (`InvFileExplorer.tsx`, `virtualFabric.ts`)**:
+  - 디코딩 실패 시 `catch { decodedContent = f.dataBase64; }`로 원본 인코딩 문자열을 내용인 양 둔갑시키던 결함을 제거하고, `decodedContent = undefined`, `decodeError`를 명시.
+  - UI 상에 `role="alert"`, `data-testid="file-decode-error-banner"` 경고 및 `👉 [사용자 조치 필요]` 배너 표출.
+  - 무결성 검증 클릭 시 `if (selectedFile.decodeError)` 조건으로 즉시 차단하여 `status: 'error'` fail-closed 방어.
+- **돌연변이 사살 (Mutation Testing)**:
+  - `default-workspace` 복원 돌연변이: 1 failed로 사살(KILLED) 실측 후 원복.
+  - 원본 base64 둔갑 복원 돌연변이: 2 failed로 사살(KILLED) 실측 후 원복.
+- **Google Chrome 153 (Blink 엔진) 실측 수용 완결**:
+  - `scratch/verify_workspace_edit_observation_chrome.py` 구동:
+    1. 정상 파일(`main.py`): 파일 URI가 `inv://workspaces/wsp_0123456789ABCDEFGHJKMNPQRS/src/main.py`로 렌더링되며 `default-workspace` 부재 확인. 무결성 검증 클릭 시 `검증 통과 (VERIFIED)` 실측.
+    2. 손상 파일(`corrupted-binary.bin`): `role="alert"` 디코딩 오류 배너 표출 확인 및 무결성 검증 클릭 시 `검증 오류 (ERROR)` fail-closed 차단 확인.
+    3. 안전한 실측 스크린샷(`scratch/real_chrome_workspace_edit_observation.png`) 및 JSON 결과(`scratch/chrome_workspace_edit_observation_acceptance_result.json`, exit code 0) 확보.
+- **게이트 통과**:
+  - Vitest **73개 파일 646/646 passed 100%** (순증 +4 passed).
+  - `check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `check_contract_bindings.py`: 39 fixtures / 12 serving anchors PASS.
+  - `check_docs.py`: 24 hashes, 712 versioned documents PASS.
+- 보고서: [[2026-09-22_workspace_edit_observation_조용한강등차단_Chrome153_Gemini]].
+
 
 ## 세션 랩업: 산출물 다운로드 전송 검증 문구 좁힘 & 노드 lost/unknown 조용한 합류 둔갑 차단 및 Chrome 153 실측 완결
 

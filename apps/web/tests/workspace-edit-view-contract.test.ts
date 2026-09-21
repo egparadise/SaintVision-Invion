@@ -80,5 +80,55 @@ describe('WorkspaceEditView contract fixture and workspaceEditObservation consum
     expect(item.content).toBe("print('hello')\n");
     expect(item.namespace).toBe('workspaces');
     expect(item.replicas).toEqual([]);
+    expect(item.uri).toBe('inv://workspaces/wsp_0123456789ABCDEFGHJKMNPQRS/src/main.py');
+    expect(item.decodeError).toBeUndefined();
+  });
+
+  it('fetchWorkspaceEditView throws when snapshot workspaceId is missing or empty', async () => {
+    const fixture = readFixture('workspace-edit-view-response.json');
+    delete fixture.snapshot.workspaceId;
+    api.mockResolvedValue(fixture);
+
+    await expect(
+      fetchWorkspaceEditView('prj_01', 'run_01', fixture.checkoutId)
+    ).rejects.toThrow('WorkspaceEditView 응답 계약 불일치');
+  });
+
+  it('mapWorkspaceFilesToInvItems strictly throws when workspaceId is missing (no silent default-workspace fallback)', () => {
+    const fixture = readFixture('workspace-edit-view-response.json');
+    const corrupted = {
+      ...fixture,
+      snapshot: {
+        ...fixture.snapshot,
+        workspaceId: '',
+      },
+    };
+
+    expect(() => mapWorkspaceFilesToInvItems(corrupted as any)).toThrow(
+      'WorkspaceSnapshot에 유효한 workspaceId가 누락되었습니다'
+    );
+  });
+
+  it('mapWorkspaceFilesToInvItems handles base64 decode failure honestly (sets content=undefined and records decodeError)', () => {
+    const fixture = readFixture('workspace-edit-view-response.json');
+    const corrupted = {
+      ...fixture,
+      snapshot: {
+        ...fixture.snapshot,
+        files: [
+          {
+            ...fixture.snapshot.files[0],
+            dataBase64: '!!!broken-base64-not-decodable!!!',
+          },
+        ],
+      },
+    };
+
+    const items = mapWorkspaceFilesToInvItems(corrupted as any);
+    expect(items).toHaveLength(1);
+    const item = items[0];
+    expect(item.content).toBeUndefined();
+    expect(item.decodeError).toBeDefined();
+    expect(item.decodeError).toContain('Base64 디코딩 실패');
   });
 });
