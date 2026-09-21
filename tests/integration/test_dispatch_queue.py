@@ -59,7 +59,8 @@ def test_claim_and_permit_commit_together_and_never_return_transient_permission(
     a = gateway
     result = queued(a)
     assert not result.may_start and result.launch is None
-    with pytest.raises(DomainError):
+    # Sealing a permit with no granted tools is refused as NODE-0001 (confirmed vs real PG, ZZPROBE).
+    with pytest.raises(DomainError, match="NODE-0001"):
         seal_permit(result, [], a.key)
     assert count(a, "tool_claims") == count(a, "execution_deliveries") == 1
     assert row(a)["phase"] == "queued"

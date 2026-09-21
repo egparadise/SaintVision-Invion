@@ -629,7 +629,11 @@ def test_current_authority_expiry_and_global_gate_invalidate_approved_control(op
         data["approvalId"] = str(expired)
     with pytest.raises(DomainError) as caught:
         a.ops.change(a.people["requester"], "drain", data, "apply-drain", a.e.node)
-    assert caught.value.code in {"AUTH-0062", "AUTH-0063"}
+    # Per-case (confirmed vs real PG, ZZPROBE): a changed voter/requester authority is AUTH-0062, a
+    # lapsed approval expiry or a raised global gate is AUTH-0063 -- tightened from a 2-code set so a
+    # voter refusal can no longer pass as a gate refusal or vice versa.
+    assert caught.value.code == {"voter": "AUTH-0062", "requester": "AUTH-0062",
+                                 "expiry": "AUTH-0063", "gate": "AUTH-0063"}[invalidated]
     if invalidated == "expiry":
         assert "expired" in caught.value.detail
     with a.e.db.transaction(a.e.tenant) as conn:

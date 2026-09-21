@@ -228,7 +228,8 @@ def test_per_run_event_order_blocks_late_commit_and_never_exposes_payload(api):
     ]
     assert "secret" not in json.dumps(page)
     assert a.control.events(p, a.e.project, a.run["runId"], page[-1]["id"]) == []
-    with pytest.raises(DomainError):
+    # A cross-run event cursor is refused as STREAM-0001 (confirmed vs real PG, ZZPROBE).
+    with pytest.raises(DomainError, match="STREAM-0001"):
         a.control.events(
             p, a.e.project, a.run["runId"], a.e.epoch + ":" + new_id("run") + ":1"
         )

@@ -36,7 +36,8 @@ def test_revalidation_retains_lifecycle_lock_until_caller_commit(registered):
         other.execute("UPDATE public.model_versions SET stage='retired' WHERE model_version_id=%s",
                       (a.registry_version,))
     with a.e.db.transaction(a.e.tenant) as c:
-        with pytest.raises(DomainError):
+        # Revalidating a retired registry version is refused as MODEL-0001 (real PG, ZZPROBE).
+        with pytest.raises(DomainError, match="MODEL-0001"):
             recheck(a, c)
 
 

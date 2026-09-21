@@ -150,23 +150,26 @@ def test_request_replay_and_scope_are_immutable(approval):
 
 
 @pytest.mark.parametrize(
-    "change",
+    # Per-case refusal codes confirmed vs real PG (ZZPROBE): a weakened policy shape is AUTH-0013,
+    # a foreign subject / rewritten action digest is AUTH-0011, and a moved expiry is AUTH-0031. A
+    # bare raises let a policy-shape rejection pass as an authorization one and vice versa.
+    "change,expected",
     [
-        {"riskLevel": "L3"},
-        {"riskLevel": "L2", "requiredApprovals": 1},
-        {"effect": "allow"},
-        {"effect": "deny"},
-        {"approvedBy": ["alice", "bob"]},
-        {"subjectId": "outsider"},
-        {"actionDigest": "b" * 64},
-        {"expiresAt": (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()},
-        {"expiresAt": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()},
+        ({"riskLevel": "L3"}, "AUTH-0013"),
+        ({"riskLevel": "L2", "requiredApprovals": 1}, "AUTH-0013"),
+        ({"effect": "allow"}, "AUTH-0013"),
+        ({"effect": "deny"}, "AUTH-0013"),
+        ({"approvedBy": ["alice", "bob"]}, "AUTH-0013"),
+        ({"subjectId": "outsider"}, "AUTH-0011"),
+        ({"actionDigest": "b" * 64}, "AUTH-0011"),
+        ({"expiresAt": (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()}, "AUTH-0031"),
+        ({"expiresAt": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()}, "AUTH-0031"),
     ],
 )
-def test_untrusted_or_weakened_policy_cannot_create_approval(approval, change):
+def test_untrusted_or_weakened_policy_cannot_create_approval(approval, change, expected):
     a = approval
     a.policy.update(change)
-    with pytest.raises(DomainError):
+    with pytest.raises(DomainError, match=expected):
         request(a)
     assert count(a, "approval_requests") == 0
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "planned"
@@ -179,11 +182,13 @@ def test_quorum_and_direct_state_bypass_are_blocked(approval):
         challenge(a, row, "requester")
     with pytest.raises(DomainError, match="AUTH-0030"):
         challenge(a, row, "outsider")
-    with pytest.raises(DomainError):
+    # Dispatch before quorum is refused as AUTH-0031 (confirmed vs real PG, ZZPROBE).
+    with pytest.raises(DomainError, match="AUTH-0031"):
         dispatch(a, row)
     row = decide(a, row, "alice", challenge(a, row))
     assert row["status"] == "pending"
-    with pytest.raises(DomainError):
+    # Dispatch with only one of the required approvals is still refused as AUTH-0031 (real PG, ZZPROBE).
+    with pytest.raises(DomainError, match="AUTH-0031"):
         dispatch(a, row)
     with pytest.raises(psycopg.errors.CheckViolation):
         a.e.runs.transition(
@@ -401,7 +406,8 @@ def test_rejection_is_terminal_and_audited(approval):
     assert result["status"] == "rejected"
     assert decide(a, row, "alice", nonce, decision="reject") == result
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "failed"
-    with pytest.raises(DomainError):
+    # Dispatching a rejected (terminal) approval is refused as AUTH-0031 (real PG, ZZPROBE).
+    with pytest.raises(DomainError, match="AUTH-0031"):
         dispatch(a, row)
     assert count(a, "approval_audit") == 2
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
@@ -428,8 +434,8 @@ def test_expiry_closes_pending_or_approved_run_once(approval, has_quorum):
     assert a.e.runs.get(a.e.tenant, a.run["runId"])["state"] == "failed"
 
 
-@pytest.mark.parametrize("change", ["cancel", "epoch"])
-def test_cancelled_run_or_restored_epoch_invalidates_approval(approval, change):
+@pytest.mark.parametrize("change,expected", [("cancel", "AUTH-0032"), ("epoch", "LEASE-0004")])
+def test_cancelled_run_or_restored_epoch_invalidates_approval(approval, change, expected):
     a = approval
     row = approved(a)
     if change == "cancel":
@@ -439,7 +445,8 @@ def test_cancelled_run_or_restored_epoch_invalidates_approval(approval, change):
     else:
         with psycopg.connect(a.e.owner) as conn:
             conn.execute("UPDATE inv.control_epoch SET epoch=%s", (uuid4(),))
-    with pytest.raises(DomainError):
+    # A cancelled run refuses dispatch as AUTH-0032; a restored epoch as LEASE-0004 (real PG, ZZPROBE).
+    with pytest.raises(DomainError, match=expected):
         dispatch(a, row)
     with psycopg.connect(a.e.owner) as conn:
         assert (

@@ -24,5 +24,6 @@ def test_new_observation_pilot_is_contained_without_changing_other_tenants(env):
         assert conn.execute('SELECT count(*) FROM inv.project_grants WHERE tenant_id=%s',(state['tenantId'],)).fetchone()[0] == 0
         assert conn.execute('SELECT count(*) FROM inv.resources WHERE tenant_id=%s',(state['tenantId'],)).fetchone()[0] == 0
     with env.db.transaction(state['tenantId']) as conn:
-        with pytest.raises(DomainError):
+        # A contained pilot tenant is refused execution as AUTH-0061 (real PG, ZZPROBE).
+        with pytest.raises(DomainError, match="AUTH-0061"):
             require_execution(conn)

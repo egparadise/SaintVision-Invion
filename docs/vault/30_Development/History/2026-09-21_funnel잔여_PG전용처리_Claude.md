@@ -1,7 +1,7 @@
 ---
 doc_id: "FUNNEL-REMAINDER-PG-ONLY-CLAUDE-001"
 title: "파라미터 funnel 잔여 — PG 전용 항목 처리(ZZPROBE 실측). Linux 필요 항목 분리·인계"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
@@ -105,6 +105,28 @@ binding·runtime에 이어 PG-only 계열 2파일을 더 처리했다. 이번엔
 **판정(양방향 돌연변이, 실측)**: grant 기대코드를 `AUTH-0030→ZZ-9999`로 바꾸니 **grant case만 실패(1 failed, 7 passed)**; membership을 `RES-0003→ZZ-9999`로 바꾸니 **membership만 실패(1 failed, 8 passed)**. 전부/아무것도 아니므로 case별로 매칭이 작동함을 확증. 원복 후 43 passed. `.venv`, 파이프 없이 exit, Docker baseline 48/79/11 복원, 보호 컨테이너 미접촉.
 
 **남은 PG-only funnel**(같은 방법, 다음): test_control_api·test_approvals·test_containment·test_dispatch_queue·test_model_registry_revalidation·test_lan_bootstrap 등.
+
+## v1.3.0 — 남은 6파일 (혼합/단일/defer 구분, 실측). 새 축 기록
+control_api·approvals·containment·dispatch_queue·registry_revalidation·lan_bootstrap을 한 PG 세션(`svcx01-funnel4`)에서 ZZPROBE했다. **없는 혼합을 만들지 않도록** case별 실측으로 혼합/단일을 갈랐다.
+
+**혼합(per-case 적용):**
+| 위치 | case → 코드 | 방식 |
+|---|---|---|
+| approvals `test_untrusted_or_weakened_policy`[9 change] | riskLevel/effect/approvedBy(5) → **AUTH-0013**, subjectId/actionDigest(2) → **AUTH-0011**, expiresAt past/future(2) → **AUTH-0031** | parametrize `(change,expected)` 쌍 |
+| approvals `test_cancelled_run_or_restored_epoch`[cancel/epoch] | cancel → **AUTH-0032**, epoch → **LEASE-0004** | parametrize `(change,expected)` 쌍 |
+| containment `test_current_authority_expiry_and_global_gate`[voter/requester/expiry/gate] | voter/requester → **AUTH-0062**, expiry/gate → **AUTH-0063** | 기존 `caught.value.code in {2-set}` 를 per-case `==`로 조임 |
+
+**단일(실측 확인, uniform):** control_api STREAM-0001 · approvals dispatch 3곳(quorum-전 L182, 부분quorum L186, reject-후 L404) 모두 AUTH-0031 · dispatch_queue NODE-0001 · registry_revalidation MODEL-0001 · lan_bootstrap AUTH-0061. (억지로 쪼개지 않고 단일로 둠.)
+
+**defer(PG-only 아님):** containment `test_control_between_start_reservation`[kill/drain](L399)은 실측상 **SKIP** — "Real Linux Docker runtime explicitly enabled only in isolated CI"(node runtime). 측정 불가라 **추측 없이 bare 유지**, node-runtime 환경에서 처리. (그 파일 L630은 PG로 돎 = 파일 내 혼재.)
+
+**비공허 이미 확보 note:** containment L630의 `raises(DomainError) as caught`는 match= 없으나 **뒤의 per-case `assert caught.value.code == …[invalidated]`**가 코드를 검사 → 공허 아님. bare 잔여 2(L399 defer + L630 assert-검사)는 이 둘.
+
+**검증:** 6파일 `py_compile` OK, 실 PG — control_api 7·approvals 25·containment 20(+8 node-skip)·dispatch_queue 13·revalidation 7·lan_bootstrap 1 passed.
+
+**돌연변이 표본(2, 선택 근거 명시)**: 이번에 도입한 **두 스타일에서 하나씩** 골랐다 — ① parametrize 쌍(approvals L169, 다case): `subjectId:outsider`의 AUTH-0011→ZZ-9999 → **[change5]만 실패(1/8)**; ② per-case assert(containment L630): voter AUTH-0062→ZZ-9999 → **[voter]만 실패(1/3)**. 전부/아무것도 아니므로 두 스타일 다 case별 작동 확증. (6파일 전 case를 돌연변이하지 않고 스타일별 표본 — 이 확증은 "두 매핑 스타일이 case별로 무게를 진다"에 대한 것.)
+
+**새 축(사용자 지시로 기록)**: 오늘 축이 "초록≠도달"·"배선≠통과"였는데, 이 funnel 계열이 세 번째를 더한다 — **"통과했는데 다른 이유로 통과함"**. bare `raises(DomainError)`가 인가·리스·멤버십·모델 거부를 뭉개면 한 원인의 회귀가 **다른 원인으로 위장해 성공(초록)**한다. 실패가 아니라 성공으로 위장하므로 특히 고약하다 — per-case match/assert가 이를 닫는다.
 
 ## 인계
 tests/는 Claude 소유라 직접 처리. reviewer: Codex — 특히 binding L87 per-case 분할의 코드 매핑(AUTH-0030 vs MODEL-0001)이 소스와 정합하는지, 남은 PG-only funnel을 같은 방법으로 이어갈지 경계 검토. apps/web 미접촉.
