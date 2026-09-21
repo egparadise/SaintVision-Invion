@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.69"
+version: "1.0.70"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T21:05:00+09:00"
+updated: "2026-09-21T21:48:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,6 +22,18 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-21T21:05:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 차단·미검증·미노출 상태의 3대 해결경로 분류정합 완결 (`ResourceExplorer.tsx`, `InvFileExplorer.tsx`, `ModelStudioView.tsx`, `ModelLineageView.tsx`, `WebTerminal.tsx`, `TerminalSessionView.tsx`, `App.tsx`, `PlacementSimulator.tsx`, `resource-explorer-dom.test.tsx`)**:
+  - **전체 화면 차단 요소 대상 3대 해결경로(Resolution Pathways Tri-Classification) 전수 분류 및 안내 정합**:
+    - **① [사용자 조치 필요]**: 로그인/테넌트 선택(`discovery-tenant-required-notice`), 탐색기/워크스페이스 선택(`storage-observation-context-warning`, `checkout-context-warning`, `terminal-no-workspace-notice`), 승인 ID 입력(`plan-run-id-user-action-notice`, `approval-input-user-action-notice`, `terminal-command-required-notice`), 슬라이더 조정(`preview-empty-state`), 유효 체크아웃 로드.
+    - **② [운영자 조치 필요]**: 노드 온보딩/등록 요청(`storage-no-nodes-notice`, `no-surviving-nodes-notice`, `terminal-empty-nodes-notice`, `candidates-empty-state`), 운영자 자격증명 발급(`discovery-empty-state`, 런북 `docs/vault/20_Operations/노드 운영 런북.md`의 `saint operator issue-grant` 연계), 리스 연장 및 실행 승인(`AUTH-0070`). 존재하지 않는 UI 셀프서비스 버튼 생성 금지 원칙 준수.
+    - **③ [제품 기능 미제공]**: 온디맨드 복제본 수복 API(`InvFileExplorer.tsx`), 분산 샤드 온디맨드 복구 API(`ModelStudioView.tsx`), 원격 HTTP 모델 검증 라우트(`model-verification-notice`), 모델 계보/평가 HTTP 서빙 라우트(`lineage-unexposed-notice`). "현재 제품 사양에 미제공 (백엔드 API 부재)"임을 명확히 못 박고 일시적 장애/재시도 유도 금지.
+  - **DOM 단위 테스트 검증 및 전체 테스트 스위트 100% 통과**:
+    - `resource-explorer-dom.test.tsx` 내 `[사용자 조치 필요]` 및 `[운영자 조치 필요]` 단언 추가.
+    - Vitest 56개 파일 **527/527 passed 100%**, Vite 프로덕션 빌드 exit 0 (5.30s, 96 modules).
+    - `check_frontend_integrity.py` 80개 파일 0 violations (PASS), 음성 대조(`--test-negative`) PASS.
+    - `check_contract_bindings.py`, `check_docs.py`, `check_ontology.py` 전수 PASS.
+  - 보고서: [[2026-09-21_화면_차단상태_3대해결경로_분류정합_Gemini]].
 
 - **디스커버리 3대 빈 상태 분리, 운영자 자격 규칙 고지 및 DOM 돌연변이 실측 사살 완결 (`ResourceExplorer.tsx`, `resource-explorer-dom.test.tsx`)**:
   - **디스커버리 3대 빈 상태 엄격 분리 (Empty-State Tri-Partition)**:

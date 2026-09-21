@@ -1035,6 +1035,14 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             >
               {nodes.length > 0 ? '기여 등록 제출' : '등록 가능 노드 없음 (제출 차단)'}
             </button>
+            {nodes.length === 0 && (
+              <div
+                data-testid="storage-no-nodes-notice"
+                style={{ marginTop: '8px', fontSize: '0.75rem', color: '#f87171' }}
+              >
+                🛠️ <strong>[운영자 조치 필요]</strong>: 클러스터에 등록된 온라인 노드가 없습니다. 인프라 운영자에게 신규 노드 편입(Node 온보딩)을 요청하십시오.
+              </div>
+            )}
           </div>
 
           {/* Contributions List */}
@@ -1216,9 +1224,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
             {(!projectId?.trim() || !runId?.trim()) && (
               <div
                 data-testid="storage-observation-context-warning"
-                style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px' }}
+                style={{ fontSize: '0.6875rem', color: '#fbbf24', marginBottom: '8px', lineHeight: '1.4' }}
               >
-                ⚠️ 활성 프로젝트/실행(Run) 컨텍스트가 없어 스토리지 샘플 조회가 비활성화되었습니다 (근거 없는 호출 방지).
+                <div>⚠️ 활성 프로젝트/실행(Run) 컨텍스트가 없어 스토리지 샘플 조회가 비활성화되었습니다 (근거 없는 호출 방지).</div>
+                <div style={{ marginTop: '2px', color: '#fed7aa' }}>
+                  👉 <strong>[사용자 조치 필요]</strong>: 상단 탐색기 또는 작업 공간(Workspace)에서 프로젝트 및 실행(Run)을 선택하여 컨텍스트를 활성화하십시오.
+                </div>
               </div>
             )}
 
@@ -1560,6 +1571,15 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 {planRunId.trim() ? '계획 확정 및 샤드 할당' : '승인 Run ID 필요 (생성 불가)'}
               </button>
 
+              {!planRunId.trim() && (
+                <div
+                  data-testid="plan-run-id-user-action-notice"
+                  style={{ marginTop: '6px', fontSize: '0.6875rem', color: '#fed7aa' }}
+                >
+                  👉 <strong>[사용자 조치 필요]</strong>: 승인된 분산 실행 Run ID(예: run_...)를 입력창에 입력하면 배치 계획 생성이 활성화됩니다.
+                </div>
+              )}
+
               {planResult && (
                 <div style={{ marginTop: '10px', fontSize: '0.75rem' }}>
                   <div style={{ fontWeight: 600, color: '#c084fc' }}>생성된 계획: {planResult.planId}</div>
@@ -1695,9 +1715,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   border: '1px solid #ef4444',
                   color: '#fca5a5',
                   fontSize: '0.75rem',
+                  lineHeight: '1.4',
                 }}
               >
-                ⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송 전송이 비활성화되었습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)
+                <div>⚠️ [테넌트 격리 차단]: 인증된 세션 테넌트 식별자(tenantId)가 없어 안내 방송 전송이 비활성화되었습니다. (위조 테넌트 합성 및 후보 한도 소진 방지)</div>
+                <div style={{ marginTop: '4px', fontSize: '0.6875rem', color: '#fed7aa' }}>
+                  👉 <strong>[사용자 조치 필요]</strong>: 상단 프로필/인증 설정에서 테넌트가 할당된 계정으로 로그인하거나 활성 테넌트를 선택하면 안내 방송 전송이 활성화됩니다.
+                </div>
               </div>
             )}
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -1810,16 +1834,19 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   border: '1px dashed #334155',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px',
+                  gap: '10px',
                   textAlign: 'center',
                 }}
               >
                 <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#94a3b8' }}>
                   ℹ️ 승인 대기 중인 디스커버리 후보가 없습니다. (0 Candidates Pending)
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', maxWidth: '640px', margin: '0 auto' }}>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', maxWidth: '680px', margin: '0 auto' }}>
                   <strong>후보 목록이 비어 있는 이유 (시스템 아키텍처 규칙):</strong><br />
                   테넌트 격리 및 무단 노드 오염 방지 정책에 따라, 운영자 CLI(<code>saint operator issue-grant</code>)를 통해 일회용 자격증명을 부여받은 노드만 디스커버리 안내 방송이 승인되어 목록에 나타납니다.
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#93c5fd', backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '6px 12px', borderRadius: '4px', maxWidth: '680px', margin: '0 auto' }}>
+                  🛠️ <strong>[운영자 조치 필요]</strong>: 일반 사용자는 노드 자격증명을 직접 발급할 수 없습니다. 클러스터 인프라 운영자에게 머신 등록을 요청하십시오 (운영자 절차: Node 운영 런북 <code>docs/vault/20_Operations/노드 운영 런북.md</code>의 <code>saint operator issue-grant</code> 발급 절차 참조). 자격증명이 주입된 노드가 부트스트랩되면 목록에 자동 표출됩니다.
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: '#64748b' }}>
                   신규 머신 부트스트랩 및 안내 방송 수신 대기 중 · 상단 '새로고침' 버튼으로 갱신 가능
