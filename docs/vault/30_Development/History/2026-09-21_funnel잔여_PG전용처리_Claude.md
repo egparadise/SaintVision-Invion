@@ -1,11 +1,11 @@
 ---
 doc_id: "FUNNEL-REMAINDER-PG-ONLY-CLAUDE-001"
 title: "파라미터 funnel 잔여 — PG 전용 항목 처리(ZZPROBE 실측). Linux 필요 항목 분리·인계"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-21T15:10:00+09:00"
+updated: "2026-09-21T16:00:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["verification-boundary", "funnel", "pytest-raises-match", "real-pg", "zzprobe", "mutation-testing"]
@@ -66,6 +66,13 @@ executor:            Claude  (검토자는 다른 사람이라야 독립 검증 
 이번 세션은 rigor를 위해 **binding·runtime 2파일로 한정**했다. 같은 PG-only 계열의 다른 bare `DomainError`/`ValueError` funnel(예: `test_model_commit.py`·`test_model_locality.py`·`test_model_registry_revalidation.py`·`test_provisioning_integrity.py`·`test_control_api.py`·`test_approvals.py`·`test_containment.py` 등)이 남아 있고, **동일 ZZPROBE 방법으로 처리 가능**하다(전부 실 PG로 실행됨을 위에서 확인). 특정 psycopg 예외 타입(`CheckViolation`/`InsufficientPrivilege`/`UniqueViolation`/`LockNotAvailable`)의 raises는 이미 좁아 funnel 아님 — 제외. `test_model_execution_registry.py`의 exit 4는 별도 조사(수집/usage 오류) 필요.
 
 **남기는 것(Linux 필요)**: node-agent(Go race/concurrency), 컨테이너/네임스페이스 격리, playwright browser, `linux_file` 계열 — 이들은 PG가 아니라 Linux 실행 환경이 선행조건이다. 다음 사람이 격리 Linux를 준비할 때 이 목록이 대상이다.
+
+## v1.1.0 정정 — `test_model_execution_registry.py` exit 4의 정체 (조사 완료)
+v1.0.0에서 "exit 4 = 수집/usage 오류, 별도 조사 필요, Linux 아님으로 보이나 실행 안 됨"으로 남겼다. **조사 결과: category 미확정이 아니라 내 배치 루프의 경로 오기였다.** 파일은 `tests/integration/`가 아니라 **`tests/core/test_model_execution_registry.py`**에 있고, 내가 `tests/integration/$f.py`로 돌려 pytest가 `ERROR: file or directory not found` → **exit 4**(usage error)를 냈다. "실행되지 않은 것을 어느 범주에 넣을지는 왜 실행되지 않았는지부터 알아야 한다"는 원칙 그대로 — 원인은 파일 부재(잘못된 경로)였다.
+
+실제 파일은 **PG 불필요**(postgres 마커·psycopg 없음, core 테스트). provenance 래핑 모드로 실행해 확인: `env_gates postgres_dsn=absent / as-of at check invocation`, **7 passed exit 0**. parametrized 5-case(`missing→MODEL-0008`, 그 외→`MODEL-0001`)는 이미 per-case match가 있었고, **bare funnel은 L48 하나**(`test_registered_input_does_not_survive_missing_operator_policy`)뿐이었다. ZZPROBE로 실제 코드 `MODEL-0008: Configured policy and exact registry binding required` 확정 → `match="MODEL-0008"` 적용, 재실행 7 passed. bare raises 잔여 0.
+
+**분류 정정**: 이 항목은 "미확정/조사 필요"가 아니라 **PG-free core, 처리 완료**다. Linux 필요 아님. (실행 시점 환경이 보고에 자동 기록됨 — 오늘 고친 wrap 모드의 첫 실사용.)
 
 ## 인계
 tests/는 Claude 소유라 직접 처리. reviewer: Codex — 특히 binding L87 per-case 분할의 코드 매핑(AUTH-0030 vs MODEL-0001)이 소스와 정합하는지, 남은 PG-only funnel을 같은 방법으로 이어갈지 경계 검토. apps/web 미접촉.

@@ -45,7 +45,9 @@ def test_frozen_registry_cannot_drop_or_change_binding(monkeypatch,mode):
 
 
 def test_registered_input_does_not_survive_missing_operator_policy():
-    with pytest.raises(DomainError):
+    # A missing operator registry-binding policy is refused via MODEL-0008 (confirmed by running,
+    # ZZPROBE); pinned so this cannot be satisfied by an unrelated DomainError.
+    with pytest.raises(DomainError, match="MODEL-0008"):
         current_registry(None,SimpleNamespace(),None,None,'v'*30)
 
 
