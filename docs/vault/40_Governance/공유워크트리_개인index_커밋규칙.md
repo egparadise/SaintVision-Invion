@@ -1,7 +1,7 @@
 ---
 doc_id: "GOV-SHARED-WORKTREE-INDEX-001"
 title: "공유 worktree 다중 에이전트 커밋 규칙 — 개인 index + rev-range 검증 (셋 다 준수)"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
@@ -65,6 +65,14 @@ diff <(git show origin/<branch>:<path>) <path>   # 동일해야; 중간본이 �
 ### R5. 남의 파일을 고쳐야 할 때 (소유 흐려짐 방지) — 오늘 세 번째 유입의 변형
 검사를 통과시키려 **다른 에이전트 소관 파일**을 고쳐야 할 때가 있다(예: Gemini가 Claude 문서의 `updated:` 누락을 보완해야 check_docs 통과). 남의 파일을 자기 커밋에 넣으면 소유가 흐려지고(오늘 사고 (가)(나)), 워킹트리에만 고치고 커밋에서 빼면 **그 수정이 떠돈다**(누가 커밋할지 불명 → 통합 검증이 워킹트리에선 통과, integration에선 실패하는 마스킹 발생). 실제로 오늘 그 보완은 소유자가 아닌 Codex 커밋 `8b8ed81`에 **우연히** 함께 올라 해소됐다 — 절차가 막은 게 아니다.
 - 권장: (a) 워킹트리에만 고치지 말 것(떠돈다). (b) **소유자에게 통지**해 소유자가 자기 커밋으로 확정하게 한다(현재 통지 경로 없음 = 갭, 만들 것). (c) 급하면 R3의 blob 주입으로 **그 한 파일만** 개인 index에 담아 커밋하되 커밋 메시지에 "남의 파일 X의 누락 Y를 보완, 소유자 통지 요"를 남긴다. (d) 통합 검증자는 워킹트리가 integration과 일치하는지(working_tree_clean) 먼저 확인해 남의 미커밋 보완이 결과를 가리지 않게 한다.
+
+### R6. 측정·검증은 clean 고정-tip 전용 워크트리에서 (커밋 규칙의 짝 — 측정 규칙)
+R1~R5는 **커밋**을 덮는다. **측정**엔 규칙이 없어 오늘 여러 번 뒤처진 트리에서 재고 틀린 상태를 봤다(공유 주 워크트리가 origin tip보다 뒤처지고, 남의 파일 + 개인-index 유사-dirty 파일을 이고 있음 — [[워크트리_재고_2026-09-21_Claude]]).
+- **R6-a 주 워크트리에서 측정하지 마라**: `provenance.working_tree_clean=YES`가 아니면 결과 불신. 주 트리는 뒤처지고 dirty를 이고 있어 틀린 상태를 보인다.
+- **R6-b 전용 detached 워크트리를 origin tip 정확 SHA에 고정**: `git fetch` → `git -C <측정트리> checkout --detach <tip-SHA>` → `status --porcelain`이 **빈 출력** 확인 후 측정. 잰 **SHA를 결과에 명시**(tip은 세션 중 이동).
+- **R6-c 짧은 경로·full checkout**: 실 파일 필요한 시험은 longpaths 짧은 경로에서 full checkout(sparse는 collection 에러).
+- **R6-d 측정 워크트리 하나를 재사용**(예 `C:/vw`): 매번 `fetch`+`checkout --detach <tip>`로 갱신. 측정 트리를 늘리면 grep 오염·혼동만 커진다.
+- **R6-e 정리 원칙**: 형제 워크트리 삭제 전 `dirty=0` 확인. `ahead>0` 브랜치는 워크트리만 제거하고 **브랜치 ref 보존**(미병합 커밋 보유). 삭제는 소유자만. 워크트리 제거 ≠ 브랜치·커밋 삭제(제거는 체크아웃·미커밋만 버림).
 
 ## 상세 근거
 `memory:integration-branch-moves-midsession`(Claude). 사고 (가)의 최초 기록·(나)의 확인은 2026-09-21 이어가기 문서. 이 규칙은 Claude가 오늘 11개 커밋을 이 방식으로 무사고 착지시킨 실증에 기반한다.

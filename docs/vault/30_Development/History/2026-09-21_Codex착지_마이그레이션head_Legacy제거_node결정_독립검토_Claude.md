@@ -1,7 +1,7 @@
 ---
 doc_id: "CLAUDE-INDEP-REVIEW-MIGRATION-LEGACY-NODE-001"
 title: "독립 검토 — Codex 착지(aed446e): 마이그레이션 head 유도 · LegacyProjectCatalog 제거 · node telemetry 결정"
-version: "1.0.0"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex(피검토)"
@@ -78,14 +78,20 @@ tags: ["independent-review", "migration", "contract", "node-telemetry", "revival
 ### 직접 확인 (소스추적, 백엔드)
 - **list producer가 telemetry를 안 낸다 — 확증(단, 정밀화 필요)**: `/v1/nodes` → `_node_body(node)` → `schemas.NodeResponse`(=`Strict`, `extra="forbid"`)가 내는 필드는 **nodeId·hostname·osType·osVersion·agentVersion·status·enrolledAt·lastHeartbeatAt·heartbeatSequence·labels 뿐**. `observedNode`가 `valid`에 요구하는 metrics(cpuCores·cpuUsagePercent·memoryTotal/Used·gpuCount·storageTotal/Used)는 **하나도 없다** → 프런트는 **모든 노드를 `telemetryUnavailable=true`(자원 미관측·비스케줄)로 렌더**. Codex 전제 참.
 - **프런트가 기대하는 동적 metrics는 백엔드 어디에도 없다**: `cpu_usage/memory_used/memory_total/storage_used/gpu_vram/usage_percent/allocatable`를 `db/models` 전수 검색 → **0건**(telemetry 컬럼 자체가 없음). schemas엔 **enrollment 시 자기신고** `cpu_cores/ram_bytes/gpu_count`(정적 용량)와 discovery `claimed_*`만 있고, **동적 사용률은 부재**. → 이 프런트 필드들은 **producer가 없는 프런트-전용 계약**이다.
-- **그러나 백엔드가 telemetry-free는 아니다 (전제 정밀화)**: heartbeat(`POST /v1/nodes/{id}/heartbeats`)가 `ObservationPayload{capabilityId, usedQuantity, unit}`를 **수집**하고 `record_observations`가 기록하며 주석은 "placement reads these"라 명시. 즉 **capability-스코프 사용률 모델**(capability별 totalQuantity/usedQuantity)이 실재하고 `/v1/nodes/{id}`의 capabilities로 노출된다. 이는 프런트의 **평면 노드-metrics 모델**(cpu%/mem-bytes/gpuVram)과 **다른 형태·다른 엔드포인트**다.
+- **백엔드는 사용량을 수집·저장·placement-내부-사용하나 HTTP로 노출하지 않는다 (⚠ 2026-09-21 정정 — 아래 "내 오류의 정정" 참조)**: heartbeat(`POST /v1/nodes/{id}/heartbeats`)가 `ObservationPayload{capabilityId, usedQuantity, unit}`(schemas.py:58)를 **수집**하고 `record_observations`(nodes.py:233, **쓰기 전용**)가 기록하며 주석은 "placement reads these"라 명시 → 사용량은 **placement가 내부에서 읽는다**. **그러나 이를 반환하는 읽기 HTTP 라우트가 없다**: `GET /v1/nodes/{id}`의 capabilities는 `capabilityId·kind·deviceIndex·vendor·model·**totalQuantity**·unit·divisible`(nodes.py:277-289)만 낸다 — **`usedQuantity` 없음**(정적 선언 용량뿐). `usedQuantity`/`used_quantity`는 API 전체에서 schemas.py:60(ingest 정의)과 nodes.py:188(heartbeat 핸들러 내부) **2곳뿐**, 읽기 라우트 0. 즉 **데이터는 존재하나 화면이 읽을 경로가 없다**(≠ 측정실패, ≠ 드리프트).
 
 ### 의도 vs 미구현 (사용자 질문 핵심)
 - 프런트가 기대하는 **평면 동적 telemetry(cpuUsagePercent 등)**: DB 컬럼도 schema 필드도 없음 → **미구현**(구현이 없어 안 나가는 것). 사용자 규칙대로 **나중에 추가되면 계약도 함께 가야 한다**.
-- 백엔드의 **capability/observation 사용률**: **구현됨·의도적**(cert 인증·`extra=forbid`·"placement reads"). heartbeat 도크스트링은 과거 무인증 라우트가 "utilisation 수치를 주입해 placement를 조종"당한 것을 고친 이력까지 서술 → 사용률을 **capability 관측으로 다루는 것이 설계 의도**.
-- 결론: "producer가 telemetry를 안 낸다"는 **list 엔드포인트엔 참**이나, 전체로는 부정확 — **두 자원 모델이 미조정 상태**다(프런트 평면 metrics = 미구현 / 백엔드 capability 관측 = 구현·의도).
+- 백엔드의 **capability별 사용량**: 수집·저장·placement-내부-읽기는 **구현됨·의도적**(cert 인증·`extra=forbid`·"placement reads"). heartbeat 도크스트링은 과거 무인증 라우트가 "utilisation 수치를 주입해 placement를 조종"당한 것을 고친 이력까지 서술. **단 화면으로의 읽기 경로는 미구현** — 화면에 주려면 인증·신선도·미관측 상태를 정의한 **별도 읽기 계약**이 필요(Codex 지적).
+- 결론: "producer가 telemetry를 안 낸다"는 **list·detail 어느 HTTP 경로에도 사용률이 없다**는 뜻에서 **참**. 정적 용량(totalQuantity)은 detail에서 오므로 화면이 보일 수 있음. **화면의 정직한 상태 = "자원 사용률 현재 미제공"**(읽기 경로 부재), 용량과 사용률을 **구별**해 용량은 표시·사용률은 미제공으로 둘 것(구별 없으면 사용자가 용량만 보고 여유 오해).
 
-**판정 ③**: Codex 결정(지금 telemetry를 계약/ fixture에 넣지 않음)은 **타당·옳다** — list producer가 실제로 안 내고 프런트가 fail-safe(부재→비스케줄, 확증)하기 때문. 다만 근거 문구는 정밀화 필요: 사용률은 **capability/observation 형태로 이미 모델·수집**된다. **권고(node 슬라이스 바인딩 시)**: 평면 telemetry는 지금 계약에서 빼되, 향후 telemetry 표면화 시 **기존 capability/observation 모델과 재조정**(프런트 평면 모델 ↔ 백엔드 capability 모델 중 하나로 수렴)을 열어둘 것. 두 모델을 각자 굳히면 나중에 또 "계약 있으나 producer 다름"이 된다.
+**판정 ③**: Codex 결정(지금 telemetry를 계약/ fixture에 넣지 않음)은 **타당·옳다** — 어떤 HTTP 경로도 사용률을 안 내고 프런트가 fail-safe(부재→비스케줄, 확증)하기 때문. **[사용자 결정 대기]** 사용량을 화면에 노출할 **별도 읽기 계약을 만들지 여부**, 그리고 **capability별 사용량 모델 ↔ 평면 metrics 모델 중 어느 쪽으로 수렴**할지는 미결 — 이어가기 §4에 올림. 둘 중 하나로 정하기 전까지 화면은 "용량 표시 + 사용률 미제공"이 정직한 유일 상태.
+
+### 내 오류의 정정 (v1.0.0의 ③이 틀렸다)
+- **틀린 주장(v1.0.0)**: "capability/observation 사용률 모델이 실재하고 `/v1/nodes/{id}`의 capabilities로 **노출된다**" 및 "다른 엔드포인트로 노출."
+- **사실**: capabilities 상세는 `totalQuantity`(정적)만 내고 `usedQuantity`는 안 낸다. 사용량 반환 읽기 라우트는 **없다**. 사용량은 수집·저장·placement-내부-읽기까지만.
+- **원인**: `get_node` 응답 본문(totalQuantity만)을 **직접 읽고도** "capabilities로 노출"이라 **느슨히 서술** — 용량-노출과 사용량-노출을 구별하지 않았다. 이것이 오늘 하루 경계한 **"있다 ≠ 노출된다"** 그 형태다(내 산출물에서 재발). Gemini에게 "실재하는 capability 관측을 쓸 수 있는지 보라"는 방향이 이 오류에서 나왔다면 **취소** — 화면이 지금 쓸 수 있는 사용률 데이터는 없다.
+- **무엇이 잡았나**: Codex의 소스 대조 정정 + 사용자·나의 재확인(schemas.py 두 클래스가 다름, 읽기 라우트 부재). 보고를 옮길 때 재확인 없으면 오류를 퍼뜨린다는 것을 실증.
 
 ---
 
@@ -96,6 +102,6 @@ tags: ["independent-review", "migration", "contract", "node-telemetry", "revival
 ## 종합 판정
 1. **마이그레이션 head**: 소프트 보호 chain()에 살아 있음(되살림 확증), de-hardcoding은 개선. `downgrade_target==expected` 한 줄만 tautology(future 단언이 구제). 비차단 권고 1.
 2. **Legacy 제거**: producer 0, 거부는 시끄럽게 표면화(role=alert). 타당. 잔여 = 외부-producer 행위변화(캐비엇이 덮음).
-3. **node telemetry**: 결정 옳음(list producer 무-telemetry·프런트 fail-safe 확증). 근거 문구 정밀화 + 향후 capability 모델과 재조정 권고.
+3. **node telemetry**: 결정 옳음(어떤 HTTP 경로도 사용률 무-노출·프런트 fail-safe 확증). **v1.0.0의 "capabilities로 노출" 주장은 틀려 정정**(§③ "내 오류의 정정") — 사용량은 수집·저장·placement-내부-읽기까지만, 읽기 라우트 없음. 화면의 정직한 상태 = 용량 표시 + 사용률 미제공. 읽기 계약 신설·모델 선택은 사용자 결정 대기.
 
 관련: [[2026-09-21_운영자자격증명발급_독립검토_Claude]] · [[2026-09-21_서빙앵커_감사_3갈래_Claude]] · [[2026-09-21_이어가기_상태와규칙_Claude]]
