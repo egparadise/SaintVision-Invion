@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.67"
+version: "1.0.68"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-21T20:45:00+09:00"
+updated: "2026-09-21T20:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,9 +19,22 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-21T20:45:00+09:00.
+- 확인 기준: 2026-09-21T20:55:00+09:00.
 
 ## 최근 확인한 진척
+
+- **화면 정직성 스캐너 6대 한계 명시 및 5대 규칙 양방향 실측 사살 완결 (`check_frontend_integrity.py`, `화면_개발_정직성_지침_및_사례집.md`)**:
+  - **스캐너 6대 구조적 한계(What this scanner does NOT check) 명시**: 도구 소스 상단 독스트링 및 거버넌스 문서 섹션 3.2에 (1) 동적 변수 조립/계산식 가짜 값, (2) 오늘 목록에 없는 신규 형태 합성 식별자, (3) 특정 컴포넌트 타겟팅 규칙의 새 파일 미추적, (4) 소스 어휘 존재 vs 런타임 데이터 흐름, (5) 모양만 유효한 임의 식별자의 실존성, (6) 비-텍스트적/시각적 조기 성공 표출 한계를 명문화하여 "검사 초록이 완벽한 안전을 뜻하지 않음"을 선언.
+  - **5대 규칙 양방향 돌연변이 실측 사살 (6대 결함 전수 KILLED)**:
+    - M1 (Rule 1): `ResourceExplorer.tsx:2` 가짜 테넌트 UUID 주입 -> exit 1 사살.
+    - M2 (Rule 1): `TerminalSessionView.tsx:2` 미인가 컴포넌트 commandId 자리표시자 주입 -> exit 1 사살.
+    - M3 (Rule 2): `ResourceExplorer.tsx:449` 안내 방송 테넌트 0-call 가드 무력화 -> 함수 본문 스코프 가드 검사 규칙 강화 후 exit 1 사살.
+    - M4 (Rule 3): `WebTerminal.tsx:30` 소켓 연결 전 초기 버퍼 Connected 주입 -> exit 1 사살.
+    - M5 (Rule 3): `WebTerminal.tsx:78` 일회용 티켓 콘솔 로깅 주입 -> exit 1 사살.
+    - M6 (Rule 4): `InvFileExplorer.tsx:258` else 블록에서 mismatch를 verified로 조작 -> else 분기 상태 검사 규칙 강화 후 exit 1 사살.
+  - **검증 실적**: 6대 실측 돌연변이 전수 사살 및 원복 완료, `check_frontend_integrity.py` PASS (0 violations), 5대 규칙 내장 음성 대조(`--test-negative`) PASS, Vitest 56개 파일 **523/523 passed 100%**, Vite 프로덕션 빌드 exit 0, check_contract_bindings / check_docs / ontology / sync_obsidian 전수 PASS.
+  - 보고서: [[2026-09-21_화면정직성_스캐너_한계명시_및_5대규칙_양방향실측_Gemini]].
+
 
 - **화면 개발 정직성 5대 원칙 수립, 자동 검사 도구 구축, 전체 감사 지도 및 디스커버리 CLI 연동 예측 완결 (`화면_개발_정직성_지침_및_사례집.md`, `check_frontend_integrity.py`, `DeveloperStudio.tsx`, `RunDetail.tsx`, `mlopsEngine.ts`, `fixtures/model-lineage.ts`, `model-lineage.test.ts`)**:
   - **화면 개발 정직성 5대 핵심 원칙 거버넌스 확립 ([[화면_개발_정직성_지침_및_사례집]])**:
