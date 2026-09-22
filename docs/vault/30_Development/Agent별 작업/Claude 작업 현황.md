@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.9"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T19:05:00+09:00"
+updated: "2026-09-22T21:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -88,6 +88,11 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+결정 #7 실 운영 증거 (Claude, 2026-09-22): 정본 tip 7168d573(#41 병합)의 `tools/alarm_check.py`를 이 PC dev PG(invdev, head 0045, 노드 0대)에 실제 실행 — exit 0, 7 family 전부 ok, `Node 시각 스큐 한도 초과: 0 online node(s) … of 0 online`, governance-gated 0. **quiet는 시계 정상이 아니라 볼 노드가 없다는 뜻**(정직 표기); firing 경로 증거는 일회용 DB 7케이스뿐, 채널은 여전히 없음. 증거 파일 Evidence/alarm-check-live-7168d573-20260922.{txt,json}(비밀 0건). 전문 [[2026-09-22_결정7_시각스큐알람_실운영증거_dev_PG_Claude]].
+
+S02 착수 선행 입력 체크리스트 (Claude, 2026-09-22): 사용자용 1쪽 — 토폴로지 결정 1건 + IdP(api.json identity·jwks.json 파일·INV_OIDC_*·INV_WEB_AUTH_CONFIG)·CA/mTLS(INV_NODE_MTLS_CA_BUNDLE·Node cert 5장·NodePeerPolicy)·DNS(allowedOrigins·SAN·프록시)·물리 PC 5대(인벤토리·offer·storage-policy·discovery credential·NTP)·Storage(INV_OBJECT_STORE_ENDPOINT·svcred 등록·source root)·DB DSN(절차서 §4 동일). 항목마다 어디에 넣는가·성공 신호(`/v1/health.unresolvedSettings`·`/readyz`·`pg ok`·alarm_check quiet). 코드에서 env/파일 이름 실측(config.py S01_PENDING, CONFIGURED-SERVER.md, discovery_credential.py, provision_credentials.py). 전문 [[S02_선행입력_체크리스트_2026-09-22]].
+
 
 route_coverage CLI docs.yml report-only 배선 (Claude, 2026-09-22): `continue-on-error`+`exit 0`으로 job 미실패, 실제 exit는 step-summary 제목·로그에 기록, json/txt artifact. 서빙 트리는 src·services(tests 제외). 검증검사도구_목록 v1.4.0에 등급·승격 조건(1주 exit 0 ∧ 백로그 0 → ratchet 이름집합). 로컬 step 시뮬레이션 exit 0·43/0. 브랜치 agent/claude/route-coverage-docs-gate(PR #45 위 stack), 워크플로는 Codex 소유라 검토 요청. 전문 [[2026-09-22_route_coverage_CLI_docs.yml_report-only_배선_Claude]].
 

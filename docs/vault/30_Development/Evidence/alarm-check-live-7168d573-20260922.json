@@ -1,0 +1,114 @@
+{
+  "evaluatedAt": "2026-09-22 09:17:29.159797+00:00",
+  "alarms": [
+    {
+      "alarm": "resource_snapshots partition \uc794\uc5ec",
+      "severity": "P1/P2",
+      "firstResponder": "DB \uc6b4\uc601",
+      "firing": false,
+      "detail": "100 day(s) of runway; partitions run to 2027-01-01"
+    },
+    {
+      "alarm": "audit_events partition \uc794\uc5ec",
+      "severity": "P1/P2",
+      "firstResponder": "DB \uc6b4\uc601",
+      "firing": false,
+      "detail": "100 day(s) of runway; partitions run to 2027-01-01"
+    },
+    {
+      "alarm": "evidence_envelopes partition \uc794\uc5ec",
+      "severity": "P1/P2",
+      "firstResponder": "DB \uc6b4\uc601",
+      "firing": false,
+      "detail": "100 day(s) of runway; partitions run to 2027-01-01"
+    },
+    {
+      "alarm": "\uccb4\ud06c\uc12c \ubd88\uc77c\uce58",
+      "severity": "P1",
+      "firstResponder": "Storage \uc6b4\uc601",
+      "firing": false,
+      "detail": "0 mismatch(es) in folder checks over the last 7 days"
+    },
+    {
+      "alarm": "\ubc31\uc5c5 \uc2e4\ud328 \ub610\ub294 \ubcf5\uc6d0 \uc2a4\ubaa8\ud06c \uc2e4\ud328",
+      "severity": "P2",
+      "firstResponder": "DB \uc6b4\uc601",
+      "firing": false,
+      "detail": "0 unverified backup(s), 0 non-passed drill(s)"
+    },
+    {
+      "alarm": "Node \uc774\ud0c8 \uac10\uc9c0 \uc9c0\uc5f0",
+      "severity": "P2",
+      "firstResponder": "\uc778\ud504\ub77c",
+      "firing": false,
+      "detail": "0 node(s) still marked online with no heartbeat for over 60s"
+    },
+    {
+      "alarm": "Node \uc2dc\uac01 \uc2a4\ud050 \ud55c\ub3c4 \ucd08\uacfc",
+      "severity": "P2",
+      "firstResponder": "\uc778\ud504\ub77c",
+      "firing": false,
+      "detail": "0 online node(s) unmeasured or outside \u00b15s of 0 online; kernel already excludes them from scheduling"
+    }
+  ],
+  "firing": [],
+  "notEvaluable": [
+    {
+      "alarm": "\ube44\ubc00 \uc6d0\ubb38 \ub178\ucd9c \ud0d0\uc9c0",
+      "severity": "P1",
+      "reason": "needs the redaction detector's output over live traffic"
+    },
+    {
+      "alarm": "\uc815\ucc45 \uc6b0\ud68c \ub610\ub294 \uc2b9\uc778 \uc5c6\ub294 L2/L3 \uc2e4\ud589",
+      "severity": "P1",
+      "reason": "needs policy decision records over live traffic"
+    },
+    {
+      "alarm": "Evidence \uae30\ub85d \uc2e4\ud328",
+      "severity": "P1",
+      "reason": "needs a write-failure counter; a database cannot report writes it never received"
+    },
+    {
+      "alarm": "OPA \uc751\ub2f5 \uc2e4\ud328\u00b7\ud0c0\uc784\uc544\uc6c3",
+      "severity": "P1",
+      "reason": "needs the policy engine's own metrics"
+    },
+    {
+      "alarm": "\uc911\ubcf5 \ubd80\uc218 \ud6a8\uacfc \ud0d0\uc9c0",
+      "severity": "P1",
+      "reason": "needs execution-side idempotency counters"
+    },
+    {
+      "alarm": "Control Plane \uc624\ub958\uc728",
+      "severity": "P1/P2",
+      "reason": "needs request metrics over a 5 minute window"
+    },
+    {
+      "alarm": "\uc2a4\ucf00\uc904 \uacb0\uc815 P95",
+      "severity": "P2",
+      "reason": "needs scheduler latency samples"
+    },
+    {
+      "alarm": "\uc815\ucc45 \uacb0\uc815 P95",
+      "severity": "P2",
+      "reason": "needs policy latency samples"
+    },
+    {
+      "alarm": "Run \uc774\ubca4\ud2b8 \uc804\ub2ec P95",
+      "severity": "P2",
+      "reason": "needs delivery latency samples"
+    },
+    {
+      "alarm": "\uc544\ud2f0\ud329\ud2b8 \uac80\uc99d \ub300\uae30 \uc801\uccb4",
+      "severity": "P2",
+      "reason": "needs a verification-queue depth metric, not a table a DB keeps"
+    },
+    {
+      "alarm": "\uce90\uc2dc \uc801\uc911\ub960 \ud558\ub77d / \ubc84\ud0b7 \uc6a9\ub7c9 \ucd94\uc138 / lock wait \uc99d\uac00",
+      "severity": "P3",
+      "reason": "trend alarms need a metrics history"
+    }
+  ],
+  "governanceGated": [],
+  "coverage": "7 evaluated data families; 11 conditions not evaluated here; 0 governance-gated conditions"
+}
