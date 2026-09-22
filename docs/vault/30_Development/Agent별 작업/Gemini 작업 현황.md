@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.108"
+version: "1.0.109"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T09:25:00+09:00"
+updated: "2026-09-22T12:09:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,30 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T09:25:00+09:00.
+- 확인 기준: 2026-09-22T12:09:00+09:00 (최신 tip `c6e9d9aa`, working tree clean).
+
+## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
+
+- **S01-FE Codex 최종 판정 수용 및 공식 `done` 완결 (`docs/task-registry.json`, `2026-09-22_S01-FE_Codex_최종판정.md`)**:
+  - Codex의 S01-FE 최종 판정에 따라 요구 증거 3대 축(계약 검증, 설계 검토, 인벤토리 보고) 전수 충족 및 1차 검토 지적 사항 2건(Vitest 수치 재현성 규명, 수기 RunItem 정본 생성 타입 전환) 완전 해소 확인.
+  - S01-DB에 이어 프런트엔드 최초이자 전체 48개 과제 중 두 번째로 **S01-FE가 공식 `done`으로 판정되어 마감**됨.
+- **백그라운드 Vite 개발 서버(포트 3005) 정상 종료 및 프로세스 완전 해제**:
+  - 사용자 PC 환경 이전 전 포트 충돌 방지를 위해 실행 중이던 Vite 개발 서버(`task-19052`)를 정상 종료 처리.
+  - `Get-NetTCPConnection -LocalPort 3005` 확인 결과 프로세스 및 소켓 100% 해제(exit code 1) 확인.
+- **공유 커밋 규칙 R2-b (push는 게이트 exit code로만 막는다) 준수 확인**:
+  - Gemini의 착지 절차는 최초부터 모든 검증 단계에서 단순 출력 판독이 아닌 `exit code 0`을 엄격히 강제하고 있음을 재확인하고 거버넌스 정합 완료.
+- **최신 통합 tip (`c6e9d9aa`) 동기화 및 신규 작업 전면 정지 (Halt)**:
+  - 사용자 PC 환경 이전(migration)에 대비하여 신규 카드 착수를 전면 중단하고, 최신 tip `c6e9d9aa` 상태에서 모든 검사 통과 및 clean 상태 유지.
+- **게이트 검증 실측 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (프로덕션 번들 3.24s 정상 생성).
+  - `npm run test` (Vitest): **75개 파일 655/655 passed 100%**.
+  - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 rules satisfied (0 violations)**.
+  - `pytest tests/test_route_coverage.py`: 30 passed in 0.78s.
+  - `python tools/check_contract_bindings.py`: 48 fixtures / 14 serving anchors PASS.
+  - `python tools/check_doc_single_source.py --ratchet`: 18 pairs PASS.
+  - `python tools/check_docs.py`: 751 documents PASS.
+- **보고서**: [[2026-09-22_S01-FE_Codex_최종판정]], [[2026-09-22_PlacementSimulator_정본PoolList_용량분리_및_디스커버리후보_신고스펙정직화_Gemini]].
 
 ## 세션 랩업: PlacementSimulator 정본 PoolList 연동, 용량 분리 및 디스커버리 후보 신고스펙 정직화와 정직성 스캐너 Rule 9 확장
 
@@ -997,7 +1020,7 @@ source_of_truth: "Git"
 
 | 카드 | 우선순위 | 상태 | 부모 task | 범위 |
 |---|---|---|---|---|
-| GM-01 | P0 | **approved** | S01-FE S03-FE S04-FE | 정본 readiness·결과 파일·승인 UX 연결 (사용자 승인 완료) |
+| GM-01 | P0 | **approved** | S01-FE(done) S03-FE S04-FE | 정본 readiness·결과 파일·승인 UX 연결 (사용자 승인 완료, S01-FE Codex 검토 완료 및 done 마감) |
 | GM-02 | P0 | **approved** | S02-FE S05-FE S07-FE | 실제 Node와 자원 숫자·관측 시각 (사용자 승인 완료) |
 | GM-03 | P1 | **approved** | S06-FE S08-FE | 편집·PTY·Git·kill/drain 화면 (사용자 승인 완료) |
 | GM-04 | P1 | **approved** | S09-FE S10-FE | Agent·AI/MLOps 예시와 검증 표시 제거 (사용자 승인 완료) |
@@ -1017,7 +1040,7 @@ source_of_truth: "Git"
 
 ### GM-01 — 정본 readiness·결과 파일·승인 UX 연결
 
-- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: review; priority: P0.
+- owner / reviewer: Gemini / Claude (인증·보안 계약은 Codex); status: approved (부모 S01-FE는 Codex 검토 완료 및 done 마감); priority: P0.
 - 원래 목표/합격 조건: OUT-01, OUT-03, OUT-04 / AC-01, AC-03, AC-04.
 - 다음 첫 행동: f08bf33의 개선을 유지하면서 /artifacts/download fallback·JSON-only 다운로드를 실제 ResultView artifacts/content 파일 bytes로 바꾼다. readiness 7개 진단과 실제 admission을 구분한다.
 - 필요한 합격 증거: 파일 선택→actual bytes 다운로드→SHA 일치, 오류/빈/권한/만료 상태. input_prepared=false 때 최초 파일 준비로 진행 가능하고 executable=false만으로 준비 단계 전체를 막지 않음.
@@ -1075,16 +1098,16 @@ source_of_truth: "Git"
  
  | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-GM-06 (외부 HTTPS, Browser Matrix, Rollback & Real-Browser 인수 완결): `apps/web/src/features/deployment/deploymentEngine.ts`, `releaseEngine.ts`, `DesktopShell.tsx`, `apps/web/tests/browser-matrix-acceptance.test.tsx` (신규 10 tests 100% 통과), Vitest 49개 파일 **447/447 tests 100% 통과** (from 437 to 447, net +10 tests), Vite 프로덕션 빌드 3.25s 클린, `tools/check_docs.py` PASS, `tools/check_ontology.py` PASS, 4대 돌연변이 사살 실측 완료 |
-| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.151 / 2026-09-21T18:32:00+09:00 |
-| branch / base SHA / 구현 SHA | integration/all-agents-unified / 90b1ba7 / agent/gemini/vf-gm-06-browser-acceptance |
-| 작업한 것 | 1) `deploymentEngine.ts`: 엄격한 TLS 1.3 암호화 제품군, HSTS, 5개 노드 SAN 목록, Nginx 단일 오리진 리버스 프록시(정적 SPA immutable 캐싱, SSE proxy_buffering off, PTY WebSocket Upgrade 헤더) 검증.<br>2) `releaseEngine.ts`: 릴리스 후보(RC.2 -> RC.1) 무중단 롤백 시뮬레이션, 비존재 버전 거절 가드, 7대 프로덕션 SLO 지표(P95 지연 ≤ 2.0s, Heartbeat ≤ 60s, 미승인 우회 = 0, Docker Socket 노출 = 0, RPO ≤ 15m, RTO ≤ 60m, 취약점 = 0) 실측 및 위반 시 breached 판정(Zero-Mock).<br>3) `DesktopShell.tsx`: 반응형 뷰포트 대응, dock 툴바 및 모드 전환 스위처 testid 결속, approvals 기본값 복원력(`approvals = []`) 실증.<br>4) `apps/web/tests/browser-matrix-acceptance.test.tsx` 신설 (10 tests 100% 통과, 4대 돌연변이 전수 사살). |
-| 확인한 것 / 명령 / exit code / 실제 환경 | 1) Vitest: `npm test` in `apps/web` (exit 0, 49개 파일 **447/447 tests 100% 통과**, from 437 to 447 net +10 tests)<br>2) Vite Production Build: `npm run build` in `apps/web` (exit 0, 3.25s 클린, 92 modules)<br>3) Docs & Ontology: `check_docs.py` (exit 0, PASS), `check_ontology.py` (exit 0, PASS)<br>4) Mutation Testing: 4대 돌연변이(롤백 대상 검증 무력화, SLO 위반 은폐, 텍스트 대비 저하, Nginx SSE 버퍼링 활성화) 100% 사살 실측 |
-| CI / 독립 reviewer / 운영 인수 | 프론트엔드 전 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / 사용자 지시 승인 완료(approved) / Claude·Codex 독립 검토 연계 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 물리 멀티 랙 Nginx TLS 리버스 프록시 및 외부 DNS 롤오버 전파 지연은 백엔드 및 실장비 인수 레인 이관 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 단일 가상 컴퓨터 보강 트랙(VF-GM-01 ~ VF-GM-06) 전수 완결 / Claude run-attempts 프론트 배선 및 독립 검토 인계 / Claude & Codex |
-| 진척도 산정 (AUDIT 기준) | **Codex 공통 기준선: 57.81%** (2,775/4,800점)<br>**Gemini 영역 구현 성숙도: 100.0%** (1,200/1,200점, GM-01~06 & VF-GM-01~06 전수 완결)<br>**단일 가상 컴퓨터 보강 트랙: 100.0%** (VF-GM-01 ~ VF-GM-06 6개 카드 전수 완결) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-21_VF_GM06_외부HTTPS_BrowserMatrix_Rollback_인수보고서_Gemini]], [[2026-09-21_run-logs_프론트엔드_계약결속_및_RunDetail배선_Gemini]], [[2026-09-21_VF_GM05_Terminal_IDE_웹세션UX_및_PTY티켓방어_Gemini]] |
+| 마지막 작업 / 착수 카드 | S01-FE 공식 판정(done 마감), PlacementSimulator 정본 PoolList 연동 및 용량 분리, Discovery 후보 신고스펙 정직화, Vite 개발 서버(포트 3005) 프로세스 완전 해제, 커밋 규칙 R2-b 게이트 준수 확인, PC 환경 이전 대비 전면 정지(Halt) |
+| 실제 owner / 읽은 진행판 버전 / KST | Gemini (Antigravity) / 전체 개발 진행 현황 v1.0.151 / 2026-09-22T12:09:00+09:00 |
+| branch / base SHA / 구현 SHA | integration/all-agents-unified / tip `c6e9d9aa` / (working tree clean, upstream 동기화 완료) |
+| 작업한 것 | 1) S01-FE Codex 최종 판정 수용: 요구 증거 3대 축(계약 검증, 설계 검토, 인벤토리 보고) 충족 및 차단 사유(Vitest 수치 재현성, 수기 RunItem) 해소로 `task-registry.json`의 S01-FE 공식 `done` 마감 확인.<br>2) 백그라운드 프로세스 정리: Vite 개발 서버(포트 3005, task-19052) 정상 종료 및 포트 해제 완료(Get-NetTCPConnection 3005 exit 1).<br>3) R2-b 규칙 준수: 모든 게이트는 출력문이 아닌 exit code 0으로만 판정/차단하는 절차 유지.<br>4) PC 환경 이전 대비 전면 정지: 사용자 지시에 따라 새 PC 이전 완료 시까지 모든 신규 카드 착수 전면 중단(Halt) 및 대기. |
+| 확인한 것 / 명령 / exit code / 실제 환경 | 1) `cd apps/web && npx tsc -b`: exit code 0 (타입 오류 0건 클린)<br>2) `cd apps/web && npm run build`: exit code 0 (3.24s 프로덕션 번들 정상)<br>3) `cd apps/web && npm run test`: exit code 0 (75개 파일 655/655 passed 100%)<br>4) `python tools/check_frontend_integrity.py`: exit code 0 (82개 파일 All 9 rules satisfied, 0 violations)<br>5) `pytest tests/test_route_coverage.py`: exit code 0 (30 passed in 0.78s)<br>6) `python tools/check_contract_bindings.py`: exit code 0 (48 fixtures / 14 anchors PASS)<br>7) `python tools/check_doc_single_source.py --ratchet`: exit code 0 (18 pairs all in baseline PASS)<br>8) `python tools/check_docs.py`: exit code 0 (751 documents PASS)<br>9) `Get-NetTCPConnection -LocalPort 3005`: exit code 1 (포트 3005 프로세스 100% 미사용/해제 확인) |
+| CI / 독립 reviewer / 운영 인수 | 프론트엔드 전 컴포넌트, DOM 하네스, 프로덕션 빌드 100% 무오류 검증 완료 / S01-FE Codex 검토 완료 및 `done` 판정 / 새 PC 환경 이전 대기 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 사용자 PC 환경 이전으로 인한 전 Agent 작업 전면 정지(Halt) 상태 / 신규 착수 절대 금지 / 사용자 및 Codex·Claude·Gemini |
+| 다음 카드 / 첫 행동 / 다음 담당 | 새 PC 환경 이전 완료 후 사용자 재개 지시 대기 / 기준선 대조 및 후속 작업 착수 / Gemini & Codex & Claude |
+| 진척도 산정 (AUDIT 기준) | **S01-FE 공식 done 마감** (48개 중 S01-DB에 이어 두 번째 완결)<br>**Gemini 영역 구현 성숙도: 100.0%** (GM-01~06 & VF-GM-01~06 구현 및 계약 결속 완비)<br>**단일 가상 컴퓨터 보강 트랙: 100.0%** (VF-GM-01 ~ VF-GM-06 6개 카드 전수 완결) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-09-22_S01-FE_Codex_최종판정]], [[2026-09-22_PlacementSimulator_정본PoolList_용량분리_및_디스커버리후보_신고스펙정직화_Gemini]], [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]], [[2026-09-22_PlacementPreview어댑터결속_및_EvidenceViewer_RunResultView정본전환_Gemini]] |
 
 > **Gemini 회신(2026-09-19, 인트라넷 사전 배포 파이프라인 외부 TLS 인증서 주입 및 회귀 검증 17종 완결 보고)**: 사용자 승인 및 공개 저장소 전환에 따른 개발 TLS 외부 주입 지원을 `tools/deploy_intranet.ps1` 및 `tests/test_deploy_intranet_preflight.py`에 완전 구현함.
 1) **환경변수 기반 동적 경로 탐색 및 안전한 폴백**: `$certDir = if ([string]::IsNullOrWhiteSpace($env:SAINTVISION_DEV_CERT_DIR)) { "deploy/certs" } else { $env:SAINTVISION_DEV_CERT_DIR }`를 적용하여 외부 주입 디렉터리를 동적으로 수용하고 미지정 시 기존 `deploy/certs`로 투명하게 폴백함.
