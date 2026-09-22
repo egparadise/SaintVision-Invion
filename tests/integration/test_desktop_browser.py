@@ -68,7 +68,10 @@ def test_browser_real_committed_model_and_current_permission(view, tmp_path):
             page.get_by_role('button',name='기록 조회',exact=True).click()
         assert response.value.status==200
         expect(page.get_by_text('Manifest SHA-256: '+a.receipt['manifestHash'],exact=True)).to_be_visible()
-        expect(page.get_by_text('현재 가용성: 미확인 · 실행 시 재검증 필요',exact=True)).to_be_visible()
+        expect(page.get_by_test_id('model-availability-status')).to_have_text(
+            '현재 가용성: 알 수 없음 (unknown) · 실행 재검증 필요 '
+            '(requiresExecutionRevalidation: true)'
+        )
         with psycopg.connect(a.e.owner) as conn:
             conn.execute('UPDATE inv.project_grants SET enabled=false WHERE tenant_id=%s',(a.e.tenant,))
         with page.expect_response(lambda r:r.url.endswith('/commitment')) as response:

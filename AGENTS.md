@@ -47,11 +47,34 @@
 
 ## 검증
 
-`python tools/check_docs.py`
+PowerShell에서는 게이트와 다음 행동을 세미콜론으로 이어 쓰지 않는다. 각 명령의
+`$LASTEXITCODE`를 즉시 저장하고 0이 아니면 중단한다.
 
-`python tools/check_ontology.py` (requirements-docs.txt 환경)
+```powershell
+python tools/check_docs.py
+$docsExit = $LASTEXITCODE
+if ($docsExit -ne 0) { throw "check_docs failed (exit $docsExit)" }
 
-`python tools/sync_obsidian.py --check` 후 실제 권한 내 `--apply`.
+python tools/check_ontology.py  # requirements-docs.txt 환경
+$ontologyExit = $LASTEXITCODE
+if ($ontologyExit -ne 0) { throw "check_ontology failed (exit $ontologyExit)" }
+
+python tools/sync_obsidian.py --check
+$syncExit = $LASTEXITCODE
+if ($syncExit -ne 0) { throw "sync check failed (exit $syncExit)" }
+# --apply는 check exit 0 이후에만 실행한다.
+```
+
+Bash에서는 같은 조건을 `rc=$?`와 `if`로 명시한다.
+
+```bash
+python tools/check_docs.py
+rc=$?
+if [ "$rc" -ne 0 ]; then exit "$rc"; fi
+```
+
+출력에 PASS가 보이는 것만으로 commit/push하지 않는다. 게이트 exit 0이 다음 행동의
+조건이어야 한다.
 
 오늘(2026-09-22) 추가된 검사 다섯 — 등급이 실패 시 CI를 막는지 말해준다:
 - `python tools/check_contract_bindings.py` — 계약 fixture·서빙앵커 커버리지. **게이트**(실패=CI 막힘).

@@ -1,14 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.160"
+version: "1.0.161"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T05:08:00+09:00"
+updated: "2026-09-22T16:25:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 최초 hosted CI 실패 교정
+
+- 카드 `THREAD-2026-09-22-FIRST-HOSTED-CI-RECOVERY`; owner Codex, reviewer Claude pending. 초기 base `d01c931a`, 최신 integration base `dcf2b947`, branch `agent/codex/continuation-20260922`.
+- Backend schema drift, Core ontology 의존성·credential fail-closed/portable fixture, Browser catalogue·business-project·model availability 회귀를 교정했다. 통합에서 누락된 `origin/codex/ontology-regeneration` 9커밋도 merge `23235bbb`로 복원했다.
+- 작성자 검증: Linux credential 61 passed, storage PG 24 passed/0 skip, 실 브라우저 6 passed/0 failed/0 skipped, Vitest 655 passed, frontend contracts 16, schema 58, bindings 50 fixtures / 14 response types / 12 replay guards, docs 763·ontology PASS. 기존 69 Docker volume은 건드리지 않았다.
+- 아직 `done` 아님: 최종 PR head의 hosted Documentation·Backend 3.12/3.14·Core·Frontend·Desktop Browser와 Claude 독립 검토가 pending. 첫 행동은 branch push·PR 생성 후 모든 workflow를 같은 SHA에서 확인하는 것. Evidence: [[2026-09-22_최초_호스티드_CI_실패_교정_Codex]].
+
+## 2026-09-22 최종 정지 기준선 — `70234d2e`
+
+- 마지막 착지: Claude `check_anchor_weight` 범위·타입/위치 독립 검토(`1c7c6ef5`), WorkloadSpec 입력 앵커 무게 시험(`cdfab100`), R2-b push exit hard-stop 절차(`ff926916`, `c74855d7`), GOV-GIT-001·AGENTS·이전 절차서의 게이트 예시 교정(`70234d2e`).
+- 확인: `check_docs.py` exit 0, `check_ontology.py` exit 0, 의도적 red gate 변형에서 `throw` 후 push marker 미생성, 작업 트리 clean.
+- 남은 것: `shard_completion` Linux 실행, WorkloadSpec 전체 PostgreSQL 통합, Go T1-3/교차언어, 물리 worker 5대 인수, 다운로드 정본 사용자 결정. 이 호스트에서 새로 시작하지 않는다.
+- 다음 담당: 새 PC 또는 CI에서 기준선 이후 전수 검증. 독립 검토·외부 실행·사용자 결정은 각 담당 경계를 유지한다.
 
 ## 2026-09-22 GOV-ALERT-001 ???? ?? ??
 

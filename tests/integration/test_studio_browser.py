@@ -9,11 +9,60 @@ import socket
 from threading import Thread
 from urllib.parse import parse_qs, urlencode, urlsplit
 import psycopg
+from psycopg.conninfo import conninfo_to_dict
 import pytest
+from sqlalchemy.engine import URL
 from test_approvals import approval, request
 from test_control_api import api
 from test_configured_server import running_server
 from test_approval_browser import browser_page, pytestmark, ROOT
+from test_server_container import business_login
+from saintvision.ids import new_id as business_id
+
+
+@pytest.fixture
+def studio_business(api, business_login, monkeypatch):
+    """Provision the real business identity/project surface used by the Studio UI."""
+    a = api
+    users = {actor: business_id('user') for actor in ('requester', 'alice', 'bob')}
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,'Studio browser')",
+            (a.e.tenant, 'studio-' + secrets.token_hex(8)),
+        )
+        conn.execute(
+            "INSERT INTO public.projects(tenant_id,project_id,code,display_name) VALUES(%s,%s,%s,'Studio project')",
+            (a.e.tenant, a.e.project, 'studio-' + secrets.token_hex(8)),
+        )
+        for actor, user_id in users.items():
+            conn.execute(
+                "INSERT INTO public.users(tenant_id,user_id,external_subject,display_name) VALUES(%s,%s,%s,%s)",
+                (a.e.tenant, user_id, a.jwt.subject(actor), actor),
+            )
+            conn.execute(
+                "INSERT INTO inv.business_subjects(tenant_id,subject_id,user_id) VALUES(%s,%s,%s)",
+                (a.e.tenant, a.jwt.subject(actor), user_id),
+            )
+            conn.execute(
+                "INSERT INTO public.project_members(tenant_id,project_id,user_id,role_code) VALUES(%s,%s,%s,%s)",
+                (a.e.tenant, a.e.project, user_id, 'operator' if actor == 'requester' else 'approver'),
+            )
+        conn.execute(
+            "INSERT INTO inv.business_projects(tenant_id,project_id) VALUES(%s,%s)",
+            (a.e.tenant, a.e.project),
+        )
+    info = conninfo_to_dict(a.e.runtime)
+    role, password = business_login
+    business_dsn = URL.create(
+        'postgresql+psycopg',
+        username=role,
+        password=password,
+        host=info['host'],
+        port=int(info.get('port', 5432)),
+        database=info['dbname'],
+    )
+    monkeypatch.setenv('INV_BUSINESS_DSN', business_dsn.render_as_string(hide_password=False))
+    return a
 
 
 @contextmanager
@@ -60,18 +109,24 @@ def synthetic_idp(identity, origin, *, invalid_token=False):
 
 
 @pytest.mark.parametrize('invalid_token', [False, True])
-def test_full_studio_login_project_approval_and_logout(api, tmp_path, invalid_token):
+def test_full_studio_login_project_approval_and_logout(studio_business, tmp_path, invalid_token):
     from playwright.sync_api import expect
-    a = api; row = request(a)
+    a = studio_business; row = request(a)
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0)); port = sock.getsockname()[1]
     origin = f'http://127.0.0.1:{port}'
     with synthetic_idp(a.jwt, origin, invalid_token=invalid_token) as (config, observations), \
-         running_server(a.e, tmp_path, a.jwt, allowed_origins=[origin]) as server, \
+         running_server(a.e, tmp_path, a.jwt, allowed_origins=[origin], business=True) as server, \
          browser_page(server.base_url, port, entry='/studio', config=config) as page:
         expect(page.get_by_role('heading', name='SaintVision 로그인')).to_be_visible()
-        with page.expect_response(lambda r: r.url.endswith('/v1/session')) as session:
-            page.get_by_role('button', name='조직 계정으로 로그인').click()
+        if invalid_token:
+            with page.expect_response(lambda r: r.url.endswith('/v1/session')) as session:
+                page.get_by_role('button', name='조직 계정으로 로그인').click()
+            projects = None
+        else:
+            with page.expect_response(lambda r: r.url.endswith('/v1/session')) as session, \
+                 page.expect_response(lambda r: r.url.endswith('/v1/projects')) as projects:
+                page.get_by_role('button', name='조직 계정으로 로그인').click()
         assert observations == ['valid PKCE exchange']
         assert page.url == origin + '/studio'
         assert page.evaluate('sessionStorage.length') == 0
@@ -85,6 +140,9 @@ def test_full_studio_login_project_approval_and_logout(api, tmp_path, invalid_to
             return
         assert session.value.status == 200
         assert session.value.json()['subjectId'] == a.jwt.subject('alice')
+        assert projects is not None
+        assert projects.value.status == 200
+        assert projects.value.json()['projects'][0]['projectId'] == a.e.project
         expect(page.get_by_role('combobox', name='프로젝트', exact=True)).to_have_value(a.e.project)
         page.get_by_role('button', name='승인 센터', exact=True).click()
         expect(page.get_by_text(a.jwt.subject('alice'), exact=True)).to_be_visible()

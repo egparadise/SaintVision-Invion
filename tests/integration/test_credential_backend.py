@@ -144,9 +144,10 @@ def credential_harness(env, tmp_path, monkeypatch):
                 os.chown(path, 1, 1)
             except PermissionError:
                 # The Linux runner drops CAP_CHOWN. Create one synthetic file as
-                # uid 1 in a disposable container with a narrowly mounted temp
-                # directory; GitHub-hosted runners are not themselves named
-                # Docker containers, so `docker exec $HOSTNAME` is not portable.
+                # uid 1 in an isolated, networkless container with a narrowly
+                # mounted temp directory; GitHub-hosted runners are not
+                # themselves named Docker containers, so `docker exec
+                # $HOSTNAME` is not portable.
                 shared = Path(tempfile.mkdtemp(prefix="credential-owner-"))
                 shared.chmod(0o777)
                 other = shared / "synthetic"
@@ -156,17 +157,20 @@ def credential_harness(env, tmp_path, monkeypatch):
                             "docker",
                             "run",
                             "--rm",
+                            "--network",
+                            "none",
                             "--user",
                             "1:1",
-                            "--volume",
-                            f"{shared}:/fixture",
-                            os.environ.get("INV_TEST_ROLE_GUARD_IMAGE", "postgres:16"),
+                            "--mount",
+                            f"type=bind,source={shared},target=/fixture",
+                            "--entrypoint",
                             "sh",
+                            os.environ.get("INV_TEST_ROLE_GUARD_IMAGE", "postgres:16"),
                             "-c",
                             "umask 077; printf synthetic > /fixture/synthetic",
                         ],
                         capture_output=True,
-                        timeout=15,
+                        timeout=30,
                     )
                     assert result.returncode == 0, "Isolated owner fixture unavailable"
                     os.replace(other, path)

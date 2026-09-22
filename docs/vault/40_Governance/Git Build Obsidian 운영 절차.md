@@ -39,14 +39,43 @@ origin은 **https://github.com/egparadise/SaintVision-Invion.git**이다. 최초
 
 ```powershell
 python tools/check_docs.py
+$docsExit = $LASTEXITCODE
+if ($docsExit -ne 0) { throw "push blocked: check_docs exit $docsExit" }
+
 python tools/check_ontology.py
+$ontologyExit = $LASTEXITCODE
+if ($ontologyExit -ne 0) { throw "push blocked: check_ontology exit $ontologyExit" }
+
 python tools/sync_obsidian.py --check
+$syncExit = $LASTEXITCODE
+if ($syncExit -ne 0) { throw "push blocked: sync check exit $syncExit" }
+
 python tools/sync_obsidian.py --apply
 git status --short
 git diff --check
+$diffExit = $LASTEXITCODE
+if ($diffExit -ne 0) { throw "push blocked: git diff --check exit $diffExit" }
+
 git push -u origin <작업브랜치>
+$pushExit = $LASTEXITCODE
+if ($pushExit -ne 0) { throw "push failed exit $pushExit" }
 gh run list --repo egparadise/SaintVision-Invion --limit 5
 ```
+
+Bash에서는 같은 게이트 조건을 `rc=$?`와 `if`로 명시한다.
+
+```bash
+python tools/check_docs.py
+rc=$?
+if [ "$rc" -ne 0 ]; then exit "$rc"; fi
+python tools/check_ontology.py
+rc=$?
+if [ "$rc" -ne 0 ]; then exit "$rc"; fi
+git push -u origin <작업브랜치>
+```
+
+`| tail -1`은 사용하지 않는다. 파이프 뒤 명령의 exit가 보고되어 원래 게이트 실패를
+숨길 수 있다.
 
 `check_ontology.py`는 `requirements-docs.txt` 환경이 필요하다. 현재 CI는 문서·추적표·Ontology 검증을 수행한다. 제품 코드가 없는 상태에서 `product build passed`라고 표시하지 않는다. 향후 Backend pytest, Go test/build, Frontend typecheck/test/build, 통합·보안·장애 시험을 기능 구현과 함께 추가한다.
 
