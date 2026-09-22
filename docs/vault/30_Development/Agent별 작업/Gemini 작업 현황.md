@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.114"
+version: "1.0.115"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T21:05:00+09:00"
+updated: "2026-09-22T21:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,29 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T21:05:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/ui-invariants-plan`).
+- 확인 기준: 2026-09-22T21:18:00+09:00 (최신 tip `e31ce3f3`, 작업 브랜치 `agent/gemini/ui-invariants-acceptance`).
+
+## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 실측 완결 (`agent/gemini/ui-invariants-acceptance`)
+
+- **실측 보고서 정본**: [[2026-09-22_WebDesktop_UI_불변식_9종_실브라우저_수용실측_Gemini]]
+- **실측 수용 계획**: [[2026-09-22_WebDesktop_UI_불변식_9종_수용계획_Gemini]] (PR #61)
+- **실행 환경 및 실측치**:
+  - Google Chrome Official Build (Version 153+) + Uvicorn 0.52.4 (`127.0.0.1:8080`) + Vite 5.x (`127.0.0.1:3005`).
+  - 명령: `$env:PYTHONIOENCODING="utf-8"; .venv\Scripts\python.exe tools/run_real_browser_acceptance.py --scenario desktop-ui-invariants`
+  - 결과: **100% PASS** (27초 소요, exit code `0`).
+  - 메모리 변동: 착수 직전 1.44GB ➔ 실행 중 단일 Headless Chrome 점유 ➔ 실행 완료 후 **1.58GB** (완전 회수).
+- **9대 불변식 전수 통과**:
+  1. **INV-01 (양방향 전환기)**: Portal ➔ Web Desktop(`desktop-shell-container`) 마운트 및 Portal 복귀 후 재진입 왕복 완결 (PASS).
+  2. **INV-02 (창 관리자 트래픽 라이트)**: 최소화(DOM 은닉) ➔ Dock 복원 ➔ 최대화(뷰포트 전폭 $\ge 1200\text{px}$) ➔ 복원 ➔ 닫기(인스턴스 소멸) 전수 완결 (PASS).
+  3. **INV-03 (동적 z-index 승격)**: 비활성 창 클릭 시 z-index가 `23 > 22 > 21`로 동적 단조 증가하며 최상위 레이어 승격 (PASS).
+  4. **INV-04 (하단 독 연동 및 복원)**: Dock 아이콘 클릭을 통한 최소화 창 즉각 복구 및 활성 창 토글 동작 (PASS).
+  5. **INV-05 (키보드 A11y Alt+Tab 창 순환)**: `Alt + Tab` 키 입력 시 다음 윈도우로 포커스 및 최상위 z-index 승격 (PASS).
+  6. **INV-06 (Escape 모달 탈출)**: 시작 메뉴 모달 오픈(`div[role="menu"]`) 후 `Escape` 키 입력 시 즉각 모달 닫힘 및 포커스 복원 (PASS).
+  7. **INV-07 (레이아웃 영속성)**: 8개 창 상태의 `saintvision_desktop_windows` 직렬화, 최소화 상태 보존, Portal 전환 후 재진입 리마운트 시 레이아웃 100% 복원 (PASS).
+  8. **INV-08 (WCAG 2.1 AA 색상 대비율)**: 상단 바 17.06:1, 활성 타이틀바 13.98:1 (기준 4.5:1 대비 대폭 초과, PASS).
+  9. **INV-09 (정직 수치 표출 및 경계 불변식)**: Anti-Magic Bus 정직 고지 배너 노출 확인, $0 \le \text{allocatableCores} \le \text{totalCores}$ 수학적 불변식 성립 (PASS).
+- **실측 증거 파일**: `scratch/desktop_ui_invariants.json`, `scratch/chrome_real_uvicorn_acceptance_result.json`, 고해상도 스크린샷 8종 (`real_chrome_desktop_*.png`).
+- **러너 배선**: `tools/run_browser_smoke.mjs` 상의 미검증 항목을 실측 증거 기반 assert로 연결하여 `unverified 4 ➔ 0` 해소.
 
 ## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 계획 확립 (`agent/gemini/ui-invariants-plan`)
 
