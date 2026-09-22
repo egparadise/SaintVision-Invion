@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.160"
+version: "1.0.161"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T05:08:00+09:00"
+updated: "2026-09-22T16:25:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 최초 hosted CI 실패 교정
+
+- 카드 `THREAD-2026-09-22-FIRST-HOSTED-CI-RECOVERY`; owner Codex, reviewer Claude pending. 초기 base `d01c931a`, 최신 integration base `dcf2b947`, branch `agent/codex/continuation-20260922`.
+- Backend schema drift, Core ontology 의존성·credential fail-closed/portable fixture, Browser catalogue·business-project·model availability 회귀를 교정했다. 통합에서 누락된 `origin/codex/ontology-regeneration` 9커밋도 merge `23235bbb`로 복원했다.
+- 작성자 검증: Linux credential 61 passed, storage PG 24 passed/0 skip, 실 브라우저 6 passed/0 failed/0 skipped, Vitest 655 passed, frontend contracts 16, schema 58, bindings 50 fixtures / 14 response types / 12 replay guards, docs 763·ontology PASS. 기존 69 Docker volume은 건드리지 않았다.
+- 아직 `done` 아님: 최종 PR head의 hosted Documentation·Backend 3.12/3.14·Core·Frontend·Desktop Browser와 Claude 독립 검토가 pending. 첫 행동은 branch push·PR 생성 후 모든 workflow를 같은 SHA에서 확인하는 것. Evidence: [[2026-09-22_최초_호스티드_CI_실패_교정_Codex]].
 
 ## 2026-09-22 최종 정지 기준선 — `70234d2e`
 
