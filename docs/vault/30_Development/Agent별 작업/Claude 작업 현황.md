@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.14"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T20:55:00+09:00"
+updated: "2026-09-22T23:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+hosted Core 첫 완주 skip 58 분류표 (Claude, 2026-09-22): run 35706465645(3d1892c0) core-tests.xml 3006/2948/58/0 — 보호 컨테이너 CX01 19·컨테이너 레인 opt-in 23(role guard 13은 backend.yml에선 실행)·Windows 전용 11·브라우저 1·도구 부재 4; 물리 노드 분류 0(node 레인은 실제 컨테이너로 실행). 로컬 142와 대조: Linux 96↔Windows 11 상보, 어디서도 안 도는 skip은 31건뿐. machinery 제안(Codex): core.yml에 ROLE_GUARD/SERVER/CONFIG 이미지 변수 → 23건 실행 전환. 전문 [[2026-09-22_hosted_Core_첫완주_skip58_분류표_Claude]].
+
 
 CX-09 PITR Tier-A 활성 여부 결정 준비 (Claude, 2026-09-22): runbook v1.2.0 실측(dev PG absent·리허설 PASS 1/FAIL 5·잔재 0·보관 7일)을 근거로 A(지금 활성, 재시작 창+외부 볼륨+readiness possible 전제, 이후 AC-12 드릴 카드) vs B(CX-09까지 유예, 릴리스 시점 위험 집중) 비교. 권고 A(전제 2). '설정≠RPO 증거' 기록 규칙 유지. 코디네이터 결정 요청. 전문 [[2026-09-22_CX-09_PITR_Tier-A_활성여부_결정준비_Claude]].
 
