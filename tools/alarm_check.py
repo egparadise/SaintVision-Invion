@@ -26,8 +26,11 @@ Clock skew (activated 2026-09-22, decision #7 option A, ERR-DESIGN-007 v2.0.0):
 the kernel already excludes a node from scheduling, placement, leases and
 containment when ``clock_skew_seconds`` is NULL, non-finite or ``abs(...) > 5``
 (``inv/scheduler.py`` ``_eligible``, ``inv/leases.py``, ``inv/dispatch.py``).
-The routed P2 alarm mirrors *exactly* that predicate over ``status='online'``
-nodes so that "why is this node never scheduled" becomes visible to 인프라
+The routed P2 alarm is an *independent mirror* of that predicate over
+``status='online'`` nodes (the kernel keeps its own Python check and four SQL
+predicates; nothing shares code with this tool, so the two CAN drift --
+``tests/test_alarm_check.py::test_alarm_limit_matches_every_kernel_predicate``
+pins them together) so that "why is this node never scheduled" becomes visible to 인프라
 instead of staying a silent runtime filter. Offline/draining/quarantined nodes
 are the 이탈 alarm's business, not this one's.
 
@@ -106,8 +109,8 @@ def clock_skew_alarm(online_nodes: list[tuple[str, Decimal | None]]) -> dict[str
 
     ``online_nodes`` is ``[(node_id, clock_skew_seconds), ...]`` for nodes whose
     status is ``online``. Fires iff at least one is unmeasured or outside ±5s
-    (ERR-DESIGN-007 제4조 3항); clears on the next heartbeat that lands inside
-    (제4조 4항) because it is recomputed from the current row, not latched.
+    (ERR-DESIGN-007 제4조 2항); clears on the next heartbeat that lands inside
+    (제4조 3항) because it is recomputed from the current row, not latched.
     """
     offending = [
         (node_id, "unmeasured" if skew is None else f"{skew}s")
@@ -236,9 +239,10 @@ def evaluate(dsn: str, tenant: str | None, now: dt.datetime) -> dict[str, Any]:
                 )
             )
 
-            # Measure, then decide in Python with the same predicate the tests pin:
-            # the SQL only selects online nodes; NULL/non-finite/abs>5 is decided
-            # by skew_outside_limit so the boundary lives in exactly one place.
+            # Measure, then decide in Python: the SQL only selects online nodes;
+            # NULL/non-finite/abs>5 is decided by skew_outside_limit. That is the
+            # alarm's single boundary -- the kernel has its own copies, which a
+            # test pins to the same value; this tool cannot make them agree by itself.
             online_nodes = [
                 (row[0], row[1])
                 for row in connection.execute(

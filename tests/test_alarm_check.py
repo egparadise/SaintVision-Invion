@@ -280,3 +280,66 @@ def test_real_pg_tc07_recovery_clears_the_alarm_without_latching(skew_db, skew_n
         conn.execute("UPDATE inv.nodes SET clock_skew_seconds = 0.2 WHERE node_id = %s", (node,))
     cleared = _skew_alarm(skew_db["url"])
     assert cleared["firing"] is False, cleared["detail"]
+
+
+# --- The alarm is an INDEPENDENT mirror of the kernel guard: pin both boundaries ---
+#
+# The kernel decides eligibility in inv/scheduler.py (Python) and in four SQL
+# predicates (leases, dispatch, containment, tooling). None of them import this
+# tool, so the two sides can drift. These tests fail the moment either side
+# changes its number or its direction. (Codex review of PR #41.)
+
+KERNEL = ROOT / "services" / "control-plane" / "src" / "inv"
+KERNEL_SQL_SITES = {
+    "leases.py": r"abs\(clock_skew_seconds\)\s*<=\s*(\d+(?:\.\d+)?)",
+    "dispatch.py": r"abs\(clock_skew_seconds\)\s*<=\s*(\d+(?:\.\d+)?)",
+    "containment.py": r"abs\(n\.clock_skew_seconds\)\s*<=\s*(\d+(?:\.\d+)?)",
+    "tooling.py": r"abs\(clock_skew_seconds\)\s*<=\s*(\d+(?:\.\d+)?)",
+}
+
+
+def test_alarm_limit_matches_every_kernel_predicate():
+    import re
+
+    # Python guard in the scheduler: None / non-finite / abs(...) > N  → rejected.
+    scheduler = (KERNEL / "scheduler.py").read_text(encoding="utf-8")
+    py = re.search(
+        r"c\.clock_skew_seconds is None\s*or not c\.clock_skew_seconds\.is_finite\(\)\s*or abs\(c\.clock_skew_seconds\)\s*>\s*(\d+(?:\.\d+)?)",
+        scheduler,
+    )
+    assert py, "scheduler clock-skew guard shape changed; re-pin the alarm mirror"
+    assert Decimal(py.group(1)) == CLOCK_SKEW_LIMIT_SECONDS
+    # Four SQL predicates: eligible iff abs(...) <= N (NULL makes the predicate NULL → not eligible).
+    for name, pattern in KERNEL_SQL_SITES.items():
+        found = re.findall(pattern, (KERNEL / name).read_text(encoding="utf-8"))
+        assert found, f"{name}: clock-skew SQL predicate not found; re-pin the alarm mirror"
+        assert {Decimal(v) for v in found} == {CLOCK_SKEW_LIMIT_SECONDS}, (name, found)
+
+
+def test_alarm_predicate_agrees_with_scheduler_eligibility():
+    """Behavioural pin at the boundary: what the real scheduler rejects for clock
+    reasons is exactly what the alarm calls 'outside'."""
+    from inv.scheduler import Candidate, Request, place
+
+    now = dt.datetime(2026, 9, 22, 12, 0, tzinfo=dt.timezone.utc)
+
+    def kernel_rejects_for_clock(skew):
+        cand = Candidate(
+            node_id="nod_a", status="online", observed_at=now, cpu_millis=1000,
+            memory_bytes=1 << 30, gpu_devices=(), local_bytes=0, bandwidth_bps=None,
+            host_load=Decimal("0.1"), clock_skew_seconds=skew,
+        )
+        # A second, always-eligible node keeps place() from raising RES-0003
+        # ("No eligible node") so the rejection map for nod_a can be read.
+        control = Candidate(
+            node_id="nod_b", status="online", observed_at=now, cpu_millis=1000,
+            memory_bytes=1 << 30, gpu_devices=(), local_bytes=0, bandwidth_bps=None,
+            host_load=Decimal("0.1"), clock_skew_seconds=Decimal("0"),
+        )
+        result = place(Request(cpu_millis=100, memory_bytes=1 << 20), [cand, control],
+                       now=now, snapshot_id="snap", policy_version="v")
+        assert "nod_b" not in result["rejected"]
+        return "clock_unmeasured_or_skewed" in result["rejected"].get("nod_a", [])
+
+    for skew in (Decimal("0"), Decimal("5"), Decimal("-5"), Decimal("5.0001"), Decimal("-5.5"), None, Decimal("NaN")):
+        assert kernel_rejects_for_clock(skew) is skew_outside_limit(skew), skew

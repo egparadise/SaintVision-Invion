@@ -1,7 +1,7 @@
 ---
 doc_id: "ERR-DESIGN-007"
 title: "ERR-DESIGN-007 시각 동기화 요구 부재"
-version: "2.0.0"
+version: "2.0.1"
 status: "accepted"
 author: "Claude"
 updated: "2026-09-22T17:25:00+09:00"
@@ -69,7 +69,7 @@ Node와 Control Plane 간 시각 편차(clock skew) 허용 한계를 정하고, 
 
 ### 제4조 (운영 알람 규격)
 1. 알람명 `Node 시각 스큐 한도 초과` · 심각도 **P2** · 1차 대응 **인프라**(백업 Backend 운영) · 통지 **기록 채널** · **자동 조치 없음** · 근무 시간 내 대응(온콜 없음) — [[알람 라우팅과 대응 주체]]와 동일.
-2. 트리거: `status='online'`인 노드 중 제3조 1항의 조건(미측정·비유한·`abs > 5.0`)에 해당하는 노드가 1대 이상이면 `firing=true`. 판정 술어는 커널 가드와 **동일한 한 함수**(`tools/alarm_check.py` `skew_outside_limit`)로 두어 알람과 가드가 어긋날 수 없게 한다.
+2. 트리거: `status='online'`인 노드 중 제3조 1항의 조건(미측정·비유한·`abs > 5.0`)에 해당하는 노드가 1대 이상이면 `firing=true`. 알람의 판정 함수(`tools/alarm_check.py` `skew_outside_limit`)는 커널 가드의 **독립 미러**다 — 커널은 `inv/scheduler.py`의 Python 판정과 `leases.py`·`dispatch.py`·`containment.py`·`tooling.py`의 SQL 술어(`abs(clock_skew_seconds) <= 5`)를 따로 가지므로 **드리프트가 가능**하다. 정합은 코드 공유가 아니라 검증 시험으로 고정한다: `tests/test_alarm_check.py::test_alarm_limit_matches_every_kernel_predicate`(다섯 커널 자리의 상수·비교 방향과 알람 상수를 함께 대조, 불일치 시 실패) + `test_alarm_predicate_agrees_with_scheduler_eligibility`(경계값에서 `inv.scheduler` 실제 판정과 대조).
 3. 해제: 후속 heartbeat에서 `abs(clock_skew_seconds) <= 5.0`이 기록되면 다음 평가에서 즉시 `firing=false`(래치 없음).
 4. offline/draining/quarantined 노드는 이 알람의 대상이 아니다(이탈 알람 관할).
 
