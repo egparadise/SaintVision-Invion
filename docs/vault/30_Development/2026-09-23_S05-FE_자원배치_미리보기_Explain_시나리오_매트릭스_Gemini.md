@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S05-FE-SCENARIO-MATRIX-20260923"
 title: "S05-FE 자원배치 미리보기·Explain UI 시나리오 매트릭스 (Gemini)"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-23T10:00:00+09:00"
+updated: "2026-09-23T11:00:00+09:00"
 source_of_truth: "Git"
 tags: ["s05-fe", "acceptance-matrix", "placement-preview", "resource-explorer", "explain", "capacity-partitioning", "gemini"]
 ---
@@ -33,7 +33,7 @@ tags: ["s05-fe", "acceptance-matrix", "placement-preview", "resource-explorer", 
 
 ## 1. 개요 및 수용 목표 (OUT-05 / AC-05)
 
-본 문서는 SaintVision 자원 스케줄링 및 제어 평면의 **S05-FE (자원배치 미리보기·설명 가능한 배치 시뮬레이터·자원 풀 관리)** 트랙을 완결하기 위해, 코디네이터 지시 및 Codex 계약 검토(PR #96 수정 요청 4건 및 잔여 Zero Fake Shards 지적)와 Claude UI 검토 피드백을 전면 반영하여 수립한 **시나리오 매트릭스 정본 개정안(v1.2.1)**이다.
+본 문서는 SaintVision 자원 스케줄링 및 제어 평면의 **S05-FE (자원배치 미리보기·설명 가능한 배치 시뮬레이터·자원 풀 관리)** 트랙을 완결하기 위해, 코디네이터 지시 및 Codex 계약 검토(PR #96 수정 요청 4건 및 잔여 Zero Fake Shards 지적)와 Claude UI 검토 피드백(hh r3)을 전면 반영하여 수립한 **시나리오 매트릭스 정본 개정안(v1.2.2)**이다.
 
 본 문서는 `PlacementSimulator` 및 `ResourceExplorer` 화면의 사용자 여정별 기대를 **실제 프런트엔드 컴포넌트 셀렉터(`data-testid`, `role`, 태그)** 및 **커널 계약 규격(`VAL-SCHEMA`, `RES-NODE-NOT-FOUND`, `AUTH-MISSING-CREDENTIAL`, `AUTH-PROJECT-SCOPE` 등)**과 1:1로 엄격히 대응시키며, 존재하지 않는 셀렉터나 임의 합성 값의 기재를 전면 금지(Zero Fake Selectors / Zero Fake Values)한다.
 
@@ -44,7 +44,7 @@ tags: ["s05-fe", "acceptance-matrix", "placement-preview", "resource-explorer", 
   - `offered <= physical capacity` 불변식은 풀 응답 스키마 자체의 상호 대소 제약이 아니라, 노드 등록 경계(`src/saintvision/services/nodes.py:71-79`)에서 강제되는 도메인 불변식으로 출처를 엄격히 분리한다.
 - **배치 미리보기 정직성 및 가짜 샤드 합성 0 (Zero Fake Shards)**:
   - 서버 배치 미리보기(`GET /v1/pools/{poolId}/placement-preview`)는 오직 유휴 우선 후보 노드 순위(`candidates`, `candidateCount`)만을 반환하며 샤드 ID나 실행 배치 결과를 포함하지 않는다.
-  - `PlacementSimulator`는 가짜 샤드 ID(`shd_*`)를 전혀 합성하지 않으며, 테이블 헤더(`후보 순위`, `후보 노드`, `적격 여부`)에 따라 `#1`, `#2` 등의 후보 순위와 적격 상태(`적격 (Eligible)` / `부적격 (Ineligible)`)만을 정직하게 렌더링한다. 실제 분산 샤드(`shardIndex`, `assignedCpuMillicores` 등) 할당은 서버 분산 계획(`POST /v1/pools/{poolId}/plans`)을 통해서만 수립되며, 실행 상세(`RunDetail`)에서만 관리된다.
+  - `PlacementSimulator`는 가짜 샤드 ID(`shd_*`)를 전혀 합성하지 않으며, 미리보기 응답에 실제 등록 샤드가 없으므로 샤드 영역에 `등록된 shard 없음(UNMEASURED)` 빈 상태(`preview-empty-state`)를 정직하게 렌더링한다. 실제 분산 샤드(`shardIndex`, `assignedCpuMillicores` 등) 할당은 서버 분산 계획(`POST /v1/pools/{poolId}/plans`)을 통해서만 수립되며, 실행 상세(`RunDetail`)에서만 관리된다.
   - 미리보기 실패 시 클라이언트는 가짜 샤드를 날조하지 않고 `서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다` 경보를 표출한다.
 - **로컬 시뮬레이션과 서버 어드미션의 엄격한 경계 분리**:
   - `PlacementSimulator`의 클라이언트 결정론적 평가는 `로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)` 배지로 한계를 명시하고, 로컬 UNVERIFIED Explain과 서버 candidate preview를 철저히 분리한다.
@@ -61,7 +61,7 @@ tags: ["s05-fe", "acceptance-matrix", "placement-preview", "resource-explorer", 
 | 영역 코드 | 핵심 테마 | 대상 컴포넌트 / 모듈 | 핵심 방어 기제 및 백엔드 계약 규격 |
 |:---:|---|---|---|
 | **POL** | **풀 인벤토리 및 3원 용량 분리**<br>(Pool & Capacity Partitioning) | `ResourceExplorer.tsx`<br>`PlacementSimulator.tsx`<br>`fabricControlApi.ts`<br>`services/pools.py` | • `GET /v1/pools`: `{ items: [{ poolId, projectId, name, status, memberCount }], count }` (용량 미번들링)<br>• `GET /v1/pools/{id}/capacity`: 독립 호출로 3원 수치(`totalOffered`, `largestSingleNode`, `spareNow`) 동시 표기<br>• `SNAPSHOT_FRESHNESS_SECONDS = 120` 초과 노드는 `measured: false`, spare=0 처리 및 `unmeasuredNodes` 분리<br>• 정적 스냅샷 수동 갱신 고지(`pool-tab-manual-refresh-notice`, `textContent` 인라인 태그 포함 검사) |
-| **PRV** | **배치 미리보기 및 샤드 어댑터**<br>(Placement Preview & Shards) | `PlacementSimulator.tsx`<br>`ResourceExplorer.tsx`<br>`fabricControlApi.ts`<br>`services/pools.py` | • `GET /v1/pools/{id}/placement-preview`: 유휴 우선(`-headroom`, `nodeId`) 후보 순위 반환<br>• 트리거: 풀/요구량 변경에 따른 자동 조회 + `button[data-testid="preview-retry-btn"]` (수동 버튼은 RE의 `적격 노드 순위 조회`)<br>• 실제 헤더: `샤드 ID`, `타겟 노드`, `배치 상태` (PS:678~680)<br>• Zero Fake Shards: 후보 순위 표출, 실제 등록 샤드가 없는 미리보기는 UNMEASURED 표기 |
+| **PRV** | **배치 미리보기 및 샤드 어댑터**<br>(Placement Preview & Shards) | `PlacementSimulator.tsx`<br>`ResourceExplorer.tsx`<br>`fabricControlApi.ts`<br>`services/pools.py` | • `GET /v1/pools/{id}/placement-preview`: 유휴 우선(`-headroom`, `nodeId`) 후보 순위 반환<br>• 트리거: 풀/요구량 변경에 따른 자동 조회 + `button[data-testid="preview-retry-btn"]` (수동 버튼은 RE의 `적격 노드 순위 조회`)<br>• Zero Fake Shards: 후보 순위 표출, 실제 등록 샤드가 없는 미리보기는 UNMEASURED 빈 상태(`preview-empty-state`) 표출 |
 | **LOC** | **로컬 평가 경계 및 디스커버리**<br>(Local Boundary & Discovery) | `PlacementSimulator.tsx`<br>`ResourceTopologyGraph.tsx`<br>`PlacementExplainView.tsx` | • `local-simulation-badge`에 `로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)` 영구 명시<br>• Hard Filter 5단계 및 다기준 가중치(0.4 locality + 0.3 headroom + 0.3 net) 클라이언트 시뮬레이션<br>• `GET /v1/discovery/candidates` 신고 스펙(`claimed*`) 및 `CANDIDATE (미검증)` 표출<br>• 후보 부재 시 운영자 조치 안내(`candidates-empty-state`) |
 | **PLN** | **분산 계획 수립 및 멤버 관리**<br>(Planning & Member Management) | `ResourceExplorer.tsx`<br>`fabricControlApi.ts`<br>`services/pools.py` | • 관측 전용(`observationOnly`, `schedulable: false`) 노드 편입 시 클라이언트 가드로 PUT 0건 차단<br>• `plan-run-id-input` 공백 시 `create-plan-btn` 비활성화 및 사용자 조치 안내 표출<br>• 정본 전략 enum(`sharded`, `data_parallel`, `single_node`) 매핑 완료로 정상 201 Created 계획 수립<br>• `splittableDeclared` 미선언 다중 샤드 또는 부분 배치 시 422 `VAL-SCHEMA` 정직 거절 |
 
@@ -84,8 +84,8 @@ tags: ["s05-fe", "acceptance-matrix", "placement-preview", "resource-explorer", 
 
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 네트워크 규격 | 검증 단언 및 기대값 |
 |:---:|---|---|---|---|---|---|
-| **PRV-01** | **유휴 우선 적격 후보 노드 순위 조회 및 설명 표출** | `PlacementSimulator.tsx`<br>`ResourceExplorer.tsx`<br>`fabricControlApi.ts` | 유효한 풀 선택 및 워크로드 자원 요구량(CPU 4C, RAM 8GB, GPU 0) 설정 | `PlacementSimulator` 요구량 슬라이더 조절(자동 조회) 또는 `button[data-testid="preview-retry-btn"]` 클릭 (참고: RE에서는 `적격 노드 순위 조회` 버튼) | • API 경로: `GET /v1/pools/{poolId}/placement-preview?cpuMillicores=4000&ramBytes=8589934592&gpuDevices=0`<br>• 어댑터: `fabricControlApi.ts`의 `getPoolPlacementPreview`<br>• 로딩 셀렉터: `div[data-testid="preview-loading"]`<br>• 테이블 헤더: `<th>후보 순위</th>`, `<th>후보 노드</th>`, `<th>적격 여부</th>` (PS:680~682) | • 백엔드가 유휴 여유도 순(`-headroom`) 및 `nodeId` 사전순 정렬된 후보 반환.<br>• 프런트엔드 `PlacementSimulator` 상단에 `🤖 서버 실시간 배치 설명: 적격 노드 N대 확인 (풀: ...)` 표출.<br>• **Zero Fake Shards 원칙 준수**: `PlacementPreviewResponse` 계약에 따라 임의의 가짜 샤드 ID(`shd_*`)를 합성하지 않고, 서버가 반환한 후보 순위(`#1`, `#2`, ...)와 노드 ID 및 적격 여부(`적격 (Eligible)` / `부적격 (Ineligible)`)를 1:1로 렌더링. 실제 분산 샤드 할당 및 실행은 계획 수립 후 커밋된 런(PLN-03 및 RunDetail)에서만 관리됨을 엄격히 분리. |
-| **PRV-02** | **가용 노드 부재 시 빈 상태 고지 및 가짜 샤드 합성 차단** | `PlacementSimulator.tsx` | 풀의 최대 노드 용량을 초과하는 과도한 요구량 설정 (예: CPU 64 Cores) | 슬라이더 조절로 요구량 변경 | • API 응답: `candidateCount: 0`, `candidates: []`<br>• 빈 상태 요소: `p[data-testid="preview-empty-state"][role="status"]`<br>• 안내 문구: `가용 적격 노드가 없습니다. 👉 [사용자 조치 필요]: 상단 슬라이더에서 모델 크기 또는 자원 풀 요건을 변경하십시오.` | • 후보 노드가 0건일 때 `preview-empty-state`가 마운트됨.<br>• DOM 상에 어떠한 가짜 샤드 행(Row)도 합성되지 않음 (테이블 언마운트).<br>• 사용자 조치 안내(슬라이더 조절) 정직 표출. |
+| **PRV-01** | **유휴 우선 적격 후보 노드 순위 조회 및 실제 샤드 부재 시 UNMEASURED 표출** | `PlacementSimulator.tsx`<br>`ResourceExplorer.tsx`<br>`fabricControlApi.ts` | 유효한 풀 선택 및 워크로드 자원 요구량(CPU 4C, RAM 8GB, GPU 0) 설정 | `PlacementSimulator` 요구량 슬라이더 조절(자동 조회) 또는 `button[data-testid="preview-retry-btn"]` 클릭 (참고: RE에서는 `적격 노드 순위 조회` 버튼) | • API 경로: `GET /v1/pools/{poolId}/placement-preview?cpuMillicores=4000&ramBytes=8589934592&gpuDevices=0`<br>• 어댑터: `fabricControlApi.ts`의 `getPoolPlacementPreview`<br>• 로딩 셀렉터: `div[data-testid="preview-loading"]`<br>• 빈 상태 셀렉터: `p[data-testid="preview-empty-state"][role="status"]`<br>• 안내 문구: `등록된 shard 없음(UNMEASURED) - 가용 샤드가 없습니다. 👉 [사용자 조치 필요]: 상단 슬라이더에서 모델 크기 또는 샤드 수를 조절하거나 자원 풀 요건을 변경하십시오.` | • 백엔드가 유휴 여유도 순(`-headroom`) 및 `nodeId` 사전순 정렬된 후보 반환.<br>• 프런트엔드 `PlacementSimulator` 상단에 `🤖 서버 실시간 배치 설명: 적격 노드 N대 확인 (풀: ...)` 표출.<br>• **Zero Fake Shards 및 UNMEASURED 렌더링**: 정본 `PlacementPreviewResponse` 응답은 후보 순위(`candidates`, `candidateCount`)만을 제공하며 실제 등록된 샤드/위치를 포함하지 않음. 따라서 `PlacementSimulator`는 가짜 `shd_*`를 합성하지 않고 실제 shard/location이 응답에 없을 때 `등록된 shard 없음(UNMEASURED)` 상태로 정직 렌더링함. 실제 분산 샤드(`shardIndex`, `assignedCpuMillicores` 등) 할당 및 배치는 분산 계획 수립(`POST /v1/pools/{poolId}/plans`) 및 실행 상세(`RunDetail`)에서만 관리됨. |
+| **PRV-02** | **가용 노드 부재 시 빈 상태 고지 및 가짜 샤드 합성 차단** | `PlacementSimulator.tsx` | 풀의 최대 노드 용량을 초과하는 과도한 요구량 설정 (예: CPU 64 Cores) | 슬라이더 조절로 요구량 변경 | • API 응답: `candidateCount: 0`, `candidates: []`<br>• 빈 상태 요소: `p[data-testid="preview-empty-state"][role="status"]`<br>• 안내 문구: `등록된 shard 없음(UNMEASURED) - 가용 샤드가 없습니다. 👉 [사용자 조치 필요]: 상단 슬라이더에서 모델 크기 또는 샤드 수를 조절하거나 자원 풀 요건을 변경하십시오.` | • 후보 노드가 0건일 때 `preview-empty-state`가 마운트됨.<br>• DOM 상에 어떠한 가짜 샤드 행(Row)도 합성되지 않음 (테이블 언마운트).<br>• 사용자 조치 안내(슬라이더 조절) 정직 표출. |
 | **PRV-03** | **서버 배치 미리보기 실패 에러 배너 및 불변식 검증** | `PlacementSimulator.tsx` | 백엔드 통신 두절 또는 422 `VAL-SCHEMA` 오류 발생 | `loadPlacementPreview` 호출 시 거부 | • 에러 배너: `div[role="alert"][data-testid="preview-error-banner"]`<br>• 불변식 텍스트: `서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다.`<br>• 재시도 버튼: `button[data-testid="preview-retry-btn"]` | • `role="alert"` 경보가 마운트되고 지정된 불변식 안내 문구가 정확히 렌더링됨.<br>• `serverShards` 상태가 `[]`로 초기화되어 미검증 샤드가 화면에 남지 않음.<br>• 재시도 버튼 클릭 시 `loadPlacementPreview()` 재호출. |
 
 ---
