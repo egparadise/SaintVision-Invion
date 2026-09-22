@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+check_anchor_weight 전수 적용 (Claude, 2026-09-22): tip에 실전 실행. 진짜 구멍=EvidenceEnvelope(앵커5·시험0, Codex 인계), 괜찮음=called-only 7(계약 거부 시험 있음), 애매=서빙거부 시험 필요여부(변이). replay12 대보기로 도구 사각 확인(scope 7모듈·타입단위라 replay 분기 못 봄→Codex 2b+negative-prior 소관). 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
+
 앵커 무게 도구화 (Claude, 2026-09-22): bbc1eb2f 스펙트럼 발견을 `tools/check_anchor_weight.py`(거부-커버리지 tier 정적 분류, report-only, check_contract_bindings 보완)로 구조화. 변이 ground truth와 7/7/1 정확 일치 교차검증, 함수수준으로 거짓양성 잡음, 자기시험 3 passed(병 심기 포함). 런타임 무게 확증은 격리 변이 절차서 [[앵커_무게_검증_절차]]. 새PC 옮겨도 지식이 도구로 남음.
 
 이전 기준선 + check_ontology RED (Claude, 2026-09-22): 새 PC 대조 기준선을 clean `47b0d2de`에서 규칙8 전수 측정, 이전 절차서 「기준선」 절에 기록(CI-스코프 1650 passed/1039 skip·vitest 655/75·tsc/build/contracts:check 통과). **RED**: check_ontology — S01-DB/FE done인데 ontology 미재생성; `generate_ontology.py`로 2줄만 고쳐 green 격리검증, 소유 Codex 착지 필요(CI 개방이라 우선). 전문 [[개발환경_이전_절차서]].
