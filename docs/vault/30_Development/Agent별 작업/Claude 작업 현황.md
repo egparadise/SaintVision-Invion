@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
-author: "Codex"
-updated: "2026-09-22T17:10:00+09:00"
+author: "Claude"
+updated: "2026-09-22T16:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -15,9 +15,11 @@ source_of_truth: "Git"
 - 배정 owner: Claude. 독립 reviewer: Codex. 최신 수신·착수·독립검토 상태는 아래 SHA별 인계 기록을 따른다.
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill service-integration v1.0.0. 계획: [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-11T17:07:33+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
+- 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Codex origin/integration 착지 4건 독립 검토 완결 (Claude, 2026-09-22): `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구). 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정. 전문 [[2026-09-22_16-55-00_KST_Claude_Codex착지4건_독립검토]].
 
 새 PC 첫날 — CI 첫 실행 triage + 이전 후 전수 검증 (Claude, 2026-09-22): SHA d01c931a. CI 4 workflow 관측(docs 성공·backend/core/browser 실패) → 원인 5(C1 계약 drift=B1 회귀·C2 rdflib=B2·C3 docker exec·C4 자격증명 매핑·C5 브라우저 3=A), **Claude 레인 0**. 작성 중 Codex가 C1~C4를 착지(881f2911·51d53b7f) → 2차 실행에서 C5=`test_desktop_browser`·`test_studio_browser`(Gemini)로 귀속, **C6 신규**=vitest 시간 포맷이 러너 locale에 기댐(B2, Gemini). CI가 처음 검증한 것: Go 컴파일·race·announce_test 해소(Go 지도 갱신), PG-in-CI로 2964 수집/58 skip, node 레인 5개 0실패. 새 PC 전수(절차서 §5, clean 트리): 게이트 PASS·프런트 기준선 동일(tsc/build/vitest 655/contracts 16)·pytest 실PG 2549 passed/2 failed/408 skip(failed 2는 단독 통과: `.work` 선존재 가정·공유 PG 경합 추정). 환경 차이 1: check_frontend_integrity가 cp949 콘솔에서 ✔ 출력으로 exit 1(검사는 0위반) → Gemini 짚어 넘김, 이 PC는 PYTHONUTF8=1. Go 이 PC에도 없음(CI 위임). 전문 [[2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude]].
 
