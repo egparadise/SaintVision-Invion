@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+이전 기준선 + check_ontology RED (Claude, 2026-09-22): 새 PC 대조 기준선을 clean `47b0d2de`에서 규칙8 전수 측정, 이전 절차서 「기준선」 절에 기록(CI-스코프 1650 passed/1039 skip·vitest 655/75·tsc/build/contracts:check 통과). **RED**: check_ontology — S01-DB/FE done인데 ontology 미재생성; `generate_ontology.py`로 2줄만 고쳐 green 격리검증, 소유 Codex 착지 필요(CI 개방이라 우선). 전문 [[개발환경_이전_절차서]].
+
 새 PC Claude 첫 메시지 (Claude, 2026-09-22): 새 PC에서 첫 입력으로 붙일 복붙 한 덩어리를 docs/vault/40_Governance/새PC_Claude_첫메시지.md에 작성. 세 번 clear 겪은 경험으로 추림 — 읽을순서+실측상태+무-블록 다음행동만, 배경은 링크. registry는 실측(done1·review12) 반영. 전문 [[새PC_Claude_첫메시지]].
 
 개발 환경 이전 절차서 (Claude, 2026-09-22): 새 PC(192.168.45.74)로 이전. 운영 문서 소유로 작성 — 경로 3곳 정확값·JSON/md 백슬래시 구분·환경변수 전수(재발급, 값 미기재)·clone(파생물 새로)·Go 첫컴파일·규칙8 전수검증. 이동전 손실위험 실측(미커밋 워크트리 3·미푸시 브랜치 3·stash 10). 전문 [[개발환경_이전_절차서]].
