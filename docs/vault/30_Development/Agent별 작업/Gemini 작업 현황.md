@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.110"
+version: "1.0.111"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T17:15:00+09:00"
+updated: "2026-09-22T18:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T17:15:00+09:00.
+- 확인 기준: 2026-09-22T18:10:00+09:00 (최신 작업 브랜치 `agent/gemini/fix-desktop-studio-browser`).
 
 ## 최근 확인한 진척
 
@@ -31,6 +31,22 @@ source_of_truth: "Git"
   - 커널 런타임 가드(±5초) 공인, P2 알람 라우팅 정합, 실 PG 검증 시험 명세 및 실패 Run 재시도(ModelRetry)/온디맨드 복구/배치 예약 분석 수립. PR #38 등록.
 
 
+
+## 2026-09-22 hosted CI Browser Acceptance 4건 전수 합격 및 Vitest Ubuntu 로캘 치유 완결 (`agent/gemini/fix-desktop-studio-browser`)
+
+- **Task B: Vitest Ubuntu CI 로캘 불일치 치유 (`freshness-and-staleness-wiring.test.tsx`, PR #40)**:
+  - Ubuntu CI 러너(`en-US`) 환경에서 `testTimestamp.toLocaleTimeString()`이 `12:30:00 AM`을 반환하여 컴포넌트(`toLocaleTimeString('ko-KR')` = `오전 12:30:00`)와 충돌하던 2개 단언을 `'ko-KR'` 로캘 명시로 정합.
+- **Task A: Browser Acceptance Tests 4건 전수 합격 치유 (`InvFileExplorer.tsx`, `test_desktop_browser.py`, `test_studio_browser.py`)**:
+  - `InvFileExplorer`에 정본 저장소 카탈로그(`fabricObservation.locations`, `resolve`, `replicas`) 조회 폼, 목록 새로고침 버튼, 복제본 상태 상세 아티클을 통합 복원.
+  - 가상 패브릭 빈 상태 텍스트(`네임스페이스에 등록된 파일이 없습니다.`)와 정본 카탈로그 빈 상태(`등록된 파일이 없습니다.`)를 분리하여 Playwright `exact=True` strict mode 충돌 원천 차단.
+- **실측 검증 전수 합격**:
+  - `pytest tests/integration/test_desktop_browser.py tests/integration/test_studio_browser.py`: **4 passed** (실 PG 16 컨테이너 + Playwright Chromium, 50.76s).
+  - `npx tsc -b`: exit code 0.
+  - `npm run build`: exit code 0 (6.03s, 765.47 kB).
+  - `python tools/check_frontend_integrity.py`: **All 9 rules satisfied (0 violations)**.
+  - `pytest tests/test_route_coverage.py`: **30 passed in 1.00s**.
+  - `npm --prefix apps/web test`: **75개 파일 655/655 passed 100%**.
+  - 상세 보고: [[2026-09-22_Desktop_Studio_Browser_수용검증_및_저장소카탈로그_정합_Gemini]].
 
 ## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
 
