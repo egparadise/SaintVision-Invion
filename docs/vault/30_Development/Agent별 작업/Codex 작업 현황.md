@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.169"
+version: "1.0.170"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T19:45:00+09:00"
+updated: "2026-09-22T20:19:51+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 VF-CL-02(c) 실행 Manifest 관측 + model-retry F1
+
+- 타 tenant model-retry가 `503 SYS-0001`을 내던 idempotency 선행 순서를 기존 `can_request` 경계 앞에서 차단하도록 고쳐 `403 AUTH-0030` ProblemDetails로 만들었다. 본 트랜잭션 재검사는 유지했다.
+- project-scoped `GET /v1/projects/{project}/models/{modelId}/versions/{version}/execution-manifest`와 strict `ModelExecutionManifestObservation`을 추가했다. missing shard/mapping은 `409 MODEL-0001` 전체 실패, stale·location-version mismatch·ready replica 없음은 `readyNodes=[]`/`materialisable=false`다. 기존 commitment API는 불변이다.
+- R1 구현 SHA `4473c7f1`(부모 `b877c601`)은 origin integration에 fast-forward 착지했다. focused 68 passed, 실 PG HTTP 2 passed/0 skipped, 생성 drift 0, bindings 52 fixtures/17 types/20 sites/12 replay guards, model_view anchor 1 rejection-tested/1 called-only/0 gap, docs·frontend·ontology·ratchet exit 0이다.
+- 같은 SHA hosted CI: Docs `35720753478`, Frontend `35720753415`, Desktop Browser `35720753385` success; Backend `35720753407`, Core `35720753383` pending. Claude 독립 검토와 남은 CI 전에는 self-close하지 않는다.
+- 상세: [[2026-09-22_20-19-51_KST_VF-CL-02C_MODEL-RETRY-F1_Codex_구현]].
 
 ## 2026-09-22 S04-DB·S05-DB·S07-DB owner 판정 + PR #53 교차검토
 
