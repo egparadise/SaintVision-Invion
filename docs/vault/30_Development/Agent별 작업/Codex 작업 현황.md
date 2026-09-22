@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.196"
+version: "1.0.197"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T08:45:00+09:00"
+updated: "2026-09-23T09:15:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 LAN pilot CP 겸임 철회 증거·재활성 경계
+
+- 철회 뒤 `init --allow-server-node-colocation`을 재실행해도 disabled/channel을 자동 재활성하지 않으며 private-state 편집·certificate 재등록·대체 Node 우회를 금지한다고 README에 명시했다. 재활성에는 identity 재검증·channel version CAS·audit·disabled 해제를 묶은 별도 검토 command가 필요하며 현재 미구현이다.
+- 겸임 Node 없이 철회 명령을 실행하면 flag false와 빈 disabled/channel 목록만 남기는 무해한 idempotent opt-out이고 독립 Node는 불변이다. 이는 과거 겸임 identity 존재 증거가 아니다.
+- final `6230b06f`의 disposable 실 PG 단일 시험은 CP channel version 1→2/enabled false, provision v1+revoke v2 audit, 독립 channel v1/enabled true, Node 2행·key/journal/cert bytes 보존을 확인해 1 passed/8.77s/exit 0이다. PG-free 47 passed와 표준 게이트도 exit 0. PR #105, reviewer Claude. [[2026-09-23_09-15-00_KST_LAN-PILOT-CP-철회증거_Codex]].
+- 실 파일럿은 변경하지 않았고 Docker API 1.41·WSL Ubuntu blocker와 `review`를 유지한다.
 
 ## 2026-09-23 S05 Card21 lock-wait 기전 확인
 
