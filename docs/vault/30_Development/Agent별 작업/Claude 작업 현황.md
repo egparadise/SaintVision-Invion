@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.9"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T21:30:00+09:00"
+updated: "2026-09-22T22:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -88,6 +88,10 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+S01-BE·S01-ST 잔여 합격 조건 표 (Claude, 2026-09-22): AC-01 요구 증거(계약 검증·설계 검토·인벤토리 보고)별 충족/미충족(우리 몫)/외부 대기(U1~U6 사용자 입력)를 가르고 S02 체크리스트 절 번호에 연결. 사용자 결정 6건 맨 위. 우리 몫 3건(증거 기록 갱신=Codex, 인벤토리 표 양식+미확인 열=Claude, 보존 정리 실측=Claude). 판정 아님(self-close 금지). 전문 [[2026-09-22_S01-BE_S01-ST_잔여_합격조건표_Claude]].
+
+route_coverage CLI docs.yml report-only 배선 (Claude, 2026-09-22): `continue-on-error`+`exit 0`으로 job 미실패, 실제 exit는 step-summary 제목·로그에 기록, json/txt artifact. 서빙 트리는 src·services(tests 제외). 검증검사도구_목록 v1.4.0에 등급·승격 조건(1주 exit 0 ∧ 백로그 0 → ratchet 이름집합). 로컬 step 시뮬레이션 exit 0·43/0. 브랜치 agent/claude/route-coverage-docs-gate(PR #45 위 stack), 워크플로는 Codex 소유라 검토 요청. 전문 [[2026-09-22_route_coverage_CLI_docs.yml_report-only_배선_Claude]].
 
 결정 #7 실 운영 증거 (Claude, 2026-09-22): 정본 tip 7168d573(#41 병합)의 `tools/alarm_check.py`를 이 PC dev PG(invdev, head 0045, 노드 0대)에 실제 실행 — exit 0, 7 family 전부 ok, `Node 시각 스큐 한도 초과: 0 online node(s) … of 0 online`, governance-gated 0. **quiet는 시계 정상이 아니라 볼 노드가 없다는 뜻**(정직 표기); firing 경로 증거는 일회용 DB 7케이스뿐, 채널은 여전히 없음. 증거 파일 Evidence/alarm-check-live-7168d573-20260922.{txt,json}(비밀 0건). 전문 [[2026-09-22_결정7_시각스큐알람_실운영증거_dev_PG_Claude]].
 
