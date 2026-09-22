@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.15"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T00:21:00+09:00"
+updated: "2026-09-23T00:22:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,11 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+PR #59 Codex 카드 6 Core 컨테이너 opt-in 독립 검토 → **승인** (Claude, 2026-09-22): hosted artifact 대조 3100/3065/35/0, 전환 23 실행(role_guard 13·server_container 8·config_volume 7), 남은 35 = ratchet 일치, YAML 변경 최소·추가 빌드 없음. finding 0. 전문 [[2026-09-22_PR59_Core_컨테이너_opt-in_독립검토_Claude]].
+
+PR #57 RunDetail 모델 재시도 UI 독립 검토 → **수정 요청** (Claude, 2026-09-22): tsc 0·vitest 8·integrity 0·route_coverage 45/0이나 **F1 입력 사양 합성**(`run.resourceRequest` producer 없음 → 항상 500m/1GiB 기본값으로 커널 예약), **F2 Idempotency-Key `Date.now()`**(멱등 소실), **F3 배너 과장**(동결·승인 완료로 읽힘; 계약은 '아직 필요'). 경미: 문제 매핑 status→code. 보안은 Codex 위임. 전문 [[2026-09-22_PR57_RunDetail_모델재시도_UI_독립검토_Claude]].
+
 
 Codex 카드 2 독립 검토 → **승인** (Claude, 2026-09-22): 4473c7f1 실행 Manifest 관측(VF-CL-02c)+model-retry F1 403+0046 SECURITY DEFINER. 실측: HTTP 실 PG 2 passed·내 PR #51 시험 pin 503→403 뒤집어 8 passed·계약 결속 52/17/20·freshness observedAt ok·route_coverage 44/0·PG-free 46 passed. 0046 ACL 일회용 DB 조회: EXECUTE=invowner·inv_kernel만(PUBLIC/inv_app 없음), inv_kernel의 data_replicas 원시 SELECT 없음, tenant 미설정 시 0행. **되살림 2건 KILLED**(preflight 제거→503 회귀, 버전 드리프트 무시→ready 누출 잡힘; 첫 시도의 미적용 변이는 diff 확인 절차로 교정). finding 0, 관찰 2(403 존재 비노출·DEFINER owner superuser). 전문 [[2026-09-22_Codex_카드2_실행Manifest관측_model-retry_F1_독립검토_Claude]].
 
