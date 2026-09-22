@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+커밋 규칙 R2-b 추가 (Claude, 2026-09-22): push는 게이트 exit code로 막는다(출력≠게이트). 오늘 red 2회 push 부류를 공유 규칙으로 승격, R2-a와 형제·부류명 「검사 ≠ 준수」. 전문 [[공유워크트리_개인index_커밋규칙]].
+
 이어가기 §0 마감 + Codex 집계 대조 (Claude, 2026-09-22): §0 5항 정합(상태·열린갈래·gh/Go·오늘vs어제·기준선이후착지). check_contract_bindings 자리수 vs Codex 집계: 응답계약 EvidenceEnvelope 5=5 일치, 입력/식별자는 내 도구 의도 제외(범위 차이, 버그 아님). 이 기계 마지막 정리.
 
 check_contract_bindings 단위 선언 (Claude, 2026-09-22): (2) 서빙앵커 게이트 출력을 타입/자리 단위 명시로 정직화(게이트 로직 불변). 14 타입/17 자리/다중자리 목록(EvidenceEnvelope 5자리)·자리별 시험은 정적 불가 명시·회귀 아닌 정확화 주석. 어젯밤 check_anchor_weight 범위선언과 같은 교정. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].

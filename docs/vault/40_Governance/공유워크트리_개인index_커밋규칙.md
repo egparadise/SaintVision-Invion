@@ -45,6 +45,7 @@ git show --name-only --pretty=format: "$COMMIT"          # 내 파일만인지, 
 ```
 - 부모가 내가 잡은 `BASE`인지, 파일이 정확히 내 것인지 확인. **주의**: 한글 파일명은 git이 octal escape로 출력하므로, grep으로 "예상외 파일 없음"을 판정할 때 인코딩 때문에 오탐하기 쉽다 — 눈으로 파일 목록을 직접 확인하라.
 - **R2-a 공유 문서엔 pre-commit drift 검사를 hard-stop으로.** 기존 파일(브리프·§0·정본 등)을 개인 index로 올릴 땐 add 전에 `git diff --name-only <내base> <BASE> -- <파일>`로 남이 그새 고쳤는지 본다. **출력만 하고 진행하면 소용없다 — 비어있지 않으면 커밋 중단(`exit`)하고 현재판에 재적용**하라. 실례(2026-09-22): S02 커밋이 stale tip(a8c979d0) 기반이라 그 사이 Codex `8b20d3e6`("close S01-DB")가 갱신한 브리프 callout을 되돌렸다(clobber). drift 검사가 **출력됐으나 스크립트가 안 멈춰** 통과했고, push 후 **R2 rev-range로 사후 발견**해 복구했다(a21e5f18). 즉 "가드가 있는데 강제 안 됨"(오늘 밤 부류). 검사는 **출력이 아니라 halt**여야 하고, R2는 사후 안전망일 뿐 pre-commit 정지를 대체하지 않는다.
+- **R2-b push는 게이트의 exit code로 막는다 — 출력을 보는 것은 게이트가 아니다.** 착지 전 check_docs 등 게이트를 돌렸으면 그 **exit를 push 조건 안에 넣어라**: `CD=$?; ... ; if [ "$CD" -eq 0 ] && [ "$NOW" = "$BASE" ]; then git push ...`. **위반 = 게이트를 돌리고도 exit를 안 보고(또는 tip 비교로만 게이트하고) push하는 것.** "출력이 통과처럼 보였다"는 변명이 안 된다. 실례(2026-09-22, 2회): 문서에 위키링크 문법(메모리 슬러그·빈 대괄호 예시)을 넣어 check_docs가 exit 1이었는데 push를 tip 비교로만 게이트해 **red가 tip에 앉았다**(1d413155→d1c6992c, 44022523→2c83aa21). **R2-a와 형제**: R2-a는 drift 검사를 출력만 하고 안 멈춘 것, R2-b는 게이트를 돌려놓고 결과를 안 본 것. 둘 다 **「검사 ≠ 준수」**(검사는 했으나 그 결과가 다음 행동을 안 바꿈) 부류다 — 검사 결과는 반드시 **다음 명령의 조건**이어야 한다(printing ≠ gating).
 
 ### R3. 남이 편집 중인(=dirty) 공유 파일은 편집·stage하지 않는다
 - 진행판(`docs/vault/00_Index/전체 개발 진행 현황.md`)처럼 여러 에이전트가 함께 쓰는 파일은, 남이 dirty면 손대지 않는다. 꼭 추가해야 하면 **origin 판을 읽어 append한 blob을 개인 index에 주입**한다(working tree 미접촉):
