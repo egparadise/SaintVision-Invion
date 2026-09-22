@@ -1,4 +1,4 @@
-# Two Windows PCs: connection pilot
+# Windows server and LAN workers: connection pilot
 
 This package starts the real `inv-node` TLS transport and PostgreSQL-backed
 `ObservationWorker`. The initial scope is enrollment, current mTLS possession,
@@ -24,6 +24,12 @@ python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot 
 python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot observe
 ```
 
+`--node-ip` may be repeated. A repeated `init` against the same state may add
+addresses, but it never removes an existing Node or changes its Node ID, key,
+channel, CA, database, or recovery epoch. The original single-Node command and
+top-level state fields remain supported; the first Node is the compatibility
+primary.
+
 `init` requires the repository Python dependencies, Docker, an available local
 `pgvector/pgvector:pg16` image and loopback port 55440. The image is resolved to
 its local content ID. Credentials are randomly generated in the protected state
@@ -32,11 +38,86 @@ only. The runtime role inherits `inv_kernel`, has no ownership or RLS bypass.
 Keep the state directory: it contains the independently generated recovery epoch
 and CA. A partial failure is preserved for inspection, never reset automatically.
 
-The download service exposes only `worker.zip`, `worker.sha256`, `node-cert.pem`
-and its own `/healthz`. It binds only the configured LAN address and accepts only
-the server and specified worker IP. Add a Windows inbound rule for TCP 18081 from
-the worker IP only. This is a public-file transfer service, not the product API.
-It has no upload/enrollment/signing endpoint and never serves private state.
+The download service exposes only the requesting Node's `worker.zip`,
+`node-cert.pem`, optional workspace bundle, and its own `/healthz`. It binds only
+the configured LAN address and maps the TCP source address to one configured
+Node ID; another configured Node cannot download that bundle. Hash sidecar files
+remain on the server for the operator and are deliberately not served over this
+channel. Add a Windows inbound rule for TCP 18081 whose remote-address list is
+exactly the configured worker IP list printed by `serve`. This is a public-file
+transfer service, not the product API. It has no upload/enrollment/signing
+endpoint and never serves private state.
+
+## Four Ubuntu workers on one pilot state
+
+The Windows PC remains the server. Reserve four stable worker IPv4 addresses and
+initialize all four against one state, isolated PostgreSQL database, CA, and
+recovery epoch:
+
+```powershell
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot init `
+  --server-ip 192.168.45.74 `
+  --node-ip 192.168.45.81 --node-ip 192.168.45.82 `
+  --node-ip 192.168.45.83 --node-ip 192.168.45.84
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot bundle --go <path-to-go>
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot serve
+```
+
+`bundle` prints one archive path and SHA-256 per Node. Send each worker only its
+own SHA-256 through the already trusted operator channel; do not fetch a hash
+from the bootstrap HTTP service. The same `/worker.zip` URL returns a different,
+Node-bound archive according to the request source IP. A proxy, NAT, or shared
+download host therefore is not supported for this enrollment step.
+
+Before enrollment, each Ubuntu worker must meet all of these conditions:
+
+- Docker Engine/CLI 25 or newer and Docker **server API 1.45 or newer**. Check
+  both `docker version` and `docker version --format '{{.Server.APIVersion}}'`;
+  an Engine 25 installation exposing only API 1.44 must be upgraded.
+- NTP synchronized (`timedatectl show -p NTPSynchronized --value` prints
+  `yes`) and no unresolved clock-skew alarm.
+- The assigned static/reserved IPv4 is present locally. TCP 18443 inbound is
+  allowed only from `192.168.45.74`; enforce this in the host/upstream firewall
+  or Docker `DOCKER-USER` path and verify a non-server source is denied.
+- TCP 18081 outbound to the server is available only for bootstrap downloads.
+
+On each Ubuntu worker, download and verify its archive, extract it into a fresh
+private directory, and run the shipped scripts from that directory:
+
+```bash
+curl --fail --output worker.zip http://192.168.45.74:18081/worker.zip
+sha256sum worker.zip                         # compare out-of-band value
+unzip worker.zip -d saintvision-worker
+cd saintvision-worker
+bash prepare-worker.sh                       # creates local key and prints public CSR
+```
+
+Return only the CSR to the server operator. For each CSR, the same command is
+used; enrollment reads the CSR common name and selects the already assigned
+Node ID rather than relying on command order:
+
+```powershell
+python tools/lan_pilot.py --state C:/Project/SaintVision-Invion/.work/lan-pilot enroll --csr <node-csr.pem>
+```
+
+Send that command's certificate file SHA-256 to the matching worker over the
+trusted channel. The worker downloads `/node-cert.pem`, verifies the supplied
+hash, places it beside the extracted files, then runs:
+
+```bash
+curl --fail --output node-cert.pem http://192.168.45.74:18081/node-cert.pem
+printf '%s  node-cert.pem\n' '<operator-supplied-sha256>' | sha256sum --check -
+bash finish-worker.sh
+```
+
+`finish-worker.sh` rechecks the fixed identity, preserves the key made by
+`prepare-worker.sh`, copies only the assigned public/configuration material, and
+delegates container startup to `start-node.sh`. Do not call `start-node.sh`
+before the certificate and identity checks. Finally run `status` and `observe
+--once` on the server. Their `nodes` arrays must show four distinct Node IDs and
+IP addresses; each Node is accepted only after its own current mTLS observation
+and persisted resource snapshot. One failed worker does not authorize replacing
+or re-enrolling the other three; preserve the state and retry that worker.
 
 ## Worker enrollment
 
