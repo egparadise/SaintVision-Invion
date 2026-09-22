@@ -9,35 +9,90 @@
   },
   "@graph": [
     {
-      "@id": "res:S12-ST",
+      "@id": "res:AC-01",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "계약과 owner 누락 0, 5노드 조사표의 미확인 값 명시",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-01"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S01-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-01"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "URI·보존·제품 검증·장비 인벤토리",
+      "dev:taskId": "S01-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "in_progress"
+    },
+    {
+      "@id": "res:AC-06",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "허용 범위 편집·Git 성공, CP 재시작 뒤 중복 실행 0, 복원 hash 일치",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-06"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-location",
+      "@type": "ml:DataLocation",
+      "inv:locatedOn": {
+        "@id": "res:example-node"
+      },
+      "ml:checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "sv:status": "ready"
+    },
+    {
+      "@id": "res:S10-DB",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S11-FE"
+          "@id": "res:S09-FE"
         },
         {
-          "@id": "res:S11-BE"
+          "@id": "res:S09-BE"
         },
         {
-          "@id": "res:S11-DB"
+          "@id": "res:S09-DB"
         },
         {
-          "@id": "res:S11-ST"
+          "@id": "res:S09-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Claude"
       },
       "dev:realizes": {
-        "@id": "res:OUT-12"
+        "@id": "res:OUT-10"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "운영 점검·제공 폴더·복구 훈련",
-      "dev:taskId": "S12-ST",
+      "dev:scope": "Dataset/commit/image/model lineage",
+      "dev:taskId": "S10-DB",
       "dev:usesContract": {
-        "@id": "res:contract-Storage"
+        "@id": "res:contract-DB"
       },
       "dev:usesSkill": [
         {
@@ -48,6 +103,12 @@
         }
       ],
       "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:evidence-required-OUT-11",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "E2E·부하·복원·보안·접근성 결과",
       "sv:status": "planned"
     },
     {
@@ -93,82 +154,16 @@
       "sv:status": "review"
     },
     {
-      "@id": "res:evidence-required-OUT-12",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "Release manifest·사용자 인수·웹 smoke·복구 Evidence",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S06-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S05-FE"
-        },
-        {
-          "@id": "res:S05-BE"
-        },
-        {
-          "@id": "res:S05-DB"
-        },
-        {
-          "@id": "res:S05-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-06"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "RunAttempt·Step·Checkpoint·session",
-      "dev:taskId": "S06-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-location",
-      "@type": "ml:DataLocation",
-      "inv:locatedOn": {
+      "@id": "res:example-plan",
+      "@type": "inv:PlacementPlan",
+      "inv:selectsNode": {
         "@id": "res:example-node"
-      },
-      "ml:checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-      "sv:status": "ready"
+      }
     },
     {
-      "@id": "res:OUT-10",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-10"
-      },
-      "sv:displayName": "서로 다른 AI 도구와 모델 계보를 공통 계약으로 추적한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:contract-Backend",
-      "@type": "dev:Contract",
-      "sv:displayName": "Backend",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:contract-DB",
-      "@type": "dev:Contract",
-      "sv:displayName": "DB",
-      "sv:version": "1.0.0"
+      "@id": "res:example-image",
+      "@type": "dev:ContainerImage",
+      "dev:imageDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
     },
     {
       "@id": "res:S07-ST",
@@ -213,33 +208,33 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:S10-ST",
+      "@id": "res:S12-ST",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S09-FE"
+          "@id": "res:S11-FE"
         },
         {
-          "@id": "res:S09-BE"
+          "@id": "res:S11-BE"
         },
         {
-          "@id": "res:S09-DB"
+          "@id": "res:S11-DB"
         },
         {
-          "@id": "res:S09-ST"
+          "@id": "res:S11-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Claude"
       },
       "dev:realizes": {
-        "@id": "res:OUT-10"
+        "@id": "res:OUT-12"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "Model immutable version·보존 pin",
-      "dev:taskId": "S10-ST",
+      "dev:scope": "운영 점검·제공 폴더·복구 훈련",
+      "dev:taskId": "S12-ST",
       "dev:usesContract": {
         "@id": "res:contract-Storage"
       },
@@ -252,206 +247,6 @@
         }
       ],
       "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-06",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "소스 commit·WS/PTY·restart·restore 결과",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-commit",
-      "@type": "dev:CodeCommit",
-      "dev:commitSha": "0000000000000000000000000000000000000000"
-    },
-    {
-      "@id": "res:S03-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S02-FE"
-        },
-        {
-          "@id": "res:S02-BE"
-        },
-        {
-          "@id": "res:S02-DB"
-        },
-        {
-          "@id": "res:S02-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-03"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "Project·Workspace 생성과 실행 결과",
-      "dev:taskId": "S03-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:contract-Storage",
-      "@type": "dev:Contract",
-      "sv:displayName": "Storage",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:AC-09",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "Prompt 100건 유효율 99%, 코딩 과제 30건 성공률 70% 목표, 누출 0",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-09"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S01-ST",
-      "@type": "dev:DevelopmentTask",
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-01"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "URI·보존·제품 검증·장비 인벤토리",
-      "dev:taskId": "S01-ST",
-      "dev:usesContract": {
-        "@id": "res:contract-Storage"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "in_progress"
-    },
-    {
-      "@id": "res:example-image",
-      "@type": "dev:ContainerImage",
-      "dev:imageDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-      "@id": "res:skill-service-integration",
-      "@type": "dev:SkillSpec",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:S06-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S05-FE"
-        },
-        {
-          "@id": "res:S05-BE"
-        },
-        {
-          "@id": "res:S05-DB"
-        },
-        {
-          "@id": "res:S05-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-06"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "Monaco·xterm·diff·session UX",
-      "dev:taskId": "S06-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:example-run",
-      "@type": "inv:Run",
-      "dev:usesCommit": {
-        "@id": "res:example-commit"
-      },
-      "dev:usesImage": {
-        "@id": "res:example-image"
-      },
-      "inv:hasAttempt": {
-        "@id": "res:example-attempt"
-      },
-      "inv:holdsLease": {
-        "@id": "res:example-lease"
-      },
-      "inv:scheduledBy": {
-        "@id": "res:example-plan"
-      },
-      "ml:consumesDataset": {
-        "@id": "res:example-dataset-v1"
-      },
-      "ml:registersModel": {
-        "@id": "res:example-model-v1"
-      },
-      "sv:recordKind": "synthetic_example",
-      "sv:status": "scheduled"
-    },
-    {
-      "@id": "res:agent-Gemini",
-      "@type": "sv:AgentProfile",
-      "sv:displayName": "Gemini",
-      "sv:recordKind": "development_profile",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:OUT-04",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-04"
-      },
-      "sv:displayName": "승인·취소·결과 확인의 단일 노드 여정을 완료한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-10",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "Codex/Claude 계약 동일, 모델의 데이터·코드·평가·승인 역추적",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-10"
-      },
       "sv:status": "planned"
     },
     {
@@ -462,508 +257,6 @@
       },
       "sv:displayName": "Workspace에서 허용 작업이 실행되고 증거가 남는다",
       "sv:status": "planned"
-    },
-    {
-      "@id": "res:S07-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S06-FE"
-        },
-        {
-          "@id": "res:S06-BE"
-        },
-        {
-          "@id": "res:S06-DB"
-        },
-        {
-          "@id": "res:S06-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-07"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "갱신/반납/Offer 경합·복구 기록",
-      "dev:taskId": "S07-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:S10-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S09-FE"
-        },
-        {
-          "@id": "res:S09-BE"
-        },
-        {
-          "@id": "res:S09-DB"
-        },
-        {
-          "@id": "res:S09-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-10"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "두 Provider adapter·MLflow·승인 배포",
-      "dev:taskId": "S10-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:contract-Frontend",
-      "@type": "dev:Contract",
-      "sv:displayName": "Frontend",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:example-attempt",
-      "@type": "inv:RunAttempt",
-      "inv:hasCheckpoint": {
-        "@id": "res:example-checkpoint"
-      }
-    },
-    {
-      "@id": "res:AC-02",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "허용 Node 등록·조회 성공, 토큰 재사용 차단, 다른 project 정보 접근 차단",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-02"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S06-ST",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S05-FE"
-        },
-        {
-          "@id": "res:S05-BE"
-        },
-        {
-          "@id": "res:S05-DB"
-        },
-        {
-          "@id": "res:S05-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-06"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "persistent snapshot·복원 경로",
-      "dev:taskId": "S06-ST",
-      "dev:usesContract": {
-        "@id": "res:contract-Storage"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S02-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S01-FE"
-        },
-        {
-          "@id": "res:S01-BE"
-        },
-        {
-          "@id": "res:S01-DB"
-        },
-        {
-          "@id": "res:S01-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-02"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "로그인·Node 목록·상세·오류 상태",
-      "dev:taskId": "S02-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:skill-core-reliability",
-      "@type": "dev:SkillSpec",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:agent-Claude",
-      "@type": "sv:AgentProfile",
-      "sv:displayName": "Claude",
-      "sv:recordKind": "development_profile",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:S03-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S02-FE"
-        },
-        {
-          "@id": "res:S02-BE"
-        },
-        {
-          "@id": "res:S02-DB"
-        },
-        {
-          "@id": "res:S02-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-03"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "Sandbox·Tool Gateway·기본 정책",
-      "dev:taskId": "S03-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-12",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "5노드 전체 여정·정량 목표·알려진 제한·인수 확인 모두 기록",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-12"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-lease",
-      "@type": "inv:ResourceLease",
-      "inv:expiresAt": {
-        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-        "@value": "2026-09-09T01:00:00+00:00"
-      },
-      "inv:fencingToken": "42",
-      "inv:grantedAt": {
-        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-        "@value": "2026-09-09T00:00:00+00:00"
-      },
-      "inv:leasesResource": {
-        "@id": "res:example-gpu"
-      }
-    },
-    {
-      "@id": "res:S08-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S07-FE"
-        },
-        {
-          "@id": "res:S07-BE"
-        },
-        {
-          "@id": "res:S07-DB"
-        },
-        {
-          "@id": "res:S07-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-08"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "ROOF·kill switch·BuildKit·단일 GPU",
-      "dev:taskId": "S08-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-08",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "보안 시나리오·GPU capability·복원 보고",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S10-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S09-FE"
-        },
-        {
-          "@id": "res:S09-BE"
-        },
-        {
-          "@id": "res:S09-DB"
-        },
-        {
-          "@id": "res:S09-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-10"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "Dataset/commit/image/model lineage",
-      "dev:taskId": "S10-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-10",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "Adapter conformance·lineage query·배포 digest",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-05",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "동일 입력 배치 동일, 50개 동시 예약 초과 0, P95 2초 목표 실측",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-05"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-07",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "이탈 감지 60초 이내, 오래된 토큰 쓰기 0, 복구 성공률 목표 95%",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-07"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S05-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S04-FE"
-        },
-        {
-          "@id": "res:S04-BE"
-        },
-        {
-          "@id": "res:S04-DB"
-        },
-        {
-          "@id": "res:S04-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-05"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "자원 그래프·후보 제외·Explain",
-      "dev:taskId": "S05-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:skill-frontend-delivery",
-      "@type": "dev:SkillSpec",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:evidence-required-OUT-03",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "허용·거부 로그·exit code·증거 ID",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-gpu",
-      "@type": "inv:GPUResource",
-      "inv:vramBytes": 17179869184
-    },
-    {
-      "@id": "res:OUT-12",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-12"
-      },
-      "sv:displayName": "5대 PC에서 개발부터 배포·장애 복구까지 완료한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-08",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "Docker socket 미노출, 승인 우회 0, 합성 GPU 실행 성공, backup 복원",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-08"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:OUT-02",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-02"
-      },
-      "sv:displayName": "로그인한 사용자가 등록 Node와 제공 자원을 본다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-01",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "계약 검증·설계 검토·인벤토리 보고",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S01-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-01"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "저장소·계약·개발 환경·권한 경계",
-      "dev:taskId": "S01-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "in_progress"
     },
     {
       "@id": "res:S04-BE",
@@ -1008,39 +301,90 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:evidence-required-OUT-11",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "E2E·부하·복원·보안·접근성 결과",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S12-FE",
+      "@id": "res:S05-DB",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S11-FE"
+          "@id": "res:S04-FE"
         },
         {
-          "@id": "res:S11-BE"
+          "@id": "res:S04-BE"
         },
         {
-          "@id": "res:S11-DB"
+          "@id": "res:S04-DB"
         },
         {
-          "@id": "res:S11-ST"
+          "@id": "res:S04-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-05"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "Lease 잠금·Fencing·Allocation",
+      "dev:taskId": "S05-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:evidence-required-OUT-01",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "계약 검증·설계 검토·인벤토리 보고",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:OUT-11",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-11"
+      },
+      "sv:displayName": "기능·보안·성능·복원이 검증된 내부망 후보를 만든다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S10-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S09-FE"
+        },
+        {
+          "@id": "res:S09-BE"
+        },
+        {
+          "@id": "res:S09-DB"
+        },
+        {
+          "@id": "res:S09-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Gemini"
       },
       "dev:realizes": {
-        "@id": "res:OUT-12"
+        "@id": "res:OUT-10"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "내부망 HTTPS 웹 배포·교육",
-      "dev:taskId": "S12-FE",
+      "dev:scope": "AI 도구·실험·모델·배포 화면",
+      "dev:taskId": "S10-FE",
       "dev:usesContract": {
         "@id": "res:contract-Frontend"
       },
@@ -1054,6 +398,41 @@
       ],
       "sv:recordKind": "development_plan",
       "sv:status": "review"
+    },
+    {
+      "@id": "res:example-workload",
+      "@type": "inv:Workload",
+      "inv:createsRun": {
+        "@id": "res:example-run"
+      }
+    },
+    {
+      "@id": "res:OUT-08",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-08"
+      },
+      "sv:displayName": "격리된 Build·GPU 작업을 정책과 복구 아래 수행한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:evidence-required-OUT-03",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "허용·거부 로그·exit code·증거 ID",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-offer",
+      "@type": "inv:ResourceOffer",
+      "inv:describesResource": {
+        "@id": "res:example-gpu"
+      },
+      "sv:status": "available"
+    },
+    {
+      "@id": "res:skill-service-integration",
+      "@type": "dev:SkillSpec",
+      "sv:version": "1.0.0"
     },
     {
       "@id": "res:S09-FE",
@@ -1098,61 +477,33 @@
       "sv:status": "review"
     },
     {
-      "@id": "res:AC-04",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "승인 전 실행 0, 중복 요청 부수 효과 0, 전송 재개 hash 일치",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-04"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-09",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "golden eval·분류별 성적·금지 행동 시험",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-checkpoint",
-      "@type": "inv:Checkpoint"
-    },
-    {
-      "@id": "res:AC-01",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "계약과 owner 누락 0, 5노드 조사표의 미확인 값 명시",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-01"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S09-ST",
+      "@id": "res:S04-ST",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S08-FE"
+          "@id": "res:S03-FE"
         },
         {
-          "@id": "res:S08-BE"
+          "@id": "res:S03-BE"
         },
         {
-          "@id": "res:S08-DB"
+          "@id": "res:S03-DB"
         },
         {
-          "@id": "res:S08-ST"
+          "@id": "res:S03-ST"
         }
       ],
       "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-09"
-      },
-      "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "diff·테스트·trace Artifact 연결",
-      "dev:taskId": "S09-ST",
+      "dev:realizes": {
+        "@id": "res:OUT-04"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "전송 재개·실제 checksum 검증",
+      "dev:taskId": "S04-ST",
       "dev:usesContract": {
         "@id": "res:contract-Storage"
       },
@@ -1161,126 +512,6 @@
           "@id": "res:skill-agent-delivery"
         },
         {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:OUT-05",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-05"
-      },
-      "sv:displayName": "5노드 자원을 초과 예약 없이 설명 가능하게 배치한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:OUT-06",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-06"
-      },
-      "sv:displayName": "편집·터미널·Git 작업이 재시작 후 안전하게 재개된다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-06",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "허용 범위 편집·Git 성공, CP 재시작 뒤 중복 실행 0, 복원 hash 일치",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-06"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S03-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S02-FE"
-        },
-        {
-          "@id": "res:S02-BE"
-        },
-        {
-          "@id": "res:S02-DB"
-        },
-        {
-          "@id": "res:S02-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-03"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "Workspace·Workload·Run·Evidence",
-      "dev:taskId": "S03-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:OUT-07",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-07"
-      },
-      "sv:displayName": "Node 손실과 분할 상황에서 낡은 실행을 차단한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S11-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S10-FE"
-        },
-        {
-          "@id": "res:S10-BE"
-        },
-        {
-          "@id": "res:S10-DB"
-        },
-        {
-          "@id": "res:S10-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-11"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "migration·restore·SLO 집계",
-      "dev:taskId": "S11-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
           "@id": "res:skill-core-reliability"
         }
       ],
@@ -1288,284 +519,33 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:OUT-01",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-01"
-      },
-      "sv:displayName": "완성 목표와 계약을 모든 Agent가 동일하게 해석한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-07",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "Node 중단·분할·late result·cache 경합 결과",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:OUT-09",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-09"
-      },
-      "sv:displayName": "Agent가 근거 있는 Context와 제한된 수정 루프로 일한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S07-BE",
+      "@id": "res:S04-FE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S06-FE"
+          "@id": "res:S03-FE"
         },
         {
-          "@id": "res:S06-BE"
+          "@id": "res:S03-BE"
         },
         {
-          "@id": "res:S06-DB"
+          "@id": "res:S03-DB"
         },
         {
-          "@id": "res:S06-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-07"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "drain·재스케줄·reconciliation",
-      "dev:taskId": "S07-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-offer",
-      "@type": "inv:ResourceOffer",
-      "inv:describesResource": {
-        "@id": "res:example-gpu"
-      },
-      "sv:status": "available"
-    },
-    {
-      "@id": "res:example-workload",
-      "@type": "inv:Workload",
-      "inv:createsRun": {
-        "@id": "res:example-run"
-      }
-    },
-    {
-      "@id": "res:S01-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-01"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "ERD·ID·상태·마이그레이션 순서",
-      "dev:taskId": "S01-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "done"
-    },
-    {
-      "@id": "res:S09-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S08-FE"
-        },
-        {
-          "@id": "res:S08-BE"
-        },
-        {
-          "@id": "res:S08-DB"
-        },
-        {
-          "@id": "res:S08-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-09"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "Prompt·Context·Skill·bounded repair",
-      "dev:taskId": "S09-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:agent-Codex",
-      "@type": "sv:AgentProfile",
-      "sv:displayName": "Codex",
-      "sv:recordKind": "development_profile",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:OUT-11",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-11"
-      },
-      "sv:displayName": "기능·보안·성능·복원이 검증된 내부망 후보를 만든다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S06-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S05-FE"
-        },
-        {
-          "@id": "res:S05-BE"
-        },
-        {
-          "@id": "res:S05-DB"
-        },
-        {
-          "@id": "res:S05-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-06"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "Git·PTY·checkpoint·resume",
-      "dev:taskId": "S06-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S02-ST",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S01-FE"
-        },
-        {
-          "@id": "res:S01-BE"
-        },
-        {
-          "@id": "res:S01-DB"
-        },
-        {
-          "@id": "res:S01-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-02"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "제공 폴더·DataLocation 카탈로그",
-      "dev:taskId": "S02-ST",
-      "dev:usesContract": {
-        "@id": "res:contract-Storage"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S08-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S07-FE"
-        },
-        {
-          "@id": "res:S07-BE"
-        },
-        {
-          "@id": "res:S07-DB"
-        },
-        {
-          "@id": "res:S07-ST"
+          "@id": "res:S03-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Gemini"
       },
       "dev:realizes": {
-        "@id": "res:OUT-08"
+        "@id": "res:OUT-04"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "감사·격리·관리 화면",
-      "dev:taskId": "S08-FE",
+      "dev:scope": "승인 화면·Run SSE 타임라인",
+      "dev:taskId": "S04-FE",
       "dev:usesContract": {
         "@id": "res:contract-Frontend"
       },
@@ -1579,99 +559,6 @@
       ],
       "sv:recordKind": "development_plan",
       "sv:status": "review"
-    },
-    {
-      "@id": "res:evidence-required-OUT-04",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "만료 승인·취소·중복 요청·재전송 통합 결과",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:evidence-required-OUT-02",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "실제 API·브라우저 여정·인증 실패 기록",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:OUT-08",
-      "@type": "dev:ProductOutcome",
-      "dev:requiresCriterion": {
-        "@id": "res:AC-08"
-      },
-      "sv:displayName": "격리된 Build·GPU 작업을 정책과 복구 아래 수행한다",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-11",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "주요 SLO와 실제값 보고, critical/high 미완화 0, rollback 검증",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-11"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-plan",
-      "@type": "inv:PlacementPlan",
-      "inv:selectsNode": {
-        "@id": "res:example-node"
-      }
-    },
-    {
-      "@id": "res:S12-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S11-FE"
-        },
-        {
-          "@id": "res:S11-BE"
-        },
-        {
-          "@id": "res:S11-DB"
-        },
-        {
-          "@id": "res:S11-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-12"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "복원·권한·운영 인수",
-      "dev:taskId": "S12-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:AC-03",
-      "@type": "dev:AcceptanceCriterion",
-      "dev:criterionText": "허용 실행 성공, 금지 경로/명령 차단, 종료 후 자원 회수",
-      "dev:requiresEvidence": {
-        "@id": "res:evidence-required-OUT-03"
-      },
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-model-v1",
-      "@type": "ml:ModelVersion",
-      "sv:version": "1.0.0"
     },
     {
       "@id": "res:S05-BE",
@@ -1716,7 +603,83 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:S08-DB",
+      "@id": "res:example-gpu",
+      "@type": "inv:GPUResource",
+      "inv:vramBytes": 17179869184
+    },
+    {
+      "@id": "res:evidence-required-OUT-02",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "실제 API·브라우저 여정·인증 실패 기록",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:OUT-01",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-01"
+      },
+      "sv:displayName": "완성 목표와 계약을 모든 Agent가 동일하게 해석한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:AC-09",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "Prompt 100건 유효율 99%, 코딩 과제 30건 성공률 70% 목표, 누출 0",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-09"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:skill-agent-delivery",
+      "@type": "dev:SkillSpec",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S05-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S04-FE"
+        },
+        {
+          "@id": "res:S04-BE"
+        },
+        {
+          "@id": "res:S04-DB"
+        },
+        {
+          "@id": "res:S04-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-05"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "자원 그래프·후보 제외·Explain",
+      "dev:taskId": "S05-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:S08-FE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
@@ -1733,60 +696,60 @@
         }
       ],
       "dev:ownedBy": {
-        "@id": "res:agent-Codex"
+        "@id": "res:agent-Gemini"
       },
       "dev:realizes": {
         "@id": "res:OUT-08"
       },
       "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
+        "@id": "res:agent-Codex"
       },
-      "dev:scope": "RLS·감사 immutable·보존",
-      "dev:taskId": "S08-DB",
+      "dev:scope": "감사·격리·관리 화면",
+      "dev:taskId": "S08-FE",
       "dev:usesContract": {
-        "@id": "res:contract-DB"
+        "@id": "res:contract-Frontend"
       },
       "dev:usesSkill": [
         {
           "@id": "res:skill-agent-delivery"
         },
         {
-          "@id": "res:skill-core-reliability"
+          "@id": "res:skill-frontend-delivery"
         }
       ],
       "sv:recordKind": "development_plan",
-      "sv:status": "planned"
+      "sv:status": "review"
     },
     {
-      "@id": "res:S09-DB",
+      "@id": "res:S02-ST",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S08-FE"
+          "@id": "res:S01-FE"
         },
         {
-          "@id": "res:S08-BE"
+          "@id": "res:S01-BE"
         },
         {
-          "@id": "res:S08-DB"
+          "@id": "res:S01-DB"
         },
         {
-          "@id": "res:S08-ST"
+          "@id": "res:S01-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Claude"
       },
       "dev:realizes": {
-        "@id": "res:OUT-09"
+        "@id": "res:OUT-02"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Codex"
       },
-      "dev:scope": "불변 Context/RunRecord·eval",
-      "dev:taskId": "S09-DB",
+      "dev:scope": "제공 폴더·DataLocation 카탈로그",
+      "dev:taskId": "S02-ST",
       "dev:usesContract": {
-        "@id": "res:contract-DB"
+        "@id": "res:contract-Storage"
       },
       "dev:usesSkill": [
         {
@@ -1800,69 +763,60 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:S01-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
+      "@id": "res:example-lease",
+      "@type": "inv:ResourceLease",
+      "inv:expiresAt": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2026-09-09T01:00:00+00:00"
       },
-      "dev:realizes": {
-        "@id": "res:OUT-01"
+      "inv:fencingToken": "42",
+      "inv:grantedAt": {
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+        "@value": "2026-09-09T00:00:00+00:00"
       },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "사용자 여정·디자인 토큰·화면 상태 명세",
-      "dev:taskId": "S01-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "done"
+      "inv:leasesResource": {
+        "@id": "res:example-gpu"
+      }
     },
     {
-      "@id": "res:evidence-required-OUT-05",
-      "@type": "dev:EvidenceRequirement",
-      "dev:evidenceDescription": "경합 테스트·snapshot/weight/policy 버전·Explain",
+      "@id": "res:OUT-05",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-05"
+      },
+      "sv:displayName": "5노드 자원을 초과 예약 없이 설명 가능하게 배치한다",
       "sv:status": "planned"
     },
     {
-      "@id": "res:S11-ST",
+      "@id": "res:S06-BE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S10-FE"
+          "@id": "res:S05-FE"
         },
         {
-          "@id": "res:S10-BE"
+          "@id": "res:S05-BE"
         },
         {
-          "@id": "res:S10-DB"
+          "@id": "res:S05-DB"
         },
         {
-          "@id": "res:S10-ST"
+          "@id": "res:S05-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Codex"
       },
       "dev:realizes": {
-        "@id": "res:OUT-11"
+        "@id": "res:OUT-06"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Claude"
       },
-      "dev:scope": "손상·용량·backup 장애 시험",
-      "dev:taskId": "S11-ST",
+      "dev:scope": "Git·PTY·checkpoint·resume",
+      "dev:taskId": "S06-BE",
       "dev:usesContract": {
-        "@id": "res:contract-Storage"
+        "@id": "res:contract-Backend"
       },
       "dev:usesSkill": [
         {
@@ -1918,33 +872,214 @@
       "sv:status": "review"
     },
     {
-      "@id": "res:S04-ST",
+      "@id": "res:S12-FE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S03-FE"
+          "@id": "res:S11-FE"
         },
         {
-          "@id": "res:S03-BE"
+          "@id": "res:S11-BE"
         },
         {
-          "@id": "res:S03-DB"
+          "@id": "res:S11-DB"
         },
         {
-          "@id": "res:S03-ST"
+          "@id": "res:S11-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-12"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "내부망 HTTPS 웹 배포·교육",
+      "dev:taskId": "S12-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:example-checkpoint",
+      "@type": "inv:Checkpoint"
+    },
+    {
+      "@id": "res:S03-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S02-FE"
+        },
+        {
+          "@id": "res:S02-BE"
+        },
+        {
+          "@id": "res:S02-DB"
+        },
+        {
+          "@id": "res:S02-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Codex"
       },
       "dev:realizes": {
-        "@id": "res:OUT-04"
+        "@id": "res:OUT-03"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Claude"
       },
-      "dev:scope": "전송 재개·실제 checksum 검증",
-      "dev:taskId": "S04-ST",
+      "dev:scope": "Sandbox·Tool Gateway·기본 정책",
+      "dev:taskId": "S03-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S02-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S01-FE"
+        },
+        {
+          "@id": "res:S01-BE"
+        },
+        {
+          "@id": "res:S01-DB"
+        },
+        {
+          "@id": "res:S01-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-02"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "로그인·Node 목록·상세·오류 상태",
+      "dev:taskId": "S02-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:S09-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S08-FE"
+        },
+        {
+          "@id": "res:S08-BE"
+        },
+        {
+          "@id": "res:S08-DB"
+        },
+        {
+          "@id": "res:S08-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-09"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "불변 Context/RunRecord·eval",
+      "dev:taskId": "S09-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:AC-08",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "Docker socket 미노출, 승인 우회 0, 합성 GPU 실행 성공, backup 복원",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-08"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S08-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S07-FE"
+        },
+        {
+          "@id": "res:S07-BE"
+        },
+        {
+          "@id": "res:S07-DB"
+        },
+        {
+          "@id": "res:S07-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-08"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "GC·secret provider·backup",
+      "dev:taskId": "S08-ST",
       "dev:usesContract": {
         "@id": "res:contract-Storage"
       },
@@ -1960,33 +1095,184 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:S05-ST",
+      "@id": "res:evidence-required-OUT-04",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "만료 승인·취소·중복 요청·재전송 통합 결과",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-dataset-v1",
+      "@type": "ml:DatasetVersion",
+      "ml:checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "ml:hasLocation": {
+        "@id": "res:example-location"
+      },
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:AC-05",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "동일 입력 배치 동일, 50개 동시 예약 초과 0, P95 2초 목표 실측",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-05"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S08-BE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S04-FE"
+          "@id": "res:S07-FE"
         },
         {
-          "@id": "res:S04-BE"
+          "@id": "res:S07-BE"
         },
         {
-          "@id": "res:S04-DB"
+          "@id": "res:S07-DB"
         },
         {
-          "@id": "res:S04-ST"
+          "@id": "res:S07-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Codex"
       },
       "dev:realizes": {
-        "@id": "res:OUT-05"
+        "@id": "res:OUT-08"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Claude"
       },
-      "dev:scope": "지역성·전송 비용·권한 확인",
-      "dev:taskId": "S05-ST",
+      "dev:scope": "ROOF·kill switch·BuildKit·단일 GPU",
+      "dev:taskId": "S08-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-capability",
+      "@type": "inv:Capability",
+      "sv:displayName": "Synthetic GPU runtime"
+    },
+    {
+      "@id": "res:skill-core-reliability",
+      "@type": "dev:SkillSpec",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S10-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S09-FE"
+        },
+        {
+          "@id": "res:S09-BE"
+        },
+        {
+          "@id": "res:S09-DB"
+        },
+        {
+          "@id": "res:S09-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-10"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "두 Provider adapter·MLflow·승인 배포",
+      "dev:taskId": "S10-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:agent-Gemini",
+      "@type": "sv:AgentProfile",
+      "sv:displayName": "Gemini",
+      "sv:recordKind": "development_profile",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:example-model-v1",
+      "@type": "ml:ModelVersion",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:evidence-required-OUT-06",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "소스 commit·WS/PTY·restart·restore 결과",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:OUT-04",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-04"
+      },
+      "sv:displayName": "승인·취소·결과 확인의 단일 노드 여정을 완료한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:contract-DB",
+      "@type": "dev:Contract",
+      "sv:displayName": "DB",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S11-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S10-FE"
+        },
+        {
+          "@id": "res:S10-BE"
+        },
+        {
+          "@id": "res:S10-DB"
+        },
+        {
+          "@id": "res:S10-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-11"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "손상·용량·backup 장애 시험",
+      "dev:taskId": "S11-ST",
       "dev:usesContract": {
         "@id": "res:contract-Storage"
       },
@@ -2000,6 +1286,96 @@
       ],
       "sv:recordKind": "development_plan",
       "sv:status": "planned"
+    },
+    {
+      "@id": "res:S03-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S02-FE"
+        },
+        {
+          "@id": "res:S02-BE"
+        },
+        {
+          "@id": "res:S02-DB"
+        },
+        {
+          "@id": "res:S02-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-03"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "볼륨·Artifact 기본 전송",
+      "dev:taskId": "S03-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:evidence-required-OUT-05",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "경합 테스트·snapshot/weight/policy 버전·Explain",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S01-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-01"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "저장소·계약·개발 환경·권한 경계",
+      "dev:taskId": "S01-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "in_progress"
+    },
+    {
+      "@id": "res:OUT-02",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-02"
+      },
+      "sv:displayName": "로그인한 사용자가 등록 Node와 제공 자원을 본다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-commit",
+      "@type": "dev:CodeCommit",
+      "dev:commitSha": "0000000000000000000000000000000000000000"
     },
     {
       "@id": "res:S12-BE",
@@ -2044,33 +1420,42 @@
       "sv:status": "planned"
     },
     {
-      "@id": "res:S11-BE",
+      "@id": "res:AC-02",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "허용 Node 등록·조회 성공, 토큰 재사용 차단, 다른 project 정보 접근 차단",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-02"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S07-BE",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
-          "@id": "res:S10-FE"
+          "@id": "res:S06-FE"
         },
         {
-          "@id": "res:S10-BE"
+          "@id": "res:S06-BE"
         },
         {
-          "@id": "res:S10-DB"
+          "@id": "res:S06-DB"
         },
         {
-          "@id": "res:S10-ST"
+          "@id": "res:S06-ST"
         }
       ],
       "dev:ownedBy": {
         "@id": "res:agent-Codex"
       },
       "dev:realizes": {
-        "@id": "res:OUT-11"
+        "@id": "res:OUT-07"
       },
       "dev:reviewedBy": {
         "@id": "res:agent-Claude"
       },
-      "dev:scope": "장시간·부하·security·rollback",
-      "dev:taskId": "S11-BE",
+      "dev:scope": "drain·재스케줄·reconciliation",
+      "dev:taskId": "S07-BE",
       "dev:usesContract": {
         "@id": "res:contract-Backend"
       },
@@ -2080,280 +1465,6 @@
         },
         {
           "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:skill-agent-delivery",
-      "@type": "dev:SkillSpec",
-      "sv:version": "1.0.0"
-    },
-    {
-      "@id": "res:S02-BE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S01-FE"
-        },
-        {
-          "@id": "res:S01-BE"
-        },
-        {
-          "@id": "res:S01-DB"
-        },
-        {
-          "@id": "res:S01-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-02"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "OIDC·mTLS 등록·Heartbeat",
-      "dev:taskId": "S02-BE",
-      "dev:usesContract": {
-        "@id": "res:contract-Backend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:S10-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S09-FE"
-        },
-        {
-          "@id": "res:S09-BE"
-        },
-        {
-          "@id": "res:S09-DB"
-        },
-        {
-          "@id": "res:S09-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-10"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "AI 도구·실험·모델·배포 화면",
-      "dev:taskId": "S10-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:S11-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S10-FE"
-        },
-        {
-          "@id": "res:S10-BE"
-        },
-        {
-          "@id": "res:S10-DB"
-        },
-        {
-          "@id": "res:S10-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-11"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "접근성·시각 회귀·배포 후보",
-      "dev:taskId": "S11-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:example-node",
-      "@type": "inv:Node",
-      "inv:advertisesCapability": {
-        "@id": "res:example-capability"
-      },
-      "inv:offersResource": {
-        "@id": "res:example-offer"
-      },
-      "sv:recordKind": "synthetic_example",
-      "sv:status": "online"
-    },
-    {
-      "@id": "res:S04-FE",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S03-FE"
-        },
-        {
-          "@id": "res:S03-BE"
-        },
-        {
-          "@id": "res:S03-DB"
-        },
-        {
-          "@id": "res:S03-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Gemini"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-04"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "승인 화면·Run SSE 타임라인",
-      "dev:taskId": "S04-FE",
-      "dev:usesContract": {
-        "@id": "res:contract-Frontend"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-frontend-delivery"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:example-capability",
-      "@type": "inv:Capability",
-      "sv:displayName": "Synthetic GPU runtime"
-    },
-    {
-      "@id": "res:S05-DB",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S04-FE"
-        },
-        {
-          "@id": "res:S04-BE"
-        },
-        {
-          "@id": "res:S04-DB"
-        },
-        {
-          "@id": "res:S04-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-05"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:scope": "Lease 잠금·Fencing·Allocation",
-      "dev:taskId": "S05-DB",
-      "dev:usesContract": {
-        "@id": "res:contract-DB"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-core-reliability"
-        }
-      ],
-      "sv:recordKind": "development_plan",
-      "sv:status": "review"
-    },
-    {
-      "@id": "res:S03-ST",
-      "@type": "dev:DevelopmentTask",
-      "dev:dependsOn": [
-        {
-          "@id": "res:S02-FE"
-        },
-        {
-          "@id": "res:S02-BE"
-        },
-        {
-          "@id": "res:S02-DB"
-        },
-        {
-          "@id": "res:S02-ST"
-        }
-      ],
-      "dev:ownedBy": {
-        "@id": "res:agent-Claude"
-      },
-      "dev:realizes": {
-        "@id": "res:OUT-03"
-      },
-      "dev:reviewedBy": {
-        "@id": "res:agent-Codex"
-      },
-      "dev:scope": "볼륨·Artifact 기본 전송",
-      "dev:taskId": "S03-ST",
-      "dev:usesContract": {
-        "@id": "res:contract-Storage"
-      },
-      "dev:usesSkill": [
-        {
-          "@id": "res:skill-agent-delivery"
-        },
-        {
-          "@id": "res:skill-service-integration"
         }
       ],
       "sv:recordKind": "development_plan",
@@ -2402,7 +1513,905 @@
       "sv:status": "review"
     },
     {
-      "@id": "res:S08-ST",
+      "@id": "res:AC-12",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "5노드 전체 여정·정량 목표·알려진 제한·인수 확인 모두 기록",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-12"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:contract-Storage",
+      "@type": "dev:Contract",
+      "sv:displayName": "Storage",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S06-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S05-FE"
+        },
+        {
+          "@id": "res:S05-BE"
+        },
+        {
+          "@id": "res:S05-DB"
+        },
+        {
+          "@id": "res:S05-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-06"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "Monaco·xterm·diff·session UX",
+      "dev:taskId": "S06-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:S09-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S08-FE"
+        },
+        {
+          "@id": "res:S08-BE"
+        },
+        {
+          "@id": "res:S08-DB"
+        },
+        {
+          "@id": "res:S08-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-09"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "diff·테스트·trace Artifact 연결",
+      "dev:taskId": "S09-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S11-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S10-FE"
+        },
+        {
+          "@id": "res:S10-BE"
+        },
+        {
+          "@id": "res:S10-DB"
+        },
+        {
+          "@id": "res:S10-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-11"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "장시간·부하·security·rollback",
+      "dev:taskId": "S11-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S03-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S02-FE"
+        },
+        {
+          "@id": "res:S02-BE"
+        },
+        {
+          "@id": "res:S02-DB"
+        },
+        {
+          "@id": "res:S02-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-03"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "Project·Workspace 생성과 실행 결과",
+      "dev:taskId": "S03-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:AC-07",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "이탈 감지 60초 이내, 오래된 토큰 쓰기 0, 복구 성공률 목표 95%",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-07"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S11-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S10-FE"
+        },
+        {
+          "@id": "res:S10-BE"
+        },
+        {
+          "@id": "res:S10-DB"
+        },
+        {
+          "@id": "res:S10-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-11"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "migration·restore·SLO 집계",
+      "dev:taskId": "S11-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:AC-11",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "주요 SLO와 실제값 보고, critical/high 미완화 0, rollback 검증",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-11"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:OUT-10",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-10"
+      },
+      "sv:displayName": "서로 다른 AI 도구와 모델 계보를 공통 계약으로 추적한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-run",
+      "@type": "inv:Run",
+      "dev:usesCommit": {
+        "@id": "res:example-commit"
+      },
+      "dev:usesImage": {
+        "@id": "res:example-image"
+      },
+      "inv:hasAttempt": {
+        "@id": "res:example-attempt"
+      },
+      "inv:holdsLease": {
+        "@id": "res:example-lease"
+      },
+      "inv:scheduledBy": {
+        "@id": "res:example-plan"
+      },
+      "ml:consumesDataset": {
+        "@id": "res:example-dataset-v1"
+      },
+      "ml:registersModel": {
+        "@id": "res:example-model-v1"
+      },
+      "sv:recordKind": "synthetic_example",
+      "sv:status": "scheduled"
+    },
+    {
+      "@id": "res:S06-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S05-FE"
+        },
+        {
+          "@id": "res:S05-BE"
+        },
+        {
+          "@id": "res:S05-DB"
+        },
+        {
+          "@id": "res:S05-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-06"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "persistent snapshot·복원 경로",
+      "dev:taskId": "S06-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-attempt",
+      "@type": "inv:RunAttempt",
+      "inv:hasCheckpoint": {
+        "@id": "res:example-checkpoint"
+      }
+    },
+    {
+      "@id": "res:evidence-required-OUT-09",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "golden eval·분류별 성적·금지 행동 시험",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S01-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-01"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "사용자 여정·디자인 토큰·화면 상태 명세",
+      "dev:taskId": "S01-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "done"
+    },
+    {
+      "@id": "res:agent-Codex",
+      "@type": "sv:AgentProfile",
+      "sv:displayName": "Codex",
+      "sv:recordKind": "development_profile",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:OUT-12",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-12"
+      },
+      "sv:displayName": "5대 PC에서 개발부터 배포·장애 복구까지 완료한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:evidence-required-OUT-07",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "Node 중단·분할·late result·cache 경합 결과",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:AC-10",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "Codex/Claude 계약 동일, 모델의 데이터·코드·평가·승인 역추적",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-10"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:agent-Claude",
+      "@type": "sv:AgentProfile",
+      "sv:displayName": "Claude",
+      "sv:recordKind": "development_profile",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S01-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-01"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "ERD·ID·상태·마이그레이션 순서",
+      "dev:taskId": "S01-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "done"
+    },
+    {
+      "@id": "res:OUT-07",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-07"
+      },
+      "sv:displayName": "Node 손실과 분할 상황에서 낡은 실행을 차단한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:AC-03",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "허용 실행 성공, 금지 경로/명령 차단, 종료 후 자원 회수",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-03"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S11-FE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S10-FE"
+        },
+        {
+          "@id": "res:S10-BE"
+        },
+        {
+          "@id": "res:S10-DB"
+        },
+        {
+          "@id": "res:S10-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Gemini"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-11"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "접근성·시각 회귀·배포 후보",
+      "dev:taskId": "S11-FE",
+      "dev:usesContract": {
+        "@id": "res:contract-Frontend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-frontend-delivery"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:contract-Frontend",
+      "@type": "dev:Contract",
+      "sv:displayName": "Frontend",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:evidence-required-OUT-12",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "Release manifest·사용자 인수·웹 smoke·복구 Evidence",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S07-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S06-FE"
+        },
+        {
+          "@id": "res:S06-BE"
+        },
+        {
+          "@id": "res:S06-DB"
+        },
+        {
+          "@id": "res:S06-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-07"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "갱신/반납/Offer 경합·복구 기록",
+      "dev:taskId": "S07-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:skill-frontend-delivery",
+      "@type": "dev:SkillSpec",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:evidence-required-OUT-08",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "보안 시나리오·GPU capability·복원 보고",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:example-node",
+      "@type": "inv:Node",
+      "inv:advertisesCapability": {
+        "@id": "res:example-capability"
+      },
+      "inv:offersResource": {
+        "@id": "res:example-offer"
+      },
+      "sv:recordKind": "synthetic_example",
+      "sv:status": "online"
+    },
+    {
+      "@id": "res:OUT-06",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-06"
+      },
+      "sv:displayName": "편집·터미널·Git 작업이 재시작 후 안전하게 재개된다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S09-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S08-FE"
+        },
+        {
+          "@id": "res:S08-BE"
+        },
+        {
+          "@id": "res:S08-DB"
+        },
+        {
+          "@id": "res:S08-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-09"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "Prompt·Context·Skill·bounded repair",
+      "dev:taskId": "S09-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S10-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S09-FE"
+        },
+        {
+          "@id": "res:S09-BE"
+        },
+        {
+          "@id": "res:S09-DB"
+        },
+        {
+          "@id": "res:S09-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-10"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "Model immutable version·보존 pin",
+      "dev:taskId": "S10-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S05-ST",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S04-FE"
+        },
+        {
+          "@id": "res:S04-BE"
+        },
+        {
+          "@id": "res:S04-DB"
+        },
+        {
+          "@id": "res:S04-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-05"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "지역성·전송 비용·권한 확인",
+      "dev:taskId": "S05-ST",
+      "dev:usesContract": {
+        "@id": "res:contract-Storage"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:contract-Backend",
+      "@type": "dev:Contract",
+      "sv:displayName": "Backend",
+      "sv:version": "1.0.0"
+    },
+    {
+      "@id": "res:S02-BE",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S01-FE"
+        },
+        {
+          "@id": "res:S01-BE"
+        },
+        {
+          "@id": "res:S01-DB"
+        },
+        {
+          "@id": "res:S01-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-02"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "OIDC·mTLS 등록·Heartbeat",
+      "dev:taskId": "S02-BE",
+      "dev:usesContract": {
+        "@id": "res:contract-Backend"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S12-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S11-FE"
+        },
+        {
+          "@id": "res:S11-BE"
+        },
+        {
+          "@id": "res:S11-DB"
+        },
+        {
+          "@id": "res:S11-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-12"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "복원·권한·운영 인수",
+      "dev:taskId": "S12-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:evidence-required-OUT-10",
+      "@type": "dev:EvidenceRequirement",
+      "dev:evidenceDescription": "Adapter conformance·lineage query·배포 digest",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:OUT-09",
+      "@type": "dev:ProductOutcome",
+      "dev:requiresCriterion": {
+        "@id": "res:AC-09"
+      },
+      "sv:displayName": "Agent가 근거 있는 Context와 제한된 수정 루프로 일한다",
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S03-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S02-FE"
+        },
+        {
+          "@id": "res:S02-BE"
+        },
+        {
+          "@id": "res:S02-DB"
+        },
+        {
+          "@id": "res:S02-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-03"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:scope": "Workspace·Workload·Run·Evidence",
+      "dev:taskId": "S03-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-service-integration"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:AC-04",
+      "@type": "dev:AcceptanceCriterion",
+      "dev:criterionText": "승인 전 실행 0, 중복 요청 부수 효과 0, 전송 재개 hash 일치",
+      "dev:requiresEvidence": {
+        "@id": "res:evidence-required-OUT-04"
+      },
+      "sv:status": "planned"
+    },
+    {
+      "@id": "res:S06-DB",
+      "@type": "dev:DevelopmentTask",
+      "dev:dependsOn": [
+        {
+          "@id": "res:S05-FE"
+        },
+        {
+          "@id": "res:S05-BE"
+        },
+        {
+          "@id": "res:S05-DB"
+        },
+        {
+          "@id": "res:S05-ST"
+        }
+      ],
+      "dev:ownedBy": {
+        "@id": "res:agent-Codex"
+      },
+      "dev:realizes": {
+        "@id": "res:OUT-06"
+      },
+      "dev:reviewedBy": {
+        "@id": "res:agent-Claude"
+      },
+      "dev:scope": "RunAttempt·Step·Checkpoint·session",
+      "dev:taskId": "S06-DB",
+      "dev:usesContract": {
+        "@id": "res:contract-DB"
+      },
+      "dev:usesSkill": [
+        {
+          "@id": "res:skill-agent-delivery"
+        },
+        {
+          "@id": "res:skill-core-reliability"
+        }
+      ],
+      "sv:recordKind": "development_plan",
+      "sv:status": "review"
+    },
+    {
+      "@id": "res:S08-DB",
       "@type": "dev:DevelopmentTask",
       "dev:dependsOn": [
         {
@@ -2427,10 +2436,10 @@
       "dev:reviewedBy": {
         "@id": "res:agent-Claude"
       },
-      "dev:scope": "GC·secret provider·backup",
-      "dev:taskId": "S08-ST",
+      "dev:scope": "RLS·감사 immutable·보존",
+      "dev:taskId": "S08-DB",
       "dev:usesContract": {
-        "@id": "res:contract-Storage"
+        "@id": "res:contract-DB"
       },
       "dev:usesSkill": [
         {
@@ -2441,16 +2450,7 @@
         }
       ],
       "sv:recordKind": "development_plan",
-      "sv:status": "planned"
-    },
-    {
-      "@id": "res:example-dataset-v1",
-      "@type": "ml:DatasetVersion",
-      "ml:checksum": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-      "ml:hasLocation": {
-        "@id": "res:example-location"
-      },
-      "sv:version": "1.0.0"
+      "sv:status": "review"
     }
   ]
 }

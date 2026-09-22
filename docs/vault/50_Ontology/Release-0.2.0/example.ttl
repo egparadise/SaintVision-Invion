@@ -622,7 +622,7 @@ res:S06-BE a dev:DevelopmentTask ;
 
 res:S06-DB a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S05-BE,
         res:S05-DB,
         res:S05-FE,
@@ -750,7 +750,7 @@ res:S08-BE a dev:DevelopmentTask ;
 
 res:S08-DB a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "planned" ;
+    sv:status "review" ;
     dev:dependsOn res:S07-BE,
         res:S07-DB,
         res:S07-FE,
