@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.2"
+version: "1.2.3"
 status: "review"
 author: "Claude"
 updated: "2026-09-22T17:40:00+09:00"
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Codex 착지 독립 검토 카드 2 (Claude, 2026-09-22): 881f2911·1312e295·eceac8cf·dcf2b947·2aa80899·36d3ee9b·b6b20ab9 + 후속 4b2204d7·2e803cd6·7509f667 — PR #37(Gemini 검토)과 별개로 내 손 검증만 기록. 49330d04 정확 트리에서 실 PG 단일 파일 **121 passed / 0 failed**(skip 53 정직), **EvidenceEnvelope 앵커 3자리 변이 3/3 KILLED**(어제 내 구멍 해소 확인), export_schemas 58/58·check_contract_bindings·check_ontology·fixture_reachability exit 0, Go build/vet 0(contracts-go·node-agent), 7509f667에서 F1 진단은닉 해소 14 passed. **전부 sound**; finding 2건 escalation(F-A provision_credentials 광범위 except→거부 위장, F-B safe evidence에 실패 케이스 nodeid 없음). **49330d04 CI 확정**: docs success · backend/core **cancelled**(cancel-in-progress, 연속 push; 4b2204d7가 해소) · browser 5/1 failed(test_desktop_browser, 케이스 미상). hosted backend PG no-skip 관측은 아직 0 — 7509f667 run이 첫 후보. 전문 [[2026-09-22_17-35-00_KST_CODEX-LANDINGS_Claude_독립검토]].
 
 새 PC 실 PG 전수·인수 증거·PITR 실측 (Claude, 2026-09-22): SHA d01c931a, 측정 워크트리 `D:\Project\sv-measure-claude`(clean, R6). (1) backend.yml 스코프 2667건 → **2523 passed / 142 skipped / 2 failed**(3덩어리 31분), skip 1011→142(전부 §4 환경 게이트); F1 `test_published_migration_heads_upgrade_without_rewriting`=동시 실행 경합(단독 1 passed·도구 직접 exit 0)+진단 은닉 → Codex; F2 `test_vf_canonical` `.work` 미생성 → Codex(51d53b7f 수정 착지). 다른 Claude 세션 c5042322와 교차 일치. (2) S02 91·S03 201·S09 76/21·S10 228·S04/05 74/48·S07 92/19 = **762 passed / 88 skipped / 0 failed**, 6세트 exit 0 — `Evidence/claude-newpc-realpg-d01c931a/*.json` + `.work/evidence-claude-d01c931a/`. (3) PITR: dev-pg readiness **absent**(비파괴), owned probe 물리 리허설 정상 PASS·결함주입 5 FAIL·잔재 0, 보관 주기 7일(파일럿, 코디네이터). self-close 없음. 전문 [[2026-09-22_17-02-56_KST_REALPG-FULLRUN_Claude_실측]] · [[2026-09-22_17-12-01_KST_REALPG-EVIDENCE_Claude_인수증거]] · [[2026-09-22_17-14-47_KST_PITR-RUNBOOK_Claude_실측]].
 
