@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+서빙 앵커 무게 전수 변이 (Claude, 2026-09-22): 커널 서빙 앵커 전수를 격리 워크트리 변이로 측정. replay만이 아니라 스펙트럼 — 층1 완전vacuous(replay 12+EvidenceEnvelope), 층2 (a)호출만검증(result_view 4·workspace_editor·model_view·storage_view; test_serving_anchors가 validator를 레코더로 대체), 층3 완전무게(control·shard·terminal·problem·artifact·workspace). 대조군으로 변이 유효성 자체 검증. 자동화(mutation testing) 제안. 전문 [[2026-09-22_서빙앵커_무게_전수변이_부류확장_Claude]].
+
 독립 검토 — 커널 쓰기면 감사 a2dada9a (Claude, 2026-09-22): 28 라우트 완전 확인 + 프런트 직접호출 실측 + **발견: replay 분기 앵커 12개 vacuous**(격리 워크트리 변이로 전부 제거해도 44 passed 불변; 무효-prior replay 거부 시험 부재). fresh 앵커는 무게 있음(대조). 재생/replay 자리라 어젯밤 우회와 동류. 전문 [[2026-09-22_Codex_커널쓰기면감사_독립검토_Claude]].
 
 독립 검토 — 저위험 쓰기 계약 7건 기록 대 코드 (Claude, 2026-09-22): f2d86db5(문서 전용)가 기록한 7건이 tip `ce300cf5` 코드에 전부 live함을 대조 확인(모델·route response_model·fixture·회귀 19 passed) + 무게(7 앵커 KILLED/복원). 기록==코드, 누락 0. 전문 [[2026-09-22_Codex_저위험쓰기계약7_코드대조_독립검토_Claude]].
