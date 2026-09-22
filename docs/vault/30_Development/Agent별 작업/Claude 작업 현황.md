@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+게이트-미적용 예시 뿌리 교정 (Claude, 2026-09-22): Codex도 같은 병(세미콜론 체인) 확인 → 공유 뿌리. 내 것 고침(이전절차서 §1-4 `|tail` exit 손실 → exit 기록형; R2-b에 bash·PowerShell 올바른 예시 추가). 짚음: GOV-GIT-001·AGENTS.md 검증 절이 게이트 없이 명령 나열(소유자 Codex/공유, 통지는 사용자). 전문 [[공유워크트리_개인index_커밋규칙]].
+
 커밋 규칙 R2-b 추가 (Claude, 2026-09-22): push는 게이트 exit code로 막는다(출력≠게이트). 오늘 red 2회 push 부류를 공유 규칙으로 승격, R2-a와 형제·부류명 「검사 ≠ 준수」. 전문 [[공유워크트리_개인index_커밋규칙]].
 
 이어가기 §0 마감 + Codex 집계 대조 (Claude, 2026-09-22): §0 5항 정합(상태·열린갈래·gh/Go·오늘vs어제·기준선이후착지). check_contract_bindings 자리수 vs Codex 집계: 응답계약 EvidenceEnvelope 5=5 일치, 입력/식별자는 내 도구 의도 제외(범위 차이, 버그 아님). 이 기계 마지막 정리.
