@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.5"
+version: "1.2.6"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T19:40:00+09:00"
+updated: "2026-09-22T18:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+카드 4 — node-dependent not_run 확정 + Docker-only skip 23건 실행 전환 (Claude, 2026-09-22, SHA 3d1892c0): 24파일은 이 Windows 호스트에서 **정직한 not_run**(inv-node가 Unix Docker 소켓만 허용 NODE-0021, 호스트는 npipe뿐·사용자 WSL 없음; 검증 자리=hosted Core CI, 이 PC 실행은 WSL2 Ubuntu 사용자 결정). 대신 skip 142 중 Docker만으로 가능한 것 전부 실행: role guard **13 passed**(postgres:16) · 후보 서버 컨테이너 **8 passed**(deploy/Dockerfile.backend 1회 빌드 `sha256:0886bab9…`, DB 172.17.0.2) · config volume **7 passed**(+2) — **business-kernel-role 등 옛 PC 미검증 이미지 레인 단언 전부 도달·통과**, 제품 보안 단언 실패 0, 잔재 컨테이너·볼륨 0·이미지 제거. 검증상태지도 §7(+§2.1/§3 닫힘). 전문 [[2026-09-22_17-52-00_KST_NODE-DEPENDENT-NOTRUN_Claude_실측]].
 
 노드 자원 사용량 서빙 라우트 구현 카드 3 (Claude, 2026-09-22): PR #36 F1(계약만 있고 라우트 404) 해소 — `GET /v1/projects/{project}/nodes/{node_id}/resource-usage`를 Claude 소유 `inv/node_resource_usage.py`(읽기 모델: control.grant 인가, project_nodes 연결 노드만, resources/미해제 lease/capacity.py와 동일 신선·인가 술어의 snapshot; 미측정은 null·0 합성 없음, 불변식 위반은 clamp 대신 500 거부, 앵커 `validate_contract("NodeResourceUsageResponse")`)로 구현, app.py는 위임 코드 3줄만(코디네이터 승인 A, R5 통지). 계약 eceac8cf 무변경. 실 PG HTTP 경로 시험 **6 passed**, 앵커 변이 **KILLED**, check_contract_bindings **14→15 타입/17→18 자리 PASS**, frontend_integrity 0 위반, route_coverage 정적 스캔에 라우트 포함. 착지 커밋 = 이 항목을 담은 커밋(git log). 화면 배선은 Gemini, 만료 lease 처리·오류코드 번호는 Codex 판단. 전문 [[2026-09-22_18-05-00_KST_NODE-RESOURCE-USAGE-ROUTE_Claude_구현]].
 
