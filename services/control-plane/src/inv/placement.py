@@ -13,7 +13,11 @@ from .approvals import ApprovalStore, digest
 from .capacity import project_capacity
 from .contracts import validate_contract
 from .control import Control
-from .db import mark_statement_phase, record_placement_metric
+from .db import (
+    DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS,
+    mark_statement_phase,
+    record_placement_metric,
+)
 from .errors import DomainError
 from .leases import Allocation, LeaseStore, active_total, lock_resources, lock_run
 from .runs import event
@@ -633,6 +637,18 @@ class PlacementStore:
                                 "MODEL-0003", "Run already has a model input reservation", 409
                             )
                         lease_store._admit_locked(conn, project, run_id, run=run)
+                        limit_lock_timeout_ms = getattr(
+                            self.db,
+                            "placement_candidate_limit_lock_timeout_ms",
+                            DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS,
+                        )
+                        prior_lock_timeout = conn.execute(
+                            "SELECT current_setting('lock_timeout') AS value"
+                        ).fetchone()["value"]
+                        conn.execute(
+                            "SELECT set_config('lock_timeout', %s, true)",
+                            (f"{limit_lock_timeout_ms}ms",),
+                        )
                         mark_statement_phase(
                             "placement-limit-row-wait",
                             attempt=attempt,
@@ -657,9 +673,19 @@ class PlacementStore:
                                     ),
                                     "outcome": "timeout",
                                     "sqlState": getattr(error, "sqlstate", None),
+                                    "lockTimeoutBudgetMs": limit_lock_timeout_ms,
                                 },
                             )
                             raise
+                        # The candidate-only budget applies to exactly the
+                        # serializing limits statement.  A savepoint rollback
+                        # restores it on failure or stale-winner retry; the
+                        # success path must restore the captured caller value
+                        # before any selected-resource lock is attempted.
+                        conn.execute(
+                            "SELECT set_config('lock_timeout', %s, true)",
+                            (prior_lock_timeout,),
+                        )
                         record_placement_metric(
                             self.db,
                             {
@@ -671,6 +697,7 @@ class PlacementStore:
                                 ),
                                 "outcome": "acquired",
                                 "sqlState": None,
+                                "lockTimeoutBudgetMs": limit_lock_timeout_ms,
                             },
                         )
                         # Measure lock ownership, not the preceding wait to

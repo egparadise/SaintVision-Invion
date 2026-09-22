@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.200"
+version: "1.0.201"
 status: "review"
 author: "Codex"
 updated: "2026-09-23T12:20:00+09:00"
@@ -10,11 +10,16 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
-## 2026-09-23 Backend S05 lock-wait opt-in 수집 hotfix — 착지 요청
+## 2026-09-23 S05 Card24 B′ 구현·h 교정 실험 — 착지 요청
 
-- 일반 Backend pytest 수집은 `test_placement_lock_wait_diagnostic.py`를 전용 도구 환경이 없으면 fixture 생성 전에 정확한 사유 `run only through tools/placement_lock_wait_diagnostic.py`로 1건 skip한다. 전용 도구는 기존 `INV_S05_LOCK_WAIT_DIAGNOSTIC=1`을 주입하므로 승인된 두 wave 실행은 불변이다.
-- `backend.yml` skip 분포에 같은 사유 1건을 명시해 누락·증가를 모두 실패시키며 ratchet을 우회하지 않는다. 로컬 일반 수집은 1 skipped/exit 0이고, 제품 코드·계약·DB schema 변경은 없다.
-- 최신 integration tip 위 R1 착지를 요청한다. 착지 뒤 hosted Backend green을 확인하며, 이 hotfix는 카드 24 B′ 구현·실측과 별도 commit으로 유지한다.
+- candidate limits `FOR UPDATE` statement에만 private budget(기본 500, 유효 1~1900ms)을 적용하고 성공 시 caller의 `current_setting('lock_timeout')` 값으로 복원한다. savepoint 실패·stale rollback, BoundDatabase 700ms 복원, 기존 `RES-0007`/503/retryable·replay·fencing·RLS·no-overbooking을 고정했으며 production flag는 off, 공개 계약·migration은 불변이다.
+- SHA `4c8a7363` PG-free 15 passed, 실 PG focused 17 passed. legacy 20동시 3회는 60/60·timeout0, candidate B=1500은 11/60·`55P03`49다. 중앙 request P95(all) 1785.486→2315.099ms, 성공 request P95 2402.481ms, hold P95 141.932→767.708ms로 3조건 전부 실패했다.
+- candidate depth19와 `h≈767.708ms`는 예상 실패17 대 실제16/16/17로 정합한다. B′는 승격이 아닌 h 교정 실험으로 닫고 1900 arm·50동시·5노드는 미실행, S05 `review` 유지. 다음은 B(project별 bounded semaphore) 사양이며 Claude 카드 28 전 구현하지 않는다. [[S05 B-prime candidate limits 잠금 예산 구현 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]].
+
+## 2026-09-23 Backend S05 lock-wait opt-in 수집 hotfix
+
+- 일반 Backend pytest 수집은 `test_placement_lock_wait_diagnostic.py`를 전용 도구 환경이 없으면 fixture 생성 전에 정확한 사유 `run only through tools/placement_lock_wait_diagnostic.py`로 1건 skip한다. 전용 도구의 opt-in 실행은 불변이다.
+- `backend.yml` skip 분포에 같은 사유 1건을 등록해 drift를 감시한다. R1 `41f899b3`으로 카드 24와 분리 착지했으며 일반 수집 1 skipped, check_docs 884, YAML/diff가 exit 0이다.
 
 ## 2026-09-23 S07 Card23 5노드 실 Node adapter 사양
 

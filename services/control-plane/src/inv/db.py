@@ -14,6 +14,8 @@ from .errors import DomainError
 
 _statement_phase = ContextVar("inv_statement_phase", default="outside-transaction")
 _placement_logger = logging.getLogger("inv.placement")
+DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS = 500
+MAX_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS = 1900
 
 
 def mark_statement_phase(
@@ -116,6 +118,11 @@ class BoundDatabase:
         self.business_handoff = getattr(db, "business_handoff", False)
         self.registry_binding_policy = getattr(db, "registry_binding_policy", None)
         self.placement_short_commit = getattr(db, "placement_short_commit", False)
+        self.placement_candidate_limit_lock_timeout_ms = getattr(
+            db,
+            "placement_candidate_limit_lock_timeout_ms",
+            DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS,
+        )
         self.statement_observer = getattr(db, "statement_observer", None)
         self.placement_metric_sink = getattr(db, "placement_metric_sink", None)
 
@@ -134,6 +141,7 @@ class Database:
         recovery_epoch: str,
         registry_binding_policy=None,
         placement_short_commit: bool = False,
+        placement_candidate_limit_lock_timeout_ms: int = DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS,
         statement_observer=None,
         placement_metric_sink=None,
     ):
@@ -145,6 +153,19 @@ class Database:
         if type(placement_short_commit) is not bool:
             raise ValueError("placement_short_commit must be boolean")
         self.placement_short_commit = placement_short_commit
+        if (
+            type(placement_candidate_limit_lock_timeout_ms) is not int
+            or not 1
+            <= placement_candidate_limit_lock_timeout_ms
+            <= MAX_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS
+        ):
+            raise ValueError(
+                "placement_candidate_limit_lock_timeout_ms must be an integer "
+                f"between 1 and {MAX_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS}"
+            )
+        self.placement_candidate_limit_lock_timeout_ms = (
+            placement_candidate_limit_lock_timeout_ms
+        )
         self.statement_observer = statement_observer
         self.placement_metric_sink = placement_metric_sink
         self._dsn = dsn

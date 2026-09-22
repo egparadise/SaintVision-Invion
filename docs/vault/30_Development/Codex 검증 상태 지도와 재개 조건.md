@@ -1,15 +1,21 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.26"
+version: "1.5.27"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T08:45:00+09:00"
+updated: "2026-09-23T12:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+## 2026-09-23 S05-DB B′ h 교정 — 승격 실패
+
+- candidate limits statement-only budget을 기본 500·유효 1~1900ms로 구현했고 성공은 caller lock_timeout 복원, 실패·stale은 savepoint rollback을 사용한다. PG-free 15 passed, 실 PG focused 17 passed, 공개 계약·migration·production config 변경 0이다.
+- legacy 20동시 3회는 60/60·timeout0, candidate B=1500은 11/60·`55P03`49다. request P95(all) 중앙 1785.486→2315.099ms, 성공 request hold P95 중앙 141.932→767.708ms로 세 게이트 모두 실패했다. depth19·`h≈767.708ms`에서 예상17 대 관측16/16/17 실패가 정합해 h 교정만 완료했다.
+- 재개 조건: Claude 카드 28이 구현·원자료·1900 미실행 경계를 검토하고 코디네이터가 B(project별 bounded semaphore) 사양 카드를 승인해야 한다. 그 전 flag on, B 구현, 20동시 초과·50동시·5노드 실행 금지. S05 `review` 유지. [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]].
 
 ## 2026-09-23 S05-DB F-S05-02 기전 확인
 

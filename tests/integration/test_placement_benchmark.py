@@ -278,6 +278,9 @@ def placement_benchmark_env(env):
         env.runtime,
         recovery_epoch=env.epoch,
         placement_short_commit=os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1",
+        placement_candidate_limit_lock_timeout_ms=int(
+            os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
+        ),
         statement_observer=observe_statement if diagnostic else None,
         placement_metric_sink=observe_lock_hold,
     )
@@ -449,7 +452,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         "enabled": os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1",
         "observer": "in-process-connection-wrapper",
         "successThresholdMs": 50,
-        "lockTimeoutMs": 500,
+        "baseLockTimeoutMs": 500,
+        "candidateLimitLockTimeoutMs": int(
+            os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
+        ),
         "statementTimeoutMs": 2000,
         "events": list(a.sql_diagnostics),
         "timeoutStatements": [
@@ -564,7 +570,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
         else report["legacyLockWait"]
     )
-    report["schemaVersion"] = "1.6.0"
+    report["schemaVersion"] = "1.7.0"
+    report["contentionObservation"]["candidateLimitLockTimeoutMs"] = int(
+        os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
+    )
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     report["contentionObservation"]["serverSideLockWaitSeparatelyMeasured"] = False
     report["contentionObservation"][
@@ -604,6 +613,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         report["limitRowWait"]["acquisitionAttemptCount"],
     )
     record_property("limitRowTimeoutCount", report["limitRowWait"]["timeoutCount"])
+    record_property(
+        "candidateLimitLockTimeoutMs",
+        report["contentionObservation"]["candidateLimitLockTimeoutMs"],
+    )
     record_property(
         "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
     )

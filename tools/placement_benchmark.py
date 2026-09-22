@@ -833,6 +833,7 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         "INV_PLACEMENT_BENCHMARK_REPORT": str(args.report.resolve()),
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
         "INV_PLACEMENT_SHORT_COMMIT": "1" if args.mode == "short-commit" else "0",
+        "INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS": str(args.candidate_limit_lock_timeout_ms),
         "INV_PLACEMENT_QUEUE_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
         "INV_PLACEMENT_SQL_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
     }
@@ -883,6 +884,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="placement feature-flag mode (default: legacy/off)",
     )
     parser.add_argument(
+        "--candidate-limit-lock-timeout-ms",
+        type=int,
+        default=500,
+        help=(
+            "transaction-local lock_timeout for the candidate limits-row statement "
+            "only (1..1900; default: 500)"
+        ),
+    )
+    parser.add_argument(
         "--queue-diagnostic",
         action="store_true",
         help=(
@@ -903,6 +913,10 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--requests must be between 1 and 200")
     if args.concurrency != args.requests:
         raise SystemExit("--concurrency must equal --requests for a simultaneous wave")
+    if not 1 <= args.candidate_limit_lock_timeout_ms <= 1900:
+        raise SystemExit("--candidate-limit-lock-timeout-ms must be between 1 and 1900")
+    if args.mode != "short-commit" and args.candidate_limit_lock_timeout_ms != 500:
+        raise SystemExit("--candidate-limit-lock-timeout-ms is only valid with --mode short-commit")
     args.junit.parent.mkdir(parents=True, exist_ok=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     return _run_pytest_adapter(args)

@@ -18,11 +18,12 @@ from test_postgres import planned
 pytestmark = pytest.mark.postgres
 
 
-def _candidate(a, *, metric_sink=None):
+def _candidate(a, *, metric_sink=None, limit_lock_timeout_ms=500):
     database = Database(
         a.e.runtime,
         recovery_epoch=a.e.epoch,
         placement_short_commit=True,
+        placement_candidate_limit_lock_timeout_ms=limit_lock_timeout_ms,
         placement_metric_sink=metric_sink,
     )
     a.placement = PlacementStore(database)
@@ -79,9 +80,18 @@ def test_flag_defaults_off_and_candidate_keeps_response_and_idempotency_contract
     assert waits and any(item["outcome"] == "acquired" for item in waits)
     assert holds and any(item["outcome"] == "commit" for item in holds)
     assert all(
-        set(item) <= {"mode", "attempt", "waitMs", "outcome", "sqlState"}
+        set(item)
+        <= {
+            "mode",
+            "attempt",
+            "waitMs",
+            "outcome",
+            "sqlState",
+            "lockTimeoutBudgetMs",
+        }
         for item in waits
     )
+    assert all(item["lockTimeoutBudgetMs"] == 500 for item in waits)
 
 
 def test_candidate_does_not_wait_on_legacy_project_mutex(placement_benchmark_env):
@@ -298,15 +308,20 @@ def test_bound_candidate_savepoint_recovers_after_fail_fast_limit_row_timeout(
     _start_observation_window(a)
     run = planned(a.e)
     holder = psycopg.connect(a.e.owner)
+    database = Database(
+        a.e.runtime,
+        recovery_epoch=a.e.epoch,
+        placement_short_commit=True,
+        placement_candidate_limit_lock_timeout_ms=200,
+    )
     try:
         holder.execute(
-            "SELECT project_id FROM inv.project_resource_limits "
-            "WHERE project_id=%s FOR UPDATE",
+            "SELECT project_id FROM inv.project_resource_limits " "WHERE project_id=%s FOR UPDATE",
             (a.e.project,),
         ).fetchone()
-        with a.e.db.transaction(a.e.tenant) as conn:
-            bound = PlacementStore(BoundDatabase(a.e.db, a.e.tenant, conn))
-            bound.db.placement_short_commit = True
+        with database.transaction(a.e.tenant) as conn:
+            conn.execute("SELECT set_config('lock_timeout', '700ms', true)")
+            bound = PlacementStore(BoundDatabase(database, a.e.tenant, conn))
             with pytest.raises(psycopg.errors.LockNotAvailable) as caught:
                 bound.reserve(
                     a.principal,
@@ -318,6 +333,10 @@ def test_bound_candidate_savepoint_recovers_after_fail_fast_limit_row_timeout(
                     pool_version="project-nodes:candidate:1",
                 )
             assert caught.value.sqlstate == "55P03"
+            assert (
+                conn.execute("SELECT current_setting('lock_timeout') AS value").fetchone()["value"]
+                == "700ms"
+            )
             holder.rollback()
             result = bound.reserve(
                 a.principal,
@@ -328,11 +347,132 @@ def test_bound_candidate_savepoint_recovers_after_fail_fast_limit_row_timeout(
                 policy_version="roof:candidate:1",
                 pool_version="project-nodes:candidate:1",
             )
+            assert (
+                conn.execute("SELECT current_setting('lock_timeout') AS value").fetchone()["value"]
+                == "700ms"
+            )
     finally:
         holder.rollback()
         holder.close()
 
     assert result["runId"] == run["runId"]
+
+
+def test_candidate_budget_applies_only_to_limits_statement_and_restores_caller_value(
+    placement_benchmark_env, monkeypatch
+):
+    import inv.placement as module
+
+    a = placement_benchmark_env
+    metrics = []
+    database = Database(
+        a.e.runtime,
+        recovery_epoch=a.e.epoch,
+        placement_short_commit=True,
+        placement_candidate_limit_lock_timeout_ms=1500,
+        placement_metric_sink=metrics.append,
+    )
+    _start_observation_window(a)
+    run = planned(a.e)
+    observed_after_limit = []
+    original = module.lock_resources
+
+    def observe_restored_value(conn, resource_ids):
+        observed_after_limit.append(
+            conn.execute("SELECT current_setting('lock_timeout') AS value").fetchone()["value"]
+        )
+        return original(conn, resource_ids)
+
+    monkeypatch.setattr(module, "lock_resources", observe_restored_value)
+    with database.transaction(a.e.tenant) as conn:
+        conn.execute("SELECT set_config('lock_timeout', '700ms', true)")
+        bound = PlacementStore(BoundDatabase(database, a.e.tenant, conn))
+        result = bound.reserve(
+            a.principal,
+            a.e.project,
+            run["runId"],
+            a.request,
+            key="candidate-budget-restore",
+            policy_version="roof:candidate:1",
+            pool_version="project-nodes:candidate:1",
+        )
+        assert (
+            conn.execute("SELECT current_setting('lock_timeout') AS value").fetchone()["value"]
+            == "700ms"
+        )
+
+    assert result["runId"] == run["runId"]
+    assert observed_after_limit == ["700ms"]
+    waits = [item for item in metrics if item["mode"] == "placement-limit-row-wait"]
+    assert len(waits) == 1
+    assert waits[0]["lockTimeoutBudgetMs"] == 1500
+
+
+def test_candidate_budget_exhaustion_keeps_res_0007_contract(
+    placement_benchmark_env,
+):
+    a = placement_benchmark_env
+    metrics = []
+    _candidate(a, metric_sink=metrics.append, limit_lock_timeout_ms=1500)
+    _start_observation_window(a)
+    run = planned(a.e)
+    holder = psycopg.connect(a.e.owner)
+    try:
+        holder.execute(
+            "SELECT project_id FROM inv.project_resource_limits " "WHERE project_id=%s FOR UPDATE",
+            (a.e.project,),
+        ).fetchone()
+        with pytest.raises(DomainError) as caught:
+            _reserve(a, run, key="candidate-budget-exhaustion")
+    finally:
+        holder.rollback()
+        holder.close()
+
+    error = caught.value
+    assert (error.code, error.status, error.retryable) == ("RES-0007", 503, True)
+    assert isinstance(error.__cause__, psycopg.errors.LockNotAvailable)
+    assert error.__cause__.sqlstate == "55P03"
+    waits = [item for item in metrics if item["mode"] == "placement-limit-row-wait"]
+    assert len(waits) == 1
+    assert waits[0]["lockTimeoutBudgetMs"] == 1500
+    assert waits[0]["outcome"] == "timeout"
+    _assert_no_residue(a, "candidate-budget-exhaustion")
+
+
+def test_candidate_budget_can_wait_beyond_default_without_changing_contract(
+    placement_benchmark_env,
+):
+    a = placement_benchmark_env
+    metrics = []
+    _candidate(a, metric_sink=metrics.append, limit_lock_timeout_ms=1500)
+    _start_observation_window(a)
+    run = planned(a.e)
+    holder = psycopg.connect(a.e.owner)
+    try:
+        holder.execute(
+            "SELECT project_id FROM inv.project_resource_limits " "WHERE project_id=%s FOR UPDATE",
+            (a.e.project,),
+        ).fetchone()
+
+        def release_after_default_budget():
+            holder.execute("SELECT pg_sleep(0.8)").fetchone()
+            holder.rollback()
+
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            release = pool.submit(release_after_default_budget)
+            result = _reserve(a, run, key="candidate-budget-success")
+            release.result(timeout=3)
+    finally:
+        holder.rollback()
+        holder.close()
+
+    assert result["runId"] == run["runId"]
+    assert set(result) == {"runId", "placement", "leases"}
+    waits = [item for item in metrics if item["mode"] == "placement-limit-row-wait"]
+    assert len(waits) == 1
+    assert waits[0]["outcome"] == "acquired"
+    assert waits[0]["lockTimeoutBudgetMs"] == 1500
+    assert waits[0]["waitMs"] > 500
 
 
 def test_limit_row_contention_fails_fast_with_existing_public_contract(
@@ -346,8 +486,7 @@ def test_limit_row_contention_fails_fast_with_existing_public_contract(
     holder = psycopg.connect(a.e.owner)
     try:
         holder.execute(
-            "SELECT project_id FROM inv.project_resource_limits "
-            "WHERE project_id=%s FOR UPDATE",
+            "SELECT project_id FROM inv.project_resource_limits " "WHERE project_id=%s FOR UPDATE",
             (a.e.project,),
         ).fetchone()
         with pytest.raises(DomainError) as caught:
@@ -365,6 +504,7 @@ def test_limit_row_contention_fails_fast_with_existing_public_contract(
     assert waits[0]["attempt"] == 1
     assert waits[0]["outcome"] == "timeout"
     assert waits[0]["sqlState"] == "55P03"
+    assert waits[0]["lockTimeoutBudgetMs"] == 500
     _assert_no_residue(a, "limit-row-fail-fast")
 
 
