@@ -117,7 +117,7 @@ describe('화면 결함 6대 부류 치유 트랙 6차: 시간 경과 묵인 및
       expect(freshnessBadge).not.toBeNull();
       expect(freshnessBadge?.getAttribute('role')).toBe('status');
       expect(freshnessBadge?.textContent).toContain('자동 갱신 (5초 주기)');
-      expect(freshnessBadge?.textContent).toContain(testTimestamp.toLocaleTimeString());
+      expect(freshnessBadge?.textContent).toContain(testTimestamp.toLocaleTimeString('ko-KR'));
 
       // 새로고침 버튼 확인
       const refreshBtn = container.querySelector('[data-testid="approval-refresh-btn"]') as HTMLButtonElement;
@@ -206,7 +206,7 @@ describe('화면 결함 6대 부류 치유 트랙 6차: 시간 경과 묵인 및
       expect(freshnessNotice).not.toBeNull();
       expect(freshnessNotice?.getAttribute('role')).toBe('status');
       expect(freshnessNotice?.textContent).toContain('클러스터 노드 동기화 (5초 주기)');
-      expect(freshnessNotice?.textContent).toContain(testTimestamp.toLocaleTimeString());
+      expect(freshnessNotice?.textContent).toContain(testTimestamp.toLocaleTimeString('ko-KR'));
     });
 
     it('Tab 1(풀 관리) 진입 시 자동 폴링이 없는 스냅샷 모드임을 알리는 수동 갱신 고지가 표출된다', async () => {
