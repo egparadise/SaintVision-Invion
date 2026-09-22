@@ -479,6 +479,10 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
     def nodes(project: str, identity=Depends(authenticated)):
         return control.nodes(identity.principal, project)
 
+    @api.get("/v1/projects/{project}/nodes/{node_id}/resource-usage")
+    def node_resource_usage(project: str, node_id: str, identity=Depends(authenticated)):
+        from .node_resource_usage import serve; return serve(control, identity.principal, project, node_id)
+
     @api.get("/v1/projects/{project}/capacity")
     def capacity(project: str, identity=Depends(authenticated)):
         return control.capacity(identity.principal, project)

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.4"
+version: "1.2.5"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T18:50:00+09:00"
+updated: "2026-09-22T18:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+노드 자원 사용량 서빙 라우트 구현 카드 3 (Claude, 2026-09-22): PR #36 F1(계약만 있고 라우트 404) 해소 — `GET /v1/projects/{project}/nodes/{node_id}/resource-usage`를 Claude 소유 `inv/node_resource_usage.py`(읽기 모델: control.grant 인가, project_nodes 연결 노드만, resources/미해제 lease/capacity.py와 동일 신선·인가 술어의 snapshot; 미측정은 null·0 합성 없음, 불변식 위반은 clamp 대신 500 거부, 앵커 `validate_contract("NodeResourceUsageResponse")`)로 구현, app.py는 위임 코드 3줄만(코디네이터 승인 A, R5 통지). 계약 eceac8cf 무변경. 실 PG HTTP 경로 시험 **6 passed**, 앵커 변이 **KILLED**, check_contract_bindings **14→15 타입/17→18 자리 PASS**, frontend_integrity 0 위반, route_coverage 정적 스캔에 라우트 포함. 착지 커밋 = 이 항목을 담은 커밋(git log). 화면 배선은 Gemini, 만료 lease 처리·오류코드 번호는 Codex 판단. 전문 [[2026-09-22_18-05-00_KST_NODE-RESOURCE-USAGE-ROUTE_Claude_구현]].
 
 Codex 착지 독립 검토 카드 2 (Claude, 2026-09-22): 881f2911·1312e295·eceac8cf·dcf2b947·2aa80899·36d3ee9b·b6b20ab9 + 후속 4b2204d7·2e803cd6·7509f667 — PR #37(Gemini 검토)과 별개로 내 손 검증만 기록. 49330d04 정확 트리에서 실 PG 단일 파일 **121 passed / 0 failed**(skip 53 정직), **EvidenceEnvelope 앵커 3자리 변이 3/3 KILLED**(어제 내 구멍 해소 확인), export_schemas 58/58·check_contract_bindings·check_ontology·fixture_reachability exit 0, Go build/vet 0(contracts-go·node-agent), 7509f667에서 F1 진단은닉 해소 14 passed. **전부 sound**; finding 2건 escalation(F-A provision_credentials 광범위 except→거부 위장, F-B safe evidence에 실패 케이스 nodeid 없음). **49330d04 CI 확정**: docs success · backend/core **cancelled**(cancel-in-progress, 연속 push; 4b2204d7가 해소) · browser 5/1 failed(test_desktop_browser, 케이스 미상). hosted backend PG no-skip 관측은 아직 0 — 7509f667 run이 첫 후보. 전문 [[2026-09-22_17-35-00_KST_CODEX-LANDINGS_Claude_독립검토]].
 
