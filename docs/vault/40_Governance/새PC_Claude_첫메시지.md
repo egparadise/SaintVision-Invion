@@ -27,7 +27,7 @@ tags: ["operations", "migration", "bootstrap"]
 오늘 새로 생긴 규칙(정본은 이미 반영됨 — 어제 것과 구분하라고 짚는다):
 - 규칙 7·8 = docs/vault/40_Governance/검증규칙과_세축_canon.md (7=느슨한 계약은 내부 폐쇄면 좁혀 사실을 적고 외부·확장면 열되 조용히 삼키지 마라; 8=여러 착지 쌓이면 지시 없이도 마지막 상태에서 전수 검증 — 조각 검증은 조각-사이 깨짐을 못 잡는다).
 - 조용한 강등 금지 = 같은 canon 문서의 해당 절(모름을 성공/알려진 값으로 조용히 치환 금지).
-- R2-a = docs/vault/40_Governance/공유워크트리_개인index_커밋규칙.md (공유 문서를 개인 index로 올릴 때 pre-commit drift 검사를 출력만 말고 hard-stop으로 — 안 멈추면 남의 갱신을 clobber한다). 그리고 게이트는 눈이 아니라 exit code로 판정하라(check_docs 등 `; echo exit=$?`).
+- R2-a = docs/vault/40_Governance/공유워크트리_개인index_커밋규칙.md (공유 문서를 개인 index로 올릴 때 pre-commit drift 검사를 출력만 말고 hard-stop으로 — 안 멈추면 남의 갱신을 clobber한다). 그리고 게이트는 눈이 아니라 exit code로 판정하라. Bash는 `rc=$?` 후 0이 아니면 `exit "$rc"`, PowerShell은 `$LASTEXITCODE`를 즉시 검사하고 실패하면 중단한다.
 
 하지 말 것: 보호 컨테이너 4개는 옛 기계에 남아 이 PC엔 없다 — 그 증거를 지어내지 말고 CX01_CONTAINER 미설정이면 관련 시험은 정직히 skip으로 둔다. 그리고 이 PC에도 남의 자원(컨테이너·워크트리·DB)이 있을 수 있으니 소유 확인 없이 지우지 마라.
 

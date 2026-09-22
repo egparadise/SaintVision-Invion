@@ -3,6 +3,8 @@ import pytest
 from inv.control import Control
 from inv.dispatch import DeliveryWorker
 from inv.shards import ShardRuntime
+import inv.shard_completion as shard_completion
+from inv.errors import DomainError
 from test_approvals import approval, count
 from test_node_runtime import node_runtime
 from test_node_delivery import remote
@@ -37,6 +39,19 @@ def test_actual_shard_outputs_complete_parent_with_one_aggregate_evidence(remote
     assert status["aggregateManifestSha256"] is not None
     assert count(a, "evidence") == 3 and count(a, "shard_completions") == 1 and active(a) == 0
     assert worker.once(a.e.tenant) == "idle"
+
+
+def test_parent_completion_rejects_malformed_evidence_envelope(remote, storage, monkeypatch):
+    """Aggregate publication must reject its own malformed EvidenceEnvelope."""
+    a = remote
+    runtime, parent, shards = plan(a, [["/probe", "output"], ["/probe", "output"]])
+    worker = DeliveryWorker(a.e.db, a.delivery, output_provider=storage.provider)
+    assert worker.once(a.e.tenant, command_id=shards[0].command["commandId"]) == "stopped"
+
+    monkeypatch.setattr(shard_completion, "digest", lambda _value: "not-a-sha256")
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        worker.once(a.e.tenant, command_id=shards[1].command["commandId"])
+    assert count(a, "shard_completions") == 0
 
 
 def test_failure_reaches_parent_and_cancels_unstarted_sibling(remote, storage):
