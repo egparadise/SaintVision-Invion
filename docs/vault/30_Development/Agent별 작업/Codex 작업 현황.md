@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.189"
+version: "1.0.190"
 status: "review"
 author: "Codex"
 updated: "2026-09-23T04:20:00+09:00"
@@ -39,7 +39,7 @@ source_of_truth: "Git"
 
 - 기존 단일 Node private state의 top-level identity를 호환 primary로 유지하면서 `nodes[]`, 반복 `init --node-ip`, Node별 manifest/worker.zip/peer policy/certificate를 추가했다. 신규 Node ID를 side effect 전에 저장해 partial retry에서도 기존 Node·key·channel·CA·epoch를 교체하지 않는다.
 - CSR CN으로 대상 Node를 선택하고 HTTP bootstrap은 source IP 허용 목록에서 그 Node의 bundle/certificate만 반환한다. hash는 HTTP로 내지 않고 별도 operator 채널로 유지하며, status/observe와 방화벽 안내는 Node별 행/IP 목록이다.
-- implementation `6da99baf`: 첫 재기반 tree에서 신규+기존 LAN 192 passed/1 PG skip, 최신 `06bab6d5` 재기반에서 PG-free 단위 6 passed·check_docs/diff exit 0. 실제 Docker/PG/Ubuntu 4대/mTLS/18443/NTP는 미실행이며 coordinator 실검증과 Claude 독립 검토 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
+- implementation `6da99baf`, Ubuntu F1 hotfix `6fdcecab`: scratch image `User`/`WorkingDir`의 `None`≡`''`만 portable default로 허용하고 non-empty mismatch는 계속 거부한다. hotfix 단일 파일 23 passed; 실제 worker 재검증과 Claude 독립 검토 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
 
 ## 2026-09-23 S05-DB 5노드 lane 실행 계획
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-2026-09-23-LAN-PILOT-MULTINODE-CODEX"
 title: "LAN pilot 다중 Node state·번들·등록 경계 구현"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T03:16:00+09:00"
+updated: "2026-09-23T04:02:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -48,6 +48,14 @@ source_of_truth: "Git"
 | `git diff --cached --check` | exit 0 |
 
 03:15 KST 메모리 경보 전에 관련 회귀 실행을 마쳤다. 경보 뒤에는 전체 pytest/build/browser/Docker를 시작하지 않았고 단일 PG-free 파일과 문서·코드 정리만 수행했다.
+
+## Ubuntu 24.04 실기 F1 보정
+
+Coordinator의 실제 Ubuntu 24.04 worker `192.168.45.143`에서 `finish-worker.sh`가 `Loaded image execution configuration differs: User`로 멈췄다. bundle manifest의 scratch image `imageConfig.User`는 빈 문자열이지만 최신 Docker Engine의 `image inspect`는 같은 기본값을 `null` 또는 key 누락으로 직렬화할 수 있었다.
+
+Hotfix `6fdcecab6200fec328b52afb36c46f0c217e9d0f`는 문자열 키 `User`와 `WorkingDir`에만 `None`과 `''` 동치를 적용한다. `1000:1000` 또는 `/workspace`처럼 비어 있지 않은 기대값과 누락값의 불일치는 계속 `ValueError`로 거부한다. `Env`와 다른 실행 구성의 비교는 넓히지 않았다. `tests/core/test_lan_worker_config.py`는 User 누락 양성, WorkingDir 누락 양성, 두 non-empty mismatch 음성을 추가했고 전체 **23 passed / 0 skipped/failed / exit 0**이다.
+
+Ubuntu 절은 `finish-worker.sh`가 identity/certificate 확인 뒤 `start-node.sh`를 내부 호출하므로 operator가 직접 호출할 필요가 없고, 직접 선호출하면 의도한 설치 순서를 우회한다는 점을 명시했다. 실제 worker 재검증은 coordinator가 이 hotfix head로 수행하며 아직 이 문서에서 성공으로 세지 않는다.
 
 ## 정직한 경계와 인계
 
