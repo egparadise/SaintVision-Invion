@@ -1,0 +1,36 @@
+# PR #66 (2a742b53) reproduction — Claude, 2026-09-22 22:35~22:45 KST
+# tree .worktrees/claude-rev66 (detached 2a742b53); own Vite 127.0.0.1:3015; mock uvicorn 8080; headless Chrome; output outside repo
+
+## run A: original apps/web
+vite ready=True pid=40076
+[Invariant 1: PASS] Bidirectional Switcher (Desktop <-> Portal) verified!
+[Window Manager] Dynamic Z-Index elevation verified: 23 > 22 > 21
+[Invariant 2: PASS] Window Manager verified! 
+[Invariant 3: PASS] Keyboard A11y (Alt+Tab, Escape) verified! 
+[Invariant 4: PASS] Layout Persistence verified! 
+[Contrast: Top System Menu Bar Text] Ratio: 17.06:1 (WCAG AA Pass: True)
+[Contrast: Window Active Title Text] Ratio: 13.98:1 (WCAG AA Pass: True)
+[Invariant 9] Capacity metrics presence: {'hasCores': True, 'hasMemory': True, 'hasDisclaimer': True}
+[Invariant 9: PASS] Honest Capacity Metrics verified! 
+acceptance exit=0
+
+## run B: mutated apps/web (M1 shell text color #f8fafc->#334155 x4 sites incl. top bar; M2 dock toggle-minimize removed)
+M1 replaced 4 color(s); M2 applied
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+vite ready=True
+[Invariant 1: PASS] Bidirectional Switcher (Desktop <-> Portal) verified!
+[Window Manager] Dynamic Z-Index elevation verified: 23 > 22 > 21
+[Invariant 2: PASS] Window Manager verified! 
+[Invariant 3: PASS] Keyboard A11y (Alt+Tab, Escape) verified! 
+[Invariant 4: PASS] Layout Persistence verified! 
+[Contrast: Top System Menu Bar Text] Ratio: 17.06:1 (WCAG AA Pass: True)
+[Contrast: Window Active Title Text] Ratio: 13.98:1 (WCAG AA Pass: True)
+[Invariant 9: PASS] Honest Capacity Metrics verified! 
+acceptance exit=0
+
+## tests/test_browser_smoke_boundary.py (PR head)
+3 passed in 4.27s
+pytest exit=0
+
+## chrome_real_uvicorn_acceptance_result.json 'proxy' field (run A, frontend actually 3015)
+  "proxy": "Vite 5.x on 127.0.0.1:3005",
