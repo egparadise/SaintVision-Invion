@@ -20,6 +20,7 @@ OWNERSHIP_LABELS = (
     "ai.saintvision.configured",
     "ai.saintvision.cx01",
     "ai.saintvision.developer-studio",
+    "ai.saintvision.evidence",  # collect_container_evidence.py probes: --rm, age-gated orphan cleanup
     "ai.saintvision.guard",
     "ai.saintvision.kernel-test",
     "ai.saintvision.pitr-rehearsal.run",

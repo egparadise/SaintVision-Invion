@@ -1,0 +1,154 @@
+{
+  "collected_at": "2026-09-22T14:39:39+00:00",
+  "collector": "tools/collect_container_evidence.py",
+  "container": {
+    "control": {
+      "exit_code": 0,
+      "isolated": false,
+      "network": "bridge",
+      "note": "isolation removed on purpose; must NOT look isolated",
+      "observed": {
+        "external_connect": "TimeoutError",
+        "ifaces": [
+          "eth0",
+          "lo"
+        ],
+        "routes": [
+          "eth0",
+          "eth0"
+        ]
+      }
+    },
+    "docker_server_version": "20.10.22",
+    "image": "python:3.12-slim",
+    "image_id": "sha256:9e87977b867847e186d066f531ef783b006d582a985c341c269446088d90f2c4",
+    "measured": true,
+    "network": "none",
+    "plan": {
+      "capDropAll": true,
+      "network": "none",
+      "noNewPrivileges": true,
+      "pidsLimit": 64,
+      "rootfsReadOnly": true,
+      "userId": 65532
+    },
+    "probes": [
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "printf 'probe-stdout\\n'; printf 'probe-stderr\\n' 1>&2"
+        ],
+        "exit_code": 0,
+        "expect": "exit 0, stdout 'probe-stdout\\n', stderr 'probe-stderr\\n'",
+        "id": "P1",
+        "name": "output-capture",
+        "stderr_bytes": 13,
+        "stderr_head": "probe-stderr\n",
+        "stderr_sha256": "043ddd6263a279cc6d59193ae41d19b95e6af0670df78882b20a98703259c4e8",
+        "stdout_bytes": 13,
+        "stdout_head": "probe-stdout\n",
+        "stdout_sha256": "5ea0daed9fc30a9d9edad0ccbe95f87074a47b4433ef53f18f56408d95226d51"
+      },
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "echo x > /etc/inv-probe"
+        ],
+        "exit_code": 2,
+        "expect": "non-zero exit, stderr mentions read-only",
+        "id": "P2",
+        "name": "rootfs-write-denied",
+        "stderr_bytes": 59,
+        "stderr_head": "sh: 1: cannot create /etc/inv-probe: Read-only file system\n",
+        "stderr_sha256": "b695fb68e3734a049f2cf0ef14de6fa399c74019e8ae8a72fb94f9ffd5d2106b",
+        "stdout_bytes": 0,
+        "stdout_head": "",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "argv": [
+          "python3",
+          "-c",
+          "import os,json,socket,errno\nifaces=sorted(os.listdir('/sys/class/net'))\nroutes=[l.split()[0] for l in open('/proc/net/route').read().splitlines()[1:]]\ntry:\n    socket.create_connection(('192.0.2.1', 9), timeout=3); err='connected'\nexcept OSError as e:\n    err=errno.errorcode.get(e.errno, type(e).__name__)\nprint(json.dumps({'ifaces': ifaces, 'routes': routes, 'external_connect': err}))"
+        ],
+        "exit_code": 0,
+        "expect": "ifaces == ['lo'], routes == [], external connect ENETUNREACH (loopback refusal is not evidence)",
+        "id": "P3",
+        "isolated": true,
+        "name": "network-namespace-isolated",
+        "observed": {
+          "external_connect": "ENETUNREACH",
+          "ifaces": [
+            "lo"
+          ],
+          "routes": []
+        },
+        "stderr_bytes": 0,
+        "stderr_head": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 68,
+        "stdout_head": "{\"ifaces\": [\"lo\"], \"routes\": [], \"external_connect\": \"ENETUNREACH\"}\n",
+        "stdout_sha256": "cd78d368b75798f10c60b4f265f5bba9ac824c1d2280a09414742c1afd83e6e2"
+      },
+      {
+        "argv": [
+          "sh",
+          "-c",
+          "id -u; grep CapEff /proc/self/status"
+        ],
+        "exit_code": 0,
+        "expect": "uid 65532, CapEff 0000000000000000",
+        "id": "P4",
+        "name": "uid-and-capabilities",
+        "stderr_bytes": 0,
+        "stderr_head": "",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 31,
+        "stdout_head": "65532\nCapEff:\t0000000000000000\n",
+        "stdout_sha256": "459b483188daa8328fafd867ef624ccd02ec69dccec288be20e74a7cb40d893d"
+      }
+    ]
+  },
+  "db": {
+    "counts": {
+      "commitments": 0,
+      "completions": 0,
+      "deliveries": 0,
+      "evidence": 0,
+      "leases": 0,
+      "runs": 0,
+      "stop_receipts": 0,
+      "storage_objects": 0,
+      "tool_claims": 0
+    },
+    "database": {
+      "migration_head": "0046_model_manifest_readiness",
+      "name": "inv_s03_fe940d4bcea74e1bb495a655fc5b6fde",
+      "server_version": "16.15"
+    },
+    "denials": {
+      "approval_audit_phases": {},
+      "delivery_error_codes": [],
+      "ingestion_errors": []
+    },
+    "measured": true,
+    "runs": {},
+    "tenant_filter": null
+  },
+  "note": "Windows host: the Linux private Node provider that produces real runs does not execute here, so the DB lane observes an empty disposable ledger (synthetic ledger is exercised by the self-test); container lane probes the local python:3.12-slim image (a probe image, not the product node image)",
+  "provenance": {
+    "collector_sha256": "5ac7a2b00b3410078b918da5f81ef429993d700e194c7b4cd97d4eec6d7015d7",
+    "git_sha": "fd1ae8ba",
+    "note": "git_sha is HEAD at collection time; when uncommitted_sources is non-empty the collector content hash identifies the code that ran.",
+    "uncommitted_sources": [
+      "tools/collect_container_evidence.py"
+    ]
+  },
+  "unmeasured": [
+    "db lane observed 0 runs: output/hash/lease facts unmeasured"
+  ],
+  "verdict": "UNMEASURED",
+  "violations": []
+}
