@@ -1,7 +1,7 @@
 ---
 doc_id: "HIST-CLAUDE-NEWPC-DAY1-CI-TRIAGE-001"
-title: "새 PC 첫날 — CI 첫 실행 triage 지도(원인 6·Claude 레인 0) + 이전 후 전수 검증(절차서 §5) 결과"
-version: "1.0.0"
+title: "새 PC 첫날 — CI 첫 실행 triage 지도(원인 7·Claude 레인 0) + 이전 후 전수 검증(절차서 §5) 결과"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
@@ -32,7 +32,7 @@ tags: ["ci", "first-run", "triage", "migration", "verification", "go", "handoff"
 | core | failure | 22단계 full pytest: **2964 수집 / 6 실패 / 58 skip** | 10~21단계 **전부 success**: Go race/build, Node·Python·LAN 이미지 build, workspace 22·containment 28·business handoff 17·shard recovery 21·LAN installer 15 = **0 실패** |
 | desktop-browser | failure | VF runner: **3 실패 / 3 통과 / 0 skip**, `evidenceStatus=partial` | Chromium·Uvicorn·tmpfs PG·후보 이미지 기동 성공 |
 
-## 2. triage 지도 — 원인 6개 (1차 실패 9건 + 2차 신규 2건, 원인으로 셈)
+## 2. triage 지도 — 원인 7개 (1차 실패 9건 + 2차 신규 3건, 원인으로 셈)
 
 분류 판별자 = 옛 PC 로컬 baseline `0b7d51ed`(CI-스코프 1622 passed / PG·Go·브라우저 not_run)의 ran-passed ↔ not_run 집합과 `git diff 0b7d51ed d01c931a -- <파일>`.
 
@@ -43,13 +43,21 @@ tags: ["ci", "first-run", "triage", "migration", "verification", "go", "handoff"
 | C3 | `test_credential_backend[wrong_owner]`가 `docker exec --user 1:1 $HOSTNAME`로 uid-1 파일을 만드는데 hosted runner는 이름 있는 컨테이너가 아님(`No such container`) | **A 새로 드러남**(Linux+PG 전용, 옛 PC not_run) | Codex(자격증명 백엔드 시험) | core 1 | **착지 `881f2911`**(`docker run --rm --volume`로 교체) |
 | C4 | `tools/provision_credentials.py` 오류 매핑: malformed manifest → `JSONDecodeError`가 internal(exit 4)로 새고, 잘못된 rotation → `InternalError`(Denied여야) | **A**(PG 필요, 옛 PC skip) | Codex(도구·시험 작성자) | core 3 (`test_credential_provision` ×3) | **착지 `51d53b7f`**(Denied 매핑) |
 | C5 | 브라우저 여정 3건 실패 — 1차는 safe evidence가 클래스명을 숨김. **2차(51d53b7f, run 35700169728)에서 노출**: `tests.integration.test_desktop_browser`·`tests.integration.test_studio_browser`(3 실패/3 통과, 재발) | **A**(실 브라우저 옛 PC not_run) | **Gemini**(화면·브라우저 인수 시험 `7c55fea7`·`325554cb` feat(web) 계열) / runner=Codex | desktop-browser 1 step(3 case) ×2회 | 다음: Gemini가 hosted Chromium에서 그 두 파일의 실패 케이스를 봄(케이스명은 safe evidence 밖 — proof.json/tests.xml은 runner 내부) |
+| C7 | **backend no-skip 게이트 vs 플랫폼 skip 45**: 2차 backend(3.14, `c5042322` run 35700572748)에서 **Tests 단계 success = 2645 passed / 45 skipped / 0 failed**(backend의 **첫 완주 관측**, PG no-skip 실물) 다음 12단계 `No PostgreSQL test was skipped`가 45 skip(Windows PowerShell 11·CX01 19·후보 이미지 10·브라우저 smoke 1·agent CLI 4)에 exit 1 | **A/machinery**(게이트가 'PG skip 0'을 'skip 0'으로 적었음 — 규칙 7의 느슨-좁힘 반대 사례) | Codex(backend.yml) | backend 1 job(3.12는 취소됨) | **착지 `2aa80899`**: 사유별 정확 카운트 ratchet(합 45)으로 교체 — skip을 성공으로 세지도, 늘게 두지도 않음 |
 | C6 | **frontend vitest 1파일 2케이스** `tests/freshness-and-staleness-wiring.test.tsx`(Priority 11·12): 기대값을 `testTimestamp.toLocaleTimeString()`(**러너 기본 locale**)로 만들고 화면은 `toLocaleTimeString('ko-KR')`로 고정 → hosted(en-US)에선 `12:30:00 AM` ≠ `AM 12:30:00`. 옛/새 PC(ko-KR)에선 우연히 일치해 655 통과 | **B2 환경차**(로컬 ran-passed, 파일 미변경, locale만 다름) | **Gemini**(`597ef148`) | frontend 1 job(2 case), 51d53b7f·39d8c238 둘 다 | 고침: 시험 기대값도 `'ko-KR'`로 고정(화면이 이미 고정) — 「시험이 러너 환경에 기댐」 부류, C3·`.work` 선존재와 같은 모양 |
 
-- **Claude 레인 원인: 0** (C1~C6 전부). `src/saintvision`·`tests/core`(ontology 시험 제외)·`contracts`에서 난 것은 C1뿐이고 C1은 Codex 커밋의 재생성 누락이다.
+- **Claude 레인 원인: 0** (C1~C7 전부). `src/saintvision`·`tests/core`(ontology 시험 제외)·`contracts`에서 난 것은 C1뿐이고 C1은 Codex 커밋의 재생성 누락이다.
 - **1원인 1소유 확인**: 여섯 모두 단일 레인. Codex가 C1~C4(+C5 노출)를 착지했고(15:41 착수 → 16:33 push), C5·C6은 Gemini. 내가 같은 파일에 손대지 않는다.
 - **멈출 선(규율 (4))**: 사용자 결정을 요구하는 원인 없음(계약 가정·우선순위 충돌 없음) → 자율 진행 가능. 사용자 몫은 그대로 [[사용자_결정대기_브리프_2026-09-22]].
-- **cascade 주의**: C1이 backend pytest 전체를 가렸으므로 backend job의 PG no-skip 결과는 **아직 0 관측**이다. C1 착지 후 재실행이 backend의 진짜 첫 실행이다.
+- **backend 첫 완주(관측)**: C1 해소 후 `c5042322`의 3.14 job이 **2645 passed / 45 skip / 0 fail**로 Tests를 통과했다 — 옛 PC not_run이던 PG 통합이 hosted에서 실물로 확인된 첫 순간(C7의 게이트만 남았고 착지됨). 3.12 job은 다음 push에 취소돼 미관측(2-1).
 - **다섯 전부 같은 SHA**: 51d53b7f는 frontend가 dispatch로, Codex PR 브랜치 `agent/codex/continuation-20260922`(39d8c238)는 pull_request로 다섯 전부 떴다. 규율 종료 조건은 다섯이 **green**이어야 하므로 C5·C6 해소 후.
+
+## 2-1. machinery 발견 — 긴 workflow가 push마다 취소돼 한 번도 끝난 적 없다 (Codex 인계)
+
+- **관측(gh, 2026-09-22 17:40 KST)**: integration 브랜치에서 **Backend Build·Core Build가 success로 끝난 적이 0회**. backend 이력 = cancelled 20 + failure(계약 drift 조기 종료) 다수. 2차 backend(51d53b7f, `35700169744`)는 **내 문서-only push `c5042322`가 취소**시켰다 — 다섯 워크플로 모두 `concurrency: cancel-in-progress: ${{ github.ref_name != 'main' }}`라 integration에서는 새 push가 진행 중 run을 죽인다.
+- **왜 문제인가**: backend(마이그레이션 전수·full pytest)·core(이미지 build·node 레인)는 20~35분인데 세 에이전트가 문서 포함 수십 분 간격으로 push한다 → **완주 확률이 구조적으로 낮다.** 1차 실행이 완주한 건 밤 사이 push가 멈춰서였다. "CI가 red"보다 앞서는 상태 = **CI가 끝을 못 봄**(규율 종료 조건 '같은 SHA 다섯 green'을 영원히 못 채우는 두 번째 경로; 첫째는 frontend 경로 필터).
+- **분류/소유**: machinery(B2 아님, 설정) → **Codex**. 선택지: (a) integration에서 `cancel-in-progress: false`(큐잉; 러너 분 소모 증가), (b) backend/core만 false, (c) 문서-only push는 backend/core를 `paths-ignore: docs/**`로 안 띄움(단 docs/vault 갱신이 매 착지에 붙으므로 코드+문서 커밋은 그대로 뜸). 내 권고는 **(b)+(c)**. 결정은 machinery 소유자.
+- **에이전트 규율(즉시, 설정 전까지)**: integration에 진행 중 backend/core run이 있으면 **문서-only push를 그 완료까지 미룬다**(`gh run list --branch integration/... --status in_progress`로 확인). 나는 이 문서의 2차 갱신을 그렇게 미뤘다.
 
 ## 3. CI가 처음 검증한 것 (예측→관측; Go 지도 갱신)
 
@@ -89,7 +97,7 @@ tags: ["ci", "first-run", "triage", "migration", "verification", "go", "handoff"
 
 ## 5. 인계 · 다음 첫 행동
 
-- **Codex**: C1~C4 착지 완료. backend 2차(51d53b7f, run 35700169744) 결과가 PG no-skip의 첫 관측 — 나오면 내가 재triage해 이 표를 갱신.
+- **Codex**: C1~C4·C7 착지 완료. **남은 machinery = 2-1(cancel-in-progress 기아)** — 결정 요청. 2aa80899 실행이 완주하면 backend 3.12까지 첫 관측이 된다.
 - **Gemini**: (1) C6 vitest locale 고정(작음, 1파일) (2) C5 `test_desktop_browser`·`test_studio_browser` 3케이스 hosted Chromium 실측 (3) check_frontend_integrity 출력 인코딩 독립화.
 - **사용자**: 새 결정 없음. 브리프 대기분 그대로.
 - **나(Claude)**: (a) backend 2차 결과 재triage(51d53b7f), (b) Go 지도 T1~T3 잔여는 Codex/운영자 소관 유지, (c) 내 레인 무-블록(§0 (c)) 계속.
