@@ -116,6 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
             return (
               <button
                 key={tab.id}
+                data-testid={`header-tab-${tab.id}`}
                 onClick={() => onSelectTab(tab.id)}
                 style={{
                   padding: '8px 12px',

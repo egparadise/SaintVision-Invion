@@ -1,0 +1,90 @@
+{
+  "schema": "https://saintvision.ai/evidence/s02-fe-real-api.schema.json",
+  "version": "1.0.0",
+  "timestamp": "2026-09-22T23:32:28.881727+09:00",
+  "gitCommitSha": "e2ebadda7255f06f8af7c37ab61874a2ca4a3ea1",
+  "assessment": "ACCEPTANCE_PASSED",
+  "operationalAcceptanceAssessed": true,
+  "environment": {
+    "os": "nt",
+    "python": "3.14.7",
+    "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "backendPort": 8080,
+    "idpPort": 8090,
+    "frontendPort": 3005
+  },
+  "scenarios": [
+    {
+      "id": "s02-login-success",
+      "name": "로그인 성공 경로 (OIDC Code Flow + Session 검증)",
+      "status": "PASS",
+      "observations": {
+        "authRedirectStatus": 302,
+        "tokenExchangeStatus": 200,
+        "sessionValidationStatus": 200,
+        "tokenType": "Bearer",
+        "tokenExpiresIn": 3600,
+        "headerMounted": true,
+        "logoutButtonVisible": true,
+        "screenshot": "s02_01_login_success.png"
+      }
+    },
+    {
+      "id": "s02-nodes-real-data",
+      "name": "Node 목록 실데이터 (0대 정직 표기)",
+      "status": "PASS",
+      "observations": {
+        "nodesEndpointStatus": 200,
+        "observedWireNodeCount": 0,
+        "wireItems": [],
+        "emptyStateRendered": true,
+        "emptyStateTitle": "등록된 Node가 없습니다",
+        "screenshot": "s02_04_nodes_empty_state.png"
+      }
+    },
+    {
+      "id": "s02-project-403",
+      "name": "미인가 프로젝트 403 ProblemDetails 및 role=alert 표출",
+      "status": "PASS",
+      "observations": {
+        "unauthorizedProjectId": "prj_01M33NGQEZTB2QD1CWV97Y7999",
+        "wireHttpStatus": 403,
+        "wireContentType": "application/problem+json",
+        "problemCode": "AUTH-0030",
+        "problemDetail": "Project permission is unavailable",
+        "problemCategory": "AUTH",
+        "problemTraceId": "8bafd0e42296059ca3ea921dc59a9b7e",
+        "domAlertRole": "alert",
+        "domAlertText": "[AUTH-0030] Project permission is unavailable (traceId: 3ab01edfba4f160de26f47f3e161e954)",
+        "screenshot": "s02_03_project_403.png"
+      }
+    },
+    {
+      "id": "s02-token-expired-401",
+      "name": "토큰 만료 401 ProblemDetails 및 재로그인 경로",
+      "status": "PASS",
+      "observations": {
+        "wireHttpStatus": 401,
+        "wireContentType": "application/problem+json",
+        "problemCode": "AUTH-0050",
+        "problemDetail": "A current access token is required",
+        "domAlertRole": "alert",
+        "domAlertText": "[AUTH-0050] A current access token is required",
+        "reloginCompleted": true,
+        "reloginHeaderVisible": true,
+        "screenshots": [
+          "s02_02_token_expired_401.png",
+          "s02_02_relogin_success.png"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "totalScenarios": 4,
+    "passed": 4,
+    "failed": 0,
+    "mockApiUsed": false,
+    "realUvicornUsed": true,
+    "realDevIdPUsed": true
+  }
+}

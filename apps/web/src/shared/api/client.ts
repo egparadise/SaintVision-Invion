@@ -89,6 +89,13 @@ export function clearAuthToken(): void {
   inMemoryAuthToken = null;
 }
 
+export type UnauthorizedHandler = (problem: ProblemDetails) => void;
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+
+export function onUnauthorized(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
+}
+
 export class ApiError extends Error {
   public readonly problem: ProblemDetails;
 
@@ -131,7 +138,14 @@ export function isRouteNotFoundError(err: any): boolean {
   }
   // Generic Starlette / FastAPI unmapped route response: {"detail": "Not Found"}
   // or network-level client synth 404: code === "NET-0404"
-  return problem?.detail === 'Not Found' || problem?.code === 'NET-0404' || !problem?.code;
+  // or FastAPI HTTPException mapped 404: code === "HTTP-0001", detail: "Request unavailable"
+  return (
+    problem?.detail === 'Not Found' ||
+    problem?.detail === 'Request unavailable' ||
+    problem?.code === 'NET-0404' ||
+    problem?.code === 'HTTP-0001' ||
+    !problem?.code
+  );
 }
 
 /**
@@ -200,6 +214,9 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
         traceId,
         true,
       );
+    }
+    if (problem.status === 401 && unauthorizedHandler) {
+      unauthorizedHandler(problem);
     }
     throw new ApiError(problem);
   }

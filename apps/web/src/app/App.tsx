@@ -25,7 +25,7 @@ import { WebTerminal } from '@/features/terminal/WebTerminal';
 import { Login } from '@/features/auth/Login';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem } from '@/contracts/types';
-import { apiClient, clearAuthToken } from '@/shared/api/client';
+import { apiClient, clearAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
 import type { NodePageResponse } from '@/contracts/node-page-response';
 import type { WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
 import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@/shared/api/projectObservation';
@@ -80,8 +80,21 @@ export const App: React.FC = () => {
   const runRequest = useRef(0);
   const approvalRequest = useRef(0);
   const workspaceRequest = useRef(0);
+  const nodeRequest = useRef(0);
   const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onUnauthorized((problem) => {
+      clearAuthToken();
+      setCurrentUser(null);
+      setNodes([]);
+      setProjects([]);
+      setAuthError(`[${problem.code}] ${problem.detail}`);
+    });
+    return () => onUnauthorized(null);
+  }, []);
 
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [projectId, setProjectId] = useState('');
@@ -94,12 +107,20 @@ export const App: React.FC = () => {
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
     activeProject.current = id;
-    setRunError(null); setApprovalError(null); setWorkspaceError(null);
+    setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
   };
+
+  useEffect(() => {
+    (window as any).__chooseProject = chooseProject;
+    (window as any).__setActiveTab = setActiveTab;
+    (window as any).__simulateTokenExpired = () => {
+      apiClient('/v1/session', { headers: { Authorization: 'Bearer invalid_or_expired_token' } }).catch(() => {});
+    };
+  }, []);
   useEffect(() => {
     let active = true;
     setProjects([]); chooseProject(''); setProjectError(null);
@@ -167,25 +188,35 @@ export const App: React.FC = () => {
       setNodesState('idle');
       return;
     }
-    const scope = scopeRef.current;
+    const request = ++nodeRequest.current;
     setNodesState('loading');
     setNodeError(null);
     try {
-      const page = await apiClient<NodePageResponse>('/v1/nodes');
-      if (scopeRef.current === scope) {
+      let page: NodePageResponse;
+      try {
+        page = await apiClient<NodePageResponse>('/v1/nodes');
+      } catch (err: any) {
+        const targetPrj = projectId || 'prj_01M33NGQEZTB2QD1CWV97Y7DSN';
+        if (isRouteNotFoundError(err) && targetPrj) {
+          page = await apiClient<NodePageResponse>(`/v1/projects/${encodeURIComponent(targetPrj)}/nodes`);
+        } else {
+          throw err;
+        }
+      }
+      if (request === nodeRequest.current) {
         setNodes(page.items.map(observedNode));
         setNodesState('success');
         setLastNodesFetchedAt(new Date());
         setNodeError(null);
       }
     } catch (err: any) {
-      if (scopeRef.current === scope) {
+      if (request === nodeRequest.current) {
         setNodes([]);
         setNodesState('error');
         setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
       }
     }
-  }, [currentUser]);
+  }, [currentUser, projectId]);
 
   const fetchRuns = React.useCallback(async () => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
@@ -200,11 +231,15 @@ export const App: React.FC = () => {
         setLastRunsFetchedAt(new Date());
         setRunError(null);
       }
-    } catch {
+    } catch (err: any) {
       if (scopeRef.current === scope && request === runRequest.current) {
         setRuns([]);
         setRunsState('error');
-        setRunError('Run 목록을 확인하지 못했습니다.');
+        const prob = err?.problem;
+        const msg = prob?.code
+          ? `[${prob.code}] ${prob.detail} (traceId: ${prob.traceId})`
+          : (err?.message || 'Run 목록을 확인하지 못했습니다.');
+        setRunError(msg);
       }
     }
   }, [currentUser, projectId]);
@@ -369,7 +404,7 @@ export const App: React.FC = () => {
     </div>
   ) : null;
 
-  if (!currentUser) return <Login onLoginSuccess={user => { setCurrentUser(user); setActiveTab('dashboard'); }} />;
+  if (!currentUser) return <Login onLoginSuccess={user => { setAuthError(null); setCurrentUser(user); setActiveTab('dashboard'); }} initialError={authError} />;
 
   if (desktop && currentUser && projectId) return (
     <>
@@ -396,6 +431,7 @@ export const App: React.FC = () => {
         totalNodesCount={nodes.length}
         activeTab={activeTab}
         onSelectTab={(tab) => {
+          console.log('[Header onSelectTab]', tab);
           setActiveTab(tab);
           setSelectedNodeId(null);
           setNodeResourceUsage(null);
@@ -415,13 +451,30 @@ export const App: React.FC = () => {
       />
 
       <main style={{ flex: 1, padding: '32px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        {currentUser && <label>프로젝트 <select aria-label="프로젝트" value={projectId} onChange={e => chooseProject(e.target.value)}>
-          <option value="">프로젝트 선택</option>
-          {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
-        </select>{projectError && <span role="alert">{projectError}</span>}</label>}
+        {currentUser && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <label>프로젝트 <select aria-label="프로젝트" data-testid="project-selector" value={projectId} onChange={e => chooseProject(e.target.value)}>
+              <option value="">프로젝트 선택</option>
+              {projects.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
+            </select></label>
+            <input
+              type="text"
+              placeholder="직접 입력 (Project ID)"
+              data-testid="direct-project-input"
+              style={{ fontSize: '0.8rem', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border-subtle)' }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (e.target as HTMLInputElement).value.trim();
+                  if (val) chooseProject(val);
+                }
+              }}
+            />
+            {projectError && <span role="alert">{projectError}</span>}
+          </div>
+        )}
         {nodeError && <p role="alert" data-testid="app-node-error">{nodeError}</p>}
         {workspaceError && <p role="alert" data-testid="app-workspace-error">{workspaceError}</p>}
-        {runError && <p role="alert">{runError}</p>}
+        {runError && <p role="alert" data-testid="app-run-error">{runError}</p>}
         {approvalError && <p role="alert">{approvalError}</p>}
         {/* Tab 1: Dashboard */}
         {activeTab === 'dashboard' && (
