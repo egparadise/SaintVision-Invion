@@ -42,6 +42,12 @@ export type { DistributedPlanResponse };
 import type { PoolMemberResponse } from '@/contracts/pool-member-response';
 import type { PoolMemberRemovalResponse } from '@/contracts/pool-member-removal-response';
 import type { NodeCapability as NodeCapabilityWire, NodeDetailResponse as NodeDetailWireResponse } from '@/contracts/node-detail-response';
+import {
+  type NodeResourceUsageResponse,
+  type ObservedNodeResourceUsage,
+  observedNodeResourceUsage,
+} from '@/contracts/kernel-observation';
+export type { ObservedNodeResourceUsage };
 
 export type StorageContribution = ContributionResponse;
 export type StorageLocation = DataLocationResponse;
@@ -335,3 +341,15 @@ export async function declineDiscoveryCandidate(
     method: 'DELETE',
   });
 }
+
+export async function getNodeResourceUsage(
+  nodeId: string,
+  projectId?: string
+): Promise<ObservedNodeResourceUsage> {
+  const url = projectId
+    ? `/v1/projects/${encodeURIComponent(projectId)}/nodes/${encodeURIComponent(nodeId)}/resource-usage`
+    : `/v1/nodes/${encodeURIComponent(nodeId)}/resource-usage`;
+  const raw = await apiClient<NodeResourceUsageResponse>(url);
+  return observedNodeResourceUsage(raw);
+}
+

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.109"
+version: "1.0.110"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T12:09:00+09:00"
+updated: "2026-09-22T16:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,41 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T12:09:00+09:00 (최신 tip `c6e9d9aa`, working tree clean).
+- 확인 기준: 2026-09-22T16:30:00+09:00 (최신 tip `8c504682`, working tree clean).
+
+## 세션 랩업: NodeResourceUsage Capability 자원 바인딩, Zero-Mock 프로젝터 및 NodeDetail 미관측 가드 (GM-02 / S02-FE)
+
+- **ViewModel 프로젝터 구축 및 엄격한 Zero-Mock (`apps/web/src/contracts/kernel-observation.ts`)**:
+  - `packages/contracts-ts`로부터 `NodeResourceUsageResponse`, `ResourceUsageMeasurement` 정본 생성 타입 re-export.
+  - `observedNodeResourceUsage(view: NodeResourceUsageResponse): ObservedNodeResourceUsage` 함수 구현.
+  - `measured === false`일 때 `reserved: null`, `spare: null`, `observedAt: null`을 엄격히 보존하여 허위 0이나 가짜 시각 합성을 원천 차단.
+- **제어 평면 어댑터 결속 (`apps/web/src/features/desktop/fabricControlApi.ts`)**:
+  - `getNodeResourceUsage(nodeId: string, projectId?: string): Promise<ObservedNodeResourceUsage>` 어댑터 구현.
+  - 프로젝트 스코프 엔드포인트 `/v1/projects/{p}/nodes/{n}/resource-usage` 및 글로벌 엔드포인트 `/v1/nodes/{n}/resource-usage` 결속.
+- **NodeDetail 조기 반환 결함 치유 및 Capability 사용량 패널 구현 (`apps/web/src/features/nodes/NodeDetail.tsx`)**:
+  - 기존 12번 라인의 조기 탈출(`if (node.telemetryUnavailable) return ...`)로 인해 노드의 정적 Capability와 사양까지 완전히 은폐되던 문제를 치유하고, 정보 배너(`data-testid="node-telemetry-unavailable-banner"`)와 함께 정적 사양 및 커널 자원 할당 상태를 온전히 표출.
+  - `data-testid="capability-resource-usage-panel"` 구축:
+    - 기준 시각: `{resourceUsage.stateAsOf ?? '미기록'} (실시간 캡처나 화면 갱신 시각이 아닙니다)`
+    - 자원별 카드: `resource-usage-card-{kind}`, `resource-measured-badge-{kind}`
+    - `측정됨 (Measured)` vs `미측정 (Unmeasured)` 명확한 뱃지 분리.
+  - `Number.isFinite(...)` 가드로 `NaN` 출력 완전 박멸 및 `미관측` 어휘 계약 준수.
+- **NodeList 미관측 노드 탐색 및 테스트 ID 정합 (`apps/web/src/features/nodes/NodeList.tsx`)**:
+  - 미관측 노드 카드에 `onSelectNode` 클릭 핸들러 및 `상세 및 자원 보기 →` 버튼(`data-testid="node-detail-btn-{node.id}"`) 추가.
+  - active 상태 공지 문단에 `data-testid="node-active-status-notice-{node.id}"` 결속.
+- **전용 회귀 테스트 구축 (`apps/web/tests/node-resource-usage-contract.test.tsx`)**:
+  - `observedNodeResourceUsage` 정본 fixture 프로젝션 및 null 보존 단언.
+  - `NodeDetail` 미관측 배너 및 Capability 패널 DOM 단언.
+  - `NodeList` active 공지 및 상세 탐색 버튼 클릭 단언 (4 tests passed).
+- **게이트 검증 실측 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (Vite 프로덕션 번들 6.45s 99 modules 정상 생성).
+  - `npm run test` (Vitest): **76개 파일 659/659 passed 100% in 24.13s (순증 +1 파일, +4 tests)**.
+  - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 rules satisfied (0 violations)**.
+  - `pytest tests/test_route_coverage.py`: **30 passed in 1.19s**.
+  - `python tools/check_contract_bindings.py`: **50 fixtures / 14 serving anchor types PASS**.
+  - `python tools/check_doc_single_source.py --ratchet`: **18 pairs PASS**.
+  - `python tools/check_docs.py`: **762 versioned documents PASS**.
+- **보고서**: [[2026-09-22_NodeResourceUsage_Capability바인딩_및_NodeDetail_미관측가드_Gemini]].
 
 ## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
 
