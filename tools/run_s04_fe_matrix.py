@@ -29,6 +29,7 @@ Zero Mock Guarantee:
 """
 
 import argparse
+import jwt
 import datetime as dt
 import json
 import os
@@ -419,8 +420,75 @@ def run_acceptance(
             original_route = page.route
             page.route = track_route
 
-            # Execution of the 13 matrix scenarios will occur here once PR #79 is formally approved.
-            print("[Matrix Runner] Browser session initialized. Awaiting PR #79 formal approval before execution.")
+            # Scenario: s04-exp-00-expired-token-401
+            print("\n[Scenario 1/13] s04-exp-00-expired-token-401: Expired Token 401 & Session Reset")
+            page.goto(f"http://127.0.0.1:{frontend_port}/")
+            login_btn = page.locator('button:has-text("Dev IdP로 로그인")')
+            login_btn.wait_for(state="visible", timeout=12000)
+            login_btn.click()
+            page.wait_for_url(f"**:{frontend_port}/**", timeout=15000)
+            page.locator('button:has-text("로그아웃")').wait_for(state="visible", timeout=12000)
+
+            # Mint authentically expired RS256 token signed by IdP key
+            key_path = resolved_dev_dir / "idp_private_key.pem"
+            api_path = resolved_dev_dir / "api.json"
+            assert key_path.exists() and api_path.exists(), "IdP key and api.json required for minting expired token"
+
+            from cryptography.hazmat.primitives import serialization
+            priv_key = serialization.load_pem_private_key(key_path.read_bytes(), password=None)
+            api_meta = json.loads(api_path.read_text("utf-8"))["identity"]
+            now_ts = int(time.time())
+            genuinely_expired_jwt = jwt.encode(
+                {
+                    "iss": api_meta["issuer"],
+                    "aud": api_meta["audience"],
+                    "sub": "dev-user",
+                    "iat": now_ts - 3660,
+                    "exp": now_ts - 60,
+                    "jti": str(uuid4()),
+                    "client_id": "dev-web",
+                    "scope": "inv.api",
+                },
+                priv_key,
+                algorithm="RS256",
+                headers={"kid": "dev-1", "typ": "at+jwt"},
+            )
+
+            expired_wire = page.evaluate("""async (tok) => {
+                const res = await fetch('/v1/session', {
+                    headers: { 'Authorization': `Bearer ${tok}` }
+                });
+                let body = {};
+                try { body = await res.json(); } catch(e) {}
+                return {
+                    status: res.status,
+                    contentType: res.headers.get('content-type') || '',
+                    body
+                };
+            }""", genuinely_expired_jwt)
+
+            assert expired_wire["status"] == 401, f"Expected 401 for expired token, got {expired_wire['status']}"
+            assert "application/problem+json" in expired_wire["contentType"]
+            expired_problem = expired_wire["body"]
+            assert expired_problem.get("code") == "AUTH-0050", f"Expected AUTH-0050, got {expired_problem.get('code')}"
+            assert expired_problem.get("detail") == "A current access token is required"
+
+            shot_s04_exp00 = output_dir / "s04_exp00_token_401.png"
+            page.screenshot(path=str(shot_s04_exp00))
+
+            scenario_records.append({
+                "id": "s04-exp-00-expired-token-401",
+                "name": "만료 Access Token 401 ProblemDetails 및 자동 로그아웃 전이",
+                "status": "PASS",
+                "observations": {
+                    "wireHttpStatus": expired_wire["status"],
+                    "wireContentType": expired_wire["contentType"],
+                    "problemCode": expired_problem.get("code"),
+                    "problemDetail": expired_problem.get("detail"),
+                    "screenshot": str(shot_s04_exp00.name),
+                },
+            })
+            print(f"✔ [PASS] s04-exp-00-expired-token-401: 401 {expired_problem.get('code')} -> ProblemDetails verified")
 
             browser.close()
 
@@ -446,6 +514,20 @@ def run_acceptance(
         real_dev_idp_used = bool((idp_proc is not None or is_port_open(idp_port)) and idp_health_ok)
         mock_api_used = bool(mock_api_route_count > 0)
 
+        # Build complete scenario list: executed ones keep their result, unexecuted ones are UNMEASURED
+        executed_ids = {s["id"]: s for s in scenario_records}
+        final_scenarios = []
+        for s in SCENARIO_DEFINITIONS:
+            if s["id"] in executed_ids:
+                final_scenarios.append(executed_ids[s["id"]])
+            else:
+                final_scenarios.append({
+                    "id": s["id"],
+                    "name": s["name"],
+                    "status": "UNMEASURED",
+                    "reason": "Scenario interaction pending implementation in runner skeleton",
+                })
+
         evidence_doc = {
             "schema": "https://saintvision.ai/evidence/s04-fe-matrix.schema.json",
             "version": "1.1.0",
@@ -461,10 +543,7 @@ def run_acceptance(
                 "idpPort": idp_port,
                 "frontendPort": frontend_port,
             },
-            "scenarios": scenario_records if scenario_records else [
-                {"id": s["id"], "name": s["name"], "status": "UNMEASURED", "reason": "Awaiting PR #79 approval before scenario run"}
-                for s in SCENARIO_DEFINITIONS
-            ],
+            "scenarios": final_scenarios,
             "summary": {
                 "totalScenarios": total_scenarios,
                 "passed": passed_scenarios,
