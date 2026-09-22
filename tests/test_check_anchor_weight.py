@@ -107,3 +107,34 @@ def test_recorder_helper_does_not_poison_a_sibling_rejection(tmp_path):
     _tree(tmp_path, rejection_test_body=mixed)
     result = caw.classify(tmp_path)
     assert result["RejType"]["tier"] == "rejection-tested", result["RejType"]
+
+
+def test_reports_its_scope_and_out_of_scope_replay(tmp_path):
+    # An in-scope module (control.py) with a replay branch -> flagged has_replay_branch.
+    # An OUT-of-scope module (containment.py, not in SERVING_MODULES) with a replay branch -> the tool
+    # must MEASURE and report it, so the numbers never read broader than what was scanned.
+    inv = tmp_path / "services" / "control-plane" / "src" / "inv"
+    inv.mkdir(parents=True)
+    (inv / "control.py").write_text(
+        "from .contracts import validate_contract\n"
+        "def serve(prior):\n"
+        "    if prior is not None:\n"
+        "        validate_contract(\"ReplayType\", prior)\n"
+        "        return prior\n",
+        encoding="utf-8",
+    )
+    (inv / "containment.py").write_text(  # NOT in SERVING_MODULES
+        "from .contracts import validate_contract\n"
+        "def serve(prior):\n"
+        "    if prior is not None:\n"
+        "        validate_contract(\"OutOfScopeReplay\", prior)\n"
+        "        return prior\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "tests").mkdir()
+    result = caw.classify(tmp_path)
+    assert result["ReplayType"]["has_replay_branch"] is True, result["ReplayType"]
+    assert "OutOfScopeReplay" not in result, "out-of-scope module must not be inventoried"
+    scope = caw.scope_report(inv)
+    assert "containment" in scope["out_of_scope_replay"], scope
+    assert "OutOfScopeReplay" in scope["out_of_scope_replay"]["containment"], scope

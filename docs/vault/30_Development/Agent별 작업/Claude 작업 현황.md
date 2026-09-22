@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+check_anchor_weight 범위 자기선언 (Claude, 2026-09-22): 도구 출력이 범위를 먼저 말하게 보강 — 스캔 7모듈·타입단위(fresh/replay 못가름)·범위밖 replay 앵커 자기측정(2b 권위)·in-scope replay 별표. 좁은 범위 유지 이유 docstring 기록, --modules opt-in. 자기시험 4 passed. 두 도구 보완관계 명문화. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
+
 check_anchor_weight 전수 적용 (Claude, 2026-09-22): tip에 실전 실행. 진짜 구멍=EvidenceEnvelope(앵커5·시험0, Codex 인계), 괜찮음=called-only 7(계약 거부 시험 있음), 애매=서빙거부 시험 필요여부(변이). replay12 대보기로 도구 사각 확인(scope 7모듈·타입단위라 replay 분기 못 봄→Codex 2b+negative-prior 소관). 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
 
 앵커 무게 도구화 (Claude, 2026-09-22): bbc1eb2f 스펙트럼 발견을 `tools/check_anchor_weight.py`(거부-커버리지 tier 정적 분류, report-only, check_contract_bindings 보완)로 구조화. 변이 ground truth와 7/7/1 정확 일치 교차검증, 함수수준으로 거짓양성 잡음, 자기시험 3 passed(병 심기 포함). 런타임 무게 확증은 격리 변이 절차서 [[앵커_무게_검증_절차]]. 새PC 옮겨도 지식이 도구로 남음.
