@@ -508,6 +508,8 @@ def load_five_node_inventory(path: Path) -> dict[str, Any]:
             raise ValueError(f"{where}.coLocatedWithControlPlane disagrees with host identity")
         if derived_colocation:
             colocated_count += 1
+            if colocated_count > 1:
+                raise ValueError("inventory can contain at most one CP-colocated node")
             if eligible != {"s05": False, "s07": False}:
                 raise ValueError(f"{where} CP-colocated node cannot join timed waves")
             if node["exclusionReason"] != "cp-host-colocation":
@@ -523,8 +525,6 @@ def load_five_node_inventory(path: Path) -> dict[str, Any]:
             if value in seen[field]:
                 raise ValueError(f"{where}.{field} duplicates another physical node")
             seen[field].add(value)
-    if colocated_count > 1:
-        raise ValueError("inventory can contain at most one CP-colocated node")
     return payload
 
 

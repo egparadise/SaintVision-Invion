@@ -82,8 +82,9 @@ class _Result:
 
 
 class _Connection:
-    def __init__(self, rows):
+    def __init__(self, rows, *, transaction_read_only="on"):
         self.rows = rows
+        self.transaction_read_only = transaction_read_only
         self.statements = []
 
     def __enter__(self):
@@ -95,7 +96,7 @@ class _Connection:
     def execute(self, statement, parameters=None):
         self.statements.append((statement, parameters))
         if statement == "SHOW transaction_read_only":
-            return _Result([{"transaction_read_only": "on"}])
+            return _Result([{"transaction_read_only": self.transaction_read_only}])
         if statement == benchmark._FIVE_NODE_PREFLIGHT_SQL:
             return _Result(self.rows)
         return _Result([])
@@ -123,6 +124,41 @@ def test_inventory_revision_and_topology_are_strict(tmp_path: Path):
         benchmark.load_five_node_inventory(_write_inventory(tmp_path, invalid))
 
 
+def test_inventory_rejects_two_cp_colocated_nodes(tmp_path: Path):
+    value = _inventory(count=2)
+    second = value["nodes"][1]
+    second["hostId"] = value["controlPlaneHostId"]
+    second["coLocatedWithControlPlane"] = True
+    second["measurementEligible"] = {"s05": False, "s07": False}
+    second["exclusionReason"] = "cp-host-colocation"
+    value["revision"] = benchmark.five_node_inventory_revision(value)
+
+    with pytest.raises(ValueError, match="at most one CP-colocated"):
+        benchmark.load_five_node_inventory(_write_inventory(tmp_path, value))
+
+
+@pytest.mark.parametrize(
+    ("host_id", "declared"),
+    [
+        ("host-ubuntu-independent", True),
+        ("host-cp", False),
+    ],
+)
+def test_inventory_rejects_declared_colocation_that_disagrees_with_host_identity(
+    tmp_path: Path,
+    host_id: str,
+    declared: bool,
+):
+    value = _inventory(count=1)
+    node = value["nodes"][0]
+    node["hostId"] = host_id
+    node["coLocatedWithControlPlane"] = declared
+    value["revision"] = benchmark.five_node_inventory_revision(value)
+
+    with pytest.raises(ValueError, match="disagrees with host identity"):
+        benchmark.load_five_node_inventory(_write_inventory(tmp_path, value))
+
+
 def test_dry_run_reads_only_and_excludes_cp_colocated_node_from_timed_wave():
     value = _inventory()
     now = datetime.now(timezone.utc)
@@ -148,6 +184,18 @@ def test_dry_run_reads_only_and_excludes_cp_colocated_node_from_timed_wave():
     assert report["nodes"][0]["selectedForAllFiveSmoke"] is True
     assert report["nodes"][0]["selectedForTimedWave"] is False
     assert report["nodes"][0]["coLocationValidation"] == "matched"
+
+
+def test_dry_run_rejects_database_that_does_not_confirm_read_only_transaction():
+    value = _inventory(count=1)
+    connection = _Connection([], transaction_read_only="off")
+
+    with pytest.raises(RuntimeError, match="database preflight failed"):
+        benchmark.five_node_lab_dry_run(
+            value,
+            "postgresql://secret",
+            connect=lambda _dsn: connection,
+        )
 
 
 def test_dry_run_reports_stale_nodes_without_promoting_them():
