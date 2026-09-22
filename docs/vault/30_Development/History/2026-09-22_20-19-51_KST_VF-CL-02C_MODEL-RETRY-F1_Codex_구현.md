@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-2026-09-22-VF-CL-02C-MODEL-RETRY-F1"
 title: "VF-CL-02(c) 실행 Manifest 관측 계약과 model-retry F1 보정"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T20:19:51+09:00"
+updated: "2026-09-22T21:18:16+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "b877c601f8e981c960a4f3d33f3af6bcb33e18fe"
@@ -41,10 +41,10 @@ tags: ["model-manifest", "authorization", "postgresql", "contract", "serving-anc
 | `python tools/check_response_freshness.py` | 10/10 present, report-only, exit 0 |
 | `git diff --check` | exit 0 |
 
-R1은 부모 `b877c601`에서 개인 index로 작성한 `4473c7f1`을 non-force fast-forward push했다. 같은 SHA hosted CI는 Documentation [35720753478](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720753478), Frontend [35720753415](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720753415), Desktop Browser [35720753385](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720753385)가 success이며 Backend [35720753407](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720753407), Core [35720753383](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720753383)는 이 기록 갱신 시 pending이다.
+R1은 부모 `b877c601`에서 개인 index로 작성한 `4473c7f1`을 non-force fast-forward push했다. 최초 Backend는 신규 0046 definer가 reviewed policy에서 빠져 red였고 `57f3afb9`에서 exact catalog digest·source migration·`inv_kernel` EXECUTE 정책을 등록했다. 그 hotfix SHA의 Documentation [35723211550](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723211550), Frontend [35723211574](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723211574), Desktop Browser [35723211494](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723211494), Core [35723211545](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723211545)는 success다. Backend [35723211526](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723211526)은 후속 integration push로 cancelled되어 통과로 세지 않는다. Claude 독립 검토 PR #58은 finding 0 승인이다.
 
 ## 이어서 할 첫 행동과 담당
 
-- **Claude reviewer:** `4473c7f1`에서 타 tenant 403 존재 노출 정책, SECURITY DEFINER의 tenant binding·권한 최소성, missing mapping 전체 409, stale/ready 판정을 독립 검토한다.
-- **Codex:** 남은 hosted Backend/Core 2개를 같은 SHA로 확인하고 최종 상태를 이 History와 작업판에 반영한다. 이 카드는 작성자가 `done`으로 self-close하지 않는다.
+- **Claude reviewer:** PR #58 finding 0으로 독립 검토를 완료했다.
+- **Codex:** 후속 VF-CL-02(d) 운영 resolver 바인딩으로 인계했다. 이 카드는 작성자가 `done`으로 self-close하지 않는다.
 - **운영 인수:** 물리 노드/실 replica fleet 인수는 별도이며 이번 단일 PC PostgreSQL 증거로 대체하지 않는다.

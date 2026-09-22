@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.171"
+version: "1.0.172"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T21:13:00+09:00"
+updated: "2026-09-22T21:18:16+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 VF-CL-02(d) inv URI resolver 운영 바인딩
+
+- project-scoped `GET /v1/projects/{project}/models/resolve?uri=inv://...`를 추가하고 카드 2의 strict `ModelExecutionManifestObservation`을 실제 `resolve_model` 주입 reader에 연결했다. restricted `inv_app`이 kernel 관측의 location/version/ready node를 RLS로 재확인하며 최종 node 집합은 교집합만 허용한다.
+- R1 구현 `b06fc199`(부모 `e31ce3f3`)은 origin integration에 fast-forward 착지했다. focused 53 passed, 실 PG 단일 파일 1 passed/0 skipped, bindings 52 fixtures/17 types/21 sites/12 replay guards, 새 anchor 1 rejection-tested/0 gap, freshness 10/10, 생성 drift 0, TS/Go·docs/frontend/ontology/ratchet exit 0이다.
+- 실 PG에서 난수 `inv_app` login의 kernel table 직접 접근 거부, tenant 미설정 0행, 타 project 403, 미존재 404, stale false/empty, 성공 후 membership 폐기 동일 GET 403을 확인했다. hosted CI는 Backend `35726028276`, Docs `35726028423`, Frontend `35726028287`, Desktop `35726028426` success, Core `35726028397`는 후속 push로 cancelled되어 통과로 세지 않는다.
+- 상세: [[2026-09-22_21-18-16_KST_VF-CL-02D_INV-URI-RESOLVER_Codex_구현]]. 다음 담당은 Claude 독립 검토이며 작성자가 self-close하지 않는다.
 
 ## 2026-09-22 S06-DB·S08-DB owner 판정
 
@@ -26,7 +33,7 @@ source_of_truth: "Git"
 - 타 tenant model-retry가 `503 SYS-0001`을 내던 idempotency 선행 순서를 기존 `can_request` 경계 앞에서 차단하도록 고쳐 `403 AUTH-0030` ProblemDetails로 만들었다. 본 트랜잭션 재검사는 유지했다.
 - project-scoped `GET /v1/projects/{project}/models/{modelId}/versions/{version}/execution-manifest`와 strict `ModelExecutionManifestObservation`을 추가했다. missing shard/mapping은 `409 MODEL-0001` 전체 실패, stale·location-version mismatch·ready replica 없음은 `readyNodes=[]`/`materialisable=false`다. 기존 commitment API는 불변이다.
 - R1 구현 SHA `4473c7f1`(부모 `b877c601`)은 origin integration에 fast-forward 착지했다. focused 68 passed, 실 PG HTTP 2 passed/0 skipped, 생성 drift 0, bindings 52 fixtures/17 types/20 sites/12 replay guards, model_view anchor 1 rejection-tested/1 called-only/0 gap, docs·frontend·ontology·ratchet exit 0이다.
-- 같은 SHA hosted CI: Docs `35720753478`, Frontend `35720753415`, Desktop Browser `35720753385` success; Backend `35720753407`, Core `35720753383` pending. Claude 독립 검토와 남은 CI 전에는 self-close하지 않는다.
+- 후속 정책 등록 hotfix `57f3afb9`에서 Docs `35723211550`, Frontend `35723211574`, Desktop `35723211494`, Core `35723211545`가 success했다. Backend `35723211526`은 후속 integration push로 cancelled되어 success로 세지 않는다. Claude는 PR #58에서 finding 0으로 독립 승인했고, 운영 인수 전에는 self-close하지 않는다.
 - 상세: [[2026-09-22_20-19-51_KST_VF-CL-02C_MODEL-RETRY-F1_Codex_구현]].
 
 ## 2026-09-22 S04-DB·S05-DB·S07-DB owner 판정 + PR #53 교차검토

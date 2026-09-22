@@ -5,7 +5,7 @@ version: "1.10.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-22T21:32:00+09:00"
+updated: "2026-09-22T21:18:16+09:00"
 source_of_truth: "Git"
 ---
 
