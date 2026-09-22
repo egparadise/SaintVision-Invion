@@ -178,6 +178,11 @@ def start_backend(
                 env[k.strip()] = v.strip()
 
     # Pass dynamic ports if configured
+    env["PYTHONPATH"] = os.pathsep.join([
+        str(REPO_ROOT / "src"),
+        str(REPO_ROOT / "services" / "control-plane" / "src"),
+    ])
+    env["PYTHONUTF8"] = "1"
     env["INV_API_PORT"] = str(backend_port)
     env["INV_IDP_PORT"] = str(idp_port)
 
