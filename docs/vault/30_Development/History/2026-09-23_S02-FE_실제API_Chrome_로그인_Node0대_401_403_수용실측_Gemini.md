@@ -61,36 +61,48 @@ tags: ["s02-fe", "real-api", "chrome", "acceptance", "evidence", "gemini", "zero
 ## 4. 정본 증거 데이터 요약 (`s02_fe_real_api_acceptance.json`)
 
 - **JSON 스키마**: `https://saintvision.ai/evidence/s02-fe-real-api.schema.json` (v1.0.0)
-- **실측 커밋 SHA**: `b3f6db051a8fd2ddb8f87911bea3a69270b10b8d` (Git HEAD 조상 관계 검증 완료)
-- **실행 타임스탬프**: `2026-09-22T23:58:30.182187+09:00`
+- **실측 커밋 SHA**: `1ff1a016398b01ae7ad2e73b0411bb76b3d903c7` (Git HEAD 조상 관계 검증 성립)
+- **실행 타임스탬프**: `2026-09-23T01:45:44.155623+09:00`
 - **종합 결과**:
   - `totalScenarios`: 4
   - `passed`: 4
   - `failed`: 0
-  - `mockApiUsed`: `false`
-  - `realUvicornUsed`: `true`
-  - `realDevIdPUsed`: `true`
+  - `unmeasured`: 0
+  - `mockApiUsed`: `false` (Playwright 라우트 모의 0건 실측 동적 유도)
+  - `realUvicornUsed`: `true` (8080 제어평면 프로세스 및 `/healthz` 200 실측)
+  - `realDevIdPUsed`: `true` (8090 Dev IdP 프로세스 및 `/` 200 실측)
   - `assessment`: `"ACCEPTANCE_PASSED"`
   - `operationalAcceptanceAssessed`: `true`
 
 ---
 
-## 6. Claude 독립 검토 지적사항 (F1~F4) 조치 내역
+## 5. Codex 보안 검토 지적 (S1) 및 관찰 (O1) 조치 내역
 
-1. **F1 (재현성 및 환경 결합도 해소)**:
-   - `dev_idp.py`에 `--port` 및 `PORT` 환경변수 처리 추가.
-   - `tools/run_s02_real_api_acceptance.py`에 `--dev-dir`, `--idp-script`, `--server-env` CLI 인자 추가.
-   - `.work/dev` 파일 부재(clean worktree/CI) 환경에서는 비정상 크래시 대신 `UNMEASURED`로 우아하게 종료하도록 게이트 보강.
-2. **F2 (프로덕션 코드 무결성 및 실제 만료 토큰 실측)**:
-   - `App.tsx` 내 `window.__chooseProject`, `window.__setActiveTab`, `window.__simulateTokenExpired` 훅 전량 삭제.
-   - `console.log` 및 하드코딩 dev project id(`prj_01M33NGQEZTB2QD1CWV97Y7DSN`) 삭제.
-   - Scenario 4 토큰 만료는 Dev IdP 단축 TTL(`/dev/set-ttl?ttl=6`) 발급 후 실제 7초 경과에 의한 유기적 만료 및 실제 만료된 RS256 서명 JWT Wire 단언(401 `AUTH-0050`)으로 실측.
-3. **F3 (계약 복원 및 RULE-9 위반 0건 달성)**:
-   - `projectObservation.ts` 내 `apiClient<any>` 및 `|| new Date()`/기본값 합성 전량 제거, 엄격한 `ProjectListResponse` generated 계약 타입 복원.
-   - `check_frontend_integrity.py` 9개 규칙 전체 무결점 통과 (RULE-9 0건).
-   - `client.ts`의 `isRouteNotFoundError`에서 `HTTP-0001`/`Request unavailable` 폴백 과잉 매핑 제거, 미매핑 404에만 한정.
-4. **F4 (증거 상수의 실측값 동적 유도)**:
-   - `tools/run_s02_real_api_acceptance.py`의 `assessment`, `operationalAcceptanceAssessed`, `realUvicornUsed`, `realDevIdPUsed` 필드를 하드코딩 상수 대신 런타임 관측치와 프로세스 생존 상태로부터 동적 유도.
+1. **S1 (401 teardown 시 tenant state 및 in-flight 요청 무효화)**:
+   - `apps/web/src/app/App.tsx`에 `resetAuthenticatedState()` 단일 동기화 함수 신설:
+     - `clearAuthToken()` 호출.
+     - 6대 generation/request 카운터(`sessionRef`, `scopeRef`, `nodeRequest`, `runRequest`, `approvalRequest`, `workspaceRequest`)를 일괄 증가시켜 in-flight 비동기 응답 무효화.
+     - `activeProject.current = ''` 초기화.
+     - `currentUser`, `projectId`, `projects`, `nodes`, `workspaces`, `runs`, `approvals`, `nodeResourceUsage`, `evidenceRunId`, `studioStep/Id`, `actionError`, `desktop`을 동기적으로 전량 초기화.
+   - `onUnauthorized` 및 Header `onLogout`이 이 함수를 공유하도록 일원화.
+   - `fetchNodes`, `fetchRuns`, `fetchApprovals`, `fetchWorkspaces`, `fetchProjects`, `getNodeResourceUsage` 완료 시점(resolve/reject 모두)에 `sessionRef.current === currentSession` 및 `scopeRef.current === currentScope` 일치를 강제하여 이전 테넌트 데이터 재유입/레이스 컨디션 원천 차단.
+2. **O1 (만료 관찰 한계 명시)**:
+   - 클라이언트 만료 감지는 Request-driven(다음 인증 요청/폴링 시 401 ProblemDetails 반환)으로 동작하며, 토큰 자연 만료 후 최초 API 폴링 시 즉시 `onUnauthorized` ➔ `resetAuthenticatedState`가 트리거됨을 정직하게 명시함.
+
+---
+
+## 6. Claude 독립 검토 지적사항 (F1~F4 및 R1~R2) 조치 내역
+
+1. **R1 (`--backend-port` SPA 도달)**:
+   - `apps/web/vite.config.ts`의 `/v1` 프록시 대상에 `process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080'` 반영.
+   - `tools/run_s02_real_api_acceptance.py`의 `start_frontend(port, backend_port)`에서 `VITE_API_PROXY_TARGET=http://127.0.0.1:{backend_port}` 환경변수를 주입하여 포트 변경 배치에서도 SPA `/v1` 호출이 정확한 백엔드 포트로 프록시되도록 완비.
+2. **R2 (커밋 evidence의 도달 가능한 `gitCommitSha` 결속)**:
+   - 코드 및 스크립트 수정사항을 먼저 Git에 커밋(`1ff1a016`)한 후, 해당 커밋 트리에서 커밋된 스크립트를 직접 실행하여 증거 JSON을 생성.
+   - 생성된 evidence의 `gitCommitSha` (`1ff1a016...`)가 현재 HEAD의 조상(ancestor)으로 도달 가능함을 보장(#66 R4와 동일 기준 충족).
+3. **관찰 권고 반영**:
+   - `UNMEASURED` 종료 시 exit code 3 반환 (collector 2종과 통일).
+   - `mockApiUsed`를 상수 false가 아닌 Playwright 라우트 등록 카운트(`mock_api_route_count > 0`)로부터 동적 유도.
+   - 단언/타임아웃 예외 발생 시 `finally`/`except`에서 `FAILED` 증거 JSON을 남기도록 예외 핸들러 보강.
 
 ---
 
@@ -102,17 +114,17 @@ tags: ["s02-fe", "real-api", "chrome", "acceptance", "evidence", "gemini", "zero
    - `cd apps/web && npx tsc -b`: **exit code 0** (타입 에러 0건)
    - `npm run build`: **exit code 0** (Vite 100 modules 프로덕션 번들 정상 생성)
 3. **Frontend Vitest 전체 스위트**:
-   - `npm run test`: **77/77 test files passed, 673/673 tests passed** (exit code 0)
+   - `npm test -- --run`: **77/77 test files passed, 673/673 tests passed** (exit code 0)
 4. **화면-백엔드 라우트 커버리지 및 불변식 게이트**:
    - `pytest tests/test_route_coverage.py`: **39 passed** (exit code 0)
 5. **문서 정합성 게이트**:
-   - `python tools/check_docs.py`: **PASS** (834 versioned documents, exit code 0)
+   - `python tools/check_docs.py`: **PASS** (844 versioned documents, exit code 0)
 6. **S02-FE 실브라우저 4대 시나리오 실측**:
    - `.venv\Scripts\python.exe -X utf8 tools/run_s02_real_api_acceptance.py`: **ACCEPTANCE_PASSED** (4/4 passed, 0 mocks, exit code 0)
 
 ---
 
-## 8. 결론 및 Claude 독립 재검토 인계
+## 8. 결론 및 Claude / Codex 독립 재검토 인계
 
-- Claude 독립 검토 지적 4건(F1~F4)을 프로덕션 코드 정리, 계약 복원, 동적 관측치 유도, 실제 exp 경과 토큰 실측을 통해 완벽히 조치하였습니다.
-- 코디네이터 지침에 따라 Claude에게 PR #77 재검토를 요청합니다.
+- Codex 보안 지적 S1(401 teardown 시 테넌트 상태 전량 초기화 및 generation 세대 검증)과 Claude 지적 R1(프록시 타겟 환경변수 연동), R2(도달 가능한 gitCommitSha 결속 및 exit 3/FAILED 기록)를 전면 완결하였습니다.
+- 최신 tip 위에서 모든 게이트 통과를 실측 완료하였으므로 PR #77 재검토를 요청합니다.
