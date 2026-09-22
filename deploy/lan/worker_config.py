@@ -19,6 +19,9 @@ CREDENTIAL_FILES = ('node-cert.pem','node-key.pem','ca.pem','signer.pub','peer-p
 
 def validate_topology(manifest):
     """Fail closed when CP co-location metadata disagrees with immutable addresses."""
+    if manifest.get('schemaVersion') != 3:
+        raise ValueError(
+            'Bundle schema v3 is required; do not run new scripts from an old v2 directory')
     colocated = manifest['serverIP'] == manifest['nodeIP']
     if (type(manifest.get('coLocatedWithControlPlane')) is not bool
             or manifest['coLocatedWithControlPlane'] != colocated):

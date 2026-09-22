@@ -103,6 +103,83 @@ def test_colocated_node_addition_requires_persisted_opt_in():
     assert expanded['nodes'][1]['coLocatedWithControlPlane'] is True
 
 
+def test_colocation_revoke_preserves_identity_but_removes_operational_access(tmp_path):
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+        node('nod_01J00000000000000000000000', '192.168.45.74', colocated=True),
+    ])
+    original = json.loads(json.dumps(configured['nodes'][1]))
+
+    revoked_state, revoked = lan_pilot.revoked_colocation_state(configured)
+
+    assert revoked_state['serverNodeColocationAllowed'] is False
+    assert revoked[0]['nodeId'] == original['nodeId']
+    assert revoked[0]['nodeIP'] == original['nodeIP']
+    assert revoked[0]['disabled'] is True
+    assert revoked[0]['disabledReason'] == 'server-node-colocation-revoked'
+    assert [item['nodeId'] for item in lan_pilot.configured_nodes(revoked_state)] == [
+        configured['nodes'][0]['nodeId'], original['nodeId']]
+    assert [item['nodeId'] for item in lan_pilot.active_configured_nodes(revoked_state)] == [
+        configured['nodes'][0]['nodeId']]
+
+    public = tmp_path / 'public'
+    public.mkdir()
+    with pytest.raises(PermissionError, match='not an allowed Node'):
+        lan_pilot.artifact_for_client(
+            revoked_state, public, original['nodeIP'], '/worker.zip')
+
+
+def test_revoke_cli_persists_fail_closed_state_before_channel_revoke(monkeypatch, capsys):
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+        node('nod_01J00000000000000000000000', '192.168.45.74', colocated=True),
+    ])
+    configured['tenantId'] = '00000000-0000-4000-8000-000000000001'
+    configured['adminDSN'] = 'not-printed'
+    events = []
+
+    class Result:
+        def fetchone(self):
+            return (7, True)
+
+    class Connection:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, query, _params):
+            if query.startswith('SELECT version'):
+                return Result()
+            return None
+
+    monkeypatch.setattr(lan_pilot, 'load', lambda _path: configured)
+    monkeypatch.setattr(
+        lan_pilot, 'save',
+        lambda _path, value: events.append(('saved', value['nodes'][1]['disabled'])))
+    monkeypatch.setattr(lan_pilot.psycopg, 'connect', lambda _dsn: Connection())
+    monkeypatch.setattr(
+        lan_pilot, 'revoke_channel',
+        lambda _conn, node, expected_version: events.append(
+            ('revoked', node.node_id, expected_version)) or 8)
+
+    lan_pilot.revoke_server_node_colocation(Namespace(state=Path('unused')))
+    output = json.loads(capsys.readouterr().out)
+
+    assert events == [
+        ('saved', True),
+        ('revoked', configured['nodes'][1]['nodeId'], 7),
+    ]
+    assert output['statePreserved'] is True
+    assert output['disabledNodes'][0]['disabledReason'] == 'server-node-colocation-revoked'
+    assert output['channels'][0] == {
+        'nodeId': configured['nodes'][1]['nodeId'],
+        'channel': 'revoked',
+        'channelVersion': 8,
+    }
+
+
 def test_colocated_manifest_is_excluded_from_adr100_measurements():
     configured = state([
         node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),

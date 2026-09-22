@@ -158,13 +158,30 @@ and use the ordinary Windows sequence:
 .\Start-Worker.ps1 -CertificateSHA256 <operator-supplied-file-sha256>
 ```
 
-Docker Desktop must use Linux containers, expose server API 1.45 or newer, and
+Do not copy schema-v3 scripts into an old schema-v2 extraction directory. The
+new installer checks `manifest.json` first and fails closed with a schema-v3
+message when scripts and bundle generation differ. Generate the v3 bundle and
+extract it into a fresh per-Node directory. The existing three Ubuntu Nodes do
+not require reinstallation; preserve their current keys, journals, containers,
+channels, and working directories.
+
+Docker Desktop must be 4.27 or newer (Docker Engine 25+), use Linux containers,
+expose server API 1.45 or newer, and
 have WSL integration enabled for the `Ubuntu` distribution because both
 PowerShell entry points delegate into the shipped shell scripts. The configured
 `192.168.45.74` address must be present on Windows. `Start-Worker.ps1` accepts an
 exact existing Node firewall rule or creates one limited to local TCP 18443 and
 the server address; it does not alter global profiles or add a port proxy.
 `finish-worker.sh` invokes `start-node.sh`, so do not call the latter directly.
+If the API is older, preparation stops with a `BLOCKED` message naming Docker
+API 1.45, Engine 25+, and Docker Desktop 4.27+; do not bypass that preflight.
+
+Bootstrap artifact routing uses the request's source address. A request for
+`worker.zip` or `node-cert.pem` that arrives as loopback or a WSL NAT address
+instead of the inventory Node IP receives HTTP 403 by design. Do not widen the
+allowlist or add a portproxy. For the co-located Node, use the Node-specific
+bundle produced on the Control Plane host and let `Start-Worker.ps1` perform the
+certificate download from Windows, where the configured Node IP is visible.
 
 Acceptance still requires `status` and `observe --once` to show this distinct
 Node ID online with its own certificate, epoch, heartbeat, and current resource
@@ -176,6 +193,22 @@ It may appear only in the all-five topology smoke and the separately named
 `colocated-node-process-loss` scenario. A full Windows host outage is
 `correlated-cp-node-host-loss` and remains `UNMEASURED` without an external
 monotonic observer or separate Control Plane.
+
+To withdraw the exceptional co-location opt-in without deleting identity or
+evidence, run:
+
+```powershell
+python tools/lan_pilot.py --state .work/lan-5node/node1 revoke-server-node-colocation
+```
+
+The command first preserves the existing Node ID, files, key, journal, and DB
+row while setting `disabled: true`,
+`disabledReason: server-node-colocation-revoked`, and
+`serverNodeColocationAllowed: false`. It then revokes an enrolled channel with
+the normal monotonic channel audit, or records `not-enrolled`; it never deletes
+the Node or rotates credentials. Disabled Nodes remain visible in `status` but
+are excluded from bundles, enrollment, observation serving, and all wave target
+sets. Restart `serve` after revocation so its source-IP allowlist is reloaded.
 
 ## Worker enrollment
 
