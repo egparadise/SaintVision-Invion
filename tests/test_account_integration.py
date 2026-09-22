@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 from types import SimpleNamespace
 import os
+import re
 import subprocess
 import sys
 
@@ -21,6 +22,25 @@ from saintvision.errors import InvError
 from inv.app import create_app as kernel_app
 
 pytestmark = pytest.mark.postgres
+
+
+_URL_CREDENTIAL = re.compile(r'(://[^:@/\s]+:)[^@/\s]+(@)')
+_PASSWORD_VALUE = re.compile(
+    r"(?i)(password\s*=\s*)('(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\"|\S+)"
+)
+
+
+def _bounded_migration_child_diagnostics(stdout, stderr):
+    """Return a credential-redacted tail that still identifies the failed phase."""
+    sections = []
+    for label, payload in (("stdout", stdout), ("stderr", stderr)):
+        text = payload.decode("utf-8", "replace") if isinstance(payload, bytes) else str(payload or "")
+        text = _URL_CREDENTIAL.sub(r"\1***\2", text)
+        text = _PASSWORD_VALUE.sub(r"\1***", text)
+        tail = "\n".join(text.splitlines()[-12:]).strip()
+        if tail:
+            sections.append(f"{label}:\n{tail}")
+    return "\n".join(sections)[-2400:] or "(child produced no diagnostics)"
 
 
 @pytest.fixture
@@ -237,7 +257,7 @@ def test_published_migration_heads_upgrade_without_rewriting(test_admin_dsn):
         [sys.executable, 'tools/check_migration_upgrade.py'],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, **popen_kwargs)
     try:
-        proc.communicate(timeout=budget)
+        stdout, stderr = proc.communicate(timeout=budget)
     except subprocess.TimeoutExpired:
         _terminate_process_tree(proc)
         cleanup = _reclaim_orphaned_upgrade_databases(test_admin_dsn)
@@ -246,4 +266,7 @@ def test_published_migration_heads_upgrade_without_rewriting(test_admin_dsn):
             'reached its assertions -- the check is O(published priors) and this is an '
             f'incomplete run, not a migration defect. Orphaned-database cleanup: {cleanup}. '
             'Raise INV_MIGRATION_CHECK_TIMEOUT or make the tool incremental.')
-    assert proc.returncode == 0, 'Disposable migration paths failed; diagnostics withheld'
+    assert proc.returncode == 0, (
+        "Disposable migration paths failed; credential-redacted child tail follows:\n"
+        + _bounded_migration_child_diagnostics(stdout, stderr)
+    )

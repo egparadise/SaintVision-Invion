@@ -6,6 +6,8 @@ import sys
 
 import pytest
 
+from test_account_integration import _bounded_migration_child_diagnostics
+
 ROOT = Path(__file__).resolve().parents[1]
 CASE = 'tests/test_account_integration.py::test_published_migration_heads_upgrade_without_rewriting'
 
@@ -36,6 +38,17 @@ def test_present_invalid_dsn_still_fails_without_echoing_credentials():
     assert result.returncode == 1
     assert 'credential-bearing diagnostics suppressed' in result.stderr
     assert secret not in result.stdout + result.stderr
+
+
+def test_bounded_child_diagnostic_keeps_phase_but_redacts_credentials():
+    secret = 'synthetic-secret-must-not-appear'
+    output = _bounded_migration_child_diagnostics(
+        ('PASS: 0039_model_manifest\nurl=postgresql://user:' + secret + '@db/x').encode(),
+        ('RuntimeError password=' + secret).encode(),
+    )
+    assert '0039_model_manifest' in output
+    assert 'RuntimeError' in output
+    assert secret not in output
 
 
 @pytest.mark.parametrize('ci', [False, True])
