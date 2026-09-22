@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.119"
+version: "1.0.120"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T07:15:00+09:00"
+updated: "2026-09-23T08:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,32 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T07:15:00+09:00 (최신 tip `4143f375`, 작업 브랜치 `agent/gemini/s06-fe-matrix`).
+- 확인 기준: 2026-09-23T08:35:00+09:00 (최신 tip `76f4528d`, 작업 브랜치 `agent/gemini/s06-fe-matrix`).
 
-## 2026-09-23 S06-FE Workspace 복원·원격 WS/PTY 콘솔 UI 시나리오 매트릭스 v1.1.1 수립 (docs-only, `agent/gemini/s06-fe-matrix`)
+## 2026-09-23 S06-FE Workspace 복원·원격 WS/PTY 콘솔 UI 시나리오 매트릭스 v1.1.2 수립 (docs-only, `agent/gemini/s06-fe-matrix`)
 
-- **WorkspaceList, WorkspaceCreateModal, TerminalSessionView/WebTerminal 4대 영역 14대 시나리오 매트릭스 정본 초안 완결**:
+- **WorkspaceList, WorkspaceCreateModal, TerminalSessionView/WebTerminal 4대 영역 15대 시나리오 매트릭스 정본 완결 (Codex 계약 대조 3건 및 Claude UI 검토 전면 반영)**:
   - **WSP (작업공간 인벤토리 및 5대 수명주기)**:
     - 5대 상태(`ready`, `provisioning`, `suspended`, `deleting`, `deleted`) 상태 배지(`span[data-testid="wsp-status-${wsp.id}"]`) 및 스타일 매핑.
     - 정상 조회 0개 빈 상태 고지 (`workspaces-empty-state`, `role="status"`, `aria-live="polite"`).
-    - 명칭 2–128자 클라이언트/백엔드 스키마 제약 (`VAL-SCHEMA`).
+    - 명칭 2–128자 클라이언트 폼 제약 (`WorkspaceCreateModal.tsx:28~33`) 및 서버 계약 검증기(`contracts.py:36`) 422 `VAL-0002` 정합.
     - 생성 단계 안내 배너 (`workspace-create-phase-notice`): 작업공간 생성은 `provisioning` 레코드 등록일 뿐이며, 물리 노드 배치·자원 할당·체크아웃은 커널 `prepare` 단계임을 정직 고지.
-  - **REC (스냅샷 복원 및 멱등 Replay, Codex a4bf2cee 결속)**:
+  - **REC (스냅샷 복원 및 멱등 Replay, [Wire-only], Codex a4bf2cee 결속)**:
     - `POST /v1/projects/{p}/runs/{r}/restores/{id}`: 체크포인트 스냅샷 불변 복원 및 receipt 수령.
     - 최초 복원 요청 시 `replayed: false`, 동일 복원 요청 Replay 시 201 Created 및 `replayed: true` (단일 부수 효과).
-    - 권한 회수 시 Replay 차단 및 403 `AUTH-PROJECT-SCOPE` ProblemDetails 표출 (저장 응답 재사용 금지).
-  - **CHK (작업공간 체크아웃 및 자원 해제 가드)**:
-    - `POST .../restores/{r_id}/checkouts/{c_id}`: 작업용 쓰기 가능 세대(Working generation) 발행.
+    - 권한 회수 시 Replay 차단 및 403 `AUTH-0030` (`Project permission is unavailable`) ProblemDetails 표출 (저장 응답 재사용 금지).
+  - **CHK (작업공간 체크아웃 및 자원 해제 가드, [Wire-only])**:
+    - `POST .../restores/{r_id}/checkouts/{c_id}`: `WorkspaceCheckoutView` 10대 required 필드(`runId`, `restoreId`, `checkoutId`, `workspaceId`, `generation`, `stepId`, `sourceAttempt`, `checkpointAttempt`, `sha256`, `replayed: false`) 완전 준수.
+    - 동일 체크아웃 2차 호출 시 201 Created `replayed: true` 및 권한 회수 시 403 `AUTH-0030` 차단.
     - 물리 리스 미반환 시 409 `LEASE-0003` ("Checkout awaits physical resource release") 차단.
     - 비-recovering 상태 또는 시도 버전 불일치 시 409 `GRAPH-0003` 거절.
   - **PTY (원격 WS/PTY 콘솔 및 티켓 경계)**:
-    - 30초 암호학적 1회용 PTY 티켓 발급 (`POST /terminal-tickets`, `pty-ticket-badge`).
+    - 최대 30초 암호학적 1회용 PTY 티켓 발급 (`POST /v1/workspaces/{id}/terminal-tickets`, `pty-ticket-badge`, UI 상 동적 타이머 부재 고정 배지 문구 정정).
     - 승인된 `commandId` 부재 시 네트워크 요청 완전 차단 ($0$ requests, 가상 터미널 표출 차단).
-    - 관측 전용 노드(`schedulable: false`) PTY 차단 (`terminal-session-error-alert`).
-    - 오프라인/미연결 상태 명령 전송 거절 및 경고 표출 (`terminal-disconnected-cmd-alert`).
+    - 관측 전용 노드(`schedulable: false`) PTY 차단 (`terminal-session-error-alert`, 클라이언트 가드).
+    - 오프라인/미연결 상태 명령 전송 거절 및 경고 표출 (`terminal-command-form`, `terminal-disconnected-cmd-alert`).
+    - `PowerShell` / `Bash` 쉘 분기 (`active-shell-type`).
     - **원격 WS/PTY 실 5노드 양방향 스트리밍 실측 항목: UNMEASURED ('5노드 랩 후')**.
-  - **프로덕션 심볼 타겟 돌연변이(MUT 5종) 사살 계획 및 하네스 명세 완비**.
-  - **계획서 정본**: [[2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini]] (v1.1.1).
+  - **프로덕션 심볼 타겟 돌연변이(MUT 5종) 사살 계획 정정**: MUT-01은 `aria-live="polite"` 단언 부재로 '신설 필요(SURVIVED)', MUT-02~05는 실제 테스트 파일 라인으로 인용 정정.
+  - **계획서 정본**: [[2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini]] (v1.1.2).
   - **독립 검토 요청**: Claude (UI 셀렉터 대조), Codex (커널 오류 코드 및 복원/체크아웃 계약 대조). 실측은 승인 후.
 
 ## 2026-09-23 S02-FE 실제 API Chrome 로그인·Node 0대·401/403 수용 실측 완결 (`agent/gemini/s02-fe-real-api`)
