@@ -314,7 +314,7 @@ res:S01-BE a dev:DevelopmentTask ;
 
 res:S01-DB a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "in_progress" ;
+    sv:status "done" ;
     dev:ownedBy res:agent-Codex ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Claude ;
@@ -326,7 +326,7 @@ res:S01-DB a dev:DevelopmentTask ;
 
 res:S01-FE a dev:DevelopmentTask ;
     sv:recordKind "development_plan" ;
-    sv:status "review" ;
+    sv:status "done" ;
     dev:ownedBy res:agent-Gemini ;
     dev:realizes res:OUT-01 ;
     dev:reviewedBy res:agent-Codex ;

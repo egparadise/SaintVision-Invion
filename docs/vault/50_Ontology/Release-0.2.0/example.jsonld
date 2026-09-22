@@ -354,7 +354,7 @@
         }
       ],
       "sv:recordKind": "development_plan",
-      "sv:status": "in_progress"
+      "sv:status": "done"
     },
     {
       "@id": "res:skill-agent-delivery",
@@ -1132,7 +1132,7 @@
         }
       ],
       "sv:recordKind": "development_plan",
-      "sv:status": "review"
+      "sv:status": "done"
     },
     {
       "@id": "res:OUT-11",
