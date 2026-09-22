@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.196"
+version: "1.0.197"
 status: "review"
 author: "Codex"
 updated: "2026-09-23T08:45:00+09:00"
@@ -23,6 +23,13 @@ source_of_truth: "Git"
 - O2는 schema-v3 script와 옛 v2 bundle 혼용을 fail closed하고 기존 Ubuntu 3대 재설치 불필요를 명시했다. O4는 loopback/WSL NAT source의 bundle/cert 요청이 HTTP 403인 정상 경계와 allowlist/portproxy 우회 금지를, O5는 API 1.45 = Engine 25+ / Docker Desktop 4.27+ `BLOCKED` 메시지를 고정했다.
 - 구현 `791c7332`, focused 47 passed, py_compile/bash parse/CLI help와 docs/bindings/frontend/ontology/ratchet/freshness가 exit 0이다. 실제 CP Node·철회 실행은 미수행이며 Docker API 1.41·WSL Ubuntu 부재 blocker와 `review`를 유지한다. [[2026-09-23_08-10-00_KST_LAN-PILOT-CP-관찰보강_Codex]].
 - 다음 담당은 Claude 독립 검토다. Docker prerequisite가 준비되기 전 운영 등록이나 철회를 대신 실행하지 않는다.
+
+## 2026-09-23 5노드 물리 adapter read-only preflight
+
+- `placement_benchmark.py`에 기존 synthetic 기본 경로를 유지한 `--adapter five-node-lab --inventory <path> --dry-run`을 추가했다. revision-fixed inventory의 node/IP/cert/profile/host/failure-domain과 ADR-100 eligibility를 strict 검증하고 PostgreSQL의 실제 heartbeat/resource snapshot/mTLS identity를 read-only transaction으로만 읽는다.
+- CP 겸임 Node는 all-five smoke 후보에는 남기되 timed wave에서 사전 제외한다. 합성 row·resource 생성, heartbeat 갱신, 물리 load 실행은 0이며 공유 계약/HTTP/DB schema 변경도 없다. PG-free 12 passed와 docs/bindings/frontend/ontology/ratchet/freshness 게이트가 exit 0이다.
+- 현재 파일럿 online Node 2개의 read-only dry-run은 registered 2, ready 0, all-five/timed false다. 두 Node 모두 실제 `lan-observe-v1`이라 workspace profile로 승격하지 않았고 AC-05·5노드 준비를 주장하지 않는다. 구현 `ec254775`(rebase 전과 코드 blob 동일), PR #101, reviewer Claude. [[2026-09-23_07-25-00_KST_5노드_물리_adapter_read-only_preflight_Codex]].
+- 다음은 Claude 독립 검토와 코디네이터의 실제 revision-fixed inventory 재실행이다. 별도 카드 15는 LAN pilot O1/O2/O4/O5 관찰 보강 PR로 진행한다.
 
 ## 2026-09-23 PR #96 S05-FE 시나리오 매트릭스 계약 검토
 
