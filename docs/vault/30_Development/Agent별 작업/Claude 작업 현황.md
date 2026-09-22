@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T16:55:00+09:00"
+updated: "2026-09-22T17:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+새 PC 실 PG 전수·인수 증거·PITR 실측 (Claude, 2026-09-22): SHA d01c931a, 측정 워크트리 `D:\Project\sv-measure-claude`(clean, R6). (1) backend.yml 스코프 2667건 → **2523 passed / 142 skipped / 2 failed**(3덩어리 31분), skip 1011→142(전부 §4 환경 게이트); F1 `test_published_migration_heads_upgrade_without_rewriting`=동시 실행 경합(단독 1 passed·도구 직접 exit 0)+진단 은닉 → Codex; F2 `test_vf_canonical` `.work` 미생성 → Codex(51d53b7f 수정 착지). 다른 Claude 세션 c5042322와 교차 일치. (2) S02 91·S03 201·S09 76/21·S10 228·S04/05 74/48·S07 92/19 = **762 passed / 88 skipped / 0 failed**, 6세트 exit 0 — `Evidence/claude-newpc-realpg-d01c931a/*.json` + `.work/evidence-claude-d01c931a/`. (3) PITR: dev-pg readiness **absent**(비파괴), owned probe 물리 리허설 정상 PASS·결함주입 5 FAIL·잔재 0, 보관 주기 7일(파일럿, 코디네이터). self-close 없음. 전문 [[2026-09-22_17-02-56_KST_REALPG-FULLRUN_Claude_실측]] · [[2026-09-22_17-12-01_KST_REALPG-EVIDENCE_Claude_인수증거]] · [[2026-09-22_17-14-47_KST_PITR-RUNBOOK_Claude_실측]].
 
 Codex origin/integration 착지 4건 독립 검토 완결 (Claude, 2026-09-22): `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구). 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정. 전문 [[2026-09-22_16-55-00_KST_Claude_Codex착지4건_독립검토]].
 

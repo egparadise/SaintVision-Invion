@@ -1,0 +1,59 @@
+# Physical PITR rehearsal on new PC (192.168.45.74) — strict-gate matrix (PITR-R2-01/R2-02), SHA d01c931a, tree D:/Project/sv-measure-claude clean
+# tool: tools/pitr_rehearsal.sh ; owned-label probe postgres:16-alpine (tmpfs); dev-pg container untouched; probes sequential (1 at a time)
+# retention decision (coordinator ask, user delegation): WAL archive + base backup 7 days (pilot); operator re-decides at production cutover
+
+sha=d01c931acf2127377a7cdc665ef3eee5f0402fe9 start=2026-09-22T17:12:30+09:00
+normal exit=0 elapsed=21s
+leftover_probes=0
+before-insert exit=1 elapsed=11s
+leftover_probes=0
+after-insert exit=1 elapsed=14s
+leftover_probes=0
+basebackup exit=1 elapsed=5s
+leftover_probes=0
+restore-start exit=1 elapsed=17s
+leftover_probes=0
+promotion exit=1 elapsed=65s
+leftover_probes=0
+end=2026-09-22T17:14:47+09:00
+
+## which gate caught each fault
+- before-insert: INJECT: skipping 'before' INSERT  =>  ASSERT-FAIL: 'before' not committed in source
+- after-insert: INJECT: skipping 'after' INSERT  =>  ASSERT-FAIL: 'after' is not present in the SOURCE -> an exclusion result would be vacuous
+- basebackup: INJECT: base backup to an unwritable path (simulate basebackup failure)  =>  pg_basebackup: error: could not create directory "/proc/nonexistent": No such file or directory
+- restore-start: INJECT: invalid port -> pg_ctl start fails  =>  
+- promotion: INJECT: recovery_target_action=pause (never promotes)  =>  ASSERT-FAIL: restore did not promote / target time not reached (state=t)
+
+## normal run detail
+archive_mode=on
+archive_timeout=300
+wal_level=replica
+step: physical base backup
+step: T1=2026-09-22 08:12:39.326474+00
+step: prepare + start restore cluster on 5433
+result: sourceHadAfter=1 targetTime=2026-09-22 08:12:39.326474+00 restoredRows=[before]
+INNER-PASS: source held before+after; restore promoted to T1; restore has before only (after excluded)
+PASS: physical PITR verified -- prerequisites (base backup, before+after in source, promotion) all held, and the restore recovered to T1 with 'before' present and 'after' excluded
+
+## dev-pg readiness (non-destructive, disposable DB)
+{
+  "verdict": "absent",
+  "reasons": [
+    "archive_mode is not on/always",
+    "archive_command is empty/disabled/no-op and archive_library is unset"
+  ],
+  "settings": {
+    "archive_mode": "off",
+    "wal_level": "replica",
+    "archive_command": "disabled",
+    "archive_library": "unset"
+  },
+  "scope": "configuration-only",
+  "pitrVerified": false,
+  "requiresEvidence": [
+    "base-backup",
+    "continuous-archived-wal",
+    "target-time-recovery",
+    "retention-and-media"
+  ]
+}

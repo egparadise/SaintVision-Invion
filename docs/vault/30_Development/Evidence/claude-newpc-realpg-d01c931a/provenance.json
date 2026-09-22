@@ -1,0 +1,46 @@
+{
+  "task": "newpc-realpg-fullrun",
+  "owner": "Claude",
+  "reviewer": "Codex",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-22T16:56:20+09:00",
+  "measured_sha": "d01c931acf2127377a7cdc665ef3eee5f0402fe9",
+  "working_tree": "D:/Project/sv-measure-claude (Claude-owned detached measurement worktree)",
+  "working_tree_clean": "YES",
+  "working_tree_note": "core chunk started with one untracked empty dir tree '%SystemDrive%/' left by the reaper-killed first attempt; removed immediately; no tracked file differed",
+  "interpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python (Python 3.14.7, pytest 9.1.1)",
+  "database": "saintvision-invion-dev-pg, PostgreSQL 16.15, 127.0.0.1:55432, INV_TEST_ADMIN_DSN from .env; per-session disposable databases only",
+  "scope": "CI backend.yml scope: tools/node_dependent_tests.py --pytest-args + 6 browser/container --ignore; --strict-markers -p no:cacheprovider -rs; CI env unset",
+  "chunks": [
+    {"name": "core", "target": "tests/core", "start_kst": "16:24:41", "elapsed_s": 90, "exit": 0, "tests": 922, "passed": 919, "skipped": 3, "failed": 0},
+    {"name": "root", "target": "tests/test_*.py (76 files)", "start_kst": "16:26:31", "elapsed_s": 1249, "exit": 1, "tests": 1227, "passed": 1198, "skipped": 28, "failed": 1, "deselected": 2},
+    {"name": "integration", "target": "tests/integration", "start_kst": "16:47:38", "elapsed_s": 521, "exit": 1, "tests": 518, "passed": 406, "skipped": 111, "failed": 1}
+  ],
+  "totals": {"tests": 2667, "passed": 2523, "skipped": 142, "failures": 2, "errors": 0},
+  "baseline_same_pc_no_dsn": {"file": ".work/newpc-backend-tests.xml", "tests": 2667, "skipped": 1011, "failures": 0},
+  "failures": [
+    {"test": "tests/test_account_integration.py::test_published_migration_heads_upgrade_without_rewriting", "class": "environment (concurrent pytest from another session on the same cluster; not reproducible standalone)", "rerun_alone": "1 passed 266s exit 0", "tool_direct": "tools/check_migration_upgrade.py exit 0, 30 PASS, 244s", "owner": "Codex"},
+    {"test": "tests/integration/test_vf_canonical.py::test_factory_route_measurement_is_not_fixture_union", "class": "test defect: writes .work/vf-route-gap.json without creating .work (fails on any fresh checkout)", "rerun_with_mkdir_work": "1 passed 7.4s exit 0", "owner": "Codex"}
+  ],
+  "skip_reasons": {
+    "Actual Linux file backend": 48,
+    "Linux credentials": 20,
+    "CX01_CONTAINER is unset": 19,
+    "Linux private-directory provider": 15,
+    "Linux publication contract": 13,
+    "Explicit local PostgreSQL image required": 13,
+    "Explicit candidate image and disposable container DB address required": 8,
+    "Explicit pinned local candidate image required": 2,
+    "launcher prerequisites absent (no .venv/node_modules in measurement worktree)": 1,
+    "antigravity is not installed": 1,
+    "symlink on Windows needs privilege": 1,
+    "browser smoke integration lane opt-in": 1
+  },
+  "junit_sha256": {
+    "core.xml": "16e38c99a7b7473b",
+    "root.xml": "a6a78dbcfb117480",
+    "integration.xml": "07964579b23bf656"
+  },
+  "junit_location": ".work/evidence-claude-d01c931a/ (untracked)",
+  "hosted_ci_at_sha": {"backend_build": {"id": 35688813798, "conclusion": "failure", "cause": "export_schemas.py --check: pool-list-item-response/pool-list-response stale (owner Codex)"}, "core_build": {"id": 35688813794, "conclusion": "failure"}, "documentation_build": {"id": 35688813795, "conclusion": "success"}}
+}

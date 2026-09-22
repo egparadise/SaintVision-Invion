@@ -1,0 +1,26 @@
+{
+  "task": "newpc-realpg-acceptance-evidence",
+  "feeds_tasks": ["S02-DB", "S02-BE", "S02-ST", "S03-DB", "S09-DB", "S09-ST", "S10-DB", "S10-ST", "S10-BE", "S04-DB", "S04-BE", "S05-DB", "S05-BE", "S07-DB", "S07-BE"],
+  "owner": "Claude (evidence contributor; card owner Codex; not self-closed)",
+  "reviewer": "Codex",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-22T17:12:01+09:00",
+  "measured_sha": "d01c931acf2127377a7cdc665ef3eee5f0402fe9",
+  "working_tree": "D:/Project/sv-measure-claude (Claude-owned detached measurement worktree)",
+  "working_tree_clean": "YES",
+  "interpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python (Python 3.14.7, pytest 9.1.1)",
+  "database": "saintvision-invion-dev-pg, PostgreSQL 16.15, 127.0.0.1:55432, INV_TEST_ADMIN_DSN from .env; per-session disposable databases only",
+  "command": "pytest -q --strict-markers -p no:cacheprovider -rs --junitxml=<set>.xml <files>; sequential, CI unset",
+  "sets": [
+    {"name": "S02", "tests": 91, "passed": 91, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 86, "junit_sha256_16": "3d04ffecf39da26f"},
+    {"name": "S03", "tests": 201, "passed": 201, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 54, "junit_sha256_16": "bf0ee66fbbe039bb"},
+    {"name": "S09", "tests": 97, "passed": 76, "skipped": 21, "failed": 0, "exit": 0, "elapsed_s": 93, "junit_sha256_16": "25ec19dc6f0a854f"},
+    {"name": "S10", "tests": 228, "passed": 228, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 218, "junit_sha256_16": "27a190b3a0dcb959"},
+    {"name": "S04_S05_contention", "tests": 122, "passed": 74, "skipped": 48, "failed": 0, "exit": 0, "elapsed_s": 99, "junit_sha256_16": "3be68ed92cd1fcad"},
+    {"name": "S07_recovery", "tests": 111, "passed": 92, "skipped": 19, "failed": 0, "exit": 0, "elapsed_s": 10, "junit_sha256_16": "d0a5462bed6a5a96"}
+  ],
+  "totals": {"tests": 850, "passed": 762, "skipped": 88, "failures": 0, "errors": 0},
+  "skip_reasons": {"Actual Linux file backend": 48, "Linux private storage": 21, "CX01_CONTAINER is unset": 19},
+  "junit_location": ".work/evidence-claude-d01c931a/evidence/ (untracked)",
+  "history": "docs/vault/30_Development/History/2026-09-22_17-12-01_KST_REALPG-EVIDENCE_Claude_인수증거.md"
+}
