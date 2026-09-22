@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-2026-09-22-MODEL-RETRY-UI"
 title: "RunDetail 모델 재시도(model-retries, 결정 #6 6a) UI 구현 및 계약 결속 보고"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Gemini"
-updated: "2026-09-22T20:25:00+09:00"
+updated: "2026-09-22T21:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -107,3 +107,23 @@ dist/assets/index-8pgHru5U.js   779.82 kB │ gzip: 197.28 kB │ map: 2,455.94 
 - **작업 브랜치**: `agent/gemini/model-retry-ui` (기반: `b877c601`)
 - **독립 검토자**: Claude
 - **후속 연계**: 거버넌스 승인 센터(S04)에서 준비된 자식 Run(`requiresFrozenInputAndApproval`)의 승인 워크플로와 자연스럽게 연결됨.
+---
+
+## 4. Claude 독립 검토 수정 요청 3건 반영 내역 (2026-09-22T21:05:00+09:00)
+
+Claude의 독립 검토 코멘트에 따라 다음 3건의 수정 요구 및 1건의 경미 권고사항을 100% 반영 완료했다:
+
+1. **입력 사양 합성 차단 (Zero-Mock 위반 원천 치유)**:
+   - 부모 Run의 실제 workload/자원 요구(`run.resourceRequest?.cpuMillis > 0`, `memoryBytes > 0`)가 관측된 경우에만 버튼을 활성화.
+   - 사양이 미관측된 경우 버튼을 비활성화(`disabled`)하고 버튼 라벨을 `'입력 사양 미관측'`으로 정직 고지하며, 툴팁으로 재시도 배치 예약 불가 사유를 투명하게 안내.
+   - 어댑터(`modelRetry.ts`)에서 `?? 500`, `?? 1073741824` 류의 기본값 합성을 전면 제거하고 필수 `ModelRetryPrepareInput`을 엄격히 강제.
+2. **부모 Run당 안정 Idempotency-Key 발급 (`Date.now()` 제거)**:
+   - 매 클릭마다 타임스탬프가 달라져 멱등성을 상실하고 재요청 시 409 MODEL-0003을 유발하던 문제를 해결.
+   - `model-retry:${projectId}:${parentRunId}:${runVersion}` 안정 키를 생성하여 중복 클릭 및 재시도 시 동일 자식 Run을 반환받도록 보장.
+3. **성공 배너 과장 문구 정정**:
+   - 커널 계약상 `requiresFrozenInputAndApproval: true`는 "입력 동결과 승인이 아직 필요함"을 의미하므로, 기존 "입력 파일이 동결되었으며 예약이 체결되었습니다" 과장 문구를 "배치 예약만 준비됨 (신규 자식 Run: PLANNED) — 입력 동결과 거버넌스 승인은 별도 단계가 필요합니다"로 정직하게 정정.
+4. **RFC 9457 Problem Details `problem.code` 분기 정밀화**:
+   - `status` 단독 분기에서 `problem.code` 우선 분기(`MODEL-0003`, `MODEL-0001`, `IDEM-0001`, `AUTH-0030`, `MODEL-0007`/`LEASE-0003`/`MODEL-0002`, `VAL-000x`/422)로 고도화하여 백엔드 에러 원인을 정확히 한국어로 표출.
+5. **단위 테스트 확장 (9/9 passed)**:
+   - `Test 9: test_model_retry_disabled_when_resource_specs_unobserved` 추가.
+   - `apps/web/tests/model-retry-action.test.tsx` 9개 시험 전수 통과 (292ms).

@@ -119,7 +119,7 @@ describe('RunDetail Model Retry UI Action (Decision #6 6a, Contract 563c54ce)', 
 
     expect(capturedUrl).toBe('/v1/projects/prj_test_gemini/runs/run_parent_failed_01/model-retries');
     expect(capturedOptions?.method).toBe('POST');
-    expect(capturedOptions?.idempotencyKey).toMatch(/^idmp_model_retry_prj_test_gemini_run_parent_failed_01_/);
+    expect(capturedOptions?.idempotencyKey).toBe('model-retry:prj_test_gemini:run_parent_failed_01:1');
 
     const body = JSON.parse(capturedOptions?.body);
     expect(body.cpuMillis).toBe(1000);
@@ -191,6 +191,8 @@ describe('RunDetail Model Retry UI Action (Decision #6 6a, Contract 563c54ce)', 
     expect(successBanner?.textContent).toContain('Generation 1');
     expect(successBanner?.textContent).toContain('run_child_retry_02');
     expect(successBanner?.textContent).toContain('nod_worker_gpu_03');
+    expect(successBanner?.textContent).toContain('배치 예약만 준비됨');
+    expect(successBanner?.textContent).toContain('requiresFrozenInputAndApproval: true');
     // Critical honest disclosure invariant
     expect(successBanner?.textContent).toContain('정직 고지');
     expect(successBanner?.textContent).toContain('본 재시도는 자동 실행되지 않으며');
@@ -229,9 +231,9 @@ describe('RunDetail Model Retry UI Action (Decision #6 6a, Contract 563c54ce)', 
       type: 'about:blank',
       title: 'Run State Conflict',
       status: 409,
-      code: 'RUN-4091',
+      code: 'MODEL-0003',
       category: 'RES',
-      detail: 'Parent run is not in failed state or has active retry',
+      detail: 'Parent run is not in failed state or active retry exists',
       retryable: false,
       traceId: '0123456789abcdef0123456789abcdef',
       causeRef: null,
@@ -257,7 +259,7 @@ describe('RunDetail Model Retry UI Action (Decision #6 6a, Contract 563c54ce)', 
     const errorAlert = container.querySelector('[data-testid="model-retry-error-alert"]');
     expect(errorAlert).not.toBeNull();
     expect(errorAlert?.getAttribute('role')).toBe('alert');
-    expect(errorAlert?.textContent).toContain('재시도 충돌 (409)');
+    expect(errorAlert?.textContent).toContain('재시도 충돌 (409 MODEL-0003)');
     expect(errorAlert?.textContent).toContain('부모 Run이 실패 종단 상태가 아니거나');
   });
 
@@ -340,5 +342,20 @@ describe('RunDetail Model Retry UI Action (Decision #6 6a, Contract 563c54ce)', 
       runBtn.click();
     });
     expect(onRunMock).toHaveBeenCalledWith('run_child_retry_02');
+  });
+
+  it('Test 9: test_model_retry_disabled_when_resource_specs_unobserved - Disabled with honest label when resource specs missing', async () => {
+    const runWithoutResources: RunItem = {
+      ...failedRun,
+      resourceRequest: undefined,
+    };
+    await act(async () => {
+      root.render(<RunDetail run={runWithoutResources} onBack={() => {}} />);
+    });
+    const retryBtn = container.querySelector('[data-testid="model-retry-prepare-btn"]') as HTMLButtonElement;
+    expect(retryBtn).not.toBeNull();
+    expect(retryBtn.disabled).toBe(true);
+    expect(retryBtn.textContent).toContain('입력 사양 미관측');
+    expect(retryBtn.title).toContain('입력 사양 미관측');
   });
 });

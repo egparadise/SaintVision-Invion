@@ -71,21 +71,44 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [retryResult, setRetryResult] = useState<ModelRetryPrepareResult | null>(null);
   const [retryError, setRetryError] = useState<string | null>(null);
 
+  const hasObservedResources = Boolean(
+    run.resourceRequest &&
+    typeof run.resourceRequest.cpuMillis === 'number' &&
+    run.resourceRequest.cpuMillis > 0 &&
+    typeof run.resourceRequest.memoryBytes === 'number' &&
+    run.resourceRequest.memoryBytes > 0
+  );
+
   const handlePrepareModelRetry = async () => {
     if (!run.projectId) {
       setRetryError('프로젝트 식별자(projectId)가 없어 Model Retry를 요청할 수 없습니다. (위조 식별자 합성 방지)');
       return;
     }
+    if (!hasObservedResources || !run.resourceRequest?.cpuMillis || !run.resourceRequest?.memoryBytes) {
+      setRetryError('입력 사양 미관측: 부모 Run의 실제 자원 요구 사양(CPU/RAM)이 관측되지 않아 재시도 배치를 요청할 수 없습니다. (합성 기본값 금지)');
+      return;
+    }
     setIsPreparingRetry(true);
     setRetryError(null);
     try {
-      const result = await prepareModelRetry(run.projectId, run.id, {
-        input: {
-          cpuMillis: run.resourceRequest?.cpuMillis ?? 500,
-          memoryBytes: run.resourceRequest?.memoryBytes ?? 1073741824,
-          gpuCount: run.resourceRequest?.gpuCount ?? 0,
+      const result = await prepareModelRetry(
+        run.projectId,
+        run.id,
+        {
+          cpuMillis: run.resourceRequest.cpuMillis,
+          memoryBytes: run.resourceRequest.memoryBytes,
+          gpuCount: run.resourceRequest.gpuCount ?? 0,
+          minVramBytes: run.resourceRequest.minVramBytes ?? 0,
+          requiredBytes: run.resourceRequest.requiredBytes ?? 0,
+          maxHostLoad: 0.8,
+          runtime: 'container',
+          policyVersion: 'model-retry:1',
+          ttlSeconds: 30,
         },
-      });
+        {
+          runVersion: run.version,
+        }
+      );
       setRetryResult(result);
       onRefreshRun?.();
     } catch (err: any) {
@@ -405,11 +428,10 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <h4 style={{ margin: '0 0 8px 0', color: '#4ade80', fontSize: '1rem', fontWeight: 600 }}>
-                ✓ Model Retry (세대: Generation {retryResult.generation}) 준비 완료
+                ✓ Model Retry 배치 예약 준비 완료 (세대: Generation {retryResult.generation})
               </h4>
               <p style={{ margin: '0 0 8px 0', fontSize: '0.875rem', lineHeight: 1.5 }}>
-                부모 Run(<code>{retryResult.parentRunId}</code>)의 입력 파일, 체크포인트 및 환경 설정이 <strong>불변 동결(Frozen)</strong>되었으며,
-                신규 자식 Run(<code>{retryResult.run.runId}</code>)에 대한 노드 배치 예약(<code>{retryResult.placement.nodeId}</code>, 리스 {retryResult.placement.leases.length}건)이 체결되었습니다.
+                배치 예약만 준비됨 (신규 자식 Run: <code>{retryResult.run.runId}</code>, 상태: <code>{retryResult.run.state.toUpperCase()}</code>, 노드: <code>{retryResult.placement.nodeId}</code>, 리스 {retryResult.placement.leases.length}건) — 입력 동결과 거버넌스 승인은 별도 단계가 필요합니다 (<code>requiresFrozenInputAndApproval: true</code>).
               </p>
               <div
                 style={{
@@ -565,10 +587,20 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               size="md"
               data-testid="model-retry-prepare-btn"
               onClick={handlePrepareModelRetry}
-              disabled={isPreparingRetry || !run.projectId}
-              title={!run.projectId ? '프로젝트 미지정 실행 (재시도 불가)' : undefined}
+              disabled={isPreparingRetry || !run.projectId || !hasObservedResources}
+              title={
+                !run.projectId
+                  ? '프로젝트 미지정 실행 (재시도 불가)'
+                  : !hasObservedResources
+                  ? '입력 사양 미관측 (부모 Run의 자원 요구가 관측되지 않아 재시도 배치 예약 불가)'
+                  : undefined
+              }
             >
-              {isPreparingRetry ? '⏳ 배치 예약 준비 중...' : '🔄 Model Retry 준비'}
+              {!hasObservedResources
+                ? '입력 사양 미관측'
+                : isPreparingRetry
+                ? '⏳ 배치 예약 준비 중...'
+                : '🔄 Model Retry 준비'}
             </Button>
           )}
 
