@@ -1,20 +1,26 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.201"
+version: "1.0.204"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T12:20:00+09:00"
+updated: "2026-09-23T14:15:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
+## 2026-09-23 S05 Card25 bounded semaphore 사양 — 착지 요청
+
+- 옵션 B를 canonical tenant+project별 process-local non-blocking permit으로 사양화했다. 상한 초과는 기존 `RES-0007`/503/retryable이며 exact replay·changed-body 409, fencing/epoch, RLS, no-overbooking과 root transaction 종료 뒤 release를 유지한다.
+- sampler-off candidate 1500×1은 20/20·timeout0, request P95 2014.409ms, hold p50/p95/max 55.469/155.873/234.974ms, DB 잔존0·기존 `inv_app_*` role 2 유지·신규 role 0이다. F-1 관측자 효과는 확인됐고 767.708ms는 observer 포함 상한이다. 보수적 max에서 N=4의 최장 469.948ms는 500ms 안, N=5는 704.922ms라 첫 실험값을 4로 정했다. permit wait budget은 0ms다.
+- process P개에서 최악 `P×N`이라 전역 FIFO·multi-CP 상한은 비보장이다. legacy/candidate-B(N=4) 20동시 각 3회 계획은 semaphore reject까지 외부 실패에 포함하는 기존 3조건을 사용한다. 구현·시험·추가 부하는 미수행, flag off·S05 `review`; Claude 카드 32의 sampler-off 재현 wave 1회 조건 검토와 코디네이터 승인 대기다. [[S05 project별 bounded semaphore 사양]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[s05-card25-sampler-off-6c389a1d.json]].
+
 ## 2026-09-23 S05 Card24 B′ 구현·h 교정 실험 — 착지 요청
 
 - candidate limits `FOR UPDATE` statement에만 private budget(기본 500, 유효 1~1900ms)을 적용하고 성공 시 caller의 `current_setting('lock_timeout')` 값으로 복원한다. savepoint 실패·stale rollback, BoundDatabase 700ms 복원, 기존 `RES-0007`/503/retryable·replay·fencing·RLS·no-overbooking을 고정했으며 production flag는 off, 공개 계약·migration은 불변이다.
 - SHA `4c8a7363` PG-free 15 passed, 실 PG focused 17 passed. legacy 20동시 3회는 60/60·timeout0, candidate B=1500은 11/60·`55P03`49다. 중앙 request P95(all) 1785.486→2315.099ms, 성공 request P95 2402.481ms, hold P95 141.932→767.708ms로 3조건 전부 실패했다.
-- candidate depth19와 `h≈767.708ms`는 예상 실패17 대 실제16/16/17로 정합한다. B′는 승격이 아닌 h 교정 실험으로 닫고 1900 arm·50동시·5노드는 미실행, S05 `review` 유지. 다음은 B(project별 bounded semaphore) 사양이며 Claude 카드 28 전 구현하지 않는다. [[S05 B-prime candidate limits 잠금 예산 구현 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]].
+- candidate depth19의 observer-on hold 767.708ms와 예상 실패17 대 실제16/16/17은 evidence 내부에서 정합하지만, sampler interval 증가와 `pg_blocking_pids` 비용 때문에 제품 h 교정값 주장은 철회했다. B′는 승격 실패로 닫고 1900 arm·50동시·5노드는 미실행, S05 `review` 유지. 다음은 B 사양과 sampler-off 대조다. [[S05 B-prime candidate limits 잠금 예산 구현 사양]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]].
 
 ## 2026-09-23 Backend S05 lock-wait opt-in 수집 hotfix
 

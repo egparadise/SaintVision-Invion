@@ -1,11 +1,11 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.4.0"
+version: "1.5.1"
 status: "accepted-mitigation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T08:45:00+09:00"
+updated: "2026-09-23T14:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
@@ -15,6 +15,14 @@ tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgre
 
 > [!warning] 상태
 > 코디네이터 결정 (b): legacy 유지 · `placementShortCommit` 기본 off · S05-DB `review` · 단계 3 미통과 · 50동시와 물리 5노드 미측정. Card21은 F-S05-02 잠금 큐 기전을 실험으로 지지했지만 정책 구현은 승인하지 않았다. 후속 v1.4 정책 초안은 B′→B 우선이며 Claude 카드 24 검토 뒤 별도 결정한다.
+
+## v1.5 — Card24 B′ 결과와 관측자 효과 경계
+
+Card24는 candidate limits statement-only budget을 구현했고 PG-free 15 passed, 실 PostgreSQL focused 17 passed로 기본 500ms, caller 값 복원, `55P03`→기존 `RES-0007`, replay/fencing/RLS/no-overbooking을 고정했다. legacy/candidate B=1500 20동시 각 3회에서 legacy는 60/60·timeout 0, candidate는 11/60·`55P03` 49였다. request P95(all) 중앙 1785.486→2315.099ms, 성공 request hold P95 중앙 141.932→767.708ms로 세 승격 조건을 모두 실패했다. B′는 flag off·기본 500을 유지한다.
+
+Claude 카드 28 F-1에 따라 `767.708ms`를 제품 고유 h의 교정값이라고 한 해석은 철회한다. Card24 wave는 queue sampler를 켰고 실제 interval이 legacy 약 21ms에서 candidate 약 67~89ms로 느려졌다. `pg_blocking_pids`가 lock 파티션 LWLock을 사용하므로 depth-19 observer가 holder의 후속 획득을 지연했을 가능성이 있다. sampler-off 카드 16/18의 candidate hold는 117~171ms였다. 따라서 767.708ms는 **observer 포함 상한**이며 `20−floor(B/h+2)=17`과 실제 16/16/17의 정합은 observer-on evidence 내부의 자기 일관성이다. 제품 경로에서 h가 약 7배 늘었다거나 semaphore N을 2로 확정하는 근거가 아니다.
+
+sampler-off candidate 1500×1은 20/20·timeout 0, hold p50/p95/max 55.469/155.873/234.974ms였다. observer-on P95보다 611.835ms 작아 **F-1 관측자 효과는 확인**됐고 767.708ms는 observer 포함 상한으로 유지한다. 단일 wave의 나머지 차이를 모두 `pg_blocking_pids` 하나의 비용으로 확정하지는 않는다. 보수적 max 산술에서 N=4의 최장 구간 469.948ms는 500ms 안이고 N=5는 704.922ms로 넘으므로 첫 옵션 B 실험값은 4다. [[S05 project별 bounded semaphore 사양]]은 permit 대기 상한 0ms, canonical tenant+project key, process-local 한계, root transaction 종료 뒤 release, semaphore reject를 포함한 외부 실패 게이트를 고정한다. 실제 semaphore 20×3 전 zero-timeout은 미확정이며 Claude 카드 32는 sampler-off 재현 wave 1회를 검토 조건으로 둔다. 구현·추가 부하는 Claude 검토와 코디네이터 별도 승인 전 금지다. [[s05-card25-sampler-off-6c389a1d.json]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]].
 
 ## Card21 — F-S05-02 실험 지지 기전
 

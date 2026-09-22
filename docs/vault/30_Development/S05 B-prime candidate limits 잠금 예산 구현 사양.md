@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BPRIME-LOCK-BUDGET-SPEC-001"
 title: "S05 B-prime candidate limits 잠금 예산 구현 사양"
-version: "1.2.0"
+version: "1.2.1"
 status: "implemented-calibration-failed-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T12:20:00+09:00"
+updated: "2026-09-23T13:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -14,7 +14,7 @@ tags: ["s05", "placement", "candidate", "lock-timeout", "statement-timeout", "sp
 
 # S05 B-prime candidate limits 잠금 예산 구현 사양
 
-> [!warning] h 교정 완료, 승격 실패
+> [!warning] observer-on 상한 기록, 승격 실패
 > v1.1 사양을 구현해 실 PostgreSQL focused 17 passed와 legacy/candidate 20동시 각 3회를 실행했다. candidate B=1500은 세 판정 조건을 모두 충족하지 못해 승격하지 않는다. 현재 정본은 `placementShortCommit=false`, 기본 candidate budget 500ms, S05-DB `review`다. 20동시 초과, 5노드·50동시는 실행하지 않았다.
 
 ## 1. 목표와 비목표
@@ -149,4 +149,4 @@ request P95와 post-acquire hold P95는 기존 대칭 경계를 유지한다. li
 | legacy | 60 | 0 | 1785.486ms | 1785.486ms | 141.932ms | 1358.987ms |
 | candidate B=1500 | 11 | `55P03` 49 | 2315.099ms | 2402.481ms | 767.708ms | 1530.788ms |
 
-외부 timeout 비증가, all-request P95 비악화, 성공 request hold P95 비악화가 모두 실패했다. candidate queue depth는 매회 19였고 `h≈767.708ms`에서 산술 예상 17 실패와 실제 16/16/17 실패가 정합했다. 이는 B′가 **h 교정 실험**으로 유효했음을 뜻할 뿐 정책 승격 근거가 아니다. 같은 방향 3회를 확인했고 `B+h>2s`의 `57014` 혼입 위험 때문에 승인에 따라 1900 arm은 실행하지 않았다.
+외부 timeout 비증가, all-request P95 비악화, 성공 request hold P95 비악화가 모두 실패했다. candidate queue depth는 매회 19였고 observer-on hold P95 중앙 767.708ms를 넣은 산술 예상 17 실패와 실제 16/16/17 실패가 evidence 내부에서 정합했다. 그러나 sampler interval이 legacy 약 21ms에서 candidate 약 67~89ms로 느려졌고 `pg_blocking_pids` 호출의 lock 파티션 비용이 holder를 지연했을 수 있어 767.708ms는 **관측자 포함 상한**이다. 제품 고유 h의 교정 완료나 N 산출 근거로 사용하지 않는다. 같은 방향 3회를 확인했고 `B+h>2s`의 `57014` 혼입 위험 때문에 승인에 따라 1900 arm은 실행하지 않았다. sampler-off candidate 1500×1 대조 뒤에만 B의 N 산술 후보를 확정한다.

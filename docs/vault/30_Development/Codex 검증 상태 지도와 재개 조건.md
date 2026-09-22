@@ -1,20 +1,26 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.27"
+version: "1.5.30"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T12:20:00+09:00"
+updated: "2026-09-23T14:15:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
+## 2026-09-23 S05-DB 옵션 B bounded semaphore — 사양 검토 대기
+
+- process-local canonical tenant+project 상한을 non-blocking fail-fast로 설계했다. sampler-off candidate 1500×1은 20/20·timeout0, hold p50/p95/max 55.469/155.873/234.974ms다. 보수적 max 산술로 첫 실험값 N=4를 정했지만 실제 semaphore 20×3 전 zero-timeout은 미확정이고 flag 기본 off다.
+- exact replay는 permit 없이 기존 응답, changed-body는 409이며 신규 reject만 기존 `RES-0007`/503/retryable을 사용한다. permit은 root transaction 종료 뒤 반환하고 semaphore reject를 성능 판정의 외부 실패 합계에 포함한다. 공개 계약·migration·제품 코드 변경은 0이다.
+- 재개 조건: Claude 카드 32가 키·root finalizer·다중 process 한계·N=4 산술·시험 판정의 정직성을 검토하고 sampler-off candidate 1500×1 재현 wave 1회를 승인한다. 재현 결과와 별도 코디네이터 구현 승인 전 코드/시험 작성, 추가 PG 부하, flag on, N=3 lower arm·N=5 이상, 20동시 초과·50동시·5노드 실행 금지. S05 `review` 유지. [[S05 project별 bounded semaphore 사양]], [[2026-09-23_13-28-00_KST_S05_bounded_semaphore_사양_Codex]], [[s05-card25-sampler-off-6c389a1d.json]].
+
 ## 2026-09-23 S05-DB B′ h 교정 — 승격 실패
 
 - candidate limits statement-only budget을 기본 500·유효 1~1900ms로 구현했고 성공은 caller lock_timeout 복원, 실패·stale은 savepoint rollback을 사용한다. PG-free 15 passed, 실 PG focused 17 passed, 공개 계약·migration·production config 변경 0이다.
-- legacy 20동시 3회는 60/60·timeout0, candidate B=1500은 11/60·`55P03`49다. request P95(all) 중앙 1785.486→2315.099ms, 성공 request hold P95 중앙 141.932→767.708ms로 세 게이트 모두 실패했다. depth19·`h≈767.708ms`에서 예상17 대 관측16/16/17 실패가 정합해 h 교정만 완료했다.
+- legacy 20동시 3회는 60/60·timeout0, candidate B=1500은 11/60·`55P03`49다. request P95(all) 중앙 1785.486→2315.099ms, 성공 request hold P95 중앙 141.932→767.708ms로 세 게이트 모두 실패했다. 예상17 대 관측16/16/17은 observer-on evidence 내부에서만 정합하며, sampler interval 증가 때문에 제품 h 교정 완료 주장은 철회했다.
 - 재개 조건: Claude 카드 28이 구현·원자료·1900 미실행 경계를 검토하고 코디네이터가 B(project별 bounded semaphore) 사양 카드를 승인해야 한다. 그 전 flag on, B 구현, 20동시 초과·50동시·5노드 실행 금지. S05 `review` 유지. [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]].
 
 ## 2026-09-23 S05-DB F-S05-02 기전 확인

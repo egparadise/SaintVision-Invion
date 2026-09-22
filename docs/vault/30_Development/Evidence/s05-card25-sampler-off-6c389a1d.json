@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "s05-card25-sampler-off:1",
+  "generatedAt": "2026-09-23T14:15:00+09:00",
+  "codeSHA": "6c389a1d7cc4b0fcb88b703d8cbebbc74b2c836d",
+  "executor": "Codex",
+  "scope": {
+    "database": "PostgreSQL 16 disposable database",
+    "topology": "development PC, one synthetic measured Node",
+    "mode": "short-commit",
+    "candidateLimitLockTimeoutMs": 1500,
+    "requests": 20,
+    "concurrency": 20,
+    "rounds": 1,
+    "queueDiagnostic": false,
+    "sqlDiagnostic": false,
+    "physicalFiveNodeAcceptanceAssessed": false,
+    "ac05Assessed": false
+  },
+  "result": {
+    "processExit": 0,
+    "pytest": {"passed": 1, "failed": 0, "skipped": 0, "durationSeconds": 16.36},
+    "success": 20,
+    "failure": 0,
+    "sqlstate": {"55P03": 0, "57014": 0},
+    "requestP95AllMs": 2014.409,
+    "requestMaxMs": 2060.953,
+    "limitRowWaitP95Ms": 1409.694,
+    "limitRowWaitMaxMs": 1451.526,
+    "holdP50Ms": 55.469,
+    "holdP95Ms": 155.873,
+    "holdMaxMs": 234.974,
+    "uniqueFencingTokens": true,
+    "noOverbooking": true
+  },
+  "comparison": {
+    "observerOnHoldP95MedianMs": 767.708,
+    "samplerOffHoldP95Ms": 155.873,
+    "differenceMs": 611.835,
+    "ratioObserverOnToSamplerOff": 4.925,
+    "observerEffectFinding": "CONFIRMED",
+    "interpretation": "Diagnostic on/off produced a large measurement difference, confirming an observer effect and retaining 767.708ms only as an observer-included upper bound. The single sampler-off wave does not isolate all remaining variance as pg_blocking_pids cost or prove a production h."
+  },
+  "semaphoreCandidate": {
+    "lockBudgetMs": 500,
+    "formula": "maximum admitted N ~= floor(B / h + 2)",
+    "p95BasedN": 5,
+    "maxBasedConservativeN": 4,
+    "proposedFirstExperimentalN": 4,
+    "n4LongestPredictedSegmentMs": 469.948,
+    "n5LongestPredictedSegmentMs": 704.922,
+    "zeroTimeoutClaimed": false,
+    "reviewCondition": "Claude Card32 requires one sampler-off candidate-1500 reproduction wave before N=4 can advance beyond a first implementation experiment value."
+  },
+  "cleanup": {
+    "invTestDatabaseResidue": 0,
+    "preexistingInvAppRoleBaseline": 2,
+    "finalInvAppRoleCount": 2,
+    "newRoleResidue": 0
+  },
+  "localRawArtifacts": {
+    "reportSHA256": "05310ed7a51bbb241d6d787a552d35828e7ae5bcf87732406496810735409d1e",
+    "junitSHA256": "7fd16187227e23140efd43c66448032c8f29201bb660be9f02e5a3be6210d0d1",
+    "stdoutSHA256": "4809e07ed8941ad8eaecf4abb7f70c7e99c56f4967f480cf1b3cb396c02330c1",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
