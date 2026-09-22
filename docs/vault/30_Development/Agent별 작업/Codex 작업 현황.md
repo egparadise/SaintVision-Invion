@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.191"
+version: "1.0.192"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T04:55:00+09:00"
+updated: "2026-09-23T05:55:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 legacy 큐 깊이 실측
+
+- report schema 1.6에 barrier 기준 request arrival/completion과 opt-in `pg_stat_activity`/`pg_blocking_pids` queue observer를 추가했다. raw PID·SQL parameter는 보존하지 않고 공개 계약·migration은 변경하지 않았다.
+- 개발 PC·합성 Node legacy 20동시 1회는 20/20 성공, timeout 0, request/acquire/hold P95 2142.809/1588.193/151.225ms, arrival spread 0.793ms였다. 98표본에서 max active 20, project-lock waiter 19, blocking chain depth 1이었다.
+- `log_lock_waits=off`라 55P03 부재 원인은 미확정이다. holder 교체별 wait segment에서 timeout이 다시 시작된다는 가설만 남기고 `log_lock_waits=on` 재실행은 별도 제안으로 둔다. O2 BoundDatabase attempt1 hold 누락과 O3 legacy 운영 metric sink 부재도 유지한다. flag off·S05 `review`·50동시/5노드 미승격. [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]].
+- PG-free 4 passed, 실 PG 단일 파일 1 passed(20동시 wave 포함), 문서·계약·ontology·ratchet·freshness·frontend·schema·diff 게이트는 모두 exit 0이다.
 
 ## 2026-09-23 S05 5노드 lane v1.4
 

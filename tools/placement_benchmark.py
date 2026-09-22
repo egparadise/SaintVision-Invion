@@ -39,6 +39,8 @@ class PlacementSample:
     cause_type: str | None
     sqlstate: str | None
     timeout_kind: str | None
+    arrival_offset_ms: float
+    completion_offset_ms: float
 
 
 @dataclass(frozen=True)
@@ -86,6 +88,7 @@ def run_round(
     request_count: int,
     concurrency: int,
     reserve: Callable[[int], dict],
+    on_wave_start: Callable[[], None] | None = None,
 ) -> tuple[RoundEvidence, list[PlacementSample]]:
     """Start all requests together and retain latency plus decision evidence."""
 
@@ -93,16 +96,25 @@ def run_round(
         raise ValueError("request_count must be between 1 and 200")
     if concurrency != request_count:
         raise ValueError("concurrency must equal request_count for one simultaneous wave")
-    barrier = Barrier(request_count)
+    wave_origin_ns: list[int] = []
+
+    def mark_wave_start() -> None:
+        wave_origin_ns.append(perf_counter_ns())
+        if on_wave_start is not None:
+            on_wave_start()
+
+    barrier = Barrier(request_count, action=mark_wave_start)
 
     def attempt(index: int) -> tuple:
         barrier.wait(timeout=30)
         started = perf_counter_ns()
+        arrival_offset_ms = (started - wave_origin_ns[0]) / 1_000_000
         try:
             result = reserve(index)
+            finished = perf_counter_ns()
             return (
                 index,
-                (perf_counter_ns() - started) / 1_000_000,
+                (finished - started) / 1_000_000,
                 result,
                 None,
                 None,
@@ -111,13 +123,16 @@ def run_round(
                 None,
                 None,
                 None,
+                arrival_offset_ms,
+                (finished - wave_origin_ns[0]) / 1_000_000,
             )
         except Exception as error:  # Evidence must retain every concurrent outcome.
+            finished = perf_counter_ns()
             cause = getattr(error, "__cause__", None)
             sqlstate = getattr(cause, "sqlstate", None) or getattr(error, "sqlstate", None)
             return (
                 index,
-                (perf_counter_ns() - started) / 1_000_000,
+                (finished - started) / 1_000_000,
                 None,
                 getattr(error, "code", None) or "UNCLASSIFIED",
                 type(error).__name__,
@@ -132,6 +147,8 @@ def run_round(
                     if sqlstate == "57014"
                     else None
                 ),
+                arrival_offset_ms,
+                (finished - wave_origin_ns[0]) / 1_000_000,
             )
 
     with ThreadPoolExecutor(max_workers=concurrency) as pool:
@@ -149,6 +166,8 @@ def run_round(
                 cause_type,
                 sqlstate,
                 timeout_kind,
+                arrival_offset_ms,
+                completion_offset_ms,
             ) = future.result()
             samples.append(
                 PlacementSample(
@@ -163,6 +182,8 @@ def run_round(
                     cause_type,
                     sqlstate,
                     timeout_kind,
+                    round(arrival_offset_ms, 3),
+                    round(completion_offset_ms, 3),
                 )
             )
 
@@ -260,6 +281,8 @@ def summarize(
                     "requestIndex": sample.request_index,
                     "completionOrder": sample.completion_order,
                     "latencyMs": sample.latency_ms,
+                    "arrivalOffsetMs": sample.arrival_offset_ms,
+                    "completionOffsetMs": sample.completion_offset_ms,
                     "lockWaitInclusiveLatencyMs": sample.latency_ms,
                     "lockWaitSeparatelyMeasured": False,
                     "status": "success" if sample.result is not None else "failure",
@@ -388,6 +411,8 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         "INV_PLACEMENT_BENCHMARK_REPORT": str(args.report.resolve()),
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
         "INV_PLACEMENT_SHORT_COMMIT": "1" if args.mode == "short-commit" else "0",
+        "INV_PLACEMENT_QUEUE_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
+        "INV_PLACEMENT_SQL_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
     }
     command = [
         sys.executable,
@@ -418,6 +443,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         choices=("legacy", "short-commit"),
         default="legacy",
         help="placement feature-flag mode (default: legacy/off)",
+    )
+    parser.add_argument(
+        "--queue-diagnostic",
+        action="store_true",
+        help=(
+            "sample pg_stat_activity wait events and retain request arrival offsets; "
+            "also enables parameter-free SQL diagnostics"
+        ),
     )
     return parser.parse_args(argv)
 

@@ -11,6 +11,12 @@ source_of_truth: "Git"
 
 # Codex 검증 상태 지도와 재개 조건
 
+## 2026-09-23 S05-DB legacy 큐 깊이 실측
+
+- legacy 20동시 1회는 20/20 성공·timeout 0, request/acquire/hold P95 2142.809/1588.193/151.225ms였다. 0.793ms arrival spread와 98개 wait-event 표본에서 max project-lock waiter 19, blocking chain depth 1을 관측했다.
+- `lock_timeout=500ms`인데 55P03이 없었던 이유는 `log_lock_waits=off`·server log 미수집이라 미확정이다. holder 교체마다 wait segment timeout이 재시작된다는 가설은 별도 `log_lock_waits=on` 카드 전까지 주장으로 승격하지 않는다.
+- 재개 조건: Claude 카드 21이 schema 1.6 queue observer와 O1/O2/O3 경계를 검토한다. candidate 정책·20동시 재실행·50동시·5노드는 별도 승인 전 금지, flag off·S05 `review` 유지. [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]].
+
 ## 2026-09-23 S05-DB 결정 (b) · P1/P2 대칭 계측
 
 - 코디네이터는 (b) legacy 유지·5노드 후 재판단을 확정했다. `placementShortCommit=false`, S05-DB `review`, 20동시 초과·50동시/5노드 미승격을 유지한다.

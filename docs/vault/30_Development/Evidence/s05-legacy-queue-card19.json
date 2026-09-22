@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceId": "S05-LEGACY-QUEUE-CARD19-20260923",
+  "generatedAt": "2026-09-23T05:55:00+09:00",
+  "author": "Codex",
+  "reviewer": "Claude",
+  "scope": "development-PC; one synthetic measured-node row; pre-five-node-lab",
+  "mode": "legacy",
+  "placementShortCommit": false,
+  "requests": 20,
+  "concurrency": 20,
+  "rounds": 1,
+  "processExitCode": 0,
+  "pytest": {
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "durationSeconds": 15.517
+  },
+  "outcome": {
+    "successCount": 20,
+    "failureCount": 0,
+    "timeoutCount": 0,
+    "requestP95Ms": 2142.809,
+    "arrivalSpreadMs": 0.793,
+    "completionMaxOffsetMs": 2262.92,
+    "legacyAcquireP95Ms": 1588.193,
+    "postAcquireHoldP95Ms": 151.225
+  },
+  "queueObservation": {
+    "method": "pg_stat_activity plus pg_blocking_pids sampled every 5ms",
+    "sampleCount": 98,
+    "lockObservationCount": 801,
+    "firstLockOffsetMs": 515.384,
+    "lastLockOffsetMs": 2136.576,
+    "maxActiveBackendCount": 20,
+    "maxLockWaiterCount": 19,
+    "maxProjectLockWaiterCount": 19,
+    "maxBlockingChainDepth": 1,
+    "lockStatementClass": "project-lock",
+    "serverSettings": {
+      "logLockWaits": "off",
+      "deadlockTimeout": "1s"
+    },
+    "serverLogRead": false,
+    "rawPidRetained": false,
+    "sqlParametersRetained": false,
+    "observerErrorType": null
+  },
+  "interpretation": {
+    "observed": "nineteen waiters directly blocked on the current project-row holder; the sampled blocking graph stayed at depth one",
+    "notProven": "why no individual project-lock wait segment raised 55P03 under lock_timeout=500ms",
+    "narrowedHypothesis": "holder turnover may restart lock_timeout for each wait segment, allowing cumulative client elapsed above 500ms without one segment exceeding the limit",
+    "nextValidation": "separate approved run with log_lock_waits=on and server-log correlation; not executed in Card19"
+  },
+  "provenance": {
+    "reportedBaseSHA": "0dd6842cbfa6572b7e13d82e60ca26d3f6e4c5a5",
+    "workingTreeDirtyDuringMeasurement": true,
+    "benchmarkSourcePatchSHA256": "d09a607b013e24efce6bb1a920e80d3ec9663302b5cf1d6c68ba8c066382fd08",
+    "benchmarkSourcePatchScope": [
+      "tools/placement_benchmark.py",
+      "tests/test_placement_benchmark_tool.py",
+      "tests/integration/test_placement_benchmark.py"
+    ],
+    "rawReportSHA256": "a2f6f171200dbad17d36ff0fcd4d829d4b8ffaf00b13863173f3838e45168b29",
+    "junitSHA256": "beff0d5c52ed3386de591e11235b4e359c2cb366315b1774e2fb337e6b973790",
+    "secretMarkerCount": 0
+  },
+  "limitations": [
+    "This is a development-PC synthetic-node preliminary measurement, not AC-05 or five-node evidence.",
+    "log_lock_waits was off, so Card19 did not correlate wait-event samples with PostgreSQL server log records.",
+    "A depth-one sampled graph does not prove a waiter's complete lock-wait segment history between 5ms samples.",
+    "BoundDatabase stale attempt-one hold and the production legacy metric sink remain unmeasured boundaries."
+  ]
+}

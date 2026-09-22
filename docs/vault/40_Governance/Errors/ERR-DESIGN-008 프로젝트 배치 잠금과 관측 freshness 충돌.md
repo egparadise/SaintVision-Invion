@@ -1,11 +1,11 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.3.0"
+version: "1.3.2"
 status: "accepted-mitigation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T03:45:00+09:00"
+updated: "2026-09-23T05:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
@@ -27,9 +27,15 @@ legacy의 phase mark를 project limits 획득 뒤로 옮기고, 그 전 project+
 
 SQL observer는 candidate 12개 실패를 모두 `SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE`에 귀속했다. 두 mode 모두 fencing 유일성과 no-overbooking은 true다. hold 감소 방향은 보이지만 candidate survivor 8개와 legacy 20개를 한 번 비교한 값이므로 성능 통과 증거가 아니다. 외부 timeout 비증가 조건은 0→12로 실패한다.
 
-legacy의 acquire client elapsed가 500ms를 넘는데도 `55P03`이 없는 이유는 **미확정**이다. 코드상 mode별 면제는 없고 양쪽 모두 같은 `SET LOCAL lock_timeout=500ms`, `statement_timeout=2s` 경로다. SQL observer의 elapsed는 server lock wait만이 아니라 Python thread scheduling과 query return 지연을 포함하고 backend wait_event timeline은 수집하지 않았다. 따라서 1453.658ms를 한 lock의 server wait로 해석할 수 없으며 [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]]의 경계를 유지한다. 이 두 wave에는 `57014`가 없어서 새 원인 statement를 주장하지 않는다. 증거: [[s05-symmetric-metrics-card18.json]].
+legacy의 acquire client elapsed가 500ms를 넘는데도 `55P03`이 없는 이유는 카드 18 wave 자체에 대해서는 **미확정**이다. 코드상 mode별 면제는 없고 양쪽 모두 같은 `SET LOCAL lock_timeout=500ms`, `statement_timeout=2s` 경로다. SQL observer elapsed는 server lock wait뿐 아니라 Python thread scheduling과 query return 지연을 포함하고 당시 backend wait-event timeline은 수집하지 않았다.
 
-다음 후보는 limit-row migration이 아니라 candidate의 lock-timeout 예산 또는 project별 queue 깊이 상한이다. Claude 검토와 별도 결정 전에는 구현하지 않는다.
+Claude 카드 20의 커널 무관 PG probe는 가능한 lock queue mechanism을 확인했다. holder chain depth 2에서는 `lock_timeout`이 서로 다른 대기 구간마다 다시 적용돼 waiter가 총 728ms 뒤 성공했고, depth 3에서는 앞선 holder 시간이 한 구간에 누적돼 각 holder가 500ms 미만이어도 `55P03`이었다.
+
+Card19 실제 legacy 20동시 wave는 arrival spread 0.793ms, max project-lock waiter 19, blocking chain depth 1, timeout 0이었다. 따라서 이 wave는 19 waiter가 현재 holder를 직접 기다리는 fan-in이지 카드 20의 depth≥3 holder chain이 아니다. request/acquire/hold P95는 2142.809/1588.193/151.225ms였지만 `55P03`은 0건이었다. `log_lock_waits=off`이고 server log를 읽지 않았으므로 원인은 여전히 **미확정**이다. holder 교체마다 실제 wait segment와 `lock_timeout` clock이 다시 시작돼 각 segment는 500ms 미만이고 누적 client elapsed만 길어졌다는 가설로 좁히며, `log_lock_waits=on` 상관 재실행은 별도 카드로 제안한다. [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]], [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]], [[s05-symmetric-metrics-card18]], [[s05-legacy-queue-card19]].
+
+다음 후보는 limit-row migration이 아니라 candidate의 lock-timeout 예산 또는 project별 queue 깊이 상한이다. Card19은 요청 arrival/completion timeline, parameter-free statement class, backend `wait_event`, blocking graph와 `log_lock_waits` 설정을 같은 20동시 wave에서 수집했다. server log 상관과 candidate 정책은 Claude 검토와 별도 결정 전 구현·실행하지 않는다.
+
+계측 제한도 오류 설계 경계에 포함한다. `BoundDatabase` stale retry는 caller-owned outer transaction의 final phase만 방출해 attempt 1 hold가 현재 집계되지 않고, 운영 `app.py`는 `placement_metric_sink`를 주입하지 않으며 logger fallback은 candidate flag on에서만 동작한다. 따라서 nested retry의 attempt coverage와 기본 legacy 운영 metric은 불완전하고, benchmark sink 수치를 운영 telemetry로 승격할 수 없다.
 
 ## F-S05-03 — 경합 재배치
 

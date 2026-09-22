@@ -7,10 +7,12 @@ import json
 import os
 from pathlib import Path
 import secrets
-from threading import Lock
+from threading import Event, Lock, Thread
+from time import perf_counter_ns
 from types import SimpleNamespace
 
 import psycopg
+from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 import pytest
 
@@ -32,6 +34,168 @@ MEMORY_PER_REQUEST = 1_048_576
 class BenchmarkEnvironment(SimpleNamespace):
     def __repr__(self):
         return "BenchmarkEnvironment(<credentials-redacted>)"
+
+
+class PgQueueObserver:
+    """Sample runtime backends without retaining SQL parameters or raw PIDs."""
+
+    def __init__(self, runtime_dsn: str, *, interval_ms: int = 5):
+        self.runtime_dsn = runtime_dsn
+        self.interval_ms = interval_ms
+        self._stop = Event()
+        self._ready = Event()
+        self._thread = Thread(target=self._run, name="placement-queue-observer", daemon=True)
+        self._wave_origin_ns: int | None = None
+        self._backend_ids: dict[int, str] = {}
+        self._timeline: list[dict] = []
+        self._settings: dict[str, str] = {}
+        self._error: str | None = None
+
+    def start(self) -> None:
+        self._thread.start()
+        if not self._ready.wait(timeout=5):
+            raise RuntimeError("Queue observer did not become ready")
+        if self._error is not None:
+            raise RuntimeError(f"Queue observer failed: {self._error}")
+
+    def stop(self) -> None:
+        self._stop.set()
+        self._thread.join(timeout=5)
+        if self._thread.is_alive():
+            raise RuntimeError("Queue observer did not stop")
+
+    def mark_wave_start(self) -> None:
+        self._wave_origin_ns = perf_counter_ns()
+
+    def _backend_id(self, pid: int) -> str:
+        if pid not in self._backend_ids:
+            self._backend_ids[pid] = f"backend-{len(self._backend_ids) + 1}"
+        return self._backend_ids[pid]
+
+    @staticmethod
+    def _chain_depth(pid: int, graph: dict[int, list[int]], seen: frozenset[int]) -> int:
+        if pid in seen or not graph.get(pid):
+            return 0
+        return 1 + max(
+            PgQueueObserver._chain_depth(blocker, graph, seen | {pid})
+            for blocker in graph[pid]
+        )
+
+    def _run(self) -> None:
+        try:
+            with psycopg.connect(
+                self.runtime_dsn, autocommit=True, row_factory=dict_row
+            ) as conn:
+                self._settings = {
+                    "logLockWaits": conn.execute("SHOW log_lock_waits").fetchone()[
+                        "log_lock_waits"
+                    ],
+                    "deadlockTimeout": conn.execute("SHOW deadlock_timeout").fetchone()[
+                        "deadlock_timeout"
+                    ],
+                }
+                self._ready.set()
+                while not self._stop.is_set():
+                    rows = conn.execute(
+                        """SELECT pid,state,wait_event_type,wait_event,
+                        pg_blocking_pids(pid) AS blockers,
+                        CASE
+                          WHEN position('FROM inv.projects' in query)>0
+                           AND position('FOR NO KEY UPDATE' in query)>0 THEN 'project-lock'
+                          WHEN position('FROM inv.project_resource_limits' in query)>0
+                           AND position('FOR UPDATE' in query)>0 THEN 'limit-lock'
+                          WHEN position('FROM inv.tenant_controls' in query)>0 THEN 'tenant-control'
+                          WHEN position('FROM inv.runs' in query)>0 THEN 'run-lock'
+                          ELSE 'other'
+                        END AS statement_class,
+                        extract(epoch from (clock_timestamp()-query_start))*1000
+                          AS query_age_ms
+                        FROM pg_stat_activity
+                        WHERE datname=current_database() AND usename=current_user
+                          AND pid<>pg_backend_pid() AND state<>'idle'
+                        ORDER BY pid"""
+                    ).fetchall()
+                    if rows and self._wave_origin_ns is not None:
+                        graph = {
+                            int(row["pid"]): [int(item) for item in row["blockers"]]
+                            for row in rows
+                        }
+                        backends = []
+                        for row in rows:
+                            pid = int(row["pid"])
+                            blockers = graph[pid]
+                            backends.append(
+                                {
+                                    "backendId": self._backend_id(pid),
+                                    "state": row["state"],
+                                    "waitEventType": row["wait_event_type"],
+                                    "waitEvent": row["wait_event"],
+                                    "statementClass": row["statement_class"],
+                                    "queryAgeMs": round(float(row["query_age_ms"]), 3),
+                                    "blockingBackendIds": [
+                                        self._backend_id(blocker) for blocker in blockers
+                                    ],
+                                    "blockingChainDepth": self._chain_depth(
+                                        pid, graph, frozenset()
+                                    ),
+                                }
+                            )
+                        lock_waiters = sum(
+                            item["waitEventType"] == "Lock" for item in backends
+                        )
+                        self._timeline.append(
+                            {
+                                "offsetMs": round(
+                                    (perf_counter_ns() - self._wave_origin_ns)
+                                    / 1_000_000,
+                                    3,
+                                ),
+                                "activeBackendCount": len(backends),
+                                "lockWaiterCount": lock_waiters,
+                                "maxBlockingChainDepth": max(
+                                    item["blockingChainDepth"] for item in backends
+                                ),
+                                "backends": backends,
+                            }
+                        )
+                    self._stop.wait(self.interval_ms / 1000)
+        except Exception as error:  # Evidence reports observer failure by type only.
+            self._error = type(error).__name__
+            self._ready.set()
+
+    def report(self) -> dict:
+        classes = Counter(
+            backend["statementClass"]
+            for sample in self._timeline
+            for backend in sample["backends"]
+        )
+        return {
+            "enabled": True,
+            "samplingIntervalMs": self.interval_ms,
+            "timelineOrigin": "concurrent-wave-barrier-release",
+            "serverSettings": self._settings,
+            "serverLogRead": False,
+            "serverLogBoundary": (
+                "log_lock_waits setting is recorded; this collector uses "
+                "pg_stat_activity wait_event and does not read PostgreSQL logs"
+            ),
+            "observerErrorType": self._error,
+            "rawPidRetained": False,
+            "sqlParametersRetained": False,
+            "sampleCount": len(self._timeline),
+            "maxActiveBackendCount": max(
+                (sample["activeBackendCount"] for sample in self._timeline), default=0
+            ),
+            "maxLockWaiterCount": max(
+                (sample["lockWaiterCount"] for sample in self._timeline), default=0
+            ),
+            "maxBlockingChainDepth": max(
+                (sample["maxBlockingChainDepth"] for sample in self._timeline),
+                default=0,
+            ),
+            "statementClassSampleCounts": dict(sorted(classes.items())),
+            "timeline": self._timeline,
+        }
 
 
 def _count(name: str, default: int) -> int:
@@ -109,6 +273,7 @@ def placement_benchmark_env(env):
             lock_hold_metrics.append(event)
 
     diagnostic = os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1"
+    queue_diagnostic = os.getenv("INV_PLACEMENT_QUEUE_DIAGNOSTIC") == "1"
     placement_db = Database(
         env.runtime,
         recovery_epoch=env.epoch,
@@ -130,6 +295,7 @@ def placement_benchmark_env(env):
         snapshot=snapshot,
         sql_diagnostics=sql_diagnostics,
         lock_hold_metrics=lock_hold_metrics,
+        queue_observer=(PgQueueObserver(env.runtime) if queue_diagnostic else None),
     )
 
 
@@ -204,12 +370,23 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             pool_version="project-nodes:benchmark:1",
         )
 
-    first, first_samples = run_round(
-        name="round-1",
-        request_count=a.request_count,
-        concurrency=concurrency,
-        reserve=lambda index: reserve(0, index),
-    )
+    if a.queue_observer is not None:
+        a.queue_observer.start()
+    try:
+        first, first_samples = run_round(
+            name="round-1",
+            request_count=a.request_count,
+            concurrency=concurrency,
+            reserve=lambda index: reserve(0, index),
+            on_wave_start=(
+                a.queue_observer.mark_wave_start
+                if a.queue_observer is not None
+                else None
+            ),
+        )
+    finally:
+        if a.queue_observer is not None:
+            a.queue_observer.stop()
     active_after_rounds = [_active(a)]
     expected_active_rounds = [
         {
@@ -279,6 +456,35 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             {"sqlState": state, "statement": statement, "count": count}
             for (state, statement), count in sorted(timeout_statement_counts.items())
         ],
+    }
+    report["requestTimeline"] = [
+        {
+            "requestIndex": sample.request_index,
+            "arrivalOffsetMs": sample.arrival_offset_ms,
+            "completionOffsetMs": sample.completion_offset_ms,
+            "status": "success" if sample.result is not None else "failure",
+            "sqlState": sample.sqlstate,
+        }
+        for sample in first.samples
+    ]
+    report["queueObservation"] = (
+        a.queue_observer.report()
+        if a.queue_observer is not None
+        else {
+            "enabled": False,
+            "reason": "set INV_PLACEMENT_QUEUE_DIAGNOSTIC=1 for pg_stat_activity sampling",
+        }
+    )
+    report["measurementLimitations"] = {
+        "boundDatabaseStaleAttemptHold": (
+            "not exercised by this benchmark; in a caller-owned outer transaction, "
+            "a savepoint-rolled-back stale attempt is overwritten by the next phase "
+            "before the outer transaction finalizer emits lockHold"
+        ),
+        "operationalLegacyMetricSink": (
+            "benchmark injects placement_metric_sink; the production app does not, "
+            "and the logger fallback is inactive while placementShortCommit=false"
+        ),
     }
     hold_metrics = [
         item
@@ -358,7 +564,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
         else report["legacyLockWait"]
     )
-    report["schemaVersion"] = "1.5.0"
+    report["schemaVersion"] = "1.6.0"
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     report["contentionObservation"]["serverSideLockWaitSeparatelyMeasured"] = False
     report["contentionObservation"][
@@ -404,6 +610,16 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     record_property(
         "sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"])
     )
+    record_property("queueObservationEnabled", report["queueObservation"]["enabled"])
+    if report["queueObservation"]["enabled"]:
+        record_property(
+            "queueMaxLockWaiterCount",
+            report["queueObservation"]["maxLockWaiterCount"],
+        )
+        record_property(
+            "queueMaxBlockingChainDepth",
+            report["queueObservation"]["maxBlockingChainDepth"],
+        )
     print("PLACEMENT_BENCHMARK_RESULT=" + json.dumps(report, sort_keys=True))
     if first.failure_count:
         pytest.fail(

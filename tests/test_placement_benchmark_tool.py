@@ -77,6 +77,8 @@ def test_one_round_marks_repeatability_unmeasured_without_junit_failure(tmp_path
 
 
 def test_round_keeps_success_and_failure_latency_evidence():
+    wave_starts = []
+
     def reserve(index):
         if index == 2:
             error = RuntimeError("synthetic")
@@ -92,7 +94,14 @@ def test_round_keeps_success_and_failure_latency_evidence():
             "leases": [{"fencingToken": f"epoch:{index}"}],
         }
 
-    evidence, samples = run_round(name="test", request_count=4, concurrency=4, reserve=reserve)
+    evidence, samples = run_round(
+        name="test",
+        request_count=4,
+        concurrency=4,
+        reserve=reserve,
+        on_wave_start=lambda: wave_starts.append("started"),
+    )
+    assert wave_starts == ["started"]
     assert evidence.success_count == 3
     assert evidence.failure_count == 1
     assert evidence.failure_request_indexes == (2,)
@@ -100,6 +109,10 @@ def test_round_keeps_success_and_failure_latency_evidence():
     assert evidence.errors_by_sqlstate == {"55P03": 1}
     assert evidence.first_failure_completion_order is not None
     assert len(samples) == 4
+    assert min(sample.arrival_offset_ms for sample in samples) >= 0
+    assert max(sample.completion_offset_ms for sample in samples) >= max(
+        sample.arrival_offset_ms for sample in samples
+    )
     failed = next(sample for sample in samples if sample.error_code)
     assert failed.error_status == 503 and failed.error_retryable is True
     assert failed.cause_type == "RuntimeError" and failed.sqlstate == "55P03"
