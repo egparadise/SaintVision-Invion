@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.201"
+version: "1.0.202"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T12:40:00+09:00"
+updated: "2026-09-23T12:50:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 5노드 preflight 실 PG 영구 게이트
+
+- PR #110 ancestry의 영구 postgres 시험은 disposable migration DB에 Node/channel/snapshot 5행을 시드하고 helper read-only·before/after 동일·tenantId/DSN 비출력·ready 5/겸임 1/독립 4를 단언한다. 실 PG 1 passed/8.47s, PG-free 16 passed다.
+- Backend exact skip map에 local no-DSN 사유를 expected 0으로 등록해 hosted PostgreSQL에서는 반드시 실행되게 했다. no-DSN local collection은 같은 정확한 사유로 1 skipped이며 이를 통과로 세지 않는다.
+- S07 adapter 사양 v1.1.1에 `observation.py:146`의 60초 하드코드와 AC-07 `60초+poll` 경계를 명시했다. 실제 Node/Docker/wave는 미실행이고 reviewer Claude, S07-DB `review` 유지. [[2026-09-23_12-50-00_KST_5노드_preflight_실PG_영구게이트_Codex]].
 
 ## 2026-09-23 S07 Card17 커널 경로·등록 mTLS helper
 
