@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.117"
+version: "1.0.118"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T02:20:00+09:00"
+updated: "2026-09-23T02:42:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -36,20 +36,17 @@ source_of_truth: "Git"
 - **증거 정본**: `docs/vault/30_Development/Evidence/s02_fe_real_api_acceptance.json` (SHA `ae4d9003`, 4 PASS, 0 FAIL, 0 Mocks).
 - **보고서 전문**: [[2026-09-23_S02-FE_실제API_Chrome_로그인_Node0대_401_403_수용실측_Gemini]].
 
-## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 v1.1.1 및 실측 러너 골격 (`agent/gemini/s04-fe-matrix`)
+## 2026-09-23 S04-FE 실측 러너 골격 착지 및 Baseline 실측 완결 (`agent/gemini/s04-fe-runner`)
 
-- **OUT-04 / AC-04 완결을 위한 4대 핵심 축 13개 시나리오 매트릭스 (docs-only, Claude UI & Codex Contract 검토 전면 반영)**:
+- **`tools/run_s04_fe_matrix.py` 러너 골격 구현 및 Baseline 실측 수용**:
+  - **`s04-exp-00-expired-token-401`**: OIDC Code Flow 로그인 ➔ 진성 만료 RS256 토큰 wire 전송 ➔ 401 Unauthorized (`AUTH-0050`) ProblemDetails 수신 실측 **PASS** (`s04_exp00_token_401.png`).
+  - **미실행 12개 시나리오**: `status: UNMEASURED`, `reason: Scenario interaction pending implementation in runner skeleton` 정직 기록 (가짜 PASS 배제).
+  - **하네스 재현성 및 동적 집계**:
+    - Uvicorn 8080 제어평면(`saintvision.server:create_app`), Dev IdP 8090, Vite 3005, Headless Chrome 153 실소켓 기동 및 자동 정리(`finally`).
+    - 선행 요소(`dev_idp.py`, `server.env`) 부재 시 예외 크래시 대신 우아한 `UNMEASURED` 종료 및 exit code 3 반환.
+    - 증거 동적 집계: 13개 시나리오 중 실제 실행된 1건만 PASS, 12건 UNMEASURED (총 13건, 1 PASS, 0 FAIL, 12 UNMEASURED, `mockApiUsed: false`, `assessment: UNMEASURED`).
+  - **증거 정본**: `docs/vault/30_Development/Evidence/s04_fe_matrix_acceptance.json` (SHA `bb828e48`, ancestor exit 0).
   - **계획서 정본**: [[2026-09-23_S04-FE_만료_취소_중복_SSE재연결_시나리오_매트릭스_Gemini]] (v1.1.1).
-  - **만료 (EXP-00~03)**: 만료 Access Token 401 ProblemDetails(`AUTH-0050`) 독립 행 추가, DomainError 계약 정합 `retryable: false` 반영, 안건 `isExpired` 시 승인 확정 버튼 `disabled=true` 및 mutation 0건 차단, 5초 폴링 실패 시 침묵 노화(Silent Aging) 방어 배너 및 스냅샷 시각 명시, 서버 시효 만료 거부 정본 HTTP 403 `AUTH-0031` 반영 (410/AUTH-0040 배제).
-  - **취소 (CNC-01~03)**: 단말 상태(`succeeded`/`failed`) 취소 시 409 `GRAPH-0002` 및 기취소 안건 멱등 200 Replay 보장, ADR-001 4대 표준 사유는 UI 로컬 수집 후 wire 전송은 strict `RunCancelInput={expectedVersion}`와 `Idempotency-Key`만 전달 (사유 필드 포함 시 422 `VAL-0003` 방어), required boolean `resourceReleasePending` 관측 및 재조회.
-  - **중복 (DUP-01~03)**: `ApprovalDetail.tsx`의 `isSubmitting` 더블클릭 방어 및 동일 키 200 Replay, `Idempotency-Key` 본문 불일치(409 `IDEM-0001`)와 1회용 Nonce 소비/만료(403 `AUTH-0034`/`AUTH-0033`) 엄격 분리, 프로덕션 심볼 `isSelfApprovalBlocked` 2인 승인 규칙 차단.
-  - **SSE 재연결 (SSE-01~03)**: 1,000-entry RingBuffer at-least-once 중복 제거, 정본 서버 ID 규격 `{recoveryEpoch}:{runId}:{sequence}` 적용, `Last-Event-ID` 커서 기반 `sequence > last` 재연결(범위 이탈 시 409 `STREAM-0001`), 최상위 JSON `sequence` 단조 증가($seq_i > seq_{i-1}$) 보장.
-  - **돌연변이 사살 계획**: 시험 로컬이 아닌 실제 프로덕션 심볼(MUT-01 `isExpired`, MUT-02 `isSelfApprovalBlocked`, MUT-03 `isSubmitting`, MUT-04 `RingBuffer.has`)을 대상으로 전수 KILLED 단언 수립.
-  - **하네스 재현성 러너 골격 완성 (`tools/run_s04_fe_matrix.py`)**:
-    - 입력 매개변수화: `--chrome-path`, `--frontend-port`, `--backend-port`, `--idp-port`, `--dev-dir`, `--idp-script`, `--server-env`, `--dry-run` 전면 지원 (포트 변경 시 IdP allowlist 등록 안내 포함).
-    - F1 재현성 가드: 필수 선행 요소(`dev_idp.py`, `server.env`) 부재 시 예외 크래시 대신 우아한 `UNMEASURED` 종료 및 exit code 3 반환.
-    - 증거 실측값 결속: 13개 시나리오 상태, 모의 API 사용 여부(`mockApiUsed`), 백엔드/IdP 실제 기동 여부 동적 집계 (하드코딩 상수 배제).
-- **실측 계획**: Claude 및 Codex 독립 검토 승인 확인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
 
 ## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 재실측 완결 (`agent/gemini/ui-invariants-run`)
 
