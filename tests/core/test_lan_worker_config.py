@@ -65,6 +65,36 @@ def test_installer_metadata_upgrade_preserves_existing_identity():
     with pytest.raises(ValueError): worker.same_identity(old,current)
 
 
+def test_colocated_topology_is_explicitly_excluded_from_adr100_measurements():
+    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.74',
+                  coLocatedWithControlPlane=True,
+                  measurementEligible={'s05':False,'s07':False},
+                  exclusionReason='cp-host-colocation')
+    worker.validate_topology(manifest)
+
+
+@pytest.mark.parametrize('fault',['implicit','flag','s05','s07','reason'])
+def test_colocated_topology_mismatch_is_rejected(fault):
+    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.74',
+                  coLocatedWithControlPlane=True,
+                  measurementEligible={'s05':False,'s07':False},
+                  exclusionReason='cp-host-colocation')
+    if fault=='implicit': manifest.pop('coLocatedWithControlPlane')
+    elif fault=='flag': manifest['coLocatedWithControlPlane']=False
+    elif fault=='s05': manifest['measurementEligible']['s05']=True
+    elif fault=='s07': manifest['measurementEligible']['s07']=None
+    else: manifest['exclusionReason']=None
+    with pytest.raises(ValueError): worker.validate_topology(manifest)
+
+
+def test_independent_topology_remains_unmeasured_not_implicitly_eligible():
+    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.81',
+                  coLocatedWithControlPlane=False,
+                  measurementEligible={'s05':None,'s07':None},
+                  exclusionReason=None)
+    worker.validate_topology(manifest)
+
+
 def test_credential_copy_uses_container_owner_and_keeps_host_bytes(tmp_path):
     originals={name:(b'p'*32 if name=='signer.pub' else b'local-only-test-value') for name in worker.CREDENTIAL_FILES}
     for name,data in originals.items(): (tmp_path/name).write_bytes(data)

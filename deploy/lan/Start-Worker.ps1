@@ -3,6 +3,15 @@ param([Parameter(Mandatory=$true)][ValidatePattern('^[a-fA-F0-9]{64}$')][string]
       [ValidatePattern('^[a-fA-F0-9]{64}$')][string]$StoragePolicySHA256)
 $ErrorActionPreference = 'Stop'
 $manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'manifest.json') -Raw | ConvertFrom-Json
+$svIsColocated = [string]$manifest.serverIP -eq [string]$manifest.nodeIP
+if ($manifest.coLocatedWithControlPlane -ne $svIsColocated) {
+    throw 'Control Plane co-location metadata differs from the configured addresses.'
+}
+if ($svIsColocated -and ($manifest.measurementEligible.s05 -ne $false `
+        -or $manifest.measurementEligible.s07 -ne $false `
+        -or $manifest.exclusionReason -ne 'cp-host-colocation')) {
+    throw 'The co-located Node is not excluded from ADR-100 measurement denominators.'
+}
 $svStorageArgs = @()
 if ($StorageSource -or $StoragePolicySHA256) {
     if (-not $StorageSource -or -not $StoragePolicySHA256) { throw 'Specify both StorageSource and StoragePolicySHA256.' }

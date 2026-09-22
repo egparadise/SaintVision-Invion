@@ -17,6 +17,23 @@ CONFIG = ('User','Env','Cmd','WorkingDir','Entrypoint','OnBuild','Volumes','Labe
 CREDENTIAL_FILES = ('node-cert.pem','node-key.pem','ca.pem','signer.pub','peer-policy.json')
 
 
+def validate_topology(manifest):
+    """Fail closed when CP co-location metadata disagrees with immutable addresses."""
+    colocated = manifest['serverIP'] == manifest['nodeIP']
+    if (type(manifest.get('coLocatedWithControlPlane')) is not bool
+            or manifest['coLocatedWithControlPlane'] != colocated):
+        raise ValueError('Control Plane co-location metadata differs from Node addresses')
+    eligibility = manifest.get('measurementEligible')
+    if not isinstance(eligibility, dict) or set(eligibility) != {'s05','s07'}:
+        raise ValueError('Measurement eligibility metadata is incomplete')
+    expected = False if colocated else None
+    if any(eligibility.get(name) is not expected for name in ('s05','s07')):
+        raise ValueError('Measurement eligibility differs from co-location policy')
+    reason = manifest.get('exclusionReason')
+    if reason != ('cp-host-colocation' if colocated else None):
+        raise ValueError('Measurement exclusion reason differs from co-location policy')
+
+
 def credential_archive(directory):
     """Use explicit container ownership without changing the host private key."""
     files = {}
@@ -135,6 +152,9 @@ if __name__ == '__main__':
             check_running(sys.argv[2])
             raise SystemExit(0)
         first=json.loads(Path(sys.argv[2]).read_text())
+        if sys.argv[1]=='topology':
+            validate_topology(first)
+            raise SystemExit(0)
         second=json.loads(Path(sys.argv[3]).read_text())
         if sys.argv[1]=='identity':
             same_identity(first,second)

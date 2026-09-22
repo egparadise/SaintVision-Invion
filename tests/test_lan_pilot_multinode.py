@@ -15,9 +15,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import lan_pilot
 
 
-def node(node_id, node_ip, *, provisioned=True):
+def node(node_id, node_ip, *, provisioned=True, colocated=False):
     return dict(nodeId=node_id, nodeIP=node_ip, nodePort=18443,
-                provisioned=provisioned)
+                provisioned=provisioned,
+                coLocatedWithControlPlane=colocated)
 
 
 def state(nodes):
@@ -26,6 +27,8 @@ def state(nodes):
         epoch='epoch-test', tenantId='tenant-test', nodes=nodes,
         nodeId=primary['nodeId'], nodeIP=primary['nodeIP'], nodePort=18443,
         serverIP='192.168.45.74', downloadPort=18081, baseSHA='a' * 40,
+        serverNodeColocationAllowed=any(
+            current['nodeIP'] == '192.168.45.74' for current in nodes),
         agentImage='sha256:' + 'b' * 64, initialized=True,
     )
 
@@ -60,10 +63,59 @@ def test_node_addresses_are_private_unique_and_distinct_from_server():
     lan_pilot.validate_node_ips('192.168.45.74', ['192.168.45.81', '192.168.45.82'])
     with pytest.raises(ValueError, match='specified once'):
         lan_pilot.validate_node_ips('192.168.45.74', ['192.168.45.81', '192.168.45.81'])
-    with pytest.raises(ValueError, match='must differ'):
+    with pytest.raises(ValueError, match='allow-server-node-colocation'):
         lan_pilot.validate_node_ips('192.168.45.74', ['192.168.45.74'])
+    lan_pilot.validate_node_ips(
+        '192.168.45.74', ['192.168.45.74'],
+        allow_server_node_colocation=True)
     with pytest.raises(ValueError, match='private LAN'):
         lan_pilot.validate_node_ips('192.168.45.74', ['8.8.8.8'])
+
+
+def test_colocated_node_metadata_is_derived_and_cannot_be_forged():
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+        node('nod_01J00000000000000000000000', '192.168.45.74', colocated=True),
+    ])
+
+    assert lan_pilot.configured_nodes(configured)[1]['coLocatedWithControlPlane'] is True
+    configured['nodes'][1]['coLocatedWithControlPlane'] = False
+    with pytest.raises(ValueError, match='co-location metadata differs'):
+        lan_pilot.configured_nodes(configured)
+
+    configured['nodes'][1]['coLocatedWithControlPlane'] = True
+    configured['serverNodeColocationAllowed'] = False
+    with pytest.raises(ValueError, match='not authorized'):
+        lan_pilot.configured_nodes(configured)
+
+
+def test_colocated_node_addition_requires_persisted_opt_in():
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+    ])
+    with pytest.raises(ValueError, match='not authorized'):
+        lan_pilot.add_requested_nodes(configured, ['192.168.45.74'])
+
+    configured['serverNodeColocationAllowed'] = True
+    expanded, added = lan_pilot.add_requested_nodes(
+        configured, ['192.168.45.74'])
+    assert added[0]['nodeIP'] == '192.168.45.74'
+    assert expanded['nodes'][1]['coLocatedWithControlPlane'] is True
+
+
+def test_colocated_manifest_is_excluded_from_adr100_measurements():
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+        node('nod_01J00000000000000000000000', '192.168.45.74', colocated=True),
+    ])
+    manifest = lan_pilot.manifest_for_node(
+        configured, configured['nodes'][1],
+        {'RootFS': {'Layers': []}, 'Config': {}}, 'test:tag')
+
+    assert manifest['schemaVersion'] == 3
+    assert manifest['coLocatedWithControlPlane'] is True
+    assert manifest['measurementEligible'] == {'s05': False, 's07': False}
+    assert manifest['exclusionReason'] == 'cp-host-colocation'
 
 
 def test_csr_common_name_selects_exact_configured_node():

@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.192"
+version: "1.0.193"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T05:55:00+09:00"
+updated: "2026-09-23T06:15:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 LAN pilot Windows CP 겸임 Node
+
+- branch `agent/codex/lan-pilot-cp-colocated`, original base `ed200c33`, final base `4143f375`, implementation `8007ae12`, reviewer Claude. server==node 기본 거부를 유지하고 `--allow-server-node-colocation`과 protected state 승인이 함께 있을 때만 CP 겸임 identity를 추가한다.
+- schema-v3 manifest·worker_config·prepare/finish·Start-Worker가 `coLocatedWithControlPlane=true`, S05/S07 false, `cp-host-colocation`을 fail closed한다. PG-free 13+30 passed, PowerShell/bash parse와 CLI help exit 0이다.
+- 실제 state에는 Ubuntu identity 3개가 있고 image digest·host IP·18443 free는 확인했다. Docker Engine 20.10.22/API 1.41과 WSL Ubuntu 부재 때문에 실제 Windows 등록은 `BLOCKED`; 코디네이터가 Engine 25+/API1.45+·Ubuntu integration 뒤 수행한다. 5 Node·운영 인수·S05/S07 완료를 주장하지 않는다. [[2026-09-23_06-15-00_KST_LAN-PILOT-CP-COLOCATED_Codex_구현]].
 
 ## 2026-09-23 S05 legacy 큐 깊이 실측
 

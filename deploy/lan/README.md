@@ -120,6 +120,63 @@ IP addresses; each Node is accepted only after its own current mTLS observation
 and persisted resource snapshot. One failed worker does not authorize replacing
 or re-enrolling the other three; preserve the state and retry that worker.
 
+## Windows Control Plane host as a co-located worker
+
+ADR-100 allows one additional Node identity in Docker Desktop on the Windows
+Control Plane host. This is an explicit exception to the normal address
+separation rule: `init` continues to reject `serverIP == nodeIP` unless the
+operator supplies `--allow-server-node-colocation`. For the current pilot state,
+add only the Windows host address and preserve every existing Node, key, channel,
+CA, database, and recovery epoch:
+
+```powershell
+python tools/lan_pilot.py --state .work/lan-5node/node1 init `
+  --server-ip 192.168.45.74 --node-ip 192.168.45.74 `
+  --allow-server-node-colocation
+python tools/lan_pilot.py --state .work/lan-5node/node1 bundle --reuse-image
+```
+
+The generated schema-v3 manifest derives co-location from the immutable server
+and Node addresses. It must contain `coLocatedWithControlPlane: true`,
+`measurementEligible.s05: false`, `measurementEligible.s07: false`, and
+`exclusionReason: cp-host-colocation`. The installer rejects a manifest whose
+declaration differs from its addresses or whose ADR-100 exclusions are missing.
+Independent worker manifests use `null` eligibility here: this bootstrap does
+not silently promote them into a measurement lane before the full preflight.
+
+Restart `serve` after adding the Node so it reloads the state. Its
+`allowedNodeIPs` and Windows TCP 18081 firewall remote-address list must now
+include `192.168.45.74` exactly once. From the same Windows host, download
+`http://192.168.45.74:18081/worker.zip`; source-IP routing returns only the
+bundle assigned to the co-located Node. Compare it with that Node's separately
+printed SHA-256, extract it into a fresh directory outside `.work/lan-5node`,
+and use the ordinary Windows sequence:
+
+```powershell
+.\Prepare-Worker.ps1
+# Send only the printed CSR to the operator, then enroll it on the server.
+.\Start-Worker.ps1 -CertificateSHA256 <operator-supplied-file-sha256>
+```
+
+Docker Desktop must use Linux containers, expose server API 1.45 or newer, and
+have WSL integration enabled for the `Ubuntu` distribution because both
+PowerShell entry points delegate into the shipped shell scripts. The configured
+`192.168.45.74` address must be present on Windows. `Start-Worker.ps1` accepts an
+exact existing Node firewall rule or creates one limited to local TCP 18443 and
+the server address; it does not alter global profiles or add a port proxy.
+`finish-worker.sh` invokes `start-node.sh`, so do not call the latter directly.
+
+Acceptance still requires `status` and `observe --once` to show this distinct
+Node ID online with its own certificate, epoch, heartbeat, and current resource
+snapshot. It counts as the one co-located identity but does not by itself prove
+that five Nodes are registered; that requires all four Ubuntu identities too.
+It remains excluded in advance from S05 timed P95 and the S07 independent-host
+recovery denominator.
+It may appear only in the all-five topology smoke and the separately named
+`colocated-node-process-loss` scenario. A full Windows host outage is
+`correlated-cp-node-host-loss` and remains `UNMEASURED` without an external
+monotonic observer or separate Control Plane.
+
 ## Worker enrollment
 
 1. Obtain `http://192.168.45.99:18081/worker.zip` and verify its SHA-256 against

@@ -6,6 +6,7 @@ node_id=$(python3 -c 'import json; print(json.load(open("manifest.json"))["nodeI
 [[ "$node_id" =~ ^nod_[0-9A-HJKMNP-TV-Z]{26}$ ]] || exit 1
 worker_root="$HOME/.local/share/saintvision/$node_id"
 [[ -f "$worker_root/node-key.pem" ]] || { echo 'Run Prepare-Worker.ps1 first'; exit 1; }
+python3 worker_config.py topology manifest.json
 python3 worker_config.py identity "$worker_root/manifest.json" manifest.json
 if [[ $# -ne 0 ]]; then
     [[ $# -eq 2 ]] || exit 1
