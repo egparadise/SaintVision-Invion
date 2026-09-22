@@ -96,6 +96,55 @@ def test_legacy_single_node_public_paths_remain_downloadable(tmp_path):
         legacy, public, '192.168.45.81', '/node-cert.pem') == public / 'node-cert.pem'
 
 
+def test_secondary_node_never_falls_back_to_primary_legacy_artifacts(tmp_path):
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+        node('nod_01J00000000000000000000000', '192.168.45.82'),
+    ])
+    public = tmp_path / 'public'
+    public.mkdir()
+    (public / 'worker.zip').write_bytes(b'primary-worker-only')
+    (public / 'node-cert.pem').write_bytes(b'primary-certificate-only')
+
+    assert lan_pilot.artifact_for_client(
+        configured, public, '192.168.45.82', '/worker.zip') is None
+    assert lan_pilot.artifact_for_client(
+        configured, public, '192.168.45.82', '/node-cert.pem') is None
+
+
+@pytest.mark.parametrize('field', ['nodeId', 'recoveryEpoch', 'clientFingerprints'])
+def test_existing_peer_policy_mismatch_is_rejected_without_replacement(tmp_path, field):
+    configured = state([
+        node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
+    ])
+    ca_key, ca_cert = lan_pilot.ca_pair()
+    control_key = Ed25519PrivateKey.generate()
+    control = lan_pilot.issue(
+        ca_key, ca_cert, control_key.public_key(),
+        'spiffe://saintvision.ai/tenant/tenant-test/control-plane/epoch/epoch-test')
+    (tmp_path / 'control-cert.pem').write_bytes(lan_pilot.pem(control))
+    policy = dict(
+        version=1, tenantId=configured['tenantId'],
+        nodeId=configured['nodeId'], recoveryEpoch=configured['epoch'],
+        expiresAt='2099-01-01T00:00:00+00:00',
+        clientFingerprints=[lan_pilot.fingerprint(control)],
+    )
+    if field == 'nodeId':
+        policy[field] = 'nod_DIFFERENT'
+    elif field == 'recoveryEpoch':
+        policy[field] = 'different-epoch'
+    else:
+        policy[field] = ['0' * 64]
+    target = tmp_path / 'peer-policy.json'
+    target.write_text(json.dumps(policy, indent=2), encoding='utf-8')
+    before = target.read_bytes()
+
+    with pytest.raises(ValueError, match='Existing peer policy identity differs'):
+        lan_pilot.ensure_node_policy(tmp_path, configured, configured['nodes'][0])
+
+    assert target.read_bytes() == before
+
+
 def test_bundle_emits_distinct_node_archives_and_ip_scoped_downloads(tmp_path, monkeypatch, capsys):
     nodes = [
         node('nod_01HZZZZZZZZZZZZZZZZZZZZZZZ', '192.168.45.81'),
