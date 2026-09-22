@@ -603,6 +603,12 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       );
     });
 
+    // MUT-05 kill assertion: verify 3-tier pool capacity cards are rendered truthfully
+    expect(container.textContent).toContain('총 제공량 (Total Offered)');
+    expect(container.textContent).toContain('단일 노드 최대 한도 (Largest Single)');
+    expect(container.textContent).toContain('현재 유휴 여유량 (Spare Now)');
+    expect(container.textContent).toContain('16C · 64 GB · 1 GPU');
+
     const select = container.querySelector<HTMLSelectElement>('[data-testid="pool-member-select"]');
     expect(select).not.toBeNull();
 
