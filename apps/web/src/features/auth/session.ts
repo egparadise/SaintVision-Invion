@@ -67,16 +67,7 @@ export async function completeLogin(): Promise<{ token: string; user: SessionUse
   }
   const session = await fetch('/v1/session', { credentials: 'omit', redirect: 'error', cache: 'no-store',
     headers: { Authorization: `Bearer ${result.access_token}` } });
-  if (!session.ok) {
-    let msg = '서버가 인증 토큰을 허용하지 않았습니다.';
-    try {
-      const prob = await session.json();
-      if (prob?.code && prob?.detail) {
-        msg = `서버가 인증 토큰을 허용하지 않았습니다. (${prob.code}: ${prob.detail})`;
-      }
-    } catch {}
-    throw new Error(msg);
-  }
+  if (!session.ok) throw new Error('서버가 인증 토큰을 허용하지 않았습니다.');
   const identity = await session.json();
   if (typeof identity.subjectId !== 'string' || !/^oidc:[0-9a-f]{64}$/.test(identity.subjectId) ||
       typeof identity.tenantId !== 'string' || !identity.tenantId ||
