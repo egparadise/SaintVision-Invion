@@ -1,6 +1,7 @@
 ﻿"""Provisioning input and CLI failures never echo operator credentials."""
 
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import types
@@ -37,6 +38,38 @@ def test_manifest_error_has_no_input_text():
     with pytest.raises(tool.ProvisioningDenied) as raised:
         tool.validate_manifest({"secret": "synthetic-private-value"}, "register")
     assert str(raised.value) == "Credential provisioning refused"
+
+
+def test_malformed_typed_manifest_is_a_refusal_not_an_internal_error():
+    tool = module()
+    manifest = {
+        "tenant": "not-a-uuid",
+        "project": "prj_" + "1" * 26,
+        "subject": "requester",
+        "run": "run_" + "1" * 26,
+        "epoch": "not-a-uuid",
+        "credential": "not-a-uuid",
+        "version": "not-a-uuid",
+    }
+    with pytest.raises(tool.ProvisioningDenied):
+        tool.validate_manifest(manifest, "revoke")
+
+
+def test_malformed_json_is_reported_as_a_sanitized_refusal(monkeypatch, capsys, tmp_path):
+    tool = module()
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text("{ malformed synthetic-private-detail")
+    monkeypatch.setenv("INV_CREDENTIAL_ADMIN_DSN", "postgresql://synthetic-secret")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["provision", "register", "--root", "x", "--manifest", str(manifest)],
+    )
+    assert tool.main() == tool.EXIT_REFUSED
+    output = capsys.readouterr()
+    assert json.loads(output.out)["error"] == "credential_provisioning_refused"
+    assert "synthetic-private-detail" not in output.out + output.err
+    assert "synthetic-secret" not in output.out + output.err
 
 
 def test_missing_connection_configuration_does_not_leak(monkeypatch, capsys):

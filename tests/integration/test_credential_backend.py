@@ -3,7 +3,6 @@
 import hashlib
 import os
 from pathlib import Path
-import socket
 import subprocess
 import sys
 import tempfile
@@ -144,30 +143,34 @@ def credential_harness(env, tmp_path, monkeypatch):
             try:
                 os.chown(path, 1, 1)
             except PermissionError:
-                # The Linux runner drops CAP_CHOWN. Its own Docker exec helper
-                # creates one synthetic file as uid 1, never a host bind mount.
+                # Hosted Linux runners drop CAP_CHOWN.  Create one synthetic
+                # file as uid 1 in an isolated, networkless container and bind
+                # only this disposable directory into it.  The runner itself
+                # is not a container, so its hostname is not a Docker container
+                # identifier.
                 shared = Path(tempfile.mkdtemp(prefix="credential-owner-"))
                 shared.chmod(0o777)
                 other = shared / "synthetic"
                 try:
-                    code = (
-                        "import os; p="
-                        + repr(str(other))
-                        + "; fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600); os.write(fd,b'synthetic'); os.close(fd)"
-                    )
                     result = subprocess.run(
                         [
                             "docker",
-                            "exec",
+                            "run",
+                            "--rm",
+                            "--network",
+                            "none",
                             "--user",
                             "1:1",
-                            socket.gethostname(),
-                            "python",
+                            "--mount",
+                            f"type=bind,source={shared},target=/fixture",
+                            "--entrypoint",
+                            "sh",
+                            os.environ.get("INV_TEST_CREDENTIAL_OWNER_IMAGE", "postgres:16"),
                             "-c",
-                            code,
+                            "umask 077; printf synthetic > /fixture/synthetic",
                         ],
                         capture_output=True,
-                        timeout=15,
+                        timeout=30,
                     )
                     assert result.returncode == 0, "Isolated owner fixture unavailable"
                     os.replace(other, path)

@@ -1,23 +1,65 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "additionalProperties": false,
   "$defs": {
     "PoolListItemResponse": {
-      "type": "object",
       "additionalProperties": false,
       "properties": {
-        "poolId": { "type": "string" },
-        "projectId": { "type": "string" },
-        "name": { "type": "string" },
-        "status": { "enum": ["active", "archived"] },
-        "memberCount": { "type": "integer", "minimum": 0 }
+        "memberCount": {
+          "minimum": 0,
+          "title": "Membercount",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "poolId": {
+          "title": "Poolid",
+          "type": "string"
+        },
+        "projectId": {
+          "title": "Projectid",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "archived"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
       },
-      "required": ["poolId", "projectId", "name", "status", "memberCount"]
+      "required": [
+        "poolId",
+        "projectId",
+        "name",
+        "status",
+        "memberCount"
+      ],
+      "title": "PoolListItemResponse",
+      "type": "object"
     }
   },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "properties": {
-    "items": { "type": "array", "items": { "$ref": "#/$defs/PoolListItemResponse" } },
-    "count": { "type": "integer", "minimum": 0 }
+    "count": {
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/PoolListItemResponse"
+      },
+      "title": "Items",
+      "type": "array"
+    }
   },
-  "required": ["items", "count"]
+  "required": [
+    "items",
+    "count"
+  ],
+  "title": "PoolListResponse",
+  "type": "object"
 }
