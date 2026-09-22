@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T04:10:00+09:00"
+updated: "2026-09-23T04:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+검증상태지도 v1.5.0 §14.1 (Claude, 2026-09-23, 카드 aa, docs-only): F-S05-03 경합 재배치(카드 14 short-commit flag off 착지·hold P95 1400→122ms·내부 retry 증폭 55P03 35건·요청 P95 4.2%), 카드 18 조건부 승인(F-R1/F-R2 시험 보강), 코디네이터 결정 fail-fast 우선(내부 retry 제거·계약 0·limit-row 대기 계측, 입도 보류), 판정 기준 3조건, 카드 16 대기 반영. [[2026-09-19_Claude영역_검증상태지도]] (PR agent/claude/vsmap-fs0503)
 
 Codex 카드 11 독립 검토 → **승인** (Claude, 2026-09-23, 카드 z): 50d5ebc4 pitr_opt_in_dry_run.py — 코드 정독 쓰기 0(SELECT current_setting·filesystem plan만, apply/compose/ALTER 호출 없음, 출력 JSON만), dev PG 읽기 전용 1회 실행 → absent(archive_mode off)·mutations/acceptance 전부 False·결정 B 정직 표기·실행 후 설정 무변경, AC-12 드릴 초안 '드릴 전 미달성' 경계 유지, 시험 22 passed·check_docs PASS, 되살림 M1(acceptance 유도)·M2(mutation flag) 모두 KILLED. 관찰 2(inconclusive 원인 미기록·빈 디렉터리 observed). [[2026-09-23_Codex_카드11_PITR_opt-in_dry-run_50d5ebc4_독립검토_Claude]] (PR agent/claude/review-codex-card11)
 
