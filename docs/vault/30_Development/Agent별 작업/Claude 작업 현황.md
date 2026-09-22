@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T00:24:00+09:00"
+updated: "2026-09-23T00:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+PR #61 Web Desktop UI 불변식 9종 수용 계획(Gemini df411756) 독립 검토 → **수정 요청** (Claude, 2026-09-22): 코드 grep 대조 — 셀렉터·파일명 부재 14건(switch-to-desktop-btn·창 최대화:·data-window-id·desktop-dock·dock-running-dot·alt-tab-hud·useDesktopPersistence·desktop-top-bar·window-title-bar·pool-capacity-metric 등), 기대값 6건 불일치(최대화 기하·최소화=언마운트·Alt+Tab HUD 없음·Escape 포커스 복귀 없음·reserved/offered 소재·배너 문구), 정본(4종 실측 approved 보고 19:40)과 중복·모순(4→0·17.06/13.98을 미래 계획으로 재기술), 실측 명령 미명시(인용된 scenario 분기 부재, scratch/는 gitignore). [[2026-09-22_PR61_WebDesktop_UI불변식_9종_수용계획_독립검토_Claude]] (PR agent/claude/review-pr61)
 
 Codex 카드 3 독립 검토 → **조건부 승인** (Claude, 2026-09-22): b06fc199 inv URI resolver↔strict Manifest 결속(VF-CL-02d) — 실 PG HTTP 1 passed(ready/stale/404/타 project 403/폐기 후 403), inv_app 직접 접근 InsufficientPrivilege·GUC 미설정 0행, bindings PASS·freshness MISSING 0·route 44/0. 되살림 M2 KILLED, **M1(교집합 재검증 제거) SURVIVED** — 현 시험은 business reader scope 강등 경로를 안 밟음; 내 판별 시험(contribution revoked: kernel ready↔resolver []) 원본 pass·M1 fail. 후속 F1 = 그 케이스 추가(비차단). [[2026-09-22_Codex_카드3_inv_URI_resolver_kernel_manifest_결속_독립검토_Claude]] (PR agent/claude/review-codex-card3)
 
