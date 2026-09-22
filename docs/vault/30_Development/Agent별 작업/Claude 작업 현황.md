@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.9"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T22:15:00+09:00"
+updated: "2026-09-22T22:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -88,6 +88,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+CX-09 PITR Tier-A 활성 여부 결정 준비 (Claude, 2026-09-22): runbook v1.2.0 실측(dev PG absent·리허설 PASS 1/FAIL 5·잔재 0·보관 7일)을 근거로 A(지금 활성, 재시작 창+외부 볼륨+readiness possible 전제, 이후 AC-12 드릴 카드) vs B(CX-09까지 유예, 릴리스 시점 위험 집중) 비교. 권고 A(전제 2). '설정≠RPO 증거' 기록 규칙 유지. 코디네이터 결정 요청. 전문 [[2026-09-22_CX-09_PITR_Tier-A_활성여부_결정준비_Claude]].
+
 
 S01-BE·S01-ST 잔여 합격 조건 표 (Claude, 2026-09-22): AC-01 요구 증거(계약 검증·설계 검토·인벤토리 보고)별 충족/미충족(우리 몫)/외부 대기(U1~U6 사용자 입력)를 가르고 S02 체크리스트 절 번호에 연결. 사용자 결정 6건 맨 위. 우리 몫 3건(증거 기록 갱신=Codex, 인벤토리 표 양식+미확인 열=Claude, 보존 정리 실측=Claude). 판정 아님(self-close 금지). 전문 [[2026-09-22_S01-BE_S01-ST_잔여_합격조건표_Claude]].
 
