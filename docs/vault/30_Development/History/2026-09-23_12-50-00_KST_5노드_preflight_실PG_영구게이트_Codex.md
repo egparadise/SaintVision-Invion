@@ -25,8 +25,8 @@ Backend CI는 PostgreSQL을 제공하므로 이 시험을 skip해서는 안 된�
 ## 증거와 정직성
 
 - base stack: PR #110 rebased head `034413fced9607cec8a326b107627c3dcdafa4a6`
-- implementation commit: `ad715574`
-- 실 PG: `pytest -q tests/integration/test_five_node_lab_preflight.py` → 1 passed / 8.47s / exit 0, disposable DB/role 정리
+- implementation commits: `ad715574`, `3640c180`
+- 실 PG: `pytest -q tests/integration/test_five_node_lab_preflight.py` → 1 passed / 8.76s / exit 0, disposable DB/role 정리. serialized report에서 tenant UUID·`tenantId`·full DSN 부재를 직접 단언
 - PG-free: `pytest -q tests/test_placement_benchmark_five_node_adapter.py` → 16 passed / exit 0
 - no-DSN: integration file 1 skipped / exit 0, exact declared local reason 확인
 - Backend skip baseline zero-count 의미 대조, workflow YAML parse, `check_docs.py` 886 documents, `git diff --check` → exit 0
