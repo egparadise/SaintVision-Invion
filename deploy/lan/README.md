@@ -112,8 +112,9 @@ bash finish-worker.sh
 
 `finish-worker.sh` rechecks the fixed identity, preserves the key made by
 `prepare-worker.sh`, copies only the assigned public/configuration material, and
-delegates container startup to `start-node.sh`. Do not call `start-node.sh`
-before the certificate and identity checks. Finally run `status` and `observe
+delegates container startup to `start-node.sh`. Therefore the operator does not
+need to call `start-node.sh` directly; doing so before the certificate and
+identity checks bypasses the intended installation sequence. Finally run `status` and `observe
 --once` on the server. Their `nodes` arrays must show four distinct Node IDs and
 IP addresses; each Node is accepted only after its own current mTLS observation
 and persisted resource snapshot. One failed worker does not authorize replacing
