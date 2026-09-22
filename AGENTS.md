@@ -42,7 +42,7 @@
 - 매 작업 종료·인계·중단 전에 **작업한 것 → 확인한 것(명령·exit code·환경·Evidence) → 이어서 할 첫 행동과 담당**을 자기 작업판과 History에 남긴다. 공통 진행판에는 한 줄 요약을 반영한다.
 - 구현·로컬 검증·CI·독립 검토·운영 인수 상태를 따로 기록한다. 미확인/차단을 완료로 바꾸지 않고, 차단된 카드 외의 ready 작업은 계속한다.
 - 집계 owner는 Orca 관리 역할이며 실제 관리 세션이 없으면 Codex가 맡는다. 다른 Agent의 수신·착수·검토를 대신 완료 처리하지 않는다.
-- 오래된 worktree는 공유 Obsidian의 `C:\Users\egpar\OneDrive - Inviz\15.Vibe Cording\Obsidian\SaintVision-Invion\00_Index\전체 개발 진행 현황.md`에서 최신 배포본과 Git source를 확인한다. 최신 페이지가 없는 branch는 최초 전달 branch `agent/codex/workspace-bridge`의 진행 문서를 확인한다. 오래된 vault 전체를 최신 공유본 위에 export하지 않는다.
+- 오래된 worktree는 공유 Obsidian의 `C:\Users\inviz\OneDrive - Inviz (1)\15.Vibe Cording\Obsidian\SaintVision-Invion\00_Index\전체 개발 진행 현황.md`에서 최신 배포본과 Git source를 확인한다. 최신 페이지가 없는 branch는 최초 전달 branch `agent/codex/workspace-bridge`의 진행 문서를 확인한다. 오래된 vault 전체를 최신 공유본 위에 export하지 않는다.
 - 상세 규칙은 `docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md`다. 긴 로그는 History/Evidence에 보존하고 진행판은 현재 상태·다음 담당을 유지한다.
 
 ## 검증
