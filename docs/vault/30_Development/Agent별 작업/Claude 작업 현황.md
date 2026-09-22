@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.7"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T18:30:00+09:00"
+updated: "2026-09-22T20:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -84,6 +84,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+route_coverage CLI docs.yml report-only 배선 (Claude, 2026-09-22): `continue-on-error`+`exit 0`으로 job 미실패, 실제 exit는 step-summary 제목·로그에 기록, json/txt artifact. 서빙 트리는 src·services(tests 제외). 검증검사도구_목록 v1.4.0에 등급·승격 조건(1주 exit 0 ∧ 백로그 0 → ratchet 이름집합). 로컬 step 시뮬레이션 exit 0·43/0. 브랜치 agent/claude/route-coverage-docs-gate(PR #45 위 stack), 워크플로는 Codex 소유라 검토 요청. 전문 [[2026-09-22_route_coverage_CLI_docs.yml_report-only_배선_Claude]].
+
 
 새 PC 첫날 — CI 첫 실행 triage + 이전 후 전수 검증 (Claude, 2026-09-22): SHA d01c931a. CI 4 workflow 관측(docs 성공·backend/core/browser 실패) → 원인 5(C1 계약 drift=B1 회귀·C2 rdflib=B2·C3 docker exec·C4 자격증명 매핑·C5 브라우저 3=A), **Claude 레인 0**. 작성 중 Codex가 C1~C4를 착지(881f2911·51d53b7f) → 2차 실행에서 C5=`test_desktop_browser`·`test_studio_browser`(Gemini)로 귀속, **C6 신규**=vitest 시간 포맷이 러너 locale에 기댐(B2, Gemini). CI가 처음 검증한 것: Go 컴파일·race·announce_test 해소(Go 지도 갱신), PG-in-CI로 2964 수집/58 skip, node 레인 5개 0실패. 새 PC 전수(절차서 §5, clean 트리): 게이트 PASS·프런트 기준선 동일(tsc/build/vitest 655/contracts 16)·pytest 실PG 2549 passed/2 failed/408 skip(failed 2는 단독 통과: `.work` 선존재 가정·공유 PG 경합 추정). 환경 차이 1: check_frontend_integrity가 cp949 콘솔에서 ✔ 출력으로 exit 1(검사는 0위반) → Gemini 짚어 넘김, 이 PC는 PYTHONUTF8=1. Go 이 PC에도 없음(CI 위임). 전문 [[2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude]].
 

@@ -36,6 +36,33 @@ jobs:
         run: |
           python tools/check_fixture_reachability.py | tee fixture-reachability.txt
           cat fixture-reachability.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Report client route coverage (report-only; promote per 검증검사도구_목록)
+        # Which /v1 paths the SPA asks for and which nothing serves. Introduced
+        # 2026-09-22 as report-only: exit code is recorded, never blocks the job.
+        # Promotion to ratchet requires one week green and backlog 0.
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python tools/route_coverage.py --served src --served services/control-plane/src             --client apps/web/src --json > route-coverage.json
+          rc=$?
+          python tools/route_coverage.py --served src --served services/control-plane/src             --client apps/web/src > route-coverage.txt
+          {
+            echo "## Client route coverage (report-only, exit=$rc)"
+            echo '```'
+            cat route-coverage.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "route_coverage exit=$rc (0=all served, 1=unserved paths, 2=no client paths)"
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: route-coverage-report
+          path: |
+            route-coverage.json
+            route-coverage.txt
+          retention-days: 30
       - run: python tools/test_sync.py
       - run: python tools/check_ontology_generation.py
       - run: python tools/check_ontology.py
