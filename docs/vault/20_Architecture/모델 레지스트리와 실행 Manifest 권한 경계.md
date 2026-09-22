@@ -1,11 +1,11 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.10.0"
+version: "1.11.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-22T21:18:16+09:00"
+updated: "2026-09-22T21:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -172,3 +172,14 @@ INV_API_CONFIG의 modelRegistryPolicy를 생산 factory가 읽어 승인/dispatc
 - `resolve_model`은 kernel이 보고한 모든 `locationId/locationVersion/readyNodes`를 제한된 business catalog에서 다시 확인한다. 최종 `readyNodes`는 두 관측의 교집합뿐이며 business 경계가 kernel 관측에 없던 node를 추가할 수 없다. location 누락·version drift·ready replica 소실은 매핑별 빈 배열과 `materialisable=false`로 강등하고, 전체 값도 모든 shard가 materialisable일 때만 true다.
 - `inv_app`에는 `inv.model_manifests`·`inv.model_shard_locations` 직접 권한을 주지 않는다. tenant GUC가 없는 public RLS 조회는 0행이고, 커널 manifest는 strict 계약 값으로만 경계를 건넌다.
 - 이 조회도 실행 permit이 아니다. `executionAuthorized=false`와 `requiresExecutionRevalidation=true`를 유지하며 approval, lease, fence, frozen input, 실제 bytes 검증을 만들거나 대체하지 않는다.
+
+
+## node-agent wire 소비 경계 (1.11.0, VF-CL-02 option e)
+
+node-agent는 resolver의 `ModelExecutionManifestObservation`을 임의 map이나 완화 DTO로 받지 않는다. `services/node-agent/internal/wire/core.schema.json`에 동기화된 canonical `$defs`를 먼저 검증하고, 생성된 `contracts-go.ModelExecutionManifestObservation`으로 역직렬화한다.
+
+- 소비자는 요청 시 고정한 `projectId`, `modelId`, `version`, `manifestHash`를 응답과 모두 대조한다. 하나라도 다르면 `NODE-0070`으로 전체 입력을 거부한다.
+- schema가 보장하는 연속 `ModelShard[]`와 shard별 최소 `{locationId, locationVersion}` 매핑, `readyNodes`, `materialisable`을 그대로 소비한다. 누락 필드나 완화된 추가 필드는 wire schema 단계에서 거부한다.
+- `executionAuthorized`는 반드시 `false`, `requiresExecutionRevalidation`은 반드시 `true`여야 한다. resolver 결과는 가용성 관측일 뿐이며 node-agent 실행 permit, approval, lease, fence, frozen input, 실제 bytes/hash 재검증을 대신하지 않는다.
+- HTTP 실 PG 판별 시험은 kernel 관측 뒤 business reader scope만 폐기한다. 이때 kernel은 ready node를 계속 보고하지만 resolver는 `readyNodes=[]`, `materialisable=false`로 강등해야 한다. 교집합 재검증 두 줄을 제거하는 M1은 이 경로에서 실패한다.
+- 계약 변경은 canonical schema에서만 시작하고 `tools/generate_contracts.py`가 node-agent mirror와 Go 타입을 다시 만든다. node-agent wire 시험은 canonical fixture를 embedded mirror로 검증하고 생성 Go 타입까지 실제 컴파일해 drift를 차단한다.

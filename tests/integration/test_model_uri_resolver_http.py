@@ -146,6 +146,24 @@ def test_model_uri_resolution_rechecks_both_roles_and_never_replays_authority(ru
             stale = client.get(url, params={"uri": model_uri}, headers=_auth())
             with psycopg.connect(a.e.owner) as conn:
                 conn.execute(
+                    "UPDATE public.data_replicas SET state='ready' WHERE location_id=%s",
+                    (location[0],),
+                )
+                conn.execute(
+                    "UPDATE public.storage_contributions "
+                    "SET status='revoked',revoked_at=now() WHERE contribution_id=%s",
+                    (a.contribution,),
+                )
+            kernel_after_reader_scope_revocation = client.get(
+                f"/v1/projects/{a.e.project}/models/{a.body['modelId']}"
+                f"/versions/{a.body['version']}/execution-manifest",
+                headers=_auth(),
+            )
+            business_after_reader_scope_revocation = client.get(
+                url, params={"uri": model_uri}, headers=_auth()
+            )
+            with psycopg.connect(a.e.owner) as conn:
+                conn.execute(
                     "DELETE FROM public.project_members "
                     "WHERE tenant_id=%s AND project_id=%s AND user_id=%s",
                     (a.e.tenant, a.e.project, a.user),
@@ -171,6 +189,22 @@ def test_model_uri_resolution_rechecks_both_roles_and_never_replays_authority(ru
         assert stale.json()["shardLocations"][0]["readyNodes"] == []
         assert stale.json()["shardLocations"][0]["materialisable"] is False
         assert stale.json()["materialisable"] is False
+        assert kernel_after_reader_scope_revocation.status_code == 200
+        assert kernel_after_reader_scope_revocation.json()["shardLocations"][0][
+            "readyNodes"
+        ] == [a.e.node]
+        assert business_after_reader_scope_revocation.status_code == 200
+        validate_contract(
+            "ModelExecutionManifestObservation",
+            business_after_reader_scope_revocation.json(),
+        )
+        assert business_after_reader_scope_revocation.json()["shardLocations"][0][
+            "readyNodes"
+        ] == []
+        assert business_after_reader_scope_revocation.json()["shardLocations"][0][
+            "materialisable"
+        ] is False
+        assert business_after_reader_scope_revocation.json()["materialisable"] is False
         assert missing.status_code == 404
         assert missing.json()["code"] == "MODEL-0004"
         validate_contract("ProblemDetails", missing.json())
