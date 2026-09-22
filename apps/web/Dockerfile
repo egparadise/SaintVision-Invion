@@ -19,12 +19,13 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy optimized intranet reverse proxy configuration
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY security-headers.conf /etc/nginx/security-headers.conf
 
 # Expose HTTPS port
 EXPOSE 443
 
 # Healthcheck for zero-downtime deployment verification
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-check-certificate -qO- https://localhost/ || exit 1
+  CMD wget -qO- http://127.0.0.1/healthz || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
