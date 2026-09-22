@@ -92,6 +92,7 @@ export const App: React.FC = () => {
       setNodes([]);
       setProjects([]);
       setAuthError(`[${problem.code}] ${problem.detail}`);
+      setActiveTab('login');
     });
     return () => onUnauthorized(null);
   }, []);
@@ -114,13 +115,6 @@ export const App: React.FC = () => {
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
   };
 
-  useEffect(() => {
-    (window as any).__chooseProject = chooseProject;
-    (window as any).__setActiveTab = setActiveTab;
-    (window as any).__simulateTokenExpired = () => {
-      apiClient('/v1/session', { headers: { Authorization: 'Bearer invalid_or_expired_token' } }).catch(() => {});
-    };
-  }, []);
   useEffect(() => {
     let active = true;
     setProjects([]); chooseProject(''); setProjectError(null);
@@ -188,17 +182,21 @@ export const App: React.FC = () => {
       setNodesState('idle');
       return;
     }
+    const targetPrj = projectId || activeProject.current;
+    if (!targetPrj) {
+      setNodesState('idle');
+      return;
+    }
     const request = ++nodeRequest.current;
     setNodesState('loading');
     setNodeError(null);
     try {
       let page: NodePageResponse;
       try {
-        page = await apiClient<NodePageResponse>('/v1/nodes');
+        page = await apiClient<NodePageResponse>(`/v1/projects/${encodeURIComponent(targetPrj)}/nodes`);
       } catch (err: any) {
-        const targetPrj = projectId || 'prj_01M33NGQEZTB2QD1CWV97Y7DSN';
-        if (isRouteNotFoundError(err) && targetPrj) {
-          page = await apiClient<NodePageResponse>(`/v1/projects/${encodeURIComponent(targetPrj)}/nodes`);
+        if (isRouteNotFoundError(err)) {
+          page = await apiClient<NodePageResponse>('/v1/nodes');
         } else {
           throw err;
         }
@@ -431,7 +429,6 @@ export const App: React.FC = () => {
         totalNodesCount={nodes.length}
         activeTab={activeTab}
         onSelectTab={(tab) => {
-          console.log('[Header onSelectTab]', tab);
           setActiveTab(tab);
           setSelectedNodeId(null);
           setNodeResourceUsage(null);
@@ -863,7 +860,9 @@ export const App: React.FC = () => {
         {/* Tab 6: Login */}
         {activeTab === 'login' && (
           <Login
+            initialError={authError}
             onLoginSuccess={(user) => {
+              setAuthError(null);
               setCurrentUser(user);
               setActiveTab('dashboard');
             }}

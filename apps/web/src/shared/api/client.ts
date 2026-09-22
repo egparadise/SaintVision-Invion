@@ -138,14 +138,7 @@ export function isRouteNotFoundError(err: any): boolean {
   }
   // Generic Starlette / FastAPI unmapped route response: {"detail": "Not Found"}
   // or network-level client synth 404: code === "NET-0404"
-  // or FastAPI HTTPException mapped 404: code === "HTTP-0001", detail: "Request unavailable"
-  return (
-    problem?.detail === 'Not Found' ||
-    problem?.detail === 'Request unavailable' ||
-    problem?.code === 'NET-0404' ||
-    problem?.code === 'HTTP-0001' ||
-    !problem?.code
-  );
+  return problem?.detail === 'Not Found' || problem?.code === 'NET-0404' || !problem?.code;
 }
 
 /**

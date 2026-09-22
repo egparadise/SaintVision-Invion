@@ -1,8 +1,8 @@
 {
   "schema": "https://saintvision.ai/evidence/s02-fe-real-api.schema.json",
   "version": "1.0.0",
-  "timestamp": "2026-09-22T23:58:30.182187+09:00",
-  "gitCommitSha": "b3f6db051a8fd2ddb8f87911bea3a69270b10b8d",
+  "timestamp": "2026-09-23T01:04:56.714788+09:00",
+  "gitCommitSha": "293c86b1935295f2f9154448fb2205a497421b7b",
   "assessment": "ACCEPTANCE_PASSED",
   "operationalAcceptanceAssessed": true,
   "environment": {
@@ -34,6 +34,7 @@
       "name": "Node 목록 실데이터 (0대 정직 표기)",
       "status": "PASS",
       "observations": {
+        "activeProjectId": "prj_01M33NGQEZTB2QD1CWV97Y7DSN",
         "nodesEndpointStatus": 200,
         "observedWireNodeCount": 0,
         "wireItems": [],
@@ -53,9 +54,9 @@
         "problemCode": "AUTH-0030",
         "problemDetail": "Project permission is unavailable",
         "problemCategory": "AUTH",
-        "problemTraceId": "57f91043886c7c3f4fe0734ffcf428f7",
+        "problemTraceId": "4c647e4b7fe5eb2ed93e05b27c140611",
         "domAlertRole": "alert",
-        "domAlertText": "[AUTH-0030] Project permission is unavailable (traceId: dd6bd03143cc52f9829782e55b2613b3)",
+        "domAlertText": "[AUTH-0030] Project permission is unavailable (traceId: e20795e3dfb1fa947822e00119069d6e)",
         "screenshot": "s02_03_project_403.png"
       }
     },
@@ -83,6 +84,7 @@
     "totalScenarios": 4,
     "passed": 4,
     "failed": 0,
+    "unmeasured": 0,
     "mockApiUsed": false,
     "realUvicornUsed": true,
     "realDevIdPUsed": true
