@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunArtifactList, RunAttemptList, ShardObservation } from '@/contracts/types';
+import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunArtifactList, RunAttemptList, ShardObservation, ModelRetryPrepareResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
-import { apiClient } from '@/shared/api/client';
+import { apiClient, ApiError } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
 import { fetchRunLogs } from '@/shared/api/runLogObservation';
 import { fetchRunArtifacts, getArtifactDownloadUrl } from '@/shared/api/runArtifactObservation';
 import { fetchRunAttempts } from '@/shared/api/runAttemptObservation';
+import { prepareModelRetry, formatModelRetryProblem } from '@/shared/api/modelRetry';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -66,6 +67,38 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [attemptError, setAttemptError] = useState<string | null>(null);
   const [actionNotice, setActionNotice] = useState<{ type: 'error' | 'success' | 'info'; message: string } | null>(null);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [isPreparingRetry, setIsPreparingRetry] = useState(false);
+  const [retryResult, setRetryResult] = useState<ModelRetryPrepareResult | null>(null);
+  const [retryError, setRetryError] = useState<string | null>(null);
+
+  const handlePrepareModelRetry = async () => {
+    if (!run.projectId) {
+      setRetryError('프로젝트 식별자(projectId)가 없어 Model Retry를 요청할 수 없습니다. (위조 식별자 합성 방지)');
+      return;
+    }
+    setIsPreparingRetry(true);
+    setRetryError(null);
+    try {
+      const result = await prepareModelRetry(run.projectId, run.id, {
+        input: {
+          cpuMillis: run.resourceRequest?.cpuMillis ?? 500,
+          memoryBytes: run.resourceRequest?.memoryBytes ?? 1073741824,
+          gpuCount: run.resourceRequest?.gpuCount ?? 0,
+        },
+      });
+      setRetryResult(result);
+      onRefreshRun?.();
+    } catch (err: any) {
+      if (err instanceof ApiError && err.problem) {
+        setRetryError(formatModelRetryProblem(err.problem, run.projectId));
+      } else {
+        const detail = err?.problem?.detail || err?.detail || err?.message || 'Model Retry 요청 실패';
+        setRetryError(`Model Retry 요청 실패: ${detail}`);
+      }
+    } finally {
+      setIsPreparingRetry(false);
+    }
+  };
 
   const handlePrepareResume = async () => {
     if (!run.projectId) {
@@ -100,6 +133,8 @@ export const RunDetail: React.FC<RunDetailProps> = ({
     setShards([]);
     setShardObservation(null);
     setReclaimNotice(null);
+    setRetryResult(null);
+    setRetryError(null);
     setIsLoadingShards(true);
     fetchShardObservation(run.projectId, run.id).then(result => {
       if (mounted) {
@@ -323,6 +358,107 @@ export const RunDetail: React.FC<RunDetailProps> = ({
         </div>
       )}
 
+      {/* Model Retry Error Alert */}
+      {retryError && (
+        <div
+          role="alert"
+          data-testid="model-retry-error-alert"
+          style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #ef4444',
+            borderRadius: 'var(--radius-md)',
+            color: '#fca5a5',
+            fontSize: '0.875rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span>{retryError}</span>
+          <button
+            type="button"
+            data-testid="close-retry-error-btn"
+            onClick={() => setRetryError(null)}
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '1rem' }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Model Retry Success Banner with Honest Disclosure (requiresFrozenInputAndApproval: true) */}
+      {retryResult && (
+        <div
+          role="status"
+          data-testid="model-retry-success-banner"
+          style={{
+            padding: '16px 20px',
+            marginBottom: '20px',
+            backgroundColor: 'rgba(34, 197, 94, 0.08)',
+            border: '1px solid #22c55e',
+            borderRadius: 'var(--radius-md)',
+            color: '#e2e8f0',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <h4 style={{ margin: '0 0 8px 0', color: '#4ade80', fontSize: '1rem', fontWeight: 600 }}>
+                ✓ Model Retry (세대: Generation {retryResult.generation}) 준비 완료
+              </h4>
+              <p style={{ margin: '0 0 8px 0', fontSize: '0.875rem', lineHeight: 1.5 }}>
+                부모 Run(<code>{retryResult.parentRunId}</code>)의 입력 파일, 체크포인트 및 환경 설정이 <strong>불변 동결(Frozen)</strong>되었으며,
+                신규 자식 Run(<code>{retryResult.run.runId}</code>)에 대한 노드 배치 예약(<code>{retryResult.placement.nodeId}</code>, 리스 {retryResult.placement.leases.length}건)이 체결되었습니다.
+              </p>
+              <div
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                  borderLeft: '3px solid #eab308',
+                  borderRadius: '4px',
+                  fontSize: '0.8125rem',
+                  color: '#fef08a',
+                  marginBottom: '12px',
+                }}
+              >
+                ⚠️ <strong>정직 고지</strong>: 본 재시도는 자동 실행되지 않으며, 인공지능 거버넌스 2인 규칙에 따라 <strong>거버넌스 승인 센터(S04)의 정식 검토 및 승인이 완료된 후</strong> 스케줄링됩니다.
+              </div>
+            </div>
+            <button
+              type="button"
+              data-testid="close-retry-success-btn"
+              onClick={() => setRetryResult(null)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1.25rem', marginLeft: '12px' }}
+            >
+              ×
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            {onNavigateApproval && (
+              <Button
+                variant="primary"
+                size="sm"
+                data-testid="goto-approval-from-retry-btn"
+                onClick={() => onNavigateApproval(retryResult.run.runId)}
+              >
+                🛡️ 승인 센터로 이동 (S04)
+              </Button>
+            )}
+            {onNavigateRun && (
+              <Button
+                variant="secondary"
+                size="sm"
+                data-testid="goto-child-run-btn"
+                onClick={() => onNavigateRun(retryResult.run.runId)}
+              >
+                📄 신규 Run 상세 보기
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -399,6 +535,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
                   종료: {run.updatedAt ? new Date(run.updatedAt).toLocaleString('ko-KR') : '미관측 (UpdatedAt Absent)'}
                 </span>
               )}
+              {retryResult && (
+                <div data-testid="retry-child-lineage-section" style={{ width: '100%', marginTop: '8px', fontSize: '0.8125rem', color: '#38bdf8' }}>
+                  <span>루트: <code>{retryResult.rootRunId}</code></span>
+                  <span style={{ margin: '0 8px' }}>•</span>
+                  <span>부모: <code>{retryResult.parentRunId}</code></span>
+                  <span style={{ margin: '0 8px' }}>•</span>
+                  <span>세대: <strong>Gen {retryResult.generation}</strong></span>
+                  <span style={{ margin: '0 8px' }}>•</span>
+                  <span>자식 Run: <code>{retryResult.run.runId}</code> ({retryResult.run.state.toUpperCase()})</span>
+                  <span style={{ margin: '0 8px' }}>•</span>
+                  <span>노드: <code>{retryResult.placement.nodeId}</code></span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -407,6 +556,19 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           {run.state === 'recovering' && (
             <Button variant="primary" size="md" onClick={handlePrepareResume} disabled={isPreparingResume}>
               {isPreparingResume ? '준비 중...' : '🚀 재개 Step 승인 준비 (ADR-044)'}
+            </Button>
+          )}
+
+          {run.state === 'failed' && (
+            <Button
+              variant="primary"
+              size="md"
+              data-testid="model-retry-prepare-btn"
+              onClick={handlePrepareModelRetry}
+              disabled={isPreparingRetry || !run.projectId}
+              title={!run.projectId ? '프로젝트 미지정 실행 (재시도 불가)' : undefined}
+            >
+              {isPreparingRetry ? '⏳ 배치 예약 준비 중...' : '🔄 Model Retry 준비'}
             </Button>
           )}
 
