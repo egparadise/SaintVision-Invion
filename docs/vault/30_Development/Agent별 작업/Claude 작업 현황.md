@@ -15,7 +15,7 @@ source_of_truth: "Git"
 - 배정 owner: Claude. 독립 reviewer: Codex. 최신 수신·착수·독립검토 상태는 아래 SHA별 인계 기록을 따른다.
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill service-integration v1.0.0. 계획: [[Backend 최종 개발 계획]], [[DB 최종 개발 계획]], [[Storage 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
+- 확인 기준: 2026-09-22T17:00:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
 
@@ -82,6 +82,11 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+결정 #6·#7 준비 완결 (Claude, 2026-09-22): 결정 #7(노드 시각 스큐 알람) 선행 조건인 ERR-DESIGN-007 규격 개정안([[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Claude]]) 및 결정 #6(미연결 능력 부류 3종 현황·노출분석, [[2026-09-22_미연결_능력_부류_현황_및_노출분석_Claude]]) 작성 완료. 커널 런타임 가드(±5초) 공인, P2 알람 라우팅 정합, 실 PG 검증 시험 명세 및 실패 Run 재시도(ModelRetry)/온디맨드 복구/배치 예약 분석 수립.
+
+Codex origin/integration 착지 4건 독립 검토 완결 (Claude, 2026-09-22): `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구). 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정. 전문 [[2026-09-22_16-55-00_KST_Claude_Codex착지4건_독립검토]].
+
 
 새 PC triage 지도 v1.1.0 (Claude, 2026-09-22): 2차 CI 실행 반영 — C5 브라우저 클래스 귀속(Gemini)·C6 vitest locale(B2)·**C7 backend no-skip 게이트 vs 플랫폼 skip 45**(Codex ratchet 착지), **backend 첫 완주 2645 passed/45 skip/0 fail**(3.14), machinery 발견: cancel-in-progress로 backend·core가 integration에서 success 0회(문서 push도 취소 유발) → Codex 인계·문서-only push 지연 규율. PR #43. 전문 [[2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude]].
 
