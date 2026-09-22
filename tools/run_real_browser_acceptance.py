@@ -1257,20 +1257,35 @@ def run_scenario(
                     const ratioHeader = contrastRatio(lumHeaderText, lumHeaderBg);
 
                     // 2. Window Title bars: distinguish Active Window Title and Inactive Window Title
-                    const titleEls = Array.from(document.querySelectorAll('div[id^="window-title-"]'));
+                    const dialogs = Array.from(document.querySelectorAll('div[role="dialog"]'));
                     let activeTitleEl = null;
                     let inactiveTitleEl = null;
-                    for (const el of titleEls) {
-                        const tStyle = window.getComputedStyle(el);
-                        // In DesktopWindow, active has #f8fafc (rgb(248, 250, 252)) while inactive has text-muted rgb(156, 163, 175) / rgb(148, 163, 184)
-                        if (tStyle.color.includes('248, 250, 252') || tStyle.color.includes('248,250,252')) {
-                            activeTitleEl = el;
+
+                    for (const dialog of dialogs) {
+                        const titleEl = dialog.querySelector('div[id^="window-title-"]');
+                        if (!titleEl) continue;
+                        const headerEl = titleEl.parentElement;
+                        const hBg = window.getComputedStyle(headerEl).backgroundColor;
+                        const tColor = window.getComputedStyle(titleEl).color;
+
+                        // Active window title bar header has #1e293b (rgb(30, 41, 59))
+                        // Inactive window title bar header has #0f172a (rgb(15, 23, 42))
+                        const isActiveHeader = hBg.includes('30, 41, 59') || hBg.includes('30,41,59');
+                        const isActiveColor = tColor.includes('248') || tColor.includes('249');
+
+                        if (isActiveHeader || isActiveColor) {
+                            activeTitleEl = titleEl;
                         } else {
-                            inactiveTitleEl = el;
+                            inactiveTitleEl = titleEl;
                         }
                     }
-                    if (!activeTitleEl && titleEls.length > 0) activeTitleEl = titleEls[0];
-                    if (!inactiveTitleEl && titleEls.length > 1) inactiveTitleEl = titleEls[1];
+
+                    if (!activeTitleEl && dialogs.length > 0) {
+                        activeTitleEl = dialogs[dialogs.length - 1].querySelector('div[id^="window-title-"]');
+                    }
+                    if (!inactiveTitleEl && dialogs.length > 1) {
+                        inactiveTitleEl = dialogs[0].querySelector('div[id^="window-title-"]');
+                    }
 
                     const out = [
                         {
@@ -1322,6 +1337,7 @@ def run_scenario(
                     return out;
                 }''')
 
+                assert len(contrast_results) == 3, f"Expected exactly 3 contrast checks (Top Bar, Active Title, Inactive Title), got {len(contrast_results)}"
                 for c in contrast_results:
                     print(f"✔ [Contrast: {c['element']}] Ratio: {c['ratio']} (DOM text: {c['domTextColor']}, bg: {c['domBgColor']}, WCAG AA Pass: {c['pass']})")
                     assert c["pass"], f"Contrast check failed for {c['element']}: ratio {c['ratio']} < 4.5:1 (Kills M1)"
