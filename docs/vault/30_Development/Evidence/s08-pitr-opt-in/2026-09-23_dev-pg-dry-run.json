@@ -1,0 +1,55 @@
+{
+  "acceptance": {
+    "ac12Satisfied": false,
+    "pitrVerified": false,
+    "reason": "Dry-run preparation cannot prove continuous WAL delivery, target-time recovery, RPO, RTO, or safe service resumption"
+  },
+  "decision": "tier-a-deferred",
+  "harnessVerdict": "observed",
+  "inputs": {
+    "archiveDirectoryReadable": true,
+    "backupsDirectoryReadable": true
+  },
+  "kind": "PitrOptInDryRun",
+  "mode": "dry-run",
+  "mutations": {
+    "composeApplied": false,
+    "postgresRestarted": false,
+    "postgresSettingsChanged": false,
+    "retentionApplied": false
+  },
+  "observedAt": "2026-09-22T16:31:51.892019+00:00",
+  "readiness": {
+    "pitrVerified": false,
+    "reasons": [
+      "archive_mode is not on/always",
+      "archive_command is empty/disabled/no-op and archive_library is unset"
+    ],
+    "requiresEvidence": [
+      "base-backup",
+      "continuous-archived-wal",
+      "target-time-recovery",
+      "retention-and-media"
+    ],
+    "scope": "configuration-only",
+    "settings": {
+      "archive_command": "disabled",
+      "archive_library": "unset",
+      "archive_mode": "off",
+      "wal_level": "replica"
+    },
+    "verdict": "absent"
+  },
+  "retention": {
+    "deleteArchive": [],
+    "deleteBackups": [],
+    "keptArchiveEntries": 0,
+    "now": "2026-09-22T16:31:51.892019+00:00",
+    "oldestRetainedStartSegment": null,
+    "reason": "no base backup: nothing is deletable (archive without a base is not recoverable; deleting WAL cannot help)",
+    "retainedBackups": [],
+    "retentionDays": 7,
+    "scope": "filesystem-plan-only"
+  },
+  "schemaVersion": 1
+}
