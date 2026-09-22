@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.14"
+version: "1.2.15"
 status: "review"
 author: "Claude"
 updated: "2026-09-23T00:20:00+09:00"
@@ -98,6 +98,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+S01 물리 노드 5대 인벤토리 표 양식 (Claude, 2026-09-22): PR #49 우리 몫 2 — 토폴로지(U1)별 행 수, 노드별 23항목(식별·하드웨어·허용 자원/폴더·NTP·cert SAN/지문·discovery credential·설치·Storage 역할·등록 후 관측)에 **출처 열 + 미확인 ☐/☑ 열**, 값 전부 미기재·비밀 원문 금지. 열마다 절차서/체크리스트 §·계약 어휘(capability kind/unit)·성공 신호 대응, 채우는 순서 6단계(등록 후 capability/skew와 대조해 ☑→☐). docs-only, check_docs만. 전문 [[S01_물리노드_인벤토리_표양식_2026-09-22]].
+
 
 결정 #6 6a 통합 검증 (Claude, 2026-09-22): Codex 563c54ce `POST …/runs/{parent}/model-retries`를 실 PG(일회용 Alembic DB)+실 HTTP(TestClient/ASGI)로 — `tests/integration/test_model_retries_claude.py` **8 passed / 0 skip**(분리 실행 25s). 요구 7항목 전부 관측: 비-failed 부모 409 MODEL-0007·lease 미해제 409 LEASE-0003·키 재사용 동일 child·키 충돌 409 IDEM-0001·키 없음 422·재요청 409 MODEL-0003·can_request 없음 403 AUTH-0030·shape=fixture 키 집합·requiresFrozenInputAndApproval true·child planned·tool_claims 0·fencing 교집합 ∅·**6c 배치 예약 실제 영속**(resource_leases). **Finding F1(Codex)**: 타 tenant → 503 SYS-0001(4xx 아님; ledger INSERT가 run/grant 확인보다 앞서 FK로 죽음; child 0이라 유출 아님) — 명시 pin. 전문 [[2026-09-22_결정6a_model-retries_통합검증_실PG_실HTTP_Claude]].
 
