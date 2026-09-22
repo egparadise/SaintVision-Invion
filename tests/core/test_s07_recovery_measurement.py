@@ -36,6 +36,15 @@ def test_validation_rejects_non_reproducible_or_unsafe_shapes():
 
 def test_summary_uses_nearest_rank_and_never_claims_operational_acceptance():
     cfg = validated_config(config())
+    cfg["provenance"] = {
+        "codeSha": "a" * 40,
+        "integrationSha": "a" * 40,
+        "integrationInSync": True,
+        "workingTreeClean": True,
+        "contentClean": True,
+        "capturedAtKst": "2026-09-22T23:25:00+09:00",
+        "executor": "Codex",
+    }
     rounds = [
         {
             "detected": True,
@@ -56,12 +65,22 @@ def test_summary_uses_nearest_rank_and_never_claims_operational_acceptance():
     assert result["syntheticShardRecoverySuccessRate"] == pytest.approx(5 / 6, abs=1e-6)
     assert result["operationalAcceptanceAssessed"] is False
     assert result["acceptanceShapeRequested"] is True
+    assert result["codeSha"] == "a" * 40
+    assert result["provenance"] == cfg["provenance"]
+    assert result["measurementClock"] == "harness-process-wall-clock-utc"
     assert {finding["id"] for finding in result["findings"]} == {
         "F-S07-01",
         "F-S07-02",
         "F-S07-03",
     }
     assert percentile([], 0.95) is None
+
+
+def test_default_detection_limit_is_timeout_plus_poll_interval():
+    result = validated_config(config(max_detection_seconds=None))
+
+    assert result["maxDetectionSeconds"] == 60.5
+    assert result["detectionLimitSource"] == "liveness-timeout-plus-poll-default"
 
 
 def test_failed_rerun_cannot_reuse_stale_evidence(tmp_path, monkeypatch):
@@ -73,6 +92,11 @@ def test_failed_rerun_cannot_reuse_stale_evidence(tmp_path, monkeypatch):
         measure_s07_recovery.subprocess,
         "run",
         lambda *args, **kwargs: SimpleNamespace(returncode=0),
+    )
+    monkeypatch.setattr(
+        measure_s07_recovery,
+        "measurement_provenance",
+        lambda: {"codeSha": "a" * 40},
     )
 
     result = measure_s07_recovery.main(

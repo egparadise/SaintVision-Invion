@@ -19,9 +19,12 @@ import subprocess
 import sys
 from typing import Any
 
+from tools.provenance import collect
+
 KERNEL_FRESHNESS_SECONDS = 15.0
 PHYSICAL_ACCEPTANCE_NODES = 5
 PHYSICAL_LIVENESS_SECONDS = 60.0
+MEASUREMENT_CLOCK = "harness-process-wall-clock-utc"
 
 
 def positive_int(value: str) -> int:
@@ -75,8 +78,8 @@ def summarize(config: dict[str, Any], rounds: list[dict[str, Any]]) -> dict[str,
             "id": "F-S07-03",
             "severity": "slo-boundary",
             "summary": (
-                "The liveness predicate is last_seen < now-timeout, so an exact 60.000s "
-                "upper bound has no scheduling margin; polling adds further delay."
+                "The strict last_seen < now-timeout predicate is retained. AC-07 defines "
+                "the detection limit as the liveness timeout plus one poll interval."
             ),
         },
     ]
@@ -93,13 +96,21 @@ def summarize(config: dict[str, Any], rounds: list[dict[str, Any]]) -> dict[str,
             }
         )
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
+        "codeSha": config["provenance"]["codeSha"],
+        "provenance": config["provenance"],
         "measurementScope": "disposable-postgresql-synthetic-measured-nodes",
+        "measurementClock": MEASUREMENT_CLOCK,
+        "measurementClockDefinition": (
+            "detectionDelaySeconds is detected_at minus departed_at; both are sampled "
+            "with datetime.now(UTC) by the harness process, not PostgreSQL clock_timestamp()."
+        ),
         "nodesPerRound": config["nodes"],
         "repetitions": config["repetitions"],
         "livenessTimeoutSeconds": config["livenessTimeoutSeconds"],
         "pollIntervalSeconds": config["pollIntervalSeconds"],
         "maxDetectionSeconds": config["maxDetectionSeconds"],
+        "detectionLimitSource": config["detectionLimitSource"],
         "targetRecoverySuccessRate": config["targetRecoverySuccessRate"],
         "acceptanceShapeRequested": acceptance_shape,
         "operationalAcceptanceAssessed": False,
@@ -128,7 +139,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--repetitions", type=positive_int, required=True)
     result.add_argument("--liveness-timeout-seconds", type=positive_float, required=True)
     result.add_argument("--poll-interval-seconds", type=positive_float, default=0.1)
-    result.add_argument("--max-detection-seconds", type=positive_float, required=True)
+    result.add_argument("--max-detection-seconds", type=positive_float)
     result.add_argument("--target-recovery-success-rate", type=probability, default=0.95)
     result.add_argument("--json-out", type=Path, required=True)
     result.add_argument("--junit-out", type=Path, required=True)
@@ -144,7 +155,12 @@ def validated_config(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("liveness timeout must not exceed 300 seconds")
     if args.poll_interval_seconds > args.liveness_timeout_seconds:
         raise ValueError("poll interval must not exceed liveness timeout")
-    if args.max_detection_seconds < args.liveness_timeout_seconds:
+    detection_limit_source = "explicit"
+    max_detection_seconds = args.max_detection_seconds
+    if max_detection_seconds is None:
+        max_detection_seconds = args.liveness_timeout_seconds + args.poll_interval_seconds
+        detection_limit_source = "liveness-timeout-plus-poll-default"
+    if max_detection_seconds < args.liveness_timeout_seconds:
         raise ValueError("max detection must not be below the configured timeout")
     if args.json_out.resolve() == args.junit_out.resolve():
         raise ValueError("JSON and JUnit outputs must be different files")
@@ -153,8 +169,22 @@ def validated_config(args: argparse.Namespace) -> dict[str, Any]:
         "repetitions": args.repetitions,
         "livenessTimeoutSeconds": args.liveness_timeout_seconds,
         "pollIntervalSeconds": args.poll_interval_seconds,
-        "maxDetectionSeconds": args.max_detection_seconds,
+        "maxDetectionSeconds": max_detection_seconds,
+        "detectionLimitSource": detection_limit_source,
         "targetRecoverySuccessRate": args.target_recovery_success_rate,
+    }
+
+
+def measurement_provenance() -> dict[str, Any]:
+    captured = collect(executor=os.environ.get("INV_S07_EXECUTOR") or "Codex")
+    return {
+        "codeSha": captured["commit_sha"],
+        "integrationSha": captured["integration_sha"],
+        "integrationInSync": captured["in_sync"],
+        "workingTreeClean": captured["working_tree_clean_status"],
+        "contentClean": captured["content_clean_diff"],
+        "capturedAtKst": captured["timestamp_kst"],
+        "executor": captured["executor"],
     }
 
 
@@ -164,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
         config = validated_config(args)
     except ValueError as exc:
         parser().error(str(exc))
+    config["provenance"] = measurement_provenance()
     args.json_out.parent.mkdir(parents=True, exist_ok=True)
     args.junit_out.parent.mkdir(parents=True, exist_ok=True)
     # A failed rerun must never leave an earlier green artifact looking current.
