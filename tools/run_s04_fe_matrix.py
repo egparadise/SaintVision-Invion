@@ -1085,6 +1085,8 @@ def run_acceptance(
                 print(f"\n[Scenario 7/13] {current_scenario_id}: Real Resource Release Pending Observation")
 
                 # Insert an active lease in DB for r_active to genuinely trigger resourceReleasePending (0001_core.sql compliant)
+                created_node_id = None
+                created_res_id = None
                 try:
                     with psycopg.connect(owner_dsn) as conn:
                         with conn.cursor() as cur:
@@ -1094,19 +1096,20 @@ def run_acceptance(
                             if res_row:
                                 target_res_id = res_row[0]
                             else:
-                                test_node_id = new_id("nod")
-                                target_res_id = new_id("res")
+                                created_node_id = new_id("nod")
+                                created_res_id = new_id("res")
+                                target_res_id = created_res_id
                                 cur.execute(
-                                    """INSERT INTO inv.nodes(tenant_id, node_id, hostname, status, schedulable)
-                                       VALUES (%s, %s, 'runner-test-node', 'ready', true)
+                                    """INSERT INTO inv.nodes(tenant_id, node_id, status)
+                                       VALUES (%s, %s, 'online')
                                        ON CONFLICT (tenant_id, node_id) DO NOTHING""",
-                                    (tenant_id, test_node_id),
+                                    (tenant_id, created_node_id),
                                 )
                                 cur.execute(
                                     """INSERT INTO inv.resources(tenant_id, resource_id, node_id, kind, capacity, offered)
                                        VALUES (%s, %s, %s, 'cpu', 1000, 1000)
                                        ON CONFLICT (tenant_id, resource_id) DO NOTHING""",
-                                    (tenant_id, target_res_id, test_node_id),
+                                    (tenant_id, created_res_id, created_node_id),
                                 )
 
                             lease_id = new_id("lse")
@@ -1139,11 +1142,15 @@ def run_acceptance(
                     shot_cnc03 = output_dir / "s04_03_cancel_reclaim.png"
                     page.screenshot(path=str(shot_cnc03))
                 finally:
-                    # Clean up the lease row from DB
+                    # Clean up the lease row from DB, and only clean up resource/node if created by this runner
                     with psycopg.connect(owner_dsn) as conn:
                         with conn.cursor() as cur:
                             cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
                             cur.execute("DELETE FROM inv.resource_leases WHERE run_id=%s", (r_active["runId"],))
+                            if created_res_id:
+                                cur.execute("DELETE FROM inv.resources WHERE tenant_id=%s AND resource_id=%s", (tenant_id, created_res_id))
+                            if created_node_id:
+                                cur.execute("DELETE FROM inv.nodes WHERE tenant_id=%s AND node_id=%s", (tenant_id, created_node_id))
                             conn.commit()
 
                 scenario_records.append({
