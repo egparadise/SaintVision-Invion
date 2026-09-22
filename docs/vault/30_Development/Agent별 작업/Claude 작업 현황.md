@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.13"
+version: "1.2.14"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T20:35:00+09:00"
+updated: "2026-09-22T20:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
 새 PC 첫날 종합 결과 + 2일차 계획 카드 11 (Claude, 2026-09-22): git/gh/registry 실측만으로 1쪽 — integration 64 커밋(Claude 워커 R1 10건·병렬 Claude 세션 PR 9 MERGED/3 OPEN·Codex·Gemini·병합 13), PR #37~#53 상태, hosted 첫 완주(Backend 2668/45/0 `3d1892c0`·Core 2948/58/0·Browser 첫 green `d651a52f`·다섯 workflow 같은 SHA `f2aa2b14` Codex 기록), 로컬 실 PG 전수 2523/142/2·인수 6세트 762/88/0·Docker-only 23·Go·PITR, registry done 2/review 13/planned 31, 결정 #1·#2·#5·#6a·#7 확정 근거 커밋 + PITR B 유예. 미결·외부: 옛 PC 잠금 파일 13(코디네이터 보고, 문서 근거 미확인)·WSL2·S02 선행 입력 체크리스트·CX-09·메모리 경보·Codex (a)/(b)/(c)·OPEN PR 4. 2일차: 레인별 첫 카드 3개·병합 큐 규칙(5분·R1·게이트 exit·slot)·메모리 대책(순차·에이전트 수 3 제안). 전문 [[2026-09-22_새PC_첫날_종합결과_및_2일차_계획_Claude]].
 
