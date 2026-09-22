@@ -16,7 +16,10 @@ on:
       - '.github/workflows/frontend.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref_name != 'main' }}
+  # Integration is a shared multi-agent evidence lane. Queue successive tips
+  # instead of erasing an in-flight build result; feature branches still cancel
+  # stale runs.
+  cancel-in-progress: ${{ github.ref_name != 'main' && github.ref_name != 'integration/all-agents-unified' }}
 permissions:
   contents: read
 
