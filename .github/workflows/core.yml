@@ -42,6 +42,11 @@ jobs:
     env:
       INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
       INV_TEST_EVIDENCE_DIR: ${{ github.workspace }}/dist
+      # Role-shape rejection tests own a separate disposable cluster. Keep the
+      # same explicit image opt-in as Backend Build, but let the normal Core
+      # pytest collection execute the cases once instead of adding another
+      # focused test step.
+      INV_TEST_ROLE_GUARD_IMAGE: postgres:16
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -108,12 +113,22 @@ jobs:
       - name: Build production API image and require explicit configuration
         run: |
           docker build -f deploy/Dockerfile.backend -t "inv-api-test:$GITHUB_SHA" .
-          test "$(docker image inspect --format '{{.Config.User}}' "inv-api-test:$GITHUB_SHA")" = '65532:65532'
+          image_id=$(docker image inspect --format '{{.Id}}' "inv-api-test:$GITHUB_SHA")
+          test "$(docker image inspect --format '{{.Config.User}}' "$image_id")" = '65532:65532'
           if docker run --rm --network=none --read-only "inv-api-test:$GITHUB_SHA" > dist/api-unconfigured.log 2>&1; then
             echo 'Unconfigured production API must not start'
             exit 1
           fi
           grep -q 'Explicit Control Plane identity/database/Workspace configuration unavailable' dist/api-unconfigured.log
+          # Candidate containers run on Docker's default bridge. Reach the
+          # PostgreSQL service through the bridge gateway and its published
+          # host port instead of depending on a runner-specific container IP.
+          bridge_gateway=$(docker network inspect bridge --format '{{(index .IPAM.Config 0).Gateway}}')
+          test -n "$bridge_gateway"
+          docker run --rm --network=bridge postgres:16 pg_isready -h "$bridge_gateway" -p 5432 -U postgres
+          echo "INV_TEST_SERVER_IMAGE=$image_id" >> "$GITHUB_ENV"
+          echo "INV_TEST_CONFIG_IMAGE=$image_id" >> "$GITHUB_ENV"
+          echo "INV_CONTAINER_TEST_DB_HOST=$bridge_gateway" >> "$GITHUB_ENV"
       - name: Verify Workspace recovery boundary first
         run: python -m pytest tests/integration/test_workspace_resume.py tests/integration/test_workspace_api.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45
       - name: Verify containment controls and physical cleanup
@@ -153,16 +168,13 @@ jobs:
           # a ratchet: a new or silently broader skip makes this job fail.
           expected_skips = Counter({
               'PowerShell and csc.exe shim require Windows': 1,
-              'Explicit pinned local candidate image required': 2,
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
-              'Explicit candidate image and disposable container DB address required': 8,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
               'antigravity is not installed on this machine': 1,
-              'Explicit local PostgreSQL image required; ambient databases are never used': 13,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
