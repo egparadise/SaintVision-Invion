@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.181"
+version: "1.0.182"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T00:18:00+09:00"
+updated: "2026-09-23T01:05:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 F-S05-02 57014 원인 분리
+
+- a1470435 실 PG disposable DB에서 runtime transaction의 `lock_timeout=500ms`, `statement_timeout=2s`, 난수 login role·tenant GUC 적용을 직접 `SHOW` 상당으로 확인했다. `Database.transaction`은 호출마다 새 connection을 열며 pool 재사용은 없다.
+- project row holder 1 + waiter 1은 `wait_event_type=Lock/transactionid` 뒤 557.919ms에 `55P03 LockNotAvailable`; 비-Lock `pg_sleep(2.5)`는 `Timeout/PgSleep` 뒤 2,092.747ms에 `57014 QueryCanceled`였고 둘 다 기존 `RES-0007`/503/retryable 표면이다. 진단은 2 passed/18.33s/exit 0이다.
+- 과거 20동시 57014는 statement 이름만 남고 wait-event가 없어 project row Lock으로 귀속할 수 없다. 정확한 실행 원인은 미확정이며 legacy/candidate 20동시 비교 카드에서 PID별 query/wait-event와 lock hold p95를 함께 계측한다. 제품·계약 수정과 AC-05 판정은 하지 않았다. 상세: [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]].
 
 ## 2026-09-22 S06-DB snapshot reader 제품 결속
 

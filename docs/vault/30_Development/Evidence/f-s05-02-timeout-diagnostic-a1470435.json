@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-23T01:05:00+09:00",
+  "codeSha": "a14704350e87b5fa4bd96cdf29370e8f81548ad6",
+  "scope": "development PC; PostgreSQL 16; disposable database; one random inv_app login; single holder and single waiter",
+  "operationalAcceptanceAssessed": false,
+  "session": {
+    "connectionModel": "new psycopg connection per Database.transaction; no pool",
+    "currentUserEqualsSessionUser": true,
+    "runtimeRoleClass": "random inv_app_* NOSUPERUSER NOBYPASSRLS login inheriting inv_kernel",
+    "tenantGucApplied": true,
+    "lockTimeout": "500ms",
+    "statementTimeout": "2s"
+  },
+  "projectRowLock": {
+    "holder": "owner SELECT project_id ... FOR UPDATE",
+    "waiter": "runtime SELECT project_id ... FOR NO KEY UPDATE",
+    "observedState": "active",
+    "waitEventType": "Lock",
+    "waitEvent": "transactionid",
+    "elapsedMs": 557.919,
+    "domainCode": "RES-0007",
+    "status": 503,
+    "retryable": true,
+    "causeType": "LockNotAvailable",
+    "sqlState": "55P03"
+  },
+  "nonLockServerWait": {
+    "statement": "SELECT pg_sleep(2.5)",
+    "observedState": "active",
+    "waitEventType": "Timeout",
+    "waitEvent": "PgSleep",
+    "elapsedMs": 2092.747,
+    "domainCode": "RES-0007",
+    "status": 503,
+    "retryable": true,
+    "causeType": "QueryCanceled",
+    "sqlState": "57014"
+  },
+  "testResult": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "durationSeconds": 18.33,
+    "diagnosticTestWasTemporaryAndRemoved": true
+  },
+  "finding": "F-S05-02",
+  "conclusion": "With the configured session, a heavyweight project-row lock wait is cut by lock_timeout as 55P03 before statement_timeout. The historical 57014 cannot be attributed to that lock wait from the statement label alone; its original wait_event was not captured."
+}
