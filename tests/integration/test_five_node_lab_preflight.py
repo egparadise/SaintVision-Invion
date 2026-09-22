@@ -136,3 +136,8 @@ def test_registration_mtls_preflight_reads_five_real_rows_without_mutation(
     assert report["timedWaveReady"] is True
     assert "tenantId" not in report
     assert report_path.exists()
+    report_text = report_path.read_text(encoding="utf-8")
+    assert json.loads(report_text) == report
+    assert '"tenantId"' not in report_text
+    assert tenant_id not in report_text
+    assert postgres.owner not in report_text
