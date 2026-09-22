@@ -1,7 +1,22 @@
 {
-  "schemaVersion": "s05-card25-sampler-off:1",
+  "schemaVersion": "s05-card25-sampler-off:2",
   "generatedAt": "2026-09-23T14:15:00+09:00",
-  "codeSHA": "6c389a1d7cc4b0fcb88b703d8cbebbc74b2c836d",
+  "codeSHA": "c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff",
+  "executionHeadAtRun": "6c389a1d7cc4b0fcb88b703d8cbebbc74b2c836d",
+  "provenance": {
+    "reachableIntegrationCommit": "c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff",
+    "executionHeadIsIntegrationAncestor": false,
+    "blobEqualityVerified": true,
+    "verifiedAt": "2026-09-23T15:10:00+09:00",
+    "gitBlobOids": {
+      "services/control-plane/src/inv/placement.py": "8be573eed075812e04d271b3e1237351fde991e2",
+      "services/control-plane/src/inv/db.py": "2e37b85eb96231e561bc08bf84a1673f9120f80e",
+      "tests/integration/test_placement_benchmark.py": "46f0ab4878787975e1d60fdefb3927084008ed51",
+      "tests/integration/test_placement_short_commit.py": "b29689ef4d004f403914959d9d63f14a539f9826",
+      "tools/placement_benchmark.py": "9a8430ad684f7dfbda0c8aca7f3c289acc7bf4e5"
+    },
+    "rule": "codeSHA is a reachable integration commit whose listed Git blobs are identical to executionHeadAtRun; executionHeadAtRun is retained only as the historical local run locator."
+  },
   "executor": "Codex",
   "scope": {
     "database": "PostgreSQL 16 disposable database",

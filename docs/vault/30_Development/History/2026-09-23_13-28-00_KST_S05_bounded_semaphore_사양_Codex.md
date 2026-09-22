@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-CARD25-BOUNDED-SEMAPHORE-SPEC-001"
 title: "S05 Card25 project별 bounded semaphore 사양"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T14:15:00+09:00"
+updated: "2026-09-23T15:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -20,7 +20,15 @@ Card24 B′ 실험이 외부 timeout 0→49, request P95(all) 1785.486→2315.09
 
 초안은 기본 lock budget 500ms와 Card24 `h≈767.708ms`를 근사식에 넣어 N=2를 제안했다. Claude 카드 28 F-1에 따라 이 확정을 철회했다. Card24는 queue observer를 켠 상태였고 실제 sampler interval이 legacy 약 21ms에서 candidate 약 67~89ms로 느려졌으며, `pg_blocking_pids`의 lock 파티션 비용이 holder 진행을 지연했을 수 있다. sampler-off 카드 16/18 candidate hold는 117~171ms였다. 따라서 767.708ms는 observer 포함 상한이고 N=2는 검토 전 fail-closed fallback일 뿐이다.
 
-승인된 sampler-off candidate 1500×1은 SHA `6c389a1d`에서 1 passed/16.36s/exit 0, 20/20 성공, `55P03`·`57014` 0이었다. request P95/max는 2014.409/2060.953ms, limit-row wait P95/max는 1409.694/1451.526ms, hold p50/p95/max는 55.469/155.873/234.974ms였다. fencing 유일성과 no-overbooking은 true, queue/sql diagnostic은 off, disposable DB·신규 role 잔존은 0이다.
+승인된 sampler-off candidate 1500×1은 실행 당시 local head `6c389a1d`에서 1 passed/16.36s/exit 0, 20/20 성공, `55P03`·`57014` 0이었다. 이 head는 integration 이력에서 도달 불가하므로 재현 정본으로 쓰지 않는다. 측정 코드의 다섯 Git blob이 모두 동일한 도달 가능 commit `c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff`를 evidence `codeSHA`로 보정했다. request P95/max는 2014.409/2060.953ms, limit-row wait P95/max는 1409.694/1451.526ms, hold p50/p95/max는 55.469/155.873/234.974ms였다. fencing 유일성과 no-overbooking은 true, queue/sql diagnostic은 off, disposable DB·신규 role 잔존은 0이다.
+
+| 측정 파일 | 실행 head와 도달 가능 commit에서 동일한 Git blob OID |
+|---|---|
+| `services/control-plane/src/inv/placement.py` | `8be573eed075812e04d271b3e1237351fde991e2` |
+| `services/control-plane/src/inv/db.py` | `2e37b85eb96231e561bc08bf84a1673f9120f80e` |
+| `tests/integration/test_placement_benchmark.py` | `46f0ab4878787975e1d60fdefb3927084008ed51` |
+| `tests/integration/test_placement_short_commit.py` | `b29689ef4d004f403914959d9d63f14a539f9826` |
+| `tools/placement_benchmark.py` | `9a8430ad684f7dfbda0c8aca7f3c289acc7bf4e5` |
 
 observer-on P95 767.708ms 대비 sampler-off 155.873ms는 611.835ms 작고 약 4.925배 차이다. 동일 하네스의 diagnostic on/off에서 측정이 크게 달라져 **F-1 관측자 효과는 확인**됐고 767.708ms는 관측자 포함 상한으로 유지한다. 다만 단일 wave의 나머지 변동까지 모두 `pg_blocking_pids` 하나의 비용으로 단정하지 않는다. 보수적으로 sampler-off max를 쓰면 N=4의 최장 예상 구간 `2×234.974=469.948ms`는 500ms 안이고 N=5의 `3×234.974=704.922ms`는 넘는다. 따라서 첫 candidate-B 실험값은 N=4, N=3은 reviewer 요청 시 lower arm이다. permit은 대기 queue 없이 논리적 wait budget 0ms다. candidate-B 20동시×3에서 실제 55P03과 semaphore reject를 함께 세기 전 zero-timeout은 주장하지 않는다. [[s05-card25-sampler-off-6c389a1d.json]].
 

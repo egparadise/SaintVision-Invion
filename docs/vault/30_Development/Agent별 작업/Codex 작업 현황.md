@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.204"
+version: "1.0.205"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T14:15:00+09:00"
+updated: "2026-09-23T15:10:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
+
+- Card24 local 실행 head `4c8a7363…`와 Card25 local 실행 head `6c389a1d…`가 origin integration 조상이 아님을 확인했다. 실행 위치는 evidence `executionHeadAtRun`에 보존하고 재현 anchor로는 쓰지 않는다.
+- 두 실행 head와 도달 가능한 `c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff`의 `placement.py`, `db.py`, benchmark/short-commit 시험, benchmark 도구 blob OID가 모두 같음을 확인했다. 두 evidence의 `codeSHA`를 이 reachable commit으로 보정하고 blob OID를 evidence·사양·History에 기록했다.
+- 제품 코드·수치·판정은 불변이고 새 wave는 실행하지 않았다. JSON parse, docs·bindings·ontology·ratchet·frontend·diff 게이트는 모두 exit 0이며 Card32 sampler-off 재현 wave 조건은 그대로 유지한다. [[2026-09-23_15-10-00_KST_S05_Card32_provenance_보강_Codex]], [[s05-card25-sampler-off-6c389a1d.json]], [[s05-bprime-card24-4c8a7363.json]].
 
 ## 2026-09-23 S05 Card25 bounded semaphore 사양 — 착지 요청
 

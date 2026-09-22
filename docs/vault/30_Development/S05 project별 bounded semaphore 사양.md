@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-PROJECT-BOUNDED-SEMAPHORE-SPEC-001"
 title: "S05 project별 bounded semaphore fail-fast 사양"
-version: "1.1.1"
+version: "1.1.2"
 status: "proposed-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T14:15:00+09:00"
+updated: "2026-09-23T15:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -49,7 +49,19 @@ N의 실험 기본값은 다음 절차 뒤에만 확정한다.
 3. sampler-off `h`에 `floor(500/h+2)`를 적용해 N=3/4 arm의 산술 후보를 만든다. 이는 시험 arm 선택값이며 production 기본값이 아니다.
 4. N=3/4 중 하나가 55P03 0을 보일 것이라는 주장은 candidate-B 20동시 3회가 끝나기 전에는 금지한다.
 
-승인된 sampler-off candidate 1500×1은 SHA `6c389a1d`에서 **20/20 성공, `55P03`/`57014` 0, hold p50/p95/max 55.469/155.873/234.974ms**였다. request P95(all)는 2014.409ms로 2초보다 14.409ms 길어 AC-05 판정에는 실패가 아니라 **미평가**로 남긴다. queue/sql diagnostic은 모두 off였고 disposable DB·신규 role 잔존은 0이다. [[s05-card25-sampler-off-6c389a1d.json]].
+승인된 sampler-off candidate 1500×1은 실행 당시 local head `6c389a1d`에서 **20/20 성공, `55P03`/`57014` 0, hold p50/p95/max 55.469/155.873/234.974ms**였다. 이 head는 integration 이력에서 도달 불가하므로 측정 코드 정본을 도달 가능한 `c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff`로 보정했다. 두 commit의 `placement.py`, `db.py`, benchmark/short-commit 시험, benchmark 도구 Git blob OID가 모두 일치한다. request P95(all)는 2014.409ms로 2초보다 14.409ms 길어 AC-05 판정에는 실패가 아니라 **미평가**로 남긴다. queue/sql diagnostic은 모두 off였고 disposable DB·신규 role 잔존은 0이다. [[s05-card25-sampler-off-6c389a1d.json]].
+
+### 2.1 측정 코드 provenance
+
+| 파일 | Git blob OID |
+|---|---|
+| `services/control-plane/src/inv/placement.py` | `8be573eed075812e04d271b3e1237351fde991e2` |
+| `services/control-plane/src/inv/db.py` | `2e37b85eb96231e561bc08bf84a1673f9120f80e` |
+| `tests/integration/test_placement_benchmark.py` | `46f0ab4878787975e1d60fdefb3927084008ed51` |
+| `tests/integration/test_placement_short_commit.py` | `b29689ef4d004f403914959d9d63f14a539f9826` |
+| `tools/placement_benchmark.py` | `9a8430ad684f7dfbda0c8aca7f3c289acc7bf4e5` |
+
+`codeSHA`는 위 blob을 모두 포함하고 origin integration에서 도달 가능한 `c042b3fc…`다. `executionHeadAtRun=6c389a1d…`는 당시 local 실행 위치를 정직하게 보존하는 역사 필드일 뿐 재현 anchor로 사용하지 않는다. 새 wave는 실행하지 않았다.
 
 P95를 쓰면 `floor(500/155.873+2)=5`지만 단일 wave의 낙관값일 수 있다. 관측 max를 보수적으로 쓰면 `floor(500/234.974+2)=4`다. N=4에서 가장 깊은 예상 구간은 `(4−2)×234.974=469.948ms`로 500ms 안이고, N=5는 `(5−2)×234.974=704.922ms`로 넘는다. 따라서 **첫 구현 실험값은 N=4**로 제안한다. N=3은 reviewer가 더 보수적 대조를 요구할 때의 lower arm이고, N=5는 현 근거로 제외한다.
 

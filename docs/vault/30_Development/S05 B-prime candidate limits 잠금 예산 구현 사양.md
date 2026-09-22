@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BPRIME-LOCK-BUDGET-SPEC-001"
 title: "S05 B-prime candidate limits 잠금 예산 구현 사양"
-version: "1.2.1"
+version: "1.2.2"
 status: "implemented-calibration-failed-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T13:55:00+09:00"
+updated: "2026-09-23T15:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -142,7 +142,7 @@ request P95와 post-acquire hold P95는 기존 대칭 경계를 유지한다. li
 
 ## 10. v1.2 교정 결과
 
-구현 SHA `4c8a7363`의 개발 PC·합성 Node·실 PostgreSQL 20동시 결과는 다음과 같다. 전체 원자료와 cleanup은 [[s05-bprime-card24-4c8a7363.json]], 절차·정직성 경계는 [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]]가 정본이다.
+실행 당시 local head `4c8a7363`의 개발 PC·합성 Node·실 PostgreSQL 20동시 결과는 다음과 같다. 이 head는 integration 이력에서 도달 불가하므로 evidence `codeSHA`는 측정 파일 blob이 동일한 도달 가능 commit `c042b3fce80cd246ba5aeb77a6a28d2ca4cdb5ff`로 보정했다. 전체 원자료와 cleanup은 [[s05-bprime-card24-4c8a7363.json]], 절차·정직성 경계는 [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]]가 정본이다.
 
 | mode | 성공/60 | 외부 timeout | request P95(all) 3회 중앙 | 성공 request P95 중앙 | hold P95 중앙 | acquire wait P95 중앙 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -150,3 +150,5 @@ request P95와 post-acquire hold P95는 기존 대칭 경계를 유지한다. li
 | candidate B=1500 | 11 | `55P03` 49 | 2315.099ms | 2402.481ms | 767.708ms | 1530.788ms |
 
 외부 timeout 비증가, all-request P95 비악화, 성공 request hold P95 비악화가 모두 실패했다. candidate queue depth는 매회 19였고 observer-on hold P95 중앙 767.708ms를 넣은 산술 예상 17 실패와 실제 16/16/17 실패가 evidence 내부에서 정합했다. 그러나 sampler interval이 legacy 약 21ms에서 candidate 약 67~89ms로 느려졌고 `pg_blocking_pids` 호출의 lock 파티션 비용이 holder를 지연했을 수 있어 767.708ms는 **관측자 포함 상한**이다. 제품 고유 h의 교정 완료나 N 산출 근거로 사용하지 않는다. 같은 방향 3회를 확인했고 `B+h>2s`의 `57014` 혼입 위험 때문에 승인에 따라 1900 arm은 실행하지 않았다. sampler-off candidate 1500×1 대조 뒤에만 B의 N 산술 후보를 확정한다.
+
+측정 코드 provenance는 다음 Git blob OID로 고정한다: `placement.py=8be573eed075812e04d271b3e1237351fde991e2`, `db.py=2e37b85eb96231e561bc08bf84a1673f9120f80e`, `test_placement_benchmark.py=46f0ab4878787975e1d60fdefb3927084008ed51`, `test_placement_short_commit.py=b29689ef4d004f403914959d9d63f14a539f9826`, `placement_benchmark.py=9a8430ad684f7dfbda0c8aca7f3c289acc7bf4e5`. 이 다섯 blob은 local 실행 head `4c8a7363…`와 도달 가능한 `c042b3fc…`에서 모두 같다.
