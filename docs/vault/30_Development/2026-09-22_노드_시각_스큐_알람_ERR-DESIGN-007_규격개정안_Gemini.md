@@ -1,15 +1,17 @@
 ---
 doc_id: "GEMINI-ERR-DESIGN-007-REVISION-PROPOSAL-001"
 title: "ERR-DESIGN-007 규격 개정안 및 노드 시각 스큐 알람 활성화 계획"
-version: "1.0.0"
-status: "proposed"
+version: "1.1.0"
+status: "active"
 author: "Gemini"
-updated: "2026-09-22T17:15:00+09:00"
+updated: "2026-09-22T17:25:00+09:00"
 source_of_truth: "Git"
 tags: ["decision", "clock-skew", "alarm", "governance", "ERR-DESIGN-007"]
 ---
 
 # ERR-DESIGN-007 규격 개정안 및 노드 시각 스큐 알람 활성화 계획
+
+> **채택됨 (2026-09-22, 결정 #7 선택지 A — 코디네이터, 사용자 위임)**. 개정 조항의 정본은 [[ERR-DESIGN-007 시각 동기화 요구 부재]] v2.0.0으로 옮겨졌고, 이 문서는 개정 근거(결함 분석·정합표·실측 계획)로 남는다. 구현·실측 결과: [[2026-09-22_결정7_시각스큐알람_활성화_구현_Claude]]. 주의: §6.2의 psql 절차는 계획이었고 실제 실측은 pytest 일회용 DB(Alembic head)에서 수행했다.
 
 > **목적**: [[사용자_결정대기_브리프_2026-09-22]] 항목 7(노드 시각 스큐 알람 활성화)의 선행 조건인 [[ERR-DESIGN-007 시각 동기화 요구 부재]]의 규격을 현실에 맞게 개정하고, [[알람 라우팅과 대응 주체]]에 부합하는 운영 알람 활성화 명세 및 실측 검증 계획을 수립한다.
 

@@ -19,8 +19,17 @@ without a database. A tool that always fired would pass a one-sided test.
 Two node tables exist: the kernel ``inv.nodes`` (status ``online``/``offline``,
 ``heartbeat_at``, ``clock_skew_seconds``; defined in
 ``services/control-plane/src/inv/migrations/0001_core.sql``) and the saintvision
-``public.nodes`` (status ``active``…, ``last_heartbeat_at``). Node liveness here
-reads the kernel table, which is where heartbeats land.
+``public.nodes`` (status ``active``…, ``last_heartbeat_at``). Node liveness and
+clock skew here read the kernel table, which is where heartbeats land.
+
+Clock skew (activated 2026-09-22, decision #7 option A, ERR-DESIGN-007 v2.0.0):
+the kernel already excludes a node from scheduling, placement, leases and
+containment when ``clock_skew_seconds`` is NULL, non-finite or ``abs(...) > 5``
+(``inv/scheduler.py`` ``_eligible``, ``inv/leases.py``, ``inv/dispatch.py``).
+The routed P2 alarm mirrors *exactly* that predicate over ``status='online'``
+nodes so that "why is this node never scheduled" becomes visible to 인프라
+instead of staying a silent runtime filter. Offline/draining/quarantined nodes
+are the 이탈 alarm's business, not this one's.
 
 **Says plainly which alarms it cannot evaluate and why.** A tool that printed
 "no alarms" while silently omitting every latency and error rate would read as
@@ -40,6 +49,7 @@ import argparse
 import datetime as dt
 import json
 import sys
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -62,24 +72,57 @@ NOT_EVALUABLE: tuple[tuple[str, str, str], ...] = (
     ("캐시 적중률 하락 / 버킷 용량 추세 / lock wait 증가", "P3", "trend alarms need a metrics history"),
 )
 
-#: Alarms whose data exists but which GOV-ALERT-001 has NOT activated. The spec
-#: excludes nodes with missing/non-finite/abs(skew)>5 measurements from runtime
-#: eligibility. That safety filter is distinct from an operator-routed alarm:
-#: ±5 seconds is not calibrated against pilot hardware, and the alert channel
-#: and responders remain unknown. The guard stays active; this alarm stays gated
-#: until those governance inputs are adopted.
-GOVERNANCE_GATED: tuple[tuple[str, str, str], ...] = (
-    (
-        "Node 시각 스큐 한도 초과",
-        "P2",
-        "Runtime eligibility already excludes missing/non-finite/abs(skew)>5 nodes; "
-        "the routed alarm remains gated until the ±5s threshold is calibrated and "
-        "channel/responders are decided under ERR-DESIGN-007",
-    ),
-)
+#: Alarms whose data exists but which governance has NOT activated. Empty since
+#: 2026-09-22: decision #7 (option A) adopted the ERR-DESIGN-007 revision and
+#: activated ``Node 시각 스큐 한도 초과`` as a routed P2 alarm (see
+#: ``clock_skew_alarm``). The tuple stays so the report keeps declaring the
+#: bucket (a reader must be able to see "0 gated", not wonder whether the
+#: category was dropped).
+GOVERNANCE_GATED: tuple[tuple[str, str, str], ...] = ()
+
+#: Kernel runtime eligibility limit (seconds). ERR-DESIGN-007 제3조: the kernel
+#: predicate is ``clock_skew_seconds IS NOT NULL AND is_finite AND abs(...) <= 5``.
+#: Changing this constant does NOT change the kernel; it would only make the
+#: alarm disagree with the guard, which is the one thing it must not do.
+CLOCK_SKEW_LIMIT_SECONDS = Decimal(5)
 
 
 # --- Pure decision functions (no database; this is what the tests exercise) ---
+
+def skew_outside_limit(value: Decimal | float | int | None, limit: Decimal = CLOCK_SKEW_LIMIT_SECONDS) -> bool:
+    """Mirror of the kernel eligibility predicate (``inv/scheduler.py``):
+    unmeasured (None), non-finite, or ``abs(value) > limit`` → outside.
+    Exactly ``limit`` is inside: the guard is ``<= 5``, so the alarm is ``> 5``."""
+    if value is None:
+        return True
+    skew = value if isinstance(value, Decimal) else Decimal(str(value))
+    if not skew.is_finite():
+        return True
+    return abs(skew) > limit
+
+
+def clock_skew_alarm(online_nodes: list[tuple[str, Decimal | None]]) -> dict[str, Any]:
+    """``Node 시각 스큐 한도 초과`` (GOV-ALERT-001 P2, first responder 인프라).
+
+    ``online_nodes`` is ``[(node_id, clock_skew_seconds), ...]`` for nodes whose
+    status is ``online``. Fires iff at least one is unmeasured or outside ±5s
+    (ERR-DESIGN-007 제4조 3항); clears on the next heartbeat that lands inside
+    (제4조 4항) because it is recomputed from the current row, not latched.
+    """
+    offending = [
+        (node_id, "unmeasured" if skew is None else f"{skew}s")
+        for node_id, skew in online_nodes
+        if skew_outside_limit(skew)
+    ]
+    shown = ", ".join(f"{node_id}={why}" for node_id, why in offending[:10])
+    more = f" (+{len(offending) - 10} more)" if len(offending) > 10 else ""
+    detail = (
+        f"{len(offending)} online node(s) unmeasured or outside ±{CLOCK_SKEW_LIMIT_SECONDS}s "
+        f"of {len(online_nodes)} online; kernel already excludes them from scheduling"
+        + (f": {shown}{more}" if offending else "")
+    )
+    return count_alarm("Node 시각 스큐 한도 초과", "P2", "인프라", len(offending), detail)
+
 
 def count_alarm(name: str, severity: str, responder: str, count: int, detail: str) -> dict[str, Any]:
     """Fires iff ``count > 0``. The quiet side (count == 0 → not firing) is the
@@ -192,6 +235,17 @@ def evaluate(dsn: str, tenant: str | None, now: dt.datetime) -> dict[str, Any]:
                     f"{stale} node(s) still marked online with no heartbeat for over 60s",
                 )
             )
+
+            # Measure, then decide in Python with the same predicate the tests pin:
+            # the SQL only selects online nodes; NULL/non-finite/abs>5 is decided
+            # by skew_outside_limit so the boundary lives in exactly one place.
+            online_nodes = [
+                (row[0], row[1])
+                for row in connection.execute(
+                    text("SELECT node_id, clock_skew_seconds FROM inv.nodes WHERE status = 'online' ORDER BY node_id")
+                ).all()
+            ]
+            alarms.append(clock_skew_alarm(online_nodes))
     finally:
         engine.dispose()
 

@@ -1,10 +1,10 @@
 ---
 doc_id: "ERR-DESIGN-007"
 title: "ERR-DESIGN-007 시각 동기화 요구 부재"
-version: "1.0.0"
-status: "open"
+version: "2.0.0"
+status: "accepted"
 author: "Claude"
-updated: "2026-09-09T15:45:31+09:00"
+updated: "2026-09-22T17:25:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -12,7 +12,7 @@ tags: ["saintvision", "final-plan"]
 
 # ERR-DESIGN-007 시각 동기화 요구 부재
 
-발견: 2026-09-09T15:45:31+09:00 / Agent: Claude / 종류: design / 상태: 검토 지적, owner 판단 대기
+발견: 2026-09-09T15:45:31+09:00 / Agent: Claude / 종류: design / 상태: **채택(accepted) — 2026-09-22 결정 #7 선택지 A**(코디네이터, 사용자 위임). 아래 「개정 규격」이 정본이며 원문 제안(§제안)은 이력으로 남긴다.
 
 ## 문제
 
@@ -52,7 +52,33 @@ S01-BE 또는 S01-DB의 계약에 다음을 추가한다.
 
 owner: Codex(S01 계약·장비 조사). 3번의 Node 측 구현은 Go Node Agent 범위다. 본 문서는 reviewer 지적이며 정정 여부는 owner가 판단한다.
 
-## 구현 상태 판정 (Codex, 2026-09-22)
+## 개정 규격 (v2.0.0, 2026-09-22 채택 — 결정 #7 A)
+
+개정안 원문·결함 분석·정합표는 [[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Gemini]](Gemini). 채택으로 규격이 된 조항만 여기 둔다(규칙 5: 유효한 것은 한 곳). 구현 기록은 [[2026-09-22_결정7_시각스큐알람_활성화_구현_Claude]].
+
+### 제1조 (목적)
+Node와 Control Plane 간 시각 편차(clock skew) 허용 한계를 정하고, 시계 이상 노드의 작업 격리와 운영자 통지 절차를 확립하여 분산 임대(Lease)·스케줄링·이탈 감지의 무결성을 보장한다.
+
+### 제2조 (스큐 측정 원칙)
+1. Control Plane은 heartbeat 프로브를 수신할 때마다 Node 보고 시각과 서버 `clock_timestamp()`의 차이를 초 단위 `inv.nodes.clock_skew_seconds`(numeric)로 갱신한다.
+2. `heartbeat_at`에는 Node 보고 시각이 아니라 서버 `clock_timestamp()`를 기록한다(`inv/observation.py`). 따라서 원문의 "미래 시각 heartbeat로 이탈 감지 지연" 실패 모드는 현 구현에서 발생하지 않는다([[설계 미결 3건 구현 영향 분석]] §3).
+
+### 제3조 (런타임 적격성 가드 — 커널 정본)
+1. 커널(`inv.scheduler`·`inv.placement`·`inv.leases`·`inv.containment`·`inv.dispatch`·`inv.tooling`)은 `clock_skew_seconds IS NULL`, 비유한 값, `abs(clock_skew_seconds) > 5.0` 중 하나면 그 노드를 스케줄링·배치·임대·실행 준비 적격에서 즉시 제외한다.
+2. 이 ±5초 가드는 상시 유지하며 완화·우회하지 않는다. ±5초의 파일럿 장비 보정은 **이 규격의 개정 사유**이지 가드 해제 사유가 아니다.
+
+### 제4조 (운영 알람 규격)
+1. 알람명 `Node 시각 스큐 한도 초과` · 심각도 **P2** · 1차 대응 **인프라**(백업 Backend 운영) · 통지 **기록 채널** · **자동 조치 없음** · 근무 시간 내 대응(온콜 없음) — [[알람 라우팅과 대응 주체]]와 동일.
+2. 트리거: `status='online'`인 노드 중 제3조 1항의 조건(미측정·비유한·`abs > 5.0`)에 해당하는 노드가 1대 이상이면 `firing=true`. 판정 술어는 커널 가드와 **동일한 한 함수**(`tools/alarm_check.py` `skew_outside_limit`)로 두어 알람과 가드가 어긋날 수 없게 한다.
+3. 해제: 후속 heartbeat에서 `abs(clock_skew_seconds) <= 5.0`이 기록되면 다음 평가에서 즉시 `firing=false`(래치 없음).
+4. offline/draining/quarantined 노드는 이 알람의 대상이 아니다(이탈 알람 관할).
+
+### 원문 제안 중 채택하지 않은 것
+- 제안 1(NTP를 Node 등록 하드 전제조건으로): 파일럿 5대(사용자 소유 PC)에서 강제 불가 → 채택 안 함. 스큐 측정·가드·알람으로 대체.
+- 제안 3(Node 측 monotonic TTL 정본): 만료는 Control Plane DB의 `clock_timestamp()`가 통제하므로 불필요 → 채택 안 함.
+- 제안 5(5노드 조사표에 시각 동기화 소스 항목): S01-ST 인수 입력에 남아 있음(별도).
+
+## 구현 상태 판정 (Codex, 2026-09-22 — 채택 전 기록)
 
 커널은 `clock_skew_seconds`가 없거나 비유한 값이거나 절댓값 5초 초과인 노드를 scheduler, placement, lease, containment 및 readiness 적격성에서 제외한다. 이 런타임 가드는 이미 운영 코드이므로 되돌리지 않는다. 되돌리면 스큐가 큰 노드가 배치·실행 경로에 진입할 수 있다.
 
