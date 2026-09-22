@@ -224,7 +224,7 @@ def start_frontend(frontend_port: int = 3005, backend_port: int = 8080) -> subpr
     env["VITE_API_PROXY_TARGET"] = f"http://127.0.0.1:{backend_port}"
 
     npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
-    cmd = [npm_cmd, "run", "dev", "--", "--port", str(frontend_port)]
+    cmd = [npm_cmd, "run", "dev", "--", "--port", str(frontend_port), "--host", "127.0.0.1"]
     proc = subprocess.Popen(
         cmd,
         cwd=str(web_dir),
@@ -427,12 +427,15 @@ def run_acceptance(
 
             # Scenario: s04-exp-00-expired-token-401
             print("\n[Scenario 1/13] s04-exp-00-expired-token-401: Expired Token 401 & Session Reset")
-            page.goto(f"http://127.0.0.1:{frontend_port}/")
-            login_btn = page.locator('button:has-text("Dev IdP로 로그인")')
+            page.goto(f"http://127.0.0.1:{frontend_port}/", wait_until="networkidle")
+            page.wait_for_timeout(500)
+            login_btn = page.locator('button:has-text("조직 계정으로 로그인")')
             login_btn.wait_for(state="visible", timeout=12000)
             login_btn.click()
-            page.wait_for_url(f"**:{frontend_port}/**", timeout=15000)
-            page.locator('button:has-text("로그아웃")').wait_for(state="visible", timeout=12000)
+            page.wait_for_url("**/studio", timeout=15000)
+            page.wait_for_timeout(1500)
+            logout_btn = page.locator('button:has-text("로그아웃")')
+            logout_btn.wait_for(state="visible", timeout=12000)
 
             # Mint authentically expired RS256 token signed by IdP key
             key_path = resolved_dev_dir / "idp_private_key.pem"
