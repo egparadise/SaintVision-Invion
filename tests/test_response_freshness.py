@@ -7,7 +7,7 @@ from tools import check_response_freshness
 
 def test_curated_freshness_fields_exist_in_contracts():
     present, missing = check_response_freshness.check()
-    assert len(present) == 9
+    assert len(present) == 10
     assert not missing
 
 
@@ -20,4 +20,4 @@ def test_removing_shard_as_of_from_schema_is_reported(tmp_path, monkeypatch):
 
     present, missing = check_response_freshness.check()
     assert "kernel:ShardObservation.stateAsOf" in missing
-    assert len(present) == 8 and len(missing) == 1
+    assert len(present) == 9 and len(missing) == 1

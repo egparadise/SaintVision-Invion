@@ -1,0 +1,31 @@
+{
+  "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "modelId": "mdl_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "version": "1.0.0",
+  "manifestHash": "1111111111111111111111111111111111111111111111111111111111111111",
+  "observedAt": "2026-09-22T10:00:00Z",
+  "shards": [
+    {
+      "index": 0,
+      "offset": 0,
+      "byteLength": 12,
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "shardLocations": [
+    {
+      "shardIndex": 0,
+      "locationId": "dtl_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "locationVersion": 1,
+      "readyNodes": [
+        "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+      ],
+      "materialisable": true
+    }
+  ],
+  "licensePolicy": "synthetic-only",
+  "classification": "internal",
+  "materialisable": true,
+  "executionAuthorized": false,
+  "requiresExecutionRevalidation": true
+}

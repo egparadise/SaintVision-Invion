@@ -119,6 +119,17 @@ def test_model_retry_product_route_is_present_and_model_specific() -> None:
     assert "/v1/projects/{}/runs/{}/retry" not in routes
 
 
+def test_model_execution_manifest_route_is_project_scoped_and_separate_from_commitment() -> None:
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "services/control-plane/src/inv/app.py"
+    ).read_text("utf-8")
+    routes = served_routes(source)
+    assert "/v1/projects/{}/models/{}/versions/{}/execution-manifest" in routes
+    assert "/v1/models/{}/versions/{}/execution-manifest" not in routes
+    assert "/v1/projects/{}/models/{}/versions/{}/commitment" in routes
+
+
 @pytest.mark.parametrize("holder", ["app", "api", "router", "business", "control"])
 def test_any_holder_name_works(holder: str) -> None:
     """The application object's variable name is not part of the contract."""

@@ -1180,6 +1180,29 @@ export interface ModelExecutionRef {
   mode: "single-node";
 }
 
+export interface ModelShardLocationObservation {
+  shardIndex: number;
+  locationId: string;
+  locationVersion: number;
+  readyNodes: Array<NodeId>;
+  materialisable: boolean;
+}
+
+export interface ModelExecutionManifestObservation {
+  projectId: ProjectId;
+  modelId: ModelId;
+  version: string;
+  manifestHash: string;
+  observedAt: Timestamp;
+  shards: Array<ModelShard>;
+  shardLocations: Array<ModelShardLocationObservation>;
+  licensePolicy: string;
+  classification: "public" | "internal" | "restricted";
+  materialisable: boolean;
+  executionAuthorized: false;
+  requiresExecutionRevalidation: true;
+}
+
 export interface ModelCommitObservation {
   projectId: ProjectId;
   modelId: ModelId;

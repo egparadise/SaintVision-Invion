@@ -1182,6 +1182,29 @@ type ModelExecutionRef struct {
     Mode string `json:"mode"`
 }
 
+type ModelShardLocationObservation struct {
+    ShardIndex int64 `json:"shardIndex"`
+    LocationId string `json:"locationId"`
+    LocationVersion int64 `json:"locationVersion"`
+    ReadyNodes []NodeId `json:"readyNodes"`
+    Materialisable bool `json:"materialisable"`
+}
+
+type ModelExecutionManifestObservation struct {
+    ProjectId ProjectId `json:"projectId"`
+    ModelId ModelId `json:"modelId"`
+    Version string `json:"version"`
+    ManifestHash string `json:"manifestHash"`
+    ObservedAt Timestamp `json:"observedAt"`
+    Shards []ModelShard `json:"shards"`
+    ShardLocations []ModelShardLocationObservation `json:"shardLocations"`
+    LicensePolicy string `json:"licensePolicy"`
+    Classification string `json:"classification"`
+    Materialisable bool `json:"materialisable"`
+    ExecutionAuthorized bool `json:"executionAuthorized"`
+    RequiresExecutionRevalidation bool `json:"requiresExecutionRevalidation"`
+}
+
 type ModelCommitObservation struct {
     ProjectId ProjectId `json:"projectId"`
     ModelId ModelId `json:"modelId"`

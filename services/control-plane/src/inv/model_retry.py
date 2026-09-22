@@ -81,6 +81,12 @@ class ModelRetryStore:
             ):
                 raise DomainError("VAL-0003", "Bounded unique model Node set required", 422)
             node_ids = sorted(node_ids)
+        # Reject an out-of-scope tenant/project at the authorization boundary
+        # before attempting to create an idempotency row for an invisible
+        # project.  The main transactions still re-check this grant after the
+        # ledger lock, so revocation cannot race this preflight into authority.
+        with self.db.transaction(principal.tenant_id) as conn:
+            self.auth._grant(conn, project, principal.subject_id, "can_request")
         payload = {
             "parent": parent,
             "request": {**asdict(request), "max_host_load": str(request.max_host_load)},

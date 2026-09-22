@@ -1,11 +1,11 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.8.0"
+version: "1.9.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-15T16:17:58+09:00"
+updated: "2026-09-22T20:06:08+09:00"
 source_of_truth: "Git"
 ---
 
@@ -149,3 +149,15 @@ INV_API_CONFIG의 modelRegistryPolicy를 생산 factory가 읽어 승인/dispatc
 기존 identity 등 필수 설정과 함께 사용한다. policy가 없으면 기존 kernel-only 모드, 존재하지만 잘못되면 시작 거부다. null/빈allowed/중복pair/unknown key는 fail-closed다. 실제 registry-bound 입력은 기존대로 현재 typed policy가 없는 프로세스에서 거부된다. trusted worker도 configured_registry_policy로 동일 정책을 파싱할 수 있다.
 
 정책 변경은 프로세스별 시작 설정이며 전역 hot reload가 아니다. 모든 worker/승인/delivery 프로세스의 같은 정책 배포·구프로세스 종료는 운영 책임이다. 이 코드 변경은 운영 허용pair 선정·정책 rollout·실장비 배포를 수행하지 않는다. e2908a5 실행결속의 Claude sound 검토는 수신했으며 이번 설정 연결의 독립 검토는 별도다. [[2026-09-18_Registry_운영정책설정_Codex]].
+
+
+## 실행 Manifest 해석 조회 (1.9.0, VF-CL-02 option c)
+
+`GET /v1/projects/{project}/models/{model_id}/versions/{version}/execution-manifest`는 비즈니스 resolver가 커널 manifest를 직접 SQL로 읽지 않고 해석할 수 있게 하는 project-scoped 최소 projection이다. 기존 `/commitment` 응답과 의미는 바꾸지 않는다.
+
+- 현재 principal의 kernel `can_request`와 linked business project permission을 먼저 교차 확인한다. 다른 tenant/project는 기존 commitment와 같은 비노출 정책으로 `AUTH-0030`/403, 권한 있는 scope의 미존재 model/version은 `MODEL-0004`/404다.
+- 응답 `ModelExecutionManifestObservation`은 `manifestHash`, 원문의 연속 `ModelShard[]`, `shardIndex → {locationId, locationVersion}` 최소 매핑, 관측시각, 현재 `readyNodes`, 매핑별·전체 `materialisable`, 원문 `licensePolicy`/`classification`을 strict하게 제공한다. 공개 registry가 정책 선언을 보유할 경우 소비자는 두 선언을 exact-match해야 하며 이 문자열 자체는 법적 허가가 아니다.
+- manifest의 shard 연속성·digest와 `inv.model_shard_locations`의 전체 집합을 대조한다. shard 또는 mapping 누락·추가·변조는 부분 응답 없이 `MODEL-0001`/409다.
+- 현재 catalog location version이 다르거나 verified ready replica가 없으면 해당 매핑은 `readyNodes=[]`, `materialisable=false`다. 빈 배열을 성공으로 올리지 않으며 전체 `materialisable`은 모든 shard가 하나 이상의 materialisable mapping을 가질 때만 true다.
+- `executionAuthorized=false`, `requiresExecutionRevalidation=true`다. 이 조회는 permit, approval, lease, fence, frozen input 또는 실제 bytes 재검사를 만들거나 대체하지 않는다.
+- `inv_kernel`과 `inv_app`의 table SELECT 권한은 넓히지 않는다. migration 0046의 `public.model_location_readiness(text[])` SECURITY DEFINER 함수만 현재 `inv.tenant_id`에 묶인 location version과 ready node ID를 반환하며 PUBLIC/`inv_app` EXECUTE는 없다. 원시 경로·contribution·key·endpoint는 응답하지 않는다.

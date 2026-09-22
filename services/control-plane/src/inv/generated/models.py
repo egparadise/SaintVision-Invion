@@ -729,7 +729,7 @@ class ModelRetryPlacementResult(BaseModel):
     nodeId: NodeId
     snapshotId: constr(pattern=r'^[0-9a-f]{64}$')
     policyVersion: constr(min_length=1, max_length=200)
-    leases: list[ResourceLease] = Field(..., max_length=128, min_length=1)
+    leases: list[ResourceLease] = Field(..., max_length=4096, min_length=1)
 
 
 class ControlRunView(BaseModel):
@@ -1645,6 +1645,35 @@ class ModelExecutionRef(BaseModel):
     mode: Literal['single-node']
 
 
+class ModelShardLocationObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    shardIndex: conint(ge=0, le=1023)
+    locationId: constr(pattern=r'^dtl_[0-9A-HJKMNP-TV-Z]{26}$')
+    locationVersion: conint(ge=1, le=2147483647)
+    readyNodes: list[NodeId] = Field(..., max_length=128)
+    materialisable: bool
+
+
+class ModelExecutionManifestObservation(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    modelId: ModelId
+    version: constr(pattern=r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')
+    manifestHash: constr(pattern=r'^[0-9a-f]{64}$')
+    observedAt: Timestamp
+    shards: list[ModelShard] = Field(..., max_length=1024, min_length=1)
+    shardLocations: list[ModelShardLocationObservation] = Field(..., max_length=4096, min_length=1)
+    licensePolicy: constr(min_length=1, max_length=200)
+    classification: Classification
+    materialisable: bool
+    executionAuthorized: Literal[False]
+    requiresExecutionRevalidation: Literal[True]
+
+
 class ModelCommitObservation(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1950,6 +1979,7 @@ class INVCore(
         | ModelRuntimeCompatibility
         | ModelManifest
         | ModelCommitObservation
+        | ModelExecutionManifestObservation
     ]
 ):
     root: (
@@ -1993,4 +2023,5 @@ class INVCore(
         | ModelRuntimeCompatibility
         | ModelManifest
         | ModelCommitObservation
+        | ModelExecutionManifestObservation
     ) = Field(..., title='INVCore')

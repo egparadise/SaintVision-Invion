@@ -33,6 +33,7 @@ SCHEMAS = ROOT / "src" / "saintvision" / "api" / "schemas.py"
 REQUIRED_TIME_FIELDS = {
     ("kernel", "RunResultView"): ("completedAt", "stateUpdatedAt"),  # output completion + durable state change
     ("kernel", "ModelCommitObservation"): "committedAt",
+    ("kernel", "ModelExecutionManifestObservation"): "observedAt",
     ("kernel", "StorageObservationView"): "createdAt",
     ("saintvision", "NodeResponse"): "lastHeartbeatAt",    # node liveness truth-time
     ("saintvision", "ReplicaObservationResponse"): "observedAt",
