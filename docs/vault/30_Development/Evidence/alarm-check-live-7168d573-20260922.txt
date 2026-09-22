@@ -1,0 +1,24 @@
+        ok      resource_snapshots partition 잔여: 100 day(s) of runway; partitions run to 2027-01-01
+        ok      audit_events partition 잔여: 100 day(s) of runway; partitions run to 2027-01-01
+        ok      evidence_envelopes partition 잔여: 100 day(s) of runway; partitions run to 2027-01-01
+        ok      체크섬 불일치: 0 mismatch(es) in folder checks over the last 7 days
+        ok      백업 실패 또는 복원 스모크 실패: 0 unverified backup(s), 0 non-passed drill(s)
+        ok      Node 이탈 감지 지연: 0 node(s) still marked online with no heartbeat for over 60s
+        ok      Node 시각 스큐 한도 초과: 0 online node(s) unmeasured or outside ±5s of 0 online; kernel already excludes them from scheduling
+
+7 evaluated data families; 11 conditions not evaluated here; 0 governance-gated conditions. Not evaluated here:
+  P1    비밀 원문 노출 탐지 — needs the redaction detector's output over live traffic
+  P1    정책 우회 또는 승인 없는 L2/L3 실행 — needs policy decision records over live traffic
+  P1    Evidence 기록 실패 — needs a write-failure counter; a database cannot report writes it never received
+  P1    OPA 응답 실패·타임아웃 — needs the policy engine's own metrics
+  P1    중복 부수 효과 탐지 — needs execution-side idempotency counters
+  P1/P2 Control Plane 오류율 — needs request metrics over a 5 minute window
+  P2    스케줄 결정 P95 — needs scheduler latency samples
+  P2    정책 결정 P95 — needs policy latency samples
+  P2    Run 이벤트 전달 P95 — needs delivery latency samples
+  P2    아티팩트 검증 대기 적체 — needs a verification-queue depth metric, not a table a DB keeps
+  P3    캐시 적중률 하락 / 버킷 용량 추세 / lock wait 증가 — trend alarms need a metrics history
+
+Nothing firing above does not mean the system is healthy: the alarms listed as not evaluated have not been checked by anything.
+No channel is implemented. GOV-ALERT-001 leaves the channel and the people as unknown, and routing a P1 to a guess is worse than printing it.
+text exit=0
