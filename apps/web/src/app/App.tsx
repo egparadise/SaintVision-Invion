@@ -32,6 +32,8 @@ import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
+import { getNodeResourceUsage } from '@/features/desktop/fabricControlApi';
+import type { ObservedNodeResourceUsage } from '@/contracts/kernel-observation';
 
 function toWorkspaceItem(w: WorkspaceSummaryResponse): WorkspaceItem {
   return {
@@ -84,6 +86,9 @@ export const App: React.FC = () => {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [projectId, setProjectId] = useState('');
   const [projectError, setProjectError] = useState<string | null>(null);
+  const [nodeResourceUsage, setNodeResourceUsage] = useState<ObservedNodeResourceUsage | null>(null);
+  const [nodeResourceUsageState, setNodeResourceUsageState] = useState<'idle' | 'unselected' | 'loading' | 'success' | 'error'>('idle');
+  const [nodeResourceUsageError, setNodeResourceUsageError] = useState<string | null>(null);
   const scopeRef = useRef(0);
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
@@ -91,6 +96,7 @@ export const App: React.FC = () => {
     activeProject.current = id;
     setRunError(null); setApprovalError(null); setWorkspaceError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
+    setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
   };
@@ -102,6 +108,44 @@ export const App: React.FC = () => {
     }).catch(() => { if (active) setProjectError('프로젝트 목록을 확인하지 못했습니다.'); });
     return () => { active = false; };
   }, [currentUser]);
+
+  useEffect(() => {
+    let active = true;
+    if (!selectedNodeId) {
+      setNodeResourceUsage(null);
+      setNodeResourceUsageState('idle');
+      setNodeResourceUsageError(null);
+      return;
+    }
+    if (!projectId) {
+      setNodeResourceUsage(null);
+      setNodeResourceUsageState('unselected');
+      setNodeResourceUsageError(null);
+      return;
+    }
+    setNodeResourceUsageState('loading');
+    setNodeResourceUsageError(null);
+    getNodeResourceUsage(selectedNodeId, projectId)
+      .then((usage) => {
+        if (active) {
+          setNodeResourceUsage(usage);
+          setNodeResourceUsageState('success');
+          setNodeResourceUsageError(null);
+        }
+      })
+      .catch((err) => {
+        if (active) {
+          setNodeResourceUsage(null);
+          setNodeResourceUsageState('error');
+          setNodeResourceUsageError(
+            err instanceof Error ? err.message : '노드 자원 사용량을 조회하지 못했습니다.'
+          );
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedNodeId, projectId]);
 
   // Integrated Developer Studio navigation state
   const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
@@ -354,6 +398,9 @@ export const App: React.FC = () => {
         onSelectTab={(tab) => {
           setActiveTab(tab);
           setSelectedNodeId(null);
+          setNodeResourceUsage(null);
+          setNodeResourceUsageState('idle');
+          setNodeResourceUsageError(null);
           setSelectedWorkspaceId(null);
           setSelectedRunId(null);
           setEvidenceRunId(null);
@@ -425,7 +472,15 @@ export const App: React.FC = () => {
             {selectedNode ? (
               <NodeDetail
                 node={selectedNode}
-                onBack={() => setSelectedNodeId(null)}
+                resourceUsage={nodeResourceUsage ?? undefined}
+                resourceUsageState={nodeResourceUsageState}
+                resourceUsageError={nodeResourceUsageError}
+                onBack={() => {
+                  setSelectedNodeId(null);
+                  setNodeResourceUsage(null);
+                  setNodeResourceUsageState('idle');
+                  setNodeResourceUsageError(null);
+                }}
                 onOpenStudio={(nodeId) => handleOpenStudio({ step: 2, nodeId })}
               />
             ) : (

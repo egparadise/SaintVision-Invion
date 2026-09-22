@@ -1,13 +1,20 @@
-/* Re-export API wire types generated from contracts/v1alpha1/core.schema.json. */
 export type {
   ApprovalPage,
   ControlRunDetail,
   ControlRunPage,
   ControlRunView,
   RunState,
+  NodeResourceUsageResponse,
+  ResourceUsageMeasurement,
 } from '../../../../packages/contracts-ts/src/index';
 
-import type { ControlRunDetail, ControlRunPage, ControlRunView } from '../../../../packages/contracts-ts/src/index';
+import type {
+  ControlRunDetail,
+  ControlRunPage,
+  ControlRunView,
+  NodeResourceUsageResponse,
+  ResourceUsageMeasurement,
+} from '../../../../packages/contracts-ts/src/index';
 import type { RunItem } from './types';
 
 /**
@@ -34,4 +41,49 @@ export function observedRunPage(page: ControlRunPage): { items: RunItem[]; nextC
     nextCursor: page.nextCursor ?? null,
   };
 }
+
+export interface ObservedResourceMeasurement {
+  resourceId: string;
+  kind: 'cpu' | 'memory' | 'gpu' | 'storage' | 'network';
+  unit: 'millicores' | 'bytes' | 'devices' | 'bitsPerSecond';
+  capacity: number | null;
+  offered: number | null;
+  reserved: number | null;
+  spare: number | null;
+  measured: boolean;
+  observedAt: string | null;
+}
+
+export interface ObservedNodeResourceUsage {
+  source: 'execution-kernel';
+  nodeId: string;
+  stateAsOf: string | null;
+  resources: ObservedResourceMeasurement[];
+}
+
+/**
+ * Projects a canonical NodeResourceUsageResponse wire response into UI ViewModel.
+ * When a resource is unmeasured (measured === false) or non-finite, capacity, offered,
+ * reserved, spare, and observedAt remain null, strictly preventing synthetic zero values
+ * or forged client timestamps.
+ */
+export function observedNodeResourceUsage(view: NodeResourceUsageResponse): ObservedNodeResourceUsage {
+  return {
+    source: view.source,
+    nodeId: view.nodeId,
+    stateAsOf: typeof view.stateAsOf === 'string' ? view.stateAsOf : null,
+    resources: (view.resources || []).map((m: ResourceUsageMeasurement) => ({
+      resourceId: m.resourceId,
+      kind: m.kind,
+      unit: m.unit,
+      capacity: typeof m.capacity === 'number' && Number.isFinite(m.capacity) ? m.capacity : null,
+      offered: typeof m.offered === 'number' && Number.isFinite(m.offered) ? m.offered : null,
+      reserved: m.measured && typeof m.reserved === 'number' && Number.isFinite(m.reserved) ? m.reserved : null,
+      spare: m.measured && typeof m.spare === 'number' && Number.isFinite(m.spare) ? m.spare : null,
+      measured: Boolean(m.measured),
+      observedAt: m.measured && typeof m.observedAt === 'string' ? m.observedAt : null,
+    })),
+  };
+}
+
 

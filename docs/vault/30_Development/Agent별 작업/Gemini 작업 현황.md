@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.111"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T18:20:00+09:00"
+updated: "2026-09-22T18:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T18:10:00+09:00 (최신 작업 브랜치 `agent/gemini/fix-desktop-studio-browser`).
+- 확인 기준: 2026-09-22T18:45:00+09:00 (최신 tip `d651a52f`).
 
 ## 최근 확인한 진척
 
@@ -29,8 +29,6 @@ source_of_truth: "Git"
 - **결정 #6·#7 준비 완결 (Gemini, 2026-09-22)**:
   - 결정 #7(노드 시각 스큐 알람) 선행 조건인 ERR-DESIGN-007 규격 개정안([[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Gemini]]) 및 결정 #6(미연결 능력 부류 3종 현황·노출분석, [[2026-09-22_미연결_능력_부류_현황_및_노출분석_Gemini]]) 작성 완료.
   - 커널 런타임 가드(±5초) 공인, P2 알람 라우팅 정합, 실 PG 검증 시험 명세 및 실패 Run 재시도(ModelRetry)/온디맨드 복구/배치 예약 분석 수립. PR #38 등록.
-
-
 
 ## 2026-09-22 hosted CI Browser Acceptance 4건 전수 합격 및 Vitest Ubuntu 로캘 치유 완결 (`agent/gemini/fix-desktop-studio-browser`)
 
@@ -47,6 +45,37 @@ source_of_truth: "Git"
   - `pytest tests/test_route_coverage.py`: **30 passed in 1.00s**.
   - `npm --prefix apps/web test`: **75개 파일 655/655 passed 100%**.
   - 상세 보고: [[2026-09-22_Desktop_Studio_Browser_수용검증_및_저장소카탈로그_정합_Gemini]].
+
+## 세션 랩업: NodeResourceUsage Capability 자원 바인딩, Zero-Mock 프로젝터 및 NodeDetail 미관측/트라이스테이트 가드 (GM-02 / S02-FE)
+
+- **상태**: 결정 #2 A 실제 서빙 라우트(`GET /v1/projects/{project}/nodes/{node_id}/resource-usage`, Claude `3d1892c0` 착지)와 App 레벨 연결 완결 및 Claude 재검토 요구사항(미서빙 글로벌 경로 제거, tri-state 안내 가드, 정직한 실측 한계 고지) 전수 반영 완료.
+- **리베이스 및 동승 커밋 제거 (F5 해결)**: 최신 integration tip 위로 리베이스 완료. 미병합 `agent/gemini/S02-FE` 잔여 변경(`InvFileExplorer.tsx +151`, `test_credential_provision_cli.py` BOM) 완전 배제.
+- **미서빙 글로벌 경로 제거 및 projectId 필수화 (Claude 재검토 지적 1 치유)**:
+  - `getNodeResourceUsage(nodeId: string, projectId: string): Promise<ObservedNodeResourceUsage>` 어댑터로 개편.
+  - 미서빙 `/v1/nodes/{n}/resource-usage` 분기를 완전히 제거하고 백엔드가 실제 서빙하는 정본 라우트 `/v1/projects/{project}/nodes/{node_id}/resource-usage` 단일 경로만 호출 (`route_coverage` 미서빙 경로 0 정합).
+- **프로젝트 미선택 안내 및 Tri-State 가드 (Claude 재검토 지적 2 치유, Anti-F2)**:
+  - `App.tsx`에서 프로젝트 미선택 시 무의미한 404 네트워크 호출을 방지하고 `resourceUsageState: 'unselected'` 노출.
+  - `NodeDetail.tsx`에 `resourceUsageState` 및 `resourceUsageError` 프로퍼티 결속:
+    - 프로젝트 미선택 시 `data-testid="node-resource-usage-unselected-notice"` (`role="status"`) 안내 배너 표출.
+    - 조회 중 시 `data-testid="node-resource-usage-loading"` (`role="status"`) 표출.
+    - 조회 실패 시 `data-testid="node-resource-usage-error"` (`role="alert"`)로 에러 메시지 정직 표출(조용한 null 강등 완전 방지).
+    - 성공 시 `capability-resource-usage-panel` 정직 표출.
+- **F4/F6 결함 치유 및 엄격한 Zero-Mock (`apps/web/src/contracts/kernel-observation.ts`)**:
+  - `packages/contracts-ts`로부터 `NodeResourceUsageResponse`, `ResourceUsageMeasurement` 정본 생성 타입 re-export.
+  - `observedNodeResourceUsage(view: NodeResourceUsageResponse): ObservedNodeResourceUsage` 함수 구현.
+  - `measured === false`일 때 `reserved: null`, `spare: null`, `observedAt: null` 엄격 보존.
+  - non-finite `capacity`/`offered`에 대한 0 조용한 강등 제거, `null` 보존 및 NodeDetail에서 `미측정` 렌더링(F4 치유).
+  - NodeDetail 수치 및 하트비트 시각 포맷에 `.toLocaleString('ko-KR')` 일관 적용(F6 치유).
+- **라이브 관측 및 검증 한계 정직 고지 (Claude 재검토 지적 3 치유)**:
+  - dev DB에 등록 노드가 0대이므로 실제 노드의 라이브 "미측정 null" 응답은 dev 환경 라이브 브라우저 경로로는 미실측(등록 노드 0대 한계).
+  - 백엔드 PostgreSQL 실 DB 통합 시험(`tests/integration/test_node_resource_usage.py` 6 passed) 및 프론트엔드 프로젝터/DOM 계약 시험(`tests/node-resource-usage-contract.test.tsx` 9 passed)으로 무결성을 교차 검증함.
+- **전용 회귀 테스트 구축 (`apps/web/tests/node-resource-usage-contract.test.tsx`)**:
+  - `observedNodeResourceUsage` 정본 fixture 프로젝션 및 null 보존 단언.
+  - non-finite capacity/offered null 보존 및 anti-F4 회귀 단언 추가.
+  - `NodeDetail` 미관측 배너, Capability 패널, 미선택 안내, 로딩, 에러 alert DOM 단언.
+  - `getNodeResourceUsage` 인코딩 및 project-scoped 엔드포인트 호출 단언.
+  - `NodeList` active 공지 및 상세 탐색 버튼 클릭 단언 (9 tests passed).
+- **보고서**: [[2026-09-22_NodeResourceUsage_Capability바인딩_및_NodeDetail_미관측가드_Gemini]].
 
 ## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
 
