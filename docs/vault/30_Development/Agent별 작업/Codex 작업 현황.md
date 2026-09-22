@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.173"
+version: "1.0.174"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T21:31:00+09:00"
+updated: "2026-09-22T21:55:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 review→done 차단 지도
+
+- registry의 `review` 18건과 `in_progress` 2건을 각각 우리 몫·U1~U6 사용자 입력·물리 자원으로 분해했다. S02~S12는 직전 스프린트 FE/BE/DB/ST 네 base 카드의 done에도 연쇄 종속하므로, 자체 증거만 채워 자동 done 처리하지 않는다.
+- 사용자 입력 없이 다음 배정 가능한 우선순위는 Codex의 S05-DB benchmark/S07-DB 장애 측정기, Claude의 S02/S03-DB Evidence collector, Gemini의 S09-FE eval runner와 S02/S04-FE browser matrix다. registry·ontology는 변경하지 않았다.
+- 초안 게이트는 docs 813, ontology 48, generation 4, ratchet 18, diff 모두 exit 0이며 표 20행·planned 26/26 미충족 선행을 기계 대조했다. Orca Obsidian check는 두 진행판 `both-diverged`로 exit 3이라 apply하지 않았다. 상세: [[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]].
 
 ## 2026-09-22 S01-BE·S01-ST 증거 기록 갱신
 
