@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.162"
+version: "1.0.163"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T17:20:00+09:00"
+updated: "2026-09-22T17:54:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 PR #41 결정 #7 시각 스큐 알람 교차검토
+
+- 대상 PR #41 최신 head `35fb2859`를 Claude→Codex 규칙으로 독립 검토했다. `.env` `INV_TEST_ADMIN_DSN` 실 PostgreSQL에서 PowerShell `Start-Process` 분리·폴링으로 `tests/test_alarm_check.py`를 실행해 **35 passed / exit 0**, `check_docs.py`도 773 documents / exit 0을 확인했다.
+- 현재 알람 술어(`None`·비유한·`abs > 5`, online만), P2·인프라 1차·기록 채널·자동 조치 없음은 커널과 규격에 맞다. 그러나 accepted ERR-DESIGN-007이 커널과 알람을 "동일 함수가 제어해 어긋날 수 없음"으로 단언한 것은 실제 독립 Python/SQL 술어와 모순이라 **수정 요청**했다. 코멘트: https://github.com/egparadise/SaintVision-Invion/pull/41#issuecomment-5773731159
+- PR #38의 미연결 능력 문서는 exact blob이고 시각 스큐 제안서는 채택 frontmatter/callout만 갱신한 내용상 superset이므로, finding 수정 뒤 #41이 #38을 supersede할 수 있다. 상세: [[2026-09-22_PR41_시각스큐알람_교차검토_Codex]].
+- 다음: Claude가 규격 보장 표현과 docstring 조항 번호를 고친 새 head를 올리면 단일 시험 파일과 docs만 재검증한다. 병합은 코디네이터 소관이다.
 
 ## 2026-09-22 최초 hosted CI 실패 교정
 
