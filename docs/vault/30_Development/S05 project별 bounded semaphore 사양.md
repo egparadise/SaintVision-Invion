@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-PROJECT-BOUNDED-SEMAPHORE-SPEC-001"
 title: "S05 project별 bounded semaphore fail-fast 사양"
-version: "1.1.2"
-status: "proposed-review"
+version: "1.2.0"
+status: "implemented-pg-free-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-23T15:27:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -14,8 +14,8 @@ tags: ["s05", "placement", "semaphore", "fail-fast", "contention", "specificatio
 
 # S05 project별 bounded semaphore fail-fast 사양
 
-> [!warning] 사양만 작성, 구현·측정 미승인
-> 이 문서는 Card24 B′의 h 교정 결과를 받아 옵션 B를 설계한 문서다. 제품 코드, migration, 공개 계약, 시험 하네스는 변경하지 않았고 부하 시험도 실행하지 않았다. `placementShortCommit=false`, candidate lock budget 기본 500ms, S05-DB `review`를 유지한다. 구현과 실 PostgreSQL 20동시 측정은 Claude 검토와 코디네이터의 별도 승인 뒤에만 시작한다.
+> [!warning] Card26 구현·PG-free 검증 완료, 실 PostgreSQL 미실행
+> process-local bounded semaphore와 benchmark 계측을 구현했고 PG-free focused 시험을 통과했다. production 설정 노출, migration, 공개 계약은 변경하지 않았으며 flag 기본값은 off다. 실 PostgreSQL focused 시험과 legacy/candidate-B 20동시 wave는 실행하지 않았고 코디네이터의 별도 승인 뒤에만 시작한다. S05-DB는 구현 검토를 위해 `in_progress`다.
 
 ## 1. 목표와 비목표
 
@@ -73,14 +73,14 @@ Claude 카드 32 검토 조건으로 queue/sql diagnostic을 끈 candidate 1500�
 
 ## 3. 내부 설정과 활성 경계
 
-구현 카드의 provisional 내부 설정은 다음과 같다.
+Card26이 구현한 private 내부 설정은 다음과 같다.
 
 | 설정 | 제안 | 경계 |
 |---|---|---|
 | `placement_project_semaphore_enabled` | 기본 `false` | `placement_short_commit is True`인 candidate 신규 예약 경로에서만 유효하다. |
 | `placement_project_semaphore_limit` | flag-on 첫 실험값 `4` | 정수만 허용하고 `bool`, 0, 음수, 과도한 값은 fail closed한다. 최초 구현의 허용 범위는 1~20으로 제한한다. production 기본값이 아니며 flag 기본 off다. |
 
-production `INV_API_CONFIG`에는 두 설정을 노출하지 않는다. benchmark와 focused test가 명시적으로 주입하며, 운영 노출은 실측·독립 검토 뒤 별도 결정한다. flag off에서는 registry 객체 생성, permit 계측, 거절 분기가 없어야 하며 기존 candidate/legacy SQL과 오류 표면이 유지돼야 한다.
+production `INV_API_CONFIG`에는 두 설정을 노출하지 않는다. benchmark와 focused test가 명시적으로 주입하며, 운영 노출은 실측·독립 검토 뒤 별도 결정한다. flag off에서는 permit registry 접근, permit 계측, 거절 분기가 없어야 하며 기존 candidate/legacy SQL과 오류 표면이 유지돼야 한다. process-global registry 객체는 모듈 수명 동안 존재할 수 있지만 flag off 호출은 entry를 만들지 않는다.
 
 ## 4. 키, 진입 위치와 permit 수명
 
@@ -152,7 +152,7 @@ process-local registry가 P개이면 같은 project가 동시에 획득할 수 �
 3. tenant A/project X, tenant B/project X, tenant A/project Y는 독립이다.
 4. 정상 commit, DomainError, 일반 exception, cancellation, BaseException에서 permit이 정확히 한 번 반환된다.
 5. 같은 root transaction 재진입은 한 permit만 쓰고 savepoint rollback은 조기 release하지 않는다.
-6. exact replay는 permit 0개, changed-body는 409이며 신규 reject는 idempotency 잔존 0이다.
+6. exact replay는 permit 0개이고 changed-body는 409다. 신규 reject의 idempotency 잔존 0은 실 PostgreSQL focused 시험에서 확인한다.
 7. metric·log에 tenant/project/principal/idempotency key, DSN, PID/XID, SQL parameter 또는 비밀이 없다.
 8. 독립 registry 두 개가 각각 N을 허용해 전역 상한이 `2N`이 될 수 있음을 부정 대조군으로 고정한다.
 
@@ -165,7 +165,7 @@ process-local registry가 P개이면 같은 project가 동시에 획득할 수 �
 5. saturated project의 commit된 exact replay와 changed-body 409, 다른 project·tenant의 독립 진행을 확인한다.
 6. epoch flip, membership/grant revoke, stale heartbeat, ceiling/offer 감소, resource fit 실패가 기존 오류와 rollback을 유지한다.
 
-시험은 disposable DB와 단일 파일만 사용한다. 구현 승인 전에는 작성·실행하지 않는다.
+시험은 disposable DB와 단일 파일만 사용한다. Card26에는 하네스 계측을 작성했지만 실행하지 않았으며, 코디네이터 승인 뒤에만 실행한다.
 
 ### 8.3 20동시 성능 판정
 
@@ -186,6 +186,6 @@ sampler-off candidate 1500×1 결과로 첫 실험값 N=4를 정했다. 다음 �
 - migration·durable state가 없으므로 DB cleanup이나 정상 Lease 삭제는 없다.
 - deadlock, permit leak, early release, cross-tenant coupling, replay/409 변화, 새 공개 오류 표면이 필요하면 구현을 중단하고 결정 요청으로 되돌린다.
 
-owner는 Codex, reviewer는 Claude, 구현·실측 승인자는 코디네이터다. 현재 handoff는 **docs-only 사양 검토 대기**이며 S05-DB `review`, flag off, 기본 lock budget 500ms를 유지한다. 근거는 [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]], [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]]다.
+owner는 Codex, reviewer는 Claude, 실측 승인자는 코디네이터다. Card26은 private flag와 N=4 process-local registry, root transaction finalizer, replay-before-permit, redacted metric, benchmark schema 1.8의 semaphore reject/외부 실패 합계 계측을 구현했다. focused PG-free 검증은 응답 계약 회귀를 포함해 101 passed/exit 0이고 production flag는 off, 기본 lock budget은 500ms다. 현재 handoff는 **R2 PR 구현 검토 대기**, S05-DB `in_progress`이며 실 PostgreSQL·20동시 측정은 `NOT_RUN`이다. 근거는 [[2026-09-23_15-27-00_KST_S05_Card26_bounded_semaphore_구현_Codex]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]], [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]]다.
 
 Card25 sampler-off wave 종료 뒤 `inv_test_*` database는 0건이었다. 실행 전부터 있던 `inv_app_*` role 2건은 종료 뒤에도 2건으로 같아 신규 role 잔존은 0이다. [[s05-card25-sampler-off-6c389a1d.json]].

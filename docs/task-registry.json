@@ -661,7 +661,7 @@
       "area": "DB",
       "owner": "Codex",
       "reviewer": "Claude",
-      "status": "review",
+      "status": "in_progress",
       "depends_on": [
         "S04-FE",
         "S04-BE",
@@ -685,7 +685,7 @@
       ],
       "scope": "Lease 잠금·Fencing·Allocation",
       "evidence_required": "경합 테스트·snapshot/weight/policy 버전·Explain",
-      "next_handoff": "Claude"
+      "next_handoff": "Claude — Card26 project별 bounded semaphore 구현 검토"
     },
     {
       "task_id": "S05-ST",
