@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T02:45:00+09:00"
+updated: "2026-09-23T03:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 7 독립 검토 → **승인** (Claude, 2026-09-23, 카드 w): 21c6a026+d6323d0f — hosted Core 35742655096 artifact 직접 집계(sha 965a98c8…, 3134/35/0, workspace_recovery 12·resume 11, 0 skip) Codex 보고와 전부 일치; 5노드 opt-in lane 정의는 core.yml 무변경·workflow_dispatch/secret 이름만/artifact if:always 정합, 명령 4개 CLI 실존(5번째 run_s06_five_node_journey.py는 제안), S05/S07 합성 adapter·S06 물리 runner 부재 정직 분리; S06-DB review 유지 근거 일치. 관찰 3(랩 lane concurrency 그룹·cancel 금지 명시, 5번째 명령 미구현 표기, PYTHONPATH 구분자). [[2026-09-23_Codex_카드7_hosted-Core_5노드-lane_독립검토_Claude]] (PR agent/claude/review-codex-card7)
 
 PR #77 S02-FE 실제 API Chrome 로그인·Node 0대·401/403(Gemini 38ae8544) 독립 검토 → **수정 요청** (Claude, 2026-09-23, 카드 v): 실 백엔드·실 DOM/wire 단언·동적 SHA는 성립(tsc 0·route 46/0·vitest 56). F1 재현성(미추적 .work/dev IdP·server.env 의존, --idp-port 미전달로 8090 고정, dev DB 기존 project/권한 상태 의존; 재현 2회 모두 브라우저 전 종료), F2 프로덕션 시험 훅 window.__*·console.log·dev project id 하드코딩·'만료' 아닌 무효 토큰 401, F3 projectObservation apiClient<any>+기본값 합성(RULE-9 위반 1 신규)·404 폴백 과잉, F4 증거 상수(assessment/mockApiUsed 등). 보안 한 줄 Codex 위임. [[2026-09-23_PR77_S02-FE_실제API_Chrome_독립검토_Claude]] (PR agent/claude/review-pr77)
 
