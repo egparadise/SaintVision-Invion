@@ -51,6 +51,14 @@ Eight structural checks, no human judgment required:
       the EvidenceViewer.tsx fake-PASS regression escaped Rule 4 precisely because it
       was a different file; a shape-based check catches the disease wherever it appears.
 
+  (9) Canonical Wire Contract & Adapter Enforcement (shape-based, file-agnostic):
+      (a) Forbids `apiClient<any>` across all frontend production source files. Stripping
+          wire response types allows screen code to invent arbitrary unvalidated shapes
+          and blinds compiler/governance to backend contract drift.
+      (b) Forbids raw `apiClient` invocations on routes with canonical adapters
+          (e.g. `/v1/pools/{pool_id}/placement-preview`) outside approved adapter modules,
+          enforcing that UI components route through validated contract adapters.
+
 What this scanner does NOT check (needs human judgment / runtime testing -- see governance doc):
 
   (1) Dynamically constructed / variable-interpolated fake values:
@@ -155,6 +163,13 @@ WIRING_CONTRADICTION_PATTERNS = [
         "Contradiction: wires saveWorkspaceEditView but claims backend save API is unexposed",
     ),
 ]
+
+# Rule 9: Canonical Wire Contract & Adapter Invariant
+API_CLIENT_ANY_REGEX = re.compile(r"apiClient\s*<\s*any\s*>", re.IGNORECASE)
+PLACEMENT_PREVIEW_DIRECT_API_REGEX = re.compile(r"apiClient[^;]*placement-preview", re.IGNORECASE)
+POOL_LIST_DIRECT_API_REGEX = re.compile(r"apiClient[^;]*['\"]/v1/pools['\"]", re.IGNORECASE)
+DISCOVERY_CANDIDATES_DIRECT_API_REGEX = re.compile(r"apiClient[^;]*['\"]/v1/discovery/candidates['\"]", re.IGNORECASE)
+
 
 
 def get_production_source_files() -> list[Path]:
@@ -394,6 +409,58 @@ def check_unimplemented_consistency(files: list[Path]) -> list[str]:
     return errors
 
 
+def check_uncontracted_wire_bypass(files: list[Path]) -> list[str]:
+    """Rule 9: Enforce canonical contract typing and adapter usage on wire calls (shape-based).
+
+    (a) Forbids `apiClient<any>` across all frontend source files: stripping response types
+        allows screen code to invent arbitrary unvalidated shapes and miss contract drifts.
+    (b) Forbids direct raw `apiClient` invocations for routes with canonical adapters
+        (e.g. /v1/pools/{pool_id}/placement-preview) outside of approved adapter modules,
+        requiring UI components to route through validated contract adapters.
+    """
+    errors: list[str] = []
+    for p in files:
+        text = p.read_text(encoding="utf-8")
+        rel = p.relative_to(ROOT)
+
+        # (a) Check prohibited apiClient<any>
+        m_any = API_CLIENT_ANY_REGEX.search(text)
+        if m_any:
+            line_no = text[: m_any.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-9 Wire Contract] {rel}:{line_no} uses prohibited 'apiClient<any>'; all backend responses must bind to canonical contract types"
+            )
+
+        # (b) Check direct placement-preview bypass outside fabricControlApi.ts
+        if p.name != "fabricControlApi.ts" and PLACEMENT_PREVIEW_DIRECT_API_REGEX.search(text):
+            m_bypass = PLACEMENT_PREVIEW_DIRECT_API_REGEX.search(text)
+            assert m_bypass is not None
+            line_no = text[: m_bypass.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-9 Wire Contract] {rel}:{line_no} directly calls placement-preview via raw apiClient; must use getPoolPlacementPreview adapter"
+            )
+
+        # (c) Check direct /v1/pools bypass outside fabricControlApi.ts
+        if p.name != "fabricControlApi.ts" and POOL_LIST_DIRECT_API_REGEX.search(text):
+            m_pools = POOL_LIST_DIRECT_API_REGEX.search(text)
+            assert m_pools is not None
+            line_no = text[: m_pools.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-9 Wire Contract] {rel}:{line_no} directly calls /v1/pools via raw apiClient; must use getPoolList adapter"
+            )
+
+        # (d) Check direct /v1/discovery/candidates bypass outside fabricControlApi.ts
+        if p.name != "fabricControlApi.ts" and DISCOVERY_CANDIDATES_DIRECT_API_REGEX.search(text):
+            m_cand = DISCOVERY_CANDIDATES_DIRECT_API_REGEX.search(text)
+            assert m_cand is not None
+            line_no = text[: m_cand.start()].count("\n") + 1
+            errors.append(
+                f"[RULE-9 Wire Contract] {rel}:{line_no} directly calls /v1/discovery/candidates via raw apiClient; must use getDiscoveryCandidates adapter"
+            )
+
+    return errors
+
+
 def run_checks(verbose: bool = True) -> list[str]:
     files = get_production_source_files()
     if verbose:
@@ -408,12 +475,13 @@ def run_checks(verbose: bool = True) -> list[str]:
     all_errors.extend(check_synthetic_timestamps(files))
     all_errors.extend(check_unimplemented_consistency(files))
     all_errors.extend(check_integrity_pass_gate(files))
+    all_errors.extend(check_uncontracted_wire_bypass(files))
 
     return all_errors
 
 
 def run_negative_control() -> bool:
-    """Verify scanner catches intentional mutations across all 8 rules (bidirectional negative control)."""
+    """Verify scanner catches intentional mutations across all 9 rules (bidirectional negative control)."""
     # Test 1 (Rule 1): Catches standard prohibited placeholders
     dummy_text_1 = "const tenant = '00000000-0000-0000-0000-000000000001';"
     errs_1 = []
@@ -474,6 +542,20 @@ def run_negative_control() -> bool:
     assert INTEGRITY_VERIFIED_GATE_REGEX.search(dummy_int_nogate_bad) is None, \
         "Negative control failed: Rule 8 missing verification gate not detectable"
 
+    # Test 12 (Rule 9 Wire Contract): Catches apiClient<any> and raw adapter bypasses
+    dummy_any_bad = "const res = await apiClient<any>('/v1/projects/prj/runs/run/result');"
+    assert API_CLIENT_ANY_REGEX.search(dummy_any_bad) is not None, \
+        "Negative control failed: Rule 9 apiClient<any> not caught"
+    dummy_bypass_bad = "apiClient<{ poolId: string }>('/v1/pools/pool1/placement-preview')"
+    assert PLACEMENT_PREVIEW_DIRECT_API_REGEX.search(dummy_bypass_bad) is not None, \
+        "Negative control failed: Rule 9 placement-preview direct bypass not caught"
+    dummy_pool_bad = "apiClient<PoolListResponse>('/v1/pools')"
+    assert POOL_LIST_DIRECT_API_REGEX.search(dummy_pool_bad) is not None, \
+        "Negative control failed: Rule 9 pool list direct bypass not caught"
+    dummy_cand_bad = "apiClient<DiscoveryCandidatesResponse>('/v1/discovery/candidates')"
+    assert DISCOVERY_CANDIDATES_DIRECT_API_REGEX.search(dummy_cand_bad) is not None, \
+        "Negative control failed: Rule 9 discovery candidates direct bypass not caught"
+
     return True
 
 
@@ -487,9 +569,9 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.test_negative:
-        print("Running negative control sensitivity tests across all 8 integrity rules...")
+        print("Running negative control sensitivity tests across all 9 integrity rules...")
         if run_negative_control():
-            print("✔ Negative control passed: Scanner successfully detects mutations across all 8 rules.")
+            print("✔ Negative control passed: Scanner successfully detects mutations across all 9 rules.")
             sys.exit(0)
         else:
             print("❌ Negative control failed.")
@@ -503,7 +585,7 @@ def main() -> None:
             print(f"  - {err}")
         sys.exit(1)
     else:
-        print("\n✔ Frontend Integrity Check Passed: All 8 integrity rules satisfied (0 violations).")
+        print("\n✔ Frontend Integrity Check Passed: All 9 integrity rules satisfied (0 violations).")
         sys.exit(0)
 
 

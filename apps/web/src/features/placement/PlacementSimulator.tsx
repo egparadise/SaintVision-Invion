@@ -1,45 +1,35 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { NodeItem, PlacementRequirement, PlacementExplainResult } from '@/contracts/types';
-import { apiClient } from '@/shared/api/client';
+import {
+  getPoolList,
+  getPoolCapacity,
+  getDiscoveryCandidates,
+  getPoolPlacementPreview,
+} from '@/features/desktop/fabricControlApi';
+import type { PoolListItemResponse } from '@/contracts/pool-list-response';
+import type { PoolCapacityResponse } from '@/contracts/pool-capacity-response';
+import type { DiscoveryCandidateResponse } from '@/contracts/discovery-candidates-response';
 import { evaluatePlacement } from './placementEngine';
 import { ResourceTopologyGraph } from './ResourceTopologyGraph';
 import { PlacementExplainView } from './PlacementExplainView';
+
+export type PoolItem = PoolListItemResponse;
+export type CandidateItem = DiscoveryCandidateResponse;
 
 export interface PlacementSimulatorProps {
   nodes: NodeItem[];
   initialPools?: PoolItem[];
   initialPoolsState?: 'idle' | 'loading' | 'success' | 'error';
   initialPoolsError?: string | null;
+  initialPoolCapacity?: PoolCapacityResponse | null;
+  initialPoolCapacityState?: 'idle' | 'loading' | 'success' | 'error';
+  initialPoolCapacityError?: string | null;
   initialPreviewState?: 'idle' | 'loading' | 'success' | 'error';
   initialPreviewError?: string | null;
   initialServerShards?: ShardItem[];
   initialCandidates?: CandidateItem[];
   initialCandidatesState?: 'idle' | 'loading' | 'success' | 'error';
   initialCandidatesError?: string | null;
-}
-
-interface PoolItem {
-  id: string;
-  name: string;
-  nodeIds: string[];
-  totalCores: number;
-  availableCores: number;
-  totalMemoryBytes: number;
-  availableMemoryBytes: number;
-  totalGpus: number;
-  availableGpus: number;
-  gpuModels: string[];
-}
-
-interface CandidateItem {
-  nodeId: string;
-  hostname: string;
-  os: string;
-  availableCores: number;
-  availableMemoryBytes: number;
-  gpuCount: number;
-  gpuName?: string;
-  healthStatus: string;
 }
 
 interface ShardItem {
@@ -53,6 +43,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   initialPools,
   initialPoolsState,
   initialPoolsError,
+  initialPoolCapacity,
+  initialPoolCapacityState,
+  initialPoolCapacityError,
   initialPreviewState,
   initialPreviewError,
   initialServerShards,
@@ -67,29 +60,44 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes[0]?.id || '');
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
-  // Real backend state
+  // Real backend pool list state
   const [pools, setPools] = useState<PoolItem[]>(initialPools || []);
   const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolsState || 'idle');
   const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
 
-  const [selectedPoolId, setSelectedPoolId] = useState<string>(() => initialPools?.[0]?.id || '');
+  const [selectedPoolId, setSelectedPoolId] = useState<string>(
+    () => initialPools?.[0]?.poolId || (initialPools?.[0] as any)?.id || ''
+  );
+
+  // Pool capacity state fetched on demand (canonical separation: pool list does NOT bundle volatile capacity)
+  const [poolCapacity, setPoolCapacity] = useState<PoolCapacityResponse | null>(initialPoolCapacity || null);
+  const [poolCapacityState, setPoolCapacityState] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    initialPoolCapacityState || 'idle'
+  );
+  const [poolCapacityError, setPoolCapacityError] = useState<string | null>(initialPoolCapacityError || null);
+
+  // Discovery candidates state
   const [candidates, setCandidates] = useState<CandidateItem[]>(initialCandidates || []);
-  const [candidatesState, setCandidatesState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialCandidatesState || 'idle');
+  const [candidatesState, setCandidatesState] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    initialCandidatesState || 'idle'
+  );
   const [candidatesError, setCandidatesError] = useState<string | null>(initialCandidatesError || null);
 
   const [serverShards, setServerShards] = useState<ShardItem[]>(initialServerShards || []);
   const [serverExplanation, setServerExplanation] = useState<string | null>(null);
-  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPreviewState || 'idle');
+  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    initialPreviewState || 'idle'
+  );
   const [previewError, setPreviewError] = useState<string | null>(initialPreviewError || null);
 
   const loadPools = () => {
     setPoolsState('loading');
     setPoolsError(null);
-    apiClient<{ items: PoolItem[] }>('/v1/pools')
+    getPoolList()
       .then((res) => {
         setPools(res.items || []);
         if (res.items && res.items.length > 0) {
-          setSelectedPoolId((prev) => prev || res.items[0].id);
+          setSelectedPoolId((prev) => prev || res.items[0].poolId);
         }
         setPoolsState('success');
       })
@@ -100,10 +108,31 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
       });
   };
 
+  const loadPoolCapacity = (poolId: string) => {
+    if (!poolId || !poolId.trim()) {
+      setPoolCapacity(null);
+      setPoolCapacityState('idle');
+      setPoolCapacityError(null);
+      return;
+    }
+    setPoolCapacityState('loading');
+    setPoolCapacityError(null);
+    getPoolCapacity(poolId)
+      .then((res) => {
+        setPoolCapacity(res);
+        setPoolCapacityState('success');
+      })
+      .catch((err) => {
+        setPoolCapacity(null);
+        setPoolCapacityError(err?.message || `풀 '${poolId}'의 실시간 용량을 조회할 수 없습니다.`);
+        setPoolCapacityState('error');
+      });
+  };
+
   const loadCandidates = () => {
     setCandidatesState('loading');
     setCandidatesError(null);
-    apiClient<{ items: CandidateItem[] }>('/v1/discovery/candidates')
+    getDiscoveryCandidates()
       .then((res) => {
         setCandidates(res.items || []);
         setCandidatesState('success');
@@ -124,6 +153,18 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
       loadCandidates();
     }
   }, []);
+
+  // Fetch live pool capacity whenever selectedPoolId changes
+  useEffect(() => {
+    if (initialPoolCapacity === undefined && initialPoolCapacityState === undefined) {
+      if (selectedPoolId && selectedPoolId.trim()) {
+        loadPoolCapacity(selectedPoolId);
+      } else {
+        setPoolCapacity(null);
+        setPoolCapacityState('idle');
+      }
+    }
+  }, [selectedPoolId]);
 
   const handleToggleFence = (nodeId: string) => {
     setFencedNodeIds((prev) => {
@@ -163,16 +204,11 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
     }
     setPreviewState('loading');
     setPreviewError(null);
-    const query = new URLSearchParams({
-      cpuMillicores: String(requirement.requiredCores * 1000),
-      ramBytes: String(requirement.requiredMemoryBytes),
-      gpuDevices: String(requirement.requiresGpu ? 1 : 0),
-    });
-    apiClient<{
-      poolId: string;
-      candidates: { nodeId: string; hostname: string; eligible?: boolean; availableCpuMillicores?: number }[];
-      candidateCount: number;
-    }>(`/v1/pools/${selectedPoolId}/placement-preview?${query.toString()}`)
+    getPoolPlacementPreview(selectedPoolId, {
+      cpuMillicores: requirement.requiredCores * 1000,
+      ramBytes: requirement.requiredMemoryBytes,
+      gpuDevices: requirement.requiresGpu ? 1 : 0,
+    })
       .then((res) => {
         setServerExplanation(`적격 노드 ${res.candidateCount}대 확인 (풀: ${res.poolId})`);
         if (res.candidates) {
@@ -180,7 +216,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             res.candidates.map((c, idx) => ({
               shardId: `shd_${selectedPoolId}_${idx + 1}`,
               targetNodeId: c.nodeId || c.hostname,
-              status: c.eligible !== false ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
+              status: c.eligible ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
             }))
           );
         } else {
@@ -203,7 +239,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
     }
   }, [requirement, selectedPoolId]);
 
-  const activePool = pools.find((p) => p.id === selectedPoolId) || pools[0];
+  const activePool = pools.find((p) => (p.poolId || (p as any).id) === selectedPoolId) || pools[0];
   const explainResult: PlacementExplainResult = localExplainResult;
 
   return (
@@ -280,45 +316,93 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
               실시간 백엔드 연결 활성: /v1/pools
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-            {pools.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPoolId(p.id)}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.8125rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: '1px solid var(--color-border-strong)',
-                  backgroundColor: selectedPoolId === p.id ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
-                  color: selectedPoolId === p.id ? '#ffffff' : 'var(--color-text-secondary)',
-                }}
-              >
-                {p.name}
-              </button>
-            ))}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {pools.map((p) => {
+              const pId = p.poolId || (p as any).id;
+              const isSelected = selectedPoolId === pId;
+              const count = p.memberCount ?? (p as any).nodeIds?.length ?? 0;
+              return (
+                <button
+                  key={pId}
+                  onClick={() => setSelectedPoolId(pId)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid var(--color-border-strong)',
+                    backgroundColor: isSelected ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                    color: isSelected ? '#ffffff' : 'var(--color-text-secondary)',
+                  }}
+                >
+                  {p.name} ({count} 노드)
+                </button>
+              );
+            })}
           </div>
 
-          {activePool && (
+          {/* Canonical Pool Capacity View (Separately fetched via /v1/pools/{poolId}/capacity) */}
+          {poolCapacityState === 'loading' && (
+            <div data-testid="pool-capacity-loading" style={{ padding: '12px', fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+              실시간 풀 용량 조회 중 (/v1/pools/{selectedPoolId}/capacity)...
+            </div>
+          )}
+
+          {poolCapacityState === 'error' && (
+            <div data-testid="pool-capacity-error" style={{ padding: '10px 14px', fontSize: '0.75rem', color: '#fca5a5', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--radius-sm)', border: '1px solid #ef4444' }}>
+              ⚠️ {poolCapacityError}
+            </div>
+          )}
+
+          {poolCapacity && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
               <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 할당 가용 코어</div>
                 <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {activePool.availableCores} / {activePool.totalCores} Cores
+                  {Math.round(poolCapacity.spareNow.cpuMillicores / 1000)} / {Math.round(poolCapacity.totalOffered.cpuMillicores / 1000)} Cores
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                  활성 멤버: {poolCapacity.activeMemberCount}/{poolCapacity.memberCount} 노드
                 </div>
               </div>
               <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 가용 메모리</div>
                 <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {Math.round(activePool.availableMemoryBytes / 1024 ** 3)} / {Math.round(activePool.totalMemoryBytes / 1024 ** 3)} GB
+                  {Math.round(poolCapacity.spareNow.ramBytes / 1024 ** 3)} / {Math.round(poolCapacity.totalOffered.ramBytes / 1024 ** 3)} GB
                 </div>
               </div>
               <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>가속 GPU 장치</div>
                 <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {activePool.totalGpus > 0 ? `${activePool.availableGpus}/${activePool.totalGpus} GPUs (${activePool.gpuModels.join(', ')})` : 'GPU 없음 (CPU 풀)'}
+                  {poolCapacity.totalOffered.gpuDevices > 0
+                    ? `${poolCapacity.spareNow.gpuDevices}/${poolCapacity.totalOffered.gpuDevices} GPUs`
+                    : 'GPU 없음 (CPU 풀)'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!poolCapacity && activePool && (activePool as any).availableCores !== undefined && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
+              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 할당 가용 코어</div>
+                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  {(activePool as any).availableCores} / {(activePool as any).totalCores} Cores
+                </div>
+              </div>
+              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>풀 가용 메모리</div>
+                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  {Math.round((activePool as any).availableMemoryBytes / 1024 ** 3)} / {Math.round((activePool as any).totalMemoryBytes / 1024 ** 3)} GB
+                </div>
+              </div>
+              <div style={{ padding: '10px', backgroundColor: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>가속 GPU 장치</div>
+                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  {(activePool as any).totalGpus > 0
+                    ? `${(activePool as any).availableGpus}/${(activePool as any).totalGpus} GPUs`
+                    : 'GPU 없음 (CPU 풀)'}
                 </div>
               </div>
             </div>
@@ -670,38 +754,52 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
           {candidatesState !== 'error' && candidates.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {candidates.map((c) => (
-                <div
-                  key={c.nodeId}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '8px 12px',
-                    backgroundColor: 'var(--color-bg-subtle)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  <div>
-                    <strong>{c.hostname}</strong> ({c.os})
-                    <span style={{ color: 'var(--color-text-muted)', marginLeft: '8px' }}>
-                      {c.availableCores} 코어 / {Math.round(c.availableMemoryBytes / 1024 ** 3)} GB 가용
-                    </span>
-                  </div>
-                  <span
+              {candidates.map((c) => {
+                const candKey = c.announcementId || (c as any).nodeId || c.instanceId;
+                const hostname = c.claimedHostname || (c as any).hostname || '이름 미제공';
+                const osType = c.claimedOsType || (c as any).os || 'OS 미제공';
+                const claimedCores = c.claimedCpuCores ?? (c as any).availableCores;
+                const claimedRam = c.claimedRamBytes ?? (c as any).availableMemoryBytes;
+                const claimedGpus = c.claimedGpuCount ?? (c as any).gpuCount ?? 0;
+
+                return (
+                  <div
+                    key={candKey}
+                    data-testid={`candidate-item-${candKey}`}
                     style={{
-                      padding: '2px 6px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      backgroundColor: 'var(--color-bg-subtle)',
                       borderRadius: 'var(--radius-sm)',
-                      backgroundColor: c.healthStatus === 'online' ? 'rgba(35, 134, 54, 0.2)' : 'rgba(218, 54, 51, 0.2)',
-                      color: c.healthStatus === 'online' ? 'var(--color-success)' : 'var(--color-danger)',
-                      fontWeight: 600,
+                      fontSize: '0.75rem',
                     }}
                   >
-                    {c.healthStatus}
-                  </span>
-                </div>
-              ))}
+                    <div>
+                      <strong>{hostname}</strong> ({osType})
+                      <div style={{ color: 'var(--color-text-muted)', marginTop: '2px', fontSize: '0.6875rem' }}>
+                        신고 스펙 (Claimed · 실측 가용량 아님): {claimedCores !== undefined ? `${claimedCores}C` : '코어 미제공'} / {claimedRam !== undefined ? `${Math.round(claimedRam / 1024 ** 3)} GB` : 'RAM 미제공'}
+                        {claimedGpus > 0 ? ` · ${claimedGpus} GPU (모델: 미제공)` : ''}
+                      </div>
+                    </div>
+                    <span
+                      data-testid={`candidate-status-${candKey}`}
+                      style={{
+                        padding: '2px 6px',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'rgba(234, 179, 8, 0.15)',
+                        color: '#fbbf24',
+                        border: '1px solid rgba(234, 179, 8, 0.3)',
+                        fontWeight: 600,
+                        fontSize: '0.6875rem',
+                      }}
+                    >
+                      CANDIDATE (미검증)
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

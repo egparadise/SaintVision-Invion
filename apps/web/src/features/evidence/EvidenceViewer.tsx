@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
+import type { RunResultView } from '@/contracts/types';
 
 export interface EvidenceViewerProps {
   runId: string;
@@ -47,11 +48,11 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     setErrorMessage(null);
     try {
       const prjId = projectId.trim();
-      const res = await apiClient<any>(`/v1/projects/${prjId}/runs/${runId}/result`);
+      const res = await apiClient<RunResultView>(`/v1/projects/${prjId}/runs/${runId}/result`);
       let integrityStatus: 'PASS' | 'FAIL' | 'UNVERIFIED' | 'RUN_FAILED' = 'UNVERIFIED';
       if (res.output?.verified === true) {
         integrityStatus = 'PASS';
-      } else if (res.output && res.output.verified === false) {
+      } else if (res.output && (res.output.verified as unknown) === false) {
         // [계약 방어]: core.schema.json에서 ResultOutputMetadata.verified는 현재 "const": true 이므로
         // 정상 백엔드 응답에서 verified === false는 도달할 수 없습니다.
         // 다만 향후 계약이 boolean으로 확장되어 서버가 무결성 실패를 200 OK로 전달하거나,
@@ -67,17 +68,17 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
       }
 
       const data: EvidenceData = {
-        evidenceId: res.evidence?.evidenceId || res.evidenceId || `evi_${runId}`,
+        evidenceId: res.evidence?.evidenceId || '미발급 (출력 미봉인)',
         runId,
         projectId: prjId,
-        manifestDigest: res.output?.sha256 || res.evidence?.outputSha256 || res.manifestDigest || res.stopReceipt?.outputCommitmentHash || undefined,
-        specDigest: res.evidence?.specDigest || res.evidence?.inputSha256 || undefined,
-        policyVersion: res.evidence?.policyVersion || res.policyVersion || 'shard-completion:v1',
-        state: res.state || 'succeeded',
-        allPhysicallyStopped: res.stopReceipt?.physicallyStopped ?? (res.stopReceipt?.processStarted ? res.stopReceipt?.exitCode !== undefined : true),
+        manifestDigest: res.output?.sha256 || res.evidence?.outputSha256 || undefined,
+        specDigest: res.evidence?.inputSha256 || undefined,
+        policyVersion: res.evidence ? 'immutable-envelope:v1alpha1' : undefined,
+        state: res.state,
+        allPhysicallyStopped: res.stopReceipt ? Boolean(res.stopReceipt.processStarted && res.stopReceipt.exitCode !== undefined) : undefined,
         allSucceeded: res.state === 'succeeded',
-        generatedAt: res.completedAt || res.stopReceipt?.finishedAt || undefined,
-        immutable: res.sealed ?? true,
+        generatedAt: res.completedAt || res.stopReceipt?.finishedAt || res.evidence?.timestamp || undefined,
+        immutable: res.sealed,
         integrityVerification: integrityStatus,
         outputAbsentReason: res.outputAbsentReason || null,
         policySpecifications: {
@@ -102,7 +103,7 @@ export const EvidenceViewer: React.FC<EvidenceViewerProps> = ({ runId, projectId
     fetchEvidence();
   }, [fetchEvidence]);
 
-  const displayId = evidenceData?.evidenceId || `evi_${runId}`;
+  const displayId = evidenceData?.evidenceId || '미발급 (미봉인)';
 
   return (
     <div>

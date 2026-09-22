@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.106"
+version: "1.0.108"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T08:58:00+09:00"
+updated: "2026-09-22T09:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,54 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T08:58:00+09:00.
+- 확인 기준: 2026-09-22T09:25:00+09:00.
+
+## 세션 랩업: PlacementSimulator 정본 PoolList 연동, 용량 분리 및 디스커버리 후보 신고스펙 정직화와 정직성 스캐너 Rule 9 확장
+
+- **PlacementSimulator 정본 PoolList 연동 및 용량 온디맨드 분리 조회 (`PlacementSimulator.tsx`)**:
+  - Codex가 신설한 `/v1/pools` 엔드포인트에 맞추어 `getPoolList()` 어댑터를 결속하고 수기 `PoolItem` 인터페이스 및 raw `apiClient` 호출 제거.
+  - 풀 목록(`PoolListResponse`)에 신선도-민감 용량을 번들링하지 않는 정본 원칙에 따라, 용량 정보는 `getPoolCapacity(selectedPoolId)` 어댑터를 통해 온디맨드로 분리 조회하도록 아키텍처 정합.
+  - `spareNow` 및 `totalOffered`로부터 실시간 가용 코어, 가용 메모리, GPU 장치, 활성 멤버 수를 정직하게 표출.
+- **Discovery 후보 허위 합성 소거 및 신고 스펙 정직화 (`PlacementSimulator.tsx`)**:
+  - `getDiscoveryCandidates()` 어댑터 결속 및 정본 `DiscoveryCandidateResponse` 바인딩.
+  - 후보가 자체 보고한 `claimedCpuCores`, `claimedRamBytes`, `claimedGpuCount`를 실제 가용량(`available`)으로 둔갑시키던 왜곡을 전면 치유하고, `"신고 스펙 (Claimed · 실측 가용량 아님): 8C / 32 GB"`로 정직하게 고지.
+  - 스키마에 부재한 `gpuName`을 아는 척하지 않고 `"모델: 미제공 (등록 후 감지)"`로 처리.
+  - 후보의 미검증 상태(`state: 'candidate'`, `verified: false`)를 `healthStatus: 'online'`으로 합성하던 왜곡을 원천 소거하고 `CANDIDATE (미검증)` 뱃지로 표출.
+- **정직성 스캐너 Rule 9 확장 (`tools/check_frontend_integrity.py`)**:
+  - `POOL_LIST_DIRECT_API_REGEX` 및 `DISCOVERY_CANDIDATES_DIRECT_API_REGEX`를 신설하여 UI 컴포넌트가 raw `apiClient`로 우회 호출하는 패턴을 원천 차단.
+  - 음성 대조군(Test 12) 사살 실측 통과.
+  - 프로덕션 82개 파일 검사 0 violations (PASS).
+- **신규 단위 테스트 구축 및 게이트 실측 통과**:
+  - `placement-simulator.test.tsx`에 풀 용량 정본 분리 렌더링 및 디스커버리 후보 신고스펙/미검증 단언 2종 추가.
+  - `npx tsc -b`: exit code 0 (타입 에러 0건).
+  - `npm run build`: exit code 0 (3.24s 프로덕션 번들 빌드 성공).
+  - `npm run test` (Vitest): **75개 파일 655/655 passed 100% in 12.90s (순증 +2 passed)**.
+  - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 rules satisfied (0 violations)**.
+  - `pytest tests/test_route_coverage.py`: 30 passed in 0.90s.
+  - `python tools/check_contract_bindings.py`: 48 fixtures / 14 serving anchors PASS.
+  - `python tools/check_doc_single_source.py --ratchet`: 18 pairs all in baseline PASS.
+- **보고서**: [[2026-09-22_PlacementSimulator_정본PoolList_용량분리_및_디스커버리후보_신고스펙정직화_Gemini]].
+
+## 세션 랩업: Placement preview 어댑터 결속, EvidenceViewer 정본 전환 및 정직성 스캐너 규칙 9 확장
+
+- **Placement preview 어댑터 결속 및 죽은 분기(TS2367) 치유 (`PlacementSimulator.tsx`)**:
+  - `PlacementSimulator.tsx`의 인라인 raw `apiClient` 호출을 `fabricControlApi.ts`의 정본 어댑터 `getPoolPlacementPreview`로 전면 결속.
+  - 어댑터 결속 과정에서 어댑터 반환 `candidates`의 적격성(`eligible: true`)과 화면의 불가능한 분기(`c.eligible !== false`) 간의 타입 불일치(TS2367)를 발굴하고 `c.eligible ? ...`로 정직화.
+- **EvidenceViewer `apiClient<any>` ➔ 정본 `RunResultView` 전면 전환 (`EvidenceViewer.tsx`)**:
+  - `any` 뒤에 숨어 임의로 미존재 속성들을 참조하고 가짜 식별자(`evi_${runId}`)를 합성하던 잠복 결함들을 영구 박멸.
+  - 정본 생성 타입 `RunResultView`를 직접 바인딩하여 와이어 실재 필드만 정직하게 투영하고, 미봉인 증거는 `미발급 (출력 미봉인)` 및 `미발급 (미봉인)`으로 정직화.
+- **정직성 스캐너 규칙 9 신설 (`tools/check_frontend_integrity.py`)**:
+  - `apiClient<any>` 사용을 프로덕션 전역에서 원천 금지.
+  - `fabricControlApi.ts` 이외의 UI 컴포넌트에서 `placement-preview`를 raw `apiClient`로 직접 호출하는 어댑터 우회 패턴을 모양 기반(shape-based)으로 영구 차단.
+  - `--test-negative` Test 12 추가 및 양방향 실측 사살 완결.
+- **게이트 검증 실측 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (3.92s 프로덕션 번들 빌드 성공).
+  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.53s**.
+  - `python tools/check_frontend_integrity.py`: **82개 파일 All 9 integrity rules satisfied (0 violations)**.
+  - `pytest tests/test_route_coverage.py`: 30 passed in 0.78s.
+  - `check_contract_bindings.py`: 47 fixtures / 14 serving anchors PASS.
+- **보고서**: [[2026-09-22_PlacementPreview어댑터결속_및_EvidenceViewer_RunResultView정본전환_Gemini]].
 
 ## 세션 랩업: S01-FE Codex 2차 검토 지적사항(Vitest 수치 재현성 규명 및 DeveloperStudio 정본 Run 계약/어댑터 전환) 완결과 인계
 

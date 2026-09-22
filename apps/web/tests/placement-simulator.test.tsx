@@ -167,4 +167,83 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
     expect(markup).toContain('data-testid="candidates-empty-state"');
     expect(markup).toContain('승인 대기 중인 디스커버리 후보가 없습니다');
   });
+
+  it('renders canonical pool capacity when pool list and capacity are provided', () => {
+    const samplePools = [
+      {
+        poolId: 'pol_test_01',
+        projectId: 'prj_test_01',
+        name: 'Standard Compute Pool',
+        status: 'active' as const,
+        memberCount: 3,
+      },
+    ];
+    const sampleCapacity = {
+      poolId: 'pol_test_01',
+      name: 'Standard Compute Pool',
+      memberCount: 3,
+      activeMemberCount: 2,
+      totalOffered: { cpuMillicores: 16000, ramBytes: 64 * 1024 ** 3, gpuDevices: 2 },
+      spareNow: { cpuMillicores: 12000, ramBytes: 48 * 1024 ** 3, gpuDevices: 1 },
+      largestSingleNode: { cpuMillicores: 8000, ramBytes: 32 * 1024 ** 3, gpuDevices: 1 },
+      nodes: [],
+      note: 'pool capacity fixture',
+      units: {},
+      unmeasuredNodes: [],
+    };
+
+    const markup = renderToStaticMarkup(
+      <PlacementSimulator
+        nodes={sampleNodes}
+        initialPools={samplePools}
+        initialPoolCapacity={sampleCapacity}
+        initialPoolCapacityState="success"
+        initialCandidates={[]}
+        initialServerShards={[]}
+      />
+    );
+    expect(markup).toContain('Standard Compute Pool (3 노드)');
+    expect(markup).toContain('12 / 16 Cores');
+    expect(markup).toContain('48 / 64 GB');
+    expect(markup).toContain('1/2 GPUs');
+    expect(markup).toContain('활성 멤버: 2/3 노드');
+  });
+
+  it('renders honest claimed specs and unverified status for discovery candidates without fake online synthesis', () => {
+    const sampleCandidates = [
+      {
+        announcementId: 'ann_test_01',
+        instanceId: 'inst_01',
+        sourceIp: '192.0.2.10',
+        claimedHostname: 'cand-worker-01',
+        claimedOsType: 'linux',
+        claimedCpuCores: 8,
+        claimedRamBytes: 32 * 1024 ** 3,
+        claimedGpuCount: 1,
+        firstSeenAt: '2026-09-22T08:00:00Z',
+        lastSeenAt: '2026-09-22T08:10:00Z',
+        announceCount: 5,
+        stale: false,
+        state: 'candidate' as const,
+        verified: false as const,
+      },
+    ];
+
+    const markup = renderToStaticMarkup(
+      <PlacementSimulator
+        nodes={sampleNodes}
+        initialPools={[]}
+        initialCandidates={sampleCandidates}
+        initialCandidatesState="success"
+        initialServerShards={[]}
+      />
+    );
+    expect(markup).toContain('cand-worker-01');
+    expect(markup).toContain('(linux)');
+    expect(markup).toContain('신고 스펙 (Claimed · 실측 가용량 아님): 8C / 32 GB · 1 GPU (모델: 미제공)');
+    expect(markup).toContain('CANDIDATE (미검증)');
+    expect(markup).not.toContain('online');
+    expect(markup).not.toContain('가용 코어');
+  });
 });
+
