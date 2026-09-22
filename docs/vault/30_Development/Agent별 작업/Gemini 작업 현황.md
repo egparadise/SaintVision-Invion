@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.114"
+version: "1.0.115"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T21:00:00+09:00"
+updated: "2026-09-23T00:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,17 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
+
+## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 초안 수립 (`agent/gemini/s04-fe-matrix`)
+
+- **OUT-04 / AC-04 완결을 위한 4대 핵심 축 12개 시나리오 매트릭스 (docs-only)**:
+  - **계획서 정본**: [[2026-09-23_S04-FE_만료_취소_중복_SSE재연결_시나리오_매트릭스_Gemini]].
+  - **만료 (EXP-01~03)**: TTL 경과 안건 승인 차단(`disabled=true`), 5초 폴링 실패 시 침묵 노화(Silent Aging) 방어 배너 및 스냅샷 시각 명시, 서버 410 Gone / ProblemDetails 대응.
+  - **취소 (CNC-01~03)**: 단말 상태(`succeeded`/`failed`/`cancelled`) 취소 버튼 완전 은닉, ADR-001 4대 표준 사유(`user_requested`, `timeout`, `budget_exceeded`, `security_concern`) 모달, ADR-040/042 자원 반환 대기 배너.
+  - **중복 (DUP-01~03)**: 원클릭 즉시 비활성화(`isSubmitting`) 더블클릭 방어, 1회용 Nonce 소비 및 409 Conflict 처리, 2인 승인 원칙(요청자 자가승인 및 1차 승인자 자가2차승인 차단).
+  - **SSE 재연결 (SSE-01~03)**: 1,000-entry RingBuffer at-least-once 중복 제거, 지수 백오프/지터 자동 재연결 및 `Last-Event-ID` 복원 커서, 타임라인 이벤트 시퀀스 단조 증가($seq_i > seq_{i-1}$) 보장.
+  - **돌연변이 사살 계획**: MUT-01(만료 우회), MUT-02(자가승인 허용), MUT-03(더블클릭 허용), MUT-04(SSE 중복 허용) 전수 KILLED 단언 설계.
+- **실측 계획**: Claude 독립 검토 승인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
 
 ## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 재실측 완결 (`agent/gemini/ui-invariants-run`)
 
