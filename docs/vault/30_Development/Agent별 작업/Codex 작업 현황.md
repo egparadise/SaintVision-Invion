@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.161"
+version: "1.0.162"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T16:25:00+09:00"
+updated: "2026-09-22T17:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,10 +12,11 @@ source_of_truth: "Git"
 
 ## 2026-09-22 최초 hosted CI 실패 교정
 
-- 카드 `THREAD-2026-09-22-FIRST-HOSTED-CI-RECOVERY`; owner Codex, reviewer Claude pending. 초기 base `d01c931a`, 최신 integration base `dcf2b947`, branch `agent/codex/continuation-20260922`.
+- 카드 `THREAD-2026-09-22-FIRST-HOSTED-CI-RECOVERY`; owner Codex, reviewer Claude pending. 초기 base `d01c931a`, R1 착지 base `2aa80899`, integration landing `36d3ee9b`, branch `agent/codex/continuation-20260922`.
 - Backend schema drift, Core ontology 의존성·credential fail-closed/portable fixture, Browser catalogue·business-project·model availability 회귀를 교정했다. 통합에서 누락된 `origin/codex/ontology-regeneration` 9커밋도 merge `23235bbb`로 복원했다.
-- 작성자 검증: Linux credential 61 passed, storage PG 24 passed/0 skip, 실 브라우저 6 passed/0 failed/0 skipped, Vitest 655 passed, frontend contracts 16, schema 58, bindings 50 fixtures / 14 response types / 12 replay guards, docs 763·ontology PASS. 기존 69 Docker volume은 건드리지 않았다.
-- 아직 `done` 아님: 최종 PR head의 hosted Documentation·Backend 3.12/3.14·Core·Frontend·Desktop Browser와 Claude 독립 검토가 pending. 첫 행동은 branch push·PR 생성 후 모든 workflow를 같은 SHA에서 확인하는 것. Evidence: [[2026-09-22_최초_호스티드_CI_실패_교정_Codex]].
+- 작성자 검증: Linux credential 61 passed, storage PG 24 passed/0 skip, 실 브라우저 6 passed/0 failed/0 skipped, Vitest 655 passed, frontend contracts 16, schema 58. 정확 착지 후보에서는 docs 764, bindings 50 fixtures / 14 response types / 17 sites / 12 replay guards, ontology 48 tasks가 exit 0이고 core 단일 파일 29 passed였다. 기존 69 Docker volume은 건드리지 않았다.
+- R1 착지: 최초 후보 `8dc73ff9`는 origin이 `2aa80899`로 이동해 push 전에 차단했다. 최신 tip에 같은 24개 작성 경로만 다시 얹은 `36d3ee9b`를 non-force push했고, 부모·rev-range·origin tip을 대조했다.
+- 아직 `done` 아님: integration landing은 완료했지만 hosted Documentation·Backend 3.12/3.14·Core·Frontend·Desktop Browser와 Claude 독립 검토가 pending이다. Evidence: [[2026-09-22_최초_호스티드_CI_실패_교정_Codex]].
 
 ## 2026-09-22 최종 정지 기준선 — `70234d2e`
 
