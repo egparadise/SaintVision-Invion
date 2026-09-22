@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'saintvision-portal-v1.0.0';
+const CACHE_NAME = 'saintvision-portal-v1.0.0';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -28,7 +28,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Skip API, SSE, and WebSocket proxy paths
-  if (url.pathname.startsWith('/v1')) {
+  if (url.origin !== self.location.origin || event.request.method !== 'GET' ||
+      url.pathname.startsWith('/v1') || ['/auth-config.js', '/callback', '/healthz', '/readyz'].includes(url.pathname)) {
     return;
   }
 

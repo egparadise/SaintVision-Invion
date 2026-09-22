@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { InvFileItem, InvReplicaLocation, InvNamespace } from '@/contracts/virtualFabric';
 import { NodeItem } from '@/contracts/types';
 import { fetchWorkspaceEditView, mapWorkspaceFilesToInvItems } from '@/shared/api/workspaceEditObservation';
+import { fabricObservation as api, replicaStates, type Location, type ReplicaObservation } from '@/shared/api/fabricObservation';
 
 export interface InvFileExplorerProps {
   projectId?: string;
@@ -42,6 +43,77 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [inputCheckoutId, setInputCheckoutId] = useState<string>(checkoutId || '');
+
+  // Canonical live storage catalogue state (fabricObservation)
+  const [items, setItems] = useState<Location[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [uri, setUri] = useState('');
+  const [detail, setDetail] = useState<{ location: Location; observation: ReplicaObservation } | null>(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const request = useRef<AbortController | null>(null);
+
+  const begin = useCallback(() => {
+    request.current?.abort();
+    const controller = new AbortController();
+    request.current = controller;
+    setLoading(true);
+    setError('');
+    return controller;
+  }, []);
+
+  useEffect(() => {
+    const controller = begin();
+    setItems([]);
+    setCursor(null);
+    setDetail(null);
+    api.locations(undefined, controller.signal).then(page => {
+      if (!controller.signal.aborted) {
+        setItems(page.items);
+        setCursor(page.nextCursor);
+      }
+    }).catch(() => {
+      if (!controller.signal.aborted) setError('저장소 조회에 실패했습니다. 로그인과 권한을 확인하세요.');
+    }).finally(() => {
+      if (!controller.signal.aborted) setLoading(false);
+    });
+    return () => {
+      controller.abort();
+      request.current?.abort();
+    };
+  }, [refresh, begin]);
+
+  const open = useCallback(async (value: string) => {
+    const controller = begin();
+    setUri(value);
+    setDetail(null);
+    try {
+      const location = await api.resolve(value, controller.signal);
+      const observation = await api.replicas(location, controller.signal);
+      if (!controller.signal.aborted) setDetail({ location, observation });
+    } catch {
+      if (!controller.signal.aborted) setError('파일을 조회할 수 없습니다. URI와 접근 권한을 확인하세요.');
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  }, [begin]);
+
+  const more = useCallback(async () => {
+    if (!cursor) return;
+    const controller = begin();
+    try {
+      const page = await api.locations(cursor, controller.signal);
+      if (!controller.signal.aborted) {
+        setItems(prev => [...prev, ...page.items]);
+        setCursor(page.nextCursor);
+      }
+    } catch {
+      if (!controller.signal.aborted) setError('다음 목록 조회에 실패했습니다.');
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  }, [begin, cursor]);
 
   const loadCheckoutFiles = useCallback(async (pId: string, rId: string, cId: string) => {
     setCheckoutLoading(true);
@@ -401,7 +473,142 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
             내가 등록한 활성 저장소의 파일 목록입니다. 현재 접근 가능 여부는 별도 확인이 필요합니다.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={() => setRefresh((n) => n + 1)}
+          style={{
+            padding: '6px 12px',
+            fontSize: '0.75rem',
+            borderRadius: '6px',
+            border: '1px solid #334155',
+            backgroundColor: '#1e293b',
+            color: '#94a3b8',
+            cursor: 'pointer',
+          }}
+        >
+          목록 새로고침
+        </button>
       </div>
+
+      {/* Canonical Storage Catalogue Query Form & Live Status */}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          void open(uri);
+        }}
+        style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+      >
+        <label style={{ fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          파일 URI{' '}
+          <input
+            value={uri}
+            maxLength={2048}
+            onChange={(event) => {
+              request.current?.abort();
+              setLoading(false);
+              setDetail(null);
+              setError('');
+              setUri(event.target.value);
+            }}
+            style={{
+              padding: '6px 10px',
+              fontSize: '0.8125rem',
+              borderRadius: '6px',
+              border: '1px solid #334155',
+              backgroundColor: '#1e293b',
+              color: '#f8fafc',
+            }}
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={!uri || loading}
+          style={{
+            padding: '6px 14px',
+            fontSize: '0.8125rem',
+            borderRadius: '6px',
+            border: 'none',
+            backgroundColor: !uri || loading ? '#334155' : '#2563eb',
+            color: '#f8fafc',
+            cursor: !uri || loading ? 'not-allowed' : 'pointer',
+          }}
+        >
+          조회
+        </button>
+      </form>
+      {loading && <p role="status">조회 중…</p>}
+      {error && <p role="alert">{error}</p>}
+      {!loading && !error && items.length === 0 && <p>등록된 파일이 없습니다.</p>}
+      {items.length > 0 && (
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {items.map((item) => (
+            <li key={item.locationId}>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => void open(item.uri)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#38bdf8',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: '0.8125rem',
+                  textDecoration: 'underline',
+                }}
+              >
+                {item.uri}
+              </button>{' '}
+              · {item.byteSize} bytes
+            </li>
+          ))}
+        </ul>
+      )}
+      {cursor && (
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => void more()}
+          style={{
+            alignSelf: 'flex-start',
+            padding: '4px 8px',
+            fontSize: '0.75rem',
+            borderRadius: '4px',
+            border: '1px solid #334155',
+            backgroundColor: '#1e293b',
+            color: '#94a3b8',
+            cursor: 'pointer',
+          }}
+        >
+          더 보기
+        </button>
+      )}
+      {detail && (
+        <article
+          style={{
+            padding: '12px 16px',
+            borderRadius: '8px',
+            border: '1px solid #334155',
+            backgroundColor: '#1e293b',
+            fontSize: '0.8125rem',
+          }}
+        >
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '0.9375rem' }}>{detail.location.uri}</h3>
+          <p style={{ margin: '2px 0' }}>{detail.location.byteSize} bytes</p>
+          <p style={{ margin: '2px 0' }}>SHA-256: {detail.location.checksumSha256 ?? '미확인'}</p>
+          <p style={{ margin: '2px 0' }}>현재 가용성: 미확인 · 실행 시 재검증 필요</p>
+          <p style={{ margin: '2px 0' }}>조회 시각: {detail.observation.observedAt}</p>
+          <p style={{ margin: '6px 0 2px 0', fontWeight: 600 }}>기록된 복제본 상태 (현재 파일 검사 결과가 아님)</p>
+          <ul style={{ margin: '2px 0', paddingLeft: '16px' }}>
+            {replicaStates.map((state) => (
+              <li key={state}>
+                {state}: {detail.observation.recordedStates[state]}
+              </li>
+            ))}
+          </ul>
+          <p style={{ margin: '4px 0 0 0' }}>전체 기록: {detail.observation.totalRecords}</p>
+        </article>
+      )}
 
       {/* 2. Address Bar & Namespace Tabs */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -568,7 +775,7 @@ export const InvFileExplorer: React.FC<InvFileExplorerProps> = ({
 
           {filteredFiles.length === 0 ? (
             <p data-testid="inv-empty-state" style={{ color: '#94a3b8', fontSize: '0.8125rem' }}>
-              등록된 파일이 없습니다.
+              네임스페이스에 등록된 파일이 없습니다.
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
