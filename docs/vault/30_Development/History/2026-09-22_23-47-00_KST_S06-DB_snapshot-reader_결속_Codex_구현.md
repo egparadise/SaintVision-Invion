@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-09-22-S06-DB-SNAPSHOT-READER-BINDING-CODEX-001"
 title: "S06-DB snapshot reader 제품 결속"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-22T23:47:00+09:00"
+updated: "2026-09-23T00:16:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -46,8 +46,18 @@ source_of_truth: "Git"
 | `check_response_freshness.py` | advisory 10/10, exit 0 |
 | docs/frontend/ontology/single-source ratchet | 모두 exit 0 |
 
-착지 SHA의 hosted run은 Backend `35742655421`, Core `35742655096`, Documentation `35742655197`, Frontend `35742655364`, Desktop/Browser `35742655235`로 생성됐다. 보고 작성 시점에는 진행 중/대기이므로 통과로 세지 않는다.
+착지 SHA의 hosted run은 Backend `35742655421`, Core `35742655096`, Documentation `35742655197`, Frontend `35742655364`, Desktop/Browser `35742655235`로 생성됐다. 최초 보고 시점에는 진행 중/대기여서 통과로 세지 않았고, 아래 후속에서 Core 완주 결과만 별도로 보강했다.
+
+## hosted Linux·독립 검토 후속
+
+Core [run 35742655096](https://github.com/egparadise/SaintVision-Invion/actions/runs/35742655096)는 exact head `a4bf2cee3c4e396b0884aba7890aa3855e8d5aa8`에서 **success**로 완주했다. `saintvision-core-evidence`의 `core-tests.xml`(SHA-256 `965a98c8776ac7dd70b6ae7956493d2a600cee1b1ef15d02414ae4230df98bbf`)을 직접 집계한 결과는 전체 3,134 tests / 35 declared platform skips / 0 failure·error다.
+
+- `tests.integration.test_workspace_recovery`: **12/12 passed, 0 skipped/failed**.
+- `tests.integration.test_workspace_resume`: **11/11 passed, 0 skipped/failed**.
+- 합계 **23/23 Linux scoped-handle·bounded Workspace case가 실행**됐다. 개발 PC Windows의 23 skip은 `Linux scoped handles` 12건 + `Linux bounded Workspace execution` 11건이었으며, hosted Linux에서는 두 사유가 0 skip이다. 별도 `workspace-tests.xml`도 resume 11건을 다시 11/11 통과했다.
+
+Claude 독립 검토 PR #76은 승인이고, replay 권한 재검사를 제거한 되살림이 회수 후 201을 만들어 KILLED됐다. 이 보강은 review 관찰 O1을 해소하지만 물리 원격 WS/PTY/Git·Control Plane/Node 재시작 복원 여정을 대신하지 않는다. 따라서 S06-DB는 `review`와 AC-06 차단을 유지한다.
 
 ## 다음 행동
 
-Claude가 구현 SHA의 transaction lock/auth 순서, replay guard 실제 무게, Linux scoped-handle hosted 결과와 운영 설정 결속을 독립 검토한다. 작성자는 S06-DB를 self-close하지 않으며, 물리 원격 WS/PTY/Git 및 CP/Node 재시작 복원 여정은 별도 랩 담당이 측정한다.
+Claude 독립 검토와 hosted Linux 보강은 완료됐다. 작성자는 S06-DB를 self-close하지 않으며, 물리 원격 WS/PTY/Git 및 CP/Node 재시작 복원 여정은 [[Codex 5노드 랩 opt-in lane 정의]]에 따라 별도 랩 담당이 측정한다.
