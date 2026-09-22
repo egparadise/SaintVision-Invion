@@ -182,12 +182,14 @@ export const NodeList: React.FC<NodeListProps> = ({
               key={node.id}
               role={node.status === 'lost' ? 'alert' : 'status'}
               data-testid={`node-card-${node.id}`}
+              onClick={() => onSelectNode?.(node.id)}
               style={{
                 padding: '20px',
                 backgroundColor: 'var(--color-bg-surface)',
                 borderRadius: 'var(--radius-lg)',
                 border: `1px solid ${node.status === 'lost' ? '#ef4444' : node.status === 'unknown' ? '#f59e0b' : 'var(--color-border-subtle)'}`,
                 boxShadow: 'var(--shadow-sm)',
+                cursor: onSelectNode ? 'pointer' : 'default',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
@@ -221,7 +223,10 @@ export const NodeList: React.FC<NodeListProps> = ({
                   {node.status === 'lost' ? 'LOST (단절)' : node.status === 'unknown' ? 'UNKNOWN (미확인)' : node.status === 'active' ? 'ACTIVE (활성 · 헬스 미결정)' : node.status.toUpperCase()}
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : node.status === 'active' ? '#7dd3fc' : 'var(--color-text-muted)', lineHeight: 1.4 }}>
+              <p
+                data-testid={node.status === 'active' ? `node-active-status-notice-${node.id}` : undefined}
+                style={{ margin: 0, fontSize: '0.8125rem', color: node.status === 'lost' ? '#fca5a5' : node.status === 'unknown' ? '#fde68a' : node.status === 'active' ? '#7dd3fc' : 'var(--color-text-muted)', lineHeight: 1.4 }}
+              >
                 {node.status === 'lost'
                   ? '🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다. 제어 평면 연결이 끊어졌으므로 즉시 인프라 점검이 필요합니다.'
                   : node.status === 'unknown'
@@ -230,6 +235,29 @@ export const NodeList: React.FC<NodeListProps> = ({
                   ? 'ℹ️ 계약 상태: active (정상 가동 노드 · liveness 및 헬스 초록 표기 정책은 사용자 결정 대기 중).'
                   : '자원 정보 미관측 · 실행 대상에서 제외'}
               </p>
+              {onSelectNode && (
+                <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    data-testid={`node-detail-btn-${node.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectNode(node.id);
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '0.75rem',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--color-bg-subtle)',
+                      border: '1px solid var(--color-border-subtle)',
+                      color: 'var(--color-text-primary)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    상세 및 자원 보기 →
+                  </button>
+                </div>
+              )}
             </div>
           );
 
