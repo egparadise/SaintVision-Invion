@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.190"
+version: "1.0.191"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T04:20:00+09:00"
+updated: "2026-09-23T04:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -39,7 +39,7 @@ source_of_truth: "Git"
 
 - 기존 단일 Node private state의 top-level identity를 호환 primary로 유지하면서 `nodes[]`, 반복 `init --node-ip`, Node별 manifest/worker.zip/peer policy/certificate를 추가했다. 신규 Node ID를 side effect 전에 저장해 partial retry에서도 기존 Node·key·channel·CA·epoch를 교체하지 않는다.
 - CSR CN으로 대상 Node를 선택하고 HTTP bootstrap은 source IP 허용 목록에서 그 Node의 bundle/certificate만 반환한다. hash는 HTTP로 내지 않고 별도 operator 채널로 유지하며, status/observe와 방화벽 안내는 Node별 행/IP 목록이다.
-- implementation `6da99baf`, Ubuntu F1 hotfix `6fdcecab`: scratch image `User`/`WorkingDir`의 `None`≡`''`만 portable default로 허용하고 non-empty mismatch는 계속 거부한다. hotfix 단일 파일 23 passed; 실제 worker 재검증과 Claude 독립 검토 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
+- implementation `e7a37b0a`, Ubuntu F1 hotfix `10b0fc03`: 실제 Ubuntu 24.04 Node 1대가 mTLS online·observed true다. Claude 조건 보강 `619a45db`는 secondary legacy fallback과 peer-policy node/epoch/fingerprint mismatch를 고정하고 M1 1-fail·M3 3-fail로 KILLED, 복원 10 passed다. Node 2/3 CSR·Ubuntu 4대 전체·CP 겸임 Windows Node와 최종 Claude 전환 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
 
 ## 2026-09-23 S05-DB 5노드 lane 실행 계획
 
