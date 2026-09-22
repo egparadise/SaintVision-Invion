@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.112"
+version: "1.0.113"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T20:18:00+09:00"
+updated: "2026-09-22T20:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,19 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T20:18:00+09:00 (기준 integration tip `b877c601`, PR #36 병합 `8f3c80c8`, 작업 브랜치 `agent/gemini/docs-today-summary`).
+- 확인 기준: 2026-09-22T20:55:00+09:00 (최신 tip `7e50296c`, 작업 브랜치 `agent/gemini/model-retry-ui-design`).
+
+## 2026-09-22 RunDetail Model Retry (결정 #6 6a) UI 설계 메모 완결 (`agent/gemini/model-retry-ui-design`)
+
+- **설계 메모 정본**: [[2026-09-22_RunDetail_재시도액션_model-retries_UI설계_Gemini]]
+- **결정 #6 6a 계약 연동**: `POST /v1/projects/{project}/runs/{parent}/model-retries` (`563c54ce`)
+- **핵심 불변식 확립**:
+  1. **노출 조건**: `run.state === 'failed'` 종단 상태에서만 `🔄 Model Retry 준비` 버튼 노출 (`succeeded`, `running`, `cancelled` 등 타 상태 엄격 차단).
+  2. **Idempotency-Key 발급**: `idmp_model_retry_${prj}_${runId}_${timestamp}` 규격 및 중복 클릭 방지 loading / disabled 프로토콜.
+  3. **requiresFrozenInputAndApproval 정직 고지**: 자동 실행 없음 / 부모 데이터 불변 동결 고지 및 거버넌스 승인 센터(S04) 연계 배너(`role="status"`).
+  4. **Child Run & Lineage 표출**: 루트/부모 Run, 세대(Generation), 신규 자식 Run ID(`planned`), 예약 노드/리스 정보 표출.
+  5. **RFC 9457 Problem Details 오류 처리**: 409 Conflict(중복/미종단), 403 Forbidden(권한부족), 503 Unavailable(스케줄러/노드부족), 400 Bad Request 경보(`role="alert"`).
+  6. **Vitest 8대 회귀 시험 명세**: `apps/web/tests/model-retry-action.test.tsx` 시험 계획 확립.
 
 ## 2026-09-22 Gemini 오늘 PR 현황 및 Web Desktop UI 불변식 실측 현황 표
 
