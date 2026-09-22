@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.178"
+version: "1.0.179"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T23:25:00+09:00"
+updated: "2026-09-22T23:30:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 F-S05-01 설계 결정 초안
+
+- 유효한 실 PG 근거는 개발 PC 1대·합성 Node의 3동시 3/3×2·worst P95 861.651ms와 10동시 10/10×2·1,738.762ms다. 50동시는 미측정이며 기존 `RES-0003` 실측 주장은 PR #71 하네스 검토 뒤 철회했다.
+- [[ERR-DESIGN-008 프로젝트 배치 잠금과 관측 freshness 충돌]]을 코드상 위험 가설로 열었다. Codex 권고는 기존 계약을 유지한 speculative read 뒤 짧은 commit에서 ceiling·resource·grant·epoch/freshness를 모두 재검증하는 옵션 1이다.
+- batch API는 최대 50 item all-or-nothing·batch idempotency·단일 tenant/project를 요구하고 50독립 요청 AC를 대체하지 않는다. freshness 확대/진입 시각 고정은 stale 결정을 허용하고 P95를 고치지 않아 기각했다.
+- PR #68 재검토는 provenance 해소·PG-free 15 passed·비밀 0건을 확인했으나 E4 count-swap false negative가 남아 [수정 요청 유지](https://github.com/egparadise/SaintVision-Invion/pull/68#issuecomment-5778202909)다.
+- 구현·50동시 재실행·AC 판정은 Claude 설계 검토와 코디네이터 A/B/C 결정 뒤다. 상세: [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]], [[2026-09-22_23-30-00_KST_S05_배치잠금_결정초안_Codex]].
 
 ## 2026-09-22 S07-DB 노드 이탈·복구 반복 측정 — F-S07-03
 
@@ -18,12 +26,11 @@ source_of_truth: "Git"
 - 전용 5-node lane은 물리 lab 수동 workflow에서 명시적 DSN·topology로만 opt-in 실행하고 기본 Backend/Core 수집에서는 제외한다. 합성 하네스만으로 물리 bytes transfer 판정을 하지 않는다.
 - 단위 3, 관련 실 PG 회귀 14, route coverage 38, docs/bindings/frontend/ontology/ratchet/freshness가 exit 0이다. 같은 SHA hosted Docs·Frontend·Browser는 success, Core·Backend는 후속 push로 job 0 cancelled라 통과로 세지 않는다. reviewer Claude이며 self-close하지 않는다. 상세: [[2026-09-22_23-00-04_KST_S07-DB_노드이탈_복구반복측정_Codex]].
 
-## 2026-09-22 S05-DB 50동시 배치 예비 측정 — F-S05-01
+## 2026-09-22 S05-DB benchmark 교정 — F-S05-01
 
-- 실 PostgreSQL + 1개 합성 measured-node 행에서 50동시 placement를 두 차례 시작했으나 모두 첫 라운드 `RES-0003`으로 실패했다. 첫 시도는 snapshot을 준비 전에 잡은 하네스 오류(78.15초), 두 번째는 준비 뒤 바로 잡아도 project-lock 직렬 대기가 15초 freshness를 넘긴 실제 커널 성질(61.69초)이었다. P95·성공 순번은 기존 runner가 첫 예외에서 중단해 미산출이며 추정하지 않는다.
-- runner를 모든 Future의 성공/실패 지연·request index·completion order·오류 코드·snapshot/node/fencing·활성 예약량을 JSON/JUnit에 남기도록 고쳤다. snapshot ID를 제거하는 정규화나 freshness 자동 갱신은 하지 않는다. harness 단위 시험 3 passed, peak memory는 각각 34.8MB·218MB였다.
-- 최신 integration 기반 R1 후보에서 docs 817, bindings 52 fixtures/17 types/21 sites/12 replay guards, ontology 48, ratchet 18, Black·compile·diff 게이트가 모두 exit 0이다.
-- **F-S05-01 결정 대기:** project-lock 입도 완화(우선 검토 제안) vs batch 예약 API vs 15초 freshness 정책 변경. 결정 전 실 PG 재부하는 중단한다. 현재 adapter는 1개 합성 행이라 물리 5노드 AC-05가 아니며 S05-DB는 `review` 유지한다. reviewer Claude. 상세: [[2026-09-22_22-38-00_KST_S05-DB_50동시배치_예비측정_F-S05-01_Codex]].
+- exact landing `3f0fab3d`는 snapshot 계약 위반과 report TypeError가 있어 기존 78.15초/61.69초 `RES-0003` 수치를 철회했다. R1 `7569c418`로 13필드 계약+fixture validation과 summarize 호출을 교정했다.
+- 실 PG에서 3동시 P95 861.651ms, 10동시 1,738.762ms, 각 두 라운드 전부 성공·오류 0·결정성/replay/fencing/no-overbooking true, disposable DB 잔존 0을 확인했다.
+- 50동시와 물리 5노드는 미측정이다. project lock 뒤 15초 freshness 검사 위험만 코드상 가설로 유지하고 S05-DB는 `review`를 유지한다. 상세: [[2026-09-22_22-38-00_KST_S05-DB_50동시배치_예비측정_F-S05-01_Codex]].
 
 ## 2026-09-22 VF-CL-02(e) node-agent wire 계약 소비 + 카드 3 M1 보강
 
