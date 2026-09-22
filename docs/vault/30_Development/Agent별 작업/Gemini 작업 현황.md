@@ -21,16 +21,17 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
 
-## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 초안 수립 (`agent/gemini/s04-fe-matrix`)
+## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 v1.1.0 개정 (`agent/gemini/s04-fe-matrix`)
 
-- **OUT-04 / AC-04 완결을 위한 4대 핵심 축 12개 시나리오 매트릭스 (docs-only)**:
-  - **계획서 정본**: [[2026-09-23_S04-FE_만료_취소_중복_SSE재연결_시나리오_매트릭스_Gemini]].
-  - **만료 (EXP-01~03)**: TTL 경과 안건 승인 차단(`disabled=true`), 5초 폴링 실패 시 침묵 노화(Silent Aging) 방어 배너 및 스냅샷 시각 명시, 서버 410 Gone / ProblemDetails 대응.
-  - **취소 (CNC-01~03)**: 단말 상태(`succeeded`/`failed`/`cancelled`) 취소 버튼 완전 은닉, ADR-001 4대 표준 사유(`user_requested`, `timeout`, `budget_exceeded`, `security_concern`) 모달, ADR-040/042 자원 반환 대기 배너.
-  - **중복 (DUP-01~03)**: 원클릭 즉시 비활성화(`isSubmitting`) 더블클릭 방어, 1회용 Nonce 소비 및 409 Conflict 처리, 2인 승인 원칙(요청자 자가승인 및 1차 승인자 자가2차승인 차단).
-  - **SSE 재연결 (SSE-01~03)**: 1,000-entry RingBuffer at-least-once 중복 제거, 지수 백오프/지터 자동 재연결 및 `Last-Event-ID` 복원 커서, 타임라인 이벤트 시퀀스 단조 증가($seq_i > seq_{i-1}$) 보장.
-  - **돌연변이 사살 계획**: MUT-01(만료 우회), MUT-02(자가승인 허용), MUT-03(더블클릭 허용), MUT-04(SSE 중복 허용) 전수 KILLED 단언 설계.
-- **실측 계획**: Claude 독립 검토 승인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
+- **OUT-04 / AC-04 완결을 위한 4대 핵심 축 13개 시나리오 매트릭스 (docs-only, Claude UI & Codex Contract 검토 전면 반영)**:
+  - **계획서 정본**: [[2026-09-23_S04-FE_만료_취소_중복_SSE재연결_시나리오_매트릭스_Gemini]] (v1.1.0).
+  - **만료 (EXP-00~03)**: 만료 Access Token 401 ProblemDetails(`AUTH-0050`) 독립 행 추가, 안건 `isExpired` 시 승인 확정 버튼 `disabled=true` 및 mutation 0건 차단, 5초 폴링 실패 시 침묵 노화(Silent Aging) 방어 배너 및 스냅샷 시각 명시, 서버 시효 만료 거부 정본 HTTP 403 `AUTH-0031` 반영 (410/AUTH-0040 배제).
+  - **취소 (CNC-01~03)**: 단말 상태(`succeeded`/`failed`) 취소 시 409 `GRAPH-0002` 및 기취소 안건 멱등 200 Replay 보장, ADR-001 4대 표준 사유는 UI 로컬 수집 후 wire 전송은 strict `RunCancelInput={expectedVersion}`와 `Idempotency-Key`만 전달 (사유 필드 포함 시 422 `VAL-0003` 방어), required boolean `resourceReleasePending` 관측 및 재조회.
+  - **중복 (DUP-01~03)**: `ApprovalDetail.tsx`의 `isSubmitting` 더블클릭 방어 및 동일 키 200 Replay, `Idempotency-Key` 본문 불일치(409 `IDEM-0001`)와 1회용 Nonce 소비/만료(403 `AUTH-0034`/`AUTH-0033`) 엄격 분리, 프로덕션 심볼 `isSelfApprovalBlocked` 2인 승인 규칙 차단.
+  - **SSE 재연결 (SSE-01~03)**: 1,000-entry RingBuffer at-least-once 중복 제거, 정본 서버 ID 규격 `{recoveryEpoch}:{runId}:{sequence}` 적용, `Last-Event-ID` 커서 기반 `sequence > last` 재연결(범위 이탈 시 409 `STREAM-0001`), 최상위 JSON `sequence` 단조 증가($seq_i > seq_{i-1}$) 보장.
+  - **돌연변이 사살 계획**: 시험 로컬이 아닌 실제 프로덕션 심볼(MUT-01 `isExpired`, MUT-02 `isSelfApprovalBlocked`, MUT-03 `isSubmitting`, MUT-04 `RingBuffer.has`)을 대상으로 전수 KILLED 단언 수립.
+  - **하네스 재현성 원칙**: #77 교훈을 반영하여 `--port`, `--dev-dir`, `--idp-script`, `--server-env` 옵션 및 환경 미구성 시 우아한 `UNMEASURED` 종료 설계 명시.
+- **실측 계획**: Claude 및 Codex 독립 검토 승인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
 
 ## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 재실측 완결 (`agent/gemini/ui-invariants-run`)
 
