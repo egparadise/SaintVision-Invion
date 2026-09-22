@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.7"
+version: "1.2.8"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T20:15:00+09:00"
+updated: "2026-09-22T18:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+hosted CI triage + 새 PC 첫날 종합 카드 6 (Claude, 2026-09-22): 오늘 integration 착지 11 SHA × 5 workflow 표 확정 — **Core Build 첫 완주 3d1892c0**(30 step success, full pytest 2948/58/0, 두 실 Node shard replacement·LAN installer·go test 포함 → node-dependent 24파일의 hosted 검증 자리 채워짐) · **Backend 완주 3회**(7dce1737·3d1892c0·9cfd8a8e, 2668/45/0, ratchet 일치) · Browser 전 SHA 5/1 failure(케이스 `test_browser_real_catalogue_owner_scope_and_revocation` 특정, Gemini 진행) · 취소 다수 = concurrency pending 대체(연속 push, 코드 실패 0). 회귀 B1·환경차 B2 = 0. 검증상태지도 §8(전환 표·남은 not_run). 전문 [[2026-09-22_18-40-00_KST_HOSTED-CI-TRIAGE_Claude_새PC종합]].
 
 S02-DB·S03-DB 검토 인계 패키지 카드 5 (Claude, 2026-09-22): registry 사실 정정 — 둘 다 현재 **planned**(in_progress 2건은 S01-BE/ST) → 제안은 planned→review, **registry·ontology 무변경**(self-close 금지; 적용 시 Codex가 generate_ontology 재생성 필요, S01 stale 선례). AC-02↔증거 1:1(등록·조회/토큰 재사용 차단/타 tenant·project 차단/거부 기록 = test_api 28 + focused 63 = 91 passed d01c931a, 브라우저 여정 = Gemini Chrome153 3페이지, hosted Backend 35706465869 success) · AC-03↔증거(S03 세트 201 passed, 증거 없는 성공 DB 거부, EvidenceEnvelope 3자리 변이 KILLED, lease 회수 74). 미충족 표: 실 IdP·물리 노드(외부), 브라우저 인수 CI red(F-B), depends_on S01-BE/ST in_progress, node-runtime 24파일은 hosted Core 자리. 제안 diff 2건(275·403행). 전문 [[2026-09-22_18-25-00_KST_S02-DB_S03-DB_검토인계패키지_Claude]].
 
