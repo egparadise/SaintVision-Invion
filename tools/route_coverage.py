@@ -89,6 +89,8 @@ _NGINX_LOCATION_DIRECTIVE = re.compile(r"^\s*location\s+(?:~\s*)?\^?\s*$")
 #: ``prj`` already ends in ``projects/<id>/``. The leftover ``{}runs`` is a tool
 #: artefact, not a path the SPA asks for.
 _GLUED_HOLE = re.compile(r"\{\}(?=[A-Za-z])")
+#: A hole glued to the end of a segment: ``resolve${query}`` → ``resolve{}``.
+_TRAILING_GLUED_HOLE = re.compile(r"(?<=[A-Za-z0-9_\-])\{\}$")
 
 
 def normalise(path: str) -> str:
@@ -110,6 +112,54 @@ def served_routes(text: str) -> set[str]:
     return {normalise(prefix + path) for _, path in _DECORATOR.findall(text)}
 
 
+def _flatten_template_holes(text: str) -> str:
+    """Rewrite every ``${...}`` inside a backtick template literal to ``${x}``.
+
+    Found 2026-09-22 (PR #36 review): the literal/head regexes only allow a
+    hole made of identifier characters, so ``/v1/nodes/${encodeURIComponent(id)}``
+    -- a hole containing a *call* -- matched nothing, and the fallback head
+    ``/v1/nodes/`` ends in ``/`` and is dropped as a prefix. The path vanished
+    and the scan reported 0 unserved: a false green over 13 distinct SPA paths.
+    Holes are parsed with brace balancing (nested ``{}`` and nested template
+    literals inside the hole are consumed), so what is inside no longer matters.
+    A query string after the path (``...?path=${x}``) is cut at ``?`` for
+    ``/v1`` literals: the route is the part before it.
+    """
+    out: list[str] = []
+    i, n = 0, len(text)
+    while i < n:
+        ch = text[i]
+        if ch != "`":
+            out.append(ch); i += 1; continue
+        # inside a template literal
+        j = i + 1
+        body: list[str] = []
+        while j < n and text[j] != "`":
+            if text[j] == "\\" and j + 1 < n:
+                body.append(text[j:j + 2]); j += 2; continue
+            if text.startswith("${", j):
+                depth, k = 1, j + 2
+                while k < n and depth:
+                    c = text[k]
+                    if c == "`":  # nested template literal inside the hole
+                        k += 1
+                        while k < n and text[k] != "`":
+                            k += 2 if text[k] == "\\" else 1
+                    elif c == "{":
+                        depth += 1
+                    elif c == "}":
+                        depth -= 1
+                    k += 1
+                body.append("${x}"); j = k; continue
+            body.append(text[j]); j += 1
+        literal = "".join(body)
+        if literal.startswith("/v1/") and "?" in literal:
+            literal = literal.split("?", 1)[0]
+        out.append("`" + literal + "`")
+        i = j + 1
+    return "".join(out)
+
+
 def client_paths(text: str) -> set[str]:
     """``/v1`` paths a client source file mentions.
 
@@ -125,6 +175,8 @@ def client_paths(text: str) -> set[str]:
             _DEPLOYMENT_LOCATION_FIELD.search(prefix)
             or _NGINX_LOCATION_DIRECTIVE.fullmatch(prefix)
         )
+
+    text = _flatten_template_holes(text)
 
     # Full literal/template matches retain the path after interpolation. Do not
     # treat a quoted Nginx ``location`` field as a browser request.
@@ -143,6 +195,10 @@ def client_paths(text: str) -> set[str]:
         if head.endswith("/") or is_deployment_location(match):
             continue
         found.add(normalise(head))
+    # A hole glued to the END of a segment (``/v1/storage/resolve${query}``,
+    # ``.../attempts${cursor}``) is a query/suffix splice, not a new segment:
+    # credit the endpoint before it instead of reporting ``resolve{}`` as unserved.
+    found = {_TRAILING_GLUED_HOLE.sub("", p) for p in found}
     return {
         p
         for p in found
