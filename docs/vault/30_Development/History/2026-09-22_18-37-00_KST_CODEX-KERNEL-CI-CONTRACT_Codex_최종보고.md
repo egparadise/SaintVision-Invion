@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-2026-09-22-CODEX-KERNEL-CI-CONTRACT-FINAL"
 title: "Codex 커널·계약·CI 레인 최종 보고"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-22T18:37:00+09:00"
+updated: "2026-09-22T19:32:44+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "d01c931acf2127377a7cdc665ef3eee5f0402fe9"
@@ -67,8 +67,22 @@ Frontend path filter는 현재 실제 의존 뿌리 `apps/web/**`와 `contracts/
 
 Claude 독립 검토의 F-A(manifest catch 범위)와 F-B(`failedCaseIds`)는 `33283867`에서 좁은 예외 분류와 비밀 비노출을 유지해 보정했다. S02-DB/S03-DB는 증거 묶음이 독립 검토 가능한 상태여서 `review`만 수용했으며, 실 IdP·물리 Node·실 컨테이너 금지 명령/출력·선행 카드가 남아 `done`과 전체 AC 충족 주장은 금지했다. 상세는 [[2026-09-22_18-27-37_KST_S02-DB_S03-DB_Codex_독립검토]]다.
 
+## 6. 동일 SHA hosted CI 최종 완주
+
+최종 문서 SHA `f2aa2b1485fef76beaa8179537a0900d08a2e34c`를 가리키는 integration 실행과 고정 proof branch 수동 실행을 합쳐 다섯 workflow를 같은 SHA에서 모두 success로 확인했다.
+
+| workflow | run ID | trigger/ref | conclusion |
+|---|---:|---|---|
+| Backend Build | [35714785554](https://github.com/egparadise/SaintVision-Invion/actions/runs/35714785554) | workflow_dispatch / `agent/codex/f2aa-ci-proof` | success (Python 3.12, 3.14) |
+| Core Build | [35714470445](https://github.com/egparadise/SaintVision-Invion/actions/runs/35714470445) | workflow_dispatch / `agent/codex/f2aa-ci-proof` | success |
+| Desktop HTTP Browser Acceptance | [35712413553](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712413553) | push / `integration/all-agents-unified` | success |
+| Documentation Build | [35712413561](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712413561) | push / `integration/all-agents-unified` | success |
+| Frontend Build & Test | [35712428159](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712428159) | workflow_dispatch / `integration/all-agents-unified` | success |
+
+최초 Core [35712413499](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712413499)는 Docker isolation 단일 subcase에서 `NODE-0027`로 failure였고 attempt 2는 후속 integration concurrency 때문에 cancelled됐다. 같은 코드의 후속 integration Core [35713565774](https://github.com/egparadise/SaintVision-Invion/actions/runs/35713565774)와 고정 SHA Core `35714470445`가 모두 해당 Docker 단계와 전체 job을 success해 재현되지 않았으므로 runner Docker inspect transient로 분류했다. 최초 Backend `35712413514`의 Python 3.12 job이 Tests에서 비정상 장기 실행되어, 같은 SHA 고정 proof run `35714785554`의 두 Python job success를 최종 증거로 사용했다.
+
 ## 남은 경계와 다음 행동
 
 - 작성자 self-close를 하지 않는다. Claude review·운영 인수·실장비 경계는 별도다.
-- 마지막 문서 착지 SHA에서 다섯 hosted workflow를 실제 실행하고 run ID·conclusion을 후속 증거에 붙인다.
-- `python tools/sync_obsidian.py --check`와 `--apply`를 실행해 pending/conflict/exit를 기록한다.
+- 동일 SHA 다섯 hosted workflow 완주는 위 run ID로 고정했다. 작성자 self-close 없이 Claude 독립 검토와 운영 인수를 기다린다.
+- 다음 fresh dispatch의 첫 행동은 model-retries 타 tenant 요청이 503 `SYS-0001`로 새는 F1을 정직한 4xx `ProblemDetails`로 보정한 뒤 VF-CL-02(c) project-scoped 커널 라우트를 착지하는 것이다.

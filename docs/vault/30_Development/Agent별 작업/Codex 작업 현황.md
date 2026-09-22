@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.167"
+version: "1.0.168"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T19:25:00+09:00"
+updated: "2026-09-22T19:32:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -24,7 +24,8 @@ source_of_truth: "Git"
 - 검증: 6a clean tree focused 68 passed, 실PG HTTP 1 passed, bindings 51 fixtures/16 response types/19 sites, app anchor 3 rejection-tested/0 gaps, Go build·vet·test, TS strict, docs/frontend/ontology/ratchet 모두 exit 0. Core [35706465645](https://github.com/egparadise/SaintVision-Invion/actions/runs/35706465645)는 전체 단계 success, Browser [35710556600](https://github.com/egparadise/SaintVision-Invion/actions/runs/35710556600)도 success다.
 - 교차검토: Node resource usage의 grant·신선도·`released_at IS NULL` lease 집계·RES-0010/0011에 finding 없음. 당시 Frontend filter가 실제 의존 뿌리를 모두 덮는다고 판단했으나 `packages/contracts-ts/**` 직접 import와 integration all-5-same-SHA 요구를 누락했다. 위 경로 필터 교정 카드가 이 결론을 대체한다.
 - reviewer 판정: S02-DB/S03-DB는 review 진입만 수용했다. 실 IdP·물리 Node·실 컨테이너 금지 명령/출력·선행 카드가 남아 있어 done/self-close 금지다. registry·ontology 및 판정 History는 `3882496d`.
-- 다음 첫 행동: 최종 문서 SHA에 frontend를 수동 dispatch해 다섯 workflow를 동일 SHA로 완주시키고 run ID를 기록한 뒤 Obsidian check/apply를 수행한다. hosted 결과가 red면 소유 분류 후 Codex 몫만 수정한다.
+- 동일 SHA hosted CI: `f2aa2b14`에서 Backend [35714785554](https://github.com/egparadise/SaintVision-Invion/actions/runs/35714785554), Core [35714470445](https://github.com/egparadise/SaintVision-Invion/actions/runs/35714470445), Browser [35712413553](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712413553), Docs [35712413561](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712413561), Frontend [35712428159](https://github.com/egparadise/SaintVision-Invion/actions/runs/35712428159)가 모두 success했다. 최초 Core의 Docker isolation 단일 failure는 같은 코드 후속 Core `35713565774`와 고정 SHA 재실행이 모두 전체 success해 runner transient로 분류했다.
+- 다음 첫 행동: 다음 fresh dispatch에서 model-retries 타 tenant 503 `SYS-0001` F1을 정직한 4xx로 먼저 보정하고 VF-CL-02(c) project-scoped 커널 라우트를 구현한다. 이 카드는 self-close하지 않고 Claude 독립 검토·운영 인수를 기다린다.
 - Evidence: [[2026-09-22_18-37-00_KST_CODEX-KERNEL-CI-CONTRACT_Codex_최종보고]], [[2026-09-22_18-27-37_KST_S02-DB_S03-DB_Codex_독립검토]].
 
 ## 2026-09-22 hosted CI 러너 기아 방지
