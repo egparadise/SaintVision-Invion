@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-FIVE-NODE-LAB-LANE-001"
 title: "Codex 5노드 랩 opt-in lane 정의"
-version: "1.5.0"
+version: "1.6.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T06:40:00+09:00"
+updated: "2026-09-23T10:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark", "NTP", "mTLS"]
@@ -13,7 +13,7 @@ tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark"
 
 # Codex 5노드 랩 opt-in lane 정의
 
-이 문서는 S05/S07 opt-in 측정과 S06 원격 WS/PTY/Git 재시작 여정을 **등록 실행 Node 5개 랩**에서만 실행하기 위한 수동 lane 제안이다. v1.5는 [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]]의 CP 겸임 Node 제외 규칙과 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.3의 결정 (b)를 함께 고정하고, `placement_benchmark.py`의 물리 inventory read-only dry-run 계약을 추가한다. Windows Control Plane 호스트의 Docker Desktop Linux Node 1개는 all-five smoke에만 포함하고, 별도 Ubuntu 물리 Node 4개만 S05 timed wave의 candidate와 지연 분모에 넣는다. `placementShortCommit`은 계속 기본 off이며 현재 승인 범위는 inventory-bound **legacy 20동시 선측정 계획**까지다. v1.5 구현은 부하를 실행하지 않으며 실제 wave 실행은 후속 승인·구현 대상이다.
+이 문서는 S05/S07 opt-in 측정과 S06 원격 WS/PTY/Git 재시작 여정을 **등록 실행 Node 5개 랩**에서만 실행하기 위한 수동 lane 제안이다. v1.6는 [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]]의 CP 겸임 Node 제외 규칙과 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.4를 함께 고정하고, `placement_benchmark.py`의 물리 inventory read-only dry-run 계약과 [[S07 5노드 실 Node adapter 사양]]을 연결한다. Windows Control Plane 호스트의 Docker Desktop Linux Node 1개는 all-five topology에만 포함하고, 별도 Ubuntu 물리 Node 4개만 S05 timed wave와 S07 기본 disruption 분모에 넣는다. `placementShortCommit`은 계속 기본 off이며 현재 승인 범위는 inventory-bound **legacy 20동시 선측정 계획**과 S07 read-only preflight 사양까지다. 실제 S07 adapter 구현·Node disruption과 복구 wave는 후속 승인 대상이다.
 
 ## 토폴로지 B와 수량 의미
 
@@ -129,16 +129,17 @@ artifact에는 trial별 `targetNodeId`, `hostId`, `failureDomainId`, `coLocatedW
 
 ```text
 python tools/placement_benchmark.py --adapter five-node-lab --inventory "$LAB_INVENTORY_PATH" --dry-run --report "$LAB_EVIDENCE_ROOT/preflight/five-node-lab.json"
+python tools/measure_s07_recovery.py --adapter five-node-lab --inventory "$LAB_INVENTORY_PATH" --dry-run --json-out "$LAB_EVIDENCE_ROOT/preflight/s07-five-node.json"  # 제안·미구현, preflight only
 python tools/placement_benchmark.py --mode legacy --requests 20 --concurrency 20 --rounds 1 --report "$LAB_EVIDENCE_ROOT/control/s05-legacy-20.json" --junit "$LAB_EVIDENCE_ROOT/control/s05-legacy-20.xml"
 python tools/run_s05_five_node_benchmark.py --inventory "$LAB_INVENTORY_PATH" --modes legacy --waves 20 --repetitions 3 --decision-sha 9dafbf09d084ed793301937ba7834a4ca057ba2d --exclude-cp-colocated --json-root "$LAB_EVIDENCE_ROOT/s05" --junit-root "$LAB_EVIDENCE_ROOT/s05"  # 제안·미구현
 # candidate 또는 50동시는 별도 승인 SHA 뒤에만 입력을 확장한다. 현재 복사·실행 금지.
-python tools/run_s07_five_node_recovery.py --inventory "$LAB_INVENTORY_PATH" --eligible-only --repetitions 20 --liveness-timeout-seconds 60 --poll-interval-seconds 0.1 --target-recovery-success-rate 0.95 --json-out "$LAB_EVIDENCE_ROOT/s07-recovery.json" --junit-out "$LAB_EVIDENCE_ROOT/s07-recovery.xml"  # 제안·미구현
+python tools/run_s07_five_node_recovery.py --inventory "$LAB_INVENTORY_PATH" --eligible-only --repetitions 20 --liveness-timeout-seconds 60 --poll-interval-seconds 0.1 --target-recovery-success-rate 0.95 --json-out "$LAB_EVIDENCE_ROOT/s07-recovery.json" --junit-out "$LAB_EVIDENCE_ROOT/s07-recovery.xml"  # 제안·미구현, 실제 disruption은 별도 승인
 python tools/check_remote_workspace.py --state "<node-state-dir>" --prepared "<prepared.json>" --image "<worker-image-digest>" --preflight-only
 python tools/check_remote_workspace.py --state "<node-state-dir>" --prepared "<prepared.json>" --image "<worker-image-digest>"
 python tools/run_s06_five_node_journey.py --inventory "$LAB_INVENTORY_PATH" --code-sha "<code_sha>" --control-plane-image "<digest>" --node-agent-image "<digest>" --worker-image "<digest>" --json-out "$LAB_EVIDENCE_ROOT/s06-remote.json" --junit-out "$LAB_EVIDENCE_ROOT/s06-remote.xml"  # 제안·미구현
 ```
 
-`placement_benchmark.py`의 두 명령과 `check_remote_workspace.py`의 두 명령은 현재 실제 인터페이스다. `run_s05_five_node_benchmark.py`, `run_s07_five_node_recovery.py`, `run_s06_five_node_journey.py`는 **제안·미구현**이다. 따라서 `five-node-lab` adapter는 inventory/DB preflight까지만 실행 가능하고 timed placement wave를 실행하지 않는다. S05 control과 기존 `measure_s07_recovery.py`는 실 PostgreSQL의 합성 node row를 측정하므로, 단지 5노드 runner에서 실행해도 물리 5노드 증거가 되지 않는다. 후속 브랜치는 preflight의 선택 집합을 실제 물리 wave에 사전 적용하고 동일 JSON/JUnit 형식의 evidence를 제공해야 한다. S06 runner는 실제 Git commit/push 또는 격리 remote publish, PTY 명령·resize·재접속, Control Plane 재시작, 대상 Node 재시작, 새 ticket으로 resume, snapshot restore hash 일치, 중복 실행 0을 한 여정으로 증명해야 한다. 기존 `check_remote_workspace.py`의 7개 case(`python`, `ai`, 두 cancel, `failure`, `timeout`, `output-recovery`)는 선행 원격 실행 증거일 뿐 WS/PTY/Git 재시작 증거를 대신하지 않는다.
+`placement_benchmark.py`의 두 명령과 `check_remote_workspace.py`의 두 명령만 현재 실제 인터페이스다. `measure_s07_recovery.py --adapter five-node-lab`, `run_s05_five_node_benchmark.py`, `run_s07_five_node_recovery.py`, `run_s06_five_node_journey.py`는 **제안·미구현**이다. 따라서 현재 `five-node-lab` 구현은 S05 inventory/DB preflight까지만 실행 가능하고 timed placement·S07 recovery wave를 실행하지 않는다. S05 control과 기존 `measure_s07_recovery.py`는 실 PostgreSQL의 합성 node row를 측정하므로, 단지 5노드 runner에서 실행해도 물리 5노드 증거가 되지 않는다. S07 adapter 후속 브랜치는 #101 inventory를 단일 정본으로 재사용하고 `measurementEligible.s07`로 CP 겸임 Node를 disruption 전에 제외하되 첫 카드는 read-only preflight만 제공한다. 실제 wave는 preflight의 선택 집합을 물리 실행기에 사전 적용하고 동일 JSON/JUnit 형식의 evidence를 제공해야 한다. S06 runner는 실제 Git commit/push 또는 격리 remote publish, PTY 명령·resize·재접속, Control Plane 재시작, 대상 Node 재시작, 새 ticket으로 resume, snapshot restore hash 일치, 중복 실행 0을 한 여정으로 증명해야 한다. 기존 `check_remote_workspace.py`의 7개 case(`python`, `ai`, 두 cancel, `failure`, `timeout`, `output-recovery`)는 선행 원격 실행 증거일 뿐 WS/PTY/Git 재시작 증거를 대신하지 않는다.
 
 S05 → S07 → S06 순서로 한 번에 하나만 실행한다. S07의 감지 상한은 커널 predicate를 바꾸지 않고 `60초 timeout + 0.1초 poll`이며, JSON의 synthetic recovery는 물리 byte 복구 성공률로 승격하지 않는다. 실패·timeout 때도 owned DB/container만 보존 또는 정리하고 red artifact를 업로드한다.
 

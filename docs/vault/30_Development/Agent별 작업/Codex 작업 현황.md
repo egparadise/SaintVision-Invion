@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.198"
+version: "1.0.199"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T09:20:00+09:00"
+updated: "2026-09-23T10:05:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S07 Card23 5노드 실 Node adapter 사양
+
+- `measure_s07_recovery.py`의 미래 `--adapter five-node-lab --inventory ... --dry-run`을 사양화했다. #101 canonical inventory/read-only DB 분류를 단일 정본으로 재사용하고 등록 Node·heartbeat/snapshot·mTLS identity·`lan-workspace-v1`을 조회만 한다.
+- topology에는 CP 겸임 Node를 포함하되 disruption target은 ready·`measurementEligible.s07=true`·CP 독립 Ubuntu 4대로 제한한다. 20회 미래 계획은 4대 각 5회지만 이 카드에서 Node 중단·repair·JUnit·5노드 실행은 모두 미실행이다.
+- 기존 S07 synthetic 기본 동작과 공개 계약·registry·ontology는 불변이다. S07-DB `review`, AC-07 미측정을 유지하며 구현은 Claude 검토와 코디네이터 별도 승인 뒤다. [[S07 5노드 실 Node adapter 사양]], [[2026-09-23_10-05-00_KST_S07_5노드_adapter_사양_Codex]].
 
 ## 2026-09-23 S05 Card22 B′ 구현 사양
 
