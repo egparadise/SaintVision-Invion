@@ -1,22 +1,29 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.22"
+version: "1.5.23"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T02:50:00+09:00"
+updated: "2026-09-23T03:45:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
+## 2026-09-23 S05-DB 결정 (b) · P1/P2 대칭 계측
+
+- 코디네이터는 (b) legacy 유지·5노드 후 재판단을 확정했다. `placementShortCommit=false`, S05-DB `review`, 20동시 초과·50동시/5노드 미승격을 유지한다.
+- F-C1 정정: 기존 1526.365→116.848ms hold 비교는 legacy만 lock 대기를 포함해 비대칭이므로 “감소 통과”를 철회했다. 대칭 20동시 1회는 legacy 20/20, hold/acquire/client request P95 289.365/1453.658/1885.489ms; candidate 8/20, 170.766/528.705/1054.907ms다. candidate 실패 12건은 모두 limits `FOR UPDATE`의 `55P03`이다.
+- 양 mode에 다른 lock_timeout 경로는 없다. legacy 1453.658ms acquire elapsed는 client wall clock이고 server wait_event가 없어 500ms 면제의 증거가 아니다. 원인은 F-S05-02 경계에서 미확정, 57014는 이번 wave 0건이다.
+- 재개 조건: Claude 카드 20이 P1/P2 코드·수치·정직성을 검토한다. 다음 후보인 candidate lock-timeout 예산/queue 깊이 상한은 별도 결정 전 미구현이다. [[2026-09-23_03-45-00_KST_S05_P1_P2_대칭계측_Codex]].
+
 ## 2026-09-23 S05-DB F-S05-03 fail-fast 재판정
 
 - candidate의 database contention 내부 retry를 제거했다. 첫 limit-row `55P03`은 기존 `RES-0007`/503/retryable로 즉시 반환하며 stale speculative decision 재계획은 유지한다. flag 기본 off, 공개 계약 변경 0이다.
 - F-R1 tight-fit과 F-R2 BoundDatabase `55P03` savepoint 시험을 추가했다. 원본 focused는 13 passed/exit 0, active_total 제거와 savepoint 제거 mutation은 각각 대상 시험 exit 1로 KILLED다. 카드 14의 두 되살림 미확인을 정정했다.
-- 최종 a60313a7 20동시×3은 legacy timeout 2, candidate 외부 `55P03` 27·내부 retry 0이다. hold P95 중앙 1526.365→116.848ms, request P95(all) 1817.763→922.915ms지만 외부 timeout 비증가 실패로 단계 3 미통과다. 5a612ebd 첫 세트는 schema 명명 결함이 있는 calibration으로 분리 보존했다.
-- 재개 조건: 코디네이터가 (a) limit-row kind별 행/usage CAS 상세 설계 또는 (b) legacy 유지·inventory-bound 5노드 20동시 선측정 중 하나를 결정한다. 그 전 flag 활성, limit-row migration, 20동시 초과·50동시는 금지한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]]
+- 최종 a60313a7 20동시×3은 legacy timeout 2, candidate 외부 `55P03` 27·내부 retry 0이다. 당시 hold P95 1526.365→116.848ms는 비대칭 계측이라 비교 근거에서 철회하며, request P95(all) 1817.763→922.915ms와 외부 timeout 비증가 실패 기록은 유지한다. 5a612ebd 첫 세트는 schema 명명 결함이 있는 calibration으로 분리 보존했다.
+- 이 과거 선택 대기는 위 결정 (b)로 해소됐다. flag 활성, limit-row migration, 20동시 초과·50동시는 여전히 금지한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]]
 
 ## 2026-09-23 S05-DB F-S05-01 timeout 실측
 

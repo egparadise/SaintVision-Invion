@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceId": "s05-symmetric-metrics-card18",
+  "recordedAt": "2026-09-23T03:45:00+09:00",
+  "baseSha": "ccca9b8f2294e279089eede0e5657de59b4da069",
+  "implementationState": "working-tree-before-r1-landing",
+  "environment": {
+    "executor": "development Windows PC",
+    "database": "real PostgreSQL disposable database per process",
+    "topology": "one synthetic measured-node row",
+    "requests": 20,
+    "rounds": 1,
+    "sqlObserver": "in-process parameter-free statement template observer",
+    "acceptanceClaim": false,
+    "fiveNode": false
+  },
+  "legacy": {
+    "processExit": 0,
+    "successCount": 20,
+    "failureCount": 0,
+    "requestP95AllMs": 1885.489,
+    "postAcquireLockHoldP95Ms": 289.365,
+    "lockAcquireElapsedP95Ms": 1453.658,
+    "lockAcquireMeasurement": "client wall clock around project FOR NO KEY UPDATE plus limits FOR UPDATE; not server wait_event duration",
+    "sqlStateCounts": {},
+    "slowestObservedStatement": {
+      "statement": "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
+      "elapsedMs": 1492.238,
+      "outcome": "success"
+    },
+    "rawEvidenceSha256": {
+      "json": "3c7bc568df157455269f9506277d3071b3e4e58a658bd5dce4a6c83aa60c5abf",
+      "junit": "f8ccc3e85357cc5bea46de81b657c3536c1ba4142f7463cc1cdd320475bee725"
+    }
+  },
+  "candidate": {
+    "processExit": 1,
+    "processExitReason": "benchmark evidence red because 12 of 20 requests failed",
+    "successCount": 8,
+    "failureCount": 12,
+    "requestP95AllMs": 1054.907,
+    "postAcquireLockHoldP95Ms": 170.766,
+    "lockAcquireElapsedP95Ms": 528.705,
+    "lockAcquireMeasurement": "client wall clock around limits FOR UPDATE; not server wait_event duration",
+    "sqlStateCounts": {
+      "55P03": 12,
+      "57014": 0
+    },
+    "timeoutStatement": {
+      "statement": "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
+      "sqlState": "55P03",
+      "count": 12,
+      "phase": "placement-limit-row-wait"
+    },
+    "rawEvidenceSha256": {
+      "json": "25ca04f2cf047e1512ada81389bba62b9e954261ac6eedb567395e106dac7f53",
+      "junit": "1c0fc0bfd88531ffeea8509386cec74abbd07a74398281c56741660ac5302653"
+    }
+  },
+  "interpretation": {
+    "symmetricHoldComparison": "legacy 289.365ms vs candidate 170.766ms is directional only; candidate has 8 committed samples and 12 timeouts, so it is not an acceptance proof",
+    "fC1": "previous 1526.365ms vs 116.848ms comparison was asymmetric and is withdrawn as a passed hold-reduction gate",
+    "fS0502": "there is no separate lock_timeout setting path or exemption in code. Both modes use the same Database.transaction SET LOCAL lock_timeout=500ms and statement_timeout=2s. Legacy client-observed elapsed above 500ms with no 55P03 does not prove server lock wait above 500ms because the observer includes Python thread scheduling and return delay; this run has no server wait_event samples. The exact reason remains unmeasured.",
+    "sqlAttribution": "candidate 55P03 is attributed to project_resource_limits FOR UPDATE. No 57014 occurred in either card18 wave, so no new 57014 attribution is made.",
+    "decision": "option-b-legacy-remains-default-off-candidate",
+    "status": "S05-DB-review"
+  },
+  "invariants": {
+    "legacyUniqueFencingTokens": true,
+    "legacyNoOverbooking": true,
+    "candidateUniqueFencingTokens": true,
+    "candidateNoOverbooking": true,
+    "secretsDetectedInCapturedStdoutStderr": false
+  }
+}

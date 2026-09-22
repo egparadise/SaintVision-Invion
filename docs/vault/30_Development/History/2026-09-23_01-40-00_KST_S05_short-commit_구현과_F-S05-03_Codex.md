@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-2026-09-23-S05-SHORT-COMMIT-F-S05-03"
 title: "S05 옵션 1 short-commit 구현과 F-S05-03 경합 재배치"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T02:50:00+09:00"
+updated: "2026-09-23T03:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "83bc1434cba23258627e4aedb86fa9a56088bc46"
@@ -18,7 +18,7 @@ tags: ["placement", "short-commit", "postgresql", "concurrency", "F-S05-03", "fe
 
 ## 결론
 
-코디네이터가 조건부 승인한 옵션 1을 `placementShortCommit` 기본 off flag로 구현했다. commit lock-hold P95 중앙값은 **1399.883ms → 122.126ms**로 줄었지만, 내부 SQL timeout은 legacy 0/0/0건에서 candidate 14/10/11건으로 늘었다. 모두 project limit row 획득의 `55P03`이고 최대 3회 내부 retry가 최종 응답의 실패를 숨겼다. 따라서 단계 3은 두 조건 중 hold 감소만 통과했고 timeout 감소는 실패했다.
+코디네이터가 조건부 승인한 옵션 1을 `placementShortCommit` 기본 off flag로 구현했다. 당시 commit lock-hold P95 중앙값은 **1399.883ms → 122.126ms**로 기록됐지만, 카드 19 F-C1에서 legacy만 잠금 대기를 포함한 비대칭 계측임을 확인해 **hold 감소 통과 판정을 철회한다**. 내부 SQL timeout은 legacy 0/0/0건에서 candidate 14/10/11건으로 늘었다. 모두 project limit row 획득의 `55P03`이고 최대 3회 내부 retry가 최종 응답의 실패를 숨겼다. 단계 3 미통과·flag off 결론은 유지한다.
 
 이를 **F-S05-03 경합 재배치**로 기록한다. flag는 켜지 않으며 5노드·50동시 카드로 승격하지 않는다. S05-DB는 `review`를 유지하고 Claude 카드 18 구현 검토 뒤 limit-row 잠금 입도/배치 갱신 또는 내부 retry 없는 fail-fast를 별도 결정한다.
 
@@ -56,7 +56,7 @@ tags: ["placement", "short-commit", "postgresql", "concurrency", "F-S05-03", "fe
 | candidate | 2 | 20/0 | 1697.737ms | 45.587 / 130.355 / 149.917ms | `55P03` 10 | 0 |
 | candidate | 3 | 20/0 | 1656.683ms | 45.939 / 122.126 / 123.818ms | `55P03` 11 | 0 |
 
-요청 P95 중앙값은 1771.763ms에서 1697.737ms로 **74.026ms, 약 4.2%**만 개선됐다. hold P95 중앙값은 1399.883ms에서 122.126ms로 감소해 조건 1은 통과했다. 그러나 timeout 중앙값/합계는 0에서 11/35로 증가해 조건 2는 실패했다. candidate의 timeout statement는 전부 `SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE`다.
+요청 P95 중앙값은 1771.763ms에서 1697.737ms로 **74.026ms, 약 4.2%**만 개선됐다. hold P95 1399.883→122.126ms는 비대칭 계측이므로 조건 1 판정은 **미확정**으로 정정한다. timeout 중앙값/합계는 0에서 11/35로 증가해 조건 2는 실패했다. candidate의 timeout statement는 전부 `SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE`다. 대칭 후속은 [[2026-09-23_03-45-00_KST_S05_P1_P2_대칭계측_Codex]]를 따른다.
 
 구현 중 제외한 두 calibration도 숨기지 않는다. `1487a18f` 후보 첫 실행은 active 사용량 변화 자체를 digest 불일치로 보아 3회 재계획을 소진했고 4/20만 성공했다. 이를 잠금 아래 fit 재계산으로 고친 뒤 20/20을 확인했다. `ec0461a1` 한 회는 hold timer가 limit row 획득 대기를 포함해 instrumentation 의미가 달랐으므로, timer를 실제 획득 직후로 옮기고 최종 3회를 새로 실행했다. 구조화 집계는 [[s05-short-commit-stage3-a0f7dba2.json]]이다.
 

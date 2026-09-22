@@ -1,5 +1,6 @@
 """Real-PostgreSQL preliminary placement benchmark for the S05 lab harness."""
 
+from collections import Counter
 from datetime import datetime, timezone
 from decimal import Decimal
 import json
@@ -10,8 +11,6 @@ from threading import Lock
 from types import SimpleNamespace
 
 import psycopg
-from psycopg import sql
-from psycopg.conninfo import conninfo_to_dict
 from psycopg.types.json import Jsonb
 import pytest
 
@@ -101,22 +100,15 @@ def placement_benchmark_env(env):
     diagnostics_lock = Lock()
 
     def observe_statement(event):
-        with diagnostics_lock:
-            sql_diagnostics.append(event)
+        if event["outcome"] == "error" or event["elapsedMs"] >= 50:
+            with diagnostics_lock:
+                sql_diagnostics.append(event)
 
     def observe_lock_hold(event):
         with diagnostics_lock:
             lock_hold_metrics.append(event)
 
     diagnostic = os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1"
-    if diagnostic:
-        runtime_role = conninfo_to_dict(env.runtime)["user"]
-        with psycopg.connect(env.owner) as conn:
-            conn.execute(
-                sql.SQL("ALTER ROLE {} SET log_min_duration_statement='500ms'").format(
-                    sql.Identifier(runtime_role)
-                )
-            )
     placement_db = Database(
         env.runtime,
         recovery_epoch=env.epoch,
@@ -271,18 +263,36 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         snapshot_replay_stable=snapshot_replay_stable,
         rounds_requested=round_count,
     )
+    timeout_statement_counts = Counter(
+        (item["sqlState"], item["statement"])
+        for item in a.sql_diagnostics
+        if item["outcome"] == "error" and item["sqlState"] in {"55P03", "57014"}
+    )
     report["sqlDiagnostics"] = {
         "enabled": os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1",
-        "logMinDurationStatementMs": (
-            500 if os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1" else None
-        ),
-        "errors": list(a.sql_diagnostics),
+        "observer": "in-process-connection-wrapper",
+        "successThresholdMs": 50,
+        "lockTimeoutMs": 500,
+        "statementTimeoutMs": 2000,
+        "events": list(a.sql_diagnostics),
+        "timeoutStatements": [
+            {"sqlState": state, "statement": statement, "count": count}
+            for (state, statement), count in sorted(timeout_statement_counts.items())
+        ],
     }
     hold_metrics = [
-        item for item in a.lock_hold_metrics if item["mode"] != "placement-limit-row-wait"
+        item
+        for item in a.lock_hold_metrics
+        if item["mode"]
+        not in {"placement-limit-row-wait", "placement-legacy-lock-wait"}
     ]
-    wait_metrics = [
+    candidate_wait_metrics = [
         item for item in a.lock_hold_metrics if item["mode"] == "placement-limit-row-wait"
+    ]
+    legacy_wait_metrics = [
+        item
+        for item in a.lock_hold_metrics
+        if item["mode"] == "placement-legacy-lock-wait"
     ]
     committed_holds = [
         item["lockHoldMs"]
@@ -312,36 +322,48 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         ),
         "commitMaxMs": round(max(committed_holds), 3) if committed_holds else None,
     }
-    wait_values = [item["waitMs"] for item in wait_metrics]
-    wait_timeout_count = sum(item["outcome"] == "timeout" for item in wait_metrics)
-    report["limitRowWait"] = {
-        "contentionPolicy": (
-            "fail-fast"
-            if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
-            else "legacy-project-serial"
-        ),
-        "samples": wait_metrics,
-        "attemptCount": len(wait_metrics),
-        "acquisitionAttemptCount": len(wait_metrics),
-        "acquiredCount": sum(item["outcome"] == "acquired" for item in wait_metrics),
-        "timeoutCount": wait_timeout_count,
-        # Kept for additive compatibility with v1.3 evidence.  Under the
-        # fail-fast policy a timeout is returned, never retried internally.
-        "timeoutRetryCount": 0,
-        "p50Ms": (
-            round(percentile_nearest_rank(wait_values, 0.50), 3)
-            if wait_values
-            else None
-        ),
-        "p95Ms": (
-            round(percentile_nearest_rank(wait_values, 0.95), 3)
-            if wait_values
-            else None
-        ),
-        "maxMs": round(max(wait_values), 3) if wait_values else None,
-    }
-    report["schemaVersion"] = "1.4.0"
+    def summarize_waits(metrics, *, mode, policy):
+        values = [item["waitMs"] for item in metrics]
+        return {
+            "mode": mode,
+            "contentionPolicy": policy,
+            "measurementMethod": "client-wall-clock-around-lock-statements",
+            "samples": metrics,
+            "attemptCount": len(metrics),
+            "acquisitionAttemptCount": len(metrics),
+            "acquiredCount": sum(item["outcome"] == "acquired" for item in metrics),
+            "timeoutCount": sum(item["outcome"] == "timeout" for item in metrics),
+            "timeoutRetryCount": 0,
+            "p50Ms": (
+                round(percentile_nearest_rank(values, 0.50), 3) if values else None
+            ),
+            "p95Ms": (
+                round(percentile_nearest_rank(values, 0.95), 3) if values else None
+            ),
+            "maxMs": round(max(values), 3) if values else None,
+        }
+
+    report["legacyLockWait"] = summarize_waits(
+        legacy_wait_metrics,
+        mode="placement-legacy-lock-wait",
+        policy="project-then-limit-serial",
+    )
+    report["limitRowWait"] = summarize_waits(
+        candidate_wait_metrics,
+        mode="placement-limit-row-wait",
+        policy="fail-fast",
+    )
+    report["lockAcquireWait"] = (
+        report["limitRowWait"]
+        if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
+        else report["legacyLockWait"]
+    )
+    report["schemaVersion"] = "1.5.0"
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
+    report["contentionObservation"]["serverSideLockWaitSeparatelyMeasured"] = False
+    report["contentionObservation"][
+        "clientObservedLockAcquireElapsedSeparatelyMeasured"
+    ] = True
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -364,6 +386,10 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     record_property("lockHoldCommitP95Ms", report["lockHold"]["commitP95Ms"])
     record_property("lockHoldCommitMaxMs", report["lockHold"]["commitMaxMs"])
     record_property("lockHoldRollbackCount", report["lockHold"]["rollbackCount"])
+    record_property("lockAcquireWaitMode", report["lockAcquireWait"]["mode"])
+    record_property("lockAcquireWaitP50Ms", report["lockAcquireWait"]["p50Ms"])
+    record_property("lockAcquireWaitP95Ms", report["lockAcquireWait"]["p95Ms"])
+    record_property("lockAcquireWaitMaxMs", report["lockAcquireWait"]["maxMs"])
     record_property("limitRowWaitP50Ms", report["limitRowWait"]["p50Ms"])
     record_property("limitRowWaitP95Ms", report["limitRowWait"]["p95Ms"])
     record_property("limitRowWaitMaxMs", report["limitRowWait"]["maxMs"])
@@ -374,6 +400,9 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     record_property("limitRowTimeoutCount", report["limitRowWait"]["timeoutCount"])
     record_property(
         "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
+    )
+    record_property(
+        "sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"])
     )
     print("PLACEMENT_BENCHMARK_RESULT=" + json.dumps(report, sort_keys=True))
     if first.failure_count:

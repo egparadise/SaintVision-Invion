@@ -123,15 +123,49 @@ class PlacementStore:
             ).fetchone():
                 raise DomainError("MODEL-0003", "Run already has a model input reservation", 409)
             lease_store._admit_locked(conn, project, run_id, run=run)
+            mark_statement_phase(
+                "placement-legacy-lock-wait", track_lock_hold=False
+            )
+            wait_started = perf_counter_ns()
+            try:
+                conn.execute(
+                    "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
+                    (project,),
+                ).fetchone()
+                limits = conn.execute(
+                    "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
+                    (project,),
+                ).fetchone()
+            except Exception as error:
+                record_placement_metric(
+                    self.db,
+                    {
+                        "mode": "placement-legacy-lock-wait",
+                        "attempt": 1,
+                        "waitMs": round(
+                            (perf_counter_ns() - wait_started) / 1_000_000, 3
+                        ),
+                        "outcome": "timeout",
+                        "sqlState": getattr(error, "sqlstate", None),
+                    },
+                )
+                raise
+            record_placement_metric(
+                self.db,
+                {
+                    "mode": "placement-legacy-lock-wait",
+                    "attempt": 1,
+                    "waitMs": round(
+                        (perf_counter_ns() - wait_started) / 1_000_000, 3
+                    ),
+                    "outcome": "acquired",
+                    "sqlState": None,
+                },
+            )
+            # Match the candidate metric: start after the serializing limits
+            # row has been acquired, so lock wait and lock ownership are not
+            # folded into one number.
             mark_statement_phase("placement-legacy-lock-scope")
-            conn.execute(
-                "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
-                (project,),
-            ).fetchone()
-            limits = conn.execute(
-                "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
-                (project,),
-            ).fetchone()
             if not limits:
                 raise DomainError("RES-0008", "Provisioned project resource ceilings required", 403)
             permitted = [
@@ -599,6 +633,11 @@ class PlacementStore:
                                 "MODEL-0003", "Run already has a model input reservation", 409
                             )
                         lease_store._admit_locked(conn, project, run_id, run=run)
+                        mark_statement_phase(
+                            "placement-limit-row-wait",
+                            attempt=attempt,
+                            track_lock_hold=False,
+                        )
                         wait_started = perf_counter_ns()
                         try:
                             limits = conn.execute(

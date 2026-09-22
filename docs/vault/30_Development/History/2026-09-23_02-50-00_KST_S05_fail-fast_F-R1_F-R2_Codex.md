@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-2026-09-23-S05-FAIL-FAST-FR1-FR2"
 title: "S05 fail-fast 구현과 F-R1·F-R2 시험 보강 — F-S05-03 단계 3 재판정"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T02:50:00+09:00"
+updated: "2026-09-23T03:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "c51a30251b9c7cc56adcba76d425966ae425f1ed"
@@ -20,7 +20,7 @@ tags: ["placement", "fail-fast", "postgresql", "F-S05-03", "mutation-test"]
 
 Claude 카드 18의 조건부 승인과 코디네이터의 fail-fast 우선 결정을 반영했다. candidate는 limit-row database contention을 내부에서 재시도하지 않고 첫 `55P03`을 기존 `RES-0007` / 503 / `retryable=true`로 반환한다. stale speculative decision의 side-effect 없는 최대 3회 재계획은 별개이며 유지한다. 공개 응답·오류·route 계약 변경은 0이고 `placementShortCommit` 기본값은 `false`다.
 
-최종 20동시 3회에서 hold P95와 요청 전체 P95 중앙값은 감소했지만 외부 timeout은 legacy 2건에서 candidate 27건으로 증가했다. 단계 3의 세 조건 중 외부 timeout 비증가를 충족하지 못했으므로 **fail-fast도 미통과**다. flag off, S05-DB `review`, 50동시·물리 5노드 미승격을 유지한다. 다음 결정은 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.3의 limit-row 입도 변경 대 legacy 유지·5노드 후 재판단이다.
+최종 20동시 3회의 요청 전체 P95 중앙값은 감소했지만 외부 timeout은 legacy 2건에서 candidate 27건으로 증가했다. hold P95 감소는 카드 19 F-C1에서 비대칭 계측임을 확인해 통과 판정을 철회한다. 외부 timeout 비증가를 충족하지 못했으므로 **fail-fast도 미통과**다. flag off, S05-DB `review`, 50동시·물리 5노드 미승격을 유지한다. 후속 결정과 대칭 계측은 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.3과 [[2026-09-23_03-45-00_KST_S05_P1_P2_대칭계측_Codex]]를 따른다.
 
 ## F-R1·F-R2·F-R3 보강
 
@@ -42,10 +42,10 @@ F-R2의 “attempt 2”는 커널 내부 retry가 아니다. fail-fast가 외부
 | legacy | 20/0 / 18/1 / 20/0 | 1027.020 / 2292.130 / 1817.763 / **1817.763ms** | 789.944 / 2021.962 / 1526.365 / **1526.365ms** | `57014` 2 | 해당 없음 | 0 |
 | candidate fail-fast | 18/1 / 7/1 / 8/1 | 827.757 / 938.185 / 922.915 / **922.915ms** | 44.114 / 145.956 / 116.848 / **116.848ms** | `55P03` 27 | **504.190ms** | **0** |
 
-- hold P95 감소: 통과.
+- hold P95 감소: **비대칭 계측으로 미확정(과거 통과 판정 철회)**.
 - 외부 `55P03+57014` 합계 legacy 대비 비증가: **실패(2→27)**.
 - 요청 P95 비악화: 통과. 단 candidate 성공 수가 18/7/8이므로 성공률을 숨기지 않는다.
-- 종합: **미통과**. limit-row 입도 변경 보류를 해제할 근거는 생겼지만 구현 승인은 아직 없다.
+- 종합: **미통과**. 코디네이터는 후속에서 (b) legacy 유지·5노드 후 재판단을 채택했고 limit-row 입도 변경은 보류했다.
 
 첫 `5a612ebd` 세트는 schema v1.3의 `timeoutRetryCount`가 fail-fast timeout 자체를 retry로 잘못 이름 붙인 calibration이다. legacy 20/20×3, candidate 성공 10/14/6, 외부 `55P03` 30, hold P95 중앙 1360.102→141.310ms였으며 버리지 않았다. schema v1.4는 `timeoutCount`와 `timeoutRetryCount=0`, `acquisitionAttemptCount`, `contentionPolicy`를 분리했고 최종 세트를 새 SHA로 다시 실행했다. 구조화 요약: [[s05-fail-fast-stage3-a60313a7.json]].
 

@@ -16,12 +16,15 @@ _statement_phase = ContextVar("inv_statement_phase", default="outside-transactio
 _placement_logger = logging.getLogger("inv.placement")
 
 
-def mark_statement_phase(phase: str, *, attempt: int = 1) -> None:
+def mark_statement_phase(
+    phase: str, *, attempt: int = 1, track_lock_hold: bool = True
+) -> None:
     """Label opt-in SQL diagnostics without changing the transaction contract."""
 
-    _statement_phase.set(
-        {"name": phase, "attempt": attempt, "startedNs": perf_counter_ns()}
-    )
+    marker = {"name": phase, "attempt": attempt}
+    if track_lock_hold:
+        marker["startedNs"] = perf_counter_ns()
+    _statement_phase.set(marker)
 
 
 def record_placement_metric(database, metric: dict) -> None:
@@ -55,8 +58,9 @@ class _ObservedConnection:
         self._observer = observer
 
     def execute(self, query, params=None, **kwargs):
+        started = perf_counter_ns()
         try:
-            return self._conn.execute(query, params, **kwargs)
+            result = self._conn.execute(query, params, **kwargs)
         except psycopg.Error as error:
             try:
                 self._observer(
@@ -69,11 +73,35 @@ class _ObservedConnection:
                         "statement": _statement_template(query),
                         "sqlState": error.sqlstate,
                         "errorType": type(error).__name__,
+                        "outcome": "error",
+                        "elapsedMs": round(
+                            (perf_counter_ns() - started) / 1_000_000, 3
+                        ),
                     }
                 )
             except Exception:
                 pass
             raise
+        try:
+            self._observer(
+                {
+                    "phase": (
+                        _statement_phase.get().get("name")
+                        if isinstance(_statement_phase.get(), dict)
+                        else _statement_phase.get()
+                    ),
+                    "statement": _statement_template(query),
+                    "sqlState": None,
+                    "errorType": None,
+                    "outcome": "success",
+                    "elapsedMs": round(
+                        (perf_counter_ns() - started) / 1_000_000, 3
+                    ),
+                }
+            )
+        except Exception:
+            pass
+        return result
 
     def __getattr__(self, name):
         return getattr(self._conn, name)

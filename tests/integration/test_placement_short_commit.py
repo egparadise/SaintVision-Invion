@@ -106,6 +106,53 @@ def test_candidate_does_not_wait_on_legacy_project_mutex(placement_benchmark_env
     assert result["runId"] == run["runId"]
 
 
+def test_legacy_lock_wait_is_separate_from_post_acquisition_hold(
+    placement_benchmark_env,
+):
+    """F-C1: the legacy hold clock starts only after both serial locks exist."""
+
+    a = placement_benchmark_env
+    metrics = []
+    statements = []
+    a.placement = PlacementStore(
+        Database(
+            a.e.runtime,
+            recovery_epoch=a.e.epoch,
+            statement_observer=statements.append,
+            placement_metric_sink=metrics.append,
+        )
+    )
+    _start_observation_window(a)
+    run = planned(a.e)
+    result = _reserve(a, run, key="legacy-symmetric-metric")
+
+    waits = [item for item in metrics if item["mode"] == "placement-legacy-lock-wait"]
+    holds = [item for item in metrics if item["mode"] == "placement-legacy-lock-scope"]
+    project_lock = next(
+        item
+        for item in statements
+        if item["statement"].startswith(
+            "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE"
+        )
+    )
+    limit_lock = next(
+        item
+        for item in statements
+        if item["statement"].startswith(
+            "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE"
+        )
+    )
+
+    assert result["runId"] == run["runId"]
+    assert len(waits) == 1 and waits[0]["outcome"] == "acquired"
+    assert waits[0]["waitMs"] >= 0
+    assert len(holds) == 1 and holds[0]["outcome"] == "commit"
+    assert project_lock["phase"] == "placement-legacy-lock-wait"
+    assert project_lock["elapsedMs"] >= 0
+    assert limit_lock["phase"] == "placement-legacy-lock-wait"
+    assert all(item["outcome"] == "success" for item in (project_lock, limit_lock))
+
+
 def test_selected_guard_change_discards_winner_and_replans(placement_benchmark_env, monkeypatch):
     a = _candidate(placement_benchmark_env)
     _start_observation_window(a)

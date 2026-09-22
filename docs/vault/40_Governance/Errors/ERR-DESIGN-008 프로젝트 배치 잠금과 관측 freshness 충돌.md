@@ -1,11 +1,11 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.2.0"
-status: "implementation-review"
+version: "1.3.0"
+status: "accepted-mitigation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T01:40:00+09:00"
+updated: "2026-09-23T03:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
@@ -14,15 +14,30 @@ tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgre
 # ERR-DESIGN-008 프로젝트 배치 잠금과 transaction timeout 경합
 
 > [!warning] 상태
-> 코디네이터 결정 A(조건부 승인) · 옵션 1 기본 off 구현 · 단계 3 timeout 감소 조건 미충족 · 50동시와 물리 5노드 미측정 · Claude 카드 18 구현 검토 대기
+> 코디네이터 결정 (b): legacy 유지 · `placementShortCommit` 기본 off · S05-DB `review` · 단계 3 미통과 · 50동시와 물리 5노드 미측정. 카드 18 P1/P2 대칭 계측 완료, Claude 카드 20 검토 대기.
+
+## 카드 18 P1/P2 — 대칭 계측과 SQL statement 귀속
+
+legacy의 phase mark를 project limits 획득 뒤로 옮기고, 그 전 project+limits 획득 구간을 `placement-legacy-lock-wait` client elapsed로 분리했다. candidate도 같은 방식으로 limits 획득 뒤부터 hold를 잰다. 개발 PC·합성 Node 1개·실 PostgreSQL·20동시·각 1회 결과는 다음과 같다.
+
+| 모드 | 성공/실패 | 요청 전체 P95 | 획득 후 hold P95 | 획득 client elapsed P95 | timeout |
+|---|---|---:|---:|---:|---|
+| legacy | 20/0 | 1885.489ms | 289.365ms | 1453.658ms | 0 |
+| candidate fail-fast | 8/12 | 1054.907ms | 170.766ms(성공 8개) | 528.705ms | `55P03` 12 |
+
+SQL observer는 candidate 12개 실패를 모두 `SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE`에 귀속했다. 두 mode 모두 fencing 유일성과 no-overbooking은 true다. hold 감소 방향은 보이지만 candidate survivor 8개와 legacy 20개를 한 번 비교한 값이므로 성능 통과 증거가 아니다. 외부 timeout 비증가 조건은 0→12로 실패한다.
+
+legacy의 acquire client elapsed가 500ms를 넘는데도 `55P03`이 없는 이유는 **미확정**이다. 코드상 mode별 면제는 없고 양쪽 모두 같은 `SET LOCAL lock_timeout=500ms`, `statement_timeout=2s` 경로다. SQL observer의 elapsed는 server lock wait만이 아니라 Python thread scheduling과 query return 지연을 포함하고 backend wait_event timeline은 수집하지 않았다. 따라서 1453.658ms를 한 lock의 server wait로 해석할 수 없으며 [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]]의 경계를 유지한다. 이 두 wave에는 `57014`가 없어서 새 원인 statement를 주장하지 않는다. 증거: [[s05-symmetric-metrics-card18.json]].
+
+다음 후보는 limit-row migration이 아니라 candidate의 lock-timeout 예산 또는 project별 queue 깊이 상한이다. Claude 검토와 별도 결정 전에는 구현하지 않는다.
 
 ## F-S05-03 — 경합 재배치
 
 옵션 1 구현은 speculative read와 선택 Node/Resource final commit을 분리하고, canonical admission/prepared primitive, current active fit 재계산, stale winner savepoint rollback·재계획, lock-hold 계측을 넣었다. 응답·replay·fencing·RLS·rollback 불변식은 실 PG 9 passed, model-retry의 caller-owned transaction 경로는 1 passed/exit 0으로 유지됐다.
 
-20동시 3회 중앙값에서 commit lock-hold P95는 legacy **1399.883ms**에서 candidate **122.126ms**로 줄었다. 요청 성공 P95 중앙값은 **1771.763ms → 1697.737ms**, 74.026ms(약 4.2%) 개선에 그쳤다. 두 모드 모두 20/20 × 3, 외부 실패 0이지만 SQL 진단은 legacy `55P03+57014` 0/0/0 대비 candidate 14/10/11이었다. 전부 `SELECT * FROM inv.project_resource_limits ... FOR UPDATE`의 `55P03`이며 내부 최대 3회 retry가 외부 실패를 숨겼다.
+20동시 3회 옛 기준선에서 commit lock-hold P95는 legacy **1399.883ms**와 candidate **122.126ms**로 기록됐지만, legacy만 잠금 대기를 포함한 비대칭 수치이므로 감소 통과 주장을 철회한다. 요청 성공 P95 중앙값은 **1771.763ms → 1697.737ms**, 74.026ms(약 4.2%) 차이였다. 두 모드 모두 20/20 × 3, 외부 실패 0이지만 SQL 진단은 legacy `55P03+57014` 0/0/0 대비 candidate 14/10/11이었다. 전부 `SELECT * FROM inv.project_resource_limits ... FOR UPDATE`의 `55P03`이며 내부 최대 3회 retry가 외부 실패를 숨겼다.
 
-따라서 옵션 1은 경합을 없애지 않고 project mutex에서 limit row로 **재배치**했다. hold 감소 조건은 충족했지만 timeout 합계 감소 조건은 미충족이므로 flag는 기본 off, S05-DB는 `review`, 5노드·50동시 승격은 없다. report schema v1.3은 retry 횟수와 limit-row 잠금 획득 대기 p50/p95/max를 별도 필드로 남긴다. 단계 3에는 이 필드가 없어 값을 소급 생성하지 않았다. 다음 설계 후보는 limit-row 잠금 입도/배치 갱신 또는 커널 retry 없는 fail-fast + 클라이언트 retryable 위임이며, 아직 결정·구현하지 않는다.
+따라서 옵션 1은 경합을 없애지 않고 project mutex에서 limit row로 **재배치**했다. 옛 hold 감소 조건은 비대칭이라 미확정이고 timeout 합계 감소 조건도 미충족이므로 flag는 기본 off, S05-DB는 `review`, 5노드·50동시 승격은 없다. report schema v1.5는 legacy/candidate acquisition elapsed와 post-acquire hold, parameter-free SQL statement를 분리한다. 결정 (b)에 따라 limit-row 입도/usage migration은 보류한다.
 
 ## 문제와 인과 정정
 

@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.187"
+version: "1.0.188"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T03:10:00+09:00"
+updated: "2026-09-23T03:45:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 P1/P2 대칭 계측 · 결정 (b)
+
+- legacy hold phase를 limits 획득 뒤로 옮기고 획득 client elapsed를 별도 metric으로 분리했다. SQL observer는 parameter-free statement template·phase·elapsed·SQLSTATE를 남기며 report schema는 1.5다. 공개 계약·migration 변경은 없다.
+- 실 PG 20동시 각 1회: legacy 20/20·요청/hold/acquire P95 1885.489/289.365/1453.658ms, candidate 8/20·1054.907/170.766/528.705ms. candidate 실패 12건은 전부 limits `FOR UPDATE`의 `55P03`; 57014는 0건이다. real-PG 단일 파일 14 passed/exit 0, PG-free 4 passed/exit 0.
+- 코디네이터 결정 (b)에 따라 legacy·flag off·S05 `review`를 유지한다. legacy acquire 1454ms에 55P03이 없는 이유는 client elapsed에 scheduling이 포함되고 server wait_event가 없어 미확정이다. 다음 후보 lock-timeout 예산/queue 깊이 상한은 Claude 카드 20 뒤 별도 결정한다. [[2026-09-23_03-45-00_KST_S05_P1_P2_대칭계측_Codex]].
 
 ## 2026-09-23 ADR-100 CP 호스트 Node 겸임
 
