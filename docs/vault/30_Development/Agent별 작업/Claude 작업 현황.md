@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.20"
+version: "1.2.21"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T06:50:00+09:00"
+updated: "2026-09-23T09:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 21 독립 검토(카드 24 역할) → **조건부 승인** (Claude, 2026-09-23, 카드 kk): abf9240f log_lock_waits 원본·FK-DROP 대조 실측 — 두 wave 수치(20/0·depth 1·transaction 190·tuple 0·55P03 0 / 2/18·depth 19·tuple max 499.957ms·55P03 18)가 evidence·History·ERR-DESIGN-008·결정 v1.4·지도에서 일치, classify() 기준과 HYPOTHESIS_SUPPORTED 도출 일치, D1(deadlock_timeout 10ms·loggedSegmentCount)·D2(backend_xid alias)·D3(FK 1개 assert 후 DROP, 새 disposable DB) 반영, 20 초과 0·잔존 검사 exit 4·ALTER SYSTEM 0·pgrowlocks REVOKE. PG-free 7 passed 재현. **조건 1(문구)**: candidate limits FIFO ≈500ms 55P03은 이 실험(candidate 미실행, 대조=FK-DROP legacy)이 확인한 기전이 아니라 카드 18 정합 추론 → 세 문서 정정. 정책 v1.4 B′→B·A 기전용·3조건 판정이 카드 23 조건과 일치, B′ 구현 카드 개설 찬성(≤1500ms·P1 대칭 계측·20×3·flag off). 관찰 4. [[2026-09-23_09-50-00_KST_Codex카드21_lock_wait_기전확인_abf9240f_독립검토_Claude]] (PR agent/claude/review-codex-card21)
 
 PR #94 S04-FE 러너 13 시나리오(Antigravity a86c6132) 독립 검토 → **수정 요청** (Claude, 2026-09-23, 카드 ff): 프로덕션 변경 0·`page.route` 0·계약 문구(AUTH-0050 401·AUTH-0031 403·cancel expectedVersion+Idempotency-Key·IDEM-0001 409·Last-Event-ID STREAM-0001) 그대로 단언은 성립. F1 evidence `gitCommitSha 07c9053a` 도달 불가·python 3.10·exp-00 PASS는 #87 실행값 바이트 동일 carry-over 재도장(04:20 실행은 시나리오 0건)·자체 중지 사유 미기록; F2 자기 주입 DOM 단언 3(EXP-02 stale 배너·CNC-03 반환 배너·SSE-01 RingBuffer 재구현); F3/F4 상수·공허 단언(statusInDom·lifecycleSteps·sse-03 `len≤1→True`·cnc-01 전체 페이지 count 0); F5 재현으로 확인한 러너 결함(예외 경로 UnboundLocalError로 evidence 미기록, Vite 자식 누수+stale 포트 재사용, psutil 부재 시 가드 비활성, FAIL record 부재, exp-01 탭 클릭 overlay 차단). 브라우저 재현 1회: exp-00 PASS(실 wire)·exp-01 FAIL·11 UNMEASURED. 보안(admin DSN dev DB 시드·reconciler 우회)은 Codex 위임. [[2026-09-23_06-45-00_KST_PR94_S04-FE_러너_13시나리오_a86c6132_독립검토_Claude]] (PR agent/claude/review-pr94)
 
