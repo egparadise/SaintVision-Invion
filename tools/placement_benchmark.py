@@ -449,6 +449,8 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
         "INV_PLACEMENT_SHORT_COMMIT": "1" if args.mode == "short-commit" else "0",
         "INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS": str(args.candidate_limit_lock_timeout_ms),
+        "INV_PLACEMENT_PROJECT_SEMAPHORE": "1" if args.project_semaphore else "0",
+        "INV_PLACEMENT_PROJECT_SEMAPHORE_LIMIT": str(args.project_semaphore_limit),
         "INV_PLACEMENT_QUEUE_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
         "INV_PLACEMENT_SQL_DIAGNOSTIC": "1" if args.queue_diagnostic else "0",
     }
@@ -515,6 +517,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "also enables parameter-free SQL diagnostics"
         ),
     )
+    parser.add_argument(
+        "--project-semaphore",
+        action="store_true",
+        help=(
+            "enable the process-local candidate tenant+project admission experiment "
+            "(default: off)"
+        ),
+    )
+    parser.add_argument(
+        "--project-semaphore-limit",
+        type=int,
+        default=4,
+        help="non-blocking per-tenant+project admission limit (1..20; default: 4)",
+    )
     return parser.parse_args(argv)
 
 
@@ -532,6 +548,12 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--candidate-limit-lock-timeout-ms must be between 1 and 1900")
     if args.mode != "short-commit" and args.candidate_limit_lock_timeout_ms != 500:
         raise SystemExit("--candidate-limit-lock-timeout-ms is only valid with --mode short-commit")
+    if not 1 <= args.project_semaphore_limit <= 20:
+        raise SystemExit("--project-semaphore-limit must be between 1 and 20")
+    if args.project_semaphore and args.mode != "short-commit":
+        raise SystemExit("--project-semaphore is only valid with --mode short-commit")
+    if not args.project_semaphore and args.project_semaphore_limit != 4:
+        raise SystemExit("--project-semaphore-limit is only valid with --project-semaphore")
     args.junit.parent.mkdir(parents=True, exist_ok=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     return _run_pytest_adapter(args)

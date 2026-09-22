@@ -127,9 +127,7 @@ class PlacementStore:
             ).fetchone():
                 raise DomainError("MODEL-0003", "Run already has a model input reservation", 409)
             lease_store._admit_locked(conn, project, run_id, run=run)
-            mark_statement_phase(
-                "placement-legacy-lock-wait", track_lock_hold=False
-            )
+            mark_statement_phase("placement-legacy-lock-wait", track_lock_hold=False)
             wait_started = perf_counter_ns()
             try:
                 conn.execute(
@@ -146,9 +144,7 @@ class PlacementStore:
                     {
                         "mode": "placement-legacy-lock-wait",
                         "attempt": 1,
-                        "waitMs": round(
-                            (perf_counter_ns() - wait_started) / 1_000_000, 3
-                        ),
+                        "waitMs": round((perf_counter_ns() - wait_started) / 1_000_000, 3),
                         "outcome": "timeout",
                         "sqlState": getattr(error, "sqlstate", None),
                     },
@@ -159,9 +155,7 @@ class PlacementStore:
                 {
                     "mode": "placement-legacy-lock-wait",
                     "attempt": 1,
-                    "waitMs": round(
-                        (perf_counter_ns() - wait_started) / 1_000_000, 3
-                    ),
+                    "waitMs": round((perf_counter_ns() - wait_started) / 1_000_000, 3),
                     "outcome": "acquired",
                     "sqlState": None,
                 },
@@ -309,8 +303,15 @@ class PlacementStore:
                 for allocation in allocations
             }
             leases = lease_store._reserve_prepared_locked(
-                conn, principal.tenant_id, project, run_id, sorted(allocations), ttl_seconds,
-                run=run, limits=limits, resources=locked_allocations,
+                conn,
+                principal.tenant_id,
+                project,
+                run_id,
+                sorted(allocations),
+                ttl_seconds,
+                run=run,
+                limits=limits,
+                resources=locked_allocations,
             )
             result = {"runId": run_id, "placement": explain, "leases": leases}
             if model_observation is not None:
@@ -374,9 +375,7 @@ class PlacementStore:
                         "memory": limits["memory_bytes"],
                     }
                 ),
-                "membership": [
-                    [row["node_id"], bool(row["enabled"])] for row in memberships
-                ],
+                "membership": [[row["node_id"], bool(row["enabled"])] for row in memberships],
                 "resources": [
                     {
                         key: (
@@ -501,8 +500,7 @@ class PlacementStore:
                         (),
                         locality.get(row["node_id"], 0),
                         None,
-                        Decimal(snapshot["cpuBusyMillis"])
-                        / Decimal(snapshot["cpuCapacityMillis"]),
+                        Decimal(snapshot["cpuBusyMillis"]) / Decimal(snapshot["cpuCapacityMillis"]),
                         clock_skew_seconds=row["clock_skew_seconds"],
                     )
                 )
@@ -563,7 +561,9 @@ class PlacementStore:
                         allocations.append(Allocation(resource_id, amount))
                         need -= amount
                 if need:
-                    raise DomainError("RES-0001", "Measured placement no longer fits offered slices")
+                    raise DomainError(
+                        "RES-0001", "Measured placement no longer fits offered slices"
+                    )
             resource_ids = [
                 resource_id
                 for resource_id, resource in resources.items()
@@ -621,15 +621,17 @@ class PlacementStore:
                     # the next attempt instead of accumulating them until the outer
                     # transaction finishes.
                     with conn.transaction():
-                        prior = approvals._ledger(
-                            conn, principal, project, "placement.reserve", key, material
+                        prior = self._candidate_replay_or_admit(
+                            conn,
+                            approvals,
+                            principal,
+                            project,
+                            key,
+                            material,
                         )
-                        run = lock_run(conn, run_id, project)
                         if prior is not None:
-                            Control(self.db).grant(
-                                conn, principal, project, "can_request"
-                            )
                             return prior
+                        run = lock_run(conn, run_id, project)
                         if conn.execute(
                             "SELECT 1 FROM inv.model_run_inputs WHERE run_id=%s", (run_id,)
                         ).fetchone():
@@ -704,17 +706,18 @@ class PlacementStore:
                         # acquire the project ceiling row. SQL diagnostics
                         # retain any 55P03/57014 acquisition failure separately.
                         mark_statement_phase("placement-short-commit", attempt=attempt)
-                        resources = lock_resources(
-                            conn, speculative["resourceIds"]
-                        )
+                        resources = lock_resources(conn, speculative["resourceIds"])
                         Control(self.db).grant(conn, principal, project, "can_request")
-                        if self._selected_guard(
-                            conn,
-                            project,
-                            limits,
-                            list(resources),
-                            lock_membership=True,
-                        ) != speculative["guard"]:
+                        if (
+                            self._selected_guard(
+                                conn,
+                                project,
+                                limits,
+                                list(resources),
+                                lock_membership=True,
+                            )
+                            != speculative["guard"]
+                        ):
                             raise _StalePlacement()
                         allocations = self._locked_fit(
                             conn,
@@ -759,9 +762,7 @@ class PlacementStore:
                             "leases": leases,
                         }
                         if model_observation is not None:
-                            model_observation.bind(
-                                conn, principal, project, run_id, result
-                            )
+                            model_observation.bind(conn, principal, project, run_id, result)
                         event(
                             conn,
                             principal.tenant_id,
@@ -769,9 +770,7 @@ class PlacementStore:
                             "inv.run.placement_reserved",
                             result,
                         )
-                        return approvals._save(
-                            conn, project, "placement.reserve", key, result
-                        )
+                        return approvals._save(conn, project, "placement.reserve", key, result)
             except _StalePlacement:
                 continue
         raise DomainError(
@@ -780,3 +779,13 @@ class PlacementStore:
             503,
             retryable=True,
         )
+
+    def _candidate_replay_or_admit(self, conn, approvals, principal, project, key, material):
+        """Classify idempotency before consuming a process-local permit."""
+
+        prior = approvals._ledger(conn, principal, project, "placement.reserve", key, material)
+        if prior is not None:
+            Control(self.db).grant(conn, principal, project, "can_request")
+            return prior
+        self.db.acquire_placement_project_permit(principal.tenant_id, project)
+        return None
