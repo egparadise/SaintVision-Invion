@@ -1,12 +1,12 @@
 ---
 doc_id: "CLAUDE-CX09-PITR-TIER-A-DECISION-PREP-001"
 title: "CX-09 PITR Tier-A 활성 여부 결정 준비 — runbook v1.2.0 실측 근거로 활성화(A) vs 유예(B) 비교 1쪽 + 코디네이터 결정 요청"
-version: "1.0.0"
-status: "decision-requested"
+version: "1.1.0"
+status: "decided"
 author: "Claude"
 reviewer: "Codex"
 audience: "coordinator"
-updated: "2026-09-22T22:20:00+09:00"
+updated: "2026-09-22T22:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["pitr", "cx-09", "ac-12", "decision", "tier-a", "operations"]
@@ -45,6 +45,14 @@ tags: ["pitr", "cx-09", "ac-12", "decision", "tier-a", "operations"]
 ## 4. 코디네이터 결정 요청
 
 - [ ] **A** 활성화 — 재시작 창(일시)과 담당(Claude가 적용·검증, Codex 검토)을 지정
-- [ ] **B** 유예 — CX-09 카드에 "PITR 활성+드릴+정리" 항목을 추가하고 이 문서를 그 카드 근거로 연결
+- [x] **B 유예 — 결정됨 (2026-09-22, 코디네이터, 사용자 위임)**. 근거: A는 dev PG 재시작(다른 레인 실 PG 시험·8080 dev 서버 중단)과 외부 `wal_archive` 볼륨 준비가 필요한데, 오늘은 5개 에이전트가 실 PG를 동시 사용 중이고 메모리 여유가 2GB 수준이라 조율 창을 잡기 어렵다.
+
+### 결정 B에 따른 조치 (CX-09 카드 첫 항목으로 추가 — [[Codex 작업 현황]] CX-09 절)
+1. **PITR 활성(Tier-A, 보관 7일)** — `docker-compose.pitr.yml` override 적용(postgres 재시작 수반).
+2. **외부 볼륨 사전 검증 3단계** — `docker volume create wal_archive` + uid 70/0700 확인 → `docker compose -f docker-compose.prod.yml -f docker-compose.pitr.yml config --quiet` exit 0 → 적용 후 `pitr_readiness --require-pitr` = `possible`.
+3. **실제 복구 드릴** — base backup → 결함 → 복구 → **AC-12 RPO/RTO 측정**(설정만으로 인수 금지).
+4. **정리 도구** — `tools/pitr_archive_retention.py`(7일 초과 세그먼트/베이스백업 정리, 착지 예정).
+- **재시작 창**: 에이전트 무활동 시간(예: 다음 작업일 시작 전)에 코디네이터가 지정.
+- 이 문서가 그 카드의 근거 문서다. AC-12는 드릴 측정 전까지 미달성으로 둔다.
 
 결정 후: A면 적용 절차 History + `readiness possible` 증거 + 드릴 카드 착수; B면 CX-09 카드 갱신(Codex owner). 둘 다 이 문서 status를 `decided`로 바꾼다.

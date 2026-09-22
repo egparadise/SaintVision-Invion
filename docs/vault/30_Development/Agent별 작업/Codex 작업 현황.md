@@ -634,6 +634,7 @@ MJS-02 인계 구체화(기준8a8e3db): Gemini owner/Codex reviewer. 상수 UI 3
 
 ### CX-09 — 릴리스 통합·5대 부하/장애·최종 인수
 
+- **첫 항목(2026-09-22 결정 B, 코디네이터 위임 — Claude가 문서 소유자 대신 기입)**: PITR 활성(Tier-A, 보관 7일) + 외부 `wal_archive` 볼륨 사전 검증 3단계 + 실제 복구 드릴(AC-12 RPO/RTO 측정) + 정리 도구 `tools/pitr_archive_retention.py`(착지 예정). 재시작 창은 에이전트 무활동 시간(예: 다음 작업일 시작 전)에 코디네이터가 지정. 근거·절차: [[2026-09-22_CX-09_PITR_Tier-A_활성여부_결정준비_Claude]].
 - owner / reviewer: Codex / Claude; status: planned; priority: P1.
 - 원래 목표/합격 조건: OUT-11, OUT-12 / AC-11, AC-12.
 - 다음 첫 행동: 전체 Agent 산출물을 같은 SHA에서 검토하고 장시간·5대 장애·upgrade/rollback·실제 복원·SLO와 최종 release manifest를 확정한다.
