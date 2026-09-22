@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.184"
+version: "1.0.185"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T01:40:00+09:00"
+updated: "2026-09-23T02:06:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05-DB 5노드 lane 실행 계획
+
+- 기존 5노드 opt-in lane 정의를 v1.1로 갱신해 legacy/candidate, 20→50동시, mode별 3회, hold·limit-row wait·retry/SQLSTATE artifact와 단계별 승격 조건을 고정했다.
+- node 5대·resource·NTP·CA/control cert·node cert·network·disposable PG·checkout/images·evidence root·승인/직렬화를 input/secret 이름, preflight evidence, 차단 기준으로 대조했다. 비밀 값은 기록하지 않았다.
+- inventory-bound S05 adapter/workflow와 물리 실행은 미구현·미측정이며 카드 18/F-S05-03 후속 결정 전 50동시를 실행하지 않는다. registry/ontology 불변, reviewer Claude. 상세: [[2026-09-23_02-06-00_KST_S05_5노드_lane_실행계획_Codex]].
 
 ## 2026-09-23 S05 옵션 1 구현 · F-S05-03 경합 재배치
 
