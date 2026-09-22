@@ -1,0 +1,15 @@
+{
+  "scope": "filesystem-plan-only",
+  "retentionDays": 7,
+  "now": "2026-09-22T11:19:51.683863+00:00",
+  "retainedBackups": [
+    "bb1",
+    "bb2"
+  ],
+  "oldestRetainedStartSegment": "0000000100000000000000BB",
+  "deleteBackups": [],
+  "deleteArchive": [],
+  "keptArchiveEntries": 7,
+  "reason": "retain backups newer than 2026-09-15T11:19:51.683863+00:00 plus the newest; keep WAL from 0000000100000000000000BB onward on timeline 00000001",
+  "mode": "dry-run"
+}
