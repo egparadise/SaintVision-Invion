@@ -22,6 +22,7 @@ from uuid import UUID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT / "services/control-plane/src")]
 
+from saintvision.credentials.contract import CredentialDenied
 from saintvision.credentials.linux_file import CredentialBinding, LinuxFileCredentials
 from saintvision.adapters.reference import recognised_secrets
 from inv.runs import event
@@ -119,8 +120,8 @@ def validate_manifest(value, action):
         return m
     except ProvisioningDenied:
         raise
-    except psycopg.Error as error:
-        raise ProvisioningDatabaseError(getattr(error, "sqlstate", None)) from None
+    except Exception:
+        raise ProvisioningDenied() from None
 
 
 def inspect_existing(provider, file_name):
@@ -325,6 +326,8 @@ def provision(dsn, root, manifest, action, *, apply=False):
             }
     except ProvisioningDenied:
         raise
+    except CredentialDenied:
+        raise ProvisioningDenied() from None
     except psycopg.Error as error:
         raise ProvisioningDatabaseError(getattr(error, "sqlstate", None)) from None
     except Exception as error:
@@ -364,7 +367,7 @@ def main():
         result = provision(dsn, args.root, manifest, args.action, apply=args.apply)
         print(json.dumps(result))
         return 0
-    except ProvisioningDenied:
+    except (ProvisioningDenied, json.JSONDecodeError, UnicodeDecodeError):
         print(json.dumps({"error": "credential_provisioning_refused"}))
         return EXIT_REFUSED
     except ProvisioningDatabaseError as error:

@@ -13,6 +13,7 @@ import run_vf_security_tests as runner
 
 PASS = '<testsuites><testsuite><testcase name="current"/></testsuite></testsuites>'
 EMPTY = '<testsuites><testsuite tests="0"/></testsuites>'
+FAILED = '<testsuites><testsuite><testcase classname="tests.browser.SafeJourney" name="case[param-private]"><failure>private failure detail</failure></testcase></testsuite></testsuites>'
 
 
 @pytest.fixture
@@ -94,6 +95,17 @@ def test_prefix_reuse_never_reads_previous_report(harness, rc):
     assert (root / first['xmlPath']).is_file()
     assert second['evidenceStatus'] == 'missing' and 'tests' not in second
     assert code == (2 if rc == 0 else rc)
+
+
+def test_safe_failure_summary_exposes_only_owning_class(harness):
+    state, invoke, root = harness
+    state.update(xml=FAILED, rc=1)
+    code, proof = invoke()
+    assert code == 1
+    assert proof['failedTestClasses'] == ['tests.browser.SafeJourney']
+    public = (root / '.work/same-prefix.json').read_text()
+    assert 'param-private' not in public
+    assert 'private failure detail' not in public
 
 
 @pytest.mark.parametrize('arg', ['--co', '--collect-only'])
