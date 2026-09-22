@@ -1,10 +1,10 @@
 ---
-doc_id: "CLAUDE-ERR-DESIGN-007-REVISION-PROPOSAL-001"
+doc_id: "GEMINI-ERR-DESIGN-007-REVISION-PROPOSAL-001"
 title: "ERR-DESIGN-007 규격 개정안 및 노드 시각 스큐 알람 활성화 계획"
 version: "1.0.0"
 status: "proposed"
-author: "Claude"
-updated: "2026-09-22T17:00:00+09:00"
+author: "Gemini"
+updated: "2026-09-22T17:15:00+09:00"
 source_of_truth: "Git"
 tags: ["decision", "clock-skew", "alarm", "governance", "ERR-DESIGN-007"]
 ---
