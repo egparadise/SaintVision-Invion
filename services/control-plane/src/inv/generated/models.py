@@ -7,7 +7,16 @@ from enum import IntEnum, StrEnum
 from typing import Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, RootModel, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    confloat,
+    conint,
+    constr,
+)
 
 
 class NodeId(RootModel[constr(pattern=r'^nod_[0-9A-HJKMNP-TV-Z]{26}$')]):
@@ -694,6 +703,33 @@ class WorkspaceEnqueueInput(BaseModel):
     resumeId: UUID
     approvalId: ApprovalId
     expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class ModelRetryPrepareInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    cpuMillis: conint(ge=1, le=9007199254740991)
+    memoryBytes: conint(ge=1, le=9007199254740991)
+    gpuCount: conint(ge=0, le=9007199254740991)
+    minVramBytes: conint(ge=0, le=9007199254740991)
+    requiredBytes: conint(ge=0, le=9007199254740991)
+    maxHostLoad: confloat(ge=0.0, le=1.0)
+    runtime: Literal['container']
+    policyVersion: constr(min_length=1, max_length=200)
+    nodeIds: list[NodeId] | None = Field(None, max_length=32, min_length=1)
+    ttlSeconds: conint(ge=1, le=300) | None = 30
+
+
+class ModelRetryPlacementResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    nodeId: NodeId
+    snapshotId: constr(pattern=r'^[0-9a-f]{64}$')
+    policyVersion: constr(min_length=1, max_length=200)
+    leases: list[ResourceLease] = Field(..., max_length=128, min_length=1)
 
 
 class ControlRunView(BaseModel):
@@ -1729,6 +1765,18 @@ class WorkspacePrepareInput(BaseModel):
     expectedVersion: conint(ge=1, le=9007199254740991)
 
 
+class ModelRetryPrepareResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    rootRunId: RunId
+    parentRunId: RunId
+    generation: conint(ge=2, le=3)
+    run: ControlRunView
+    placement: ModelRetryPlacementResult
+    requiresFrozenInputAndApproval: Literal[True]
+
+
 class WorkspacePrepareResult(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -1893,6 +1941,8 @@ class INVCore(
         | NodePeerPolicy
         | EmptyRequest
         | RunCancelInput
+        | ModelRetryPrepareInput
+        | ModelRetryPrepareResult
         | NodeProbeInput
         | NodeProbeResult
         | ModelShard
@@ -1934,6 +1984,8 @@ class INVCore(
         | NodePeerPolicy
         | EmptyRequest
         | RunCancelInput
+        | ModelRetryPrepareInput
+        | ModelRetryPrepareResult
         | NodeProbeInput
         | NodeProbeResult
         | ModelShard

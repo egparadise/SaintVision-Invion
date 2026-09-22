@@ -2,11 +2,15 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
+from types import SimpleNamespace
 from uuid import uuid4
 
 import psycopg
 import pytest
+from fastapi.testclient import TestClient
+from inv.app import create_app
 from inv.errors import DomainError
+from inv.contracts import validate_contract
 from inv.model_retry import ModelRetryStore
 from test_model_runtime import runtime
 from test_model_locality import locality
@@ -43,6 +47,96 @@ def retry(a, parent=None, *, key="retry"):
         key=key,
         policy_version="model-retry:1",
     )
+
+
+def test_failed_model_run_retry_is_served_with_fresh_child_and_replays(runtime):
+    a = runtime
+    fail_unstarted(a)
+
+    class Tokens:
+        tenant_id = a.e.tenant
+
+        @staticmethod
+        def verify(value):
+            return SimpleNamespace(principal=a.principal, expires_at="2026-09-22T09:00:00Z")
+
+        @staticmethod
+        def _keys():
+            return None
+    request = a.request
+    body = {
+        "cpuMillis": request.cpu_millis,
+        "memoryBytes": request.memory_bytes,
+        "gpuCount": request.gpu_count,
+        "minVramBytes": request.min_vram_bytes,
+        "requiredBytes": request.required_bytes,
+        "maxHostLoad": float(request.max_host_load),
+        "runtime": request.runtime,
+        "policyVersion": "model-retry:1",
+    }
+    headers = {
+        "Authorization": "Bearer synthetic",
+        "Idempotency-Key": "http-model-retry",
+    }
+    url = f"/v1/projects/{a.e.project}/runs/{a.target}/model-retries"
+    app = create_app(
+        a.e.db,
+        Tokens(),
+        model_retry=ModelRetryStore(a.e.db, a.verifier),
+    )
+    with TestClient(app, raise_server_exceptions=False) as client:
+        first = client.post(url, json=body, headers=headers)
+        replay = client.post(url, json=body, headers=headers)
+        conflict = client.post(
+            url,
+            json={**body, "policyVersion": "model-retry:changed"},
+            headers=headers,
+        )
+    assert first.status_code == replay.status_code == 201, (first.json(), replay.json())
+    assert first.json() == replay.json()
+    result = first.json()
+    validate_contract("ModelRetryPrepareResult", result)
+    assert result["parentRunId"] == a.target
+    assert result["run"]["runId"] != a.target
+    assert result["run"]["state"] == "planned"
+    assert result["placement"]["runId"] == result["run"]["runId"]
+    assert result["requiresFrozenInputAndApproval"] is True
+    assert conflict.status_code == 409
+    validate_contract("ProblemDetails", conflict.json())
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert not conn.execute("SELECT 1 FROM inv.tool_claims").fetchone()
+
+    class InvalidModelRetry:
+        @staticmethod
+        def prepare(*args, **kwargs):
+            return {
+                "rootRunId": result["rootRunId"],
+                "parentRunId": result["parentRunId"],
+                "generation": result["generation"],
+                "run": result["run"],
+                "reservation": {
+                    "runId": result["placement"]["runId"],
+                    "placement": {
+                        "nodeId": result["placement"]["nodeId"],
+                        "snapshotId": result["placement"]["snapshotId"],
+                        "policyVersion": result["placement"]["policyVersion"],
+                    },
+                    "leases": result["placement"]["leases"],
+                },
+                "requiresFrozenInputAndApproval": False,
+            }
+
+    with TestClient(
+        create_app(a.e.db, Tokens(), model_retry=InvalidModelRetry()),
+        raise_server_exceptions=False,
+    ) as client:
+        rejected = client.post(
+            url,
+            json=body,
+            headers={**headers, "Idempotency-Key": "invalid-service-result"},
+        )
+    assert rejected.status_code == 422
+    assert rejected.json()["code"] == "VAL-0002"
 
 
 def test_retry_uses_new_run_fences_and_requires_new_approval(runtime):

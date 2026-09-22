@@ -474,6 +474,36 @@ export interface WorkspaceEnqueueInput {
   expectedVersion: number;
 }
 
+export interface ModelRetryPrepareInput {
+  cpuMillis: number;
+  memoryBytes: number;
+  gpuCount: number;
+  minVramBytes: number;
+  requiredBytes: number;
+  maxHostLoad: number;
+  runtime: "container";
+  policyVersion: string;
+  nodeIds?: Array<NodeId>;
+  ttlSeconds?: number;
+}
+
+export interface ModelRetryPlacementResult {
+  runId: RunId;
+  nodeId: NodeId;
+  snapshotId: string;
+  policyVersion: string;
+  leases: Array<ResourceLease>;
+}
+
+export interface ModelRetryPrepareResult {
+  rootRunId: RunId;
+  parentRunId: RunId;
+  generation: number;
+  run: ControlRunView;
+  placement: ModelRetryPlacementResult;
+  requiresFrozenInputAndApproval: true;
+}
+
 export interface ControlRunView {
   runId: RunId;
   tenantId: TenantId;

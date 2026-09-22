@@ -5,6 +5,7 @@ import json
 import os
 import time
 from contextlib import asynccontextmanager
+from decimal import Decimal
 from threading import BoundedSemaphore
 from fastapi import FastAPI, Request, Depends, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
@@ -205,7 +206,15 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
-def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None, business=None):
+def create_app(
+    database=None,
+    tokens=None,
+    *,
+    allowed_origins=(),
+    workspace=None,
+    business=None,
+    model_retry=None,
+):
     @asynccontextmanager
     async def lifespan(api):
         if business is None:
@@ -474,6 +483,57 @@ def create_app(database=None, tokens=None, *, allowed_origins=(), workspace=None
             data["expectedVersion"],
             key(request),
         )
+
+    @api.post("/v1/projects/{project}/runs/{parent}/model-retries", status_code=201)
+    async def prepare_model_retry(
+        project: str,
+        parent: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        if model_retry is None:
+            raise DomainError("MODEL-0002", "Model retry is not configured", 503)
+        data = await request.json()
+        validate_contract("ModelRetryPrepareInput", data)
+        from .scheduler import Request as PlacementRequest
+
+        result = await run_in_threadpool(
+            model_retry.prepare,
+            identity.principal,
+            project,
+            parent,
+            PlacementRequest(
+                data["cpuMillis"],
+                data["memoryBytes"],
+                data["gpuCount"],
+                data["minVramBytes"],
+                data["requiredBytes"],
+                Decimal(str(data["maxHostLoad"])),
+                data["runtime"],
+            ),
+            key=key(request),
+            policy_version=data["policyVersion"],
+            node_ids=data.get("nodeIds"),
+            ttl_seconds=data.get("ttlSeconds", 30),
+        )
+        reservation = result["reservation"]
+        placement = reservation["placement"]
+        response = {
+            "rootRunId": result["rootRunId"],
+            "parentRunId": result["parentRunId"],
+            "generation": result["generation"],
+            "run": result["run"],
+            "placement": {
+                "runId": reservation["runId"],
+                "nodeId": placement["nodeId"],
+                "snapshotId": placement["snapshotId"],
+                "policyVersion": placement["policyVersion"],
+                "leases": reservation["leases"],
+            },
+            "requiresFrozenInputAndApproval": result["requiresFrozenInputAndApproval"],
+        }
+        validate_contract("ModelRetryPrepareResult", response)
+        return response
 
     @api.get("/v1/projects/{project}/nodes")
     def nodes(project: str, identity=Depends(authenticated)):
@@ -941,7 +1001,14 @@ def create_configured_app():
     """Production factory: explicit operator configuration, never seeded demo data."""
     try:
         settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        if not {"identity"} <= settings.keys() <= {"identity", "allowedOrigins", "workspace", "business", "modelRegistryPolicy"}:
+        if not {"identity"} <= settings.keys() <= {
+            "identity",
+            "allowedOrigins",
+            "workspace",
+            "business",
+            "modelRegistryPolicy",
+            "modelVerifier",
+        }:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
         registry_policy = None
@@ -964,12 +1031,23 @@ def create_configured_app():
                 raise ValueError()
             from .business_surface import configured_business
             business = configured_business(database, identity)
+        model_retry = None
+        if "modelVerifier" in settings:
+            from .model_manifest import ConfiguredModelVerifier
+            from .model_registry_config import configured_model_roots
+            from .model_retry import ModelRetryStore
+
+            model_retry = ModelRetryStore(
+                database,
+                ConfiguredModelVerifier(**configured_model_roots(settings["modelVerifier"])),
+            )
         return create_app(
             database,
             identity,
             allowed_origins=settings.get("allowedOrigins", []),
             workspace=workspace,
             business=business,
+            model_retry=model_retry,
         )
     except Exception:
         raise RuntimeError(

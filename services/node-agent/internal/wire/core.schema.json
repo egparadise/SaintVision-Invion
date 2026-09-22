@@ -2185,6 +2185,67 @@
         "expectedVersion"
       ]
     },
+    "ModelRetryPrepareInput": {
+      "description": "Measured placement request for a fresh child of one failed model Run.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpuMillis": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "memoryBytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "gpuCount": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "minVramBytes": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "requiredBytes": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "maxHostLoad": {"type": "number", "minimum": 0, "maximum": 1},
+        "runtime": {"type": "string", "const": "container"},
+        "policyVersion": {"type": "string", "minLength": 1, "maxLength": 200},
+        "nodeIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/NodeId"}
+        },
+        "ttlSeconds": {"type": "integer", "minimum": 1, "maximum": 300, "default": 30}
+      },
+      "required": [
+        "cpuMillis", "memoryBytes", "gpuCount", "minVramBytes", "requiredBytes",
+        "maxHostLoad", "runtime", "policyVersion"
+      ]
+    },
+    "ModelRetryPlacementResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {"$ref": "#/$defs/RunId"},
+        "nodeId": {"$ref": "#/$defs/NodeId"},
+        "snapshotId": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "policyVersion": {"type": "string", "minLength": 1, "maxLength": 200},
+        "leases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {"$ref": "#/$defs/ResourceLease"}
+        }
+      },
+      "required": ["runId", "nodeId", "snapshotId", "policyVersion", "leases"]
+    },
+    "ModelRetryPrepareResult": {
+      "description": "A fresh planned model Run; no command, permit, frozen input or approval is reused.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rootRunId": {"$ref": "#/$defs/RunId"},
+        "parentRunId": {"$ref": "#/$defs/RunId"},
+        "generation": {"type": "integer", "minimum": 2, "maximum": 3},
+        "run": {"$ref": "#/$defs/ControlRunView"},
+        "placement": {"$ref": "#/$defs/ModelRetryPlacementResult"},
+        "requiresFrozenInputAndApproval": {"type": "boolean", "const": true}
+      },
+      "required": [
+        "rootRunId", "parentRunId", "generation", "run", "placement",
+        "requiresFrozenInputAndApproval"
+      ]
+    },
     "ControlRunView": {
       "type": "object",
       "additionalProperties": false,
@@ -5687,6 +5748,12 @@
     },
     {
       "$ref": "#/$defs/RunCancelInput"
+    },
+    {
+      "$ref": "#/$defs/ModelRetryPrepareInput"
+    },
+    {
+      "$ref": "#/$defs/ModelRetryPrepareResult"
     },
     {
       "$ref": "#/$defs/NodeProbeInput"

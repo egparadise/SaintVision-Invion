@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from uuid import uuid4
 import json
 import pytest
-from inv.model_registry_config import configured_registry_policy
+from inv.model_registry_config import configured_model_roots, configured_registry_policy
 from inv.model_registry_binding import RegistryBindingPolicy
 
 VALID = {"version": "operator:1", "allowed": [{"licensePolicy": "synthetic", "classification": "internal"}]}
@@ -53,6 +53,7 @@ def factory(monkeypatch,tmp_path):
     seen = {}
     def app(database,identity,**kwargs):
         seen['database']=database
+        seen['kwargs']=kwargs
         return database
     monkeypatch.setattr(module,'create_app',app)
     def start(settings):
@@ -71,6 +72,54 @@ def test_factory_passes_policy_to_shared_database(factory):
 def test_factory_keeps_unconfigured_legacy_mode_explicit(factory):
     start,_=factory
     assert start({}).registry_binding_policy is None
+
+
+def test_model_verifier_roots_are_explicit_and_bounded(tmp_path):
+    root = tmp_path / "models"
+    root.mkdir()
+    result = configured_model_roots(
+        {
+            "roots": [
+                {
+                    "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                    "contributionId": "stc_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                    "contributionVersion": 1,
+                    "path": str(root),
+                }
+            ],
+            "maxReadBytes": 4096,
+        }
+    )
+    assert result["max_read_bytes"] == 4096
+    assert result["roots"][0].root.path == root.resolve()
+
+
+def test_factory_wires_model_retry_only_with_explicit_verifier(factory, tmp_path):
+    root = tmp_path / "configured-models"
+    root.mkdir()
+    start, seen = factory
+    start(
+        {
+            "modelVerifier": {
+                "roots": [
+                    {
+                        "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                        "contributionId": "stc_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                        "contributionVersion": 1,
+                        "path": str(root),
+                    }
+                ],
+                "maxReadBytes": 4096,
+            }
+        }
+    )
+    assert type(seen["kwargs"]["model_retry"]).__name__ == "ModelRetryStore"
+
+
+@pytest.mark.parametrize("value", [None, {}, {"roots": [], "maxReadBytes": 1}])
+def test_invalid_model_verifier_configuration_is_rejected(value):
+    with pytest.raises(ValueError):
+        configured_model_roots(value)
 
 
 @pytest.mark.parametrize('value',[None,{}, {**VALID,'allowed':[]}, {**VALID,'unexpected':'sensitive-sentinel'}])

@@ -1,0 +1,32 @@
+{
+  "rootRunId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "parentRunId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "generation": 2,
+  "run": {
+    "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+    "tenantId": "00000000-0000-0000-0000-000000000001",
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "state": "planned",
+    "version": 3,
+    "attempt": 0
+  },
+  "placement": {
+    "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+    "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "snapshotId": "1111111111111111111111111111111111111111111111111111111111111111",
+    "policyVersion": "model-retry:1",
+    "leases": [
+      {
+        "leaseId": "lse_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "tenantId": "00000000-0000-0000-0000-000000000001",
+        "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+        "resourceId": "res_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "amount": 500,
+        "fencingToken": "00000000-0000-0000-0000-000000000002:1",
+        "grantedAt": "2026-09-22T08:00:00Z",
+        "expiresAt": "2026-09-22T08:00:30Z"
+      }
+    ]
+  },
+  "requiresFrozenInputAndApproval": true
+}

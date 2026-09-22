@@ -476,6 +476,36 @@ type WorkspaceEnqueueInput struct {
     ExpectedVersion int64 `json:"expectedVersion"`
 }
 
+type ModelRetryPrepareInput struct {
+    CpuMillis int64 `json:"cpuMillis"`
+    MemoryBytes int64 `json:"memoryBytes"`
+    GpuCount int64 `json:"gpuCount"`
+    MinVramBytes int64 `json:"minVramBytes"`
+    RequiredBytes int64 `json:"requiredBytes"`
+    MaxHostLoad float64 `json:"maxHostLoad"`
+    Runtime string `json:"runtime"`
+    PolicyVersion string `json:"policyVersion"`
+    NodeIds *[]NodeId `json:"nodeIds,omitempty"`
+    TtlSeconds *int64 `json:"ttlSeconds,omitempty"`
+}
+
+type ModelRetryPlacementResult struct {
+    RunId RunId `json:"runId"`
+    NodeId NodeId `json:"nodeId"`
+    SnapshotId string `json:"snapshotId"`
+    PolicyVersion string `json:"policyVersion"`
+    Leases []ResourceLease `json:"leases"`
+}
+
+type ModelRetryPrepareResult struct {
+    RootRunId RunId `json:"rootRunId"`
+    ParentRunId RunId `json:"parentRunId"`
+    Generation int64 `json:"generation"`
+    Run ControlRunView `json:"run"`
+    Placement ModelRetryPlacementResult `json:"placement"`
+    RequiresFrozenInputAndApproval bool `json:"requiresFrozenInputAndApproval"`
+}
+
 type ControlRunView struct {
     RunId RunId `json:"runId"`
     TenantId TenantId `json:"tenantId"`

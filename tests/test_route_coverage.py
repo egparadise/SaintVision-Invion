@@ -109,6 +109,16 @@ def test_the_kernel_decorator_form_is_found() -> None:
     }
 
 
+def test_model_retry_product_route_is_present_and_model_specific() -> None:
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "services/control-plane/src/inv/app.py"
+    ).read_text("utf-8")
+    routes = served_routes(source)
+    assert "/v1/projects/{}/runs/{}/model-retries" in routes
+    assert "/v1/projects/{}/runs/{}/retry" not in routes
+
+
 @pytest.mark.parametrize("holder", ["app", "api", "router", "business", "control"])
 def test_any_holder_name_works(holder: str) -> None:
     """The application object's variable name is not part of the contract."""
@@ -328,7 +338,6 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     # Truthful verification status: Output Verified must require verifiedEvidenceId and not fallbackUsed
     assert "Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed" in ds_content
     assert "출력 무결성 미검증 (Completed / UNVERIFIED)" in ds_content
-
 
 
 # --- 2026-09-22: holes that contain a call (found by the PR #36 review; false green) ---
