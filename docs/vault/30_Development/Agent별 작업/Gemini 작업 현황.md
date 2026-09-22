@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.120"
+version: "1.0.121"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T08:35:00+09:00"
+updated: "2026-09-23T10:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,29 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T08:35:00+09:00 (최신 tip `76f4528d`, 작업 브랜치 `agent/gemini/s06-fe-matrix`).
+- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `e1290f0a`, 작업 브랜치 `agent/gemini/s05-fe-matrix`).
+
+## 2026-09-23 S05-FE 자원배치 미리보기·Explain UI 시나리오 매트릭스 v1.1.1 수립 (docs-only, `agent/gemini/s05-fe-matrix`)
+
+- **PlacementSimulator 및 ResourceExplorer 4대 영역 13대 시나리오 매트릭스 정본 초안 완결**:
+  - **POL (풀 인벤토리 및 3원 용량 분리)**:
+    - `GET /v1/pools`는 `memberCount`만 반환하며 휘발성 용량 미번들링 (정본 용량 분리 원칙).
+    - `GET /v1/pools/{id}/capacity` 독립 호출로 3원 수치(`totalOffered`, `largestSingleNode`, `spareNow`) 동시 표기 (비분할 단일 작업 물리적 천장 정직 고지).
+    - `SNAPSHOT_FRESHNESS_SECONDS = 120` 초과 노드는 `measured: false`, spare=0 및 `unmeasuredNodes` 분리. 정적 스냅샷 수동 갱신 알림(`pool-tab-manual-refresh-notice`) 및 404 `RES-NODE-NOT-FOUND` 에러 재시도(`pool-capacity-retry`).
+  - **PRV (배치 미리보기 및 샤드 어댑터)**:
+    - `GET /v1/pools/{id}/placement-preview`: `(-headroom, nodeId)` 사전순 결정론적 유휴 우선 노드 순위 조회.
+    - 가용 후보 0개 시 `preview-empty-state` 정직 표출 및 가짜 샤드 합성 0건.
+    - 미리보기 실패 시 `preview-error-banner` 및 불변식 `서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다` 표출.
+  - **LOC (로컬 평가 경계 및 디스커버리)**:
+    - `local-simulation-badge`에 `로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)` 영구 명시.
+    - `GET /v1/discovery/candidates` 신고 스펙(`claimed*`) 및 `CANDIDATE (미검증)` 표출.
+  - **PLN (분산 계획 수립 및 멤버 관리)**:
+    - 관측 전용 노드(`schedulable: false`, `observationOnly: true`) 연산 풀 편입 시도 즉시 차단 (`pool-action-error-banner-inline`).
+    - `plan-run-id-input` 공백 시 `create-plan-btn` 비활성화 및 사용자 조치 안내(`plan-run-id-user-action-notice`).
+    - `POST /v1/pools/{id}/plans`: `splittableDeclared` 미선언 다중 샤드 422 `VAL-SCHEMA` 거절 및 부분 배치 원천 금지.
+  - **프로덕션 심볼 타겟 돌연변이(MUT 5종) 사살 계획 및 하네스 명세 완비**.
+  - **계획서 정본**: [[2026-09-23_S05-FE_자원배치_미리보기_Explain_시나리오_매트릭스_Gemini]] (v1.1.1).
+  - **독립 검토 요청**: Claude (UI 셀렉터 대조), Codex (커널 오류 코드 및 3원 용량 계약 대조). 실측은 승인 후.
 
 ## 2026-09-23 S06-FE Workspace 복원·원격 WS/PTY 콘솔 UI 시나리오 매트릭스 v1.1.2 수립 (docs-only, `agent/gemini/s06-fe-matrix`)
 
