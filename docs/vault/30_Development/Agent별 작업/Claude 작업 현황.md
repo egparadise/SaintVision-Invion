@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.15"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T00:20:00+09:00"
+updated: "2026-09-23T00:21:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 2 독립 검토 → **승인** (Claude, 2026-09-22): 4473c7f1 실행 Manifest 관측(VF-CL-02c)+model-retry F1 403+0046 SECURITY DEFINER. 실측: HTTP 실 PG 2 passed·내 PR #51 시험 pin 503→403 뒤집어 8 passed·계약 결속 52/17/20·freshness observedAt ok·route_coverage 44/0·PG-free 46 passed. 0046 ACL 일회용 DB 조회: EXECUTE=invowner·inv_kernel만(PUBLIC/inv_app 없음), inv_kernel의 data_replicas 원시 SELECT 없음, tenant 미설정 시 0행. **되살림 2건 KILLED**(preflight 제거→503 회귀, 버전 드리프트 무시→ready 누출 잡힘; 첫 시도의 미적용 변이는 diff 확인 절차로 교정). finding 0, 관찰 2(403 존재 비노출·DEFINER owner superuser). 전문 [[2026-09-22_Codex_카드2_실행Manifest관측_model-retry_F1_독립검토_Claude]].
+
 
 PITR 보존 7일 정리 실측 (Claude, 2026-09-22): PR #49 우리 몫 3 — dev PG에서 실제 `pg_basebackup` 라벨 2개·실제 `pg_wal` 이름으로 아카이브 레이아웃 구성(DB 무변경, 컨테이너 /tmp 정리) → `pitr_archive_retention.py` 실 클록 dry-run 삭제 0 / +8일 dry-run bb1+BB·BC 삭제 계획(최신 bb2·BD 이후 WAL 보존) / 사본 `--apply` 정확히 그만 삭제·원본 무변경 / 자기시험 9 passed. 정직: dev PG는 archive_mode off라 정리 대상 없음 → 도구 검증이지 운영 정리 아님(Tier-A 활성 후 실 아카이브에 재실행). Evidence/pitr-retention/ 4파일, 비밀 0. 전문 [[2026-09-22_PITR_보존7일_정리_dry-run_실측_dev_PG_Claude]].
 
