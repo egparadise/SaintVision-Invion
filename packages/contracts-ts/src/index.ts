@@ -559,6 +559,11 @@ export interface BusinessEditLockView {
   inputSizeBytes: number;
 }
 
+export interface BusinessEditLockReleaseView {
+  lockId: string;
+  releasedAt: string;
+}
+
 export interface BusinessBindingInput {
   projectId: ProjectId;
   lockId: string;

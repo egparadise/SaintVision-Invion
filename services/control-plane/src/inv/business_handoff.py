@@ -422,6 +422,7 @@ class BusinessHandoff:
                     "AUTH-0045", "Only the current lock owner may release editing", 403
                 )
             if prior is not None:
+                validate_contract("BusinessEditLockReleaseView", prior)
                 return prior
             if lock["released_at"] is None:
                 binding = conn.execute(
@@ -446,13 +447,15 @@ class BusinessHandoff:
                 "SELECT released_at FROM public.workspace_edit_locks WHERE lock_id=%s",
                 (lock["lock_id"],),
             ).fetchone()
-            return self.ledger._save(
+            result = self.ledger._save(
                 conn,
                 lock["project_id"],
                 "business.release",
                 key,
                 {"lockId": lock_id, "releasedAt": row["released_at"].isoformat()},
             )
+            validate_contract("BusinessEditLockReleaseView", result)
+            return result
 
     def reconcile(self, principal, binding_id, key):
         current = self.get(principal, binding_id)

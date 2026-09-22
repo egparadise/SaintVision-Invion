@@ -15,7 +15,7 @@
 | 고위험 누락 수정 | `Control.cancel` | shard parent 반환, 일반 취소 결과, idempotency replay 모두 `ControlRunView`를 검증하도록 했다. parent 변형에서 앵커를 제거하면 시험이 실패한다. |
 | replay 누락 수정 | containment, workspace API/start, business binding prepare | 저장된 prior 응답도 각각 `ContainmentResult`, `WorkspacePrepareResult`, `WorkspaceEnqueueResult`, `WorkspaceStartPrepareResult`, `WorkspaceStartEnqueueResult`, `BusinessBindingView`로 재검증한다. |
 | 신규 계약 공백 수정 | business edit lock | `BusinessEditLockView`를 정본 JSON Schema에서 생성하고 lock 발급·replay에 앵커를 추가했다. lockId가 다음 prepare 요청의 대상이므로 고위험이다. |
-| 별도 판단 필요 | business lock release의 `{lockId,releasedAt}`와 일부 운영 응답 | 현재 canonical response schema가 없다. 무명 raw dict를 억지로 기존 계약에 맞추지 않고 별도 계약 카드로 남긴다. |
+| 신규 계약 공백 수정 | business lock release | 실제 반환 `{lockId,releasedAt}`를 그대로 `BusinessEditLockReleaseView`로 기록하고 정상·replay 응답에 앵커를 추가했다. 새 필드를 추측하지 않았다. |
 
 `tools/check_contract_bindings.py`는 현재 48개 fixture가 시험에서 참조되고 14개 kernel 응답 타입에 serving-anchor 시험이 있음을 보고한다. 이 검사는 앵커 호출의 존재를 보장하지만 모든 write route의 의미적 도달성과 실제 DB 실행을 보장하지 않는다.
 
@@ -36,7 +36,18 @@ git diff --check
 exit 0
 ```
 
-되돌림 대조: `Control.cancel` parent 응답의 `validate_contract("ControlRunView", ...)` 호출을 제거하면 `test_parent_cancel_anchor_rejects_an_invalid_state`가 `DID NOT RAISE`로 실패한다. 즉 시험은 잘못된 응답을 초록으로 통과시키지 않는다.
+되돌림 대조: `Control.cancel` parent 응답의 `validate_contract("ControlRunDetail", ...)` 호출을 제거하면 `test_parent_cancel_anchor_rejects_an_invalid_state`가 `DID NOT RAISE`로 실패한다. 즉 시험은 잘못된 응답을 초록으로 통과시키지 않는다.
+
+## 실제 PostgreSQL 확인
+
+일회용 Docker PostgreSQL 16 컨테이너(`ai.saintvision.codex-audit=20260922`)에서 Alembic 초기화 후 다음을 실행했다.
+
+- `test_public_create_cancel_and_replay_are_durable`: **1 passed**, exit 0. 일반 취소와 동일 idempotency key 재생을 실제 DB에서 확인했다.
+- `test_concurrent_control_replay_has_one_version_and_immutable_audit`: **1 passed**, exit 0. containment replay의 동시성·단일 버전·감사 행을 확인했다.
+- workspace/business replay 시험: Windows 호스트의 Linux 실행 전제 때문에 각각 **skip**. PostgreSQL 부재가 아니라 Linux Workspace 실행 전제이며, 이 경로의 실제 DB 증거는 CI/Linux에서 남아 있다.
+
+컨테이너는 라벨을 확인한 뒤 해당 컨테이너만 제거했고, 보호 컨테이너는 건드리지 않았다.
+
+`check_docs.py`는 이번 변경과 무관한 기존 History 문서의 깨진 wiki 링크 2건(`doc-only-commit-verify-the-code`, `empty-output-is-not-evidence`)으로 exit 1이었다. 이를 이번 계약 변경의 통과로 보고하지 않는다.
 
 남은 범위는 독립 검토와 통합 tip 재실행 전까지 완료로 세지 않는다.
-

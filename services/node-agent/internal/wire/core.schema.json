@@ -2496,6 +2496,24 @@
         "inputSizeBytes"
       ]
     },
+    "BusinessEditLockReleaseView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "releasedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "lockId",
+        "releasedAt"
+      ]
+    },
     "BusinessBindingInput": {
       "type": "object",
       "additionalProperties": false,

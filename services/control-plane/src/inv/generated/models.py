@@ -774,6 +774,14 @@ class BusinessEditLockView(BaseModel):
     inputSizeBytes: conint(ge=0, le=1073741824)
 
 
+class BusinessEditLockReleaseView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    lockId: UUID
+    releasedAt: AwareDatetime
+
+
 class BusinessApprovalInput(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

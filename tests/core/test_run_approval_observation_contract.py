@@ -19,6 +19,7 @@ from inv.errors import DomainError
 from inv.generated.models import (
     ApprovalPage,
     BusinessEditLockView,
+    BusinessEditLockReleaseView,
     ControlRunDetail,
     ControlRunPage,
 )
@@ -217,7 +218,7 @@ def test_parent_cancel_anchor_rejects_an_invalid_state(monkeypatch):
     monkeypatch.setattr("inv.shards.ShardRuntime", _ShardRuntime)
     control = Control(_Database([{"plan_id": "plan-1"}]))
 
-    with pytest.raises(DomainError, match="ControlRunView: invalid contract"):
+    with pytest.raises(DomainError, match="ControlRunDetail: invalid contract"):
         control.cancel(
             SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"])),
             expected["projectId"],
@@ -240,6 +241,18 @@ def test_business_edit_lock_view_contract_rejects_missing_target_identity():
     payload.pop("lockId")
     with pytest.raises(ValidationError):
         BusinessEditLockView.model_validate(payload)
+
+
+def test_business_edit_lock_release_contract_records_the_actual_wire_shape():
+    payload = {
+        "lockId": "00000000-0000-4000-8000-000000000042",
+        "releasedAt": "2026-09-22T12:00:00Z",
+    }
+    validate_contract("BusinessEditLockReleaseView", payload)
+    assert BusinessEditLockReleaseView.model_validate(payload).model_dump(mode="json") == payload
+    payload.pop("releasedAt")
+    with pytest.raises(ValidationError):
+        BusinessEditLockReleaseView.model_validate(payload)
 
 
 def test_approval_listing_provider_returns_the_shared_approval_page_fixture(monkeypatch):

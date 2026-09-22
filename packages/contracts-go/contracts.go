@@ -561,6 +561,11 @@ type BusinessEditLockView struct {
     InputSizeBytes int64 `json:"inputSizeBytes"`
 }
 
+type BusinessEditLockReleaseView struct {
+    LockId string `json:"lockId"`
+    ReleasedAt string `json:"releasedAt"`
+}
+
 type BusinessBindingInput struct {
     ProjectId ProjectId `json:"projectId"`
     LockId string `json:"lockId"`
