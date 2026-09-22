@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.180"
+version: "1.0.181"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T23:47:00+09:00"
+updated: "2026-09-23T00:18:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 카드 7 — hosted Core 보강·5노드 opt-in lane 정의
+
+- Core run `35742655096`은 exact `a4bf2cee`에서 success다. artifact `core-tests.xml`에서 Windows skip 대상인 workspace recovery 12 + resume 11을 직접 집계해 Linux **23/23 passed, 0 skipped/failed**를 확인했다.
+- [[Codex 5노드 랩 opt-in lane 정의]]에 self-hosted runner, exact SHA/inventory·image digest, env/secret 이름, S05/S07/S06 명령, JUnit+JSON artifact와 fail-closed 판정을 고정했다. `.github/workflows/core.yml`은 변경하지 않았고 향후 `agent/codex/five-node-lane` 제안만 정의했다.
+- 현재 S05/S07은 합성 node adapter이고 S06 물리 runner는 아직 없으므로 5-node runner 실행 자체를 물리 합격으로 세지 않는다. S06-DB는 원격 WS/PTY/Git·CP/Node 재시작 복원 미측정 때문에 `review` 유지다.
+- content R1 `21c6a026` 착지, docs 831·ontology 48·ratchet 18 모두 exit 0. 상세: [[2026-09-23_00-18-00_KST_Card7_hosted-Core_5노드-lane_Codex_보고]]. 다음 담당은 Claude 독립 검토다.
 
 ## 2026-09-22 S06-DB snapshot reader 제품 결속
 
