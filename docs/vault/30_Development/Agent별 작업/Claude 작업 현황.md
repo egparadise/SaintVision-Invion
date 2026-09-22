@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T03:05:00+09:00"
+updated: "2026-09-23T03:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+검증검사도구_목록 v1.5.0 (Claude, 2026-09-23, 카드 x, docs-only): 오늘 착지한 실측 도구 4(`collect_rls_evidence.py`·`collect_container_evidence.py`·`placement_benchmark.py`·`measure_s07_recovery.py`)와 [[Codex 5노드 랩 opt-in lane 정의]]를 새 절 '실측 Evidence collector·측정기'에 등급(온디맨드 실측/측정기/제안, exit 0/1/2/3)·실행 명령·증거 경로·실패 시 대응·자기시험으로 등록. 게이트 승격 없음. [[검증검사도구_목록]] (PR agent/claude/tool-registry-v150)
 
 S03-DB 컨테이너 출력·거부·lease 회수 Evidence collector (Claude, 2026-09-22, 카드 s, reviewer Codex): `tools/collect_container_evidence.py` — DB 레인(run별 lease 회수 근거·claims·deliveries 오류·stop receipt hash·commitment↔storage object hash·evidence outputSha256·completions, C1~C4) + 컨테이너 레인(`compile_launch` plan 그대로 docker run, P1 출력 sha256·P2 rootfs 거부·P3 네트워크 거부·P4 uid/CapEff), 미측정은 정직 표기. 자기시험 20(실 PG 2: 커널 트리거 경로로 seed한 합성 원장 + 부정 대조군, Docker 1). 표준 실행 PASS: DB 레인 run 0(Linux Node provider 없는 PC라 미측정 명시), 컨테이너 4 프로브 전부 기대 일치. [[2026-09-22_S03-DB_컨테이너_출력_거부_lease회수_Evidence_collector_Claude]] (PR agent/claude/s03-container-evidence)
 
