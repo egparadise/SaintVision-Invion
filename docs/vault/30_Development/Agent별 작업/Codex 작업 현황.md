@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.174"
+version: "1.0.175"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T21:55:00+09:00"
+updated: "2026-09-22T22:24:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 VF-CL-02(e) node-agent wire 계약 소비 + 카드 3 M1 보강
+
+- PR #64 조건부 승인에서 생존한 reader-scope M1을 실 PG HTTP 시험에 추가했다. kernel ready 관측 뒤 business reader scope만 폐기하면 kernel은 ready node를 유지하지만 resolver는 빈 `readyNodes`와 false로 강등한다. 원본 1 passed, 교집합 두 줄 제거 변이 1 failed, 복원본 1 passed로 M1 KILLED다.
+- node-agent는 canonical fixture를 embedded `core.schema.json`으로 검증하고 생성 `contracts-go.ModelExecutionManifestObservation`으로 소비한다. project/model/version/manifest hash와 비권한 플래그를 대조하며 drift는 `NODE-0070`으로 전체 거부한다. generator exit 0, node mirror/Go 타입 drift 0이다.
+- 구현 `9c519774`(부모 `80d4e748`)는 origin integration에 fast-forward 착지했다. node-agent build/vet/test, contracts-go, focused pytest 45, 실 PG 1, bindings 52/17/21/12, freshness 10/10, frontend/docs/ontology/ratchet가 모두 exit 0이다.
+- hosted 같은 SHA는 Docs `35730310514`, Frontend `35730310623`, Desktop `35730310535`, Core `35730310519`가 success다. Backend `35730310466`은 후속 push로 job 0 cancelled된 최초 시도를 통과로 세지 않고 같은 run/head SHA로 rerun해 Python matrix 두 job과 최종 conclusion success를 확인했다.
+- 상세: [[2026-09-22_21-58-06_KST_VF-CL-02E_NODE-WIRE_Codex_구현]]. 다음 담당은 Claude 독립 검토이며 작성자가 self-close하지 않는다.
 
 ## 2026-09-22 review→done 차단 지도
 
