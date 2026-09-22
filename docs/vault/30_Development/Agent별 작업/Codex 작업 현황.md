@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.172"
+version: "1.0.173"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T21:18:16+09:00"
+updated: "2026-09-22T21:31:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 S01-BE·S01-ST 증거 기록 갱신
+
+- PR [#62](https://github.com/egparadise/SaintVision-Invion/pull/62) head `d97a6d7e`의 Claude 인계 R1~R6을 대조해 stale migration head `0045`를 실제 `0046_model_manifest_readiness`로 고쳤다. 계약/hosted CI와 독립 peer review 완료, 물리 노드 인벤토리 **표 양식** 착지를 증거 표에 연결했다.
+- registry의 `S01-BE.next_handoff`는 `user-input:U2/U3/U4`, `S01-ST.next_handoff`는 `user-input:U1/U5/U6`으로 바꿨다. 두 task의 `status: in_progress`와 scope는 유지했으며, 값 없는 표 양식이나 소프트웨어 peer review를 실운영 완료로 올리지 않았다.
+- 정확한 R1 후보 트리의 문서·ontology 게이트와 content commit은 [[2026-09-22_21-31-00_KST_S01_증거기록갱신_Codex]] receipt에 고정한다. 다음 담당은 사용자가 U1~U6의 비밀 제외 값을 제공하고, Codex가 해당 운영 성공 신호를 실제 측정하는 것이다.
+- Orca worktree Obsidian check는 baseline 차이(3 both-diverged·1 no-baseline)로 exit 3이어서 apply하지 않았다. 착지 뒤 코디네이터가 정본 checkout에서 sync한다.
 
 ## 2026-09-22 VF-CL-02(d) inv URI resolver 운영 바인딩
 

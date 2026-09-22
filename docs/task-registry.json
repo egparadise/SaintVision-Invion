@@ -151,7 +151,7 @@
       ],
       "scope": "저장소·계약·개발 환경·권한 경계",
       "evidence_required": "계약 검증·설계 검토·인벤토리 보고",
-      "next_handoff": "Claude"
+      "next_handoff": "user-input:U2/U3/U4"
     },
     {
       "task_id": "S01-DB",
@@ -205,7 +205,7 @@
       ],
       "scope": "URI·보존·제품 검증·장비 인벤토리",
       "evidence_required": "계약 검증·설계 검토·인벤토리 보고",
-      "next_handoff": "Claude"
+      "next_handoff": "user-input:U1/U5/U6"
     },
     {
       "task_id": "S02-FE",

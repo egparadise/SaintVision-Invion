@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-REMAINING-001"
 title: "Codex 잔여 개발 작업과 합격 증거"
-version: "1.20.0"
+version: "1.21.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T08:35:00+09:00"
+updated: "2026-09-22T21:31:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -51,11 +51,15 @@ source_of_truth: "Git"
 
 **2026-09-22 S01-DB closure:** task registry의 `S01-DB`는 계약 검증·설계 검토·인벤토리 보고와 실제 PostgreSQL 34건(0 skip)을 모두 기록했으므로 `done`으로 갱신했다. 이는 S01-BE/S01-ST와 전체 S01의 완료를 의미하지 않는다.
 
+**2026-09-22 S01 증거 기록 갱신:** PR [#62](https://github.com/egparadise/SaintVision-Invion/pull/62) head `d97a6d7e`의 Claude 인계 R1~R6을 owner가 대조했다. migration head를 실제 `0046_model_manifest_readiness`로 바로잡고 계약·hosted CI·독립 peer review·물리 노드 인벤토리 **표 양식** 착지를 아래 표에 연결했다. 표 양식에는 장비 값이 입력되지 않았고 U1~U6 실운영 입력도 남았으므로 S01-BE/S01-ST는 `in_progress`를 유지한다.
+
 owner Codex / reviewer Claude / task control-integration follow-up. 입력 GUIDE-001, PLAN-BACKEND/DB/STORAGE-001 v1.0.0, ADR-INDEX-001 v1.6.0. 현재 구현 HEAD는 이 문서와 연결한 History 검증 보고서로 고정한다. 작성자 자기 검증과 peer review를 혼동하지 않는다.
 
 | 배정 task | 현재 확보한 kernel/증거 | 남은 구현 또는 합격 증거 |
 |---|---|---|
-| S01-BE/DB/ST | 정본 Schema, migration head 0045, 강제 RLS, ID/권한/오류·trace 계약, package/CI/ontology | 실장비 5대·허용 폴더/자원·IdP/CA/DNS·Storage 제품 선택 및 운영 연결, peer review |
+| S01-BE | 정본 Schema와 migration head `0046_model_manifest_readiness`, 강제 RLS·ID/권한/오류/trace 계약, bindings 52 fixtures·17 response types·20 anchors·12 replay guards, hosted Backend [35723589663](https://github.com/egparadise/SaintVision-Invion/actions/runs/35723589663), 독립 peer review `8b20d3e6`·`54cb7f68` | U2 IdP·U3 CA·U4 DNS 실연결과 운영 성공 신호 |
+| S01-DB | migration head `0046_model_manifest_readiness`, 실제 PostgreSQL 34 passed·0 skipped, 독립 peer review | 카드 자체는 `done`; S01-BE/ST 및 전체 S01 완료를 뜻하지 않음 |
+| S01-ST | Contribution/DataLocation/StorageObservation 결속과 artifact-content SHA-256, 보존 7일 dry-run, 인벤토리 **표 양식** `04d42ee5`, 독립 URI·보존 정책 검토 | U1 토폴로지·U5 물리 장비 5대/허용 폴더·자원 값·U6 Storage 제품 선택 및 실제 왕복 |
 | S03-BE | 사전 승인 policy, 일회 ToolGateway, signed permit, Linux Docker 격리·정지 receipt | 업무 Workspace adapter, Windows driver/ACL, 운영 profile 및 실제 사용자 여정 |
 | S04-BE/DB | 권한 있는 승인 challenge/decision·cancel API, 원자 ledger/outbox, bounded SSE/cursor, Node control cancel | workflow plan/approval request/dispatch daemon과 UI 통합, 오류·취소의 종단 자동 진행 |
 | S04-ST | checksum/path 검증 함수, 합성 bytes 시험 | 제품 object storage의 resumable multipart, 중단/재개/동시 finalize/실제 checksum 검증 |
