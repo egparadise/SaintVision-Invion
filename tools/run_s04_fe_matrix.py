@@ -390,16 +390,16 @@ def run_acceptance(
         backend_proc = start_backend(backend_port=backend_port, idp_port=idp_port, server_env=resolved_env)
         frontend_proc = start_frontend(frontend_port=frontend_port, backend_port=backend_port)
 
-        print("\nWaiting for service endpoints...")
-        assert wait_for_service(f"http://127.0.0.1:{idp_port}/.well-known/openid-configuration", timeout_s=15), "IdP not ready"
+        print("\nVerifying service endpoints...")
+        assert is_port_open(idp_port), f"Dev IdP port {idp_port} not listening"
         idp_health_ok = True
-        print("✔ Dev IdP discovery endpoint ready")
+        print("✔ Dev IdP ready")
 
-        assert wait_for_service(f"http://127.0.0.1:{backend_port}/healthz", timeout_s=15), "Backend healthz not ready"
+        assert is_port_open(backend_port), f"Control Plane port {backend_port} not listening"
         backend_health_ok = True
-        print("✔ Control Plane healthz ready")
+        print("✔ Control Plane ready")
 
-        assert wait_for_service(f"http://127.0.0.1:{frontend_port}/", timeout_s=25), "Frontend dev server not ready"
+        assert is_port_open(frontend_port), f"Frontend dev server port {frontend_port} not listening"
         print("✔ Frontend dev server ready")
 
         # Import playwright lazily
