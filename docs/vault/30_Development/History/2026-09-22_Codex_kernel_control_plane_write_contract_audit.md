@@ -1,8 +1,8 @@
-# Kernel/control-plane 쓰기 계약 감사
+﻿# Kernel/control-plane 쓰기 계약 감사
 
 ## 범위와 판정 기준
 
-- 기준 SHA: `712d9560`에서 시작한 Codex 작업 트리; 이 기록의 구현 후 커밋은 인계 시 갱신한다.
+- 기준 SHA: `712d9560`; 구현·통합 반영 SHA: `a2dada9a` (integration/all-agents-unified).
 - `services/control-plane/src/inv/app.py`의 `POST`·`PUT`·`PATCH`·`DELETE` 라우트 28개를 전수 목록화했다.
 - 프런트는 runs 생성·취소, approval, workspace start/resume·files, terminal ticket, node control을 control-plane에 직접 요청한다. 따라서 이 면은 내부 전용으로 간주할 수 없고, 새 ID·handle·전이 집합·경로를 반환하는 쓰기 응답은 v1 쓰기면과 같은 고위험 기준을 적용한다.
 - 확인은 소스 읽기와 기존 계약/앵커 시험 실행으로 했다. 브라우저, 실 HTTP, PostgreSQL 전체 쓰기면 회귀는 이 감사에서 주장하지 않는다.
@@ -39,3 +39,4 @@ exit 0
 되돌림 대조: `Control.cancel` parent 응답의 `validate_contract("ControlRunView", ...)` 호출을 제거하면 `test_parent_cancel_anchor_rejects_an_invalid_state`가 `DID NOT RAISE`로 실패한다. 즉 시험은 잘못된 응답을 초록으로 통과시키지 않는다.
 
 남은 범위는 독립 검토와 통합 tip 재실행 전까지 완료로 세지 않는다.
+
