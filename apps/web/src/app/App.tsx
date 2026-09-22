@@ -76,34 +76,95 @@ export const App: React.FC = () => {
   const [nodesState, setNodesState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [workspacesState, setWorkspacesState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const activeProject = useRef('');
-  const runRequest = useRef(0);
-  const approvalRequest = useRef(0);
-  const workspaceRequest = useRef(0);
-  const nodeRequest = useRef(0);
-  const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
-  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
-  const [authError, setAuthError] = useState<string | null>(null);
-
-  useEffect(() => {
-    onUnauthorized((problem) => {
-      clearAuthToken();
-      setCurrentUser(null);
-      setNodes([]);
-      setProjects([]);
-      setAuthError(`[${problem.code}] ${problem.detail}`);
-      setActiveTab('login');
-    });
-    return () => onUnauthorized(null);
-  }, []);
-
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [projectId, setProjectId] = useState('');
   const [projectError, setProjectError] = useState<string | null>(null);
   const [nodeResourceUsage, setNodeResourceUsage] = useState<ObservedNodeResourceUsage | null>(null);
   const [nodeResourceUsageState, setNodeResourceUsageState] = useState<'idle' | 'unselected' | 'loading' | 'success' | 'error'>('idle');
   const [nodeResourceUsageError, setNodeResourceUsageError] = useState<string | null>(null);
+  const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
+  const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
+  const [studioWorkspaceId, setStudioWorkspaceId] = useState<string | null>(null);
+  const [studioRunId, setStudioRunId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [nodeSimState, setNodeSimState] = useState<'normal' | 'loading' | 'empty' | 'error' | 'forbidden'>('normal');
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; role: string; tenantId?: string } | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const sessionRef = useRef(0);
   const scopeRef = useRef(0);
+  const activeProject = useRef('');
+  const runRequest = useRef(0);
+  const approvalRequest = useRef(0);
+  const workspaceRequest = useRef(0);
+  const nodeRequest = useRef(0);
+
+  const resetAuthenticatedState = React.useCallback((errorMessage?: string | null) => {
+    clearAuthToken();
+    sessionRef.current += 1;
+    scopeRef.current += 1;
+    runRequest.current += 1;
+    approvalRequest.current += 1;
+    workspaceRequest.current += 1;
+    nodeRequest.current += 1;
+
+    activeProject.current = '';
+
+    setCurrentUser(null);
+    setProjectId('');
+    setProjects([]);
+    setProjectError(null);
+
+    setNodes([]);
+    setNodesState('idle');
+    setNodeError(null);
+    setLastNodesFetchedAt(null);
+    setSelectedNodeId(null);
+
+    setNodeResourceUsage(null);
+    setNodeResourceUsageState('idle');
+    setNodeResourceUsageError(null);
+
+    setWorkspaces([]);
+    setWorkspacesState('idle');
+    setWorkspaceError(null);
+    setSelectedWorkspaceId(null);
+    setIsCreateModalOpen(false);
+
+    setRuns([]);
+    setRunsState('idle');
+    setRunError(null);
+    setLastRunsFetchedAt(null);
+    setSelectedRunId(null);
+
+    setApprovals([]);
+    setApprovalsState('idle');
+    setApprovalError(null);
+    setLastApprovalsFetchedAt(null);
+
+    setEvidenceRunId(null);
+
+    setStudioStep(1);
+    setStudioNodeId(null);
+    setStudioWorkspaceId(null);
+    setStudioRunId(null);
+
+    setActionError(null);
+    setDesktop(false);
+
+    if (errorMessage !== undefined) {
+      setAuthError(errorMessage);
+    }
+    setActiveTab('login');
+  }, []);
+
+  useEffect(() => {
+    onUnauthorized((problem) => {
+      resetAuthenticatedState(`[${problem.code}] ${problem.detail}`);
+    });
+    return () => onUnauthorized(null);
+  }, [resetAuthenticatedState]);
+
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
@@ -117,15 +178,27 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let active = true;
+    const currentSession = sessionRef.current;
     setProjects([]); chooseProject(''); setProjectError(null);
-    if (currentUser) fetchProjects().then(items => {
-      if (active) { setProjects(items); chooseProject(items[0]?.id ?? ''); }
-    }).catch(() => { if (active) setProjectError('프로젝트 목록을 확인하지 못했습니다.'); });
+    if (currentUser) {
+      fetchProjects().then(items => {
+        if (active && sessionRef.current === currentSession) {
+          setProjects(items);
+          chooseProject(items[0]?.id ?? '');
+        }
+      }).catch(() => {
+        if (active && sessionRef.current === currentSession) {
+          setProjectError('프로젝트 목록을 확인하지 못했습니다.');
+        }
+      });
+    }
     return () => { active = false; };
   }, [currentUser]);
 
   useEffect(() => {
     let active = true;
+    const currentSession = sessionRef.current;
+    const currentScope = scopeRef.current;
     if (!selectedNodeId) {
       setNodeResourceUsage(null);
       setNodeResourceUsageState('idle');
@@ -142,14 +215,14 @@ export const App: React.FC = () => {
     setNodeResourceUsageError(null);
     getNodeResourceUsage(selectedNodeId, projectId)
       .then((usage) => {
-        if (active) {
+        if (active && sessionRef.current === currentSession && scopeRef.current === currentScope) {
           setNodeResourceUsage(usage);
           setNodeResourceUsageState('success');
           setNodeResourceUsageError(null);
         }
       })
       .catch((err) => {
-        if (active) {
+        if (active && sessionRef.current === currentSession && scopeRef.current === currentScope) {
           setNodeResourceUsage(null);
           setNodeResourceUsageState('error');
           setNodeResourceUsageError(
@@ -161,13 +234,6 @@ export const App: React.FC = () => {
       active = false;
     };
   }, [selectedNodeId, projectId]);
-
-  // Integrated Developer Studio navigation state
-  const [studioStep, setStudioStep] = useState<1 | 2 | 3 | 4>(1);
-  const [studioNodeId, setStudioNodeId] = useState<string | null>(null);
-  const [studioWorkspaceId, setStudioWorkspaceId] = useState<string | null>(null);
-  const [studioRunId, setStudioRunId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
 
   const handleOpenStudio = (opts: { step?: 1 | 2 | 3 | 4; nodeId?: string; workspaceId?: string; runId?: string }) => {
     if (opts.step) setStudioStep(opts.step);
@@ -187,6 +253,8 @@ export const App: React.FC = () => {
       setNodesState('idle');
       return;
     }
+    const currentSession = sessionRef.current;
+    const currentScope = scopeRef.current;
     const request = ++nodeRequest.current;
     setNodesState('loading');
     setNodeError(null);
@@ -201,14 +269,14 @@ export const App: React.FC = () => {
           throw err;
         }
       }
-      if (request === nodeRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
         setNodes(page.items.map(observedNode));
         setNodesState('success');
         setLastNodesFetchedAt(new Date());
         setNodeError(null);
       }
     } catch (err: any) {
-      if (request === nodeRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
         setNodes([]);
         setNodesState('error');
         setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
@@ -218,19 +286,20 @@ export const App: React.FC = () => {
 
   const fetchRuns = React.useCallback(async () => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++runRequest.current;
     setRunsState('loading');
     try {
       const items = await fetchObservedRuns(projectId);
-      if (scopeRef.current === scope && request === runRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
         setRuns(items);
         setRunsState('success');
         setLastRunsFetchedAt(new Date());
         setRunError(null);
       }
     } catch (err: any) {
-      if (scopeRef.current === scope && request === runRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
         setRuns([]);
         setRunsState('error');
         const prob = err?.problem;
@@ -244,19 +313,20 @@ export const App: React.FC = () => {
 
   const fetchApprovals = React.useCallback(async () => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
+    const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++approvalRequest.current;
     setApprovalsState('loading');
     try {
       const items = await fetchObservedApprovals(projectId);
-      if (scopeRef.current === scope && request === approvalRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
         setApprovals(items);
         setApprovalsState('success');
         setLastApprovalsFetchedAt(new Date());
         setApprovalError(null);
       }
     } catch {
-      if (scopeRef.current === scope && request === approvalRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
         setApprovals([]);
         setApprovalsState('error');
         setApprovalError('승인 목록을 확인하지 못했습니다.');
@@ -269,19 +339,20 @@ export const App: React.FC = () => {
       setWorkspacesState('idle');
       return;
     }
+    const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++workspaceRequest.current;
     setWorkspacesState('loading');
     setWorkspaceError(null);
     try {
       const items = await fetchProjectWorkspaces(projectId);
-      if (scopeRef.current === scope && request === workspaceRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
         setWorkspaces(items.map(toWorkspaceItem));
         setWorkspacesState('success');
         setWorkspaceError(null);
       }
     } catch (err: any) {
-      if (scopeRef.current === scope && request === workspaceRequest.current) {
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
         setWorkspaces([]);
         setWorkspacesState('error');
         setWorkspaceError(err?.message || 'Workspace 목록을 확인하지 못했습니다.');
@@ -402,7 +473,7 @@ export const App: React.FC = () => {
     </div>
   ) : null;
 
-  if (!currentUser) return <Login onLoginSuccess={user => { setAuthError(null); setCurrentUser(user); setActiveTab('dashboard'); }} initialError={authError} />;
+  if (!currentUser) return <Login onLoginSuccess={user => { setAuthError(null); sessionRef.current += 1; setCurrentUser(user); setActiveTab('dashboard'); }} initialError={authError} />;
 
   if (desktop && currentUser && projectId) return (
     <>
@@ -440,10 +511,7 @@ export const App: React.FC = () => {
         }}
         currentUser={currentUser}
         onLogout={() => {
-          clearAuthToken();
-          setNodes([]); chooseProject(''); setProjects([]);
-          setCurrentUser(null);
-          setActiveTab('login');
+          resetAuthenticatedState(null);
         }}
       />
 

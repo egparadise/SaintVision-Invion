@@ -23,6 +23,7 @@ import socket
 import subprocess
 import sys
 import time
+import traceback
 import urllib.request
 from pathlib import Path
 from uuid import uuid4
@@ -31,6 +32,13 @@ import jwt
 from playwright.sync_api import sync_playwright
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 DEFAULT_CHROME_PATH = os.environ.get(
     "CHROME_PATH",
@@ -169,15 +177,18 @@ def start_backend(server_env_path: Path, port: int = 8080) -> subprocess.Popen |
     raise RuntimeError(f"Timeout waiting for Backend on port {port}")
 
 
-def start_frontend(port: int = 3005) -> subprocess.Popen | None:
+def start_frontend(port: int = 3005, backend_port: int = 8080) -> subprocess.Popen | None:
     if is_port_open(port):
         print(f"[Frontend] Port {port} already active.")
         return None
-    print(f"[Frontend] Launching Vite dev server on port {port}...")
+    print(f"[Frontend] Launching Vite dev server on port {port} (proxying /v1 to http://127.0.0.1:{backend_port})...")
     cmd = ["npm.cmd" if os.name == "nt" else "npm", "run", "dev", "--", "--port", str(port), "--host", "127.0.0.1"]
+    env = os.environ.copy()
+    env["VITE_API_PROXY_TARGET"] = f"http://127.0.0.1:{backend_port}"
     proc = subprocess.Popen(
         cmd,
         cwd=str(REPO_ROOT / "apps" / "web"),
+        env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -274,7 +285,7 @@ def run_acceptance(
         with open(evidence_file, "w", encoding="utf-8") as f:
             json.dump(evidence_doc, f, indent=2, ensure_ascii=False)
         print(f"✔ UNMEASURED evidence recorded to: {evidence_file}")
-        return 0
+        return 3
 
     idp_proc = None
     backend_proc = None
@@ -284,10 +295,14 @@ def run_acceptance(
     backend_health_ok = False
     frontend_health_ok = False
 
+    evidence_written = False
+    scenario_records = []
+    mock_api_route_count = 0
+
     try:
         idp_proc = start_dev_idp(resolved_idp, idp_port)
         backend_proc = start_backend(resolved_env, backend_port)
-        frontend_proc = start_frontend(frontend_port)
+        frontend_proc = start_frontend(port=frontend_port, backend_port=backend_port)
 
         # Pre-flight health checks
         with urllib.request.urlopen(f"http://127.0.0.1:{idp_port}/", timeout=3) as r:
@@ -299,8 +314,6 @@ def run_acceptance(
         with urllib.request.urlopen(f"http://127.0.0.1:{frontend_port}/", timeout=3) as r:
             assert r.status == 200, f"Frontend health status was {r.status}"
             frontend_health_ok = True
-
-        scenario_records = []
 
         with sync_playwright() as p:
             browser = p.chromium.launch(
@@ -681,7 +694,7 @@ def run_acceptance(
 
         real_uvicorn_used = bool((backend_proc is not None or is_port_open(backend_port)) and backend_health_ok)
         real_dev_idp_used = bool((idp_proc is not None or is_port_open(idp_port)) and idp_health_ok)
-        mock_api_used = False  # Zero route mocks registered in playwright context
+        mock_api_used = bool(mock_api_route_count > 0)
 
         evidence_doc = {
             "schema": "https://saintvision.ai/evidence/s02-fe-real-api.schema.json",
@@ -712,12 +725,50 @@ def run_acceptance(
 
         with open(evidence_file, "w", encoding="utf-8") as f:
             json.dump(evidence_doc, f, indent=2, ensure_ascii=False)
+        evidence_written = True
         print(f"\n✔ Permanent evidence saved to: {evidence_file}")
 
         print("\n" + "=" * 70)
         print(f"STATUS: {assessment} ({passed_scenarios}/{total_scenarios} passed, 0 mocks)")
         print("=" * 70)
         return 0 if assessment == "ACCEPTANCE_PASSED" else 1
+
+    except Exception as exc:
+        print(f"\n❌ [ERROR] Acceptance execution encountered exception: {exc}", file=sys.stderr)
+        traceback.print_exc()
+        if not evidence_written:
+            end_time_iso = dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).isoformat()
+            failed_doc = {
+                "schema": "https://saintvision.ai/evidence/s02-fe-real-api.schema.json",
+                "version": "1.0.0",
+                "timestamp": end_time_iso,
+                "gitCommitSha": git_sha,
+                "assessment": "ACCEPTANCE_FAILED",
+                "operationalAcceptanceAssessed": False,
+                "failureDetail": f"{type(exc).__name__}: {str(exc)}",
+                "environment": {
+                    "os": os.name,
+                    "python": sys.version.split()[0],
+                    "chromePath": chrome_path,
+                    "backendPort": backend_port,
+                    "idpPort": idp_port,
+                    "frontendPort": frontend_port,
+                },
+                "scenarios": scenario_records,
+                "summary": {
+                    "totalScenarios": 4,
+                    "passed": len([s for s in scenario_records if s.get("status") == "PASS"]),
+                    "failed": max(1, len([s for s in scenario_records if s.get("status") == "FAIL"])),
+                    "unmeasured": max(0, 4 - len(scenario_records)),
+                    "mockApiUsed": bool(mock_api_route_count > 0),
+                    "realUvicornUsed": bool(backend_health_ok),
+                    "realDevIdPUsed": bool(idp_health_ok),
+                },
+            }
+            with open(evidence_file, "w", encoding="utf-8") as f:
+                json.dump(failed_doc, f, indent=2, ensure_ascii=False)
+            print(f"✔ Recorded FAILED evidence to: {evidence_file}")
+        return 1
 
     finally:
         if idp_proc:
