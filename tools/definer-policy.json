@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "revision": "0045_discovery_machine_cred",
-  "referenceSource": "8b8ed816f41af79c2cc6b8b3e08a6c74b4a75a5c",
+  "revision": "0046_model_manifest_readiness",
+  "referenceSource": "4473c7f1668eb3ea459b217d6af59bb9e6c113d3",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
     "public.apply_capability_offer(uuid, character, character, bigint)": {
@@ -77,6 +77,14 @@
       ],
       "kind": "tenant-bound",
       "sourceMigrationSHA256": "b6401933d8ca573e49cede31b6e5e44b32dcd3bbc42dd845b3444f99a3ef9d4a"
+    },
+    "public.model_location_readiness(text[])": {
+      "definitionSHA256": "b8f291d23bc2908ad5379934af6328f1a9c2df866542d4a25bac01d61933ca0b",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "c7105a2dcef3b24b0323e0e737169606502fa80093d452b451e5c5bece02f4a7"
     }
   }
 }
