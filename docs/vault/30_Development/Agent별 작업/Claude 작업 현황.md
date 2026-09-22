@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.9"
+version: "1.2.10"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T22:20:00+09:00"
+updated: "2026-09-22T19:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF-CL-02 model-kind URI → ModelManifest shards 확장 카드 8 (Claude, 2026-09-22): 설계안 1쪽(진입점·반환 타입·계약 무변경 범위·인가 술어 재사용·실패 모드·시험 계획) → 시험 골격(red) → 코디네이터 승인 → 구현. `services/resolver.py::resolve_model`(join key models.name+model_versions.version, **주입식 manifest_reader** — 비즈니스 role은 inv.model_manifests SELECT 불가라 운영 결속 (a) grant/(b) 커널 HTTP/(c) 커널 라우트는 Codex 결정 대기; reader 없으면 shards=None·manifest_source='unavailable', 빈 목록 위장 금지; shard→replica.locationId→data_locations(RLS·reader scope 동일)→data_replicas ready 대조; reason: unrecorded·location-missing·location-version-drift·manifest-<state>·replica-not-ready). `tests/test_model_uri_resolver.py` **7 passed** + `test_uri_resolver.py` 25 passed 불변(실 PG). 계약 파일·생성 타입 무변경. 검증상태지도 §10. 전문 [[2026-09-22_19-20-00_KST_VF-CL-02_model-kind_URI_shards_설계_Claude]].
 
 VF-CL 재고 + 아카이브 보관 정리 도구 카드 7 (Claude, 2026-09-22): VF-CL-01~05 재고표(06은 로드맵에 없음) — 전부 implemented·locally_verified·상호검토, 새 PC 실 PG로 S02 91·S10 228·S07 92 재확인; 미완은 VF-CL-02 model-kind URI 확장·VF-CL-03 import adapter(계약 $defs는 착지됐으나 결속 방식 Codex 확인 필요)·VF-CL-04 정리 절차·drill·운영 게이트. 무-블록 1개 구현(코디네이터 승인): `tools/pitr_archive_retention.py` 7일 보관 정리 계획(기본 dry-run, `--apply` 명시+계획 선출력, 불변식 4)+`tests/test_pitr_archive_retention.py` **9 passed**(속성 시험이 첫 구현 경계 결함을 잡아 수정) + runbook §4 정합. 검증상태지도 §9. 전문 [[2026-09-22_19-00-00_KST_VF-CL_재고_및_아카이브보관정리_Claude]].
 
