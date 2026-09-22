@@ -113,6 +113,9 @@ def image_id(manifest, image):
     for key in CONFIG:
         expected = manifest['imageConfig'].get(key)
         actual = image.get('Config',{}).get(key)
+        if key in ('User','WorkingDir'):
+            expected = '' if expected is None else expected
+            actual = '' if actual is None else actual
         if key in ('Cmd','OnBuild','Volumes','Labels'):
             expected, actual = expected or None, actual or None
         if actual != expected:

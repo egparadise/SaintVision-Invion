@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.189"
+version: "1.0.191"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T04:20:00+09:00"
+updated: "2026-09-23T04:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,6 +34,12 @@ source_of_truth: "Git"
 - database contention 내부 retry를 제거해 limit-row `55P03`을 기존 `RES-0007`/503/retryable로 즉시 반환한다. stale speculative decision 재계획은 유지하고 flag는 기본 off다. 공개 계약 변경 0이다.
 - tight-fit active_total 재계산과 BoundDatabase 실제 `55P03` savepoint 시험을 추가했다. 실 PG 13 passed/exit 0, 두 mutation은 각각 exit 1로 KILLED이며 model-retry 회귀 1 passed/exit 0이다. flag-off는 내부 shared primitive 리팩터를 포함한 동작 동등 경로라고 문서를 정정했다.
 - a60313a7 20동시×3에서 hold P95 중앙 1526.365→116.848ms, 요청 P95(all) 1817.763→922.915ms였으나 외부 timeout 2→27로 증가해 단계 3은 미통과다. flag off·S05 `review`·50/5노드 미승격을 유지하며 decision v1.3의 limit-row 입도 변경 대 legacy 유지·5노드 후 재판단을 코디네이터에게 요청한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]].
+
+## 2026-09-23 LAN pilot 다중 Node state·번들·등록 경계
+
+- 기존 단일 Node private state의 top-level identity를 호환 primary로 유지하면서 `nodes[]`, 반복 `init --node-ip`, Node별 manifest/worker.zip/peer policy/certificate를 추가했다. 신규 Node ID를 side effect 전에 저장해 partial retry에서도 기존 Node·key·channel·CA·epoch를 교체하지 않는다.
+- CSR CN으로 대상 Node를 선택하고 HTTP bootstrap은 source IP 허용 목록에서 그 Node의 bundle/certificate만 반환한다. hash는 HTTP로 내지 않고 별도 operator 채널로 유지하며, status/observe와 방화벽 안내는 Node별 행/IP 목록이다.
+- implementation `e7a37b0a`, Ubuntu F1 hotfix `10b0fc03`: 실제 Ubuntu 24.04 Node 1대가 mTLS online·observed true다. Claude 조건 보강 `619a45db`는 secondary legacy fallback과 peer-policy node/epoch/fingerprint mismatch를 고정하고 M1 1-fail·M3 3-fail로 KILLED, 복원 10 passed다. Node 2/3 CSR·Ubuntu 4대 전체·CP 겸임 Windows Node와 최종 Claude 전환 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
 
 ## 2026-09-23 S05-DB 5노드 lane 실행 계획
 

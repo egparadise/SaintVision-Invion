@@ -23,6 +23,28 @@ def test_different_store_identifier_is_accepted_only_for_identical_image_content
     assert image['Id']!=manifest['agentImage']
 
 
+def test_missing_engine_user_matches_manifest_empty_string():
+    manifest,image=pair()
+    image['Config'].pop('User')
+    assert worker.image_id(manifest,image)==image['Id']
+
+
+def test_missing_engine_working_dir_matches_manifest_empty_string():
+    manifest,image=pair()
+    manifest['imageConfig']['WorkingDir']=''
+    image['Config'].pop('WorkingDir')
+    assert worker.image_id(manifest,image)==image['Id']
+
+
+@pytest.mark.parametrize('key,value',[('User','1000:1000'),('WorkingDir','/workspace')])
+def test_nonempty_string_image_config_mismatch_remains_rejected(key,value):
+    manifest,image=pair()
+    manifest['imageConfig'][key]=value
+    image['Config'].pop(key)
+    with pytest.raises(ValueError,match='execution configuration differs: '+key):
+        worker.image_id(manifest,image)
+
+
 @pytest.mark.parametrize('fault',['layer','entrypoint','env','healthcheck','architecture','invalid-id'])
 def test_named_image_cannot_substitute_different_content(fault):
     manifest,image=pair()
