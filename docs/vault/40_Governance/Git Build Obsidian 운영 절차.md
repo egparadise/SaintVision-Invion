@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-GIT-001"
 title: "Git Build Obsidian 운영 절차"
-version: "1.1.2"
+version: "1.1.3"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-21T12:52:00+09:00"
+updated: "2026-09-22T18:08:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -34,6 +34,18 @@ origin은 **https://github.com/egparadise/SaintVision-Invion.git**이다. 최초
 보고서는 코드 SHA를 참조한다. 보고서 후속 commit은 코드 SHA의 검증 결과를 기록한다. 자기 SHA를 본문에 넣고 다시 커밋하는 무한 루프를 만들지 않는다. 후속 보고서 commit도 CI가 검사하며 CI 자체 기록이 마지막 보고서 커밋의 증거다.
 
 2026-09-18부터 push workflow는 `main`과 `integration/all-agents-unified`에서만 자동 실행된다. 개인 Agent branch push 자체는 CI 증거를 만들지 않으며, 개인 변경은 PR을 열거나 갱신해 동일 SHA의 PR workflow를 실행해야 한다. 따라서 `push → CI build` 절차의 CI 증거 위치만 PR 시점으로 이동했고, 구현 완료·인계 판정에 CI run ID와 상태를 요구하는 규칙은 유지된다. 개인 branch push가 성공했다는 사실을 CI 통과로 기록하지 않는다.
+
+## hosted runner 기아 방지와 브랜치별 concurrency
+
+다섯 workflow는 `workflow + github.ref`를 concurrency group으로 사용한다. 같은 PR merge ref 또는 수동 실행한 같은 Agent branch의 새 run은 이전 stale run을 취소한다(`cancel-in-progress: true`). 반대로 `main`과 `integration/all-agents-unified`는 공유 증거 lane이므로 진행 중 run을 취소하지 않고 순서대로 완료한다. 서로 다른 PR은 서로 다른 ref group이므로 이 규칙만으로 hosted runner 총량을 제한하지는 않는다.
+
+Core Build는 PostgreSQL, Go race, Docker 이미지와 Python 통합 시험을 한 run에서 수행하는 무거운 lane이다. 일반 PR의 open/synchronize/reopen만으로는 Core job을 실행하지 않는다. 다음 중 하나일 때만 실행한다.
+
+- PR에 `run-core` label이 붙어 있다. label을 붙이는 `labeled` event 자체가 실행을 만들고, label이 유지된 뒤의 synchronize도 다시 실행한다.
+- Actions에서 `workflow_dispatch`로 대상 branch를 명시한다.
+- `main` 또는 `integration/all-agents-unified`에 push한다. 이 두 공유 branch의 Core는 항상 실행하며 취소하지 않는다.
+
+Backend, Documentation, Frontend는 PR에서 계속 자동 실행한다. Desktop Browser도 기존 PR 자동 실행을 유지한다. 개인 branch push 자체는 여전히 workflow 증거가 아니며, PR event에서 생성된 run 또는 공유 branch push run만 해당 SHA의 hosted 증거로 기록한다. Core가 필요한 PR은 최종 검토 전에 `run-core`를 붙이고 run ID·SHA·결론을 남긴다. label 없는 PR의 skipped Core job을 통과 증거로 쓰지 않는다.
 
 ## 현재 사용 가능한 명령
 
