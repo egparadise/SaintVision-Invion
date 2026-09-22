@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.111"
+version: "1.0.112"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T18:45:00+09:00"
+updated: "2026-09-22T20:18:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,31 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T18:45:00+09:00 (최신 tip `d651a52f`).
+- 확인 기준: 2026-09-22T20:18:00+09:00 (기준 integration tip `b877c601`, PR #36 병합 `8f3c80c8`, 작업 브랜치 `agent/gemini/docs-today-summary`).
+
+## 2026-09-22 Gemini 오늘 PR 현황 및 Web Desktop UI 불변식 실측 현황 표
+
+| PR 번호 | 대상 브랜치 / SHA (HEAD / 병합) | 성격 | 최종 상태 | 주요 내용 및 검증 실측 내역 |
+|---|---|---|---|---|
+| **#39** | `agent/gemini/attribution-fix`<br>(HEAD: `b112b2e5` / 병합: `ddf149e9`) | 거버넌스 / 저자 정정 | **병합 완료**<br>(mergeCommit: `ddf149e9`) | PR #37 History 및 PR #38 산출물의 작성자 명의(Claude ➔ Gemini)를 코디네이터 승인에 따라 공식 정정. `docs/task-registry.json` 및 frontmatter 완전 일치화. gh 실측: `headRefOid: b112b2e5`, `mergeCommit: ddf149e9`. |
+| **#40** | `agent/gemini/fix-locale-vitest`<br>(HEAD: `5b12e76c` / 병합: `7b251bd6`) | 단위 테스트 정합 | **병합 완료**<br>(mergeCommit: `7b251bd6`) | `freshness-and-staleness-wiring.test.tsx`의 `toLocaleTimeString('ko-KR')` 로캘 명시로 Ubuntu CI 러너(`en-US`) 환경과의 시간 문자열 충돌 치유. hosted Frontend CI 통과. gh 실측: `headRefOid: 5b12e76c`, `mergeCommit: 7b251bd6`. |
+| **#44** | `agent/gemini/fix-desktop-studio-browser`<br>(HEAD: `5c43a250` / 병합: `d651a52f`) | 브라우저 수용 / 보안 | **병합 완료**<br>(mergeCommit: `d651a52f`) | `InvFileExplorer` 정본 저장소 카탈로그 복원, 가상 패브릭/카탈로그 빈 상태 분리, Nginx CSP `frame-ancestors 'self'` 보안 헤더 검토 통과. hosted Browser Acceptance CI 통과. gh 실측: `headRefOid: 5c43a250`, `mergeCommit: d651a52f`. |
+| **#36** | `agent/claude/node-usage-ui`<br>(HEAD: `c6094d71` / 병합: `8f3c80c8`) | UI 계약 / 노드 사용량 | **병합 완료**<br>(mergeCommit: `8f3c80c8`) | Claude 2차 지적 사항 3건 전면 수용(미서빙 글로벌 경로 제거·정직 tri-state 안내 고지·dev DB 0대 한계 정직 고지) 및 Claude 승인 후 코디네이터 병합 완료. NodeResourceUsage UI가 실제 서빙 라우트에 정상 연결됨. `tsc -b` 0, `build` 0, Vitest 9/9, route_coverage 37 passed. gh 실측: `headRefOid: c6094d71`, `mergeCommit: 8f3c80c8`. |
+
+### Web Desktop 4대 UI 불변식 및 A11y / 대비 실측 현황
+
+- **환경**: 실제 Google Chrome (Official Build, Blink 엔진) + 실제 Uvicorn 8080 백엔드 + Vite 3005 개발 서버
+- **[UNVERIFIED] 잔여 수 추이**: **4건 ➔ 0건 (전수 실측 해소 완료)**
+- **4대 UI 불변식 실측 결과**:
+  1. **양방향 전환기 (Bidirectional Switcher)**: Portal (`/`) ➔ Web Desktop (`[data-testid="desktop-shell-container"]`) ➔ Portal 왕복 전환 100% 정상 작동 (`real_chrome_desktop_01_switcher_*.png`). **PASS**
+  2. **창 관리자 (Window Manager)**: 내 컴퓨터 및 inv:// 파일 탐색기 트래픽 라이트(최소화/복원/최대화), 독(Dock) 복원, 동적 z-index 승격(23 > 22 > 21) 및 창 닫기 언마운트 100% 정상 작동 (`real_chrome_desktop_02_*.png`). **PASS**
+  3. **키보드 A11y (Keyboard Accessibility)**: Alt+Tab 창 포커스 순환, 시작 메뉴 열기 및 Escape 키를 통한 모달 닫기 프로토콜 100% 정상 작동 (`real_chrome_desktop_03_*.png`). **PASS**
+  4. **레이아웃 영속성 (Layout Persistence)**: 8개 창 구성 `localStorage` 직렬화, 최소화 상태 저장 및 포털 전환 언마운트 ➔ 데스크톱 복귀 리마운트 시 `restoreDesktopLayout`을 통한 최소화 상태 영속 복원 및 독 재오픈 100% 실측 (`real_chrome_desktop_04_layout_persistence.png`). **PASS**
+- **WCAG AA 대비율 검증**:
+  - 상단 시스템 메뉴 바 텍스트 대비율: **17.06:1** (WCAG AA 기준치 4.5:1 대비 초과 달성, PASS)
+  - 창 활성 타이틀 텍스트 대비율: **13.98:1** (WCAG AA 기준치 4.5:1 대비 초과 달성, PASS)
+- **실측 증거 파일**: `scratch/desktop_ui_invariants.json`, `scratch/chrome_real_uvicorn_acceptance_result.json`, 스크린샷 PNG 7종(7개).
+- **보고서 전문**: [[2026-09-22_WebDesktop_4대UI불변식_및_A11y실측검증_Gemini]].
 
 ## 최근 확인한 진척
 
