@@ -37,6 +37,14 @@ source_of_truth: "Git"
 
 따라서 RunItem 외에 추가로 발견된 **실제 정본 누락**은 pool 목록 하나였고, 이를 백엔드 producer·스키마·서빙 앵커로 보강했다. 정본이 있던 여섯 응답도 어댑터에 연결했고, discovery 후보 확장 필드처럼 producer가 없는 모양은 추측 계약으로 만들지 않았다.
 
+## producer 방향의 추가 판정
+
+- Pool capacity는 이미 `totalOffered`, `spareNow`, 노드별 `offered/used/spare/measured`, `units`를 낸다. 따라서 풀 용량·사용량은 값이 없는 것이 아니라 **목록 응답에 넣지 않고 별도 읽기 모델로 유지해야 하는 값**이다.
+- Discovery 후보는 `claimedCpuCores`, `claimedRamBytes`, `claimedGpuCount`, `state: candidate`, `verified: false`만 낸다. `available*`, `gpuName`, `healthStatus`는 후보 producer가 만들지 않는다.
+- 등록된 노드의 capability `vendor/model/totalQuantity`와 placement preview의 `spare`는 존재하지만, 그것을 미등록 후보의 건강·가용량으로 투영할 근거는 없다.
+
+결론적으로 노드 자원 사용량 계약 결정에는 `total/used/spare`, 단위, `measured`, 관측 시각의 의미를 포함해야 한다. 후보 화면의 `gpuName`과 `healthStatus`는 이 결정으로 자동 해결되지 않으며 Gemini가 미제공 상태로 다뤄야 한다.
+
 ## 확인
 
 - `npm run build` (cwd `apps/web`, SHA 작업 브랜치 기준) → exit 0
