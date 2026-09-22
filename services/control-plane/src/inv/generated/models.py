@@ -153,6 +153,38 @@ class ResourceSnapshot(BaseModel):
     resources: list[ResourceOffer]
 
 
+class Unit(StrEnum):
+    millicores = 'millicores'
+    bytes = 'bytes'
+    devices = 'devices'
+    bitsPerSecond = 'bitsPerSecond'
+
+
+class ResourceUsageMeasurement(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    resourceId: ResourceId
+    kind: Kind
+    unit: Unit
+    capacity: conint(ge=0, le=9007199254740991)
+    offered: conint(ge=0, le=9007199254740991)
+    reserved: conint(ge=0, le=9007199254740991) | None
+    spare: conint(ge=0, le=9007199254740991) | None
+    measured: bool
+    observedAt: Timestamp | None
+
+
+class NodeResourceUsageResponse(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['execution-kernel']
+    nodeId: NodeId
+    stateAsOf: Timestamp | None
+    resources: list[ResourceUsageMeasurement] = Field(..., max_length=1024)
+
+
 class ResourceLease(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -444,7 +476,7 @@ class ExecutionClaim(BaseModel):
     notAfter: Timestamp
 
 
-class Kind1(StrEnum):
+class Kind2(StrEnum):
     cpu = 'cpu'
     memory = 'memory'
 
@@ -455,7 +487,7 @@ class NodeAllocation(BaseModel):
     )
     lease: ResourceLease
     nodeId: NodeId
-    kind: Kind1
+    kind: Kind2
 
 
 class SignedNodePermit(BaseModel):
@@ -980,6 +1012,22 @@ class RunResultView(BaseModel):
     output: ResultOutputMetadata | None
     outputAbsentReason: constr(max_length=1024) | None
     resourceReleasePending: bool
+
+
+class ArtifactDownloadMetadata(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source: Literal['storage-object']
+    objectId: UUID
+    evidenceId: EvidenceId
+    digestHeader: Literal['X-Content-SHA256']
+    contentSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    contentLength: conint(ge=0, le=9007199254740991)
+    contentType: Literal['application/octet-stream']
+    contentDisposition: Literal['attachment; filename="artifact.bin"']
+    cacheControl: Literal['no-store']
+    contentTypeOptions: Literal['nosniff']
 
 
 class RunArtifactFile(BaseModel):

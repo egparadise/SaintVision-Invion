@@ -66,6 +66,25 @@ type ResourceSnapshot struct {
     Resources []ResourceOffer `json:"resources"`
 }
 
+type ResourceUsageMeasurement struct {
+    ResourceId ResourceId `json:"resourceId"`
+    Kind string `json:"kind"`
+    Unit string `json:"unit"`
+    Capacity int64 `json:"capacity"`
+    Offered int64 `json:"offered"`
+    Reserved *int64 `json:"reserved"`
+    Spare *int64 `json:"spare"`
+    Measured bool `json:"measured"`
+    ObservedAt *Timestamp `json:"observedAt"`
+}
+
+type NodeResourceUsageResponse struct {
+    Source string `json:"source"`
+    NodeId NodeId `json:"nodeId"`
+    StateAsOf *Timestamp `json:"stateAsOf"`
+    Resources []ResourceUsageMeasurement `json:"resources"`
+}
+
 type WorkloadSpec struct {
     ApiVersion string `json:"apiVersion"`
     Kind string `json:"kind"`
@@ -741,6 +760,19 @@ type ArtifactContentResponse struct {
     ContentType string `json:"contentType"`
     ContentDisposition string `json:"contentDisposition"`
     Artifact RunArtifactFile `json:"artifact"`
+    ContentTypeOptions string `json:"contentTypeOptions"`
+}
+
+type ArtifactDownloadMetadata struct {
+    Source string `json:"source"`
+    ObjectId string `json:"objectId"`
+    EvidenceId EvidenceId `json:"evidenceId"`
+    DigestHeader string `json:"digestHeader"`
+    ContentSha256 string `json:"contentSha256"`
+    ContentLength int64 `json:"contentLength"`
+    ContentType string `json:"contentType"`
+    ContentDisposition string `json:"contentDisposition"`
+    CacheControl string `json:"cacheControl"`
     ContentTypeOptions string `json:"contentTypeOptions"`
 }
 

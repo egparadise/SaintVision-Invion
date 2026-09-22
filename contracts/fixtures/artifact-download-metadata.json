@@ -1,0 +1,12 @@
+{
+  "source": "storage-object",
+  "objectId": "00000000-0000-4000-8000-000000000001",
+  "evidenceId": "evd_00000000000000000000000000",
+  "digestHeader": "X-Content-SHA256",
+  "contentSha256": "f2d0ed2b0424686c6ef54d6bc84596355385f25a3daa90b8c3784fb3b2c9719e",
+  "contentLength": 34,
+  "contentType": "application/octet-stream",
+  "contentDisposition": "attachment; filename=\"artifact.bin\"",
+  "cacheControl": "no-store",
+  "contentTypeOptions": "nosniff"
+}
