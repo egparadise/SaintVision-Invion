@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.113"
+version: "1.0.114"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T20:55:00+09:00"
+updated: "2026-09-22T21:05:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,24 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T20:55:00+09:00 (최신 tip `7e50296c`, 작업 브랜치 `agent/gemini/model-retry-ui-design`).
+- 확인 기준: 2026-09-22T21:05:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/ui-invariants-plan`).
+
+## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 계획 확립 (`agent/gemini/ui-invariants-plan`)
+
+- **수용 계획 정본**: [[2026-09-22_WebDesktop_UI_불변식_9종_수용계획_Gemini]]
+- **불변식 9종 매핑 매트릭스 확립**:
+  1. **INV-01 (양방향 전환기)**: `Header` ➔ `desktop-shell-container` 마운트/언마운트 및 100vw/100vh 뷰포트 점유.
+  2. **INV-02 (창 관리자 트래픽 라이트)**: 최소화(`aria-label^="창 최소화:"`), 최대화, 닫기 및 크기 복원 프로토콜.
+  3. **INV-03 (동적 z-index 승격)**: 비활성 창 클릭 시 `zIndex` 최대값+1 승격 (`23 > 22 > 21`) 및 겹침 제어.
+  4. **INV-04 (하단 독 연동 및 복원)**: `DesktopDock` 활성 점(`dock-running-dot`), 최소화 창 원좌표 복원 및 토글.
+  5. **INV-05 (키보드 A11y Alt+Tab 창 순환)**: `alt-tab-hud` 오버레이 표출, 순환 선택 및 포커스 전달.
+  6. **INV-06 (Escape 모달 탈출)**: 시작 메뉴 및 대화상자(`role="dialog"`) Escape 입력 즉시 닫힘 및 포커스 복원.
+  7. **INV-07 (레이아웃 영속성)**: `localStorage` 직렬화 및 컴포넌트 리마운트(포털 왕복) 시 이전 창 상태 100% 복원.
+  8. **INV-08 (WCAG 2.1 AA 색상 대비율)**: 시스템 바(17.06:1) 및 타이틀바(13.98:1) 4.5:1 이상 대비율 보장.
+  9. **INV-09 (정직 수치 표출 및 경계 불변식)**: 0 <= reserved <= offered <= capacity 수치 무결성, 미관측 지표 `null`/`미관측` 정직 표출 및 프로젝트 미선택 시 네트워크 차단/안내 배너.
+- **실측 실행 준비**: 코디네이터 메모리 경보(< 1.5GB) 해제 통보 즉시 1-Headless Chrome 단일 프로세스로 순차 실측 예정.
+
+
 
 ## 2026-09-22 RunDetail Model Retry (결정 #6 6a) UI 설계 메모 완결 (`agent/gemini/model-retry-ui-design`)
 
