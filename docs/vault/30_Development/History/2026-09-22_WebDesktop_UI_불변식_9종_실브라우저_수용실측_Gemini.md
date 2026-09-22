@@ -13,7 +13,7 @@ tags: ["gemini", "browser-acceptance", "ui-invariants", "web-desktop", "mutation
 
 # Web Desktop UI 불변식 9종 실브라우저 수용 실측 검증 보고 (v1.3.1)
 
-- **작업 일시**: 2026-09-22T23:45:31+09:00 (KST)
+- **작업 일시**: 2026-09-22T23:48:22+09:00 (KST)
 - **배정**: Gemini (Frontend & Browser Acceptance Owner)
 - **독립 검토**: Claude (PR #66 Claude 재검토 r3 지적 사항 전수 반영)
 - **참조 문서**: [[전체 개발 진행 현황]], [[Gemini 작업 현황]], PR #61 계획서 v1.3.0 (`2026-09-22_WebDesktop_UI_불변식_9종_수용계획_Gemini` (PR #61)), [[2026-09-22_WebDesktop_4대UI불변식_및_A11y실측검증_Gemini]], `2026-09-22_PR66_WebDesktop_UI불변식_9종_실측_독립검토_Claude` (head `f5ed5a61`)
@@ -93,8 +93,8 @@ Claude 리뷰어의 PR #66 독립 검토 및 재검토 r3 지침에 따라, 스�
 ## 4. Git 영구 정본 증거
 
 - **정본 증거 JSON**: [`docs/vault/30_Development/Evidence/desktop_ui_invariants.json`](file:///D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/docs/vault/30_Development/Evidence/desktop_ui_invariants.json)
-  - `timestamp`: "2026-09-22T23:45:31+09:00"
-  - `gitCommitSha`: "cd2b54f4aeca00ae8ec7d78b28ed34e8aa9daa0f"
+  - `timestamp`: "2026-09-22T23:48:22+09:00"
+  - `gitCommitSha`: "84700612ac780ca71dff8d50ec4ef26b9b9bc113"
   - `observedFrontendPort`: 3005
   - `summary`: `{"totalChecks": 9, "passedChecks": 8, "partialChecks": 1, "failedChecks": 0}`
   - 동적 관측치(실제 DOM 추출 텍스트/스타일/수치, 바운딩 박스, z-index 배열, 상대 파일명)만 수록.
