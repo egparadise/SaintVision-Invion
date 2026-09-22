@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S04-FE-SCENARIO-MATRIX-20260923"
 title: "S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 (Gemini)"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-23T01:30:00+09:00"
+updated: "2026-09-23T02:05:00+09:00"
 source_of_truth: "Git"
 tags: ["s04-fe", "acceptance-matrix", "approval", "cancellation", "idempotency", "sse-reconnect", "gemini"]
 ---
@@ -60,7 +60,7 @@ tags: ["s04-fe", "acceptance-matrix", "approval", "cancellation", "idempotency",
 
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 네트워크 규격 | 검증 단언 및 기대값 |
 |:---:|---|---|---|---|---|---|
-| **EXP-00** | **만료/무효 Access Token 보호 라우트 차단** | `client.ts`<br>전체 보호 라우트 | Access Token의 `exp` 시각이 경과한 만료 토큰 보유 | 임의의 보호 API (`GET /v1/projects`) 호출 | • 요청 헤더: `Authorization: Bearer <expired-jwt>`<br>• 응답 헤더: `WWW-Authenticate: Bearer`<br>• 응답 규격: HTTP 401, `application/problem+json`<br>• 본문: `ProblemDetails` (`code="AUTH-0050"`, `category="AUTH"`, `status=401`, safe `detail`, `retryable: true`, `traceId`) | • 백엔드가 401 ProblemDetails 반환.<br>• 프런트엔드 `clearAuthToken()` 호출 및 로그인 화면 전이.<br>• 로그인 에러 배너(`[data-testid="login-error-alert"]`)에 `[AUTH-0050]` 문구 표출. |
+| **EXP-00** | **만료/무효 Access Token 보호 라우트 차단** | `client.ts`<br>전체 보호 라우트 | Access Token의 `exp` 시각이 경과한 만료 토큰 보유 | 임의의 보호 API (`GET /v1/projects`) 호출 | • 요청 헤더: `Authorization: Bearer <expired-jwt>`<br>• 응답 헤더: `WWW-Authenticate: Bearer`<br>• 응답 규격: HTTP 401, `application/problem+json`<br>• 본문: `ProblemDetails` (`code="AUTH-0050"`, `category="AUTH"`, `status=401`, safe `detail`, `retryable: false`, `traceId`) | • 백엔드가 401 ProblemDetails 반환.<br>• 프런트엔드 `clearAuthToken()` 호출 및 로그인 화면 전이.<br>• 로그인 에러 배너(`[data-testid="login-error-alert"]`)에 `[AUTH-0050]` 문구 표출. |
 | **EXP-01** | **승인 안건 만료 상태 전이 및 액션 차단** | `ApprovalDetail.tsx`<br>`ApprovalCenter.tsx` | 승인 안건의 `expiresAt` 시각 경과 또는 서버 상태 `expired` (Run은 `failed` 전이) | 화면 렌더링 및 만료 안건 선택 | • 안건 식별: `code:has-text("${approval.id}")`<br>• 승인 버튼: `button:has-text("승인 확정")`<br>• 반려 버튼: `button:has-text("반려")`<br>• 내부 상태: `ApprovalDetail.tsx`의 `isExpired` 불린 | • `isExpired === true`로 계산되어 `canApprove === false` 불변식 만족.<br>• `button:has-text("승인 확정")`이 `disabled=true` 상태 유지.<br>• 클릭 시 어떠한 HTTP mutation (`/decision`)도 발생하지 않음 ($0$ requests).<br>• 서버 reconciler는 만료 안건을 `expired`로 확정하고 Run을 `failed`로 전이. |
 | **EXP-02** | **폴링 지연 침묵 노화 방어 배너** | `ApprovalCenter.tsx` | 승인 목록 폴링 실패 (`approvalsState === 'error'` 또는 `approvalError != null`) | 5초 자동 갱신 실패 시점 | • 경보 배너: `div[role="alert"][data-testid="approval-stale-warning"]`<br>• 신선도: `div[role="status"][data-testid="approval-freshness-indicator"]`<br>• 새로고침: `button[data-testid="approval-refresh-btn"]` | • `⚠️ 승인 목록 동기화 실패` 문구 렌더링.<br>• 마지막 확인 시각(`lastFetchedAt.toLocaleTimeString('ko-KR')`)을 정직 명시하여 사용자 오도 방지.<br>• 새로고침 버튼 클릭 시 `onRefresh()` 정상 호출. |
 | **EXP-03** | **승인 시효 만료 서버 403 AUTH-0031 거부 표출** | `ApprovalDetail.tsx`<br>`App.tsx` | 클라이언트 화면 로드 후 백엔드 원장에서 안건 만료 확정 | `handleConfirmApprove` 호출 시 백엔드 검증 | • 응답 규격: HTTP 403, `application/problem+json`<br>• 본문: `ProblemDetails` (`code="AUTH-0031"`, `detail="Approval is expired, stale, or unavailable"`)<br>• 에러 배너: `div[role="alert"]` (App 레벨 알림) | • 410 Gone 또는 AUTH-0040이 아닌 정본 **HTTP 403 `AUTH-0031`** 반환.<br>• `role="alert"` 경보가 마운트되고 만료 에러 문구 표시.<br>• 화면 새로고침 유도 및 승인 버튼 즉시 비활성화. |
@@ -129,9 +129,11 @@ data: {...}`<br>• 링버퍼 단언: `ringBuffer.has(id)` | • 첫 번째 이�
 
 ### 5.1 재현성 보장 원칙 (#77 교훈 완벽 반영)
 1. **유연한 매개변수 주입**:
-   - `tools/run_s04_real_api_acceptance.py` (신규 제작 예정)는 `--port`, `--dev-dir`, `--idp-script`, `--server-env` 옵션을 필수 지원하여 특정 하드코딩 경로에 의존하지 않는다.
-2. **우아한 미측정(UNMEASURED) 게이트 종료**:
-   - 클린 CI 환경이나 로컬 워크트리에 `.work/dev` 파일, Dev DB, Dev IdP가 부재한 경우, 스크립트 크래시(예: `FileNotFoundError`)가 아닌 사유를 명시하고 `STATUS: UNMEASURED (exit code 0)`으로 정상 종료한다.
+   - `tools/run_s04_fe_matrix.py`는 `--chrome-path`, `--frontend-port`, `--backend-port`, `--idp-port`, `--dev-dir`, `--idp-script`, `--server-env`, `--dry-run` 옵션을 지원하여 특정 하드코딩 경로 및 포트에 의존하지 않는다.
+   - Vite 프록시는 `VITE_API_PROXY_TARGET=http://127.0.0.1:{backend_port}`를 동적 전달한다.
+   - 단, `frontend-port ≠ 3005` 사용 시 로컬 `dev_idp.py`의 `ALLOWED_REDIRECTS` 및 `api.json`의 `allowedOrigins`에 해당 origin이 사전 등록되어 있어야 하며, 미등록으로 인한 IdP `/authorize` 400 발생 시 `UNMEASURED` (사유: redirect allowlist mismatch)로 안전하게 종료한다.
+2. **우아한 미측정(UNMEASURED) 게이트 종료 (Exit Code 3)**:
+   - 클린 CI 환경이나 로컬 워크트리에 `.work/dev` 파일, Dev DB, Dev IdP가 부재한 경우, 스크립트 크래시(예: `FileNotFoundError`)가 아닌 사유를 명시하고 `STATUS: UNMEASURED (exit code 3)`으로 게이트 종료한다 (Exit Code 0은 전 시나리오 실측 통과 전용으로 엄격 제한).
 3. **격리된 자원 관리**:
    - 실행 시 백엔드 Uvicorn(8080), Dev IdP(8090/인자), Vite(3005)의 기동 및 종료를 `finally` 블록에서 완전하게 정리한다.
 
