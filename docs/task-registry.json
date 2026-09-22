@@ -99,13 +99,13 @@
     }
   ],
   "tasks": [
-    {
-      "task_id": "S01-FE",
+  {
+    "task_id": "S01-FE",
       "sprint": "S01",
       "area": "Frontend",
       "owner": "Gemini",
       "reviewer": "Codex",
-      "status": "review",
+    "status": "done",
       "depends_on": [],
       "outcome_ids": [
         "OUT-01"
@@ -124,8 +124,8 @@
       ],
       "scope": "사용자 여정·디자인 토큰·화면 상태 명세",
       "evidence_required": "계약 검증·설계 검토·인벤토리 보고",
-      "next_handoff": "Codex"
-    },
+    "next_handoff": "Orca"
+  },
     {
       "task_id": "S01-BE",
       "sprint": "S01",
