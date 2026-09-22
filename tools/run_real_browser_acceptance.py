@@ -22,6 +22,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -507,6 +508,7 @@ def run_scenario(
     chrome_path: str = DEFAULT_CHROME_PATH,
     output_dir: str = str(REPO_ROOT / "scratch"),
     headless: bool = True,
+    commit_evidence: bool = False,
 ) -> bool:
     frontend_url = f"http://127.0.0.1:{frontend_port}"
     backend_url = f"http://127.0.0.1:{backend_port}"
@@ -1254,18 +1256,23 @@ def run_scenario(
                     const lumHeaderBg = getLuminance(bgComposite[0], bgComposite[1], bgComposite[2]);
                     const ratioHeader = contrastRatio(lumHeaderText, lumHeaderBg);
 
-                    // 2. Window Active Title text & parent title bar background directly from DOM getComputedStyle
-                    const activeTitleEl = document.querySelector('div[id^="window-title-"]');
-                    if (!activeTitleEl) throw new Error("Active window title element not found in DOM");
-                    const titleStyle = window.getComputedStyle(activeTitleEl);
-                    const titleParentStyle = window.getComputedStyle(activeTitleEl.parentElement);
-                    const titleTextRgb = parseRgb(titleStyle.color);
-                    const titleBgRgb = parseRgb(titleParentStyle.backgroundColor);
-                    const lumTitleText = getLuminance(titleTextRgb[0], titleTextRgb[1], titleTextRgb[2]);
-                    const lumTitleBg = getLuminance(titleBgRgb[0], titleBgRgb[1], titleBgRgb[2]);
-                    const ratioTitle = contrastRatio(lumTitleText, lumTitleBg);
+                    // 2. Window Title bars: distinguish Active Window Title and Inactive Window Title
+                    const titleEls = Array.from(document.querySelectorAll('div[id^="window-title-"]'));
+                    let activeTitleEl = null;
+                    let inactiveTitleEl = null;
+                    for (const el of titleEls) {
+                        const tStyle = window.getComputedStyle(el);
+                        // In DesktopWindow, active has #f8fafc (rgb(248, 250, 252)) while inactive has text-muted rgb(156, 163, 175) / rgb(148, 163, 184)
+                        if (tStyle.color.includes('248, 250, 252') || tStyle.color.includes('248,250,252')) {
+                            activeTitleEl = el;
+                        } else {
+                            inactiveTitleEl = el;
+                        }
+                    }
+                    if (!activeTitleEl && titleEls.length > 0) activeTitleEl = titleEls[0];
+                    if (!inactiveTitleEl && titleEls.length > 1) inactiveTitleEl = titleEls[1];
 
-                    return [
+                    const out = [
                         {
                             element: "Top System Menu Bar Text",
                             domTextColor: hStyle.color,
@@ -1273,16 +1280,46 @@ def run_scenario(
                             ratio: ratioHeader.toFixed(2) + ":1",
                             numericalRatio: ratioHeader,
                             pass: ratioHeader >= 4.5
-                        },
-                        {
-                            element: "Window Active Title Text",
-                            domTextColor: titleStyle.color,
-                            domBgColor: titleParentStyle.backgroundColor,
-                            ratio: ratioTitle.toFixed(2) + ":1",
-                            numericalRatio: ratioTitle,
-                            pass: ratioTitle >= 4.5
                         }
                     ];
+
+                    if (activeTitleEl) {
+                        const activeStyle = window.getComputedStyle(activeTitleEl);
+                        const activeParentStyle = window.getComputedStyle(activeTitleEl.parentElement);
+                        const activeTextRgb = parseRgb(activeStyle.color);
+                        const activeBgRgb = parseRgb(activeParentStyle.backgroundColor);
+                        const lumActiveText = getLuminance(activeTextRgb[0], activeTextRgb[1], activeTextRgb[2]);
+                        const lumActiveBg = getLuminance(activeBgRgb[0], activeBgRgb[1], activeBgRgb[2]);
+                        const ratioActiveTitle = contrastRatio(lumActiveText, lumActiveBg);
+                        out.push({
+                            element: "Window Active Title Text",
+                            domTextColor: activeStyle.color,
+                            domBgColor: activeParentStyle.backgroundColor,
+                            ratio: ratioActiveTitle.toFixed(2) + ":1",
+                            numericalRatio: ratioActiveTitle,
+                            pass: ratioActiveTitle >= 4.5
+                        });
+                    }
+
+                    if (inactiveTitleEl) {
+                        const inactStyle = window.getComputedStyle(inactiveTitleEl);
+                        const inactParentStyle = window.getComputedStyle(inactiveTitleEl.parentElement);
+                        const inactTextRgb = parseRgb(inactStyle.color);
+                        const inactBgRgb = parseRgb(inactParentStyle.backgroundColor);
+                        const lumInactText = getLuminance(inactTextRgb[0], inactTextRgb[1], inactTextRgb[2]);
+                        const lumInactBg = getLuminance(inactBgRgb[0], inactBgRgb[1], inactBgRgb[2]);
+                        const ratioInactTitle = contrastRatio(lumInactText, lumInactBg);
+                        out.push({
+                            element: "Window Inactive Title Text",
+                            domTextColor: inactStyle.color,
+                            domBgColor: inactParentStyle.backgroundColor,
+                            ratio: ratioInactTitle.toFixed(2) + ":1",
+                            numericalRatio: ratioInactTitle,
+                            pass: ratioInactTitle >= 4.5
+                        });
+                    }
+
+                    return out;
                 }''')
 
                 for c in contrast_results:
@@ -1341,9 +1378,9 @@ def run_scenario(
                 # Write summary verification evidence with dynamic observations
                 # -------------------------------------------------------------
                 try:
-                    git_sha = subprocess.check_output("git rev-parse HEAD", cwd=str(REPO_ROOT), text=True, shell=True).strip()
+                    git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(REPO_ROOT), text=True).strip()
                 except Exception:
-                    git_sha = "39537173"
+                    git_sha = None
 
                 evidence_payload = {
                     "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S+09:00"),
@@ -1431,26 +1468,27 @@ def run_scenario(
                         "keyboardNavigationPass": True
                     },
                     "screenshots": [
-                        os.path.join(output_dir, "real_chrome_desktop_01_switcher_desktop.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_01_switcher_portal.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_02_minimized.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_02_window_manager.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_03_start_menu_open.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_03_escape_dismissed.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_04_layout_persistence.png"),
-                        os.path.join(output_dir, "real_chrome_desktop_09_honest_metrics.png")
+                        "real_chrome_desktop_01_switcher_desktop.png",
+                        "real_chrome_desktop_01_switcher_portal.png",
+                        "real_chrome_desktop_02_minimized.png",
+                        "real_chrome_desktop_02_window_manager.png",
+                        "real_chrome_desktop_03_start_menu_open.png",
+                        "real_chrome_desktop_03_escape_dismissed.png",
+                        "real_chrome_desktop_04_layout_persistence.png",
+                        "real_chrome_desktop_09_honest_metrics.png"
                     ]
                 }
                 invariants_evidence_file = os.path.join(output_dir, "desktop_ui_invariants.json")
-                git_evidence_file = os.path.join(str(REPO_ROOT), "docs", "vault", "30_Development", "Evidence", "desktop_ui_invariants.json")
-                os.makedirs(os.path.dirname(git_evidence_file), exist_ok=True)
                 with open(invariants_evidence_file, "w", encoding="utf-8") as f:
                     json.dump(evidence_payload, f, indent=2, ensure_ascii=False)
-                with open(git_evidence_file, "w", encoding="utf-8") as f:
-                    json.dump(evidence_payload, f, indent=2, ensure_ascii=False)
-                print(f"✔ [Evidence Written] Saved genuine browser verification records to:")
-                print(f"    - Scratch: {invariants_evidence_file}")
-                print(f"    - Git Tracked: {git_evidence_file}")
+                print(f"✔ [Evidence Written] Saved genuine browser verification records to: {invariants_evidence_file}")
+
+                if commit_evidence:
+                    git_evidence_file = os.path.join(str(REPO_ROOT), "docs", "vault", "30_Development", "Evidence", "desktop_ui_invariants.json")
+                    os.makedirs(os.path.dirname(git_evidence_file), exist_ok=True)
+                    with open(git_evidence_file, "w", encoding="utf-8") as f:
+                        json.dump(evidence_payload, f, indent=2, ensure_ascii=False)
+                    print(f"✔ [Vault Evidence Updated] Saved git-tracked evidence to: {git_evidence_file}")
 
             # -----------------------------------------------------------------
             # DeveloperStudio Step 4 Artifact Download Scenarios
@@ -1576,6 +1614,7 @@ def run_acceptance(
     output_dir: str = str(REPO_ROOT / "scratch"),
     headless: bool = True,
     scenario: str = "all",
+    commit_evidence: bool = False,
 ) -> bool:
     if scenario == "all":
         scenarios = [
@@ -1628,6 +1667,7 @@ def run_acceptance(
             chrome_path=chrome_path,
             output_dir=output_dir,
             headless=headless,
+            commit_evidence=commit_evidence,
         )
         results[sc] = ok
         if not ok:
@@ -1689,6 +1729,12 @@ def main():
         ],
         help="Acceptance scenario to run (default: all branches)",
     )
+    parser.add_argument(
+        "--commit-evidence",
+        action="store_true",
+        default=False,
+        help="Explicitly commit evidence to docs/vault/30_Development/Evidence/desktop_ui_invariants.json",
+    )
     args = parser.parse_args()
 
     success = run_acceptance(
@@ -1698,6 +1744,7 @@ def main():
         output_dir=args.output_dir,
         headless=not args.headed,
         scenario=args.scenario,
+        commit_evidence=args.commit_evidence,
     )
     sys.exit(0 if success else 1)
 

@@ -16,6 +16,7 @@
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 const BACKEND_URL = process.env.TEST_BACKEND_URL || 'http://127.0.0.1:8080';
@@ -919,7 +920,31 @@ async function runFullSmokeJourney() {
       const evPath = 'docs/vault/30_Development/Evidence/desktop_ui_invariants.json';
       if (typeof fs !== 'undefined' && fs.existsSync(evPath)) {
         const raw = JSON.parse(fs.readFileSync(evPath, 'utf8'));
-        if (
+
+        let isShaValid = false;
+        try {
+          if (typeof execSync === 'function') {
+            const headSha = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+            if (headSha && typeof raw?.gitCommitSha === 'string') {
+              if (headSha.startsWith(raw.gitCommitSha) || raw.gitCommitSha.startsWith(headSha)) {
+                isShaValid = true;
+              } else {
+                try {
+                  execSync(`git merge-base --is-ancestor ${raw.gitCommitSha} HEAD`, { stdio: ['ignore', 'ignore', 'ignore'] });
+                  isShaValid = true;
+                } catch {
+                  isShaValid = false;
+                }
+              }
+            }
+          }
+        } catch {
+          // If git command fails or execSync not available, isShaValid remains false
+        }
+
+        if (!isShaValid && raw) {
+          console.log(`  ℹ [STALE-EVIDENCE] Evidence commit SHA (${raw?.gitCommitSha}) does not match current git HEAD or ancestor; keeping unverified`);
+        } else if (
           raw &&
           raw.verified === true &&
           typeof raw.gitCommitSha === 'string' &&

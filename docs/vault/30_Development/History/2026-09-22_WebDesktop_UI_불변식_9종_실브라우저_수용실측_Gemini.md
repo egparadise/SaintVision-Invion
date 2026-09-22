@@ -1,17 +1,17 @@
 ---
 doc_id: "HIST-GEMINI-2026-09-22-UI-INVARIANTS-ACCEPTANCE"
-title: "Web Desktop UI 불변식 9종 실브라우저 수용 실측 검증 보고 (변이 M1/M2 살해 및 정량 실측 v1.2.0)"
-version: "1.2.0"
+title: "Web Desktop UI 불변식 9종 실브라우저 수용 실측 검증 보고 (변이 M1/M2 살해 및 정량 실측 v1.3.0)"
+version: "1.3.0"
 status: "completed"
 author: "Gemini"
 reviewer: "Claude"
-updated: "2026-09-22T22:30:00+09:00"
+updated: "2026-09-22T23:15:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["gemini", "browser-acceptance", "ui-invariants", "web-desktop", "mutation-testing", "a11y", "real-chrome"]
 ---
 
-# Web Desktop UI 불변식 9종 실브라우저 수용 실측 검증 보고 (v1.2.0)
+# Web Desktop UI 불변식 9종 실브라우저 수용 실측 검증 보고 (v1.3.0)
 
 - **작업 일시**: 2026-09-22T22:28:56+09:00 (KST)
 - **배정**: Gemini (Frontend & Browser Acceptance Owner)
@@ -28,7 +28,8 @@ Claude 리뷰어의 PR #66 독립 검토(`f5ed5a61`) 및 코디네이터 지침(
 1. **변이 M1 살해 (INV-08 real DOM `window.getComputedStyle` 실측)**:
    - 종래의 상수 RGB `(248, 250, 252)` 계산 방식을 완전히 제거하고, Playwright를 통해 실제 DOM `<header>` 및 `div[id^="window-title-"]`의 `getComputedStyle`을 직접 호출하여 `color` 및 `backgroundColor`를 추출해 상대 휘도 및 대비율을 실측.
    - 상단 바: DOM 텍스트 `rgb(248, 250, 252)` vs 합성 배경 `rgba(15, 23, 42, 0.85)` ➔ **17.26:1** (WCAG AA $\ge 4.5:1$ PASS).
-   - 윈도우 타이틀: DOM 텍스트 `rgb(156, 163, 175)` vs 배경 `rgb(17, 24, 39)` ➔ **6.99:1** (WCAG AA $\ge 4.5:1$ PASS).
+   - 활성 창 타이틀: DOM 텍스트 `rgb(248, 250, 252)` vs 배경 `rgb(30, 41, 59)` ➔ **13.98:1** (WCAG AA $\ge 4.5:1$ PASS).
+   - 비활성 창 타이틀: DOM 텍스트 `rgb(156, 163, 175)` vs 배경 `rgb(17, 24, 39)` ➔ **6.99:1** (WCAG AA $\ge 4.5:1$ PASS).
    - 만약 글자 색상이 `#334155`로 변이될 경우 대비율이 1.41:1로 폭락하여 단언이 즉시 실패(FAIL)하므로, **변이 M1은 완전히 KILLED됨**.
 2. **변이 M2 살해 (INV-04 활성 창 독 클릭 시 토글 최소화 실측)**:
    - 최상위 활성 창(Model Studio)의 독 버튼을 클릭했을 때 창이 최소화(`isMinimized === true`, React 언마운트, `div[role="dialog"]` 사라짐)됨을 실단언.
@@ -40,14 +41,18 @@ Claude 리뷰어의 PR #66 독립 검토(`f5ed5a61`) 및 코디네이터 지침(
    - 트리거 버튼 포커스 복원은 `DesktopShell.tsx`에 미구현되어 있음을 `document.activeElement` 실측으로 확인하고, 허위 PASS 없이 **PARTIAL (8 PASS / 1 PARTIAL)** 로 정직 고지.
 4. **INV-07 레이아웃 영속성 형상(Geometry) 직렬화 및 복원 실측**:
    - `localStorage`의 `saintvision_desktop_windows`에서 Model Studio의 직렬화 형상($x=120, y=90, w=1000, h=640$)을 추출하여 검증.
-   - Portal 언마운트 후 복귀 시 실제 창 크기가 $1000 	imes 640$으로 100% 일치 복원됨을 바운딩 박스로 실단언.
+   - Portal 언마운트 후 복귀 시 실제 창 크기가 $1000 \times 640$으로 100% 일치 복원됨을 바운딩 박스로 실단언.
 5. **INV-09 정직 수치 및 Anti-Magic Bus 경계 실측**:
    - `ResourceExplorer.tsx` DOM에서 `data-testid="logical-vcpu-card"`의 내부 텍스트를 정규식으로 파싱하여 실제 수치 추출: 총 $16$ Cores, 스케줄 가용 $12$ Cores, 실시간 점유 $4.8$ Cores.
-   - 수학적 불변식 $0 \le 	ext{allocatable} (12) \le 	ext{total} (16)$ 성립을 실단언.
+   - 수학적 불변식 $0 \le \text{allocatable} (12) \le \text{total} (16)$ 성립을 실단언.
    - Anti-Magic Bus 고지 배너("단일 하드웨어 버스로 마법처럼 병합된 것이 아니며...") DOM 노출 확인.
-6. **증거 JSON 동적 관측치 기록 및 스모크 러너 결속 (F3, F4)**:
-   - `gitCommitSha`(`39537173`), 실제 프런트엔드 포트(`observedFrontendPort: 3005`), 실제 z-index 전이값(`[21, 22, 23]`), 실제 측정 대비율, 창 형상 좌표 등 동적 관측치만을 `docs/vault/30_Development/Evidence/desktop_ui_invariants.json`에 영구 커밋.
-   - `run_browser_smoke.mjs`가 gitignore된 `scratch/`가 아닌 정본 Git 증거를 검증하도록 결속 강화.
+6. **Claude 재검토 r2 잔여 3건(R1~R3) 전수 조치**:
+   - **R1 (gitCommitSha 동적 추출 누락 해소)**: `tools/run_real_browser_acceptance.py`에 `import subprocess`를 추가하고 실패 시 fallback을 `None`(`null`)으로 수정하여 상수 SHA(`39537173`) 하드코딩을 원천 제거.
+   - **R2 (vault 증거 매 실행 덮어쓰기 분리 및 러너 HEAD/조상 대조 가드)**:
+     - 스크립트에 `--commit-evidence` 플래그를 추가하여 vault 추적 파일(`docs/vault/.../desktop_ui_invariants.json`) 덮어쓰기를 명시적으로 제어.
+     - `tools/run_browser_smoke.mjs`에 `git rev-parse HEAD` 및 `git merge-base --is-ancestor` 대조 가드를 추가하여, 커밋된 증거의 SHA가 현재 HEAD 또는 조상 커밋이 아닐 경우 `[STALE-EVIDENCE]`로 격리하여 4건 unverified를 유지하도록 안전 장치 확보.
+   - **R3 ("Window Active Title Text"와 비활성 타이틀 분리 실측)**:
+     - DOM `div[id^="window-title-"]` 중 활성 창 타이틀(`rgb(248, 250, 252)` on `rgb(30, 41, 59)`, **13.98:1**)과 비활성 창 타이틀(`rgb(156, 163, 175)` on `rgb(17, 24, 39)`, **6.99:1**)을 모두 분리 측정하여 계획서 v1.3.0 및 실측치 정합 완료.
 
 ---
 
@@ -62,7 +67,7 @@ Claude 리뷰어의 PR #66 독립 검토(`f5ed5a61`) 및 코디네이터 지침(
 | **INV-05** | **Alt+Tab 창 순환** | 전역 keydown 리스너 | `Alt+Tab` 주입 시 시각적 HUD 없이 전역 keydown에서 즉시 다음 창 z-index 승격 실측: 내 컴퓨터($28$) > Model Studio($27$) | **PASS** | Alt+Tab keydown z-order 승격 완결 (HUD 부재 정직 반영) |
 | **INV-06** | **Escape 모달 탈출** | `button[aria-label="SaintVision 시작 메뉴"]`<br>`div[role="menu"]` | • 시작 메뉴 오픈 후 `Escape` 입력 시 `div[role="menu"]` 즉시 닫힘 ➔ **PASS**<br>• **트리거 포커스 복원**: `document.activeElement` 검사 결과 React 셸에 미구현(ABSENT) 확인 ➔ **기술부채 정직 고지** | **PARTIAL**<br>(8/9 PASS) | 모달 닫힘 성공 / 포커스 복구 한계 고지<br>`real_chrome_desktop_03_start_menu_open.png`<br>`real_chrome_desktop_03_escape_dismissed.png` |
 | **INV-07** | **레이아웃 영속성** | `saintvision_desktop_windows`<br>`desktopLayout.ts` | • `localStorage` 직렬화 형상($x=120, y=90, w=1000, h=640$) 실측<br>• 최소화 직렬화 및 셸 언마운트 후 재진입 시 $1000 	imes 640$ 복원 실측 | **PASS** | 형상 직렬화 및 바운딩 박스 정합 완결<br>`real_chrome_desktop_04_layout_persistence.png` |
-| **INV-08** | **WCAG 2.1 AA 색상 대비율** | `header`<br>`div[id^="window-title-"]` | **실제 DOM `window.getComputedStyle` 실측** (Kills M1):<br>• 상단 메뉴 바: 텍스트 `rgb(248, 250, 252)` vs `rgba(15, 23, 42, 0.85)` ➔ **17.26:1**<br>• 창 타이틀: 텍스트 `rgb(156, 163, 175)` vs `rgb(17, 24, 39)` ➔ **6.99:1**<br>• WCAG 2.1 Level AA 규격($\ge 4.5:1$) 전수 충족 | **PASS** | **Mutation M1 KILLED**<br>실제 DOM 스타일 실측 전수 합격 |
+| **INV-08** | **WCAG 2.1 AA 색상 대비율** | `header`<br>`div[id^="window-title-"]` | **실제 DOM `window.getComputedStyle` 실측** (Kills M1):<br>• 상단 메뉴 바: 텍스트 `rgb(248, 250, 252)` vs `rgba(15, 23, 42, 0.85)` ➔ **17.26:1**<br>• 활성 창 타이틀: 텍스트 `rgb(248, 250, 252)` vs `rgb(30, 41, 59)` ➔ **13.98:1**<br>• 비활성 창 타이틀: 텍스트 `rgb(156, 163, 175)` vs `rgb(17, 24, 39)` ➔ **6.99:1**<br>• WCAG 2.1 Level AA 규격($\ge 4.5:1$) 전수 충족 | **PASS** | **Mutation M1 KILLED**<br>실제 DOM 스타일 실측 전수 합격 |
 | **INV-09** | **정직 수치 및 Anti-Magic 고지** | `ResourceExplorer.tsx`<br>`[data-testid="logical-vcpu-card"]` | • DOM 텍스트 수치 실추출: 총 $16$ Cores, 가용 $12$ Cores, 점유 $4.8$ Cores<br>• 수학적 불변식 $0 \le 12 \le 16$ 성립 실단언<br>• Anti-Magic Bus 고지 배너 노출 실측 | **PASS** | $0 \le allocatable \le total$ 실단언 성립<br>`real_chrome_desktop_09_honest_metrics.png` |
 
 ---
@@ -71,7 +76,7 @@ Claude 리뷰어의 PR #66 독립 검토(`f5ed5a61`) 및 코디네이터 지침(
 
 - **실행 명령**:
   ```powershell
-  .venv\Scripts\python.exe -X utf8 tools/run_real_browser_acceptance.py --scenario desktop-ui-invariants
+  .venv\Scripts\python.exe -X utf8 tools/run_real_browser_acceptance.py --scenario desktop-ui-invariants --commit-evidence
   ```
 - **종료 코드 (Exit Code)**: `0`
 - **소요 시간**: 26초
@@ -79,15 +84,15 @@ Claude 리뷰어의 PR #66 독립 검토(`f5ed5a61`) 및 코디네이터 지침(
 - **서버 환경**: Uvicorn 0.52.4 on `http://127.0.0.1:8080`, Vite 5.x on `http://127.0.0.1:3005`
 - **검증 게이트**:
   - `pytest tests/test_browser_smoke_boundary.py`: **3 passed** in 4.22s
-  - `python tools/check_docs.py`: **PASS** (816 versioned documents, exit 0)
+  - `python tools/check_docs.py`: **PASS** (822 versioned documents, exit 0)
 
 ---
 
 ## 4. Git 영구 정본 증거
 
 - **정본 증거 JSON**: [`docs/vault/30_Development/Evidence/desktop_ui_invariants.json`](file:///D:/Project/SaintVisionI-Invion/https-github.com-egparadise-SaintVision-Invion.git/docs/vault/30_Development/Evidence/desktop_ui_invariants.json)
-  - `timestamp`: "2026-09-22T22:28:56+09:00"
-  - `gitCommitSha`: "39537173"
+  - `timestamp`: "2026-09-22T23:10:00+09:00"
+  - `gitCommitSha`: "539e090edc65056bfb2fc2ff4e859e58fb5244a8"
   - `observedFrontendPort`: 3005
   - `summary`: `{"totalChecks": 9, "passedChecks": 8, "partialChecks": 1, "failedChecks": 0}`
-  - 동적 관측치(실제 DOM 추출 텍스트/스타일/수치, 바운딩 박스, z-index 배열)만 수록.
+  - 동적 관측치(실제 DOM 추출 텍스트/스타일/수치, 바운딩 박스, z-index 배열, 상대 파일명)만 수록.
