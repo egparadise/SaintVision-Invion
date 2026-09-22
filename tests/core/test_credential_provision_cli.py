@@ -72,6 +72,24 @@ def test_malformed_json_is_reported_as_a_sanitized_refusal(monkeypatch, capsys, 
     assert "synthetic-secret" not in output.out + output.err
 
 
+def test_manifest_path_os_error_is_a_policy_refusal(monkeypatch):
+    """O_NOFOLLOW symlink rejection must not be reported as an internal defect."""
+    tool = module()
+
+    class Provider:
+        @staticmethod
+        def _open_root():
+            return 123
+
+    monkeypatch.setattr(tool.os, "O_NOFOLLOW", 0, raising=False)
+    monkeypatch.setattr(tool.os, "O_NONBLOCK", 0, raising=False)
+    monkeypatch.setattr(tool.os, "O_CLOEXEC", 0, raising=False)
+    monkeypatch.setattr(tool.os, "open", lambda *args, **kwargs: (_ for _ in ()).throw(OSError()))
+    monkeypatch.setattr(tool.os, "close", lambda fd: None)
+    with pytest.raises(tool.ProvisioningDenied, match="Credential provisioning refused"):
+        tool.inspect_existing(Provider(), "synthetic.secret")
+
+
 def test_missing_connection_configuration_does_not_leak(monkeypatch, capsys):
     monkeypatch.delenv("INV_CREDENTIAL_ADMIN_DSN", raising=False)
     monkeypatch.setattr(
