@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.163"
+version: "1.0.164"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T17:54:00+09:00"
+updated: "2026-09-22T18:21:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 hosted CI 러너 기아 방지
+
+- 카드 `THREAD-2026-09-22-CI-RUNNER-STARVATION`; owner Codex. integration `3d1892c0` Core가 PR Core 네 곳의 러너 점유 때문에 20분 이상 jobs 0 pending이었던 관측을 원인으로 삼았다.
+- 5 workflow를 `workflow + ref` group으로 고정하고 main/integration만 `cancel-in-progress=false`, PR/수동 Agent branch는 true로 명시했다. Core는 label 없는 PR에서 job을 skip하고 `run-core` label·workflow_dispatch·main/integration push에서만 실행한다. Backend/Docs/Frontend/Desktop Browser PR 실행은 유지한다.
+- repository `run-core` label을 생성했다. 로컬 actionlint는 PATH에 없어 실행하지 않았고, PyYAML 정책 validator·check_docs·check_ontology·diff check는 모두 exit 0이다. 상세: [[2026-09-22_hosted_CI_러너기아_방지_브랜치별_concurrency_Codex]].
+- 카드 중 선처리 검토: PR #41 재검토 승인, PR #46 report-only docs 배선 승인·선병합 후 재기반, PR #44 보안 헤더·실 browser/container 증거 승인(rebase 필요). 다음은 R1 착지 뒤 integration Core run ID와 즉시 시작을 확인하는 것이다.
 
 ## 2026-09-22 PR #41 결정 #7 시각 스큐 알람 교차검토
 

@@ -6,16 +6,27 @@ on:
       - main
       - integration/all-agents-unified
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Integration is a shared multi-agent evidence lane. Queue successive tips
-  # instead of erasing an in-flight full-suite result; feature branches still
-  # cancel stale runs.
-  cancel-in-progress: ${{ github.ref_name != 'main' && github.ref_name != 'integration/all-agents-unified' }}
+  # Keep shared evidence branches ordered, but let a PR merge ref or a manually
+  # dispatched agent branch replace its own stale run.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/integration/all-agents-unified' }}
 permissions:
   contents: read
 jobs:
   core:
+    # Core owns PostgreSQL, Go race, Docker image and Python integration work.
+    # Do not consume a hosted runner for every PR update: opt in with the
+    # ``run-core`` label, or choose the branch in workflow_dispatch. Pushes to
+    # main/integration are never pull_request events and therefore always run.
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'run-core')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     services:
