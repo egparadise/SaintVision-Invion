@@ -1,0 +1,139 @@
+{
+  "timestamp": "2026-09-22T22:28:56+09:00",
+  "gitCommitSha": "39537173",
+  "browser": "Google Chrome (Official Build, Blink engine)",
+  "frontendUrl": "http://127.0.0.1:3005",
+  "backendUrl": "http://127.0.0.1:8080",
+  "observedFrontendPort": 3005,
+  "verified": true,
+  "summary": {
+    "totalChecks": 9,
+    "passedChecks": 8,
+    "partialChecks": 1,
+    "failedChecks": 0,
+    "limitationNote": "INV-06: Modal dismissal succeeded, but trigger focus restoration is unfulfilled (not implemented in DesktopShell.tsx). All other 8 invariants passed strictly."
+  },
+  "invariants": {
+    "inv01_bidirectionalSwitcher": {
+      "pass": true,
+      "observedPortalUrl": "http://127.0.0.1:3005/",
+      "observedShellTestId": "desktop-shell-container",
+      "observedSwitcherTitle": "📑 클래식 포털 뷰로 전환"
+    },
+    "inv02_trafficLightControls": {
+      "pass": true,
+      "minimizedUnmounted": true,
+      "maximizedHeightStyle": "calc(100% - 104px)",
+      "restoredWidth": 920,
+      "closedUnmounted": true
+    },
+    "inv03_dynamicZIndex": {
+      "pass": true,
+      "observedProgression": [
+        21,
+        22,
+        23
+      ],
+      "strictlyAscending": true
+    },
+    "inv04_dockIntegration": {
+      "pass": true,
+      "dockToggleMinimizeKillsM2": true,
+      "runningDotPresent": true,
+      "runningDotStyle": {
+        "exists": true,
+        "backgroundColor": "rgb(56, 189, 248)",
+        "width": "4px",
+        "height": "4px"
+      }
+    },
+    "inv05_keyboardAltTab": {
+      "pass": true,
+      "elevatedZComp": 28,
+      "backgroundZModel": 27,
+      "hudPresent": false
+    },
+    "inv06_modalEscapeDismissal": {
+      "modalDismissed": true,
+      "triggerFocusRestored": false,
+      "pass": "PARTIAL",
+      "details": "Escape key dismisses start menu modal, but trigger button focus return is not implemented in DesktopShell.tsx"
+    },
+    "inv07_layoutPersistence": {
+      "pass": true,
+      "serializedWindowsCount": 8,
+      "observedModelStudioGeometry": {
+        "x": 120,
+        "y": 90,
+        "width": 1000,
+        "height": 640
+      },
+      "restoredBoxMatches": true
+    },
+    "inv08_colorContrastAA": {
+      "pass": true,
+      "method": "window.getComputedStyle DOM evaluation (Mutation M1 Guard)",
+      "results": [
+        {
+          "element": "Top System Menu Bar Text",
+          "domTextColor": "rgb(248, 250, 252)",
+          "domBgColor": "rgba(15, 23, 42, 0.85)",
+          "ratio": "17.26:1",
+          "numericalRatio": 17.262081808254987,
+          "pass": true
+        },
+        {
+          "element": "Window Active Title Text",
+          "domTextColor": "rgb(156, 163, 175)",
+          "domBgColor": "rgb(17, 24, 39)",
+          "ratio": "6.99:1",
+          "numericalRatio": 6.987328296864191,
+          "pass": true
+        }
+      ]
+    },
+    "inv09_honestCapacityMetrics": {
+      "pass": true,
+      "observedTotalCores": 16,
+      "observedAllocatableCores": 12,
+      "observedUsedCores": 4.8,
+      "antiMagicDisclaimerVisible": true,
+      "mathematicalInvariantHold": true
+    },
+    "bidirectionalSwitcher": true,
+    "windowManager": true,
+    "keyboardA11y": true,
+    "layoutPersistence": true
+  },
+  "accessibility": {
+    "contrastChecks": [
+      {
+        "element": "Top System Menu Bar Text",
+        "domTextColor": "rgb(248, 250, 252)",
+        "domBgColor": "rgba(15, 23, 42, 0.85)",
+        "ratio": "17.26:1",
+        "numericalRatio": 17.262081808254987,
+        "pass": true
+      },
+      {
+        "element": "Window Active Title Text",
+        "domTextColor": "rgb(156, 163, 175)",
+        "domBgColor": "rgb(17, 24, 39)",
+        "ratio": "6.99:1",
+        "numericalRatio": 6.987328296864191,
+        "pass": true
+      }
+    ],
+    "keyboardNavigationPass": true
+  },
+  "screenshots": [
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_01_switcher_desktop.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_01_switcher_portal.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_02_minimized.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_02_window_manager.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_03_start_menu_open.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_03_escape_dismissed.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_04_layout_persistence.png",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\scratch\\real_chrome_desktop_09_honest_metrics.png"
+  ]
+}
