@@ -430,8 +430,6 @@ def _run_five_node_adapter(args: argparse.Namespace) -> int:
             "--adapter five-node-lab currently requires --dry-run; load execution is not enabled"
         )
     dsn = os.environ.get("INV_TEST_ADMIN_DSN")
-    if not dsn:
-        raise SystemExit("INV_TEST_ADMIN_DSN is required for --adapter five-node-lab")
     try:
         report = write_registration_mtls_preflight(args.inventory, dsn, args.report)
     except (ValueError, RuntimeError) as error:
