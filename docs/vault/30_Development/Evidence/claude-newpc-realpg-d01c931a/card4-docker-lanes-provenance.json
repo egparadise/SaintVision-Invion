@@ -1,0 +1,29 @@
+{
+  "task": "card4-node-dependent-notrun-and-docker-lanes",
+  "owner": "Claude",
+  "reviewer": "Codex",
+  "review_status": "pending",
+  "verified_at_kst": "2026-09-22T17:51:59+09:00",
+  "measured_sha": "3d1892c0d5a946864334bd143a05ed060b344bf5",
+  "working_tree": "D:/Project/sv-measure-claude (Claude-owned detached measurement worktree)",
+  "working_tree_clean": "YES",
+  "interpreter": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python (Python 3.14.7, pytest 9.1.1)",
+  "database": "saintvision-invion-dev-pg, PostgreSQL 16.15; container-side address 172.17.0.2:5432 for in-container candidates; disposable DBs only",
+  "docker": "Docker Desktop 20.10.22 linux/amd64, endpoint npipe (no Unix socket on host)",
+  "node_dependent_24_files": {
+    "status": "not_run",
+    "cause": "inv-node dials Docker only via a local Unix socket (runtime/docker.go NewDocker, NODE-0021); host exposes npipe only and has no user WSL distro; fixture test_node_runtime requires a host-process binary and host tmp paths",
+    "verification_site": "hosted Core CI (Linux runner) — already 0 failures for workspace/containment/business-handoff/shard-recovery/LAN-installer lanes",
+    "to_run_here": "WSL2 Ubuntu + Docker Desktop WSL integration + Linux venv (user decision)"
+  },
+  "candidate_image": {"tag": "inv-api-test:local-3d1892c0", "id": "sha256:0886bab93368d372e070ea50c2b533a8b9fb39ce62c0382f5c585a16b8f29358", "dockerfile": "deploy/Dockerfile.backend", "build_elapsed_s": 36, "labels": ["ai.saintvision.owner=claude", "ai.saintvision.card=4"], "removed_after_run": true},
+  "lanes": [
+    {"name": "roleguard", "file": "tests/test_migration_role_guard.py", "env": "INV_TEST_ROLE_GUARD_IMAGE=postgres:16", "passed": 13, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 28},
+    {"name": "server_container", "file": "tests/integration/test_server_container.py", "env": "INV_TEST_SERVER_IMAGE=<image id>;INV_CONTAINER_TEST_DB_HOST=172.17.0.2", "passed": 8, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 69, "cases": ["healthy", "workspace", "unreadable", "writable", "public-signing-key", "business", "business-workspace", "business-kernel-role"]},
+    {"name": "config_volume", "file": "tests/core/test_server_config_volume.py", "env": "INV_TEST_CONFIG_IMAGE=<image id>", "passed": 7, "skipped": 0, "failed": 0, "exit": 0, "elapsed_s": 8}
+  ],
+  "skips_converted": 23,
+  "leftovers": {"containers_label_test": 0, "volumes_label_test": 0, "containers_label_guard": 0},
+  "junit_location": ".work/evidence-claude-d01c931a/card4/",
+  "history": "docs/vault/30_Development/History/2026-09-22_17-52-00_KST_NODE-DEPENDENT-NOTRUN_Claude_실측.md"
+}
