@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S07-FIVE-NODE-ADAPTER-SPEC-001"
 title: "S07 5노드 실 Node adapter 사양"
-version: "1.1.0"
+version: "1.1.1"
 status: "proposed-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T11:45:00+09:00"
+updated: "2026-09-23T12:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S07-DB"]
@@ -36,6 +36,8 @@ python tools/measure_s07_recovery.py --adapter five-node-lab --inventory "$LAB_I
 | bridge 신설 | 실 heartbeat를 core 테이블에 복제하는 구현이 없다 | 새 이중 정본과 순서·재시도·stale 동기화 계약이 필요하다 | 측정을 위해 선행 신설하지 않음 |
 
 따라서 물리 감지는 `services/control-plane/src/inv/observation.py`의 heartbeat 기반 offline 전이, 복구는 `services/control-plane/src/inv/shard_recovery.py`의 fresh approval/run·source plan/shard·stop receipt·lease/fence·bounded generation, 성공은 `output_ingestion.py`와 `shard_completion.py`의 receipt-bound byte 및 manifest commit으로 판정한다. core 합성 하네스 결과를 물리 성공률에 합산하지 않는다.
+
+현재 커널 감지 기준은 `services/control-plane/src/inv/observation.py:146`의 `heartbeat_at < clock_timestamp() - interval '60 seconds'`로 **60초가 하드코드**돼 있다. 따라서 AC-07 감지 판정은 이 구현을 바꾸거나 더 짧게 해석하지 않고 `60초 liveness timeout + observer poll 간격` 이내로 고정한다. 후속 recovery adapter는 실제 offline 전이 시각과 poll 시각을 모두 기록해야 하며 preflight의 15초 heartbeat freshness를 AC-07 timeout으로 오인하면 안 된다.
 
 ## 2. #101 inventory 정본 재사용
 

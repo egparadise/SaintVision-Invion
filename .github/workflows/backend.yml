@@ -170,6 +170,10 @@ jobs:
               # S05 lock-wait evidence is a separately approved two-wave diagnostic.
               # Normal Backend collection must expose, but never execute, that load.
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              # The five-node registration/mTLS preflight is a permanent real-PG
+              # boundary. Local PG-free collection has this explicit reason, but
+              # Backend supplies PostgreSQL and must execute it (expected 0 skips).
+              'Set INV_TEST_ADMIN_DSN to a disposable PostgreSQL 16+ test server': 0,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
