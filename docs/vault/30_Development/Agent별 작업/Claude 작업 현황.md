@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.15"
+version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T00:22:00+09:00"
+updated: "2026-09-23T00:23:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+S01 증거 기록 갱신 Codex 인계 (Claude, 2026-09-22): PR #49 우리 몫 1 — Codex가 갱신할 기록 6항(R1 합격증거 문서 head 0045→0046·hosted run 첨부, R2 '남음'에서 peer review 제거·U1~U6 번호화, R3/R4 registry next_handoff를 사용자 입력 대기로(status 불변→ontology 재생성 불필요), R5 작업판, R6 ontology 무영향) + AC-01 증거별 현재 증거(경로·SHA·run 35723589663/35719185379/35720205341)·부족분 표. 값 미기재, 닫힘 아님. 전문 [[2026-09-22_S01_증거기록갱신_Codex인계_Claude]].
+
 
 PR #59 Codex 카드 6 Core 컨테이너 opt-in 독립 검토 → **승인** (Claude, 2026-09-22): hosted artifact 대조 3100/3065/35/0, 전환 23 실행(role_guard 13·server_container 8·config_volume 7), 남은 35 = ratchet 일치, YAML 변경 최소·추가 빌드 없음. finding 0. 전문 [[2026-09-22_PR59_Core_컨테이너_opt-in_독립검토_Claude]].
 
