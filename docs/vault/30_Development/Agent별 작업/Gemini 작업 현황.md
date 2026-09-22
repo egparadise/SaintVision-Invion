@@ -21,6 +21,12 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
 
+## 2026-09-22 Web Desktop UI 불변식 9종 수용 계획 수립 (Claude 독립검토 F1~F4 전수 반영 v1.2.0, gent/gemini/ui-invariants-plan)
+
+- **Track 15 4대 ➔ 9대 불변식 체계 확장 및 Claude 지적 전수 반영**:
+  - 19:40 4대 불변식 실측(unverified 4→0) 기반 위에, Claude의 코드 대조 지적(F1 14건 셀렉터/파일명 정정, F2 calc(100%-104px)·언마운트·Escape 한계 등 실제 동작 정합, F3 4대↔9대 대응표 및 WCAG AA >= 4.5:1 정본 정합, F4 Git 영구 증거 경로 Evidence/ 지정)을 전수 반영한 v1.2.0 계획서를 확립했다.
+  - **계획서 정본**: [[2026-09-22_WebDesktop_UI_불변식_9종_수용계획_Gemini]].
+
 ## 2026-09-22 RunDetail 모델 재시도(model-retries, 결정 #6 6a) UI 구현 및 계약 결속 완결 (`agent/gemini/model-retry-ui`)
 
 - **결정 #6 6a / 계약 563c54ce UI 실배선 완결**:
