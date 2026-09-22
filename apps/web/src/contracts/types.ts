@@ -9,6 +9,9 @@ import type {
   RiskLevel,
   StorageObservationView,
   RecordedStorageObservation,
+  ModelRetryPrepareInput,
+  ModelRetryPlacementResult,
+  ModelRetryPrepareResult,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -16,6 +19,9 @@ export type {
   RiskLevel,
   StorageObservationView,
   RecordedStorageObservation,
+  ModelRetryPrepareInput,
+  ModelRetryPlacementResult,
+  ModelRetryPrepareResult,
 };
 
 export type ErrorCategory =
@@ -175,6 +181,13 @@ export interface RunItem {
   entrypoint?: string;
   leaseId?: string;
   stopReceipt?: NodeStopReceiptView;
+  resourceRequest?: {
+    cpuMillis?: number;
+    memoryBytes?: number;
+    gpuCount?: number;
+    minVramBytes?: number;
+    requiredBytes?: number;
+  };
 }
 
 export interface WorkspaceResumeSpec {

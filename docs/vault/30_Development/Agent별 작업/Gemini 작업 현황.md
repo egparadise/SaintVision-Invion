@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.113"
+version: "1.0.114"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T20:55:00+09:00"
+updated: "2026-09-22T21:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T20:55:00+09:00 (최신 tip `7e50296c`, 작업 브랜치 `agent/gemini/model-retry-ui-design`).
+- 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
+
+## 2026-09-22 RunDetail 모델 재시도(model-retries, 결정 #6 6a) UI 구현 및 계약 결속 완결 (`agent/gemini/model-retry-ui`)
+
+- **결정 #6 6a / 계약 563c54ce UI 실배선 완결**:
+  - `POST /v1/projects/{project}/runs/{parent}/model-retries` 계약 서빙 엔드포인트와 `RunDetail` 프런트엔드 컴포넌트 결속 완료.
+  - **failed 종단 상태 가드**: `run.state === 'failed'`에서만 `[🔄 Model Retry 준비]` 버튼 노출 (타 상태 DOM 완전 은닉).
+  - **멱등성 및 로딩 상태**: `idmp_model_retry_${prj}_${parent}_${timestamp}` 멱등성 헤더 전달 및 요청 진행 중 버튼 `disabled` + `⏳ 배치 예약 준비 중...` 텍스트 전이.
+  - **`requiresFrozenInputAndApproval: true` 정직 고지 배너**: 자동 실행 없음 및 S04 거버넌스 승인 센터 정식 승인 후 스케줄링됨을 정직 고지하는 안내 배너(`role="status"`, `data-testid="model-retry-success-banner"`) 완비.
+  - **Child Run & Lineage 표출**: 루트, 부모, 세대(Generation 1), 신규 자식 Run ID(`planned`), 예약 노드 ID 및 체결된 리스 건수 렌더링.
+  - **RFC 9457 Problem Details 대응**: 409 Conflict, 403 Forbidden, 503 Unavailable, 400 Bad Request에 대해 사유 및 대응 안내를 담은 `role="alert"` 경보 표출.
+- **실측 검증 전수 통과**:
+  - `apps/web/tests/model-retry-action.test.tsx` 8대 회귀 시험 100% 통과 (8/8 passed).
+  - `npx tsc -b` exit code 0 (타입 에러 0건).
+  - `pytest tests/test_route_coverage.py` 38/38 passed (unserved 0건).
+  - `python tools/check_frontend_integrity.py` 0 violations (9개 규칙 전수 합격).
+  - `npm run build` Vite 100 modules 번들링 6.81s 클린 완료.
+- **보고서 전문**: [[2026-09-22_RunDetail_모델재시도_model-retries_UI구현_Gemini]], 설계 메모 [[2026-09-22_RunDetail_재시도액션_model-retries_UI설계_Gemini]].
+
+
+- **Codex origin/integration 착지 4건 독립 검토 완결 (Gemini, 2026-09-22)**:
+  - `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구).
+  - 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정 (PR #37). 전문 [[2026-09-22_16-55-00_KST_Gemini_Codex착지4건_독립검토]].
+- **결정 #6·#7 준비 완결 (Gemini, 2026-09-22)**:
+  - 결정 #7(노드 시각 스큐 알람) 선행 조건인 ERR-DESIGN-007 규격 개정안([[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Gemini]]) 및 결정 #6(미연결 능력 부류 3종 현황·노출분석, [[2026-09-22_미연결_능력_부류_현황_및_노출분석_Gemini]]) 작성 완료.
+  - 커널 런타임 가드(±5초) 공인, P2 알람 라우팅 정합, 실 PG 검증 시험 명세 및 실패 Run 재시도(ModelRetry)/온디맨드 복구/배치 예약 분석 수립. PR #38 등록.
+
+
 
 ## 2026-09-22 RunDetail Model Retry (결정 #6 6a) UI 설계 메모 완결 (`agent/gemini/model-retry-ui-design`)
 
