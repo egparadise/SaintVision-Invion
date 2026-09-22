@@ -1,9 +1,11 @@
 """Real-PostgreSQL preliminary placement benchmark for the S05 lab harness."""
 
+from datetime import datetime, timezone
 from decimal import Decimal
 import json
 import os
 from pathlib import Path
+import secrets
 from types import SimpleNamespace
 
 import psycopg
@@ -11,6 +13,7 @@ from psycopg.types.json import Jsonb
 import pytest
 
 from inv.approvals import Principal
+from inv.contracts import validate_contract
 from inv.ids import new_id
 from inv.placement import PlacementStore
 from inv.scheduler import Request
@@ -46,11 +49,21 @@ def placement_benchmark_env(env):
     cpu_total = request_count * CPU_PER_REQUEST
     memory_total = request_count * MEMORY_PER_REQUEST
     snapshot = {
+        "nonce": secrets.token_hex(32),
+        "tenantId": env.tenant,
+        "nodeId": env.node,
+        "recoveryEpoch": env.epoch,
+        "profileVersion": "benchmark:1",
+        "observedAt": datetime.now(timezone.utc).isoformat(),
+        "sampleMillis": 100,
         "cpuCapacityMillis": cpu_total,
         "cpuBusyMillis": 0,
         "memoryCapacityBytes": memory_total,
         "memoryAvailableBytes": memory_total,
+        "osType": "linux",
+        "agentVersion": "0.1.0",
     }
+    validate_contract("NodeResourceSnapshot", snapshot)
     with psycopg.connect(env.owner) as conn:
         conn.execute(
             "UPDATE inv.resources SET capacity=%s,offered=%s WHERE tenant_id=%s AND resource_id=%s",
@@ -213,6 +226,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         second,
         topology="development-PC; one synthetic measured-node row; pre-five-node-lab",
         code_sha=os.getenv("INV_PLACEMENT_BENCHMARK_CODE_SHA", "working-tree"),
+        active_after_first=active_after_rounds[0],
         active_after_rounds=active_after_rounds,
         expected_active_rounds=expected_active_rounds,
         snapshot_replay_stable=snapshot_replay_stable,
