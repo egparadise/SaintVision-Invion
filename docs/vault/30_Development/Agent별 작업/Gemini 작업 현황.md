@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.115"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T00:25:00+09:00"
+updated: "2026-09-23T02:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,7 +21,7 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
 
-## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 v1.1.0 개정 (`agent/gemini/s04-fe-matrix`)
+## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 v1.1.0 및 실측 러너 골격 (`agent/gemini/s04-fe-matrix`)
 
 - **OUT-04 / AC-04 완결을 위한 4대 핵심 축 13개 시나리오 매트릭스 (docs-only, Claude UI & Codex Contract 검토 전면 반영)**:
   - **계획서 정본**: [[2026-09-23_S04-FE_만료_취소_중복_SSE재연결_시나리오_매트릭스_Gemini]] (v1.1.0).
@@ -30,8 +30,11 @@ source_of_truth: "Git"
   - **중복 (DUP-01~03)**: `ApprovalDetail.tsx`의 `isSubmitting` 더블클릭 방어 및 동일 키 200 Replay, `Idempotency-Key` 본문 불일치(409 `IDEM-0001`)와 1회용 Nonce 소비/만료(403 `AUTH-0034`/`AUTH-0033`) 엄격 분리, 프로덕션 심볼 `isSelfApprovalBlocked` 2인 승인 규칙 차단.
   - **SSE 재연결 (SSE-01~03)**: 1,000-entry RingBuffer at-least-once 중복 제거, 정본 서버 ID 규격 `{recoveryEpoch}:{runId}:{sequence}` 적용, `Last-Event-ID` 커서 기반 `sequence > last` 재연결(범위 이탈 시 409 `STREAM-0001`), 최상위 JSON `sequence` 단조 증가($seq_i > seq_{i-1}$) 보장.
   - **돌연변이 사살 계획**: 시험 로컬이 아닌 실제 프로덕션 심볼(MUT-01 `isExpired`, MUT-02 `isSelfApprovalBlocked`, MUT-03 `isSubmitting`, MUT-04 `RingBuffer.has`)을 대상으로 전수 KILLED 단언 수립.
-  - **하네스 재현성 원칙**: #77 교훈을 반영하여 `--port`, `--dev-dir`, `--idp-script`, `--server-env` 옵션 및 환경 미구성 시 우아한 `UNMEASURED` 종료 설계 명시.
-- **실측 계획**: Claude 및 Codex 독립 검토 승인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
+  - **하네스 재현성 러너 골격 완성 (`tools/run_s04_fe_matrix.py`)**:
+    - 입력 매개변수화: `--chrome-path`, `--frontend-port`, `--backend-port`, `--idp-port`, `--dev-dir`, `--idp-script`, `--server-env`, `--dry-run` 전면 지원.
+    - F1 재현성 가드: 필수 선행 요소(`dev_idp.py`, `server.env`) 부재 시 예외 크래시 대신 우아한 `UNMEASURED` 종료 및 exit code 3 반환.
+    - 증거 실측값 결속: 13개 시나리오 상태, 모의 API 사용 여부(`mockApiUsed`), 백엔드/IdP 실제 기동 여부 동적 집계 (하드코딩 상수 배제).
+- **실측 계획**: Claude 및 Codex 독립 검토 승인 확인 후 실제 Chrome 153 및 실 백엔드 기반 수용 실측 착수 예정.
 
 ## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 재실측 완결 (`agent/gemini/ui-invariants-run`)
 
