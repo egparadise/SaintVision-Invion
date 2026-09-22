@@ -462,6 +462,39 @@ type WorkspaceSnapshot struct {
     Files []WorkspaceSnapshotFile `json:"files"`
 }
 
+type WorkspaceRestoreInput struct {
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    SourceAttempt int64 `json:"sourceAttempt"`
+    StepId string `json:"stepId"`
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type WorkspaceRestoreView struct {
+    RunId RunId `json:"runId"`
+    RestoreId string `json:"restoreId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    Generation string `json:"generation"`
+    Sha256 string `json:"sha256"`
+    Replayed bool `json:"replayed"`
+}
+
+type WorkspaceCheckoutInput struct {
+    ExpectedVersion int64 `json:"expectedVersion"`
+}
+
+type WorkspaceCheckoutView struct {
+    RunId RunId `json:"runId"`
+    RestoreId string `json:"restoreId"`
+    CheckoutId string `json:"checkoutId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    Generation string `json:"generation"`
+    StepId string `json:"stepId"`
+    SourceAttempt int64 `json:"sourceAttempt"`
+    CheckpointAttempt int64 `json:"checkpointAttempt"`
+    Sha256 string `json:"sha256"`
+    Replayed bool `json:"replayed"`
+}
+
 type WorkspacePrepareInput struct {
     CheckoutId string `json:"checkoutId"`
     ResumeId string `json:"resumeId"`

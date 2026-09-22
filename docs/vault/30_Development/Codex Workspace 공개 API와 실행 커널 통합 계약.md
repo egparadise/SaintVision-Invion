@@ -1,10 +1,10 @@
 ---
 doc_id: "CODEX-WORKSPACE-API-001"
 title: "Codex Workspace 공개 API와 실행 커널 통합 계약"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-10T12:12:00+09:00"
+updated: "2026-09-22T23:42:37+09:00"
 source_of_truth: "Git"
 ---
 
@@ -50,6 +50,14 @@ Gemini의 화면·브라우저 fixture 및 기존 `/v1/runs/...` 경로는 이 p
 0019 merge revision은 공개된 Codex `0018_workspace_resume`와 Claude `0010_canonical_resource_units`의 부모를 변경하지 않고 합친다. empty DB 및 양쪽 기존 head에서 통합 head로 upgrade, 반복 upgrade를 시험한다. backward downgrade는 거부하며 검증된 restore와 forward fix를 사용한다. 운영 DB에 적용한 기록은 아직 없다.
 
 0019의 `inv_kernel`은 비특권 NOLOGIN 그룹 역할이다. 운영자는 별도의 NOBYPASSRLS/non-owner LOGIN에 membership을 부여하고 비밀 저장소에서 연결 정보를 공급한다. epoch·project 권한·Node 인증 channel의 권위 있는 열은 runtime에서 변경하지 못한다. immutable Evidence/승인 기록은 수정·삭제를 허용하지 않는다. kernel 통합 시험은 별도 시험용 GRANT 목록 대신 실제 migration 그룹 권한을 사용한다.
+
+## S06 snapshot reader 제품 경계
+
+복구 reader는 `POST /v1/projects/{project}/runs/{run}/restores/{restore}`의 `WorkspaceRestoreInput → WorkspaceRestoreView`와 `POST /v1/projects/{project}/runs/{run}/restores/{restore}/checkouts/{checkout}`의 `WorkspaceCheckoutInput → WorkspaceCheckoutView`로 노출한다. 첫 경로는 checkpoint에 pin된 immutable snapshot bytes를 검증해 read-only generation으로 발행하고, 둘째 경로만 별도의 writable checkout generation을 만든다. path UUID가 멱등 identity이므로 별도 `Idempotency-Key`를 받지 않으며 같은 identity의 다른 내용은 `IDEM-0001/409`다. 기존 resume·commitment API는 변경하지 않는다.
+
+두 경로는 tenant RLS transaction에서 project/run 존재 범위를 기존 `lock_run` 정책대로 먼저 확인하고 같은 transaction에서 현재 `can_request`를 검사한다. 따라서 타 tenant/project는 존재 노출 없이 404, 권한 회수는 fresh와 replay 모두 `AUTH-0030/403`이다. 저장된 replay receipt도 `WorkspaceRestoreView`/`WorkspaceCheckoutView` strict 계약으로 다시 검증한 뒤 snapshot/generation 무결성을 재확인한다. `inv_app`에는 kernel table 직접 접근을 주지 않고 `inv_kernel`도 tenant GUC가 없으면 0행이다.
+
+운영 조립은 workspace 설정의 `snapshotObjectRoot`와 `restoreRoot`를 둘 다 명시할 때만 `LocalObjects → SnapshotStore → WorkspaceRecovery`를 만든다. 둘 중 하나만 있으면 시작을 거부하고, 둘 다 없으면 `/readyz.workspaceRecovery=not_configured`와 복구 route 503으로 정직하게 드러낸다. 응답은 immutable receipt이므로 freshness timestamp 대상이 아니며, 현재 시각 상태로 오인하지 않는다. 원격 장비의 WS/PTY 상태·실 Git 프로세스·Control Plane/Node 재시작을 한 여정으로 복원하는 물리 시험은 이 결속 범위에서 **미측정**이고 AC-06 완료로 세지 않는다.
 
 ## 운영 설정과 제한
 

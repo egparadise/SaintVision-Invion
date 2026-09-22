@@ -7,13 +7,17 @@ from .node_transport import NodeTLSClient, private_key
 from .sandbox import SandboxProfile
 from .tooling import NodePrincipal
 from .workspace_api import RestrictedWorkspaceRuntime, WorkspaceAPI
-from .workspace_files import WorkingGenerations
+from .workspace_files import RestoreGenerations, WorkingGenerations
 
 
 def configured_workspace(database, tenant, settings):
     settings = dict(settings)
     destinations = settings.pop("destinations", [])
     git_repositories = settings.pop("gitRepositories", [])
+    snapshot_object_root = settings.pop("snapshotObjectRoot", None)
+    restore_root = settings.pop("restoreRoot", None)
+    if (snapshot_object_root is None) != (restore_root is None):
+        raise ValueError("Snapshot object and restore roots must be configured together")
     if not isinstance(git_repositories, list) or len(git_repositories) > 16:
         raise ValueError("At most sixteen explicit Git repositories are allowed")
     if not isinstance(destinations, list) or len(destinations) > 4:
@@ -50,6 +54,16 @@ def configured_workspace(database, tenant, settings):
             client=NodeTLSClient(**settings["tls"]),
         ),
     )
+    result.recovery = None
+    if snapshot_object_root is not None:
+        from .object_store import LocalObjects
+        from .snapshots import SnapshotStore
+        from .workspace_recovery import WorkspaceRecovery
+
+        result.recovery = WorkspaceRecovery(
+            SnapshotStore(database, LocalObjects(snapshot_object_root)),
+            RestoreGenerations(restore_root),
+        )
     pool = {result.runtime.node.node_id: result.runtime}
     from .remote_git import GitHubRepository
 
@@ -60,7 +74,13 @@ def configured_workspace(database, tenant, settings):
             raise ValueError("Duplicate Git repository alias")
         result.git_repositories[configured_git.alias] = configured_git
     for target in destinations:
-        if not isinstance(target, dict) or "destinations" in target or "gitRepositories" in target:
+        if (
+            not isinstance(target, dict)
+            or "destinations" in target
+            or "gitRepositories" in target
+            or "snapshotObjectRoot" in target
+            or "restoreRoot" in target
+        ):
             raise ValueError("Flat trusted destination configuration required")
         if target.get("workingRoot") != settings["workingRoot"]:
             raise ValueError("Destinations must share the same authoritative editor root")

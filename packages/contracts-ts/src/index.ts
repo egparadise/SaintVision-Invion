@@ -460,6 +460,39 @@ export interface WorkspaceSnapshot {
   files: Array<WorkspaceSnapshotFile>;
 }
 
+export interface WorkspaceRestoreInput {
+  workspaceId: WorkspaceId;
+  sourceAttempt: number;
+  stepId: string;
+  expectedVersion: number;
+}
+
+export interface WorkspaceRestoreView {
+  runId: RunId;
+  restoreId: string;
+  workspaceId: WorkspaceId;
+  generation: string;
+  sha256: string;
+  replayed: boolean;
+}
+
+export interface WorkspaceCheckoutInput {
+  expectedVersion: number;
+}
+
+export interface WorkspaceCheckoutView {
+  runId: RunId;
+  restoreId: string;
+  checkoutId: string;
+  workspaceId: WorkspaceId;
+  generation: string;
+  stepId: string;
+  sourceAttempt: number;
+  checkpointAttempt: number;
+  sha256: string;
+  replayed: boolean;
+}
+
 export interface WorkspacePrepareInput {
   checkoutId: string;
   resumeId: string;

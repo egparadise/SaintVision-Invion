@@ -21,6 +21,7 @@ from inv import model_view as mv_mod
 from inv import result_view as rv_mod
 from inv import storage_view as sv_mod
 from inv import workspace_editor as we_mod
+from inv import workspace_recovery as wr_mod
 from inv.errors import DomainError
 from inv.model_view import ModelCommitObservation
 from inv.result_view import ResultView
@@ -130,6 +131,36 @@ def test_workspace_editor_view_anchors_workspace_edit_view(monkeypatch):
     monkeypatch.setattr(we_mod, "validate_contract", lambda name, value=None: rec.append(name))
     WorkspaceEditor._view(str(uuid.uuid4()), 1, b"{}")
     assert "WorkspaceEditView" in rec
+
+
+def test_workspace_recovery_views_anchor_restore_and_checkout(monkeypatch):
+    rec = []
+    monkeypatch.setattr(wr_mod, "validate_contract", lambda name, value=None: rec.append(name))
+    run_id = "run_01K00000000000000000000000"
+    workspace_id = "wsp_0123456789ABCDEFGHJKMNPQRS"
+    restore_id = "11111111-1111-4111-8111-111111111111"
+    wr_mod.restore_view(
+        run_id,
+        restore_id,
+        workspace_id,
+        "generation-11111111111141118111111111111111",
+        "a" * 64,
+        False,
+    )
+    wr_mod.checkout_view(
+        run_id,
+        restore_id,
+        "22222222-2222-4222-8222-222222222222",
+        workspace_id,
+        "generation-22222222222242228222222222222222",
+        "files-v1",
+        2,
+        1,
+        "a" * 64,
+        False,
+    )
+    assert "WorkspaceRestoreView" in rec
+    assert "WorkspaceCheckoutView" in rec
 
 
 def test_model_view_get_anchors_model_commit_observation(monkeypatch):

@@ -696,6 +696,51 @@ class WorkspaceSnapshot(BaseModel):
     files: list[WorkspaceSnapshotFile] = Field(..., max_length=2048)
 
 
+class WorkspaceRestoreInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workspaceId: WorkspaceId
+    sourceAttempt: conint(ge=1, le=9007199254740991)
+    stepId: constr(min_length=1, max_length=200)
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class WorkspaceRestoreView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    restoreId: UUID
+    workspaceId: WorkspaceId
+    generation: constr(pattern=r'^generation-[0-9a-f]{32}$')
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    replayed: bool
+
+
+class WorkspaceCheckoutInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    expectedVersion: conint(ge=1, le=9007199254740991)
+
+
+class WorkspaceCheckoutView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    runId: RunId
+    restoreId: UUID
+    checkoutId: UUID
+    workspaceId: WorkspaceId
+    generation: constr(pattern=r'^generation-[0-9a-f]{32}$')
+    stepId: constr(min_length=1, max_length=200)
+    sourceAttempt: conint(ge=1, le=9007199254740991)
+    checkpointAttempt: conint(ge=1, le=9007199254740991)
+    sha256: constr(pattern=r'^[0-9a-f]{64}$')
+    replayed: bool
+
+
 class WorkspaceEnqueueInput(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

@@ -22,19 +22,20 @@ def test_registered_surface_ignores_unmounted_router_and_keeps_prefix_and_websoc
     from route_coverage import registered_routes
 
     app = FastAPI()
-    mounted, unmounted = APIRouter(prefix='/v1/projects'), APIRouter()
-    mounted.add_api_route('/{project}/approvals', lambda: {}, methods=['GET'])
-    mounted.add_api_websocket_route('/{project}/socket', lambda: None)
-    unmounted.add_api_route('/v1/fixture-only', lambda: {}, methods=['GET'])
+    mounted, unmounted = APIRouter(prefix="/v1/projects"), APIRouter()
+    mounted.add_api_route("/{project}/approvals", lambda: {}, methods=["GET"])
+    mounted.add_api_websocket_route("/{project}/socket", lambda: None)
+    unmounted.add_api_route("/v1/fixture-only", lambda: {}, methods=["GET"])
     app.include_router(mounted)
 
-    @app.websocket('/v1/workspaces/{workspace}/terminals/{session}')
+    @app.websocket("/v1/workspaces/{workspace}/terminals/{session}")
     async def terminal(socket):
         pass
 
     assert registered_routes(app) == {
-        '/v1/projects/{}/approvals', '/v1/workspaces/{}/terminals/{}',
-        '/v1/projects/{}/socket',
+        "/v1/projects/{}/approvals",
+        "/v1/workspaces/{}/terminals/{}",
+        "/v1/projects/{}/socket",
     }
 
 
@@ -44,44 +45,63 @@ def test_business_dispatch_does_not_expose_its_unselected_routes():
     from route_coverage import registered_routes
 
     app, business = FastAPI(), FastAPI()
-    for route in ['/v1/projects', '/v1/projects/{project}/approvals', '/v1/projects/{project}/members']:
+    for route in [
+        "/v1/projects",
+        "/v1/projects/{project}/approvals",
+        "/v1/projects/{project}/members",
+    ]:
         app.add_api_route(route, lambda: {})
-    business.add_api_route('/v1/projects', lambda: {})
-    business.add_api_route('/v1/fixture-only', lambda: {})
+    business.add_api_route("/v1/projects", lambda: {})
+    business.add_api_route("/v1/fixture-only", lambda: {})
     app.add_middleware(BusinessDispatch, business=business)
     # Member listing is shadowed by dispatch but absent from this business app.
-    assert registered_routes(app) == {'/v1/projects', '/v1/projects/{}/approvals'}
+    assert registered_routes(app) == {"/v1/projects", "/v1/projects/{}/approvals"}
 
 
 def test_configured_failure_is_sanitized_and_never_falls_back(tmp_path, monkeypatch, capsys):
     import route_coverage
-    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--configured-surface', '--client', str(tmp_path)])
+
+    monkeypatch.setattr(
+        sys, "argv", ["route_coverage.py", "--configured-surface", "--client", str(tmp_path)]
+    )
+
     def broken():
-        raise RuntimeError('private-dsn-and-key-path')
-    monkeypatch.setattr(route_coverage, 'configured_routes', broken)
+        raise RuntimeError("private-dsn-and-key-path")
+
+    monkeypatch.setattr(route_coverage, "configured_routes", broken)
     with pytest.raises(SystemExit) as error:
         route_coverage.main()
     assert error.value.code == 2
     captured = capsys.readouterr()
-    assert 'no source fallback' in captured.err
-    assert 'private-dsn' not in captured.err
+    assert "no source fallback" in captured.err
+    assert "private-dsn" not in captured.err
 
 
 def test_empty_source_measurement_never_claims_operating_acceptance(tmp_path, monkeypatch, capsys):
     import json
     import route_coverage
-    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path), '--json'])
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["route_coverage.py", "--served", str(tmp_path), "--client", str(tmp_path), "--json"],
+    )
     assert route_coverage.main() == 2
     output = json.loads(capsys.readouterr().out)
-    assert output['assessment'] == 'inconclusive-no-client-paths'
-    assert output['measurement'] == 'source-declarations'
-    assert output['operationalAcceptanceAssessed'] is False
-    assert 'dynamic prefixes' in output['limitations']
+    assert output["assessment"] == "inconclusive-no-client-paths"
+    assert output["measurement"] == "source-declarations"
+    assert output["operationalAcceptanceAssessed"] is False
+    assert "dynamic prefixes" in output["limitations"]
 
 
 def test_missing_input_directory_is_not_zero_unserved(tmp_path, monkeypatch):
     import route_coverage
-    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path), '--client', str(tmp_path / 'missing')])
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["route_coverage.py", "--served", str(tmp_path), "--client", str(tmp_path / "missing")],
+    )
     with pytest.raises(SystemExit) as error:
         route_coverage.main()
     assert error.value.code == 2
@@ -93,7 +113,7 @@ def test_the_kernel_decorator_form_is_found() -> None:
     The kernel builds its application inside a factory and calls it ``api``, so
     a pattern anchored on ``@app.`` or ``@router.`` finds almost nothing.
     """
-    source = '''
+    source = """
     def create_app():
         api = FastAPI()
 
@@ -102,7 +122,7 @@ def test_the_kernel_decorator_form_is_found() -> None:
 
         @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
         def cancel(): ...
-    '''
+    """
     assert served_routes(source) == {
         "/v1/projects/{}/runs",
         "/v1/projects/{}/runs/{}/cancel",
@@ -111,8 +131,7 @@ def test_the_kernel_decorator_form_is_found() -> None:
 
 def test_model_retry_product_route_is_present_and_model_specific() -> None:
     source = (
-        Path(__file__).resolve().parents[1]
-        / "services/control-plane/src/inv/app.py"
+        Path(__file__).resolve().parents[1] / "services/control-plane/src/inv/app.py"
     ).read_text("utf-8")
     routes = served_routes(source)
     assert "/v1/projects/{}/runs/{}/model-retries" in routes
@@ -121,8 +140,7 @@ def test_model_retry_product_route_is_present_and_model_specific() -> None:
 
 def test_model_execution_manifest_route_is_project_scoped_and_separate_from_commitment() -> None:
     source = (
-        Path(__file__).resolve().parents[1]
-        / "services/control-plane/src/inv/app.py"
+        Path(__file__).resolve().parents[1] / "services/control-plane/src/inv/app.py"
     ).read_text("utf-8")
     routes = served_routes(source)
     assert "/v1/projects/{}/models/{}/versions/{}/execution-manifest" in routes
@@ -130,6 +148,16 @@ def test_model_execution_manifest_route_is_project_scoped_and_separate_from_comm
     assert "/v1/projects/{}/models/{}/versions/{}/commitment" in routes
     assert "/v1/projects/{}/models/resolve" in routes
     assert "/v1/models/resolve" not in routes
+
+
+def test_workspace_snapshot_reader_routes_are_project_and_run_scoped() -> None:
+    source = (
+        Path(__file__).resolve().parents[1] / "services/control-plane/src/inv/app.py"
+    ).read_text("utf-8")
+    routes = served_routes(source)
+    assert "/v1/projects/{}/runs/{}/restores/{}" in routes
+    assert "/v1/projects/{}/runs/{}/restores/{}/checkouts/{}" in routes
+    assert "/v1/runs/{}/restores/{}" not in routes
 
 
 @pytest.mark.parametrize("holder", ["app", "api", "router", "business", "control"])
@@ -145,19 +173,17 @@ def test_websocket_routes_count() -> None:
 
 
 def test_a_router_prefix_is_applied() -> None:
-    source = '''
+    source = """
     router = APIRouter(prefix="/v1", tags=["nodes"])
 
     @router.get("/nodes/{node_id}")
     def one(): ...
-    '''
+    """
     assert served_routes(source) == {"/v1/nodes/{}"}
 
 
 def test_an_f_string_path_is_found() -> None:
-    assert served_routes('@api.get(f"/v1/runs/{run_id}/result")') == {
-        "/v1/runs/{}/result"
-    }
+    assert served_routes('@api.get(f"/v1/runs/{run_id}/result")') == {"/v1/runs/{}/result"}
 
 
 def test_parameter_spellings_collapse_to_one() -> None:
@@ -171,7 +197,7 @@ def test_parameter_spellings_collapse_to_one() -> None:
 
 
 def test_a_client_interpolation_is_captured() -> None:
-    source = 'await get(`/v1/runs/${activeRunId}/result`)'
+    source = "await get(`/v1/runs/${activeRunId}/result`)"
     assert "/v1/runs/{}/result" in client_paths(source)
 
 
@@ -181,9 +207,7 @@ def test_a_plain_client_literal_is_captured() -> None:
 
 def test_non_v1_paths_are_ignored() -> None:
     """Static assets and health checks outside the API are not the question."""
-    assert client_paths("""fetch('/assets/app.css'); fetch('/v1/runs')""") == {
-        "/v1/runs"
-    }
+    assert client_paths("""fetch('/assets/app.css'); fetch('/v1/runs')""") == {"/v1/runs"}
 
 
 def test_a_hardcoded_fixture_id_is_reported_as_its_own_path() -> None:
@@ -213,7 +237,7 @@ def test_a_hole_fused_to_a_segment_is_dropped_as_an_artefact() -> None:
     """/v1/${prj}runs, where prj already ends in projects/<id>/, must not be
     reported as the malformed /v1/{}runs -- that is the tool's artefact, not a
     path the SPA asks for."""
-    source = 'apiClient(`/v1/${prj}runs/${run.id}/result`)'
+    source = "apiClient(`/v1/${prj}runs/${run.id}/result`)"
     got = client_paths(source)
     assert "/v1/{}runs/{}/result" not in got
     # It is dropped entirely rather than half-corrected; the well-formed sibling
@@ -224,13 +248,13 @@ def test_a_hole_fused_to_a_segment_is_dropped_as_an_artefact() -> None:
 
 def test_a_properly_separated_interpolation_still_counts() -> None:
     """The fix must not suppress a legitimate leading-parameter path."""
-    source = 'apiClient(`/v1/projects/${prj}/runs`)'
+    source = "apiClient(`/v1/projects/${prj}/runs`)"
     assert "/v1/projects/{}/runs" in client_paths(source)
 
 
 def test_interpolated_path_head_is_not_a_separate_endpoint_but_query_head_is() -> None:
     """A variable path segment must not invent its parent route; query assembly may keep a complete route head."""
-    workspace_call = 'apiClient(`/v1/workspaces/${workspaceId}/terminal-tickets`)'
+    workspace_call = "apiClient(`/v1/workspaces/${workspaceId}/terminal-tickets`)"
     assert client_paths(workspace_call) == {"/v1/workspaces/{}/terminal-tickets"}
 
     query_call = "get(`/v1/storage/resolve${qs ? '?' + qs : ''}`)"
@@ -239,14 +263,14 @@ def test_interpolated_path_head_is_not_a_separate_endpoint_but_query_head_is() -
 
 def test_nginx_location_declarations_are_not_client_calls() -> None:
     """Deployment route metadata may resemble a path but is not an API request."""
-    source = '''
+    source = """
     const rules = [{ location: '/v1/workspaces/{id}/terminals/{sessionId}' }];
     const nginx = `
       location ~ ^/v1/workspaces/[^/]+/terminals/ {
         proxy_pass http://pacs-backend:8080;
       }
     `;
-    '''
+    """
     assert client_paths(source) == set()
 
     # A real request to the same route family remains visible.
@@ -254,20 +278,26 @@ def test_nginx_location_declarations_are_not_client_calls() -> None:
     assert "/v1/workspaces" in client_paths(actual_call)
 
 
-@pytest.mark.parametrize('served,expected', [(False, 1), (True, 0)])
-def test_nonempty_route_comparison_can_pass_or_fail(tmp_path, monkeypatch, capsys, served, expected):
+@pytest.mark.parametrize("served,expected", [(False, 1), (True, 0)])
+def test_nonempty_route_comparison_can_pass_or_fail(
+    tmp_path, monkeypatch, capsys, served, expected
+):
     import json
     import route_coverage
-    (tmp_path / 'client.ts').write_text("fetch('/v1/projects')")
+
+    (tmp_path / "client.ts").write_text("fetch('/v1/projects')")
     if served:
-        (tmp_path / 'api.py').write_text('@api.get("/v1/projects")')
-    monkeypatch.setattr(sys, 'argv', ['route_coverage.py', '--served', str(tmp_path),
-                                    '--client', str(tmp_path), '--json'])
+        (tmp_path / "api.py").write_text('@api.get("/v1/projects")')
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["route_coverage.py", "--served", str(tmp_path), "--client", str(tmp_path), "--json"],
+    )
     assert route_coverage.main() == expected
     report = json.loads(capsys.readouterr().out)
-    assert report['assessment'] == 'compared'
-    assert report['clientPaths'] == ['/v1/projects']
-    assert report['unserved'] == ([] if served else ['/v1/projects'])
+    assert report["assessment"] == "compared"
+    assert report["clientPaths"] == ["/v1/projects"]
+    assert report["unserved"] == ([] if served else ["/v1/projects"])
 
 
 def test_client_source_does_not_request_unserved_evidence_or_bare_events_endpoints() -> None:
@@ -285,11 +315,21 @@ def test_evidence_viewer_integrity_contract_invariants() -> None:
     """Bidirectional regression: EvidenceViewer must never synthesize fake PASS, mock digests, or tool calls."""
     from pathlib import Path
 
-    viewer_path = Path(__file__).resolve().parents[1] / "apps" / "web" / "src" / "features" / "evidence" / "EvidenceViewer.tsx"
+    viewer_path = (
+        Path(__file__).resolve().parents[1]
+        / "apps"
+        / "web"
+        / "src"
+        / "features"
+        / "evidence"
+        / "EvidenceViewer.tsx"
+    )
     content = viewer_path.read_text(encoding="utf-8")
 
     # 1. No mock 'sha256:verified' digests
-    assert "sha256:verified" not in content, "Mock digest 'sha256:verified' found in EvidenceViewer.tsx"
+    assert (
+        "sha256:verified" not in content
+    ), "Mock digest 'sha256:verified' found in EvidenceViewer.tsx"
 
     # 2. No fabricated tool calls or wall times
     for fake in ["git.checkout", "test.run", "artifact.write", "wallTimeMs"]:
@@ -314,39 +354,74 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     # 1. UI-FB-01 ResourceExplorer: No synthetic candidate in initial state, no fake capacity/capabilities fallback
     re_path = web_src / "features" / "desktop" / "ResourceExplorer.tsx"
     re_content = re_path.read_text(encoding="utf-8")
-    assert "ann_node06_unverified" not in re_content, "Synthetic candidate 'ann_node06_unverified' found in ResourceExplorer.tsx"
-    assert "totalOfferedCores: 48" not in re_content, "Synthetic 48-core pool fallback found in ResourceExplorer.tsx"
-    assert "totalOfferedRamBytes: 192 * 1024 ** 3" not in re_content, "Synthetic 192GiB RAM pool fallback found in ResourceExplorer.tsx"
-    assert "vendor: 'DDR4/DDR5'" not in re_content, "Synthetic RAM vendor fallback found in ResourceExplorer.tsx"
-    assert "vendor: 'AMD/Intel'" not in re_content, "Synthetic CPU vendor fallback found in ResourceExplorer.tsx"
-    assert "discovery-error-banner" in re_content, "Missing discovery-error-banner in ResourceExplorer.tsx"
-    assert "discovery-empty-state" in re_content, "Missing discovery-empty-state in ResourceExplorer.tsx"
-    assert "pool-capacity-error" in re_content, "Missing pool-capacity-error in ResourceExplorer.tsx"
+    assert (
+        "ann_node06_unverified" not in re_content
+    ), "Synthetic candidate 'ann_node06_unverified' found in ResourceExplorer.tsx"
+    assert (
+        "totalOfferedCores: 48" not in re_content
+    ), "Synthetic 48-core pool fallback found in ResourceExplorer.tsx"
+    assert (
+        "totalOfferedRamBytes: 192 * 1024 ** 3" not in re_content
+    ), "Synthetic 192GiB RAM pool fallback found in ResourceExplorer.tsx"
+    assert (
+        "vendor: 'DDR4/DDR5'" not in re_content
+    ), "Synthetic RAM vendor fallback found in ResourceExplorer.tsx"
+    assert (
+        "vendor: 'AMD/Intel'" not in re_content
+    ), "Synthetic CPU vendor fallback found in ResourceExplorer.tsx"
+    assert (
+        "discovery-error-banner" in re_content
+    ), "Missing discovery-error-banner in ResourceExplorer.tsx"
+    assert (
+        "discovery-empty-state" in re_content
+    ), "Missing discovery-empty-state in ResourceExplorer.tsx"
+    assert (
+        "pool-capacity-error" in re_content
+    ), "Missing pool-capacity-error in ResourceExplorer.tsx"
     # Accessibility: role="alert" on all error banners
     assert 'role="alert" data-testid="discovery-error-banner"' in re_content
-    assert 'role="alert"\n                data-testid="storage-error-banner"' in re_content or 'role="alert" data-testid="storage-error-banner"' in re_content
+    assert (
+        'role="alert"\n                data-testid="storage-error-banner"' in re_content
+        or 'role="alert" data-testid="storage-error-banner"' in re_content
+    )
     assert 'role="alert" data-testid="pool-capacity-error"' in re_content
     assert 'role="alert" data-testid="node-detail-error"' in re_content
 
     # 2. UI-FB-02 PlacementSimulator: UNVERIFIED local evaluation label and preview error banner
     ps_path = web_src / "features" / "placement" / "PlacementSimulator.tsx"
     ps_content = ps_path.read_text(encoding="utf-8")
-    assert "UNVERIFIED: 로컬 시뮬레이션 전용" in ps_content, "Missing UNVERIFIED local simulation label in PlacementSimulator.tsx"
-    assert "preview-error-banner" in ps_content, "Missing preview-error-banner in PlacementSimulator.tsx"
-    assert "pools-error-banner" in ps_content, "Missing pools-error-banner in PlacementSimulator.tsx"
-    assert "서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다" in ps_content, "Missing fake shard prevention message in PlacementSimulator.tsx"
+    assert (
+        "UNVERIFIED: 로컬 시뮬레이션 전용" in ps_content
+    ), "Missing UNVERIFIED local simulation label in PlacementSimulator.tsx"
+    assert (
+        "preview-error-banner" in ps_content
+    ), "Missing preview-error-banner in PlacementSimulator.tsx"
+    assert (
+        "pools-error-banner" in ps_content
+    ), "Missing pools-error-banner in PlacementSimulator.tsx"
+    assert (
+        "서버 어드미션 미검증: 가짜 샤드 상태를 생성하지 않습니다" in ps_content
+    ), "Missing fake shard prevention message in PlacementSimulator.tsx"
     # Accessibility: role="alert" on placement error banners
     assert 'role="alert"' in ps_content
-    assert 'pools-error-banner' in ps_content
-    assert 'candidates-error-banner' in ps_content
+    assert "pools-error-banner" in ps_content
+    assert "candidates-error-banner" in ps_content
 
     # 3. UI-FB-03 DeveloperStudio: ResultView fallback gated strictly on isRouteNotFoundError & Output Verified gated on evidence
     ds_path = web_src / "features" / "studio" / "DeveloperStudio.tsx"
     ds_content = ds_path.read_text(encoding="utf-8")
-    assert "isRouteNotFoundError" in ds_content, "Missing isRouteNotFoundError import or usage in DeveloperStudio.tsx"
-    assert "isRouteNotFoundError(err)" in ds_content, "ResultView catch must test isRouteNotFoundError(err)"
-    assert "artifact-error-banner" in ds_content, "Missing artifact-error-banner in DeveloperStudio.tsx"
-    assert "artifact-fallback-badge" in ds_content, "Missing artifact-fallback-badge in DeveloperStudio.tsx"
+    assert (
+        "isRouteNotFoundError" in ds_content
+    ), "Missing isRouteNotFoundError import or usage in DeveloperStudio.tsx"
+    assert (
+        "isRouteNotFoundError(err)" in ds_content
+    ), "ResultView catch must test isRouteNotFoundError(err)"
+    assert (
+        "artifact-error-banner" in ds_content
+    ), "Missing artifact-error-banner in DeveloperStudio.tsx"
+    assert (
+        "artifact-fallback-badge" in ds_content
+    ), "Missing artifact-fallback-badge in DeveloperStudio.tsx"
     assert 'role="alert"' in ds_content
     # Truthful verification status: Output Verified must require verifiedEvidenceId and not fallbackUsed
     assert "Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed" in ds_content
@@ -354,6 +429,7 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
 
 
 # --- 2026-09-22: holes that contain a call (found by the PR #36 review; false green) ---
+
 
 def test_a_hole_containing_a_call_is_still_a_path() -> None:
     """``${encodeURIComponent(nodeId)}`` is the SPA's normal way to interpolate.
@@ -370,12 +446,14 @@ def test_a_hole_containing_a_call_is_still_a_path() -> None:
 def test_two_call_holes_and_a_url_built_in_a_variable() -> None:
     """The exact PR #36 adapter shape: ternary of two templates assigned to a
     variable, then passed on. Both paths must surface."""
-    source = chr(10).join([
-        "const url = projectId",
-        "  ? `/v1/projects/${encodeURIComponent(projectId)}/nodes/${encodeURIComponent(nodeId)}/resource-usage`",
-        "  : `/v1/nodes/${encodeURIComponent(nodeId)}/resource-usage`;",
-        "const raw = await apiClient<NodeResourceUsageResponse>(url);",
-    ])
+    source = chr(10).join(
+        [
+            "const url = projectId",
+            "  ? `/v1/projects/${encodeURIComponent(projectId)}/nodes/${encodeURIComponent(nodeId)}/resource-usage`",
+            "  : `/v1/nodes/${encodeURIComponent(nodeId)}/resource-usage`;",
+            "const raw = await apiClient<NodeResourceUsageResponse>(url);",
+        ]
+    )
     assert client_paths(source) == {
         "/v1/projects/{}/nodes/{}/resource-usage",
         "/v1/nodes/{}/resource-usage",

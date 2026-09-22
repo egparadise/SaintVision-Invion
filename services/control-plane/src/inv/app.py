@@ -287,6 +287,11 @@ def create_app(
             "scope": "authenticated-control-api",
             "executionDispatcher": "external-worker-required" if workspace else "not_configured",
             "workspaceAdmission": "configured" if workspace else "not_configured",
+            "workspaceRecovery": (
+                "configured"
+                if workspace is not None and getattr(workspace, "recovery", None) is not None
+                else "not_configured"
+            ),
         }
 
     @api.get("/v1/session")
@@ -917,6 +922,54 @@ def create_app(
         from .workspace_start import WorkspaceStart
 
         return WorkspaceStart(workspace_service())
+
+    def workspace_recovery_service():
+        from .workspace_recovery import WorkspaceRecoveryService
+
+        service = workspace_service()
+        recovery = getattr(service, "recovery", None)
+        if recovery is None:
+            raise DomainError("SYS-0001", "Workspace recovery is not configured", 503)
+        return WorkspaceRecoveryService(recovery, service.working)
+
+    @api.post("/v1/projects/{project}/runs/{run_id}/restores/{restore_id}", status_code=201)
+    async def restore_workspace(
+        project: str,
+        run_id: str,
+        restore_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        return await run_in_threadpool(
+            workspace_recovery_service().restore,
+            identity.principal,
+            project,
+            run_id,
+            restore_id,
+            await request.json(),
+        )
+
+    @api.post(
+        "/v1/projects/{project}/runs/{run_id}/restores/{restore_id}/checkouts/{checkout_id}",
+        status_code=201,
+    )
+    async def checkout_restored_workspace(
+        project: str,
+        run_id: str,
+        restore_id: str,
+        checkout_id: str,
+        request: Request,
+        identity=Depends(authenticated),
+    ):
+        return await run_in_threadpool(
+            workspace_recovery_service().checkout,
+            identity.principal,
+            project,
+            run_id,
+            restore_id,
+            checkout_id,
+            await request.json(),
+        )
 
     @api.post("/v1/projects/{project}/runs/{run_id}/start/prepare", status_code=201)
     async def prepare_first_workspace(

@@ -49,6 +49,7 @@ INV = ROOT / "services" / "control-plane" / "src" / "inv"
 # Kernel modules that build and serve a response to the frontend.
 SERVING_MODULES = [
     "result_view.py", "model_view.py", "model_uri_resolver.py", "storage_view.py", "workspace_editor.py",
+    "workspace_recovery.py",
     "control.py", "shards.py", "app.py",
     "node_resource_usage.py",  # Claude: GET .../nodes/{node_id}/resource-usage (decision #2 A)
 ]
@@ -68,6 +69,7 @@ REPLAY_GUARD_COUNTS = {
     },
     "approvals.py": {"ApprovalView": 1},
     "workspace_api.py": {"WorkspacePrepareResult": 1, "WorkspaceEnqueueResult": 2},
+    "workspace_recovery.py": {"WorkspaceRestoreView": 1, "WorkspaceCheckoutView": 1},
     "workspace_start.py": {
         "WorkspaceStartPrepareResult": 1,
         "WorkspaceStartEnqueueResult": 2,

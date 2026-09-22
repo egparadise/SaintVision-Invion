@@ -11,11 +11,53 @@ from psycopg.types.json import Jsonb
 from uuid import UUID, uuid5
 from .approvals import digest
 from .contracts import validate_contract
+from .control import Control
 from .errors import DomainError
 from .leases import lock_run
 from .object_store import PART_BYTES
 from .runs import event
 from .snapshots import identity, object_key
+
+
+def restore_view(run_id, restore_id, workspace_id, generation, sha256, replayed):
+    result = {
+        "runId": run_id,
+        "restoreId": restore_id,
+        "workspaceId": workspace_id,
+        "generation": generation,
+        "sha256": sha256,
+        "replayed": replayed,
+    }
+    validate_contract("WorkspaceRestoreView", result)
+    return result
+
+
+def checkout_view(
+    run_id,
+    restore_id,
+    checkout_id,
+    workspace_id,
+    generation,
+    step_id,
+    source_attempt,
+    checkpoint_attempt,
+    sha256,
+    replayed,
+):
+    result = {
+        "runId": run_id,
+        "restoreId": restore_id,
+        "checkoutId": checkout_id,
+        "workspaceId": workspace_id,
+        "generation": generation,
+        "stepId": step_id,
+        "sourceAttempt": source_attempt,
+        "checkpointAttempt": checkpoint_attempt,
+        "sha256": sha256,
+        "replayed": replayed,
+    }
+    validate_contract("WorkspaceCheckoutView", result)
+    return result
 
 
 class WorkspaceRecovery:
@@ -67,6 +109,7 @@ class WorkspaceRecovery:
         restore_id,
         *,
         expected_version,
+        authorize=None,
     ):
         restore_id = identity(restore_id)
         validate_contract("WorkspaceId", workspace_id)
@@ -95,13 +138,27 @@ class WorkspaceRecovery:
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
-            prior = conn.execute(
+            if authorize is not None:
+                authorize(conn)
+            stored = conn.execute(
                 "SELECT * FROM inv.workspace_restores WHERE restore_id=%s",
                 (restore_id,),
             ).fetchone()
-            if prior and prior["request_hash"] != request_hash:
+            if stored and stored["request_hash"] != request_hash:
                 raise DomainError("IDEM-0001", "Restore identity already differs")
-            if not prior:
+            prior = None
+            if stored:
+                prior = restore_view(
+                    run_id,
+                    restore_id,
+                    stored["workspace_id"],
+                    stored["generation"],
+                    stored["content_hash"],
+                    True,
+                )
+            if prior is not None:
+                validate_contract("WorkspaceRestoreView", prior)
+            if stored is None:
                 if (
                     run["state"] != "recovering"
                     or run["version"] != expected_version
@@ -126,9 +183,9 @@ class WorkspaceRecovery:
                 raise DomainError("STORE-0005", "Workspace checkpoint unavailable")
             raw = files.read(object_key(obj["object_id"]), obj["content_hash"], obj["size_bytes"])
             generation = self.generations.publish(
-                root_fd, restore_id, raw, workspace_id, allow_create=prior is None
+                root_fd, restore_id, raw, workspace_id, allow_create=stored is None
             )
-            if not prior:
+            if stored is None:
                 conn.execute(
                     """INSERT INTO inv.workspace_restores
                     (tenant_id,project_id,run_id,restore_id,workspace_id,source_attempt,step_id,request_hash,generation,content_hash,recovery_epoch)
@@ -160,16 +217,28 @@ class WorkspaceRecovery:
                         "sha256": obj["content_hash"],
                     },
                 )
-            return {
-                "restoreId": restore_id,
-                "workspaceId": workspace_id,
-                "generation": generation,
-                "sha256": obj["content_hash"],
-                "replayed": prior is not None,
-            }
+            if prior is not None:
+                return prior
+            return restore_view(
+                run_id,
+                restore_id,
+                workspace_id,
+                generation,
+                obj["content_hash"],
+                False,
+            )
 
     def checkout(
-        self, tenant, project, run_id, restore_id, checkout_id, working, *, expected_version
+        self,
+        tenant,
+        project,
+        run_id,
+        restore_id,
+        checkout_id,
+        working,
+        *,
+        expected_version,
+        authorize=None,
     ):
         """Prepare writable files and resume cursor; does not grant OS execution.
 
@@ -197,10 +266,12 @@ class WorkspaceRecovery:
             self.db.transaction(tenant) as conn,
         ):
             run = lock_run(conn, run_id, project)
-            prior = conn.execute(
+            if authorize is not None:
+                authorize(conn)
+            stored = conn.execute(
                 "SELECT * FROM inv.workspace_checkouts WHERE checkout_id=%s", (checkout_id,)
             ).fetchone()
-            if prior and prior["request_hash"] != fingerprint:
+            if stored and stored["request_hash"] != fingerprint:
                 raise DomainError("IDEM-0001", "Checkout identity already differs")
             restored = conn.execute(
                 "SELECT * FROM inv.workspace_restores WHERE restore_id=%s AND project_id=%s AND run_id=%s",
@@ -208,14 +279,30 @@ class WorkspaceRecovery:
             ).fetchone()
             if not restored or str(restored["recovery_epoch"]) != self.db.recovery_epoch:
                 raise DomainError("STORE-0022", "Current-epoch restore required")
-            if not prior and (
+            prior = None
+            if stored:
+                prior = checkout_view(
+                    run_id,
+                    restore_id,
+                    checkout_id,
+                    restored["workspace_id"],
+                    stored["generation"],
+                    restored["step_id"],
+                    stored["source_attempt"],
+                    stored["checkpoint_attempt"] or stored["source_attempt"],
+                    stored["content_hash"],
+                    True,
+                )
+            if prior is not None:
+                validate_contract("WorkspaceCheckoutView", prior)
+            if stored is None and (
                 run["state"] != "recovering"
                 or run["version"] != expected_version
                 or restored["source_attempt"] > run["attempt"]
             ):
                 raise DomainError("GRAPH-0003", "Checkout requires current recovering attempt")
             if (
-                not prior
+                stored is None
                 and conn.execute(
                     "SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL",
                     (run_id,),
@@ -225,21 +312,12 @@ class WorkspaceRecovery:
             if prior:
                 working.inspect_committed(
                     work_fd,
-                    prior["generation"],
+                    stored["generation"],
                     restored["workspace_id"],
-                    prior["content_hash"],
-                    prior["filesystem_identity"],
+                    stored["content_hash"],
+                    stored["filesystem_identity"],
                 )
-                return {
-                    "checkoutId": checkout_id,
-                    "workspaceId": restored["workspace_id"],
-                    "generation": prior["generation"],
-                    "stepId": restored["step_id"],
-                    "sourceAttempt": prior["source_attempt"],
-                    "checkpointAttempt": prior["checkpoint_attempt"] or prior["source_attempt"],
-                    "sha256": prior["content_hash"],
-                    "replayed": True,
-                }
+                return prior
             pin = conn.execute(
                 "SELECT object_id FROM inv.checkpoint_objects WHERE run_id=%s AND attempt=%s AND step_id=%s",
                 (run_id, restored["source_attempt"], restored["step_id"]),
@@ -289,13 +367,53 @@ class WorkspaceRecovery:
                     "sha256": restored["content_hash"],
                 },
             )
-            return {
-                "checkoutId": checkout_id,
-                "workspaceId": restored["workspace_id"],
-                "generation": generation,
-                "stepId": restored["step_id"],
-                "sourceAttempt": run["attempt"],
-                "checkpointAttempt": restored["source_attempt"],
-                "sha256": restored["content_hash"],
-                "replayed": False,
-            }
+            return checkout_view(
+                run_id,
+                restore_id,
+                checkout_id,
+                restored["workspace_id"],
+                generation,
+                restored["step_id"],
+                run["attempt"],
+                restored["source_attempt"],
+                restored["content_hash"],
+                False,
+            )
+
+
+class WorkspaceRecoveryService:
+    """Project-authorized HTTP boundary over the trusted snapshot reader."""
+
+    def __init__(self, recovery, working):
+        self.recovery, self.working = recovery, working
+        self.control = Control(recovery.db)
+
+    def _authorize(self, principal, project):
+        return lambda conn: self.control.grant(conn, principal, project, "can_request")
+
+    def restore(self, principal, project, run_id, restore_id, data):
+        validate_contract("WorkspaceRestoreInput", data)
+        return self.recovery.restore(
+            principal.tenant_id,
+            project,
+            run_id,
+            data["workspaceId"],
+            data["sourceAttempt"],
+            data["stepId"],
+            restore_id,
+            expected_version=data["expectedVersion"],
+            authorize=self._authorize(principal, project),
+        )
+
+    def checkout(self, principal, project, run_id, restore_id, checkout_id, data):
+        validate_contract("WorkspaceCheckoutInput", data)
+        return self.recovery.checkout(
+            principal.tenant_id,
+            project,
+            run_id,
+            restore_id,
+            checkout_id,
+            self.working,
+            expected_version=data["expectedVersion"],
+            authorize=self._authorize(principal, project),
+        )

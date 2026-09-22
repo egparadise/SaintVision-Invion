@@ -2128,6 +2128,143 @@
         "files"
       ]
     },
+    "WorkspaceRestoreInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "sourceAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "workspaceId",
+        "sourceAttempt",
+        "stepId",
+        "expectedVersion"
+      ]
+    },
+    "WorkspaceRestoreView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "restoreId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^generation-[0-9a-f]{32}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "runId",
+        "restoreId",
+        "workspaceId",
+        "generation",
+        "sha256",
+        "replayed"
+      ]
+    },
+    "WorkspaceCheckoutInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "expectedVersion"
+      ]
+    },
+    "WorkspaceCheckoutView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "restoreId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "checkoutId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^generation-[0-9a-f]{32}$"
+        },
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "sourceAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "checkpointAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "runId",
+        "restoreId",
+        "checkoutId",
+        "workspaceId",
+        "generation",
+        "stepId",
+        "sourceAttempt",
+        "checkpointAttempt",
+        "sha256",
+        "replayed"
+      ]
+    },
     "WorkspacePrepareInput": {
       "type": "object",
       "additionalProperties": false,
