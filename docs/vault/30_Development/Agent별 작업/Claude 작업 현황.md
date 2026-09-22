@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+새 PC Claude 첫 메시지 (Claude, 2026-09-22): 새 PC에서 첫 입력으로 붙일 복붙 한 덩어리를 docs/vault/40_Governance/새PC_Claude_첫메시지.md에 작성. 세 번 clear 겪은 경험으로 추림 — 읽을순서+실측상태+무-블록 다음행동만, 배경은 링크. registry는 실측(done1·review12) 반영. 전문 [[새PC_Claude_첫메시지]].
+
 개발 환경 이전 절차서 (Claude, 2026-09-22): 새 PC(192.168.45.74)로 이전. 운영 문서 소유로 작성 — 경로 3곳 정확값·JSON/md 백슬래시 구분·환경변수 전수(재발급, 값 미기재)·clone(파생물 새로)·Go 첫컴파일·규칙8 전수검증. 이동전 손실위험 실측(미커밋 워크트리 3·미푸시 브랜치 3·stash 10). 전문 [[개발환경_이전_절차서]].
 
 서빙 앵커 무게 전수 변이 (Claude, 2026-09-22): 커널 서빙 앵커 전수를 격리 워크트리 변이로 측정. replay만이 아니라 스펙트럼 — 층1 완전vacuous(replay 12+EvidenceEnvelope), 층2 (a)호출만검증(result_view 4·workspace_editor·model_view·storage_view; test_serving_anchors가 validator를 레코더로 대체), 층3 완전무게(control·shard·terminal·problem·artifact·workspace). 대조군으로 변이 유효성 자체 검증. 자동화(mutation testing) 제안. 전문 [[2026-09-22_서빙앵커_무게_전수변이_부류확장_Claude]].
