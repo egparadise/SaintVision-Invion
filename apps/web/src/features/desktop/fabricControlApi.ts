@@ -189,10 +189,9 @@ export async function createPoolPlan(
   poolId: string,
   data: {
     runId: string;
-    // UI vocabulary currently differs from the backend request enum. Keep this
-    // input boundary explicit until Gemini maps the visible choices to domain
-    // strategies; response typing remains generated and strict.
-    strategy: 'binpack' | 'spread';
+    // Canonical backend request enum mapped directly:
+    // 'single_node' | 'data_parallel' | 'sharded'
+    strategy: 'single_node' | 'data_parallel' | 'sharded';
     shardCount: number;
     shardCpuMillicores: number;
     shardRamBytes: number;

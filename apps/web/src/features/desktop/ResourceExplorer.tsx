@@ -128,7 +128,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const [placementReq, setPlacementReq] = useState({ cpuMillicores: 2000, ramBytes: 4 * 1024 ** 3, gpuDevices: 1 });
   const [placementPreview, setPlacementPreview] = useState<PlacementPreviewResponse | null>(null);
   const [planRunId, setPlanRunId] = useState('');
-  const [planStrategy, setPlanStrategy] = useState<'binpack' | 'spread'>('spread');
+  const [planStrategy, setPlanStrategy] = useState<'single_node' | 'data_parallel' | 'sharded'>('sharded');
   const [planShardCount, setPlanShardCount] = useState(2);
   const [planResult, setPlanResult] = useState<DistributedPlanResponse | null>(null);
   const [poolMessage, setPoolMessage] = useState<string | null>(null);
@@ -1840,8 +1840,9 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     onChange={(e) => setPlanStrategy(e.target.value as any)}
                     style={{ width: '100%', padding: '4px', backgroundColor: '#0f172a', border: '1px solid #334155', color: '#fff', borderRadius: '4px' }}
                   >
-                    <option value="spread">분산 (Spread - 권장)</option>
-                    <option value="binpack">밀집 (Binpack)</option>
+                    <option value="sharded">분산 샤딩 (sharded - 권장)</option>
+                    <option value="data_parallel">데이터 병렬 (data_parallel)</option>
+                    <option value="single_node">단일 노드 (single_node)</option>
                   </select>
                 </div>
                 <div>

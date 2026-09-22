@@ -218,7 +218,7 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
       const mockPlan = {
         planId: 'plan_01JTEST',
         runId: 'run_123',
-        strategy: 'spread',
+        strategy: 'sharded',
         shardCount: 2,
         placements: [],
       };
@@ -226,7 +226,7 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
 
       const res = await createPoolPlan('pool-alpha', {
         runId: 'run_123',
-        strategy: 'spread',
+        strategy: 'sharded',
         shardCount: 2,
         shardCpuMillicores: 2000,
         shardRamBytes: 8 * 1024 ** 3,
@@ -236,7 +236,7 @@ describe('CX-01 Fabric Control Plane API Client & ResourceExplorer Tests', () =>
 
       expect(mockApi).toHaveBeenCalledWith('/v1/pools/pool-alpha/plans', {
         method: 'POST',
-        body: expect.stringContaining('"strategy":"spread"'),
+        body: expect.stringContaining('"strategy":"sharded"'),
       });
       expect(res.planId).toBe('plan_01JTEST');
     });
