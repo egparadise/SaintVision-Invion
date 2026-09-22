@@ -105,12 +105,15 @@ def validate_manifest(value, action):
             ):
                 raise ProvisioningDenied()
             if (
-                m["purpose"] not in PURPOSES
+                not isinstance(m["purpose"], str)
+                or m["purpose"] not in PURPOSES
                 or not isinstance(m["destination"], str)
                 or not re.fullmatch(r"[a-z][a-z0-9-]{0,63}", m["destination"])
             ):
                 raise ProvisioningDenied()
         if "expires" in m:
+            if not isinstance(m["expires"], str):
+                raise ProvisioningDenied()
             m["expires"] = datetime.fromisoformat(m["expires"])
             if m["expires"].tzinfo is None:
                 raise ProvisioningDenied()
@@ -120,10 +123,9 @@ def validate_manifest(value, action):
         return m
     except ProvisioningDenied:
         raise
-    except Exception:
-        # Manifest validation is a pure input boundary.  No database operation
-        # occurs here, so malformed values are intentional refusals rather than
-        # database or internal failures.
+    except ValueError:
+        # UUID and ISO datetime parse failures are untrusted input. Unexpected
+        # implementation failures must retain their internal-error category.
         raise ProvisioningDenied() from None
 
 

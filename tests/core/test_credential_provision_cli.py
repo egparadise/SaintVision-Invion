@@ -55,6 +55,46 @@ def test_malformed_typed_manifest_is_a_refusal_not_an_internal_error():
         tool.validate_manifest(manifest, "revoke")
 
 
+@pytest.mark.parametrize("field,value", [("purpose", []), ("expires", 123)])
+def test_manifest_field_type_errors_are_policy_refusals(field, value):
+    tool = module()
+    manifest = {
+        "tenant": "00000000-0000-0000-0000-000000000001",
+        "project": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "subject": "synthetic-subject",
+        "run": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "epoch": "00000000-0000-0000-0000-000000000002",
+        "credential": "00000000-0000-0000-0000-000000000003",
+        "version": "00000000-0000-0000-0000-000000000004",
+        "file": "0" * 32 + ".secret",
+        "purpose": "git.read",
+        "destination": "origin",
+    }
+    action = "register"
+    if field == "expires":
+        action = "grant"
+        manifest = {k: manifest[k] for k in ("tenant", "project", "subject", "run", "epoch", "credential", "version")}
+    manifest[field] = value
+    with pytest.raises(tool.ProvisioningDenied, match="Credential provisioning refused"):
+        tool.validate_manifest(manifest, action)
+
+
+def test_manifest_internal_failure_is_not_disguised_as_refusal(monkeypatch):
+    tool = module()
+    monkeypatch.setattr(tool, "recognised_secrets", lambda value: (_ for _ in ()).throw(RuntimeError("synthetic")))
+    manifest = {
+        "tenant": "00000000-0000-0000-0000-000000000001",
+        "project": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "subject": "synthetic-subject",
+        "run": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "epoch": "00000000-0000-0000-0000-000000000002",
+        "credential": "00000000-0000-0000-0000-000000000003",
+        "version": "00000000-0000-0000-0000-000000000004",
+    }
+    with pytest.raises(RuntimeError, match="synthetic"):
+        tool.validate_manifest(manifest, "revoke")
+
+
 def test_malformed_json_is_reported_as_a_sanitized_refusal(monkeypatch, capsys, tmp_path):
     tool = module()
     manifest = tmp_path / "manifest.json"

@@ -103,6 +103,7 @@ def test_safe_failure_summary_exposes_only_owning_class(harness):
     code, proof = invoke()
     assert code == 1
     assert proof['failedTestClasses'] == ['tests.browser.SafeJourney']
+    assert proof['failedCaseIds'] == ['tests.browser.SafeJourney::case']
     public = (root / '.work/same-prefix.json').read_text()
     assert 'param-private' not in public
     assert 'private failure detail' not in public

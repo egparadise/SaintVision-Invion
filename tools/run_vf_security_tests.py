@@ -30,6 +30,17 @@ class _HarnessUnavailable(RuntimeError):
     product/test failure, so it must be recorded as such rather than reported as one."""
 
 
+def _safe_failed_case_id(case):
+    """Return an attributable pytest node id without parameter values."""
+    classname = case.get('classname') or ''
+    name = (case.get('name') or '').split('[', 1)[0]
+    if not re.fullmatch(r'[A-Za-z0-9_.]+', classname):
+        return None
+    if not re.fullmatch(r'[A-Za-z0-9_]+', name):
+        return None
+    return classname + '::' + name
+
+
 def assess_evidence(xml, subprocess_code):
     """Validate this run's report; completeness of a requested suite is a separate gate."""
     if not xml.is_file():
@@ -52,6 +63,12 @@ def assess_evidence(xml, subprocess_code):
             c.get('classname') or 'unknown'
             for c in cases
             if c.find('failure') is not None or c.find('error') is not None
+        })
+        result['failedCaseIds'] = sorted({
+            case_id
+            for c in cases
+            if c.find('failure') is not None or c.find('error') is not None
+            if (case_id := _safe_failed_case_id(c)) is not None
         })
     except (ET.ParseError, ValueError):
         return {**result, 'evidenceStatus': 'invalid'}
