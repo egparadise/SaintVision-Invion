@@ -1,21 +1,28 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.166"
+version: "1.0.167"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T19:05:00+09:00"
+updated: "2026-09-22T19:25:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 Frontend 경로 필터 교정 + PR #51 교차검토
+
+- Claude hosted triage의 integration Frontend 1회 관측을 재검토했다. push의 `paths`를 제거해 main/integration에서는 모든 SHA에 Frontend가 실행되게 했고, PR filter에는 실제 import 뿌리 `packages/contracts-ts/**`를 추가했다. 기존 `contracts/**`는 공유 schema·fixture를 이미 덮으며, docs route-coverage 배선은 PR에서 Documentation 소유이고 integration에서는 path filter 제거로 Frontend도 실행된다.
+- PR #51 head `ec58e0c1`은 실제 `.env` PostgreSQL + `TestClient(create_app(...))` 단일 파일에서 **8 passed / 0 skipped / exit 0 / 17.29s**였다. 제품 POST route, idempotency, 409/403, failed-only, `requiresFrozenInputAndApproval`, lineage·lease 영속을 확인해 시험·증거 PR로 승인했다. 코멘트: https://github.com/egparadise/SaintVision-Invion/pull/51#issuecomment-5774858320
+- PR #51 F1은 타 tenant가 기대 4xx 대신 `503 SYS-0001`을 받는 현재 backend 분류 오류다. child·lineage 유출은 없고 PR이 명시 pin해 숨기지 않으므로 검증 PR에는 비차단이지만, backend 후속에서 `RES-0004`/`AUTH-0030` 계열로 고쳐야 한다. 현재 PR conflict 재기반 중 시험 blob 변경 시 재검토한다.
+- 상세: [[2026-09-22_frontend_경로필터_교정_PR51_교차검토_Codex]].
 
 ## 2026-09-22 task_84d2b7804299 — 커널·계약·CI와 후속 reviewer 판정
 
 - 기준선 `d01c931a`; owner Codex, 독립 검토 Claude. 코드 착지: `881f2911`, `1312e295`, `eceac8cf`, `dcf2b94`, `51d53b7f`, `2aa80899`, `2e803cd6`, `4b2204d7`, `7509f667`, `33283867`, `9f1c0fcc`, `563c54ce`. reviewer 착지: `3882496d`.
 - 완료한 것: 5-workflow 실제 실행·red 귀속, Codex CI/harness 보정, EvidenceEnvelope 실PG 5-site 서빙 거부, docs 계약·프런트 게이트/UTF-8, 결정 #2/#5 계약, fixture reachability report-only, 결정 #6a 실패 model Run 재시도 HTTP 계약. F-A/F-B는 `33283867`에 반영했다.
 - 검증: 6a clean tree focused 68 passed, 실PG HTTP 1 passed, bindings 51 fixtures/16 response types/19 sites, app anchor 3 rejection-tested/0 gaps, Go build·vet·test, TS strict, docs/frontend/ontology/ratchet 모두 exit 0. Core [35706465645](https://github.com/egparadise/SaintVision-Invion/actions/runs/35706465645)는 전체 단계 success, Browser [35710556600](https://github.com/egparadise/SaintVision-Invion/actions/runs/35710556600)도 success다.
-- 교차검토: Node resource usage의 grant·신선도·`released_at IS NULL` lease 집계·RES-0010/0011에 finding 없음. Frontend path filter는 현재 실제 의존 뿌리를 모두 덮고 `563c54ce` contracts 변경에서 run 35710325340이 실제 success했으므로 machinery 변경 없이 유지한다.
+- 교차검토: Node resource usage의 grant·신선도·`released_at IS NULL` lease 집계·RES-0010/0011에 finding 없음. 당시 Frontend filter가 실제 의존 뿌리를 모두 덮는다고 판단했으나 `packages/contracts-ts/**` 직접 import와 integration all-5-same-SHA 요구를 누락했다. 위 경로 필터 교정 카드가 이 결론을 대체한다.
 - reviewer 판정: S02-DB/S03-DB는 review 진입만 수용했다. 실 IdP·물리 Node·실 컨테이너 금지 명령/출력·선행 카드가 남아 있어 done/self-close 금지다. registry·ontology 및 판정 History는 `3882496d`.
 - 다음 첫 행동: 최종 문서 SHA에 frontend를 수동 dispatch해 다섯 workflow를 동일 SHA로 완주시키고 run ID를 기록한 뒤 Obsidian check/apply를 수행한다. hosted 결과가 red면 소유 분류 후 Codex 몫만 수정한다.
 - Evidence: [[2026-09-22_18-37-00_KST_CODEX-KERNEL-CI-CONTRACT_Codex_최종보고]], [[2026-09-22_18-27-37_KST_S02-DB_S03-DB_Codex_독립검토]].

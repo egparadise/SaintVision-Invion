@@ -1,10 +1,10 @@
 ---
 doc_id: "GOV-GIT-001"
 title: "Git Build Obsidian 운영 절차"
-version: "1.1.3"
+version: "1.1.4"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-22T18:08:00+09:00"
+updated: "2026-09-22T19:25:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -46,6 +46,8 @@ Core Build는 PostgreSQL, Go race, Docker 이미지와 Python 통합 시험을 �
 - `main` 또는 `integration/all-agents-unified`에 push한다. 이 두 공유 branch의 Core는 항상 실행하며 취소하지 않는다.
 
 Backend, Documentation, Frontend는 PR에서 계속 자동 실행한다. Desktop Browser도 기존 PR 자동 실행을 유지한다. 개인 branch push 자체는 여전히 workflow 증거가 아니며, PR event에서 생성된 run 또는 공유 branch push run만 해당 SHA의 hosted 증거로 기록한다. Core가 필요한 PR은 최종 검토 전에 `run-core`를 붙이고 run ID·SHA·결론을 남긴다. label 없는 PR의 skipped Core job을 통과 증거로 쓰지 않는다.
+
+Frontend는 `main`/`integration/all-agents-unified` push에서 path filter를 두지 않고 항상 실행해 다섯 workflow의 같은-SHA 증거를 만든다. PR에서는 실제 입력 뿌리인 `apps/web/**`, `contracts/**`(공유 schema·fixture), `packages/contracts-ts/**`와 frontend workflow 변경에 실행한다. `docs.yml`의 route-coverage 배선처럼 frontend 빌드 입력이 아닌 문서 workflow 변경은 PR에서는 Documentation이 검증하되, integration 착지 뒤에는 Frontend도 항상 실행한다.
 
 ## 현재 사용 가능한 명령
 
