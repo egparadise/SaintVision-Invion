@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "scope": "Reviewed exceptions to collect_rls_evidence.py expectations. An entry silences the listed rules for one (role, table) and is reported under 'accepted' with its reason. Anything not listed here stays a violation (exit 1).",
+  "accepted": [
+    {
+      "role": "inv_app",
+      "table": "public.tenants",
+      "rules": ["E2", "E3", "E4", "E5"],
+      "reason": "Tenant registry: the row is the tenant, so no tenant_id scope applies. 0001_s02_baseline grants SELECT to inv_app on purpose. Cross-tenant enumeration of slug/display_name remains a design observation for Codex.",
+      "since": "0001_s02_baseline"
+    },
+    {
+      "role": "inv_discovery_issuer",
+      "table": "public.tenants",
+      "rules": ["E2", "E3", "E4", "E5"],
+      "reason": "0045_discovery_machine_credentials grants SELECT(tenant_id) only, to validate tenant existence while issuing machine credentials.",
+      "since": "0045_discovery_machine_credentials"
+    },
+    {
+      "role": "inv_discovery_issuer_guard",
+      "table": "public.discovery_credential_issue_budgets",
+      "rules": ["E2"],
+      "reason": "0045 budget guard role reads issue budgets across tenants to enforce the issuer budget trigger; it is NOLOGIN and used only by the budget trigger function.",
+      "since": "0045_discovery_machine_credentials"
+    }
+  ]
+}
