@@ -1,12 +1,14 @@
 """Actual PostgreSQL authorization, atomic evidence and durable nonce consumption."""
 
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from types import SimpleNamespace
 from uuid import uuid4
 import hashlib
 
 import psycopg
 import pytest
+import inv.storage_commit as storage_commit
 from inv.approvals import Principal
 from inv.errors import DomainError
 from inv.ids import new_id
@@ -154,6 +156,22 @@ def test_atomic_existing_evidence_and_check_without_run_completion(sample):
         assert not check["detail"]["operationalAcceptanceAssessed"]
     assert accept(a, envelope) == {**result, "replayed": True}
     assert counts(a) == (1, 1, 1)
+
+
+def test_generated_evidence_envelope_is_rejected_before_storage_commit(sample, monkeypatch):
+    """The storage write path must reject a malformed envelope it generated itself."""
+    a = sample
+    _, envelope = prepare(a)
+    original = storage_commit.verify_sample
+
+    def malformed(*args, **kwargs):
+        return replace(original(*args, **kwargs), payload_sha256="not-a-sha256")
+
+    monkeypatch.setattr(storage_commit, "verify_sample", malformed)
+
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        accept(a, envelope)
+    assert counts(a) == (0, 0, 0)
 
 
 def test_storage_commit_rejects_invalid_EvidenceEnvelope_atomically(sample, monkeypatch):

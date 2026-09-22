@@ -121,6 +121,9 @@ def validate_manifest(value, action):
     except ProvisioningDenied:
         raise
     except Exception:
+        # Manifest validation is a pure input boundary.  No database operation
+        # occurs here, so malformed values are intentional refusals rather than
+        # database or internal failures.
         raise ProvisioningDenied() from None
 
 
@@ -335,6 +338,9 @@ def provision(dsn, root, manifest, action, *, apply=False):
     except ProvisioningDenied:
         raise
     except CredentialDenied:
+        # The runtime file adapter intentionally exposes one fail-closed error
+        # for unsafe ownership, modes, links, substitutions, and size.  Those
+        # are policy refusals at this operator boundary, not internal defects.
         raise ProvisioningDenied() from None
     except psycopg.Error as error:
         raise ProvisioningDatabaseError(getattr(error, "sqlstate", None)) from None
@@ -375,7 +381,10 @@ def main():
         result = provision(dsn, args.root, manifest, args.action, apply=args.apply)
         print(json.dumps(result))
         return 0
-    except (ProvisioningDenied, json.JSONDecodeError, UnicodeDecodeError):
+    except (ProvisioningDenied, OSError, UnicodeError, json.JSONDecodeError):
+        # Missing, unreadable, non-UTF-8, and malformed manifests are all
+        # untrusted input.  Keep the fixed refusal label and never echo paths or
+        # payload fragments.
         print(json.dumps({"error": "credential_provisioning_refused"}))
         return EXIT_REFUSED
     except ProvisioningDatabaseError as error:
