@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+check_contract_bindings 단위 선언 (Claude, 2026-09-22): (2) 서빙앵커 게이트 출력을 타입/자리 단위 명시로 정직화(게이트 로직 불변). 14 타입/17 자리/다중자리 목록(EvidenceEnvelope 5자리)·자리별 시험은 정적 불가 명시·회귀 아닌 정확화 주석. 어젯밤 check_anchor_weight 범위선언과 같은 교정. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
+
 check_anchor_weight 범위 자기선언 (Claude, 2026-09-22): 도구 출력이 범위를 먼저 말하게 보강 — 스캔 7모듈·타입단위(fresh/replay 못가름)·범위밖 replay 앵커 자기측정(2b 권위)·in-scope replay 별표. 좁은 범위 유지 이유 docstring 기록, --modules opt-in. 자기시험 4 passed. 두 도구 보완관계 명문화. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
 
 check_anchor_weight 전수 적용 (Claude, 2026-09-22): tip에 실전 실행. 진짜 구멍=EvidenceEnvelope(앵커5·시험0, Codex 인계), 괜찮음=called-only 7(계약 거부 시험 있음), 애매=서빙거부 시험 필요여부(변이). replay12 대보기로 도구 사각 확인(scope 7모듈·타입단위라 replay 분기 못 봄→Codex 2b+negative-prior 소관). 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].

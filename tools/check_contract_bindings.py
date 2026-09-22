@@ -95,6 +95,31 @@ def _kernel_response_anchors() -> dict[str, str]:
     return anchors
 
 
+def _anchor_sites() -> dict[str, list[str]]:
+    """type -> module basename PER anchor call-site (NOT deduped). len() is the site count.
+
+    `_kernel_response_anchors` keeps one module per type (setdefault), so "N types each have a serving-
+    anchor test" says nothing about types anchored at MULTIPLE sites where only one site is tested
+    (e.g. EvidenceEnvelope is validated on 5 serving paths). This exposes the site count so the passing
+    line cannot read broader than the sites actually covered. Site->test mapping is not statically
+    decidable (same limit as branch granularity), so per-site test coverage is deferred, not claimed.
+    """
+    # Scan ALL inv modules (not just SERVING_MODULES) so the site count is not undercounted: a response
+    # like EvidenceEnvelope is anchored on 5 serving paths, 4 of them outside SERVING_MODULES. The GATE
+    # stays serving-module-scoped (`enforced`), but the reported site count reflects the true total.
+    sites: dict[str, list[str]] = {}
+    if not INV.is_dir():
+        return sites
+    for path in sorted(INV.glob("*.py")):
+        joined = re.sub(r"\n\s*", " ", path.read_text(encoding="utf-8"))
+        for m in _CHECKED.finditer(joined):
+            sites.setdefault(m.group(1), []).append(path.name[:-3])
+        for m in _VALIDATE.finditer(joined):
+            if m.group(2) in RESPONSE_ARGS:
+                sites.setdefault(m.group(1), []).append(path.name[:-3])
+    return sites
+
+
 def _bound_contract_names() -> set[str]:
     """Contract names that appear in a contract test (paired with a shared fixture there).
 
@@ -213,13 +238,31 @@ def validate(root: Path = ROOT) -> None:
         name for name in (bound & contract_types) if not _is_served(name)
     )
 
+    sites = _anchor_sites()
+    enforced_sites = sum(len(sites.get(n, [])) for n in enforced)
+    multi_enforced = {n: sites[n] for n in enforced if len(sites.get(n, [])) > 1}
+    multi_all = {t: ms for t, ms in sites.items() if len(ms) > 1}
+
     if errors:
         raise SystemExit("FAIL check_contract_bindings:\n  " + "\n  ".join(errors))
     print(
         f"PASS check_contract_bindings: {len(fixtures)} fixtures each referenced by a test; "
-        f"{len(enforced)} bound kernel responses each have a serving-anchor test; "
+        f"{len(enforced)} bound kernel response TYPES each have >=1 serving-anchor test "
+        f"(counted PER TYPE, not per anchor SITE: those types occupy {enforced_sites} anchor sites; a "
+        f"multi-site type counts covered even if only one site is tested -- site-level weight is not "
+        f"decidable here, use tools/check_anchor_weight.py + the mutation harness); "
         f"{sum(sum(v.values()) for v in REPLAY_GUARD_COUNTS.values())} replay guards present."
     )
+    if multi_all:
+        print(
+            "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an "
+            "untested site): "
+            + ", ".join(f"{t}({len(ms)} sites: {sorted(set(ms))})" for t, ms in sorted(multi_all.items()))
+        )
+        print(
+            "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; "
+            "this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+        )
     if dead:
         print("WARN dead contracts (report-only; owner must decide wire-or-remove):")
         for name in dead:
