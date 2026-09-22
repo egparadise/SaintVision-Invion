@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.199"
+version: "1.0.200"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T10:05:00+09:00"
+updated: "2026-09-23T12:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 Backend S05 lock-wait opt-in 수집 hotfix — 착지 요청
+
+- 일반 Backend pytest 수집은 `test_placement_lock_wait_diagnostic.py`를 전용 도구 환경이 없으면 fixture 생성 전에 정확한 사유 `run only through tools/placement_lock_wait_diagnostic.py`로 1건 skip한다. 전용 도구는 기존 `INV_S05_LOCK_WAIT_DIAGNOSTIC=1`을 주입하므로 승인된 두 wave 실행은 불변이다.
+- `backend.yml` skip 분포에 같은 사유 1건을 명시해 누락·증가를 모두 실패시키며 ratchet을 우회하지 않는다. 로컬 일반 수집은 1 skipped/exit 0이고, 제품 코드·계약·DB schema 변경은 없다.
+- 최신 integration tip 위 R1 착지를 요청한다. 착지 뒤 hosted Backend green을 확인하며, 이 hotfix는 카드 24 B′ 구현·실측과 별도 commit으로 유지한다.
 
 ## 2026-09-23 S07 Card23 5노드 실 Node adapter 사양
 

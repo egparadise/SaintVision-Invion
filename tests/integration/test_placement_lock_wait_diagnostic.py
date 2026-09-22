@@ -35,7 +35,14 @@ from test_placement_benchmark import (
 from test_postgres import planned
 from tools.placement_benchmark import percentile_nearest_rank, run_round
 
-pytestmark = pytest.mark.postgres
+_OPT_IN_REASON = "run only through tools/placement_lock_wait_diagnostic.py"
+pytestmark = [
+    pytest.mark.postgres,
+    pytest.mark.skipif(
+        os.getenv("INV_S05_LOCK_WAIT_DIAGNOSTIC") != "1",
+        reason=_OPT_IN_REASON,
+    ),
+]
 
 _LOG_RE = re.compile(
     r"process (?P<pid>\d+) (?P<event>still waiting for|acquired) "
@@ -308,9 +315,6 @@ def _server_segments(container: str, since_epoch: float, observer: DiagnosticObs
 
 
 def test_approved_legacy_lock_wait_wave(placement_benchmark_env):
-    assert os.getenv("INV_S05_LOCK_WAIT_DIAGNOSTIC") == "1", (
-        "run only through tools/placement_lock_wait_diagnostic.py"
-    )
     phase = os.environ["INV_S05_LOCK_WAIT_PHASE"]
     assert phase in {"legacy", "fk-dropped"}
     assert placement_benchmark_env.request_count == 20

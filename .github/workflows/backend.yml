@@ -167,6 +167,9 @@ jobs:
               # collect_container_evidence.py local Docker probe: the hosted runner has no
               # python:3.12-slim image; the collector itself reports that lane as UNMEASURED.
               'docker or local image python:3.12-slim unavailable': 1,
+              # S05 lock-wait evidence is a separately approved two-wave diagnostic.
+              # Normal Backend collection must expose, but never execute, that load.
+              'run only through tools/placement_lock_wait_diagnostic.py': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
