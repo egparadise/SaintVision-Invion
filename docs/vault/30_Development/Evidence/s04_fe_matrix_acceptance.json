@@ -1,13 +1,13 @@
 {
   "schema": "https://saintvision.ai/evidence/s04-fe-matrix.schema.json",
   "version": "1.1.0",
-  "timestamp": "2026-09-23T02:40:49.254823+09:00",
-  "gitCommitSha": "8e719b7a41ea4549907402cda2d93d22fcc1560b",
+  "timestamp": "2026-09-23T04:20:51.941226+09:00",
+  "gitCommitSha": "07c9053a60294a2b58d9480482a53867fac7dbc2",
   "assessment": "UNMEASURED",
   "operationalAcceptanceAssessed": false,
   "environment": {
     "os": "nt",
-    "python": "3.14.7",
+    "python": "3.10.11",
     "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "backendPort": 8080,
     "idpPort": 8090,
@@ -30,73 +30,73 @@
       "id": "s04-exp-01-approval-expired-trans",
       "name": "승인 안건 만료 상태 전이 및 액션 차단",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-exp-02-stale-polling-banner",
       "name": "폴링 지연 침묵 노화 방어 배너 및 신선도 시각 표출",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-exp-03-server-403-auth-0031",
       "name": "승인 시효 만료 서버 403 AUTH-0031 거부 표출",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-cnc-01-terminal-run-rejection",
       "name": "단말 상태 취소 차단 및 기취소 안건 멱등 200 Replay",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-cnc-02-strict-wire-cancel-input",
       "name": "ADR-001 표준 사유 모달 및 엄격한 RunCancelInput 전송",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-cnc-03-lease-release-observation",
       "name": "자원 반환 대기 배너 노출 및 관측 재조회",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-dup-01-double-click-200-replay",
       "name": "승인 버튼 더블클릭 방어 및 200 Replay",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-dup-02-key-collision-nonce-separation",
       "name": "Idempotency-Key 충돌 및 1회용 Nonce 재사용 차단 분리",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-dup-03-two-person-rule-defense",
       "name": "2인 승인 규칙 자가승인 및 동일인 중복 승인 차단",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-sse-01-ring-buffer-dedup",
       "name": "1,000건 링버퍼 at-least-once 중복 제거",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-sse-02-last-event-id-resume",
       "name": "Last-Event-ID 커서 기반 스트림 재개 및 범위 검증",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     },
     {
       "id": "s04-sse-03-monotonic-sequence-timeline",
       "name": "이벤트 sequence 단조 증가 및 타임라인 렌더링",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Scenario pending execution in current lane"
     }
   ],
   "summary": {
