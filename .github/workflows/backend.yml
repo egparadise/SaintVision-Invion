@@ -164,6 +164,9 @@ jobs:
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
               'antigravity is not installed on this machine': 1,
+              # collect_container_evidence.py local Docker probe: the hosted runner has no
+              # python:3.12-slim image; the collector itself reports that lane as UNMEASURED.
+              'docker or local image python:3.12-slim unavailable': 1,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
