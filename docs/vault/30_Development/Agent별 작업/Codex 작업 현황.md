@@ -4,11 +4,13 @@ title: "Codex 작업 현황"
 version: "1.0.170"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T20:19:51+09:00"
+updated: "2026-09-22T20:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+- **hosted Core 컨테이너 opt-in**: PR [#59](https://github.com/egparadise/SaintVision-Invion/pull/59), exact head `0d02f343`, run [35720205341](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720205341) success — role guard 13 + server 8 + config 2를 실행 전환해 JUnit **3065 passed / 35 skipped / 0 failed**; Claude review pending. 상세: [[2026-09-22_hosted_Core_컨테이너_opt-in_검증_Codex]].
 
 ## 2026-09-22 VF-CL-02(c) 실행 Manifest 관측 + model-retry F1
 
