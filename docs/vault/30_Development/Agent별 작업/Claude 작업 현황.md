@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.19"
+version: "1.2.20"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T05:45:00+09:00"
+updated: "2026-09-23T06:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+PR #94 S04-FE 러너 13 시나리오(Antigravity a86c6132) 독립 검토 → **수정 요청** (Claude, 2026-09-23, 카드 ff): 프로덕션 변경 0·`page.route` 0·계약 문구(AUTH-0050 401·AUTH-0031 403·cancel expectedVersion+Idempotency-Key·IDEM-0001 409·Last-Event-ID STREAM-0001) 그대로 단언은 성립. F1 evidence `gitCommitSha 07c9053a` 도달 불가·python 3.10·exp-00 PASS는 #87 실행값 바이트 동일 carry-over 재도장(04:20 실행은 시나리오 0건)·자체 중지 사유 미기록; F2 자기 주입 DOM 단언 3(EXP-02 stale 배너·CNC-03 반환 배너·SSE-01 RingBuffer 재구현); F3/F4 상수·공허 단언(statusInDom·lifecycleSteps·sse-03 `len≤1→True`·cnc-01 전체 페이지 count 0); F5 재현으로 확인한 러너 결함(예외 경로 UnboundLocalError로 evidence 미기록, Vite 자식 누수+stale 포트 재사용, psutil 부재 시 가드 비활성, FAIL record 부재, exp-01 탭 클릭 overlay 차단). 브라우저 재현 1회: exp-00 PASS(실 wire)·exp-01 FAIL·11 UNMEASURED. 보안(admin DSN dev DB 시드·reconciler 우회)은 Codex 위임. [[2026-09-23_06-45-00_KST_PR94_S04-FE_러너_13시나리오_a86c6132_독립검토_Claude]] (PR agent/claude/review-pr94)
 
 Codex 카드 15 독립 검토 → **승인** (Claude, 2026-09-23, 카드 ee, docs-only): 0dd6842c 5노드 lane v1.4 — ADR-100 분류(등록 5 all-five smoke / CP 독립 Ubuntu 4 timed wave, 6 count 동반)·co-location 유도 검증(`coLocationValidation` mismatch/unmeasured 차단, 카드 17 O1/O3 해소)·결정 (b) 권한 분리(legacy 20×3만, candidate/50 `UNAUTHORIZED/NOT_RUN`, decision_sha 9dafbf09 조상 검사, 잔존 양 모드 문구 0)·카드 20 큐 깊이 관찰 인용(실행 승인 아님)·schema 1.5 필드 실재(tests/integration/test_placement_benchmark.py 361행)·랩 준비표 vs 실제 파일럿(3 Node, .143 online, CP 겸임 미등록 = 차단 조건 2) 모순 없음. 관찰 4(O1 schema 1.5 정본은 integration test 증강이고 tool CLI는 1.1.0, O2 조건 ② 감소→비증가는 타당·지도 §14.1 후속 정정, O3 History 카드 14/16 수치 라벨, O4 S07 UNMEASURED 표기 잔존). [[2026-09-23_05-40-00_KST_Codex카드15_5노드_lane_v1.4_0dd6842c_독립검토_Claude]] (PR agent/claude/review-codex-card15)
 
