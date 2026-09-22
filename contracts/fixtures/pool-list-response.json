@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "poolId": "pool_contract_training",
+      "projectId": "prj_contract",
+      "name": "Training pool",
+      "status": "active",
+      "memberCount": 2
+    }
+  ],
+  "count": 1
+}

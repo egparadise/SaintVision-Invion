@@ -544,6 +544,23 @@ class PlacementPreviewResponse(Strict):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
 
+class PoolListItemResponse(Strict):
+    pool_id: str = Field(alias="poolId")
+    project_id: str = Field(alias="projectId")
+    name: str
+    status: Literal["active", "archived"]
+    member_count: int = Field(ge=0, alias="memberCount")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class PoolListResponse(Strict):
+    items: list[PoolListItemResponse]
+    count: int = Field(ge=0)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
 class PoolCreatedResponse(Strict):
     pool_id: str = Field(alias="poolId")
     name: str

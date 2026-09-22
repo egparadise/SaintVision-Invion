@@ -312,6 +312,15 @@ def decline(
     return {"announcementId": row.announcement_id, "state": row.state}
 
 
+@router.get("/pools", response_model=schemas.PoolListResponse)
+def list_pools(
+    principal: Principal = Depends(get_principal),
+    session: Session = Depends(get_session),
+) -> dict:
+    """List tenant pools; capacity remains a separate time-sensitive read."""
+    return pool_service.list_pools(session, tenant_id=principal.tenant_id)
+
+
 @router.post("/pools", status_code=201, response_model=schemas.PoolCreatedResponse)
 def create_pool(
     payload: schemas.PoolRequest,

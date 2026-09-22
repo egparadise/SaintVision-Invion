@@ -35,6 +35,7 @@ import type { DiscoveryDeclineResponse } from '@/contracts/discovery-decline-res
 import type { HeartbeatAcceptedResponse } from '@/contracts/heartbeat-accepted-response';
 import type { NodeLivenessSweepResponse } from '@/contracts/node-liveness-sweep-response';
 import type { PoolCapacityResponse } from '@/contracts/pool-capacity-response';
+import type { PoolListResponse } from '@/contracts/pool-list-response';
 import type { PlacementPreviewResponse as PlacementPreviewWireResponse } from '@/contracts/placement-preview-response';
 import type { DistributedPlanResponse } from '@/contracts/distributed-plan-response';
 export type { DistributedPlanResponse };
@@ -46,6 +47,10 @@ export type StorageContribution = ContributionResponse;
 export type StorageLocation = DataLocationResponse;
 
 export type PoolCapacity = PoolCapacityResponse;
+
+export async function getPoolList(): Promise<PoolListResponse> {
+  return apiClient<PoolListResponse>('/v1/pools');
+}
 
 /** UI view mapped from the generated placement-preview wire contract. */
 export interface PlacementPreviewResponse {

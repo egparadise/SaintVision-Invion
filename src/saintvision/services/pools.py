@@ -297,6 +297,31 @@ def pool_members(session: Session, *, tenant_id: uuid.UUID, pool_id: str) -> lis
     )
 
 
+def list_pools(session: Session, *, tenant_id: uuid.UUID) -> dict[str, Any]:
+    """Return the tenant's pool inventory without inventing capacity values.
+
+    Capacity is time-sensitive and has its own endpoint. The inventory route
+    intentionally returns identity and membership count only so a caller cannot
+    mistake a list snapshot for a capacity observation.
+    """
+    rows = session.scalars(
+        select(ResourcePool)
+        .where(ResourcePool.tenant_id == tenant_id)
+        .order_by(ResourcePool.created_at, ResourcePool.pool_id)
+    ).all()
+    items = [
+        {
+            "poolId": pool.pool_id,
+            "projectId": pool.project_id,
+            "name": pool.name,
+            "status": pool.status,
+            "memberCount": len(pool_members(session, tenant_id=tenant_id, pool_id=pool.pool_id)),
+        }
+        for pool in rows
+    ]
+    return {"items": items, "count": len(items)}
+
+
 def pool_capacity(
     session: Session, *, tenant_id: uuid.UUID, pool_id: str, now: dt.datetime
 ) -> dict[str, Any]:

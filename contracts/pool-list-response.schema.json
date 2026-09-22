@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "$defs": {
+    "PoolListItemResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "poolId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "name": { "type": "string" },
+        "status": { "enum": ["active", "archived"] },
+        "memberCount": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["poolId", "projectId", "name", "status", "memberCount"]
+    }
+  },
+  "properties": {
+    "items": { "type": "array", "items": { "$ref": "#/$defs/PoolListItemResponse" } },
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["items", "count"]
+}

@@ -30,20 +30,21 @@ source_of_truth: "Git"
 
 ## 정본을 만들지 않고 인계한 공백
 
-1. **`/v1/pools` 목록**: 현재 백엔드에 해당 GET 라우트와 정본 스키마가 없다. `PlacementSimulator`가 이 경로를 호출하지만, producer가 없는 응답 타입을 새로 만들면 존재하지 않는 계약을 고정하게 된다. 백엔드 producer와 화면 요구를 먼저 결정해야 한다.
+1. **`/v1/pools` 목록**: 감사 시점에는 백엔드 GET 라우트와 정본 스키마가 없었고 `PlacementSimulator`가 이 경로를 호출하고 있었다. 이 실제 404를 닫기 위해 tenant-scoped `PoolListResponse`(poolId/projectId/name/status/memberCount)와 FastAPI 서빙 앵커를 추가했다. 화면은 아직 legacy `id`·용량 필드를 기대하므로 Gemini가 canonical adapter로 전환해야 한다. 용량은 시점이 있는 별도 `/capacity` 응답을 사용하며 목록에 합성하지 않는다.
 2. **PlacementSimulator 후보 확장 필드**: 화면의 `availableCores`, `availableMemoryBytes`, `gpuCount`, `healthStatus`는 discovery 후보 producer가 반환하는 `claimed*`, `state`, `verified`와 다르다. 이는 계약 누락이 아니라 producer와 화면 어휘의 불일치다. Gemini가 화면의 정직한 미제공 상태를 결정하고, 백엔드 계약은 실제 producer가 정해진 뒤 묶어야 한다.
 3. **Placement preview 직접 호출**: 정본 `placement-preview-response.schema.json`과 계약 어댑터는 이미 있다. `PlacementSimulator`가 inline generic으로 직접 호출하는 것은 화면 레인의 배선 정리 대상이며, Codex가 새 UI 동작을 바꾸지 않았다.
 4. **EvidenceViewer의 `apiClient<any>`**: 정본 `RunResultView`는 존재한다. 해당 화면 파일의 타입 수렴은 Gemini에게 인계한다.
 
-따라서 RunItem 외에 추가로 발견된 **실제 정본 누락**은 이번 감사 범위에서 확인되지 않았다. 정본이 있던 여섯 응답은 어댑터에 연결했고, producer가 없는 두 경로는 추측 계약으로 만들지 않았다.
+따라서 RunItem 외에 추가로 발견된 **실제 정본 누락**은 pool 목록 하나였고, 이를 백엔드 producer·스키마·서빙 앵커로 보강했다. 정본이 있던 여섯 응답도 어댑터에 연결했고, discovery 후보 확장 필드처럼 producer가 없는 모양은 추측 계약으로 만들지 않았다.
 
 ## 확인
 
 - `npm run build` (cwd `apps/web`, SHA 작업 브랜치 기준) → exit 0
+- `C:\Project\SaintVision-Invion\.venv\Scripts\python.exe -m pytest -q tests/core/test_pool_placement_response_contract.py` (PYTHONPATH=src) → 24 passed, exit 0
 - 변경은 `apps/web/src/contracts`의 생성 타입과 계약 전용 어댑터에 한정했다.
 - 브라우저 인수와 실제 HTTP/DB 실행은 이 감사에 포함하지 않았다.
 
 ## 인계
 
-- Gemini: PlacementSimulator의 `/v1/pools` 및 후보 확장 필드가 실제 화면에서 무엇을 의미해야 하는지 결정하고, placement preview 직접 호출과 EvidenceViewer `any`를 정본 어댑터로 수렴할지 검토한다.
+- Gemini: PlacementSimulator를 새 `PoolListResponse`의 `poolId`/`projectId`/`status` 계약에 맞는 어댑터로 연결하고, 후보 확장 필드가 실제 화면에서 무엇을 의미해야 하는지 결정한다. placement preview 직접 호출과 EvidenceViewer `any`도 정본 어댑터로 수렴할지 검토한다.
 - Codex: 정본 producer가 생기면 해당 응답을 `contracts/*.schema.json`과 생성 타입·서빙 앵커·적합성 시험에 연결한다.

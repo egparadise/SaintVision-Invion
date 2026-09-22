@@ -44,6 +44,7 @@ def client(*, raise_server_exceptions: bool = True) -> TestClient:
 
 def test_all_pool_and_placement_serving_routes_declare_response_contracts():
     expected = {
+        ("GET", "/v1/pools"): schemas.PoolListResponse,
         ("POST", "/v1/pools"): schemas.PoolCreatedResponse,
         ("PUT", "/v1/pools/{pool_id}/members/{node_id}"): schemas.PoolMemberResponse,
         ("DELETE", "/v1/pools/{pool_id}/members/{node_id}"): schemas.PoolMemberRemovalResponse,
@@ -60,11 +61,16 @@ def test_all_pool_and_placement_serving_routes_declare_response_contracts():
         assert actual[key] is model, f"missing FastAPI response_model anchor: {key}"
 
 
-@pytest.mark.parametrize("route_name", ["capacity", "placement", "create", "remove", "plan"])
+@pytest.mark.parametrize("route_name", ["list", "capacity", "placement", "create", "remove", "plan"])
 def test_response_model_rejects_invalid_values_from_real_pool_routes(monkeypatch, route_name):
     """Exercise FastAPI response validation on the actual serving endpoints."""
     payload = fixture("pool-capacity-response.json")
-    if route_name == "capacity":
+    if route_name == "list":
+        payload = fixture("pool-list-response.json")
+        payload["items"][0].pop("poolId")
+        monkeypatch.setattr(pools.pool_service, "list_pools", lambda *_args, **_kwargs: payload)
+        response = client(raise_server_exceptions=False).get("/v1/pools")
+    elif route_name == "capacity":
         payload.pop("units")
         monkeypatch.setattr(pools.pool_service, "pool_capacity", lambda *_args, **_kwargs: payload)
         response = client(raise_server_exceptions=False).get("/v1/pools/pool_contract_training/capacity")
