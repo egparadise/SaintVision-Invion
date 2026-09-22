@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.6"
+version: "1.2.7"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T18:15:00+09:00"
+updated: "2026-09-22T18:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S02-DB·S03-DB 검토 인계 패키지 카드 5 (Claude, 2026-09-22): registry 사실 정정 — 둘 다 현재 **planned**(in_progress 2건은 S01-BE/ST) → 제안은 planned→review, **registry·ontology 무변경**(self-close 금지; 적용 시 Codex가 generate_ontology 재생성 필요, S01 stale 선례). AC-02↔증거 1:1(등록·조회/토큰 재사용 차단/타 tenant·project 차단/거부 기록 = test_api 28 + focused 63 = 91 passed d01c931a, 브라우저 여정 = Gemini Chrome153 3페이지, hosted Backend 35706465869 success) · AC-03↔증거(S03 세트 201 passed, 증거 없는 성공 DB 거부, EvidenceEnvelope 3자리 변이 KILLED, lease 회수 74). 미충족 표: 실 IdP·물리 노드(외부), 브라우저 인수 CI red(F-B), depends_on S01-BE/ST in_progress, node-runtime 24파일은 hosted Core 자리. 제안 diff 2건(275·403행). 전문 [[2026-09-22_18-25-00_KST_S02-DB_S03-DB_검토인계패키지_Claude]].
 
 카드 4 — node-dependent not_run 확정 + Docker-only skip 23건 실행 전환 (Claude, 2026-09-22, SHA 3d1892c0): 24파일은 이 Windows 호스트에서 **정직한 not_run**(inv-node가 Unix Docker 소켓만 허용 NODE-0021, 호스트는 npipe뿐·사용자 WSL 없음; 검증 자리=hosted Core CI, 이 PC 실행은 WSL2 Ubuntu 사용자 결정). 대신 skip 142 중 Docker만으로 가능한 것 전부 실행: role guard **13 passed**(postgres:16) · 후보 서버 컨테이너 **8 passed**(deploy/Dockerfile.backend 1회 빌드 `sha256:0886bab9…`, DB 172.17.0.2) · config volume **7 passed**(+2) — **business-kernel-role 등 옛 PC 미검증 이미지 레인 단언 전부 도달·통과**, 제품 보안 단언 실패 0, 잔재 컨테이너·볼륨 0·이미지 제거. 검증상태지도 §7(+§2.1/§3 닫힘). 전문 [[2026-09-22_17-52-00_KST_NODE-DEPENDENT-NOTRUN_Claude_실측]].
 
