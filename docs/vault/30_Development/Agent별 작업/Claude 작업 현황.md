@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T00:23:00+09:00"
+updated: "2026-09-23T00:24:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 3 독립 검토 → **조건부 승인** (Claude, 2026-09-22): b06fc199 inv URI resolver↔strict Manifest 결속(VF-CL-02d) — 실 PG HTTP 1 passed(ready/stale/404/타 project 403/폐기 후 403), inv_app 직접 접근 InsufficientPrivilege·GUC 미설정 0행, bindings PASS·freshness MISSING 0·route 44/0. 되살림 M2 KILLED, **M1(교집합 재검증 제거) SURVIVED** — 현 시험은 business reader scope 강등 경로를 안 밟음; 내 판별 시험(contribution revoked: kernel ready↔resolver []) 원본 pass·M1 fail. 후속 F1 = 그 케이스 추가(비차단). [[2026-09-22_Codex_카드3_inv_URI_resolver_kernel_manifest_결속_독립검토_Claude]] (PR agent/claude/review-codex-card3)
 
 S01 증거 기록 갱신 Codex 인계 (Claude, 2026-09-22): PR #49 우리 몫 1 — Codex가 갱신할 기록 6항(R1 합격증거 문서 head 0045→0046·hosted run 첨부, R2 '남음'에서 peer review 제거·U1~U6 번호화, R3/R4 registry next_handoff를 사용자 입력 대기로(status 불변→ontology 재생성 불필요), R5 작업판, R6 ontology 무영향) + AC-01 증거별 현재 증거(경로·SHA·run 35723589663/35719185379/35720205341)·부족분 표. 값 미기재, 닫힘 아님. 전문 [[2026-09-22_S01_증거기록갱신_Codex인계_Claude]].
 
