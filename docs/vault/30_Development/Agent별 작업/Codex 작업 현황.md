@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.200"
+version: "1.0.201"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T12:20:00+09:00"
+updated: "2026-09-23T12:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S07 Card17 커널 경로·등록 mTLS helper
+
+- 물리 AC-07은 실 heartbeat의 `inv.nodes` offline 전이와 `inv.shard_recovery`, receipt-bound output storage, `inv.shard_completion`을 잇는 커널 경로로 권고했다. core replica 하네스는 byte를 옮기지 않는 합성 개발 proxy이고 bridge는 측정을 위해 신설하지 않는다.
+- #101 strict inventory와 등록/mTLS read-only preflight를 `tools/five_node_lab_preflight.py`로 동작 보존 추출했다. report `tenantId` 제거, stale JSON 선삭제, inventory/report 동일 경로 fail-closed를 추가했다. focused 15 passed와 docs/bindings/frontend/ontology/ratchet/route/freshness 게이트가 exit 0이다.
+- `19/20`은 시연 점추정 0.95와 양측 95% exact 하한 약 0.751로 보고한다. 물리 이탈은 bounded `docker stop`/동일 container `docker start`만 허용하고 rm/prune/reboot를 금지한다. `--allow-four-node-pilot`은 future opt-in이며 5노드 인수로 승격하지 않는다.
+- 구현 `de8a9b7d`, PR #110, reviewer Claude. 실제 PG·Node·Docker·물리 wave는 미실행이고 S07-DB `review`, AC-07 미측정 유지. [[S07 5노드 실 Node adapter 사양]], [[2026-09-23_11-50-00_KST_S07_커널경로_등록mTLS_helper_Codex]].
 
 ## 2026-09-23 Backend S05 lock-wait opt-in 수집 hotfix — 착지 요청
 
