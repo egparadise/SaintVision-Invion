@@ -1084,40 +1084,67 @@ def run_acceptance(
                 print(f"\n[실행 시작] {current_scenario_id}: {current_scenario_name} (여유: {_avail:.2f}GB)", flush=True)
                 print(f"\n[Scenario 7/13] {current_scenario_id}: Real Resource Release Pending Observation")
 
-                # Insert an active lease in DB for r_active to genuinely trigger resourceReleasePending
-                with psycopg.connect(owner_dsn) as conn:
-                    with conn.cursor() as cur:
-                        cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
-                        cur.execute(
-                            """INSERT INTO inv.resource_leases(tenant_id, project_id, run_id, resource_id, leased_at, expires_at, released_at)
-                               VALUES (%s, %s, %s, %s, now(), now() + interval '1 hour', NULL)""",
-                            (tenant_id, project_id, r_active["runId"], new_id("rsc")),
-                        )
-                        conn.commit()
+                # Insert an active lease in DB for r_active to genuinely trigger resourceReleasePending (0001_core.sql compliant)
+                try:
+                    with psycopg.connect(owner_dsn) as conn:
+                        with conn.cursor() as cur:
+                            cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
+                            cur.execute("SELECT resource_id FROM inv.resources WHERE tenant_id=%s LIMIT 1", (tenant_id,))
+                            res_row = cur.fetchone()
+                            if res_row:
+                                target_res_id = res_row[0]
+                            else:
+                                test_node_id = new_id("nod")
+                                target_res_id = new_id("res")
+                                cur.execute(
+                                    """INSERT INTO inv.nodes(tenant_id, node_id, hostname, status, schedulable)
+                                       VALUES (%s, %s, 'runner-test-node', 'ready', true)
+                                       ON CONFLICT (tenant_id, node_id) DO NOTHING""",
+                                    (tenant_id, test_node_id),
+                                )
+                                cur.execute(
+                                    """INSERT INTO inv.resources(tenant_id, resource_id, node_id, kind, capacity, offered)
+                                       VALUES (%s, %s, %s, 'cpu', 1000, 1000)
+                                       ON CONFLICT (tenant_id, resource_id) DO NOTHING""",
+                                    (tenant_id, target_res_id, test_node_id),
+                                )
 
-                # Verify wire contract returns resourceReleasePending: true
-                st_run, body_run, _ = wire_call(f"/v1/projects/{project_id}/runs/{r_active['runId']}", method="GET")
-                assert st_run == 200
-                assert body_run.get("resourceReleasePending") is True
+                            lease_id = new_id("lse")
+                            epoch = str(uuid4())
+                            cur.execute(
+                                """INSERT INTO inv.resource_leases(
+                                       tenant_id, project_id, run_id, resource_id,
+                                       lease_id, amount, granted_at, expires_at, released_at,
+                                       recovery_epoch, stop_receipt
+                                   )
+                                   VALUES (%s, %s, %s, %s, %s, 1, clock_timestamp(), clock_timestamp() + interval '1 hour', NULL, %s, NULL)""",
+                                (tenant_id, project_id, r_active["runId"], target_res_id, lease_id, epoch),
+                            )
+                            conn.commit()
 
-                # Navigate to Runs tab to view the real run row in DOM
-                tab_runs = page.locator('[data-testid="header-tab-runs"]')
-                tab_runs.scroll_into_view_if_needed()
-                tab_runs.click(force=True)
-                page.wait_for_timeout(1000)
+                    # Verify wire contract returns resourceReleasePending: true
+                    st_run, body_run, _ = wire_call(f"/v1/projects/{project_id}/runs/{r_active['runId']}", method="GET")
+                    assert st_run == 200
+                    assert body_run.get("resourceReleasePending") is True
 
-                pending_badge = page.locator('span:has-text("반환 대기")')
-                badge_seen = pending_badge.is_visible()
+                    # Navigate to Runs tab to view the real run row in DOM
+                    tab_runs = page.locator('[data-testid="header-tab-runs"]')
+                    tab_runs.scroll_into_view_if_needed()
+                    tab_runs.click(force=True)
+                    page.wait_for_timeout(1000)
 
-                shot_cnc03 = output_dir / "s04_03_cancel_reclaim.png"
-                page.screenshot(path=str(shot_cnc03))
+                    pending_badge = page.locator('span:has-text("반환 대기")')
+                    badge_seen = pending_badge.is_visible()
 
-                # Clean up the lease row from DB
-                with psycopg.connect(owner_dsn) as conn:
-                    with conn.cursor() as cur:
-                        cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
-                        cur.execute("DELETE FROM inv.resource_leases WHERE run_id=%s", (r_active["runId"],))
-                        conn.commit()
+                    shot_cnc03 = output_dir / "s04_03_cancel_reclaim.png"
+                    page.screenshot(path=str(shot_cnc03))
+                finally:
+                    # Clean up the lease row from DB
+                    with psycopg.connect(owner_dsn) as conn:
+                        with conn.cursor() as cur:
+                            cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
+                            cur.execute("DELETE FROM inv.resource_leases WHERE run_id=%s", (r_active["runId"],))
+                            conn.commit()
 
                 scenario_records.append({
                     "id": current_scenario_id,
@@ -1446,6 +1473,7 @@ def run_acceptance(
                 "backendPort": backend_port,
                 "idpPort": idp_port,
                 "frontendPort": frontend_port,
+                "frontendStartedByRunner": bool(frontend_proc is not None),
             },
             "scenarios": scenario_records,
             "summary": {
@@ -1512,6 +1540,7 @@ def run_acceptance(
                     "backendPort": backend_port,
                     "idpPort": idp_port,
                     "frontendPort": frontend_port,
+                    "frontendStartedByRunner": bool(frontend_proc is not None),
                 },
                 "scenarios": scenario_records,
                 "summary": {
@@ -1541,7 +1570,7 @@ def run_acceptance(
         if frontend_proc:
             print("[Cleanup] Terminating Frontend Vite subprocess tree...")
             kill_proc_tree(frontend_proc)
-        free_port(frontend_port)
+        # N1: Process cleanup strictly limited to runner's own PID tree (no blind free_port killing)
 
 
 def main():
