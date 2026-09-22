@@ -202,6 +202,22 @@ def test_run_creation_anchor_rejects_an_invalid_state(monkeypatch):
         )
 
 
+def test_run_creation_replay_anchor_rejects_an_invalid_persisted_prior(monkeypatch):
+    """A malformed idempotency record cannot bypass the create response contract."""
+    expected = fixture("control-run-page-response.json")["items"][0]
+    invalid_prior = dict(expected)
+    invalid_prior["state"] = "not-a-run-state"
+    control = _control_with_rows(monkeypatch, [])
+    monkeypatch.setattr(control.approvals, "_ledger", lambda *_args, **_kwargs: invalid_prior)
+
+    with pytest.raises(DomainError, match="ControlRunView: invalid contract"):
+        control.create(
+            SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"])),
+            expected["projectId"],
+            "replay-invalid-prior",
+        )
+
+
 def test_parent_cancel_anchor_rejects_an_invalid_state(monkeypatch):
     """The shard-parent cancel response is a serving path, not only a fixture."""
     expected = fixture("control-run-page-response.json")["items"][0]

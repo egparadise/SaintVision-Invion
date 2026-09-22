@@ -24,11 +24,17 @@ Two structural checks, no human judgment required:
       gate), since the fix is a human decision (wire the endpoint vs remove the contract). Verified both
       ways: it flagged the now-removed legacy project envelope and does NOT flag live or nested-item contracts.
 
+  (2b) replay-anchor inventory -- the twelve audited idempotency replay branches must retain the
+      expected ``validate_contract(..., prior)`` call. This catches deletion of a replay guard,
+      but it does not by itself prove that the guard has runtime weight; the negative persisted-prior
+      test is deliberately kept separate for that proof.
+
 What this does NOT check (needs human judgment -- see the governance doc): whether a serving-anchor test
-actually exercises the path and fails when the anchor is removed (bears-weight); whether an anchor sits
-on the serving path vs an ingestion/verify-worker path (the ModelManifest lesson); whether a value that
-is shape-valid points at something real (the placeholder-identifier class). saintvision responses are
-anchored by FastAPI response_model (framework-enforced) and are out of this kernel-anchor check.
+actually exercises every replay branch and fails when the anchor is removed (the runtime-weight question);
+whether an anchor sits on the serving path vs an ingestion/verify-worker path (the ModelManifest lesson);
+whether a value that is shape-valid points at something real (the placeholder-identifier class).
+saintvision responses are anchored by FastAPI response_model (framework-enforced) and are out of this
+kernel-anchor check.
 """
 from __future__ import annotations
 
@@ -47,6 +53,25 @@ SERVING_MODULES = [
 ]
 # Argument names that mark a validate_contract call as validating a RESPONSE (not an input/id).
 RESPONSE_ARGS = {"result", "body", "response", "envelope", "evidence", "payload", "snapshot", "receipt", "prior"}
+
+# Replay guards are a stricter subset of serving anchors.  A stored idempotency
+# result is an untrusted persisted wire value, so each audited branch must keep
+# its contract check immediately after ``prior is not None``.  Counting these
+# guards prevents a refactor from silently leaving only the fresh path checked.
+REPLAY_GUARD_COUNTS = {
+    "control.py": {"ControlRunView": 1, "ControlRunDetail": 1},
+    "business_handoff.py": {
+        "BusinessEditLockView": 1,
+        "BusinessBindingView": 1,
+        "BusinessEditLockReleaseView": 1,
+    },
+    "approvals.py": {"ApprovalView": 1},
+    "workspace_api.py": {"WorkspacePrepareResult": 1, "WorkspaceEnqueueResult": 2},
+    "workspace_start.py": {
+        "WorkspaceStartPrepareResult": 1,
+        "WorkspaceStartEnqueueResult": 2,
+    },
+}
 
 # `_checked(` and `validate_contract(` may put the name on the next line; join for scanning.
 _CHECKED = re.compile(r'_checked\(\s*"([A-Za-z]+)"')
@@ -126,8 +151,32 @@ def _tests_naming(name: str) -> list[Path]:
     return [p for p in TESTS.rglob("*.py") if re.search(rf'"{name}"', p.read_text(encoding="utf-8"))]
 
 
+def _replay_guard_errors() -> list[str]:
+    """Return missing/mismatched checks on the twelve audited replay branches.
+
+    This is intentionally source-level: it is a guard against deleting an
+    otherwise hard-to-reach replay check during refactoring.  Runtime weight
+    is supplied by the negative-prior test in
+    ``tests/core/test_run_approval_observation_contract.py``.
+    """
+    errors: list[str] = []
+    for filename, expected in REPLAY_GUARD_COUNTS.items():
+        path = INV / filename
+        text = re.sub(r"\n\s*", " ", path.read_text(encoding="utf-8"))
+        for contract, count in expected.items():
+            pattern = rf"if prior is not None:\s+validate_contract\(\s*\"{contract}\"\s*,\s*prior\s*\)"
+            actual = len(re.findall(pattern, text))
+            if actual != count:
+                errors.append(
+                    f"(2b) replay guard {filename}:{contract} expected {count}, found {actual}"
+                )
+    return errors
+
+
 def validate(root: Path = ROOT) -> None:
     errors: list[str] = []
+
+    errors.extend(_replay_guard_errors())
 
     fixtures = sorted(FIXTURES.glob("*.json"))
     all_test_text = {p: p.read_text(encoding="utf-8") for p in TESTS.rglob("*.py")}
@@ -168,7 +217,8 @@ def validate(root: Path = ROOT) -> None:
         raise SystemExit("FAIL check_contract_bindings:\n  " + "\n  ".join(errors))
     print(
         f"PASS check_contract_bindings: {len(fixtures)} fixtures each referenced by a test; "
-        f"{len(enforced)} bound kernel responses each have a serving-anchor test."
+        f"{len(enforced)} bound kernel responses each have a serving-anchor test; "
+        f"{sum(sum(v.values()) for v in REPLAY_GUARD_COUNTS.values())} replay guards present."
     )
     if dead:
         print("WARN dead contracts (report-only; owner must decide wire-or-remove):")
