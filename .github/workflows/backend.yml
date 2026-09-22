@@ -139,10 +139,35 @@ jobs:
           python tools/node_dependent_tests.py | sed 's/^/  /'
           python -m pytest -q --strict-markers --junitxml=backend-tests.xml $IGNORES --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
 
-      - name: No PostgreSQL test was skipped
+      - name: Require executed evidence and declared platform skips
         run: |
           python - <<'PY'
+          from collections import Counter
           import xml.etree.ElementTree as ET
           root = ET.parse('backend-tests.xml').getroot()
-          assert not root.findall('.//skipped'), 'Backend tests must not be skipped'
+          assert root.findall('.//testcase'), 'No backend test evidence'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error')), 'Every executed backend test must pass'
+          # PostgreSQL is mandatory in this job.  The remaining skips require a
+          # different OS, an explicit image/container lane, or third-party
+          # agent CLIs.  Pin the exact reason/count map so skip remains visible
+          # evidence rather than being counted as success or allowed to grow.
+          expected_skips = Counter({
+              'PowerShell and csc.exe shim require Windows': 1,
+              'Explicit pinned local candidate image required': 2,
+              'Actual Windows PowerShell launcher': 10,
+              'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
+              'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
+              'Explicit candidate image and disposable container DB address required': 8,
+              'claude is not installed on this machine': 1,
+              'codex is not installed on this machine': 1,
+              'gemini is not installed on this machine': 1,
+              'antigravity is not installed on this machine': 1,
+          })
+          actual_skips = Counter(
+              (skipped.get('message') or '').strip()
+              for skipped in root.findall('.//skipped')
+          )
+          assert actual_skips == expected_skips, (
+              f'backend skip distribution drifted: expected={expected_skips}, actual={actual_skips}'
+          )
           PY
