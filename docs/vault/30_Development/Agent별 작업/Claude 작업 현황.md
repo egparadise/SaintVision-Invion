@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.18"
+version: "1.2.19"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T04:10:00+09:00"
+updated: "2026-09-23T05:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 15 독립 검토 → **승인** (Claude, 2026-09-23, 카드 ee, docs-only): 0dd6842c 5노드 lane v1.4 — ADR-100 분류(등록 5 all-five smoke / CP 독립 Ubuntu 4 timed wave, 6 count 동반)·co-location 유도 검증(`coLocationValidation` mismatch/unmeasured 차단, 카드 17 O1/O3 해소)·결정 (b) 권한 분리(legacy 20×3만, candidate/50 `UNAUTHORIZED/NOT_RUN`, decision_sha 9dafbf09 조상 검사, 잔존 양 모드 문구 0)·카드 20 큐 깊이 관찰 인용(실행 승인 아님)·schema 1.5 필드 실재(tests/integration/test_placement_benchmark.py 361행)·랩 준비표 vs 실제 파일럿(3 Node, .143 online, CP 겸임 미등록 = 차단 조건 2) 모순 없음. 관찰 4(O1 schema 1.5 정본은 integration test 증강이고 tool CLI는 1.1.0, O2 조건 ② 감소→비증가는 타당·지도 §14.1 후속 정정, O3 History 카드 14/16 수치 라벨, O4 S07 UNMEASURED 표기 잔존). [[2026-09-23_05-40-00_KST_Codex카드15_5노드_lane_v1.4_0dd6842c_독립검토_Claude]] (PR agent/claude/review-codex-card15)
 
 PR #89 Codex LAN pilot 다중 Node(fce4f6de) 독립 검토 → **조건부 승인** (Claude, 2026-09-23, 카드 dd): 보안 불변식 6항(키 미출력·source IP→해당 Node 번들만·허용 IP 목록·hash 비서빙·기존 Node/키/채널 교체 거부·부분 실패 보존) 코드 대조 ✔, 단일 Node state 하위 호환은 코디네이터 state 사본(v1 재구성)으로 PG-free 프로브 ✔(id/IP 보존·CSR CN 식별·legacy 경로·policy 무변경 수용·디스크 무변경), 새 시험 6 passed·LAN bootstrap 2 passed 1 skip. 되살림 4: M2(CN 무시)·M4(id 재발급) KILLED, **M1(비-primary legacy fallback)·M3(policy identity 불일치 수용) SURVIVED → 조건 = 시험 보강 2건**. Docker 실검증은 코디네이터 수행, PR CONFLICTING → rebase 후 SHA 재확인. [[2026-09-23_04-05-00_KST_PR89_LAN-pilot_다중Node_fce4f6de_독립검토_Claude]] (PR agent/claude/review-pr89)
 
