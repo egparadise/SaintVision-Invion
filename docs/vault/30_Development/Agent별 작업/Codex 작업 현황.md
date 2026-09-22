@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.188"
+version: "1.0.189"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T03:45:00+09:00"
+updated: "2026-09-23T04:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 5노드 lane v1.4
+
+- ADR-100 topology B를 실행 계획에 고정했다. 등록 Node 5개 중 Windows CP 겸임 Docker Node 1개는 all-five smoke만 수행하고, S05 timed candidate와 P95 분모는 CP 독립 Ubuntu 4대만 사용한다. co-location은 inventory 선언과 host/machine identity·Docker parent 유도값을 대조하며 mismatch/unmeasured면 차단한다.
+- 카드 18 결정 (b)에 따라 현재 물리 실행 권한은 inventory-bound legacy 20동시 × 3회 계획까지다. `placementShortCommit=false`, candidate와 50동시는 별도 승인 SHA 없이는 `UNAUTHORIZED/NOT_RUN`, S05-DB는 `review`를 유지한다.
+- Claude 카드 20은 대칭 계측과 결정 (b)를 승인했다. holder chain별 `lock_timeout` 재적용으로 얕은 legacy 큐와 깊은 candidate limits 큐의 차이를 설명할 수 있지만, candidate 재검토 전 도착 timeline·wait_event·queue depth 실측이 필요하며 이 승인을 실행 권한으로 승격하지 않는다.
+- evidence를 schema 1.5 `lockHold`·`lockAcquireWait`·mode별 wait·parameter-free `sqlDiagnostics`로 갱신했다. workflow/adapter는 미구현이고 메모리 경보에 따라 시험·빌드·브라우저·부하는 실행하지 않았다. [[2026-09-23_04-20-00_KST_S05_5노드_lane_v1_4_Codex]].
 
 ## 2026-09-23 S05 P1/P2 대칭 계측 · 결정 (b)
 
