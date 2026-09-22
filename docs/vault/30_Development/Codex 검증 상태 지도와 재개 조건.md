@@ -1,22 +1,28 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.25"
+version: "1.5.26"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T07:00:00+09:00"
+updated: "2026-09-23T08:45:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
 
+## 2026-09-23 S05-DB F-S05-02 기전 확인
+
+- Card21 `40b24329` 원본 legacy 20×1은 20/20·depth 1·transaction segment 190·tuple 0·Key Share+For No Key Update·timeout 0이었다. FK 하나만 제거한 새 disposable DB 대조군은 2/20·depth 19·tuple 최대 499.957ms·`55P03` 18이었다. 두 단일 파일 exit 0, DB/role 잔존 0.
+- 판정 `HYPOTHESIS_SUPPORTED`: idempotency FK RI KEY SHARE가 project `FOR NO KEY UPDATE` tuple FIFO를 우회하고 holder 교체별로 500ms timer를 재시작한다. 대기 합이 2초에 닿으면 `57014`; 선행 FK 잠금이 없는 candidate limits FIFO는 약 500ms `55P03` 경로다.
+- 재개 조건: Claude 카드 24가 하네스·evidence·v1.4 정책 초안을 검토하고 코디네이터가 별도 구현 카드를 승인한다. 그 전 B′/B/A 구현, flag on, 20동시 초과·50동시·5노드 실행 금지. S05 `review` 유지. [[2026-09-23_08-45-00_KST_S05_Card21_lock_wait_기전확인_Codex]], [[s05-lock-wait-card21-40b24329.json]].
+
 ## 2026-09-23 S05-DB log_lock_waits 진단 설계
 
-- Card19의 55P03 부재 원인은 계속 미확정이다. Claude 카드 21 probe는 idempotency FK가 project KEY SHARE를 먼저 잡아 tuple FIFO를 우회한다는 가설을 제시했지만 제품 인과로 승격하지 않았다.
-- 후속 설계는 disposable DB의 `log_lock_waits=on`, `deadlock_timeout=50ms`와 `pgrowlocks('inv.projects')`를 legacy 20×1에서 함께 수집한다. holder별 다른 xid wait/acquired 반복·tuple wait 0·다수 Key Share+하나 No Key Update·55P03 0을 모두 본 경우에만 `KEY_SHARE_RESET_SUPPORTED`다.
+- 이 절은 Card20 설계 시점의 역사 상태다. 당시 미확정이던 원인은 위 Card21 원본/FK-DROP 대조로 `HYPOTHESIS_SUPPORTED`에 도달했다.
+- 실행 설계 v1.2는 disposable DB의 `log_lock_waits=on`, `deadlock_timeout=10ms`, `backend_xid` alias와 `pgrowlocks('inv.projects')`, FK-DROP 20×1 대조군을 포함한다.
 - 실행 유효성은 승인 SHA·네 SHOW 값·request/backend 1:1·log pair completeness·pgrowlocks snapshot·DB/role/raw scratch 잔존 0이 모두 필요하다. sampler 5ms는 명목/실측 약 17ms를 병기하고, arrival 0.793ms는 client barrier 기준, DB 첫 Lock 표본 515ms, 외부 role/DB blocker는 invalid로 처리한다.
-- 정책 재개 조건: 확인 시험 뒤 별도 결정. 옵션 A는 limits `FOR NO KEY UPDATE` 전환과 기아/thundering herd 위험, 옵션 B는 FIFO queue 깊이 상한과 admission 원자성을 다룬다. workflow/runner/parser는 미구현, 실제 PG/부하는 미실행이며 Claude의 실수 50동시 수치는 사용하지 않는다. flag off·S05 `review`·candidate/50/5노드 금지 유지. [[S05 log_lock_waits opt-in 재실행 설계]].
+- 정책 재개 조건은 B′→B 우선 초안의 Claude 카드 24 검토다. A는 기전 확인용만 유지하며 flag off·S05 `review`·candidate/50/5노드 금지 유지. [[S05 log_lock_waits opt-in 재실행 설계]].
 
 ## 2026-09-23 S05-DB legacy 큐 깊이 실측
 

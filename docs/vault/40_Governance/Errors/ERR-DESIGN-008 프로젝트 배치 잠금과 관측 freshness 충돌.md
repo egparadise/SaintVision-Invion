@@ -1,11 +1,11 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.3.4"
+version: "1.4.0"
 status: "accepted-mitigation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T07:00:00+09:00"
+updated: "2026-09-23T08:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
@@ -14,7 +14,22 @@ tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgre
 # ERR-DESIGN-008 프로젝트 배치 잠금과 transaction timeout 경합
 
 > [!warning] 상태
-> 코디네이터 결정 (b): legacy 유지 · `placementShortCommit` 기본 off · S05-DB `review` · 단계 3 미통과 · 50동시와 물리 5노드 미측정. 카드 18 P1/P2 대칭 계측 완료, Claude 카드 20 검토 대기.
+> 코디네이터 결정 (b): legacy 유지 · `placementShortCommit` 기본 off · S05-DB `review` · 단계 3 미통과 · 50동시와 물리 5노드 미측정. Card21은 F-S05-02 잠금 큐 기전을 실험으로 지지했지만 정책 구현은 승인하지 않았다. 후속 v1.4 정책 초안은 B′→B 우선이며 Claude 카드 24 검토 뒤 별도 결정한다.
+
+## Card21 — F-S05-02 실험 지지 기전
+
+Card21은 같은 구현 SHA `40b24329`에서 PostgreSQL 16 disposable DB 두 개를 사용했다. 두 wave 모두 legacy 20동시×1, `log_lock_waits=on`, `deadlock_timeout=10ms`, `lock_timeout=500ms`, `statement_timeout=2s`였고, 대조군은 migration 파일이나 제품 코드를 바꾸지 않고 그 disposable DB의 `inv.idempotency → inv.projects` FK 하나만 제거했다.
+
+| wave | 성공/실패 | queue | server lock segment | `pgrowlocks` | SQLSTATE |
+|---|---:|---|---|---|---|
+| FK 있음 | 20/0 | waiter 19, depth 1 | transaction acquired 190, tuple 0, waiter별 holder 교체 0~18 | Key Share + For No Key Update, 103 snapshots | timeout 0 |
+| FK 제거 대조 | 2/18 | waiter 19, depth 19 | tuple 관측, 단일 최대 499.957ms | For No Key Update만, 4 snapshots | `55P03` 18 |
+
+판정은 `HYPOTHESIS_SUPPORTED`다. **idempotency INSERT의 FK RI KEY SHARE가 tuple-lock FIFO를 우회해 waiter가 holder xid를 직접 대기하고, holder 교체마다 `lock_timeout`이 다시 시작되므로 `55P03`이 0이 된다. 이 비FIFO 재경쟁의 대기 합이 `statement_timeout` 2초에 닿으면 과거 legacy wave에서 관측한 `57014`로 끝난다. candidate limits 행은 선행 FK 잠금이 없어 FIFO가 누적되고 한 대기 구간이 약 500ms에 닿아 `55P03`이 된다.**
+
+두 단일 파일은 exit 0이었고 20동시를 넘지 않았으며, disposable DB/role 잔존과 raw PID/xid/log·비밀 보존은 모두 0이다. Card21의 2575.213ms/982.737ms P95는 logging 진단 부수값이며 AC-05·후속 정책 성능 판정에 쓰지 않는다. 근거: [[S05 log_lock_waits opt-in 재실행 설계]] v1.2, [[s05-lock-wait-card21-40b24329.json]], Claude 카드 23 설계 검토, 후속 Claude 카드 24.
+
+정책은 기전 판정과 분리한다. [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.4 초안은 B′(candidate limits `lock_timeout` 약 1500ms) 뒤 B(project별 bounded semaphore)를 우선하며, A(`FOR NO KEY UPDATE` 전환)는 비FIFO 기아를 재현하는 기전 확인용으로만 둔다. 구현 전 상태는 flag off·S05 `review` 그대로다.
 
 ## 카드 18 P1/P2 — 대칭 계측과 SQL statement 귀속
 
@@ -27,17 +42,17 @@ legacy의 phase mark를 project limits 획득 뒤로 옮기고, 그 전 project+
 
 SQL observer는 candidate 12개 실패를 모두 `SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE`에 귀속했다. 두 mode 모두 fencing 유일성과 no-overbooking은 true다. hold 감소 방향은 보이지만 candidate survivor 8개와 legacy 20개를 한 번 비교한 값이므로 성능 통과 증거가 아니다. 외부 timeout 비증가 조건은 0→12로 실패한다.
 
-legacy의 acquire client elapsed가 500ms를 넘는데도 `55P03`이 없는 이유는 카드 18 wave 자체에 대해서는 **미확정**이다. 코드상 mode별 면제는 없고 양쪽 모두 같은 `SET LOCAL lock_timeout=500ms`, `statement_timeout=2s` 경로다. SQL observer elapsed는 server lock wait뿐 아니라 Python thread scheduling과 query return 지연을 포함하고 당시 backend wait-event timeline은 수집하지 않았다.
+legacy의 acquire client elapsed가 500ms를 넘는데도 `55P03`이 없는 이유는 카드 18 wave 자체만으로는 미확정이었다. 코드상 mode별 면제는 없고 양쪽 모두 같은 `SET LOCAL lock_timeout=500ms`, `statement_timeout=2s` 경로다. Card21이 그 빈칸을 위의 RI KEY SHARE→tuple FIFO 우회→holder별 timeout 재시작 기전으로 실험 지지했다.
 
 Claude 카드 20의 커널 무관 PG probe는 가능한 lock queue mechanism을 확인했다. holder chain depth 2에서는 `lock_timeout`이 서로 다른 대기 구간마다 다시 적용돼 waiter가 총 728ms 뒤 성공했고, depth 3에서는 앞선 holder 시간이 한 구간에 누적돼 각 holder가 500ms 미만이어도 `55P03`이었다.
 
-Card19 실제 legacy 20동시 wave는 arrival spread 0.793ms, max project-lock waiter 19, blocking chain depth 1, timeout 0이었다. 따라서 이 wave는 19 waiter가 현재 holder를 직접 기다리는 fan-in이지 카드 20의 depth≥3 holder chain이 아니다. request/acquire/hold P95는 2142.809/1588.193/151.225ms였지만 `55P03`은 0건이었다. `log_lock_waits=off`이고 server log를 읽지 않았으므로 원인은 여전히 **미확정**이다. holder 교체마다 실제 wait segment와 `lock_timeout` clock이 다시 시작돼 각 segment는 500ms 미만이고 누적 client elapsed만 길어졌다는 가설로 좁히며, `log_lock_waits=on` 상관 재실행은 별도 카드로 제안한다. [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]], [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]], [[s05-symmetric-metrics-card18]], [[s05-legacy-queue-card19]].
+Card19 실제 legacy 20동시 wave는 arrival spread 0.793ms, max project-lock waiter 19, blocking chain depth 1, timeout 0이었다. request/acquire/hold P95는 2142.809/1588.193/151.225ms였고 `55P03`은 0건이었다. 당시 `log_lock_waits=off`라 미확정이었지만 Card21이 동일한 depth-1 fan-in과 holder별 segment 재시작을 server log로 확인하고 FK-DROP 대조로 인과를 지지했다. [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]], [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]], [[s05-symmetric-metrics-card18]], [[s05-legacy-queue-card19]], [[s05-lock-wait-card21-40b24329.json]].
 
-Claude 카드 21의 커널 무관 probe는 legacy의 정적 순서와 맞는 원인 가설을 제시했다. `approvals._ledger`의 idempotency INSERT가 FK로 project 행의 KEY SHARE를 먼저 보유한 뒤 `FOR NO KEY UPDATE`를 요청하면 tuple FIFO를 건너뛰고 holder xid를 직접 기다릴 수 있다. 이 경우 holder 교체마다 `lock_timeout` 구간이 다시 시작돼 depth-1 fan-in·55P03 0·2초 57014를 함께 설명한다. candidate limits `FOR UPDATE`에는 같은 선행 약한 잠금이 없어 tuple FIFO가 누적된다는 설명이다. 다만 제품 커널에서는 아직 probe 인과를 확인하지 않았으므로 사실로 승격하지 않는다.
+Claude 카드 21의 커널 무관 probe가 제시한 정적 순서는 Card21의 제품 경로 원본/대조 실험으로 지지됐다. `approvals._ledger`의 idempotency INSERT, FK RI KEY SHARE, project `FOR NO KEY UPDATE`가 depth-1 transactionid fan-in을 만들고, FK 제거만으로 depth-19 tuple FIFO와 18건의 `55P03`으로 바뀌었다.
 
-[[S05 log_lock_waits opt-in 재실행 설계]] v1.1은 disposable DB의 `log_lock_waits=on`, `deadlock_timeout=50ms`와 `pgrowlocks('inv.projects')`를 같은 legacy 20×1 wave에서 상관한다. holder별 다른 xid wait/acquired 반복·tuple wait 0·다수 Key Share+하나 No Key Update·55P03 0을 함께 본 경우에만 가설을 지지한다. 5ms는 명목 sampler이고 실제 약 17ms, 0.793ms는 client barrier 기준이며 DB 첫 Lock 표본은 515ms였다는 관찰 경계도 포함한다. `ALTER SYSTEM`·운영 DB·자동 CI는 금지하며 exact-SHA coordinator 승인 전에는 실행하지 않는다.
+[[S05 log_lock_waits opt-in 재실행 설계]] v1.2는 `deadlock_timeout=10ms`, `backend_xid` holder alias, FK-DROP 대조군을 추가했고 coordinator 승인 아래 두 wave를 실행했다. `ALTER SYSTEM`·운영 DB·20동시 초과는 없었으며 표본 간격과 log threshold 한계는 evidence에 그대로 남겼다.
 
-후속 옵션은 (A) 선행 약한 잠금과 limits 최종 lock을 `FOR NO KEY UPDATE`로 낮추는 변형, (B) FIFO를 유지하는 queue 깊이 상한이다. KEY SHARE 뒤 기존 `FOR UPDATE` 승격은 교착 가능성 때문에 제외한다. A의 비FIFO 기아·thundering herd·fail-fast 상충과 B의 admission 원자성·누수 복구를 각각 검증해야 하며, server log/pgrowlocks 확인과 별도 결정 전에는 구현하지 않는다.
+후속 정책은 B′(candidate limits 대기 예산)→B(project별 bounded semaphore) 우선이다. A의 선행 약한 잠금+`FOR NO KEY UPDATE`는 비FIFO 기아·thundering herd·2초 `57014` 위험 때문에 기전 확인용일 뿐 제품 정책 후보가 아니다. Claude 카드 24와 별도 결정 전에는 구현하지 않는다.
 
 계측 제한도 오류 설계 경계에 포함한다. `BoundDatabase` stale retry는 caller-owned outer transaction의 final phase만 방출해 attempt 1 hold가 현재 집계되지 않고, 운영 `app.py`는 `placement_metric_sink`를 주입하지 않으며 logger fallback은 candidate flag on에서만 동작한다. 따라서 nested retry의 attempt coverage와 기본 legacy 운영 metric은 불완전하고, benchmark sink 수치를 운영 telemetry로 승격할 수 없다.
 

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0.0",
+  "verdict": "HYPOTHESIS_SUPPORTED",
+  "codeSha": "40b24329ab3248bdf609ed3658596ae44b163e04",
+  "measuredAt": "2026-09-23T08:40:00+09:00",
+  "scope": "development-PC; PostgreSQL 16; two disposable databases; legacy 20x1 each",
+  "settings": {
+    "logLockWaits": "on",
+    "deadlockTimeout": "10ms",
+    "lockTimeout": "500ms",
+    "statementTimeout": "2s"
+  },
+  "legacyFkPresent": {
+    "pytest": {"passed": 1, "exitCode": 0, "elapsedSeconds": 18.45},
+    "requests": {"success": 20, "failure": 0, "p95AllMs": 2575.213},
+    "errorsBySqlstate": {},
+    "observer": {
+      "sampleCount": 113,
+      "nominalIntervalMs": 5,
+      "actualIntervalP50Ms": 15.332,
+      "actualIntervalP95Ms": 90.937,
+      "actualIntervalMaxMs": 109.0,
+      "maxLockWaiterCount": 19,
+      "maxBlockingChainDepth": 1,
+      "backendXidSampleCount": 1112
+    },
+    "pgrowlocks": {
+      "snapshotCount": 103,
+      "modesObserved": ["Key Share", "For No Key Update"],
+      "maxHolderCount": 20,
+      "snapshotsWithBothModes": 91
+    },
+    "serverSegments": {
+      "loggedEventCount": 380,
+      "loggedAcquiredSegmentCount": 190,
+      "transactionSegmentCount": 190,
+      "tupleSegmentCount": 0,
+      "waiterCount": 19,
+      "loggedSegmentCountDistribution": {
+        "1": 1, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1,
+        "7": 1, "8": 1, "9": 1, "10": 1, "11": 1, "12": 1,
+        "13": 1, "14": 1, "15": 1, "16": 1, "17": 1, "18": 1,
+        "19": 1
+      },
+      "holderChangeDistribution": {
+        "0": 1, "1": 1, "2": 1, "3": 1, "4": 1, "5": 1,
+        "6": 1, "7": 1, "8": 1, "9": 1, "10": 1, "11": 1,
+        "12": 1, "13": 1, "14": 1, "15": 1, "16": 1, "17": 1,
+        "18": 1
+      },
+      "maxLoggedWaitMsPerWaiter": 1975.618,
+      "maxSingleSegmentMs": 191.343,
+      "unresolvedHolderCount": 0
+    }
+  },
+  "fkDroppedControl": {
+    "pytest": {"passed": 1, "exitCode": 0, "elapsedSeconds": 14.85},
+    "requests": {"success": 2, "failure": 18, "p95AllMs": 982.737},
+    "errorsByCode": {"RES-0007": 18},
+    "errorsBySqlstate": {"55P03": 18},
+    "observer": {
+      "sampleCount": 14,
+      "maxLockWaiterCount": 19,
+      "maxBlockingChainDepth": 19,
+      "backendXidSampleCount": 110
+    },
+    "pgrowlocks": {
+      "snapshotCount": 4,
+      "modesObserved": ["For No Key Update"],
+      "maxHolderCount": 1
+    },
+    "serverSegments": {
+      "loggedEventCount": 22,
+      "loggedAcquiredSegmentCount": 2,
+      "transactionSegmentCount": 1,
+      "tupleSegmentCount": 1,
+      "maxSingleSegmentMs": 499.957
+    }
+  },
+  "interpretation": {
+    "mechanism": "The idempotency INSERT foreign-key RI Key Share bypasses tuple-lock FIFO for the later project FOR NO KEY UPDATE lock. Waiters directly wait for each successive holder xid, so lock_timeout restarts per holder segment. Removing only that disposable FK restores tuple FIFO and produces a depth-19 55P03 cascade near 500ms.",
+    "statementTimeoutBoundary": "Non-FIFO starvation can accumulate sub-500ms holder segments until statement_timeout 2s and then surface 57014; that outcome was observed in prior legacy waves, not in these two Card21 waves.",
+    "ac05": "NOT_EVALUATED",
+    "policyDecisionIndependent": true,
+    "policyOrder": ["B-prime lock-timeout budget", "B project-bounded semaphore"],
+    "optionA": "mechanism-only"
+  },
+  "safety": {
+    "maxConcurrency": 20,
+    "candidateExecuted": false,
+    "fiftyConcurrentExecuted": false,
+    "operationalDsnUsed": false,
+    "alterSystemUsed": false,
+    "databaseOrRoleResidue": 0,
+    "rawPidOrXidRetained": false,
+    "rawServerLogRetained": false,
+    "secretCount": 0
+  }
+}

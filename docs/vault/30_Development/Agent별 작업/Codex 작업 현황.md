@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.195"
+version: "1.0.196"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T08:10:00+09:00"
+updated: "2026-09-23T08:45:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 Card21 lock-wait 기전 확인
+
+- Claude 카드 23의 D1~D3를 반영한 opt-in 하네스를 `40b24329`에 고정하고 PostgreSQL 16 disposable DB 두 개에서 legacy 원본/FK-DROP 대조를 각각 20동시×1로 실행했다. 둘 다 단일 파일 1 passed/exit 0, DB/role 잔존 0이다.
+- 원본은 20/20, depth 1, transaction acquired segment 190, tuple 0, `pgrowlocks` Key Share+For No Key Update, timeout 0. FK-DROP은 2/20, depth 19, tuple segment 최대 499.957ms, `55P03` 18로 **HYPOTHESIS_SUPPORTED**다.
+- F-S05-02를 RI KEY SHARE→tuple FIFO 우회→holder xid 직접 대기→holder 교체별 lock_timeout 재시작 기전으로 승격했다. candidate limits는 선행 FK 잠금이 없어 FIFO `55P03` cascade가 난다. 정책은 B′→B 우선 v1.4 초안, A는 기전 확인용이며 구현은 Claude 카드 24 뒤 별도 결정이다.
+- 20동시 초과·candidate·50동시·5노드는 실행하지 않았고 P95는 진단 부수값이라 AC-05 판정에 쓰지 않는다. flag off·S05 `review` 유지. [[2026-09-23_08-45-00_KST_S05_Card21_lock_wait_기전확인_Codex]], [[s05-lock-wait-card21-40b24329.json]].
 
 ## 2026-09-23 LAN pilot CP 겸임 관찰 보강
 

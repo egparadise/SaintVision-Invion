@@ -33,10 +33,23 @@ def postgres():
     password = uuid4().hex
     owner = make_conninfo(admin, dbname=name)
     runtime = make_conninfo(owner, user=role, password=password)
+    lock_wait_diagnostic = os.getenv("INV_S05_LOCK_WAIT_DIAGNOSTIC") == "1"
+    fk_dropped_control = os.getenv("INV_S05_LOCK_WAIT_PHASE") == "fk-dropped"
 
     def create_database():
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
+            if lock_wait_diagnostic:
+                conn.execute(
+                    sql.SQL("ALTER DATABASE {} SET log_lock_waits = on").format(
+                        sql.Identifier(name)
+                    )
+                )
+                conn.execute(
+                    sql.SQL("ALTER DATABASE {} SET deadlock_timeout = '10ms'").format(
+                        sql.Identifier(name)
+                    )
+                )
 
     def create_role():
         with psycopg.connect(admin, autocommit=True) as conn:
@@ -74,7 +87,32 @@ def postgres():
             # Use the production migration's least-privilege group, not a test-only
             # permission recipe which could hide a missing deployment grant.
             conn.execute(sql.SQL("GRANT inv_kernel TO {}").format(sql.Identifier(role)))
-        return SimpleNamespace(owner=owner, runtime=runtime)
+            if lock_wait_diagnostic:
+                conn.execute("CREATE EXTENSION IF NOT EXISTS pgrowlocks")
+                conn.execute("REVOKE EXECUTE ON FUNCTION pgrowlocks(text) FROM PUBLIC")
+                if fk_dropped_control:
+                    constraints = conn.execute(
+                        """SELECT c.conname FROM pg_constraint c
+                        WHERE c.contype='f'
+                          AND c.conrelid='inv.idempotency'::regclass
+                          AND c.confrelid='inv.projects'::regclass"""
+                    ).fetchall()
+                    assert len(constraints) == 1, (
+                        "diagnostic control requires exactly one idempotency->projects FK"
+                    )
+                    conn.execute(
+                        sql.SQL("ALTER TABLE inv.idempotency DROP CONSTRAINT {}").format(
+                            sql.Identifier(constraints[0][0])
+                        )
+                    )
+        return SimpleNamespace(
+            owner=owner,
+            runtime=runtime,
+            database_name=name,
+            runtime_role=role,
+            lock_wait_diagnostic=lock_wait_diagnostic,
+            fk_dropped_control=fk_dropped_control,
+        )
 
     def drop_database():
         assert name.startswith("inv_test_") and len(name) == 41  # only this run's unique name
