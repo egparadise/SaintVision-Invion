@@ -13,7 +13,7 @@ tags: ["independent-review", "codex", "response-contract", "record-vs-code", "do
 
 # 독립 검토 — 저위험 쓰기 계약 7건: 기록 대 코드
 
-`f2d86db5`는 **문서 전용 커밋**이라 저위험 쓰기 응답 계약 7건을 완료로 기록만 했다. "기록이 있다 ≠ 코드가 있다"이며, 오늘 tip이 수십 번 이동·병합됐으므로 그 7건이 **지금 tip 코드에 실제로 살아 있는지**를 대조했다(문서 전용 커밋의 완료 기록은 코드 위치를 대조한다 — [[doc-only-commit-verify-the-code]]). Codex 큐 밖(검토는 내 역할).
+`f2d86db5`는 **문서 전용 커밋**이라 저위험 쓰기 응답 계약 7건을 완료로 기록만 했다. "기록이 있다 ≠ 코드가 있다"이며, 오늘 tip이 수십 번 이동·병합됐으므로 그 7건이 **지금 tip 코드에 실제로 살아 있는지**를 대조했다(문서 전용 커밋의 완료 기록은 코드 위치를 대조한다 — 운영 규칙 메모리 `doc-only-commit-verify-the-code`). Codex 큐 밖(검토는 내 역할).
 
 ## Provenance
 
@@ -46,7 +46,7 @@ tags: ["independent-review", "codex", "response-contract", "record-vs-code", "do
 
 ## 도구 caveat (정직)
 
-첫 `grep 'response_model=<Model>'`이 빈 결과였다 — 코드가 `response_model=schemas.<Model>`(schemas. 접두)라 정규식이 못 잡은 것. **빈 출력은 깨진 도구지 발견이 아니다**([[empty-output-is-not-evidence]]) — 넓혀서 결속을 확인한 뒤에야 판정했다.
+첫 `grep 'response_model=<Model>'`이 빈 결과였다 — 코드가 `response_model=schemas.<Model>`(schemas. 접두)라 정규식이 못 잡은 것. **빈 출력은 깨진 도구지 발견이 아니다**(빈 출력=깨진 도구 규칙) — 넓혀서 결속을 확인한 뒤에야 판정했다.
 
 ## 판정
 
