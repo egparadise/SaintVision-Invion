@@ -41,7 +41,8 @@ hosted 수치는 artifact의 JUnit XML을 읽기 전용으로 파싱해 classnam
 - `tools/generate_ontology.py`: 공용 Python에는 `rdflib`가 없어 최초 exit 1이었고, 정본 checkout의 `.venv` Python으로 재실행해 **405 schema triples / 916 data triples / exit 0**으로 네 ontology 산출물을 갱신했다.
 - 착지 전 게이트: `check_docs.py` **804 documents / exit 0**, `check_ontology.py` **48 task mappings / exit 0**, `check_ontology_generation.py` **4 artifacts graph-equivalent / exit 0**, `check_doc_single_source.py --ratchet` **18 pairs / exit 0**, `git diff --check` **exit 0**.
 - `sync_obsidian.py --check`는 이 Orca worktree의 네 파일(전체 진행판·Codex 작업판·ontology mirror 2개)이 destination과 `both-diverged`이고 신뢰할 baseline이 없어 **exit 3**이었다. 코디네이터 지침대로 `--apply`하지 않았으며, 정본 checkout에서 integration 착지 SHA 기준으로 동기화한다.
-- 제품 시험은 재실행하지 않았고, 최종 R1 착지 SHA는 착지 후 이 문서에 기록한다.
+- 최신 integration `b06fc199`을 부모로 한 R1 개인-index 적용 commit은 **`6d095d5c5c7972a08cbc4133bd59e5d2fa13f50f`**다. registry·ontology·History·두 진행판 8개 소유 파일만 포함하며, 이 SHA를 기록하는 후속 문서 commit과 함께 한 번의 non-force push로 착지한다.
+- 제품 시험은 재실행하지 않았다.
 
 ## 다음 행동
 

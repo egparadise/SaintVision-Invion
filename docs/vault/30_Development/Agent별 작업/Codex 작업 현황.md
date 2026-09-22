@@ -16,6 +16,7 @@ source_of_truth: "Git"
 - hosted Core `35706465645` artifact에서 Workspace explicit 22, workspace recovery 12, snapshots 15, permission observation 11, readiness 10, pilot 35, containment 28, audit 41이 모두 0 failure임을 직접 확인했다. hosted recovery drill 19 skip과 물리 GPU 미실행도 함께 기록했다.
 - S06은 S05 선행·실 원격 WS/PTY/Git 재시작·제품 snapshot reader 결속, S08은 S07 선행·실 GPU·승인 우회 종단·off-device/PITR/독립 역할 복원을 done 차단 조건으로 유지한다.
 - registry 2줄과 ontology 4산출물을 재생성했고 docs 804·ontology 48 mappings·generation 4 artifacts·ratchet 18 pairs·diff 게이트가 모두 exit 0이었다. 상세: [[2026-09-22_21-13-00_KST_S06-DB_S08-DB_Codex_owner판정]].
+- R1 적용 commit `6d095d5c`는 최신 integration `b06fc199`을 부모로 하며 8개 Codex 소유 파일만 담는다.
 - Orca worktree의 Obsidian check는 baseline 없는 4개 `both-diverged`로 exit 3이어서 apply하지 않았다. 착지 뒤 코디네이터가 정본 checkout에서 sync한다.
 
 - **hosted Core 컨테이너 opt-in**: PR [#59](https://github.com/egparadise/SaintVision-Invion/pull/59), exact head `0d02f343`, run [35720205341](https://github.com/egparadise/SaintVision-Invion/actions/runs/35720205341) success — role guard 13 + server 8 + config 2를 실행 전환해 JUnit **3065 passed / 35 skipped / 0 failed**; Claude review pending. 상세: [[2026-09-22_hosted_Core_컨테이너_opt-in_검증_Codex]].
