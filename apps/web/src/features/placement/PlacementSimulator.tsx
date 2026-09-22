@@ -26,18 +26,9 @@ export interface PlacementSimulatorProps {
   initialPoolCapacityError?: string | null;
   initialPreviewState?: 'idle' | 'loading' | 'success' | 'error';
   initialPreviewError?: string | null;
-  initialServerShards?: ShardItem[];
   initialCandidates?: CandidateItem[];
   initialCandidatesState?: 'idle' | 'loading' | 'success' | 'error';
   initialCandidatesError?: string | null;
-}
-
-interface ShardItem {
-  shardId?: string;
-  candidateRank?: number;
-  targetNodeId: string;
-  status: string;
-  eligible?: boolean;
 }
 
 export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
@@ -50,7 +41,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   initialPoolCapacityError,
   initialPreviewState,
   initialPreviewError,
-  initialServerShards,
   initialCandidates,
   initialCandidatesState,
   initialCandidatesError,
@@ -85,7 +75,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   );
   const [candidatesError, setCandidatesError] = useState<string | null>(initialCandidatesError || null);
 
-  const [serverShards, setServerShards] = useState<ShardItem[]>(initialServerShards || []);
   const [serverExplanation, setServerExplanation] = useState<string | null>(null);
   const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'success' | 'error'>(
     initialPreviewState || 'idle'
@@ -198,7 +187,6 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
   const loadPlacementPreview = () => {
     if (!selectedPoolId || !selectedPoolId.trim()) {
-      setServerShards([]);
       setServerExplanation(null);
       setPreviewState('idle');
       setPreviewError(null);
@@ -213,22 +201,12 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
     })
       .then((res) => {
         setServerExplanation(`적격 노드 ${res.candidateCount}대 확인 (풀: ${res.poolId})`);
-        if (res.candidates) {
-          setServerShards(
-            res.candidates.map((c, idx) => ({
-              candidateRank: idx + 1,
-              targetNodeId: c.nodeId || c.hostname,
-              status: c.eligible ? '적격 (Eligible)' : '부적격 (Ineligible)',
-              eligible: Boolean(c.eligible),
-            }))
-          );
-        } else {
-          setServerShards([]);
-        }
+        // Canonical PlacementPreviewResponse wire contract returns candidates, candidateCount, poolId, units.
+        // It does NOT return registered shards (registered shards exist only in committed plans/runs).
+        // Therefore preview honestly renders UNMEASURED empty status without fake shard synthesis.
         setPreviewState('success');
       })
       .catch((err) => {
-        setServerShards([]);
         setServerExplanation(null);
         setPreviewError(err?.message || `서버 배치 미리보기 실패: 풀 '${selectedPoolId}' 연결 불가`);
         setPreviewState('error');
@@ -668,33 +646,10 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             </p>
           )}
 
-          {previewState === 'success' && serverShards.length === 0 && (
+          {previewState === 'success' && (
             <p data-testid="preview-empty-state" role="status" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-              가용 적격 노드가 없습니다. 👉 <strong>[사용자 조치 필요]</strong>: 상단 슬라이더에서 모델 크기 또는 자원 풀 요건을 변경하십시오.
+              등록된 shard 없음(UNMEASURED) - 가용 샤드가 없습니다. 👉 <strong>[사용자 조치 필요]</strong>: 상단 슬라이더에서 모델 크기 또는 샤드 수를 조절하거나 자원 풀 요건을 변경하십시오.
             </p>
-          )}
-
-          {previewState !== 'error' && serverShards.length > 0 && (
-            <table style={{ width: '100%', fontSize: '0.8125rem', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left' }}>
-                  <th style={{ padding: '6px 8px' }}>후보 순위</th>
-                  <th style={{ padding: '6px 8px' }}>후보 노드</th>
-                  <th style={{ padding: '6px 8px' }}>적격 여부</th>
-                </tr>
-              </thead>
-              <tbody>
-                {serverShards.map((s, idx) => (
-                  <tr key={s.shardId || `${s.targetNodeId}_${s.candidateRank || idx}`} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-                    <td style={{ padding: '6px 8px', fontFamily: 'var(--font-mono)' }}>
-                      {s.candidateRank ? `#${s.candidateRank}` : s.shardId || `#${idx + 1}`}
-                    </td>
-                    <td style={{ padding: '6px 8px' }}>{s.targetNodeId}</td>
-                    <td style={{ padding: '6px 8px', color: s.eligible !== false ? 'var(--color-success)' : 'var(--color-text-muted)' }}>{s.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           )}
         </div>
 

@@ -425,7 +425,6 @@ describe('Accessibility Status Roles, Screen Reader Guards & Disabled Button Des
           <PlacementSimulator
             nodes={mockNodes}
             initialPreviewState="success"
-            initialServerShards={[]}
             initialCandidatesState="success"
             initialCandidates={[]}
           />

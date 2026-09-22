@@ -45,7 +45,7 @@ const sampleNodes: NodeItem[] = [
 describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundaries', () => {
   it('renders explicit UNVERIFIED badge for local heuristic evaluation', () => {
     const markup = renderToStaticMarkup(
-      <PlacementSimulator nodes={sampleNodes} initialPools={[]} initialCandidates={[]} initialServerShards={[]} />
+      <PlacementSimulator nodes={sampleNodes} initialPools={[]} initialCandidates={[]} />
     );
     expect(markup).toContain('로컬 결정론적 평가 (UNVERIFIED: 로컬 시뮬레이션 전용)');
     expect(markup).toContain('data-testid="local-simulation-badge"');
@@ -53,7 +53,7 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
 
   it('renders pools-idle-banner when pools query is in idle state', () => {
     const markup = renderToStaticMarkup(
-      <PlacementSimulator nodes={sampleNodes} initialPoolsState="idle" initialPools={[]} initialCandidates={[]} initialServerShards={[]} />
+      <PlacementSimulator nodes={sampleNodes} initialPoolsState="idle" initialPools={[]} initialCandidates={[]} />
     );
     expect(markup).toContain('data-testid="pools-idle-banner"');
     expect(markup).toContain('자원 풀 연동 대기 중입니다');
@@ -62,7 +62,7 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
 
   it('renders pools-fallback-banner with UNVERIFIED label after successful empty query', () => {
     const markup = renderToStaticMarkup(
-      <PlacementSimulator nodes={sampleNodes} initialPoolsState="success" initialPools={[]} initialCandidates={[]} initialServerShards={[]} />
+      <PlacementSimulator nodes={sampleNodes} initialPoolsState="success" initialPools={[]} initialCandidates={[]} />
     );
     expect(markup).toContain('data-testid="pools-fallback-banner"');
     expect(markup).toContain('[로컬 결정론적 평가 (UNVERIFIED)]');
@@ -75,7 +75,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPoolsState="error"
         initialPoolsError="자원 풀 서비스 503 Service Unavailable"
         initialCandidates={[]}
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('data-testid="pools-error-banner"');
@@ -93,7 +92,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPreviewState="error"
         initialPreviewError="엔드포인트 403 Forbidden: 클러스터 스케줄러 권한 부족"
         initialCandidates={[]}
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('data-testid="preview-error-banner"');
@@ -111,7 +109,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPools={[]}
         initialCandidatesState="error"
         initialCandidatesError="디스커버리 500 내부 오류"
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('data-testid="candidates-error-banner"');
@@ -120,37 +117,56 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
     expect(markup).toContain('data-testid="candidates-retry-btn"');
   });
 
-  it('renders real server preview candidates when placement-preview succeeds', () => {
+  it('renders preview-empty-state when placement preview succeeds (Zero Fake Shards: no registered shards in preview)', () => {
+    const markup = renderToStaticMarkup(
+      <PlacementSimulator
+        nodes={sampleNodes}
+        initialPools={[]}
+        initialPreviewState="success"
+        initialCandidates={[]}
+      />
+    );
+    expect(markup).not.toContain('data-testid="preview-error-banner"');
+    expect(markup).toContain('data-testid="preview-empty-state"');
+    expect(markup).toContain('등록된 shard 없음(UNMEASURED)');
+    expect(markup).toContain('가용 샤드가 없습니다');
+    expect(markup).not.toContain('shd_');
+    expect(markup).not.toContain('shard-');
+  });
+
+  it('renders preview-empty-state even when candidates are present (positive control: Zero Fake Shards invariant)', () => {
     const sampleCandidates = [
-      { candidateRank: 1, targetNodeId: 'Node-01-WinMain', status: '적격 (Eligible)', eligible: true },
+      {
+        announcementId: 'ann_test_01',
+        instanceId: 'inst_01',
+        sourceIp: '192.0.2.10',
+        claimedHostname: 'cand-worker-01',
+        claimedOsType: 'linux',
+        claimedCpuCores: 8,
+        claimedRamBytes: 32 * 1024 ** 3,
+        claimedGpuCount: 1,
+        firstSeenAt: '2026-09-22T08:00:00Z',
+        lastSeenAt: '2026-09-22T08:10:00Z',
+        announceCount: 5,
+        stale: false,
+        state: 'candidate' as const,
+        verified: false as const,
+      },
     ];
     const markup = renderToStaticMarkup(
       <PlacementSimulator
         nodes={sampleNodes}
         initialPools={[]}
         initialPreviewState="success"
-        initialServerShards={sampleCandidates}
-        initialCandidates={[]}
-      />
-    );
-    expect(markup).not.toContain('data-testid="preview-error-banner"');
-    expect(markup).toContain('#1');
-    expect(markup).toContain('Node-01-WinMain');
-    expect(markup).toContain('적격 (Eligible)');
-  });
-
-  it('renders preview-empty-state when placement preview returns 0 shards', () => {
-    const markup = renderToStaticMarkup(
-      <PlacementSimulator
-        nodes={sampleNodes}
-        initialPools={[]}
-        initialPreviewState="success"
-        initialServerShards={[]}
-        initialCandidates={[]}
+        initialCandidates={sampleCandidates}
       />
     );
     expect(markup).toContain('data-testid="preview-empty-state"');
+    expect(markup).toContain('등록된 shard 없음(UNMEASURED)');
     expect(markup).toContain('가용 샤드가 없습니다');
+    expect(markup).not.toContain('shd_');
+    expect(markup).not.toContain('shard-');
+    expect(markup).not.toContain('<table');
   });
 
   it('renders candidates-empty-state when discovery returns 0 candidates', () => {
@@ -161,7 +177,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPreviewState="idle"
         initialCandidatesState="success"
         initialCandidates={[]}
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('data-testid="candidates-empty-state"');
@@ -199,7 +214,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPoolCapacity={sampleCapacity}
         initialPoolCapacityState="success"
         initialCandidates={[]}
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('Standard Compute Pool (3 노드)');
@@ -235,7 +249,6 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
         initialPools={[]}
         initialCandidates={sampleCandidates}
         initialCandidatesState="success"
-        initialServerShards={[]}
       />
     );
     expect(markup).toContain('cand-worker-01');
