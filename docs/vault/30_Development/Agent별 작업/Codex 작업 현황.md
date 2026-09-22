@@ -35,6 +35,12 @@ source_of_truth: "Git"
 - tight-fit active_total 재계산과 BoundDatabase 실제 `55P03` savepoint 시험을 추가했다. 실 PG 13 passed/exit 0, 두 mutation은 각각 exit 1로 KILLED이며 model-retry 회귀 1 passed/exit 0이다. flag-off는 내부 shared primitive 리팩터를 포함한 동작 동등 경로라고 문서를 정정했다.
 - a60313a7 20동시×3에서 hold P95 중앙 1526.365→116.848ms, 요청 P95(all) 1817.763→922.915ms였으나 외부 timeout 2→27로 증가해 단계 3은 미통과다. flag off·S05 `review`·50/5노드 미승격을 유지하며 decision v1.3의 limit-row 입도 변경 대 legacy 유지·5노드 후 재판단을 코디네이터에게 요청한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]].
 
+## 2026-09-23 LAN pilot 다중 Node state·번들·등록 경계
+
+- 기존 단일 Node private state의 top-level identity를 호환 primary로 유지하면서 `nodes[]`, 반복 `init --node-ip`, Node별 manifest/worker.zip/peer policy/certificate를 추가했다. 신규 Node ID를 side effect 전에 저장해 partial retry에서도 기존 Node·key·channel·CA·epoch를 교체하지 않는다.
+- CSR CN으로 대상 Node를 선택하고 HTTP bootstrap은 source IP 허용 목록에서 그 Node의 bundle/certificate만 반환한다. hash는 HTTP로 내지 않고 별도 operator 채널로 유지하며, status/observe와 방화벽 안내는 Node별 행/IP 목록이다.
+- implementation `6da99baf`: 첫 재기반 tree에서 신규+기존 LAN 192 passed/1 PG skip, 최신 `06bab6d5` 재기반에서 PG-free 단위 6 passed·check_docs/diff exit 0. 실제 Docker/PG/Ubuntu 4대/mTLS/18443/NTP는 미실행이며 coordinator 실검증과 Claude 독립 검토 전 `review`다. 상세: [[2026-09-23_03-16-00_KST_LAN-PILOT-MULTINODE_Codex_구현]].
+
 ## 2026-09-23 S05-DB 5노드 lane 실행 계획
 
 - 기존 5노드 opt-in lane 정의를 v1.1로 갱신해 legacy/candidate, 20→50동시, mode별 3회, hold·limit-row wait·retry/SQLSTATE artifact와 단계별 승격 조건을 고정했다.
