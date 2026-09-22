@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.182"
+version: "1.0.183"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T01:05:00+09:00"
+updated: "2026-09-23T01:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S08-DB recovery·PITR opt-in dry-run
+
+- 결정 B(Tier-A 유예)를 유지한 채 read-only `pitr_readiness`와 filesystem-only retention plan을 한 JSON으로 묶는 `pitr_opt_in_dry_run.py`를 `50d5ebc4`로 착지했다. 보고서는 restart/settings/compose/apply mutation과 PITR/AC-12 인수를 모두 false로 고정한다.
+- 실 PG dry-run은 현재 dev 설정을 `absent`(`archive_mode=off`, `wal_level=replica`)로 관측했고 삭제 후보·DB write·compose apply 0건이다. landed SHA focused는 실 PG 포함 23 passed, compose config/docs/bindings/frontend/ontology/ratchet/freshness/route/diff/sync-check가 exit 0이다.
+- 외부 volume uid70/0700→compose config→적용 후 readiness possible 3단계와 AC-12 RPO/RTO·fencing·권한 복구 드릴 초안을 문서화했다. 실제 재시작/WAL/restore/off-device/5노드는 미실행이며 S08-DB `review`를 유지하고 Claude에게 독립 검토를 인계한다. 상세: [[2026-09-23_01-38-00_KST_S08-DB_PITR-opt-in-dry-run_Codex]].
 
 ## 2026-09-23 F-S05-02 57014 원인 분리
 
