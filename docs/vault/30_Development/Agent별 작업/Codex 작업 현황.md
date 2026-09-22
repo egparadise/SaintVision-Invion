@@ -21,6 +21,13 @@ source_of_truth: "Git"
 - 일반 Backend pytest 수집은 `test_placement_lock_wait_diagnostic.py`를 전용 도구 환경이 없으면 fixture 생성 전에 정확한 사유 `run only through tools/placement_lock_wait_diagnostic.py`로 1건 skip한다. 전용 도구의 opt-in 실행은 불변이다.
 - `backend.yml` skip 분포에 같은 사유 1건을 등록해 drift를 감시한다. R1 `41f899b3`으로 카드 24와 분리 착지했으며 일반 수집 1 skipped, check_docs 884, YAML/diff가 exit 0이다.
 
+## 2026-09-23 S07 Card17 커널 경로·등록 mTLS helper
+
+- 물리 AC-07은 실 heartbeat의 `inv.nodes` offline 전이와 `inv.shard_recovery`, receipt-bound output storage, `inv.shard_completion`을 잇는 커널 경로로 권고했다. core replica 하네스는 byte를 옮기지 않는 합성 개발 proxy이고 bridge는 측정을 위해 신설하지 않는다.
+- #101 strict inventory와 등록/mTLS read-only preflight를 `tools/five_node_lab_preflight.py`로 동작 보존 추출했다. report `tenantId` 제거, stale JSON 선삭제, inventory/report 동일 경로 fail-closed를 추가했다. focused 15 passed와 docs/bindings/frontend/ontology/ratchet/route/freshness 게이트가 exit 0이다.
+- `19/20`은 시연 점추정 0.95와 양측 95% exact 하한 약 0.751로 보고한다. 물리 이탈은 bounded `docker stop`/동일 container `docker start`만 허용하고 rm/prune/reboot를 금지한다. `--allow-four-node-pilot`은 future opt-in이며 5노드 인수로 승격하지 않는다.
+- 구현 `de8a9b7d`, PR #110, reviewer Claude. 실제 PG·Node·Docker·물리 wave는 미실행이고 S07-DB `review`, AC-07 미측정 유지. [[S07 5노드 실 Node adapter 사양]], [[2026-09-23_11-50-00_KST_S07_커널경로_등록mTLS_helper_Codex]].
+
 ## 2026-09-23 S07 Card23 5노드 실 Node adapter 사양
 
 - `measure_s07_recovery.py`의 미래 `--adapter five-node-lab --inventory ... --dry-run`을 사양화했다. #101 canonical inventory/read-only DB 분류를 단일 정본으로 재사용하고 등록 Node·heartbeat/snapshot·mTLS identity·`lan-workspace-v1`을 조회만 한다.
