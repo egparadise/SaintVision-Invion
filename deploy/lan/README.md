@@ -210,6 +210,20 @@ the Node or rotates credentials. Disabled Nodes remain visible in `status` but
 are excluded from bundles, enrollment, observation serving, and all wave target
 sets. Restart `serve` after revocation so its source-IP allowlist is reloaded.
 
+Revocation has no implicit reverse path. Re-running `init` with
+`--allow-server-node-colocation` does not clear `disabled` and does not enable a
+revoked channel. Do not edit private state, re-enroll the old certificate, or
+create a replacement Node to work around this boundary. Reactivation requires a
+separately reviewed operator command that revalidates the preserved Node/key,
+uses the current channel version, appends a new audit entry, and only then
+clears the disabled marker; that command is not implemented in this version.
+
+Running `revoke-server-node-colocation` before a co-located Node exists is a
+harmless idempotent opt-out: it persists
+`serverNodeColocationAllowed: false`, reports empty `disabledNodes` and
+`channels`, and does not alter any independent Node. It is not evidence that a
+co-located identity or channel ever existed.
+
 ## Worker enrollment
 
 1. Obtain `http://192.168.45.99:18081/worker.zip` and verify its SHA-256 against
