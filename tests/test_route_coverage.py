@@ -329,3 +329,58 @@ def test_ui_priority_6_fallback_boundary_invariants() -> None:
     assert "Boolean(artifactData?.verifiedEvidenceId) && !artifactData?.fallbackUsed" in ds_content
     assert "출력 무결성 미검증 (Completed / UNVERIFIED)" in ds_content
 
+
+
+# --- 2026-09-22: holes that contain a call (found by the PR #36 review; false green) ---
+
+def test_a_hole_containing_a_call_is_still_a_path() -> None:
+    """``${encodeURIComponent(nodeId)}`` is the SPA's normal way to interpolate.
+
+    Before the fix this returned an EMPTY set: the literal regex forbids ``(``,
+    and the head fallback ``/v1/nodes/`` ends in ``/`` and is dropped as a prefix.
+    The adapter's route silently left the measurement and 0 unserved was reported
+    while nothing served it.
+    """
+    source = "apiClient<NodeResourceUsageResponse>(`/v1/nodes/${encodeURIComponent(nodeId)}/resource-usage`)"
+    assert client_paths(source) == {"/v1/nodes/{}/resource-usage"}
+
+
+def test_two_call_holes_and_a_url_built_in_a_variable() -> None:
+    """The exact PR #36 adapter shape: ternary of two templates assigned to a
+    variable, then passed on. Both paths must surface."""
+    source = chr(10).join([
+        "const url = projectId",
+        "  ? `/v1/projects/${encodeURIComponent(projectId)}/nodes/${encodeURIComponent(nodeId)}/resource-usage`",
+        "  : `/v1/nodes/${encodeURIComponent(nodeId)}/resource-usage`;",
+        "const raw = await apiClient<NodeResourceUsageResponse>(url);",
+    ])
+    assert client_paths(source) == {
+        "/v1/projects/{}/nodes/{}/resource-usage",
+        "/v1/nodes/{}/resource-usage",
+    }
+
+
+def test_nested_braces_and_a_nested_template_inside_a_hole_are_consumed() -> None:
+    source = "fetch(`/v1/runs/${run?.id ?? `${fallback}`}/logs?tail=${JSON.stringify({n: 5})}`)"
+    assert client_paths(source) == {"/v1/runs/{}/logs"}
+
+
+def test_a_query_string_after_a_v1_template_does_not_hide_the_route() -> None:
+    source = "get(`/v1/projects/${encodeURIComponent(p)}/runs/${encodeURIComponent(r)}/artifacts/content?path=${encodeURIComponent(path)}`)"
+    assert client_paths(source) == {"/v1/projects/{}/runs/{}/artifacts/content"}
+
+
+def test_flattening_does_not_change_what_was_already_found() -> None:
+    """The earlier forms keep their answers (no regression in the visible set)."""
+    assert client_paths("await get(`/v1/runs/${activeRunId}/result`)") == {"/v1/runs/{}/result"}
+    assert client_paths("apiClient(`/v1/storage/resolve${query}`)") >= {"/v1/storage/resolve"}
+    assert client_paths("fetch('/v1/approvals')") == {"/v1/approvals"}
+
+
+def test_a_hole_glued_to_the_end_is_a_suffix_splice_not_a_segment() -> None:
+    """``/v1/storage/resolve${query}`` credits ``/v1/storage/resolve`` and never
+    reports the artefact ``/v1/storage/resolve{}`` as unserved."""
+    got = client_paths("apiClient(`/v1/storage/resolve${query ? `?${query}` : ''}`)")
+    assert got == {"/v1/storage/resolve"}
+    got = client_paths("get(`/v1/projects/${encodeURIComponent(p)}/runs/${r}/attempts${cursor}`)")
+    assert got == {"/v1/projects/{}/runs/{}/attempts"}

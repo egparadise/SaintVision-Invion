@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.5"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T18:10:00+09:00"
+updated: "2026-09-22T19:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -80,6 +80,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+route_coverage 스캐너 사각 수정 (Claude, 2026-09-22): 원인 정정 — '변수 조립'이 아니라 **템플릿 hole 안의 함수 호출**(`${encodeURIComponent(x)}`)이 경로를 지움, apps/web 15곳(13 경로). `_flatten_template_holes`+꼬리 hole 귀속. 회귀 5개 원본에서 FAILED→수정 후 36 passed. 재측정: tip 30/0→**43/0**, PR #36 트리 **45/unserved 2**(resource-usage) — 도구가 F1을 스스로 잡음. 브랜치 agent/claude/route-coverage-template-holes(PR #42 위 stack). 전문 [[2026-09-22_route_coverage_템플릿hole_사각_수정_Claude]].
 
 PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, 게이트 전부 GREEN(tsc 0·vitest 659/76·build 0·integrity 0·route_coverage 30/0) + Zero-Mock 되살림(reserved→0 변이가 시험에 잡힘). 발견: F1 서빙 라우트 0(404; 결정 #2는 계약만 착지) · F2 App 배선 0(사용자 가시 변화 없음) · **F3 route_coverage가 변수 조립 URL을 못 봐 30/0 거짓 초록**(내 레인 후속) · F4 프로젝터 capacity→0 조용한 강등 · F5 미병합 gemini/S02-FE 작업(InvFileExplorer +151) 동승. 판정: 조건부 병합(rebase·설명 정정), '연결 완결' 아님. 후속: 라우트=Claude, 배선=Gemini, 스캐너=Claude. PR 코멘트 게시. 전문 [[2026-09-22_PR36_NodeResourceUsage_UI_독립검토_Claude]].
 
