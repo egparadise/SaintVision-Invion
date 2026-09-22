@@ -19,7 +19,13 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T12:09:00+09:00 (최신 tip `c6e9d9aa`, working tree clean).
+- 확인 기준: 2026-09-22T17:15:00+09:00.
+
+## 최근 확인한 진척
+
+- **Codex origin/integration 착지 4건 독립 검토 완결 (Gemini, 2026-09-22)**:
+  - `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구).
+  - 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정 (PR #37). 전문 [[2026-09-22_16-55-00_KST_Gemini_Codex착지4건_독립검토]].
 
 ## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
 
