@@ -5,7 +5,7 @@ version: "1.1.0"
 status: "review"
 author: "Gemini"
 reviewer: "Codex, Claude"
-updated: "2026-09-23T13:35:00+09:00"
+updated: "2026-09-23T14:40:00+09:00"
 source_of_truth: "Git"
 tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-suite", "bounded-repair", "zero-leakage", "gemini"]
 ---
@@ -64,7 +64,8 @@ tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-
   - `LEAK_ATTEMPT_DETECTED`, `BUDGET_EXCEEDED`, `BOUNDED_LOOP_EXCEEDED`는 `agentEngine.ts`의 **클라이언트 로컬 문자열 (HTTP 없음, Network 0)**이다.
   - 백엔드 wire ProblemDetails(`application/problem+json`) 정본 코드는:
     - 요청 스키마 위반, 미지원 strategy, single_node의 shardCount > 1, splittable 미선언, 배치 용량 부족 모두 HTTP 422 `VAL-SCHEMA`.
-    - 인증/인가 실패는 HTTP 403 `AUTH` 계열.
+    - 인증 헤더(Authorization/Bearer) 누락: HTTP 401 `AUTH-MISSING-CREDENTIAL` (`src/saintvision/api/deps.py:get_principal`).
+    - 유효하지 않은 자격증명 또는 tenant scope 인가 거부: HTTP 403 해당 `AUTH-*` 계열.
 - **실측 판정 유예 (Zero Mock Guarantee)**:
   - 백엔드 `/v1/agent/*` 자율 실행 및 코드 diff 패치 API는 현재 미노출 상태이며, 실제 외부 LLM Provider 어댑터 실행은 자격증명 경계(`CX-02 credential 경계 대기`)에 있다.
   - 따라서 실 ProviderAdapter 및 실 샌드박스 컨테이너를 통한 100건 프롬프트 / 30건 코딩 과제 라이브 러너 항목은 **`UNMEASURED ('운영 모델/Provider 어댑터 배선 후')`**로 정직하게 표기한다.
