@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.11"
+version: "1.2.12"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T20:00:00+09:00"
+updated: "2026-09-22T20:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S04-DB·S05-DB·S07-DB 검토 인계 패키지 카드 10 (Claude, 2026-09-22): 세 카드는 **owner Codex·reviewer Claude·planned**라 reviewer 실측 증거를 owner에게 대조표로 넘기는 패키지 — AC-04(승인 전 실행 0·중복 부수효과 0: test_approvals 13·test_postgres 경합·idempotency·outbox 원자성) · AC-05(50 동시 예약 초과 0·fencing·provisioning 무결성 11·자원 사용량 불변식) · AC-07(오래된 토큰 0·복구 드릴/판정/경계 66·replica stale·liveness sweep). 미충족 정직: 재전송 hash·Explain·shard/containment는 hosted Core(35706465645 success)에서만, AC-05 P95/결정성·AC-07 60초/95%는 5노드 랩 물리 대기, CX01 19 skip. 제안 diff 3줄(536·664·920행), registry·ontology 무변경(적용·generate_ontology는 owner Codex). S02-DB/S03-DB는 Codex 3882496d 수용·finding 0 기록. 검증상태지도 §12. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
 VF-CL-03 license/classification exact-비교 fail-closed 시험 착지 카드 9 (Claude, 2026-09-22): Codex 판정(선언↔제안 exact, mismatch fail-closed, 매치≠법적 허가·실행 승인)을 두 층으로 고정 — 층 1 커널 정책 allowlist 근접값 10종 거부·설정 미확장·중복 거부(시험만), 층 2 신규 Claude adapter `saintvision/adapters/model_import.py`(compare_declaration/require_exact_declaration, missing·differs·extra·undeclared 이유 명명, 값 미노출, InvError VAL-MODEL-IMPORT-DECLARATION 409). `tests/core/test_registry_policy_exact_match.py` **37 passed**(DB 없음, docstring에 비의미 명시). 계약·커널 무변경. import 경로 배선은 Codex (a)/(b)/(c) 회신 후. 검증상태지도 §11. 전문 [[2026-09-22_19-55-00_KST_VF-CL-03_license_exact_failclosed_시험_Claude]].
 
