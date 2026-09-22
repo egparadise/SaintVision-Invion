@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.179"
+version: "1.0.180"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T23:30:00+09:00"
+updated: "2026-09-22T23:47:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 S06-DB snapshot reader 제품 결속
+
+- strict restore/checkout 입력·응답 계약, fixture, Python/TS/Go/node schema와 product route/composition을 구현 `a4bf2cee`로 착지했다. fresh/replay 모두 계약 anchor와 현재 `can_request`를 재검증하며 기존 resume·commitment API는 불변이다.
+- 실 PG 단일 파일은 1 passed/0 skipped: 실제 object bytes read, restore replay, writable checkout, 권한 회수 replay 403, 타 project/tenant 404, 난수 `inv_app` 직접 접근 거부, tenant 미설정 `inv_kernel` 0행을 확인했다.
+- 관련 56 passed/23 Windows Linux-only skip/0 failed, bindings 54 fixtures·19 types·25 sites·14 replay guards, 생성 drift 0, Go/docs/frontend/ontology/ratchet/freshness가 exit 0이다. hosted 5 run은 생성됐으나 보고 시점 진행 중이라 통과로 세지 않는다.
+- 원격 WS/PTY·실 Git·CP/Node 재시작 복원은 미측정이며 S06-DB `review`와 AC-06 차단을 유지한다. 다음 담당은 Claude 독립 검토다. 상세: [[2026-09-22_23-47-00_KST_S06-DB_snapshot-reader_결속_Codex_구현]].
 
 ## 2026-09-22 F-S05-01 설계 결정 초안
 
