@@ -134,20 +134,17 @@ def kill_proc_tree(proc: subprocess.Popen | None):
             pass
 
 
-def free_port(port: int):
-    """Clean up any leftover listener on port on Windows."""
-    if sys.platform != "win32":
-        return
-    try:
-        out = subprocess.check_output(f"netstat -ano | findstr :{port}", shell=True, text=True)
-        for line in out.strip().splitlines():
-            parts = line.split()
-            if len(parts) >= 5 and "LISTENING" in parts:
-                pid = parts[-1]
-                if pid and pid != "0":
-                    subprocess.run(["taskkill", "/F", "/PID", pid], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except Exception:
-        pass
+def redact_credentials(text: str) -> str:
+    """Redact sensitive patterns (passwords, tokens, keys) from error messages."""
+    if not text:
+        return ""
+    import re
+    # Redact postgres password in DSNs: postgresql://user:pass@host
+    redacted = re.sub(r"://([^:]+):([^@]+)@", r"://\1:[REDACTED]@", str(text))
+    # Redact bearer tokens or jwt-like structures
+    redacted = re.sub(r"Bearer\s+[A-Za-z0-9\-_.]+", "Bearer [REDACTED]", redacted)
+    redacted = re.sub(r"ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*", "[REDACTED_JWT]", redacted)
+    return redacted
 
 
 def check_mem() -> tuple[bool, float]:
@@ -1087,6 +1084,7 @@ def run_acceptance(
                 # Insert an active lease in DB for r_active to genuinely trigger resourceReleasePending (0001_core.sql compliant)
                 created_node_id = None
                 created_res_id = None
+                teardown_error = None
                 try:
                     with psycopg.connect(owner_dsn) as conn:
                         with conn.cursor() as cur:
@@ -1142,26 +1140,39 @@ def run_acceptance(
                     shot_cnc03 = output_dir / "s04_03_cancel_reclaim.png"
                     page.screenshot(path=str(shot_cnc03))
                 finally:
-                    # Clean up the lease row from DB, and only clean up resource/node if created by this runner
-                    with psycopg.connect(owner_dsn) as conn:
-                        with conn.cursor() as cur:
-                            cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
-                            cur.execute("DELETE FROM inv.resource_leases WHERE run_id=%s", (r_active["runId"],))
-                            if created_res_id:
-                                cur.execute("DELETE FROM inv.resources WHERE tenant_id=%s AND resource_id=%s", (tenant_id, created_res_id))
-                            if created_node_id:
-                                cur.execute("DELETE FROM inv.nodes WHERE tenant_id=%s AND node_id=%s", (tenant_id, created_node_id))
-                            conn.commit()
+                    # Clean up the lease row from DB, and only clean up node_controls/resource/node if created by this runner
+                    # N3: 0022_node_containment.sql AFTER INSERT trigger containment_seed inserts into inv.node_controls,
+                    # whose FK REFERENCES inv.nodes has NO ON DELETE CASCADE. Delete order: node_controls -> resources -> nodes.
+                    # Teardown is wrapped in try/except to isolate cleanup errors and record in observations without failing the scenario.
+                    try:
+                        with psycopg.connect(owner_dsn) as conn:
+                            with conn.cursor() as cur:
+                                cur.execute("SELECT set_config('inv.tenant_id', %s, false)", (tenant_id,))
+                                cur.execute("DELETE FROM inv.resource_leases WHERE run_id=%s", (r_active["runId"],))
+                                if created_node_id:
+                                    cur.execute("DELETE FROM inv.node_controls WHERE tenant_id=%s AND node_id=%s", (tenant_id, created_node_id))
+                                if created_res_id:
+                                    cur.execute("DELETE FROM inv.resources WHERE tenant_id=%s AND resource_id=%s", (tenant_id, created_res_id))
+                                if created_node_id:
+                                    cur.execute("DELETE FROM inv.nodes WHERE tenant_id=%s AND node_id=%s", (tenant_id, created_node_id))
+                                conn.commit()
+                    except Exception as td_exc:
+                        teardown_error = redact_credentials(f"{type(td_exc).__name__}: {td_exc}")
+                        print(f"⚠️ [CNC-03 Teardown Warning] Failed to clean up fallback test seed: {teardown_error}", file=sys.stderr)
+
+                cnc03_obs = {
+                    "resourceReleasePending": True,
+                    "pendingBadgeInDom": badge_seen,
+                    "screenshot": str(shot_cnc03.name),
+                }
+                if teardown_error:
+                    cnc03_obs["teardownError"] = teardown_error
 
                 scenario_records.append({
                     "id": current_scenario_id,
                     "name": current_scenario_name,
                     "status": "PASS",
-                    "observations": {
-                        "resourceReleasePending": True,
-                        "pendingBadgeInDom": badge_seen,
-                        "screenshot": str(shot_cnc03.name),
-                    },
+                    "observations": cnc03_obs,
                 })
                 print(f"✔ [PASS] {current_scenario_id}: Real resourceReleasePending wire and DOM observation verified")
                 _, _avail = check_mem()
@@ -1515,10 +1526,10 @@ def run_acceptance(
                     "id": current_scenario_id,
                     "name": current_scenario_name or current_scenario_id,
                     "status": "FAIL",
-                    "error": f"{type(exc).__name__}: {str(exc)}",
+                    "error": f"{type(exc).__name__}: {redact_credentials(str(exc))}",
                 })
             measured_ids = {s.get("id") for s in scenario_records}
-            fail_reason = f"Aborted due to exception in {current_scenario_id or 'startup'}: {exc}"
+            fail_reason = f"Aborted due to exception in {current_scenario_id or 'startup'}: {redact_credentials(str(exc))}"
             for defn in SCENARIO_DEFINITIONS:
                 if defn["id"] not in measured_ids:
                     scenario_records.append({
@@ -1539,7 +1550,7 @@ def run_acceptance(
                 "gitCommitSha": git_sha,
                 "assessment": assessment_val,
                 "operationalAcceptanceAssessed": False,
-                "failureDetail": f"{type(exc).__name__}: {str(exc)}",
+                "failureDetail": f"{type(exc).__name__}: {redact_credentials(str(exc))}",
                 "environment": {
                     "os": os.name,
                     "python": sys.version.split()[0],
