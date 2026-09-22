@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-22T23:10:00+09:00",
-  "gitCommitSha": "539e090edc65056bfb2fc2ff4e859e58fb5244a8",
+  "timestamp": "2026-09-22T23:45:31+09:00",
+  "gitCommitSha": "cd2b54f4aeca00ae8ec7d78b28ed34e8aa9daa0f",
   "browser": "Google Chrome (Official Build, Blink engine)",
   "frontendUrl": "http://127.0.0.1:3005",
   "backendUrl": "http://127.0.0.1:8080",
@@ -61,7 +61,7 @@
     },
     "inv07_layoutPersistence": {
       "pass": true,
-      "serializedWindowsCount": 2,
+      "serializedWindowsCount": 8,
       "observedModelStudioGeometry": {
         "x": 120,
         "y": 90,
@@ -84,10 +84,10 @@
         },
         {
           "element": "Window Active Title Text",
-          "domTextColor": "rgb(248, 250, 252)",
-          "domBgColor": "rgb(30, 41, 59)",
-          "ratio": "13.98:1",
-          "numericalRatio": 13.981845124018742,
+          "domTextColor": "rgb(249, 250, 251)",
+          "domBgColor": "rgb(31, 41, 55)",
+          "ratio": "14.05:1",
+          "numericalRatio": 14.046656202460271,
           "pass": true
         },
         {
@@ -125,10 +125,10 @@
       },
       {
         "element": "Window Active Title Text",
-        "domTextColor": "rgb(248, 250, 252)",
-        "domBgColor": "rgb(30, 41, 59)",
-        "ratio": "13.98:1",
-        "numericalRatio": 13.981845124018742,
+        "domTextColor": "rgb(249, 250, 251)",
+        "domBgColor": "rgb(31, 41, 55)",
+        "ratio": "14.05:1",
+        "numericalRatio": 14.046656202460271,
         "pass": true
       },
       {
