@@ -25,6 +25,7 @@ jobs:
       - run: python tools/check_contract_bindings.py
       - run: python tools/check_frontend_integrity.py
       - run: python tools/test_sync.py
+      - run: python tools/check_ontology_generation.py
       - run: python tools/check_ontology.py
       - name: Build documentation bundle
         run: python tools/build_docs.py
