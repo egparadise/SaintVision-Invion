@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.194"
+version: "1.0.195"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T07:00:00+09:00"
+updated: "2026-09-23T08:10:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 LAN pilot CP 겸임 관찰 보강
+
+- O1 `revoke-server-node-colocation`은 기존 CP 겸임 identity/files/key/journal/DB row를 보존하고 private state disabled marker를 먼저 저장한 뒤 등록 channel만 monotonic revoke한다. disabled Node는 status에는 남되 bundle/enroll/source-IP serve의 active 집합에서 제외한다.
+- O2는 schema-v3 script와 옛 v2 bundle 혼용을 fail closed하고 기존 Ubuntu 3대 재설치 불필요를 명시했다. O4는 loopback/WSL NAT source의 bundle/cert 요청이 HTTP 403인 정상 경계와 allowlist/portproxy 우회 금지를, O5는 API 1.45 = Engine 25+ / Docker Desktop 4.27+ `BLOCKED` 메시지를 고정했다.
+- 구현 `791c7332`, focused 47 passed, py_compile/bash parse/CLI help와 docs/bindings/frontend/ontology/ratchet/freshness가 exit 0이다. 실제 CP Node·철회 실행은 미수행이며 Docker API 1.41·WSL Ubuntu 부재 blocker와 `review`를 유지한다. [[2026-09-23_08-10-00_KST_LAN-PILOT-CP-관찰보강_Codex]].
+- 다음 담당은 Claude 독립 검토다. Docker prerequisite가 준비되기 전 운영 등록이나 철회를 대신 실행하지 않는다.
 
 ## 2026-09-23 PR #96 S05-FE 시나리오 매트릭스 계약 검토
 

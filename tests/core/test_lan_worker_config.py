@@ -66,7 +66,7 @@ def test_installer_metadata_upgrade_preserves_existing_identity():
 
 
 def test_colocated_topology_is_explicitly_excluded_from_adr100_measurements():
-    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.74',
+    manifest=dict(schemaVersion=3,serverIP='192.168.45.74',nodeIP='192.168.45.74',
                   coLocatedWithControlPlane=True,
                   measurementEligible={'s05':False,'s07':False},
                   exclusionReason='cp-host-colocation')
@@ -75,7 +75,7 @@ def test_colocated_topology_is_explicitly_excluded_from_adr100_measurements():
 
 @pytest.mark.parametrize('fault',['implicit','flag','s05','s07','reason'])
 def test_colocated_topology_mismatch_is_rejected(fault):
-    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.74',
+    manifest=dict(schemaVersion=3,serverIP='192.168.45.74',nodeIP='192.168.45.74',
                   coLocatedWithControlPlane=True,
                   measurementEligible={'s05':False,'s07':False},
                   exclusionReason='cp-host-colocation')
@@ -88,11 +88,26 @@ def test_colocated_topology_mismatch_is_rejected(fault):
 
 
 def test_independent_topology_remains_unmeasured_not_implicitly_eligible():
-    manifest=dict(serverIP='192.168.45.74',nodeIP='192.168.45.81',
+    manifest=dict(schemaVersion=3,serverIP='192.168.45.74',nodeIP='192.168.45.81',
                   coLocatedWithControlPlane=False,
                   measurementEligible={'s05':None,'s07':None},
                   exclusionReason=None)
     worker.validate_topology(manifest)
+
+
+def test_new_installer_scripts_reject_old_v2_bundle_directory():
+    manifest=dict(schemaVersion=2,serverIP='192.168.45.74',nodeIP='192.168.45.81',
+                  coLocatedWithControlPlane=False,
+                  measurementEligible={'s05':None,'s07':None},
+                  exclusionReason=None)
+    with pytest.raises(ValueError,match='schema v3'):
+        worker.validate_topology(manifest)
+
+
+def test_prepare_worker_blocked_message_names_minimum_docker_versions():
+    script=(Path(__file__).resolve().parents[2]/'deploy/lan/prepare-worker.sh').read_text()
+    assert 'BLOCKED: Docker API 1.45 or newer is required' in script
+    assert 'Docker Engine 25+ / Docker Desktop 4.27+' in script
 
 
 def test_credential_copy_uses_container_owner_and_keeps_host_bytes(tmp_path):

@@ -33,11 +33,13 @@ from psycopg import sql
 from psycopg.conninfo import make_conninfo
 from inv.db import Database
 from inv.ids import new_id
-from inv.node_channels import provision_channel, node_uri
+from inv.node_channels import provision_channel, revoke_channel, node_uri
 from inv.node_transport import NodeTLSClient
 from inv.observer_worker import ObservationWorker
 from inv.tooling import NodePrincipal
 from lan_pki import ca_pair, issue, pem, private_pem, fingerprint, csr_public_key
+
+COLOCATION_REVOKED_REASON = 'server-node-colocation-revoked'
 
 
 def run(args, **kwargs):
@@ -86,7 +88,16 @@ def configured_nodes(state):
         declared_colocation = node.get('coLocatedWithControlPlane', colocated)
         if type(declared_colocation) is not bool or declared_colocation != colocated:
             raise ValueError('Node Control Plane co-location metadata differs from its address')
-        if colocated and not colocation_allowed:
+        disabled = node.get('disabled', False)
+        disabled_reason = node.get('disabledReason')
+        if type(disabled) is not bool:
+            raise ValueError('Node disabled marker must be boolean')
+        if disabled:
+            if not colocated or disabled_reason != COLOCATION_REVOKED_REASON:
+                raise ValueError('Only a revoked co-located Node may be disabled in pilot state')
+        elif disabled_reason is not None:
+            raise ValueError('Active Node cannot carry a disabled reason')
+        if colocated and not colocation_allowed and not disabled:
             raise ValueError('Server Node co-location is not authorized in private state')
         node['coLocatedWithControlPlane'] = colocated
         if node['nodeId'] in seen_ids or node['nodeIP'] in seen_ips:
@@ -97,6 +108,11 @@ def configured_nodes(state):
     if not nodes:
         raise ValueError('At least one Node is required')
     return nodes
+
+
+def active_configured_nodes(state):
+    """Return Nodes authorized for bundles, enrollment, and observation."""
+    return [node for node in configured_nodes(state) if not node.get('disabled', False)]
 
 
 def normalized_state(state):
@@ -158,8 +174,23 @@ def add_requested_nodes(state, node_ips):
     return normalized_state(result), added
 
 
+def revoked_colocation_state(state):
+    """Preserve a co-located identity while revoking its operational opt-in."""
+    result = normalized_state(state)
+    nodes = [dict(node) for node in result['nodes']]
+    revoked = []
+    for node in nodes:
+        if node['nodeIP'] == result['serverIP']:
+            node['disabled'] = True
+            node['disabledReason'] = COLOCATION_REVOKED_REASON
+            revoked.append(node)
+    result['nodes'] = nodes
+    result['serverNodeColocationAllowed'] = False
+    return normalized_state(result), revoked
+
+
 def node_by_id(state, node_id):
-    matches = [node for node in configured_nodes(state) if node['nodeId'] == node_id]
+    matches = [node for node in active_configured_nodes(state) if node['nodeId'] == node_id]
     if len(matches) != 1:
         raise ValueError('CSR Node identity is not configured')
     return matches[0]
@@ -242,7 +273,8 @@ def manifest_for_node(state, node, inspected, tag):
 
 def artifact_for_client(state, public, client_ip, request_path):
     """Map a worker source address to only that worker's public artifact."""
-    matches = [node for node in configured_nodes(state) if node['nodeIP'] == client_ip]
+    active = active_configured_nodes(state)
+    matches = [node for node in active if node['nodeIP'] == client_ip]
     if len(matches) != 1:
         raise PermissionError('Client address is not an allowed Node')
     names = {'/worker.zip': 'worker.zip', '/node-cert.pem': 'node-cert.pem',
@@ -254,7 +286,7 @@ def artifact_for_client(state, public, client_ip, request_path):
     target = public / 'nodes' / node['nodeId'] / name
     if target.is_file():
         return target
-    if node['nodeId'] == configured_nodes(state)[0]['nodeId']:
+    if node['nodeId'] == active[0]['nodeId']:
         legacy = public / name
         if legacy.is_file():
             return legacy
@@ -381,7 +413,9 @@ def init(args):
 
 def bundle(args):
     path, state = args.state, load(args.state)
-    nodes = configured_nodes(state)
+    nodes = active_configured_nodes(state)
+    if not nodes:
+        raise ValueError('No active Node remains after co-location revocation')
     if not state['initialized'] or not all(node['provisioned'] for node in nodes):
         raise ValueError('Initialize the pilot first')
     output = path/'public'
@@ -470,6 +504,42 @@ def enroll(args):
                           node='awaiting-mTLS-observation')))
 
 
+def revoke_server_node_colocation(args):
+    """Fail closed without deleting the co-located Node identity or its files."""
+    state = load(args.state)
+    state, revoked = revoked_colocation_state(state)
+    # Persist the fail-closed marker before touching PostgreSQL. If that step
+    # fails, a retry still cannot serve or enroll the co-located Node.
+    save(args.state, state)
+    channel_states = []
+    if revoked:
+        with psycopg.connect(state['adminDSN']) as conn:
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)",(state['tenantId'],))
+            for node in revoked:
+                row = conn.execute(
+                    'SELECT version,enabled FROM inv.node_channels '
+                    'WHERE tenant_id=%s AND node_id=%s',
+                    (state['tenantId'], node['nodeId'])).fetchone()
+                if not row:
+                    channel_states.append(dict(nodeId=node['nodeId'], channel='not-enrolled'))
+                elif row[1]:
+                    version = revoke_channel(
+                        conn, NodePrincipal(state['tenantId'], node['nodeId']),
+                        expected_version=row[0])
+                    channel_states.append(dict(nodeId=node['nodeId'], channel='revoked',
+                                               channelVersion=version))
+                else:
+                    channel_states.append(dict(nodeId=node['nodeId'], channel='already-disabled',
+                                               channelVersion=row[0]))
+    print(json.dumps(dict(
+        serverNodeColocationAllowed=False,
+        statePreserved=True,
+        disabledNodes=[dict(nodeId=node['nodeId'], nodeIP=node['nodeIP'],
+                            disabled=True, disabledReason=COLOCATION_REVOKED_REASON)
+                       for node in revoked],
+        channels=channel_states)))
+
+
 def node_status_rows(state):
     result = []
     with runtime(state).transaction(state['tenantId']) as conn:
@@ -478,6 +548,8 @@ def node_status_rows(state):
             snap = conn.execute('SELECT received_at,snapshot FROM inv.node_resource_snapshots WHERE node_id=%s',(node['nodeId'],)).fetchone()
             result.append(dict(nodeId=node['nodeId'], nodeIP=node['nodeIP'],
                                coLocatedWithControlPlane=node['coLocatedWithControlPlane'],
+                               disabled=node.get('disabled', False),
+                               disabledReason=node.get('disabledReason'),
                                node=dict(row) if row else None, observed=bool(snap),
                                snapshot=dict(snap) if snap else None))
     return result
@@ -504,7 +576,9 @@ def observe(args):
                              ensure_ascii=False),flush=True)
         except Exception:
             nodes = [dict(nodeId=node['nodeId'], nodeIP=node['nodeIP'],
-                          status='observation-unavailable') for node in configured_nodes(state)]
+                          status=(COLOCATION_REVOKED_REASON if node.get('disabled')
+                                  else 'observation-unavailable'))
+                     for node in configured_nodes(state)]
             print(json.dumps(dict(status='observation-unavailable', nodes=nodes)),flush=True)
         if args.once:
             return
@@ -514,7 +588,7 @@ def observe(args):
 def serve(args):
     state = load(args.state)
     public = args.state/'public'
-    node_ips = [node['nodeIP'] for node in configured_nodes(state)]
+    node_ips = [node['nodeIP'] for node in active_configured_nodes(state)]
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             target = None
@@ -591,6 +665,9 @@ def main():
                    help='Private worker IPv4 address; repeat once per Node')
     p.add_argument('--allow-server-node-colocation',action='store_true',
                    help='Explicitly allow one Node on the Control Plane host address')
+    commands.add_parser(
+        'revoke-server-node-colocation',
+        help='Preserve but disable the Control Plane co-located Node and channel')
     p = commands.add_parser('bundle')
     p.add_argument('--go')
     p.add_argument('--reuse-image',action='store_true')
@@ -603,7 +680,7 @@ def main():
     args = parser.parse_args()
     args.state = args.state.resolve()
     try:
-        globals()[args.command](args)
+        globals()[args.command.replace('-', '_')](args)
     except KeyboardInterrupt:
         pass
     except Exception as error:
