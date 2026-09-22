@@ -557,9 +557,13 @@ class PlacementStore:
         approvals,
         lease_store,
     ):
-        """Optimistic placement with a bounded, selected-resource commit section."""
+        """Optimistic placement with a bounded, selected-resource commit section.
 
-        last_contention = None
+        Stale speculative decisions may be recomputed locally.  Database
+        contention is deliberately fail-fast so the existing RES-0007 response
+        reaches the caller without multiplying pressure on the limit row.
+        """
+
         for attempt in range(1, 4):
             try:
                 speculative = self._speculate(
@@ -704,13 +708,6 @@ class PlacementStore:
                         )
             except _StalePlacement:
                 continue
-            except DomainError as error:
-                if error.code == "RES-0007" and error.retryable and attempt < 3:
-                    last_contention = error
-                    continue
-                raise
-        if last_contention is not None:
-            raise last_contention
         raise DomainError(
             "RES-0007",
             "Transaction contention; retry with the same key",

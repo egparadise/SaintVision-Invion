@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceType": "s05-fail-fast-stage3-summary",
+  "scope": "development-PC; one synthetic measured-node row; real disposable PostgreSQL; not five-node AC-05",
+  "acceptanceClaim": false,
+  "taskId": "S05-DB",
+  "finding": "F-S05-03",
+  "featureFlagDefault": false,
+  "measurementCodeSHA": "a60313a72a618c338a0d67da13e2993b1e536e8e",
+  "finalSchemaVersion": "1.4.0",
+  "requestCount": 20,
+  "concurrency": 20,
+  "repetitions": 3,
+  "calibration": {
+    "codeSHA": "5a612ebd35fa332ff5e6c60b93ecad4b3b0d4afd",
+    "schemaVersion": "1.3.0",
+    "reasonNotFinal": "timeoutRetryCount counted fail-fast timeouts even though no retry occurred; v1.4 separates timeoutCount and fixes timeoutRetryCount at zero",
+    "legacy": {
+      "successCounts": [20, 20, 20],
+      "external55P03": [0, 0, 0],
+      "external57014": [0, 0, 0],
+      "requestP95AllMs": [1900.261, 1630.595, 1604.7],
+      "requestP95MedianMs": 1630.595,
+      "lockHoldP95Ms": [1542.168, 1329.965, 1360.102],
+      "lockHoldP95MedianMs": 1360.102
+    },
+    "candidate": {
+      "successCounts": [10, 14, 6],
+      "external55P03": [10, 6, 14],
+      "external57014": [0, 0, 0],
+      "requestP95AllMs": [1002.514, 940.22, 993.147],
+      "requestP95MedianMs": 993.147,
+      "lockHoldP95Ms": [111.886, 141.31, 175.484],
+      "lockHoldP95MedianMs": 141.31,
+      "limitRowWaitP95Ms": [522.253, 524.122, 504.218],
+      "limitRowWaitP95MedianMs": 522.253
+    }
+  },
+  "final": {
+    "executionOrder": ["legacy-1", "candidate-1", "candidate-2", "legacy-2", "legacy-3", "candidate-3"],
+    "legacy": {
+      "processExitCodes": [0, 1, 0],
+      "successCounts": [20, 18, 20],
+      "failureCounts": [0, 2, 0],
+      "external55P03": [0, 0, 0],
+      "external57014": [0, 2, 0],
+      "requestP95AllMs": [1027.02, 2292.13, 1817.763],
+      "requestP95MedianMs": 1817.763,
+      "lockHoldP95Ms": [789.944, 2021.962, 1526.365],
+      "lockHoldP95MedianMs": 1526.365,
+      "limitRowAcquisitionAttempts": [0, 0, 0],
+      "internalContentionRetries": [0, 0, 0]
+    },
+    "candidateFailFast": {
+      "processExitCodes": [1, 1, 1],
+      "successCounts": [18, 7, 8],
+      "failureCounts": [2, 13, 12],
+      "external55P03": [2, 13, 12],
+      "external57014": [0, 0, 0],
+      "requestP95AllMs": [827.757, 938.185, 922.915],
+      "requestP95MedianMs": 922.915,
+      "lockHoldP95Ms": [44.114, 145.956, 116.848],
+      "lockHoldP95MedianMs": 116.848,
+      "limitRowAcquisitionAttempts": [20, 20, 20],
+      "limitRowAcquired": [18, 7, 8],
+      "limitRowTimeoutCount": [2, 13, 12],
+      "limitRowTimeoutRetryCount": [0, 0, 0],
+      "limitRowWaitP95Ms": [501.331, 504.19, 504.437],
+      "limitRowWaitP95MedianMs": 504.19
+    }
+  },
+  "decisionGates": {
+    "lockHoldP95Decreased": true,
+    "externalTimeoutTotalNonIncreasing": false,
+    "requestP95NonWorsening": true,
+    "passed": false,
+    "legacyExternalTimeoutTotal": 2,
+    "candidateExternalTimeoutTotal": 27
+  },
+  "cleanup": {
+    "remainingInvTestDatabases": 0,
+    "checkedAfterBothMeasurementSets": true
+  },
+  "boundaries": {
+    "fiftyConcurrentExecuted": false,
+    "physicalFiveNodeExecuted": false,
+    "ac05Evaluated": false,
+    "peakWorkingSetMeasured": false
+  }
+}

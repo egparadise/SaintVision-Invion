@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-2026-09-23-S05-SHORT-COMMIT-F-S05-03"
 title: "S05 옵션 1 short-commit 구현과 F-S05-03 경합 재배치"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T01:40:00+09:00"
+updated: "2026-09-23T02:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "83bc1434cba23258627e4aedb86fa9a56088bc46"
@@ -24,7 +24,7 @@ tags: ["placement", "short-commit", "postgresql", "concurrency", "F-S05-03", "fe
 
 ## 구현
 
-- flag off는 기존 placement 경로를 그대로 사용한다. 운영자 설정은 strict boolean이며 기본값은 `false`다.
+- flag off는 외부 동작이 기존 placement와 동등하지만, 내부 구현은 direct lease와 shared admission/prepared primitive를 쓰도록 리팩터됐다. 바이트 무변경이 아니다. 운영자 설정은 strict boolean이며 기본값은 `false`다.
 - flag on은 speculative read에서 pool·관측·capacity·Explain을 만들고, final transaction에서 idempotency·Run·네 admission 검사 뒤 project ceiling과 선택 Node/Resource만 잠근다.
 - membership, limits, resource offered/capacity, Node heartbeat/skew/epoch, snapshot/channel을 final lock 아래 재검증한다.
 - `active_total` 변화 자체는 stale로 취급하지 않고 잠긴 선택 resource에서 fit을 다시 계산한다. fit이 깨지거나 나머지 mutable 입력이 바뀌면 savepoint rollback 뒤 후보 계산부터 최대 3회 재시도한다.
@@ -38,7 +38,7 @@ tags: ["placement", "short-commit", "postgresql", "concurrency", "F-S05-03", "fe
 
 ## 실 PG 불변식 시험
 
-- `tests/integration/test_placement_short_commit.py`: 최종 **10 passed / 14.41s / exit 0**. 기본 off와 응답/replay, 안전한 metric payload, legacy project mutex 우회, stale guard 재계획, active fit 재계산, grant/epoch fail-closed, event rollback, direct lease 혼합 ceiling, RLS, caller-owned transaction savepoint를 확인했다.
+- `tests/integration/test_placement_short_commit.py`: 당시 **10 passed / 14.41s / exit 0**. 다만 Claude 카드 18 되살림에서 active fit 재계산과 caller-owned savepoint 제거가 모두 살아남아, 이 두 항목의 시험 무게는 당시 미확인이었다. 카드 16에서 tight-fit과 실제 `55P03` 경계를 추가해 두 mutation을 각각 exit 1로 KILL했다.
 - `tests/integration/test_model_retry.py::test_retry_short_commit_flag_preserves_atomic_response_and_replay`: **1 passed / 12.32s / exit 0**. model-retry 응답, exact replay, 새 fencing, frozen input/approval 요구를 보존했다.
 - config/benchmark 단위 시험: **33 passed / exit 0**. 구현 뒤 compile과 `git diff --check`도 exit 0이다.
 - 각 실 PG 시험과 benchmark는 일회용 DB를 사용했고 fixture가 정리했다. DSN·role password·tenant/project/run 식별자는 문서 증거에 없다.
@@ -81,3 +81,7 @@ tags: ["placement", "short-commit", "postgresql", "concurrency", "F-S05-03", "fe
 - S05-DB `review` 유지. registry/ontology 변경 없음.
 - report schema v1.3에 요청별 limit-row 획득 시도, `55P03` timeout retry 횟수, 대기 p50/p95/max를 별도 필드로 추가했다. 단계 3 원본에는 없던 필드라 값을 소급 생성하지 않았으며, 후속 3동시 smoke는 3/3·exit 0, 대기 p50/p95/max 42.859/162.104/162.104ms, retry 0이었다.
 - 후속 옵션은 (1) ceiling 원자성을 보존하는 limit-row 잠금 입도/배치 갱신, (2) 내부 retry를 제거하고 기존 503/retryable을 클라이언트에 즉시 위임하는 fail-fast다. 둘 다 Claude 카드 18 검토와 코디네이터 결정 전 구현하지 않는다.
+
+## 카드 16 F-R3 정정
+
+카드 18은 코드 sound와 공개 계약 불변을 확인했지만, 당시 “반례를 잡는다”는 표현 중 fit 재계산·savepoint 두 건은 되살림 민감도가 없었다. 카드 16은 `offered - need + 1` tight-fit과 BoundDatabase의 실제 limit-row `55P03` 뒤 같은 outer transaction 재호출을 추가해 두 되살림을 각각 실패시켰다. 또한 “flag off 기존 경로 그대로”는 외부 동작 동등성이지 구현 무변경이 아니며, shared primitive 리팩터를 포함한다. 후속 fail-fast·재측정과 현재 판정은 [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]]가 정본이다.

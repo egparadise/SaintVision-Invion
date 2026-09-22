@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.185"
+version: "1.0.186"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T02:06:00+09:00"
+updated: "2026-09-23T02:50:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 fail-fast · F-R1/F-R2 보강
+
+- database contention 내부 retry를 제거해 limit-row `55P03`을 기존 `RES-0007`/503/retryable로 즉시 반환한다. stale speculative decision 재계획은 유지하고 flag는 기본 off다. 공개 계약 변경 0이다.
+- tight-fit active_total 재계산과 BoundDatabase 실제 `55P03` savepoint 시험을 추가했다. 실 PG 13 passed/exit 0, 두 mutation은 각각 exit 1로 KILLED이며 model-retry 회귀 1 passed/exit 0이다. flag-off는 내부 shared primitive 리팩터를 포함한 동작 동등 경로라고 문서를 정정했다.
+- a60313a7 20동시×3에서 hold P95 중앙 1526.365→116.848ms, 요청 P95(all) 1817.763→922.915ms였으나 외부 timeout 2→27로 증가해 단계 3은 미통과다. flag off·S05 `review`·50/5노드 미승격을 유지하며 decision v1.3의 limit-row 입도 변경 대 legacy 유지·5노드 후 재판단을 코디네이터에게 요청한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]].
 
 ## 2026-09-23 S05-DB 5노드 lane 실행 계획
 

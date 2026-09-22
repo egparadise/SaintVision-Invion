@@ -1,15 +1,22 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.21"
+version: "1.5.22"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T00:18:00+09:00"
+updated: "2026-09-23T02:50:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+## 2026-09-23 S05-DB F-S05-03 fail-fast 재판정
+
+- candidate의 database contention 내부 retry를 제거했다. 첫 limit-row `55P03`은 기존 `RES-0007`/503/retryable로 즉시 반환하며 stale speculative decision 재계획은 유지한다. flag 기본 off, 공개 계약 변경 0이다.
+- F-R1 tight-fit과 F-R2 BoundDatabase `55P03` savepoint 시험을 추가했다. 원본 focused는 13 passed/exit 0, active_total 제거와 savepoint 제거 mutation은 각각 대상 시험 exit 1로 KILLED다. 카드 14의 두 되살림 미확인을 정정했다.
+- 최종 a60313a7 20동시×3은 legacy timeout 2, candidate 외부 `55P03` 27·내부 retry 0이다. hold P95 중앙 1526.365→116.848ms, request P95(all) 1817.763→922.915ms지만 외부 timeout 비증가 실패로 단계 3 미통과다. 5a612ebd 첫 세트는 schema 명명 결함이 있는 calibration으로 분리 보존했다.
+- 재개 조건: 코디네이터가 (a) limit-row kind별 행/usage CAS 상세 설계 또는 (b) legacy 유지·inventory-bound 5노드 20동시 선측정 중 하나를 결정한다. 그 전 flag 활성, limit-row migration, 20동시 초과·50동시는 금지한다. [[2026-09-23_02-50-00_KST_S05_fail-fast_F-R1_F-R2_Codex]]
 
 ## 2026-09-23 S05-DB F-S05-01 timeout 실측
 

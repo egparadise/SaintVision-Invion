@@ -313,14 +313,21 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         "commitMaxMs": round(max(committed_holds), 3) if committed_holds else None,
     }
     wait_values = [item["waitMs"] for item in wait_metrics]
+    wait_timeout_count = sum(item["outcome"] == "timeout" for item in wait_metrics)
     report["limitRowWait"] = {
+        "contentionPolicy": (
+            "fail-fast"
+            if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
+            else "legacy-project-serial"
+        ),
         "samples": wait_metrics,
         "attemptCount": len(wait_metrics),
+        "acquisitionAttemptCount": len(wait_metrics),
         "acquiredCount": sum(item["outcome"] == "acquired" for item in wait_metrics),
-        "timeoutRetryCount": sum(
-            item["outcome"] == "timeout" and item.get("sqlState") == "55P03"
-            for item in wait_metrics
-        ),
+        "timeoutCount": wait_timeout_count,
+        # Kept for additive compatibility with v1.3 evidence.  Under the
+        # fail-fast policy a timeout is returned, never retried internally.
+        "timeoutRetryCount": 0,
         "p50Ms": (
             round(percentile_nearest_rank(wait_values, 0.50), 3)
             if wait_values
@@ -333,7 +340,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         ),
         "maxMs": round(max(wait_values), 3) if wait_values else None,
     }
-    report["schemaVersion"] = "1.3.0"
+    report["schemaVersion"] = "1.4.0"
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -360,6 +367,11 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     record_property("limitRowWaitP50Ms", report["limitRowWait"]["p50Ms"])
     record_property("limitRowWaitP95Ms", report["limitRowWait"]["p95Ms"])
     record_property("limitRowWaitMaxMs", report["limitRowWait"]["maxMs"])
+    record_property(
+        "limitRowAcquisitionAttemptCount",
+        report["limitRowWait"]["acquisitionAttemptCount"],
+    )
+    record_property("limitRowTimeoutCount", report["limitRowWait"]["timeoutCount"])
     record_property(
         "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
     )

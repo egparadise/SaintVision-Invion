@@ -10,8 +10,8 @@ import pytest
 from inv.approvals import Principal
 from inv.db import BoundDatabase, Database
 from inv.errors import DomainError
-from inv.leases import Allocation
-from inv.placement import PlacementStore
+from inv.leases import Allocation, lock_resources
+from inv.placement import PlacementStore, _StalePlacement
 from test_placement_benchmark import placement_benchmark_env, _start_observation_window
 from test_postgres import planned
 
@@ -161,6 +161,46 @@ def test_active_total_change_recomputes_fit_without_discarding_valid_winner(
     assert calls == 1
 
 
+def test_locked_fit_rejects_tight_fit_after_competing_active_total(
+    placement_benchmark_env,
+):
+    """F-R1: removing active_total from _locked_fit must make this test fail."""
+
+    a = _candidate(placement_benchmark_env)
+    competing = planned(a.e)
+    with a.e.db.transaction(a.e.tenant) as conn:
+        rows = conn.execute(
+            "SELECT resource_id,kind,offered FROM inv.resources "
+            "WHERE node_id=%s AND kind IN ('cpu','memory') ORDER BY resource_id",
+            (a.e.node,),
+        ).fetchall()
+    by_kind = {row["kind"]: row for row in rows}
+    a.e.leases.reserve(
+        a.e.tenant,
+        a.e.project,
+        competing["runId"],
+        [
+            Allocation(
+                by_kind["cpu"]["resource_id"],
+                int(by_kind["cpu"]["offered"]) - a.request.cpu_millis + 1,
+            ),
+            Allocation(
+                by_kind["memory"]["resource_id"],
+                int(by_kind["memory"]["offered"]) - a.request.memory_bytes + 1,
+            ),
+        ],
+        key="tight-fit-competitor",
+    )
+
+    with a.e.db.transaction(a.e.tenant) as conn:
+        resources = lock_resources(
+            conn,
+            [by_kind["cpu"]["resource_id"], by_kind["memory"]["resource_id"]],
+        )
+        with pytest.raises(_StalePlacement):
+            a.placement._locked_fit(conn, resources, a.e.node, a.request)
+
+
 def test_bound_candidate_rolls_back_stale_attempt_to_savepoint(
     placement_benchmark_env, monkeypatch
 ):
@@ -200,6 +240,85 @@ def test_bound_candidate_rolls_back_stale_attempt_to_savepoint(
 
     assert result["runId"] == run["runId"]
     assert calls >= 2
+
+
+def test_bound_candidate_savepoint_recovers_after_fail_fast_limit_row_timeout(
+    placement_benchmark_env,
+):
+    """F-R2: a caller may retry in one outer transaction after a 55P03 savepoint."""
+
+    a = placement_benchmark_env
+    _start_observation_window(a)
+    run = planned(a.e)
+    holder = psycopg.connect(a.e.owner)
+    try:
+        holder.execute(
+            "SELECT project_id FROM inv.project_resource_limits "
+            "WHERE project_id=%s FOR UPDATE",
+            (a.e.project,),
+        ).fetchone()
+        with a.e.db.transaction(a.e.tenant) as conn:
+            bound = PlacementStore(BoundDatabase(a.e.db, a.e.tenant, conn))
+            bound.db.placement_short_commit = True
+            with pytest.raises(psycopg.errors.LockNotAvailable) as caught:
+                bound.reserve(
+                    a.principal,
+                    a.e.project,
+                    run["runId"],
+                    a.request,
+                    key="bound-limit-fail-fast",
+                    policy_version="roof:candidate:1",
+                    pool_version="project-nodes:candidate:1",
+                )
+            assert caught.value.sqlstate == "55P03"
+            holder.rollback()
+            result = bound.reserve(
+                a.principal,
+                a.e.project,
+                run["runId"],
+                a.request,
+                key="bound-limit-fail-fast",
+                policy_version="roof:candidate:1",
+                pool_version="project-nodes:candidate:1",
+            )
+    finally:
+        holder.rollback()
+        holder.close()
+
+    assert result["runId"] == run["runId"]
+
+
+def test_limit_row_contention_fails_fast_with_existing_public_contract(
+    placement_benchmark_env,
+):
+    a = placement_benchmark_env
+    metrics = []
+    _candidate(a, metric_sink=metrics.append)
+    _start_observation_window(a)
+    run = planned(a.e)
+    holder = psycopg.connect(a.e.owner)
+    try:
+        holder.execute(
+            "SELECT project_id FROM inv.project_resource_limits "
+            "WHERE project_id=%s FOR UPDATE",
+            (a.e.project,),
+        ).fetchone()
+        with pytest.raises(DomainError) as caught:
+            _reserve(a, run, key="limit-row-fail-fast")
+    finally:
+        holder.rollback()
+        holder.close()
+
+    error = caught.value
+    assert (error.code, error.status, error.retryable) == ("RES-0007", 503, True)
+    assert isinstance(error.__cause__, psycopg.errors.LockNotAvailable)
+    assert error.__cause__.sqlstate == "55P03"
+    waits = [item for item in metrics if item["mode"] == "placement-limit-row-wait"]
+    assert len(waits) == 1
+    assert waits[0]["attempt"] == 1
+    assert waits[0]["outcome"] == "timeout"
+    assert waits[0]["sqlState"] == "55P03"
+    _assert_no_residue(a, "limit-row-fail-fast")
 
 
 def test_grant_revocation_between_speculation_and_commit_fails_closed(

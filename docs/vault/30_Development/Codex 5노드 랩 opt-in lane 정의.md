@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-FIVE-NODE-LAB-LANE-001"
 title: "Codex 5노드 랩 opt-in lane 정의"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T02:06:00+09:00"
+updated: "2026-09-23T02:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark", "NTP", "mTLS"]
@@ -54,7 +54,7 @@ tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark"
 - `manifest.json`: code/inventory/image/policy SHA, 실행 순서, 입력 body hash, node 공개 fingerprint, 명령과 exit code, 시작·종료 UTC/KST.
 - `s05/<mode>/<wave>/<repetition>/placement.json`: 요청별 sample, Explain/snapshot/canonical decision digest, leases/fencing, no-overbooking, active before/after.
 - 같은 경로의 `placement.xml`: JUnit failure/skip/error를 숨기지 않는다.
-- schema 1.3의 `lockHold` p50/p95/max와 `limitRowWait` attempt/acquired/timeoutRetryCount/p50/p95/max. project/limit/node/resource lock 종류별 wait가 추가되면 기존 필드를 지우지 않고 additive version으로 낸다.
+- schema 1.4의 `lockHold` p50/p95/max와 `limitRowWait` contentionPolicy/acquisitionAttemptCount/acquiredCount/timeoutCount/timeoutRetryCount/p50/p95/max. fail-fast에서는 `timeoutCount`와 `timeoutRetryCount=0`을 구분한다. project/limit/node/resource lock 종류별 wait가 추가되면 기존 필드를 지우지 않고 additive version으로 낸다.
 - `comparison.json`: mode·wave별 3회 중앙값, 내부와 외부 `55P03/57014`, retry 분포, candidate gate 두 조건, AC-05 항목별 pass/fail/unmeasured.
 - `redaction.json`: DSN·private key·token·원문 terminal secret 탐지 0건과 검사 명령/exit code.
 
