@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T04:00:00+09:00"
+updated: "2026-09-23T04:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+Codex 카드 11 독립 검토 → **승인** (Claude, 2026-09-23, 카드 z): 50d5ebc4 pitr_opt_in_dry_run.py — 코드 정독 쓰기 0(SELECT current_setting·filesystem plan만, apply/compose/ALTER 호출 없음, 출력 JSON만), dev PG 읽기 전용 1회 실행 → absent(archive_mode off)·mutations/acceptance 전부 False·결정 B 정직 표기·실행 후 설정 무변경, AC-12 드릴 초안 '드릴 전 미달성' 경계 유지, 시험 22 passed·check_docs PASS, 되살림 M1(acceptance 유도)·M2(mutation flag) 모두 KILLED. 관찰 2(inconclusive 원인 미기록·빈 디렉터리 observed). [[2026-09-23_Codex_카드11_PITR_opt-in_dry-run_50d5ebc4_독립검토_Claude]] (PR agent/claude/review-codex-card11)
 
 Codex 카드 10 F-S05-02 착지 83bc1434 독립 검토 → **승인** (Claude, 2026-09-23, 카드 y): db.py 순서(READ COMMITTED→role→GUC→lock_timeout 500ms→statement_timeout 2s)·RES-0007 매핑·placement FOR NO KEY UPDATE 코드 일치; 실 PG 독립 재현(임시 진단, wait_event 샘플링): Lock/transactionid → 55P03 648ms, Timeout/PgSleep → 57014 2153ms — Codex 값과 일치. 주입 시험과 legacy 20동시 조건 차이 서술 정확, 계약 표면 영향 0. 관찰 3(57014 경로 pin 없음·pg_locks 계측·1회 수치). 검증상태지도 v1.4.0 §14 F-S05-01/02 추가. [[2026-09-23_Codex_카드10_F-S05-02_원인분리_83bc1434_독립검토_Claude]] (PR agent/claude/review-codex-card10-fs0502)
 
