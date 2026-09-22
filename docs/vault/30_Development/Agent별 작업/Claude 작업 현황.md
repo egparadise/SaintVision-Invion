@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.14"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T23:20:00+09:00"
+updated: "2026-09-23T00:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -116,27 +116,15 @@ S02 착수 선행 입력 체크리스트 (Claude, 2026-09-22): 사용자용 1쪽
 
 route_coverage CLI docs.yml report-only 배선 (Claude, 2026-09-22): `continue-on-error`+`exit 0`으로 job 미실패, 실제 exit는 step-summary 제목·로그에 기록, json/txt artifact. 서빙 트리는 src·services(tests 제외). 검증검사도구_목록 v1.4.0에 등급·승격 조건(1주 exit 0 ∧ 백로그 0 → ratchet 이름집합). 로컬 step 시뮬레이션 exit 0·43/0. 브랜치 agent/claude/route-coverage-docs-gate(PR #45 위 stack), 워크플로는 Codex 소유라 검토 요청. 전문 [[2026-09-22_route_coverage_CLI_docs.yml_report-only_배선_Claude]].
 
-
-새 PC 첫날 — CI 첫 실행 triage + 이전 후 전수 검증 (Claude, 2026-09-22): SHA d01c931a. CI 4 workflow 관측(docs 성공·backend/core/browser 실패) → 원인 5(C1 계약 drift=B1 회귀·C2 rdflib=B2·C3 docker exec·C4 자격증명 매핑·C5 브라우저 3=A), **Claude 레인 0**. 작성 중 Codex가 C1~C4를 착지(881f2911·51d53b7f) → 2차 실행에서 C5=`test_desktop_browser`·`test_studio_browser`(Gemini)로 귀속, **C6 신규**=vitest 시간 포맷이 러너 locale에 기댐(B2, Gemini). CI가 처음 검증한 것: Go 컴파일·race·announce_test 해소(Go 지도 갱신), PG-in-CI로 2964 수집/58 skip, node 레인 5개 0실패. 새 PC 전수(절차서 §5, clean 트리): 게이트 PASS·프런트 기준선 동일(tsc/build/vitest 655/contracts 16)·pytest 실PG 2549 passed/2 failed/408 skip(failed 2는 단독 통과: `.work` 선존재 가정·공유 PG 경합 추정). 환경 차이 1: check_frontend_integrity가 cp949 콘솔에서 ✔ 출력으로 exit 1(검사는 0위반) → Gemini 짚어 넘김, 이 PC는 PYTHONUTF8=1. Go 이 PC에도 없음(CI 위임). 전문 [[2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude]].
-
-
-version: "1.2.3"
-status: "review"
-author: "Claude"
-updated: "2026-09-22T18:20:00+09:00"
-
-
 결정 #6·#7 준비 완결 (Antigravity/Gemini 작성, Claude 탭 경유, 2026-09-22): 결정 #7(노드 시각 스큐 알람) 선행 조건인 ERR-DESIGN-007 규격 개정안([[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Gemini]]) 및 결정 #6(미연결 능력 부류 3종 현황·노출분석, [[2026-09-22_미연결_능력_부류_현황_및_노출분석_Gemini]]) 작성 완료(PR #38). 결정 #7은 A로 결정되어 위 카드에서 구현됨.
 
 결정 #7 A 구현 — 시각 스큐 P2 알람 활성화 (Claude, 2026-09-22): ERR-DESIGN-007 v2.0.0 채택(제1~4조 정본), GOV-ALERT-001 v1.1.0 활성화 문단, 개정안 문서 active, 브리프 §7 결정됨. `tools/alarm_check.py`: gated 해제·`skew_outside_limit`(커널 술어의 독립 미러; 드리프트는 커널 5자리 대조 시험으로 고정)·`clock_skew_alarm`·evaluate에 online 노드 스큐 판정. 시험: PG-free 28 + **실 PG 7케이스(TC-SKEW-01~07) 35 passed/0 skip**(일회용 Alembic DB, 분리 프로세스). 커널 변경 0. 브랜치 agent/claude/decision-7-clock-skew-alarm(base PR #38) → PR. reviewer Codex. 전문 [[2026-09-22_결정7_시각스큐알람_활성화_구현_Claude]].
 
-
 새 PC triage 지도 v1.1.0 (Claude, 2026-09-22): 2차 CI 실행 반영 — C5 브라우저 클래스 귀속(Gemini)·C6 vitest locale(B2)·**C7 backend no-skip 게이트 vs 플랫폼 skip 45**(Codex ratchet 착지), **backend 첫 완주 2645 passed/45 skip/0 fail**(3.14), machinery 발견: cancel-in-progress로 backend·core가 integration에서 success 0회(문서 push도 취소 유발) → Codex 인계·문서-only push 지연 규율. PR #43. 전문 [[2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude]].
-
 
 route_coverage 스캐너 사각 수정 (Claude, 2026-09-22): 원인 정정 — '변수 조립'이 아니라 **템플릿 hole 안의 함수 호출**(`${encodeURIComponent(x)}`)이 경로를 지움, apps/web 15곳(13 경로). `_flatten_template_holes`+꼬리 hole 귀속. 회귀 5개 원본에서 FAILED→수정 후 36 passed. 재측정: tip 30/0→**43/0**, PR #36 트리 **45/unserved 2**(resource-usage) — 도구가 F1을 스스로 잡음. 브랜치 agent/claude/route-coverage-template-holes(PR #42 위 stack). 전문 [[2026-09-22_route_coverage_템플릿hole_사각_수정_Claude]].
 
-PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, 게이트 전부 GREEN(tsc 0·vitest 659/76·build 0·integrity 0·route_coverage 30/0) + Zero-Mock 되살림(reserved→0 변이가 시험에 잡힘). 발견: F1 서빙 라우트 0(404; 결정 #2는 계약만 착지) · F2 App 배선 0(사용자 가시 변화 없음) · **F3 route_coverage가 변수 조립 URL을 못 봐 30/0 거짓 초록**(내 레인 후속) · F4 프로젝터 capacity→0 조용한 강등 · F5 미병합 gemini/S02-FE 작업(InvFileExplorer +151) 동승. 판정: 조건부 병합(rebase·설명 정정), '연결 완결' 아님. 후속: 라우트=Claude, 배선=Gemini, 스캐너=Claude. PR 코멘트 게시. 전문 [[2026-09-22_PR36_NodeResourceUsage_UI_독립검토_Claude]].
+PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, 게이트 전부 GREEN(tsc 0·vitest 659/76·build 0·integrity 0·route_coverage 30/0) + Zero-Mock 되살림(reserved→0 변이가 시험에 잡힘). 발견: F1 서빙 라우트 0(404; 결정 #2는 계약만 착지) · F2 App 배선 0(사용자 가시 변화 없음) · **F3 route_coverage가 변수 조립 URL을 못 봐 30/0 거짓 초록**(내 레인 후속) · F4 프로젝터 capacity→0 조용한 강등 · F5 미병합 gemini/S02-FE 작업(InvFileExplorer +151) 동승. 판정: 조건부 병합(rebase·설명 정정), '연결 완결' 아님. 후속: 라우트=Claude, 배선=Gemini, 스캐너=Claude. PR 코멘트 게시. 전문 [[2026-09-22_PR36_NodeResourceUsage_UI_독립검토_Claude]].## 작업 카드
 
 ## 작업 카드
 
@@ -346,7 +334,6 @@ PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, �
 | 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
 | 다음 카드 / 첫 행동 / 다음 담당 | 착지 완료(11커밋 b378785). e2908a5 registry 권한 결속 독립 검토 완료(sound), docker 부재 3파일 동작 실측(22 passed/2 skipped, 깔끔 skip·가드 불필요). 남은 것: 3파일 배치/CI 경계(Codex), 여유 호스트 image lane 재판별(사용자/CI) |
 | History / 오류 / Evidence / PR / sync 결과 | **상태 지도(단일 참조)**: [[2026-09-19_Claude영역_검증상태지도]] — 검증완료/미검증(정확히 기록)/외부대기 구분, image lane 6건 재실행 조건·명령 포함. History: `..._VF-CL-R-001_...근본원인과R2수정.md` v1.5.0; `..._model_remote독립검토.md`; `..._원격권한결속과CAS_fixture독립검토.md`; `..._registry권한결속_독립검토.md`. 착지 merge b378785 |
-
 
 ## Codex 통합 수신 (2026-09-18)
 
