@@ -17,7 +17,7 @@ tags: ["history", "s07", "kernel", "five-node", "preflight", "mtls", "statistics
 ## 기준과 결과
 
 - base/integration SHA: `9e3827aca952db91fef305706e63de01baf66318`
-- implementation SHA: `de8a9b7def0fc88ec049057ce32a9dd46415230b`
+- implementation SHAs: `de8a9b7def0fc88ec049057ce32a9dd46415230b`, `58ad1cb03b024bff22bb330a5cf80809e7405314`
 - branch/PR: `agent/codex/s07-preflight-v11`, PR #110
 - owner/reviewer: Codex / Claude
 
@@ -35,11 +35,12 @@ tags: ["history", "s07", "kernel", "five-node", "preflight", "mtls", "statistics
 
 ## 검증
 
-환경은 Windows 11, Python 3.14.7 `.venv`, `PYTHONUTF8=1`, `PYTHONPATH=src;services/control-plane/src`다. 실제 Node, Docker, browser, shard wave와 실 PostgreSQL 부하는 실행하지 않았다. Codex tab 카드 24의 PG 측정과 충돌하지 않도록 실 PG 단일 파일은 대기 상태다.
+환경은 Windows 11, Python 3.14.7 `.venv`, `PYTHONUTF8=1`, `PYTHONPATH=src;services/control-plane/src`다. 실제 Node, Docker, browser와 shard wave는 실행하지 않았다. Codex tab 카드 24의 PG 측정 종료 뒤 disposable 실 PostgreSQL 단일 파일만 순차 실행했다.
 
 | 명령 | 결과 |
 |---|---|
-| `pytest -q tests/test_placement_benchmark_five_node_adapter.py` | 15 passed, exit 0 |
+| `pytest -q tests/test_placement_benchmark_five_node_adapter.py` | 16 passed, exit 0 |
+| `pytest -q tests/integration/test_five_node_lab_preflight.py` | 실 PG 1 passed / 8.47s, exit 0; unique DB/login role 정리 |
 | `python -m py_compile tools/five_node_lab_preflight.py tools/placement_benchmark.py` | exit 0 |
 | `python tools/placement_benchmark.py --help` | exit 0 |
 | `python tools/check_docs.py` | 24 hashes, 884 documents, exit 0 |
@@ -50,10 +51,12 @@ tags: ["history", "s07", "kernel", "five-node", "preflight", "mtls", "statistics
 | `pytest -q tests/test_route_coverage.py` | 39 passed, exit 0 |
 | `python tools/check_response_freshness.py` | advisory 10/10, exit 0 |
 
-첫 pytest 호출은 별도 worktree에 없는 상대 `.venv` 경로를 써 PowerShell command resolution exit 1이었다. 같은 소스에서 프로젝트의 절대 `.venv` interpreter로 즉시 재실행한 15 passed만 제품 회귀 증거로 사용한다.
+첫 PG-free pytest 호출은 별도 worktree에 없는 상대 `.venv` 경로를 써 PowerShell command resolution exit 1이었다. 같은 소스에서 프로젝트의 절대 `.venv` interpreter로 재실행한 결과만 제품 회귀 증거로 사용한다.
+
+실 PG 첫 준비 실행은 migration의 정본 Node ID 형식을 쓰지 않아 setup `CheckViolation`으로 실패했고 helper에는 도달하지 않았다. 이 실패 중 pytest가 credential-bearing fixture repr을 로컬 Orca transcript에 렌더링하는 위험을 발견했다. 시험은 fixture를 `request`로 지연 취득하고 `new_id("nod")`를 사용하도록 보정해 실패 표현에 DSN이 들어가지 않게 했으며, 재실행은 5개 실제-shaped node/channel/snapshot row의 read-only `SHOW`, before/after 동일성, ready 5·CP 겸임 1·timed 4, `tenantId` 비출력을 확인했다. 비밀 값은 저장소·History·GitHub artifact에 남기지 않았고 credential 회전 여부는 코디네이터에게 별도 통지했다.
 
 ## CI와 인계
 
-PR #110 head `de8a9b7d`에서 docs run `35788634457`과 desktop-browser run `35788634538`은 success이고 Backend run `35788634498`의 Python 3.12/3.14 job은 이 기록 작성 시 진행 중이다. Core run `35788634458`은 path filter로 skipped라 통과로 세지 않는다. Claude는 helper 추출의 동작 보존, tenant redaction/stale 삭제, 커널 경로 선택과 4-node pilot의 비승격 경계를 독립 검토한다.
+PR #110의 첫 code head `de8a9b7d`에서 docs run `35788634457`과 desktop-browser run `35788634538`은 success였고 Backend run `35788634498`은 후속 push로 대체됐다. Core run `35788634458`은 path filter로 skipped라 통과로 세지 않는다. 최종 code head `58ad1cb0`의 CI와 Claude 검토는 진행 중이다. Claude는 helper 추출의 동작 보존, tenant redaction/stale 삭제, 커널 경로 선택과 4-node pilot의 비승격 경계를 독립 검토한다.
 
 다음 첫 행동은 Backend CI 완주와 Claude 검토 확인이다. 이후 별도 승인 카드만 커널 source plan/shard·stop receipt·lease/fence·output storage·ShardCompletion readiness를 포함한 물리 adapter와 wave를 구현한다. S07-DB와 AC-07은 계속 `review`/미측정이다.
