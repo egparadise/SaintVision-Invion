@@ -1,9 +1,11 @@
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from threading import Barrier
 from uuid import uuid4
 from datetime import datetime, timezone
 import hashlib
 import psycopg
+from psycopg.types.json import Jsonb
 import pytest
 from inv.db import Database
 from inv.errors import DomainError
@@ -11,6 +13,8 @@ from inv.ids import new_id
 from inv.leases import Allocation, active_total
 from inv.runs import RunStore
 from inv.outbox import Outbox
+from inv.results import ResultStore
+from inv.shard_completion import ShardCompletion
 
 pytestmark = pytest.mark.postgres
 
@@ -370,6 +374,147 @@ def test_evidence_state_outbox_atomic_and_immutable(env, tmp_path):
     with pytest.raises(psycopg.errors.InsufficientPrivilege):
         with e.db.transaction(e.tenant) as conn:
             conn.execute("DELETE FROM inv.evidence")
+
+
+def test_results_rejects_invalid_EvidenceEnvelope_before_persistence(env):
+    """The results site must give the real "EvidenceEnvelope" validator rejection weight."""
+    e = env
+    run = e.runs.create(e.tenant, e.project)
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        ResultStore(e.db, None).prepare(
+            e.tenant,
+            e.project,
+            run["runId"],
+            str(uuid4()),
+            str(uuid4()),
+            {},
+            proofs={},
+        )
+    with e.db.transaction(e.tenant) as conn:
+        assert conn.execute("SELECT 1 FROM inv.result_commitments").fetchone() is None
+
+
+def test_runs_rejects_invalid_EvidenceEnvelope_before_persistence(env, tmp_path):
+    """The runs completion site must reject an invalid "EvidenceEnvelope", not store it."""
+    e = env
+    run, _lease, proofs = running(e)
+    run = e.runs.transition(
+        e.tenant,
+        run["runId"],
+        "verifying",
+        expected_version=run["version"],
+        proofs=proofs,
+    )
+    output = tmp_path / "invalid-contract-artifact"
+    output.write_bytes(b"verified")
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        e.runs.complete(
+            e.tenant,
+            run["runId"],
+            expected_version=run["version"],
+            evidence={},
+            artifact_path=output,
+            expected_size=8,
+            proofs=proofs,
+        )
+    with e.db.transaction(e.tenant) as conn:
+        assert conn.execute("SELECT 1 FROM inv.evidence").fetchone() is None
+
+
+def test_shard_completion_rejects_invalid_EvidenceEnvelope_atomically(env, monkeypatch):
+    """A real-PG aggregate rowset must validate "EvidenceEnvelope" before parent commit."""
+    e = env
+    plan_id = "anchor-weight"
+    parent, child = new_id("run"), new_id("run")
+    command, object_id = str(uuid4()), str(uuid4())
+    evidence_id = new_id("evd")
+    envelope = {
+        "evidenceId": evidence_id,
+        "tenantId": e.tenant,
+        "runId": child,
+        "traceId": "a" * 32,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "actorId": "anchor-fixture",
+        "action": "verify-output",
+        "policyDecisionId": "anchor-policy",
+        "inputSha256": "1" * 64,
+        "outputSha256": "2" * 64,
+        "result": "succeeded",
+    }
+    # Build the already-verified child boundary directly as the disposable DB
+    # owner.  Foreign-key triggers are suspended only for the three synthetic
+    # join rows; checks/RLS are restored before the serving method is called.
+    with psycopg.connect(e.owner) as conn:
+        conn.execute("ALTER TABLE inv.runs DISABLE TRIGGER USER")
+        try:
+            conn.execute(
+                "INSERT INTO inv.runs(tenant_id,project_id,run_id,state,attempt) VALUES"
+                "(%s,%s,%s,'running',0),(%s,%s,%s,'succeeded',1)",
+                (e.tenant, e.project, parent, e.tenant, e.project, child),
+            )
+        finally:
+            conn.execute("ALTER TABLE inv.runs ENABLE TRIGGER USER")
+        conn.execute(
+            "INSERT INTO inv.shard_plans VALUES(%s,%s,%s,%s,1)",
+            (e.tenant, e.project, plan_id, "3" * 64),
+        )
+        conn.execute(
+            "INSERT INTO inv.shard_parents VALUES(%s,%s,%s,%s,%s)",
+            (e.tenant, e.project, plan_id, parent, e.epoch),
+        )
+        conn.execute(
+            "INSERT INTO inv.storage_budgets VALUES(%s,%s,1024)",
+            (e.tenant, e.project),
+        )
+        conn.execute(
+            "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) "
+            "VALUES(%s,%s,%s,%s,1)",
+            (e.tenant, e.project, object_id, "2" * 64),
+        )
+        conn.execute(
+            "UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (object_id,)
+        )
+        for table, statement, params in (
+            (
+                "inv.shard_commands",
+                "INSERT INTO inv.shard_commands VALUES(%s,%s,%s,0,%s,%s,%s)",
+                (e.tenant, e.project, plan_id, e.node, child, command),
+            ),
+            (
+                "inv.result_commitments",
+                "INSERT INTO inv.result_commitments(tenant_id,project_id,run_id,attempt,command_id,object_id,evidence_id,envelope,content_hash) "
+                "VALUES(%s,%s,%s,1,%s,%s,%s,%s,%s)",
+                (e.tenant, e.project, child, command, object_id, evidence_id, Jsonb(envelope), "4" * 64),
+            ),
+            (
+                "inv.result_completions",
+                "INSERT INTO inv.result_completions VALUES(%s,%s,1,%s,%s,clock_timestamp())",
+                (e.tenant, child, command, evidence_id),
+            ),
+        ):
+            conn.execute("ALTER TABLE " + table + " DISABLE TRIGGER ALL")
+            try:
+                conn.execute(statement, params)
+            finally:
+                conn.execute("ALTER TABLE " + table + " ENABLE TRIGGER ALL")
+
+    class Files:
+        @staticmethod
+        def read(*_args):
+            return b"x"
+
+    class Provider:
+        @contextmanager
+        def locked(self):
+            yield Files()
+
+    monkeypatch.setattr("inv.shard_completion.new_id", lambda _prefix: "invalid")
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        ShardCompletion(e.db, Provider()).once(e.tenant)
+    assert e.runs.get(e.tenant, parent)["state"] == "running"
+    with e.db.transaction(e.tenant) as conn:
+        assert conn.execute("SELECT 1 FROM inv.shard_completions").fetchone() is None
+        assert conn.execute("SELECT 1 FROM inv.evidence").fetchone() is None
 
 
 def test_outbox_crash_duplicate_and_consumer_rollback(env):

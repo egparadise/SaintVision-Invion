@@ -156,6 +156,16 @@ def test_atomic_existing_evidence_and_check_without_run_completion(sample):
     assert counts(a) == (1, 1, 1)
 
 
+def test_storage_commit_rejects_invalid_EvidenceEnvelope_atomically(sample, monkeypatch):
+    """Generated "EvidenceEnvelope" is schema-checked inside the real PG transaction."""
+    a = sample
+    _, envelope = prepare(a)
+    monkeypatch.setattr("inv.storage_commit.new_id", lambda _prefix: "invalid")
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        accept(a, envelope)
+    assert counts(a) == (0, 0, 0)
+
+
 def test_concurrent_duplicate_has_one_durable_consumption(sample):
     a = sample
     _, envelope = prepare(a)

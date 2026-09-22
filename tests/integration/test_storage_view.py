@@ -196,6 +196,24 @@ def test_tampered_stored_records_cannot_be_reported_verified(view, field):
     assert "certificateDer" not in response.text
 
 
+def test_storage_view_rejects_invalid_stored_EvidenceEnvelope(view):
+    """The historical read site revalidates persisted "EvidenceEnvelope" data."""
+    a = view
+    _, envelope = prepare(a)
+    committed = accept(a, envelope)
+    with psycopg.connect(a.e.owner) as conn:
+        conn.execute("ALTER TABLE inv.evidence DISABLE TRIGGER USER")
+        conn.execute(
+            "UPDATE inv.evidence SET envelope=envelope-'actorId' WHERE evidence_id=%s",
+            (committed["evidenceId"],),
+        )
+        conn.execute("ALTER TABLE inv.evidence ENABLE TRIGGER USER")
+    with pytest.raises(DomainError, match="VERIFY-0032"):
+        StorageObservationView(a.e.db).result(
+            a.principal, a.e.project, a.run, a.request
+        )
+
+
 def test_read_holds_current_grant_until_verified_response(view, monkeypatch):
     a = view
     _, envelope = prepare(a)
