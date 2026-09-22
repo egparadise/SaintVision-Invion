@@ -1,14 +1,22 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.168"
+version: "1.0.169"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T19:32:44+09:00"
+updated: "2026-09-22T19:45:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 S04-DB·S05-DB·S07-DB owner 판정 + PR #53 교차검토
+
+- Claude 인계 패키지 `04d88d58`의 실 PG·hosted Core 증거를 AC-04/05/07과 대조해 세 카드의 `planned` → `review` 진입을 수용했다. acceptance/outcome `done`은 건드리지 않았고, S04 물리 전송 재개, S05 5노드 결정성·P95 2초, S07 이탈 60초·복구 95%·CX01 및 각 선행 카드가 완료 차단 조건이다.
+- Core run `35706465645`의 실제 파일별 수치는 node delivery 18, output ingestion 5, placement 12, shard recovery 21, containment 28, workspace recovery 12다. 인계 문서의 shard 15·containment 21 표기는 집계 오기로 보정해 기록했다.
+- registry 3줄과 ontology mirror를 재생성한 뒤 착지 후보에서 `check_docs` 796 documents, `check_ontology` 48 task mappings, single-source ratchet 18 pairs가 모두 exit 0이었다. 메모리 경보 지침에 따라 시험 suite는 재실행하지 않았다.
+- PR #53 HEAD `9a7a3651`은 잔여 충돌 표식, 스크린샷 수·병합 head SHA 불일치, 제어문자성 손상, 미래 갱신 시각 때문에 수정 요청했다. 코멘트: https://github.com/egparadise/SaintVision-Invion/pull/53#issuecomment-5775051728
+- 상세: [[2026-09-22_19-45-00_KST_S04-DB_S05-DB_S07-DB_Codex_owner판정]].
 
 ## 2026-09-22 Frontend 경로 필터 교정 + PR #51 교차검토
 
