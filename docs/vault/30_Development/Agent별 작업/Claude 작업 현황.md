@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.16"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T01:45:00+09:00"
+updated: "2026-09-23T02:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+둘째 날 저녁 세션 요약 (Claude, 2026-09-22, 카드 t, docs-only): 19:50~23:45 integration 착지·병합 PR #50~#73 표(SHA·소유·검토자·판정), 발견 목록 현재 상태(F-S05-01·F-R1~R4·F-S07-01~03·#66 R1~R4·#68/#73 finding), 결정(F-S07-03 AC-07 정의 5f123331·F-S05-01 A/B/C 대기·#48 B), 실측 수치(3동시 P95 861.651ms·10동시 1,738.762ms·S07 감지 1.034~1.113s·60초 경계 60.067s), 미완 큐(#66·#68·#73·카드 6·12·15·F-S05-01 검토), 내일 첫 행동/담당. 근거는 git log·PR·History만. [[2026-09-22_둘째날_저녁_세션_요약_Claude]] (PR agent/claude/day2-evening-summary)
 
 PR #61·#66 재검토 r2 (Claude, 2026-09-22): #66 `7586af6e` → **조건부 승인** — 스크립트 재실행 8 PASS/1 PARTIAL 재현, 되살림 M1(상단 바 글자색) KILLED 1.74:1·M2(독 토글) KILLED, 무검사 04/09·상수 08 해소; 잔여 3(gitCommitSha 상수 fallback=subprocess 미import, vault 증거 매 실행 덮어쓰기+러너 HEAD 미대조, '활성' 타이틀 실측이 비활성 창). #61 `e9e22569` v1.2.0 → **수정 요청**(잔여 참조 6: setDesktopMode·desktop-window-id·bg-cyan-400·header.bg-slate-900/13.98·logical-cpu/memory-card·aria-label 완전일치). [[2026-09-22_PR61_PR66_재검토_r2_Claude]] (PR agent/claude/review-pr61-66-r2)
 
