@@ -99,6 +99,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
 
+결정 #6 6a 통합 검증 (Claude, 2026-09-22): Codex 563c54ce `POST …/runs/{parent}/model-retries`를 실 PG(일회용 Alembic DB)+실 HTTP(TestClient/ASGI)로 — `tests/integration/test_model_retries_claude.py` **8 passed / 0 skip**(분리 실행 25s). 요구 7항목 전부 관측: 비-failed 부모 409 MODEL-0007·lease 미해제 409 LEASE-0003·키 재사용 동일 child·키 충돌 409 IDEM-0001·키 없음 422·재요청 409 MODEL-0003·can_request 없음 403 AUTH-0030·shape=fixture 키 집합·requiresFrozenInputAndApproval true·child planned·tool_claims 0·fencing 교집합 ∅·**6c 배치 예약 실제 영속**(resource_leases). **Finding F1(Codex)**: 타 tenant → 503 SYS-0001(4xx 아님; ledger INSERT가 run/grant 확인보다 앞서 FK로 죽음; child 0이라 유출 아님) — 명시 pin. 전문 [[2026-09-22_결정6a_model-retries_통합검증_실PG_실HTTP_Claude]].
+
+
 hosted Core 첫 완주 skip 58 분류표 (Claude, 2026-09-22): run 35706465645(3d1892c0) core-tests.xml 3006/2948/58/0 — 보호 컨테이너 CX01 19·컨테이너 레인 opt-in 23(role guard 13은 backend.yml에선 실행)·Windows 전용 11·브라우저 1·도구 부재 4; 물리 노드 분류 0(node 레인은 실제 컨테이너로 실행). 로컬 142와 대조: Linux 96↔Windows 11 상보, 어디서도 안 도는 skip은 31건뿐. machinery 제안(Codex): core.yml에 ROLE_GUARD/SERVER/CONFIG 이미지 변수 → 23건 실행 전환. 전문 [[2026-09-22_hosted_Core_첫완주_skip58_분류표_Claude]].
 
 
