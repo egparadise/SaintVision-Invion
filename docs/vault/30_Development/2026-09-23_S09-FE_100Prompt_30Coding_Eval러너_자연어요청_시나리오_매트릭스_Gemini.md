@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S09-FE-SCENARIO-MATRIX-20260923"
 title: "S09-FE 100 Prompt·30 Coding Eval 러너 및 자연어 요청·예산·Diff 검토 UI 시나리오 매트릭스 (Gemini)"
-version: "1.1.0"
+version: "1.1.1"
 status: "review"
 author: "Gemini"
 reviewer: "Codex, Claude"
-updated: "2026-09-23T14:40:00+09:00"
+updated: "2026-09-23T15:45:00+09:00"
 source_of_truth: "Git"
 tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-suite", "bounded-repair", "zero-leakage", "gemini"]
 ---
@@ -34,7 +34,7 @@ tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-
 
 ## 1. 개요 및 수용 목표 (OUT-09 / AC-09)
 
-본 문서는 SaintVision 제어 평면의 **S09-FE (100 Prompt/30 Coding Eval 러너 및 자연어 요청·예산 쿼터·Diff 검토 UX)** 트랙을 체계적으로 완결하기 위해, 코디네이터 지시([12:02 KST 차단 지도 Gemini 몫 1순위]), Codex 백엔드 계약(`services/evaluation.py`, `services/eval_execution.py`, `api/schemas.py`, `control-plane/.../app.py`), Claude 실 PG 불변성 검증(`tests/test_context_eval.py`, `tests/test_eval_execution.py`), 그리고 `apps/web`의 실제 프런트엔드 컴포넌트(`NaturalLanguageRunView.tsx`, `agentEngine.ts`)를 대조하여 수립한 **docs-only 시나리오 매트릭스 정본(v1.1.0)**이다.
+본 문서는 SaintVision 제어 평면의 **S09-FE (100 Prompt/30 Coding Eval 러너 및 자연어 요청·예산 쿼터·Diff 검토 UX)** 트랙을 체계적으로 완결하기 위해, 코디네이터 지시([12:02 KST 차단 지도 Gemini 몫 1순위]), Codex 백엔드 계약(`services/evaluation.py`, `services/eval_execution.py`, `api/schemas.py`, `control-plane/.../app.py`), Claude 실 PG 불변성 검증(`tests/test_context_eval.py`, `tests/test_eval_execution.py`), 그리고 `apps/web`의 실제 프런트엔드 컴포넌트(`NaturalLanguageRunView.tsx`, `agentEngine.ts`)를 대조하여 수립한 **docs-only 시나리오 매트릭스 정본(v1.1.1)**이다.
 
 본 문서는 실제 프런트엔드 컴포넌트에 존재하는 셀렉터(`data-testid`, `role`, `aria-live`, 태그, 텍스트)와 백엔드 정본 계약만을 사용하며, 존재하지 않는 임의의 목(mock)이나 가짜 성공(Fake Pass) 주장을 엄격히 금지(Zero Fake Selectors / Zero Mock Guarantee)한다.
 
@@ -112,8 +112,8 @@ tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 규격 | 검증 단언 및 기대값 |
 |:---:|---|---|---|---|---|---|
 | **REP-01** | **제안된 코드 Diff 렌더링 및 READY 상태 표출** | `NaturalLanguageRunView.tsx` | 정상 코딩 과제 요청 제출 완료 상태 | 화면 우측 Diff 패널 확인 | • 패널 제목: `h3:has-text("제안된 코드 Diff 검토 및 Bounded Repair")`<br>• 상태 배지: `span:has-text("READY")`<br>• 루프 안내: `p:has-text("루프: 1/3")`<br>• Diff 뷰: 코드 블록 내 `--- a/src/pipeline.ts`<br>• 규격: **`Client-only (HTTP 없음)`** | • Agent가 제안한 diff 내용이 고정폭 글꼴로 렌더링됨.<br>• 상태 배지가 파란색 `READY`로 표출되고 현재 루프 `1/3` 표시 확인. |
-| **REP-02** | **대화형 추가 보정 요청 (Bounded Repair Loop 진행)** | `NaturalLanguageRunView.tsx` | Diff 패널이 `READY` 또는 `REPAIRING` 상태 | "🔄 추가 보정 요청 (Bounded Repair +1)" 버튼 클릭 | • 보정 버튼: `button:has-text("🔄 추가 보정 요청 (Bounded Repair +1)")`<br>• 상태 배지: `span:has-text("REPAIRING")`<br>• 루프 안내: `p:has-text("루프: 2/3")`<br>• 알림 배너: `div:has-text("🔄 보정 루프 진행: 루프 2/3 완료")`<br>• 규격: **`Client-only (HTTP 없음)`** | • 루프 카운터가 `2/3`로 증가하고 상태 배지가 `REPAIRING`으로 갱신.<br>• Diff 코드 하단에 `// [Repair Loop 2]: Added null safety check...` 보정 주석 추가.<br>• 3차 클릭 시 `루프: 3/3`까지 정상 도달. |
-| **REP-03** | **4회 시도 시 Bounded Repair 상한 초과 거절** | `NaturalLanguageRunView.tsx`<br>`agentEngine.ts` | Bounded Repair 루프 3/3 도달 상태 | 추가 보정 요청 버튼 4차 클릭 시도 | • 보정 버튼: `button:has-text("🔄 추가 보정 요청 (Bounded Repair +1)")`<br>• 상태 배지: `span:has-text("REJECTED")`<br>• 에러 알림: `div:has-text("🛑 Bounded Repair 한도 초과: BOUNDED_LOOP_EXCEEDED")`<br>• 오류 분류: **`Client-only (HTTP 없음)`** | • `🛑 BOUNDED_LOOP_EXCEEDED: Maximum repair limit (3) reached. Escalate to human developer.` 에러 표출.<br>• 요청 상태가 적색 `REJECTED`로 전이되며 추가 보정 액션 버튼 자동 비활성화/숨김. |
+| **REP-02** | **대화형 추가 보정 요청 (Bounded Repair Loop 진행)** | `NaturalLanguageRunView.tsx` | Diff 패널이 `READY` 또는 `REPAIRING` 상태 | "🔄 추가 보정 요청 (Bounded Repair +1)" 버튼 클릭 | • 보정 버튼: `button:has-text("🔄 추가 보정 요청 (Bounded Repair +1)")`<br>• 상태 배지: `span:has-text("REPAIRING")`<br>• 루프 안내: `p:has-text("루프: 2/3")`<br>• 알림 배너: `div:has-text("🔄 Bounded Repair Loop 2/3 실행 완료")`<br>• 규격: **`Client-only (HTTP 없음)`** | • 루프 카운터가 `2/3`로 증가하고 상태 배지가 `REPAIRING`으로 갱신.<br>• Diff 코드 하단에 `// [Repair Loop 2]: Added null safety check...` 보정 주석 추가.<br>• 3차 클릭 시 `루프: 3/3`까지 정상 도달. |
+| **REP-03** | **4회 시도 시 Bounded Repair 상한 초과 거절** | `NaturalLanguageRunView.tsx`<br>`agentEngine.ts` | Bounded Repair 루프 3/3 도달 상태 | 추가 보정 요청 버튼 4차 클릭 시도 | • 보정 버튼: `button:has-text("🔄 추가 보정 요청 (Bounded Repair +1)")`<br>• 상태 배지: `span:has-text("REJECTED")`<br>• 에러 알림: `div:has-text("🛑 BOUNDED_LOOP_EXCEEDED")`<br>• 오류 분류: **`Client-only (HTTP 없음)`** | • `🛑 BOUNDED_LOOP_EXCEEDED: Maximum repair limit (3) reached. Escalate to human developer.` 에러 표출.<br>• 요청 상태가 적색 `REJECTED`로 전이되며 추가 보정 액션 버튼 자동 비활성화/숨김. |
 | **REP-04** | **Diff 승인 액션 및 백엔드 패치 API 미노출 고지** | `NaturalLanguageRunView.tsx` | Diff 패널이 활성 상태 (`READY` 또는 `REPAIRING`) | "✔ Diff 승인 및 코드 적용" 버튼 클릭 | • 승인 버튼: `button:has-text("✔ Diff 승인 및 코드 적용")`<br>• 상태 배지: `span:has-text("COMPLETED")`<br>• 정보 알림: `div:has-text("ℹ️ 코드 Diff 모의 적용 완료: 백엔드 코드 패치 API가 미노출 상태이므로")`<br>• 규격: **`Client-only (HTTP 없음)`** | • 상태 배지가 녹색 `COMPLETED`로 전이.<br>• `ℹ️ 코드 Diff 모의 적용 완료: 백엔드 코드 패치 API가 미노출 상태이므로 실제 작업공간 파일시스템에는 기록되지 않았습니다.` 정직 안내 배너 표출. |
 
 ---
@@ -183,8 +183,8 @@ tags: ["s09-fe", "acceptance-matrix", "agent", "prompt", "eval-runner", "golden-
 
 ## 6. 검토 인계 및 다음 단계
 
-- **문서 상태**: `status: "review"` (S09-FE 100 Prompt / 30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.0 정정 완결)
+- **문서 상태**: `status: "review"` (S09-FE 100 Prompt / 30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.1 정정 완결)
 - **독립 리뷰어**: Codex (S09 정본 계약, 분산 플랜, ProblemDetails, SSE 대조), Claude (UI 셀렉터, 거버넌스 불변식, 돌연변이 단언 대조)
 - **다음 단계**:
-  1. Codex 및 Claude 리뷰어의 v1.1.0 정합성 독립 재검토 및 최종 승인.
+  1. Codex 및 Claude 리뷰어의 v1.1.1 정합성 독립 재검토 및 최종 승인.
   2. 승인(APPROVED) 확인 및 코디네이터 지시에 따라 후속 진행.

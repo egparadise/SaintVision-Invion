@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.123"
+version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T13:40:00+09:00"
+updated: "2026-09-23T15:45:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,11 +19,11 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T13:40:00+09:00 (최신 tip `878626eb`, 작업 브랜치 `agent/gemini/s09-fe-matrix`).
+- 확인 기준: 2026-09-23T15:45:00+09:00 (최신 tip `b3a39305`, 작업 브랜치 `agent/gemini/s09-fe-matrix`).
 
-## 2026-09-23 S09-FE 100 Prompt·30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.0 개정 (docs-only, `agent/gemini/s09-fe-matrix`)
+## 2026-09-23 S09-FE 100 Prompt·30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.1 개정 (docs-only, `agent/gemini/s09-fe-matrix`)
 
-- **Claude 및 Codex 독립 검토 전면 반영 5대 영역 15대 시나리오 매트릭스 정본 수립 (v1.1.0)**:
+- **Codex 백엔드 계약 승인 및 Claude r2 UI 지적 2건 전수 반영 매트릭스 v1.1.1 개정**:
   - **PRM (프롬프트 보안 및 누출 차단, AC-09 Zero Leakage)**:
     - 정상 코딩 과제 프롬프트(DICOM 전처리 버그 수정) 및 Context 파일 바인딩 (`PRM-01`).
     - API Key(`sk-...`), AWS Secret Key, SSH 개인키, `cat /etc/shadow`, 시스템 프롬프트 덤프, API 키 노출 요구 등 6대 정규식 사전 비행 차단 및 `LEAK_ATTEMPT_DETECTED` 에러 표출 (`PRM-02`, Client-only HTTP 없음).
@@ -35,22 +35,19 @@ source_of_truth: "Git"
     - 테넌트 잔여 예산 초과 요청 사전 차단 (`BUDGET_EXCEEDED`, Client-only HTTP 없음) (`QTA-03`).
   - **REP (Bounded Repair 루프 및 코드 Diff 검토 UX)**:
     - 제안된 코드 Diff 렌더링 및 `READY` 상태 배지 표출 (`REP-01`).
-    - 대화형 추가 보정 루프 진행 (`Loop 1/3` ➔ `Loop 2/3`, 상태 `REPAIRING`, Diff 보정 주석 누적) (`REP-02`).
-    - 4회 시도 시 3회 상한 초과 거절 (`BOUNDED_LOOP_EXCEEDED`, 상태 `REJECTED`, Client-only HTTP 없음) (`REP-03`).
+    - 대화형 추가 보정 루프 진행: 알림 배너를 코드와 일치하는 `div:has-text("🔄 Bounded Repair Loop 2/3 실행 완료")`로 정정 (`REP-02`).
+    - 4회 시도 시 3회 상한 초과 거절: 에러 알림을 코드와 일치하는 `div:has-text("🛑 BOUNDED_LOOP_EXCEEDED")`로 정정 (`REP-03`, Client-only HTTP 없음).
     - Diff 승인 액션 및 백엔드 패치 API 미노출 정직 고지 배너 표출 (`REP-04`).
   - **EVL (100 Prompt / 30 Coding Golden Eval 러너)**:
     - 클라이언트 픽스처 Golden Eval 성적표 렌더링 (100-Prompt 유효율 ≥ 99%, 30-Coding 성공률 ≥ 70%, 누출 0건) (`EVL-01`).
     - 백엔드 에이전트 엔드포인트 미노출 거버넌스 고지 배너 (`agent-unexposed-notice`, `role="status"`, `aria-live="polite"`) (`EVL-02`).
     - 실 ProviderAdapter 100건 프롬프트 골든 평가 러너: **UNMEASURED ('운영 모델/Provider 어댑터 배선 후')**, 모듈 `tools/run_s09_golden_eval.py` [제안·미구현] 명시 (`EVL-03`).
     - 실 샌드박스 30건 코딩 과제 Bounded 실행 및 바이트 검증: **UNMEASURED ('운영 모델/도구 어댑터 배선 후')**, 모듈 `tools/run_s09_coding_tasks.py` [제안·미구현] 명시 (`EVL-04`).
-  - **SSE (커널 Run 이벤트 스트림 및 SSE 재연결 계약) [신설]**:
-    - 커널 Run 이벤트 SSE 스트림 및 `Last-Event-ID` 재연결 불변식 (`GET /v1/projects/{project}/runs/{run_id}/events`, `id: <id>\nevent: inv.event\ndata: <json>\n\n`, Bearer 토큰 루프별 재검증, 25초 주기 reconnect, 인가 실패 시 `inv.stream.closed`) (`SSE-01`). UI 레벨에서는 **UNMEASURED ('runId 생성 API 배선 후')** 명시.
-  - **프로덕션 심볼 타겟 돌연변이(MUT 5종) 사살 계획 정정**:
-    - MUT-01(누출 정규식 누락) KILLED, MUT-02(예산 초과 무력화) KILLED, MUT-03(Bounded Repair 상한 초과) KILLED.
-    - MUT-04(금지행동 단위가중치 1 제약): **`시험 신설 필요 (현 상태 SURVIVED)`** 정직 표기 (`evaluation.py:54~58` 로직 실존하나 `tests/test_context_eval.py`에 단언 부재).
-    - MUT-05(어댑터 예외 failed 오분류): `tests/test_eval_execution.py:209` (`assert dict(outcomes) == {"errored": 2}`) 및 `:366` (`assert outcome == "errored"`) 실패로 사살(KILLED) 정정.
-  - **계획서 정본**: [[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]] (v1.1.0).
-  - **독립 검토 요청**: Codex (S09 정본 계약, DistributedPlanRequest exact shape, ProblemDetails, SSE 대조), Claude (UI 셀렉터, 거버넌스 불변식, 돌연변이 단언 대조). 실측은 승인 후.
+  - **SSE (커널 Run 이벤트 스트림 및 SSE 재연결 계약)**:
+    - 커널 Run 이벤트 SSE 스트림 및 `Last-Event-ID` 재연결 불변식 (`GET /v1/projects/{project}/runs/{run_id}/events`, Bearer 토큰 루프별 재검증, 25초 주기 reconnect, 인가 실패 시 `inv.stream.closed`) (`SSE-01`). UI 레벨에서는 **UNMEASURED ('runId 생성 API 배선 후')** 명시.
+  - **오류 코드 분류 체계 정밀화 (Codex 반영)**: 인증 헤더 누락 시 HTTP 401 `AUTH-MISSING-CREDENTIAL`, 유효하지 않은 자격증명/인가 실패 시 HTTP 403 `AUTH-*` 계열로 분리.
+  - **계획서 정본**: [[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]] (v1.1.1).
+  - **독립 검토 상태**: Codex 승인 확인 완료, Claude r2 지적 2건 정정 후 최종 승인 대기.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
