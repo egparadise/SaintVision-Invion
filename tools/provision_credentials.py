@@ -147,6 +147,14 @@ def inspect_existing(provider, file_name):
         binding = CredentialBinding(file_name, info.st_dev, info.st_ino, digest.hexdigest())
         provider._read(binding)
         return binding
+    except OSError:
+        # ``file_name`` is an untrusted manifest field.  Linux reports policy
+        # boundary failures such as O_NOFOLLOW rejecting a symlink as OSError
+        # (ELOOP), while the runtime reader deliberately maps the same family
+        # to CredentialDenied.  Keep registration/rotation fail-closed and
+        # consistent with that public contract instead of calling it an
+        # internal provisioning defect.
+        raise ProvisioningDenied() from None
     finally:
         if fd is not None:
             os.close(fd)

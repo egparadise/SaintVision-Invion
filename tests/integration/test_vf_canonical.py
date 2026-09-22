@@ -52,7 +52,9 @@ def test_factory_route_measurement_is_not_fixture_union(env, tmp_path, monkeypat
     assert '/v1/storage/resolve' not in served
     assert '/v1/storage/replica-status' not in served
     wanted = scan_client(root / 'apps/web/src')
-    (root / '.work/vf-route-gap.json').write_text(json.dumps({
+    evidence_dir = root / '.work'
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    (evidence_dir / 'vf-route-gap.json').write_text(json.dumps({
         'measurement': 'configured-factory, synthetic issuer, isolated PostgreSQL, workspace/business disabled',
         'served': sorted(served), 'clientPaths': sorted(wanted), 'unserved': sorted(wanted-served),
         'payloadCompatibilityAssessed': False, 'operationalAcceptance': False,
@@ -84,7 +86,7 @@ def test_factory_route_measurement_is_not_fixture_union(env, tmp_path, monkeypat
         assert '/v1/auth/token' not in composed
         with TestClient(api) as client:
             assert client.get('/v1/projects/'+env.project+'/workspaces', headers={'Authorization': 'Bearer attacker-admin'}).status_code == 401
-        (root / '.work/vf-composed-route-gap.json').write_text(json.dumps({
+        (evidence_dir / 'vf-composed-route-gap.json').write_text(json.dumps({
             'measurement': 'configured-factory; business enabled with separate non-owner role; workspace runtime disabled',
             'served': sorted(composed), 'clientPaths': sorted(wanted), 'unserved': sorted(wanted-composed),
             'payloadCompatibilityAssessed': False, 'operationalAcceptance': False,

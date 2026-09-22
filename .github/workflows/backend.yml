@@ -70,7 +70,7 @@ jobs:
             requirements-backend.txt
             requirements-test.txt
             requirements-core.txt
-      - run: python -m pip install -r requirements-backend.txt
+      - run: python -m pip install -r requirements-backend.txt -r requirements-docs.txt
 
       - name: Contract schemas match their models
         run: python tools/export_schemas.py --check
