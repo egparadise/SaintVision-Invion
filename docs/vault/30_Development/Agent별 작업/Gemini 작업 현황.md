@@ -33,7 +33,7 @@ source_of_truth: "Git"
   - `App.tsx` 내 모든 비동기 mutation(`handleApprove`, `handleReject`, `handleCancelRun`, `WorkspaceCreateModal.onCreate`) 전후에 세션/스코프 세대 가드(`sessionRef.current`, `scopeRef.current`) 적용 ➔ 토큰 만료 401 또는 명시적 로그아웃 시 지연 반환된 이전 응답/에러가 신규 테넌트 화면에 누출되거나 고스트 에러 배너를 띄우지 않도록 억제.
   - 신규 테넌트 로그인 시 이전 잔여 상태(`selectedWorkspaceId`, `workspaceError`, `actionError`) 전면 초기화.
   - 지연 응답 회귀 시험(`tests/late-mutation-generation-regression.test.tsx`) 2종 통과.
-- **증거 정본**: `docs/vault/30_Development/Evidence/s02_fe_real_api_acceptance.json` (4 PASS, 0 FAIL, 0 Mocks).
+- **증거 정본**: `docs/vault/30_Development/Evidence/s02_fe_real_api_acceptance.json` (SHA `ae4d9003`, 4 PASS, 0 FAIL, 0 Mocks).
 - **보고서 전문**: [[2026-09-23_S02-FE_실제API_Chrome_로그인_Node0대_401_403_수용실측_Gemini]].
 
 ## 2026-09-23 S04-FE 만료·취소·중복·SSE 재연결 시나리오 매트릭스 v1.1.1 및 실측 러너 골격 (`agent/gemini/s04-fe-matrix`)

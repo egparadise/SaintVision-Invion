@@ -1,8 +1,8 @@
 {
   "schema": "https://saintvision.ai/evidence/s02-fe-real-api.schema.json",
   "version": "1.0.0",
-  "timestamp": "2026-09-23T01:45:44.155623+09:00",
-  "gitCommitSha": "1ff1a016398b01ae7ad2e73b0411bb76b3d903c7",
+  "timestamp": "2026-09-23T02:20:52.805888+09:00",
+  "gitCommitSha": "ae4d900345e922ca17ebe4ff9d748dd85056b897",
   "assessment": "ACCEPTANCE_PASSED",
   "operationalAcceptanceAssessed": true,
   "environment": {
@@ -54,9 +54,9 @@
         "problemCode": "AUTH-0030",
         "problemDetail": "Project permission is unavailable",
         "problemCategory": "AUTH",
-        "problemTraceId": "6ea524d3c1c037e5c8858d5138affcb0",
+        "problemTraceId": "595df14db82235b816940460eb3b997b",
         "domAlertRole": "alert",
-        "domAlertText": "[AUTH-0030] Project permission is unavailable (traceId: 60cf3d5b14b79578a7efe3a233182205)",
+        "domAlertText": "[AUTH-0030] Project permission is unavailable (traceId: c1675e4e6b2b5785584112a2070b30fa)",
         "screenshot": "s02_03_project_403.png"
       }
     },
