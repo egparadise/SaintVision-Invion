@@ -21,7 +21,20 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-22T21:00:00+09:00 (최신 tip `98524c29`, 작업 브랜치 `agent/gemini/model-retry-ui`).
 
-## 2026-09-22 Web Desktop UI 불변식 9종 수용 계획 수립 (Claude 독립검토 F1~F4 전수 반영 v1.2.0, gent/gemini/ui-invariants-plan)
+## 2026-09-22 Web Desktop UI 불변식 9종 실브라우저 수용 재실측 완결 (`agent/gemini/ui-invariants-run`)
+
+- **실측 보고서 정본**: [[2026-09-22_WebDesktop_UI_불변식_9종_실브라우저_수용실측_Gemini]] (v1.3.1)
+- **Claude 독립 검토 지적 및 변이(Mutation) 전수 조치 (8 PASS, 1 PARTIAL)**:
+  - **변이 M1 살해**: 상수 RGB 계산을 영구 배제하고 Playwright `window.getComputedStyle`로 상단바(텍스트 rgb(248, 250, 252) vs 배경 rgba(15, 23, 42, 0.85) 합성 ➔ **17.26:1**), 활성 창 타이틀(텍스트 rgb(249, 250, 251) vs 배경 rgb(31, 41, 55) ➔ **14.05:1**), 비활성 창 타이틀(텍스트 rgb(156, 163, 175) vs 배경 rgb(17, 24, 39) ➔ **6.99:1**) 실측 (WCAG AA >= 4.5:1 합격). #334155 변이 시 1.41:1 즉시 실패 확인.
+  - **변이 M2 살해**: 활성 창(Model Studio) 독 버튼 클릭 시 토글 최소화(`isMinimized === true`, React 언마운트) 및 재클릭 복원 실단언. 활성 점(active dot: `width: 4px, height: 4px, bg: rgb(56, 189, 248)`) 스타일 실측. 항상 focusWindow 변이 시 언마운트 실패로 즉시 탈락.
+  - **INV-06 A11y Escape 모달 탈출**: 시작 메뉴 Escape 닫힘 PASS, 트리거 버튼 자동 포커스 복원은 React 셸 미구현으로 **PARTIAL (8 PASS / 1 PARTIAL)** 정직 고지.
+  - **INV-07 레이아웃 영속성**: `localStorage` 내 형상($x=120, y=90, w=1000, h=640$) 직렬화 및 복원 바운딩 박스 $1000 \times 640$ 실단언.
+  - **INV-09 정직 수치 경계**: `ResourceExplorer.tsx` DOM에서 총 $16$ Cores, 가용 $12$ Cores, 점유 $4.8$ Cores 파싱 추출 및 수학적 불변식 $0 \le 12 \le 16$ 실단언 성립. Anti-Magic Bus 고지 배너 노출 확인.
+  - **Git 정본 증거 및 러너 결속 (R1~R4)**: `docs/vault/30_Development/Evidence/desktop_ui_invariants.json`에 동적 관측치만 영구 커밋. `run_browser_smoke.mjs` 검증 게이트 연결.
+- **실측 실행 결과**: `.venv\Scripts\python.exe -X utf8 tools/run_real_browser_acceptance.py --scenario desktop-ui-invariants --commit-evidence` exit code 0 (28초).
+- **스크린샷**: `scratch/real_chrome_desktop_01_switcher_desktop.png` 외 고해상도 스크린샷 8종.
+
+## 2026-09-22 Web Desktop UI 불변식 9종 수용 계획 수립 (Claude 독립검토 F1~F4 전수 반영 v1.2.0, `agent/gemini/ui-invariants-plan`)
 
 - **Track 15 4대 ➔ 9대 불변식 체계 확장 및 Claude 지적 전수 반영**:
   - 19:40 4대 불변식 실측(unverified 4→0) 기반 위에, Claude의 코드 대조 지적(F1 14건 셀렉터/파일명 정정, F2 calc(100%-104px)·언마운트·Escape 한계 등 실제 동작 정합, F3 4대↔9대 대응표 및 WCAG AA >= 4.5:1 정본 정합, F4 Git 영구 증거 경로 Evidence/ 지정)을 전수 반영한 v1.2.0 계획서를 확립했다.

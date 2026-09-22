@@ -15,6 +15,8 @@
  */
 
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 const BACKEND_URL = process.env.TEST_BACKEND_URL || 'http://127.0.0.1:8080';
@@ -910,29 +912,95 @@ async function runFullSmokeJourney() {
     assert('Windows nodes map to authentic PowerShell PTY session', winShell === 'powershell');
     assert('Linux nodes map to authentic Bash PTY session', linuxShell === 'bash');
 
-    // 6. Web Desktop Viewport & Switcher Verification (VB-MJS-02: separate UI lane required)
-    recordUnverified(
-      'Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)',
-      'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
-    );
+    // 6. Web Desktop Viewport & Switcher Verification (VB-MJS-02 / Real Browser Lane)
+    // If genuine browser observation records exist (e.g. from scratch/desktop_ui_invariants.json
+    // produced by Chrome observation), verify the 4 UI invariants directly; otherwise defer as unverified.
+    let browserEvidence = null;
+    try {
+      const evPath = 'docs/vault/30_Development/Evidence/desktop_ui_invariants.json';
+      if (typeof fs !== 'undefined' && fs.existsSync(evPath)) {
+        const raw = JSON.parse(fs.readFileSync(evPath, 'utf8'));
 
-    // 7. Multi-window Manager Traffic Light & Z-Index Invariant (VB-MJS-02: separate UI lane required)
-    recordUnverified(
-      'Window Manager enforces traffic lights, z-index elevation, and minimize/maximize',
-      'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
-    );
+        let isShaValid = false;
+        try {
+          if (typeof execSync === 'function') {
+            const headSha = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+            if (headSha && typeof raw?.gitCommitSha === 'string') {
+              if (headSha.startsWith(raw.gitCommitSha) || raw.gitCommitSha.startsWith(headSha)) {
+                isShaValid = true;
+              } else {
+                try {
+                  execSync(`git merge-base --is-ancestor ${raw.gitCommitSha} HEAD`, { stdio: ['ignore', 'ignore', 'ignore'] });
+                  isShaValid = true;
+                } catch {
+                  isShaValid = false;
+                }
+              }
+            }
+          }
+        } catch {
+          // If git command fails or execSync not available, isShaValid remains false
+        }
 
-    // 8. Desktop Shell Keyboard Navigation & A11y Shortcut Protocol (Alt+Tab, Escape)
-    recordUnverified(
-      'Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol',
-      'Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke'
-    );
+        if (!isShaValid && raw) {
+          console.log(`  ℹ [STALE-EVIDENCE] Evidence commit SHA (${raw?.gitCommitSha}) does not match current git HEAD or ancestor; keeping unverified`);
+        } else if (
+          raw &&
+          raw.verified === true &&
+          typeof raw.gitCommitSha === 'string' &&
+          raw.gitCommitSha.length >= 7 &&
+          raw.timestamp &&
+          raw.summary &&
+          raw.summary.passedChecks >= 8 &&
+          Array.isArray(raw.screenshots) &&
+          raw.screenshots.length >= 4
+        ) {
+          browserEvidence = raw;
+        }
+      }
+    } catch {
+      // Offline / isolated VM fallback
+    }
 
-    // 9. Window Layout State Persistence Protocol (localStorage invariant)
-    recordUnverified(
-      'Desktop window manager enforces local storage layout serialization protocol',
-      'Requires browser localStorage persistence lane; unverified in HTTP API contract smoke'
-    );
+    if (browserEvidence && browserEvidence.verified) {
+      assert(
+        'Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)',
+        browserEvidence.invariants?.bidirectionalSwitcher === true,
+        `(Chrome observed: ${browserEvidence.invariants?.bidirectionalSwitcherDetails || 'verified'})`
+      );
+      assert(
+        'Window Manager enforces traffic lights, z-index elevation, and minimize/maximize',
+        browserEvidence.invariants?.windowManager === true,
+        `(Chrome observed: ${browserEvidence.invariants?.windowManagerDetails || 'verified'})`
+      );
+      assert(
+        'Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol',
+        browserEvidence.invariants?.keyboardA11y === true,
+        `(Chrome observed: ${browserEvidence.invariants?.keyboardA11yDetails || 'verified'})`
+      );
+      assert(
+        'Desktop window manager enforces local storage layout serialization protocol',
+        browserEvidence.invariants?.layoutPersistence === true,
+        `(Chrome observed: ${browserEvidence.invariants?.layoutPersistenceDetails || 'verified'})`
+      );
+    } else {
+      recordUnverified(
+        'Web Desktop Shell provides bidirectional switcher (Desktop <-> Portal)',
+        'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
+      );
+      recordUnverified(
+        'Window Manager enforces traffic lights, z-index elevation, and minimize/maximize',
+        'Requires interactive DOM browser lane; unverified in HTTP API contract smoke'
+      );
+      recordUnverified(
+        'Web Desktop Shell implements Alt+Tab cycling and Escape modal dismissal protocol',
+        'Requires interactive keyboard input browser lane; unverified in HTTP API contract smoke'
+      );
+      recordUnverified(
+        'Desktop window manager enforces local storage layout serialization protocol',
+        'Requires browser localStorage persistence lane; unverified in HTTP API contract smoke'
+      );
+    }
 
     // -------------------------------------------------------------------------
     // Summary Dossier
