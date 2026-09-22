@@ -7,6 +7,7 @@ command -v python3 >/dev/null
 command -v docker >/dev/null
 api=$(timeout 20 docker version --format '{{.Server.APIVersion}}')
 python3 -c 'import sys; assert tuple(map(int, sys.argv[1].split("."))) >= (1,45), "Docker API 1.45 or newer is required"' "$api"
+python3 worker_config.py topology manifest.json
 node_id=$(python3 -c 'import json; print(json.load(open("manifest.json"))["nodeId"])')
 [[ "$node_id" =~ ^nod_[0-9A-HJKMNP-TV-Z]{26}$ ]] || exit 1
 worker_root="$HOME/.local/share/saintvision/$node_id"

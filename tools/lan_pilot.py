@@ -75,10 +75,20 @@ def configured_nodes(state):
                     provisioned=bool(state.get('initialized')))]
     nodes = []
     seen_ids, seen_ips = set(), set()
+    colocation_allowed = state.get('serverNodeColocationAllowed', False)
+    if type(colocation_allowed) is not bool:
+        raise ValueError('Server Node co-location authorization must be boolean')
     for item in raw:
         node = dict(item)
         node.setdefault('nodePort', 18443)
         node.setdefault('provisioned', bool(state.get('initialized')))
+        colocated = node['nodeIP'] == state.get('serverIP')
+        declared_colocation = node.get('coLocatedWithControlPlane', colocated)
+        if type(declared_colocation) is not bool or declared_colocation != colocated:
+            raise ValueError('Node Control Plane co-location metadata differs from its address')
+        if colocated and not colocation_allowed:
+            raise ValueError('Server Node co-location is not authorized in private state')
+        node['coLocatedWithControlPlane'] = colocated
         if node['nodeId'] in seen_ids or node['nodeIP'] in seen_ips:
             raise ValueError('Duplicate Node identity or address in private state')
         seen_ids.add(node['nodeId'])
@@ -114,7 +124,7 @@ def save(path, data):
     os.replace(temp, path / 'private-state.json')
 
 
-def validate_node_ips(server_ip, node_ips):
+def validate_node_ips(server_ip, node_ips, *, allow_server_node_colocation=False):
     server = ipaddress.ip_address(server_ip)
     if server.version != 4 or not server.is_private or server.is_loopback:
         raise ValueError('Explicit private LAN IPv4 addresses are required')
@@ -124,8 +134,10 @@ def validate_node_ips(server_ip, node_ips):
         addr = ipaddress.ip_address(value)
         if addr.version != 4 or not addr.is_private or addr.is_loopback:
             raise ValueError('Explicit private LAN IPv4 addresses are required')
-        if value == server_ip:
-            raise ValueError('Server and Node addresses must differ')
+        if addr == server and not allow_server_node_colocation:
+            raise ValueError(
+                'Server and Node addresses must differ unless '
+                '--allow-server-node-colocation is set')
 
 
 def add_requested_nodes(state, node_ips):
@@ -217,8 +229,13 @@ def ensure_node_policy(path, state, node):
 
 def manifest_for_node(state, node, inspected, tag):
     manifest = {key: state[key] for key in ('tenantId', 'epoch', 'serverIP', 'baseSHA', 'agentImage')}
+    colocated = node['nodeIP'] == state['serverIP']
     manifest.update(nodeId=node['nodeId'], nodeIP=node['nodeIP'], nodePort=node['nodePort'],
-                    scope='observation-only', schemaVersion=2, agentTag=tag,
+                    scope='observation-only', schemaVersion=3, agentTag=tag,
+                    coLocatedWithControlPlane=colocated,
+                    measurementEligible=dict(s05=False if colocated else None,
+                                             s07=False if colocated else None),
+                    exclusionReason='cp-host-colocation' if colocated else None,
                     imageLayers=inspected['RootFS']['Layers'], imageConfig=inspected['Config'])
     return manifest
 
@@ -262,12 +279,16 @@ def provision_observation_node(conn, state):
 
 def init(args):
     path = args.state
-    validate_node_ips(args.server_ip, args.node_ip)
+    validate_node_ips(
+        args.server_ip, args.node_ip,
+        allow_server_node_colocation=args.allow_server_node_colocation)
     private_directory(path)
     if (path/'private-state.json').exists():
         state = load(path)
         if state['serverIP'] != args.server_ip:
             raise ValueError('Existing server address differs')
+        if args.allow_server_node_colocation and args.server_ip in args.node_ip:
+            state['serverNodeColocationAllowed'] = True
         state, added = add_requested_nodes(state, args.node_ip)
         if added:
             # Persist assigned identities before side effects. A retry resumes the
@@ -284,6 +305,8 @@ def init(args):
         state = dict(epoch=epoch, tenantId=tenant, nodes=nodes,
                      serverIP=args.server_ip, nodeId=nodes[0]['nodeId'], nodeIP=nodes[0]['nodeIP'],
                      nodePort=nodes[0]['nodePort'], downloadPort=18081,
+                     serverNodeColocationAllowed=(
+                         args.allow_server_node_colocation and args.server_ip in args.node_ip),
                      container='saintvision-lan-db-'+epoch[:8], dbPort=55440,
                      baseSHA=run(['git','rev-parse','HEAD'], cwd=ROOT), initialized=False)
         state['adminDSN'] = make_conninfo(host='127.0.0.1', port=55440, dbname='saintvision_lan', user='postgres', password=db_password, connect_timeout=5)
@@ -351,6 +374,7 @@ def init(args):
     print(json.dumps(dict(database='ready', scope='observation-only',
                           nodeId=state['nodeId'], node='offline-awaiting-CSR',
                           nodes=[dict(nodeId=node['nodeId'], nodeIP=node['nodeIP'],
+                                      coLocatedWithControlPlane=node['coLocatedWithControlPlane'],
                                       state='offline-awaiting-CSR') for node in configured_nodes(state)],
                           workloadExecution='disabled')))
 
@@ -453,6 +477,7 @@ def node_status_rows(state):
             row = conn.execute('SELECT node_id,status,heartbeat_at FROM inv.nodes WHERE node_id=%s',(node['nodeId'],)).fetchone()
             snap = conn.execute('SELECT received_at,snapshot FROM inv.node_resource_snapshots WHERE node_id=%s',(node['nodeId'],)).fetchone()
             result.append(dict(nodeId=node['nodeId'], nodeIP=node['nodeIP'],
+                               coLocatedWithControlPlane=node['coLocatedWithControlPlane'],
                                node=dict(row) if row else None, observed=bool(snap),
                                snapshot=dict(snap) if snap else None))
     return result
@@ -564,6 +589,8 @@ def main():
     p.add_argument('--server-ip',required=True)
     p.add_argument('--node-ip',action='append',required=True,
                    help='Private worker IPv4 address; repeat once per Node')
+    p.add_argument('--allow-server-node-colocation',action='store_true',
+                   help='Explicitly allow one Node on the Control Plane host address')
     p = commands.add_parser('bundle')
     p.add_argument('--go')
     p.add_argument('--reuse-image',action='store_true')
