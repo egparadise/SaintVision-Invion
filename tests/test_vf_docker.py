@@ -49,6 +49,14 @@ def test_cleanup_under_host_pressure_records_every_resource_and_never_raises(mon
     assert all("timed out" in why for _, why in incomplete)  # every resource attempted, recorded
 
 
+def test_already_absent_resource_is_idempotent_cleanup_success(monkeypatch):
+    def absent(argv, **k):
+        return _cp(argv, 1, err="Error: No such object: already-gone")
+
+    monkeypatch.setattr(vf_docker.docker_diag, "run", absent)
+    assert cleanup_owned("this-run", [_RES[0]]) == []
+
+
 def test_body_failure_survives_a_cleanup_that_cannot_run(monkeypatch):
     """The core inversion: a real body failure must NOT be replaced by cleanup's
     inability to run. cleanup_owned returns (records) instead of raising a skip."""

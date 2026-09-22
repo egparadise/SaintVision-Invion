@@ -8,9 +8,20 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+import re
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import docker_diag  # noqa: E402
+
+
+_ABSENT = re.compile(r"\bNo such (?:object|volume|network):", re.IGNORECASE)
+
+
+def _confirmed_absent(result):
+    """Docker inspect's narrow, idempotent absence result (not a daemon error)."""
+    return result.returncode == 1 and bool(
+        _ABSENT.search(docker_diag.masked_stderr(getattr(result, "stderr", "")))
+    )
 
 
 def cleanup_owned(name, resources):
@@ -35,6 +46,8 @@ def cleanup_owned(name, resources):
         try:
             inspected = docker_diag.run(["docker", *inspect_args], timeout=90, text=True)
             if inspected.returncode != 0:
+                if _confirmed_absent(inspected):
+                    continue  # already gone: the cleanup postcondition holds
                 incomplete.append((label, "ownership uncheckable, preserved: " + docker_diag.describe(inspected)))
                 continue
             if inspected.stdout.strip() != name:
