@@ -120,23 +120,23 @@ describe('UI-FB-02 PlacementSimulator Negative Controls & Verification Boundarie
     expect(markup).toContain('data-testid="candidates-retry-btn"');
   });
 
-  it('renders real server preview shards when placement-preview succeeds', () => {
-    const sampleShards = [
-      { shardId: 'shd_test_01', targetNodeId: 'Node-01-WinMain', status: '배치 적격 (Eligible)' },
+  it('renders real server preview candidates when placement-preview succeeds', () => {
+    const sampleCandidates = [
+      { candidateRank: 1, targetNodeId: 'Node-01-WinMain', status: '적격 (Eligible)', eligible: true },
     ];
     const markup = renderToStaticMarkup(
       <PlacementSimulator
         nodes={sampleNodes}
         initialPools={[]}
         initialPreviewState="success"
-        initialServerShards={sampleShards}
+        initialServerShards={sampleCandidates}
         initialCandidates={[]}
       />
     );
     expect(markup).not.toContain('data-testid="preview-error-banner"');
-    expect(markup).toContain('shd_test_01');
+    expect(markup).toContain('#1');
     expect(markup).toContain('Node-01-WinMain');
-    expect(markup).toContain('배치 적격 (Eligible)');
+    expect(markup).toContain('적격 (Eligible)');
   });
 
   it('renders preview-empty-state when placement preview returns 0 shards', () => {

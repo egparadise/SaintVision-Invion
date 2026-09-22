@@ -33,9 +33,11 @@ export interface PlacementSimulatorProps {
 }
 
 interface ShardItem {
-  shardId: string;
+  shardId?: string;
+  candidateRank?: number;
   targetNodeId: string;
   status: string;
+  eligible?: boolean;
 }
 
 export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
@@ -214,9 +216,10 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
         if (res.candidates) {
           setServerShards(
             res.candidates.map((c, idx) => ({
-              shardId: `shd_${selectedPoolId}_${idx + 1}`,
+              candidateRank: idx + 1,
               targetNodeId: c.nodeId || c.hostname,
-              status: c.eligible ? '배치 적격 (Eligible)' : '배치 부적격 (Ineligible)',
+              status: c.eligible ? '적격 (Eligible)' : '부적격 (Ineligible)',
+              eligible: Boolean(c.eligible),
             }))
           );
         } else {
@@ -667,7 +670,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
           {previewState === 'success' && serverShards.length === 0 && (
             <p data-testid="preview-empty-state" role="status" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-              가용 샤드가 없습니다. 👉 <strong>[사용자 조치 필요]</strong>: 상단 슬라이더에서 모델 크기 또는 샤드 수를 조절하거나 자원 풀 요건을 변경하십시오.
+              가용 적격 노드가 없습니다. 👉 <strong>[사용자 조치 필요]</strong>: 상단 슬라이더에서 모델 크기 또는 자원 풀 요건을 변경하십시오.
             </p>
           )}
 
@@ -675,17 +678,19 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
             <table style={{ width: '100%', fontSize: '0.8125rem', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--color-border-subtle)', textAlign: 'left' }}>
-                  <th style={{ padding: '6px 8px' }}>샤드 ID</th>
-                  <th style={{ padding: '6px 8px' }}>타겟 노드</th>
-                  <th style={{ padding: '6px 8px' }}>배치 상태</th>
+                  <th style={{ padding: '6px 8px' }}>후보 순위</th>
+                  <th style={{ padding: '6px 8px' }}>후보 노드</th>
+                  <th style={{ padding: '6px 8px' }}>적격 여부</th>
                 </tr>
               </thead>
               <tbody>
-                {serverShards.map((s) => (
-                  <tr key={s.shardId} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-                    <td style={{ padding: '6px 8px', fontFamily: 'var(--font-mono)' }}>{s.shardId}</td>
+                {serverShards.map((s, idx) => (
+                  <tr key={s.shardId || `${s.targetNodeId}_${s.candidateRank || idx}`} style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+                    <td style={{ padding: '6px 8px', fontFamily: 'var(--font-mono)' }}>
+                      {s.candidateRank ? `#${s.candidateRank}` : s.shardId || `#${idx + 1}`}
+                    </td>
                     <td style={{ padding: '6px 8px' }}>{s.targetNodeId}</td>
-                    <td style={{ padding: '6px 8px', color: 'var(--color-success)' }}>{s.status}</td>
+                    <td style={{ padding: '6px 8px', color: s.eligible !== false ? 'var(--color-success)' : 'var(--color-text-muted)' }}>{s.status}</td>
                   </tr>
                 ))}
               </tbody>
