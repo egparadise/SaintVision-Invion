@@ -1,0 +1,49 @@
+# PR #66 head 7586af6e re-review reproduction — Claude, 2026-09-22 23:15~23:30 KST
+# tree .worktrees/claude-rev66 (detached 7586af6e); own Vite 127.0.0.1:3015; mock uvicorn 8080; headless Chrome; --output-dir outside repo (script ALSO rewrote docs/vault/.../desktop_ui_invariants.json in the tree: restored with git checkout)
+
+## run A: original apps/web
+vite ready=True
+[Invariant 1: PASS] Bidirectional Switcher (Desktop <-> Portal) verified!
+[Invariant 3: PASS] Dynamic Z-Index elevation strictly verified: 23 > 22 > 21
+[Invariant 4: PASS] Taskbar dock toggle minimize & restore verified!
+[Invariant 5: PASS] Alt+Tab cycling elevated my_computer (28) above model (27)
+[Invariant 6: PARTIAL] Escape modal dismissal verified, trigger focus return recorded as absent! 
+[Invariant 7: PASS] Layout persistence verified! Restored rect: 1000x640
+[Contrast: Top System Menu Bar Text] Ratio: 17.26:1 (DOM text: rgb(248, 250, 252), bg: rgba(15, 23, 42, 0.85), WCAG AA Pass: True)
+[Contrast: Window Active Title Text] Ratio: 6.99:1 (DOM text: rgb(156, 163, 175), bg: rgb(17, 24, 39), WCAG AA Pass: True)
+[Invariant 8: PASS] Real DOM computed style contrast verified! (Mutation M1 killed)
+[Invariant 9] Extracted DOM capacity numbers: total=16, allocatable=12, used=4.8
+[Invariant 9: PASS] Mathematical invariant strictly held: 0 <= 12 <= 16
+acceptance exit=0
+
+## run B: M1+M2 (shell text #f8fafc->#334155 x4; dock toggle-minimize removed)
+M1 replaced 4 color(s); M2 applied
+ 2 files changed, 17 insertions(+), 21 deletions(-)
+vite ready=True
+[Invariant 1: PASS] Bidirectional Switcher (Desktop <-> Portal) verified!
+[Invariant 3: PASS] Dynamic Z-Index elevation strictly verified: 23 > 22 > 21
+AssertionError: Clicking active window's dock button MUST toggle minimize (hide window)! (Kills M2)
+acceptance exit=1
+
+## run C: M1 only
+M1-only replaced 4
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+vite ready=True
+[Invariant 1: PASS] Bidirectional Switcher (Desktop <-> Portal) verified!
+[Invariant 3: PASS] Dynamic Z-Index elevation strictly verified: 23 > 22 > 21
+[Invariant 4: PASS] Taskbar dock toggle minimize & restore verified!
+[Invariant 5: PASS] Alt+Tab cycling elevated my_computer (28) above model (27)
+[Invariant 6: PARTIAL] Escape modal dismissal verified, trigger focus return recorded as absent! 
+[Invariant 7: PASS] Layout persistence verified! Restored rect: 1000x640
+[Contrast: Top System Menu Bar Text] Ratio: 1.74:1 (DOM text: rgb(51, 65, 85), bg: rgba(15, 23, 42, 0.85), WCAG AA Pass: False)
+AssertionError: Contrast check failed for Top System Menu Bar Text: ratio 1.74:1 < 4.5:1 (Kills M1)
+acceptance exit=1
+
+## tests/test_browser_smoke_boundary.py
+3 passed in 4.38s
+pytest exit=0
+
+## evidence JSON written by run A (gitCommitSha is the fallback constant: script never imports subprocess)
+gitCommitSha 39537173 (tree HEAD was 7586af6e)
+observedFrontendPort 3015
+title contrast {'element': 'Window Active Title Text', 'domTextColor': 'rgb(156, 163, 175)', 'domBgColor': 'rgb(17, 24, 39)', 'ratio': '6.99:1', 'numericalRatio': 6.987328296864191, 'pass': True}
