@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.3"
+version: "1.2.4"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T17:40:00+09:00"
+updated: "2026-09-22T18:50:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -74,6 +74,12 @@ CL-01 (Claude, 2026-09-11): d14db0a 독립 검토 완료. finding 2건(F1 제공
 0581964 (Claude, 2026-09-11): 복원 시험에 인가 모델·definer 함수·서비스 재개·RLS 실제 작동 검사를 추가했다. policy 122개가 전부 살아 있고 digest까지 동일하면서 두 tenant가 서로 보이는 복원본이 기존 검사를 모두 통과하던 것이 핵심 결함이었다. 남은 object 저장소·journal은 각각 S01 미결정과 원격 설치에 막혀 있다.
 
 c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 검사가 실패할 수 있음을 로컬에서 실증했다. 네 결함 모두 "증거 없는 통과"를 만들고 있었다 — 특히 fencing 조회 실패가 0으로 읽혀 "safe"가 출력되던 건은 복원 수락 여부를 결정하는 검사에서의 거짓 통과였다. 정상 시험 RTO 6.1s·RPO 6.2s, old epoch 시험 exit 1. 역할·RLS·object 저장소·서비스 재개는 아직 검사 밖이므로 전체 복원 합격은 미완료다. reviewer Codex의 독립 확인은 아직 없다.
+
+## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
+
+다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, 게이트 전부 GREEN(tsc 0·vitest 659/76·build 0·integrity 0·route_coverage 30/0) + Zero-Mock 되살림(reserved→0 변이가 시험에 잡힘). 발견: F1 서빙 라우트 0(404; 결정 #2는 계약만 착지) · F2 App 배선 0(사용자 가시 변화 없음) · **F3 route_coverage가 변수 조립 URL을 못 봐 30/0 거짓 초록**(내 레인 후속) · F4 프로젝터 capacity→0 조용한 강등 · F5 미병합 gemini/S02-FE 작업(InvFileExplorer +151) 동승. 판정: 조건부 병합(rebase·설명 정정), '연결 완결' 아님. 후속: 라우트=Claude, 배선=Gemini, 스캐너=Claude. PR 코멘트 게시. 전문 [[2026-09-22_PR36_NodeResourceUsage_UI_독립검토_Claude]].
 
 ## 작업 카드
 
