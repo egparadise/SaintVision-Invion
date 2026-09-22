@@ -1,8 +1,8 @@
 {
   "schema": "https://saintvision.ai/evidence/s04-fe-matrix.schema.json",
   "version": "1.1.0",
-  "timestamp": "2026-09-23T02:40:49.254823+09:00",
-  "gitCommitSha": "8e719b7a41ea4549907402cda2d93d22fcc1560b",
+  "timestamp": "2026-09-23T05:32:29.366260+09:00",
+  "gitCommitSha": "a40ca43823f03172b8b6ceaeca643462db499d92",
   "assessment": "UNMEASURED",
   "operationalAcceptanceAssessed": false,
   "environment": {
@@ -16,94 +16,88 @@
   "scenarios": [
     {
       "id": "s04-exp-00-expired-token-401",
-      "name": "만료 Access Token 401 ProblemDetails 및 자동 로그아웃 전이",
-      "status": "PASS",
-      "observations": {
-        "wireHttpStatus": 401,
-        "wireContentType": "application/problem+json",
-        "problemCode": "AUTH-0050",
-        "problemDetail": "A current access token is required",
-        "screenshot": "s04_exp00_token_401.png"
-      }
+      "name": "만료 Access Token 401 ProblemDetails (AUTH-0050) 검증 [Wire]",
+      "status": "UNMEASURED",
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-exp-01-approval-expired-trans",
       "name": "승인 안건 만료 상태 전이 및 액션 차단",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-exp-02-stale-polling-banner",
       "name": "폴링 지연 침묵 노화 방어 배너 및 신선도 시각 표출",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-exp-03-server-403-auth-0031",
-      "name": "승인 시효 만료 서버 403 AUTH-0031 거부 표출",
+      "name": "승인 시효 만료 서버 403 AUTH-0031 거부 표출 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-cnc-01-terminal-run-rejection",
-      "name": "단말 상태 취소 차단 및 기취소 안건 멱등 200 Replay",
+      "name": "단말 상태 취소 차단 409 GRAPH-0002 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-cnc-02-strict-wire-cancel-input",
-      "name": "ADR-001 표준 사유 모달 및 엄격한 RunCancelInput 전송",
+      "name": "엄격한 RunCancelInput 전송 및 422/200 검증 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-cnc-03-lease-release-observation",
       "name": "자원 반환 대기 배너 노출 및 관측 재조회",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-dup-01-double-click-200-replay",
-      "name": "승인 버튼 더블클릭 방어 및 200 Replay",
+      "name": "승인 멱등 키 200 Replay 검증 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-dup-02-key-collision-nonce-separation",
-      "name": "Idempotency-Key 충돌 및 1회용 Nonce 재사용 차단 분리",
+      "name": "Idempotency-Key 충돌(409) 및 Nonce 재사용 차단(403) 분리 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-dup-03-two-person-rule-defense",
-      "name": "2인 승인 규칙 자가승인 및 동일인 중복 승인 차단",
+      "name": "2인 승인 규칙 자가승인 차단 403 AUTH-0033 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-sse-01-ring-buffer-dedup",
-      "name": "1,000건 링버퍼 at-least-once 중복 제거",
+      "name": "1,000건 링버퍼 at-least-once 중복 제거 (UNMEASURED: 라이브 SSE 결속 후 실측)",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-sse-02-last-event-id-resume",
-      "name": "Last-Event-ID 커서 기반 스트림 재개 및 범위 검증",
+      "name": "Last-Event-ID 커서 기반 스트림 재개 및 범위 검증 [Wire]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     },
     {
       "id": "s04-sse-03-monotonic-sequence-timeline",
-      "name": "이벤트 sequence 단조 증가 및 타임라인 렌더링",
+      "name": "이벤트 sequence 단조 증가 검증 [Wire/DB]",
       "status": "UNMEASURED",
-      "reason": "Scenario interaction pending implementation in runner skeleton"
+      "reason": "Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)"
     }
   ],
   "summary": {
     "totalScenarios": 13,
-    "passed": 1,
+    "passed": 0,
     "failed": 0,
-    "unmeasured": 12,
+    "unmeasured": 13,
     "mockApiUsed": false,
     "realUvicornUsed": true,
     "realDevIdPUsed": true
