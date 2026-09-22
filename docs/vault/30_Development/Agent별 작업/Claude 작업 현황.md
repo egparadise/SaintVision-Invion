@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+이어가기 §0 마감 + Codex 집계 대조 (Claude, 2026-09-22): §0 5항 정합(상태·열린갈래·gh/Go·오늘vs어제·기준선이후착지). check_contract_bindings 자리수 vs Codex 집계: 응답계약 EvidenceEnvelope 5=5 일치, 입력/식별자는 내 도구 의도 제외(범위 차이, 버그 아님). 이 기계 마지막 정리.
+
 check_contract_bindings 단위 선언 (Claude, 2026-09-22): (2) 서빙앵커 게이트 출력을 타입/자리 단위 명시로 정직화(게이트 로직 불변). 14 타입/17 자리/다중자리 목록(EvidenceEnvelope 5자리)·자리별 시험은 정적 불가 명시·회귀 아닌 정확화 주석. 어젯밤 check_anchor_weight 범위선언과 같은 교정. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
 
 check_anchor_weight 범위 자기선언 (Claude, 2026-09-22): 도구 출력이 범위를 먼저 말하게 보강 — 스캔 7모듈·타입단위(fresh/replay 못가름)·범위밖 replay 앵커 자기측정(2b 권위)·in-scope replay 별표. 좁은 범위 유지 이유 docstring 기록, --modules opt-in. 자기시험 4 passed. 두 도구 보완관계 명문화. 전문 [[2026-09-22_앵커무게도구_전수적용_결과_Claude]].
