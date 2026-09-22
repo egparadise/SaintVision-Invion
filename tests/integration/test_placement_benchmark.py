@@ -157,9 +157,14 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
 ):
     a = placement_benchmark_env
     concurrency = _count("INV_PLACEMENT_BENCHMARK_CONCURRENCY", a.request_count)
+    round_count = _count("INV_PLACEMENT_BENCHMARK_ROUNDS", 2)
+    if round_count not in (1, 2):
+        pytest.fail("Benchmark rounds must be 1 or 2")
     if concurrency != a.request_count:
         pytest.fail("Benchmark concurrency must equal request count")
-    runs = [[planned(a.e) for _ in range(a.request_count)] for _ in range(2)]
+    runs = [
+        [planned(a.e) for _ in range(a.request_count)] for _ in range(round_count)
+    ]
     _start_observation_window(a)
 
     def reserve(round_index, request_index):
@@ -188,7 +193,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     ]
     second = None
     snapshot_replay_stable = None
-    if first.failure_count == 0:
+    if first.failure_count == 0 and round_count == 2:
         replayed = [reserve(0, sample.request_index) for sample in first_samples]
         snapshot_replay_stable = all(
             sample.result == replay
@@ -230,6 +235,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         active_after_rounds=active_after_rounds,
         expected_active_rounds=expected_active_rounds,
         snapshot_replay_stable=snapshot_replay_stable,
+        rounds_requested=round_count,
     )
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -255,7 +261,8 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             f"{first.failure_count} failures; inspect the JSON/JUnit distribution"
         )
     assert report["benchmarkComplete"]
-    assert report["deterministicExplainAndSnapshot"]
-    assert report["snapshotIdStableOnIdempotentReplay"]
+    if round_count == 2:
+        assert report["deterministicExplainAndSnapshot"]
+        assert report["snapshotIdStableOnIdempotentReplay"]
     assert report["uniqueFencingTokens"]
     assert report["noOverbooking"]

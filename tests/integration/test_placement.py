@@ -1,10 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from decimal import Decimal
+import json
+from time import perf_counter
 import psycopg
 from psycopg.types.json import Jsonb
 import pytest
 from inv.approvals import Principal
+from inv.app import problem
 from inv.errors import DomainError
 from inv.ids import new_id
 from inv.leases import Allocation
@@ -16,6 +19,7 @@ from test_approvals import approval
 from test_node_runtime import node_runtime
 from test_node_delivery import remote
 from test_postgres import planned
+from test_placement_benchmark import placement_benchmark_env, _start_observation_window
 
 pytestmark = pytest.mark.postgres
 
@@ -173,6 +177,77 @@ def test_concurrent_placement_and_direct_lease_share_project_ceiling(placement):
             ).fetchone()["used"]
             == 500
         )
+
+
+def test_project_lock_timeout_is_retryable_res_0007_problem(placement_benchmark_env):
+    """A held project row reaches the 500 ms lock timeout, not snapshot freshness.
+
+    The holder sleeps in PostgreSQL while retaining the row lock.  This pins both
+    the Python error and the canonical HTTP ProblemDetails surface without changing
+    the timeout or retry policy under test.
+    """
+
+    a = placement_benchmark_env
+    _start_observation_window(a)
+    run = planned(a.e)
+    holder = psycopg.connect(a.e.owner)
+    try:
+        holder.execute(
+            "SELECT project_id FROM inv.projects WHERE project_id=%s FOR UPDATE",
+            (a.e.project,),
+        ).fetchone()
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            sleeping = pool.submit(
+                lambda: holder.execute("SELECT pg_sleep(1.2)").fetchone()
+            )
+            started = perf_counter()
+            with pytest.raises(DomainError) as caught:
+                a.placement.reserve(
+                    a.principal,
+                    a.e.project,
+                    run["runId"],
+                    a.request,
+                    key="project-lock-timeout",
+                    policy_version="roof:benchmark:1",
+                    pool_version="project-nodes:benchmark:1",
+                )
+            elapsed_ms = (perf_counter() - started) * 1000
+            sleeping.result(timeout=3)
+    finally:
+        holder.rollback()
+        holder.close()
+
+    error = caught.value
+    assert error.code == "RES-0007"
+    assert error.status == 503
+    assert error.retryable is True
+    assert isinstance(error.__cause__, psycopg.errors.LockNotAvailable)
+    assert error.__cause__.sqlstate == "55P03"
+    assert 350 <= elapsed_ms < 1500
+
+    response = problem(error, "a" * 32)
+    payload = json.loads(response.body)
+    assert response.status_code == 503
+    assert payload == {
+        "type": "about:blank",
+        "title": "Request rejected",
+        "status": 503,
+        "code": "RES-0007",
+        "category": "RES",
+        "detail": "Transaction contention; retry with the same key",
+        "retryable": True,
+        "traceId": "a" * 32,
+        "causeRef": None,
+        "evidenceId": None,
+    }
+    with a.e.db.transaction(a.e.tenant) as conn:
+        assert not conn.execute(
+            "SELECT 1 FROM inv.resource_leases WHERE run_id=%s", (run["runId"],)
+        ).fetchall()
+        assert not conn.execute(
+            "SELECT 1 FROM inv.idempotency WHERE operation='placement.reserve' AND key=%s",
+            ("project-lock-timeout",),
+        ).fetchall()
 
 
 def test_explain_event_failure_rolls_back_all_resources(placement, monkeypatch):

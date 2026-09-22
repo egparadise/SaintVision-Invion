@@ -10,13 +10,6 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
-## 2026-09-23 카드 7 — hosted Core 보강·5노드 opt-in lane 정의
-
-- Core run `35742655096`은 exact `a4bf2cee`에서 success다. artifact `core-tests.xml`에서 Windows skip 대상인 workspace recovery 12 + resume 11을 직접 집계해 Linux **23/23 passed, 0 skipped/failed**를 확인했다.
-- [[Codex 5노드 랩 opt-in lane 정의]]에 self-hosted runner, exact SHA/inventory·image digest, env/secret 이름, S05/S07/S06 명령, JUnit+JSON artifact와 fail-closed 판정을 고정했다. `.github/workflows/core.yml`은 변경하지 않았고 향후 `agent/codex/five-node-lane` 제안만 정의했다.
-- 현재 S05/S07은 합성 node adapter이고 S06 물리 runner는 아직 없으므로 5-node runner 실행 자체를 물리 합격으로 세지 않는다. S06-DB는 원격 WS/PTY/Git·CP/Node 재시작 복원 미측정 때문에 `review` 유지다.
-- content R1 `21c6a026` 착지, docs 831·ontology 48·ratchet 18 모두 exit 0. 상세: [[2026-09-23_00-18-00_KST_Card7_hosted-Core_5노드-lane_Codex_보고]]. 다음 담당은 Claude 독립 검토다.
-
 ## 2026-09-22 S06-DB snapshot reader 제품 결속
 
 - strict restore/checkout 입력·응답 계약, fixture, Python/TS/Go/node schema와 product route/composition을 구현 `a4bf2cee`로 착지했다. fresh/replay 모두 계약 anchor와 현재 `can_request`를 재검증하며 기존 resume·commitment API는 불변이다.
@@ -24,13 +17,14 @@ source_of_truth: "Git"
 - 관련 56 passed/23 Windows Linux-only skip/0 failed, bindings 54 fixtures·19 types·25 sites·14 replay guards, 생성 drift 0, Go/docs/frontend/ontology/ratchet/freshness가 exit 0이다. hosted 5 run은 생성됐으나 보고 시점 진행 중이라 통과로 세지 않는다.
 - 원격 WS/PTY·실 Git·CP/Node 재시작 복원은 미측정이며 S06-DB `review`와 AC-06 차단을 유지한다. 다음 담당은 Claude 독립 검토다. 상세: [[2026-09-22_23-47-00_KST_S06-DB_snapshot-reader_결속_Codex_구현]].
 
-## 2026-09-22 F-S05-01 설계 결정 초안
+## 2026-09-23 F-S05-01 timeout 실측과 결정 초안 v1.1
 
-- 유효한 실 PG 근거는 개발 PC 1대·합성 Node의 3동시 3/3×2·worst P95 861.651ms와 10동시 10/10×2·1,738.762ms다. 50동시는 미측정이며 기존 `RES-0003` 실측 주장은 PR #71 하네스 검토 뒤 철회했다.
-- [[ERR-DESIGN-008 프로젝트 배치 잠금과 관측 freshness 충돌]]을 코드상 위험 가설로 열었다. Codex 권고는 기존 계약을 유지한 speculative read 뒤 짧은 commit에서 ceiling·resource·grant·epoch/freshness를 모두 재검증하는 옵션 1이다.
-- batch API는 최대 50 item all-or-nothing·batch idempotency·단일 tenant/project를 요구하고 50독립 요청 AC를 대체하지 않는다. freshness 확대/진입 시각 고정은 stale 결정을 허용하고 P95를 고치지 않아 기각했다.
-- PR #68 재검토는 provenance 해소·PG-free 15 passed·비밀 0건을 확인했으나 E4 count-swap false negative가 남아 [수정 요청 유지](https://github.com/egparadise/SaintVision-Invion/pull/68#issuecomment-5778202909)다.
-- 구현·50동시 재실행·AC 판정은 Claude 설계 검토와 코디네이터 A/B/C 결정 뒤다. 상세: [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]], [[2026-09-22_23-30-00_KST_S05_배치잠금_결정초안_Codex]].
+- 단일 project lock 주입 실 PG 시험은 `55P03 LockNotAvailable`을 기존 `RES-0007`/503/retryable로 고정했고 1 passed/exit 0, Lease·idempotency 잔존 0이었다. 따라서 v1.0의 freshness→`RES-0003` 인과와 PR #74의 미매핑·계약변경 전제를 함께 정정했다.
+- 개발 PC·합성 Node의 3동시 3/3×2 P95 861.651ms, 10동시 10/10×2 P95 1,738.762ms에 이어 20동시 한 라운드는 **17/20 성공, 성공 P95 2,417.912ms, 실패 3건 모두 `57014 QueryCanceled` statement timeout → `RES-0007`**이었다. 50동시·물리 5노드·20동시 peak는 미측정이다.
+- 코디네이터 결정 C(조건부 보류)에 따라 옵션 1·2 구현은 시작하지 않았다. 옵션 1 v1.1은 final lock 아래 active_total/fit 재계산, stale winner 재계획, Node/Resource 병목, `leases.py:176` 중복 project lock, 네 `require_*` 순서 통일과 transaction별 lock hold p50/p95/max를 필수로 한다.
+- benchmark JSON/JUnit은 요청별 지연·완료 순서·오류 status/retryable·cause·SQLSTATE·timeoutKind와 1/2 라운드 미측정 경계를 기록한다. 단위 4 passed, 단일 주입 1 passed, 20동시는 finding을 JUnit failure/exit 1로 정직 노출했다.
+- PR #68 head `ef5b6587`은 E4를 ctid 또는 tenant_id+전체 PK로 고치고 불가 시 UNMEASURED/exit3으로 닫아 [승인](https://github.com/egparadise/SaintVision-Invion/pull/68#issuecomment-5778940562)했다. PR #73 head `1b21e8d1`의 evidence cleanup 라벨도 [승인 유지](https://github.com/egparadise/SaintVision-Invion/pull/73#issuecomment-5778941058)했다.
+- Claude v1.1 재검토와 코디네이터 후속 A/B/C 결정 전 커널 구현·50동시 재실행·AC 판정을 하지 않는다. 상세: [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]], [[2026-09-23_00-18-00_KST_S05_timeout_실측과_결정초안_v1_1_Codex]].
 
 ## 2026-09-22 S07-DB 노드 이탈·복구 반복 측정 — F-S07-03
 
@@ -44,7 +38,7 @@ source_of_truth: "Git"
 
 - exact landing `3f0fab3d`는 snapshot 계약 위반과 report TypeError가 있어 기존 78.15초/61.69초 `RES-0003` 수치를 철회했다. R1 `7569c418`로 13필드 계약+fixture validation과 summarize 호출을 교정했다.
 - 실 PG에서 3동시 P95 861.651ms, 10동시 1,738.762ms, 각 두 라운드 전부 성공·오류 0·결정성/replay/fencing/no-overbooking true, disposable DB 잔존 0을 확인했다.
-- 50동시와 물리 5노드는 미측정이다. project lock 뒤 15초 freshness 검사 위험만 코드상 가설로 유지하고 S05-DB는 `review`를 유지한다. 상세: [[2026-09-22_22-38-00_KST_S05-DB_50동시배치_예비측정_F-S05-01_Codex]].
+- 후속 20동시 실측이 현 실패를 2초 statement timeout(`57014` → `RES-0007`)으로 고정해 15초 freshness 인과를 철회했다. 50동시와 물리 5노드는 미측정이며 S05-DB는 `review`를 유지한다. 상세: [[2026-09-23_00-18-00_KST_S05_timeout_실측과_결정초안_v1_1_Codex]].
 
 ## 2026-09-22 VF-CL-02(e) node-agent wire 계약 소비 + 카드 3 M1 보강
 

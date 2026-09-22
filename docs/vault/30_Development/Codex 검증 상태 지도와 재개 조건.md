@@ -1,15 +1,22 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.20"
+version: "1.5.21"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-21T13:00:00+09:00"
+updated: "2026-09-23T00:18:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+## 2026-09-23 S05-DB F-S05-01 timeout 실측
+
+- 실 PG 단일 project lock 주입은 `55P03 LockNotAvailable` → 기존 `RES-0007`/503/retryable, 1 passed/exit 0, 잔존 0을 확인했다. `LockNotAvailable` 미매핑·계약 변경 필요 전제는 해소됐다.
+- 개발 PC·한 합성 measured-node의 20동시 한 라운드는 17 성공/3 실패, 성공 P95 2,417.912ms였다. 실패는 모두 `57014 QueryCanceled` statement timeout → `RES-0007`이며 fencing 유일성·no-overbooking·active 합계는 정상이다.
+- 기존 “project 직렬 대기 → 15초 freshness → `RES-0003`” 인과는 철회한다. 3·10·20동시 비교는 각각 861.651ms/실패0, 1,738.762ms/실패0, 2,417.912ms/실패3이다. 50동시·물리 5노드·20동시 peak·server-side row별 lock hold는 미측정이다.
+- 재개 조건: Claude가 결정 초안 v1.1의 active fit 재계산, Node/Resource 병목, 중복 project lock, 네 admission 순서, lock hold 계측을 승인하고 코디네이터가 A/B/C를 재결정해야 한다. 그 전 커널 구현·50동시 재실행·AC-05 판정 금지. [[2026-09-23_00-18-00_KST_S05_timeout_실측과_결정초안_v1_1_Codex]]
 
 2026-09-21 최신 Obsidian 결과: 사용자는 두 checkout을 모두 `b5ea2a5`로 고정한 paired `--check`에서 각각 1373 managed/6 pending/0 conflicts를 확인했다. 6개를 적용해 exit 0, 1373 destination hashes 일치, 사후 check 1373/0/0 및 당시 vault 1384 files를 확인했다. 이후 `a39fc13`의 14개 regression evidence와 Codex 문서를 함께 동기화해 1388 managed/0 pending/0 conflicts로 끝났다. Vault recursive count 1399는 managed count와 범위가 다르다. 6/5 pending은 다른 snapshot에 대한 과거 중간 관측이며 현재 기준이 아니다. 최신 기록은 [[2026-09-21_sync_common_state_UI_FB_boundary_Codex]] 및 [[2026-09-21_discovery_candidates_response_contract_Codex]].
 

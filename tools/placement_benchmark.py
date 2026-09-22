@@ -34,6 +34,11 @@ class PlacementSample:
     result: dict | None
     error_code: str | None
     error_type: str | None
+    error_status: int | None
+    error_retryable: bool | None
+    cause_type: str | None
+    sqlstate: str | None
+    timeout_kind: str | None
 
 
 @dataclass(frozen=True)
@@ -54,6 +59,7 @@ class RoundEvidence:
     failure_request_indexes: tuple[int, ...]
     first_failure_completion_order: int | None
     errors_by_code: dict[str, int]
+    errors_by_sqlstate: dict[str, int]
     samples: tuple[PlacementSample, ...]
 
 
@@ -89,26 +95,61 @@ def run_round(
         raise ValueError("concurrency must equal request_count for one simultaneous wave")
     barrier = Barrier(request_count)
 
-    def attempt(index: int) -> tuple[int, float, dict | None, str | None, str | None]:
+    def attempt(index: int) -> tuple:
         barrier.wait(timeout=30)
         started = perf_counter_ns()
         try:
             result = reserve(index)
-            return index, (perf_counter_ns() - started) / 1_000_000, result, None, None
+            return (
+                index,
+                (perf_counter_ns() - started) / 1_000_000,
+                result,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
         except Exception as error:  # Evidence must retain every concurrent outcome.
+            cause = getattr(error, "__cause__", None)
+            sqlstate = getattr(cause, "sqlstate", None) or getattr(error, "sqlstate", None)
             return (
                 index,
                 (perf_counter_ns() - started) / 1_000_000,
                 None,
                 getattr(error, "code", None) or "UNCLASSIFIED",
                 type(error).__name__,
+                getattr(error, "status", None),
+                getattr(error, "retryable", None),
+                type(cause).__name__ if cause is not None else None,
+                sqlstate,
+                (
+                    "lock_timeout"
+                    if sqlstate == "55P03"
+                    else "statement_timeout"
+                    if sqlstate == "57014"
+                    else None
+                ),
             )
 
     with ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = [pool.submit(attempt, index) for index in range(request_count)]
         samples = []
         for completion_order, future in enumerate(as_completed(futures), start=1):
-            index, latency, result, error_code, error_type = future.result()
+            (
+                index,
+                latency,
+                result,
+                error_code,
+                error_type,
+                error_status,
+                error_retryable,
+                cause_type,
+                sqlstate,
+                timeout_kind,
+            ) = future.result()
             samples.append(
                 PlacementSample(
                     index,
@@ -117,6 +158,11 @@ def run_round(
                     result,
                     error_code,
                     error_type,
+                    error_status,
+                    error_retryable,
+                    cause_type,
+                    sqlstate,
+                    timeout_kind,
                 )
             )
 
@@ -157,6 +203,7 @@ def run_round(
                 min(s.completion_order for s in failures) if failures else None
             ),
             errors_by_code=dict(Counter(s.error_code for s in failures)),
+            errors_by_sqlstate=dict(Counter(s.sqlstate or "none" for s in failures)),
             samples=tuple(sorted(samples, key=lambda sample: sample.request_index)),
         ),
         samples,
@@ -173,18 +220,25 @@ def summarize(
     active_after_rounds: list[dict[str, int]],
     expected_active_rounds: list[dict[str, int]],
     snapshot_replay_stable: bool | None,
+    rounds_requested: int = 2,
 ) -> dict:
-    deterministic = bool(
-        second
-        and not first.failure_count
-        and not second.failure_count
-        and first.explain_signatures == second.explain_signatures
+    deterministic = (
+        bool(
+            second
+            and not first.failure_count
+            and not second.failure_count
+            and first.explain_signatures == second.explain_signatures
+        )
+        if rounds_requested > 1
+        else None
     )
     rounds = [first] + ([second] if second else [])
     fences = tuple(token for item in rounds for token in item.fencing_tokens)
     unique_fences = len(set(fences)) == len(fences)
     no_overbooking = active_after_rounds == expected_active_rounds
-    benchmark_complete = bool(second and all(item.failure_count == 0 for item in rounds))
+    benchmark_complete = bool(
+        len(rounds) == rounds_requested and all(item.failure_count == 0 for item in rounds)
+    )
 
     def round_json(item: RoundEvidence) -> dict:
         return {
@@ -198,6 +252,7 @@ def summarize(
             "failureRequestIndexes": list(item.failure_request_indexes),
             "firstFailureCompletionOrder": item.first_failure_completion_order,
             "errorsByCode": item.errors_by_code,
+            "errorsBySqlState": item.errors_by_sqlstate,
             "snapshotIds": list(item.snapshot_ids),
             "nodeIds": list(item.node_ids),
             "samples": [
@@ -205,9 +260,16 @@ def summarize(
                     "requestIndex": sample.request_index,
                     "completionOrder": sample.completion_order,
                     "latencyMs": sample.latency_ms,
+                    "lockWaitInclusiveLatencyMs": sample.latency_ms,
+                    "lockWaitSeparatelyMeasured": False,
                     "status": "success" if sample.result is not None else "failure",
                     "errorCode": sample.error_code,
                     "errorType": sample.error_type,
+                    "errorStatus": sample.error_status,
+                    "errorRetryable": sample.error_retryable,
+                    "causeType": sample.cause_type,
+                    "sqlState": sample.sqlstate,
+                    "timeoutKind": sample.timeout_kind,
                     "snapshotId": (
                         sample.result["placement"]["snapshotId"]
                         if sample.result is not None
@@ -223,15 +285,28 @@ def summarize(
 
     successful_p95s = [item.p95_success_ms for item in rounds if item.p95_success_ms is not None]
     return {
-        "schemaVersion": "1.0.0",
+        "schemaVersion": "1.1.0",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "codeSHA": code_sha,
         "scope": topology,
         "acceptanceClaim": False,
         "requestCount": first.request_count,
         "concurrency": first.concurrency,
+        "roundsRequested": rounds_requested,
+        "contentionObservation": {
+            "databaseLockTimeoutMs": 500,
+            "databaseStatementTimeoutMs": 2000,
+            "requestLatencyIncludesLockWait": True,
+            "serverSideLockWaitSeparatelyMeasured": False,
+        },
         "rounds": [round_json(item) for item in rounds],
-        "secondRoundStatus": ("completed" if second else "not_run_due_to_first_round_failure"),
+        "secondRoundStatus": (
+            "completed"
+            if second
+            else "not_requested"
+            if rounds_requested == 1
+            else "not_run_due_to_first_round_failure"
+        ),
         "p95SuccessfulMsWorstRound": max(successful_p95s) if successful_p95s else None,
         "benchmarkComplete": benchmark_complete,
         "deterministicExplainAndSnapshot": deterministic,
@@ -241,7 +316,12 @@ def summarize(
         "expectedActiveAfterRounds": expected_active_rounds,
         "activeAfterRounds": active_after_rounds,
         "finding": (
-            "F-S05-01" if any("RES-0003" in item.errors_by_code for item in rounds) else None
+            "F-S05-01"
+            if any(
+                {"RES-0003", "RES-0007"}.intersection(item.errors_by_code)
+                for item in rounds
+            )
+            else None
         ),
         "fiveNodeAC05": "not_evaluated",
     }
@@ -259,7 +339,7 @@ def write_junit(path: Path, report: dict, *, elapsed_seconds: float = 0.0) -> No
             "uniqueFencingTokens",
             "noOverbooking",
         )
-        if not report[name]
+        if report[name] is False
     ]
     suite = ET.Element(
         "testsuite",
@@ -304,6 +384,7 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         **os.environ,
         "INV_PLACEMENT_BENCHMARK_REQUESTS": str(args.requests),
         "INV_PLACEMENT_BENCHMARK_CONCURRENCY": str(args.concurrency),
+        "INV_PLACEMENT_BENCHMARK_ROUNDS": str(args.rounds),
         "INV_PLACEMENT_BENCHMARK_REPORT": str(args.report.resolve()),
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
     }
@@ -327,6 +408,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--requests", type=int, default=50)
     parser.add_argument("--concurrency", type=int, default=50)
+    parser.add_argument("--rounds", type=int, choices=(1, 2), default=2)
     parser.add_argument("--junit", type=Path, default=ROOT / ".work/placement-benchmark.xml")
     parser.add_argument("--report", type=Path, default=ROOT / ".work/placement-benchmark.json")
     parser.add_argument("--timeout", type=int, default=300)
