@@ -39,6 +39,32 @@ def test_protected_digest_keeps_private_key_changes_visible(plan, monkeypatch):
     assert replacement.preserved(plan, "container") != original
 
 
+def test_startup_checkpoint_follows_readiness(monkeypatch):
+    observed = []
+    monkeypatch.setattr(
+        replacement.storage,
+        "docker",
+        lambda *args: observed.append(("docker", *args)),
+    )
+    monkeypatch.setattr(
+        replacement,
+        "check_running",
+        lambda name: observed.append(("ready", name)),
+    )
+
+    replacement.start_and_confirm(
+        "saintvision-node",
+        "a" * 64,
+        lambda phase: observed.append(("checkpoint", phase)),
+    )
+
+    assert observed == [
+        ("docker", "start", "a" * 64),
+        ("ready", "saintvision-node"),
+        ("checkpoint", "starting"),
+    ]
+
+
 @pytest.mark.parametrize(
     "fault",
     [None, "ownership", "privileged", "restart", "port", "capabilities", "memory", "identifier"],

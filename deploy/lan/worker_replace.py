@@ -133,6 +133,14 @@ def preserved(plan, container):
     )
 
 
+def start_and_confirm(name, container_id, checkpoint):
+    """Cross the startup fault seam only after journal initialization is stable."""
+    storage.docker("start", container_id)
+    with redirect_stdout(io.StringIO()):
+        check_running(name)
+    checkpoint("starting")
+
+
 def old_target(record, value):
     if value is None or value["Id"] != record["previous"]["Id"]:
         storage.reject()
@@ -339,10 +347,12 @@ def run(plan, receipt, *, checkpoint=lambda phase: None):
             # Starting may persist a new floor. Never restore the old policy/container.
             record["phase"] = "starting"
             save(path, record)
-            storage.docker("start", current["Id"])
-            phase("starting")
-        with redirect_stdout(io.StringIO()):
-            check_running(name)
+            start_and_confirm(name, current["Id"], checkpoint)
+            record["phase"] = "starting"
+            save(path, record)
+        else:
+            with redirect_stdout(io.StringIO()):
+                check_running(name)
         current = optional(name)
         new_target(plan, record, current)
         result = storage.receipt(
