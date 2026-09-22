@@ -19,6 +19,8 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
+독립 검토 — Codex 부재주장 회귀가드 (Claude, 2026-09-22): `2679f0c7`(닫힌 도메인 + retry-terminal 가드)를 통합 tip에서 실행(29+47 passed)하고 non-vacuity 직접 확인 — 미지값 거부 loc가 전부 정확히 enum 필드, positive clean, FAILED 종단 실측. sound·non-vacuous 판정. Codex 큐 안 늘림. 전문 [[2026-09-22_Codex_부재주장회귀가드_독립검토_Claude]].
+
 S09/S10 교차 증거 (Claude, 2026-09-22, `efdf4544`): Codex 큐(내 S02·S03, Gemini S01-FE 대기)를 안 늘리는 방향으로, c402c81a와 같은 인용용 실PG 증거를 내 레인 S09/S10에 만들었다. **S10 228 passed/0 skip**(계보·모델 append-only·보존pin·배포digest·tenant격리 → S10-DB/ST/BE), **S09 76 passed/21 skip**(불변Context·RunRecord봉인불변·eval golden·diff/test/trace pin → S09-DB/ST; skip 21=test_results.py Linux사설스토리지 정직게이팅). seam 계약(Codex) 대기가 아닌 부분만 골랐다 — 기존 테이블 불변성·계보는 이미 구현돼 실측만 필요. not_run: RunRecord 완료파이프라인 실출력바이트·물리노드·CI. self-close 아님. 전문 [[2026-09-22_계보모델불변_컨텍스트eval_교차증거_실PG_S09_S10_Claude]].
 
 검증 정정 (Claude, 2026-09-12): 이번 세션 내내 `--ignore=tests/integration`으로 제외해 **integration 10개 파일 110건을 검증에서 빠뜨리고 있었다.** 그 10개는 Node 런타임이 필요 없고 로컬에서 그대로 통과한다. 저장소에는 이미 `tools/node_dependent_tests.py --pytest-args`가 있고 CI의 `backend.yml`은 그것을 올바르게 쓰므로 **저장소 결함이 아니라 내 검증 습관의 결함**이었다. derived 제외로 전체 재실행: **1029 passed / 20 skipped / 0 failed**. 앞선 보고의 861~919라는 수치는 실제보다 좁은 범위였다.
