@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.176"
+version: "1.0.177"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T22:38:00+09:00"
+updated: "2026-09-22T23:00:04+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 S07-DB 노드 이탈·복구 반복 측정 — F-S07-03
+
+- 실 PostgreSQL disposable DB·난수 login role에서 합성 measured-node N대 중 한 node만 heartbeat를 끊고, 생존 node는 제품 heartbeat/observation을 계속 갱신한다. 실제 lost 판정·replica stale·repair plan·15초 fresh candidate·health 경로를 R회 측정해 JSON 분포와 JUnit을 남기는 opt-in 하네스를 구현 SHA `d2471226`로 착지했다.
+- 착지 SHA N=3/R=3 축약 예비값은 감지 min/p50/p95/max `1.034432/1.103582/1.112639/1.112639s`, stale 3/3, fresh target 3/3, 합성 shard proxy 3/3(1.0), JUnit exit 0이다. 이는 물리 5-node·bytes transfer·execution shard replay 판정이 아니며 `operationalAcceptanceAssessed=false`다.
+- 실제 60초 경계 N=3/R=1은 `60.066591s`로 상한을 초과해 JUnit red였다. strict `< cutoff`에는 scheduling margin이 없다는 F-S07-03을 우회하지 않고 고정했다. fresh candidate 0은 F-S07-01 fail-closed, 물리 복구 미검증은 F-S07-02다.
+- 단위 3, 관련 실 PG 회귀 14, route coverage 38, docs/bindings/frontend/ontology/ratchet/freshness가 exit 0이다. 같은 SHA hosted Docs·Frontend·Browser는 success, Core·Backend는 후속 push로 job 0 cancelled라 통과로 세지 않는다. reviewer Claude이며 self-close하지 않는다. 상세: [[2026-09-22_23-00-04_KST_S07-DB_노드이탈_복구반복측정_Codex]].
 
 ## 2026-09-22 S05-DB 50동시 배치 예비 측정 — F-S05-01
 
