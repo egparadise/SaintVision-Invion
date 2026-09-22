@@ -416,7 +416,7 @@ def five_node_lab_dry_run(
 
 def write_registration_mtls_preflight(
     inventory_path: Path,
-    dsn: str,
+    dsn: str | None,
     report_path: Path,
     *,
     connect: Callable[..., Any] | None = None,
@@ -426,6 +426,8 @@ def write_registration_mtls_preflight(
     if inventory_path.resolve() == report_path.resolve():
         raise ValueError("five-node inventory and preflight report paths must differ")
     report_path.unlink(missing_ok=True)
+    if not dsn:
+        raise ValueError("INV_TEST_ADMIN_DSN is required for --adapter five-node-lab")
     inventory = load_five_node_inventory(inventory_path)
     report = five_node_lab_dry_run(inventory, dsn, connect=connect)
     report_path.parent.mkdir(parents=True, exist_ok=True)

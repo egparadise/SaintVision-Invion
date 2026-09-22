@@ -279,6 +279,17 @@ def test_report_writer_never_deletes_inventory_when_paths_match(tmp_path: Path):
     assert inventory_path.read_bytes() == original
 
 
+def test_report_writer_removes_stale_output_when_dsn_is_missing(tmp_path: Path):
+    stale_report = tmp_path / "preflight.json"
+    stale_report.write_text('{"timedWaveReady":true}\n', encoding="utf-8")
+    inventory_path = _write_inventory(tmp_path, _inventory(count=1))
+
+    with pytest.raises(ValueError, match="INV_TEST_ADMIN_DSN is required"):
+        preflight.write_registration_mtls_preflight(inventory_path, None, stale_report)
+
+    assert not stale_report.exists()
+
+
 @pytest.mark.parametrize(
     ("mutate", "message"),
     [
