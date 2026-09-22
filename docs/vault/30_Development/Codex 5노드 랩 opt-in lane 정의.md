@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-FIVE-NODE-LAB-LANE-001"
 title: "Codex 5노드 랩 opt-in lane 정의"
-version: "1.6.0"
+version: "1.7.0"
 status: "proposed"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T10:05:00+09:00"
+updated: "2026-09-23T11:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark", "NTP", "mTLS"]
@@ -13,7 +13,7 @@ tags: ["five-node", "lab", "workflow-dispatch", "S05", "S06", "S07", "benchmark"
 
 # Codex 5노드 랩 opt-in lane 정의
 
-이 문서는 S05/S07 opt-in 측정과 S06 원격 WS/PTY/Git 재시작 여정을 **등록 실행 Node 5개 랩**에서만 실행하기 위한 수동 lane 제안이다. v1.6는 [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]]의 CP 겸임 Node 제외 규칙과 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.4를 함께 고정하고, `placement_benchmark.py`의 물리 inventory read-only dry-run 계약과 [[S07 5노드 실 Node adapter 사양]]을 연결한다. Windows Control Plane 호스트의 Docker Desktop Linux Node 1개는 all-five topology에만 포함하고, 별도 Ubuntu 물리 Node 4개만 S05 timed wave와 S07 기본 disruption 분모에 넣는다. `placementShortCommit`은 계속 기본 off이며 현재 승인 범위는 inventory-bound **legacy 20동시 선측정 계획**과 S07 read-only preflight 사양까지다. 실제 S07 adapter 구현·Node disruption과 복구 wave는 후속 승인 대상이다.
+이 문서는 S05/S07 opt-in 측정과 S06 원격 WS/PTY/Git 재시작 여정을 **등록 실행 Node 5개 랩**에서만 실행하기 위한 수동 lane 제안이다. v1.7은 [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]]의 CP 겸임 Node 제외 규칙과 [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]] v1.4를 함께 고정하고, 공용 `five_node_lab_preflight.py` 등록/mTLS helper와 [[S07 5노드 실 Node adapter 사양]] v1.1의 커널 복구 경로 결정을 연결한다. Windows Control Plane 호스트의 Docker Desktop Linux Node 1개는 all-five topology에만 포함하고, 별도 Ubuntu 물리 Node 4개만 S05 timed wave와 S07 기본 disruption 분모에 넣는다. `placementShortCommit`은 계속 기본 off이며 현재 승인 범위는 inventory-bound **legacy 20동시 선측정 계획**과 S07 read-only preflight helper까지다. 실제 S07 adapter 구현·Node disruption과 복구 wave는 후속 승인 대상이다.
 
 ## 토폴로지 B와 수량 의미
 
@@ -104,11 +104,17 @@ $env:INV_TEST_ADMIN_DSN='<PG 55440 admin DSN>'; python tools/placement_benchmark
 
 S07의 기본 반복 분모도 CP에서 독립적인 Ubuntu 4대다. 20회 반복은 Ubuntu Node마다 5회씩 배분한다. 각 반복 전에 등록 Node 5개의 online·epoch·certificate·heartbeat를 확인하지만, disruption target은 `measurementEligible.s07=true`인 Node만 허용한다.
 
+물리 AC-07은 core replica planner가 아니라 커널 `inv.nodes` offline 관측과 `inv.shard_recovery` 재실행, receipt-bound output storage와 `inv.shard_completion` manifest commit을 잇는 제품 경로로 측정한다. 현 core 하네스는 합성 개발 proxy이므로 물리 성공률에 포함하지 않는다. 등록/mTLS helper는 `tools/five_node_lab_preflight.py` 한 곳을 placement와 S07이 공유하며 공개 report에는 tenant/project ID를 쓰지 않고 실패 전 stale JSON을 제거한다.
+
+Windows 겸임 Node가 ADR-100 되돌리기로 비활성인 동안에는 future explicit `--allow-four-node-pilot`만 Ubuntu 4대 pilot wave를 열 수 있다. 이 경우 `topologyMode=four-node-pilot`, `pilotWaveReady=true`, `topologyReady=false`, `recoveryWaveReady=false`, `fiveNodeAcceptanceEligible=false`를 함께 기록하며 5노드 인수나 all-five smoke를 통과로 쓰지 않는다. 기본값 false에서는 기존 all-five 차단을 유지한다.
+
 - `independent-worker-loss`: Ubuntu Node process/host/network 이탈. 감지 지연 ≤ `60초 + poll`, stale write 0, fencing/epoch 단조성, 실제 byte 복구 receipt와 20회 중 성공률 ≥95%를 기본 분모로 계산한다.
 - `colocated-node-process-loss`: Windows는 켠 채 Docker Desktop Node process/container만 정지한다. 별도 상관 표본이며 기본 95% 분모와 합치지 않는다.
 - `correlated-cp-node-host-loss`: Windows 물리 호스트를 정지하면 CP observer와 Node가 함께 사라진다. 외부 monotonic observer 또는 별도 CP가 사전에 없으면 detection/recovery는 `UNMEASURED`, JUnit skip이 아니라 failure/error 또는 도구 exit 3으로 남긴다.
 
 artifact에는 trial별 `targetNodeId`, `hostId`, `failureDomainId`, `coLocatedWithControlPlane`, `measurementEligible`, `scenarioClass`, observer identity/clock을 넣는다. 겸임 Node와 Ubuntu 표본의 지연·성공률을 합산하지 않는다. S07의 5노드 기준은 topology preflight에 적용되며 기본 성능 분모는 `eligibleNodeCount=4`, `excludedNodeCount=1`로 정직하게 표시한다.
+
+`19/20`은 시연 threshold 통과와 점추정 `0.95`로만 기록하고 양측 95% Clopper-Pearson 하한 약 `0.751`을 병기한다. 물리 이탈은 대상 container에 bounded `docker stop`을 사용해 SIGTERM을 보내고 volume·journal·키를 보존한다. `docker rm`, prune, reboot는 금지하며 같은 container의 `docker start` 뒤 identity·channel·heartbeat/resource baseline을 재확인한다.
 
 ## 랩 준비 체크리스트 대응표
 

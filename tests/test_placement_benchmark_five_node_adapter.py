@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tools import five_node_lab_preflight as preflight
 from tools import placement_benchmark as benchmark
 
 
@@ -124,6 +125,12 @@ def test_inventory_revision_and_topology_are_strict(tmp_path: Path):
         benchmark.load_five_node_inventory(_write_inventory(tmp_path, invalid))
 
 
+def test_placement_adapter_reexports_the_shared_preflight_implementation():
+    assert benchmark.load_five_node_inventory is preflight.load_five_node_inventory
+    assert benchmark.five_node_lab_dry_run is preflight.five_node_lab_dry_run
+    assert benchmark._FIVE_NODE_PREFLIGHT_SQL == preflight._FIVE_NODE_PREFLIGHT_SQL
+
+
 def test_inventory_rejects_two_cp_colocated_nodes(tmp_path: Path):
     value = _inventory(count=2)
     second = value["nodes"][1]
@@ -177,6 +184,7 @@ def test_dry_run_reads_only_and_excludes_cp_colocated_node_from_timed_wave():
     assert report["databaseReadOnly"] is True
     assert report["syntheticRowsCreated"] is False
     assert report["heartbeatUpdated"] is False
+    assert "tenantId" not in report
     assert report["allFiveSmokeReady"] is True
     assert report["timedWaveReady"] is True
     assert report["allFiveSmokeNodeIds"] == [node["nodeId"] for node in value["nodes"]]
@@ -236,6 +244,39 @@ def test_dry_run_rejects_inventory_node_missing_from_postgresql():
             "postgresql://secret",
             connect=lambda _dsn: connection,
         )
+
+
+def test_report_writer_removes_stale_output_before_validation(tmp_path: Path):
+    stale_report = tmp_path / "preflight.json"
+    stale_report.write_text('{"timedWaveReady":true}\n', encoding="utf-8")
+    invalid_inventory = _inventory(count=1)
+    invalid_inventory["revision"] = "sha256:" + "0" * 64
+    inventory_path = _write_inventory(tmp_path, invalid_inventory)
+
+    with pytest.raises(ValueError, match="revision mismatch"):
+        preflight.write_registration_mtls_preflight(
+            inventory_path,
+            "postgresql://secret",
+            stale_report,
+            connect=lambda _dsn: pytest.fail("validation must precede database access"),
+        )
+
+    assert not stale_report.exists()
+
+
+def test_report_writer_never_deletes_inventory_when_paths_match(tmp_path: Path):
+    inventory_path = _write_inventory(tmp_path, _inventory(count=1))
+    original = inventory_path.read_bytes()
+
+    with pytest.raises(ValueError, match="inventory and preflight report paths must differ"):
+        preflight.write_registration_mtls_preflight(
+            inventory_path,
+            "postgresql://secret",
+            inventory_path,
+            connect=lambda _dsn: pytest.fail("same-path rejection must precede database access"),
+        )
+
+    assert inventory_path.read_bytes() == original
 
 
 @pytest.mark.parametrize(
