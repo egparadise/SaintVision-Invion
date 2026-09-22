@@ -6,19 +6,23 @@ import json
 import os
 from pathlib import Path
 import secrets
+from threading import Lock
 from types import SimpleNamespace
 
 import psycopg
+from psycopg import sql
+from psycopg.conninfo import conninfo_to_dict
 from psycopg.types.json import Jsonb
 import pytest
 
 from inv.approvals import Principal
 from inv.contracts import validate_contract
 from inv.ids import new_id
+from inv.db import Database
 from inv.placement import PlacementStore
 from inv.scheduler import Request
 from test_postgres import planned
-from tools.placement_benchmark import run_round, summarize
+from tools.placement_benchmark import percentile_nearest_rank, run_round, summarize
 
 pytestmark = pytest.mark.postgres
 
@@ -92,10 +96,38 @@ def placement_benchmark_env(env):
             clock_timestamp()+interval '1 hour',true)""",
             (env.tenant, env.node, env.epoch, "a" * 64),
         )
+    sql_diagnostics = []
+    lock_hold_metrics = []
+    diagnostics_lock = Lock()
+
+    def observe_statement(event):
+        with diagnostics_lock:
+            sql_diagnostics.append(event)
+
+    def observe_lock_hold(event):
+        with diagnostics_lock:
+            lock_hold_metrics.append(event)
+
+    diagnostic = os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1"
+    if diagnostic:
+        runtime_role = conninfo_to_dict(env.runtime)["user"]
+        with psycopg.connect(env.owner) as conn:
+            conn.execute(
+                sql.SQL("ALTER ROLE {} SET log_min_duration_statement='500ms'").format(
+                    sql.Identifier(runtime_role)
+                )
+            )
+    placement_db = Database(
+        env.runtime,
+        recovery_epoch=env.epoch,
+        placement_short_commit=os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1",
+        statement_observer=observe_statement if diagnostic else None,
+        placement_metric_sink=observe_lock_hold,
+    )
     return BenchmarkEnvironment(
         e=env,
         principal=Principal(env.tenant, "benchmark"),
-        placement=PlacementStore(env.db),
+        placement=PlacementStore(placement_db),
         request=Request(
             CPU_PER_REQUEST,
             MEMORY_PER_REQUEST,
@@ -104,6 +136,8 @@ def placement_benchmark_env(env):
         request_count=request_count,
         memory_resource=memory_resource,
         snapshot=snapshot,
+        sql_diagnostics=sql_diagnostics,
+        lock_hold_metrics=lock_hold_metrics,
     )
 
 
@@ -237,6 +271,70 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         snapshot_replay_stable=snapshot_replay_stable,
         rounds_requested=round_count,
     )
+    report["sqlDiagnostics"] = {
+        "enabled": os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1",
+        "logMinDurationStatementMs": (
+            500 if os.getenv("INV_PLACEMENT_SQL_DIAGNOSTIC") == "1" else None
+        ),
+        "errors": list(a.sql_diagnostics),
+    }
+    hold_metrics = [
+        item for item in a.lock_hold_metrics if item["mode"] != "placement-limit-row-wait"
+    ]
+    wait_metrics = [
+        item for item in a.lock_hold_metrics if item["mode"] == "placement-limit-row-wait"
+    ]
+    committed_holds = [
+        item["lockHoldMs"]
+        for item in hold_metrics
+        if item["outcome"] == "commit"
+    ]
+    report["lockHold"] = {
+        "mode": (
+            "placement-short-commit"
+            if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
+            else "placement-legacy-lock-scope"
+        ),
+        "samples": hold_metrics,
+        "commitCount": len(committed_holds),
+        "rollbackCount": sum(
+            item["outcome"] == "rollback" for item in hold_metrics
+        ),
+        "commitP50Ms": (
+            round(percentile_nearest_rank(committed_holds, 0.50), 3)
+            if committed_holds
+            else None
+        ),
+        "commitP95Ms": (
+            round(percentile_nearest_rank(committed_holds, 0.95), 3)
+            if committed_holds
+            else None
+        ),
+        "commitMaxMs": round(max(committed_holds), 3) if committed_holds else None,
+    }
+    wait_values = [item["waitMs"] for item in wait_metrics]
+    report["limitRowWait"] = {
+        "samples": wait_metrics,
+        "attemptCount": len(wait_metrics),
+        "acquiredCount": sum(item["outcome"] == "acquired" for item in wait_metrics),
+        "timeoutRetryCount": sum(
+            item["outcome"] == "timeout" and item.get("sqlState") == "55P03"
+            for item in wait_metrics
+        ),
+        "p50Ms": (
+            round(percentile_nearest_rank(wait_values, 0.50), 3)
+            if wait_values
+            else None
+        ),
+        "p95Ms": (
+            round(percentile_nearest_rank(wait_values, 0.95), 3)
+            if wait_values
+            else None
+        ),
+        "maxMs": round(max(wait_values), 3) if wait_values else None,
+    }
+    report["schemaVersion"] = "1.3.0"
+    report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -254,6 +352,17 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         "fiveNodeAC05",
     ):
         record_property(key, report[key])
+    record_property("placementMode", report["lockHold"]["mode"])
+    record_property("lockHoldCommitP50Ms", report["lockHold"]["commitP50Ms"])
+    record_property("lockHoldCommitP95Ms", report["lockHold"]["commitP95Ms"])
+    record_property("lockHoldCommitMaxMs", report["lockHold"]["commitMaxMs"])
+    record_property("lockHoldRollbackCount", report["lockHold"]["rollbackCount"])
+    record_property("limitRowWaitP50Ms", report["limitRowWait"]["p50Ms"])
+    record_property("limitRowWaitP95Ms", report["limitRowWait"]["p95Ms"])
+    record_property("limitRowWaitMaxMs", report["limitRowWait"]["maxMs"])
+    record_property(
+        "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
+    )
     print("PLACEMENT_BENCHMARK_RESULT=" + json.dumps(report, sort_keys=True))
     if first.failure_count:
         pytest.fail(

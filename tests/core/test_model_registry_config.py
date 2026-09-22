@@ -71,7 +71,16 @@ def test_factory_passes_policy_to_shared_database(factory):
 
 def test_factory_keeps_unconfigured_legacy_mode_explicit(factory):
     start,_=factory
-    assert start({}).registry_binding_policy is None
+    database = start({})
+    assert database.registry_binding_policy is None
+    assert database.placement_short_commit is False
+
+
+def test_factory_requires_explicit_boolean_to_enable_short_commit(factory):
+    start, _ = factory
+    assert start({"placementShortCommit": True}).placement_short_commit is True
+    with pytest.raises(RuntimeError, match="configuration unavailable"):
+        start({"placementShortCommit": "true"})
 
 
 def test_model_verifier_roots_are_explicit_and_bounded(tmp_path):

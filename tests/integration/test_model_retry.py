@@ -9,6 +9,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 from inv.app import create_app
+from inv.db import Database
 from inv.errors import DomainError
 from inv.contracts import validate_contract
 from inv.model_retry import ModelRetryStore
@@ -154,6 +155,37 @@ def test_retry_uses_new_run_fences_and_requires_new_approval(runtime):
         retry(a, key="another")
     with a.e.db.transaction(a.e.tenant) as c:
         assert not c.execute("SELECT 1 FROM inv.tool_claims").fetchone()
+
+
+def test_retry_short_commit_flag_preserves_atomic_response_and_replay(runtime):
+    a = runtime
+    fail_unstarted(a)
+    database = Database(
+        a.e.runtime,
+        recovery_epoch=a.e.epoch,
+        placement_short_commit=True,
+    )
+    store = ModelRetryStore(database, a.verifier)
+
+    def prepare():
+        return store.prepare(
+            a.principal,
+            a.e.project,
+            a.target,
+            a.request,
+            key="retry-short-commit",
+            policy_version="model-retry:short-commit:1",
+        )
+
+    result = prepare()
+    assert result == prepare()
+    assert result["requiresFrozenInputAndApproval"] is True
+    assert result["run"]["state"] == "planned"
+    assert result["reservation"]["runId"] == result["run"]["runId"]
+    assert all(
+        lease["fencingToken"].startswith(a.e.epoch + ":")
+        for lease in result["reservation"]["leases"]
+    )
 
 
 def test_three_generations_are_a_hard_budget(runtime):

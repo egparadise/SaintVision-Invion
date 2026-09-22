@@ -387,6 +387,7 @@ def _run_pytest_adapter(args: argparse.Namespace) -> int:
         "INV_PLACEMENT_BENCHMARK_ROUNDS": str(args.rounds),
         "INV_PLACEMENT_BENCHMARK_REPORT": str(args.report.resolve()),
         "INV_PLACEMENT_BENCHMARK_CODE_SHA": code_sha,
+        "INV_PLACEMENT_SHORT_COMMIT": "1" if args.mode == "short-commit" else "0",
     }
     command = [
         sys.executable,
@@ -412,6 +413,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--junit", type=Path, default=ROOT / ".work/placement-benchmark.xml")
     parser.add_argument("--report", type=Path, default=ROOT / ".work/placement-benchmark.json")
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument(
+        "--mode",
+        choices=("legacy", "short-commit"),
+        default="legacy",
+        help="placement feature-flag mode (default: legacy/off)",
+    )
     return parser.parse_args(argv)
 
 

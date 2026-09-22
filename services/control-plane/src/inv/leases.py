@@ -156,10 +156,36 @@ class LeaseStore:
     ):
         """Internal validated allocation API; caller owns its durable ledger.
 
-        Lock Run -> project mutex -> configured ceiling -> all Nodes -> Resources.
-        Ceiling rows are provisioned before enabling a project for placement.
+        Canonical order: Run/admission -> project mutex -> ceiling -> Nodes -> Resources.
+        Placement's opt-in short-commit path reuses the same admission and commit
+        primitives but omits the legacy project mutex after locking the ceiling row.
         """
-        run = lock_run(conn, run_id, project_id)
+        run = self._admit_locked(conn, project_id, run_id)
+        conn.execute(
+            "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
+            (project_id,),
+        ).fetchone()
+        limits = conn.execute(
+            "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
+            (project_id,),
+        ).fetchone()
+        resources = lock_resources(conn, [a.resource_id for a in ordered])
+        return self._reserve_prepared_locked(
+            conn,
+            tenant_id,
+            project_id,
+            run_id,
+            ordered,
+            ttl_seconds,
+            run=run,
+            limits=limits,
+            resources=resources,
+        )
+
+    def _admit_locked(self, conn, project_id, run_id, *, run=None):
+        """Lock one Run and perform the canonical four admission checks."""
+
+        run = run or lock_run(conn, run_id, project_id)
         from .containment import require_execution
 
         require_execution(conn)
@@ -172,10 +198,6 @@ class LeaseStore:
         from .workspace_start import require_start_admission
 
         require_start_admission(conn, self.db, run_id)
-        conn.execute(
-            "SELECT project_id FROM inv.projects WHERE project_id=%s FOR NO KEY UPDATE",
-            (project_id,),
-        ).fetchone()
         if run["state"] not in {"planned", "scheduled", "running"}:
             raise DomainError(
                 "RES-0005", "Run cannot acquire resources in its current state"
@@ -188,11 +210,27 @@ class LeaseStore:
                 "LEASE-0003",
                 "Previous allocations require verified stop acknowledgements",
             )
-        limits = conn.execute(
-            "SELECT * FROM inv.project_resource_limits WHERE project_id=%s FOR UPDATE",
-            (project_id,),
-        ).fetchone()
-        resources = lock_resources(conn, [a.resource_id for a in ordered])
+        return run
+
+    def _reserve_prepared_locked(
+        self,
+        conn,
+        tenant_id,
+        project_id,
+        run_id,
+        ordered,
+        ttl_seconds,
+        *,
+        run,
+        limits,
+        resources,
+    ):
+        """Validate and insert after the caller acquired canonical locks once."""
+
+        if run["run_id"] != run_id or run["project_id"] != project_id:
+            raise DomainError("RES-0004", "Run not found", 404)
+        if set(resources) != {allocation.resource_id for allocation in ordered}:
+            raise DomainError("RES-0004", "Resource not found", 404)
         if limits:
             for kind, field in [("cpu", "cpu_millis"), ("memory", "memory_bytes")]:
                 used = conn.execute(

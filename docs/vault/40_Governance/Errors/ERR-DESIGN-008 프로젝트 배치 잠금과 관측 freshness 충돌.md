@@ -1,20 +1,28 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.1.0"
-status: "decision-deferred"
+version: "1.2.0"
+status: "implementation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T00:18:00+09:00"
+updated: "2026-09-23T01:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
-tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01"]
+tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
 ---
 
 # ERR-DESIGN-008 프로젝트 배치 잠금과 transaction timeout 경합
 
 > [!warning] 상태
-> 코디네이터 결정 C(조건부 보류) · 개발 PC 실 PG 20동시에서 현 실패 모드 측정 · 50동시와 물리 5노드 미측정 · Claude v1.1 재검토 전 구현 금지
+> 코디네이터 결정 A(조건부 승인) · 옵션 1 기본 off 구현 · 단계 3 timeout 감소 조건 미충족 · 50동시와 물리 5노드 미측정 · Claude 카드 18 구현 검토 대기
+
+## F-S05-03 — 경합 재배치
+
+옵션 1 구현은 speculative read와 선택 Node/Resource final commit을 분리하고, canonical admission/prepared primitive, current active fit 재계산, stale winner savepoint rollback·재계획, lock-hold 계측을 넣었다. 응답·replay·fencing·RLS·rollback 불변식은 실 PG 9 passed, model-retry의 caller-owned transaction 경로는 1 passed/exit 0으로 유지됐다.
+
+20동시 3회 중앙값에서 commit lock-hold P95는 legacy **1399.883ms**에서 candidate **122.126ms**로 줄었다. 요청 성공 P95 중앙값은 **1771.763ms → 1697.737ms**, 74.026ms(약 4.2%) 개선에 그쳤다. 두 모드 모두 20/20 × 3, 외부 실패 0이지만 SQL 진단은 legacy `55P03+57014` 0/0/0 대비 candidate 14/10/11이었다. 전부 `SELECT * FROM inv.project_resource_limits ... FOR UPDATE`의 `55P03`이며 내부 최대 3회 retry가 외부 실패를 숨겼다.
+
+따라서 옵션 1은 경합을 없애지 않고 project mutex에서 limit row로 **재배치**했다. hold 감소 조건은 충족했지만 timeout 합계 감소 조건은 미충족이므로 flag는 기본 off, S05-DB는 `review`, 5노드·50동시 승격은 없다. report schema v1.3은 retry 횟수와 limit-row 잠금 획득 대기 p50/p95/max를 별도 필드로 남긴다. 단계 3에는 이 필드가 없어 값을 소급 생성하지 않았다. 다음 설계 후보는 limit-row 잠금 입도/배치 갱신 또는 커널 retry 없는 fail-fast + 클라이언트 retryable 위임이며, 아직 결정·구현하지 않는다.
 
 ## 문제와 인과 정정
 

@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.183"
+version: "1.0.184"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T01:38:00+09:00"
+updated: "2026-09-23T01:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 옵션 1 구현 · F-S05-03 경합 재배치
+
+- 기본 off `placementShortCommit`으로 speculative read → 선택 Node/Resource final commit, canonical admission/prepared primitive, active fit 재계산, stale savepoint 재계획, 안전한 hold/limit-wait metric을 구현했다. 공개 응답·오류 계약은 불변이며 실 PG 불변식 10 passed와 model-retry outer transaction 1 passed/exit 0이다.
+- 실 PG 20동시 legacy/candidate 각 3회 모두 20/20·exit 0이었다. hold P95 중앙값은 1399.883→122.126ms로 줄었지만 요청 P95 중앙값은 1771.763→1697.737ms(약 4.2%)에 그쳤고, 내부 timeout은 0/0/0→limit-row `55P03` 14/10/11로 늘었다.
+- 단계 3 timeout 감소 조건 미충족을 F-S05-03으로 기록했다. flag off·S05-DB `review`·50동시/5노드 미실행을 유지하며, 다음은 Claude 카드 18 구현 검토 뒤 limit-row 입도/배치 갱신 또는 fail-fast 위임을 결정한다. 상세: [[2026-09-23_01-40-00_KST_S05_short-commit_구현과_F-S05-03_Codex]].
 
 ## 2026-09-23 S08-DB recovery·PITR opt-in dry-run
 

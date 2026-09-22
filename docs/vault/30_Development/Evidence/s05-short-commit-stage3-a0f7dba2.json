@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-23T01:40:00+09:00",
+  "baseSHA": "83bc1434cba23258627e4aedb86fa9a56088bc46",
+  "implementationSourceSHA": "a0f7dba2",
+  "scope": "development PC; PostgreSQL 16; one synthetic measured node; one disposable database per run; pre-five-node-lab",
+  "operationalAcceptanceAssessed": false,
+  "featureFlag": {
+    "name": "placementShortCommit",
+    "default": false
+  },
+  "runs": [
+    {
+      "mode": "legacy",
+      "run": 1,
+      "sourceSHA": "1487a18f",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 2342.143,
+      "lockHoldP50Ms": 1068.215,
+      "lockHoldP95Ms": 1803.721,
+      "lockHoldMaxMs": 1861.308,
+      "diagnostic55P03": 0,
+      "diagnostic57014": 0
+    },
+    {
+      "mode": "legacy",
+      "run": 2,
+      "sourceSHA": "1487a18f",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 1607.483,
+      "lockHoldP50Ms": 721.74,
+      "lockHoldP95Ms": 1325.524,
+      "lockHoldMaxMs": 1371.845,
+      "diagnostic55P03": 0,
+      "diagnostic57014": 0
+    },
+    {
+      "mode": "legacy",
+      "run": 3,
+      "sourceSHA": "1487a18f",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 1771.763,
+      "lockHoldP50Ms": 680.04,
+      "lockHoldP95Ms": 1399.883,
+      "lockHoldMaxMs": 1533.428,
+      "diagnostic55P03": 0,
+      "diagnostic57014": 0
+    },
+    {
+      "mode": "short-commit",
+      "run": 1,
+      "sourceSHA": "a0f7dba2",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 1862.488,
+      "lockHoldP50Ms": 43.558,
+      "lockHoldP95Ms": 118.644,
+      "lockHoldMaxMs": 147.771,
+      "diagnostic55P03": 14,
+      "diagnostic57014": 0
+    },
+    {
+      "mode": "short-commit",
+      "run": 2,
+      "sourceSHA": "a0f7dba2",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 1697.737,
+      "lockHoldP50Ms": 45.587,
+      "lockHoldP95Ms": 130.355,
+      "lockHoldMaxMs": 149.917,
+      "diagnostic55P03": 10,
+      "diagnostic57014": 0
+    },
+    {
+      "mode": "short-commit",
+      "run": 3,
+      "sourceSHA": "a0f7dba2",
+      "exitCode": 0,
+      "success": 20,
+      "failure": 0,
+      "requestP95Ms": 1656.683,
+      "lockHoldP50Ms": 45.939,
+      "lockHoldP95Ms": 122.126,
+      "lockHoldMaxMs": 123.818,
+      "diagnostic55P03": 11,
+      "diagnostic57014": 0
+    }
+  ],
+  "medianComparison": {
+    "legacyRequestP95Ms": 1771.763,
+    "candidateRequestP95Ms": 1697.737,
+    "requestP95ImprovementMs": 74.026,
+    "requestP95ImprovementPercent": 4.18,
+    "legacyLockHoldP95Ms": 1399.883,
+    "candidateLockHoldP95Ms": 122.126,
+    "lockHoldCondition": "PASS",
+    "legacyDiagnosticTimeoutCounts": [0, 0, 0],
+    "candidateDiagnosticTimeoutCounts": [14, 10, 11],
+    "timeoutCondition": "FAIL"
+  },
+  "excludedCalibration": [
+    {
+      "sourceSHA": "1487a18f",
+      "result": "4 success / 16 failure",
+      "reason": "active totals were included in the stale digest, so valid winners exhausted three replans; fixed by recomputing fit under selected resource locks"
+    },
+    {
+      "sourceSHA": "ec0461a1",
+      "result": "20 success / 0 failure",
+      "reason": "candidate lock-hold timer started before acquiring the limit row and included acquisition wait; instrumentation corrected before final three runs"
+    }
+  ],
+  "gate": "FAIL_TIMEOUT_DECREASE",
+  "conclusion": "F-S05-03: contention moved from the legacy project mutex to the project_resource_limits row. Keep the feature flag off and do not promote to 50-concurrent or five-node validation."
+}

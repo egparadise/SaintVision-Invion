@@ -1079,6 +1079,7 @@ def create_configured_app():
             "business",
             "modelRegistryPolicy",
             "modelVerifier",
+            "placementShortCommit",
         }:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
@@ -1090,6 +1091,7 @@ def create_configured_app():
         database = Database(
             os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
             registry_binding_policy=registry_policy,
+            placement_short_commit=settings.get("placementShortCommit", False),
         )
         workspace = None
         if "workspace" in settings:
