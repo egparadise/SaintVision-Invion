@@ -1,14 +1,21 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.175"
+version: "1.0.176"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T22:24:00+09:00"
+updated: "2026-09-22T22:38:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 S05-DB 50동시 배치 예비 측정 — F-S05-01
+
+- 실 PostgreSQL + 1개 합성 measured-node 행에서 50동시 placement를 두 차례 시작했으나 모두 첫 라운드 `RES-0003`으로 실패했다. 첫 시도는 snapshot을 준비 전에 잡은 하네스 오류(78.15초), 두 번째는 준비 뒤 바로 잡아도 project-lock 직렬 대기가 15초 freshness를 넘긴 실제 커널 성질(61.69초)이었다. P95·성공 순번은 기존 runner가 첫 예외에서 중단해 미산출이며 추정하지 않는다.
+- runner를 모든 Future의 성공/실패 지연·request index·completion order·오류 코드·snapshot/node/fencing·활성 예약량을 JSON/JUnit에 남기도록 고쳤다. snapshot ID를 제거하는 정규화나 freshness 자동 갱신은 하지 않는다. harness 단위 시험 3 passed, peak memory는 각각 34.8MB·218MB였다.
+- 최신 integration 기반 R1 후보에서 docs 817, bindings 52 fixtures/17 types/21 sites/12 replay guards, ontology 48, ratchet 18, Black·compile·diff 게이트가 모두 exit 0이다.
+- **F-S05-01 결정 대기:** project-lock 입도 완화(우선 검토 제안) vs batch 예약 API vs 15초 freshness 정책 변경. 결정 전 실 PG 재부하는 중단한다. 현재 adapter는 1개 합성 행이라 물리 5노드 AC-05가 아니며 S05-DB는 `review` 유지한다. reviewer Claude. 상세: [[2026-09-22_22-38-00_KST_S05-DB_50동시배치_예비측정_F-S05-01_Codex]].
 
 ## 2026-09-22 VF-CL-02(e) node-agent wire 계약 소비 + 카드 3 M1 보강
 
