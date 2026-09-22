@@ -253,6 +253,116 @@
       ],
       "additionalProperties": false
     },
+    "ResourceUsageMeasurement": {
+      "description": "One registered kernel resource. reserved/spare are allocation quantities, not physical utilization percentages.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceId",
+        "kind",
+        "unit",
+        "capacity",
+        "offered",
+        "reserved",
+        "spare",
+        "measured",
+        "observedAt"
+      ],
+      "properties": {
+        "resourceId": {
+          "$ref": "#/$defs/ResourceId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["cpu", "memory", "gpu", "storage", "network"]
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["millicores", "bytes", "devices", "bitsPerSecond"]
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offered": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reserved": {
+          "anyOf": [
+            {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+            {"type": "null"}
+          ]
+        },
+        "spare": {
+          "anyOf": [
+            {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+            {"type": "null"}
+          ]
+        },
+        "measured": {
+          "type": "boolean"
+        },
+        "observedAt": {
+          "anyOf": [
+            {"$ref": "#/$defs/Timestamp"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"measured": {"const": false}}, "required": ["measured"]},
+          "then": {
+            "properties": {
+              "reserved": {"type": "null"},
+              "spare": {"type": "null"},
+              "observedAt": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"measured": {"const": true}}, "required": ["measured"]},
+          "then": {
+            "properties": {
+              "reserved": {"type": "integer"},
+              "spare": {"type": "integer"},
+              "observedAt": {"$ref": "#/$defs/Timestamp"}
+            }
+          }
+        }
+      ]
+    },
+    "NodeResourceUsageResponse": {
+      "description": "Capability-specific allocation usage for one registered Node; discovery claims are never projected here.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "nodeId", "stateAsOf", "resources"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "execution-kernel"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "stateAsOf": {
+          "anyOf": [
+            {"$ref": "#/$defs/Timestamp"},
+            {"type": "null"}
+          ]
+        },
+        "resources": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "$ref": "#/$defs/ResourceUsageMeasurement"
+          }
+        }
+      }
+    },
     "WorkloadSpec": {
       "type": "object",
       "properties": {
@@ -3421,6 +3531,65 @@
         },
         "artifact": {
           "$ref": "#/$defs/RunArtifactFile"
+        },
+        "contentTypeOptions": {
+          "type": "string",
+          "const": "nosniff"
+        }
+      }
+    },
+    "ArtifactDownloadMetadata": {
+      "description": "Canonical headers and storage-object identity for an opaque artifact body. The body digest must equal contentSha256.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "objectId",
+        "evidenceId",
+        "digestHeader",
+        "contentSha256",
+        "contentLength",
+        "contentType",
+        "contentDisposition",
+        "cacheControl",
+        "contentTypeOptions"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "storage-object"
+        },
+        "objectId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "evidenceId": {
+          "$ref": "#/$defs/EvidenceId"
+        },
+        "digestHeader": {
+          "type": "string",
+          "const": "X-Content-SHA256"
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "contentLength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "contentType": {
+          "type": "string",
+          "const": "application/octet-stream"
+        },
+        "contentDisposition": {
+          "type": "string",
+          "const": "attachment; filename=\"artifact.bin\""
+        },
+        "cacheControl": {
+          "type": "string",
+          "const": "no-store"
         },
         "contentTypeOptions": {
           "type": "string",

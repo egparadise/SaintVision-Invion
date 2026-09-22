@@ -143,11 +143,11 @@ def credential_harness(env, tmp_path, monkeypatch):
             try:
                 os.chown(path, 1, 1)
             except PermissionError:
-                # Hosted Linux runners drop CAP_CHOWN.  Create one synthetic
-                # file as uid 1 in an isolated, networkless container and bind
-                # only this disposable directory into it.  The runner itself
-                # is not a container, so its hostname is not a Docker container
-                # identifier.
+                # The Linux runner drops CAP_CHOWN. Create one synthetic file as
+                # uid 1 in an isolated, networkless container with a narrowly
+                # mounted temp directory; GitHub-hosted runners are not
+                # themselves named Docker containers, so `docker exec
+                # $HOSTNAME` is not portable.
                 shared = Path(tempfile.mkdtemp(prefix="credential-owner-"))
                 shared.chmod(0o777)
                 other = shared / "synthetic"
@@ -165,7 +165,7 @@ def credential_harness(env, tmp_path, monkeypatch):
                             f"type=bind,source={shared},target=/fixture",
                             "--entrypoint",
                             "sh",
-                            os.environ.get("INV_TEST_CREDENTIAL_OWNER_IMAGE", "postgres:16"),
+                            os.environ.get("INV_TEST_ROLE_GUARD_IMAGE", "postgres:16"),
                             "-c",
                             "umask 077; printf synthetic > /fixture/synthetic",
                         ],

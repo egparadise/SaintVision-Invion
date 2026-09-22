@@ -168,6 +168,17 @@ def test_generated_evidence_envelope_is_rejected_before_storage_commit(sample, m
         return replace(original(*args, **kwargs), payload_sha256="not-a-sha256")
 
     monkeypatch.setattr(storage_commit, "verify_sample", malformed)
+
+    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+        accept(a, envelope)
+    assert counts(a) == (0, 0, 0)
+
+
+def test_storage_commit_rejects_invalid_EvidenceEnvelope_atomically(sample, monkeypatch):
+    """Generated "EvidenceEnvelope" is schema-checked inside the real PG transaction."""
+    a = sample
+    _, envelope = prepare(a)
+    monkeypatch.setattr("inv.storage_commit.new_id", lambda _prefix: "invalid")
     with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
         accept(a, envelope)
     assert counts(a) == (0, 0, 0)

@@ -64,6 +64,25 @@ export interface ResourceSnapshot {
   resources: Array<ResourceOffer>;
 }
 
+export interface ResourceUsageMeasurement {
+  resourceId: ResourceId;
+  kind: "cpu" | "memory" | "gpu" | "storage" | "network";
+  unit: "millicores" | "bytes" | "devices" | "bitsPerSecond";
+  capacity: number;
+  offered: number;
+  reserved: (number | null);
+  spare: (number | null);
+  measured: boolean;
+  observedAt: (Timestamp | null);
+}
+
+export interface NodeResourceUsageResponse {
+  source: "execution-kernel";
+  nodeId: NodeId;
+  stateAsOf: (Timestamp | null);
+  resources: Array<ResourceUsageMeasurement>;
+}
+
 export interface WorkloadSpec {
   apiVersion: "inv.saintvision.ai/v1alpha1";
   kind: "Workload";
@@ -739,6 +758,19 @@ export interface ArtifactContentResponse {
   contentType: "application/octet-stream";
   contentDisposition: "attachment; filename=\"artifact.bin\"";
   artifact: RunArtifactFile;
+  contentTypeOptions: "nosniff";
+}
+
+export interface ArtifactDownloadMetadata {
+  source: "storage-object";
+  objectId: string;
+  evidenceId: EvidenceId;
+  digestHeader: "X-Content-SHA256";
+  contentSha256: string;
+  contentLength: number;
+  contentType: "application/octet-stream";
+  contentDisposition: "attachment; filename=\"artifact.bin\"";
+  cacheControl: "no-store";
   contentTypeOptions: "nosniff";
 }
 

@@ -1,5 +1,6 @@
 name: Documentation Build
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,6 +11,8 @@ concurrency:
   cancel-in-progress: ${{ github.ref_name != 'main' }}
 permissions:
   contents: read
+env:
+  PYTHONUTF8: '1'
 jobs:
   docs:
     runs-on: ubuntu-latest
@@ -24,6 +27,12 @@ jobs:
       - run: python tools/check_docs.py
       - run: python tools/check_contract_bindings.py
       - run: python tools/check_frontend_integrity.py
+      - name: Report fixture producer reachability
+        continue-on-error: true
+        shell: bash
+        run: |
+          python tools/check_fixture_reachability.py | tee fixture-reachability.txt
+          cat fixture-reachability.txt >> "$GITHUB_STEP_SUMMARY"
       - run: python tools/test_sync.py
       - run: python tools/check_ontology_generation.py
       - run: python tools/check_ontology.py

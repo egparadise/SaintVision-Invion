@@ -45,6 +45,14 @@ def assess_evidence(xml, subprocess_code):
                   for tag in ('failure', 'error', 'skipped')}
         counts['passed'] = sum(not any(c.find(tag) is not None for tag in counts)
                                for c in cases)
+        # Keep parameter values and failure text private, but expose the owning
+        # test classes so a hosted-CI red can be attributed without downloading
+        # secret-bearing JUnit or private case identities.
+        result['failedTestClasses'] = sorted({
+            c.get('classname') or 'unknown'
+            for c in cases
+            if c.find('failure') is not None or c.find('error') is not None
+        })
     except (ET.ParseError, ValueError):
         return {**result, 'evidenceStatus': 'invalid'}
     # Parameterized case IDs may contain sensitive input: keep identities private.

@@ -22,8 +22,8 @@ from uuid import UUID
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT / "services/control-plane/src")]
 
-from saintvision.credentials.linux_file import CredentialBinding, LinuxFileCredentials
 from saintvision.credentials.contract import CredentialDenied
+from saintvision.credentials.linux_file import CredentialBinding, LinuxFileCredentials
 from saintvision.adapters.reference import recognised_secrets
 from inv.runs import event
 
@@ -373,13 +373,10 @@ def main():
         result = provision(dsn, args.root, manifest, args.action, apply=args.apply)
         print(json.dumps(result))
         return 0
-    except (OSError, UnicodeError, json.JSONDecodeError):
+    except (ProvisioningDenied, OSError, UnicodeError, json.JSONDecodeError):
         # Missing, unreadable, non-UTF-8, and malformed manifests are all
         # untrusted input.  Keep the fixed refusal label and never echo paths or
         # payload fragments.
-        print(json.dumps({"error": "credential_provisioning_refused"}))
-        return EXIT_REFUSED
-    except ProvisioningDenied:
         print(json.dumps({"error": "credential_provisioning_refused"}))
         return EXIT_REFUSED
     except ProvisioningDatabaseError as error:

@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.35.17"
+version: "1.36.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-21T22:33:42+09:00"
+updated: "2026-09-22T16:18:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -170,6 +170,10 @@ ADR-095(기존 container/정책 보존·private durable 단계·same-plan forwar
 ADR-096(Windows 입력·WSL 고정 private 준비·request SHA 지정 apply·같은 요청 재개·운영 인수 분리)는 [[Codex 로컬 폴더 점검과 Node 증명 계약]] v1.9.0과 [[2026-09-12_STORAGE-WINDOWS_Codex_검증보고]]를 따른다.
 
 ADR-097은 사용자 승인으로 **임시 운영자 CLI 발급 경로를 Accepted**로 채택했다(tenant/install binding, `discovery:announce` 최소 scope, 15분 만료, digest-only 저장, 회전·폐기·감사 및 tenant별 10회/24h issuer-role DB 제한). 발급 CLI와 테스트된 PostgreSQL 경계는 통합에 있다. 보호 전달 채널을 통한 실제 Node 바이너리/물리 장비 온보딩은 운영 인수 전이며, 장기 protected issuer API는 미결정이다. 익명 discovery endpoint는 재개하지 않는다. 상세 결정과 남은 인수 범위는 [[2026-09-21_Discovery_기계자격증명_최소권한_계약제안_Codex]] 참조.
+
+ADR-098은 사용자 위임을 받은 코디네이터의 2026-09-22 승인으로 Node 자원 사용량 읽기 모델을 **capability별**로 채택한다. kind/unit을 제한하고 `capacity/offered/reserved/spare`, `measured`, `observedAt`을 같은 자원에 결속한다. 미측정 자원의 reserved/spare/observedAt은 null이며 discovery 자기신고를 등록 Node의 가용 자원으로 승격하지 않는다. 상세 비교와 계약 범위는 [[2026-09-22_노드_자원_사용량_HTTP_계약_결정제안_Codex]]를 따른다. 이번 결정은 계약/생성 타입을 고정하며 HTTP route가 이미 구현됐다는 뜻이 아니다.
+
+ADR-099는 같은 승인으로 Artifact 다운로드 정본을 **storage object bytes + `X-Content-SHA256` lowercase 64 hex**로 채택한다. `X-Checksum-SHA256`/`sha256:` 레거시 형식은 정본 계약에 넣지 않는다. 코디네이터가 확인한 저장소 밖 운영 레거시 배포는 없고 옛 PC 인트라넷 컨테이너는 파일럿이었다. 상세 근거는 [[2026-09-22_Artifact_다운로드_정본_계약_결정제안_Codex]]를 따른다. 이번 결정은 metadata 계약을 고정하며 volume read route·S03-ST 운영 인수 완료가 아니다.
 
 
 ## VF 서비스 통합 정정 — 복제본 가용성과 보존 분리

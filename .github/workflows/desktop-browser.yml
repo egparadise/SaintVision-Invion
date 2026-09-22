@@ -1,5 +1,6 @@
 name: Auth and Desktop HTTP Browser Acceptance
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

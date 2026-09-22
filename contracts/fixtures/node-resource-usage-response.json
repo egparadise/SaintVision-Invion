@@ -1,0 +1,29 @@
+{
+  "source": "execution-kernel",
+  "nodeId": "nod_00000000000000000000000000",
+  "stateAsOf": "2026-09-22T07:00:00Z",
+  "resources": [
+    {
+      "resourceId": "res_00000000000000000000000000",
+      "kind": "cpu",
+      "unit": "millicores",
+      "capacity": 8000,
+      "offered": 6000,
+      "reserved": 3000,
+      "spare": 3000,
+      "measured": true,
+      "observedAt": "2026-09-22T07:00:00Z"
+    },
+    {
+      "resourceId": "res_11111111111111111111111111",
+      "kind": "gpu",
+      "unit": "devices",
+      "capacity": 2,
+      "offered": 1,
+      "reserved": null,
+      "spare": null,
+      "measured": false,
+      "observedAt": null
+    }
+  ]
+}
