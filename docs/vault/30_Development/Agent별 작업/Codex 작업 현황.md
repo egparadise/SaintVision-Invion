@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.186"
+version: "1.0.187"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T02:50:00+09:00"
+updated: "2026-09-23T03:10:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 ADR-100 CP 호스트 Node 겸임
+
+- 사용자 결정 토폴로지 B를 accepted ADR로 기록했다: Windows 물리 호스트의 Control Plane + Docker Desktop Linux Node 1개, 별도 Ubuntu Node 4개다. 등록 Node는 5개지만 CP 독립 worker host는 4개이며 registry/ontology는 바꾸지 않았다.
+- S05에서는 겸임 Node를 all-five smoke에만 포함하고 20/50 동시 timed candidate·P95 분모에서 사전 제외한다. S07 기본 20회는 Ubuntu 4대에 균등 배분하고, 겸임 process loss와 CP+Node host loss는 별도 상관 장애 scenario로 분리한다.
+- docs-only gate는 check_docs·contract bindings·ontology·single-source ratchet·response freshness·frontend integrity·diff check 모두 exit 0이다. 제품 시험·빌드·브라우저·부하는 실행하지 않았다. 실제 5노드 등록·inventory-bound wrapper/workflow·물리 부하/복구는 미실행·미측정이고 S05/S07은 `review` 유지, reviewer Claude. [[2026-09-23_03-10-00_KST_CP호스트_Node겸임_ADR100_Codex]].
 
 ## 2026-09-23 S05 fail-fast · F-R1/F-R2 보강
 

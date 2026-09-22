@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-INDEX-001"
 title: "설계 충돌 정정 및 ADR"
-version: "1.36.0"
+version: "1.37.0"
 status: "baseline"
 author: "Codex"
-updated: "2026-09-22T16:18:00+09:00"
+updated: "2026-09-23T03:10:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["saintvision", "final-plan"]
@@ -174,6 +174,8 @@ ADR-097은 사용자 승인으로 **임시 운영자 CLI 발급 경로를 Accept
 ADR-098은 사용자 위임을 받은 코디네이터의 2026-09-22 승인으로 Node 자원 사용량 읽기 모델을 **capability별**로 채택한다. kind/unit을 제한하고 `capacity/offered/reserved/spare`, `measured`, `observedAt`을 같은 자원에 결속한다. 미측정 자원의 reserved/spare/observedAt은 null이며 discovery 자기신고를 등록 Node의 가용 자원으로 승격하지 않는다. 상세 비교와 계약 범위는 [[2026-09-22_노드_자원_사용량_HTTP_계약_결정제안_Codex]]를 따른다. 이번 결정은 계약/생성 타입을 고정하며 HTTP route가 이미 구현됐다는 뜻이 아니다.
 
 ADR-099는 같은 승인으로 Artifact 다운로드 정본을 **storage object bytes + `X-Content-SHA256` lowercase 64 hex**로 채택한다. `X-Checksum-SHA256`/`sha256:` 레거시 형식은 정본 계약에 넣지 않는다. 코디네이터가 확인한 저장소 밖 운영 레거시 배포는 없고 옛 PC 인트라넷 컨테이너는 파일럿이었다. 상세 근거는 [[2026-09-22_Artifact_다운로드_정본_계약_결정제안_Codex]]를 따른다. 이번 결정은 metadata 계약을 고정하며 volume read route·S03-ST 운영 인수 완료가 아니다.
+
+ADR-100은 2026-09-23 사용자 결정으로 **Windows Control Plane 호스트 + 같은 호스트의 Docker Desktop Linux Node 1개 + 별도 Ubuntu Node 4개**인 토폴로지 B를 채택한다. 등록 실행 Node는 5개지만 CP에서 독립적인 worker host는 4개다. 겸임 Node는 S05 timed P95 candidate와 S07 기본 장애·복구 분모에서 제외하고 all-five smoke·별도 상관 장애 drill로만 기록한다. registry의 5대 기준은 서로 다른 nodeId·인증서·epoch을 가진 등록 실행 identity 수로 유지하며, 5개 독립 CP 장애 영역을 뜻하지 않는다. 상세는 [[ADR-100 CP 호스트의 Node 겸임과 5노드 측정 경계]]와 [[Codex 5노드 랩 opt-in lane 정의]] v1.3을 따른다. 제품·계약·migration·registry 상태 변경이나 실제 5노드 인수 완료가 아니다.
 
 
 ## VF 서비스 통합 정정 — 복제본 가용성과 보존 분리
