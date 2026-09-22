@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.12"
+version: "1.2.13"
 status: "review"
 author: "Claude"
-updated: "2026-09-22T20:15:00+09:00"
+updated: "2026-09-22T20:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+새 PC 첫날 종합 결과 + 2일차 계획 카드 11 (Claude, 2026-09-22): git/gh/registry 실측만으로 1쪽 — integration 64 커밋(Claude 워커 R1 10건·병렬 Claude 세션 PR 9 MERGED/3 OPEN·Codex·Gemini·병합 13), PR #37~#53 상태, hosted 첫 완주(Backend 2668/45/0 `3d1892c0`·Core 2948/58/0·Browser 첫 green `d651a52f`·다섯 workflow 같은 SHA `f2aa2b14` Codex 기록), 로컬 실 PG 전수 2523/142/2·인수 6세트 762/88/0·Docker-only 23·Go·PITR, registry done 2/review 13/planned 31, 결정 #1·#2·#5·#6a·#7 확정 근거 커밋 + PITR B 유예. 미결·외부: 옛 PC 잠금 파일 13(코디네이터 보고, 문서 근거 미확인)·WSL2·S02 선행 입력 체크리스트·CX-09·메모리 경보·Codex (a)/(b)/(c)·OPEN PR 4. 2일차: 레인별 첫 카드 3개·병합 큐 규칙(5분·R1·게이트 exit·slot)·메모리 대책(순차·에이전트 수 3 제안). 전문 [[2026-09-22_새PC_첫날_종합결과_및_2일차_계획_Claude]].
 
 S04-DB·S05-DB·S07-DB 검토 인계 패키지 카드 10 (Claude, 2026-09-22): 세 카드는 **owner Codex·reviewer Claude·planned**라 reviewer 실측 증거를 owner에게 대조표로 넘기는 패키지 — AC-04(승인 전 실행 0·중복 부수효과 0: test_approvals 13·test_postgres 경합·idempotency·outbox 원자성) · AC-05(50 동시 예약 초과 0·fencing·provisioning 무결성 11·자원 사용량 불변식) · AC-07(오래된 토큰 0·복구 드릴/판정/경계 66·replica stale·liveness sweep). 미충족 정직: 재전송 hash·Explain·shard/containment는 hosted Core(35706465645 success)에서만, AC-05 P95/결정성·AC-07 60초/95%는 5노드 랩 물리 대기, CX01 19 skip. 제안 diff 3줄(536·664·920행), registry·ontology 무변경(적용·generate_ontology는 owner Codex). S02-DB/S03-DB는 Codex 3882496d 수용·finding 0 기록. 검증상태지도 §12. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
