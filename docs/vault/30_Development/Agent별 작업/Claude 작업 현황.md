@@ -99,6 +99,9 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
 
+PITR 보존 7일 정리 실측 (Claude, 2026-09-22): PR #49 우리 몫 3 — dev PG에서 실제 `pg_basebackup` 라벨 2개·실제 `pg_wal` 이름으로 아카이브 레이아웃 구성(DB 무변경, 컨테이너 /tmp 정리) → `pitr_archive_retention.py` 실 클록 dry-run 삭제 0 / +8일 dry-run bb1+BB·BC 삭제 계획(최신 bb2·BD 이후 WAL 보존) / 사본 `--apply` 정확히 그만 삭제·원본 무변경 / 자기시험 9 passed. 정직: dev PG는 archive_mode off라 정리 대상 없음 → 도구 검증이지 운영 정리 아님(Tier-A 활성 후 실 아카이브에 재실행). Evidence/pitr-retention/ 4파일, 비밀 0. 전문 [[2026-09-22_PITR_보존7일_정리_dry-run_실측_dev_PG_Claude]].
+
+
 S01 물리 노드 5대 인벤토리 표 양식 (Claude, 2026-09-22): PR #49 우리 몫 2 — 토폴로지(U1)별 행 수, 노드별 23항목(식별·하드웨어·허용 자원/폴더·NTP·cert SAN/지문·discovery credential·설치·Storage 역할·등록 후 관측)에 **출처 열 + 미확인 ☐/☑ 열**, 값 전부 미기재·비밀 원문 금지. 열마다 절차서/체크리스트 §·계약 어휘(capability kind/unit)·성공 신호 대응, 채우는 순서 6단계(등록 후 capability/skew와 대조해 ☑→☐). docs-only, check_docs만. 전문 [[S01_물리노드_인벤토리_표양식_2026-09-22]].
 
 

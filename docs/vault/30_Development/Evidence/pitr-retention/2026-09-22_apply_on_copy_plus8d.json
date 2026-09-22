@@ -1,0 +1,30 @@
+{
+  "scope": "filesystem-plan-only",
+  "retentionDays": 7,
+  "now": "2026-09-30T12:00:00+00:00",
+  "retainedBackups": [
+    "bb2"
+  ],
+  "oldestRetainedStartSegment": "0000000100000000000000BD",
+  "deleteBackups": [
+    "bb1"
+  ],
+  "deleteArchive": [
+    "0000000100000000000000BB",
+    "0000000100000000000000BC"
+  ],
+  "keptArchiveEntries": 5,
+  "reason": "retain backups newer than 2026-09-23T12:00:00+00:00 plus the newest; keep WAL from 0000000100000000000000BD onward on timeline 00000001",
+  "mode": "apply"
+}
+{
+  "removed": {
+    "archive": [
+      "0000000100000000000000BB",
+      "0000000100000000000000BC"
+    ],
+    "backups": [
+      "bb1"
+    ]
+  }
+}
