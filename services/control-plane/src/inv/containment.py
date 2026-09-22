@@ -133,6 +133,7 @@ class Containment:
             if prior["request_hash"] != request_hash:
                 raise DomainError("IDEM-0001", "Containment request key has different content")
             if prior["response"] is not None:
+                validate_contract("ContainmentResult", prior["response"])
                 return prior["response"]
             current = self._view(conn, node_id)
             if current["version"] != data["expectedVersion"]:

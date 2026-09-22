@@ -144,6 +144,7 @@ class WorkspaceStart:
             )
             run, linked = self._scope(conn, principal, project, run_id, workload)
             if prior is not None:
+                validate_contract("WorkspaceStartPrepareResult", prior)
                 return prior
             require_execution(conn)
             independent_run(conn, run_id)
@@ -276,6 +277,7 @@ class WorkspaceStart:
         with self.db.transaction(principal.tenant_id) as conn:
             prior, frozen, _, _ = self._preflight(conn, principal, project, run_id, data, key)
             if prior is not None:
+                validate_contract("WorkspaceStartEnqueueResult", prior)
                 return prior
             self.workspace._node_membership(conn, project)
         capabilities = self.runtime.observe()
@@ -285,6 +287,7 @@ class WorkspaceStart:
                 conn, principal, project, run_id, data, key
             )
             if prior is not None:
+                validate_contract("WorkspaceStartEnqueueResult", prior)
                 return prior
             if run["version"] != data["expectedVersion"] or run["state"] != "awaiting_approval":
                 raise DomainError("GRAPH-0003", "Current approved Run version required")

@@ -763,6 +763,17 @@ class BusinessEditLockInput(BaseModel):
     expectedVersion: conint(ge=1, le=9007199254740991)
 
 
+class BusinessEditLockView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    lockId: UUID
+    workspaceId: WorkspaceId
+    runId: RunId
+    contentSha256: constr(pattern=r'^[0-9a-f]{64}$')
+    inputSizeBytes: conint(ge=0, le=1073741824)
+
+
 class BusinessApprovalInput(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

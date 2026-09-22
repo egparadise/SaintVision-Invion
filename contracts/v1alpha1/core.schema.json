@@ -2464,6 +2464,38 @@
         "expectedVersion"
       ]
     },
+    "BusinessEditLockView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "runId": {
+          "$ref": "#/$defs/RunId"
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputSizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1073741824
+        }
+      },
+      "required": [
+        "lockId",
+        "workspaceId",
+        "runId",
+        "contentSha256",
+        "inputSizeBytes"
+      ]
+    },
     "BusinessBindingInput": {
       "type": "object",
       "additionalProperties": false,

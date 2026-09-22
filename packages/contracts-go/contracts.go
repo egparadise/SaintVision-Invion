@@ -553,6 +553,14 @@ type BusinessEditLockInput struct {
     ExpectedVersion int64 `json:"expectedVersion"`
 }
 
+type BusinessEditLockView struct {
+    LockId string `json:"lockId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    RunId RunId `json:"runId"`
+    ContentSha256 string `json:"contentSha256"`
+    InputSizeBytes int64 `json:"inputSizeBytes"`
+}
+
 type BusinessBindingInput struct {
     ProjectId ProjectId `json:"projectId"`
     LockId string `json:"lockId"`

@@ -169,6 +169,7 @@ class WorkspaceAPI:
             )
             self._scope(conn, principal, project, run_id)
             if prior is not None:
+                validate_contract("WorkspacePrepareResult", prior)
                 return prior
             bound = BoundDatabase(self.db, principal.tenant_id, conn)
             frozen = WorkspaceResume(bound, self.working)._prepare(
@@ -267,6 +268,7 @@ class WorkspaceAPI:
                 replay=prior is not None,
             )
             if prior is not None:
+                validate_contract("WorkspaceEnqueueResult", prior)
                 return prior
             frozen = self._frozen(conn, project, run_id, data["resumeId"])
             runtime = self.runtime.for_workload(frozen["workload"])
@@ -289,6 +291,7 @@ class WorkspaceAPI:
                 replay=prior is not None,
             )
             if prior is not None:
+                validate_contract("WorkspaceEnqueueResult", prior)
                 return prior
             if run["version"] != data["expectedVersion"] or run["state"] != "awaiting_approval":
                 raise DomainError("GRAPH-0003", "Current approved Run version required")

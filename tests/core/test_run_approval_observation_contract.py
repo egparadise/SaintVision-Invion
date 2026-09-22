@@ -16,7 +16,12 @@ from inv.approvals import view
 from inv.control import Control
 from inv.contracts import validate_contract
 from inv.errors import DomainError
-from inv.generated.models import ApprovalPage, ControlRunDetail, ControlRunPage
+from inv.generated.models import (
+    ApprovalPage,
+    BusinessEditLockView,
+    ControlRunDetail,
+    ControlRunPage,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / "contracts" / "fixtures"
@@ -194,6 +199,47 @@ def test_run_creation_anchor_rejects_an_invalid_state(monkeypatch):
             expected["projectId"],
             "idem-1",
         )
+
+
+def test_parent_cancel_anchor_rejects_an_invalid_state(monkeypatch):
+    """The shard-parent cancel response is a serving path, not only a fixture."""
+    expected = fixture("control-run-page-response.json")["items"][0]
+
+    class _ShardRuntime:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def cancel(self, *_args, **_kwargs):
+            invalid = dict(expected)
+            invalid["state"] = "not-a-run-state"
+            return {"parentRun": invalid}
+
+    monkeypatch.setattr("inv.shards.ShardRuntime", _ShardRuntime)
+    control = Control(_Database([{"plan_id": "plan-1"}]))
+
+    with pytest.raises(DomainError, match="ControlRunView: invalid contract"):
+        control.cancel(
+            SimpleNamespace(tenant_id=uuid.UUID(expected["tenantId"])),
+            expected["projectId"],
+            expected["runId"],
+            expected["version"],
+            "cancel-parent-anchor",
+        )
+
+
+def test_business_edit_lock_view_contract_rejects_missing_target_identity():
+    payload = {
+        "lockId": "00000000-0000-4000-8000-000000000042",
+        "workspaceId": "wsp_0123456789ABCDEFGHJKMNPQRS",
+        "runId": "run_0123456789ABCDEFGHJKMNPQRS",
+        "contentSha256": "0" * 64,
+        "inputSizeBytes": 1,
+    }
+    validate_contract("BusinessEditLockView", payload)
+    assert BusinessEditLockView.model_validate(payload).model_dump(mode="json") == payload
+    payload.pop("lockId")
+    with pytest.raises(ValidationError):
+        BusinessEditLockView.model_validate(payload)
 
 
 def test_approval_listing_provider_returns_the_shared_approval_page_fixture(monkeypatch):

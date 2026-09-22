@@ -185,7 +185,9 @@ class Control:
                 key=key,
                 expected_parent_version=expected_version,
             )
-            return result["parentRun"]
+            parent_result = result["parentRun"]
+            validate_contract("ControlRunView", parent_result)
+            return parent_result
         with self.db.transaction(principal.tenant_id) as conn:
             prior = self.approvals._ledger(
                 conn,
@@ -203,6 +205,7 @@ class Control:
             lock_resources(conn, [r["resource_id"] for r in resources])
             self.grant(conn, principal, project, "can_request")
             if prior is not None:
+                validate_contract("ControlRunView", prior)
                 return prior
             changed = self.runs._transition(
                 conn, principal.tenant_id, row, "cancelled", expected_version
@@ -231,6 +234,7 @@ class Control:
                     ).fetchone()
                 ),
             }
+            validate_contract("ControlRunView", result)
             return self.approvals._save(conn, project, "api.run.cancel", key, result)
 
     def nodes(self, principal, project):

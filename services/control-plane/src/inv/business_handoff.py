@@ -205,6 +205,7 @@ class BusinessHandoff:
             if current["workspace_id"] != workspace_id:
                 raise DomainError("AUTH-0011", "Workspace differs from Run", 403)
             if prior is not None:
+                validate_contract("BusinessEditLockView", prior)
                 return prior
             if (
                 current["status"] != "ready"
@@ -268,6 +269,7 @@ class BusinessHandoff:
                 "contentSha256": hashlib.sha256(raw).hexdigest(),
                 "inputSizeBytes": len(raw),
             }
+            validate_contract("BusinessEditLockView", result)
             event(conn, principal.tenant_id, run_id, "inv.workspace.editing_stopped", result)
             return self.ledger._save(conn, project, "business.lock", key, result)
 
@@ -285,6 +287,7 @@ class BusinessHandoff:
             )
             run, _, current = scope(conn, self.db, principal, project, run_id)
             if prior is not None:
+                validate_contract("BusinessBindingView", prior)
                 return prior
             lock = conn.execute(
                 "SELECT * FROM public.workspace_edit_locks WHERE lock_id=%s FOR UPDATE",

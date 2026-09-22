@@ -551,6 +551,14 @@ export interface BusinessEditLockInput {
   expectedVersion: number;
 }
 
+export interface BusinessEditLockView {
+  lockId: string;
+  workspaceId: WorkspaceId;
+  runId: RunId;
+  contentSha256: string;
+  inputSizeBytes: number;
+}
+
 export interface BusinessBindingInput {
   projectId: ProjectId;
   lockId: string;
