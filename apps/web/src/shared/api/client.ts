@@ -89,6 +89,13 @@ export function clearAuthToken(): void {
   inMemoryAuthToken = null;
 }
 
+export type UnauthorizedHandler = (problem: ProblemDetails) => void;
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+
+export function onUnauthorized(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
+}
+
 export class ApiError extends Error {
   public readonly problem: ProblemDetails;
 
@@ -200,6 +207,9 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
         traceId,
         true,
       );
+    }
+    if (problem.status === 401 && unauthorizedHandler) {
+      unauthorizedHandler(problem);
     }
     throw new ApiError(problem);
   }
