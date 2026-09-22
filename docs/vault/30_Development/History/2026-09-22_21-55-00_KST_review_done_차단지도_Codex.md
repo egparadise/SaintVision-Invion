@@ -57,4 +57,6 @@ tags: ["review", "done-blocker", "task-registry", "owner-proposal", "user-input"
 
 Registry와 ontology는 변경하지 않았다. 초안에서 `check_docs.py` **813 documents / exit 0**, `check_ontology.py` **48 task mappings / exit 0**, `check_ontology_generation.py` **4 artifacts graph-equivalent / exit 0**, `check_doc_single_source.py --ratchet` **18 pairs / exit 0**, `git diff --check` **exit 0**을 확인했다. 표의 task 행은 **20개**, planned는 **26/26 모두 non-done dependency 보유**로 기계 대조했다.
 
-Orca worktree의 `sync_obsidian.py --check`는 두 진행판이 `both-diverged`라 **2 conflicts / exit 3**이었다. 이 checkout에서는 `--apply`하지 않고, integration 착지 뒤 코디네이터가 정본 checkout에서 sync한다. 정확한 R1 candidate의 게이트와 landing SHA는 receipt에 기록한다.
+Orca worktree의 `sync_obsidian.py --check`는 두 진행판이 `both-diverged`라 **2 conflicts / exit 3**이었다. 이 checkout에서는 `--apply`하지 않고, integration 착지 뒤 코디네이터가 정본 checkout에서 sync한다.
+
+최신 integration `9c5197744629034b66d4f826e6e93ff4083688a1` 위 R1 content commit은 `20a777a83b77d6bb5c0aec9a232265d4619da2d2`다. 정확한 candidate worktree에서 docs **813**, ontology **48**, generation **4**, ratchet **18**, diff 및 표 **20행** 검사가 모두 exit 0이었다. 이 provenance를 적는 receipt commit을 같은 non-force push로 착지한다.
