@@ -277,7 +277,7 @@
       "area": "DB",
       "owner": "Claude",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S01-FE",
         "S01-BE",
@@ -405,7 +405,7 @@
       "area": "DB",
       "owner": "Claude",
       "reviewer": "Codex",
-      "status": "planned",
+      "status": "review",
       "depends_on": [
         "S02-FE",
         "S02-BE",
