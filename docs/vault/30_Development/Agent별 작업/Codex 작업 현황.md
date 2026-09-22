@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.197"
+version: "1.0.198"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T09:15:00+09:00"
+updated: "2026-09-23T09:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 Card22 B′ 구현 사양
+
+- Card21 기전과 결정 v1.4를 바탕으로 candidate limits `FOR UPDATE` 한 statement에만 기본 500ms·실험 1500ms를 적용하고 획득 직후 공통 500ms로 복원하는 사양을 작성했다. legacy/direct lease/후속 resource lock과 production config는 바꾸지 않는다.
+- 한 lock segment 1500ms 초과의 `55P03`과 같은 statement 누적 2초의 `57014`를 구분하되 공개 표면은 기존 `RES-0007`/503/retryable로 유지한다. SQLSTATE는 evidence 전용이고 계약 변경은 0이다.
+- 승인 뒤 판정은 legacy/candidate 20동시 각 3회에서 외부 timeout 합계 비증가, request P95 중앙값 비악화, post-acquire hold P95 중앙값 비악화 3조건을 모두 요구한다. 현재는 docs-only이며 코드·시험·부하 미실행, flag off·S05 `review`; Claude Card24와 코디네이터 별도 승인 대기다. [[S05 B-prime candidate limits 잠금 예산 구현 사양]], [[2026-09-23_09-20-00_KST_S05_Bprime_구현사양_Codex]].
 
 ## 2026-09-23 LAN pilot CP 겸임 철회 증거·재활성 경계
 
