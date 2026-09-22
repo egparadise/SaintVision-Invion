@@ -26,8 +26,14 @@
 
 import { apiClient } from '@/shared/api/client';
 import type { ContributionPageResponse, ContributionResponse } from '@/contracts/contribution-page-response';
+import type { ContributionRegistrationResponse } from '@/contracts/contribution-registration-response';
 import type { DataLocationPageResponse, DataLocationResponse } from '@/contracts/data-location-page-response';
 import type { DiscoveryCandidateResponse, DiscoveryCandidatesResponse } from '@/contracts/discovery-candidates-response';
+import type { DiscoveryAdmissionResponse } from '@/contracts/discovery-admission-response';
+import type { DiscoveryAnnouncementResponse } from '@/contracts/discovery-announcement-response';
+import type { DiscoveryDeclineResponse } from '@/contracts/discovery-decline-response';
+import type { HeartbeatAcceptedResponse } from '@/contracts/heartbeat-accepted-response';
+import type { NodeLivenessSweepResponse } from '@/contracts/node-liveness-sweep-response';
 import type { PoolCapacityResponse } from '@/contracts/pool-capacity-response';
 import type { PlacementPreviewResponse as PlacementPreviewWireResponse } from '@/contracts/placement-preview-response';
 import type { DistributedPlanResponse } from '@/contracts/distributed-plan-response';
@@ -64,12 +70,7 @@ export type DiscoveryCandidate = Omit<DiscoveryCandidateResponse, 'state' | 'ver
   verified: boolean;
 };
 
-export interface AdmissionResponse {
-  announcementId: string;
-  bootstrapToken: string;
-  expiresAt: string;
-  next: string;
-}
+export type AdmissionResponse = DiscoveryAdmissionResponse;
 
 // -----------------------------------------------------------------------------
 // 1. Storage Contributions & Locations APIs
@@ -92,8 +93,8 @@ export async function registerStorageContribution(
     availableBytes: number;
   },
   idempotencyKey?: string
-): Promise<{ contribution: StorageContribution }> {
-  return apiClient<{ contribution: StorageContribution }>('/v1/storage/contributions', {
+): Promise<ContributionRegistrationResponse> {
+  return apiClient<ContributionRegistrationResponse>('/v1/storage/contributions', {
     method: 'POST',
     body: JSON.stringify({
       nodeId: data.nodeId,
@@ -108,8 +109,8 @@ export async function registerStorageContribution(
 
 export async function activateStorageContribution(
   contributionId: string
-): Promise<{ contribution: StorageContribution }> {
-  return apiClient<{ contribution: StorageContribution }>(
+): Promise<ContributionRegistrationResponse> {
+  return apiClient<ContributionRegistrationResponse>(
     `/v1/storage/contributions/${contributionId}/activation`,
     {
       method: 'POST',
@@ -119,8 +120,8 @@ export async function activateStorageContribution(
 
 export async function revokeStorageContribution(
   contributionId: string
-): Promise<{ contribution: StorageContribution }> {
-  return apiClient<{ contribution: StorageContribution }>(
+): Promise<ContributionRegistrationResponse> {
+  return apiClient<ContributionRegistrationResponse>(
     `/v1/storage/contributions/${contributionId}`,
     {
       method: 'DELETE',
@@ -240,8 +241,8 @@ export async function postNodeHeartbeat(
     sequence: number;
     observations?: Array<{ capabilityId: string; usedQuantity: number; unit: string }>;
   }
-): Promise<{ nodeId: string; applied: boolean; heartbeatSequence: number }> {
-  return apiClient<{ nodeId: string; applied: boolean; heartbeatSequence: number }>(
+): Promise<HeartbeatAcceptedResponse> {
+  return apiClient<HeartbeatAcceptedResponse>(
     `/v1/nodes/${nodeId}/heartbeats`,
     {
       method: 'POST',
@@ -253,11 +254,8 @@ export async function postNodeHeartbeat(
   );
 }
 
-export async function triggerLivenessSweep(): Promise<{
-  markedLost: number;
-  timeoutSeconds: number;
-}> {
-  return apiClient<{ markedLost: number; timeoutSeconds: number }>(
+export async function triggerLivenessSweep(): Promise<NodeLivenessSweepResponse> {
+  return apiClient<NodeLivenessSweepResponse>(
     '/v1/nodes/liveness-sweeps',
     {
       method: 'POST',
@@ -291,8 +289,8 @@ export async function broadcastAnnouncement(
     labels?: Record<string, string>;
   },
   tenantId: string
-): Promise<{ accepted: boolean; state: string }> {
-  return apiClient<{ accepted: boolean; state: string }>('/v1/discovery/announcements', {
+): Promise<DiscoveryAnnouncementResponse> {
+  return apiClient<DiscoveryAnnouncementResponse>('/v1/discovery/announcements', {
     method: 'POST',
     headers: {
       'X-Inv-Tenant': tenantId,
@@ -325,10 +323,10 @@ export async function admitDiscoveryCandidate(
 export async function declineDiscoveryCandidate(
   announcementId: string,
   reason?: string
-): Promise<{ announcementId: string; state: string }> {
+): Promise<DiscoveryDeclineResponse> {
   const base = `/v1/discovery/candidates/${announcementId}`;
   const url = reason ? `${base}?reason=${encodeURIComponent(reason)}` : base;
-  return apiClient<{ announcementId: string; state: string }>(url, {
+  return apiClient<DiscoveryDeclineResponse>(url, {
     method: 'DELETE',
   });
 }

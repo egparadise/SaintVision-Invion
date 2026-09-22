@@ -3,6 +3,7 @@ import type {
   ApprovalChallenge,
   ApprovalDecisionInput,
   ApprovalView,
+  ControlRunDetail,
 } from '../../../../../packages/contracts-ts/src';
 
 interface ApprovalIntent {
@@ -36,7 +37,7 @@ export async function decideApproval(intent: ApprovalIntent, decision: 'approve'
 /** Read the current version; never retry a mutation through an alternate route. */
 export async function cancelKernelRun(projectId: string | undefined, runId: string) {
   const base = `${scope(projectId)}/runs/${encodeURIComponent(runId)}`;
-  const current = await apiClient<{ runId: string; version: number }>(base);
+  const current = await apiClient<ControlRunDetail>(base);
   if (current?.runId !== runId || !Number.isSafeInteger(current.version) || current.version < 1) {
     throw new Error('실행 버전을 확인하지 못했습니다. 새로고침한 뒤 다시 시도하세요.');
   }
