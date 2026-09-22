@@ -641,7 +641,7 @@ export const App: React.FC = () => {
         {activeTab === 'runs' && (
           <div>
             {evidenceRunId ? (
-              <EvidenceViewer runId={evidenceRunId} onBack={() => setEvidenceRunId(null)} />
+              <EvidenceViewer runId={evidenceRunId} projectId={projectId} onBack={() => setEvidenceRunId(null)} />
             ) : selectedRun ? (
               <RunDetail
                 run={selectedRun}

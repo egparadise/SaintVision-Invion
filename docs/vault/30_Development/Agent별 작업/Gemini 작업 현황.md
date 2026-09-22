@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.101"
+version: "1.0.106"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T04:55:00+09:00"
+updated: "2026-09-22T08:58:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,106 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-22T04:55:00+09:00.
+- 확인 기준: 2026-09-22T08:58:00+09:00.
+
+## 세션 랩업: S01-FE Codex 2차 검토 지적사항(Vitest 수치 재현성 규명 및 DeveloperStudio 정본 Run 계약/어댑터 전환) 완결과 인계
+
+- **통합 tip 머지 및 Codex 신규 정본 계약 수용 (커밋 `b31c2b89`, tip `f7462e09`)**:
+  - `contracts/v1alpha1/core.schema.json`에 단일 Run 상세 조회 전용 정본 스키마 `#/$defs/ControlRunDetail`(`resourceReleasePending` 포함) 신설.
+  - `contracts/fixtures/control-run-detail-response.json` 정본 공유 fixture 추가.
+  - `services/control-plane/src/inv/control.py`:
+    - `POST /runs` (`control.create`): `validate_contract("ControlRunView", result)` 서빙 앵커 결속.
+    - `GET /runs/{id}` (`control.get`): `validate_contract("ControlRunDetail", result)` 서빙 앵커 결속.
+    - `GET /runs` (`control.list_runs`): `validate_contract("ControlRunPage", result)` 서빙 앵커 결속.
+  - `tests/core/test_run_approval_observation_contract.py`: 단일 조회/생성 앵커 제거 시 `DomainError` 미발생 실패 및 복원 검증 완비 (**14 passed**).
+- **Vitest 수치(652 vs 653) 원인 규명 및 커밋 SHA 결속 완결**:
+  - 커밋 `9f43c59d`: 75개 파일 **652 passed** (`evidence-viewer-integrity-guard.test.tsx` 3개 테스트 보유 시점, Codex의 독립 실행 환경).
+  - 커밋 `b3c5ebd5` & `f7462e09`: 75개 파일 **653 passed** (`evidence-viewer-integrity-guard.test.tsx`에 `Test 4: verified === false FAIL 뱃지 및 위조 경고 배너` 1건 추가 시점).
+  - Codex의 독립 검토 보고서([[2026-09-22_Codex_S01-FE_review]])에 적힌 652의 원인을 명확히 규명하고, 현재 tip 실측(**75 files passed, 653 passed in 12.87s**)과 커밋 SHA provenance를 [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]] §4.1에 고정.
+- **DeveloperStudio Run API 3곳 수기 타입 ➔ 정본 생성 타입 및 `observedRun` 어댑터 전면 전환**:
+  - `apps/web/src/contracts/kernel-observation.ts`:
+    - `packages/contracts-ts`의 정본 생성 타입 `ControlRunDetail`, `ControlRunView`, `ControlRunPage` re-export.
+    - 화면 어댑터 `observedRun(view: ControlRunView | ControlRunDetail): RunItem` 및 `observedRunPage(page: ControlRunPage)` 구축. 와이어 응답에 존재하는 필드만 안전하게 투영하고, 부재 필드는 합성 없이 `undefined`로 유지.
+  - `apps/web/src/features/studio/DeveloperStudio.tsx`:
+    - Line 230 (`refreshActiveRun` 수동 새로고침): `apiClient<ControlRunDetail>` 호출 후 `observedRun(data)`로 투영.
+    - Line 255 (`poll` 활성 실행 주기적 폴링): `apiClient<ControlRunDetail>` 호출 후 `observedRun(data)`로 투영.
+    - Line 417 (`handleDispatchRun` POST 생성): `apiClient<ControlRunView>` 호출 후 `observedRun(res)`로 투영 및 `(res as any).nodeId` 허위 조회 완전 제거.
+- **게이트 검증 실측 통과**:
+  - `npx tsc -b`: exit code 0 (타입 오류 0건).
+  - `npm run build`: exit code 0 (프로덕션 번들 3.87s 빌드 성공).
+  - `npm run test` (Vitest): **75개 파일 653/653 passed 100% in 12.87s**.
+  - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `python tools/check_contract_bindings.py`: **47 fixtures / 14 serving anchors PASS**.
+  - `pytest tests/test_route_coverage.py`: 30 passed in 0.81s.
+  - `pytest tests/core/test_run_approval_observation_contract.py`: 14 passed in 0.94s.
+  - `python tools/check_doc_single_source.py --ratchet`: PASS.
+  - `python tools/check_docs.py`: 742 versioned documents PASS.
+- **보고서**: [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]] §4, §5.
+
+## 세션 랩업: S01-FE 증거 꾸러미(체크리스트) 완결 및 Codex 검토/판정 인계
+
+- **S01-FE 고유 범위 정합 및 증거 꾸러미 구축**:
+  - 사용자 지시(S01-DB 닫힘 방식 준용 및 S01-FE 증거 체크리스트 구축)에 따라 S01-FE 고유 범위인 **"사용자 여정·디자인 토큰·화면 상태 명세"**에 맞추어 이미 확보된 실물 증거들을 전수 연결하고, 범위 밖 기능(물리 장비, 사내 DNS/TLS, hosted CI)을 정직하게 분리한 체크리스트 보고서 작성.
+  - **정본 명세 최신화**: [[Gemini Frontend 상세 아키텍처 및 화면 명세]] (SPEC-FRONTEND-001)을 v1.1.0으로 갱신하여 13개 화면 상세 테이블 및 승인 경로(`/decision`), Node 5대 상태, Workspace 5대 상태, Evidence 4대 상태를 정본 계약과 100% 일치시킴.
+  - **요구 증거 3대 축 전수 충족 확인**:
+    1. **계약 검증**: `tests/test_route_coverage.py` 30 passed in 0.82s, `check_contract_bindings.py` 46/12 PASS, Vitest 75개 파일 653/653 passed 100%, `tsc -b` 0 errors, Chrome 153 + Uvicorn 8대 시나리오 100% true.
+    2. **설계 검토**: SPEC-FRONTEND-001 v1.1.0, Codex 1차 회신(FR-01~07) 지적 사항 전수 해결 대조표 완비, Claude 3건 독립 검토 완료.
+    3. **인벤토리 보고**: 13개 화면, 30개 디자인 토큰, 5대 공통 화면 상태, OUT-01/AC-01 미확인 값 명시 완결.
+  - **Codex 인계**: owner Gemini는 직접 `task-registry.json`을 닫지 않고, reviewer인 Codex에게 검토 및 최종 판정을 인계.
+- **보고서**: [[2026-09-22_S01-FE_증거_체크리스트_및_인계_Gemini]].
+
+## 세션 랩업: EvidenceViewer RUN_FAILED 상태 분리와 RunDetail 시간 부인 고지 Chrome 153 실측 완결
+
+- **실행 실패와 출력 무결성 실패의 정직한 분리 (`EvidenceViewer.tsx`)**:
+  - `state === 'failed'`일 때 "출력 무결성 검증 실패 (FAIL)"로 왜곡하던 기존 증상을 치유. 실행 실패(비정상 프로세스 종료로 산출물 부재)와 무결성 검증 실패(산출물 바이트 위조/손상)를 명확히 분리.
+  - 신규 상태 `RUN_FAILED` (`✗ 실행 실패 · 출력 부재`) 및 안내 배너("저장소 출력물 손상이 아닌 프로세스 비정상 종료") 확립.
+  - `res.output && res.output.verified === false`: `FAIL` (출력 다이제스트 불일치/손상 경고 배너).
+  - `res.output?.verified === true`: `PASS` (출력 무결성 통과).
+  - 죽은 분기(`res.output.verified === false`)의 계약적 맥락(`core.schema.json`의 `const true` 제약과 방어적 목적) 주석 공식화.
+- **RunDetail 시간 표시 및 부인 고지 문장 Chrome 153 브라우저 실측 완결**:
+  - 헤더 3대 시간(생성, 갱신, 완료) 겹침 없이 렌더링 확인.
+  - Tab 2 실시간 SSE 로그 시각 부인 고지 `(실시간 로그 캡처나 화면 갱신 시각이 아닙니다)` 잘림 없이 표출 확인.
+  - Tab 3 산출물 시각 부인 고지 `(파일 다운로드 또는 화면 조회 시각이 아닙니다)` 표출 확인.
+  - Tab 5 샤드 시각 부인 고지 `(단일 공통 스냅샷이나 조회 시각이 아닙니다)` 표출 확인.
+- **검속 도구(`tools/run_real_browser_acceptance.py`) 8대 시나리오 체제 완비**:
+  - `--scenario rundetail-times` 및 `--scenario evidence-run-failed` 신설.
+  - 실제 Uvicorn 0.52.4 ↔ Vite ↔ Chrome 153 종단간 파이프라인에서 8대 시나리오 100% 통과 실측 (`scratch/chrome_real_uvicorn_acceptance_result.json`).
+- **신규 스크린샷 증거 획득**:
+  - `scratch/real_chrome_rundetail_header_times.png`
+  - `scratch/real_chrome_rundetail_tab2_logs_freshness.png`
+  - `scratch/real_chrome_rundetail_tab3_artifacts_freshness.png`
+  - `scratch/real_chrome_rundetail_tab5_shards_freshness.png`
+  - `scratch/real_chrome_evidence_run_failed.png`
+- **게이트 검증 실측**:
+  - `pytest tests/test_route_coverage.py`: 30 passed in 1.00s.
+  - `cd apps/web && npx tsc -b && npm run build`: exit code 0.
+  - Vitest: 75개 파일 **653/653 passed 100%** (순증 +1 passed).
+  - `python tools/check_frontend_integrity.py`: 82개 파일 0 violations (PASS).
+  - `python tools/check_contract_bindings.py`: 46 fixtures / 12 anchors PASS.
+- **보고서**: [[2026-09-22_EvidenceViewer_RUN_FAILED분리와_RunDetail_시간부인고지_Chrome153_실측_Gemini]].
+
+## 세션 랩업: EvidenceViewer 및 RunDetail 실제 브라우저(Chrome 153) 실측 완결 및 경계 표 무른 칸 메우기
+
+- **경계 표 가장 무른 칸(`EvidenceViewer` / `RunDetail`) 로컬 실측 YES 승격**:
+  - `tools/run_real_browser_acceptance.py`를 확장하여 Uvicorn 0.52.4 ↔ Vite ↔ Google Chrome 153 환경에서 총 6대 종단간 시나리오 파이프라인 구축.
+  - **백엔드/커널 실측 규명**: `core.schema.json` 및 `services/control-plane/src/inv/result_view.py` 전수 대조 결과, 정상 커밋된 실행에서 `output.verified === true`가 const true로 확실하게 반환됨을 증명.
+  - **3대 무결성 상태 전수 실측**:
+    1. `PASS`: `✓ 출력 무결성 검증 통과 (PASS)` 녹색 뱃지 및 `[시스템 정책 사양]` 실측 (`real_chrome_evidence_verified_pass.png`).
+    2. `UNVERIFIED`: 산출물 미커밋 실행(`outputAbsentReason` 부여) 시 `⚠️ 출력 무결성 미검증 (UNVERIFIED)` 호박색 뱃지 및 사유·권장조치 배너 실측 (`real_chrome_evidence_unverified_notice.png`).
+    3. `FAIL`: `✗ 출력 무결성 검증 실패 (FAIL)` 적색 뱃지 실측 (`real_chrome_evidence_failed.png`).
+  - **화면 간 연결 실측**:
+    - `Header.tsx`의 `Runs 실행` 탭 ➔ `RunDetail` 타임라인 마운트 실측 (`real_chrome_rundetail_timeline.png`).
+    - `RunDetail`의 `🔍 불변 증거 열람` 클릭 ➔ `EvidenceViewer` 진입 및 `← 이전으로 돌아가기` 왕복 내비게이션 완결 실측.
+- **잠복 결함 2건 발견 및 박멸**:
+  - `apps/web/src/app/App.tsx`: `EvidenceViewer` 호출 시 `projectId` 누락으로 실제 UI 진입 시 발생하던 "프로젝트 식별자 부재" 크래시 버그 치유.
+  - `apps/web/src/features/evidence/EvidenceViewer.tsx`: `outputAbsentReason`이 존재할 때 무조건 `FAIL`로 왜곡 표출되던 결함을 제거하고, 정상적인 `UNVERIFIED` 및 명확한 안내 배너로 교정.
+- **실측 증거 파일 완비**:
+  - `scratch/real_chrome_rundetail_timeline.png`
+  - `scratch/real_chrome_evidence_verified_pass.png`
+  - `scratch/real_chrome_evidence_unverified_notice.png`
+  - `scratch/real_chrome_evidence_failed.png`
+  - `scratch/chrome_real_uvicorn_acceptance_result.json` (6대 시나리오 100% true).
+- **보고서**: [[2026-09-22_화면별_실제브라우저_대_실제백엔드_실측경계_및_도구확장_Gemini]].
 
 ## 세션 랩업: 화면별 실제 브라우저(Chrome 153) 대 실제 백엔드(Uvicorn) 실측 경계 총괄 및 검속 도구 확장 가이드
 

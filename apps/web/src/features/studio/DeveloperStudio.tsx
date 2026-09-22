@@ -12,6 +12,11 @@ import {
   RunResultView,
   RunArtifactList,
 } from '@/contracts/types';
+import {
+  ControlRunDetail,
+  ControlRunView,
+  observedRun,
+} from '@/contracts/kernel-observation';
 import { Button } from '@/shared/ui/Button';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { apiClient, getAuthToken, isRouteNotFoundError } from '@/shared/api/client';
@@ -227,9 +232,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     if (!activeRunId) return;
     const prjId = selectedProjectId;
     try {
-      const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
-      if (data && data.id) {
-        setLiveRun(data);
+      const data = await apiClient<ControlRunDetail>(`/v1/projects/${prjId}/runs/${activeRunId}`);
+      if (data && data.runId) {
+        setLiveRun(observedRun(data));
       }
     } catch (err) {
       console.warn('Failed to refresh active run:', err);
@@ -244,9 +249,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
 
     const poll = async () => {
       try {
-        const data = await apiClient<RunItem>(`/v1/projects/${prjId}/runs/${activeRunId}`);
-        if (mounted && data && data.id) {
-          setLiveRun(data);
+        const data = await apiClient<ControlRunDetail>(`/v1/projects/${prjId}/runs/${activeRunId}`);
+        if (mounted && data && data.runId) {
+          setLiveRun(observedRun(data));
         }
       } catch (err) {
         console.warn('Active run poll failed:', err);
@@ -399,7 +404,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
     ]);
 
     try {
-      const res = await apiClient<RunItem>(`/v1/projects/${selectedProjectId}/runs`, {
+      const res = await apiClient<ControlRunView>(`/v1/projects/${selectedProjectId}/runs`, {
         method: 'POST',
         body: JSON.stringify({
           workspaceId: selectedWorkspaceId,
@@ -419,18 +424,19 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
         }),
       });
 
-      if (!res || !res.id) {
+      if (!res || !res.runId) {
         throw new Error('서버 응답에 유효한 Run ID가 누락되었습니다.');
       }
 
-      const newRunId = res.id;
+      const newRunId = res.runId;
       setActiveRunId(newRunId);
+      setLiveRun(observedRun(res));
       onRefreshRuns?.();
 
       setLogs((prev) => [
         ...prev,
         { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state '${res.state}'` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${res.nodeId || selectedNodeId || '(자동 할당)'}' (Headroom & Lease verified)` },
+        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${selectedNodeId || '(자동 할당)'}' (Headroom & Lease verified)` },
         { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.path}' inside 0600 process isolation sandbox...` },
       ]);
 

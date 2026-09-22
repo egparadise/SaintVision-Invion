@@ -75,12 +75,120 @@ SAMPLE_NODE = {
     "gpuVramUsedBytes": 20000000000,
 }
 
+SAMPLE_NODES_5STATES = [
+    {
+        "nodeId": "nod_active_01",
+        "hostname": "pacs-worker-active",
+        "status": "active",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 16,
+        "cpuUsagePercent": 42,
+        "memoryTotalBytes": 68719476736,
+        "memoryUsedBytes": 24000000000,
+        "storageTotalBytes": 2199023255552,
+        "storageUsedBytes": 600000000000,
+        "gpuCount": 1,
+        "gpuName": "NVIDIA A100",
+        "gpuVramTotalBytes": 85899345920,
+        "gpuVramUsedBytes": 32000000000,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+        "allocatableCores": 14,
+        "allocatableMemoryBytes": 60000000000,
+    },
+    {
+        "nodeId": "nod_enrolling_02",
+        "hostname": "pacs-worker-enrolling",
+        "status": "enrolling",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 8,
+        "cpuUsagePercent": 15,
+        "memoryTotalBytes": 34359738368,
+        "memoryUsedBytes": 8000000000,
+        "storageTotalBytes": 1099511627776,
+        "storageUsedBytes": 200000000000,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+    {
+        "nodeId": "nod_draining_03",
+        "hostname": "pacs-worker-draining",
+        "status": "draining",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T04:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T04:00:00Z",
+        "cpuCores": 16,
+        "cpuUsagePercent": 10,
+        "memoryTotalBytes": 68719476736,
+        "memoryUsedBytes": 8000000000,
+        "storageTotalBytes": 2199023255552,
+        "storageUsedBytes": 200000000000,
+        "gpuCount": 0,
+        "isDraining": True,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+    },
+    {
+        "nodeId": "nod_lost_04",
+        "hostname": "pacs-worker-lost",
+        "status": "lost",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-22T03:00:00Z",
+        "lastHeartbeatAt": "2026-09-22T03:00:00Z",
+        "cpuCores": 8,
+        "cpuUsagePercent": 0,
+        "memoryTotalBytes": 34359738368,
+        "memoryUsedBytes": 0,
+        "storageTotalBytes": 1099511627776,
+        "storageUsedBytes": 0,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+    {
+        "nodeId": "nod_retired_05",
+        "hostname": "pacs-worker-retired",
+        "status": "retired",
+        "os": "linux",
+        "osType": "linux",
+        "heartbeatAt": "2026-09-20T00:00:00Z",
+        "lastHeartbeatAt": "2026-09-20T00:00:00Z",
+        "cpuCores": 4,
+        "cpuUsagePercent": 0,
+        "memoryTotalBytes": 17179869184,
+        "memoryUsedBytes": 0,
+        "storageTotalBytes": 500000000000,
+        "storageUsedBytes": 0,
+        "gpuCount": 0,
+        "observationOnly": False,
+        "killSwitchEngaged": False,
+        "isDraining": False,
+    },
+]
+
 VALID_SUBJECT_ID = "oidc:" + "a" * 64
 VALID_TENANT_ID = "00000000-0000-4000-8000-000000000001"
 
 
 class MockTokens:
+    def __init__(self, scenario: str = "verified"):
+        self.scenario = scenario
+
     def verify(self, token):
+        if self.scenario == "s02-auth-failure" or token == "invalid_token":
+            raise ValueError("AUTH-0050: Invalid or expired access token")
         principal = SimpleNamespace(
             subject_id=VALID_SUBJECT_ID,
             tenant_id=VALID_TENANT_ID,
@@ -106,13 +214,15 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
         "count": 1,
     }
 
+    run_state = "failed" if scenario == "evidence-failed" else "succeeded"
+
     Control.list_runs = lambda self, principal, project, after=None, limit=50: {
         "items": [
             {
                 "id": "run_pacs_pipeline_01",
                 "runId": "run_pacs_pipeline_01",
                 "projectId": "prj_pacs_core",
-                "state": "succeeded",
+                "state": run_state,
                 "version": 1,
                 "attempt": 1,
                 "stateUpdatedAt": "2026-09-22T04:00:00Z",
@@ -126,7 +236,7 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
         "id": "run_pacs_pipeline_01",
         "runId": "run_pacs_pipeline_01",
         "projectId": "prj_pacs_core",
-        "state": "succeeded",
+        "state": run_state,
         "version": 1,
         "attempt": 1,
         "stateUpdatedAt": "2026-09-22T04:00:00Z",
@@ -139,31 +249,103 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
     }
 
     # Bind result, download and artifacts on ResultView so canonical handlers use them
-    ResultView.result = lambda self, principal, run_id, project=None: {
-        "source": "execution-kernel",
-        "runId": run_id,
-        "projectId": project or "prj_pacs_core",
-        "state": "succeeded",
-        "version": 1,
-        "attemptCount": 1,
-        "stateUpdatedAt": "2026-09-22T04:00:00Z",
-        "sealed": True,
-        "executionConfirmed": True,
-        "commandId": "00000000-0000-4000-8000-000000000002",
-        "nodeId": None,
-        "stopReceipt": {"exitCode": 0},
-        "evidence": {
-            "evidenceId": "evd_00000000000000000000000000",
-        },
-        "completedAt": "2026-09-22T04:00:00Z",
-        "output": {
-            "sha256": SAMPLE_SHA256,
-            "sizeBytes": len(SAMPLE_CONTENT),
-            "verified": True,
-        },
-        "outputAbsentReason": None,
-        "resourceReleasePending": False,
-    }
+    def mock_result(self, principal, run_id, project=None):
+        if scenario == "evidence-run-failed":
+            return {
+                "source": "execution-kernel",
+                "runId": run_id,
+                "projectId": project or "prj_pacs_core",
+                "state": "failed",
+                "version": 1,
+                "attemptCount": 1,
+                "stateUpdatedAt": "2026-09-22T04:00:00Z",
+                "sealed": False,
+                "executionConfirmed": True,
+                "commandId": "00000000-0000-4000-8000-000000000002",
+                "nodeId": None,
+                "stopReceipt": {"exitCode": 137, "reason": "OOMKilled"},
+                "evidence": None,
+                "completedAt": "2026-09-22T04:00:00Z",
+                "output": None,
+                "outputAbsentReason": "Process killed before output commit (OOMKilled)",
+                "resourceReleasePending": False,
+            }
+        elif scenario == "evidence-failed":
+            return {
+                "source": "execution-kernel",
+                "runId": run_id,
+                "projectId": project or "prj_pacs_core",
+                "state": "succeeded",
+                "version": 1,
+                "attemptCount": 1,
+                "stateUpdatedAt": "2026-09-22T04:00:00Z",
+                "sealed": True,
+                "executionConfirmed": True,
+                "commandId": "00000000-0000-4000-8000-000000000002",
+                "nodeId": None,
+                "stopReceipt": {"exitCode": 0},
+                "evidence": {
+                    "evidenceId": "evd_00000000000000000000000000",
+                },
+                "completedAt": "2026-09-22T04:00:00Z",
+                "output": {
+                    "sha256": SAMPLE_SHA256,
+                    "sizeBytes": len(SAMPLE_CONTENT),
+                    "verified": False,
+                },
+                "outputAbsentReason": None,
+                "resourceReleasePending": False,
+            }
+        elif scenario == "evidence-unverified":
+            return {
+                "source": "execution-kernel",
+                "runId": run_id,
+                "projectId": project or "prj_pacs_core",
+                "state": "succeeded",
+                "version": 1,
+                "attemptCount": 1,
+                "stateUpdatedAt": "2026-09-22T04:00:00Z",
+                "sealed": True,
+                "executionConfirmed": True,
+                "commandId": "00000000-0000-4000-8000-000000000002",
+                "nodeId": None,
+                "stopReceipt": {"exitCode": 0},
+                "evidence": {
+                    "evidenceId": "evd_00000000000000000000000000",
+                },
+                "completedAt": "2026-09-22T04:00:00Z",
+                "output": None,
+                "outputAbsentReason": "No committed output for this attempt",
+                "resourceReleasePending": False,
+            }
+        else:
+            return {
+                "source": "execution-kernel",
+                "runId": run_id,
+                "projectId": project or "prj_pacs_core",
+                "state": "succeeded",
+                "version": 1,
+                "attemptCount": 1,
+                "stateUpdatedAt": "2026-09-22T04:00:00Z",
+                "sealed": True,
+                "executionConfirmed": True,
+                "commandId": "00000000-0000-4000-8000-000000000002",
+                "nodeId": None,
+                "stopReceipt": {"exitCode": 0},
+                "evidence": {
+                    "evidenceId": "evd_00000000000000000000000000",
+                },
+                "completedAt": "2026-09-22T04:00:00Z",
+                "output": {
+                    "sha256": SAMPLE_SHA256,
+                    "sizeBytes": len(SAMPLE_CONTENT),
+                    "verified": True,
+                },
+                "outputAbsentReason": None,
+                "resourceReleasePending": False,
+            }
+
+    ResultView.result = mock_result
 
     ResultView.artifacts = lambda self, principal, run_id, project=None: {
         "source": "execution-kernel",
@@ -179,9 +361,56 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
         "artifact": SAMPLE_ARTIFACT,
     }
 
+    ResultView.logs = lambda self, principal, run_id, project=None: {
+        "source": "execution-kernel",
+        "runId": "run_pacs_pipeline_01",
+        "completedAt": "2026-09-22T04:00:00Z",
+        "stdout": "[Kernel] Task run_pacs_pipeline_01 initialized.\n[Kernel] Loading model weights from storage...\n[Kernel] Model weights loaded (PACS v2.4).\n[Kernel] Inference batch processed: 128 items.\n[Kernel] Output written to /tmp/inv_output/metrics.json.\n[Kernel] Process completed with exit code 0.",
+        "stderr": "",
+        "redacted": False,
+        "truncated": False,
+        "absentReason": None,
+    }
+
+    from inv.control import Control
+    Control.shards = lambda self, principal, project, run_id: {
+        "planId": "shard_plan_pacs_inference_01",
+        "sourcePlanId": None,
+        "rootPlanId": "shard_plan_pacs_inference_01",
+        "generation": 1,
+        "parentRunId": "run_pacs_pipeline_01",
+        "parentState": "succeeded",
+        "stateAsOf": "2026-09-22T04:00:00+00:00",
+        "aggregateManifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "shardCount": 1,
+        "allPhysicallyStopped": True,
+        "allSucceeded": True,
+        "resultManifest": [
+            {
+                "index": 0,
+                "runId": "run_pacs_pipeline_01",
+                "evidenceId": "evd_00000000000000000000000000",
+                "objectId": "44444444-4444-4444-8444-444444444444",
+                "sha256": SAMPLE_SHA256,
+                "sizeBytes": len(SAMPLE_CONTENT),
+            }
+        ],
+        "resultManifestSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "shards": [
+            {
+                "index": 0,
+                "runId": "run_pacs_pipeline_01",
+                "nodeId": "nod_worker_gpu_01",
+                "phase": "stopped",
+                "state": "succeeded",
+                "evidenceId": "evd_00000000000000000000000000",
+            }
+        ],
+    }
+
     app = create_app(
         database=object(),
-        tokens=MockTokens(),
+        tokens=MockTokens(scenario),
         allowed_origins=[
             f"http://127.0.0.1:{frontend_port}",
             f"http://localhost:{frontend_port}",
@@ -226,6 +455,8 @@ def build_real_backend_app(frontend_port: int, backend_port: int, scenario: str 
 
     @app.get("/v1/nodes")
     def get_nodes():
+        if scenario == "s02-nodes-journey":
+            return {"items": SAMPLE_NODES_5STATES, "count": len(SAMPLE_NODES_5STATES)}
         return {"items": [SAMPLE_NODE], "count": 1}
 
     @app.get("/v1/projects/prj_pacs_core/workspaces")
@@ -335,110 +566,468 @@ def run_scenario(
             page.goto(f"{frontend_url}/callback?code=mock_code&state=real_uvicorn_state", wait_until="domcontentloaded")
             page.wait_for_timeout(1500)
 
-            studio_tab = page.locator('button:has-text("개발 Studio")')
-            studio_tab.wait_for(state="visible", timeout=10000)
-            studio_tab.click()
-            page.wait_for_timeout(1500)
-
-            step4_btn = page.locator('button:has-text("4. 실행 상태 & 실시간 로그")')
-            step4_btn.wait_for(state="visible", timeout=10000)
-            step4_btn.click()
-            page.wait_for_timeout(1500)
-
-            raw_download_btn = page.locator('[data-testid="artifact-raw-download-btn"]')
-            raw_download_btn.wait_for(state="visible", timeout=10000)
-
             # -----------------------------------------------------------------
-            # Branch 1: VERIFIED (Happy Path)
+            # EvidenceViewer & RunDetail Acceptance Scenarios
             # -----------------------------------------------------------------
-            if scenario == "verified":
-                print("[Acceptance: VERIFIED] Expecting genuine download and [전송 확인 완료] banner...")
-                with page.expect_download(timeout=15000) as download_info:
-                    raw_download_btn.click()
+            if scenario == "rundetail-times":
+                print(f"\n[Acceptance: RUNDETAIL-TIMES] Navigating to Runs tab...")
+                runs_tab = page.locator('button:has-text("Runs 실행")')
+                runs_tab.wait_for(state="visible", timeout=10000)
+                runs_tab.click()
+                page.wait_for_timeout(1500)
 
-                download = download_info.value
-                download_path = os.path.join(output_dir, "downloaded_real_uvicorn_artifact.bin")
-                download.save_as(download_path)
+                # Click the Run row to open RunDetail
+                print("[Acceptance] Selecting Run 'run_pacs_pipeline_01' in RunList...")
+                run_row = page.locator('tr:has-text("run_pacs_pipeline_01")')
+                run_row.wait_for(state="visible", timeout=10000)
+                run_row.click()
+                page.wait_for_timeout(1500)
 
+                # 1. Header timestamps verification
+                print("[Acceptance] Verifying RunDetail Header Timestamps...")
+                created_at_span = page.locator('[data-testid="run-detail-created-at"]')
+                created_at_span.wait_for(state="visible", timeout=10000)
+                state_updated_at_span = page.locator('[data-testid="run-state-updated-at"]')
+                completed_at_span = page.locator('[data-testid="run-detail-completed-at"]')
+
+                created_text = created_at_span.inner_text()
+                updated_text = state_updated_at_span.inner_text()
+                completed_text = completed_at_span.inner_text()
+                print(f"✔ [Header Times] Created: '{created_text}', StateUpdated: '{updated_text}', Completed: '{completed_text}'")
+                assert "생성:" in created_text
+                assert "실행 상태 갱신:" in updated_text
+                assert "실행 완료 시각:" in completed_text
+
+                header_screenshot = os.path.join(output_dir, "real_chrome_rundetail_header_times.png")
+                page.screenshot(path=header_screenshot)
+                print(f"✔ [Header Times] Screenshot: {header_screenshot}")
+
+                # 2. Tab 2: Logs tab negation notice
+                print("[Acceptance] Testing Tab 2 (2. 실시간 SSE 로그) time notice...")
+                logs_tab_btn = page.locator('button:has-text("2. 실시간 SSE 로그")')
+                logs_tab_btn.wait_for(state="visible", timeout=10000)
+                logs_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                logs_banner = page.locator('[data-testid="logs-freshness-banner"]')
+                logs_banner.wait_for(state="visible", timeout=10000)
+                logs_banner_text = logs_banner.inner_text()
+                print(f"✔ [Tab 2 Logs Banner] Text: {logs_banner_text}")
+                assert "실행 완료 시각" in logs_banner_text
+                assert "커널 결과 완료 커밋 시각이며, 실시간 로그 캡처나 화면 갱신 시각이 아닙니다" in logs_banner_text
+
+                box_logs = logs_banner.bounding_box()
+                assert box_logs is not None and box_logs["height"] >= 20 and box_logs["width"] >= 250, "Logs banner must be clearly rendered"
+                tab2_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab2_logs_freshness.png")
+                page.screenshot(path=tab2_screenshot)
+                print(f"✔ [Tab 2 Logs Banner] Screenshot: {tab2_screenshot}")
+
+                # 3. Tab 3: Artifacts tab negation notice
+                print("[Acceptance] Testing Tab 3 (3. 산출물 (Artifacts)) time notice...")
+                artifacts_tab_btn = page.locator('button:has-text("3. 산출물 (Artifacts)")')
+                artifacts_tab_btn.wait_for(state="visible", timeout=10000)
+                artifacts_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                art_banner = page.locator('[data-testid="artifacts-freshness-banner"]')
+                art_banner.wait_for(state="visible", timeout=10000)
+                art_banner_text = art_banner.inner_text()
+                print(f"✔ [Tab 3 Artifacts Banner] Text: {art_banner_text}")
+                assert "실행 완료 시각" in art_banner_text
+                assert "커널 결과 완료 커밋 시각이며, 파일 다운로드 또는 화면 조회 시각이 아닙니다" in art_banner_text
+
+                box_art = art_banner.bounding_box()
+                assert box_art is not None and box_art["height"] >= 20 and box_art["width"] >= 250, "Artifacts banner must be clearly rendered"
+                tab3_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab3_artifacts_freshness.png")
+                page.screenshot(path=tab3_screenshot)
+                print(f"✔ [Tab 3 Artifacts Banner] Screenshot: {tab3_screenshot}")
+
+                # 4. Tab 5: Shards tab negation notice
+                print("[Acceptance] Testing Tab 5 (5. 분산 샤드 & 자원 회수) time notice...")
+                shards_tab_btn = page.locator('button:has-text("5. 분산 샤드")')
+                shards_tab_btn.wait_for(state="visible", timeout=10000)
+                shards_tab_btn.click()
+                page.wait_for_timeout(1500)
+
+                shards_banner = page.locator('[data-testid="shards-freshness-banner"]')
+                shards_banner.wait_for(state="visible", timeout=10000)
+                shards_banner_text = shards_banner.inner_text()
+                print(f"✔ [Tab 5 Shards Banner] Text: {shards_banner_text}")
+                assert "샤드 상태 기준" in shards_banner_text
+                assert "포함된 Run 행들의 최신 DB 갱신 시각 기준이며, 단일 공통 스냅샷이나 조회 시각이 아닙니다" in shards_banner_text
+
+                box_shards = shards_banner.bounding_box()
+                assert box_shards is not None and box_shards["height"] >= 20 and box_shards["width"] >= 250, "Shards banner must be clearly rendered"
+                tab5_screenshot = os.path.join(output_dir, "real_chrome_rundetail_tab5_shards_freshness.png")
+                page.screenshot(path=tab5_screenshot)
+                print(f"✔ [Tab 5 Shards Banner] Screenshot: {tab5_screenshot}")
+
+            elif scenario.startswith("evidence-"):
+                print(f"\n[Acceptance: {scenario.upper()}] Navigating to Runs tab...")
+                runs_tab = page.locator('button:has-text("Runs 실행")')
+                runs_tab.wait_for(state="visible", timeout=10000)
+                runs_tab.click()
+                page.wait_for_timeout(1500)
+
+                # Click the Run row to open RunDetail
+                print("[Acceptance] Selecting Run 'run_pacs_pipeline_01' in RunList...")
+                run_row = page.locator('tr:has-text("run_pacs_pipeline_01")')
+                run_row.wait_for(state="visible", timeout=10000)
+                run_row.click()
+                page.wait_for_timeout(1500)
+
+                # Verify RunDetail is mounted
+                print("[Acceptance] Verifying RunDetail mounted...")
+                timeline_tab = page.locator('button:has-text("1. 상태 전이 타임라인")')
+                timeline_tab.wait_for(state="visible", timeout=10000)
+                rundetail_screenshot = os.path.join(output_dir, "real_chrome_rundetail_timeline.png")
+                page.screenshot(path=rundetail_screenshot)
+                print(f"✔ [RunDetail] Saved screenshot: {rundetail_screenshot}")
+
+                # Click "🔍 불변 증거 열람" button
+                print("[Acceptance] Clicking '🔍 불변 증거 열람' button...")
+                evidence_btn = page.locator('button:has-text("🔍 불변 증거 열람")')
+                evidence_btn.wait_for(state="visible", timeout=10000)
+                evidence_btn.click()
+                page.wait_for_timeout(1500)
+
+                # Verify EvidenceViewer is mounted
+                viewer_header = page.locator('h2:has-text("불변 증거 (Evidence) 패키지")')
+                viewer_header.wait_for(state="visible", timeout=10000)
+                print(f"✔ [EvidenceViewer] Mounted for {scenario}!")
+
+                if scenario == "evidence-verified":
+                    print("[Acceptance: evidence-verified] Checking PASS badge and policy specs...")
+                    pass_badge = page.locator('span:has-text("✓ 출력 무결성 검증 통과 (PASS)")')
+                    pass_badge.wait_for(state="visible", timeout=10000)
+                    assert pass_badge.is_visible()
+
+                    specs_box = page.locator('span:has-text("[시스템 정책 사양]")')
+                    assert specs_box.is_visible()
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_evidence_verified_pass.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [evidence-verified] PASS badge verified! Saved: {screenshot_path}")
+
+                elif scenario == "evidence-unverified":
+                    print("[Acceptance: evidence-unverified] Checking UNVERIFIED badge & notice banner...")
+                    unverified_badge = page.locator('span:has-text("⚠️ 출력 무결성 미검증 (UNVERIFIED)")')
+                    unverified_badge.wait_for(state="visible", timeout=10000)
+                    assert unverified_badge.is_visible()
+
+                    notice_banner = page.locator('[data-testid="evidence-unverified-notice"]')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [evidence-unverified] Notice banner: {notice_text.splitlines()[0]}")
+                    assert "권장 조치" in notice_text
+                    assert "미검증 (UNVERIFIED)" in notice_text
+
+                    # Ensure PASS badge is NOT present
+                    assert page.locator('span:has-text("✓ 출력 무결성 검증 통과 (PASS)")').count() == 0
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_evidence_unverified_notice.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [evidence-unverified] UNVERIFIED banner verified! Saved: {screenshot_path}")
+
+                elif scenario == "evidence-run-failed":
+                    print("[Acceptance: evidence-run-failed] Checking RUN_FAILED badge & process failure notice banner...")
+                    run_failed_badge = page.locator('[data-testid="evidence-status-run-failed"]')
+                    run_failed_badge.wait_for(state="visible", timeout=10000)
+                    assert "실행 실패 · 출력 부재 (RUN_FAILED)" in run_failed_badge.inner_text()
+
+                    notice_banner = page.locator('[data-testid="evidence-run-failed-notice"]')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [evidence-run-failed] Notice banner: {notice_text.splitlines()[0]}")
+                    assert "작업 실행 실패 (RUN_FAILED)" in notice_text
+                    assert "프로세스 실행 자체의 미완료 또는 실패" in notice_text
+
+                    # Ensure PASS badge and misleading FAIL badge are NOT present
+                    assert page.locator('[data-testid="evidence-status-pass"]').count() == 0
+                    assert page.locator('[data-testid="evidence-status-fail"]').count() == 0
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_evidence_run_failed.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [evidence-run-failed] RUN_FAILED verified! Saved: {screenshot_path}")
+
+                elif scenario == "evidence-failed":
+                    print("[Acceptance: evidence-failed] Checking FAIL badge & cryptographic warning banner...")
+                    fail_badge = page.locator('[data-testid="evidence-status-fail"]')
+                    fail_badge.wait_for(state="visible", timeout=10000)
+                    assert "출력 무결성 검증 실패 (FAIL)" in fail_badge.inner_text()
+
+                    notice_banner = page.locator('[data-testid="evidence-failed-notice"]')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [evidence-failed] Notice banner: {notice_text.splitlines()[0]}")
+                    assert "출력 무결성 검증 실패 (FAIL)" in notice_text
+                    assert "위조 또는 전송 중 변조 가능성" in notice_text
+
+                    # Ensure PASS badge is NOT present
+                    assert page.locator('[data-testid="evidence-status-pass"]').count() == 0
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_evidence_failed.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [evidence-failed] FAIL badge verified! Saved: {screenshot_path}")
+
+                # Test navigation back to RunDetail
+                back_btn = page.locator('button:has-text("← 이전으로 돌아가기")')
+                back_btn.click()
                 page.wait_for_timeout(1000)
-                notice_banner = page.locator('[role="status"]:has-text("[전송 확인 완료]")')
-                notice_banner.wait_for(state="visible", timeout=10000)
-                notice_text = notice_banner.inner_text()
-                print(f"✔ [VERIFIED] Banner verified: {notice_text.splitlines()[0]}")
+                timeline_tab.wait_for(state="visible", timeout=10000)
+                print("✔ [Navigation] Returned to RunDetail successfully!")
 
-                assert "[전송 확인 완료]" in notice_text
-                assert "50 Bytes" in notice_text
-                assert "수신 바이트와 서버 헤더 일치" in notice_text
+            # -----------------------------------------------------------------
+            # S02-FE Scenarios: Login Success, Auth Failure, Nodes Journey
+            # -----------------------------------------------------------------
+            elif scenario == "s02-login-success":
+                print(f"\n[Acceptance: S02-LOGIN-SUCCESS] Verifying OIDC session completion & Studio/Dashboard mount...")
+                # Verify Header is mounted
+                header_title = page.locator('span:has-text("SaintVision")')
+                header_title.wait_for(state="visible", timeout=10000)
 
-                with open(download_path, "rb") as f:
-                    downloaded_bytes = f.read()
+                # Verify user profile in Header
+                user_badge = page.locator('span:has-text("👤")')
+                user_badge.wait_for(state="visible", timeout=10000)
+                user_text = user_badge.inner_text()
+                print(f"✔ [S02-LOGIN-SUCCESS] User badge: {user_text}")
 
-                assert downloaded_bytes == SAMPLE_CONTENT, "Downloaded bytes must match server byte-for-byte"
-                assert hashlib.sha256(downloaded_bytes).hexdigest() == SAMPLE_SHA256
+                # Verify Logout button
+                logout_btn = page.locator('button:has-text("로그아웃")')
+                logout_btn.wait_for(state="visible", timeout=10000)
+                assert logout_btn.is_visible()
 
-                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_verified.png")
+                # Verify core navigation tabs exist
+                assert page.locator('button:has-text("Nodes 인벤토리")').is_visible()
+                assert page.locator('button:has-text("클러스터 개요")').is_visible()
+
+                screenshot_path = os.path.join(output_dir, "real_chrome_s02_login_success.png")
                 page.screenshot(path=screenshot_path)
-                print(f"✔ [VERIFIED] Saved screenshot: {screenshot_path}")
+                print(f"✔ [S02-LOGIN-SUCCESS] Login success verified! Saved: {screenshot_path}")
+
+            elif scenario == "s02-auth-failure":
+                print(f"\n[Acceptance: S02-AUTH-FAILURE] Testing Layer 1: Resource Server 401 AUTH-0050 rejection...")
+                # Part A: 401 rejection from Uvicorn
+                alert_401 = page.locator('[role="alert"]:has-text("서버가 인증 토큰을 허용하지 않았습니다.")')
+                alert_401.wait_for(state="visible", timeout=10000)
+                assert alert_401.is_visible()
+                print(f"✔ [S02-AUTH-FAILURE] Part A 401 alert: {alert_401.inner_text()}")
+
+                # Verify Login page elements remain intact
+                assert page.locator('h1:has-text("SaintVision 로그인")').is_visible()
+                assert page.locator('button:has-text("조직 계정으로 로그인")').is_visible()
+
+                screenshot_401 = os.path.join(output_dir, "real_chrome_s02_auth_failure_401.png")
+                page.screenshot(path=screenshot_401)
+                print(f"✔ [S02-AUTH-FAILURE] Part A 401 screenshot saved: {screenshot_401}")
+
+                # Part B: IdP error callback rejection (/callback?error=access_denied)
+                print("\n[Acceptance: S02-AUTH-FAILURE] Testing Layer 2: IdP protocol rejection callback (/callback?error=access_denied)...")
+                page.evaluate(f"""() => {{
+                    const tx = {{
+                        state: 'idp_error_state',
+                        verifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+                        createdAt: Date.now(),
+                        redirectUri: '{frontend_url}/callback',
+                        config: {{
+                            idpAuthorizeUrl: '{frontend_url}/oauth/authorize',
+                            idpTokenUrl: '{frontend_url}/oauth/token',
+                            clientId: 'saintvision-web',
+                            scope: 'openid profile email'
+                        }}
+                    }};
+                    sessionStorage.setItem('saintvision.oauth.transaction', JSON.stringify(tx));
+                }}""")
+                page.goto(f"{frontend_url}/callback?error=access_denied&state=idp_error_state", wait_until="domcontentloaded")
+                page.wait_for_timeout(1000)
+
+                alert_idp = page.locator('[role="alert"]:has-text("인증 제공자가 로그인을 완료하지 못했습니다.")')
+                alert_idp.wait_for(state="visible", timeout=10000)
+                assert alert_idp.is_visible()
+                print(f"✔ [S02-AUTH-FAILURE] Part B IdP error alert: {alert_idp.inner_text()}")
+
+                screenshot_idp = os.path.join(output_dir, "real_chrome_s02_auth_failure_idp.png")
+                page.screenshot(path=screenshot_idp)
+                print(f"✔ [S02-AUTH-FAILURE] Part B IdP callback error screenshot saved: {screenshot_idp}")
+
+            elif scenario == "s02-nodes-journey":
+                print(f"\n[Acceptance: S02-NODES-JOURNEY] Navigating to Nodes 인벤토리 tab...")
+                nodes_tab = page.locator('button:has-text("Nodes 인벤토리")')
+                nodes_tab.wait_for(state="visible", timeout=10000)
+                nodes_tab.click()
+                page.wait_for_timeout(1500)
+
+                # Verify NodeList with 5 canonical states
+                inventory_header = page.locator('h2:has-text("Node 인벤토리 (5대)")')
+                inventory_header.wait_for(state="visible", timeout=10000)
+                assert inventory_header.is_visible()
+
+                badge_active = page.locator('[data-testid="node-status-badge-nod_active_01"]')
+                badge_active.wait_for(state="visible", timeout=10000)
+                assert "ACTIVE (활성 · 헬스 미결정)" in badge_active.inner_text()
+
+                badge_enrolling = page.locator('[data-testid="node-status-badge-nod_enrolling_02"]')
+                badge_enrolling.wait_for(state="visible", timeout=10000)
+                assert "ENROLLING" in badge_enrolling.inner_text()
+
+                badge_draining = page.locator('[data-testid="node-status-badge-nod_draining_03"]')
+                badge_draining.wait_for(state="visible", timeout=10000)
+                assert "DRAINING" in badge_draining.inner_text()
+
+                badge_lost = page.locator('[data-testid="node-status-badge-nod_lost_04"]')
+                badge_lost.wait_for(state="visible", timeout=10000)
+                assert "LOST (단절)" in badge_lost.inner_text()
+
+                badge_retired = page.locator('[data-testid="node-status-badge-nod_retired_05"]')
+                badge_retired.wait_for(state="visible", timeout=10000)
+                assert "RETIRED" in badge_retired.inner_text()
+
+                # Verify alert banner on lost node
+                lost_card = page.locator('[data-testid="node-card-nod_lost_04"]')
+                assert "🔴 노드와의 통신이 두절되어 상태가 유실(Lost)되었습니다" in lost_card.inner_text()
+
+                screenshot_list = os.path.join(output_dir, "real_chrome_s02_nodes_list.png")
+                page.screenshot(path=screenshot_list)
+                print(f"✔ [S02-NODES-JOURNEY] 5 canonical states verified! Saved: {screenshot_list}")
+
+                # Click node card for nod_active_01
+                print("[Acceptance: S02-NODES-JOURNEY] Clicking pacs-worker-active node card...")
+                active_card = page.locator('[data-testid="node-card-nod_active_01"]')
+                active_card.click()
+                page.wait_for_timeout(1500)
+
+                # Verify NodeDetail mounted
+                detail_header = page.locator('h2:has-text("Node 상세 정보: pacs-worker-active (nod_active_01)")')
+                detail_header.wait_for(state="visible", timeout=10000)
+                assert detail_header.is_visible()
+
+                # Verify Hardware capability details
+                assert page.locator('text=x86_64 (16 코어)').is_visible()
+                assert page.locator('text=NVIDIA A100').is_visible()
+
+                screenshot_detail = os.path.join(output_dir, "real_chrome_s02_node_detail.png")
+                page.screenshot(path=screenshot_detail)
+                print(f"✔ [S02-NODES-JOURNEY] NodeDetail verified! Saved: {screenshot_detail}")
+
+                # Return to NodeList
+                print("[Acceptance: S02-NODES-JOURNEY] Clicking '← 인벤토리로 돌아가기'...")
+                back_btn = page.locator('button:has-text("← 인벤토리로 돌아가기")')
+                back_btn.wait_for(state="visible", timeout=10000)
+                back_btn.click()
+                page.wait_for_timeout(1500)
+
+                inventory_header.wait_for(state="visible", timeout=10000)
+                screenshot_return = os.path.join(output_dir, "real_chrome_s02_nodes_return.png")
+                page.screenshot(path=screenshot_return)
+                print(f"✔ [S02-NODES-JOURNEY] Returned to inventory verified! Saved: {screenshot_return}")
 
             # -----------------------------------------------------------------
-            # Branch 2: MISMATCH (Corrupted / Tampered Wire Bytes)
+            # DeveloperStudio Step 4 Artifact Download Scenarios
             # -----------------------------------------------------------------
-            elif scenario == "mismatch":
-                print("[Acceptance: MISMATCH] Expecting download blocked and [전송 불일치 · 저장 차단] alert...")
-                download_triggered = False
+            else:
+                studio_tab = page.locator('button:has-text("개발 Studio")')
+                studio_tab.wait_for(state="visible", timeout=10000)
+                studio_tab.click()
+                page.wait_for_timeout(1500)
 
-                def on_download(d):
-                    nonlocal download_triggered
-                    download_triggered = True
+                step4_btn = page.locator('button:has-text("4. 실행 상태 & 실시간 로그")')
+                step4_btn.wait_for(state="visible", timeout=10000)
+                step4_btn.click()
+                page.wait_for_timeout(1500)
 
-                page.on("download", on_download)
-                raw_download_btn.click()
-                page.wait_for_timeout(2000)
+                raw_download_btn = page.locator('[data-testid="artifact-raw-download-btn"]')
+                raw_download_btn.wait_for(state="visible", timeout=10000)
 
-                assert not download_triggered, "CRITICAL: Download MUST be blocked on checksum mismatch!"
-                print("✔ [MISMATCH] Chrome download event was blocked (0 bytes downloaded).")
+                # -----------------------------------------------------------------
+                # Branch 1: VERIFIED (Happy Path)
+                # -----------------------------------------------------------------
+                if scenario == "verified":
+                    print("[Acceptance: VERIFIED] Expecting genuine download and [전송 확인 완료] banner...")
+                    with page.expect_download(timeout=15000) as download_info:
+                        raw_download_btn.click()
 
-                notice_banner = page.locator('[role="alert"]:has-text("[전송 불일치 · 저장 차단]")')
-                notice_banner.wait_for(state="visible", timeout=10000)
-                notice_text = notice_banner.inner_text()
-                print(f"✔ [MISMATCH] Alert banner verified: {notice_text.splitlines()[0]}")
+                    download = download_info.value
+                    download_path = os.path.join(output_dir, "downloaded_real_uvicorn_artifact.bin")
+                    download.save_as(download_path)
 
-                assert "[전송 불일치 · 저장 차단]" in notice_text
-                assert "전송 중 손상 위험으로 파일 저장을 차단했습니다" in notice_text
+                    page.wait_for_timeout(1000)
+                    notice_banner = page.locator('[role="status"]:has-text("[전송 확인 완료]")')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [VERIFIED] Banner verified: {notice_text.splitlines()[0]}")
 
-                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_mismatch_blocked.png")
-                page.screenshot(path=screenshot_path)
-                print(f"✔ [MISMATCH] Saved screenshot: {screenshot_path}")
+                    assert "[전송 확인 완료]" in notice_text
+                    assert "50 Bytes" in notice_text
+                    assert "수신 바이트와 서버 헤더 일치" in notice_text
 
-            # -----------------------------------------------------------------
-            # Branch 3: MISSING-HEADER (Downgrade Attack Prevention)
-            # -----------------------------------------------------------------
-            elif scenario == "missing-header":
-                print("[Acceptance: MISSING-HEADER] Expecting download blocked and [전송 헤더 누락 · 저장 차단] alert...")
-                download_triggered = False
+                    with open(download_path, "rb") as f:
+                        downloaded_bytes = f.read()
 
-                def on_download(d):
-                    nonlocal download_triggered
-                    download_triggered = True
+                    assert downloaded_bytes == SAMPLE_CONTENT, "Downloaded bytes must match server byte-for-byte"
+                    assert hashlib.sha256(downloaded_bytes).hexdigest() == SAMPLE_SHA256
 
-                page.on("download", on_download)
-                raw_download_btn.click()
-                page.wait_for_timeout(2000)
+                    screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_verified.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [VERIFIED] Saved screenshot: {screenshot_path}")
 
-                assert not download_triggered, "CRITICAL: Download MUST be blocked on missing X-Content-SHA256 header!"
-                print("✔ [MISSING-HEADER] Chrome download event was blocked (0 bytes downloaded).")
+                # -----------------------------------------------------------------
+                # Branch 2: MISMATCH (Corrupted / Tampered Wire Bytes)
+                # -----------------------------------------------------------------
+                elif scenario == "mismatch":
+                    print("[Acceptance: MISMATCH] Expecting download blocked and [전송 불일치 · 저장 차단] alert...")
+                    download_triggered = False
 
-                notice_banner = page.locator('[role="alert"]:has-text("[전송 헤더 누락 · 저장 차단]")')
-                notice_banner.wait_for(state="visible", timeout=10000)
-                notice_text = notice_banner.inner_text()
-                print(f"✔ [MISSING-HEADER] Alert banner verified: {notice_text.splitlines()[0]}")
+                    def on_download(d):
+                        nonlocal download_triggered
+                        download_triggered = True
 
-                assert "[전송 헤더 누락 · 저장 차단]" in notice_text
-                assert "전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다" in notice_text
+                    page.on("download", on_download)
+                    raw_download_btn.click()
+                    page.wait_for_timeout(2000)
 
-                screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_missing_header_blocked.png")
-                page.screenshot(path=screenshot_path)
-                print(f"✔ [MISSING-HEADER] Saved screenshot: {screenshot_path}")
+                    assert not download_triggered, "CRITICAL: Download MUST be blocked on checksum mismatch!"
+                    print("✔ [MISMATCH] Chrome download event was blocked (0 bytes downloaded).")
+
+                    notice_banner = page.locator('[role="alert"]:has-text("[전송 불일치 · 저장 차단]")')
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [MISMATCH] Alert banner verified: {notice_text.splitlines()[0]}")
+
+                    assert "[전송 불일치 · 저장 차단]" in notice_text
+                    assert "전송 중 손상 위험으로 파일 저장을 차단했습니다" in notice_text
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_mismatch_blocked.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [MISMATCH] Saved screenshot: {screenshot_path}")
+
+                # -----------------------------------------------------------------
+                # Branch 3: MISSING-HEADER (Downgrade Attack Prevention)
+                # -----------------------------------------------------------------
+                elif scenario == "missing-header":
+                    print("[Acceptance: MISSING-HEADER] Expecting download blocked and [전송 헤더 누락 · 저장 차단] alert...")
+                    download_triggered = False
+
+                    def on_download(d):
+                        nonlocal download_triggered
+                        download_triggered = True
+
+                    page.on("download", on_download)
+                    raw_download_btn.click()
+                    page.wait_for_timeout(2000)
+
+                    assert not download_triggered, "CRITICAL: Download MUST be blocked on missing X-Content-SHA256 header!"
+                    print("✔ [MISSING-HEADER] Chrome download event was blocked (0 bytes downloaded).")
+
+                    notice_banner = page.locator('[role="alert"]:has-text("[전송 헤더 누락 · 저장 차단]")')
+                    notice_banner.wait_for(state="visible", timeout=10000)
+                    notice_text = notice_banner.inner_text()
+                    print(f"✔ [MISSING-HEADER] Alert banner verified: {notice_text.splitlines()[0]}")
+
+                    assert "[전송 헤더 누락 · 저장 차단]" in notice_text
+                    assert "전송 검증 생략 및 조용한 강등 위험을 방지하기 위해 파일 저장을 차단했습니다" in notice_text
+
+                    screenshot_path = os.path.join(output_dir, "real_chrome_real_uvicorn_missing_header_blocked.png")
+                    page.screenshot(path=screenshot_path)
+                    print(f"✔ [MISSING-HEADER] Saved screenshot: {screenshot_path}")
 
             browser.close()
             print(f"✔ [Scenario: {scenario.upper()}] PASSED!")
@@ -457,7 +1046,38 @@ def run_acceptance(
     headless: bool = True,
     scenario: str = "all",
 ) -> bool:
-    scenarios = ["verified", "mismatch", "missing-header"] if scenario == "all" else [scenario]
+    if scenario == "all":
+        scenarios = [
+            "verified",
+            "mismatch",
+            "missing-header",
+            "evidence-verified",
+            "evidence-unverified",
+            "evidence-run-failed",
+            "evidence-failed",
+            "rundetail-times",
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
+        ]
+    elif scenario == "all-artifacts":
+        scenarios = ["verified", "mismatch", "missing-header"]
+    elif scenario == "all-evidence":
+        scenarios = [
+            "evidence-verified",
+            "evidence-unverified",
+            "evidence-run-failed",
+            "evidence-failed",
+        ]
+    elif scenario == "all-s02":
+        scenarios = [
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
+        ]
+    else:
+        scenarios = [scenario]
+
     results = {}
 
     print("====================================================================")
@@ -496,7 +1116,7 @@ def run_acceptance(
         )
 
     print("\n====================================================================")
-    print("ALL 3 SCENARIOS (VERIFIED, MISMATCH, MISSING-HEADER) PASSED 100%!")
+    print("ALL TARGET SCENARIOS PASSED 100%!")
     print(f"Results recorded in: {summary_file}")
     print("====================================================================")
     return True
@@ -513,8 +1133,24 @@ def main():
         "--scenario",
         type=str,
         default="all",
-        choices=["all", "verified", "mismatch", "missing-header"],
-        help="Acceptance scenario to run (default: all 3 branches)",
+        choices=[
+            "all",
+            "all-artifacts",
+            "all-evidence",
+            "all-s02",
+            "verified",
+            "mismatch",
+            "missing-header",
+            "evidence-verified",
+            "evidence-unverified",
+            "evidence-run-failed",
+            "evidence-failed",
+            "rundetail-times",
+            "s02-login-success",
+            "s02-auth-failure",
+            "s02-nodes-journey",
+        ],
+        help="Acceptance scenario to run (default: all 11 branches)",
     )
     args = parser.parse_args()
 
