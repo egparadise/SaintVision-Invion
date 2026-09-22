@@ -425,6 +425,16 @@ def run_acceptance(
             original_route = page.route
             page.route = track_route
 
+            # Inject operator auth settings into window before any scripts execute
+            page.add_init_script(f"""
+                window.__SAINTVISION_CONFIG__ = {{
+                    idpAuthorizeUrl: 'http://127.0.0.1:{idp_port}/authorize',
+                    idpTokenUrl: 'http://127.0.0.1:{idp_port}/token',
+                    clientId: 'dev-web',
+                    scope: 'inv.api'
+                }};
+            """)
+
             # Scenario: s04-exp-00-expired-token-401
             print("\n[Scenario 1/13] s04-exp-00-expired-token-401: Expired Token 401 & Session Reset")
             page.goto(f"http://127.0.0.1:{frontend_port}/", wait_until="networkidle")
