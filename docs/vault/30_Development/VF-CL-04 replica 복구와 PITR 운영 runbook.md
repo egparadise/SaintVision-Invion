@@ -48,7 +48,7 @@ tags: ["saintvision", "vf-cl-04", "runbook", "replica", "pitr", "operations"]
 - 논리 dump는 PITR이 아니다 -- dump 시점으로만 복원된다. absent를 backup 있음으로 기록하지 않는다.
 - 기본 배포(archive_mode off)는 absent다. --require-pitr는 실제 복구 증거가 없는 이 도구에서 항상 exit 1로 인수를 차단한다.
 - backup 매체·보존·오프사이트는 운영자 결정. 이 runbook은 readiness 판정만 제공한다.
-- **보관 주기(2026-09-22 결정, 코디네이터가 사용자 위임으로 회신)**: WAL 아카이브·base backup **7일** — 5대 PC 파일럿 단계 값이며 **운영 전환 시 운영자가 재결정**한다. 7일 초과 세그먼트/베이스백업 정리 절차와 활성 후 복구 drill(실 RPO 측정)은 아직 없다. 새 PC 실측(dev-pg readiness absent · owned probe 물리 리허설 6회): [[2026-09-22_17-14-47_KST_PITR-RUNBOOK_Claude_실측]].
+- **보관 주기(2026-09-22 결정, 코디네이터가 사용자 위임으로 회신)**: WAL 아카이브·base backup **7일** — 5대 PC 파일럿 단계 값이며 **운영 전환 시 운영자가 재결정**한다. 정리 절차 = `python tools/pitr_archive_retention.py --archive <wal_archive> --backups <base backups dir> [--days 7]` — **기본 dry-run(계획 JSON만)**, `--apply`는 명시 플래그이며 삭제 전 같은 계획을 먼저 출력한다. 불변식: 최신 base backup은 항상 보존, 유지되는 backup들의 **최소 START WAL 세그먼트 이후 WAL은 절대 삭제 안 함**, `.history`/`.partial`·다른 timeline 보존, base backup이 없으면 아무것도 지우지 않는다(`tests/test_pitr_archive_retention.py` 9건, 무작위 300 아카이브 속성 시험 포함). 활성 후 복구 drill(실 RPO 측정)은 아직 없다. 새 PC 실측(dev-pg readiness absent · owned probe 물리 리허설 6회): [[2026-09-22_17-14-47_KST_PITR-RUNBOOK_Claude_실측]].
 
 ## 5. 하지 않는 것 (경계)
 
