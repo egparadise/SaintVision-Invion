@@ -15,8 +15,10 @@ replica table actually hold:
   a ready copy; which one a workload runs against is the Scheduler's
   locality/placement decision (VF-CX-03), not the resolver's.
 
-The model-manifest binding (a ``kind='model'`` URI that expands to shard URIs) is
-deferred to the VF-CX-02 contract and is not resolved here yet.
+The model-manifest binding accepts either the immutable ``ModelManifest`` used
+by the kernel internally or its strict project-authorized execution observation.
+The latter is the production boundary: the business role still rechecks every
+reported location/version/ready node through its own RLS-scoped catalogue.
 """
 
 from __future__ import annotations
@@ -105,17 +107,26 @@ from typing import Any, Callable  # noqa: E402
 
 from ..db.models.lineage import Model, ModelVersion  # noqa: E402
 
-#: ``(tenant_id, model_id, version) -> ModelManifest dict | None``. The business role
+#: ``(tenant_id, model_id, version) -> manifest observation dict | None``. The business role
 #: cannot read the kernel's ``inv.model_manifests`` (no SELECT grant), so the manifest is
-#: injected by the caller; how it is obtained in operation (grant / kernel HTTP / kernel
-#: route) is a Codex decision. Without a reader the resolver reports ``unavailable`` --
-#: it never fabricates an empty shard list.
+#: injected by the caller.  Production injects the project-authorized kernel
+#: ``ModelExecutionManifestObservation``; unit callers may still inject the immutable
+#: ``ModelManifest``. Without a reader the resolver reports ``unavailable`` -- it never
+#: fabricates an empty shard list.
 ManifestReader = Callable[[uuid.UUID, str, str], "dict[str, Any] | None"]
 
 _MANIFEST_KEYS = {"modelId", "version", "shards", "replicas"}
 _SHARD_KEYS = {"index", "offset", "byteLength", "sha256"}
 _REPLICA_KEYS = {"shardIndex", "locationId", "locationVersion", "nodeId", "state"}
 _REPLICA_STATES = {"unverified", "verified", "unavailable"}
+_OBSERVATION_KEYS = {
+    "projectId", "modelId", "version", "manifestHash", "observedAt", "shards",
+    "shardLocations", "licensePolicy", "classification", "materialisable",
+    "executionAuthorized", "requiresExecutionRevalidation",
+}
+_OBSERVATION_LOCATION_KEYS = {
+    "shardIndex", "locationId", "locationVersion", "readyNodes", "materialisable",
+}
 
 
 @dataclass(frozen=True)
@@ -141,6 +152,19 @@ class ShardResolution:
 
 
 @dataclass(frozen=True)
+class LocationResolution:
+    """Business-role recheck of one kernel shard/location observation."""
+
+    shard_index: int
+    location_id: str
+    location_version: int
+    ready_nodes: list[str]
+    location: DataLocation | None
+    materialisable: bool
+    reason: str  # ok | location-missing | location-version-drift | replica-not-ready
+
+
+@dataclass(frozen=True)
 class ModelResolution:
     parsed: ParsedUri
     model_version: ModelVersion
@@ -149,6 +173,7 @@ class ModelResolution:
     shards: list[ShardResolution] | None
     manifest_source: str  # reader | unavailable
     reason: str
+    locations: list[LocationResolution] | None = field(default=None)
     fully_materialisable: bool = field(default=False)
 
 
@@ -172,6 +197,34 @@ def _check_manifest_shape(manifest: Any) -> None:
             raise ValueError("ModelReplica.state outside the contract enum")
 
 
+def _is_execution_observation(manifest: Any) -> bool:
+    return isinstance(manifest, dict) and _OBSERVATION_KEYS <= set(manifest)
+
+
+def _check_observation_shape(observation: Any, *, project_id: str | None,
+                             model_id: str, version: str) -> None:
+    """Check the invariants the resolver relies on after boundary schema validation."""
+    if not _is_execution_observation(observation):
+        raise ValueError("manifest reader must return a ModelManifest or execution observation")
+    if observation["executionAuthorized"] is not False or (
+        observation["requiresExecutionRevalidation"] is not True
+    ):
+        raise ValueError("execution observation cannot carry execution authority")
+    if (observation["modelId"], observation["version"]) != (model_id, version):
+        raise ValueError("execution observation identity mismatch")
+    if project_id is not None and observation["projectId"] != project_id:
+        raise ValueError("execution observation project mismatch")
+    if not isinstance(observation["shards"], list) or not observation["shards"]:
+        raise ValueError("execution observation shards must be non-empty")
+    if not isinstance(observation["shardLocations"], list) or not observation["shardLocations"]:
+        raise ValueError("execution observation shardLocations must be non-empty")
+    for item in observation["shardLocations"]:
+        if not isinstance(item, dict) or not _OBSERVATION_LOCATION_KEYS <= set(item):
+            raise ValueError("execution observation shard location shape mismatch")
+        if bool(item["readyNodes"]) != bool(item["materialisable"]):
+            raise ValueError("execution observation materialisable flag mismatch")
+
+
 def _reader_scoped(query, tenant_id: uuid.UUID, reader_user_id: str | None):
     """The same public-reader scope :func:`resolve_location` applies (no bypass SQL)."""
     if reader_user_id is None:
@@ -186,6 +239,7 @@ def _reader_scoped(query, tenant_id: uuid.UUID, reader_user_id: str | None):
 
 
 def resolve_model(session: Session, *, tenant_id: uuid.UUID, uri: str,
+                  project_id: str | None = None,
                   reader_user_id: str | None = None,
                   manifest_reader: ManifestReader | None = None) -> ModelResolution:
     """Resolve ``inv://models/<name>@<version>/...`` into its registered version and, when
@@ -205,7 +259,10 @@ def resolve_model(session: Session, *, tenant_id: uuid.UUID, uri: str,
     parsed = parse_uri(uri)
     if parsed.kind != "model":
         raise ValueError(f"resolve_model expects a model URI, got kind={parsed.kind!r}")
-    model = session.scalar(select(Model).where(Model.tenant_id == tenant_id, Model.name == parsed.name))
+    model_query = select(Model).where(Model.tenant_id == tenant_id, Model.name == parsed.name)
+    if project_id is not None:
+        model_query = model_query.where(Model.project_id == project_id)
+    model = session.scalar(model_query)
     version = None
     if model is not None:
         version = session.scalar(select(ModelVersion).where(
@@ -240,6 +297,20 @@ def resolve_model(session: Session, *, tenant_id: uuid.UUID, uri: str,
             parsed=parsed, model_version=version, location=location, ready_nodes=ready_nodes,
             shards=None, manifest_source="unavailable",
             reason="manifest reader returned no manifest for this (model, version)",
+        )
+    if _is_execution_observation(manifest):
+        _check_observation_shape(
+            manifest, project_id=project_id, model_id=model.model_id, version=parsed.version
+        )
+        return _resolve_execution_observation(
+            session,
+            tenant_id=tenant_id,
+            parsed=parsed,
+            version=version,
+            location=location,
+            ready_nodes=ready_nodes,
+            reader_user_id=reader_user_id,
+            observation=manifest,
         )
     _check_manifest_shape(manifest)
     by_shard: dict[int, list[dict[str, Any]]] = {}
@@ -289,4 +360,99 @@ def resolve_model(session: Session, *, tenant_id: uuid.UUID, uri: str,
         shards=shards, manifest_source="reader",
         reason="expanded from the injected manifest; per-shard reasons are authoritative",
         fully_materialisable=all(s.materialisable for s in shards),
+    )
+
+
+def _resolve_execution_observation(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    parsed: ParsedUri,
+    version: ModelVersion,
+    location: DataLocation | None,
+    ready_nodes: list[str],
+    reader_user_id: str | None,
+    observation: dict[str, Any],
+) -> ModelResolution:
+    """Intersect a kernel observation with what the restricted business role sees now."""
+    checked_locations: list[LocationResolution] = []
+    replicas_by_shard: dict[int, list[ReplicaResolution]] = {}
+    for item in sorted(
+        observation["shardLocations"],
+        key=lambda value: (int(value["shardIndex"]), value["locationId"]),
+    ):
+        shard_index = int(item["shardIndex"])
+        loc = session.scalar(_reader_scoped(
+            select(DataLocation).where(
+                DataLocation.tenant_id == tenant_id,
+                DataLocation.location_id == item["locationId"],
+            ),
+            tenant_id,
+            reader_user_id,
+        ))
+        if loc is None:
+            reason = "location-missing"
+            verified_nodes: list[str] = []
+        elif int(loc.version) != int(item["locationVersion"]):
+            reason = "location-version-drift"
+            verified_nodes = []
+        else:
+            candidates = sorted(set(item["readyNodes"]))
+            verified_nodes = list(session.scalars(
+                select(DataReplica.node_id).where(
+                    DataReplica.tenant_id == tenant_id,
+                    DataReplica.location_id == loc.location_id,
+                    DataReplica.node_id.in_(candidates),
+                    DataReplica.state == "ready",
+                ).order_by(DataReplica.node_id)
+            ).all()) if candidates else []
+            reason = "ok" if verified_nodes else "replica-not-ready"
+        checked_locations.append(LocationResolution(
+            shard_index=shard_index,
+            location_id=item["locationId"],
+            location_version=int(item["locationVersion"]),
+            ready_nodes=verified_nodes,
+            location=loc,
+            materialisable=bool(verified_nodes),
+            reason=reason,
+        ))
+        for node_id in item["readyNodes"]:
+            node_ok = node_id in verified_nodes
+            replicas_by_shard.setdefault(shard_index, []).append(ReplicaResolution(
+                location_id=item["locationId"],
+                location_version=int(item["locationVersion"]),
+                node_id=node_id,
+                manifest_state="verified",
+                location=loc,
+                materialisable=node_ok,
+                reason="ok" if node_ok else reason,
+            ))
+
+    mapped_shards = {item.shard_index for item in checked_locations}
+    shards: list[ShardResolution] = []
+    for shard in sorted(observation["shards"], key=lambda value: int(value["index"])):
+        shard_index = int(shard["index"])
+        candidates = [item for item in checked_locations if item.shard_index == shard_index]
+        materialisable = any(item.materialisable for item in candidates)
+        shards.append(ShardResolution(
+            index=shard_index,
+            offset=int(shard["offset"]),
+            byte_length=int(shard["byteLength"]),
+            sha256=shard["sha256"],
+            replicas=replicas_by_shard.get(shard_index, []),
+            materialisable=materialisable,
+            reason="ok" if materialisable else (
+                "no-materialisable-replica" if shard_index in mapped_shards else "unrecorded"
+            ),
+        ))
+    return ModelResolution(
+        parsed=parsed,
+        model_version=version,
+        location=location,
+        ready_nodes=ready_nodes,
+        shards=shards,
+        manifest_source="reader",
+        reason="kernel observation rechecked through the restricted business catalogue",
+        locations=checked_locations,
+        fully_materialisable=all(shard.materialisable for shard in shards),
     )

@@ -1,11 +1,11 @@
 ---
 doc_id: "ARCH-MODEL-REGISTRY-BOUNDARY-001"
 title: "모델 레지스트리와 실행 Manifest 권한 경계"
-version: "1.9.0"
+version: "1.10.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-22T20:06:08+09:00"
+updated: "2026-09-22T21:32:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,7 +20,7 @@ source_of_truth: "Git"
 | public.models/model_versions/lineage | S10 모델 등록·업무 버전·평가/승인 추적 | 커널 manifest 존재, 현재 bytes 일치, 실행 permit |
 | inv.model_manifests/model_shard_locations | tenant/project/model/version별 불변 실행 manifest, source Run 및 DataLocation 버전 참조, 커밋 당시 full-byte 검증 | S10 released 상태, 현재 복제본 가용성, 새 실행 권한 |
 
-inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 커밋 요약 GET은 아래1.1.0에 정의한다. ModelVersion의 명시적 불변 결속은 아래1.4.0 내부 worker service로 제공한다. HTTP·runtime permit 연결은 아직 없다.
+inv_app의 커널 테이블 권한을 확장하지 않는다. 공개 조회가 필요하면 커널의 현재 사용자·프로젝트 인가를 거친 API로 최소 메타데이터를 제공한다. 커밋 요약 GET은 아래1.1.0에 정의한다. ModelVersion의 명시적 불변 결속은 아래1.4.0 내부 worker service로 제공하고, HTTP resolver 운영 결속은 아래1.10.0에서 추가한다. resolver 조회는 runtime permit 연결이 아니다.
 
 ## 정책 필드와 후속 결속 합격 조건
 
@@ -161,3 +161,14 @@ INV_API_CONFIG의 modelRegistryPolicy를 생산 factory가 읽어 승인/dispatc
 - 현재 catalog location version이 다르거나 verified ready replica가 없으면 해당 매핑은 `readyNodes=[]`, `materialisable=false`다. 빈 배열을 성공으로 올리지 않으며 전체 `materialisable`은 모든 shard가 하나 이상의 materialisable mapping을 가질 때만 true다.
 - `executionAuthorized=false`, `requiresExecutionRevalidation=true`다. 이 조회는 permit, approval, lease, fence, frozen input 또는 실제 bytes 재검사를 만들거나 대체하지 않는다.
 - `inv_kernel`과 `inv_app`의 table SELECT 권한은 넓히지 않는다. migration 0046의 `public.model_location_readiness(text[])` SECURITY DEFINER 함수만 현재 `inv.tenant_id`에 묶인 location version과 ready node ID를 반환하며 PUBLIC/`inv_app` EXECUTE는 없다. 원시 경로·contribution·key·endpoint는 응답하지 않는다.
+
+
+## inv URI resolver 운영 결속 (1.10.0, VF-CL-02 option d)
+
+`GET /v1/projects/{project}/models/resolve?uri=inv://models/<name>@<version>/<path>`는 1.9.0의 strict 관측 계약을 `saintvision.services.resolver.resolve_model`의 주입식 manifest reader에 결속한다. 응답은 새 완화 envelope가 아니라 동일한 `ModelExecutionManifestObservation`이며 기존 `/commitment`와 `/execution-manifest`는 불변이다.
+
+- 요청마다 kernel `can_request`와 linked business permission을 먼저 다시 확인한다. 그 다음에만 별도 `inv_app` login의 tenant transaction에서 `public.models/model_versions`를 `(tenant, project, name, version)`으로 찾는다. 타 project는 모델 존재 여부를 조회하기 전에 `AUTH-0030`/403, 권한 있는 project의 미존재 모델은 `MODEL-0004`/404다.
+- manifest reader는 1.9.0의 `ModelExecutionManifestObservation.get`을 매 호출 새로 실행한다. 저장된 성공 응답이나 idempotency ledger를 재생하지 않으므로 membership/grant 폐기 뒤 같은 GET은 403이다.
+- `resolve_model`은 kernel이 보고한 모든 `locationId/locationVersion/readyNodes`를 제한된 business catalog에서 다시 확인한다. 최종 `readyNodes`는 두 관측의 교집합뿐이며 business 경계가 kernel 관측에 없던 node를 추가할 수 없다. location 누락·version drift·ready replica 소실은 매핑별 빈 배열과 `materialisable=false`로 강등하고, 전체 값도 모든 shard가 materialisable일 때만 true다.
+- `inv_app`에는 `inv.model_manifests`·`inv.model_shard_locations` 직접 권한을 주지 않는다. tenant GUC가 없는 public RLS 조회는 0행이고, 커널 manifest는 strict 계약 값으로만 경계를 건넌다.
+- 이 조회도 실행 permit이 아니다. `executionAuthorized=false`와 `requiresExecutionRevalidation=true`를 유지하며 approval, lease, fence, frozen input, 실제 bytes 검증을 만들거나 대체하지 않는다.

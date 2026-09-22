@@ -10,6 +10,7 @@ from inv.contracts import validate_contract
 from inv.errors import DomainError
 from inv.generated.models import ModelExecutionManifestObservation as GeneratedObservation
 from inv.model_view import ModelExecutionManifestObservation
+from inv.model_uri_resolver import ModelUriResolver
 
 
 FIXTURE = (
@@ -50,4 +51,11 @@ def test_serving_class_is_bound_to_the_strict_response_contract():
     # Structural anchor: check_contract_bindings also requires this test to name
     # the response and import the module that validates it on the serving path.
     assert ModelExecutionManifestObservation.__module__ == "inv.model_view"
+    assert ModelUriResolver.__module__ == "inv.model_uri_resolver"
 
+
+def test_uri_resolver_serving_anchor_rejects_a_corrupt_projection():
+    body = payload()
+    body["executionAuthorized"] = True
+    with pytest.raises(DomainError, match="ModelExecutionManifestObservation: invalid contract"):
+        ModelUriResolver._checked(body)

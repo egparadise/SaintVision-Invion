@@ -48,7 +48,7 @@ INV = ROOT / "services" / "control-plane" / "src" / "inv"
 
 # Kernel modules that build and serve a response to the frontend.
 SERVING_MODULES = [
-    "result_view.py", "model_view.py", "storage_view.py", "workspace_editor.py",
+    "result_view.py", "model_view.py", "model_uri_resolver.py", "storage_view.py", "workspace_editor.py",
     "control.py", "shards.py", "app.py",
     "node_resource_usage.py",  # Claude: GET .../nodes/{node_id}/resource-usage (decision #2 A)
 ]

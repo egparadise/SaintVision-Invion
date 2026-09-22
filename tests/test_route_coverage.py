@@ -128,6 +128,8 @@ def test_model_execution_manifest_route_is_project_scoped_and_separate_from_comm
     assert "/v1/projects/{}/models/{}/versions/{}/execution-manifest" in routes
     assert "/v1/models/{}/versions/{}/execution-manifest" not in routes
     assert "/v1/projects/{}/models/{}/versions/{}/commitment" in routes
+    assert "/v1/projects/{}/models/resolve" in routes
+    assert "/v1/models/resolve" not in routes
 
 
 @pytest.mark.parametrize("holder", ["app", "api", "router", "business", "control"])

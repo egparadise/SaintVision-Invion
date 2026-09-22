@@ -5631,7 +5631,7 @@
       ]
     },
     "ModelExecutionManifestObservation": {
-      "description": "Project-authorized manifest projection for a resolver. Availability is observed, not execution authority.",
+      "description": "Project-authorized manifest projection served by both immutable-ID observation and inv URI resolution. Every request reauthorizes; availability is observed and never execution authority.",
       "type": "object",
       "additionalProperties": false,
       "properties": {

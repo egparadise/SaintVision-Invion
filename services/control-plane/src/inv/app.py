@@ -432,8 +432,14 @@ def create_app(
     storage_view = StorageObservationView(database)
 
     from .model_view import ModelCommitObservation, ModelExecutionManifestObservation
+    from .model_uri_resolver import ModelUriResolver
     model_view = ModelCommitObservation(database)
     model_execution_view = ModelExecutionManifestObservation(database)
+    model_uri_resolver = (
+        ModelUriResolver(database, business.state.engine)
+        if business is not None and getattr(business.state, "engine", None) is not None
+        else None
+    )
 
     @api.get("/v1/projects/{project}/models/{model_id}/versions/{version}/commitment")
     def model_commitment(project: str, model_id: str, version: str,
@@ -444,6 +450,12 @@ def create_app(
     def model_execution_manifest(project: str, model_id: str, version: str,
                                  identity=Depends(authenticated)):
         return model_execution_view.get(identity.principal, project, model_id, version)
+
+    @api.get("/v1/projects/{project}/models/resolve")
+    def resolve_model_uri(project: str, uri: str, identity=Depends(authenticated)):
+        if model_uri_resolver is None:
+            raise DomainError("SYS-0001", "Business model resolver unavailable", 503)
+        return model_uri_resolver.get(identity.principal, project, uri)
 
     @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
     def storage_observation(project: str, run_id: str, request_id: str,
