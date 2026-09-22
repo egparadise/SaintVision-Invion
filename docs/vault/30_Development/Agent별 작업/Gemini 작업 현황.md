@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.109"
+version: "1.0.110"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-22T12:09:00+09:00"
+updated: "2026-09-22T17:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -26,6 +26,11 @@ source_of_truth: "Git"
 - **Codex origin/integration 착지 4건 독립 검토 완결 (Gemini, 2026-09-22)**:
   - `881f2911`(fix(ci) 귀속·재현성), `1312e295`(EvidenceEnvelope 5개 실 PG 사이트 무게 고정), `eceac8cf`(결정 #2 A / #5 A 정본 계약), `dcf2b947`(fixture producer reachability 정적 도구).
   - 실 PG(`127.0.0.1:55432/invdev`) 및 `.venv`(Python 3.14.7) 전수 실측 완료, 전 건 **SOUND (합격)** 판정 (PR #37). 전문 [[2026-09-22_16-55-00_KST_Gemini_Codex착지4건_독립검토]].
+- **결정 #6·#7 준비 완결 (Gemini, 2026-09-22)**:
+  - 결정 #7(노드 시각 스큐 알람) 선행 조건인 ERR-DESIGN-007 규격 개정안([[2026-09-22_노드_시각_스큐_알람_ERR-DESIGN-007_규격개정안_Gemini]]) 및 결정 #6(미연결 능력 부류 3종 현황·노출분석, [[2026-09-22_미연결_능력_부류_현황_및_노출분석_Gemini]]) 작성 완료.
+  - 커널 런타임 가드(±5초) 공인, P2 알람 라우팅 정합, 실 PG 검증 시험 명세 및 실패 Run 재시도(ModelRetry)/온디맨드 복구/배치 예약 분석 수립. PR #38 등록.
+
+
 
 ## 세션 랩업: S01-FE 공식 완결(done), Vite 개발 서버(3005) 정상 종료 및 환경 이전 대비 전면 정지 (tip `c6e9d9aa`)
 
