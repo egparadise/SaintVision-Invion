@@ -1,14 +1,24 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.164"
+version: "1.0.165"
 status: "review"
 author: "Codex"
-updated: "2026-09-22T18:21:00+09:00"
+updated: "2026-09-22T18:44:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-22 task_84d2b7804299 — 커널·계약·CI와 후속 reviewer 판정
+
+- 기준선 `d01c931a`; owner Codex, 독립 검토 Claude. 코드 착지: `881f2911`, `1312e295`, `eceac8cf`, `dcf2b94`, `51d53b7f`, `2aa80899`, `2e803cd6`, `4b2204d7`, `7509f667`, `33283867`, `9f1c0fcc`, `563c54ce`. reviewer 착지: `3882496d`.
+- 완료한 것: 5-workflow 실제 실행·red 귀속, Codex CI/harness 보정, EvidenceEnvelope 실PG 5-site 서빙 거부, docs 계약·프런트 게이트/UTF-8, 결정 #2/#5 계약, fixture reachability report-only, 결정 #6a 실패 model Run 재시도 HTTP 계약. F-A/F-B는 `33283867`에 반영했다.
+- 검증: 6a clean tree focused 68 passed, 실PG HTTP 1 passed, bindings 51 fixtures/16 response types/19 sites, app anchor 3 rejection-tested/0 gaps, Go build·vet·test, TS strict, docs/frontend/ontology/ratchet 모두 exit 0. Core [35706465645](https://github.com/egparadise/SaintVision-Invion/actions/runs/35706465645)는 전체 단계 success, Browser [35710556600](https://github.com/egparadise/SaintVision-Invion/actions/runs/35710556600)도 success다.
+- 교차검토: Node resource usage의 grant·신선도·`released_at IS NULL` lease 집계·RES-0010/0011에 finding 없음. Frontend path filter는 현재 실제 의존 뿌리를 모두 덮고 `563c54ce` contracts 변경에서 run 35710325340이 실제 success했으므로 machinery 변경 없이 유지한다.
+- reviewer 판정: S02-DB/S03-DB는 review 진입만 수용했다. 실 IdP·물리 Node·실 컨테이너 금지 명령/출력·선행 카드가 남아 있어 done/self-close 금지다. registry·ontology 및 판정 History는 `3882496d`.
+- 다음 첫 행동: 최종 문서 SHA에 frontend를 수동 dispatch해 다섯 workflow를 동일 SHA로 완주시키고 run ID를 기록한 뒤 Obsidian check/apply를 수행한다. hosted 결과가 red면 소유 분류 후 Codex 몫만 수정한다.
+- Evidence: [[2026-09-22_18-37-00_KST_CODEX-KERNEL-CI-CONTRACT_Codex_최종보고]], [[2026-09-22_18-27-37_KST_S02-DB_S03-DB_Codex_독립검토]].
 
 ## 2026-09-22 hosted CI 러너 기아 방지
 
