@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.17"
+version: "1.2.18"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T03:50:00+09:00"
+updated: "2026-09-23T04:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -98,6 +98,8 @@ c28cdff (Claude, 2026-09-11): CL-03이 지목한 네 결함을 수정하고 각 
 ## 백업-클로드 세션 (Claude Code, 별도 세션 — 이 절만 갱신)
 
 다른 Claude 주체(오케스트레이션 워커·Antigravity)와 같은 작업판을 쓰므로 충돌을 피해 이 절만 갱신한다(코디네이터 지시 2026-09-22). 앞선 카드(새 PC 첫날 triage·결정 #7 구현)는 「최근 확인한 진척」에 있다.
+
+PR #89 Codex LAN pilot 다중 Node(fce4f6de) 독립 검토 → **조건부 승인** (Claude, 2026-09-23, 카드 dd): 보안 불변식 6항(키 미출력·source IP→해당 Node 번들만·허용 IP 목록·hash 비서빙·기존 Node/키/채널 교체 거부·부분 실패 보존) 코드 대조 ✔, 단일 Node state 하위 호환은 코디네이터 state 사본(v1 재구성)으로 PG-free 프로브 ✔(id/IP 보존·CSR CN 식별·legacy 경로·policy 무변경 수용·디스크 무변경), 새 시험 6 passed·LAN bootstrap 2 passed 1 skip. 되살림 4: M2(CN 무시)·M4(id 재발급) KILLED, **M1(비-primary legacy fallback)·M3(policy identity 불일치 수용) SURVIVED → 조건 = 시험 보강 2건**. Docker 실검증은 코디네이터 수행, PR CONFLICTING → rebase 후 SHA 재확인. [[2026-09-23_04-05-00_KST_PR89_LAN-pilot_다중Node_fce4f6de_독립검토_Claude]] (PR agent/claude/review-pr89)
 
 Codex 카드 17 독립 검토 → **승인** (Claude, 2026-09-23, 카드 cc, docs-only): b890d3ad ADR-100 CP 호스트 Node 겸임 + 5노드 lane v1.3 — 분류(등록 5/물리 host 5/CP 독립 4/겸임 1)가 ADR·lane·History 세 문서에서 일치하고 S05 timed wave(candidate 구성 전 cordon/offer 0·Explain 선택 0·사후 삭제 금지)·S07 기본 20회(Ubuntu 4×5, eligible만 target) 사전 제외 규칙과 정합; all-five smoke 0a 행·S07 3 scenarioClass 분리; registry '5대' 유지는 AC-05/AC-07/5대 PC outcome 문구와 충돌 0(registry diff 0 확인); 미등록·미부하·파일럿 provenance 정직 표기. check_docs tip ccca9b8f exit 0. 관찰 3(O1 count 필드 3 vs 4, O2 correlated drill JUnit failure vs UNMEASURED/exit 3, O3 co-location 유도 검증용 CP hostId). [[2026-09-23_03-45-00_KST_Codex카드17_ADR-100_CP호스트_Node겸임_b890d3ad_독립검토_Claude]] (PR agent/claude/adr100-review)
 
