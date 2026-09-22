@@ -1,11 +1,11 @@
 ---
 doc_id: "ERR-DESIGN-008"
 title: "프로젝트 배치 잠금과 transaction timeout 경합"
-version: "1.3.2"
+version: "1.3.4"
 status: "accepted-mitigation-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T05:55:00+09:00"
+updated: "2026-09-23T07:00:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tags: ["placement", "concurrency", "lock-timeout", "statement-timeout", "postgresql", "S05-DB", "F-S05-01", "F-S05-02", "F-S05-03"]
@@ -33,7 +33,11 @@ Claude 카드 20의 커널 무관 PG probe는 가능한 lock queue mechanism을 
 
 Card19 실제 legacy 20동시 wave는 arrival spread 0.793ms, max project-lock waiter 19, blocking chain depth 1, timeout 0이었다. 따라서 이 wave는 19 waiter가 현재 holder를 직접 기다리는 fan-in이지 카드 20의 depth≥3 holder chain이 아니다. request/acquire/hold P95는 2142.809/1588.193/151.225ms였지만 `55P03`은 0건이었다. `log_lock_waits=off`이고 server log를 읽지 않았으므로 원인은 여전히 **미확정**이다. holder 교체마다 실제 wait segment와 `lock_timeout` clock이 다시 시작돼 각 segment는 500ms 미만이고 누적 client elapsed만 길어졌다는 가설로 좁히며, `log_lock_waits=on` 상관 재실행은 별도 카드로 제안한다. [[2026-09-23_01-05-00_KST_F-S05-02_57014_원인분리_Codex]], [[2026-09-23_05-55-00_KST_S05_legacy_큐깊이_실측_Codex]], [[s05-symmetric-metrics-card18]], [[s05-legacy-queue-card19]].
 
-다음 후보는 limit-row migration이 아니라 candidate의 lock-timeout 예산 또는 project별 queue 깊이 상한이다. Card19은 요청 arrival/completion timeline, parameter-free statement class, backend `wait_event`, blocking graph와 `log_lock_waits` 설정을 같은 20동시 wave에서 수집했다. server log 상관과 candidate 정책은 Claude 검토와 별도 결정 전 구현·실행하지 않는다.
+Claude 카드 21의 커널 무관 probe는 legacy의 정적 순서와 맞는 원인 가설을 제시했다. `approvals._ledger`의 idempotency INSERT가 FK로 project 행의 KEY SHARE를 먼저 보유한 뒤 `FOR NO KEY UPDATE`를 요청하면 tuple FIFO를 건너뛰고 holder xid를 직접 기다릴 수 있다. 이 경우 holder 교체마다 `lock_timeout` 구간이 다시 시작돼 depth-1 fan-in·55P03 0·2초 57014를 함께 설명한다. candidate limits `FOR UPDATE`에는 같은 선행 약한 잠금이 없어 tuple FIFO가 누적된다는 설명이다. 다만 제품 커널에서는 아직 probe 인과를 확인하지 않았으므로 사실로 승격하지 않는다.
+
+[[S05 log_lock_waits opt-in 재실행 설계]] v1.1은 disposable DB의 `log_lock_waits=on`, `deadlock_timeout=50ms`와 `pgrowlocks('inv.projects')`를 같은 legacy 20×1 wave에서 상관한다. holder별 다른 xid wait/acquired 반복·tuple wait 0·다수 Key Share+하나 No Key Update·55P03 0을 함께 본 경우에만 가설을 지지한다. 5ms는 명목 sampler이고 실제 약 17ms, 0.793ms는 client barrier 기준이며 DB 첫 Lock 표본은 515ms였다는 관찰 경계도 포함한다. `ALTER SYSTEM`·운영 DB·자동 CI는 금지하며 exact-SHA coordinator 승인 전에는 실행하지 않는다.
+
+후속 옵션은 (A) 선행 약한 잠금과 limits 최종 lock을 `FOR NO KEY UPDATE`로 낮추는 변형, (B) FIFO를 유지하는 queue 깊이 상한이다. KEY SHARE 뒤 기존 `FOR UPDATE` 승격은 교착 가능성 때문에 제외한다. A의 비FIFO 기아·thundering herd·fail-fast 상충과 B의 admission 원자성·누수 복구를 각각 검증해야 하며, server log/pgrowlocks 확인과 별도 결정 전에는 구현하지 않는다.
 
 계측 제한도 오류 설계 경계에 포함한다. `BoundDatabase` stale retry는 caller-owned outer transaction의 final phase만 방출해 attempt 1 hold가 현재 집계되지 않고, 운영 `app.py`는 `placement_metric_sink`를 주입하지 않으며 logger fallback은 candidate flag on에서만 동작한다. 따라서 nested retry의 attempt coverage와 기본 legacy 운영 metric은 불완전하고, benchmark sink 수치를 운영 telemetry로 승격할 수 없다.
 

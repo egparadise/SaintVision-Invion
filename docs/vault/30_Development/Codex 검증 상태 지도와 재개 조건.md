@@ -1,15 +1,22 @@
 ---
 doc_id: "STATUS-CODEX-VERIFICATION-001"
 title: "Codex 검증 상태 지도와 재개 조건"
-version: "1.5.23"
+version: "1.5.25"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T03:45:00+09:00"
+updated: "2026-09-23T07:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 검증 상태 지도와 재개 조건
+
+## 2026-09-23 S05-DB log_lock_waits 진단 설계
+
+- Card19의 55P03 부재 원인은 계속 미확정이다. Claude 카드 21 probe는 idempotency FK가 project KEY SHARE를 먼저 잡아 tuple FIFO를 우회한다는 가설을 제시했지만 제품 인과로 승격하지 않았다.
+- 후속 설계는 disposable DB의 `log_lock_waits=on`, `deadlock_timeout=50ms`와 `pgrowlocks('inv.projects')`를 legacy 20×1에서 함께 수집한다. holder별 다른 xid wait/acquired 반복·tuple wait 0·다수 Key Share+하나 No Key Update·55P03 0을 모두 본 경우에만 `KEY_SHARE_RESET_SUPPORTED`다.
+- 실행 유효성은 승인 SHA·네 SHOW 값·request/backend 1:1·log pair completeness·pgrowlocks snapshot·DB/role/raw scratch 잔존 0이 모두 필요하다. sampler 5ms는 명목/실측 약 17ms를 병기하고, arrival 0.793ms는 client barrier 기준, DB 첫 Lock 표본 515ms, 외부 role/DB blocker는 invalid로 처리한다.
+- 정책 재개 조건: 확인 시험 뒤 별도 결정. 옵션 A는 limits `FOR NO KEY UPDATE` 전환과 기아/thundering herd 위험, 옵션 B는 FIFO queue 깊이 상한과 admission 원자성을 다룬다. workflow/runner/parser는 미구현, 실제 PG/부하는 미실행이며 Claude의 실수 50동시 수치는 사용하지 않는다. flag off·S05 `review`·candidate/50/5노드 금지 유지. [[S05 log_lock_waits opt-in 재실행 설계]].
 
 ## 2026-09-23 S05-DB legacy 큐 깊이 실측
 

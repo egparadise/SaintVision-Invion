@@ -1,14 +1,27 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.193"
+version: "1.0.194"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T06:15:00+09:00"
+updated: "2026-09-23T07:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 PR #96 S05-FE 시나리오 매트릭스 계약 검토
+
+- head `90991423`를 실제 pool route/service/schema, generated contract, frontend adapter/DOM, ProblemDetails와 대조해 수정 요청했다. 코멘트: <https://github.com/egparadise/SaintVision-Invion/pull/96#issuecomment-5783083226>.
+- 차단: 미존재 pool 실제 409를 404로 기재, preview 후보를 `shd_*`로 합성해 Zero Fake Shards와 모순, UI `spread|binpack`과 서버 enum 불일치로 plan 201 불가, 관측 전용 편입의 server-side 거부 부재. 문서/계약·어댑터 정정을 분리했다.
+- focused route/contract 검증 63 passed/exit 0. Gemini PR branch는 수정하지 않았다.
+
+## 2026-09-23 S05 log_lock_waits 재실행 설계
+
+- Card19의 waiter 19/depth 1/timeout 0과 Claude 카드 21의 idempotency FK→project KEY SHARE→tuple FIFO 우회 probe 가설을 연결했다. 제품 인과는 미확정이며 `log_lock_waits=on` server segment와 `pgrowlocks('inv.projects')`를 같은 legacy 20×1 wave에서 확인하는 설계다.
+- 5ms sampler는 명목값(실측 약 17ms), 0.793ms arrival은 client barrier 기준(DB 첫 Lock 표본 515ms), 다른 role/DB blocker는 depth가 끊긴다는 O-a/O-b/O-c를 판정 경계에 넣었다. disposable DB session default만 쓰며 `ALTER SYSTEM`·config reload/restart·운영 DSN은 금지한다.
+- 후속 옵션은 (A) limits 최종 lock까지 `FOR NO KEY UPDATE`로 낮추는 선행 약한 잠금 변형과 (B) FIFO queue 깊이 상한이다. KEY SHARE+기존 `FOR UPDATE`는 교착 가능성 때문에 제외하고, 기아·thundering herd·fail-fast 상충과 rollback을 명시했다.
+- 별도 Environment 승인형 `workflow_dispatch`를 제안했지만 workflow/runner/parser는 미구현이고 실행하지 않았다. Claude의 실수 50동시 1회 수치는 사용하지 않는다. coordinator exact-SHA 승인 전 실행 금지, flag off·S05 `review`·candidate/50/5노드 미승격. [[S05 log_lock_waits opt-in 재실행 설계]], [[2026-09-23_06-15-00_KST_S05_log_lock_waits_재실행설계_Codex]].
 
 ## 2026-09-23 LAN pilot Windows CP 겸임 Node
 
