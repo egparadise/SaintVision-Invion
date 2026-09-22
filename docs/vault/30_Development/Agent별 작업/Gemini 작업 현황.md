@@ -21,6 +21,26 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
 
+## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
+
+- **Claude 검토 의견 F1~F5 전수 반영 완결 (`a40ca438`)**:
+  - **F1 (증거 재현성 및 정직한 중지 사유)**:
+    - 러너 1269~1284행의 이전 PASS 캐리오버(`existing_passed`) 로직 전면 제거 (Zero Fake Pass).
+    - 가용 메모리 1.0GB 미만(실측 0.88GB) 시 'pending execution'이 아닌 'Stopped due to memory guard (available memory 0.88GB below 1.0GB threshold)'를 사유로 정직 기록.
+    - 저장소 정본 가상환경(`.venv`, Python 3.14.7)으로 실행.
+    - 증거 `gitCommitSha`를 실제 도달 가능한 HEAD 커밋 SHA(`a40ca438`)로 기록.
+  - **F2 (자가 주입 단언 제거)**:
+    - EXP-02: `page.evaluate` DOM 주입 제거. 비인가 프로젝트 요청 에러를 통한 실제 `approval-stale-warning` 렌더링 검증으로 전환.
+    - CNC-03: `page.evaluate` DOM 주입 제거. DB에 활성 리스(`allocated`)를 실 레코드로 삽입하여 서버 응답의 `resourceReleasePending: true`를 유도하고 실제 배너 단언.
+    - SSE-01: 인메모리 링버퍼는 UI 컴포넌트(`ApprovalCenter.tsx`) 자체 구현이 아니므로 라이브 SSE 결속 후 실측(`UNMEASURED`)으로 정직 분류.
+  - **F3 & F4 (실제 DOM 스크래핑 및 표기 정합)**:
+    - Wire 시나리오에 `[Wire]` 접미사 명시.
+    - EXP-01/02 등 UI 시나리오는 실제 DOM 배지 및 신선도 타임스탬프 스크래핑 방식으로 검증.
+  - **F5 (메모리 가드 및 프로세스 정리 견고화)**:
+    - Windows 네이티브 `ctypes.windll.kernel32.GlobalMemoryStatusEx` 기반 실측 가드 적용.
+    - 종료 시 `taskkill /F /T /PID` 프로세스 트리 강제 정리 연동.
+- **증거 정본**: `docs/vault/30_Development/Evidence/s04_fe_matrix_acceptance.json` (총 13건, 0 PASS, 0 FAIL, 13 UNMEASURED, `mockApiUsed: false`, `realUvicornUsed: true`, `realDevIdPUsed: true`, `assessment: UNMEASURED`).
+
 ## 2026-09-23 S04-FE 13개 시나리오 러너 보강 및 메모리 가드 자체 안전 중지 (`agent/gemini/s04-fe-matrix-measured`)
 
 - **러너 코드 보강 완결 (`6c291ea6`)**:
