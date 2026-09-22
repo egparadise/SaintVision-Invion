@@ -11,7 +11,9 @@ serving code drops or renames its anchor call, the name is absent and the test f
 removing the anchor on a sample -- see the review doc).
 """
 import datetime as _dt
+import base64
 import uuid
+from types import SimpleNamespace
 
 import pytest
 
@@ -19,6 +21,7 @@ from inv import model_view as mv_mod
 from inv import result_view as rv_mod
 from inv import storage_view as sv_mod
 from inv import workspace_editor as we_mod
+from inv.errors import DomainError
 from inv.model_view import ModelCommitObservation
 from inv.result_view import ResultView
 from inv.storage_view import StorageObservationView
@@ -209,3 +212,70 @@ def test_storage_view_result_anchors_storage_observation_view(monkeypatch):
         p, "prj_x", "run_x", req
     )
     assert "StorageObservationView" in rec
+
+
+def test_storage_view_rejects_invalid_evidence_envelope_at_serving_anchor(monkeypatch):
+    """The stored-envelope verification branch must execute the real contract validator."""
+    p = _Principal()
+    checked_at = _dt.datetime(2026, 9, 22, tzinfo=_dt.timezone.utc)
+    certificate = base64.b64encode(b"synthetic-certificate").decode()
+    detail = {
+        "scope": "node-storage-sample-v1",
+        "requestId": "req_x",
+        "evidenceId": "evd_x",
+        "challenge": {},
+        "certificateDer": certificate,
+        "unverifiable": 0,
+        "examined": 1,
+        "unsampled": 0,
+        "cataloguedAtIssue": 1,
+        "operationalAcceptanceAssessed": False,
+        "envelope": {"payload": "cA==", "signature": "cw=="},
+    }
+    pending = {
+        "run_id": "run_x",
+        "contribution_id": "stc_x",
+        "request_id": "req_x",
+        "subject_id": p.subject_id,
+        "challenge": {},
+    }
+    response_hash = sv_mod.hashlib.sha256(
+        sv_mod.canonical({"envelope": detail["envelope"], "certificate": certificate})
+    ).hexdigest()
+    row = {
+        "checked_at": checked_at,
+        "response_sha256": response_hash,
+        "evidence_run": "run_x",
+        "envelope": {"result": "not-a-result"},
+        "contribution_id": "stc_x",
+        "evidence_id": "evd_x",
+        "check_id": "chk_x",
+        "detail": detail,
+        "reachable": True,
+        "healthy": True,
+        "sampled_count": 1,
+        "mismatch_count": 0,
+    }
+    challenge = SimpleNamespace(catalogued=1, digest=lambda: "challenge-digest")
+    verified = SimpleNamespace(
+        sampled=1,
+        mismatches=0,
+        unverifiable=0,
+        examined=1,
+        unsampled=0,
+        sample_healthy=True,
+        observed_at=int(checked_at.timestamp()),
+        payload_sha256="a" * 64,
+    )
+    monkeypatch.setattr(sv_mod, "verify_sample", lambda *a, **k: verified)
+    original = sv_mod.validate_contract
+    calls = []
+
+    def record_and_validate(name, value=None):
+        calls.append(name)
+        return original(name, value)
+
+    monkeypatch.setattr(sv_mod, "validate_contract", record_and_validate)
+    with pytest.raises(DomainError, match="VERIFY-0032"):
+        sv_mod.StorageObservationView._verified(p, pending, challenge, row, int(checked_at.timestamp()))
+    assert "EvidenceEnvelope" in calls
