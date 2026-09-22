@@ -788,7 +788,12 @@ def run_acceptance(
 def main():
     parser = argparse.ArgumentParser(description="Run S02-FE Real Browser Acceptance")
     parser.add_argument("--chrome-path", default=DEFAULT_CHROME_PATH, help="Path to Google Chrome executable")
-    parser.add_argument("--frontend-port", type=int, default=3005, help="Port of running Vite frontend")
+    parser.add_argument(
+        "--frontend-port",
+        type=int,
+        default=3005,
+        help="Port of running Vite frontend (default: 3005. Note: non-default ports require registration in Dev IdP redirect allowlist and api.json.allowedOrigins)",
+    )
     parser.add_argument("--backend-port", type=int, default=8080, help="Port for Uvicorn backend")
     parser.add_argument("--idp-port", type=int, default=8090, help="Port for dev IdP")
     parser.add_argument("--headless", action="store_true", default=True, help="Run Chrome in headless mode")

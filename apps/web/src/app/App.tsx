@@ -388,14 +388,22 @@ export const App: React.FC = () => {
   };
 
   const handleApprove = async (approvalId: string, _nonce: string, shown?: ReviewedAction) => {
+    const currentSession = sessionRef.current;
+    const currentScope = scopeRef.current;
     try {
       setActionError(null);
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
       await approveReviewed(approval, shown);
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       // Fetch fresh runs and approvals after server confirmed approval
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       console.error('Backend approval API failed:', err);
       const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 처리 중 오류가 발생했습니다.';
       setActionError(`승인 처리 실패: ${errMsg}`);
@@ -404,14 +412,22 @@ export const App: React.FC = () => {
   };
 
   const handleReject = async (approvalId: string, _reason: string) => {
+    const currentSession = sessionRef.current;
+    const currentScope = scopeRef.current;
     try {
       setActionError(null);
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval) throw new Error('승인 요청을 새로고침하세요.');
       await decideApproval(approval, 'reject');
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       // Fetch fresh runs and approvals after server confirmed rejection
       await Promise.all([fetchApprovals(), fetchRuns()]);
     } catch (err: any) {
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       console.error('Backend approval reject API failed:', err);
       const errMsg = err?.problem?.detail || err?.detail || err?.message || '승인 반려 처리 중 오류가 발생했습니다.';
       setActionError(`승인 반려 실패: ${errMsg}`);
@@ -420,12 +436,20 @@ export const App: React.FC = () => {
   };
 
   const handleCancelRun = async (runId: string, _reason: string) => {
+    const currentSession = sessionRef.current;
+    const currentScope = scopeRef.current;
     try {
       setActionError(null);
       const targetRun = runs.find((r) => r.id === runId);
       await cancelKernelRun(targetRun?.projectId, runId);
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       await fetchRuns();
     } catch (err) {
+      if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+        return;
+      }
       console.warn('Backend run cancellation API error:', err);
       setActionError('취소를 확인하지 못했습니다. 실행 상태를 새로고침한 뒤 확인하세요.');
       throw err;
@@ -473,7 +497,7 @@ export const App: React.FC = () => {
     </div>
   ) : null;
 
-  if (!currentUser) return <Login onLoginSuccess={user => { setAuthError(null); sessionRef.current += 1; setCurrentUser(user); setActiveTab('dashboard'); }} initialError={authError} />;
+  if (!currentUser) return <Login onLoginSuccess={user => { setAuthError(null); setActionError(null); setWorkspaceError(null); setSelectedWorkspaceId(null); sessionRef.current += 1; setCurrentUser(user); setActiveTab('dashboard'); }} initialError={authError} />;
 
   if (desktop && currentUser && projectId) return (
     <>
@@ -754,11 +778,21 @@ export const App: React.FC = () => {
               isOpen={isCreateModalOpen}
               onClose={() => setIsCreateModalOpen(false)}
               onCreate={async (newWsp) => {
+                const currentSession = sessionRef.current;
+                const currentScope = scopeRef.current;
                 try {
                   const created = await createProjectWorkspace(projectId, newWsp.name);
+                  if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+                    return;
+                  }
                   await fetchWorkspaces();
-                  setSelectedWorkspaceId(created.workspaceId);
+                  if (sessionRef.current === currentSession && scopeRef.current === currentScope) {
+                    setSelectedWorkspaceId(created.workspaceId);
+                  }
                 } catch (err: any) {
+                  if (sessionRef.current !== currentSession || scopeRef.current !== currentScope) {
+                    return;
+                  }
                   setWorkspaceError(err?.message || 'Workspace 생성 실패');
                   throw err;
                 }
