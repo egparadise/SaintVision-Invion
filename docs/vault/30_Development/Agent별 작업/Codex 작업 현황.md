@@ -1,19 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T10:40:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 구현 중
+## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 검토 인계
 
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
-- mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용은 금지한다. 먼저 workflow 생명주기 정적 시험을 red로 만들고 구현한 뒤, 주 검증은 `run-core` label의 hosted JUnit으로 19 setup skip 제거와 실제 body 결과를 확인한다. [[Core CX01 hosted disposable container 설계]]
+- mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용 없이 head `bc27588d`의 Core `36353272311`이 success했다. focused recovery는 18 passed/2 구체적 internal-network skip/0 failed·error, main은 3236 passed/17 declared skip/0 failed·error이며 build·Go·TS·owned cleanup도 success다. 기존 unset 19 skip은 0건이다.
+- 앞선 shared-session 14 fail은 owner-only 음성 시험이 trigger를 끄고 남긴 orphan `inv.result_commitments`를 다음 restore가 FK로 거부한 시험 격리 오염으로 재현했다. 제품 drill은 손상을 통과시키지 않았고 fresh restore는 통과했으므로 recovery를 fresh session으로 분리했으며, 음성 시험 cleanup은 별도 test-hygiene 관찰로 남긴다. S07-DB 물리 인수는 `review` 유지, Claude 독립 재검토가 다음이다. [[Core CX01 hosted disposable container 설계]], [[2026-09-28_06-53-26_KST_Card36_CX01_hosted_Core_Codex]]
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
