@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-HOSTED-WAVE-LANE-SPEC-001"
 title: "S05 hosted 20동시 wave opt-in lane 사양"
-version: "1.0.0"
-status: "implemented-pg-free-review"
+version: "1.1.0"
+status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T08:25:00+09:00"
+updated: "2026-09-28T08:35:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -51,3 +51,14 @@ tags: ["s05", "placement", "semaphore", "hosted-ci", "benchmark", "specification
 hosted runner의 CPU·메모리·scheduler·PostgreSQL service 환경은 개발 PC와 다르다. 따라서 hosted 수치는 독립 calibration이며 기존 로컬 수치와 합치거나 절대값으로 직접 비교하지 않는다. 같은 hosted run 안의 legacy/candidate-B 상대 비교만 판정 입력이다.
 
 롤백은 `.github/workflows/s05-hosted-wave.yml`, `tools/run_s05_hosted_wave.py`, focused PG-free 시험을 제거하는 것으로 끝난다. 제품 flag·schema·migration에는 롤백 대상이 없다.
+
+## 5. 첫 hosted 실행 결과
+
+PR #141 head `60a63fbf5ee60cacd6c6212b7362a99576d9d4af`의 run [36358438372](https://github.com/egparadise/SaintVision-Invion/actions/runs/36358438372)은 `s05-hosted-wave` job을 success로 완료했다. aggregate JUnit은 1 test, failure/error/skip 0이고 6개 원본 JSON/JUnit/log를 `saintvision-s05-hosted-wave-36358438372` artifact로 보존했다.
+
+| mode | 3회 성공/실패 | 외부 실패 합계 | 전체 요청 P95 중앙 | 성공 post-acquire hold P95 중앙 |
+|---|---:|---:|---:|---:|
+| legacy | 60/0 | 0 | 457.822ms | 13.131ms |
+| candidate-B | 12/48 | 48(semaphore reject 48, SQL timeout 0) | 391.719ms | 16.984ms |
+
+candidate-B 각 wave는 4/20 성공·16 semaphore reject였고 종료 뒤 registry entry/permit은 모두 0이다. gate는 외부 실패 비증가=false, 전체 요청 P95 비악화=true, 성공 hold P95 비악화=false이므로 `GATES_FAILED`다. 빠른 거절 때문에 전체 요청 P95가 낮아진 값을 성공으로 해석하지 않으며 flag 기본 off, `promotionClaim=false`, S05-DB `in_progress`를 유지한다. hosted 환경은 Ubuntu 24 runner 4 CPU/약 15.6GiB, Python 3.12.14, PostgreSQL 16.15였으며 로컬 수치와 직접 비교하지 않는다. [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]].
