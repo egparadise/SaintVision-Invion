@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.24"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T10:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF 트랙 독립 검토 대장 카드 uu (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/vf-ledger`, docs-only): `vf-task-registry.json` v1.0.1의 VF-CX-01~04 `ciVerified:false`·`independentlyReviewed:false`가 지금도 사실인지 실측으로 갈랐다. **착지 SHA 5건 전부 integration 조상 확인**(01 `290aba56`+진단 `f8855530`·02 `d6d9d871`·03 `bc8797c1`·04 `a42178ab`·05 문서 `8c5050c4`)이고 9/15 CI 13 run **전부 job 미시작(billing)** → 당시 `ciVerified:false`는 정확했다. **대장의 정정 하나**: `290aba56`은 merge commit이라 `git show --stat`이 973 files/+144,856을 내놓지만 카드가 저작한 것은 combined diff **33 파일**이고, `b9752a8`에는 definer-policy도 migration 0007~0046도 없어 내용 부모는 `89a405a9`다. **ciVerified 근거를 모듈 단위로 실측**: 앵커 `f2aa2b14`(다섯 workflow success, Core 35714470445) + 보조 `3d1892c0`(Core 35706465645), hosted junit 파싱 — 01 `test_vf_canonical` **2**·account_production 3·vf_deployment 3·package_surface 3·definer_audit 22 / 02 model_commit 17·model_manifest 30 / 03 model_locality 26·placement 12·tool_admission 45 / 04 model_node 6·model_retry 8(9)·model_runtime 23, 해당 모듈 skip·fail **0**, 여섯 model Evidence도 hosted에서 재생성됨. **hosted 미보완 2건 정직 기록**: `test_storage_windows_launcher` 10 전부 skip(Linux runner), `test_recovery_drill` 1 passed/19 skip. **검토 공백은 VF-CX-01 하나**(9/15 02:30 문서는 base b9752a8 = 착지 전) → 이번에 Codex가 요청한 세 항목 독립 검토: definer 정책이 `revision` 0037→0038 **한 줄만** 바뀌고 함수 9개 완전 동일(HEAD 0046에서도 9/9 digest 동일), `89a405a9→290aba56`에서 migration **0 수정**, fixture는 `tests/fixtures/`에만·shipped 트리 0건·.dockerignore allowlist, `configured_business`의 not superuser/not bypassrls/inv_app member/inv_kernel 아님/스키마·테이블 소유 아님 + 같은 DB 재확인 — **세 항목 모두 sound, finding 0**. PG-free **16 passed**(package_surface 3·vf_deployment 3·server_auth_integrity 4·server_project_api 6). 관찰 3: server_auth_integrity·server_project_api 10건은 파일 첫 줄이 스스로 밝히듯 **격리된 legacy fixture**라 제품 인증 수치에 합산 금지 / `configured_business` restricted-role 가드에 **부정 시험 없음**(happy path만) / `.dockerignore`가 이미 없는 `src/saintvision/demo_server.py`를 막는 유령 줄. **registry 무변경**(제안 diff만; state·acceptedCards 유지, `implemented:partial`은 승격 제안 안 함 — 26개 중 11 미제공 gap이 이 카드로 닫혔다는 증거 없음). VF-CX-05 blocker는 근거가 현재 topology에 없는 Node(`nod_01M25VZZ…`/192.168.45.225, 9/15)라 `remote-node-unreachable-three-probes` 철회·`ci-billing` 제거·5대 중 3대 provisioned와 CP 겸임 Windows Docker API 1.41 두 줄 추가를 제안. 실 PG·브라우저·Docker·LAN 재측정 **없음**(가용 1.1~1.28GB < 1.5GB, 읽기 전용 지시). check_docs exit 0. 전문 [[2026-09-28_10-00-00_KST_VF트랙_독립검토_대장_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
