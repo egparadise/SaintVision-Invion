@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-23T15:27:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-23 S05 Card26 bounded semaphore 구현 — R2 검토 준비
+
+- 카드 번호 `26`, branch `agent/codex/s05-bounded-semaphore`, base `1e8baf04`, owner Codex, reviewer Claude다. `S05-DB` registry를 `in_progress`로 전환했다.
+- 사양 §4~§8의 canonical tenant+project process-local permit, 논리적 wait 0ms, root transaction finalizer, replay-before-permit, 기존 `RES-0007`/503/retryable 표면과 flag 기본 off를 구현했다. benchmark schema 1.8은 semaphore reject를 SQL timeout과 분리하되 외부 실패 합계에 포함한다.
+- PG-free focused 시험은 응답 계약 회귀를 포함해 101 passed/exit 0이고 docs·contract bindings·ontology·single-source ratchet·frontend integrity·Black·diff 게이트도 exit 0이다. 실 PostgreSQL·20동시 wave는 실행하지 않았고 코디네이터 별도 승인 전 실행하지 않는다. R2 PR의 reviewer는 Claude다. [[S05 project별 bounded semaphore 사양]], [[2026-09-23_15-27-00_KST_S05_Card26_bounded_semaphore_구현_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

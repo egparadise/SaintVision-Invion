@@ -77,15 +77,12 @@ class PgQueueObserver:
         if pid in seen or not graph.get(pid):
             return 0
         return 1 + max(
-            PgQueueObserver._chain_depth(blocker, graph, seen | {pid})
-            for blocker in graph[pid]
+            PgQueueObserver._chain_depth(blocker, graph, seen | {pid}) for blocker in graph[pid]
         )
 
     def _run(self) -> None:
         try:
-            with psycopg.connect(
-                self.runtime_dsn, autocommit=True, row_factory=dict_row
-            ) as conn:
+            with psycopg.connect(self.runtime_dsn, autocommit=True, row_factory=dict_row) as conn:
                 self._settings = {
                     "logLockWaits": conn.execute("SHOW log_lock_waits").fetchone()[
                         "log_lock_waits"
@@ -96,8 +93,7 @@ class PgQueueObserver:
                 }
                 self._ready.set()
                 while not self._stop.is_set():
-                    rows = conn.execute(
-                        """SELECT pid,state,wait_event_type,wait_event,
+                    rows = conn.execute("""SELECT pid,state,wait_event_type,wait_event,
                         pg_blocking_pids(pid) AS blockers,
                         CASE
                           WHEN position('FROM inv.projects' in query)>0
@@ -113,12 +109,10 @@ class PgQueueObserver:
                         FROM pg_stat_activity
                         WHERE datname=current_database() AND usename=current_user
                           AND pid<>pg_backend_pid() AND state<>'idle'
-                        ORDER BY pid"""
-                    ).fetchall()
+                        ORDER BY pid""").fetchall()
                     if rows and self._wave_origin_ns is not None:
                         graph = {
-                            int(row["pid"]): [int(item) for item in row["blockers"]]
-                            for row in rows
+                            int(row["pid"]): [int(item) for item in row["blockers"]] for row in rows
                         }
                         backends = []
                         for row in rows:
@@ -140,14 +134,11 @@ class PgQueueObserver:
                                     ),
                                 }
                             )
-                        lock_waiters = sum(
-                            item["waitEventType"] == "Lock" for item in backends
-                        )
+                        lock_waiters = sum(item["waitEventType"] == "Lock" for item in backends)
                         self._timeline.append(
                             {
                                 "offsetMs": round(
-                                    (perf_counter_ns() - self._wave_origin_ns)
-                                    / 1_000_000,
+                                    (perf_counter_ns() - self._wave_origin_ns) / 1_000_000,
                                     3,
                                 ),
                                 "activeBackendCount": len(backends),
@@ -165,9 +156,7 @@ class PgQueueObserver:
 
     def report(self) -> dict:
         classes = Counter(
-            backend["statementClass"]
-            for sample in self._timeline
-            for backend in sample["backends"]
+            backend["statementClass"] for sample in self._timeline for backend in sample["backends"]
         )
         return {
             "enabled": True,
@@ -281,6 +270,10 @@ def placement_benchmark_env(env):
         placement_candidate_limit_lock_timeout_ms=int(
             os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
         ),
+        placement_project_semaphore_enabled=(os.getenv("INV_PLACEMENT_PROJECT_SEMAPHORE") == "1"),
+        placement_project_semaphore_limit=int(
+            os.getenv("INV_PLACEMENT_PROJECT_SEMAPHORE_LIMIT", "4")
+        ),
         statement_observer=observe_statement if diagnostic else None,
         placement_metric_sink=observe_lock_hold,
     )
@@ -357,9 +350,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         pytest.fail("Benchmark rounds must be 1 or 2")
     if concurrency != a.request_count:
         pytest.fail("Benchmark concurrency must equal request count")
-    runs = [
-        [planned(a.e) for _ in range(a.request_count)] for _ in range(round_count)
-    ]
+    runs = [[planned(a.e) for _ in range(a.request_count)] for _ in range(round_count)]
     _start_observation_window(a)
 
     def reserve(round_index, request_index):
@@ -382,9 +373,7 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             concurrency=concurrency,
             reserve=lambda index: reserve(0, index),
             on_wave_start=(
-                a.queue_observer.mark_wave_start
-                if a.queue_observer is not None
-                else None
+                a.queue_observer.mark_wave_start if a.queue_observer is not None else None
             ),
         )
     finally:
@@ -496,21 +485,22 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         item
         for item in a.lock_hold_metrics
         if item["mode"]
-        not in {"placement-limit-row-wait", "placement-legacy-lock-wait"}
+        not in {
+            "placement-limit-row-wait",
+            "placement-legacy-lock-wait",
+            "placement-project-semaphore",
+        }
     ]
     candidate_wait_metrics = [
         item for item in a.lock_hold_metrics if item["mode"] == "placement-limit-row-wait"
     ]
     legacy_wait_metrics = [
-        item
-        for item in a.lock_hold_metrics
-        if item["mode"] == "placement-legacy-lock-wait"
+        item for item in a.lock_hold_metrics if item["mode"] == "placement-legacy-lock-wait"
     ]
-    committed_holds = [
-        item["lockHoldMs"]
-        for item in hold_metrics
-        if item["outcome"] == "commit"
+    semaphore_metrics = [
+        item for item in a.lock_hold_metrics if item["mode"] == "placement-project-semaphore"
     ]
+    committed_holds = [item["lockHoldMs"] for item in hold_metrics if item["outcome"] == "commit"]
     report["lockHold"] = {
         "mode": (
             "placement-short-commit"
@@ -519,21 +509,16 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         ),
         "samples": hold_metrics,
         "commitCount": len(committed_holds),
-        "rollbackCount": sum(
-            item["outcome"] == "rollback" for item in hold_metrics
-        ),
+        "rollbackCount": sum(item["outcome"] == "rollback" for item in hold_metrics),
         "commitP50Ms": (
-            round(percentile_nearest_rank(committed_holds, 0.50), 3)
-            if committed_holds
-            else None
+            round(percentile_nearest_rank(committed_holds, 0.50), 3) if committed_holds else None
         ),
         "commitP95Ms": (
-            round(percentile_nearest_rank(committed_holds, 0.95), 3)
-            if committed_holds
-            else None
+            round(percentile_nearest_rank(committed_holds, 0.95), 3) if committed_holds else None
         ),
         "commitMaxMs": round(max(committed_holds), 3) if committed_holds else None,
     }
+
     def summarize_waits(metrics, *, mode, policy):
         values = [item["waitMs"] for item in metrics]
         return {
@@ -546,12 +531,8 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
             "acquiredCount": sum(item["outcome"] == "acquired" for item in metrics),
             "timeoutCount": sum(item["outcome"] == "timeout" for item in metrics),
             "timeoutRetryCount": 0,
-            "p50Ms": (
-                round(percentile_nearest_rank(values, 0.50), 3) if values else None
-            ),
-            "p95Ms": (
-                round(percentile_nearest_rank(values, 0.95), 3) if values else None
-            ),
+            "p50Ms": (round(percentile_nearest_rank(values, 0.50), 3) if values else None),
+            "p95Ms": (round(percentile_nearest_rank(values, 0.95), 3) if values else None),
             "maxMs": round(max(values), 3) if values else None,
         }
 
@@ -570,15 +551,64 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         if os.getenv("INV_PLACEMENT_SHORT_COMMIT") == "1"
         else report["legacyLockWait"]
     )
-    report["schemaVersion"] = "1.7.0"
+    permit_holds = [item["holdMs"] for item in semaphore_metrics if item["outcome"] == "released"]
+    report["projectSemaphore"] = {
+        "enabled": os.getenv("INV_PLACEMENT_PROJECT_SEMAPHORE") == "1",
+        "limit": int(os.getenv("INV_PLACEMENT_PROJECT_SEMAPHORE_LIMIT", "4")),
+        "permitWaitBudgetMs": 0,
+        "scope": "process-local-tenant-project",
+        "samples": semaphore_metrics,
+        "acquiredCount": sum(
+            item["outcome"] == "acquired" and not item["reentrant"] for item in semaphore_metrics
+        ),
+        "reentrantCount": sum(
+            item["outcome"] == "acquired" and item["reentrant"] for item in semaphore_metrics
+        ),
+        "rejectedCount": sum(item["outcome"] == "rejected" for item in semaphore_metrics),
+        "releasedCount": sum(item["outcome"] == "released" for item in semaphore_metrics),
+        "maxInUse": max(
+            (
+                item["inUseBefore"] + 1
+                for item in semaphore_metrics
+                if item["outcome"] == "acquired" and not item["reentrant"]
+            ),
+            default=0,
+        ),
+        "permitHoldP50Ms": (
+            round(percentile_nearest_rank(permit_holds, 0.50), 3) if permit_holds else None
+        ),
+        "permitHoldP95Ms": (
+            round(percentile_nearest_rank(permit_holds, 0.95), 3) if permit_holds else None
+        ),
+        "permitHoldMaxMs": round(max(permit_holds), 3) if permit_holds else None,
+        "releaseCauses": dict(
+            Counter(
+                item["releaseCause"] for item in semaphore_metrics if item["outcome"] == "released"
+            )
+        ),
+        "registryEntryCountAfterWave": len(a.placement.db._placement_project_permit_snapshot()),
+        "registryPermitCountAfterWave": sum(
+            a.placement.db._placement_project_permit_snapshot().values()
+        ),
+    }
+    all_samples = list(first.samples) + (list(second.samples) if second else [])
+    semaphore_reject_count = sum(
+        sample.cause_type == "_PlacementSemaphoreLimit" for sample in all_samples
+    )
+    sql_timeout_count = sum(sample.sqlstate in {"55P03", "57014"} for sample in all_samples)
+    report["externalFailure"] = {
+        "semaphoreRejectCount": semaphore_reject_count,
+        "sqlTimeoutCount": sql_timeout_count,
+        "count": semaphore_reject_count + sql_timeout_count,
+        "gateDefinition": "semaphore reject + 55P03 + 57014",
+    }
+    report["schemaVersion"] = "1.8.0"
     report["contentionObservation"]["candidateLimitLockTimeoutMs"] = int(
         os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
     )
     report["contentionObservation"]["serverSideLockHoldMeasured"] = True
     report["contentionObservation"]["serverSideLockWaitSeparatelyMeasured"] = False
-    report["contentionObservation"][
-        "clientObservedLockAcquireElapsedSeparatelyMeasured"
-    ] = True
+    report["contentionObservation"]["clientObservedLockAcquireElapsedSeparatelyMeasured"] = True
     path = Path(os.getenv("INV_PLACEMENT_BENCHMARK_REPORT", ".work/placement-benchmark.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -614,15 +644,20 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
     )
     record_property("limitRowTimeoutCount", report["limitRowWait"]["timeoutCount"])
     record_property(
+        "projectSemaphoreRejectCount",
+        report["projectSemaphore"]["rejectedCount"],
+    )
+    record_property(
+        "projectSemaphoreRegistryPermitCountAfterWave",
+        report["projectSemaphore"]["registryPermitCountAfterWave"],
+    )
+    record_property("externalFailureCount", report["externalFailure"]["count"])
+    record_property(
         "candidateLimitLockTimeoutMs",
         report["contentionObservation"]["candidateLimitLockTimeoutMs"],
     )
-    record_property(
-        "limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"]
-    )
-    record_property(
-        "sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"])
-    )
+    record_property("limitRowTimeoutRetryCount", report["limitRowWait"]["timeoutRetryCount"])
+    record_property("sqlTimeoutStatementCount", len(report["sqlDiagnostics"]["timeoutStatements"]))
     record_property("queueObservationEnabled", report["queueObservation"]["enabled"])
     if report["queueObservation"]["enabled"]:
         record_property(
