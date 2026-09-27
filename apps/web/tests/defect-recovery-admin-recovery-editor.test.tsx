@@ -387,9 +387,12 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
     it('동일한 노드·의도·승인ID의 재시도 시 동일한 Idempotency-Key와 동일한 payload(expectedVersion 포함)를 재전송한다', async () => {
       let postCount = 0;
+      let controlCallCount = 0;
       const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
         if (endpoint.includes('/control')) {
-          return { version: 7, killSwitchActive: false, nodeStatus: 'online' } as any;
+          controlCallCount++;
+          // Invariant: If code erroneously re-queries /control on retry, it returns version 8 instead of 7
+          return { version: controlCallCount === 1 ? 7 : 8, killSwitchActive: false, nodeStatus: 'online' } as any;
         }
         if (endpoint.includes('/drain')) {
           postCount++;
@@ -464,6 +467,11 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         drainBtn.click();
       });
 
+      // Invariant: Retrying MUST NOT re-query /control! Exactly 1 call.
+      const controlCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/control'));
+      expect(controlCalls).toHaveLength(1);
+      expect(controlCallCount).toBe(1);
+
       const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
       expect(drainCalls).toHaveLength(2);
       const secondKey = drainCalls[1]?.[1]?.idempotencyKey;
@@ -473,6 +481,115 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(secondKey).toBe(firstKey);
       expect(secondBody).toEqual(firstBody);
       expect(secondBody.expectedVersion).toBe(7);
+    });
+
+    it('409 GRAPH-0003 최종 실패 뒤 재클릭 시 캐시를 삭제하고 /control을 다시 조회하여 최신 expectedVersion으로 요청한다', async () => {
+      let controlCallCount = 0;
+      let drainCallCount = 0;
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          controlCallCount++;
+          // First query returns stale version 7, second query returns refreshed version 8
+          return {
+            version: controlCallCount === 1 ? 7 : 8,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+          } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          drainCallCount++;
+          if (drainCallCount === 1) {
+            // First call fails with 409 Conflict GRAPH-0003 (non-retryable final failure)
+            const problem = {
+              type: 'about:blank',
+              title: 'Conflict',
+              status: 409,
+              code: 'GRAPH-0003',
+              category: 'GRAPH',
+              detail: 'Control version conflict: expected version 7 differs from server',
+              retryable: false,
+              traceId: '0123456789abcdef0123456789abcdef',
+            };
+            throw new client.ApiError(problem as any);
+          }
+          // Second call succeeds with updated version 8
+          return {
+            requestId: 'req_drain_recovered_after_409',
+            operation: 'drain',
+            control: { nodeStatus: 'draining', version: 9 },
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // Switch to Drain tab
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // Enter approval UUID
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      // 1st attempt: fails with 409 Conflict
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Verify 409 error banner is displayed
+      const errorBanner = container.querySelector('[data-testid="drain-error-banner"]');
+      expect(errorBanner?.textContent).toContain('GRAPH-0003 (409)');
+
+      const firstDrainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
+      expect(firstDrainCall).toBeDefined();
+      const firstKey = firstDrainCall?.[1]?.idempotencyKey;
+      const firstBody = JSON.parse(firstDrainCall?.[1]?.body);
+      expect(firstBody.expectedVersion).toBe(7);
+
+      // 2nd attempt: click drain again after 409 final failure
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Invariant: Non-retryable error MUST have purged cache.
+      // Therefore, /control MUST be queried a second time, obtaining version 8!
+      const controlCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/control'));
+      expect(controlCalls).toHaveLength(2);
+      expect(controlCallCount).toBe(2);
+
+      const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
+      expect(drainCalls).toHaveLength(2);
+      const secondKey = drainCalls[1]?.[1]?.idempotencyKey;
+      const secondBody = JSON.parse(drainCalls[1]?.[1]?.body);
+
+      // Fresh idempotency key and updated expectedVersion (8 instead of 7)
+      expect(secondKey).not.toBe(firstKey);
+      expect(secondBody.expectedVersion).toBe(8);
+
+      // Successfully resolved
+      expect(container.querySelector('[data-testid="drain-error-banner"]')).toBeNull();
     });
 
     it('화면 표시 의도와 서버 상태 불일치 시 POST를 수행하지 않고(POST 0회) 상태 변경 안내를 표시한다', async () => {

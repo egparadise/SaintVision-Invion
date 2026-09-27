@@ -205,7 +205,34 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       refreshState();
     } catch (err: any) {
       console.error(`Failed to execute node ${targetAction} on control plane:`, err);
-      // Key and payload remain in cachedOperationsRef so retrying resends the exact same request!
+      // Invariant: Non-retryable final failures (e.g. 409 GRAPH-0003, 403, 422, or retryable === false)
+      // MUST clear the cache so subsequent user clicks re-query canonical /control and get fresh expectedVersion.
+      // Cache is maintained ONLY for network errors or transient/retryable failures (5xx, 408, 429, retryable === true).
+      const isProblem = !!err?.problem;
+      const status = err?.problem?.status;
+      const retryableFlag = err?.problem?.retryable;
+
+      let shouldKeepCache = false;
+      if (!isProblem) {
+        // Network error (fetch failure, timeout before HTTP response)
+        shouldKeepCache = true;
+      } else if (retryableFlag === false) {
+        // Explicitly marked non-retryable by server (e.g. 409 GRAPH-0003, 403, 422)
+        shouldKeepCache = false;
+      } else if (status === 408 || status === 429 || (typeof status === 'number' && status >= 500)) {
+        // Transient server or rate-limit errors
+        shouldKeepCache = true;
+      } else if (retryableFlag === true && status !== 409 && status !== 403 && status !== 422) {
+        shouldKeepCache = true;
+      } else {
+        // Other 4xx client errors (400, 401, 403, 404, 409, 422)
+        shouldKeepCache = false;
+      }
+
+      if (!shouldKeepCache) {
+        cachedOperationsRef.current.delete(opKey);
+      }
+
       if (err?.problem) {
         const p = err.problem;
         const codeStr = p.code ? `[${p.code} (${p.status})]` : `[${p.status}]`;
@@ -239,7 +266,13 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const handleCloseKillSwitchModal = () => {
     setShowKillSwitchModal(false);
     setTimeout(() => {
-      previousActiveElementRef.current?.focus();
+      const toggleBtn = document.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLElement | null;
+      const prevEl = previousActiveElementRef.current;
+      if (prevEl && document.body.contains(prevEl) && !prevEl.textContent?.includes('Deactivate Kill Switch')) {
+        prevEl.focus();
+      } else if (toggleBtn) {
+        toggleBtn.focus();
+      }
     }, 0);
   };
 
