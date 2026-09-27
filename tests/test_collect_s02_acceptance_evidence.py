@@ -291,3 +291,22 @@ def test_real_pg_collector_bundle_is_measured_and_redacted(tmp_path):
     assert admin not in text
     assert not any(k for k in os.environ if k.endswith("_PASSWORD") and os.environ[k] and os.environ[k] in text)
     assert (tmp_path / "real-rls.json").is_file()
+
+
+def test_rls_evidence_outside_repo_is_recorded_as_placeholder_not_relative_to(tmp_path, monkeypatch):
+    """Hosted CI writes to /tmp: relative_to(REPO_ROOT) must never raise or leak the absolute path."""
+    from tools import collect_rls_evidence as rls
+    payload = {"roles": {"inv_app": {}}, "violations": [], "accepted": [], "unmeasured": [],
+               "provenance": {"collector_sha256": "c", "baseline_sha256": "b"}, "verdict": "PASS"}
+    def fake_main(argv):
+        out = Path(argv[argv.index("--out-dir") + 1]); label = argv[argv.index("--label") + 1]
+        (out / f"{label}.json").write_text(json.dumps(payload), encoding="utf-8")
+        (out / f"{label}.md").write_text("md", encoding="utf-8")
+        return 0
+    monkeypatch.setattr(rls, "main", fake_main)
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    outside = tmp_path / "outside"
+    summary = tool.run_rls_collector(outside, "x-rls")
+    assert summary["evidenceJson"] == "<outside-repo>/x-rls.json"
+    assert str(outside) not in json.dumps(summary)
+    assert tool.evidence_ref(REPO_ROOT / "docs" / "x.json") == "docs/x.json"

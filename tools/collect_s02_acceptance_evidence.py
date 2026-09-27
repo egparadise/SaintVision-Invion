@@ -117,6 +117,14 @@ _SAFE_NAME = re.compile(r"[A-Za-z0-9_]+")
 _SAFE_CLASS = re.compile(r"[A-Za-z0-9_.]+")
 
 
+def evidence_ref(path: Path) -> str:
+    """Repo-relative POSIX path, or a placeholder for outputs outside the repository (e.g. CI tmp)."""
+    try:
+        return path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return f"<outside-repo>/{path.name}"
+
+
 def safe_case_id(case: ET.Element) -> str | None:
     """classname::name without parameter values; None when it cannot be made safe."""
     classname = case.get("classname") or ""
@@ -228,7 +236,7 @@ def run_rls_collector(out_dir: Path, label: str) -> dict[str, Any]:
     verdict = RLS_EXIT_VERDICT.get(code, "UNAVAILABLE")
     summary: dict[str, Any] = {"status": "complete" if code in (0, 1, 3) else "unavailable",
                                "verdict": verdict, "exitCode": code,
-                               "evidenceJson": (out_dir / f"{label}.json").relative_to(REPO_ROOT).as_posix()
+                               "evidenceJson": evidence_ref(out_dir / f"{label}.json")
                                if (out_dir / f"{label}.json").is_file() else None}
     json_path = out_dir / f"{label}.json"
     if json_path.is_file():
