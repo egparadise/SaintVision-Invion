@@ -18,6 +18,24 @@ from test_control_api import api
 pytestmark = pytest.mark.postgres
 
 
+class _RedactedApi:
+    """Delegate to the fixture without exposing its DSNs in pytest failures."""
+
+    def __init__(self, value):
+        self._value = value
+
+    def __getattr__(self, name):
+        return getattr(self._value, name)
+
+    def __repr__(self):
+        return "<S04Api redacted>"
+
+
+@pytest.fixture
+def s04_api(api):
+    return _RedactedApi(api)
+
+
 def _write_report(report: dict) -> None:
     target_value = os.environ.get("INV_S04_DB_EVIDENCE_JSON")
     if not target_value:
@@ -28,8 +46,8 @@ def _write_report(report: dict) -> None:
     temporary.replace(target)
 
 
-def test_http_pg_expiry_cancel_idempotency_and_outbox_crash_retry(api):
-    a = api
+def test_http_pg_expiry_cancel_idempotency_and_outbox_crash_retry(s04_api):
+    a = s04_api
     cases = []
 
     # HTTP create/cancel exact replay must not duplicate the Run or cancel event.
