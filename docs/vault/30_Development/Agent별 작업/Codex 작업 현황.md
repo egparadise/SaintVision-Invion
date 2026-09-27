@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T13:15:00+09:00"
+updated: "2026-09-28T15:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -13,9 +13,9 @@ source_of_truth: "Git"
 ## 2026-09-28 카드 40 S3 호환 Object Store Adapter 설계 — reviewer 인계
 
 - Base `1e8baf045c5a554209aaef601ae4883b64da50a7`, branch `agent/codex/s3-object-store-design`, owner Codex/reviewer Claude. [[S03_ST_S3_호환_Object_Store_Adapter_설계]]에 구현 전 1쪽 설계를 작성했다.
-- Local/S3 공통 `put/get/delete/exists/hash`, 제품 모듈 하나의 SigV4를 #135 도구도 재사용하는 구조, #129와 같은 보호 설정 정본, tenant/prefix 격리, 실제 bytes SHA-256과 `X-Content-SHA256` 결속, ambiguous PUT/delete 실패 의미를 고정했다.
-- 기존 row를 S3로 재해석하지 않도록 immutable `provider_id` additive migration과 `local-bounded-v1` backfill을 권고했다. 제품 코드·migration·계약·Docker/MinIO·실 PG는 변경/실행하지 않았다.
-- 다음 행동: Claude 설계 독립 검토. 승인 뒤 Codex가 계약/schema·migration·PG-free conformance부터 별도 카드로 구현하며, hosted MinIO와 운영 인수는 분리한다. [[2026-09-28_13-15-00_KST_S03_ST_S3_Object_Store_설계_Codex]].
+- Claude 1차 검토 F1~F5를 반영한 v1.1은 provider-native opaque locator를 공통 SPI로 정하고 Local flat namespace는 service/RLS, S3는 prefix/IAM 격리로 명시해 scope 무시를 금지했다. 제품 모듈 하나의 SigV4를 #135 도구도 재사용한다.
+- immutable `provider_id`+locator migration과 정확한 local backfill, `snapshots.py`/`workspace_resume.py` 양쪽 checkpoint identity/replay 불변, receipt가 아닌 provider body 다운로드와 ready-row/object-missing `STORE-0001`/503을 고정했다. live checksum과 설계-only metadata 필드도 구분했다.
+- `configurationReadiness.objectStore` 단일 정본은 binary-first legacy/new 상호배타 전환을 쓴다. 제품 코드·migration·계약·Docker/MinIO·실 PG는 변경/실행하지 않았다. 다음 행동은 Claude v1.1 재검토이며 승인 전 구현 금지다. [[2026-09-28_13-15-00_KST_S03_ST_S3_Object_Store_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
