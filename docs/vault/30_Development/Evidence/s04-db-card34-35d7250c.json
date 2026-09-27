@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "cancelOutboxCount": 1,
+      "httpStatuses": [201, 201, 200, 200],
+      "id": "http-run-idempotency-cancel",
+      "runCount": 1,
+      "status": "PASS"
+    },
+    {
+      "approvalStatus": "expired",
+      "authorizedCommandOutboxCount": 0,
+      "dispatchCount": 0,
+      "expiryClosedExactlyOnce": true,
+      "httpVoteStatuses": [200, 200, 200],
+      "id": "approval-before-execution-and-expiry",
+      "status": "PASS"
+    },
+    {
+      "id": "outbox-publisher-crash-retry",
+      "sameEventPublicationCount": 2,
+      "status": "PASS"
+    },
+    {
+      "committedEffects": 1,
+      "duplicateEffectCount": 0,
+      "id": "outbox-consumer-rollback-dedup",
+      "status": "PASS"
+    }
+  ],
+  "codeSha": "35d7250cba481b944846f385366e63c6dff9317a",
+  "measurementScope": "disposable-postgresql-http-kernel",
+  "migrationChanged": false,
+  "operationalAcceptanceAssessed": false,
+  "physicalNodeDeliveryResumption": "UNMEASURED",
+  "provenance": {
+    "capturedAtKst": "2026-09-28T05:16:13+09:00",
+    "codeSha": "35d7250cba481b944846f385366e63c6dff9317a",
+    "contentClean": true,
+    "executor": "Codex",
+    "integrationInSync": false,
+    "integrationSha": "1e8baf045c5a554209aaef601ae4883b64da50a7",
+    "workingTreeClean": true
+  },
+  "publicContractChanged": false,
+  "schemaVersion": 1,
+  "taskId": "S04-DB"
+}
