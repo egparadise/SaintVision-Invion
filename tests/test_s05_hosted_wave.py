@@ -103,6 +103,11 @@ def test_legacy_command_keeps_flag_off(tmp_path):
     assert "--project-semaphore" not in command
 
 
+def test_workflow_fetches_history_for_product_sha_ancestry():
+    workflow = (ROOT / ".github" / "workflows" / "s05-hosted-wave.yml").read_text(encoding="utf-8")
+    assert "fetch-depth: 0" in workflow
+
+
 @pytest.mark.parametrize("candidate", [False, True])
 def test_report_validation_accepts_complete_invariant_evidence(candidate):
     spec = module.WaveSpec("candidate-b" if candidate else "legacy", 1)

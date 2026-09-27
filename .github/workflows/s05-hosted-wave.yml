@@ -42,8 +42,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # pull_request's default checkout is a synthetic merge SHA. Evidence
-          # must identify the reviewed PR head instead.
+          # must identify the reviewed PR head instead. Full history is needed
+          # for the fail-closed product-SHA ancestry check.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
