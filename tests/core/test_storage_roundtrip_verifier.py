@@ -68,6 +68,7 @@ def test_missing_endpoint_bucket_or_credentials_is_blocked_without_network():
         "bodySha256": False,
         "metadataSha256": False,
         "xContentSha256": False,
+        "contentLength": False,
         "delete": False,
         "cleanupVerified": False,
     }
@@ -189,3 +190,41 @@ def test_junit_and_json_outputs_contain_only_the_redacted_evidence(tmp_path):
     assert 'tests="1"' in text and 'failures="0"' in text
     assert "synthetic-secret" not in text
     assert ENV["INV_OBJECT_STORE_ENDPOINT"] not in text
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "http://user:password@storage.invalid:9000",
+        "http://storage.invalid:9000/path",
+        "http://storage.invalid:bad-port",
+        "http://storage.invalid:9000/#fragment",
+    ],
+)
+def test_ambiguous_endpoint_is_blocked_before_network(endpoint):
+    transport = FakeTransport()
+    evidence, exit_code = verifier.execute(
+        {**ENV, "INV_OBJECT_STORE_ENDPOINT": endpoint},
+        transport=transport,
+        payload=PAYLOAD,
+    )
+
+    assert exit_code == 3 and evidence["status"] == "BLOCKED"
+    assert transport.calls == []
+
+
+def test_environment_and_volume_credentials_together_are_blocked(monkeypatch):
+    monkeypatch.setattr(
+        verifier,
+        "_trusted_credential_file",
+        lambda _path: (_ for _ in ()).throw(AssertionError("must not read")),
+    )
+    transport = FakeTransport()
+    evidence, exit_code = verifier.execute(
+        {**ENV, "INV_OBJECT_STORE_CREDENTIAL_FILE": "/run/saintvision/object-store.json"},
+        transport=transport,
+        payload=PAYLOAD,
+    )
+
+    assert exit_code == 3 and evidence["status"] == "BLOCKED"
+    assert transport.calls == []

@@ -64,6 +64,57 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
+      - name: Start disposable MinIO candidate for S01 Storage evidence
+        env:
+          # Docker Hub distribution is archived. This fixed upstream release is
+          # used only as a disposable S3-compatible CI candidate, never as a
+          # production image selection.
+          MINIO_IMAGE: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+          MINIO_ROOT_USER: s01-roundtrip-ci
+          MINIO_ROOT_PASSWORD: s01-roundtrip-ci-only-secret
+        run: |
+          mkdir -p dist
+          docker pull "$MINIO_IMAGE"
+          docker image inspect --format '{{index .RepoDigests 0}}' "$MINIO_IMAGE" > dist/s01-minio-image.txt
+          docker run --detach --rm \
+            --name saintvision-s01-minio \
+            --tmpfs /data:rw,noexec,nosuid,size=64m \
+            --publish 9000:9000 \
+            --env MINIO_ROOT_USER \
+            --env MINIO_ROOT_PASSWORD \
+            "$MINIO_IMAGE" server /data --address ':9000'
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs saintvision-s01-minio
+          exit 1
+      - name: Create disposable S01 Storage test bucket
+        env: &s01-storage-env
+          INV_OBJECT_STORE_ENDPOINT: http://127.0.0.1:9000
+          INV_OBJECT_STORE_BUCKET: saintvision-roundtrip-ci
+          INV_OBJECT_STORE_ACCESS_KEY_ID: s01-roundtrip-ci
+          INV_OBJECT_STORE_SECRET_ACCESS_KEY: s01-roundtrip-ci-only-secret
+          INV_OBJECT_STORE_REGION: us-east-1
+        run: |
+          python - <<'PY'
+          import os
+          from tools.verify_storage_roundtrip import S3Client, load_config
+
+          response = S3Client(load_config(os.environ)).create_bucket()
+          assert response.status == 200, f'redacted bucket setup failed ({response.status})'
+          PY
+      - name: Verify S01 Storage SHA-256 roundtrip and cleanup
+        env: *s01-storage-env
+        run: >-
+          python tools/verify_storage_roundtrip.py
+          --output dist/s01-storage-roundtrip.json
+          --junit dist/s01-storage-roundtrip.xml
+      - name: Stop disposable S01 Storage service
+        if: always()
+        run: docker rm --force saintvision-s01-minio 2>/dev/null || true
       - name: Regenerate contracts and detect drift
         run: |
           python tools/generate_contracts.py
