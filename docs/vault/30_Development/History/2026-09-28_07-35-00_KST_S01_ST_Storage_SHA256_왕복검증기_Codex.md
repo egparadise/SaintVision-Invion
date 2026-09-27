@@ -45,7 +45,7 @@ tags: ["history", "s01", "storage", "sha256", "artifact", "minio", "hosted-ci"]
 
 ## hosted 증거와 남은 경계
 
-- PR과 `run-core` hosted 실행은 아직 PENDING이다. 동일 SHA에서 MinIO 기동, 1 tests/0 failures/0 skipped JUnit, `status=PASS`, 모든 check true, cleanup 404를 확인하기 전 실측 완료로 쓰지 않는다.
+- 첫 hosted Core run `36355731393`은 archived upstream image의 Quay pull이 401을 반환해 verifier 전에 exit 1이었다. 제품 왕복 실패가 아니며 PASS 증거로 세지 않는다. upstream community image 배포 종료를 반영해 최종 upstream 보안 release의 공개 source-build mirror를 linux/amd64 manifest digest로 고정했고 재실행은 PENDING이다. 동일 SHA에서 MinIO 기동, 1 tests/0 failures/0 skipped JUnit, `status=PASS`, 모든 check true, cleanup 404를 확인하기 전 실측 완료로 쓰지 않는다.
 - #129 route는 endpoint·CA의 구조적 readiness만 반환하며 이 왕복 결과를 저장하거나 합성하지 않는다.
 - #122의 후속 `--storage-evidence`는 reachable `codeSha`, UTC `observedAt`, PASS, 모든 필수 check true일 때만 U6 Storage 왕복을 PASS로 볼 수 있다. 이 카드에서 #122 branch는 수정하지 않는다.
 - 운영 TLS·전용 service credential·Run `OutputIngestion`→S3 adapter→DB commitment·90일/1년/35일 retention/GC·복원 실측은 여전히 UNMEASURED/BLOCKED다.

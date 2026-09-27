@@ -54,7 +54,7 @@ stdout은 redacted JSON 한 건만 낸다.
 ## 5. 시험과 hosted lane
 
 - PG-free 단위 시험은 가짜 transport로 SigV4 필수 header, PUT→GET→DELETE 순서, digest/header 불일치 FAIL, 입력 부재 BLOCKED/외부 호출 0, 예외 redaction, cleanup finalizer를 고정한다.
-- hosted Core의 기존 `run-core` opt-in job에서 `quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z`를 명시적으로 기동하고 test bucket을 만든 뒤 verifier를 한 번 실행한다. GitHub Actions `services`에는 MinIO의 필수 `server /data` command를 지정할 수 없으므로, 동일한 disposable runner 안의 Docker service로 실행하고 `always()` cleanup으로 제거한다. Docker Hub 배포 중단 이후의 이 고정 upstream release는 오직 S3 호환 후보 실측용이며 운영 이미지 선정이 아니다. 실행 때 해석된 image digest, JUnit, redacted JSON을 `saintvision-core-evidence`에 포함한다. 로컬 Docker/실 PG는 실행하지 않는다.
+- hosted Core의 기존 `run-core` opt-in job에서 최종 upstream 보안 release를 source-build한 `docker.io/coollabsio/minio` linux/amd64 image를 exact digest `sha256:72b4794d…c629`로 고정하고 test bucket을 만든 뒤 verifier를 한 번 실행한다. GitHub Actions `services`에는 MinIO의 필수 `server /data` command를 지정할 수 없으므로, 동일한 disposable runner 안의 Docker service로 실행하고 `always()` cleanup으로 제거한다. upstream community image 배포가 종료된 상황의 이 mirror는 오직 S3 호환 후보 실측용이며 신뢰·운영 이미지 선정이 아니다. 실행 때 해석된 image digest, JUnit, redacted JSON을 `saintvision-core-evidence`에 포함한다. 로컬 Docker/실 PG는 실행하지 않는다.
 - hosted PASS는 MinIO 후보 lane의 증거일 뿐 운영 제품 선정·TLS·전용 service credential·복원·lifecycle 인수는 아니다.
 
 ## 6. S01 preflight 및 설정 route 연결
