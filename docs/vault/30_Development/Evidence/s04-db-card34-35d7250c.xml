@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites name="pytest tests">
+  <testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="12.641" timestamp="2026-09-28T05:16:17.723377+09:00" hostname="DESKTOP-2IRPGV7">
+    <testcase classname="tests.integration.s04_db_runner_case" name="test_http_pg_expiry_cancel_idempotency_and_outbox_crash_retry" time="9.653" />
+  </testsuite>
+</testsuites>
