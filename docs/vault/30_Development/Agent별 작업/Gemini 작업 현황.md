@@ -21,20 +21,22 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
 
-## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.0 수립 (`agent/gemini/s08-fe-matrix`)
+## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.1 개정 (`agent/gemini/s08-fe-matrix`)
 
-- **작업 개요**: OUT-08 / AC-08 (보안 감사, Docker 소켓 차단, 승인 우회 방지, 합성 GPU 벤치마크, 긴급 Kill Switch, 재해 복구 WAL 백업 관리자 콘솔) 완결을 위한 5대 축 15개 시나리오 매트릭스 정본 초안(v1.0.0) 수립.
-- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (docs-only).
-- **5대 핵심 영역 15개 시나리오 체계**:
-  1. **SCK (Docker Socket 미노출 격리 3종)**: `/var/run/docker.sock`, Windows Named Pipe `//./pipe/docker_engine`, `containerd.sock` 마운트 시도 원천 차단 (`AC-08 Zero Exposure`), 정상 데이터셋 볼륨 허용 검증.
-  2. **BYP (승인 우회 방지 3종)**: L1 자가 승인 허용 vs L2/L3 승인 ID 부재 시 `APPROVAL_REQUIRED` 즉각 거절, 유효 승인 토큰(`apr_*`) 인가 및 20회 연속 자동화 봇 우회 시도 전수 차단 (`approvalBypassesBlocked >= 22`, 우회 허용 0).
-  3. **GPU (합성 GPU 성능 검증 3종)**: RTX 4090 (82.5 TFLOPS, 4GB VRAM) 및 A4000 (19.2 TFLOPS, 2GB VRAM) 합성 연산 성공(exit 0, `^evi_gpu_`), 가용 GPU 부재 시 `no-gpu-nodes-notice` 안내 및 버튼 비활성화 (위조 합성 차단).
-  4. **AUD (불변 감사 원장 및 긴급 Kill Switch 3종)**: W3C SHA-256 해시 체이닝 무결성 전수 검증(`verifyLedgerIntegrity().isValid === true`), 원장 7대 메타데이터 렌더링, 긴급 Kill Switch 발동 모달의 모의 고지 배너(`kill-switch-mock-notice`) 및 최상단 활성 배너(`kill-switch-active-banner`, `role="alert"`), 해제 토글 감사 기록.
-  5. **ADM (관리자 인증 가드 및 재해 복구 WAL 백업 3종)**: 인증 관리자 세션 시 실제 actor 동적 배선(`usr_admin_01` 하드코딩 배제), 세션 부재 시 `admin-auth-required-notice`(`role="alert"`) 렌더링 및 Drain 네트워크 호출 0회 차단(0-call guard), WAL 스냅샷/RPO/RTO 프레젠테이션 카드 렌더링.
-- **불변식 및 격리 원칙 엄수**:
-  - 클라이언트 시뮬레이션 vs 커널/OS 격리 경계 철저 분리: 물리 GPU, Linux 제한 컨테이너, off-device 백업, 물리 클러스터 전원 차단은 모두 **UNMEASURED**로 정직하게 격리.
-  - 돌연변이(MUT 5종) 사살 계획 수립: 미실행 상태는 **PLANNED / NOT_RUN**으로 기록, 변조 원장 단언 부재 변이는 **SURVIVED (미측정) [단언 보강 필요]**로 정직 표기.
-- **다음 행동**: `check_docs.py` 및 `check_frontend_integrity.py` 통과 후 PR 개설 (병합 금지 준수) 및 Claude(UI), Codex(계약) 독립 검토 요청.
+- **작업 개요**: PR #123 Claude UI 독립 검토 r1(`issuecomment-5859784561`) 9대 결함/불일치 지적 및 관찰사항 전수 반영하여 시나리오 매트릭스 v1.0.1 개정.
+- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (v1.0.1, docs-only).
+- **v1.0.1 조치 내역**:
+  1. Kill Switch 백엔드 API 현황 정정: 백엔드에 `GET/POST /v1/operations/kill-switch` 및 `/clear`가 구현되어 있으나 프런트엔드가 미연결(FE 미연결)된 상태이며, 현재 로컬 엔진에는 실제 작업 차단 가드가 없는 UI 결함임을 명시.
+  2. ADM-01 Drain 요청 백엔드 계약 불일치 고지: 백엔드의 `Idempotency-Key` 헤더 필수 및 `ContainmentInput` 스키마 요구사항과 UI의 단순 `{actor, reason}` 전송 간 불일치로 인해 실제 서버에서는 422 실패함을 고지하고 vitest mock 환경 한정 검증임을 명시.
+  3. MUT-01 SURVIVED 판정 정정: `securityEngine.ts:127`에서 `'docker.sock'` 누락 시에도 `/var/run/docker` 패턴 매칭으로 단언이 통과하므로 `SURVIVED (미측정) [단언 보강 필요: /run/docker.sock]`로 정정.
+  4. MUT-04 인용 단언 원문 일치: `defect-recovery-admin-recovery-editor.test.tsx:88-97` 실제 단언문으로 정정.
+  5. 감사 원장 무결성 및 합성 명시: 해시 페이로드에 `target`, `traceId`, `id` 누락으로 대상 변조는 미검출됨을 한정 고지하고, 마운트마다 4개 시드로 생성되는 클라이언트 로컬 합성 원장임을 명시.
+  6. 정적 리터럴 전수 표기: 상단 KPI 타일 4종(`0 건 (완전 격리)`, `성공 (Exit 0)`, `(우회 허용 0)`, `4 분 전 / RTO 12분`) 및 백업 탭 리터럴 전수 명시.
+  7. A4000 VRAM 단언 부재 명시: `admin-security.test.ts:72-76`에 A4000 VRAM 단언이 누락되어 있음을 명시하고 4090 외 모델 일괄 합성 로직 기술.
+  8. 오류 코드 client-only 및 2인 승인 관계: `SECURITY_VIOLATION`, `APPROVAL_REQUIRED`는 HTTP 계약에 없는 client 전용이며 L3 2인 승인은 UI 모의 수준임을 명시.
+  9. DOM 인용 보강: ADM-02 Kill Switch disabled 단언(`write-actions-integrity-wiring.test.tsx:249-256`), AUD-03 단언(`:281-321`), AUD-01 4개 시드 및 `length >= 6` 단언 대조.
+  10. 관찰사항 5건(ADR-038 오기, 단방향 Drain 동기화, traceId 난수 합성, 모달 role=dialog 부재) 및 차기 FE 제품 결함 6건(FE-DEFECT-S08-01~06) 섹션 §6 신설.
+- **다음 행동**: `check_docs.py` 통과 확인 후 커밋·푸시, PR #123에 조치 보고 코멘트 작성.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
