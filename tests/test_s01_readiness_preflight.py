@@ -5,13 +5,17 @@ from pathlib import Path
 
 import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from inv.node_channels import node_uri
+from inv.tooling import NodePrincipal
 
+import tools.s01_readiness_preflight as s01
 from tools.s01_readiness_preflight import (
     aggregate_inputs,
     evaluate_capability_rows,
     lint_inventory,
     probe_certificate_chain,
     probe_control_plane,
+    probe_dns,
     probe_pilot_capabilities,
     report_exit_code,
     write_redacted_report,
@@ -25,7 +29,7 @@ def inventory() -> dict:
         colocated = index == 0
         nodes.append(
             {
-                "nodeId": f"nod_test_{index}",
+                "nodeId": f"nod_{index + 1:026d}",
                 "hostname": f"node-{index}.internal.example",
                 "dnsName": f"node-{index}.internal.example",
                 "ip": f"192.168.45.{140 + index}",
@@ -102,6 +106,26 @@ def test_inventory_lint_distinguishes_missing_input_from_invalid_supplied_value(
     assert invalid_result["facts"]["invalidFieldCount"] == 1
 
 
+def test_inventory_lint_treats_present_null_values_as_missing_not_pass():
+    value = inventory()
+    value["schemaVersion"] = None
+    value["nodes"][0]["profile"] = None
+    value["nodes"][0]["role"] = None
+    value["nodes"][0]["ntp"]["configured"] = None
+    value["nodes"][0]["capacity"]["gpuDevices"] = None
+
+    result = lint_inventory(value)
+
+    assert result["status"] == "BLOCKED"
+    assert result["facts"]["missingFieldCount"] == 5
+    assert result["facts"]["invalidFieldCount"] == 0
+
+    value["nodes"] = None
+    result = lint_inventory(value)
+    assert result["status"] == "BLOCKED"
+    assert result["facts"]["missingFieldCount"] >= 1
+
+
 def test_control_plane_requires_both_real_session_and_anonymous_boundary():
     responses = {
         ("/v1/health", False): (200, {"unresolvedSettings": []}, {}),
@@ -113,7 +137,16 @@ def test_control_plane_requires_both_real_session_and_anonymous_boundary():
     def fetch(path: str, *, authenticated: bool):
         return responses[(path, authenticated)]
 
-    checks = probe_control_plane(base_url="https://secret-host.example", token="secret-token", fetch=fetch)
+    def health_fetch(_path: str, *, authenticated: bool):
+        return responses[("/v1/health", authenticated)]
+
+    checks = probe_control_plane(
+        base_url="https://secret-host.example",
+        health_url="https://health-secret.example/v1/health",
+        token="secret-token",
+        fetch=fetch,
+        health_fetch=health_fetch,
+    )
     assert [check["status"] for check in checks] == ["PASS", "PASS", "PASS"]
     rendered = json.dumps(checks, sort_keys=True)
     assert "secret-host" not in rendered
@@ -129,7 +162,16 @@ def test_missing_token_blocks_session_even_when_anonymous_401_is_correct():
             return 200, {"status": "ready"}, {}
         return 401, {}, {"www-authenticate": "Bearer"}
 
-    checks = probe_control_plane(base_url="http://127.0.0.1:8080", token=None, fetch=fetch)
+    def health_fetch(_path: str, *, authenticated: bool):
+        return 200, {"unresolvedSettings": ["INV_SECRET_ENDPOINT"]}, {}
+
+    checks = probe_control_plane(
+        base_url="http://127.0.0.1:8080",
+        health_url="http://127.0.0.1:9000/v1/health",
+        token=None,
+        fetch=fetch,
+        health_fetch=health_fetch,
+    )
     assert checks[2]["status"] == "BLOCKED"
     assert checks[2]["code"] == "access-token-missing"
     assert checks[2]["facts"]["anonymousBoundaryValid"] is True
@@ -143,10 +185,43 @@ def test_unresolved_health_setting_is_fail_without_setting_names():
             return 200, {"status": "ready"}, {}
         return 401, {}, {"www-authenticate": "Bearer"}
 
-    health = probe_control_plane(base_url="https://cp.example", token=None, fetch=fetch)[0]
+    def health_fetch(_path: str, *, authenticated: bool):
+        return 200, {"unresolvedSettings": ["INV_SECRET_ENDPOINT"]}, {}
+
+    health = probe_control_plane(
+        base_url="https://cp.example",
+        health_url="https://health.example/v1/health",
+        token=None,
+        fetch=fetch,
+        health_fetch=health_fetch,
+    )[0]
     assert health["status"] == "FAIL"
     assert health["facts"] == {"unresolvedSettingCount": 1}
     assert "INV_SECRET_ENDPOINT" not in json.dumps(health)
+
+
+def test_health_surface_is_separate_and_plaintext_token_is_never_sent():
+    calls: list[tuple[str, bool]] = []
+
+    def fetch(path: str, *, authenticated: bool):
+        calls.append((path, authenticated))
+        if path == "/readyz":
+            return 200, {"status": "ready"}, {}
+        return 401, {}, {"www-authenticate": "Bearer"}
+
+    checks = probe_control_plane(
+        base_url="http://cp.example",
+        health_url=None,
+        token="must-not-be-sent",
+        fetch=fetch,
+        health_fetch=lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError()),
+    )
+
+    assert checks[0]["status"] == "BLOCKED"
+    assert checks[0]["code"] == "health-url-missing"
+    assert checks[2]["status"] == "FAIL"
+    assert checks[2]["code"] == "plaintext-token-transport-rejected"
+    assert ("/v1/session", True) not in calls
 
 
 def capability_rows(value: dict) -> list[dict]:
@@ -182,43 +257,104 @@ def test_capability_comparison_is_exact_and_redacted():
     assert value["nodes"][1]["nodeId"] not in json.dumps(failed)
 
 
-def test_pilot_certificate_chain_uses_registered_leaf_and_inventory_fingerprint(tmp_path: Path):
-    value = inventory()
+def _write_pilot_certificates(
+    state: Path,
+    value: dict,
+    *,
+    count: int = 5,
+    wrong_identity_index: int | None = None,
+) -> None:
+    tenant_id = "00000000-0000-0000-0000-000000000001"
+    epoch = "00000000-0000-0000-0000-000000000002"
     ca_key, ca_cert = ca_pair()
-    node_key = Ed25519PrivateKey.generate()
-    leaf = issue(
-        ca_key,
-        ca_cert,
-        node_key.public_key(),
-        "inv://tenant/nodes/" + value["nodes"][0]["nodeId"],
-    )
-    value["nodes"][0]["certificateSHA256"] = fingerprint(leaf)
-    state = tmp_path / "pilot"
-    (state / "public").mkdir(parents=True)
+    (state / "public" / "nodes").mkdir(parents=True)
     (state / "ca.pem").write_bytes(pem(ca_cert))
-    (state / "public" / "node-cert.pem").write_bytes(pem(leaf))
+    state_nodes = []
+    for index, node in enumerate(value["nodes"][:count]):
+        node_key = Ed25519PrivateKey.generate()
+        uri = node_uri(NodePrincipal(tenant_id, node["nodeId"]), epoch)
+        if index == wrong_identity_index:
+            uri += "/wrong"
+        leaf = issue(ca_key, ca_cert, node_key.public_key(), uri, address=node["ip"])
+        node_dir = state / "public" / "nodes" / node["nodeId"]
+        node_dir.mkdir()
+        (node_dir / "node-cert.pem").write_bytes(pem(leaf))
+        node["certificateSHA256"] = fingerprint(leaf)
+        state_nodes.append(
+            {"nodeId": node["nodeId"], "nodeIP": node["ip"], "provisioned": True}
+        )
     (state / "private-state.json").write_text(
         json.dumps(
             {
-                "nodes": [
-                    {
-                        "nodeId": value["nodes"][0]["nodeId"],
-                        "nodeIP": value["nodes"][0]["ip"],
-                        "provisioned": True,
-                    }
-                ]
+                "tenantId": tenant_id,
+                "epoch": epoch,
+                "nodes": state_nodes,
             }
         ),
         encoding="utf-8",
     )
 
+
+def test_pilot_certificate_chain_matches_product_identity_for_all_five_nodes(tmp_path: Path):
+    value = inventory()
+    state = tmp_path / "pilot"
+    _write_pilot_certificates(state, value)
+
     passed = probe_certificate_chain(state, value, None)
     assert passed["status"] == "PASS"
-    assert passed["facts"] == {"registeredLeafCount": 1, "verifiedLeafCount": 1}
+    assert passed["facts"] == {"registeredLeafCount": 5, "verifiedLeafCount": 5}
     assert value["nodes"][0]["nodeId"] not in json.dumps(passed)
 
     value["nodes"][0]["certificateSHA256"] = "f" * 64
     assert probe_certificate_chain(state, value, None)["status"] == "FAIL"
+
+
+def test_pilot_certificate_chain_blocks_partial_or_null_registration(tmp_path: Path):
+    value = inventory()
+    state = tmp_path / "pilot"
+    _write_pilot_certificates(state, value, count=1)
+
+    result = probe_certificate_chain(state, value, None)
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "registered-node-certificates-incomplete"
+    assert result["facts"]["registeredLeafCount"] == 1
+
+    private_state = state / "private-state.json"
+    private_state.write_text(json.dumps({"tenantId": "tenant", "epoch": "epoch", "nodes": None}))
+    assert probe_certificate_chain(state, value, None)["status"] == "BLOCKED"
+
+
+def test_pilot_certificate_chain_rejects_wrong_spiffe_identity(tmp_path: Path):
+    value = inventory()
+    state = tmp_path / "pilot"
+    _write_pilot_certificates(state, value, wrong_identity_index=2)
+
+    result = probe_certificate_chain(state, value, None)
+
+    assert result["status"] == "FAIL"
+    assert result["facts"]["verifiedLeafCount"] == 4
+
+
+def test_dns_probe_pass_fail_and_blocked_are_redacted():
+    value = inventory()
+    hostnames = 3 + len(value["nodes"])
+    passed = probe_dns(value, resolver=lambda *_args: [(None,)])
+    assert passed["status"] == "PASS"
+    assert passed["facts"] == {"hostnameCount": hostnames, "resolvedCount": hostnames}
+
+    secret = "dns-exception-secret"
+
+    def failing_resolver(*_args):
+        raise RuntimeError(secret)
+
+    failed = probe_dns(value, resolver=failing_resolver)
+    assert failed["status"] == "FAIL"
+    assert secret not in json.dumps(failed)
+
+    value["hostnames"]["portal"] = None
+    blocked = probe_dns(value, resolver=lambda *_args: [(None,)])
+    assert blocked["status"] == "BLOCKED"
+    assert blocked["code"] == "inventory-not-ready"
 
 
 def test_pilot_capability_probe_sets_read_only_scope_and_redacts_dsn(tmp_path: Path):
@@ -312,6 +448,135 @@ def test_report_writer_removes_stale_report_and_never_serializes_forbidden_field
         write_redacted_report(target, bad)
     assert not target.exists()
 
+    with pytest.raises(ValueError, match="forbidden"):
+        write_redacted_report(
+            target,
+            dict(report, checks=[{"facts": {"message": "-----BEGIN CERTIFICATE-----"}}]),
+        )
+    assert not target.exists()
+
+
+@pytest.mark.parametrize("protected", ["inventory", "ca", "state-child"])
+def test_main_validates_protected_output_before_unlink(
+    tmp_path: Path, protected: str
+):
+    state = tmp_path / "state"
+    state.mkdir()
+    inventory_path = tmp_path / "inventory.json"
+    ca_path = tmp_path / "node-ca.pem"
+    inventory_path.write_text("inventory sentinel", encoding="utf-8")
+    ca_path.write_text("ca sentinel", encoding="utf-8")
+    state_child = state / "private-state.json"
+    state_child.write_text("state sentinel", encoding="utf-8")
+    output = {
+        "inventory": inventory_path,
+        "ca": ca_path,
+        "state-child": state_child,
+    }[protected]
+    before = output.read_bytes()
+
+    with pytest.raises(SystemExit) as error:
+        s01.main(
+            [
+                "--inventory",
+                str(inventory_path),
+                "--state",
+                str(state),
+                "--ca-bundle",
+                str(ca_path),
+                "--output",
+                str(output),
+            ]
+        )
+
+    assert error.value.code == 2
+    assert output.read_bytes() == before
+
+
+def test_main_report_and_stdout_are_redacted_end_to_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+):
+    value = inventory()
+    inventory_path = tmp_path / "inventory-secret-marker.json"
+    inventory_path.write_text(json.dumps(value), encoding="utf-8")
+    state = tmp_path / "state-secret-marker"
+    state.mkdir()
+    report_path = tmp_path / "report.json"
+    token = "token-secret-marker"
+    monkeypatch.setenv("TEST_S01_TOKEN", token)
+
+    def fake_http_fetcher(base_url, token_value, ca_bundle, timeout_seconds, *, exact_url=False):
+        assert "secret-marker" not in str(ca_bundle)
+
+        def fetch(path: str, *, authenticated: bool):
+            if exact_url:
+                return 200, {"unresolvedSettings": []}, {}
+            if path == "/readyz":
+                return 200, {"status": "ready"}, {}
+            if authenticated:
+                assert token_value == token
+                return 200, {"subjectId": "response-secret-marker"}, {}
+            return 401, {}, {"www-authenticate": "Bearer"}
+
+        return fetch
+
+    monkeypatch.setattr(s01, "http_fetcher", fake_http_fetcher)
+    monkeypatch.setattr(
+        s01,
+        "probe_certificate_chain",
+        lambda *_args: s01._check(
+            "node-certificate-chain", "PASS", "certificate-chain-valid", registeredLeafCount=5, verifiedLeafCount=5
+        ),
+    )
+    monkeypatch.setattr(
+        s01,
+        "probe_dns",
+        lambda *_args: s01._check("dns-resolution", "PASS", "dns-resolved", hostnameCount=8, resolvedCount=8),
+    )
+    monkeypatch.setattr(
+        s01,
+        "probe_pilot_capabilities",
+        lambda *_args: s01._check(
+            "pilot-capability-match",
+            "PASS",
+            "pilot-capabilities-match",
+            inventoryNodeCount=5,
+            registeredNodeCount=5,
+            matchedNodeCount=5,
+            databaseReadOnly=True,
+        ),
+    )
+
+    exit_code = s01.main(
+        [
+            "--base-url",
+            "https://cp-secret-marker.example",
+            "--health-url",
+            "https://health-secret-marker.example/v1/health",
+            "--token-env",
+            "TEST_S01_TOKEN",
+            "--inventory",
+            str(inventory_path),
+            "--state",
+            str(state),
+            "--output",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    rendered = report_path.read_text(encoding="utf-8") + capsys.readouterr().out
+    for secret in (
+        token,
+        "secret-marker",
+        value["nodes"][0]["nodeId"],
+        value["nodes"][0]["ip"],
+        value["nodes"][0]["certificateSHA256"],
+        "-----BEGIN CERTIFICATE-----",
+        "postgresql://",
+    ):
+        assert secret not in rendered
+
 
 @pytest.mark.parametrize(
     ("checks", "expected"),
@@ -319,6 +584,7 @@ def test_report_writer_removes_stale_report_and_never_serializes_forbidden_field
         ([{"status": "PASS"}], 0),
         ([{"status": "PASS"}, {"status": "FAIL"}], 1),
         ([{"status": "PASS"}, {"status": "BLOCKED"}], 2),
+        ([], 2),
     ],
 )
 def test_exit_code_does_not_count_blocked_as_pass(checks: list[dict], expected: int):

@@ -15,12 +15,14 @@ import ssl
 import sys
 from typing import Any, Callable
 from urllib.error import HTTPError
+from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener, HTTPSHandler
 
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519, padding, rsa
-from cryptography.x509.oid import ExtendedKeyUsageOID
+from inv.node_channels import certificate_identity
+from inv.tooling import NodePrincipal
 
 
 SCHEMA_VERSION = "s01-readiness-preflight:1"
@@ -50,7 +52,8 @@ def _check(check_id: str, status: str, code: str, **facts: Any) -> dict[str, Any
 def _mapping_counts(value: Any, expected: set[str]) -> tuple[int, int]:
     if not isinstance(value, dict):
         return len(expected), 1 if value is not None else 0
-    return len(expected - set(value)), len(set(value) - expected)
+    missing = {key for key in expected if key not in value or value[key] is None}
+    return len(missing), len(set(value) - expected)
 
 
 def _positive_integer(value: Any, *, allow_zero: bool = False) -> bool:
@@ -86,7 +89,7 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
             invalidFieldCount=max(invalid, 1),
         )
     if payload.get("schemaVersion") != INVENTORY_SCHEMA_VERSION:
-        if "schemaVersion" in payload:
+        if payload.get("schemaVersion") is not None:
             invalid += 1
     topology = payload.get("topology")
     if topology not in {"five-workers-dedicated-cp", "cp-colocated-plus-four-workers"}:
@@ -280,7 +283,11 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
                         value, allow_zero=field == "gpuDevices"
                     ):
                         invalid += 1
-                if isinstance(hardware, dict) and isinstance(hardware.get("gpus"), list):
+                if (
+                    isinstance(hardware, dict)
+                    and isinstance(hardware.get("gpus"), list)
+                    and capacity.get("gpuDevices") is not None
+                ):
                     if len(hardware["gpus"]) != capacity.get("gpuDevices"):
                         invalid += 1
 
@@ -317,7 +324,7 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
             missing += add_missing
             invalid += add_invalid
             if isinstance(ntp, dict):
-                if "configured" in ntp and ntp["configured"] is not True:
+                if ntp.get("configured") is not None and ntp["configured"] is not True:
                     invalid += 1
                 source = ntp.get("source")
                 if source is not None and (
@@ -333,10 +340,14 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
                 ):
                     invalid += 1
 
-    if topology == "cp-colocated-plus-four-workers" and colocated_count != 1:
-        invalid += 1
-    if topology == "five-workers-dedicated-cp" and colocated_count != 0:
-        invalid += 1
+    roles_complete = isinstance(nodes, list) and all(
+        isinstance(node, dict) and node.get("role") is not None for node in nodes
+    )
+    if roles_complete:
+        if topology == "cp-colocated-plus-four-workers" and colocated_count != 1:
+            invalid += 1
+        if topology == "five-workers-dedicated-cp" and colocated_count != 0:
+            invalid += 1
 
     if invalid:
         status, code = "FAIL", "inventory-invalid"
@@ -354,48 +365,54 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
     )
 
 
-def _blocked_http_checks() -> list[dict[str, Any]]:
-    return [
-        _check("health-unresolved-settings", "BLOCKED", "base-url-missing", unresolvedSettingCount=0),
-        _check("readyz", "BLOCKED", "base-url-missing", readySignalValid=False),
-        _check(
+def probe_control_plane(
+    *,
+    base_url: str | None,
+    health_url: str | None,
+    token: str | None,
+    fetch: Callable[..., tuple[int, Any, dict[str, str]]],
+    health_fetch: Callable[..., tuple[int, Any, dict[str, str]]],
+) -> list[dict[str, Any]]:
+    """Probe HTTP signals while returning no response or endpoint value."""
+
+    if not health_url:
+        health = _check(
+            "health-unresolved-settings",
+            "BLOCKED",
+            "health-url-missing",
+            unresolvedSettingCount=0,
+        )
+    else:
+        try:
+            health_status, health_body, _ = health_fetch("", authenticated=False)
+            unresolved = health_body.get("unresolvedSettings") if isinstance(health_body, dict) else None
+            unresolved_count = len(unresolved) if isinstance(unresolved, list) else 0
+            health_valid = health_status == 200 and isinstance(unresolved, list) and not unresolved
+            health = _check(
+                "health-unresolved-settings",
+                "PASS" if health_valid else "FAIL",
+                "health-resolved" if health_valid else "health-not-resolved",
+                unresolvedSettingCount=unresolved_count,
+            )
+        except Exception:
+            health = _check(
+                "health-unresolved-settings",
+                "FAIL",
+                "health-probe-failed",
+                unresolvedSettingCount=0,
+            )
+
+    if not base_url:
+        ready = _check("readyz", "BLOCKED", "base-url-missing", readySignalValid=False)
+        session = _check(
             "session-boundary",
             "BLOCKED",
             "base-url-missing",
             authenticatedSessionValid=False,
             anonymousBoundaryValid=False,
-        ),
-    ]
-
-
-def probe_control_plane(
-    *,
-    base_url: str | None,
-    token: str | None,
-    fetch: Callable[..., tuple[int, Any, dict[str, str]]],
-) -> list[dict[str, Any]]:
-    """Probe HTTP signals while returning no response or endpoint value."""
-
-    if not base_url:
-        return _blocked_http_checks()
-    try:
-        health_status, health_body, _ = fetch("/v1/health", authenticated=False)
-        unresolved = health_body.get("unresolvedSettings") if isinstance(health_body, dict) else None
-        unresolved_count = len(unresolved) if isinstance(unresolved, list) else 0
-        health_valid = health_status == 200 and isinstance(unresolved, list) and not unresolved
-        health = _check(
-            "health-unresolved-settings",
-            "PASS" if health_valid else "FAIL",
-            "health-resolved" if health_valid else "health-not-resolved",
-            unresolvedSettingCount=unresolved_count,
         )
-    except Exception:
-        health = _check(
-            "health-unresolved-settings",
-            "FAIL",
-            "health-probe-failed",
-            unresolvedSettingCount=0,
-        )
+        return [health, ready, session]
+
     try:
         ready_status, ready_body, _ = fetch("/readyz", authenticated=False)
         ready_valid = (
@@ -427,6 +444,14 @@ def probe_control_plane(
             "session-boundary",
             "BLOCKED" if anonymous_valid else "FAIL",
             "access-token-missing" if anonymous_valid else "anonymous-session-boundary-invalid",
+            authenticatedSessionValid=False,
+            anonymousBoundaryValid=anonymous_valid,
+        )
+    elif urlsplit(base_url).scheme.lower() != "https":
+        session = _check(
+            "session-boundary",
+            "FAIL",
+            "plaintext-token-transport-rejected",
             authenticatedSessionValid=False,
             anonymousBoundaryValid=anonymous_valid,
         )
@@ -462,6 +487,8 @@ def http_fetcher(
     token: str | None,
     ca_bundle: Path | None,
     timeout_seconds: float,
+    *,
+    exact_url: bool = False,
 ) -> Callable[..., tuple[int, Any, dict[str, str]]]:
     context = ssl.create_default_context(cafile=str(ca_bundle)) if ca_bundle else None
     handlers: list[Any] = [_NoRedirect()]
@@ -473,7 +500,8 @@ def http_fetcher(
         headers = {"Accept": "application/json"}
         if authenticated:
             headers["Authorization"] = "Bearer " + (token or "")
-        request = Request(base_url.rstrip("/") + path, headers=headers, method="GET")
+        request_url = base_url if exact_url else base_url.rstrip("/") + path
+        request = Request(request_url, headers=headers, method="GET")
         try:
             response = opener.open(request, timeout=timeout_seconds)
         except HTTPError as error:
@@ -509,6 +537,8 @@ def probe_dns(
     lint = lint_inventory(inventory)
     if inventory is None:
         return _check("dns-resolution", "BLOCKED", "inventory-input-missing", hostnameCount=0, resolvedCount=0)
+    if lint["status"] != "PASS":
+        return _check("dns-resolution", "BLOCKED", "inventory-not-ready", hostnameCount=0, resolvedCount=0)
     hostnames: list[str] = []
     groups = inventory.get("hostnames") if isinstance(inventory, dict) else None
     if isinstance(groups, dict):
@@ -533,7 +563,7 @@ def probe_dns(
                 resolved += 1
         except Exception:
             pass
-    valid = resolved == len(hostnames) and lint["status"] != "BLOCKED"
+    valid = resolved == len(hostnames)
     return _check(
         "dns-resolution",
         "PASS" if valid else "FAIL",
@@ -580,7 +610,9 @@ def _signed_by(leaf: x509.Certificate, authority: x509.Certificate) -> bool:
     return True
 
 
-def _state_nodes(state: dict[str, Any]) -> list[dict[str, Any]]:
+def _state_nodes(state: Any) -> list[dict[str, Any]]:
+    if not isinstance(state, dict):
+        return []
     nodes = state.get("nodes")
     if nodes is None and state.get("nodeId") and state.get("nodeIP"):
         nodes = [
@@ -590,7 +622,9 @@ def _state_nodes(state: dict[str, Any]) -> list[dict[str, Any]]:
                 "provisioned": bool(state.get("initialized")),
             }
         ]
-    return [node for node in nodes or [] if isinstance(node, dict) and not node.get("disabled", False)]
+    if not isinstance(nodes, list):
+        return []
+    return [node for node in nodes if isinstance(node, dict) and not node.get("disabled", False)]
 
 
 def _node_certificate_file(state_path: Path, state: dict[str, Any], node: dict[str, Any]) -> Path:
@@ -610,6 +644,8 @@ def probe_certificate_chain(
 ) -> dict[str, Any]:
     if state_path is None or inventory is None:
         return _check("node-certificate-chain", "BLOCKED", "certificate-input-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    if lint_inventory(inventory)["status"] != "PASS":
+        return _check("node-certificate-chain", "BLOCKED", "inventory-not-ready", registeredLeafCount=0, verifiedLeafCount=0)
     state_file = state_path / "private-state.json"
     if not state_file.is_file():
         return _check("node-certificate-chain", "FAIL", "pilot-state-invalid", registeredLeafCount=0, verifiedLeafCount=0)
@@ -621,23 +657,38 @@ def probe_certificate_chain(
         authorities = _pem_certificates(ca_path)
     except Exception:
         return _check("node-certificate-chain", "FAIL", "certificate-input-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    now = datetime.now(timezone.utc)
     valid_authorities = []
     for authority in authorities:
         try:
-            if authority.extensions.get_extension_for_class(x509.BasicConstraints).value.ca:
+            if (
+                authority.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+                and authority.not_valid_before_utc <= now < authority.not_valid_after_utc
+            ):
                 valid_authorities.append(authority)
         except x509.ExtensionNotFound:
             pass
+    if not valid_authorities:
+        return _check("node-certificate-chain", "FAIL", "certificate-authority-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    if not isinstance(state, dict):
+        return _check("node-certificate-chain", "FAIL", "pilot-state-invalid", registeredLeafCount=0, verifiedLeafCount=0)
+    tenant_id = state.get("tenantId")
+    epoch = state.get("epoch")
+    if not isinstance(tenant_id, str) or not tenant_id or not isinstance(epoch, str) or not epoch:
+        return _check("node-certificate-chain", "BLOCKED", "certificate-identity-input-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    raw_inventory_nodes = inventory.get("nodes")
+    if not isinstance(raw_inventory_nodes, list):
+        return _check("node-certificate-chain", "BLOCKED", "inventory-not-ready", registeredLeafCount=0, verifiedLeafCount=0)
     inventory_nodes = {
         node.get("nodeId"): node
-        for node in inventory.get("nodes", [])
+        for node in raw_inventory_nodes
         if isinstance(node, dict)
     }
     candidates = [node for node in _state_nodes(state) if node.get("provisioned")]
-    if not candidates:
-        return _check("node-certificate-chain", "BLOCKED", "registered-node-certificate-missing", registeredLeafCount=0, verifiedLeafCount=0)
+    candidate_ids = {node.get("nodeId") for node in candidates}
+    if len(candidates) != 5 or candidate_ids != set(inventory_nodes):
+        return _check("node-certificate-chain", "BLOCKED", "registered-node-certificates-incomplete", registeredLeafCount=len(candidates), verifiedLeafCount=0)
     verified = 0
-    now = datetime.now(timezone.utc)
     for node in candidates:
         cert_path = _node_certificate_file(state_path, state, node)
         inventory_node = inventory_nodes.get(node.get("nodeId"))
@@ -648,15 +699,15 @@ def probe_certificate_chain(
             fingerprint = hashlib.sha256(
                 leaf.public_bytes(serialization.Encoding.DER)
             ).hexdigest()
-            eku = leaf.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
-            sans = leaf.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
-            uris = sans.get_values_for_type(x509.UniformResourceIdentifier)
+            identity_fingerprint, _ = certificate_identity(
+                leaf.public_bytes(serialization.Encoding.DER),
+                NodePrincipal(tenant_id, str(node.get("nodeId"))),
+                epoch,
+                now=now,
+            )
             valid = (
                 inventory_node.get("certificateSHA256") == fingerprint
-                and leaf.not_valid_before_utc <= now <= leaf.not_valid_after_utc
-                and ExtendedKeyUsageOID.CLIENT_AUTH in eku
-                and len(uris) == 1
-                and uris[0].startswith("inv://")
+                and identity_fingerprint == fingerprint
                 and any(_signed_by(leaf, authority) for authority in valid_authorities)
             )
             if valid:
@@ -799,6 +850,8 @@ def aggregate_inputs(checks: list[dict[str, Any]]) -> dict[str, dict[str, str]]:
 
 
 def report_exit_code(checks: list[dict[str, Any]]) -> int:
+    if not checks:
+        return 2
     statuses = {check["status"] for check in checks}
     if "FAIL" in statuses:
         return 1
@@ -848,30 +901,54 @@ def _overall_status(checks: list[dict[str, Any]]) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default=os.environ.get("INV_S01_BASE_URL"))
+    parser.add_argument("--health-url", default=os.environ.get("INV_S01_HEALTH_URL"))
     parser.add_argument("--token-env", default="INV_S01_ACCESS_TOKEN")
     parser.add_argument("--inventory", type=Path, default=os.environ.get("INV_S01_INVENTORY"))
     parser.add_argument("--state", type=Path, default=os.environ.get("INV_LAN_PILOT_STATE"))
     parser.add_argument("--ca-bundle", type=Path, default=os.environ.get("INV_NODE_MTLS_CA_BUNDLE"))
+    parser.add_argument("--http-ca-bundle", type=Path, default=os.environ.get("INV_S01_HTTP_CA_BUNDLE"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--timeout-seconds", type=float, default=5.0)
     args = parser.parse_args(argv)
-    args.output.unlink(missing_ok=True)
     if args.timeout_seconds <= 0 or args.timeout_seconds > 30:
         parser.error("--timeout-seconds must be in (0, 30]")
-    protected_inputs = [path for path in (args.inventory, args.ca_bundle) if path is not None]
-    if args.state is not None:
-        protected_inputs.append(args.state / "private-state.json")
-    if any(args.output.resolve() == path.resolve() for path in protected_inputs):
+    output_path = args.output.resolve()
+    protected_inputs = [
+        path.resolve()
+        for path in (args.inventory, args.ca_bundle, args.http_ca_bundle)
+        if path is not None
+    ]
+    state_path = args.state.resolve() if args.state is not None else None
+    if output_path in protected_inputs or (
+        state_path is not None and (output_path == state_path or state_path in output_path.parents)
+    ):
         parser.error("--output must not replace an input")
+    args.output.unlink(missing_ok=True)
 
     token = os.environ.get(args.token_env)
     inventory = _load_inventory(args.inventory)
     inventory_check = lint_inventory(inventory)
     if args.base_url:
-        fetch = http_fetcher(args.base_url, token, args.ca_bundle, args.timeout_seconds)
+        fetch = http_fetcher(args.base_url, token, args.http_ca_bundle, args.timeout_seconds)
     else:
         fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
-    checks = probe_control_plane(base_url=args.base_url, token=token, fetch=fetch)
+    if args.health_url:
+        health_fetch = http_fetcher(
+            args.health_url,
+            None,
+            args.http_ca_bundle,
+            args.timeout_seconds,
+            exact_url=True,
+        )
+    else:
+        health_fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
+    checks = probe_control_plane(
+        base_url=args.base_url,
+        health_url=args.health_url,
+        token=token,
+        fetch=fetch,
+        health_fetch=health_fetch,
+    )
     checks.extend(
         [
             probe_certificate_chain(args.state, inventory, args.ca_bundle),
