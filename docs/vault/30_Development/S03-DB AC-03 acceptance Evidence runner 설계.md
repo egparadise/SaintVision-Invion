@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S03-DB-AC03-EVIDENCE-RUNNER-DESIGN-001"
 title: "S03-DB AC-03 acceptance Evidence runner 설계 — 제한 컨테이너 출력 bytes/hash·금지 경로/명령 거부·lease 회수·Evidence ID를 고정 SHA에서 한 번에 묶는 runner (기존 collect_container_evidence.py + S03 시험 재사용)"
-version: "1.2.0"
+version: "1.3.0"
 status: "proposed-review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T06:50:00+09:00"
+updated: "2026-09-28T08:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -51,11 +51,11 @@ tags: ["S03-DB", "AC-03", "evidence", "runner", "container", "lease", "sandbox",
 - 묶음 verdict: DB lane 규칙(C1/C4·C2/C3)에 의존하는 두 조항은 **DB lane이 measured일 때만** 판정한다 — 관측하지 않은 위반 수는 0이 아니라 unknown이므로 unmeasured면 두 조항은 `not_run`(`notRunReason=db-lane-unmeasured`, rule 값 `null`). pytest-only 두 조항이 pass이고 나머지가 lane-unmeasured `not_run`뿐이면 `PASS_MEASURED_PARTIAL`이며 JSON `passScope`/`passScopeNote`와 MD가 어느 조항이 pass인지 명시한다(4조항 전부 pass로 렌더링하지 않음); 4조항 전부 pass ∧ 모든 lane measured ∧ Docker lane 측정 → `PASS`; 실패/위반 → `FAIL`; 실행 불가 → `UNAVAILABLE`; 측정 0 또는 lane 외 사유의 not_run → `NOT_RUN`. `acceptanceClaim=false` 고정(실 Linux 제한 컨테이너·ToolGateway·제품 Storage 출력은 물리 자원 대기). 어떤 clause 시험 파일이든 failed/error > 0 또는 exit ≠ 0이면 매핑 여부와 무관하게 `FAIL`(#120 F-R1과 같은 fail-closed).
 - **Redaction 계약 (Codex F-R3, #120 F-R3과 동일 기준)**: 산출 이름은 "redacted" — (i) DSN·password는 `assert_no_secrets`로 쓰기 거부, (ii) 식별자는 sanitizer가 placeholder로 치환: disposable DB 이름(`inv_s03_<hex>`·`inv_rls_<hex>`·`inv_backend_test_<hex>`), UUID(tenant·epoch·abort·object), 커널 ULID 식별자(`run_/lse_/evd_/nod_/prj_/res_/tnt_` + 26자), `IPv4:port`; collector가 쓴 lane JSON/MD도 그 자리에서 치환(JSON 유효 유지, raw/redacted sha256 병기), `--note`도 같은 치환; (iii) **보존되는 것**: probe stdout/stderr head(고정 probe 문자열)·SQLSTATE·rule id·count. 부정 시험(각 패턴이 남으면 쓰기 거부)을 둔다. 이 묶음은 내부 evidence이며 공개 artifact가 아니다.
 - 외부·물리 대기(값 없음): 실제 Linux 제한 컨테이너 실행 24파일(`integration/test_node_runtime`·`test_dispatch_node`·`test_node_delivery`·`test_shard_recovery`·`test_workspace_*`·`test_results` 등, "Real Linux Docker runtime explicitly enabled only in isolated CI") → `not_run_here` + hosted Core run id를 인용 칸으로만, ToolGateway 실 Node, S03-ST 전송 정본(#5 결정 대기).
-- 산출: `Evidence/s03-db-acceptance/s03-acceptance-<sha12>-<utc>.{json,md}` + `-container.{json,md}`(collector 원본). stale 선삭제, DSN/비밀번호 쓰기 거부, provenance = SHA·branch·integration 거리·clean 플래그·runner sha256·collector sha256. exit 0 PASS_MEASURED(_PARTIAL) / 1 FAIL / 2 UNAVAILABLE / 3 NOT_RUN.
+- 산출: `Evidence/s03-db-acceptance/s03-acceptance-<sha12>-<utc>.{json,md}` + `-container.{json,md}`(collector 원본). 같은 label 산출물이 있으면 거부(삭제·덮어쓰기 없음), 기본 label은 `<sha12>-<UTC %Y%m%dT%H%M%SZ>`, DSN/비밀번호 쓰기 거부, provenance = repo 루트 cwd로 계산한 SHA·branch·integration 거리·clean 플래그·runner sha256·collector sha256·`dirtyTreeAllowed`(dirty tree 기본 거부, `--allow-dirty-tree` opt-out 기록). verdict는 fail-closed 먼저: 어느 suite/lane이든 실패가 있으면 unavailable이 섞여도 FAIL. ULID 식별자 redaction은 prefix 무관(`<3~4 소문자>_<Crockford 26>`)이며 `saintvision.ids.PREFIXES` 전수 + 커널 prefix로 부정 시험. exit 0 PASS_MEASURED(_PARTIAL) / 1 FAIL / 2 UNAVAILABLE / 3 NOT_RUN.
 
 ## 3. 시험 계획
 
-- PG-free: 매핑 실재(AST), JUnit 파싱·clause 규칙, lane 전달(measured/unmeasured 그대로, 절대 pass로 승격 금지), verdict 표, 비밀 guard, stale 삭제, stub end-to-end, 시드 함수 동작 보존(승격 전후 동일 row 수).
+- PG-free: 매핑 실재(AST), JUnit 파싱·clause 규칙, lane 전달(measured/unmeasured 그대로, 절대 pass로 승격 금지), verdict 표, failed+unavailable → FAIL, 기존 산출물 거부·미삭제, dirty 기본 거부·opt-out 기록, label 시각 형식, repo 루트 provenance, 비밀 guard, stub end-to-end, 시드 함수 동작 보존(승격 전후 동일 row 수).
 - 실 PG: 파일 하나씩 순차(메모리 규칙) = test_execution 25·tool_admission 12·postgres 2(-k)·reservation 3; DB lane은 빈 disposable DB → UNMEASURED(정직). 컨테이너 기동 없음. 예상 총 2~3분.
 - 되살림 1건 이상: 매핑 밖 케이스 1건 실패 + 매핑 전부 pass → 묶음 FAIL(fail-closed); sanitizer 패턴 하나를 지우면 부정 시험이 쓰기 거부를 요구해 실패하는지; 금지 명령 조항의 케이스 하나를 매핑에서 빼면 AST 시험이 잡는지.
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -84,10 +85,16 @@ def test_unmapped_failure_in_any_suite_fails_closed():
     assert evidence["verdict"] == "FAIL"
 
 
+from saintvision.ids import PREFIXES as _CORE_PREFIXES
+
+_KERNEL_PREFIXES = ["apr", "chk", "dtl", "evd", "lse", "mdl", "mdv", "nod", "node", "plan", "pool", "prj",
+                    "rep", "res", "run", "stc", "user", "usr", "wkl", "wld", "wsp"]
+
+
 @pytest.mark.parametrize("sample", [
     "inv_s03_" + "a" * 32, "inv_rls_" + "b" * 32, "inv_backend_test_" + "c" * 32,
-    "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53", "run_01HZZZZZZZZZZZZZZZZZZZZZZZ", "lse_01J00000000000000000000000",
-    "evd_01HZZZZZZZZZZZZZZZZZZZZZZZ", "192.168.45.74:18443",
+    "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53", "192.168.45.74:18443",
+    *[f"{prefix}_01HZZZZZZZZZZZZZZZZZZZZZZZ" for prefix in sorted(set(_CORE_PREFIXES.values()) | set(_KERNEL_PREFIXES))],
 ])
 def test_sanitizer_replaces_each_identifier_class_and_negative_guard_refuses(sample, tmp_path):
     assert sample not in tool.redact_text(f"x {sample} y")
@@ -225,12 +232,62 @@ def test_secret_guard_and_write_refusal(monkeypatch, tmp_path):
     assert not (tmp_path / "x.json").exists()
 
 
-def test_stale_outputs_removed_and_missing_dsn_is_unavailable(tmp_path, monkeypatch):
-    for name in ("s.json", "s.md", "s-lanes.json", "s-lanes.md"):
-        (tmp_path / name).write_text("{}", encoding="utf-8")
-    monkeypatch.delenv("INV_TEST_ADMIN_DSN", raising=False)
+def test_existing_outputs_are_refused_never_deleted_and_missing_dsn_is_unavailable(tmp_path, monkeypatch):
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov())
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    (tmp_path / "s-lanes.md").write_text("prior", encoding="utf-8")  # a lone sibling artifact blocks the label
     assert tool.main(["--out-dir", str(tmp_path), "--label", "s", "--junit-dir", str(tmp_path / "j")]) == 2
-    assert not any((tmp_path / n).exists() for n in ("s.json", "s.md", "s-lanes.json", "s-lanes.md"))
+    assert (tmp_path / "s-lanes.md").read_text(encoding="utf-8") == "prior" and not (tmp_path / "s.json").exists()
+    monkeypatch.delenv("INV_TEST_ADMIN_DSN", raising=False)
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "n", "--junit-dir", str(tmp_path / "j")]) == 2
+
+
+def test_dirty_tree_is_refused_by_default_and_recorded_when_allowed(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance",
+                        lambda executor=None: {**_prov(), "working_tree_clean_status": False})
+    monkeypatch.setattr(tool, "run_suite", lambda spec, junit_dir, python=None: {**_suite(), "id": spec["id"]})
+    monkeypatch.setattr(tool, "run_lanes", lambda out_dir, label, dsn, container_image, note: _lanes())
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "j")]) == 2
+    assert not (tmp_path / "d.json").exists()
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "j"),
+                      "--allow-dirty-tree"]) == 0
+    payload = json.loads((tmp_path / "d.json").read_text(encoding="utf-8"))
+    assert payload["provenance"]["dirtyTreeAllowed"] is True
+    assert payload["provenance"]["working_tree_clean_status"] is False
+
+
+def test_default_label_carries_sha_and_utc_timestamp(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov())
+    monkeypatch.setattr(tool, "run_suite", lambda spec, junit_dir, python=None: {**_suite(), "id": spec["id"]})
+    monkeypatch.setattr(tool, "run_lanes", lambda out_dir, label, dsn, container_image, note: _lanes())
+    assert tool.main(["--out-dir", str(tmp_path), "--junit-dir", str(tmp_path / "j")]) == 0
+    names = [p.name for p in tmp_path.glob("s03-acceptance-*.json")]
+    assert len(names) == 1 and re.fullmatch(r"s03-acceptance-a{12}-\d{8}T\d{6}Z\.json", names[0]), names
+
+
+@pytest.mark.parametrize("suites, lanes_kwargs", [
+    ([_suite(outcomes={**_all_cases(), "tests.test_run_state::test_the_happy_path_is_walkable": "failed"}, exit_code=1)],
+     {"verdict": "UNAVAILABLE", "status": "unavailable"}),
+    ([_suite(status="unavailable"), _suite(exit_code=1)], {}),
+    ([_suite(status="unavailable")], {"verdict": "VIOLATIONS", "db": True, "violations": {"C1": 1}}),
+])
+def test_failure_outranks_unavailable(suites, lanes_kwargs):
+    assert tool.build_evidence(provenance=_prov(), suites=suites, lanes=_lanes(**lanes_kwargs))["verdict"] == "FAIL"
+
+
+def test_provenance_is_computed_from_the_repo_root(tmp_path, monkeypatch):
+    seen = {}
+
+    def fake_collect(executor=None):
+        seen["cwd"] = Path(os.getcwd()).resolve()
+        return _prov()
+    monkeypatch.setattr(tool, "collect_provenance", fake_collect)
+    monkeypatch.chdir(tmp_path)
+    tool.collect_provenance_at_repo_root("Claude")
+    assert seen["cwd"] == tool.REPO_ROOT.resolve()
+    assert Path(os.getcwd()).resolve() == tmp_path.resolve()
 
 
 def test_main_bundles_stubbed_suites_and_lanes(tmp_path, monkeypatch):

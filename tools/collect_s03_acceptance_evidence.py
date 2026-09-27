@@ -41,15 +41,20 @@ Honesty rules:
   - identifiers are replaced by placeholders in every produced file, including the
     collector's own lane JSON/Markdown rewritten in place: disposable database names
     (``inv_s03_``/``inv_rls_``/``inv_backend_test_`` + hex), UUIDs (tenant, epoch,
-    abort, object ids), kernel ULID ids (``run_``/``lse_``/``evd_``/``nod_``/``prj_``/
-    ``res_``/``tnt_`` + 26 chars) and ``IPv4:port`` pairs; ``--note`` passes through
-    the same replacement;
+    abort, object ids), every ``<prefix>_<26-char Crockford ULID>`` entity id regardless
+    of prefix (``run_``/``lse_``/``evd_``/``nod_``/``prj_``/``res_``/``wkl_``/... — the
+    kernel and ``saintvision.ids.PREFIXES`` sets) and ``IPv4:port`` pairs; ``--note``
+    passes through the same replacement;
   - retained on purpose: probe stdout/stderr heads (fixed probe strings), SQLSTATEs,
     rule ids and counts; pytest failure messages are never kept.
   This bundle is internal evidence, not a public artifact.
 
 Exit codes: 0 PASS / PASS_MEASURED_PARTIAL; 1 FAIL (a clause or any case failed, or
-a lane reported violations); 2 UNAVAILABLE (no DSN or a suite could not run); 3 NOT_RUN.
+a lane reported violations; a failure outranks an unavailable sibling); 2 UNAVAILABLE
+(no DSN, a suite could not run, dirty tree without ``--allow-dirty-tree``, or an
+existing output with the same label); 3 NOT_RUN.  Provenance is computed with the
+repository root as cwd; the default label carries the SHA and a UTC timestamp and
+existing outputs are never deleted or overwritten.
 """
 
 from __future__ import annotations
@@ -352,18 +357,20 @@ def run_lanes(out_dir: Path, label: str, *, dsn: str | None, container_image: st
 
 def overall_verdict(clauses: dict[str, Any], suites: list[dict[str, Any]], lanes: dict[str, Any]) -> str:
     statuses = {c["status"] for c in clauses.values()}
-    if any(s["status"] in ("unavailable", "invalid-junit") for s in suites) or lanes["status"] == "unavailable":
-        return "UNAVAILABLE"
-    # Fail closed on every executed suite (mapped or not): failed/error cases,
-    # non-zero pytest exit or an incomplete status can never leave the bundle PASS.
+    # Fail closed first, on every suite (mapped or not) and the lanes: any observed
+    # failure outranks an unavailable sibling, so failed+unavailable is FAIL.
     for suite in suites:
         counts = suite.get("counts") or {}
-        if suite["status"] == "not_run" and not (counts.get("failed") or counts.get("error")):
+        if suite["status"] in ("unavailable", "invalid-junit", "not_run"):
+            if counts.get("failed") or counts.get("error"):
+                return "FAIL"
             continue
         if suite["status"] != "complete" or suite.get("exitCode") != 0 or counts.get("failed") or counts.get("error"):
             return "FAIL"
     if "fail" in statuses or lanes.get("verdict") == "VIOLATIONS":
         return "FAIL"
+    if any(s["status"] in ("unavailable", "invalid-junit") for s in suites) or lanes["status"] == "unavailable":
+        return "UNAVAILABLE"
     scope = pass_scope(clauses)
     if not scope["passed"] or scope["notRunOther"]:
         return "NOT_RUN"
@@ -415,6 +422,7 @@ def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]], 
                 "working_tree_clean_status", "content_clean_diff", "modified_paths", "interpreter",
                 "runtime_python", "timestamp_kst", "executor", "os_platform")},
             "runnerSha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "dirtyTreeAllowed": bool(provenance.get("dirtyTreeAllowed", False)),
         },
         "environment": {
             "database": "disposable PostgreSQL database per pytest session / per lane run from "
@@ -481,7 +489,7 @@ _REDACTIONS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\binv_(?:s03|rls|backend_test)_[0-9a-f]{32}\b"), "inv_disposable_<redacted>"),
     (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"),
      "<uuid:redacted>"),
-    (re.compile(r"\b(?:run|lse|evd|nod|prj|res|tnt)_[0-9A-HJKMNP-TV-Z]{26}\b"), "<id:redacted>"),
+    (re.compile(r"\b[a-z]{3,4}_[0-9A-HJKMNP-TV-Z]{26}\b"), "<id:redacted>"),  # any prefixed ULID
     (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}:\d{2,5}\b"), "<host:port:redacted>"),
 ]
 
@@ -552,15 +560,29 @@ def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple
     return json_path, md_path
 
 
-def remove_stale_outputs(out_dir: Path, label: str) -> None:
-    for name in (f"{label}.json", f"{label}.md", f"{label}-lanes.json", f"{label}-lanes.md"):
-        (out_dir / name).unlink(missing_ok=True)
+def existing_outputs(out_dir: Path, label: str, extra: tuple[str, ...] = ()) -> list[Path]:
+    """Outputs that already exist for this label; they are never deleted or overwritten."""
+    names = [f"{label}.json", f"{label}.md", *extra]
+    return [out_dir / name for name in names if (out_dir / name).exists()]
+
+
+def collect_provenance_at_repo_root(executor: str | None) -> dict[str, Any]:
+    """Provenance must describe the repository, not whatever cwd the caller happened to use."""
+    previous = os.getcwd()
+    os.chdir(REPO_ROOT)
+    try:
+        return collect_provenance(executor=executor)
+    finally:
+        os.chdir(previous)
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     result.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
-    result.add_argument("--label", default=None, help="file stem (default: s03-acceptance-<sha12>-<utc date>)")
+    result.add_argument("--label", default=None, help="file stem (default: s03-acceptance-<sha12>-<utc timestamp>)")
+    result.add_argument("--allow-dirty-tree", action="store_true",
+                        help="explicit opt-out: run on a dirty working tree (recorded in provenance); "
+                             "by default a dirty tree is refused because the evidence would not be reachable")
     result.add_argument("--executor", default=os.environ.get("INV_S03_EXECUTOR") or "Claude")
     result.add_argument("--note", default=None)
     result.add_argument("--dsn", default=None, help="owner DSN of a database holding a PRODUCT run ledger (never recorded)")
@@ -582,10 +604,17 @@ def run_docker_lane(junit_dir: Path) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
-    provenance = collect_provenance(executor=args.executor)
+    provenance = collect_provenance_at_repo_root(args.executor)
+    provenance["dirtyTreeAllowed"] = bool(args.allow_dirty_tree)
     sha12 = (provenance.get("commit_sha") or "nogit")[:12]
-    label = args.label or f"s03-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%d}"
-    remove_stale_outputs(args.out_dir, label)
+    label = args.label or f"s03-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%dT%H%M%SZ}"
+    if existing := existing_outputs(args.out_dir, label, (f"{label}-lanes.json", f"{label}-lanes.md")):
+        print(f"refusing to overwrite existing evidence: {[p.name for p in existing]}", file=sys.stderr)
+        return 2
+    if not provenance.get("working_tree_clean_status") and not args.allow_dirty_tree:
+        print("working tree is not clean; evidence must come from a committed, reachable head "
+              "(pass --allow-dirty-tree to record an explicit opt-out)", file=sys.stderr)
+        return 2
     if not os.environ.get("INV_TEST_ADMIN_DSN") and not args.dsn:
         print("INV_TEST_ADMIN_DSN (or --dsn) is required; nothing measured", file=sys.stderr)
         return 2
