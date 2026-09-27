@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S08-FE-SCENARIO-MATRIX-20260928"
 title: "S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 시나리오 매트릭스 (Gemini)"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T06:50:00+09:00"
+updated: "2026-09-28T07:20:00+09:00"
 source_of_truth: "Git"
 tags: ["s08-fe", "acceptance-matrix", "security-console", "docker-socket-isolation", "approval-bypass", "gpu-benchmark", "kill-switch", "audit-ledger", "wal-backup", "gemini"]
 ---
@@ -22,6 +22,8 @@ tags: ["s08-fe", "acceptance-matrix", "security-console", "docker-socket-isolati
 > - PR #123 Claude r1 독립 검토 (`issuecomment-5859784561`)
 > - PR #123 Codex 계약 축 독립 검토 (`issuecomment-5859831617`)
 > - PR #123 Claude r2 UI 독립 재대조 (`issuecomment-5859854873`)
+> - PR #123 Claude r3 UI 경로 승인 (`issuecomment-5859910871`)
+> - PR #123 Codex 계약 정밀도 재대조 (`issuecomment-5859916746`)
 > - `apps/web/src/features/admin/AdminSecurityConsole.tsx`
 > - `apps/web/src/features/admin/securityEngine.ts`
 > - `apps/web/tests/admin-security.test.ts`
@@ -49,7 +51,7 @@ Codex 계약 축 검토(F-C3)에 따라, 현재 UI 엔진이 사용하는 클라
 |---|---|---|
 | **오류 코드 규격** | `SECURITY_VIOLATION` (`securityEngine:139`),<br>`APPROVAL_REQUIRED` (`securityEngine:165`)<br>*(HTTP 계약 없는 프런트엔드 자체 문자열)* | **RFC 7807 ProblemDetails** 정본 오류 코드:<br>• `VAL-0003` (422: Idempotency-Key 누락/길이 오류, 스키마 검증 실패)<br>• `AUTH-0062` (403: operator 권한 `can_contain`/`can_resume` 부재)<br>• `GRAPH-0003` (409: version 불일치 낙관적 락 충돌)<br>• `NODE-0033` (409: recovery_epoch 불일치)<br>• `NODE-0062` (409: 격리/관측 불가 상태 전이 거절)<br>• `LEASE-0003` (409: 활성 리스/작업 미정착 시 해제 거절)<br>• `IDEM-0001` (409: 동일 키 내용 변경 충돌) |
 | **승인 토큰 형식** | `apr_01JABCDEF` 등 임의의 비어있지 않은 문자열 (`securityEngine:156`은 non-empty 여부만 검사) | **UUID 형식** (`contracts/v1alpha1/core.schema.json:3051`)<br>사전 인가된 2인 containment approval(`inv.containment_approvals`)을 operation/node/body에 결속하여 서버가 단 1회 원자적 소비(consume, ADR-056) |
-| **요청 헤더 및 페이로드** | 단순 JSON 객체 `{ actor: string, reason: string }`<br>*(Idempotency-Key 헤더 없음, `AdminSecurityConsole:66-69`)* | • **헤더**: `Idempotency-Key: string` (1~200자 필수, `containment.py:98`)<br>• **본문**: `ContainmentInput { expectedVersion: integer, reasonCode: "maintenance"\|"incident"\|"operator_request", approvalId: uuid }`, `additionalProperties: false` (`core.schema.json:3032`)<br>• **Actor**: 본문이 아닌 Bearer 인증 토큰(principal.subject_id)에서 추출 |
+| **요청 헤더 및 페이로드** | 단순 JSON 객체 `{ actor: string, reason: string }`<br>*(Idempotency-Key 헤더 없음, `AdminSecurityConsole:66-69`)* | • **헤더**: `Idempotency-Key: string` (1~200자의 printable ASCII 필수: 각 문자 ordinal 33..126; 공백/제어문자/non-ASCII 거부, 누락·규격 위반 시 422 `VAL-0003`, `app.py:key()`, `containment.py:98`)<br>• **본문**: `ContainmentInput { expectedVersion: integer, reasonCode: "maintenance"\|"incident"\|"operator_request", approvalId: uuid }`, `additionalProperties: false` (`core.schema.json:3032`)<br>• **Actor**: 본문이 아닌 Bearer 인증 토큰(principal.subject_id)에서 추출 |
 | **노드 제어 성공 상태** | UI 모의 상태 `🚨 DRAINED (스케줄링 제외)` (`AdminSecurityConsole:728`)<br>*(비계약 상태명)* | `ContainmentResult.control.nodeStatus` canonical enum (`core.schema.json:3086`):<br>**`online` \| `offline` \| `draining` \| `quarantined` \| `null`**<br>*(주의: `drained`는 백엔드 계약에 존재하지 않는 상태명임; drain 요청 시 전이 대상은 `draining`)* |
 | **응답 데이터 구조** | 프런트엔드 상태 객체 (로컬 state 업데이트) | `ContainmentResult { requestId: uuid, approvalId: uuid, operation: "kill"\|"clear"\|"drain"\|"resume", control: ContainmentView }` (`core.schema.json:3128`) |
 | **원장 및 카운터** | 컴포넌트 마운트 시 생성되는 인메모리 배열 `auditLogs` 및 정적/인메모리 카운터 (`dockerSocketAttemptsBlocked`, `approvalBypassesBlocked`) | PostgreSQL 불변 테이블 (`inv.containment_requests`, `inv.tenant_controls`, `inv.node_controls`) 트랜잭션 원자 기록 (ADR-053) |
@@ -100,9 +102,9 @@ Codex 계약 축 검토(F-C3)에 따라, 현재 UI 엔진이 사용하는 클라
      - `currentUser === null`인 경우 상단에 `data-testid="admin-auth-required-notice"`(`role="alert"`)를 렌더링하고, 노드 Drain/Undrain 클릭 시 네트워크 호출을 **0회(0 network calls)**로 차단하며 `admin-drain-error-banner`를 표출한다 (`defect-recovery-admin-recovery-editor.test.tsx:100-144`).
      - 비상 Kill Switch 토글 버튼 역시 `disabled={!actor}` 및 `aria-disabled={!actor}`로 비활성화된다 (`AdminSecurityConsole.tsx:320-322`, `write-actions-integrity-wiring.test.tsx:249-256`).
    - **[ADM-01 계약 불일치 고지 — Mock 환경 한정 통과 및 단방향 동기화 (F-C2, N3)]**:
-     - 실제 백엔드 `POST /v1/nodes/{id}/drain` 및 `POST /v1/nodes/{id}/resume` (`app.py:388, :401`, ADR-054)은 `Idempotency-Key` 헤더 필수(누락 시 422 `VAL-0003`, `app.py:265`)이며, 요청 본문은 `ContainmentInput{expectedVersion, reasonCode: "maintenance"|"incident"|"operator_request", approvalId: uuid}`, `additionalProperties:false` (`contracts/v1alpha1/core.schema.json:3032`)이다. actor는 본문이 아니라 Bearer 토큰의 검증된 principal에서 취한다 (`containment.py:101, :123`).
+     - 실제 백엔드 `POST /v1/nodes/{id}/drain` 및 `POST /v1/nodes/{id}/resume` (`app.py:388, :401`, ADR-054)은 `Idempotency-Key` 헤더 필수(`app.py:key()` 기준 1~200자의 printable ASCII, 각 문자 ordinal 33..126, 공백/control/non-ASCII 거부; 누락·형식 위반 시 422 `VAL-0003`, `app.py:265`)이며, 요청 본문은 `ContainmentInput{expectedVersion, reasonCode: "maintenance"|"incident"|"operator_request", approvalId: uuid}`, `additionalProperties:false` (`contracts/v1alpha1/core.schema.json:3032`)이다. actor는 본문이 아니라 Bearer 토큰의 검증된 principal에서 취한다 (`containment.py:101, :123`).
      - 성공 시 응답은 `ContainmentResult`이며, canonical nodeStatus enum은 `online | offline | draining | quarantined | null`이다 (`core.schema.json:3086`). 백엔드 계약상 `drained`라는 상태는 존재하지 않는다 (drain 완료 대상 상태는 `draining`).
-     - 409 충돌 경계로는 version 불일치 시 `GRAPH-0003`, stale recovery epoch 시 `NODE-0033`, 상태 전이 거절 시 `NODE-0062`, 활성 리스 존재 시 `LEASE-0003`, 멱등성 충돌 시 `IDEM-0001`, operator 권한 부재 시 `AUTH-0062`가 반환된다.
+     - 충돌 및 권한 경계로는 409 Conflict(`GRAPH-0003` version 불일치 낙관적 락 충돌, `NODE-0033` stale recovery epoch, `NODE-0062` 격리/관측 불가 상태 전이 거절, `LEASE-0003` 활성 리스 존재 시 해제 거절, `IDEM-0001` 동일 키 페이로드 변경 충돌)와 403 Forbidden(`AUTH-0062` operator 권한 `can_contain`/`can_resume` 부재)이 엄격히 분리되어 반환된다 (`containment.py:33, :114, :134, :140, :153, :162, :168, :180`).
      - 그러나 현재 UI(`AdminSecurityConsole.tsx:66-69`)는 `{actor, reason}`만 전송하고 `Idempotency-Key`를 넘기지 않는다. 따라서 **실제 서버 환경에서는 Drain 요청이 100% 거절(422)되고 UI가 롤백**된다. 매트릭스의 DRAINED 갱신은 vitest mock(`mockResolvedValue`) 환경에서만 확인된 것이며, 실제 계약 일치 배선은 차기 FE 결함 수정 카드(`FE-DEFECT-S08-02`) 및 Codex 계약 확인 대상이다.
      - **[단방향 Drain 동기화 결함 (N3)]**: `AdminSecurityConsole.tsx:27-39`에서 컴포넌트는 서버의 draining 상태(`node.status === 'draining'`)는 초기에 가져오지만, 서버 측에서 drain이 해제되어도 이를 화면에 다시 반영하지 않으며, 화면에 표출되는 상태는 순수 로컬 state(`AdminSecurityConsole.tsx:728`)에만 의존하는 단방향 동기화 결함이 존재한다.
    - **재해 복구 및 WAL 백업 원장 표시 (Backup & PITR)**:
@@ -169,7 +171,7 @@ Codex 계약 축 검토(F-C3)에 따라, 현재 UI 엔진이 사용하는 클라
 
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 네트워크 규격 | 검증 단언 및 기대값 | 관련 인용 시험 (파일:행) |
 |:---:|---|---|---|---|---|---|---|
-| **ADM-01** | **인증된 관리자 세션 시 실제 actor 동적 배선 (하드코딩 배제)** | `AdminSecurityConsole.tsx`<br>`apiClient` | `currentUser: { id: 'usr_actual_admin_77', role: 'admin' }` 주입 상태 | 노드 Drain 탭 이동 후 `Node Drain` 버튼 클릭 | • 서브탭 버튼: `button:has-text("노드 Drain 통제 (ADR-038)")` (주의: ADR 번호는 ADR-054의 오기임)<br>• 액션 버튼: `button:has-text("Node Drain")`<br>• **현재 UI 요청**: `apiClient('/v1/nodes/nod_test_01/drain', { method: 'POST', body: JSON.stringify({ actor: 'usr_actual_admin_77', reason: '...' }) })`<br>• **백엔드 정본 규격 (F-C2)**:<br>  - Header: `Idempotency-Key: <key>`<br>  - Body: `ContainmentInput { expectedVersion: 1, reasonCode: "maintenance", approvalId: "<uuid>" }`<br>  - Actor: Bearer principal 자동 추출<br>  - Response: `ContainmentResult` (target status: `draining`) | • 인증 부재 배너(`admin-auth-required-notice`) 미노출 확인.<br>• `apiClient` 호출 시 실제 로그인 식별자 `usr_actual_admin_77` 전송 단언.<br>• **[F-C2 계약 불일치 및 409 경계 고지]**:<br>  - 실제 백엔드는 `Idempotency-Key` 누락 시 422 `VAL-0003`, version 불일치 시 409 `GRAPH-0003`, stale recovery epoch 시 409 `NODE-0033`, 격리 거부 시 409 `NODE-0062`, operator 권한 부재 시 403 `AUTH-0062`를 반환함.<br>  - canonical nodeStatus enum은 `online\|offline\|draining\|quarantined\|null`이며 `drained`는 계약 상태가 아님.<br>  - 본 호출은 vitest mock(`mockResolvedValue`) 환경에서만 성공 성립하며 실제 서버에서는 100% 거절됨 (차기 FE 결함 수정 대상). | `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx:52-98` |
+| **ADM-01** | **인증된 관리자 세션 시 실제 actor 동적 배선 (하드코딩 배제)** | `AdminSecurityConsole.tsx`<br>`apiClient` | `currentUser: { id: 'usr_actual_admin_77', role: 'admin' }` 주입 상태 | 노드 Drain 탭 이동 후 `Node Drain` 버튼 클릭 | • 서브탭 버튼: `button:has-text("노드 Drain 통제 (ADR-038)")` (주의: ADR 번호는 ADR-054의 오기임)<br>• 액션 버튼: `button:has-text("Node Drain")`<br>• **현재 UI 요청**: `apiClient('/v1/nodes/nod_test_01/drain', { method: 'POST', body: JSON.stringify({ actor: 'usr_actual_admin_77', reason: '...' }) })`<br>• **백엔드 정본 규격 (F-C2)**:<br>  - Header: `Idempotency-Key: <key>` (1~200자 printable ASCII, ord 33..126, `app.py:key()`)<br>  - Body: `ContainmentInput { expectedVersion: 1, reasonCode: "maintenance", approvalId: "<uuid>" }`<br>  - Actor: Bearer principal 자동 추출<br>  - Response: `ContainmentResult` (target status: `draining`) | • 인증 부재 배너(`admin-auth-required-notice`) 미노출 확인.<br>• `apiClient` 호출 시 실제 로그인 식별자 `usr_actual_admin_77` 전송 단언.<br>• **[F-C2 계약 불일치 및 409 경계 고지]**:<br>  - 실제 백엔드는 `Idempotency-Key` 누락 및 ASCII(ord 33..126) 규격 위반 시 422 `VAL-0003`, version 불일치 시 409 `GRAPH-0003`, stale recovery epoch 시 409 `NODE-0033`, 격리 거부 시 409 `NODE-0062`, 활성 리스 미정착 시 409 `LEASE-0003`, 멱등성 충돌 시 409 `IDEM-0001`, operator 권한 부재 시 403 `AUTH-0062`를 반환함.<br>  - canonical nodeStatus enum은 `online\|offline\|draining\|quarantined\|null`이며 `drained`는 계약 상태가 아님.<br>  - 본 호출은 vitest mock(`mockResolvedValue`) 환경에서만 성공 성립하며 실제 서버에서는 100% 거절됨 (차기 FE 결함 수정 대상). | `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx:52-98` |
 | **ADM-02** | **관리자 세션 부재(`null`) 시 경고 배너(role=alert) 및 0-네트워크 가드** | `AdminSecurityConsole.tsx`<br>`apiClient` | `currentUser: null` (비로그인/세션 만료 상태) | 1) 컴포넌트 마운트<br>2) Drain 탭 이동 후 Drain 버튼 클릭 시도 | • 경고 배너: `div[role="alert"][data-testid="admin-auth-required-notice"]`<br>• 경고 문구: `⚠️ 인증된 관리자 세션 부재: 관리자 세션 식별자(actor)가 확인되지 않았습니다...`<br>• 에러 배너: `div[data-testid="admin-drain-error-banner"]`<br>• 에러 문구: `❌ 인증된 관리자 세션이 없습니다. 노드 격리(Drain) 명령은 로그인된 관리자 식별자(actor)가 필수입니다.`<br>• Kill Switch 버튼: `button[data-testid="emergency-kill-switch-toggle-btn"][disabled]` | • 마운트 즉시 `role="alert"`를 가진 인증 부재 경고 배너 렌더링 단언.<br>• Drain 버튼 클릭 시 `apiClient` 네트워크 호출이 **0회(not.toHaveBeenCalled)**로 원천 차단됨을 단언.<br>• Kill Switch 버튼 disabled 처리(`write-actions-integrity-wiring.test.tsx:249-256`에서 단언). | `apps/web/tests/defect-recovery-admin-recovery-editor.test.tsx:100-144`<br>`apps/web/tests/write-actions-integrity-wiring.test.tsx:249-256` |
 | **ADM-03** | **재해 복구 및 PostgreSQL WAL 백업 원장 카드 렌더링** | `AdminSecurityConsole.tsx` | 백업 서브탭 활성화 (`activeSubTab === 'backup'`) | 서브탭 마운트 시점 | • 서브탭 버튼: `button:has-text("재해 복구 및 WAL 백업")`<br>• 스냅샷 카드: `div:has-text("Latest Snapshot WAL")` ➔ `000000010000000A0000002F`<br>• 복제 상태: `div:has-text("S3 복제 완료")` (정적 리터럴)<br>• RPO 카드: `div:has-text("RPO 달성도 (Target ≤ 15m)")` ➔ `div:has-text("4 분 전")` (상단 타일) / `div:has-text("4분 전 기록 완료")`<br>• RTO 카드: `div:has-text("RTO 실측치 (Target ≤ 60m)")` ➔ `div:has-text("RTO 12분")` (상단 타일) / `div:has-text("12.5 분 (PASS)")` | • 상단 KPI 타일 및 서브탭 4에서 WAL 백업 및 RPO/RTO 카드 표출 확인.<br>• 타일 및 카드의 모든 수치는 상태 비연결 정적 리터럴임.<br>• **[물리 경계 고지]**: 실제 PostgreSQL 물리 WAL 아카이빙, S3 오프사이트 복제, PITR 복원 훈련 및 보존 GC는 **UNMEASURED ('독립 역할 restore/PITR 및 off-device backup 배선 후')**임. | `apps/web/src/features/admin/AdminSecurityConsole.tsx:257-263, 654-702`<br>*(컴포넌트 렌더링 검증)* |
 
@@ -238,8 +240,12 @@ Codex 계약 축 검토(F-C3)에 따라, 현재 UI 엔진이 사용하는 클라
 
 ## 7. 검토 인계 및 다음 단계
 
-- **문서 상태**: `status: "review"` (S08-FE 보안 감사 시나리오 매트릭스 v1.0.2 개정 완료)
-- **독립 리뷰어**: Claude (UI 셀렉터, 거버넌스 불변식, DOM 단언 대조), Codex (보안 정본 계약, 커널/OS 격리 경계, ADR-053/054/056/100 규격 대조)
+- **문서 상태**: `status: "review"` (S08-FE 보안 감사 시나리오 매트릭스 v1.0.3 개정 완료)
+- **독립 리뷰어**: Claude (UI 경로 승인 완료: `issuecomment-5859910871`), Codex (계약 정밀도 재대조: `issuecomment-5859916746`)
+- **v1.0.3 조치 요약**:
+  - **Codex 계약 재대조(issuecomment-5859916746) 반영**:
+    - §1.2 및 요약의 409 충돌 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`)와 403 권한 경계(`AUTH-0062`)를 명확히 분리 정정 (`containment.operator()`의 `AUTH-0062` 403 HTTP 상태 일치).
+    - `Idempotency-Key` 규격을 `app.py:key()` 기준 1~200자의 printable ASCII (각 문자 ordinal 33..126; 공백/control/non-ASCII 거부)로 정밀 명시 (표 §1.1 및 ADM-01 정본 규격).
 - **v1.0.2 조치 요약**:
   - **Codex 계약 축 검토(F-C1~F-C3) 반영**:
     - F-C1: Kill Switch를 "API 미노출"에서 "API 존재·FE 미연결"로 전면 정정, POST 호출 규격(Bearer identity, operator grant, `Idempotency-Key`, `ContainmentInput`) 및 tenant execution barrier 경계 명시.

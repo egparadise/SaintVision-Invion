@@ -21,10 +21,12 @@ source_of_truth: "Git"
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
 
-## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.2 개정 (`agent/gemini/s08-fe-matrix`)
+## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.3 개정 (`agent/gemini/s08-fe-matrix`)
 
-- **작업 개요**: PR #123 Codex 계약 축 검토(`issuecomment-5859831617`, F-C1~F-C3) 및 Claude UI 독립 재대조 r2(`issuecomment-5859854873`, N1~N4) 전수 반영하여 시나리오 매트릭스 v1.0.2 개정.
-- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (v1.0.2, docs-only).
+- **작업 개요**: PR #123 Claude r3 UI 경로 승인(`issuecomment-5859910871`) 및 Codex 계약 재대조(`issuecomment-5859916746`) 전수 반영하여 시나리오 매트릭스 v1.0.3 개정.
+  - 409 충돌 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`)와 403 권한 경계(`AUTH-0062`) 분리 정정.
+  - `Idempotency-Key` 규격을 `app.py:key()` 기준 1~200자 printable ASCII (ordinals 33..126)로 정밀 명시.
+- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (v1.0.3, docs-only).
 - **v1.0.2 조치 내역**:
   1. **Kill Switch canonical 계약 (F-C1)**: 백엔드 `app.py:310, :358, :370` API 실재(`GET/POST /v1/operations/kill-switch`, `/clear`) 및 POST 필수 규격(Bearer identity, operator grant, `Idempotency-Key`, `ContainmentInput`), tenant execution barrier/reconciler 정지 규약(ADR-053) 명시. 문서 내 "API 미노출" 전면 정정.
   2. **Drain/Resume canonical 계약 (F-C2)**: `POST /v1/nodes/{id}/drain` 및 `/resume`의 필수 규격(`Idempotency-Key` 헤더, `ContainmentInput`, principal actor 추출), 성공 canonical nodeStatus enum(`online|offline|draining|quarantined|null`, 비계약 상태 `drained` 배제), 409 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`, `AUTH-0062`), `ContainmentResult` 응답 명시 및 mock UI와의 불일치 고지.
