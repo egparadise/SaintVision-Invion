@@ -25,9 +25,10 @@ Three policies, one per role, because the three needs are different:
 
 Reversible, unlike 0045 and 0046: adding RLS can be undone by removing it, and
 an operator holding a rollback should not be told to restore from a backup for
-a change that unpicks cleanly. The two roles are not dropped on downgrade --
-they may be shared with another database in the cluster, the same reason
-0001_s02_baseline gives for keeping ``inv_app``.
+a change that unpicks cleanly. It is reversible but **not symmetric** -- the
+downgrade removes the machinery and leaves ``inv_app``'s SELECT revoked, because
+a rollback must not be a way to reintroduce the exposure this revision fixes.
+See :func:`downgrade`.
 """
 
 from alembic import op
@@ -65,17 +66,26 @@ def upgrade():
     END $$;
     ALTER ROLE inv_audit_reader NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE
       NOINHERIT NOBYPASSRLS;
-    -- Reading audit records must not be reachable from a runtime role; an
-    -- operator who granted it there gets a stopped migration, not a quiet pass.
-    DO $$ BEGIN
-      IF EXISTS (
-        SELECT 1 FROM pg_auth_members m
+    -- Any pre-existing member at all stops the migration, not just inv_app and
+    -- inv_kernel. Naming those two would only catch a direct grant: with
+    -- `GRANT inv_audit_reader TO audit_bridge; GRANT audit_bridge TO inv_app` the
+    -- runtime role assumes the reader transitively and the check would pass. It
+    -- would also let an unrelated pre-existing login become a cross-tenant audit
+    -- reader with no review. Every membership chain that reaches this role has a
+    -- direct member at its head, so refusing direct members refuses the chains
+    -- too -- which is why there is one guard here and not two.
+    DO $$
+    DECLARE members text;
+    BEGIN
+      SELECT string_agg(member_role.rolname, ', ' ORDER BY member_role.rolname)
+        INTO members
+        FROM pg_auth_members m
         JOIN pg_roles granted_role ON granted_role.oid = m.roleid
         JOIN pg_roles member_role ON member_role.oid = m.member
-        WHERE granted_role.rolname = 'inv_audit_reader'
-          AND member_role.rolname IN ('inv_app', 'inv_kernel')
-      ) THEN
-        RAISE EXCEPTION 'a runtime role is a member of inv_audit_reader; review membership before migration';
+       WHERE granted_role.rolname = 'inv_audit_reader';
+      IF members IS NOT NULL THEN
+        RAISE EXCEPTION
+          'inv_audit_reader already has members (%); review membership before migration', members;
       END IF;
     END $$;
     GRANT USAGE ON SCHEMA public TO inv_audit_reader;
@@ -151,11 +161,29 @@ def upgrade():
 
 
 def downgrade():
-    """Undo the isolation. Restores the baseline grant, keeps the roles.
+    """Remove the isolation machinery **without** reopening the exposure.
 
-    Dropping ``inv_audit_writer`` or ``inv_audit_reader`` here would fail
-    whenever another database in the cluster still owns objects or memberships
-    through them, so they are left in place with no privileges on this database.
+    Deliberately not a symmetric inverse. Re-granting ``SELECT ON audit_events
+    TO inv_app`` would hand the application role every tenant's authorisation
+    decisions back the moment an operator rolls back, which is the exact defect
+    this revision exists to fix -- a rollback of a security fix must not be a way
+    to reintroduce it. There is no compatibility argument for restoring it
+    either: no product read path uses that privilege (the only reader in the
+    tree is a test, as the owner). So the grant stays revoked and restoring it
+    is an explicit, reviewed security exception, not an automatic side effect of
+    ``alembic downgrade``.
+
+    What that leaves at 0046: ``audit_events`` with no RLS, ``inv_app`` with
+    INSERT and no SELECT. The application can still append its own audit rows.
+    Rolling the *database* back while 0047 application code is still deployed
+    does break the tenant-less denial path -- ``public.record_auth_denial`` is
+    gone, so an authentication failure would surface as a 500 instead of a 401.
+    Migrate forward before deploying, roll code back before the schema.
+
+    ``inv_audit_writer`` and ``inv_audit_reader`` are not dropped: they may be
+    shared with another database in the cluster, the same reason
+    0001_s02_baseline gives for keeping ``inv_app``. They are left with no
+    privilege on this database.
     """
     op.execute("""
     DROP FUNCTION IF EXISTS
@@ -169,5 +197,6 @@ def downgrade():
     REVOKE SELECT ON audit_events FROM inv_audit_reader;
     REVOKE USAGE ON SCHEMA public FROM inv_audit_reader;
     REVOKE USAGE ON SCHEMA public FROM inv_audit_writer;
-    GRANT SELECT ON audit_events TO inv_app;
+    -- inv_app's SELECT is NOT restored. See the docstring.
+    REVOKE SELECT ON audit_events FROM inv_app;
     """)

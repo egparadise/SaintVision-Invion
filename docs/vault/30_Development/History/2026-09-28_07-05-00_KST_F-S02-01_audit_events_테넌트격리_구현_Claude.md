@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-F-S02-01-AUDIT-RLS-IMPL-001"
 title: "F-S02-01 구현 — audit_events RLS ENABLE+FORCE, 앱 SELECT 회수, NULL-tenant 거부 기록 append primitive (실 PG 실측)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T07:05:00+09:00"
+updated: "2026-09-28T09:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf045c5a554209aaef601ae4883b64da50a7"
@@ -75,8 +75,36 @@ tags: ["f-s02-01", "audit-events", "rls", "security-definer", "s02-db", "claude"
 - **주입 clock 손실**: NULL-tenant 거부 행의 `occurred_at`은 서버 `clock_timestamp()`다. 기존 시험 중 그 시각을 단언하는 것은 없었다(실측). 설계 §7-2에서 Codex 확인 요청 항목으로 올렸다.
 - **registry 무변경**: `docs/task-registry.json`에 F-* 카드 항목은 없고 S02-DB는 `review`다. self-close 하지 않았다.
 
-## 5. 다음 첫 행동과 담당
+## 6. Codex 보안 검토 반영 (v1.1.0, 2026-09-28 09:05 KST)
 
-1. **Codex** — 설계 §7 세 가지(읽기 역할 범위 / `occurred_at` 서버 시계 / downgrade 가역 유지) 확인, 그리고 0047 + `definer-policy.json` 항목 독립 검토. 병합은 Codex 판정 후.
+`c96f4f60`에 대한 Codex 판정은 **수정 요청**이었고 두 건 모두 맞다. SECURITY DEFINER 본문·`occurred_at` 서버 시계·명시적 cross-tenant reader 역할은 수용됐다.
+
+### F-R1 — reader membership guard가 간접·미승인 멤버십을 못 막았다
+
+원래 guard는 `pg_auth_members`에서 **직접** member가 `inv_app`/`inv_kernel`인 경우만 봤다. `GRANT inv_audit_reader TO bridge; GRANT bridge TO inv_app`이면 통과하면서 `inv_app`은 `pg_has_role` 상 reader를 assume한다. 그 두 역할이 아닌 기존 login member도 검토 없이 cross-tenant reader가 된다.
+
+고친 것: guard가 **member가 하나라도 있으면** 거부하고, 예외 메시지에 그 이름들을 담는다(writer guard와 같은 원칙). 두 번째 `pg_has_role` guard를 덧붙이지 않은 이유를 migration 주석에 적었다 — `inv_audit_reader`에 닿는 모든 멤버십 사슬은 머리에 직접 member가 있으므로, 직접 member를 전부 거부하면 사슬도 거부된다. 도달 불가능한 두 번째 guard를 들고 있는 것보다 정확하다.
+
+시험: `tests/test_audit_events_isolation.py::test_the_upgrade_stops_when_the_audit_reader_already_has_members[direct|chain]` — disposable DB를 0046까지 올린 뒤 (a) 직접 member, (b) `reader → bridge → leaf` 사슬을 시드하고 `alembic upgrade head`가 **중단**되는 것, 그리고 중단이 half-applied가 아닌 것(head 0046·RLS off·정책 0·함수 0)을 확인한다. 사슬 시드가 실제 bypass 형태임을 `pg_has_role(leaf,'inv_audit_reader','MEMBER') = true`로 먼저 단언한다(no-op 시드가 아님). leaf에 `inv_app`을 쓰지 않은 이유도 적었다: 역할은 클러스터 전역이고, 실제 앱 역할에 전 테넌트 감사 경로를 부여하는 것은 시험 방법이 아니라 그 구멍 자체다. guard의 성질은 "member가 있는지"이므로 leaf가 누구인지에 의존하지 않는다. 클러스터 전역 부수효과(수초간 존재, `finally`에서 회수)도 docstring에 명시했다.
+
+정적 게이트도 좁혔다: `test_migrations.py`가 새 메시지를 요구하고, 두 runtime 역할로 범위가 좁혀진 옛 형태를 **거부**한다.
+
+### F-R2 — downgrade가 원래 취약점을 조용히 복원했다
+
+원래 downgrade는 RLS를 끈 뒤 `GRANT SELECT ON audit_events TO inv_app`을 다시 실행했다. 감사 행이 남은 운영 DB를 0046으로 내리는 순간 app role이 전 테넌트·NULL-tenant 감사기록을 읽는다. **보안 수정의 rollback이 그 수정을 되돌리는 경로가 되면 안 된다.**
+
+고친 것: downgrade는 기계장치만 걷어내고 `inv_app`의 SELECT는 **회수 상태로 둔다**(`REVOKE SELECT ON audit_events FROM inv_app`). 호환성 근거도 없다 — 제품 읽기 경로가 그 권한을 쓰지 않는다(트리 안의 유일한 reader는 owner로 읽는 시험이다). 정확한 baseline 복원이 필요하면 자동 downgrade가 아니라 명시적 보안 예외 절차다. 가역성은 유지하되 **대칭이 아니다**를 migration docstring과 module docstring에 적었고, DB만 0046으로 내리고 0047 코드를 남기면 NULL-tenant 거부 경로가 500이 된다는 운영 순서(migrate → deploy, code rollback → schema rollback)도 함께 적었다.
+
+시험: 왕복을 스크래치패드 검증이 아니라 **저장소 시험**으로 승격했다 — `test_the_downgrade_removes_the_machinery_without_restoring_the_read`(head → 0046 → head 세 상태를 카탈로그에서 읽어 비교, 0046 상태에서 `app_select=False`를 요구) + PG-free 소스 단언 `test_migrations.py::test_the_downgrade_does_not_restore_the_insecure_audit_grant`. `--sql`은 downgrade를 렌더하지 않으므로 소스에서 읽는다.
+
+### 이 수정의 검증 상태 (정직)
+
+- PG-free: `pytest tests/test_migrations.py` **26 passed** exit 0(새 downgrade 소스 단언 포함), `tests/core/test_definer_audit_cli.py` 3 passed, `check_docs` exit 0.
+- **실 PG는 이 수정분에 대해 로컬에서 돌리지 않았다.** 코디네이터 규칙(가용 1.5GB 이상일 때만 실 PG, 파일 하나씩)에 따른 것이며 측정 시각 가용 메모리는 1.28GB → 0.81GB였다. 따라서 새 시험 3건(`[direct]`·`[chain]`·downgrade 왕복)의 실행 근거는 **hosted Backend**다. 로컬 통과를 주장하지 않는다.
+- `definer-policy.json`의 `sourceMigrationSHA256`은 migration 본문이 바뀌었으므로 `82e1126d…`로 갱신했다. `definitionSHA256`은 함수 본문을 건드리지 않았으므로 불변(`397bfe69…`).
+
+## 7. 다음 첫 행동과 담당
+
+1. **Codex** — F-R1·F-R2 수정분 재검토(§6). 설계 §7의 세 확인 항목은 이미 수용 회신을 받았다. 병합은 Codex 판정 후.
 2. **Claude** — 회신 반영, 필요 시 두 번째 읽기 역할 카드.
 3. **코디네이터/운영** — 운영·공유 DB의 0047 적용과 `inv_audit_reader` 위임 대상 결정(현재는 NOLOGIN·NOINHERIT이므로 명시적 `SET ROLE`이나 member 부여가 필요하다).

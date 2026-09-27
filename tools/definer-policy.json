@@ -92,7 +92,7 @@
         "inv_app"
       ],
       "kind": "tenant-less-audit-append",
-      "sourceMigrationSHA256": "d9e3c774d1cb5b02e21d9b754e6a41f1958def004b2f581a7bc4e908bec60385"
+      "sourceMigrationSHA256": "82e1126db57a15efa91764fc1da97a74e3efc2653d1364d9b8ce5974831e59da"
     }
   }
 }

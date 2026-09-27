@@ -169,7 +169,27 @@ def test_the_tenant_less_denial_has_exactly_one_narrow_writer(rendered_sql):
     ):
         assert re.search(pattern, rendered_sql), pattern
     assert "inv_audit_writer has members; refusing denial-primitive ownership" in rendered_sql
-    assert "a runtime role is a member of inv_audit_reader" in rendered_sql
+    # Any member at all, not just inv_app/inv_kernel: naming the runtime roles
+    # would miss `GRANT inv_audit_reader TO bridge; GRANT bridge TO inv_app` and
+    # would let an unrelated pre-existing login read across tenants unreviewed.
+    assert "inv_audit_reader already has members (%); review membership before migration" in rendered_sql
+    assert not re.search(
+        r"rolname IN \('inv_app', 'inv_kernel'\)[^;]*inv_audit_reader", rendered_sql
+    ), "the reader guard must not be scoped to the two runtime roles"
+
+
+def test_the_downgrade_does_not_restore_the_insecure_audit_grant(rendered_sql):
+    """A rollback of a security fix must not be a way to reintroduce it.
+
+    Read from the source rather than the rendered upgrade, because ``--sql``
+    never renders ``downgrade()``.
+    """
+    source = (MIGRATIONS / "0047_audit_events_isolation.py").read_text(encoding="utf-8")
+    body = source.split("def downgrade()", 1)[1]
+    assert re.search(r"REVOKE SELECT ON audit_events FROM inv_app", body)
+    assert not re.search(r"GRANT SELECT ON audit_events TO inv_app", body), (
+        "downgrade re-grants the privilege this revision revoked"
+    )
 
 
 def test_the_audit_read_role_is_separate_and_not_a_login(rendered_sql):

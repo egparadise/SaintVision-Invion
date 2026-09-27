@@ -11,7 +11,10 @@ did not exist. These tests hold the shape that closes the gap:
 * an authentication denial with no resolvable tenant is still recorded, through
   one narrow SECURITY DEFINER primitive that can write nothing else (AC-02);
 * the application role cannot forge a NULL-tenant row or another tenant's row;
-* append-only holds for every role that can reach the table.
+* append-only holds for every role that can reach the table;
+* the migration itself refuses to run when the audit read role already has
+  members, directly or through a bridge role — checked by running the upgrade
+  against a seeded cluster, not by reading a clean database's end state.
 
 Read probes are compared against the owner's ground truth in the same test, so
 "0 rows" is never accepted as a pass on its own -- there are rows to miss.
@@ -20,6 +23,11 @@ Read probes are compared against the owner's ground truth in the same test, so
 from __future__ import annotations
 
 import datetime as dt
+import os
+import subprocess
+import sys
+import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy import text
@@ -30,7 +38,9 @@ from saintvision.ids import new_id
 
 pytestmark = pytest.mark.postgres
 
+ROOT = Path(__file__).resolve().parents[1]
 UTC = dt.timezone.utc
+PREVIOUS_REVISION = "0046_model_manifest_readiness"
 
 APP_ROLE = "inv_app"
 WRITER_ROLE = "inv_audit_writer"
@@ -486,3 +496,195 @@ def test_the_writer_role_can_append_only_null_tenant_denials(owner_engine, seede
         assert connection.execute(
             text("SELECT count(*) FROM audit_events")
         ).scalar_one() == len(ids) + 1
+
+
+# --------------------------------------------------------------------------
+# The membership guard, exercised by running the migration
+# --------------------------------------------------------------------------
+
+
+def _alembic(url: str, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-m", "alembic", *args],
+        cwd=ROOT,
+        env={**os.environ, "INV_MIGRATION_DSN": url, "INV_DATABASE_URL": url, "PYTHONUTF8": "1"},
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+
+
+#: What the isolation looks like in the catalogue, in one row. Read as the owner.
+ISOLATION_STATE = """
+SELECT
+  (SELECT c.relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'audit_events') AS rls_enabled,
+  (SELECT c.relforcerowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'audit_events') AS rls_forced,
+  (SELECT count(*) FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'audit_events') AS policies,
+  (SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'record_auth_denial') AS primitive,
+  has_table_privilege('inv_app', 'public.audit_events', 'SELECT') AS app_select,
+  has_table_privilege('inv_app', 'public.audit_events', 'INSERT') AS app_insert,
+  (SELECT version_num FROM public.alembic_version) AS head
+"""
+
+
+def _isolation_state(url: str) -> dict:
+    import psycopg
+    from psycopg.rows import dict_row
+
+    with psycopg.connect(url.replace("postgresql+psycopg", "postgresql"), row_factory=dict_row) as conn:
+        return conn.execute(ISOLATION_STATE).fetchone()
+
+
+@pytest.fixture
+def disposable_migration_database(test_admin_dsn, migrated):
+    """An empty throwaway database this test may migrate on its own.
+
+    ``migrated`` is requested so the cluster already holds ``inv_audit_reader``
+    and ``inv_audit_writer``: roles are cluster-wide, and the membership guard is
+    about membership that *pre-dates* the migration, which can only happen when
+    the role arrived from another database in the cluster.
+    """
+    import psycopg
+    from psycopg import sql
+    from psycopg.conninfo import conninfo_to_dict
+    from sqlalchemy.engine import URL
+
+    name = "inv_audit_guard_" + uuid.uuid4().hex
+    with psycopg.connect(test_admin_dsn, autocommit=True) as conn:
+        conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
+    info = conninfo_to_dict(test_admin_dsn)
+    url = URL.create(
+        "postgresql+psycopg",
+        username=info.get("user"),
+        password=info.get("password"),
+        host=info.get("host"),
+        port=int(info.get("port", 5432)),
+        database=name,
+    ).render_as_string(hide_password=False)
+    try:
+        yield url
+    finally:
+        with psycopg.connect(test_admin_dsn, autocommit=True) as conn:
+            assert name.startswith("inv_audit_guard_")
+            conn.execute(sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name)))
+
+
+@pytest.fixture
+def guard_database(disposable_migration_database):
+    """The same database, stopped one revision below 0047."""
+    result = _alembic(disposable_migration_database, "upgrade", PREVIOUS_REVISION)
+    assert result.returncode == 0, result.stderr[-2000:]
+    return disposable_migration_database
+
+
+@pytest.mark.parametrize("shape", ["direct", "chain"])
+def test_the_upgrade_stops_when_the_audit_reader_already_has_members(
+    guard_database, test_admin_dsn, shape
+):
+    """Pre-existing membership must fail the migration closed, chains included.
+
+    ``GRANT inv_audit_reader TO bridge; GRANT bridge TO leaf`` gives ``leaf`` the
+    reader through ``pg_has_role`` while no runtime role is a direct member, which
+    is why the guard refuses *any* member rather than naming inv_app and
+    inv_kernel. A clean database's final ``pg_has_role = false`` cannot show this;
+    only running the upgrade against a seeded cluster can.
+
+    The leaf is a throwaway role, not ``inv_app``: roles are cluster-wide, and
+    granting the real application role a transitive path to every tenant's audit
+    rows is the hole itself, not a way to test for it. The guard's property does
+    not depend on who the leaf is — it is "any member at all" — and the test
+    asserts the seeded chain really does confer the reader on the leaf, so the
+    shape being refused is the bypass and not a no-op.
+
+    Cluster-wide side effect, deliberately short-lived: the memberships below
+    exist for the seconds this test runs and are revoked in ``finally``. While
+    they exist, any *other* session running this upgrade would also (correctly)
+    abort.
+    """
+    import psycopg
+    from psycopg import sql
+
+    suffix = uuid.uuid4().hex[:12]
+    leaf = f"inv_audit_leaf_{suffix}"
+    bridge = f"inv_audit_bridge_{suffix}" if shape == "chain" else None
+    created = [r for r in (leaf, bridge) if r]
+
+    with psycopg.connect(test_admin_dsn, autocommit=True) as conn:
+        for role in created:
+            conn.execute(
+                sql.SQL("CREATE ROLE {} NOLOGIN NOSUPERUSER NOBYPASSRLS").format(
+                    sql.Identifier(role)
+                )
+            )
+        if bridge:
+            conn.execute(sql.SQL("GRANT inv_audit_reader TO {}").format(sql.Identifier(bridge)))
+            conn.execute(
+                sql.SQL("GRANT {} TO {}").format(sql.Identifier(bridge), sql.Identifier(leaf))
+            )
+        else:
+            conn.execute(sql.SQL("GRANT inv_audit_reader TO {}").format(sql.Identifier(leaf)))
+        # The seed is the real bypass shape: the leaf holds the reader either way.
+        assert conn.execute(
+            "SELECT pg_has_role(%s, 'inv_audit_reader', 'MEMBER')", (leaf,)
+        ).fetchone()[0] is True
+    try:
+        result = _alembic(guard_database, "upgrade", "head")
+        assert result.returncode != 0, "the upgrade must refuse, not proceed"
+        output = result.stdout + result.stderr
+        assert "inv_audit_reader already has members" in output, output[-2000:]
+        # Aborted, not half-applied.
+        state = _isolation_state(guard_database)
+        assert state["head"] == PREVIOUS_REVISION
+        assert state["rls_enabled"] is False and state["policies"] == 0
+        assert state["primitive"] == 0
+    finally:
+        with psycopg.connect(test_admin_dsn, autocommit=True) as conn:
+            if bridge:
+                conn.execute(
+                    sql.SQL("REVOKE {} FROM {}").format(
+                        sql.Identifier(bridge), sql.Identifier(leaf)
+                    )
+                )
+            conn.execute(
+                sql.SQL("REVOKE inv_audit_reader FROM {}").format(
+                    sql.Identifier(bridge or leaf)
+                )
+            )
+            for role in created:
+                conn.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
+
+
+def test_the_downgrade_removes_the_machinery_without_restoring_the_read(
+    disposable_migration_database,
+):
+    """The reversible tail reverses, and rolling back does not reopen the hole.
+
+    ``backend.yml`` runs ``downgrade <target>`` then ``upgrade head`` for the
+    reversible tail, and 0047 is the first revision that makes that tail
+    non-empty. The property that matters is not just "both commands succeed": a
+    downgrade that restored ``GRANT SELECT ON audit_events TO inv_app`` would make
+    a rollback a way to reintroduce the exposure 0047 fixes. So the app role's
+    SELECT is asserted to stay revoked at 0046.
+    """
+    url = disposable_migration_database
+    assert _alembic(url, "upgrade", "head").returncode == 0
+    at_head = _isolation_state(url)
+    assert _alembic(url, "downgrade", PREVIOUS_REVISION).returncode == 0
+    at_previous = _isolation_state(url)
+    assert _alembic(url, "upgrade", "head").returncode == 0
+    back_at_head = _isolation_state(url)
+
+    assert at_head == {
+        "rls_enabled": True, "rls_forced": True, "policies": 3, "primitive": 1,
+        "app_select": False, "app_insert": True, "head": "0047_audit_events_isolation",
+    }
+    assert at_previous == {
+        "rls_enabled": False, "rls_forced": False, "policies": 0, "primitive": 0,
+        # The machinery is gone; the revoked read is NOT given back.
+        "app_select": False, "app_insert": True, "head": PREVIOUS_REVISION,
+    }
+    assert back_at_head == at_head
