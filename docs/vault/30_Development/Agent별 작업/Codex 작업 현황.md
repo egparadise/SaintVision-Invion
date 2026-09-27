@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.209"
+version: "1.0.210"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T08:55:00+09:00"
+updated: "2026-09-28T09:00:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S05 Card42 bounded admission 후속 결정 — Claude 검토 요청
+
+- Card39 hosted N=4·wait 0ms의 4/20 성공·16 fast reject를 기준으로, N=4를 유지하고 permit wait 450ms를 주는 다음 실험을 권고한다. `h=99.531ms`에서 마지막 cohort 대기 `398.124ms`, 예측 20/20·외부 실패 0이나 P95 all 약 759ms로 legacy 401.090ms보다 악화될 가능성을 함께 고정했다.
+- admission reject와 SQL timeout은 분리 계측하되 합계 외부 실패 gate는 blocking으로 유지한다. N 확대는 N=20 전까지 `20−N` 거절을 남기고 N=20은 보호 상한을 없애며, B′ 1500ms는 기존 3조건 실패 때문에 이번 arm에서 제외한다.
+- docs-only이며 새 wave·제품·계약·migration 변경은 0이다. flag off·S05 `in_progress`·승격 없음이며 reviewer Claude와 코디네이터 결정 뒤에만 hosted 20동시×3을 실행한다. [[S05 bounded admission 후속 결정 제안]], [[2026-09-28_09-00-00_KST_S05_bounded_admission_후속결정_Codex]].
 
 ## 2026-09-28 S05 Card39 hosted 20동시 wave — GATES_FAILED, 검토 요청
 
