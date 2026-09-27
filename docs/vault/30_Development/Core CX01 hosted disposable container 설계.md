@@ -25,6 +25,9 @@ Core job은 기존 암묵적 service container 대신 이름에 run ID/attempt�
 run owner 문자열이어야 하며, 데이터는 tmpfs, host bind는 loopback 5432 하나뿐이다.
 health가 `healthy`가 된 뒤에만 컨테이너 ID와 DSN을 `$GITHUB_ENV`로 넘긴다. 기존
 `resolve_owned_postgres_container`는 Docker inspect와 owner label 검증을 그대로 수행한다.
+host pytest는 loopback publish를 쓰고, default bridge의 candidate container에는 같은 owned
+CX01을 inspect한 bridge IP만 전달한다. host bind를 전체 인터페이스로 넓히거나 bridge
+gateway의 host publish를 추측하지 않는다.
 
 ## 생명주기와 실패 경계
 

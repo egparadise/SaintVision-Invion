@@ -26,6 +26,11 @@ def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
     assert 'echo "INV_TEST_ADMIN_DSN=' in create_step
     assert 'printf \'%s\\n\' "$cx01_id" > .work/cx01-container-id' in create_step
 
+    assert "bridge_gateway=$(docker network inspect bridge" not in text
+    assert "cx01_ip=$(docker inspect --format" in text
+    assert '"$CX01_CONTAINER")' in text
+    assert 'echo "INV_CONTAINER_TEST_DB_HOST=$cx01_ip" >> "$GITHUB_ENV"' in text
+
     cleanup_step = text[cleanup:upload]
     assert "if: always()" in cleanup_step
     assert 'cx01_id="$(cat .work/cx01-container-id)"' in cleanup_step
