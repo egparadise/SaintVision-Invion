@@ -20,7 +20,7 @@ tags: ["history", "s04", "approval", "idempotency", "outbox", "postgresql", "run
 - base: `1e8baf045c5a554209aaef601ae4883b64da50a7`
 - 구현 head: `6f0156c7727a92a3afd8c17ed9a6d15dc55af2a2`
 - owner/reviewer: Codex/Claude
-- delivery: R2 PR, 사용자 병합 금지
+- delivery: draft R2 [PR #118](https://github.com/egparadise/SaintVision-Invion/pull/118), 사용자 병합 금지
 - 계약·migration: 변경 0
 - 물리 Node 전송 재개/hash: `UNMEASURED`
 

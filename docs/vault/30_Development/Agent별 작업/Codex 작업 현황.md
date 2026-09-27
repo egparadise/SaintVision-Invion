@@ -10,7 +10,7 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
-CODEX: Card34 S04-DB HTTP+PG 만료 승인·cancel·idempotency·outbox crash/retry 통합 runner를 `agent/codex/s04-db-runner`에 구현했다(PG-free 11 passed); 실 PG 첫 실행은 immutable approval scope를 직접 바꾼 하네스 결함으로 exit 1이었고 제품 가드 보존 방식으로 교정했으나 재실행은 코디네이터 승인 대기, 물리 Node 전송 재개는 `UNMEASURED`, reviewer Claude다. [[2026-09-28_00-20-00_KST_S04-DB_Card34_통합runner_Codex]]
+CODEX: Card34 S04-DB HTTP+PG 만료 승인·cancel·idempotency·outbox crash/retry 통합 runner를 `agent/codex/s04-db-runner`에 구현했다(PG-free 11 passed); 실 PG 첫 실행은 immutable approval scope를 직접 바꾼 하네스 결함으로 exit 1이었고 제품 가드 보존 방식으로 교정했으나 재실행은 코디네이터 승인 대기, 물리 Node 전송 재개는 `UNMEASURED`, reviewer Claude, draft [PR #118](https://github.com/egparadise/SaintVision-Invion/pull/118)이다. [[2026-09-28_00-20-00_KST_S04-DB_Card34_통합runner_Codex]]
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
