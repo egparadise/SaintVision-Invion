@@ -17,15 +17,20 @@ Rules applied from the start (Codex review of the S02 collector, PR #120):
   pytest exit or a suite status other than ``complete`` makes the bundle FAIL; a
   clause is ``pass`` only if every mapped case passed in THIS run, skipped or
   missing cases make it ``not_run``;
-* provenance from ``tools.provenance.collect`` (commit SHA, branch, integration
-  distance, clean-tree flags) plus this collector's own content hash; the output
-  label carries the SHA so earlier bundles are never overwritten;
+* provenance from ``tools.provenance.collect`` computed with the repository root
+  as cwd (commit SHA, branch, integration distance, clean-tree flags) plus this
+  collector's own content hash; a dirty working tree is refused by default
+  (``--allow-dirty-tree`` is an explicit, recorded opt-out); the output label carries
+  the SHA and a UTC timestamp, and an existing output with the same label is refused
+  rather than deleted or overwritten;
 * redaction contract (checked before every write, violations refuse the write):
   DSN values and passwords from ``INV_TEST_ADMIN_DSN`` / ``INV_AUDIT_DSN`` /
   ``INV_DATABASE_URL`` / ``INV_TEST_DATABASE_URL`` are refused; disposable database
-  names (``inv_backend_test_``/``inv_rls_``/``inv_s03_`` + hex), UUIDs, kernel ULID
-  ids (``mdl_``/``mv_``/``dep_``/``ds_``/``img_``/``cmt_``/``run_``/``evd_``/``nod_``/
-  ``prj_``/``res_``/``tnt_``/``lse_`` + 26 chars) and ``IPv4:port`` are replaced by
+  names (``inv_backend_test_``/``inv_rls_``/``inv_s03_`` + hex), UUIDs, every
+  ``<prefix>_<26-char Crockford ULID>`` entity id regardless of prefix (the real S10
+  prefixes from ``saintvision.ids.PREFIXES`` are ``dst``/``dsv``/``cmt``/``img``/``mdl``/
+  ``mdv``/``dpl`` plus ``apv``/``usr``/``wsp``/``wkl``/``evs``/``evr`` and the kernel
+  ``run``/``evd``/``nod``/``prj``/``res``/``lse``) and ``IPv4:port`` are replaced by
   placeholders in every produced file; ``--note`` passes through the same
   replacement; pytest failure messages are never kept (parameter-free case ids and
   counts only).  This bundle is internal evidence, not a public artifact.
@@ -156,7 +161,7 @@ _REDACTIONS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"\binv_(?:backend_test|rls|s03)_[0-9a-f]{32}\b"), "inv_disposable_<redacted>"),
     (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"),
      "<uuid:redacted>"),
-    (re.compile(r"\b(?:mdl|mv|dep|ds|img|cmt|run|evd|nod|prj|res|tnt|lse)_[0-9A-HJKMNP-TV-Z]{26}\b"), "<id:redacted>"),
+    (re.compile(r"\b[a-z]{3,4}_[0-9A-HJKMNP-TV-Z]{26}\b"), "<id:redacted>"),  # any prefixed ULID
     (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}:\d{2,5}\b"), "<host:port:redacted>"),
 ]
 
@@ -249,18 +254,20 @@ def run_suite(spec: dict[str, Any], junit_dir: Path, *, python: str = sys.execut
 
 
 def overall_verdict(clauses: dict[str, Any], suites: list[dict[str, Any]]) -> str:
-    if any(s["status"] in ("unavailable", "invalid-junit") for s in suites):
-        return "UNAVAILABLE"
-    # Fail closed on every executed suite, mapped or not.
+    # Fail closed first: any failure anywhere outranks an unavailable sibling suite.
     for suite in suites:
         counts = suite.get("counts") or {}
-        if suite["status"] == "not_run" and not (counts.get("failed") or counts.get("error")):
+        if suite["status"] in ("unavailable", "invalid-junit", "not_run"):
+            if counts.get("failed") or counts.get("error"):
+                return "FAIL"
             continue
         if suite["status"] != "complete" or suite.get("exitCode") != 0 or counts.get("failed") or counts.get("error"):
             return "FAIL"
     statuses = {c["status"] for c in clauses.values()}
     if "fail" in statuses:
         return "FAIL"
+    if any(s["status"] in ("unavailable", "invalid-junit") for s in suites):
+        return "UNAVAILABLE"
     if statuses == {"pass"} and all(s["status"] == "complete" for s in suites):
         return "PASS"
     return "NOT_RUN"
@@ -290,6 +297,7 @@ def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]],
                 "working_tree_clean_status", "content_clean_diff", "modified_paths", "interpreter",
                 "runtime_python", "timestamp_kst", "executor", "os_platform")},
             "collectorSha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "dirtyTreeAllowed": bool(provenance.get("dirtyTreeAllowed", False)),
         },
         "environment": {
             "database": "disposable PostgreSQL database per pytest session from INV_TEST_ADMIN_DSN "
@@ -376,9 +384,19 @@ def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple
     return json_path, md_path
 
 
-def remove_stale_outputs(out_dir: Path, label: str) -> None:
-    for suffix in (".json", ".md"):
-        (out_dir / f"{label}{suffix}").unlink(missing_ok=True)
+def existing_outputs(out_dir: Path, label: str) -> list[Path]:
+    """Outputs that already exist for this label; they are never deleted or overwritten."""
+    return [out_dir / f"{label}{suffix}" for suffix in (".json", ".md") if (out_dir / f"{label}{suffix}").exists()]
+
+
+def collect_provenance_at_repo_root(executor: str | None) -> dict[str, Any]:
+    """Provenance must describe the repository, not whatever cwd the caller happened to use."""
+    previous = os.getcwd()
+    os.chdir(REPO_ROOT)
+    try:
+        return collect_provenance(executor=executor)
+    finally:
+        os.chdir(previous)
 
 
 def parser() -> argparse.ArgumentParser:
@@ -388,19 +406,24 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--executor", default=os.environ.get("INV_S10_EXECUTOR") or "Claude")
     result.add_argument("--note", default=None)
     result.add_argument("--junit-dir", type=Path, default=REPO_ROOT / ".work" / "s10-acceptance")
-    result.add_argument("--require-clean-head", action="store_true",
-                        help="refuse to run unless the working tree is clean (reachable-provenance rule)")
+    result.add_argument("--allow-dirty-tree", action="store_true",
+                        help="explicit opt-out: run on a dirty working tree (recorded in provenance); "
+                             "by default a dirty tree is refused because the evidence would not be reachable")
     return result
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
-    provenance = collect_provenance(executor=args.executor)
+    provenance = collect_provenance_at_repo_root(args.executor)
+    provenance["dirtyTreeAllowed"] = bool(args.allow_dirty_tree)
     sha12 = (provenance.get("commit_sha") or "nogit")[:12]
-    label = args.label or f"s10-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%d}"
-    remove_stale_outputs(args.out_dir, label)
-    if args.require_clean_head and not provenance.get("working_tree_clean_status"):
-        print("working tree is not clean; evidence must come from a committed, reachable head", file=sys.stderr)
+    label = args.label or f"s10-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%dT%H%M%SZ}"
+    if existing := existing_outputs(args.out_dir, label):
+        print(f"refusing to overwrite existing evidence: {[p.name for p in existing]}", file=sys.stderr)
+        return 2
+    if not provenance.get("working_tree_clean_status") and not args.allow_dirty_tree:
+        print("working tree is not clean; evidence must come from a committed, reachable head "
+              "(pass --allow-dirty-tree to record an explicit opt-out)", file=sys.stderr)
         return 2
     if not os.environ.get("INV_TEST_ADMIN_DSN"):
         print("INV_TEST_ADMIN_DSN is required (disposable PostgreSQL); nothing measured", file=sys.stderr)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import os
 from pathlib import Path
 
@@ -149,11 +150,16 @@ def test_external_waits_have_no_values_and_outcomes_are_not_embedded():
 # --------------------------------------------------------------------------
 
 
+from saintvision.ids import PREFIXES as _CORE_PREFIXES
+
+_KERNEL_PREFIXES = ["apr", "chk", "dtl", "evd", "lse", "mdl", "mdv", "nod", "node", "plan", "pool", "prj",
+                    "rep", "res", "run", "stc", "user", "usr", "wkl", "wld", "wsp"]
+
+
 @pytest.mark.parametrize("sample", [
     "inv_backend_test_" + "a" * 32, "inv_rls_" + "b" * 32, "inv_s03_" + "c" * 32,
-    "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53", "mdl_01HZZZZZZZZZZZZZZZZZZZZZZZ", "mv_01J00000000000000000000000",
-    "dep_01HZZZZZZZZZZZZZZZZZZZZZZZ", "ds_01HZZZZZZZZZZZZZZZZZZZZZZZ", "img_01HZZZZZZZZZZZZZZZZZZZZZZZ",
-    "cmt_01HZZZZZZZZZZZZZZZZZZZZZZZ", "run_01HZZZZZZZZZZZZZZZZZZZZZZZ", "10.0.0.7:5432",
+    "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53", "10.0.0.7:5432",
+    *[f"{prefix}_01HZZZZZZZZZZZZZZZZZZZZZZZ" for prefix in sorted(set(_CORE_PREFIXES.values()) | set(_KERNEL_PREFIXES))],
 ])
 def test_sanitizer_replaces_each_identifier_class_and_refuses_unredacted_writes(sample, tmp_path):
     assert sample not in tool.redact_text(f"x {sample} y")
@@ -178,16 +184,52 @@ def test_secret_guard_rejects_dsn_and_password(monkeypatch):
         tool.assert_no_secrets("top-secret")
 
 
-def test_stale_outputs_removed_and_missing_dsn_or_dirty_tree_is_unavailable(tmp_path, monkeypatch):
+def test_existing_outputs_are_refused_never_deleted_and_dirty_tree_is_refused_by_default(tmp_path, monkeypatch):
     for name in ("s.json", "s.md"):
         (tmp_path / name).write_text('{"verdict":"PASS"}', encoding="utf-8")
-    monkeypatch.delenv("INV_TEST_ADMIN_DSN", raising=False)
-    assert tool.main(["--out-dir", str(tmp_path), "--label", "s", "--junit-dir", str(tmp_path / "j")]) == 2
-    assert not (tmp_path / "s.json").exists() and not (tmp_path / "s.md").exists()
     monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov())
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "s", "--junit-dir", str(tmp_path / "j")]) == 2
+    assert (tmp_path / "s.json").read_text(encoding="utf-8") == '{"verdict":"PASS"}'
     monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov(clean=False))
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "j")]) == 2
+    assert not (tmp_path / "d.json").exists()
+    monkeypatch.setattr(tool, "run_suite", lambda spec, junit_dir, python=None: _suite(suite_id=spec["id"]))
     assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "j"),
-                      "--require-clean-head"]) == 2
+                      "--allow-dirty-tree"]) == 0
+    assert json.loads((tmp_path / "d.json").read_text(encoding="utf-8"))["provenance"]["dirtyTreeAllowed"] is True
+    monkeypatch.delenv("INV_TEST_ADMIN_DSN", raising=False)
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "n", "--junit-dir", str(tmp_path / "j")]) == 2
+
+
+def test_default_label_carries_sha_and_utc_timestamp(monkeypatch, tmp_path):
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov())
+    monkeypatch.setattr(tool, "run_suite", lambda spec, junit_dir, python=None: _suite(suite_id=spec["id"]))
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    assert tool.main(["--out-dir", str(tmp_path), "--junit-dir", str(tmp_path / "j")]) == 0
+    names = sorted(p.name for p in tmp_path.glob("s10-acceptance-*.json"))
+    assert len(names) == 1 and re.fullmatch(r"s10-acceptance-a{12}-\d{8}T\d{6}Z\.json", names[0]), names
+
+
+def test_failed_outranks_unavailable():
+    failed = _suite(status="failed", outcomes={**_all_cases(), "tests.test_lineage::test_x": "failed"}, exit_code=1)
+    failed["counts"] = {"passed": 36, "failed": 1, "error": 0, "skipped": 0}
+    unavailable = _suite(status="unavailable", suite_id="u")
+    unavailable["counts"] = None
+    assert tool.build_evidence(provenance=_prov(), suites=[unavailable, failed])["verdict"] == "FAIL"
+
+
+def test_provenance_is_computed_from_the_repo_root(monkeypatch, tmp_path):
+    seen = {}
+
+    def fake_collect(executor=None):
+        seen["cwd"] = Path(os.getcwd()).resolve()
+        return _prov()
+    monkeypatch.setattr(tool, "collect_provenance", fake_collect)
+    monkeypatch.chdir(tmp_path)
+    tool.collect_provenance_at_repo_root("Claude")
+    assert seen["cwd"] == tool.REPO_ROOT.resolve()
+    assert Path(os.getcwd()).resolve() == tmp_path.resolve()
 
 
 def test_main_bundles_stubbed_suites(tmp_path, monkeypatch):

@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S10-DB-AC10-EVIDENCE-COLLECTOR-DESIGN-001"
 title: "S10-DB AC-10 acceptance Evidence collector 설계 — 모델 계보 역추적·모델 버전 append-only·보존 pin/release gate·배포 digest/승인·tenant 격리를 고정 SHA에서 한 번에 묶는 collector (기존 S10 실PG 228 세트 재사용, #120과 같은 형태)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed-review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T06:50:00+09:00"
+updated: "2026-09-28T08:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -24,7 +24,7 @@ tags: ["S10-DB", "S10-ST", "AC-10", "evidence", "collector", "lineage", "model-r
 |---|---|
 | **fail-closed(모든 실패)** | 파일 하나가 pytest 프로세스 하나(메모리 규칙). 어떤 suite든 failed/error > 0, exit ≠ 0, status ≠ complete → 묶음 **FAIL**(매핑 여부 무관). 조항은 매핑 케이스 전부 `passed`일 때만 `pass`, skipped/missing → `not_run`. 아무것도 실행되지 않았을 때만 `NOT_RUN`. |
 | **도달 가능한 clean head provenance** | `tools.provenance.collect`(commit_sha·branch·integration 거리·`working_tree_clean_status`·`content_clean_diff`) + collector 파일 sha256. 커밋된 clean head에서만 evidence를 남기고, 산출물 label에 sha12를 넣어 이전 산출물을 덮어쓰지 않는다. |
-| **식별자 redaction + 부정 시험** | 쓰기 전 `assert_no_secrets`(DSN/password 거부) + `assert_redacted`(disposable DB 이름·UUID·커널 ULID `mdl_/mv_/dep_/ds_/img_/cmt_/run_/evd_/nod_/prj_/res_/tnt_`·`IPv4:port`가 남아 있으면 거부), `--note` 동일 치환, pytest 실패 문구 미보존(parameter 제거 케이스 id·count만). 패턴별 부정 시험. 내부 evidence이며 공개 artifact 아님. |
+| **식별자 redaction + 부정 시험** | 쓰기 전 `assert_no_secrets`(DSN/password 거부) + `assert_redacted`(disposable DB 이름·UUID·커널 ULID — 실제 S10 prefix `dst_/dsv_/cmt_/img_/mdl_/mdv_/dpl_` + `apv_/usr_/wsp_/wkl_/evs_/evr_` + 커널 `run_/evd_/nod_/prj_/res_/lse_` 등 **prefix 무관 `<3~4 소문자>_<Crockford ULID 26>` 전부**(`saintvision.ids.PREFIXES` 값 전수 + 커널 prefix 세트로 부정 시험)·`IPv4:port`가 남아 있으면 거부), `--note` 동일 치환, pytest 실패 문구 미보존(parameter 제거 케이스 id·count만). 패턴별 부정 시험. 내부 evidence이며 공개 artifact 아님. |
 
 ## 2. AC-10 조항 ↔ 기존 시험 (case id = `<module>::<test>`, 전부 실재 — PG-free 시험이 AST로 고정)
 
@@ -40,10 +40,11 @@ tags: ["S10-DB", "S10-ST", "AC-10", "evidence", "collector", "lineage", "model-r
 ## 3. 산출·판정·외부 대기
 
 - 산출: `Evidence/s10-db-acceptance/s10-acceptance-<sha12>-<utc>.{json,md}`: schema `s10-db-acceptance-evidence:1`, provenance, suite별 exit·counts·junit sha256·elapsed, 조항별 케이스 상태, `verdict` ∈ {PASS, FAIL, UNAVAILABLE, NOT_RUN}, `acceptanceClaim=false`, 외부 대기 = 실제 두 외부 Provider 실행/취소/collect/attest(CX-02 credential 경계, S10-BE)·MLflow 실접속 → `UNMEASURED`, 값 없음.
-- exit 0 PASS / 1 FAIL / 2 UNAVAILABLE / 3 NOT_RUN. stale 산출물 선삭제.
+- exit 0 PASS / 1 FAIL / 2 UNAVAILABLE / 3 NOT_RUN. verdict 우선순위는 **fail-closed 먼저**: 어느 suite든 failed/error·exit≠0이 있으면 unavailable suite가 섞여도 FAIL(UNAVAILABLE은 실패가 하나도 없을 때만).
+- provenance는 **repo 루트를 cwd로** 계산(`tools.provenance._git`이 cwd 의존이므로 worktree 밖 호출도 같은 답). dirty tree는 **기본 거부(exit 2)**, `--allow-dirty-tree`는 명시 opt-out이며 `provenance.dirtyTreeAllowed=true`로 기록. 기본 label `s10-acceptance-<sha12>-<UTC %Y%m%dT%H%M%SZ>`(같은 날 재실행도 별도 파일), 같은 label의 json/md가 이미 있으면 **삭제·덮어쓰기 없이 거부(exit 2)**.
 - 실 PG는 가용 메모리 ≥1.5GB일 때만 단일 invocation(파일 하나씩 순차, 총 14 프로세스, 이전 실측 225s). 전체 suite·브라우저·Docker 기동 없음.
 
 ## 4. 시험·롤백·인계
 
-- PG-free: 매핑 실재(AST, BOM 허용), suite ↔ 모듈 커버, JUnit worst-outcome·parameter 제거, 조항 규칙, verdict 표(매핑 밖 실패 → FAIL 되살림 포함), 외부 대기 UNMEASURED·값 없음, sanitizer 패턴별 부정 시험, 비밀 guard, stale 삭제, stub end-to-end. postgres 마커 1(전체 파이프라인 1회; 로컬 DSN 없으면 skip, CI fail; hosted **Backend**가 수집).
+- PG-free: 매핑 실재(AST, BOM 허용), suite ↔ 모듈 커버, JUnit worst-outcome·parameter 제거, 조항 규칙, verdict 표(매핑 밖 실패 → FAIL 되살림 포함), 외부 대기 UNMEASURED·값 없음, sanitizer 부정 시험(prefix 전수 + UUID·disposable·host:port), failed+unavailable → FAIL, 기존 산출물 거부·미삭제, dirty 기본 거부·opt-out 기록, label 시각 형식, repo 루트 provenance, 비밀 guard, stub end-to-end. postgres 마커 1(전체 파이프라인 1회; 로컬 DSN 없으면 skip, CI fail; hosted **Backend**가 수집).
 - 롤백: collector·시험 파일 삭제. owner Claude / reviewer Codex / 병합 금지. worktree `.worktrees/claude-s10-collector`, branch `agent/claude/s10-db-evidence-collector`, base `1e8baf04`.
