@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
   "track": "VF-CX",
   "owner": "Codex",
@@ -16,8 +16,8 @@
       "dependsOn": [],
       "implemented": "partial",
       "locallyVerified": "partial",
-      "ciVerified": false,
-      "independentlyReviewed": false,
+      "ciVerified": true,
+      "independentlyReviewed": true,
       "operationallyAccepted": false
     },
     {
@@ -31,8 +31,8 @@
       ],
       "implemented": true,
       "locallyVerified": true,
-      "ciVerified": false,
-      "independentlyReviewed": false,
+      "ciVerified": true,
+      "independentlyReviewed": true,
       "operationallyAccepted": false
     },
     {
@@ -46,8 +46,8 @@
       ],
       "implemented": true,
       "locallyVerified": true,
-      "ciVerified": false,
-      "independentlyReviewed": false,
+      "ciVerified": true,
+      "independentlyReviewed": true,
       "operationallyAccepted": false
     },
     {
@@ -61,8 +61,8 @@
       ],
       "implemented": true,
       "locallyVerified": true,
-      "ciVerified": false,
-      "independentlyReviewed": false,
+      "ciVerified": true,
+      "independentlyReviewed": true,
       "operationallyAccepted": false
     },
     {
@@ -81,10 +81,10 @@
       "operationallyAccepted": false,
       "preflightVerified": true,
       "blockers": [
-        "remote-node-unreachable-three-probes",
+        "five-node-topology-incomplete-three-of-five-provisioned",
+        "cp-colocated-windows-node-docker-api-1.41-below-1.45-and-no-wsl-ubuntu",
         "operational-migration-backup-review-required",
         "W2-W4-acceptance-unverified",
-        "ci-billing",
         "independent-review-pending"
       ],
       "evidence": "docs/vault/30_Development/Evidence/vf-cx-05"
