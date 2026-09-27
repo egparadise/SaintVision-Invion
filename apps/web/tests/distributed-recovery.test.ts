@@ -86,6 +86,36 @@ describe('S07-FE: Distributed Recovery Dashboard & Monotonic Fencing Validation 
   });
 
   describe('Cluster Drain & Reconciliation Recovery (AC-07 ≥ 95%)', () => {
+    it('evacuates active workspaces, heals partition, advances epoch, and restores online status during single node reconciliation (REC-01)', () => {
+      const mgr = new DistributedRecoveryManager(INITIAL_NODES);
+      const target = 'nod_01JABCDEF01';
+      const node = mgr.getNode(target)!;
+      const initialEpoch = node.fencingToken.epoch;
+      const initialWorkspaces = node.activeWorkspacesCount;
+      expect(initialWorkspaces).toBeGreaterThan(0);
+
+      // 1. Partition the node
+      mgr.simulateNetworkPartition(target);
+      expect(node.isPartitioned).toBe(true);
+      expect(node.healthState).toBe('fenced');
+      const partitionedEpoch = node.fencingToken.epoch;
+      expect(partitionedEpoch).toBe(initialEpoch + 1);
+
+      // 2. Reconcile node
+      const record = mgr.reconcileNode(target);
+
+      // Explicit assertions resolving REC-01 expect 0 defect
+      expect(record.recoverySuccess).toBe(true);
+      expect(record.evacuatedWorkspacesCount).toBe(initialWorkspaces);
+      expect(node.activeWorkspacesCount).toBe(0);
+      expect(node.isPartitioned).toBe(false);
+      expect(node.healthState).toBe('online');
+      expect(node.fencingToken.epoch).toBe(partitionedEpoch + 1);
+      expect(record.newEpoch).toBe(node.fencingToken.epoch);
+      expect(record.nodeId).toBe(target);
+      expect(mgr.getReconciliations()).toHaveLength(1);
+    });
+
     it('evacuates workspaces, advances epoch, and achieves 100% recovery rate over 20 runs', () => {
       const mgr = new DistributedRecoveryManager(INITIAL_NODES);
 
@@ -101,6 +131,8 @@ describe('S07-FE: Distributed Recovery Dashboard & Monotonic Fencing Validation 
 
         // Drain & reconcile
         const record = mgr.reconcileNode(targetNodeId);
+        expect(record.recoverySuccess).toBe(true);
+        expect(mgr.getNode(targetNodeId)?.isPartitioned).toBe(false);
         if (record.recoverySuccess && mgr.getNode(targetNodeId)?.healthState === 'online') {
           successfulReconciliations++;
         }
@@ -109,6 +141,31 @@ describe('S07-FE: Distributed Recovery Dashboard & Monotonic Fencing Validation 
       const recoveryRate = successfulReconciliations / totalRuns;
       expect(recoveryRate).toBe(1.0); // 100%
       expect(recoveryRate).toBeGreaterThanOrEqual(0.95); // AC-07 threshold: ≥95%
+    });
+
+    it('initializes node health and heartbeat age from actual backend status and heartbeatAt timestamp', () => {
+      const pastTime = new Date(Date.now() - 75 * 1000).toISOString();
+      const ancientTime = new Date(Date.now() - 150 * 1000).toISOString();
+      const customNodes = [
+        { nodeId: 'nod_actual_online', hostname: 'Node-Online', status: 'healthy', heartbeatAt: new Date().toISOString() },
+        { nodeId: 'nod_actual_stale', hostname: 'Node-Stale', status: 'healthy', heartbeatAt: pastTime },
+        { nodeId: 'nod_actual_offline', hostname: 'Node-Offline', status: 'offline', heartbeatAt: pastTime },
+        { nodeId: 'nod_actual_ancient', hostname: 'Node-Ancient', status: 'healthy', heartbeatAt: ancientTime },
+      ];
+
+      const mgr = new DistributedRecoveryManager(customNodes);
+      expect(mgr.getNode('nod_actual_online')?.healthState).toBe('online');
+      expect(mgr.getNode('nod_actual_online')?.actualStatus).toBe('healthy');
+      expect(mgr.getNode('nod_actual_online')?.heartbeatAgeSeconds).toBeLessThanOrEqual(5);
+
+      expect(mgr.getNode('nod_actual_stale')?.healthState).toBe('stale');
+      expect(mgr.getNode('nod_actual_stale')?.heartbeatAgeSeconds).toBeGreaterThanOrEqual(70);
+
+      expect(mgr.getNode('nod_actual_offline')?.healthState).toBe('offline');
+      expect(mgr.getNode('nod_actual_offline')?.actualStatus).toBe('offline');
+
+      expect(mgr.getNode('nod_actual_ancient')?.healthState).toBe('offline');
+      expect(mgr.getNode('nod_actual_ancient')?.heartbeatAgeSeconds).toBeGreaterThanOrEqual(140);
     });
   });
 });

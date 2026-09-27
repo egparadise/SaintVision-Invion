@@ -9,6 +9,16 @@ export interface ResilientNodeState {
   fencingToken: FencingToken;
   activeWorkspacesCount: number;
   isPartitioned: boolean;
+  actualStatus?: string;
+  isSimulationModified?: boolean;
+}
+
+export interface InitialRecoveryNode {
+  nodeId: string;
+  hostname: string;
+  activeWorkspaces?: number;
+  status?: string;
+  heartbeatAt?: string;
 }
 
 /**
@@ -40,23 +50,42 @@ export class DistributedRecoveryManager {
   private reconciliationHistory: ReconciliationRecord[] = [];
   private staleTokenWritesAllowed = 0;
 
-  constructor(initialNodes: Array<{ nodeId: string; hostname: string; activeWorkspaces?: number }>) {
-    const now = new Date().toISOString();
+  constructor(initialNodes: InitialRecoveryNode[]) {
+    const now = new Date();
     initialNodes.forEach((n, idx) => {
+      let ageSeconds = 2;
+      if (n.heartbeatAt) {
+        const t = new Date(n.heartbeatAt).getTime();
+        if (!isNaN(t)) {
+          ageSeconds = Math.max(0, Math.floor((now.getTime() - t) / 1000));
+        }
+      }
+
+      let initialHealth: NodeHealthState = 'online';
+      if (n.status === 'offline' || n.status === 'unhealthy' || ageSeconds > 120) {
+        initialHealth = 'offline';
+      } else if (n.status === 'stale' || ageSeconds > 60) {
+        initialHealth = 'stale';
+      } else if (n.status === 'draining') {
+        initialHealth = 'stale';
+      }
+
       this.nodes.set(n.nodeId, {
         nodeId: n.nodeId,
         hostname: n.hostname,
-        healthState: 'online',
-        lastHeartbeatAt: now,
-        heartbeatAgeSeconds: 2,
+        healthState: initialHealth,
+        lastHeartbeatAt: n.heartbeatAt || now.toISOString(),
+        heartbeatAgeSeconds: ageSeconds,
         fencingToken: {
           nodeId: n.nodeId,
           epoch: 1,
           sequence: 10 + idx * 5,
-          issuedAt: now,
+          issuedAt: now.toISOString(),
         },
         activeWorkspacesCount: n.activeWorkspaces ?? (idx + 1),
         isPartitioned: false,
+        actualStatus: n.status || 'healthy',
+        isSimulationModified: false,
       });
     });
   }
@@ -113,6 +142,7 @@ export class DistributedRecoveryManager {
     if (!node) return;
     const delayedTime = new Date(Date.now() - ageSeconds * 1000).toISOString();
     node.lastHeartbeatAt = delayedTime;
+    node.isSimulationModified = true;
     this.evaluateNodeHealth(nodeId, ageSeconds);
   }
 
@@ -124,6 +154,7 @@ export class DistributedRecoveryManager {
     if (!node) return;
 
     node.isPartitioned = true;
+    node.isSimulationModified = true;
     node.healthState = 'fenced';
     // Advance cluster epoch for this node boundary to invalidate future partitioned attempts
     node.fencingToken.epoch += 1;
@@ -177,6 +208,7 @@ export class DistributedRecoveryManager {
     const evacuatedCount = node.activeWorkspacesCount;
     node.activeWorkspacesCount = 0;
     node.isPartitioned = false;
+    node.isSimulationModified = true;
     node.healthState = 'recovering';
     node.heartbeatAgeSeconds = 0;
     node.lastHeartbeatAt = new Date().toISOString();

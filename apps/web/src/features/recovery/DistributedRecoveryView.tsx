@@ -14,11 +14,13 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         nodeId: n.id,
         hostname: n.hostname,
         activeWorkspaces: i + 1,
+        status: n.status,
+        heartbeatAt: n.heartbeatAt,
       }))
     );
   });
 
-  const [resilientNodes, setResilientNodes] = useState<ResilientNodeState[]>(recoveryManager.getNodes());
+  const [resilientNodes, setResilientNodes] = useState<ResilientNodeState[]>(() => recoveryManager.getNodes());
   const [selectedNodeId, setSelectedNodeId] = useState<string>(() => nodes[0]?.id || '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [checkouts, setCheckouts] = useState<
@@ -69,16 +71,18 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   // 1. Simulate Heartbeat Drop > 60s
   const handleSimulateHeartbeatDrop = () => {
+    if (!selectedNode) return;
     recoveryManager.simulateHeartbeatDelay(selectedNode.nodeId, 75);
     refreshState();
     setActionNotice({
       type: 'info',
-      text: `Heartbeat age for ${selectedNode.hostname} set to 75s (>60s). Health transitioned to STALE (AC-07 verified).`,
+      text: `Heartbeat age for ${selectedNode.hostname} set to 75s (>60s). Health transitioned to STALE (모의 시뮬레이션; 물리 AC-07 UNMEASURED).`,
     });
   };
 
   // 2. Simulate Network Partition / Split-Brain
   const handleSimulatePartition = () => {
+    if (!selectedNode) return;
     recoveryManager.simulateNetworkPartition(selectedNode.nodeId);
     refreshState();
     setActionNotice({
@@ -89,6 +93,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   // 3. Attempt Zombie Late Write with Stale Token
   const handleAttemptZombieWrite = () => {
+    if (!selectedNode) return;
     const curToken = selectedNode.fencingToken;
     const staleToken = {
       epoch: Math.max(1, curToken.epoch - 1),
@@ -113,6 +118,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   // 4. Drain & Reconcile Node
   const handleDrainAndReconcile = () => {
+    if (!selectedNode) return;
     const rec = recoveryManager.reconcileNode(selectedNode.nodeId);
     refreshState();
     setActionNotice({
@@ -123,6 +129,9 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
   const lateRejections = recoveryManager.getLateRejections();
   const reconciliations = recoveryManager.getReconciliations();
+  const recoveryCount = reconciliations.length;
+  const successfulCount = reconciliations.filter((r) => r.recoverySuccess).length;
+  const calculatedRate = recoveryCount > 0 ? Math.round((successfulCount / recoveryCount) * 100) : null;
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -161,10 +170,13 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           }}
         >
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>AC-07 이탈 감지 시간</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            ≤ 60 초 (실측 통과)
+          <div
+            data-testid="kpi-detection-time"
+            style={{ fontSize: '20px', fontWeight: 700, color: '#8b949e', marginTop: '4px' }}
+          >
+            UNMEASURED (물리 실측)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Heartbeat 60s 초과 시 자동 Stale 전이</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Heartbeat 60s 초과 감지 시뮬레이션 (물리 5노드 랩 미측정)</div>
         </div>
 
         <div
@@ -191,16 +203,29 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           }}
         >
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>분산 복구 성공률 목표</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#58a6ff', marginTop: '4px' }}>
-            100% (목표: ≥95%)
+          <div
+            data-testid="kpi-recovery-rate"
+            style={{
+              fontSize: '20px',
+              fontWeight: 700,
+              color: calculatedRate !== null ? '#58a6ff' : '#8b949e',
+              marginTop: '4px',
+            }}
+          >
+            {calculatedRate !== null ? `${calculatedRate}% (${successfulCount}/${recoveryCount}회)` : 'UNMEASURED (미측정)'}
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Drain 및 Epoch 전진 Consensus</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            {recoveryCount > 0 ? 'Drain 및 Epoch 전진 Consensus' : '복구 이력 부재 (Drain & Reconcile 실행 필요)'}
+          </div>
         </div>
       </div>
 
       {/* Action Notice Bar */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          aria-live="polite"
+          data-testid="recovery-action-notice"
           style={{
             padding: '12px 18px',
             borderRadius: '6px',
@@ -231,301 +256,357 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         </div>
       )}
 
-      {/* 5-Node Resilience Cluster Grid */}
-      <div>
-        <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#f0f6fc', marginBottom: '12px' }}>
-          5-Node Cluster Resilience & Fencing Status (AC-07)
-        </h3>
+      {/* Empty State Screen when nodes list is empty */}
+      {resilientNodes.length === 0 ? (
+        <div
+          data-testid="recovery-empty-nodes-screen"
+          style={{
+            padding: '48px 24px',
+            textAlign: 'center',
+            backgroundColor: 'var(--color-bg-surface, #161b22)',
+            border: '1px solid #30363d',
+            borderRadius: 'var(--radius-lg, 8px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div style={{ fontSize: '32px' }}>📡</div>
+          <div style={{ fontSize: '18px', fontWeight: 600, color: '#f0f6fc' }}>
+            클러스터에 등록된 노드가 없습니다
+          </div>
+          <div style={{ fontSize: '13px', color: '#8b949e', maxWidth: '520px', lineHeight: '1.5' }}>
+            현재 백엔드 제어 평면 또는 관측 파이프라인에서 전달된 가용 노드가 없습니다 (0대).
+            노드가 등록된 후 분산 복구 및 펜싱 시뮬레이션을 실행할 수 있습니다.
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* 5-Node Resilience Cluster Grid */}
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#f0f6fc', marginBottom: '12px' }}>
+              5-Node Cluster Resilience &amp; Fencing Status (AC-07)
+            </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
-          {resilientNodes.map((node) => {
-            const isSelected = node.nodeId === selectedNodeId;
-            let statusColor = '#3fb950';
-            if (node.healthState === 'stale') statusColor = '#e3b341';
-            if (node.healthState === 'offline') statusColor = '#f85149';
-            if (node.healthState === 'fenced') statusColor = '#a371f7';
-            if (node.healthState === 'recovering') statusColor = '#58a6ff';
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+              {resilientNodes.map((node) => {
+                const isSelected = selectedNode && node.nodeId === selectedNode.nodeId;
+                let statusColor = '#3fb950';
+                if (node.healthState === 'stale') statusColor = '#e3b341';
+                if (node.healthState === 'offline') statusColor = '#f85149';
+                if (node.healthState === 'fenced') statusColor = '#a371f7';
+                if (node.healthState === 'recovering') statusColor = '#58a6ff';
 
-            return (
-              <div
-                key={node.nodeId}
-                onClick={() => setSelectedNodeId(node.nodeId)}
-                style={{
-                  backgroundColor: '#161b22',
-                  border: isSelected ? '2px solid #58a6ff' : '1px solid #30363d',
-                  borderRadius: 'var(--radius-lg, 8px)',
-                  padding: '16px',
-                  cursor: 'pointer',
-                  transition: 'border-color 0.2s',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
-                    {node.hostname}
-                  </span>
-                  <span
+                return (
+                  <div
+                    key={node.nodeId}
+                    role="button"
+                    tabIndex={0}
+                    data-testid={`node-card-${node.nodeId}`}
+                    aria-pressed={isSelected}
+                    onClick={() => setSelectedNodeId(node.nodeId)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedNodeId(node.nodeId);
+                      }
+                    }}
                     style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      backgroundColor: `${statusColor}22`,
-                      color: statusColor,
-                      border: `1px solid ${statusColor}`,
+                      backgroundColor: '#161b22',
+                      border: isSelected ? '2px solid #58a6ff' : '1px solid #30363d',
+                      borderRadius: 'var(--radius-lg, 8px)',
+                      padding: '16px',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s',
                     }}
                   >
-                    {node.healthState.toUpperCase()}
-                  </span>
-                </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 600, color: '#f0f6fc', fontSize: '14px' }}>
+                        {node.hostname}
+                      </span>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span
+                          data-testid={`node-actual-status-${node.nodeId}`}
+                          style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '10px',
+                            color: '#8b949e',
+                            backgroundColor: '#21262d',
+                            border: '1px solid #30363d',
+                          }}
+                          title="백엔드 제어 평면 실제 보고 상태"
+                        >
+                          실제: {node.actualStatus || 'healthy'}
+                        </span>
+                        <span
+                          data-testid={`node-sim-status-${node.nodeId}`}
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            backgroundColor: `${statusColor}22`,
+                            color: statusColor,
+                            border: `1px solid ${statusColor}`,
+                          }}
+                        >
+                          시뮬레이션: {node.healthState.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
 
-                <div style={{ fontSize: '12px', color: '#8b949e', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div>ID: <code>{node.nodeId}</code></div>
-                  <div>Heartbeat Age: <span style={{ color: node.heartbeatAgeSeconds > 60 ? '#f85149' : '#c9d1d9', fontWeight: 600 }}>{node.heartbeatAgeSeconds}s ago</span></div>
-                  <div>Fencing Lease: <code style={{ color: '#58a6ff' }}>Epoch {node.fencingToken.epoch} : Seq {node.fencingToken.sequence}</code></div>
-                  <div>Active Tasks: <span style={{ color: '#c9d1d9' }}>{node.activeWorkspacesCount}</span></div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Simulator Control & Inspection Split */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-        {/* Left: Interactive Fault Injection & Recovery Controls */}
-        <div
-          style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-          }}
-        >
-          <div>
-            <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Fault Injection & Recovery Controls: <span style={{ color: '#58a6ff' }}>{selectedNode.hostname}</span>
-            </h4>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              Execute distributed partition, stale token attack, or node drain & reconciliation.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <Button variant="secondary" onClick={handleSimulateHeartbeatDrop}>
-              ⏱️ Simulate Heartbeat Delay (75s &gt; 60s Stale Threshold)
-            </Button>
-
-            <Button variant="secondary" onClick={handleSimulatePartition} style={{ color: '#a371f7', borderColor: '#a371f7' }}>
-              ⚡ Simulate Network Partition &amp; Split-Brain Fencing
-            </Button>
-
-            <Button variant="secondary" onClick={handleAttemptZombieWrite} style={{ color: '#f85149', borderColor: '#f85149' }}>
-              🚫 Attempt Stale Token Write (Simulate Zombie Worker)
-            </Button>
-
-            <Button variant="primary" onClick={handleDrainAndReconcile}>
-              🛡️ Drain &amp; Reconcile Node (Restore &amp; Advance Epoch)
-            </Button>
-          </div>
-        </div>
-
-        {/* Right: Monotonic Fencing Lease & Late Result Rejections */}
-        <div
-          style={{
-            backgroundColor: '#161b22',
-            border: '1px solid #30363d',
-            borderRadius: 'var(--radius-lg, 8px)',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Late Result Rejections (AC-07 Zero Stale Writes)
-            </h4>
-            <span style={{ fontSize: '12px', color: '#8b949e' }}>
-              Total Rejections: {lateRejections.length}
-            </span>
-          </div>
-
-          <div style={{ flex: 1, minHeight: '200px', maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {lateRejections.length === 0 ? (
-              <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
-                No late result rejections yet. Click "Attempt Stale Token Write" to test zombie blocking.
-              </div>
-            ) : (
-              lateRejections.map((rej) => (
-                <div
-                  key={rej.requestId}
-                  style={{
-                    backgroundColor: '#0d1117',
-                    border: '1px solid #f85149',
-                    borderRadius: '6px',
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f85149', fontWeight: 600 }}>
-                    <span>BLOCKED: {rej.requestId}</span>
-                    <span>{new Date(rej.rejectedAt).toLocaleTimeString()}</span>
+                    <div style={{ fontSize: '12px', color: '#8b949e', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div>ID: <code>{node.nodeId}</code></div>
+                      <div>Heartbeat Age: <span style={{ color: node.heartbeatAgeSeconds > 60 ? '#f85149' : '#c9d1d9', fontWeight: 600 }}>{node.heartbeatAgeSeconds}s ago</span></div>
+                      <div>Fencing Lease: <code style={{ color: '#58a6ff' }}>Epoch {node.fencingToken.epoch} : Seq {node.fencingToken.sequence}</code></div>
+                      <div>Active Tasks: <span style={{ color: '#c9d1d9' }}>{node.activeWorkspacesCount}</span></div>
+                    </div>
                   </div>
-                  <div style={{ color: '#8b949e', marginTop: '4px' }}>
-                    Attempted: <code>Epoch {rej.attemptedToken.epoch} : Seq {rej.attemptedToken.sequence}</code> vs
-                    Current: <code>Epoch {rej.currentToken.epoch} : Seq {rej.currentToken.sequence}</code>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Simulator Control & Inspection Split */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            {/* Left: Interactive Fault Injection & Recovery Controls */}
+            <div
+              style={{
+                backgroundColor: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: 'var(--radius-lg, 8px)',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <div>
+                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                  Fault Injection &amp; Recovery Controls: <span style={{ color: '#58a6ff' }}>{selectedNode ? selectedNode.hostname : '(선택된 노드 없음)'}</span>
+                </h4>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+                  Execute distributed partition, stale token attack, or node drain &amp; reconciliation.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <Button variant="secondary" onClick={handleSimulateHeartbeatDrop} disabled={!selectedNode}>
+                  ⏱️ Simulate Heartbeat Delay (75s &gt; 60s Stale Threshold)
+                </Button>
+
+                <Button variant="secondary" onClick={handleSimulatePartition} disabled={!selectedNode} style={{ color: '#a371f7', borderColor: '#a371f7' }}>
+                  ⚡ Simulate Network Partition &amp; Split-Brain Fencing
+                </Button>
+
+                <Button variant="secondary" onClick={handleAttemptZombieWrite} disabled={!selectedNode} style={{ color: '#f85149', borderColor: '#f85149' }}>
+                  🚫 Attempt Stale Token Write (Simulate Zombie Worker)
+                </Button>
+
+                <Button variant="primary" onClick={handleDrainAndReconcile} disabled={!selectedNode}>
+                  🛡️ Drain &amp; Reconcile Node (Restore &amp; Advance Epoch)
+                </Button>
+              </div>
+            </div>
+
+            {/* Right: Monotonic Fencing Lease & Late Result Rejections */}
+            <div
+              style={{
+                backgroundColor: '#161b22',
+                border: '1px solid #30363d',
+                borderRadius: 'var(--radius-lg, 8px)',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                  Late Result Rejections (AC-07 Zero Stale Writes)
+                </h4>
+                <span style={{ fontSize: '12px', color: '#8b949e' }}>
+                  Total Rejections: {lateRejections.length}
+                </span>
+              </div>
+
+              <div style={{ flex: 1, minHeight: '200px', maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {lateRejections.length === 0 ? (
+                  <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
+                    No late result rejections yet. Click "Attempt Stale Token Write" to test zombie blocking.
                   </div>
-                  <div style={{ color: '#f85149', fontSize: '11px', marginTop: '2px' }}>{rej.reason}</div>
-                </div>
-              ))
-            )}
+                ) : (
+                  lateRejections.map((rej) => (
+                    <div
+                      key={rej.requestId}
+                      style={{
+                        backgroundColor: '#0d1117',
+                        border: '1px solid #f85149',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#f85149', fontWeight: 600 }}>
+                        <span>BLOCKED: {rej.requestId}</span>
+                        <span>{new Date(rej.rejectedAt).toLocaleTimeString()}</span>
+                      </div>
+                      <div style={{ color: '#8b949e', marginTop: '4px' }}>
+                        Attempted: <code>Epoch {rej.attemptedToken.epoch} : Seq {rej.attemptedToken.sequence}</code> vs
+                        Current: <code>Epoch {rej.currentToken.epoch} : Seq {rej.currentToken.sequence}</code>
+                      </div>
+                      <div style={{ color: '#f85149', fontSize: '11px', marginTop: '2px' }}>{rej.reason}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Reconciliation Audit Trail */}
-      <div
-        style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
-          borderRadius: 'var(--radius-lg, 8px)',
-          padding: '20px',
-        }}
-      >
-        <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#f0f6fc' }}>
-          Cluster Reconciliation Audit Trail (AC-07 Recovery KPI)
-        </h4>
-
-        {reconciliations.length === 0 ? (
-          <div style={{ color: '#8b949e', fontSize: '13px' }}>
-            No recovery reconciliations recorded yet. Drain &amp; Reconcile a node to record audit events.
-          </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                <th style={{ padding: '8px' }}>Reconciliation ID</th>
-                <th style={{ padding: '8px' }}>Node ID</th>
-                <th style={{ padding: '8px' }}>Evacuated Tasks</th>
-                <th style={{ padding: '8px' }}>New Epoch</th>
-                <th style={{ padding: '8px' }}>Status</th>
-                <th style={{ padding: '8px' }}>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reconciliations.map((rec) => (
-                <tr key={rec.reconciliationId} style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{rec.reconciliationId}</td>
-                  <td style={{ padding: '8px' }}>{rec.nodeId}</td>
-                  <td style={{ padding: '8px' }}>{rec.evacuatedWorkspacesCount} workspaces</td>
-                  <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {rec.newEpoch}</td>
-                  <td style={{ padding: '8px', color: rec.recoverySuccess ? '#3fb950' : '#f85149', fontWeight: 600 }}>
-                    {rec.recoverySuccess ? 'RECOVERED' : 'FAILED'}
-                  </td>
-                  <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(rec.timestamp).toLocaleTimeString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* ADR-043 Writable Generations & Working Checkouts */}
-      <div
-        style={{
-          backgroundColor: '#161b22',
-          border: '1px solid #30363d',
-          borderRadius: 'var(--radius-lg, 8px)',
-          padding: '20px',
-          marginTop: '20px',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-              Working Generations &amp; Workspace Checkouts (ADR-043 수정 가능한 작업 사본)
-            </h4>
-            <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
-            </p>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            data-testid="create-checkout-btn"
-            disabled={!selectedNode}
-            onClick={handleCreateCheckout}
-          >
-            + 새 수정 가능 작업 사본 체크아웃 (Working Generation)
-          </Button>
-        </div>
-
-        {checkouts.length === 0 ? (
+          {/* Reconciliation Audit Trail */}
           <div
-            data-testid="recovery-no-checkouts"
             style={{
-              padding: '24px',
-              textAlign: 'center',
-              color: '#8b949e',
-              fontSize: '13px',
-              backgroundColor: '#0d1117',
-              borderRadius: '6px',
+              backgroundColor: '#161b22',
+              border: '1px solid #30363d',
+              borderRadius: 'var(--radius-lg, 8px)',
+              padding: '20px',
             }}
           >
-            활성화된 수정 가능 세대(Working Generation) 체크아웃이 없습니다.
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#f0f6fc' }}>
+              Cluster Reconciliation Audit Trail (AC-07 Recovery KPI)
+            </h4>
+
+            {reconciliations.length === 0 ? (
+              <div style={{ color: '#8b949e', fontSize: '13px' }}>
+                No recovery reconciliations recorded yet. Drain &amp; Reconcile a node to record audit events.
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                    <th style={{ padding: '8px' }}>Reconciliation ID</th>
+                    <th style={{ padding: '8px' }}>Node ID</th>
+                    <th style={{ padding: '8px' }}>Evacuated Tasks</th>
+                    <th style={{ padding: '8px' }}>New Epoch</th>
+                    <th style={{ padding: '8px' }}>Status</th>
+                    <th style={{ padding: '8px' }}>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reconciliations.map((rec) => (
+                    <tr key={rec.reconciliationId} style={{ borderBottom: '1px solid #21262d' }}>
+                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{rec.reconciliationId}</td>
+                      <td style={{ padding: '8px' }}>{rec.nodeId}</td>
+                      <td style={{ padding: '8px' }}>{rec.evacuatedWorkspacesCount} workspaces</td>
+                      <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {rec.newEpoch}</td>
+                      <td style={{ padding: '8px', color: rec.recoverySuccess ? '#3fb950' : '#f85149', fontWeight: 600 }}>
+                        {rec.recoverySuccess ? 'RECOVERED' : 'FAILED'}
+                      </td>
+                      <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(rec.timestamp).toLocaleTimeString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                <th style={{ padding: '8px' }}>Checkout ID</th>
-                <th style={{ padding: '8px' }}>Target Node</th>
-                <th style={{ padding: '8px' }}>Directory Inode</th>
-                <th style={{ padding: '8px' }}>POSIX Permissions</th>
-                <th style={{ padding: '8px' }}>Checkpoint Hash</th>
-                <th style={{ padding: '8px' }}>Fencing Epoch</th>
-                <th style={{ padding: '8px' }}>Status</th>
-                <th style={{ padding: '8px' }}>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-            {checkouts.map((chk) => (
-              <tr key={chk.checkoutId} style={{ borderBottom: '1px solid #21262d' }}>
-                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>
-                  {chk.checkoutId}
-                </td>
-                <td style={{ padding: '8px' }}>{chk.nodeId}</td>
-                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{chk.inode}</td>
-                <td style={{ padding: '8px' }}>
-                  <span
-                    style={{
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                      color: '#58a6ff',
-                      border: '1px solid rgba(56, 139, 253, 0.4)',
-                    }}
-                  >
-                    {chk.permissions}
-                  </span>
-                </td>
-                <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
-                  {chk.checkpointSha.slice(0, 18)}...
-                </td>
-                <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {chk.epoch}</td>
-                <td style={{ padding: '8px', color: '#3fb950', fontWeight: 600 }}>
-                  ✓ {chk.status.toUpperCase()} (WRITABLE)
-                </td>
-                <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(chk.createdAt).toLocaleTimeString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        )}
-      </div>
+
+          {/* ADR-043 Writable Generations & Working Checkouts */}
+          <div
+            style={{
+              backgroundColor: '#161b22',
+              border: '1px solid #30363d',
+              borderRadius: 'var(--radius-lg, 8px)',
+              padding: '20px',
+              marginTop: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                  Working Generations &amp; Workspace Checkouts (ADR-043 수정 가능한 작업 사본)
+                </h4>
+                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+                  격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                data-testid="create-checkout-btn"
+                disabled={!selectedNode}
+                onClick={handleCreateCheckout}
+              >
+                + 새 수정 가능 작업 사본 체크아웃 (Working Generation)
+              </Button>
+            </div>
+
+            {checkouts.length === 0 ? (
+              <div
+                data-testid="recovery-no-checkouts"
+                style={{
+                  padding: '24px',
+                  textAlign: 'center',
+                  color: '#8b949e',
+                  fontSize: '13px',
+                  backgroundColor: '#0d1117',
+                  borderRadius: '6px',
+                }}
+              >
+                활성화된 수정 가능 세대(Working Generation) 체크아웃이 없습니다.
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                    <th style={{ padding: '8px' }}>Checkout ID</th>
+                    <th style={{ padding: '8px' }}>Target Node</th>
+                    <th style={{ padding: '8px' }}>Directory Inode</th>
+                    <th style={{ padding: '8px' }}>POSIX Permissions</th>
+                    <th style={{ padding: '8px' }}>Checkpoint Hash</th>
+                    <th style={{ padding: '8px' }}>Fencing Epoch</th>
+                    <th style={{ padding: '8px' }}>Status</th>
+                    <th style={{ padding: '8px' }}>Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {checkouts.map((chk) => (
+                    <tr key={chk.checkoutId} style={{ borderBottom: '1px solid #21262d' }}>
+                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>
+                        {chk.checkoutId}
+                      </td>
+                      <td style={{ padding: '8px' }}>{chk.nodeId}</td>
+                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{chk.inode}</td>
+                      <td style={{ padding: '8px' }}>
+                        <span
+                          style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            backgroundColor: 'rgba(56, 139, 253, 0.15)',
+                            color: '#58a6ff',
+                            border: '1px solid rgba(56, 139, 253, 0.4)',
+                          }}
+                        >
+                          {chk.permissions}
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
+                        {chk.checkpointSha.slice(0, 18)}...
+                      </td>
+                      <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {chk.epoch}</td>
+                      <td style={{ padding: '8px', color: '#3fb950', fontWeight: 600 }}>
+                        ✓ {chk.status.toUpperCase()} (WRITABLE)
+                      </td>
+                      <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(chk.createdAt).toLocaleTimeString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

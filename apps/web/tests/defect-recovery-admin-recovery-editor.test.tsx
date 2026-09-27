@@ -176,6 +176,136 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(container.textContent).toContain('백엔드 파일시스템에는 기록되지 않습니다');
       expect(container.textContent).toContain('sim_chk_1');
     });
+
+    it('Defect 1: nodes=[] 일 때 selectedNode.hostname 렌더 예외 없이 recovery-empty-nodes-screen 빈 화면을 안전하게 렌더링한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={[]} />);
+      });
+
+      const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]');
+      expect(emptyScreen).not.toBeNull();
+      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없습니다');
+      expect(emptyScreen?.textContent).toContain('0대');
+      const nodeCards = container.querySelectorAll('[data-testid^="node-card-"]');
+      expect(nodeCards.length).toBe(0);
+    });
+
+    it('Defect 2: KPI 타일에 UNMEASURED(미측정/물리 실측)를 올바르게 표기하고, Heartbeat Drop 시 AC-07 verified 허위 문구를 배제한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      // 1. KPI detection time 검증 (정적 ≤60초 실측 통과 리터럴 제거 확인)
+      const detectionTile = container.querySelector('[data-testid="kpi-detection-time"]');
+      expect(detectionTile).not.toBeNull();
+      expect(detectionTile?.textContent).toContain('UNMEASURED (물리 실측)');
+
+      // 2. 초기 recovery rate 검증 (0건일 때 100% 하드코딩 제거 확인)
+      const rateTile = container.querySelector('[data-testid="kpi-recovery-rate"]');
+      expect(rateTile).not.toBeNull();
+      expect(rateTile?.textContent).toContain('UNMEASURED (미측정)');
+
+      // 3. Heartbeat Drop 버튼 클릭
+      const hbBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Simulate Heartbeat Drop (>60s)')
+      );
+      expect(hbBtn).toBeDefined();
+
+      act(() => {
+        hbBtn?.click();
+      });
+
+      // 4. 액션 알림창에서 '(AC-07 verified)'가 없어야 하고 '(모의 시뮬레이션; 물리 AC-07 UNMEASURED)'가 포함되어야 함
+      const notice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.textContent).not.toContain('(AC-07 verified)');
+      expect(notice?.textContent).toContain('(모의 시뮬레이션; 물리 AC-07 UNMEASURED)');
+    });
+
+    it('Defect 3: 노드 카드에 백엔드 제어 평면 실제 보고 상태와 클라이언트 시뮬레이션 상태를 분리 표기한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      const actualBadge = container.querySelector('[data-testid="node-actual-status-nod_test_01"]');
+      expect(actualBadge).not.toBeNull();
+      expect(actualBadge?.textContent).toContain('실제: healthy');
+
+      const simBadge = container.querySelector('[data-testid="node-sim-status-nod_test_01"]');
+      expect(simBadge).not.toBeNull();
+      expect(simBadge?.textContent).toContain('시뮬레이션: HEALTHY');
+    });
+
+    it('Defect 4: 조작 시 액션 알림창(recovery-action-notice)에 role="status" / "alert" 및 aria-live 속성을 올바르게 적용한다', () => {
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+      });
+
+      // Network Partition 버튼 클릭 -> 에러 알림 (role="alert")
+      const partitionBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Simulate Network Partition')
+      );
+      expect(partitionBtn).toBeDefined();
+
+      act(() => {
+        partitionBtn?.click();
+      });
+
+      const notice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(notice).not.toBeNull();
+      expect(notice?.getAttribute('role')).toBe('alert');
+      expect(notice?.getAttribute('aria-live')).toBe('polite');
+      expect(notice?.textContent).toContain('Network partition simulated');
+    });
+
+    it('Defect 5: 노드 카드에 role="button", tabIndex=0, aria-pressed 속성을 부여하고 키보드(Enter/Space) 조작을 지원한다', () => {
+      const TWO_NODES: NodeItem[] = [
+        ...MOCK_NODES,
+        {
+          id: 'nod_test_02',
+          hostname: 'node-win-02',
+          os: 'linux',
+          cpuCores: 8,
+          cpuUsagePercent: 15,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsagePercent: 25,
+          gpuName: 'NVIDIA RTX 3080',
+          gpuCount: 1,
+          status: 'healthy',
+          labels: { tier: 'general' },
+        },
+      ];
+
+      act(() => {
+        root.render(<DistributedRecoveryView nodes={TWO_NODES} />);
+      });
+
+      const card1 = container.querySelector('[data-testid="node-card-nod_test_01"]');
+      const card2 = container.querySelector('[data-testid="node-card-nod_test_02"]');
+      expect(card1).not.toBeNull();
+      expect(card2).not.toBeNull();
+
+      expect(card1?.getAttribute('role')).toBe('button');
+      expect(card1?.getAttribute('tabindex')).toBe('0');
+      expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card2?.getAttribute('aria-pressed')).toBe('false');
+
+      // 키보드 Enter 키로 2번 노드 선택
+      act(() => {
+        card2?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      });
+
+      expect(card1?.getAttribute('aria-pressed')).toBe('false');
+      expect(card2?.getAttribute('aria-pressed')).toBe('true');
+
+      // 키보드 Space 키로 1번 노드 재선택
+      act(() => {
+        card1?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      });
+
+      expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card2?.getAttribute('aria-pressed')).toBe('false');
+    });
   });
 
   // =========================================================================
