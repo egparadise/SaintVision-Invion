@@ -49,10 +49,15 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
   // Priority 4: AdminSecurityConsole usr_admin_01 하드코딩 제거 및 세션 실배선
   // =========================================================================
   describe('Priority 4: AdminSecurityConsole canonical Containment 계약 및 세션/승인ID 가드', () => {
-    it('인증된 currentUser와 유효한 approval UUID가 주어졌을 때 Idempotency-Key와 ContainmentInput을 전송한다 (body에 actor 미포함)', async () => {
-      const apiClientSpy = vi.spyOn(client, 'apiClient').mockResolvedValue({});
+    it('인증된 currentUser와 유효한 approval UUID가 주어졌을 때 Idempotency-Key와 ContainmentInput(조회된 expectedVersion=7)을 전송한다 (body에 actor 미포함)', async () => {
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint.includes('/control')) {
+          return { version: 7, killSwitchActive: false, nodeStatus: 'online' } as any;
+        }
+        return {} as any;
+      });
 
-      act(() => {
+      await act(async () => {
         root.render(
           <AdminSecurityConsole
             nodes={MOCK_NODES}
@@ -70,7 +75,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         b.textContent?.includes('노드 Drain 통제')
       );
       expect(drainTabBtn).toBeDefined();
-      act(() => {
+      await act(async () => {
         drainTabBtn?.click();
       });
 
@@ -85,10 +90,10 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(approvalNotice).not.toBeNull();
       expect(approvalNotice?.textContent).toContain('유효한 Containment 승인 UUID');
 
-      // 4. 유효한 UUIDv4 입력
+      // 4. 유효한 UUIDv4 입력 (nativeSetter 사용)
       const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
       expect(approvalInput).not.toBeNull();
-      act(() => {
+      await act(async () => {
         const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
         nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
         approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -104,7 +109,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       });
 
       // 6. apiClient에 canonical ContainmentInput 및 Idempotency-Key 전달, body에 actor 미포함 검증
-      const drainCall = apiClientSpy.mock.calls.find((call) => call[0] === '/v1/nodes/nod_test_01/drain');
+      const drainCall = apiClientSpy.mock.calls.find((call) => call[0].includes('/drain'));
       expect(drainCall).toBeDefined();
       const drainOptions = drainCall?.[1] as any;
       expect(drainOptions.method).toBe('POST');
@@ -115,7 +120,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
       const parsedBody = JSON.parse(drainOptions.body);
       expect(parsedBody).toEqual({
-        expectedVersion: 1,
+        expectedVersion: 7, // 서버에서 조회한 version=7 반영 단언 (합성 fallback 1 방지)
         reasonCode: 'maintenance',
         approvalId: '550e8400-e29b-41d4-a716-446655440000',
       });
@@ -126,7 +131,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
     it('currentUser가 null일 때 경고 배너(role=alert)를 렌더링하고 Drain 네트워크 호출을 0회로 원천 차단한다', async () => {
       const apiClientSpy = vi.spyOn(client, 'apiClient').mockResolvedValue({});
 
-      act(() => {
+      await act(async () => {
         root.render(
           <AdminSecurityConsole
             nodes={MOCK_NODES}
@@ -146,7 +151,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         b.textContent?.includes('노드 Drain 통제')
       );
       expect(drainTabBtn).toBeDefined();
-      act(() => {
+      await act(async () => {
         drainTabBtn?.click();
       });
 
@@ -180,13 +185,16 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       };
       const apiError = new client.ApiError(problem as any);
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
-        if (endpoint.endsWith('/drain')) {
+        if (endpoint.includes('/control')) {
+          return { version: 1, killSwitchActive: false, nodeStatus: 'online' } as any;
+        }
+        if (endpoint.includes('/drain')) {
           throw apiError;
         }
         return {} as any;
       });
 
-      act(() => {
+      await act(async () => {
         root.render(
           <AdminSecurityConsole
             nodes={MOCK_NODES}
@@ -198,13 +206,13 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('노드 Drain 통제')
       );
-      act(() => {
+      await act(async () => {
         drainTabBtn?.click();
       });
 
       const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
       expect(approvalInput).not.toBeNull();
-      act(() => {
+      await act(async () => {
         const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
         nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
         approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -224,6 +232,231 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(errorBanner?.textContent).toContain('GRAPH-0003 (409)');
       expect(errorBanner?.textContent).toContain('Control version changed; reload before retry');
       expect(errorBanner?.textContent).toContain('Stored version 2 does not match expected version 1');
+    });
+
+    it('노드 제어 버전(/control) 사전 조회 실패 시 Drain POST를 호출하지 않고 에러 배너를 표시한다 (0 network mutations)', async () => {
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint.includes('/control')) {
+          const problem = {
+            type: 'about:blank',
+            title: 'Control plane unavailable',
+            status: 503,
+            code: 'NET-0503',
+            category: 'NET',
+            detail: 'Control database unreachable',
+            retryable: true,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          };
+          throw new client.ApiError(problem as any);
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_actual_admin_77', name: 'Actual Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      expect(approvalInput).not.toBeNull();
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      await act(async () => {
+        drainBtn?.click();
+      });
+
+      const errorBanner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+      expect(errorBanner).not.toBeNull();
+      expect(errorBanner?.textContent).toContain('노드 제어 버전(expectedVersion) 사전 조회 실패');
+      expect(errorBanner?.textContent).toContain('NET-0503 (503)');
+
+      const drainPosts = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain') || c[0].includes('/resume'));
+      expect(drainPosts).toHaveLength(0);
+    });
+
+    it('백엔드 Kill Switch 조회 상태를 data-testid="backend-kill-switch-status"에 정직하게 반영한다 (403, 빈 응답, INACTIVE, ACTIVE)', async () => {
+      // 1. 403 AUTH-0062 실패 시: ⚠️ 조회 실패 [AUTH-0062]
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint === '/v1/operations/kill-switch') {
+          const problem = {
+            type: 'about:blank',
+            title: 'Current operator permission required',
+            status: 403,
+            code: 'AUTH-0062',
+            category: 'AUTH',
+            detail: 'Operator grant missing',
+            retryable: false,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          };
+          throw new client.ApiError(problem as any);
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const statusEl403 = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusEl403).not.toBeNull();
+      expect(statusEl403?.textContent).toContain('조회 실패 [AUTH-0062]');
+
+      // 2. 빈 응답 {} 전달 시 (ContainmentView 누락): ⚠️ 조회 실패 [응답 형식 불일치]
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint === '/v1/operations/kill-switch') {
+          return {} as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const statusElEmpty = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusElEmpty?.textContent).toContain('조회 실패 [응답 형식 불일치]');
+
+      // 3. 정상 INACTIVE 응답 ({ killSwitchActive: false, version: 1 })
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint === '/v1/operations/kill-switch') {
+          return { killSwitchActive: false, version: 1, nodeId: null, nodeStatus: 'online', activeLeases: 0, pendingDeliveries: 0, unsettledRuns: 0, settled: true } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const statusElInactive = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusElInactive?.textContent).toContain('✔ INACTIVE');
+
+      // 4. 정상 ACTIVE 응답 ({ killSwitchActive: true, version: 2 })
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint === '/v1/operations/kill-switch') {
+          return { killSwitchActive: true, version: 2, nodeId: null, nodeStatus: 'quarantined', activeLeases: 0, pendingDeliveries: 0, unsettledRuns: 0, settled: true } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const statusElActive = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusElActive?.textContent).toContain('🚨 ACTIVE');
+    });
+
+    it('상단 보안 KPI 타일 및 재해복구/백업 탭의 모의 및 UNMEASURED 고지를 DOM에서 검증한다', async () => {
+      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. 상단 KPI 타일 모의/UNMEASURED 표기 검증
+      expect(container.textContent).toContain('0 건 차단 (모의 격리; 물리 컨테이너 UNMEASURED)');
+      expect(container.textContent).toContain('건 차단 (모의 차단; 물리 승인은 UNMEASURED)');
+      expect(container.textContent).toContain('RTX 4090 / A4000 합성 벤치마크 (물리 GPU 미측정)');
+      expect(container.textContent).toContain('분 전 (모의; 물리 S3 오프사이트 UNMEASURED)');
+      expect(container.textContent).toContain('RTO 12분 (모의; 물리 PITR UNMEASURED)');
+
+      // 2. 재해 복구 및 WAL 백업 서브탭으로 이동하여 RPO/RTO 표기 검증
+      const backupTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('재해 복구 및 WAL 백업')
+      );
+      expect(backupTabBtn).toBeDefined();
+      await act(async () => {
+        backupTabBtn?.click();
+      });
+
+      expect(container.textContent).toContain('4분 전 기록 (모의 시뮬레이션; 물리 WAL UNMEASURED)');
+      expect(container.textContent).toContain('4.2 분 (모의 PASS; 물리 S3 RPO UNMEASURED)');
+      expect(container.textContent).toContain('RTO 모의 추정치 (Target ≤ 60m; 물리 RTO UNMEASURED)');
+      expect(container.textContent).toContain('12.5 분 (모의 PASS; 물리 PITR 복원 UNMEASURED)');
+      expect(container.textContent).toContain('Epoch 전진 포함 (물리 재해 복구 UNMEASURED)');
+    });
+
+    it('ADR-054 탭 버튼 및 섹션 헤더, 그리고 불변 감사 로그 원장의 모의 고지 제목을 DOM에서 단언한다', async () => {
+      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. 감사 로그 원장 제목 고지 검증
+      const auditHeading = container.querySelector('h3');
+      expect(auditHeading?.textContent).toContain('불변 감사 로그 원장 (로컬 합성 원장; 백엔드 감사 아님)');
+
+      // 2. Drain 탭 버튼의 ADR-054 명칭 검증
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제 (ADR-054)')
+      );
+      expect(drainTabBtn).toBeDefined();
+
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // 3. 섹션 헤더의 ADR-054 명칭 검증
+      const sectionHeader = Array.from(container.querySelectorAll('h3')).find((h) =>
+        h.textContent?.includes('클러스터 노드 Drain 및 스케줄링 통제 (ADR-054)')
+      );
+      expect(sectionHeader).toBeDefined();
     });
   });
 

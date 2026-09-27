@@ -100,6 +100,34 @@ describe('S08-FE: Security Controls, Isolation, Audit Ledger & GPU Benchmark (AC
       expect(verification.isValid).toBe(true);
       expect(verification.checkedRecords).toBeGreaterThanOrEqual(6);
     });
+
+    it('detects tampering of record id, target, or traceId in append-only hash chain', () => {
+      const sec = new SecurityControlManager();
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(true);
+
+      const logs = (sec as any).auditLogs;
+
+      // 1. Tampering id causes verification failure
+      const originalId = logs[1].id;
+      logs[1].id = 'aud_tampered_id';
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(false);
+      logs[1].id = originalId;
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(true);
+
+      // 2. Tampering target causes verification failure
+      const originalTarget = logs[1].target;
+      logs[1].target = 'tampered_target';
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(false);
+      logs[1].target = originalTarget;
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(true);
+
+      // 3. Tampering traceId causes verification failure
+      const originalTraceId = logs[1].traceId;
+      logs[1].traceId = 'tampered_trace_id';
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(false);
+      logs[1].traceId = originalTraceId;
+      expect(sec.verifyLedgerIntegrity().isValid).toBe(true);
+    });
   });
 
   describe('Emergency Kill Switch', () => {

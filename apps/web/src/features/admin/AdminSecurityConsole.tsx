@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NodeItem, SyntheticGpuResult, ContainmentInput } from '@/contracts/types';
+import { NodeItem, SyntheticGpuResult, ContainmentInput, ContainmentView } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
@@ -27,26 +27,41 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [drainError, setDrainError] = useState<string | null>(null);
   const [drainReasonCode, setDrainReasonCode] = useState<'maintenance' | 'incident' | 'operator_request'>('maintenance');
   const [drainApprovalId, setDrainApprovalId] = useState<string>('');
-  const [backendKillSwitch, setBackendKillSwitch] = useState<{ active: boolean; version?: number } | null>(null);
+  type BackendKillSwitchState =
+    | { status: 'loading' }
+    | { status: 'active'; version?: number }
+    | { status: 'inactive'; version?: number }
+    | { status: 'error'; message: string };
+
+  const [backendKillSwitch, setBackendKillSwitch] = useState<BackendKillSwitchState>({ status: 'loading' });
   const [gpuRunError, setGpuRunError] = useState<string | null>(null);
 
   const actor = currentUser?.id?.trim() || null;
 
   useEffect(() => {
     let isMounted = true;
-    apiClient<{ killSwitchActive?: boolean; active?: boolean; version?: number }>('/v1/operations/kill-switch')
+    apiClient<ContainmentView>('/v1/operations/kill-switch')
       .then((res) => {
-        if (isMounted) {
+        if (!isMounted) return;
+        if (res && typeof res.killSwitchActive === 'boolean') {
           setBackendKillSwitch({
-            active: Boolean(res?.killSwitchActive ?? res?.active),
-            version: res?.version,
+            status: res.killSwitchActive ? 'active' : 'inactive',
+            version: typeof res.version === 'number' ? res.version : undefined,
+          });
+        } else {
+          setBackendKillSwitch({
+            status: 'error',
+            message: '조회 실패 [응답 형식 불일치]',
           });
         }
       })
-      .catch((_err) => {
-        if (isMounted) {
-          setBackendKillSwitch({ active: false });
-        }
+      .catch((err: any) => {
+        if (!isMounted) return;
+        const code = err?.problem?.code || (err?.problem?.status ? `HTTP ${err.problem.status}` : err?.status ? `HTTP ${err.status}` : 'UNKNOWN');
+        setBackendKillSwitch({
+          status: 'error',
+          message: `조회 실패 [${code}]`,
+        });
       });
     return () => {
       isMounted = false;
@@ -73,10 +88,6 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   }, [nodes]);
 
   const handleToggleDrain = async (nodeId: string, currentDrained: boolean) => {
-    if (status.emergencyKillSwitchActive) {
-      setDrainError('🛑 KILL SWITCH BLOCKED: 긴급 비상 정지(Kill Switch)가 활성화되어 있어 노드 Drain/Resume 제어 평면 변경이 차단됩니다.');
-      return;
-    }
     if (!actor) {
       setDrainError('인증된 관리자 세션이 없습니다. 노드 격리(Drain) 명령은 로그인된 관리자 식별자(actor)가 필수입니다.');
       return;
@@ -87,15 +98,21 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }
     setDrainError(null);
 
-    // 1. Expected control version query
-    let expectedVersion = 1;
+    // 1. Expected control version query (strictly required, no synthetic fallback)
+    let expectedVersion: number;
     try {
-      const ctrl = await apiClient<{ version: number }>(`/v1/nodes/${nodeId}/control`);
+      const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
       if (typeof ctrl?.version === 'number') {
         expectedVersion = ctrl.version;
+      } else {
+        setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
+        return;
       }
-    } catch (_err) {
-      // fallback
+    } catch (err: any) {
+      console.error('Failed to fetch node control version:', err);
+      const codeStr = err?.problem?.code ? `[${err.problem.code} (${err.problem.status})]` : err?.problem?.status ? `[${err.problem.status}]` : '';
+      setDrainError(`노드 제어 버전(expectedVersion) 사전 조회 실패: ${codeStr} ${err?.problem?.title || err?.message || '조회 실패'}`);
+      return;
     }
 
     const idempotencyKey = generateIdempotencyKey(`drain_${nodeId}`);
@@ -105,7 +122,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       approvalId: drainApprovalId.trim(),
     };
 
-    const endpoint = currentDrained ? `/v1/nodes/${nodeId}/resume` : `/v1/nodes/${nodeId}/drain`;
+    const endpoint = currentDrained ? `/v1/nodes/${encodeURIComponent(nodeId)}/resume` : `/v1/nodes/${encodeURIComponent(nodeId)}/drain`;
 
     if (currentDrained) {
       secManager.undrainNode(nodeId, actor);
@@ -417,7 +434,15 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             {status.emergencyKillSwitchActive ? 'Kill Switch 해제 (모의)' : '🚨 긴급 Kill Switch 발동 (모의)'}
           </Button>
           <div data-testid="backend-kill-switch-status" style={{ fontSize: '11px', color: '#8b949e' }}>
-            백엔드 제어 평면: {backendKillSwitch ? (backendKillSwitch.active ? '🚨 ACTIVE' : '✔ INACTIVE') : '확인 중...'} (GET /v1/operations/kill-switch)
+            백엔드 제어 평면: {
+              backendKillSwitch.status === 'loading'
+                ? '확인 중...'
+                : backendKillSwitch.status === 'active'
+                ? '🚨 ACTIVE'
+                : backendKillSwitch.status === 'inactive'
+                ? '✔ INACTIVE'
+                : `⚠️ ${backendKillSwitch.message}`
+            } (GET /v1/operations/kill-switch)
           </div>
         </div>
       </div>
@@ -798,13 +823,13 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
             <div style={{ backgroundColor: '#0d1117', padding: '14px', borderRadius: '6px', border: '1px solid #30363d' }}>
               <div style={{ fontSize: '12px', color: '#8b949e' }}>RPO 달성도 (Target ≤ 15m)</div>
               <div style={{ fontSize: '18px', fontWeight: 600, color: '#3fb950', marginTop: '4px' }}>
-                4.2 분 (PASS)
+                4.2 분 (모의 PASS; 물리 S3 RPO UNMEASURED)
               </div>
               <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '2px' }}>S3 복제 (모의 시뮬레이션; 물리 오프사이트 UNMEASURED)</div>
             </div>
 
             <div style={{ backgroundColor: '#0d1117', padding: '14px', borderRadius: '6px', border: '1px solid #30363d' }}>
-              <div style={{ fontSize: '12px', color: '#8b949e' }}>RTO 실측치 (Target ≤ 60m)</div>
+              <div style={{ fontSize: '12px', color: '#8b949e' }}>RTO 모의 추정치 (Target ≤ 60m; 물리 RTO UNMEASURED)</div>
               <div style={{ fontSize: '18px', fontWeight: 600, color: '#58a6ff', marginTop: '4px' }}>
                 12.5 분 (모의 PASS; 물리 PITR 복원 UNMEASURED)
               </div>
@@ -814,7 +839,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         </div>
       )}
 
-      {/* Sub-Tab 5: Node Drain & Schedulable Control (ADR-038) */}
+      {/* Sub-Tab 5: Node Drain & Schedulable Control (ADR-054) */}
       {activeSubTab === 'drain' && (
         <div
           style={{
@@ -954,11 +979,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                     size="sm"
                     variant={isDrained ? 'primary' : 'danger'}
                     onClick={() => handleToggleDrain(n.id, isDrained)}
-                    disabled={!actor || !isValidUuid(drainApprovalId) || status.emergencyKillSwitchActive}
+                    disabled={!actor || !isValidUuid(drainApprovalId)}
                     title={
-                      status.emergencyKillSwitchActive
-                        ? 'Kill Switch 활성 상태에서는 조작할 수 없습니다.'
-                        : !actor
+                      !actor
                         ? '관리자 세션 식별자(actor)가 필요합니다.'
                         : !isValidUuid(drainApprovalId)
                         ? '유효한 승인 UUID(approvalId)가 필요합니다.'
@@ -1022,7 +1045,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 lineHeight: '1.5',
               }}
             >
-              ⚠️ <strong>[모의 시뮬레이션 고지]</strong>: 백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다. 현재 화면의 토글은 프론트엔드 보안 엔진의 로컬 모의 에뮬레이션(Local Simulation)으로 동작하며, 로컬 비상 정지 발동 시 화면 내 모의 작업 디스패치가 즉시 차단됩니다.
+              ⚠️ <strong>[모의 시뮬레이션 고지]</strong>: 백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다. 현재 화면의 토글은 프론트엔드 보안 엔진의 로컬 모의 에뮬레이션(Local Simulation)으로 동작하며, 로컬 비상 정지 발동 시 화면 내 모의 작업 디스패치(소켓 마운트 시험, 승인 우회 시험, GPU 벤치마크)가 차단됩니다. 백엔드 계약 불변식에 따라 노드 격리(Drain/Resume) 제어는 비상 정지 상태에서도 안전한 장애 격리를 위해 계속 허용됩니다.
             </div>
             <p style={{ margin: 0, color: '#c9d1d9', fontSize: '13px', lineHeight: '20px' }}>
               {status.emergencyKillSwitchActive
