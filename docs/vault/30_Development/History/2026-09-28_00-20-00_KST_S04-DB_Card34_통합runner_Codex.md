@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S04DB-CARD34-INTEGRATED-RUNNER-001"
 title: "S04-DB Card34 HTTP+PG 통합 Evidence runner"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T05:17:00+09:00"
+updated: "2026-09-28T05:30:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S04-DB"]
@@ -20,7 +20,7 @@ tags: ["history", "s04", "approval", "idempotency", "outbox", "postgresql", "run
 - base: `1e8baf045c5a554209aaef601ae4883b64da50a7`
 - 구현 head: `6f0156c7727a92a3afd8c17ed9a6d15dc55af2a2`
 - owner/reviewer: Codex/Claude
-- delivery: draft R2 [PR #118](https://github.com/egparadise/SaintVision-Invion/pull/118), 사용자 병합 금지
+- delivery: R2 [PR #118](https://github.com/egparadise/SaintVision-Invion/pull/118), 사용자 병합 금지
 - 계약·migration: 변경 0
 - 물리 Node 전송 재개/hash: `UNMEASURED`
 
@@ -54,6 +54,11 @@ tags: ["history", "s04", "approval", "idempotency", "outbox", "postgresql", "run
 | 하네스 교정 뒤 PG-free | 11 passed / exit 0, collect-only 1 case / exit 0. |
 | 승인된 교정본 실 PG 단일 파일 | 1 passed / 2 warnings / 12.65s / exit 0. 네 case 모두 PASS, JSON·JUnit 생성. |
 | 교정본 cleanup 확인 | `inv_test_*` database 0, 실행 전부터 있던 `inv_app_*` role 2 유지, 신규 잔존 0. |
+| hosted Docs | run `36347557757`, job `108699713035`, success / exit 0. |
+| hosted Desktop Browser | run `36347557692`, job `108699712631`, success / exit 0. |
+| hosted Backend Python 3.12 | run `36347557726`, job `108699713000`, success / exit 0. |
+| hosted Backend Python 3.14 | run `36347557726`, job `108699712877`, success / exit 0. |
+| hosted Core | PR에 `run-core` label이 없어 정책상 skipped; green 실행으로 재해석하지 않는다. |
 
 실 PG 실패는 제품 결함이 아니라 하네스가 immutable approval scope를 직접 변경한 결함이다. 기존 제품 시험과 같은 방식으로 요청 전에 2초 만료 정책을 만들고 실제 시계 경과를 기다리도록 바꿨다. 직접 UPDATE가 되살아나면 PG-free 시험이 실패한다. 최초 실패 JUnit은 disposable 자격증명 표현 가능성이 있어 보존·커밋하지 않고 제거했다.
 
@@ -61,6 +66,6 @@ tags: ["history", "s04", "approval", "idempotency", "outbox", "postgresql", "run
 
 ## 현재 판정과 다음 행동
 
-사용자의 자동 승인 뒤 교정본을 같은 단일 파일로 한 번 실행해 4 case PASS·cleanup 0·비밀 0을 확인했다. 이 결과는 물리 Node 전달 재개나 운영 인수를 뜻하지 않으므로 S04-DB를 `done`으로 올리지 않는다.
+사용자의 자동 승인 뒤 교정본을 같은 단일 파일로 한 번 실행해 4 case PASS·cleanup 0·비밀 0을 확인했다. head `ff29ae3af55c6340f2b98e8488e5877d8b6549c5`의 hosted Docs·Desktop Browser·Backend 3.12·3.14도 모두 통과했다. Core는 PR opt-in 정책에 따른 skip이며 실행 성공으로 세지 않는다. 이 결과는 물리 Node 전달 재개나 운영 인수를 뜻하지 않으므로 S04-DB를 `done`으로 올리지 않는다.
 
 R2 PR #118에서 Claude가 제품 불변식 재사용, 실패 주입, redaction, 물리 Node `UNMEASURED` 경계를 검토한다. S04-DB는 `review`를 유지하고 사용자 지시대로 병합하지 않는다.
