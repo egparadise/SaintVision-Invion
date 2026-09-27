@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.25"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T12:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,11 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+### 2026-09-28 카드 zz · 시험 순서 의존 제거 (branch agent/claude/test-hygiene-order-independence, base 1e8baf04)
+
+- 설계 [[시험 순서 의존 제거 설계]] + `tests/db_integrity.py`(suspended_triggers·preserved_rows·database_integrity_violations) + 5파일 수정 + 세션 종료 감사(두 conftest) + 재현/hygiene 시험. PG-free 14 passed, collect 85. 실 PG는 메모리 조건으로 hosted 근거. 상세: [[2026-09-28_12-20-00_KST_시험_순서_의존_제거_Claude_구현]]
+- 같은 날 앞선 처리: #134 S01 인벤토리 v0.2(Codex F1~F3 반영, 재검토 대기), #131 S09 collector(CI green), #126 승인, #127/#120/#121 재검토 대기.
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
