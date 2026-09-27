@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.122"
+version: "1.0.123"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T00:20:00+09:00"
+updated: "2026-09-28T05:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,38 +19,25 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T00:20:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s07-fe-matrix`).
+- 확인 기준: 2026-09-28T05:35:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s07-fe-matrix`).
 
-## 2026-09-28 S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 v1.0.0 수립 (docs-only, `agent/gemini/s07-fe-matrix`)
+## 2026-09-28 S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 v1.0.1 개정 (docs-only, `agent/gemini/s07-fe-matrix`)
 
-- **5대 핵심 영역 15대 시나리오 매트릭스 정본 수립 (v1.0.0)**:
-  - **HBD (Heartbeat 지연 감지 및 노드 헬스 수명주기, AC-07 ≤60s)**:
-    - 정상 Heartbeat 수신 및 5대 노드 `ONLINE` 렌더링 (`HBD-01`).
-    - Heartbeat 지연(75초 > 60초) 시뮬레이션 및 `STALE` 자동 격리 전이 (`HBD-02`, AC-07 이탈 감지 ≤60s).
-    - 120초 초과 지연 시 `OFFLINE` 전이 및 스케줄러 영구 제외 (`HBD-03`).
-  - **FNC (단조 Fencing Token 및 Split-Brain 분할 격리, ADR-006 & ERR-DESIGN-006)**:
-    - 네트워크 분할 시뮬레이션 및 `FENCED` 격리, `epoch += 1` 전진 발급 (`FNC-01`).
-    - 상위 Epoch 우선순위 사전식 순서 단조성 단언 (`epoch: 2, seq: 1` > `epoch: 1, seq: 9999`) (`FNC-02`).
-    - 동일 Epoch 내 상위 시퀀스 단조성 및 미발행/과거 토큰 거절 (`isTokenValidAndCurrent`) (`FNC-03`).
-  - **ZMB (Zombie Late Write 차단 및 Stale 쓰기 0건 보증, AC-07 Zero Stale Writes)**:
-    - 고립 Zombie 워커의 과거 토큰 쓰기 시도 차단 (`STALE_FENCING_TOKEN`) (`ZMB-01`).
-    - AC-07 불변식: `staleTokenWritesAllowed === 0` (0건 완전 차단) 유지 (`ZMB-02`).
-    - 실시간 `Late Result Rejections` 감사 목록 렌더링 및 거부 상세 표출 (`ZMB-03`).
-  - **REC (노드 Drain 및 Reconciliation 복구 Consensus, AC-07 ≥95% 복구율)**:
-    - 노드 태스크 대피(`activeWorkspacesCount = 0`), Epoch 전진 및 `online` 복구 (`REC-01`).
-    - 20회 반복 복구 시뮬레이션 100% 성공률 달성 (AC-07 목표 ≥95%) (`REC-02`).
-    - `Cluster Reconciliation Audit Trail` 이력 감사 원장 표출 (`REC-03`).
-  - **CHK (ADR-043 작업 세대 및 미노출 API 고지)**:
-    - 상단 `recovery-unexposed-notice`(`role="status"`)로 `/v1/recovery/*` 실 API 미배선 정직 고지 (`CHK-01`).
-    - ADR-043 Working Generation 수정 가능 작업 사본 체크아웃 생성 및 모의 고지 (`sim_chk_*`, `0600 file / 0700 dir`) (`CHK-02`).
-    - 체크아웃 부재 시 빈 상태 고지(`recovery-no-checkouts`) 및 대상 노드 부재 시 생성 거절 가드 (`CHK-03`).
-- **프로덕션 심볼 타겟 돌연변이(MUT 5종) 사살 계획 확정**:
-  - MUT-01(Heartbeat 60s 임계치 완화) KILLED, MUT-02(Epoch 우선순위 누락) KILLED, MUT-03(Zombie 쓰기 허용) KILLED, MUT-04(Drain 시 Epoch 미전진) KILLED, MUT-05(미노출 배너 제거/변조) KILLED.
-- **백엔드 커널 계약 및 5노드 물리 환경 UNMEASURED 경계 (ADR-100)**:
-  - `tools/measure_s07_recovery.py` Findings (F-S07-01: 15s 커널 윈도우 독립 갱신, F-S07-02: 레플리카 복구 계획 vs 물리 전송, F-S07-03: `timeout + 1 poll interval` SLO 경계).
-  - 실 5대 물리 머신 간의 네트워크 케이블 단절 및 전원 차단 복구는 **UNMEASURED ('실 5노드 분산 랩 배선 후')**로 정직 격리.
-- **계획서 정본**: [[2026-09-28_S07-FE_분산복구_Heartbeat60s_FencingToken_Zombie차단_시나리오_매트릭스_Gemini]] (v1.0.0).
-- **독립 검토 요청**: Codex (S07 정본 계약, 단조 Fencing Token, DB recovery_epoch, 커널 15s 윈도우 대조), Claude (UI 셀렉터, 거버넌스 불변식, 돌연변이 단언 대조). 실측은 승인 후.
+- **Codex 계약 검토(F-C1, F-C2, F-C3) 전면 반영 5대 핵심 영역 15대 시나리오 정본 개정 (v1.0.1)**:
+  - **F-C1 (UI 합성 상태 vs 커널 정본 분리)**:
+    - `stale` 및 `fenced`는 DB 상태가 아니며 `recoveryEngine.ts` 클라이언트 인메모리 시뮬레이션 상태임으로 한정 (`HBD-01~03`).
+    - 백엔드 DB 커널 `inv.nodes.status`는 4종(`online|offline|draining|quarantined`)만 허용하며, observer(`observation.py:138-150`)는 60s 초과 시 곧바로 `offline`으로 전환함.
+    - 실행/리스 디스패치 경로는 별도 `15s freshness`(`heartbeat_at >= clock_timestamp() - 15s`)를 요구함 (`dispatch.py:79-85`, `leases.py:253-263`).
+    - `HBD-03`의 '스케줄러 영구 제외'를 인메모리 반환값(`offline`) 단언으로 정정하고 스케줄러 연동은 UNMEASURED로 분리.
+  - **F-C2 (합성 거절/복구 vs 물리 AC-07 분리)**:
+    - `ZMB-01~03`: 50회 연속 지연 쓰기 거절(`staleTokenWritesAllowed === 0`)을 'UI 인메모리 합성 거절 시나리오'로 명시하고, 운영 AC-07의 클러스터 전체 물리 영속 쓰기 완전 차단은 **UNMEASURED**로 유지.
+    - `REC-01~03`: 20/20 복구를 'UI 인메모리 모의 복구 시나리오'로 명시하고, 물리 바이트 전송 및 실행 샤드 재생을 수반하는 운영 AC-07 복구율(≥95%)은 **UNMEASURED**로 유지.
+  - **F-C3 (돌연변이 PLANNED/SURVIVED 정정 및 recovery_epoch UUID 경계 반영)**:
+    - MUT-01, MUT-02, MUT-03, MUT-05의 판정 결과를 provenance 실행 전이므로 `PLANNED / NOT_RUN`으로 정정.
+    - MUT-04: `distributed-recovery.test.ts:89-113`이 `record.newEpoch`를 단언하지 않아 `epoch += 1` 제거 시에도 통과하므로 `SURVIVED (미측정) [단언 보강 필요]`로 정직 표기.
+    - 백엔드 `recovery_epoch`(`0001_core.sql:19`) 근거를 `tests/integration/test_shard_recovery.py:371-383`로 교체하고, 단조 증가 카운터가 아닌 UUID equality boundary(`str(uuid4())` 불일치 시 `LEASE-0004` 거절)임을 명시.
+- **계획서 정본**: [[2026-09-28_S07-FE_분산복구_Heartbeat60s_FencingToken_Zombie차단_시나리오_매트릭스_Gemini]] (v1.0.1).
+- **독립 검토 상태**: Codex 지적 3건 전수 조치 완료 후 재대조 대기, Claude UI 경로 독립 검토 대기.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
