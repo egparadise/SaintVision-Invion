@@ -420,6 +420,7 @@ def write_registration_mtls_preflight(
     report_path: Path,
     *,
     connect: Callable[..., Any] | None = None,
+    transform: Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Replace a preflight artifact only after a current observation succeeds."""
 
@@ -430,6 +431,8 @@ def write_registration_mtls_preflight(
         raise ValueError("INV_TEST_ADMIN_DSN is required for --adapter five-node-lab")
     inventory = load_five_node_inventory(inventory_path)
     report = five_node_lab_dry_run(inventory, dsn, connect=connect)
+    if transform is not None:
+        report = transform(inventory, report)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(
         json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
