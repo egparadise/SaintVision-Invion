@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NodeItem, SyntheticGpuResult, ContainmentInput, ContainmentView } from '@/contracts/types';
+import React, { useState, useEffect, useRef } from 'react';
+import { NodeItem, SyntheticGpuResult, ContainmentInput, ContainmentView, ContainmentResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
@@ -35,6 +35,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   const [backendKillSwitch, setBackendKillSwitch] = useState<BackendKillSwitchState>({ status: 'loading' });
   const [gpuRunError, setGpuRunError] = useState<string | null>(null);
+  const idempotencyKeysRef = useRef<Map<string, string>>(new Map());
+  const [nodeControlStatuses, setNodeControlStatuses] = useState<Record<string, { nodeStatus: string | null; version: number }>>({});
 
   const actor = currentUser?.id?.trim() || null;
 
@@ -87,7 +89,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }
   }, [nodes]);
 
-  const handleToggleDrain = async (nodeId: string, currentDrained: boolean) => {
+  const handleToggleDrain = async (nodeId: string, _legacyDrainedArg?: boolean) => {
     if (!actor) {
       setDrainError('인증된 관리자 세션이 없습니다. 노드 격리(Drain) 명령은 로그인된 관리자 식별자(actor)가 필수입니다.');
       return;
@@ -98,8 +100,9 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }
     setDrainError(null);
 
-    // 1. Expected control version query (strictly required, no synthetic fallback)
+    // 1. Expected control version query & canonical server status (strictly required, no synthetic fallback)
     let expectedVersion: number;
+    let targetAction: 'drain' | 'resume';
     try {
       const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
       if (typeof ctrl?.version === 'number') {
@@ -108,6 +111,16 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
         return;
       }
+
+      // Determine targetAction strictly from canonical server state
+      const isCurrentlyDrainedOnServer = ctrl.nodeStatus === 'draining' || ctrl.nodeStatus === 'quarantined';
+      targetAction = isCurrentlyDrainedOnServer ? 'resume' : 'drain';
+
+      // Update local cache of server control status
+      setNodeControlStatuses((prev) => ({
+        ...prev,
+        [nodeId]: { nodeStatus: ctrl.nodeStatus, version: ctrl.version },
+      }));
     } catch (err: any) {
       console.error('Failed to fetch node control version:', err);
       const codeStr = err?.problem?.code ? `[${err.problem.code} (${err.problem.status})]` : err?.problem?.status ? `[${err.problem.status}]` : '';
@@ -115,58 +128,62 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       return;
     }
 
-    const idempotencyKey = generateIdempotencyKey(`drain_${nodeId}`);
+    // 2. Fixed Idempotency-Key per logical operation (nodeId + targetAction + reasonCode + approvalId)
+    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId.trim()}`;
+    let idempotencyKey = idempotencyKeysRef.current.get(opKey);
+    if (!idempotencyKey) {
+      idempotencyKey = generateIdempotencyKey(`containment_${nodeId}_${targetAction}`);
+      idempotencyKeysRef.current.set(opKey, idempotencyKey);
+    }
+
     const payload: ContainmentInput = {
       expectedVersion,
       reasonCode: drainReasonCode,
       approvalId: drainApprovalId.trim(),
     };
 
-    const endpoint = currentDrained ? `/v1/nodes/${encodeURIComponent(nodeId)}/resume` : `/v1/nodes/${encodeURIComponent(nodeId)}/drain`;
+    const endpoint = `/v1/nodes/${encodeURIComponent(nodeId)}/${targetAction}`;
 
-    if (currentDrained) {
-      secManager.undrainNode(nodeId, actor);
-      refreshState();
-      try {
-        await apiClient(endpoint, {
-          method: 'POST',
-          idempotencyKey,
-          body: JSON.stringify(payload),
-        });
-      } catch (err: any) {
-        console.error('Failed to sync node resume to control plane:', err);
-        secManager.drainNode(nodeId, actor, 'Reverting failed undrain action');
-        refreshState();
-        if (err?.problem) {
-          const p = err.problem;
-          const codeStr = p.code ? `[${p.code} (${p.status})]` : `[${p.status}]`;
-          setDrainError(`${codeStr} ${p.title}: ${p.detail}`);
-        } else {
-          setDrainError(`노드 재개 동기화 실패: ${err?.message || '제어 평면 오류'}`);
-        }
-      }
-    } else {
-      secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId}`);
-      refreshState();
-      try {
-        await apiClient(endpoint, {
-          method: 'POST',
-          idempotencyKey,
-          body: JSON.stringify(payload),
-        });
-      } catch (err: any) {
-        console.error('Failed to sync node drain to control plane:', err);
+    // 3. Post to canonical endpoint and mutate local state ONLY on server success
+    try {
+      const result = await apiClient<ContainmentResult>(endpoint, {
+        method: 'POST',
+        idempotencyKey,
+        body: JSON.stringify(payload),
+      });
+
+      // On success, clear idempotency key for this completed logical operation
+      idempotencyKeysRef.current.delete(opKey);
+
+      // Extract canonical nodeStatus and version from ContainmentResult
+      const canonicalStatus = result?.control?.nodeStatus ?? (targetAction === 'drain' ? 'draining' : 'online');
+      const canonicalVersion = typeof result?.control?.version === 'number' ? result.control.version : expectedVersion + 1;
+
+      setNodeControlStatuses((prev) => ({
+        ...prev,
+        [nodeId]: { nodeStatus: canonicalStatus, version: canonicalVersion },
+      }));
+
+      // Synchronize local security engine to match server response
+      if (canonicalStatus === 'draining' || canonicalStatus === 'quarantined') {
+        secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId.trim()}`);
+      } else {
         secManager.undrainNode(nodeId, actor);
-        refreshState();
-        if (err?.problem) {
-          const p = err.problem;
-          const codeStr = p.code ? `[${p.code} (${p.status})]` : `[${p.status}]`;
-          setDrainError(`${codeStr} ${p.title}: ${p.detail}`);
-        } else {
-          setDrainError(`노드 격리(Drain) 동기화 실패: ${err?.message || '제어 평면 오류'}`);
-        }
+      }
+      refreshState();
+    } catch (err: any) {
+      console.error(`Failed to execute node ${targetAction} on control plane:`, err);
+      // Key remains in idempotencyKeysRef.current so retrying the same operation reuses it!
+      // Local state is NOT altered on failure (maintaining server truth).
+      if (err?.problem) {
+        const p = err.problem;
+        const codeStr = p.code ? `[${p.code} (${p.status})]` : `[${p.status}]`;
+        setDrainError(`${codeStr} ${p.title}: ${p.detail}`);
+      } else {
+        setDrainError(`노드 ${targetAction === 'drain' ? '격리(Drain)' : '재개'} 동기화 실패: ${err?.message || '제어 평면 오류'}`);
       }
     }
+
     if (onRefreshNodes) {
       onRefreshNodes();
     }
@@ -177,8 +194,54 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);
   const [selectedGpuNodeId, setSelectedGpuNodeId] = useState<string>(() => gpuNodes[0]?.id || '');
   const [gpuResult, setGpuResult] = useState<SyntheticGpuResult | null>(null);
-  const [isGpuRunning, setIsGpuRunning] = useState(false);
   const [showKillSwitchModal, setShowKillSwitchModal] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const cancelBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!showKillSwitchModal) return;
+
+    // Initial focus on cancel button
+    const timer = setTimeout(() => {
+      cancelBtnRef.current?.focus();
+    }, 0);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowKillSwitchModal(false);
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!modalRef.current) return;
+        const focusableEls = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableEls.length === 0) return;
+        const firstEl = focusableEls[0];
+        const lastEl = focusableEls[focusableEls.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showKillSwitchModal]);
 
   const refreshState = () => {
     setStatus(secManager.getStatus());
@@ -931,7 +994,10 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {nodes.map((n) => {
-              const isDrained = secManager.isNodeDrained(n.id);
+              const serverStatus = nodeControlStatuses[n.id]?.nodeStatus;
+              const isDrained = serverStatus
+                ? (serverStatus === 'draining' || serverStatus === 'quarantined')
+                : (n.status === 'draining' || secManager.isNodeDrained(n.id));
               return (
                 <div
                   key={n.id}
@@ -1017,6 +1083,8 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           }}
         >
           <div
+            ref={modalRef}
+            tabIndex={-1}
             style={{
               width: '100%',
               maxWidth: '520px',
@@ -1053,7 +1121,13 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 : 'Kill Switch를 발동하면 프론트엔드 보안 통제 계층에서 모든 모의 작업 디스패치가 일시 중지됩니다.'}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <Button size="sm" variant="secondary" onClick={() => setShowKillSwitchModal(false)}>
+              <Button
+                ref={cancelBtnRef}
+                size="sm"
+                variant="secondary"
+                onClick={() => setShowKillSwitchModal(false)}
+                data-testid="kill-switch-cancel-btn"
+              >
                 취소
               </Button>
               <Button

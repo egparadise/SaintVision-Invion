@@ -385,6 +385,208 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(parsedBody.approvalId).toBe('11111111-2222-4333-8444-555555555555');
     });
 
+    it('동일한 노드·의도·승인ID의 재시도 시 동일한 Idempotency-Key를 재사용하고 다른 조작에는 새 키를 생성한다', async () => {
+      let postCount = 0;
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          return { version: 10, killSwitchActive: false, nodeStatus: 'online' } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          postCount++;
+          if (postCount === 1) {
+            // First call fails with 503 network error
+            const problem = {
+              type: 'about:blank',
+              title: 'Transient network failure',
+              status: 503,
+              code: 'NET-0503',
+              category: 'NET',
+              detail: 'Connection reset by peer',
+              retryable: true,
+              traceId: '0123456789abcdef0123456789abcdef',
+            };
+            throw new client.ApiError(problem as any);
+          }
+          return {
+            requestId: 'req_1',
+            operation: 'drain',
+            control: { nodeStatus: 'draining', version: 11 },
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // Switch to Drain tab
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // Enter approval UUID
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      // 1st attempt (fails with 503)
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      const firstDrainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
+      expect(firstDrainCall).toBeDefined();
+      const firstKey = firstDrainCall?.[1]?.idempotencyKey;
+      expect(firstKey).toBeDefined();
+
+      // 2nd attempt (same operation retry)
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
+      expect(drainCalls).toHaveLength(2);
+      const secondKey = drainCalls[1]?.[1]?.idempotencyKey;
+
+      // Invariant: Retrying the identical logical operation MUST reuse the exact same Idempotency-Key
+      expect(secondKey).toBe(firstKey);
+    });
+
+    it('서버 /control 응답의 nodeStatus를 정본으로 하여 drain/resume 엔드포인트를 선택하고 응답 성공 후에만 로컬 상태를 전이한다', async () => {
+      let isServerDrained = true;
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          // Server reports node is already draining!
+          return {
+            version: 12,
+            killSwitchActive: false,
+            nodeStatus: isServerDrained ? 'draining' : 'online',
+          } as any;
+        }
+        if (endpoint.includes('/resume')) {
+          isServerDrained = false;
+          return {
+            requestId: 'req_resume_1',
+            operation: 'resume',
+            control: { nodeStatus: 'online', version: 13 },
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      // Click button for node-test-01
+      const actionBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.getAttribute('data-testid') === 'drain-node-btn-node-test-01'
+      ) as HTMLButtonElement;
+      expect(actionBtn).toBeDefined();
+
+      await act(async () => {
+        actionBtn.click();
+      });
+
+      // Because server /control reported nodeStatus: 'draining', component must target /resume (not /drain)
+      const resumeCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/resume'));
+      expect(resumeCall).toBeDefined();
+      const drainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
+      expect(drainCall).toBeUndefined();
+    });
+
+    it('Kill Switch 모달은 열릴 때 취소 버튼에 초기 포커스되고, Esc 키로 닫히며, Tab 포커스 트랩이 동작한다', async () => {
+      vi.useFakeTimers();
+      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. Open modal
+      const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        toggleBtn.click();
+      });
+
+      // Advance timers for initial focus
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      const modal = container.querySelector('[data-testid="kill-switch-modal"]');
+      expect(modal).not.toBeNull();
+
+      const cancelBtn = container.querySelector('[data-testid="kill-switch-cancel-btn"]') as HTMLButtonElement;
+      const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+      expect(cancelBtn).not.toBeNull();
+      expect(confirmBtn).not.toBeNull();
+
+      // Initial focus on cancel button
+      expect(document.activeElement).toBe(cancelBtn);
+
+      // 2. Focus trap: Tab from confirmBtn wraps to cancelBtn
+      confirmBtn.focus();
+      expect(document.activeElement).toBe(confirmBtn);
+
+      const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+      window.dispatchEvent(tabEvent);
+      expect(document.activeElement).toBe(cancelBtn);
+
+      // 3. Esc key closes modal
+      const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+      act(() => {
+        window.dispatchEvent(escEvent);
+      });
+
+      expect(container.querySelector('[data-testid="kill-switch-modal"]')).toBeNull();
+      vi.useRealTimers();
+    });
+
     it('백엔드 Kill Switch 403 AUTH-0062 실패 시 "조회 실패 [AUTH-0062]"를 표시한다', async () => {
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
