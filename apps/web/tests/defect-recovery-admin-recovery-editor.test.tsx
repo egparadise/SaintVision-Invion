@@ -559,7 +559,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       });
 
       // Verify 409 error banner is displayed
-      const errorBanner = container.querySelector('[data-testid="drain-error-banner"]');
+      const errorBanner = container.querySelector('[data-testid="admin-drain-error-banner"]');
       expect(errorBanner?.textContent).toContain('GRAPH-0003 (409)');
 
       const firstDrainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
@@ -589,7 +589,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(secondBody.expectedVersion).toBe(8);
 
       // Successfully resolved
-      expect(container.querySelector('[data-testid="drain-error-banner"]')).toBeNull();
+      expect(container.querySelector('[data-testid="admin-drain-error-banner"]')).toBeNull();
     });
 
     it('화면 표시 의도와 서버 상태 불일치 시 POST를 수행하지 않고(POST 0회) 상태 변경 안내를 표시한다', async () => {
