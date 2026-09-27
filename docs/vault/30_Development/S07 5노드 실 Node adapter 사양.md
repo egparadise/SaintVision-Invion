@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S07-FIVE-NODE-ADAPTER-SPEC-001"
 title: "S07 5노드 실 Node adapter 사양"
-version: "1.1.0"
-status: "proposed-review"
+version: "1.2.0"
+status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T11:45:00+09:00"
+updated: "2026-09-28T00:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S07-DB"]
@@ -15,7 +15,7 @@ tags: ["s07", "five-node", "adapter", "inventory", "read-only", "preflight"]
 # S07 5노드 실 Node adapter 사양
 
 > [!warning] 물리 wave 실행 권한 없음
-> v1.1은 공용 inventory와 등록/mTLS read-only preflight를 `tools/five_node_lab_preflight.py`로 추출하지만 실제 이탈·복구 wave는 구현하거나 승인하지 않는다. S07-DB는 `review`이며 AC-07·5노드 인수는 미측정이다.
+> v1.2는 공용 inventory와 등록/mTLS read-only preflight를 재사용하는 S07 dry-run CLI까지만 구현한다. 실제 이탈·복구 wave는 구현하거나 승인하지 않는다. S07-DB는 `review`이며 AC-07·5노드 인수는 미측정이다.
 
 ## 1. 목적
 
@@ -25,7 +25,7 @@ tags: ["s07", "five-node", "adapter", "inventory", "read-only", "preflight"]
 python tools/measure_s07_recovery.py --adapter five-node-lab --inventory "$LAB_INVENTORY_PATH" --dry-run --json-out "$LAB_EVIDENCE_ROOT/preflight/s07-five-node.json"
 ```
 
-`--adapter synthetic`이 기본이며 기존 `--nodes`, `--repetitions`, timeout/poll/target, JSON/JUnit 실행 의미를 바꾸지 않는다. 위 S07 CLI는 여전히 제안·미구현이다. 이번 카드의 helper는 #101 placement adapter의 등록/mTLS preflight만 공용화하며 Node disruption, repair, JUnit success를 실행하지 않는다.
+`--adapter synthetic`이 기본이며 기존 `--nodes`, `--repetitions`, timeout/poll/target, JSON/JUnit 실행 의미를 바꾸지 않는다. 카드 33의 S07 CLI는 위 명령의 `five-node-lab + inventory + dry-run + JSON` 조합만 구현했다. 이 경로는 #101 placement adapter의 공용 등록/mTLS preflight를 재사용하며 Node disruption, repair, 20회 wave, JUnit success를 실행하지 않는다. five-node adapter에 synthetic 측정 knob 또는 JUnit을 주면 fail closed한다.
 
 ### F-A: 물리 AC-07 제품 경로 결정
 
@@ -104,6 +104,8 @@ readiness false는 유효한 관측이므로 #101과 같이 JSON을 보존하고
 
 five-node dry-run은 JUnit을 만들지 않는다. JUnit은 실제 recovery assertion이 실행됐을 때만 생성한다. 사용자가 five-node adapter에 `--dry-run` 없이 measurement knobs 또는 JUnit path를 주면 “physical recovery execution is not enabled”로 거부한다.
 
+카드 33 구현은 `services/control-plane/src/inv/observation.py:146`의 60초 offline 조건을 변경하지 않고 artifact에 `livenessTimeoutSeconds=60`과 `detectionLimit=60-seconds-plus-observer-poll`을 고정한다. 이는 등록/mTLS 후보 관측일 뿐 kernel source plan/shard·stop receipt·lease/fence·output storage 준비를 판정하거나 실제 복구를 승인하지 않는다.
+
 ## 6. 구현 카드 시험
 
 ### PG-free
@@ -124,6 +126,14 @@ five-node dry-run은 JUnit을 만들지 않는다. JUnit은 실제 recovery asse
 4. profile/heartbeat/channel/snapshot 부정 대조는 write 없이 readiness false 또는 identity error를 낸다.
 
 실제 LAN Node, channel, heartbeat를 갱신하거나 process를 중단하는 시험은 이 구현 카드에 포함하지 않는다.
+
+### 카드 33 구현 증거
+
+- branch `agent/codex/s07-five-node-adapter`, base `1e8baf04`, implementation `4d322156`.
+- `tests/core/test_s07_recovery_measurement.py`: 10 passed. Synthetic 기본 경로, five-node CLI fail-closed, S07 projection, CP 겸임 제외, readiness 강등 미승격을 검증했다.
+- `tests/test_placement_benchmark_five_node_adapter.py`: 16 passed. 공용 helper의 strict inventory·read-only·stale report·identity 경계를 회귀 검증했다.
+- `tests/integration/test_five_node_lab_preflight.py`: disposable PostgreSQL 단일 파일 1 passed. 실제-shaped 5행의 before/after가 같고 transaction read-only, ready 5·S07 selected 4·CP 겸임 disruption 0, tenant/DSN 비노출을 확인했다.
+- Node/Docker 중단·repair·20회 wave·물리 health probe·JUnit은 실행하지 않았다. 따라서 `topologyReady`/`recoveryWaveReady`는 등록/mTLS 후보 분류 결과이며 operational acceptance가 아니다.
 
 ## 7. 후속 물리 실행의 별도 승인 조건
 

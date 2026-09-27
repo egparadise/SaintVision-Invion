@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T00:55:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S07 Card33 5노드 실 Node adapter dry-run
+
+- base `1e8baf04`, branch `agent/codex/s07-five-node-adapter`, 구현 `4d322156`. `measure_s07_recovery.py --adapter five-node-lab --inventory ... --dry-run --json-out ...`가 `five_node_lab_preflight.py`의 strict inventory·등록/mTLS·read-only SQL·stale-output writer를 단일 정본으로 재사용한다.
+- S07 artifact는 ready 5·CP 겸임 1·독립/eligible/selected 4를 분리하고 겸임 Node를 topology에는 포함하되 disruption target에서 제외한다. 20회 계획은 각 Ubuntu 5회인 계획값만 기록하며 실제 wave·repair·JUnit은 실행하지 않는다. Synthetic 기본 경로·공개 계약·registry는 불변이다.
+- PG-free 10+16 passed, disposable 실 PG 단일 파일 1 passed/6.65s, py_compile·diff-check exit 0. 실제 Node/Docker 중단·health probe·kernel source plan/shard readiness·AC-07은 미측정이며 S07-DB `review`와 Claude 독립 검토 대기를 유지한다. [[S07 5노드 실 Node adapter 사양]], [[2026-09-28_00-55-00_KST_S07_5노드_dry-run_adapter_Codex_구현]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
