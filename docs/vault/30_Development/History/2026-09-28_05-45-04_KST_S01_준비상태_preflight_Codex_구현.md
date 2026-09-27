@@ -1,15 +1,15 @@
 ---
 doc_id: "HIST-CODEX-2026-09-28-S01-READINESS-PREFLIGHT"
 title: "S01-BE·S01-ST 준비 상태 preflight 수집기 구현"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T05:45:04+09:00"
+updated: "2026-09-28T06:12:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf045c5a554209aaef601ae4883b64da50a7"
-implementation_sha: "c959e158"
+implementation_sha: "15f84413"
 task_ids: ["S01-BE", "S01-ST"]
 tags: ["S01", "preflight", "read-only", "redaction", "evidence"]
 ---
@@ -42,15 +42,16 @@ S01 상태·registry·공개 계약은 변경하지 않고, 입력 U1~U6이 들�
 
 | 명령/관측 | 결과 |
 |---|---|
-| `pytest tests/test_s01_readiness_preflight.py -q` | 13 passed, exit 0 |
+| `pytest tests/test_s01_readiness_preflight.py -q` | 23 passed, exit 0 |
 | `py_compile` + CLI `--help` + `git diff --check` | 각각 exit 0 |
 | `pytest tests/test_route_coverage.py -q` | 39 passed, exit 0 |
-| `check_docs.py` | 893 documents, exit 0 |
+| `check_docs.py` | 894 documents, exit 0 |
 | `check_contract_bindings.py` | 54 fixtures·19 types·25 sites·14 guards, exit 0 |
 | `check_frontend_integrity.py` | 9 rules, 0 violations, exit 0 |
 | `check_ontology.py` | 48 task mappings, exit 0 |
 | `check_doc_single_source.py --ratchet` | 18 pairs, exit 0 |
 | `check_response_freshness.py` | advisory 10/10, exit 0 |
+| `sync_obsidian.py --check` | 1734 managed·4 pending export·0 conflict, exit 0; read-only |
 
 현재 dev API/LAN state 예비 실행은 redacted JSON만 남겼다. API가 응답하지 않아 HTTP
 3건은 `FAIL`, 실 inventory·access token이 없어 나머지 4건은 `BLOCKED`, exit 1이었다.
@@ -65,3 +66,18 @@ read-only SQL과 certificate identity 결속을 독립 검토한다. 사용자 U
 보호 inventory와 실토큰 환경변수로 재실행하고, 그때의 PASS/FAIL/BLOCKED JSON을 S01
 인수 증거로 연결한다. Storage SHA-256 왕복·retention/GC·독립 검토·운영 인수와
 S01-BE/S01-ST `done` 판정은 이 카드에서 수행하지 않았다.
+
+## Claude 수정 요청 반영
+
+PR #122 독립 검토의 차단 6건을 구현 `15f84413`에서 보정했다. inventory의 명시적
+`null`은 invalid나 PASS가 아니라 missing/BLOCKED로 집계한다. output은 unlink 전에
+inventory·Node/HTTP CA·state 전체 하위와 겹치는지 검사한다. pilot leaf는 제품
+`certificate_identity`를 직접 재사용해 정확한 nodeId/epoch SPIFFE URI, `SERVER_AUTH`,
+`ca=false`, 유효한 CA와 fingerprint를 검사하며 5대 미등록은 BLOCKED다.
+
+`/v1/health`는 inv.app의 `/readyz`·`/v1/session`과 다른 표면이므로 `--health-url`로
+분리했다. Node CA와 HTTP TLS CA도 분리했고 실토큰의 평문 HTTP 전송은 거부한다.
+`nodes:null`은 예외 대신 BLOCKED로 판정한다. focused 시험은 실제 pilot 형식 leaf 5장,
+1/5 BLOCKED, 잘못된 SPIFFE, DNS PASS/FAIL/BLOCKED, 보호 경로 선검증, PEM과 `main()` 종단
+redaction을 포함해 23 passed다. PG 대조는 DB 정본에 있는 CPU/RAM/profile/cert만 다루며
+GPU/NTP DB 일치는 이 카드가 주장하지 않는다.
