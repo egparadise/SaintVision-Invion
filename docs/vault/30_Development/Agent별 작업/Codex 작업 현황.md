@@ -10,6 +10,11 @@ source_of_truth: "Git"
 
 # Codex 작업 현황
 
+## 2026-09-28 Card36 hosted Core CX01 19 skip 실행 전환 — 구현 중
+
+- base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
+- mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용은 금지한다. 먼저 workflow 생명주기 정적 시험을 red로 만들고 구현한 뒤, 주 검증은 `run-core` label의 hosted JUnit으로 19 setup skip 제거와 실제 body 결과를 확인한다. [[Core CX01 hosted disposable container 설계]]
+
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
 - Card24 local 실행 head `4c8a7363…`와 Card25 local 실행 head `6c389a1d…`가 origin integration 조상이 아님을 확인했다. 실행 위치는 evidence `executionHeadAtRun`에 보존하고 재현 anchor로는 쓰지 않는다.

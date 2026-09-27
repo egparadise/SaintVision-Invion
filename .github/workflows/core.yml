@@ -29,16 +29,6 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'run-core')
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: inv_test_only
-          POSTGRES_DB: postgres
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       INV_TEST_ADMIN_DSN: postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres
       INV_TEST_EVIDENCE_DIR: ${{ github.workspace }}/dist
@@ -64,6 +54,40 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
+      - name: Create disposable CX01 PostgreSQL
+        run: |
+          mkdir -p .work
+          cx01_owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cx01_name="sv-cx01-${cx01_owner}"
+          cx01_id="$(docker run -d \
+            --name "$cx01_name" \
+            --label "ai.saintvision.kernel-test=$cx01_owner" \
+            --label "ai.saintvision.cx01=$cx01_owner" \
+            --label "ai.saintvision.created-by=github-actions" \
+            --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid \
+            --memory 512m \
+            -e POSTGRES_PASSWORD=inv_test_only \
+            -e POSTGRES_DB=postgres \
+            -p 127.0.0.1:5432:5432 \
+            --health-cmd 'pg_isready -U postgres' \
+            --health-interval 2s --health-timeout 2s --health-retries 30 \
+            postgres:16)"
+          printf '%s\n' "$cx01_id" > .work/cx01-container-id
+          for attempt in $(seq 1 45); do
+            health="$(docker inspect --format '{{.State.Health.Status}}' "$cx01_id")"
+            if [ "$health" = healthy ]; then break; fi
+            if [ "$(docker inspect --format '{{.State.Running}}' "$cx01_id")" != true ]; then
+              docker logs "$cx01_id"
+              exit 1
+            fi
+            sleep 2
+          done
+          test "$(docker inspect --format '{{.State.Health.Status}}' "$cx01_id")" = healthy
+          test "$(docker inspect --format '{{index .Config.Labels "ai.saintvision.kernel-test"}}' "$cx01_id")" = "$cx01_owner"
+          test "$(docker inspect --format '{{index .Config.Labels "ai.saintvision.cx01"}}' "$cx01_id")" = "$cx01_owner"
+          test "$(docker inspect --format '{{.Name}}' "$cx01_id")" = "/$cx01_name"
+          echo "CX01_CONTAINER=$cx01_id" >> "$GITHUB_ENV"
+          echo "INV_TEST_ADMIN_DSN=postgresql://postgres:inv_test_only@127.0.0.1:5432/postgres" >> "$GITHUB_ENV"
       - name: Regenerate contracts and detect drift
         run: |
           python tools/generate_contracts.py
@@ -171,7 +195,6 @@ jobs:
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
-              'CX01_CONTAINER is unset; container identity/ownership cannot be verified': 19,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
@@ -196,6 +219,27 @@ jobs:
       - run: go test ./...
         working-directory: packages/contracts-go
       - run: npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts
+      - name: Cleanup disposable CX01 PostgreSQL
+        if: always()
+        run: |
+          if [ ! -f .work/cx01-container-id ]; then
+            echo 'No CX01 receipt exists; no owned container is eligible for cleanup.'
+            exit 0
+          fi
+          cx01_id="$(cat .work/cx01-container-id)"
+          cx01_owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          expected_name="sv-cx01-${cx01_owner}"
+          actual_owner="$(docker inspect --format '{{index .Config.Labels "ai.saintvision.cx01"}}' "$cx01_id")"
+          actual_kernel_owner="$(docker inspect --format '{{index .Config.Labels "ai.saintvision.kernel-test"}}' "$cx01_id")"
+          actual_name="$(docker inspect --format '{{.Name}}' "$cx01_id" | sed 's#^/##')"
+          test "$actual_owner" = "$cx01_owner"
+          test "$actual_kernel_owner" = "$cx01_owner"
+          test "$actual_name" = "$expected_name"
+          docker rm -f -v "$cx01_id"
+          if docker inspect "$cx01_id" >/dev/null 2>&1; then
+            echo 'Owned CX01 container still exists after cleanup.'
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
