@@ -11,6 +11,7 @@ from __future__ import annotations
 import ast
 import json
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -238,13 +239,63 @@ def test_secret_guard_rejects_dsn_and_password_from_environment(monkeypatch, tmp
     assert not (tmp_path / "x.json").exists()
 
 
-def test_stale_outputs_are_removed_before_a_rerun(tmp_path, monkeypatch):
-    for name in ("s.json", "s.md", "s-rls.json", "s-rls.md"):
-        (tmp_path / name).write_text('{"verdict":"PASS"}', encoding="utf-8")
-    monkeypatch.delenv("INV_TEST_ADMIN_DSN", raising=False)
+def test_existing_outputs_are_refused_never_deleted(tmp_path, monkeypatch):
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _provenance())
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    for name in ("s-rls.md",):  # even a lone sibling artifact blocks the label
+        (tmp_path / name).write_text("prior", encoding="utf-8")
     code = tool.main(["--out-dir", str(tmp_path), "--label", "s", "--junit-dir", str(tmp_path / "junit")])
     assert code == 2
-    assert not any((tmp_path / name).exists() for name in ("s.json", "s.md", "s-rls.json", "s-rls.md"))
+    assert (tmp_path / "s-rls.md").read_text(encoding="utf-8") == "prior"
+    assert not (tmp_path / "s.json").exists()
+
+
+def test_dirty_tree_is_refused_by_default_and_recorded_when_allowed(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance",
+                        lambda executor=None: {**_provenance(), "working_tree_clean_status": False})
+    monkeypatch.setattr(tool, "run_api_suite", lambda junit_path, python=None: _api())
+    monkeypatch.setattr(tool, "run_rls_collector", lambda out_dir, label: _rls())
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "junit")]) == 2
+    assert not (tmp_path / "d.json").exists()
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "d", "--junit-dir", str(tmp_path / "junit"),
+                      "--allow-dirty-tree"]) == 0
+    payload = json.loads((tmp_path / "d.json").read_text(encoding="utf-8"))
+    assert payload["provenance"]["dirtyTreeAllowed"] is True
+    assert payload["provenance"]["working_tree_clean_status"] is False
+
+
+def test_default_label_carries_sha_and_utc_timestamp(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _provenance())
+    monkeypatch.setattr(tool, "run_api_suite", lambda junit_path, python=None: _api())
+    monkeypatch.setattr(tool, "run_rls_collector", lambda out_dir, label: _rls())
+    assert tool.main(["--out-dir", str(tmp_path), "--junit-dir", str(tmp_path / "junit")]) == 0
+    names = [p.name for p in tmp_path.glob("s02-acceptance-*.json")]
+    assert len(names) == 1 and re.fullmatch(r"s02-acceptance-a{12}-\d{8}T\d{6}Z\.json", names[0]), names
+
+
+@pytest.mark.parametrize("api_kwargs, rls_kwargs", [
+    ({"outcomes": {**_all_passed(), "test_denials_are_recorded": "failed"}},
+     {"verdict": "UNAVAILABLE", "status": "unavailable"}),
+    ({"status": "unavailable", "exit_code": 1}, {"verdict": "VIOLATIONS"}),
+])
+def test_failure_outranks_unavailable(api_kwargs, rls_kwargs):
+    evidence = tool.build_evidence(provenance=_provenance(), api=_api(**api_kwargs), rls=_rls(**rls_kwargs))
+    assert evidence["verdict"] == "FAIL"
+
+
+def test_provenance_is_computed_from_the_repo_root(tmp_path, monkeypatch):
+    seen = {}
+
+    def fake_collect(executor=None):
+        seen["cwd"] = Path(os.getcwd()).resolve()
+        return _provenance()
+    monkeypatch.setattr(tool, "collect_provenance", fake_collect)
+    monkeypatch.chdir(tmp_path)
+    tool.collect_provenance_at_repo_root("Claude")
+    assert seen["cwd"] == tool.REPO_ROOT.resolve()
+    assert Path(os.getcwd()).resolve() == tmp_path.resolve()
 
 
 def test_main_writes_bundle_from_stubbed_runners(tmp_path, monkeypatch):

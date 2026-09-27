@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S02-DB-AC02-EVIDENCE-COLLECTOR"
 title: "S02-DB AC-02 acceptance Evidence collector 구현 — 고정 SHA 1e8baf04에서 API↔PG 인증·격리 시험 4조항(28 passed)과 RLS 경계 collector(VIOLATIONS 1 = 기존 E2 public.audit_events)를 한 번에 실행해 redacted JSON/MD로 묶음, U2~U5 UNMEASURED"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T06:05:00+09:00"
+updated: "2026-09-28T08:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -64,6 +64,16 @@ tags: ["S02-DB", "AC-02", "evidence", "collector", "RLS", "token-replay", "tenan
 | F-S02-01 | 이 PR에서 하지 않음. Codex 판정(baseline 수용 기각, RLS ENABLE+FORCE + 별도 audit writer/reader 역할 + 시험 4종)은 별도 구현 카드로 Claude tab이 진행 | — |
 
 재실행 결과(측정분): API **28 passed / 0 failed**(exit 0, 59.125s), 4/4 조항 pass; RLS **VIOLATIONS 1**(동일 E2 `public.audit_events`) → 묶음 **FAIL**, `acceptanceClaim=false`, U2~U5 UNMEASURED. PG-free 자기 시험 **24 passed / 1 skipped**.
+
+## 7. #127(S10) Codex 검토에서 드러난 같은 패턴 반영 (08:05 KST)
+
+| 항목 | 조치 | 검증 |
+|---|---|---|
+| clean head가 없고 provenance가 cwd 의존 | dirty tree는 **기본 거부(exit 2)**, `--allow-dirty-tree`는 명시 opt-out이며 `provenance.dirtyTreeAllowed=true`로 기록. provenance는 `collect_provenance_at_repo_root`로 **repo 루트를 cwd로** 계산 | `test_dirty_tree_is_refused_by_default_and_recorded_when_allowed`, `test_provenance_is_computed_from_the_repo_root` |
+| 같은 날 재실행이 이전 산출물을 삭제·덮어씀(`remove_stale_outputs`) | 기본 label `s02-acceptance-<sha12>-<UTC %Y%m%dT%H%M%SZ>`; 같은 label의 json/md/-rls가 하나라도 있으면 **삭제 없이 거부(exit 2)** | `test_existing_outputs_are_refused_never_deleted`, `test_default_label_carries_sha_and_utc_timestamp` |
+| failed+unavailable → UNAVAILABLE | `overall_verdict`가 관측된 실패(JUnit failed/error, 조항 fail, RLS VIOLATIONS, complete인데 exit≠0)를 **먼저** FAIL로 판정하고, UNAVAILABLE은 실패가 없을 때만 | `test_failure_outranks_unavailable`(2 조합) |
+
+기존 evidence 파일(`…1e8baf045c5a-20260927.*`, `…fc0bf0ceb590-20260927.*`)은 그대로 보존(라벨 형식 변경은 이후 실행부터). PG-free 자기 시험 **30 passed / 1 skipped**. 실 PG 재실행 없음(가용 메모리 조건 미충족).
 
 ## 5. 경계·다음
 

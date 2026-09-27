@@ -24,7 +24,12 @@ Honesty rules baked into the output:
   does not close AC-02;
 * the verdict is fail-closed on the WHOLE API suite: any failed/error case in
   ``tests/test_api.py`` (mapped or not), a non-zero pytest exit, or a suite status
-  other than ``complete`` makes the bundle FAIL (or UNAVAILABLE when nothing ran);
+  other than ``complete`` makes the bundle FAIL; a failure anywhere outranks an
+  unavailable sibling (FAIL, never UNAVAILABLE), and UNAVAILABLE only when nothing failed;
+* provenance is computed with the repository root as cwd; a dirty working tree is
+  refused by default (``--allow-dirty-tree`` is an explicit, recorded opt-out); the
+  default label carries the SHA and a UTC timestamp and an existing output with the
+  same label is refused rather than deleted or overwritten;
 * redaction contract (checked before every write, violations refuse the write):
   - DSN values and their passwords from ``INV_TEST_ADMIN_DSN`` / ``INV_AUDIT_DSN`` /
     ``INV_DATABASE_URL`` / ``INV_TEST_DATABASE_URL`` are never written;
@@ -254,20 +259,23 @@ def run_rls_collector(out_dir: Path, label: str) -> dict[str, Any]:
 
 def overall_verdict(clauses: dict[str, Any], api: dict[str, Any], rls: dict[str, Any]) -> str:
     statuses = {c["status"] for c in clauses.values()}
+    counts = api.get("counts") or {}
+    # Fail closed first, on the whole API suite (mapped or not) and the RLS lane: any
+    # observed failure outranks an unavailable sibling, so failed+unavailable is FAIL.
+    observed_failure = (
+        counts.get("failed", 0) > 0
+        or counts.get("error", 0) > 0
+        or "fail" in statuses
+        or rls.get("verdict") == "VIOLATIONS"
+        or (api["status"] == "complete" and api.get("exitCode") != 0)
+    )
+    if observed_failure:
+        return "FAIL"
     if api["status"] in ("unavailable", "invalid-junit") or rls["status"] == "unavailable":
         return "UNAVAILABLE"
-    counts = api.get("counts") or {}
-    # Fail closed on the whole API suite: an unmapped failure, a non-zero pytest
-    # exit or an incomplete suite status must never leave the bundle PASS.
-    api_failed = (
-        api["status"] != "complete"
-        or api.get("exitCode") != 0
-        or counts.get("failed", 0) > 0
-        or counts.get("error", 0) > 0
-    )
-    if api_failed and api["status"] == "not_run" and not (counts.get("failed") or counts.get("error")):
+    if api["status"] == "not_run":
         return "NOT_RUN"
-    if "fail" in statuses or rls["verdict"] == "VIOLATIONS" or api_failed:
+    if api["status"] != "complete":
         return "FAIL"
     if statuses == {"pass"} and rls["verdict"] == "PASS":
         return "PASS"
@@ -302,6 +310,7 @@ def build_evidence(*, provenance: dict[str, Any], api: dict[str, Any], rls: dict
             # The content hash identifies the collector that ran even when it was
             # still uncommitted (working_tree_clean_status false) at run time.
             "collectorSha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "dirtyTreeAllowed": bool(provenance.get("dirtyTreeAllowed", False)),
         },
         "environment": {
             "database": "disposable PostgreSQL database per pytest session / per collector run, "
@@ -432,18 +441,29 @@ def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple
     return json_path, md_path
 
 
-def remove_stale_outputs(out_dir: Path, label: str) -> None:
-    """A failed rerun must never leave an earlier green bundle looking current."""
-    for suffix in (".json", ".md"):
-        (out_dir / f"{label}{suffix}").unlink(missing_ok=True)
-    (out_dir / f"{label}-rls.json").unlink(missing_ok=True)
-    (out_dir / f"{label}-rls.md").unlink(missing_ok=True)
+def existing_outputs(out_dir: Path, label: str, extra: tuple[str, ...] = ()) -> list[Path]:
+    """Outputs that already exist for this label; they are never deleted or overwritten."""
+    names = [f"{label}.json", f"{label}.md", *extra]
+    return [out_dir / name for name in names if (out_dir / name).exists()]
+
+
+def collect_provenance_at_repo_root(executor: str | None) -> dict[str, Any]:
+    """Provenance must describe the repository, not whatever cwd the caller happened to use."""
+    previous = os.getcwd()
+    os.chdir(REPO_ROOT)
+    try:
+        return collect_provenance(executor=executor)
+    finally:
+        os.chdir(previous)
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     result.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
-    result.add_argument("--label", default=None, help="file stem (default: s02-acceptance-<sha12>-<utc date>)")
+    result.add_argument("--label", default=None, help="file stem (default: s02-acceptance-<sha12>-<utc timestamp>)")
+    result.add_argument("--allow-dirty-tree", action="store_true",
+                        help="explicit opt-out: run on a dirty working tree (recorded in provenance); "
+                             "by default a dirty tree is refused because the evidence would not be reachable")
     result.add_argument("--executor", default=os.environ.get("INV_S02_EXECUTOR") or "Claude")
     result.add_argument("--note", default=None, help="free-text run condition recorded in the evidence")
     result.add_argument("--junit-dir", type=Path, default=REPO_ROOT / ".work" / "s02-acceptance",
@@ -453,11 +473,18 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
-    provenance = collect_provenance(executor=args.executor)
+    provenance = collect_provenance_at_repo_root(args.executor)
+    provenance["dirtyTreeAllowed"] = bool(args.allow_dirty_tree)
     sha12 = (provenance.get("commit_sha") or "nogit")[:12]
-    label = args.label or f"s02-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%d}"
+    label = args.label or f"s02-acceptance-{sha12}-{dt.datetime.now(dt.timezone.utc):%Y%m%dT%H%M%SZ}"
     out_dir = args.out_dir
-    remove_stale_outputs(out_dir, label)
+    if existing := existing_outputs(out_dir, label, (f"{label}-rls.json", f"{label}-rls.md")):
+        print(f"refusing to overwrite existing evidence: {[p.name for p in existing]}", file=sys.stderr)
+        return 2
+    if not provenance.get("working_tree_clean_status") and not args.allow_dirty_tree:
+        print("working tree is not clean; evidence must come from a committed, reachable head "
+              "(pass --allow-dirty-tree to record an explicit opt-out)", file=sys.stderr)
+        return 2
     if not os.environ.get("INV_TEST_ADMIN_DSN"):
         print("INV_TEST_ADMIN_DSN is required (disposable PostgreSQL); nothing measured", file=sys.stderr)
         return 2
