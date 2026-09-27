@@ -117,7 +117,7 @@ describe('S08-FE: Security Controls, Isolation, Audit Ledger & GPU Benchmark (AC
     });
   });
 
-  describe('Node Drain & Schedulable Control (ADR-038)', () => {
+  describe('Node Drain & Schedulable Control (ADR-054)', () => {
     it('places node into drain state, excludes from scheduling, and logs audit event', () => {
       const sec = new SecurityControlManager();
       expect(sec.isNodeDrained('nod_01JABCDEF01')).toBe(false);

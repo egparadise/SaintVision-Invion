@@ -12,6 +12,9 @@ import type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ContainmentInput,
+  ContainmentView,
+  ContainmentResult,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -22,6 +25,9 @@ export type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ContainmentInput,
+  ContainmentView,
+  ContainmentResult,
 };
 
 export type ErrorCategory =

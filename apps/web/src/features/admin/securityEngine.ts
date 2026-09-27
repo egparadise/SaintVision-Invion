@@ -46,14 +46,16 @@ export class SecurityControlManager {
 
     let prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
     initialEvents.forEach((evt, idx) => {
+      const id = `aud_seed_${idx}`;
       const timestamp = new Date(Date.now() - (4 - idx) * 1000 * 60 * 15).toISOString();
-      const payload = `${prevHash}|${timestamp}|${evt.actor}|${evt.action}|${evt.outcome}|${evt.details}`;
+      const traceId = `4bf92f3577b34da6a3ce929d0e0e473${idx}`;
+      const payload = `${prevHash}|${id}|${timestamp}|${traceId}|${evt.actor}|${evt.action}|${evt.target}|${evt.outcome}|${evt.details}`;
       const integrityHash = computeSha256(payload);
 
       this.auditLogs.push({
-        id: `aud_${Date.now().toString(36)}_${idx}`,
+        id,
         timestamp,
-        traceId: `4bf92f3577b34da6a3ce929d0e0e473${idx}`,
+        traceId,
         actor: evt.actor,
         action: evt.action,
         target: evt.target,
@@ -98,14 +100,15 @@ export class SecurityControlManager {
     traceId?: string;
   }): AuditLogEntry {
     const prevHash = this.auditLogs[this.auditLogs.length - 1]?.integrityHash || '0'.repeat(64);
+    const id = `aud_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
     const timestamp = new Date().toISOString();
     const traceId = params.traceId || `4bf92f3577b34da6a3ce929d0e0e473${Math.floor(Math.random() * 10)}`;
     
-    const payload = `${prevHash}|${timestamp}|${params.actor}|${params.action}|${params.outcome}|${params.details}`;
+    const payload = `${prevHash}|${id}|${timestamp}|${traceId}|${params.actor}|${params.action}|${params.target}|${params.outcome}|${params.details}`;
     const integrityHash = computeSha256(payload);
 
     const entry: AuditLogEntry = {
-      id: `aud_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+      id,
       timestamp,
       traceId,
       actor: params.actor,
@@ -221,7 +224,7 @@ export class SecurityControlManager {
 
     for (let i = 0; i < this.auditLogs.length; i++) {
       const entry = this.auditLogs[i];
-      const payload = `${prevHash}|${entry.timestamp}|${entry.actor}|${entry.action}|${entry.outcome}|${entry.details}`;
+      const payload = `${prevHash}|${entry.id}|${entry.timestamp}|${entry.traceId}|${entry.actor}|${entry.action}|${entry.target}|${entry.outcome}|${entry.details}`;
       const expected = computeSha256(payload);
 
       if (entry.integrityHash !== expected) {
@@ -234,7 +237,7 @@ export class SecurityControlManager {
   }
 
   /**
-   * ADR-038 Node Drain / Schedulable Control
+   * ADR-054 Node Drain / Schedulable Control
    */
   drainNode(nodeId: string, actor: string, reason: string): boolean {
     this.drainedNodes.add(nodeId);

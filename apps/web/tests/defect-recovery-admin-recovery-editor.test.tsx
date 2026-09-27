@@ -48,8 +48,8 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
   // =========================================================================
   // Priority 4: AdminSecurityConsole usr_admin_01 하드코딩 제거 및 세션 실배선
   // =========================================================================
-  describe('Priority 4: AdminSecurityConsole 행위자(actor) 실배선 및 세션 부재 0-call 가드', () => {
-    it('인증된 currentUser가 주어졌을 때 노드 Drain 요청에 실제 actor 식별자를 전송한다', async () => {
+  describe('Priority 4: AdminSecurityConsole canonical Containment 계약 및 세션/승인ID 가드', () => {
+    it('인증된 currentUser와 유효한 approval UUID가 주어졌을 때 Idempotency-Key와 ContainmentInput을 전송한다 (body에 actor 미포함)', async () => {
       const apiClientSpy = vi.spyOn(client, 'apiClient').mockResolvedValue({});
 
       act(() => {
@@ -74,27 +74,52 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         drainTabBtn?.click();
       });
 
-      // 3. Drain 액션 버튼 클릭
+      // 3. Approval UUID 입력 전에는 Drain 버튼이 비활성화되고 안내 배너 표시
       const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('Node Drain')
-      );
+      ) as HTMLButtonElement;
       expect(drainBtn).toBeDefined();
+      expect(drainBtn.disabled).toBe(true);
 
+      const approvalNotice = container.querySelector('[data-testid="drain-approval-required-notice"]');
+      expect(approvalNotice).not.toBeNull();
+      expect(approvalNotice?.textContent).toContain('유효한 Containment 승인 UUID');
+
+      // 4. 유효한 UUIDv4 입력
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      expect(approvalInput).not.toBeNull();
+      act(() => {
+        approvalInput.value = '550e8400-e29b-41d4-a716-446655440000';
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      // 입력 후 Drain 버튼 활성화
+      expect(drainBtn.disabled).toBe(false);
+
+      // 5. Drain 액션 버튼 클릭
       await act(async () => {
         drainBtn?.click();
       });
 
-      // 4. apiClient에 하드코딩 'usr_admin_01'이 아니라 실제 로그인 사용자 'usr_actual_admin_77'이 전달되어야 함
-      expect(apiClientSpy).toHaveBeenCalledWith(
-        '/v1/nodes/nod_test_01/drain',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({
-            actor: 'usr_actual_admin_77',
-            reason: 'Admin manual maintenance and isolation protocol',
-          }),
-        })
-      );
+      // 6. apiClient에 canonical ContainmentInput 및 Idempotency-Key 전달, body에 actor 미포함 검증
+      const drainCall = apiClientSpy.mock.calls.find((call) => call[0] === '/v1/nodes/nod_test_01/drain');
+      expect(drainCall).toBeDefined();
+      const drainOptions = drainCall?.[1] as any;
+      expect(drainOptions.method).toBe('POST');
+      expect(drainOptions.idempotencyKey).toBeDefined();
+      expect(typeof drainOptions.idempotencyKey).toBe('string');
+      expect(drainOptions.idempotencyKey.length).toBeGreaterThan(0);
+      expect(drainOptions.idempotencyKey.length).toBeLessThanOrEqual(200);
+
+      const parsedBody = JSON.parse(drainOptions.body);
+      expect(parsedBody).toEqual({
+        expectedVersion: 1,
+        reasonCode: 'maintenance',
+        approvalId: '550e8400-e29b-41d4-a716-446655440000',
+      });
+      // actor는 body에 포함되지 않아야 함 (서버에서 Bearer principal 추출)
+      expect(parsedBody.actor).toBeUndefined();
     });
 
     it('currentUser가 null일 때 경고 배너(role=alert)를 렌더링하고 Drain 네트워크 호출을 0회로 원천 차단한다', async () => {
@@ -115,7 +140,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(authNotice?.getAttribute('role')).toBe('alert');
       expect(authNotice?.textContent).toContain('인증된 관리자 세션 부재');
 
-      // 2. Drain 탭으로 이동 후 클릭 시도
+      // 2. Drain 탭으로 이동 후 버튼 비활성화 상태 확인
       const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('노드 Drain 통제')
       );
@@ -126,20 +151,76 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
       const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('Node Drain')
-      );
+      ) as HTMLButtonElement;
       expect(drainBtn).toBeDefined();
+      expect(drainBtn.disabled).toBe(true);
 
       await act(async () => {
         drainBtn?.click();
       });
 
-      // 3. 네트워크 0회 호출 가드 검증 (0 network calls)
-      expect(apiClientSpy).not.toHaveBeenCalled();
+      // 3. Drain 네트워크 호출 0회 검증
+      const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain') || c[0].includes('/resume'));
+      expect(drainCalls).toHaveLength(0);
+    });
 
-      // 4. 에러 배너 표출 검증
-      const drainError = container.querySelector('[data-testid="admin-drain-error-banner"]');
-      expect(drainError).not.toBeNull();
-      expect(drainError?.textContent).toContain('인증된 관리자 세션이 없습니다');
+    it('Drain API 실패 시 RFC 9457 ProblemDetails(409 GRAPH-0003)를 정직하게 에러 배너에 표시한다', async () => {
+      const problem = {
+        type: 'about:blank',
+        title: 'Control version changed; reload before retry',
+        status: 409,
+        code: 'GRAPH-0003',
+        category: 'GRAPH',
+        detail: 'Stored version 2 does not match expected version 1',
+        retryable: false,
+        traceId: '0123456789abcdef0123456789abcdef',
+        causeRef: null,
+        evidenceId: null,
+      };
+      const apiError = new client.ApiError(problem as any);
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint.endsWith('/drain')) {
+          throw apiError;
+        }
+        return {} as any;
+      });
+
+      act(() => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_admin', name: 'Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      act(() => {
+        drainTabBtn?.click();
+      });
+
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      act(() => {
+        approvalInput.value = '550e8400-e29b-41d4-a716-446655440000';
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      await act(async () => {
+        drainBtn?.click();
+      });
+
+      const errorBanner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+      expect(errorBanner).not.toBeNull();
+      expect(errorBanner?.textContent).toContain('GRAPH-0003 (409)');
+      expect(errorBanner?.textContent).toContain('Control version changed; reload before retry');
+      expect(errorBanner?.textContent).toContain('Stored version 2 does not match expected version 1');
     });
   });
 
