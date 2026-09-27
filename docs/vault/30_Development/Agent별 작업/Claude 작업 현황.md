@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.26"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T13:30:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+VF-CL 트랙 독립 검토 대장 카드 ad (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/vfcl-ledger`, docs-only): 카드 uu와 같은 방식으로 내 소유 VF-CL-01~05를 대응시켰다. 착지 SHA **25건 전부 integration 조상**(01 `de52a039`·`faa70b39` / 02 `5eea1445`·`c75201af` / 03 `ae739ee5`·`7ef9a3ce`·`2dce2c14`·`1fe3a6ae`·`34791448` / 04 `68f60363`·`46ab3f74`·`4cf018f6`·`56adc29d`·`3e267b05` / 05 검토 8건). **ciVerified 앵커는 integration tip `1e8baf04`의 Core run `35795657393`** — 단계 22 pytest **success 3234 passed/36 skipped/0 failed**, 모듈별로 storage_catalog 13·storage_api 5·uri_resolver 25·model_uri_resolver 7·model_registry 14·registry_policy_exact_match 37·lineage 30·replica_repair 11·pitr_readiness 9·pitr_archive_retention 9·replica_observation_api 7 전부 passed. **중요한 단서 둘**: 그 run의 전체 결론은 ratchet(#117 lock-wait 한 줄) 때문에 `failure`이므로 'Core success'로 인용할 수 없고 단계 22 수치로만 인용해야 하며 — 이 red는 integration tip 자체의 pre-existing 조건이다; 그리고 카드 uu의 앵커 `f2aa2b14`에는 `test_model_uri_resolver`·`test_registry_policy_exact_match`가 **없다**(`c75201af`·`34791448`이 그 조상이 아님). **Codex 독립 검토 왕복 확인**: `7ef9a3c`(VF-CL-01~04 1차 전부)에 대해 Codex가 원본 재현 56 passed + 독립 경계 시험 **4 failed(R1 pin CheckViolation·R2 URI 말미 slash 왕복 불일치 2·R3 version slash)**로 **changes requested**를 냈고, 그 수정(resolver owner-scoping 28줄·replica_repair FOR UPDATE 4줄)을 내가 역방향 검토해 건전 판정·채택·커버 시험 보강까지 닫혔다. 단 **09-22 착지 3건(`c75201af`·`34791448`·`3e267b05`)에 대한 Codex 검토 문서는 찾지 못했다**. **공백 현재화**: (1) VF-CL-02 `manifest_reader` 운영 결속 **닫힘** — 커널 라우트 둘(`execution-manifest`·`models/resolve`)이 live이고 채택된 답은 (a) grant가 아니라 **(c) 커널 라우트 + 주입 reader + 비즈니스 재확인, readyNodes는 두 관측의 교집합**(inv_app EXECUTE 없음·inv_kernel raw data_replicas SELECT 없음); (2) VF-CL-03 import adapter는 **소비자가 시험뿐**(요청 경로 0건) → 진입 경로 계약 한 줄이 필요한 **열린 공백**, 커널 경계이므로 owner Codex; (3) VF-CL-04 restore drill은 hosted에서 **1 passed/19 skipped**이고 #126 병합 시 **17 passed + 구체적 환경 skip 2**로 바뀐다(focused gate 20/18/2) — 내 lane에서 닫을 수 없음; (4) PITR 보관 정리·readiness 도구는 불변식 9+9 passed지만 **어떤 workflow도 부르지 않는다** → 운영 게이트 부재, owner 코디네이터/운영(CX-09 결정). **registry에 VF-CL 트랙이 아예 없어서**(`track: "VF-CX"`) 플래그 수정이 아니라 **트랙 추가 제안 diff**를 뒀다(04는 `ciVerified: partial`, 02·03·04는 `independentlyReviewed: partial`, 03은 `implemented: partial`; `tracks` 배열 형태 변경은 owner 결정). **자기 정정**: 카드 uu 대장이 VF-CX-01 Claude 검토를 '없었다'로 적었지만 `dcbfb06d`(P0-1 해소 확인)과 `1b0d8eea`(`fe4c04c` 병합본 검토, P2 finding) 두 건이 있었다 — 결론(공백 있었고 채웠다)은 유지되나 표현이 틀렸으므로 #132에 정정. 실 PG·Docker·vitest·tsc·전체 suite·새 worktree **없음**(12:25 메모리 규칙; 이 카드의 새 로컬 수치 0건). check_docs·ratchet exit 0. 전문 [[2026-09-28_13-00-00_KST_VF-CL트랙_독립검토_대장_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
