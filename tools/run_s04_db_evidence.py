@@ -16,9 +16,12 @@ import subprocess
 import sys
 from typing import Any
 
-from tools.provenance import collect
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.provenance import collect  # noqa: E402
+
 CASE_FILE = ROOT / "tests" / "integration" / "s04_db_runner_case.py"
 EXPECTED_CASES = {
     "http-run-idempotency-cancel",

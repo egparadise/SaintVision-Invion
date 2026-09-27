@@ -37,6 +37,11 @@ def test_paths_must_be_distinct(tmp_path):
         run_s04_db_evidence.validated_paths(paths(tmp_path, json_out=same, junit_out=same))
 
 
+def test_direct_script_bootstraps_the_repository_tools_package():
+    assert str(run_s04_db_evidence.ROOT) in run_s04_db_evidence.sys.path
+    assert callable(run_s04_db_evidence.collect)
+
+
 @pytest.mark.parametrize(
     "change,match",
     [
