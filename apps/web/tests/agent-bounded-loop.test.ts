@@ -54,6 +54,7 @@ describe('S09-FE: Natural Language Run Requester, Budget Quota & Bounded Repair 
       const created = mgr.createRunRequest('Fix race condition in threadpool', ['src/threads.ts']);
       expect(created.success).toBe(true);
       expect(created.request!.boundedRepairLoops).toBe(0);
+      const reqId = created.request!.id;
 
       // Loop 0 -> 1 (1st repair iteration)
       const step1 = mgr.advanceRepairLoop(reqId);
