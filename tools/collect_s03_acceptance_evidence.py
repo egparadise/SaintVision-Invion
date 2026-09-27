@@ -154,8 +154,18 @@ LINUX_DOCKER_ONLY = [
 ]
 
 LANE_EXIT_VERDICT = {0: "PASS", 1: "VIOLATIONS", 2: "UNAVAILABLE", 3: "UNMEASURED"}
+# DB-lane rules the clauses depend on; a measured lane must report each one explicitly.
+LANE_RULES = ["C1", "C2", "C3", "C4"]
 _SAFE_NAME = re.compile(r"[A-Za-z0-9_]+")
 _SAFE_CLASS = re.compile(r"[A-Za-z0-9_.]+")
+
+
+def evidence_ref(path: Path) -> str:
+    """Repo-relative POSIX path, or a placeholder for outputs outside the repository (e.g. CI tmp)."""
+    try:
+        return path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return f"<outside-repo>/{path.name}"
 
 
 def safe_case_id(case: ET.Element) -> str | None:
@@ -215,11 +225,21 @@ def evaluate_clauses(outcomes: dict[str, str], lane_violations: dict[str, int] |
         rules = spec.get("lane_rules", [])
         if rules:
             if db_measured:
-                hits = {rule: int((lane_violations or {}).get(rule, 0)) for rule in rules}
-                clause["dbLaneRules"] = hits
+                # A measured lane must state every rule count explicitly; a missing key is
+                # not "0 violations" but invalid evidence -> fail closed to not_run.
+                present = {rule: (lane_violations or {}).get(rule) for rule in rules}
+                missing = [rule for rule, value in present.items()
+                           if not isinstance(value, int) or isinstance(value, bool) or value < 0]
+                clause["dbLaneRules"] = {rule: (value if rule not in missing else None)
+                                         for rule, value in present.items()}
                 clause["dbLaneMeasured"] = True
-                if any(hits.values()) and clause["status"] != "fail":
-                    clause["status"] = "fail"
+                if any(v for r, v in present.items() if r not in missing) and clause["status"] != "fail":
+                    clause["status"] = "fail"  # a reported violation always dominates
+                elif missing:
+                    clause["laneRulesMissing"] = missing
+                    if clause["status"] == "pass":
+                        clause["status"] = "not_run"
+                        clause["notRunReason"] = "lane-rule-missing-invalid-evidence"
             else:
                 clause["dbLaneRules"] = {rule: None for rule in rules}
                 clause["dbLaneMeasured"] = False
@@ -315,14 +335,17 @@ def run_lanes(out_dir: Path, label: str, *, dsn: str | None, container_image: st
         db, lane = payload.get("db") or {}, payload.get("container") or {}
         violations = payload.get("violations") or []
         summary.update({
-            "evidenceJson": json_path.relative_to(REPO_ROOT).as_posix(),
+            "evidenceJson": evidence_ref(json_path),
             "collectorSha256": (payload.get("provenance") or {}).get("collector_sha256"),
             "db": {"measured": bool(db.get("measured")), "runs": (db.get("counts") or {}).get("runs"),
                    "leases": (db.get("counts") or {}).get("leases")},
             "container": {"measured": bool(lane.get("measured")), "probes": len(lane.get("probes") or []),
                           "reason": lane.get("reason")},
+            # Explicit count for EVERY judged rule (0 is a measured zero, never an absence),
+            # plus any other rule the collector reported.
             "violationsByRule": {rule: sum(1 for v in violations if v.get("rule") == rule)
-                                 for rule in sorted({v.get("rule") for v in violations})},
+                                 for rule in sorted(set(LANE_RULES) | {v.get("rule") for v in violations
+                                                                       if v.get("rule")})},
         })
     return summary
 

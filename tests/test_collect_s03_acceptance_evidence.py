@@ -141,13 +141,14 @@ def test_clause_pass_requires_every_case_passed(mutate, expected):
     for case, outcome in mutate.items():
         cases.pop(case) if outcome is None else cases.__setitem__(case, outcome)
     outcomes = tool.parse_junit(_junit(cases))["outcomes"]
-    clause = tool.evaluate_clauses(outcomes, {}, db_measured=True)["evidence-id-and-output-hash-enforced"]
+    zeros = {"C1": 0, "C2": 0, "C3": 0, "C4": 0}  # a measured lane states every rule explicitly
+    clause = tool.evaluate_clauses(outcomes, zeros, db_measured=True)["evidence-id-and-output-hash-enforced"]
     assert clause["status"] == expected
 
 
 def test_db_lane_violation_fails_the_owning_clause_only():
     outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
-    clauses = tool.evaluate_clauses(outcomes, {"C2": 1}, db_measured=True)
+    clauses = tool.evaluate_clauses(outcomes, {"C1": 0, "C2": 1, "C3": 0, "C4": 0}, db_measured=True)
     assert clauses["evidence-id-and-output-hash-enforced"]["status"] == "fail"
     assert clauses["evidence-id-and-output-hash-enforced"]["dbLaneRules"] == {"C2": 1, "C3": 0}
     assert clauses["resources-reclaimed-after-exit"]["status"] == "pass"
@@ -167,10 +168,12 @@ def _suite(status="complete", outcomes=None, exit_code=0):
 
 
 def _lanes(verdict="UNMEASURED", db=False, container=False, violations=None, status="complete"):
+    if violations is None:  # a measured lane states every judged rule explicitly; {} stays {} when passed
+        violations = {"C1": 0, "C2": 0, "C3": 0, "C4": 0} if db else {}
     return {"status": status, "verdict": verdict, "exitCode": {"PASS": 0, "VIOLATIONS": 1, "UNAVAILABLE": 2,
             "UNMEASURED": 3}[verdict], "ledgerSource": "empty-disposable-database", "evidenceJson": "l.json",
             "db": {"measured": db, "runs": 0, "leases": 0}, "container": {"measured": container, "probes": 0,
-            "reason": None if container else "docker unavailable"}, "violationsByRule": violations or {}}
+            "reason": None if container else "docker unavailable"}, "violationsByRule": violations}
 
 
 def _prov():
@@ -304,3 +307,64 @@ def test_measured_db_lane_with_explicit_zero_violations_passes_lane_clauses():
                                                 violations={"C1": 0, "C2": 0, "C3": 0, "C4": 0}))
     assert evidence["passScope"]["passed"] == list(tool.AC03_CLAUSES)
     assert evidence["verdict"] == "PASS_MEASURED_PARTIAL"  # docker lane still not_run
+
+
+def test_measured_lane_with_empty_rule_map_is_invalid_evidence_not_pass():
+    """Codex #121: db_measured=True + {} (or a missing key) must never be treated as zero."""
+    outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
+    for violations in ({}, {"C1": 0, "C2": 0, "C3": 0}, {"C1": 0, "C2": 0, "C3": 0, "C4": None},
+                       {"C1": 0, "C2": 0, "C3": 0, "C4": True}):
+        clauses = tool.evaluate_clauses(outcomes, violations, db_measured=True)
+        for key in ("resources-reclaimed-after-exit", "evidence-id-and-output-hash-enforced"):
+            if any(rule not in violations or not isinstance(violations.get(rule), int)
+                   or isinstance(violations.get(rule), bool) for rule in tool.AC03_CLAUSES[key]["lane_rules"]):
+                assert clauses[key]["status"] == "not_run", (violations, key)
+                assert clauses[key]["notRunReason"] == "lane-rule-missing-invalid-evidence"
+                assert 0 not in [v for r, v in clauses[key]["dbLaneRules"].items() if r in clauses[key]["laneRulesMissing"]]
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()],
+                                   lanes=_lanes(verdict="PASS", db=True, container=True, violations={}))
+    assert evidence["verdict"] == "NOT_RUN"
+    assert evidence["passScope"]["notRunOther"] == ["resources-reclaimed-after-exit", "evidence-id-and-output-hash-enforced"]
+
+
+def test_reported_violation_dominates_a_missing_sibling_rule():
+    outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
+    clauses = tool.evaluate_clauses(outcomes, {"C2": 1}, db_measured=True)
+    assert clauses["evidence-id-and-output-hash-enforced"]["status"] == "fail"
+    assert clauses["resources-reclaimed-after-exit"]["status"] == "not_run"
+
+
+def test_run_lanes_serializes_every_judged_rule_explicitly(tmp_path, monkeypatch):
+    from tools import collect_container_evidence as cce
+    payload = {"db": {"measured": True, "counts": {"runs": 2, "leases": 3}}, "container": {"measured": False,
+               "probes": [], "reason": "no docker"}, "violations": [{"rule": "C4", "run": "run_01HZZZZZZZZZZZZZZZZZZZZZZZ"}],
+               "provenance": {"collector_sha256": "x"}}
+    def fake_main(argv):
+        out = Path(argv[argv.index("--out-dir") + 1]); label = argv[argv.index("--label") + 1]
+        (out / f"{label}.json").write_text(json.dumps(payload), encoding="utf-8")
+        (out / f"{label}.md").write_text("md", encoding="utf-8")
+        return 1
+    monkeypatch.setattr(cce, "main", fake_main)
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    summary = tool.run_lanes(tmp_path, "lanes", dsn=None, container_image=None, note=None)
+    assert summary["violationsByRule"] == {"C1": 0, "C2": 0, "C3": 0, "C4": 1}
+    assert summary["verdict"] == "VIOLATIONS" and summary["db"]["measured"] is True
+
+
+def test_lane_evidence_outside_repo_is_recorded_as_placeholder_not_relative_to(tmp_path, monkeypatch):
+    """Hosted CI writes to /tmp: relative_to(REPO_ROOT) must never raise or leak the absolute path."""
+    from tools import collect_container_evidence as cce
+    payload = {"db": {"measured": False, "counts": {"runs": 0, "leases": 0}}, "container": {"measured": False,
+               "probes": [], "reason": "no docker"}, "violations": [], "provenance": {"collector_sha256": "x"}}
+    def fake_main(argv):
+        out = Path(argv[argv.index("--out-dir") + 1]); label = argv[argv.index("--label") + 1]
+        (out / f"{label}.json").write_text(json.dumps(payload), encoding="utf-8")
+        (out / f"{label}.md").write_text("md", encoding="utf-8")
+        return 3
+    monkeypatch.setattr(cce, "main", fake_main)
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    outside = tmp_path / "outside"  # pytest tmp_path is outside the repository
+    summary = tool.run_lanes(outside, "lanes", dsn=None, container_image=None, note=None)
+    assert summary["evidenceJson"] == "<outside-repo>/lanes.json"
+    assert str(outside) not in json.dumps(summary)
+    assert tool.evidence_ref(REPO_ROOT / "docs" / "x.json") == "docs/x.json"
