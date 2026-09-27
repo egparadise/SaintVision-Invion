@@ -161,9 +161,68 @@ def test_external_waits_are_unmeasured_without_values_and_outcomes_are_not_embed
     assert "UNMEASURED" in text and "**PASS**" in text
 
 
+def test_unmapped_api_failure_fails_the_bundle_even_when_every_clause_passes():
+    """Codex F-R1 revival: 16 mapped pass + 1 unmapped failure + RLS PASS must not be PASS."""
+    outcomes = {**_all_passed(), "test_traceparent_is_honoured_and_echoed": "failed"}
+    api = _api(status="failed", outcomes=outcomes, exit_code=1)
+    api["counts"] = {"passed": 16, "failed": 1, "error": 0, "skipped": 0}
+    evidence = tool.build_evidence(provenance=_provenance(), api=api, rls=_rls())
+    assert {c["status"] for c in evidence["clauses"].values()} == {"pass"}
+    assert evidence["verdict"] == "FAIL"
+
+
+@pytest.mark.parametrize("field, value", [("status", "failed"), ("exitCode", 1)])
+def test_incomplete_api_suite_is_never_pass(field, value):
+    api = _api()
+    api[field] = value
+    evidence = tool.build_evidence(provenance=_provenance(), api=api, rls=_rls())
+    assert evidence["verdict"] == "FAIL"
+
+
 # --------------------------------------------------------------------------
 # Redaction and stale outputs
 # --------------------------------------------------------------------------
+
+
+def test_rls_artifacts_are_rewritten_with_placeholders(tmp_path):
+    """Codex F-R3 regression: disposable DB name, tenant UUIDs and host:port never survive."""
+    raw = {
+        "database": {"name": "inv_rls_" + "a" * 32, "server_version": "16.15"},
+        "tenant_guc": {"tenant_a": "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53",
+                       "random_tenant": "11111111-2222-4333-8444-555555555555"},
+        "note": "listener 127.0.0.1:55432",
+        "git_sha": "1e8baf04",
+    }
+    (tmp_path / "x.json").write_text(json.dumps(raw), encoding="utf-8")
+    (tmp_path / "x.md").write_text("- database: `inv_rls_" + "a" * 32 + "` · tenant A `ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53` at 127.0.0.1:55432\n",
+                                   encoding="utf-8")
+    summary = tool.redact_rls_artifacts(tmp_path, "x")
+    assert summary["redacted"] is True and summary["jsonSha256"]
+    for name in ("x.json", "x.md"):
+        text = (tmp_path / name).read_text(encoding="utf-8")
+        assert "inv_rls_" + "a" * 32 not in text and "ff5d8e54" not in text and "55555555" not in text
+        assert "127.0.0.1:55432" not in text
+        tool.assert_redacted(text)
+    redacted = json.loads((tmp_path / "x.json").read_text(encoding="utf-8"))
+    assert redacted["database"]["name"] == "inv_rls_<redacted>"
+    assert redacted["tenant_guc"] == {"tenant_a": "<uuid:redacted>", "random_tenant": "<uuid:redacted>"}
+    assert redacted["note"] == "listener <host:port:redacted>"
+    assert redacted["git_sha"] == "1e8baf04"
+
+
+def test_note_is_redacted_and_unredacted_text_refuses_write(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_TEST_ADMIN_DSN", "postgresql://inv:stub-pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _provenance())
+    monkeypatch.setattr(tool, "run_api_suite", lambda junit_path, python=None: _api())
+    monkeypatch.setattr(tool, "run_rls_collector", lambda out_dir, label: _rls())
+    code = tool.main(["--out-dir", str(tmp_path), "--label", "n", "--junit-dir", str(tmp_path / "junit"),
+                      "--note", "dev PG at 127.0.0.1:55432 tenant ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53 db inv_rls_" + "b" * 32])
+    assert code == 0
+    payload = json.loads((tmp_path / "n.json").read_text(encoding="utf-8"))
+    assert payload["note"] == "dev PG at <host:port:redacted> tenant <uuid:redacted> db inv_rls_<redacted>"
+    evidence = tool.build_evidence(provenance=_provenance(), api=_api(), rls=_rls(), note="raw 10.0.0.1:5432")
+    with pytest.raises(ValueError, match="unredacted"):
+        tool.write_evidence(evidence, tmp_path, "raw")
 
 
 def test_secret_guard_rejects_dsn_and_password_from_environment(monkeypatch, tmp_path):

@@ -22,12 +22,23 @@ Honesty rules baked into the output:
   Node mTLS/heartbeat) are always ``UNMEASURED`` and carry no numbers;
 * ``acceptanceClaim`` is always ``false``: this bundle feeds the S02-DB review, it
   does not close AC-02;
-* the JSON/Markdown never contain the DSN, passwords, tenant ids, or failure
-  messages (only parameter-free pytest case ids and counts).
+* the verdict is fail-closed on the WHOLE API suite: any failed/error case in
+  ``tests/test_api.py`` (mapped or not), a non-zero pytest exit, or a suite status
+  other than ``complete`` makes the bundle FAIL (or UNAVAILABLE when nothing ran);
+* redaction contract (checked before every write, violations refuse the write):
+  - DSN values and their passwords from ``INV_TEST_ADMIN_DSN`` / ``INV_AUDIT_DSN`` /
+    ``INV_DATABASE_URL`` / ``INV_TEST_DATABASE_URL`` are never written;
+  - ephemeral identifiers are replaced by placeholders in every produced file,
+    including the RLS collector's JSON/Markdown: disposable database names
+    (``inv_rls_<hex>``, ``inv_backend_test_<hex>``), UUIDs (tenant ids, GUC probe
+    values), and ``IPv4:port`` pairs;
+  - ``--note`` is free text: it passes through the same placeholder redaction and
+    the same DSN/password refusal, nothing else in it is inspected;
+  - pytest failure messages are never kept (only parameter-free case ids and counts).
 
-Exit codes: 0 measured clauses and RLS all pass; 1 a measured clause failed or the
-RLS collector found violations; 2 observation unavailable (no DSN, pytest could
-not run); 3 nothing measured / UNMEASURED only.
+Exit codes: 0 measured clauses and RLS all pass; 1 a measured clause or any API
+case failed, or the RLS collector found violations; 2 observation unavailable (no
+DSN, pytest could not run); 3 nothing measured / UNMEASURED only.
 """
 
 from __future__ import annotations
@@ -221,6 +232,8 @@ def run_rls_collector(out_dir: Path, label: str) -> dict[str, Any]:
                                if (out_dir / f"{label}.json").is_file() else None}
     json_path = out_dir / f"{label}.json"
     if json_path.is_file():
+        summary["rawJsonSha256"] = hashlib.sha256(json_path.read_bytes()).hexdigest()
+        summary.update(redact_rls_artifacts(out_dir, label))  # placeholders for DB name/UUID/host:port
         payload = json.loads(json_path.read_text(encoding="utf-8"))
         summary["roles"] = sorted(payload.get("roles", {}).keys())
         summary["violations"] = len(payload.get("violations", []))
@@ -228,7 +241,6 @@ def run_rls_collector(out_dir: Path, label: str) -> dict[str, Any]:
         summary["unmeasured"] = len(payload.get("unmeasured", []))
         summary["collectorSha256"] = (payload.get("provenance") or {}).get("collector_sha256")
         summary["baselineSha256"] = (payload.get("provenance") or {}).get("baseline_sha256")
-        summary["jsonSha256"] = hashlib.sha256(json_path.read_bytes()).hexdigest()
     return summary
 
 
@@ -236,7 +248,18 @@ def overall_verdict(clauses: dict[str, Any], api: dict[str, Any], rls: dict[str,
     statuses = {c["status"] for c in clauses.values()}
     if api["status"] in ("unavailable", "invalid-junit") or rls["status"] == "unavailable":
         return "UNAVAILABLE"
-    if "fail" in statuses or rls["verdict"] == "VIOLATIONS":
+    counts = api.get("counts") or {}
+    # Fail closed on the whole API suite: an unmapped failure, a non-zero pytest
+    # exit or an incomplete suite status must never leave the bundle PASS.
+    api_failed = (
+        api["status"] != "complete"
+        or api.get("exitCode") != 0
+        or counts.get("failed", 0) > 0
+        or counts.get("error", 0) > 0
+    )
+    if api_failed and api["status"] == "not_run" and not (counts.get("failed") or counts.get("error")):
+        return "NOT_RUN"
+    if "fail" in statuses or rls["verdict"] == "VIOLATIONS" or api_failed:
         return "FAIL"
     if statuses == {"pass"} and rls["verdict"] == "PASS":
         return "PASS"
@@ -323,6 +346,48 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+_REDACTIONS: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\binv_rls_[0-9a-f]{32}\b"), "inv_rls_<redacted>"),
+    (re.compile(r"\binv_backend_test_[0-9a-f]{32}\b"), "inv_backend_test_<redacted>"),
+    (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"),
+     "<uuid:redacted>"),
+    (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}:\d{2,5}\b"), "<host:port:redacted>"),
+]
+
+
+def redact_text(text: str) -> str:
+    """Replace ephemeral identifiers (disposable DB names, UUIDs, IPv4:port) by placeholders."""
+    for pattern, placeholder in _REDACTIONS:
+        text = pattern.sub(placeholder, text)
+    return text
+
+
+def assert_redacted(text: str) -> None:
+    """Refuse to write evidence that still carries an ephemeral identifier."""
+    for pattern, placeholder in _REDACTIONS:
+        if pattern.search(text):
+            raise ValueError(f"evidence would embed an unredacted identifier ({placeholder})")
+
+
+def redact_rls_artifacts(out_dir: Path, label: str) -> dict[str, Any]:
+    """Rewrite the RLS collector's JSON/Markdown in place with placeholders; JSON stays valid."""
+    result: dict[str, Any] = {"redacted": False}
+    json_path, md_path = out_dir / f"{label}.json", out_dir / f"{label}.md"
+    if json_path.is_file():
+        redacted = redact_text(json_path.read_text(encoding="utf-8"))
+        json.loads(redacted)  # placeholders never break the document
+        assert_redacted(redacted)
+        json_path.write_text(redacted, encoding="utf-8")
+        result["redacted"] = True
+        result["jsonSha256"] = hashlib.sha256(json_path.read_bytes()).hexdigest()
+    if md_path.is_file():
+        redacted = redact_text(md_path.read_text(encoding="utf-8"))
+        assert_redacted(redacted)
+        md_path.write_text(redacted, encoding="utf-8")
+        result["redacted"] = True
+    return result
+
+
 def assert_no_secrets(text: str) -> None:
     """Refuse to write evidence that embeds a DSN or a password from the environment."""
     from psycopg.conninfo import conninfo_to_dict
@@ -350,8 +415,9 @@ def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple
     out_dir.mkdir(parents=True, exist_ok=True)
     json_text = json.dumps(evidence, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
     md_text = render_markdown(evidence)
-    assert_no_secrets(json_text)
-    assert_no_secrets(md_text)
+    for text in (json_text, md_text):
+        assert_no_secrets(text)
+        assert_redacted(text)
     json_path, md_path = out_dir / f"{label}.json", out_dir / f"{label}.md"
     json_path.write_text(json_text, encoding="utf-8")
     md_path.write_text(md_text, encoding="utf-8")
@@ -389,7 +455,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     api = run_api_suite(args.junit_dir / f"{label}-api.xml")
     rls = run_rls_collector(out_dir, f"{label}-rls")
-    evidence = build_evidence(provenance=provenance, api=api, rls=rls, note=args.note)
+    note = redact_text(args.note) if args.note else None  # free text: placeholders only, see docstring
+    evidence = build_evidence(provenance=provenance, api=api, rls=rls, note=note)
     try:
         json_path, md_path = write_evidence(evidence, out_dir, label)
     except ValueError as error:

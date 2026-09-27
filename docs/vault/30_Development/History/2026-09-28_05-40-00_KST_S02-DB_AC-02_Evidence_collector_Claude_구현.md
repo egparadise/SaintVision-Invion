@@ -44,7 +44,7 @@ tags: ["S02-DB", "AC-02", "evidence", "collector", "RLS", "token-replay", "tenan
 
 ## 3. 자기 시험·게이트
 
-- `tests/test_collect_s02_acceptance_evidence.py`: **19 passed / 1 skipped**(postgres 케이스는 로컬 DSN 미설정으로 skip — 실 PG는 §2의 CLI 1회로 갈음, 두 번째 PG 실행은 하지 않음; hosted Core에서는 CI 조건으로 실행/실패 표시).
+- `tests/test_collect_s02_acceptance_evidence.py`: **19 passed / 1 skipped**(postgres 케이스는 로컬 DSN 미설정으로 skip — 실 PG는 §2의 CLI 1회로 갈음, 두 번째 PG 실행은 하지 않음; hosted **Backend** 전체 pytest(`backend.yml`)가 이 파일을 수집해 CI 조건으로 실행/실패 표시하며, Core는 label 없이는 skip — Codex 비차단 정정 반영).
 - `py_compile` exit 0. 문서·계약 게이트는 PR 본문에 exit code로 기록.
 
 ## 4. 실행 뒤 도구 수정 2건(산출물은 실행 당시 그대로 보존)
