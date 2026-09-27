@@ -24,16 +24,21 @@ ENV = {
     "INV_OBJECT_STORE_ACCESS_KEY_ID": "synthetic-access",
     "INV_OBJECT_STORE_SECRET_ACCESS_KEY": "synthetic-secret",
     "INV_OBJECT_STORE_REGION": "us-east-1",
+    "INV_OBJECT_STORE_TARGET_KIND": "ci-candidate",
     "GITHUB_SHA": "a" * 40,
+    "GITHUB_HEAD_SHA": "b" * 40,
 }
 PAYLOAD = b"saintvision-storage-roundtrip\n"
 
 
 class FakeTransport:
-    def __init__(self, *, downloaded=PAYLOAD, metadata=None, delete_status=204):
+    def __init__(
+        self, *, downloaded=PAYLOAD, metadata=None, delete_status=204, survives_delete=False
+    ):
         self.downloaded = downloaded
         self.metadata = metadata
         self.delete_status = delete_status
+        self.survives_delete = survives_delete
         self.calls = []
         self.deleted = False
 
@@ -44,7 +49,7 @@ class FakeTransport:
         if method == "DELETE":
             self.deleted = self.delete_status in {200, 204}
             return verifier.HttpResponse(self.delete_status, {}, b"")
-        if method == "GET" and self.deleted:
+        if method == "GET" and self.deleted and not self.survives_delete:
             return verifier.HttpResponse(404, {}, b"")
         if method == "GET":
             digest = verifier.hashlib.sha256(PAYLOAD).hexdigest()
@@ -58,7 +63,11 @@ class FakeTransport:
 
 def test_missing_endpoint_bucket_or_credentials_is_blocked_without_network():
     transport = FakeTransport()
-    evidence, exit_code = verifier.execute({}, transport=transport, payload=PAYLOAD)
+    evidence, exit_code = verifier.execute(
+        {"INV_OBJECT_STORE_TARGET_KIND": "ci-candidate"},
+        transport=transport,
+        payload=PAYLOAD,
+    )
 
     assert exit_code == 3
     assert evidence["status"] == "BLOCKED"
@@ -67,8 +76,6 @@ def test_missing_endpoint_bucket_or_credentials_is_blocked_without_network():
         "get": False,
         "bodySha256": False,
         "metadataSha256": False,
-        "xContentSha256": False,
-        "contentLength": False,
         "delete": False,
         "cleanupVerified": False,
     }
@@ -82,6 +89,8 @@ def test_environment_credentials_complete_the_real_byte_and_product_header_chain
     assert exit_code == 0
     assert evidence["status"] == "PASS"
     assert evidence["payloadBytes"] == len(PAYLOAD)
+    assert evidence["targetKind"] == "ci-candidate"
+    assert evidence["codeSha"] == "b" * 40
     assert all(evidence["checks"].values())
     assert evidence["cleanupVerified"] is True
     assert [call[0] for call in transport.calls] == ["PUT", "GET", "DELETE", "GET"]
@@ -126,6 +135,17 @@ def test_cleanup_failure_can_never_report_pass():
     assert evidence["cleanupVerified"] is False
 
 
+def test_delete_204_but_object_still_present_can_never_report_pass():
+    transport = FakeTransport(survives_delete=True)
+    evidence, exit_code = verifier.execute(ENV, transport=transport, payload=PAYLOAD)
+
+    assert exit_code == 1
+    assert evidence["status"] == "FAIL"
+    assert evidence["checks"]["delete"] is True
+    assert evidence["cleanupVerified"] is False
+    assert [call[0] for call in transport.calls][-2:] == ["DELETE", "GET"]
+
+
 def test_volume_credential_reference_is_flat_private_and_never_echoed(monkeypatch):
     observed = []
 
@@ -144,11 +164,13 @@ def test_volume_credential_reference_is_flat_private_and_never_echoed(monkeypatc
         "INV_OBJECT_STORE_ENDPOINT": ENV["INV_OBJECT_STORE_ENDPOINT"],
         "INV_OBJECT_STORE_BUCKET": ENV["INV_OBJECT_STORE_BUCKET"],
         "INV_OBJECT_STORE_CREDENTIAL_FILE": "/run/saintvision/object-store.json",
+        "INV_OBJECT_STORE_TARGET_KIND": "operational",
         "GITHUB_SHA": "b" * 40,
     }
     evidence, exit_code = verifier.execute(env, transport=FakeTransport(), payload=PAYLOAD)
 
     assert exit_code == 0 and evidence["status"] == "PASS"
+    assert evidence["targetKind"] == "operational"
     assert observed == ["/run/saintvision/object-store.json"]
     assert "volume-access" not in json.dumps(evidence)
     assert "volume-secret" not in json.dumps(evidence)
@@ -172,6 +194,7 @@ def test_outside_or_nested_credential_file_is_blocked_before_read(monkeypatch, p
         "INV_OBJECT_STORE_ENDPOINT": ENV["INV_OBJECT_STORE_ENDPOINT"],
         "INV_OBJECT_STORE_BUCKET": ENV["INV_OBJECT_STORE_BUCKET"],
         "INV_OBJECT_STORE_CREDENTIAL_FILE": path,
+        "INV_OBJECT_STORE_TARGET_KIND": "operational",
     }
     evidence, exit_code = verifier.execute(env, transport=FakeTransport(), payload=PAYLOAD)
 
@@ -228,3 +251,15 @@ def test_environment_and_volume_credentials_together_are_blocked(monkeypatch):
 
     assert exit_code == 3 and evidence["status"] == "BLOCKED"
     assert transport.calls == []
+
+
+@pytest.mark.parametrize("target_kind", [None, "", "candidate", "production"])
+def test_target_kind_is_required_and_closed_to_two_values(target_kind):
+    env = dict(ENV)
+    if target_kind is None:
+        env.pop("INV_OBJECT_STORE_TARGET_KIND")
+    else:
+        env["INV_OBJECT_STORE_TARGET_KIND"] = target_kind
+
+    with pytest.raises(verifier.Blocked):
+        verifier.execute(env, transport=FakeTransport(), payload=PAYLOAD)

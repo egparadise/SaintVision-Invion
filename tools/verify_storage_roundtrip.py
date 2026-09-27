@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Verify one redacted S3 byte roundtrip and the product Artifact SHA header.
+"""Verify one redacted S3-compatible candidate byte roundtrip.
 
 The verifier owns one random object only. It never lists a bucket, changes a
-lifecycle policy, logs provider errors, or treats this preflight as an S3 adapter.
+lifecycle policy, logs provider errors, or treats this preflight as a product adapter.
 """
 
 from __future__ import annotations
@@ -17,18 +17,11 @@ from pathlib import Path
 import re
 import stat
 import subprocess
-import sys
 from urllib.error import HTTPError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 from uuid import uuid4
 import xml.etree.ElementTree as ET
-
-
-ROOT = Path(__file__).resolve().parents[1]
-# The verifier is an executable repository tool, not only a pytest import. Make
-# the product response boundary reachable when invoked directly by hosted CI.
-sys.path.insert(0, str(ROOT / "services" / "control-plane" / "src"))
 
 
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
@@ -174,7 +167,12 @@ def load_config(environment):
     ):
         raise Blocked()
     access, secret, region = _credentials(environment)
-    return Config(endpoint.rstrip("/"), bucket, access, secret, region)
+    target_kind = environment.get("INV_OBJECT_STORE_TARGET_KIND")
+    if target_kind not in {"ci-candidate", "operational"}:
+        raise Blocked()
+    config = Config(endpoint.rstrip("/"), bucket, access, secret, region)
+    config.target_kind = target_kind
+    return config
 
 
 def _sign(key, value):
@@ -244,7 +242,11 @@ class S3Client:
 
 
 def _code_sha(environment):
-    value = environment.get("GITHUB_SHA") or environment.get("INV_EVIDENCE_CODE_SHA")
+    value = (
+        environment.get("INV_EVIDENCE_CODE_SHA")
+        or environment.get("GITHUB_HEAD_SHA")
+        or environment.get("GITHUB_SHA")
+    )
     if isinstance(value, str) and _SHA.fullmatch(value.lower()):
         return value.lower()
     try:
@@ -260,10 +262,11 @@ def _code_sha(environment):
     return value if _SHA.fullmatch(value) else "UNMEASURED"
 
 
-def _evidence(environment, status, checks, payload_bytes):
+def _evidence(environment, status, checks, payload_bytes, target_kind=None):
     return {
-        "schemaVersion": "1.0",
+        "schemaVersion": "1.1",
         "status": status,
+        "targetKind": target_kind,
         "checks": checks,
         "payloadBytes": payload_bytes,
         "cleanupVerified": checks["cleanupVerified"],
@@ -273,13 +276,14 @@ def _evidence(environment, status, checks, payload_bytes):
 
 
 def execute(environment, *, transport=None, payload=None):
+    target_kind = environment.get("INV_OBJECT_STORE_TARGET_KIND")
+    if target_kind not in {"ci-candidate", "operational"}:
+        raise Blocked()
     checks = {
         "put": False,
         "get": False,
         "bodySha256": False,
         "metadataSha256": False,
-        "xContentSha256": False,
-        "contentLength": False,
         "delete": False,
         "cleanupVerified": False,
     }
@@ -287,7 +291,7 @@ def execute(environment, *, transport=None, payload=None):
     try:
         config = load_config(environment)
     except (Blocked, OSError):
-        return _evidence(environment, "BLOCKED", checks, 0), 3
+        return _evidence(environment, "BLOCKED", checks, 0, target_kind), 3
 
     client = S3Client(config, transport)
     key = "saintvision-u6/roundtrip-" + uuid4().hex
@@ -303,27 +307,6 @@ def execute(environment, *, transport=None, payload=None):
                 checks["metadataSha256"] = (
                     response.headers.get("x-amz-meta-content-sha256") == digest
                 )
-                if checks["bodySha256"] and checks["metadataSha256"]:
-                    from inv.app import artifact_content_response
-
-                    product = artifact_content_response(
-                        response.body,
-                        {
-                            "path": "outputs/storage-roundtrip.bin",
-                            "checksumSha256": digest,
-                            "byteSize": len(payload),
-                            "verified": True,
-                            "evidenceId": "evd_00000000000000000000000000",
-                        },
-                    )
-                    checks["xContentSha256"] = (
-                        product.headers.get("x-content-sha256")
-                        == hashlib.sha256(product.body).hexdigest()
-                    )
-                    checks["contentLength"] = (
-                        product.headers.get("content-length") == str(len(product.body))
-                        and product.body == response.body
-                    )
     except Exception:
         # Provider and framework exception strings are deliberately suppressed.
         pass
@@ -337,7 +320,9 @@ def execute(environment, *, transport=None, payload=None):
             pass
 
     status = "PASS" if all(checks.values()) else "FAIL"
-    return _evidence(environment, status, checks, len(payload)), (0 if status == "PASS" else 1)
+    return _evidence(
+        environment, status, checks, len(payload), config.target_kind
+    ), (0 if status == "PASS" else 1)
 
 
 def write_outputs(evidence, output_path, junit_path):
@@ -365,8 +350,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", default="dist/s01-storage-roundtrip.json")
     parser.add_argument("--junit", default="dist/s01-storage-roundtrip.xml")
+    parser.add_argument(
+        "--target-kind", choices=("ci-candidate", "operational"), required=True
+    )
     args = parser.parse_args(argv)
-    evidence, exit_code = execute(os.environ)
+    environment = dict(os.environ)
+    environment["INV_OBJECT_STORE_TARGET_KIND"] = args.target_kind
+    evidence, exit_code = execute(environment)
     write_outputs(evidence, args.output, args.junit)
     print(json.dumps(evidence, sort_keys=True, separators=(",", ":")))
     return exit_code
