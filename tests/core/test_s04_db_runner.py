@@ -42,6 +42,12 @@ def test_direct_script_bootstraps_the_repository_tools_package():
     assert callable(run_s04_db_evidence.collect)
 
 
+def test_expiry_case_does_not_mutate_the_immutable_approval_scope():
+    source = run_s04_db_evidence.CASE_FILE.read_text(encoding="utf-8")
+    assert "UPDATE inv.approval_requests" not in source
+    assert "timedelta(seconds=2)" in source
+
+
 @pytest.mark.parametrize(
     "change,match",
     [

@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from datetime import datetime, timedelta, timezone
+import time
 
-import psycopg
 import pytest
 
 from inv.errors import DomainError
@@ -72,6 +73,7 @@ def test_http_pg_expiry_cancel_idempotency_and_outbox_crash_retry(api):
     # Approval votes travel over HTTP; dispatch is blocked before quorum. The
     # approved row is then made expired by the disposable DB owner to avoid a
     # wall-clock sleep, and expiry closes the Run exactly once.
+    a.policy["expiresAt"] = (datetime.now(timezone.utc) + timedelta(seconds=2)).isoformat()
     approval = request(a, key="s04-approval")
     approval_url = a.url + "/approvals/" + approval["approvalId"]
     first_nonce = a.client.post(approval_url + "/challenge", json={}, headers=a.headers("alice"))
@@ -105,12 +107,10 @@ def test_http_pg_expiry_cancel_idempotency_and_outbox_crash_retry(api):
         headers=a.headers("bob", key="s04-vote-bob"),
     )
     assert second_vote.status_code == 200 and second_vote.json()["status"] == "approved"
-    with psycopg.connect(a.e.owner) as conn:
-        conn.execute(
-            "UPDATE inv.approval_requests "
-            "SET expires_at=clock_timestamp()-interval '1 second' WHERE approval_id=%s",
-            (approval["approvalId"],),
-        )
+    remaining = (
+        datetime.fromisoformat(approval["expiresAt"]) - datetime.now(timezone.utc)
+    ).total_seconds()
+    time.sleep(max(0, remaining) + 0.05)
     with pytest.raises(DomainError, match="AUTH-0031"):
         dispatch(a, approval, key="s04-after-expiry")
     assert a.store.expire(a.e.tenant, a.e.project, approval["approvalId"])
