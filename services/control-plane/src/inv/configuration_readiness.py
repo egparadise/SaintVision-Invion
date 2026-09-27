@@ -6,37 +6,47 @@ volume.  The public response only contains the stable setting names below.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
+import re
 from urllib.parse import urlsplit
 
 from cryptography import x509
+
+from .identity import trusted_file
 
 
 NODE_CA = "INV_NODE_MTLS_CA_BUNDLE"
 OBJECT_STORE = "INV_OBJECT_STORE_ENDPOINT"
 SETTING_NAMES = frozenset({NODE_CA, OBJECT_STORE})
 _CONFIG_KEYS = frozenset({"nodeMtlsCaBundle", "objectStoreEndpoint"})
-_MAX_CA_BUNDLE_BYTES = 1_048_576
+_TRUSTED_CONFIGURATION_PATH = re.compile(
+    r"/run/saintvision/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}"
+)
 
 
 def _ca_bundle_ready(value: object) -> bool:
-    if not isinstance(value, str) or not value:
+    if not isinstance(value, str) or not _TRUSTED_CONFIGURATION_PATH.fullmatch(value):
         return False
     try:
-        path = Path(value)
-        if not path.is_absolute() or not path.is_file():
-            return False
-        raw = path.read_bytes()
-        if not raw or len(raw) > _MAX_CA_BUNDLE_BYTES:
+        raw = trusted_file(Path(value))
+        if not raw:
             return False
         certificates = x509.load_pem_x509_certificates(raw)
     except (OSError, ValueError, TypeError):
         return False
+    now = datetime.now(timezone.utc)
     for certificate in certificates:
         try:
-            if certificate.extensions.get_extension_for_class(
+            constraints = certificate.extensions.get_extension_for_class(
                 x509.BasicConstraints
-            ).value.ca:
+            ).value
+            usage = certificate.extensions.get_extension_for_class(x509.KeyUsage).value
+            if (
+                constraints.ca
+                and usage.key_cert_sign
+                and certificate.not_valid_before_utc <= now < certificate.not_valid_after_utc
+            ):
                 return True
         except x509.ExtensionNotFound:
             continue

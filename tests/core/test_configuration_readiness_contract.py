@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 import inv.app as app_module
+import inv.configuration_readiness as readiness_module
 from inv.app import create_app
 from inv.contracts import validate_contract
 from inv.errors import DomainError
@@ -144,26 +145,29 @@ def test_operator_route_reports_names_only_and_anchors_response_contract(auth, m
     assert all("value" not in key.lower() for key in response.json())
 
 
-def test_operator_route_reports_ready_without_echoing_values(auth, tmp_path):
-    ca_file = tmp_path / "node-ca.pem"
-    ca_file.write_bytes(authority().pem)
+def test_operator_route_reports_ready_without_echoing_values(auth, monkeypatch):
+    ca_bundle = authority().pem
+    ca_file = "/run/saintvision/node-mtls-ca.pem"
+    monkeypatch.setattr(readiness_module, "trusted_file", lambda path: ca_bundle)
     endpoint = "https://objects.example.invalid:9443/saintvision"
     provider = configured_s01_readiness(
-        {"nodeMtlsCaBundle": str(ca_file.resolve()), "objectStoreEndpoint": endpoint}
+        {"nodeMtlsCaBundle": ca_file, "objectStoreEndpoint": endpoint}
     )
     client, headers, _ = _client(auth, unresolved_settings=provider)
     response = client.get("/v1/operations/configuration-readiness", headers=headers)
 
     assert response.status_code == 200
     assert response.json() == {"status": "ready", "unresolvedSettings": []}
-    assert str(ca_file) not in response.text and endpoint not in response.text
+    assert ca_file not in response.text and endpoint not in response.text
 
 
-def test_one_invalid_setting_keeps_the_route_blocked(auth, tmp_path):
-    ca_file = tmp_path / "node-ca.pem"
-    ca_file.write_bytes(authority().pem)
+def test_one_invalid_setting_keeps_the_route_blocked(auth, monkeypatch):
+    monkeypatch.setattr(readiness_module, "trusted_file", lambda path: authority().pem)
     provider = configured_s01_readiness(
-        {"nodeMtlsCaBundle": str(ca_file.resolve()), "objectStoreEndpoint": "not-a-url"}
+        {
+            "nodeMtlsCaBundle": "/run/saintvision/node-mtls-ca.pem",
+            "objectStoreEndpoint": "not-a-url",
+        }
     )
     client, headers, _ = _client(auth, unresolved_settings=provider)
     response = client.get("/v1/operations/configuration-readiness", headers=headers)
@@ -176,17 +180,60 @@ def test_one_invalid_setting_keeps_the_route_blocked(auth, tmp_path):
 
 
 @pytest.mark.parametrize("ca_case", ["missing", "malformed", "leaf"])
-def test_missing_malformed_or_non_ca_pem_is_unresolved(tmp_path, ca_case):
-    path = tmp_path / "node-ca.pem"
+def test_missing_malformed_or_non_ca_pem_is_unresolved(monkeypatch, ca_case):
     if ca_case == "malformed":
-        path.write_text("-----BEGIN CERTIFICATE-----\ninvalid\n-----END CERTIFICATE-----\n")
+        raw = b"-----BEGIN CERTIFICATE-----\ninvalid\n-----END CERTIFICATE-----\n"
     elif ca_case == "leaf":
         ca = authority()
-        path.write_bytes(issue(ca, "spiffe://saintvision.test/node", server=True).pem)
+        raw = issue(ca, "spiffe://saintvision.test/node", server=True).pem
+    else:
+        raw = None
+
+    def read_ca(_path):
+        if raw is None:
+            raise FileNotFoundError()
+        return raw
+
+    monkeypatch.setattr(readiness_module, "trusted_file", read_ca)
     provider = configured_s01_readiness(
-        {"nodeMtlsCaBundle": str(path.resolve()), "objectStoreEndpoint": "http://minio:9000"}
+        {
+            "nodeMtlsCaBundle": "/run/saintvision/node-mtls-ca.pem",
+            "objectStoreEndpoint": "http://minio:9000",
+        }
     )
     assert provider() == ["INV_NODE_MTLS_CA_BUNDLE"]
+
+
+def test_ca_bundle_outside_the_read_only_configuration_volume_is_unresolved(monkeypatch):
+    def unexpected_read(_path):
+        raise AssertionError("an outside path must be rejected before file access")
+
+    monkeypatch.setattr(readiness_module, "trusted_file", unexpected_read)
+    provider = configured_s01_readiness(
+        {
+            "nodeMtlsCaBundle": "/etc/ssl/certs/ca-certificates.crt",
+            "objectStoreEndpoint": "http://minio:9000",
+        }
+    )
+    assert provider() == ["INV_NODE_MTLS_CA_BUNDLE"]
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "https://user@example.invalid/storage",
+        "https://example.invalid/storage#fragment",
+        "https://example.invalid:99999/storage",
+    ],
+)
+def test_object_store_endpoint_rejects_credentials_fragments_and_bad_ports(endpoint):
+    provider = configured_s01_readiness(
+        {
+            "nodeMtlsCaBundle": None,
+            "objectStoreEndpoint": endpoint,
+        }
+    )
+    assert "INV_OBJECT_STORE_ENDPOINT" in provider()
 
 
 def test_operator_route_requires_bearer_and_current_operator_grant(auth):
