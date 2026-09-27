@@ -517,9 +517,9 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
 
-      // Click button for node-test-01
+      // Click button for nod_test_01
       const actionBtn = Array.from(container.querySelectorAll('button')).find((b) =>
-        b.getAttribute('data-testid') === 'drain-node-btn-node-test-01'
+        b.getAttribute('data-testid') === 'drain-node-btn-nod_test_01'
       ) as HTMLButtonElement;
       expect(actionBtn).toBeDefined();
 
