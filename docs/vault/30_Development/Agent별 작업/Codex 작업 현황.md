@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T05:45:04+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S01-BE·S01-ST 준비 상태 preflight — 검토 요청
+
+- base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.
+- 출력은 PASS/FAIL/BLOCKED와 개수·불리언만 포함한다. token/DSN/URL/hostname/IP/Node·tenant ID/fingerprint/path/인증서·예외 원문을 배제하고 stale output을 선삭제한다. DB는 repeatable-read read-only·2초 timeout·tenant scope SELECT만 쓴다.
+- focused 13 passed, route 39 passed, docs/contracts/frontend/ontology/ratchet/freshness 게이트 exit 0. 현재 실 inventory·token은 합성하지 않아 예비 실행은 HTTP unreachable 3 FAIL + 입력 없음 4 BLOCKED이며 S01 합격을 주장하지 않는다. 다음은 Claude 독립 검토와 사용자 U1~U6 후 실제 재실행이다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
