@@ -59,20 +59,20 @@ jobs:
           mkdir -p .work
           cx01_owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           cx01_name="sv-cx01-${cx01_owner}"
-          cx01_id="$(docker run -d \
+          docker run -d \
+            --cidfile .work/cx01-container-id \
             --name "$cx01_name" \
             --label "ai.saintvision.kernel-test=$cx01_owner" \
             --label "ai.saintvision.cx01=$cx01_owner" \
             --label "ai.saintvision.created-by=github-actions" \
             --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid \
-            --memory 512m \
             -e POSTGRES_PASSWORD=inv_test_only \
             -e POSTGRES_DB=postgres \
             -p 127.0.0.1:5432:5432 \
             --health-cmd 'pg_isready -U postgres' \
             --health-interval 2s --health-timeout 2s --health-retries 30 \
-            postgres:16)"
-          printf '%s\n' "$cx01_id" > .work/cx01-container-id
+            postgres:16
+          cx01_id="$(cat .work/cx01-container-id)"
           for attempt in $(seq 1 45); do
             health="$(docker inspect --format '{{.State.Health.Status}}' "$cx01_id")"
             if [ "$health" = healthy ]; then break; fi
@@ -171,10 +171,42 @@ jobs:
           assert root.findall('.//testcase'), 'No LAN installer test evidence'
           assert not any(root.findall('.//' + tag) for tag in ('failure', 'error', 'skipped')), 'Every provisioned LAN installer test must run and pass'
           PY
+      - name: Run owned CX01 recovery drill evidence
+        run: python -m pytest tests/integration/test_recovery_drill.py -q --junitxml=dist/cx01-recovery-tests.xml -o faulthandler_timeout=45
+      - name: Require executed CX01 recovery evidence
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          import xml.etree.ElementTree as ET
+          root = ET.parse('dist/cx01-recovery-tests.xml').getroot()
+          cases = root.findall('.//testcase')
+          assert len(cases) == 20, f'CX01 recovery case set drifted: {len(cases)}'
+          assert not any(root.findall('.//' + tag) for tag in ('failure', 'error')), (
+              'Every executable CX01 recovery case must pass'
+          )
+          internal_network_reason = (
+              'Docker inspect state confirms status=running, running=True, '
+              'restarting=False, restartCount=0, exitCode=0; PostgreSQL-ready '
+              'log marker is present; hostPortPublished=False. This test\'s Docker '
+              'internal network has no published host port, so host pytest cannot '
+              'reach the container by Docker-only name'
+          )
+          skips = Counter(
+              (skipped.get('message') or '').strip()
+              for skipped in root.findall('.//skipped')
+          )
+          assert skips == Counter({internal_network_reason: 2}), (
+              f'CX01 recovery skip distribution drifted: {skips}'
+          )
+          setup_skip = 'CX01_CONTAINER is unset; container identity/ownership cannot be verified'
+          assert setup_skip not in skips
+          passed = len(cases) - sum(skips.values())
+          assert passed == 18, f'Expected 18 passed CX01 cases, got {passed}'
+          PY
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       # Web-container acceptance belongs to desktop-browser.yml. The two LAN
       # image-opt-in suites run in the explicit provisioned step above.
-      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py
+      - run: python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_recovery_drill.py
       - name: Docker host hygiene (explicit lane)
         # These prune real host residue. Keep them off the default/backend path.
         # This job already owns a disposable runner with a working Docker daemon.
