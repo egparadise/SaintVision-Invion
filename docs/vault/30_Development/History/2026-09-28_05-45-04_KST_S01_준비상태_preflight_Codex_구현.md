@@ -42,8 +42,8 @@ S01 상태·registry·공개 계약은 변경하지 않고, 입력 U1~U6이 들�
 
 | 명령/관측 | 결과 |
 |---|---|
-| `pytest tests/test_s01_readiness_preflight.py -q` | 23 passed, exit 0 |
-| `py_compile` + CLI `--help` + `git diff --check` | 각각 exit 0 |
+| `pytest tests/test_s01_readiness_preflight.py -q` | 25 passed, exit 0 |
+| `py_compile` + CLI `--help` + `git diff --check` | 각각 exit 0; CLI help는 `PYTHONPATH` 제거 subprocess로도 확인 |
 | `pytest tests/test_route_coverage.py -q` | 39 passed, exit 0 |
 | `check_docs.py` | 894 documents, exit 0 |
 | `check_contract_bindings.py` | 54 fixtures·19 types·25 sites·14 guards, exit 0 |
@@ -81,3 +81,8 @@ inventory·Node/HTTP CA·state 전체 하위와 겹치는지 검사한다. pilot
 1/5 BLOCKED, 잘못된 SPIFFE, DNS PASS/FAIL/BLOCKED, 보호 경로 선검증, PEM과 `main()` 종단
 redaction을 포함해 23 passed다. PG 대조는 DB 정본에 있는 CPU/RAM/profile/cert만 다루며
 GPU/NTP DB 일치는 이 카드가 주장하지 않는다.
+
+Claude r2 조건에 따라 입력을 하나도 주지 않은 `main()`이 실제 probe 7건과 U1~U6을
+전부 BLOCKED, exit 2로 내는 종단 시험을 추가했다. 도구 자체가 control-plane source
+경로를 bootstrap하므로 `PYTHONPATH` 없는 venv subprocess의 `--help`도 exit 0이다. focused
+시험은 최종 25 passed다.

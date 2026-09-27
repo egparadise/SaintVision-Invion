@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -576,6 +579,53 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
         "postgresql://",
     ):
         assert secret not in rendered
+
+
+def test_main_without_any_input_uses_real_probes_and_blocks_every_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+):
+    for name in (
+        "INV_S01_BASE_URL",
+        "INV_S01_HEALTH_URL",
+        "INV_S01_ACCESS_TOKEN",
+        "INV_S01_INVENTORY",
+        "INV_LAN_PILOT_STATE",
+        "INV_NODE_MTLS_CA_BUNDLE",
+        "INV_S01_HTTP_CA_BUNDLE",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    report_path = tmp_path / "no-input-report.json"
+
+    exit_code = s01.main(["--output", str(report_path)])
+
+    assert exit_code == 2
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert len(report["checks"]) == 7
+    assert {check["status"] for check in report["checks"]} == {"BLOCKED"}
+    assert set(report["inputs"]) == {"U1", "U2", "U3", "U4", "U5", "U6"}
+    assert {value["status"] for value in report["inputs"].values()} == {"BLOCKED"}
+    assert report["overallStatus"] == "BLOCKED"
+    assert json.loads(capsys.readouterr().out)["counts"] == {
+        "PASS": 0,
+        "FAIL": 0,
+        "BLOCKED": 7,
+    }
+
+
+def test_cli_help_bootstraps_control_plane_import_without_pythonpath():
+    env = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
+
+    result = subprocess.run(
+        [sys.executable, str(s01.ROOT / "tools" / "s01_readiness_preflight.py"), "--help"],
+        cwd=s01.ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "--health-url" in result.stdout
 
 
 @pytest.mark.parametrize(

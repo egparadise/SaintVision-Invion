@@ -21,6 +21,12 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener, HTTPSHand
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, ed448, ed25519, padding, rsa
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTROL_PLANE_SRC = ROOT / "services" / "control-plane" / "src"
+if str(CONTROL_PLANE_SRC) not in sys.path:
+    sys.path.insert(0, str(CONTROL_PLANE_SRC))
+
 from inv.node_channels import certificate_identity
 from inv.tooling import NodePrincipal
 

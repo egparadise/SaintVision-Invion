@@ -22,6 +22,11 @@ Plane base URL, `unresolvedSettings`를 제공하는 별도 health URL, 실 acce
 TLS CA bundle이다. 토큰·DSN은 CLI 인자로 받지 않고 환경 또는 보호 state에서만
 읽는다. 입력이 없으면 합성하지 않고 해당 U 항목을 `BLOCKED`로 둔다.
 
+현재 운영 `inv.app` factory에는 `/v1/health`가 없고 이 경로는
+`src/saintvision/api/app.py` 표면에서만 제공된다. 따라서 승인된 별도 health 배포 URL이
+없으면 U2·U3·U6의 이 검사는 `BLOCKED`이며, Control Plane base URL에서 경로를 추측하거나
+SPA fallback 응답을 성공으로 세지 않는다.
+
 S01 inventory `schemaVersion=s01-readiness-inventory:1`은 토폴로지와 정확히 5개 Node의
 식별·DNS·OS·역할·certificate fingerprint, CPU 모델/코어, GPU 모델/VRAM/driver,
 disk/NIC, 실제 capacity, 허용 상한·절대 폴더, NTP source/스큐, Storage 역할을 담는다.
