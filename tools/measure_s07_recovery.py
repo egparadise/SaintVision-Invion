@@ -19,12 +19,14 @@ import subprocess
 import sys
 from typing import Any
 
+from tools.five_node_lab_preflight import write_registration_mtls_preflight
 from tools.provenance import collect
 
 KERNEL_FRESHNESS_SECONDS = 15.0
 PHYSICAL_ACCEPTANCE_NODES = 5
 PHYSICAL_LIVENESS_SECONDS = 60.0
 MEASUREMENT_CLOCK = "harness-process-wall-clock-utc"
+FIVE_NODE_PLANNED_REPETITIONS = 20
 
 
 def positive_int(value: str) -> int:
@@ -135,18 +137,43 @@ def summarize(config: dict[str, Any], rounds: list[dict[str, Any]]) -> dict[str,
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
-    result.add_argument("--nodes", type=positive_int, required=True)
-    result.add_argument("--repetitions", type=positive_int, required=True)
-    result.add_argument("--liveness-timeout-seconds", type=positive_float, required=True)
-    result.add_argument("--poll-interval-seconds", type=positive_float, default=0.1)
+    result.add_argument(
+        "--adapter",
+        choices=("synthetic", "five-node-lab"),
+        default="synthetic",
+        help="measurement backend (default: synthetic)",
+    )
+    result.add_argument("--inventory", type=Path)
+    result.add_argument("--dry-run", action="store_true")
+    result.add_argument("--nodes", type=positive_int)
+    result.add_argument("--repetitions", type=positive_int)
+    result.add_argument("--liveness-timeout-seconds", type=positive_float)
+    result.add_argument("--poll-interval-seconds", type=positive_float)
     result.add_argument("--max-detection-seconds", type=positive_float)
-    result.add_argument("--target-recovery-success-rate", type=probability, default=0.95)
+    result.add_argument("--target-recovery-success-rate", type=probability)
     result.add_argument("--json-out", type=Path, required=True)
-    result.add_argument("--junit-out", type=Path, required=True)
+    result.add_argument("--junit-out", type=Path)
     return result
 
 
 def validated_config(args: argparse.Namespace) -> dict[str, Any]:
+    required = {
+        "--nodes": args.nodes,
+        "--repetitions": args.repetitions,
+        "--liveness-timeout-seconds": args.liveness_timeout_seconds,
+        "--junit-out": args.junit_out,
+    }
+    missing = [name for name, value in required.items() if value is None]
+    if missing:
+        raise ValueError(
+            f"{', '.join(missing)} required for --adapter synthetic"
+        )
+    if getattr(args, "inventory", None) is not None or getattr(args, "dry_run", False):
+        raise ValueError("--inventory/--dry-run are only valid with --adapter five-node-lab")
+    if args.poll_interval_seconds is None:
+        args.poll_interval_seconds = 0.1
+    if args.target_recovery_success_rate is None:
+        args.target_recovery_success_rate = 0.95
     if not 3 <= args.nodes <= 50:
         raise ValueError("nodes must be between 3 and 50")
     if args.repetitions > 100:
@@ -188,8 +215,182 @@ def measurement_provenance() -> dict[str, Any]:
     }
 
 
+def _planned_target_counts(node_ids: list[str]) -> dict[str, int]:
+    """Return the future 20-round allocation only for the four-node topology."""
+
+    ordered = sorted(node_ids)
+    if len(ordered) != 4:
+        return {}
+    counts = {node_id: 0 for node_id in ordered}
+    for index in range(FIVE_NODE_PLANNED_REPETITIONS):
+        counts[ordered[index % len(ordered)]] += 1
+    return counts
+
+
+def build_five_node_s07_preflight(
+    inventory: dict[str, Any],
+    registration: dict[str, Any],
+    *,
+    provenance: dict[str, Any],
+) -> dict[str, Any]:
+    """Project the shared registration observation into the S07 dry-run contract."""
+
+    nodes: list[dict[str, Any]] = []
+    for observed in registration["nodes"]:
+        ready = bool(observed["readiness"]["ready"])
+        colocated = bool(observed["coLocatedWithControlPlane"])
+        eligible = bool(observed["measurementEligible"]["s07"])
+        selected = ready and eligible and not colocated
+        if colocated:
+            exclusion = "cp-host-colocation"
+        elif not eligible:
+            exclusion = "s07-measurement-ineligible"
+        elif not ready:
+            exclusion = "registration-or-mtls-not-ready"
+        else:
+            exclusion = None
+        nodes.append(
+            {
+                "nodeId": observed["nodeId"],
+                "ip": observed["ip"],
+                "certificateSHA256": observed["certificateSHA256"],
+                "profile": observed["profile"],
+                "hostId": observed["hostId"],
+                "failureDomainId": observed["failureDomainId"],
+                "coLocatedWithControlPlane": colocated,
+                "coLocationValidation": observed["coLocationValidation"],
+                "measurementEligible": observed["measurementEligible"],
+                "exclusionReason": observed["exclusionReason"],
+                "readiness": observed["readiness"],
+                "selectedForTopology": ready,
+                "selectedForDisruption": selected,
+                "disruptionExclusionReason": exclusion,
+            }
+        )
+
+    ready_nodes = [node for node in nodes if node["readiness"]["ready"]]
+    disruption_nodes = [node for node in nodes if node["selectedForDisruption"]]
+    colocated_count = sum(node["coLocatedWithControlPlane"] for node in nodes)
+    independent_count = len(nodes) - colocated_count
+    eligible_count = sum(node["measurementEligible"]["s07"] for node in nodes)
+    physical_host_count = len({node["hostId"] for node in nodes})
+    topology_ready = (
+        len(nodes) == PHYSICAL_ACCEPTANCE_NODES
+        and len(ready_nodes) == PHYSICAL_ACCEPTANCE_NODES
+        and physical_host_count == PHYSICAL_ACCEPTANCE_NODES
+        and colocated_count == 1
+        and independent_count == 4
+        and eligible_count == 4
+    )
+    disruption_ids = sorted(node["nodeId"] for node in disruption_nodes)
+    return {
+        "schemaVersion": "s07-five-node-preflight:1",
+        "generatedAt": registration["generatedAt"],
+        "adapter": "five-node-lab",
+        "provenance": {
+            **provenance,
+            "inventoryRevision": inventory["revision"],
+        },
+        "inventoryRevision": inventory["revision"],
+        "dryRun": True,
+        "databaseReadOnly": bool(registration["databaseReadOnly"]),
+        "syntheticRowsCreated": False,
+        "heartbeatUpdated": False,
+        "resourceSnapshotUpdated": False,
+        "nodeDisrupted": False,
+        "repairExecuted": False,
+        "loadExecuted": False,
+        "operationalAcceptanceAssessed": False,
+        "livenessTimeoutSeconds": PHYSICAL_LIVENESS_SECONDS,
+        "detectionLimit": "60-seconds-plus-observer-poll",
+        "nodes": nodes,
+        "counts": {
+            "inventory": len(nodes),
+            "physicalExecutionHosts": physical_host_count,
+            "registered": sum(node["readiness"]["registered"] for node in nodes),
+            "ready": len(ready_nodes),
+            "cpColocated": colocated_count,
+            "cpIndependent": independent_count,
+            "s07Eligible": eligible_count,
+            "s07Selected": len(disruption_nodes),
+            "s07Excluded": len(nodes) - len(disruption_nodes),
+        },
+        "topologyReady": topology_ready,
+        "recoveryWaveReady": topology_ready and len(disruption_nodes) == 4,
+        "allFiveNodeIds": sorted(node["nodeId"] for node in nodes),
+        "disruptionTargetNodeIds": disruption_ids,
+        "plannedTargetCounts": _planned_target_counts(disruption_ids),
+        "plannedRepetitions": FIVE_NODE_PLANNED_REPETITIONS,
+    }
+
+
+def run_five_node_preflight(
+    inventory_path: Path,
+    dsn: str | None,
+    report_path: Path,
+    *,
+    provenance: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Write one current S07 registration/mTLS observation without mutating PostgreSQL."""
+
+    captured = provenance or measurement_provenance()
+    return write_registration_mtls_preflight(
+        inventory_path,
+        dsn,
+        report_path,
+        transform=lambda inventory, registration: build_five_node_s07_preflight(
+            inventory,
+            registration,
+            provenance=captured,
+        ),
+    )
+
+
+def validate_five_node_args(args: argparse.Namespace) -> None:
+    if args.inventory is None:
+        raise ValueError("--inventory is required for --adapter five-node-lab")
+    if not args.dry_run:
+        raise ValueError("--adapter five-node-lab requires --dry-run")
+    measurement_options = {
+        "--nodes": args.nodes,
+        "--repetitions": args.repetitions,
+        "--liveness-timeout-seconds": args.liveness_timeout_seconds,
+        "--poll-interval-seconds": args.poll_interval_seconds,
+        "--max-detection-seconds": args.max_detection_seconds,
+        "--target-recovery-success-rate": args.target_recovery_success_rate,
+        "--junit-out": args.junit_out,
+    }
+    supplied = [name for name, value in measurement_options.items() if value is not None]
+    if supplied:
+        raise ValueError(
+            "physical recovery execution is not enabled; remove " + ", ".join(supplied)
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    if args.adapter == "five-node-lab":
+        try:
+            validate_five_node_args(args)
+            report = run_five_node_preflight(
+                args.inventory,
+                os.environ.get("INV_TEST_ADMIN_DSN"),
+                args.json_out,
+            )
+        except (ValueError, RuntimeError) as exc:
+            parser().error(str(exc))
+        print(
+            json.dumps(
+                {
+                    "json": str(args.json_out.resolve()),
+                    "dryRun": report["dryRun"],
+                    "topologyReady": report["topologyReady"],
+                    "recoveryWaveReady": report["recoveryWaveReady"],
+                },
+                separators=(",", ":"),
+            )
+        )
+        return 0
     try:
         config = validated_config(args)
     except ValueError as exc:

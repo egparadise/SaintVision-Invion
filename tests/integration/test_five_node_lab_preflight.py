@@ -13,8 +13,8 @@ import pytest
 from inv.ids import new_id
 from tools.five_node_lab_preflight import (
     five_node_inventory_revision,
-    write_registration_mtls_preflight,
 )
+from tools.measure_s07_recovery import run_five_node_preflight
 
 pytestmark = pytest.mark.postgres
 
@@ -118,21 +118,34 @@ def test_registration_mtls_preflight_reads_five_real_rows_without_mutation(
     node_ids = [node["nodeId"] for node in nodes]
     before = _database_state(postgres.owner, node_ids)
 
-    report = write_registration_mtls_preflight(
+    report = run_five_node_preflight(
         inventory_path,
         postgres.owner,
         report_path,
+        provenance={"codeSha": "a" * 40, "executor": "Codex"},
     )
 
     assert _database_state(postgres.owner, node_ids) == before
     assert report["databaseReadOnly"] is True
     assert report["syntheticRowsCreated"] is False
     assert report["heartbeatUpdated"] is False
+    assert report["resourceSnapshotUpdated"] is False
+    assert report["nodeDisrupted"] is False
+    assert report["repairExecuted"] is False
+    assert report["loadExecuted"] is False
+    assert report["operationalAcceptanceAssessed"] is False
     assert report["counts"]["registered"] == 5
     assert report["counts"]["ready"] == 5
     assert report["counts"]["cpColocated"] == 1
-    assert report["counts"]["timedWaveSelected"] == 4
-    assert report["allFiveSmokeReady"] is True
-    assert report["timedWaveReady"] is True
+    assert report["counts"]["s07Selected"] == 4
+    assert report["topologyReady"] is True
+    assert report["recoveryWaveReady"] is True
+    assert report["nodes"][0]["selectedForDisruption"] is False
+    assert report["nodes"][0]["disruptionExclusionReason"] == "cp-host-colocation"
+    assert report["plannedTargetCounts"] == {
+        node["nodeId"]: 5 for node in nodes[1:]
+    }
     assert "tenantId" not in report
+    assert tenant_id not in report_path.read_text(encoding="utf-8")
+    assert postgres.owner not in report_path.read_text(encoding="utf-8")
     assert report_path.exists()
