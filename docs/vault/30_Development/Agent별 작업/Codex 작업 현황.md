@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T08:35:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S01-BE 운영 설정 미해결 관측 route
+
+- 운영 정본 `inv.app.create_configured_app`에 인증+operator grant 전용 `GET /v1/operations/configuration-readiness`를 추가했다. 값은 반환하지 않고 `INV_NODE_MTLS_CA_BUNDLE`·`INV_OBJECT_STORE_ENDPOINT` 이름만 엄격한 `ConfigurationReadinessView`로 반환한다.
+- `/readyz` 의미는 유지하고, provider 미구성은 빈 목록 추정 대신 `SYS-0001/503`이다. schema 생성물·fixture·serving anchor·route coverage와 focused PG-free 48 passed, bindings 0, schema check 0을 확보했다.
+- PR #122의 `--health-url`은 `--settings-url`+Bearer로, PR #125 §7은 새 운영 route로 후속 정정한다. U2·U3·U6은 미해결이며 S01-BE `in_progress` 유지. [[S01_BE_운영_설정_미해결_관측_결정]], [[2026-09-28_08-35-00_KST_S01_BE_운영_설정_미해결_관측_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
