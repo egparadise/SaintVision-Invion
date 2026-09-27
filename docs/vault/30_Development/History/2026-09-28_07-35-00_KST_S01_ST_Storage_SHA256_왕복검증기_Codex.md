@@ -46,7 +46,8 @@ tags: ["history", "s01", "storage", "sha256", "artifact", "minio", "hosted-ci"]
 ## hosted 증거와 남은 경계
 
 - 첫 hosted Core run `36355731393`은 archived upstream image의 Quay pull이 401을 반환해 verifier 전에 exit 1이었다. 두 번째 run `36355914520`은 digest 고정 image pull·bucket 생성과 후보 PUT/GET/body hash/metadata hash/DELETE/404는 모두 성공했지만, 당시 남아 있던 제품 응답 동어반복 check가 false라 schema 1.0 결과는 FAIL/exit 1이었다. 둘 다 최종 PASS 증거로 세지 않는다.
-- registry/candidate 실패가 정상 Core 전체를 지운 결함을 해소하기 위해 같은 `run-core` gate의 별도 job으로 분리하고 publish를 loopback으로 좁혔다. evidence schema 1.1은 `targetKind`를 필수 enum으로 두고 PR head SHA를 기록한다. #122 U6은 `operational`만 받을 수 있으며 hosted `ci-candidate`는 U6 PASS가 아니다. M2 생존변이인 “DELETE 204지만 object 잔존”은 재조회 200을 주입해 FAIL하도록 시험을 추가했다. 최종 hosted 재실행은 PENDING이다.
+- registry/candidate 실패가 정상 Core 전체를 지운 결함을 해소하기 위해 같은 `run-core` gate의 별도 job으로 분리하고 publish를 loopback으로 좁혔다. evidence schema 1.1은 `targetKind`를 필수 enum으로 두고 PR head SHA를 기록한다. #122 U6은 `operational`만 받을 수 있으며 hosted `ci-candidate`는 U6 PASS가 아니다. M2 생존변이인 “DELETE 204지만 object 잔존”은 재조회 200을 주입해 FAIL하도록 시험을 추가했다.
+- head `32cb061e26d6062b8d30e9a640c783bc49d5164e`, hosted run [36356313380](https://github.com/egparadise/SaintVision-Invion/actions/runs/36356313380)의 격리 job은 PASS(12s)다. artifact `saintvision-s01-storage-evidence-36356313380`에서 JSON `schemaVersion=1.1`, `targetKind=ci-candidate`, head와 같은 `codeSha`, payload 32, PUT/GET/body SHA/metadata SHA/DELETE/cleanup 여섯 check true를 직접 대조했다. JUnit은 1 tests/0 failures/0 errors/0 skipped이며 image digest는 workflow 고정값과 같다. 이 수치는 CI 후보 preflight일 뿐 U6 운영 PASS가 아니다.
 - #129 route는 endpoint·CA의 구조적 readiness만 반환하며 이 왕복 결과를 저장하거나 합성하지 않는다.
 - #122의 후속 `--storage-evidence`는 `targetKind=operational`, reachable PR head `codeSha`, UTC `observedAt`, PASS, 모든 필수 check true일 때만 U6 Storage 왕복을 PASS로 볼 수 있다. 이 카드에서 #122 branch는 수정하지 않는다.
 - 운영 TLS·전용 service credential·Run `OutputIngestion`→S3 adapter→DB commitment·90일/1년/35일 retention/GC·복원 실측은 여전히 UNMEASURED/BLOCKED다.
