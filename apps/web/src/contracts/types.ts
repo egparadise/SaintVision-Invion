@@ -396,6 +396,7 @@ export interface SyntheticGpuResult {
 
 export interface SecurityControlStatus {
   dockerSocketExposed: boolean;
+  dockerSocketAttemptsBlocked: number;
   approvalBypassesBlocked: number;
   emergencyKillSwitchActive: boolean;
   drainedNodesCount?: number;

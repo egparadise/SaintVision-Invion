@@ -78,6 +78,7 @@ export class SecurityControlManager {
   getStatus(): SecurityControlStatus {
     return {
       dockerSocketExposed: false, // Invariant: always false
+      dockerSocketAttemptsBlocked: this.dockerSocketAttemptsBlocked,
       approvalBypassesBlocked: this.approvalBypassesBlocked,
       emergencyKillSwitchActive: this.killSwitchActive,
       drainedNodesCount: this.drainedNodes.size,
