@@ -89,7 +89,8 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
       expect(approvalInput).not.toBeNull();
       act(() => {
-        approvalInput.value = '550e8400-e29b-41d4-a716-446655440000';
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
         approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
         approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
@@ -202,8 +203,10 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       });
 
       const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      expect(approvalInput).not.toBeNull();
       act(() => {
-        approvalInput.value = '550e8400-e29b-41d4-a716-446655440000';
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
         approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
         approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
