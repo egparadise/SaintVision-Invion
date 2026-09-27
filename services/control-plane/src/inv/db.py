@@ -25,6 +25,10 @@ class _PlacementSemaphoreLimit(Exception):
     """Identifier-free internal cause for the existing RES-0007 surface."""
 
 
+class _TransactionRollbackSignal(Exception):
+    """Internal control flow that intentionally rolls back a root transaction."""
+
+
 class _ProjectPermitRegistry:
     """One non-blocking tenant+project permit registry for this CP process."""
 
@@ -286,6 +290,9 @@ class Database:
             yield state
         except CancelledError:
             release_cause = "cancel"
+            raise
+        except _TransactionRollbackSignal:
+            release_cause = "rollback"
             raise
         except DomainError:
             release_cause = "rollback"

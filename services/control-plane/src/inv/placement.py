@@ -15,6 +15,7 @@ from .contracts import validate_contract
 from .control import Control
 from .db import (
     DEFAULT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS,
+    _TransactionRollbackSignal,
     mark_statement_phase,
     record_placement_metric,
 )
@@ -24,7 +25,7 @@ from .runs import event
 from .scheduler import Candidate, Request, place
 
 
-class _StalePlacement(Exception):
+class _StalePlacement(_TransactionRollbackSignal):
     """Internal optimistic-validation signal; never crosses the API boundary."""
 
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-PROJECT-BOUNDED-SEMAPHORE-SPEC-001"
 title: "S05 project별 bounded semaphore fail-fast 사양"
-version: "1.2.0"
+version: "1.2.1"
 status: "implemented-pg-free-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T15:27:00+09:00"
+updated: "2026-09-28T06:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -91,7 +91,7 @@ permit key는 인증·RLS로 확인된 canonical `(tenant_id, project_id)`다. r
 ### 4.2 진입 순서
 
 1. 기존 인증, tenant GUC, membership/grant, canonical request hash와 idempotency 분류를 수행한다.
-2. 이미 commit된 exact replay는 기존 응답을 반환하고 permit을 소비하지 않는다. 같은 key의 다른 body는 기존 409를 반환한다.
+2. 이미 commit된 exact replay는 ledger·권한 확인 뒤 기존 응답을 반환하고 permit을 소비하지 않는다. Card26은 replay가 run row `lock_run`을 거치지 않고 즉시 반환하도록 의도적으로 재배치했다. 같은 key의 다른 body는 기존 409를 반환한다.
 3. **새 예약 시도만** candidate의 첫 project/limits writer lock 전에 non-blocking permit을 획득한다.
 4. permit이 없으면 DB writer lock을 기다리지 않고 기존 `RES-0007`/503/retryable을 반환한다. 새 idempotency insert가 있었다면 transaction rollback으로 잔존 0이어야 한다.
 5. permit을 얻은 요청은 기존 candidate final validation과 canonical reserve를 그대로 수행한다.
@@ -102,7 +102,7 @@ permit key는 인증·RLS로 확인된 canonical `(tenant_id, project_id)`다. r
 
 permit은 placement 함수 반환이 아니라 **root DB transaction의 commit 또는 rollback 완료 뒤** 정확히 한 번 반환한다. `BoundDatabase`나 savepoint에서 함수가 먼저 반환돼도 outer transaction이 lock을 보유할 수 있으므로 조기 release는 사양 위반이다.
 
-- root transaction context에 release callback을 등록하고 commit, DomainError, 일반 exception, `CancelledError`, `BaseException` rollback에서 모두 실행한다.
+- root transaction context에 release callback을 등록하고 commit, DomainError/optimistic stale rollback, 일반 exception, `CancelledError`, `BaseException` 종료에서 모두 실행한다. `_StalePlacement`는 재시도용 내부 rollback signal이므로 release cause를 `rollback`으로 기록한다.
 - 같은 root transaction이 같은 tenant+project의 canonical primitive에 재진입하면 permit을 중복 차감하지 않는 reentrant token을 사용한다.
 - savepoint rollback은 root permit을 반환하지 않는다. root transaction 종료만 반환한다.
 - process crash 때 local registry는 사라지지만 DB connection 종료·transaction rollback은 기존 복구 경계다. 이 동작을 durable permit 복구라고 부르지 않는다.
@@ -186,6 +186,6 @@ sampler-off candidate 1500×1 결과로 첫 실험값 N=4를 정했다. 다음 �
 - migration·durable state가 없으므로 DB cleanup이나 정상 Lease 삭제는 없다.
 - deadlock, permit leak, early release, cross-tenant coupling, replay/409 변화, 새 공개 오류 표면이 필요하면 구현을 중단하고 결정 요청으로 되돌린다.
 
-owner는 Codex, reviewer는 Claude, 실측 승인자는 코디네이터다. Card26은 private flag와 N=4 process-local registry, root transaction finalizer, replay-before-permit, redacted metric, benchmark schema 1.8의 semaphore reject/외부 실패 합계 계측을 구현했다. focused PG-free 검증은 응답 계약 회귀를 포함해 101 passed/exit 0이고 production flag는 off, 기본 lock budget은 500ms다. 현재 handoff는 **R2 PR 구현 검토 대기**, S05-DB `in_progress`이며 실 PostgreSQL·20동시 측정은 `NOT_RUN`이다. 근거는 [[2026-09-23_15-27-00_KST_S05_Card26_bounded_semaphore_구현_Codex]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]], [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]]다.
+owner는 Codex, reviewer는 Claude, 실측 승인자는 코디네이터다. Card26은 private flag와 N=4 process-local registry, root transaction finalizer, replay-before-permit, redacted metric, benchmark schema 1.8의 semaphore reject/외부 실패 합계 계측을 구현했다. focused PG-free 101 passed 집합은 `test_placement_project_semaphore.py`, `test_placement_lock_budget.py`, `test_model_registry_config.py`, `test_pool_placement_response_contract.py`, `test_model_retry_http_contract.py`이며 exit 0이다. production flag는 off, 기본 lock budget은 500ms다. 2026-09-28 코디네이터가 S05-DB `review` → `in_progress`를 승격이 아닌 구현 진행 상태 반영으로 비준했다. 현재 handoff는 **R2 PR 구현 검토 대기**, S05-DB `in_progress`이며 실 PostgreSQL·20동시 측정은 `NOT_RUN`이다. 근거는 [[2026-09-23_15-27-00_KST_S05_Card26_bounded_semaphore_구현_Codex]], [[2026-09-23_12-20-00_KST_S05_Bprime_구현_교정실험_Codex]], [[s05-bprime-card24-4c8a7363.json]], [[2026-09-22_S05_배치잠금_입도_결정제안_Codex]]다.
 
 Card25 sampler-off wave 종료 뒤 `inv_test_*` database는 0건이었다. 실행 전부터 있던 `inv_app_*` role 2건은 종료 뒤에도 2건으로 같아 신규 role 잔존은 0이다. [[s05-card25-sampler-off-6c389a1d.json]].

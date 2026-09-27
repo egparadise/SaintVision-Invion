@@ -140,6 +140,7 @@ def test_tenant_and_project_keys_are_independent():
         (RuntimeError("exception"), "exception"),
         (CancelledError(), "cancel"),
         (KeyboardInterrupt(), "exception"),
+        (placement_module._StalePlacement(), "rollback"),
     ],
 )
 def test_root_finalizer_releases_once_for_every_exit(error, release_cause):
@@ -162,6 +163,28 @@ def test_root_finalizer_releases_once_for_every_exit(error, release_cause):
     assert len(released) == 1
     assert released[0]["releaseCause"] == release_cause
     assert released[0]["registryEntries"] == 0
+
+
+@pytest.mark.parametrize("owner_state", ["missing", "different-database"])
+def test_permit_requires_its_owning_root_transaction(owner_state):
+    tenant = str(uuid4())
+    database = _database()
+
+    if owner_state == "missing":
+        with pytest.raises(
+            RuntimeError,
+            match="placement project permit requires the owning root transaction",
+        ):
+            _acquire(database, tenant, "prj_wrong_root")
+        return
+
+    other = _database()
+    with other._root_transaction_lifecycle():
+        with pytest.raises(
+            RuntimeError,
+            match="placement project permit requires the owning root transaction",
+        ):
+            _acquire(database, tenant, "prj_wrong_root")
 
 
 def test_reentrant_root_transaction_uses_one_permit_and_savepoint_like_rollback_keeps_it():

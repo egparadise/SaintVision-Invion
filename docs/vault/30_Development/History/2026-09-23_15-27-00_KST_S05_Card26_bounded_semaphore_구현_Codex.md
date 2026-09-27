@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-CARD26-BOUNDED-SEMAPHORE-IMPLEMENTATION-001"
 title: "S05 Card26 project별 bounded semaphore 구현"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-23T15:27:00+09:00"
+updated: "2026-09-28T06:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -19,14 +19,14 @@ tags: ["history", "s05", "placement", "semaphore", "fail-fast", "implementation"
 - branch: `agent/codex/s05-bounded-semaphore`
 - base: `1e8baf045c5a554209aaef601ae4883b64da50a7`
 - owner/reviewer: Codex/Claude
-- registry: S05-DB `review` → `in_progress`, next handoff `Claude — Card26 project별 bounded semaphore 구현 검토`
+- registry: S05-DB `review` → `in_progress`. 2026-09-28 코디네이터가 사양 v1.2.0·§9·본 History의 일치와 "승격이 아닌 진행 상태 반영"을 근거로 이 전환을 비준했다. next handoff `Claude — Card26 project별 bounded semaphore 구현 검토`
 - delivery: R2 PR, integration 직접 착지·병합 없음
 
 Card25 사양 §4~§8에 따라 candidate short-commit 신규 예약 앞에 canonical `(tenant_id, project_id)`별 process-local permit을 구현했다. 상한 N의 첫 실험값은 4이고 permit queue/future/sleep 없이 즉시 획득 또는 거절하므로 논리적 permit wait는 0ms다. production 설정에는 노출하지 않았고 private flag 기본값은 off다.
 
 ## 구현 경계
 
-- commit된 exact replay와 changed-body 409 분류는 permit보다 먼저 수행한다. 신규 candidate 예약만 project/limits writer lock 전에 permit을 획득한다.
+- commit된 exact replay와 changed-body 409 분류는 permit보다 먼저 수행한다. 이 재배치로 exact replay는 기존처럼 `lock_run`으로 run row를 잠그지 않고 ledger·권한 확인 뒤 즉시 반환한다. writer lock 미접촉을 의도한 변경이며 신규 candidate 예약만 project/limits writer lock 전에 permit을 획득한다.
 - permit은 placement 함수 반환이나 savepoint 종료가 아니라 root transaction commit/rollback 뒤 finalizer가 정확히 한 번 반환한다. `BoundDatabase` 재진입은 root permit 하나를 공유한다.
 - commit, DomainError rollback, 일반 exception, cancellation, BaseException 종료를 분류하고 entry count가 0이면 process registry에서 제거한다.
 - 상한 초과 공개 표면은 기존 `RES-0007`, HTTP 503, `retryable=true` 그대로다. 내부 reason과 metric에는 tenant/project/principal/idempotency key를 넣지 않는다.
@@ -40,8 +40,9 @@ Card25 사양 §4~§8에 따라 candidate short-commit 신규 예약 앞에 cano
 | 검증 | 결과 |
 |---|---|
 | `py_compile` (변경 Python 파일) | exit 0 |
-| 신규 semaphore focused 시험 | 26 passed, exit 0 |
-| semaphore + lock-budget + model-registry + 응답 계약 focused suite | 101 passed, exit 0 |
+| 신규 semaphore focused 시험 | 리뷰 기준 30 passed, exit 0; 후속 O1/O3 보강 뒤 33 passed |
+| semaphore + lock-budget + model-registry + 응답 계약 focused suite | 101 passed, exit 0 (`test_placement_project_semaphore.py`, `test_placement_lock_budget.py`, `test_model_registry_config.py`, `test_pool_placement_response_contract.py`, `test_model_retry_http_contract.py`) |
+| 같은 5파일 후속 O1/O3 보강 재검증 | 104 passed, exit 0 |
 | Black check (변경 Python 파일) | exit 0 |
 | `git diff --check` | exit 0 |
 | ontology 생성 | schema 405/data 916 triples, exit 0 |
@@ -52,6 +53,8 @@ Card25 사양 §4~§8에 따라 candidate short-commit 신규 예약 앞에 cano
 | `PYTHONUTF8=1 check_frontend_integrity.py` | 0 violations, exit 0 |
 
 PG-free 시험은 N=1/3/4 즉시 거절, tenant/project 격리, commit/rollback/cancel/BaseException release, reentrant/savepoint 경계, exact replay/changed-body 선행, metric redaction, 독립 registry의 `2N` 부정 대조군과 benchmark CLI opt-in을 포함한다.
+
+Claude 관찰 O1/O3 후속으로 optimistic stale winner의 `_StalePlacement`를 일반 `exception`이 아닌 의도된 `rollback` release cause로 분류했다. 또한 flag-on permit이 root transaction 밖 또는 다른 `Database`의 root context에서 호출되면 `RuntimeError`로 닫히는 두 방어 경로를 focused 시험으로 고정했다. 공개 오류·응답·migration은 바뀌지 않는다.
 
 ## 미실행과 다음 단계
 
