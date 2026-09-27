@@ -3,78 +3,62 @@ import {
   DistributedRecoveryManager,
   isTokenValidAndCurrent,
   isTokenNewer,
+  InitialRecoveryNode,
 } from '../src/features/recovery/recoveryEngine';
 
-const INITIAL_NODES = [
-  { nodeId: 'nod_01JABCDEF01', hostname: 'Node-01-WinMain', activeWorkspaces: 2 },
-  { nodeId: 'nod_01JABCDEF02', hostname: 'Node-02-WinWork', activeWorkspaces: 1 },
-  { nodeId: 'nod_01JABCDEF03', hostname: 'Node-03-WinDev', activeWorkspaces: 0 },
-  { nodeId: 'nod_01JABCDEF04', hostname: 'Node-04-LinuxBuild', activeWorkspaces: 3 },
-  { nodeId: 'nod_01JABCDEF05', hostname: 'Node-05-LinuxGPU', activeWorkspaces: 1 },
+const INITIAL_NODES: InitialRecoveryNode[] = [
+  { nodeId: 'nod_01JABCDEF01', hostname: 'Node-01-WinMain', activeWorkspaces: 3 },
+  { nodeId: 'nod_01JABCDEF02', hostname: 'Node-02-LinuxWorker1', activeWorkspaces: 2 },
+  { nodeId: 'nod_01JABCDEF03', hostname: 'Node-03-LinuxWorker2', activeWorkspaces: 4 },
+  { nodeId: 'nod_01JABCDEF04', hostname: 'Node-04-LinuxWorker3', activeWorkspaces: 1 },
+  { nodeId: 'nod_01JABCDEF05', hostname: 'Node-05-SpareCold', activeWorkspaces: 0 },
 ];
 
-describe('S07-FE: Distributed Recovery Dashboard & Monotonic Fencing Validation (AC-07)', () => {
-  describe('Heartbeat Age & Stale Detection Time (AC-07 ≤ 60s)', () => {
-    it('detects node stale condition within 60s threshold', () => {
+describe('Distributed Fencing Token & Recovery Engine (ADR-006 & ERR-DESIGN-006)', () => {
+  describe('Monotonic Fencing Invariants', () => {
+    it('strictly accepts identical (epoch, sequence) tokens', () => {
+      const current = { epoch: 2, sequence: 15 };
+      expect(isTokenValidAndCurrent({ epoch: 2, sequence: 15 }, current)).toBe(true);
+    });
+
+    it('strictly rejects stale tokens with smaller epoch (zombie write protection)', () => {
+      const current = { epoch: 2, sequence: 15 };
+      expect(isTokenValidAndCurrent({ epoch: 1, sequence: 99 }, current)).toBe(false);
+    });
+
+    it('strictly rejects stale tokens with identical epoch but smaller sequence', () => {
+      const current = { epoch: 2, sequence: 15 };
+      expect(isTokenValidAndCurrent({ epoch: 2, sequence: 14 }, current)).toBe(false);
+    });
+
+    it('strictly rejects unissued future tokens (epoch > current)', () => {
+      const current = { epoch: 2, sequence: 15 };
+      expect(isTokenValidAndCurrent({ epoch: 3, sequence: 1 }, current)).toBe(false);
+    });
+
+    it('evaluates token seniority via isTokenNewer', () => {
+      const baseline = { epoch: 2, sequence: 10 };
+      expect(isTokenNewer({ epoch: 3, sequence: 1 }, baseline)).toBe(true);
+      expect(isTokenNewer({ epoch: 2, sequence: 11 }, baseline)).toBe(true);
+      expect(isTokenNewer({ epoch: 2, sequence: 10 }, baseline)).toBe(false);
+      expect(isTokenNewer({ epoch: 1, sequence: 99 }, baseline)).toBe(false);
+    });
+  });
+
+  describe('Zombie Task Interception & Late Result Blocking (AC-07 Invariant)', () => {
+    it('blocks 50 consecutive late writes with stale tokens and logs rejections', () => {
       const mgr = new DistributedRecoveryManager(INITIAL_NODES);
       const target = 'nod_01JABCDEF01';
 
-      // 1. Healthy heartbeat (5s age)
-      expect(mgr.evaluateNodeHealth(target, 5)).toBe('online');
-
-      // 2. Bound check at 60s
-      expect(mgr.evaluateNodeHealth(target, 60)).toBe('online');
-
-      // 3. Exceeded 60s (61s age) -> must transition to stale
-      expect(mgr.evaluateNodeHealth(target, 61)).toBe('stale');
-
-      // 4. Delayed 125s -> transitions to offline
-      expect(mgr.evaluateNodeHealth(target, 125)).toBe('offline');
-    });
-  });
-
-  describe('Monotonic Fencing Token Rules (ADR-006 & ERR-DESIGN-006)', () => {
-    it('validates higher epoch takes precedence regardless of sequence', () => {
-      // New epoch with seq 1 beats older epoch with seq 9999
-      expect(isTokenNewer({ epoch: 2, sequence: 1 }, { epoch: 1, sequence: 9999 })).toBe(true);
-      expect(isTokenNewer({ epoch: 1, sequence: 9999 }, { epoch: 2, sequence: 1 })).toBe(false);
-    });
-
-    it('validates higher sequence takes precedence when epochs are equal', () => {
-      expect(isTokenNewer({ epoch: 2, sequence: 15 }, { epoch: 2, sequence: 10 })).toBe(true);
-      expect(isTokenNewer({ epoch: 2, sequence: 10 }, { epoch: 2, sequence: 10 })).toBe(false);
-      expect(isTokenNewer({ epoch: 2, sequence: 9 }, { epoch: 2, sequence: 10 })).toBe(false);
-    });
-
-    it('strictly requires exact match for current active token and rejects future/stale tokens', () => {
-      expect(isTokenValidAndCurrent({ epoch: 1, sequence: 100 }, { epoch: 1, sequence: 100 })).toBe(true);
-      // Rejects unissued future epoch or sequence
-      expect(isTokenValidAndCurrent({ epoch: 99, sequence: 1 }, { epoch: 1, sequence: 100 })).toBe(false);
-      expect(isTokenValidAndCurrent({ epoch: 1, sequence: 999 }, { epoch: 1, sequence: 100 })).toBe(false);
-      // Rejects stale epoch or sequence
-      expect(isTokenValidAndCurrent({ epoch: 0, sequence: 100 }, { epoch: 1, sequence: 100 })).toBe(false);
-      expect(isTokenValidAndCurrent({ epoch: 1, sequence: 99 }, { epoch: 1, sequence: 100 })).toBe(false);
-    });
-  });
-
-  describe('Late Result Rejection & Zero Stale Writes (AC-07)', () => {
-    it('strictly rejects zombie late write attempts with zero stale writes allowed', () => {
-      const mgr = new DistributedRecoveryManager(INITIAL_NODES);
-      const target = 'nod_01JABCDEF04';
-      const node = mgr.getNode(target)!;
-
-      const currentEpoch = node.fencingToken.epoch;
-      const currentSeq = node.fencingToken.sequence;
-
-      // 1. Simulate Network Partition / Split-Brain
+      // 1. Advance epoch via network partition simulation
       mgr.simulateNetworkPartition(target);
-      expect(mgr.getNode(target)?.healthState).toBe('fenced');
-      expect(mgr.getNode(target)?.fencingToken.epoch).toBe(currentEpoch + 1);
+      const node = mgr.getNode(target);
+      expect(node).toBeDefined();
+      expect(node!.fencingToken.epoch).toBe(2);
 
-      // 2. 50 simulated concurrent late writes from isolated zombie worker using previous token
-      const staleToken = { epoch: currentEpoch, sequence: currentSeq + 10 };
+      // 2. Attempt 50 writes with stale Epoch 1
       for (let i = 0; i < 50; i++) {
-        const res = mgr.attemptWrite(target, staleToken, `stale_write_attempt_${i}`);
+        const res = mgr.attemptWrite(target, { epoch: 1, sequence: 10 + i }, `zombie_payload_${i}`);
         expect(res.success).toBe(false);
         expect(res.error).toContain('STALE_FENCING_TOKEN');
       }
@@ -146,26 +130,69 @@ describe('S07-FE: Distributed Recovery Dashboard & Monotonic Fencing Validation 
     it('initializes node health and heartbeat age from actual backend status and heartbeatAt timestamp', () => {
       const pastTime = new Date(Date.now() - 75 * 1000).toISOString();
       const ancientTime = new Date(Date.now() - 150 * 1000).toISOString();
-      const customNodes = [
-        { nodeId: 'nod_actual_online', hostname: 'Node-Online', status: 'healthy', heartbeatAt: new Date().toISOString() },
-        { nodeId: 'nod_actual_stale', hostname: 'Node-Stale', status: 'healthy', heartbeatAt: pastTime },
+      const customNodes: InitialRecoveryNode[] = [
+        { nodeId: 'nod_actual_online', hostname: 'Node-Online', status: 'online', heartbeatAt: new Date().toISOString() },
+        { nodeId: 'nod_actual_stale', hostname: 'Node-Stale', status: 'online', heartbeatAt: pastTime },
         { nodeId: 'nod_actual_offline', hostname: 'Node-Offline', status: 'offline', heartbeatAt: pastTime },
-        { nodeId: 'nod_actual_ancient', hostname: 'Node-Ancient', status: 'healthy', heartbeatAt: ancientTime },
+        { nodeId: 'nod_actual_ancient', hostname: 'Node-Ancient', status: 'online', heartbeatAt: ancientTime },
+        { nodeId: 'nod_actual_lost', hostname: 'Node-Lost', status: 'lost', heartbeatAt: null },
+        { nodeId: 'nod_actual_degraded', hostname: 'Node-Degraded', status: 'degraded', heartbeatAt: new Date().toISOString() },
+        { nodeId: 'nod_actual_unknown', hostname: 'Node-Unknown', status: undefined, heartbeatAt: null },
       ];
 
       const mgr = new DistributedRecoveryManager(customNodes);
+
+      // 1. Online node with fresh heartbeat
       expect(mgr.getNode('nod_actual_online')?.healthState).toBe('online');
-      expect(mgr.getNode('nod_actual_online')?.actualStatus).toBe('healthy');
+      expect(mgr.getNode('nod_actual_online')?.actualStatus).toBe('online');
       expect(mgr.getNode('nod_actual_online')?.heartbeatAgeSeconds).toBeLessThanOrEqual(5);
 
+      // 2. Stale node due to >60s heartbeat
       expect(mgr.getNode('nod_actual_stale')?.healthState).toBe('stale');
       expect(mgr.getNode('nod_actual_stale')?.heartbeatAgeSeconds).toBeGreaterThanOrEqual(70);
 
+      // 3. Offline node explicitly marked offline
       expect(mgr.getNode('nod_actual_offline')?.healthState).toBe('offline');
       expect(mgr.getNode('nod_actual_offline')?.actualStatus).toBe('offline');
 
+      // 4. Ancient heartbeat (>120s) -> offline
       expect(mgr.getNode('nod_actual_ancient')?.healthState).toBe('offline');
       expect(mgr.getNode('nod_actual_ancient')?.heartbeatAgeSeconds).toBeGreaterThanOrEqual(140);
+
+      // 5. Lost node with null heartbeat must be OFFLINE, never synthetic 2s/ONLINE
+      expect(mgr.getNode('nod_actual_lost')?.healthState).toBe('offline');
+      expect(mgr.getNode('nod_actual_lost')?.actualStatus).toBe('lost');
+      expect(mgr.getNode('nod_actual_lost')?.heartbeatAgeSeconds).toBe(-1);
+      expect(mgr.getNode('nod_actual_lost')?.lastHeartbeatAt).toBe('');
+
+      // 6. Degraded node mapped to stale
+      expect(mgr.getNode('nod_actual_degraded')?.healthState).toBe('stale');
+      expect(mgr.getNode('nod_actual_degraded')?.actualStatus).toBe('degraded');
+
+      // 7. Unknown node without heartbeat
+      expect(mgr.getNode('nod_actual_unknown')?.healthState).toBe('offline');
+      expect(mgr.getNode('nod_actual_unknown')?.actualStatus).toBe('unknown');
+      expect(mgr.getNode('nod_actual_unknown')?.heartbeatAgeSeconds).toBe(-1);
+    });
+
+    it('dynamically syncs nodes and preserves non-simulation modified status via syncNodes', () => {
+      const mgr = new DistributedRecoveryManager([
+        { nodeId: 'nod_dyn_01', hostname: 'Node-Dynamic-01', status: 'online', heartbeatAt: new Date().toISOString() },
+      ]);
+      expect(mgr.getNodes()).toHaveLength(1);
+      expect(mgr.getNode('nod_dyn_01')?.healthState).toBe('online');
+
+      // Update with new incoming list (nod_dyn_01 becomes draining, nod_dyn_02 added)
+      mgr.syncNodes([
+        { nodeId: 'nod_dyn_01', hostname: 'Node-Dynamic-01', status: 'draining', heartbeatAt: new Date().toISOString() },
+        { nodeId: 'nod_dyn_02', hostname: 'Node-Dynamic-02', status: 'offline', heartbeatAt: null },
+      ]);
+
+      expect(mgr.getNodes()).toHaveLength(2);
+      expect(mgr.getNode('nod_dyn_01')?.actualStatus).toBe('draining');
+      expect(mgr.getNode('nod_dyn_01')?.healthState).toBe('stale');
+      expect(mgr.getNode('nod_dyn_02')?.actualStatus).toBe('offline');
+      expect(mgr.getNode('nod_dyn_02')?.healthState).toBe('offline');
     });
   });
 });

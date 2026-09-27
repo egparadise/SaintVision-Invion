@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NodeItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
 import { DistributedRecoveryManager, ResilientNodeState } from './recoveryEngine';
@@ -15,7 +15,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         hostname: n.hostname,
         activeWorkspaces: i + 1,
         status: n.status,
-        heartbeatAt: n.heartbeatAt,
+        heartbeatAt: (n as any).heartbeatAt ?? null,
       }))
     );
   });
@@ -35,6 +35,20 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       createdAt: string;
     }>
   >([]);
+
+  // Sync incoming nodes prop with recoveryManager
+  useEffect(() => {
+    recoveryManager.syncNodes(
+      nodes.map((n, i) => ({
+        nodeId: n.id,
+        hostname: n.hostname,
+        activeWorkspaces: i + 1,
+        status: n.status,
+        heartbeatAt: (n as any).heartbeatAt ?? null,
+      }))
+    );
+    setResilientNodes(recoveryManager.getNodes());
+  }, [nodes, recoveryManager]);
 
   const selectedNode = resilientNodes.find((n) => n.nodeId === selectedNodeId) || resilientNodes[0];
 
@@ -76,7 +90,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
     refreshState();
     setActionNotice({
       type: 'info',
-      text: `Heartbeat age for ${selectedNode.hostname} set to 75s (>60s). Health transitioned to STALE (모의 시뮬레이션; 물리 AC-07 UNMEASURED).`,
+      text: `[모의 시뮬레이션] Heartbeat age for ${selectedNode.hostname} set to 75s (>60s). Health updated to STALE (모의 시뮬레이션; 물리 AC-07 UNMEASURED).`,
     });
   };
 
@@ -87,7 +101,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
     refreshState();
     setActionNotice({
       type: 'error',
-      text: `Network partition simulated for ${selectedNode.hostname}. Node isolated & FENCED; Epoch advanced to ${recoveryManager.getNode(selectedNode.nodeId)?.fencingToken.epoch}.`,
+      text: `[모의 시뮬레이션] Network partition simulated for ${selectedNode.hostname}. Node isolated & FENCED; Epoch advanced to ${recoveryManager.getNode(selectedNode.nodeId)?.fencingToken.epoch}.`,
     });
   };
 
@@ -106,12 +120,12 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
     if (!res.success) {
       setActionNotice({
         type: 'error',
-        text: `🛡️ AC-07 Zombie Write Blocked: ${res.error}. Stale writes allowed: ${recoveryManager.getStaleWritesAllowed()} (ZERO LEAK).`,
+        text: `🛡️ [모의 시뮬레이션] AC-07 Zombie Write Blocked: ${res.error}. Stale writes allowed: ${recoveryManager.getStaleWritesAllowed()} (모의 검증).`,
       });
     } else {
       setActionNotice({
         type: 'success',
-        text: `Write accepted.`,
+        text: `[모의 시뮬레이션] Write accepted.`,
       });
     }
   };
@@ -123,7 +137,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
     refreshState();
     setActionNotice({
       type: 'success',
-      text: `✔ Node ${selectedNode.hostname} reconciled! Evacuated ${rec.evacuatedWorkspacesCount} tasks. Advanced to Epoch ${rec.newEpoch}. Status restored to ONLINE.`,
+      text: `✔ [모의 시뮬레이션] Node ${selectedNode.hostname} reconciled! Evacuated ${rec.evacuatedWorkspacesCount} tasks. Advanced to Epoch ${rec.newEpoch}. Status restored to ONLINE.`,
     });
   };
 
@@ -138,12 +152,11 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       {/* Unexposed API Simulation Notice Banner */}
       <div
         role="status"
-        aria-live="polite"
         data-testid="recovery-unexposed-notice"
         style={{
           padding: '12px 16px',
-          backgroundColor: 'rgba(56, 139, 253, 0.15)',
-          border: '1px solid #388bfd',
+          backgroundColor: 'rgba(56, 139, 253, 0.1)',
+          border: '1px solid rgba(56, 139, 253, 0.4)',
           borderRadius: '6px',
           color: '#58a6ff',
           fontSize: '13px',
@@ -176,7 +189,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           >
             UNMEASURED (물리 실측)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Heartbeat 60s 초과 감지 시뮬레이션 (물리 5노드 랩 미측정)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Heartbeat 60s 초과 감지 시뮬레이션 (물리 5노드 랩 실측 미실시)</div>
         </div>
 
         <div
@@ -188,10 +201,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
           }}
         >
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>오래된 토큰(Zombie) 쓰기 수</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
-            {recoveryManager.getStaleWritesAllowed()} 건 (완전 차단)
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#3fb950', marginTop: '4px' }}>
+            {recoveryManager.getStaleWritesAllowed()} 건 (모의 검증; 물리 AC-07 UNMEASURED)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>단조 Fencing Token (Epoch:Seq) 검증</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>단조 Fencing Token (Epoch:Seq) 클라이언트 시뮬레이션 검증</div>
         </div>
 
         <div
@@ -212,10 +225,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
               marginTop: '4px',
             }}
           >
-            {calculatedRate !== null ? `${calculatedRate}% (${successfulCount}/${recoveryCount}회)` : 'UNMEASURED (미측정)'}
+            {calculatedRate !== null ? `${calculatedRate}% (모의 ${successfulCount}/${recoveryCount}회; 물리 AC-07 UNMEASURED)` : 'UNMEASURED (미측정)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {recoveryCount > 0 ? 'Drain 및 Epoch 전진 Consensus' : '복구 이력 부재 (Drain & Reconcile 실행 필요)'}
+            {recoveryCount > 0 ? '클라이언트 인메모리 Drain & Reconcile 시뮬레이션 결과' : '복구 이력 부재 (Drain & Reconcile 실행 필요)'}
           </div>
         </div>
       </div>
@@ -224,7 +237,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       {actionNotice && (
         <div
           role={actionNotice.type === 'error' ? 'alert' : 'status'}
-          aria-live="polite"
+          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
           data-testid="recovery-action-notice"
           style={{
             padding: '12px 18px',
@@ -274,19 +287,19 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         >
           <div style={{ fontSize: '32px' }}>📡</div>
           <div style={{ fontSize: '18px', fontWeight: 600, color: '#f0f6fc' }}>
-            클러스터에 등록된 노드가 없습니다
+            클러스터에 등록된 노드가 없거나 관측 대기 중입니다
           </div>
-          <div style={{ fontSize: '13px', color: '#8b949e', maxWidth: '520px', lineHeight: '1.5' }}>
-            현재 백엔드 제어 평면 또는 관측 파이프라인에서 전달된 가용 노드가 없습니다 (0대).
-            노드가 등록된 후 분산 복구 및 펜싱 시뮬레이션을 실행할 수 있습니다.
+          <div style={{ fontSize: '13px', color: '#8b949e', maxWidth: '560px', lineHeight: '1.5' }}>
+            현재 백엔드 제어 평면 또는 관측 파이프라인에서 전달된 가용 노드가 없습니다 (0대 또는 관측 수집 대기).
+            노드가 등록되거나 관측이 수신된 후 분산 복구 및 펜싱 시뮬레이션을 실행할 수 있습니다.
           </div>
         </div>
       ) : (
         <>
-          {/* 5-Node Resilience Cluster Grid */}
+          {/* Cluster Grid */}
           <div>
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#f0f6fc', marginBottom: '12px' }}>
-              5-Node Cluster Resilience &amp; Fencing Status (AC-07)
+              Cluster Resilience &amp; Fencing Simulation (AC-07 모의 검증)
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
@@ -305,6 +318,8 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     tabIndex={0}
                     data-testid={`node-card-${node.nodeId}`}
                     aria-pressed={isSelected}
+                    aria-current={isSelected ? 'true' : 'false'}
+                    aria-label={`${node.hostname} (실제: ${node.actualStatus || 'unknown'}, 시뮬레이션: ${node.healthState.toUpperCase()})`}
                     onClick={() => setSelectedNodeId(node.nodeId)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -338,7 +353,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                           }}
                           title="백엔드 제어 평면 실제 보고 상태"
                         >
-                          실제: {node.actualStatus || 'healthy'}
+                          실제: {node.actualStatus || 'unknown'}
                         </span>
                         <span
                           data-testid={`node-sim-status-${node.nodeId}`}
@@ -358,10 +373,10 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     </div>
 
                     <div style={{ fontSize: '12px', color: '#8b949e', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div>ID: <code>{node.nodeId}</code></div>
-                      <div>Heartbeat Age: <span style={{ color: node.heartbeatAgeSeconds > 60 ? '#f85149' : '#c9d1d9', fontWeight: 600 }}>{node.heartbeatAgeSeconds}s ago</span></div>
-                      <div>Fencing Lease: <code style={{ color: '#58a6ff' }}>Epoch {node.fencingToken.epoch} : Seq {node.fencingToken.sequence}</code></div>
-                      <div>Active Tasks: <span style={{ color: '#c9d1d9' }}>{node.activeWorkspacesCount}</span></div>
+                      <div>Fencing Token: <code>Epoch {node.fencingToken.epoch} : Seq {node.fencingToken.sequence}</code></div>
+                      <div>Heartbeat: {node.heartbeatAgeSeconds >= 0 ? `${node.heartbeatAgeSeconds}s ago` : '미보고'}</div>
+                      <div>Active Workspaces: {node.activeWorkspacesCount}</div>
+                      <div>Partitioned: {node.isPartitioned ? '🚨 YES (Split-Brain Isolated)' : 'NO'}</div>
                     </div>
                   </div>
                 );
@@ -369,9 +384,62 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             </div>
           </div>
 
-          {/* Simulator Control & Inspection Split */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            {/* Left: Interactive Fault Injection & Recovery Controls */}
+          {/* Targeted Failure Injection Panel */}
+          <div
+            style={{
+              backgroundColor: '#161b22',
+              border: '1px solid #30363d',
+              borderRadius: 'var(--radius-lg, 8px)',
+              padding: '20px',
+            }}
+          >
+            <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#f0f6fc' }}>
+              Fault Injection &amp; Recovery Actions for Target:{' '}
+              <span style={{ color: '#58a6ff' }}>{selectedNode ? selectedNode.hostname : '(선택된 노드 없음)'}</span>
+            </h4>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+              <Button
+                data-testid="simulate-heartbeat-delay-btn"
+                variant="secondary"
+                disabled={!selectedNode}
+                onClick={handleSimulateHeartbeatDrop}
+              >
+                Simulate Heartbeat Delay (75s &gt; 60s Stale Threshold)
+              </Button>
+
+              <Button
+                data-testid="simulate-partition-btn"
+                variant="danger"
+                disabled={!selectedNode}
+                onClick={handleSimulatePartition}
+              >
+                Simulate Network Partition / Split-Brain
+              </Button>
+
+              <Button
+                data-testid="attempt-zombie-write-btn"
+                variant="secondary"
+                disabled={!selectedNode}
+                onClick={handleAttemptZombieWrite}
+              >
+                Attempt Stale Token Write (Zombie Task)
+              </Button>
+
+              <Button
+                data-testid="drain-reconcile-btn"
+                variant="primary"
+                disabled={!selectedNode}
+                onClick={handleDrainAndReconcile}
+              >
+                Drain &amp; Reconcile Node
+              </Button>
+            </div>
+          </div>
+
+          {/* Audit Logs & Rejections Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+            {/* ADR-043 Writable Generation Panel */}
             <div
               style={{
                 backgroundColor: '#161b22',
@@ -380,38 +448,55 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
+                gap: '12px',
               }}
             >
-              <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-                  Fault Injection &amp; Recovery Controls: <span style={{ color: '#58a6ff' }}>{selectedNode ? selectedNode.hostname : '(선택된 노드 없음)'}</span>
+                  ADR-043 Writable Generation &amp; Checkouts
                 </h4>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-                  Execute distributed partition, stale token attack, or node drain &amp; reconciliation.
-                </p>
+                <Button
+                  data-testid="create-checkout-btn"
+                  variant="primary"
+                  size="sm"
+                  disabled={!selectedNode}
+                  onClick={handleCreateCheckout}
+                >
+                  새 Generation 체크아웃 생성 (모의)
+                </Button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <Button variant="secondary" onClick={handleSimulateHeartbeatDrop} disabled={!selectedNode}>
-                  ⏱️ Simulate Heartbeat Delay (75s &gt; 60s Stale Threshold)
-                </Button>
-
-                <Button variant="secondary" onClick={handleSimulatePartition} disabled={!selectedNode} style={{ color: '#a371f7', borderColor: '#a371f7' }}>
-                  ⚡ Simulate Network Partition &amp; Split-Brain Fencing
-                </Button>
-
-                <Button variant="secondary" onClick={handleAttemptZombieWrite} disabled={!selectedNode} style={{ color: '#f85149', borderColor: '#f85149' }}>
-                  🚫 Attempt Stale Token Write (Simulate Zombie Worker)
-                </Button>
-
-                <Button variant="primary" onClick={handleDrainAndReconcile} disabled={!selectedNode}>
-                  🛡️ Drain &amp; Reconcile Node (Restore &amp; Advance Epoch)
-                </Button>
+              <div style={{ flex: 1, minHeight: '200px', maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {checkouts.length === 0 ? (
+                  <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
+                    생성된 시뮬레이션 체크아웃이 없습니다.
+                  </div>
+                ) : (
+                  checkouts.map((chk) => (
+                    <div
+                      key={chk.checkoutId}
+                      style={{
+                        backgroundColor: '#0d1117',
+                        border: '1px solid #30363d',
+                        borderRadius: '6px',
+                        padding: '10px 14px',
+                        fontSize: '12px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#58a6ff', fontWeight: 600 }}>
+                        <span>{chk.checkoutId}</span>
+                        <span style={{ color: '#3fb950' }}>{chk.status.toUpperCase()}</span>
+                      </div>
+                      <div style={{ color: '#8b949e', marginTop: '4px' }}>
+                        Inode: <code>{chk.inode}</code> | Permissions: <code>{chk.permissions}</code> | Epoch: <code>{chk.epoch}</code>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
-            {/* Right: Monotonic Fencing Lease & Late Result Rejections */}
+            {/* Late Result Rejection Audit Stream */}
             <div
               style={{
                 backgroundColor: '#161b22',
@@ -420,11 +505,12 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
+                gap: '12px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-                  Late Result Rejections (AC-07 Zero Stale Writes)
+                  Late Result Rejection Stream (Monotonic Fencing)
                 </h4>
                 <span style={{ fontSize: '12px', color: '#8b949e' }}>
                   Total Rejections: {lateRejections.length}
@@ -478,131 +564,38 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             </h4>
 
             {reconciliations.length === 0 ? (
-              <div style={{ color: '#8b949e', fontSize: '13px' }}>
-                No recovery reconciliations recorded yet. Drain &amp; Reconcile a node to record audit events.
+              <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', padding: '16px' }}>
+                No node reconciliations triggered yet.
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                    <th style={{ padding: '8px' }}>Reconciliation ID</th>
-                    <th style={{ padding: '8px' }}>Node ID</th>
-                    <th style={{ padding: '8px' }}>Evacuated Tasks</th>
-                    <th style={{ padding: '8px' }}>New Epoch</th>
-                    <th style={{ padding: '8px' }}>Status</th>
-                    <th style={{ padding: '8px' }}>Timestamp</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reconciliations.map((rec) => (
-                    <tr key={rec.reconciliationId} style={{ borderBottom: '1px solid #21262d' }}>
-                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{rec.reconciliationId}</td>
-                      <td style={{ padding: '8px' }}>{rec.nodeId}</td>
-                      <td style={{ padding: '8px' }}>{rec.evacuatedWorkspacesCount} workspaces</td>
-                      <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {rec.newEpoch}</td>
-                      <td style={{ padding: '8px', color: rec.recoverySuccess ? '#3fb950' : '#f85149', fontWeight: 600 }}>
-                        {rec.recoverySuccess ? 'RECOVERED' : 'FAILED'}
-                      </td>
-                      <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(rec.timestamp).toLocaleTimeString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          {/* ADR-043 Writable Generations & Working Checkouts */}
-          <div
-            style={{
-              backgroundColor: '#161b22',
-              border: '1px solid #30363d',
-              borderRadius: 'var(--radius-lg, 8px)',
-              padding: '20px',
-              marginTop: '20px',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <div>
-                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-                  Working Generations &amp; Workspace Checkouts (ADR-043 수정 가능한 작업 사본)
-                </h4>
-                <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-                  격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
-                </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {reconciliations.map((rec) => (
+                  <div
+                    key={rec.reconciliationId}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: '#0d1117',
+                      padding: '10px 14px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      border: '1px solid #30363d',
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#f0f6fc' }}>Node: {rec.nodeId}</span>
+                      <span style={{ color: '#8b949e', marginLeft: '12px' }}>
+                        Evacuated: <strong>{rec.evacuatedWorkspacesCount}</strong> workspaces
+                      </span>
+                      <span style={{ color: '#8b949e', marginLeft: '12px' }}>
+                        New Fencing Epoch: <strong>{rec.newEpoch}</strong>
+                      </span>
+                    </div>
+                    <span style={{ color: '#3fb950', fontWeight: 600, fontSize: '12px' }}>RECOVERY COMPLETE</span>
+                  </div>
+                ))}
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                data-testid="create-checkout-btn"
-                disabled={!selectedNode}
-                onClick={handleCreateCheckout}
-              >
-                + 새 수정 가능 작업 사본 체크아웃 (Working Generation)
-              </Button>
-            </div>
-
-            {checkouts.length === 0 ? (
-              <div
-                data-testid="recovery-no-checkouts"
-                style={{
-                  padding: '24px',
-                  textAlign: 'center',
-                  color: '#8b949e',
-                  fontSize: '13px',
-                  backgroundColor: '#0d1117',
-                  borderRadius: '6px',
-                }}
-              >
-                활성화된 수정 가능 세대(Working Generation) 체크아웃이 없습니다.
-              </div>
-            ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-                    <th style={{ padding: '8px' }}>Checkout ID</th>
-                    <th style={{ padding: '8px' }}>Target Node</th>
-                    <th style={{ padding: '8px' }}>Directory Inode</th>
-                    <th style={{ padding: '8px' }}>POSIX Permissions</th>
-                    <th style={{ padding: '8px' }}>Checkpoint Hash</th>
-                    <th style={{ padding: '8px' }}>Fencing Epoch</th>
-                    <th style={{ padding: '8px' }}>Status</th>
-                    <th style={{ padding: '8px' }}>Created At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {checkouts.map((chk) => (
-                    <tr key={chk.checkoutId} style={{ borderBottom: '1px solid #21262d' }}>
-                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontWeight: 600 }}>
-                        {chk.checkoutId}
-                      </td>
-                      <td style={{ padding: '8px' }}>{chk.nodeId}</td>
-                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)' }}>{chk.inode}</td>
-                      <td style={{ padding: '8px' }}>
-                        <span
-                          style={{
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            fontSize: '11px',
-                            backgroundColor: 'rgba(56, 139, 253, 0.15)',
-                            color: '#58a6ff',
-                            border: '1px solid rgba(56, 139, 253, 0.4)',
-                          }}
-                        >
-                          {chk.permissions}
-                        </span>
-                      </td>
-                      <td style={{ padding: '8px', fontFamily: 'var(--font-mono, monospace)', fontSize: '12px' }}>
-                        {chk.checkpointSha.slice(0, 18)}...
-                      </td>
-                      <td style={{ padding: '8px', color: '#58a6ff' }}>Epoch {chk.epoch}</td>
-                      <td style={{ padding: '8px', color: '#3fb950', fontWeight: 600 }}>
-                        ✓ {chk.status.toUpperCase()} (WRITABLE)
-                      </td>
-                      <td style={{ padding: '8px', color: '#8b949e' }}>{new Date(chk.createdAt).toLocaleTimeString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             )}
           </div>
         </>

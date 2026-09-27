@@ -21,7 +21,7 @@ const MOCK_NODES: NodeItem[] = [
     memoryUsagePercent: 30,
     gpuName: 'NVIDIA RTX 4090',
     gpuCount: 1,
-    status: 'healthy',
+    status: 'online',
     labels: { tier: 'gpu' },
   },
 ];
@@ -184,7 +184,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
       const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]');
       expect(emptyScreen).not.toBeNull();
-      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없습니다');
+      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없거나 관측 대기 중입니다');
       expect(emptyScreen?.textContent).toContain('0대');
       const nodeCards = container.querySelectorAll('[data-testid^="node-card-"]');
       expect(nodeCards.length).toBe(0);
@@ -205,14 +205,12 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(rateTile).not.toBeNull();
       expect(rateTile?.textContent).toContain('UNMEASURED (미측정)');
 
-      // 3. Heartbeat Drop 버튼 클릭
-      const hbBtn = Array.from(container.querySelectorAll('button')).find((b) =>
-        b.textContent?.includes('Simulate Heartbeat Drop (>60s)')
-      );
-      expect(hbBtn).toBeDefined();
+      // 3. Heartbeat Delay 버튼 클릭 (정확한 data-testid 셀렉터 사용)
+      const hbBtn = container.querySelector('[data-testid="simulate-heartbeat-delay-btn"]') as HTMLButtonElement;
+      expect(hbBtn).not.toBeNull();
 
       act(() => {
-        hbBtn?.click();
+        hbBtn.click();
       });
 
       // 4. 액션 알림창에서 '(AC-07 verified)'가 없어야 하고 '(모의 시뮬레이션; 물리 AC-07 UNMEASURED)'가 포함되어야 함
@@ -222,18 +220,70 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(notice?.textContent).toContain('(모의 시뮬레이션; 물리 AC-07 UNMEASURED)');
     });
 
-    it('Defect 3: 노드 카드에 백엔드 제어 평면 실제 보고 상태와 클라이언트 시뮬레이션 상태를 분리 표기한다', () => {
+    it('Defect 3: 노드 카드에 백엔드 제어 평면 실제 보고 상태(offline/lost/degraded)와 클라이언트 시뮬레이션 상태를 정확히 분리 표기한다', () => {
+      const TEST_NODES: NodeItem[] = [
+        {
+          id: 'nod_offline_01',
+          hostname: 'node-offline-01',
+          os: 'windows',
+          cpuCores: 8,
+          cpuUsagePercent: 10,
+          memoryTotalBytes: 32 * 1024 ** 3,
+          memoryUsagePercent: 20,
+          status: 'offline',
+          heartbeatAt: new Date(Date.now() - 75000).toISOString(),
+        },
+        {
+          id: 'nod_lost_02',
+          hostname: 'node-lost-02',
+          os: 'linux',
+          cpuCores: 4,
+          cpuUsagePercent: 5,
+          memoryTotalBytes: 16 * 1024 ** 3,
+          memoryUsagePercent: 10,
+          status: 'lost',
+          heartbeatAt: null,
+        },
+        {
+          id: 'nod_degraded_03',
+          hostname: 'node-degraded-03',
+          os: 'linux',
+          cpuCores: 16,
+          cpuUsagePercent: 50,
+          memoryTotalBytes: 64 * 1024 ** 3,
+          memoryUsagePercent: 60,
+          status: 'degraded',
+          heartbeatAt: new Date(Date.now() - 10000).toISOString(),
+        },
+      ];
+
       act(() => {
-        root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
+        root.render(<DistributedRecoveryView nodes={TEST_NODES} />);
       });
 
-      const actualBadge = container.querySelector('[data-testid="node-actual-status-nod_test_01"]');
-      expect(actualBadge).not.toBeNull();
-      expect(actualBadge?.textContent).toContain('실제: healthy');
+      // 1. offline 노드 검증
+      const actualOffline = container.querySelector('[data-testid="node-actual-status-nod_offline_01"]');
+      expect(actualOffline).not.toBeNull();
+      expect(actualOffline?.textContent).toContain('실제: offline');
+      const simOffline = container.querySelector('[data-testid="node-sim-status-nod_offline_01"]');
+      expect(simOffline).not.toBeNull();
+      expect(simOffline?.textContent).toContain('시뮬레이션: OFFLINE');
 
-      const simBadge = container.querySelector('[data-testid="node-sim-status-nod_test_01"]');
-      expect(simBadge).not.toBeNull();
-      expect(simBadge?.textContent).toContain('시뮬레이션: HEALTHY');
+      // 2. lost 노드 검증 (하트비트 부재 시 ONLINE으로 둔갑하지 않고 OFFLINE)
+      const actualLost = container.querySelector('[data-testid="node-actual-status-nod_lost_02"]');
+      expect(actualLost).not.toBeNull();
+      expect(actualLost?.textContent).toContain('실제: lost');
+      const simLost = container.querySelector('[data-testid="node-sim-status-nod_lost_02"]');
+      expect(simLost).not.toBeNull();
+      expect(simLost?.textContent).toContain('시뮬레이션: OFFLINE');
+
+      // 3. degraded 노드 검증 (STALE 매핑)
+      const actualDegraded = container.querySelector('[data-testid="node-actual-status-nod_degraded_03"]');
+      expect(actualDegraded).not.toBeNull();
+      expect(actualDegraded?.textContent).toContain('실제: degraded');
+      const simDegraded = container.querySelector('[data-testid="node-sim-status-nod_degraded_03"]');
+      expect(simDegraded).not.toBeNull();
+      expect(simDegraded?.textContent).toContain('시뮬레이션: STALE');
     });
 
     it('Defect 4: 조작 시 액션 알림창(recovery-action-notice)에 role="status" / "alert" 및 aria-live 속성을 올바르게 적용한다', () => {
@@ -241,24 +291,35 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
       });
 
-      // Network Partition 버튼 클릭 -> 에러 알림 (role="alert")
-      const partitionBtn = Array.from(container.querySelectorAll('button')).find((b) =>
-        b.textContent?.includes('Simulate Network Partition')
-      );
-      expect(partitionBtn).toBeDefined();
+      // Network Partition 버튼 클릭 -> 에러 알림 (role="alert", aria-live="assertive")
+      const partitionBtn = container.querySelector('[data-testid="simulate-partition-btn"]') as HTMLButtonElement;
+      expect(partitionBtn).not.toBeNull();
 
       act(() => {
-        partitionBtn?.click();
+        partitionBtn.click();
       });
 
       const notice = container.querySelector('[data-testid="recovery-action-notice"]');
       expect(notice).not.toBeNull();
       expect(notice?.getAttribute('role')).toBe('alert');
-      expect(notice?.getAttribute('aria-live')).toBe('polite');
+      expect(notice?.getAttribute('aria-live')).toBe('assertive');
       expect(notice?.textContent).toContain('Network partition simulated');
+
+      // 체크아웃 생성 버튼 클릭 -> 정보 알림 (role="status", aria-live="polite")
+      const checkoutBtn = container.querySelector('[data-testid="create-checkout-btn"]') as HTMLButtonElement;
+      expect(checkoutBtn).not.toBeNull();
+
+      act(() => {
+        checkoutBtn.click();
+      });
+
+      const infoNotice = container.querySelector('[data-testid="recovery-action-notice"]');
+      expect(infoNotice).not.toBeNull();
+      expect(infoNotice?.getAttribute('role')).toBe('status');
+      expect(infoNotice?.getAttribute('aria-live')).toBe('polite');
     });
 
-    it('Defect 5: 노드 카드에 role="button", tabIndex=0, aria-pressed 속성을 부여하고 키보드(Enter/Space) 조작을 지원한다', () => {
+    it('Defect 5: 노드 카드에 role="button", tabIndex=0, aria-pressed, aria-current 속성을 부여하고 키보드(Enter/Space) 조작을 지원한다', () => {
       const TWO_NODES: NodeItem[] = [
         ...MOCK_NODES,
         {
@@ -271,7 +332,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
           memoryUsagePercent: 25,
           gpuName: 'NVIDIA RTX 3080',
           gpuCount: 1,
-          status: 'healthy',
+          status: 'online',
           labels: { tier: 'general' },
         },
       ];
@@ -288,7 +349,9 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(card1?.getAttribute('role')).toBe('button');
       expect(card1?.getAttribute('tabindex')).toBe('0');
       expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card1?.getAttribute('aria-current')).toBe('true');
       expect(card2?.getAttribute('aria-pressed')).toBe('false');
+      expect(card2?.getAttribute('aria-current')).toBe('false');
 
       // 키보드 Enter 키로 2번 노드 선택
       act(() => {
@@ -296,7 +359,9 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       });
 
       expect(card1?.getAttribute('aria-pressed')).toBe('false');
+      expect(card1?.getAttribute('aria-current')).toBe('false');
       expect(card2?.getAttribute('aria-pressed')).toBe('true');
+      expect(card2?.getAttribute('aria-current')).toBe('true');
 
       // 키보드 Space 키로 1번 노드 재선택
       act(() => {
@@ -304,7 +369,9 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       });
 
       expect(card1?.getAttribute('aria-pressed')).toBe('true');
+      expect(card1?.getAttribute('aria-current')).toBe('true');
       expect(card2?.getAttribute('aria-pressed')).toBe('false');
+      expect(card2?.getAttribute('aria-current')).toBe('false');
     });
   });
 
