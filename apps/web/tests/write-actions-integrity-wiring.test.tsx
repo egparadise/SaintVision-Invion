@@ -309,6 +309,7 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
       expect(mockNotice?.getAttribute('role')).toBe('status');
       expect(mockNotice?.textContent).toContain('모의 시뮬레이션 고지');
       expect(mockNotice?.textContent).toContain('백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다');
+      expect(mockNotice?.textContent).toContain('노드 격리(Drain/Resume) 제어는 비상 정지 상태에서도 안전한 장애 격리를 위해 계속 허용됩니다');
 
       // 비상 정지 확정 실행
       const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;

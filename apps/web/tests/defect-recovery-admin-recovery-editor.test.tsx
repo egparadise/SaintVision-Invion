@@ -296,6 +296,95 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(drainPosts).toHaveLength(0);
     });
 
+    it('로컬 Kill Switch가 활성화된 상태에서도 백엔드 정본 Drain 버튼이 활성화되어 있고 /drain POST를 1회 호출한다', async () => {
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          return {
+            version: 5,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+          } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          return {
+            control: {
+              nodeStatus: 'draining',
+              version: 6,
+            },
+          } as any;
+        }
+        if (endpoint === '/v1/operations/kill-switch') {
+          return {
+            version: 1,
+            killSwitchActive: false,
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. 로컬 비상 Kill Switch 활성화
+      const killSwitchToggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+      expect(killSwitchToggleBtn).not.toBeNull();
+      await act(async () => {
+        killSwitchToggleBtn.click();
+      });
+
+      const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+      expect(confirmBtn).not.toBeNull();
+      await act(async () => {
+        confirmBtn.click();
+      });
+
+      // 상단 활성 배너 노출 확인
+      const activeBanner = container.querySelector('[data-testid="kill-switch-active-banner"]');
+      expect(activeBanner).not.toBeNull();
+
+      // 2. Drain 통제 서브탭으로 전환
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // 3. 승인 UUID 입력
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      expect(approvalInput).not.toBeNull();
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '11111111-2222-4333-8444-555555555555');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      // 4. 로컬 Kill Switch 활성 상태임에도 백엔드 정본 격리 제어 버튼은 활성(disabled=false) 유지 단언
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+      expect(drainBtn).toBeDefined();
+      expect(drainBtn.disabled).toBe(false);
+
+      // 5. Drain 액션 실행 및 /drain POST 1회 호출 단언
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      const drainPosts = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
+      expect(drainPosts).toHaveLength(1);
+      const parsedBody = JSON.parse(drainPosts[0][1].body);
+      expect(parsedBody.expectedVersion).toBe(5);
+      expect(parsedBody.approvalId).toBe('11111111-2222-4333-8444-555555555555');
+    });
+
     it('백엔드 Kill Switch 403 AUTH-0062 실패 시 "조회 실패 [AUTH-0062]"를 표시한다', async () => {
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
