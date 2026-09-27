@@ -1098,6 +1098,7 @@ def create_configured_app():
             "modelRegistryPolicy",
             "modelVerifier",
             "placementShortCommit",
+            "configurationReadiness",
         }:
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
@@ -1132,7 +1133,7 @@ def create_configured_app():
                 database,
                 ConfiguredModelVerifier(**configured_model_roots(settings["modelVerifier"])),
             )
-        from saintvision.config import unresolved_s01_settings
+        from .configuration_readiness import configured_s01_readiness
 
         return create_app(
             database,
@@ -1141,7 +1142,9 @@ def create_configured_app():
             workspace=workspace,
             business=business,
             model_retry=model_retry,
-            unresolved_settings=unresolved_s01_settings,
+            unresolved_settings=configured_s01_readiness(
+                settings.get("configurationReadiness")
+            ),
         )
     except Exception:
         raise RuntimeError(

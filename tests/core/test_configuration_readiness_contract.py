@@ -17,7 +17,8 @@ from inv.contracts import validate_contract
 from inv.errors import DomainError
 from inv.generated.models import ConfigurationReadinessView
 from jwt_support import jwt_fixture
-from saintvision.config import unresolved_s01_settings
+from inv.configuration_readiness import configured_s01_readiness
+from pki_support import authority, issue
 
 
 FIXTURE = (
@@ -72,10 +73,14 @@ def auth(tmp_path):
     return jwt_fixture(tmp_path, str(uuid4()))
 
 
-def _client(auth, *, operator=True):
+def _client(auth, *, operator=True, unresolved_settings=None):
     database = _Database(operator=operator)
     client = TestClient(
-        create_app(database, auth.auth, unresolved_settings=unresolved_s01_settings),
+        create_app(
+            database,
+            auth.auth,
+            unresolved_settings=unresolved_settings or configured_s01_readiness({}),
+        ),
         raise_server_exceptions=False,
     )
     headers = {"Authorization": "Bearer " + auth.token()}
@@ -117,8 +122,6 @@ def test_runtime_contract_rejects_duplicate_setting_names():
 
 
 def test_operator_route_reports_names_only_and_anchors_response_contract(auth, monkeypatch):
-    for name in SETTING_NAMES:
-        monkeypatch.delenv(name, raising=False)
     observed = []
     real_validate = app_module.validate_contract
 
@@ -141,15 +144,49 @@ def test_operator_route_reports_names_only_and_anchors_response_contract(auth, m
     assert all("value" not in key.lower() for key in response.json())
 
 
-def test_operator_route_reports_ready_without_echoing_values(auth, monkeypatch):
-    for name in SETTING_NAMES:
-        monkeypatch.setenv(name, f"private-{name.lower()}")
-    client, headers, _ = _client(auth)
+def test_operator_route_reports_ready_without_echoing_values(auth, tmp_path):
+    ca_file = tmp_path / "node-ca.pem"
+    ca_file.write_bytes(authority().pem)
+    endpoint = "https://objects.example.invalid:9443/saintvision"
+    provider = configured_s01_readiness(
+        {"nodeMtlsCaBundle": str(ca_file.resolve()), "objectStoreEndpoint": endpoint}
+    )
+    client, headers, _ = _client(auth, unresolved_settings=provider)
     response = client.get("/v1/operations/configuration-readiness", headers=headers)
 
     assert response.status_code == 200
     assert response.json() == {"status": "ready", "unresolvedSettings": []}
-    assert "private-" not in response.text
+    assert str(ca_file) not in response.text and endpoint not in response.text
+
+
+def test_one_invalid_setting_keeps_the_route_blocked(auth, tmp_path):
+    ca_file = tmp_path / "node-ca.pem"
+    ca_file.write_bytes(authority().pem)
+    provider = configured_s01_readiness(
+        {"nodeMtlsCaBundle": str(ca_file.resolve()), "objectStoreEndpoint": "not-a-url"}
+    )
+    client, headers, _ = _client(auth, unresolved_settings=provider)
+    response = client.get("/v1/operations/configuration-readiness", headers=headers)
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "blocked",
+        "unresolvedSettings": ["INV_OBJECT_STORE_ENDPOINT"],
+    }
+
+
+@pytest.mark.parametrize("ca_case", ["missing", "malformed", "leaf"])
+def test_missing_malformed_or_non_ca_pem_is_unresolved(tmp_path, ca_case):
+    path = tmp_path / "node-ca.pem"
+    if ca_case == "malformed":
+        path.write_text("-----BEGIN CERTIFICATE-----\ninvalid\n-----END CERTIFICATE-----\n")
+    elif ca_case == "leaf":
+        ca = authority()
+        path.write_bytes(issue(ca, "spiffe://saintvision.test/node", server=True).pem)
+    provider = configured_s01_readiness(
+        {"nodeMtlsCaBundle": str(path.resolve()), "objectStoreEndpoint": "http://minio:9000"}
+    )
+    assert provider() == ["INV_NODE_MTLS_CA_BUNDLE"]
 
 
 def test_operator_route_requires_bearer_and_current_operator_grant(auth):
