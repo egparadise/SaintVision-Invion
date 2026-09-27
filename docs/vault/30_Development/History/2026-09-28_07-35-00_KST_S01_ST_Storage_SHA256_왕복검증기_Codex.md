@@ -1,0 +1,53 @@
+---
+doc_id: "HIST-CODEX-S01-ST-STORAGE-ROUNDTRIP-001"
+title: "S01-ST Storage SHA-256 왕복 검증기"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+reviewer: "Claude"
+updated: "2026-09-28T07:35:00+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+task_ids: ["S01-ST"]
+tags: ["history", "s01", "storage", "sha256", "artifact", "minio", "hosted-ci"]
+---
+
+# S01-ST Storage SHA-256 왕복 검증기
+
+## 범위와 결정
+
+- branch `agent/codex/s01-storage-roundtrip`, base `1e8baf04`, owner Codex, reviewer Claude다.
+- 현재 제품 byte provider는 `LocalObjects`이고 S3 adapter·공개 Artifact upload API는 없다. 따라서 이 카드는 S3 호환 후보의 실제 byte PUT/GET/DELETE와 제품 `artifact_content_response()`의 `X-Content-SHA256` 경계를 연결하는 preflight다. Run 전체 저장 경로나 운영 object store 선정 완료를 주장하지 않는다.
+- endpoint·bucket·완전한 자격이 없거나 env와 보호 volume 자격이 모순되면 외부 호출 없이 `BLOCKED`/exit 3이다. 결과 JSON/JUnit에는 endpoint·bucket·object key·access key·secret·provider 오류 원문을 넣지 않는다.
+- hosted Core `run-core` 레인만 고정 MinIO 후보를 기동한다. 로컬 Docker와 PostgreSQL은 실행하지 않았다.
+
+## 설계 → 시험 → 구현
+
+1. 설계 commit `5d3ed7ff`에서 입력·redaction·삭제/404 증명·#122 U6·#129 설정 route 경계를 먼저 고정했다.
+2. 시험 commit `d8588b4c`에서 구현 파일 부재로 예상된 `FileNotFoundError`, pytest exit 2를 확인했다.
+3. 구현 commit `1d24f690`은 AWS SigV4 path-style PUT/GET/DELETE, body/metadata digest, 제품 `X-Content-SHA256`·`Content-Length`·opaque body, `finally` 삭제와 GET 404를 검증한다. hosted workflow는 test bucket 생성과 verifier 실행 뒤 container를 `always()`로 제거하고 redacted JSON/JUnit 및 해석된 image digest를 artifact로 보존한다.
+
+## 로컬 검증
+
+실행 환경은 Windows, Python `D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe`이며 object-store 자격과 외부 endpoint는 주입하지 않았다.
+
+| 검증 | 결과 |
+|---|---|
+| `python -m pytest tests/core/test_storage_roundtrip_verifier.py -q` | 15 passed, exit 0 |
+| 입력 없는 CLI 실행 | `BLOCKED`, exit 3, network call 0 |
+| `yaml.safe_load(.github/workflows/core.yml)` | parse 성공, exit 0 |
+| `actionlint` | 실행 파일 부재로 NOT_RUN; hosted GitHub parser로 후속 확인 |
+| `python tools/check_docs.py` | 894 versioned documents, exit 0 |
+| `python tools/check_contract_bindings.py` | 54 fixtures/19 response types/14 replay guards, exit 0 |
+| `python tools/check_ontology.py` | 48 task mappings/invalid fixture 4건 거부, exit 0 |
+| `python tools/check_doc_single_source.py --ratchet` | baseline 18 pairs, 신규 중복 0, exit 0 |
+| `git diff --check` | exit 0 |
+
+## hosted 증거와 남은 경계
+
+- PR과 `run-core` hosted 실행은 아직 PENDING이다. 동일 SHA에서 MinIO 기동, 1 tests/0 failures/0 skipped JUnit, `status=PASS`, 모든 check true, cleanup 404를 확인하기 전 실측 완료로 쓰지 않는다.
+- #129 route는 endpoint·CA의 구조적 readiness만 반환하며 이 왕복 결과를 저장하거나 합성하지 않는다.
+- #122의 후속 `--storage-evidence`는 reachable `codeSha`, UTC `observedAt`, PASS, 모든 필수 check true일 때만 U6 Storage 왕복을 PASS로 볼 수 있다. 이 카드에서 #122 branch는 수정하지 않는다.
+- 운영 TLS·전용 service credential·Run `OutputIngestion`→S3 adapter→DB commitment·90일/1년/35일 retention/GC·복원 실측은 여전히 UNMEASURED/BLOCKED다.
+
+다음 담당은 Claude 독립 검토다. 병합은 사용자/코디네이터 결정이며 Codex는 병합하지 않는다.

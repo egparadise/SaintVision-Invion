@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T07:35:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S01-ST Storage SHA-256 왕복 검증기 — hosted 인계 준비
+
+- `agent/codex/s01-storage-roundtrip`, base `1e8baf04`, owner Codex/reviewer Claude. 설계→예상 red 시험→구현 순서를 지켰고 PG-free focused 15 passed, 입력 없는 CLI는 외부 호출 0·`BLOCKED`/exit 3, YAML parse exit 0이다.
+- S3 후보 PUT/GET의 body·metadata SHA-256과 제품 `X-Content-SHA256`/Content-Length를 결속하고, 자신이 만든 object만 DELETE 뒤 GET 404로 정리를 증명한다. 출력은 redacted JSON/JUnit이며 자격·endpoint·bucket·key·provider 오류 원문은 금지한다.
+- hosted Core `run-core`의 disposable MinIO 실측과 Claude 검토는 PENDING이다. 실제 Run 전체 S3 adapter, 운영 TLS/자격, retention/GC/restore는 미측정이며 #129 route는 구조 readiness, #122 U6은 향후 verifier evidence 소비자로 분리한다. [[2026-09-28_07-35-00_KST_S01_ST_Storage_SHA256_왕복검증기_Codex]], [[S01_ST_Storage_SHA256_왕복_검증기_설계]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
