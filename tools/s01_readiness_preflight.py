@@ -48,7 +48,28 @@ _STORAGE_CHECKS = (
     "delete",
     "cleanupVerified",
 )
-_PROCEDURE_FIELDS = ("executedBy", "configurationProfile", "runbookRevision")
+_STORAGE_EVIDENCE_FIELDS = frozenset(
+    {
+        "schemaVersion",
+        "status",
+        "targetKind",
+        "checks",
+        "payloadBytes",
+        "cleanupVerified",
+        "codeSha",
+        "observedAt",
+    }
+)
+_STORAGE_ATTESTATION_FIELDS = frozenset(
+    {
+        "executedBy",
+        "configurationProfile",
+        "runbookRevision",
+        "codeSha",
+        "observedAt",
+    }
+)
+_ATTESTATION_TEXT_FIELDS = ("executedBy", "configurationProfile", "runbookRevision")
 _DEFAULT_EVIDENCE_MAX_AGE = timedelta(hours=24)
 _FORBIDDEN_REPORT_KEYS = {
     "token",
@@ -969,6 +990,7 @@ def _commit_reachable(code_sha: str) -> bool:
 
 def evaluate_storage_evidence(
     payload: Any,
+    attestation: Any,
     *,
     now: datetime | None = None,
     reachable: Callable[[str], bool] | None = None,
@@ -976,7 +998,13 @@ def evaluate_storage_evidence(
 ) -> dict[str, Any]:
     """Validate operational roundtrip evidence without returning any input value."""
 
+    payload_shape_valid = isinstance(payload, dict) and set(payload) == set(
+        _STORAGE_EVIDENCE_FIELDS
+    )
     checks = payload.get("checks") if isinstance(payload, dict) else None
+    checks_shape_valid = isinstance(checks, dict) and set(checks) == set(
+        _STORAGE_CHECKS
+    )
     verified_count = (
         sum(checks.get(name) is True for name in _STORAGE_CHECKS)
         if isinstance(checks, dict)
@@ -1006,26 +1034,39 @@ def evaluate_storage_evidence(
         except ValueError:
             observed_valid = False
 
-    procedure = payload.get("operatorProcedure") if isinstance(payload, dict) else None
-    procedure_complete = isinstance(procedure, dict) and set(procedure) == set(
-        _PROCEDURE_FIELDS
+    attestation_complete = isinstance(attestation, dict) and set(attestation) == set(
+        _STORAGE_ATTESTATION_FIELDS
     )
-    if procedure_complete:
-        procedure_complete = all(
-            isinstance(procedure[field], str)
-            and bool(procedure[field].strip())
-            and len(procedure[field]) <= 200
-            for field in _PROCEDURE_FIELDS
+    if attestation_complete:
+        attestation_complete = all(
+            isinstance(attestation[field], str)
+            and bool(attestation[field].strip())
+            and len(attestation[field]) <= 200
+            for field in _ATTESTATION_TEXT_FIELDS
+        ) and all(
+            isinstance(attestation[field], str)
+            for field in ("codeSha", "observedAt")
         )
+    attestation_bound = bool(
+        attestation_complete
+        and isinstance(payload, dict)
+        and attestation["codeSha"] == payload.get("codeSha")
+        and attestation["observedAt"] == payload.get("observedAt")
+    )
 
     facts = {
         "requiredCheckCount": len(_STORAGE_CHECKS),
         "verifiedCheckCount": verified_count,
         "codeReachable": code_reachable,
         "observedAtValid": observed_valid,
-        "procedureComplete": procedure_complete,
+        "attestationComplete": attestation_complete,
+        "attestationBound": attestation_bound,
     }
-    if not isinstance(payload, dict) or payload.get("schemaVersion") != "1.1":
+    if (
+        not payload_shape_valid
+        or not checks_shape_valid
+        or payload.get("schemaVersion") != "1.1"
+    ):
         return _check(
             "storage-roundtrip-evidence", "BLOCKED", "storage-evidence-invalid", **facts
         )
@@ -1034,19 +1075,6 @@ def evaluate_storage_evidence(
             "storage-roundtrip-evidence",
             "BLOCKED",
             "storage-evidence-not-operational",
-            **facts,
-        )
-    evidence_verified = (
-        payload.get("status") == "PASS"
-        and verified_count == len(_STORAGE_CHECKS)
-        and payload.get("cleanupVerified") is True
-        and _positive_integer(payload.get("payloadBytes"))
-    )
-    if not evidence_verified:
-        return _check(
-            "storage-roundtrip-evidence",
-            "BLOCKED",
-            "storage-evidence-unverified",
             **facts,
         )
     if not code_reachable:
@@ -1063,11 +1091,31 @@ def evaluate_storage_evidence(
             "storage-evidence-time-invalid",
             **facts,
         )
-    if not procedure_complete:
+    if not attestation_complete or not attestation_bound:
         return _check(
             "storage-roundtrip-evidence",
             "BLOCKED",
-            "storage-evidence-procedure-incomplete",
+            "storage-attestation-invalid",
+            **facts,
+        )
+    if payload.get("status") == "FAIL":
+        return _check(
+            "storage-roundtrip-evidence",
+            "FAIL",
+            "storage-operational-evidence-failed",
+            **facts,
+        )
+    evidence_verified = (
+        payload.get("status") == "PASS"
+        and verified_count == len(_STORAGE_CHECKS)
+        and payload.get("cleanupVerified") is True
+        and _positive_integer(payload.get("payloadBytes"))
+    )
+    if not evidence_verified:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-unverified",
             **facts,
         )
     return _check(
@@ -1080,28 +1128,38 @@ def evaluate_storage_evidence(
 
 def probe_storage_evidence(
     path: Path | None,
+    attestation_path: Path | None,
     *,
     now: datetime | None = None,
     reachable: Callable[[str], bool] | None = None,
     max_age: timedelta = _DEFAULT_EVIDENCE_MAX_AGE,
 ) -> dict[str, Any]:
-    if path is None:
+    if path is None or attestation_path is None:
         return _check(
             "storage-roundtrip-evidence",
             "BLOCKED",
-            "storage-evidence-missing",
+            "storage-evidence-or-attestation-missing",
             requiredCheckCount=len(_STORAGE_CHECKS),
             verifiedCheckCount=0,
             codeReachable=False,
             observedAtValid=False,
-            procedureComplete=False,
+            attestationComplete=False,
+            attestationBound=False,
         )
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError):
         payload = None
+    try:
+        attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        attestation = None
     return evaluate_storage_evidence(
-        payload, now=now, reachable=reachable, max_age=max_age
+        payload,
+        attestation,
+        now=now,
+        reachable=reachable,
+        max_age=max_age,
     )
 
 
@@ -1200,6 +1258,11 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=os.environ.get("INV_S01_STORAGE_EVIDENCE"),
     )
+    parser.add_argument(
+        "--storage-attestation",
+        type=Path,
+        default=os.environ.get("INV_S01_STORAGE_ATTESTATION"),
+    )
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--timeout-seconds", type=float, default=5.0)
     parser.add_argument("--storage-max-age-seconds", type=float, default=86_400.0)
@@ -1216,6 +1279,7 @@ def main(argv: list[str] | None = None) -> int:
             args.ca_bundle,
             args.http_ca_bundle,
             args.storage_evidence,
+            args.storage_attestation,
         )
         if path is not None
     ]
@@ -1265,6 +1329,7 @@ def main(argv: list[str] | None = None) -> int:
             probe_pilot_capabilities(args.state, inventory),
             probe_storage_evidence(
                 args.storage_evidence,
+                args.storage_attestation,
                 max_age=timedelta(seconds=args.storage_max_age_seconds),
             ),
         ]

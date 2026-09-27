@@ -261,19 +261,29 @@ def storage_evidence(**overrides) -> dict:
         "cleanupVerified": True,
         "codeSha": "a" * 40,
         "observedAt": "2026-09-28T03:00:00Z",
-        "operatorProcedure": {
-            "executedBy": "operator-role-a",
-            "configurationProfile": "pilot-operational-v1",
-            "runbookRevision": "S01-ST-ROUNDTRIP-1",
-        },
     }
     value.update(overrides)
     return value
 
 
-def test_operational_storage_evidence_requires_all_checks_reachable_sha_and_procedure():
+def storage_attestation(evidence: dict | None = None, **overrides) -> dict:
+    source = evidence or storage_evidence()
+    value = {
+        "executedBy": "operator-role-a",
+        "configurationProfile": "pilot-operational-v1",
+        "runbookRevision": "S01-ST-ROUNDTRIP-1",
+        "codeSha": source["codeSha"],
+        "observedAt": source["observedAt"],
+    }
+    value.update(overrides)
+    return value
+
+
+def test_operational_storage_evidence_requires_all_checks_reachable_sha_and_attestation():
+    evidence = storage_evidence()
     result = evaluate_storage_evidence(
-        storage_evidence(),
+        evidence,
+        storage_attestation(evidence),
         now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
         reachable=lambda sha: sha == "a" * 40,
     )
@@ -283,7 +293,8 @@ def test_operational_storage_evidence_requires_all_checks_reachable_sha_and_proc
         "verifiedCheckCount": 6,
         "codeReachable": True,
         "observedAtValid": True,
-        "procedureComplete": True,
+        "attestationComplete": True,
+        "attestationBound": True,
     }
     assert "operator-role-a" not in json.dumps(result)
 
@@ -291,6 +302,7 @@ def test_operational_storage_evidence_requires_all_checks_reachable_sha_and_proc
 def test_ci_candidate_storage_evidence_is_blocked_for_u6():
     result = evaluate_storage_evidence(
         storage_evidence(targetKind="ci-candidate"),
+        storage_attestation(),
         now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
         reachable=lambda _sha: True,
     )
@@ -303,6 +315,7 @@ def test_operational_storage_evidence_with_a_false_required_check_is_blocked():
     checks["metadataSha256"] = False
     result = evaluate_storage_evidence(
         storage_evidence(checks=checks),
+        storage_attestation(),
         now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
         reachable=lambda _sha: True,
     )
@@ -314,6 +327,7 @@ def test_operational_storage_evidence_with_a_false_required_check_is_blocked():
 def test_unreachable_storage_evidence_code_sha_is_blocked():
     result = evaluate_storage_evidence(
         storage_evidence(),
+        storage_attestation(),
         now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
         reachable=lambda _sha: False,
     )
@@ -321,14 +335,120 @@ def test_unreachable_storage_evidence_code_sha_is_blocked():
     assert result["code"] == "storage-evidence-code-unreachable"
 
 
-def test_storage_evidence_without_operator_procedure_is_blocked():
+def test_storage_evidence_without_operator_attestation_is_blocked():
     result = evaluate_storage_evidence(
-        storage_evidence(operatorProcedure=None),
+        storage_evidence(),
+        None,
         now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
         reachable=lambda _sha: True,
     )
     assert result["status"] == "BLOCKED"
-    assert result["code"] == "storage-evidence-procedure-incomplete"
+    assert result["code"] == "storage-attestation-invalid"
+
+
+def test_storage_attestation_rejects_unknown_fields():
+    evidence = storage_evidence()
+    attestation = storage_attestation(evidence)
+    attestation["unexpected"] = "not-allowed"
+    result = evaluate_storage_evidence(
+        evidence,
+        attestation,
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-attestation-invalid"
+
+
+@pytest.mark.parametrize(
+    ("evidence", "attestation"),
+    [
+        (storage_evidence(unexpected=True), storage_attestation()),
+        (
+            storage_evidence(checks={**storage_evidence()["checks"], "unexpected": True}),
+            storage_attestation(),
+        ),
+    ],
+)
+def test_storage_evidence_rejects_unknown_fields_and_check_names(
+    evidence: dict, attestation: dict
+):
+    result = evaluate_storage_evidence(
+        evidence,
+        attestation,
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-invalid"
+
+
+@pytest.mark.parametrize(
+    "observed_at",
+    ["2026-09-27T03:59:59Z", "2026-09-28T04:00:01Z"],
+)
+def test_storage_evidence_rejects_stale_or_future_observation(observed_at: str):
+    evidence = storage_evidence(observedAt=observed_at)
+    result = evaluate_storage_evidence(
+        evidence,
+        storage_attestation(evidence),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-time-invalid"
+
+
+def test_storage_evidence_rejects_schema_version_1_0():
+    evidence = storage_evidence(schemaVersion="1.0")
+    result = evaluate_storage_evidence(
+        evidence,
+        storage_attestation(evidence),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-invalid"
+
+
+def test_commit_reachability_is_blocked_when_git_is_unavailable(monkeypatch):
+    def missing_git(*_args, **_kwargs):
+        raise FileNotFoundError("git unavailable")
+
+    monkeypatch.setattr(s01.subprocess, "run", missing_git)
+    assert s01._commit_reachable("a" * 40) is False
+    evidence = storage_evidence()
+    result = evaluate_storage_evidence(
+        evidence,
+        storage_attestation(evidence),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-code-unreachable"
+
+
+def test_storage_evidence_requires_attestation_sha_and_time_binding():
+    evidence = storage_evidence()
+    result = evaluate_storage_evidence(
+        evidence,
+        storage_attestation(evidence, codeSha="b" * 40),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-attestation-invalid"
+
+
+def test_failed_operational_storage_evidence_is_fail_not_blocked():
+    evidence = storage_evidence(status="FAIL")
+    result = evaluate_storage_evidence(
+        evidence,
+        storage_attestation(evidence),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "FAIL"
+    assert result["code"] == "storage-operational-evidence-failed"
 
 
 def capability_rows(value: dict) -> list[dict]:
@@ -567,7 +687,10 @@ def test_report_writer_removes_stale_report_and_never_serializes_forbidden_field
     assert not target.exists()
 
 
-@pytest.mark.parametrize("protected", ["inventory", "ca", "storage-evidence", "state-child"])
+@pytest.mark.parametrize(
+    "protected",
+    ["inventory", "ca", "storage-evidence", "storage-attestation", "state-child"],
+)
 def test_main_validates_protected_output_before_unlink(
     tmp_path: Path, protected: str
 ):
@@ -576,15 +699,18 @@ def test_main_validates_protected_output_before_unlink(
     inventory_path = tmp_path / "inventory.json"
     ca_path = tmp_path / "node-ca.pem"
     storage_path = tmp_path / "storage-evidence.json"
+    attestation_path = tmp_path / "storage-attestation.json"
     inventory_path.write_text("inventory sentinel", encoding="utf-8")
     ca_path.write_text("ca sentinel", encoding="utf-8")
     storage_path.write_text("storage sentinel", encoding="utf-8")
+    attestation_path.write_text("attestation sentinel", encoding="utf-8")
     state_child = state / "private-state.json"
     state_child.write_text("state sentinel", encoding="utf-8")
     output = {
         "inventory": inventory_path,
         "ca": ca_path,
         "storage-evidence": storage_path,
+        "storage-attestation": attestation_path,
         "state-child": state_child,
     }[protected]
     before = output.read_bytes()
@@ -600,6 +726,8 @@ def test_main_validates_protected_output_before_unlink(
                 str(ca_path),
                 "--storage-evidence",
                 str(storage_path),
+                "--storage-attestation",
+                str(attestation_path),
                 "--output",
                 str(output),
             ]
@@ -619,10 +747,14 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
     state.mkdir()
     report_path = tmp_path / "report.json"
     storage_path = tmp_path / "storage-secret-marker.json"
+    attestation_path = tmp_path / "attestation-secret-marker.json"
     evidence = storage_evidence(
         observedAt=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     )
     storage_path.write_text(json.dumps(evidence), encoding="utf-8")
+    attestation_path.write_text(
+        json.dumps(storage_attestation(evidence)), encoding="utf-8"
+    )
     session_token = "session-token-secret-marker"
     operator_token = "operator-token-secret-marker"
     monkeypatch.setenv("TEST_S01_TOKEN", session_token)
@@ -687,6 +819,8 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
             str(inventory_path),
             "--storage-evidence",
             str(storage_path),
+            "--storage-attestation",
+            str(attestation_path),
             "--state",
             str(state),
             "--output",
@@ -719,6 +853,7 @@ def test_main_without_any_input_uses_real_probes_and_blocks_every_input(
         "INV_S01_OPERATOR_TOKEN",
         "INV_S01_INVENTORY",
         "INV_S01_STORAGE_EVIDENCE",
+        "INV_S01_STORAGE_ATTESTATION",
         "INV_LAN_PILOT_STATE",
         "INV_NODE_MTLS_CA_BUNDLE",
         "INV_S01_HTTP_CA_BUNDLE",

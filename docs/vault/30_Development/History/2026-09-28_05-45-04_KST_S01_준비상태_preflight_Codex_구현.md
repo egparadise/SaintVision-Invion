@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-2026-09-28-S01-READINESS-PREFLIGHT"
 title: "S01-BE·S01-ST 준비 상태 preflight 수집기 구현"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T14:20:00+09:00"
+updated: "2026-09-28T14:40:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf045c5a554209aaef601ae4883b64da50a7"
@@ -96,21 +96,22 @@ PR #122 승인 head `44f4bd7d` 위 branch `agent/codex/s01-readiness-preflight-f
 목록에서 Node CA와 Object Store를 별도 판정한다. U2는 settings와 분리해 `/readyz`와
 실토큰/무토큰 `/v1/session`만 소비한다.
 
-U6에는 `--storage-evidence`를 추가했다. #135 형식 중 `targetKind=operational`, `status=PASS`,
+U6에는 `--storage-evidence`와 `--storage-attestation`을 추가했다. #135 형식 중 `targetKind=operational`, `status=PASS`,
 6개 필수 check true, cleanup/양수 payload, 현재 HEAD에서 도달 가능한 40-hex `codeSha`,
-24시간 이내 UTC `observedAt`을 요구한다. 추가 attestation
-`operatorProcedure.{executedBy,configurationProfile,runbookRevision}`도 모두 있어야 한다.
+24시간 이내 UTC `observedAt`을 요구한다. #135 evidence에 없는 운영자 정보는 별도 strict
+attestation으로 받고 실행자·구성 profile·runbook revision과 evidence의 SHA·시각 결속을 요구한다.
 보고서에는 그 값이나 URL/token/path를 쓰지 않고 count/boolean만 남긴다. ci-candidate,
-false/missing check, unreachable SHA, 비UTC·오래된/미래 시각, 절차 누락은 모두 U6
-`BLOCKED`다. settings `ready`와 operational evidence PASS도 입력 구조/왕복 증거일 뿐
+false/missing/unknown check, unknown top-level 필드, unreachable SHA, 비UTC·오래된/미래 시각,
+attestation 누락·불일치는 모두 U6 `BLOCKED`다. operational evidence의 명시적 FAIL은 U6
+`FAIL`이다. settings `ready`와 operational evidence PASS도 입력 구조/왕복 증거일 뿐
 제품 adapter·lifecycle·복구·S01 `done`을 뜻하지 않는다.
 
 시험을 먼저 추가했을 때 `evaluate_storage_evidence` import 부재로 collection error/exit 1이었고,
-구현 뒤 `pytest -q tests/test_s01_readiness_preflight.py`는 **34 passed/exit 0**이다. 이 범위는
+조건부 승인 보정 뒤 `pytest -q tests/test_s01_readiness_preflight.py`는 **44 passed/exit 0**이다. 이 범위는
 PG-free이며 실 PG·Docker·전체 suite를 실행하지 않았다. `py_compile`, `PYTHONPATH` 없는
 CLI `--help`, `git diff --check`도 exit 0이다. #122·#129·#135가 먼저 병합된 뒤 이 stacked
-PR을 병합해야 하며, reviewer Claude가 401→BLOCKED, ci-candidate·unreachable SHA 거부,
-operator/session token 분리를 독립 확인하는 것이 다음 행동이다.
+PR을 병합해야 한다. reviewer Claude의 조건부 승인에서 지적한 evidence/attestation 분리,
+strict 키 집합, 오래된·미래 시각, schema 1.0, git 부재 fail-closed를 보정했으며 재검토가 다음 행동이다.
 
 최종 docs-only report 갱신 뒤 검증은 focused **34 passed**, route coverage **39 passed**,
 `check_docs` 894 documents, contract bindings 54 fixtures/19 types/25 sites/14 guards,
