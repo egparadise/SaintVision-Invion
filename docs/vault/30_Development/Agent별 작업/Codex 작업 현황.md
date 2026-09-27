@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.208"
+version: "1.0.209"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T08:35:00+09:00"
+updated: "2026-09-28T08:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -12,8 +12,8 @@ source_of_truth: "Git"
 
 ## 2026-09-28 S05 Card39 hosted 20동시 wave — GATES_FAILED, 검토 요청
 
-- PR #141 head `60a63fbf`의 opt-in `run-s05-wave` lane은 PostgreSQL 16 hosted runner에서 legacy 3회 뒤 candidate-B(N=4) 3회를 각 20동시로 순차 실행했고 run 36358438372/job success, aggregate JUnit 1 passed를 확보했다.
-- legacy는 60/60·외부 실패 0·P95 all/hold 중앙 457.822/13.131ms, candidate-B는 12/60·semaphore reject 48·SQL timeout 0·P95 all/hold 중앙 391.719/16.984ms다. 외부 실패·hold 게이트가 실패해 `GATES_FAILED`이며 빠른 거절로 낮아진 P95 all을 개선으로 세지 않는다.
+- PR #141 실행 head `50c7b9dd`의 opt-in `run-s05-wave` lane은 PostgreSQL 16 hosted runner에서 legacy 3회 뒤 candidate-B(N=4) 3회를 각 20동시로 순차 실행했고 run 36359052826/job success, aggregate JUnit 1 passed를 확보했다. 측정 대상 제품 SHA는 #115 `08f4a6a9`다.
+- legacy는 60/60·외부 실패 0·P95 all/hold 중앙 401.090/12.428ms, candidate-B는 12/60·semaphore reject 48·SQL timeout 0·P95 all/hold 중앙 350.460/12.232ms다. 외부 실패 게이트가 실패해 `GATES_FAILED`이며 빠른 거절로 낮아진 P95 all을 개선으로 세지 않는다.
 - flag 기본 off, S05 `in_progress`, 승격·AC-05 주장 없음. hosted 수치는 로컬과 직접 비교하지 않으며 reviewer Claude에게 원자료·판정 분리 검토를 요청한다. [[S05 hosted 20동시 wave opt-in lane 사양]], [[2026-09-28_08-35-00_KST_S05_hosted_20동시_wave_Codex]].
 
 ## 2026-09-23 S05 Card26 bounded semaphore 구현 — R2 검토 준비
