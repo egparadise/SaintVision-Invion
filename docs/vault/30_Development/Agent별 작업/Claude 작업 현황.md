@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T05:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,13 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+### 2026-09-28 카드 13 · S02-DB AC-02 Evidence collector (branch agent/claude/s02-db-evidence-collector, base 1e8baf04)
+
+- 만든 것: `tools/collect_s02_acceptance_evidence.py`(기존 `tests/test_api.py` + `collect_rls_evidence.py --disposable`를 한 호출로, 카드 5 §A-1 대조표 16 케이스→AC-02 4조항 매핑, provenance SHA/clean 플래그/collector sha256, stale 산출물 선삭제, DSN·비밀번호 쓰기 거부, U2~U5 UNMEASURED·값 없음, `acceptanceClaim=false`) + PG-free 시험 19(+postgres 1) + Evidence `Evidence/s02-db-acceptance/s02-acceptance-1e8baf045c5a-20260927.{json,md}`(+`-rls`).
+- 실측(실 PG 단일 invocation 1회, 05:30~05:33 KST): API 28 passed/0 failed → 4조항 전부 pass; RLS **VIOLATIONS 1** = 기존 E2 `inv_app` `public.audit_events`(09-22 `b988ca7a` 증거와 동일, baseline 미수용) → 묶음 verdict **FAIL**(정직 반영). 해소는 F-S02-01 별도 카드(RLS enable+force+NULL tenant 정책 vs baseline 수용) Codex 결정.
+- 경계: 계약·registry·ontology 무변경. 실행 시 collector가 미커밋이라 `working_tree_clean_status=false`(content diff clean) — 내용 해시 `c0253d90…`로 식별. note에 로컬 host/port가 남은 것과 `\` 경로는 실행 후 도구 수정(산출물 보존). 두 번째 PG 실행 없음.
+- 다음: PR(reviewer Codex, 병합 금지) → S03-DB runner 설계 1쪽(`.worktrees/claude-s03-runner`). 상세: [[2026-09-28_05-40-00_KST_S02-DB_AC-02_Evidence_collector_Claude_구현]]
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
