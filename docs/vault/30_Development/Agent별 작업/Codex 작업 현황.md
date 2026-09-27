@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.206"
+version: "1.0.207"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T05:45:04+09:00"
+updated: "2026-09-28T14:20:00+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 카드 41 S01 readiness 후속 — 검토 요청
+
+- PR #122 승인 head `44f4bd7d` 위 코드/시험 `74789bfc`, owner Codex/reviewer Claude. `--health-url`을 #129의 operator-authenticated `--settings-url`로 교체하고 Node CA/Object Store 설정 이름을 독립 판정한다. U2는 settings에서 분리해 `/readyz`와 실/무토큰 session만 소비한다.
+- U6는 #135 evidence가 operational·PASS, 6 check true, reachable SHA, 24시간 이내 UTC, 운영자/구성/runbook 절차 완전일 때만 PASS다. ci-candidate·false check·unreachable SHA·절차 누락과 settings 401/403/503은 BLOCKED다. 출력 schema는 `s01-readiness-preflight:2`; 비밀·식별값은 내보내지 않는다.
+- 선행 red는 신규 함수 import collection error, 구현 뒤 focused PG-free 34 passed와 compile/CLI help/diff 0이다. 실 PG·Docker·전체 suite 미실행. 설계·History를 v1.2로 갱신했으며 #122·#129·#135 병합 뒤에만 이 stacked PR을 병합한다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
 
 ## 2026-09-28 S01-BE·S01-ST 준비 상태 preflight — 검토 요청
 
