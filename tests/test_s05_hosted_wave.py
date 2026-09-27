@@ -142,6 +142,35 @@ def test_evaluation_passes_only_when_all_three_gates_pass():
     assert result["s05StatusAfterRun"] == "in_progress"
 
 
+def test_gate_two_uses_all_request_p95_not_success_only():
+    legacy = [wave("legacy", index) for index in range(1, 4)]
+    candidate = [wave("candidate-b", index) for index in range(1, 4)]
+    for item in legacy:
+        item["metrics"]["p95AllMs"] = 100.0
+        item["metrics"]["p95SuccessMs"] = 10.0
+    for item in candidate:
+        item["metrics"]["p95AllMs"] = 90.0
+        item["metrics"]["p95SuccessMs"] = 900.0
+    result = module.evaluate(legacy + candidate)
+    assert result["gates"]["allRequestP95MedianNonWorse"] is True
+    assert result["candidateB"]["allRequestP95MedianMs"] == 90.0
+
+
+def test_equal_metrics_are_non_worse_at_the_inclusive_boundary():
+    legacy = [wave("legacy", index) for index in range(1, 4)]
+    candidate = [wave("candidate-b", index) for index in range(1, 4)]
+    for item in legacy + candidate:
+        item["metrics"]["externalFailureCount"] = 0
+        item["metrics"]["p95AllMs"] = 100.0
+        item["metrics"]["postAcquireHoldP95Ms"] = 40.0
+    result = module.evaluate(legacy + candidate)
+    assert result["gates"] == {
+        "externalFailureNonIncrease": True,
+        "allRequestP95MedianNonWorse": True,
+        "successfulPostAcquireHoldP95MedianNonWorse": True,
+    }
+
+
 def test_semaphore_rejects_are_counted_as_external_failures():
     waves = [wave("legacy", index) for index in range(1, 4)] + [
         wave("candidate-b", index, failures=16) for index in range(1, 4)
@@ -160,6 +189,7 @@ def test_evaluation_requires_exactly_three_waves_per_mode():
 def test_aggregate_junit_reports_measurement_not_promotion(tmp_path):
     summary = {
         "codeSha": "b" * 40,
+        "measurementTargetProductSha": "a" * 40,
         "evaluation": {
             "candidateDecision": "GATES_FAILED",
             "gates": {
@@ -174,6 +204,7 @@ def test_aggregate_junit_reports_measurement_not_promotion(tmp_path):
     text = path.read_text(encoding="utf-8")
     assert 'failures="0"' in text
     assert 'name="candidateDecision" value="GATES_FAILED"' in text
+    assert 'name="measurementTargetProductSha" value="aaaaaaaa' in text
     assert 'name="promotionClaim" value="False"' in text
 
 

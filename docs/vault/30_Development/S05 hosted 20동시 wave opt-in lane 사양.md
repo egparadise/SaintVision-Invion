@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-HOSTED-WAVE-LANE-SPEC-001"
 title: "S05 hosted 20동시 wave opt-in lane 사양"
-version: "1.1.0"
+version: "1.1.1"
 status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T08:35:00+09:00"
+updated: "2026-09-28T08:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -33,6 +33,7 @@ tags: ["s05", "placement", "semaphore", "hosted-ci", "benchmark", "specification
 2. candidate 여부와 semaphore enabled 상태 일치
 3. wave 종료 뒤 semaphore registry entry/permit 잔존 0
 4. report code SHA가 synthetic pull-request merge SHA가 아닌 checkout된 PR head와 일치
+5. `measurementTargetProductSha`는 stacked PR base의 검토된 제품 SHA이고 checkout의 조상이어야 함
 
 집계 JSON은 runner OS/arch/image, CPU 수·메모리, Python 버전, GitHub run ID/attempt와 PostgreSQL server version/default timeout/max connections를 기록한다. DSN·password·tenant/project/run 식별자는 집계 출력에 넣지 않는다. aggregate JUnit green은 **6개 측정이 완결됐다는 뜻**이며 candidate 합격을 뜻하지 않는다. candidate 판정은 JSON의 별도 `candidateDecision`과 gate별 boolean으로만 표현한다.
 
@@ -54,7 +55,7 @@ hosted runner의 CPU·메모리·scheduler·PostgreSQL service 환경은 개발 
 
 ## 5. 첫 hosted 실행 결과
 
-PR #141 head `60a63fbf5ee60cacd6c6212b7362a99576d9d4af`의 run [36358438372](https://github.com/egparadise/SaintVision-Invion/actions/runs/36358438372)은 `s05-hosted-wave` job을 success로 완료했다. aggregate JUnit은 1 test, failure/error/skip 0이고 6개 원본 JSON/JUnit/log를 `saintvision-s05-hosted-wave-36358438372` artifact로 보존했다.
+PR #141 head `60a63fbf5ee60cacd6c6212b7362a99576d9d4af`의 run [36358438372](https://github.com/egparadise/SaintVision-Invion/actions/runs/36358438372)은 `s05-hosted-wave` job을 success로 완료했다. 측정 대상 제품은 #115 head `08f4a6a95d08f28e90bea300d32b2f657f3cf656`이며 lane/tool commit과 분리해 기록한다. aggregate JUnit은 1 test, failure/error/skip 0이고 6개 원본 JSON/JUnit/log를 `saintvision-s05-hosted-wave-36358438372` artifact로 보존했다.
 
 | mode | 3회 성공/실패 | 외부 실패 합계 | 전체 요청 P95 중앙 | 성공 post-acquire hold P95 중앙 |
 |---|---:|---:|---:|---:|

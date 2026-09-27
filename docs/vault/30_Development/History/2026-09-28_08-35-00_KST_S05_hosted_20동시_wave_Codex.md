@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S05-HOSTED-20-WAVE-20260928-001"
 title: "S05 hosted legacy candidate-B 20동시 wave"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T08:35:00+09:00"
+updated: "2026-09-28T08:45:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -18,6 +18,7 @@ tags: ["history", "s05", "placement", "semaphore", "hosted-ci", "benchmark"]
 
 - PR: [#141](https://github.com/egparadise/SaintVision-Invion/pull/141), stacked base PR #115 head `08f4a6a9`
 - 실행 code SHA: `60a63fbf5ee60cacd6c6212b7362a99576d9d4af`
+- 측정 대상 제품 SHA: PR #115 head `08f4a6a95d08f28e90bea300d32b2f657f3cf656`
 - hosted run: [36358438372](https://github.com/egparadise/SaintVision-Invion/actions/runs/36358438372), `s05-hosted-wave` success
 - artifact: `saintvision-s05-hosted-wave-36358438372`
 - 순서: legacy 1~3 뒤 candidate-B 1~3, 각 20 request/20 concurrency/1 round, 겹침 없이 순차 실행

@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import platform
+import re
 import statistics
 import subprocess
 import sys
@@ -211,6 +212,20 @@ def runner_environment() -> dict[str, Any]:
     }
 
 
+def validate_product_sha(product_sha: str, checkout_sha: str) -> None:
+    if not re.fullmatch(r"[0-9a-f]{40}", product_sha):
+        raise SystemExit("INV_MEASUREMENT_TARGET_PRODUCT_SHA must be a full lowercase Git SHA")
+    completed = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", product_sha, checkout_sha],
+        cwd=ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise SystemExit("measurement target product SHA must be an ancestor of the checkout")
+
+
 def postgres_environment(dsn: str) -> dict[str, Any]:
     with psycopg.connect(dsn) as connection:
         row = connection.execute(
@@ -247,6 +262,7 @@ def write_junit(path: Path, summary: dict[str, Any]) -> None:
     properties = ET.SubElement(case, "properties")
     values = {
         "codeSha": summary["codeSha"],
+        "measurementTargetProductSha": summary["measurementTargetProductSha"],
         "candidateDecision": summary["evaluation"]["candidateDecision"],
         **summary["evaluation"]["gates"],
         "promotionClaim": False,
@@ -280,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
     ).strip()
     if code_sha != checkout_sha:
         raise SystemExit("INV_EVIDENCE_CODE_SHA must match the checked-out PR head")
+    product_sha = os.getenv("INV_MEASUREMENT_TARGET_PRODUCT_SHA", "")
+    validate_product_sha(product_sha, checkout_sha)
 
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -328,6 +346,7 @@ def main(argv: list[str] | None = None) -> int:
         "schemaVersion": "1.0.0",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "codeSha": code_sha,
+        "measurementTargetProductSha": product_sha,
         "measurementComplete": True,
         "measurementScope": "hosted-single-runner-synthetic-node-postgresql16",
         "directlyComparableWithLocalEvidence": False,
