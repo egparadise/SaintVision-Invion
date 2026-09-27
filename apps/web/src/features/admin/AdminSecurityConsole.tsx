@@ -35,7 +35,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
 
   const [backendKillSwitch, setBackendKillSwitch] = useState<BackendKillSwitchState>({ status: 'loading' });
   const [gpuRunError, setGpuRunError] = useState<string | null>(null);
-  const idempotencyKeysRef = useRef<Map<string, string>>(new Map());
+  interface CachedOperation {
+    idempotencyKey: string;
+    payload: ContainmentInput;
+    targetAction: 'drain' | 'resume';
+  }
+  const cachedOperationsRef = useRef<Map<string, CachedOperation>>(new Map());
   const [nodeControlStatuses, setNodeControlStatuses] = useState<Record<string, { nodeStatus: string | null; version: number }>>({});
 
   const actor = currentUser?.id?.trim() || null;
@@ -89,7 +94,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }
   }, [nodes]);
 
-  const handleToggleDrain = async (nodeId: string, _legacyDrainedArg?: boolean) => {
+  const handleToggleDrain = async (nodeId: string, currentlyDrained?: boolean) => {
     if (!actor) {
       setDrainError('인증된 관리자 세션이 없습니다. 노드 격리(Drain) 명령은 로그인된 관리자 식별자(actor)가 필수입니다.');
       return;
@@ -100,51 +105,74 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     }
     setDrainError(null);
 
-    // 1. Expected control version query & canonical server status (strictly required, no synthetic fallback)
-    let expectedVersion: number;
-    let targetAction: 'drain' | 'resume';
-    try {
-      const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
-      if (typeof ctrl?.version === 'number') {
-        expectedVersion = ctrl.version;
-      } else {
-        setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
+    // 1. Determine targetAction strictly from UI's displayed intent
+    const isNodeCurrentlyDrained = currentlyDrained !== undefined
+      ? currentlyDrained
+      : (nodeControlStatuses[nodeId]?.nodeStatus === 'draining' || nodeControlStatuses[nodeId]?.nodeStatus === 'quarantined' || secManager.isNodeDrained(nodeId));
+    const targetAction: 'drain' | 'resume' = isNodeCurrentlyDrained ? 'resume' : 'drain';
+
+    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId.trim()}`;
+    let idempotencyKey: string;
+    let payload: ContainmentInput;
+
+    const cachedOp = cachedOperationsRef.current.get(opKey);
+    if (cachedOp) {
+      // Retry attempt: exactly reuse the same Idempotency-Key and first payload (including original expectedVersion)
+      idempotencyKey = cachedOp.idempotencyKey;
+      payload = cachedOp.payload;
+    } else {
+      // First attempt: check control version and server status
+      let expectedVersion: number;
+      let serverNodeStatus: string | null;
+      try {
+        const ctrl = await apiClient<ContainmentView>(`/v1/nodes/${encodeURIComponent(nodeId)}/control`);
+        if (typeof ctrl?.version === 'number') {
+          expectedVersion = ctrl.version;
+          serverNodeStatus = ctrl.nodeStatus ?? null;
+        } else {
+          setDrainError('노드 제어 버전(expectedVersion) 응답 형식 불일치로 작업을 중단했습니다.');
+          return;
+        }
+
+        // Update local cache of server control status
+        setNodeControlStatuses((prev) => ({
+          ...prev,
+          [nodeId]: { nodeStatus: serverNodeStatus, version: expectedVersion },
+        }));
+
+        // Invariant: Server status must match user's displayed intention
+        // If user wants 'drain', server must NOT already be draining/quarantined.
+        // If user wants 'resume', server MUST be draining/quarantined.
+        const isServerDrained = serverNodeStatus === 'draining' || serverNodeStatus === 'quarantined';
+        const serverDiffers = targetAction === 'drain' ? isServerDrained : !isServerDrained;
+        if (serverDiffers) {
+          setDrainError('상태 변경됨·새로고침: 서버의 노드 제어 상태가 화면에 표시된 의도와 달라 작업을 중단했습니다. 새로고침 후 다시 시도하십시오.');
+          return;
+        }
+      } catch (err: any) {
+        console.error('Failed to fetch node control version:', err);
+        const codeStr = err?.problem?.code ? `[${err.problem.code} (${err.problem.status})]` : err?.problem?.status ? `[${err.problem.status}]` : '';
+        setDrainError(`노드 제어 버전(expectedVersion) 사전 조회 실패: ${codeStr} ${err?.problem?.title || err?.message || '조회 실패'}`);
         return;
       }
 
-      // Determine targetAction strictly from canonical server state
-      const isCurrentlyDrainedOnServer = ctrl.nodeStatus === 'draining' || ctrl.nodeStatus === 'quarantined';
-      targetAction = isCurrentlyDrainedOnServer ? 'resume' : 'drain';
-
-      // Update local cache of server control status
-      setNodeControlStatuses((prev) => ({
-        ...prev,
-        [nodeId]: { nodeStatus: ctrl.nodeStatus, version: ctrl.version },
-      }));
-    } catch (err: any) {
-      console.error('Failed to fetch node control version:', err);
-      const codeStr = err?.problem?.code ? `[${err.problem.code} (${err.problem.status})]` : err?.problem?.status ? `[${err.problem.status}]` : '';
-      setDrainError(`노드 제어 버전(expectedVersion) 사전 조회 실패: ${codeStr} ${err?.problem?.title || err?.message || '조회 실패'}`);
-      return;
-    }
-
-    // 2. Fixed Idempotency-Key per logical operation (nodeId + targetAction + reasonCode + approvalId)
-    const opKey = `${nodeId}:${targetAction}:${drainReasonCode}:${drainApprovalId.trim()}`;
-    let idempotencyKey = idempotencyKeysRef.current.get(opKey);
-    if (!idempotencyKey) {
       idempotencyKey = generateIdempotencyKey(`containment_${nodeId}_${targetAction}`);
-      idempotencyKeysRef.current.set(opKey, idempotencyKey);
-    }
+      payload = {
+        expectedVersion,
+        reasonCode: drainReasonCode,
+        approvalId: drainApprovalId.trim(),
+      };
 
-    const payload: ContainmentInput = {
-      expectedVersion,
-      reasonCode: drainReasonCode,
-      approvalId: drainApprovalId.trim(),
-    };
+      // Cache for retry idempotency
+      cachedOperationsRef.current.set(opKey, {
+        idempotencyKey,
+        payload,
+        targetAction,
+      });
+    }
 
     const endpoint = `/v1/nodes/${encodeURIComponent(nodeId)}/${targetAction}`;
 
-    // 3. Post to canonical endpoint and mutate local state ONLY on server success
     try {
       const result = await apiClient<ContainmentResult>(endpoint, {
         method: 'POST',
@@ -152,19 +180,23 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         body: JSON.stringify(payload),
       });
 
-      // On success, clear idempotency key for this completed logical operation
-      idempotencyKeysRef.current.delete(opKey);
+      // Invariant: Successful response MUST contain canonical control field. Do NOT synthesize!
+      if (!result?.control || typeof result.control.nodeStatus !== 'string' || typeof result.control.version !== 'number') {
+        setDrainError('응답 오류: 서버 응답에 canonical control 필드가 누락되었거나 형식이 올바르지 않습니다.');
+        return;
+      }
 
-      // Extract canonical nodeStatus and version from ContainmentResult
-      const canonicalStatus = result?.control?.nodeStatus ?? (targetAction === 'drain' ? 'draining' : 'online');
-      const canonicalVersion = typeof result?.control?.version === 'number' ? result.control.version : expectedVersion + 1;
+      // Success: clear cached retry operation
+      cachedOperationsRef.current.delete(opKey);
+
+      const canonicalStatus = result.control.nodeStatus;
+      const canonicalVersion = result.control.version;
 
       setNodeControlStatuses((prev) => ({
         ...prev,
         [nodeId]: { nodeStatus: canonicalStatus, version: canonicalVersion },
       }));
 
-      // Synchronize local security engine to match server response
       if (canonicalStatus === 'draining' || canonicalStatus === 'quarantined') {
         secManager.drainNode(nodeId, actor, `[${drainReasonCode}] approval: ${drainApprovalId.trim()}`);
       } else {
@@ -173,8 +205,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       refreshState();
     } catch (err: any) {
       console.error(`Failed to execute node ${targetAction} on control plane:`, err);
-      // Key remains in idempotencyKeysRef.current so retrying the same operation reuses it!
-      // Local state is NOT altered on failure (maintaining server truth).
+      // Key and payload remain in cachedOperationsRef so retrying resends the exact same request!
       if (err?.problem) {
         const p = err.problem;
         const codeStr = p.code ? `[${p.code} (${p.status})]` : `[${p.status}]`;
@@ -198,6 +229,19 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [showKillSwitchModal, setShowKillSwitchModal] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  const handleOpenKillSwitchModal = () => {
+    previousActiveElementRef.current = (document.activeElement as HTMLElement) || null;
+    setShowKillSwitchModal(true);
+  };
+
+  const handleCloseKillSwitchModal = () => {
+    setShowKillSwitchModal(false);
+    setTimeout(() => {
+      previousActiveElementRef.current?.focus();
+    }, 0);
+  };
 
   useEffect(() => {
     if (!showKillSwitchModal) return;
@@ -210,7 +254,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        setShowKillSwitchModal(false);
+        handleCloseKillSwitchModal();
         return;
       }
 
@@ -224,12 +268,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
         const lastEl = focusableEls[focusableEls.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === firstEl) {
+          if (document.activeElement === firstEl || !modalRef.current.contains(document.activeElement)) {
             e.preventDefault();
             lastEl.focus();
           }
         } else {
-          if (document.activeElement === lastEl) {
+          if (document.activeElement === lastEl || !modalRef.current.contains(document.activeElement)) {
             e.preventDefault();
             firstEl.focus();
           }
@@ -318,11 +362,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const handleConfirmKillSwitch = () => {
     if (!actor) {
       setDrainError('비상 정지(Kill Switch) 명령을 실행하려면 인증된 관리자 식별자(actor)가 필수입니다.');
-      setShowKillSwitchModal(false);
+      handleCloseKillSwitchModal();
       return;
     }
     secManager.toggleEmergencyKillSwitch(actor, 'Admin manual emergency intervention');
-    setShowKillSwitchModal(false);
+    handleCloseKillSwitchModal();
     refreshState();
   };
 
@@ -351,7 +395,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               로컬 보안 통제 엔진이 모의 격리 상태입니다. (백엔드 제어 평면 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재하며, 본 토글은 UI 로컬 보안 엔진 시뮬레이션 격리 상태입니다)
             </div>
           </div>
-          <Button variant="danger" size="sm" onClick={() => setShowKillSwitchModal(true)}>
+          <Button variant="danger" size="sm" onClick={handleOpenKillSwitchModal}>
             Deactivate Kill Switch
           </Button>
         </div>
@@ -489,7 +533,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
           <Button
             size="sm"
             variant={status.emergencyKillSwitchActive ? 'secondary' : 'danger'}
-            onClick={() => setShowKillSwitchModal(true)}
+            onClick={handleOpenKillSwitchModal}
             disabled={!actor}
             aria-disabled={!actor}
             title={!actor ? '관리자 세션 식별자(actor)가 필요합니다.' : undefined}
@@ -1126,7 +1170,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
                 ref={cancelBtnRef}
                 size="sm"
                 variant="secondary"
-                onClick={() => setShowKillSwitchModal(false)}
+                onClick={handleCloseKillSwitchModal}
                 data-testid="kill-switch-cancel-btn"
               >
                 취소
