@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,7 @@ from inv.tooling import NodePrincipal
 import tools.s01_readiness_preflight as s01
 from tools.s01_readiness_preflight import (
     aggregate_inputs,
+    evaluate_storage_evidence,
     evaluate_capability_rows,
     lint_inventory,
     probe_certificate_chain,
@@ -131,7 +133,6 @@ def test_inventory_lint_treats_present_null_values_as_missing_not_pass():
 
 def test_control_plane_requires_both_real_session_and_anonymous_boundary():
     responses = {
-        ("/v1/health", False): (200, {"unresolvedSettings": []}, {}),
         ("/readyz", False): (200, {"status": "ready"}, {}),
         ("/v1/session", False): (401, {}, {"www-authenticate": "Bearer"}),
         ("/v1/session", True): (200, {"subjectId": "redacted"}, {}),
@@ -140,17 +141,19 @@ def test_control_plane_requires_both_real_session_and_anonymous_boundary():
     def fetch(path: str, *, authenticated: bool):
         return responses[(path, authenticated)]
 
-    def health_fetch(_path: str, *, authenticated: bool):
-        return responses[("/v1/health", authenticated)]
+    def settings_fetch(_path: str, *, authenticated: bool):
+        assert authenticated is True
+        return 200, {"status": "ready", "unresolvedSettings": []}, {}
 
     checks = probe_control_plane(
         base_url="https://secret-host.example",
-        health_url="https://health-secret.example/v1/health",
-        token="secret-token",
+        settings_url="https://settings-secret.example/v1/operations/configuration-readiness",
+        session_token="secret-token",
+        operator_token="operator-secret-token",
         fetch=fetch,
-        health_fetch=health_fetch,
+        settings_fetch=settings_fetch,
     )
-    assert [check["status"] for check in checks] == ["PASS", "PASS", "PASS"]
+    assert [check["status"] for check in checks] == ["PASS", "PASS", "PASS", "PASS"]
     rendered = json.dumps(checks, sort_keys=True)
     assert "secret-host" not in rendered
     assert "secret-token" not in rendered
@@ -159,51 +162,64 @@ def test_control_plane_requires_both_real_session_and_anonymous_boundary():
 
 def test_missing_token_blocks_session_even_when_anonymous_401_is_correct():
     def fetch(path: str, *, authenticated: bool):
-        if path == "/v1/health":
-            return 200, {"unresolvedSettings": []}, {}
         if path == "/readyz":
             return 200, {"status": "ready"}, {}
         return 401, {}, {"www-authenticate": "Bearer"}
-
-    def health_fetch(_path: str, *, authenticated: bool):
-        return 200, {"unresolvedSettings": ["INV_SECRET_ENDPOINT"]}, {}
 
     checks = probe_control_plane(
         base_url="http://127.0.0.1:8080",
-        health_url="http://127.0.0.1:9000/v1/health",
-        token=None,
+        settings_url=None,
+        session_token=None,
+        operator_token=None,
         fetch=fetch,
-        health_fetch=health_fetch,
+        settings_fetch=lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError()),
     )
-    assert checks[2]["status"] == "BLOCKED"
-    assert checks[2]["code"] == "access-token-missing"
-    assert checks[2]["facts"]["anonymousBoundaryValid"] is True
+    assert checks[3]["status"] == "BLOCKED"
+    assert checks[3]["code"] == "access-token-missing"
+    assert checks[3]["facts"]["anonymousBoundaryValid"] is True
 
 
-def test_unresolved_health_setting_is_fail_without_setting_names():
+def test_settings_names_block_only_the_matching_operational_input():
     def fetch(path: str, *, authenticated: bool):
-        if path == "/v1/health":
-            return 200, {"unresolvedSettings": ["INV_SECRET_ENDPOINT"]}, {}
         if path == "/readyz":
             return 200, {"status": "ready"}, {}
         return 401, {}, {"www-authenticate": "Bearer"}
 
-    def health_fetch(_path: str, *, authenticated: bool):
-        return 200, {"unresolvedSettings": ["INV_SECRET_ENDPOINT"]}, {}
+    def settings_fetch(_path: str, *, authenticated: bool):
+        assert authenticated is True
+        return 200, {
+            "status": "blocked",
+            "unresolvedSettings": ["INV_OBJECT_STORE_ENDPOINT"],
+        }, {}
 
-    health = probe_control_plane(
+    settings = probe_control_plane(
         base_url="https://cp.example",
-        health_url="https://health.example/v1/health",
-        token=None,
+        settings_url="https://cp.example/v1/operations/configuration-readiness",
+        session_token=None,
+        operator_token="operator-secret",
         fetch=fetch,
-        health_fetch=health_fetch,
-    )[0]
-    assert health["status"] == "FAIL"
-    assert health["facts"] == {"unresolvedSettingCount": 1}
-    assert "INV_SECRET_ENDPOINT" not in json.dumps(health)
+        settings_fetch=settings_fetch,
+    )[:2]
+    assert settings[0]["status"] == "PASS"
+    assert settings[1]["status"] == "BLOCKED"
+    assert "INV_OBJECT_STORE_ENDPOINT" not in json.dumps(settings)
 
 
-def test_health_surface_is_separate_and_plaintext_token_is_never_sent():
+@pytest.mark.parametrize("status", [401, 403, 503])
+def test_settings_authorization_or_availability_is_blocked(status: int):
+    checks = probe_control_plane(
+        base_url=None,
+        settings_url="https://cp.example/v1/operations/configuration-readiness",
+        session_token=None,
+        operator_token="operator-secret",
+        fetch=lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError()),
+        settings_fetch=lambda *_args, **_kwargs: (status, {}, {}),
+    )
+    assert [check["status"] for check in checks[:2]] == ["BLOCKED", "BLOCKED"]
+    assert {check["code"] for check in checks[:2]} == {"settings-access-blocked"}
+
+
+def test_settings_surface_is_separate_and_plaintext_tokens_are_never_sent():
     calls: list[tuple[str, bool]] = []
 
     def fetch(path: str, *, authenticated: bool):
@@ -214,17 +230,105 @@ def test_health_surface_is_separate_and_plaintext_token_is_never_sent():
 
     checks = probe_control_plane(
         base_url="http://cp.example",
-        health_url=None,
-        token="must-not-be-sent",
+        settings_url=None,
+        session_token="must-not-be-sent",
+        operator_token="operator-must-not-be-sent",
         fetch=fetch,
-        health_fetch=lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError()),
+        settings_fetch=lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError()),
     )
 
     assert checks[0]["status"] == "BLOCKED"
-    assert checks[0]["code"] == "health-url-missing"
-    assert checks[2]["status"] == "FAIL"
-    assert checks[2]["code"] == "plaintext-token-transport-rejected"
+    assert checks[0]["code"] == "settings-url-missing"
+    assert checks[3]["status"] == "FAIL"
+    assert checks[3]["code"] == "plaintext-token-transport-rejected"
     assert ("/v1/session", True) not in calls
+
+
+def storage_evidence(**overrides) -> dict:
+    value = {
+        "schemaVersion": "1.1",
+        "status": "PASS",
+        "targetKind": "operational",
+        "checks": {
+            "put": True,
+            "get": True,
+            "bodySha256": True,
+            "metadataSha256": True,
+            "delete": True,
+            "cleanupVerified": True,
+        },
+        "payloadBytes": 32,
+        "cleanupVerified": True,
+        "codeSha": "a" * 40,
+        "observedAt": "2026-09-28T03:00:00Z",
+        "operatorProcedure": {
+            "executedBy": "operator-role-a",
+            "configurationProfile": "pilot-operational-v1",
+            "runbookRevision": "S01-ST-ROUNDTRIP-1",
+        },
+    }
+    value.update(overrides)
+    return value
+
+
+def test_operational_storage_evidence_requires_all_checks_reachable_sha_and_procedure():
+    result = evaluate_storage_evidence(
+        storage_evidence(),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda sha: sha == "a" * 40,
+    )
+    assert result["status"] == "PASS"
+    assert result["facts"] == {
+        "requiredCheckCount": 6,
+        "verifiedCheckCount": 6,
+        "codeReachable": True,
+        "observedAtValid": True,
+        "procedureComplete": True,
+    }
+    assert "operator-role-a" not in json.dumps(result)
+
+
+def test_ci_candidate_storage_evidence_is_blocked_for_u6():
+    result = evaluate_storage_evidence(
+        storage_evidence(targetKind="ci-candidate"),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-not-operational"
+
+
+def test_operational_storage_evidence_with_a_false_required_check_is_blocked():
+    checks = storage_evidence()["checks"]
+    checks["metadataSha256"] = False
+    result = evaluate_storage_evidence(
+        storage_evidence(checks=checks),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-unverified"
+    assert result["facts"]["verifiedCheckCount"] == 5
+
+
+def test_unreachable_storage_evidence_code_sha_is_blocked():
+    result = evaluate_storage_evidence(
+        storage_evidence(),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: False,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-code-unreachable"
+
+
+def test_storage_evidence_without_operator_procedure_is_blocked():
+    result = evaluate_storage_evidence(
+        storage_evidence(operatorProcedure=None),
+        now=datetime(2026, 9, 28, 4, 0, tzinfo=timezone.utc),
+        reachable=lambda _sha: True,
+    )
+    assert result["status"] == "BLOCKED"
+    assert result["code"] == "storage-evidence-procedure-incomplete"
 
 
 def capability_rows(value: dict) -> list[dict]:
@@ -417,18 +521,22 @@ def test_pilot_capability_probe_sets_read_only_scope_and_redacts_dsn(tmp_path: P
 
 def test_input_aggregation_uses_fail_then_blocked_then_pass_priority():
     checks = [
-        {"id": "health-unresolved-settings", "status": "PASS"},
+        {"id": "configuration-node-ca", "status": "BLOCKED"},
+        {"id": "configuration-object-store", "status": "BLOCKED"},
         {"id": "readyz", "status": "PASS"},
-        {"id": "session-boundary", "status": "BLOCKED"},
+        {"id": "session-boundary", "status": "PASS"},
         {"id": "node-certificate-chain", "status": "PASS"},
         {"id": "dns-resolution", "status": "FAIL"},
         {"id": "inventory-lint", "status": "PASS"},
         {"id": "pilot-capability-match", "status": "PASS"},
+        {"id": "storage-roundtrip-evidence", "status": "PASS"},
     ]
     inputs = aggregate_inputs(checks)
-    assert inputs["U2"]["status"] == "BLOCKED"
+    assert inputs["U2"]["status"] == "PASS"
+    assert inputs["U3"]["status"] == "BLOCKED"
     assert inputs["U4"]["status"] == "FAIL"
     assert inputs["U5"]["status"] == "PASS"
+    assert inputs["U6"]["status"] == "BLOCKED"
 
 
 def test_report_writer_removes_stale_report_and_never_serializes_forbidden_fields(tmp_path: Path):
@@ -459,7 +567,7 @@ def test_report_writer_removes_stale_report_and_never_serializes_forbidden_field
     assert not target.exists()
 
 
-@pytest.mark.parametrize("protected", ["inventory", "ca", "state-child"])
+@pytest.mark.parametrize("protected", ["inventory", "ca", "storage-evidence", "state-child"])
 def test_main_validates_protected_output_before_unlink(
     tmp_path: Path, protected: str
 ):
@@ -467,13 +575,16 @@ def test_main_validates_protected_output_before_unlink(
     state.mkdir()
     inventory_path = tmp_path / "inventory.json"
     ca_path = tmp_path / "node-ca.pem"
+    storage_path = tmp_path / "storage-evidence.json"
     inventory_path.write_text("inventory sentinel", encoding="utf-8")
     ca_path.write_text("ca sentinel", encoding="utf-8")
+    storage_path.write_text("storage sentinel", encoding="utf-8")
     state_child = state / "private-state.json"
     state_child.write_text("state sentinel", encoding="utf-8")
     output = {
         "inventory": inventory_path,
         "ca": ca_path,
+        "storage-evidence": storage_path,
         "state-child": state_child,
     }[protected]
     before = output.read_bytes()
@@ -487,6 +598,8 @@ def test_main_validates_protected_output_before_unlink(
                 str(state),
                 "--ca-bundle",
                 str(ca_path),
+                "--storage-evidence",
+                str(storage_path),
                 "--output",
                 str(output),
             ]
@@ -505,25 +618,35 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
     state = tmp_path / "state-secret-marker"
     state.mkdir()
     report_path = tmp_path / "report.json"
-    token = "token-secret-marker"
-    monkeypatch.setenv("TEST_S01_TOKEN", token)
+    storage_path = tmp_path / "storage-secret-marker.json"
+    evidence = storage_evidence(
+        observedAt=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    )
+    storage_path.write_text(json.dumps(evidence), encoding="utf-8")
+    session_token = "session-token-secret-marker"
+    operator_token = "operator-token-secret-marker"
+    monkeypatch.setenv("TEST_S01_TOKEN", session_token)
+    monkeypatch.setenv("TEST_S01_OPERATOR_TOKEN", operator_token)
 
     def fake_http_fetcher(base_url, token_value, ca_bundle, timeout_seconds, *, exact_url=False):
         assert "secret-marker" not in str(ca_bundle)
 
         def fetch(path: str, *, authenticated: bool):
             if exact_url:
-                return 200, {"unresolvedSettings": []}, {}
+                assert authenticated is True
+                assert token_value == operator_token
+                return 200, {"status": "ready", "unresolvedSettings": []}, {}
             if path == "/readyz":
                 return 200, {"status": "ready"}, {}
             if authenticated:
-                assert token_value == token
+                assert token_value == session_token
                 return 200, {"subjectId": "response-secret-marker"}, {}
             return 401, {}, {"www-authenticate": "Bearer"}
 
         return fetch
 
     monkeypatch.setattr(s01, "http_fetcher", fake_http_fetcher)
+    monkeypatch.setattr(s01, "_commit_reachable", lambda _sha: True)
     monkeypatch.setattr(
         s01,
         "probe_certificate_chain",
@@ -554,12 +677,16 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
         [
             "--base-url",
             "https://cp-secret-marker.example",
-            "--health-url",
-            "https://health-secret-marker.example/v1/health",
+            "--settings-url",
+            "https://settings-secret-marker.example/v1/operations/configuration-readiness",
             "--token-env",
             "TEST_S01_TOKEN",
+            "--operator-token-env",
+            "TEST_S01_OPERATOR_TOKEN",
             "--inventory",
             str(inventory_path),
+            "--storage-evidence",
+            str(storage_path),
             "--state",
             str(state),
             "--output",
@@ -570,7 +697,8 @@ def test_main_report_and_stdout_are_redacted_end_to_end(
     assert exit_code == 0
     rendered = report_path.read_text(encoding="utf-8") + capsys.readouterr().out
     for secret in (
-        token,
+        session_token,
+        operator_token,
         "secret-marker",
         value["nodes"][0]["nodeId"],
         value["nodes"][0]["ip"],
@@ -586,9 +714,11 @@ def test_main_without_any_input_uses_real_probes_and_blocks_every_input(
 ):
     for name in (
         "INV_S01_BASE_URL",
-        "INV_S01_HEALTH_URL",
+        "INV_S01_SETTINGS_URL",
         "INV_S01_ACCESS_TOKEN",
+        "INV_S01_OPERATOR_TOKEN",
         "INV_S01_INVENTORY",
+        "INV_S01_STORAGE_EVIDENCE",
         "INV_LAN_PILOT_STATE",
         "INV_NODE_MTLS_CA_BUNDLE",
         "INV_S01_HTTP_CA_BUNDLE",
@@ -600,7 +730,7 @@ def test_main_without_any_input_uses_real_probes_and_blocks_every_input(
 
     assert exit_code == 2
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    assert len(report["checks"]) == 7
+    assert len(report["checks"]) == 9
     assert {check["status"] for check in report["checks"]} == {"BLOCKED"}
     assert set(report["inputs"]) == {"U1", "U2", "U3", "U4", "U5", "U6"}
     assert {value["status"] for value in report["inputs"].values()} == {"BLOCKED"}
@@ -608,7 +738,7 @@ def test_main_without_any_input_uses_real_probes_and_blocks_every_input(
     assert json.loads(capsys.readouterr().out)["counts"] == {
         "PASS": 0,
         "FAIL": 0,
-        "BLOCKED": 7,
+        "BLOCKED": 9,
     }
 
 
@@ -625,7 +755,8 @@ def test_cli_help_bootstraps_control_plane_import_without_pythonpath():
     )
 
     assert result.returncode == 0, result.stderr
-    assert "--health-url" in result.stdout
+    assert "--settings-url" in result.stdout
+    assert "--health-url" not in result.stdout
 
 
 @pytest.mark.parametrize(
