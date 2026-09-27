@@ -296,8 +296,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(drainPosts).toHaveLength(0);
     });
 
-    it('백엔드 Kill Switch 조회 상태를 data-testid="backend-kill-switch-status"에 정직하게 반영한다 (403, 빈 응답, INACTIVE, ACTIVE)', async () => {
-      // 1. 403 AUTH-0062 실패 시: ⚠️ 조회 실패 [AUTH-0062]
+    it('백엔드 Kill Switch 403 AUTH-0062 실패 시 "조회 실패 [AUTH-0062]"를 표시한다', async () => {
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
           const problem = {
@@ -326,11 +325,12 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         );
       });
 
-      const statusEl403 = container.querySelector('[data-testid="backend-kill-switch-status"]');
-      expect(statusEl403).not.toBeNull();
-      expect(statusEl403?.textContent).toContain('조회 실패 [AUTH-0062]');
+      const statusEl = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusEl).not.toBeNull();
+      expect(statusEl?.textContent).toContain('조회 실패 [AUTH-0062]');
+    });
 
-      // 2. 빈 응답 {} 전달 시 (ContainmentView 누락): ⚠️ 조회 실패 [응답 형식 불일치]
+    it('백엔드 Kill Switch 빈 응답({}) 시 "조회 실패 [응답 형식 불일치]"를 표시한다', async () => {
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
           return {} as any;
@@ -347,10 +347,13 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         );
       });
 
-      const statusElEmpty = container.querySelector('[data-testid="backend-kill-switch-status"]');
-      expect(statusElEmpty?.textContent).toContain('조회 실패 [응답 형식 불일치]');
+      const statusEl = container.querySelector('[data-testid="backend-kill-switch-status"]');
+      expect(statusEl).not.toBeNull();
+      expect(statusEl?.textContent).toContain('조회 실패 [응답 형식 불일치]');
+    });
 
-      // 3. 정상 INACTIVE 응답 ({ killSwitchActive: false, version: 1 })
+    it('백엔드 Kill Switch 정상 조회 시 INACTIVE 및 ACTIVE 상태를 정직하게 표시한다', async () => {
+      // INACTIVE case
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
           return { killSwitchActive: false, version: 1, nodeId: null, nodeStatus: 'online', activeLeases: 0, pendingDeliveries: 0, unsettledRuns: 0, settled: true } as any;
@@ -370,7 +373,12 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       const statusElInactive = container.querySelector('[data-testid="backend-kill-switch-status"]');
       expect(statusElInactive?.textContent).toContain('✔ INACTIVE');
 
-      // 4. 정상 ACTIVE 응답 ({ killSwitchActive: true, version: 2 })
+      // Unmount and re-mount for ACTIVE case
+      act(() => {
+        root.unmount();
+      });
+      root = createRoot(container);
+
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
           return { killSwitchActive: true, version: 2, nodeId: null, nodeStatus: 'quarantined', activeLeases: 0, pendingDeliveries: 0, unsettledRuns: 0, settled: true } as any;
@@ -403,8 +411,8 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         );
       });
 
-      // 1. 상단 KPI 타일 모의/UNMEASURED 표기 검증
-      expect(container.textContent).toContain('0 건 차단 (모의 격리; 물리 컨테이너 UNMEASURED)');
+      // 1. 상단 KPI 타일 모의/UNMEASURED 표기 검증 (seedInitialAuditLogs로 인해 각 1건 차단 초기값)
+      expect(container.textContent).toContain('1 건 차단 (모의 격리; 물리 컨테이너 UNMEASURED)');
       expect(container.textContent).toContain('건 차단 (모의 차단; 물리 승인은 UNMEASURED)');
       expect(container.textContent).toContain('RTX 4090 / A4000 합성 벤치마크 (물리 GPU 미측정)');
       expect(container.textContent).toContain('분 전 (모의; 물리 S3 오프사이트 UNMEASURED)');
