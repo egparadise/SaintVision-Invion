@@ -202,18 +202,44 @@ def clause_status(outcomes: dict[str, str], cases: list[str]) -> dict[str, Any]:
     return {"status": status, "cases": per_case}
 
 
-def evaluate_clauses(outcomes: dict[str, str], lane_violations: dict[str, int] | None = None) -> dict[str, Any]:
+def evaluate_clauses(outcomes: dict[str, str], lane_violations: dict[str, int] | None = None,
+                     db_measured: bool | None = False) -> dict[str, Any]:
+    """Clause status; a clause that depends on DB-lane rules is judged only on a MEASURED lane.
+
+    An unmeasured DB lane has no violation count at all -- it is unknown, never 0 --
+    so such a clause is ``not_run`` with ``dbLaneRules`` values ``None``.
+    """
     result = {}
     for key, spec in AC03_CLAUSES.items():
         clause = {"title": spec["title"], **clause_status(outcomes, spec["cases"])}
         rules = spec.get("lane_rules", [])
         if rules:
-            hits = {rule: (lane_violations or {}).get(rule, 0) for rule in rules}
-            clause["dbLaneRules"] = hits
-            if any(hits.values()) and clause["status"] != "fail":
-                clause["status"] = "fail"
+            if db_measured:
+                hits = {rule: int((lane_violations or {}).get(rule, 0)) for rule in rules}
+                clause["dbLaneRules"] = hits
+                clause["dbLaneMeasured"] = True
+                if any(hits.values()) and clause["status"] != "fail":
+                    clause["status"] = "fail"
+            else:
+                clause["dbLaneRules"] = {rule: None for rule in rules}
+                clause["dbLaneMeasured"] = False
+                if clause["status"] == "pass":
+                    clause["status"] = "not_run"
+                    clause["notRunReason"] = "db-lane-unmeasured"
         result[key] = clause
     return result
+
+
+def pass_scope(clauses: dict[str, Any]) -> dict[str, list[str]]:
+    """Which clauses a PASS_MEASURED_PARTIAL actually covers, and which it does not."""
+    return {
+        "passed": [k for k, c in clauses.items() if c["status"] == "pass"],
+        "notRunUnmeasuredLane": [k for k, c in clauses.items()
+                                 if c["status"] == "not_run" and c.get("notRunReason") == "db-lane-unmeasured"],
+        "notRunOther": [k for k, c in clauses.items()
+                        if c["status"] == "not_run" and c.get("notRunReason") != "db-lane-unmeasured"],
+        "failed": [k for k, c in clauses.items() if c["status"] == "fail"],
+    }
 
 
 def run_suite(spec: dict[str, Any], junit_dir: Path, *, python: str = sys.executable) -> dict[str, Any]:
@@ -315,12 +341,15 @@ def overall_verdict(clauses: dict[str, Any], suites: list[dict[str, Any]], lanes
             return "FAIL"
     if "fail" in statuses or lanes.get("verdict") == "VIOLATIONS":
         return "FAIL"
-    if statuses != {"pass"}:
+    scope = pass_scope(clauses)
+    if not scope["passed"] or scope["notRunOther"]:
         return "NOT_RUN"
     db_measured = (lanes.get("db") or {}).get("measured")
     container_measured = (lanes.get("container") or {}).get("measured")
-    if lanes.get("verdict") == "PASS" and db_measured and container_measured:
+    if statuses == {"pass"} and lanes.get("verdict") == "PASS" and db_measured and container_measured:
         return "PASS"
+    # Some clauses passed on pytest evidence; lane-dependent clauses are not_run
+    # because the DB lane was unmeasured -- the JSON/MD state this scope explicitly.
     return "PASS_MEASURED_PARTIAL"
 
 
@@ -341,7 +370,8 @@ def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]], 
     outcomes: dict[str, str] = {}
     for suite in suites:
         outcomes.update(suite.get("outcomes") or {})
-    clauses = evaluate_clauses(outcomes, lanes.get("violationsByRule"))
+    clauses = evaluate_clauses(outcomes, lanes.get("violationsByRule"),
+                               db_measured=bool((lanes.get("db") or {}).get("measured")))
     docker_lane = docker_lane or DOCKER_LANE_NOT_RUN
     judged_suites = suites + ([docker_lane["suite_result"]] if docker_lane.get("suite_result") else [])
     verdict = overall_verdict(clauses, judged_suites, lanes)
@@ -370,6 +400,10 @@ def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]], 
         },
         "suites": [{k: v for k, v in suite.items() if k != "outcomes"} for suite in suites],
         "clauses": clauses,
+        "passScope": pass_scope(clauses),
+        "passScopeNote": ("PASS_MEASURED_PARTIAL covers only passScope.passed (pytest-judged clauses); clauses in "
+                          "passScope.notRunUnmeasuredLane depend on DB-lane rules that were NOT observed "
+                          "(their rule values are null, not 0)"),
         "lanes": lanes,
         "dockerLane": {k: ({kk: vv for kk, vv in v.items() if kk != "outcomes"} if k == "suite_result" else v)
                        for k, v in docker_lane.items()},
@@ -391,6 +425,9 @@ def render_markdown(evidence: dict[str, Any]) -> str:
         f"# S03-DB AC-03 acceptance evidence — `{(evidence.get('codeSha') or 'nogit')[:12]}`",
         "",
         f"- verdict (measured part): **{evidence['verdict']}** · acceptanceClaim: `false`",
+        f"- pass scope: passed {evidence['passScope']['passed']} · not_run (DB lane unmeasured, rule values null)"
+        f" {evidence['passScope']['notRunUnmeasuredLane']} · not_run other {evidence['passScope']['notRunOther']}"
+        f" · failed {evidence['passScope']['failed']}",
         f"- captured: {p.get('timestamp_kst')} · executor: {p.get('executor')} · clean tree: {p.get('working_tree_clean_status')}",
         "",
         "| suite | postgres | status | exit | counts | elapsed s |",

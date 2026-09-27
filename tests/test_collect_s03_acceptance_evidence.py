@@ -77,7 +77,9 @@ def test_unmapped_failure_in_any_suite_fails_closed():
     outcomes = {**_all_cases(), "tests.test_execution::test_retry_budget_is_enforced": "failed"}
     suite = _suite(status="failed", outcomes=outcomes, exit_code=1)
     suite["counts"] = {"passed": 27, "failed": 1, "error": 0, "skipped": 0}
-    evidence = tool.build_evidence(provenance=_prov(), suites=[suite], lanes=_lanes())
+    evidence = tool.build_evidence(provenance=_prov(), suites=[suite],
+                                   lanes=_lanes(verdict="PASS", db=True, container=True,
+                                                violations={"C1": 0, "C2": 0, "C3": 0, "C4": 0}))
     assert {c["status"] for c in evidence["clauses"].values()} == {"pass"}
     assert evidence["verdict"] == "FAIL"
 
@@ -139,13 +141,13 @@ def test_clause_pass_requires_every_case_passed(mutate, expected):
     for case, outcome in mutate.items():
         cases.pop(case) if outcome is None else cases.__setitem__(case, outcome)
     outcomes = tool.parse_junit(_junit(cases))["outcomes"]
-    clause = tool.evaluate_clauses(outcomes)["evidence-id-and-output-hash-enforced"]
+    clause = tool.evaluate_clauses(outcomes, {}, db_measured=True)["evidence-id-and-output-hash-enforced"]
     assert clause["status"] == expected
 
 
 def test_db_lane_violation_fails_the_owning_clause_only():
     outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
-    clauses = tool.evaluate_clauses(outcomes, {"C2": 1})
+    clauses = tool.evaluate_clauses(outcomes, {"C2": 1}, db_measured=True)
     assert clauses["evidence-id-and-output-hash-enforced"]["status"] == "fail"
     assert clauses["evidence-id-and-output-hash-enforced"]["dbLaneRules"] == {"C2": 1, "C3": 0}
     assert clauses["resources-reclaimed-after-exit"]["status"] == "pass"
@@ -237,7 +239,13 @@ def test_main_bundles_stubbed_suites_and_lanes(tmp_path, monkeypatch):
     assert code == 0
     payload = json.loads((tmp_path / "b.json").read_text(encoding="utf-8"))
     assert payload["verdict"] == "PASS_MEASURED_PARTIAL"
-    assert {k: v["status"] for k, v in payload["clauses"].items()} == {k: "pass" for k in tool.AC03_CLAUSES}
+    assert {k: v["status"] for k, v in payload["clauses"].items()} == {
+        "allowed-execution-succeeds": "pass", "forbidden-path-or-command-blocked": "pass",
+        "resources-reclaimed-after-exit": "not_run", "evidence-id-and-output-hash-enforced": "not_run"}
+    assert payload["passScope"]["passed"] == ["allowed-execution-succeeds", "forbidden-path-or-command-blocked"]
+    assert payload["passScope"]["notRunUnmeasuredLane"] == ["resources-reclaimed-after-exit", "evidence-id-and-output-hash-enforced"]
+    assert payload["clauses"]["resources-reclaimed-after-exit"]["dbLaneRules"] == {"C1": None, "C4": None}
+    assert "pass scope" in (tmp_path / "b.md").read_text(encoding="utf-8")
     assert [s["id"] for s in payload["suites"]] == [s["id"] for s in tool.SUITES]
     text = (tmp_path / "b.json").read_text(encoding="utf-8") + (tmp_path / "b.md").read_text(encoding="utf-8")
     assert "stub-pw" not in text
@@ -261,3 +269,38 @@ def test_real_pg_runner_bundle(tmp_path):
     assert payload["acceptanceClaim"] is False
     assert payload["lanes"]["status"] == "complete"
     assert admin not in (tmp_path / "real.json").read_text(encoding="utf-8")
+
+
+# --------------------------------------------------------------------------
+# Codex #121 residual: unobserved violations are unknown, never 0
+# --------------------------------------------------------------------------
+
+
+def test_unmeasured_db_lane_never_passes_lane_dependent_clauses():
+    """Revival: db.measured=false + violationsByRule={} must not yield pass or numeric zeros."""
+    outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
+    clauses = tool.evaluate_clauses(outcomes, {}, db_measured=False)
+    for key in ("resources-reclaimed-after-exit", "evidence-id-and-output-hash-enforced"):
+        assert clauses[key]["status"] == "not_run"
+        assert clauses[key]["notRunReason"] == "db-lane-unmeasured"
+        assert all(v is None for v in clauses[key]["dbLaneRules"].values())
+        assert 0 not in clauses[key]["dbLaneRules"].values()
+    assert clauses["allowed-execution-succeeds"]["status"] == "pass"
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()], lanes=_lanes(db=False))
+    assert evidence["verdict"] == "PASS_MEASURED_PARTIAL"
+    assert evidence["passScope"]["notRunUnmeasuredLane"] == [
+        "resources-reclaimed-after-exit", "evidence-id-and-output-hash-enforced"]
+    assert "not_run" in tool.render_markdown(evidence)
+
+
+def test_measured_db_lane_with_explicit_zero_violations_passes_lane_clauses():
+    """Only a measured DB lane with explicit C1..C4 = 0 may pass the lane-dependent clauses."""
+    outcomes = tool.parse_junit(_junit(_all_cases()))["outcomes"]
+    clauses = tool.evaluate_clauses(outcomes, {"C1": 0, "C2": 0, "C3": 0, "C4": 0}, db_measured=True)
+    assert {c["status"] for c in clauses.values()} == {"pass"}
+    assert clauses["evidence-id-and-output-hash-enforced"]["dbLaneRules"] == {"C2": 0, "C3": 0}
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()],
+                                   lanes=_lanes(verdict="PASS", db=True, container=True,
+                                                violations={"C1": 0, "C2": 0, "C3": 0, "C4": 0}))
+    assert evidence["passScope"]["passed"] == list(tool.AC03_CLAUSES)
+    assert evidence["verdict"] == "PASS_MEASURED_PARTIAL"  # docker lane still not_run

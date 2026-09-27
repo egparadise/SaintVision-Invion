@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S03-DB-AC03-EVIDENCE-RUNNER-DESIGN-001"
 title: "S03-DB AC-03 acceptance Evidence runner 설계 — 제한 컨테이너 출력 bytes/hash·금지 경로/명령 거부·lease 회수·Evidence ID를 고정 SHA에서 한 번에 묶는 runner (기존 collect_container_evidence.py + S03 시험 재사용)"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed-review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T06:20:00+09:00"
+updated: "2026-09-28T06:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -48,7 +48,7 @@ tags: ["S03-DB", "AC-03", "evidence", "runner", "container", "lease", "sandbox",
 - DB lane (**Codex F-R1, 선택 (b)**): `collect_container_evidence.py`를 import로 호출해 exit(0/1/2/3)와 JSON 요약(runs·leases·violations·measured 플래그)만 묶음에 넣는다. 기본은 `--disposable`(빈 마이그레이션 DB) → collector가 **runs 0 → UNMEASURED**를 내고 runner는 그것을 그대로 `ledgerSource: empty-disposable-database`로 옮긴다. `s03_db` 시드 승격은 **하지 않는다**: 현 `_seed_ledger()`는 실행 FK chain(execution_attempts→tool_claims→approval_dispatches)이 없어 result completion/commitment를 만들 수 없고 C2 위반 2건이 기대값이므로, 시드 lane은 PASS 입력이 될 수 없다. 제품 ledger를 가진 DB(실 Node 경유)가 있을 때만 `--dsn`으로 측정하며 `ledgerSource: product-dsn`으로 표기한다. 시드 기반 측정이 언젠가 필요하면 별도 카드에서 제품 서비스 경로(approval→dispatch→claim→attempt→completion)로 chain을 만드는 절차를 먼저 설계하고, 그때도 `ledgerSource: seeded-fixture`·`acceptanceClaim=false`·`EXPECTED_FINDING` 표기를 유지한다.
 - Container lane: `--container-image`가 주어지고 로컬 docker에 이미지가 있을 때만; 없으면 collector가 그대로 `measured:false`. runner는 그 값을 옮기고 이유를 남긴다. 이미지 pull 금지. 이 PC에서는 컨테이너를 기동하지 않는다(메모리 경보).
 - **Docker opt-in lane (Codex F-R2)**: `tests/integration/test_containment.py::test_running_kill_preempts_network_call_and_releases_only_after_real_stop`는 `test_node_delivery.remote`/`test_node_runtime`을 통해 실제 synthetic container를 기동하므로 PG-only 계획에서 **제외**하고 별도 `--docker-lane`(명시 opt-in, 격리 Linux Docker host)에서만 실행한다. 기본값은 `dockerLane.status = not_run`(값 없음). 로컬 measured `resources-reclaimed-after-exit` 조항은 `reservation_aborts` 3건 + `test_postgres` 2건 + DB lane C1·C4만으로 판정한다.
-- 묶음 verdict: 측정된 4조항 전부 pass ∧ DB lane 위반 0 → lane이 모두 measured면 `PASS`, 하나라도 UNMEASURED/not_run이면 `PASS_MEASURED_PARTIAL`; 실패/위반 → `FAIL`; 실행 불가 → `UNAVAILABLE`; 측정 0 → `NOT_RUN`. `acceptanceClaim=false` 고정(실 Linux 제한 컨테이너·ToolGateway·제품 Storage 출력은 물리 자원 대기). 어떤 clause 시험 파일이든 failed/error > 0 또는 exit ≠ 0이면 매핑 여부와 무관하게 `FAIL`(#120 F-R1과 같은 fail-closed).
+- 묶음 verdict: DB lane 규칙(C1/C4·C2/C3)에 의존하는 두 조항은 **DB lane이 measured일 때만** 판정한다 — 관측하지 않은 위반 수는 0이 아니라 unknown이므로 unmeasured면 두 조항은 `not_run`(`notRunReason=db-lane-unmeasured`, rule 값 `null`). pytest-only 두 조항이 pass이고 나머지가 lane-unmeasured `not_run`뿐이면 `PASS_MEASURED_PARTIAL`이며 JSON `passScope`/`passScopeNote`와 MD가 어느 조항이 pass인지 명시한다(4조항 전부 pass로 렌더링하지 않음); 4조항 전부 pass ∧ 모든 lane measured ∧ Docker lane 측정 → `PASS`; 실패/위반 → `FAIL`; 실행 불가 → `UNAVAILABLE`; 측정 0 또는 lane 외 사유의 not_run → `NOT_RUN`. `acceptanceClaim=false` 고정(실 Linux 제한 컨테이너·ToolGateway·제품 Storage 출력은 물리 자원 대기). 어떤 clause 시험 파일이든 failed/error > 0 또는 exit ≠ 0이면 매핑 여부와 무관하게 `FAIL`(#120 F-R1과 같은 fail-closed).
 - **Redaction 계약 (Codex F-R3, #120 F-R3과 동일 기준)**: 산출 이름은 "redacted" — (i) DSN·password는 `assert_no_secrets`로 쓰기 거부, (ii) 식별자는 sanitizer가 placeholder로 치환: disposable DB 이름(`inv_s03_<hex>`·`inv_rls_<hex>`·`inv_backend_test_<hex>`), UUID(tenant·epoch·abort·object), 커널 ULID 식별자(`run_/lse_/evd_/nod_/prj_/res_/tnt_` + 26자), `IPv4:port`; collector가 쓴 lane JSON/MD도 그 자리에서 치환(JSON 유효 유지, raw/redacted sha256 병기), `--note`도 같은 치환; (iii) **보존되는 것**: probe stdout/stderr head(고정 probe 문자열)·SQLSTATE·rule id·count. 부정 시험(각 패턴이 남으면 쓰기 거부)을 둔다. 이 묶음은 내부 evidence이며 공개 artifact가 아니다.
 - 외부·물리 대기(값 없음): 실제 Linux 제한 컨테이너 실행 24파일(`integration/test_node_runtime`·`test_dispatch_node`·`test_node_delivery`·`test_shard_recovery`·`test_workspace_*`·`test_results` 등, "Real Linux Docker runtime explicitly enabled only in isolated CI") → `not_run_here` + hosted Core run id를 인용 칸으로만, ToolGateway 실 Node, S03-ST 전송 정본(#5 결정 대기).
 - 산출: `Evidence/s03-db-acceptance/s03-acceptance-<sha12>-<utc>.{json,md}` + `-container.{json,md}`(collector 원본). stale 선삭제, DSN/비밀번호 쓰기 거부, provenance = SHA·branch·integration 거리·clean 플래그·runner sha256·collector sha256. exit 0 PASS_MEASURED(_PARTIAL) / 1 FAIL / 2 UNAVAILABLE / 3 NOT_RUN.
