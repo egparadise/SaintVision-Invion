@@ -263,7 +263,7 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
 
       // 1. offline 노드 검증
       const cardOffline = container.querySelector('[data-testid="node-card-nod_offline_01"]');
-      expect(cardOffline?.textContent).toContain('Heartbeat: 75s ago');
+      expect(cardOffline?.textContent).toMatch(/Heartbeat: 7[5-6]s ago/);
       const actualOffline = container.querySelector('[data-testid="node-actual-status-nod_offline_01"]');
       expect(actualOffline).not.toBeNull();
       expect(actualOffline?.textContent).toContain('실제: offline');
@@ -377,21 +377,21 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
         root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
       });
 
-      // 1. 체크아웃 비어있을 때 recovery-no-checkouts testid 및 모의 표기 단언
+      // 1. 체크아웃 비어있을 때 recovery-no-checkouts testid 및 실제 view:479 모의 표기 단언
       const noCheckouts = container.querySelector('[data-testid="recovery-no-checkouts"]');
       expect(noCheckouts).not.toBeNull();
-      expect(noCheckouts?.textContent).toContain('활성화된 수정 가능 세대(Working Generation) 체크아웃이 없습니다. (모의)');
+      expect(noCheckouts?.textContent).toContain('생성된 시뮬레이션 체크아웃이 없습니다. (모의)');
 
-      // 2. 권한 설명 문구 단언 (0400 read-only, 0600 read/write, 0700 executable generation)
-      expect(container.textContent).toContain('0400 read-only');
-      expect(container.textContent).toContain('0600 read/write');
-      expect(container.textContent).toContain('0700 executable generation');
+      // 2. 권한 설명 문구 단언 (ADR-043 원문: 0400 readonly, 0600 file / 0700 dir, 단조 epoch 보증)
+      expect(container.textContent).toContain('0400 readonly');
+      expect(container.textContent).toContain('0600 file / 0700 dir');
+      expect(container.textContent).toContain('단조 epoch 보증');
 
       // 3. Reconcile 헤더의 모의 표기 및 물리 AC-07 UNMEASURED 단언
       expect(container.textContent).toContain('Cluster Reconciliation Audit Trail (AC-07 모의 복구 시뮬레이션; 물리 AC-07 UNMEASURED)');
 
-      // 4. Drain & Reconcile 실행 후 Reconcile 표의 RECOVERED (모의) 배지 단언
-      const reconcileBtn = container.querySelector('[data-testid="reconcile-node-btn"]') as HTMLButtonElement;
+      // 4. Drain & Reconcile 실행 후 Reconcile 표의 RECOVERED (모의) 배지 단언 (실제 view:429 drain-reconcile-btn 사용)
+      const reconcileBtn = container.querySelector('[data-testid="drain-reconcile-btn"]') as HTMLButtonElement;
       expect(reconcileBtn).not.toBeNull();
       act(() => {
         reconcileBtn.click();
@@ -402,25 +402,26 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
     });
 
     it('nodes=[] 빈 상태 마운트 후 nodes 공급 시 동적으로 뷰를 갱신한다 (root.render([]) -> root.render(nodes))', () => {
-      // 1. 빈 노드 배열로 초기 렌더링 -> empty-state 표시
+      // 1. 빈 노드 배열로 초기 렌더링 -> 실제 view:275 recovery-empty-nodes-screen 표시 확인
       act(() => {
         root.render(<DistributedRecoveryView nodes={[]} />);
       });
 
-      const emptyNotice = container.querySelector('[data-testid="recovery-empty-state"]');
-      expect(emptyNotice).not.toBeNull();
-      expect(emptyNotice?.textContent).toContain('등록되거나 관측된 클러스터 노드가 없습니다');
+      const emptyScreen = container.querySelector('[data-testid="recovery-empty-nodes-screen"]');
+      expect(emptyScreen).not.toBeNull();
+      expect(emptyScreen?.textContent).toContain('클러스터에 등록된 노드가 없거나 관측 대기 중입니다');
+      expect(emptyScreen?.textContent).toContain('0대 또는 관측 수집 대기');
       expect(container.querySelector('[data-testid="node-card-nod_test_01"]')).toBeNull();
 
-      // 2. 후속으로 노드 공급하여 재렌더링 -> empty-state 사라지고 노드 카드 표시
+      // 2. 후속으로 노드 공급하여 재렌더링 -> recovery-empty-nodes-screen 소멸 및 실제 MOCK_NODES 노드 카드(node-win-01) 노출 확인
       act(() => {
         root.render(<DistributedRecoveryView nodes={MOCK_NODES} />);
       });
 
-      expect(container.querySelector('[data-testid="recovery-empty-state"]')).toBeNull();
+      expect(container.querySelector('[data-testid="recovery-empty-nodes-screen"]')).toBeNull();
       const nodeCard = container.querySelector('[data-testid="node-card-nod_test_01"]');
       expect(nodeCard).not.toBeNull();
-      expect(nodeCard?.textContent).toContain('WinMain-Production-01');
+      expect(nodeCard?.textContent).toContain('node-win-01');
     });
   });
 

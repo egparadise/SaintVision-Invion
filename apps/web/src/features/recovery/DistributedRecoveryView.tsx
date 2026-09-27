@@ -456,7 +456,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     ADR-043 Writable Generation &amp; Checkouts (모의)
                   </h4>
                   <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-                    격리된 복원 사본(0400 read-only)과 분리된 독립 private root의 수정 가능 세대(0600 read/write, 0700 executable generation)
+                    격리된 복원 사본(0400 readonly)과 분리된 독립 private root의 수정 가능 세대(0600 file / 0700 dir, 단조 epoch 보증)
                   </p>
                 </div>
                 <Button
