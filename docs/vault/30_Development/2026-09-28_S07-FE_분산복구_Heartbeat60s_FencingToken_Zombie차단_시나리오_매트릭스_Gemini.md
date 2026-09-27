@@ -1,11 +1,11 @@
 ---
 doc_id: "GEMINI-S07-FE-SCENARIO-MATRIX-20260928"
 title: "S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 (Gemini)"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Gemini"
 reviewer: "Codex, Claude"
-updated: "2026-09-28T05:50:00+09:00"
+updated: "2026-09-28T06:15:00+09:00"
 source_of_truth: "Git"
 tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "zombie-rejection", "split-brain", "heartbeat", "gemini"]
 ---
@@ -34,7 +34,7 @@ tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "
 
 ## 1. 개요 및 수용 목표 (OUT-07 / AC-07)
 
-본 문서는 SaintVision 분산 클러스터 탄력성 및 제어 평면의 **S07-FE (분산 복구·Node 이탈·Heartbeat 60s Stale 전이·단조 Fencing Token·Zombie Late Write 차단 UX)** 트랙을 완결하기 위해, 코디네이터 지시 및 Codex 계약 검토(F-C1, F-C2, F-C3)와 **Claude UI 경로 독립 검토(issuecomment-5859600000+ 8대 수정 요청 및 관찰사항 전수)**를 반영하여 수립한 **시나리오 매트릭스 정본 개정안(v1.0.2)**이다.
+본 문서는 SaintVision 분산 클러스터 탄력성 및 제어 평면의 **S07-FE (분산 복구·Node 이탈·Heartbeat 60s Stale 전이·단조 Fencing Token·Zombie Late Write 차단 UX)** 트랙을 완결하기 위해, 코디네이터 지시 및 Codex 계약 검토(F-C1, F-C2, F-C3)와 **Claude UI 경로 독립 검토(issuecomment-5859655979 8대 수정 요청 및 관찰사항 전수)**를 반영하여 수립한 **시나리오 매트릭스 정본 개정안(v1.0.3)**이다.
 
 본 문서는 `DistributedRecoveryView` 및 `recoveryEngine` 화면/엔진의 사용자 여정별 기대를 **실제 프런트엔드 컴포넌트 셀렉터(`data-testid`, `button:has-text`, `role`, 배너 텍스트)**와 1:1로 엄격히 대응시키며, 클라이언트 인메모리 시뮬레이션 결과와 백엔드 DB 커널 계약의 경계를 철저히 분리한다.
 
@@ -44,7 +44,7 @@ tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "
    - **클라이언트 인메모리 시뮬레이션 계약 (UI Simulation Contract)**:
      - `recoveryEngine.ts`의 `ResilientNodeState`는 하트비트 경과 시간에 따라 60초 초과 시 `stale`, 120초 초과 시 `offline`, 네트워크 분할 시 `fenced` 상태로 전이한다.
      - `DistributedRecoveryView:71-78`의 버튼(`⏱️ Simulate Heartbeat Delay (75s > 60s Stale Threshold)`)을 통해 75초 지연 인입 시 UI 카드 배지(`STALE`) 및 알림 배너 전이를 검증한다. (참고: 120초 초과 `offline` 전이는 UI 버튼/트리거 경로가 없으며 엔진 단위 시험 `distributed-recovery.test.ts:31-32`에서만 실행됨).
-     - 상단 KPI 배너의 `≤ 60 초 (실측 통과)`는 **정적 JSX 리터럴(측정값이나 동적 계산값이 아닌 고정 문자열)**이며, 실제 커널 AC-07 감지 한계는 timeout + 1 poll interval (60.5s)로 숫자도 차이가 있다. 제품 문구의 동적 실측 연동은 향후 FE 개선 과제로 분리하며, 실제 물리/PG 클러스터 감지 지연은 **`UNMEASURED`**이다.
+     - 상단 KPI 배너의 `≤ 60 초 (실측 통과)`는 **정적 JSX 리터럴(측정값이나 동적 계산값이 아닌 고정 문자열)**이며, 실제 커널 AC-07 감지 한계는 timeout + poll (설정 의존: measure_s07_recovery 도구 기본 60.1s, 단위시험 fixture 60.5s)로 숫자도 차이가 있다. 제품 문구의 동적 실측 연동은 향후 FE 개선 과제로 분리하며, 실제 물리/PG 클러스터 감지 지연은 **`UNMEASURED`**이다.
      - **실제 Node에 합성 상태를 덧씌우는 구조 고지**: `DistributedRecoveryView:13-17`은 실제 백엔드에서 전달된 Node 목록(`App.tsx:264-267` `/v1/nodes` 등)의 `id`, `hostname`만 취하고, 실제 백엔드 헬스(`NodeItem.status`, `heartbeatAt`)를 무시한 채 모두 `healthState: 'online'`, `heartbeatAgeSeconds: 2`로 강제 초기화(`recoveryEngine.ts:49-51`)한다. 따라서 백엔드 상에서 실제 offline인 노드도 UI상에서는 초록 ONLINE으로 렌더된다.
    - **백엔드 DB 커널 정본 계약 (Kernel Authority Boundary)**:
      - DB 정본 `inv.nodes.status` enum 규격(`0001_core.sql:17`)은 `'online' | 'offline' | 'draining' | 'quarantined'` 4종만을 허용하며, `stale`이나 `fenced`는 DB 상태가 아닌 프런트엔드 전용 합성 상태이다.
@@ -98,7 +98,7 @@ tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 네트워크 규격 | 검증 단언 및 기대값 | 관련 인용 시험 (파일:행) |
 |:---:|---|---|---|---|---|---|---|
 | **HBD-01** | **정상 Heartbeat 수신 및 Healthy 노드 렌더링** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | 초기 클러스터 노드 마운트 완료 (엔진 fixture는 5대, DOM 테스트는 1대 `node-win-01` 마운트) | 화면 마운트 완료 시점 | • KPI 배너: `div:has-text("AC-07 이탈 감지 시간")`<br>• KPI 값: `div:has-text("≤ 60 초 (실측 통과)")` (정적 JSX 리터럴)<br>• 상태 배지: `span:has-text("ONLINE")`<br>• 경과 시간: `span:has-text("2s ago")` | • 초기 노드 `healthState === 'online'` 및 녹색 배지(`#3fb950`) 표출 확인.<br>• Heartbeat 경과 시간이 60초 이내(기본 2s)로 렌더링됨.<br>• 상단 KPI 배너에 `≤ 60 초 (실측 통과)` 고정 JSX 리터럴 표출 확인 (동적 측정값 아님; 물리 클러스터 감지 시간은 UNMEASURED).<br>• **(합성 상태 고지)** 백엔드 실제 노드 상태와 무관하게 UI 인메모리에서 무조건 online/2s로 초기화됨. (인용 시험은 엔진 단언 전용이며 DOM 셀렉터 단언은 아님). | `apps/web/tests/distributed-recovery.test.ts:22-26`<br>*(순수 엔진 단위시험)* |
-| **HBD-02** | **Heartbeat 지연(75초 > 60초) 시뮬레이션 및 STALE 자동 전이** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | **비분할(Non-partitioned) Node**(`nod_01JABCDEF01`) 선택 상태 | 지연 버튼 클릭: `button:has-text("⏱️ Simulate Heartbeat Delay (75s > 60s Stale Threshold)")` | • 버튼: `Button variant="secondary"` (style: `#30363d`)<br>• 알림 배너: `actionNotice.type === 'info'` (border/color `#58a6ff`; 별도 role/testid 없음)<br>• 알림 문구: `Heartbeat age for Node-01-WinMain set to 75s (>60s). Health transitioned to STALE (AC-07 verified).` (정적 고정 문구)<br>• 상태 배지: `span:has-text("STALE")` (color: `#e3b341`)<br>• 경과 시간 텍스트: `span:has-text("75s ago")` (color: `#f85149`) | • `recoveryManager.simulateHeartbeatDelay(nodeId, 75)` 호출 완료.<br>• 클라이언트 엔진 상에서 노드 헬스가 즉시 `online`에서 `stale`로 전이됨을 실측.<br>• (경계 고지) `stale`은 UI 인메모리 시뮬레이션 상태이며, 백엔드 DB observer는 60s 초과 시 `offline`으로 직접 전이함(`observation.py:146`). 분할 노드는 엔진이 `fenced`를 유지하므로 비분할 노드에서만 배지가 STALE로 변경됨. | `apps/web/tests/distributed-recovery.test.ts:28-29`<br>*(순수 엔진 단위시험)* |
+| **HBD-02** | **Heartbeat 지연(75초 > 60초) 시뮬레이션 및 STALE 자동 전이** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | **비분할(Non-partitioned) Node**(`nod_01JABCDEF01`) 선택 상태 | 지연 버튼 클릭: `button:has-text("⏱️ Simulate Heartbeat Delay (75s > 60s Stale Threshold)")` | • 버튼: `Button variant="secondary"`<br>• 알림 배너: `actionNotice.type === 'info'` (border/color `#58a6ff`; 별도 role/testid 없음)<br>• 알림 문구: `Heartbeat age for Node-01-WinMain set to 75s (>60s). Health transitioned to STALE (AC-07 verified).` (정적 고정 문구)<br>• 상태 배지: `span:has-text("STALE")` (color: `#e3b341`)<br>• 경과 시간 텍스트: `span:has-text("75s ago")` (color: `#f85149`) | • `recoveryManager.simulateHeartbeatDelay(nodeId, 75)` 호출 완료.<br>• 클라이언트 엔진 상에서 노드 헬스가 즉시 `online`에서 `stale`로 전이됨을 실측.<br>• (경계 고지) `stale`은 UI 인메모리 시뮬레이션 상태이며, 백엔드 DB observer는 60s 초과 시 `offline`으로 직접 전이함(`observation.py:146`). 분할 노드는 엔진이 `fenced`를 유지하므로 비분할 노드에서만 배지가 STALE로 변경됨. (참고: `Node-01-WinMain`은 엔진 시험 fixture 값이며 실제 화면에서는 백엔드 API가 전달한 노드의 hostname이 동적 렌더링됨). | `apps/web/tests/distributed-recovery.test.ts:28-29`<br>*(순수 엔진 단위시험)* |
 | **HBD-03** | **Heartbeat 120초 초과 시 OFFLINE 전이 (엔진 전용; DOM 경로 부재)** | `recoveryEngine.ts` | 특정 노드 선택 상태 | `evaluateNodeHealth(nodeId, 125)` 직접 호출 | • 엔진 상태: `healthState: 'offline'`<br>• 상태 배지: `span:has-text("OFFLINE")` (color: `#f85149`)<br>• **[DOM 경로 부재]**: UI 버튼(`view:72`)은 75초만 전달하므로 UI 화면상에서 >120s 지연을 인입하는 DOM 트리거 버튼은 없음 | • 120초 초과 지연 발생 시 클라이언트 엔진에서 `stale`에서 `offline`으로 전이됨을 엔진 시험으로만 단언.<br>• (경계 고지) 백엔드 스케줄러의 영구 제외 연동은 별도 커널 디스패치 계약(`dispatch.py:79-85`, `leases.py:253-256`) 영역이며 **스케줄러 연동은 UNMEASURED**로 분리함. | `apps/web/tests/distributed-recovery.test.ts:31-32`<br>*(순수 엔진 단위시험)* |
 
 ---
@@ -127,7 +127,7 @@ tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "
 
 | 시나리오 ID | 시나리오 명칭 | 대상 컴포넌트 | 선행 상태 및 조건 | 트리거 액션 | 실제 DOM 셀렉터 및 네트워크 규격 | 검증 단언 및 기대값 | 관련 인용 시험 (파일:행) |
 |:---:|---|---|---|---|---|---|---|
-| **REC-01** | **노드 태스크 대피(Drain) 및 Epoch 전진 복구 재개** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | FNC-01 실행된 첫 노드 (`activeWorkspacesCount > 0`, `isPartitioned === true`) | 복구 버튼 클릭: `button:has-text("🛡️ Drain & Reconcile Node (Restore & Advance Epoch)")` | • 버튼: `Button variant="primary"` (style: `#238636`)<br>• 알림 배너: `actionNotice.type === 'success'` (border/color `#3fb950`)<br>• 알림 문구: `✔ Node Node-01-WinMain reconciled! Evacuated 1 tasks. Advanced to Epoch 3. Status restored to ONLINE.`<br>• 상태 배지: `span:has-text("ONLINE")`<br>• 활성 태스크: `span:has-text("0")` (단, 경과시간 0s ago와 혼동 주의) | • `recoveryManager.reconcileNode(nodeId)` 실행 완료.<br>• 활성 작업 대피(`evacuatedWorkspacesCount`) 후 `activeWorkspacesCount = 0` 초기화.<br>• 네트워크 분할 해제(`isPartitioned = false`) 및 Epoch 전진(+1) 발급.<br>• 엔진 내부에서 `recovering` ➔ `online` 동기 전이되므로 화면에는 recovering이 노출되지 않고 곧바로 ONLINE으로 복구됨.<br>• **[주의]** 인용 시험 `:101-106`은 `record.recoverySuccess && healthState==='online'`만 확인하며, 대피·분할해제·Epoch 전진에 대한 expect 단언이 0개임 (단언 보강 필요). | `apps/web/tests/distributed-recovery.test.ts:101-106`<br>*(단언 미흡 / 보강 필요)* |
+| **REC-01** | **노드 태스크 대피(Drain) 및 Epoch 전진 복구 재개** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | FNC-01 실행된 첫 노드 (`activeWorkspacesCount > 0`, `isPartitioned === true`) | 복구 버튼 클릭: `button:has-text("🛡️ Drain & Reconcile Node (Restore & Advance Epoch)")` | • 버튼: `Button variant="primary"`<br>• 알림 배너: `actionNotice.type === 'success'` (border/color `#3fb950`)<br>• 알림 문구: `✔ Node Node-01-WinMain reconciled! Evacuated 1 tasks. Advanced to Epoch 3. Status restored to ONLINE.`<br>• 상태 배지: `span:has-text("ONLINE")`<br>• 활성 태스크: `span:has-text("0")` (단, 경과시간 0s ago와 혼동 주의) | • `recoveryManager.reconcileNode(nodeId)` 실행 완료.<br>• 활성 작업 대피(`evacuatedWorkspacesCount`) 후 `activeWorkspacesCount = 0` 초기화.<br>• 네트워크 분할 해제(`isPartitioned = false`) 및 Epoch 전진(+1) 발급.<br>• 엔진 내부에서 `recovering` ➔ `online` 동기 전이되므로 화면에는 recovering이 노출되지 않고 곧바로 ONLINE으로 복구됨.<br>• **[주의]** 인용 시험 `:101-106`은 `record.recoverySuccess && healthState==='online'`만 확인하며, 대피·분할해제·Epoch 전진에 대한 expect 단언이 0개임 (단언 보강 필요). | `apps/web/tests/distributed-recovery.test.ts:101-106`<br>*(단언 미흡 / 보강 필요)* |
 | **REC-02** | **UI 인메모리 복구 시뮬레이션 20회 반복 성공 (F-C2 및 Claude r1 반영)** | `DistributedRecoveryView.tsx`<br>`recoveryEngine.ts` | 5개 fixture 노드 대상 20회 순차 분할 및 Reconcile 루프 (`i % 5`) | 테스트 스위트 또는 모의 하네스 완료 시점 | • KPI 배너: `div:has-text("분산 복구 성공률 목표")`<br>• KPI 값: `div:has-text("100% (목표: ≥95%)")` (정적 JSX 리터럴)<br>• 부제: `div:has-text("Drain 및 Epoch 전진 Consensus")` | • 20회 반복 복구 시뮬레이션에서 20회 전수 복구 성공 (`successfulReconciliations === 20`).<br>• 상단 KPI 배너에 `100% (목표: ≥95%)` 정적 JSX 리터럴 표출 확인.<br>• **[거버넌스 고지]**: 이 20회 시험은 fixture 노드 대상 4회씩 순차 실행한 것이며, **ADR-100:51의 물리 5노드 벤치마크 규격(Ubuntu 4대 × 5회, 겸임 노드 분모 제외 및 합산 금지)**과 형태가 다름.<br>• 물리 바이트 전송 및 실행 샤드 재생을 수반하는 운영 AC-07 복구율(≥95%)은 **UNMEASURED**임. | `apps/web/tests/distributed-recovery.test.ts:89-113`<br>*(순수 엔진 단위시험)* |
 | **REC-03** | **Cluster Reconciliation 이력 감사 원장 표출** | `DistributedRecoveryView.tsx` | 복구 1회 이상 완료 상태 | 이력 렌더링 시점 | • 헤더: `h4:has-text("Cluster Reconciliation Audit Trail (AC-07 Recovery KPI)")`<br>• 테이블 헤더: `th:has-text("Reconciliation ID")`, `th:has-text("Node ID")`, `th:has-text("Evacuated Tasks")`, `th:has-text("New Epoch")`, `th:has-text("Status")`, `th:has-text("Timestamp")`<br>• 상태 셀: `td:has-text("RECOVERED")` (color: `#3fb950`) | • `reconciliationHistory` 배열의 감사 레코드가 테이블 행으로 즉시 표출됨.<br>• `rec_*` 식별자, 대피된 태스크 수, 신규 Epoch 번호 및 `RECOVERED` 성공 상태 확인.<br>• 이력 0건일 때 `No recovery reconciliations recorded yet...` 안내 표출. | `apps/web/src/features/recovery/DistributedRecoveryView.tsx:401-432`<br>*(컴포넌트 렌더링 검증)* |
 
@@ -194,7 +194,7 @@ tags: ["s07-fe", "acceptance-matrix", "distributed-recovery", "fencing-token", "
 
 ## 6. Claude UI 독립 검토 관찰사항 및 FE 개선 과제 등록
 
-Claude UI 경로 독립 검토(issuecomment-5859600000+)에서 식별된 비차단 관찰사항을 투명하게 기록하고 향후 프런트엔드 개선 카드로 등록한다:
+Claude UI 경로 독립 검토(issuecomment-5859655979)에서 식별된 비차단 관찰사항을 투명하게 기록하고 향후 프런트엔드 개선 카드로 등록한다:
 
 1. **FE-DEFECT-S07-01 (빈 노드 렌더 예외 방어)**:
    - `App.tsx:58` 초기 상태 또는 노드 fetch 실패(`nodes=[]`) 상태에서 `DistributedRecoveryView` 마운트 시 line 309 `selectedNode.hostname`에서 `TypeError: Cannot read properties of undefined` 렌더 크래시가 발생함.
@@ -209,14 +209,14 @@ Claude UI 경로 독립 검토(issuecomment-5859600000+)에서 식별된 비차�
    - 노드 선택 카드가 단순 `div onClick`(`DistributedRecoveryView.tsx:250-252`)으로 구현되어 있어 `role="button"`, `tabIndex={0}`, 키보드 엔터/스페이스 이벤트가 부재함.
    - 조치 계획: 웹 접근성 WCAG 2.1 AA 준수를 위한 대화형 요소 속성 보강.
 5. **FE-STATE-S07-05 (Node 목록 props 갱신 반영)**:
-   - `useState(recoveryManager.getNodes())`(`view:11-19`)가 컴포넌트 마운트 시점에만 1회 초기화되어 부모(`App.tsx`)로부터 전달되는 `nodes` props의 동적 변경이 재렌더링에 반영되지 않음.
+   - `useState(recoveryManager.getNodes())`(`view:11-21`)가 컴포넌트 마운트 시점에만 1회 초기화되어 부모(`App.tsx`)로부터 전달되는 `nodes` props의 동적 변경이 재렌더링에 반영되지 않음.
    - 조치 계획: `useEffect`를 통한 nodes props 동기화 처리.
 
 ---
 
 ## 7. 검토 인계 및 다음 단계
 
-- **문서 상태**: `status: "review"` (S07-FE 시나리오 매트릭스 v1.0.2 - Codex 계약 검토 및 Claude UI 경로 독립 검토 8대 수정 요청 및 관찰사항 전수 반영 완결)
+- **문서 상태**: `status: "review"` (S07-FE 시나리오 매트릭스 v1.0.3 - Codex 계약 검토 및 Claude UI 경로 독립 검토 8대 수정 요청 및 관찰사항 전수 반영 완결)
 - **독립 리뷰어**: Codex (S07 정본 계약, 단조 Fencing Token, DB recovery_epoch, 커널 15s 윈도우 대조), Claude (UI 셀렉터, 거버넌스 불변식, 돌연변이 단언 대조)
 - **다음 단계**:
   1. Claude UI 검토 반영 commit & push (`agent/gemini/s07-fe-matrix`).
