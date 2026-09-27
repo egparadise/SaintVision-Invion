@@ -46,14 +46,72 @@ def test_every_mapped_case_exists_in_its_file_and_is_unique():
         if name not in defined:
             missing.append(case)
     assert not missing, missing
-    assert len(mapped) == 28
+    assert len(mapped) == 27
 
 
-def test_every_mapped_module_is_covered_by_a_suite_entry():
+def test_every_mapped_module_is_covered_by_a_pg_only_suite_and_containment_is_docker_lane_only():
     modules = {case.split("::")[0].replace(".", "/") + ".py"
                for spec in tool.AC03_CLAUSES.values() for case in spec["cases"]}
     covered = {path for spec in tool.SUITES for path in spec["paths"]}
     assert modules <= covered, modules - covered
+    assert "tests/integration/test_containment.py" not in covered
+    assert tool.DOCKER_LANE_SUITE["paths"] == ["tests/integration/test_containment.py"]
+    assert tool.DOCKER_LANE_SUITE["docker"] is True
+    assert not any("test_containment" in case for spec in tool.AC03_CLAUSES.values() for case in spec["cases"])
+
+
+def test_docker_lane_defaults_to_not_run_and_keeps_partial_verdict():
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()],
+                                   lanes=_lanes(verdict="PASS", db=True, container=True))
+    assert evidence["dockerLane"]["status"] == "not_run" and evidence["dockerLane"]["value"] is None
+    assert evidence["verdict"] == "PASS_MEASURED_PARTIAL"
+    measured = {**tool.DOCKER_LANE_NOT_RUN, "status": "complete", "suite_result": _suite()}
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()],
+                                   lanes=_lanes(verdict="PASS", db=True, container=True), docker_lane=measured)
+    assert evidence["verdict"] == "PASS"
+    assert "outcomes" not in evidence["dockerLane"]["suite_result"]
+
+
+def test_unmapped_failure_in_any_suite_fails_closed():
+    """Revival: 27 mapped pass + one unmapped failed case in a suite → FAIL, never PARTIAL/PASS."""
+    outcomes = {**_all_cases(), "tests.test_execution::test_retry_budget_is_enforced": "failed"}
+    suite = _suite(status="failed", outcomes=outcomes, exit_code=1)
+    suite["counts"] = {"passed": 27, "failed": 1, "error": 0, "skipped": 0}
+    evidence = tool.build_evidence(provenance=_prov(), suites=[suite], lanes=_lanes())
+    assert {c["status"] for c in evidence["clauses"].values()} == {"pass"}
+    assert evidence["verdict"] == "FAIL"
+
+
+@pytest.mark.parametrize("sample", [
+    "inv_s03_" + "a" * 32, "inv_rls_" + "b" * 32, "inv_backend_test_" + "c" * 32,
+    "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53", "run_01HZZZZZZZZZZZZZZZZZZZZZZZ", "lse_01J00000000000000000000000",
+    "evd_01HZZZZZZZZZZZZZZZZZZZZZZZ", "192.168.45.74:18443",
+])
+def test_sanitizer_replaces_each_identifier_class_and_negative_guard_refuses(sample, tmp_path):
+    assert sample not in tool.redact_text(f"x {sample} y")
+    with pytest.raises(ValueError, match="unredacted"):
+        tool.assert_redacted(f"x {sample} y")
+    evidence = tool.build_evidence(provenance=_prov(), suites=[_suite()], lanes=_lanes(), note=f"raw {sample}")
+    with pytest.raises(ValueError, match="unredacted"):
+        tool.write_evidence(evidence, tmp_path, "raw")
+
+
+def test_lane_artifacts_are_rewritten_in_place_with_placeholders(tmp_path):
+    raw = {"db": {"name": "inv_s03_" + "d" * 32, "runs": [{"run_id": "run_01HZZZZZZZZZZZZZZZZZZZZZZZ",
+           "tenant_id": "ff5d8e54-3ac6-4fbb-924e-a7f2f88bbf53"}]},
+           "container": {"probes": [{"stdout_head": "probe-stdout\n", "sqlState": "55P03"}]}, "git_sha": "1e8baf04"}
+    (tmp_path / "l.json").write_text(json.dumps(raw), encoding="utf-8")
+    (tmp_path / "l.md").write_text("db inv_s03_" + "d" * 32 + " run run_01HZZZZZZZZZZZZZZZZZZZZZZZ at 10.0.0.1:5432\n",
+                                   encoding="utf-8")
+    summary = tool.redact_lane_artifacts(tmp_path, "l")
+    assert summary["redacted"] is True and summary["rawJsonSha256"] != summary["jsonSha256"]
+    redacted = json.loads((tmp_path / "l.json").read_text(encoding="utf-8"))
+    assert redacted["db"]["name"] == "inv_disposable_<redacted>"
+    assert redacted["db"]["runs"][0] == {"run_id": "<id:redacted>", "tenant_id": "<uuid:redacted>"}
+    assert redacted["container"]["probes"][0] == {"stdout_head": "probe-stdout\n", "sqlState": "55P03"}
+    assert redacted["git_sha"] == "1e8baf04"
+    for name in ("l.json", "l.md"):
+        tool.assert_redacted((tmp_path / name).read_text(encoding="utf-8"))
 
 
 # --------------------------------------------------------------------------
@@ -122,7 +180,7 @@ def _prov():
 
 @pytest.mark.parametrize("suite_kwargs, lanes_kwargs, expected", [
     ({}, {}, "PASS_MEASURED_PARTIAL"),
-    ({}, {"verdict": "PASS", "db": True, "container": True}, "PASS"),
+    ({}, {"verdict": "PASS", "db": True, "container": True}, "PASS_MEASURED_PARTIAL"),  # docker lane not run
     ({}, {"verdict": "PASS", "db": True, "container": False}, "PASS_MEASURED_PARTIAL"),
     ({"outcomes": {**_all_cases(), "tests.test_run_state::test_the_happy_path_is_walkable": "failed"}}, {}, "FAIL"),
     ({}, {"verdict": "VIOLATIONS", "db": True, "violations": {"C1": 2}}, "FAIL"),

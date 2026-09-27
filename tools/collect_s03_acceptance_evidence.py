@@ -25,11 +25,31 @@ Honesty rules:
   ``PASS_MEASURED_PARTIAL``, never ``PASS``;
 * the 24 integration files that need a real Linux Docker runtime are listed as
   ``not_run_here`` with no numbers;
-* ``acceptanceClaim`` is always ``false``; outputs never contain a DSN, password,
-  tenant id or failure text (parameter-free case ids and counts only).
+* the verdict is fail-closed on every suite: any failed/error case (mapped or not),
+  a non-zero pytest exit or a suite status other than ``complete`` makes the bundle
+  FAIL;
+* ``tests/integration/test_containment.py::test_running_kill_preempts_network_call_and_releases_only_after_real_stop``
+  starts a real synthetic container through ``test_node_delivery``/``test_node_runtime``;
+  it is NOT part of the PostgreSQL-only plan and runs only with the explicit
+  ``--docker-lane`` opt-in on an isolated Linux Docker host, otherwise
+  ``dockerLane.status = not_run`` with no numbers;
+* ``acceptanceClaim`` is always ``false``;
+* redaction contract ("redacted" = credentials refused, identifiers replaced,
+  probe heads retained), checked before every write:
+  - DSN values and passwords from ``INV_TEST_ADMIN_DSN`` / ``INV_AUDIT_DSN`` /
+    ``INV_DATABASE_URL`` / ``INV_TEST_DATABASE_URL`` are refused;
+  - identifiers are replaced by placeholders in every produced file, including the
+    collector's own lane JSON/Markdown rewritten in place: disposable database names
+    (``inv_s03_``/``inv_rls_``/``inv_backend_test_`` + hex), UUIDs (tenant, epoch,
+    abort, object ids), kernel ULID ids (``run_``/``lse_``/``evd_``/``nod_``/``prj_``/
+    ``res_``/``tnt_`` + 26 chars) and ``IPv4:port`` pairs; ``--note`` passes through
+    the same replacement;
+  - retained on purpose: probe stdout/stderr heads (fixed probe strings), SQLSTATEs,
+    rule ids and counts; pytest failure messages are never kept.
+  This bundle is internal evidence, not a public artifact.
 
-Exit codes: 0 PASS / PASS_MEASURED_PARTIAL; 1 FAIL (a clause failed or a lane
-reported violations); 2 UNAVAILABLE (no DSN or a suite could not run); 3 NOT_RUN.
+Exit codes: 0 PASS / PASS_MEASURED_PARTIAL; 1 FAIL (a clause or any case failed, or
+a lane reported violations); 2 UNAVAILABLE (no DSN or a suite could not run); 3 NOT_RUN.
 """
 
 from __future__ import annotations
@@ -65,9 +85,14 @@ SUITES: list[dict[str, Any]] = [
     {"id": "reservation-aborts", "postgres": True, "paths": ["tests/integration/test_reservation_aborts.py"]},
     {"id": "postgres-reclaim", "postgres": True, "paths": ["tests/integration/test_postgres.py"],
      "select": "expiration_and_cancellation_do_not_release_capacity or recovery_blocks_until_stop_and_old_checkpoint_cannot_win"},
-    {"id": "containment-stop", "postgres": True, "paths": ["tests/integration/test_containment.py"],
-     "select": "running_kill_preempts_network_call_and_releases_only_after_real_stop"},
 ]
+
+# Explicit opt-in only: starts a real synthetic container (Docker/Go/mTLS), never PG-only.
+DOCKER_LANE_SUITE: dict[str, Any] = {
+    "id": "docker-lane-containment-stop", "postgres": True, "docker": True,
+    "paths": ["tests/integration/test_containment.py"],
+    "select": "running_kill_preempts_network_call_and_releases_only_after_real_stop",
+}
 
 # Review package (card 5, §B-1) mapping, case ids are "<module>::<test>".
 AC03_CLAUSES: dict[str, dict[str, Any]] = {
@@ -108,7 +133,6 @@ AC03_CLAUSES: dict[str, dict[str, Any]] = {
             "tests.integration.test_reservation_aborts::test_issued_claim_still_requires_authenticated_node_proof",
             "tests.integration.test_postgres::test_expiration_and_cancellation_do_not_release_capacity",
             "tests.integration.test_postgres::test_recovery_blocks_until_stop_and_old_checkpoint_cannot_win",
-            "tests.integration.test_containment::test_running_kill_preempts_network_call_and_releases_only_after_real_stop",
         ],
         "lane_rules": ["C1", "C4"],
     },
@@ -260,12 +284,12 @@ def run_lanes(out_dir: Path, label: str, *, dsn: str | None, container_image: st
                                "evidenceJson": None}
     json_path = out_dir / f"{label}.json"
     if json_path.is_file():
+        summary.update(redact_lane_artifacts(out_dir, label))  # placeholders before anything is read back
         payload = json.loads(json_path.read_text(encoding="utf-8"))
         db, lane = payload.get("db") or {}, payload.get("container") or {}
         violations = payload.get("violations") or []
         summary.update({
             "evidenceJson": json_path.relative_to(REPO_ROOT).as_posix(),
-            "jsonSha256": hashlib.sha256(json_path.read_bytes()).hexdigest(),
             "collectorSha256": (payload.get("provenance") or {}).get("collector_sha256"),
             "db": {"measured": bool(db.get("measured")), "runs": (db.get("counts") or {}).get("runs"),
                    "leases": (db.get("counts") or {}).get("leases")},
@@ -281,6 +305,14 @@ def overall_verdict(clauses: dict[str, Any], suites: list[dict[str, Any]], lanes
     statuses = {c["status"] for c in clauses.values()}
     if any(s["status"] in ("unavailable", "invalid-junit") for s in suites) or lanes["status"] == "unavailable":
         return "UNAVAILABLE"
+    # Fail closed on every executed suite (mapped or not): failed/error cases,
+    # non-zero pytest exit or an incomplete status can never leave the bundle PASS.
+    for suite in suites:
+        counts = suite.get("counts") or {}
+        if suite["status"] == "not_run" and not (counts.get("failed") or counts.get("error")):
+            continue
+        if suite["status"] != "complete" or suite.get("exitCode") != 0 or counts.get("failed") or counts.get("error"):
+            return "FAIL"
     if "fail" in statuses or lanes.get("verdict") == "VIOLATIONS":
         return "FAIL"
     if statuses != {"pass"}:
@@ -295,13 +327,26 @@ def overall_verdict(clauses: dict[str, Any], suites: list[dict[str, Any]], lanes
 EXIT_BY_VERDICT = {"PASS": 0, "PASS_MEASURED_PARTIAL": 0, "FAIL": 1, "UNAVAILABLE": 2, "NOT_RUN": 3}
 
 
+DOCKER_LANE_NOT_RUN: dict[str, Any] = {
+    "status": "not_run",
+    "suite": DOCKER_LANE_SUITE["id"],
+    "case": "tests.integration.test_containment::test_running_kill_preempts_network_call_and_releases_only_after_real_stop",
+    "reason": "starts a real synthetic container (Docker/Go/mTLS); runs only with --docker-lane on an isolated Linux Docker host",
+    "value": None,
+}
+
+
 def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]], lanes: dict[str, Any],
-                   note: str | None = None) -> dict[str, Any]:
+                   note: str | None = None, docker_lane: dict[str, Any] | None = None) -> dict[str, Any]:
     outcomes: dict[str, str] = {}
     for suite in suites:
         outcomes.update(suite.get("outcomes") or {})
     clauses = evaluate_clauses(outcomes, lanes.get("violationsByRule"))
-    verdict = overall_verdict(clauses, suites, lanes)
+    docker_lane = docker_lane or DOCKER_LANE_NOT_RUN
+    judged_suites = suites + ([docker_lane["suite_result"]] if docker_lane.get("suite_result") else [])
+    verdict = overall_verdict(clauses, judged_suites, lanes)
+    if verdict == "PASS" and docker_lane.get("status") != "complete":
+        verdict = "PASS_MEASURED_PARTIAL"  # the Docker lane was not measured
     return {
         "schemaVersion": SCHEMA_VERSION,
         "task": "S03-DB",
@@ -326,6 +371,8 @@ def build_evidence(*, provenance: dict[str, Any], suites: list[dict[str, Any]], 
         "suites": [{k: v for k, v in suite.items() if k != "outcomes"} for suite in suites],
         "clauses": clauses,
         "lanes": lanes,
+        "dockerLane": {k: ({kk: vv for kk, vv in v.items() if kk != "outcomes"} if k == "suite_result" else v)
+                       for k, v in docker_lane.items()},
         "linuxDockerOnly": {"status": "not_run_here", "files": LINUX_DOCKER_ONLY,
                             "reason": "Real Linux Docker runtime explicitly enabled only in isolated CI"},
         "physicalWaits": [
@@ -360,6 +407,7 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     lines += ["", f"- collector lanes: **{lanes.get('verdict')}** (exit {lanes.get('exitCode')}), ledger `{lanes.get('ledgerSource')}`,"
                   f" db {lanes.get('db')}, container {lanes.get('container')}, violations {lanes.get('violationsByRule')}"
                   f" → `{lanes.get('evidenceJson')}`",
+              f"- Docker opt-in lane: `{evidence['dockerLane']['status']}` — {evidence['dockerLane'].get('reason')}",
               f"- Linux-Docker-only files: `{evidence['linuxDockerOnly']['status']}` ({len(evidence['linuxDockerOnly']['files'])} entries, no numbers)",
               "", "| physical wait | status | value |", "|---|---|---|"]
     for item in evidence["physicalWaits"]:
@@ -367,6 +415,48 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     if evidence.get("note"):
         lines += ["", f"- note: {evidence['note']}"]
     return "\n".join(lines) + "\n"
+
+
+_REDACTIONS: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\binv_(?:s03|rls|backend_test)_[0-9a-f]{32}\b"), "inv_disposable_<redacted>"),
+    (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"),
+     "<uuid:redacted>"),
+    (re.compile(r"\b(?:run|lse|evd|nod|prj|res|tnt)_[0-9A-HJKMNP-TV-Z]{26}\b"), "<id:redacted>"),
+    (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}:\d{2,5}\b"), "<host:port:redacted>"),
+]
+
+
+def redact_text(text: str) -> str:
+    """Replace disposable DB names, UUIDs, kernel ULID ids and IPv4:port by placeholders."""
+    for pattern, placeholder in _REDACTIONS:
+        text = pattern.sub(placeholder, text)
+    return text
+
+
+def assert_redacted(text: str) -> None:
+    for pattern, placeholder in _REDACTIONS:
+        if pattern.search(text):
+            raise ValueError(f"evidence would embed an unredacted identifier ({placeholder})")
+
+
+def redact_lane_artifacts(out_dir: Path, label: str) -> dict[str, Any]:
+    """Rewrite the collector's lane JSON/Markdown in place with placeholders (JSON stays valid)."""
+    result: dict[str, Any] = {"redacted": False}
+    json_path, md_path = out_dir / f"{label}.json", out_dir / f"{label}.md"
+    if json_path.is_file():
+        result["rawJsonSha256"] = hashlib.sha256(json_path.read_bytes()).hexdigest()
+        redacted = redact_text(json_path.read_text(encoding="utf-8"))
+        json.loads(redacted)
+        assert_redacted(redacted)
+        json_path.write_text(redacted, encoding="utf-8")
+        result["redacted"] = True
+        result["jsonSha256"] = hashlib.sha256(json_path.read_bytes()).hexdigest()
+    if md_path.is_file():
+        redacted = redact_text(md_path.read_text(encoding="utf-8"))
+        assert_redacted(redacted)
+        md_path.write_text(redacted, encoding="utf-8")
+        result["redacted"] = True
+    return result
 
 
 def assert_no_secrets(text: str) -> None:
@@ -393,8 +483,9 @@ def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple
     out_dir.mkdir(parents=True, exist_ok=True)
     json_text = json.dumps(evidence, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
     md_text = render_markdown(evidence)
-    assert_no_secrets(json_text)
-    assert_no_secrets(md_text)
+    for text in (json_text, md_text):
+        assert_no_secrets(text)
+        assert_redacted(text)
     json_path, md_path = out_dir / f"{label}.json", out_dir / f"{label}.md"
     json_path.write_text(json_text, encoding="utf-8")
     md_path.write_text(md_text, encoding="utf-8")
@@ -414,8 +505,19 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--note", default=None)
     result.add_argument("--dsn", default=None, help="owner DSN of a database holding a PRODUCT run ledger (never recorded)")
     result.add_argument("--container-image", default=None, help="local image for the container lane (never pulled)")
+    result.add_argument("--docker-lane", action="store_true",
+                        help="explicit opt-in: also run the containment stop case that starts a real synthetic "
+                             "container (isolated Linux Docker host only); default not_run")
     result.add_argument("--junit-dir", type=Path, default=REPO_ROOT / ".work" / "s03-acceptance")
     return result
+
+
+def run_docker_lane(junit_dir: Path) -> dict[str, Any]:
+    """Explicit opt-in lane; its suite result is judged fail-closed like every other suite."""
+    suite = run_suite(DOCKER_LANE_SUITE, junit_dir)
+    status = "complete" if suite["status"] == "complete" else suite["status"]
+    return {**{k: v for k, v in DOCKER_LANE_NOT_RUN.items() if k != "reason"}, "status": status,
+            "reason": "run with --docker-lane", "suite_result": suite}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -427,10 +529,13 @@ def main(argv: list[str] | None = None) -> int:
     if not os.environ.get("INV_TEST_ADMIN_DSN") and not args.dsn:
         print("INV_TEST_ADMIN_DSN (or --dsn) is required; nothing measured", file=sys.stderr)
         return 2
+    note = redact_text(args.note) if args.note else None  # free text: placeholders only (see docstring)
     suites = [run_suite(spec, args.junit_dir / label) for spec in SUITES]
+    docker_lane = run_docker_lane(args.junit_dir / label) if args.docker_lane else None
     lanes = run_lanes(args.out_dir, f"{label}-lanes", dsn=args.dsn, container_image=args.container_image,
-                      note=args.note)
-    evidence = build_evidence(provenance=provenance, suites=suites, lanes=lanes, note=args.note)
+                      note=note)
+    evidence = build_evidence(provenance=provenance, suites=suites, lanes=lanes, note=note,
+                              docker_lane=docker_lane)
     try:
         json_path, md_path = write_evidence(evidence, args.out_dir, label)
     except ValueError as error:
