@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S02-DB-AC02-EVIDENCE-COLLECTOR"
 title: "S02-DB AC-02 acceptance Evidence collector 구현 — 고정 SHA 1e8baf04에서 API↔PG 인증·격리 시험 4조항(28 passed)과 RLS 경계 collector(VIOLATIONS 1 = 기존 E2 public.audit_events)를 한 번에 실행해 redacted JSON/MD로 묶음, U2~U5 UNMEASURED"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T05:40:00+09:00"
+updated: "2026-09-28T06:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -52,6 +52,18 @@ tags: ["S02-DB", "AC-02", "evidence", "collector", "RLS", "token-replay", "tenan
 - `rlsBoundary.evidenceJson` 상대 경로를 POSIX(`/`)로 기록하도록 수정 — 이번 산출 JSON/MD에는 Windows `\` 경로가 남아 있음.
 - provenance에 `collectorSha256`(collector 파일 내용 해시)을 추가 — 이번 산출물에는 없으므로 §2에 해시를 직접 적었다.
 - note 문구에 host/port를 쓰지 않는다(도구 변경 아님, 운용 규칙).
+
+## 6. Codex 수정 요청 반영 (05:55 KST, PR #120 코멘트 5859666651)
+
+| 항목 | 조치 | 검증 |
+|---|---|---|
+| **F-R1** 매핑 밖 API 실패가 overall PASS로 승격(fail-open) | `overall_verdict`가 API suite 전체를 fail-closed로 본다: `status != complete` 또는 `exitCode != 0` 또는 JUnit failed/error > 0 → **FAIL**(아무것도 실행되지 않았을 때만 NOT_RUN) | 되살림 시험 `test_unmapped_api_failure_fails_the_bundle_even_when_every_clause_passes`(매핑 16 pass + 매핑 밖 1 failed + RLS PASS → FAIL) + `test_incomplete_api_suite_is_never_pass`(status failed / exit 1) |
+| **F-R3** RLS artifact에 disposable DB 이름·tenant UUID 2개·host:port 잔존 | 권고안 (a): `redact_text`/`assert_redacted`/`redact_rls_artifacts` — collector가 쓴 RLS JSON/MD를 그 자리에서 placeholder(`inv_rls_<redacted>`, `inv_backend_test_<redacted>`, `<uuid:redacted>`, `<host:port:redacted>`)로 다시 쓰고(JSON 유효성 유지, raw/redacted sha256 둘 다 기록), 본 묶음 JSON/MD도 쓰기 전 `assert_no_secrets`+`assert_redacted`를 통과해야 하며, `--note`는 같은 placeholder 치환을 거친다. guard 계약을 docstring에 명시(DSN/password는 거부, 위 식별자는 치환, 그 외 자유 문자열은 미검사, 실패 문구 미보존) | 회귀 `test_rls_artifacts_are_rewritten_with_placeholders`, `test_note_is_redacted_and_unredacted_text_refuses_write`; 재실행 산출 4파일 grep: `inv_rls_*` 0, UUID 0, `IPv4:port` 0, `postgresql://` 0 |
+| **F-R2** evidence를 만든 collector가 도달 가능한 blob 아님 | 위 수정을 **`fc0bf0ce`로 커밋한 clean head**에서 단일 invocation을 다시 실행(05:50:23~05:52:47 KST, note에 host/port 없음). 기존 `…1e8baf045c5a-20260927.*` 4파일은 소급 덮어쓰지 않고 그대로 보존(당시 그대로: 비대칭 provenance·미redaction 상태의 첫 실행 기록) | 새 묶음 `s02-acceptance-fc0bf0ceb590-20260927.{json,md}` + `-rls.{json,md}`: `codeSha=fc0bf0ce`, `working_tree_clean_status=true`, `content_clean_diff=true`, `provenance.collectorSha256=5e07d1ac…` = `git show fc0bf0ce:tools/collect_s02_acceptance_evidence.py`의 sha256, RLS `collectorSha256=d540c8e9…` = 같은 head의 `collect_rls_evidence.py` sha256, `rlsBoundary.redacted=true`(raw `57cd6a7a…` → redacted `b86b838a…`) |
+| 비차단 | "hosted Core" → hosted **Backend**(`backend.yml` 전체 pytest가 수집, Core는 label 없이 skip)로 §3 정정 | — |
+| F-S02-01 | 이 PR에서 하지 않음. Codex 판정(baseline 수용 기각, RLS ENABLE+FORCE + 별도 audit writer/reader 역할 + 시험 4종)은 별도 구현 카드로 Claude tab이 진행 | — |
+
+재실행 결과(측정분): API **28 passed / 0 failed**(exit 0, 59.125s), 4/4 조항 pass; RLS **VIOLATIONS 1**(동일 E2 `public.audit_events`) → 묶음 **FAIL**, `acceptanceClaim=false`, U2~U5 UNMEASURED. PG-free 자기 시험 **24 passed / 1 skipped**.
 
 ## 5. 경계·다음
 
