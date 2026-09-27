@@ -194,6 +194,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [bypassTestResult, setBypassTestResult] = useState<string | null>(null);
   const [selectedGpuNodeId, setSelectedGpuNodeId] = useState<string>(() => gpuNodes[0]?.id || '');
   const [gpuResult, setGpuResult] = useState<SyntheticGpuResult | null>(null);
+  const [isGpuRunning, setIsGpuRunning] = useState(false);
   const [showKillSwitchModal, setShowKillSwitchModal] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
