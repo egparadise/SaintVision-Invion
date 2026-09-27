@@ -40,14 +40,14 @@ export function evaluateInitialHealth(
     }
   }
 
-  // 1. Explicit status mapping per NodeStatus enum:
-  // 'offline' | 'lost' | 'quarantined' | 'retired' -> offline
-  if (s === 'offline' || s === 'lost' || s === 'quarantined' || s === 'retired' || s === 'unhealthy') {
+  // 1. Explicit canonical status mapping per NodeStatus enum:
+  // 'offline' | 'lost' | 'retired' -> offline
+  if (s === 'offline' || s === 'lost' || s === 'retired') {
     return { health: 'offline', ageSeconds };
   }
 
-  // 2. 'draining' | 'degraded' | 'stale' -> stale
-  if (s === 'draining' || s === 'degraded' || s === 'stale') {
+  // 2. 'draining' | 'degraded' -> stale
+  if (s === 'draining' || s === 'degraded') {
     return { health: 'stale', ageSeconds };
   }
 
@@ -70,11 +70,11 @@ export function evaluateInitialHealth(
   }
 
   // 5. Fresh heartbeat and status is online/active
-  if (s === 'online' || s === 'active' || s === 'healthy') {
+  if (s === 'online' || s === 'active') {
     return { health: 'online', ageSeconds };
   }
 
-  // 6. Unknown with fresh heartbeat
+  // 6. enrolling / unknown with fresh heartbeat -> stale
   return { health: 'stale', ageSeconds };
 }
 
@@ -122,11 +122,12 @@ export class DistributedRecoveryManager {
 
       if (existing) {
         existing.actualStatus = n.status || 'unknown';
-        if (n.heartbeatAt !== undefined) {
-          existing.lastHeartbeatAt = n.heartbeatAt || '';
-          existing.heartbeatAgeSeconds = evalResult.ageSeconds;
-        }
+        // Polling protection: do not overwrite simulated heartbeat or health state if simulation modified
         if (!existing.isSimulationModified) {
+          if (n.heartbeatAt !== undefined) {
+            existing.lastHeartbeatAt = n.heartbeatAt || '';
+            existing.heartbeatAgeSeconds = evalResult.ageSeconds;
+          }
           existing.healthState = evalResult.health;
         }
       } else {

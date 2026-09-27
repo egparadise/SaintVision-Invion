@@ -15,7 +15,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         hostname: n.hostname,
         activeWorkspaces: i + 1,
         status: n.status,
-        heartbeatAt: (n as any).heartbeatAt ?? null,
+        heartbeatAt: n.heartbeatAt ?? null,
       }))
     );
   });
@@ -44,7 +44,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
         hostname: n.hostname,
         activeWorkspaces: i + 1,
         status: n.status,
-        heartbeatAt: (n as any).heartbeatAt ?? null,
+        heartbeatAt: n.heartbeatAt ?? null,
       }))
     );
     setResilientNodes(recoveryManager.getNodes());
@@ -318,7 +318,6 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     tabIndex={0}
                     data-testid={`node-card-${node.nodeId}`}
                     aria-pressed={isSelected}
-                    aria-current={isSelected ? 'true' : 'false'}
                     aria-label={`${node.hostname} (실제: ${node.actualStatus || 'unknown'}, 시뮬레이션: ${node.healthState.toUpperCase()})`}
                     onClick={() => setSelectedNodeId(node.nodeId)}
                     onKeyDown={(e) => {
@@ -452,9 +451,14 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
-                  ADR-043 Writable Generation &amp; Checkouts
-                </h4>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+                    ADR-043 Writable Generation &amp; Checkouts (모의)
+                  </h4>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+                    격리된 복원 사본(0400 read-only)과 분리된 독립 private root의 수정 가능 세대(0600 read/write, 0700 executable generation)
+                  </p>
+                </div>
                 <Button
                   data-testid="create-checkout-btn"
                   variant="primary"
@@ -468,8 +472,11 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
 
               <div style={{ flex: 1, minHeight: '200px', maxHeight: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {checkouts.length === 0 ? (
-                  <div style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}>
-                    생성된 시뮬레이션 체크아웃이 없습니다.
+                  <div
+                    data-testid="recovery-no-checkouts"
+                    style={{ color: '#8b949e', fontSize: '13px', textAlign: 'center', margin: 'auto' }}
+                  >
+                    생성된 시뮬레이션 체크아웃이 없습니다. (모의)
                   </div>
                 ) : (
                   checkouts.map((chk) => (
@@ -485,7 +492,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', color: '#58a6ff', fontWeight: 600 }}>
                         <span>{chk.checkoutId}</span>
-                        <span style={{ color: '#3fb950' }}>{chk.status.toUpperCase()}</span>
+                        <span style={{ color: '#3fb950' }}>{chk.status.toUpperCase()} (모의)</span>
                       </div>
                       <div style={{ color: '#8b949e', marginTop: '4px' }}>
                         Inode: <code>{chk.inode}</code> | Permissions: <code>{chk.permissions}</code> | Epoch: <code>{chk.epoch}</code>
@@ -560,7 +567,7 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
             }}
           >
             <h4 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#f0f6fc' }}>
-              Cluster Reconciliation Audit Trail (AC-07 Recovery KPI)
+              Cluster Reconciliation Audit Trail (AC-07 모의 복구 시뮬레이션; 물리 AC-07 UNMEASURED)
             </h4>
 
             {reconciliations.length === 0 ? (
@@ -592,7 +599,15 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
                         New Fencing Epoch: <strong>{rec.newEpoch}</strong>
                       </span>
                     </div>
-                    <span style={{ color: '#3fb950', fontWeight: 600, fontSize: '12px' }}>RECOVERY COMPLETE</span>
+                    <span
+                      style={{
+                        color: rec.recoverySuccess ? '#3fb950' : '#f85149',
+                        fontWeight: 600,
+                        fontSize: '12px',
+                      }}
+                    >
+                      {rec.recoverySuccess ? 'RECOVERED (모의)' : 'FAILED'}
+                    </span>
                   </div>
                 ))}
               </div>

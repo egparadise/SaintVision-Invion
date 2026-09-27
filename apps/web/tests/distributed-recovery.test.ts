@@ -7,14 +7,33 @@ import {
 } from '../src/features/recovery/recoveryEngine';
 
 const INITIAL_NODES: InitialRecoveryNode[] = [
-  { nodeId: 'nod_01JABCDEF01', hostname: 'Node-01-WinMain', activeWorkspaces: 3 },
-  { nodeId: 'nod_01JABCDEF02', hostname: 'Node-02-LinuxWorker1', activeWorkspaces: 2 },
-  { nodeId: 'nod_01JABCDEF03', hostname: 'Node-03-LinuxWorker2', activeWorkspaces: 4 },
-  { nodeId: 'nod_01JABCDEF04', hostname: 'Node-04-LinuxWorker3', activeWorkspaces: 1 },
-  { nodeId: 'nod_01JABCDEF05', hostname: 'Node-05-SpareCold', activeWorkspaces: 0 },
+  { nodeId: 'nod_01JABCDEF01', hostname: 'Node-01-WinMain', activeWorkspaces: 3, status: 'online', heartbeatAt: new Date().toISOString() },
+  { nodeId: 'nod_01JABCDEF02', hostname: 'Node-02-LinuxWorker1', activeWorkspaces: 2, status: 'online', heartbeatAt: new Date().toISOString() },
+  { nodeId: 'nod_01JABCDEF03', hostname: 'Node-03-LinuxWorker2', activeWorkspaces: 4, status: 'online', heartbeatAt: new Date().toISOString() },
+  { nodeId: 'nod_01JABCDEF04', hostname: 'Node-04-LinuxWorker3', activeWorkspaces: 1, status: 'online', heartbeatAt: new Date().toISOString() },
+  { nodeId: 'nod_01JABCDEF05', hostname: 'Node-05-SpareCold', activeWorkspaces: 0, status: 'online', heartbeatAt: new Date().toISOString() },
 ];
 
 describe('Distributed Fencing Token & Recovery Engine (ADR-006 & ERR-DESIGN-006)', () => {
+  describe('Heartbeat Age & Stale Detection Time (AC-07 ≤ 60s)', () => {
+    it('detects node stale condition within 60s threshold', () => {
+      const mgr = new DistributedRecoveryManager(INITIAL_NODES);
+      const target = 'nod_01JABCDEF01';
+
+      // 1. Healthy heartbeat (5s age)
+      expect(mgr.evaluateNodeHealth(target, 5)).toBe('online');
+
+      // 2. Bound check at 60s
+      expect(mgr.evaluateNodeHealth(target, 60)).toBe('online');
+
+      // 3. Exceeded 60s (61s age) -> must transition to stale
+      expect(mgr.evaluateNodeHealth(target, 61)).toBe('stale');
+
+      // 4. Delayed 125s -> transitions to offline
+      expect(mgr.evaluateNodeHealth(target, 125)).toBe('offline');
+    });
+  });
+
   describe('Monotonic Fencing Invariants', () => {
     it('strictly accepts identical (epoch, sequence) tokens', () => {
       const current = { epoch: 2, sequence: 15 };
@@ -193,6 +212,27 @@ describe('Distributed Fencing Token & Recovery Engine (ADR-006 & ERR-DESIGN-006)
       expect(mgr.getNode('nod_dyn_01')?.healthState).toBe('stale');
       expect(mgr.getNode('nod_dyn_02')?.actualStatus).toBe('offline');
       expect(mgr.getNode('nod_dyn_02')?.healthState).toBe('offline');
+    });
+
+    it('protects simulation modified node heartbeat from being overwritten by incoming polling syncNodes', () => {
+      const mgr = new DistributedRecoveryManager([
+        { nodeId: 'nod_sim_01', hostname: 'Node-Sim-01', status: 'online', heartbeatAt: new Date().toISOString() },
+      ]);
+      // Simulate heartbeat delay (75s)
+      mgr.simulateHeartbeatDelay('nod_sim_01', 75);
+      expect(mgr.getNode('nod_sim_01')?.healthState).toBe('stale');
+      expect(mgr.getNode('nod_sim_01')?.heartbeatAgeSeconds).toBe(75);
+
+      // Incoming background polling with fresh heartbeat (e.g. 3s ago)
+      const freshHeartbeat = new Date(Date.now() - 3000).toISOString();
+      mgr.syncNodes([
+        { nodeId: 'nod_sim_01', hostname: 'Node-Sim-01', status: 'online', heartbeatAt: freshHeartbeat },
+      ]);
+
+      // Polling must not overwrite the simulated stale health state or simulated age
+      expect(mgr.getNode('nod_sim_01')?.healthState).toBe('stale');
+      expect(mgr.getNode('nod_sim_01')?.heartbeatAgeSeconds).toBe(75);
+      expect(mgr.getNode('nod_sim_01')?.isSimulationModified).toBe(true);
     });
   });
 });
