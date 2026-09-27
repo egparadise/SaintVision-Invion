@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.122"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T06:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,21 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+
+## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.0 수립 (`agent/gemini/s08-fe-matrix`)
+
+- **작업 개요**: OUT-08 / AC-08 (보안 감사, Docker 소켓 차단, 승인 우회 방지, 합성 GPU 벤치마크, 긴급 Kill Switch, 재해 복구 WAL 백업 관리자 콘솔) 완결을 위한 5대 축 15개 시나리오 매트릭스 정본 초안(v1.0.0) 수립.
+- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (docs-only).
+- **5대 핵심 영역 15개 시나리오 체계**:
+  1. **SCK (Docker Socket 미노출 격리 3종)**: `/var/run/docker.sock`, Windows Named Pipe `//./pipe/docker_engine`, `containerd.sock` 마운트 시도 원천 차단 (`AC-08 Zero Exposure`), 정상 데이터셋 볼륨 허용 검증.
+  2. **BYP (승인 우회 방지 3종)**: L1 자가 승인 허용 vs L2/L3 승인 ID 부재 시 `APPROVAL_REQUIRED` 즉각 거절, 유효 승인 토큰(`apr_*`) 인가 및 20회 연속 자동화 봇 우회 시도 전수 차단 (`approvalBypassesBlocked >= 22`, 우회 허용 0).
+  3. **GPU (합성 GPU 성능 검증 3종)**: RTX 4090 (82.5 TFLOPS, 4GB VRAM) 및 A4000 (19.2 TFLOPS, 2GB VRAM) 합성 연산 성공(exit 0, `^evi_gpu_`), 가용 GPU 부재 시 `no-gpu-nodes-notice` 안내 및 버튼 비활성화 (위조 합성 차단).
+  4. **AUD (불변 감사 원장 및 긴급 Kill Switch 3종)**: W3C SHA-256 해시 체이닝 무결성 전수 검증(`verifyLedgerIntegrity().isValid === true`), 원장 7대 메타데이터 렌더링, 긴급 Kill Switch 발동 모달의 모의 고지 배너(`kill-switch-mock-notice`) 및 최상단 활성 배너(`kill-switch-active-banner`, `role="alert"`), 해제 토글 감사 기록.
+  5. **ADM (관리자 인증 가드 및 재해 복구 WAL 백업 3종)**: 인증 관리자 세션 시 실제 actor 동적 배선(`usr_admin_01` 하드코딩 배제), 세션 부재 시 `admin-auth-required-notice`(`role="alert"`) 렌더링 및 Drain 네트워크 호출 0회 차단(0-call guard), WAL 스냅샷/RPO/RTO 프레젠테이션 카드 렌더링.
+- **불변식 및 격리 원칙 엄수**:
+  - 클라이언트 시뮬레이션 vs 커널/OS 격리 경계 철저 분리: 물리 GPU, Linux 제한 컨테이너, off-device 백업, 물리 클러스터 전원 차단은 모두 **UNMEASURED**로 정직하게 격리.
+  - 돌연변이(MUT 5종) 사살 계획 수립: 미실행 상태는 **PLANNED / NOT_RUN**으로 기록, 변조 원장 단언 부재 변이는 **SURVIVED (미측정) [단언 보강 필요]**로 정직 표기.
+- **다음 행동**: `check_docs.py` 및 `check_frontend_integrity.py` 통과 후 PR 개설 (병합 금지 준수) 및 Claude(UI), Codex(계약) 독립 검토 요청.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
