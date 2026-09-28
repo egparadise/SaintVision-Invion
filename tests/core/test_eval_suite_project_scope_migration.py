@@ -35,8 +35,8 @@ import pytest
 
 MIGRATION = Path(__file__).resolve().parents[2] / "migrations/versions/0053_eval_suite_project_scope.py"
 COLUMN_OK = ("character", 30, "YES")
-FK_OK = ("f", "projects", ["tenant_id", "project_id"], ["tenant_id", "project_id"], "a", "a", False, False, True)
-INDEX_OK = (["tenant_id", "project_id"], False, False, False, True, True)
+FK_OK = ("f", "projects", ["tenant_id", "project_id"], ["tenant_id", "project_id"], "a", "a", "s", False, False, True)
+INDEX_OK = (["tenant_id", "project_id"], False, False, False, "btree", True, True)
 
 
 def _module():
@@ -181,7 +181,7 @@ def test_a_column_of_that_name_with_a_different_shape_is_refused(monkeypatch, co
 
 
 def _fk(**overrides):
-    fields = ["contype", "referenced", "columns", "referenced_columns", "on_update", "on_delete", "deferrable", "initially_deferred", "validated"]
+    fields = ["contype", "referenced", "columns", "referenced_columns", "on_update", "on_delete", "match_type", "deferrable", "initially_deferred", "validated"]
     values = dict(zip(fields, FK_OK))
     values.update(overrides)
     return tuple(values[f] for f in fields)
@@ -196,11 +196,13 @@ def _fk(**overrides):
         _fk(on_delete="c"),                      # ON DELETE CASCADE: a project deletion would delete suites
         _fk(on_update="c"),                      # ON UPDATE CASCADE
         _fk(on_delete="n"),                      # ON DELETE SET NULL
+        _fk(match_type="f"),                     # MATCH FULL: would refuse (tenant_id, NULL), the unscoped suite (Codex #202 R1)
+        _fk(match_type="p"),                     # MATCH PARTIAL
         _fk(deferrable=True),                    # DEFERRABLE
         _fk(deferrable=True, initially_deferred=True),
         _fk(validated=False),                    # NOT VALID
     ],
-    ids=["other-table", "not-composite", "not-a-fk", "delete-cascade", "update-cascade", "delete-set-null", "deferrable", "initially-deferred", "not-valid"],
+    ids=["other-table", "not-composite", "not-a-fk", "delete-cascade", "update-cascade", "delete-set-null", "match-full", "match-partial", "deferrable", "initially-deferred", "not-valid"],
 )
 def test_a_constraint_of_that_name_with_a_different_shape_is_refused(monkeypatch, fk):
     """Codex #202 F1: the name and the columns are not the contract; the
@@ -213,7 +215,7 @@ def test_a_constraint_of_that_name_with_a_different_shape_is_refused(monkeypatch
 
 
 def _index(**overrides):
-    fields = ["columns", "is_unique", "is_partial", "is_expression", "is_valid", "is_ready"]
+    fields = ["columns", "is_unique", "is_partial", "is_expression", "access_method", "is_valid", "is_ready"]
     values = dict(zip(fields, INDEX_OK))
     values.update(overrides)
     return tuple(values[f] for f in fields)
@@ -227,8 +229,9 @@ def _index(**overrides):
         _index(is_unique=True),                        # unique
         _index(is_partial=True),                       # partial
         _index(is_expression=True),                    # expression
+        _index(access_method="hash"),                  # another access method under the name
     ],
-    ids=["column-order", "other-columns", "unique", "partial", "expression"],
+    ids=["column-order", "other-columns", "unique", "partial", "expression", "access-method"],
 )
 def test_an_index_of_that_name_with_a_different_shape_is_refused(monkeypatch, index):
     """Codex #202 F2: an index is judged by its columns in order, uniqueness,

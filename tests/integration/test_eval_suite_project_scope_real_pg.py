@@ -163,6 +163,32 @@ def test_a_foreign_key_of_that_name_that_cascades_is_refused_on_resume(owner_eng
             connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
 
 
+def test_a_foreign_key_of_that_name_with_match_full_is_refused_on_resume(owner_engine, database_url, migrated, two_tenants, frozen_now, clean_tables, monkeypatch):
+    """Codex #202 R1 on the real catalogue: MATCH FULL under the same name is
+    the contract this migration exists to avoid -- it would refuse the
+    (tenant_id, NULL) row every unscoped suite is -- so the re-run stops."""
+    with owner_engine.begin() as connection:
+        connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
+        connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
+                                "REFERENCES projects (tenant_id, project_id) MATCH FULL"))
+        connection.execute(text("UPDATE alembic_version SET version_num = '0052_model_version_digest_scope'"))
+    try:
+        with pytest.raises(RuntimeError) as raised:
+            _rerun_from_0052(database_url, monkeypatch)
+        assert FK in str(raised.value) and "different definition" in str(raised.value)
+    finally:
+        with owner_engine.begin() as connection:
+            connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
+            connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
+                                    "REFERENCES projects (tenant_id, project_id)"))
+            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+    # And the reason it matters, on the real key: an unscoped suite is admitted.
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        legacy = _suite(connection, tenant_id=tenant, now=frozen_now, label="legacy-after-match")
+        assert connection.execute(text("SELECT project_id FROM eval_suites WHERE suite_id = :s"), {"s": legacy}).scalar_one() is None
+
+
 def test_an_index_of_that_name_with_the_columns_reversed_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
     """Codex #202 F2 on the real catalogue: a same-named index over
     ``(project_id, tenant_id)`` is not the index, and the re-run stops."""
@@ -198,10 +224,11 @@ def test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_e
         index = connection.exec_driver_sql(module.INDEX_SHAPE).fetchall()
     assert len(fk) == 1 and len(index) == 1
     row = fk[0]
-    assert (row[0], row[1], list(row[2]), list(row[3]), row[4], row[5], bool(row[6]), bool(row[7]), bool(row[8])) == module.EXPECTED_FK
+    assert (row[0], row[1], list(row[2]), list(row[3]), row[4], row[5], row[6], bool(row[7]), bool(row[8]), bool(row[9])) == module.EXPECTED_FK
+    assert row[6] == "s"                                                    # MATCH SIMPLE, the nullable contract
     irow = index[0]
-    assert (list(irow[0]), bool(irow[1]), bool(irow[2]), bool(irow[3])) == module.EXPECTED_INDEX
-    assert bool(irow[4]) and bool(irow[5])
+    assert (list(irow[0]), bool(irow[1]), bool(irow[2]), bool(irow[3]), irow[4]) == module.EXPECTED_INDEX
+    assert bool(irow[5]) and bool(irow[6])
 
 
 def test_a_resume_with_an_orphan_reference_is_refused_before_the_foreign_key(owner_engine, database_url, migrated, two_tenants, frozen_now, clean_tables, monkeypatch):

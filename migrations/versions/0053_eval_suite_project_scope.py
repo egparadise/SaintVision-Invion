@@ -35,9 +35,13 @@ already did (the way 0052 does it):
   -- refuse. Something other than this migration owns the name. "Shape" is
   the whole contract, not the name: for the foreign key also its referential
   actions (``NO ACTION`` both ways -- a ``CASCADE`` under this name would let
-  a project deletion silently delete suites), deferrability and validity
+  a project deletion silently delete suites), its match type (``MATCH
+  SIMPLE`` -- under ``MATCH FULL`` the ``(tenant_id, NULL)`` row every
+  unscoped suite is would be refused, which is the nullable contract this
+  migration exists to keep; Codex #202 R1), deferrability and validity
   (Codex #202 F1); for the index its exact column order, non-uniqueness,
-  no predicate, no expression, and validity (Codex #202 F2);
+  no predicate, no expression, the btree access method, and validity (Codex
+  #202 F2);
 * the index is there with the right shape but **invalid** (the residue of an
   interrupted build) -- drop it and build it again; that is the one catalogue
   state this migration repairs rather than refuses;
@@ -95,6 +99,7 @@ SELECT c.contype::text AS contype,
        ) AS referenced_columns,
        c.confupdtype::text AS on_update,
        c.confdeltype::text AS on_delete,
+       c.confmatchtype::text AS match_type,
        c.condeferrable AS deferrable,
        c.condeferred AS initially_deferred,
        c.convalidated AS validated
@@ -114,10 +119,12 @@ SELECT (
        i.indisunique AS is_unique,
        (i.indpred IS NOT NULL) AS is_partial,
        (i.indexprs IS NOT NULL) AS is_expression,
+       am.amname::text AS access_method,
        i.indisvalid AS is_valid,
        i.indisready AS is_ready
 FROM pg_index i
 JOIN pg_class ic ON ic.oid = i.indexrelid
+JOIN pg_am am ON am.oid = ic.relam
 WHERE ic.relname = '{INDEX}' AND i.indrelid = '{TABLE}'::regclass
 """
 
@@ -136,11 +143,13 @@ SCOPED = f"SELECT suite_id FROM {TABLE} WHERE {COLUMN} IS NOT NULL ORDER BY suit
 
 EXPECTED_COLUMN = ("character", 30, "YES")
 #: contype, referenced table, local columns, referenced columns, ON UPDATE,
-#: ON DELETE ("a" = NO ACTION, what the product creates), deferrable,
-#: initially deferred, validated.
-EXPECTED_FK = ("f", REFERENCED, ["tenant_id", COLUMN], ["tenant_id", "project_id"], "a", "a", False, False, True)
-#: columns in order, unique, partial, expression -- validity is judged apart.
-EXPECTED_INDEX = (["tenant_id", COLUMN], False, False, False)
+#: ON DELETE ("a" = NO ACTION, what the product creates), match type ("s" =
+#: MATCH SIMPLE, the default, which admits the (tenant_id, NULL) row of an
+#: unscoped suite), deferrable, initially deferred, validated.
+EXPECTED_FK = ("f", REFERENCED, ["tenant_id", COLUMN], ["tenant_id", "project_id"], "a", "a", "s", False, False, True)
+#: columns in order, unique, partial, expression, access method -- validity is
+#: judged apart.
+EXPECTED_INDEX = (["tenant_id", COLUMN], False, False, False, "btree")
 
 
 def _add_column() -> None:
@@ -197,14 +206,15 @@ def upgrade():
         row = fk[0]
         shape = (
             row[0], row[1], list(row[2] or []), list(row[3] or []),
-            row[4], row[5], bool(row[6]), bool(row[7]), bool(row[8]),
+            row[4], row[5], row[6], bool(row[7]), bool(row[8]), bool(row[9]),
         )
         if shape != EXPECTED_FK:
             raise RuntimeError(
                 f"{FK} already exists on {TABLE} with a different definition "
-                f"({shape!r}; expected {EXPECTED_FK!r}: NO ACTION both ways, not "
-                "deferrable, validated). Something other than this migration owns "
-                "that name; resolve it with a reviewed fix before running again."
+                f"({shape!r}; expected {EXPECTED_FK!r}: NO ACTION both ways, MATCH "
+                "SIMPLE, not deferrable, validated). Something other than this "
+                "migration owns that name; resolve it with a reviewed fix before "
+                "running again."
             )
         # Present and right, in every attribute: left alone.
     else:
@@ -213,16 +223,16 @@ def upgrade():
     index = bind.exec_driver_sql(INDEX_SHAPE).fetchall()
     if index:
         row = index[0]
-        shape = (list(row[0] or []), bool(row[1]), bool(row[2]), bool(row[3]))
+        shape = (list(row[0] or []), bool(row[1]), bool(row[2]), bool(row[3]), row[4])
         if shape != EXPECTED_INDEX:
             raise RuntimeError(
                 f"{INDEX} already exists on {TABLE} with a different definition "
                 f"({shape!r}; expected {EXPECTED_INDEX!r}: columns in that order, "
-                "not unique, no predicate, no expression). Something other than "
-                "this migration owns that name; resolve it with a reviewed fix "
+                "not unique, no predicate, no expression, btree). Something other "
+                "than this migration owns that name; resolve it with a reviewed fix "
                 "before running again."
             )
-        if not (bool(row[4]) and bool(row[5])):
+        if not (bool(row[5]) and bool(row[6])):
             # The right shape but not valid or not ready: the residue of a build
             # that was interrupted. This is the one state repaired here, because
             # its shape says it is ours and an invalid index serves nobody.
