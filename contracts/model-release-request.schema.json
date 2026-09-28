@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An importer's claim about what it is releasing (VF-CL-03).\n\nThe two fields and their constraints are copied from the kernel's\n``ModelManifest``, because the point of the request is to be compared\nagainst that immutable declaration for exact equality. ``extra=\"forbid\"``\nis load-bearing here rather than conventional: a proposal carrying a field\nthe declaration does not have is itself a mismatch.",
+  "properties": {
+    "classification": {
+      "pattern": "^(public|internal|restricted)$",
+      "title": "Classification",
+      "type": "string"
+    },
+    "licensePolicy": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Licensepolicy",
+      "type": "string"
+    }
+  },
+  "required": [
+    "licensePolicy",
+    "classification"
+  ],
+  "title": "ModelReleaseRequest",
+  "type": "object"
+}

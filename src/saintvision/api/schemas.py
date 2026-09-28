@@ -729,3 +729,40 @@ class WorkspaceToolRequest(Strict):
     )
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseRequest(Strict):
+    """An importer's claim about what it is releasing (VF-CL-03).
+
+    The two fields and their constraints are copied from the kernel's
+    ``ModelManifest``, because the point of the request is to be compared
+    against that immutable declaration for exact equality. ``extra="forbid"``
+    is load-bearing here rather than conventional: a proposal carrying a field
+    the declaration does not have is itself a mismatch.
+    """
+
+    license_policy: str = Field(min_length=1, max_length=200, alias="licensePolicy")
+    classification: str = Field(pattern="^(public|internal|restricted)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseResponse(Strict):
+    """The released version, echoed back by identity.
+
+    ``stage`` is a literal rather than a free string: the only state this
+    response can describe is the one the route just established, so a future
+    change that returns a different stage under the same type breaks the
+    contract instead of quietly widening it.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["released"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
