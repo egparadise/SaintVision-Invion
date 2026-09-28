@@ -46,6 +46,7 @@ const contracts = [
   { schema: 'distributed-plan-response', output: 'distributed-plan-response' },
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
+  { schema: 'conformance-status-response', output: 'conformance-status-response' },
   { schema: 'run-record-response', output: 'run-record-response' },
   { schema: 'run-record-artifact-page-response', output: 'run-record-artifact-page-response' },
   { schema: 'artifact-pin-verification-response', output: 'artifact-pin-verification-response' },

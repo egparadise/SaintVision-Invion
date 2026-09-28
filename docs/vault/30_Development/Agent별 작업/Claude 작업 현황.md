@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.41"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T16:44:42+09:00"
+updated: "2026-09-28T17:15:23+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,10 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-03 conformance API 1단계 구현 (Claude, 2026-09-28, base 설계 #182 `50c7a33c` + #167 `b7866d63` + #184 `c47811b2`(=#195) merge, branch `agent/claude/g03-conformance-api-impl`): 설계 v1.2 그대로. `conformance.py`에 `CheckSpec`·`CHECKLIST` 단일 정본 도입(`run_conformance()`가 소비, `tests/test_adapters.py` 27 passed 무변경이 동작 불변의 근거), 15-name 독립 set ratchet(순서+gate 3), `GET /v1/projects/{p}/adapters/conformance`는 `NOT_OBSERVED` 단일값·counts·boolean 없음·`recordedAt`은 null 전용 required·suite 미실행(예외 stub + AST 참조 확인), `RES-0004`는 2단계 deferred, live membership·부재/비회원/다른 tenant 동형 403, **#195 merge로 정본 403 denial 1행을 PG-free(stub 단언)와 실 PG(audit_events 실제 행)에서 확인**(무토큰 401 + anonymous 행 포함). 계약 1개 생성·새 code 0·migration 없음. PG-free 43 passed + 변이 5건 사망, 실 PG 7건 hosted, fixture guard 포함. 다음 첫 행동: Codex 검토. 2단계는 migration 번호 선요청부터. 전문 [[2026-09-28_G-03_conformance_API_1단계_구현_Claude]].
+
+G-03 conformance 결과 API 노출 설계 카드 55 (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/g03-conformance-api-design`, docs-only): PR #179 §3-3 구현 1단계의 설계. **실측이 설계를 정했다** — 생산자·증거 shape·비교 함수·계약 버전은 있는데 **제품 호출부 0, 저장 0(db·migrations grep 0건), CI 산출물 0**이다. 그래서 1단계는 `status: "NOT_OBSERVED"` + `reason` + `scope: "control-plane-host"` + 계약 버전 + check 이름 15 + 대상 adapter 4만 내고 **counts와 boolean을 두지 않는다**(`passed: 0`은 "돌렸고 0 통과"로 읽히고 `conformant: bool`에는 미측정 자리가 없다). **route가 `run_conformance()`를 부르지 않음**도 부정 시험으로 고정했다 — 그 함수는 `CliAdapter`에서 호스트 CLI 프로세스를 구동한다. 권한은 #158을 그대로 물려받되(live `require_project_access`, 읽기는 membership, 존재 비노출 동형 거부) **conformance가 tenant 데이터가 아니라는 사실**을 `scope` 필드로 밝혔고, path→row 결속이 1단계에 없다는 것도 적었다. #146 FE 대응표에서 **백엔드 근거 없는 필드·값 셋**을 찾아 API에서 배제했다 — `avgLatencyMs`·`tokensPerSec`(suite가 측정하지 않음) · `Local-vLLM`(대상 아님) · `v1.0.0-ADR-004`(정본은 `1.0.0`). FE 수정은 Gemini 책임이라 범위 밖. **1단계 persistence 필요 없음(확정)이라 migration 번호 미요청**, 2단계는 번호 선요청 필요(#174 반례 인용). 계약 2건·새 code 0·`export_schemas --check`가 잡음(`…Response` 이름 규칙, #167 사례). 선행 의존 `api/problem.py` → 병합 순서 #167 → 구현 PR. 부정 시험 17건(NOT_OBSERVED 7·권한/비노출 6·계약 4, 실 PG 1). 다음 첫 행동: Codex 검토, 승인 뒤 구현 PR을 이 설계 위에 stack. 전문 [[2026-09-28_G-03_conformance_API_설계_Claude]].
 
 G-04 W2 model version 등록 route 구현 카드 64 (Claude, 2026-09-28, base #175 `6ea12700` + #159 `5e206aa4` merge, branch `agent/claude/g04-w2-model-version-register`): 설계 #183 v1.2.1 §8의 PR 4. `register_model_version`에 처음으로 HTTP 경로가 생겼고 **서비스 시그니처 변경 0**이다. 순서: permission → body-read → lock → permission → ledger-read → model-get → service → audit → ledger-write. 권한·키가 body보다 먼저, **lock이 원장·row보다 먼저**(IDEM-6), **lock 뒤 권한 재확인**, span 2개로 **body 읽는 동안 tx 0**. IDEM-6 직렬화점은 `deps.serialise_idempotent_write`(키 파생 advisory xact lock, migration 0)이고 실 PG barrier 시험으로 동시 최초 2건 → row 1·원장 1·unique error 0을 확인한다. 부모 `models` 결속으로 **부재·다른 tenant·다른 project가 같은 404**, UNIQUE 충돌은 **409**(UNIQUE 아닌 IntegrityError는 500 유지). **발견**: digest UNIQUE가 tenant 범위라 409가 다른 project의 존재를 드러낸다 — 어디서인지는 말하지 않게 했고 판단은 owner에게 남겼다. **의도적 누락 2**: `produced_by_run_id`(#184 `run_in_project` 필요), `lineage`(subject 미검증) — 422 거부를 시험으로 고정. **관찰**: 정본 403이 denial audit을 남기지 않는다(공유 핸들러, 별 카드). PG-free 64 passed + revert-fail 5, 실 PG 13은 hosted, PG-free fixture guard 포함. 다음 첫 행동: Codex 검토. 이어서 G-03 1단계 구현 카드(#182 설계 위 stack). 전문 [[2026-09-28_G-04_W2_model_version_등록_구현_Claude]].
 
