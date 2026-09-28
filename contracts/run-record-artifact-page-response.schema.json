@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "RunRecordArtifactPin": {
+      "additionalProperties": false,
+      "description": "One artifact as the record pinned it: reference, digest and size, no content.",
+      "properties": {
+        "artifactId": {
+          "title": "Artifactid",
+          "type": "string"
+        },
+        "byteSize": {
+          "minimum": 0,
+          "title": "Bytesize",
+          "type": "integer"
+        },
+        "checksumSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Checksumsha256",
+          "type": "string"
+        },
+        "objectVersion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Objectversion"
+        },
+        "role": {
+          "pattern": "^(diff|test_report|trace|log|model|dataset|other)$",
+          "title": "Role",
+          "type": "string"
+        },
+        "uri": {
+          "minLength": 1,
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifactId",
+        "role",
+        "uri",
+        "checksumSha256",
+        "byteSize"
+      ],
+      "title": "RunRecordArtifactPin",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One bounded page of the artifacts pinned into a sealed record.\n\nA record pins the run's whole artifact set, which has no bound of its own,\nso the list is paged: at most ``limit`` (default 50, maximum 200) items in\nstable ``artifactId`` order. ``count`` is the number of items in *this\npage*, never the record's total. ``nextCursor`` is the last item's\n``artifactId`` when more follow, and null on the last page. ``role`` echoes\nthe filter, which holds across pages.",
+  "properties": {
+    "count": {
+      "maximum": 200,
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/RunRecordArtifactPin"
+      },
+      "maxItems": 200,
+      "title": "Items",
+      "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nextcursor"
+    },
+    "recordId": {
+      "title": "Recordid",
+      "type": "string"
+    },
+    "role": {
+      "anyOf": [
+        {
+          "pattern": "^(diff|test_report|trace|log|model|dataset|other)$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Role"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recordId",
+    "runId",
+    "items",
+    "count"
+  ],
+  "title": "RunRecordArtifactPageResponse",
+  "type": "object"
+}
