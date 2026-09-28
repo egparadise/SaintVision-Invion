@@ -29,7 +29,10 @@ from saintvision.api.deps import get_principal
 from saintvision.api.v1 import model_retention
 from saintvision.config import Settings
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
+from saintvision.db.session import make_session_factory, tenant_scope
 from saintvision.ids import new_id
+from saintvision.services.lineage import release_model_version
+from test_model_release_real_pg import _seed as _seed_releasable
 from test_model_version_register_real_pg import _canonical, _digest, _insert, _ledger, _seed
 
 pytestmark = pytest.mark.postgres
@@ -247,6 +250,72 @@ def test_a_pin_waits_for_a_release_and_extends_the_released_row(owner_engine, ap
     assert response.json()["stage"] == "released" and response.json()["extended"] is True
     until, stage = _pinned_until(owner_engine, version_id)
     assert until == B and stage == "released"
+
+
+def test_a_release_waits_for_a_pin_in_flight_and_then_judges_the_new_pin(
+    owner_engine, app_engine, two_tenants, frozen_now, clean_tables, monkeypatch
+):
+    """Design §5-3, the other direction: the pin holds the row first; the
+    release (the #167 write path: ``_locked_version`` then
+    ``release_model_version``, in an independent application session) blocks
+    on that lock, and after the pin commits it reads the *new* retention and
+    releases with it intact. The pin transaction is held open from inside the
+    route -- after ``pin_retention`` ran, before commit -- until PostgreSQL
+    reports the release blocked."""
+    from saintvision.api.v1.model_release import _locked_version
+
+    tenant, _ = two_tenants
+    with owner_engine.begin() as connection:
+        seeded = _seed_releasable(connection, tenant_id=tenant, now=frozen_now, project_code="w4-9", role="approver")
+    version_id = seeded["version_id"]
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text("UPDATE model_versions SET retention_pinned_until = :u WHERE model_version_id = :v"),
+            {"u": OLD, "v": version_id},
+        )
+    pin_locked = threading.Event()
+    release_blocked = threading.Event()
+    real_pin = model_retention.pin_retention
+
+    def pin_then_hold(session, **kwargs):
+        row = real_pin(session, **kwargs)
+        pin_locked.set()                      # the row is locked and the new pin written, uncommitted
+        assert release_blocked.wait(timeout=60), "the release never blocked on the pin's lock"
+        return row
+
+    monkeypatch.setattr(model_retention, "pin_retention", pin_then_hold)
+
+    def pin():
+        client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], now=frozen_now, lock_timeout_ms=60_000)
+        return client.post(_path({"project_id": seeded["project_id"], "model_id": seeded["model_id"]}), json=_body(B), headers=_headers("k-9"))
+
+    def release():
+        factory = make_session_factory(app_engine)
+        with factory() as session:
+            with session.begin():
+                with tenant_scope(session, tenant):
+                    session.execute(text("SET LOCAL lock_timeout = '60000ms'"))
+                    row = _locked_version(
+                        session, tenant_id=tenant, project_id=seeded["project_id"], model_id=seeded["model_id"], version="1.0.0"
+                    )
+                    seen = row.retention_pinned_until
+                    released = release_model_version(session, tenant_id=tenant, model_version_id=row.model_version_id, now=frozen_now)
+                    return seen, released.stage, released.retention_pinned_until
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pin_future = pool.submit(pin)
+        assert pin_locked.wait(timeout=60), "the pin never reached the service"
+        release_future = pool.submit(release)
+        _wait_until_blocked(owner_engine)     # the release is on the row lock the pin holds
+        release_blocked.set()
+        response = pin_future.result(timeout=90)
+        seen, stage, kept = release_future.result(timeout=90)
+
+    assert response.status_code == 200, response.text
+    assert seen == B, "the release read the pin before it committed"
+    assert stage == "released" and kept == B
+    until, final_stage = _pinned_until(owner_engine, version_id)
+    assert until == B and final_stage == "released"
 
 
 def test_a_wait_past_the_budget_is_a_retryable_503_with_nothing_written(owner_engine, app_engine, two_tenants, frozen_now, clean_tables):

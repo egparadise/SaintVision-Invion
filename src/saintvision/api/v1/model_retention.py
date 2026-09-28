@@ -43,6 +43,13 @@ database in the answer.
 **Two transaction spans.** The permission is checked in its own short
 transaction, the body is read with no transaction open (the caller controls how
 slowly it arrives), and the write is the one transaction above.
+
+**The clock is read after the lock** (Codex #191 F3, #196 F2). ``Depends(get_now)``
+would stamp the request before the body the caller paced and before the wait
+for the row lock; after a long contention the ledger's ``expires_at`` could
+already be in the past and the audit row older than the write. The app clock
+is read once, after the advisory lock and the live permission, and that one
+instant is used for the ledger, the audit row and nothing else.
 """
 
 from __future__ import annotations
@@ -69,7 +76,6 @@ from ...services.audit import record_event
 from ...services.lineage import pin_retention
 from .. import schemas
 from ..deps import (
-    get_now,
     get_principal,
     get_settings,
     replay_or_reserve,
@@ -173,7 +179,6 @@ async def pin_model_version_retention(
     request: Request,
     principal: Principal = Depends(get_principal),
     settings: Settings = Depends(get_settings),
-    now: dt.datetime = Depends(get_now),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Any:
     """Extend the retention pin to ``until``, once per idempotency key."""
@@ -215,6 +220,10 @@ async def pin_model_version_retention(
                         project_id=project_id,
                     )
                     _require_approval(session, principal=principal, project_id=project_id)
+                    # Read once, here: after the body the caller paced and after
+                    # the wait for the serialisation point, so every stamp this
+                    # request writes is the time it actually did the work.
+                    now: dt.datetime = request.app.state.clock()
                     try:
                         replayed = replay_or_reserve(
                             session,

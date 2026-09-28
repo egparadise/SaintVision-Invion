@@ -99,6 +99,10 @@ class Session:
         elif "pg_advisory_xact_lock" in sql:
             self.world["log"].append("advisory-lock")
             self.world["locks"].append({"sql": sql, "params": params})
+            # A real lock can wait. Advancing the clock here is how a waiting
+            # request is expressed without sleeping.
+            if self.world.get("advance_on_lock") is not None:
+                self.world["clock"] = self.world["advance_on_lock"]
         else:
             self.world["log"].append("execute")
         return None
@@ -163,6 +167,8 @@ def build(monkeypatch, world, *, lock_timeout_ms=5_000):
     world.setdefault("depth", 0)
     world.setdefault("spans", 0)
     world.setdefault("body_depth", [])
+    world.setdefault("clock", NOW)
+    world.setdefault("clock_reads", [])
 
     monkeypatch.setattr(model_retention, "make_session_factory", lambda _engine: Factory(world))
     monkeypatch.setattr(model_retention, "tenant_scope", lambda _s, _t: contextlib.nullcontext())
@@ -195,6 +201,9 @@ def build(monkeypatch, world, *, lock_timeout_ms=5_000):
     async def read_bounded_body(request, **kwargs):
         world["body_depth"].append(world["depth"])
         world["log"].append("body-read")
+        # The caller paces the body; a slow one is time passing.
+        if world.get("advance_on_body") is not None:
+            world["clock"] = world["advance_on_body"]
         return await original_read(request, **kwargs)
 
     monkeypatch.setattr(model_retention, "read_bounded_body", read_bounded_body)
@@ -239,13 +248,17 @@ def build(monkeypatch, world, *, lock_timeout_ms=5_000):
     principal = Principal(
         user_id=USER, tenant_id=TENANT, external_subject="oidc:pin", project_ids=frozenset({PROJECT})
     )
+    def clock():
+        world["clock_reads"].append(len(world["log"]))
+        return world["clock"]
+
     app = create_app(
         engine=object(),
         settings=Settings(
             database_url="postgresql://unused", idempotency_ttl_seconds=600, business_lock_timeout_ms=lock_timeout_ms
         ),
         verifier=StaticPrincipalVerifier({"pin-token": principal}, allow_outside_dev=True),
-        clock=lambda: NOW,
+        clock=clock,
         check_partitions_on_startup=False,
     )
     return TestClient(app, raise_server_exceptions=False)
@@ -349,6 +362,40 @@ def test_a_released_version_can_still_be_extended_and_says_so(monkeypatch):
     client = build(monkeypatch, world)
     response = post(client)
     assert response.status_code == 200 and response.json()["stage"] == "released"
+
+
+# ---------------------------------------------------------------- the clock (Codex #196 F2)
+
+
+def test_the_clock_is_read_once_after_the_lock_and_the_live_permission(monkeypatch):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 200
+    assert len(world["clock_reads"]) == 1
+    log = world["log"]
+    read_at = world["clock_reads"][0]
+    assert read_at > log.index("advisory-lock") and read_at > log.index("permission", log.index("advisory-lock"))
+    assert read_at <= log.index("ledger-read")
+
+
+def test_time_that_passes_in_the_body_and_the_lock_wait_is_what_the_ledger_and_the_audit_carry(monkeypatch):
+    """Revert (``Depends(get_now)``): the stamps would be NOW, before the wait."""
+    after_body = NOW + dt.timedelta(minutes=5)
+    after_lock = NOW + dt.timedelta(minutes=30)
+    world = {"advance_on_body": after_body, "advance_on_lock": after_lock}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 200
+    assert world["ledger_reads"][0]["now"] == after_lock
+    assert world["stored"][0]["now"] == after_lock
+    assert world["audits"][0]["now"] == after_lock
+    assert world["clock_reads"] and world["clock"] == after_lock
+
+
+def test_the_route_declares_no_clock_dependency():
+    import inspect
+
+    assert "now" not in inspect.signature(model_retention.pin_model_version_retention).parameters
+    assert not hasattr(model_retention, "get_now")
 
 
 # ---------------------------------------------------------------- permission, before anything
