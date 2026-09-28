@@ -253,6 +253,12 @@ jobs:
           response = S3Client(load_config(os.environ)).create_bucket()
           assert response.status == 200, f'redacted bucket setup failed ({response.status})'
           PY
+      - name: Verify product ObjectStore adapter conformance
+        env:
+          PYTHONPATH: services/control-plane/src
+        run: >-
+          python -m pytest -q tools/test_s3_object_store_hosted.py
+          --junitxml=dist/s3-product-object-store.xml
       - name: Verify S01 Storage candidate SHA-256 roundtrip and cleanup
         run: >-
           python tools/verify_storage_roundtrip.py
