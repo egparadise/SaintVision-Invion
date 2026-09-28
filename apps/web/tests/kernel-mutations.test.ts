@@ -1,12 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '@/shared/api/client';
-import { cancelKernelRun, decideApproval } from '@/shared/api/kernelMutations';
+import { cancelKernelRun, decideApproval, _resetKernelMutationCache } from '@/shared/api/kernelMutations';
 import { approvalReviewFixture } from './fixtures/approval-review';
 import { approvalChallengeFixture } from './fixtures/approval-challenge';
 
-vi.mock('@/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'test-intent-key' }));
+let traceCount = 0;
+vi.mock('@/shared/api/client', () => ({
+  apiClient: vi.fn(),
+  generateTraceId: () => `test-intent-key-${++traceCount}`,
+}));
 const api = vi.mocked(apiClient);
-beforeEach(() => api.mockReset());
+beforeEach(() => {
+  api.mockReset();
+  _resetKernelMutationCache();
+  traceCount = 0;
+});
 
 describe('kernel mutation contracts', () => {
   it.each(['approve', 'reject'] as const)('%s obtains a challenge before deciding', async decision => {
@@ -25,7 +33,7 @@ describe('kernel mutation contracts', () => {
           nonce: approvalChallengeFixture.nonce,
           actionDigest: approvalReviewFixture.approval.actionDigest,
         }),
-        idempotencyKey: 'test-intent-key',
+        idempotencyKey: 'test-intent-key-1',
       }],
     ]);
   });
@@ -58,7 +66,7 @@ describe('kernel mutation contracts', () => {
     await expect(cancelKernelRun('project', 'run')).resolves.toEqual({ state: 'cancelled' });
     expect(api.mock.calls).toEqual([
       ['/v1/projects/project/runs/run'],
-      ['/v1/projects/project/runs/run/cancel', { method: 'POST', body: '{"expectedVersion":9}', idempotencyKey: 'test-intent-key' }],
+      ['/v1/projects/project/runs/run/cancel', { method: 'POST', body: '{"expectedVersion":9}', idempotencyKey: 'test-intent-key-1' }],
     ]);
   });
 
@@ -77,5 +85,63 @@ describe('kernel mutation contracts', () => {
   it('requires project scope instead of inventing one', async () => {
     await expect(cancelKernelRun(undefined, 'run')).rejects.toThrow();
     expect(api).not.toHaveBeenCalled();
+  });
+
+  it('F2: reuses identical Idempotency-Key and payload when retrying cancelKernelRun after failure without refetching Run version', async () => {
+    api
+      .mockResolvedValueOnce({ runId: 'run-retry', version: 9 })
+      .mockRejectedValueOnce(new Error('503 Service Unavailable'));
+
+    await expect(cancelKernelRun('prj-1', 'run-retry')).rejects.toThrow('503 Service Unavailable');
+    expect(api).toHaveBeenCalledTimes(2);
+
+    const firstCancelCall = api.mock.calls[1];
+    const firstKey = firstCancelCall[1]?.idempotencyKey;
+    const firstBody = firstCancelCall[1]?.body;
+    expect(firstKey).toBe('test-intent-key-1');
+    expect(firstBody).toBe('{"expectedVersion":9}');
+
+    // 2nd attempt (retry): reuses firstKey and firstBody without refetching Run version
+    api.mockResolvedValueOnce({ state: 'cancelled' });
+
+    const retryResult = await cancelKernelRun('prj-1', 'run-retry');
+    expect(retryResult).toEqual({ state: 'cancelled' });
+    expect(api).toHaveBeenCalledTimes(3);
+
+    const retryCancelCall = api.mock.calls[2];
+    expect(retryCancelCall[0]).toBe('/v1/projects/prj-1/runs/run-retry/cancel');
+    expect(retryCancelCall[1]?.idempotencyKey).toBe(firstKey);
+    expect(retryCancelCall[1]?.body).toBe(firstBody);
+  });
+
+  it('F2: reuses identical Idempotency-Key and challenge payload when retrying decideApproval after failure', async () => {
+    api
+      .mockResolvedValueOnce(approvalChallengeFixture)
+      .mockRejectedValueOnce(new Error('500 Internal Error'));
+
+    const intent = {
+      id: approvalChallengeFixture.approvalId,
+      projectId: approvalReviewFixture.approval.projectId,
+      actionDigest: approvalReviewFixture.approval.actionDigest,
+    };
+
+    await expect(decideApproval(intent, 'approve')).rejects.toThrow('500 Internal Error');
+    expect(api).toHaveBeenCalledTimes(2);
+
+    const firstDecisionCall = api.mock.calls[1];
+    const firstKey = firstDecisionCall[1]?.idempotencyKey;
+    const firstBody = firstDecisionCall[1]?.body;
+    expect(firstKey).toBe('test-intent-key-1');
+
+    // 2nd attempt (retry): reuses key and body
+    api.mockResolvedValueOnce(approvalReviewFixture.approval);
+
+    const retryResult = await decideApproval(intent, 'approve');
+    expect(retryResult).toEqual(approvalReviewFixture.approval);
+    expect(api).toHaveBeenCalledTimes(3);
+
+    const retryDecisionCall = api.mock.calls[2];
+    expect(retryDecisionCall[1]?.idempotencyKey).toBe(firstKey);
+    expect(retryDecisionCall[1]?.body).toBe(firstBody);
   });
 });

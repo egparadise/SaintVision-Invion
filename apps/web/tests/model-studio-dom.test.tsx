@@ -561,4 +561,80 @@ describe('VF-GM-04: Model Studio DOM Harness & ADR-041 Guarantees', () => {
 
     expect(container.querySelector('[data-testid="shard-repair-success"]')).toBeNull();
   });
+
+  // ---------------------------------------------------------------------------
+  // 6. Card 126 F4: repairState Reset on clear() (Model/Project/Version Change)
+  // ---------------------------------------------------------------------------
+  it('[CARD-126-F4-REPAIR-STATE-RESET] clears repairState when clear() is invoked via projectId change or modelId input', async () => {
+    const onRepairMock = vi.fn().mockResolvedValue({
+      success: true,
+      repairedReplicas: [
+        { nodeId: 'nod_01JABCDEF01', nodeHostname: 'Node-01-WinMain', status: 'healthy' },
+        { nodeId: 'nod_01JABCDEF02', nodeHostname: 'Node-02-WinWork', status: 'healthy' },
+      ],
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelStudioView
+          projectId="prj_01"
+          initialModel={sampleModel}
+          clusterNodes={clusterNodesFixture}
+          onRepairShard={onRepairMock}
+        />
+      );
+    });
+
+    const repairBtn = container.querySelector<HTMLButtonElement>('[data-testid="repair-shard-0-btn"]');
+    await act(async () => {
+      repairBtn!.click();
+      await Promise.resolve();
+    });
+
+    // Success banner is present
+    expect(container.querySelector('[data-testid="shard-repair-success"]')).not.toBeNull();
+
+    // 1. Changing model-id input invokes clear() and resets repairState
+    const modelIdInput = container.querySelector<HTMLInputElement>('[data-testid="model-id-input"]');
+    expect(modelIdInput).not.toBeNull();
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(modelIdInput, 'different-model');
+      modelIdInput!.dispatchEvent(new Event('input', { bubbles: true }));
+      modelIdInput!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    expect(container.querySelector('[data-testid="shard-repair-success"]')).toBeNull();
+
+    // 2. Re-render with new projectId prop also invokes clear()
+    await act(async () => {
+      root.render(
+        <ModelStudioView
+          projectId="prj_02"
+          initialModel={sampleModel}
+          clusterNodes={clusterNodesFixture}
+          onRepairShard={onRepairMock}
+        />
+      );
+    });
+
+    const repairBtn2 = container.querySelector<HTMLButtonElement>('[data-testid="repair-shard-0-btn"]');
+    await act(async () => {
+      repairBtn2!.click();
+      await Promise.resolve();
+    });
+    expect(container.querySelector('[data-testid="shard-repair-success"]')).not.toBeNull();
+
+    // Switch projectId prop
+    await act(async () => {
+      root.render(
+        <ModelStudioView
+          projectId="prj_03"
+          initialModel={null}
+          clusterNodes={clusterNodesFixture}
+          onRepairShard={onRepairMock}
+        />
+      );
+    });
+    expect(container.querySelector('[data-testid="shard-repair-success"]')).toBeNull();
+  });
 });

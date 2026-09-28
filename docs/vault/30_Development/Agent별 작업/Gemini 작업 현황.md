@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.135"
+version: "1.0.136"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T00:20:00+09:00"
+updated: "2026-09-29T03:11:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,38 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
+## 2026-09-29 apps/web 전역 감사 지적사항(F1~F7) 시정 완료 (Card 126, `agent/gemini/card126-audit-fixes`)
+
+- **PR**: Card 126 (생성 예정)
+- **Base / Head**: Base `f23c0423` (PR #219 head) 위 전역 감사 F1~F7 전수 시정 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 무결성 소유). Reviewer: Claude (감사자 및 UI 축), Codex (계약 축).
+- **조치 내역 (Claude 전역 감사 PR #235 F1~F7 시정 전수 완결)**:
+  1. **F1 [High] `releaseEngine.ts` 서버 미제공 SLO 7축 허위 met 제거 및 NOT_OBSERVED 처리**:
+     - 실제 텔레메트리 부재 시 `unmeasured` 및 `observedValue: null` 반환.
+     - `ReleaseCandidateView.tsx`에서 `미측정 (NOT_OBSERVED)` 레이블 표출.
+     - `release-candidate.test.ts` 및 `browser-matrix-acceptance.test.tsx` 시험 반전/정합.
+  2. **F2 [High] `kernelMutations.ts` 승인 결정 및 Run 취소 멱등키 캐싱 보장**:
+     - 동일 `(runId/approvalId + action/reason)` 재시도 시 캐시된 동일 멱등키 재사용, 파라미터 변경 시 새 키 발행.
+     - `kernel-mutations.test.ts` 회귀 시험 14건 완결.
+  3. **F3 [Med-High] `ResourceExplorer.tsx` 및 `fabricControlApi.ts` 스토리지 기여 멱등키 보존**:
+     - `storageContributionKey` 상태 도입으로 실패 재시도 시 동일 키 보존, 용량 변경 시 새 키 회전.
+  4. **F4 [Med-High] `ModelStudioView.tsx` `clear()` 시 `repairState` 잔류 해소**:
+     - 폼 초기화 시 `setRepairState(null)` 명시 호출로 상태 오염 방지.
+  5. **F5 [Med] `ResourceExplorer.tsx` 허위 `- 50` 가짜 여유 용량 계산식 제거 및 null 허용**:
+     - 임의 수식 제거, 서버 원천값 부재 시 `availableBytes: null` 전달.
+  6. **F6 [Med] 형식불가 RFC 9457 ProblemDetails 코드 8건 정정 및 무결성 시험 신설**:
+     - 5개 테스트 파일의 비표준 코드 정정, 전수 정규식 `/^[A-Z]+-[0-9]{4}$/` 검증 시험 `fixture-problem-codes-integrity.test.ts` 신설.
+  7. **F7 [Low] `isRouteNotFoundError` fail-closed 헬퍼 정리 및 독스트링 정정**:
+     - 404 및 RFC 9457 구조 판별 간결화 및 독스트링 정합.
+- **실측 검증**:
+  - Vitest: **81 test files / 758 passed** (28.33s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run contracts:check` 28 passed, `npm run build` 번들 생성 성공 (874.31 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (1.94s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` 0 conflicts PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_03-11-00_KST_Card126_Web_Audit_Fixes_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: `agent/gemini/card126-audit-fixes` 브랜치 push 및 PR 생성 후 리뷰 요청.
 
 ## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)
 

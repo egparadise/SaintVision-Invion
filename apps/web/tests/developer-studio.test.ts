@@ -423,25 +423,29 @@ describe('Developer Studio: Unified 4-Step Workflow & Governance Verification', 
 
   describe('UI-FB-03 ResultView & Artifact Fallback Boundary Controls', () => {
     it('isRouteNotFoundError returns true ONLY for genuine unmapped route 404', () => {
-      // Generic FastAPI unmapped 404
+      // Generic FastAPI unmapped 404 without structured code
       expect(isRouteNotFoundError({ status: 404, problem: { detail: 'Not Found' } })).toBe(true);
       // Client synthesized network 404
       expect(isRouteNotFoundError({ status: 404, problem: { code: 'NET-0404' } })).toBe(true);
+      expect(isRouteNotFoundError({ code: 'NET-0404', status: 404 })).toBe(true);
       // Generic 404 without code
       expect(isRouteNotFoundError({ status: 404 })).toBe(true);
     });
 
-    it('isRouteNotFoundError returns false for 401, 403, 500, network errors, and app-level 404s', () => {
-      // 401 Unauthorized
-      expect(isRouteNotFoundError({ status: 401, problem: { status: 401, code: 'SEC-401' } })).toBe(false);
-      // 403 Forbidden
-      expect(isRouteNotFoundError({ status: 403, problem: { status: 403, code: 'SEC-403' } })).toBe(false);
-      // 500 Internal Error
-      expect(isRouteNotFoundError({ status: 500, problem: { status: 500, code: 'NET-500' } })).toBe(false);
-      // Application level entity not found (route exists, run missing)
+    it('isRouteNotFoundError returns false for non-404, canonical application 404, and any structured problem code (fail-closed)', () => {
+      // 401 Unauthorized (canonical server auth denial)
+      expect(isRouteNotFoundError({ status: 401, problem: { status: 401, code: 'AUTH-0030' } })).toBe(false);
+      // 403 Forbidden (canonical net auth error)
+      expect(isRouteNotFoundError({ status: 403, problem: { status: 403, code: 'NET-0403' } })).toBe(false);
+      // 500 Internal Error (canonical system error)
+      expect(isRouteNotFoundError({ status: 500, problem: { status: 500, code: 'SYS-0002' } })).toBe(false);
+      // Canonical application level entity not found (route exists, entity missing)
+      expect(isRouteNotFoundError({ status: 404, problem: { status: 404, code: 'RES-0004' } })).toBe(false);
+      // Fail-closed guard: any structured problem code (even non-canonical) forbids route fallback
       expect(isRouteNotFoundError({ status: 404, problem: { status: 404, code: 'RES-RUN-404' } })).toBe(false);
-      expect(isRouteNotFoundError({ status: 404, problem: { status: 404, code: 'APP-404' } })).toBe(false);
+      expect(isRouteNotFoundError({ status: 404, problem: { status: 404, code: 'APP-XXXX' } })).toBe(false);
       expect(isRouteNotFoundError(null)).toBe(false);
+      expect(isRouteNotFoundError(undefined)).toBe(false);
     });
   });
 });

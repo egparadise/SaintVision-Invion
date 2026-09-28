@@ -461,7 +461,7 @@ export interface SloMetricRecord {
   name: string;
   targetValue: string;
   actualValue: string;
-  status: 'met' | 'breached';
+  status: 'met' | 'breached' | 'unmeasured';
   category: 'latency' | 'resilience' | 'security' | 'storage';
 }
 

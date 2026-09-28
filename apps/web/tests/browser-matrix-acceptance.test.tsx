@@ -177,7 +177,18 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
 
   it('Test 4: Verifies all 7 production SLO metrics meet criteria under normal telemetry', () => {
     const rm = new ReleaseManager();
-    const slos = rm.getSloRecords();
+    // When telemetry is absent from server, returns unmeasured
+    expect(rm.getSloRecords().every((s) => s.status === 'unmeasured')).toBe(true);
+
+    const slos = rm.computeSloRecords({
+      schedulerP95LatencySeconds: 1.24,
+      heartbeatDetectionSeconds: 48.0,
+      unapprovedExecutionsCount: 0,
+      dockerSocketExposedCount: 0,
+      rpoMinutes: 4.2,
+      rtoMinutes: 12.5,
+      unresolvedVulnerabilitiesCount: 0,
+    });
 
     expect(slos).toHaveLength(7);
     slos.forEach((slo) => {

@@ -77,7 +77,7 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     const err401 = {
       problem: {
         status: 401,
-        code: 'NET-401',
+        code: 'NET-0401',
         title: 'Unauthorized',
         detail: 'User session expired or invalid token',
       },
@@ -138,7 +138,7 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     const err403 = {
       problem: {
         status: 403,
-        code: 'NET-403',
+        code: 'NET-0403',
         title: 'Forbidden',
         detail: 'Insufficient permissions to view run results',
       },
@@ -194,7 +194,7 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     const err500 = {
       problem: {
         status: 500,
-        code: 'NET-500',
+        code: 'NET-0500',
         title: 'Internal Server Error',
         detail: 'Database connection failed',
       },
@@ -350,12 +350,12 @@ describe('DeveloperStudio Artifact Route-404 Fallback DOM Harness (UI-FB-03)', (
     expect(container.textContent).not.toContain('✓ 산출물 검증 완료 (Output Verified)');
   });
 
-  it('Scenario 6: App-level 404 (RES-RUN-404) -> STRICTLY NO fallback to /artifacts, displays error banner, suppresses fallback badge & verified banner', async () => {
+  it('Scenario 6: App-level 404 (RES-0004) -> STRICTLY NO fallback to /artifacts, displays error banner, suppresses fallback badge & verified banner', async () => {
     let artifactsCalls = 0;
     const errApp404 = {
       problem: {
         status: 404,
-        code: 'RES-RUN-404',
+        code: 'RES-0004',
         title: 'Run Not Found',
         detail: 'Specified run does not exist or has been purged',
       },
@@ -548,7 +548,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const err401 = {
       problem: {
         status: 401,
-        code: 'NET-401',
+        code: 'NET-0401',
         title: 'Unauthorized',
         detail: 'User session expired or invalid token',
       },
@@ -610,7 +610,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const notice1 = container.querySelector('[data-testid="studio-action-notice"]');
     expect(notice1).not.toBeNull();
     expect(notice1?.getAttribute('role')).toBe('alert');
-    expect(notice1?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-401): User session expired or invalid token');
+    expect(notice1?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-0401): User session expired or invalid token');
     expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
@@ -621,7 +621,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const err403 = {
       problem: {
         status: 403,
-        code: 'SEC-403',
+        code: 'AUTH-0030',
         title: 'Forbidden',
         detail: 'Insufficient permissions to export artifacts',
       },
@@ -675,7 +675,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const notice1b = container.querySelector('[data-testid="studio-action-notice"]');
     expect(notice1b).not.toBeNull();
     expect(notice1b?.getAttribute('role')).toBe('alert');
-    expect(notice1b?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (SEC-403): Insufficient permissions to export artifacts');
+    expect(notice1b?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (AUTH-0030): Insufficient permissions to export artifacts');
     expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
@@ -686,7 +686,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const err500 = {
       problem: {
         status: 500,
-        code: 'NET-500',
+        code: 'NET-0500',
         title: 'Internal Server Error',
         detail: 'Database connection failed',
       },
@@ -745,7 +745,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const notice2 = container.querySelector('[data-testid="studio-action-notice"]');
     expect(notice2).not.toBeNull();
     expect(notice2?.getAttribute('role')).toBe('alert');
-    expect(notice2?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-500): Database connection failed');
+    expect(notice2?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (NET-0500): Database connection failed');
     expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
@@ -813,13 +813,13 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('Download Scenario 4: App-level 404 (RES-RUN-404) during download probe -> STRICTLY NO fallback to /artifacts (0 calls), alerts user, NO silent cache download', async () => {
+  it('Download Scenario 4: App-level 404 (RES-0004) during download probe -> STRICTLY NO fallback to /artifacts (0 calls), alerts user, NO silent cache download', async () => {
     let artifactsCalls = 0;
     let initialMount = true;
     const errApp404 = {
       problem: {
         status: 404,
-        code: 'RES-RUN-404',
+        code: 'RES-0004',
         title: 'Run Not Found',
         detail: 'Specified run does not exist or has been purged',
       },
@@ -878,7 +878,7 @@ describe('handleDownloadArtifact route-404 fallback and non-route error guards (
     const notice4 = container.querySelector('[data-testid="studio-action-notice"]');
     expect(notice4).not.toBeNull();
     expect(notice4?.getAttribute('role')).toBe('alert');
-    expect(notice4?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (RES-RUN-404): Specified run does not exist or has been purged');
+    expect(notice4?.textContent).toContain('산출물 검증 및 다운로드 요청 실패 (RES-0004): Specified run does not exist or has been purged');
     expect(window.alert).not.toHaveBeenCalled();
     expect(window.URL.createObjectURL).not.toHaveBeenCalled();
   });

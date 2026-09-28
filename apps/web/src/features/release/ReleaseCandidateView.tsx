@@ -13,16 +13,20 @@ export const ReleaseCandidateView: React.FC = () => {
   const activeCandidate = candidates.find((c) => c.isActive) || candidates[0];
 
   const metCount = slos.filter((s) => s.status === 'met').length;
+  const measuredSlos = slos.filter((s) => s.status !== 'unmeasured');
+  const totalMeasured = measuredSlos.length;
+  const unmeasuredCount = slos.filter((s) => s.status === 'unmeasured').length;
   const totalSlos = slos.length;
-  const sloRate = totalSlos > 0 ? Math.round((metCount / totalSlos) * 100) : 0;
+  const sloRate = totalMeasured > 0 ? Math.round((metCount / totalMeasured) * 100) : 0;
 
   const passCount = audits.filter((a) => a.status === 'pass').length;
   const totalAudits = audits.length;
   const auditRate = totalAudits > 0 ? Math.round((passCount / totalAudits) * 100) : 0;
 
   const vulnsSlo = slos.find((s) => s.name.includes('취약점'));
-  const vulnsCountStr = vulnsSlo?.actualValue || '0 건';
   const isZeroVulns = vulnsSlo?.status === 'met';
+  const isVulnsUnmeasured = vulnsSlo?.status === 'unmeasured';
+  const vulnsCountStr = vulnsSlo?.actualValue || (isVulnsUnmeasured ? '미측정' : '0 건');
 
   const handleRollback = (targetTag: string) => {
     const res = releaseManager.rollbackToVersion(targetTag);
@@ -69,21 +73,25 @@ export const ReleaseCandidateView: React.FC = () => {
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : '#f85149', marginTop: '4px' }}>
-            {vulnsCountStr} {isZeroVulns ? '(ZERO BUG)' : '(ACTION REQUIRED)'}
+          <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : isVulnsUnmeasured ? '#8b949e' : '#f85149', marginTop: '4px' }}>
+            {vulnsCountStr} {isZeroVulns ? '(ZERO BUG)' : isVulnsUnmeasured ? '(UNMEASURED)' : '(ACTION REQUIRED)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {isZeroVulns ? '보안·무결성 전수 검증 완료' : '미완화 결함 조치 필요'}
+            {isZeroVulns ? '보안·무결성 전수 검증 완료' : isVulnsUnmeasured ? '실측 증거 부재 (서버 관측 대기)' : '미완화 결함 조치 필요'}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 달성률 (AC-11)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: metCount === totalSlos ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {sloRate}% ({metCount}/{totalSlos} 지표 Met)
+          <div style={{ fontSize: '24px', fontWeight: 700, color: totalMeasured > 0 && metCount === totalMeasured ? '#3fb950' : '#d29922', marginTop: '4px' }}>
+            {totalMeasured > 0 ? `${sloRate}% (${metCount}/${totalMeasured} 지표 Met)` : `0% (0/0 실측)`}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {metCount === totalSlos ? '전체 목표 지표 충족 (Met)' : `${totalSlos - metCount}개 지표 미충족 또는 실측 중`}
+            {unmeasuredCount > 0
+              ? `${unmeasuredCount}개 지표 서버 관측치 부재 (UNMEASURED)`
+              : metCount === totalSlos
+              ? '전체 목표 지표 충족 (Met)'
+              : `${totalSlos - metCount}개 지표 미충족 또는 실측 중`}
           </div>
         </div>
 
@@ -168,11 +176,21 @@ export const ReleaseCandidateView: React.FC = () => {
                         borderRadius: '4px',
                         fontSize: '11px',
                         fontWeight: 700,
-                        backgroundColor: slo.status === 'met' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
-                        color: slo.status === 'met' ? '#3fb950' : '#f85149',
+                        backgroundColor:
+                          slo.status === 'met'
+                            ? 'rgba(46, 160, 67, 0.2)'
+                            : slo.status === 'unmeasured'
+                            ? 'rgba(139, 148, 158, 0.2)'
+                            : 'rgba(248, 81, 73, 0.2)',
+                        color:
+                          slo.status === 'met'
+                            ? '#3fb950'
+                            : slo.status === 'unmeasured'
+                            ? '#8b949e'
+                            : '#f85149',
                       }}
                     >
-                      {slo.status.toUpperCase()}
+                      {slo.status === 'unmeasured' ? 'UNMEASURED (미측정)' : slo.status.toUpperCase()}
                     </span>
                   </td>
                 </tr>

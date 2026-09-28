@@ -65,6 +65,11 @@ export const ModelStudioView: React.FC<ModelStudioViewProps> = ({
     setResult(initialModel);
     setError('');
     setLoading(false);
+    setRepairState({
+      repairingShardIndex: null,
+      message: null,
+      error: null,
+    });
   };
 
   useEffect(() => {

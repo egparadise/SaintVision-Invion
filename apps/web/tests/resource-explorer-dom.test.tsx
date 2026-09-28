@@ -1151,5 +1151,113 @@ describe('VF-GM-02: My Computer / Resource Explorer Fabric & Topology Harness', 
       expect(modal?.textContent).toContain('일회용 부트스트랩 토큰 발급 완료');
       expect(modal?.textContent).toContain('btk_canonical_fixture_token_abc123');
     });
+
+    it('F3: preserves identical Idempotency-Key on retry of storage contribution submission when advancing fake timers', async () => {
+      vi.useFakeTimers();
+      let callCount = 0;
+      const capturedKeys: (string | undefined)[] = [];
+      vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);
+      vi.spyOn(fabricApi, 'registerStorageContribution').mockImplementation(async (_data, key) => {
+        capturedKeys.push(key);
+        callCount++;
+        if (callCount === 1) {
+          throw { problem: { detail: 'Temporary storage lock error', status: 503 } };
+        }
+        return {
+          contribution: {
+            contributionId: 'stc_retry_success_01',
+            nodeId: sampleNodes[0].id,
+            declaredPath: 'C:\\SaintVision\\StorageData',
+            mode: 'read_write',
+            capacityBytes: 500 * 1024 ** 3,
+            availableBytes: 500 * 1024 ** 3,
+            status: 'pending',
+            createdAt: '2026-09-29T00:00:00Z',
+          },
+        };
+      });
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="storage" />);
+      });
+
+      const registerBtn = container.querySelector<HTMLButtonElement>('[data-testid="register-contribution-btn"]');
+      expect(registerBtn).not.toBeNull();
+
+      // First click: fails with 503
+      await act(async () => {
+        registerBtn!.click();
+      });
+
+      expect(capturedKeys).toHaveLength(1);
+      expect(container.textContent).toContain('Temporary storage lock error');
+
+      // Advance timer by 50ms (would change Date.now() in buggy implementation)
+      vi.advanceTimersByTime(50);
+
+      // Second click: retry identical submission
+      await act(async () => {
+        registerBtn!.click();
+      });
+
+      expect(capturedKeys).toHaveLength(2);
+      expect(capturedKeys[1]).toBeDefined();
+      // MUST be strictly identical Idempotency-Key on retry
+      expect(capturedKeys[1]).toBe(capturedKeys[0]);
+      expect(container.textContent).toContain('스토리지 기여 등록 완료 (stc_retry_success_01)');
+
+      vi.useRealTimers();
+    });
+
+    it('F5: does not send negative or fabricated availableBytes when registering 10 GB storage contribution', async () => {
+      let registeredData: any = null;
+      vi.spyOn(fabricApi, 'getStorageContributions').mockResolvedValue([]);
+      vi.spyOn(fabricApi, 'registerStorageContribution').mockImplementation(async (data, _key) => {
+        registeredData = data;
+        return {
+          contribution: {
+            contributionId: 'stc_10gb_01',
+            nodeId: sampleNodes[0].id,
+            declaredPath: 'C:\\SaintVision\\StorageData',
+            mode: 'read_write',
+            capacityBytes: 10 * 1024 ** 3,
+            availableBytes: 10 * 1024 ** 3,
+            status: 'pending',
+            createdAt: '2026-09-29T00:00:00Z',
+          },
+        };
+      });
+
+      await act(async () => {
+        root.render(<ResourceExplorer nodes={sampleNodes} initialTab="storage" />);
+      });
+
+      // Find capacity input and change to 10 GB
+      const capacityInput = container.querySelector<HTMLInputElement>('[data-testid="storage-capacity-input"]');
+      expect(capacityInput).not.toBeNull();
+
+      await act(async () => {
+        const proto = window.HTMLInputElement.prototype;
+        const setVal = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+        setVal?.call(capacityInput, '10');
+        capacityInput!.dispatchEvent(new Event('input', { bubbles: true }));
+        capacityInput!.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const registerBtn = container.querySelector<HTMLButtonElement>('[data-testid="register-contribution-btn"]');
+      expect(registerBtn).not.toBeNull();
+
+      await act(async () => {
+        registerBtn!.click();
+      });
+
+      expect(registeredData).not.toBeNull();
+      expect(registeredData.capacityBytes).toBe(10 * 1024 ** 3);
+      // availableBytes must NOT be negative (-42949672960 in buggy code); it must be null (or non-negative if provided)
+      if (typeof registeredData.availableBytes === 'number') {
+        expect(registeredData.availableBytes).toBeGreaterThanOrEqual(0);
+      }
+      expect(registeredData.availableBytes === null || registeredData.availableBytes === undefined).toBe(true);
+    });
   });
 });
