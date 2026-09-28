@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.124"
+version: "1.0.126"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T15:45:00+09:00"
+updated: "2026-09-28T14:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1511,4 +1511,24 @@ source_of_truth: "Git"
 > 3) **RunDetail Tab 6 실배선**: Tab 6 `6. 시도 이력 (Attempts)` 신설, 실제 커널 시도 목록 조회, 출처 배지, 노드 ID, 시작 시각, 종료 코드, 사유, 명령/영수증 ID 렌더링, 미배정/대기 null 안전 처리, 빈 상태 알림, `role="alert"` 에러 경고 완비.
 > 4) **3대 돌연변이 실측 사살 (KILLED)**: `fetchRunAttempts` source 가드 주석 처리, RunDetail 에러 배너 `role="alert"` 변조, Ajv 스키마 `additionalProperties` 무단 주입 등 3대 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **51개 파일 464/464 tests 100% 통과** (from 447 to 464, net +17 tests 순증; `run-attempt-contract.test.ts` 9 passed, `run-detail-attempts-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 3.18s 클린 번들링(93 modules), Pytest 7 passed, check_docs/ontology PASS. 상세 [[2026-09-21_run-attempts_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
+
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 계획 수립 (`agent/gemini/g07-eval-runner-plan`)
+
+- **작업 ID**: `G-07` (카드 60 1단계: 구현 계획 수립, docs-only)
+- **상위 근거**: PR #179 통합 분류표(PR #179 통합 분류표) 및 정본 차단 지도([[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]]:42)
+- **정본 설계**: S09-FE 매트릭스 v1.1.1([[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]], PR #113)
+- **핵심 불변식 및 설계 내용**:
+  1. **합성 평가는 제품·운영 인수(G-26)로 세지 않음**: 본 러너의 100/30 평가는 클라이언트 방어 기제의 결정론적 무결성 검증용 합성 평가이며, 실제 모델(CX-02) 및 물리 샌드박스 인수(G-26)와 엄격히 분리 표기 (`"isSynthetic": true`, `"countsAsOperationalAcceptance": false`).
+  2. **미실행 케이스 NOT_OBSERVED**: 실 Provider 및 실 샌드박스 미배선 항목(EVL-03, EVL-04, SSE-01)은 0점이나 허위 PASS가 아닌 반드시 `status: "NOT_OBSERVED"` 및 사유 명시.
+  3. **입출력 원본 및 고정 SHA 보존**: 100/30 입출력 원본과 데이터셋 SHA-256을 증거 JSON에 영구 보존.
+  4. **skip 0 강제**: 테스트 스위트 및 러너에서 skip 0 정책 엄격 적용.
+  5. **Revert-fail 시험 필수**: 모든 방어 로직에 대해 코드 원복 시 즉각 실패하는 MUT-01~03 변이 사살 시험 동반.
+  6. **역할 경계**: Gemini는 UI/클라이언트 러너/픽스처/변이 도구를 소유하며, 백엔드/커널 코드가 필요할 경우 즉시 중단하고 코디네이터(Claude/Codex)에 인계.
+- **문서 산출물**:
+  - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.0.0)
+  - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.0.0)
+- **검증 실측**:
+  - `python tools/check_docs.py`: **PASS: 24 original hashes, 895 versioned documents (exit 0)**
+  - `python tools/check_doc_single_source.py --ratchet`: **PASS: 18 pairs (exit 0)**
 
