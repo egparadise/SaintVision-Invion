@@ -1277,10 +1277,11 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - Focused evidence after r1 fixes: `tests/test_aggregate_ac11_evidence.py` 49 passed and module compilation exit 0; docs/ontology/contract/ratchet gates are rerun before the next push. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
 - History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
 - Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
+- Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
 
 ## 2026-09-28 Card 51 — S11 AC-11 migration restore rehearsal
 
-- Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 r2 head `ea93e2e7`; owner/reviewer Codex/Claude.
+- Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 C1 head `960fdc6b`; owner/reviewer Codex/Claude.
 - Opt-in hosted lane, exact PR-head checkout, disposable PostgreSQL 16 source/restore DB, pre/post-forward sentinel, final catalog fingerprint, residue-zero JSON/JUnit evidence를 구현했다. reversible tail 0은 조건부 `NOT_APPLICABLE`, 짝인 `0045→snapshot restore→0046`만 실제 PASS 후보이며 lossy-reversible 10개는 개별 측정이 아닌 restore-route 사전 분류로 유지한다.
 - PG-free focused 8 passed, py_compile/YAML/diff-check exit 0. hosted run 전이므로 실제 restore는 `NOT_OBSERVED`, AC-11은 미완료다.
 - History: [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
