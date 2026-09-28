@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.124"
+version: "1.0.126"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T15:45:00+09:00"
+updated: "2026-09-28T15:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -1512,3 +1512,23 @@ source_of_truth: "Git"
 > 4) **3대 돌연변이 실측 사살 (KILLED)**: `fetchRunAttempts` source 가드 주석 처리, RunDetail 에러 배너 `role="alert"` 변조, Ajv 스키마 `additionalProperties` 무단 주입 등 3대 돌연변이 전수 즉시 실패 포착 증명.
 > 결과: 전체 Vitest **51개 파일 464/464 tests 100% 통과** (from 447 to 464, net +17 tests 순증; `run-attempt-contract.test.ts` 9 passed, `run-detail-attempts-dom.test.tsx` 8 passed), Vite 프로덕션 빌드 3.18s 클린 번들링(93 modules), Pytest 7 passed, check_docs/ontology PASS. 상세 [[2026-09-21_run-attempts_프론트엔드_계약결속_및_RunDetail배선_Gemini]].
 
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.1 개정 (`agent/gemini/g07-eval-runner-plan`)
+
+- **작업 ID**: `G-07` (카드 60 1단계: 구현 계획 v1.1 개정, docs-only)
+- **상위 근거**: PR #179 통합 분류표 및 정본 차단 지도([[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]]:42)
+- **정본 설계**: S09-FE 매트릭스 v1.1.1([[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]], PR #113)
+- **리뷰 피드백(Claude F1~F8, Codex C1~C2) 전면 반영 내역**:
+  1. **Codex C1 (백엔드 run_suite 인용 정합 & EVL-05 분리)**: 부재 식별자 `execute_suite` 삭제 및 정본 `src/saintvision/services/eval_execution.py:run_suite` 정합. EVL-03/04는 라이브 레인으로서 `NOT_OBSERVED` 유지, 클라이언트 합성 러너는 `EVL-05`로 명시 분리.
+  2. **Codex C2 & Claude F3 (고정 SHA 증거 스키마 v1.1 & provenance 결속)**: `sourceHeadSha`, `gitBlobOids`, `fixturesSha256`, `casesDigest`, 130개 case 레코드 전수 수록, 파일명 `<sha>` 반영(`Evidence/s09-g07-eval-evidence-<sha>.json`), CI `eval:check` 배선 계획.
+  3. **Claude F1 (30 코딩 과제 판정 함수 및 지표 정정)**: 80% 하드코딩 삭제, 관측 가능한 결과 코드와 루프 수 기반 판정 함수 `evaluateCodingTask` 도입, 지표명 `guardConformanceRate` 분리.
+  4. **Claude F2 (6대 정규식 전용 Probe 표 & 오탐 정직 기록)**: 정규식 6종 전용 Probe 표 수립, 오탐 식별자 2건 `KNOWN_FALSE_POSITIVE` 정직 기록, no-op 스캐너 사살 revert-fail 사전 등록.
+  5. **Claude F4 (skip 0 & fail-closed 강제 장치, 결정성)**: 매 case 독립 `AgentLoopManager` 및 결정론적 ID `req_eval_${caseId}` 부여, Fail-closed 표 명시, AST skip guard 시험 배선, 러너 자체 변이체 4종 사살 계획.
+  6. **Claude F5 (변이 도구 카탈로그 & 소스 변이 절차)**: 6대 입력 변이 연산자 카탈로그(`OP-CASE-01` ~ `OP-SYN-01`) 정의, 금지행동 소유 경계 명시.
+  7. **Claude F6 (매트릭스 v1.1.1 대비 5대 이탈 정정 표)**: 상태 어휘(`NOT_OBSERVED`), 증거 경로(`<sha>`), 클릭 수(2차/3차), 거절 화면 갱신(PR 4 신설), 러너 행 ID(`EVL-05`) 5대 항목 완비.
+  8. **Claude F7 (식별자 3건 정정)**: REP-04 role='status' 신설 계획, SSE 경로 전체 경로화(`services/control-plane/src/inv/app.py:1030~1057`), MUT-04 `:590` 기사살 정적 대조 명시, MUT-05 정적 대조 표기.
+  9. **Claude F8 (수치 정정)**: 문서 수 실측치("895 versioned documents") 정정, 시나리오 수 16대 정정.
+  11. **Claude r2 피드백 반영 (N1~N4, v1.1.1)**: N1(§5 정규식 표를 agentEngine.ts:29-35 글자 그대로 인용 및 1:1 probe/변이 연산자 재산출), N2(§9 증거 예시 사전 단정 수치를 <observed> 자리표시자로 교체), N3(frontmatter updated 시각 정합), N4($schema 외부 URL 제거 및 내부 스키마 경로 지정). Codex 계약 축 승인(head 091e830f) 유지.
+- **문서 산출물**:
+  - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1)
+  - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.1.1)
