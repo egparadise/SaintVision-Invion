@@ -293,3 +293,33 @@ def test_property_unknown_age_backups_are_retained_and_bound_the_wal_and_never_p
                 assert b.start_segment[8:] >= boundary[8:]
         for name in p.delete_archive:
             assert name[8:24] < boundary[8:]
+
+
+def test_revival_f01_filesystem_seam_missing_start_time_never_reads_directory_mtime(tmp_path):
+    """Kills the seam mutant that swaps ``UnknownAge`` back for ``child.stat().st_mtime`` in
+    ``load_backups``: a real label without START TIME whose directory mtime is far older than
+    the cutoff must still come back with ``taken_at is None`` and be retained by ``plan``."""
+    import os
+
+    backups = tmp_path / "backups"
+    no_time = backups / "no-time"
+    no_time.mkdir(parents=True)
+    (no_time / "backup_label").write_text(_label(seg(3), None), encoding="utf-8")
+    ancient = (NOW - timedelta(days=400)).timestamp()
+    os.utime(no_time, (ancient, ancient))
+    os.utime(no_time / "backup_label", (ancient, ancient))
+    _write_backup(backups, "known-old", seg(10), NOW - timedelta(days=20))
+    _write_backup(backups, "known-new", seg(20), NOW - timedelta(days=2))
+
+    loaded = load_backups(backups)
+    by_name = {b.name: b for b in loaded}
+    assert by_name["no-time"].taken_at is None  # not a datetime built from st_mtime
+    assert by_name["no-time"].start_segment == seg(3)
+    assert by_name["known-new"].taken_at == NOW - timedelta(days=2)
+
+    p = plan([seg(i) for i in range(1, 30)], loaded, retention_days=7, now=NOW)
+    assert p.unknown_age_backups == ["no-time"]
+    assert "no-time" in p.retained_backups and "no-time" not in p.delete_backups
+    assert p.delete_backups == ["known-old"]  # newest still chosen among KNOWN ages only
+    assert p.oldest_retained_start_segment == seg(3)  # boundary did not advance past the unknown one
+    assert p.delete_archive == [seg(1), seg(2)]
