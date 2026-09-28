@@ -355,7 +355,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       expect(alert?.textContent).toContain('The measurement does not match the current storage snapshot of the model version.');
     });
 
-    it('fails closed when canApprove is false or undefined (both button and handler level)', async () => {
+    it('fails closed when canApprove is false for W3 (both button and handler level)', async () => {
       const mockFetch = vi.fn().mockImplementation((url: string) => {
         if (url.includes('/lineage')) {
           return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
@@ -364,7 +364,6 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       });
       globalThis.fetch = mockFetch;
 
-      // 1. canApprove = false
       await act(async () => {
         root.render(
           <ModelLineageView
@@ -397,21 +396,53 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
       expect(mockFetch).not.toHaveBeenCalledWith(expect.stringContaining('/verify'), expect.anything());
       const alert = container.querySelector('[role="alert"]');
       expect(alert?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
+    });
 
-      // 2. canApprove undefined (fail-closed)
+    it('M4: fails closed when canApprove is undefined for W3 (fresh root, button disabled, handler blocked, zero /verify calls)', async () => {
+      const mockFetch = vi.fn().mockImplementation((url: string) => {
+        if (url.includes('/lineage')) {
+          return Promise.resolve(new Response(JSON.stringify(validTraceResponse), { status: 200 }));
+        }
+        return Promise.reject(new Error(`Unhandled URL: ${url}`));
+      });
+      globalThis.fetch = mockFetch;
+
       await act(async () => {
         root.render(
           <ModelLineageView
             projectId="prj_demo"
             modelId="mdl_test"
             version="1.0.0"
+            canApprove={undefined}
           />
         );
       });
-      const submitBtn2 = Array.from(container.querySelectorAll('button')).find((b) =>
+
+      const verifyTab = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('W3 검증')
+      );
+      await act(async () => {
+        verifyTab?.click();
+      });
+
+      const submitBtn = Array.from(container.querySelectorAll('button')).find((b) =>
         b.textContent?.includes('W3 커널 측정 검증 제출')
       );
-      expect(submitBtn2?.hasAttribute('disabled')).toBe(true);
+      expect(submitBtn?.hasAttribute('disabled')).toBe(true);
+      expect(submitBtn?.getAttribute('aria-disabled')).toBe('true');
+
+      // Programmatic form submission to test handler-level fail-closed guard
+      const form = container.querySelector('form');
+      await act(async () => {
+        form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
+
+      // Assert zero /verify network calls
+      const verifyCalls = mockFetch.mock.calls.filter(([url]: [string]) => url.includes('/verify'));
+      expect(verifyCalls.length).toBe(0);
+
+      const alert = container.querySelector('[role="alert"]');
+      expect(alert?.textContent).toContain('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
     });
 
     it('W3 idempotency lifecycle: keeps key on retry, rotates on success, rotates on input change', async () => {
@@ -432,7 +463,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
                   title: 'SYS-0001',
                   status: 503,
                   code: 'SYS-0001',
-                  category: 'transient',
+                  category: 'SYS',
                   detail: 'The model measurement observation could not be read.',
                   retryable: true,
                   traceId: '0123456789abcdef0123456789abcdef',
@@ -531,8 +562,12 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
                   title: 'GRAPH-0002',
                   status: 409,
                   code: 'GRAPH-0002',
-                  category: 'business_rule',
+                  category: 'GRAPH',
                   detail: 'The measurement does not match the current storage snapshot of the model version.',
+                  retryable: false,
+                  traceId: '0123456789abcdef0123456789abcdef',
+                  causeRef: null,
+                  evidenceId: null,
                 }),
                 { status: 409, headers: { 'Content-Type': 'application/problem+json' } }
               )
@@ -1244,14 +1279,17 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
               new Response(
                 JSON.stringify({
                   type: 'about:blank',
-                  title: 'SYS-0001',
-                  status: 503,
-                  code: 'SYS-0001',
+                  title: 'SYS-0002',
+                  status: 500,
+                  code: 'SYS-0002',
                   category: 'SYS',
-                  detail: 'The resource is locked by another request; retry.',
-                  retryable: true,
+                  detail: 'The service raised an error this route cannot represent.',
+                  retryable: false,
+                  traceId: '0123456789abcdef0123456789abcdef',
+                  causeRef: null,
+                  evidenceId: null,
                 }),
-                { status: 503, headers: { 'Content-Type': 'application/problem+json' } }
+                { status: 500, headers: { 'Content-Type': 'application/problem+json' } }
               )
             );
           }
@@ -1288,7 +1326,7 @@ describe('G-05 W3 Verify & W5 Eval Run Business Routes (Card 101)', () => {
         b.textContent?.includes('W5 평가 실행 시작')
       );
 
-      // (a) Attempt 1: fails 503
+      // (a) Attempt 1: fails 500 SYS-0002
       await act(async () => {
         submitBtn?.click();
       });
