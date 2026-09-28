@@ -49,7 +49,12 @@ def rung_specs(concurrency: int) -> list[WaveSpec]:
 
 
 def benchmark_command(
-    spec: WaveSpec, *, python: str, output_dir: Path, timeout_seconds: int
+    spec: WaveSpec,
+    *,
+    python: str,
+    output_dir: Path,
+    timeout_seconds: int,
+    measurement_scope: str,
 ) -> list[str]:
     return [
         python,
@@ -68,6 +73,8 @@ def benchmark_command(
         str(output_dir / f"{spec.name}.xml"),
         "--mode",
         "legacy",
+        "--topology",
+        measurement_scope,
     ]
 
 
@@ -91,12 +98,18 @@ def _database_fingerprint(report: dict[str, Any]) -> str:
     return fingerprint
 
 
-def validate_wave_report(spec: WaveSpec, report: dict[str, Any], code_sha: str) -> None:
+def validate_wave_report(
+    spec: WaveSpec,
+    report: dict[str, Any],
+    code_sha: str,
+    measurement_scope: str,
+) -> None:
     _require(report.get("schemaVersion") == "1.7.0", f"{spec.name}: schemaVersion")
     _require(report.get("codeSHA") == code_sha, f"{spec.name}: codeSHA")
     _require(report.get("requestCount") == spec.concurrency, f"{spec.name}: requestCount")
     _require(report.get("concurrency") == spec.concurrency, f"{spec.name}: concurrency")
     _require(report.get("roundsRequested") == 1, f"{spec.name}: roundsRequested")
+    _require(report.get("scope") == measurement_scope, f"{spec.name}: measurement scope")
     _require(len(report.get("rounds", [])) == 1, f"{spec.name}: one wave required")
     _require(report.get("uniqueFencingTokens") is True, f"{spec.name}: fencing invariant")
     _require(report.get("noOverbooking") is True, f"{spec.name}: no-overbooking invariant")
@@ -108,14 +121,57 @@ def validate_wave_report(spec: WaveSpec, report: dict[str, Any], code_sha: str) 
         f"{spec.name}: lock timeout budget",
     )
     _database_fingerprint(report)
+    _wave_metrics(report)
 
 
 def _wave_metrics(report: dict[str, Any]) -> dict[str, Any]:
     round_report = report["rounds"][0]
-    sqlstates = round_report.get("errorsBySqlState", {})
+    for field in (
+        "successCount",
+        "failureCount",
+        "p95AllMs",
+        "p95SuccessMs",
+        "maxMs",
+        "errorsBySqlState",
+    ):
+        _require(field in round_report, f"INVALID_RUN: round field {field} is required")
+    _require("errorsBySqlState" in round_report, "INVALID_RUN: errorsBySqlState is required")
+    request_count = report.get("requestCount")
+    success_count = round_report["successCount"]
+    failure_count = round_report["failureCount"]
+    for name, value in (
+        ("requestCount", request_count),
+        ("successCount", success_count),
+        ("failureCount", failure_count),
+    ):
+        _require(
+            isinstance(value, int) and not isinstance(value, bool) and value >= 0,
+            f"INVALID_RUN: {name} must be a non-negative integer",
+        )
+    _require(
+        success_count + failure_count == request_count,
+        "INVALID_RUN: successCount plus failureCount must equal requestCount",
+    )
+    sqlstates = round_report["errorsBySqlState"]
+    _require(isinstance(sqlstates, dict), "INVALID_RUN: errorsBySqlState must be an object")
+    _require(
+        all(
+            isinstance(value, int) and not isinstance(value, bool) and value >= 0
+            for value in sqlstates.values()
+        ),
+        "INVALID_RUN: errorsBySqlState values must be non-negative integers",
+    )
+    _require(
+        sum(sqlstates.values()) == failure_count,
+        "INVALID_RUN: errorsBySqlState sum must equal failureCount",
+    )
     lock_timeout_count = int(sqlstates.get("55P03", 0))
     statement_timeout_count = int(sqlstates.get("57014", 0))
     timeout_count = lock_timeout_count + statement_timeout_count
+    _require(
+        failure_count <= timeout_count,
+        "INVALID_RUN: failureCount exceeds classified SQL timeout failures",
+    )
     return {
         "successCount": round_report["successCount"],
         "failureCount": round_report["failureCount"],
@@ -218,6 +274,26 @@ def validate_code_sha(code_sha: str, checkout_sha: str) -> None:
         raise SystemExit("INV_EVIDENCE_CODE_SHA must match the checked-out PR head")
 
 
+def validate_clean_checkout(status_porcelain: str) -> None:
+    if status_porcelain.strip():
+        raise SystemExit("working tree must be clean before evidence collection")
+
+
+def validate_run_metadata(
+    run_purpose: str, canonical_decision_evidence_run_id: str, measurement_scope: str
+) -> None:
+    if re.fullmatch(r"[a-z0-9][a-z0-9-]{2,127}", run_purpose) is None:
+        raise SystemExit("--run-purpose must be a lowercase kebab-case identifier")
+    if re.fullmatch(r"[1-9][0-9]{5,19}", canonical_decision_evidence_run_id) is None:
+        raise SystemExit("--canonical-decision-evidence-run-id must be a GitHub run ID")
+    if (
+        not measurement_scope
+        or len(measurement_scope) > 200
+        or any(ord(character) < 32 for character in measurement_scope)
+    ):
+        raise SystemExit("--measurement-scope must be a bounded printable label")
+
+
 def write_junit(path: Path, summary: dict[str, Any]) -> None:
     suite = ET.Element(
         "testsuite", name="s05-legacy-staircase", tests="1", failures="0", errors="0", skipped="0"
@@ -233,9 +309,10 @@ def write_junit(path: Path, summary: dict[str, Any]) -> None:
         "codeSha": summary["codeSha"],
         "runPurpose": summary["runPurpose"],
         "canonicalDecisionEvidenceRunId": summary["canonicalDecisionEvidenceRunId"],
+        "measurementScope": summary["measurementScope"],
         "decision": summary["evaluation"]["decision"],
         "firstDegradeConcurrency": summary["evaluation"]["firstDegradeConcurrency"],
-        "semaphoreProductCodePresent": False,
+        "semaphoreProductCodeExpected": False,
         "promotionClaim": False,
         "directlyComparableWithLocal": False,
     }
@@ -249,17 +326,29 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "dist" / "s05-legacy-staircase")
     parser.add_argument("--timeout-seconds", type=int, default=300)
+    parser.add_argument("--run-purpose", required=True)
+    parser.add_argument("--canonical-decision-evidence-run-id", required=True)
+    parser.add_argument("--measurement-scope", required=True)
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    validate_run_metadata(
+        args.run_purpose,
+        args.canonical_decision_evidence_run_id,
+        args.measurement_scope,
+    )
     dsn = os.getenv("INV_TEST_ADMIN_DSN")
     if not dsn:
         raise SystemExit("INV_TEST_ADMIN_DSN is required")
     checkout_sha = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
+    status_porcelain = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=ROOT, text=True
+    )
+    validate_clean_checkout(status_porcelain)
     code_sha = os.getenv("INV_EVIDENCE_CODE_SHA", checkout_sha)
     validate_code_sha(code_sha, checkout_sha)
     if owned_disposable_count(dsn) != 0:
@@ -267,6 +356,10 @@ def main(argv: list[str] | None = None) -> int:
 
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = output_dir / "s05-legacy-staircase-summary.json"
+    summary_junit_path = output_dir / "s05-legacy-staircase-summary.xml"
+    summary_path.unlink(missing_ok=True)
+    summary_junit_path.unlink(missing_ok=True)
     waves: list[dict[str, Any]] = []
     rung_evaluations: list[dict[str, Any]] = []
     fingerprints: set[str] = set()
@@ -281,8 +374,14 @@ def main(argv: list[str] | None = None) -> int:
                 python=sys.executable,
                 output_dir=output_dir,
                 timeout_seconds=args.timeout_seconds,
+                measurement_scope=args.measurement_scope,
             )
             log_path = output_dir / f"{spec.name}.log"
+            report_path = output_dir / f"{spec.name}.json"
+            junit_path = output_dir / f"{spec.name}.xml"
+            report_path.unlink(missing_ok=True)
+            junit_path.unlink(missing_ok=True)
+            log_path.unlink(missing_ok=True)
             with log_path.open("w", encoding="utf-8") as log:
                 completed = subprocess.run(
                     command,
@@ -292,12 +391,10 @@ def main(argv: list[str] | None = None) -> int:
                     timeout=args.timeout_seconds + 30,
                     check=False,
                 )
-            report_path = output_dir / f"{spec.name}.json"
-            junit_path = output_dir / f"{spec.name}.xml"
             if not report_path.is_file() or not junit_path.is_file():
                 raise SystemExit(f"{spec.name}: benchmark did not produce JSON and JUnit")
             report = json.loads(report_path.read_text(encoding="utf-8"))
-            validate_wave_report(spec, report, code_sha)
+            validate_wave_report(spec, report, code_sha, args.measurement_scope)
             if completed.returncode not in (0, 1):
                 raise SystemExit(f"{spec.name}: unexpected exit {completed.returncode}")
             _require(owned_disposable_count(dsn) == 0, f"{spec.name}: post-wave residue")
@@ -333,17 +430,17 @@ def main(argv: list[str] | None = None) -> int:
         "schemaVersion": "1.0.0",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "codeSha": code_sha,
-        "runPurpose": "clean-integration-base-execution-compatibility",
-        "canonicalDecisionEvidenceRunId": "36362386530",
+        "runPurpose": args.run_purpose,
+        "canonicalDecisionEvidenceRunId": args.canonical_decision_evidence_run_id,
         "mayReplaceCanonicalDecision": False,
         "measurementComplete": True,
-        "measurementScope": "hosted-single-runner-legacy-only-postgresql16",
+        "measurementScope": args.measurement_scope,
         "directlyComparableWithLocalEvidence": False,
         "comparisonBoundary": (
             "Hosted staircase evidence is environment-specific and must not be numerically "
             "merged with development-PC evidence."
         ),
-        "semaphoreProductCodePresent": False,
+        "semaphoreProductCodeExpected": False,
         "promotionClaim": False,
         "s05StatusAfterRun": "in_progress",
         "freshDatabasePolicy": {
@@ -358,7 +455,7 @@ def main(argv: list[str] | None = None) -> int:
             "order": "ascending; stop only after completing the first degraded rung",
             "mode": "legacy",
             "candidateExecuted": False,
-            "semaphoreProductCodePresent": False,
+            "semaphoreProductCodeExpected": False,
         },
         "runner": runner_environment(),
         "postgresql": postgres_environment(dsn),
@@ -375,12 +472,10 @@ def main(argv: list[str] | None = None) -> int:
         },
     }
     _require(summary["freshDatabasePolicy"]["residueAfterRun"] == 0, "database residue")
-    summary_path = output_dir / "s05-legacy-staircase-summary.json"
-    junit_path = output_dir / "s05-legacy-staircase-summary.xml"
     summary_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    write_junit(junit_path, summary)
+    write_junit(summary_junit_path, summary)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 0
 
