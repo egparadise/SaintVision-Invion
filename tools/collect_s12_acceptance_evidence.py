@@ -220,6 +220,26 @@ def _item(status: str, reason: str | None = None, **facts: Any) -> dict[str, Any
     return {"status": status, "reason": reason, **facts}
 
 
+_HEX_SHA = re.compile(r"^[0-9a-f]{12,40}$")
+
+
+def sha_binding(proof_sha: Any, code_sha: Any) -> tuple[bool, str | None]:
+    """Bind a proof to this bundle's code SHA: both must be lowercase hex of 12..40 chars (a full
+    40 is recommended) and the shorter must be a prefix of the longer.  Anything else -- a
+    1-character or 11-character token, non-hex text, or a different SHA -- is NOT a binding."""
+    if not isinstance(proof_sha, str) or not isinstance(code_sha, str):
+        return False, "sha is not a string"
+    proof_sha, code_sha = proof_sha.strip().lower(), code_sha.strip().lower()
+    if not _HEX_SHA.fullmatch(proof_sha):
+        return False, f"proof sha is not 12..40 lowercase hex characters ({len(proof_sha)} chars)"
+    if not _HEX_SHA.fullmatch(code_sha):
+        return False, "bundle code sha is not 12..40 lowercase hex characters"
+    shorter, longer = sorted((proof_sha, code_sha), key=len)
+    if not longer.startswith(shorter):
+        return False, "different code SHA"
+    return True, None
+
+
 # Every blocker text ``pilot_readiness`` can emit today, attributed to the item it blocks.  A
 # blocker that matches none of these is UNCLASSIFIED: the catalog is then not known to be
 # clean and no blocker-derived item may become PASS (fail-closed against future blockers).
@@ -381,8 +401,9 @@ def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dic
             items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof was not produced with browserOptIn=true (no real browser ran)", browserOptIn=proof.get("browserOptIn"))
         elif not proof_sha:
             items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof is not bound to a code SHA (no codeSha/gitSha in proof and no --web-smoke-sha)")
-        elif not code_sha or not str(proof_sha).lower().startswith(str(code_sha).lower()[:12]) and not str(code_sha).lower().startswith(str(proof_sha).lower()[:12]):
-            items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof is bound to a different code SHA than this bundle", proofSha=str(proof_sha)[:12])
+        elif not (binding := sha_binding(proof_sha, code_sha))[0]:
+            items["web-smoke-journeys"] = _item(NOT_OBSERVED, f"proof is not bound to this bundle's code SHA: {binding[1]}",
+                                                proofSha=str(proof_sha)[:12] if isinstance(proof_sha, str) else None)
         elif not isinstance(passed, int):
             items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof has no passed count")
         elif passed > 0 and not bad and proof.get("exitCode") == 0 and proof.get("evidenceStatus") == "complete":
@@ -461,6 +482,7 @@ def build_evidence(*, provenance: dict[str, Any], readiness: dict[str, Any], pit
             "dirtyTreeAllowed": bool(provenance.get("dirtyTreeAllowed", False)),
             "remoteReachable": provenance.get("remoteReachable"),
             "remoteRefCount": provenance.get("remoteRefCount"),
+            "remoteRefFreshness": provenance.get("remoteRefFreshness"),
             "unpushedHeadAllowed": bool(provenance.get("unpushedHeadAllowed", False)),
         },
         "inputs": {
@@ -602,20 +624,60 @@ def _git_lines(*args: str) -> list[str]:
     return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
 
 
+def _git_ok(*args: str) -> bool:
+    return subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True).returncode == 0
+
+
+def resolve_remote_tracking_ref(ref: str) -> dict[str, Any]:
+    """Accept only a remote-tracking ref (``refs/remotes/<remote>/<branch>`` or ``<remote>/<branch>``
+    for a configured remote) that git can resolve.  ``HEAD``, local branches, tags and unknown
+    remotes are refused -- an ancestry check against those proves nothing about the remote."""
+    remotes = set(_git_lines("remote"))
+    name = ref.strip()
+    if name.startswith("refs/remotes/"):
+        short = name[len("refs/remotes/"):]
+    elif "/" in name and not name.startswith("refs/"):
+        short = name
+    else:
+        return {"ok": False, "reason": "not a remote-tracking ref (HEAD, local branch, tag or refs/heads are refused)"}
+    remote, _, branch = short.partition("/")
+    if remote not in remotes or not branch:
+        return {"ok": False, "reason": f"remote {remote!r} is not configured or branch is empty"}
+    full = f"refs/remotes/{remote}/{branch}"
+    resolved = _git_lines("rev-parse", "--verify", "--quiet", full + "^{commit}")
+    if not resolved:
+        return {"ok": False, "reason": f"{full} does not resolve to a commit"}
+    # Stale detection: compare the remote-tracking tip with what the remote reports now.
+    live = _git_lines("ls-remote", "--heads", remote, branch)
+    if not live:
+        freshness = "unknown"
+    else:
+        live_sha = live[0].split()[0]
+        freshness = "fresh" if live_sha == resolved[0] else "stale"
+    return {"ok": True, "ref": full, "sha": resolved[0], "remote": remote, "freshness": freshness}
+
+
 def remote_reachability(sha: str | None, ref: str | None = None) -> dict[str, Any]:
     """Whether the commit this evidence describes can be reached from a remote ref.
 
     A clean but unpushed commit would otherwise produce evidence nobody can check out.  With
-    ``ref`` the check is explicit ancestry (``merge-base --is-ancestor``); without it, any
-    ``refs/remotes/*`` that contains the commit counts.  Fail closed when git says nothing.
+    ``ref`` the check is explicit ancestry (``merge-base --is-ancestor``) against a VERIFIED
+    remote-tracking ref only; without it, any ``refs/remotes/*`` that contains the commit
+    counts.  A stale remote-tracking ref (its tip differs from the live remote) does not count.
+    Fail closed when git says nothing.
     """
     if not sha:
-        return {"reachable": False, "refs": [], "mode": "no-sha"}
+        return {"reachable": False, "refs": [], "mode": "no-sha", "freshness": None}
     if ref:
-        completed = subprocess.run(["git", "merge-base", "--is-ancestor", sha, ref], cwd=REPO_ROOT, capture_output=True, text=True)
-        return {"reachable": completed.returncode == 0, "refs": [ref] if completed.returncode == 0 else [], "mode": "explicit-ref"}
+        resolved = resolve_remote_tracking_ref(ref)
+        if not resolved["ok"]:
+            return {"reachable": False, "refs": [], "mode": "invalid-ref", "reason": resolved["reason"], "freshness": None}
+        ancestor = _git_ok("merge-base", "--is-ancestor", sha, resolved["sha"])
+        reachable = ancestor and resolved["freshness"] != "stale"
+        return {"reachable": reachable, "refs": [resolved["ref"]] if reachable else [], "mode": "explicit-ref",
+                "freshness": resolved["freshness"], "reason": None if reachable else ("remote-tracking ref is stale" if ancestor else "not an ancestor")}
     refs = [line for line in _git_lines("branch", "-r", "--contains", sha) if "->" not in line]
-    return {"reachable": bool(refs), "refs": refs, "mode": "remote-containment"}
+    return {"reachable": bool(refs), "refs": refs, "mode": "remote-containment", "freshness": None}
 
 
 def parser() -> argparse.ArgumentParser:
@@ -660,10 +722,14 @@ def main(argv: list[str] | None = None) -> int:
     reach = remote_reachability(provenance.get("commit_sha"), args.reachable_ref)
     provenance["remoteReachable"] = reach["reachable"]
     provenance["remoteRefCount"] = len(reach["refs"])
+    provenance["remoteRefFreshness"] = reach.get("freshness")
     provenance["unpushedHeadAllowed"] = bool(args.allow_unpushed_head)
+    if reach["mode"] == "invalid-ref":
+        print(f"--reachable-ref rejected: {reach.get('reason')}", file=sys.stderr)
+        return 2
     if not reach["reachable"] and not args.allow_unpushed_head:
-        print(f"head is not reachable from any remote ref ({reach['mode']}); evidence must come from a pushed head "
-              "(pass --allow-unpushed-head to record an explicit opt-out)", file=sys.stderr)
+        print(f"head is not reachable from any remote ref ({reach['mode']}: {reach.get('reason') or 'no containing ref'}); "
+              "evidence must come from a pushed head (pass --allow-unpushed-head to record an explicit opt-out)", file=sys.stderr)
         return 2
     if not os.environ.get(args.readiness_dsn_env) and not os.environ.get(args.pitr_dsn_env):
         print(f"neither {args.readiness_dsn_env} nor {args.pitr_dsn_env} is set; nothing can be observed", file=sys.stderr)

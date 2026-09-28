@@ -563,7 +563,94 @@ def test_f4_reachable_head_passes_and_explicit_ref_uses_ancestry(tmp_path, monke
 
 def test_f4_remote_reachability_reads_git_and_fails_closed_without_output(monkeypatch):
     monkeypatch.setattr(tool, "_git_lines", lambda *args: [])
-    assert tool.remote_reachability("a" * 40) == {"reachable": False, "refs": [], "mode": "remote-containment"}
+    assert tool.remote_reachability("a" * 40) == {"reachable": False, "refs": [], "mode": "remote-containment", "freshness": None}
     monkeypatch.setattr(tool, "_git_lines", lambda *args: ["origin/HEAD -> origin/main", "origin/agent/claude/x"])
     assert tool.remote_reachability("a" * 40)["refs"] == ["origin/agent/claude/x"]
     assert tool.remote_reachability(None)["reachable"] is False
+
+
+# --------------------------------------------------------------------------
+# Codex re-review of #153 (head 663aad65): F3/F4 residual bypasses
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("proof_sha, expected, why", [
+    ("a", tool.NOT_OBSERVED, "not 12..40 lowercase hex"),                 # 1 char matched the old mutual-prefix check
+    ("a" * 11, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),            # 11 chars
+    ("A" * 12, tool.PASS, None),                                          # uppercase hex is normalised to lowercase
+    ("g" * 12, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),            # non-hex
+    ("zz" + "a" * 38, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),
+    ("b" * 40, tool.NOT_OBSERVED, "different code SHA"),                  # a different full SHA
+    ("a" * 41, tool.NOT_OBSERVED, "not 12..40 lowercase hex"),
+    ("a" * 12, tool.PASS, None),
+    ("a" * 40, tool.PASS, None),
+])
+def test_f3_binding_requires_12_to_40_lowercase_hex_and_prefix_agreement(proof_sha, expected, why):
+    web = _web()
+    web["boundSha"] = proof_sha
+    item = _build(web=web)["items"]["web-smoke-journeys"]
+    assert item["status"] == expected, item
+    if why:
+        assert why in item["reason"]
+
+
+def test_f3_uppercase_hex_is_normalised_and_bundle_sha_is_validated_too():
+    assert tool.sha_binding("A" * 40, "a" * 40) == (True, None)
+    ok, why = tool.sha_binding("a" * 40, "not-a-sha")
+    assert not ok and "bundle code sha" in why
+    assert tool.sha_binding(None, "a" * 40)[0] is False
+
+
+def _fake_git(mapping):
+    def lines(*args):
+        return mapping.get(args, [])
+    return lines
+
+
+def test_f4_reachable_ref_accepts_only_verified_remote_tracking_refs(monkeypatch):
+    """Revival: ``--reachable-ref HEAD`` always passed because merge-base was run on the raw string."""
+    git = _fake_git({
+        ("remote",): ["origin"],
+        ("rev-parse", "--verify", "--quiet", "refs/remotes/origin/integration/all-agents-unified^{commit}"): ["c" * 40],
+        ("ls-remote", "--heads", "origin", "integration/all-agents-unified"): ["c" * 40 + "\trefs/heads/integration/all-agents-unified"],
+    })
+    monkeypatch.setattr(tool, "_git_lines", git)
+    monkeypatch.setattr(tool, "_git_ok", lambda *args: True)
+    for bad in ("HEAD", "main", "v1.0.0", "refs/heads/main", "refs/tags/v1", "upstream/main", "origin/"):
+        result = tool.remote_reachability("a" * 40, bad)
+        assert result["reachable"] is False and result["mode"] == "invalid-ref", (bad, result)
+    good = tool.remote_reachability("a" * 40, "origin/integration/all-agents-unified")
+    assert good["reachable"] is True and good["refs"] == ["refs/remotes/origin/integration/all-agents-unified"] and good["freshness"] == "fresh"
+    assert tool.remote_reachability("a" * 40, "refs/remotes/origin/integration/all-agents-unified")["reachable"] is True
+
+
+def test_f4_stale_remote_tracking_ref_does_not_count_and_unknown_freshness_is_recorded(monkeypatch):
+    base = {
+        ("remote",): ["origin"],
+        ("rev-parse", "--verify", "--quiet", "refs/remotes/origin/x^{commit}"): ["c" * 40],
+    }
+    monkeypatch.setattr(tool, "_git_ok", lambda *args: True)
+    monkeypatch.setattr(tool, "_git_lines", _fake_git({**base, ("ls-remote", "--heads", "origin", "x"): ["d" * 40 + "\trefs/heads/x"]}))
+    stale = tool.remote_reachability("a" * 40, "origin/x")
+    assert stale["reachable"] is False and stale["freshness"] == "stale" and "stale" in stale["reason"]
+    monkeypatch.setattr(tool, "_git_lines", _fake_git(base))  # ls-remote gave nothing (offline)
+    unknown = tool.remote_reachability("a" * 40, "origin/x")
+    assert unknown["reachable"] is True and unknown["freshness"] == "unknown"
+    monkeypatch.setattr(tool, "_git_ok", lambda *args: False)
+    assert tool.remote_reachability("a" * 40, "origin/x")["reason"] == "not an ancestor"
+
+
+def test_f4_cli_rejects_head_local_branch_and_tag_as_reachable_ref(tmp_path, monkeypatch):
+    monkeypatch.setenv("INV_READINESS_DSN", "postgresql://inv:pw@127.0.0.1:1/postgres")
+    monkeypatch.setattr(tool, "collect_provenance", lambda executor=None: _prov())
+    _stub_runners(monkeypatch)
+    monkeypatch.setattr(tool, "remote_reachability", lambda sha, ref=None: (
+        {"reachable": False, "refs": [], "mode": "invalid-ref", "reason": "not a remote-tracking ref", "freshness": None} if ref in ("HEAD", "main", "v1")
+        else {"reachable": True, "refs": ["refs/remotes/origin/x"], "mode": "explicit-ref", "freshness": "fresh", "reason": None}))
+    for bad in ("HEAD", "main", "v1"):
+        assert tool.main(["--out-dir", str(tmp_path), "--label", "bad-" + bad, "--tenant", TENANT, "--reachable-ref", bad,
+                          "--allow-unpushed-head"]) == 2, bad   # even the opt-out does not accept an invalid ref
+        assert not (tmp_path / f"bad-{bad}.json").exists()
+    assert tool.main(["--out-dir", str(tmp_path), "--label", "ok", "--tenant", TENANT, "--reachable-ref", "origin/x"]) == 0
+    prov = json.loads((tmp_path / "ok.json").read_text(encoding="utf-8"))["provenance"]
+    assert prov["remoteRefFreshness"] == "fresh" and prov["remoteReachable"] is True

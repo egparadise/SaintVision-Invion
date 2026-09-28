@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S12-DB-AC12-EVIDENCE-COLLECTOR"
 title: "S12-DB AC-12 acceptance Evidence collector — 설계 1쪽 + collector + PG-free 자기 시험 111 passed (기존 operational_readiness·pitr_readiness·pitr_opt_in_dry_run·browser proof 재사용, 판정 복제 없음, 카드 aq)"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:16:43+09:00"
+updated: "2026-09-28T10:23:47+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -22,11 +22,15 @@ tags: ["S12-DB", "AC-12", "evidence", "collector", "claude"]
 | 파일 | 내용 |
 |---|---|
 | `tools/collect_s12_acceptance_evidence.py` | `operational_readiness.py --acceptance-evidence [--release] --json`(권한·offer·admission + `pilot_readiness` catalog: `acceptanceAssessed`·`catalogComplete`·`blockers`), `pitr_readiness.py --json`, `pitr_opt_in_dry_run.py`, desktop-browser proof를 subprocess/파일로 읽어 AC-12 항목 13 + 외부 4를 PASS/FAIL/NOT_OBSERVED/BLOCKED_EXTERNAL로 분류. 판정 논리 복제 0(SQL·설정 평가·drill 규칙 없음, 시험이 소스로 고정). 미관측 = NOT_OBSERVED+reason(0·PASS 아님), 사용자 입력·외부 = BLOCKED_EXTERNAL+reason·value null. verdict FAIL 우선 → NOT_OBSERVED(exit 3) → PASS_MEASURED_PARTIAL(exit 0; 외부 4건 때문에 PASS 불가). provenance repo 루트·dirty 기본 거부·label 시각·기존 파일 거부·`<outside-repo>` placeholder. redaction: 명령행 값(모양 무관)·UUID·prefix 비의존 ULID·disposable·host:port, 이 실행의 DSN env 비밀 guard. `acceptanceClaim=false` |
-| `tests/test_collect_s12_acceptance_evidence.py` | PG-free **134 passed**(설계 §4 목록 + §1b 되살림 22) + postgres 마커 1(hosted Backend: 마이그레이션된 disposable DB·새 tenant에 실제 세 도구 실행 → readiness complete, backup·drill FAIL, release BLOCKED_EXTERNAL, 리허설·web NOT_OBSERVED, verdict FAIL, DSN·tenant 미포함) |
+| `tests/test_collect_s12_acceptance_evidence.py` | PG-free **147 passed**(설계 §4 목록 + §1b 되살림 22 + §1c 13) + postgres 마커 1(hosted Backend: 마이그레이션된 disposable DB·새 tenant에 실제 세 도구 실행 → readiness complete, backup·drill FAIL, release BLOCKED_EXTERNAL, 리허설·web NOT_OBSERVED, verdict FAIL, DSN·tenant 미포함) |
 
 ## 1b. Codex 검토 4건 반영(#153 코멘트, 10:12 KST)
 
 F1 구조화 값 redaction + raw/escaped 검사(부정 시험 7 + walker 1), F2 미분류 blocker → NOT_OBSERVED·자기모순 catalog → FAIL(되살림 4 + pilot_readiness blocker 전수 분류 시험), F3 `browserOptIn` 필수·codeSha 결속(`--web-smoke-sha`/proof `codeSha`, 되살림 1 + 결속 6), F4 remote 도달성(`--reachable-ref` ancestry 또는 remote containment, `--allow-unpushed-head` 기록; 되살림 3). PG-free **134 passed**. hosted Backend(head 30f5ca83) run 36364528281: 3041 passed / 47 skipped / 0 failed = base 2929 + 112(PG-free 111 + **postgres 케이스 1 실행**), skip 분포 base와 동일(47). 수정 head의 run은 PR 코멘트. 실PG 시험은 hosted 병합 head가 remote ref에 없을 수 있어 `--allow-unpushed-head`를 **기록하며** 넘긴다(숨기지 않음).
+
+## 1c. Codex 재검토 잔여 2건 반영(head 663aad65 → 다음 head)
+
+F3' `sha_binding` 소문자 hex 12~40 + 접두 일치(부정 시험: 1자·11자·비hex·41자·다른 40자·대문자 정규화·번들 sha 검증), F4' `resolve_remote_tracking_ref`(HEAD·local·tag·refs/heads·미설정 remote 거부, `ls-remote` stale 구분, invalid-ref는 opt-out으로도 불가; 시험 3). PG-free **147 passed**.
 
 ## 2. 검증·경계
 
