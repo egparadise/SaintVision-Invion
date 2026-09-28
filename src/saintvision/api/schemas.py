@@ -822,6 +822,8 @@ class ModelVersionResponse(Strict):
     uri: str = Field(min_length=1)
     created_at: dt.datetime = Field(alias="createdAt")
 
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
 
 class AdapterReadinessResponse(Strict):
     """One agent CLI's install, login and reachability state (G-01 follow-up).
