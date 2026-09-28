@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -23,8 +24,14 @@ sys.modules[SPEC.name] = runner
 SPEC.loader.exec_module(runner)
 
 
-def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_restore():
-    payload = runner.load_fixture_manifest()
+def _load_manifest_with_reviewed_design(monkeypatch):
+    payload = json.loads(runner.MANIFEST_PATH.read_text(encoding="utf-8"))
+    monkeypatch.setattr(runner, "_git", lambda *_args: payload["designRef"]["blob"])
+    return runner.load_fixture_manifest()
+
+
+def test_fixture_manifest_covers_graph_and_routes_all_ten_lossy_revisions_to_restore(monkeypatch):
+    payload = _load_manifest_with_reviewed_design(monkeypatch)
     mapping = runner.validate_fixture_manifest(payload, chain())
     assert set(mapping) == {revision.revision for revision in chain() if not revision.irreversible}
     assert {key for key, value in mapping.items() if value == "DECLARED_LOSS_REQUIRES_RESTORE"} == runner.EXPECTED_LOSSY
@@ -72,14 +79,20 @@ def test_successful_downgrade_claim_for_refusal_revision_is_invalid(tmp_path, mo
         )
 
 
-def test_missing_0009_fixture_fails_closed():
-    payload = copy.deepcopy(runner.load_fixture_manifest())
+def test_missing_0009_fixture_fails_closed(monkeypatch):
+    payload = copy.deepcopy(_load_manifest_with_reviewed_design(monkeypatch))
     payload["revisions"] = [
         row for row in payload["revisions"]
         if row["revision"] != "0009_idempotency_and_inbox_scope"
     ]
     with pytest.raises(runner.RehearsalError, match="exactly cover reversible revisions"):
         runner.validate_fixture_manifest(payload, chain())
+
+
+def test_fixture_manifest_rejects_unreachable_reviewed_design(monkeypatch):
+    monkeypatch.setattr(runner, "_git", lambda *_args: "0" * 40)
+    with pytest.raises(runner.RehearsalError, match="designRef blob is unreachable"):
+        runner.load_fixture_manifest()
 
 
 def test_catalog_fingerprint_detects_existing_object_deletion():
@@ -204,6 +217,8 @@ def test_workflow_is_opt_in_exact_head_and_non_cancelling():
     assert "ref: ${{ env.SOURCE_HEAD_SHA }}" in source
     assert "github.event.pull_request.head.sha || github.sha" in source
     assert "cancel-in-progress: false" in source
+    assert "fetch-depth: 0" in source
+    assert "git fetch --no-tags origin a793f258dac9b2a4951df084089bf3a3a3ae1bcc" in source
     assert 'test -z "$(git status --porcelain)"' in source
     assert "postgres:16" in source
     assert "actions/upload-artifact@v4" in source
