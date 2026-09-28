@@ -1,14 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.213"
+version: "1.0.214"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T01:49:48+09:00"
+updated: "2026-09-29T02:08:04+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 카드 122 Medium 후속 — pool write 권한·unique 충돌
+
+- member 추가·삭제는 project lock→live membership/canRequest→pool lock·project 재결속 순서로 닫고, plan은 run lock→workload project가 pool project와 같은지까지 확인한다. viewer·없는 pool·cross-project run은 동일 `AUTH-PROJECT-SCOPE`다.
+- pool name·run plan의 등록된 unique constraint만 `GRAPH-INVALID-TRANSITION`/409로 번역하고, concurrent member PK는 savepoint 뒤 exact row가 있을 때만 idempotent 200이다. PG-free 32 passed; real PG 4경계는 hosted Core 대기다. Storage unique와 legacy audit/idempotency는 후속 유지. [[2026-09-29_02-08-04_KST_pool_쓰기권한_및_unique충돌_Codex]].
 
 ## 2026-09-29 카드 122 후속 — node admission token 재발급 차단
 

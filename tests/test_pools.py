@@ -14,11 +14,15 @@ from __future__ import annotations
 import datetime as dt
 
 import pytest
+from fastapi import Response
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 
+from saintvision.api import schemas
+from saintvision.api.v1 import pools as pool_routes
 from saintvision.db.session import tenant_scope
 from saintvision.errors import InvError
+from saintvision.identity.principal import Principal
 from saintvision.ids import new_id
 from saintvision.services import discovery as discovery_service
 from saintvision.services import nodes as node_service
@@ -76,6 +80,13 @@ def lab(owner_engine, two_tenants):
                 "created_at, version) VALUES (:p, :t, 'a', 'A', 'active', now(), 1)"
             ),
             {"p": ids["project_id"], "t": tenant_a},
+        )
+        c.execute(
+            text(
+                "INSERT INTO project_members (tenant_id, project_id, user_id, role_code, granted_at) "
+                "VALUES (:t, :p, :u, 'owner', now())"
+            ),
+            {"t": tenant_a, "p": ids["project_id"], "u": ids["user_id"]},
         )
         c.execute(
             text(
@@ -674,6 +685,43 @@ def test_one_run_has_at_most_one_plan(app_sessionmaker, lab):
                     )
 
 
+def test_duplicate_plan_is_a_registered_409_not_a_500(app_sessionmaker, lab):
+    principal = Principal(
+        user_id=lab["user_id"],
+        tenant_id=lab["tenant_a"],
+        external_subject="pool-owner",
+    )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                run = _run(session, lab)
+                pool_service.plan_distributed_run(
+                    session, tenant_id=lab["tenant_a"], run_id=run.run_id,
+                    pool_id=lab["pool_id"], strategy="single_node",
+                    shard_count=1, requirement=_req(ram=8), now=NOW,
+                )
+                run_id = run.run_id
+
+        with pytest.raises(InvError) as caught:
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    pool_routes.create_plan(
+                        pool_id=lab["pool_id"],
+                        payload=schemas.DistributedPlanRequest(
+                            runId=run_id,
+                            strategy="single_node",
+                            shardCount=1,
+                            splittableDeclared=False,
+                            shardRamBytes=8,
+                        ),
+                        principal=principal,
+                        session=session,
+                        now=NOW,
+                    )
+    assert caught.value.code == "GRAPH-INVALID-TRANSITION"
+    assert caught.value.status == 409
+
+
 def test_pool_membership_is_idempotent(app_sessionmaker, lab):
     with app_sessionmaker() as session:
         with session.begin():
@@ -688,6 +736,133 @@ def test_pool_membership_is_idempotent(app_sessionmaker, lab):
                     {"n": lab["nodes"][0]},
                 ).scalar_one()
     assert count == 1
+
+
+def test_pool_write_access_uses_live_project_membership(app_sessionmaker, owner_engine, lab):
+    principal = Principal(
+        user_id=lab["user_id"],
+        tenant_id=lab["tenant_a"],
+        external_subject="pool-owner",
+    )
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, lab["tenant_a"]):
+                pool = pool_routes._require_pool_write_access(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    pool_id=lab["pool_id"],
+                    user_id=principal.user_id,
+                )
+                assert pool.project_id == lab["project_id"]
+
+    viewer = new_id("user")
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO users(user_id,tenant_id,external_subject,display_name,status,created_at,updated_at,version) "
+                "VALUES (:user,:tenant,'pool-viewer','Viewer','active',now(),now(),1)"
+            ),
+            {"user": viewer, "tenant": lab["tenant_a"]},
+        )
+        connection.execute(
+            text(
+                "INSERT INTO project_members(tenant_id,project_id,user_id,role_code,granted_at) "
+                "VALUES (:tenant,:project,:user,'viewer',now())"
+            ),
+            {"tenant": lab["tenant_a"], "project": lab["project_id"], "user": viewer},
+        )
+
+    with app_sessionmaker() as session:
+        with pytest.raises(InvError) as caught:
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    pool_routes._require_pool_write_access(
+                        session,
+                        tenant_id=lab["tenant_a"],
+                        pool_id=lab["pool_id"],
+                        user_id=viewer,
+                    )
+    assert caught.value.code == "AUTH-PROJECT-SCOPE"
+
+
+def test_duplicate_pool_name_is_a_registered_409_not_a_500(app_sessionmaker, lab):
+    principal = Principal(
+        user_id=lab["user_id"],
+        tenant_id=lab["tenant_a"],
+        external_subject="pool-owner",
+    )
+    with app_sessionmaker() as session:
+        with pytest.raises(InvError) as caught:
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    pool_routes.create_pool(
+                        payload=schemas.PoolRequest(
+                            projectId=lab["project_id"],
+                            name="lab",
+                        ),
+                        response=Response(),
+                        principal=principal,
+                        session=session,
+                        now=NOW,
+                    )
+    assert caught.value.code == "GRAPH-INVALID-TRANSITION"
+    assert caught.value.status == 409
+
+
+def test_plan_rejects_a_run_whose_workload_belongs_to_another_project(
+    app_sessionmaker, owner_engine, lab
+):
+    foreign_project = new_id("project")
+    foreign_workload = new_id("workload")
+    foreign_run = new_id("run")
+    digest = run_service.workload_digest({"objective": "foreign"})
+    with owner_engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO projects(project_id,tenant_id,code,display_name,status,created_at,version) "
+                "VALUES (:project,:tenant,'foreign','Foreign','active',now(),1)"
+            ),
+            {"project": foreign_project, "tenant": lab["tenant_a"]},
+        )
+        connection.execute(
+            text(
+                "INSERT INTO workloads(workload_id,tenant_id,project_id,kind,objective,spec,spec_sha256,contract_version,created_by_user_id,created_at,version) "
+                "VALUES (:workload,:tenant,:project,'batch','foreign','{}',:digest,'1.0.0',:user,now(),1)"
+            ),
+            {
+                "workload": foreign_workload,
+                "tenant": lab["tenant_a"],
+                "project": foreign_project,
+                "digest": digest,
+                "user": lab["user_id"],
+            },
+        )
+        connection.execute(
+            text(
+                "INSERT INTO runs(run_id,tenant_id,workload_id,workspace_id,state,requested_by_user_id,attempt_count,retry_budget,created_at,version) "
+                "VALUES (:run,:tenant,:workload,:workspace,'draft',:user,0,2,now(),1)"
+            ),
+            {
+                "run": foreign_run,
+                "tenant": lab["tenant_a"],
+                "workload": foreign_workload,
+                "workspace": lab["workspace_id"],
+                "user": lab["user_id"],
+            },
+        )
+
+    with app_sessionmaker() as session:
+        with pytest.raises(InvError) as caught:
+            with session.begin():
+                with tenant_scope(session, lab["tenant_a"]):
+                    pool_routes._require_plan_write_access(
+                        session,
+                        tenant_id=lab["tenant_a"],
+                        pool_id=lab["pool_id"],
+                        run_id=foreign_run,
+                        user_id=lab["user_id"],
+                    )
+    assert caught.value.code == "AUTH-PROJECT-SCOPE"
 
 
 # --------------------------------------------------------------------------
