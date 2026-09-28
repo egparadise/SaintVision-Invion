@@ -18,7 +18,7 @@ from __future__ import annotations
 from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
-from .models import APPEND_ONLY_TABLES, TENANT_SCOPED_TABLES
+from .models import APPEND_ONLY_TABLES, AUDIT_TABLES, TENANT_SCOPED_TABLES
 from .session import TENANT_GUC
 
 APP_ROLE = "inv_app"
@@ -56,18 +56,30 @@ def grant_app_privileges(
     Evidence and audit tables are append-only for this role: UPDATE and DELETE
     are withheld, which is a real constraint on the application and explicitly
     not a claim of WORM against a superuser (PLAN-DB-001).
+
+    ``AUDIT_TABLES`` get INSERT and nothing else. SELECT would let the
+    application read decisions about other tenants, including the rows whose
+    tenant is NULL and which therefore no tenant policy can hide
+    (0047_audit_events_isolation withdrew that grant from the live schema; this
+    helper is the declarative statement of the same rule).
     """
     targets = TENANT_SCOPED_TABLES if tables is None else tables
     connection.execute(text(f"GRANT USAGE ON SCHEMA public TO {role}"))
     for table in targets:
-        if table in APPEND_ONLY_TABLES:
+        if table in AUDIT_TABLES:
+            connection.execute(text(f"GRANT INSERT ON {table} TO {role}"))
+        elif table in APPEND_ONLY_TABLES:
             connection.execute(text(f"GRANT SELECT, INSERT ON {table} TO {role}"))
         else:
             connection.execute(
                 text(f"GRANT SELECT, INSERT, UPDATE, DELETE ON {table} TO {role}")
             )
     for table in APPEND_ONLY_TABLES:
-        if table not in targets:
+        if table in targets:
+            continue
+        if table in AUDIT_TABLES:
+            connection.execute(text(f"GRANT INSERT ON {table} TO {role}"))
+        else:
             connection.execute(text(f"GRANT SELECT, INSERT ON {table} TO {role}"))
     connection.execute(text(f"GRANT SELECT ON tenants TO {role}"))
 
