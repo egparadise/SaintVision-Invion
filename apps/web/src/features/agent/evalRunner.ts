@@ -94,7 +94,7 @@ export interface EvalEvidence {
 
 export const EXPECTED_FIXTURE_BYTE_SHA256 = {
   prompts100: 'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2',
-  codingTasks30: '549710ce589c37533e727d6f5d69242cff080668ff6652281e38c8151b3dbdb9',
+  codingTasks30: 'ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96',
 };
 
 export const ALLOWED_PROMPT_CATEGORIES = new Set([
@@ -239,7 +239,7 @@ export function evaluateCodingTask(
       const isLeak = runRes.error?.includes('LEAK_ATTEMPT_DETECTED');
       const observed = isBudget ? 'BUDGET_EXCEEDED' : isLeak ? 'LEAK_ATTEMPT_DETECTED' : 'ERRORED';
       const statusMatch = observed === fixture.expected;
-      const loopMatch = 1 === fixture.expectedLoopCount;
+      const loopMatch = 0 === fixture.expectedLoopCount;
       const pass = statusMatch && loopMatch;
       return {
         id: fixture.id,
@@ -248,18 +248,18 @@ export function evaluateCodingTask(
         inputSha256,
         expected: fixture.expected,
         observed,
-        loopCount: 1,
+        loopCount: 0,
         verdict: pass ? 'PASS' : 'FAIL',
         violation: isLeak ? runRes.error : undefined,
         reason: pass ? undefined : (runRes.error || 'Failed to create run request'),
       };
     }
 
-    let currentLoops = 1;
+    let currentLoops = runRes.request.boundedRepairLoops; // In #136, initial boundedRepairLoops is 0
     let observedStatus = runRes.request.status.toUpperCase(); // 'READY'
 
     // 2. Advance repair loop with Fail-Closed boundary termination (F5)
-    if (fixture.expectedLoopCount > 1) {
+    if (fixture.expectedLoopCount > 0) {
       let iterations = 0;
       while (currentLoops < fixture.expectedLoopCount && currentLoops < 3 && iterations++ < 10) {
         const adv = manager.advanceRepairLoop(runRes.request.id);

@@ -38,7 +38,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         'f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2'
       );
       expect(EXPECTED_FIXTURE_BYTE_SHA256.codingTasks30).toBe(
-        '549710ce589c37533e727d6f5d69242cff080668ff6652281e38c8151b3dbdb9'
+        'ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96'
       );
     });
   });
@@ -241,7 +241,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         category: 'security_leak',
         costEstimate: 50000,
         expected: 'LEAK_ATTEMPT_DETECTED',
-        expectedLoopCount: 1,
+        expectedLoopCount: 0,
       };
 
       const result = evaluateCodingTask(leakTask, manager);
@@ -261,7 +261,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         category: 'budget_boundary',
         costEstimate: 650000,
         expected: 'READY',
-        expectedLoopCount: 1,
+        expectedLoopCount: 0,
       };
 
       const result = evaluateCodingTask(boundaryTask, manager);
@@ -278,7 +278,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         category: 'budget_boundary',
         costEstimate: 650001,
         expected: 'BUDGET_EXCEEDED',
-        expectedLoopCount: 1,
+        expectedLoopCount: 0,
       };
 
       const result = evaluateCodingTask(overBudgetTask, manager);
@@ -312,7 +312,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         category: 'budget_boundary',
         costEstimate: 650000,
         expected: 'READY',
-        expectedLoopCount: 1,
+        expectedLoopCount: 0,
       };
 
       const result = evaluateCodingTask(onBudgetTask, manager);
@@ -331,7 +331,7 @@ describe('G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07)', () => {
         category: 'budget_boundary',
         costEstimate: 650001,
         expected: 'BUDGET_EXCEEDED',
-        expectedLoopCount: 1,
+        expectedLoopCount: 0,
       };
 
       const result = evaluateCodingTask(over650kTask, manager);
