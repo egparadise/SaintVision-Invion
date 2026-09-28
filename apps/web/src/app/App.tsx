@@ -831,7 +831,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.11: Model Lineage & Multi-LLM Conformance (S10-FE) */}
         {activeTab === 'mlops' && (
-          <ModelLineageView />
+          <ModelLineageView projectId={projectId} currentUser={currentUser} />
         )}
 
         {/* Tab 2.12: Release Candidate & Web Rollback (S11-FE) */}

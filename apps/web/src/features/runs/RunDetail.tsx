@@ -8,6 +8,7 @@ import { fetchRunLogs } from '@/shared/api/runLogObservation';
 import { fetchRunArtifacts, getArtifactDownloadUrl } from '@/shared/api/runArtifactObservation';
 import { fetchRunAttempts } from '@/shared/api/runAttemptObservation';
 import { prepareModelRetry, formatModelRetryProblem } from '@/shared/api/modelRetry';
+import { SealRecordPanel } from './SealRecordPanel';
 
 export interface RunDetailProps {
   run: RunItem;
@@ -41,7 +42,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   onRefreshRun,
   onOpenStudio,
 }) => {
-  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards' | 'attempts'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'logs' | 'artifacts' | 'explain' | 'shards' | 'attempts' | 'seal'>('timeline');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('user_requested');
   const [isCancelling, setIsCancelling] = useState(false);
@@ -995,11 +996,13 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           { id: 'explain', label: '4. 자원 배치 Explain' },
           { id: 'shards', label: `5. 분산 샤드 & 자원 회수 (${shards.length > 0 ? shards.length : 'ADR-040'})` },
           { id: 'attempts', label: `6. 시도 이력 (${attemptList ? attemptList.count : 'Attempts'})` },
+          { id: 'seal', label: '7. 봉인 기록 (Seal Record)' },
         ].map((t) => {
           const isActive = activeTab === t.id;
           return (
             <button
               key={t.id}
+              data-testid={`tab-${t.id}`}
               onClick={() => setActiveTab(t.id as typeof activeTab)}
               style={{
                 padding: '10px 16px',
@@ -1796,6 +1799,11 @@ export const RunDetail: React.FC<RunDetailProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab 7: Seal Record */}
+      {activeTab === 'seal' && (
+        <SealRecordPanel projectId={run.projectId} runId={run.id} />
       )}
     </div>
   );
