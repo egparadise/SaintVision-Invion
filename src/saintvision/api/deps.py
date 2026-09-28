@@ -11,7 +11,8 @@ import datetime as dt
 import hashlib
 import json
 import uuid
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from typing import Any
 
 from fastapi import Depends, Header, Request
@@ -210,3 +211,64 @@ def store_idempotent_response(
         )
     )
     session.flush()
+
+
+@contextmanager
+def optional_idempotent_write(
+    session: Session,
+    *,
+    principal: Principal,
+    endpoint: str,
+    idempotency_key: str | None,
+    payload: Any,
+    now: dt.datetime,
+    ttl_seconds: int,
+    lock_timeout_ms: int,
+    project_id: str | None = None,
+) -> Iterator[tuple[dict[str, Any] | None, Callable[[dict[str, Any], int], None]]]:
+    """Bound and optionally replay a legacy write without changing its schema.
+
+    The web client already sends ``Idempotency-Key`` on mutations. Legacy
+    handlers historically ignored it and therefore repeated audit rows and
+    version/timestamp writes. When a key is present, the shared advisory lock
+    closes the concurrent-first gap before reading the durable ledger. When it
+    is absent, the route retains its existing behavior while lock waits are
+    still bounded.
+    """
+    from .lock_wait import bounded_lock_wait
+
+    with bounded_lock_wait(session, timeout_ms=lock_timeout_ms):
+        if idempotency_key is not None:
+            serialise_idempotent_write(
+                session,
+                tenant_id=principal.tenant_id,
+                endpoint=endpoint,
+                idempotency_key=idempotency_key,
+                project_id=project_id,
+            )
+        replay = replay_or_reserve(
+            session,
+            principal=principal,
+            endpoint=endpoint,
+            idempotency_key=idempotency_key,
+            payload=payload,
+            now=now,
+            ttl_seconds=ttl_seconds,
+            project_id=project_id,
+        )
+
+        def finish(response_body: dict[str, Any], response_status: int = 200) -> None:
+            store_idempotent_response(
+                session,
+                principal=principal,
+                endpoint=endpoint,
+                idempotency_key=idempotency_key,
+                payload=payload,
+                response_status=response_status,
+                response_body=response_body,
+                now=now,
+                ttl_seconds=ttl_seconds,
+                project_id=project_id,
+            )
+
+        yield replay, finish

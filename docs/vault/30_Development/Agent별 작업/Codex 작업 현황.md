@@ -1,14 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.215"
+version: "1.0.216"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T02:20:41+09:00"
+updated: "2026-09-29T02:30:04+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 카드 122 Medium 후속 — legacy audit write optional idempotency
+
+- workspace tool, member role/삭제, user/project/workspace status, capability offer 7개가 FE의 선택적 `Idempotency-Key`를 실제 소비한다. live 권한 preflight 뒤 bounded advisory lock→ledger replay를 수행하고, replay는 service·audit·ledger 재기록이 0이다. 최초 service/audit/ledger는 한 transaction이다.
+- PG-free 91 passed; real PG member role replay에 동일 response·audit 1행·ledger 1행 단언을 추가해 hosted 대기다. key 없음 동작·공개 schema·migration은 불변이다. [[2026-09-29_02-30-04_KST_legacy_write_optional_idempotency_Codex]].
 
 ## 2026-09-29 카드 122 Medium 후속 — storage contribution idempotency
 

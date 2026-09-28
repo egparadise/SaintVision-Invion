@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import json
 import datetime as dt
 from pathlib import Path
+from types import SimpleNamespace
 import uuid
 
 import pytest
@@ -13,7 +15,7 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from saintvision.api import schemas
-from saintvision.api.deps import get_now, get_principal, get_session
+from saintvision.api.deps import get_now, get_principal, get_session, get_settings
 from saintvision.api.v1 import projects, readiness
 from saintvision.identity.principal import Principal
 
@@ -193,10 +195,20 @@ def test_create_workspace_response_model_rejects_contract_violation(monkeypatch)
 
 
 def _tool_app(monkeypatch, service_return):
+    @contextmanager
+    def optional_write(*_args, **_kwargs):
+        yield None, lambda _body, _status=200: None
+
     monkeypatch.setattr(
         projects.project_service, "set_workspace_tool", lambda *_a, **_k: service_return
     )
+    monkeypatch.setattr(
+        projects.project_service,
+        "require_project_access",
+        lambda *_a, **_k: {"canRequest": True, "roleCode": "owner"},
+    )
     monkeypatch.setattr(projects, "record_event", lambda *_a, **_k: None)
+    monkeypatch.setattr(projects, "optional_idempotent_write", optional_write)
     principal = Principal(
         user_id="usr_workspace_contract",
         tenant_id=uuid.UUID("00000000-0000-4000-8000-000000000041"),
@@ -205,7 +217,16 @@ def _tool_app(monkeypatch, service_return):
     app = FastAPI()
     app.include_router(projects.router)
     app.dependency_overrides[get_principal] = lambda: principal
-    app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_session] = lambda: SimpleNamespace(
+        get=lambda *_a, **_k: SimpleNamespace(
+            tenant_id=principal.tenant_id,
+            project_id="prj_workspace_contract",
+        )
+    )
+    app.dependency_overrides[get_settings] = lambda: SimpleNamespace(
+        idempotency_ttl_seconds=600,
+        business_lock_timeout_ms=5_000,
+    )
     app.dependency_overrides[get_now] = lambda: dt.datetime(
         2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
     )
