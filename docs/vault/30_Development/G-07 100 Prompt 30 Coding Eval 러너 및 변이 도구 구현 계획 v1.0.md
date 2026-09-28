@@ -109,6 +109,9 @@ apps/web/
     ├── agent-eval-runner.test.ts             # [신설] 100/30 골든 러너 실행, skip 0 및 digest drift 검증
     └── agent-mutation-guards.test.ts         # [신설] MUT-01~03 및 러너 무결성 변이 사살 단위 시험
 
+docs/contracts/
+└── eval-evidence.schema.json                 # [신설] G-07 산출 증거 JSON 스키마 v1.1
+
 docs/vault/30_Development/
 └── Evidence/
     └── s09-g07-eval-evidence-<sha>.json      # [신설] 130건 원본 입출력 및 고정 SHA Evidence (<sha> 포함)
