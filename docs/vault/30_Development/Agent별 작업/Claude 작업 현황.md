@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.22"
 status: "review"
 author: "Claude"
-updated: "2026-09-23T09:55:00+09:00"
+updated: "2026-09-28T13:26:17+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+Evidence 공백 통합 분류 카드 bi (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/evidence-gap-triage`, docs-only): 대응표 6종(#155 S12-ST·#160 S10-ST·#161 S09-DB·ST·#163 S03-ST·#164 S02-BE·ST·#166 S10-BE)의 공백 29행 → 중복 8 제거 → **21건**(IMPLEMENTATION/DESIGN 6 · CI_LANE_GAP/NOT_OBSERVED 4 · BLOCKED_EXTERNAL 11). **재분류 3건**: ①MLflow adapter를 BLOCKED_EXTERNAL에서 IMPLEMENTATION으로 회수(우리 코드이고 #172·#176 진행 중, 외부는 실 endpoint뿐) — 코디네이터 지시에 해당하는 실제 위반은 이 한 건이었다. ②Windows 게이트와 `remoteNodeReadiness: unknown`은 **공백이 아니므로** 작업 항목에서 제외(hosted에서 실행됨 / route가 범위를 스스로 밝힘). ③#155의 NOT_OBSERVED와 #166의 CI_LANE_GAP이 같은 성질이라 CI_LANE_GAP으로 통일. **실측**: `tests/`에 `v1/adapters` grep 0건 → 서빙 route가 HTTP 표면에서 미검증(구현 1순위) · live archiver의 hosted skip은 `--internal` 네트워크 격리 때문이고 port publish는 그 격리를 깨므로 `docker exec` probe를 권고(판정 함수의 인자 모양만 바뀐다) · 기존 `/v1/adapters`는 `HTTPException(404)`로 정본 `ProblemDetails`가 아니지만 1순위 PR은 **현재 동작을 pin하고 바꾸지 않는다**(#167이 기존 표면을 건드리지 않은 결정과 같은 이유). 구현 순서 5단과 각 단의 설계 필요 여부를 PR 본문에 적었고, 가치 순서가 내 판단임(G-02가 더 가치 있으나 결정이 먼저 필요해 G-01을 1순위로 둠)을 명시했다. migration 필요 없음. 다음 첫 행동: Codex 검토 뒤 1순위(G-01 `GET /v1/adapters` HTTP 시험)를 작은 구현 PR로. 전문 [[2026-09-28_Evidence_공백_통합분류_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
