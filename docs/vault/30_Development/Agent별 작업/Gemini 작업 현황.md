@@ -1528,7 +1528,7 @@ source_of_truth: "Git"
   7. **Claude F6 (매트릭스 v1.1.1 대비 5대 이탈 정정 표)**: 상태 어휘(`NOT_OBSERVED`), 증거 경로(`<sha>`), 클릭 수(2차/3차), 거절 화면 갱신(PR 4 신설), 러너 행 ID(`EVL-05`) 5대 항목 완비.
   8. **Claude F7 (식별자 3건 정정)**: REP-04 role='status' 신설 계획, SSE 경로 전체 경로화(`services/control-plane/src/inv/app.py:1030~1057`), MUT-04 `:590` 기사살 정적 대조 명시, MUT-05 정적 대조 표기.
   9. **Claude F8 (수치 정정)**: 문서 수 실측치("895 versioned documents") 정정, 시나리오 수 16대 정정.
-  10. **관찰사항 반영**: O3(fixtures `tests/fixtures/` 배치, KPI 라벨 G-26 고지), O4(MUT-02 650,000 KRW 경계 probe), O5(frontmatter reviewer 명시), O6(PR별 CI job 명시).
+  11. **Claude r2 피드백 반영 (N1~N4, v1.1.1)**: N1(§5 정규식 표를 agentEngine.ts:29-35 글자 그대로 인용 및 1:1 probe/변이 연산자 재산출), N2(§9 증거 예시 사전 단정 수치를 <observed> 자리표시자로 교체), N3(frontmatter updated 시각 정합), N4($schema 외부 URL 제거 및 내부 스키마 경로 지정). Codex 계약 축 승인(head 091e830f) 유지.
 - **문서 산출물**:
-  - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.0)
-  - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.1.0)
+  - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1)
+  - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.1.1)
