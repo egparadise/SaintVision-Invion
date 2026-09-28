@@ -231,6 +231,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [verifyMeasurementId, setVerifyMeasurementId] = useState('');
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [verifyResult, setVerifyResult] = useState<ModelVerifyResponse | null>(null);
+  const [verifyTarget, setVerifyTarget] = useState<{ projectId: string; modelId: string; version: string } | null>(null);
   const [verifyIdempotencyKey, setVerifyIdempotencyKey] = useState<string>(() =>
     modelRegistryObservation.generateIdempotencyKey('w3')
   );
@@ -245,6 +246,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [evalRequirePinning, setEvalRequirePinning] = useState(true);
   const [evalLoading, setEvalLoading] = useState(false);
   const [evalResult, setEvalResult] = useState<EvalRunResponse | null>(null);
+  const [evalTarget, setEvalTarget] = useState<{ projectId: string; suiteId: string } | null>(null);
   const [evalIdempotencyKey, setEvalIdempotencyKey] = useState<string>(() =>
     modelRegistryObservation.generateIdempotencyKey('w5')
   );
@@ -296,6 +298,33 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setProjectId(effectiveProjectId);
       setCommitmentProject(effectiveProjectId);
       setConformanceProjectId(effectiveProjectId);
+      verifyAbortControllerRef.current?.abort();
+      verifyAbortControllerRef.current = null;
+      evalAbortControllerRef.current?.abort();
+      evalAbortControllerRef.current = null;
+      regAbortControllerRef.current?.abort();
+      regAbortControllerRef.current = null;
+      pinAbortControllerRef.current?.abort();
+      pinAbortControllerRef.current = null;
+      relAbortControllerRef.current?.abort();
+      relAbortControllerRef.current = null;
+      verifyGenerationRef.current++;
+      evalGenerationRef.current++;
+      regGenerationRef.current++;
+      pinGenerationRef.current++;
+      relGenerationRef.current++;
+      setVerifyLoading(false);
+      setEvalLoading(false);
+      setRegLoading(false);
+      setPinLoading(false);
+        setVerifyResult(null);
+      setVerifyTarget(null);
+      setEvalResult(null);
+      setEvalTarget(null);
+      setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+      setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+      setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+      setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     }
   }, [effectiveProjectId]);
 
@@ -335,12 +364,28 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleProjectIdChange = (val: string) => {
     setProjectId(val);
     setVerifyResult(null);
+    setVerifyTarget(null);
     setEvalResult(null);
+    setEvalTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
     verifyGenerationRef.current++;
     evalGenerationRef.current++;
+    setVerifyLoading(false);
+    setEvalLoading(false);
+    setRegLoading(false);
+    setPinLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
@@ -350,104 +395,159 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleModelIdChange = (val: string) => {
     setModelId(val);
     setVerifyResult(null);
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
     verifyGenerationRef.current++;
-    evalGenerationRef.current++;
+    setVerifyLoading(false);
+    setRegLoading(false);
+    setPinLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
-    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleVersionChange = (val: string) => {
     setVersion(val);
     setVerifyResult(null);
-    regGenerationRef.current++;
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     pinGenerationRef.current++;
     relGenerationRef.current++;
     verifyGenerationRef.current++;
-    evalGenerationRef.current++;
-    setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
+    setVerifyLoading(false);
+    setPinLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
-    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleRegVersionChange = (val: string) => {
     setRegVersion(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegSha256Change = (val: string) => {
     setRegSha256(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegByteSizeChange = (val: string) => {
     setRegByteSize(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handlePinUntilChange = (val: string) => {
     setPinUntil(val);
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
     pinGenerationRef.current++;
+    setPinLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
   const handleRelLicensePolicyChange = (val: string) => {
     setRelLicensePolicy(val);
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     relGenerationRef.current++;
   };
 
   const handleRelClassificationChange = (val: 'public' | 'internal' | 'restricted') => {
     setRelClassification(val);
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     relGenerationRef.current++;
   };
 
   const handleVerifyMeasurementIdChange = (val: string) => {
     setVerifyMeasurementId(val);
     setVerifyResult(null);
+    setVerifyTarget(null);
+    verifyAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current = null;
     verifyGenerationRef.current++;
+    setVerifyLoading(false);
     setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
   };
 
   const handleEvalSuiteIdChange = (val: string) => {
     setEvalSuiteId(val);
     setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
     evalGenerationRef.current++;
+    setEvalLoading(false);
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalAdapterChange = (val: string) => {
     setEvalAdapter(val);
     setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
     evalGenerationRef.current++;
+    setEvalLoading(false);
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalPromptVerChange = (val: string) => {
     setEvalPromptVer(val);
     setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
     evalGenerationRef.current++;
+    setEvalLoading(false);
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalCtxVerChange = (val: string) => {
     setEvalCtxVer(val);
     setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
     evalGenerationRef.current++;
+    setEvalLoading(false);
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleEvalRequirePinningChange = (checked: boolean) => {
     setEvalRequirePinning(checked);
     setEvalResult(null);
+    setEvalTarget(null);
+    evalAbortControllerRef.current?.abort();
+    evalAbortControllerRef.current = null;
     evalGenerationRef.current++;
+    setEvalLoading(false);
     setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
@@ -644,6 +744,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       );
       if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setVerifyResult(res);
+      setVerifyTarget({ projectId: projectId.trim(), modelId: modelId.trim(), version: version.trim() });
       setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
       setLiveAnnouncement(
         `W3 커널 측정 검증 완료: ${modelId.trim()}:${version.trim()} (${res.newlyVerified ? '새로 검증됨' : '이미 검증됨'})`
@@ -653,7 +754,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setVerifyResult(null);
       handleApiError(err, 'W3 커널 측정 검증 실패');
     } finally {
-      if (verifyGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+      if (verifyAbortControllerRef.current === ctrl || verifyGenerationRef.current === currentGen) {
         setVerifyLoading(false);
       }
     }
@@ -707,6 +808,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       );
       if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setEvalResult(res);
+      setEvalTarget({ projectId: projectId.trim(), suiteId: evalSuiteId.trim() });
       setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
       setLiveAnnouncement(`W5 평가 실행 완료: ${res.evalRunId}`);
     } catch (err: unknown) {
@@ -714,7 +816,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setEvalResult(null);
       handleApiError(err, 'W5 평가 실행 실패');
     } finally {
-      if (evalGenerationRef.current === currentGen && !ctrl.signal.aborted) {
+      if (evalAbortControllerRef.current === ctrl || evalGenerationRef.current === currentGen) {
         setEvalLoading(false);
       }
     }
@@ -774,12 +876,45 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               borderRadius: '4px',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: verifyResult && verifyResult.version === version.trim() ? '#1f6feb' : '#21262d',
-              border: verifyResult && verifyResult.version === version.trim() ? '1px solid #388bfd' : '1px solid #30363d',
-              color: verifyResult && verifyResult.version === version.trim() ? '#ffffff' : '#8b949e',
+              backgroundColor:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '#1f6feb'
+                  : '#21262d',
+              border:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '1px solid #388bfd'
+                  : '1px solid #30363d',
+              color:
+                verifyResult &&
+                verifyTarget &&
+                verifyTarget.projectId === projectId.trim() &&
+                verifyTarget.modelId === modelId.trim() &&
+                verifyTarget.version === version.trim() &&
+                verifyResult.modelId === modelId.trim() &&
+                verifyResult.version === version.trim()
+                  ? '#ffffff'
+                  : '#8b949e',
             }}
           >
-            {verifyResult && verifyResult.version === version.trim()
+            {verifyResult &&
+            verifyTarget &&
+            verifyTarget.projectId === projectId.trim() &&
+            verifyTarget.modelId === modelId.trim() &&
+            verifyTarget.version === version.trim() &&
+            verifyResult.modelId === modelId.trim() &&
+            verifyResult.version === version.trim()
               ? `W3 검증: 검증 완료 (측정: ${verifyResult.verifiedMeasurementId})`
               : 'W3 검증: 미검증 (커널 계측 검증 대기)'}
           </span>
@@ -1467,7 +1602,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </div>
       )}
       {/* Mutation Results Displays */}
-      {verifyResult && verifyResult.version === version.trim() && (
+      {verifyResult &&
+        verifyTarget &&
+        verifyTarget.projectId === projectId.trim() &&
+        verifyTarget.modelId === modelId.trim() &&
+        verifyTarget.version === version.trim() &&
+        verifyResult.modelId === modelId.trim() &&
+        verifyResult.version === version.trim() && (
         <div
           role="status"
           data-testid="registry-verify-success"
@@ -1495,7 +1636,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </div>
       )}
 
-      {evalResult && (
+      {evalResult &&
+        evalTarget &&
+        evalTarget.projectId === projectId.trim() &&
+        evalTarget.suiteId === evalSuiteId.trim() &&
+        evalResult.suiteId === evalSuiteId.trim() && (
         <div
           role="status"
           data-testid="registry-eval-success"
