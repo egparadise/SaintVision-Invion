@@ -1277,3 +1277,4 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - Focused evidence after r1 fixes: `tests/test_aggregate_ac11_evidence.py` 49 passed and module compilation exit 0; docs/ontology/contract/ratchet gates are rerun before the next push. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
 - History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
 - Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
+- Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
