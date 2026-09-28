@@ -210,8 +210,12 @@ class ModelVersion(Base):
             "tenant_id", "model_version_id", name="uq_model_versions_tenant_id_version_id"
         ),
         UniqueConstraint("model_id", "version", name="uq_model_versions_model_id_version"),
+        # Scoped to the model, not the tenant (0052). The invariant is still "two
+        # names for identical bytes is a mistake", but a model belongs to one
+        # project, so refusing across projects answered a question the caller had
+        # no access to ask -- see the migration for the whole argument.
         UniqueConstraint(
-            "tenant_id", "content_sha256", name="uq_model_versions_tenant_id_content_sha256"
+            "model_id", "content_sha256", name="uq_model_versions_model_id_content_sha256"
         ),
         CheckConstraint("byte_size >= 0", name="byte_size_non_negative"),
         CheckConstraint(
