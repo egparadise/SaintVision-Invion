@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.211"
+version: "1.0.212"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T12:38:00+09:00"
+updated: "2026-09-28T20:55:02+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
+
+- #177에서 manifest를 0047·0050·0053 `PRESERVED`까지 확장하고 source graph로 0052 barrier 뒤 reversible tail을 재계산한다. 0053 scoped-row downgrade refusal은 exact revision 0053까지 upgrade한 뒤 0052 거부·version/project_id 원자 보존을 확인해, 이후 0054가 들어와도 fixture 의미가 바뀌지 않는다.
+- hosted run `36416624234`는 source `da112daf`, JUnit 7/0/0/0, reversible·restore 두 축 PASS, 부정 fixture 4/4, residue 0, Backend 3592 passed·50 skipped·0 failed다. 다만 source에 새 registry pin이 없어 **reference-only**이며 release evidence로 소비하지 않는다.
+- #192가 새 target과 restore criteria 4를 registry blob `c08a45f8…`으로 aggregator·importer에 함께 재핀한다. 소비 가능한 evidence는 이 registry를 포함한 #192 이후 exact head에서 재생성해야 한다. #193 standalone LocalObjectStore 경계와 #204 hosted lane까지 force 없이 cascade하고 S11/AC-11 상태 승격은 하지 않는다. [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 제품 결속 v2 — 제품 restore 보강·hosted 재검증
 
@@ -1301,3 +1307,22 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - `5914f04` adds backend run-result/artifact-list contract; Gemini frontend generated-type/Ajv fixture wiring remains pending, and artifact-content is unbound. This corrects the older “all result/artifact unbound” statement.
 - Obsidian latest committed check found 1408 managed/2 pending/0 conflicts before final record updates. Paired sync status is in dedicated History. Next: push branch and request Claude fixed-SHA review; then take placement preview/pool/mutation as next Codex response contract. PostgreSQL/CI/browser/operational gates remain separate.
 - Latest integration `8fd49a5` (VF-GM-03) is included as the base of final verification. At clean branch HEAD `f350155`, provider tests 7 + 4 passed, full Vitest 42 files/391 passed, response schemas 32, response types 9, `tsc -b`, Vite build, docs (616), ontology and SHACL passed; complete provenance is in `2026-09-21_run-approval-page-contract_Codex`. This feature branch is three commits ahead of integration; push/Claude review pending. Last sync snapshot after the rebase was 1409 managed/2 pending/0 conflicts, to be resolved after this record update.
+
+## 2026-09-28 Card 50 — S11 AC-11 aggregator stage 1
+
+- Branch/base: `agent/codex/s11-ac11-aggregator` / `1e8baf045c5a554209aaef601ae4883b64da50a7`; owner/reviewer Codex/Claude; approved design PR #157 head `a793f258`.
+- Added a PG-free fail-closed aggregator for the eight required AC-11 axes plus the reviewed security allowlist v0. Claude r1 D1~D6 are addressed: Git-backed target registry criteria, source-tree migration graph conditional N/A, actual definer/RLS/VF producer formats with nonempty inventories, reviewed baseline/blob binding, and skip fail-closed. Producer verdicts cannot override recomputation in either direction.
+- Focused evidence after r1 fixes: `tests/test_aggregate_ac11_evidence.py` 49 passed and module compilation exit 0; docs/ontology/contract/ratchet gates are rerun before the next push. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
+- History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
+- Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
+- Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
+
+## 2026-09-28 Card 51 — S11 AC-11 migration restore rehearsal
+
+- Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 C1 head `960fdc6b`; owner/reviewer Codex/Claude.
+- Opt-in hosted lane, exact PR-head checkout, disposable PostgreSQL 16 source/restore DB, pre/post-forward sentinel, final catalog fingerprint, residue-zero JSON/JUnit evidence를 구현했다. reversible tail 0은 조건부 `NOT_APPLICABLE`, 짝인 `0045→snapshot restore→0046`만 실제 PASS 후보이며 lossy-reversible 10개는 개별 측정이 아닌 restore-route 사전 분류로 유지한다.
+- History: [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
+- Hosted 후속 정정: PG-free focused 12 passed. 정본 run `36377513831`(head `de9d8a4e`)은 `0045→snapshot restore→0046`를 `MEASURED_PASS`, JUnit 3/0/0/1 skip, disposable DB residue 0으로 확인했다. 앞선 네 run의 진단·owner 보존·OID/attnum·동등 CHECK deparse 교정도 History에 보존했다. 이는 단일 hosted restore 축만의 PASS이며 AC-11 전체와 S11 상태는 미완료다.
+- Claude F1~F5 보강 head `abe8435a`: shallow Backend 분리, future reversible 기준 DB 비교, 임시 Alembic 부정 fixture 3종, AC-11 importer/target registry, 좁은 CHECK 정규화를 추가했다. hosted run `36379743674`는 JUnit 6/0/0/1 skip·disposable DB 7개 residue 0·artifact `10952510591`로 PASS했고, PG-free 75 passed와 문서/ontology/contract/ratchet 게이트 exit 0이다. 단일 hosted restore 축만의 증거이며 새 cluster role·운영 PITR·물리 복구는 미측정이다.
+- Claude r2 N1~N4 대응: importer가 artifact zip을 직접 hash하고 zip 내부 report/JUnit 및 GitHub run/artifact metadata의 run ID·head·결론·이름·만료를 exact 대조한다. 정본 artifact 재수입은 expected/observed `d4437410…`·report `cfa3b678…`·JUnit `1cbc2ffe…`, exit 0이며 임의 digest/failed·expired·head/run drift/sourceRunId 누락/JUnit 실패를 거부한다. 0009는 23505와 rollback state를 요구하고 JUnit은 negative case 실제 실행을 반영하며, PG-free focused 87 passed다.
+- Claude r3 조건부 승인 N5/N6 경계: 정본 hosted run `36379743674`는 느슨한 0009 판정이 있던 `abe8435a` 산출물이고, `b2b4db3c`의 N2/N3 강화는 PG-free만 검증돼 release 전 lane 재실행이 필요하다. importer는 `gh api`로 취득한 zip/run/artifact JSON의 상호 결속을 검사하지만 metadata 출처를 인증하지 않으므로, canonical repository 조회 명령·artifact id `10952510591`·일관된 입력 위조 한계를 History와 docstring에 고정했다.
