@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.216"
+version: "1.0.217"
 status: "review"
 author: "Codex"
-updated: "2026-09-29T02:30:04+09:00"
+updated: "2026-09-29T02:34:48+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,8 +22,8 @@ source_of_truth: "Git"
 
 ## 2026-09-29 카드 122 Medium 후속 — pool write 권한·unique 충돌
 
-- member 추가·삭제는 project lock→live membership/canRequest→pool lock·project 재결속 순서로 닫고, plan은 run lock→workload project가 pool project와 같은지까지 확인한다. viewer·없는 pool·cross-project run은 동일 `AUTH-PROJECT-SCOPE`다.
-- pool name·run plan의 등록된 unique constraint만 `GRAPH-INVALID-TRANSITION`/409로 번역하고, concurrent member PK는 savepoint 뒤 exact row가 있을 때만 idempotent 200이다. PG-free 32 passed; real PG 4경계는 hosted Core 대기다. Storage unique와 legacy audit/idempotency는 후속 유지. [[2026-09-29_02-08-04_KST_pool_쓰기권한_및_unique충돌_Codex]].
+- member 추가·삭제는 project lock→live membership/canRequest→pool lock·project 재결속 순서로 닫고, plan은 run lock→workload project가 pool project와 같은지까지 확인한다. Claude r1 뒤 pool에서 유도한 `projectId`도 제거해 viewer·비회원·없는 pool의 전체 ProblemDetails가 동일하다.
+- pool name·run plan의 등록된 unique constraint만 `GRAPH-INVALID-TRANSITION`/409로 번역하고, concurrent member PK는 savepoint 뒤 exact row가 있을 때만 idempotent 200이다. 최초 PG-free 32 passed, r1 보완 단일 파일 8 passed와 문서·계약·온톨로지 gate exit 0; real PG 4경계는 hosted Core 대기다. Storage unique와 legacy audit/idempotency는 후속 유지. [[2026-09-29_02-08-04_KST_pool_쓰기권한_및_unique충돌_Codex]].
 
 ## 2026-09-29 카드 122 후속 — node admission token 재발급 차단
 
