@@ -51,6 +51,14 @@ def collect(directory):
             private.add(name)
 
     reference(config["identity"]["jwks_file"])
+    readiness = config.get("configurationReadiness")
+    if readiness is not None:
+        if not isinstance(readiness, dict) or set(readiness) - {
+            "nodeMtlsCaBundle", "objectStoreEndpoint"
+        }:
+            raise ValueError("Invalid configurationReadiness settings")
+        if "nodeMtlsCaBundle" in readiness:
+            reference(readiness["nodeMtlsCaBundle"])
     workspace = config.get("workspace")
     if workspace is not None:
         targets = [workspace, *workspace.get("destinations", [])]

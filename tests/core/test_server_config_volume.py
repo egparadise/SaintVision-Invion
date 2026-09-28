@@ -28,6 +28,22 @@ def test_unreferenced_private_files_never_copied(tmp_path):
     assert set(files) == {"api.json", "jwks.json"} and not private
 
 
+def test_operational_ca_bundle_is_copied_only_when_api_json_references_it(tmp_path):
+    config = {
+        "identity": {"jwks_file": "/run/saintvision/jwks.json"},
+        "configurationReadiness": {
+            "nodeMtlsCaBundle": "/run/saintvision/node-mtls-ca.pem",
+            "objectStoreEndpoint": "http://minio:9000",
+        },
+    }
+    (tmp_path / "api.json").write_text(json.dumps(config))
+    (tmp_path / "jwks.json").write_text("{}")
+    (tmp_path / "node-mtls-ca.pem").write_text("synthetic-public-ca")
+    files, private = module.collect(tmp_path)
+    assert set(files) == {"api.json", "jwks.json", "node-mtls-ca.pem"}
+    assert not private
+
+
 @pytest.mark.parametrize("expired", [False, True])
 def test_real_volume_copy_or_failure_cleanup(tmp_path, expired):
     image = os.environ.get("INV_TEST_CONFIG_IMAGE")
