@@ -7,6 +7,7 @@ import hashlib
 import psycopg
 from psycopg.types.json import Jsonb
 import pytest
+from db_integrity import database_integrity_violations, preserved_rows, suspended_triggers
 from inv.db import Database
 from inv.errors import DomainError
 from inv.ids import new_id
@@ -444,77 +445,93 @@ def test_shard_completion_rejects_invalid_EvidenceEnvelope_atomically(env, monke
     # Build the already-verified child boundary directly as the disposable DB
     # owner.  Foreign-key triggers are suspended only for the three synthetic
     # join rows; checks/RLS are restored before the serving method is called.
-    with psycopg.connect(e.owner) as conn:
-        conn.execute("ALTER TABLE inv.runs DISABLE TRIGGER USER")
-        try:
+    # The synthetic rows are physically impossible (result_commitments without an
+    # execution_attempts parent), so ``preserved_rows`` removes every one of them
+    # when the test ends: a later pg_restore of this session database must not
+    # fail on that orphan (PR #126, 14 recovery-drill failures in a shared session).
+    synthetic = (
+        ("inv.result_completions", "tenant_id=%s AND run_id=%s", (e.tenant, child)),
+        ("inv.result_commitments", "tenant_id=%s AND run_id=%s", (e.tenant, child)),
+        ("inv.shard_commands", "tenant_id=%s AND plan_id=%s", (e.tenant, plan_id)),
+        ("inv.storage_objects", "tenant_id=%s AND object_id=%s", (e.tenant, object_id)),
+        ("inv.storage_budgets", "tenant_id=%s AND project_id=%s", (e.tenant, e.project)),
+        ("inv.shard_parents", "tenant_id=%s AND plan_id=%s", (e.tenant, plan_id)),
+        ("inv.shard_plans", "tenant_id=%s AND plan_id=%s", (e.tenant, plan_id)),
+        ("inv.runs", "tenant_id=%s AND run_id=ANY(%s)", (e.tenant, [parent, child])),
+    )
+    with preserved_rows(e.owner, *synthetic):
+        with psycopg.connect(e.owner) as conn:
+            with suspended_triggers(conn, "inv.runs", "USER"):
+                conn.execute(
+                    "INSERT INTO inv.runs(tenant_id,project_id,run_id,state,attempt) VALUES"
+                    "(%s,%s,%s,'running',0),(%s,%s,%s,'succeeded',1)",
+                    (e.tenant, e.project, parent, e.tenant, e.project, child),
+                )
             conn.execute(
-                "INSERT INTO inv.runs(tenant_id,project_id,run_id,state,attempt) VALUES"
-                "(%s,%s,%s,'running',0),(%s,%s,%s,'succeeded',1)",
-                (e.tenant, e.project, parent, e.tenant, e.project, child),
+                "INSERT INTO inv.shard_plans VALUES(%s,%s,%s,%s,1)",
+                (e.tenant, e.project, plan_id, "3" * 64),
             )
-        finally:
-            conn.execute("ALTER TABLE inv.runs ENABLE TRIGGER USER")
-        conn.execute(
-            "INSERT INTO inv.shard_plans VALUES(%s,%s,%s,%s,1)",
-            (e.tenant, e.project, plan_id, "3" * 64),
-        )
-        conn.execute(
-            "INSERT INTO inv.shard_parents VALUES(%s,%s,%s,%s,%s)",
-            (e.tenant, e.project, plan_id, parent, e.epoch),
-        )
-        conn.execute(
-            "INSERT INTO inv.storage_budgets VALUES(%s,%s,1024)",
-            (e.tenant, e.project),
-        )
-        conn.execute(
-            "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) "
-            "VALUES(%s,%s,%s,%s,1)",
-            (e.tenant, e.project, object_id, "2" * 64),
-        )
-        conn.execute(
-            "UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (object_id,)
-        )
-        for table, statement, params in (
-            (
-                "inv.shard_commands",
-                "INSERT INTO inv.shard_commands VALUES(%s,%s,%s,0,%s,%s,%s)",
-                (e.tenant, e.project, plan_id, e.node, child, command),
-            ),
-            (
-                "inv.result_commitments",
-                "INSERT INTO inv.result_commitments(tenant_id,project_id,run_id,attempt,command_id,object_id,evidence_id,envelope,content_hash) "
-                "VALUES(%s,%s,%s,1,%s,%s,%s,%s,%s)",
-                (e.tenant, e.project, child, command, object_id, evidence_id, Jsonb(envelope), "4" * 64),
-            ),
-            (
-                "inv.result_completions",
-                "INSERT INTO inv.result_completions VALUES(%s,%s,1,%s,%s,clock_timestamp())",
-                (e.tenant, child, command, evidence_id),
-            ),
-        ):
-            conn.execute("ALTER TABLE " + table + " DISABLE TRIGGER ALL")
-            try:
-                conn.execute(statement, params)
-            finally:
-                conn.execute("ALTER TABLE " + table + " ENABLE TRIGGER ALL")
+            conn.execute(
+                "INSERT INTO inv.shard_parents VALUES(%s,%s,%s,%s,%s)",
+                (e.tenant, e.project, plan_id, parent, e.epoch),
+            )
+            conn.execute(
+                "INSERT INTO inv.storage_budgets VALUES(%s,%s,1024)",
+                (e.tenant, e.project),
+            )
+            conn.execute(
+                "INSERT INTO inv.storage_objects(tenant_id,project_id,object_id,content_hash,size_bytes) "
+                "VALUES(%s,%s,%s,%s,1)",
+                (e.tenant, e.project, object_id, "2" * 64),
+            )
+            conn.execute(
+                "UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (object_id,)
+            )
+            for table, statement, params in (
+                (
+                    "inv.shard_commands",
+                    "INSERT INTO inv.shard_commands VALUES(%s,%s,%s,0,%s,%s,%s)",
+                    (e.tenant, e.project, plan_id, e.node, child, command),
+                ),
+                (
+                    "inv.result_commitments",
+                    "INSERT INTO inv.result_commitments(tenant_id,project_id,run_id,attempt,command_id,object_id,evidence_id,envelope,content_hash) "
+                    "VALUES(%s,%s,%s,1,%s,%s,%s,%s,%s)",
+                    (e.tenant, e.project, child, command, object_id, evidence_id, Jsonb(envelope), "4" * 64),
+                ),
+                (
+                    "inv.result_completions",
+                    "INSERT INTO inv.result_completions VALUES(%s,%s,1,%s,%s,clock_timestamp())",
+                    (e.tenant, child, command, evidence_id),
+                ),
+            ):
+                with suspended_triggers(conn, table, "ALL"):
+                    conn.execute(statement, params)
 
-    class Files:
-        @staticmethod
-        def read(*_args):
-            return b"x"
+        class Files:
+            @staticmethod
+            def read(*_args):
+                return b"x"
 
-    class Provider:
-        @contextmanager
-        def locked(self):
-            yield Files()
+        class Provider:
+            @contextmanager
+            def locked(self):
+                yield Files()
 
-    monkeypatch.setattr("inv.shard_completion.new_id", lambda _prefix: "invalid")
-    with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
-        ShardCompletion(e.db, Provider()).once(e.tenant)
-    assert e.runs.get(e.tenant, parent)["state"] == "running"
-    with e.db.transaction(e.tenant) as conn:
-        assert conn.execute("SELECT 1 FROM inv.shard_completions").fetchone() is None
-        assert conn.execute("SELECT 1 FROM inv.evidence").fetchone() is None
+        monkeypatch.setattr("inv.shard_completion.new_id", lambda _prefix: "invalid")
+        with pytest.raises(DomainError, match="EvidenceEnvelope: invalid contract"):
+            ShardCompletion(e.db, Provider()).once(e.tenant)
+        assert e.runs.get(e.tenant, parent)["state"] == "running"
+        with e.db.transaction(e.tenant) as conn:
+            assert conn.execute("SELECT 1 FROM inv.shard_completions").fetchone() is None
+            assert conn.execute("SELECT 1 FROM inv.evidence").fetchone() is None
+        # While the corruption is live the audit must see it (the assertion above is real).
+        assert any(f["table"] == "inv.result_commitments" for f in database_integrity_violations(e.owner))
+
+
+def test_invalid_envelope_scenario_leaves_no_physical_inconsistency(env):
+    """Order-independence regression for PR #126: runs right after the owner-corruption case above."""
+    assert database_integrity_violations(env.owner) == []
 
 
 def test_outbox_crash_duplicate_and_consumer_rollback(env):
