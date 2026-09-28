@@ -4,9 +4,11 @@
 # no longer broken (STALE -> remove it, ratcheting the floor down). The floor only goes down: fix the
 # citation in the document, then delete its line here. Never add a line to hide a new invented path.
 00_Index/전체 개발 진행 현황.md || deploy/certs
+00_Index/전체 개발 진행 현황.md || services/lineage.py
 00_Index/전체 개발 진행 현황.md || tests/browser-matrix-acceptance.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/dashboard-runlist-freshness-wiring.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/defect-recovery-admin-recovery-editor.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/fixtures/prompts_100.json
 00_Index/전체 개발 진행 현황.md || tests/inv-file-explorer-dom.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/model-studio-dom.test.tsx
 00_Index/전체 개발 진행 현황.md || tests/resource-explorer-dom.test.tsx
@@ -24,10 +26,39 @@
 30_Development/2026-09-23_S05-FE_자원배치_미리보기_Explain_시나리오_매트릭스_Gemini.md || services/pools.py:335-337
 30_Development/2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini.md || tests/web/terminal-session-dom.test.tsx:297
 30_Development/2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini.md || tests/web/terminal-session-dom.test.tsx:361
+30_Development/2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini.md || services/eval_execution.py
+30_Development/2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini.md || services/evaluation.py
+30_Development/2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini.md || services/records.py
+30_Development/2026-09-28 병합 목록 현황과 남은 공백.md || services/lineage.py
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || services/eval_execution.py
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || services/lineage.py
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || services/lineage.py:343-345
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || services/runs.py:434
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/fixtures/model-lineage.ts
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/model-lineage.test.ts
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/model-lineage.test.ts:138-143
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/model-lineage.test.ts:149-153
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/model-lineage.test.ts:22-35
+30_Development/2026-09-28_S10-FE_AdapterConformance_실패분류_LineageQuery_배포Digest_시나리오_매트릭스_Gemini.md || tests/model-lineage.test.ts:51-78
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/accessibility-status-and-guards.test.tsx
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/deployment-release-integrity-wiring.test.tsx:104-108
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/deployment-release-integrity-wiring.test.tsx:119-125
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/fixtures/baselines/
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:37-63
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:6-35
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:65-95
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:66-81
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:83-95
+30_Development/2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini.md || tests/release-candidate.test.ts:98-128
+30_Development/Agent별 작업/Claude 작업 현황.md || services/lineage.py
+30_Development/Agent별 작업/Claude 작업 현황.md || src/saintvision/demo_server.py
 30_Development/Agent별 작업/Gemini 작업 현황.md || apps/web/dist
+30_Development/Agent별 작업/Gemini 작업 현황.md || contracts/pool-list-response
 30_Development/Agent별 작업/Gemini 작업 현황.md || contracts/types.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || deploy/certs
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/accessibility-status-and-guards.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/agent-eval-runner.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/agent-mutation-guards.test.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/dashboard-runlist-freshness-wiring.test.tsx
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/inv-file-explorer-dom.test.tsx
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/late-mutation-generation-regression.test.tsx
@@ -38,15 +69,31 @@
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/placement-explain.test.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/resource-explorer-dom.test.tsx
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/response-freshness-wiring.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/run-detail-seal-record.test.tsx
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/sse-stream.test.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/storage-observation-contract.test.ts
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/terminal-session-dom.test.tsx
 30_Development/Agent별 작업/Gemini 작업 현황.md || tests/workspace-list-5state-contract.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tools/run_s09_coding_tasks.py
+30_Development/Agent별 작업/Gemini 작업 현황.md || tools/run_s09_golden_eval.py
 30_Development/Claude_CL-01_커널독립검토.md || tools/_definer_rules.py
 30_Development/Claude_통합코드_독립검토.md || src/saintvision/api/v1/results.py
 30_Development/Claude_통합코드_독립검토.md || src/saintvision/services/results.py
 30_Development/Codex 5노드 랩 opt-in lane 정의.md || tools/run_s05_five_node_benchmark.py
 30_Development/Codex 실제 실행 결과 조회 계약.md || src/saintvision/services/results.py
+30_Development/G-03_conformance_결과_API_노출_설계.md || services/projects.py:209
+30_Development/G-04 W3 verify trusted-worker 측정 seam 설계 v1.0.md || services/evidence.py:73
+30_Development/G-04 W3 verify trusted-worker 측정 seam 설계 v1.0.md || services/lineage.py:279
+30_Development/G-04 W3 verify trusted-worker 측정 seam 설계 v1.0.md || services/resolver.py:37 resolve_location
+30_Development/G-04 W3 verify trusted-worker 측정 seam 설계 v1.0.md || services/verification.py:74
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/context.py:165 build_bundle
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/eval_execution.py:240 run_suite
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/evaluation.py:130 start_eval_run
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/lineage.py:184 register_model_version
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/projects.py:204
+30_Development/G-04_G-05 business lane route 통합 설계 v1.0.md || services/records.py:41 seal_run_record
+30_Development/G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0.md || services/eval_execution.py
+30_Development/G-11 hosted CLI provision 설계 v1.0.md || tools/cli-conformance/package.json
 30_Development/History/2026-09-09_17-45-00_KST_S01-FE_Gemini_완료보고.md || src/index.css
 30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/approval.test.ts
 30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/governance-rules.test.ts
@@ -218,9 +265,29 @@
 30_Development/History/2026-09-23_02-06-00_KST_S05_5노드_lane_실행계획_Codex.md || tools/run_s05_five_node_benchmark.py
 30_Development/History/2026-09-23_02-06-00_KST_S05_5노드_lane_실행계획_Codex.md || tools/run_s06_five_node_journey.py
 30_Development/History/2026-09-23_04-45-00_KST_Codex카드19_legacy큐깊이_4143f375_독립검토_Claude.md || src/inv
+30_Development/History/2026-09-28_10-00-00_KST_VF트랙_독립검토_대장_Claude.md || migrations/versions/0007~0046
+30_Development/History/2026-09-28_10-00-00_KST_VF트랙_독립검토_대장_Claude.md || src/saintvision/demo_server.py
+30_Development/History/2026-09-28_10-41-29_KST_S05_S06_FE_Gemini_제품결함_감사_및_수정.md || tests/s05-s06-defect-fixes.test.tsx (8 tests)
+30_Development/History/2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정.md || tests/browser-matrix-acceptance.test.tsx
+30_Development/History/2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정.md || tests/release-candidate.test.ts
+30_Development/History/2026-09-28_13-05-00_KST_S11_FE_Gemini_제품결함_수정.md || tests/s11-defect-fixes.test.tsx
+30_Development/History/2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini.md || tests/fixtures/prompts_100.json
+30_Development/History/2026-09-28_15-55-00_KST_G-07_Eval러너_구현_Gemini.md || tests/agent-eval-runner.test.ts
+30_Development/History/2026-09-28_15-55-00_KST_G-07_Eval러너_구현_Gemini.md || tests/agent-mutation-guards.test.ts
+30_Development/History/2026-09-28_18-37-52_KST_G-04_W3_verify_측정_seam_설계_Claude.md || services/lineage.py:279
+30_Development/History/2026-09-28_20-25-00_KST_G-07_Eval러너_136_병합_및_루프카운트_정합_Gemini.md || tests/agent-eval-runner.test.ts
+30_Development/History/2026-09-28_20-25-00_KST_G-07_Eval러너_136_병합_및_루프카운트_정합_Gemini.md || tests/agent-mutation-guards.test.ts
+30_Development/History/2026-09-28_20-50-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r2_Codex_Gemini.md || tests/run-detail-seal-record.test.tsx
+30_Development/History/2026-09-28_21-22-00_KST_G04_RunDetail_Seal_Record_Panel_Claude_r3_Gemini.md || tests/run-detail-seal-record.test.tsx
+30_Development/History/2026-09-28_G-03_conformance_API_설계_Claude.md || contracts/types.ts:444
+30_Development/History/2026-09-28_G-04_W2_model_version_등록_구현_Claude.md || services/lineage.py
 30_Development/PR14 업무 연결과 실행 커널 통합 선행 검토.md || services/handoff.py
 30_Development/PR14 업무 연결과 실행 커널 통합 선행 검토.md || src/saintvision/api/v1/execution.py
 30_Development/S05 log_lock_waits opt-in 재실행 설계.md || .github/workflows/s05-lock-wait-diagnostic.yml
+30_Development/S10-BE MLflow 연동 설계 v1.0.md || services/evidence.py:113
+30_Development/S10-DB_lineage_조회_API_설계.md || services/projects.py:204
+30_Development/VF-CL-03_import_adapter_요청경로_결속_설계.md || contracts/model-release-result.schema.json
+30_Development/VF-CL-03_import_adapter_요청경로_결속_설계.md || services/projects.py:199
 30_Development/VF-CL-04 replica 복구와 PITR 운영 runbook.md || services/replica_repair.fleet_replica_summary(tenant, desired)
 30_Development/단계별 개발 계획.md || contracts/workload.schema.json
 40_Governance/Claude 구현 인계 - Codex 검토 요청.md || services/context.py
