@@ -481,6 +481,38 @@ def test_bak02_kill_after_label_removal_resumes_from_external_marker(tmp_path, m
     assert list(backups.glob(".pitr-retention-removing-*")) == []
 
 
+def test_bak02_marker_publish_is_atomic_and_interrupted_temp_never_blocks_resume(
+    tmp_path, monkeypatch
+):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_replace = retention.os.replace
+    interrupted = False
+
+    def interrupt_marker_publish(source, destination):
+        nonlocal interrupted
+        if not interrupted and Path(destination).name.startswith(".pitr-retention-removing-"):
+            interrupted = True
+            assert Path(source).read_bytes()
+            assert not Path(destination).exists()
+            raise KeyboardInterrupt
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(retention.os, "replace", interrupt_marker_publish)
+    with pytest.raises(KeyboardInterrupt):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert list(backups.glob(".pitr-retention-removing-*")) == []
+    assert list(backups.glob("..pitr-retention-removing-*.tmp-*")) == []
+    assert (backups / "old" / "backup_label").is_file()
+
+    monkeypatch.setattr(retention.os, "replace", real_replace)
+    current = retention.plan(
+        retention.load_archive(archive), retention.load_backups(backups), retention_days=7, now=NOW
+    )
+    retention.apply(current, archive, backups, journal_path=journal)
+    assert not (backups / "old").exists()
+    assert retention.load_apply_receipt(journal)["status"] == "completed"
+
+
 @pytest.mark.skipif(sys.platform != "linux", reason="Linux directory ctime repair boundary")
 def test_bak02_permission_repair_does_not_wedge_resume(tmp_path, monkeypatch):
     archive, backups, planned, journal = _interrupt_before_first_delete(

@@ -389,8 +389,9 @@ def _ensure_backup_removal_marker(journal: dict, target: dict, backups_dir: Path
     if _path_exists_no_follow(marker):
         _validate_backup_removal_marker(journal, target, backups_dir)
         return
+    temporary = backups_dir / f".{marker.name}.tmp-{os.getpid()}-{uuid4().hex}"
     fd = os.open(
-        marker,
+        temporary,
         os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
         0o600,
     )
@@ -399,14 +400,15 @@ def _ensure_backup_removal_marker(journal: dict, target: dict, backups_dir: Path
             stream.write(_removal_marker_body(journal, target))
             stream.flush()
             os.fsync(stream.fileno())
+        # Publish only complete bytes.  A hard stop before replace can leave an
+        # unreferenced temporary file, never a torn authoritative marker.
+        os.replace(temporary, marker)
         _fsync_directory(backups_dir)
-    except BaseException:
+    finally:
         try:
-            os.unlink(marker)
-            _fsync_directory(backups_dir)
-        except OSError:
+            os.unlink(temporary)
+        except FileNotFoundError:
             pass
-        raise
 
 
 def _clear_backup_removal_marker(journal: dict, target: dict, backups_dir: Path) -> None:
