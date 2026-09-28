@@ -170,6 +170,9 @@ jobs:
               # S05 lock-wait evidence is a separately approved two-wave diagnostic.
               # Normal Backend collection must expose, but never execute, that load.
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              # S10-BE stage 2: the live MLflow conformance file runs only in the run-mlflow
+              # lane (INV_MLFLOW_LIVE_URI); in this job it skips, visibly, 3 cases.
+              'Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)': 3,
           })
           actual_skips = Counter(
               (skipped.get('message') or '').strip()
@@ -179,3 +182,46 @@ jobs:
               f'backend skip distribution drifted: expected={expected_skips}, actual={actual_skips}'
           )
           PY
+
+  # Opt-in live lane (S10-BE stage 2): the real MLflow tracking server in a
+  # container, the real sink, the real conformance suite. Costs a runner and a
+  # container pull, so it runs only with the ``run-mlflow`` label (or on
+  # pushes to main/integration and manual dispatch), the ``run-core`` pattern.
+  # The image is pinned by tag here; pinning by digest is for the workflow
+  # owner to set once the tag has been verified (recorded as NOT_OBSERVED in
+  # the PR until then).
+  mlflow-live:
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.labels.*.name, 'run-mlflow')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MLFLOW_IMAGE: ghcr.io/mlflow/mlflow:v2.17.2
+      INV_MLFLOW_LIVE_URI: http://127.0.0.1:5000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-backend.txt
+            requirements-test.txt
+      - run: python -m pip install -r requirements-backend.txt
+      - name: Start the MLflow tracking server
+        run: |
+          docker pull --platform linux/amd64 "$MLFLOW_IMAGE"
+          docker run --detach --rm --platform linux/amd64             --name saintvision-mlflow-live             --publish 127.0.0.1:5000:5000             "$MLFLOW_IMAGE" mlflow server --host 0.0.0.0 --port 5000               --backend-store-uri sqlite:////tmp/mlflow.db --default-artifact-root /tmp/mlruns
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:5000/health > /dev/null; then
+              break
+            fi
+            if test "$attempt" = 60; then
+              docker logs saintvision-mlflow-live
+              exit 1
+            fi
+            sleep 1
+          done
+      - name: Live tracking-sink conformance against the real server
+        run: python -m pytest -q -p no:randomly tests/integration/test_mlflow_live_conformance.py
