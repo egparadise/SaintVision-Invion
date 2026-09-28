@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S11-AC11-REGISTRY-REPIN-001"
 title: "S11 AC-11 PITR target registry 재고정"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:05:53+09:00"
+updated: "2026-09-28T16:23:43+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 reviewer: "Claude"
@@ -37,6 +37,7 @@ reviewer: "Claude"
 ## 경계와 후속
 
 - 공개 HTTP 계약·migration은 바꾸지 않았다. S11-ST parent는 S10 선행 task가 미완료라 `planned`를 유지한다.
+- #177의 정본 restore artifact(run `36379743674`, artifact `10952510591`, source `abe8435a`)는 old registry blob `99e64cb4…`에 결속돼 있다. #192의 importer와 aggregator는 새 pin `e8c01340…`이 없는 이 artifact와 이미 import한 봉투를 의도대로 `INVALID_RUN`으로 거부한다. 따라서 #177 restore 증거는 `e8c01340…`을 포함하는 release SHA에서 재생성해야 하며, 과거 CLI exit 0을 release evidence로 재사용하지 않는다.
 - task registry는 고정 sprint task schema라 synthetic card row를 추가하지 않고 이 History와 [[Codex 작업 현황]]에서 카드 ID를 추적한다.
 - stage-1 aggregator가 metric별 `value` 의미를 재계산하지 않는 R12는 다음 §8-3 storage importer 카드에서 machine-readable semantics를 registry에 둘지 importer-only derivation으로 둘지 결정한다.
 - 다음 구현은 PG-free raw producer·storage importer이며 universe 22, PG-free 12, hosted 10 identity와 exact 분류를 부정 시험으로 고정한다.
