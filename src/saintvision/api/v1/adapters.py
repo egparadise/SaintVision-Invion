@@ -23,11 +23,13 @@ advice.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from ...adapters import agents
 from ...identity.principal import Principal
+from .. import schemas
 from ..deps import get_principal
+from ..problem import RES_NOT_FOUND, CanonicalProblem
 
 router = APIRouter(prefix="/v1", tags=["adapters"])
 
@@ -61,15 +63,25 @@ def list_adapters(principal: Principal = Depends(get_principal)) -> dict:
     }
 
 
-@router.get("/adapters/{name}")
+@router.get("/adapters/{name}", response_model=schemas.AdapterReadinessResponse)
 def read_adapter(name: str, principal: Principal = Depends(get_principal)) -> dict:
+    """One tool's state, or the canonical refusal.
+
+    The 404 is the canonical ``ProblemDetails`` (``RES-0004``), the same body
+    ``model_release`` and the lineage reads give. #180 pinned the old
+    ``HTTPException`` shape -- ``{"detail": "unknown adapter: ..."}``, with no
+    ``code`` and no ``type`` -- deliberately, as a record of what was served; this
+    replaces it, and that test is updated in the same commit rather than deleted.
+
+    **The name is not echoed.** The old detail repeated whatever the caller put in
+    the path, which puts caller-controlled text in a body a screen renders. The
+    canonical detail is fixed, and the name is in the request the caller already
+    has.
+    """
     try:
         adapter = agents.adapter_for(name)
     except KeyError:
-        raise HTTPException(
-            status_code=404,
-            detail=f"unknown adapter: {name}",
-        ) from None
+        raise CanonicalProblem(RES_NOT_FOUND, 404, "No such adapter.") from None
     probe = adapter.probe()
     return {
         **adapter.readiness(),

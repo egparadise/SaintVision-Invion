@@ -12,7 +12,7 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
 
@@ -821,6 +821,52 @@ class ModelVersionResponse(Strict):
     byte_size: int = Field(ge=0, alias="byteSize")
     uri: str = Field(min_length=1)
     created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class AdapterReadinessResponse(Strict):
+    """One agent CLI's install, login and reachability state (G-01 follow-up).
+
+    #180 recorded that both adapter routes were declared ``-> dict``, so
+    ``export_schemas`` generated nothing for them and a change to the response
+    shape broke no gate. This closes that for the single-adapter route, where the
+    shape is one row and has no variants.
+
+    The fields and their types are **observed**, not inferred: ``agents.readiness()``
+    was run and its rows read (eleven keys, the same key set for all four tools),
+    and ``probe()`` was run for ``reachable`` and ``latencyMs``. The nullable ones
+    are nullable because the tool may be absent (``path``, ``version``), present
+    elsewhere (``installedElsewhere``) or have nothing to say
+    (``instructions``, ``latencyMs`` when unreachable).
+
+    ``loginDetail`` is the one unbounded field: it is whatever the adapter's
+    ``login_state()`` returned, which comes from CLI output. Declaring it as an
+    open mapping is honest about that rather than pretending a shape; narrowing it
+    -- and deciding whether tool output belongs in a screen-facing response at all
+    -- is a separate question this card does not answer.
+
+    The **list** route keeps ``-> dict`` on purpose. Its rows have two shapes: the
+    eleven-key row above, and a five-key row when one tool raises
+    (``adapter``, ``executable``, ``installed``, ``loginState``, ``error``). A
+    response model would fill the missing keys with defaults and so change the
+    wire shape a screen sees for a broken tool, which is a public change owned by
+    the frontend rather than a side effect of canonicalising a 404.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64)
+    executable: str = Field(min_length=1, max_length=128)
+    installed: bool
+    path: str | None = None
+    installed_elsewhere: str | None = Field(default=None, alias="installedElsewhere")
+    version: str | None = None
+    login_state: str = Field(pattern="^(logged_in|logged_out|unknown)$", alias="loginState")
+    login_detail: dict[str, Any] = Field(default_factory=dict, alias="loginDetail")
+    headless: bool
+    missing: list[str] = Field(default_factory=list)
+    instructions: str | None = None
+    reachable: bool
+    latency_ms: int | None = Field(default=None, ge=0, alias="latencyMs")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
