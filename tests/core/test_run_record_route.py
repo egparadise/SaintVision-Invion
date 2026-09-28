@@ -102,6 +102,15 @@ def build(monkeypatch, world):
     from saintvision.api.deps import get_session
 
     app.dependency_overrides[get_session] = lambda: session
+    # The shared denial recorder writes through the app's engine, which these
+    # tests do not have; recorded here so a 403's audit call is asserted, not lost.
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(
+        app_module,
+        "record_denial_out_of_band",
+        lambda _engine, **kwargs: world.setdefault("denials_recorded", []).append(kwargs),
+    )
 
     calls = world.setdefault("access_calls", [])
 
@@ -194,12 +203,9 @@ def test_without_a_credential_the_route_is_401_and_the_denial_is_audited_before_
     """The app records every AUTH denial out of band; that writer touches the
     engine, which this harness cannot provide, so it is captured here. What the
     route contributes is only that nothing of its own runs before the denial."""
-    from saintvision.api import app as app_module
-
-    denials = []
-    monkeypatch.setattr(app_module, "record_denial_out_of_band", lambda engine, **fields: denials.append(fields))
     world: dict = {}
-    client = build(monkeypatch, world)
+    client = build(monkeypatch, world)          # the harness captures the recorder in world["denials_recorded"]
+    denials = world.setdefault("denials_recorded", [])
     response = client.get(PATH)
     assert response.status_code == 401, response.text
     body = response.json()                      # legacy InvError shape on the auth boundary, not CanonicalProblem
