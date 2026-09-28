@@ -14,7 +14,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from pydantic import field_validator, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
 
 
 class Strict(BaseModel):
@@ -821,6 +821,102 @@ class ModelVersionResponse(Strict):
     byte_size: int = Field(ge=0, alias="byteSize")
     uri: str = Field(min_length=1)
     created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunStartRequest(Strict):
+    """What a caller may choose when starting an eval run (G-05 W5).
+
+    Three fields, and what is *absent* matters as much as what is here.
+
+    ``adapter`` is a **name**, not an endpoint or a credential. The server resolves
+    it through ``adapters.agents.adapter_for``, whose ``BY_NAME`` is the configured
+    allowlist, so a caller can pick one of the platform's four CLIs and nothing
+    else. A request that could name a URL would let the caller point this route --
+    which spends money -- at a host of their choosing.
+
+    ``componentVersions`` is part of the run's identity: "the agent scored 72%"
+    means nothing without which prompt, context and model produced it. It is
+    bounded, and the three keys the service fills in itself are **refused**:
+    ``run_suite`` merges them with ``setdefault``, so a caller who sent
+    ``{"adapter": "something-else"}`` would have their own value recorded as the
+    identity of the run. Refusing them is the only place that can be stopped
+    without changing the service's signature.
+
+    ``requireModelPinning`` defaults to **true**, which is the service's own
+    default: a score from an adapter that cannot say which model build produced it
+    is not reproducible. Passing false is allowed and is recorded on the run
+    (``modelPinned: "false"``) rather than merely decided at the call site.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64, pattern="^[a-z0-9-]+$")
+    require_model_pinning: bool = Field(default=True, alias="requireModelPinning")
+    component_versions: dict[str, str] = Field(
+        default_factory=dict, alias="componentVersions", max_length=32
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinRequest(Strict):
+    """What a caller asks of W4: keep this version at least until ``until``.
+
+    One field, because ``pin_retention`` takes one: the service decides what the
+    request means (extend, never shorten). The instant must carry an offset --
+    a naive time would be compared with the stored aware value by whatever the
+    driver assumes, and "retained until when?" is not a question to answer with
+    an assumption.
+    """
+
+    until: AwareDatetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunResponse(Strict):
+    """The finished run, by identity and by count.
+
+    No case content and no model output: ``eval_results.observed`` is a redacted
+    summary and this response does not carry even that. What a caller needs from
+    starting a run is which run it was and whether it passed.
+
+    ``passedGate`` is its own field rather than something a reader derives from
+    the counts, because the row's own rule is stricter than "passed == total": a
+    run with any forbidden-behaviour violation is not a pass whatever the score
+    says.
+    """
+
+    eval_run_id: str = Field(alias="evalRunId")
+    suite_id: str = Field(alias="suiteId")
+    status: Literal["running", "completed", "aborted"]
+    total_cases: int = Field(ge=0, alias="totalCases")
+    passed_cases: int = Field(ge=0, alias="passedCases")
+    violations: int = Field(ge=0)
+    passed_gate: bool = Field(alias="passedGate")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    started_at: dt.datetime = Field(alias="startedAt")
+    ended_at: dt.datetime | None = Field(default=None, alias="endedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinResponse(Strict):
+    """The version's retention after the request was judged.
+
+    ``retentionPinnedUntil`` is the committed value, which is the requested one
+    only when it extended the pin; ``extended`` says which, so a no-op is
+    visible to the caller instead of looking like success by coincidence.
+    ``stage`` is whatever the row is in -- a released version can still be
+    extended (design §5-3) -- and is the closed set the column allows.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft", "candidate", "released", "retired"]
+    retention_pinned_until: AwareDatetime = Field(alias="retentionPinnedUntil")
+    extended: bool
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
