@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.134"
+version: "1.0.135"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T23:55:00+09:00"
+updated: "2026-09-29T00:20:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,34 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T23:55:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Claude UI r3 및 Codex Release 멱등 경계 조치 완결).
+- 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
+## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #219 `4743b3d7` 위 Codex r4 닫힘 기준 2번 전수 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Codex r4 F1 닫힘 기준 2번 전수 반영)**:
+  1. **Release 쓰기 UI fail-closed 미노출 (카드 113 대기)**:
+     - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않으므로 FE 헤더 기반 멱등 주장이 성립하지 않음을 확인.
+     - 서버 계약이 생길 때까지 쓰기 UI를 fail-closed로 미노출: 제출 버튼 `disabled={true}`, `aria-disabled="true"`, 배너 및 버튼에 `서버 멱등 계약 대기(카드 113)` 안내 표출 (`data-testid="banner-release-pending-idempotency"`).
+     - `handleReleaseModel`에서 카드 113 대기 안내와 함께 조기 반환(`setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.')`).
+     - 서버 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+  2. **Release 요청의 Idempotency-Key 헤더 및 멱등 주장 제거**:
+     - `releaseModelVersion` API 클라이언트에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전면 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 제거.
+  3. **시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
+     - 시험 4: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 미전송 및 200 응답 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+- **실측 검증**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.4.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 계속 진행.
 
 ## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r3 및 Codex Release 멱등 경계·Path 회전 전수 조치 (`agent/gemini/g05-fe-model-registry`, PR #219)
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-FE-MODEL-REGISTRY-001"
 title: "G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증"
-version: "1.3.0"
+version: "1.4.0"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T23:55:00+09:00"
+updated: "2026-09-29T00:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05"]
@@ -162,3 +162,31 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
   - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+
+## 7. Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기)
+
+- **배경**:
+  - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않아 FE 헤더 기반 멱등 주장이 성립하지 않음을 Codex r4에서 지적함.
+  - Codex 닫힘 기준 2번에 따라, 서버 계약이 확립될 때까지 release 쓰기 UI를 fail-closed로 미노출하고, 헤더 및 멱등 주장을 제거하기로 결정.
+- **상세 조치 내역**:
+  1. **Release 쓰기 UI fail-closed 미노출**:
+     - `ModelLineageView.tsx`: 모델 릴리스 제출 버튼을 `disabled={true}`, `aria-disabled="true"`로 영구 비활성화하고, 버튼 레이블에 `모델 릴리스 (POST /release) — 서버 멱등 계약 대기(카드 113)` 명시.
+     - 배너(`data-testid="banner-release-pending-idempotency"`)를 추가하여 `⚠️ 서버 멱등 계약 대기(카드 113): 백엔드 release route(model_release.py)의 Idempotency-Key 처리 계약이 수립될 때까지 쓰기 작업이 fail-closed로 비활성화됩니다.` 안내 제공.
+     - `handleReleaseModel` 핸들러 시작부에 fail-closed 가드를 배치하여 호출 시 즉시 차단 및 `setGeneralError` 에러 배너 표출.
+  2. **Idempotency-Key 헤더 및 멱등 주장 전면 제거**:
+     - `releaseModelVersion` API 클라이언트(`apps/web/src/shared/api/modelRegistryObservation.ts`)에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전송 코드 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 및 관련 멱등키 생성 로직 전면 제거.
+  3. **회귀 시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - `apps/web/tests/model-registry-business-routes.test.tsx`의 시험 20에서 릴리스 멱등키 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태(버튼 disabled/aria-disabled, 안내 문구 표출, 클릭/폼제출 시 /release 네트워크 호출 0건, 되돌리면 실패)를 고정하는 시험으로 전면 전환.
+     - 시험 4: `releaseModelVersion` 클라이언트 함수 직접 호출 시 `Idempotency-Key` 헤더 미전송 및 200 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+  4. **후속 배정 연계**:
+     - 릴리스 서버 멱등 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms).
+  - 웹 전체: 80 test files, 751 passed (23.69s, 0 failures).
+  - TypeScript: `npx tsc -b` 0 errors.
+  - 빌드: `npm run build` dist 번들 정상 생성 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.

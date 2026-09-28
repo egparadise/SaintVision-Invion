@@ -6,6 +6,7 @@ import { act } from 'react';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import { isProblemDetails } from '../src/shared/api/client';
 import {
+  modelRegistryObservation,
   isModelLineageTraceResponse,
   isModelVersionResponse,
   isRetentionPinResponse,
@@ -342,8 +343,8 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(banner?.textContent).toContain('보존 고정 판정 완료 (200 OK)');
   });
 
-  // 4. Model Release Route
-  it('releases model version via POST /release with declaration and renders 200 response', async () => {
+  // 4. Model Release Route Client
+  it('calls releaseModelVersion via POST /release without Idempotency-Key and parses 200 response', async () => {
     let capturedUrl = '';
     let capturedMethod = '';
     let capturedHeaders: Record<string, string> = {};
@@ -357,6 +358,10 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
         init.headers.forEach((v, k) => {
           capturedHeaders[k.toLowerCase()] = v;
         });
+      } else if (init?.headers) {
+        Object.entries(init.headers).forEach(([k, v]) => {
+          capturedHeaders[k.toLowerCase()] = String(v);
+        });
       }
       return Promise.resolve(
         new Response(JSON.stringify(validReleaseResponse), {
@@ -366,46 +371,23 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       );
     });
 
-    await act(async () => {
-      root.render(
-        <ModelLineageView
-          projectId="prj_alpha"
-          initialModelId="mdl_01JLLAMA30000000000000000"
-          initialVersion="1.0.0-rc1"
-          currentUser={{ canApprove: true }}
-        />
-      );
-    });
-
-    const tabs = container.querySelectorAll('button');
-    const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
-    expect(releaseTabBtn).toBeDefined();
-
-    await act(async () => {
-      releaseTabBtn?.click();
-    });
-
-    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
-    expect(releaseBtn.disabled).toBe(false);
-
-    await act(async () => {
-      releaseBtn.click();
-    });
+    const res = await modelRegistryObservation.releaseModelVersion(
+      'prj_alpha',
+      'mdl_01JLLAMA30000000000000000',
+      '1.0.0-rc1',
+      { licensePolicy: 'Apache-2.0', classification: 'internal' }
+    );
 
     expect(capturedMethod).toBe('POST');
     expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0-rc1/release');
-    // Model Release must send Idempotency-Key
-    const relKey = capturedHeaders['idempotency-key'] || capturedHeaders['Idempotency-Key'];
-    expect(relKey).toBeDefined();
-    expect(relKey).toMatch(/^[A-Za-z0-9._:-]{1,128}$/);
+    // Release does NOT consume Idempotency-Key on server until Card 113
+    expect(capturedHeaders['idempotency-key']).toBeUndefined();
 
     const parsedBody = JSON.parse(capturedBody);
     expect(parsedBody.licensePolicy).toBe('Apache-2.0');
     expect(parsedBody.classification).toBe('internal');
-
-    const banner = container.querySelector('[data-testid="registry-release-success"]');
-    expect(banner).not.toBeNull();
-    expect(banner?.textContent).toContain('모델 릴리스 완료 (200 OK)');
+    expect(res.version).toBe('1.0.0-rc1');
+    expect(res.stage).toBe('released');
   });
 
   // 5. RFC 9457 Problem Details: 409 Conflict with exact server detail string (Claude G5)
@@ -444,14 +426,19 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     });
 
     const tabs = container.querySelectorAll('button');
-    const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
+    const pinTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('보존 고정'));
     await act(async () => {
-      releaseTabBtn?.click();
+      pinTabBtn?.click();
     });
 
-    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    const untilInput = container.querySelector('[data-testid="input-pin-until"]') as HTMLInputElement;
     await act(async () => {
-      releaseBtn.click();
+      setInputValue(untilInput, '2026-12-31T23:59:59Z');
+    });
+
+    const pinBtn = container.querySelector('[data-testid="btn-pin-retention"]') as HTMLButtonElement;
+    await act(async () => {
+      pinBtn.click();
     });
 
     const alert = container.querySelector('[data-testid="registry-problem-alert"]');
@@ -1404,38 +1391,12 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="registry-register-success"]')).toBeNull();
   });
 
-  // 20. Release Idempotency-Key Rotation on Parameter & Path Change (Codex High)
-  it('preserves release Idempotency-Key across retries but rotates upon parameter and path change', async () => {
-    let capturedKeys: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
-      let key = '';
-      if (init?.headers instanceof Headers) {
-        key = init.headers.get('Idempotency-Key') || '';
-      } else if (init?.headers) {
-        key = (init.headers as any)['Idempotency-Key'] || (init.headers as any)['idempotency-key'] || '';
-      }
-      capturedKeys.push(key);
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({
-            type: 'about:blank',
-            title: 'Temporary lock contention',
-            status: 503,
-            code: 'SYS-0001',
-            category: 'SYS',
-            detail: 'Locked; retry later.',
-            retryable: true,
-            traceId: '0123456789abcdef0123456789abcdef',
-            causeRef: null,
-            evidenceId: null,
-          }),
-          {
-            status: 503,
-            headers: { 'Content-Type': 'application/problem+json' },
-          }
-        )
-      );
+  // 20. Release Write UI Fail-Closed Pending Server Idempotency Contract (Card 113)
+  it('strictly keeps release write UI fail-closed pending server idempotency contract (Card 113) with disabled button and no network requests', async () => {
+    let capturedUrls: string[] = [];
+    globalThis.fetch = vi.fn().mockImplementation((url) => {
+      capturedUrls.push(String(url));
+      return Promise.reject(new Error('Should not make any network requests'));
     });
 
     await act(async () => {
@@ -1451,103 +1412,67 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     const tabs = container.querySelectorAll('button');
     const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
+    expect(releaseTabBtn).toBeDefined();
     await act(async () => {
       releaseTabBtn?.click();
     });
 
+    // 1. Release submit button must be strictly disabled and aria-disabled="true"
     const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
-    const policyInput = container.querySelector('[data-testid="input-release-license"]') as HTMLInputElement;
-    const classSelect = container.querySelector('[data-testid="select-release-classification"]') as HTMLSelectElement;
+    expect(releaseBtn).not.toBeNull();
+    expect(releaseBtn.disabled).toBe(true);
+    expect(releaseBtn.getAttribute('aria-disabled')).toBe('true');
 
-    // 1. First submission -> Key 1
+    // 2. Banner and button text must explicitly guide user about Card 113
+    expect(releaseBtn.textContent).toContain('서버 멱등 계약 대기(카드 113)');
+    const banner = container.querySelector('[data-testid="banner-release-pending-idempotency"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('서버 멱등 계약 대기(카드 113)');
+
+    // 3. Attempting to click the button or submit the form must NOT invoke /release
     await act(async () => {
       releaseBtn.click();
     });
-    expect(capturedKeys.length).toBe(1);
-    expect(capturedKeys[0]).toBeTruthy();
-    const key1 = capturedKeys[0];
 
-    // 2. Retry with identical parameters -> Key 2 === Key 1
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(2);
-    expect(capturedKeys[1]).toBe(key1);
+    const releaseForm = releaseBtn.closest('form');
+    if (releaseForm) {
+      await act(async () => {
+        releaseForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      });
+    }
 
-    // 3. Change license policy -> Key 3 rotates
-    await act(async () => {
-      setInputValue(policyInput, 'MIT');
-    });
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(3);
-    expect(capturedKeys[2]).not.toBe(key1);
-    const key3 = capturedKeys[2];
+    const releaseCalls = capturedUrls.filter((u) => u.includes('/release'));
+    expect(releaseCalls.length).toBe(0);
+    expect(container.querySelector('[data-testid="registry-release-success"]')).toBeNull();
 
-    // 4. Retry with new policy -> Key 4 === Key 3
-    await act(async () => {
-      releaseBtn.click();
+    // 4. Verify releaseModelVersion API client does NOT send Idempotency-Key
+    let capturedHeaders: Record<string, string> = {};
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      if (init?.headers instanceof Headers) {
+        init.headers.forEach((v, k) => {
+          capturedHeaders[k.toLowerCase()] = v;
+        });
+      } else if (init?.headers) {
+        Object.entries(init.headers).forEach(([k, v]) => {
+          capturedHeaders[k.toLowerCase()] = String(v);
+        });
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify(validReleaseResponse), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
     });
-    expect(capturedKeys.length).toBe(4);
-    expect(capturedKeys[3]).toBe(key3);
 
-    // 5. Change classification -> Key 5 rotates
-    await act(async () => {
-      classSelect.value = 'public';
-      classSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(5);
-    expect(capturedKeys[4]).not.toBe(key3);
-    const key5 = capturedKeys[4];
+    await modelRegistryObservation.releaseModelVersion(
+      'prj_alpha',
+      'mdl_01JLLAMA30000000000000000',
+      '1.0.0',
+      { licensePolicy: 'Apache-2.0', classification: 'internal' }
+    );
 
-    // 6. Retry with new classification -> Key 6 === Key 5
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(6);
-    expect(capturedKeys[5]).toBe(key5);
-
-    // 7. Change modelId path -> Key 7 rotates
-    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
-    await act(async () => {
-      setInputValue(modelInput, 'mdl_RELROTATEMODEL000000000001');
-    });
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(7);
-    expect(capturedKeys[6]).not.toBe(key5);
-    const key7 = capturedKeys[6];
-
-    // 8. Retry with new model path -> Key 8 === Key 7
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(8);
-    expect(capturedKeys[7]).toBe(key7);
-
-    // 9. Change version path -> Key 9 rotates
-    const versionInput = container.querySelector('[data-testid="input-version"]') as HTMLInputElement;
-    await act(async () => {
-      setInputValue(versionInput, '2.0.0-rel');
-    });
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(9);
-    expect(capturedKeys[8]).not.toBe(key7);
-    const key9 = capturedKeys[8];
-
-    // 10. Retry with new version path -> Key 10 === Key 9
-    await act(async () => {
-      releaseBtn.click();
-    });
-    expect(capturedKeys.length).toBe(10);
-    expect(capturedKeys[9]).toBe(key9);
+    expect(capturedHeaders['idempotency-key']).toBeUndefined();
   });
 
 });
