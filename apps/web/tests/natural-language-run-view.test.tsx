@@ -51,6 +51,13 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
         root.render(<NaturalLanguageRunView />);
       });
 
+      // Persistent live region container exists prior to any action (F1)
+      const initialNotice = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(initialNotice).not.toBeNull();
+      expect(initialNotice?.getAttribute('role')).toBe('status');
+      expect(initialNotice?.getAttribute('aria-live')).toBe('polite');
+      expect(initialNotice?.textContent).toBe('');
+
       // Submit run request first to generate proposed diff
       const submitBtn = Array.from(container.querySelectorAll('button[type="submit"]')).find((b) =>
         b.textContent?.includes('자연어 Run 분석 및 제안 Diff 생성')
@@ -102,6 +109,8 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
 
       // Invariant 1: Screen status badge IMMEDIATELY transitions to REJECTED (REP-03 fix)
       expect(statusBadge?.textContent).toBe('REJECTED');
+      expect(statusBadge?.style.color).toBe('#ff7b72'); // WCAG AA >= 4.5:1 (F2 fix)
+      expect(statusBadge?.style.backgroundColor).toBe('rgba(248, 81, 73, 0.15)');
 
       // Invariant 2: Action notice banner displays BOUNDED_LOOP_EXCEEDED error with role="status" & aria-live="polite"
       const noticeAfterClick3 = container.querySelector('[data-testid="agent-action-notice"]');
@@ -225,6 +234,28 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       return (lighter + 0.05) / (darker + 0.05);
     }
 
+    function compositeRgb(
+      overlayRgb: [number, number, number],
+      alpha: number,
+      baseHex: string
+    ): [number, number, number] {
+      const [br, bg, bb] = parseHex(baseHex);
+      const [or, og, ob] = overlayRgb;
+      return [
+        Math.round(or * alpha + br * (1 - alpha)),
+        Math.round(og * alpha + bg * (1 - alpha)),
+        Math.round(ob * alpha + bb * (1 - alpha)),
+      ];
+    }
+
+    function getContrastRgb(rgb1: [number, number, number], rgb2: [number, number, number]): number {
+      const l1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+      const l2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
+      const lighter = Math.max(l1, l2);
+      const darker = Math.min(l1, l2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
     it('satisfies WCAG AA text contrast ratio (>= 4.5:1) for all foreground colors on dark background', () => {
       const darkBg = '#161b22';
       const codeBg = '#0d1117';
@@ -245,6 +276,122 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
         const ratio = getContrast(item.hex, item.bg);
         expect(ratio).toBeGreaterThanOrEqual(item.min);
       }
+    });
+
+    it('satisfies WCAG AA text contrast ratio (>= 4.5:1) for all badges and banners composited over base backgrounds (F2)', () => {
+      const cardBg = '#161b22';
+      const pageBg = '#090d16';
+
+      // Status badges composited over card background (#161b22)
+      const badges = [
+        {
+          name: 'COMPLETED badge',
+          fgRgb: parseHex('#3fb950'),
+          overlayRgb: [46, 160, 67] as [number, number, number],
+          alpha: 0.2,
+          baseBg: cardBg,
+        },
+        {
+          name: 'REPAIRING badge',
+          fgRgb: parseHex('#58a6ff'),
+          overlayRgb: [56, 139, 253] as [number, number, number],
+          alpha: 0.2,
+          baseBg: cardBg,
+        },
+        {
+          name: 'REJECTED badge (F2 fixed)',
+          fgRgb: parseHex('#ff7b72'), // Primer light red
+          overlayRgb: [248, 81, 73] as [number, number, number],
+          alpha: 0.15,
+          baseBg: cardBg,
+        },
+      ];
+
+      for (const b of badges) {
+        const compositedBg = compositeRgb(b.overlayRgb, b.alpha, b.baseBg);
+        const ratio = getContrastRgb(b.fgRgb, compositedBg);
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+      }
+
+      // Action notice banners composited over page canvas background (#090d16)
+      const banners = [
+        {
+          name: 'error notice',
+          fgRgb: parseHex('#f85149'),
+          overlayRgb: [248, 81, 73] as [number, number, number],
+          alpha: 0.15,
+          baseBg: pageBg,
+        },
+        {
+          name: 'success notice',
+          fgRgb: parseHex('#3fb950'),
+          overlayRgb: [46, 160, 67] as [number, number, number],
+          alpha: 0.15,
+          baseBg: pageBg,
+        },
+        {
+          name: 'info notice',
+          fgRgb: parseHex('#58a6ff'),
+          overlayRgb: [56, 139, 253] as [number, number, number],
+          alpha: 0.15,
+          baseBg: pageBg,
+        },
+      ];
+
+      for (const bn of banners) {
+        const compositedBg = compositeRgb(bn.overlayRgb, bn.alpha, bn.baseBg);
+        const ratio = getContrastRgb(bn.fgRgb, compositedBg);
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    it('kills mutant: previous REJECTED badge (#f85149 on rgba(248, 81, 73, 0.2) over #161b22) fails WCAG AA (< 4.5:1) (F2 mutant kill)', () => {
+      const cardBg = '#161b22';
+      const mutantFg = parseHex('#f85149');
+      const mutantOverlay: [number, number, number] = [248, 81, 73];
+      const mutantAlpha = 0.2;
+
+      const compositedBg = compositeRgb(mutantOverlay, mutantAlpha, cardBg);
+      const ratio = getContrastRgb(mutantFg, compositedBg);
+
+      // Mutated combination yielded 4.04:1 which violates WCAG AA requirement of 4.5:1
+      expect(ratio).toBeLessThan(4.5);
+      expect(ratio).toBeCloseTo(4.04, 1);
+    });
+
+    it('guarantees permanent action notice live region container in DOM for screen reader discovery (F1)', () => {
+      act(() => {
+        root.render(<NaturalLanguageRunView />);
+      });
+
+      // 1. Initial state: Live region is in the DOM before any action, ready for AT registration
+      const initialNotice = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(initialNotice).not.toBeNull();
+      expect(initialNotice?.getAttribute('role')).toBe('status');
+      expect(initialNotice?.getAttribute('aria-live')).toBe('polite');
+      expect(initialNotice?.textContent).toBe('');
+
+      // 2. Perform action to trigger notice
+      const submitBtn = Array.from(container.querySelectorAll('button[type="submit"]')).find((b) =>
+        b.textContent?.includes('자연어 Run 분석 및 제안 Diff 생성')
+      );
+      expect(submitBtn).toBeDefined();
+
+      act(() => {
+        submitBtn?.click();
+      });
+
+      const applyBtn = container.querySelector('[data-testid="agent-apply-diff-btn"]') as HTMLButtonElement;
+      expect(applyBtn).not.toBeNull();
+
+      act(() => {
+        applyBtn.click();
+      });
+
+      // 3. The EXACT SAME live region element in the DOM is reused with content updated
+      const activeNotice = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(activeNotice).toBe(initialNotice);
+      expect(activeNotice?.textContent).toContain('모의 적용 완료');
     });
   });
 });

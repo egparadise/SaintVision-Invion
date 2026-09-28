@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.128"
+version: "1.0.129"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T17:10:00+09:00"
+updated: "2026-09-28T17:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,22 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-23T15:45:00+09:00 (최신 tip `b3a39305`, 작업 브랜치 `agent/gemini/s09-fe-matrix`).
+
+## 2026-09-28 G-07 PR 4 NaturalLanguageRunView 화면 연동 및 Claude UI 결함 F1/F2 조치 완료 (PR #203, `agent/gemini/g07-nl-run-view-ui`)
+
+- **PR**: #203 (https://github.com/egparadise/SaintVision-Invion/pull/203)
+- **베이스 커밋**: `90a2021a` (PR #190 승인 헤드)
+- **카드 67 4대 핵심 요구사항 구현 완료**:
+  - REP-03 상한 초과(3차 클릭) 시 화면 상태 `rejected` 즉시 갱신 및 diff 액션 버튼 DOM 제거.
+  - REP-02/03 클릭 수 = 엔진 초기값 1·`>=` 일치 (제출 후 1/3 → 클릭 1 2/3 → 클릭 2 3/3 → 클릭 3 거절 `BOUNDED_LOOP_EXCEEDED (3)`).
+  - REP-04 승인 결과 알림에 `role="status"` `aria-live="polite"` 신설 및 거버넌스 고지 배너(`agent-unexposed-notice`)와 엄격 분리.
+  - EVL-01 / G-26 KPI 카드 라벨 `합성 · 운영 인수 아님(G-26)` 표기.
+- **Claude UI·시험 축 검토 F1·F2 결함 전수 조치**:
+  - **F1 (접근성)**: `agent-action-notice` live region을 영구 렌더링 컨테이너로 DOM에 유지하여 스크린리더 공지 누락(announcement drop) 차단. 초기 마운트 시 컨테이너 존재 및 갱신 후 동일 DOM 참조 재사용 단언.
+  - **F2 (대비비)**: `REJECTED` 배지 색상을 Primer 다크모드 전용 `#ff7b72` 및 `rgba(248, 81, 73, 0.15)`로 보정하여 카드 배경 `#161b22` 위 **5.79:1** (≥ 4.5:1, WCAG AA) 달성. 알파 블렌딩 합성 함수를 통한 전 배지/배너 실측 검증 및 이전 변이 색상 조합(4.04:1) 사살 테스트 완료.
+- **백엔드/러너/픽스처 변경 0건**: 프런트엔드 컴포넌트 및 단위 시험만 수정되어 PR #190 증거 파일 재생성 불요.
+- **실측 검증**: Hosted/로컬 vitest 81 test files / 723 passed, `tsc -b` 통과, `npm run build` 통과, `pytest tests/test_route_coverage.py` 39 passed, `check_frontend_integrity.py` 0 violations, `check_docs.py` PASS.
+- **정본 기록**: [[2026-09-28_17-45-00_KST_G-07_PR4_화면연동_Gemini]] (`HIST-G07-004`).
 
 ## 2026-09-23 S09-FE 100 Prompt·30 Coding Eval 러너 및 자연어 요청·예산·Diff UI 시나리오 매트릭스 v1.1.1 개정 (docs-only, `agent/gemini/s09-fe-matrix`)
 

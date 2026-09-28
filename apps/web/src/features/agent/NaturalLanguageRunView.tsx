@@ -151,41 +151,43 @@ export const NaturalLanguageRunView: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Notification Banner */}
-      {actionNotice && (
-        <div
-          data-testid="agent-action-notice"
-          role="status"
-          aria-live="polite"
-          style={{
-            padding: '12px 18px',
-            borderRadius: '6px',
-            fontSize: '13px',
-            fontWeight: 500,
-            backgroundColor:
-              actionNotice.type === 'error'
-                ? 'rgba(248, 81, 73, 0.15)'
-                : actionNotice.type === 'success'
-                ? 'rgba(46, 160, 67, 0.15)'
-                : 'rgba(56, 139, 253, 0.15)',
-            border: `1px solid ${
-              actionNotice.type === 'error'
-                ? '#f85149'
-                : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff'
-            }`,
-            color:
-              actionNotice.type === 'error'
-                ? '#f85149'
-                : actionNotice.type === 'success'
-                ? '#3fb950'
-                : '#58a6ff',
-          }}
-        >
-          {actionNotice.text}
-        </div>
-      )}
+      {/* Action Notification Banner (Permanent live region container for screen reader announcements) */}
+      <div
+        data-testid="agent-action-notice"
+        role="status"
+        aria-live="polite"
+        style={
+          actionNotice
+            ? {
+                padding: '12px 18px',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: 500,
+                backgroundColor:
+                  actionNotice.type === 'error'
+                    ? 'rgba(248, 81, 73, 0.15)'
+                    : actionNotice.type === 'success'
+                    ? 'rgba(46, 160, 67, 0.15)'
+                    : 'rgba(56, 139, 253, 0.15)',
+                border: `1px solid ${
+                  actionNotice.type === 'error'
+                    ? '#f85149'
+                    : actionNotice.type === 'success'
+                    ? '#3fb950'
+                    : '#58a6ff'
+                }`,
+                color:
+                  actionNotice.type === 'error'
+                    ? '#f85149'
+                    : actionNotice.type === 'success'
+                    ? '#3fb950'
+                    : '#58a6ff',
+              }
+            : undefined
+        }
+      >
+        {actionNotice?.text}
+      </div>
 
       {/* Natural Language Requester and Diff Review Split View */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -368,13 +370,13 @@ export const NaturalLanguageRunView: React.FC = () => {
                     activeRequest.status === 'completed'
                       ? 'rgba(46, 160, 67, 0.2)'
                       : activeRequest.status === 'rejected'
-                      ? 'rgba(248, 81, 73, 0.2)'
+                      ? 'rgba(248, 81, 73, 0.15)'
                       : 'rgba(56, 139, 253, 0.2)',
                   color:
                     activeRequest.status === 'completed'
                       ? '#3fb950'
                       : activeRequest.status === 'rejected'
-                      ? '#f85149'
+                      ? '#ff7b72'
                       : '#58a6ff',
                 }}
               >
