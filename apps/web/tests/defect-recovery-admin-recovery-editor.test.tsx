@@ -385,6 +385,416 @@ describe('화면 결함 5대 부류 치유 트랙 2차 (Priority 4: 관리자 �
       expect(parsedBody.approvalId).toBe('11111111-2222-4333-8444-555555555555');
     });
 
+    it('동일한 노드·의도·승인ID의 재시도 시 동일한 Idempotency-Key와 동일한 payload(expectedVersion 포함)를 재전송한다', async () => {
+      let postCount = 0;
+      let controlCallCount = 0;
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          controlCallCount++;
+          // Invariant: If code erroneously re-queries /control on retry, it returns version 8 instead of 7
+          return { version: controlCallCount === 1 ? 7 : 8, killSwitchActive: false, nodeStatus: 'online' } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          postCount++;
+          if (postCount === 1) {
+            // First call fails with 503 network error
+            const problem = {
+              type: 'about:blank',
+              title: 'Transient network failure',
+              status: 503,
+              code: 'NET-0503',
+              category: 'NET',
+              detail: 'Connection reset by peer',
+              retryable: true,
+              traceId: '0123456789abcdef0123456789abcdef',
+            };
+            throw new client.ApiError(problem as any);
+          }
+          return {
+            requestId: 'req_drain_retry_success',
+            operation: 'drain',
+            control: { nodeStatus: 'draining', version: 8 },
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // Switch to Drain tab
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // Enter approval UUID
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      // 1st attempt (fails with 503)
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      const firstDrainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
+      expect(firstDrainCall).toBeDefined();
+      const firstKey = firstDrainCall?.[1]?.idempotencyKey;
+      const firstBody = JSON.parse(firstDrainCall?.[1]?.body);
+      expect(firstKey).toBeDefined();
+      expect(firstBody.expectedVersion).toBe(7);
+
+      // 2nd attempt (same operation retry)
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Invariant: Retrying MUST NOT re-query /control! Exactly 1 call.
+      const controlCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/control'));
+      expect(controlCalls).toHaveLength(1);
+      expect(controlCallCount).toBe(1);
+
+      const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
+      expect(drainCalls).toHaveLength(2);
+      const secondKey = drainCalls[1]?.[1]?.idempotencyKey;
+      const secondBody = JSON.parse(drainCalls[1]?.[1]?.body);
+
+      // Invariant: Retrying MUST reuse the exact same Idempotency-Key AND identical payload (including expectedVersion)
+      expect(secondKey).toBe(firstKey);
+      expect(secondBody).toEqual(firstBody);
+      expect(secondBody.expectedVersion).toBe(7);
+    });
+
+    it('409 GRAPH-0003 최종 실패 뒤 재클릭 시 캐시를 삭제하고 /control을 다시 조회하여 최신 expectedVersion으로 요청한다', async () => {
+      let controlCallCount = 0;
+      let drainCallCount = 0;
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string, options?: any) => {
+        if (endpoint.includes('/control')) {
+          controlCallCount++;
+          // First query returns stale version 7, second query returns refreshed version 8
+          return {
+            version: controlCallCount === 1 ? 7 : 8,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+          } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          drainCallCount++;
+          if (drainCallCount === 1) {
+            // First call fails with 409 Conflict GRAPH-0003 (non-retryable final failure)
+            const problem = {
+              type: 'about:blank',
+              title: 'Conflict',
+              status: 409,
+              code: 'GRAPH-0003',
+              category: 'GRAPH',
+              detail: 'Control version conflict: expected version 7 differs from server',
+              retryable: false,
+              traceId: '0123456789abcdef0123456789abcdef',
+            };
+            throw new client.ApiError(problem as any);
+          }
+          // Second call succeeds with updated version 8
+          return {
+            requestId: 'req_drain_recovered_after_409',
+            operation: 'drain',
+            control: { nodeStatus: 'draining', version: 9 },
+            approvalId: '550e8400-e29b-41d4-a716-446655440000',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // Switch to Drain tab
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      // Enter approval UUID
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      // 1st attempt: fails with 409 Conflict
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Verify 409 error banner is displayed
+      const errorBanner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+      expect(errorBanner?.textContent).toContain('GRAPH-0003 (409)');
+
+      const firstDrainCall = apiClientSpy.mock.calls.find((c) => c[0].includes('/drain'));
+      expect(firstDrainCall).toBeDefined();
+      const firstKey = firstDrainCall?.[1]?.idempotencyKey;
+      const firstBody = JSON.parse(firstDrainCall?.[1]?.body);
+      expect(firstBody.expectedVersion).toBe(7);
+
+      // 2nd attempt: click drain again after 409 final failure
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Invariant: Non-retryable error MUST have purged cache.
+      // Therefore, /control MUST be queried a second time, obtaining version 8!
+      const controlCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/control'));
+      expect(controlCalls).toHaveLength(2);
+      expect(controlCallCount).toBe(2);
+
+      const drainCalls = apiClientSpy.mock.calls.filter((c) => c[0].includes('/drain'));
+      expect(drainCalls).toHaveLength(2);
+      const secondKey = drainCalls[1]?.[1]?.idempotencyKey;
+      const secondBody = JSON.parse(drainCalls[1]?.[1]?.body);
+
+      // Fresh idempotency key and updated expectedVersion (8 instead of 7)
+      expect(secondKey).not.toBe(firstKey);
+      expect(secondBody.expectedVersion).toBe(8);
+
+      // Successfully resolved
+      expect(container.querySelector('[data-testid="admin-drain-error-banner"]')).toBeNull();
+    });
+
+    it('화면 표시 의도와 서버 상태 불일치 시 POST를 수행하지 않고(POST 0회) 상태 변경 안내를 표시한다', async () => {
+      const apiClientSpy = vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint.includes('/control')) {
+          // Server reports node is already draining while UI displays 'Node Drain' (undrained)
+          return {
+            version: 15,
+            killSwitchActive: false,
+            nodeStatus: 'draining',
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Invariant: Because server state differed from displayed intention, POST must NOT be called (0 calls)
+      const postCalls = apiClientSpy.mock.calls.filter((c) => c[1]?.method === 'POST');
+      expect(postCalls).toHaveLength(0);
+
+      // Error banner indicates state changed and asks to refresh
+      const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+      expect(banner?.textContent).toContain('상태 변경됨·새로고침');
+    });
+
+    it('서버 성공 응답에 canonical control 필드가 누락되면 합성하지 않고 오류 배너를 표시한다', async () => {
+      vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
+        if (endpoint.includes('/control')) {
+          return {
+            version: 3,
+            killSwitchActive: false,
+            nodeStatus: 'online',
+          } as any;
+        }
+        if (endpoint.includes('/drain')) {
+          // Success status 200 but control field is missing!
+          return {
+            requestId: 'req_missing_control',
+            operation: 'drain',
+            // No control field!
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      const drainTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('노드 Drain 통제')
+      );
+      await act(async () => {
+        drainTabBtn?.click();
+      });
+
+      const approvalInput = container.querySelector('[data-testid="drain-approval-id-input"]') as HTMLInputElement;
+      await act(async () => {
+        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        nativeSetter?.call(approvalInput, '550e8400-e29b-41d4-a716-446655440000');
+        approvalInput.dispatchEvent(new Event('input', { bubbles: true }));
+        approvalInput.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+
+      const drainBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('Node Drain')
+      ) as HTMLButtonElement;
+
+      await act(async () => {
+        drainBtn.click();
+      });
+
+      // Error banner displays missing control error rather than synthesizing state
+      const banner = container.querySelector('[data-testid="admin-drain-error-banner"]');
+      expect(banner?.textContent).toContain('canonical control 필드가 누락');
+    });
+
+    it('Kill Switch 모달은 열릴 때 취소 버튼에 초기 포커스되고, Tab/Shift+Tab 순환 후 Esc 닫기 시 열기 전 요소로 포커스를 복원한다', async () => {
+      vi.useFakeTimers();
+      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // 1. Focus toggle button and open modal
+      const toggleBtn = container.querySelector('[data-testid="emergency-kill-switch-toggle-btn"]') as HTMLButtonElement;
+      toggleBtn.focus();
+      expect(document.activeElement).toBe(toggleBtn);
+
+      await act(async () => {
+        toggleBtn.click();
+      });
+
+      // Advance timers for initial focus
+      act(() => {
+        vi.runAllTimers();
+      });
+
+      const modal = container.querySelector('[data-testid="kill-switch-modal"]');
+      expect(modal).not.toBeNull();
+
+      const cancelBtn = container.querySelector('[data-testid="kill-switch-cancel-btn"]') as HTMLButtonElement;
+      const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
+      expect(cancelBtn).not.toBeNull();
+      expect(confirmBtn).not.toBeNull();
+
+      // Initial focus on cancel button
+      expect(document.activeElement).toBe(cancelBtn);
+
+      // 2. Focus trap: Shift+Tab from cancelBtn (first element) wraps to confirmBtn (last element)
+      const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+      window.dispatchEvent(shiftTabEvent);
+      expect(document.activeElement).toBe(confirmBtn);
+
+      // Tab from confirmBtn (last element) wraps back to cancelBtn (first element)
+      const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false, bubbles: true, cancelable: true });
+      window.dispatchEvent(tabEvent);
+      expect(document.activeElement).toBe(cancelBtn);
+
+      // 3. Esc key closes modal and restores focus to toggle button
+      const escEvent = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+      act(() => {
+        window.dispatchEvent(escEvent);
+        vi.runAllTimers();
+      });
+
+      expect(container.querySelector('[data-testid="kill-switch-modal"]')).toBeNull();
+      expect(document.activeElement).toBe(toggleBtn);
+      vi.useRealTimers();
+    });
+
+    it('GPU 탭 전환 시 ReferenceError 없이 렌더링되고 GPU 벤치마크 컨트롤이 표시된다', async () => {
+      vi.spyOn(client, 'apiClient').mockResolvedValue({});
+
+      await act(async () => {
+        root.render(
+          <AdminSecurityConsole
+            nodes={MOCK_NODES}
+            currentUser={{ id: 'usr_sec_admin', name: 'Sec Admin', role: 'admin' }}
+          />
+        );
+      });
+
+      // Find and click the GPU sub-tab button
+      const gpuTabBtn = Array.from(container.querySelectorAll('button')).find((b) =>
+        b.textContent?.includes('합성 GPU')
+      );
+      expect(gpuTabBtn).toBeDefined();
+
+      await act(async () => {
+        gpuTabBtn?.click();
+      });
+
+      // Verify GPU tab content renders without crashing
+      const heading = Array.from(container.querySelectorAll('h3')).find((h) =>
+        h.textContent?.includes('합성 GPU 작업 실행 성능 검증')
+      );
+      expect(heading).toBeDefined();
+
+      const gpuSelect = container.querySelector('[data-testid="gpu-node-select"]');
+      expect(gpuSelect).not.toBeNull();
+    });
+
     it('백엔드 Kill Switch 403 AUTH-0062 실패 시 "조회 실패 [AUTH-0062]"를 표시한다', async () => {
       vi.spyOn(client, 'apiClient').mockImplementation(async (endpoint: string) => {
         if (endpoint === '/v1/operations/kill-switch') {
