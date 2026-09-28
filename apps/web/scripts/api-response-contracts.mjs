@@ -47,6 +47,9 @@ const contracts = [
   { schema: 'node-page-response', output: 'node-page-response' },
   { schema: 'node-detail-response', output: 'node-detail-response' },
   { schema: 'conformance-status-response', output: 'conformance-status-response' },
+  { schema: 'conformance-status-recorded-response', output: 'conformance-status-recorded-response' },
+  { schema: 'adapter-conformance-not-observed-response', output: 'adapter-conformance-not-observed-response' },
+  { schema: 'adapter-conformance-recorded-response', output: 'adapter-conformance-recorded-response' },
 ];
 const mode = process.argv[2];
 

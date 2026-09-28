@@ -785,6 +785,18 @@ def test_T13_a_broken_stored_record_is_sys_0002_and_says_nothing_about_the_row(m
 
 
 @pytest.mark.parametrize("name", [None, "codex-cli"])
+def test_F3_a_record_the_response_model_refuses_is_the_same_fixed_sys_0002(monkeypatch, name):
+    """Codex #221 F3: the reader validates first, but if a lifted record ever
+    fails response validation the caller still sees the fixed ProblemDetails,
+    not a framework 500 carrying the row."""
+    client, calls = build(monkeypatch, records={"codex-cli": recorded("codex-cli", contract_version="")})
+    body = canonical(get(client, name=name), code="SYS-0002", status=500, retryable=False)
+    assert body["detail"] == conformance_status.RECORD_INVALID_DETAIL
+    assert "contract_version" not in json.dumps(body) and "string_too_short" not in json.dumps(body)
+    assert calls["denials"] == []
+
+
+@pytest.mark.parametrize("name", [None, "codex-cli"])
 def test_T15_no_host_identity_is_sys_0002_not_not_observed(monkeypatch, name):
     client, calls = build(monkeypatch, host_id=None, records={"codex-cli": recorded("codex-cli")})
     body = canonical(get(client, name=name), code="SYS-0002", status=500, retryable=False)

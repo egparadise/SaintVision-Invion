@@ -196,7 +196,14 @@ def _unknown_suite_version(values):
     return {"suite_contract_version": "0.9.0"}
 
 
+def _empty_contract_version(values):
+    # VARCHAR(32) NOT NULL admits '' -- the contract's min_length=1 does not
+    # (Codex #221 F3). The reader must refuse before response assembly.
+    return {"contract_version": ""}
+
+
 TAMPERINGS = {
+    "empty-contract-version": _empty_contract_version,
     "duplicate-names": _duplicate_names,
     "unknown-name": _unknown_name,
     "shuffled-order": _shuffled_order,
@@ -499,6 +506,7 @@ def test_T13_a_row_that_passes_the_checks_but_breaks_an_invariant_is_sys_0002(
         assert "install_actually_installs" not in text_body
         assert "/srv/cp" not in text_body and "token=" not in text_body
         assert "0.9.0" not in text_body
+        assert "contract_version" not in text_body and "string_too_short" not in text_body
     # Not a denial, so not audited.
     assert _denials(owner_engine) == []
 

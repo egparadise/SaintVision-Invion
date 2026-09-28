@@ -50,6 +50,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from fastapi import APIRouter, Depends, Request
+from pydantic import ValidationError
 
 from ...adapters import agents
 from ...adapters.conformance import CHECKLIST
@@ -167,9 +168,25 @@ def _records(request: Request, *, principal: Principal, host_id, adapters: list[
                 except StoredRecordInvalid:
                     # The rule that failed is in the exception; the client does
                     # not get it.
-                    raise CanonicalProblem(
-                        SYS_UNMAPPED, 500, RECORD_INVALID_DETAIL, retryable=False
-                    ) from None
+                    raise _record_invalid() from None
+
+
+def _record_invalid() -> CanonicalProblem:
+    return CanonicalProblem(SYS_UNMAPPED, 500, RECORD_INVALID_DETAIL, retryable=False)
+
+
+def _assembled(build):
+    """Build a response model; a validation failure is the same fixed refusal.
+
+    ``to_recorded`` checks every contract bound before a row gets here, so
+    this is a second net, not the first: whatever a future column or contract
+    change lets through must still leave as ``SYS-0002`` with the fixed
+    sentence, never as a framework 500 carrying the row (design §4-3, R5).
+    """
+    try:
+        return build()
+    except ValidationError:
+        raise _record_invalid() from None
 
 
 def _outcomes(record: Recorded) -> list[schemas.ConformanceCheckOutcome]:
@@ -220,16 +237,19 @@ async def read_conformance_status(
             checks=_checks(),
             recordedAt=None,
         )
-    records = [_item(found[name]) for name in adapters if name in found]
-    return schemas.ConformanceStatusRecordedResponse(
-        status="RECORDED",
-        scope="control-plane-host",
-        contractVersion=CONTRACT_VERSION,
-        adapters=adapters,
-        checks=_checks(),
-        records=records,
-        latestRecordedAt=max(item.recorded_at for item in records),
-    )
+    def recorded():
+        records = [_item(found[name]) for name in adapters if name in found]
+        return schemas.ConformanceStatusRecordedResponse(
+            status="RECORDED",
+            scope="control-plane-host",
+            contractVersion=CONTRACT_VERSION,
+            adapters=adapters,
+            checks=_checks(),
+            records=records,
+            latestRecordedAt=max(item.recorded_at for item in records),
+        )
+
+    return _assembled(recorded)
 
 
 async def read_adapter_conformance(
@@ -258,20 +278,22 @@ async def read_adapter_conformance(
             checks=_checks(),
             recordedAt=None,
         )
-    return schemas.AdapterConformanceRecordedResponse(
-        status="RECORDED",
-        scope="control-plane-host",
-        adapter=record.adapter,
-        subject=record.subject,
-        provenance=record.provenance,
-        contractVersion=record.contract_version,
-        suiteContractVersion=record.suite_contract_version,
-        total=record.total,
-        passed=record.passed,
-        failed=record.failed,
-        skipped=record.skipped,
-        outcomes=_outcomes(record),
-        recordedAt=record.recorded_at,
+    return _assembled(
+        lambda: schemas.AdapterConformanceRecordedResponse(
+            status="RECORDED",
+            scope="control-plane-host",
+            adapter=record.adapter,
+            subject=record.subject,
+            provenance=record.provenance,
+            contractVersion=record.contract_version,
+            suiteContractVersion=record.suite_contract_version,
+            total=record.total,
+            passed=record.passed,
+            failed=record.failed,
+            skipped=record.skipped,
+            outcomes=_outcomes(record),
+            recordedAt=record.recorded_at,
+        )
     )
 
 

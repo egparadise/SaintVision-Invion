@@ -219,14 +219,40 @@ def record_fixture_conformance(
 # ---------------------------------------------------------------- reading
 
 
+#: The bounds the response contract puts on the two version strings. A row
+#: the database accepts (``VARCHAR(32) NOT NULL`` admits ``''``) but the
+#: contract would refuse must be refused *here*, as ``StoredRecordInvalid``,
+#: so it reaches the caller as the fixed ``SYS-0002`` and never as a
+#: validation exception from response assembly (Codex #221 F3).
+VERSION_MIN, VERSION_MAX = 1, 32
+
+
+def _version_string(value: object, what: str) -> str:
+    if not isinstance(value, str) or not VERSION_MIN <= len(value) <= VERSION_MAX:
+        raise StoredRecordInvalid(f"{what} is not a version string within the contract's bounds")
+    if value != value.strip():
+        raise StoredRecordInvalid(f"{what} carries surrounding whitespace")
+    return value
+
+
 def to_recorded(row: AdapterConformanceRecord) -> Recorded:
-    """Validate one stored row and lift it; ``StoredRecordInvalid`` otherwise."""
+    """Validate one stored row and lift it; ``StoredRecordInvalid`` otherwise.
+
+    Every field the response contract constrains is checked here first, so
+    that no DB-valid row can pass this function and then fail response
+    validation: the reader's refusal is the only refusal.
+    """
     if row.subject not in CONFORMANCE_SUBJECTS or row.provenance not in CONFORMANCE_PROVENANCES:
         raise StoredRecordInvalid("subject or provenance is not a value this stage produces")
     if row.adapter not in agents.BY_NAME:
         raise StoredRecordInvalid("adapter is not one of the platform's tools")
     if row.recorded_at is None or row.recorded_at.tzinfo is None:
         raise StoredRecordInvalid("recorded_at is missing or naive")
+    _version_string(row.contract_version, "contract_version")
+    _version_string(row.suite_contract_version, "suite_contract_version")
+    for count in (row.total, row.passed, row.failed, row.skipped):
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise StoredRecordInvalid("a stored count is not a non-negative integer")
     outcomes = validate_outcomes(
         row.checks,
         total=row.total,

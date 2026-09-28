@@ -375,6 +375,57 @@ def test_T13c_the_row_lifter_refuses_a_subject_provenance_or_adapter_outside_the
             service.to_recorded(models.AdapterConformanceRecord(**{**base, **change}))
 
 
+# F3 (Codex #221): a row the database accepts but the contract would not.
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"contract_version": ""},
+        {"contract_version": "x" * 33},
+        {"contract_version": " 1.0.0"},
+        {"suite_contract_version": ""},
+        {"suite_contract_version": "y" * 33},
+        {"total": -1},
+        {"passed": True},
+    ],
+)
+def test_F3_a_db_valid_row_outside_the_contract_bounds_is_refused_by_the_reader(change):
+    checks, c = _valid()
+    base = dict(
+        record_id="cfr_01J8Z3XQ2K9WMV5T7N4B6C8D0E", host_id=HOST, adapter="codex-cli",
+        contract_version=CONTRACT_VERSION, suite_contract_version=CONTRACT_VERSION,
+        subject="fixture-adapter", provenance="in-server", checks=checks, recorded_at=NOW, **c,
+    )
+    base.update(change)
+    with pytest.raises(StoredRecordInvalid) as refused:
+        service.to_recorded(models.AdapterConformanceRecord(**base))
+    # The rule, never the value.
+    assert "x" * 33 not in str(refused.value) and "y" * 33 not in str(refused.value)
+
+
+def test_F3_every_bound_the_contract_puts_on_a_lifted_field_is_checked_by_the_reader():
+    """Whatever ``to_recorded`` returns must validate as an item: the reader's
+    refusal is the only refusal, so response assembly cannot be the first
+    place a stored row fails."""
+    from saintvision.api import schemas
+
+    checks, c = _valid()
+    row = models.AdapterConformanceRecord(
+        record_id="cfr_01J8Z3XQ2K9WMV5T7N4B6C8D0E", host_id=HOST, adapter="codex-cli",
+        contract_version="1", suite_contract_version=CONTRACT_VERSION,
+        subject="fixture-adapter", provenance="in-server", checks=checks, recorded_at=NOW, **c,
+    )
+    lifted = service.to_recorded(row)
+    schemas.ConformanceRecordItem(
+        adapter=lifted.adapter, subject=lifted.subject, provenance=lifted.provenance,
+        contractVersion=lifted.contract_version, suiteContractVersion=lifted.suite_contract_version,
+        total=lifted.total, passed=lifted.passed, failed=lifted.failed, skipped=lifted.skipped,
+        outcomes=[{"name": o.name, "passed": o.passed, "skipped": o.skipped} for o in lifted.outcomes],
+        recordedAt=lifted.recorded_at,
+    )
+    assert service.VERSION_MAX == schemas.ConformanceRecordItem.model_fields["contract_version"].metadata[1].max_length
+    assert service.VERSION_MIN == schemas.ConformanceRecordItem.model_fields["contract_version"].metadata[0].min_length
+
+
 def test_the_lifted_record_carries_no_host_id():
     checks, c = _valid()
     row = models.AdapterConformanceRecord(

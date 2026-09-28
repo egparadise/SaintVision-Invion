@@ -7,7 +7,15 @@ import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
 import type { ProblemDetails } from '../src/contracts/types';
 import type { ConformanceStatusResponse, ConformanceCheckDescriptor } from '../src/contracts/conformance-status-response';
-import { isConformanceStatusResponse, isConformanceCheckDescriptor } from '../src/shared/api/adapterObservation';
+import type { ConformanceStatusRecordedResponse, ConformanceRecordItem } from '../src/contracts/conformance-status-recorded-response';
+import {
+  isConformanceStatusResponse,
+  isConformanceCheckDescriptor,
+  isConformanceStatusRecordedResponse,
+  isConformanceRecordItem,
+  isConformanceCheckOutcome,
+  isConformanceStatusUnion,
+} from '../src/shared/api/adapterObservation';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -654,7 +662,10 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         { name: 'declared_model_pinning_returns_an_id', capabilityGated: true },
       ];
 
-      // F2: Real adapters from agents.py:99 and reason from conformance_status.py:65-68
+      // F2: Real adapters from agents.py:99 and reason from conformance_status.py
+      // NOT_OBSERVED_REASON (G-03 stage two, #221: the platform now persists records, so
+      // the sentence states the absence only -- design #218 v1.2 §4-4 / T5b).
+      const NOT_OBSERVED_REASON = 'No conformance run is recorded for this host and these adapters.';
       const canonicalConformancePayload: ConformanceStatusResponse = {
         contractVersion: '1.0.0',
         scope: 'control-plane-host',
@@ -662,8 +673,134 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         recordedAt: null,
         adapters: ['claude-code', 'codex-cli', 'gemini-cli', 'antigravity'],
         checks: canonical15Checks,
-        reason: 'No conformance run is recorded; this platform does not persist conformance results yet.',
+        reason: NOT_OBSERVED_REASON,
       };
+
+      // G-03 stage two: one record, the fixture adapter's real result shape (15 checks,
+      // the one ungated-but-undeclared capability check skipped).
+      const canonicalRecord: ConformanceRecordItem = {
+        adapter: 'codex-cli',
+        subject: 'fixture-adapter',
+        provenance: 'in-server',
+        contractVersion: '1.0.0',
+        suiteContractVersion: '1.0.0',
+        total: 15,
+        passed: 14,
+        failed: 0,
+        skipped: 1,
+        outcomes: canonical15Checks.map((check) => ({
+          name: check.name,
+          passed: check.name !== 'declared_server_cancel_actually_stops',
+          skipped: check.name === 'declared_server_cancel_actually_stops',
+        })),
+        recordedAt: '2026-09-28T06:00:00Z',
+      };
+      const canonicalRecordedPayload: ConformanceStatusRecordedResponse = {
+        status: 'RECORDED',
+        scope: 'control-plane-host',
+        contractVersion: '1.0.0',
+        adapters: ['claude-code', 'codex-cli', 'gemini-cli', 'antigravity'],
+        checks: canonical15Checks,
+        records: [canonicalRecord],
+        latestRecordedAt: '2026-09-28T06:00:00Z',
+      };
+
+      it('pins the stage-two NOT_OBSERVED reason and no longer carries the stage-one sentence (design #218 T5b)', () => {
+        expect(canonicalConformancePayload.reason).toBe('No conformance run is recorded for this host and these adapters.');
+        expect(canonicalConformancePayload.reason).not.toContain('does not persist');
+        expect(isConformanceStatusResponse(canonicalConformancePayload)).toBe(true);
+      });
+
+      it('accepts the RECORDED branch and rejects every invariant break (design #218 §2-8, §4-1)', () => {
+        expect(isConformanceStatusRecordedResponse(canonicalRecordedPayload)).toBe(true);
+        expect(isConformanceStatusUnion(canonicalRecordedPayload)).toBe(true);
+        expect(isConformanceStatusUnion(canonicalConformancePayload)).toBe(true);
+        expect(isConformanceRecordItem(canonicalRecord)).toBe(true);
+        expect(isConformanceCheckOutcome(canonicalRecord.outcomes[0])).toBe(true);
+
+        // T1: no detail on an outcome; T2: counts must be one measurement.
+        expect(isConformanceCheckOutcome({ ...canonicalRecord.outcomes[0], detail: 'x' })).toBe(false);
+        expect(isConformanceCheckOutcome({ name: 'a', passed: true, skipped: true })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, passed: 13 })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, total: 16 })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, outcomes: canonicalRecord.outcomes.slice(1) })).toBe(false);
+        // T3: only the producible subject/provenance.
+        expect(isConformanceRecordItem({ ...canonicalRecord, subject: 'installed-cli' })).toBe(false);
+        expect(isConformanceRecordItem({ ...canonicalRecord, provenance: 'hosted-ci-import' })).toBe(false);
+        // T4: the aggregate has latestRecordedAt (the maximum) and no recordedAt/reason.
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, latestRecordedAt: '2026-09-28T05:00:00Z' })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, recordedAt: null })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, reason: 'x' })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [canonicalRecord, canonicalRecord] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, records: [{ ...canonicalRecord, adapter: 'not-a-tool' }] })).toBe(false);
+        expect(isConformanceStatusRecordedResponse({ ...canonicalRecordedPayload, conformant: true })).toBe(false);
+        // A NOT_OBSERVED payload is not a RECORDED one and vice versa.
+        expect(isConformanceStatusRecordedResponse(canonicalConformancePayload)).toBe(false);
+        expect(isConformanceStatusResponse(canonicalRecordedPayload)).toBe(false);
+        expect(isConformanceStatusUnion({ ...canonicalRecordedPayload, status: 'PASS' })).toBe(false);
+      });
+
+      it('renders a RECORDED response as per-adapter records of the fixture subject without a conformant verdict', async () => {
+        const originalFetch = globalThis.fetch;
+        const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+
+        try {
+          globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            headers: new Headers({ 'content-type': 'application/json' }),
+            json: async () => canonicalRecordedPayload,
+          } as any);
+
+          await act(async () => {
+            root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+          });
+          const projectInput = container.querySelector<HTMLInputElement>('[data-testid="conformance-project-input"]');
+          const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="conformance-fetch-btn"]');
+          await act(async () => {
+            setInputValue(projectInput!, testProjectId);
+          });
+          await act(async () => {
+            fetchBtn!.click();
+          });
+          await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          });
+
+          expect(container.querySelector('[data-testid="conformance-top-status"]')?.textContent).toBe('기록됨 (RECORDED)');
+          expect(container.querySelector('[data-testid="conformance-top-subtext"]')?.textContent).toBe(
+            '1/4 어댑터 기록 · fixture-adapter 측정 (control-plane-host)'
+          );
+          expect(container.querySelector('[data-testid="conformance-status-badge"]')?.textContent).toBe('기록됨 (RECORDED)');
+          expect(container.querySelector('[data-testid="conformance-recorded-at"]')?.textContent).toBe('2026-09-28T06:00:00Z');
+          // No reason on the RECORDED branch; the subject note says what was measured.
+          expect(container.querySelector('[data-testid="conformance-reason"]')).toBeNull();
+          expect(container.querySelector('[data-testid="conformance-subject-note"]')?.textContent).toContain('fixture-adapter');
+          expect(container.querySelector('[data-testid="conformance-subject-note"]')?.textContent).toContain('설치된 CLI');
+
+          const recordsTable = container.querySelector('[data-testid="conformance-records-table"]');
+          expect(recordsTable).not.toBeNull();
+          expect(container.querySelector('[data-testid="conformance-record-adapter-0"]')?.textContent).toBe('codex-cli');
+          expect(container.querySelector('[data-testid="conformance-record-subject-0"]')?.textContent).toBe('fixture-adapter');
+          expect(container.querySelector('[data-testid="conformance-record-provenance-0"]')?.textContent).toBe('in-server');
+          expect(container.querySelector('[data-testid="conformance-record-counts-0"]')?.textContent).toBe('전체 15 · 통과 14 · 실패 0 · 건너뜀 1');
+          expect(container.querySelector('[data-testid="conformance-record-row-1"]')).toBeNull();
+
+          // The checklist is still the server's descriptor list, tallied from outcomes only.
+          expect(container.querySelector('[data-testid="conformance-check-status-0"]')?.textContent).toBe('통과 1 · 실패 0 · 건너뜀 0 (1개 기록)');
+          expect(container.querySelector('[data-testid="conformance-check-status-12"]')?.textContent).toBe('통과 0 · 실패 0 · 건너뜀 1 (1개 기록)');
+
+          // No verdict: a record of the fixture is not "conforming", and there is no percentage.
+          const resultContainer = container.querySelector('[data-testid="conformance-result-container"]');
+          expect(resultContainer?.textContent).not.toContain('100%');
+          expect(resultContainer?.textContent).not.toMatch(/conforming/i);
+          expect(resultContainer?.textContent).not.toMatch(/\bPASS\b/);
+          expect(container.querySelector('[data-testid="conformance-live-status"]')?.textContent).toContain('기록됨(RECORDED)');
+        } finally {
+          globalThis.fetch = originalFetch;
+        }
+      });
 
       it('statically and dynamically verifies types are bound to generated @/contracts/conformance-status-response (Codex F-R1)', () => {
         expect(isConformanceStatusResponse(canonicalConformancePayload)).toBe(true);
