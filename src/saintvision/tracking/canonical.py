@@ -166,8 +166,20 @@ def canonical_bytes(payload: dict[str, Any]) -> bytes:
 
 
 def payload_sha256(payload: dict[str, Any]) -> str:
-    """The digest stored on an intent and compared at attest."""
+    """The digest stored on an intent and compared at attest (canonicalises first)."""
     return hashlib.sha256(canonical_bytes(payload)).hexdigest()
+
+
+def canonical_digest(canonical: dict[str, Any]) -> str:
+    """The digest of an *already canonical* payload: serialise, never re-canonicalise.
+
+    ``enqueue_mirror`` canonicalises exactly once and hashes with this, so the
+    boundary is one pass; ``payload_sha256`` remains the entry point for a raw
+    payload. Canonicalisation is idempotent as well, so the two agree.
+    """
+    return hashlib.sha256(
+        json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    ).hexdigest()
 
 
 # --------------------------------------------------------------------------

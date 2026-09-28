@@ -139,6 +139,7 @@ def test_canonicalization_is_idempotent_including_non_integral_float_metrics():
     twice = canonical.canonical_payload(once)
     assert twice == once
     assert payload_sha256(once) == payload_sha256(payload) == payload_sha256(twice)
+    assert canonical.canonical_digest(once) == payload_sha256(payload)      # the one-pass boundary agrees
     # Only a float's exact repr is accepted back; any other string is not numeric.
     for bad in ("0.90", " 0.9", "abc", "1e3", "nan", "inf"):
         with pytest.raises(CanonicalizationError):
@@ -148,8 +149,10 @@ def test_canonicalization_is_idempotent_including_non_integral_float_metrics():
 def test_the_pair_predicate_is_null_safe():
     """A failure status with a NULL code must fail the CHECK, not pass through NULL."""
     predicate = codes.sql_pair_check()
-    assert "IS NOT DISTINCT FROM 'TRACK-0001'" in predicate
-    assert "error_code = 'TRACK" not in predicate
+    assert "(status = 'mirrored' AND error_code IS NULL)" in predicate
+    for code in ("TRACK-0001", "TRACK-0002", "TRACK-0003"):
+        assert f"error_code IS NOT NULL AND error_code = '{code}'" in predicate
+    assert predicate.count("IS NOT NULL") == 3
 
 
 def test_canonicalize_does_not_mutate_its_input():

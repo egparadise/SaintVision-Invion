@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.3.2"
+version: "1.3.3"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:13:15+09:00"
+updated: "2026-09-28T13:14:55+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -84,3 +84,9 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 3.12 총계 **3224 passed / 47 skipped / 2 deselected / 2 failed**(3.14 동류). 둘 다 #172 자체 결함:
 - `test_finished_eval_run_…`: `enqueue_mirror`가 `canonical_payload(payload)` 뒤 `payload_sha256(canonical)`로 **canonical 형식을 다시 canonicalize**하는데, 비정수 float metric은 첫 pass에서 `repr` 문자열("0.9")이 되어 두 번째 pass의 "metric value must be numeric"에 걸렸다(멱등 아님). 수정: `canonical_metrics`가 **float의 정확한 repr 문자열만** 숫자로 되돌려 받음(그 밖 문자열·"0.90"·" 0.9"·"1e3"·"nan"은 거부). 시험: `canonical_payload(canonical_payload(p)) == canonical_payload(p)`, digest 3자 일치.
 - `test_attempt_check_constraints…[status=unavailable, error_code=NULL]` DID NOT RAISE: CHECK `error_code = 'TRACK-0001'`은 NULL에서 NULL이고 CHECK는 NULL을 통과시킨다. 수정: `sql_pair_check()`·0049 literal을 **`IS NOT DISTINCT FROM`**으로(NULL-safe). 시험: predicate에 `=` 비교 부재, literal == 생성값.
+
+### 6.3 코디네이터 13:13 반영 (v1.3.3, 2026-09-28T13:14:55+09:00)
+
+- canonicalize **한 번**: `enqueue_mirror`는 `canonical_payload(payload)` 1회 뒤 **`canonical_digest(canonical)`**(직렬화만, 재canonicalize 없음)로 digest. `payload_sha256`은 원본 payload 진입점으로 남고, 멱등성(6.2)도 유지되어 둘이 일치(시험).
+- pair CHECK를 코디네이터 형식으로: non-mirrored 분기마다 **`error_code IS NOT NULL AND error_code = '…'`**, mirrored는 `error_code IS NULL`. `sql_pair_check()`와 0049 literal 동일(시험이 3 분기의 `IS NOT NULL` 명시를 확인).
+- 0049·0051 다른 CHECK의 3값 논리 감사: subject XOR는 `num_nonnulls`(NULL 불가), kind↔컬럼·project 결속·`mirrored_has_reference`는 `IS NOT NULL` 명시, `error_code_track`은 `IS NULL OR ~`, 나머지는 NOT NULL 열의 regex/비교(`payload_sha256`·`tracking_uri_sha256`·`attempt_no`·`delivery_no`·`recovery_epoch`; 0051 `purpose`·`destination`·`file_name`·`content_sha256`·`device/inode`·`expires_at > created_at`). 추가 함정 없음.
