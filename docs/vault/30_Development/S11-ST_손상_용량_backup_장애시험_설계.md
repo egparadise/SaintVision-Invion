@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S11-ST-FAILURE-001"
 title: "S11-ST 손상·용량·backup 장애 시험 설계"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:47:09+09:00"
+updated: "2026-09-28T16:03:42+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -64,6 +64,8 @@ AC-11의 닫힌 8축에는 별도 `storage-failure` 축을 추가하지 않는�
 | `CAP-02` | 새 key에 Local `ENOSPC`/`EDQUOT` 또는 S3 507 | `STORE-0001`/503/retryable | `begin` 완료 뒤 실패한 part row 0, `ready` 전이 0, 사용량은 예약분만, 이전 object 손실 0, partial/temp residue 0 | S3 non-success 변환은 존재, Local 변환은 구현 공백 |
 
 quota 시험은 “요청 실패”만 보지 않는다. `snapshots.py:166-177`의 `begin`이 `uploading` row와 예약 사용량을 먼저 commit하므로 기준 시점은 `begin` 직후로 고정한다. failure 뒤 DB 사용량, part row, `ready` 전이, immutable object hash, temp key, S3 canonical key를 다시 읽고 초과 예약·부분 publish가 모두 0임을 확인한다.
+
+PG-free `CAP-02/local/*`는 exact 오류 변환·provider key·partial/temp residue만 검증한다. `begin` 뒤 DB row·usage·`ready` 불변식은 PostgreSQL이 있는 hosted `CAP-02/s3/http-507-new-key`에서 검증하며 PG-free run의 합격 조건으로 요구하지 않는다.
 
 ### 2.3 backup·archive 장애
 
@@ -135,6 +137,10 @@ storage importer는 raw schema·case identity hash·중복·exact 분류·JUnit 
 
 metric 행의 계수 의미도 닫는다. `n = successCount + failureCount + skipCount`이며 raw receipt를 중복 없이 센 값이다. zero-expected count metric의 `value`는 `failureCount`, minimum-positive metric의 `value`는 receipt로 증명된 `successCount`, max/percentile metric의 `n`은 유효 표본 수다. parsing·identity·분모 오류는 `failureCount`로 낮추지 않고 import 오류다. `failureCount > 0`인데 `value`가 이를 반영하지 않거나, `n=0`, 합계 불일치는 `INVALID_RUN`이다. physical evidence의 환경은 workflow metadata가 아니라 ADR-100 inventory, signed injector/recovery receipt, runner blob으로 대조한다.
 
+`retentionDays`는 실행 종료 시점에 보존 경계의 oldest retained WAL/backup timestamp에서 계산한 gauge다. `n=1`, `successCount=1`, `failureCount=0`, `skipCount=0`이고 경계 receipt와 동일한 값을 써야 한다. signed injector/recovery receipt는 사전 등록한 Node identity key로 서명한 canonical JSON이며 `caseIdentity`, `sourceRunId`, `sourceHeadSha`, `nodeId`, `injectedAt`, `recoveredAt`, before/after digest, key id를 exact set으로 담는다. key가 ADR-100 inventory에 없거나 서명·run 결속이 틀리면 import 오류다.
+
+현재 stage-1 aggregator는 count 합계와 target value만 독립 검증하고 metric별 `value` 도출 의미까지 재계산하지 않는다. 따라서 `failureCount > 0`인데 forged `value`가 target을 통과하는 R12는 이 카드에서 임의 휴리스틱으로 막지 않는다. §8-3 storage importer 구현 카드에서 metric kind/receipt 결속을 importer 전용으로 둘지 registry가 해석 가능한 machine-readable semantics를 추가해 aggregator에서도 거부할지 결정하고 부정 시험으로 고정한다.
+
 - unknown/missing/duplicate case, injection 미관측, 합계 불일치, unknown failure class, digest·만료 누락, wrong target/path/blob, hosted→physical 자기 신고: import 오류 또는 `INVALID_RUN`.
 - `skipCount > 0`: 집계기 계약대로 `NOT_OBSERVED`; PASS 분자에 들어가지 않는다.
 - planned/executed 기준 미달처럼 관측은 완결됐지만 목표를 못 채운 경우: `MEASURED_FAIL`.
@@ -193,7 +199,7 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 ## 9. 이번 카드의 판정
 
-- 설계·사전 목표: v1.1 보강 완료, Claude 재검토 대기. 별도 registry는 소비 금지이며 정본 registry patch 선행 카드가 남아 있다.
+- 설계·사전 목표: v1.2는 Claude r3 승인됐다. `CARD-S11-AC11-REGISTRY-REPIN-01`은 merge commit `067e6a48` 위 구현 commit `ffd99bfd`에서 old PITR target 제거·새 target 적용·축별 targetId·registry/importer pin을 반영했다. 별도 patch proposal은 계속 소비 금지다.
 - PG-free/hosted/실장비 실행: `NOT_OBSERVED`.
 - 공개 계약·migration 변경: 없음.
-- S11-ST registry 상태 변경: 없음(`planned` 유지).
+- S11-ST registry 상태 변경: 없음(`planned` 유지). 정본 task registry는 sprint task만 허용하고 S10 선행 task가 미완료이므로 synthetic subtask를 추가하거나 parent를 `in_progress`로 올리지 않았다. 카드 ID는 History·Codex 작업판에서 추적한다.

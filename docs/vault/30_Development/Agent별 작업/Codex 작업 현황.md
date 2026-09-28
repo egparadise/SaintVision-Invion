@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.209"
+version: "1.0.210"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T15:50:00+09:00"
+updated: "2026-09-28T16:05:53+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
+
+- #177 `b246e7db` 위에 #185 승인 head `33ed1b8c`를 merge commit `067e6a48`로 결속했고 merge-tree exact 일치를 확인했다.
+- 정본 registry에서 old PITR target을 제거하고 fault 종류별 recovery를 요구하는 새 target을 적용했다. registry blob `e8c01340…`을 aggregator·migration importer에 함께 pin하고 PITR `REQUIRED_TARGET_BY_AXIS`를 닫았다. long-soak은 `NOT_REGISTERED` 유지다.
+- 구현 commit `ffd99bfd`; aggregator 단일 파일 55 passed, importer 단일 파일 14 passed, docs·ontology·bindings·ratchet 게이트 exit 0. task registry는 sprint 고정 schema와 미완료 S10 dependency 때문에 S11-ST `planned`를 유지하고 카드 ID는 History에서 추적한다. [[2026-09-28_16-05-00_KST_S11_AC11_registry_repin_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
 
 ## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.2 — Claude r2 반영
 
