@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T10:56:00+09:00"
+updated: "2026-09-28T11:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,11 +19,20 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T10:56:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
+- 확인 기준: 2026-09-28T11:10:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
 
-## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.2 개정 (`agent/gemini/s12-fe-matrix`)
+## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.3 개정 (`agent/gemini/s12-fe-matrix`)
 
-- **작업 개요**: Claude UI 축 검토 의견 11개 항목 및 Codex 계약 축 지적을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.2로 확정.
+- **작업 개요**: Claude UI r2 조건부 승인(C1~C8) 및 Codex 계약 축 지적(1~3)을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.3으로 확정.
+- **주요 규격 및 식별자 정정 (Zero Fake Invariants)**:
+  1. **SMK-05 Transport Fixture 응답 JSON 정합 (C1, Codex 1)**: `tests/fixtures/nginx_transport.py:26, :30` 및 `tests/integration/test_web_container.py:160, :162` 원문 그대로 `{"code": "FIXTURE-404", "scope": "transport-fixture"}` 및 `{"status": "not_ready", "scope": "transport-fixture"}`로 정정.
+  2. **RCV-03 SSE Location 정규식 정합 (C2)**: 존재하지 않는 `/v1/run-events` 인용을 제거하고 실제 `nginx.conf:101`의 `~ ^/v1/projects/[^/]+/runs/[^/]+/events`, `:112` `/v1/events`, `:122` `/v1/runs/events`로 정정.
+  3. **권고 사항 C3~C8 및 Codex 2~3 정정**:
+     - C3: `nginx.conf:53` -> `:56` (`/callback` no-store) 정정.
+     - C4: 23행 인벤토리 참조를 `(15행: 실제 원격 Node 1대 192.168.45.225 및 서버 192.168.45.99 기록)`으로 보강.
+     - C5/Codex 3: 백엔드 `inv/app.py`에 다수의 라우트 데코레이터가 있으나 release manifest/acceptance 노출 REST 라우트는 0건임을 정밀 표기.
+     - C6/Codex 2: MAN-02 `authToken`/`roles` 미단언 및 UNMEASURED 분리, MAN-03 서명 후 disabled 미단언, RCV-01 502/504 둘 다 허용 명시.
+     - C7: §5 거버넌스 표의 SMK-03 HTTPS 로그인 UNMEASURED, SMK-04 배포 탭 UNMEASURED 한정어 보강.
 - **주요 규격 및 정직한 경계 정정 (Zero Fake / Honest Boundary)**:
   1. **TLS 1.2 이상 협상 규격 통일 (Claude 1, Codex F-R1)**: `nginx.conf:42` 및 테스트에 일치하도록 SMK-01을 "TLS 1.2 이상 협상 (1.3 전용 아님)"으로 정정하고, 화면의 TLS 1.3 STRICT 표출을 결함(DEF-S12-09)으로 수록.
   2. **관측 경로 분리 (Claude 2)**: HTTPS Nginx 컨테이너(transport fixture 업스트림)와 HTTP Vite 개발서버(실 CP + PG)를 명확히 분리하고, HTTPS 경유 IdP 로그인은 미관측(`UNMEASURED`)으로 지정. SMK-05 게이트웨이 검증에서 401 분리.
