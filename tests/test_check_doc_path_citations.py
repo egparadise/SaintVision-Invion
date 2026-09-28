@@ -241,6 +241,56 @@ def test_baseline_at_ref_reads_git_and_fails_closed_on_an_unknown_ref(tmp_path):
         tool.baseline_at_ref("no-such-ref", repo)
 
 
+def _git_repo_with_vault(tmp_path):
+    """A git repo with the citation roots, one vault doc and a seeded baseline (commit 0)."""
+    import subprocess
+    repo = tmp_path / "git"
+    root, vault = _repo(tmp_path / "git")
+    run = lambda *args: subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True)
+    run("init", "-q")
+    run("config", "user.email", "t@example")
+    run("config", "user.name", "t")
+    _doc(vault, "a.md", "`src/App.tsx`")
+    baseline = repo / "tools" / "baselines" / "doc_path_citations.txt"
+    baseline.parent.mkdir(parents=True, exist_ok=True)
+    tool.write_baseline(tool.broken_citations(root, vault), baseline, seed=True)
+    run("add", "-A")
+    run("commit", "-q", "-m", "c0: seeded baseline")
+    return repo, vault, baseline, run
+
+
+def test_a_two_commit_push_that_raises_the_floor_in_commit_one_fails_against_the_pre_push_sha(tmp_path):
+    """Codex #169 r2: HEAD~1 would already contain the raised floor; github.event.before must not."""
+    import subprocess
+    repo, vault, baseline, run = _git_repo_with_vault(tmp_path)
+    before = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True, check=True).stdout.strip()
+    # commit 1: a new broken citation together with its baseline line (floor raised)
+    _doc(vault, "a.md", "`src/App.tsx` `src/New.tsx`")
+    baseline.write_text(baseline.read_text(encoding="utf-8") + "a.md || src/New.tsx\n", encoding="utf-8")
+    run("add", "-A")
+    run("commit", "-q", "-m", "c1: raise the floor")
+    # commit 2: unrelated
+    (repo / "tools" / "note.txt").write_text("unrelated\n", encoding="utf-8")
+    run("add", "-A")
+    run("commit", "-q", "-m", "c2: unrelated")
+    # HEAD~1 is commit 1 and already holds the raised floor: the bypass Codex described.
+    assert tool.run_ratchet(repo, vault, baseline, base_baseline=tool.baseline_at_ref("HEAD~1", repo)) == 0
+    # The pre-push SHA is the real floor, and the gate fails.
+    assert tool.run_ratchet(repo, vault, baseline, base_baseline=tool.baseline_at_ref(before, repo)) == 1
+
+
+def test_the_docs_workflow_names_a_base_per_trigger_and_never_uses_head_minus_one():
+    """Static check of the wiring: push uses github.event.before, no HEAD~1 anywhere."""
+    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows" / "docs.yml").read_text(encoding="utf-8")
+    step = workflow[workflow.index("Repository path citations exist"):workflow.index("check_contract_bindings.py")]
+    assert "HEAD~1" not in step
+    assert "${{ github.event.before }}" in step
+    assert "0000000000000000000000000000000000000000" in step and "exit 1" in step   # zero SHA fails closed
+    assert 'origin/$GITHUB_BASE_REF' in step                                           # pull_request base
+    assert "--ratchet --base-ref" in step
+    assert 'base="HEAD"' in step and "consistency only" in step                        # workflow_dispatch, stated
+
+
 def test_cli_ratchet_requires_a_base_ref(capsys):
     import pytest
     with pytest.raises(SystemExit) as exc:
