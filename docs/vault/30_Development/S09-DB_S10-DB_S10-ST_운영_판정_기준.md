@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-DONE-CRITERIA-S09DB-S10DB-S10ST-001"
-title: "S09-DB·S10-DB·S10-ST 운영 판정 기준 v1.1 — 코드가 이미 강제하는 것을 다시 세지 않고, 12개 관측을 '지금 가능 4 · 두 시점 순변화 2 · 임계치 결정 대기 1 · 외부 전제 5'로 분류한다 (카드 106, docs-only)"
-version: "1.1.0"
+title: "S09-DB·S10-DB·S10-ST 운영 판정 기준 v1.1 — 코드가 이미 강제하는 것을 다시 세지 않고, 12개 관측을 '지금 가능 4 · 두 시점 순변화 2 · 임계치 결정 대기 1 · 외부 전제 5'로 분류하고 O6을 service 수준 판정으로 고정한다 (카드 106, docs-only)"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T23:40:51+09:00"
+updated: "2026-09-28T23:47:27+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "9f1c2be4"
@@ -86,8 +86,24 @@ v1.0은 "`len(items) + unresolved` == SQL count"라고 적었다. **그 정의�
 
 1. `nextCursor`가 없어질 때까지 **모든 page를 따라가 item을 합산**한다.
 2. `unresolvedModelVersions`는 **한 번만** 더한다(page마다 같은 값이 온다).
-3. 비교는 **같은 snapshot 안에서** 한다 — `REPEATABLE READ` transaction에서 page 순회와 독립 SQL count를 함께 수행한다. 그러지 않으면 순회 중의 삽입이 불일치로 보인다.
+3. 비교는 **같은 snapshot 안에서** 한다. 단, **HTTP route를 순회하는 방식으로는 그것이 불가능하다** — v1.1의 문구를 v1.2에서 고쳤다(§3-3).
 4. **`datasetVersionIds`가 200에서 잘린 응답은 표본에서 제외**한다. 그 경우 `wanted` 자체가 잘려 있어 "실제 수"의 정의가 달라지므로, 잘린 표본은 **§1의 `truncated`→`complete=false` 불변식**이 담당하고 O6은 잘리지 않은 표본만 본다.
+
+### 3-3. O6은 **service 수준 판정**이다 — HTTP 순회로는 한 snapshot을 만들 수 없다 (v1.2 정정)
+
+v1.1은 "`REPEATABLE READ` transaction에서 **page 순회와 독립 SQL count를 함께** 수행한다"고 적었다. **현재 제품 경계로는 실행할 수 없다.**
+
+`api/deps.py:61` `def get_session`은 **요청마다** `make_session_factory(...)` → `factory()` → `session.begin()` → `tenant_scope(...)`를 열고 그 session을 `yield`한다. `api/v1/lineage_query.py:227`의 route는 그것을 `Depends(get_session)`로 받는다. 그러므로 **cursor의 다음 HTTP 요청은 다른 transaction**이고, 외부 collector의 SQL을 그 snapshot에 참여시킬 **snapshot token이나 API가 없다.** 없는 계약을 있다고 쓴 것이 잘못이었다.
+
+**O6을 service 수준 판정으로 고정한다.**
+
+| | |
+|---|---|
+| **무엇을 측정하는가** | collector가 **한 `REPEATABLE READ` session**에서 `services.lineage.models_from_dataset_digest(..., cursor=...)`를 모든 page에 대해 호출하고, **같은 transaction의** 독립 SQL count와 비교한다 |
+| **무엇을 측정하지 않는가** | HTTP route의 응답이 아니다. 이것은 **service + serializer** 판정이고, **route wiring은 기존 route 시험**(`tests/core/test_lineage_query_routes.py`)이 담당한다 |
+| 왜 이 분리가 정직한가 | 한 snapshot이 필요한 것은 **산술**이고, 그 산술은 service 함수가 만든다. route는 그 결과를 직렬화할 뿐이며 **직렬화의 정확성은 다른 질문**이다 |
+
+**HTTP 수준 판정을 원한다면** 다른 절차가 필요하다 — write를 **quiesce한 측정 창**에서 모든 page와 독립 SQL을 수행하고, 창 **전후의 high-water/count가 불변**임을 함께 증명해야 한다. 그것은 운영 창을 요구하므로 "지금 가능"이 아니고, 이 문서는 그 길을 택하지 않았다.
 
 ### 3-2. O8은 "지금 가능"이 아니다 — 임계치가 없다 (v1.1 정정)
 
@@ -172,8 +188,8 @@ seam을 만드는 것은 이 카드의 범위가 아니고 §7의 미해결이�
 |---|---|---|
 | T1 | O1의 권한 snapshot이 **실제 권한**을 읽는다 | app role에 UPDATE를 주면 비교가 실패해야 한다. "권한 없음"을 하드코딩하면 실패하지 않으므로 `information_schema`에서 읽는다 |
 | T2 | O3의 집계가 **모든** `eval_runs` 행을 본다 | 표본만 보도록 바꾸면 실패. 분모가 전수임을 단언한다 |
-| T3 | O6의 SQL 카운트가 route와 **독립 경로**다 | route와 같은 함수를 쓰면 실패 — 같은 버그가 양쪽에 있으면 일치가 증명이 아니다 |
-| T4 | O6이 **모든 page를 합산**하고 **한 snapshot**에서 비교한다 | 첫 page만 세면 실패(§3-1). `REPEATABLE READ` 밖에서 비교하면 실패 |
+| T3 | O6의 SQL 카운트가 **service 함수와 독립 경로**다 | `models_from_dataset_digest`가 쓰는 같은 질의를 재사용하면 실패 — 같은 버그가 양쪽에 있으면 일치가 증명이 아니다 |
+| T4 | O6이 **모든 page를 합산**하고 **한 `REPEATABLE READ` service session**에서 비교한다 | 첫 page만 세면 실패(§3-1). HTTP route를 순회해 "같은 snapshot"이라 주장하면 실패 — 요청마다 transaction이 새로 열린다(§3-3) |
 | T5 | O10의 3자 일치가 **measurement 행에서** 온다 | 요청 digest만 비교하면 실패 |
 | **T6′** | O11′이 **제약의 정의·validated 상태**를 읽고, **제약을 뗀 fixture에서 reader가 fail-closed**한다 | shape 비교를 이름 존재 확인으로 바꾸면 실패. 제약을 뗀 fixture의 반쪽 row가 정상 응답으로 나오면 실패. (v1.0의 T6은 **validated CHECK가 즉시 거부**하므로 실행 자체가 불가능했다 — §4-1) |
 | T7 | O13이 **GC를 실제로 돌린 뒤** 본다 | GC 없이 존재만 확인하면 실패 |
@@ -187,6 +203,7 @@ seam을 만드는 것은 이 카드의 범위가 아니고 §7의 미해결이�
   3. **O1·O12**가 두 snapshot으로 "동안 한 번도"를 주장했다 — 바꿨다 되돌리면 통과한다(§5-1). 주장을 순변화로 낮추고 done 근거에서 뺐다.
   4. **O8**이 임계치 없이 "지금 가능"이었고 `seq scan 0`은 안정적 계약이 아니다(§3-2). 결정 대기로 옮겼다.
   5. **개수와 분류가 서로 맞지 않았고**(8이라 적고 9+5를 열거) O4·O7은 이미 강제되는 불변식이었다(§5). §1로 옮기고 12로 맞췄다.
+- **v1.2에서 한 곳을 더 고쳤다** — O6의 "한 snapshot" 절차가 **실행 불가능**했다(§3-3). `get_session`이 요청마다 transaction을 열므로 HTTP 순회로는 snapshot을 공유할 수 없고, **없는 계약을 있다고 쓴 것**이다. O6을 service 수준 판정으로 고정하고 route wiring은 기존 route 시험에 분리했다.
 - **연속 증거 seam이 없다**(§5-1). append-only audit·temporal history·논리 변경 로그 중 무엇을 둘지는 이 카드의 범위가 아니다.
 - **O8의 다섯 임계치가 미정**이다(§3-2). 파일럿 데이터량이 정해지면 채운다.
 - **O13의 GC 주체·주기가 미정**이다(`G-20`).
