@@ -26,6 +26,8 @@ tags: ["S11", "AC-11", "long-soak", "design", "Codex"]
 
 - `git grep -n -F`로 #157 `:238/:254`, #185 storage 설계 `:22/:88`, target `:29`, ADR-100 `:29/:35/:43/:54`, registry pin과 `REQUIRED_TARGET_BY_AXIS` 위치를 복사했다.
 - source target 첫 commit 전 `python tools/check_docs.py`는 895 versioned documents, exit 0; `git diff --check` exit 0이었다.
+- committed design head `ab0d31b7d77a97e021320428056f9fcbf12c04d9`에서 JSON parse, `check_docs`(897 documents), `check_ontology`(48 mappings), `check_contract_bindings`(54 fixtures/19 types/25 sites/14 replay guards), `check_doc_single_source --ratchet`(18 baseline pairs)와 `git diff --check`는 모두 exit 0이었다.
+- `sync_obsidian.py --check`는 source를 쓰지 않고 exit 3이었다. 기존 공유 destination의 공통 진행판·Codex 작업판 `both-diverged` 2건과 Claude·Gemini 작업판 `destination-edited` 2건이며, coordinator 전용 sync 경계를 지켜 `--apply`나 충돌 해소는 수행하지 않았다.
 - 이 카드에서는 PostgreSQL, Docker, browser, Node 중단, 전원·network fault, hosted CI를 실행하지 않았다. 수치 실측과 AC-11 PASS는 없다.
 
 ## 현재 판정과 다음 행동
