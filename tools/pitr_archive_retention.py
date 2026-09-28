@@ -30,7 +30,8 @@ Invariants (tested in ``tests/test_pitr_archive_retention.py``):
    ``START WAL LOCATION``; a label WITHOUT ``START TIME`` gives the backup an UNKNOWN age
    (never the directory mtime): an unknown-age backup is always retained, never a
    deletion candidate, never the "newest" pick, and its start segment still bounds the
-   WAL that is kept.  Accepted time forms are a numeric offset (``+0900``/``+09:00``) or an
+   WAL that is kept.  Accepted time forms are a numeric offset (``+00``/``+09``/``+0900``/
+   ``+09:00``/``-05:30`` -- PostgreSQL abbreviates nameless zones as ``+HH``) or an
    explicit ``UTC``/``GMT``; a named non-UTC abbreviation (``KST``, ``EST``, ...) is
    rejected instead of being stamped UTC, and a naive time is rejected as ambiguous.
 
@@ -56,7 +57,7 @@ LABEL = re.compile(r"^([0-9A-F]{24})\.[0-9A-F]{8}\.backup$")
 START_WAL = re.compile(r"START WAL LOCATION:.*\(file ([0-9A-F]{24})\)")
 START_TIME = re.compile(r"START TIME:\s*(.+)$", re.M)
 _TIME_WITH_ZONE = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})(?:\s*(\S+))?$")
-_NUMERIC_OFFSET = re.compile(r"^[+-]\d{2}:?\d{2}$")
+_NUMERIC_OFFSET = re.compile(r"^[+-]\d{2}(?::?\d{2})?$")  # +00, +09, +0900, +09:00, -05:30 (PostgreSQL forms)
 UTC_NAMES = ("UTC", "GMT", "Z")
 
 DEFAULT_DAYS = 7  # decision 2026-09-22 (coordinator, user delegation) -- pilot value
@@ -130,7 +131,12 @@ def parse_start_time(raw: str) -> datetime:
     if zone.upper() in UTC_NAMES:
         return naive.replace(tzinfo=timezone.utc)
     if _NUMERIC_OFFSET.match(zone):
-        return datetime.strptime(clock + " " + zone.replace(":", ""), "%Y-%m-%d %H:%M:%S %z").astimezone(timezone.utc)
+        # PostgreSQL abbreviates zones without a name as ``+HH``/``-HH`` (e.g. ``+00``, ``+04``) and
+        # renders timestamptz text as ``+00``/``+05:30``; normalise every form to ``+HHMM``.
+        compact = zone.replace(":", "")
+        if len(compact) == 3:
+            compact += "00"
+        return datetime.strptime(clock + " " + compact, "%Y-%m-%d %H:%M:%S %z").astimezone(timezone.utc)
     raise ValueError(
         f"START TIME zone {zone!r} is a named non-UTC abbreviation; only a numeric offset or UTC/GMT "
         f"is accepted (PostgreSQL writes the server zone; set timezone=UTC or log_timezone for labels): {raw!r}"

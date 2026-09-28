@@ -323,3 +323,22 @@ def test_revival_f01_filesystem_seam_missing_start_time_never_reads_directory_mt
     assert p.delete_backups == ["known-old"]  # newest still chosen among KNOWN ages only
     assert p.oldest_retained_start_segment == seg(3)  # boundary did not advance past the unknown one
     assert p.delete_archive == [seg(1), seg(2)]
+
+
+@pytest.mark.parametrize("raw, expected_utc", [
+    ("2026-09-22 01:30:00+00", datetime(2026, 9, 22, 1, 30, tzinfo=timezone.utc)),      # PostgreSQL nameless-zone abbreviation / timestamptz text
+    ("2026-09-22 01:30:00 +00", datetime(2026, 9, 22, 1, 30, tzinfo=timezone.utc)),
+    ("2026-09-22 10:30:00 +09", datetime(2026, 9, 22, 1, 30, tzinfo=timezone.utc)),
+    ("2026-09-22 07:00:00 +05:30", datetime(2026, 9, 22, 1, 30, tzinfo=timezone.utc)),
+    ("2026-09-21 20:30:00 -05", datetime(2026, 9, 22, 1, 30, tzinfo=timezone.utc)),
+])
+def test_f02_hour_only_and_half_hour_numeric_offsets_are_accepted(raw, expected_utc):
+    """hosted Backend on head 29a2b131 (run 36362748049) rejected the ``+00`` form PostgreSQL writes for
+    nameless zones; it is a numeric offset, not a named abbreviation, and must be accepted."""
+    assert parse_start_time(raw) == expected_utc
+
+
+@pytest.mark.parametrize("raw", ["2026-09-22 01:30:00 +0", "2026-09-22 01:30:00 +000", "2026-09-22 01:30:00 +09:0"])
+def test_f02_malformed_numeric_offsets_are_still_rejected(raw):
+    with pytest.raises(ValueError):
+        parse_start_time(raw)
