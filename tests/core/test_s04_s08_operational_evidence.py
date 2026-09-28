@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+from pathlib import Path
 
 import pytest
 
@@ -77,6 +78,19 @@ def test_c1_empty_is_not_observed_and_reason_totals_are_fail_closed():
     with pytest.raises(ValueError, match="do not sum"):
         collector.evaluate_c1_summary(_summary(valid_count=0, violation_count=1))
 
+    clean = collector.evaluate_c1_summary(_summary())
+    assert clean["status"] == "NOT_OBSERVED"
+    assert clean["metrics"]["cancelHistorySource"] == "absent"
+
+
+def test_core_cancel_history_absence_is_explicit_until_a_product_producer_exists():
+    source = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in Path("src/saintvision").rglob("*.py")
+    )
+    assert "run.cancel" not in source
+    assert collector.CANCEL_HISTORY_SOURCE == "absent"
+
 
 def test_c1_sql_is_core_only_and_keeps_every_preregistered_reason():
     sql = collector.C1_SQL
@@ -131,7 +145,8 @@ def test_evidence_binds_database_time_criteria_and_excludes_kernel_boundary():
     )
     assert evidence["acceptanceClaim"] is False
     assert evidence["verdict"] == "NOT_OBSERVED"
-    assert evidence["observations"]["O3"]["status"] == "MEASURED_PASS"
+    assert evidence["observations"]["O3"]["status"] == "NOT_OBSERVED"
+    assert evidence["observations"]["O3"]["metrics"]["cancelHistorySource"] == "absent"
     assert evidence["excludedBoundaries"]["C1-K"]["status"] == "NOT_OBSERVED"
     assert evidence["source"]["database"]["databaseIdentitySha256"] == DIGEST
     assert '"databaseName":' not in json.dumps(evidence)
@@ -149,6 +164,11 @@ def test_evidence_binds_database_time_criteria_and_excludes_kernel_boundary():
     changed = deepcopy(evidence)
     changed["excludedBoundaries"]["C1-K"]["status"] = "MEASURED_PASS"
     with pytest.raises(ValueError, match="C1-K"):
+        collector.validate_evidence(changed)
+
+    changed = deepcopy(evidence)
+    changed["observations"]["O3"]["status"] = "MEASURED_PASS"
+    with pytest.raises(ValueError, match="cannot pass"):
         collector.validate_evidence(changed)
 
 

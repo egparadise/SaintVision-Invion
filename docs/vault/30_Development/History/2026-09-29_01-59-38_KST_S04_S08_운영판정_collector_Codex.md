@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CODEX-S04-S08-OPERATIONAL-COLLECTOR-001"
 title: "S04-DB 재전송·S08-DB 보존 운영 판정 collector"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T01:59:38+09:00"
+updated: "2026-09-29T02:14:34+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S04-DB", "S08-DB"]
@@ -13,6 +13,11 @@ tags: ["s04-db", "s08-db", "evidence", "collector", "postgresql", "operational-a
 ---
 
 # S04-DB·S08-DB 운영 판정 collector
+
+## 독립 검토 r1 정정
+
+- PG-free와 실 PG 시험의 basename 충돌을 제거해 hosted 전체 수집이 중단되지 않도록 실 PG 파일을 `test_s04_s08_operational_evidence_real_pg.py`로 바꿨다.
+- core 제품에는 `run.cancel*` audit producer가 없으므로, collector가 직접 넣은 audit fixture를 운영 취소 이력으로 간주하지 않는다. (a)~(c)가 깨끗해도 O3는 `cancelHistorySource: absent`와 함께 `NOT_OBSERVED`이며, 실제 위반이 있으면 `MEASURED_FAIL`이다. 정본 producer 또는 C1-K 결속 전에는 O3 `MEASURED_PASS`가 불가능하다.
 
 ## 범위와 결론
 
