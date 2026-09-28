@@ -40,6 +40,12 @@ from ..errors import (
 )
 from ..ids import new_id
 from .pagination import build_page
+from .tracking import (
+    deployment_mirror_payload,
+    enqueue_mirror,
+    model_version_mirror_payload,
+    release_mirror_payload,
+)
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _OCI_DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -230,6 +236,17 @@ def register_model_version(
             now=now,
         )
     session.flush()
+    # Mirror intent in the same transaction (design #168 §2). Absent or
+    # invalid configuration records nothing; the version is registered either way.
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="model_version",
+        subject_id=row.model_version_id,
+        project_id=model.project_id,
+        payload=model_version_mirror_payload(row, model_name=model.name, now=now),
+        now=now,
+    )
     return row
 
 
@@ -338,6 +355,18 @@ def release_model_version(
 
     row.stage = "released"
     session.flush()
+    # The stage transition is its own mirror intent (design #168 §1): the tag
+    # ``inv.stage`` moves to ``released`` only because a new intent says so.
+    model = session.get(Model, row.model_id)
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="model_version",
+        subject_id=row.model_version_id,
+        project_id=model.project_id if model is not None else None,
+        payload=release_mirror_payload(row, now=now),
+        now=now,
+    )
     return row
 
 
@@ -541,6 +570,16 @@ def record_deployment(
     )
     session.add(deployment)
     session.flush()
+    model = session.get(Model, version.model_id)
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="deployment",
+        subject_id=deployment.deployment_id,
+        project_id=model.project_id if model is not None else None,
+        payload=deployment_mirror_payload(deployment, now=now),
+        now=now,
+    )
     return deployment
 
 
