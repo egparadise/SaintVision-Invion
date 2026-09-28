@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.38"
+version: "1.2.39"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T12:55:53+09:00"
+updated: "2026-09-28T13:03:45+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,10 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+### 2026-09-28 카드 bh · S10-BE MLflow 미러 2단계 (branch agent/claude/s10-be-mlflow-mirror-p2, base #172 41256e4f)
+
+- `adapters/mlflow_sink.py`(실 REST sink) · 0051 service credential + `tracking/service_credentials.py` · worker 경로 `resolve_sink`/`deliver_outbox_event` · backend.yml `mlflow-live` opt-in job · 시험 PG-free 20 / 실 PG 24 / live 3. 상세: [[2026-09-28_13-03-45_KST_S10-BE_MLflow_미러_구현_2단계_Claude]]
 
 ### 2026-09-28 카드 bg · S10-BE MLflow 미러 구현 1단계 (branch agent/claude/s10-be-mlflow-mirror-impl, base 1e8baf04)
 

@@ -46,7 +46,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from ..adapters.contract import AttestationResult
-from ..adapters.tracking import MirrorRecord, TrackingSink
+from ..adapters.tracking import MirrorFailure, MirrorRecord, TrackingSink
 from ..db.models.tracking import (
     MIRROR_SUBJECT_KINDS,
     MlflowMirrorAttempt,
@@ -473,11 +473,167 @@ def deliver_intent(
     return attempt
 
 
+# --------------------------------------------------------------------------
+# Worker path (stage 2): configuration -> credential -> sink -> deliver_intent
+# --------------------------------------------------------------------------
+
+
+class RefusingSink:
+    """A sink whose credential was refused: every mirror is ``TRACK-0002``.
+
+    Used so a credential refusal is recorded through the same ``deliver_intent``
+    path as any other outcome (one attempt row, terminal, no retry), without a
+    single network call.
+    """
+
+    name = "refused-credential"
+    contract_version = "1.0.0"
+
+    def probe(self):  # pragma: no cover - never reached
+        raise AssertionError("a refusing sink is not probed")
+
+    def authenticate(self, secret_handle):  # pragma: no cover - never reached
+        raise AssertionError("a refusing sink is not authenticated")
+
+    def find(self, intent_id: str) -> str | None:
+        return None
+
+    def mirror(self, record: MirrorRecord):
+        from ..adapters.tracking import MirrorResult
+        from ..tracking.codes import TRACK_REFUSED
+
+        return MirrorResult(MirrorStatus.REFUSED, error_code=TRACK_REFUSED, detail="service credential refused")
+
+    def redact(self, content: str) -> tuple[str, bool]:
+        return content, False
+
+    def attest(self, reference_id: str):  # pragma: no cover - never reached (no mirror succeeds)
+        raise AssertionError("a refusing sink never attests")
+
+
+@dataclass(frozen=True, slots=True)
+class WorkerIdentity:
+    """Who the worker is and where its secret files live."""
+
+    worker_principal: str
+    recovery_epoch: int
+    credentials_root: str
+
+
+def resolve_sink(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    settings: TrackingSettings,
+    identity: WorkerIdentity,
+    now: dt.datetime,
+    sink_factory=None,
+) -> TrackingSink:
+    """The sink for one delivery, authenticated from the service credential.
+
+    ``sink_factory(settings)`` builds the unauthenticated sink (the real
+    ``MlflowSink`` by default; tests inject the reference sink). A refused or
+    missing credential yields :class:`RefusingSink`, so the outcome is recorded
+    as ``TRACK-0002`` without contacting the server. The 0035 run-bound
+    registry is never consulted here.
+    """
+    from ..credentials.contract import CredentialDenied
+    from ..tracking.service_credentials import (
+        PURPOSE_MLFLOW_MIRROR,
+        LookupRequest,
+        ServiceCredentialRegistry,
+        ServiceRegistryAdapter,
+        worker_context,
+    )
+
+    request = LookupRequest(
+        tenant_id=tenant_id,
+        purpose=PURPOSE_MLFLOW_MIRROR,
+        destination=settings.destination,
+        destination_uri_sha256=settings.tracking_uri_sha256,
+        worker_principal=identity.worker_principal,
+        recovery_epoch=identity.recovery_epoch,
+        now=now,
+    )
+    registry = ServiceCredentialRegistry(session)
+    match = registry.lookup(request)
+    if match is None:
+        return RefusingSink()
+
+    if sink_factory is None:
+        from ..adapters.mlflow_sink import MlflowSink
+
+        def sink_factory(s: TrackingSettings):  # noqa: E306
+            return MlflowSink(s.tracking_uri, experiment_prefix=s.experiment_prefix, timeout_seconds=s.timeout_seconds)
+
+    sink = sink_factory(settings)
+    try:
+        from ..credentials.linux_file import LinuxFileCredentials
+
+        reader = LinuxFileCredentials(identity.credentials_root, ServiceRegistryAdapter(registry, request))
+        handle = reader.resolve(match.reference, worker_context(request), request.purpose, request.destination)
+    except CredentialDenied:
+        return RefusingSink()
+    auth = sink.authenticate(handle)
+    if not auth.authenticated:
+        return RefusingSink()
+    return sink
+
+
+def deliver_outbox_event(
+    session: Session,
+    *,
+    event: Any,
+    tenant_id: uuid.UUID,
+    identity: WorkerIdentity,
+    worker_id: str,
+    now: dt.datetime,
+    configuration: TrackingConfiguration | None = None,
+    sink_factory=None,
+) -> MlflowMirrorAttempt | None:
+    """Consume one ``inv.mlflow.mirror.requested`` outbox event.
+
+    Returns the attempt row, or ``None`` when the configuration is ``absent``
+    or ``invalid`` -- then nothing is sent, nothing is recorded, and the event
+    stays pending (NOT_OBSERVED / INVALID_RUN by readiness, design §6). A
+    :class:`MlflowRequestInvalid` from the sink propagates: it is our defect
+    (``TRACK-0004``), leaves no attempt row, and the outbox policy retries or
+    parks the event.
+    """
+    if event.event_type != MIRROR_EVENT_TYPE:
+        raise ValueError(f"not a mirror event: {event.event_type!r}")
+    configuration = resolve() if configuration is None else configuration
+    if not configuration.readiness.configured:
+        return None
+    settings = configuration.settings
+    intent_id = event.payload.get("intentId") if isinstance(event.payload, dict) else None
+    if not intent_id or intent_id != event.aggregate_id:
+        raise DeliveryIdentityError("outbox event payload does not name its own intent")
+
+    sink = resolve_sink(
+        session, tenant_id=tenant_id, settings=settings, identity=identity, now=now, sink_factory=sink_factory
+    )
+    return deliver_intent(
+        session,
+        sink,
+        tenant_id=tenant_id,
+        intent_id=intent_id,
+        outbox_event_id=event.event_id,
+        delivery_no=int(event.publish_attempts) + 1,
+        settings=settings,
+        worker_id=worker_id,
+        now=now,
+    )
+
+
 def _push(
     sink: TrackingSink, intent: MlflowMirrorIntent, settings: TrackingSettings
 ) -> tuple[MirrorStatus, str | None, str | None, str | None]:
     """find -> (mirror) -> attest. Returns (status, error_code, reference, digest)."""
-    reference_id = sink.find(intent.intent_id)
+    try:
+        reference_id = sink.find(intent.intent_id)
+    except MirrorFailure as failure:
+        return failure.result.status, failure.result.error_code, None, None
     if reference_id is None:
         record = MirrorRecord(
             intent_id=intent.intent_id,

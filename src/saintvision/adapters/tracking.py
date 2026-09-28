@@ -72,6 +72,21 @@ class MirrorResult:
             raise ValueError("a mirrored result carries the sink's reference")
 
 
+class MirrorFailure(Exception):
+    """``find`` could not answer; carries the coded :class:`MirrorResult`.
+
+    ``find`` returns ``None`` only when the server answered that nothing is
+    tagged with the intent. An outage or a refusal during the search is not
+    "not found" -- treating it so would make the next ``mirror`` create a
+    duplicate run -- so it is raised with the same coded result ``mirror``
+    would have produced, and the worker records that.
+    """
+
+    def __init__(self, result: "MirrorResult") -> None:
+        super().__init__(result.detail or result.status.value)
+        self.result = result
+
+
 @runtime_checkable
 class TrackingSink(Protocol):
     """The seven members every tracking sink implements."""
