@@ -1,0 +1,7 @@
+{
+  "status": "blocked",
+  "unresolvedSettings": [
+    "INV_NODE_MTLS_CA_BUNDLE",
+    "INV_OBJECT_STORE_ENDPOINT"
+  ]
+}
