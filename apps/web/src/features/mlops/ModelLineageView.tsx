@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ModelLineage } from '@/contracts/types';
+import { ModelLineage, ModelCommitObservation } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
 import { MlopsManager } from './mlopsEngine';
 
 export interface ModelLineageViewProps {
@@ -17,8 +18,25 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [approvalInput, setApprovalInput] = useState('');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Model commitment observation state
+  const [commitmentProject, setCommitmentProject] = useState('prj_default');
+  const [commitmentModelId, setCommitmentModelId] = useState(lineages[0]?.modelId || '');
+  const [commitmentVersion, setCommitmentVersion] = useState(lineages[0]?.version || '1.0.0');
+  const [commitmentData, setCommitmentData] = useState<ModelCommitObservation | null>(null);
+  const [commitmentLoading, setCommitmentLoading] = useState(false);
+  const [commitmentError, setCommitmentError] = useState<string | null>(null);
+
   const conformances = mlopsManager.verifyProviderConformances();
   const selectedModel = lineages.find((m) => m.modelId === selectedModelId) || lineages[0];
+
+  const handleSelectModel = (modelId: string) => {
+    setSelectedModelId(modelId);
+    const m = lineages.find((item) => item.modelId === modelId);
+    if (m) {
+      setCommitmentModelId(m.modelId);
+      setCommitmentVersion(m.version || '1.0.0');
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +44,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
 
     const matched = mlopsManager.queryLineage(searchQuery);
     if (matched) {
-      setSelectedModelId(matched.modelId);
+      handleSelectModel(matched.modelId);
       setActionNotice({
         type: 'success',
         text: `✔ 역추적(Reverse Query) 성공: [${matched.modelName}] 계보가 일치합니다.`,
@@ -34,7 +52,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     } else {
       setActionNotice({
         type: 'error',
-        text: `❌ 검색 결과 없음: 입력된 식별자 '${searchQuery}'와 일치하는 모델/커밋/다이제스트가 없습니다.`,
+        text: `❌ 검색 결과 없음: 입력된 식별자 '${searchQuery}'와 일치하는 모델/커밋/데이터셋/다이제스트가 없습니다.`,
       });
     }
   };
@@ -61,8 +79,30 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 검증 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
+    }
+  };
+
+  const handleFetchCommitment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!commitmentProject.trim() || !commitmentModelId.trim() || !commitmentVersion.trim()) {
+      return;
+    }
+    setCommitmentLoading(true);
+    setCommitmentError(null);
+    try {
+      const data = await fetchModelCommitment(
+        commitmentProject.trim(),
+        commitmentModelId.trim(),
+        commitmentVersion.trim()
+      );
+      setCommitmentData(data);
+    } catch (err: any) {
+      setCommitmentData(null);
+      setCommitmentError(err.message || 'Commitment 조회 중 오류가 발생했습니다.');
+    } finally {
+      setCommitmentLoading(false);
     }
   };
 
@@ -100,10 +140,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       >
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Provider 계약 동일성 (AC-10)</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: conformances.every((c) => c.conformancePassed) ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {conformances.every((c) => c.conformancePassed) ? '100% 적합' : '일부 불일치'} ({conformances.map((c) => c.provider).join(' = ')})
+          <div style={{ fontSize: '18px', fontWeight: 700, color: '#d29922', marginTop: '4px' }}>
+            미측정 (모의/정적 예시 · 검증 아님)
           </div>
-          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>W3C-Trace / SSE-v2 / RFC 9457 일치</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
+            실제 conformance API 부재 · {conformances.map((c) => c.provider).join(' = ')} 스키마 예시
+          </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
@@ -173,14 +215,15 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             계보 역추적 검색 (Reverse Lineage Query — AC-10)
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-            배포 다이제스트(sha256:...), Git 커밋 SHA, 데이터셋 해시로 역추적하여 근원 데이터셋과 승인 원장을 확인합니다.
+            배포 다이제스트(sha256:...), Git 커밋 SHA, 데이터셋 해시(dset_sha256...)로 역추적하여 픽스처 계보를 검색합니다.
           </p>
         </div>
 
         <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
           <input
             type="text"
-            placeholder="Search by commit SHA (58cabd3...), deployment digest (sha256:4a8b2...), or model name..."
+            data-testid="lineage-search-input"
+            placeholder="Search by commit SHA (58cabd3...), deployment digest (sha256:...), dataset hash (dset_sha256...), or model name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -194,7 +237,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               fontFamily: 'var(--font-mono, monospace)',
             }}
           />
-          <Button size="sm" variant="primary" type="submit">
+          <Button size="sm" variant="primary" type="submit" data-testid="lineage-search-btn">
             역추적 질의 (Query)
           </Button>
         </form>
@@ -232,7 +275,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 <button
                   key={model.modelId}
                   type="button"
-                  onClick={() => setSelectedModelId(model.modelId)}
+                  onClick={() => handleSelectModel(model.modelId)}
                   style={{
                     padding: '8px 16px',
                     borderRadius: '6px',
@@ -332,7 +375,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     {selectedModel.datasetDigest ? selectedModel.datasetDigest.slice(0, 16) + '...' : '미지정'}
                   </div>
                   <div style={{ fontSize: '11px', color: selectedModel.datasetDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
-                    {selectedModel.datasetDigest ? 'SHA-256 Verified' : '미검증'}
+                    {selectedModel.datasetDigest ? 'SHA-256 (모의 표기)' : '미검증'}
                   </div>
                 </div>
 
@@ -343,7 +386,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                     {selectedModel.sourceCommitSha ? selectedModel.sourceCommitSha.slice(0, 12) : '미지정'}
                   </div>
                   <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>
-                    {selectedModel.sourceCommitSha ? 'Git Signed SHA' : '커밋 없음'}
+                    {selectedModel.sourceCommitSha ? 'Git Signed SHA (모의 표기)' : '커밋 없음'}
                   </div>
                 </div>
 
@@ -353,12 +396,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   <div style={{ fontSize: '12px', color: '#f0f6fc', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.trainingRunId || '미실행'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime</div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Isolated Runtime (모의)</div>
                 </div>
 
                 {/* Node 4: Evaluation Score */}
                 <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION</div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>4. EVALUATION (모의 점수)</div>
                   <div style={{ fontSize: '14px', color: selectedModel.evalAccuracy !== undefined && selectedModel.evalAccuracy >= 0.85 ? '#3fb950' : '#f85149', fontWeight: 700, marginTop: '4px' }}>
                     Acc: {selectedModel.evalAccuracy !== undefined ? (selectedModel.evalAccuracy * 100).toFixed(1) + '%' : '미평가'}
                   </div>
@@ -373,17 +416,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                   <div style={{ fontSize: '12px', color: selectedModel.approvalId ? '#3fb950' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.approvalId ? selectedModel.approvalId : 'None (Pending)'}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Two-Person Rule</div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', marginTop: '4px' }}>Two-Person Rule (모의)</div>
                 </div>
 
-                {/* Node 6: Deployment Digest */}
+                {/* Node 6: Deployment Digest (Simulated) */}
                 <div style={{ backgroundColor: '#0d1117', border: '1px solid #30363d', borderRadius: '6px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>6. DEPLOYMENT DIGEST</div>
+                  <div style={{ fontSize: '11px', color: '#8b949e', fontWeight: 600 }}>6. DEPLOYMENT DIGEST (모의 시뮬레이션)</div>
                   <div style={{ fontSize: '12px', color: selectedModel.deploymentDigest ? '#58a6ff' : '#8b949e', fontFamily: 'var(--font-mono, monospace)', marginTop: '6px' }}>
                     {selectedModel.deploymentDigest ? selectedModel.deploymentDigest.slice(0, 16) + '...' : 'Not deployed'}
                   </div>
-                  <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
-                    {selectedModel.deploymentDigest ? 'Production Live' : 'Pending Gate'}
+                  <div style={{ fontSize: '11px', color: selectedModel.deploymentDigest ? '#e3b341' : '#8b949e', marginTop: '4px' }}>
+                    {selectedModel.deploymentDigest ? '모의 배포 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포)' : 'Pending Gate'}
                   </div>
                 </div>
               </div>
@@ -407,7 +450,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               Multi-LLM Provider Adapter Conformance (AC-10)
             </h4>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              Codex와 Claude 어댑터가 동일한 공통 계약(Schema, Error Category, SSE Streaming)을 100% 준수합니다.
+              Codex와 Claude 어댑터 공통 계약 스키마 정적 예시입니다 (실제 어댑터 conformance API 부재로 '미측정' · 실시간 측정값 아님).
             </p>
           </div>
         </div>
@@ -430,20 +473,21 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>{conf.contractVersion}</td>
                 <td style={{ padding: '10px 8px' }}>
                   <span
+                    data-testid={`conformance-status-${conf.provider}`}
                     style={{
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '11px',
                       fontWeight: 700,
-                      backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                      color: '#3fb950',
+                      backgroundColor: 'rgba(210, 153, 34, 0.2)',
+                      color: '#d29922',
                     }}
                   >
-                    100% CONFORMING
+                    미측정 (모의/정적 예시 · 검증 아님)
                   </span>
                 </td>
-                <td style={{ padding: '10px 8px' }}>{conf.avgLatencyMs} ms</td>
-                <td style={{ padding: '10px 8px', color: '#58a6ff' }}>{conf.tokensPerSec} tok/s</td>
+                <td style={{ padding: '10px 8px' }}>{conf.avgLatencyMs} ms (모의/정적 예시)</td>
+                <td style={{ padding: '10px 8px', color: '#58a6ff' }}>{conf.tokensPerSec} tok/s (모의/정적 예시)</td>
                 <td style={{ padding: '10px 8px', color: '#8b949e', fontSize: '12px' }}>
                   {conf.supportedProtocols.join(', ')}
                 </td>
@@ -451,6 +495,162 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Real Model Commitment Observation Panel (Control-Plane GET /v1/.../commitment) */}
+      <div
+        data-testid="model-commitment-panel"
+        style={{
+          backgroundColor: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: '8px',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+        <div>
+          <h4 style={{ margin: 0, fontSize: '15px', color: '#f0f6fc' }}>
+            실제 모델 Commitment 조회 (Control-Plane HTTP API)
+          </h4>
+          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
+            백엔드 엔드포인트 <code>GET /v1/projects/:project/models/:model_id/versions/:version/commitment</code>로부터 정본 manifestHash와 sourceRunId를 조회합니다.
+          </p>
+        </div>
+
+        <form onSubmit={handleFetchCommitment} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+          <input
+            type="text"
+            data-testid="commitment-project-input"
+            placeholder="Project ID (예: prj_default)"
+            value={commitmentProject}
+            onChange={(e) => setCommitmentProject(e.target.value)}
+            style={{
+              padding: '6px 10px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              color: '#c9d1d9',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono, monospace)',
+              minWidth: '180px',
+            }}
+          />
+          <input
+            type="text"
+            data-testid="commitment-model-input"
+            placeholder="Model ID (예: mod_pacs_seg)"
+            value={commitmentModelId}
+            onChange={(e) => setCommitmentModelId(e.target.value)}
+            style={{
+              padding: '6px 10px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              color: '#c9d1d9',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono, monospace)',
+              minWidth: '180px',
+            }}
+          />
+          <input
+            type="text"
+            data-testid="commitment-version-input"
+            placeholder="Version (예: 1.0.0)"
+            value={commitmentVersion}
+            onChange={(e) => setCommitmentVersion(e.target.value)}
+            style={{
+              padding: '6px 10px',
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              color: '#c9d1d9',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono, monospace)',
+              minWidth: '120px',
+            }}
+          />
+          <Button
+            size="sm"
+            variant="primary"
+            type="submit"
+            data-testid="commitment-fetch-btn"
+            disabled={commitmentLoading || !commitmentProject.trim() || !commitmentModelId.trim() || !commitmentVersion.trim()}
+          >
+            {commitmentLoading ? '조회 중...' : 'Commitment 조회'}
+          </Button>
+        </form>
+
+        {commitmentError && (
+          <div
+            role="alert"
+            data-testid="commitment-error-banner"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              backgroundColor: 'rgba(248, 81, 73, 0.15)',
+              border: '1px solid #f85149',
+              color: '#f85149',
+            }}
+          >
+            ❌ Commitment 조회 실패: {commitmentError}
+          </div>
+        )}
+
+        {commitmentData && (
+          <div
+            data-testid="commitment-result-container"
+            style={{
+              backgroundColor: '#0d1117',
+              border: '1px solid #30363d',
+              borderRadius: '6px',
+              padding: '16px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
+              fontSize: '13px',
+            }}
+          >
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>MANIFEST HASH</span>
+              <code data-testid="commitment-manifest-hash" style={{ color: '#58a6ff', wordBreak: 'break-all' }}>
+                {commitmentData.manifestHash}
+              </code>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SOURCE RUN ID</span>
+              <code data-testid="commitment-source-run-id" style={{ color: '#f0f6fc', wordBreak: 'break-all' }}>
+                {commitmentData.sourceRunId}
+              </code>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>COMMITTED AT</span>
+              <span data-testid="commitment-committed-at" style={{ color: '#c9d1d9' }}>
+                {commitmentData.committedAt}
+              </span>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>RECOVERY EPOCH</span>
+              <span data-testid="commitment-recovery-epoch" style={{ color: '#c9d1d9' }}>
+                {commitmentData.commitRecoveryEpoch}
+              </span>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>FORMAT / TOTAL BYTES</span>
+              <span data-testid="commitment-format-bytes" style={{ color: '#c9d1d9' }}>
+                {commitmentData.format} ({commitmentData.totalBytes.toLocaleString()} bytes)
+              </span>
+            </div>
+            <div>
+              <span style={{ color: '#8b949e', fontSize: '11px', display: 'block' }}>SHARD COUNT</span>
+              <span data-testid="commitment-shard-count" style={{ color: '#c9d1d9' }}>
+                {commitmentData.shardCount} shard(s)
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

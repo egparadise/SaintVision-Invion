@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
@@ -76,6 +76,23 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       expect(lineage?.deploymentDigest).toMatch(/^sha256:/);
       expect(lineage?.status).toBe('deployed');
     });
+
+    it('reversely traces model lineage from dataset digest (dset_sha256...) to root model', () => {
+      const mlops = new MlopsManager(TEST_FIXTURE_LINEAGES);
+
+      // Query by dataset digest prefix and full digest
+      const targetModel = TEST_FIXTURE_LINEAGES[0];
+      const lineageByFullDigest = mlops.queryLineage(targetModel.datasetDigest);
+      expect(lineageByFullDigest).toBeDefined();
+      expect(lineageByFullDigest?.modelId).toBe(targetModel.modelId);
+
+      const lineageByPartialDigest = mlops.queryLineage('dset_sha256');
+      expect(lineageByPartialDigest).toBeDefined();
+
+      // Empty or whitespace term returns undefined
+      expect(mlops.queryLineage('')).toBeUndefined();
+      expect(mlops.queryLineage('   ')).toBeUndefined();
+    });
   });
 
   describe('Gated Model Deployment (AC-10 - Test Fixtures)', () => {
@@ -106,6 +123,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         approvalId: 'apr_01JXYZ777777',
       });
       expect(attempt3.success).toBe(true);
+      expect(attempt3.isSimulated).toBe(true);
       expect(attempt3.deployedModel?.deploymentDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
       expect(attempt3.deployedModel?.status).toBe('deployed');
     });
@@ -190,6 +208,132 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         nativeInputValueSetter?.call(input, 'apr_01JXYZ123456');
         input!.dispatchEvent(new Event('change', { bubbles: true }));
       });
+    });
+
+    it('verifies Adapter Conformance displays "미측정 (모의/정적 예시 · 검증 아님)" and NEVER "100% CONFORMING"', async () => {
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+      });
+
+      // Strict Invariant 1: "100% CONFORMING" is strictly forbidden (must be unmeasured)
+      expect(container.textContent).not.toContain('100% CONFORMING');
+
+      // Strict Invariant 2: Explicit unmeasured disclaimer is rendered
+      expect(container.textContent).toContain('미측정 (모의/정적 예시 · 검증 아님)');
+      expect(container.textContent).toContain('실제 conformance API 부재');
+      expect(container.textContent).toContain('실제 어댑터 conformance API 부재');
+
+      // Strict Invariant 3: Latency and token throughput marked as mock/static example
+      expect(container.textContent).toContain('ms (모의/정적 예시)');
+      expect(container.textContent).toContain('tok/s (모의/정적 예시)');
+    });
+
+    it('verifies Node 1-5 labels are qualified with (모의) and deployed node NEVER displays "Production Live"', async () => {
+      const deployedModel = TEST_FIXTURE_LINEAGES.find((m) => m.status === 'deployed')!;
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView, { initialLineages: [deployedModel] }));
+      });
+
+      // Strict Invariant 1: Node labels lowered to mock/qualifier
+      expect(container.textContent).toContain('SHA-256 (모의 표기)');
+      expect(container.textContent).toContain('Git Signed SHA (모의 표기)');
+      expect(container.textContent).toContain('Isolated Runtime (모의)');
+      expect(container.textContent).toContain('4. EVALUATION (모의 점수)');
+      expect(container.textContent).toContain('Two-Person Rule (모의)');
+
+      // Strict Invariant 2: Deployed model MUST NEVER claim "Production Live"
+      expect(container.textContent).not.toContain('Production Live');
+      expect(container.textContent).toContain('모의 배포 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포)');
+      expect(container.textContent).toContain('6. DEPLOYMENT DIGEST (모의 시뮬레이션)');
+
+      // Strict Invariant 3: Reverse query prompt mentions dataset hash
+      expect(container.textContent).toContain('데이터셋 해시(dset_sha256...)로 역추적');
+    });
+
+    it('renders Real Model Commitment Observation Panel and fetches commitment via control-plane API', async () => {
+      const originalFetch = globalThis.fetch;
+      const mockCommitmentResponse = {
+        projectId: 'prj_test_10',
+        modelId: 'mod_pacs_seg_v2',
+        version: '2.1.0',
+        manifestHash: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        sourceRunId: 'run_01JTESTCOMMITMENT01',
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: '42',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => mockCommitmentResponse,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const panel = container.querySelector('[data-testid="model-commitment-panel"]');
+        expect(panel).not.toBeNull();
+        expect(panel?.textContent).toContain('실제 모델 Commitment 조회 (Control-Plane HTTP API)');
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        expect(projectInput).not.toBeNull();
+        expect(modelInput).not.toBeNull();
+        expect(versionInput).not.toBeNull();
+        expect(fetchBtn).not.toBeNull();
+
+        // Trigger fetch
+        await act(async () => {
+          fetchBtn!.click();
+        });
+
+        expect(globalThis.fetch).toHaveBeenCalled();
+
+        // Invariant: manifestHash and sourceRunId must be displayed in read-only panel
+        const manifestHashEl = container.querySelector('[data-testid="commitment-manifest-hash"]');
+        const sourceRunIdEl = container.querySelector('[data-testid="commitment-source-run-id"]');
+        expect(manifestHashEl?.textContent).toBe(mockCommitmentResponse.manifestHash);
+        expect(sourceRunIdEl?.textContent).toBe(mockCommitmentResponse.sourceRunId);
+
+        // Now test 404 failure handling
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+          headers: new Headers({ 'content-type': 'application/problem+json' }),
+          json: async () => ({
+            code: 'MODEL-0004',
+            title: 'Not Found',
+            detail: 'Committed model not found',
+            status: 404,
+          }),
+        } as any);
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('Committed model not found');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
   });
 });

@@ -12,6 +12,7 @@ import type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ModelCommitObservation,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -22,6 +23,7 @@ export type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ModelCommitObservation,
 };
 
 export type ErrorCategory =
