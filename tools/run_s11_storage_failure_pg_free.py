@@ -8,6 +8,7 @@ the process still exits zero after every case and cleanup receipt is emitted.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import errno
 import hashlib
 import io
@@ -113,6 +114,12 @@ def _surface(exc: BaseException | None) -> dict[str, Any]:
             "code": exc.code,
             "status": exc.status,
             "retryable": exc.retryable,
+        }
+    if isinstance(exc, retention.RetentionApplyPartial):
+        return {
+            "kind": "failureClass",
+            "failureClass": retention.PARTIAL_FAILURE_CLASS,
+            "retryable": True,
         }
     if isinstance(exc, OSError):
         return {"kind": "osError", "errno": int(exc.errno or 0)}
@@ -285,20 +292,52 @@ def _retention_fault(identity: str) -> dict[str, Any]:
         backups = root / "backups"
         archive.mkdir()
         backups.mkdir()
-        plan = retention.Plan(retention_days=35, now="2026-09-28T00:00:00+00:00")
         retained_archive = {
             "000000010000000000000010": b"boundary",
             "000000010000000000000011": b"after-boundary",
             "00000002.history": b"history",
             "000000010000000000000012.partial": b"partial",
         }
-        retained_backups = {"latest-backup": b"START WAL LOCATION 0/10000010 (file 000000010000000000000010)\n"}
+        retained_backups = {
+            "latest-backup": (
+                b"START WAL LOCATION: 0/10000010 (file 000000010000000000000010)\n"
+                b"START TIME: 2026-09-27 00:00:00 +00\n"
+            )
+        }
+        deletion_backups = {
+            "old-backup-a": (
+                b"START WAL LOCATION: 0/10000001 (file 000000010000000000000001)\n"
+                b"START TIME: 2026-07-01 00:00:00 +00\n"
+            ),
+            "old-backup-b": (
+                b"START WAL LOCATION: 0/10000002 (file 000000010000000000000002)\n"
+                b"START TIME: 2026-07-02 00:00:00 +00\n"
+            ),
+        }
         for name, data in retained_archive.items():
             (archive / name).write_bytes(data)
         for name, data in retained_backups.items():
             target = backups / name
             target.mkdir()
             (target / "backup_label").write_bytes(data)
+        for name, data in deletion_backups.items():
+            target = backups / name
+            target.mkdir()
+            (target / "backup_label").write_bytes(data)
+
+        for name in ("000000010000000000000001", "000000010000000000000002"):
+            (archive / name).write_bytes(b"wal")
+        plan_ = retention.plan(
+            retention.load_archive(archive),
+            retention.load_backups(backups),
+            retention_days=35,
+            now=datetime.fromisoformat("2026-09-28T00:00:00+00:00"),
+        )
+        if plan_.delete_archive != [
+            "000000010000000000000001",
+            "000000010000000000000002",
+        ] or plan_.delete_backups != ["old-backup-a", "old-backup-b"]:
+            raise AssertionError("the BAK-02 fixture no longer yields the reviewed retention plan")
 
         def retained_digest() -> str:
             digest = hashlib.sha256()
@@ -318,10 +357,6 @@ def _retention_fault(identity: str) -> dict[str, Any]:
         before = retained_digest()
         injected = 0
         if identity.endswith("unlink"):
-            names = ["000000010000000000000001", "000000010000000000000002"]
-            for name in names:
-                (archive / name).write_bytes(b"wal")
-            plan.delete_archive = names
             original_unlink = Path.unlink
 
             def interrupted_unlink(path, *args, **kwargs):
@@ -333,10 +368,6 @@ def _retention_fault(identity: str) -> dict[str, Any]:
 
             patcher = mock.patch.object(Path, "unlink", new=interrupted_unlink)
         else:
-            names = ["old-backup-a", "old-backup-b"]
-            for name in names:
-                (backups / name).mkdir()
-            plan.delete_backups = names
             original_rmtree = shutil.rmtree
 
             def interrupted_rmtree(path, *args, **kwargs):
@@ -349,8 +380,8 @@ def _retention_fault(identity: str) -> dict[str, Any]:
             patcher = mock.patch.object(shutil, "rmtree", new=interrupted_rmtree)
         try:
             with patcher:
-                retention.apply(plan, archive, backups)
-        except OSError as exc:
+                retention.apply(plan_, archive, backups)
+        except (OSError, retention.RetentionApplyPartial) as exc:
             actual = _surface(exc)
         else:
             actual = {"kind": "success"}

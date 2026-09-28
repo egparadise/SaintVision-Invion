@@ -107,9 +107,9 @@ def test_default_linux_executor_covers_the_full_pg_free_tier():
     evidence = importer.import_evidence(raw, producer.junit_xml(raw), FakeGit())
     assert raw["caseCount"] == 12
     if sys.platform == "linux":
-        assert evidence["verdict"] == "MEASURED_FAIL"
-        assert evidence["metrics"]["classificationMismatchCount"] == 7
-        assert sum(case["actualSurface"].get("kind") == "osError" for case in raw["cases"]) == 7
+        assert evidence["verdict"] == "MEASURED_PASS"
+        assert evidence["metrics"]["classificationMismatchCount"] == 0
+        assert sum(case["actualSurface"].get("kind") == "osError" for case in raw["cases"]) == 0
     else:
         assert evidence["verdict"] == "MEASURED_PASS"
 
@@ -130,15 +130,68 @@ def test_product_finding_is_preserved_as_measured_fail():
 
 
 @pytest.mark.parametrize("identity", producer.PG_FREE_CASES[:2])
-def test_retention_and_backup_fault_cases_execute_hermetically(identity):
+def test_retention_and_backup_fault_cases_execute_hermetically(identity, monkeypatch):
+    receipts = []
+    original_apply = producer.retention.apply
+
+    def observed_apply(*args, **kwargs):
+        try:
+            return original_apply(*args, **kwargs)
+        except producer.retention.RetentionApplyPartial as exc:
+            receipts.append(exc.receipt)
+            raise
+
+    monkeypatch.setattr(producer.retention, "apply", observed_apply)
     case = producer.execute_case(identity)
     assert case["caseIdentity"] == identity
-    assert case["actualSurface"] == {"kind": "osError", "errno": 5}
-    assert case["matched"] is False
-    assert case["observedFindingCount"] == 1
+    assert case["actualSurface"] == {
+        "kind": "failureClass",
+        "failureClass": "RETENTION_APPLY_PARTIAL",
+        "retryable": True,
+    }
+    assert case["matched"] is True
+    assert case["observedFindingCount"] == 0
     assert case["beforeSha256"] == case["afterSha256"]
     assert case["partialResidueCount"] is None
     assert case["cleanupResidueCount"] is None
+    assert len(receipts) == 1
+    assert receipts[0]["status"] == "partial"
+    assert receipts[0]["failureClass"] == "RETENTION_APPLY_PARTIAL"
+    assert sum(map(len, receipts[0]["removed"].values())) >= 1
+    assert receipts[0]["incompleteCandidates"]
+
+
+def test_retention_fixture_uses_the_product_planner_and_not_a_handmade_plan(monkeypatch):
+    planned = []
+    real_plan = producer.retention.plan
+
+    def observed_plan(*args, **kwargs):
+        value = real_plan(*args, **kwargs)
+        planned.append(value)
+        return value
+
+    def stop_after_observing(plan, _archive, _backups):
+        assert planned and plan is planned[0]
+        assert plan.delete_archive == [
+            "000000010000000000000001",
+            "000000010000000000000002",
+        ]
+        assert plan.delete_backups == ["old-backup-a", "old-backup-b"]
+        raise producer.retention.RetentionApplyPartial(
+            {
+                "status": "partial",
+                "failureClass": "RETENTION_APPLY_PARTIAL",
+                "removed": {"archive": [plan.delete_archive[0]], "backups": []},
+                "incompleteCandidates": [
+                    {"kind": "archive", "name": plan.delete_archive[1]}
+                ],
+            }
+        )
+
+    monkeypatch.setattr(producer.retention, "plan", observed_plan)
+    monkeypatch.setattr(producer.retention, "apply", stop_after_observing)
+    case = producer.execute_case("BAK-02/local/retention-unlink")
+    assert case["matched"] is True and case["beforeSha256"] == case["afterSha256"]
 
 
 @pytest.mark.parametrize("identity", producer.PG_FREE_CASES[2:4])
