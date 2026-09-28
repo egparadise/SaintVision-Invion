@@ -4,6 +4,9 @@ import hashlib
 import os
 from uuid import uuid4
 
+import pytest
+
+from inv.errors import DomainError
 from inv.object_store import LocalObjectStore, LocalObjects
 from inv.s3_client import S3Client, S3Config
 from inv.s3_object_store import S3Objects, make_s3_locator
@@ -46,6 +49,11 @@ def test_product_adapter_put_get_exists_hash_delete():
         assert provider.get(locator, digest, len(body)) == body
         measured = provider.hash(locator)
         assert measured.sha256 == digest and measured.size_bytes == len(body)
+        different = body + b"different"
+        with pytest.raises(DomainError) as error:
+            provider.put(locator, different, hashlib.sha256(different).hexdigest())
+        assert error.value.code == "STORE-0005" and error.value.status == 409
+        assert provider.get(locator, digest, len(body)) == body
     finally:
         provider.delete(locator)
     assert provider.exists(locator) is False
@@ -64,5 +72,10 @@ def test_local_compatibility_adapter_uses_the_same_conformance(tmp_path):
     assert provider.get(locator, digest, len(body)) == body
     measured = provider.hash(locator)
     assert measured.sha256 == digest and measured.size_bytes == len(body)
+    different = body + b"different"
+    with pytest.raises(DomainError) as error:
+        provider.put(locator, different, hashlib.sha256(different).hexdigest())
+    assert error.value.status == 409
+    assert provider.get(locator, digest, len(body)) == body
     provider.delete(locator)
     assert provider.exists(locator) is False

@@ -109,7 +109,7 @@ class S3Objects:
         try:
             response = self.client.put(key, body, expected_sha256)
             published = response.status in {200, 201, 204}
-            ambiguous = response.status == 409 or response.status >= 500
+            ambiguous = response.status in {409, 412} or response.status >= 500
         except Exception:
             published = False
             ambiguous = True

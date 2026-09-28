@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S3-OBJECT-STORE-SPI-001"
 title: "S3 호환 ObjectStore 구현 1단계 — SPI·단일 SigV4·provider conformance"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:15:00+09:00"
+updated: "2026-09-28T18:10:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -39,3 +39,11 @@ PG-free 시험은 scoped locator, prefix 이탈, timeout 멱등, 403 fail-closed
 ## 다음 행동
 
 Claude가 이 분할 PR을 검토하고 hosted MinIO JUnit 2건이 실행돼야 한다. 그 뒤 같은 stack에서 provider/locator backfill migration, strict `objectStore` 설정, producer replay guard, provider-body Artifact download를 구현하며 hosted migration upgrade/definer audit를 증거로 남긴다.
+
+## Claude 독립 검토 반영 (v1.1)
+
+- hosted `s01-storage-roundtrip` job은 `requirements-test.txt`의 pinned pytest를 설치한다. 제품 conformance가 실패해도 기존 #135 storage evidence step은 `if: always()`로 별도 실행되어 두 증거가 조용히 함께 사라지지 않는다.
+- S3 PUT은 서명된 `If-None-Match: *` 조건부 요청이다. 412는 실제 object를 다시 읽어 같은 byte만 멱등 성공으로 인정하고, 다른 byte는 `STORE-0005`/409로 거부한다. Local compatibility wrapper도 기존 byte와 다른 PUT을 같은 409 의미로 거부한다.
+- AWS S3 SigV4 공식 GET Object 예제(2013-05-24, signature `f0e8…db41`)를 known-answer vector로 고정했다. signer key-derivation/canonicalization 변이는 hosted 환경 없이도 잡힌다.
+- 공개 입력 검사는 request root의 중첩 property와 `$ref`, standalone request schema, FastAPI HTTP route의 path/query parameter까지 확장했다.
+- PG-free focused 결과: `38 passed`, YAML parse와 `git diff --check` exit 0. Hosted S3/Local conformance 및 기존 storage evidence의 실제 JUnit은 수정 head의 Core run에서 확인한다.
