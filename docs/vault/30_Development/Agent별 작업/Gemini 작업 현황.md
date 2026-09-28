@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T15:45:00+09:00"
+updated: "2026-09-28T05:35:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -48,6 +48,25 @@ source_of_truth: "Git"
   - **오류 코드 분류 체계 정밀화 (Codex 반영)**: 인증 헤더 누락 시 HTTP 401 `AUTH-MISSING-CREDENTIAL`, 유효하지 않은 자격증명/인가 실패 시 HTTP 403 `AUTH-*` 계열로 분리.
   - **계획서 정본**: [[2026-09-23_S09-FE_100Prompt_30Coding_Eval러너_자연어요청_시나리오_매트릭스_Gemini]] (v1.1.1).
   - **독립 검토 상태**: Codex 승인 확인 완료, Claude r2 지적 2건 정정 후 최종 승인 대기.
+- 확인 기준: 2026-09-28T05:35:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s07-fe-matrix`).
+
+## 2026-09-28 S07-FE 분산 복구·Node 이탈·Heartbeat 60s Stale 전이·Fencing Token·Zombie Late Write 차단 UX 시나리오 매트릭스 v1.0.1 개정 (docs-only, `agent/gemini/s07-fe-matrix`)
+
+- **Codex 계약 검토(F-C1, F-C2, F-C3) 전면 반영 5대 핵심 영역 15대 시나리오 정본 개정 (v1.0.1)**:
+  - **F-C1 (UI 합성 상태 vs 커널 정본 분리)**:
+    - `stale` 및 `fenced`는 DB 상태가 아니며 `recoveryEngine.ts` 클라이언트 인메모리 시뮬레이션 상태임으로 한정 (`HBD-01~03`).
+    - 백엔드 DB 커널 `inv.nodes.status`는 4종(`online|offline|draining|quarantined`)만 허용하며, observer(`observation.py:138-150`)는 60s 초과 시 곧바로 `offline`으로 전환함.
+    - 실행/리스 디스패치 경로는 별도 `15s freshness`(`heartbeat_at >= clock_timestamp() - 15s`)를 요구함 (`dispatch.py:79-85`, `leases.py:253-263`).
+    - `HBD-03`의 '스케줄러 영구 제외'를 인메모리 반환값(`offline`) 단언으로 정정하고 스케줄러 연동은 UNMEASURED로 분리.
+  - **F-C2 (합성 거절/복구 vs 물리 AC-07 분리)**:
+    - `ZMB-01~03`: 50회 연속 지연 쓰기 거절(`staleTokenWritesAllowed === 0`)을 'UI 인메모리 합성 거절 시나리오'로 명시하고, 운영 AC-07의 클러스터 전체 물리 영속 쓰기 완전 차단은 **UNMEASURED**로 유지.
+    - `REC-01~03`: 20/20 복구를 'UI 인메모리 모의 복구 시나리오'로 명시하고, 물리 바이트 전송 및 실행 샤드 재생을 수반하는 운영 AC-07 복구율(≥95%)은 **UNMEASURED**로 유지.
+  - **F-C3 (돌연변이 PLANNED/SURVIVED 정정 및 recovery_epoch UUID 경계 반영)**:
+    - MUT-01, MUT-02, MUT-03, MUT-05의 판정 결과를 provenance 실행 전이므로 `PLANNED / NOT_RUN`으로 정정.
+    - MUT-04: `distributed-recovery.test.ts:89-113`이 `record.newEpoch`를 단언하지 않아 `epoch += 1` 제거 시에도 통과하므로 `SURVIVED (미측정) [단언 보강 필요]`로 정직 표기.
+    - 백엔드 `recovery_epoch`(`0001_core.sql:19`) 근거를 `tests/integration/test_shard_recovery.py:371-383`로 교체하고, 단조 증가 카운터가 아닌 UUID equality boundary(`str(uuid4())` 불일치 시 `LEASE-0004` 거절)임을 명시.
+- **계획서 정본**: [[2026-09-28_S07-FE_분산복구_Heartbeat60s_FencingToken_Zombie차단_시나리오_매트릭스_Gemini]] (v1.0.1).
+- **독립 검토 상태**: Codex 지적 3건 전수 조치 완료 후 재대조 대기, Claude UI 경로 독립 검토 대기.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
