@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.210"
+version: "1.0.214"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:25:00+09:00"
+updated: "2026-09-28T17:21:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,6 +30,12 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r2 C1~C3 보강
+
+- #193 Claude r1 D1~D6에 이어 r2 C1~C2를 보강했다. truncated backup은 유효 tar의 data 구간을 실제 절단하고 verifier source 변이 6종을 부정 시험으로 고정한다.
+- retention 미완료 삭제 후보와 directory-fsync 뒤 exact canonical byte는 허용 상태라 residue로 세지 않는다. retained boundary 삭제는 digest finding이며 관측하지 않은 committed loss는 `null`이다. raw OSError 분류 공백은 숨기지 않는다.
+- C4에서 BAK-02의 미관측 partial/cleanup residue를 `null`로 고치고 절대경로·symlink·hardlink·8193-byte control verifier 부정 시험을 추가했다. 로컬 단일 시험은 storage evidence 53 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux에서 actual LocalObjects 8건·osError finding 7건과 Backend green을 확인하기 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+
 ## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
 
 - #177 `b246e7db` 위에 #185 승인 head `33ed1b8c`를 merge commit `067e6a48`로 결속했고 merge-tree exact 일치를 확인했다.
