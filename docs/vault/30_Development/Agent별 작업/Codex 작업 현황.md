@@ -58,6 +58,12 @@ source_of_truth: "Git"
 - base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.
 - 출력은 PASS/FAIL/BLOCKED와 개수·불리언만 포함한다. token/DSN/URL/hostname/IP/Node·tenant ID/fingerprint/path/인증서·예외 원문을 배제하고 stale output을 선삭제한다. DB는 repeatable-read read-only·2초 timeout·tenant scope SELECT만 쓴다.
 - Claude 1차 검토의 null fail-open·보호 입력 선삭제·비제품 인증서 identity·health 표면 혼합·`nodes:null`·redaction 시험 공백을 `15f84413`에서 보정했다. r2 조건의 무입력 실제 probe 7건/U1~U6 전부 BLOCKED·exit 2와 `PYTHONPATH` 없는 CLI help도 추가해 focused 25 passed다. 제품 `certificate_identity`와 pilot 형식 5장을 결속하고 1/5는 BLOCKED로 고정했으며 Node/HTTP CA 분리와 평문 토큰 거부를 추가했다. 표준 게이트 재실행 후 Claude 재검토가 다음이며, 현재 실 inventory·token은 합성하지 않아 S01 합격을 주장하지 않는다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
+## 2026-09-28 Card45 S3 ObjectStore 구현 1단계 — reviewer 인계
+
+- 승인된 #140 v1.2 설계를 #135 head 위에서 구현했다. locator 기반 `ObjectStore` SPI, 기존 Local compatibility wrapper, scoped `S3Objects`, 단일 제품 SigV4 client를 추가하고 #135 preflight의 signer 복사본을 제거했다.
+- S3 timeout/5xx/409는 실제 bytes 재조회로만 멱등 성공, 403은 성공 강등 금지, delete는 HEAD 404 확인으로 고정했다. PG-free 35 passed에서 prefix 이탈·digest/metadata/size drift·잔존 delete·공개 request의 objectId/locator 입력 0건을 단언했다.
+- Claude 1차 검토의 차단 3건을 반영했다. lane은 pinned pytest를 설치하고 conformance 실패와 #135 evidence를 독립 실행한다. S3는 서명된 `If-None-Match: *`와 412 재조회로 다른 byte 덮어쓰기를 `STORE-0005`/409로 막고, Local도 같은 충돌 의미를 지킨다. AWS 공식 SigV4 known-answer와 중첩 schema·route 입력 스캔을 추가해 PG-free 38 passed다. 수정 head의 hosted S3/Local JUnit과 #135 evidence는 대기이며, migration·strict 설정·두 producer·Artifact provider-body download는 다음 stack PR이라 아직 제품 경로 완료가 아니다. [[2026-09-28_17-15-00_KST_S3_ObjectStore_SPI_Codex]].
+
 ## 2026-09-28 S01-ST Storage SHA-256 왕복 검증기 — hosted 인계 준비
 
 - `agent/codex/s01-storage-roundtrip`, base `1e8baf04`, owner Codex/reviewer Claude. 설계→예상 red 시험→구현 순서를 지켰고 v1.1 PG-free focused 20 passed(M2 잔존 object 부정 대조 포함), 저장소 입력 없는 CLI는 외부 호출 0·`BLOCKED`/exit 3, YAML parse exit 0이다.
