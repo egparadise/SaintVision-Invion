@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.219"
+version: "1.0.220"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T20:55:02+09:00"
+updated: "2026-09-28T21:38:56+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
+
+- branch `agent/codex/ac11-composite-long-soak-repin`, base #204 head `dc52051b`, #214 설계 merge `a4e0c466`. 정본 registry에 `s11-ac11-composite-long-soak-v0`를 새 ID로 추가하고 blob `e80b252a…`에 aggregator·migration importer·physical importer를 함께 repin했다.
+- physical importer는 exact case/fault identity, topology, 24시간 창, physical storage와 hosted drift child의 SHA·inventory·window 결속을 fail-closed로 검사한다. G-19/G-24 부재는 `BLOCKED_EXTERNAL`, pre-registration fixture는 `NOT_REGISTERED`이고 hosted/synthetic 결과만으로 PASS를 만들지 않는다.
+- PG-free focused 92 passed, compile·JSON·diff와 docs·bindings·ontology·ratchet gate 모두 exit 0. 물리 5노드·fault injection·PG·Docker는 실행하지 않았고 `long-soak`은 완료 또는 승격이 아니다. [[2026-09-28_21-38-56_KST_S11_AC11_composite_long_soak_repin_Codex]].
 
 ## 2026-09-28 S11-ST hosted 10-case reference lane — PR #204
 
