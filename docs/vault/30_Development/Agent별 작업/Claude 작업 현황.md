@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.21"
+version: "1.2.25"
 status: "review"
 author: "Claude"
 updated: "2026-09-23T09:55:00+09:00"
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+G-11 재평가 판정 카드 119 (Claude, 2026-09-29, 기준 착지 후보 `b91ab72f` = `origin/coord/train-land-2330` + G-03 2단계 #221 `2f853a94`, base `integration/all-agents-unified`, docs-only): 설계 #206 §6의 "모두 충족 시 B안 재개" 네 조건을 하나씩 실측 판정했다. **판정: 재개하지 않는다 — 셋 미충족, 하나는 전제만 유지.** 조건1(G-01~G-05 카드 닫힘)은 **4/5** — G-01(adapters HTTP 시험 2파일)·G-02(`backend.yml:164-166`이 "the two live archiver cases now run here", `:66`이 `INV_TEST_ARCHIVER_IMAGE: postgres:16`)·G-04·G-05(`api/v1`에 route 8개) 구현은 착지 후보에 있으나 **G-03은 1단계만**이고(`conformance_status.py:1`이 스스로 "G-03 phase one") 2단계 #221은 OPEN이다. 조건2(`workflow_dispatch` 1회 실측)는 **하나도 수행되지 않았다** — `cli-conformance` lane 없음(workflows 8개 전수 확인), `tools/cli-conformance/` 없음, Evidence JSON 없음. **이 조건은 기다려서 충족되는 종류가 아니라는 것이 이 판정의 발견이다** — runner 관측을 요구하므로 workflow 파일을 먼저 commit해야 성립하고, 설계 §6이 그 순환을 적지 않았다. 조건3(핀 갱신 담당·주기)은 결정 기록이 없고(grep 결과가 설계 자신과 그 History 둘뿐), **필요성이 7.5시간 만에 실측으로 강해졌다** — npm 재조회에서 `@openai/codex`의 버전 수가 설계 조회 시점 **5044 → 5051**(+7)인데 `latest`는 0.158.0 그대로다(claude-code 525·gemini-cli 763은 불변). 조건4(antigravity 제외)는 `agents.py`의 `ANTIGRAVITY`가 여전히 Windows·macOS `install_paths`만·`prompt_args=None`·`capabilities=frozenset()`이어서 **정의 변경 없음 → 상한 3/4 유지**이고, "map에 skip 1" 반쪽은 구현 시점 요구사항이다. **설계 v1.0 이후에 다섯째 조건이 새로 생겼다**: #221이 `0055`의 CHECK로 `subject = 'fixture-adapter'`·`provenance = 'in-server'`를 못박고 migration 자신이 "A wider value is refused by the CHECK until a producer exists"라고 적으며, 유일한 producer `tools/record_fixture_conformance.py:1-11`도 "**not the CLI installed on this host**"라고 선언한다. 그래서 카드가 말한 "#221의 conformance 기록 import 경로"는 **오늘 존재하지 않는다** — hosted CLI 결과를 넣으려면 CHECK를 넓히는 새 migration + 계약 4개 + producer 확장이 필요하다. §6에 조건 5로 추가할 것을 제안했다. 다음 재평가 순서를 고정했다: #221 착지 → 핀 주기 결정 → `subject` 확장 설계·migration 번호 → **측정 전용 dispatch PR**(조건 2) → B안. 측정을 3번 뒤에 두는 이유는 결과를 넣을 자리가 정해진 뒤 측정해야 그것이 증거가 되기 때문이다. hosted 증거 1건 인용: Backend Build run **36436343934**(head `b91ab72f`) success, 두 job의 step 12 "Require executed evidence and declared platform skips" 통과 — 네 skip이 선언대로 실제 일어났음이 확인된다. 설계 인용 줄이 밀린 것도 적었다(`backend.yml:163-166`→`:168-171`, `core.yml:174-177`→`:271-274`). 인용 12곳 줄 단위 재검증(내 인용 2곳 정정: `record_fixture_conformance.py:1-9`→`:1-11`, 계약 glob→실제 4파일명), wiki link 0(설계가 base에 없어 평문 인용), `check_docs`·`check_doc_single_source --ratchet` exit 0. npm 설치·workflow 생성·코드 변경 0건. 다음 첫 행동: Codex 검토.
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
