@@ -53,7 +53,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
   });
 
   describe('5-Node Full E2E Journey & Smoke Verification (AC-12)', () => {
-    it('verifies all 5 nodes (3 Windows, 2 Linux) successfully pass smoke checks', () => {
+    it('verifies 5-node architectural journey spec definitions and reconciliation behavior', () => {
       const dm = new DeploymentManager();
       const nodes = dm.getNodeVerifications();
 
@@ -64,13 +64,31 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(windowsNodes).toHaveLength(3);
       expect(linuxNodes).toHaveLength(2);
 
-      // All nodes must pass smoke tests with low intranet latency
+      // Architectural baseline checks
       nodes.forEach((node) => {
-        expect(node.smokeStatus).toBe('passed');
-        expect(node.latencyMs).toBeLessThanOrEqual(30);
         expect(node.roles.length).toBeGreaterThan(0);
-        expect(node.lastVerifiedAt).toBe('2026-09-28T09:00:00Z');
       });
+
+      // Reconciliation with offline live node marks smokeStatus as failed (DEF-S12-03)
+      const reconciled = dm.reconcileLiveClusterNodes([
+        {
+          id: 'nod_01JABCDEF01',
+          hostname: 'Node-01-WinMain',
+          status: 'offline',
+          os: 'windows',
+          cpuCores: 8,
+          cpuUsagePercent: 0,
+          memoryTotalBytes: 32000000000,
+          memoryUsedBytes: 0,
+          gpuCount: 0,
+          storageTotalBytes: 100000000000,
+          storageUsedBytes: 0,
+          heartbeatAt: '2026-09-28T09:00:00Z',
+        },
+      ]);
+      const node1 = reconciled.find((n) => n.nodeId === 'nod_01JABCDEF01');
+      expect(node1?.liveStatus).toBe('offline');
+      expect(node1?.smokeStatus).toBe('failed');
     });
   });
 
@@ -87,7 +105,7 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(manifest.knownLimitations.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('requires valid operator ID and signs off final GA release', () => {
+    it('requires valid operator ID and roles; keeps canonical sign-off false without backend route', () => {
       const dm = new DeploymentManager();
 
       // Empty operator ID rejected
@@ -95,15 +113,21 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
       expect(attempt1.success).toBe(false);
       expect(attempt1.error).toContain('Operator ID is required');
 
-      // Unauthorized arbitrary actor rejected
+      // Unauthorized actor without roles rejected (regex bypass removed per Codex F-R1)
       const attemptUnauthorized = dm.signOffRelease('arbitrary-actor');
       expect(attemptUnauthorized.success).toBe(false);
       expect(attemptUnauthorized.error).toContain('Unauthorized operator');
 
-      // Valid operator sign-off succeeded
-      const attempt2 = dm.signOffRelease('usr_operator_lead');
+      // Calling with operator prefix but without roles is rejected
+      const attemptNoRoles = dm.signOffRelease('usr_operator_lead');
+      expect(attemptNoRoles.success).toBe(false);
+      expect(attemptNoRoles.error).toContain('Unauthorized operator');
+
+      // Valid operator sign-off executes local simulation, but canonical manifest.operatorSignOff remains false
+      const attempt2 = dm.signOffRelease('usr_operator_lead', { roles: ['operator'] });
       expect(attempt2.success).toBe(true);
-      expect(attempt2.manifest.operatorSignOff).toBe(true);
+      expect(attempt2.localSimulationCompleted).toBe(true);
+      expect(attempt2.manifest.operatorSignOff).toBe(false);
     });
   });
 
@@ -126,19 +150,19 @@ describe('S12-FE: Intranet HTTPS Web Deployment, 5-Node Journey & Training Walkt
   });
 
   describe('Preflight Pipeline vs Physical Hardware Acceptance (AC-12 Zero-Mock)', () => {
-    it('returns verified preflight status with 202 checks and pending physical hardware acceptance', () => {
+    it('returns unmeasured preflight status with 202 checks and pending physical hardware acceptance', () => {
       const dm = new DeploymentManager();
       const preflight = dm.getPreflightStatus();
 
-      expect(preflight.isPreflightPassed).toBe(true);
-      expect(preflight.tlsVerified).toBe(true);
-      expect(preflight.nginxRoutingVerified).toBe(true);
+      expect(preflight.isPreflightPassed).toBe(false);
+      expect(preflight.tlsVerified).toBe(false);
+      expect(preflight.nginxRoutingVerified).toBe(false);
       expect(preflight.smokeChecksCount).toBe(202);
-      expect(preflight.smokePassedRatio).toBe(100.0);
+      expect(preflight.smokePassedRatio).toBe(0);
       expect(preflight.physicalHardwareAcceptance).toBe('pending');
 
       // Software sign-off does NOT auto-accept physical hardware (DEF-S12-16)
-      dm.signOffRelease('usr_operator_lead');
+      dm.signOffRelease('usr_operator_lead', { roles: ['operator'] });
       const updated = dm.getPreflightStatus();
       expect(updated.physicalHardwareAcceptance).toBe('pending');
     });

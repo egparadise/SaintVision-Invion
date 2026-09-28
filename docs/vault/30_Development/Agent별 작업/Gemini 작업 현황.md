@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.122"
+version: "1.0.123"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T12:20:00+09:00"
+updated: "2026-09-28T12:43:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,28 +19,27 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T12:20:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-fixes`).
+- 확인 기준: 2026-09-28T12:43:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-fixes`).
 
-## 2026-09-28 S12-FE 제품 결함 DEF-S12-01~18 치유 완결 (apps/web 및 시험 100% 통과, `agent/gemini/s12-fe-fixes`)
+## 2026-09-28 S12-FE 제품 결함 DEF-S12-01~18 치유 및 검토 피드백 반영 완결 (apps/web 및 시험 100% 통과, `agent/gemini/s12-fe-fixes`)
 
-- **작업 개요**: 승인된 PR #156 (S12-FE 시나리오 매트릭스 v1.0.4, `6057936e`)의 18대 제품 결함(DEF-S12-01 ~ DEF-S12-18)을 전수 치유.
+- **작업 개요**: 승인된 PR #156 (S12-FE 시나리오 매트릭스 v1.0.4, `6057936e`)의 18대 제품 결함(DEF-S12-01 ~ DEF-S12-18) 및 PR #171에 대한 Claude UI 축과 Codex 계약 축(차단 3건 F-R1~F-R3)의 검토 피드백을 전수 반영.
 - **주요 수정 내역**:
-  - **DEF-S12-18**: 운영자 ID 입력란을 `currentUser.id`로 고정(`readOnly={true}`), 미인증 세션 시 버튼 비활성화(`disabled`), `currentUser.role`이 `admin` 또는 `operator`가 아니면 서명 거부 및 role="alert" 통지, 성공 시 `[모의 시뮬레이션]` 고지 부여 및 `SIGNED-OFF ✔` / `프로덕션 가동 승인 완료` 허위 라벨 완전 제거.
-  - **DEF-S12-11**: `generateNginxConfig()` 및 `nginxRules`를 실제 `apps/web/nginx.conf` (`listen 443`, `http://control-plane:8080`, `ssl_protocols TLSv1.2 TLSv1.3`, `ssl_ciphers HIGH:!aNULL:!MD5;`, `include /etc/nginx/security-headers.conf;`)와 1:1로 정합.
-  - **DEF-S12-09·10·13**: 허위 `TLS 1.3 (STRICT)` 및 `전용 Enterprise CA`를 `TLS 1.2 / TLSv1.3 협상 (개발용 자체서명 CA)`로 교정, 인증서 패널에 `[정적 구성 예시 (실시간 인증서 조회 아님)]`, 게이트웨이 프로브에 `[사전 설계 규격 항목] ... (게이트웨이 실시간 프로브 미연결)` 안내 추가.
-  - **DEF-S12-12·14·15**: 클러스터 적합성을 라이브 노드 온라인/합격 수 기반 동적 계산(미연결 시 `미측정 (라이브 클러스터 미연결)`), 동적 `Date.now()`를 고정 기준 시각(`2026-09-28T09:00:00Z`)으로 정정, 릴리스 라벨을 `REL-2026-PILOT-RC` / `v1.0.0-pilot-rc` (파일럿 후보 릴리스)로 하향.
-  - **DEF-S12-16·17**: 소프트웨어 서명 후에도 `physicalHardwareAcceptance`는 `'pending'`을 유지(물리 현장 실물 검수 전제 분리), 훈련 완료 시 `[자율 실습 확인]` 고지 부여.
-  - **DEF-S12-01~08**: 스킵 링크 `<a href="#deployment-main-content">` 및 `<h1 id="deployment-main-content">` 접근성 계층 추가, 노드 테이블 `data-testid` 및 `aria-label` 바인딩, 훈련 단계 `COMPLETED ✔` vs `PENDING` 바인딩, 기존 시험(`intranet-deployment.test.ts`, `deployment-release-integrity-wiring.test.tsx`, `browser-matrix-acceptance.test.tsx`) 갱신 및 신규 18대 결함 전용 검증 스위트(`s12-defect-fixes.test.tsx`, 15개 시험) 착지.
+  - **Codex F-R1 & DEF-S12-18 (운영자 서명 권한 가드 & 계약 불변성)**: 백엔드 서명 route 부재에 따라 `ReleaseManifest.operatorSignOff = false` (pending/unmeasured) 불변성을 유지하고, 클라이언트 로컬 시뮬레이션 상태(`localSimulationCompleted: true`)로 격리. `deploymentEngine.ts`에서 ID 정규식 bypass fallback을 완전 제거하고 `roles`(`operator`/`admin`/`cluster:admin`) 명시 전달 시에만 시뮬레이션 허용. `IntranetDeploymentView.tsx`에서 입력란 `readOnly`, 비인증 차단, fallback `'usr_operator_lead'` 제거 -> `${signedOperatorId || currentUser?.id || '미확인'}` 표기, `SIGNED-OFF ✔` 및 `프로덕션 가동 승인 완료` 허위 라벨 완전 제거.
+  - **Codex F-R2 & DEF-S12-11 (Nginx 설정 정합 및 발췌 라벨 격하)**: `generateNginxConfig()` 및 `nginxRules`를 실제 `apps/web/nginx.conf` (`listen 443`, `http://control-plane:8080`, `ssl_protocols TLSv1.2 TLSv1.3`, `ssl_ciphers HIGH:!aNULL:!MD5;`, `include /etc/nginx/security-headers.conf;`)와 맞추고, summary 라벨을 `▶ 배포용 nginx.conf 구성 파일 발췌 보기 [발췌 예시 — 전문은 apps/web/nginx.conf]`로 정정 (`apps/web/src` 내 허위 정합 주장 0건).
+  - **Codex F-R3 & DEF-S12-04·13 (사전 검증 및 게이트웨이 프로브 미측정 정합)**: `deploymentEngine.ts` `getPreflightStatus()`를 `isPreflightPassed: false`, `smokePassedRatio: 0` 등 미측정으로 정정하고, 화면에서 `PREFLIGHT PASS ✔` 배지를 완전 제거하여 `미측정 (설계 규격 예시)` 표기 (`apps/web/src` 내 `PREFLIGHT PASS ✔` 0건). 게이트웨이 프로브에 `[사전 설계 규격 항목] ... (게이트웨이 실시간 프로브 미연결)` 안내 추가.
+  - **Claude 결함 1 (DEF-S12-03 노드 테이블 상태 무결성)**: 미연결 노드(`!node.liveStatus`)는 `미측정` 및 지연시간 숨김(`미측정`), `aria-label="Smoke status: unmeasured"`. 매칭 오프라인 노드는 `FAILED ✘` (`aria-label="Smoke status: failed"`), 매칭 온라인 노드는 `PASSED ✔` (`aria-label="Smoke status: passed"`). 결함을 고정하던 `intranet-deployment.test.ts` 수정 및 `s12-defect-fixes.test.tsx` 3대 분기 시험 완료.
+  - **Claude 결함 3 (DEF-S12-01·02 번호 정합 및 전용 시험)**: 스킵 링크와 H1 제목을 "DEF 외 접근성 추가"로 정상 재분류(H1에 `tabIndex={-1}` 추가). 실제 DEF-S12-01(`'프로덕션 가동 승인 완료'` 차단 및 모의 서명 완료)과 DEF-S12-02(`'운영자 인수 완료 (docker compose up -d 가능)'` 차단 및 서명 후 `'모의 인수 절차 확인됨'`, `docker compose up -d` 0건) 전용 되돌림 감지 시험 착지.
+  - **DEF-S12-09·10 (보안 규격 및 자체서명 CA)**: `TLS 1.2 / TLSv1.3 협상 (개발용 자체서명 CA)` 교정, 인증서 패널에 `[정적 구성 예시 (실시간 인증서 조회 아님)]`, issuer: `SaintVision Internal Dev Self-Signed CA` 명시.
+  - **DEF-S12-12·14·15 (클러스터 적합성 heartbeat 기준·기준시각 표기·Pilot RC 하향)**: 상단 배지 `${onlineNodesCount}/${clusterNodes.length} online (heartbeat 기준, smoke 미측정)`, 테이블 헤더 `기준 시각 (예시) / heartbeat` (미연결 `[정적 예시]`, 라이브 `(heartbeat)`), 릴리스 라벨 `REL-2026-PILOT-RC` / `v1.0.0-pilot-rc`.
+  - **DEF-S12-16·17 (물리 하드웨어 수락 분리·자율 실습 확인)**: `physicalHardwareAcceptance: 'pending'` 유지, 훈련 완료 시 `[자율 실습 확인]` 고지 부여.
+  - **DEF-S12-05 (동적 알림 접근성)**: `role="alert"` / `aria-live="assertive"` (권한 부족 에러) 및 `role="status"` / `aria-live="polite"` (모의 서명 성공) 양방향 시험 착지.
 - **검증 실측 증거**:
-  - `npx vitest run`: **79개 파일 690개 시험 100% 통과 (690 passed, 0 failed)**.
-  - `npx tsc -b`: **타입 에러 0건 (Zero errors, exit 0)**.
-  - `npm run build`: **프로덕션 번들 빌드 성공 (7.11초, exit 0)**.
-  - `pytest tests/test_route_coverage.py`: **39 passed in 1.38s (exit 0)**.
-  - `python tools/check_frontend_integrity.py`: **83개 소스 대상 9대 무결성 규칙 전수 준수 (0 violations, exit 0)**.
-  - `python tools/check_contract_bindings.py`: **54 fixtures / 19 kernel types / 25 anchor sites 통과 (exit 0)**.
-- **정본 기록**: [[2026-09-28_12-20-00_KST_S12_FE_Gemini_제품결함_수정]]
-- **다음 행동 및 담당**: Claude UI 경로 축 및 Codex 계약 축 독립 검토 요청.
-
+  - `npx vitest run tests/s12-defect-fixes.test.tsx`: **23개 시험 100% 통과 (23 passed, 0 failed, 688ms)**.
+  - `npx vitest run tests/intranet-deployment.test.ts`: **9개 시험 100% 통과 (9 passed, 0 failed, 7ms)**.
+  - `npx vitest run tests/browser-matrix-acceptance.test.tsx`: **10개 시험 100% 통과 (10 passed, 0 failed, 99ms)**.
+  - `pytest tests/test_route_coverage.py`: **39 passed in 2.96s (exit 0)**.
+  - `git grep -n` 정적 감사: `PREFLIGHT PASS`, `|| 'usr_operator_lead'`, `실제 apps/web/nginx.conf 정합`, `mTLS 보안 통신 및 저지연 상태`, `프로덕션 운영 인수 서명`, `docker compose` 모두 `apps/web/src` 내 **0건**.
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
 - **Claude 검토 의견 F1~F5 전수 반영 완결 (`a40ca438`)**:

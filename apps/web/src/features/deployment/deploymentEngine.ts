@@ -20,6 +20,7 @@ export type ReconciledNodeJourney = NodeJourneyVerification & {
   liveIsDraining?: boolean;
   liveObservationOnly?: boolean;
   liveAllocatableCores?: number;
+  liveHeartbeatAt?: string;
 };
 
 export class DeploymentManager {
@@ -253,21 +254,40 @@ export class DeploymentManager {
   signOffRelease(
     operatorId: string,
     options?: OperatorSignOffOptions
-  ): { success: boolean; manifest: ReleaseManifest; error?: string } {
+  ): {
+    success: boolean;
+    manifest: ReleaseManifest;
+    localSimulationCompleted?: boolean;
+    signedOperatorId?: string;
+    error?: string;
+  } {
     if (!operatorId || operatorId.trim().length === 0) {
-      return { success: false, manifest: { ...this.releaseManifest }, error: 'Operator ID is required for sign-off' };
+      return {
+        success: false,
+        manifest: { ...this.releaseManifest },
+        localSimulationCompleted: false,
+        error: 'Operator ID is required for sign-off',
+      };
     }
 
-    // 1. Verify token claims and operator role if token/roles provided
-    if (options?.roles && options.roles.length > 0) {
-      const hasPrivilege = options.roles.some((r) => r === 'cluster:admin' || r === 'operator' || r === 'admin');
-      if (!hasPrivilege) {
-        return {
-          success: false,
-          manifest: { ...this.releaseManifest },
-          error: `Unauthorized operator: '${operatorId}' lacks required cluster authority roles`,
-        };
-      }
+    // 1. Strict operator role verification (regex bypass removed per Codex F-R1)
+    if (!options?.roles || options.roles.length === 0) {
+      return {
+        success: false,
+        manifest: { ...this.releaseManifest },
+        localSimulationCompleted: false,
+        error: `Unauthorized operator: '${operatorId}' lacks required cluster authority roles`,
+      };
+    }
+
+    const hasPrivilege = options.roles.some((r) => r === 'cluster:admin' || r === 'operator' || r === 'admin');
+    if (!hasPrivilege) {
+      return {
+        success: false,
+        manifest: { ...this.releaseManifest },
+        localSimulationCompleted: false,
+        error: `Unauthorized operator: '${operatorId}' lacks required cluster authority roles`,
+      };
     }
 
     // 2. Reject explicit unprivileged or revoked token credentials
@@ -275,23 +295,18 @@ export class DeploymentManager {
       return {
         success: false,
         manifest: { ...this.releaseManifest },
+        localSimulationCompleted: false,
         error: `Unauthorized operator: '${operatorId}' credential rejected by authority server`,
       };
     }
 
-    // 3. Registered authorized operator identity validation
-    const hasRolePrivilege = options?.roles && options.roles.some((r) => r === 'cluster:admin' || r === 'operator' || r === 'admin');
-    const isAuthorized = hasRolePrivilege || /^(usr_operator_|usr_admin_|admin|operator)/.test(operatorId.trim());
-    if (!isAuthorized) {
-      return {
-        success: false,
-        manifest: { ...this.releaseManifest },
-        error: `Unauthorized operator: '${operatorId}' does not hold deployment sign-off privilege`,
-      };
-    }
-
-    this.releaseManifest.operatorSignOff = true;
-    return { success: true, manifest: { ...this.releaseManifest } };
+    // Canonical ReleaseManifest.operatorSignOff MUST remain false until backend sign-off route exists (Codex F-R1)
+    return {
+      success: true,
+      manifest: { ...this.releaseManifest, operatorSignOff: false },
+      localSimulationCompleted: true,
+      signedOperatorId: operatorId,
+    };
   }
 
   getTrainingSteps(): TrainingModuleStep[] {
@@ -316,11 +331,11 @@ export class DeploymentManager {
     physicalHardwareAcceptance: 'pending' | 'accepted';
   } {
     return {
-      isPreflightPassed: true,
-      tlsVerified: true,
-      nginxRoutingVerified: true,
+      isPreflightPassed: false,
+      tlsVerified: false,
+      nginxRoutingVerified: false,
       smokeChecksCount: 202,
-      smokePassedRatio: 100.0,
+      smokePassedRatio: 0,
       physicalHardwareAcceptance: 'pending',
     };
   }
@@ -342,6 +357,7 @@ export class DeploymentManager {
         liveIsDraining: live.isDraining,
         liveObservationOnly: live.observationOnly,
         liveAllocatableCores: live.allocatableCores,
+        liveHeartbeatAt: live.heartbeatAt,
       };
     });
   }

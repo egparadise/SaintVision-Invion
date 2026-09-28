@@ -15,6 +15,8 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
   const [nginxConfig] = useState(manager.generateNginxConfig());
   const nodes = clusterNodes ? manager.reconcileLiveClusterNodes(clusterNodes) : manager.getNodeVerifications();
   const [manifest, setManifest] = useState(manager.getReleaseManifest());
+  const [localSimulationCompleted, setLocalSimulationCompleted] = useState(false);
+  const [signedOperatorId, setSignedOperatorId] = useState<string | null>(null);
   const [trainingSteps, setTrainingSteps] = useState(manager.getTrainingSteps());
   const [operatorId, setOperatorId] = useState<string>(currentUser ? currentUser.id : '');
   const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -27,11 +29,11 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
     }
   }, [currentUser]);
 
-  const passedNodesCount = clusterNodes
-    ? nodes.filter((n) => n.smokeStatus === 'passed' && n.liveStatus === 'online').length
+  const onlineNodesCount = clusterNodes
+    ? nodes.filter((n) => n.liveStatus === 'online' && n.smokeStatus === 'passed').length
     : 0;
   const clusterComplianceLabel = clusterNodes && clusterNodes.length > 0
-    ? `${passedNodesCount}/${clusterNodes.length} Nodes PASSED (${Math.round((passedNodesCount / clusterNodes.length) * 100)}%)`
+    ? `${onlineNodesCount}/${clusterNodes.length} online (heartbeat 기준, smoke 미측정)`
     : '미측정 (라이브 클러스터 미연결)';
 
   const handleSignOff = () => {
@@ -51,6 +53,8 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
       setActionNotice({ type: 'error', text: `서명 실패: ${res.error}` });
     } else {
       setManifest(res.manifest);
+      setLocalSimulationCompleted(true);
+      setSignedOperatorId(currentUser.id);
       setActionNotice({
         type: 'success',
         text: `✔ [모의 시뮬레이션] 파일럿 후보 릴리스 [${res.manifest.version}]에 대한 운영자 [${currentUser.id}]의 인수가 로컬 시뮬레이션 서명되었습니다. (백엔드 배포 API 미연결 · 실 환경 미배포)`,
@@ -71,7 +75,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* DEF-S12-01: Accessible Skip Navigation Link */}
+      {/* DEF 외 접근성 추가: Accessible Skip Navigation Link */}
       <a
         href="#deployment-main-content"
         style={{
@@ -98,8 +102,8 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         본문으로 바로가기
       </a>
 
-      {/* DEF-S12-02: Heading Level 1 */}
-      <h1 id="deployment-main-content" style={{ fontSize: '20px', fontWeight: 700, color: '#f0f6fc', margin: '0 0 4px 0' }}>
+      {/* DEF 외 접근성 추가: Heading Level 1 with tabIndex for focus targeting */}
+      <h1 id="deployment-main-content" tabIndex={-1} style={{ fontSize: '20px', fontWeight: 700, color: '#f0f6fc', margin: '0 0 4px 0', outline: 'none' }}>
         내부망 HTTPS 배포 및 운영 인수 검증 (AC-12)
       </h1>
 
@@ -136,7 +140,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
             fontWeight: 500,
           }}
         >
-          🛑 <strong>인증 필요</strong>: 로그인된 운영자 세션이 없습니다. 프로덕션 운영 인수 서명을 수행하려면 유효한 운영자 계정으로 로그인해야 합니다.
+          🛑 <strong>인증 필요</strong>: 로그인된 운영자 세션이 없습니다. 내부망 모의 운영 인수 서명을 수행하려면 유효한 운영자 계정으로 로그인해야 합니다.
         </div>
       )}
 
@@ -158,10 +162,8 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>5대 노드 여정 검증 [AC-12 기준 규격]</div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: clusterNodes && clusterNodes.length > 0 ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
-            {clusterNodes && clusterNodes.length > 0
-              ? `${Math.round((passedNodesCount / clusterNodes.length) * 100)}% (${passedNodesCount}/${clusterNodes.length} PASSED)`
-              : '미측정 (라이브 클러스터 미연결)'}
+          <div style={{ fontSize: '18px', fontWeight: 700, color: clusterNodes && clusterNodes.length > 0 ? '#3fb950' : '#8b949e', marginTop: '4px' }}>
+            {clusterComplianceLabel}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>Windows 3대 + Linux 2대 통합 여정 규격</div>
         </div>
@@ -180,14 +182,14 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
             style={{
               fontSize: '24px',
               fontWeight: 700,
-              color: manifest.operatorSignOff ? '#3fb950' : '#d29922',
+              color: localSimulationCompleted ? '#3fb950' : '#d29922',
               marginTop: '4px',
             }}
           >
-            {manifest.operatorSignOff ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기'}
+            {localSimulationCompleted ? '모의 서명 완료 ✔' : 'SIGN-OFF 대기 (백엔드 미연결)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {manifest.operatorSignOff ? `서명자: ${currentUser?.id || 'usr_operator_lead'}` : '운영자 확인 대기 중'}
+            {localSimulationCompleted ? `모의 서명자: ${signedOperatorId || currentUser?.id || '미확인'}` : '운영자 확인 대기 중'}
           </div>
         </div>
       </div>
@@ -233,11 +235,11 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
-                backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                color: '#3fb950',
+                backgroundColor: 'rgba(139, 148, 158, 0.2)',
+                color: '#8b949e',
               }}
             >
-              PREFLIGHT PASS ✔
+              미측정 (설계 규격 예시)
             </span>
             <strong style={{ fontSize: '14px', color: '#f0f6fc' }}>
               내부망 배포 사전 검증 파이프라인 [설계 규격 예시 (202개 검증 항목)]
@@ -252,12 +254,12 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
           <div
             style={{
               fontSize: '13px',
-              color: manifest.operatorSignOff ? '#3fb950' : '#d29922',
+              color: localSimulationCompleted ? '#3fb950' : '#d29922',
               fontWeight: 600,
               marginTop: '2px',
             }}
           >
-            {manifest.operatorSignOff
+            {localSimulationCompleted
               ? '모의 인수 절차 확인됨 (온프레미스 실장비 기동 별도 필요)'
               : '현장 운영자 인수 대기 (Pending Acceptance)'}
           </div>
@@ -402,7 +404,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
         {/* Nginx Config Code Block */}
         <details style={{ marginTop: '8px', fontSize: '12px' }}>
           <summary style={{ cursor: 'pointer', color: '#58a6ff' }}>
-            ▶ 배포용 nginx.conf 구성 파일 전문 보기 (실제 apps/web/nginx.conf 정합)
+            ▶ 배포용 nginx.conf 구성 파일 발췌 보기 [발췌 예시 — 전문은 apps/web/nginx.conf]
           </summary>
           <pre
             style={{
@@ -440,7 +442,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               5-Node 통합 여정 및 Smoke 검증 매트릭스 (AC-12)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
-              Windows/Linux 혼합 노드 여정, 역할 격리, mTLS 보안 통신 및 저지연 상태
+              Windows/Linux 혼합 노드 여정, 역할 격리, mTLS 설계 규격 [정적 예시]
             </p>
           </div>
           <span
@@ -466,7 +468,7 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               <th style={{ padding: '8px' }}>검증된 역할 (Roles)</th>
               <th style={{ padding: '8px' }}>지연시간</th>
               <th style={{ padding: '8px' }}>Smoke 상태</th>
-              <th style={{ padding: '8px' }}>최근 검증 시각</th>
+              <th style={{ padding: '8px' }}>기준 시각 (예시) / heartbeat</th>
             </tr>
           </thead>
           <tbody>
@@ -538,32 +540,32 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                     ))}
                   </div>
                 </td>
-                <td style={{ padding: '10px 8px', color: node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online') ? '#3fb950' : '#8b949e', fontWeight: 600 }}>
-                  {node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online') ? `${node.latencyMs} ms` : '미측정'}
+                <td style={{ padding: '10px 8px', color: node.liveStatus === 'online' && node.smokeStatus === 'passed' ? '#3fb950' : '#8b949e', fontWeight: 600 }}>
+                  {node.liveStatus === 'online' && node.smokeStatus === 'passed' ? `${node.latencyMs} ms` : '미측정'}
                 </td>
                 <td style={{ padding: '10px 8px' }}>
                   <span
-                    aria-label={`Smoke status: ${node.smokeStatus}`}
+                    aria-label={`Smoke status: ${node.liveStatus === 'online' && node.smokeStatus === 'passed' ? 'passed' : node.liveStatus === 'offline' || node.smokeStatus === 'failed' ? 'failed' : 'unmeasured'}`}
                     style={{
                       padding: '2px 8px',
                       borderRadius: '4px',
                       fontSize: '11px',
                       fontWeight: 700,
                       backgroundColor:
-                        node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                        node.liveStatus === 'online' && node.smokeStatus === 'passed'
                           ? 'rgba(46, 160, 67, 0.2)'
                           : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
                           ? 'rgba(248, 81, 73, 0.2)'
                           : 'rgba(139, 148, 158, 0.2)',
                       color:
-                        node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                        node.liveStatus === 'online' && node.smokeStatus === 'passed'
                           ? '#3fb950'
                           : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
                           ? '#f85149'
                           : '#8b949e',
                     }}
                   >
-                    {node.smokeStatus === 'passed' && (!node.liveStatus || node.liveStatus === 'online')
+                    {node.liveStatus === 'online' && node.smokeStatus === 'passed'
                       ? 'PASSED ✔'
                       : node.liveStatus === 'offline' || node.smokeStatus === 'failed'
                       ? 'FAILED ✘'
@@ -571,7 +573,11 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
                   </span>
                 </td>
                 <td style={{ padding: '10px 8px', fontSize: '12px', color: '#8b949e' }}>
-                  {node.lastVerifiedAt ? `${node.lastVerifiedAt} (기준 시각)` : '미측정'}
+                  {node.liveStatus
+                    ? node.liveHeartbeatAt
+                      ? `${node.liveHeartbeatAt} (heartbeat)`
+                      : '미측정'
+                    : `${node.lastVerifiedAt || '미측정'} [정적 예시]`}
                 </td>
               </tr>
             ))}
@@ -607,7 +613,6 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
               data-testid="deployment-operator-id-input"
               value={operatorId}
               readOnly={true}
-              onChange={(e) => setOperatorId(e.target.value)}
               placeholder="운영자 계정 ID"
               title={currentUser ? '운영자 ID는 로그인된 세션 계정으로 고정됩니다' : '운영자 계정 ID'}
               style={{
@@ -622,21 +627,21 @@ export const IntranetDeploymentView: React.FC<IntranetDeploymentViewProps> = ({ 
             />
             <Button
               data-testid="deployment-signoff-btn"
-              variant={manifest.operatorSignOff ? 'secondary' : 'primary'}
+              variant={localSimulationCompleted ? 'secondary' : 'primary'}
               onClick={handleSignOff}
-              disabled={manifest.operatorSignOff || !currentUser}
+              disabled={localSimulationCompleted || !currentUser}
               title={
                 !currentUser
                   ? '운영자 계정 로그인이 필요합니다'
                   : currentUser.role !== 'admin' && currentUser.role !== 'operator'
                   ? '운영자 권한(operator/admin)이 필요합니다'
-                  : manifest.operatorSignOff
+                  : localSimulationCompleted
                   ? '이미 인수가 서명되었습니다'
                   : '파일럿 운영 인수를 로컬 시뮬레이션 서명합니다'
               }
-              aria-disabled={manifest.operatorSignOff || !currentUser ? 'true' : 'false'}
+              aria-disabled={localSimulationCompleted || !currentUser ? 'true' : 'false'}
             >
-              {manifest.operatorSignOff ? '✔ 모의 서명 완료됨' : '운영 인수 모의 서명'}
+              {localSimulationCompleted ? '✔ 모의 서명 완료됨' : '운영 인수 모의 서명'}
             </Button>
           </div>
         </div>

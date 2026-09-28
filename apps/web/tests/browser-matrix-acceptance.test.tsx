@@ -286,9 +286,10 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
     });
 
     expect(result.success).toBe(true);
+    expect(result.localSimulationCompleted).toBe(true);
     expect(result.manifest.version).toBe('v1.0.0-pilot-rc');
     expect(result.manifest.releaseId).toBe('REL-2026-PILOT-RC');
-    expect(result.manifest.operatorSignOff).toBe(true);
+    expect(result.manifest.operatorSignOff).toBe(false);
     expect(result.manifest.imageDigest).toMatch(/^sha256:[a-f0-9]{64}$/);
     expect(result.manifest.totalNodes).toBe(5);
   });
@@ -298,7 +299,7 @@ describe('VF-GM-06: 외부 HTTPS, Browser Matrix, Rollback & Real-Browser Accept
     const before = dm.getPreflightStatus();
     expect(before.physicalHardwareAcceptance).toBe('pending');
 
-    dm.signOffRelease('usr_operator_lead');
+    dm.signOffRelease('usr_operator_lead', { roles: ['operator'] });
     const after = dm.getPreflightStatus();
     expect(after.physicalHardwareAcceptance).toBe('pending');
   });
