@@ -1,20 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.211"
+version: "1.0.212"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:17:14+09:00"
+updated: "2026-09-28T16:41:03+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
 
-## 2026-09-28 S11-ST PG-free fault evidence producer/importer — 구현 완료·hosted 증거 대기
+## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r1 D1~D6 보강
 
-- commit `06718b59`에서 universe 22/PG-free 12 identity를 고정하고 Linux LocalObjects 8건+retention/backup 4건 raw producer와 fail-closed importer를 구현했다.
-- reference evidence만 생성해 AC-11 축 승격을 막는다. aggregator의 zero-count `value/failureCount` 결속도 추가했고 provenance·redaction·surface·JUnit 변이를 닫았다.
-- 로컬은 새 단일 시험 31 passed와 aggregator 56 passed, docs·ontology·bindings·ratchet exit 0이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. hosted Linux actual 12-case와 Claude 검토를 위해 #192 위 stacked PR을 준비한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+- #193 Claude r1에서 발견된 self-check backup, retention 재라벨, 미관측 0, open단계 ENOSPC, 변이표 누락, tier 밖 surface import 오류를 모두 보강한다.
+- backup은 별도 tar verifier와 blob 결속, retention은 retained-set digest와 raw OSError finding, write ENOSPC는 stream.write 주입으로 바꿨다. residue·quota 양수는 판정에 포함하고 미관측 metric은 null로 남긴다.
+- 로컬 단일 시험은 storage evidence 40 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux actual 12-case와 Claude 재검토 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
 
 ## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
 

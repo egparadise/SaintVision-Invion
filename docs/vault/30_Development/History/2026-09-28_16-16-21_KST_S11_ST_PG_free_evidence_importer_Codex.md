@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S11-ST-PGFREE-IMPORTER-001"
 title: "S11-ST PG-free fault evidence producer와 importer"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:17:14+09:00"
+updated: "2026-09-28T16:41:03+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 reviewer: "Claude"
@@ -15,26 +15,30 @@ reviewer: "Claude"
 ## 구현
 
 - `tools/run_s11_storage_failure_pg_free.py`는 frozen universe 22개와 PG-free subset 12개의 identity SHA를 코드 상수로 고정한다.
-- Linux 실행에서 LocalObjects corruption·size·write/fsync/ENOSPC/EDQUOT 8건과 retention/backup 4건을 실행한다. 제품 finding이 있어도 12개와 cleanup을 끝내고 raw JSON·JUnit에 실패를 보존한다.
-- `tools/import_s11_storage_failure_evidence.py`는 report exact key, source tree와 producer/injector blob, UTC 시각, tier hash, exact identity 순서, actual surface 닫힌 enum, content digest, JUnit identity·failure 대응, secret-bearing key/value를 불신 검증한다.
+- Linux 실행에서 LocalObjects corruption·size·write/fsync/ENOSPC/EDQUOT 8건, retention interruption 2건, backup artifact 2건을 실행한다. backup은 별도 `verify_backup_artifact.py`가 tar 구조와 `PG_VERSION`·`backup_label`·`global/pg_control`을 검사하며 verifier blob도 source head에 결속한다.
+- 현재 retention 제품에는 receipt/journal이 없으므로 raw `OSError`를 `RETENTION_APPLY_PARTIAL` 성공 표면으로 재라벨하지 않는다. 첫 후보 삭제 뒤 둘째 후보에서 중단하고, boundary 이후 WAL·history/partial·latest backup의 before/after digest 불변과 미완료 후보를 finding으로 보존한다.
+- `OBJ-04/local/write-enospc`는 `os.open`이 아니라 실제 `stream.write`에서 ENOSPC를 주입한다. 실패 뒤 canonical·temp·cleanup residue와 quota overshoot를 관측하며 양수는 표면 일치와 무관하게 `MEASURED_FAIL`이다.
+- `tools/import_s11_storage_failure_evidence.py`는 report exact key, source tree와 producer/injector/verifier blob, UTC 시각, tier hash, exact identity 순서, actual surface 형식, content digest, JUnit identity·failure 대응, secret-bearing key/value를 불신 검증한다. well-formed 공개 code와 양의 errno가 기대 표 밖이면 import 오류로 숨기지 않고 classification finding으로 보존한다.
+- residue·quota·committed-loss 수치는 실제 관측한 case만 합산하고 관측 case 수를 같이 낸다. 관측하지 않은 metric은 `0`이 아니라 `null`이다.
+- raw/reference evidence shape 변경을 `schemaVersion=1.1.0`으로 올려 과거 1.0.0과 혼동하지 않는다.
 - 출력은 `referenceOnly=true`, `axis=null`, `targetRef=null`인 reference evidence다. PG-free 결과를 AC-11 축 PASS로 승격하지 않는다.
 - stage-1 aggregator는 `eq 0` count metric에서 `value == failureCount`를 강제해 forged zero value를 `INVALID_RUN`으로 거부한다. 그 밖 metric kind는 importer가 raw receipt에서 직접 도출한다.
 
 ## 정직한 측정 경계
 
-- Windows 로컬에서는 Linux LocalObjects 경로를 실행하지 않았다. pure closed-contract와 importer 변이 31건, retention/backup 실제 fault 4건만 실행했다.
+- Windows 로컬에서는 Linux LocalObjects 경로를 실행하지 않았다. pure closed-contract, importer 변이, retention interruption 2건, backup verifier invalid/valid 구조 시험만 실행했다.
 - hosted Backend Linux에서는 같은 시험 파일이 실제 12-case executor를 실행한다. 현재 코드의 Local raw `OSError` 5건은 `MEASURED_FAIL` reference로 기대하며, green은 finding을 숨긴다는 뜻이 아니라 expected raw finding count와 JUnit 일치를 뜻한다.
 - PostgreSQL·Docker·전체 suite는 로컬에서 실행하지 않았다. hosted 10-case producer와 lane, physical evidence는 별도 카드다.
 
 ## 검증
 
-- `python -m pytest -q tests/test_s11_storage_failure_evidence.py`: 31 passed, exit 0.
+- `python -m pytest -q tests/test_s11_storage_failure_evidence.py`: 40 passed, exit 0.
 - `python -m pytest -q tests/test_aggregate_ac11_evidence.py`: 56 passed, exit 0.
-- `python -m py_compile` 두 새 tool: exit 0.
+- `python -m py_compile` producer·importer·backup verifier: exit 0.
 - `check_docs`, `check_ontology`, `check_contract_bindings`, `check_doc_single_source --ratchet`, `git diff --check`는 모두 exit 0이다.
 
 ## provenance
 
-- implementation commit: `06718b5967e3a6e34c34770ea8aa09ec4448e266`
+- initial implementation commit: `06718b5967e3a6e34c34770ea8aa09ec4448e266`; Claude r1 보강 commit은 이 History 다음 commit으로 고정한다.
 - parent stack: PR #192 / head `88567849`
 - frozen tier hashes: universe `5d700981…34fd9`, PG-free `f69d161e…8799`, hosted `0509d94a…4a33`.

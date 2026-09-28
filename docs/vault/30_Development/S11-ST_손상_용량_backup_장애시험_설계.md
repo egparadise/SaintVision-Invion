@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S11-ST-FAILURE-001"
 title: "S11-ST 손상·용량·backup 장애 시험 설계"
-version: "1.3.0"
+version: "1.3.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:16:21+09:00"
+updated: "2026-09-28T16:41:03+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -151,25 +151,25 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 ## 6. 부정 시험과 되살림 변이
 
-| 변이 | 죽이는 시험 |
-|---|---|
-| body만 검사하고 metadata drift를 성공 처리 | `OBJ-03` exact `VERIFY-0010`와 성공 body 0 |
-| size mismatch에서 요청 size만 신뢰 | truncate·append 각각 read 거부 |
-| Local byte 변조 뒤 writable mode로 read해 size/hash 검사를 우회 | read 전 `0o400` 복원·mode 단언 뒤 `OBJ-01`은 VERIFY-0010, `OBJ-02`는 STORE-0003 |
-| temp를 fsync 전 canonical로 publish | write/fsync fault 뒤 canonical absent/old hash 불변 |
-| directory fsync 실패를 성공 처리 | 성공 응답 0, retryable `STORE-0001`, retry 뒤 exact byte만 quiet success |
-| provider quota 실패 뒤 DB row commit | `CAP-02` before/after row·usage·provider key 0 delta |
-| DB quota를 provider write 뒤 검사 | `CAP-01` provider call 0 |
-| archive 설정 `possible`을 PITR PASS로 변환 | `BAK-01`에서 `pitrVerified=false`와 nonzero exit 강제 |
-| archive command가 exit 0이지만 byte를 쓰지 않음 | `BAK-03/postgresql/archive-command-true-empty`의 verifier nonzero·restore 거부 |
-| backup이 exit 0이지만 empty/truncated | `BAK-03/local/backup-exit0-*` exact identity·`BACKUP_ARTIFACT_INVALID` |
-| invalid/unknown label을 삭제 후보로 간주 | invalid label은 계획 0/exit 3, unknown-age는 retained |
-| retention apply 중단 뒤 전체 성공 보고 | receipt 합계 불일치·미완료 후보가 있으면 `RETENTION_APPLY_PARTIAL` |
-| retained boundary도 candidate와 함께 삭제 | boundary·이후 WAL·latest/unknown backup hash 불변 |
-| hosted/physical storage reference를 `long-soak` PASS로 사용 | composite target 미등록·map 부재 → `NOT_REGISTERED`, axis envelope 생성 금지 |
-| 약한 `s11-actual-pitr-v0`로 archive fault를 우회 | old targetId → `INVALID_RUN` |
-| 같은 case를 반복해 전체 case 수를 채움 | 계층별 subset 또는 physical identity SHA·중복 검사 → import 오류 |
-| fault case skip을 성공 분모에서 제거 | `skipCount > 0` → `NOT_OBSERVED`, PASS 분자 제외 |
+| 변이 | 죽이는 시험 | PG-free 상태 | 후속 범위 |
+|---|---|---|---|
+| body만 검사하고 metadata drift를 성공 처리 | `OBJ-03` exact `VERIFY-0010`와 성공 body 0 | 계층 밖 | hosted 10-case |
+| size mismatch에서 요청 size만 신뢰 | truncate·append 각각 read 거부 | 구현 | — |
+| Local byte 변조 뒤 writable mode로 read해 size/hash 검사를 우회 | read 전 `0o400` 복원·mode 단언 뒤 `OBJ-01`은 VERIFY-0010, `OBJ-02`는 STORE-0003 | 구현 | — |
+| temp를 fsync 전 canonical로 publish | write/fsync fault 뒤 canonical absent/old hash 불변 | 구현: canonical·temp·cleanup residue가 양수면 finding | retry 뒤 quiet success는 Local 오류 변환 카드 |
+| directory fsync 실패를 성공 처리 | 성공 응답 0, retryable `STORE-0001`, retry 뒤 exact byte만 quiet success | 부분: 성공·residue는 finding | retry 경로는 Local 오류 변환 카드 |
+| provider quota 실패 뒤 DB row commit | `CAP-02` before/after row·usage·provider key 0 delta | Local key·quota overshoot만 관측; DB는 미관측 | hosted PG 10-case |
+| DB quota를 provider write 뒤 검사 | `CAP-01` provider call 0 | 계층 밖 | hosted PG 10-case |
+| archive 설정 `possible`을 PITR PASS로 변환 | `BAK-01`에서 `pitrVerified=false`와 nonzero exit 강제 | 계층 밖 | hosted PG 10-case |
+| archive command가 exit 0이지만 byte를 쓰지 않음 | `BAK-03/postgresql/archive-command-true-empty`의 verifier nonzero·restore 거부 | 계층 밖 | hosted PG 10-case |
+| backup이 exit 0이지만 empty/truncated | 별도 `verify_backup_artifact.py`가 tar 구조·필수 PostgreSQL member를 검사해 `BACKUP_ARTIFACT_INVALID` | 구현 | 실제 restore는 hosted/physical |
+| invalid/unknown label을 삭제 후보로 간주 | invalid label은 계획 0/exit 3, unknown-age는 retained | 미해결: 현재 integration retention 도구는 #150 이전 | #150 병합 뒤 retention 카드 |
+| retention apply 중단 뒤 전체 성공 보고 | receipt 합계 불일치·미완료 후보가 있으면 `RETENTION_APPLY_PARTIAL` | 부분: raw `OSError`와 partial/residue를 finding으로 보존; 성공 분류 금지 | receipt/journal 구현 카드 |
+| retained boundary도 candidate와 함께 삭제 | boundary·이후 WAL·latest/unknown backup hash 불변 | 구현: retained set before/after digest | — |
+| hosted/physical storage reference를 `long-soak` PASS로 사용 | composite target 미등록·map 부재 → `NOT_REGISTERED`, axis envelope 생성 금지 | 구현 | — |
+| 약한 `s11-actual-pitr-v0`로 archive fault를 우회 | old targetId → `INVALID_RUN` | 구현 | — |
+| 같은 case를 반복해 전체 case 수를 채움 | 계층별 subset 또는 physical identity SHA·중복 검사 → import 오류 | 구현 | — |
+| fault case skip을 성공 분모에서 제거 | `skipCount > 0` → `NOT_OBSERVED`, PASS 분자 제외 | PG-free는 skip 금지 | hosted/physical importer |
 
 ## 7. 기존 증거 재사용과 잔여 범위
 
@@ -190,7 +190,7 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 1. 이 설계와 [[S11_ST_storage_failure_target_v0]]를 merge commit 방식으로 병합해 임계치·환경을 먼저 고정한다.
 2. #177 병합 뒤 `CARD-S11-AC11-REGISTRY-REPIN-01`이 정본 `s11-ac11-target-registry-v0.json`에 PITR patch를 적용하고 old target 제거, PITR `REQUIRED_TARGET_BY_AXIS`, registry/blob·importer pin, 기존 repo 시험과 old-target 부정 시험을 한 commit에 넣는다. long-soak은 composite target 전 `NOT_REGISTERED`다. 이 단계 전 측정 금지.
-3. PG-free raw producer·storage importer는 commit `06718b59`에 구현했다. universe 22개와 PG-free 12개 subset hash, exact surface·provenance·redaction·JUnit 변이를 fail-closed로 검증한다. hosted 10개 producer/importer는 별도 lane 카드에 남는다.
+3. PG-free raw producer·storage importer는 commit `06718b59`에서 시작했고 #193 검토 후속에서 보강한다. universe 22개와 PG-free 12개 subset hash, exact surface·provenance·redaction·JUnit을 fail-closed로 검증하며, 위 표의 PG-free 구현/부분/미해결 상태를 숨기지 않는다. hosted 10개 producer/importer는 별도 lane 카드에 남는다.
 4. Local `OSError`→기존 `STORE-0001` 변환과 retention receipt/journal을 작은 코드 카드로 분리한다. 공개 schema·migration 변화가 생기면 이 설계를 다시 검토한다.
 5. hosted opt-in lane에서 MinIO+PG fault matrix와 archive `/bin/false`·`/bin/true`를 실행한다. 전부 reference-only로 보존한다.
 6. 운영자가 물리 5노드·별도 장애 영역·archive 자격·허용 중단 창을 제공한 뒤에만 24시간 storage reference와 physical PITR identity 3개를 실행한다. storage reference는 long-soak composite target 승인 전 축 판정에 쓰지 않는다.
@@ -200,6 +200,6 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 ## 9. 이번 카드의 판정
 
 - 설계·사전 목표: v1.2는 Claude r3 승인됐다. `CARD-S11-AC11-REGISTRY-REPIN-01`은 merge commit `067e6a48` 위 구현 commit `ffd99bfd`에서 old PITR target 제거·새 target 적용·축별 targetId·registry/importer pin을 반영했다. 별도 patch proposal은 계속 소비 금지다.
-- PG-free producer/importer: 구현·Windows PG-free contract 시험 완료. hosted Linux에서 실제 LocalObjects 12-case 실행 결과는 PR CI 전까지 `NOT_OBSERVED`다. hosted 10-case와 실장비는 `NOT_OBSERVED`다.
+- PG-free producer/importer: Claude #193 r1의 D1~D6을 반영 중이다. backup 2건은 별도 tar verifier를 호출하고, retention 2건은 receipt/journal 전 raw `OSError` finding이며, residue·quota의 미관측값은 `null`로 보존한다. 최종 hosted Linux head 실행 전까지 `NOT_OBSERVED`이며 hosted 10-case와 실장비도 `NOT_OBSERVED`다.
 - 공개 계약·migration 변경: 없음.
 - S11-ST registry 상태 변경: 없음(`planned` 유지). 정본 task registry는 sprint task만 허용하고 S10 선행 task가 미완료이므로 synthetic subtask를 추가하거나 parent를 `in_progress`로 올리지 않았다. 카드 ID는 History·Codex 작업판에서 추적한다.

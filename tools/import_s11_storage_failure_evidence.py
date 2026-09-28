@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 from run_s11_storage_failure_pg_free import (
     EXECUTION_LAYER,
     EXPECTED,
+    BACKUP_VERIFIER_PATH,
     PG_FREE_CASES,
     PG_FREE_SHA256,
     PRODUCER_PATH,
@@ -28,13 +29,12 @@ SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 FORBIDDEN_KEYS = {"password", "secret", "token", "credential", "dsn", "endpoint"}
 REPORT_KEYS = {
     "schemaVersion", "runPurpose", "executionLayer", "sourceRunId", "sourceHeadSha",
-    "checkoutTreeSha", "cleanCheckout", "producerFile", "injectorFile", "startedAt", "finishedAt",
+    "checkoutTreeSha", "cleanCheckout", "producerFile", "injectorFile", "backupVerifierFile", "startedAt", "finishedAt",
     "universeCaseIdentitiesSha256", "tierCaseIdentitiesSha256", "caseCount",
     "findingCount", "cases", "redacted",
 }
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 PROBLEM_CODE_RE = re.compile(r"^[A-Z]+-[0-9]{4}$")
-ALLOWED_OS_ERRNOS = {5, 28, 122}
 CASE_KEYS = {
     "caseIdentity", "executionLayer", "provider", "injectionObserved", "attemptedCount",
     "expectedFindingCount", "observedFindingCount", "expectedSurface", "actualSurface",
@@ -101,9 +101,12 @@ def _validate_surface(surface: Any) -> None:
     if kind == "problem" and set(surface) == {"kind", "code", "status", "retryable"}:
         if not PROBLEM_CODE_RE.fullmatch(str(surface["code"])):
             raise EvidenceImportError("actual ProblemDetails code is invalid")
-        if surface["code"] not in {row["code"] for row in EXPECTED.values() if row["kind"] == "problem"}:
-            raise EvidenceImportError("actual ProblemDetails code is outside the closed tier")
-        if isinstance(surface["status"], bool) or not isinstance(surface["status"], int) or not isinstance(surface["retryable"], bool):
+        if (
+            isinstance(surface["status"], bool)
+            or not isinstance(surface["status"], int)
+            or not 100 <= surface["status"] <= 599
+            or not isinstance(surface["retryable"], bool)
+        ):
             raise EvidenceImportError("actual ProblemDetails status or retryable is invalid")
         return
     if kind == "failureClass" and set(surface) == {"kind", "failureClass", "retryable"}:
@@ -112,8 +115,8 @@ def _validate_surface(surface: Any) -> None:
             raise EvidenceImportError("actual failureClass is outside the closed tier")
         return
     if kind == "osError" and set(surface) == {"kind", "errno"}:
-        if surface["errno"] not in ALLOWED_OS_ERRNOS:
-            raise EvidenceImportError("actual errno is outside the closed tier")
+        if isinstance(surface["errno"], bool) or not isinstance(surface["errno"], int) or surface["errno"] <= 0:
+            raise EvidenceImportError("actual errno is invalid")
         return
     if kind == "unexpected" and set(surface) == {"kind", "class"} and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", str(surface["class"])):
         return
@@ -171,6 +174,12 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
     expected_file = {"path": PRODUCER_PATH, "blob": git.blob(report["sourceHeadSha"], PRODUCER_PATH)}
     if report["producerFile"] != expected_file or report["injectorFile"] != expected_file:
         raise EvidenceImportError("producer or injector blob differs from source head")
+    expected_verifier = {
+        "path": BACKUP_VERIFIER_PATH,
+        "blob": git.blob(report["sourceHeadSha"], BACKUP_VERIFIER_PATH),
+    }
+    if report["backupVerifierFile"] != expected_verifier:
+        raise EvidenceImportError("backup verifier blob differs from source head")
     started = _utc(report["startedAt"], "startedAt")
     finished = _utc(report["finishedAt"], "finishedAt")
     if finished < started:
@@ -195,6 +204,13 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
     unexpected = 0
     cleanup_residue = 0
     committed_loss = 0
+    partial_residue = 0
+    temp_residue = 0
+    quota_overshoot = 0
+    observed_counts = {name: 0 for name in (
+        "quotaOvershootBytes", "committedObjectLossCount", "partialResidueCount",
+        "tempResidueCount", "cleanupResidueCount",
+    )}
     for case in cases:
         if set(case) != CASE_KEYS:
             raise EvidenceImportError("case receipt requires the exact reviewed key set")
@@ -212,17 +228,14 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
             raise EvidenceImportError("case expected surface differs from the reviewed contract")
         _validate_surface(case["actualSurface"])
         matched = case["actualSurface"] == EXPECTED[identity]
-        observed = 0 if matched else 1
         if (
-            case["matched"] is not matched
-            or isinstance(case["observedFindingCount"], bool)
+            isinstance(case["observedFindingCount"], bool)
             or not isinstance(case["observedFindingCount"], int)
-            or case["observedFindingCount"] != observed
             or isinstance(case["expectedFindingCount"], bool)
             or not isinstance(case["expectedFindingCount"], int)
             or case["expectedFindingCount"] != 0
         ):
-            raise EvidenceImportError("producer finding fields do not match recomputation")
+            raise EvidenceImportError("producer finding fields are invalid")
         for digest_field in ("beforeSha256", "afterSha256"):
             digest = case[digest_field]
             if digest is not None and not SHA256_RE.fullmatch(str(digest)):
@@ -234,17 +247,37 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
             "tempResidueCount", "cleanupResidueCount",
         ):
             value = case[name]
-            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 0):
                 raise EvidenceImportError("case numeric receipt is invalid")
+            if value is not None:
+                observed_counts[name] += 1
+        receipt_finding = any(
+            isinstance(case[name], int) and case[name] > 0
+            for name in (
+                "quotaOvershootBytes", "committedObjectLossCount", "partialResidueCount",
+                "tempResidueCount", "cleanupResidueCount",
+            )
+        )
+        if identity.startswith("BAK-02/") and case["beforeSha256"] != case["afterSha256"]:
+            receipt_finding = True
+        observed = int(not matched or receipt_finding)
+        if (
+            case["matched"] is not (observed == 0)
+            or case["observedFindingCount"] != observed
+        ):
+            raise EvidenceImportError("producer finding fields do not match receipt recomputation")
         findings += observed
         if observed:
             finding_identities.append(identity)
         actual = case["actualSurface"]
         false_success += int(actual.get("kind") == "success")
-        classification_mismatch += observed
+        classification_mismatch += int(not matched)
         unexpected += int(actual.get("kind") == "unexpected")
-        cleanup_residue += case["cleanupResidueCount"] + case["tempResidueCount"]
-        committed_loss += case["committedObjectLossCount"]
+        cleanup_residue += int(case["cleanupResidueCount"] or 0)
+        committed_loss += int(case["committedObjectLossCount"] or 0)
+        partial_residue += int(case["partialResidueCount"] or 0)
+        temp_residue += int(case["tempResidueCount"] or 0)
+        quota_overshoot += int(case["quotaOvershootBytes"] or 0)
     if (
         isinstance(report["findingCount"], bool)
         or not isinstance(report["findingCount"], int)
@@ -253,7 +286,7 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
     ):
         raise EvidenceImportError("report finding count or redaction marker is invalid")
     junit_sha = _validate_junit(junit, PG_FREE_CASES, tuple(finding_identities))
-    verdict = "MEASURED_PASS" if findings == 0 and cleanup_residue == 0 and committed_loss == 0 else "MEASURED_FAIL"
+    verdict = "MEASURED_PASS" if findings == 0 else "MEASURED_FAIL"
     return {
         "schemaVersion": SCHEMA_VERSION,
         "kind": "s11-storage-reference-evidence",
@@ -274,8 +307,12 @@ def import_evidence(report: dict[str, Any], junit: bytes, git: Any) -> dict[str,
             "classificationMismatchCount": classification_mismatch,
             "falseSuccessCount": false_success,
             "unexpectedErrorCount": unexpected,
-            "committedObjectLossCount": committed_loss,
-            "cleanupResidueCount": cleanup_residue,
+            "committedObjectLossCount": committed_loss if observed_counts["committedObjectLossCount"] else None,
+            "cleanupResidueCount": cleanup_residue if observed_counts["cleanupResidueCount"] else None,
+            "partialResidueCount": partial_residue if observed_counts["partialResidueCount"] else None,
+            "tempResidueCount": temp_residue if observed_counts["tempResidueCount"] else None,
+            "quotaOvershootBytes": quota_overshoot if observed_counts["quotaOvershootBytes"] else None,
+            "observedCaseCountByMetric": observed_counts,
         },
     }
 
