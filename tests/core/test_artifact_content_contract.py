@@ -179,6 +179,37 @@ def test_result_view_download_maps_missing_provider_object_to_retryable_503(
     )
 
 
+def test_result_view_local_session_maps_handle_oserror_to_retryable_503():
+    class Files:
+        @staticmethod
+        def read(*_args):
+            raise OSError("private local provider detail")
+
+    class Legacy:
+        @contextmanager
+        def locked(self):
+            yield Files()
+
+    provider = object.__new__(LocalObjectStore)
+    provider.legacy = Legacy()
+    view = ResultView(object(), ObjectStoreRegistry([provider]))
+    ticket = {
+        "provider_id": "local-bounded-v1",
+        "locator": "obj-22222222222242228222222222222222",
+        "content_hash": "2" * 64,
+        "size_bytes": 1,
+    }
+    with pytest.raises(DomainError) as denied:
+        with view._provider_bytes(ticket):
+            pass
+    assert (denied.value.code, denied.value.status, denied.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
+    assert "private local provider detail" not in denied.value.detail
+
+
 def test_result_view_download_revalidates_the_ticket_after_remote_io(monkeypatch):
     principal = SimpleNamespace(tenant_id="tenant-contract")
     view = _view_with_committed_file(monkeypatch, BODY)
