@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What a caller may say when sealing a run (G-04 W1, design §5-2).\n\nOnly the *role* of each server-derived artifact. The sealed set, the\ndigests, the bundle and the component versions are derived from the rows\nthe server locks; a request cannot add, omit or name any of them. An\nartifact the mapping leaves out is sealed as ``other``; an id outside the\nserver's set is refused.",
+  "properties": {
+    "roles": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Roles",
+      "type": "object"
+    }
+  },
+  "title": "RunRecordSealRequest",
+  "type": "object"
+}
