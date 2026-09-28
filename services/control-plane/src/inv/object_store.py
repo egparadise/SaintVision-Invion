@@ -34,6 +34,8 @@ class ObjectStore(Protocol):
 
     provider_id: str
 
+    def validate_locator(self, locator: str) -> str: ...
+
     def put(self, locator: str, body: bytes, expected_sha256: str) -> None: ...
 
     def get(self, locator: str, expected_sha256: str, expected_size: int) -> bytes: ...
@@ -133,6 +135,9 @@ class LocalObjectStore:
     def __init__(self, legacy: LocalObjects):
         self.legacy = legacy
 
+    def validate_locator(self, locator):
+        return ObjectHandle.name(locator)
+
     def put(self, locator, body, expected_sha256):
         with self.legacy.locked() as files:
             if files.exists(locator):
@@ -174,6 +179,9 @@ class _LegacyObjectSession:
     def __init__(self, files, provider_id=LOCAL_PROVIDER_ID):
         self.files = files
         self.provider_id = provider_id
+
+    def validate_locator(self, locator):
+        return ObjectHandle.name(locator)
 
     def put(self, locator, body, expected_sha256):
         self.files.put(locator, body, expected_sha256)
