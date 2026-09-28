@@ -15,13 +15,17 @@
 
     /* Primary Brand */
     --color-brand-primary: #2563eb;
+    --color-brand-primary-bg: #2563eb;
     --color-brand-hover: #1d4ed8;
+    --color-brand-primary-hover-bg: #1d4ed8;
     --color-brand-subtle: #dbeafe;
 
     /* Status Colors */
     --color-status-online: #16a34a;
     --color-status-degraded: #d97706;
     --color-status-offline: #dc2626;
+    --color-status-offline-bg: #dc2626;
+    --color-status-offline-hover-bg: #b91c1c;
     --color-status-neutral: #64748b;
 
     /* Risk Grades (L0~L3) */
@@ -58,19 +62,23 @@
     --color-text-muted: #9ca3af;
     --color-text-inverse: #0f172a;
 
-    --color-brand-primary: #1d4ed8;
-    --color-brand-hover: #2563eb;
+    --color-brand-primary: #60a5fa;
+    --color-brand-primary-bg: #1d4ed8;
+    --color-brand-hover: #93c5fd;
+    --color-brand-primary-hover-bg: #2563eb;
     --color-brand-subtle: #1e293b;
 
     --color-status-online: #22c55e;
     --color-status-degraded: #f59e0b;
-    --color-status-offline: #dc2626;
+    --color-status-offline: #f87171;
+    --color-status-offline-bg: #dc2626;
+    --color-status-offline-hover-bg: #b91c1c;
     --color-status-neutral: #9ca3af;
 
     --color-risk-l0: #10b981;
-    --color-risk-l1: #3b82f6;
+    --color-risk-l1: #60a5fa;
     --color-risk-l2: #f59e0b;
-    --color-risk-l3: #dc2626;
+    --color-risk-l3: #f87171;
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);

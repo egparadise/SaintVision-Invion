@@ -76,7 +76,6 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       }}
     >
       <div
-        ref={modalRef}
         style={{
           backgroundColor: 'var(--color-bg-surface)',
           borderRadius: 'var(--radius-lg)',

@@ -18,7 +18,6 @@ export const ReleaseCandidateView: React.FC = () => {
 
   const passCount = audits.filter((a) => a.status === 'pass').length;
   const totalAudits = audits.length;
-  const auditRate = totalAudits > 0 ? Math.round((passCount / totalAudits) * 100) : 0;
 
   const vulnsSlo = slos.find((s) => s.name.includes('취약점'));
   const vulnsCountStr = vulnsSlo?.actualValue || '0 건';
@@ -81,7 +80,7 @@ export const ReleaseCandidateView: React.FC = () => {
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
           <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>Critical / High 미완화 결함 (AC-11)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: isZeroVulns ? '#3fb950' : '#f85149', marginTop: '4px' }}>
-            {vulnsCountStr} {isZeroVulns ? '(ZERO BUG)' : '(ACTION REQUIRED)'}
+            {vulnsCountStr} {isZeroVulns ? '(모의 기준 충족)' : '(조치 필요)'}
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
             {isZeroVulns ? '[정적 요약] 보안·무결성 지표 예시' : '미완화 결함 조치 필요'}
@@ -89,22 +88,22 @@ export const ReleaseCandidateView: React.FC = () => {
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 달성률 (AC-11)</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>주요 SLO 목표치 (모의 규격 시뮬레이션)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: metCount === totalSlos ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {sloRate}% ({metCount}/{totalSlos} 지표 Met)
+            {sloRate}% ({metCount}/{totalSlos} 모의 규격 충족)
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {metCount === totalSlos ? '전체 목표 지표 충족 (Met)' : `${totalSlos - metCount}개 지표 미충족 또는 실측 중`}
+            {metCount === totalSlos ? '모의 설계 목표 충족 (서버 미측정)' : `${totalSlos - metCount}개 지표 미충족 또는 미측정`}
           </div>
         </div>
 
         <div style={{ backgroundColor: '#161b22', border: '1px solid #30363d', borderRadius: '8px', padding: '16px 20px' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>WCAG 2.1 AA 접근성 적합도</div>
+          <div style={{ fontSize: '12px', color: '#8b949e', fontWeight: 600 }}>WCAG 2.1 AA 접근성 체크리스트 (모의 점검)</div>
           <div style={{ fontSize: '24px', fontWeight: 700, color: passCount === totalAudits ? '#3fb950' : '#d29922', marginTop: '4px' }}>
-            {auditRate}% ({passCount}/{totalAudits} 적합)
+            {passCount}/{totalAudits} 항목 점검 (자동화 검증 미실시)
           </div>
           <div style={{ fontSize: '12px', color: '#8b949e', marginTop: '4px' }}>
-            {passCount === totalAudits ? '명도대비 11.4:1 & 키보드 완결' : `${totalAudits - passCount}개 규정 점검 필요`}
+            {passCount === totalAudits ? '규격 체크리스트 충족 (모의 점검)' : `${totalAudits - passCount}개 규정 점검 필요`}
           </div>
         </div>
 
@@ -152,7 +151,7 @@ export const ReleaseCandidateView: React.FC = () => {
         >
           <div>
             <h3 style={{ margin: 0, fontSize: '16px', color: '#f0f6fc' }}>
-              주요 SLO 실측치 및 목표 비교 (AC-11)
+              주요 SLO 모의 규격 및 목표 비교 (AC-11)
             </h3>
             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#8b949e' }}>
               [정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)
@@ -165,7 +164,7 @@ export const ReleaseCandidateView: React.FC = () => {
                 <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
                   <th style={{ padding: '8px' }}>SLO 항목</th>
                   <th style={{ padding: '8px' }}>목표치</th>
-                  <th style={{ padding: '8px' }}>실측치</th>
+                  <th style={{ padding: '8px' }}>모의 예시값 (서버 미측정)</th>
                   <th style={{ padding: '8px' }}>상태</th>
                 </tr>
               </thead>
@@ -186,7 +185,7 @@ export const ReleaseCandidateView: React.FC = () => {
                           color: slo.status === 'met' ? '#3fb950' : '#f85149',
                         }}
                       >
-                        {slo.status.toUpperCase()}
+                        {slo.status === 'met' ? '모의 MET (미측정)' : 'BREACHED'}
                       </span>
                     </td>
                   </tr>
@@ -253,7 +252,7 @@ export const ReleaseCandidateView: React.FC = () => {
                     color: audit.status === 'pass' ? '#3fb950' : '#f85149',
                   }}
                 >
-                  {audit.status === 'pass' ? 'PASS' : 'FAIL'}
+                  {audit.status === 'pass' ? '모의 PASS' : 'FAIL'}
                 </span>
               </div>
             ))}

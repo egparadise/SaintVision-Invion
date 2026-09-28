@@ -35,7 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      backgroundColor: 'var(--color-brand-primary)',
+      backgroundColor: 'var(--color-brand-primary-bg, var(--color-brand-primary))',
       color: '#ffffff',
       border: '1px solid transparent',
     },
@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
       border: '1px solid var(--color-border-strong)',
     },
     danger: {
-      backgroundColor: 'var(--color-status-offline)',
+      backgroundColor: 'var(--color-status-offline-bg, var(--color-status-offline))',
       color: '#ffffff',
       border: '1px solid transparent',
     },

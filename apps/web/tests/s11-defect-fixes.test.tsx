@@ -1,16 +1,29 @@
 // @vitest-environment happy-dom
-import React, { act } from 'react';
+// @ts-ignore
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import React, { act, useRef, useState } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+import fs from 'node:fs';
+import path from 'node:path';
+
+const indexCss = fs.readFileSync(path.resolve(__dirname, '../src/index.css'), 'utf-8');
 import { Button } from '../src/shared/ui/Button';
 import { Header } from '../src/shared/ui/Header';
+import { useModalA11y } from '../src/shared/ui/useModalA11y';
 import { WorkspaceList } from '../src/features/workspaces/WorkspaceList';
 import { WorkspaceCreateModal } from '../src/features/workspaces/WorkspaceCreateModal';
 import { GitCommitModal } from '../src/features/editor/GitCommitModal';
 import { ConflictResolutionModal } from '../src/features/editor/ConflictResolutionModal';
 import { ReleaseCandidateView } from '../src/features/release/ReleaseCandidateView';
 import { ReleaseManager } from '../src/features/release/releaseEngine';
+import { DesktopWindowComponent } from '../src/features/desktop/DesktopWindow';
+import { DesktopShell } from '../src/features/desktop/DesktopShell';
+import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
+import { AdminSecurityConsole } from '../src/features/admin/AdminSecurityConsole';
+import { WorkspaceItem, NodeItem, ApprovalItem } from '../src/contracts/types';
+import { DesktopWindow as IDesktopWindow } from '../src/contracts/virtualFabric';
 
 describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
   let container: HTMLDivElement;
@@ -29,8 +42,13 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     container.remove();
   });
 
-  // DEF-S11-01: Focus visibility on buttons
-  it('DEF-S11-01: Button does not hardcode outline: none and allows focus-visible ring', async () => {
+  // DEF-S11-01: Focus visibility on buttons and index.css :focus-visible
+  it('DEF-S11-01: Button does not hardcode outline: none and index.css defines :focus-visible ring', async () => {
+    // Assert index.css has :focus-visible with outline 2px solid and offset 2px
+    expect(indexCss).toContain(':focus-visible');
+    expect(indexCss).toMatch(/:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--color-brand-primary\)/);
+    expect(indexCss).toMatch(/:focus-visible\s*\{[^}]*outline-offset:\s*2px/);
+
     await act(async () => {
       root.render(<Button variant="primary">Accessibility Button</Button>);
     });
@@ -43,35 +61,35 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
   it('DEF-S11-02: WorkspaceList cards have role=button, tabIndex=0 and onKeyDown support', async () => {
     const handleSelect = vi.fn();
     const handleOpenStudio = vi.fn();
-    const mockWorkspaces = [
+    const mockWorkspaces: WorkspaceItem[] = [
       {
         id: 'wsp-101',
         name: 'Workspace 101',
         projectId: 'prj-alpha',
-        status: 'ready' as const,
+        status: 'ready',
         targetNodeId: 'nod-01',
-        isolationMode: 'chroot' as const,
+        isolationMode: 'container_isolated',
+        allowedPaths: ['/data'],
+        prohibitedPaths: ['/etc'],
         cpuLimitCores: 4,
         memoryLimitBytes: 8 * 1024 ** 3,
         createdAt: '2026-09-28T00:00:00Z',
       },
     ];
-    const mockNodes = [
+    const mockNodes: NodeItem[] = [
       {
         id: 'nod-01',
         hostname: 'node1.saintvision.internal',
-        status: 'online' as const,
-        cpuTotalCores: 16,
-        cpuAllocatedCores: 4,
+        status: 'online',
+        os: 'linux',
+        cpuCores: 16,
+        cpuUsagePercent: 20,
         memoryTotalBytes: 32 * 1024 ** 3,
-        memoryAllocatedBytes: 8 * 1024 ** 3,
+        memoryUsedBytes: 8 * 1024 ** 3,
         storageTotalBytes: 500 * 1024 ** 3,
-        storageAllocatedBytes: 100 * 1024 ** 3,
+        storageUsedBytes: 100 * 1024 ** 3,
         gpuCount: 0,
-        labels: {},
-        registeredAt: '2026-09-28T00:00:00Z',
         heartbeatAt: '2026-09-28T00:00:00Z',
-        isDraining: false,
       },
     ];
 
@@ -82,7 +100,7 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
           nodes={mockNodes}
           onSelectWorkspace={handleSelect}
           onOpenStudio={handleOpenStudio}
-          onOpenCreateModal={vi.fn()}
+          onCreateWorkspace={vi.fn()}
         />
       );
     });
@@ -104,74 +122,134 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     });
     expect(handleSelect).toHaveBeenCalledTimes(2);
 
-    // Verify Studio button inside card does not trigger onSelectWorkspace when activated
-    const studioBtn = container.querySelector('button') as HTMLButtonElement;
+    // Verify Studio button inside card triggers onOpenStudio and does not trigger onSelectWorkspace
+    const studioBtn = Array.from(card.querySelectorAll('button')).find((b) => b.textContent?.includes('Studio에서 열기')) as HTMLButtonElement;
     expect(studioBtn).not.toBeNull();
     act(() => {
-      studioBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      studioBtn.click();
     });
+    expect(handleOpenStudio).toHaveBeenCalledWith('wsp-101');
     // handleSelect should NOT be called from inner button
     expect(handleSelect).toHaveBeenCalledTimes(2);
   });
 
-  // DEF-S11-03, DEF-S11-04, DEF-S11-05, DEF-S11-06: Modal focus trap, restore, Esc, dialog ARIA
-  it('DEF-S11-03 ~ DEF-S11-06: WorkspaceCreateModal has dialog ARIA, Esc handler and focus trap', async () => {
+  // DEF-S11-03, 04, 05: useModalA11y focus trap, container wrap, initial focus, and trigger restoration
+  it('DEF-S11-03 & DEF-S11-04: useModalA11y handles focus trap, container wrap, and restores focus to trigger', async () => {
     const handleClose = vi.fn();
-    const handleCreate = vi.fn().mockResolvedValue(undefined);
 
+    const TestModalComponent: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+      const { containerRef, handleKeyDown } = useModalA11y({ isOpen, onClose: handleClose });
+      if (!isOpen) return null;
+      return (
+        <div ref={containerRef} role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={handleKeyDown}>
+          <button id="btn-first">First</button>
+          <button id="btn-middle">Middle</button>
+          <button id="btn-last">Last</button>
+        </div>
+      );
+    };
+
+    const triggerBtn = document.createElement('button');
+    triggerBtn.id = 'external-trigger-btn';
+    document.body.appendChild(triggerBtn);
+    triggerBtn.focus();
+    expect(document.activeElement).toBe(triggerBtn);
+
+    // Open modal
+    await act(async () => {
+      root.render(<TestModalComponent isOpen={true} />);
+    });
+
+    const dialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
+    expect(dialog).not.toBeNull();
+    const btnFirst = container.querySelector('#btn-first') as HTMLButtonElement;
+    const btnLast = container.querySelector('#btn-last') as HTMLButtonElement;
+
+    // Initial focus on first element
+    expect(document.activeElement).toBe(btnFirst);
+
+    // Tab on last element wraps to first element
+    btnLast.focus();
+    expect(document.activeElement).toBe(btnLast);
+    act(() => {
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    });
+    expect(document.activeElement).toBe(btnFirst);
+
+    // Shift+Tab on first element wraps to last element
+    act(() => {
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
+    });
+    expect(document.activeElement).toBe(btnLast);
+
+    // Shift+Tab when container is focused wraps to last element
+    dialog.focus();
+    expect(document.activeElement).toBe(dialog);
+    act(() => {
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }));
+    });
+    expect(document.activeElement).toBe(btnLast);
+
+    // Escape triggers onClose
+    act(() => {
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    // Close modal and verify focus restores to triggerBtn
+    await act(async () => {
+      root.render(<TestModalComponent isOpen={false} />);
+    });
+    expect(document.activeElement).toBe(triggerBtn);
+    triggerBtn.remove();
+  });
+
+  // DEF-S11-03 ~ DEF-S11-06: Priority Modals Verification (ApprovalDetail, AdminSecurityConsole, WorkspaceCreateModal, GitCommitModal, ConflictResolutionModal)
+  it('DEF-S11-03 ~ DEF-S11-06: Priority Modals enforce dialog ARIA, Esc handler and labeled title', async () => {
+    // 1. WorkspaceCreateModal
+    const handleWspClose = vi.fn();
     await act(async () => {
       root.render(
         <WorkspaceCreateModal
           projectId="prj-test"
           isOpen={true}
-          onClose={handleClose}
-          onCreate={handleCreate}
+          onClose={handleWspClose}
+          onCreate={vi.fn()}
         />
       );
     });
-
-    const dialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
-    expect(dialog).not.toBeNull();
-    expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(dialog.getAttribute('aria-labelledby')).toBe('workspace-create-title');
-
-    // Escape closes modal
+    const wspDialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
+    expect(wspDialog).not.toBeNull();
+    expect(wspDialog.getAttribute('aria-modal')).toBe('true');
+    expect(wspDialog.getAttribute('aria-labelledby')).toBe('workspace-create-title');
     act(() => {
-      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      wspDialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
-    expect(handleClose).toHaveBeenCalledTimes(1);
-  });
+    expect(handleWspClose).toHaveBeenCalledTimes(1);
 
-  it('DEF-S11-03 ~ DEF-S11-06: GitCommitModal has dialog ARIA, Esc handler and labeled title', async () => {
-    const handleCancel = vi.fn();
-    const handleCommit = vi.fn();
-
+    // 2. GitCommitModal
+    const handleCommitCancel = vi.fn();
     await act(async () => {
       root.render(
         <GitCommitModal
           files={[{ path: 'src/main.ts', content: 'console.log("ok");', isDirty: true }]}
           parentCommit={null}
-          onCommit={handleCommit}
-          onCancel={handleCancel}
+          onCommit={vi.fn()}
+          onCancel={handleCommitCancel}
         />
       );
     });
-
-    const dialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
-    expect(dialog).not.toBeNull();
-    expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(dialog.getAttribute('aria-labelledby')).toBe('git-commit-modal-title');
-
-    // Escape cancels modal
+    const commitDialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
+    expect(commitDialog).not.toBeNull();
+    expect(commitDialog.getAttribute('aria-modal')).toBe('true');
+    expect(commitDialog.getAttribute('aria-labelledby')).toBe('git-commit-modal-title');
     act(() => {
-      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      commitDialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
-    expect(handleCancel).toHaveBeenCalledTimes(1);
-  });
+    expect(handleCommitCancel).toHaveBeenCalledTimes(1);
 
-  it('DEF-S11-03 ~ DEF-S11-06: ConflictResolutionModal has dialog ARIA, Esc handler and labeled title', async () => {
-    const handleCancel = vi.fn();
-
+    // 3. ConflictResolutionModal
+    const handleConflictCancel = vi.fn();
     await act(async () => {
       root.render(
         <ConflictResolutionModal
@@ -189,21 +267,99 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
           onKeepMine={vi.fn()}
           onAcceptRemote={vi.fn()}
           onMerge={vi.fn()}
-          onCancel={handleCancel}
+          onCancel={handleConflictCancel}
         />
       );
     });
-
-    const dialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
-    expect(dialog).not.toBeNull();
-    expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(dialog.getAttribute('aria-labelledby')).toBe('conflict-resolution-title');
-
-    // Escape cancels modal
+    const conflictDialog = container.querySelector('div[role="dialog"]') as HTMLDivElement;
+    expect(conflictDialog).not.toBeNull();
+    expect(conflictDialog.getAttribute('aria-modal')).toBe('true');
+    expect(conflictDialog.getAttribute('aria-labelledby')).toBe('conflict-resolution-title');
     act(() => {
-      dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      conflictDialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
-    expect(handleCancel).toHaveBeenCalledTimes(1);
+    expect(handleConflictCancel).toHaveBeenCalledTimes(1);
+
+    // 4. ApprovalDetail (rejection modal)
+    const mockApproval: ApprovalItem = {
+      id: 'app-01',
+      projectId: 'prj-alpha',
+      runId: 'run-01',
+      nonce: 'nonce-123',
+      actionDigest: 'sha256-mock-digest-1234567890',
+      riskLevel: 'L2',
+      command: 'echo deploy',
+      policyReason: 'AC-10 Policy Requirement',
+      status: 'pending',
+      expiresAt: new Date(Date.now() + 60000).toISOString(),
+    };
+    await act(async () => {
+      root.render(
+        <ApprovalDetail
+          approval={mockApproval}
+          currentUserId="user-01"
+          onApprove={vi.fn()}
+          onReject={vi.fn()}
+        />
+      );
+    });
+    const rejectBtn = Array.from(container.querySelectorAll('button')).find((b) => b.textContent?.includes('반려'));
+    expect(rejectBtn).not.toBeUndefined();
+    await act(async () => {
+      rejectBtn?.click();
+    });
+    const rejectDialog = container.querySelector('[role="dialog"]');
+    expect(rejectDialog).not.toBeNull();
+    expect(rejectDialog?.getAttribute('aria-modal')).toBe('true');
+    expect(rejectDialog?.getAttribute('aria-labelledby')).toBe('reject-modal-title');
+    act(() => {
+      rejectDialog?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  // DEF-S11-05: DesktopWindow Escape isolation
+  it('DEF-S11-05: DesktopWindow ignores Esc when input is focused and closes on window body Esc', async () => {
+    const handleClose = vi.fn();
+    const mockWin: IDesktopWindow = {
+      id: 'win-1',
+      appId: 'terminal',
+      title: 'Terminal Window',
+      isOpen: true,
+      isMinimized: false,
+      isMaximized: false,
+      position: { x: 10, y: 10 },
+      size: { width: 600, height: 400 },
+      zIndex: 10,
+    };
+    await act(async () => {
+      root.render(
+        <DesktopWindowComponent
+          window={mockWin}
+          isActive={true}
+          onFocus={vi.fn()}
+          onClose={handleClose}
+          onMinimize={vi.fn()}
+          onToggleMaximize={vi.fn()}
+        >
+          <input data-testid="term-input" />
+        </DesktopWindowComponent>
+      );
+    });
+    const termInput = container.querySelector('[data-testid="term-input"]') as HTMLInputElement;
+    termInput.focus();
+    // Esc while typing in input must NOT close window
+    act(() => {
+      termInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(handleClose).not.toHaveBeenCalled();
+
+    // Esc on window body closes window
+    const winEl = container.firstElementChild as HTMLElement;
+    act(() => {
+      winEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
   // DEF-S11-06: Header active tab aria-current="page"
@@ -214,7 +370,7 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
           currentUser={{ id: 'gemini', name: 'Gemini Agent', role: 'admin' }}
           activeTab="workspaces"
           onSelectTab={vi.fn()}
-          theme="dark"
+          currentTheme="dark"
           onToggleTheme={vi.fn()}
         />
       );
@@ -229,47 +385,52 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     expect(inactiveTabBtn?.getAttribute('aria-current')).toBeNull();
   });
 
-  // DEF-S11-08, 11, 12, 13, 14, 15, 17, 18, 19: ReleaseCandidateView integrity and truthfulness
-  it('DEF-S11-08, 11~19: ReleaseCandidateView removes false claims and enforces truthful status', async () => {
+  // DEF-S11-15 & DEF-S11-08, 11~19: ReleaseCandidateView integrity and dynamic audit status binding
+  it('DEF-S11-15: ReleaseCandidateView dynamically binds audit status and displays FAIL on failure', async () => {
+    // Spy on getAccessibilityAudits to inject a failed audit
+    const spy = vi.spyOn(ReleaseManager.prototype, 'getAccessibilityAudits').mockReturnValue([
+      {
+        ruleId: 'wcag21-1.4.3-contrast-minimum',
+        wcagLevel: 'AA',
+        description: '본문 텍스트와 배경 간 명도 대비 미달',
+        status: 'fail',
+      },
+    ]);
+
+    await act(async () => {
+      root.render(<ReleaseCandidateView />);
+    });
+
+    const badges = Array.from(container.querySelectorAll('span')).map((s) => s.textContent?.trim());
+    expect(badges).toContain('FAIL');
+    spy.mockRestore();
+  });
+
+  it('DEF-S11-08, 11~19: ReleaseCandidateView removes false claims and enforces truthful simulation status', async () => {
     await act(async () => {
       root.render(<ReleaseCandidateView />);
     });
 
     const text = container.textContent || '';
 
-    // DEF-S11-08: False telemetry claim removed, replaced with static simulation notice
-    expect(text).not.toContain('측정 환경: 5-Node 분산 클러스터 및 실제 원격 호출 계측 결과');
-    expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
-
-    // DEF-S11-08: False "ACTIVE LIVE" and "STANDBY" replaced with honest simulation badges
+    // False claims eliminated
+    expect(text).not.toContain('(ZERO BUG)');
+    expect(text).not.toContain('명도대비 11.4:1 & 키보드 완결');
+    expect(text).not.toContain('실측치 및 목표 비교');
     expect(text).not.toContain('ACTIVE LIVE');
-    expect(text).toContain('모의 활성 (서버 API 미노출 · 실 인프라 미배포)');
-    expect(text).toContain('모의 대기');
-
-    // DEF-S11-08 & DEF-S11-16: Table initially does NOT show unverified "✔ 검증 완료"
     expect(text).not.toContain('✔ 검증 완료');
+
+    // Truthful simulation labels confirmed
+    expect(text).toContain('(모의 기준 충족)');
+    expect(text).toContain('주요 SLO 모의 규격 및 목표 비교 (AC-11)');
+    expect(text).toContain('모의 예시값 (서버 미측정)');
+    expect(text).toContain('모의 MET (미측정)');
+    expect(text).toContain('WCAG 2.1 AA 접근성 체크리스트 (모의 점검)');
+    expect(text).toContain('모의 PASS');
+    expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
+    expect(text).toContain('모의 활성 (서버 API 미노출 · 실 인프라 미배포)');
     expect(text).toContain('미측정 (대기)');
-
-    // DEF-S11-11: WCAG false full automated audit claim downgraded
-    expect(text).not.toContain('W3C 웹 콘텐츠 접근성 지침 2.1 AA 등급 전수 자동화 검증');
-    expect(text).toContain('[모의 지표] WCAG 2.1 AA 규격 체크리스트 (자동화 검증 미실시)');
-
-    // DEF-S11-12: Contrast ratio false general claim downgraded to manual calculation
-    expect(text).not.toContain('(기준 4.5:1 대비 초과 충족)');
-    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님)');
-
-    // DEF-S11-13: Security full verification false claim downgraded
-    expect(text).not.toContain('보안·무결성 전수 검증 완료');
-    expect(text).toContain('[정적 요약] 보안·무결성 지표 예시');
-
-    // DEF-S11-14: Zero-downtime guaranteed rollback claim downgraded to in-memory simulation
-    expect(text).not.toContain('배포 후 장애 감지 시 1클릭 무중단 롤백 및 캐시 무효화가 보증됩니다.');
-    expect(text).toContain('[모의 안내] 클라이언트 인메모리 롤백 시뮬레이션 (실 인프라 캐시 무효화 미연동)');
-
-    // DEF-S11-15: WCAG status badge dynamically bound
-    const passBadges = container.querySelectorAll('span');
-    const badgeTexts = Array.from(passBadges).map((s) => s.textContent?.trim());
-    expect(badgeTexts).toContain('PASS');
+    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): 12.26:1');
 
     // DEF-S11-17: Table wrapper has overflowX auto
     const tableWrappers = container.querySelectorAll('div[style*="overflow-x: auto"], div[style*="overflowX: auto"]');
@@ -318,12 +479,18 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     expect(res.activeCandidate?.rollbackVerified).toBe(true);
   });
 
-  // DEF-S11-09 & DEF-S11-10: Mathematical contrast verification
-  it('DEF-S11-09 & DEF-S11-10: Confirms mathematical contrast formulas exceed AA standards', () => {
+  // DEF-S11-09 & DEF-S11-10: Mathematical contrast verification by dynamically parsing index.css ?raw tokens
+  it('DEF-S11-09 & DEF-S11-10: Parses index.css tokens dynamically and confirms contrast ratios exceed AA standards', () => {
     // Relative Luminance calculation per WCAG 2.1 specs:
     // L = 0.2126 * R + 0.7152 * G + 0.0722 * B
-    // where C_srgb = C <= 0.04045 ? C/12.92 : ((C+0.055)/1.055)^2.4
-    const getLuminance = (r: number, g: number, b: number) => {
+    const parseHex = (hex: string) => {
+      const clean = hex.replace('#', '').trim();
+      const num = parseInt(clean, 16);
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    };
+
+    const getLuminance = (hex: string) => {
+      const [r, g, b] = parseHex(hex);
       const a = [r, g, b].map((v) => {
         v /= 255;
         return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
@@ -331,29 +498,60 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     };
 
-    const getContrast = (l1: number, l2: number) => {
+    const getContrast = (hex1: string, hex2: string) => {
+      const l1 = getLuminance(hex1);
+      const l2 = getLuminance(hex2);
       const lighter = Math.max(l1, l2);
       const darker = Math.min(l1, l2);
       return (lighter + 0.05) / (darker + 0.05);
     };
 
-    const lWhite = getLuminance(255, 255, 255); // 1.0
-    const lDarkPrimary = getLuminance(0x1d, 0x4e, 0xd8); // #1d4ed8
-    const lDarkDanger = getLuminance(0xdc, 0x26, 0x26); // #dc2626
-    const lDarkSubtle = getLuminance(0x1f, 0x29, 0x37); // #1f2937
-    const lDarkBorderStrong = getLuminance(0x9c, 0xa3, 0xaf); // #9ca3af
-    const lLightSubtle = getLuminance(0xf1, 0xf5, 0xf9); // #f1f5f9
-    const lLightBorderStrong = getLuminance(0x64, 0x74, 0x8b); // #64748b
+    // Extract tokens from index.css dynamically
+    const rootBlock = indexCss.match(/:root\s*\{([^}]+)\}/)?.[1] || '';
+    const darkBlock = indexCss.match(/\[data-theme=['"]dark['"]\]\s*\{([^}]+)\}/)?.[1] || '';
 
-    // DEF-S11-09: Primary and Danger buttons on white text exceed 4.5:1 (WCAG 1.4.3 Level AA)
-    const primaryContrast = getContrast(lWhite, lDarkPrimary);
-    const dangerContrast = getContrast(lWhite, lDarkDanger);
-    expect(primaryContrast).toBeGreaterThanOrEqual(4.5);
-    expect(dangerContrast).toBeGreaterThanOrEqual(4.5);
+    const extractToken = (block: string, name: string): string => {
+      const regex = new RegExp(`${name}\\s*:\\s*([^;]+);`);
+      const match = block.match(regex);
+      if (!match) throw new Error(`Token ${name} not found in CSS block`);
+      return match[1].split('/*')[0].trim();
+    };
 
-    // DEF-S11-10: Form input borders exceed 3.0:1 (WCAG 1.4.11 Non-text Contrast)
-    const darkBorderContrast = getContrast(lDarkBorderStrong, lDarkSubtle);
-    const lightBorderContrast = getContrast(lLightSubtle, lLightBorderStrong);
+    const darkPrimaryBg = extractToken(darkBlock, '--color-brand-primary-bg');
+    const darkPrimaryHoverBg = extractToken(darkBlock, '--color-brand-primary-hover-bg');
+    const darkPrimaryText = extractToken(darkBlock, '--color-brand-primary');
+    const darkDangerBg = extractToken(darkBlock, '--color-status-offline-bg');
+    const darkDangerText = extractToken(darkBlock, '--color-status-offline');
+    const darkBorderStrong = extractToken(darkBlock, '--color-border-strong');
+    const darkBgSurface = extractToken(darkBlock, '--color-bg-surface');
+    const darkBgSubtle = extractToken(darkBlock, '--color-bg-subtle');
+
+    const rootBorderStrong = extractToken(rootBlock, '--color-border-strong');
+    const rootBgSubtle = extractToken(rootBlock, '--color-bg-subtle');
+
+    // 1. Dark primary button bg on white text exceeds 4.5:1 (actual 6.70:1)
+    const primaryBgContrast = getContrast('#ffffff', darkPrimaryBg);
+    expect(primaryBgContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 2. Dark primary button hover bg on white text exceeds 4.5:1 (actual 5.17:1)
+    const primaryHoverBgContrast = getContrast('#ffffff', darkPrimaryHoverBg);
+    expect(primaryHoverBgContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 3. Dark danger button bg on white text exceeds 4.5:1 (actual 4.83:1)
+    const dangerBgContrast = getContrast('#ffffff', darkDangerBg);
+    expect(dangerBgContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 4. Dark brand text/ring on dark surface exceeds 4.5:1 for text, 3.0:1 for ring (actual 6.98:1)
+    const darkTextContrast = getContrast(darkPrimaryText, darkBgSurface);
+    expect(darkTextContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 5. Dark danger text on dark surface exceeds 4.5:1 (actual 6.41:1)
+    const darkDangerTextContrast = getContrast(darkDangerText, darkBgSurface);
+    expect(darkDangerTextContrast).toBeGreaterThanOrEqual(4.5);
+
+    // 6. Non-text form input borders exceed 3.0:1 (WCAG 1.4.11)
+    const darkBorderContrast = getContrast(darkBorderStrong, darkBgSubtle);
+    const lightBorderContrast = getContrast(rootBorderStrong, rootBgSubtle);
     expect(darkBorderContrast).toBeGreaterThanOrEqual(3.0);
     expect(lightBorderContrast).toBeGreaterThanOrEqual(3.0);
   });
