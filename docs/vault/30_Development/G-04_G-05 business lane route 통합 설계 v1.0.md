@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G04-G05-BUSINESS-ROUTES-DESIGN-001"
 title: "G-04·G-05 남은 business lane route 통합 설계 v1.0 — S09 넷(Context bundle 조회·RunRecord 봉인·pin 조회·eval 실행) + model-registry 셋(register·verify·pin_retention): 기존 서비스·index·route 재사용 표, 읽기 membership/쓰기 canApprove 등급, 정본 ProblemDetails·strict·path→row·404·IDEM, tx/lock 순서와 Codex 계약 지점, persistence 판정(eval suite project 결속 = migration 필요·번호 요청), 계약·FE 영향, route별 PR 분할 (카드 58, docs-only)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T14:15:36+09:00"
+updated: "2026-09-28T14:22:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -82,7 +82,7 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 ### 5-1. persistence·index 판정
 
 - R1~R3·W1~W4: **migration 없음**. 조회는 PK/UNIQUE(`uq_model_versions_tenant_id_content_sha256`, run_records PK) 경로. 새 index 0.
-- **W5: migration 필요.** 최소안 = `eval_suites.project_id`(nullable, composite FK `(tenant_id, project_id)` → `projects`; 기존 suite는 NULL이며 route는 NULL suite를 404로 취급) + `eval_runs`는 suite로 전이. 대안(tenant 범위 route + canApprove)은 #158 §1-4·Codex F-R1("범위 표시만으로는 권한이 생기지 않는다")과 충돌해 채택하지 않는다. **번호는 0051까지 배정됨 → 이 설계는 여기서 멈추고 코디네이터에게 W5용 migration 번호를 요청한다.** W5 구현 PR은 번호 배정 뒤.
+- **W5: migration 필요.** 최소안 = `eval_suites.project_id`(nullable, composite FK `(tenant_id, project_id)` → `projects`; 기존 suite는 NULL이며 route는 NULL suite를 404로 취급) + `eval_runs`는 suite로 전이. 대안(tenant 범위 route + canApprove)은 #158 §1-4·Codex F-R1("범위 표시만으로는 권한이 생기지 않는다")과 충돌해 채택하지 않는다. **코디네이터 결정(2026-09-28 14:21 KST, PR #183 코멘트): W5 migration 번호 `0052` 예약, `down_revision = 0051_service_credentials`(#176).** 중앙 순서 0047(#128)→0048(#159)→0049(#172)→0050(#174)→0051(#176)→0052(W5). W5 구현 PR(8)은 #176이 포함된 branch 위에 stack; 최소안이 검토에서 바뀌면 번호는 유지하고 내용만 갱신. 다른 PR은 0052를 쓰지 않는다.
 
 ## 6. 계약 변경 범위와 FE 영향
 
@@ -113,5 +113,6 @@ tags: ["G-04", "G-05", "business-lane", "route", "design", "claude"]
 
 - bundle 본문(`content`) 노출 route: 비밀 스캔(`context.py:71 _refuse_recognised_secrets`)이 저장 시점에만 있어 읽기 노출은 별 결정.
 - 봉인 시 outbox/mirror 훅 여부(#172의 `enqueue_mirror`는 lineage·eval에만) — 봉인은 미러 대상 아님(설계 #168 §1 표에 없음).
-- **코디네이터 결정 요청 2건**: (1) W5 migration 번호, (2) W1~W5 canApprove 통일 승인.
+- **코디네이터 결정(v1.1 반영)**: (1) W5 migration 번호 **0052** 예약(§5-1). (2) W1~W5 canApprove 통일 **잠정 승인**(#152 §3·#167 `_require_approval` 선례) — 권한 경계 결정이므로 **최종 확정은 Codex 설계 검토**에서: 특히 W5(외부 adapter 호출·비용)가 canApprove로 충분한지, W1 봉인·W4 pin 경합 계약(§5)과 함께 판단.
+- **진행 결정**: 계약 지점이 없는 **PR 1(R1 RunRecord 조회 + `_run_in_project` helper)**은 설계 승인 전이라도 #175 branch 위에 **draft**로 올려 검토 대기 시간을 줄인다(설계가 바뀌면 draft를 따라 고침). W1·W4는 Codex 계약 전 착수하지 않는다.
 - owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/g04-g05-business-routes-design`, base `1e8baf04`, force-push·`git add -A` 없음. 시각은 `date`.

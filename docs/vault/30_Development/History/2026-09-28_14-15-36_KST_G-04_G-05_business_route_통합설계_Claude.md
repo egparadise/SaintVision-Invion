@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-G04-G05-BUSINESS-ROUTES-DESIGN"
 title: "G-04·G-05 남은 business lane route 통합 설계 v1.0 (docs-only) — 7 route 등급·정본 오류·IDEM·tx/lock·Codex 계약 지점(seal·pin)·eval suite project 결속 migration 번호 요청·계약/FE·PR 분할 8 (카드 58)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T14:15:36+09:00"
+updated: "2026-09-28T14:22:04+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -24,3 +24,7 @@ tags: ["G-04", "G-05", "design", "claude"]
 - 계약/FE(§6): Strict 파생 → `export_schemas`; 화면 없음(Gemini 인계). 부정 시험 목록(§7), PR 분할 8(§8).
 
 docs-only. 게이트 통과. owner Claude / reviewer Codex / 병합 금지.
+
+## v1.1 (2026-09-28T14:22:04+09:00) — 코디네이터 결정 반영
+
+W5 migration **0052** 예약(down 0051, #176 위 stack); W1~W5 canApprove 통일 잠정 승인(최종은 Codex 설계 검토, W5 충분성·W1/W4 경합 계약과 함께). PR 1(R1 + `_run_in_project`)은 #175 위 draft로 선착수, W1·W4는 Codex 계약 전 착수 금지.
