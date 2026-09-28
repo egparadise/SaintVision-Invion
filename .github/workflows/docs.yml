@@ -27,6 +27,40 @@ jobs:
           cache-dependency-path: requirements-docs.txt
       - run: python -m pip install -r requirements-docs.txt
       - run: python tools/check_docs.py
+      - name: Repository path citations exist (ratchet; baseline may only shrink)
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          # The floor is the baseline at the base commit. Each trigger names its
+          # base explicitly; none of them guesses from the previous commit (a multi-commit push
+          # could raise the floor in commit 1 and hide it behind commit 2).
+          case "$EVENT_NAME" in
+            pull_request)
+              git fetch --no-tags --depth=1 origin "$GITHUB_BASE_REF"
+              base="origin/$GITHUB_BASE_REF"
+              ;;
+            push)
+              # The commit the branch pointed at before this push (all of the
+              # pushed commits are compared against it). A zero SHA means the
+              # branch is new: fail closed rather than invent a floor.
+              if [ -z "$PUSH_BEFORE" ] || [ "$PUSH_BEFORE" = "0000000000000000000000000000000000000000" ]; then
+                echo "FAIL: push without a previous commit (new branch); no baseline floor to compare against" >&2
+                exit 1
+              fi
+              git fetch --no-tags --depth=1 origin "$PUSH_BEFORE"
+              git rev-parse --verify --quiet "$PUSH_BEFORE^{commit}" >/dev/null
+              base="$PUSH_BEFORE"
+              ;;
+            *)
+              # workflow_dispatch: a manual run has no base to ratchet against.
+              # It checks current consistency only (new/stale entries), and says so.
+              echo "manual run: floor check is against HEAD itself (consistency only)"
+              base="HEAD"
+              ;;
+          esac
+          python tools/check_doc_path_citations.py --ratchet --base-ref "$base"
       - run: python tools/check_contract_bindings.py
       - run: python tools/check_frontend_integrity.py
       - name: Report fixture producer reachability

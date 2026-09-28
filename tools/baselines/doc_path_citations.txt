@@ -1,0 +1,232 @@
+# Ratchet baseline for check_doc_path_citations --ratchet.
+# Each line is an ACCEPTED broken repository-path citation: '<doc relative to docs/vault> || <citation>'.
+# --ratchet FAILS on a broken citation NOT listed here (a NEW regression) AND on a listed citation that is
+# no longer broken (STALE -> remove it, ratcheting the floor down). The floor only goes down: fix the
+# citation in the document, then delete its line here. Never add a line to hide a new invented path.
+00_Index/전체 개발 진행 현황.md || deploy/certs
+00_Index/전체 개발 진행 현황.md || tests/browser-matrix-acceptance.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/dashboard-runlist-freshness-wiring.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/defect-recovery-admin-recovery-editor.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/inv-file-explorer-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/model-studio-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/resource-explorer-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/run-attempt-contract.test.ts
+00_Index/전체 개발 진행 현황.md || tests/run-detail-attempts-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/run-detail-logs-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/run-log-contract.test.ts
+00_Index/전체 개발 진행 현황.md || tests/terminal-session-dom.test.tsx
+00_Index/전체 개발 진행 현황.md || tests/workspace-list-5state-contract.test.tsx
+30_Development/2026-09-11_전체개발점검_신규검토사항.md || src/saintvision/server.py:1864
+30_Development/2026-09-19_Claude_PITR_변경안과영향.md || tools/pitr_readiness.assess
+30_Development/2026-09-19_Claude_PITR_변경안과영향.md || tools/recovery_drill.rpo_bound_from
+30_Development/2026-09-23_S05-FE_자원배치_미리보기_Explain_시나리오_매트릭스_Gemini.md || services/pools.py
+30_Development/2026-09-23_S05-FE_자원배치_미리보기_Explain_시나리오_매트릭스_Gemini.md || services/pools.py:136-148
+30_Development/2026-09-23_S05-FE_자원배치_미리보기_Explain_시나리오_매트릭스_Gemini.md || services/pools.py:335-337
+30_Development/2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini.md || tests/web/terminal-session-dom.test.tsx:297
+30_Development/2026-09-23_S06-FE_Workspace복원_원격WSPTY콘솔_시나리오_매트릭스_Gemini.md || tests/web/terminal-session-dom.test.tsx:361
+30_Development/Agent별 작업/Gemini 작업 현황.md || apps/web/dist
+30_Development/Agent별 작업/Gemini 작업 현황.md || contracts/types.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || deploy/certs
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/accessibility-status-and-guards.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/dashboard-runlist-freshness-wiring.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/inv-file-explorer-dom.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/late-mutation-generation-regression.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/model-commit-observation-contract.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/model-lineage.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/monaco-workspace-editor-wiring.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/node-resource-usage-contract.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/placement-explain.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/resource-explorer-dom.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/response-freshness-wiring.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/sse-stream.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/storage-observation-contract.test.ts
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/terminal-session-dom.test.tsx
+30_Development/Agent별 작업/Gemini 작업 현황.md || tests/workspace-list-5state-contract.test.tsx
+30_Development/Claude_CL-01_커널독립검토.md || tools/_definer_rules.py
+30_Development/Claude_통합코드_독립검토.md || src/saintvision/api/v1/results.py
+30_Development/Claude_통합코드_독립검토.md || src/saintvision/services/results.py
+30_Development/Codex 5노드 랩 opt-in lane 정의.md || tools/run_s05_five_node_benchmark.py
+30_Development/Codex 실제 실행 결과 조회 계약.md || src/saintvision/services/results.py
+30_Development/History/2026-09-09_17-45-00_KST_S01-FE_Gemini_완료보고.md || src/index.css
+30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-09_23-20-00_KST_S02-FE_Gemini_노드관측_여정_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-09_23-40-00_KST_S03-FE_Gemini_격리실행_결과_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-09_23-50-00_KST_S12_Claude_개발과정.md || services/pilot.py
+30_Development/History/2026-09-09_23-55-00_KST_S04-FE_Gemini_승인센터_SSE타임라인_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_00-10-00_KST_S05-FE_Gemini_자원배치_토폴로지_Explain_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/editor-session.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-10_00-25-00_KST_S06-FE_Gemini_개발작업공간_Monaco_Diff_Session_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/distributed-recovery.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/editor-session.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-10_00-45-00_KST_S07-FE_Gemini_분산복구_Stale_Fencing_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/admin-security.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/distributed-recovery.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/editor-session.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-10_01-10-00_KST_S08-FE_Gemini_보안감사_격리_관리자콘솔_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/admin-security.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/agent-bounded-loop.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/distributed-recovery.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/editor-session.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-10_01-30-00_KST_S09-FE_Gemini_자연어요청_예산_Diff_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/admin-security.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/agent-bounded-loop.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/approval-timeline.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/approval.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/distributed-recovery.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/editor-session.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/governance-rules.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/model-lineage.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/node-journey.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/placement-explain.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/redact.test.ts
+30_Development/History/2026-09-10_01-45-00_KST_S10-FE_Gemini_AI도구_모델계보_배포_개발과정.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-10_02-00-00_KST_S11-FE_Gemini_접근성_시각회귀_배포후보_개발과정.md || tests/release-candidate.test.ts
+30_Development/History/2026-09-10_02-15-00_KST_S12-FE_Gemini_내부망HTTPS_웹배포_운영인수_개발과정.md || tests/intranet-deployment.test.ts
+30_Development/History/2026-09-10_03-00-00_KST_Track1_Track3_종합고도화_인프라패키징.md || deploy/certs/
+30_Development/History/2026-09-10_10-10-00_KST_SHARD-I07_Parent_Child_Resource_Reclamation_Report.md || contracts/types.ts
+30_Development/History/2026-09-10_10-10-00_KST_SHARD-I07_Parent_Child_Resource_Reclamation_Report.md || tests/shard-journey.test.ts
+30_Development/History/2026-09-10_11-30-00_KST_WORKSPACE-RESUME_ADR-044-045_Gemini_완결보고서.md || tests/shard-journey.test.ts
+30_Development/History/2026-09-11_09-26-00_KST_DEVELOPER-STUDIO-INTEGRATION_Gemini_검증보고.md || contracts/governance.yaml
+30_Development/History/2026-09-11_09-26-00_KST_DEVELOPER-STUDIO-INTEGRATION_Gemini_검증보고.md || src/server.ts
+30_Development/History/2026-09-11_11-30-00_KST_STUDIO-EXECUTION-ARTIFACT-DISPLAY_Gemini_검증보고.md || src/server.ts
+30_Development/History/2026-09-11_GEMINI-STUDIO_수정본_Codex_재검토.md || src/saintvision/server.py:1601
+30_Development/History/2026-09-11_GM03-TERMINAL-DRAIN_Gemini_검증보고.md || contracts/types.ts
+30_Development/History/2026-09-14_LEGACY-ROLE-REPAIR_Codex_검증보고.md || tests/test_role_fixture_preservation.py tests/test_database.py
+30_Development/History/2026-09-15_02-30-00_KST_VF-CL-05_Claude_배포경계재현.md || services/control-plane/src;src
+30_Development/History/2026-09-15_03-40-00_KST_VF-CL-02_Claude_inv-resolver골격.md || services/resolver.py
+30_Development/History/2026-09-15_04-10-00_KST_VF-CL-04_Claude_replica복구계획.md || services/replica_repair.py
+30_Development/History/2026-09-15_04-40-00_KST_VF-CL-03_Claude_model레지스트리시험.md || services/lineage.py
+30_Development/History/2026-09-15_15-00-00_KST_VF-CL-05_Claude_VF-CX-02독립검토.md || migrations/0039_model_manifest.py
+30_Development/History/2026-09-15_15-30-00_KST_VF-CL-05_Claude_VF-CX-03-04독립검토.md || migrations/0040 model_run_inputs
+30_Development/History/2026-09-15_15-30-00_KST_VF-CL-05_Claude_VF-CX-03-04독립검토.md || migrations/0042 model_retry_lineage
+30_Development/History/2026-09-15_STUDIO-AUTH-ENTRY_Codex_검증보고.md || tests/core/test_contracts.py
+30_Development/History/2026-09-18_14-45-00_KST_VERIFICATION-BOUNDARY-AUDIT-REMEDIATION_Gemini_검증보고.md || src/server.ts
+30_Development/History/2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고.md || apps/web/dist/index.html
+30_Development/History/2026-09-18_15-15-00_KST_DEPLOY-INTRANET-PREFLIGHT-EXIT-GUARD_Gemini_검증보고.md || deploy/certs/saintvision.crt
+30_Development/History/2026-09-18_22-30-00_KST_VF-CX_Claude_원격권한결속과CAS_fixture독립검토.md || migrations/0005_node_channels.sql
+30_Development/History/2026-09-18_CX01착지전_공통진행판보존.md || apps/web/App.tsx
+30_Development/History/2026-09-18_CX01착지전_공통진행판보존.md || tools/_definer_rules.py
+30_Development/History/2026-09-18_TLS_외부주입_전환준비_Codex.md || deploy/certs
+30_Development/History/2026-09-18_TLS_외부주입_전환준비_Codex.md || deploy/certs/saintvision.crt
+30_Development/History/2026-09-18_공개저장소_비밀노출_긴급감사_Codex.md || deploy/certs
+30_Development/History/2026-09-18_공개저장소_비밀노출_긴급감사_Codex.md || deploy/certs/saintvision.key
+30_Development/History/2026-09-18_커밋된_TLS_개인키_보안_finding_Codex.md || deploy/certs
+30_Development/History/2026-09-18_커밋된_TLS_개인키_보안_finding_Codex.md || deploy/certs/saintvision.key
+30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs
+30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs/saintvision.crt
+30_Development/History/2026-09-19_00-35-00_KST_DEPLOY-INTRANET-EXTERNAL-CERT-INJECTION_Gemini_검증보고.md || deploy/certs/saintvision.key
+30_Development/History/2026-09-19_Launcher_우선순위5_감사_Codex.md || apps/web/node_modules/vite/bin/vite.js
+30_Development/History/2026-09-19_Launcher_우선순위5_감사_Codex.md || deploy/certs
+30_Development/History/2026-09-19_TLS_Docker_마운트_검증_보류_Codex.md || deploy/certs
+30_Development/History/2026-09-19_TLS_Docker_마운트_재검증_Codex.md || deploy/certs
+30_Development/History/2026-09-19_TLS외부주입전환_Claude_독립검토.md || deploy/certs
+30_Development/History/2026-09-21_PTY보안경계_토큰제로누설_사전연결허위성공제거_Gemini.md || tests/terminal-session-dom.test.tsx
+30_Development/History/2026-09-21_ShardObservation_앵커와_검증정보_노출판정_Codex.md || services/lineage.py
+30_Development/History/2026-09-21_UI_FB_contract_readiness_review_Codex.md || apps/web/tests/developer-studio.test.ts:448
+30_Development/History/2026-09-21_UI_FB_contract_readiness_review_Codex.md || tests/browser/desktop.tsx
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || packages/contracts-ts/src/index
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/desktop-layout.test.tsx
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/inv-file-explorer-dom.test.tsx
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/model-commit-observation-contract.test.ts
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/model-studio-dom.test.tsx
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/terminal-session-dom.test.tsx
+30_Development/History/2026-09-21_VF-GM-03-05_Codex_경계지적_치유_및_계약결속_Gemini.md || tests/ws-terminal.test.ts
+30_Development/History/2026-09-21_WorkspaceEditView_StorageObservationView_무결성배선_Gemini.md || tests/storage-observation-contract.test.ts
+30_Development/History/2026-09-21_discovery_candidates_response_contract_Codex.md || apps/web/scripts/discovery-contracts.mjs
+30_Development/History/2026-09-21_funnel잔여_PG전용처리_Claude.md || tests/integration/$f.py
+30_Development/History/2026-09-21_lineage_평가점수합성차단_및_PTY_commandId보안정합_Gemini.md || services/lineage.py
+30_Development/History/2026-09-21_lineage_평가점수합성차단_및_PTY_commandId보안정합_Gemini.md || tests/model-lineage.test.ts
+30_Development/History/2026-09-21_lineage_평가점수합성차단_및_PTY_commandId보안정합_Gemini.md || tests/terminal-session-dom.test.tsx
+30_Development/History/2026-09-21_run-logs_계약결속_Gemini인계_Claude.md || contracts/v1alpha1/core.schema.json#/$defs/RunLogView
+30_Development/History/2026-09-21_run결과_artifacts_계약결속_Claude.md || contracts/v1alpha1/core.schema.json#/$defs/RunResultView
+30_Development/History/2026-09-21_sync_common_state_UI_FB_boundary_Codex.md || apps/web/scripts/discovery-contracts.mjs
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/approval-review.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/desktop-layout.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/developer-studio.test.ts
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/fabric-control-plane.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/fabric-observation.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/live-observation.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/placement-simulator.test.tsx
+30_Development/History/2026-09-21_sync_obsidian_state_and_static_markup_audit_Codex.md || tests/run-approval-observation.test.tsx
+30_Development/History/2026-09-21_web_response_contract_map_workspace_Codex.md || services/nodes.py
+30_Development/History/2026-09-21_web_response_contract_map_workspace_Codex.md || services/pools.py
+30_Development/History/2026-09-21_web_response_contract_map_workspace_Codex.md || tests/pool-placement-response-contract.test.ts
+30_Development/History/2026-09-21_디스커버리_테넌트격리_및_UI입력_가짜값_전면소거_Gemini.md || tests/model-lineage.test.ts
+30_Development/History/2026-09-21_디스커버리_테넌트격리_및_UI입력_가짜값_전면소거_Gemini.md || tests/resource-explorer-dom.test.tsx
+30_Development/History/2026-09-21_디스커버리_테넌트격리_및_UI입력_가짜값_전면소거_Gemini.md || tests/terminal-session-dom.test.tsx
+30_Development/History/2026-09-21_모델verify노출_lineage_권고_Codex인계_Claude.md || services/lineage.py
+30_Development/History/2026-09-21_무결성_복제본_백엔드능력지도_Claude.md || services/lineage.py
+30_Development/History/2026-09-21_미병합브랜치_44커밋_유실점검_Claude.md || services/results.py
+30_Development/History/2026-09-21_미병합브랜치_44커밋_유실점검_Claude.md || tools/ensure_partitions.py
+30_Development/History/2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini.md || apps/web/src/shared/api/runApprovalObservation.ts(18)
+30_Development/History/2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini.md || packages/contracts-ts/src/index
+30_Development/History/2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini.md || src/contracts/types.ts
+30_Development/History/2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini.md || src/features/runs/RunDetail.tsx(194,23)
+30_Development/History/2026-09-21_생성타입_전환_ApprovalPage_RunArtifactList_일원화_Gemini.md || src/features/studio/DeveloperStudio.tsx(628,23)
+30_Development/History/2026-09-22_19-00-00_KST_VF-CL_재고_및_아카이브보관정리_Claude.md || services/replica_repair.py
+30_Development/History/2026-09-22_19-00-00_KST_VF-CL_재고_및_아카이브보관정리_Claude.md || services/resolver.py
+30_Development/History/2026-09-22_Codex_S01-FE_review.md || contracts/v1alpha1/core.schema.json#/$defs/ControlRunView
+30_Development/History/2026-09-22_NodeResourceUsage_Capability바인딩_및_NodeDetail_미관측가드_Gemini.md || tests/node-resource-usage-contract.test.tsx
+30_Development/History/2026-09-22_PR36_NodeResourceUsage_UI_독립검토_Claude.md || contracts/types.ts
+30_Development/History/2026-09-22_PR61_WebDesktop_UI불변식_9종_수용계획_독립검토_Claude.md || tests/browser/desktop.tsx
+30_Development/History/2026-09-22_PR61_WebDesktop_UI불변식_9종_수용계획_독립검토_Claude.md || tests/desktop-layout.test.tsx
+30_Development/History/2026-09-22_WorkspaceItem_잉여어휘소거_및_WorkspaceList_5대상태정직화_Chrome153_Gemini.md || tests/workspace-execution.test.ts
+30_Development/History/2026-09-22_WorkspaceSummary_status_enum_좁힘_tsc가_죽은active분기_발견_Claude.md || apps/web/node_modules
+30_Development/History/2026-09-22_set_workspace_status_후속확인_잔여와레인_Claude.md || apps/web/node_modules
+30_Development/History/2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude.md || contracts/types.ts:33
+30_Development/History/2026-09-22_느슨한계약열거_화면죽은분기_부류훑기_Claude.md || services/nodes.py:120
+30_Development/History/2026-09-22_새PC_첫날_CI첫실행_triage_및_이전후_전수검증_Claude.md || tests/freshness-and-staleness-wiring.test.tsx
+30_Development/History/2026-09-22_시험방어력_실측감사_유일방어목록_Gemini.md || tests/dashboard-runlist-freshness-wiring.test.tsx
+30_Development/History/2026-09-22_시험방어력_실측감사_유일방어목록_Gemini.md || tests/developer-studio.test.ts
+30_Development/History/2026-09-22_시험방어력_실측감사_유일방어목록_Gemini.md || tests/monaco-workspace-editor-wiring.test.tsx
+30_Development/History/2026-09-22_시험방어력_실측감사_유일방어목록_Gemini.md || tests/response-freshness-wiring.test.tsx
+30_Development/History/2026-09-22_시험방어력_실측감사_유일방어목록_Gemini.md || tests/truth-time-and-freshness-axis.test.tsx
+30_Development/History/2026-09-22_에디터저장_백엔드실배선_및_터미널모의고지_Gemini.md || tests/editor-session.test.ts
+30_Development/History/2026-09-22_조용한강등_미지값을기본값으로_훑기_Claude.md || services/eval_execution.py
+30_Development/History/2026-09-22_조용한강등_미지값을기본값으로_훑기_Claude.md || services/evaluation.py
+30_Development/History/2026-09-22_진실시각_실배선_및_조회시각_분리_Gemini.md || tests/dashboard-runlist-freshness-wiring.test.tsx
+30_Development/History/2026-09-22_진실시각_실배선_및_조회시각_분리_Gemini.md || tests/freshness-and-staleness-wiring.test.tsx
+30_Development/History/2026-09-22_허위미구현소거_및_산출물다운로드_실배선_Gemini.md || tests/dashboard-runlist-freshness-wiring.test.tsx
+30_Development/History/2026-09-22_허위미구현소거_및_산출물다운로드_실배선_Gemini.md || tests/defect-recovery-admin-recovery-editor.test.tsx
+30_Development/History/2026-09-22_허위미구현소거_및_산출물다운로드_실배선_Gemini.md || tests/monaco-workspace-editor-wiring.test.tsx
+30_Development/History/2026-09-23_02-06-00_KST_S05_5노드_lane_실행계획_Codex.md || tools/run_s05_five_node_benchmark.py
+30_Development/History/2026-09-23_02-06-00_KST_S05_5노드_lane_실행계획_Codex.md || tools/run_s06_five_node_journey.py
+30_Development/History/2026-09-23_04-45-00_KST_Codex카드19_legacy큐깊이_4143f375_독립검토_Claude.md || src/inv
+30_Development/PR14 업무 연결과 실행 커널 통합 선행 검토.md || services/handoff.py
+30_Development/PR14 업무 연결과 실행 커널 통합 선행 검토.md || src/saintvision/api/v1/execution.py
+30_Development/S05 log_lock_waits opt-in 재실행 설계.md || .github/workflows/s05-lock-wait-diagnostic.yml
+30_Development/VF-CL-04 replica 복구와 PITR 운영 runbook.md || services/replica_repair.fleet_replica_summary(tenant, desired)
+30_Development/단계별 개발 계획.md || contracts/workload.schema.json
+40_Governance/Claude 구현 인계 - Codex 검토 요청.md || services/context.py
+40_Governance/Claude 구현 인계 - Codex 검토 요청.md || services/pilot.py
+40_Governance/Errors/SEC-PUBLIC-EXPOSURE-CLAUDE-ANGLE-001.md || deploy/certs
+40_Governance/Errors/SEC-PUBLIC-EXPOSURE-CLAUDE-ANGLE-001.md || deploy/certs/saintvision.key
+40_Governance/설계 미결 3건 구현 영향 분석.md || services/nodes.py
+40_Governance/설계 미결 3건 구현 영향 분석.md || services/pilot.py
+40_Operations/서비스-시작-재시작-복구-절차.md || services/verification.py

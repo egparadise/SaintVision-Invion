@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.33"
+version: "1.2.37"
 status: "review"
 author: "Claude"
 updated: "2026-09-28T17:30:00+09:00"
@@ -76,6 +76,10 @@ VF-CL 트랙 독립 검토 대장 카드 ad (Claude, 2026-09-28, base `1e8baf04`
 
 - [[S10-BE Evidence 대응표]]: adapter 9·MLflow 1·승인 배포 5·commitment/lineage 3 항목 대응, 공백 G1a MLflow 내부 구현/설계 공백(+G1b 구현 뒤 외부 실측)·G2 /v1/adapters HTTP 시험·G3 conformance API·G4 business route(#158 lane)·G5 CLI 4종 CI provision(NOT_OBSERVED)·E1 실 계정/CX-02만 외부, 구현 0. 상세: [[2026-09-28_11-05-27_KST_S10-BE_Evidence_대응표_Claude]]
 - 같은 날: #163 승인(병합 목록), #164 S02-BE/ST 대응표(Codex 검토 대기).
+### 2026-09-28 카드 bf · 문서 경로 인용 실재 검사 (branch agent/claude/docs-path-citation-check, base 1e8baf04, worktree 재사용)
+
+- `tools/check_doc_path_citations.py`(--ratchet/--report/--write-baseline) + baseline 227 + docs.yml step 1줄 + 시험 12. 되살림 확인. 상세: Codex 검토 반영(v1.1): `--base-ref` floor 검사(baseline은 base의 부분집합이어야)·repo containment(`..`·symlink·root 밖 fail-closed)·들여쓴 fence 인식. r2(v1.2): push는 `github.event.before` base·zero SHA fail-closed·dispatch는 HEAD 일관성만, 2커밋 push 우회 부정 시험. [[2026-09-28_11-51-09_KST_문서_경로인용_실재검사_Claude_구현]]
+- 같은 날: #168 MLflow 설계 v1.3(Codex 재검토 중), #166 대응표 v1.2.1(재검토 중).
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
