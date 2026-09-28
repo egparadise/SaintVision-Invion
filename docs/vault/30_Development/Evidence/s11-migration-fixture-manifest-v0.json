@@ -22,6 +22,7 @@
     {"revision": "0029_run_outputs", "expected": "PRESERVED"},
     {"revision": "0030_apply_resource_offer", "expected": "PRESERVED"},
     {"revision": "0026_subject_kernel_link", "expected": "PRESERVED"},
-    {"revision": "0031_workspace_input_state", "expected": "PRESERVED"}
+    {"revision": "0031_workspace_input_state", "expected": "PRESERVED"},
+    {"revision": "0047_audit_events_isolation", "expected": "PRESERVED"}
   ]
 }

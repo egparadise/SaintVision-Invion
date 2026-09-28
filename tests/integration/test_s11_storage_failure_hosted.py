@@ -11,9 +11,11 @@ import pytest
 from tools import run_s11_storage_failure_hosted as runner
 
 
-pytestmark = pytest.mark.postgres
-
 _OPT_IN_REASON = "run only through S11 Storage Failure Hosted Reference opt-in lane"
+pytestmark = [
+    pytest.mark.postgres,
+    pytest.mark.skipif("INV_S11_STORAGE_REPORT" not in os.environ, reason=_OPT_IN_REASON),
+]
 
 
 def test_hosted_storage_failure_reference_matrix(env):
@@ -33,6 +35,16 @@ def test_hosted_storage_failure_reference_matrix(env):
     assert not runner.git_value("status", "--porcelain"), "hosted evidence checkout is dirty"
     with psycopg.connect(env.owner) as connection:
         postgres_version = connection.execute("SHOW server_version").fetchone()[0]
+        # Exercise the real composite-key upsert twice.  A SQL-text-only test
+        # does not prove that the hosted migrated schema accepts the statement.
+        runner._set_budget(connection, env.tenant, env.project, 4096)
+        runner._set_budget(connection, env.tenant, env.project, 8192)
+        budget = connection.execute(
+            "SELECT quota_bytes FROM inv.storage_budgets "
+            "WHERE tenant_id=%s AND project_id=%s",
+            (env.tenant, env.project),
+        ).fetchall()
+        assert budget == [(8192,)]
 
     started = runner.utc_now()
     report = runner.build_report(
@@ -50,7 +62,6 @@ def test_hosted_storage_failure_reference_matrix(env):
         recovery_probe_blob=runner.git_value("rev-parse", f"HEAD:{runner.RECOVERY_PROBE_PATH}"),
         harness_blob=runner.git_value("rev-parse", f"HEAD:{runner.HARNESS_PATH}"),
         started_at=started,
-        finished_at=runner.utc_now(),
         environment=runner.hosted_environment(
             postgres_version=postgres_version,
             minio_digest=minio_digest,

@@ -145,7 +145,7 @@ jobs:
           assert raw['caseCount'] == 10 and raw['cleanup'] == {'performed': True, 'residueCount': 0}
           assert evidence['referenceOnly'] is True
           assert evidence['axis'] is None and evidence['targetRef'] is None
-          assert evidence['verdict'] in {'MEASURED_PASS', 'MEASURED_FAIL'}
+          assert evidence['verdict'] in {'MEASURED_PASS', 'MEASURED_FAIL', 'NOT_OBSERVED'}
           assert junit.attrib['tests'] == '10'
           assert junit.attrib['errors'] == '0' and junit.attrib['skipped'] == '0'
           assert int(junit.attrib['failures']) == raw['findingCount']

@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import copy
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
 
 import pytest
 
@@ -101,7 +104,6 @@ def report(executor=matching_case) -> dict:
         recovery_probe_blob=BLOBS[producer.RECOVERY_PROBE_PATH],
         harness_blob=BLOBS[producer.HARNESS_PATH],
         started_at="2026-09-28T08:00:00Z",
-        finished_at="2026-09-28T08:01:00Z",
         environment=environment(),
     )
 
@@ -130,14 +132,23 @@ def test_positive_report_imports_as_reference_only_pass():
         "committedObjectLossCount": 0,
         "partialResidueCount": 0,
         "tempResidueCount": 0,
-        "cleanupResidueCount": 0,
-        "observedCaseCountByMetric": {
+            "cleanupResidueCount": 0,
+            "providerPutCount": 1,
+            "concurrencyBarrierCount": 9,
+            "archivedCountDelta": None,
+            "failedCountDelta": None,
+            "unobservedInvariantCount": 0,
+            "observedCaseCountByMetric": {
             "quotaOvershootBytes": 3,
             "committedObjectLossCount": 8,
             "partialResidueCount": 8,
             "tempResidueCount": 8,
-            "cleanupResidueCount": 10,
-        },
+                "cleanupResidueCount": 10,
+                "providerPutCount": 3,
+                "concurrencyBarrierCount": 2,
+                "archivedCountDelta": 0,
+                "failedCountDelta": 0,
+            },
     }
 
 
@@ -155,6 +166,33 @@ def test_product_finding_is_preserved_as_measured_fail_without_invalidating_run(
     assert raw["findingCount"] == 1
     assert evidence["verdict"] == "MEASURED_FAIL"
     assert evidence["metrics"]["falseSuccessCount"] == 1
+
+
+def test_case_exception_is_preserved_and_later_cases_still_execute():
+    visited = []
+
+    def executor(identity: str) -> dict:
+        visited.append(identity)
+        if identity == producer.HOSTED_CASES[1]:
+            raise RuntimeError("private diagnostic must not escape")
+        return matching_case(identity)
+
+    raw = report(executor)
+    assert tuple(visited) == producer.HOSTED_CASES
+    failed = raw["cases"][1]
+    assert failed["actualSurface"] == {"kind": "unexpected", "class": "RuntimeError"}
+    assert failed["injectionObserved"] is False
+    assert raw["findingCount"] == 1
+    assert "private diagnostic" not in json.dumps(raw)
+    evidence = importer.import_evidence(raw, producer.junit_xml(raw), FakeGit())
+    assert evidence["verdict"] == "MEASURED_FAIL"
+
+
+def test_finished_at_is_sampled_after_all_cases(monkeypatch):
+    values = iter(["2026-09-28T08:02:00Z"])
+    monkeypatch.setattr(producer, "utc_now", lambda: next(values))
+    raw = report()
+    assert raw["finishedAt"] == "2026-09-28T08:02:00Z"
 
 
 def test_importer_cli_returns_zero_for_valid_measured_fail(tmp_path, monkeypatch):
@@ -245,6 +283,7 @@ def test_workflow_is_opt_in_exact_head_reference_only_and_non_cancelling():
     assert "secrets." not in workflow
     assert "referenceOnly" in workflow
     assert "axis'] is None" in workflow and "targetRef'] is None" in workflow
+    assert "'NOT_OBSERVED'" in workflow
 
 
 def test_fault_transport_preserves_real_reads_and_injects_only_one_put(monkeypatch):
@@ -281,3 +320,82 @@ def test_budget_upsert_uses_the_actual_composite_primary_key():
     statement, params = connection.call
     assert "ON CONFLICT(tenant_id,project_id)" in statement
     assert params == ("tenant", "project", 63)
+
+
+def artifact_bundle(raw: dict) -> tuple[bytes, dict, dict]:
+    junit = producer.junit_xml(raw)
+    reference = importer.import_evidence(raw, junit, FakeGit())
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("evidence/" + importer.RAW_REPORT_NAME, json.dumps(raw))
+        archive.writestr("evidence/" + importer.RAW_JUNIT_NAME, junit)
+        archive.writestr("evidence/" + importer.REFERENCE_NAME, json.dumps(reference))
+    payload = stream.getvalue()
+    run = {
+        "id": 36399999999,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": SOURCE,
+    }
+    artifact = {
+        "id": 10999999999,
+        "name": f"s11-storage-hosted-{SOURCE}",
+        "expired": False,
+        "expires_at": "2026-10-28T08:00:00Z",
+        "digest": "sha256:" + hashlib.sha256(payload).hexdigest(),
+        "workflow_run": {"id": 36399999999, "head_sha": SOURCE},
+    }
+    return payload, run, artifact
+
+
+def test_offline_artifact_binds_zip_run_artifact_and_recomputed_reference():
+    payload, run, artifact = artifact_bundle(report())
+    value = importer.import_artifact(
+        payload,
+        run_metadata=run,
+        artifact_metadata=artifact,
+        git=FakeGit(),
+        now=datetime(2026, 9, 28, 9, tzinfo=timezone.utc),
+    )
+    assert value["artifactId"] == "10999999999"
+    assert value["artifactSha256"] == hashlib.sha256(payload).hexdigest()
+    assert value["runConclusion"] == "success"
+
+
+@pytest.mark.parametrize(
+    "mutation,message",
+    [
+        (lambda _run, artifact: artifact.update(digest="sha256:" + "0" * 64), "digest"),
+        (lambda run, _artifact: run.update(conclusion="failure"), "did not complete"),
+        (lambda run, _artifact: run.update(head_sha="f" * 40), "head differs"),
+        (lambda run, _artifact: run.update(run_attempt=2), "sourceRunId"),
+        (lambda _run, artifact: artifact.update(expired=True), "expired"),
+    ],
+)
+def test_offline_artifact_metadata_mutations_fail_closed(mutation, message):
+    payload, run, artifact = artifact_bundle(report())
+    mutation(run, artifact)
+    with pytest.raises(importer.HostedEvidenceImportError, match=message):
+        importer.import_artifact(
+            payload,
+            run_metadata=run,
+            artifact_metadata=artifact,
+            git=FakeGit(),
+            now=datetime(2026, 9, 28, 9, tzinfo=timezone.utc),
+        )
+
+
+def test_cleanup_inventory_and_migration_fixture_cover_merged_inputs():
+    cleanup = (ROOT / "tools" / "cleanup_owned_docker.py").read_text(encoding="utf-8")
+    for label in (
+        "ai.saintvision.s11-storage",
+        "ai.saintvision.s11-storage-minio",
+        "ai.saintvision.s11-storage-network",
+    ):
+        assert label in cleanup
+    manifest = json.loads(
+        (ROOT / "docs/vault/30_Development/Evidence/s11-migration-fixture-manifest-v0.json")
+        .read_text(encoding="utf-8")
+    )
+    assert {row["revision"] for row in manifest["revisions"]} >= {"0047_audit_events_isolation"}

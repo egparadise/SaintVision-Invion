@@ -18,6 +18,7 @@ import platform
 import re
 import subprocess
 import sys
+import threading
 import time
 from typing import Any, Callable
 from uuid import uuid4
@@ -34,11 +35,12 @@ sys.path.insert(0, str(ROOT / "tools"))
 from inv.errors import DomainError  # noqa: E402
 from inv.s3_client import HttpResponse, S3Client, S3Config, UrlLibTransport  # noqa: E402
 from inv.s3_object_store import S3Objects  # noqa: E402
+import pitr_readiness  # noqa: E402
 import recovery_drill  # noqa: E402
 from run_s11_storage_failure_pg_free import UNIVERSE_CASES, UNIVERSE_SHA256  # noqa: E402
 
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 RUN_PURPOSE = "s11-storage-failure-hosted-reference"
 EXECUTION_LAYER = "hosted-minio-postgresql"
 PRODUCER_PATH = "tools/run_s11_storage_failure_hosted.py"
@@ -129,6 +131,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
             "partialResidueCount": 0,
             "tempResidueCount": 0,
             "cleanupResidueCount": 0,
+            "providerPutCount": None,
+            "concurrencyBarrierCount": None,
+            "archivedCountDelta": None,
+            "failedCountDelta": None,
+            "archiveNetworkInternal": None,
             "sourceExitClass": None,
             "verifierExitClass": None,
             "archiveByteCount": None,
@@ -144,6 +151,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "partialResidueCount": 0,
         "tempResidueCount": 0,
         "cleanupResidueCount": 0,
+        "providerPutCount": 0,
+        "concurrencyBarrierCount": 8,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": None,
         "sourceExitClass": None,
         "verifierExitClass": None,
         "archiveByteCount": None,
@@ -157,6 +169,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "partialResidueCount": 0,
         "tempResidueCount": 0,
         "cleanupResidueCount": 0,
+        "providerPutCount": 0,
+        "concurrencyBarrierCount": 1,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": None,
         "sourceExitClass": None,
         "verifierExitClass": None,
         "archiveByteCount": None,
@@ -170,6 +187,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "partialResidueCount": 0,
         "tempResidueCount": 0,
         "cleanupResidueCount": 0,
+        "providerPutCount": 1,
+        "concurrencyBarrierCount": None,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": None,
         "sourceExitClass": None,
         "verifierExitClass": None,
         "archiveByteCount": None,
@@ -183,6 +205,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "partialResidueCount": None,
         "tempResidueCount": None,
         "cleanupResidueCount": 0,
+        "providerPutCount": None,
+        "concurrencyBarrierCount": None,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": True,
         "sourceExitClass": "nonzero-observed",
         "verifierExitClass": "nonzero-observed",
         "archiveByteCount": 0,
@@ -196,6 +223,11 @@ EXPECTED_INVARIANTS: dict[str, dict[str, Any]] = {
         "partialResidueCount": None,
         "tempResidueCount": None,
         "cleanupResidueCount": 0,
+        "providerPutCount": None,
+        "concurrencyBarrierCount": None,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": True,
         "sourceExitClass": "zero-observed",
         "verifierExitClass": "nonzero-observed",
         "archiveByteCount": 0,
@@ -244,6 +276,11 @@ def _receipt(identity: str, actual: dict[str, Any], *, attempted_count: int = 1,
         "partialResidueCount": None,
         "tempResidueCount": None,
         "cleanupResidueCount": None,
+        "providerPutCount": None,
+        "concurrencyBarrierCount": None,
+        "archivedCountDelta": None,
+        "failedCountDelta": None,
+        "archiveNetworkInternal": None,
         "sourceExitClass": None,
         "verifierExitClass": None,
         "archiveByteCount": None,
@@ -253,8 +290,16 @@ def _receipt(identity: str, actual: dict[str, Any], *, attempted_count: int = 1,
     }
     receipt.update(values)
     invariants = EXPECTED_INVARIANTS[identity]
-    invariant_match = all(receipt[name] == expected for name, expected in invariants.items())
-    receipt["matched"] = actual == EXPECTED[identity] and invariant_match
+    invariant_match = all(
+        receipt[name] == expected
+        for name, expected in invariants.items()
+        if expected is not None and receipt[name] is not None
+    )
+    receipt["matched"] = (
+        actual == EXPECTED[identity]
+        and invariant_match
+        and receipt["injectionObserved"] is True
+    )
     receipt["observedFindingCount"] = 0 if receipt["matched"] else 1
     return receipt
 
@@ -298,6 +343,19 @@ class _FaultTransport:
         return HttpResponse(200, {}, b"")
 
 
+class _CountingTransport:
+    """Count provider PUT attempts while delegating the real S3 exchange."""
+
+    def __init__(self):
+        self.delegate = UrlLibTransport()
+        self.put_count = 0
+
+    def request(self, method, url, headers, body):
+        if method == "PUT":
+            self.put_count += 1
+        return self.delegate.request(method, url, headers, body)
+
+
 def _delete_control(client: S3Client, key: str) -> int:
     response = client.delete(key)
     if response.status not in {200, 202, 204, 404}:
@@ -305,45 +363,65 @@ def _delete_control(client: S3Client, key: str) -> int:
     return 0 if client.head(key).status == 404 else 1
 
 
-def _s3_corruption_case(identity: str) -> dict[str, Any]:
+def _s3_corruption_case(identity: str, env) -> dict[str, Any]:
+    from inv.snapshots import SnapshotStore
+
     config = _s3_config()
     control = S3Client(config)
     prefix = "s11-hosted/" + uuid4().hex
-    provider = S3Objects("s3-compatible-v1", prefix, S3Client(config))
-    locator = provider.locator(
-        "11111111-1111-4111-8111-111111111111",
-        "project_s11_hosted",
-        "objects",
-        str(uuid4()),
-    )
+    counting = _CountingTransport()
+    provider = S3Objects("s3-compatible-v1", prefix, S3Client(config, transport=counting))
+    store = SnapshotStore(env.db, provider)
+    object_id = str(uuid4())
+    locator = provider.locator(env.tenant, env.project, "objects", object_id)
+    part_locator = store._part_locator(env.tenant, env.project, object_id, 0)
     body = b"saintvision-s11-hosted-object"
     digest = hashlib.sha256(body).hexdigest()
     actual: dict[str, Any]
     injected = False
+    ready_before = 0
+    ready_after = 0
+    partial_residue: int | None = None
+    with psycopg.connect(env.owner) as owner:
+        _set_budget(owner, env.tenant, env.project, 1024 * 1024)
+    before = _count_storage_rows(env)
     try:
+        store.begin(env.tenant, env.project, object_id, digest, len(body))
+        if identity.endswith(("body-byte", "size-metadata", "metadata-digest")):
+            store.put_part(env.tenant, env.project, object_id, 0, body)
+            store.finalize(env.tenant, env.project, object_id)
+            ready_before = 1
         if identity.endswith("body-byte"):
             changed = bytes([body[0] ^ 1]) + body[1:]
+            control.delete(locator)
             response = control.put(locator, changed, digest)
             injected = response.status in {200, 201, 204}
-            call = lambda: provider.get(locator, digest, len(body))
+            call = lambda: store.finalize(env.tenant, env.project, object_id)
         elif identity.endswith("size-metadata"):
-            response = control.put(locator, body, digest)
-            injected = response.status in {200, 201, 204}
-            call = lambda: provider.get(locator, digest, len(body) + 1)
+            with psycopg.connect(env.owner) as owner:
+                changed = owner.execute(
+                    "UPDATE inv.storage_objects SET size_bytes=size_bytes+1 "
+                    "WHERE project_id=%s AND object_id=%s",
+                    (env.project, object_id),
+                ).rowcount
+            injected = changed == 1
+            call = lambda: store.finalize(env.tenant, env.project, object_id)
         elif identity.endswith("metadata-digest"):
+            control.delete(locator)
             response = control.put(locator, body, "f" * 64)
             injected = response.status in {200, 201, 204}
-            call = lambda: provider.get(locator, digest, len(body))
+            call = lambda: store.finalize(env.tenant, env.project, object_id)
         else:
             alternate = b"different-immutable-byte" if "ambiguous" in identity else body[:7]
             mode = "timeout-after-different-byte" if "ambiguous" in identity else "success-partial"
-            transport = _FaultTransport(control, locator, mode, alternate)
+            transport = _FaultTransport(control, part_locator, mode, alternate)
             faulted = S3Objects(
                 "s3-compatible-v1",
                 prefix,
                 S3Client(config, transport=transport),
             )
-            call = lambda: faulted.put(locator, body, digest)
+            fault_store = SnapshotStore(env.db, faulted)
+            call = lambda: fault_store.put_part(env.tenant, env.project, object_id, 0, body)
         try:
             call()
         except BaseException as exc:  # closed evidence surface
@@ -352,16 +430,33 @@ def _s3_corruption_case(identity: str) -> dict[str, Any]:
             actual = _surface(None)
         if "transport" in locals():
             injected = transport.observed
+        with env.db.transaction(env.tenant) as conn:
+            row = conn.execute(
+                "SELECT state FROM inv.storage_objects WHERE project_id=%s AND object_id=%s",
+                (env.project, object_id),
+            ).fetchone()
+            ready_after = int(bool(row) and row["state"] == "ready")
+        # A finalized object's retained part is an intentional reconciliation
+        # source (snapshots.py), not a failed-upload residue.  Only uploading
+        # rows classify a surviving part as partial residue here.
+        partial_residue = (
+            0 if ready_after else int(control.head(part_locator).status == 200)
+        )
     finally:
-        residue = _delete_control(control, locator)
+        residue = _delete_control(control, locator) + _delete_control(control, part_locator)
+    after = _count_storage_rows(env)
     return _receipt(
         identity,
         actual,
         injectionObserved=injected,
+        dbRowDelta=after - before,
+        readyTransitionCount=max(0, ready_after - ready_before),
+        quotaOvershootBytes=0,
         committedObjectLossCount=0,
-        partialResidueCount=0,
-        tempResidueCount=0,
+        partialResidueCount=partial_residue,
+        tempResidueCount=None,
         cleanupResidueCount=residue,
+        providerPutCount=counting.put_count + int("transport" in locals()),
     )
 
 
@@ -389,11 +484,23 @@ def _quota_case(identity: str, env) -> dict[str, Any]:
     attempts = 8 if identity.endswith("concurrent-8") else 1
     with psycopg.connect(env.owner) as owner:
         _set_budget(owner, env.tenant, env.project, len(body) - 1)
-    provider = S3Objects("s3-compatible-v1", "s11-quota/" + uuid4().hex, S3Client(_s3_config()))
+    counting = _CountingTransport()
+    provider = S3Objects(
+        "s3-compatible-v1", "s11-quota/" + uuid4().hex,
+        S3Client(_s3_config(), transport=counting),
+    )
     store = SnapshotStore(env.db, provider)
     before = _count_storage_rows(env)
+    barrier = threading.Barrier(attempts) if attempts > 1 else None
+    barrier_count = 0
+    barrier_lock = threading.Lock()
 
     def one(_index: int) -> dict[str, Any]:
+        nonlocal barrier_count
+        if barrier is not None:
+            barrier.wait(timeout=5)
+        with barrier_lock:
+            barrier_count += 1
         try:
             store.begin(env.tenant, env.project, str(uuid4()), digest, len(body))
         except BaseException as exc:
@@ -408,18 +515,31 @@ def _quota_case(identity: str, env) -> dict[str, Any]:
         "class": "QuotaSurfaceMismatch",
     }
     after = _count_storage_rows(env)
+    with env.db.transaction(env.tenant) as conn:
+        state = conn.execute(
+            "SELECT count(*) FILTER (WHERE state='ready') AS ready, "
+            "coalesce(sum(size_bytes) FILTER (WHERE state<>'deleted'),0) AS used "
+            "FROM inv.storage_objects WHERE project_id=%s",
+            (env.project,),
+        ).fetchone()
+        quota = conn.execute(
+            "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s",
+            (env.project,),
+        ).fetchone()["quota_bytes"]
     return _receipt(
         identity,
         actual,
         attempted_count=attempts,
         injectionObserved=True,
         dbRowDelta=after - before,
-        readyTransitionCount=0,
-        quotaOvershootBytes=0,
-        committedObjectLossCount=0,
-        partialResidueCount=0,
-        tempResidueCount=0,
+        readyTransitionCount=int(state["ready"]),
+        quotaOvershootBytes=max(0, int(state["used"]) - int(quota)),
+        committedObjectLossCount=int(state["ready"]),
+        partialResidueCount=0 if counting.put_count == 0 else None,
+        tempResidueCount=0 if counting.put_count == 0 else None,
         cleanupResidueCount=0,
+        providerPutCount=counting.put_count,
+        concurrencyBarrierCount=barrier_count,
     )
 
 
@@ -462,6 +582,16 @@ def _provider_507_case(identity: str, env) -> dict[str, Any]:
             "SELECT count(*) AS n FROM inv.storage_parts WHERE project_id=%s AND object_id=%s",
             (env.project, object_id),
         ).fetchone()["n"]
+        budget = conn.execute(
+            "SELECT quota_bytes FROM inv.storage_budgets WHERE project_id=%s",
+            (env.project,),
+        ).fetchone()["quota_bytes"]
+        used = conn.execute(
+            "SELECT coalesce(sum(size_bytes),0) AS used FROM inv.storage_objects "
+            "WHERE project_id=%s AND state<>'deleted'",
+            (env.project,),
+        ).fetchone()["used"]
+    partial = int(control.head(key).status == 200)
     residue = _delete_control(control, key)
     return _receipt(
         identity,
@@ -469,11 +599,12 @@ def _provider_507_case(identity: str, env) -> dict[str, Any]:
         injectionObserved=transport.observed,
         dbRowDelta=after_parts - before_parts,
         readyTransitionCount=int(row["state"] == "ready"),
-        quotaOvershootBytes=max(0, int(row["size_bytes"]) - len(body)),
+        quotaOvershootBytes=max(0, int(used) - int(budget)),
         committedObjectLossCount=0,
-        partialResidueCount=0,
+        partialResidueCount=partial,
         tempResidueCount=0,
         cleanupResidueCount=residue,
+        providerPutCount=int(transport.observed),
     )
 
 
@@ -516,6 +647,13 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
     created_container = False
     residue = 0
     settings_sha = None
+    actual = {"kind": "unexpected", "class": "ArchiveObservationMissing"}
+    source_exit = None
+    verifier_exit = None
+    archive_bytes = None
+    archived_delta = None
+    failed_delta = None
+    network_internal = None
     try:
         result = _docker(
             "network", "create", "--internal", "--label", f"{network_label}={owner}", network,
@@ -529,6 +667,7 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
             "--label", f"{container_label}={owner}",
             "--network", network,
             "--tmpfs", "/var/lib/postgresql/data:rw,noexec,nosuid,size=256m",
+            "--tmpfs", "/archive:rw,noexec,nosuid,size=32m",
             "-e", "POSTGRES_HOST_AUTH_METHOD=trust",
             image,
             "-c", "archive_mode=on",
@@ -542,6 +681,8 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
         inspected = json.loads(_docker("inspect", container, timeout=10).stdout)[0]
         if any((inspected.get("HostConfig", {}).get("PortBindings") or {}).values()):
             raise RuntimeError("owned archive PostgreSQL published a host port")
+        network_doc = json.loads(_docker("network", "inspect", network, timeout=10).stdout)[0]
+        network_internal = network_doc.get("Internal") is True
         deadline = time.monotonic() + 60
         while True:
             logs = _docker("logs", "--tail", "200", container, timeout=10)
@@ -560,27 +701,58 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
         safe_settings = capability["settings"]
         if safe_settings.get("archive_command") != "configured":
             raise RuntimeError("archive command was not observed as configured")
-        settings_sha = hashlib.sha256(
-            json.dumps(safe_settings, sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()
+        readiness = pitr_readiness.assess({
+            "archive_mode": safe_settings.get("archive_mode"),
+            "archive_command": command,
+            "archive_library": "",
+            "wal_level": safe_settings.get("wal_level"),
+        })
+        verifier_code = pitr_readiness.verifier_exit(readiness, require_pitr=True)
+        verifier_exit = "zero-observed" if verifier_code == 0 else "nonzero-observed"
+        before_archived, before_failed = (
+            int(value) for value in _docker_sql(
+                container, "SELECT archived_count,failed_count FROM pg_stat_archiver"
+            )[0].split("\t")
+        )
         _docker_sql(container, "CREATE TABLE archive_probe(value text)")
         _docker_sql(container, "INSERT INTO archive_probe VALUES('synthetic-marker')")
         _docker_sql(container, "SELECT pg_switch_wal()")
         deadline = time.monotonic() + 20
-        archived = failed = 0
+        archived = before_archived
+        failed = before_failed
         while True:
             row = _docker_sql(container, "SELECT archived_count,failed_count FROM pg_stat_archiver")[0]
             archived, failed = (int(value) for value in row.split("\t"))
-            if (failed if command == "/bin/false" else archived) > 0:
+            if (
+                failed > before_failed if command == "/bin/false"
+                else archived > before_archived
+            ):
                 break
             if time.monotonic() >= deadline:
                 raise RuntimeError("archive outcome was not observed")
             time.sleep(0.1)
+        archived_delta = archived - before_archived
+        failed_delta = failed - before_failed
+        size_result = _docker(
+            "exec", container, "sh", "-c",
+            "find /archive -type f -exec wc -c {} + 2>/dev/null | awk 'END {print $1+0}'",
+            timeout=10,
+        )
+        if size_result.returncode:
+            raise RuntimeError("archive byte count was not observed")
+        archive_bytes = int(size_result.stdout.decode("utf-8", errors="replace").strip() or "0")
+        settings_sha = hashlib.sha256(json.dumps({
+            "settings": safe_settings,
+            "probeClass": "failure" if command == "/bin/false" else "success-empty",
+            "archivedCountDelta": archived_delta,
+            "failedCountDelta": failed_delta,
+            "archiveByteCount": archive_bytes,
+        }, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         if command == "/bin/false":
-            actual = EXPECTED[identity] if failed > 0 else {"kind": "unexpected", "class": "ArchiveFailureNotObserved"}
+            actual = EXPECTED[identity] if failed_delta > 0 else {"kind": "unexpected", "class": "ArchiveFailureNotObserved"}
             source_exit = "nonzero-observed"
         else:
-            actual = EXPECTED[identity] if archived > 0 else {"kind": "unexpected", "class": "ArchiveSuccessNotObserved"}
+            actual = EXPECTED[identity] if archived_delta > 0 and archive_bytes == 0 else {"kind": "unexpected", "class": "ArchiveSuccessNotObserved"}
             source_exit = "zero-observed"
     finally:
         if created_container:
@@ -593,16 +765,19 @@ def _archive_case(identity: str, *, image: str, owner: str) -> dict[str, Any]:
         injectionObserved=True,
         cleanupResidueCount=residue,
         sourceExitClass=source_exit,
-        verifierExitClass="nonzero-observed",
-        archiveByteCount=0,
-        pitrVerified=False,
+        verifierExitClass=verifier_exit,
+        archiveByteCount=archive_bytes,
+        pitrVerified=readiness["pitrVerified"] if "readiness" in locals() else None,
+        archivedCountDelta=archived_delta,
+        failedCountDelta=failed_delta,
+        archiveNetworkInternal=network_internal,
         settingsSha256=settings_sha,
     )
 
 
 def execute_case(identity: str, env, *, archive_image: str, owner: str) -> dict[str, Any]:
     if identity.startswith(("OBJ-",)):
-        return _s3_corruption_case(identity)
+        return _s3_corruption_case(identity, env)
     if identity.startswith("CAP-01/"):
         return _quota_case(identity, env)
     if identity.startswith("CAP-02/"):
@@ -623,11 +798,36 @@ def build_report(
     recovery_probe_blob: str,
     harness_blob: str,
     started_at: str,
-    finished_at: str,
     environment: dict[str, Any],
 ) -> dict[str, Any]:
-    cases = [executor(identity) for identity in HOSTED_CASES]
+    cases = []
+    for identity in HOSTED_CASES:
+        try:
+            cases.append(executor(identity))
+        except BaseException as exc:  # preserve all remaining cases after one harness/product error
+            cases.append(_receipt(
+                identity,
+                {"kind": "unexpected", "class": type(exc).__name__},
+                attempted_count=8 if identity.endswith("concurrent-8") else 1,
+                injectionObserved=False,
+            ))
     findings = sum(case["observedFindingCount"] for case in cases)
+    unobserved = sum(
+        1
+        for case in cases
+        for name, expected in EXPECTED_INVARIANTS[case["caseIdentity"]].items()
+        if expected is not None and case[name] is None
+    )
+    archive_network_values = [
+        case["archiveNetworkInternal"] for case in cases
+        if case["caseIdentity"].startswith("BAK-")
+    ]
+    environment = dict(environment)
+    environment["archiveNetworkInternal"] = (
+        all(value is True for value in archive_network_values)
+        if all(value is not None for value in archive_network_values)
+        else None
+    )
     return {
         "schemaVersion": SCHEMA_VERSION,
         "runPurpose": RUN_PURPOSE,
@@ -644,11 +844,12 @@ def build_report(
         "recoveryProbeFile": {"path": RECOVERY_PROBE_PATH, "blob": recovery_probe_blob},
         "harnessFile": {"path": HARNESS_PATH, "blob": harness_blob},
         "startedAt": started_at,
-        "finishedAt": finished_at,
+        "finishedAt": utc_now(),
         "universeCaseIdentitiesSha256": UNIVERSE_SHA256,
         "tierCaseIdentitiesSha256": HOSTED_SHA256,
         "caseCount": len(cases),
         "findingCount": findings,
+        "unobservedInvariantCount": unobserved,
         "cases": cases,
         "environment": environment,
         "cleanup": {
