@@ -48,18 +48,22 @@ def _verified_artifact(session, *, tenant_id, run_id, name, checksum):
     return artifact_id
 
 
-def _client(app_engine, *, tenant_id, user_id, authenticate=True, lock_timeout_ms=5_000):
+TOKEN = "seal-real-token"
+
+
+def _client(app_engine, *, tenant_id, user_id, authenticate=True, lock_timeout_ms=5_000, verified=False):
+    """``verified=True`` uses the real verifier and the real ``get_principal`` (the
+    request carries ``Authorization: Bearer``), so a denial row names the actor."""
+    principal = Principal(user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-seal")
     app = create_app(
         engine=app_engine,
         settings=Settings(database_url="test-only", idempotency_ttl_seconds=600, business_lock_timeout_ms=lock_timeout_ms),
-        verifier=StaticPrincipalVerifier({}, allow_outside_dev=True),
+        verifier=StaticPrincipalVerifier({TOKEN: principal} if verified else {}, allow_outside_dev=True),
         clock=lambda: NOW,
         check_partitions_on_startup=False,
     )
-    if authenticate:
-        app.dependency_overrides[get_principal] = lambda: Principal(
-            user_id=user_id, tenant_id=tenant_id, external_subject="synthetic-seal"
-        )
+    if authenticate and not verified:
+        app.dependency_overrides[get_principal] = lambda: principal
     return TestClient(app, raise_server_exceptions=False)
 
 
@@ -291,9 +295,11 @@ def test_c_a_terminal_transition_racing_the_seal_is_waited_for_and_the_final_sta
         with ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(send)
             _wait_until_blocked(owner_engine)
-            # the transition commits under the lock the seal is waiting for
+            # the transition commits under the lock the seal is waiting for. A
+            # failure, because success requires evidence (success_requires_evidence)
+            # that only complete_run writes; the seal must follow whatever ended it.
             holder.execute(
-                text("UPDATE runs SET state = 'succeeded', termination_reason = 'completed', ended_at = now() WHERE run_id = :r"),
+                text("UPDATE runs SET state = 'failed', termination_reason = 'timeout', ended_at = now() WHERE run_id = :r"),
                 {"r": run_id},
             )
             tx.commit()
@@ -301,9 +307,9 @@ def test_c_a_terminal_transition_racing_the_seal_is_waited_for_and_the_final_sta
     finally:
         holder.close()
     assert response.status_code == 200, response.text
-    assert response.json()["finalState"] == "succeeded" and response.json()["terminationReason"] == "completed"
+    assert response.json()["finalState"] == "failed" and response.json()["terminationReason"] == "timeout"
     records, pins = _records(owner_engine, run_id)
-    assert records[0]["final_state"] == "succeeded" and len(pins) == 2
+    assert records[0]["final_state"] == "failed" and records[0]["termination_reason"] == "timeout" and len(pins) == 2
 
 
 def test_d_a_revocation_during_the_lock_wait_is_403_after_the_lock_with_nothing_written_and_one_denial(owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables):
@@ -315,8 +321,10 @@ def test_d_a_revocation_during_the_lock_wait_is_403_after_the_lock_with_nothing_
     holder, tx = _hold_run(owner_engine, run_id)
     try:
         def send():
-            client = _client(app_engine, tenant_id=tenant, user_id=seed["user_id"], lock_timeout_ms=60_000)
-            return client.post(_path(seed["project_id"], run_id), json={}, headers=_headers("k-d"))
+            client = _client(app_engine, tenant_id=tenant, user_id=seed["user_id"], lock_timeout_ms=60_000, verified=True)
+            return client.post(
+                _path(seed["project_id"], run_id), json={}, headers={**_headers("k-d"), "Authorization": f"Bearer {TOKEN}"}
+            )
 
         with ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(send)
