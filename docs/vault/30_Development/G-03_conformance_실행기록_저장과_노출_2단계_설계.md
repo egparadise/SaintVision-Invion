@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-G03-CONFORMANCE-RECORD-DESIGN-001"
 title: "G-03 2단계 설계 v1.1 — host-global record(Codex 승인)·생산 가능한 값만 계약에 넣기·report 내부 무결성 재계산·host 결속과 결정적 최신 선택·응답 shape 확정 (docs-only)"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T22:24:00+09:00"
+updated: "2026-09-28T22:56:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "a0e807b5"
@@ -33,6 +33,19 @@ Codex 검토에서 **RLS 방향은 승인**됐고 **차단 결함 5건**이 왔�
 | **F5** host 결속 | 없음 | **`host_id`를 row·조회·index에 결속**하고 최신 선택에 tie-breaker를 둔다 |
 
 나머지 v1.0 결정(§2-5 `detail` 제외, 요청이 suite를 돌리지 않음, import를 열지 않음, G-25 유보, migration 번호 미예약, append-only)은 승인됐고 그대로다.
+
+### v1.2 — 재검토에서 온 다섯 가지
+
+v1.1의 방향은 승인됐고, **계약을 다시 갈라 놓은 모순과 강제되지 않은 보안 불변식** 다섯 건이 왔다. 전부 "둘 중 하나를 골라 한 곳에서 말하라"는 성질이다.
+
+| | 지적 | v1.2의 선택 |
+|---|---|---|
+| **R1** | 0-record 호환 설명과 시험이 모순(§4-4가 "값 동일"이라면서 다음 줄에서 `reason`을 바꾼다) | **shape는 유지, `reason` 값은 의도적으로 바뀐다**로 통일. "byte 동일·값 동일·fixture 불변" 주장을 **삭제**하고 T5를 **T5a(schema·키 집합)** / **T5b(새 `reason` 고정값 + FE fixture)** 로 나눴다 |
+| **R2** | aggregate와 item이 둘 다 `recordedAt` | **aggregate RECORDED의 키를 `latestRecordedAt`으로 바꿨다.** item은 `recordedAt`, `NOT_OBSERVED` branch는 1단계 호환을 위해 `recordedAt: null`을 유지한다 |
+| **R3** | §3-4가 `source_ref` 결론을 되돌린다 | 그 문장을 **삭제**했다. 결론은 한 곳뿐 — 이 단계에 column이 **없다** |
+| **R4** | `host_id` 비식별성이 서술뿐 | **강제한다.** column을 `uuid`로, config key를 `INV_CONTROL_PLANE_HOST_ID`로 못 박고 startup에서 strict parse한다. hostname·IP·경로는 **형 자체가 거부**한다(T15 부정 시험) |
+| **R5** | 두 fail-closed 경로의 공개 오류가 "정본 5xx"뿐 | code·status·retryable을 **정확히** 정했다 — 둘 다 `SYS-0002` **500** `retryable: false`, detail은 고정 문장이고 row 내용·예외 문자열을 **싣지 않는다** |
+| 문구 | "`record_id`는 ULID이므로 단조적" | 틀렸다. `ids.py:new_ulid()`는 같은 밀리초에서 `secrets.randbits(80)`이므로 **단조적이지 않다.** "**결정적 lexical tie-breaker**"로 고쳤다 |
 ## 1. 실측 — 1단계가 남긴 자리
 
 전부 `git grep -n -F`·정독으로 확인했다. 경로와 줄 번호는 base `a0e807b5` 기준이고, rebase 뒤 인용 10개를 전부 다시 대조해 옮겨간 둘(`conformance_status.py`의 `CONFORMANCE_PATH`, `schemas.py`의 `ConformanceStatusResponse`)을 고쳤다.
@@ -82,7 +95,7 @@ table 이름 `adapter_conformance_records`. `to_dict()`에서 파생한다.
 | column | 형 | 왜 |
 |---|---|---|
 | `record_id` | `String` PK | `prefix_ULID`. `ids.py`의 `PREFIXES`에 새 kind가 필요하다(§2-6) |
-| `host_id` | `String(64)` NOT NULL | **F5.** 이 기록을 만든 control-plane host의 **비식별 opaque 식별자**(§2-9). hostname·IP·경로를 담지 않는다 |
+| `host_id` | **`uuid`** NOT NULL | **F5·R4.** 이 기록을 만든 control-plane host의 **비식별 식별자**(§2-9). **형이 `uuid`이므로** hostname·IP·경로는 애초에 저장될 수 없다 |
 | `adapter` | `String(64)` NOT NULL | `TOOLS`의 이름. allowlist 밖 값은 저장 전에 거부한다 |
 | `contract_version` | `String(32)` NOT NULL | report의 `contractVersion` — adapter가 **선언한** 값 |
 | `suite_contract_version` | `String(32)` NOT NULL | suite 쪽 `CONTRACT_VERSION`. 둘이 다른 것 자체가 check 하나의 실패이므로 같은 행에 남긴다 |
@@ -104,7 +117,7 @@ table 이름 `adapter_conformance_records`. `to_dict()`에서 파생한다.
 | 닫힌 값 | `subject = 'fixture-adapter'`, `provenance = 'in-server'` — **이 단계에 실제로 생산되는 값 하나씩** |
 | counts | 네 값 모두 `>= 0`, 그리고 `passed + failed + skipped = total` |
 | checks 개수 | `jsonb_array_length(checks) = total` — §2-8의 개수 조건을 **DB에서도** 고정 |
-| host | `host_id <> ''` |
+| host | `host_id IS NOT NULL` — 형이 `uuid`라서 값 모양은 DB가 강제한다(R4). 별도 문자열 CHECK가 필요 없다 |
 
 v1.0은 `installed-cli`·`hosted-ci-import`를 미리 열거했다. 그것은 **1단계가 "코드가 만들 수 없는 `RECORDED`를 schema가 광고하지 않는다"고 좁힌 원칙을 그대로 위반**한다 — 잘못 넣은 row가 reader에서 정상 RECORDED로 나가고, 공개 계약이 존재하지 않는 생산 경로를 약속한다. 그래서 두 값을 **뺐다.** G-25가 풀리는 PR과 import를 여는 PR이 각각 producer·검증·계약·CHECK를 **같은 commit에서** 넓힌다. 그때 필요한 조건도 미리 적어 둔다 — `in-server ⇒ source_ref IS NULL`, `hosted-ci-import ⇒ source_ref IS NOT NULL`, 그리고 subject×provenance 조합 allowlist를 **DB와 모델 양쪽에** 둔다.
 ### 2-3. index (F5 반영)
@@ -114,7 +127,11 @@ v1.0은 `installed-cli`·`hosted-ci-import`를 미리 열거했다. 그것은 **
 - **host 결속**: 같은 DB를 둘 이상의 control-plane host·process가 공유하면 `(adapter, recorded_at)`만으로는 **다른 host의 기록을 현재 host의 사실로** 답한다. 응답이 `scope: "control-plane-host"`라서 그 혼합이 **보이지도 않는다.**
 - **동률의 결정성**: 같은 밀리초에 두 기록이 들어오면 "최신"이 질의마다 달라질 수 있다.
 
-그래서 index와 질의를 **`(host_id, adapter, recorded_at DESC, record_id DESC)`** 로 고정한다. `record_id`는 ULID이므로 tie-breaker로서 단조적이고, 질의와 index가 **같은 순서**를 쓴다(한쪽만 바꾸면 조용히 seq scan이 되거나 순서가 갈린다).
+그래서 index와 질의를 **`(host_id, adapter, recorded_at DESC, record_id DESC)`** 로 고정한다.
+
+`record_id`가 tie-breaker인 이유를 정확히 적는다 — **단조적이기 때문이 아니다.** `ids.py:new_ulid()`는 48비트 밀리초 뒤에 `secrets.randbits(80)`을 붙이므로 **같은 밀리초 안에서는 순서가 시간과 무관**하다. 필요한 성질은 단조성이 아니라 **결정성**이다: 같은 `recorded_at`을 가진 두 행에 대해 `record_id DESC`는 **언제 물어도 같은 행**을 고른다. 그것이 "최신"이 질의마다 달라지지 않게 하는 데 충분하고, 그 이상을 주장하지 않는다.
+
+질의와 index는 **같은 순서**를 쓴다(한쪽만 바꾸면 조용히 seq scan이 되거나 순서가 갈린다).
 
 1단계 §7이 `#174`를 반례로 들었다("route만으로 끝나지 않고 index가 필요했다"). 그래서 이 index는 구현 PR의 migration에 **함께** 들어간다.
 ### 2-4. append-only
@@ -162,14 +179,21 @@ counts 합만 고정하면 **합이 맞는 거짓 row**가 통과한다 — `che
 
 `CHECKLIST`가 자라면 과거 row의 이름 집합은 그때의 목록이다. 그래서 읽기 쪽 비교 대상은 **row의 `suite_contract_version`에 해당하는 목록**이어야 하고, 이 단계에는 버전이 하나뿐이므로 현재 `CHECKLIST`와 비교한다 — **suite 계약이 올라가는 PR이 이 비교 규칙을 함께 정해야 한다**는 것을 §6에 미해결로 남긴다.
 
-### 2-9. `host_id` — 무엇이고 무엇이 아닌가 (F5)
+### 2-9. `host_id` — 서술이 아니라 강제한다 (F5 · R4)
 
-- **비식별**이다. hostname·IP·경로·사용자명을 담지 않는다. 배포가 한 번 정하는 **opaque 값**(예: 설정으로 주는 UUID)이고, 그 값 자체로는 host를 지목할 수 없다.
-- **설정에서 온다.** 프로세스가 스스로 추론하지 않는다(추론하면 컨테이너 재시작마다 값이 바뀌어 "최신"이 끊긴다).
-- **없으면 조용히 넘어가지 않는다.** 생산자는 값이 없으면 **시작하지 않고**(fail-fast), 읽기는 값이 없으면 **다른 host의 기록으로 답하지 않고** 정본 5xx로 거부한다. `NOT_OBSERVED`로 답하는 선택은 하지 않았다 — 그것은 "측정이 없다"는 뜻이고, 실제 상태는 "이 기록이 누구 것인지 말할 수 없다"이기 때문이다.
+v1.1은 "비식별 opaque 값(예: UUID)"이라고 **서술**했다. 그러면 column이 `String(64)`이고 CHECK가 `<> ''`뿐이므로 **hostname·IP·경로를 그대로 넣어도 통과**한다 — 승인된 host-global/RLS 예외의 조건(행에 식별 가능한 값이 없다)을 **문서만 지키고 DB는 지키지 않는** 상태였다. 그래서 v1.2는 형과 설정을 못 박는다.
 
-이렇게 두면 "DB당 control-plane host가 정확히 하나"라는 **배포 불변식에 의존하지 않는다.** Codex가 제시한 두 선택 중 결속 쪽을 골랐다 — 강제할 수 없는 배포 전제보다 행에 적힌 값이 낫다.
+| | 결정 |
+|---|---|
+| **저장 형** | column은 **`uuid`** 다. hostname·IP·경로는 **형 위반이라 저장 자체가 불가능**하다 — 검사에 의존하지 않고 표현 가능성을 없앤다 |
+| **wire 형** | 응답에 `host_id`를 **내지 않는다.** 읽기 경계를 정하는 값이고 소비자가 알 필요가 없다. 내보내면 배포 구조를 노출하는 방향으로만 쓰인다 |
+| **config key** | **`INV_CONTROL_PLANE_HOST_ID`** 하나. 프로세스가 hostname·MAC·경로에서 **추론하지 않는다**(추론하면 컨테이너 재시작마다 값이 바뀌어 "최신"이 끊긴다) |
+| **parsing** | startup·configuration-readiness에서 **strict UUID parsing**. 형식이 아니면 기동하지 않는다. 관용적 보정(대문자 허용, 공백 제거 후 재시도 등)을 하지 않는다 |
+| **부재** | 생산자는 **시작하지 않는다**(fail-fast). 읽기는 §4-3의 고정된 정본 오류로 거부한다 — 다른 host의 기록으로 답하지 않고 `NOT_OBSERVED`로 위장하지도 않는다 |
 
+**왜 `NOT_OBSERVED`가 아닌가**: 그것은 "측정이 없다"는 뜻인데, 실제 상태는 "이 기록이 누구 것인지 말할 수 없다"다. 후자를 전자로 답하면 설정 사고가 **정상 응답으로 위장**된다.
+
+이렇게 두면 "DB당 control-plane host가 정확히 하나"라는 **배포 불변식에 의존하지 않는다.** Codex가 제시한 두 선택 중 결속 쪽을 골랐다 — 강제할 수 없는 배포 전제보다 행에 적힌 값이 낫고, 이제 그 값의 모양까지 DB가 강제한다.
 ## 3. 생산자 — credential 없이 도는 것만
 
 ### 3-1. 두 후보
@@ -226,7 +250,7 @@ v1.0이 적은 네 가지 금지 *이유*(credential은 G-25, `install`은 host�
 - `repository`·`workflow` 결속이 없으면 다른 fork의 실제 run도 통과한다(`#177` 관찰 2, probe T5).
 - 따라서 import 경로는 **적어도** (i) 서버가 스스로 조회하거나, (ii) run 식별자·repository·workflow·artifact digest를 모두 결속하고, (iii) 그래도 남는 한계를 문서에 적어야 한다.
 
-**2단계는 (B)만 열기 때문에 이 경계를 열지 않는다.** `source_ref`는 nullable로 두고 (B)에서는 NULL이다. (A)를 여는 카드가 이 §을 계약으로 받아 닫아야 한다.
+**2단계는 (B)만 열기 때문에 이 경계를 열지 않는다.** (A)를 여는 카드가 이 §을 계약으로 받아 닫고, **그때 `source_ref` column과 CHECK를 producer와 같은 migration·commit에서 추가한다**(§2-2). 이 단계에 그 column은 **없다**.
 
 ## 4. 노출 — RECORDED branch
 
@@ -249,11 +273,19 @@ response_model = Annotated[
 | branch | 언제 | exact key set |
 |---|---|---|
 | **`ConformanceStatusResponse`** (기존 이름·기존 class 그대로) | `records`가 **비었을 때만** | `status`(`"NOT_OBSERVED"`) · `reason` · `scope` · `contractVersion` · `adapters` · `checks` · `recordedAt`(항상 `null`) — **1단계 7키에서 하나도 더하지 않고 빼지 않는다** |
-| **`ConformanceStatusRecordedResponse`** (신규) | 기록이 하나 이상 | `status`(`"RECORDED"`) · `scope` · `contractVersion` · `adapters` · `checks` · `records` · `recordedAt` — **`reason`이 없다**(이유를 말할 부재가 없다) |
+| **`ConformanceStatusRecordedResponse`** (신규) | 기록이 하나 이상 | `status`(`"RECORDED"`) · `scope` · `contractVersion` · `adapters` · `checks` · `records` · **`latestRecordedAt`** — **`reason`도 `recordedAt`도 없다** |
 
 - `checks`는 두 branch 모두 **descriptor**(`name`·`capabilityGated`)다. 1단계와 같은 뜻·같은 형이다.
 - `records[i]`의 결과별 목록은 이름이 **`outcomes`** 다 — `checks`(descriptor)와 **같은 키 이름을 쓰지 않는다.** 같은 이름에 다른 shape를 두면 소비자가 둘을 섞는다.
-- 목록의 `recordedAt`은 **`records` 중 가장 최신 값**이고, 그 뜻을 "이 응답의 신선도"로 문서에 못 박는다. item의 시각은 각 `records[i].recordedAt`이다. **둘을 같은 키로 쓰지 않는다.**
+- **시각 키 이름을 나눈다 (R2).** v1.1은 aggregate와 item에 **둘 다 `recordedAt`** 을 두고 "같은 키로 쓰지 않는다"고 적었는데, exact key set은 두 수준 모두 `recordedAt`이어서 그 문장이 스스로를 부정했다. v1.2의 선택:
+
+| 수준 | 키 | 뜻 |
+|---|---|---|
+| aggregate, `RECORDED` | **`latestRecordedAt`** | `records[*].recordedAt`의 **최대값** = 이 응답의 신선도 |
+| aggregate, `NOT_OBSERVED` | `recordedAt` (항상 `null`) | **1단계 키를 그대로 유지**한다 — 호환이 목적이므로 이름을 바꾸지 않는다 |
+| item | `recordedAt` | 그 측정 하나의 시각 |
+
+즉 aggregate 수준의 `recordedAt`은 **`NOT_OBSERVED` branch에만** 있고 언제나 `null`이며 RECORDED branch에는 없다. 두 branch가 discriminated union이므로 이 비대칭은 모호하지 않고, "aggregate의 `recordedAt`"이 측정 시각처럼 읽히는 일을 없앤다.
 - `records`는 **`adapters` 순서**를 따른다(질의 순서가 아니라 대상 목록 순서) — 응답 순서가 DB 계획에 따라 흔들리지 않게.
 
 #### `records[i]` — `ConformanceRecordItem` (nested, 계약 파일 아님)
@@ -322,27 +354,47 @@ union으로 가는 방식에 따라 **gate가 통과하면서 계약 파일이 �
 | `name`은 allowlist 안, **기록 없음** | **`AdapterConformanceNotObservedResponse` 200.** 404가 아니다 — "그런 adapter는 없다"와 "그 adapter의 측정이 없다"는 다른 사실이고, 합치면 두 번째가 첫 번째처럼 읽힌다 |
 | 비회원·없는 project | 1단계와 같은 **`AUTH-0030` 403**, 존재 비노출 동형 |
 | 무토큰 | `AUTH-MISSING-CREDENTIAL` 401 (`#195` 경계) |
-| 저장 row가 §2-8을 위반 | **정본 5xx, fail-closed.** RECORDED로 내보내지 않는다 |
-| `host_id` 설정 없음 | **정본 5xx** (§2-9). 다른 host의 기록으로 답하지 않고, `NOT_OBSERVED`로 위장하지도 않는다 |
+| 저장 row가 §2-8을 위반 | **`SYS-0002` · 500 · `retryable: false`** (아래) |
+| `host_id` 설정 없음·형식 위반 | **`SYS-0002` · 500 · `retryable: false`** (아래) |
+
+#### 두 fail-closed 경로의 정확한 공개 계약 (R5)
+
+v1.1은 "정본 5xx"라고만 적어 구현자가 500/503과 retryable을 고르게 남겼다. 정한다.
+
+| 조건 | code | status | `retryable` | detail |
+|---|---|---|---|---|
+| 저장 row가 §2-8 위반 (T13) | `SYS-0002` | **500** | **`false`** | 고정 문장. **row 내용·check 이름·예외 문자열을 싣지 않는다** |
+| `host_id` 부재·형식 위반 (T15) | `SYS-0002` | **500** | **`false`** | 고정 문장. **설정 키 값·host 값을 싣지 않는다** |
+
+- **`retryable: false`인 이유**: 둘 다 재시도로 낫지 않는다. 깨진 행은 다시 물어도 깨져 있고, 없는 설정은 다시 물어도 없다. `SYS-0001`(503, retryable)을 쓰면 클라이언트에게 **무의미한 재시도를 지시**한다.
+- **`SYS-0002`를 쓰는 이유와 한계**: 정본 표(`api/problem.py:86-87`)에는 `SYS-0001`(upstream 불가)과 `SYS-0002`(미매핑)뿐이고 **설정 오류·내부 불변식 위반에 해당하는 code가 없다.** 의미가 가장 가까운 `SYS-0002`를 고르고 그 선택을 기록한다 — 설정 전용 code가 생기면 **이 두 줄이 그 code로 옮겨야 한다**(§6).
+- detail에 무엇을 싣지 않는지까지 적는 이유는 §2-5와 같다. 이 응답은 모든 tenant의 project 구성원이 볼 수 있고, "왜 깨졌는지"를 친절하게 적으면 **host 내부와 DB 내용이 그 경로로 나간다**.
 
 권한은 두 route 모두 1단계와 같다 — `require_project_access()`, 등급(`canApprove`) 요구 없음. 읽기다.
-### 4-4. 1단계 `NOT_OBSERVED`와의 호환
+### 4-4. 1단계와의 호환 — **shape는 유지하고 `reason` 값은 바뀐다** (R1)
 
-**바꾸지 않는 것을 명시한다.** 기록이 없을 때 목록 route의 응답은 1단계와 **필드 집합·값이 동일**하다 — `status`·`reason`·`scope`·`contractVersion`·`adapters`·`checks`·`recordedAt: null`. `#208`이 고정한 FE fixture(`reason` 문자열 byte 일치까지)가 **깨지지 않는다.**
+v1.1은 첫 문장에서 "**필드 집합·값이 동일**"하고 `#208` fixture가 "`reason` 문자열 byte 일치까지 깨지지 않는다"고 적고, **바로 다음 bullet에서 그 `reason`을 바꾼다**고 적었다. 둘은 같이 성립할 수 없다. 정직한 쪽은 후자이므로 그것으로 통일한다.
 
-- `recordedAt`은 1단계에서 `None` **required**였다. union에서 `NOT_OBSERVED` branch는 그 형을 유지한다 — `None`만 허용한다.
-- `reason` 문자열(`conformance_status.py:65` `NOT_OBSERVED_REASON`)은 "아직 저장하지 않는다"고 말한다. 2단계가 저장하기 시작하면 **이 문장은 사실이 아니게 된다.** 그래서 2단계 구현은 이 문자열을 "이 adapter에 대한 기록이 없다"로 **갱신**해야 하고, `#208`의 fixture도 같은 PR에서 함께 바뀐다. **이것이 2단계의 유일한 FE 파괴 지점**이므로 여기 적어 둔다.
-- `status` 리터럴이 넓어진다. 1단계가 `Literal["NOT_OBSERVED"]` 하나로 둔 이유는 *"코드가 만들 수 없는 `RECORDED`를 스키마가 광고하지 않는다"* 였다. 2단계는 생산자를 함께 넣으므로 그 조건이 충족된다 — **branch와 생산자가 같은 PR에 들어가야 한다**는 뜻이다.
+| | 2단계에서 |
+|---|---|
+| **키 집합·형 (shape/schema)** | **유지한다.** 기록이 없을 때 목록 응답은 `status`·`reason`·`scope`·`contractVersion`·`adapters`·`checks`·`recordedAt` **일곱 키 그대로**이고 `recordedAt`은 1단계처럼 **`null`만** 허용한다. 계약 파일 `conformance-status-response.schema.json`의 **내용이 바뀌지 않는다** |
+| **`reason` 문자열 값** | **의도적으로 바뀐다.** 1단계 값(`conformance_status.py:65` `NOT_OBSERVED_REASON`)은 "이 플랫폼은 conformance 결과를 아직 저장하지 않는다"는 뜻이고 **2단계가 저장을 시작하면 그 문장은 거짓**이다. "이 adapter(들)에 대한 기록이 없다"로 갱신한다 |
+| **`#208` FE fixture** | **같은 PR에서 함께 바뀐다.** `reason`을 byte로 고정한 fixture이므로 문자열이 바뀌면 fixture도 바뀐다. **2단계의 유일한 FE 파괴 지점**이다 |
 
-## 5. 되돌리면 실패하는 시험 계획 (v1.1)
+그래서 "byte 동일"·"값 동일"·"fixture 불변"이라는 v1.1의 세 주장을 **삭제한다.** JSON Schema는 `reason`의 런타임 고정 문자열을 담지 않으므로 schema 대조만으로 값 동일성을 검증할 수도 없다 — 그것이 T5를 둘로 나누는 이유다(§5의 T5a·T5b).
+
+- `status` 리터럴이 넓어진다. 1단계가 `Literal["NOT_OBSERVED"]` 하나로 둔 이유는 *"코드가 만들 수 없는 `RECORDED`를 스키마가 광고하지 않는다"* 였다. 2단계는 생산자를 함께 넣으므로 조건이 충족된다 — **branch와 생산자가 같은 PR**이어야 한다는 뜻이다.
+- aggregate `RECORDED`에는 `recordedAt`이 없고 `latestRecordedAt`이 있다(§4-1, R2). `NOT_OBSERVED` branch만 1단계 키를 그대로 갖는다.
+## 5. 되돌리면 실패하는 시험 계획 (v1.2)
 
 | # | 무엇을 고정하는가 | 되돌릴 때 실패하는 방식 | 종류 |
 |---|---|---|---|
 | T1 | `detail`이 저장·노출되지 않는다 | `checks`/`outcomes`에 `detail` 키를 넣으면 실패. 응답 모델이 받으면 `extra="forbid"`로 실패 | PG-free |
 | T2 | counts 합 | `passed+failed+skipped != total` 응답을 만들면 실패. DB `CHECK`는 실 PG로 별도 | PG-free + 실 PG |
 | T3 | `subject`·`provenance`가 required이고 **이 단계에 생산 가능한 값만** | 값을 빼거나 `installed-cli`·`hosted-ci-import`를 쓰면 실패(모델·DB 양쪽) | PG-free + 실 PG |
-| T4 | RECORDED는 `recordedAt` non-null | `recordedAt: null`인 RECORDED를 만들면 실패 | PG-free |
-| T5 | **기록 0개일 때 1단계와 exact key set이 같다** | 목록 응답의 키 집합·값을 **기존 계약 파일 `conformance-status-response.schema.json`과 대조**한다. 한 키라도 더하거나 빼면 실패 | PG-free |
+| T4 | RECORDED의 시각 키 | aggregate RECORDED는 **`latestRecordedAt`** non-null이고 `records[*].recordedAt`의 **최대값**과 같다. aggregate에 `recordedAt` 키가 있으면 실패, `latestRecordedAt`이 최대값이 아니면 실패. 단건 RECORDED는 `recordedAt` non-null | PG-free |
+| **T5a** | **기록 0개일 때 1단계와 shape(키 집합·형)가 같다** | 목록 응답의 키 집합·형을 **기존 계약 파일 `conformance-status-response.schema.json`과 대조**한다. 한 키라도 더하거나 빼면, `recordedAt`이 `null` 아닌 값을 허용하면 실패. **값 동일성은 여기서 보지 않는다** — schema에 런타임 문자열이 없다 |
+| **T5b** | **새 `reason` 고정값** | `NOT_OBSERVED_REASON`을 런타임에서 새 문자열과 대조하고, `#208` FE fixture도 같은 문자열을 쓰는지 확인한다. 1단계 문장("아직 저장하지 않는다")이 남아 있으면 실패 — 저장을 시작한 뒤에는 그것이 거짓이다 |
 | T6 | unknown adapter `RES-0004` / known-but-unrecorded 200 `NOT_OBSERVED` | 둘을 404로 합치면 실패 | PG-free |
 | T7 | `exported()` 결과 집합과 계약 파일 목록 | 계약 파일이 사라지거나 고아가 되면 실패 — §4-2의 gate 공백을 메운다 | PG-free |
 | T8 | append-only | app role로 UPDATE·DELETE를 시도하면 거부된다 | **실 PG** |
@@ -350,14 +402,15 @@ union으로 가는 방식에 따라 **gate가 통과하면서 계약 파일이 �
 | T10 | **최신 선택이 host별이고 결정적이다** | 다른 `host_id`의 더 최신 행을 넣어도 현재 host의 답이 바뀌지 않는다. 같은 `recorded_at` 두 행에서 `record_id` tie-breaker로 **항상 같은 행**이 나온다. index를 지우거나 tie-breaker를 빼면 실패 | **실 PG** |
 | T11 | 요청이 suite를 돌리지 않는다 | route 모듈이 `run_conformance`를 import하거나 부르면 실패 | PG-free |
 | **T12** | **실 adapter·subprocess·실 credential을 쓰지 않는다** (v1.0에서 고침) | 생산자가 `CliAdapter`/`agents.BY_NAME`에서 adapter를 고르면 실패. subprocess 생성이 관측되면 실패. `credential_ref`가 `conformance://dummy`가 아니면 실패. **fixture의 `install`·`authenticate`는 호출되어야 하고**, 그 stub이 host를 바꾸지 않고(파일·환경 변수 변경 0) 외부 credential을 읽지 않음을 단언한다 | PG-free |
-| **T13** | **깨진 저장 row는 RECORDED로 나가지 않는다** | `checks: []`+`total: 15`, 중복 이름, `CHECKLIST` 밖 이름, 뒤섞인 순서, `passed && skipped` 각각을 저장하고 읽으면 **정본 5xx**여야 한다. 하나라도 200 RECORDED로 나가면 실패 | **실 PG** |
+| **T13** | **깨진 저장 row는 RECORDED로 나가지 않는다** | `checks: []`+`total: 15`, 중복 이름, `CHECKLIST` 밖 이름, 뒤섞인 순서, `passed && skipped` 각각을 저장하고 읽으면 **`SYS-0002` · 500 · `retryable: false`** 여야 한다(§4-3). 하나라도 200 RECORDED로 나가면 실패. detail에 **row 내용·check 이름·예외 문자열이 들어가면 실패** | **실 PG** |
 | **T14** | **생산자가 report에서 재계산한다** | caller가 준 counts를 그대로 쓰면 실패 — 일부러 틀린 counts를 넘겨도 저장된 행은 report에서 센 값이어야 한다. `failed`를 독립 입력으로 받으면 실패 | PG-free |
-| **T15** | **`host_id` 부재가 조용히 지나가지 않는다** | 설정이 없을 때 생산자는 시작하지 않고, 읽기는 정본 5xx다. `NOT_OBSERVED`나 다른 host의 기록으로 답하면 실패 | PG-free + 실 PG |
+| **T15** | **`host_id`가 비식별 형식으로 강제된다** | (a) 설정 부재 시 생산자는 **시작하지 않고** 읽기는 **`SYS-0002` · 500 · `retryable: false`** 다 — `NOT_OBSERVED`나 다른 host의 기록으로 답하면 실패. (b) **부정 시험**: `INV_CONTROL_PLANE_HOST_ID`에 hostname(`cp-01.internal`)·IP(`10.0.0.7`)·경로(`/srv/cp`)·빈 문자열·대충 맞는 문자열을 주면 **strict UUID parsing이 거부**한다. 하나라도 기동하면 실패. (c) detail에 설정 값·host 값이 들어가면 실패 | PG-free + 실 PG |
 
-**T11·T12·T13·T14**가 이 설계의 핵심 부정 시험이다 — 차례로 "읽기가 측정하지 않는다", "측정 대상이 fixture다", "DB가 API보다 정직하다", "숫자를 호출자가 정하지 않는다"를 고정한다.
+**T11·T12·T13·T14**가 이 설계의 핵심 부정 시험이다 — 차례로 "읽기가 측정하지 않는다", "측정 대상이 fixture다", "DB가 API보다 정직하다", "숫자를 호출자가 정하지 않는다"를 고정한다. **T15(b)** 가 추가로 승인된 RLS 예외의 조건(행에 식별 가능한 host 값이 없다)을 **검사 가능하게** 만든다 — v1.1에서는 그것이 서술뿐이었다.
 ## 6. 경계 · 미해결 (v1.1)
 
-- **RLS는 확정됐다** — §2-1(c), Codex 승인, 세 불변식을 계약으로 받았다. v1.0의 "판단 대기"는 닫혔다.
+- **RLS는 확정됐다** — §2-1(c), Codex 승인, 세 불변식을 계약으로 받았다. v1.0의 "판단 대기"는 닫혔다. v1.2에서 그중 "행에 식별 가능한 값이 없다"를 **`uuid` 형과 strict parsing으로 강제**했다(§2-9, R4).
+- **설정 오류·내부 불변식 위반에 쓸 정본 code가 없다.** §4-3의 두 줄은 `SYS-0002`(미매핑)를 빌려 쓰고 있다. 설정 전용 code가 생기면 두 줄을 옮겨야 한다.
 - **`CHECKLIST`가 자랄 때의 비교 규칙**(§2-8 마지막 단락). 과거 row의 이름 집합은 그때의 목록이므로, 읽기는 row의 `suite_contract_version`에 맞는 목록과 비교해야 한다. 이 단계는 버전이 하나라 현재 목록과 비교하고, **suite 계약을 올리는 PR이 규칙을 함께 정해야 한다.**
 - **보존 기간을 정하지 않았다**(§2-4). 삭제 주체가 정해지지 않았다.
 - **hosted CI import(A)를 열지 않았다**(§3-1). 열려면 §3-4를 계약으로 받고 `source_ref` column·CHECK·조합 allowlist를 같은 PR에서 넓혀야 한다.

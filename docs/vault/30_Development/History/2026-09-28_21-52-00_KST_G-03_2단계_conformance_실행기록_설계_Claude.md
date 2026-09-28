@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G03-STAGE2-CONFORMANCE-RECORD-001"
 title: "G-03 2단계 설계 — conformance 실행 기록의 저장과 노출: host 범위 사실에 tenant RLS를 씌우지 않고, credential 없는 생산자만 허용하며, RECORDED가 무엇을 측정한 것인지 말한다 (카드 95, docs-only)"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T22:24:00+09:00"
+updated: "2026-09-28T22:56:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "a0e807b5"
@@ -85,7 +85,7 @@ v1.0은 12개를 적고 핵심 부정 시험을 **T11**(route가 `run_conformanc
 
 v1.1 재검토 요청을 올렸다. RLS 판단은 §10에서 닫혔으므로 승인 뒤 구현 카드는 (1) migration 번호 배정 요청, (2) branch·생산자·`NOT_OBSERVED_REASON`·`#208` fixture를 한 PR로 묶기, (3) `CHECKLIST` 버전별 비교 규칙 확정 순서다.
 
-## 10. Codex 검토 반영 (v1.1)
+## 10. Codex 검토 반영 (v1.1)  *(F1~F5. v1.2가 그중 일부를 더 조였다 — §11)*
 
 RLS는 **§2-1(c) host-global record로 승인**됐다. 승인 조건으로 붙은 세 불변식(row에 tenant·project·user 값이나 자유 문자열 없음 / route는 매번 `require_project_access` / 직접 DB 표면은 host-global 안전 필드만)을 설계가 계약으로 받았다. 차단 결함 5건은 다음과 같이 닫았다.
 
@@ -100,3 +100,18 @@ RLS는 **§2-1(c) host-global record로 승인**됐다. 승인 조건으로 붙�
 시험은 12개에서 **15개**가 됐다. T12를 고치고 T13(깨진 row fail-closed)·T14(생산자 재계산)·T15(`host_id` 부재)를 넣었으며, T5를 "**기존 계약 파일과 exact key set 대조**"로, T3을 "생산 가능한 값만"으로, T10을 "host별·결정적 최신 선택"으로 조였다.
 
 **정직하게 적어 둘 것**: F3은 내가 설계에서 틀린 것이다 — 금지의 *이유* 네 개는 유효했지만 그것에서 **시험 가능한 경계를 도출한 방식**이 잘못됐고, 그대로 구현하면 정상 생산자가 실패했다. 실측(`:206`·`:215`)으로 확인한 뒤 경계를 다시 세웠다.
+
+## 11. Codex 재검토 반영 (v1.2)
+
+F1~F5의 **방향은 승인**됐고, "계약을 다시 갈라 놓은 모순"과 "강제되지 않은 보안 불변식" 다섯 건이 왔다. 전부 **둘 중 하나를 골라 한 곳에서만 말하라**는 성질이었다.
+
+| | 지적 | 선택 |
+|---|---|---|
+| **R1** | 0-record 호환 설명과 시험이 모순 — §4-4가 "값 동일·fixture 불변"이라면서 다음 줄에서 `reason`을 바꾼다 | **shape 유지 / `reason` 값은 의도적으로 바뀜**으로 통일하고 세 주장("byte 동일"·"값 동일"·"fixture 불변")을 **삭제**했다. T5를 **T5a**(schema·키 집합·형) / **T5b**(새 `reason` 런타임 고정값 + `#208` fixture)로 나눴다 — JSON Schema에 런타임 문자열이 없으므로 schema 대조로는 값 동일성을 검증할 수 없다는 지적이 정확했다 |
+| **R2** | aggregate와 item이 둘 다 `recordedAt`인데 "같은 키로 쓰지 않는다"고 적음 | aggregate `RECORDED`의 키를 **`latestRecordedAt`**(= `records[*].recordedAt`의 최대값)으로 **바꿨다.** item은 `recordedAt`, `NOT_OBSERVED` branch는 1단계 호환을 위해 `recordedAt: null`을 유지한다. 즉 aggregate `recordedAt`은 `NOT_OBSERVED` branch에만 있다 |
+| **R3** | §3-4가 `source_ref` 결론을 되돌림 | 그 문장을 **삭제**했다. 결론은 한 곳 — 이 단계에 column이 **없고**, import를 여는 PR이 column·CHECK를 producer와 같은 migration에서 추가한다 |
+| **R4** | `host_id` 비식별성이 서술뿐 | **강제로 바꿨다.** column을 **`uuid`** 로(그래서 hostname·IP·경로는 *표현 자체가 불가능*), config key를 **`INV_CONTROL_PLANE_HOST_ID`** 로 못 박고 startup·configuration-readiness에서 **strict UUID parsing**. 응답에는 `host_id`를 **내지 않는다**. T15(b)에 hostname·IP·경로·빈 문자열 거부 부정 시험을 넣어 이 조건을 **검사 가능**하게 했다 |
+| **R5** | 두 fail-closed 경로가 "정본 5xx"뿐 | 둘 다 **`SYS-0002` · 500 · `retryable: false`** 로 정했다. `retryable: false`인 이유는 재시도로 낫지 않기 때문이고, `SYS-0002`를 빌려 쓰는 이유는 정본 표(`api/problem.py:86-87`)에 **설정 오류·내부 불변식 위반 code가 없기** 때문이다 — 그 한계를 §6 미해결로 적고, 전용 code가 생기면 두 줄을 옮긴다. detail에 row 내용·check 이름·예외 문자열·설정 값을 **싣지 않는다** |
+| 문구 | "`record_id`는 ULID이므로 단조적" | **틀렸다.** `ids.py:new_ulid()`는 48비트 밀리초 뒤에 `secrets.randbits(80)`을 붙이므로 같은 밀리초 안에서 단조적이지 않다 — 실측으로 확인했다. 필요한 성질은 단조성이 아니라 **결정성**이므로 "결정적 lexical tie-breaker"로 고치고 그 이상을 주장하지 않았다 |
+
+**이 판에서 배운 것**: v1.1의 결함 다섯 중 셋(R1·R2·R3)은 **새 결정을 적으면서 옛 문장을 지우지 않아** 생긴 자기모순이었다. 설계를 고칠 때 바뀐 결론을 **한 곳에서만** 말하도록 옛 문장을 찾아 지우는 것이 새 문장을 쓰는 것과 같은 크기의 일이다. R4는 다른 종류다 — "비식별"을 **서술**했지만 `String(64)`은 그것을 **강제하지 않았고**, 보안 조건은 서술이 아니라 형·파싱·부정 시험으로만 성립한다.
