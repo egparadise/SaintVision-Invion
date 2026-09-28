@@ -295,6 +295,10 @@ def test_junit_marks_unobserved_negative_fixture_as_failure():
 
 
 def test_0053_scoped_row_refusal_requires_exact_reason_and_atomic_state():
+    source = inspect.getsource(runner._negative_fixture_probes)
+    assert '_alembic_upgrade(admin_dsn, scoped, "0053_eval_suite_project_scope")' in source
+    assert '_alembic_upgrade(admin_dsn, scoped, "head")' not in source
+
     refused = subprocess.CompletedProcess(
         args=[], returncode=1, stdout=b"", stderr=b"1 suite(s) belong to a project"
     )
