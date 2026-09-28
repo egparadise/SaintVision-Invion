@@ -51,13 +51,24 @@ class EvalSuite(Base):
 
     __tablename__ = "eval_suites"
     __table_args__ = (
+        # 0053: the project a suite belongs to, so the W5 route can bind the
+        # path's project to a row. Nullable: a suite made before 0053 has none
+        # and the route treats it as absent rather than as every project's.
+        ForeignKeyConstraint(
+            ["tenant_id", "project_id"],
+            ["projects.tenant_id", "projects.project_id"],
+            name="fk_eval_suites_tenant_id_project_id",
+        ),
         UniqueConstraint("tenant_id", "suite_id", name="uq_eval_suites_tenant_id_suite_id"),
         UniqueConstraint("tenant_id", "name", "version", name="uq_eval_suites_name_version"),
         CheckConstraint("case_count >= 0", name="case_count_non_negative"),
+        Index("ix_eval_suites_tenant_id_project_id", "tenant_id", "project_id"),
     )
 
     suite_id: Mapped[InvId] = mapped_column(primary_key=True)
     tenant_id: Mapped[TenantId] = mapped_column()
+    #: The project the suite belongs to (0053). NULL for suites made before.
+    project_id: Mapped[InvId | None] = mapped_column(nullable=True)
     name: Mapped[str] = mapped_column(String(128))
     #: SemVer of the case set, not a row version.
     version: Mapped[str] = mapped_column(String(32))
