@@ -31,6 +31,15 @@ from ..deps import get_now, get_principal, get_session
 
 router = APIRouter(prefix="/v1", tags=["projects"])
 
+# Declared in its own module, added here on purpose: ``BusinessDispatch`` reads
+# this router's ``routes``, so a separate top-level router would be registered
+# and never reached, and a nested ``include_router`` would only leave a lazy
+# placeholder. ``register`` adds the real route.
+from . import lineage_query, model_release  # noqa: E402
+
+model_release.register(router)
+lineage_query.register(router)
+
 
 @router.get("/projects", response_model=schemas.ProjectListResponse)
 def list_projects(
