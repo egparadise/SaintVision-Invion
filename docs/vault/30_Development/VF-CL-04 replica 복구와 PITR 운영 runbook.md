@@ -1,11 +1,11 @@
 ---
 doc_id: "OPS-VF-CL-04-001"
 title: "VF-CL-04 replica 복구와 PITR 운영 runbook"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-22T17:50:00+09:00"
+updated: "2026-09-28T17:30:00+09:00"
 branch: "agent/claude/vf-cl"
 task: "VF-CL-04"
 source_of_truth: "Git"
@@ -49,6 +49,7 @@ tags: ["saintvision", "vf-cl-04", "runbook", "replica", "pitr", "operations"]
 - 기본 배포(archive_mode off)는 absent다. --require-pitr는 실제 복구 증거가 없는 이 도구에서 항상 exit 1로 인수를 차단한다.
 - backup 매체·보존·오프사이트는 운영자 결정. 이 runbook은 readiness 판정만 제공한다.
 - **보관 주기(2026-09-22 결정, 코디네이터가 사용자 위임으로 회신)**: WAL 아카이브·base backup **7일** — 5대 PC 파일럿 단계 값이며 **운영 전환 시 운영자가 재결정**한다. 정리 절차 = `python tools/pitr_archive_retention.py --archive <wal_archive> --backups <base backups dir> [--days 7]` — **기본 dry-run(계획 JSON만)**, `--apply`는 명시 플래그이며 삭제 전 같은 계획을 먼저 출력한다. 불변식: 최신 base backup은 항상 보존, 유지되는 backup들의 **최소 START WAL 세그먼트 이후 WAL은 절대 삭제 안 함**, `.history`/`.partial`·다른 timeline 보존, base backup이 없으면 아무것도 지우지 않는다(`tests/test_pitr_archive_retention.py` 9건, 무작위 300 아카이브 속성 시험 포함). 활성 후 복구 drill(실 RPO 측정)은 아직 없다. 새 PC 실측(dev-pg readiness absent · owned probe 물리 리허설 6회): [[2026-09-22_17-14-47_KST_PITR-RUNBOOK_Claude_실측]].
+- **label 시각 규칙(2026-09-28, 카드 al)**: `tools/pitr_archive_retention.py`는 `backup_label`의 `START TIME`을 숫자 offset(`+0900`·`+09:00`) 또는 명시적 `UTC`/`GMT`로만 읽는다. 서버 timezone 약어(`KST` 등)·zone 없는 시각·형식 오류는 **계획 전체 거부(exit 3, 삭제 0)**, `START TIME` 부재는 **unknown age = 항상 보존**. 따라서 backup을 만드는 PostgreSQL은 `timezone=UTC`로 두거나 label을 offset 형식으로 남겨야 정리 계획이 나온다.
 
 ## 5. 하지 않는 것 (경계)
 
