@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.22"
+version: "1.2.23"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T13:26:17+09:00"
+updated: "2026-09-28T13:36:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-Evidence 공백 통합 분류 카드 bi (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/evidence-gap-triage`, docs-only): 대응표 6종(#155 S12-ST·#160 S10-ST·#161 S09-DB·ST·#163 S03-ST·#164 S02-BE·ST·#166 S10-BE)의 공백 29행 → 중복 8 제거 → **21건**(IMPLEMENTATION/DESIGN 6 · CI_LANE_GAP/NOT_OBSERVED 4 · BLOCKED_EXTERNAL 11). **재분류 3건**: ①MLflow adapter를 BLOCKED_EXTERNAL에서 IMPLEMENTATION으로 회수(우리 코드이고 #172·#176 진행 중, 외부는 실 endpoint뿐) — 코디네이터 지시에 해당하는 실제 위반은 이 한 건이었다. ②Windows 게이트와 `remoteNodeReadiness: unknown`은 **공백이 아니므로** 작업 항목에서 제외(hosted에서 실행됨 / route가 범위를 스스로 밝힘). ③#155의 NOT_OBSERVED와 #166의 CI_LANE_GAP이 같은 성질이라 CI_LANE_GAP으로 통일. **실측**: `tests/`에 `v1/adapters` grep 0건 → 서빙 route가 HTTP 표면에서 미검증(구현 1순위) · live archiver의 hosted skip은 `--internal` 네트워크 격리 때문이고 port publish는 그 격리를 깨므로 `docker exec` probe를 권고(판정 함수의 인자 모양만 바뀐다) · 기존 `/v1/adapters`는 `HTTPException(404)`로 정본 `ProblemDetails`가 아니지만 1순위 PR은 **현재 동작을 pin하고 바꾸지 않는다**(#167이 기존 표면을 건드리지 않은 결정과 같은 이유). 구현 순서 5단과 각 단의 설계 필요 여부를 PR 본문에 적었고, 가치 순서가 내 판단임(G-02가 더 가치 있으나 결정이 먼저 필요해 G-01을 1순위로 둠)을 명시했다. migration 필요 없음. 다음 첫 행동: Codex 검토 뒤 1순위(G-01 `GET /v1/adapters` HTTP 시험)를 작은 구현 PR로. 전문 [[2026-09-28_Evidence_공백_통합분류_Claude]].
+Evidence 공백 통합 분류 카드 bi (Claude, 2026-09-28, base `1e8baf04`, branch `agent/claude/evidence-gap-triage`, docs-only): 대응표 6종(#155 S12-ST·#160 S10-ST·#161 S09-DB·ST·#163 S03-ST·#164 S02-BE·ST·#166 S10-BE)의 공백 29행 → 중복 8 제거 → **21건**(IMPLEMENTATION/DESIGN 6 · CI_LANE_GAP/NOT_OBSERVED 4 · BLOCKED_EXTERNAL 11). **재분류 3건**: ①MLflow adapter를 BLOCKED_EXTERNAL에서 IMPLEMENTATION으로 회수(우리 코드이고 #172·#176 진행 중, 외부는 실 endpoint뿐) — 코디네이터 지시에 해당하는 실제 위반은 이 한 건이었다. ②Windows 게이트와 `remoteNodeReadiness: unknown`은 **공백이 아니므로** 작업 항목에서 제외(hosted에서 실행됨 / route가 범위를 스스로 밝힘). ③#155의 NOT_OBSERVED와 #166의 CI_LANE_GAP이 같은 성질이라 CI_LANE_GAP으로 통일. **실측**: `tests/`에 `v1/adapters` grep 0건 → 서빙 route가 HTTP 표면에서 미검증(구현 1순위) · live archiver의 hosted skip은 `--internal` 네트워크 격리 때문이고 port publish는 그 격리를 깨므로 `docker exec` probe를 권고(판정 함수의 인자 모양만 바뀐다) · 기존 `/v1/adapters`는 `HTTPException(404)`로 정본 `ProblemDetails`가 아니지만 1순위 PR은 **현재 동작을 pin하고 바꾸지 않는다**(#167이 기존 표면을 건드리지 않은 결정과 같은 이유). 구현 순서 5단과 각 단의 설계 필요 여부를 PR 본문에 적었고, 가치 순서가 내 판단임(G-02가 더 가치 있으나 결정이 먼저 필요해 G-01을 1순위로 둠)을 명시했다. migration 필요 없음. **v1.1(Codex F-R1~F-R3 반영)**: ①**산술이 어긋났다** — 표 22행을 21건, BLOCKED 12행을 11건("G-19가 출처 둘을 합쳤다"는 각주로 정당화했으나 그 합침은 이미 한 행으로 표현돼 근거가 안 된다), G-12·G-13은 "공백 아님"이라면서 4건·총계에 포함. 단위를 다섯으로 고정했다(출처 29 / distinct 23 / actionable 9 / 관찰만 2 / BLOCKED 12, `9+2+12=23`)고 출처→distinct 대응을 행 단위로(합침 7·나눔 1 = `29−7+1=23`) 적었다. ②**G-26 전체를 BLOCKED_EXTERNAL로 둔 것이 fail-closed가 아니었다** — 정본 차단 지도 `:42`가 고정 SHA 100/30 eval runner·누출·금지행동 변이 도구를 S09-FE의 Gemini 몫으로 적고 **U1~U6 직접 입력 없음**이라 명시하며 FE review map `:39`도 "외부 환경 없이 가능한 가장 작은 독립 카드"라 한다. G-07(내부 runner, **owner Gemini**)과 G-26(실 모델·도구·credential 인수)로 나눴고, **배정되지 않은 것을 내 큐에 넣지 않았다**(배정되면 G-02 다음·G-03 앞 권고, 근거 3). `agent/gemini/s09-fe-matrix`에 매트릭스 v1.1.1이 이미 있어 owner 쪽에 설계가 선 공백이다. ③겹침표에 **#174**를 추가(역조회 index `0050`, #175와 한 쌍 → G-04·G-05가 같은 index를 다시 만들지 않게), **#170·#177의 비중복 근거**를 명시(집계 축·복원 예행 축이고 live archiver 비인증 생산자와 무관), migration 주장을 **G-01·G-02·G-11만 확정**으로 좁히고 G-03~G-05는 설계에서 재판정(#174가 반례). G-01 순서는 Codex도 합리적이라 확인해 그대로 1순위. 다음 첫 행동: G-01 구현 PR을 올린다(이미 작성 완료). 전문 [[2026-09-28_Evidence_공백_통합분류_Claude]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 

@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-EVIDENCE-GAP-TRIAGE-001"
-title: "Claude Evidence 대응표 6종 공백 통합 분류 — 29행을 21건으로, BLOCKED_EXTERNAL에서 1건 회수, 작업 항목 2건 제외, 구현 순서 5단"
-version: "1.0.0"
+title: "Claude Evidence 대응표 6종 공백 통합 분류 v1.1 — 출처 29행을 distinct 23행으로, BLOCKED_EXTERNAL에서 2건 회수(MLflow·AC-09 runner), actionable 9·관찰 2·외부 12, Claude 큐 5순위 6공백"
+version: "1.1.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T13:26:17+09:00"
+updated: "2026-09-28T13:36:40+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S02-BE", "S02-ST", "S03-ST", "S09-DB", "S09-ST", "S10-BE", "S10-ST", "S12-ST"]
@@ -65,3 +65,36 @@ tags: ["evidence", "gap", "triage", "claude", "docs-only"]
 ## 7. 다음 첫 행동
 
 Codex 검토를 받고, 승인되면 1순위(G-01)를 작은 구현 PR로 올린다. 그 PR은 base `integration/all-agents-unified`이고 진행 중인 것과 겹치지 않는다.
+
+## 8. v1.1 — Codex 검토 F-R1~F-R3 반영
+
+세 건 모두 타당했다. **F-R1은 산술이 어긋난 것**이라 가장 부끄러운 쪽이다.
+
+### 8-1. F-R1 — 세는 단위를 섞었다
+
+v1.0이 세 군데에서 어긋났다.
+
+- 표는 **22행**(G-01~06, G-11~14, G-15~26)인데 **21건**이라 적었다.
+- BLOCKED_EXTERNAL은 **12행**인데 **11건**이라 적고, "G-19가 출처 둘을 합쳤다"는 각주로 12→11을 정당화했다. 그 합침은 **이미 G-19 한 행으로 표현돼 있으므로** 근거가 되지 못한다 — Codex 지적이 정확하다.
+- G-12·G-13을 본문에서는 "공백이 아니다·작업 항목에서 제외"라 하면서 **4건 분류와 총계에는 계속 넣었다.**
+- 서론의 "BLOCKED_EXTERNAL이던 것 중 둘을 옮겼다"도 실제로는 G-06 한 건만 가리켰다.
+
+고친 방식: 세는 단위를 **다섯으로 명시**하고(출처 29 / distinct 23 / actionable 9 / 관찰만 2 / BLOCKED 12) 서론에 표로 박았다. `9 + 2 + 12 = 23`이고, 출처 → distinct 대응(합침 7·나눔 1)을 §1-4에 행 단위로 적어 **29 − 7 + 1 = 23**이 보이게 했다. actionable과 관찰을 §1-5에서 분리했으므로 "영원히 닫히지 않는 항목이 큐에 남는" 문제도 사라진다. 제목·frontmatter·두 작업판·이 History·PR 본문을 같은 수로 맞췄다.
+
+### 8-2. F-R2 — G-26을 통째로 외부에 둔 것이 fail-closed가 아니었다
+
+정본 차단 지도(`2026-09-22_21-55-00_KST_review_done_차단지도_Codex.md:42`)가 S09-FE `review`를 **"고정 SHA·원본 입력/출력·skip 0인 100 prompt/30 coding eval과 누출·금지행동 변이 도구 — Gemini … U1~U6 직접 입력 없음"** 으로 적고, FE review map(`:39`)도 "외부 환경이 없어도 가능한 가장 작은 독립 카드"라 부른다. **외부 전제가 없다고 정본이 말하는 것을 내가 BLOCKED_EXTERNAL에 넣었다.**
+
+그래서 **G-07**(내부 runner·변이 도구)과 **G-26**(실제 모델·도구·credential 운영 인수)으로 나눴다. 같은 두 문서가 "합성 eval을 제품 인수로 세지 않음"을 함께 적으므로 인수는 G-26에 남는 것이 맞다.
+
+**owner는 Gemini다.** 그래서 actionable 9에는 넣되 **Claude 큐(§3)에는 넣지 않았다** — 배정되지 않은 것을 내 큐에 넣는 것은 owner 경계를 넘는 일이다. 배정되면 **G-02 다음·G-03 앞**을 권고하고 근거 셋을 §3-0에 적었다. `agent/gemini/s09-fe-matrix`에 S09-FE 매트릭스 v1.1.1이 이미 있어 **owner 쪽에 설계가 선 공백**임도 적었다.
+
+### 8-3. F-R3 — 겹침표가 #174를 놓치고, 비중복 근거가 없고, migration 없음을 확정했다
+
+- **#174 추가**: 역조회 index migration `0050`이 #175와 한 쌍이다. G-04·G-05 설계가 **같은 index를 다시 만들지 않도록** 겹침표에 넣고, §3-4에도 "먼저 읽어야 한다"를 적었다.
+- **#170·#177의 비중복 근거**: #170은 AC-11 증거 **집계** 축, #177은 migration **복원 예행**(`0045 snapshot restore → 0046`) 축이고, 둘 다 live archiver의 operational-RPO **비인증 생산자**를 실행 가능하게 만드는 일이 아니다. 표에 적었다.
+- **migration 주장 축소**: G-01·G-02·G-11은 확정으로 "없음"이고, **G-03~G-05는 설계 전이므로 확정하지 않는다.** #174가 바로 반례다 — #175의 역조회는 route만으로 끝나지 않고 index가 필요했다. 그래서 "설계 단계에서 persistence·index 필요성을 재판정하고 필요하면 그때 번호를 요청한다"로 바꿨다.
+
+### 8-4. 첫 구현(G-01)에 미치는 영향
+
+없다. Codex도 **G-01 → G-02 순서는 합리적**이라고 확인했고, F-R2가 추가한 G-07은 owner가 다르다. 그래서 이미 작성한 `GET /v1/adapters` HTTP 시험은 그대로 1순위로 올린다.
