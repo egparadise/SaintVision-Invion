@@ -781,6 +781,14 @@ class ModelVersionRegisterRequest(Strict):
     ``ABC...`` gets a request error at the boundary instead of a service error
     translated later. Both defences stay.
 
+    ``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted
+    and stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and
+    another model version's ``inv://`` address all persisted -- and the kernel
+    manifest's join key assumes the URI's version *is* the row's version. The
+    canonical address is fully determined by the model's name and the version, so
+    the server derives it instead of validating a string that has no reason to
+    vary.
+
     ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
     module docstring of ``api/v1/model_versions.py`` for why neither can be
     bound to the path's project on this branch.
@@ -788,7 +796,6 @@ class ModelVersionRegisterRequest(Strict):
 
     version: str = Field(min_length=1, max_length=64)
     content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
-    uri: str = Field(min_length=1, max_length=2048)
     byte_size: int = Field(default=0, ge=0, alias="byteSize")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
