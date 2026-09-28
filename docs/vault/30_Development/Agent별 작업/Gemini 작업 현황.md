@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.122"
+version: "1.0.123"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T10:20:00+09:00"
+updated: "2026-09-28T10:33:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,16 +19,18 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T10:20:00+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
+- 확인 기준: 2026-09-28T10:33:44+09:00 (작업 브랜치 `agent/gemini/s12-fe-matrix`).
 
-## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.0 수립 (`agent/gemini/s12-fe-matrix`)
+## 2026-09-28 S12-FE 내부망 HTTPS 웹 배포·운영자 교육 시나리오 매트릭스 v1.0.1 정정 (`agent/gemini/s12-fe-matrix`)
 
-- **작업 개요**: 코디네이터 지침, task-registry S12-FE(`OUT-12` / `AC-12`), Codex FE Review Map 33행 및 S12 파일럿 계획에 따라 `IntranetDeploymentView.tsx` 및 Nginx 리버스 프록시(`nginx.conf`), CI 컨테이너 검증 파이프라인(`tests/integration/test_web_container.py`) 기준의 정본 시나리오 매트릭스 v1.0.0 수립 완료.
-- **주요 규격 및 정직한 경계 (Zero Fake)**:
-  1. **Release Manifest 서버 계약 대조**: 백엔드 제어 평면(`services/control-plane`)에 배포 매니페스트 서빙 라우트가 전무함을 실측 확인하여 **"미연결 (서버 API 부재 · 클라이언트 정적 픽스처)"**로 명시.
-  2. **Web Smoke & Recovery 실측 체계**: Nginx TLS 1.3 Strict, HSTS, 정적 SPA immutable 캐싱, OAuth/PKCE 로그인, 401/404/503 오류 보존, 업스트림 중단 시 Fail-Closed(502/504) 및 재기동 후 200 복구를 Hosted CI 컨테이너 및 Vitest 단위 시험으로 매핑 (13개 시나리오).
-  3. **장비 의존 항목의 `BLOCKED_EXTERNAL` 격리**: 사내 물리 서버 실제 TLS/Nginx 배포, 5노드 물리 사내망 분산 환경(Win 3대 + Linux 2대), 운영 책임자 실물 인수 서명 및 GA 선언 3건을 외부 물리 인프라 의존(`BLOCKED_EXTERNAL`)으로 솔직히 표기.
-  4. **8대 제품 결함 백로그 (DEF-S12-01 ~ DEF-S12-08) 수록**: 모의 서명 후 '프로덕션 가동 승인 완료' 표기(DEF-01), '운영자 인수 완료 (docker compose up -d 가능)' 표기(DEF-02), 5노드 무조건 PASSED 및 모의 레이턴시(DEF-03), 하드코딩 202 Checks PASS(DEF-04), `actionNotice` Live Region 누락(DEF-05), 매니페스트 서버 API 미연결 고지 누락(DEF-06), 서명 백엔드 원장 미기록(DEF-07), 교육 4모듈 기본 completed 조기 표출(DEF-08) 식별.
+- **작업 개요**: Codex 계약 축 독립 검토 지적 5건(F-R1~F-R5)을 전수 반영하여 정본 시나리오 매트릭스를 v1.0.1로 갱신.
+- **주요 규격 및 정직한 경계 정정 (Zero Fake / Honest Boundary)**:
+  1. **F-R1 (TLS 협상 규격 정정)**: `nginx.conf` 설정(`ssl_protocols TLSv1.2 TLSv1.3;`) 및 시험에 정합하게 "TLS 1.2/1.3 협상"으로 바로잡고, 엄격한 TLS 1.3 단독 강제는 미측정(UNMEASURED)으로 분리.
+  2. **F-R2 (Transport Fixture 한계 명시)**: `test_web_container.py`의 업스트림이 실 Control Plane이 아닌 `tests/fixtures/nginx_transport.py` 전송 계층 픽스처임을 명시하고, SMK-05/RCV-01을 `MEASURED (transport fixture)`로 정정. 실제 Control Plane 401은 `test_studio_browser.py`의 PG+HTTP 레인으로 분리.
+  3. **F-R3 (RCV-03 제품 결속 분리)**: `DistributedRecoveryView.tsx`가 SSE를 구독하지 않는 인메모리 시뮬레이션임을 확인하여 UI 재연결/복구 조회를 `UNMEASURED / 미연결`로 분리하고, Nginx 비버퍼링 설정만 `MEASURED`로 한정.
+  4. **F-R4 (MAN-02 서명 가드 한정)**: `signOffRelease`가 접두사/문자열 휴리스틱임을 명시하여 `MEASURED (엔진 단위시험 한정)`로 표기하고, 실제 서버 인가(Authorization)는 `UNMEASURED / 미연결`로 규정.
+  5. **F-R5 (ADR-100 토폴로지 정합)**: 실재하지 않는 임의의 IP/GPU/OS 분기 표기를 전면 삭제하고, 정본 토폴로지 ADR-100(CP 호스트 겸임 Node 1 + 독립 Ubuntu Worker 4) 참조 및 `BLOCKED_EXTERNAL / 미측정`으로 정직 격리.
+  6. **3분류 상태 체계 통일**: 모든 시나리오 상태를 `MEASURED (fixture/합성)`, `UNMEASURED / 미연결`, `BLOCKED_EXTERNAL`로 엄격 정렬.
 - **산출 문서**: `docs/vault/30_Development/2026-09-28_S12-FE_내부망HTTPS_웹배포_운영인수_시나리오_매트릭스_Gemini.md`
 - **독립 검토 요청**: Claude (UI 경로 축), Codex (계약 축).
 
