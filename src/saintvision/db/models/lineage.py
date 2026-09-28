@@ -88,6 +88,15 @@ class DatasetVersion(Base):
         CheckConstraint(
             "content_sha256 = lower(content_sha256)", name="checksum_is_lowercase"
         ),
+        # Where the reverse lineage lookup starts (S10-DB query API). Declared so
+        # the model and the database agree; migration 0050 creates it
+        # CONCURRENTLY, and it is deliberately not unique -- the same bytes may be
+        # registered as more than one dataset version.
+        Index(
+            "ix_dataset_versions_tenant_id_content_sha256",
+            "tenant_id",
+            "content_sha256",
+        ),
     )
 
     dataset_version_id: Mapped[InvId] = mapped_column(primary_key=True)
