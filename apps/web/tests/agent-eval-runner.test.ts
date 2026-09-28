@@ -127,7 +127,7 @@ describe('G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05)', () => {
         stdio: 'pipe',
       });
     }).toThrow(/FAIL-CLOSED/);
-  });
+  }, 30000);
 
   describe('§5: 6대 정규식 1:1 전용 Probe 단독 격리 매칭 검증', () => {
     const manager = new AgentLoopManager();

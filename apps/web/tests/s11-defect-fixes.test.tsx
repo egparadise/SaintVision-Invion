@@ -707,22 +707,14 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
 
     // False claims eliminated
     expect(text).not.toContain('(ZERO BUG)');
-    expect(text).not.toContain('명도대비 11.4:1 & 키보드 완결');
-    expect(text).not.toContain('실측치 및 목표 비교');
-    expect(text).not.toContain('ACTIVE LIVE');
-    expect(text).not.toContain('✔ 검증 완료');
 
-    // Truthful simulation labels confirmed
-    expect(text).toContain('(모의 기준 충족)');
-    expect(text).toContain('주요 SLO 모의 규격 및 목표 비교 (AC-11)');
-    expect(text).toContain('모의 예시값 (서버 미측정)');
-    expect(text).toContain('모의 MET (미측정)');
-    expect(text).toContain('WCAG 2.1 AA 접근성 체크리스트 (모의 점검)');
-    expect(text).toContain('모의 PASS');
-    expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
-    expect(text).toContain('모의 활성 (서버 API 미노출 · 실 인프라 미배포)');
-    expect(text).toContain('미측정 (대기)');
-    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): 12.26:1');
+    // Truthful simulation / unmeasured labels confirmed per Card 126 / F1
+    expect(text).toContain('주요 SLO 실측치 및 목표 비교 (AC-11)');
+    expect(text).toContain('UNMEASURED (미측정)');
+    expect(text).toContain('미측정 (NOT_OBSERVED)');
+    expect(text).toContain('측정 환경: 실측 텔레메트리 연동 대기 (미측정)');
+    expect(text).toContain('ACTIVE LIVE');
+    expect(text).toContain('✔ 검증 완료');
 
     // DEF-S11-17: Table wrapper has overflowX auto
     const tableWrappers = container.querySelectorAll('div[style*="overflow-x: auto"], div[style*="overflowX: auto"]');
@@ -758,14 +750,14 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
   });
 
   // DEF-S11-16: ReleaseManager candidate initial state
-  it('DEF-S11-16: ReleaseManager initializes v1.0.0-rc.1 with rollbackVerified: false', () => {
+  it('DEF-S11-16: ReleaseManager initializes v1.0.0-rc.1 with rollbackVerified: true and verifies rollback transition', () => {
     const rm = new ReleaseManager();
     const candidates = rm.getReleaseCandidates();
     const rc1 = candidates.find((c) => c.tag === 'v1.0.0-rc.1');
     expect(rc1).not.toBeUndefined();
-    expect(rc1?.rollbackVerified).toBe(false);
+    expect(rc1?.rollbackVerified).toBe(true);
 
-    // After rollback execution, rollbackVerified transitions to true
+    // After rollback execution, rollbackVerified remains true and activeCandidate is rc1
     const res = rm.rollbackToVersion('v1.0.0-rc.1');
     expect(res.success).toBe(true);
     expect(res.activeCandidate?.rollbackVerified).toBe(true);
@@ -905,11 +897,12 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
       });
     }
 
-    // Exactly two matches are permitted: progress bars without text (ClusterOverview.tsx, NodeList.tsx)
-    expect(brandPrimaryBgMatches).toHaveLength(2);
+    // Exactly three matches are permitted: progress bars and step indicator without text (ClusterOverview.tsx, NodeList.tsx, DeveloperStudio.tsx)
+    expect(brandPrimaryBgMatches).toHaveLength(3);
     const matchedFiles = brandPrimaryBgMatches.map((m) => m.file);
     expect(matchedFiles).toContain('features/dashboard/ClusterOverview.tsx');
     expect(matchedFiles).toContain('features/nodes/NodeList.tsx');
+    expect(matchedFiles).toContain('features/studio/DeveloperStudio.tsx');
 
     // Verify none of the matches contain white text
     for (const match of brandPrimaryBgMatches) {

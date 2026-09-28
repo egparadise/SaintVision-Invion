@@ -45,7 +45,17 @@ export const ReleaseCandidateView: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div
+      style={{
+        padding: '24px',
+        maxWidth: activeDevice === 'mobile' ? '375px' : activeDevice === 'tablet' ? '768px' : '1400px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        transition: 'max-width 0.2s ease',
+      }}
+    >
       {/* Unexposed Release Notice Banner */}
       <div
         role="status"
@@ -254,11 +264,11 @@ export const ReleaseCandidateView: React.FC = () => {
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 700,
-                    backgroundColor: 'rgba(46, 160, 67, 0.2)',
-                    color: '#3fb950',
+                    backgroundColor: audit.status === 'pass' ? 'rgba(46, 160, 67, 0.2)' : 'rgba(248, 81, 73, 0.2)',
+                    color: audit.status === 'pass' ? '#3fb950' : '#f85149',
                   }}
                 >
-                  PASS
+                  {audit.status === 'pass' ? 'PASS' : 'FAIL'}
                 </span>
               </div>
             ))}
@@ -304,61 +314,68 @@ export const ReleaseCandidateView: React.FC = () => {
           </div>
         </div>
 
-        <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
-              <th style={{ padding: '8px' }}>Release Tag</th>
-              <th style={{ padding: '8px' }}>Build SHA</th>
-              <th style={{ padding: '8px' }}>SLO 달성률</th>
-              <th style={{ padding: '8px' }}>미완화 취약점</th>
-              <th style={{ padding: '8px' }}>롤백 검증</th>
-              <th style={{ padding: '8px' }}>활성 상태</th>
-              <th style={{ padding: '8px', textAlign: 'right' }}>액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {candidates.map((rc) => (
-              <tr key={rc.tag} style={{ borderBottom: '1px solid #21262d' }}>
-                <td style={{ padding: '10px 8px', fontWeight: 600, color: '#f0f6fc' }}>{rc.tag}</td>
-                <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
-                  <code>{rc.buildSha}</code>
-                </td>
-                <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
-                  {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
-                </td>
-                <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
-                  {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
-                    {rc.rollbackVerified ? '✔ 검증 완료' : '대기'}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span
-                    style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      backgroundColor: rc.isActive ? 'rgba(56, 139, 253, 0.2)' : 'rgba(139, 148, 158, 0.1)',
-                      color: rc.isActive ? '#58a6ff' : '#8b949e',
-                    }}
-                  >
-                    {rc.isActive ? 'ACTIVE LIVE' : 'STANDBY'}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right' }}>
-                  {!rc.isActive && (
-                    <Button size="sm" variant="secondary" onClick={() => handleRollback(rc.tag)}>
-                      이 버전으로 롤백 실행 (AC-11)
-                    </Button>
-                  )}
-                </td>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table data-testid="candidates-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#c9d1d9' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #30363d', textAlign: 'left', color: '#8b949e' }}>
+                <th style={{ padding: '8px' }}>Release Tag</th>
+                <th style={{ padding: '8px' }}>Build SHA</th>
+                <th style={{ padding: '8px' }}>SLO 달성률</th>
+                <th style={{ padding: '8px' }}>미완화 취약점</th>
+                <th style={{ padding: '8px' }}>롤백 검증</th>
+                <th style={{ padding: '8px' }}>활성 상태</th>
+                <th style={{ padding: '8px', textAlign: 'right' }}>액션</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {candidates.map((rc) => (
+                <tr key={rc.tag} style={{ borderBottom: '1px solid #21262d' }}>
+                  <td style={{ padding: '10px 8px', fontWeight: 600, color: '#f0f6fc' }}>{rc.tag}</td>
+                  <td style={{ padding: '10px 8px', fontFamily: 'var(--font-mono, monospace)' }}>
+                    <code>{rc.buildSha}</code>
+                  </td>
+                  <td style={{ padding: '10px 8px', color: rc.sloComplianceRate !== null ? '#3fb950' : '#8b949e' }}>
+                    {rc.sloComplianceRate !== null ? `${rc.sloComplianceRate}%` : '미측정 (NOT_OBSERVED)'}
+                  </td>
+                  <td style={{ padding: '10px 8px', color: rc.unresolvedVulnerabilities !== null ? '#f0f6fc' : '#8b949e' }}>
+                    {rc.unresolvedVulnerabilities !== null ? `${rc.unresolvedVulnerabilities} 건` : '미측정 (NOT_OBSERVED)'}
+                  </td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span style={{ color: rc.rollbackVerified ? '#3fb950' : '#8b949e' }}>
+                      {rc.rollbackVerified ? '✔ 검증 완료' : '대기'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 8px' }}>
+                    <span
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: rc.isActive ? 'rgba(56, 139, 253, 0.2)' : 'rgba(139, 148, 158, 0.1)',
+                        color: rc.isActive ? '#58a6ff' : '#8b949e',
+                      }}
+                    >
+                      {rc.isActive ? 'ACTIVE LIVE' : 'STANDBY'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                    {!rc.isActive && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleRollback(rc.tag)}
+                        aria-label={`이 버전(${rc.tag})으로 롤백 실행 (AC-11)`}
+                      >
+                        이 버전으로 롤백 실행 (AC-11)
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
