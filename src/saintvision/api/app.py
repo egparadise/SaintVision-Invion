@@ -22,6 +22,7 @@ from ..errors import PROBLEM_CONTENT_TYPE, VAL_SCHEMA, InvError
 from ..ids import is_trace_id, new_trace_id
 from ..identity.principal import PrincipalVerifier
 from ..services.audit import record_denial_out_of_band
+from .audit_action import audit_action
 from .v1 import adapters as adapters_router
 from .v1 import nodes as nodes_router
 from .v1 import pools as pools_router
@@ -116,7 +117,9 @@ def create_app(
                 now=now(),
                 actor_type=getattr(request.state, "actor_type", "anonymous"),
                 actor_id=getattr(request.state, "actor_id", None),
-                action=f"{request.method} {request.url.path}",
+                # Bounded and identifier-free: the raw path overflowed the
+                # 64-char column on long routes and turned a 401 into a 500.
+                action=audit_action(request),
                 outcome="deny",
                 tenant_id=getattr(request.state, "tenant_id", None),
                 reason_code=exc.code,
