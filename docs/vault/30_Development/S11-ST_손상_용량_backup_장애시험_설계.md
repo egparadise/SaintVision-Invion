@@ -119,7 +119,7 @@ hosted job은 label 또는 `workflow_dispatch` opt-in이며 job 수준 `cancel-i
 - criteria: 연속 주간 restore smoke ≥ 2주, smoke gap ≤ 7일, retention ≥ 35일, RPO ≤ 900초, RTO ≤ 3,600초, WAL archive failure ≥ 1, silent archive loss ≥ 1, retention interruption ≥ 1, fault 뒤 recovery pass ≥ 3, false PITR pass·retained-boundary deletion·cleanup residue 모두 0.
 - `pitr_readiness`, `pitr_opt_in_dry_run`, same-host `pitr_rehearsal.sh`, hosted MinIO/PG는 reference observation만 허용한다.
 
-두 target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 고정 commit/path/blob을 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
+두 target의 `sourceDocument`는 [[S11_ST_storage_failure_target_v0]]의 commit `2ac98cbec2873463f91561a20a706abeb0d776a5`, path `docs/vault/30_Development/S11_ST_storage_failure_target_v0.md`, blob `a9f5f950c14fd4b4d91f6647c5c8473a66e2c5af`를 가리킨다. 이 commit이 integration 조상으로 남도록 이 PR은 merge commit 방식(`--merge`)으로만 병합하고 squash·rebase 병합을 금지한다. envelope의 `targetRef`는 정본 registry commit/path/blob·targetId·criteria exact set을 사용한다. source document와 registry가 `sourceHeadSha`의 조상이 아니거나 source tree의 blob과 다르면 `INVALID_RUN`이다.
 
 ## 5. evidence와 fail-closed 판정
 
