@@ -5,7 +5,7 @@ version: "1.1.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T20:42:00+09:00"
+updated: "2026-09-28T20:38:03+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S11-BE", "S11-DB"]
