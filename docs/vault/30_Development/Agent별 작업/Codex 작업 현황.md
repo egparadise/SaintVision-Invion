@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.210"
+version: "1.0.211"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T12:10:00+09:00"
+updated: "2026-09-28T12:38:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -16,7 +16,7 @@ source_of_truth: "Git"
 - Claude r2에서 미사용 `SnapshotStore.restore`만 S3를 읽고 실제 `WorkspaceRecovery.restore`가 Local writer에 고정된 공백을 확인했다. 제품 restore와 checkout이 row provider를 registry에서 선택하도록 고치고 PG-free 선택 시험을 추가했으며, hosted 시험도 실제 `WorkspaceRecovery.restore`·receipt replay를 호출한다. `deploy/CONFIGURED-SERVER.md`에는 Local root 일치, legacy/new 동시 거부, worker mount, 전환 전 drain을 기록했다.
 - PR #149 위 stack에서 provider/locator migration, strict `configurationReadiness.objectStore`, worker/API 단일 설정 정본, 두 checkpoint 생산자 replay guard, provider-body Artifact download와 Local provider→DB lock order를 결속했다. 코드 head는 `51ffdc26`; 문서 head는 후속 커밋이다.
 - receipt body fallback은 제거했고 provider 부재는 `STORE-0001`/503으로 닫는다. S3 예약 local provider ID·endpoint path·unknown inner key·dual provider를 거부하며, 공개 route/schema의 objectId/locator 입력은 positional·keyword-only·Query alias까지 0건을 단언한다.
-- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, r2 설정/provider 26 passed/1 Windows symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. head `3cf7b33c` hosted는 S01 2+3·Backend·Docs·Frontend·Desktop green, Core pytest 3361/36/2/0이며 exact skip-map 1건에서만 red였다. `c556e99a`로 map을 맞췄고 제품 restore 보강 head의 최종 hosted 완주는 대기다. 로컬 실 PG·Docker는 실행하지 않았다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
+- PG-free focused 87 passed/3 명시 skip, 추가 경계 58 passed/1 symlink skip, r2 설정/provider 26 passed/1 Windows symlink skip, route coverage 40 passed, bindings/frontend/freshness/ontology/YAML/compile/diff exit 0이다. 최종 head `249b73e2`는 Core `36372821204`(3362 passed/36 skipped/2 deselected/0 failed, exact skip gate·Python build·Go·TS exit 0), Backend `36372821119`, Docs `36372821243`, Frontend `36372821191`, Desktop `36372821245`가 모두 success다. S01 job은 conformance 2건과 disposable MinIO·PostgreSQL 제품 경로 3건을 0 failure/error/skip으로 실행했다. 로컬 실 PG·Docker는 실행하지 않았고 Claude 최종 재검토·사용자 병합·운영 S3 인수는 별도다. [[2026-09-28_10-36-00_KST_S3_ObjectStore_제품결속_v2_Codex]].
 
 ## 2026-09-28 Card45 S3 ObjectStore 구현 1단계 — reviewer 인계
 
