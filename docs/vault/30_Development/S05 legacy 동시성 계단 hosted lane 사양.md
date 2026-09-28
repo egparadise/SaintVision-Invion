@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-LEGACY-STAIRCASE-LANE-SPEC-001"
 title: "S05 legacy 동시성 계단 hosted lane 사양"
-version: "1.2.0"
+version: "1.3.0"
 status: "hosted-measured-review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:40:00+09:00"
+updated: "2026-09-28T17:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -79,3 +79,5 @@ PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`의 run [363623865
 #115와 #141은 병합하지 않는다는 코디네이터 결정에 따라 integration `1e8baf04` 위에서 제품 semaphore 의존을 제거했다. 가져온 최소 benchmark 변경은 schema 1.7 report에 DB 이름 대신 SHA-256 fingerprint·비노출·일회용 lifecycle 3필드를 더한 것뿐이다. `db.py`, `placement.py`, public contract, migration, `tools/placement_benchmark.py`는 integration base와 동일하다.
 
 Card47 hosted run의 목적은 새 PR lane이 clean base에서도 같은 legacy 명령으로 실행된다는 **실행 호환성 확인**이다. `runPurpose=clean-integration-base-execution-compatibility`, `canonicalDecisionEvidenceRunId=36362386530`, `mayReplaceCanonicalDecision=false`를 JSON/JUnit에 고정한다. 새 수치로 위 §5의 정본 결론을 소급 변경하지 않는다.
+
+PR #151 clean-base run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477)은 9개 wave·aggregate JUnit을 success로 완료했다. 20/35/50 성공은 60/60·105/105·150/150, timeout 최대는 모두 0, P95 all 중앙은 665.154/1109.917/1558.406ms다. fingerprint 9개 유일·잔존 0이고 `semaphoreProductCodePresent=false`다. 이는 실행 호환성 확인일 뿐 §5 Card46 정본 수치와 직접 비교하거나 결론을 교체하지 않는다. artifact ID `10946163808`, 보존 JSON SHA-256 `1538dc3b303955f22f96f1cc7284df0822f2014b730eed8ad5ddaadd19f677c1`.

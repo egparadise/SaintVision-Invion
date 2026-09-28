@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.4.0"
+version: "1.5.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T17:40:00+09:00"
+updated: "2026-09-28T17:55:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -166,3 +166,5 @@ PR #148 측정 head `3a1790ff3431706e81a2ba258eb0b26ea456ed31`, hosted run [3636
 ## 7. Card47 clean-base 비준
 
 코디네이터 결정으로 #115·#141·#145·#148은 병합하지 않고 이 문서와 legacy lane만 integration base 위 새 PR로 재구성한다. 제품 semaphore 코드는 0줄 이식한다. benchmark에서 가져오는 최소 변경은 wave별 새 DB를 증명하는 redacted fingerprint 3필드뿐이며 schema 1.7·legacy 제품 경로는 유지한다. Card47 hosted run은 clean-base 실행 가능성만 확인하고 run `36362386530`의 결론과 수치를 소급 변경하지 않는다.
+
+PR #151 run [36363327477](https://github.com/egparadise/SaintVision-Invion/actions/runs/36363327477)은 clean-base에서 9개 wave와 aggregate JUnit을 success로 완료했다. JSON의 `mayReplaceCanonicalDecision=false` 경계를 지켰으며 이 결과는 위 Card46 결론을 재판정하지 않는다.
