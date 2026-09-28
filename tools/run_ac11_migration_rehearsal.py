@@ -392,10 +392,25 @@ def _validate_duplicate_fixture_failure(
         raise RehearsalError("0009 duplicate fixture did not roll back atomically")
 
 
+def _validate_0053_scoped_refusal(
+    result: subprocess.CompletedProcess[bytes],
+    *,
+    version: str | None,
+    project_id: str | None,
+) -> None:
+    if result.returncode == 0:
+        raise RehearsalError("0053 scoped-row fixture unexpectedly downgraded")
+    diagnostic = (result.stdout + result.stderr).decode("utf-8", errors="replace")
+    if "suite(s) belong to a project" not in diagnostic:
+        raise RehearsalError("0053 scoped-row fixture failed for an unexpected reason")
+    if version != "0053_eval_suite_project_scope" or project_id != "prj_ac11_scoped_refusal":
+        raise RehearsalError("0053 scoped-row refusal did not roll back atomically")
+
+
 def _negative_fixture_probes(
     admin_dsn: str, created: list[str], passed_cases: list[str]
 ) -> dict[str, Any]:
-    """Execute the three preregistered bad downgrades in owned disposable DBs."""
+    """Execute the four preregistered bad downgrades in owned disposable DBs."""
     cases: list[dict[str, Any]] = []
     fixture_heads = {
         "existing-object-deletion": textwrap.dedent(
@@ -532,6 +547,63 @@ def _negative_fixture_probes(
         )
         passed_cases.append("0009-duplicate-key")
         cases.append({"case": "0009-duplicate-key", "verdict": "EXPECTED_FINDING"})
+
+    scoped = _database_name("negative_0053")
+    _create_database(admin_dsn, scoped)
+    created.append(scoped)
+    _alembic_upgrade(admin_dsn, scoped, "head")
+    tenant_id = str(uuid4())
+    project_id = "prj_ac11_scoped_refusal"
+    with psycopg.connect(_db_conninfo(admin_dsn, scoped)) as conn:
+        conn.execute(
+            "INSERT INTO public.tenants(tenant_id,slug,display_name) VALUES(%s,%s,%s)",
+            (tenant_id, "ac11-scoped-refusal", "AC-11 scoped downgrade refusal"),
+        )
+        conn.execute(
+            "INSERT INTO public.projects(project_id,tenant_id,code,display_name) "
+            "VALUES(%s,%s,%s,%s)",
+            (project_id, tenant_id, "ac11-refusal", "AC-11 refusal project"),
+        )
+        conn.execute(
+            "INSERT INTO public.eval_suites"
+            "(suite_id,tenant_id,name,version,case_count,definition_sha256,project_id) "
+            "VALUES(%s,%s,%s,%s,0,%s,%s)",
+            (
+                "sui_ac11_scoped_refusal",
+                tenant_id,
+                "ac11-scoped-refusal",
+                "1",
+                "0" * 64,
+                project_id,
+            ),
+        )
+    env = dict(os.environ)
+    env["INV_MIGRATION_DSN"] = _sqlalchemy_url(admin_dsn, scoped)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "alembic",
+            "downgrade",
+            "0052_model_version_digest_scope",
+        ],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+    )
+    with psycopg.connect(_db_conninfo(admin_dsn, scoped)) as conn:
+        version_row = conn.execute("SELECT version_num FROM alembic_version").fetchone()
+        project_row = conn.execute(
+            "SELECT project_id FROM public.eval_suites WHERE suite_id=%s",
+            ("sui_ac11_scoped_refusal",),
+        ).fetchone()
+    _validate_0053_scoped_refusal(
+        result,
+        version=version_row[0] if version_row else None,
+        project_id=project_row[0].strip() if project_row else None,
+    )
+    passed_cases.append("0053-scoped-row-refusal")
+    cases.append({"case": "0053-scoped-row-refusal", "verdict": "EXPECTED_FINDING"})
 
     return {"passedCount": len(cases), "cases": cases}
 
@@ -781,13 +853,14 @@ def _junit_bytes(
         "existing-object-deletion",
         "0009-duplicate-key",
         "ellipsis-noop",
+        "0053-scoped-row-refusal",
     )
     missing_negative = [name for name in expected_negative if name not in negative_cases]
     failure_count = (0 if success else 1) + len(missing_negative)
     suite = ET.Element(
         "testsuite",
         name="s11-ac11-migration-rehearsal",
-        tests="6",
+        tests="7",
         failures=str(failure_count),
         errors="0",
         skipped="1" if reversible_tail == 0 else "0",
