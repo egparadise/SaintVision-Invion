@@ -213,12 +213,31 @@ def rls_db():
 
 @pytest.mark.postgres
 def test_real_pg_boundary_passes_and_records_kernel_denial(rls_db, tmp_path):
-    observation = tool.collect(rls_db["owner"], ("inv_app", "inv_kernel", "inv_runtime_dev"), rls_db["tenant_a"])
+    observation = tool.collect(
+        rls_db["owner"],
+        ("inv_app", "inv_kernel", "inv_runtime_dev", "inv_audit_writer", "inv_audit_reader"),
+        rls_db["tenant_a"],
+    )
     violations, accepted = tool.apply_baseline(tool.evaluate(observation), tool.load_baseline())
-    # Pinned gap at migration head 0046: public.audit_events is readable by inv_app without RLS.
-    # This assertion flips to [] once a migration scopes audit_events (Codex security review).
-    assert [(v["rule"], v["role"], v["table"]) for v in violations] == [("E2", "inv_app", "public.audit_events")]
+    # The audit_events gap that was pinned at head 0046 is closed by
+    # 0047_audit_events_isolation: inv_app has no SELECT on the table and RLS is
+    # enabled and forced, so no expectation applies to it for that role.
+    assert [(v["rule"], v["role"], v["table"]) for v in violations] == []
     assert {(a["role"], a["table"]) for a in accepted} == {("inv_app", "public.tenants")}
+    audit = observation["roles"]["inv_app"]["tables"]["public.audit_events"]
+    assert audit["rls_enabled"] and audit["rls_forced"]
+    assert audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
+    reader = observation["roles"]["inv_audit_reader"]
+    assert reader["present"] and not reader["superuser"] and not reader["bypassrls"] and not reader["login"]
+    reader_audit = reader["tables"]["public.audit_events"]
+    assert reader_audit["privileges"]["select"] == "table"
+    assert [p["cmd"] for p in reader_audit["policies"]] == ["SELECT"]
+    writer_audit = observation["roles"]["inv_audit_writer"]["tables"]["public.audit_events"]
+    assert writer_audit["privileges"] == {"select": None, "insert": "table", "update": None, "delete": None}
+    denial = [k for k in observation["definer_functions"] if k.startswith("public.record_auth_denial(")]
+    assert len(denial) == 1
+    assert observation["definer_functions"][denial[0]]["owner"] == "inv_audit_writer"
+    assert observation["definer_functions"][denial[0]]["execute_grants"] == ["inv_app"]
     app = observation["roles"]["inv_app"]
     assert app["present"] and not app["superuser"] and not app["bypassrls"]
     projects = app["tables"]["public.projects"]
@@ -306,7 +325,7 @@ def test_real_pg_negative_control_unscoped_table_is_reported_then_clears(rls_db)
             conn.execute("DROP TABLE public.rls_probe_colpriv")
             conn.execute("DROP TABLE public.rls_probe_swap")
     after, _ = tool.apply_baseline(tool.evaluate(tool.collect(rls_db["owner"], ("inv_app",), rls_db["tenant_a"])), tool.load_baseline())
-    assert [v["table"] for v in after] == ["public.audit_events"]
+    assert [v["table"] for v in after] == []
 
 
 @pytest.mark.postgres
@@ -315,10 +334,10 @@ def test_real_pg_cli_exit_codes(rls_db, tmp_path):
     result = subprocess.run([sys.executable, str(ROOT / "tools/collect_rls_evidence.py"), "--out-dir", str(tmp_path),
                              "--label", "cli", "--roles", "inv_app,inv_kernel"], cwd=ROOT, env=env,
                             capture_output=True, text=True)
-    # exit 1 while the audit_events gap is open at head; the CLI must still write both files
-    assert result.returncode == 1, result.stdout[-500:]
-    assert result.stdout.startswith("VIOLATIONS 1: roles=2") and "unmeasured=" in result.stdout
-    assert "E2 inv_app public.audit_events" in result.stdout
+    # exit 0 since 0047 closed the audit_events gap; the CLI still writes both files
+    assert result.returncode == 0, result.stdout[-500:]
+    assert result.stdout.startswith("PASS: roles=2") and "unmeasured=" in result.stdout
+    assert "audit_events" not in result.stdout
     assert (tmp_path / "cli.json").exists() and (tmp_path / "cli.md").exists()
     assert rls_db["owner"] not in (tmp_path / "cli.json").read_text(encoding="utf-8")
     bad = subprocess.run([sys.executable, str(ROOT / "tools/collect_rls_evidence.py"), "--dsn",

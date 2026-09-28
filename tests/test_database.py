@@ -169,13 +169,16 @@ def test_app_role_cannot_delete_audit_events(app_sessionmaker, two_tenants):
     tenant_a, _ = two_tenants
     with app_sessionmaker() as session:
         with session.begin():
-            session.execute(
-                text(
-                    "INSERT INTO audit_events (event_id, occurred_at, tenant_id, actor_type, "
-                    "action, outcome, detail) VALUES (:i, now(), :t, 'system', 'x', 'allow', '{}')"
-                ),
-                {"i": new_id("audit_event"), "t": tenant_a},
-            )
+            # Since 0047 the row also has to satisfy the tenant policy, so the
+            # scope is set here; the DELETE below is still refused on privilege.
+            with tenant_scope(session, tenant_a):
+                session.execute(
+                    text(
+                        "INSERT INTO audit_events (event_id, occurred_at, tenant_id, actor_type, "
+                        "action, outcome, detail) VALUES (:i, now(), :t, 'system', 'x', 'allow', '{}')"
+                    ),
+                    {"i": new_id("audit_event"), "t": tenant_a},
+                )
     with app_sessionmaker() as session:
         with pytest.raises((ProgrammingError, DBAPIError)):
             with session.begin():
