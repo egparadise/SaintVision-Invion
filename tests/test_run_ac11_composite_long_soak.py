@@ -9,6 +9,7 @@ from xml.etree import ElementTree
 
 import pytest
 
+from tools.aggregate_ac11_evidence import Verdict, evaluate_axis
 from tools.import_ac11_composite_long_soak import (
     CASE_IDENTITIES,
     EvidenceImportError,
@@ -193,8 +194,23 @@ def test_dry_run_traverses_exact_cases_but_imports_as_not_observed() -> None:
     assert envelope["verdict"] == "NOT_OBSERVED"
     assert envelope["referenceOnly"] is True
     assert envelope["acceptanceClaim"] is False
+    assert envelope["cleanup"] == {
+        "residueCount": 0,
+        "observed": False,
+        "physicalResidueCount": None,
+    }
     assert "reference-only" in envelope["reason"]
     assert "targetRef" not in envelope
+
+    result = evaluate_axis(
+        envelope,
+        FakeGit(),
+        {},
+        datetime(2026, 9, 29, 0, 1, tzinfo=timezone.utc),
+    )
+    assert result.verdict is Verdict.NOT_OBSERVED
+    assert result.reference_only is False
+    assert result.reasons == ()
 
 
 @pytest.mark.parametrize(

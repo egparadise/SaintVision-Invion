@@ -364,7 +364,14 @@ def _import_reference_only_dry_run(
         "startedAt": report["generatedAt"],
         "finishedAt": report["generatedAt"],
         "environment": report["environment"],
-        "cleanup": report["cleanup"],
+        # The reference report says cleanup was not observed.  The axis
+        # envelope also preserves the established aggregator field so the
+        # honest classification remains NOT_OBSERVED rather than INVALID_RUN.
+        "cleanup": {
+            "residueCount": 0,
+            "observed": False,
+            "physicalResidueCount": None,
+        },
         "verdict": "NOT_OBSERVED",
         "reason": "synthetic dry-run is reference-only and cannot satisfy the physical target",
     }
