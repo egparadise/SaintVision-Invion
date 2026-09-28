@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.35"
+version: "1.2.36"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T12:20:45+09:00"
+updated: "2026-09-28T12:45:57+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S10-DB dataset digest 인덱스 migration 카드 be-분리 (Claude, 2026-09-28, base `agent/claude/s10-be-mlflow-mirror-impl`, branch `agent/claude/s10-lineage-digest-index`): 설계 #158 v1.2 §7의 인덱스 하나를 `0050_dataset_digest_lookup`(`down_revision="0049_mlflow_mirror"`)로 올린다. 같이 온 것: `DatasetVersion`의 인덱스 선언(모델과 DB가 어긋나면 안 된다), CONCURRENTLY 구조를 읽는 PG-free 시험 3건, 설계 §10-35(계획 관측)·§10-36(재시도) 실 PG 2 node. **분리 사유**: 코디네이터가 고정한 순서(`0047` #128 → `0048` #159 → `0049` #172 → `0050`)상 이 migration은 #172 위여야 하는데 #172가 수정 요청 상태이고, lineage 조회 PR은 공유 `api/problem.py` 때문에 #167 위에 있다. 한 PR에 담으면 승인된 #167 작업이 수정 중인 #172에 묶인다. 설계 §7의 요구는 **병합 순서**로 지킨다 — `#159 → #172 → 이 PR → 조회 PR`이고, 조회 PR이 먼저 병합되면 역조회 1단계가 전체 스캔이 된다. 순서를 코드로 강제할 수 없다는 것도 문서에 적었다. 선행 `DROP INDEX CONCURRENTLY IF EXISTS`가 핵심이다 — 실패한 concurrent build의 INVALID index는 계획에 쓰이지 않으면서 이름을 점유하므로 치우지 않으면 재시도가 성공하지 못한다. 저장소 첫 CONCURRENTLY migration이다. **재현하지 못한 것**: 진짜 INVALID index(동시 build를 죽여야 생김)는 만들지 못했고 재현한 것은 이름 점유 상태다. 계획 관측은 성능 단언이 아니다(`enable_seqscan=off`는 금지가 아니라 비용 가중). 검증: `pytest tests/core -q` **1035 passed / 4 skipped**, 신규 `tests/core/test_dataset_digest_index_migration.py` **3 passed**, `migration_graph` head `0050` reversible·safe downgrade `0049`, docs gate 2종 exit 0. 실 PG 2 node는 로컬 `INV_TEST_ADMIN_DSN` 부재로 skip이고 근거는 hosted Backend다. **보고**: #172의 `0049_mlflow_mirror`가 아직 `down_revision="0046"`이라 #128·#159가 먼저 들어가면 head가 둘(`0048`·`0050`)이 된다 — 고정 순서대로 단일 head를 유지하려면 #172가 `0049`를 `0048_object_store_locator` 위로 옮겨야 하고 내 카드로는 닫을 수 없다. 다음 첫 행동: Codex 독립 검토, 그리고 #159·#172 정리 뒤 이 PR을 조회 PR보다 먼저 병합. 전문 [[2026-09-28_S10-DB_dataset_digest_인덱스_migration_Claude]].
 
 ### 2026-09-28 카드 bg · S10-BE MLflow 미러 구현 1단계 (branch agent/claude/s10-be-mlflow-mirror-impl, base 1e8baf04)
 
