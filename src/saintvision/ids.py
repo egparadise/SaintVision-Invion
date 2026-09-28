@@ -84,6 +84,7 @@ PREFIXES: Final[dict[str, str]] = {
     "mirror_intent": "mmi",
     "mirror_attempt": "mma",
     "mirror_defect": "mmd",
+    "service_credential_grant": "scg",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")

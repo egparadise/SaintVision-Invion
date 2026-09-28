@@ -44,6 +44,11 @@ from .evaluation import (
     EvalRun,
     EvalSuite,
 )
+from .service_credentials import (
+    SERVICE_CREDENTIAL_PURPOSES,
+    ServiceCredentialGrant,
+    ServiceCredentialVersion,
+)
 from .tracking import (
     MIRROR_ATTEMPT_STATUSES,
     MIRROR_DEFECT_REASONS,
@@ -197,6 +202,8 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "mlflow_mirror_intents",
     "mlflow_mirror_attempts",
     "mlflow_mirror_defects",
+    "service_credential_versions",
+    "service_credential_grants",
     # S12
     "backup_records",
     "recovery_drills",
@@ -340,6 +347,9 @@ __all__ = [
     "MlflowMirrorAttempt",
     "MlflowMirrorDefect",
     "MlflowMirrorIntent",
+    "SERVICE_CREDENTIAL_PURPOSES",
+    "ServiceCredentialGrant",
+    "ServiceCredentialVersion",
     "MAX_ARTIFACT_BYTES",
     "OUTBOX_STATUSES",
     "OutboxEvent",

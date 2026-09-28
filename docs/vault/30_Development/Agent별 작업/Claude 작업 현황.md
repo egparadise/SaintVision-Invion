@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.38"
+version: "1.2.40"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T12:55:53+09:00"
+updated: "2026-09-28T13:27:20+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,11 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+### 2026-09-28 카드 bh · S10-BE MLflow 미러 2단계 (branch agent/claude/s10-be-mlflow-mirror-p2, base #172 41256e4f)
+
+- `adapters/mlflow_sink.py`(실 REST sink) · 0051 service credential + `tracking/service_credentials.py` · worker 경로 `resolve_sink`/`deliver_outbox_event` · backend.yml `mlflow-live` opt-in job · 시험 PG-free 20 / 실 PG 24 / live 3. Codex 1차(v1.2): 완료 marker 마지막+부분 쓰기 resume(승격 금지), revoke/disable 단방향 trigger, /version plain text, head pin 0051, hosted 27 실패 분류(pin 23/#172 2/자체 1/#174 1). 상세: [[2026-09-28_13-03-45_KST_S10-BE_MLflow_미러_구현_2단계_Claude]]
+S10-DB dataset digest 인덱스 migration 카드 be-분리 (Claude, 2026-09-28, base `agent/claude/s10-be-mlflow-mirror-impl`, branch `agent/claude/s10-lineage-digest-index`): 설계 #158 v1.2 §7의 인덱스 하나를 `0050_dataset_digest_lookup`(`down_revision="0049_mlflow_mirror"`)로 올린다. 같이 온 것: `DatasetVersion`의 인덱스 선언(모델과 DB가 어긋나면 안 된다), CONCURRENTLY 구조를 읽는 PG-free 시험 3건, 설계 §10-35(계획 관측)·§10-36(재시도) 실 PG 2 node. **분리 사유**: 코디네이터가 고정한 순서(`0047` #128 → `0048` #159 → `0049` #172 → `0050`)상 이 migration은 #172 위여야 하는데 #172가 수정 요청 상태이고, lineage 조회 PR은 공유 `api/problem.py` 때문에 #167 위에 있다. 한 PR에 담으면 승인된 #167 작업이 수정 중인 #172에 묶인다. 설계 §7의 요구는 **병합 순서**로 지킨다 — `#159 → #172 → 이 PR → 조회 PR`이고, 조회 PR이 먼저 병합되면 역조회 1단계가 전체 스캔이 된다. 순서를 코드로 강제할 수 없다는 것도 문서에 적었다. 선행 `DROP INDEX CONCURRENTLY IF EXISTS`가 핵심이다 — 실패한 concurrent build의 INVALID index는 계획에 쓰이지 않으면서 이름을 점유하므로 치우지 않으면 재시도가 성공하지 못한다. 저장소 첫 CONCURRENTLY migration이다. **재현하지 못한 것**: 진짜 INVALID index(동시 build를 죽여야 생김)는 만들지 못했고 재현한 것은 이름 점유 상태다. 계획 관측은 성능 단언이 아니다(`enable_seqscan=off`는 금지가 아니라 비용 가중). 검증: `pytest tests/core -q` **1035 passed / 4 skipped**, 신규 `tests/core/test_dataset_digest_index_migration.py` **3 passed**, `migration_graph` head `0050` reversible·safe downgrade `0049`, docs gate 2종 exit 0. 실 PG 2 node는 로컬 `INV_TEST_ADMIN_DSN` 부재로 skip이고 근거는 hosted Backend다. **그 보고는 철회한다**: v1.0에서 "#172의 `0049`가 `0046` 위"라고 적었는데 `faa2e470`에서 이미 `0048_object_store_locator`로 정정됐다. 그 head를 force 없이 merge해 이 브랜치에 `0047 → 0048 → 0049 → 0050` 전체 사슬이 있고 `migration_graph` head는 하나(`0050`)다. **Codex 검토 3건 반영(12:55)**: ①실 PG 재시도 node가 renumber 이전 경로(`0047_dataset_digest_lookup.py`)를 읽어 수집 후 `FileNotFoundError`였다 — 재시도·downgrade 검증이 **한 번도 실행되지 않았다**. `0050`으로 고치고 `path.exists()` 단언을 넣고, **경로는 DB 없이 확인할 수 있으므로** core 시험이 그 파일의 `migrations/versions/*.py` 참조가 전부 존재하는지 단언한다. ②stack base가 `44654021`이어서 PR이 CONFLICTING이고 hosted check가 0건이었다 — force 없이 #172 현재 head `faa2e470`을 merge했고, 그 head가 이미 #159를 품고 있어 이제 `0047 → 0048 → 0049 → 0050` 전체 사슬과 단일 head(`0050`)가 이 브랜치에 있다. ③내가 보고한 "#172의 `0049`가 `0046` 위"는 `faa2e470`에서 이미 정정됐으므로 **철회한다**(`44654021` 시점에는 참이었다). 로컬 skip은 실행이 아니라는 지적대로 새 head의 hosted Backend run ID·수치를 제시한다. 다음 첫 행동: hosted 결과를 PR에 적고 Codex 재검토, 병합은 조회 PR(#175)보다 먼저. 전문 [[2026-09-28_S10-DB_dataset_digest_인덱스_migration_Claude]].
 
 ### 2026-09-28 카드 bg · S10-BE MLflow 미러 구현 1단계 (branch agent/claude/s10-be-mlflow-mirror-impl, base 1e8baf04)
 
