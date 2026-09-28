@@ -473,6 +473,24 @@ def test_empty_n_and_bad_failure_denominator_are_invalid(allowlist):
     assert axis_result(mismatch, allowlist).verdict is tool.Verdict.INVALID_RUN
 
 
+def test_zero_expected_count_value_must_equal_failure_count(allowlist):
+    value = envelope(tool.REQUIRED_AXES[1], "MEASURED_PASS")
+    value["targetRef"] = target(
+        tool.REQUIRED_AXES[1],
+        {"cleanupResidueCount": {"operator": "eq", "value": 0}},
+    )
+    value["observations"][0].update(
+        metric="cleanupResidueCount",
+        value=0,
+        n=1,
+        successCount=0,
+        failureCount=1,
+        skipCount=0,
+        errorsByClass={"residue": 1},
+    )
+    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+
 def test_target_violation_is_fail_but_false_pass_is_invalid(allowlist):
     value = envelope(tool.REQUIRED_AXES[1], "MEASURED_FAIL")
     value["observations"][0]["value"] = 0
