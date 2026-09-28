@@ -153,4 +153,3 @@ storage observations는 최소 아래를 포함한다.
 - PG-free/hosted/실장비 실행: `NOT_OBSERVED`.
 - 공개 계약·migration 변경: 없음.
 - S11-ST registry 상태 변경: 없음(`planned` 유지).
-
