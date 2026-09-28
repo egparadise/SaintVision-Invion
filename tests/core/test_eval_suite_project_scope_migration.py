@@ -133,7 +133,8 @@ def test_the_graph_has_one_head_and_it_is_this_revision():
         capture_output=True, text=True, cwd=root,
     )
     assert head.returncode == 0, head.stderr
-    assert head.stdout.strip() == "0053_eval_suite_project_scope"
+    # 0054 (W3 measurement seam) sits above this revision now; the graph still has one head.
+    assert head.stdout.strip() == "0054_model_version_measurements"
 
 
 # ---------------------------------------------------------------- upgrade paths
