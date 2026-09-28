@@ -240,7 +240,7 @@ def test_release_ends_within_the_budget_when_the_version_row_is_held(owner_engin
         client = _client(app_engine, tenant_id=tenant, user_id=seeded["user_id"], observation=observation)
         response, elapsed = _within_deadline(lambda: client.post(
             f"/v1/projects/{seeded['project_id']}/models/{seeded['model_id']}/versions/1.0.0/release",
-            json=DECLARATION, headers={"Content-Type": "application/json"},
+            json=DECLARATION, headers={"Idempotency-Key": "k-rel", "Content-Type": "application/json"},
         ))
     finally:
         held.close()
@@ -365,7 +365,7 @@ def test_f1_release_ends_within_the_budget_when_the_callers_user_row_is_held_and
         client.app.state.model_commitment_fetcher = fetch
         response, elapsed = _within_deadline(lambda: client.post(
             f"/v1/projects/{seeded['project_id']}/models/{seeded['model_id']}/versions/1.0.0/release",
-            json=DECLARATION, headers={"Content-Type": "application/json"},
+            json=DECLARATION, headers={"Idempotency-Key": "k-rel", "Content-Type": "application/json"},
         ))
     finally:
         held.close()

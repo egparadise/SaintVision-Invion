@@ -44,6 +44,36 @@ call the kernel's observation object in-process and skip HTTP; that would mean
 reaching into kernel-owned code and rebuilding its identity object, so the
 kernel's own authorisation would no longer be the single gate on the
 observation.
+
+**Idempotency (card 113, Codex #219 r4 F1).** A release moves ``stage`` and
+enqueues a mirror intent (``release_mirror_payload``), so a retry after a lost
+response used to release twice and mirror twice. This route now carries the
+lane's write contract, the one W2 (``model_versions``) and W4
+(``model_retention``) already carry, with the same helpers and nothing new:
+
+* ``Idempotency-Key`` is **required** (IDEM-1) and checked after the
+  permission preflight (a non-member learns nothing from how the key is
+  judged) and before the body is read;
+* the ledger payload is ``{modelId, version, request}`` -- the path is part of
+  what the key identifies -- and its canonical hash is what a replay is
+  compared against (``deps.request_digest``);
+* inside the one write transaction and **before any resource row**: the
+  advisory serialisation point (``serialise_idempotent_write``, IDEM-6), the
+  live approval grade, the clock read once, then ``replay_or_reserve``: the
+  same key with the same payload **replays the stored response** and locks no
+  row, the same key with a different payload is ``GRAPH-0002/409``;
+* the response is stored (``store_idempotent_response``) in the same
+  transaction as the stage write, the mirror intent and the audit row, so a
+  crash between them leaves none of them.
+
+The kernel observation is still fetched between the two spans, with no
+transaction open. A replay therefore still performs that read-only GET before
+it finds the stored answer; the write side is what the ledger protects, and
+keeping the observation outside every transaction (the reason this route has
+two spans) mattered more than skipping one GET. A version that is already
+``released`` is refused ``GRAPH-0002/409`` under a *different* key rather than
+released again: a second stage write and a second mirror intent are the very
+side effects this contract exists to prevent.
 """
 
 from __future__ import annotations
@@ -56,7 +86,7 @@ import urllib.request
 import uuid
 from typing import Any, Mapping
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Header, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
@@ -68,13 +98,19 @@ from ...adapters.model_import import (
 )
 from ...db.models.lineage import Model, ModelVersion
 from ...db.session import make_session_factory, tenant_scope
-from ...errors import AUTH_PROJECT_SCOPE, VAL_SCHEMA, InvError
+from ...errors import AUTH_PROJECT_SCOPE, GRAPH_IDEMPOTENCY_CONFLICT, VAL_SCHEMA, InvError
 from ...identity.principal import Principal
 from ...services import projects as project_service
 from ...services.audit import record_event
 from ...services.lineage import release_model_version, trace_model
 from .. import schemas
-from ..deps import get_now, get_principal, get_settings
+from ..deps import (
+    get_principal,
+    get_settings,
+    replay_or_reserve,
+    serialise_idempotent_write,
+    store_idempotent_response,
+)
 from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
@@ -87,6 +123,7 @@ from ..problem import (
     translate,
     validate_strict,
 )
+from .model_versions import _require_idempotency_key
 
 #: The declaration fields compared against the manifest. Kept beside the route
 #: so the request model, the comparison and the audit record cannot disagree.
@@ -104,7 +141,12 @@ TRANSLATION: Mapping[str, tuple[str, int, bool]] = {
     VAL_SCHEMA: (GRAPH_PRECONDITION, 409, False),
     AUTH_PROJECT_SCOPE: (AUTH_PROJECT, 403, False),
     MODEL_IMPORT_DECLARATION_MISMATCH: ("MODEL-0009", 409, False),
+    GRAPH_IDEMPOTENCY_CONFLICT: (GRAPH_PRECONDITION, 409, False),
 }
+
+#: The idempotency ledger's ``endpoint`` for this route (IDEM-2): a constant, so
+#: a renamed path cannot silently start a new key space.
+ENDPOINT = "POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/release"
 
 #: How long the kernel observation fetch may take. A business request that hangs
 #: on the kernel is worse than one that refuses: the caller can retry a 503.
@@ -352,10 +394,10 @@ async def release_model(
     version: str,
     request: Request,
     principal: Principal = Depends(get_principal),
-    now: dt.datetime = Depends(get_now),
     settings: Settings = Depends(get_settings),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Any:
-    """Compare the importer's declaration with the manifest, then release.
+    """Compare the importer's declaration with the manifest, then release, once per key.
 
     The body is read and parsed here rather than declared as a parameter:
     FastAPI validates a declared model before the handler runs, and its
@@ -368,7 +410,28 @@ async def release_model(
     call must happen with no transaction open, so the work is three spans:
     permission, then HTTP, then one atomic transaction that re-checks the
     permission it no longer holds.
+
+    The clock is read once, after the serialisation point and the live
+    permission (Codex #191 F3 / #196 F2 precedent): the ledger's ``expires_at``,
+    the audit row and ``released_at`` all carry the instant the work was done,
+    not the instant the request arrived.
     """
+    factory = make_session_factory(request.app.state.engine)
+
+    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
+    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
+    # (1) Permission, in its own short transaction, so nothing is held open
+    # across the body or the network call that follow.
+    with factory() as session:
+        with session.begin():
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
+                _require_approval(session, principal=principal, project_id=project_id)
+
+    # The key before the body (IDEM-1, W4's order): a request that cannot be
+    # retried safely is refused before anything is read from it.
+    key = _require_idempotency_key(idempotency_key)
     payload = strict_json_object(
         await read_bounded_body(request),
         content_type=request.headers.get("content-type"),
@@ -376,33 +439,52 @@ async def release_model(
     )
     proposal = validate_strict(schemas.ModelReleaseRequest, payload)
     declared = proposal.model_dump(by_alias=True)
-
-    factory = make_session_factory(request.app.state.engine)
-
-    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
-    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
-    # (1) Permission, in its own short transaction, so nothing is held open
-    # across the network call that follows.
-    with factory() as session:
-        with session.begin():
-            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
-                session, timeout_ms=settings.business_lock_timeout_ms
-            ):
-                _require_approval(session, principal=principal, project_id=project_id)
+    # The path is part of what the key identifies: the same key for another
+    # version is a conflict, not a replay of the first version's answer.
+    ledger_payload = {"modelId": model_id, "version": version, "request": declared}
 
     # (2) The observation, with no transaction open.
     observation = await _observation(
         request, project_id=project_id, model_id=model_id, version=version
     )
 
-    # (3) One atomic transaction: re-check, bind, compare, release, audit. The
-    # row lock below waits at most the lane's budget (card 84).
+    # (3) One atomic transaction, in the lane's lock order: serialisation
+    # point, live permission, clock, ledger, parent read, row lock, live
+    # permission again, compare, release, audit, ledger row. The waits are
+    # bounded by the lane's budget (card 84).
     with factory() as session:
         with session.begin():
             with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
                 session, timeout_ms=settings.business_lock_timeout_ms
             ):
+                serialise_idempotent_write(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    endpoint=ENDPOINT,
+                    idempotency_key=key,
+                    project_id=project_id,
+                )
                 _require_approval(session, principal=principal, project_id=project_id)
+                now: dt.datetime = request.app.state.clock()
+                try:
+                    replayed = replay_or_reserve(
+                        session,
+                        principal=principal,
+                        endpoint=ENDPOINT,
+                        idempotency_key=key,
+                        payload=ledger_payload,
+                        now=now,
+                        ttl_seconds=settings.idempotency_ttl_seconds,
+                        project_id=project_id,
+                    )
+                except InvError as error:
+                    raise translate(
+                        error,
+                        table=TRANSLATION,
+                        detail="That idempotency key was used with a different request.",
+                    ) from None
+                if replayed is not None:
+                    return replayed
                 row = _locked_version(
                     session,
                     tenant_id=principal.tenant_id,
@@ -416,6 +498,17 @@ async def release_model(
                     model_id=model_id,
                     version=row.version,
                 )
+                # Re-checked after the lock: a revocation during the wait must
+                # not release anything.
+                _require_approval(session, principal=principal, project_id=project_id)
+                if row.stage == "released":
+                    # Under a different key. The same key replayed above. A
+                    # second release would write the stage again and enqueue a
+                    # second mirror intent -- the duplicate this contract exists
+                    # to prevent -- so it is a precondition failure, not a no-op.
+                    raise CanonicalProblem(
+                        GRAPH_PRECONDITION, 409, "The model version is already released."
+                    )
                 _require_release_preconditions(session, row)
                 manifest = {field: observation[field] for field in DECLARED}
                 try:
@@ -453,11 +546,23 @@ async def release_model(
                         "declarationFields": list(DECLARED),
                     },
                 )
-                result = schemas.ModelReleaseResponse(
+                body = schemas.ModelReleaseResponse(
                     modelVersionId=released.model_version_id,
                     modelId=released.model_id,
                     version=released.version,
                     stage="released",
                     contentSha256=released.content_sha256,
+                ).model_dump(by_alias=True, mode="json")
+                store_idempotent_response(
+                    session,
+                    principal=principal,
+                    endpoint=ENDPOINT,
+                    idempotency_key=key,
+                    payload=ledger_payload,
+                    response_status=200,
+                    response_body=body,
+                    now=now,
+                    ttl_seconds=settings.idempotency_ttl_seconds,
+                    project_id=project_id,
                 )
-    return result
+    return body

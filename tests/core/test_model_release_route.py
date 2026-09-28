@@ -42,7 +42,7 @@ from saintvision.api.problem import (
 )
 from saintvision.api.v1 import model_release
 from saintvision.config import Settings
-from saintvision.errors import AUTH_PROJECT_SCOPE, VAL_SCHEMA, InvError
+from saintvision.errors import AUTH_PROJECT_SCOPE, GRAPH_IDEMPOTENCY_CONFLICT, VAL_SCHEMA, InvError
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
 
 TENANT = uuid.UUID("11111111-1111-1111-1111-111111111111")
@@ -55,9 +55,11 @@ VERSION = "1.4.0"
 SHA = "a" * 64
 DECLARATION = {"licensePolicy": "internal-only-eula-2026", "classification": "restricted"}
 PATH = f"/v1/projects/{PROJECT}/models/{MODEL}/versions/{VERSION}/release"
-AUTH = {"Authorization": "Bearer release-token"}
-
-
+KEY = "release-key-01"
+#: Every request carries the key (card 113, IDEM-1); the tests that take it
+#: away are the ones about the key.
+AUTH = {"Authorization": "Bearer release-token", "Idempotency-Key": KEY}
+NOW = dt.datetime(2026, 9, 28, 6, 0, tzinfo=dt.timezone.utc)
 def observation(**overrides):
     body = {
         "projectId": PROJECT,
@@ -120,12 +122,12 @@ class Session:
         return None
 
     def get(self, _model, _key, **_kwargs):
+        self.world.setdefault("log", []).append("parent-get")
         return self.world["parent"]
 
     def scalars(self, _statement):
+        self.world.setdefault("log", []).append("version-lock")
         return Scalars(self.world["row"])
-
-
 class Factory:
     """A session factory that records transaction spans.
 
@@ -168,9 +170,39 @@ def build(monkeypatch, world, *, kernel_base_url="http://kernel.invalid"):
     world.setdefault("permission", {"canRequest": True, "canApprove": True})
     world.setdefault("audits", [])
     world.setdefault("released", [])
-
+    # Card 113: the idempotency contract, stubbed at the same seam W4's tests use.
+    world.setdefault("log", [])
+    world.setdefault("locks", [])
+    world.setdefault("ledger_reads", [])
+    world.setdefault("stored", [])
+    world.setdefault("replay", None)
+    world.setdefault("replay_error", None)
+    world.setdefault("clock", NOW)
+    world.setdefault("clock_reads", [])
     factory = Factory(world)
     monkeypatch.setattr(model_release, "make_session_factory", lambda _engine: factory)
+
+    def serialise_idempotent_write(_session, **kwargs):
+        world["log"].append("advisory-lock")
+        world["locks"].append(kwargs)
+        return 0
+
+    monkeypatch.setattr(model_release, "serialise_idempotent_write", serialise_idempotent_write)
+
+    def replay_or_reserve(_session, **kwargs):
+        world["log"].append("ledger-read")
+        world["ledger_reads"].append(kwargs)
+        if world["replay_error"] is not None:
+            raise world["replay_error"]
+        return world["replay"]
+
+    monkeypatch.setattr(model_release, "replay_or_reserve", replay_or_reserve)
+
+    def store_idempotent_response(_session, **kwargs):
+        world["log"].append("ledger-write")
+        world["stored"].append(kwargs)
+
+    monkeypatch.setattr(model_release, "store_idempotent_response", store_idempotent_response)
     # The shared denial recorder writes through the app's engine, which these
     # tests do not have; recorded here so a 403's audit call is asserted, not lost.
     from saintvision.api import app as app_module
@@ -185,11 +217,16 @@ def build(monkeypatch, world, *, kernel_base_url="http://kernel.invalid"):
     )
 
     def require_project_access(_session, *, tenant_id, project_id, user_id):
+        world["log"].append("permission")
         denial = world.get("denial")
         if denial is not None:
             raise denial
+        grants = world.get("permissions")
+        if grants:
+            index = min(world.setdefault("permission_calls", 0), len(grants) - 1)
+            world["permission_calls"] += 1
+            return grants[index]
         return world["permission"]
-
     monkeypatch.setattr(
         model_release.project_service, "require_project_access", require_project_access
     )
@@ -200,18 +237,22 @@ def build(monkeypatch, world, *, kernel_base_url="http://kernel.invalid"):
     )
 
     def release(_session, *, tenant_id, model_version_id, now):
+        world["log"].append("service")
         row = world["row"]
         row.stage = "released"
-        world["released"].append(model_version_id)
+        world["released"].append({"model_version_id": model_version_id, "now": now})
         return row
-
     monkeypatch.setattr(model_release, "release_model_version", release)
-    monkeypatch.setattr(
-        model_release,
-        "record_event",
-        lambda _session, **kwargs: world["audits"].append(kwargs) or "audit",
-    )
+    def record_event(_session, **kwargs):
+        world["log"].append("audit")
+        world["audits"].append(kwargs)
+        return "audit"
 
+    monkeypatch.setattr(model_release, "record_event", record_event)
+
+    def clock():
+        world["clock_reads"].append(len(world["log"]))
+        return world["clock"]
     def fetcher(**kwargs):
         world.setdefault("fetches", []).append({**kwargs, "depth": world["depth"]})
         error = world.get("fetch_error")
@@ -231,12 +272,11 @@ def build(monkeypatch, world, *, kernel_base_url="http://kernel.invalid"):
         verifier=StaticPrincipalVerifier(
             {"release-token": principal}, allow_outside_dev=True
         ),
+        clock=clock,
         check_partitions_on_startup=False,
     )
     app.state.model_commitment_fetcher = fetcher
     return TestClient(app, raise_server_exceptions=False)
-
-
 def post(client, body=DECLARATION, *, headers=None, data=None, content_type="application/json"):
     sent = {**AUTH}
     if content_type is not None:
@@ -544,7 +584,7 @@ def test_15_the_route_binds_the_path_to_a_row_and_locks_it(monkeypatch):
     world = {}
     client = build(monkeypatch, world)
     assert post(client).status_code == 200
-    assert world["released"] == [VERSION_ID]
+    assert [r["model_version_id"] for r in world["released"]] == [VERSION_ID]
 
     source = open(model_release.__file__, encoding="utf-8").read()
     assert "with_for_update()" in source
@@ -1153,3 +1193,148 @@ def test_card84_both_spans_bound_their_lock_waits(monkeypatch):
     response = post(client)
     assert response.status_code == 200, response.text
     assert world["lock_timeouts"] == ["SET LOCAL lock_timeout = '5000ms'"] * 2
+
+
+# ---------------------------------------------------------------------------
+# Card 113 (Codex #219 r4 F1): the write contract W2/W4 carry, on release
+# ---------------------------------------------------------------------------
+
+FULL_ORDER = [
+    "permission",                                    # span 1
+    "advisory-lock", "permission", "ledger-read",    # span 2, before any row
+    "parent-get", "version-lock", "permission",      # bind, lock, re-check
+    "service", "audit", "ledger-write",              # write, audit, ledger
+]
+LEDGER_PAYLOAD = {"modelId": MODEL, "version": VERSION, "request": DECLARATION}
+
+
+def test_113_a_release_follows_the_lane_lock_order_and_stores_its_answer(monkeypatch):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert world["log"] == FULL_ORDER
+    assert world["spans"] == 2
+    assert world["locks"] == [
+        {"tenant_id": TENANT, "endpoint": model_release.ENDPOINT, "idempotency_key": KEY, "project_id": PROJECT}
+    ]
+    assert world["ledger_reads"][0]["payload"] == LEDGER_PAYLOAD
+    assert world["ledger_reads"][0]["endpoint"] == model_release.ENDPOINT
+    assert world["ledger_reads"][0]["idempotency_key"] == KEY
+    stored = world["stored"][0]
+    assert stored["response_status"] == 200 and stored["response_body"] == body
+    assert stored["payload"] == LEDGER_PAYLOAD and stored["endpoint"] == model_release.ENDPOINT
+    assert stored["idempotency_key"] == KEY and stored["project_id"] == PROJECT
+    assert len(world["released"]) == 1
+
+
+def test_113_the_endpoint_constant_is_the_route_path_under_v1():
+    assert model_release.ENDPOINT == "POST /v1" + model_release.RELEASE_PATH
+    assert model_release.ENDPOINT != model_release.RELEASE_PATH
+
+
+@pytest.mark.parametrize("headers", [{"Idempotency-Key": None}, {"Idempotency-Key": ""}, {"Idempotency-Key": "x" * 129}, {"Idempotency-Key": "bad key"}])
+def test_113_a_missing_or_malformed_key_is_422_after_the_preflight_and_before_the_body_and_the_kernel(monkeypatch, headers):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    sent = {k: v for k, v in AUTH.items() if k != "Idempotency-Key"}
+    sent.update({k: v for k, v in headers.items() if v is not None})
+    sent["Content-Type"] = "application/json"
+    response = client.post(PATH, content=b"not even json", headers=sent)
+    body = canonical(response, code="VAL-0003", status=422)
+    assert "Idempotency-Key" in body["detail"]
+    # After the permission preflight (a non-member learns nothing from how the
+    # key is judged), before the body, the kernel and the write span.
+    assert world["log"] == ["permission"] and world["spans"] == 1
+    assert world.get("fetches", []) == [] and world["released"] == []
+
+
+def test_113_a_stored_answer_is_replayed_exactly_and_nothing_is_locked_released_or_mirrored(monkeypatch):
+    stored = {"modelVersionId": VERSION_ID, "modelId": MODEL, "version": VERSION, "stage": "released", "contentSha256": SHA}
+    world: dict = {"replay": stored, "row": Row(stage="released")}
+    client = build(monkeypatch, world)
+    response = post(client)
+    assert response.status_code == 200, response.text
+    assert response.json() == stored
+    # The ledger answered under the serialisation point, and the row was
+    # never bound, locked, released or audited; nothing was stored again.
+    assert world["log"] == ["permission", "advisory-lock", "permission", "ledger-read"]
+    assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
+
+
+def test_113_the_same_key_with_a_different_body_or_path_is_409_and_writes_nothing(monkeypatch):
+    world: dict = {"replay_error": InvError(GRAPH_IDEMPOTENCY_CONFLICT, "different body")}
+    client = build(monkeypatch, world)
+    body = canonical(post(client), code="GRAPH-0002", status=409)
+    assert body["detail"] == "That idempotency key was used with a different request."
+    assert "different body" not in json.dumps(body)
+    assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
+    assert "version-lock" not in world["log"]
+
+
+def test_113_the_path_is_part_of_what_the_key_identifies(monkeypatch):
+    """The ledger payload names the model and version, so one key cannot
+    replay another version's release."""
+    world: dict = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 200
+    payload = world["ledger_reads"][0]["payload"]
+    assert payload["modelId"] == MODEL and payload["version"] == VERSION
+    assert set(payload) == {"modelId", "version", "request"}
+    assert payload["request"] == DECLARATION
+
+
+def test_113_an_already_released_version_under_another_key_is_409_not_a_second_release(monkeypatch):
+    world: dict = {"row": Row(stage="released")}
+    client = build(monkeypatch, world)
+    body = canonical(post(client, headers={"Idempotency-Key": "another-key"}), code="GRAPH-0002", status=409)
+    assert body["detail"] == "The model version is already released."
+    # Locked and judged, but no second stage write, mirror intent, audit or ledger row.
+    assert "version-lock" in world["log"]
+    assert world["released"] == [] and world["audits"] == [] and world["stored"] == []
+
+
+def test_113_the_clock_is_read_once_after_the_lock_and_the_live_permission(monkeypatch):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    assert post(client).status_code == 200
+    assert len(world["clock_reads"]) == 1
+    read_at = world["clock_reads"][0]
+    log = world["log"]
+    assert log.index("advisory-lock") < read_at <= log.index("ledger-read")
+    # The one instant is what the service, the audit and the ledger carry.
+    assert world["released"][0]["now"] == NOW
+    assert world["audits"][0]["now"] == NOW
+    assert world["stored"][0]["now"] == NOW and world["ledger_reads"][0]["now"] == NOW
+
+
+def test_113_permission_is_re_checked_after_the_row_lock(monkeypatch):
+    """A revocation during the lock wait must not release."""
+    world: dict = {"permissions": [
+        {"canRequest": True, "canApprove": True},   # preflight
+        {"canRequest": True, "canApprove": True},   # after the advisory lock
+        {"canRequest": True, "canApprove": False},  # after the row lock
+    ]}
+    client = build(monkeypatch, world)
+    canonical(post(client), code="AUTH-0030", status=403)
+    assert "version-lock" in world["log"]
+    assert world["released"] == [] and world["stored"] == []
+
+
+def test_113_the_translation_table_covers_the_ledger_conflict():
+    assert model_release.TRANSLATION[GRAPH_IDEMPOTENCY_CONFLICT] == ("GRAPH-0002", 409, False)
+
+
+def test_113_the_route_reuses_the_lane_helpers_and_copies_none():
+    import inspect
+
+    source = inspect.getsource(model_release)
+    for helper in ("serialise_idempotent_write(", "replay_or_reserve(", "store_idempotent_response(", "_require_idempotency_key("):
+        assert helper in source, helper
+    for copied in ("pg_advisory_xact_lock", "IdempotencyRecord", "hashlib.sha256(material"):
+        assert copied not in source, copied
+    assert source.count("with factory() as session:") == 2
+    assert source.count("bounded_lock_wait(") == 2
+    # The kernel observation is fetched with no transaction open, still.
+    assert "get_now" not in source
