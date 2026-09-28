@@ -425,11 +425,19 @@ def test_every_reachable_business_code_is_in_the_translation_table():
 
 
 def test_the_three_routes_are_registered_once_each():
+    """Counted by (path, method), not by path: W1's seal (#201) adds a POST on
+    the same ``/record`` path, and a path-only count would read that as a
+    duplicate GET once the two land together (coordinator, #212 CI)."""
     from saintvision.api.v1 import projects
 
-    paths = [route.path for route in projects.router.routes]
+    registered = [
+        (route.path, method)
+        for route in projects.router.routes
+        for method in (getattr(route, "methods", None) or ())
+    ]
     for suffix in (run_records.RECORD_PATH, run_records.ARTIFACTS_PATH, run_records.VERIFY_PATH):
-        assert paths.count("/v1" + suffix) + paths.count(suffix) == 1, suffix
+        gets = registered.count(("/v1" + suffix, "GET")) + registered.count((suffix, "GET"))
+        assert gets == 1, suffix
 
 
 def test_the_response_models_are_strict():
