@@ -7,6 +7,7 @@ the business DB role. No state transition or output ingestion happens on a GET.
 
 import base64
 import hashlib
+from contextlib import contextmanager
 
 from .contracts import validate_contract
 from .control import Control
@@ -14,6 +15,7 @@ from .errors import DomainError
 from .leases import lock_run
 from .node_transport import strict_json
 from .output_ingestion import output_bytes
+from .object_store import LocalObjectStore, ObjectStoreRegistry
 from .workspace_files import decode_snapshot, portable_path
 from .workspace_resume import workspace_output
 
@@ -28,8 +30,9 @@ def _checked(name, value):
 
 
 class ResultView:
-    def __init__(self, database):
+    def __init__(self, database, object_stores=None):
         self.db = database
+        self.object_stores = object_stores or ObjectStoreRegistry()
 
     def _scope(self, conn, principal, project, run_id):
         validate_contract("RunId", run_id)
@@ -54,7 +57,8 @@ class ResultView:
             """SELECT a.command_id, a.node_id, a.attempt,
           s.receipt_id, s.envelope AS receipt, c.evidence_id, c.completed_at,
           e.envelope AS evidence, p.envelope AS commitment,
-          o.content_hash, o.size_bytes, o.state AS object_state, d.envelope AS delivery
+          o.object_id,o.provider_id,o.locator,o.content_hash,o.size_bytes,
+          o.state AS object_state,d.envelope AS delivery
           FROM inv.execution_attempts a
           LEFT JOIN inv.node_stop_receipts s USING(tenant_id,command_id)
           LEFT JOIN inv.result_completions c USING(tenant_id,command_id)
@@ -72,7 +76,8 @@ class ResultView:
         return conn.execute(
             """SELECT d.command_id,d.node_id,s.receipt_id,s.envelope AS receipt,
           NULL AS evidence_id,NULL AS completed_at,NULL AS evidence,NULL AS commitment,
-          NULL AS content_hash,NULL AS size_bytes,NULL AS object_state,d.envelope AS delivery
+          NULL AS object_id,NULL AS provider_id,NULL AS locator,NULL AS content_hash,
+          NULL AS size_bytes,NULL AS object_state,d.envelope AS delivery
           FROM inv.execution_deliveries d LEFT JOIN inv.node_stop_receipts s USING(tenant_id,command_id)
           WHERE d.run_id=%s ORDER BY d.created_at DESC,d.command_id DESC LIMIT 1""",
             (run["run_id"],),
@@ -104,6 +109,68 @@ class ResultView:
         launch = strict_json(base64.b64decode(row["delivery"]["payload"], validate=True))["launch"]
         raw = workspace_output(artifact, launch)
         return decode_snapshot(raw, launch["workspaceId"]) if raw is not None else None
+
+    @staticmethod
+    def _download_ticket(row, run):
+        if not row or not row["evidence_id"]:
+            raise DomainError("RES-0004", "Committed output file unavailable", 404)
+        if (
+            row["object_state"] != "ready"
+            or row["evidence"] != row["commitment"]
+            or row["evidence"]["outputSha256"] != row["content_hash"]
+            or not row["provider_id"]
+            or not row["locator"]
+        ):
+            raise DomainError("VERIFY-0023", "Committed output evidence is inconsistent")
+        return {
+            "project_id": run["project_id"],
+            "run_id": run["run_id"],
+            "attempt": run["attempt"],
+            "object_id": str(row["object_id"]),
+            "provider_id": row["provider_id"],
+            "locator": row["locator"],
+            "content_hash": row["content_hash"],
+            "size_bytes": row["size_bytes"],
+            "evidence_id": row["evidence_id"],
+            "delivery": row["delivery"],
+        }
+
+    @staticmethod
+    def _ticket_matches(row, ticket):
+        return bool(
+            row
+            and row["evidence_id"] == ticket["evidence_id"]
+            and row["object_state"] == "ready"
+            and str(row["object_id"]) == ticket["object_id"]
+            and row["provider_id"] == ticket["provider_id"]
+            and row["locator"] == ticket["locator"]
+            and row["content_hash"] == ticket["content_hash"]
+            and row["size_bytes"] == ticket["size_bytes"]
+        )
+
+    @contextmanager
+    def _provider_bytes(self, ticket):
+        provider = self.object_stores.resolve(ticket["provider_id"])
+        try:
+            if isinstance(provider, LocalObjectStore):
+                # Preserve the established provider -> DB order through the
+                # caller's short revalidation transaction.
+                with provider.legacy.locked() as files:
+                    yield files.read(
+                        ticket["locator"],
+                        ticket["content_hash"],
+                        ticket["size_bytes"],
+                    )
+            else:
+                # Remote providers have no process-wide lock. The immutable
+                # ticket is revalidated after this network I/O.
+                yield provider.get(
+                    ticket["locator"],
+                    ticket["content_hash"],
+                    ticket["size_bytes"],
+                )
+        except FileNotFoundError:
+            raise DomainError("STORE-0001", "Object provider unavailable", 503, True) from None
 
     def result(self, principal, run_id, project=None):
         with self.db.transaction(principal.tenant_id) as conn:
@@ -202,7 +269,16 @@ class ResultView:
             run = self._scope(conn, principal, project, run_id)
             portable_path(path)
             row = self._current(conn, run)
-            files = self._files(row, self._output(row))
+            ticket = self._download_ticket(row, run)
+        with self._provider_bytes(ticket) as raw:
+            with self.db.transaction(principal.tenant_id) as conn:
+                current_run = self._scope(conn, principal, ticket["project_id"], ticket["run_id"])
+                if current_run["attempt"] != ticket["attempt"] or not self._ticket_matches(
+                    self._current(conn, current_run), ticket
+                ):
+                    raise DomainError("VERIFY-0023", "Committed output ticket changed")
+            artifact = strict_json(raw)
+            files = self._files(ticket, artifact)
             if files is None or path not in files[1]:
                 raise DomainError("RES-0004", "Committed output file unavailable", 404)
             file = next(item for item in files[0]["files"] if item["path"] == path)
@@ -219,7 +295,7 @@ class ResultView:
                     "checksumSha256": file["sha256"],
                     "byteSize": file["sizeBytes"],
                     "verified": True,
-                    "evidenceId": str(row["evidence_id"]),
+                    "evidenceId": str(ticket["evidence_id"]),
                 },
             }
 

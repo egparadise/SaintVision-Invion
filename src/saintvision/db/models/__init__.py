@@ -44,6 +44,19 @@ from .evaluation import (
     EvalRun,
     EvalSuite,
 )
+from .service_credentials import (
+    SERVICE_CREDENTIAL_PURPOSES,
+    ServiceCredentialGrant,
+    ServiceCredentialVersion,
+)
+from .tracking import (
+    MIRROR_ATTEMPT_STATUSES,
+    MIRROR_DEFECT_REASONS,
+    MIRROR_SUBJECT_KINDS,
+    MlflowMirrorAttempt,
+    MlflowMirrorDefect,
+    MlflowMirrorIntent,
+)
 from .evidence import (
     EVIDENCE_RESULTS,
     OUTBOX_STATUSES,
@@ -185,6 +198,12 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "model_versions",
     "model_lineage",
     "deployments",
+    # S10-BE MLflow mirror
+    "mlflow_mirror_intents",
+    "mlflow_mirror_attempts",
+    "mlflow_mirror_defects",
+    "service_credential_versions",
+    "service_credential_grants",
     # S12
     "backup_records",
     "recovery_drills",
@@ -223,7 +242,19 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     # key — so UPDATE is meaningless and DELETE belongs to the orphan
     # collector, which runs as the owner, not the application.
     "context_snapshots",
+    # The mirror may record what it sent and never rewrite it (design #168 §2).
+    "mlflow_mirror_intents",
+    "mlflow_mirror_attempts",
+    "mlflow_mirror_defects",
 )
+
+#: Append-only tables the application role may write but **not read**. Their
+#: tenant_id is nullable — an authentication failure may resolve to no tenant, and
+#: AC-02 requires keeping that record — so a tenant policy cannot cover every row
+#: and a reader scoped by tenant would miss exactly the rows that matter. Reading
+#: belongs to ``inv_audit_reader``; 0047_audit_events_isolation is the DDL, and
+#: the difference from APPEND_ONLY_TABLES is the withheld SELECT.
+AUDIT_TABLES: tuple[str, ...] = ("audit_events",)
 
 #: Tables whose *identity* is immutable but whose lifecycle advances. The
 #: application role gets column-level UPDATE on exactly these columns and no
@@ -301,6 +332,7 @@ __all__ = [
     "RunRecordArtifact",
     "SNAPSHOT_SOFT_LIMIT_BYTES",
     "APPEND_ONLY_TABLES",
+    "AUDIT_TABLES",
     "ARTIFACT_STATUSES",
     "Approval",
     "Artifact",
@@ -309,6 +341,15 @@ __all__ = [
     "EVIDENCE_RESULTS",
     "EvidenceEnvelope",
     "InboxEvent",
+    "MIRROR_ATTEMPT_STATUSES",
+    "MIRROR_DEFECT_REASONS",
+    "MIRROR_SUBJECT_KINDS",
+    "MlflowMirrorAttempt",
+    "MlflowMirrorDefect",
+    "MlflowMirrorIntent",
+    "SERVICE_CREDENTIAL_PURPOSES",
+    "ServiceCredentialGrant",
+    "ServiceCredentialVersion",
     "MAX_ARTIFACT_BYTES",
     "OUTBOX_STATUSES",
     "OutboxEvent",

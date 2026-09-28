@@ -34,6 +34,7 @@ from ..errors import (
     InvError,
 )
 from ..ids import new_id
+from .tracking import enqueue_mirror, training_run_mirror_payload
 from ..runs.state import RunState, TerminationReason, assert_transition, is_terminal
 from .evidence import canonical_sha256, enqueue_event, record_evidence
 from .pagination import Page, build_page, clamp_limit, validate_cursor
@@ -294,6 +295,20 @@ def complete_run(
         aggregate_type="run",
         aggregate_id=run_id,
         payload={"runId": run_id, "evidenceId": evidence_id},
+        now=now,
+        trace_id=run.trace_id,
+    )
+
+    # Mirror intent for the training run, in this same transaction (design
+    # #168 §1). Absent or invalid configuration records nothing.
+    workload = session.get(Workload, run.workload_id)
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="training_run",
+        subject_id=run_id,
+        project_id=workload.project_id if workload is not None else None,
+        payload=training_run_mirror_payload(run, workload, evidence_id=evidence_id, now=now),
         now=now,
         trace_id=run.trace_id,
     )

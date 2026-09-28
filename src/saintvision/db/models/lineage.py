@@ -88,6 +88,15 @@ class DatasetVersion(Base):
         CheckConstraint(
             "content_sha256 = lower(content_sha256)", name="checksum_is_lowercase"
         ),
+        # Where the reverse lineage lookup starts (S10-DB query API). Declared so
+        # the model and the database agree; migration 0050 creates it
+        # CONCURRENTLY, and it is deliberately not unique -- the same bytes may be
+        # registered as more than one dataset version.
+        Index(
+            "ix_dataset_versions_tenant_id_content_sha256",
+            "tenant_id",
+            "content_sha256",
+        ),
     )
 
     dataset_version_id: Mapped[InvId] = mapped_column(primary_key=True)
@@ -201,8 +210,12 @@ class ModelVersion(Base):
             "tenant_id", "model_version_id", name="uq_model_versions_tenant_id_version_id"
         ),
         UniqueConstraint("model_id", "version", name="uq_model_versions_model_id_version"),
+        # Scoped to the model, not the tenant (0052). The invariant is still "two
+        # names for identical bytes is a mistake", but a model belongs to one
+        # project, so refusing across projects answered a question the caller had
+        # no access to ask -- see the migration for the whole argument.
         UniqueConstraint(
-            "tenant_id", "content_sha256", name="uq_model_versions_tenant_id_content_sha256"
+            "model_id", "content_sha256", name="uq_model_versions_model_id_content_sha256"
         ),
         CheckConstraint("byte_size >= 0", name="byte_size_non_negative"),
         CheckConstraint(
