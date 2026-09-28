@@ -31,7 +31,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-REGISTRY_BLOB = "99e64cb4125d47ae681a2e8e7c8f76c05193a892"
+REGISTRY_BLOB = "e8c0134081dde18b2aa2bcadd42fe76f42cff667"
 TARGET_ID = "s11-irreversible-restore-forward-v0"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
