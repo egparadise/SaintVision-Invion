@@ -12,6 +12,10 @@ import type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ModelCommitObservation,
+  ContainmentInput,
+  ContainmentView,
+  ContainmentResult,
 } from '../../../../packages/contracts-ts/src/index';
 
 export type {
@@ -22,6 +26,10 @@ export type {
   ModelRetryPrepareInput,
   ModelRetryPlacementResult,
   ModelRetryPrepareResult,
+  ModelCommitObservation,
+  ContainmentInput,
+  ContainmentView,
+  ContainmentResult,
 };
 
 export type ErrorCategory =
@@ -390,6 +398,7 @@ export interface SyntheticGpuResult {
 
 export interface SecurityControlStatus {
   dockerSocketExposed: boolean;
+  dockerSocketAttemptsBlocked: number;
   approvalBypassesBlocked: number;
   emergencyKillSwitchActive: boolean;
   drainedNodesCount?: number;

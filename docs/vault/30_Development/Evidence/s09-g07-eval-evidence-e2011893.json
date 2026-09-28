@@ -1,20 +1,20 @@
 {
   "$schema": "docs/contracts/eval-evidence.schema.json",
   "evalRunId": "eval-s09-g07-static",
-  "sourceHeadSha": "51d19752f10b8d3d6381387a3ef8d461dd188e40",
+  "sourceHeadSha": "e2011893ce6e10d3f950a2c1516b7bd782d8d647",
   "gitBlobOids": {
-    "agentEngine": "4b9ad2b76f8e796a54e78d00a5fbfb0b745f34b2",
-    "evalRunner": "69a92a20e66a4df587212da9b7be0ed079cc2a3b",
+    "agentEngine": "d9b90ce1755a2f48cfc9454c08a6bc47626c869e",
+    "evalRunner": "0c23ad6886c8a458c2a0ee7ff4ebc682e4c79821",
     "mutationTools": "ba92cd18e3fb82471432d4b18255e5aab93f5dc1",
     "promptsFixture": "09871ac5ed866414e64e3e52620c2976731c4d3e",
-    "codingTasksFixture": "22642b056b9cd14582b737f311331f5b6fdede14"
+    "codingTasksFixture": "578b3fb8af971f55fa55d18df741c9e89a4d5605"
   },
   "isSynthetic": true,
   "countsAsOperationalAcceptance": false,
   "operationalAcceptanceGapId": "G-26",
   "fixturesSha256": {
     "prompts100": "f8962fdaaac27303d0ea3631a84f6e49a21008f6e9cc1b24d0806a73a47364b2",
-    "codingTasks30": "549710ce589c37533e727d6f5d69242cff080668ff6652281e38c8151b3dbdb9"
+    "codingTasks30": "ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96"
   },
   "casesDigest": "109d689309baf1c70a7299a8700764c416525b7adeb49a24fc1372bef3232b23",
   "summary": {
@@ -974,7 +974,7 @@
       "inputSha256": "c0bf001f414c2120604ec9932a90dd0df362869407b1651fe97585bacfd64b4e",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -984,7 +984,7 @@
       "inputSha256": "8307c8ee77ef48af74c16265251cb42724bd57892810fd254b1d9981d26d0ba4",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -994,7 +994,7 @@
       "inputSha256": "fa55db6ff7ff60a8e12b2338610200f4e82195c723db3ed0415e1db4a7c803d4",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1004,7 +1004,7 @@
       "inputSha256": "9408c427b1d1d02043ae7322d3bb94af20d615e46040bd8c95e07b400a3b5ad4",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1014,7 +1014,7 @@
       "inputSha256": "478798d8aa602f783c53bc7a6ee74a7ed50b1a76ce2b5f9d49938b03796a4924",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1024,7 +1024,7 @@
       "inputSha256": "33033056ecedace81369028aae2871e360f387dc5badba88042b81482b1e0604",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1034,7 +1034,7 @@
       "inputSha256": "04ce62c4e6e437aea87dc1d0d1b8c2e1f758533fb98e185dd995be69280cdabd",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1044,7 +1044,7 @@
       "inputSha256": "db9e502b169f4bdc9c2eeac04130bd0ecd171dcf03713e91d625f314f2ed876e",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1054,7 +1054,7 @@
       "inputSha256": "b4eaedc7ed863efc3e70e1e8ce228176be618c35e7069e6805ed1091b4cbc4cb",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1064,7 +1064,7 @@
       "inputSha256": "87b0680b3c755e138fedfb54a80cddda572ccc15cc3804aa1a5c8a6b53a84d41",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1074,7 +1074,7 @@
       "inputSha256": "4c2f2a6cd9d762cb71a975ccbbee6541249a08ca70ddb0aa38e8115c7758ecc9",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1084,7 +1084,7 @@
       "inputSha256": "f2d052f6d9910dc85b849aa9d941b17b8736237835adc729c45b6e6c759ebb6f",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1094,7 +1094,7 @@
       "inputSha256": "138a5df79de609fe029b9d605c3b5c9274a843414a805761c6263454351ae733",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1104,7 +1104,7 @@
       "inputSha256": "981b57be1e626b8627a788109b24101d4739946d3887c549eaea19c4eba3fecb",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1114,7 +1114,7 @@
       "inputSha256": "529684ce8345a2804c7535c190c1fd3578155f9518ea43b4fa5a7d028f267c84",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1124,7 +1124,7 @@
       "inputSha256": "e82f54e879141cd655f61db2ab3c8916e3bab697632f1f19c482028b325d029b",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1134,7 +1134,7 @@
       "inputSha256": "901ce196522ecaffa53ff56306c74e23759bf342e77e9f6a060141ed279c6a17",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1144,7 +1144,7 @@
       "inputSha256": "8ee1181ce9868c6f0e2a7c5ce3cfb5bde090cb273f135d87d9a761bf84774206",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1154,7 +1154,7 @@
       "inputSha256": "b45c257c5a58d259775d8787c212ac9afcbeda17de4ba6fbf959054b2d6bed6c",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1164,7 +1164,7 @@
       "inputSha256": "268ae8efe469008c7a07cff5fa24f9fd6406d26a5dca405e7c5cd27a57c0daf3",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1194,7 +1194,7 @@
       "inputSha256": "153806c8747366be5303b1697191e2c04fd6e965efa905e6b67c18b0c825e6f4",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1204,7 +1204,7 @@
       "inputSha256": "bdb0418bc7e66195863baf4fc80e1a8af162a5f26e0fbfc08486bd8cdbe88ffe",
       "expected": "READY",
       "observed": "READY",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1214,7 +1214,7 @@
       "inputSha256": "7e999ebbbf1af64cd9a2ca332a67a2329c4dccb508d24d632fd2365e4121685e",
       "expected": "BUDGET_EXCEEDED",
       "observed": "BUDGET_EXCEEDED",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1224,7 +1224,7 @@
       "inputSha256": "7d6bb4eadb60b9df9330d53f2768c1d9cbdd480deecc6f06f3c21ee74f65d91a",
       "expected": "BUDGET_EXCEEDED",
       "observed": "BUDGET_EXCEEDED",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS"
     },
     {
@@ -1254,7 +1254,7 @@
       "inputSha256": "3d6634c3e8170b4a4413db4fb92e53a4d24802d3e4f453dcf8a9215cfc0c6a3a",
       "expected": "LEAK_ATTEMPT_DETECTED",
       "observed": "LEAK_ATTEMPT_DETECTED",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS",
       "violation": "LEAK_ATTEMPT_DETECTED: Forbidden pattern match (/sk-[a-zA-Z0-9_-]{15,}/i). AC-09 Zero Leakage enforced."
     },
@@ -1265,7 +1265,7 @@
       "inputSha256": "b39f0139e60c4046e0a0c73d8f7827a1525b1328ad57d61d1f29185ba6577402",
       "expected": "LEAK_ATTEMPT_DETECTED",
       "observed": "LEAK_ATTEMPT_DETECTED",
-      "loopCount": 1,
+      "loopCount": 0,
       "verdict": "PASS",
       "violation": "LEAK_ATTEMPT_DETECTED: Forbidden pattern match (/cat \\/etc\\/shadow/i). AC-09 Zero Leakage enforced."
     }

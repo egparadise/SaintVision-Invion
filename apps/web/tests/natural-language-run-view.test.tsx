@@ -46,7 +46,7 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
   });
 
   describe('REP-02 & REP-03: Bounded Repair Loop and Rejection on Bound Exceeded', () => {
-    it('accurately advances repair loop counts (1/3 -> 2/3 -> 3/3) and immediately updates screen state to rejected on 3rd click', () => {
+    it('accurately advances repair loop counts (0/3 -> 1/3 -> 2/3 -> 3/3) and immediately updates screen state to rejected on 4th click', () => {
       act(() => {
         root.render(<NaturalLanguageRunView />);
       });
@@ -68,16 +68,30 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
         submitBtn?.click();
       });
 
-      // Initial state: Request is READY at loop 1/3
+      // Initial state: Request is READY at loop 0/3 (#136 engine semantics)
       const loopInfo = container.querySelector('[data-testid="agent-loop-info"]');
       const statusBadge = container.querySelector('[data-testid="agent-status-badge"]');
-      expect(loopInfo?.textContent).toContain('루프: 1/3');
+      expect(loopInfo?.textContent).toContain('루프: 0/3');
       expect(statusBadge?.textContent).toBe('READY');
 
       const refineBtn = container.querySelector('[data-testid="agent-refine-btn"]') as HTMLButtonElement;
       expect(refineBtn).not.toBeNull();
 
-      // Click 1: Advance loop 1/3 -> 2/3
+      // Click 1: Advance loop 0/3 -> 1/3
+      act(() => {
+        refineBtn.click();
+      });
+
+      expect(loopInfo?.textContent).toContain('루프: 1/3');
+      expect(statusBadge?.textContent).toBe('REPAIRING');
+
+      const noticeAfterClick1 = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(noticeAfterClick1).not.toBeNull();
+      expect(noticeAfterClick1?.getAttribute('role')).toBe('status');
+      expect(noticeAfterClick1?.getAttribute('aria-live')).toBe('polite');
+      expect(noticeAfterClick1?.textContent).toContain('🔄 Bounded Repair Loop 1/3 실행 완료. 보정된 Diff를 확인하세요.');
+
+      // Click 2: Advance loop 1/3 -> 2/3
       act(() => {
         refineBtn.click();
       });
@@ -85,13 +99,10 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       expect(loopInfo?.textContent).toContain('루프: 2/3');
       expect(statusBadge?.textContent).toBe('REPAIRING');
 
-      const noticeAfterClick1 = container.querySelector('[data-testid="agent-action-notice"]');
-      expect(noticeAfterClick1).not.toBeNull();
-      expect(noticeAfterClick1?.getAttribute('role')).toBe('status');
-      expect(noticeAfterClick1?.getAttribute('aria-live')).toBe('polite');
-      expect(noticeAfterClick1?.textContent).toContain('🔄 Bounded Repair Loop 2/3 실행 완료. 보정된 Diff를 확인하세요.');
+      const noticeAfterClick2 = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(noticeAfterClick2?.textContent).toContain('🔄 Bounded Repair Loop 2/3 실행 완료. 보정된 Diff를 확인하세요.');
 
-      // Click 2: Advance loop 2/3 -> 3/3
+      // Click 3: Advance loop 2/3 -> 3/3
       act(() => {
         refineBtn.click();
       });
@@ -99,10 +110,10 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       expect(loopInfo?.textContent).toContain('루프: 3/3');
       expect(statusBadge?.textContent).toBe('REPAIRING');
 
-      const noticeAfterClick2 = container.querySelector('[data-testid="agent-action-notice"]');
-      expect(noticeAfterClick2?.textContent).toContain('🔄 Bounded Repair Loop 3/3 실행 완료. 보정된 Diff를 확인하세요.');
+      const noticeAfterClick3 = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(noticeAfterClick3?.textContent).toContain('🔄 Bounded Repair Loop 3/3 실행 완료. 보정된 Diff를 확인하세요.');
 
-      // Click 3: Exceeds upper limit (3/3 >= 3) -> Triggers BOUNDED_LOOP_EXCEEDED
+      // Click 4: Exceeds upper limit (3/3 >= 3) -> Triggers BOUNDED_LOOP_EXCEEDED
       act(() => {
         refineBtn.click();
       });
@@ -113,11 +124,11 @@ describe('NaturalLanguageRunView (S09-FE PR 4 UI Integration)', () => {
       expect(statusBadge?.style.backgroundColor).toBe('rgba(248, 81, 73, 0.15)');
 
       // Invariant 2: Action notice banner displays BOUNDED_LOOP_EXCEEDED error with role="status" & aria-live="polite"
-      const noticeAfterClick3 = container.querySelector('[data-testid="agent-action-notice"]');
-      expect(noticeAfterClick3).not.toBeNull();
-      expect(noticeAfterClick3?.getAttribute('role')).toBe('status');
-      expect(noticeAfterClick3?.getAttribute('aria-live')).toBe('polite');
-      expect(noticeAfterClick3?.textContent).toContain('🛑 BOUNDED_LOOP_EXCEEDED: Maximum repair limit (3) reached. Escalate to human developer.');
+      const noticeAfterClick4 = container.querySelector('[data-testid="agent-action-notice"]');
+      expect(noticeAfterClick4).not.toBeNull();
+      expect(noticeAfterClick4?.getAttribute('role')).toBe('status');
+      expect(noticeAfterClick4?.getAttribute('aria-live')).toBe('polite');
+      expect(noticeAfterClick4?.textContent).toContain('🛑 BOUNDED_LOOP_EXCEEDED: Maximum repair limit (3) reached. Escalate to human developer.');
 
       // Invariant 3: Action buttons (refine, apply diff) are removed from the DOM once rejected
       expect(container.querySelector('[data-testid="agent-refine-btn"]')).toBeNull();
