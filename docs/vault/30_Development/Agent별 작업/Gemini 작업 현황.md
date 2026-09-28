@@ -1532,3 +1532,24 @@ source_of_truth: "Git"
 - **문서 산출물**:
   - 구현 계획 정본: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1)
   - 실행 기록: [[2026-09-28_14-35-00_KST_G-07_Eval러너_구현계획_Gemini]] (`HIST-G07-001`, v1.1.1)
+
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 및 변이 도구 구현 (`agent/gemini/g07-eval-runner-impl`)
+
+- **작업 ID**: `G-07` (카드 60 2단계: 골든 러너 및 변이 도구 구현, apps/web)
+- **상위 근거**: PR #179 통합 분류표 및 정본 차단 지도([[2026-09-22_21-55-00_KST_review_done_차단지도_Codex]]:42)
+- **정본 계획**: [[G-07 100 Prompt 30 Coding Eval 러너 및 변이 도구 구현 계획 v1.0]] (`PLAN-G07-001`, v1.1.1, PR #186 head `b8e71c36`)
+- **구현 산출물**:
+  1. **픽스처**: `apps/web/tests/fixtures/prompts_100.json` (100건, SHA256 봉인), `coding_tasks_30.json` (30건, SHA256 봉인).
+  2. **러너**: `apps/web/src/features/agent/evalRunner.ts` (EVL-05 합성 러너, 결정론적 ID, case별 AgentLoopManager 격리, fail-closed 표, evaluateCodingTask, guardConformanceRate 100.0%, casesDigest, NOT_OBSERVED 라이브 레인 격리).
+  3. **변이 도구**: `apps/web/src/features/agent/mutationTools.ts` (agentEngine.ts:29-35 정규식 6종 대응 6대 입력 변이 연산자 OP-CASE-01 ~ OP-SYN-01, KNOWN_BYPASS 5종 사전 등록).
+  4. **증거 및 스키마**: `docs/contracts/eval-evidence.schema.json` 스키마 v1.1, `docs/vault/30_Development/Evidence/s09-g07-eval-evidence-b8e71c36.json` 130건 원본 입출력 증거.
+  5. **테스트 스위트**: `tests/agent-eval-runner.test.ts` (16 passed), `tests/agent-mutation-guards.test.ts` (11 passed). no-op 스캐너 변이 사살, AST .skip/.todo/.only 정적 가드.
+- **실측 검증**:
+  - Vitest: 80 test files passed (80), 702 passed (702) (G-07 27 passed)
+  - `npx tsc -b`: exit 0
+  - `npm run build`: dist/ built in 6.56s (exit 0)
+  - `pytest tests/test_route_coverage.py`: 39 passed in 2.58s (exit 0)
+  - `python tools/check_docs.py`: PASS (896 versioned documents, exit 0)
+- **문서 산출물**:
+  - 실행 기록: [[2026-09-28_15-55-00_KST_G-07_Eval러너_구현_Gemini]] (`HIST-G07-002`, v1.0.0)
