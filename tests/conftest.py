@@ -71,7 +71,7 @@ def database_url(test_admin_dsn) -> str:
     # Always allocate our own database. Never DROP SCHEMA in an operator's DB.
     import psycopg
     from psycopg import sql
-    from psycopg.conninfo import conninfo_to_dict
+    from psycopg.conninfo import conninfo_to_dict, make_conninfo
     from sqlalchemy.engine import URL
 
     admin = test_admin_dsn
@@ -87,12 +87,22 @@ def database_url(test_admin_dsn) -> str:
         port=int(info.get("port", 5432)),
         database=name,
     )
+    findings = None
     try:
         yield url.render_as_string(hide_password=False)
+        # Session-end audit (same rule as tests/integration): no FK orphan, no CHECK
+        # violation, no disabled trigger may survive a test in the shared database.
+        from db_integrity import database_integrity_violations
+
+        try:
+            findings = database_integrity_violations(make_conninfo(admin, dbname=name))
+        except Exception as audit_error:  # noqa: BLE001 -- reported below, never hides the drop
+            findings = [{"kind": "audit-error", "error": type(audit_error).__name__}]
     finally:
         assert name.startswith("inv_backend_test_") and len(name) == 49
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name)))
+    assert not findings, f"disposable database was left physically inconsistent by a test: {findings}"
 
 
 @pytest.fixture(scope="session")

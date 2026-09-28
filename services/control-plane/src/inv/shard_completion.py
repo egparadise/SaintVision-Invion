@@ -12,7 +12,7 @@ from .contracts import validate_contract
 from .ids import new_id
 from .leases import lock_run
 from .runs import RunStore, event, public
-from .snapshots import object_key
+from .object_store import object_store_session, require_object_provider
 from .state import TERMINAL
 
 
@@ -42,7 +42,7 @@ class ShardCompletion:
         # Provider -> plan -> sorted children -> parent. No caller holds a Run
         # when entering this method; this matches result publication lock order.
         with (
-            self.provider.locked() if self.provider else nullcontext(None) as files,
+            object_store_session(self.provider) if self.provider else nullcontext(None) as files,
             self.db.transaction(tenant) as conn,
         ):
             plan = conn.execute(
@@ -92,7 +92,8 @@ class ShardCompletion:
             if files is None or not all(run["state"] == "succeeded" for _, run in members):
                 return "idle"
             rows = conn.execute(
-                """SELECT s.shard_index,s.run_id,s.command_id,c.evidence_id,p.object_id,o.content_hash,o.size_bytes,o.state
+                """SELECT s.shard_index,s.run_id,s.command_id,c.evidence_id,p.object_id,
+                o.provider_id,o.locator,o.content_hash,o.size_bytes,o.state
                 FROM inv.shard_commands s JOIN inv.runs r ON (s.tenant_id,s.run_id)=(r.tenant_id,r.run_id)
                 JOIN inv.result_completions c ON (s.tenant_id,s.command_id,r.attempt)=(c.tenant_id,c.command_id,c.attempt)
                 JOIN inv.result_commitments p ON (c.tenant_id,c.command_id)=(p.tenant_id,p.command_id)
@@ -103,7 +104,8 @@ class ShardCompletion:
             if len(rows) != len(members) or any(r["state"] != "ready" for r in rows):
                 return "idle"
             for row in rows:
-                files.read(object_key(row["object_id"]), row["content_hash"], row["size_bytes"])
+                require_object_provider(files, row)
+                files.get(row["locator"], row["content_hash"], row["size_bytes"])
             manifest = [
                 {
                     "index": r["shard_index"],
