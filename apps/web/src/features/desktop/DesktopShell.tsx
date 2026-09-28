@@ -661,6 +661,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({
               key={win.id}
               window={win}
               isActive={activeWindowId === win.id}
+              isOverlayOpen={isStartMenuOpen || isNotifOpen}
               onFocus={() => focusWindow(win.id)}
               onClose={() => closeWindow(win.id)}
               onMinimize={() => minimizeWindow(win.id)}
