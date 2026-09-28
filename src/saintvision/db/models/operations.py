@@ -79,8 +79,11 @@ class AuditEvent(Base):
 
     ``tenant_id`` is nullable: a rejected credential may not resolve to a
     tenant, and losing that record is exactly the case AC-02 asks us to keep.
-    Those rows are outside RLS by construction, so the audit read role is
-    separate from the application role.
+    No tenant policy can cover such a row, so reading this table is not the
+    application role's job: 0047_audit_events_isolation gives the application
+    INSERT under a tenant policy, revokes its SELECT, grants the read to
+    ``inv_audit_reader``, and routes the tenant-less denial through
+    ``public.record_auth_denial`` — the only writer of a NULL-tenant row.
     """
 
     __tablename__ = "audit_events"
