@@ -389,6 +389,11 @@ type ProblemDetails struct {
     EvidenceId *EvidenceId `json:"evidenceId"`
 }
 
+type ConfigurationReadinessView struct {
+    Status string `json:"status"`
+    UnresolvedSettings []string `json:"unresolvedSettings"`
+}
+
 type NodeResourceSnapshot struct {
     Nonce string `json:"nonce"`
     TenantId TenantId `json:"tenantId"`
