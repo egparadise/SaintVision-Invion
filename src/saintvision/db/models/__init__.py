@@ -44,6 +44,14 @@ from .evaluation import (
     EvalRun,
     EvalSuite,
 )
+from .tracking import (
+    MIRROR_ATTEMPT_STATUSES,
+    MIRROR_DEFECT_REASONS,
+    MIRROR_SUBJECT_KINDS,
+    MlflowMirrorAttempt,
+    MlflowMirrorDefect,
+    MlflowMirrorIntent,
+)
 from .evidence import (
     EVIDENCE_RESULTS,
     OUTBOX_STATUSES,
@@ -185,6 +193,10 @@ TENANT_SCOPED_TABLES: tuple[str, ...] = (
     "model_versions",
     "model_lineage",
     "deployments",
+    # S10-BE MLflow mirror
+    "mlflow_mirror_intents",
+    "mlflow_mirror_attempts",
+    "mlflow_mirror_defects",
     # S12
     "backup_records",
     "recovery_drills",
@@ -223,6 +235,10 @@ APPEND_ONLY_TABLES: tuple[str, ...] = (
     # key — so UPDATE is meaningless and DELETE belongs to the orphan
     # collector, which runs as the owner, not the application.
     "context_snapshots",
+    # The mirror may record what it sent and never rewrite it (design #168 §2).
+    "mlflow_mirror_intents",
+    "mlflow_mirror_attempts",
+    "mlflow_mirror_defects",
 )
 
 #: Append-only tables the application role may write but **not read**. Their
@@ -318,6 +334,12 @@ __all__ = [
     "EVIDENCE_RESULTS",
     "EvidenceEnvelope",
     "InboxEvent",
+    "MIRROR_ATTEMPT_STATUSES",
+    "MIRROR_DEFECT_REASONS",
+    "MIRROR_SUBJECT_KINDS",
+    "MlflowMirrorAttempt",
+    "MlflowMirrorDefect",
+    "MlflowMirrorIntent",
     "MAX_ARTIFACT_BYTES",
     "OUTBOX_STATUSES",
     "OutboxEvent",

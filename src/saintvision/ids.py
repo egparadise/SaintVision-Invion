@@ -80,6 +80,10 @@ PREFIXES: Final[dict[str, str]] = {
     "pool": "pol",
     "plan": "pln",
     "replica": "rep",
+    # S10-BE MLflow mirror (design #168)
+    "mirror_intent": "mmi",
+    "mirror_attempt": "mma",
+    "mirror_defect": "mmd",
 }
 
 _PREFIX_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z]{3}$")
