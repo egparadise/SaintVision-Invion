@@ -90,13 +90,13 @@ class FakeGit:
                 })
             return json.dumps({"schemaVersion": tool.SCHEMA_VERSION, "targets": targets})
         if path == "migrations/versions/0001_base.py":
-            return 'revision = "0001_base"\ndown_revision = None\ndef downgrade():\n    pass\n'
+            return 'revision = "0001_base"\ndown_revision = None\ndef downgrade():\n    raise RuntimeError("restore")\n'
         if path == "migrations/versions/0002_head.py":
-            return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    raise RuntimeError("restore")\n'
+            return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    pass\n'
         raise AssertionError((commit, path))
 
     def list_paths(self, commit: str, prefix: str) -> list[str]:
-        assert commit == SOURCE and prefix == "migrations/versions"
+        assert prefix == "migrations/versions"
         return ["migrations/versions/0001_base.py", "migrations/versions/0002_head.py"]
 
 
@@ -131,7 +131,7 @@ def target(
 
 
 def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
-    return {
+    value = {
         "axis": axis,
         "schemaVersion": "1.0.0",
         "runPurpose": "ac11-axis-evidence",
@@ -166,6 +166,20 @@ def envelope(axis: str, verdict: str = "MEASURED_PASS") -> dict:
         ],
         "cleanup": {"residueCount": 0},
     }
+    if axis == "migration-reversible-segment":
+        value["reversibleSegment"] = {
+            "startingRevision": "0002_head",
+            "endingRevision": "0001_base",
+            "reversibleTailCount": 1,
+        }
+    return value
+
+
+class ZeroTailGit(FakeGit):
+    def show(self, commit: str, path: str) -> str:
+        if path == "migrations/versions/0002_head.py":
+            return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    raise RuntimeError("restore")\n'
+        return super().show(commit, path)
 
 
 def security_reports(allowlist: dict) -> list[dict]:
@@ -417,6 +431,26 @@ def test_repository_registry_targets_match_current_tree_and_pitr_is_weekly_regis
         "operator": "gte",
         "value": 1,
     }
+    restore = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-irreversible-restore-forward-v0"
+    )
+    assert restore["criteria"]["negativeFixturePassCount"] == {
+        "operator": "eq",
+        "value": 4,
+    }
+    reversible = next(
+        row
+        for row in registry["targets"]
+        if row["targetId"] == "s11-migration-reversible-roundtrip-v1"
+    )
+    assert reversible["axis"] == "migration-reversible-segment"
+    assert reversible["criteria"] == {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0},
+    }
 
 
 def test_required_target_map_rejects_old_pitr_target(allowlist):
@@ -605,9 +639,10 @@ def test_only_reversible_axis_accepts_declared_zero_tail(allowlist):
     value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
     value["observations"] = []
     value["structuralException"] = {"reason": "no-reversible-tail", "reversibleTailCount": 0}
-    assert axis_result(value, allowlist).verdict is tool.Verdict.NOT_APPLICABLE
+    value.pop("reversibleSegment")
+    assert axis_result(value, allowlist, ZeroTailGit()).verdict is tool.Verdict.NOT_APPLICABLE
     value["axis"] = tool.REQUIRED_AXES[1]
-    assert axis_result(value, allowlist).verdict is tool.Verdict.INVALID_RUN
+    assert axis_result(value, allowlist, ZeroTailGit()).verdict is tool.Verdict.INVALID_RUN
 
 
 def test_zero_tail_is_conditionally_excluded_only_when_restore_passes(allowlist):
@@ -618,29 +653,39 @@ def test_zero_tail_is_conditionally_excluded_only_when_restore_passes(allowlist)
         observations=[],
         structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
     )
-    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    reversible.pop("reversibleSegment")
+    result = tool.aggregate(value, ZeroTailGit(), allowlist, NOW)
     assert result["verdict"] == "MEASURED_PASS" and result["done"] is True
 
     restore = value["axes"][1]
     restore["verdict"] = "MEASURED_FAIL"
     restore["observations"][0]["value"] = 0
-    result = tool.aggregate(value, FakeGit(), allowlist, NOW)
+    result = tool.aggregate(value, ZeroTailGit(), allowlist, NOW)
     assert result["verdict"] == "MEASURED_FAIL" and result["done"] is False
 
 
 def test_zero_tail_claim_is_invalid_when_git_graph_has_reversible_tail(allowlist):
-    class ReversibleHeadGit(FakeGit):
-        def show(self, commit: str, path: str) -> str:
-            if path == "migrations/versions/0002_head.py":
-                return 'revision = "0002_head"\ndown_revision = "0001_base"\ndef downgrade():\n    pass\n'
-            return super().show(commit, path)
-
     value = envelope(tool.REQUIRED_AXES[0], "NOT_APPLICABLE")
     value.update(
         observations=[],
         structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
     )
-    assert axis_result(value, allowlist, ReversibleHeadGit()).verdict is tool.Verdict.INVALID_RUN
+    value.pop("reversibleSegment")
+    assert axis_result(value, allowlist, FakeGit()).verdict is tool.Verdict.INVALID_RUN
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("startingRevision", "0001_base"),
+        ("endingRevision", "base"),
+        ("reversibleTailCount", 2),
+    ],
+)
+def test_measured_reversible_segment_must_match_source_graph(field, value, allowlist):
+    evidence = envelope(tool.REQUIRED_AXES[0])
+    evidence["reversibleSegment"][field] = value
+    assert axis_result(evidence, allowlist, FakeGit()).verdict is tool.Verdict.INVALID_RUN
 
 
 def test_looser_envelope_criteria_cannot_override_git_registry(allowlist):

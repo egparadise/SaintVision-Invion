@@ -71,14 +71,32 @@
       "targetId": "s11-irreversible-restore-forward-v0",
       "axis": "irreversible-restore-forward",
       "sourceDocument": {
-        "commit": "40b592e623da4107d3857fe678e1eb3d8387541d",
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
         "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
-        "blob": "d14e09dfabad930f996a3a9d38506627535b2723"
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
       },
       "criteria": {
         "catalogMismatchCount": {"operator": "eq", "value": 0},
-        "negativeFixturePassCount": {"operator": "eq", "value": 3},
+        "negativeFixturePassCount": {"operator": "eq", "value": 4},
         "restoreForwardPassCount": {"operator": "eq", "value": 1}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted-single-postgres-service",
+        "synthetic": true
+      }
+    },
+    {
+      "targetId": "s11-migration-reversible-roundtrip-v1",
+      "axis": "migration-reversible-segment",
+      "sourceDocument": {
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+      },
+      "criteria": {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0}
       },
       "requiredEnvironment": {
         "topology": "hosted-single-postgres-service",

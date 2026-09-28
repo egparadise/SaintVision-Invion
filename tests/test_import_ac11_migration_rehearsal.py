@@ -36,10 +36,18 @@ SOURCE = "a" * 40
 TREE = "b" * 40
 DESIGN_BLOB = "99776a491772c4a62e1be26644d35a365d80a030"
 RUN_ID = "36380000000"
+REVERSIBLE_HEAD = "0053_eval_suite_project_scope"
+REVERSIBLE_BARRIER = "0052_model_version_digest_scope"
+
+
+def test_importer_and_aggregator_pin_the_same_repository_registry():
+    content = (ROOT / importer.REGISTRY_PATH).read_bytes()
+    actual_blob = hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
+    assert importer.REGISTRY_BLOB == aggregator.TARGET_REGISTRY_BLOB == actual_blob
 NOW = datetime(2026, 9, 28, 5, 0, tzinfo=timezone.utc)
 CRITERIA = {
     "catalogMismatchCount": {"operator": "eq", "value": 0},
-    "negativeFixturePassCount": {"operator": "eq", "value": 3},
+    "negativeFixturePassCount": {"operator": "eq", "value": 4},
     "restoreForwardPassCount": {"operator": "eq", "value": 1},
 }
 REGISTRY = {
@@ -58,7 +66,25 @@ REGISTRY = {
                 "topology": "hosted-single-postgres-service",
                 "synthetic": True,
             },
-        }
+        },
+        {
+            "targetId": importer.REVERSIBLE_TARGET_ID,
+            "axis": "migration-reversible-segment",
+            "sourceDocument": {
+                "commit": "d" * 40,
+                "path": "docs/design.md",
+                "blob": DESIGN_BLOB,
+            },
+            "criteria": {
+                "catalogMismatchCount": {"operator": "eq", "value": 0},
+                "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+                "sentinelMismatchCount": {"operator": "eq", "value": 0},
+            },
+            "requiredEnvironment": {
+                "topology": "hosted-single-postgres-service",
+                "synthetic": True,
+            },
+        },
     ],
 }
 
@@ -85,10 +111,13 @@ def report() -> dict:
         "axes": [
             {
                 "axis": "migration-reversible-segment",
-                "verdict": "NOT_APPLICABLE",
-                "structuralException": {
-                    "reason": "no-reversible-tail",
-                    "reversibleTailCount": 0,
+                "verdict": "MEASURED_PASS",
+                "observationCount": 1,
+                "details": {
+                    "startingRevision": REVERSIBLE_HEAD,
+                    "endingRevision": REVERSIBLE_BARRIER,
+                    "catalogEquivalent": True,
+                    "sentinelPreserved": True,
                 },
             },
             {
@@ -97,11 +126,12 @@ def report() -> dict:
                 "observationCount": 1,
                 "details": {
                     "negativeFixtures": {
-                        "passedCount": 3,
+                        "passedCount": 4,
                         "cases": [
                             {"case": "existing-object-deletion", "verdict": "EXPECTED_FINDING"},
                             {"case": "0009-duplicate-key", "verdict": "EXPECTED_FINDING"},
                             {"case": "ellipsis-noop", "verdict": "EXPECTED_FINDING"},
+                            {"case": "0053-scoped-row-refusal", "verdict": "EXPECTED_FINDING"},
                         ],
                     }
                 },
@@ -110,14 +140,14 @@ def report() -> dict:
     }
 
 
-def junit(*, failing: bool = False) -> bytes:
+def junit(*, failing: bool = False, reversible_tail: int = 1) -> bytes:
     root = ET.Element(
         "testsuite",
         name="s11-ac11-migration-rehearsal",
-        tests="6",
+        tests="7",
         failures="1" if failing else "0",
         errors="0",
-        skipped="1",
+        skipped="0" if reversible_tail else "1",
     )
     names = (
         "fixture-manifest",
@@ -126,10 +156,11 @@ def junit(*, failing: bool = False) -> bytes:
         "negative-existing-object-deletion",
         "negative-0009-duplicate-key",
         "negative-ellipsis-noop",
+        "negative-0053-scoped-row-refusal",
     )
     for name in names:
         case = ET.SubElement(root, "testcase", classname="ac11.migration", name=name)
-        if name == "reversible-segment":
+        if name == "reversible-segment" and not reversible_tail:
             ET.SubElement(case, "skipped", message="no reversible tail; paired restore required")
         if failing and name == "negative-0009-duplicate-key":
             ET.SubElement(case, "failure", message="wrong error")
@@ -195,14 +226,34 @@ class AggregatorGit:
     def show(self, commit: str, path: str) -> str:
         if path == importer.REGISTRY_PATH:
             return json.dumps(REGISTRY)
+        if path == "migrations/versions/0052_barrier.py":
+            return (
+                f'revision = "{REVERSIBLE_BARRIER}"\n'
+                'down_revision = None\ndef downgrade():\n    raise RuntimeError("restore")\n'
+            )
+        if path == "migrations/versions/0053_head.py":
+            return (
+                f'revision = "{REVERSIBLE_HEAD}"\n'
+                f'down_revision = "{REVERSIBLE_BARRIER}"\n'
+                'def downgrade():\n    pass\n'
+            )
         raise AssertionError((commit, path))
 
     def list_paths(self, commit: str, prefix: str) -> list[str]:
-        raise AssertionError((commit, prefix))
+        assert commit == SOURCE and prefix == "migrations/versions"
+        return [
+            "migrations/versions/0052_barrier.py",
+            "migrations/versions/0053_head.py",
+        ]
 
 
 def imported(monkeypatch, *, value: dict | None = None, run_mutation=None, artifact_mutation=None):
     monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: (REVERSIBLE_HEAD, REVERSIBLE_BARRIER, 1),
+    )
     archive, bundled = bundle(value)
     run, artifact = metadata(archive, bundled)
     if run_mutation:
@@ -223,12 +274,52 @@ def test_imported_restore_axis_is_consumed_by_stage_one_aggregator(monkeypatch):
         "migration-reversible-segment",
         "irreversible-restore-forward",
     ]
-    restore = result["axes"][1]
+    reversible, restore = result["axes"]
+    reversible_evaluated = aggregator.evaluate_axis(reversible, AggregatorGit(), {}, NOW)
     evaluated = aggregator.evaluate_axis(restore, AggregatorGit(), {}, NOW)
+    assert reversible_evaluated.verdict is aggregator.Verdict.MEASURED_PASS
     assert evaluated.verdict is aggregator.Verdict.MEASURED_PASS
     assert restore["artifactSha256"] == restore["artifactObservedSha256"]
     assert restore["producerReportSha256"] == result["producerReportSha256"]
     assert restore["junitSha256"] == result["junitSha256"]
+
+
+def test_zero_tail_imports_only_the_graph_proved_structural_exception(monkeypatch):
+    monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: ("0054_irreversible_head", "0054_irreversible_head", 0),
+    )
+    value = report()
+    value["axes"][0] = {
+        "axis": "migration-reversible-segment",
+        "verdict": "NOT_APPLICABLE",
+        "structuralException": {"reason": "no-reversible-tail", "reversibleTailCount": 0},
+    }
+    archive, bundled = bundle(value, junit(reversible_tail=0))
+    run, artifact = metadata(archive, bundled)
+    result = importer.import_artifact(
+        archive, run_metadata=run, artifact_metadata=artifact, now=NOW
+    )
+    reversible = result["axes"][0]
+    assert reversible["verdict"] == "NOT_APPLICABLE"
+    assert "targetRef" not in reversible and "observations" not in reversible
+
+
+def test_graph_tail_and_junit_evidence_kind_mismatch_is_rejected(monkeypatch):
+    monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: ("0054_irreversible_head", "0054_irreversible_head", 0),
+    )
+    archive, bundled = bundle()
+    run, artifact = metadata(archive, bundled)
+    with pytest.raises(importer.EvidenceImportError, match="differs from the source graph"):
+        importer.import_artifact(
+            archive, run_metadata=run, artifact_metadata=artifact, now=NOW
+        )
 
 
 @pytest.mark.parametrize(
@@ -242,11 +333,27 @@ def test_imported_restore_axis_is_consumed_by_stage_one_aggregator(monkeypatch):
             ),
             "negative fixture",
         ),
+        (
+            lambda value: value["axes"][0]["details"].update(catalogEquivalent=False),
+            "tail roundtrip",
+        ),
+        (
+            lambda value: value["axes"][0].update(
+                verdict="NOT_APPLICABLE",
+                structuralException={"reason": "no-reversible-tail", "reversibleTailCount": 0},
+            ),
+            "tail roundtrip",
+        ),
         (lambda value: value.pop("sourceRunId"), "sourceRunId"),
     ],
 )
 def test_importer_rejects_incomplete_or_failed_producer_evidence(monkeypatch, mutation, message):
     monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: (REVERSIBLE_HEAD, REVERSIBLE_BARRIER, 1),
+    )
     value = report()
     mutation(value)
     archive, bundled = bundle(value)
@@ -282,6 +389,11 @@ def test_importer_rejects_unbound_github_metadata(
 
 def test_importer_rejects_junit_result_drift(monkeypatch):
     monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: (REVERSIBLE_HEAD, REVERSIBLE_BARRIER, 1),
+    )
     archive, bundled = bundle(report(), junit(failing=True))
     run, artifact = metadata(archive, bundled)
     with pytest.raises(importer.EvidenceImportError, match="JUnit summary"):
@@ -292,6 +404,11 @@ def test_importer_rejects_junit_result_drift(monkeypatch):
 
 def test_main_reads_zip_and_github_metadata_files(tmp_path, monkeypatch):
     monkeypatch.setattr(importer, "_git", fake_git)
+    monkeypatch.setattr(
+        importer,
+        "_source_migration_segment",
+        lambda _source: (REVERSIBLE_HEAD, REVERSIBLE_BARRIER, 1),
+    )
     archive, bundled = bundle()
     run, artifact = metadata(archive, bundled)
     archive_path = tmp_path / "evidence.zip"
