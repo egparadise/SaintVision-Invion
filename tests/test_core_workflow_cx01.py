@@ -64,6 +64,8 @@ def test_recovery_drill_runs_in_a_fresh_focused_session_before_the_full_suite():
     assert focused < gate < full
     assert "tests/integration/test_recovery_drill.py -q" in text[focused:gate]
     assert "assert len(cases) == 20" in text[gate:full]
-    assert "assert passed == 18" in text[gate:full]
-    assert "Counter({internal_network_reason: 2})" in text[gate:full]
+    # G-02: every one of the 20 focused cases executes; no internal-network skip remains.
+    assert "assert passed == 20" in text[gate:full]
+    assert "assert skips == Counter()" in text[gate:full]
+    assert "internal_network_reason" not in text[gate:full]
     assert "--ignore=tests/integration/test_recovery_drill.py" in text[full:]
