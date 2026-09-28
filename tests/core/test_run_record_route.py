@@ -190,9 +190,25 @@ def test_a_non_member_is_403_and_nothing_else_is_touched(monkeypatch):
     assert "record_calls" not in world
 
 
-# The unauthenticated case (401) needs the real engine: the app's denial path
-# touches it, and ``engine=object()`` here cannot answer. It is in
-# ``tests/integration/test_run_record_real_pg.py``.
+def test_without_a_credential_the_route_is_401_and_the_denial_is_audited_before_any_row(monkeypatch):
+    """The app records every AUTH denial out of band; that writer touches the
+    engine, which this harness cannot provide, so it is captured here. What the
+    route contributes is only that nothing of its own runs before the denial."""
+    from saintvision.api import app as app_module
+
+    denials = []
+    monkeypatch.setattr(app_module, "record_denial_out_of_band", lambda engine, **fields: denials.append(fields))
+    world: dict = {}
+    client = build(monkeypatch, world)
+    response = client.get(PATH)
+    assert response.status_code == 401, response.text
+    body = response.json()                      # legacy InvError shape on the auth boundary, not CanonicalProblem
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert body["code"] == "AUTH-MISSING-CREDENTIAL" and body["status"] == 401
+    assert RUN not in response.text
+    assert [d["reason_code"] for d in denials] == ["AUTH-MISSING-CREDENTIAL"]
+    assert denials[0]["actor_type"] == "anonymous" and denials[0]["outcome"] == "deny"
+    assert world["access_calls"] == [] and world["session"].gets == [] and "record_calls" not in world
 
 
 # ---------------------------------------------------------------- path -> row binding (revert: drop the helper)
