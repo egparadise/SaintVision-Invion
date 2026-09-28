@@ -1,4 +1,4 @@
-"""Normalize credential-free hosted security scanners into AC-11 evidence.
+"""Normalize hosted dependency/SAST scanners into redacted AC-11 evidence.
 
 The opt-in workflow runs pinned ``pip-audit`` and ``bandit`` binaries.  This
 producer does not trust their prose, does not serialize source snippets or
@@ -37,6 +37,7 @@ SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 RUN_ID_RE = re.compile(r"^[0-9]+$")
 ALLOWED_SEVERITIES = {"CRITICAL", "HIGH"}
 SCANNER_IDS = {"bandit", "pip-audit"}
+PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 
 class SecurityScanError(RuntimeError):
@@ -98,6 +99,7 @@ def load_allowlist(path: Path) -> dict[str, Any]:
         "verifiedAt",
         "producer",
         "workflow",
+        "importer",
         "scanners",
         "acceptedFindings",
     }
@@ -106,7 +108,7 @@ def load_allowlist(path: Path) -> dict[str, Any]:
     if value["schemaVersion"] != SCHEMA_VERSION:
         raise SecurityScanError("scan allowlist schemaVersion is unsupported")
     _utc(value["verifiedAt"], "verifiedAt")
-    for field in ("producer", "workflow"):
+    for field in ("producer", "workflow", "importer"):
         row = value[field]
         if (
             not isinstance(row, dict)
@@ -174,22 +176,52 @@ def _canonical_name(value: str) -> str:
     return re.sub(r"[-_.]+", "-", value).lower()
 
 
-def parse_pip_audit(value: Any) -> tuple[list[dict[str, Any]], dict[str, int]]:
+def _required_pins(path: Path) -> dict[str, str]:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise SecurityScanError(
+            f"registered requirements unreadable: {type(exc).__name__}"
+        ) from None
+    pins: dict[str, str] = {}
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        match = PIN_RE.fullmatch(line)
+        if match is None:
+            raise SecurityScanError("registered requirements contain a non-exact pin")
+        name, version = _canonical_name(match.group(1)), match.group(2)
+        if name in pins:
+            raise SecurityScanError("registered requirements contain a duplicate package")
+        pins[name] = version
+    if not pins:
+        raise SecurityScanError("registered requirements contain no exact pins")
+    return pins
+
+
+def parse_pip_audit(
+    value: Any, required_pins: dict[str, str]
+) -> tuple[list[dict[str, Any]], dict[str, int], list[dict[str, str]]]:
     if not isinstance(value, dict) or not isinstance(value.get("dependencies"), list):
         raise SecurityScanError("pip-audit JSON shape is unsupported")
     findings: list[dict[str, Any]] = []
-    dependency_count = 0
+    dependencies: dict[str, str] = {}
     for dependency in value["dependencies"]:
         if not isinstance(dependency, dict):
             raise SecurityScanError("pip-audit dependency row is malformed")
+        if dependency.get("skip_reason") is not None:
+            raise SecurityScanError("pip-audit skipped a registered dependency")
         name, version, vulns = dependency.get("name"), dependency.get("version"), dependency.get("vulns")
         if not isinstance(name, str) or not isinstance(version, str) or not isinstance(vulns, list):
             raise SecurityScanError("pip-audit dependency identity is malformed")
-        dependency_count += 1
+        package = _canonical_name(name)
+        if not package or not version or package in dependencies:
+            raise SecurityScanError("pip-audit dependency identity is empty or duplicated")
+        dependencies[package] = version
         for vuln in vulns:
             if not isinstance(vuln, dict) or not isinstance(vuln.get("id"), str):
                 raise SecurityScanError("pip-audit vulnerability identity is malformed")
-            package = _canonical_name(name)
             vuln_id = vuln["id"].strip()
             if not vuln_id:
                 raise SecurityScanError("pip-audit vulnerability ID is empty")
@@ -203,7 +235,17 @@ def parse_pip_audit(value: Any) -> tuple[list[dict[str, Any]], dict[str, int]]:
                     "location": version,
                 }
             )
-    return findings, {"dependencyCount": dependency_count, "findingCount": len(findings)}
+    if not dependencies:
+        raise SecurityScanError("pip-audit returned no dependencies")
+    missing = sorted(
+        name for name, version in required_pins.items() if dependencies.get(name) != version
+    )
+    if missing:
+        raise SecurityScanError("pip-audit omitted or changed a registered direct pin")
+    audited = [
+        {"name": name, "version": dependencies[name]} for name in sorted(dependencies)
+    ]
+    return findings, {"dependencyCount": len(audited), "findingCount": len(findings)}, audited
 
 
 def _relative_repo_path(value: str) -> str:
@@ -219,9 +261,34 @@ def _relative_repo_path(value: str) -> str:
     return normalized
 
 
-def parse_bandit(value: Any, scope_paths: list[str]) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    if not isinstance(value, dict) or not isinstance(value.get("results"), list):
+def parse_bandit(
+    value: Any, scope_paths: list[str], expected_files: list[str] | None = None
+) -> tuple[list[dict[str, Any]], dict[str, int], list[str]]:
+    if (
+        not isinstance(value, dict)
+        or not isinstance(value.get("results"), list)
+        or not isinstance(value.get("errors"), list)
+        or not isinstance(value.get("metrics"), dict)
+    ):
         raise SecurityScanError("bandit JSON shape is unsupported")
+    if value["errors"]:
+        raise SecurityScanError("bandit did not parse every registered source file")
+    scanned_files: list[str] = []
+    for raw_path in value["metrics"]:
+        if raw_path == "_totals":
+            continue
+        path = _relative_repo_path(str(raw_path))
+        if not path.endswith(".py") or not any(
+            path == scope or path.startswith(scope.rstrip("/") + "/")
+            for scope in scope_paths
+        ):
+            raise SecurityScanError("bandit metrics contain an out-of-scope file")
+        scanned_files.append(path)
+    scanned_files.sort()
+    if not scanned_files or len(scanned_files) != len(set(scanned_files)):
+        raise SecurityScanError("bandit scanned-file inventory is empty or duplicated")
+    if expected_files is not None and scanned_files != expected_files:
+        raise SecurityScanError("bandit scanned-file inventory differs from the source tree")
     counts = {"LOW": 0, "MEDIUM": 0, "HIGH": 0}
     findings: list[dict[str, Any]] = []
     for finding in value["results"]:
@@ -254,7 +321,8 @@ def parse_bandit(value: Any, scope_paths: list[str]) -> tuple[list[dict[str, Any
         "lowFindingCount": counts["LOW"],
         "mediumFindingCount": counts["MEDIUM"],
         "highFindingCount": counts["HIGH"],
-    }
+        "scannedFileCount": len(scanned_files),
+    }, scanned_files
 
 
 def _read_json(path: Path, label: str) -> Any:
@@ -294,6 +362,7 @@ def build_report(
     bandit_exit: int,
     pip_audit_version: str,
     bandit_version: str,
+    scan_started_at: str,
     allowlist_path: Path,
 ) -> dict[str, Any]:
     if not RUN_ID_RE.fullmatch(source_run_id):
@@ -306,17 +375,27 @@ def build_report(
     versions = {"pip-audit": pip_audit_version, "bandit": bandit_version}
     if versions != {key: scanner_specs[key]["version"] for key in sorted(SCANNER_IDS)}:
         raise SecurityScanError("installed scanner versions differ from the reviewed allowlist")
-    started_at = utc_now()
+    started_at_value = _utc(scan_started_at, "scan startedAt").astimezone(timezone.utc)
+    started_at = started_at_value.isoformat().replace("+00:00", "Z")
     complete = pip_audit_exit in (0, 1) and bandit_exit in (0, 1)
     failure_class = "NONE"
     findings: list[dict[str, Any]] = []
     summaries: dict[str, Any] = {}
     if complete:
-        pip_findings, summaries["pip-audit"] = parse_pip_audit(
-            _read_json(pip_audit_path, "pip-audit")
+        required_pins = _required_pins(
+            ROOT / scanner_specs["pip-audit"]["scopePaths"][0]
         )
-        bandit_findings, summaries["bandit"] = parse_bandit(
-            _read_json(bandit_path, "bandit"), scanner_specs["bandit"]["scopePaths"]
+        pip_findings, summaries["pip-audit"], audited_dependencies = parse_pip_audit(
+            _read_json(pip_audit_path, "pip-audit"), required_pins
+        )
+        bandit_scopes = scanner_specs["bandit"]["scopePaths"]
+        expected_python_files = sorted(
+            path.relative_to(ROOT).as_posix()
+            for scope in bandit_scopes
+            for path in (ROOT / scope).rglob("*.py")
+        )
+        bandit_findings, summaries["bandit"], scanned_python_files = parse_bandit(
+            _read_json(bandit_path, "bandit"), bandit_scopes, expected_python_files
         )
         findings = sorted(pip_findings + bandit_findings, key=lambda row: row["findingId"])
         if len({row["findingId"] for row in findings}) != len(findings):
@@ -347,6 +426,7 @@ def build_report(
         verdict = "MEASURED_PASS" if failure_class == "NONE" else "MEASURED_FAIL"
     else:
         stale, unallowlisted, expired, severity_mismatch = [], [], [], []
+        audited_dependencies, scanned_python_files = [], []
         verdict = "NOT_OBSERVED"
         failure_class = "SCANNER_UNAVAILABLE"
     scope_paths = sorted(
@@ -360,6 +440,8 @@ def build_report(
         "scannerVersions": versions,
         "scannerExitCodes": {"pip-audit": pip_audit_exit, "bandit": bandit_exit},
         "scanInputs": scan_inputs,
+        "auditedDependencies": audited_dependencies,
+        "scannedPythonFiles": scanned_python_files,
         "summaries": summaries,
         "criticalHighFindings": findings,
         "criticalCount": sum(row["severity"] == "CRITICAL" for row in findings),
@@ -369,6 +451,9 @@ def build_report(
         "staleAllowlistFindingIds": stale,
         "severityMismatchFindingIds": severity_mismatch,
     }
+    finished_at = utc_now()
+    if _utc(finished_at, "scan finishedAt") < started_at_value:
+        raise SecurityScanError("scan finishedAt precedes startedAt")
     return {
         "schemaVersion": SCHEMA_VERSION,
         "runPurpose": RUN_PURPOSE,
@@ -382,14 +467,16 @@ def build_report(
             "topology": "hosted",
             "evidenceClass": "security-tools-v0",
             "credentialsRequired": False,
-            "externalServicesRequired": False,
+            "externalServicesRequired": True,
         },
         "startedAt": started_at,
-        "finishedAt": utc_now(),
+        "finishedAt": finished_at,
         "reportAvailable": complete,
         "status": "complete" if complete else "unavailable",
         "allowlist": {"path": allowlist_repo_path, "blob": allowlist_blob},
-        "toolFiles": [allowlist["producer"], allowlist["workflow"]],
+        "toolFiles": [
+            allowlist["producer"], allowlist["workflow"], allowlist["importer"]
+        ],
         "payloadSha256": canonical_sha256(payload),
         "payload": payload,
         "verdict": verdict,
@@ -408,6 +495,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--bandit-exit", type=int, required=True)
     parser.add_argument("--pip-audit-version", required=True)
     parser.add_argument("--bandit-version", required=True)
+    parser.add_argument("--scan-started-at", required=True)
     parser.add_argument("--allowlist", type=Path, default=DEFAULT_ALLOWLIST)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--junit", type=Path, required=True)
@@ -423,6 +511,7 @@ def main(argv: list[str] | None = None) -> int:
             bandit_exit=args.bandit_exit,
             pip_audit_version=args.pip_audit_version,
             bandit_version=args.bandit_version,
+            scan_started_at=args.scan_started_at,
             allowlist_path=args.allowlist,
         )
     except SecurityScanError as exc:

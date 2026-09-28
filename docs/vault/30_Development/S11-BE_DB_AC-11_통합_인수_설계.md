@@ -1,11 +1,11 @@
 ---
 doc_id: "DESIGN-S11-AC11-ACCEPTANCE-001"
 title: "S11-BE·S11-DB AC-11 통합 인수 설계"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-29T00:08:48+09:00"
+updated: "2026-09-29T00:45:49+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 tasks: ["S11-BE", "S11-DB"]
@@ -175,14 +175,16 @@ VF-CL-04 파일럿 retention 기본값 **7일**과 정본 DB 계획의 **35일**
 
 ### 4.3 security allowlist v0
 
-dependency/static scanner는 opt-in hosted lane의 `pip-audit 2.10.1`과 `bandit 1.9.4` 두 개를 등록한다. 등록 자체는 측정이 아니며, exact source head에서 네 report가 모두 결속되기 전 판정은 계속 `NOT_OBSERVED`다. 아래 repo-native 보안 evidence도 “scanner 전체”로 부풀리지 않고 각 threat ID 범위만 덮는다.
+dependency/static scanner는 opt-in hosted lane의 `pip-audit 2.10.1`과 `bandit 1.9.4` 두 개를 등록한다. 등록 자체는 측정이 아니며, exact source head에서 네 report가 모두 결속되기 전 판정은 계속 `NOT_OBSERVED`다. `pip-audit`는 PyPI·vulnerability database라는 외부 서비스를 쓰지만 credential은 요구하지 않는다. 아래 repo-native 보안 evidence도 “scanner 전체”로 부풀리지 않고 각 threat ID 범위만 덮는다.
 
 | threat ID | 도구·고정 버전(blob) | 범위 | severity 규칙 |
 |---|---|---|---|
 | `SEC-DEF-001` | `tools/check_definer_functions.py` `5831f8d8…3952` + `definer-policy.json` `c1581f1f…70e` | SECURITY DEFINER owner/search_path/EXECUTE 정책 drift | 미등록 definer·PUBLIC EXECUTE·비고정 search_path = high |
 | `SEC-RLS-001` | `tools/collect_rls_evidence.py` `329da31a…932` + `rls-boundary-baseline.json` `698a5b55…404` | tenant isolation·RLS boundary evidence | reachable cross-tenant read/write 또는 fail-open provenance = critical; 미측정 = NOT_OBSERVED |
 | `SEC-VF-001` | `Evidence/s11-security-allowlist-v0.json`이 runner/workflow/test 3파일 blob과 required node ID 5개를 고정 | 승인 중복·회수, catalogue owner scope, current permission, login/approval/logout 경계 | policy bypass/credential disclosure = critical, 다른 강제 경계 회귀 = high |
-| `SEC-SCAN-001` | `pip-audit 2.10.1` + `bandit 1.9.4`; `Evidence/s11-security-dependency-sast-allowlist-v1.json`이 producer/workflow blob·scope·severity policy를 고정 | `requirements-core.txt` 의존성 취약점, `services/control-plane/src`·`src/saintvision` Python SAST | pip-audit finding은 안정 severity 부재 때문에 전부 high로 보수 분류, Bandit HIGH만 high; allowlist 밖 1건 이상 = `MEASURED_FAIL` |
+| `SEC-SCAN-001` | `pip-audit 2.10.1` + `bandit 1.9.4`; `Evidence/s11-security-dependency-sast-allowlist-v1.json`이 producer/workflow/importer blob·scope·severity policy를 고정 | `requirements-core.txt` exact direct pin 포함 + audited name/version 전체 목록, 두 production Python tree의 exact `.py` 목록·Bandit parse error 0 | pip-audit finding은 안정 severity 부재 때문에 전부 high로 보수 분류, Bandit HIGH만 high; allowlist 밖 1건 이상 = `MEASURED_FAIL` |
+
+`SEC-SCAN-001`의 hosted artifact는 raw producer report/JUnit이다. 집계 입력으로 쓰기 전 `tools/import_ac11_security_scan.py`가 canonical repository의 `gh api` run/artifact JSON과 다운로드 zip을 받아 run ID·source head·artifact ID/name·GitHub digest와 직접 계산한 zip SHA-256·expiry·workflow path를 결속한다. 집계기는 source head/tree·clean checkout·hosted environment·30일 freshness·artifact 결속을 다시 검사한다. raw artifact 또는 손으로 쓴 report를 곧바로 security 축에 넣을 수 없다. `gh api` metadata를 취득하는 호출자의 인증 경계 자체는 #177 importer와 같은 잔존 trust boundary다.
 
 `SEC-VF-001`의 정본 invocation은 `tools/run_vf_security_tests.py tests/integration/test_desktop_browser.py tests/integration/test_approval_browser.py tests/integration/test_studio_browser.py`이고, workflow가 요구하는 node ID 집합이 manifest와 exact match해야 한다. argv로 다른 파일을 넘기거나 node ID가 빠지면 `INVALID_RUN`이다.
 
@@ -201,10 +203,10 @@ dependency/static scanner는 opt-in hosted lane의 `pip-audit 2.10.1`과 `bandit
 | RLS exit 0 / 1 / 2 / 3 | tool-scope pass / 위반 / 관측 불가 / identity unmeasured | `MEASURED_PASS` / `MEASURED_FAIL` / `NOT_OBSERVED` / `NOT_OBSERVED` |
 | pip-audit vulnerability 1건 이상 | high(보수 분류) | exact finding ID가 사유·만료와 함께 allowlist에 없으면 `MEASURED_FAIL` |
 | Bandit HIGH 1건 이상 | high | exact `test_id:path:line` finding ID가 사유·만료와 함께 allowlist에 없으면 `MEASURED_FAIL` |
-| `SEC-SCAN-001` report 누락·scanner exit 2+·payload SHA 불일치 | 관측 불완전 | `NOT_OBSERVED` |
-| scanner 버전·scope Git object·producer/workflow blob drift | provenance 불일치 | `INVALID_RUN` |
+| `SEC-SCAN-001` report 누락·scanner exit 2+·Bandit `errors[]`·source/artifact SHA 불일치·30일 초과 | 관측 불완전 | `NOT_OBSERVED` |
+| scanner 버전·scope Git object·producer/workflow/importer blob drift, direct pin 누락, Bandit source inventory 불일치 | provenance 불일치 | `INVALID_RUN` |
 
-도구·blob·범위·severity mapping·threat ID 중 하나라도 문서 갱신 없이 바뀌면 `INVALID_RUN`이다. allowlist 도구 report 누락은 `NOT_OBSERVED`, accepted-with-expiry가 만료되면 `MEASURED_FAIL`이다. `SEC-SCAN-001`은 이 v1.2 표와 고정 allowlist가 merge된 source head에서만 분모에 들어간다. `check_definer_functions.py`에는 검토에서 열거한 8개 외에도 실제 code `expected_privileged_function_missing`이 있으므로 위 표가 함께 fail-closed로 포함한다.
+도구·blob·범위·severity mapping·threat ID 중 하나라도 문서 갱신 없이 바뀌면 `INVALID_RUN`이다. allowlist 도구 report 누락은 `NOT_OBSERVED`, accepted-with-expiry가 만료되면 `MEASURED_FAIL`이다. `SEC-SCAN-001`은 이 v1.3 표와 고정 allowlist가 merge된 source head에서만 분모에 들어간다. `check_definer_functions.py`에는 검토에서 열거한 8개 외에도 실제 code `expected_privileged_function_missing`이 있으므로 위 표가 함께 fail-closed로 포함한다.
 
 ### 4.4 SLO 부정 시험
 

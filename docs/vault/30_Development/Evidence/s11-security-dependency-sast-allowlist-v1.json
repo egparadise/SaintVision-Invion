@@ -1,13 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-09-29T00:14:43+09:00",
+  "verifiedAt": "2026-09-29T00:45:49+09:00",
   "producer": {
     "path": "tools/run_ac11_security_scan.py",
-    "blob": "de439f288d6dcd1101b57411b6ebc5c7f0974c5b"
+    "blob": "87d142e045b43776b776732ea6dc28822a1c0f32"
   },
   "workflow": {
     "path": ".github/workflows/ac11-security-scan.yml",
-    "blob": "aabc827040ed6d5c02040bffdd40153881d0288a"
+    "blob": "f0400d21c0d59803161323a5d036a4bea69c8366"
+  },
+  "importer": {
+    "path": "tools/import_ac11_security_scan.py",
+    "blob": "866175333039778f1afe0635dc85b64796cad819"
   },
   "scanners": [
     {

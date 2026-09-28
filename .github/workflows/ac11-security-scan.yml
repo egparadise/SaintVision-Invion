@@ -32,13 +32,14 @@ jobs:
         with:
           ref: ${{ env.SOURCE_HEAD_SHA }}
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: pip
 
-      - name: Install pinned credential-free scanners
+      - name: Install pinned scanners
         run: >-
           python -m pip install
           pip-audit==${PIP_AUDIT_VERSION}
@@ -48,6 +49,9 @@ jobs:
         id: scan
         shell: bash
         run: |
+          echo "started_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "pip_audit_version=$(python -m pip_audit --version | awk 'NR==1 {print $2}')" >> "$GITHUB_OUTPUT"
+          echo "bandit_version=$(python -m bandit --version | awk 'NR==1 {print $2}')" >> "$GITHUB_OUTPUT"
           set +e
           python -m pip_audit \
             --requirement requirements-core.txt \
@@ -76,8 +80,9 @@ jobs:
             --bandit-json "$BANDIT_JSON" \
             --pip-audit-exit "${{ steps.scan.outputs.pip_audit_exit }}" \
             --bandit-exit "${{ steps.scan.outputs.bandit_exit }}" \
-            --pip-audit-version "$PIP_AUDIT_VERSION" \
-            --bandit-version "$BANDIT_VERSION" \
+            --pip-audit-version "${{ steps.scan.outputs.pip_audit_version }}" \
+            --bandit-version "${{ steps.scan.outputs.bandit_version }}" \
+            --scan-started-at "${{ steps.scan.outputs.started_at }}" \
             --report "$REPORT" \
             --junit "$JUNIT"
           producer_exit=$?
@@ -101,9 +106,10 @@ jobs:
           assert report['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
           assert report['cleanCheckout'] is True
           assert report['environment']['credentialsRequired'] is False
-          assert report['environment']['externalServicesRequired'] is False
+          assert report['environment']['externalServicesRequired'] is True
           assert set(report['payload']) == {
               'scannerVersions', 'scannerExitCodes', 'scanInputs', 'summaries',
+              'auditedDependencies', 'scannedPythonFiles',
               'criticalHighFindings', 'criticalCount', 'highCount',
               'unallowlistedFindingIds', 'expiredFindingIds',
               'staleAllowlistFindingIds', 'severityMismatchFindingIds',

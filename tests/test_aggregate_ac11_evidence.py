@@ -40,7 +40,11 @@ TOOL_BLOBS = {
 }
 TOOL_BLOBS[tool.ALLOWLIST_REPO_PATH] = tool.ALLOWLIST_BLOB
 TOOL_BLOBS[tool.SCAN_ALLOWLIST_REPO_PATH] = tool.SCAN_ALLOWLIST_BLOB
-for row in (SCAN_ALLOWLIST["producer"], SCAN_ALLOWLIST["workflow"]):
+for row in (
+    SCAN_ALLOWLIST["producer"],
+    SCAN_ALLOWLIST["workflow"],
+    SCAN_ALLOWLIST["importer"],
+):
     TOOL_BLOBS[row["path"]] = row["blob"]
 for scanner in SCAN_ALLOWLIST["scanners"]:
     for path in scanner["scopePaths"]:
@@ -100,6 +104,8 @@ class FakeGit:
             return json.dumps({"schemaVersion": tool.SCHEMA_VERSION, "targets": targets})
         if path == tool.SCAN_ALLOWLIST_REPO_PATH:
             return json.dumps(SCAN_ALLOWLIST)
+        if path == "requirements-core.txt":
+            return "fastapi==0.141.1\npydantic==2.13.5\n"
         if path == "migrations/versions/0001_base.py":
             return 'revision = "0001_base"\ndown_revision = None\ndef downgrade():\n    raise RuntimeError("restore")\n'
         if path == "migrations/versions/0002_head.py":
@@ -107,6 +113,10 @@ class FakeGit:
         raise AssertionError((commit, path))
 
     def list_paths(self, commit: str, prefix: str) -> list[str]:
+        if prefix == "services/control-plane/src":
+            return ["services/control-plane/src/inv/sample.py"]
+        if prefix == "src/saintvision":
+            return ["src/saintvision/sample.py"]
         assert prefix == "migrations/versions"
         return ["migrations/versions/0001_base.py", "migrations/versions/0002_head.py"]
 
@@ -250,13 +260,22 @@ def security_scan_report() -> dict:
                 {path for row in scanner_specs.values() for path in row["scopePaths"]}
             )
         ],
+        "auditedDependencies": [
+            {"name": "fastapi", "version": "0.141.1"},
+            {"name": "pydantic", "version": "2.13.5"},
+        ],
+        "scannedPythonFiles": [
+            "services/control-plane/src/inv/sample.py",
+            "src/saintvision/sample.py",
+        ],
         "summaries": {
             "bandit": {
                 "lowFindingCount": 0,
                 "mediumFindingCount": 0,
                 "highFindingCount": 0,
+                "scannedFileCount": 2,
             },
-            "pip-audit": {"dependencyCount": 10, "findingCount": 0},
+            "pip-audit": {"dependencyCount": 2, "findingCount": 0},
         },
         "criticalHighFindings": [],
         "criticalCount": 0,
@@ -270,6 +289,19 @@ def security_scan_report() -> dict:
         "schemaVersion": tool.SCHEMA_VERSION,
         "runPurpose": "s11-ac11-security-scan",
         "threatId": "SEC-SCAN-001",
+        "sourceRunId": "36440000000",
+        "sourceHeadSha": SOURCE,
+        "checkoutTreeSha": TREE,
+        "cleanCheckout": True,
+        "environment": {
+            "runnerImage": "Linux-X64",
+            "topology": "hosted",
+            "evidenceClass": "security-tools-v0",
+            "credentialsRequired": False,
+            "externalServicesRequired": True,
+        },
+        "startedAt": "2026-09-28T02:00:00Z",
+        "finishedAt": "2026-09-28T02:01:00Z",
         "reportAvailable": True,
         "status": "complete",
         "allowlist": {
@@ -279,7 +311,21 @@ def security_scan_report() -> dict:
         "toolFiles": [
             copy.deepcopy(SCAN_ALLOWLIST["producer"]),
             copy.deepcopy(SCAN_ALLOWLIST["workflow"]),
+            copy.deepcopy(SCAN_ALLOWLIST["importer"]),
         ],
+        "scanArtifact": {
+            "repository": "egparadise/SaintVision-Invion",
+            "workflowPath": ".github/workflows/ac11-security-scan.yml",
+            "runId": "36440000000",
+            "artifactId": "10970000000",
+            "artifactName": f"s11-ac11-security-{SOURCE}",
+            "digest": "9" * 64,
+            "observedDigest": "9" * 64,
+            "expiresAt": "2030-01-01T00:00:00Z",
+            "runConclusion": "success",
+            "producerReportSha256": "8" * 64,
+            "junitSha256": "7" * 64,
+        },
         "payloadSha256": tool._canonical_sha256(payload),
         "payload": payload,
         "verdict": "MEASURED_PASS",
@@ -678,6 +724,73 @@ def test_security_scan_missing_or_payload_sha_mismatch_is_not_observed(allowlist
     assert axis_result(mismatch, allowlist).verdict is tool.Verdict.NOT_OBSERVED
 
 
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        (lambda row: row.update(sourceHeadSha="f" * 40), tool.Verdict.NOT_OBSERVED),
+        (lambda row: row.update(checkoutTreeSha="f" * 40), tool.Verdict.NOT_OBSERVED),
+        (lambda row: row.update(cleanCheckout=False), tool.Verdict.NOT_OBSERVED),
+        (lambda row: row.pop("sourceRunId"), tool.Verdict.INVALID_RUN),
+        (
+            lambda row: row["environment"].update(credentialsRequired=True),
+            tool.Verdict.INVALID_RUN,
+        ),
+        (
+            lambda row: row.update(finishedAt="2026-07-01T00:00:00Z"),
+            tool.Verdict.NOT_OBSERVED,
+        ),
+        (
+            lambda row: row["scanArtifact"].update(observedDigest="6" * 64),
+            tool.Verdict.NOT_OBSERVED,
+        ),
+        (
+            lambda row: row["scanArtifact"].update(expiresAt="2020-01-01T00:00:00Z"),
+            tool.Verdict.NOT_OBSERVED,
+        ),
+    ],
+)
+def test_security_scan_run_source_and_artifact_provenance_is_fail_closed(
+    mutation, expected
+):
+    report = security_scan_report()
+    mutation(report)
+    assert (
+        tool.evaluate_security_scan(report, SCAN_ALLOWLIST, NOW, FakeGit(), SOURCE)
+        is expected
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda row: row["payload"]["scannerVersions"].update(bandit="0.0.0"),
+        lambda row: row["payload"]["scannerExitCodes"].update(bandit=2),
+        lambda row: row.update(runPurpose="unregistered"),
+        lambda row: row["allowlist"].update(blob="0" * 40),
+        lambda row: row["payload"]["summaries"]["pip-audit"].update(dependencyCount=1),
+        lambda row: row["payload"].update(scannedPythonFiles=[]),
+        lambda row: row.update(failureClass="STALE_ALLOWLIST"),
+    ],
+)
+def test_security_scan_registered_shape_guards_are_mutation_sensitive(mutation):
+    report = security_scan_report()
+    mutation(report)
+    report["payloadSha256"] = tool._canonical_sha256(report["payload"])
+    assert (
+        tool.evaluate_security_scan(report, SCAN_ALLOWLIST, NOW, FakeGit(), SOURCE)
+        is tool.Verdict.INVALID_RUN
+    )
+
+
+def test_security_scan_unavailable_report_is_not_observed():
+    report = security_scan_report()
+    report.update(reportAvailable=False, status="unavailable", verdict="NOT_OBSERVED")
+    assert (
+        tool.evaluate_security_scan(report, SCAN_ALLOWLIST, NOW, FakeGit(), SOURCE)
+        is tool.Verdict.NOT_OBSERVED
+    )
+
+
 def test_security_scan_unallowlisted_high_is_measured_fail(allowlist):
     value = security_envelope(allowlist)
     scan = value["observations"][3]
@@ -692,6 +805,7 @@ def test_security_scan_unallowlisted_high_is_measured_fail(allowlist):
     scan["payload"]["criticalHighFindings"] = [finding]
     scan["payload"]["highCount"] = 1
     scan["payload"]["summaries"]["bandit"]["highFindingCount"] = 1
+    scan["payload"]["scannerExitCodes"]["bandit"] = 1
     scan["payload"]["unallowlistedFindingIds"] = [finding["findingId"]]
     scan["payloadSha256"] = tool._canonical_sha256(scan["payload"])
     scan["verdict"] = "MEASURED_FAIL"
@@ -713,6 +827,7 @@ def test_security_scan_reviewed_exception_requires_reason_and_unexpired_exact_id
     scan["payload"]["criticalHighFindings"] = [finding]
     scan["payload"]["highCount"] = 1
     scan["payload"]["summaries"]["pip-audit"]["findingCount"] = 1
+    scan["payload"]["scannerExitCodes"]["pip-audit"] = 1
     reviewed = copy.deepcopy(SCAN_ALLOWLIST)
     reviewed["acceptedFindings"] = [
         {

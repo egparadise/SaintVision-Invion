@@ -20,7 +20,7 @@ import math
 import re
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
@@ -38,7 +38,7 @@ ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "74dde5cb52976a598bfc27466289d07877872f70"
+SCAN_ALLOWLIST_BLOB = "c0d19f65305d7ea18e3c208ca2600d785cafaf06"
 SCHEMA_VERSION = "1.0.0"
 RUN_PURPOSE = "ac11-release-gate"
 AXIS_PURPOSE = "ac11-axis-evidence"
@@ -74,6 +74,8 @@ REQUIRED_TARGET_BY_AXIS = {
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 KNOWN_OPERATORS = {"lt", "lte", "eq", "gte", "gt"}
+SCAN_FRESHNESS = timedelta(days=30)
+PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
@@ -698,14 +700,15 @@ def evaluate_vf(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
 
 def validate_scan_allowlist(value: Any) -> dict[str, Any]:
     expected = {
-        "schemaVersion", "verifiedAt", "producer", "workflow", "scanners", "acceptedFindings"
+        "schemaVersion", "verifiedAt", "producer", "workflow", "importer",
+        "scanners", "acceptedFindings"
     }
     if not isinstance(value, dict) or set(value) != expected:
         raise ValueError("dependency/SAST allowlist shape is not reviewed")
     if value["schemaVersion"] != SCHEMA_VERSION:
         raise ValueError("dependency/SAST allowlist schema is unknown")
     _timezone_aware(value["verifiedAt"], "dependency/SAST verifiedAt")
-    _files([value["producer"], value["workflow"]])
+    _files([value["producer"], value["workflow"], value["importer"]])
     scanners = value["scanners"]
     if not isinstance(scanners, list) or len(scanners) != 2:
         raise ValueError("dependency/SAST scanner inventory must contain exactly two rows")
@@ -753,6 +756,28 @@ def validate_scan_allowlist(value: Any) -> dict[str, Any]:
     return value
 
 
+def _canonical_package(value: str) -> str:
+    return re.sub(r"[-_.]+", "-", value).lower()
+
+
+def _registered_pins(content: str) -> dict[str, str]:
+    pins: dict[str, str] = {}
+    for raw in content.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        match = PIN_RE.fullmatch(line)
+        if match is None:
+            raise ValueError("registered requirements contain a non-exact pin")
+        name, version = _canonical_package(match.group(1)), match.group(2)
+        if name in pins:
+            raise ValueError("registered requirements contain a duplicate package")
+        pins[name] = version
+    if not pins:
+        raise ValueError("registered requirements contain no exact pins")
+    return pins
+
+
 def evaluate_security_scan(
     report: dict[str, Any], scan_allowlist: dict[str, Any], now: datetime, git: GitReader, source: str
 ) -> Verdict:
@@ -768,10 +793,67 @@ def evaluate_security_scan(
         return Verdict.INVALID_RUN
     if report.get("schemaVersion") != SCHEMA_VERSION or report.get("threatId") != "SEC-SCAN-001":
         return Verdict.INVALID_RUN
+    source_run_id = report.get("sourceRunId")
+    if not isinstance(source_run_id, str) or not source_run_id.isdigit():
+        return Verdict.INVALID_RUN
+    if report.get("sourceHeadSha") != source:
+        return Verdict.NOT_OBSERVED
+    if report.get("checkoutTreeSha") != git.tree(source) or report.get("cleanCheckout") is not True:
+        return Verdict.NOT_OBSERVED
+    environment = report.get("environment")
+    if (
+        not isinstance(environment, dict)
+        or set(environment) != {
+            "runnerImage", "topology", "evidenceClass", "credentialsRequired",
+            "externalServicesRequired",
+        }
+        or not isinstance(environment["runnerImage"], str)
+        or not environment["runnerImage"]
+        or environment["topology"] != "hosted"
+        or environment["evidenceClass"] != "security-tools-v0"
+        or environment["credentialsRequired"] is not False
+        or environment["externalServicesRequired"] is not True
+    ):
+        return Verdict.INVALID_RUN
+    try:
+        started = _utc(report.get("startedAt"), "security scan startedAt")
+        finished = _utc(report.get("finishedAt"), "security scan finishedAt")
+    except ValueError:
+        return Verdict.INVALID_RUN
+    if finished < started or finished > now or now - finished > SCAN_FRESHNESS:
+        return Verdict.NOT_OBSERVED
+    artifact = report.get("scanArtifact")
+    artifact_keys = {
+        "repository", "workflowPath", "runId", "artifactId", "artifactName",
+        "digest", "observedDigest", "expiresAt", "runConclusion",
+        "producerReportSha256", "junitSha256",
+    }
+    if not isinstance(artifact, dict) or set(artifact) != artifact_keys:
+        return Verdict.NOT_OBSERVED
+    if (
+        artifact["repository"] != "egparadise/SaintVision-Invion"
+        or artifact["workflowPath"] != ".github/workflows/ac11-security-scan.yml"
+        or artifact["runId"] != source_run_id
+        or not str(artifact["artifactId"]).isdigit()
+        or artifact["artifactName"] != f"s11-ac11-security-{source}"
+        or artifact["runConclusion"] != "success"
+        or not SHA256_RE.fullmatch(str(artifact["digest"]))
+        or artifact["observedDigest"] != artifact["digest"]
+        or not SHA256_RE.fullmatch(str(artifact["producerReportSha256"]))
+        or not SHA256_RE.fullmatch(str(artifact["junitSha256"]))
+    ):
+        return Verdict.NOT_OBSERVED
+    try:
+        if _utc(artifact["expiresAt"], "security scan artifact expiry") <= now:
+            return Verdict.NOT_OBSERVED
+    except ValueError:
+        return Verdict.INVALID_RUN
     allowlist_ref = report.get("allowlist")
     if allowlist_ref != {"path": SCAN_ALLOWLIST_REPO_PATH, "blob": SCAN_ALLOWLIST_BLOB}:
         return Verdict.INVALID_RUN
-    expected_files = [scan_allowlist["producer"], scan_allowlist["workflow"]]
+    expected_files = [
+        scan_allowlist["producer"], scan_allowlist["workflow"], scan_allowlist["importer"]
+    ]
     if _files(report.get("toolFiles")) != _files(expected_files):
         return Verdict.INVALID_RUN
     for item in _files(expected_files):
@@ -809,6 +891,7 @@ def evaluate_security_scan(
         return Verdict.INVALID_RUN
     expected_payload_keys = {
         "scannerVersions", "scannerExitCodes", "scanInputs", "summaries",
+        "auditedDependencies", "scannedPythonFiles",
         "criticalHighFindings", "criticalCount", "highCount",
         "unallowlistedFindingIds", "expiredFindingIds", "staleAllowlistFindingIds",
         "severityMismatchFindingIds",
@@ -820,7 +903,8 @@ def evaluate_security_scan(
         not isinstance(summaries, dict)
         or set(summaries) != {"bandit", "pip-audit"}
         or set(summaries["bandit"]) != {
-            "lowFindingCount", "mediumFindingCount", "highFindingCount"
+            "lowFindingCount", "mediumFindingCount", "highFindingCount",
+            "scannedFileCount",
         }
         or set(summaries["pip-audit"]) != {"dependencyCount", "findingCount"}
         or any(
@@ -829,6 +913,54 @@ def evaluate_security_scan(
             for count in summary.values()
         )
     ):
+        return Verdict.INVALID_RUN
+    audited = payload["auditedDependencies"]
+    if not isinstance(audited, list) or not audited:
+        return Verdict.INVALID_RUN
+    audited_map: dict[str, str] = {}
+    for row in audited:
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"name", "version"}
+            or not isinstance(row["name"], str)
+            or not row["name"]
+            or not isinstance(row["version"], str)
+            or not row["version"]
+            or row["name"] in audited_map
+        ):
+            return Verdict.INVALID_RUN
+        audited_map[row["name"]] = row["version"]
+    if audited != [
+        {"name": name, "version": audited_map[name]} for name in sorted(audited_map)
+    ]:
+        return Verdict.INVALID_RUN
+    requirements_path = scanner_specs["pip-audit"]["scopePaths"][0]
+    try:
+        required_pins = _registered_pins(git.show(source, requirements_path))
+    except ValueError:
+        return Verdict.INVALID_RUN
+    if any(audited_map.get(name) != version for name, version in required_pins.items()):
+        return Verdict.INVALID_RUN
+    if summaries["pip-audit"]["dependencyCount"] != len(audited):
+        return Verdict.INVALID_RUN
+    scanned_files = payload["scannedPythonFiles"]
+    if (
+        not isinstance(scanned_files, list)
+        or not scanned_files
+        or scanned_files != sorted(scanned_files)
+        or len(scanned_files) != len(set(scanned_files))
+        or any(not isinstance(path, str) or not path.endswith(".py") for path in scanned_files)
+    ):
+        return Verdict.INVALID_RUN
+    expected_python_files = sorted(
+        path
+        for prefix in scanner_specs["bandit"]["scopePaths"]
+        for path in git.list_paths(source, prefix)
+        if path.endswith(".py")
+    )
+    if scanned_files != expected_python_files:
+        return Verdict.INVALID_RUN
+    if summaries["bandit"]["scannedFileCount"] != len(scanned_files):
         return Verdict.INVALID_RUN
     findings = payload["criticalHighFindings"]
     if not isinstance(findings, list):
@@ -862,6 +994,14 @@ def evaluate_security_scan(
     ) or summaries["pip-audit"]["findingCount"] != sum(
         row["scanner"] == "pip-audit" for row in findings
     ):
+        return Verdict.INVALID_RUN
+    expected_pip_exit = 1 if summaries["pip-audit"]["findingCount"] else 0
+    bandit_total = sum(
+        summaries["bandit"][key]
+        for key in ("lowFindingCount", "mediumFindingCount", "highFindingCount")
+    )
+    expected_bandit_exit = 1 if bandit_total else 0
+    if exits != {"pip-audit": expected_pip_exit, "bandit": expected_bandit_exit}:
         return Verdict.INVALID_RUN
     accepted = {row["findingId"]: row for row in scan_allowlist["acceptedFindings"]}
     stale = sorted(set(accepted) - set(actual))

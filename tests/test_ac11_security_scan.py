@@ -28,6 +28,7 @@ def base_allowlist() -> dict:
         "verifiedAt": "2026-09-29T00:03:32+09:00",
         "producer": {"path": "tools/run_ac11_security_scan.py", "blob": OBJECT},
         "workflow": {"path": ".github/workflows/ac11-security-scan.yml", "blob": OBJECT},
+        "importer": {"path": "tools/import_ac11_security_scan.py", "blob": OBJECT},
         "scanners": [
             {
                 "id": "bandit",
@@ -59,6 +60,16 @@ def source(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path]:
     )
     allowlist_path.parent.mkdir(parents=True)
     allowlist_path.write_text(json.dumps(base_allowlist()), encoding="utf-8")
+    (root / "requirements-core.txt").write_text(
+        "fastapi==0.141.1\npydantic==2.13.5\n", encoding="utf-8"
+    )
+    source_files = [
+        root / "services" / "control-plane" / "src" / "inv" / "sample.py",
+        root / "src" / "saintvision" / "sample.py",
+    ]
+    for path in source_files:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("VALUE = 1\n", encoding="utf-8")
     pip_path = root / "pip-audit.json"
     bandit_path = root / "bandit.json"
     pip_path.write_text(
@@ -72,7 +83,20 @@ def source(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, Path]:
         ),
         encoding="utf-8",
     )
-    bandit_path.write_text(json.dumps({"results": []}), encoding="utf-8")
+    bandit_path.write_text(
+        json.dumps(
+            {
+                "results": [],
+                "errors": [],
+                "metrics": {
+                    "services/control-plane/src/inv/sample.py": {},
+                    "src/saintvision/sample.py": {},
+                    "_totals": {},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(tool, "ROOT", root)
 
     def fake_git(*args: str) -> str:
@@ -101,6 +125,7 @@ def build(source: dict[str, Path], **overrides: object) -> dict:
         "bandit_exit": 0,
         "pip_audit_version": "2.10.1",
         "bandit_version": "1.9.4",
+        "scan_started_at": "2026-09-28T15:00:00Z",
         "allowlist_path": source["allowlist"],
     }
     values.update(overrides)
@@ -112,6 +137,12 @@ def test_complete_zero_finding_report_is_measured_pass_and_redacted(source):
     assert report["verdict"] == "MEASURED_PASS"
     assert report["failureClass"] == "NONE"
     assert report["payload"]["criticalHighFindings"] == []
+    assert report["payload"]["auditedDependencies"] == [
+        {"name": "fastapi", "version": "0.141.1"},
+        {"name": "pydantic", "version": "2.13.5"},
+    ]
+    assert report["payload"]["summaries"]["bandit"]["scannedFileCount"] == 2
+    assert report["environment"]["externalServicesRequired"] is True
     assert report["payloadSha256"] == tool.canonical_sha256(report["payload"])
     serialized = json.dumps(report).lower()
     assert "description" not in serialized
@@ -124,6 +155,8 @@ def test_pip_audit_vulnerability_is_conservatively_high_and_cannot_be_ignored(so
         json.dumps(
             {
                 "dependencies": [
+                    {"name": "fastapi", "version": "0.141.1", "vulns": []},
+                    {"name": "pydantic", "version": "2.13.5", "vulns": []},
                     {
                         "name": "Example_Pkg",
                         "version": "1.2.3",
@@ -167,7 +200,13 @@ def test_bandit_high_uses_repo_relative_identity_and_out_of_scope_fails(source):
                         "test_id": "B999",
                         "issue_text": "never serialize source prose",
                     }
-                ]
+                ],
+                "errors": [],
+                "metrics": {
+                    "services/control-plane/src/inv/sample.py": {},
+                    "src/saintvision/sample.py": {},
+                    "_totals": {},
+                },
             }
         ),
         encoding="utf-8",
@@ -184,11 +223,80 @@ def test_bandit_high_uses_repo_relative_identity_and_out_of_scope_fails(source):
         tool.parse_bandit(value, ["services/control-plane/src", "src/saintvision"])
 
 
+def test_bandit_errors_and_incomplete_inventory_fail_closed(source):
+    value = json.loads(source["bandit"].read_text(encoding="utf-8"))
+    value["errors"] = [{"filename": "src/saintvision/sample.py", "reason": "syntax"}]
+    source["bandit"].write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(tool.SecurityScanError, match="did not parse every"):
+        build(source)
+
+    value["errors"] = []
+    value["metrics"].pop("src/saintvision/sample.py")
+    source["bandit"].write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(tool.SecurityScanError, match="inventory differs"):
+        build(source)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"dependencies": []},
+        {"dependencies": [{"name": "fastapi", "version": "0.141.1", "vulns": []}]},
+        {
+            "dependencies": [
+                {"name": "fastapi", "version": "0.141.1", "vulns": []},
+                {
+                    "name": "pydantic",
+                    "version": "2.13.5",
+                    "vulns": [],
+                    "skip_reason": "unresolved",
+                },
+            ]
+        },
+    ],
+)
+def test_pip_audit_empty_missing_or_skipped_pin_fails_closed(source, value):
+    source["pip"].write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(tool.SecurityScanError):
+        build(source)
+
+
+def test_truncated_json_and_unknown_bandit_severity_fail_closed(source):
+    source["pip"].write_text('{"dependencies":', encoding="utf-8")
+    with pytest.raises(tool.SecurityScanError, match="report unreadable"):
+        build(source)
+    source["pip"].write_text(
+        json.dumps(
+            {
+                "dependencies": [
+                    {"name": "fastapi", "version": "0.141.1", "vulns": []},
+                    {"name": "pydantic", "version": "2.13.5", "vulns": []},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    value = json.loads(source["bandit"].read_text(encoding="utf-8"))
+    value["results"] = [
+        {
+            "filename": "src/saintvision/sample.py",
+            "line_number": 1,
+            "issue_severity": "UNKNOWN",
+            "test_id": "B999",
+        }
+    ]
+    source["bandit"].write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(tool.SecurityScanError, match="severity is unsupported"):
+        build(source)
+
+
 def test_allowlist_requires_reason_expiry_and_exact_current_finding(source):
     source["pip"].write_text(
         json.dumps(
             {
                 "dependencies": [
+                    {"name": "fastapi", "version": "0.141.1", "vulns": []},
+                    {"name": "pydantic", "version": "2.13.5", "vulns": []},
                     {
                         "name": "example",
                         "version": "1",
