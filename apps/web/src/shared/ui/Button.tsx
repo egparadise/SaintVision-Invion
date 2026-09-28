@@ -6,7 +6,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   isLoading?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   variant = 'primary',
   size = 'md',
   isLoading = false,
@@ -14,7 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   style,
   ...props
-}) => {
+}, ref) => {
   const baseStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
@@ -58,6 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      ref={ref}
       style={{
         ...baseStyle,
         ...sizeStyles[size],
@@ -78,4 +79,4 @@ export const Button: React.FC<ButtonProps> = ({
       )}
     </button>
   );
-};
+});
