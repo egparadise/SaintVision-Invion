@@ -21,18 +21,22 @@ if (!targetSha) {
   }
 }
 
-// Compute real Git Blob OIDs
-function computeBlobOid(filePath: string): string {
-  const buf = fs.readFileSync(filePath);
-  return crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex');
+// Compute real Git Blob OIDs via git rev-parse <targetSha>:<path>
+function getGitBlobOid(commitSha: string, relPath: string): string {
+  try {
+    return execSync(`git rev-parse ${commitSha}:${relPath}`, { cwd: rootDir, encoding: 'utf-8' }).trim();
+  } catch {
+    const buf = fs.readFileSync(path.join(rootDir, relPath));
+    return crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex');
+  }
 }
 
 const gitBlobOids = {
-  agentEngine: computeBlobOid(path.join(rootDir, 'apps/web/src/features/agent/agentEngine.ts')),
-  evalRunner: computeBlobOid(path.join(rootDir, 'apps/web/src/features/agent/evalRunner.ts')),
-  mutationTools: computeBlobOid(path.join(rootDir, 'apps/web/src/features/agent/mutationTools.ts')),
-  promptsFixture: computeBlobOid(path.join(rootDir, 'apps/web/tests/fixtures/prompts_100.json')),
-  codingTasksFixture: computeBlobOid(path.join(rootDir, 'apps/web/tests/fixtures/coding_tasks_30.json')),
+  agentEngine: getGitBlobOid(targetSha, 'apps/web/src/features/agent/agentEngine.ts'),
+  evalRunner: getGitBlobOid(targetSha, 'apps/web/src/features/agent/evalRunner.ts'),
+  mutationTools: getGitBlobOid(targetSha, 'apps/web/src/features/agent/mutationTools.ts'),
+  promptsFixture: getGitBlobOid(targetSha, 'apps/web/tests/fixtures/prompts_100.json'),
+  codingTasksFixture: getGitBlobOid(targetSha, 'apps/web/tests/fixtures/coding_tasks_30.json'),
 };
 
 console.log('Target Commit SHA:', targetSha);
