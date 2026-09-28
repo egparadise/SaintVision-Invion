@@ -267,6 +267,7 @@ jobs:
               'Actual Windows PowerShell launcher': 10,
               'Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)': 1,
               'run only through tools/placement_lock_wait_diagnostic.py': 1,
+              'run only through S11 Storage Failure Hosted Reference opt-in lane': 1,
               'claude is not installed on this machine': 1,
               'codex is not installed on this machine': 1,
               'gemini is not installed on this machine': 1,
