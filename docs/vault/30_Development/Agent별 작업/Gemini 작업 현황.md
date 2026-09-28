@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.121"
+version: "1.0.122"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-23T10:30:00+09:00"
+updated: "2026-09-28T10:15:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,38 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-23T10:30:00+09:00 (최신 tip `fdd4a895`, 작업 브랜치 `agent/gemini/s04-fe-matrix-measured`).
+- 확인 기준: 2026-09-28T10:15:00+09:00 (최신 tip `1e8baf04`, 작업 브랜치 `agent/gemini/s11-fe-matrix`).
+
+## 2026-09-28 S11-FE 접근성·시각 회귀·배포 후보 시나리오 매트릭스 v1.0.0 수립 (docs-only, `agent/gemini/s11-fe-matrix`)
+
+- **작업 개요 및 목적**:
+  - OUT-11 / AC-11(기능·보안·성능·복원이 검증된 내부망 릴리스 후보) 완결을 위한 시나리오 매트릭스 정본 v1.0.0 수립.
+  - task-registry S11-FE, History Codex FE Review Map 32행("WCAG와 릴리스 후보 UI의 Chrome 증거"), S11 개발과정 History 및 `S11 릴리스 후보.md` 기준 충족.
+- **16대 시나리오 매트릭스 수립 (`[[2026-09-28_S11-FE_접근성_시각회귀_배포후보_시나리오_매트릭스_Gemini]]`)**:
+  1. **ACC (WCAG 2.1 AA 접근성 심층 점검, 9개 시나리오)**:
+     - ACC-01: 전역 버튼 키보드 포커스 링 시각화 결함 (`Button.tsx:27` `outline: 'none'`, `index.css:98` `:focus-visible` 부재)
+     - ACC-02: `WorkspaceList.tsx:96-100` 카드 div의 키보드 탐색 및 활성화 결함 (`tabIndex`, `role="button"`, `onKeyDown` 누락)
+     - ACC-03: `WorkspaceCreateModal.tsx:52`, `GitCommitModal.tsx:60`, `ConflictResolutionModal.tsx:24`의 포커스 트랩 부재 및 배경 누출
+     - ACC-04: `WorkspaceCreateModal.tsx:43, :85` 모달 닫힘 시 트리거 버튼으로의 포커스 복원 부재
+     - ACC-05: `DesktopWindow.tsx:99`의 허위 `title="창 닫기 (Esc)"` 및 모달 Escape 키 닫기 핸들러 부재
+     - ACC-06: `Header.tsx:113` WAI-ARIA `role="tablist"`/`role="tab"`/`aria-selected` 부재 및 모달 `role="dialog"` 누락
+     - ACC-07: `ReleaseCandidateView.tsx:110`, `NaturalLanguageRunView.tsx:150`, `DistributedRecoveryView.tsx:202` 동적 알림 Live Region(`role="status"`, `aria-live`) 부재
+     - ACC-08: 오류 배너 `role="alert"` 무결성 점검 (`ErrorState.tsx`, `Login.tsx` 준수 vs `actionNotice` 에러 시 누락)
+     - ACC-09: WCAG 색 대비율 실측치 대조 및 `releaseEngine.ts:99`의 하드코딩 11.4:1 리터럴 과장 분리
+  2. **VIS (시각 회귀 기준 및 hosted 브라우저 실행 제약, 3개 시나리오)**:
+     - VIS-01: Desktop(1920x1080), Tablet(768x1024), Mobile(375x812) 릴리스 후보 및 데스크톱 셸 기준 화면(Baseline) 정의
+     - VIS-02: `ReleaseCandidateView.tsx:10, :275-283` 뷰포트 시뮬레이션 버튼의 레이아웃 무반응(Placebo UI) 결함 점검
+     - VIS-03: Hosted `desktop-browser` job(Playwright Linux Chromium) 인프라 확인 및 step 57 5대 journey guard 불변식 제약 분석 (새 여정 추가 시 drift 차단으로 게이트 실패; 픽셀 디프 자동화 미구현 확인)
+  3. **REL (배포 후보 화면 정직성 및 허위 상태 표출 격리, 4개 시나리오)**:
+     - REL-01: `ReleaseCandidateView.tsx:324`의 서버 계약 없는 무조건적 `'ACTIVE LIVE'` 배지 표출 결함 점검
+     - REL-02: `ReleaseCandidateView.tsx:310`의 클라이언트 인메모리 조작 기반 `'✔ 검증 완료'` 배지 표출 결함 점검
+     - REL-03: `ReleaseCandidateView.tsx:70-88` 7대 SLO 실측치 하드코딩 리터럴 및 OTel 미연동 점검
+     - REL-04: `ReleaseCandidateView.tsx:91-98` WCAG 2.1 AA 100% PASS 배지의 정적 예시 고지 점검
+- **10대 제품 결함 목록(DEF-S11-01 ~ DEF-S11-10) 수록**:
+  - docs-only 카드 원칙에 따라 결함 목록으로만 수록하고 제품 코드는 일절 변경하지 않음.
+- **다음 행동 및 인계**:
+  - Claude(UI 경로) 및 Codex(계약 축) 독립 검토 요청.
+  - 매트릭스 승인 완료 후 후속 "S11-FE 제품 결함 수정 및 접근성/시각회귀 보강" 카드로 결함 치유 착수.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
