@@ -69,7 +69,7 @@ _NUMERIC_OFFSET = re.compile(
 UTC_NAMES = ("UTC", "GMT", "Z")
 
 DEFAULT_DAYS = 7  # decision 2026-09-22 (coordinator, user delegation) -- pilot value
-APPLY_JOURNAL_SCHEMA = "inv.pitr-retention-apply-receipt.v1"
+APPLY_JOURNAL_SCHEMA = "inv.pitr-retention-apply-receipt.v2"
 PARTIAL_FAILURE_CLASS = "RETENTION_APPLY_PARTIAL"
 
 
@@ -329,18 +329,93 @@ def _candidate_identity(root: Path, name: str, kind: str) -> dict:
     expected_type = stat.S_ISREG if kind == "archive" else stat.S_ISDIR
     if not expected_type(info.st_mode):
         raise RetentionApplyRefused("retention candidate changed type")
-    # Linux can immediately recycle an inode after an operator replaces a
-    # candidate at the same path.  Bind the metadata-change clock as well so
-    # dev+inode reuse cannot authorise deletion of the replacement.
-    return {
-        "device": int(info.st_dev),
-        "inode": int(info.st_ino),
-        "ctimeNs": int(info.st_ctime_ns),
-    }
+    # Directory ctime changes as rmtree removes children and when an operator
+    # repairs permissions.  Binding it would make a legitimate partial delete
+    # impossible to resume.  The live plan, label digest and durable external
+    # removal marker provide the semantic binding; dev+inode guards the path.
+    return {"device": int(info.st_dev), "inode": int(info.st_ino)}
 
 
 def _journal_path(backups_dir: Path, journal_path: Path | None) -> Path:
     return journal_path or backups_dir / ".pitr-retention-apply-journal.json"
+
+
+def _removal_marker_path(backups_dir: Path, target: dict) -> Path:
+    token = target.get("removalToken")
+    if (
+        target.get("kind") != "backups"
+        or not isinstance(token, str)
+        or not re.fullmatch(r"[0-9a-f]{32}", token)
+    ):
+        raise RetentionApplyRefused("backup removal marker binding is invalid")
+    return backups_dir / f".pitr-retention-removing-{token}"
+
+
+def _removal_marker_body(journal: dict, target: dict) -> bytes:
+    return (
+        json.dumps(
+            {
+                "schemaVersion": journal["schemaVersion"],
+                "planSha256": journal["planSha256"],
+                "name": target["name"],
+                "identity": target["identity"],
+                "labelSha256": journal["candidateBackupLabelSha256"][target["name"]],
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _validate_backup_removal_marker(journal: dict, target: dict, backups_dir: Path) -> None:
+    marker = _removal_marker_path(backups_dir, target)
+    try:
+        info = marker.stat(follow_symlinks=False)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise RetentionApplyRefused("backup removal marker is not a regular file")
+        if marker.read_bytes() != _removal_marker_body(journal, target):
+            raise RetentionApplyRefused("backup removal marker binding changed")
+    except FileNotFoundError as error:
+        raise RetentionApplyRefused("partial backup has no durable removal marker") from error
+    except RetentionApplyRefused:
+        raise
+    except OSError as error:
+        raise RetentionApplyRefused("backup removal marker is unavailable") from error
+
+
+def _ensure_backup_removal_marker(journal: dict, target: dict, backups_dir: Path) -> None:
+    marker = _removal_marker_path(backups_dir, target)
+    if _path_exists_no_follow(marker):
+        _validate_backup_removal_marker(journal, target, backups_dir)
+        return
+    fd = os.open(
+        marker,
+        os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0),
+        0o600,
+    )
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(_removal_marker_body(journal, target))
+            stream.flush()
+            os.fsync(stream.fileno())
+        _fsync_directory(backups_dir)
+    except BaseException:
+        try:
+            os.unlink(marker)
+            _fsync_directory(backups_dir)
+        except OSError:
+            pass
+        raise
+
+
+def _clear_backup_removal_marker(journal: dict, target: dict, backups_dir: Path) -> None:
+    marker = _removal_marker_path(backups_dir, target)
+    if not _path_exists_no_follow(marker):
+        return
+    _validate_backup_removal_marker(journal, target, backups_dir)
+    marker.unlink()
+    _fsync_directory(backups_dir)
 
 
 def _fsync_directory(path: Path) -> None:
@@ -421,6 +496,7 @@ def _new_journal(plan_: Plan, archive_dir: Path, backups_dir: Path) -> dict:
             "name": name,
             "state": "pending",
             "identity": _candidate_identity(archive_dir, name, "archive"),
+            "removalToken": None,
         }
         for name in plan_.delete_archive
     ] + [
@@ -429,6 +505,7 @@ def _new_journal(plan_: Plan, archive_dir: Path, backups_dir: Path) -> dict:
             "name": name,
             "state": "pending",
             "identity": _candidate_identity(backups_dir, name, "backups"),
+            "removalToken": uuid4().hex,
         }
         for name in plan_.delete_backups
     ]
@@ -464,6 +541,32 @@ def _archive_completed_journal(path: Path, journal: dict) -> Path:
         _fsync_directory(path.parent)
     except OSError as error:
         raise RetentionApplyRefused("completed retention journal could not be archived") from error
+    return archived
+
+
+def _archive_abandoned_journal(path: Path, journal: dict, backups_dir: Path) -> Path:
+    """Preserve an operator-abandoned active receipt without deleting candidates."""
+
+    if journal["status"] not in {"running", "partial"}:
+        raise RetentionApplyRefused(
+            "--abandon-journal requires a running or partial retention journal"
+        )
+    archived = path.with_name(f"{path.stem}.abandoned-{journal['planSha256']}-{uuid4().hex}.json")
+    try:
+        # Clear only markers whose binding is still exact while the active
+        # journal remains in place.  If cleanup fails, ordinary resume remains
+        # fail-closed and the operator can repair permissions then retry.
+        for target in journal["targets"]:
+            if target["kind"] == "backups":
+                _clear_backup_removal_marker(journal, target, backups_dir)
+        os.replace(path, archived)
+        _fsync_directory(path.parent)
+    except RetentionApplyRefused:
+        raise
+    except OSError as error:
+        raise RetentionApplyRefused(
+            "active retention journal could not be archived for abandonment"
+        ) from error
     return archived
 
 
@@ -553,15 +656,23 @@ def _load_journal(path: Path) -> dict:
     targets = journal["targets"]
     if not isinstance(targets, list) or any(
         not isinstance(target, dict)
-        or set(target) != {"kind", "name", "state", "identity"}
+        or set(target) != {"kind", "name", "state", "identity", "removalToken"}
         or target["kind"] not in {"archive", "backups"}
         or not isinstance(target["name"], str)
         or target["state"] not in {"pending", "removed", "already-absent"}
         or not isinstance(target["identity"], dict)
-        or set(target["identity"]) != {"device", "inode", "ctimeNs"}
+        or set(target["identity"]) != {"device", "inode"}
         or any(
             not isinstance(value, int) or isinstance(value, bool) or value < 0
             for value in target["identity"].values()
+        )
+        or (target["kind"] == "archive" and target["removalToken"] is not None)
+        or (
+            target["kind"] == "backups"
+            and (
+                not isinstance(target["removalToken"], str)
+                or not re.fullmatch(r"[0-9a-f]{32}", target["removalToken"])
+            )
         )
         for target in targets
     ):
@@ -677,9 +788,9 @@ def _validate_pending_target(
     )
     if target["name"] not in allowed:
         # shutil.rmtree may have removed backup_label before a crash.  The live
-        # planner then cannot enumerate that candidate, but the same directory
-        # inode plus the original label digest still authorises finishing only
-        # that already-started removal.  A surviving label gets no exception.
+        # planner then cannot enumerate that candidate.  Resume is allowed only
+        # when the service durably placed its external removal marker before
+        # starting rmtree; a journal-only forgery cannot supply that disk fact.
         label = path / "backup_label"
         partial_backup = (
             target["kind"] == "backups"
@@ -688,6 +799,7 @@ def _validate_pending_target(
         )
         if not partial_backup:
             raise RetentionApplyRefused("pending retention target is no longer deletable")
+        _validate_backup_removal_marker(journal, target, backups_dir)
     if _candidate_identity(root, target["name"], target["kind"]) != target["identity"]:
         raise RetentionApplyRefused("retention candidate identity changed")
     if target["kind"] == "backups":
@@ -742,11 +854,7 @@ def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> boo
         info = path.stat(follow_symlinks=False)
     except FileNotFoundError:
         return False
-    if {
-        "device": int(info.st_dev),
-        "inode": int(info.st_ino),
-        "ctimeNs": int(info.st_ctime_ns),
-    } != target["identity"]:
+    if {"device": int(info.st_dev), "inode": int(info.st_ino)} != target["identity"]:
         raise RetentionApplyRefused("retention candidate identity changed")
     if target["kind"] == "archive":
         if not stat.S_ISREG(info.st_mode):
@@ -763,7 +871,12 @@ def _delete_candidate(target: dict, archive_dir: Path, backups_dir: Path) -> boo
 
 
 def apply(
-    plan_: Plan, archive_dir: Path, backups_dir: Path, *, journal_path: Path | None = None
+    plan_: Plan,
+    archive_dir: Path,
+    backups_dir: Path,
+    *,
+    journal_path: Path | None = None,
+    abandon_journal: bool = False,
 ) -> dict:
     """Apply one semantic plan with a durable, resumable per-candidate journal."""
 
@@ -771,7 +884,10 @@ def apply(
     invocation_removed = {"archive": [], "backups": []}
     if journal_file.exists() or journal_file.is_symlink():
         journal = _load_journal(journal_file)
-        if journal["status"] == "completed":
+        if abandon_journal:
+            _archive_abandoned_journal(journal_file, journal, backups_dir)
+            journal = _new_journal(plan_, archive_dir, backups_dir)
+        elif journal["status"] == "completed":
             _archive_completed_journal(journal_file, journal)
             journal = _new_journal(plan_, archive_dir, backups_dir)
         else:
@@ -780,14 +896,16 @@ def apply(
             journal["status"] = "running"
             journal["failureClass"] = None
     else:
+        if abandon_journal:
+            raise RetentionApplyRefused(
+                "--abandon-journal requires an existing running or partial journal"
+            )
         journal = _new_journal(plan_, archive_dir, backups_dir)
-    active_target: dict | None = None
     try:
         _write_journal(journal_file, journal)
         for target in journal["targets"]:
             if target["state"] != "pending":
                 continue
-            active_target = target
             observed = _observed_plan(plan_, archive_dir, backups_dir)
             current = _validate_current_plan(journal, observed, backups_dir)
             _validate_pending_target(
@@ -797,7 +915,11 @@ def apply(
                 archive_dir=archive_dir,
                 backups_dir=backups_dir,
             )
+            if target["kind"] == "backups":
+                _ensure_backup_removal_marker(journal, target, backups_dir)
             removed = _delete_candidate(target, archive_dir, backups_dir)
+            if target["kind"] == "backups":
+                _clear_backup_removal_marker(journal, target, backups_dir)
             state = "removed" if removed else "already-absent"
             target["state"] = state
             journal["receipt"]["removed" if removed else "alreadyAbsent"][target["kind"]].append(
@@ -813,28 +935,6 @@ def apply(
         _write_journal(journal_file, journal)
         return invocation_removed
     except (OSError, RetentionApplyRefused) as error:
-        # A caught rmtree failure may already have removed backup_label.  Its
-        # directory ctime legitimately changed, so persist that new identity
-        # only when the original dev+inode still names the same partial
-        # directory.  A hard crash before this receipt update remains
-        # fail-closed on resume.
-        if (
-            isinstance(error, OSError)
-            and active_target is not None
-            and active_target["kind"] == "backups"
-        ):
-            partial = _candidate_path(backups_dir, active_target["name"], "backups")
-            if _path_exists_no_follow(partial) and not _path_exists_no_follow(
-                partial / "backup_label"
-            ):
-                observed_identity = _candidate_identity(
-                    backups_dir, active_target["name"], "backups"
-                )
-                if (
-                    observed_identity["device"] == active_target["identity"]["device"]
-                    and observed_identity["inode"] == active_target["identity"]["inode"]
-                ):
-                    active_target["identity"] = observed_identity
         journal["status"] = "partial"
         journal["failureClass"] = PARTIAL_FAILURE_CLASS
         _refresh_incomplete(journal)
@@ -868,6 +968,14 @@ def main(argv: list[str] | None = None) -> int:
         help="durable apply journal (default: BACKUPS/.pitr-retention-apply-journal.json)",
     )
     parser.add_argument(
+        "--abandon-journal",
+        action="store_true",
+        help=(
+            "archive a stale running/partial journal, preserve current candidates, "
+            "and start from a fresh disk-derived plan (requires --apply)"
+        ),
+    )
+    parser.add_argument(
         "--now", default=None, help="override the clock (ISO 8601, UTC) for reproducible plans"
     )
     args = parser.parse_args(argv)
@@ -877,6 +985,20 @@ def main(argv: list[str] | None = None) -> int:
         else datetime.now(timezone.utc)
     )
     archive_dir, backups_dir = Path(args.archive), Path(args.backups)
+    if args.abandon_journal and not args.apply:
+        print(
+            json.dumps(
+                {
+                    "scope": "filesystem-plan-only",
+                    "mode": "refused",
+                    "error": "--abandon-journal requires --apply",
+                    "deleteBackups": [],
+                    "deleteArchive": [],
+                },
+                indent=2,
+            )
+        )
+        return 3
     try:
         backups = load_backups(backups_dir)
     except ValueError as error:
@@ -902,7 +1024,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.apply:
         journal_path = _journal_path(backups_dir, Path(args.journal) if args.journal else None)
         try:
-            removed = apply(plan_, archive_dir, backups_dir, journal_path=journal_path)
+            removed = apply(
+                plan_,
+                archive_dir,
+                backups_dir,
+                journal_path=journal_path,
+                abandon_journal=args.abandon_journal,
+            )
         except RetentionApplyRefused as error:
             print(json.dumps({"mode": "refused", "error": str(error)}, indent=2))
             return 3

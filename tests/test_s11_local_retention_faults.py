@@ -153,6 +153,38 @@ def test_cap02_real_locked_scope_does_not_relabel_unrelated_consumer_oserror(tmp
     assert not isinstance(raised.value, DomainError)
 
 
+@pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects open requires Linux")
+def test_cap02_real_local_objects_init_translates_open_oserror(tmp_path, monkeypatch):
+    root = tmp_path / "objects"
+    root.mkdir(mode=0o700)
+
+    def fail_open(*_args, **_kwargs):
+        raise OSError(errno.EIO, "private provider directory")
+
+    monkeypatch.setattr(os, "open", fail_open)
+    with pytest.raises(DomainError) as raised:
+        LocalObjects(root)
+    _assert_store_unavailable(raised.value)
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects flock requires Linux")
+def test_cap02_real_local_objects_translates_flock_oserror(tmp_path, monkeypatch):
+    import fcntl
+
+    root = tmp_path / "objects"
+    root.mkdir(mode=0o700)
+    provider = LocalObjects(root)
+
+    def fail_flock(*_args, **_kwargs):
+        raise OSError(errno.EIO, "private flock detail")
+
+    monkeypatch.setattr(fcntl, "flock", fail_flock)
+    with pytest.raises(DomainError) as raised:
+        with provider.locked():
+            pass
+    _assert_store_unavailable(raised.value)
+
+
 @pytest.mark.skipif(sys.platform != "linux", reason="real LocalObjects flock requires Linux")
 @pytest.mark.parametrize(
     "operation,handle_method", [("put", "put"), ("get", "read"), ("delete", "remove")]
@@ -395,6 +427,76 @@ def test_bak02_partial_backup_rmtree_resumes_only_the_same_directory_inode(tmp_p
     assert receipt["status"] == "completed" and receipt["attemptCount"] == 2
 
 
+@pytest.mark.skipif(sys.platform != "linux", reason="Linux rmtree partial-resume boundary")
+def test_bak02_caught_rmtree_error_with_label_surviving_resumes(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_rmtree = retention.shutil.rmtree
+    failed = False
+
+    def fail_before_children(path):
+        nonlocal failed
+        if path.name == "old" and not failed:
+            failed = True
+            raise OSError(errno.EIO, "private backup mount")
+        return real_rmtree(path)
+
+    monkeypatch.setattr(retention.shutil, "rmtree", fail_before_children)
+    with pytest.raises(retention.RetentionApplyPartial):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert (backups / "old" / "backup_label").is_file()
+
+    monkeypatch.setattr(retention.shutil, "rmtree", real_rmtree)
+    current = retention.plan(
+        retention.load_archive(archive), retention.load_backups(backups), retention_days=7, now=NOW
+    )
+    retention.apply(current, archive, backups, journal_path=journal)
+    assert not (backups / "old").exists()
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="Linux rmtree kill-resume boundary")
+def test_bak02_kill_after_label_removal_resumes_from_external_marker(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_rmtree = retention.shutil.rmtree
+    interrupted = False
+
+    def remove_label_then_kill(path):
+        nonlocal interrupted
+        if path.name == "old" and not interrupted:
+            interrupted = True
+            (path / "backup_label").unlink()
+            raise KeyboardInterrupt
+        return real_rmtree(path)
+
+    monkeypatch.setattr(retention.shutil, "rmtree", remove_label_then_kill)
+    with pytest.raises(KeyboardInterrupt):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert list(backups.glob(".pitr-retention-removing-*"))
+
+    monkeypatch.setattr(retention.shutil, "rmtree", real_rmtree)
+    current = retention.plan(
+        retention.load_archive(archive), retention.load_backups(backups), retention_days=7, now=NOW
+    )
+    retention.apply(current, archive, backups, journal_path=journal)
+    assert not (backups / "old").exists()
+    assert list(backups.glob(".pitr-retention-removing-*")) == []
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="Linux directory ctime repair boundary")
+def test_bak02_permission_repair_does_not_wedge_resume(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _interrupt_before_first_delete(
+        _retention_world(tmp_path), monkeypatch
+    )
+    before = retention._candidate_identity(backups, "old", "backups")
+    (backups / "old").chmod(0o700)
+    after = retention._candidate_identity(backups, "old", "backups")
+    assert before == after
+    current = retention.plan(
+        retention.load_archive(archive), retention.load_backups(backups), retention_days=7, now=NOW
+    )
+    retention.apply(current, archive, backups, journal_path=journal)
+    assert not (backups / "old").exists()
+
+
 def test_bak02_replaced_candidate_directory_is_refused_before_delete(tmp_path, monkeypatch):
     archive, backups, planned, journal = _retention_world(tmp_path)
 
@@ -404,7 +506,11 @@ def test_bak02_replaced_candidate_directory_is_refused_before_delete(tmp_path, m
     monkeypatch.setattr(retention, "_delete_candidate", stop_before_delete)
     with pytest.raises(KeyboardInterrupt):
         retention.apply(planned, archive, backups, journal_path=journal)
-    retention.shutil.rmtree(backups / "old")
+    # Keep the original inode alive outside the backups root.  A replacement at
+    # the same name therefore cannot receive the original identity, even on a
+    # filesystem that aggressively recycles deleted inodes.
+    original = tmp_path / "original-old"
+    (backups / "old").rename(original)
     _write_backup(backups, "old", seg(2), NOW - timedelta(days=20))
     monkeypatch.undo()
     current = retention.plan(
@@ -445,6 +551,7 @@ def test_bak02_self_consistent_journal_cannot_add_retained_wal(tmp_path, monkeyp
         "name": retained,
         "state": "pending",
         "identity": retention._candidate_identity(archive, retained, "archive"),
+        "removalToken": None,
     }
     first_backup = next(
         index for index, value in enumerate(document["targets"]) if value["kind"] == "backups"
@@ -475,6 +582,7 @@ def test_bak02_self_consistent_journal_cannot_target_retained_backup(tmp_path, m
             "name": retained,
             "state": "pending",
             "identity": retention._candidate_identity(backups, retained, "backups"),
+            "removalToken": "0" * 32,
         }
     )
     retention._refresh_incomplete(document)
@@ -484,6 +592,95 @@ def test_bak02_self_consistent_journal_cannot_target_retained_backup(tmp_path, m
         retention.apply(planned, archive, backups, journal_path=journal)
     assert (backups / retained / "backup_label").is_file()
     assert all((archive / seg(index)).exists() for index in range(1, 8))
+
+
+def test_bak02_journal_only_forgery_cannot_delete_label_less_directory(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _interrupt_before_first_delete(
+        _retention_world(tmp_path), monkeypatch
+    )
+    forged = backups / "operator-not-a-backup"
+    forged.mkdir()
+    (forged / "keep.txt").write_text("preserve", encoding="utf-8")
+    document = json.loads(journal.read_text(encoding="utf-8"))
+    document["plan"]["deleteBackups"].append(forged.name)
+    document["plan"]["deleteBackups"].sort()
+    document["planSha256"] = retention._digest(document["plan"])
+    document["candidateBackupLabelSha256"][forged.name] = "f" * 64
+    document["targets"].append(
+        {
+            "kind": "backups",
+            "name": forged.name,
+            "state": "pending",
+            "identity": retention._candidate_identity(backups, forged.name, "backups"),
+            "removalToken": "3" * 32,
+        }
+    )
+    retention._refresh_incomplete(document)
+    journal.write_text(json.dumps(document), encoding="utf-8")
+
+    with pytest.raises(retention.RetentionApplyRefused, match="no durable removal marker"):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert (forged / "keep.txt").read_text(encoding="utf-8") == "preserve"
+
+
+def test_bak02_explicit_abandon_archives_stale_partial_and_replans_from_disk(tmp_path, monkeypatch):
+    archive, backups, planned, journal = _retention_world(tmp_path)
+    real_delete = retention._delete_candidate
+
+    def fail_before_backup_delete(target, archive_dir, backups_dir):
+        if target["kind"] == "backups":
+            raise OSError(errno.EIO, "private retention mount")
+        return real_delete(target, archive_dir, backups_dir)
+
+    monkeypatch.setattr(retention, "_delete_candidate", fail_before_backup_delete)
+    with pytest.raises(retention.RetentionApplyPartial):
+        retention.apply(planned, archive, backups, journal_path=journal)
+    assert list(backups.glob(".pitr-retention-removing-*"))
+    monkeypatch.undo()
+
+    _write_backup(backups, "daily", seg(6), NOW + timedelta(hours=1))
+    current = retention.plan(
+        retention.load_archive(archive),
+        retention.load_backups(backups),
+        retention_days=7,
+        now=NOW + timedelta(hours=2),
+    )
+    with pytest.raises(
+        retention.RetentionApplyRefused, match="retention label or boundary changed"
+    ):
+        retention.apply(current, archive, backups, journal_path=journal)
+
+    retention.apply(
+        current,
+        archive,
+        backups,
+        journal_path=journal,
+        abandon_journal=True,
+    )
+    abandoned = list(journal.parent.glob(f"{journal.stem}.abandoned-*.json"))
+    assert len(abandoned) == 1
+    assert retention.load_apply_receipt(abandoned[0])["status"] == "partial"
+    assert retention.load_apply_receipt(journal)["status"] == "completed"
+    assert list(backups.glob(".pitr-retention-removing-*")) == []
+    assert (backups / "daily").is_dir()
+
+
+def test_bak02_abandon_requires_apply_at_the_cli(tmp_path, capsys):
+    archive, backups, _planned, journal = _retention_world(tmp_path)
+    code = retention.main(
+        [
+            "--archive",
+            str(archive),
+            "--backups",
+            str(backups),
+            "--journal",
+            str(journal),
+            "--abandon-journal",
+        ]
+    )
+    assert code == 3
+    assert "--abandon-journal requires --apply" in capsys.readouterr().out
+    assert not journal.exists()
 
 
 def test_bak02_rechecks_the_live_boundary_immediately_before_delete(tmp_path, monkeypatch):
@@ -534,6 +731,7 @@ def test_bak02_delete_flushes_parent_before_returning(tmp_path, monkeypatch):
         "name": planned.delete_archive[0],
         "state": "pending",
         "identity": retention._candidate_identity(archive, planned.delete_archive[0], "archive"),
+        "removalToken": None,
     }
     flushed: list[Path] = []
     monkeypatch.setattr(retention, "_fsync_directory", lambda path: flushed.append(path))
@@ -542,11 +740,10 @@ def test_bak02_delete_flushes_parent_before_returning(tmp_path, monkeypatch):
     assert not (archive / target["name"]).exists()
 
 
-def test_bak02_candidate_identity_binds_ctime_against_inode_reuse(tmp_path):
+def test_bak02_candidate_identity_allows_internal_directory_progress(tmp_path):
     archive, _backups, planned, _journal = _retention_world(tmp_path)
     identity = retention._candidate_identity(archive, planned.delete_archive[0], "archive")
-    assert set(identity) == {"device", "inode", "ctimeNs"}
-    assert identity["ctimeNs"] >= 0
+    assert set(identity) == {"device", "inode"}
 
 
 def test_bak02_changed_retained_label_refuses_before_another_delete(tmp_path, monkeypatch):
