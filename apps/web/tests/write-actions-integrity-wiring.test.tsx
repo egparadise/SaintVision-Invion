@@ -371,8 +371,9 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
       expect(successBanner).not.toBeNull();
       expect(successBanner?.getAttribute('role')).toBe('status');
       // 허위 축하 문구 대신 정직한 모의 고지 확인
-      expect(successBanner?.textContent).toContain('✔ [모의 시뮬레이션] [Qwen-2.5-7B-Instruct] 로컬 배포 게이트 검증 완료');
+      expect(successBanner?.textContent).toContain('✔ [모의 시뮬레이션] [Qwen-2.5-7B-Instruct] 로컬 배포 게이트 시뮬레이션 완료');
       expect(successBanner?.textContent).toContain('백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영');
+      expect(successBanner?.textContent).not.toContain('검증 완료');
       expect(successBanner?.textContent).not.toContain('🚀 [Qwen-2.5-7B-Instruct] 프로덕션 배포 완료!');
     });
   });
