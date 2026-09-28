@@ -10,7 +10,12 @@ Catalogue states, because which one the database is in decides what converges:
 * nothing there -- add the column, the foreign key and the index;
 * the column there with the right shape (a resume) -- keep it, check the data,
   add only what is missing;
-* the column or the foreign key there with a different shape -- refuse;
+* the column, the foreign key or the index there with a different shape --
+  refuse, where "shape" includes the foreign key's referential actions,
+  deferrability and validity (Codex #202 F1) and the index's column order,
+  uniqueness, predicate, expression and validity (Codex #202 F2);
+* the index there with the right shape but invalid or not ready -- drop and
+  rebuild it, the one residue this migration repairs;
 * on a resume, rows referencing a project that is not theirs -- refuse before
   any DDL;
 * a downgrade while any suite holds a project -- refuse; otherwise drop all
@@ -30,7 +35,8 @@ import pytest
 
 MIGRATION = Path(__file__).resolve().parents[2] / "migrations/versions/0053_eval_suite_project_scope.py"
 COLUMN_OK = ("character", 30, "YES")
-FK_OK = ("f", "projects", ["tenant_id", "project_id"], ["tenant_id", "project_id"])
+FK_OK = ("f", "projects", ["tenant_id", "project_id"], ["tenant_id", "project_id"], "a", "a", False, False, True)
+INDEX_OK = (["tenant_id", "project_id"], False, False, False, True, True)
 
 
 def _module():
@@ -51,10 +57,10 @@ class _Result:
 class Bind:
     """Answers the catalogue and data questions, and records that it was asked."""
 
-    def __init__(self, *, column=None, fk=None, index=False, violations=(), scoped=()):
+    def __init__(self, *, column=None, fk=None, index=None, violations=(), scoped=()):
         self.column = column
         self.fk = fk
-        self.index = index
+        self.index = index                      # a full INDEX_SHAPE row, or None
         self.violations = list(violations)
         self.scoped = list(scoped)
         self.asked: list[str] = []
@@ -65,8 +71,8 @@ class Bind:
             return _Result([self.column] if self.column else [])
         if "pg_constraint" in sql:
             return _Result([self.fk] if self.fk else [])
-        if "pg_indexes" in sql:
-            return _Result([(1,)] if self.index else [])
+        if "pg_index" in sql:
+            return _Result([self.index] if self.index else [])
         if "LEFT JOIN" in sql:
             return _Result([(s,) for s in self.violations])
         if "IS NOT NULL ORDER BY" in sql:
@@ -138,7 +144,7 @@ def test_a_clean_catalogue_adds_the_column_the_foreign_key_and_the_index(monkeyp
     issued = _run(monkeypatch, bind=bind)
     assert issued == [ADD_COLUMN, ADD_FK, ADD_INDEX]
     # No data question on a fresh run: there is no column to read.
-    assert not any("LEFT JOIN" in q for q in bind.asked)
+    assert not any("LEFT JOIN projects" in q for q in bind.asked)   # the data question, not the index shape query
 
 
 def test_offline_rendering_issues_everything_and_asks_nothing(monkeypatch):
@@ -151,7 +157,7 @@ def test_a_resume_with_the_column_right_adds_only_what_is_missing(monkeypatch):
     assert _run(monkeypatch, bind=bind) == [ADD_FK, ADD_INDEX]
     bind = Bind(column=COLUMN_OK, fk=FK_OK)
     assert _run(monkeypatch, bind=bind) == [ADD_INDEX]
-    bind = Bind(column=COLUMN_OK, fk=FK_OK, index=True)
+    bind = Bind(column=COLUMN_OK, fk=FK_OK, index=INDEX_OK)
     assert _run(monkeypatch, bind=bind) == []                       # fully applied: nothing touched
 
 
@@ -174,19 +180,70 @@ def test_a_column_of_that_name_with_a_different_shape_is_refused(monkeypatch, co
     assert "different definition" in str(raised.value)
 
 
+def _fk(**overrides):
+    fields = ["contype", "referenced", "columns", "referenced_columns", "on_update", "on_delete", "deferrable", "initially_deferred", "validated"]
+    values = dict(zip(fields, FK_OK))
+    values.update(overrides)
+    return tuple(values[f] for f in fields)
+
+
 @pytest.mark.parametrize(
     "fk",
     [
-        ("f", "workloads", ["tenant_id", "project_id"], ["tenant_id", "project_id"]),
-        ("f", "projects", ["project_id"], ["project_id"]),
-        ("u", "projects", ["tenant_id", "project_id"], ["tenant_id", "project_id"]),
+        _fk(referenced="workloads"),
+        _fk(columns=["project_id"], referenced_columns=["project_id"]),
+        _fk(contype="u"),
+        _fk(on_delete="c"),                      # ON DELETE CASCADE: a project deletion would delete suites
+        _fk(on_update="c"),                      # ON UPDATE CASCADE
+        _fk(on_delete="n"),                      # ON DELETE SET NULL
+        _fk(deferrable=True),                    # DEFERRABLE
+        _fk(deferrable=True, initially_deferred=True),
+        _fk(validated=False),                    # NOT VALID
     ],
-    ids=["other-table", "not-composite", "not-a-fk"],
+    ids=["other-table", "not-composite", "not-a-fk", "delete-cascade", "update-cascade", "delete-set-null", "deferrable", "initially-deferred", "not-valid"],
 )
 def test_a_constraint_of_that_name_with_a_different_shape_is_refused(monkeypatch, fk):
+    """Codex #202 F1: the name and the columns are not the contract; the
+    referential actions, deferrability and validity are part of it."""
+    bind = Bind(column=COLUMN_OK, fk=fk)
     with pytest.raises(RuntimeError) as raised:
-        _run(monkeypatch, bind=Bind(column=COLUMN_OK, fk=fk))
+        _run(monkeypatch, bind=bind)
     assert "different definition" in str(raised.value)
+    assert not any("pg_index" in q for q in bind.asked)              # refused before the index is even looked at
+
+
+def _index(**overrides):
+    fields = ["columns", "is_unique", "is_partial", "is_expression", "is_valid", "is_ready"]
+    values = dict(zip(fields, INDEX_OK))
+    values.update(overrides)
+    return tuple(values[f] for f in fields)
+
+
+@pytest.mark.parametrize(
+    "index",
+    [
+        _index(columns=["project_id", "tenant_id"]),   # wrong order
+        _index(columns=["project_id"]),                # other columns
+        _index(is_unique=True),                        # unique
+        _index(is_partial=True),                       # partial
+        _index(is_expression=True),                    # expression
+    ],
+    ids=["column-order", "other-columns", "unique", "partial", "expression"],
+)
+def test_an_index_of_that_name_with_a_different_shape_is_refused(monkeypatch, index):
+    """Codex #202 F2: an index is judged by its columns in order, uniqueness,
+    predicate and expression -- not by its name being present."""
+    with pytest.raises(RuntimeError) as raised:
+        _run(monkeypatch, bind=Bind(column=COLUMN_OK, fk=FK_OK, index=index))
+    assert "different definition" in str(raised.value)
+
+
+@pytest.mark.parametrize("index", [_index(is_valid=False), _index(is_ready=False)], ids=["invalid", "not-ready"])
+def test_an_index_of_the_right_shape_that_is_invalid_is_dropped_and_rebuilt(monkeypatch, index):
+    """The residue of an interrupted build is the one state repaired: the
+    shape says it is ours, and an invalid index serves nobody."""
+    issued = _run(monkeypatch, bind=Bind(column=COLUMN_OK, fk=FK_OK, index=index))
+    assert issued == [("execute", "DROP INDEX IF EXISTS ix_eval_suites_tenant_id_project_id"), ADD_INDEX]
 
 
 # ---------------------------------------------------------------- downgrade

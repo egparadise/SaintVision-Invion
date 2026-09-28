@@ -31,8 +31,16 @@ already did (the way 0052 does it):
   ``InvId`` type every id column uses, nullable) -- keep it; add whatever of the
   foreign key and the index is
   missing, and leave alone whatever is present with the right shape;
-* the column or the constraint is there with a **different** shape -- refuse.
-  Something other than this migration owns the name;
+* the column, the constraint or the index is there with a **different** shape
+  -- refuse. Something other than this migration owns the name. "Shape" is
+  the whole contract, not the name: for the foreign key also its referential
+  actions (``NO ACTION`` both ways -- a ``CASCADE`` under this name would let
+  a project deletion silently delete suites), deferrability and validity
+  (Codex #202 F1); for the index its exact column order, non-uniqueness,
+  no predicate, no expression, and validity (Codex #202 F2);
+* the index is there with the right shape but **invalid** (the residue of an
+  interrupted build) -- drop it and build it again; that is the one catalogue
+  state this migration repairs rather than refuses;
 * a row already references a project that does not exist in its tenant --
   refuse before any DDL, naming the suite ids only.
 
@@ -68,7 +76,10 @@ FROM information_schema.columns
 WHERE table_schema = current_schema() AND table_name = '{TABLE}' AND column_name = '{COLUMN}'
 """
 
-#: The foreign key's shape under the expected name, or no rows.
+#: The foreign key's whole shape under the expected name, or no rows: type,
+#: referenced table, local and referenced columns, the referential actions,
+#: deferrability and validity. A key that agrees on the columns but cascades,
+#: is deferrable or is NOT VALID is a different contract under the same name.
 FK_SHAPE = f"""
 SELECT c.contype::text AS contype,
        c.confrelid::regclass::text AS referenced,
@@ -81,15 +92,33 @@ SELECT c.contype::text AS contype,
          SELECT array_agg(a.attname::text ORDER BY k.ord)
          FROM unnest(c.confkey) WITH ORDINALITY AS k(attnum, ord)
          JOIN pg_attribute a ON a.attrelid = c.confrelid AND a.attnum = k.attnum
-       ) AS referenced_columns
+       ) AS referenced_columns,
+       c.confupdtype::text AS on_update,
+       c.confdeltype::text AS on_delete,
+       c.condeferrable AS deferrable,
+       c.condeferred AS initially_deferred,
+       c.convalidated AS validated
 FROM pg_constraint c
 WHERE c.conname = '{FK}' AND c.conrelid = '{TABLE}'::regclass
 """
 
-#: Whether the index exists under the expected name.
-INDEX_PRESENT = f"""
-SELECT 1 FROM pg_indexes
-WHERE schemaname = current_schema() AND tablename = '{TABLE}' AND indexname = '{INDEX}'
+#: The index's whole shape under the expected name, or no rows: its columns in
+#: order, whether it is unique, whether it has a predicate or an expression,
+#: and whether it is valid and ready.
+INDEX_SHAPE = f"""
+SELECT (
+         SELECT array_agg(a.attname::text ORDER BY k.ord)
+         FROM unnest(i.indkey::int2[]) WITH ORDINALITY AS k(attnum, ord)
+         LEFT JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = k.attnum
+       ) AS columns,
+       i.indisunique AS is_unique,
+       (i.indpred IS NOT NULL) AS is_partial,
+       (i.indexprs IS NOT NULL) AS is_expression,
+       i.indisvalid AS is_valid,
+       i.indisready AS is_ready
+FROM pg_index i
+JOIN pg_class ic ON ic.oid = i.indexrelid
+WHERE ic.relname = '{INDEX}' AND i.indrelid = '{TABLE}'::regclass
 """
 
 #: Rows that would violate the foreign key. Only meaningful when the column
@@ -106,7 +135,12 @@ ORDER BY s.suite_id
 SCOPED = f"SELECT suite_id FROM {TABLE} WHERE {COLUMN} IS NOT NULL ORDER BY suite_id"
 
 EXPECTED_COLUMN = ("character", 30, "YES")
-EXPECTED_FK = ("f", REFERENCED, ["tenant_id", COLUMN], ["tenant_id", "project_id"])
+#: contype, referenced table, local columns, referenced columns, ON UPDATE,
+#: ON DELETE ("a" = NO ACTION, what the product creates), deferrable,
+#: initially deferred, validated.
+EXPECTED_FK = ("f", REFERENCED, ["tenant_id", COLUMN], ["tenant_id", "project_id"], "a", "a", False, False, True)
+#: columns in order, unique, partial, expression -- validity is judged apart.
+EXPECTED_INDEX = (["tenant_id", COLUMN], False, False, False)
 
 
 def _add_column() -> None:
@@ -160,19 +194,42 @@ def upgrade():
 
     fk = bind.exec_driver_sql(FK_SHAPE).fetchall()
     if fk:
-        shape = (fk[0][0], fk[0][1], list(fk[0][2] or []), list(fk[0][3] or []))
+        row = fk[0]
+        shape = (
+            row[0], row[1], list(row[2] or []), list(row[3] or []),
+            row[4], row[5], bool(row[6]), bool(row[7]), bool(row[8]),
+        )
         if shape != EXPECTED_FK:
             raise RuntimeError(
                 f"{FK} already exists on {TABLE} with a different definition "
-                f"({shape!r}; expected {EXPECTED_FK!r}). Something other than this "
-                "migration owns that name; resolve it with a reviewed fix before "
-                "running again."
+                f"({shape!r}; expected {EXPECTED_FK!r}: NO ACTION both ways, not "
+                "deferrable, validated). Something other than this migration owns "
+                "that name; resolve it with a reviewed fix before running again."
             )
-        # Present and right: left alone.
+        # Present and right, in every attribute: left alone.
     else:
         _add_fk()
 
-    if not bind.exec_driver_sql(INDEX_PRESENT).fetchall():
+    index = bind.exec_driver_sql(INDEX_SHAPE).fetchall()
+    if index:
+        row = index[0]
+        shape = (list(row[0] or []), bool(row[1]), bool(row[2]), bool(row[3]))
+        if shape != EXPECTED_INDEX:
+            raise RuntimeError(
+                f"{INDEX} already exists on {TABLE} with a different definition "
+                f"({shape!r}; expected {EXPECTED_INDEX!r}: columns in that order, "
+                "not unique, no predicate, no expression). Something other than "
+                "this migration owns that name; resolve it with a reviewed fix "
+                "before running again."
+            )
+        if not (bool(row[4]) and bool(row[5])):
+            # The right shape but not valid or not ready: the residue of a build
+            # that was interrupted. This is the one state repaired here, because
+            # its shape says it is ours and an invalid index serves nobody.
+            op.execute(f"DROP INDEX IF EXISTS {INDEX}")
+            _add_index()
+        # Present, right and valid: left alone.
+    else:
         _add_index()
 
 

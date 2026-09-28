@@ -128,6 +128,82 @@ def test_a_run_interrupted_after_the_column_resumes_and_converges(owner_engine, 
     assert recorded == "0053_eval_suite_project_scope"
 
 
+def _rerun_from_0052(database_url, monkeypatch):
+    from alembic import command
+    from alembic.config import Config
+
+    config = Config("alembic.ini")
+    config.set_main_option("script_location", "migrations")
+    with monkeypatch.context() as patch:
+        patch.setenv("INV_DATABASE_URL", database_url)
+        patch.setenv("INV_MIGRATION_DSN", database_url)
+        command.upgrade(config, "head")
+
+
+def test_a_foreign_key_of_that_name_that_cascades_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
+    """Codex #202 F1 on the real catalogue: the same name and columns with
+    ON DELETE CASCADE is a different contract, and the re-run stops."""
+    with owner_engine.begin() as connection:
+        connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
+        connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
+                                "REFERENCES projects (tenant_id, project_id) ON DELETE CASCADE"))
+        connection.execute(text("UPDATE alembic_version SET version_num = '0052_model_version_digest_scope'"))
+    try:
+        with pytest.raises(RuntimeError) as raised:
+            _rerun_from_0052(database_url, monkeypatch)
+        assert FK in str(raised.value) and "different definition" in str(raised.value)
+        with owner_engine.begin() as connection:
+            recorded = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+        assert recorded == "0052_model_version_digest_scope"                 # nothing recorded
+    finally:
+        with owner_engine.begin() as connection:
+            connection.execute(text(f"ALTER TABLE eval_suites DROP CONSTRAINT IF EXISTS {FK}"))
+            connection.execute(text(f"ALTER TABLE eval_suites ADD CONSTRAINT {FK} FOREIGN KEY (tenant_id, project_id) "
+                                    "REFERENCES projects (tenant_id, project_id)"))
+            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+
+
+def test_an_index_of_that_name_with_the_columns_reversed_is_refused_on_resume(owner_engine, database_url, migrated, clean_tables, monkeypatch):
+    """Codex #202 F2 on the real catalogue: a same-named index over
+    ``(project_id, tenant_id)`` is not the index, and the re-run stops."""
+    with owner_engine.begin() as connection:
+        connection.execute(text(f"DROP INDEX IF EXISTS {INDEX}"))
+        connection.execute(text(f"CREATE INDEX {INDEX} ON eval_suites (project_id, tenant_id)"))
+        connection.execute(text("UPDATE alembic_version SET version_num = '0052_model_version_digest_scope'"))
+    try:
+        with pytest.raises(RuntimeError) as raised:
+            _rerun_from_0052(database_url, monkeypatch)
+        assert INDEX in str(raised.value) and "different definition" in str(raised.value)
+    finally:
+        with owner_engine.begin() as connection:
+            connection.execute(text(f"DROP INDEX IF EXISTS {INDEX}"))
+            connection.execute(text(f"CREATE INDEX {INDEX} ON eval_suites (tenant_id, project_id)"))
+            connection.execute(text("UPDATE alembic_version SET version_num = '0053_eval_suite_project_scope'"))
+
+
+def test_the_catalogue_shape_the_migration_reads_matches_what_it_expects(owner_engine, migrated):
+    """The exact rows the migration's shape queries return on the applied
+    catalogue: NO ACTION both ways, not deferrable, validated; index over
+    (tenant_id, project_id), non-unique, no predicate, no expression, valid."""
+    import importlib.util
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location(
+        "migration_0053", Path(__file__).resolve().parents[2] / "migrations/versions/0053_eval_suite_project_scope.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with owner_engine.begin() as connection:
+        fk = connection.exec_driver_sql(module.FK_SHAPE).fetchall()
+        index = connection.exec_driver_sql(module.INDEX_SHAPE).fetchall()
+    assert len(fk) == 1 and len(index) == 1
+    row = fk[0]
+    assert (row[0], row[1], list(row[2]), list(row[3]), row[4], row[5], bool(row[6]), bool(row[7]), bool(row[8])) == module.EXPECTED_FK
+    irow = index[0]
+    assert (list(irow[0]), bool(irow[1]), bool(irow[2]), bool(irow[3])) == module.EXPECTED_INDEX
+    assert bool(irow[4]) and bool(irow[5])
+
+
 def test_a_resume_with_an_orphan_reference_is_refused_before_the_foreign_key(owner_engine, database_url, migrated, two_tenants, frozen_now, clean_tables, monkeypatch):
     """The data check is real: with the foreign key removed, a suite that points
     at a project of its tenant that is gone makes the re-run stop with the
