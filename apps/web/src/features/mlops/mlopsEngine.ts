@@ -18,16 +18,18 @@ export class MlopsManager {
 
   /**
    * Reverse Lineage Query (AC-10: 역추적 질의)
-   * Resolves query by modelId, deploymentDigest, or sourceCommitSha
+   * Resolves query by modelId, deploymentDigest, sourceCommitSha, modelName, or datasetDigest
    */
   queryLineage(term: string): ModelLineage | undefined {
     const trimmed = term.trim().toLowerCase();
+    if (!trimmed) return undefined;
     return this.lineages.find(
       (m) =>
         m.modelId.toLowerCase().includes(trimmed) ||
         m.deploymentDigest.toLowerCase().includes(trimmed) ||
         m.sourceCommitSha.toLowerCase().includes(trimmed) ||
-        m.modelName.toLowerCase().includes(trimmed)
+        m.modelName.toLowerCase().includes(trimmed) ||
+        m.datasetDigest.toLowerCase().includes(trimmed)
     );
   }
 
@@ -64,12 +66,14 @@ export class MlopsManager {
   }
 
   /**
-   * Gated Model Deployment: Enforces Accuracy >= 0.85 and Two-Person Rule Approval
+   * Client-only Simulated Gated Model Deployment (Mock Simulation: Unrelated to Backend Digest Pinning)
+   * Note: Real backend persists digest via ModelVersion.content_sha256 and validates approval via AUTH-APPROVAL-DIGEST-MISMATCH.
+   * This is a client-side mock simulation only and does not interact with backend digest pinning or production infrastructure.
    */
   deployModel(params: {
     modelId: string;
     approvalId: string;
-  }): { success: boolean; deployedModel?: ModelLineage; error?: string } {
+  }): { success: boolean; deployedModel?: ModelLineage; error?: string; isSimulated?: boolean } {
     const model = this.lineages.find((m) => m.modelId === params.modelId);
     if (!model) {
       return { success: false, error: 'Model not found' };
@@ -89,7 +93,7 @@ export class MlopsManager {
       };
     }
 
-    // Generate deployment digest
+    // Client-only simulated deployment digest (mock simulation, unrelated to backend ModelVersion digest pinning)
     const digestPayload = `${model.modelId}:${model.datasetDigest}:${model.sourceCommitSha}:${params.approvalId}`;
     const deploymentDigest = `sha256:${computeSha256(digestPayload)}`;
 
@@ -98,6 +102,6 @@ export class MlopsManager {
     model.deployedAt = new Date().toISOString();
     model.status = 'deployed';
 
-    return { success: true, deployedModel: { ...model } };
+    return { success: true, deployedModel: { ...model }, isSimulated: true };
   }
 }

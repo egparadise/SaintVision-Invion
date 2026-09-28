@@ -1,10 +1,11 @@
 // @vitest-environment happy-dom
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MlopsManager } from '../src/features/mlops/mlopsEngine';
 import { TEST_FIXTURE_LINEAGES } from './fixtures/model-lineage';
 import { ModelLineageView } from '../src/features/mlops/ModelLineageView';
+import type { ProblemDetails } from '../src/contracts/types';
 
 describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (AC-10)', () => {
   describe('Provider Adapter Conformance (AC-10 Codex = Claude)', () => {
@@ -76,6 +77,23 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
       expect(lineage?.deploymentDigest).toMatch(/^sha256:/);
       expect(lineage?.status).toBe('deployed');
     });
+
+    it('reversely traces model lineage from dataset digest (dset_sha256...) to root model', () => {
+      const mlops = new MlopsManager(TEST_FIXTURE_LINEAGES);
+
+      // Query by dataset digest prefix and full digest
+      const targetModel = TEST_FIXTURE_LINEAGES[0];
+      const lineageByFullDigest = mlops.queryLineage(targetModel.datasetDigest);
+      expect(lineageByFullDigest).toBeDefined();
+      expect(lineageByFullDigest?.modelId).toBe(targetModel.modelId);
+
+      const lineageByPartialDigest = mlops.queryLineage('dset_sha256');
+      expect(lineageByPartialDigest).toBeDefined();
+
+      // Empty or whitespace term returns undefined
+      expect(mlops.queryLineage('')).toBeUndefined();
+      expect(mlops.queryLineage('   ')).toBeUndefined();
+    });
   });
 
   describe('Gated Model Deployment (AC-10 - Test Fixtures)', () => {
@@ -106,6 +124,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         approvalId: 'apr_01JXYZ777777',
       });
       expect(attempt3.success).toBe(true);
+      expect(attempt3.isSimulated).toBe(true);
       expect(attempt3.deployedModel?.deploymentDigest).toMatch(/^sha256:[0-9a-f]{64}$/);
       expect(attempt3.deployedModel?.status).toBe('deployed');
     });
@@ -190,6 +209,410 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         nativeInputValueSetter?.call(input, 'apr_01JXYZ123456');
         input!.dispatchEvent(new Event('change', { bubbles: true }));
       });
+    });
+
+    it('verifies Adapter Conformance displays "미측정 (모의/정적 예시 · 검증 아님)" and NEVER "100% CONFORMING"', async () => {
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+      });
+
+      // Strict Invariant 1: "100% CONFORMING" is strictly forbidden (must be unmeasured)
+      expect(container.textContent).not.toContain('100% CONFORMING');
+
+      // Strict Invariant 2: Explicit unmeasured disclaimer is rendered
+      expect(container.textContent).toContain('미측정 (모의/정적 예시 · 검증 아님)');
+      expect(container.textContent).toContain('실제 conformance API 부재');
+      expect(container.textContent).toContain('실제 어댑터 conformance API 부재');
+
+      // Strict Invariant 3: Latency and token throughput marked as mock/static example
+      expect(container.textContent).toContain('ms (모의/정적 예시)');
+      expect(container.textContent).toContain('tok/s (모의/정적 예시)');
+    });
+
+    it('verifies Node 1-5 labels are qualified with (모의) and deployed node NEVER displays "Production Live"', async () => {
+      const deployedModel = TEST_FIXTURE_LINEAGES.find((m) => m.status === 'deployed')!;
+      await act(async () => {
+        root.render(React.createElement(ModelLineageView, { initialLineages: [deployedModel] }));
+      });
+
+      // Strict Invariant 1: Node labels lowered to mock/qualifier
+      expect(container.textContent).toContain('SHA-256 (모의 표기)');
+      expect(container.textContent).toContain('Git Signed SHA (모의 표기)');
+      expect(container.textContent).toContain('Isolated Runtime (모의)');
+      expect(container.textContent).toContain('4. EVALUATION (모의 점수)');
+      expect(container.textContent).toContain('Two-Person Rule (모의)');
+
+      // Strict Invariant 2: Deployed model MUST NEVER claim "Production Live"
+      expect(container.textContent).not.toContain('Production Live');
+      expect(container.textContent).toContain('모의 배포 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포)');
+      expect(container.textContent).toContain('6. DEPLOYMENT DIGEST (모의 시뮬레이션)');
+
+      // Strict Invariant 3: Reverse query prompt mentions dataset hash
+      expect(container.textContent).toContain('데이터셋 해시(dset_sha256...)로 역추적');
+    });
+
+    it('renders Real Model Commitment Observation Panel and fetches commitment via control-plane API', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+      const testManifestHash = '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069';
+      const testSourceRunId = 'run_0123456789ABCDEFGHJKMNPQRS';
+      const testRecoveryEpoch = '33333333-3333-4333-8333-333333333333';
+
+      const mockCommitmentResponse = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: testManifestHash,
+        sourceRunId: testSourceRunId,
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: testRecoveryEpoch,
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => mockCommitmentResponse,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const panel = container.querySelector('[data-testid="model-commitment-panel"]');
+        expect(panel).not.toBeNull();
+        expect(panel?.textContent).toContain('실제 모델 Commitment 조회 (Control-Plane HTTP API)');
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        expect(projectInput).not.toBeNull();
+        expect(modelInput).not.toBeNull();
+        expect(versionInput).not.toBeNull();
+        expect(fetchBtn).not.toBeNull();
+
+        // Inputs default to empty string requiring explicit context
+        expect(projectInput?.value).toBe('');
+
+        // Explicitly set inputs according to canonical schema format
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        // Trigger fetch and flush async execution
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        expect(globalThis.fetch).toHaveBeenCalled();
+
+        // Invariant: manifestHash, sourceRunId, availability, and revalidation must be displayed
+        const manifestHashEl = container.querySelector('[data-testid="commitment-manifest-hash"]');
+        const sourceRunIdEl = container.querySelector('[data-testid="commitment-source-run-id"]');
+        const availabilityEl = container.querySelector('[data-testid="commitment-availability"]');
+        const revalidationEl = container.querySelector('[data-testid="commitment-revalidation"]');
+
+        expect(manifestHashEl?.textContent).toBe(mockCommitmentResponse.manifestHash);
+        expect(sourceRunIdEl?.textContent).toBe(mockCommitmentResponse.sourceRunId);
+        expect(availabilityEl?.textContent).toBe('unknown');
+        expect(revalidationEl?.textContent).toContain('Required (true)');
+
+        // Now test 404 canonical ProblemDetails failure handling
+        const canonical404Problem: ProblemDetails = {
+          type: 'about:blank',
+          title: 'Not Found',
+          status: 404,
+          code: 'MODEL-0004',
+          category: 'RES',
+          detail: 'Committed model not found',
+          retryable: false,
+          traceId: '0123456789abcdef0123456789abcdef',
+          causeRef: null,
+          evidenceId: null,
+        };
+
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+          headers: new Headers({ 'content-type': 'application/problem+json' }),
+          json: async () => canonical404Problem,
+        } as any);
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('MODEL-0004');
+        expect(errorBanner?.textContent).toContain('404');
+        expect(errorBanner?.textContent).toContain('Committed model not found');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('rejects invalid ModelCommitObservation violating strict schema guard and hides corrupted details', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+
+      const corruptedPayload = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: 'bad_hash_not_64_hex', // violates manifestHash schema
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => corruptedPayload,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
+
+        // Critical: corrupt data must NOT be rendered
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('rejects ModelCommitObservation with extra property (violating additionalProperties: false)', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+
+      const payloadWithExtraProp = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        committedAt: '2026-09-28T09:00:00Z',
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+        unexpectedProperty: 'violates_additionalProperties_false', // extra property
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => payloadWithExtraProp,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
+
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('rejects ModelCommitObservation with invalid calendar date-time (e.g. 2026-02-30T25:61:00Z)', async () => {
+      const originalFetch = globalThis.fetch;
+      const testProjectId = 'prj_0123456789ABCDEFGHJKMNPQRS';
+      const testModelId = 'mdl_0123456789ABCDEFGHJKMNPQRS';
+      const testVersion = '1.0.0';
+
+      const payloadWithInvalidDate = {
+        projectId: testProjectId,
+        modelId: testModelId,
+        version: testVersion,
+        manifestHash: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
+        sourceRunId: 'run_0123456789ABCDEFGHJKMNPQRS',
+        committedAt: '2026-02-30T25:61:00Z', // impossible calendar date & time
+        commitRecoveryEpoch: '33333333-3333-4333-8333-333333333333',
+        format: 'safetensors',
+        totalBytes: 52428800,
+        shardCount: 4,
+        licensePolicy: 'Apache-2.0',
+        classification: 'internal',
+        committed: true,
+        currentAvailability: 'unknown',
+        requiresExecutionRevalidation: true,
+      };
+
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: async () => payloadWithInvalidDate,
+        } as any);
+
+        await act(async () => {
+          root.render(React.createElement(ModelLineageView, { initialLineages: TEST_FIXTURE_LINEAGES }));
+        });
+
+        const projectInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-project-input"]');
+        const modelInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-model-input"]');
+        const versionInput = container.querySelector<HTMLInputElement>('[data-testid="commitment-version-input"]');
+        const fetchBtn = container.querySelector<HTMLButtonElement>('[data-testid="commitment-fetch-btn"]');
+
+        const setInputValue = (el: HTMLInputElement, val: string) => {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+          setter?.call(el, val);
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+
+        await act(async () => {
+          setInputValue(projectInput!, testProjectId);
+          setInputValue(modelInput!, testModelId);
+          setInputValue(versionInput!, testVersion);
+        });
+
+        await act(async () => {
+          fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');
+        expect(errorBanner).not.toBeNull();
+        expect(errorBanner?.getAttribute('role')).toBe('alert');
+        expect(errorBanner?.textContent).toContain('클라이언트 응답 계약 검증 실패');
+        expect(errorBanner?.textContent).toContain('ModelCommitObservation 응답 계약 불일치');
+        expect(errorBanner?.textContent).not.toContain('500');
+        expect(errorBanner?.textContent).not.toContain('(500)');
+        expect(errorBanner?.textContent).not.toContain('FETCH_ERROR');
+
+        const resultContainer = container.querySelector('[data-testid="commitment-result-container"]');
+        expect(resultContainer).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
   });
 });
