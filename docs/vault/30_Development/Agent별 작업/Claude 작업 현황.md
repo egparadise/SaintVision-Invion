@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.40"
+version: "1.2.41"
 status: "review"
 author: "Claude"
 updated: "2026-09-28T17:30:00+09:00"
@@ -38,6 +38,8 @@ source_of_truth: "Git"
 
 - [[S01_Node_인벤토리_실측초안_2026-09-28]] v0.1: 등록 3 Node의 관측 사실(pilot status·PG READ ONLY·Node-3 SSH 읽기 전용)만 기입, Node-3 CPU/RAM ↔ capability 정확히 일치. Node-1·2 SSH 키 미승인·Node-4 미등록 → 미확인, 사용자 결정 칸(C1·C2·G1·A6·U1) 비움. IP는 `<lan>.N` 마스킹, 비밀 미기재. #122 lint 대응·불일치 후속 §3. 상세: [[2026-09-28_10-50-00_KST_S01_Node_인벤토리_실측초안_Claude]]
 - 같은 날 앞선 처리: #131 S09 collector(CI green, Codex 검토 대기), #126 카드 tt r2 승인, #127/#120/#121 Codex 재검토 대기.
+F1 model version digest UNIQUE 범위 migration 0052 (Claude, 2026-09-28, base #176 `1ddd85d0`, branch `agent/claude/g04-f1-digest-scope`): #191 F1의 선행. tenant 범위 digest UNIQUE가 project별 `canApprove`와 어긋나 **status code로 sibling-project 존재를 누출**하던 것을 `(model_id, content_sha256)`으로 좁혔다. 사전 데이터 검사(논증이 틀리면 문장으로 멈춤) → `CONCURRENTLY` 생성 → `USING INDEX` 승격 → 옛 제약 제거 순서, INVALID 인덱스 이름 선제 drop, offline render는 검사 생략(첫 판이 hosted offline 단계를 깼음), downgrade는 두 이유로 거부, head `0052` 단일. ORM·definer-policy·head marker 동반 이동. PG-free 11 passed + 변이 3건 사망, 실 PG 6건 hosted. 시험이 주석을 매칭하던 첫 판을 AST + source 위치 정렬로 고쳤다. 다음 첫 행동: Codex 검토 → 승인되면 #191이 이 head와 새 #184 head(#195 정본 403 denial audit)를 merge해 oracle 시험을 뒤집고 F4를 고정. 전문 [[2026-09-28_F1_model_version_digest_범위_migration_0052_Claude]].
+
 ### 2026-09-28 카드 bh · S10-BE MLflow 미러 2단계 (branch agent/claude/s10-be-mlflow-mirror-p2, base #172 41256e4f)
 
 - `adapters/mlflow_sink.py`(실 REST sink) · 0051 service credential + `tracking/service_credentials.py` · worker 경로 `resolve_sink`/`deliver_outbox_event` · backend.yml `mlflow-live` opt-in job · 시험 PG-free 20 / 실 PG 24 / live 3. Codex 1차(v1.2): 완료 marker 마지막+부분 쓰기 resume(승격 금지), revoke/disable 단방향 trigger, /version plain text, head pin 0051, hosted 27 실패 분류(pin 23/#172 2/자체 1/#174 1). 상세: [[2026-09-28_13-03-45_KST_S10-BE_MLflow_미러_구현_2단계_Claude]]
