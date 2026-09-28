@@ -49,7 +49,8 @@ from ...services import settings as settings_service
 from ...services.audit import record_event
 from ...units import CANONICAL_UNIT
 from .. import schemas
-from ..deps import get_now, get_principal, get_session, get_settings
+from ..deps import get_now, get_principal, get_session, get_settings, get_write_session
+from ..lock_wait import bounded_lock_wait
 
 router = APIRouter(prefix="/v1", tags=["pools"])
 
@@ -219,7 +220,13 @@ def announce(
         denied = False
         response_state: str | None = None
         with factory() as session:
-            with session.begin():
+            with (
+                session.begin(),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 # Digest-scoped lookup obtains tenant identity from the grant;
                 # the caller's tenant header is checked only after this read.
                 session.execute(
@@ -335,7 +342,13 @@ def announce(
     factory = make_session_factory(request.app.state.engine)
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, tenant_id):
+            with (
+                tenant_scope(session, tenant_id),
+                bounded_lock_wait(
+                    session,
+                    timeout_ms=request.app.state.settings.business_lock_timeout_ms,
+                ),
+            ):
                 row = discovery_service.record_announcement(
                     session,
                     tenant_id=tenant_id,
@@ -388,7 +401,7 @@ def admit(
     request: Request,
     announcement_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     settings: Settings = Depends(get_settings),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
@@ -435,7 +448,7 @@ def admit(
 def decline(
     announcement_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
     reason: str | None = Query(default=None),
 ) -> dict:
@@ -463,7 +476,7 @@ def create_pool(
     payload: schemas.PoolRequest,
     response: Response,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     # Read now, not from the credential: a project created a moment ago
@@ -503,7 +516,7 @@ def add_member(
     pool_id: str,
     node_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     _require_pool_write_access(
@@ -546,7 +559,7 @@ def remove_member(
     pool_id: str,
     node_id: str,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
 ) -> dict:
     _require_pool_write_access(
         session,
@@ -621,7 +634,7 @@ def create_plan(
     pool_id: str,
     payload: schemas.DistributedPlanRequest,
     principal: Principal = Depends(get_principal),
-    session: Session = Depends(get_session),
+    session: Session = Depends(get_write_session),
     now: dt.datetime = Depends(get_now),
 ) -> dict:
     """Spread one Run over the idlest nodes that fit.
