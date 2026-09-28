@@ -22,7 +22,7 @@ from saintvision.api.lock_wait import (
     validate_lock_timeout,
 )
 from saintvision.api.problem import CanonicalProblem
-from saintvision.api.v1 import model_release, model_retention, model_versions, run_seal
+from saintvision.api.v1 import model_release, model_retention, model_verify, model_versions, run_seal
 from saintvision.config import Settings
 
 
@@ -126,7 +126,7 @@ def test_the_context_manager_sets_the_bound_then_maps_a_wait_and_reraises_anythi
 # ---------------------------------------------------------------- one helper, every write route
 
 
-@pytest.mark.parametrize("module", [run_seal, model_retention, model_versions, model_release])
+@pytest.mark.parametrize("module", [run_seal, model_retention, model_versions, model_release, model_verify])
 def test_every_transaction_span_of_every_write_route_is_bounded_and_no_copy_exists(module):
     """Structure, not a substring (Codex #211 F1): each route opens N sessions
     (the permission preflight and the write) and every one of them enters
