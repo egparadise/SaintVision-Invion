@@ -300,11 +300,16 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
       // 모달 및 모의 고지 확인
       const modal = container.querySelector('[data-testid="kill-switch-modal"]');
       expect(modal).not.toBeNull();
+      expect(modal?.getAttribute('role')).toBe('dialog');
+      expect(modal?.getAttribute('aria-modal')).toBe('true');
+      expect(modal?.getAttribute('aria-labelledby')).toBe('kill-switch-modal-title');
+
       const mockNotice = container.querySelector('[data-testid="kill-switch-mock-notice"]');
       expect(mockNotice).not.toBeNull();
       expect(mockNotice?.getAttribute('role')).toBe('status');
       expect(mockNotice?.textContent).toContain('모의 시뮬레이션 고지');
-      expect(mockNotice?.textContent).toContain('백엔드 제어 평면 비상 정지 API가 현재 미노출 상태입니다');
+      expect(mockNotice?.textContent).toContain('백엔드 제어 평면에 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재합니다');
+      expect(mockNotice?.textContent).toContain('노드 격리(Drain/Resume) 제어는 비상 정지 상태에서도 안전한 장애 격리를 위해 계속 허용됩니다');
 
       // 비상 정지 확정 실행
       const confirmBtn = container.querySelector('[data-testid="kill-switch-confirm-btn"]') as HTMLButtonElement;
@@ -317,7 +322,20 @@ describe('화면 결함 5대 부류 치유 트랙 5차: 고위험 쓰기 동작 
       expect(activeBanner).not.toBeNull();
       expect(activeBanner?.getAttribute('role')).toBe('alert');
       expect(activeBanner?.textContent).toContain('[모의 시뮬레이션] EMERGENCY KILL SWITCH ACTIVE');
-      expect(activeBanner?.textContent).toContain('백엔드 제어 평면 비상 정지 API 미노출 상태로 실제 물리 노드에는 전달되지 않는 로컬 모의 동작');
+      expect(activeBanner?.textContent).toContain('백엔드 제어 평면 비상 정지 API(GET/POST /v1/operations/kill-switch)가 존재하며');
+
+      // Kill Switch 활성화 상태에서 모의 액션 차단(Interception) 검증
+      const tabs = container.querySelectorAll('button');
+      const isolationTab = Array.from(tabs).find((b) => b.textContent?.includes('소켓·승인 격리 검증'));
+      await act(async () => {
+        isolationTab?.click();
+      });
+      const bypassBtn = container.querySelector('[data-testid="test-bypass-btn"]') as HTMLButtonElement;
+      await act(async () => {
+        bypassBtn.click();
+      });
+      const bypassResult = container.querySelector('[data-testid="bypass-test-result"]');
+      expect(bypassResult?.textContent).toContain('🛑 KILL SWITCH BLOCKED: 긴급 비상 정지(Kill Switch) 상태로 인해 승인 우회 검증 요청이 차단되었습니다.');
     });
   });
 
