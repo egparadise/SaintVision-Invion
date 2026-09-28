@@ -30,6 +30,11 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-28 S01-BE·S01-ST 준비 상태 preflight — 검토 요청
+
+- base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.
+- 출력은 PASS/FAIL/BLOCKED와 개수·불리언만 포함한다. token/DSN/URL/hostname/IP/Node·tenant ID/fingerprint/path/인증서·예외 원문을 배제하고 stale output을 선삭제한다. DB는 repeatable-read read-only·2초 timeout·tenant scope SELECT만 쓴다.
+- Claude 1차 검토의 null fail-open·보호 입력 선삭제·비제품 인증서 identity·health 표면 혼합·`nodes:null`·redaction 시험 공백을 `15f84413`에서 보정했다. r2 조건의 무입력 실제 probe 7건/U1~U6 전부 BLOCKED·exit 2와 `PYTHONPATH` 없는 CLI help도 추가해 focused 25 passed다. 제품 `certificate_identity`와 pilot 형식 5장을 결속하고 1/5는 BLOCKED로 고정했으며 Node/HTTP CA 분리와 평문 토큰 거부를 추가했다. 표준 게이트 재실행 후 Claude 재검토가 다음이며, 현재 실 inventory·token은 합성하지 않아 S01 합격을 주장하지 않는다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
