@@ -58,7 +58,18 @@ def path(project_id=PROJECT):
 
 def build(monkeypatch, *, permission=None, denial=None):
     """An app whose only database call is replaced, and whose principal is real."""
-    calls = {"access": []}
+    calls = {"access": [], "denials": []}
+
+    # The shared denial recorder (#195) writes through the app's engine, which
+    # these tests do not have. Recorded here so a 403's audit call is asserted
+    # rather than lost -- the same stub the sibling route harnesses use.
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(
+        app_module,
+        "record_denial_out_of_band",
+        lambda _engine, **kwargs: calls["denials"].append(kwargs),
+    )
 
     def require_project_access(_session, *, tenant_id, project_id, user_id):
         calls["access"].append(
@@ -288,23 +299,59 @@ def test_9_membership_alone_is_enough_to_read(monkeypatch):
 
 # 10. A non-member is refused, and the body says nothing about the project.
 def test_10_a_non_member_is_refused_without_naming_the_project(monkeypatch):
-    client, _ = build(
+    client, calls = build(
         monkeypatch, denial=InvError(AUTH_PROJECT_SCOPE, "no membership", status=403)
     )
     body = canonical(get(client), code="AUTH-0030", status=403)
     assert PROJECT not in json.dumps(body)
+    # AC-02: the refusal is recorded once, at the shared handler boundary (#195).
+    assert len(calls["denials"]) == 1
+    recorded = calls["denials"][0]
+    assert recorded["outcome"] == "deny"
+    assert recorded["reason_code"] == "AUTH-0030"
+    assert recorded["actor_type"] == "user"
+    assert recorded["actor_id"] == USER
+    assert recorded["tenant_id"] == TENANT
+    # The project is the target because the path carried a well-formed id; the
+    # tenant is the caller's, never the project's.
+    assert (recorded["target_type"], recorded["target_id"]) == ("project", PROJECT)
+    assert recorded["trace_id"] == body["traceId"]
+    assert recorded["detail"] == {}
+    # The action is the bounded template, with no identifier in it (#189).
+    assert PROJECT not in recorded["action"]
+    assert "adapters/conformance" in recorded["action"]
+
+
+def test_10b_a_read_that_succeeds_records_no_denial(monkeypatch):
+    client, calls = build(monkeypatch)
+    assert get(client).status_code == 200
+    assert calls["denials"] == []
+
+
+def test_10c_the_route_does_not_record_the_denial_itself(monkeypatch):
+    """One audit point. A route inside a transaction the refusal rolls back
+    cannot be the place this is written (#195)."""
+    import inspect
+
+    source = inspect.getsource(conformance_status)
+    assert "record_denial" not in source
+    assert "record_event" not in source
 
 
 # 11. An absent project is the same denial as one the caller cannot see.
 def test_11_an_absent_project_is_the_same_denial(monkeypatch):
-    bodies = []
+    bodies, actions = [], []
     for project_id in (PROJECT, ABSENT_PROJECT):
-        client, _ = build(
+        client, calls = build(
             monkeypatch, denial=InvError(AUTH_PROJECT_SCOPE, "not visible", status=403)
         )
         body = get(client, project_id=project_id).json()
         bodies.append({key: value for key, value in body.items() if key != "traceId"})
+        actions.append(calls["denials"][0]["action"])
     assert bodies[0] == bodies[1]
+    # Both are audited, and under the same identifier-free action, so the trail
+    # does not distinguish them either.
+    assert actions[0] == actions[1]
 
 
 # --------------------------------------------------------------------------
@@ -418,6 +465,7 @@ def test_membership_is_checked_before_the_body_is_read(monkeypatch):
         get(client, data=b"x" * (MAX_REQUEST_BYTES + 100)), code="AUTH-0030", status=403
     )
     assert len(calls["access"]) == 1
+    assert len(calls["denials"]) == 1
 
 
 def test_no_credential_never_reaches_the_access_check(monkeypatch):
@@ -498,3 +546,57 @@ def _raised_codes(module, function):
         elif isinstance(first, ast.Constant) and isinstance(first.value, str):
             codes.add(first.value)
     return codes
+
+
+# --------------------------------------------------------------------------
+# The real-PostgreSQL fixture, exercised without PostgreSQL
+# --------------------------------------------------------------------------
+
+
+def test_the_real_pg_fixture_builds_its_rows_without_a_database():
+    """A wrong column or a wrong id kind should not cost an hour of hosted CI.
+
+    #167 spent one learning that ``new_id("code_commit")`` is not an entity kind,
+    with every assertion behind it unrun. Importing the fixture and handing it a
+    connection that only records statements catches that class here.
+    """
+    import importlib.util
+
+    path = (
+        pathlib.Path(__file__).resolve().parents[1]
+        / "integration/test_conformance_status_real_pg.py"
+    )
+    spec = importlib.util.spec_from_file_location("real_pg_conformance_fixture", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    class Recorder:
+        def __init__(self):
+            self.statements: list[str] = []
+
+        def execute(self, statement, params=None):
+            self.statements.append(str(statement))
+            return None
+
+    recorder = Recorder()
+    seeded = module._seed(recorder, tenant_id=TENANT, now=NOW, label="fixture-guard")
+    assert set(seeded) == {"user_id", "project_id"}
+    written = [
+        statement.split("INSERT INTO ", 1)[1].split(" ", 1)[0]
+        for statement in recorder.statements
+    ]
+    # A user, a project and a membership -- and no model or version: this route
+    # reads static facts and needs no registry rows at all.
+    assert written == ["users", "projects", "project_members"], written
+
+    from saintvision.ids import is_id
+
+    assert is_id(seeded["user_id"], "user")
+    assert is_id(seeded["project_id"], "project")
+
+    # The default role is deliberately the one without the approval grade: reading
+    # this route needs membership and nothing more, so the real-PG happy path must
+    # not be seeded with an approver.
+    import inspect
+
+    assert 'role="requester"' in inspect.getsource(module._seed)
