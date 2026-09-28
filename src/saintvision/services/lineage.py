@@ -17,7 +17,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.orm import Session
 
 from ..db.models import (
@@ -39,6 +39,13 @@ from ..errors import (
     InvError,
 )
 from ..ids import new_id
+from .pagination import build_page
+from .tracking import (
+    deployment_mirror_payload,
+    enqueue_mirror,
+    model_version_mirror_payload,
+    release_mirror_payload,
+)
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _OCI_DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -229,6 +236,17 @@ def register_model_version(
             now=now,
         )
     session.flush()
+    # Mirror intent in the same transaction (design #168 §2). Absent or
+    # invalid configuration records nothing; the version is registered either way.
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="model_version",
+        subject_id=row.model_version_id,
+        project_id=model.project_id,
+        payload=model_version_mirror_payload(row, model_name=model.name, now=now),
+        now=now,
+    )
     return row
 
 
@@ -268,23 +286,66 @@ def record_lineage(
     return row
 
 
+#: The measurement a verification binds to, read through the tenant-bound
+#: SECURITY DEFINER reader of 0054: the application role has no privilege on
+#: the kernel table itself, and the reader takes the tenant from the session's
+#: ``inv.tenant_id`` scope, never from an argument.
+_MEASUREMENT = text(
+    "SELECT model_version_id, sha256, byte_size, observed_at "
+    "FROM public.model_version_measurement(:measurement_id)"
+)
+
+
 def verify_model_version(
     session: Session,
     *,
     tenant_id: uuid.UUID,
     model_version_id: str,
+    measurement_id: str,
     content_sha256: str,
     now: dt.datetime,
 ) -> ModelVersion:
-    """Record that a trusted worker hashed the actual weights (ADR-011)."""
+    """Record that a trusted worker hashed the actual weights (ADR-011).
+
+    "A trusted worker hashed them" is not a claim the caller may make: it is
+    the existence of a signed node measurement (``inv.model_version_measurements``,
+    written only by the kernel's accept path) of *this* version whose digest
+    is the registered one. ``measurement_id`` is therefore required, and the
+    digest the caller passes must agree with both the measurement and the
+    row -- a digest alone cannot set ``verified_at`` (design #209 v1.1 §4).
+    ``verified_at`` and ``verified_measurement_id`` are set together; the
+    database CHECK refuses one without the other. The size is compared exactly
+    as the digest is: a registration that recorded 0 bytes is proved only by a
+    measurement of 0 bytes.
+    """
     row = _load_model_version(session, tenant_id=tenant_id, model_version_id=model_version_id)
-    if row.content_sha256 != content_sha256:
+    measurement = session.execute(_MEASUREMENT, {"measurement_id": measurement_id}).one_or_none()
+    if measurement is None:
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "measurement not found", cause_ref=measurement_id)
+    if measurement.model_version_id != row.model_version_id:
+        raise InvError(
+            VAL_SCHEMA, "the measurement belongs to a different model version", cause_ref=measurement_id
+        )
+    if measurement.sha256 != content_sha256 or row.content_sha256 != content_sha256:
         raise InvError(
             VAL_SCHEMA,
             "the computed checksum does not match the recorded one",
             cause_ref=model_version_id,
         )
+    # Always, with no sentinel (Codex #213 F2): a registered size of 0 is a
+    # size like any other and must be what the worker measured.
+    if int(measurement.byte_size) != int(row.byte_size):
+        raise InvError(
+            VAL_SCHEMA, "the measured size does not match the recorded one", cause_ref=model_version_id
+        )
+    if row.verified_at is not None:
+        if row.verified_measurement_id == measurement_id:
+            return row
+        raise InvError(
+            VAL_SCHEMA, "the model version is already verified by another measurement", cause_ref=model_version_id
+        )
     row.verified_at = now
+    row.verified_measurement_id = measurement_id
     session.flush()
     return row
 
@@ -337,6 +398,18 @@ def release_model_version(
 
     row.stage = "released"
     session.flush()
+    # The stage transition is its own mirror intent (design #168 §1): the tag
+    # ``inv.stage`` moves to ``released`` only because a new intent says so.
+    model = session.get(Model, row.model_id)
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="model_version",
+        subject_id=row.model_version_id,
+        project_id=model.project_id if model is not None else None,
+        payload=release_mirror_payload(row, now=now),
+        now=now,
+    )
     return row
 
 
@@ -540,6 +613,16 @@ def record_deployment(
     )
     session.add(deployment)
     session.flush()
+    model = session.get(Model, version.model_id)
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="deployment",
+        subject_id=deployment.deployment_id,
+        project_id=model.project_id if model is not None else None,
+        payload=deployment_mirror_payload(deployment, now=now),
+        now=now,
+    )
     return deployment
 
 
@@ -560,3 +643,299 @@ def _load_all(session: Session, entity, id_column, tenant_id: uuid.UUID, ids: li
             select(entity).where(entity.tenant_id == tenant_id, id_column.in_(ids))
         ).all()
     )
+
+
+# --------------------------------------------------------------------------
+# Project-scoped reads (S10-DB lineage query API)
+# --------------------------------------------------------------------------
+
+#: The most items any lineage array carries. Taken from the ``maximum=200``
+#: convention in ``pagination.py`` rather than from a measurement, and recorded
+#: as such: whatever is over the bound is reported, never silently dropped.
+ARRAY_LIMIT: int = 200
+
+#: Kinds whose detail a project-scoped read may serve, because their ownership
+#: is provable -- ``dataset_version`` through ``datasets.project_id``, and
+#: ``deployment`` through the model version the path already bound.
+DETAILED_KINDS: tuple[str, ...] = ("dataset_version", "deployment")
+
+#: Kinds with no project column anywhere, so a project member cannot be served
+#: their detail on the strength of that membership. Counted only.
+COUNT_ONLY_KINDS: tuple[str, ...] = (
+    "code_commit",
+    "container_image",
+    "eval_run",
+    "approval",
+)
+
+
+def _bounded(rows: list, key: str, truncated: dict[str, int]) -> list:
+    """Cut a list to ``ARRAY_LIMIT`` and record what was cut.
+
+    A slice with nothing recorded is the failure this exists to prevent: the
+    consumer cannot tell a complete answer from a cut one.
+    """
+    if len(rows) > ARRAY_LIMIT:
+        truncated[key] = len(rows)
+        return rows[:ARRAY_LIMIT]
+    return rows
+
+
+def trace_model_for_project(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    project_id: str,
+    model_version_id: str,
+) -> dict[str, Any]:
+    """``trace_model`` reduced to what a project member may be shown.
+
+    Not a filter over :func:`trace_model`: that function loads the detail of all
+    five kinds, and a project-scoped read that loaded rows and then dropped them
+    would leak the moment a filter went missing, besides putting them within
+    reach of a log or a traceback. Here the rows that will not be served are
+    never read.
+
+    What a caller cannot be given is reported as a count under ``unresolved``,
+    and the three reasons -- the subject row is absent, it belongs to another
+    project, or its kind has no project column at all -- are deliberately **not**
+    distinguished. Separating them would confirm that a hidden identifier exists
+    and belongs to someone else, which is an existence oracle over the tenant.
+
+    ``missing`` stays as it is: it says an edge is absent from *our* model
+    version and reveals nothing about anyone else's rows.
+    """
+    version = _load_model_version(
+        session, tenant_id=tenant_id, model_version_id=model_version_id
+    )
+    edges = list(
+        session.scalars(
+            select(ModelLineage).where(
+                ModelLineage.tenant_id == tenant_id,
+                ModelLineage.model_version_id == model_version_id,
+            )
+        ).all()
+    )
+    by_kind: dict[str, list[str]] = {}
+    for edge in edges:
+        by_kind.setdefault(edge.kind, []).append(edge.subject_id)
+
+    truncated: dict[str, int] = {}
+    unresolved: dict[str, int] = {}
+
+    subjects = by_kind.get("dataset_version", [])
+    rows = (
+        list(
+            session.execute(
+                select(DatasetVersion)
+                .join(
+                    Dataset,
+                    (Dataset.tenant_id == DatasetVersion.tenant_id)
+                    & (Dataset.dataset_id == DatasetVersion.dataset_id),
+                )
+                .where(
+                    DatasetVersion.tenant_id == tenant_id,
+                    DatasetVersion.dataset_version_id.in_(subjects),
+                    Dataset.project_id == project_id,
+                )
+                .order_by(DatasetVersion.dataset_version_id)
+            )
+            .scalars()
+            .all()
+        )
+        if subjects
+        else []
+    )
+    if len(rows) < len(subjects):
+        unresolved["dataset_version"] = len(subjects) - len(rows)
+    datasets = [
+        {
+            "datasetVersionId": row.dataset_version_id,
+            "version": row.version,
+            "contentSha256": row.content_sha256,
+            "uri": row.uri,
+        }
+        for row in _bounded(rows, "datasets", truncated)
+    ]
+
+    for kind in COUNT_ONLY_KINDS:
+        count = len(by_kind.get(kind, []))
+        if count:
+            unresolved[kind] = count
+
+    deployment_rows = list(
+        session.scalars(
+            select(Deployment)
+            .where(
+                Deployment.tenant_id == tenant_id,
+                Deployment.model_version_id == model_version_id,
+            )
+            .order_by(Deployment.deployment_id)
+        ).all()
+    )
+    deployments = [
+        {
+            "deploymentId": row.deployment_id,
+            "environment": row.environment,
+            "status": row.status,
+            "deployedDigest": row.deployed_digest,
+            "imageId": row.image_id,
+            "approvalId": row.approval_id,
+            "deployedAt": row.deployed_at,
+            "supersededAt": row.superseded_at,
+        }
+        for row in _bounded(deployment_rows, "deployments", truncated)
+    ]
+
+    missing = [kind for kind in REQUIRED_KINDS if not by_kind.get(kind)]
+    unresolved_list = [
+        {"kind": kind, "count": unresolved[kind]} for kind in sorted(unresolved)
+    ]
+    return {
+        "modelVersionId": version.model_version_id,
+        "version": version.version,
+        "stage": version.stage,
+        "contentSha256": version.content_sha256,
+        "producedByRunId": version.produced_by_run_id,
+        "datasets": datasets,
+        "deployments": deployments,
+        "missing": missing,
+        "unresolved": unresolved_list,
+        "truncated": truncated,
+        "fullyTraceable": not missing and not unresolved_list and not truncated,
+        # Says why ``fullyTraceable`` is false. Without it an operator reads that
+        # false as a recording gap and goes looking for records to fix, when the
+        # cause is this route's permission boundary.
+        "traceabilityLimitedByScope": any(
+            kind in unresolved for kind in COUNT_ONLY_KINDS
+        ),
+        "detailedKinds": list(DETAILED_KINDS),
+        "countOnlyKinds": list(COUNT_ONLY_KINDS),
+    }
+
+
+def models_from_dataset_digest(
+    session: Session,
+    *,
+    tenant_id: uuid.UUID,
+    project_id: str,
+    content_sha256: str,
+    limit: int,
+    cursor: str | None = None,
+) -> dict[str, Any]:
+    """Which model versions were built from the bytes with this digest.
+
+    The reverse of a traceback, and the question #144/#146 found no way to ask.
+
+    Two invariants live in the SQL rather than in prose. The dataset-version set
+    is bounded first and the ``IN`` list is *exactly* that bounded set, so every
+    item can be traced back to a listed dataset version; and the distinct is
+    taken on ``model_version_id`` **before** the cursor and the limit, because
+    several dataset versions can converge on one model version and paginating the
+    pre-distinct rows duplicates items and loses others at the page edge.
+    """
+    if not _SHA256.match(content_sha256):
+        raise InvError(VAL_SCHEMA, "content digest must be 64 lowercase hex characters")
+
+    truncated: dict[str, int] = {}
+    dataset_versions = list(
+        session.execute(
+            select(DatasetVersion.dataset_version_id)
+            .join(
+                Dataset,
+                (Dataset.tenant_id == DatasetVersion.tenant_id)
+                & (Dataset.dataset_id == DatasetVersion.dataset_id),
+            )
+            .where(
+                DatasetVersion.tenant_id == tenant_id,
+                DatasetVersion.content_sha256 == content_sha256,
+                Dataset.project_id == project_id,
+            )
+            .order_by(DatasetVersion.dataset_version_id)
+        )
+        .scalars()
+        .all()
+    )
+    if not dataset_versions:
+        # Absent, another project's and another tenant's are one answer.
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "dataset version not found")
+    dataset_versions = _bounded(dataset_versions, "datasetVersionIds", truncated)
+
+    wanted = sorted(
+        set(
+            session.execute(
+                select(ModelLineage.model_version_id).where(
+                    ModelLineage.tenant_id == tenant_id,
+                    ModelLineage.kind == "dataset_version",
+                    ModelLineage.subject_id.in_(dataset_versions),
+                )
+            )
+            .scalars()
+            .all()
+        )
+    )
+
+    rows: list = []
+    resolvable = 0
+    if wanted:
+        in_project = (
+            select(ModelVersion.model_version_id)
+            .join(
+                Model,
+                (Model.tenant_id == ModelVersion.tenant_id)
+                & (Model.model_id == ModelVersion.model_id),
+            )
+            .where(
+                ModelVersion.tenant_id == tenant_id,
+                ModelVersion.model_version_id.in_(wanted),
+                Model.project_id == project_id,
+            )
+            .distinct()
+        )
+        # Counted over the whole wanted set rather than over this page, so the
+        # number means the same thing on page one and page four.
+        resolvable = int(
+            session.execute(
+                select(func.count()).select_from(in_project.subquery())
+            ).scalar_one()
+        )
+        statement = (
+            select(ModelVersion)
+            .join(
+                Model,
+                (Model.tenant_id == ModelVersion.tenant_id)
+                & (Model.model_id == ModelVersion.model_id),
+            )
+            .where(
+                ModelVersion.tenant_id == tenant_id,
+                ModelVersion.model_version_id.in_(wanted),
+                Model.project_id == project_id,
+            )
+            .distinct()
+            .order_by(ModelVersion.model_version_id)
+        )
+        if cursor is not None:
+            statement = statement.where(ModelVersion.model_version_id > cursor)
+        rows = list(session.execute(statement.limit(limit + 1)).scalars().all())
+    page = build_page(rows, limit=limit, id_attr="model_version_id")
+    # One number for "belongs to another project" and for "no such row": telling
+    # them apart is the same oracle ``unresolved`` closes on the forward side.
+    unresolved_model_versions = len(wanted) - resolvable
+    return {
+        "contentSha256": content_sha256,
+        "datasetVersionIds": list(dataset_versions),
+        "items": [
+            {
+                "modelVersionId": row.model_version_id,
+                "modelId": row.model_id,
+                "version": row.version,
+                "stage": row.stage,
+                "contentSha256": row.content_sha256,
+            }
+            for row in page.items
+        ],
+        "nextCursor": page.next_cursor,
+        "unresolvedModelVersions": max(unresolved_model_versions, 0),
+        "truncated": truncated,
+        "complete": not truncated and unresolved_model_versions <= 0,
+    }

@@ -33,6 +33,7 @@ from saintvision.db.session import tenant_scope
 from saintvision.errors import InvError
 from saintvision.ids import new_id
 from saintvision.services import lineage as lineage_service
+from measurement_support import record_measurement
 from saintvision.services.lineage import LineageEdge
 
 pytestmark = pytest.mark.postgres
@@ -77,7 +78,21 @@ def registry(owner_engine, two_tenants):
             ),
             {"d": ids["dataset_id"], "t": tenant_a, "p": ids["project_id"]},
         )
+    ids["owner_engine"] = owner_engine       # the tests stand in for the kernel's measurement writer (0054)
     return ids
+
+
+def _verify(session, registry, mv, *, content_sha256=SHA, measured_sha256=None):
+    """Verify through the seam (0054): record a measurement of ``mv`` as the
+    kernel would, then bind it."""
+    measurement_id = record_measurement(
+        registry["owner_engine"], tenant_id=registry["tenant_a"],
+        model_version_id=mv.model_version_id, sha256=measured_sha256 or content_sha256,
+    )
+    return lineage_service.verify_model_version(
+        session, tenant_id=registry["tenant_a"], model_version_id=mv.model_version_id,
+        measurement_id=measurement_id, content_sha256=content_sha256, now=NOW,
+    )
 
 
 def _draft(session, registry, *, version="1", sha=SHA):
@@ -134,15 +149,10 @@ def test_verify_sets_the_timestamp_and_rejects_a_mismatch(app_sessionmaker, regi
             with tenant_scope(session, registry["tenant_a"]):
                 mv = _draft(session, registry)
                 with pytest.raises(InvError, match="does not match"):
-                    lineage_service.verify_model_version(
-                        session, tenant_id=registry["tenant_a"],
-                        model_version_id=mv.model_version_id, content_sha256=OTHER_SHA, now=NOW,
-                    )
-                verified = lineage_service.verify_model_version(
-                    session, tenant_id=registry["tenant_a"],
-                    model_version_id=mv.model_version_id, content_sha256=SHA, now=NOW,
-                )
+                    _verify(session, registry, mv, content_sha256=OTHER_SHA, measured_sha256=SHA)
+                verified = _verify(session, registry, mv)
                 assert verified.verified_at is not None
+                assert verified.verified_measurement_id is not None
 
 
 def test_a_retention_pin_only_extends(app_sessionmaker, registry):
@@ -173,10 +183,7 @@ def test_release_is_refused_until_verified_then_pinned_then_traceable(app_sessio
                         session, tenant_id=registry["tenant_a"],
                         model_version_id=mv.model_version_id, now=NOW,
                     )
-                lineage_service.verify_model_version(
-                    session, tenant_id=registry["tenant_a"],
-                    model_version_id=mv.model_version_id, content_sha256=SHA, now=NOW,
-                )
+                _verify(session, registry, mv)
                 # 2. verified but unpinned
                 with pytest.raises(InvError, match="retention pinned"):
                     lineage_service.release_model_version(
@@ -377,10 +384,7 @@ def test_release_succeeds_when_verified_pinned_and_fully_traceable(owner_engine,
                         model_version_id=mv.model_version_id,
                         edge=LineageEdge(kind=kind, subject_id=sid), now=NOW,
                     )
-                lineage_service.verify_model_version(
-                    session, tenant_id=registry["tenant_a"],
-                    model_version_id=mv.model_version_id, content_sha256=SHA, now=NOW,
-                )
+                _verify(session, registry, mv)
                 lineage_service.pin_retention(
                     session, tenant_id=registry["tenant_a"],
                     model_version_id=mv.model_version_id, until=LATER,
@@ -417,10 +421,7 @@ def _release_with_subjects(session, owner_engine, registry, user_id, subjects):
             session, tenant_id=registry["tenant_a"], model_version_id=mv.model_version_id,
             edge=LineageEdge(kind=kind, subject_id=sid), now=NOW,
         )
-    lineage_service.verify_model_version(
-        session, tenant_id=registry["tenant_a"],
-        model_version_id=mv.model_version_id, content_sha256=SHA, now=NOW,
-    )
+    _verify(session, registry, mv)
     lineage_service.pin_retention(
         session, tenant_id=registry["tenant_a"],
         model_version_id=mv.model_version_id, until=LATER,
