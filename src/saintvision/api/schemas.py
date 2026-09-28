@@ -12,9 +12,9 @@ default (공통 계약 §3).
 from __future__ import annotations
 
 import datetime as dt
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
 
 
 class Strict(BaseModel):
@@ -727,5 +727,491 @@ class WorkspaceToolRequest(Strict):
         pattern="^(claude-code|codex-cli|gemini-cli|antigravity)$",
         alias="toolName",
     )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseRequest(Strict):
+    """An importer's claim about what it is releasing (VF-CL-03).
+
+    The two fields and their constraints are copied from the kernel's
+    ``ModelManifest``, because the point of the request is to be compared
+    against that immutable declaration for exact equality. ``extra="forbid"``
+    is load-bearing here rather than conventional: a proposal carrying a field
+    the declaration does not have is itself a mismatch.
+    """
+
+    license_policy: str = Field(min_length=1, max_length=200, alias="licensePolicy")
+    classification: str = Field(pattern="^(public|internal|restricted)$")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelReleaseResponse(Strict):
+    """The released version, echoed back by identity.
+
+    ``stage`` is a literal rather than a free string: the only state this
+    response can describe is the one the route just established, so a future
+    change that returns a different stage under the same type breaks the
+    contract instead of quietly widening it.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["released"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionRegisterRequest(Strict):
+    """What an importer must state to register one model build (G-04 W2).
+
+    The fields are exactly ``register_model_version``'s own required arguments,
+    and nothing more: the service is the judge of what a registration means, so
+    a field here that it does not take would be this route inventing state.
+
+    ``contentSha256`` carries the service's rule as a pattern rather than
+    trusting it: the service raises ``VAL-SCHEMA`` for a non-lowercase digest
+    and the column has ``checksum_is_lowercase``, so a caller who sends
+    ``ABC...`` gets a request error at the boundary instead of a service error
+    translated later. Both defences stay.
+
+    ``uri`` is **not** here (Codex #191 F2). A caller-supplied URI was accepted
+    and stored verbatim, so ``https://user:secret@host``, ``javascript:...`` and
+    another model version's ``inv://`` address all persisted -- and the kernel
+    manifest's join key assumes the URI's version *is* the row's version. The
+    canonical address is fully determined by the model's name and the version, so
+    the server derives it instead of validating a string that has no reason to
+    vary.
+
+    ``producedByRunId`` and ``lineage`` are deliberately absent -- see the
+    module docstring of ``api/v1/model_versions.py`` for why neither can be
+    bound to the path's project on this branch.
+    """
+
+    version: str = Field(min_length=1, max_length=64)
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    byte_size: int = Field(default=0, ge=0, alias="byteSize")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionResponse(Strict):
+    """The registered build, echoed back by identity.
+
+    ``stage`` is a literal: registration creates a draft and nothing else, so a
+    change that returns a released version under this type breaks the contract
+    rather than widening it quietly. There is no person and no free text here --
+    the same rule ``LineageDeployment`` states.
+
+    Python field names avoid the ``model_`` prefix because Pydantic reserves
+    that namespace; the wire names are the aliases.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft"]
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    uri: str = Field(min_length=1)
+    created_at: dt.datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class AdapterReadinessResponse(Strict):
+    """One agent CLI's install, login and reachability state (G-01 follow-up).
+
+    #180 recorded that both adapter routes were declared ``-> dict``, so
+    ``export_schemas`` generated nothing for them and a change to the response
+    shape broke no gate. This closes that for the single-adapter route, where the
+    shape is one row and has no variants.
+
+    The fields and their types are **observed**, not inferred: ``agents.readiness()``
+    was run and its rows read (eleven keys, the same key set for all four tools),
+    and ``probe()`` was run for ``reachable`` and ``latencyMs``. The nullable ones
+    are nullable because the tool may be absent (``path``, ``version``), present
+    elsewhere (``installedElsewhere``) or have nothing to say
+    (``instructions``, ``latencyMs`` when unreachable).
+
+    ``loginDetail`` is the one unbounded field: it is whatever the adapter's
+    ``login_state()`` returned, which comes from CLI output. Declaring it as an
+    open mapping is honest about that rather than pretending a shape; narrowing it
+    -- and deciding whether tool output belongs in a screen-facing response at all
+    -- is a separate question this card does not answer.
+
+    The **list** route keeps ``-> dict`` on purpose. Its rows have two shapes: the
+    eleven-key row above, and a five-key row when one tool raises
+    (``adapter``, ``executable``, ``installed``, ``loginState``, ``error``). A
+    response model would fill the missing keys with defaults and so change the
+    wire shape a screen sees for a broken tool, which is a public change owned by
+    the frontend rather than a side effect of canonicalising a 404.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64)
+    executable: str = Field(min_length=1, max_length=128)
+    installed: bool
+    path: str | None = None
+    installed_elsewhere: str | None = Field(default=None, alias="installedElsewhere")
+    version: str | None = None
+    login_state: str = Field(pattern="^(logged_in|logged_out|unknown)$", alias="loginState")
+    login_detail: dict[str, Any] = Field(default_factory=dict, alias="loginDetail")
+    headless: bool
+    missing: list[str] = Field(default_factory=list)
+    instructions: str | None = None
+    reachable: bool
+    latency_ms: int | None = Field(default=None, ge=0, alias="latencyMs")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunStartRequest(Strict):
+    """What a caller may choose when starting an eval run (G-05 W5).
+
+    Three fields, and what is *absent* matters as much as what is here.
+
+    ``adapter`` is a **name**, not an endpoint or a credential. The server resolves
+    it through ``adapters.agents.adapter_for``, whose ``BY_NAME`` is the configured
+    allowlist, so a caller can pick one of the platform's four CLIs and nothing
+    else. A request that could name a URL would let the caller point this route --
+    which spends money -- at a host of their choosing.
+
+    ``componentVersions`` is part of the run's identity: "the agent scored 72%"
+    means nothing without which prompt, context and model produced it. It is
+    bounded, and the three keys the service fills in itself are **refused**:
+    ``run_suite`` merges them with ``setdefault``, so a caller who sent
+    ``{"adapter": "something-else"}`` would have their own value recorded as the
+    identity of the run. Refusing them is the only place that can be stopped
+    without changing the service's signature.
+
+    ``requireModelPinning`` defaults to **true**, which is the service's own
+    default: a score from an adapter that cannot say which model build produced it
+    is not reproducible. Passing false is allowed and is recorded on the run
+    (``modelPinned: "false"``) rather than merely decided at the call site.
+    """
+
+    adapter: str = Field(min_length=1, max_length=64, pattern="^[a-z0-9-]+$")
+    require_model_pinning: bool = Field(default=True, alias="requireModelPinning")
+    component_versions: dict[str, str] = Field(
+        default_factory=dict, alias="componentVersions", max_length=32
+    )
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinRequest(Strict):
+    """What a caller asks of W4: keep this version at least until ``until``.
+
+    One field, because ``pin_retention`` takes one: the service decides what the
+    request means (extend, never shorten). The instant must carry an offset --
+    a naive time would be compared with the stored aware value by whatever the
+    driver assumes, and "retained until when?" is not a question to answer with
+    an assumption.
+    """
+
+    until: AwareDatetime
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class EvalRunResponse(Strict):
+    """The finished run, by identity and by count.
+
+    No case content and no model output: ``eval_results.observed`` is a redacted
+    summary and this response does not carry even that. What a caller needs from
+    starting a run is which run it was and whether it passed.
+
+    ``passedGate`` is its own field rather than something a reader derives from
+    the counts, because the row's own rule is stricter than "passed == total": a
+    run with any forbidden-behaviour violation is not a pass whatever the score
+    says.
+    """
+
+    eval_run_id: str = Field(alias="evalRunId")
+    suite_id: str = Field(alias="suiteId")
+    status: Literal["running", "completed", "aborted"]
+    total_cases: int = Field(ge=0, alias="totalCases")
+    passed_cases: int = Field(ge=0, alias="passedCases")
+    violations: int = Field(ge=0)
+    passed_gate: bool = Field(alias="passedGate")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    started_at: dt.datetime = Field(alias="startedAt")
+    ended_at: dt.datetime | None = Field(default=None, alias="endedAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RetentionPinResponse(Strict):
+    """The version's retention after the request was judged.
+
+    ``retentionPinnedUntil`` is the committed value, which is the requested one
+    only when it extended the pin; ``extended`` says which, so a no-op is
+    visible to the caller instead of looking like success by coincidence.
+    ``stage`` is whatever the row is in -- a released version can still be
+    extended (design §5-3) -- and is the closed set the column allows.
+    """
+
+    version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: Literal["draft", "candidate", "released", "retired"]
+    retention_pinned_until: AwareDatetime = Field(alias="retentionPinnedUntil")
+    extended: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageDatasetVersion(Strict):
+    dataset_version_id: str = Field(alias="datasetVersionId")
+    version: str = Field(min_length=1, max_length=64)
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    uri: str = Field(min_length=1)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ConformanceCheckDescriptor(Strict):
+    """One check the conformance contract defines, named and gated.
+
+    A descriptor, not a result: there is no ``passed`` here because nothing has
+    been observed. Read from ``adapters.conformance.CHECKLIST``, which is the
+    single source for the list.
+    """
+
+    name: str = Field(min_length=1, max_length=100)
+    capability_gated: bool = Field(alias="capabilityGated")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageDeployment(Strict):
+    """A deployment of the traced version.
+
+    ``deployedByUserId`` and ``notes`` are on the row and are deliberately not
+    here: reading lineage does not need a person's identifier or free text.
+    """
+
+    deployment_id: str = Field(alias="deploymentId")
+    environment: str = Field(pattern="^(lab|staging|pilot)$")
+    status: str = Field(pattern="^(pending|active|superseded|rolled_back|failed)$")
+    deployed_digest: str = Field(pattern="^[0-9a-f]{64}$", alias="deployedDigest")
+    image_id: str | None = Field(default=None, alias="imageId")
+    approval_id: str | None = Field(default=None, alias="approvalId")
+    deployed_at: dt.datetime = Field(alias="deployedAt")
+    superseded_at: dt.datetime | None = Field(default=None, alias="supersededAt")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class LineageUnresolved(Strict):
+    """How many subjects of one kind this response does not describe.
+
+    A count and a kind, and nothing else. An identifier would leak another
+    project's row, and a reason would tell the caller whether a hidden
+    identifier exists -- which is the same disclosure by a longer route.
+    """
+
+    kind: str = Field(min_length=1, max_length=32)
+    count: int = Field(ge=1)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class RunRecordSealRequest(Strict):
+    """What a caller may say when sealing a run (G-04 W1, design §5-2).
+
+    Only the *role* of each server-derived artifact. The sealed set, the
+    digests, the bundle and the component versions are derived from the rows
+    the server locks; a request cannot add, omit or name any of them. An
+    artifact the mapping leaves out is sealed as ``other``; an id outside the
+    server's set is refused.
+    """
+
+    roles: dict[str, str] = Field(default_factory=dict)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    @field_validator("roles")
+    @classmethod
+    def _roles_are_known(cls, value: dict[str, str]) -> dict[str, str]:
+        allowed = {"diff", "test_report", "trace", "log", "model", "dataset", "other"}
+        for artifact_id, role in value.items():
+            if not (isinstance(artifact_id, str) and artifact_id.startswith("art_") and len(artifact_id) == 30):
+                raise ValueError("roles keys must be artifact ids")
+            if role not in allowed:
+                raise ValueError("unknown artifact role")
+        if len(value) > 1000:
+            raise ValueError("too many role mappings")
+        return value
+class ContextBundleItemSummary(Strict):
+    """One bundle item without its content: what was read, in what version,
+    and the digest and byte length of the text -- never the text itself and
+    not the caller-written source URI."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    ordinal: int = Field(ge=0)
+    item_id: str = Field(min_length=1, max_length=255, alias="itemId")
+    item_version: int = Field(ge=1, alias="itemVersion")
+    kind: str = Field(pattern="^(document|code|message|tool_output|summary)$")
+    content_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="contentHash")
+    byte_size: int = Field(ge=0, alias="byteSize")
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    redacted: bool
+
+
+class ContextBundleResponse(Strict):
+    """A run's context bundle as metadata (G-04 R3).
+
+    ``hashVerified`` is ``verify_bundle``'s answer, reported as a fact: false
+    means the stored content no longer reproduces the bundle hash. ``sealed``
+    says whether this is the bundle the run's sealed record pins (true) or the
+    run's most recently built bundle (false). ``itemCount``/``totalBytes`` are
+    the bundle's own columns; ``items`` is the ordered item list. No content,
+    no person, no free text.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    bundle_id: str = Field(alias="bundleId")
+    run_id: str = Field(alias="runId")
+    bundle_hash: str = Field(pattern="^[0-9a-f]{64}$", alias="bundleHash")
+    hash_verified: bool = Field(alias="hashVerified")
+    sealed: bool
+    item_count: int = Field(ge=0, alias="itemCount")
+    total_bytes: int = Field(ge=0, alias="totalBytes")
+    retrieval_strategy: str = Field(pattern="^(lexical|metadata|hybrid|explicit)$", alias="retrievalStrategy")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    token_estimate: int | None = Field(default=None, ge=0, alias="tokenEstimate")
+    built_at: dt.datetime = Field(alias="builtAt")
+    items: list[ContextBundleItemSummary]
+
+
+class RunRecordResponse(Strict):
+    """The sealed record of a run, reduced to identifiers, digests and counts.
+
+    No person and no free text: who requested the run and what it produced are
+    other routes' business. ``bundleId``/``bundleHash`` are null when the run
+    was sealed without a context bundle; that is a fact about the record, not a
+    gap in this response.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+    record_id: str = Field(alias="recordId")
+    run_id: str = Field(alias="runId")
+    final_state: str = Field(min_length=1, max_length=16, alias="finalState")
+    termination_reason: str = Field(min_length=1, max_length=24, alias="terminationReason")
+    evidence_id: str | None = Field(default=None, alias="evidenceId")
+    bundle_id: str | None = Field(default=None, alias="bundleId")
+    bundle_hash: str | None = Field(default=None, pattern="^[0-9a-f]{64}$", alias="bundleHash")
+    workload_spec_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="workloadSpecSha256")
+    component_versions: dict[str, str] = Field(alias="componentVersions")
+    attempt_count: int = Field(ge=0, alias="attemptCount")
+    sealed_at: dt.datetime = Field(alias="sealedAt")
+
+
+class ModelLineageTraceResponse(Strict):
+    """AC-10's traceback, reduced to what a project member may be shown.
+
+    ``commits``, ``images``, ``evaluations`` and ``approvals`` are absent rather
+    than empty. An empty array would read as "nothing was recorded", which is a
+    different and much more alarming statement than "this route cannot prove who
+    owns those rows"; the second is what ``unresolved`` and ``countOnlyKinds``
+    say.
+
+    ``deployments: []`` *is* an empty array, because it means something
+    complete: nothing has been deployed. That difference is the reason the two
+    are shaped differently.
+    """
+
+    model_version_id: str = Field(alias="modelVersionId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: str = Field(pattern="^(draft|candidate|released|retired)$")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    produced_by_run_id: str | None = Field(default=None, alias="producedByRunId")
+    datasets: list[LineageDatasetVersion] = Field(max_length=200)
+    deployments: list[LineageDeployment] = Field(max_length=200)
+    missing: list[str] = Field(max_length=16)
+    unresolved: list[LineageUnresolved] = Field(max_length=16)
+    truncated: dict[str, int] = Field(default_factory=dict)
+    fully_traceable: bool = Field(alias="fullyTraceable")
+    traceability_limited_by_scope: bool = Field(alias="traceabilityLimitedByScope")
+    detailed_kinds: list[str] = Field(alias="detailedKinds", max_length=16)
+    count_only_kinds: list[str] = Field(alias="countOnlyKinds", max_length=16)
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionByDigest(Strict):
+    model_version_id: str = Field(alias="modelVersionId")
+    parent_model_id: str = Field(alias="modelId")
+    version: str = Field(min_length=1, max_length=64)
+    stage: str = Field(pattern="^(draft|candidate|released|retired)$")
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ModelVersionByDatasetDigestPageResponse(Strict):
+    """Model versions built from one set of bytes.
+
+    ``datasetVersionIds`` is the set the items were derived from, bounded and
+    echoed so a caller can check the derivation rather than take it on trust. It
+    is a list because the same bytes may be registered as more than one dataset
+    version, and narrowing it to one value would silently drop model versions.
+    """
+
+    content_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="contentSha256")
+    dataset_version_ids: list[str] = Field(alias="datasetVersionIds", max_length=200)
+    items: list[ModelVersionByDigest] = Field(max_length=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+    unresolved_model_versions: int = Field(ge=0, alias="unresolvedModelVersions")
+    truncated: dict[str, int] = Field(default_factory=dict)
+    complete: bool
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+
+class ConformanceStatusResponse(Strict):
+    """What this platform can honestly say about adapter conformance (G-03).
+
+    Phase one says **NOT_OBSERVED** and nothing more, because nothing is stored:
+    ``run_conformance`` has no product caller and no table. The consequences are
+    in the field list rather than in a comment --
+
+    * ``status`` is ``Literal["NOT_OBSERVED"]``, one value. A widened literal
+      would advertise ``RECORDED`` in the generated schema before any code can
+      produce it; phase two brings that branch in with the counts that make it
+      mean something.
+    * there is **no** ``conformant`` boolean. A boolean has no third value, so
+      "not measured" would have to be spelled ``false``, which reads as "it was
+      run and it failed".
+    * there are **no counts**. ``passed: 0`` is not the absence of a
+      measurement; it is a measurement of zero.
+    * ``recordedAt`` is typed ``None``: the only honest value is null, so the
+      contract says so rather than trusting the route.
+
+    ``scope`` is the same word ``GET /v1/adapters`` uses. The project in the path
+    is who may read this, not who owns it: conformance is a property of the
+    control-plane host, not of a tenant's data.
+    """
+
+    status: Literal["NOT_OBSERVED"]
+    reason: str = Field(min_length=1, max_length=300)
+    scope: Literal["control-plane-host"]
+    contract_version: str = Field(min_length=1, max_length=32, alias="contractVersion")
+    #: The adapters the suite would run against -- a target list, not a result.
+    adapters: list[str]
+    checks: list[ConformanceCheckDescriptor]
+    #: Required, and only ever null: a consumer can rely on the key being
+    #: there, and the one value it may hold is the absence of a measurement.
+    recorded_at: None = Field(alias="recordedAt")
 
     model_config = ConfigDict(extra="forbid", populate_by_name=True)

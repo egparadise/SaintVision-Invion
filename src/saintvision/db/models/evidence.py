@@ -109,6 +109,8 @@ class OutboxEvent(Base):
         CheckConstraint("publish_attempts >= 0", name="publish_attempts_non_negative"),
         Index("ix_outbox_events_status_created_at", "status", "created_at"),
         Index("ix_outbox_events_tenant_id_created_at", "tenant_id", "created_at"),
+        # Target of the MLflow mirror delivery-identity foreign keys (0049).
+        Index("uq_outbox_events_tenant_id_event_id", "tenant_id", "event_id", unique=True),
     )
 
     outbox_id: Mapped[InvId] = mapped_column(primary_key=True)
