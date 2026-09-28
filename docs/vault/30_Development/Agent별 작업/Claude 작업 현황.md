@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.24"
+version: "1.2.29"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T00:09:51+09:00"
+updated: "2026-09-29T02:30:18+09:00"
 source_of_truth: "Git"
 ---
 
@@ -18,6 +18,8 @@ source_of_truth: "Git"
 - 확인 기준: 2026-09-22T16:55:00+09:00. 준비됨(ready)은 아직 착수했다는 뜻이 아니다. 차단 카드 대신 선행 없이 가능한 ready 카드를 진행한다.
 
 ## 최근 확인한 진척
+
+S09-DB·S10-DB·S10-ST 운영 판정 collector 카드 128 (Claude, 2026-09-29, base 착지 후보 `b91ab72f` + `#237`·`#222` merge): #222 v1.2(`6db0899a`, Codex 승인)의 판정을 실행 가능한 collector로 옮겼다 — `tools/collect_s09_s10_operational_evidence.py`. 12 관측 중 **입력이 있는 넷만 측정**한다: **O2**(`verify_bundle`로 snapshot에서 hash 재구성, 표본 ≥20·불일치 0), **O6**(**한 REPEATABLE READ session**에서 `models_from_dataset_digest` 전 page 합계 + `unresolvedModelVersions`를 **같은 transaction의 독립 SQL**과 비교, 표본 ≥30 — 독립 구현이어야 T3가 성립하므로 SQL로 다시 썼다), **O11′**(migration `0054`의 **자기 질의**로 `pg_constraint`를 읽어 `EXPECTED_CHECK`·`EXPECTED_FK`와 대조, 권한은 `information_schema`에서 읽음 — 복사본을 두면 복사본을 검증하게 된다), **O14**(전수 SQL + **판정에 쓴 상한을 함께 기록**해 나중에 상한을 바꿔 소급 판정하지 못하게 한다). 나머지 여덟(O1·O12 순변화, O8 임계치 없음, O3·O5·O9·O10·O13 외부 전제)은 **이유와 함께 미관측**이고 `validate_evidence`가 그 셋의 `MEASURED_PASS`를 각각 거부한다. **골격은 재구현하지 않았다** — 먼저 올라온 `#237`(카드 123)과의 공용부를 `tools/operational_evidence.py`로 **추출**하고 `#237` collector가 그것을 import하게 고쳤다(그쪽 기존 시험 7건 그대로 통과). **base를 바꾼 이유를 History에 적었다**: 제안된 두 base(`#222`·`#237` branch) **둘 다 `0054`와 `models_from_dataset_digest`가 없어** 이 collector의 실 PG 시험이 성립하지 않는다 — 그래서 착지 후보에서 시작하고 둘을 merge했다(해소만). 시험: **PG-free 부정 38건 통과**(표본 19→미관측·20→통과, 불일치 1건이면 표본이 커도 실패, 손으로 쓴 verdict 거부, 잘린 표본은 제외로 셈) + **실 PG 7건**(모든 SQL이 실 스키마에서 해석, 빈 DB는 통과 아님, **제약을 떼면 O11′이 MEASURED_FAIL**임을 transaction 안에서 확인 후 rollback). **로컬에서 실 PG 시험은 실행하지 않았다** — 이 PC Python 3.10이고 integration conftest가 `StrEnum`(3.11+)을 쓴다(#237 integration도 같은 이유로 수집 불가). hosted Core(`run-core`)가 실행 주체다. migration 없음. 다음 첫 행동: Codex 검토.
 
 ### 2026-09-28 카드 bf · 문서 경로 인용 실재 검사 (branch agent/claude/docs-path-citation-check, base 1e8baf04, worktree 재사용)
 

@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -39,7 +38,19 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools.provenance import collect as collect_provenance  # noqa: E402
+from tools.operational_evidence import (  # noqa: E402
+    EXIT_BY_VERDICT,
+    collect_provenance_at_root as _collect_provenance_at_root,
+    collector_sha256,
+    database_identity as _database_identity,
+    input_binding_sha256,
+    iso as _iso,
+    normalise_dsn,
+    parse_timestamp,
+    validate_common,
+    write_evidence as _write_evidence_pair,
+)
+from tools.operational_evidence import overall_verdict as _overall_verdict  # noqa: E402
 
 
 SCHEMA_VERSION = "s04-s08-operational-evidence:1"
@@ -48,16 +59,6 @@ CRITERIA_HEAD = "90a2051d450f5b52744129035bead25c50551217"
 CRITERIA_PATH = "docs/vault/30_Development/S04-DB_S08-DB_운영_판정_기준.md"
 DEFAULT_OUT_DIR = REPO_ROOT / "docs/vault/30_Development/Evidence/s04-s08-operational"
 
-STATUSES = frozenset(
-    {
-        "MEASURED_PASS",
-        "MEASURED_FAIL",
-        "NOT_OBSERVED",
-        "NOT_REGISTERED",
-        "BLOCKED_EXTERNAL",
-        "RECORDED_ONLY",
-    }
-)
 REQUIRED_OBSERVATIONS = (
     "O1",
     "O2",
@@ -81,7 +82,6 @@ C1_REASONS = frozenset(
         "cancelled_before_attempt",
     }
 )
-_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 # C1 is intentionally public/core-only.  ``inv.approval_requests`` and every
@@ -149,25 +149,6 @@ SELECT count(*)::bigint AS event_count,
  WHERE created_at >= %(started_at)s
    AND created_at <= %(finished_at)s
 """
-
-
-def _sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
-def _iso(value: dt.datetime) -> str:
-    if value.tzinfo is None:
-        raise ValueError("timestamp must be timezone-aware")
-    return value.astimezone(dt.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-
-def parse_timestamp(value: str | None) -> dt.datetime | None:
-    if value is None:
-        return None
-    parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
-    if parsed.tzinfo is None:
-        raise ValueError("timestamp must carry an offset")
-    return parsed.astimezone(dt.timezone.utc)
 
 
 def evaluate_c1_summary(summary: dict[str, int]) -> dict[str, Any]:
@@ -310,56 +291,12 @@ def default_unobserved() -> dict[str, dict[str, Any]]:
     }
 
 
-def overall_verdict(observations: dict[str, dict[str, Any]]) -> str:
-    for item in observations.values():
-        if item.get("status") not in STATUSES:
-            raise ValueError(f"unknown observation status: {item.get('status')!r}")
-    if any(item["status"] == "MEASURED_FAIL" for item in observations.values()):
-        return "FAIL"
-    if all(
-        observations.get(key, {}).get("status") == "MEASURED_PASS" for key in REQUIRED_OBSERVATIONS
-    ):
-        return "PASS"
-    return "NOT_OBSERVED"
-
-
-def _database_identity(conn) -> dict[str, Any]:
-    row = conn.execute(
-        """
-        SELECT current_database() AS database_name,
-               (SELECT oid::text FROM pg_database WHERE datname = current_database()) AS database_oid,
-               current_setting('server_version_num') AS server_version_num,
-               current_setting('transaction_isolation') AS transaction_isolation,
-               current_setting('transaction_read_only') AS transaction_read_only,
-               txid_current_snapshot()::text AS snapshot_id,
-               (SELECT version_num FROM alembic_version LIMIT 1) AS migration_head,
-               clock_timestamp() AS observed_at
-        """
-    ).fetchone()
-    system_identifier = conn.execute(
-        "SELECT system_identifier::text AS system_identifier FROM pg_control_system()"
-    ).fetchone()["system_identifier"]
-    raw_identity = "\0".join((system_identifier, row["database_name"], row["database_oid"]))
-    return {
-        "databaseIdentitySha256": _sha256_text(raw_identity),
-        "databaseNameSha256": _sha256_text(row["database_name"]),
-        "systemIdentifierObserved": True,
-        "databaseOid": row["database_oid"],
-        "serverVersionNum": row["server_version_num"],
-        "migrationHead": row["migration_head"],
-        "transactionIsolation": row["transaction_isolation"],
-        "transactionReadOnly": row["transaction_read_only"],
-        "snapshotSha256": _sha256_text(row["snapshot_id"]),
-        "observedAt": _iso(row["observed_at"]),
-    }
-
-
 def collect_database(dsn: str, *, window_start: dt.datetime | None = None) -> dict[str, Any]:
     """Read one target DB in a repeatable-read, read-only transaction."""
     import psycopg
     from psycopg.rows import dict_row
 
-    dsn = dsn.replace("postgresql+psycopg://", "postgresql://", 1)
+    dsn = normalise_dsn(dsn)
     with psycopg.connect(dsn, row_factory=dict_row) as conn:
         conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
         conn.execute("SET LOCAL statement_timeout = '30s'")
@@ -386,23 +323,14 @@ def collect_database(dsn: str, *, window_start: dt.datetime | None = None) -> di
     }
 
 
-def _collect_provenance_at_root(executor: str) -> dict[str, Any]:
-    previous = os.getcwd()
-    os.chdir(REPO_ROOT)
-    try:
-        return collect_provenance(executor=executor)
-    finally:
-        os.chdir(previous)
-
-
 def build_evidence(
     *, database: dict[str, Any], provenance: dict[str, Any], source_env: str
 ) -> dict[str, Any]:
     observations = default_unobserved()
     observations["O1"] = evaluate_outbox_summary(database.get("outbox"))
     observations["O3"] = evaluate_c1_summary(database["c1"])
-    verdict = overall_verdict(observations)
-    collector_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    verdict = _overall_verdict(observations, REQUIRED_OBSERVATIONS)
+    collector_sha = collector_sha256(__file__)
     binding = {
         "codeSha": provenance.get("commit_sha"),
         "collectorSha256": collector_sha,
@@ -437,9 +365,7 @@ def build_evidence(
             "sourceFinishedAt": database["sourceFinishedAt"],
             "windowStartedAt": database.get("windowStartedAt"),
             "database": database["identity"],
-            "inputBindingSha256": _sha256_text(
-                json.dumps(binding, sort_keys=True, separators=(",", ":"))
-            ),
+            "inputBindingSha256": input_binding_sha256(binding),
         },
         "observations": observations,
         "excludedBoundaries": {
@@ -454,55 +380,18 @@ def build_evidence(
 
 
 def validate_evidence(evidence: dict[str, Any]) -> None:
-    if evidence.get("schemaVersion") != SCHEMA_VERSION:
-        raise ValueError("schemaVersion mismatch")
-    if not re.fullmatch(r"[0-9a-f]{40}", str(evidence.get("codeSha") or "")):
-        raise ValueError("codeSha must be an exact 40-hex commit")
-    if evidence.get("criteria") != {
-        "version": CRITERIA_VERSION,
-        "sourceHead": CRITERIA_HEAD,
-        "path": CRITERIA_PATH,
-    }:
-        raise ValueError("criteria binding mismatch")
-    provenance = evidence.get("provenance") or {}
-    if provenance.get("workingTreeClean") is not True or provenance.get("contentClean") is not True:
-        raise ValueError("evidence source tree must be clean")
-    source = evidence.get("source") or {}
-    database = source.get("database") or {}
-    for key in ("databaseIdentitySha256", "databaseNameSha256", "snapshotSha256"):
-        if not _SHA256.fullmatch(str(database.get(key) or "")):
-            raise ValueError(f"missing or invalid database binding: {key}")
-    if database.get("systemIdentifierObserved") is not True:
-        raise ValueError("database system identifier was not observed")
-    if not _SHA256.fullmatch(str(source.get("inputBindingSha256") or "")):
-        raise ValueError("input binding is missing")
-    started = parse_timestamp(source.get("sourceStartedAt"))
-    finished = parse_timestamp(source.get("sourceFinishedAt"))
-    if started is None or finished is None or started > finished:
-        raise ValueError("source timestamps are reversed")
+    validate_common(
+        evidence,
+        schema_version=SCHEMA_VERSION,
+        criteria={
+            "version": CRITERIA_VERSION,
+            "sourceHead": CRITERIA_HEAD,
+            "path": CRITERIA_PATH,
+        },
+        required=REQUIRED_OBSERVATIONS,
+    )
     if (evidence.get("excludedBoundaries") or {}).get("C1-K", {}).get("status") != "NOT_OBSERVED":
         raise ValueError("C1-K must remain explicitly excluded")
-    if evidence.get("verdict") != overall_verdict(evidence.get("observations") or {}):
-        raise ValueError("verdict was not recomputed from observations")
-
-
-def _secret_values() -> list[str]:
-    values: list[str] = []
-    for key in ("INV_AUDIT_DSN", "INV_TEST_DATABASE_URL", "INV_TEST_ADMIN_DSN", "INV_DATABASE_URL"):
-        value = os.environ.get(key)
-        if not value:
-            continue
-        values.append(value)
-        match = re.search(r"://[^:/]+:([^@]+)@", value)
-        if match:
-            values.append(match.group(1))
-    return [value for value in values if value]
-
-
-def assert_no_secrets(text: str) -> None:
-    for value in _secret_values():
-        if value in text:
-            raise ValueError("evidence would contain a DSN or credential")
 
 
 def render_markdown(evidence: dict[str, Any]) -> str:
@@ -531,21 +420,7 @@ def render_markdown(evidence: dict[str, Any]) -> str:
 
 
 def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str) -> tuple[Path, Path]:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    json_path = out_dir / f"{label}.json"
-    markdown_path = out_dir / f"{label}.md"
-    if json_path.exists() or markdown_path.exists():
-        raise ValueError("refusing to overwrite existing evidence")
-    json_text = json.dumps(evidence, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    markdown_text = render_markdown(evidence)
-    assert_no_secrets(json_text)
-    assert_no_secrets(markdown_text)
-    json_path.write_text(json_text, encoding="utf-8")
-    markdown_path.write_text(markdown_text, encoding="utf-8")
-    return json_path, markdown_path
-
-
-EXIT_BY_VERDICT = {"PASS": 0, "FAIL": 1, "NOT_OBSERVED": 3}
+    return _write_evidence_pair(evidence, out_dir, label, render_markdown=render_markdown)
 
 
 def parser() -> argparse.ArgumentParser:
