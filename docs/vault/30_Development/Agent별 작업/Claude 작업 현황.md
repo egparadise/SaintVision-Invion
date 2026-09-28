@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.27"
+version: "1.2.28"
 status: "review"
 author: "Claude"
 updated: "2026-09-28T17:30:00+09:00"
@@ -52,6 +52,10 @@ VF-CL 트랙 독립 검토 대장 카드 ad (Claude, 2026-09-28, base `1e8baf04`
 
 - 설계 1쪽(항목표 17·입력 도구·판정 규칙·부정 시험 목록) + collector + PG-free 111 passed. 기존 readiness/PITR/browser-proof 출력만 읽고 AC-12 판정 복제 없음; NOT_OBSERVED/BLOCKED_EXTERNAL 분리. 상세: [[2026-09-28_10-13-44_KST_S12-DB_AC-12_Evidence_collector_Claude_설계_PGfree]]
 - 같은 날: #150 VF-CL-04 retention fail-closed(Backend green 36363486696, Codex delta 재검토 중). #120·#121·#127·#131·#134·#137은 Codex 승인 → 사용자 병합 목록.
+### 2026-09-28 카드 as · S12-ST Evidence 대응표 (branch agent/claude/s12-st-evidence-map, base 1e8baf04, docs-only, worktree 재사용)
+
+- [[S12-ST 운영 점검·제공 폴더·복구 훈련 Evidence 대응표]]: 세 범위 19항목 + registry evidence 4종을 기존 도구·시험·hosted run ID로 대응, 공백 5(NOT_OBSERVED 1·BLOCKED_EXTERNAL 4), 구현 추가 0. 상세: [[2026-09-28_10-17-17_KST_S12-ST_Evidence_대응표_Claude]]
+- 같은 날: #153 S12-DB collector(Codex 검토 중), #150 retention fail-closed(delta 재검토 중).
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
