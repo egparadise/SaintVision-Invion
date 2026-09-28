@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S11-ST-FAILURE-001"
 title: "S11-ST 손상·용량·backup 장애 시험 설계"
-version: "1.2.1"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T16:03:42+09:00"
+updated: "2026-09-28T16:16:21+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -190,7 +190,7 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 
 1. 이 설계와 [[S11_ST_storage_failure_target_v0]]를 merge commit 방식으로 병합해 임계치·환경을 먼저 고정한다.
 2. #177 병합 뒤 `CARD-S11-AC11-REGISTRY-REPIN-01`이 정본 `s11-ac11-target-registry-v0.json`에 PITR patch를 적용하고 old target 제거, PITR `REQUIRED_TARGET_BY_AXIS`, registry/blob·importer pin, 기존 repo 시험과 old-target 부정 시험을 한 commit에 넣는다. long-soak은 composite target 전 `NOT_REGISTERED`다. 이 단계 전 측정 금지.
-3. PG-free raw producer·storage importer를 구현하고 universe 22개, PG-free 12개, hosted 10개 subset hash와 변이 표를 모두 죽인다.
+3. PG-free raw producer·storage importer는 commit `06718b59`에 구현했다. universe 22개와 PG-free 12개 subset hash, exact surface·provenance·redaction·JUnit 변이를 fail-closed로 검증한다. hosted 10개 producer/importer는 별도 lane 카드에 남는다.
 4. Local `OSError`→기존 `STORE-0001` 변환과 retention receipt/journal을 작은 코드 카드로 분리한다. 공개 schema·migration 변화가 생기면 이 설계를 다시 검토한다.
 5. hosted opt-in lane에서 MinIO+PG fault matrix와 archive `/bin/false`·`/bin/true`를 실행한다. 전부 reference-only로 보존한다.
 6. 운영자가 물리 5노드·별도 장애 영역·archive 자격·허용 중단 창을 제공한 뒤에만 24시간 storage reference와 physical PITR identity 3개를 실행한다. storage reference는 long-soak composite target 승인 전 축 판정에 쓰지 않는다.
@@ -200,6 +200,6 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 ## 9. 이번 카드의 판정
 
 - 설계·사전 목표: v1.2는 Claude r3 승인됐다. `CARD-S11-AC11-REGISTRY-REPIN-01`은 merge commit `067e6a48` 위 구현 commit `ffd99bfd`에서 old PITR target 제거·새 target 적용·축별 targetId·registry/importer pin을 반영했다. 별도 patch proposal은 계속 소비 금지다.
-- PG-free/hosted/실장비 실행: `NOT_OBSERVED`.
+- PG-free producer/importer: 구현·Windows PG-free contract 시험 완료. hosted Linux에서 실제 LocalObjects 12-case 실행 결과는 PR CI 전까지 `NOT_OBSERVED`다. hosted 10-case와 실장비는 `NOT_OBSERVED`다.
 - 공개 계약·migration 변경: 없음.
 - S11-ST registry 상태 변경: 없음(`planned` 유지). 정본 task registry는 sprint task만 허용하고 S10 선행 task가 미완료이므로 synthetic subtask를 추가하거나 parent를 `in_progress`로 올리지 않았다. 카드 ID는 History·Codex 작업판에서 추적한다.
