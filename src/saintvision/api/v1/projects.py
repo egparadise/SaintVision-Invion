@@ -54,9 +54,9 @@ run_records.register(router)
 run_seal.register(router)
 context_bundles.register(router)
 model_versions.register(router)
+model_retention.register(router)
 conformance_status.register(router)
 eval_runs.register(router)
-model_retention.register(router)
 model_verify.register(router)
 
 

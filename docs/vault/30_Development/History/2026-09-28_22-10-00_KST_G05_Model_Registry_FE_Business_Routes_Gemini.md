@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-FE-MODEL-REGISTRY-001"
 title: "G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증"
-version: "1.1.0"
+version: "1.2.0"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T22:38:00+09:00"
+updated: "2026-09-28T23:37:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05"]
@@ -104,3 +104,38 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`에 `writeAbortControllerRef` 및 `writeGenerationRef`를 적용하여 unmount 시 요청 abort 및 늦은 응답 상태 오염 차단 (시험 17).
 - **Claude G6 (문서 시각 정합성)**:
   - History 및 작업 현황 문서의 `updated` 시각을 커밋 이전 시각(`2026-09-28T22:38:00+09:00`)으로 정정.
+
+## 5. Claude UI r2 검토 항목(G1, G2, G3, G5, Test 16) 조치 및 PR #212 머지 (r3)
+
+- **G3 [중간, 새 결함] 쓰기 3종 독립 AbortController 및 세대 분리, finally 로딩 해제 보장**:
+  - `handleRegisterVersion`, `handleExtendPin`, `handleReleaseModel`이 기존에 단일 writeAbortController를 공유하여 한 작업 중 다른 작업을 누르면 이전 작업이 취소되고 `finally`에서 로딩 플래그를 해제하지 못해 버튼이 영구 비활성화되던 결함을 전면 해소.
+  - 각각 독립적인 AbortController(`regAbortControllerRef`, `pinAbortControllerRef`, `relAbortControllerRef`)와 세대 번호(`regGenerationRef`, `pinGenerationRef`, `relGenerationRef`)를 할당.
+  - 어떤 작업이 abort되더라도 각 액션의 `finally`에서 무조건 `setRegLoading(false)`, `setPinLoading(false)`, `setRelLoading(false)`를 호출하여 버튼 영구 비활성화를 방지.
+  - 9개 폼 입력 필드 변경 시 즉시 해당 작업의 in-flight 세대 번호를 증가시켜 이전 파라미터로 진행 중이던 응답이 새 입력 상태를 덮어쓰지 못하도록 무효화.
+  - 되돌리면 실패하는 회귀 시험 실장 (시험 18: 쓰기 간 독립 abort 및 finally 로딩 해제 검증).
+- **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
+  - `validTraceResponse` 픽스처에서 `unresolved`가 비어있지 않을 때 서버 `services/lineage.py:762` 계약에 따라 `fullyTraceable: false`로 정합.
+  - `missing` 배열 항목은 서버 `services/lineage.py:747` 정본대로 kind 이름 문자열(`"dataset_version"`)만 포함하도록 교정.
+  - 비정본 4대 별칭(`evaluations`, `commits`, `approvals`, `images`), `isEval` 특수 분기, 임의의 하드코딩 fallback kind 목록을 전면 제거.
+- **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
+  - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하여 멱등적 재시도를 지원하되, 핀 만료일(`until`) 또는 프로젝트/모델/버전 식별자가 변경될 때는 즉시 새 UUID v4 멱등키로 회전.
+  - 파라미터 변경 시 멱등키가 회전하지 않으면 서버가 409 `GRAPH-0002` 충돌을 반환하는 문제를 방지.
+  - 되돌리면 실패하는 회귀 시험 실장 (시험 19: 핀 파라미터 변경 시 멱등키 즉시 회전 실측).
+- **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
+  - 409 Conflict detail을 서버 `services/lineage.py` 및 `model_release.py:326-327`의 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
+  - `ProblemDetails`의 `title`을 서버 `api/problem.py:131` 정본대로 에러 코드(`MODEL-0004` 등)와 일치화.
+- **Test 16 엄격 스키마 경계 픽스처 교정**:
+  - `deployments` 컬렉션 상한 검증 시 스키마 허용 환경(`environment: 'pilot'`) 적용.
+  - `unresolved` 항목 번호가 1부터 시작하도록 교정하여 스키마 regex 패턴 만족.
+- **PR #212 선행 머지 (`7ddc616e`) 및 ModelLineageView 완전 합성**:
+  - PR #212 head `5b2609d9`를 병합하고, `ModelLineageView.tsx`에서 Card 94 비즈니스 라우트(상단 4개 탭)와 PR #203 어댑터 Conformance 패널(`adapter-conformance-panel`) 및 Model Commitment 패널(`model-commitment-panel`)을 완벽하게 통합/합성.
+  - `write-actions-integrity-wiring.test.tsx` 무결성 검증 통과 (`로컬 배포 게이트 시뮬레이션 완료` 정직 표출).
+- **실측 검증 증거**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 19 passed (826ms).
+  - Vitest: `tests/model-lineage.test.ts` 23 passed (997ms).
+  - Vitest: `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
+  - 웹 전체: 80 test files, 750 passed (23.88s).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist 번들 정상 빌드 (874.71 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.46s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
