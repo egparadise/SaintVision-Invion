@@ -312,6 +312,29 @@ def test_missing_credential_is_refused(client):
     assert response.json()["code"] == "AUTH-MISSING-CREDENTIAL"
 
 
+def test_a_denial_with_no_tenant_is_still_recorded(client, owner_engine):
+    """AC-02 for the row RLS cannot cover.
+
+    A request with no credential resolves to no tenant, so the row has
+    ``tenant_id IS NULL`` and no tenant policy can admit it. Since
+    0047_audit_events_isolation it is written by ``public.record_auth_denial``;
+    if that path ever broke, the denial would vanish silently rather than fail
+    the request, which is why this asserts the row and not just the 401.
+    """
+    assert client.get("/v1/nodes").status_code == 401
+    with owner_engine.connect() as connection:
+        rows = connection.execute(
+            text(
+                "SELECT outcome, actor_type, action FROM audit_events "
+                "WHERE tenant_id IS NULL AND reason_code = 'AUTH-MISSING-CREDENTIAL'"
+            )
+        ).mappings().all()
+    assert len(rows) == 1
+    assert rows[0]["outcome"] == "deny"
+    assert rows[0]["actor_type"] == "anonymous"
+    assert rows[0]["action"] == "GET /v1/nodes"
+
+
 def test_unknown_credential_is_refused(client):
     response = client.get("/v1/nodes", headers={"Authorization": "Bearer nope"})
     assert response.status_code == 403
