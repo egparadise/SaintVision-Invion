@@ -17,7 +17,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.orm import Session
 
 from ..db.models import (
@@ -286,23 +286,63 @@ def record_lineage(
     return row
 
 
+#: The measurement a verification binds to, read through RLS with the caller's
+#: tenant scope. The application role may only SELECT this kernel-owned table.
+_MEASUREMENT = text(
+    "SELECT model_version_id, sha256, byte_size, observed_at "
+    "FROM inv.model_version_measurements "
+    "WHERE tenant_id = :tenant_id AND measurement_id = :measurement_id"
+)
+
+
 def verify_model_version(
     session: Session,
     *,
     tenant_id: uuid.UUID,
     model_version_id: str,
+    measurement_id: str,
     content_sha256: str,
     now: dt.datetime,
 ) -> ModelVersion:
-    """Record that a trusted worker hashed the actual weights (ADR-011)."""
+    """Record that a trusted worker hashed the actual weights (ADR-011).
+
+    "A trusted worker hashed them" is not a claim the caller may make: it is
+    the existence of a signed node measurement (``inv.model_version_measurements``,
+    written only by the kernel's accept path) of *this* version whose digest
+    is the registered one. ``measurement_id`` is therefore required, and the
+    digest the caller passes must agree with both the measurement and the
+    row -- a digest alone cannot set ``verified_at`` (design #209 v1.1 §4).
+    ``verified_at`` and ``verified_measurement_id`` are set together; the
+    database CHECK refuses one without the other.
+    """
     row = _load_model_version(session, tenant_id=tenant_id, model_version_id=model_version_id)
-    if row.content_sha256 != content_sha256:
+    measurement = session.execute(
+        _MEASUREMENT, {"tenant_id": tenant_id, "measurement_id": measurement_id}
+    ).one_or_none()
+    if measurement is None:
+        raise InvError(RES_ARTIFACT_NOT_FOUND, "measurement not found", cause_ref=measurement_id)
+    if measurement.model_version_id != row.model_version_id:
+        raise InvError(
+            VAL_SCHEMA, "the measurement belongs to a different model version", cause_ref=measurement_id
+        )
+    if measurement.sha256 != content_sha256 or row.content_sha256 != content_sha256:
         raise InvError(
             VAL_SCHEMA,
             "the computed checksum does not match the recorded one",
             cause_ref=model_version_id,
         )
+    if row.byte_size and int(measurement.byte_size) != int(row.byte_size):
+        raise InvError(
+            VAL_SCHEMA, "the measured size does not match the recorded one", cause_ref=model_version_id
+        )
+    if row.verified_at is not None:
+        if row.verified_measurement_id == measurement_id:
+            return row
+        raise InvError(
+            VAL_SCHEMA, "the model version is already verified by another measurement", cause_ref=model_version_id
+        )
     row.verified_at = now
+    row.verified_measurement_id = measurement_id
     session.flush()
     return row
 
