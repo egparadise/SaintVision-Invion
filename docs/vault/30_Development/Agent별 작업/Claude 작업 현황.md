@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.22"
+version: "1.2.23"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T01:10:37+09:00"
+updated: "2026-09-29T01:27:07+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-진행판 갱신 카드 120 (Claude, 2026-09-29, base `integration/all-agents-unified` `1e8baf04`, docs-only): 2026-09-28~29 상태를 전체 진행 현황에 한 줄로 — 착지 후보 `b91ab72f`(95 PR, hosted 7종 green, Codex 카드 104 r2 착지 가능, 사용자 스크립트 미실행), 재채점 #220 69.79%(34/48 75점 천장), 병합 목록 밖 PR 12개 상태(#218~#229)와 다음 첫 행동(사용자: 착지·G-19 결정, 코디네이터: train 2). 같은 기간 Claude tab: #221 카드 103 조건 충족(`2f853a94`), #223 카드 108 v1.1.1, #225 카드 110 v1.1, #229 카드 113(`236e8219` Codex 코드·계약 승인), #226 r2·#227 r1/재확인 독립 검토, #221 카드 112 FE 변경 명세, #169 카드 107 baseline 재시드(`b69bba2d`). 다음 첫 행동: #228 Gemini 조치 head r2 검토(B), hosted 인용 대기 3건(#226·#229·#227 cae12b15).
+진행판 갱신 카드 120 (Claude, 2026-09-29, base `integration/all-agents-unified` `1e8baf04`, docs-only): 2026-09-28~29 상태를 전체 진행 현황에 한 줄로 — 착지 후보 `b91ab72f`(95 PR, hosted 7종 green, Codex 카드 104 r2 착지 가능, 사용자 스크립트 미실행), 재채점 #220 69.79%(34/48 75점 천장), 병합 목록 밖 PR 12개 상태(#218~#229)와 다음 첫 행동(사용자: 착지·G-19 결정, 코디네이터: train 2). 같은 기간 Claude tab: #221 카드 103 조건 충족(`2f853a94`), #223 카드 108 v1.1.1(Codex 승인 00:13 KST), #225 카드 110 v1.1(Codex 승인 00:27 KST), #229 카드 113(`236e8219` hosted Backend 36446971153·Core 36446971117 red → Codex 승인 철회 → 시험 fixture 정정 `41fe5c3c` hosted 대기), #226 r2·#227 r1/재확인 독립 검토, #221 카드 112 FE 변경 명세, #169 카드 107 baseline 재시드(`b69bba2d`). 다음 첫 행동: #229 `41fe5c3c` Backend·Core 인용 뒤 Codex 재확인 요청, #226 `1feab4de` Backend 36450299952·#227 `cae12b15` Core 36448417270 인용. #228 r2 검토(B)는 코디네이터가 맡아 제외. (v1.1 2026-09-29 01:27 KST: Codex #230 지적 3건 정정.)
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
