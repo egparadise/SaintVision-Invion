@@ -17,7 +17,10 @@ export type PoolItem = PoolListItemResponse;
 export type CandidateItem = DiscoveryCandidateResponse;
 
 export interface PlacementSimulatorProps {
-  nodes: NodeItem[];
+  nodes?: NodeItem[];
+  activePool?: any;
+  allPools?: any[];
+  projectId?: string;
   initialPools?: PoolItem[];
   initialPoolsState?: 'idle' | 'loading' | 'success' | 'error';
   initialPoolsError?: string | null;
@@ -32,7 +35,7 @@ export interface PlacementSimulatorProps {
 }
 
 export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
-  nodes,
+  nodes = [],
   initialPools,
   initialPoolsState,
   initialPoolsError,
@@ -49,7 +52,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
   const [preferredOs, setPreferredOs] = useState<'windows' | 'linux' | undefined>(undefined);
-  const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes[0]?.id || '');
+  const [localityNodeId, setLocalityNodeId] = useState<string>(() => nodes?.[0]?.id || '');
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend pool list state

@@ -105,6 +105,7 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
     await act(async () => {
       root.render(
         <PlacementSimulator
+          nodes={[]}
           activePool={activePool}
           allPools={[activePool]}
           projectId="prj-test-01"
