@@ -161,7 +161,9 @@ def test_result_and_download_match_actual_node_output_and_current_grant(first):
             item["path"],
             a.e.project,
         )
-    assert denied_download.value.status == 403
+    # The project-scoped download follows the existing non-disclosure policy:
+    # another tenant cannot observe the run row, so provider I/O never starts.
+    assert denied_download.value.status == 404
     # A corrupted stored receipt cannot produce a verified downloadable file.
     bad = deepcopy(facts)
     bad["receipt"]["output"]["data"] = base64.b64encode(b"changed").decode()

@@ -18,7 +18,7 @@ import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -256,7 +256,7 @@ def _seed_ledger(owner: str) -> dict:
         conn.execute("""INSERT INTO inv.storage_objects
             (tenant_id,project_id,object_id,provider_id,locator,content_hash,size_bytes,state)
             VALUES (%s,%s,%s,'local-bounded-v1',%s,%s,%s,'uploading')""",
-            (tenant, project, obj, "obj-" + obj.hex, content_hash, len(data)))
+            (tenant, project, obj, "obj-" + UUID(obj).hex, content_hash, len(data)))
         conn.execute("UPDATE inv.storage_objects SET state='ready' WHERE object_id=%s", (obj,))
         # A result commitment/completion cannot be seeded here: its FK chain
         # (execution_attempts -> tool_claims -> approval_dispatches) only exists after a real
