@@ -82,15 +82,26 @@ jobs:
           assert report['sourceHeadSha'] == os.environ['SOURCE_HEAD_SHA']
           assert report['cleanCheckout'] is True
           assert report['cleanup']['residueCount'] == 0
-          assert report['axes'][0]['verdict'] == 'NOT_APPLICABLE'
+          reversible = report['axes'][0]
+          assert reversible['verdict'] in {'MEASURED_PASS', 'NOT_APPLICABLE'}
+          if reversible['verdict'] == 'NOT_APPLICABLE':
+              assert reversible['structuralException'] == {
+                  'reason': 'no-reversible-tail',
+                  'reversibleTailCount': 0,
+              }
+          else:
+              assert reversible['observationCount'] == 1
+              assert reversible['details']['catalogEquivalent'] is True
+              assert reversible['details']['sentinelPreserved'] is True
           assert report['axes'][1]['verdict'] == 'MEASURED_PASS'
           root = ET.parse(junit_path).getroot()
+          skipped = '1' if reversible['verdict'] == 'NOT_APPLICABLE' else '0'
           assert root.attrib == {
               'name': 's11-ac11-migration-rehearsal',
-              'tests': '6',
+              'tests': '7',
               'failures': '0',
               'errors': '0',
-              'skipped': '1',
+              'skipped': skipped,
           }
           PY
 

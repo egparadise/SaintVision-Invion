@@ -27,11 +27,13 @@ tags: ["s11", "ac-11", "migration", "restore", "hosted", "fail-closed"]
 
 최종 source와 restore DB의 catalog fingerprint는 table·column·constraint·index·function body/owner·table/routine grant·RLS policy·role membership을 비교한다. forward 전 sentinel은 restore 뒤 exact match해야 한다. forward 후 sentinel은 사전 snapshot에 없어야 하며 `DECLARED_LOSS_REQUIRES_RESTORE`로 명시한다. 종료 시 owned DB를 강제 정리하고 residue가 하나라도 남으면 실패한다. 오류 보고에는 예외 type만 남기며 DSN·비밀번호·SQL 출력을 evidence에 쓰지 않는다.
 
-fixture manifest는 graph의 가역 revision 20개를 exact cover한다. 새 revision 중 `0047_audit_events_isolation`, `0050_dataset_digest_lookup`, `0053_eval_suite_project_scope`는 실행형 downgrade이고 데이터 손실을 선언하지 않아 `PRESERVED`다. `0048_object_store_locator`, `0049_mlflow_mirror`, `0051_service_credentials`, `0052_model_version_digest_scope`는 원문이 restore/forward를 요구하는 명시적 refusal이라 manifest에서 제외한다. 기존 restore 필요 10종 집합은 바꾸지 않는다. 이후 migration PR은 같은 PR에서 이 manifest와 tail 기대를 갱신해야 하며, 누락 시 graph gate가 DB 호출 전에 실패한다.
+fixture manifest는 graph의 가역 revision 20개를 exact cover한다. 새 revision 중 `0047_audit_events_isolation`, `0050_dataset_digest_lookup`, `0053_eval_suite_project_scope`는 실행형 downgrade이고 데이터 손실을 선언하지 않아 `PRESERVED`다. 여기서 0047의 `PRESERVED`는 데이터 보존 등급이다. downgrade가 보안상 `inv_app SELECT`를 복원하지 않으므로 fresh 0046과 catalog는 의도적으로 비대칭이며, 0047이 가역 tail에 들어오는 graph라면 catalog 동등 PASS로 세면 안 된다(현재는 뒤의 불가역 0048 때문에 tail 밖). `0048_object_store_locator`, `0049_mlflow_mirror`, `0051_service_credentials`, `0052_model_version_digest_scope`는 원문이 restore/forward를 요구하는 명시적 refusal이라 manifest에서 제외한다. 기존 restore 필요 10종 집합은 바꾸지 않는다. 이후 migration PR은 같은 PR에서 이 manifest와 tail 기대를 갱신해야 하며, 누락 시 graph gate가 DB 호출 전에 실패한다.
+
+부정 fixture는 기존 3종에 `0053-scoped-row-refusal`을 추가한다. 0053 head DB에 project-bound eval suite를 만든 뒤 0052 downgrade가 정확한 scoped-row 사유로 거부되고, alembic version과 `project_id`가 0053 상태로 원자 보존돼야 `EXPECTED_FINDING`이다.
 
 기존 정본 run `36377513831`은 head 0046·tail 0 evidence이므로 새 head 0053의 release evidence로 재사용하지 않는다. 새 head에서는 restore-forward와 reversible-roundtrip 두 축을 같은 source SHA에서 다시 생성해야 한다.
 
-workflow `AC-11 Migration Rehearsal`은 manual dispatch 또는 PR label `run-ac11-migration`에서만 실행된다. job-level concurrency는 `cancel-in-progress: false`, checkout은 merge ref가 아닌 PR head SHA, PostgreSQL은 `postgres:16` service다. JSON과 3-case JUnit(현재 reversible 1 skip, fixture/restore 2 pass)을 artifact로 30일 보존한다.
+workflow `AC-11 Migration Rehearsal`은 manual dispatch 또는 PR label `run-ac11-migration`에서만 실행된다. job-level concurrency는 `cancel-in-progress: false`, checkout은 merge ref가 아닌 PR head SHA, PostgreSQL은 `postgres:16` service다. JSON과 7-case JUnit(reversible roundtrip 1, restore 1, 부정 fixture 4, provenance 1)을 artifact로 30일 보존한다. 가역 tail이 0인 source에서만 reversible case 1건을 구조적으로 skip하며, 현재 0053 source에서는 7건 모두 실행해야 한다.
 
 ## PG-free 검증
 
