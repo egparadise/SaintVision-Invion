@@ -1,11 +1,11 @@
 ---
 doc_id: "CODEX-S05-BOUNDED-ADMISSION-DECISION-001"
 title: "S05 bounded admission 후속 결정 제안"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-09-28T15:40:00+09:00"
+updated: "2026-09-28T16:50:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S05-DB"]
@@ -103,7 +103,7 @@ Card24 observer-on B′=1500ms는 세 조건을 모두 실패했고 Card25 sampl
 
 ### 실행 순서
 
-- 각 rung은 동일 runner·동일 disposable DB 설정에서 `20×3`, `35×3`, `50×3` wave를 한 번에 하나씩 순차 실행한다.
+- 각 wave는 별도 pytest session이 만든 새 일회용 DB를 사용한다. 따라서 rung마다 새 DB라는 하한보다 강하게 9개 wave가 모두 서로 다른 DB fingerprint를 가져야 하며 wave 전후 `inv_test_%` 잔존은 0이어야 한다.
 - 한 rung의 세 wave를 끝낸 뒤 아래 degrade 기준을 판정한다. degrade면 더 높은 rung은 실행하지 않는다.
 - 제품 SHA, runner OS/CPU, PostgreSQL 버전과 `lock_timeout=500ms`·`statement_timeout=2000ms`, wave별 JSON/JUnit을 artifact로 보존한다.
 - candidate, permit wait, B′ arm은 이 lane에서 실행하지 않는다. 제품 flag는 off다.
@@ -114,6 +114,8 @@ Card24 observer-on B′=1500ms는 세 조건을 모두 실패했고 Card25 sampl
 
 1. 세 wave 중 하나라도 `externalFailureCount = 55P03 + 57014 > 0`
 2. 세 wave의 request P95 all 중앙값이 **2000.000ms 초과**
+
+기준 1은 드문 timeout 한 건도 숨기지 않도록 세 wave의 **최대값(any wave)**을 쓰고, 기준 2는 지연의 대표값을 보도록 세 wave의 **중앙값**을 쓴다. 이 혼용은 의도적이다. 기준 2는 단일 SQL의 `statement_timeout=2000ms`와 같은 숫자를 쓰지만, 여러 statement·트랜잭션 경계를 포함한 **요청 전체 누적 경로 전용 기준**이다. 그러므로 개별 statement가 2초 전에 끝나 `57014=0`이어도 요청 P95 all 중앙값은 2초를 넘을 수 있다. 측정 뒤 임계나 집계 방식을 바꾸지 않는다.
 
 hold P95/max와 legacy lock-wait P95/max는 반드시 기록하지만 degrade trigger는 아니다. workflow/service-container/pull/setup 실패는 제품 degrade가 아니라 `INVALID_RUN`이며 같은 rung 재실행에는 별도 코디네이터 승인이 필요하다.
 

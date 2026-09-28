@@ -603,6 +603,13 @@ def test_fifty_concurrent_placement_decisions_are_repeatable_and_bounded(
         "gateDefinition": "semaphore reject + 55P03 + 57014",
     }
     report["schemaVersion"] = "1.8.0"
+    report["disposableDatabase"] = {
+        "fingerprintSha256": hashlib.sha256(
+            a.e.database_name.encode("utf-8")
+        ).hexdigest(),
+        "nameExposed": False,
+        "lifecycle": "unique-pytest-session-database",
+    }
     report["contentionObservation"]["candidateLimitLockTimeoutMs"] = int(
         os.getenv("INV_PLACEMENT_CANDIDATE_LIMIT_LOCK_TIMEOUT_MS", "500")
     )
