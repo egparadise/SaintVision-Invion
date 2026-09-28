@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-FE-MODEL-REGISTRY-001"
 title: "G-05 FE 모델 레지스트리 화면 실제 business route 연동 및 불변식 검증"
-version: "1.2.0"
+version: "1.4.0"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-28T23:37:00+09:00"
+updated: "2026-09-29T00:20:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05"]
@@ -112,7 +112,7 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - 각각 독립적인 AbortController(`regAbortControllerRef`, `pinAbortControllerRef`, `relAbortControllerRef`)와 세대 번호(`regGenerationRef`, `pinGenerationRef`, `relGenerationRef`)를 할당.
   - 어떤 작업이 abort되더라도 각 액션의 `finally`에서 무조건 `setRegLoading(false)`, `setPinLoading(false)`, `setRelLoading(false)`를 호출하여 버튼 영구 비활성화를 방지.
   - 9개 폼 입력 필드 변경 시 즉시 해당 작업의 in-flight 세대 번호를 증가시켜 이전 파라미터로 진행 중이던 응답이 새 입력 상태를 덮어쓰지 못하도록 무효화.
-  - 되돌리면 실패하는 회귀 시험 실장 (시험 18: 쓰기 간 독립 abort 및 finally 로딩 해제 검증).
+  - 되돌리면 실패하는 회귀 시험 실장 (시험 19: 쓰기 간 독립 abort 및 finally 로딩 해제 검증).
 - **G1 [중간] Lineage Trace 응답 픽스처 및 서버 정본 모델 정합**:
   - `validTraceResponse` 픽스처에서 `unresolved`가 비어있지 않을 때 서버 `services/lineage.py:762` 계약에 따라 `fullyTraceable: false`로 정합.
   - `missing` 배열 항목은 서버 `services/lineage.py:747` 정본대로 kind 이름 문자열(`"dataset_version"`)만 포함하도록 교정.
@@ -120,10 +120,10 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
 - **G2 [부분] 보존 핀 멱등키 회전 및 동일 재시도 보존**:
   - 동일 파라미터 재시도 시에는 `pinIdempotencyKey`를 보존하여 멱등적 재시도를 지원하되, 핀 만료일(`until`) 또는 프로젝트/모델/버전 식별자가 변경될 때는 즉시 새 UUID v4 멱등키로 회전.
   - 파라미터 변경 시 멱등키가 회전하지 않으면 서버가 409 `GRAPH-0002` 충돌을 반환하는 문제를 방지.
-  - 되돌리면 실패하는 회귀 시험 실장 (시험 19: 핀 파라미터 변경 시 멱등키 즉시 회전 실측).
+  - 되돌리면 실패하는 회귀 시험 실장 (시험 18: 핀 파라미터 변경 시 멱등키 즉시 회전 실측).
 - **G5 [경미] 409 Conflict detail 형식 및 ProblemDetails.title 교정**:
   - 409 Conflict detail을 서버 `services/lineage.py` 및 `model_release.py:326-327`의 정본 문자열(`f"kind '{missing_kind}' is not traceable for model '{model_id}' version '{version}'"`)과 일치.
-  - `ProblemDetails`의 `title`을 서버 `api/problem.py:131` 정본대로 에러 코드(`MODEL-0004` 등)와 일치화.
+  - `ProblemDetails`의 `title`을 서버 `api/problem.py:131` 정본대로 에러 코드(`code`, 예: `GRAPH-0002`, `RES-0004`)와 일치화.
 - **Test 16 엄격 스키마 경계 픽스처 교정**:
   - `deployments` 컬렉션 상한 검증 시 스키마 허용 환경(`environment: 'pilot'`) 적용.
   - `unresolved` 항목 번호가 1부터 시작하도록 교정하여 스키마 regex 패턴 만족.
@@ -139,3 +139,54 @@ tags: ["s10-fe", "g-05", "model-registry", "lineage", "retention-pin", "model-re
   - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.46s).
   - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
   - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+
+## 6. Claude UI r3 조건부 승인 및 Codex Release 멱등 경계·Path 회전 전수 조치 (r4)
+
+- **Claude UI r3 조건부 승인 전수 반영**:
+  1. `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거: 서버에서 `countOnlyKinds`를 제공하지 않을 경우 임의의 fallback을 합성하지 않고 정직하게 NOT_OBSERVED 표기.
+  2. `:1208` `'evaluations'` 옛 별칭 제거: 정본 `kind === 'eval_run'` 단일 조건으로 판별.
+  3. 시험 9 픽스처 교정: 서버 `services/lineage.py:762-768` 산식(`traceabilityLimitedByScope = any(kind in unresolved for kind in COUNT_ONLY_KINDS)`)과 일치하도록 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정하여 서버가 실제로 생성 가능한 데이터로 검증.
+  4. `:203` 안내 문구 복원: `5b2609d9` 원문인 `✔ [모의 시뮬레이션] [...] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 완전 복원.
+  5. View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 `isValidIsoDateTime` 로컬 함수를 제거하고 `@/shared/api/modelRegistryObservation`의 정본 함수로 일원화하여 `+99:99` 등 비정상 타임존 오프셋 누출 차단.
+- **Codex 계약 축 Release 멱등 경계 및 Path 회전 전수 반영**:
+  1. `releaseModelVersion` 및 `handleReleaseModel`에 `Idempotency-Key` 헤더 연동 (`relIdempotencyKey` 상태 관리).
+  2. 동일 파라미터 재시도 시에는 동일한 `relIdempotencyKey`를 보존하여 불필요한 중복 부수효과 방지.
+  3. 파라미터(`relLicensePolicy`, `relClassification`) 또는 경로(`projectId`, `modelId`, `version`) 변경 시 즉시 새 UUID v4 멱등키로 회전.
+  4. W2 model path(`modelId`, `projectId`), W4 model/version path(`modelId`, `version`), Release model/version path 변경 시 멱등키 즉시 회전 및 변경된 path+payload 재시도 시 새 멱등키 유지 실측 (시험 13, 시험 18, 시험 20).
+- **실측 검증 증거**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (855ms).
+  - Vitest: `tests/model-lineage.test.ts` 23 passed (924ms).
+  - Vitest: `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms).
+  - 웹 전체: 80 test files, 751 passed (27.53s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist 번들 정상 생성 (874.53 kB, 6.05s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+
+## 7. Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기)
+
+- **배경**:
+  - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않아 FE 헤더 기반 멱등 주장이 성립하지 않음을 Codex r4에서 지적함.
+  - Codex 닫힘 기준 2번에 따라, 서버 계약이 확립될 때까지 release 쓰기 UI를 fail-closed로 미노출하고, 헤더 및 멱등 주장을 제거하기로 결정.
+- **상세 조치 내역**:
+  1. **Release 쓰기 UI fail-closed 미노출**:
+     - `ModelLineageView.tsx`: 모델 릴리스 제출 버튼을 `disabled={true}`, `aria-disabled="true"`로 영구 비활성화하고, 버튼 레이블에 `모델 릴리스 (POST /release) — 서버 멱등 계약 대기(카드 113)` 명시.
+     - 배너(`data-testid="banner-release-pending-idempotency"`)를 추가하여 `⚠️ 서버 멱등 계약 대기(카드 113): 백엔드 release route(model_release.py)의 Idempotency-Key 처리 계약이 수립될 때까지 쓰기 작업이 fail-closed로 비활성화됩니다.` 안내 제공.
+     - `handleReleaseModel` 핸들러 시작부에 fail-closed 가드를 배치하여 호출 시 즉시 차단 및 `setGeneralError` 에러 배너 표출.
+  2. **Idempotency-Key 헤더 및 멱등 주장 전면 제거**:
+     - `releaseModelVersion` API 클라이언트(`apps/web/src/shared/api/modelRegistryObservation.ts`)에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전송 코드 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 및 관련 멱등키 생성 로직 전면 제거.
+  3. **회귀 시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - `apps/web/tests/model-registry-business-routes.test.tsx`의 시험 20에서 릴리스 멱등키 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태(버튼 disabled/aria-disabled, 안내 문구 표출, 클릭/폼제출 시 /release 네트워크 호출 0건, 되돌리면 실패)를 고정하는 시험으로 전면 전환.
+     - 시험 4: `releaseModelVersion` 클라이언트 함수 직접 호출 시 `Idempotency-Key` 헤더 미전송 및 200 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+  4. **후속 배정 연계**:
+     - 릴리스 서버 멱등 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms).
+  - 웹 전체: 80 test files, 751 passed (23.69s, 0 failures).
+  - TypeScript: `npx tsc -b` 0 errors.
+  - 빌드: `npm run build` dist 번들 정상 생성 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.

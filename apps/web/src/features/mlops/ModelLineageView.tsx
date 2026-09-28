@@ -5,10 +5,12 @@ import type { ModelVersionResponse } from '@/contracts/model-version-response';
 import type { RetentionPinResponse } from '@/contracts/retention-pin-response';
 import type { ModelReleaseResponse } from '@/contracts/model-release-response';
 import type { ModelLineageTraceResponse } from '@/contracts/model-lineage-trace-response';
+import type { ModelVerifyResponse } from '@/contracts/model-verify-response';
+import type { EvalRunResponse } from '@/contracts/eval-run-response';
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
 import { fetchConformanceStatus } from '@/shared/api/adapterObservation';
-import { modelRegistryObservation } from '@/shared/api/modelRegistryObservation';
+import { modelRegistryObservation, isValidIsoDateTime } from '@/shared/api/modelRegistryObservation';
 import { ApiError } from '@/shared/api/client';
 import { MlopsManager } from './mlopsEngine';
 
@@ -21,27 +23,6 @@ const SERVER_KIND_LABELS: Record<string, string> = {
   approval: '승인 기록 (Approval Record)',
 };
 
-function isValidIsoDateTime(str: string): boolean {
-  if (typeof str !== 'string') return false;
-  const regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
-  const match = str.match(regex);
-  if (!match) return false;
-  const year = parseInt(match[1], 10);
-  const month = parseInt(match[2], 10);
-  const day = parseInt(match[3], 10);
-  const hour = parseInt(match[4], 10);
-  const min = parseInt(match[5], 10);
-  const sec = parseInt(match[6], 10);
-  if (month < 1 || month > 12) return false;
-  if (hour < 0 || hour > 23) return false;
-  if (min < 0 || min > 59) return false;
-  if (sec < 0 || sec > 59) return false;
-
-  const daysInMonth = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (day < 1 || day > daysInMonth[month - 1]) return false;
-  return true;
-}
-
 export interface ModelLineageViewProps {
   initialLineages?: ModelLineage[];
   currentProjectId?: string;
@@ -49,6 +30,9 @@ export interface ModelLineageViewProps {
   currentUser?: { canApprove?: boolean; role?: string; permissions?: string[] };
   initialModelId?: string;
   initialVersion?: string;
+  modelId?: string;
+  version?: string;
+  canApprove?: boolean;
 }
 
 export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
@@ -58,8 +42,17 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   currentUser,
   initialModelId = '',
   initialVersion = '',
+  modelId: propModelId,
+  version: propVersion,
+  canApprove: propCanApprove,
 }) => {
   const effectiveProjectId = propProjectId || currentProjectId || '';
+  const effectiveInitialModelId = propModelId || initialModelId || '';
+  const effectiveInitialVersion = propVersion || initialVersion || '';
+  const effectiveCanApprove =
+    propCanApprove !== undefined
+      ? propCanApprove === true
+      : (currentUser as { canApprove?: boolean } | null | undefined)?.canApprove === true;
   const [mlopsManager] = useState<MlopsManager>(() => new MlopsManager(initialLineages));
   const [lineages, setLineages] = useState<ModelLineage[]>(mlopsManager.getLineages());
   const [selectedModelId, setSelectedModelId] = useState<string>(lineages[0]?.modelId || '');
@@ -221,17 +214,41 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
 
   // --- Real HTTP API / Business Lanes State (Card 94) ---
   const [projectId, setProjectId] = useState<string>(effectiveProjectId);
-  const [modelId, setModelId] = useState<string>(initialModelId);
-  const [version, setVersion] = useState<string>(initialVersion);
+  const [modelId, setModelId] = useState<string>(effectiveInitialModelId);
+  const [version, setVersion] = useState<string>(effectiveInitialVersion);
 
-  const [activeTab, setActiveTab] = useState<'trace' | 'register' | 'pin' | 'release'>('trace');
+  const [activeTab, setActiveTab] = useState<'trace' | 'register' | 'pin' | 'release' | 'verify' | 'eval-run'>('trace');
+
+  // W3 Verify form state
+  const [verifyMeasurementId, setVerifyMeasurementId] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<ModelVerifyResponse | null>(null);
+  const [verifyIdempotencyKey, setVerifyIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('w3')
+  );
+  const verifyAbortControllerRef = useRef<AbortController | null>(null);
+  const verifyGenerationRef = useRef(0);
+
+  // W5 Eval Run form state
+  const [evalSuiteId, setEvalSuiteId] = useState('');
+  const [evalAdapter, setEvalAdapter] = useState('codex');
+  const [evalPromptVer, setEvalPromptVer] = useState('');
+  const [evalCtxVer, setEvalCtxVer] = useState('');
+  const [evalRequirePinning, setEvalRequirePinning] = useState(true);
+  const [evalLoading, setEvalLoading] = useState(false);
+  const [evalResult, setEvalResult] = useState<EvalRunResponse | null>(null);
+  const [evalIdempotencyKey, setEvalIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('w5')
+  );
+  const evalAbortControllerRef = useRef<AbortController | null>(null);
+  const evalGenerationRef = useRef(0);
   const [queryLoading, setQueryLoading] = useState(false);
   const [realTrace, setRealTrace] = useState<ModelLineageTraceResponse | null>(null);
 
@@ -247,11 +264,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const [pinLoading, setPinLoading] = useState(false);
   const [pinResult, setPinResult] = useState<RetentionPinResponse | null>(null);
 
-  // Release form state
+  // Release form state (pending server idempotency contract Card 113)
   const [relLicensePolicy, setRelLicensePolicy] = useState('Apache-2.0');
   const [relClassification, setRelClassification] = useState<'public' | 'internal' | 'restricted'>('internal');
-  const [relLoading, setRelLoading] = useState(false);
-  const [relResult, setRelResult] = useState<ModelReleaseResponse | null>(null);
+  const [relResult] = useState<ModelReleaseResponse | null>(null);
 
   // Idempotency keys preserved per submission intent
   const [regIdempotencyKey, setRegIdempotencyKey] = useState<string>(() =>
@@ -288,11 +304,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       regAbortControllerRef.current?.abort();
       pinAbortControllerRef.current?.abort();
       relAbortControllerRef.current?.abort();
+      verifyAbortControllerRef.current?.abort();
+      evalAbortControllerRef.current?.abort();
     };
   }, []);
 
   // F1: Fail-closed strict canApprove check. Missing / undefined canApprove is strictly FALSE!
-  const canApprove = (currentUser as { canApprove?: boolean } | null | undefined)?.canApprove === true;
+  const canApprove = effectiveCanApprove;
 
   const clearErrors = () => {
     setProblemDetails(null);
@@ -318,8 +336,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    verifyGenerationRef.current++;
+    evalGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleModelIdChange = (val: string) => {
@@ -327,8 +349,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    verifyGenerationRef.current++;
+    evalGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleVersionChange = (val: string) => {
@@ -336,8 +362,12 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    verifyGenerationRef.current++;
+    evalGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   const handleRegVersionChange = (val: string) => {
@@ -372,6 +402,42 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleRelClassificationChange = (val: 'public' | 'internal' | 'restricted') => {
     setRelClassification(val);
     relGenerationRef.current++;
+  };
+
+  const handleVerifyMeasurementIdChange = (val: string) => {
+    setVerifyMeasurementId(val);
+    verifyGenerationRef.current++;
+    setVerifyIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w3'));
+  };
+
+  const handleEvalSuiteIdChange = (val: string) => {
+    setEvalSuiteId(val);
+    evalGenerationRef.current++;
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalAdapterChange = (val: string) => {
+    setEvalAdapter(val);
+    evalGenerationRef.current++;
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalPromptVerChange = (val: string) => {
+    setEvalPromptVer(val);
+    evalGenerationRef.current++;
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalCtxVerChange = (val: string) => {
+    setEvalCtxVer(val);
+    evalGenerationRef.current++;
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
+  };
+
+  const handleEvalRequirePinningChange = (checked: boolean) => {
+    setEvalRequirePinning(checked);
+    evalGenerationRef.current++;
+    setEvalIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w5'));
   };
 
   // Real API Actions: Lineage, Register, Pin, Release
@@ -521,45 +587,113 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleReleaseModel = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
+    // Fail-closed guard: pending server idempotency contract (Card 113)
+    setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.');
+    setLiveAnnouncement('모델 릴리스 차단: 서버 멱등 계약 대기(카드 113)');
+    return;
+  };
+
+  const handleVerifyVersion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
     if (!canApprove) {
-      setGeneralError('승인 권한(canApprove)이 없는 계정은 모델을 릴리스할 수 없습니다.');
+      setGeneralError('승인 권한(canApprove)이 없는 계정은 모델 버전을 검증할 수 없습니다.');
       return;
     }
     if (!projectId.trim() || !modelId.trim() || !version.trim()) {
       setGeneralError('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
       return;
     }
-    if (!relLicensePolicy.trim()) {
-      setGeneralError('라이선스 정책(licensePolicy)을 입력해야 합니다.');
+    const mId = verifyMeasurementId.trim();
+    if (!mId) {
+      setGeneralError('측정 ID(measurementId)를 입력해야 합니다.');
+      return;
+    }
+    if (!/^mvm_[0-9A-HJKMNP-TV-Z]{26}$/.test(mId)) {
+      setGeneralError('유효한 측정 ID 형식(mvm_... 26자리 Crockford Base32)이어야 합니다.');
       return;
     }
 
-    relAbortControllerRef.current?.abort();
+    verifyAbortControllerRef.current?.abort();
     const ctrl = new AbortController();
-    relAbortControllerRef.current = ctrl;
-    const currentGen = ++relGenerationRef.current;
+    verifyAbortControllerRef.current = ctrl;
+    const currentGen = ++verifyGenerationRef.current;
 
-    setRelLoading(true);
-    setLiveAnnouncement(`모델 릴리스 요청 중 (분류: ${relClassification})...`);
+    setVerifyLoading(true);
+    setLiveAnnouncement(`모델 [${modelId}:${version}] W3 커널 측정 검증 요청 중...`);
     try {
-      const res = await modelRegistryObservation.releaseModelVersion(
+      const res = await modelRegistryObservation.verifyModelVersion(
         projectId.trim(),
         modelId.trim(),
         version.trim(),
-        {
-          licensePolicy: relLicensePolicy.trim(),
-          classification: relClassification,
-        },
-        { signal: ctrl.signal }
+        { measurementId: mId },
+        { signal: ctrl.signal, idempotencyKey: verifyIdempotencyKey }
       );
-      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
-      setRelResult(res);
-      setLiveAnnouncement(`모델 릴리스 성공: [${res.version}] (Stage: ${res.stage})`);
+      if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setVerifyResult(res);
+      setLiveAnnouncement(
+        `W3 커널 측정 검증 완료: ${modelId.trim()}:${version.trim()} (${res.newlyVerified ? '새로 검증됨' : '이미 검증됨'})`
+      );
     } catch (err: unknown) {
-      if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
-      handleApiError(err, '모델 릴리스 실패');
+      if (verifyGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      handleApiError(err, 'W3 커널 측정 검증 실패');
     } finally {
-      setRelLoading(false);
+      setVerifyLoading(false);
+    }
+  };
+
+  const handleStartEvalRun = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    if (!canApprove) {
+      setGeneralError('Running an eval suite requires approval permission.');
+      return;
+    }
+    if (!projectId.trim() || !evalSuiteId.trim()) {
+      setGeneralError('프로젝트 ID와 평가 스위트 ID를 확인하세요.');
+      return;
+    }
+    const adapterTrimmed = evalAdapter.trim();
+    if (!adapterTrimmed) {
+      setGeneralError('어댑터 식별자(adapter)를 입력해야 합니다.');
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(adapterTrimmed)) {
+      setGeneralError('어댑터 식별자는 소문자, 숫자, 하이픈만 허용됩니다.');
+      return;
+    }
+
+    evalAbortControllerRef.current?.abort();
+    const ctrl = new AbortController();
+    evalAbortControllerRef.current = ctrl;
+    const currentGen = ++evalGenerationRef.current;
+
+    setEvalLoading(true);
+    setLiveAnnouncement(`W5 평가 실행 요청 중 (스위트: ${evalSuiteId})...`);
+
+    const componentVersions: Record<string, string> = {};
+    if (evalPromptVer.trim()) componentVersions.prompt = evalPromptVer.trim();
+    if (evalCtxVer.trim()) componentVersions.context = evalCtxVer.trim();
+
+    try {
+      const res = await modelRegistryObservation.startEvalRun(
+        projectId.trim(),
+        evalSuiteId.trim(),
+        {
+          adapter: adapterTrimmed,
+          requireModelPinning: evalRequirePinning,
+          ...(Object.keys(componentVersions).length > 0 ? { componentVersions } : {}),
+        },
+        { signal: ctrl.signal, idempotencyKey: evalIdempotencyKey }
+      );
+      if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      setEvalResult(res);
+      setLiveAnnouncement(`W5 평가 실행 완료: ${res.evalRunId}`);
+    } catch (err: unknown) {
+      if (evalGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
+      handleApiError(err, 'W5 평가 실행 실패');
+    } finally {
+      setEvalLoading(false);
     }
   };
 
@@ -610,20 +744,22 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             </p>
           </div>
           {/* W3 Seam Badge */}
-          <div
+          <span
             data-testid="badge-w3-verify-seam"
             style={{
               padding: '4px 10px',
               borderRadius: '4px',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: '#21262d',
-              border: '1px solid #30363d',
-              color: '#8b949e',
+              backgroundColor: verifyResult ? '#1f6feb' : '#21262d',
+              border: verifyResult ? '1px solid #388bfd' : '1px solid #30363d',
+              color: verifyResult ? '#ffffff' : '#8b949e',
             }}
           >
-            W3 검증: 미연결 (검증 앵커 #215 대기)
-          </div>
+            {verifyResult
+              ? `W3 검증: 검증 완료 (측정: ${verifyResult.verifiedMeasurementId})`
+              : 'W3 검증: 미연결 (검증 앵커 #215 대기)'}
+          </span>
         </div>
         {/* Global Resource Binding Inputs */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
@@ -780,6 +916,40 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
             }}
           >
             🚀 모델 릴리스 (Release)
+          </button>
+          <button
+            type="button"
+            data-testid="tab-verify"
+            onClick={() => setActiveTab('verify')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: activeTab === 'verify' ? '1px solid #58a6ff' : '1px solid transparent',
+              backgroundColor: activeTab === 'verify' ? '#1f242c' : 'transparent',
+              color: activeTab === 'verify' ? '#58a6ff' : '#8b949e',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            🛡️ W3 검증 (Verify)
+          </button>
+          <button
+            type="button"
+            data-testid="tab-eval-run"
+            onClick={() => setActiveTab('eval-run')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              border: activeTab === 'eval-run' ? '1px solid #58a6ff' : '1px solid transparent',
+              backgroundColor: activeTab === 'eval-run' ? '#1f242c' : 'transparent',
+              color: activeTab === 'eval-run' ? '#58a6ff' : '#8b949e',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            🧪 W5 평가 실행 (Eval)
           </button>
         </div>
         {/* Tab Content: 1. Trace Query */}
@@ -995,8 +1165,18 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 </select>
               </div>
             </div>
-            <div style={{ fontSize: '11px', color: '#8b949e', backgroundColor: '#161b22', padding: '8px', borderRadius: '4px' }}>
-              ℹ️ Release는 서버 계약상 Idempotency-Key를 수신하지 않으므로 in-flight 이중 제출 방지 가드로 보호됩니다.
+            <div
+              data-testid="banner-release-pending-idempotency"
+              style={{
+                fontSize: '11px',
+                color: '#d29922',
+                backgroundColor: '#2b2111',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid #9e6a03',
+              }}
+            >
+              ⚠️ 서버 멱등 계약 대기(카드 113): 백엔드 release route(model_release.py)의 Idempotency-Key 처리 계약이 수립될 때까지 쓰기 작업이 fail-closed로 비활성화됩니다.
             </div>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Button
@@ -1004,10 +1184,193 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                 variant="primary"
                 type="submit"
                 data-testid="btn-release-model"
-                disabled={relLoading || !canApprove || !projectId || !modelId || !version || !relLicensePolicy}
-                aria-disabled={relLoading || !canApprove || !projectId || !modelId || !version || !relLicensePolicy}
+                disabled={true}
+                aria-disabled="true"
               >
-                {relLoading ? '릴리스 중...' : '모델 릴리스 (POST /release)'}
+                모델 릴리스 (POST /release) — 서버 멱등 계약 대기(카드 113)
+              </Button>
+              <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                ⚠️ 서버 멱등 계약 대기(카드 113)
+              </span>
+            </div>
+          </form>
+        )}
+        {/* Tab Content: 5. W3 Verify */}
+        {activeTab === 'verify' && (
+          <form noValidate onSubmit={handleVerifyVersion} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ fontSize: '12px', color: '#8b949e' }}>
+              ℹ️ W3 커널 측정 검증: 서버 신뢰 워커(trusted-worker)의 계측 기록(measurementId)을 모델 버전에 결속합니다. 측정값(digest, size 등)은 화면이 조작/생성할 수 없으며 오직 커널 기록된 측정 ID만 전송합니다 (정직성 원칙).
+            </div>
+            <div>
+              <label htmlFor="mvm-measurement-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                커널 측정 ID (measurementId - mvm_ + 26자리 Crockford Base32) *
+              </label>
+              <input
+                id="mvm-measurement-id"
+                data-testid="input-verify-measurement-id"
+                type="text"
+                placeholder="mvm_01JABCDEF1234567890ABCDEF"
+                value={verifyMeasurementId}
+                onChange={(e) => handleVerifyMeasurementIdChange(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '6px 10px',
+                  backgroundColor: '#0d1117',
+                  border: '1px solid #30363d',
+                  borderRadius: '4px',
+                  color: '#c9d1d9',
+                  fontSize: '12px',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Button
+                size="sm"
+                variant="primary"
+                type="submit"
+                data-testid="btn-verify-model"
+                disabled={verifyLoading || !canApprove || !projectId || !modelId || !version}
+                aria-disabled={verifyLoading || !canApprove || !projectId || !modelId || !version}
+              >
+                {verifyLoading ? '검증 처리 중...' : 'W3 커널 측정 검증 제출 (POST /models/.../verify)'}
+              </Button>
+              {!canApprove && (
+                <span style={{ fontSize: '11px', color: '#fed7aa' }}>
+                  ⚠️ 승인 권한(canApprove)이 필요한 작업입니다.
+                </span>
+              )}
+            </div>
+          </form>
+        )}
+        {/* Tab Content: 6. W5 Eval Run */}
+        {activeTab === 'eval-run' && (
+          <form noValidate onSubmit={handleStartEvalRun} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+              <div>
+                <label htmlFor="eval-suite-id" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  평가 스위트 ID (suiteId) *
+                </label>
+                <input
+                  id="eval-suite-id"
+                  data-testid="input-eval-suite-id"
+                  type="text"
+                  placeholder="evs_01JABCDEF1234567890ABCDEF"
+                  value={evalSuiteId}
+                  onChange={(e) => handleEvalSuiteIdChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor="eval-adapter" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  어댑터 식별자 (adapter - codex | claude | gemini | orca) *
+                </label>
+                <input
+                  id="eval-adapter"
+                  data-testid="input-eval-adapter"
+                  type="text"
+                  placeholder="codex"
+                  value={evalAdapter}
+                  onChange={(e) => handleEvalAdapterChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+              <div>
+                <label htmlFor="eval-prompt-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  프롬프트 버전 (promptVersion - 선택)
+                </label>
+                <input
+                  id="eval-prompt-ver"
+                  data-testid="input-eval-prompt-ver"
+                  type="text"
+                  placeholder="pmt_01J11111111111111111111111"
+                  value={evalPromptVer}
+                  onChange={(e) => handleEvalPromptVerChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor="eval-ctx-ver" style={{ display: 'block', fontSize: '11px', color: '#8b949e', marginBottom: '4px' }}>
+                  컨텍스트 버전 (contextVersion - 선택)
+                </label>
+                <input
+                  id="eval-ctx-ver"
+                  data-testid="input-eval-ctx-ver"
+                  type="text"
+                  placeholder="ctx_01J22222222222222222222222"
+                  value={evalCtxVer}
+                  onChange={(e) => handleEvalCtxVerChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    backgroundColor: '#0d1117',
+                    border: '1px solid #30363d',
+                    borderRadius: '4px',
+                    color: '#c9d1d9',
+                    fontSize: '12px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                id="eval-pinning"
+                data-testid="checkbox-eval-pinning"
+                type="checkbox"
+                checked={evalRequirePinning}
+                onChange={(e) => handleEvalRequirePinningChange(e.target.checked)}
+              />
+              <label htmlFor="eval-pinning" style={{ fontSize: '12px', color: '#c9d1d9' }}>
+                모델 고정 필수 요구 (requireModelPinning — 재현 불가능한 빌드 차단)
+              </label>
+            </div>
+
+            <div style={{ fontSize: '11px', color: '#8b949e', backgroundColor: '#161b22', padding: '8px', borderRadius: '4px' }}>
+              ℹ️ W5 평가는 지정된 어댑터 CLI를 통해 테스트 스위트를 실행하고 엄격한 게이트 판정 결과를 반환합니다.
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Button
+                size="sm"
+                variant="primary"
+                type="submit"
+                data-testid="btn-start-eval-run"
+                disabled={evalLoading || !canApprove || !projectId || !evalSuiteId || !evalAdapter}
+                aria-disabled={evalLoading || !canApprove || !projectId || !evalSuiteId || !evalAdapter}
+              >
+                {evalLoading ? '평가 실행 중...' : 'W5 평가 실행 시작 (POST /eval/suites/.../runs)'}
               </Button>
               {!canApprove && (
                 <span style={{ fontSize: '11px', color: '#fed7aa' }}>
@@ -1078,6 +1441,74 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
         </div>
       )}
       {/* Mutation Results Displays */}
+      {verifyResult && (
+        <div
+          role="status"
+          data-testid="registry-verify-success"
+          className="bg-emerald-950/40"
+          style={{
+            padding: '14px 18px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(46, 160, 67, 0.12)',
+            border: '1px solid #3fb950',
+            color: '#3fb950',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>
+            ✔ 모델 무결성 검증 완료 (200 OK) — {verifyResult.newlyVerified ? '새로 검증됨' : '이미 검증됨'}
+          </div>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+            <div>Version ID: <code>{verifyResult.modelVersionId}</code></div>
+            <div>Version: <strong>{verifyResult.version}</strong> (Stage: {verifyResult.stage})</div>
+            <div>Content Digest: <code>{verifyResult.contentSha256.slice(0, 16)}...</code></div>
+            <div>Verified Measurement: <code data-testid="verified-measurement-id">{verifyResult.verifiedMeasurementId}</code></div>
+            <div>Verified At: {verifyResult.verifiedAt}</div>
+            <div>Newly Verified: <span data-testid="verify-newly-verified-flag">{String(verifyResult.newlyVerified)}</span></div>
+          </div>
+        </div>
+      )}
+
+      {evalResult && (
+        <div
+          role="status"
+          data-testid="registry-eval-success"
+          style={{
+            padding: '14px 18px',
+            borderRadius: '8px',
+            backgroundColor: evalResult.passedGate ? 'rgba(46, 160, 67, 0.12)' : 'rgba(248, 81, 73, 0.12)',
+            border: evalResult.passedGate ? '1px solid #3fb950' : '1px solid #f85149',
+            color: evalResult.passedGate ? '#3fb950' : '#f85149',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>✔ 평가 스위트 실행 완료 (Status: {evalResult.status})</span>
+            <span
+              data-testid="eval-gate-badge"
+              style={{
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 700,
+                backgroundColor: evalResult.passedGate ? '#2ea043' : '#f85149',
+                color: '#ffffff',
+              }}
+            >
+              {evalResult.passedGate ? 'GATE PASS' : 'GATE FAIL'}
+            </span>
+          </div>
+          <div style={{ marginTop: '6px', fontSize: '12px', color: '#c9d1d9' }}>
+            <div>통과: {evalResult.passedCases} / {evalResult.totalCases} 케이스 (위반 {evalResult.violations}건)</div>
+            <div style={{ marginTop: '4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+              <div>Run ID: <code>{evalResult.evalRunId}</code></div>
+              <div>Suite ID: <code>{evalResult.suiteId}</code></div>
+              <div>Started: {evalResult.startedAt}</div>
+              {evalResult.endedAt && <div>Ended: {evalResult.endedAt}</div>}
+            </div>
+          </div>
+        </div>
+      )}
       {regResult && (
         <div
           role="status"
@@ -1214,13 +1645,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               gap: '12px',
             }}
           >
-            {(realTrace.countOnlyKinds && realTrace.countOnlyKinds.length > 0
-              ? realTrace.countOnlyKinds
-              : ['eval_run', 'code_commit', 'approval', 'container_image']
-            ).map((kind) => {
+            {(realTrace.countOnlyKinds || []).map((kind) => {
               const unresolvedItem = realTrace.unresolved.find((u) => u.kind === kind);
               const label = SERVER_KIND_LABELS[kind] || `${kind} 항목`;
-              const isEval = kind === 'eval_run' || kind === 'evaluations';
+              const isEval = kind === 'eval_run';
               return (
                 <div
                   key={kind}

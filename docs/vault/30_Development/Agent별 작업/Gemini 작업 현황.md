@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.133"
+version: "1.0.136"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T23:37:00+09:00"
+updated: "2026-09-29T00:33:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,93 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-- 확인 기준: 2026-09-28T23:37:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Claude UI r2 조치 및 PR #212 머지 완결).
+- 확인 기준: 2026-09-29T00:33:00+09:00 (최신 tip `agent/gemini/g05-fe-verify-eval`, 카드 101 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 검증 완결).
+
+## 2026-09-29 G-05 W3 Verify 및 W5 Eval Run 비즈니스 라우트 화면 연동 및 무결성 불변식 검증 (카드 101, `agent/gemini/g05-fe-verify-eval`)
+
+- **작업 브랜치**: `agent/gemini/g05-fe-verify-eval` (base: PR #219 `26edf079` 위 #215 head `3bdc6e70` 선행 머지 및 PR #219 r4 최신 반영).
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **작업 내용 (카드 101 전수 완결)**:
+  1. **계약 스키마 등록 및 자동 동기화**:
+     - `model-verify-request`, `model-verify-response`, `eval-run-start-request`, `eval-run-response` 4종 스키마를 `api-response-contracts.mjs`에 등록 (총 32종).
+     - 엄격한 TypeScript 타입 인터페이스 생성 및 `npm run contracts:check` 32개 전수 일치 확인.
+  2. **Zero Fake Measurements / Zero Fake Verification 불변식 확립 (#209 trusted-worker seam)**:
+     - W3 커널 검증 요청 시 커널 측정 ID(`measurementId`: `mvm_...` 26자리 Crockford Base32)만 전송하고 서버 신뢰 워커가 측정 출처 판정.
+     - 화면은 측정값을 위조하거나 자체적으로 "검증됨"을 단언하지 않으며 서버의 검증 응답(`verifiedAt`, `verifiedMeasurementId`, `newlyVerified`)만 표출.
+     - W5 평가 실행 결과(`passedGate`, `totalCases`, `passedCases`, `violations`)를 `GATE PASS` / `GATE FAIL`로 정직하게 시각화.
+  3. **Observation 계층 및 런타임 fail-closed 가드**:
+     - `verifyModelVersion`, `startEvalRun` 구현.
+     - `isModelVerifyResponse`, `isEvalRunResponse` 런타임 가드 구현 (`additionalProperties: false` 차단, Crockford Base32 26자리 정규식 검증, 케이스 범위 제약 `passedCases <= totalCases` 검증).
+     - 멱등키 보존 및 회전: 실패 시 재시도는 동일 키 재사용, 입력 변경 시 새 키로 회전.
+  4. **UI 컴포넌트 강화 (`ModelLineageView.tsx`)**:
+     - Tab 5 (W3 Verify) 및 Tab 6 (W5 Eval Run) 연동.
+     - 독립 `AbortController` 및 세대 가드를 적용하여 입력 변경 시 늦은 응답 무효화 및 로딩 걸림 원천 차단.
+     - 권한 없는 사용자(`canApprove !== true`) 대상 fail-closed 비활성화 및 안내 표출.
+     - `role="status"` 결과 카드, `aria-live="polite"` 음성 안내 지원.
+  5. **전용 통합 시험 및 전수 검증**:
+     - `tests/model-verify-eval-routes.test.tsx` 10개 전용 시험 구현 및 전수 통과 (되돌리면 실패).
+     - 전체 81 test files / 761 tests 통과.
+- **실측 검증 증거**:
+  - Vitest: `tests/model-verify-eval-routes.test.tsx` 10 passed, `tests/model-registry-business-routes.test.tsx` 20 passed. (웹 전체 81 test files / 761 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 889.27 kB 생성 성공.
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed.
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_00-33-00_KST_G05_W3_Verify_W5_Eval_FE_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: Card 101 브랜치 push 및 PR 생성 후 리뷰어 요청.
+
+
+## 2026-09-29 G-05 FE 모델 레지스트리 화면 Codex r4 (F1) 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거 (카드 113 대기, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #219 `4743b3d7` 위 Codex r4 닫힘 기준 2번 전수 반영.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Codex r4 F1 닫힘 기준 2번 전수 반영)**:
+  1. **Release 쓰기 UI fail-closed 미노출 (카드 113 대기)**:
+     - 백엔드 release route(`model_release.py`)가 Idempotency-Key를 소비하지 않으므로 FE 헤더 기반 멱등 주장이 성립하지 않음을 확인.
+     - 서버 계약이 생길 때까지 쓰기 UI를 fail-closed로 미노출: 제출 버튼 `disabled={true}`, `aria-disabled="true"`, 배너 및 버튼에 `서버 멱등 계약 대기(카드 113)` 안내 표출 (`data-testid="banner-release-pending-idempotency"`).
+     - `handleReleaseModel`에서 카드 113 대기 안내와 함께 조기 반환(`setGeneralError('서버 멱등 계약 대기(카드 113): 백엔드 릴리스 멱등성 계약 수립 전까지 릴리스 쓰기 요청이 차단됩니다.')`).
+     - 서버 계약은 Claude가 카드 113으로 추가하고, 그 뒤 재노출은 후속 카드로 배정됨.
+  2. **Release 요청의 Idempotency-Key 헤더 및 멱등 주장 제거**:
+     - `releaseModelVersion` API 클라이언트에서 `idempotencyKey` 옵션 및 `Idempotency-Key` 헤더 전면 제거.
+     - `ModelLineageView.tsx`에서 `relIdempotencyKey` 상태 제거.
+  3. **시험 개정 및 미노출 고정 (되돌리면 실패)**:
+     - 시험 20의 릴리스 헤더 재사용 단언을 전면 제거하고, 릴리스 쓰기 UI의 fail-closed 상태 및 `서버 멱등 계약 대기(카드 113)` 안내 미노출을 고정하는 시험으로 전면 전환 (`tests/model-registry-business-routes.test.tsx`: 버튼 disabled/aria-disabled 확인, 안내 문구 실측, 클릭/폼제출 시 /release 네트워크 호출 0건 실측, 되돌리면 실패).
+     - 시험 4: `releaseModelVersion` 클라이언트 호출 시 `Idempotency-Key` 헤더 미전송 및 200 응답 파싱 검증으로 정합.
+     - 시험 5: 보존 고정(Pin) 탭을 통해 RFC 9457 409 Conflict ProblemDetails 검증 수행.
+- **실측 검증**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (819ms). (웹 전체 80 test files / 751 passed, 23.69s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (873.66 kB, 8.55s).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (8.06s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.4.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 계속 진행.
+
+## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r3 및 Codex Release 멱등 경계·Path 회전 전수 조치 (`agent/gemini/g05-fe-model-registry`, PR #219)
+
+- **PR**: #219 (https://github.com/egparadise-SaintVision-Invion/pull/219)
+- **Base / Head**: PR #212 head `5b2609d9` 선행 머지(`7ddc616e`) 위 Claude UI r3 및 Codex 멱등 경계 조치 완료.
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성). Reviewer: Claude (UI·테스트 축), Codex (계약 축).
+- **조치 내역 (Claude UI r3 전수 & Codex Release 멱등/Path 회전 전수 완결)**:
+  1. **Codex Release 멱등 경계 연동**:
+     - `releaseModelVersion` 및 `handleReleaseModel`에 `Idempotency-Key` 헤더 연동 (`relIdempotencyKey` 상태 관리).
+     - 동일 파라미터 재시도 시 동일 키 보존, 폼 변경(`relLicensePolicy`, `relClassification`, `projectId`, `modelId`, `version`) 시 새 UUID v4로 회전.
+     - W2 model path(`modelId`, `projectId`), W4 model/version path(`modelId`, `version`), Release model/version path 변경 시 멱등키 즉시 회전 및 재시도 시 새 멱등키 유지 실측 (시험 13, 시험 18, 시험 20).
+  2. **Claude UI r3 조건 전수 반영**:
+     - `ModelLineageView.tsx:1205` fallback kind 배열 `['eval_run', 'code_commit', 'approval', 'container_image']` 완전 제거 (서버 미제공 시 NOT_OBSERVED 정직 표기).
+     - `:1208` `'evaluations'` 옛 별칭 제거, 정본 `kind === 'eval_run'`만 판별.
+     - 시험 9 픽스처 교정: 서버 `services/lineage.py:762-768` 산식에 맞춰 `missing: ['dataset_version']`, `unresolved: [{ kind: 'code_commit', count: 2 }]`, `countOnlyKinds: ['code_commit', 'eval_run']`으로 교정.
+     - `:203` 안내 문구 복원: `5b2609d9` 원문 `(백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ...)`로 복원.
+     - View 날짜 검증 중복 제거: `ModelLineageView.tsx` 내부의 중복 함수를 제거하고 정본 공용 가드(`modelRegistryObservation.isValidIsoDateTime`)로 일원화 (`+99:99` 오프셋 누출 차단).
+- **실측 검증**:
+  - Vitest: `tests/model-registry-business-routes.test.tsx` 20 passed (855ms), `tests/model-lineage.test.ts` 23 passed (924ms), `tests/write-actions-integrity-wiring.test.tsx` 8 passed (204ms). (웹 전체 80 test files / 751 passed).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` dist/ 번들 생성 성공 (874.53 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.85s).
+  - 무결성 도구: `check_frontend_integrity.py` 88 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` PASS (0 conflicts).
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-28_22-10-00_KST_G05_Model_Registry_FE_Business_Routes_Gemini.md` (v1.3.0).
+- **다음 첫 행동**: PR #219에 조치표 코멘트 등록 및 카드 101(W3 Verify & W5 Eval Run 화면 연동) 완료.
 
 ## 2026-09-28 G-05 FE 모델 레지스트리 화면 Claude UI r2 재검토(G1, G2, G3, G5, Test 16) 조치 및 PR #212 클린 머지 (`agent/gemini/g05-fe-model-registry`, PR #219)
 
