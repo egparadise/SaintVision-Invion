@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 
 export interface WorkspaceCreateModalProps {
   projectId: string;
@@ -17,6 +18,11 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { containerRef, handleKeyDown } = useModalA11y({
+    isOpen,
+    onClose,
+  });
 
   if (!isOpen) return null;
 
@@ -50,8 +56,12 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
 
   return (
     <div
+      ref={containerRef}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="workspace-create-title"
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
       style={{
         position: 'fixed',
         inset: 0,
@@ -76,7 +86,7 @@ export const WorkspaceCreateModal: React.FC<WorkspaceCreateModalProps> = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>작업공간 생성 (Workspace Provisioning)</h3>
+            <h3 id="workspace-create-title" style={{ fontSize: '1.25rem', fontWeight: 600 }}>작업공간 생성 (Workspace Provisioning)</h3>
             <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
               프로젝트: <code>{projectId}</code> · 백엔드 초기 레코드 등록
             </p>

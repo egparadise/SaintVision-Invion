@@ -95,7 +95,17 @@ export const WorkspaceList: React.FC<WorkspaceListProps> = ({
             return (
               <div
                 key={wsp.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`작업공간 ${wsp.name} 선택`}
                 onClick={() => onSelectWorkspace(wsp.id)}
+                onKeyDown={(e) => {
+                  if (e.target !== e.currentTarget) return;
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectWorkspace(wsp.id);
+                  }
+                }}
                 style={{
                   padding: '20px',
                   backgroundColor: 'var(--color-bg-surface)',

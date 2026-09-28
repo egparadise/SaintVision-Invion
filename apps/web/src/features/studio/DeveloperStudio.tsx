@@ -18,6 +18,7 @@ import {
   observedRun,
 } from '@/contracts/kernel-observation';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { RiskBadge } from '@/shared/ui/RiskBadge';
 import { apiClient, getAuthToken, isRouteNotFoundError } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
@@ -148,6 +149,17 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [isCancelling, setIsCancelling] = useState(false);
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
+
+  const { containerRef: cancelModalRef, handleKeyDown: handleCancelKeyDown } = useModalA11y({
+    isOpen: showCancelModal,
+    onClose: () => setShowCancelModal(false),
+  });
+
+  const { containerRef: receiptModalRef, handleKeyDown: handleReceiptKeyDown } = useModalA11y({
+    isOpen: receiptModalOpen && Boolean(selectedReceipt),
+    onClose: () => setReceiptModalOpen(false),
+  });
+
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [reclaimNotice, setReclaimNotice] = useState<string | null>(null);
   const [studioActionNotice, setStudioActionNotice] = useState<{
@@ -2641,9 +2653,12 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       {/* Cancel Run Modal */}
       {showCancelModal && (
         <div
+          ref={cancelModalRef}
           role="dialog"
           aria-labelledby="cancel-title"
           aria-modal="true"
+          onKeyDown={handleCancelKeyDown}
+          tabIndex={-1}
           style={{
             position: 'fixed',
             top: 0,
@@ -2712,10 +2727,13 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       {/* NodeStopReceipt & Evidence Reconciliation Modal */}
       {receiptModalOpen && selectedReceipt && (
         <div
+          ref={receiptModalRef}
           role="dialog"
           data-testid="receipt-modal"
           aria-labelledby="receipt-title"
           aria-modal="true"
+          onKeyDown={handleReceiptKeyDown}
+          tabIndex={-1}
           style={{
             position: 'fixed',
             top: 0,

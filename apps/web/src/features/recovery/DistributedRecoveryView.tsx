@@ -201,6 +201,8 @@ export const DistributedRecoveryView: React.FC<DistributedRecoveryViewProps> = (
       {/* Action Notice Bar */}
       {actionNotice && (
         <div
+          role={actionNotice.type === 'error' ? 'alert' : 'status'}
+          aria-live={actionNotice.type === 'error' ? 'assertive' : 'polite'}
           style={{
             padding: '12px 18px',
             borderRadius: '6px',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RunItem, RunState, ShardExecutionItem, NodeStopReceiptView, RunResultView, RunLogView, RunArtifactList, RunAttemptList, ShardObservation, ModelRetryPrepareResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient, ApiError } from '@/shared/api/client';
 import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { fetchShardObservation, shardRows, shardRefreshNotice } from '@/shared/api/shardObservation';
@@ -54,6 +55,16 @@ export const RunDetail: React.FC<RunDetailProps> = ({
   const [isPreparingResume, setIsPreparingResume] = useState(false);
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<NodeStopReceiptView | null>(null);
+
+  const { containerRef: cancelModalRef, handleKeyDown: handleCancelKeyDown } = useModalA11y({
+    isOpen: showCancelModal,
+    onClose: () => setShowCancelModal(false),
+  });
+
+  const { containerRef: receiptModalRef, handleKeyDown: handleReceiptKeyDown } = useModalA11y({
+    isOpen: Boolean(selectedReceipt),
+    onClose: () => setSelectedReceipt(null),
+  });
   const [isLoadingReceipt, setIsLoadingReceipt] = useState(false);
   const [logView, setLogView] = useState<RunLogView | null>(null);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
@@ -633,8 +644,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       {/* Cancellation Modal (S04-FE / AC-04) */}
       {showCancelModal && (
         <div
+          ref={cancelModalRef}
           role="dialog"
           aria-modal="true"
+          aria-labelledby="run-cancel-modal-title"
+          onKeyDown={handleCancelKeyDown}
+          tabIndex={-1}
           style={{
             position: 'fixed',
             inset: 0,
@@ -657,7 +672,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
               boxShadow: 'var(--shadow-md)',
             }}
           >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
+            <h3 id="run-cancel-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-brand-danger)' }}>
               Run 실행 취소 확인 (AC-04)
             </h3>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
@@ -721,6 +736,12 @@ export const RunDetail: React.FC<RunDetailProps> = ({
       {/* NodeStopReceipt Modal (ADR-027 / ADR-028 / ADR-040 / ADR-041) */}
       {selectedReceipt && (
         <div
+          ref={receiptModalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="receipt-modal-title"
+          onKeyDown={handleReceiptKeyDown}
+          tabIndex={-1}
           data-testid="receipt-modal"
           style={{
             position: 'fixed',
@@ -751,7 +772,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 id="receipt-modal-title" style={{ fontSize: '1.125rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span>🧾</span> NodeStopReceipt 물리 정지 영수증 검증
                 </h3>
                 <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>

@@ -24,7 +24,6 @@ export const Button: React.FC<ButtonProps> = ({
     transition: 'background-color 0.2s, border-color 0.2s, opacity 0.2s',
     cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
     opacity: disabled || isLoading ? 0.6 : 1,
-    outline: 'none',
     userSelect: 'none',
   };
 

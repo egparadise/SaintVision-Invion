@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NodeItem, SyntheticGpuResult } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { useModalA11y } from '@/shared/ui/useModalA11y';
 import { apiClient } from '@/shared/api/client';
 import { SecurityControlManager } from './securityEngine';
 
@@ -86,6 +87,11 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
   const [gpuResult, setGpuResult] = useState<SyntheticGpuResult | null>(null);
   const [isGpuRunning, setIsGpuRunning] = useState(false);
   const [showKillSwitchModal, setShowKillSwitchModal] = useState(false);
+
+  const { containerRef: killSwitchModalRef, handleKeyDown: handleKillSwitchKeyDown } = useModalA11y({
+    isOpen: showKillSwitchModal,
+    onClose: () => setShowKillSwitchModal(false),
+  });
 
   const refreshState = () => {
     setStatus(secManager.getStatus());
@@ -786,6 +792,12 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
       {/* Emergency Kill Switch Confirmation Modal */}
       {showKillSwitchModal && (
         <div
+          ref={killSwitchModalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="kill-switch-modal-title"
+          onKeyDown={handleKillSwitchKeyDown}
+          tabIndex={-1}
           data-testid="kill-switch-modal"
           style={{
             position: 'fixed',
@@ -811,7 +823,7 @@ export const AdminSecurityConsole: React.FC<AdminSecurityConsoleProps> = ({ node
               gap: '16px',
             }}
           >
-            <h3 style={{ margin: 0, color: '#f85149', fontSize: '18px' }}>
+            <h3 id="kill-switch-modal-title" style={{ margin: 0, color: '#f85149', fontSize: '18px' }}>
               {status.emergencyKillSwitchActive ? 'Kill Switch 비활성화 확인' : '🚨 [모의 시뮬레이션] 긴급 Kill Switch 발동 확인'}
             </h3>
             <div

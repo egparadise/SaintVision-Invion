@@ -5,7 +5,7 @@
     --color-bg-surface: #ffffff;
     --color-bg-subtle: #f1f5f9;
     --color-border-subtle: #e2e8f0;
-    --color-border-strong: #cbd5e1;
+    --color-border-strong: #64748b;
 
     /* Typography */
     --color-text-primary: #0f172a;
@@ -51,26 +51,26 @@
     --color-bg-surface: #111827;
     --color-bg-subtle: #1f2937;
     --color-border-subtle: #374151;
-    --color-border-strong: #4b5563;
+    --color-border-strong: #9ca3af;
 
     --color-text-primary: #f9fafb;
     --color-text-secondary: #e5e7eb;
     --color-text-muted: #9ca3af;
     --color-text-inverse: #0f172a;
 
-    --color-brand-primary: #3b82f6;
-    --color-brand-hover: #60a5fa;
+    --color-brand-primary: #1d4ed8;
+    --color-brand-hover: #2563eb;
     --color-brand-subtle: #1e293b;
 
     --color-status-online: #22c55e;
     --color-status-degraded: #f59e0b;
-    --color-status-offline: #ef4444;
+    --color-status-offline: #dc2626;
     --color-status-neutral: #9ca3af;
 
     --color-risk-l0: #10b981;
     --color-risk-l1: #3b82f6;
     --color-risk-l2: #f59e0b;
-    --color-risk-l3: #ef4444;
+    --color-risk-l3: #dc2626;
 
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
@@ -106,4 +106,9 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
 }

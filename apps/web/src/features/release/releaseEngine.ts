@@ -141,7 +141,7 @@ export class ReleaseManager {
       builtAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
       unresolvedVulnerabilities: 0,
       sloComplianceRate: 100.0,
-      rollbackVerified: true,
+      rollbackVerified: false,
       isActive: false,
     },
   ];
