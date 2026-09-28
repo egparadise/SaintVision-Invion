@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.210"
 status: "review"
 author: "Codex"
 updated: "2026-09-28T16:25:00+09:00"
@@ -30,6 +30,17 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
+
+- #177 `b246e7db` 위에 #185 승인 head `33ed1b8c`를 merge commit `067e6a48`로 결속했고 merge-tree exact 일치를 확인했다.
+- 정본 registry에서 old PITR target을 제거하고 fault 종류별 recovery를 요구하는 새 target을 적용했다. registry blob `e8c01340…`을 aggregator·migration importer에 함께 pin하고 PITR `REQUIRED_TARGET_BY_AXIS`를 닫았다. long-soak은 `NOT_REGISTERED` 유지다.
+- 구현 commit `ffd99bfd`; aggregator 단일 파일 55 passed, importer 단일 파일 14 passed, docs·ontology·bindings·ratchet 게이트 exit 0. task registry는 sprint 고정 schema와 미완료 S10 dependency 때문에 S11-ST `planned`를 유지하고 카드 ID는 History에서 추적한다. [[2026-09-28_16-05-00_KST_S11_AC11_registry_repin_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+
+## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 v1.2 — Claude r2 반영
+
+- Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
+- storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
+- physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. target source는 commit `3363ab77…`·blob `421d4d3a…`로 고정했고 문서·bindings·ontology·ratchet 게이트는 exit 0이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 

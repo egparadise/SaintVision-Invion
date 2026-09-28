@@ -32,7 +32,7 @@ DEFAULT_ALLOWLIST = (
     ROOT / ALLOWLIST_REPO_PATH
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
-TARGET_REGISTRY_BLOB = "99e64cb4125d47ae681a2e8e7c8f76c05193a892"
+TARGET_REGISTRY_BLOB = "e8c0134081dde18b2aa2bcadd42fe76f42cff667"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
 ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
 SCHEMA_VERSION = "1.0.0"
@@ -61,6 +61,10 @@ REQUIRED_AXES = (
     "security-critical-high-zero",
     "accessibility-e2e",
 )
+
+REQUIRED_TARGET_BY_AXIS = {
+    "actual-pitr-rpo-rto-retention": "s11-st-actual-pitr-archive-failure-v0",
+}
 
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -230,6 +234,9 @@ def _validate_target(
     if registry.get("schemaVersion") != SCHEMA_VERSION or not isinstance(registry.get("targets"), list):
         raise ValueError("target registry schema is unknown")
     target_id = target["targetId"]
+    required_target_id = REQUIRED_TARGET_BY_AXIS.get(axis)
+    if required_target_id is not None and target_id != required_target_id:
+        raise ValueError("targetId is not the required target for axis")
     matches = [row for row in registry["targets"] if isinstance(row, dict) and row.get("targetId") == target_id]
     if len(matches) != 1:
         raise ValueError("targetId is absent or duplicated in target registry")
