@@ -5,10 +5,77 @@ export interface ResilientNodeState {
   hostname: string;
   healthState: NodeHealthState;
   lastHeartbeatAt: string;
-  heartbeatAgeSeconds: number;
+  heartbeatAgeSeconds: number; // -1 if unreported
   fencingToken: FencingToken;
   activeWorkspacesCount: number;
   isPartitioned: boolean;
+  actualStatus: string;
+  isSimulationModified: boolean;
+}
+
+export interface InitialRecoveryNode {
+  nodeId: string;
+  hostname: string;
+  activeWorkspaces?: number;
+  status?: string;
+  heartbeatAt?: string | null;
+}
+
+/**
+ * Explicit NodeStatus -> NodeHealthState evaluation adhering to canonical contracts.
+ * Canonical NodeStatus enum: 'online' | 'degraded' | 'offline' | 'draining' | 'enrolling' | 'retired' | 'lost' | 'active' | 'unknown'
+ */
+export function evaluateInitialHealth(
+  status?: string,
+  heartbeatAt?: string | null
+): { health: NodeHealthState; ageSeconds: number } {
+  const now = new Date();
+  let ageSeconds = -1;
+  const s = (status || 'unknown').toLowerCase();
+
+  if (heartbeatAt) {
+    const t = new Date(heartbeatAt).getTime();
+    if (!isNaN(t)) {
+      ageSeconds = Math.max(0, Math.floor((now.getTime() - t) / 1000));
+    }
+  }
+
+  // 1. Explicit canonical status mapping per NodeStatus enum:
+  // 'offline' | 'lost' | 'retired' -> offline
+  if (s === 'offline' || s === 'lost' || s === 'retired') {
+    return { health: 'offline', ageSeconds };
+  }
+
+  // 2. 'draining' | 'degraded' -> stale
+  if (s === 'draining' || s === 'degraded') {
+    return { health: 'stale', ageSeconds };
+  }
+
+  // 3. Heartbeat age thresholds:
+  if (ageSeconds > 120) {
+    return { health: 'offline', ageSeconds };
+  }
+  if (ageSeconds > 60) {
+    return { health: 'stale', ageSeconds };
+  }
+
+  // 4. If no heartbeat was reported at all (ageSeconds < 0):
+  if (ageSeconds < 0) {
+    // If status claims online or active, but has no heartbeat, treat as stale (unverified)
+    if (s === 'online' || s === 'active') {
+      return { health: 'stale', ageSeconds: -1 };
+    }
+    // unknown or enrolling without heartbeat -> offline
+    return { health: 'offline', ageSeconds: -1 };
+  }
+
+  // 5. Fresh heartbeat and status is online/active
+  if (s === 'online' || s === 'active') {
+    return { health: 'online', ageSeconds };
+  }
+
+  // 6. enrolling / unknown with fresh heartbeat -> stale
+  return { health: 'stale', ageSeconds };
 }
 
 /**
@@ -19,9 +86,6 @@ export function isTokenValidAndCurrent(
   attempted: { epoch: number; sequence: number },
   current: { epoch: number; sequence: number }
 ): boolean {
-  // Monotonic fencing invariant:
-  // An attempted execution/write token must match the currently issued active fencing token.
-  // Stale tokens (attempted < current) and unissued future tokens (attempted > current) are strictly rejected.
   return attempted.epoch === current.epoch && attempted.sequence === current.sequence;
 }
 
@@ -40,25 +104,55 @@ export class DistributedRecoveryManager {
   private reconciliationHistory: ReconciliationRecord[] = [];
   private staleTokenWritesAllowed = 0;
 
-  constructor(initialNodes: Array<{ nodeId: string; hostname: string; activeWorkspaces?: number }>) {
-    const now = new Date().toISOString();
-    initialNodes.forEach((n, idx) => {
-      this.nodes.set(n.nodeId, {
-        nodeId: n.nodeId,
-        hostname: n.hostname,
-        healthState: 'online',
-        lastHeartbeatAt: now,
-        heartbeatAgeSeconds: 2,
-        fencingToken: {
+  constructor(initialNodes: InitialRecoveryNode[]) {
+    this.syncNodes(initialNodes);
+  }
+
+  syncNodes(incomingNodes: InitialRecoveryNode[]): ResilientNodeState[] {
+    const validIds = new Set(incomingNodes.map((n) => n.nodeId));
+    for (const id of this.nodes.keys()) {
+      if (!validIds.has(id)) {
+        this.nodes.delete(id);
+      }
+    }
+
+    incomingNodes.forEach((n, idx) => {
+      const existing = this.nodes.get(n.nodeId);
+      const evalResult = evaluateInitialHealth(n.status, n.heartbeatAt);
+
+      if (existing) {
+        existing.actualStatus = n.status || 'unknown';
+        // Polling protection: do not overwrite simulated heartbeat or health state if simulation modified
+        if (!existing.isSimulationModified) {
+          if (n.heartbeatAt !== undefined) {
+            existing.lastHeartbeatAt = n.heartbeatAt || '';
+            existing.heartbeatAgeSeconds = evalResult.ageSeconds;
+          }
+          existing.healthState = evalResult.health;
+        }
+      } else {
+        const now = new Date();
+        this.nodes.set(n.nodeId, {
           nodeId: n.nodeId,
-          epoch: 1,
-          sequence: 10 + idx * 5,
-          issuedAt: now,
-        },
-        activeWorkspacesCount: n.activeWorkspaces ?? (idx + 1),
-        isPartitioned: false,
-      });
+          hostname: n.hostname,
+          healthState: evalResult.health,
+          lastHeartbeatAt: n.heartbeatAt || '',
+          heartbeatAgeSeconds: evalResult.ageSeconds,
+          fencingToken: {
+            nodeId: n.nodeId,
+            epoch: 1,
+            sequence: 10 + idx * 5,
+            issuedAt: now.toISOString(),
+          },
+          activeWorkspacesCount: n.activeWorkspaces ?? (idx + 1),
+          isPartitioned: false,
+          actualStatus: n.status || 'unknown',
+          isSimulationModified: false,
+        });
+      }
     });
+
+    return this.getNodes();
   }
 
   getNodes(): ResilientNodeState[] {
@@ -113,6 +207,7 @@ export class DistributedRecoveryManager {
     if (!node) return;
     const delayedTime = new Date(Date.now() - ageSeconds * 1000).toISOString();
     node.lastHeartbeatAt = delayedTime;
+    node.isSimulationModified = true;
     this.evaluateNodeHealth(nodeId, ageSeconds);
   }
 
@@ -124,6 +219,7 @@ export class DistributedRecoveryManager {
     if (!node) return;
 
     node.isPartitioned = true;
+    node.isSimulationModified = true;
     node.healthState = 'fenced';
     // Advance cluster epoch for this node boundary to invalidate future partitioned attempts
     node.fencingToken.epoch += 1;
@@ -177,6 +273,7 @@ export class DistributedRecoveryManager {
     const evacuatedCount = node.activeWorkspacesCount;
     node.activeWorkspacesCount = 0;
     node.isPartitioned = false;
+    node.isSimulationModified = true;
     node.healthState = 'recovering';
     node.heartbeatAgeSeconds = 0;
     node.lastHeartbeatAt = new Date().toISOString();
