@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The finished run, by identity and by count.\n\nNo case content and no model output: ``eval_results.observed`` is a redacted\nsummary and this response does not carry even that. What a caller needs from\nstarting a run is which run it was and whether it passed.\n\n``passedGate`` is its own field rather than something a reader derives from\nthe counts, because the row's own rule is stricter than \"passed == total\": a\nrun with any forbidden-behaviour violation is not a pass whatever the score\nsays.",
+  "properties": {
+    "componentVersions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Componentversions",
+      "type": "object"
+    },
+    "endedAt": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Endedat"
+    },
+    "evalRunId": {
+      "title": "Evalrunid",
+      "type": "string"
+    },
+    "passedCases": {
+      "minimum": 0,
+      "title": "Passedcases",
+      "type": "integer"
+    },
+    "passedGate": {
+      "title": "Passedgate",
+      "type": "boolean"
+    },
+    "startedAt": {
+      "format": "date-time",
+      "title": "Startedat",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "running",
+        "completed",
+        "aborted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "suiteId": {
+      "title": "Suiteid",
+      "type": "string"
+    },
+    "totalCases": {
+      "minimum": 0,
+      "title": "Totalcases",
+      "type": "integer"
+    },
+    "violations": {
+      "minimum": 0,
+      "title": "Violations",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "evalRunId",
+    "suiteId",
+    "status",
+    "totalCases",
+    "passedCases",
+    "violations",
+    "passedGate",
+    "componentVersions",
+    "startedAt"
+  ],
+  "title": "EvalRunResponse",
+  "type": "object"
+}
