@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.130"
+version: "1.0.131"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T20:15:00+09:00"
+updated: "2026-09-28T20:25:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,8 +19,7 @@ source_of_truth: "Git"
 - **사용자 승인 상태: 2026-09-18 사용자 명시적 지시에 따라 Gemini 소유 영역 전 카드(GM-01~06, VF-GM-01~06) 승인 OK 정리 완료 (approved).**
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
-<<<<<<< HEAD
-- 확인 기준: 2026-09-28T20:15:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, PR #190).
+- 확인 기준: 2026-09-28T20:25:00+09:00 (최신 tip `agent/gemini/g07-eval-runner-impl`, commit `e2011893`, PR #190).
 
 ## 2026-09-28 S10-FE 제품 결함 수정 및 Claude UI / Codex 계약 재검토 전수 반영 (agent/gemini/s10-fe-fixes, PR #146)
 
@@ -1647,3 +1646,26 @@ source_of_truth: "Git"
 - **문서 산출물**:
   - 실행 기록: [[2026-09-28_16-30-00_KST_G-07_Eval러너_Claude_r2_수정_Gemini]] (`HIST-G07-003`, v1.1.0)
 
+
+## 2026-09-28 G-07 100 Prompt / 30 Coding Eval 러너 #146·#178 병합 및 #136 엔진 루프 카운트 정합 완결 (`agent/gemini/g07-eval-runner-impl`)
+
+- **작업 ID**: `G-07` (카드 60 2단계: #146·#178 병합 및 #136 엔진 루프 카운트 정합, commit `e2011893`)
+- **상위 근거**: 병합 대기 전체 트리 통합 CI (`coord/train-ci-2001`, run `36413455649`) 시 #190 G-07 시험 3건 실패에 대한 코디네이터 최우선 긴급 조치 지시
+- **조치 상세**:
+  1. **후행 브랜치 순차 병합**: `agent/gemini/g07-eval-runner-impl` 브랜치에서 PR #146 head `2e318022`(`aba89bee`) 및 PR #178 head `7da1fd66`(`92a0ba59`) 순차 병합 (충돌 해소만, force-push 없음).
+  2. **#136 엔진 정합성 및 루프 진전부 탈출 가드 정정**:
+     - 후행 PR #136·#146·#178이 `apps/web/src/features/agent/agentEngine.ts:98`의 `boundedRepairLoops` 초기값을 `1`에서 `0`으로 정정(초기 diff 0/3 표기)함에 따라, `evalRunner.ts:258`의 `let currentLoops = 1;` 하드코딩을 제거하고 `runRes.request.boundedRepairLoops`(0)로부터 읽도록 정정.
+     - 사전 비행 거절(BUDGET_EXCEEDED, LEAK_ATTEMPT_DETECTED) 시 `loopCount: 0`, `loopMatch = 0 === fixture.expectedLoopCount`로 정합.
+     - `coding_tasks_30.json` 픽스처 26건(초기 diff 22건, 사전 비행 거절 4건)의 `expectedLoopCount`를 `0`으로 정합 (TSK-21 2회, TSK-22 3회, TSK-27/28 3회 상한초과 정상 보존).
+  3. **픽스처 바이트 봉인 및 실재 커밋 증거 갱신**:
+     - `coding_tasks_30.json` LF 정규화 바이트 SHA-256 `ed4c3841bfd1b82090bfaf175094ee2a48298363d69c41df4582807eccdcbd96` 봉인 갱신.
+     - 코드 커밋 `e2011893ce6e10d3f950a2c1516b7bd782d8d647` 기반 증거 생성 도구 실행으로 실제 Git Blob OID 5종 결속 증거 파일(`docs/vault/30_Development/Evidence/s09-g07-eval-evidence-e2011893.json`) 생성 (Pass 98, Known FP 2, Fail 0 / Coding Pass 30, Fail 0, Conformance 100.0%).
+- **실측 검증**:
+  - Vitest: G-07 전용 40 passed (eval-runner 17, mutation-guards 23). 웹 전체 **82 test files passed (82), 774 passed (774)** in 29.66s.
+  - `npx tsc -b`: exit 0 (0 errors).
+  - `npm run build`: dist/ built in 5.21s (exit 0).
+  - `pytest tests/test_route_coverage.py`: **39 passed** in 1.97s (exit 0).
+  - `python tools/check_frontend_integrity.py`: 87 files 0 violations (PASS, exit 0).
+  - `python tools/check_contract_bindings.py`: 54 fixtures / 19 types PASS (exit 0).
+- **문서 산출물**:
+  - 실행 기록: [[2026-09-28_20-25-00_KST_G-07_Eval러너_136_병합_및_루프카운트_정합_Gemini]] (`HIST-G07-004`, v1.0.0)
