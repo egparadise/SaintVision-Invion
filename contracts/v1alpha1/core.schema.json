@@ -1786,6 +1786,36 @@
         "evidenceId"
       ]
     },
+    "ConfigurationReadinessView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "ready",
+            "blocked"
+          ]
+        },
+        "unresolvedSettings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "INV_NODE_MTLS_CA_BUNDLE",
+              "INV_OBJECT_STORE_BUCKET",
+              "INV_OBJECT_STORE_CREDENTIAL_FILE",
+              "INV_OBJECT_STORE_ENDPOINT"
+            ]
+          }
+        }
+      },
+      "required": [
+        "status",
+        "unresolvedSettings"
+      ]
+    },
     "NodeResourceSnapshot": {
       "type": "object",
       "additionalProperties": false,
