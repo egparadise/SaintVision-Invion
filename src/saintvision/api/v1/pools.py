@@ -102,12 +102,22 @@ def _require_pool_write_access(
             "project is not accessible to this principal",
         )
     settings_service.lock_project(session, tenant_id, project_id)
-    permission = project_service.require_project_access(
-        session,
-        tenant_id=tenant_id,
-        project_id=project_id,
-        user_id=user_id,
-    )
+    try:
+        permission = project_service.require_project_access(
+            session,
+            tenant_id=tenant_id,
+            project_id=project_id,
+            user_id=user_id,
+        )
+    except InvError as error:
+        if error.code != AUTH_PROJECT_SCOPE:
+            raise
+        # ``project_id`` was derived from a pool the caller cannot see.  Do not
+        # expose it through require_project_access's otherwise useful extra.
+        raise InvError(
+            AUTH_PROJECT_SCOPE,
+            "project is not accessible to this principal",
+        ) from None
     if not permission["canRequest"]:
         raise InvError(
             AUTH_PROJECT_SCOPE,

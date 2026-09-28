@@ -23,10 +23,12 @@ NOW = dt.datetime(2026, 9, 29, 2, 20, tzinfo=dt.timezone.utc)
 
 
 class _Session:
-    def __init__(self, scalars=(), *, workload=None, member=None):
+    def __init__(self, scalars=(), *, workload=None, member=None, project_member=None, user=None):
         self._scalars = list(scalars)
         self.workload = workload
         self.member = member
+        self.project_member = project_member
+        self.user = user
         self.statements = []
 
     def scalar(self, statement):
@@ -38,6 +40,10 @@ class _Session:
             return self.workload
         if model is pools.ResourcePoolMember:
             return self.member
+        if model is pools.project_service.ProjectMember:
+            return self.project_member
+        if model is pools.project_service.User:
+            return self.user
         raise AssertionError(f"unexpected model lookup: {model}")
 
     def begin_nested(self):
@@ -83,16 +89,28 @@ def test_pool_writer_locks_project_then_rechecks_permission_and_pool(monkeypatch
     assert session.statements[1]._for_update_arg is not None
 
 
-def test_viewer_or_unknown_pool_is_denied_without_revealing_existence(monkeypatch):
+def test_viewer_non_member_or_unknown_pool_have_identical_problem_bodies(monkeypatch):
     monkeypatch.setattr(pools.settings_service, "lock_project", lambda *_args: None)
     monkeypatch.setattr(
-        pools.project_service,
-        "require_project_access",
+        pools.settings_service,
+        "effective_permission",
         lambda *_args, **_kwargs: {"canRequest": False},
     )
+    active_user = SimpleNamespace(tenant_id=TENANT, status="active")
     with pytest.raises(InvError) as viewer:
         pools._require_pool_write_access(
-            _Session(["prj_hidden"]),
+            _Session(
+                ["prj_hidden"],
+                project_member=SimpleNamespace(role_code="viewer"),
+                user=active_user,
+            ),
+            tenant_id=TENANT,
+            pool_id="pol_hidden",
+            user_id=PRINCIPAL.user_id,
+        )
+    with pytest.raises(InvError) as non_member:
+        pools._require_pool_write_access(
+            _Session(["prj_hidden"], project_member=None, user=active_user),
             tenant_id=TENANT,
             pool_id="pol_hidden",
             user_id=PRINCIPAL.user_id,
@@ -104,8 +122,13 @@ def test_viewer_or_unknown_pool_is_denied_without_revealing_existence(monkeypatc
             pool_id="pol_absent",
             user_id=PRINCIPAL.user_id,
         )
-    assert viewer.value.code == missing.value.code == AUTH_PROJECT_SCOPE
-    assert viewer.value.message == missing.value.message
+    bodies = [
+        error.value.to_problem(trace_id="trc_pool", instance="/v1/pools/pol_hidden")
+        for error in (viewer, non_member, missing)
+    ]
+    assert bodies[0] == bodies[1] == bodies[2]
+    assert bodies[0]["code"] == AUTH_PROJECT_SCOPE
+    assert "projectId" not in bodies[0]
 
 
 def test_plan_requires_run_workload_to_belong_to_the_locked_pool_project(monkeypatch):
