@@ -17,6 +17,7 @@ from inv.leases import LeaseStore
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from db_provision import provision_disposable_database  # noqa: E402
+from db_integrity import database_integrity_violations  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -116,8 +117,17 @@ def postgres():
 
     def drop_database():
         assert name.startswith("inv_test_") and len(name) == 41  # only this run's unique name
+        # Session-end audit: a test that left the shared database physically
+        # inconsistent (FK orphan, CHECK violation, disabled trigger) fails the
+        # session here, after every test ran and before the evidence is dropped.
+        # The drop itself is never skipped because of a finding.
+        try:
+            findings = database_integrity_violations(owner)
+        except Exception as audit_error:  # noqa: BLE001 -- audited below, never hides the drop
+            findings = [{"kind": "audit-error", "error": type(audit_error).__name__}]
         with psycopg.connect(admin, autocommit=True) as conn:
             conn.execute(sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(name)))
+        assert not findings, f"disposable database was left physically inconsistent by a test: {findings}"
 
     def drop_role():
         assert role.startswith("inv_app_")

@@ -16,6 +16,39 @@ from .identity import strict_object, trusted_file
 from .node_transport import NodeDelivery, NodeTLSClient
 
 
+def _output_provider(config):
+    """Select exactly one legacy-local or canonical API-configured provider."""
+
+    from .object_store import LocalObjects
+
+    local = LocalObjects(config["outputRoot"]) if config.get("outputRoot") else None
+    api_config_path = os.environ.get("INV_API_CONFIG")
+    if not api_config_path:
+        return local
+    api_settings = strict_object(trusted_file(api_config_path))
+    readiness = api_settings.get("configurationReadiness")
+    from .configuration_readiness import configured_s01_readiness
+
+    # Validate the same strict nested surface even when this worker ultimately
+    # remains on the rollout-compatible Local provider.
+    configured_s01_readiness(readiness)
+    remote = None
+    if isinstance(readiness, dict) and "objectStore" in readiness:
+        from .object_store_config import (
+            configured_object_store,
+            parse_object_store_configuration,
+            unresolved_object_store,
+        )
+
+        parsed = parse_object_store_configuration(readiness["objectStore"])
+        if unresolved_object_store(parsed):
+            raise ValueError("ObjectStore configuration is not ready")
+        remote = configured_object_store(parsed)
+    if local is not None and remote is not None:
+        raise ValueError("Duplicate legacy and objectStore providers")
+    return remote or local
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--once", action="store_true")
@@ -34,9 +67,7 @@ def main():
             recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
         )
         delivery = NodeDelivery(db, NodeTLSClient(**config["tls"]))
-        from .object_store import LocalObjects
-
-        output_provider = LocalObjects(config["outputRoot"]) if config.get("outputRoot") else None
+        output_provider = _output_provider(config)
         # Migrations and tenant/epoch privileges are checked before serving work.
         with db.transaction(tenant) as conn:
             conn.execute("SELECT command_id FROM inv.execution_deliveries LIMIT 0")
