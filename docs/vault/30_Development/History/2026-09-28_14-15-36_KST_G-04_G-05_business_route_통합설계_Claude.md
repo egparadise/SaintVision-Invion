@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-G04-G05-BUSINESS-ROUTES-DESIGN"
 title: "G-04·G-05 남은 business lane route 통합 설계 v1.0 (docs-only) — 7 route 등급·정본 오류·IDEM·tx/lock·Codex 계약 지점(seal·pin)·eval suite project 결속 migration 번호 요청·계약/FE·PR 분할 8 (카드 58)"
-version: "1.2.1"
+version: "1.2.2"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T15:16:34+09:00"
+updated: "2026-09-28T17:29:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -36,3 +36,7 @@ F1 등급: W2·W4·W5 canApprove 최종, W1은 필요조건 + integrity 값 서�
 ## v1.2.1 (2026-09-28T15:16:34+09:00) — Codex 조건부 승인 조건 반영
 
 W1 문구 모순 정리: 봉인 artifact 집합은 **서버가 run 정본에서 완전하게 파생**(active + checksum 있는 행 전부), request는 role 매핑만(누락·추가 불가, 미매핑은 `other`, 집합 밖 매핑은 409), canonical intent도 서버 파생 집합 기준. §9의 옛 '잠정 승인'·'착수 금지' 문장을 최종 상태(W2·W4·W5 확정, W4 해제, W1 조건 충족, W3 보류)로 교체. 추가 설계 라운드 없음.
+
+## v1.2.2 (2026-09-28T17:29:11+09:00) — W5 migration 번호 0052 → 0053 (코디네이터 #191 결정)
+
+§5-1·§9의 W5 migration 번호를 `0053`(`down_revision = 0052_model_version_digest_scope`, #197)으로 정정. 0052는 #191 F1 유일성 migration. 문구만; 설계 내용 변경 없음. 선행 migration PR은 `agent/claude/g04-w5-migration-0053`.
