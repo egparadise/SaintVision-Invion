@@ -57,6 +57,14 @@ CASES = [
 ]
 
 
+class ContractSession:
+    def begin_nested(self):
+        return nullcontext()
+
+    def execute(self, *_args, **_kwargs):
+        return None
+
+
 def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, str, str, dict]:
     principal = Principal(
         user_id="usr_contract_actor",
@@ -65,13 +73,14 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
     )
     app = FastAPI()
     app.dependency_overrides[get_principal] = lambda: principal
-    app.dependency_overrides[get_session] = lambda: object()
+    app.dependency_overrides[get_session] = ContractSession
     app.dependency_overrides[get_now] = lambda: dt.datetime(
         2026, 9, 22, 9, 0, tzinfo=dt.timezone.utc
     )
     app.dependency_overrides[get_settings] = lambda: SimpleNamespace(
         bootstrap_token_ttl_seconds=900,
         idempotency_ttl_seconds=600,
+        business_lock_timeout_ms=5_000,
     )
 
     if kind == "project":
@@ -85,7 +94,9 @@ def _client(monkeypatch, kind: str, service_result: dict) -> tuple[TestClient, s
             "admit_candidate",
             lambda *_a, **_k: SimpleNamespace(
                 secret=service_result["bootstrapToken"],
-                expires_at=dt.datetime.fromisoformat(service_result["expiresAt"]),
+                expires_at=dt.datetime.fromisoformat(
+                    service_result["expiresAt"].replace("Z", "+00:00")
+                ),
             ),
         )
         monkeypatch.setattr(pools, "record_event", lambda *_a, **_k: None)
