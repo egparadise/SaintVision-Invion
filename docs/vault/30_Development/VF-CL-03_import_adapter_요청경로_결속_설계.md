@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-VFCL03-IMPORT-REQUEST-PATH-DESIGN-001"
 title: "VF-CL-03 import adapter 요청 경로 결속 설계 — blocker import-adapter-has-no-request-path-contract 해소"
-version: "1.1.0"
+version: "1.2.0"
 status: "proposed"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T10:17:03+09:00"
+updated: "2026-09-28T10:36:30+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf045c5a554209aaef601ae4883b64da50a7"
@@ -23,6 +23,12 @@ blocker `import-adapter-has-no-request-path-contract` 해소안. 근거는 Codex
 > - **F-R3**: 새 route의 **모든** 오류를 정본 `ProblemDetails`로 고정. top-level `mismatches`·`fields` 금지. 새 code는 **`MODEL-0009` 하나**이고 나머지는 기존 정본 code 재사용. 계약 변경 수 **재계산**(§4·§7).
 > - **F-R4**: `(tenant, project, model, version)` → project 소유 model → version row 잠금 → 관측 identity 재결속 순서 확정. 응답 계약·status code **지금 확정**(§7).
 > - **F-R5**: 부정 시험 7건 추가(총 19건, §9).
+>
+> **v1.2 변경 요약** (Codex 재검토의 F-R3 잔존 2건 + 코디네이터 10:25 결정, `99018d9c` 대상)
+> - **F-R3-1**: business `InvError`로는 `MODEL-0009`·`SYS-0001`을 **만들 수 없다**는 지적이 맞다(`category_of()`가 10개 prefix만 허용). 코디네이터 결정대로 선택지 **(b)를 route 전용이 아닌 공유 모듈**로 확정했다 — `src/saintvision/api/problem.py`(신규). 카드 ar(#158)의 lineage route도 같은 모듈을 쓴다. 기존 `InvError`는 이 경계에서 번역하고 release precondition `VAL-SCHEMA`는 `GRAPH-0002`로 번역한다(§7).
+> - **F-R3-2**: `body: dict` annotation으로는 `RequestValidationError`를 피할 수 없다는 지적이 맞다. `Request`의 **raw body를 handler가 직접 파싱**하는 경로로 고정하고 malformed JSON·배열·scalar 부정 시험을 넣었다(§6-1·§9-17~19).
+> - 그 과정에서 **v1.1의 계약 표면 서술이 틀린 것을 찾았다** — business 요청·응답 타입은 정본 `core.schema.json` `$defs`가 아니라 `api/schemas.py`의 `Strict` 클래스다(§4). 새 code는 `MODEL-0009` + 공유 모듈의 `SYS-0002` **둘**로 재계산한다.
+> - business error infrastructure 변경은 **구현 변경 범위로 따로** 적었다(§11-3). 기존 표면 전체 정리(선택지 (a))는 이번 범위가 아니다.
 
 ## 1. 실측한 현재 상태
 
@@ -46,14 +52,27 @@ blocker `import-adapter-has-no-request-path-contract` 해소안. 근거는 Codex
 
 `src/saintvision/api/deps.py:59` `get_session`은 `session.begin()`과 `tenant_scope()`를 **handler 앞에서** 연다. 그래서 이 dependency를 받으면서 "커널 HTTP를 트랜잭션 밖에서" 하는 것은 **성립하지 않는다**(v1.0의 모순). 자체 세션 관리 전례가 이미 있다 — `src/saintvision/api/v1/nodes.py:75-78`과 `pools.py:196-199`가 `make_session_factory(request.app.state.engine)` 뒤 `with factory() as session: with session.begin(): with tenant_scope(...)`를 직접 쓴다.
 
-### 1-6. business 오류 표면은 정본 `ProblemDetails`가 아니다
+### 1-6. business `InvError`로는 정본 `ProblemDetails`를 만들 수 없다 (v1.2 확장 실측)
 
-`ProblemDetails`는 `code` 패턴 `^[A-Z]+-[0-9]{4}$`와 `additionalProperties: false`를 요구한다. business 어휘(`VAL-SCHEMA`·`AUTH-PROJECT-SCOPE`·adapter의 `VAL-MODEL-IMPORT-DECLARATION`)는 **패턴에 맞지 않고**, `InvError.to_problem()`(`errors.py:104-121`)의 `problem.update(self.extra)`가 `mismatches`를, 앱 전역 `_validation_error` 핸들러가 `fields`를 **top-level에 올린다**. v1.0은 이것을 "기존 분기"로 두고 넘어갔으나, **새 공개 route까지 비정본으로 만들 근거가 아니다**(F-R3 수용).
+v1.1은 "패턴이 안 맞고 `extra`가 top-level로 올라간다"까지만 적었다. Codex 재검토의 지적을 받아 **여섯 곳을 전수 확인**했고, 전부 사실이다.
+
+| 실측 | 위치 | 결과 |
+|---|---|---|
+| `category_of()`가 `VAL·AUTH·CTX·TOOL·RES·NET·GRAPH·VERIFY·SEC·BUDGET`만 허용 | `errors.py:18-28`·`:62-69` | `InvError("MODEL-0009", …)`·`InvError("SYS-0001", …)`는 **`__post_init__`에서 `ValueError`** |
+| `to_problem()`의 `type`이 `https://saintvision.invenio/problems/<code>` | `errors.py:59`·`:106` | 정본은 `const: "about:blank"` → **위반** |
+| `_problem()`이 `instance=str(request.url.path)`를 넣는다 | `api/app.py:100` | `instance`는 정본 properties에 **없고** `additionalProperties: false`다 → **위반** |
+| `detail`을 `public`일 때만 넣는다 | `errors.py:112-113` | 정본 `required`에 `detail`이 있다 → 비공개 오류는 **required 누락** |
+| `problem.update(self.extra)` | `errors.py:120` | top-level 임의 key(`mismatches`) → **위반** |
+| `_STATUS`/`_RETRYABLE`이 `RES`를 409·retryable **true**로 둔다 | `errors.py:36`·`:50` | `RES-0004`는 404·false여야 한다 → 카테고리 기본값 사용 불가 |
+| `_validation_error` 핸들러가 `extra={"fields": …}` | `api/app.py:129-138` | top-level `fields` → **위반** |
+
+**정본 쪽이 막는 것은 하나도 없다.** `ProblemDetails.category`는 `^[A-Z]+$`이고, 커널이 이미 `MODEL-0001`~`MODEL-0008`·`SYS-0001`을 `problem()`(`services/control-plane/src/inv/app.py:24-41`)으로 내며 그 함수가 `validate_contract("ProblemDetails", body)`를 통과한다. 즉 **`MODEL`·`SYS` category는 정본에서 이미 살아 있고, 막는 것은 business `InvError` 한 곳이다.** Codex가 적은 대로 `SYS-0001`의 "기존 관례"는 커널 `DomainError`의 것이지 business 오류 타입의 것이 아니다 — v1.1이 그 둘을 뭉갠 것을 정정한다.
 
 ### 1-7. 정본 code 재고 (실측)
 
 - `MODEL-*` 사용: `MODEL-0001`~`MODEL-0008` → **`MODEL-0009`가 다음 빈 번호다.**
-- `SYS-0001` = 503 "…unavailable"의 기존 정본 관례(`app.py`의 configuration/resolver unavailable).
+- `SYS-0001` = 503 "…unavailable"의 기존 **커널** 관례(`services/control-plane/src/inv/app.py:205`·`:462`·`:629`·`:932`). business 쪽 관례가 아니므로 §7의 공유 모듈을 통해서만 낸다.
+- `SYS-0002` = **미사용**(위 grep에 `SYS-0002`가 0건). §7이 공유 모듈의 미매핑 fallback으로 쓴다.
 - `AUTH-0030` = project permission 거부·불가. `RES-0004` = not found. `VAL-0003` = 요청 검증. `GRAPH-0002` = 상태 전제 미충족(`DomainError` 기본 status **409**, `errors.py:8`).
 
 ## 2. 결속 지점
@@ -74,18 +93,24 @@ blocker `import-adapter-has-no-request-path-contract` 해소안. 근거는 Codex
 
 ## 4. 계약 변경 — 재계산 (F-R3·F-R4)
 
-v1.0은 "route + request 1건"이라고 적었다. 정본 `ProblemDetails`와 응답 계약을 확정하면 **3건 + code 1개**다.
+v1.0은 "route + request 1건"이라고 적었다. 정본 `ProblemDetails`와 응답 계약을 확정하면 **3건 + code 2개**다(v1.2에서 code를 1개→2개로 재계산: `MODEL-0009` + 공유 모듈의 `SYS-0002`).
 
 | # | 항목 | 내용 |
 |---|---|---|
 | 1 | **새 route** | `POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/release` |
-| 2 | **새 요청 타입** `ModelReleaseRequest` | `additionalProperties: false`, `required: [licensePolicy, classification]`, 제약은 `ModelManifest`에서 복제 |
-| 3 | **새 응답 타입** `ModelReleaseResult` | `additionalProperties: false`, `required: [modelVersionId, modelId, version, stage, contentSha256]`, `stage`는 **`const: "released"`**. status **200** |
-| — | **새 정본 code 1개** | `MODEL-0009`(선언 불일치, 409). `ProblemDetails.code`는 enum이 아니라 패턴이므로 **JSON Schema 변경은 없다**. 그래도 새 공개 오류 신원이므로 여기 센다 |
+| 2 | **새 요청 타입** `ModelReleaseRequest` | `api/schemas.py`의 `Strict` 파생 클래스(`extra="forbid"`, `populate_by_name=True`) → 생성 schema가 `additionalProperties: false`, `required: [licensePolicy, classification]`, 제약은 `ModelManifest`에서 복제 |
+| 3 | **새 응답 타입** `ModelReleaseResult` | 같은 `Strict` 파생. `required: [modelVersionId, modelId, version, stage, contentSha256]`, `stage`는 **`Literal["released"]`**(생성 schema에서 `const`). status **200** |
+| — | **새 정본 code 2개** | `MODEL-0009`(선언 불일치, 409)와 `SYS-0002`(공유 모듈의 미매핑 fallback, 500). `ProblemDetails.code`는 enum이 아니라 패턴이므로 **JSON Schema 변경은 없다**. 그래도 새 공개 오류 신원이므로 여기 센다. **`SYS-0002`는 공유 모듈의 것이고 카드 ar(#158)은 세지 않는다** — 같은 code를 두 카드가 각각 세면 분모가 부풀어 오른다 |
 
 기존 표현을 재사용할 수 있는지 확인했다 — 정본 `$defs`에 model version을 나타내는 응답 타입이 **없다**(`Model*`은 `ModelManifest`·`ModelShard`·`ModelReplica`·`ModelExecutionRef`·두 Observation·`ModelRetry*`·`ModelId`뿐). 그래서 3번은 신설이다.
 
-커널 schema·라우트·migration·registry status 변경은 **없다**. 동반 산출물: JSON Schema, 생성 TS/Go/Python, fixture, 서빙 앵커, `generate_contracts.py` drift 0, `tests/test_route_coverage.py`.
+**어디에 신설하는지를 v1.2에서 고친다.** v1.1은 정본 `$defs` 추가와 TS/Go 생성을 동반 산출물로 적었는데 그것은 **커널 정본의 절차**였다. 실측: business 요청·응답 타입은 `src/saintvision/api/schemas.py`의 `Strict` 파생 Pydantic 클래스이고, 그 파일이 *"these Pydantic models are the source, and `tools/export_schemas.py` emits the JSON Schema from them — one direction"*이라 적는다. `tools/check_response_freshness.py:32`도 `"kernel" = core.schema.json $def; "saintvision" = a schemas.py class`로 두 표면을 구분한다.
+
+따라서 동반 산출물은 — `schemas.py`에 `Strict` 클래스 2개, `python tools/export_schemas.py`로 `contracts/model-release-request.schema.json`·`contracts/model-release-result.schema.json` 생성, `.github/workflows/backend.yml:78`의 `export_schemas.py --check` drift 0, `tests/test_route_coverage.py` 반영이다. 클래스는 `exported()`가 **열거가 아니라 탐색**으로 찾으므로 목록 갱신은 없다. **TS/Go 생성과 `generate_contracts.py`는 커널 전용이라 이 카드의 산출물이 아니다 — v1.1의 목록을 철회한다.**
+
+이 정정은 §6-1에도 영향을 준다: `validate_contract("ModelReleaseRequest", …)`는 **불가능**하다(그 함수는 정본 `$defs`를 찾고 `ModelReleaseRequest`는 거기 없다). 대신 handler가 `ModelReleaseRequest.model_validate(...)`를 부르고 `pydantic.ValidationError`를 잡아 `VAL-0003`으로 번역한다. 커널 관측 검증(`validate_contract("ModelCommitObservation", …)`)은 정본 `$def`이므로 그대로다.
+
+커널 schema·라우트·migration·registry status 변경은 **없다**.
 
 ## 5. 어느 관측을 쓰는가 — `ModelCommitObservation`, freshness 주장 철회 (F-R2)
 
@@ -107,7 +132,13 @@ v1.0은 "route + request 1건"이라고 적었다. 정본 `ProblemDetails`와 �
 
 `get_session`을 **쓰지 않는다**(§1-5). `get_principal`로 인증만 받고 세션은 직접 관리한다(`nodes.py:75-78` 전례).
 
-1. **(트랜잭션 없음)** `get_principal`로 인증. 요청 본문을 `validate_contract("ModelReleaseRequest", body)`로 검증 — FastAPI의 `RequestValidationError`가 앱 전역 핸들러에 닿지 않게 **본문을 dict로 받아 직접 검증**한다(§1-6의 top-level `fields` 회피). 위반은 `VAL-0003` 422.
+1. **(트랜잭션 없음)** `get_principal`로 인증. **요청 본문은 handler가 raw로 파싱한다(v1.2, F-R3-2)** — `body: dict` annotation으로는 `RequestValidationError`를 피할 수 없기 때문이다(FastAPI가 handler 진입 **전에** 검증하고 전역 핸들러가 top-level `fields`를 붙인다). 고정 경로:
+   1. 서명은 `async def release(request: Request, project_id: str, model_id: str, version: str)` — **제약 annotation을 쓰지 않는다**(제약 없는 `str` path 변수는 검증 예외를 만들지 않는다).
+   2. `raw = await request.body()` → 빈 본문이면 `VAL-0003` 422.
+   3. `json.loads(raw)` → `json.JSONDecodeError`는 `VAL-0003` 422(**malformed JSON**).
+   4. `isinstance(parsed, dict)`가 아니면 `VAL-0003` 422(**배열·scalar·null**). 이것이 "JSON이 object가 아닌" 경우다.
+   5. `ModelReleaseRequest.model_validate(parsed)` → `pydantic.ValidationError`를 잡아 `VAL-0003` 422. **`exc.errors()`를 body에 싣지 않는다**(필드 경로도 top-level key도 없다). 미지 필드는 `extra="forbid"`가 여기서 거부한다.
+   6. 모든 `VAL-0003`은 §7 공유 모듈이 만든 정본 body다 — 여섯 갈래가 **같은 키 집합**을 낸다.
 2. **(짧은 tx #1)** `tenant_scope` 안에서 `require_project_access(session, tenant_id=…, project_id=…, user_id=…)` → 반환 permission의 `canApprove`가 false면 `AUTH-0030` 403. **트랜잭션을 닫는다.**
 3. **(트랜잭션 없음)** 커널 `…/commitment` 호출 → `validate_contract("ModelCommitObservation", …)`. 실패·도달 불가는 `SYS-0001` 503 **retryable**. `committed != true`면 `GRAPH-0002` 409.
 4. **(tx #2 — 원자 구간 시작)** `tenant_scope` 안에서:
@@ -124,22 +155,49 @@ v1.0은 "route + request 1건"이라고 적었다. 정본 `ProblemDetails`와 �
 
 **커널 HTTP는 3에서만 일어나고 그 순간 열린 DB 트랜잭션이 없다.** 이것을 부정 시험으로 고정한다(§9-8).
 
-## 7. 정본 `ProblemDetails` 고정 (F-R3)
+## 7. 정본 `ProblemDetails`는 **공유 모듈**이 낸다 (F-R3, v1.2)
 
-이 route의 **모든** 오류는 정본 `ProblemDetails`다 — `code`가 `^[A-Z]+-[0-9]{4}$`, 키 집합은 정본 required와 정확히 일치, **top-level 임의 key 금지**(`mismatches`·`fields` 둘 다).
+### 7-1. 결정: 선택지 (b)를 route 전용이 아닌 공유 모듈로
+
+Codex가 준 (a)(b) 중 코디네이터가 **(b)를 공유 모듈로** 결정했다 — 새 business route가 함께 쓰는 정본 예외와 handler를 한 곳에 둔다. **`src/saintvision/api/problem.py`(신규)** 이고, 이 카드의 release route와 카드 ar(#158)의 lineage route **둘 다** 이것을 쓴다. route마다 `JSONResponse`를 여섯 군데 만드는 방식은 Codex가 지적한 drift 때문에 쓰지 않는다.
+
+요구 사항 넷:
+
+1. **required exact key 집합**: `type·title·status·code·category·detail·retryable·traceId·causeRef·evidenceId` 정확히 10개. **`instance` 없음**(정본 properties에 없다), **`extra` 병합 없음**, **`detail`은 항상 존재**(비공개 사유일 때도 code별 고정 문구 — required이므로 생략할 수 없다).
+2. **`type: "about:blank"`** 고정.
+3. **`MODEL`·`SYS` category 지원**: category를 `code.split("-", 1)[0]`에서 파생하고 **enum 화이트리스트를 두지 않는다**(정본 제약이 `^[A-Z]+$`이므로 그것이 유일한 제약이다). status·retryable은 카테고리 기본값 표가 아니라 **code별로 명시**한다 — `errors.py`의 `_STATUS`/`_RETRYABLE`이 `RES`를 409·retryable true로 두므로 기본값을 쓰면 `RES-0004`가 틀린다.
+4. **정본 앵커**: body를 만든 뒤 `from inv.contracts import validate_contract`로 `validate_contract("ProblemDetails", body)`를 호출한다. business 제품 코드가 `inv`를 import하는 전례가 있다(`server.py:2`, `identity/oidc.py:72`). 커널 `problem()`과 **같은 앵커**를 쓰므로 두 표면이 갈라질 수 없다.
+
+`traceId`는 `request.state.trace_id`(`api/app.py:90-96`의 `_trace` 미들웨어) 또는 `ids.new_trace_id()`이고 둘 다 32 hex라 정본 `TraceId`(`^[0-9a-f]{32}$`)를 만족한다. 응답은 `application/problem+json` + `Cache-Control: no-store`(커널 `problem()`과 동일)다. handler는 `create_app`에 `@app.exception_handler(...)`로 한 번 등록하고, **기존 `InvError`·`RequestValidationError` 핸들러는 건드리지 않는다**(§11-3).
+
+### 7-2. 이 route의 오류 표 (변동 없음, 한 줄 추가)
 
 | 상황 | code | status | retryable |
 |---|---|---|---|
-| 요청 본문이 `ModelReleaseRequest` 위반 | `VAL-0003` | 422 | false |
+| 요청 본문 위반(빈 본문·malformed JSON·배열·scalar·미지 필드·제약 위반) | `VAL-0003` | 422 | false |
 | `canApprove` 없음 / project 접근 불가 | `AUTH-0030` | 403 | false |
 | model·version 부재, 다른 project, 다른 tenant, identity 불일치 | `RES-0004` | 404 | false |
 | 승격 전제 미충족(unverified·unpinned·untraceable), `committed != true` | `GRAPH-0002` | 409 | false |
 | 커널 관측 도달 불가·schema 위반 | `SYS-0001` | 503 | **true** |
 | **선언 불일치** | **`MODEL-0009`** | 409 | false |
+| **(v1.2) 번역표에 없는 business code** | **`SYS-0002`** | 500 | false |
 
-**불일치 이유를 어디에 싣는가**: top-level key는 쓸 수 없으므로 **`detail` 문자열에 필드 이름만** 넣는다 — 예 `"import proposal differs from the immutable manifest declaration: missing:classification"`. 값은 여전히 어디에도 없다. `ProblemDetails`에 정식 필드를 추가하는 길은 **공개 계약 확대**이므로 이 카드에서 하지 않는다.
+### 7-3. 기존 `InvError`는 이 경계에서 번역한다
 
-business 어휘를 이 route에 쓰지 않는다. adapter는 내부에서 `InvError`를 던지지만 route가 그것을 잡아 `MODEL-0009` 정본 오류로 **번역**한다(adapter 자체는 바꾸지 않는다). exact schema 시험을 둔다(§9-14).
+| 서비스·adapter가 던지는 것 | 이 route의 정본 code |
+|---|---|
+| `release_model_version`의 `VAL-SCHEMA`(unverified·unpinned·untraceable — `lineage.py:324`·`:326`·`:331`) | **`GRAPH-0002` 409** |
+| adapter의 `VAL-MODEL-IMPORT-DECLARATION` | `MODEL-0009` 409 |
+| `AUTH-PROJECT-SCOPE` / `require_project_access` 거부 | `AUTH-0030` 403 |
+| `_load_model_version`의 부재 | `RES-0004` 404 |
+
+`VAL-SCHEMA`→`GRAPH-0002`는 코디네이터 결정대로 이 경계에서 한다. **다만 전역 규칙이 아니다**: 같은 `VAL-SCHEMA`가 카드 ar의 lineage route에서는 digest·커서 형식 위반이라 `VAL-0003` 422로 번역된다. 한 business code의 뜻이 호출 지점마다 다르다는 것이 실측이므로, 모듈은 **route별로 명시한 매핑**을 받고 전역으로 추측하지 않는다. `errors.py`·adapter·서비스는 **바꾸지 않는다**.
+
+**표에 없는 code**는 정본 신원으로 꾸미지 않는다. 우리 장부에 기록된 실패를 되풀이하지 않기 위해서다 — 타 tenant model-retry가 `503 SYS-0001`로 새어 *"클라이언트가 서버 장애로 오해해 재시도하고 운영 알람에 503으로 잡힌다"*가 F1로 남아 있다(`History/2026-09-22_결정6a_model-retries_통합검증_실PG_실HTTP_Claude.md`). 그래서 미매핑은 **`SYS-0002` 500 · retryable false**다 — 우리 쪽 매핑 누락이므로 "일시적 장애"도 아니고 재시도도 의미가 없다. 그리고 **PG-free 시험이 이 route에서 도달 가능한 business code를 열거해 표가 그것을 모두 덮음을 요구**하므로(§9-23) `SYS-0002`는 계약이 깨지지 않게 두는 자리이고 실제로는 도달하지 않는다.
+
+### 7-4. 불일치 이유를 어디에 싣는가 (변동 없음)
+
+top-level key는 쓸 수 없으므로 **`detail` 문자열에 필드 이름만** 넣는다 — 예 `"import proposal differs from the immutable manifest declaration: missing:classification"`. 값은 여전히 어디에도 없다. `ProblemDetails`에 정식 필드를 추가하는 길은 **공개 계약 확대**이므로 이 카드에서 하지 않는다.
 
 ## 8. 권한 경계와 404 정책
 
@@ -148,7 +206,7 @@ business 어휘를 이 route에 쓰지 않는다. adapter는 내부에서 `InvEr
 3. **행 수준**: `models.project_id`로 소유를 확인한 뒤에만 version 행을 잠근다(§6-4-2). `model_versions`에는 `project_id` 컬럼이 없으므로 **부모 join이 유일한 경로**다.
 4. **404 정책**: 부재·다른 project·다른 tenant·identity 불일치를 **모두 같은 `RES-0004` 404**로 낸다. `require_project_access`가 이미 같은 원칙을 쓰고("Reports the same denial whether the project does not exist or the caller simply cannot see it"), 403은 **그 project에 대한 접근 자체가 없을 때**만이다.
 
-## 9. 부정 시험 — 되돌리면 실패해야 하는 것 (총 19건)
+## 9. 부정 시험 — 되돌리면 실패해야 하는 것 (총 26건)
 
 **PG-free** (`tests/core/`):
 
@@ -169,13 +227,23 @@ business 어휘를 이 route에 쓰지 않는다. adapter는 내부에서 `InvEr
 15. **(F-R5) `(model_id, version)` lookup/lock 제거 또는 다른 `model_version_id` 선택** → 잘못된 행이 release되거나 잠금 없이 진행된다.
 16. **(F-R5) 확정된 성공 응답의 missing/extra 필드 거부** — `ModelReleaseResult`가 `stage: "released"` const를 포함해 exact key set으로 검증된다.
 
+**PG-free 추가 (v1.2, F-R3)**:
+
+17. **malformed JSON 본문**(`{"licensePolicy":`) → `VAL-0003` 정본 body이고 top-level `fields`가 **없다**. `body: dict` annotation으로 되돌리면 `fields`가 붙어 실패한다.
+18. **top-level 배열 본문**(`[{…}]`) → 같은 `VAL-0003` 정본 body. 무시하거나 첫 원소를 쓰지 않는다.
+19. **scalar 본문**(`"released"`·`3`·`null`) → 같은 `VAL-0003` 정본 body.
+20. `ModelReleaseRequest.model_validate`의 `ValidationError`를 그대로 직렬화하면 → 필드 경로·입력 값이 body에 들어가 "값 미노출"·"exact key set" 단언이 함께 실패한다.
+21. 공유 모듈을 `InvError`로 되돌리면 → `MODEL-0009`·`SYS-0001` 생성이 `category_of()`에서 `ValueError`가 되어 **오류 경로 자체가 500으로 무너진다**(§1-6).
+22. 모듈의 `validate_contract("ProblemDetails", …)` 호출을 지우면 → `instance`를 다시 넣거나 `detail`을 빼도 통과한다(정본 앵커 회귀).
+23. 번역표에서 한 항목을 지우면 → 그 실패가 `SYS-0002` 500으로 떨어지고, **도달 가능 business code 열거 시험이 표 미충족으로 실패**한다(§7-3).
+
 **실 PG** (단일 파일, hosted 또는 가용 메모리 1.5GB 이상일 때만):
 
-17. RLS: 다른 tenant의 model version은 404이고 행이 바뀌지 않는다.
-18. path project와 model 소유 project 불일치 → **타 tenant와 같은 404**, 행 불변.
-19. 양성 대조: 검증·pin·trace 완비 + 선언 일치 + `canApprove` → 200 `ModelReleaseResult`, `stage='released'`, 감사 1행(값 없음).
+24. RLS: 다른 tenant의 model version은 404이고 행이 바뀌지 않는다.
+25. path project와 model 소유 project 불일치 → **타 tenant와 같은 404**, 행 불변.
+26. 양성 대조: 검증·pin·trace 완비 + 선언 일치 + `canApprove` → 200 `ModelReleaseResult`, `stage='released'`, 감사 1행(값 없음).
 
-**로컬 실 PG는 이 세션에서 돌리지 않는다**(메모리 규칙). 17~19의 실행 근거는 hosted CI다.
+**로컬 실 PG는 이 세션에서 돌리지 않는다**(메모리 규칙). 24~26의 실행 근거는 hosted CI다.
 
 ## 10. 값 미노출 규칙
 
@@ -187,6 +255,6 @@ business 어휘를 이 route에 쓰지 않는다. adapter는 내부에서 `InvEr
 
 1. **쓰기 라우트 전체는 범위 밖이다.** `register_model_version`·`verify_model_version`·`pin_retention`에는 여전히 요청 경로가 없다. 이 설계는 승격 한 지점만 연다 — blocker를 닫은 뒤에도 그 사실은 장부에 남아야 한다.
 2. `canApprove`를 강제하는 **첫 business route**가 된다(§3). 다른 승격류 행위에도 같은 등급을 적용할지는 별 결정이다.
-3. business 오류 표면 전체를 정본 `ProblemDetails`로 통일하는 것은 **이 카드 범위 밖**이다. 이 route만 정본을 지키며, 기존 분기는 그대로 드러내 둔다(§1-6).
+3. **business error infrastructure 변경 = 구현 변경 범위 (v1.2 명시)**. 이 카드가 만드는 것은 **`src/saintvision/api/problem.py` 신설 + `create_app`에 handler 1개 등록 + 이 route가 그 모듈 사용**까지다. `errors.py`·`InvError`·`_inv_error`·`_validation_error`·기존 `nodes`·`pools`·`storage` 라우트는 **건드리지 않는다** — 기존 오류 표면 전체의 정본화(Codex 선택지 (a))는 코디네이터 결정대로 이번 범위가 아니고, 그 분기는 §1-6에 드러내 둔다. 모듈은 카드 ar(#158)과 **공유**하므로 **먼저 착지하는 쪽이 만들고 나중 쪽은 재사용한다**(두 PR이 같은 파일을 각각 만들면 충돌한다).
 4. adapter는 **변경하지 않는다**. route가 `InvError`를 정본 오류로 번역한다(§7).
-5. `MODEL-0009` 번호 확정과 `SYS-0001` 재사용 판단은 Codex 확인 대상이다.
+5. `MODEL-0009`·**`SYS-0002`** 번호 확정과 `SYS-0001` 재사용 판단은 Codex 확인 대상이다. `SYS-0002`는 grep 0건이라 비어 있음을 확인했을 뿐, 커널 쪽 예약 의도는 내가 알 수 없다.
