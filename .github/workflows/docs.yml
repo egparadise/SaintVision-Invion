@@ -27,6 +27,7 @@ jobs:
           cache-dependency-path: requirements-docs.txt
       - run: python -m pip install -r requirements-docs.txt
       - run: python tools/check_docs.py
+      - run: python tools/check_doc_path_citations.py --ratchet
       - run: python tools/check_contract_bindings.py
       - run: python tools/check_frontend_integrity.py
       - name: Report fixture producer reachability
