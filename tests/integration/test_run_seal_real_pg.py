@@ -92,6 +92,16 @@ def _run_to(session, *, tenant_id, seed, terminal=True):
     return run.run_id, sorted([a, b]), staging
 
 
+def _checksums(owner_engine, artifact_ids):
+    """What the artifacts table holds for these ids, by id (the pins must copy it)."""
+    with owner_engine.begin() as connection:
+        rows = connection.execute(
+            text("SELECT artifact_id, checksum_sha256 FROM artifacts WHERE artifact_id = ANY(:ids)"),
+            {"ids": list(artifact_ids)},
+        ).all()
+    return {row[0]: row[1] for row in rows}
+
+
 def _complete(session, *, tenant_id, run_id):
     run_service.complete_run(
         session, tenant_id=tenant_id, run_id=run_id, now=NOW, actor_type="system",
@@ -185,9 +195,13 @@ def test_an_approver_seals_the_servers_set_with_the_requested_roles_and_replays_
     assert body["runId"] == run_id and body["finalState"] == "succeeded" and body["terminationReason"] == "completed"
     records, pins = _records(owner_engine, run_id)
     assert len(records) == 1 and records[0]["record_id"] == body["recordId"]
-    assert [(p["artifact_id"], p["role"]) for p in pins] == [(a, "diff"), (b, "other")]
+    # Compared as mappings, never by position: the fixture sorts the two ids
+    # and the pin query orders by artifact_id, but two ULIDs minted in the same
+    # millisecond do not sort in creation order, so "first created, first
+    # checksum" was an assumption that failed on hosted CI (#200 Core re-run).
+    assert {p["artifact_id"]: p["role"] for p in pins} == {a: "diff", b: "other"}
     assert staging not in [p["artifact_id"] for p in pins]
-    assert [(p["checksum_sha256"]) for p in pins] == ["1" * 64, "2" * 64]
+    assert {p["artifact_id"]: p["checksum_sha256"] for p in pins} == _checksums(owner_engine, [a, b])
     # exact replay
     again = client.post(_path(seed["project_id"], run_id), json={"roles": {a: "diff"}}, headers=_headers("k-1"))
     assert again.status_code == 200 and again.json() == body
@@ -245,7 +259,7 @@ def test_a_the_same_intent_twice_at_once_produces_one_record_and_both_succeed(ow
     assert sorted(r.status_code for r in responses) == [200, 200], [r.text for r in responses]
     assert responses[0].json() == responses[1].json()
     records, pins = _records(owner_engine, run_id)
-    assert len(records) == 1 and [(p["artifact_id"], p["role"]) for p in pins] == [(a, "diff"), (b, "other")]
+    assert len(records) == 1 and {p["artifact_id"]: p["role"] for p in pins} == {a: "diff", b: "other"}
     assert len(_ledger(owner_engine, tenant)) == 2
 
 
