@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.3.0"
+version: "1.3.1"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:55:53+09:00"
+updated: "2026-09-28T12:59:25+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -74,3 +74,7 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 - 부정 시험 `test_two_concurrent_first_intents_of_one_project_commit_both_with_exactly_one_experiment`: config absent로 model version 2개 준비 → thread A가 enqueue 뒤 tx를 열어둔 채 대기, thread B enqueue가 잠금에 막힘(0.5s 뒤 결과·오류 없음 확인) → A commit → B 진행. 기대: 오류 0, **experiment intent 1**, subject intent 2(각자 event 보존), mirror event 3 = intent의 event 집합(고아 0), ModelVersion 2 모두 commit.
 
 **Durable 후속 공백(1단계 범위 밖, Codex 관찰)**: 일반 `artifacts` row와 학습 run의 `output_ref`(evidence 산출물)는 미러하지 않는다. 지금 미러되는 artifact 참조는 model_version payload의 `uri`·`content_sha256`·`byte_size`뿐이다. 후속 카드 후보: "artifact 참조 미러(`artifacts` checksum·`inv://` URI를 run tag로)". 2단계(카드 bh)에도 포함되지 않는다.
+
+### 6.1 Codex r3 (v1.3.1, 2026-09-28T12:59:25+09:00) — 경쟁 시험 정정
+
+지적: 시험이 ModelVersion 2개를 config absent인 선행 tx에서 미리 commit하고 thread에서는 `enqueue_mirror`만 호출해 "canonical mutation과 mirror의 같은-tx 결속" 변이가 생존하며, `sleep(0.5)`는 B가 잠금에 도달했다는 신호가 아니다. 정정: 두 thread가 각각 **실제 `register_model_version`(훅 포함)을 자기 tx 안에서** 호출(version 1.0.0/`a`*64, 1.0.1/`b`*64). A는 등록 뒤 tx를 열어둔 채 대기. `_serialize_enqueue`를 감싼 wrapper가 thread B의 잠금 진입 직전에 event를 set → main이 그 신호를 기다린 뒤(0.3s 뒤 B 미완료·오류 없음 확인) A를 release. 기대 그대로: canonical row 2, subject intent 2, experiment 1, event 3 = intent 집합, 오류 0. 잠금 제거 변이(B가 experiment 중복 INSERT → 롤백)와 "canonical 먼저 commit 뒤 mirror 별도 tx" 변이가 각각 죽는다.
