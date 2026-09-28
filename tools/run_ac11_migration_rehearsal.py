@@ -310,7 +310,7 @@ CATALOG_QUERIES = {
         ORDER BY 1,2,3
     """,
     "columns": """
-        SELECT n.nspname,c.relname,a.attname,a.attnum,
+        SELECT n.nspname,c.relname,a.attname,
                pg_catalog.format_type(a.atttypid,a.atttypmod),a.attnotnull,
                coalesce(pg_get_expr(d.adbin,d.adrelid),'')
         FROM pg_attribute a
@@ -348,9 +348,16 @@ CATALOG_QUERIES = {
         WHERE table_schema IN ('public','inv') ORDER BY 1,2,3,4
     """,
     "routineGrants": """
-        SELECT routine_schema,routine_name,specific_name,grantee,privilege_type,is_grantable
-        FROM information_schema.role_routine_grants
-        WHERE routine_schema IN ('public','inv') ORDER BY 1,2,3,4,5
+        SELECT n.nspname,p.proname,pg_get_function_identity_arguments(p.oid),
+               coalesce(grantee.rolname,'PUBLIC'),acl.privilege_type,
+               CASE WHEN acl.is_grantable THEN 'YES' ELSE 'NO' END
+        FROM pg_proc p
+        JOIN pg_namespace n ON n.oid=p.pronamespace
+        CROSS JOIN LATERAL aclexplode(
+            coalesce(p.proacl,acldefault('f',p.proowner))
+        ) AS acl
+        LEFT JOIN pg_roles grantee ON grantee.oid=acl.grantee
+        WHERE n.nspname IN ('public','inv') ORDER BY 1,2,3,4,5,6
     """,
     "policies": """
         SELECT schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check
@@ -393,15 +400,16 @@ def _catalog_row_diagnostic(section: str, row: list[Any]) -> dict[str, Any]:
     """Return structural keys and hashes without serializing executable definitions."""
     if section == "columns":
         return {
-            "key": row[:4],
-            "type": row[4],
-            "notNull": row[5],
-            "defaultSha256": canonical_sha256(row[6]),
+            "key": row[:3],
+            "type": row[3],
+            "notNull": row[4],
+            "defaultSha256": canonical_sha256(row[5]),
         }
     if section == "constraints":
         return {
             "key": row[:4],
             "validated": row[4],
+            "definition": row[5][:512],
             "definitionSha256": canonical_sha256(row[5]),
         }
     if section == "functions":
@@ -415,12 +423,7 @@ def _catalog_row_diagnostic(section: str, row: list[Any]) -> dict[str, Any]:
             "definitionSha256": canonical_sha256(row[8]),
         }
     if section == "routineGrants":
-        # specific_name contains a database-local function OID, so keep it visible
-        # only as a hash while retaining the stable privilege identity.
-        return {
-            "key": [row[0], row[1], row[3], row[4], row[5]],
-            "specificNameSha256": canonical_sha256(row[2]),
-        }
+        return {"key": row}
     return {"rowSha256": canonical_sha256(row)}
 
 
@@ -546,7 +549,7 @@ def run_rehearsal(
         with tempfile.TemporaryDirectory(prefix="s11-ac11-") as temp_dir:
             archive = Path(temp_dir) / "pre-forward.dump"
             _run_checked(
-                ["pg_dump", "--format=custom", "--no-owner", "--file", str(archive)],
+                ["pg_dump", "--format=custom", "--file", str(archive)],
                 env=_libpq_env(admin_dsn, names[0]),
                 label="pg_dump snapshot",
             )
@@ -564,7 +567,7 @@ def run_rehearsal(
 
             _run_checked(
                 [
-                    "pg_restore", "--single-transaction", "--exit-on-error", "--no-owner",
+                    "pg_restore", "--single-transaction", "--exit-on-error",
                     "--dbname", names[1], str(archive),
                 ],
                 env=_libpq_env(admin_dsn, names[1]),

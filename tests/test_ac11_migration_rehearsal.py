@@ -113,7 +113,7 @@ def test_catalog_diagnostics_hash_function_definitions_and_routine_specific_name
         counts={"functions": 1, "routineGrants": 1},
         sections={
             "functions": [["inv", "f", "", "void", "sql", "owner", True, "", "secret body"]],
-            "routineGrants": [["inv", "f", "f_123", "inv_app", "EXECUTE", "NO"]],
+            "routineGrants": [["inv", "f", "integer", "inv_app", "EXECUTE", "NO"]],
         },
     )
     actual = runner.CatalogFingerprint(
@@ -121,7 +121,7 @@ def test_catalog_diagnostics_hash_function_definitions_and_routine_specific_name
         counts={"functions": 1, "routineGrants": 1},
         sections={
             "functions": [["inv", "f", "", "void", "sql", "owner", True, "", "changed body"]],
-            "routineGrants": [["inv", "f", "f_456", "inv_app", "EXECUTE", "NO"]],
+            "routineGrants": [["inv", "f", "uuid", "inv_app", "EXECUTE", "NO"]],
         },
     )
     diagnostics = runner.catalog_diff_diagnostics(
@@ -129,11 +129,19 @@ def test_catalog_diagnostics_hash_function_definitions_and_routine_specific_name
     )
     serialized = str(diagnostics)
     assert "secret body" not in serialized and "changed body" not in serialized
-    assert "f_123" not in serialized and "f_456" not in serialized
     assert diagnostics["functions"]["expectedOnlySample"][0]["key"] == ["inv", "f", ""]
     assert diagnostics["routineGrants"]["expectedOnlySample"][0]["key"] == [
-        "inv", "f", "inv_app", "EXECUTE", "NO"
+        "inv", "f", "integer", "inv_app", "EXECUTE", "NO"
     ]
+
+
+def test_catalog_queries_compare_logical_columns_and_stable_routine_identities():
+    columns = runner.CATALOG_QUERIES["columns"]
+    grants = runner.CATALOG_QUERIES["routineGrants"]
+    assert "a.attname,a.attnum" not in columns
+    assert "ORDER BY 1,2,4" in columns
+    assert "specific_name" not in grants
+    assert "pg_get_function_identity_arguments" in grants
 
 
 def test_junit_declares_zero_tail_as_skip_and_restore_as_pass():
