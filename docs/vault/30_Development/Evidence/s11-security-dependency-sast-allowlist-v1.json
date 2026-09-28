@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-09-29T00:03:32+09:00",
+  "producer": {
+    "path": "tools/run_ac11_security_scan.py",
+    "blob": "de439f288d6dcd1101b57411b6ebc5c7f0974c5b"
+  },
+  "workflow": {
+    "path": ".github/workflows/ac11-security-scan.yml",
+    "blob": "942316a4491e4ee80898555a2cf38039329f33b2"
+  },
+  "scanners": [
+    {
+      "id": "bandit",
+      "version": "1.9.4",
+      "scopePaths": [
+        "services/control-plane/src",
+        "src/saintvision"
+      ],
+      "severityPolicy": "HIGH_ONLY"
+    },
+    {
+      "id": "pip-audit",
+      "version": "2.10.1",
+      "scopePaths": [
+        "requirements-core.txt"
+      ],
+      "severityPolicy": "ANY_VULNERABILITY_AS_HIGH"
+    }
+  ],
+  "acceptedFindings": []
+}

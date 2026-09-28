@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.221"
+version: "1.0.222"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T22:01:22+09:00"
+updated: "2026-09-29T00:08:48+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 Card111 AC-11 security critical/high hosted scan — 구현·검증 중
+
+- branch `agent/codex/ac11-security-hosted-scan`, base #217 승인 head `35c5b207`, owner Codex·reviewer Claude. 기본 CI에는 넣지 않고 label `run-ac11-security` 또는 `workflow_dispatch`로만 실행하는 credential·외부 서비스 0 hosted lane을 추가한다.
+- `pip-audit 2.10.1`은 `requirements-core.txt`의 모든 취약점을 high로 보수 분류하고, `bandit 1.9.4`는 두 production Python tree의 HIGH를 수집한다. finding은 설명·source snippet 없이 stable ID만 남기며 allowlist는 exact ID·사유·만료를 요구한다.
+- AC-11 집계기는 기존 definer/RLS/VF와 새 `SEC-SCAN-001` 네 report를 모두 요구한다. report 누락·payload SHA 불일치는 `NOT_OBSERVED`, allowlist 밖 critical/high는 `MEASURED_FAIL`, scanner/scope/tool Git provenance drift는 `INVALID_RUN`이다. registry target은 바꾸지 않아 `be99a506…` repin은 없다.
 
 ## 2026-09-28 Card96 S11 AC-11 composite long-soak registry repin — Claude 검토 요청
 

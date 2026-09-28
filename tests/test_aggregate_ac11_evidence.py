@@ -24,6 +24,9 @@ BLOB = "d" * 40
 REGISTRY_BLOB = tool.TARGET_REGISTRY_BLOB
 NOW = datetime(2026, 9, 28, 3, 0, tzinfo=timezone.utc)
 APPROVED_ALLOWLIST = json.loads(tool.DEFAULT_ALLOWLIST.read_text(encoding="utf-8"))
+SCAN_ALLOWLIST = json.loads(
+    (ROOT / tool.SCAN_ALLOWLIST_REPO_PATH).read_text(encoding="utf-8")
+)
 TOOL_BLOBS = {
     item["path"]: item["blob"]
     for item in [
@@ -36,6 +39,12 @@ TOOL_BLOBS = {
     ]
 }
 TOOL_BLOBS[tool.ALLOWLIST_REPO_PATH] = tool.ALLOWLIST_BLOB
+TOOL_BLOBS[tool.SCAN_ALLOWLIST_REPO_PATH] = tool.SCAN_ALLOWLIST_BLOB
+for row in (SCAN_ALLOWLIST["producer"], SCAN_ALLOWLIST["workflow"]):
+    TOOL_BLOBS[row["path"]] = row["blob"]
+for scanner in SCAN_ALLOWLIST["scanners"]:
+    for path in scanner["scopePaths"]:
+        TOOL_BLOBS[path] = BLOB
 TARGET_CRITERIA = {
     tool.REQUIRED_TARGET_BY_AXIS.get(axis, "target-" + axis): (
         {} if axis == "security-critical-high-zero" else {"sampleCount": {"operator": "gte", "value": 1}}
@@ -89,6 +98,8 @@ class FakeGit:
                     "requiredEnvironment": TARGET_ENVIRONMENTS[target_id],
                 })
             return json.dumps({"schemaVersion": tool.SCHEMA_VERSION, "targets": targets})
+        if path == tool.SCAN_ALLOWLIST_REPO_PATH:
+            return json.dumps(SCAN_ALLOWLIST)
         if path == "migrations/versions/0001_base.py":
             return 'revision = "0001_base"\ndown_revision = None\ndef downgrade():\n    raise RuntimeError("restore")\n'
         if path == "migrations/versions/0002_head.py":
@@ -222,7 +233,58 @@ def security_reports(allowlist: dict) -> list[dict]:
             "caseIdentitiesSha256": vf["requiredCaseIdentitiesSha256"],
             "tests": copy.deepcopy(vf["expectedTests"]),
         },
+        security_scan_report(),
     ]
+
+
+def security_scan_report() -> dict:
+    scanner_specs = {row["id"]: row for row in SCAN_ALLOWLIST["scanners"]}
+    payload = {
+        "scannerVersions": {
+            key: scanner_specs[key]["version"] for key in sorted(scanner_specs)
+        },
+        "scannerExitCodes": {"pip-audit": 0, "bandit": 0},
+        "scanInputs": [
+            {"path": path, "objectId": BLOB}
+            for path in sorted(
+                {path for row in scanner_specs.values() for path in row["scopePaths"]}
+            )
+        ],
+        "summaries": {
+            "bandit": {
+                "lowFindingCount": 0,
+                "mediumFindingCount": 0,
+                "highFindingCount": 0,
+            },
+            "pip-audit": {"dependencyCount": 10, "findingCount": 0},
+        },
+        "criticalHighFindings": [],
+        "criticalCount": 0,
+        "highCount": 0,
+        "unallowlistedFindingIds": [],
+        "expiredFindingIds": [],
+        "staleAllowlistFindingIds": [],
+        "severityMismatchFindingIds": [],
+    }
+    return {
+        "schemaVersion": tool.SCHEMA_VERSION,
+        "runPurpose": "s11-ac11-security-scan",
+        "threatId": "SEC-SCAN-001",
+        "reportAvailable": True,
+        "status": "complete",
+        "allowlist": {
+            "path": tool.SCAN_ALLOWLIST_REPO_PATH,
+            "blob": tool.SCAN_ALLOWLIST_BLOB,
+        },
+        "toolFiles": [
+            copy.deepcopy(SCAN_ALLOWLIST["producer"]),
+            copy.deepcopy(SCAN_ALLOWLIST["workflow"]),
+        ],
+        "payloadSha256": tool._canonical_sha256(payload),
+        "payload": payload,
+        "verdict": "MEASURED_PASS",
+        "failureClass": "NONE",
+    }
 
 
 def security_envelope(allowlist: dict) -> dict:
@@ -599,6 +661,101 @@ def test_security_report_cannot_claim_reviewed_blob_when_source_tree_differs(all
         assert axis_result(security_envelope(allowlist), allowlist, git).verdict is tool.Verdict.INVALID_RUN
     finally:
         TOOL_BLOBS["tools/check_definer_functions.py"] = original
+
+
+def test_security_scan_missing_or_payload_sha_mismatch_is_not_observed(allowlist):
+    missing = security_envelope(allowlist)
+    missing["observations"] = [
+        row for row in missing["observations"] if row["threatId"] != "SEC-SCAN-001"
+    ]
+    missing["verdict"] = "NOT_OBSERVED"
+    assert axis_result(missing, allowlist).verdict is tool.Verdict.NOT_OBSERVED
+
+    mismatch = security_envelope(allowlist)
+    scan = mismatch["observations"][3]
+    scan["payload"]["highCount"] = 1
+    mismatch["verdict"] = "NOT_OBSERVED"
+    assert axis_result(mismatch, allowlist).verdict is tool.Verdict.NOT_OBSERVED
+
+
+def test_security_scan_unallowlisted_high_is_measured_fail(allowlist):
+    value = security_envelope(allowlist)
+    scan = value["observations"][3]
+    finding = {
+        "findingId": "bandit:B999:services/control-plane/src/inv/example.py:7",
+        "scanner": "bandit",
+        "severity": "HIGH",
+        "ruleId": "B999",
+        "component": "services/control-plane/src/inv/example.py",
+        "location": "7",
+    }
+    scan["payload"]["criticalHighFindings"] = [finding]
+    scan["payload"]["highCount"] = 1
+    scan["payload"]["summaries"]["bandit"]["highFindingCount"] = 1
+    scan["payload"]["unallowlistedFindingIds"] = [finding["findingId"]]
+    scan["payloadSha256"] = tool._canonical_sha256(scan["payload"])
+    scan["verdict"] = "MEASURED_FAIL"
+    scan["failureClass"] = "UNALLOWLISTED_CRITICAL_HIGH"
+    value["verdict"] = "MEASURED_FAIL"
+    assert axis_result(value, allowlist).verdict is tool.Verdict.MEASURED_FAIL
+
+
+def test_security_scan_reviewed_exception_requires_reason_and_unexpired_exact_identity():
+    finding = {
+        "findingId": "pip-audit:example:1:CVE-2099-0001",
+        "scanner": "pip-audit",
+        "severity": "HIGH",
+        "ruleId": "CVE-2099-0001",
+        "component": "example",
+        "location": "1",
+    }
+    scan = security_scan_report()
+    scan["payload"]["criticalHighFindings"] = [finding]
+    scan["payload"]["highCount"] = 1
+    scan["payload"]["summaries"]["pip-audit"]["findingCount"] = 1
+    reviewed = copy.deepcopy(SCAN_ALLOWLIST)
+    reviewed["acceptedFindings"] = [
+        {
+            "findingId": finding["findingId"],
+            "severity": "HIGH",
+            "reason": "reviewed compatibility exception",
+            "expiresAt": "2030-01-01T00:00:00Z",
+        }
+    ]
+    scan["payloadSha256"] = tool._canonical_sha256(scan["payload"])
+    assert (
+        tool.evaluate_security_scan(scan, reviewed, NOW, FakeGit(), SOURCE)
+        is tool.Verdict.MEASURED_PASS
+    )
+
+    expired = copy.deepcopy(reviewed)
+    expired["acceptedFindings"][0]["expiresAt"] = "2020-01-01T00:00:00Z"
+    scan["payload"]["expiredFindingIds"] = [finding["findingId"]]
+    scan["payloadSha256"] = tool._canonical_sha256(scan["payload"])
+    scan["verdict"] = "MEASURED_FAIL"
+    scan["failureClass"] = "EXPIRED_ALLOWLIST"
+    assert (
+        tool.evaluate_security_scan(scan, expired, NOW, FakeGit(), SOURCE)
+        is tool.Verdict.MEASURED_FAIL
+    )
+
+    missing_reason = copy.deepcopy(reviewed)
+    missing_reason["acceptedFindings"][0]["reason"] = ""
+    with pytest.raises(ValueError, match="reason is required"):
+        tool.validate_scan_allowlist(missing_reason)
+
+
+def test_security_scan_tool_or_scope_object_drift_is_invalid(allowlist):
+    tool_drift = security_envelope(allowlist)
+    tool_drift["observations"][3]["toolFiles"][0]["blob"] = "0" * 40
+    assert axis_result(tool_drift, allowlist).verdict is tool.Verdict.INVALID_RUN
+
+    scope_drift = security_envelope(allowlist)
+    scope_drift["observations"][3]["payload"]["scanInputs"][0]["objectId"] = "0" * 40
+    scope_drift["observations"][3]["payloadSha256"] = tool._canonical_sha256(
+        scope_drift["observations"][3]["payload"]
+    )
+    assert axis_result(scope_drift, allowlist).verdict is tool.Verdict.INVALID_RUN
 
 
 def test_allowlist_schema_and_disposition_duplicates_are_invalid(allowlist):
