@@ -324,7 +324,7 @@ def test_admission_mints_a_token_but_does_not_create_a_node(app_sessionmaker, la
     assert state == "candidate"
 
 
-def test_admitting_twice_is_refused(app_sessionmaker, lab):
+def test_admitting_twice_mints_only_one_bootstrap_token(app_sessionmaker, lab):
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, lab["tenant_a"]):
@@ -332,16 +332,30 @@ def test_admitting_twice_is_refused(app_sessionmaker, lab):
                     session, tenant_id=lab["tenant_a"], source_ip="10.0.0.9",
                     announcement=_announcement(), now=NOW,
                 )
-                discovery_service.decline_candidate(
+                first = discovery_service.admit_candidate(
                     session, tenant_id=lab["tenant_a"],
-                    announcement_id=row.announcement_id, now=NOW,
+                    announcement_id=row.announcement_id,
+                    admitted_by_user_id=lab["user_id"], now=NOW,
                 )
-                with pytest.raises(InvError):
+                with pytest.raises(InvError) as raised:
                     discovery_service.admit_candidate(
                         session, tenant_id=lab["tenant_a"],
                         announcement_id=row.announcement_id,
                         admitted_by_user_id=lab["user_id"], now=NOW,
                     )
+                token_count = session.execute(
+                    text(
+                        "SELECT count(*) FROM node_bootstrap_tokens "
+                        "WHERE tenant_id = :tenant AND consumed_at IS NULL"
+                    ),
+                    {"tenant": lab["tenant_a"]},
+                ).scalar_one()
+
+    assert first.secret
+    assert raised.value.code == "GRAPH-INVALID-TRANSITION"
+    assert raised.value.status == 409
+    assert raised.value.retryable is False
+    assert token_count == 1
 
 
 def test_the_database_refuses_an_admitted_state_without_a_node(app_sessionmaker, lab):

@@ -1,14 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.212"
+version: "1.0.213"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T20:55:02+09:00"
+updated: "2026-09-29T01:49:48+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-29 카드 122 후속 — node admission token 재발급 차단
+
+- announcement row를 `FOR UPDATE`로 잠그고 `admitted_by_user_id`를 단일 발급 marker로 사용한다. 첫 bootstrap token 뒤 같은 candidate의 재시도·경합은 token과 audit을 추가하지 않고 `GRAPH-INVALID-TRANSITION`/409/non-retryable로 닫는다. 평문 token 비저장 불변식 때문에 기존 token 재제시는 하지 않는다.
+- PG-free 회귀는 1 passed, compile exit 0이다. 실 PG service·HTTP 회귀는 hosted Core `run-core`에서 실행 전까지 미측정이다. 카드 122 Medium 3건은 pool↔project/run 권한 결속, constraint allowlist 기반 IntegrityError 번역, legacy idempotency/audit 계약으로 분리한다. [[2026-09-29_01-49-48_KST_노드_admission_토큰_재발급_차단_Codex]].
 
 ## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
 
