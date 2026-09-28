@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-GEMINI-G05-RELEASE-REEXPOSE-001"
 title: "G-05 모델 릴리스 쓰기 UI 재노출 및 서버 멱등성 계약 연동 (카드 118)"
-version: "1.0.2"
+version: "1.0.3"
 status: "active"
 author: "Gemini"
 reviewer: "Claude, Codex"
-updated: "2026-09-29T03:01:00+09:00"
+updated: "2026-09-29T03:05:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S10-FE", "G-05", "CARD-118"]
@@ -65,6 +65,18 @@ tags: ["s10-fe", "g-05", "card-118", "model-release", "idempotency", "re-exposur
    - **Test 23**: `canApprove: undefined`일 때 릴리스 버튼 비활성화 및 안내 문구 표출 검증.
 4. **L3: 릴리스 요청 중 입력 변경 시 abort 및 로딩 해제 시험 추가**:
    - **Test 24**: 릴리스 요청 in-flight 상태에서 `licensePolicy` 입력값 변경 시 진행 중인 요청의 signal이 abort되고 버튼 로딩 상태가 즉시 해제되며 지연 응답이 안전하게 폐기됨을 검증.
+
+
+### 2-2. Codex 계약 축 검토 조치 (C1, C2 반영)
+
+1. **C1: Replay 확정/Fresh 단정 제거 및 재시도 응답 정직화**:
+   - `ModelReleaseResponse` 스키마(`additionalProperties: false`, 5개 필드) 및 서버 원장(`model_release.py:479-480, 524-525`) 계약상 반환 바디에 replay 플래그가 없으며 서버는 저장 바디를 그대로 반환함.
+   - 키 전송 시점을 네트워크 디스패치 시점으로 옮겨, 동일 키 재제출 200 수신 시 클라이언트가 허위의 '신규 릴리스 완료 (Fresh)' 대신 `재시도 응답 — 서버 원장 결과 (저장된 응답일 수 있음)`로 표출.
+   - **Test 21**: 재시도 200 수신 시 indicator가 Fresh가 아니며 '재시도 응답 — 서버 원장 결과'를 포함함을 단언.
+2. **C2: `releaseModelVersion` helper 필수 Idempotency-Key 전송 보장**:
+   - `modelRegistryObservation.ts`의 `releaseModelVersion`에서 `options?.idempotencyKey`가 생략되더라도 `generateIdempotencyKey('rel')`를 통해 런타임 키를 자동 생성하여 `Idempotency-Key` 헤더가 항상 전송되도록 보장 (`apiClient`에 `idempotencyKey: key` 전달).
+   - 호출자가 키 인자를 생략하더라도 서버 `VAL-0003/422` 오류가 발생하지 않도록 fail-closed 계약 완결.
+   - **Test 4**: `releaseModelVersion` 호출 시 `options` 인자 생략 시에도 `capturedHeaders['idempotency-key']`가 정의되고 `rel_` 접두사를 가진 비어 있지 않은 헤더가 반드시 전송됨을 단언 (되돌리면 실패).
 
 ## 3. 실측 검증 증거
 

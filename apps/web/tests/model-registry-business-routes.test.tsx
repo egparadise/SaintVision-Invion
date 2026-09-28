@@ -389,6 +389,17 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(parsedBody.classification).toBe('internal');
     expect(res.version).toBe('1.0.0-rc1');
     expect(res.stage).toBe('released');
+
+    // C2 Invariant: When options/idempotencyKey is omitted, helper MUST generate and send a non-empty rel_ key
+    capturedHeaders = {};
+    await modelRegistryObservation.releaseModelVersion(
+      'prj_alpha',
+      'mdl_01JLLAMA30000000000000000',
+      '1.0.0-rc1',
+      { licensePolicy: 'Apache-2.0', classification: 'internal' }
+    );
+    expect(capturedHeaders['idempotency-key']).toBeDefined();
+    expect(capturedHeaders['idempotency-key']).toMatch(/^rel_/);
   });
 
   // 5. RFC 9457 Problem Details: 409 Conflict with exact server detail string (Claude G5)

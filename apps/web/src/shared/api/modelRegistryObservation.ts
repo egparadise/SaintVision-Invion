@@ -433,18 +433,15 @@ export async function releaseModelVersion(
     throw new Error('licensePolicy 및 classification 필드가 필수입니다.');
   }
 
+  const key = options?.idempotencyKey || generateIdempotencyKey('rel');
   const path = [projectId, modelId, version].map(encodeURIComponent);
-  const headers: Record<string, string> = {};
-  if (options?.idempotencyKey) {
-    headers['Idempotency-Key'] = options.idempotencyKey;
-  }
 
   const result = await apiClient<ModelReleaseResponse>(
     `/v1/projects/${path[0]}/models/${path[1]}/versions/${path[2]}/release`,
     {
       method: 'POST',
       body: JSON.stringify(payload),
-      headers,
+      idempotencyKey: key,
       signal: options?.signal,
     }
   );
