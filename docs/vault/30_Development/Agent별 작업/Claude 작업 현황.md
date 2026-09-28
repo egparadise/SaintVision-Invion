@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.22"
+version: "1.2.23"
 status: "review"
 author: "Claude"
-updated: "2026-09-29T00:00:54+09:00"
+updated: "2026-09-29T00:21:29+09:00"
 source_of_truth: "Git"
 ---
 
@@ -19,7 +19,7 @@ source_of_truth: "Git"
 
 ## 최근 확인한 진척
 
-병합 목록 착지 후 runbook 카드 110 (Claude, 2026-09-28, 착지 commit `b91ab72f` = `96a03486` + #169 `b69bba2d`, PR base `integration/all-agents-unified`, docs-only, 실행 0): (1) 95 PR MERGED 확인 — base가 integration인 58개는 자동, **stacked 37개는 OPEN으로 남으므로** `gh pr edit --base integration` 재지정(번호 목록 실측) + 미전환 시 처리; (2) 목록 밖 열린 PR — #218·#219·#221은 base가 착지된 branch라 재지정 + 보드 union re-merge, #194는 owner 확인(superseded 가능), #220·#222·#223은 re-merge만, #141/#145/#148 close 권고, 카드 101 PR 미특정; (3) `coord/train-*` 7 branch 정리(사용자, tag 고정 권고); (4) push 자동 5 workflow + dispatch AC-11·S11, 기대 수치는 `b91ab72f`(Backend 5203/49/2, Docs 1006·citations 294)·`96a03486`(Core 5485/21/2, Frontend 85/838, Desktop 7, AC-11·S11 success) 실측 인용; (5) 되돌리기는 force 금지·`read-tree 1e8baf04` revert commit 방식 권고(PR MERGED 표시는 되돌아가지 않음). 다음 첫 행동: Codex 검토. 전문 [[병합_목록_착지_후_runbook_b91ab72f]].
+병합 목록 착지 후 runbook 카드 110 (Claude, 2026-09-28, 착지 commit `b91ab72f` = `96a03486` + #169 `b69bba2d`, PR base `integration/all-agents-unified`, docs-only, 실행 0): (1) 95 PR MERGED 확인 — base가 integration인 58개는 자동, **stacked 37개는 OPEN으로 남으므로** `gh pr edit --base integration` 재지정(번호 목록 실측) + 미전환 시 처리; (2) 목록 밖 열린 PR — #218·#219·#221은 base가 착지된 branch라 재지정 + 보드 union re-merge, #194는 owner 확인(superseded 가능), #220·#222·#223은 re-merge만, #141/#145/#148 close 권고, 카드 101 PR 미특정; (3) `coord/train-*` 7 branch 정리(사용자, tag 고정 권고); (4) push 자동 5 workflow + dispatch AC-11·S11, 기대 수치는 `b91ab72f`(Backend 5203/49/2, Docs 1006·citations 294)·`96a03486`(Core 5485/21/2, Frontend 85/838, Desktop 7, AC-11·S11 success) 실측 인용; (5) 되돌리기는 force 금지·`read-tree 1e8baf04` revert commit 방식 권고(PR MERGED 표시는 되돌아가지 않음). **Codex 1차 4건 반영 v1.1**: 순서를 exact-SHA 7 workflow green → 읽기 확인 → base 재지정/close → branch 정리로 재배치(되돌릴 수 없는 것은 green 뒤에만), Core 기대는 5506 추론(+21, 실측 없음 명시), rollback에 tip==b91ab72f·clean worktree hard-stop, tag는 이름별 refspec + 사전 SHA 검사, re-merge는 `gh pr view` head 단언 + 저장소 안 검사로 classcheck 대체. 다음 첫 행동: Codex 재검토. 전문 [[병합_목록_착지_후_runbook_b91ab72f]].
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
