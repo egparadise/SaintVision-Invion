@@ -85,6 +85,17 @@ source_of_truth: "Git"
 - base `9a837fd7`(#117 lock-wait skip map hotfix 포함), branch `agent/codex/cx01-hosted-core`, owner Codex/reviewer Claude. Core job이 고유 owner label·tmpfs·loopback으로 PostgreSQL 16을 직접 생성하고 같은 컨테이너를 recovery source/CX01 identity로 쓰며 `if: always()` 정리하는 설계를 고정했다.
 - mock·identity/ownership 단언 완화·옛 PC 보호 컨테이너 사용 없이 head `bc27588d`의 Core `36353272311`이 success했다. focused recovery는 18 passed/2 구체적 internal-network skip/0 failed·error, main은 3236 passed/17 declared skip/0 failed·error이며 build·Go·TS·owned cleanup도 success다. 기존 unset 19 skip은 0건이다.
 - 앞선 shared-session 14 fail은 owner-only 음성 시험이 trigger를 끄고 남긴 orphan `inv.result_commitments`를 다음 restore가 FK로 거부한 시험 격리 오염으로 재현했다. 제품 drill은 손상을 통과시키지 않았고 fresh restore는 통과했으므로 recovery를 fresh session으로 분리했으며, 음성 시험 cleanup은 별도 test-hygiene 관찰로 남긴다. S07-DB 물리 인수는 `review` 유지, Claude 독립 재검토가 다음이다. [[Core CX01 hosted disposable container 설계]], [[2026-09-28_06-53-26_KST_Card36_CX01_hosted_Core_Codex]]
+## 2026-09-28 S11 AC-11 composite long-soak target 설계 — Claude 검토 요청
+
+- #157의 필수 `long-soak`과 #185의 storage reference 경계를 결합해 열·전원·NTP·스위치·WAN·실 WS/PTY·물리 storage를 한 24시간 물리 창에 묶었다. ADR-100의 등록 5/eligible Ubuntu 4/CP 겸임 제외 1, external monotonic observer, 14개 exact case와 20개 fault-class SHA를 고정했다.
+- hosted storage/drift는 같은 SHA의 필수 하위 관측이지만 성공만으로 축 PASS를 만들 수 없고, storage-only도 PASS가 아니다. 실제 registry 변경은 #192 방식의 별도 repin 카드로 남겼다.
+- 이 카드는 docs-only이며 실제 장비·fault·hosted 실행은 0건이다. 운영자 자원 전 `BLOCKED_EXTERNAL(G-19/G-24)`이고 reviewer Claude 승인 뒤 registry/importer repin이 첫 후속이다. [[S11_AC11_composite_long_soak_설계]], [[S11_AC11_composite_long_soak_target_v0]], [[2026-09-28_19-59-12_KST_S11_AC11_composite_long_soak_설계_Codex]].
+
+## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
+
+- migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
+- PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
+- Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
