@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S3-OBJECT-STORE-PRODUCT-BINDING-002"
 title: "S3 호환 ObjectStore 제품 결속 v2"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T12:10:00+09:00"
+updated: "2026-09-28T12:38:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -45,6 +45,6 @@ source_of_truth: "Git"
 ## Hosted 관측과 남은 경계
 
 - head `3cf7b33c` run `36370524842`: migration upgrade·LAN/Docker 사전 단계와 Core pytest `3361 passed / 36 skipped / 2 deselected / 0 failed`, S01 job `108765769138`의 conformance 2/2 및 MinIO+disposable PG 3/3, Backend 3.12·3.14 `3055 passed / 47 skipped / 2 deselected / 0 failed`, Docs·Frontend·Desktop은 green이다. Core job은 제품 실패가 아니라 base에 PR #117의 `run only through tools/placement_lock_wait_diagnostic.py` exact skip 1건이 없어 skip gate에서만 red였다.
-- `c556e99a`가 Backend와 같은 exact skip 사유를 Core map에 넣었다. Claude r2가 찾은 제품 호출 공백은 그 뒤 `WorkspaceRecovery.restore`·checkout registry 선택과 실제 제품 restore hosted 시험으로 보강했다. 이 새 head의 S01 JUnit·Core skip/build/Go/TS 완주는 아직 대기이며 green 전에는 완료로 세지 않는다.
+- 최종 head `249b73e2`의 5 workflow는 모두 success다: Core `36372821204`, Backend `36372821119`, Docs `36372821243`, Frontend `36372821191`, Desktop `36372821245`. Core는 `3362 passed / 36 skipped / 2 deselected / 0 failed`이며 exact skip gate, control-plane sdist/wheel build, Go test, strict TypeScript compile가 모두 exit 0이다. 별도 S01 job `108772541073`은 product adapter conformance 2건과 disposable MinIO·PostgreSQL 제품 결속 3건을 각각 failure/error/skip 0으로 실행했다. 제품 결속 3건은 S3 locator+타 tenant RLS, 실제 `WorkspaceRecovery.restore`+receipt replay, workspace output replay+pin/event 단일성을 포함한다.
 - S3 ETag는 정본이 아니고, 운영 S3 vendor·TLS·IAM·retention/GC/restore/DR 인수는 이 카드로 주장하지 않는다.
-- 다음 Codex: 수정 head의 hosted migration/definer·MinIO·제품 Workspace restore·Artifact HTTP·skip/build/Go/TS를 확인한다. 다음 Claude: fixed head의 제품 호출 경로와 replay/read-ticket/strict-config 되살림을 재판정한다.
+- 다음 Codex 구현 행동은 없다. 다음 Claude: `249b73e2`의 제품 호출 경로와 replay/read-ticket/strict-config 되살림 및 위 hosted evidence를 최종 재판정한다. 병합은 사용자/코디네이터 결정이며 운영 S3 인수는 별도다.
