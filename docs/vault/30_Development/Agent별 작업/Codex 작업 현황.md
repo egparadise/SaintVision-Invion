@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.216"
+version: "1.0.217"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T20:55:02+09:00"
+updated: "2026-09-28T21:56:36+09:00"
 source_of_truth: "Git"
 ---
 
@@ -57,6 +57,31 @@ source_of_truth: "Git"
 - PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
 - restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
 - Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
+## 2026-09-28 Card 50 — S11 AC-11 aggregator stage 1
+
+- Branch/base: `agent/codex/s11-ac11-aggregator` / `1e8baf045c5a554209aaef601ae4883b64da50a7`; owner/reviewer Codex/Claude; approved design PR #157 head `a793f258`.
+- Added a PG-free fail-closed aggregator for the eight required AC-11 axes plus the reviewed security allowlist v0. Claude r1 D1~D6 are addressed: Git-backed target registry criteria, source-tree migration graph conditional N/A, actual definer/RLS/VF producer formats with nonempty inventories, reviewed baseline/blob binding, and skip fail-closed. Producer verdicts cannot override recomputation in either direction.
+- Focused evidence after r1 fixes: `tests/test_aggregate_ac11_evidence.py` 49 passed and module compilation exit 0; docs/ontology/contract/ratchet gates are rerun before the next push. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
+- History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
+- Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
+- Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
+
+## 2026-09-28 Card 51 — S11 AC-11 migration restore rehearsal
+
+- Branch/stack: `agent/codex/s11-migration-rehearsal` / PR #170 C1 head `960fdc6b`; owner/reviewer Codex/Claude.
+- Opt-in hosted lane, exact PR-head checkout, disposable PostgreSQL 16 source/restore DB, pre/post-forward sentinel, final catalog fingerprint, residue-zero JSON/JUnit evidence를 구현했다. reversible tail 0은 조건부 `NOT_APPLICABLE`, 짝인 `0045→snapshot restore→0046`만 실제 PASS 후보이며 lossy-reversible 10개는 개별 측정이 아닌 restore-route 사전 분류로 유지한다.
+- History: [[2026-09-28_13-06-51_KST_S11_AC11_migration_리허설_Codex]].
+- Hosted 후속 정정: PG-free focused 12 passed. 정본 run `36377513831`(head `de9d8a4e`)은 `0045→snapshot restore→0046`를 `MEASURED_PASS`, JUnit 3/0/0/1 skip, disposable DB residue 0으로 확인했다. 앞선 네 run의 진단·owner 보존·OID/attnum·동등 CHECK deparse 교정도 History에 보존했다. 이는 단일 hosted restore 축만의 PASS이며 AC-11 전체와 S11 상태는 미완료다.
+- Claude F1~F5 보강 head `abe8435a`: shallow Backend 분리, future reversible 기준 DB 비교, 임시 Alembic 부정 fixture 3종, AC-11 importer/target registry, 좁은 CHECK 정규화를 추가했다. hosted run `36379743674`는 JUnit 6/0/0/1 skip·disposable DB 7개 residue 0·artifact `10952510591`로 PASS했고, PG-free 75 passed와 문서/ontology/contract/ratchet 게이트 exit 0이다. 단일 hosted restore 축만의 증거이며 새 cluster role·운영 PITR·물리 복구는 미측정이다.
+- Claude r2 N1~N4 대응: importer가 artifact zip을 직접 hash하고 zip 내부 report/JUnit 및 GitHub run/artifact metadata의 run ID·head·결론·이름·만료를 exact 대조한다. 정본 artifact 재수입은 expected/observed `d4437410…`·report `cfa3b678…`·JUnit `1cbc2ffe…`, exit 0이며 임의 digest/failed·expired·head/run drift/sourceRunId 누락/JUnit 실패를 거부한다. 0009는 23505와 rollback state를 요구하고 JUnit은 negative case 실제 실행을 반영하며, PG-free focused 87 passed다.
+- Claude r3 조건부 승인 N5/N6 경계: 정본 hosted run `36379743674`는 느슨한 0009 판정이 있던 `abe8435a` 산출물이고, `b2b4db3c`의 N2/N3 강화는 PG-free만 검증돼 release 전 lane 재실행이 필요하다. importer는 `gh api`로 취득한 zip/run/artifact JSON의 상호 결속을 검사하지만 metadata 출처를 인증하지 않으므로, canonical repository 조회 명령·artifact id `10952510591`·일관된 입력 위조 한계를 History와 docstring에 고정했다.
+
+## 2026-09-28 S11-ST PG-free fault evidence producer/importer — Claude r2 C1~C3 보강
+
+- #193 Claude r1 D1~D6에 이어 r2 C1~C2를 보강했다. truncated backup은 유효 tar의 data 구간을 실제 절단하고 verifier source 변이 6종을 부정 시험으로 고정한다.
+- retention 미완료 삭제 후보와 directory-fsync 뒤 exact canonical byte는 허용 상태라 residue로 세지 않는다. retained boundary 삭제는 digest finding이며 관측하지 않은 committed loss는 `null`이다. raw OSError 분류 공백은 숨기지 않는다.
+- #198 retention journal 결속 merge `e1dd5075`와 registered Local object boundary 보정 `f9274465` 뒤 BAK-02는 제품 retention plan/journal과 `RetentionApplyPartial`을 사용한다. 최종 hosted Linux run `36418968755`는 actual LocalObjects 8건, osError finding 0건, reference `MEASURED_PASS`이며 Backend 3.12/3.14가 모두 green이다. 물리 storage와 AC-11 축 승격은 여전히 미측정이다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+
 ## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
 
 - #177 `b246e7db` 위에 #185 승인 head `33ed1b8c`를 merge commit `067e6a48`로 결속했고 merge-tree exact 일치를 확인했다.
@@ -68,6 +93,18 @@ source_of_truth: "Git"
 - Claude r2 N1을 반영해 raw 22-case universe를 PG-free 12개와 hosted 10개 실행 subset으로 분리하고 각각 identity SHA를 고정했다. 한 계층 run이 다른 계층 case를 실행하지 않아도 누락이 아니다.
 - storage-only evidence로 AC-11 `long-soak`을 닫던 우회를 없앴다. PG-free·hosted·물리 storage는 모두 reference-only이며, 열·전원·NTP·스위치·WAN·원격 WS를 포함한 composite target 승인 전 `long-soak=NOT_REGISTERED`다. registry patch는 PITR target 교체만 제안한다.
 - physical storage와 PITR은 부류별 identity·recovery를 요구하고, Local byte 변조는 read 전 mode 복원, metric 계수 의미, 선행 카드 `CARD-S11-AC11-REGISTRY-REPIN-01`을 명시했다. target source는 commit `3363ab77…`·blob `421d4d3a…`로 고정했고 문서·bindings·ontology·ratchet 게이트는 exit 0이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정 `NOT_OBSERVED`; push 뒤 Claude 재검토를 요청한다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[S11_ST_storage_failure_target_v0]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
+
+## 2026-09-28 Card70 S11-ST Local 저장 실패·retention journal — reviewer 인계
+
+- PR #198에서 Local provider의 host `OSError`를 기존 `STORE-0001`/503/retryable로 닫고, PITR retention apply에 durable journal·중단 재개·중복 삭제 방지·완료 receipt 회전을 구현했다. 공개 schema·route·migration 변화는 없다.
+- Claude 1차 E1~E5 뒤 r2 N1~N5를 반영했다. directory ctime 결속은 partial rmtree/권한 복구를 막으므로 제거하고, device+inode + rmtree 전 durable 외부 removal marker로 hard-interrupt 재개와 journal-only 위조 거부를 함께 고정했다. stale journal은 receipt를 보존하는 명시적 `--abandon-journal`에서만 현재 디스크로 재계획하고, `ResultView` Local read도 canonical session을 사용한다.
+- Claude r3의 최종 조건으로 marker 발행을 temp write·file fsync·atomic replace·directory fsync로 바꾸고, replace 전 hard interruption이 orphan temp를 남겨도 다음 실행을 막지 않는 회귀를 추가했다. runbook에는 abandon·label-less residue·v1 fail-closed·동시 apply 금지를 기록했다. 최종 code/test head `3178edc8`의 로컬 PG-free는 retention 37 passed, S11 경계 32 passed/12 Linux-only skipped, artifact 계약 18 passed, route coverage 40 passed이며 format/compile/diff도 통과했다. hosted Backend `36402267753`은 양 Python 각각 3174 passed/47 declared skipped/2 deselected/0 failed, Core `36402267783`은 main 3479 passed/17 declared skipped/2 deselected/0 failed + LAN 15 + CX01 18/2 declared skip + Docker host 2이고 exact/build/Go/TS/S01 gate가 모두 green이다. Claude r4가 head `3178edc8`을 승인했다. 상태는 self-close 금지에 따라 `review`; 다음은 코디네이터의 #173 뒤 retarget·병합이며 실제 disk-full·전원 차단·물리 PITR restore는 미측정이다. [[2026-09-28_17-27-00_KST_S11_Local_retention_journal_Codex]].
+
+## 2026-09-28 Card52 S3 ObjectStore 관찰 후속 — reviewer 인계
+
+- PR #159 Claude r3의 비차단 관찰을 #159 위 PR #173으로 분리했다. S3 checkout은 persisted provider를 exact resolve하고, collect는 locator prefix를 `deleting` 커밋 전에 검증하며, begin/prefix drift는 `STORE-0001`/503/retryable로 통일했다. malformed locator 422와 upload content identity 409는 유지한다.
+- restore의 새 요청은 Run state/version/attempt를 checkpoint pin보다 먼저 검증해 `GRAPH-0003`을 유지한다. object byte/delete 호출 11곳의 provider mismatch guard 순서를 회귀 시험으로 고정했다.
+- Claude 조건부 검토 뒤 실제 checkout 호출 지점과 ResultStore prepare/complete·ShardCompletion once의 mismatch 동작 시험을 보강해 focused 26 passed, 최종 head `f02dacf6`이다. hosted Backend `36377648185`는 3.12/3.14 각각 3077 passed/47 skipped/2 deselected/0 failed, Core `36377648156`은 3383 passed/36 skipped/2 deselected/0 failed와 exact skip gate, S01은 2+3 passed, Docs·desktop-browser도 success다. Claude 재대조 r2는 해당 head를 승인했으며, #159 병합 뒤 retarget·병합은 코디네이터 담당이다. 로컬 실 PG·Docker는 미실행이다. [[2026-09-28_12-40-00_KST_S3_ObjectStore_관찰후속_Codex]].
 
 ## 2026-09-28 카드 90 — AC-11 migration 0047~0053 통합·재핀 cascade
 
