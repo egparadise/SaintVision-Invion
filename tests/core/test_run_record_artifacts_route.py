@@ -118,6 +118,15 @@ def build(monkeypatch, world):
     from saintvision.api.deps import get_session
 
     app.dependency_overrides[get_session] = lambda: session
+    # The shared denial recorder (#195) writes through the app's engine, which
+    # these tests do not have; recorded here so a 403's audit call is asserted, not lost.
+    from saintvision.api import app as app_module
+
+    monkeypatch.setattr(
+        app_module,
+        "record_denial_out_of_band",
+        lambda _engine, **kwargs: world.setdefault("denials_recorded", []).append(kwargs),
+    )
 
     calls = world.setdefault("access_calls", [])
 
