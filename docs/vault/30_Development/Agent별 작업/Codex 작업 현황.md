@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T14:16:18+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 S11-ST 손상·용량·backup 장애 시험 설계 — PR 요청
+
+- 객체 손상·부분 쓰기·용량 소진은 AC-11 `long-soak`의 hosted 하위 matrix, WAL archive·retention 장애는 `actual-pitr-rpo-rto-retention` 축으로 분리했다. hosted archive·same-host dry-run은 운영 PITR 합격으로 승격하지 않는다.
+- target을 결과보다 먼저 Git에 고정했다: hosted 3600초·1000 operation·fault 6/6와 손실/유출/overshoot/residue 0, 운영 RPO 900초·RTO 3600초·35일·2주 smoke 및 archive/retention fault 뒤 복구 2건이다.
+- Local disk-full의 raw `OSError`와 retention apply 중단의 journal 부재는 현재 구현 공백이다. 공개 계약·migration·registry 상태는 불변이며 S11-ST `planned`, 측정은 `NOT_OBSERVED`, Claude 설계 검토 대기다. [[S11-ST_손상_용량_backup_장애시험_설계]], [[2026-09-28_14-16-18_KST_S11-ST_손상_용량_backup_장애시험_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
