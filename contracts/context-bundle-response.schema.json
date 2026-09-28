@@ -1,0 +1,158 @@
+{
+  "$defs": {
+    "ContextBundleItemSummary": {
+      "additionalProperties": false,
+      "description": "One bundle item without its content: what was read, in what version,\nand the digest and byte length of the text -- never the text itself and\nnot the caller-written source URI.",
+      "properties": {
+        "byteSize": {
+          "minimum": 0,
+          "title": "Bytesize",
+          "type": "integer"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "contentHash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contenthash",
+          "type": "string"
+        },
+        "itemId": {
+          "maxLength": 255,
+          "minLength": 1,
+          "title": "Itemid",
+          "type": "string"
+        },
+        "itemVersion": {
+          "minimum": 1,
+          "title": "Itemversion",
+          "type": "integer"
+        },
+        "kind": {
+          "pattern": "^(document|code|message|tool_output|summary)$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "redacted": {
+          "title": "Redacted",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ordinal",
+        "itemId",
+        "itemVersion",
+        "kind",
+        "contentHash",
+        "byteSize",
+        "redacted"
+      ],
+      "title": "ContextBundleItemSummary",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A run's context bundle as metadata (G-04 R3).\n\n``hashVerified`` is ``verify_bundle``'s answer, reported as a fact: false\nmeans the stored content no longer reproduces the bundle hash. ``sealed``\nsays whether this is the bundle the run's sealed record pins (true) or the\nrun's most recently built bundle (false). ``itemCount``/``totalBytes`` are\nthe bundle's own columns; ``items`` is the ordered item list. No content,\nno person, no free text.",
+  "properties": {
+    "builtAt": {
+      "format": "date-time",
+      "title": "Builtat",
+      "type": "string"
+    },
+    "bundleHash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Bundlehash",
+      "type": "string"
+    },
+    "bundleId": {
+      "title": "Bundleid",
+      "type": "string"
+    },
+    "componentVersions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Componentversions",
+      "type": "object"
+    },
+    "hashVerified": {
+      "title": "Hashverified",
+      "type": "boolean"
+    },
+    "itemCount": {
+      "minimum": 0,
+      "title": "Itemcount",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ContextBundleItemSummary"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "retrievalStrategy": {
+      "pattern": "^(lexical|metadata|hybrid|explicit)$",
+      "title": "Retrievalstrategy",
+      "type": "string"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    },
+    "sealed": {
+      "title": "Sealed",
+      "type": "boolean"
+    },
+    "tokenEstimate": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tokenestimate"
+    },
+    "totalBytes": {
+      "minimum": 0,
+      "title": "Totalbytes",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "bundleId",
+    "runId",
+    "bundleHash",
+    "hashVerified",
+    "sealed",
+    "itemCount",
+    "totalBytes",
+    "retrievalStrategy",
+    "componentVersions",
+    "builtAt",
+    "items"
+  ],
+  "title": "ContextBundleResponse",
+  "type": "object"
+}
