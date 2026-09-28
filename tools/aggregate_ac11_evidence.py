@@ -20,7 +20,7 @@ import math
 import re
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Protocol
@@ -35,6 +35,10 @@ TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-regis
 TARGET_REGISTRY_BLOB = "be99a506efecdb2ff29cf4e7a96a8772f5524473"
 ALLOWLIST_BLOB = "ff2f9966956da677ebcdee92ec1de2292bd5ec52"
 ALLOWLIST_CANONICAL_SHA256 = "b73aba8ff97443bbd1e314d5ca0375fdcbce8205a1a746bc5a73759a04083707"
+SCAN_ALLOWLIST_REPO_PATH = (
+    "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
+)
+SCAN_ALLOWLIST_BLOB = "7e78403a33ebb66a4abd78ddbfa8fee405d3a3ba"
 SCHEMA_VERSION = "1.0.0"
 RUN_PURPOSE = "ac11-release-gate"
 AXIS_PURPOSE = "ac11-axis-evidence"
@@ -70,6 +74,8 @@ REQUIRED_TARGET_BY_AXIS = {
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 KNOWN_OPERATORS = {"lt", "lte", "eq", "gte", "gt"}
+SCAN_FRESHNESS = timedelta(days=30)
+PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
@@ -168,6 +174,18 @@ def _utc(value: Any, field: str) -> datetime:
     return parsed
 
 
+def _timezone_aware(value: Any, field: str) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError(f"{field} must be an RFC3339 string")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{field} is not RFC3339") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{field} must include a timezone")
+    return parsed
+
+
 def _files(value: Any) -> list[dict[str, str]]:
     if not isinstance(value, list):
         raise ValueError("toolFiles must be a list")
@@ -179,6 +197,14 @@ def _files(value: Any) -> list[dict[str, str]]:
             raise ValueError("toolFiles blob must be a full Git blob SHA")
         normalized.append({"path": str(item["path"]), "blob": str(item["blob"])})
     return sorted(normalized, key=lambda row: row["path"])
+
+
+def _canonical_sha256(value: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+            "utf-8"
+        )
+    ).hexdigest()
 
 
 def _producer_verdict(value: Any) -> Verdict:
@@ -672,6 +698,350 @@ def evaluate_vf(report: dict[str, Any], allowlist: dict[str, Any]) -> Verdict:
     return Verdict.INVALID_RUN
 
 
+def validate_scan_allowlist(value: Any) -> dict[str, Any]:
+    expected = {
+        "schemaVersion", "verifiedAt", "producer", "workflow", "importer",
+        "scanners", "acceptedFindings"
+    }
+    if not isinstance(value, dict) or set(value) != expected:
+        raise ValueError("dependency/SAST allowlist shape is not reviewed")
+    if value["schemaVersion"] != SCHEMA_VERSION:
+        raise ValueError("dependency/SAST allowlist schema is unknown")
+    _timezone_aware(value["verifiedAt"], "dependency/SAST verifiedAt")
+    _files([value["producer"], value["workflow"], value["importer"]])
+    scanners = value["scanners"]
+    if not isinstance(scanners, list) or len(scanners) != 2:
+        raise ValueError("dependency/SAST scanner inventory must contain exactly two rows")
+    by_id: dict[str, dict[str, Any]] = {}
+    for scanner in scanners:
+        if not isinstance(scanner, dict) or set(scanner) != {
+            "id", "version", "scopePaths", "severityPolicy"
+        }:
+            raise ValueError("dependency/SAST scanner row is malformed")
+        scanner_id = scanner["id"]
+        if scanner_id not in {"bandit", "pip-audit"} or scanner_id in by_id:
+            raise ValueError("dependency/SAST scanner ID is unknown or duplicated")
+        scope = scanner["scopePaths"]
+        if (
+            not isinstance(scanner["version"], str)
+            or not scanner["version"]
+            or not isinstance(scope, list)
+            or not scope
+            or len(scope) != len(set(scope))
+            or any(not isinstance(path, str) or not path for path in scope)
+        ):
+            raise ValueError("dependency/SAST scanner version or scope is malformed")
+        policy = "HIGH_ONLY" if scanner_id == "bandit" else "ANY_VULNERABILITY_AS_HIGH"
+        if scanner["severityPolicy"] != policy:
+            raise ValueError("dependency/SAST severity policy is not fail-closed")
+        by_id[scanner_id] = scanner
+    entries = value["acceptedFindings"]
+    if not isinstance(entries, list):
+        raise ValueError("dependency/SAST acceptedFindings must be a list")
+    identities: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict) or set(entry) != {
+            "findingId", "severity", "reason", "expiresAt"
+        }:
+            raise ValueError("dependency/SAST accepted finding is malformed")
+        finding_id = entry["findingId"]
+        if not isinstance(finding_id, str) or not finding_id or finding_id in identities:
+            raise ValueError("dependency/SAST accepted finding ID is empty or duplicated")
+        identities.add(finding_id)
+        if entry["severity"] not in {"CRITICAL", "HIGH"}:
+            raise ValueError("dependency/SAST accepted finding severity is unknown")
+        if not isinstance(entry["reason"], str) or not entry["reason"].strip():
+            raise ValueError("dependency/SAST accepted finding reason is required")
+        _timezone_aware(entry["expiresAt"], "dependency/SAST accepted finding expiry")
+    return value
+
+
+def _canonical_package(value: str) -> str:
+    return re.sub(r"[-_.]+", "-", value).lower()
+
+
+def _registered_pins(content: str) -> dict[str, str]:
+    pins: dict[str, str] = {}
+    for raw in content.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        match = PIN_RE.fullmatch(line)
+        if match is None:
+            raise ValueError("registered requirements contain a non-exact pin")
+        name, version = _canonical_package(match.group(1)), match.group(2)
+        if name in pins:
+            raise ValueError("registered requirements contain a duplicate package")
+        pins[name] = version
+    if not pins:
+        raise ValueError("registered requirements contain no exact pins")
+    return pins
+
+
+def evaluate_security_scan(
+    report: dict[str, Any], scan_allowlist: dict[str, Any], now: datetime, git: GitReader, source: str
+) -> Verdict:
+    if report.get("reportAvailable") is not True or report.get("status") != "complete":
+        return Verdict.NOT_OBSERVED
+    payload = report.get("payload")
+    payload_sha = report.get("payloadSha256")
+    if not isinstance(payload, dict) or not SHA256_RE.fullmatch(str(payload_sha)):
+        return Verdict.NOT_OBSERVED
+    if _canonical_sha256(payload) != payload_sha:
+        return Verdict.NOT_OBSERVED
+    if report.get("runPurpose") != "s11-ac11-security-scan":
+        return Verdict.INVALID_RUN
+    if report.get("schemaVersion") != SCHEMA_VERSION or report.get("threatId") != "SEC-SCAN-001":
+        return Verdict.INVALID_RUN
+    source_run_id = report.get("sourceRunId")
+    if not isinstance(source_run_id, str) or not source_run_id.isdigit():
+        return Verdict.INVALID_RUN
+    if report.get("sourceHeadSha") != source:
+        return Verdict.NOT_OBSERVED
+    if report.get("checkoutTreeSha") != git.tree(source) or report.get("cleanCheckout") is not True:
+        return Verdict.NOT_OBSERVED
+    environment = report.get("environment")
+    if (
+        not isinstance(environment, dict)
+        or set(environment) != {
+            "runnerImage", "topology", "evidenceClass", "credentialsRequired",
+            "externalServicesRequired",
+        }
+        or not isinstance(environment["runnerImage"], str)
+        or not environment["runnerImage"]
+        or environment["topology"] != "hosted"
+        or environment["evidenceClass"] != "security-tools-v0"
+        or environment["credentialsRequired"] is not False
+        or environment["externalServicesRequired"] is not True
+    ):
+        return Verdict.INVALID_RUN
+    try:
+        started = _utc(report.get("startedAt"), "security scan startedAt")
+        finished = _utc(report.get("finishedAt"), "security scan finishedAt")
+    except ValueError:
+        return Verdict.INVALID_RUN
+    if finished < started or finished > now or now - finished > SCAN_FRESHNESS:
+        return Verdict.NOT_OBSERVED
+    artifact = report.get("scanArtifact")
+    artifact_keys = {
+        "repository", "workflowPath", "runId", "artifactId", "artifactName",
+        "digest", "observedDigest", "expiresAt", "runConclusion",
+        "producerReportSha256", "junitSha256",
+    }
+    if not isinstance(artifact, dict) or set(artifact) != artifact_keys:
+        return Verdict.NOT_OBSERVED
+    if (
+        artifact["repository"] != "egparadise/SaintVision-Invion"
+        or artifact["workflowPath"] != ".github/workflows/ac11-security-scan.yml"
+        or artifact["runId"] != source_run_id
+        or not str(artifact["artifactId"]).isdigit()
+        or artifact["artifactName"] != f"s11-ac11-security-{source}"
+        or artifact["runConclusion"] != "success"
+        or not SHA256_RE.fullmatch(str(artifact["digest"]))
+        or artifact["observedDigest"] != artifact["digest"]
+        or not SHA256_RE.fullmatch(str(artifact["producerReportSha256"]))
+        or not SHA256_RE.fullmatch(str(artifact["junitSha256"]))
+    ):
+        return Verdict.NOT_OBSERVED
+    try:
+        if _utc(artifact["expiresAt"], "security scan artifact expiry") <= now:
+            return Verdict.NOT_OBSERVED
+    except ValueError:
+        return Verdict.INVALID_RUN
+    allowlist_ref = report.get("allowlist")
+    if allowlist_ref != {"path": SCAN_ALLOWLIST_REPO_PATH, "blob": SCAN_ALLOWLIST_BLOB}:
+        return Verdict.INVALID_RUN
+    expected_files = [
+        scan_allowlist["producer"], scan_allowlist["workflow"], scan_allowlist["importer"]
+    ]
+    if _files(report.get("toolFiles")) != _files(expected_files):
+        return Verdict.INVALID_RUN
+    for item in _files(expected_files):
+        if git.blob(source, item["path"]) != item["blob"]:
+            return Verdict.INVALID_RUN
+    scanner_specs = {row["id"]: row for row in scan_allowlist["scanners"]}
+    expected_versions = {key: scanner_specs[key]["version"] for key in sorted(scanner_specs)}
+    if payload.get("scannerVersions") != expected_versions:
+        return Verdict.INVALID_RUN
+    exits = payload.get("scannerExitCodes")
+    if (
+        not isinstance(exits, dict)
+        or set(exits) != {"bandit", "pip-audit"}
+        or any(value not in (0, 1) for value in exits.values())
+    ):
+        return Verdict.INVALID_RUN
+    expected_scope = sorted(
+        {path for scanner in scanner_specs.values() for path in scanner["scopePaths"]}
+    )
+    inputs = payload.get("scanInputs")
+    if not isinstance(inputs, list) or len(inputs) != len(expected_scope):
+        return Verdict.INVALID_RUN
+    normalized_inputs: list[dict[str, str]] = []
+    for row in inputs:
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"path", "objectId"}
+            or not SHA1_RE.fullmatch(str(row["objectId"]))
+        ):
+            return Verdict.INVALID_RUN
+        normalized_inputs.append({"path": str(row["path"]), "objectId": str(row["objectId"])})
+    if [row["path"] for row in normalized_inputs] != expected_scope:
+        return Verdict.INVALID_RUN
+    if any(git.blob(source, row["path"]) != row["objectId"] for row in normalized_inputs):
+        return Verdict.INVALID_RUN
+    expected_payload_keys = {
+        "scannerVersions", "scannerExitCodes", "scanInputs", "summaries",
+        "auditedDependencies", "scannedPythonFiles",
+        "criticalHighFindings", "criticalCount", "highCount",
+        "unallowlistedFindingIds", "expiredFindingIds", "staleAllowlistFindingIds",
+        "severityMismatchFindingIds",
+    }
+    if set(payload) != expected_payload_keys:
+        return Verdict.INVALID_RUN
+    summaries = payload["summaries"]
+    if (
+        not isinstance(summaries, dict)
+        or set(summaries) != {"bandit", "pip-audit"}
+        or set(summaries["bandit"]) != {
+            "lowFindingCount", "mediumFindingCount", "highFindingCount",
+            "scannedFileCount",
+        }
+        or set(summaries["pip-audit"]) != {"dependencyCount", "findingCount"}
+        or any(
+            isinstance(count, bool) or not isinstance(count, int) or count < 0
+            for summary in summaries.values()
+            for count in summary.values()
+        )
+    ):
+        return Verdict.INVALID_RUN
+    audited = payload["auditedDependencies"]
+    if not isinstance(audited, list) or not audited:
+        return Verdict.INVALID_RUN
+    audited_map: dict[str, str] = {}
+    for row in audited:
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"name", "version"}
+            or not isinstance(row["name"], str)
+            or not row["name"]
+            or not isinstance(row["version"], str)
+            or not row["version"]
+            or row["name"] in audited_map
+        ):
+            return Verdict.INVALID_RUN
+        audited_map[row["name"]] = row["version"]
+    if audited != [
+        {"name": name, "version": audited_map[name]} for name in sorted(audited_map)
+    ]:
+        return Verdict.INVALID_RUN
+    requirements_path = scanner_specs["pip-audit"]["scopePaths"][0]
+    try:
+        required_pins = _registered_pins(git.show(source, requirements_path))
+    except ValueError:
+        return Verdict.INVALID_RUN
+    if any(audited_map.get(name) != version for name, version in required_pins.items()):
+        return Verdict.INVALID_RUN
+    if summaries["pip-audit"]["dependencyCount"] != len(audited):
+        return Verdict.INVALID_RUN
+    scanned_files = payload["scannedPythonFiles"]
+    if (
+        not isinstance(scanned_files, list)
+        or not scanned_files
+        or scanned_files != sorted(scanned_files)
+        or len(scanned_files) != len(set(scanned_files))
+        or any(not isinstance(path, str) or not path.endswith(".py") for path in scanned_files)
+    ):
+        return Verdict.INVALID_RUN
+    expected_python_files = sorted(
+        path
+        for prefix in scanner_specs["bandit"]["scopePaths"]
+        for path in git.list_paths(source, prefix)
+        if path.endswith(".py")
+    )
+    if scanned_files != expected_python_files:
+        return Verdict.INVALID_RUN
+    if summaries["bandit"]["scannedFileCount"] != len(scanned_files):
+        return Verdict.INVALID_RUN
+    findings = payload["criticalHighFindings"]
+    if not isinstance(findings, list):
+        return Verdict.INVALID_RUN
+    actual: dict[str, dict[str, Any]] = {}
+    finding_keys = {"findingId", "scanner", "severity", "ruleId", "component", "location"}
+    for finding in findings:
+        if not isinstance(finding, dict) or set(finding) != finding_keys:
+            return Verdict.INVALID_RUN
+        finding_id = finding["findingId"]
+        if (
+            not isinstance(finding_id, str)
+            or not finding_id
+            or finding_id in actual
+            or finding["scanner"] not in scanner_specs
+            or finding["severity"] not in {"CRITICAL", "HIGH"}
+            or any(not isinstance(finding[key], str) or not finding[key] for key in finding_keys - {"findingId", "scanner", "severity"})
+        ):
+            return Verdict.INVALID_RUN
+        if finding["scanner"] == "pip-audit" and finding["severity"] != "HIGH":
+            return Verdict.INVALID_RUN
+        actual[finding_id] = finding
+    if findings != sorted(findings, key=lambda row: row["findingId"]):
+        return Verdict.INVALID_RUN
+    critical = sum(row["severity"] == "CRITICAL" for row in findings)
+    high = sum(row["severity"] == "HIGH" for row in findings)
+    if payload["criticalCount"] != critical or payload["highCount"] != high:
+        return Verdict.INVALID_RUN
+    if summaries["bandit"]["highFindingCount"] != sum(
+        row["scanner"] == "bandit" for row in findings
+    ) or summaries["pip-audit"]["findingCount"] != sum(
+        row["scanner"] == "pip-audit" for row in findings
+    ):
+        return Verdict.INVALID_RUN
+    expected_pip_exit = 1 if summaries["pip-audit"]["findingCount"] else 0
+    bandit_total = sum(
+        summaries["bandit"][key]
+        for key in ("lowFindingCount", "mediumFindingCount", "highFindingCount")
+    )
+    expected_bandit_exit = 1 if bandit_total else 0
+    if exits != {"pip-audit": expected_pip_exit, "bandit": expected_bandit_exit}:
+        return Verdict.INVALID_RUN
+    accepted = {row["findingId"]: row for row in scan_allowlist["acceptedFindings"]}
+    stale = sorted(set(accepted) - set(actual))
+    unallowlisted = sorted(set(actual) - set(accepted))
+    expired = sorted(
+        finding_id
+        for finding_id in set(actual) & set(accepted)
+        if _timezone_aware(
+            accepted[finding_id]["expiresAt"], "dependency/SAST finding expiry"
+        ) <= now
+    )
+    severity_mismatch = sorted(
+        finding_id
+        for finding_id in set(actual) & set(accepted)
+        if accepted[finding_id]["severity"] != actual[finding_id]["severity"]
+    )
+    expected_lists = {
+        "unallowlistedFindingIds": unallowlisted,
+        "expiredFindingIds": expired,
+        "staleAllowlistFindingIds": stale,
+        "severityMismatchFindingIds": severity_mismatch,
+    }
+    if any(payload[key] != value for key, value in expected_lists.items()):
+        return Verdict.INVALID_RUN
+    if stale:
+        failure_class = "STALE_ALLOWLIST"
+    elif severity_mismatch:
+        failure_class = "ALLOWLIST_SEVERITY_MISMATCH"
+    elif expired:
+        failure_class = "EXPIRED_ALLOWLIST"
+    elif unallowlisted:
+        failure_class = "UNALLOWLISTED_CRITICAL_HIGH"
+    else:
+        failure_class = "NONE"
+    computed = Verdict.MEASURED_PASS if failure_class == "NONE" else Verdict.MEASURED_FAIL
+    if report.get("failureClass") != failure_class or report.get("verdict") != computed.value:
+        return Verdict.INVALID_RUN
+    return computed
+
+
 def _security_observations(
     envelope: dict[str, Any], allowlist: dict[str, Any], now: datetime, git: GitReader, source: str
 ) -> Verdict:
@@ -685,7 +1055,7 @@ def _security_observations(
         if not isinstance(report, dict) or report.get("threatId") in by_id:
             raise ValueError("security threat IDs must be unique")
         by_id[report.get("threatId")] = report
-    expected = {"SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001"}
+    expected = {"SEC-DEF-001", "SEC-RLS-001", "SEC-VF-001", "SEC-SCAN-001"}
     if set(by_id) - expected:
         raise ValueError("unregistered security threat ID")
     if set(by_id) != expected:
@@ -694,10 +1064,19 @@ def _security_observations(
         for item in _files(report.get("toolFiles")):
             if git.blob(source, item["path"]) != item["blob"]:
                 return Verdict.INVALID_RUN
+    if git.blob(source, SCAN_ALLOWLIST_REPO_PATH) != SCAN_ALLOWLIST_BLOB:
+        return Verdict.INVALID_RUN
+    try:
+        scan_allowlist = validate_scan_allowlist(
+            json.loads(git.show(source, SCAN_ALLOWLIST_REPO_PATH))
+        )
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return Verdict.INVALID_RUN
     verdicts = [
         evaluate_definer(by_id["SEC-DEF-001"], allowlist),
         evaluate_rls(by_id["SEC-RLS-001"], allowlist, now),
         evaluate_vf(by_id["SEC-VF-001"], allowlist),
+        evaluate_security_scan(by_id["SEC-SCAN-001"], scan_allowlist, now, git, source),
     ]
     if Verdict.INVALID_RUN in verdicts:
         return Verdict.INVALID_RUN
