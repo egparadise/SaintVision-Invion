@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 from ..db.models import EvalCase, EvalResult, EvalRun, EvalSuite
 from ..errors import VAL_SCHEMA, InvError
 from ..ids import new_id
+from .tracking import enqueue_mirror, eval_run_mirror_payload
 from .evidence import canonical_sha256
 
 CATEGORIES = (
@@ -282,6 +283,15 @@ def finish_eval_run(
     )
     run.ended_at = now
     session.flush()
+    enqueue_mirror(
+        session,
+        tenant_id=tenant_id,
+        subject_kind="eval_run",
+        subject_id=run.eval_run_id,
+        project_id=None,
+        payload=eval_run_mirror_payload(run, now=now),
+        now=now,
+    )
     return run
 
 
