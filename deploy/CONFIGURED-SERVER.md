@@ -23,11 +23,17 @@ Compose는 자동 DB 초기화/마이그레이션/운영 로그인 생성을 수
     "client_ids": ["approved-web-client"],
     "jwks_file": "/run/saintvision/jwks.json"
   },
+  "configurationReadiness": {
+    "nodeMtlsCaBundle": "/run/saintvision/node-mtls-ca.pem",
+    "objectStoreEndpoint": "https://objects.example.invalid"
+  },
   "allowedOrigins": ["https://studio.example.invalid"]
 }
 ```
 
 `jwks.json`은 관리자가 검증한 공개 RSA 키만 포함하는 로컬 신뢰 묶음이다. `{ "issuer": "동일 issuer", "expiresAt": 정수 Unix 시각, "keys": [RS256 공개 JWK] }` 형식이며 만료는 현재부터 7일 이내다. 실제 issuer/audience/client와 키 출처를 확인한 뒤 배포한다. 개인 키를 서버 설정 디렉터리에 넣지 않는다. 네트워크에서 임의 키를 자동 신뢰하지 않는다.
+
+`configurationReadiness.nodeMtlsCaBundle`이 참조하는 파일은 같은 입력 디렉터리에 두며 `tools/prepare_server_config.py`가 검증된 Linux config volume으로 복사한다. 운영 route는 경로 문자열 존재만 보지 않고 PEM을 읽어 `BasicConstraints.ca=true` 인증서가 하나 이상인지 확인한다. `objectStoreEndpoint`도 단순 비어 있지 않음이 아니라 자격증명 없는 HTTP(S) URL인지 확인한다. 두 값·경로·인증서 내용은 응답에 나오지 않고, 실패하면 호환 이름 `INV_NODE_MTLS_CA_BUNDLE` 또는 `INV_OBJECT_STORE_ENDPOINT`만 `unresolvedSettings`에 남는다.
 
 컨테이너 UID/GID `65532:65532`가 디렉터리를 탐색하고 파일을 읽을 수 있어야 한다. Linux 설정 파일은 일반 파일이고 group/other 쓰기 권한이 없어야 한다(예: 소유자 65532, 파일 0600, 디렉터리 0700). 이 서버의 Windows bind mount는 파일이0777로 노출되어 trusted_file 검사가 실제 거부했다. 아래 전용 Linux volume 준비 경로를 사용한다. 운영 키 파일에 일괄 chmod/chown을 적용하지 않는다.
 
