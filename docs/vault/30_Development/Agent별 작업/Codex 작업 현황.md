@@ -1,7 +1,7 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.207"
+version: "1.0.208"
 status: "review"
 author: "Codex"
 updated: "2026-09-28T16:25:00+09:00"
@@ -30,6 +30,12 @@ source_of_truth: "Git"
 - migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
 - PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
 - Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
+## 2026-09-28 카드 41 S01 readiness 후속 — 검토 요청
+
+- PR #122 승인 head `44f4bd7d` 위 코드/시험 `74789bfc`, owner Codex/reviewer Claude. `--health-url`을 #129의 operator-authenticated `--settings-url`로 교체하고 Node CA/Object Store 설정 이름을 독립 판정한다. U2는 settings에서 분리해 `/readyz`와 실/무토큰 session만 소비한다.
+- U6는 #135 evidence와 별도 strict 운영자 attestation이 operational·PASS, 정확한 6 check, reachable SHA, 24시간 이내 UTC, 동일 SHA·시각으로 결속될 때만 PASS다. ci-candidate·unknown field/check·unreachable SHA·attestation 불일치와 settings 401/403/503은 BLOCKED이며 trusted operational FAIL은 FAIL이다. 출력 schema는 `s01-readiness-preflight:2`; 비밀·식별값은 내보내지 않는다.
+- Claude 조건부 승인 뒤 #135에 없는 `operatorProcedure` 요구를 제거하고 `--storage-attestation`을 분리했다. 오래된/미래 시각, schema 1.0, git 부재와 strict key 부정 시험까지 focused PG-free 44 passed다. 실 PG·Docker·전체 suite 미실행. 설계·History를 v1.3으로 갱신했으며 #122·#129·#135 병합 뒤에만 이 stacked PR을 병합한다. [[S01 준비 상태 preflight 수집기 설계]], [[2026-09-28_05-45-04_KST_S01_준비상태_preflight_Codex_구현]].
+
 ## 2026-09-28 S01-BE·S01-ST 준비 상태 preflight — 검토 요청
 
 - base `1e8baf04`, branch `agent/codex/s01-readiness-preflight`, 구현 `c959e158`, owner Codex/reviewer Claude. U1~U6이 들어오면 health/ready/session 200·401, CA→Node chain, DNS, 5 Node inventory lint, pilot PG capability 대조를 한 번에 수행하는 read-only 수집기를 추가했다.

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import ipaddress
 import json
@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 import socket
 import ssl
+import subprocess
 import sys
 from typing import Any, Callable
 from urllib.error import HTTPError
@@ -31,10 +32,45 @@ from inv.node_channels import certificate_identity
 from inv.tooling import NodePrincipal
 
 
-SCHEMA_VERSION = "s01-readiness-preflight:1"
+SCHEMA_VERSION = "s01-readiness-preflight:2"
 INVENTORY_SCHEMA_VERSION = "s01-readiness-inventory:1"
 _HEX_64 = re.compile(r"^[0-9a-f]{64}$")
 _NODE_ID = re.compile(r"^nod_[A-Za-z0-9][A-Za-z0-9_-]{0,126}$")
+_COMMIT_SHA = re.compile(r"^[0-9a-f]{40}$")
+_NODE_CA_SETTING = "INV_NODE_MTLS_CA_BUNDLE"
+_OBJECT_STORE_SETTING = "INV_OBJECT_STORE_ENDPOINT"
+_SETTINGS = frozenset({_NODE_CA_SETTING, _OBJECT_STORE_SETTING})
+_STORAGE_CHECKS = (
+    "put",
+    "get",
+    "bodySha256",
+    "metadataSha256",
+    "delete",
+    "cleanupVerified",
+)
+_STORAGE_EVIDENCE_FIELDS = frozenset(
+    {
+        "schemaVersion",
+        "status",
+        "targetKind",
+        "checks",
+        "payloadBytes",
+        "cleanupVerified",
+        "codeSha",
+        "observedAt",
+    }
+)
+_STORAGE_ATTESTATION_FIELDS = frozenset(
+    {
+        "executedBy",
+        "configurationProfile",
+        "runbookRevision",
+        "codeSha",
+        "observedAt",
+    }
+)
+_ATTESTATION_TEXT_FIELDS = ("executedBy", "configurationProfile", "runbookRevision")
+_DEFAULT_EVIDENCE_MAX_AGE = timedelta(hours=24)
 _FORBIDDEN_REPORT_KEYS = {
     "token",
     "dsn",
@@ -374,39 +410,143 @@ def lint_inventory(payload: dict[str, Any] | None) -> dict[str, Any]:
 def probe_control_plane(
     *,
     base_url: str | None,
-    health_url: str | None,
-    token: str | None,
+    settings_url: str | None,
+    session_token: str | None,
+    operator_token: str | None,
     fetch: Callable[..., tuple[int, Any, dict[str, str]]],
-    health_fetch: Callable[..., tuple[int, Any, dict[str, str]]],
+    settings_fetch: Callable[..., tuple[int, Any, dict[str, str]]],
 ) -> list[dict[str, Any]]:
     """Probe HTTP signals while returning no response or endpoint value."""
 
-    if not health_url:
-        health = _check(
-            "health-unresolved-settings",
-            "BLOCKED",
-            "health-url-missing",
-            unresolvedSettingCount=0,
-        )
+    setting_checks: list[dict[str, Any]]
+    if not settings_url:
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "BLOCKED",
+                "settings-url-missing",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "BLOCKED",
+                "settings-url-missing",
+                settingReady=False,
+            ),
+        ]
+    elif not operator_token or not operator_token.strip():
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "BLOCKED",
+                "operator-token-missing",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "BLOCKED",
+                "operator-token-missing",
+                settingReady=False,
+            ),
+        ]
+    elif urlsplit(settings_url).scheme.lower() != "https":
+        setting_checks = [
+            _check(
+                "configuration-node-ca",
+                "FAIL",
+                "plaintext-operator-token-transport-rejected",
+                settingReady=False,
+            ),
+            _check(
+                "configuration-object-store",
+                "FAIL",
+                "plaintext-operator-token-transport-rejected",
+                settingReady=False,
+            ),
+        ]
     else:
         try:
-            health_status, health_body, _ = health_fetch("", authenticated=False)
-            unresolved = health_body.get("unresolvedSettings") if isinstance(health_body, dict) else None
-            unresolved_count = len(unresolved) if isinstance(unresolved, list) else 0
-            health_valid = health_status == 200 and isinstance(unresolved, list) and not unresolved
-            health = _check(
-                "health-unresolved-settings",
-                "PASS" if health_valid else "FAIL",
-                "health-resolved" if health_valid else "health-not-resolved",
-                unresolvedSettingCount=unresolved_count,
-            )
+            settings_status, settings_body, _ = settings_fetch("", authenticated=True)
+            if settings_status in {401, 403, 503}:
+                setting_checks = [
+                    _check(
+                        "configuration-node-ca",
+                        "BLOCKED",
+                        "settings-access-blocked",
+                        settingReady=False,
+                    ),
+                    _check(
+                        "configuration-object-store",
+                        "BLOCKED",
+                        "settings-access-blocked",
+                        settingReady=False,
+                    ),
+                ]
+            else:
+                unresolved = (
+                    settings_body.get("unresolvedSettings")
+                    if isinstance(settings_body, dict)
+                    else None
+                )
+                declared_status = (
+                    settings_body.get("status") if isinstance(settings_body, dict) else None
+                )
+                valid_names = (
+                    settings_status == 200
+                    and isinstance(unresolved, list)
+                    and len(unresolved) == len(set(unresolved))
+                    and all(isinstance(name, str) and name in _SETTINGS for name in unresolved)
+                )
+                derived_status = "ready" if valid_names and not unresolved else "blocked"
+                response_valid = valid_names and declared_status == derived_status
+                if not response_valid:
+                    setting_checks = [
+                        _check(
+                            "configuration-node-ca",
+                            "FAIL",
+                            "settings-response-invalid",
+                            settingReady=False,
+                        ),
+                        _check(
+                            "configuration-object-store",
+                            "FAIL",
+                            "settings-response-invalid",
+                            settingReady=False,
+                        ),
+                    ]
+                else:
+                    unresolved_set = set(unresolved)
+                    setting_checks = []
+                    for check_id, setting in (
+                        ("configuration-node-ca", _NODE_CA_SETTING),
+                        ("configuration-object-store", _OBJECT_STORE_SETTING),
+                    ):
+                        ready = setting not in unresolved_set
+                        setting_checks.append(
+                            _check(
+                                check_id,
+                                "PASS" if ready else "BLOCKED",
+                                "setting-structure-ready"
+                                if ready
+                                else "setting-unresolved",
+                                settingReady=ready,
+                            )
+                        )
         except Exception:
-            health = _check(
-                "health-unresolved-settings",
-                "FAIL",
-                "health-probe-failed",
-                unresolvedSettingCount=0,
-            )
+            setting_checks = [
+                _check(
+                    "configuration-node-ca",
+                    "FAIL",
+                    "settings-probe-failed",
+                    settingReady=False,
+                ),
+                _check(
+                    "configuration-object-store",
+                    "FAIL",
+                    "settings-probe-failed",
+                    settingReady=False,
+                ),
+            ]
 
     if not base_url:
         ready = _check("readyz", "BLOCKED", "base-url-missing", readySignalValid=False)
@@ -417,7 +557,7 @@ def probe_control_plane(
             authenticatedSessionValid=False,
             anonymousBoundaryValid=False,
         )
-        return [health, ready, session]
+        return [*setting_checks, ready, session]
 
     try:
         ready_status, ready_body, _ = fetch("/readyz", authenticated=False)
@@ -445,7 +585,7 @@ def probe_control_plane(
         )
     except Exception:
         anonymous_failed = True
-    if token is None or not token.strip():
+    if session_token is None or not session_token.strip():
         session = _check(
             "session-boundary",
             "BLOCKED" if anonymous_valid else "FAIL",
@@ -480,7 +620,7 @@ def probe_control_plane(
             authenticatedSessionValid=authenticated_valid,
             anonymousBoundaryValid=anonymous_valid,
         )
-    return [health, ready, session]
+    return [*setting_checks, ready, session]
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -830,13 +970,210 @@ def probe_pilot_capabilities(
         return _check("pilot-capability-match", "FAIL", "pilot-database-probe-failed", inventoryNodeCount=5, registeredNodeCount=0, matchedNodeCount=0, databaseReadOnly=False)
 
 
+def _commit_reachable(code_sha: str) -> bool:
+    if not _COMMIT_SHA.fullmatch(code_sha):
+        return False
+    try:
+        completed = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", code_sha, "HEAD"],
+            cwd=ROOT,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return completed.returncode == 0
+
+
+def evaluate_storage_evidence(
+    payload: Any,
+    attestation: Any,
+    *,
+    now: datetime | None = None,
+    reachable: Callable[[str], bool] | None = None,
+    max_age: timedelta = _DEFAULT_EVIDENCE_MAX_AGE,
+) -> dict[str, Any]:
+    """Validate operational roundtrip evidence without returning any input value."""
+
+    payload_shape_valid = isinstance(payload, dict) and set(payload) == set(
+        _STORAGE_EVIDENCE_FIELDS
+    )
+    checks = payload.get("checks") if isinstance(payload, dict) else None
+    checks_shape_valid = isinstance(checks, dict) and set(checks) == set(
+        _STORAGE_CHECKS
+    )
+    verified_count = (
+        sum(checks.get(name) is True for name in _STORAGE_CHECKS)
+        if isinstance(checks, dict)
+        else 0
+    )
+    sha = payload.get("codeSha") if isinstance(payload, dict) else None
+    reachability = reachable or _commit_reachable
+    code_reachable = (
+        isinstance(sha, str)
+        and bool(_COMMIT_SHA.fullmatch(sha))
+        and reachability(sha)
+    )
+
+    observed_valid = False
+    observed = payload.get("observedAt") if isinstance(payload, dict) else None
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    if isinstance(observed, str) and (
+        observed.endswith("Z") or observed.endswith("+00:00")
+    ):
+        try:
+            parsed = datetime.fromisoformat(observed.replace("Z", "+00:00"))
+            observed_valid = (
+                parsed.tzinfo is not None
+                and parsed.utcoffset() == timedelta(0)
+                and timedelta(0) <= current - parsed <= max_age
+            )
+        except ValueError:
+            observed_valid = False
+
+    attestation_complete = isinstance(attestation, dict) and set(attestation) == set(
+        _STORAGE_ATTESTATION_FIELDS
+    )
+    if attestation_complete:
+        attestation_complete = all(
+            isinstance(attestation[field], str)
+            and bool(attestation[field].strip())
+            and len(attestation[field]) <= 200
+            for field in _ATTESTATION_TEXT_FIELDS
+        ) and all(
+            isinstance(attestation[field], str)
+            for field in ("codeSha", "observedAt")
+        )
+    attestation_bound = bool(
+        attestation_complete
+        and isinstance(payload, dict)
+        and attestation["codeSha"] == payload.get("codeSha")
+        and attestation["observedAt"] == payload.get("observedAt")
+    )
+
+    facts = {
+        "requiredCheckCount": len(_STORAGE_CHECKS),
+        "verifiedCheckCount": verified_count,
+        "codeReachable": code_reachable,
+        "observedAtValid": observed_valid,
+        "attestationComplete": attestation_complete,
+        "attestationBound": attestation_bound,
+    }
+    if (
+        not payload_shape_valid
+        or not checks_shape_valid
+        or payload.get("schemaVersion") != "1.1"
+    ):
+        return _check(
+            "storage-roundtrip-evidence", "BLOCKED", "storage-evidence-invalid", **facts
+        )
+    if payload.get("targetKind") != "operational":
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-not-operational",
+            **facts,
+        )
+    if not code_reachable:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-code-unreachable",
+            **facts,
+        )
+    if not observed_valid:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-time-invalid",
+            **facts,
+        )
+    if not attestation_complete or not attestation_bound:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-attestation-invalid",
+            **facts,
+        )
+    if payload.get("status") == "FAIL":
+        return _check(
+            "storage-roundtrip-evidence",
+            "FAIL",
+            "storage-operational-evidence-failed",
+            **facts,
+        )
+    evidence_verified = (
+        payload.get("status") == "PASS"
+        and verified_count == len(_STORAGE_CHECKS)
+        and payload.get("cleanupVerified") is True
+        and _positive_integer(payload.get("payloadBytes"))
+    )
+    if not evidence_verified:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-unverified",
+            **facts,
+        )
+    return _check(
+        "storage-roundtrip-evidence",
+        "PASS",
+        "storage-operational-evidence-valid",
+        **facts,
+    )
+
+
+def probe_storage_evidence(
+    path: Path | None,
+    attestation_path: Path | None,
+    *,
+    now: datetime | None = None,
+    reachable: Callable[[str], bool] | None = None,
+    max_age: timedelta = _DEFAULT_EVIDENCE_MAX_AGE,
+) -> dict[str, Any]:
+    if path is None or attestation_path is None:
+        return _check(
+            "storage-roundtrip-evidence",
+            "BLOCKED",
+            "storage-evidence-or-attestation-missing",
+            requiredCheckCount=len(_STORAGE_CHECKS),
+            verifiedCheckCount=0,
+            codeReachable=False,
+            observedAtValid=False,
+            attestationComplete=False,
+            attestationBound=False,
+        )
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        payload = None
+    try:
+        attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        attestation = None
+    return evaluate_storage_evidence(
+        payload,
+        attestation,
+        now=now,
+        reachable=reachable,
+        max_age=max_age,
+    )
+
+
 _INPUT_CHECKS = {
     "U1": ("inventory-lint",),
-    "U2": ("health-unresolved-settings", "readyz", "session-boundary"),
-    "U3": ("health-unresolved-settings", "readyz", "node-certificate-chain"),
+    "U2": ("readyz", "session-boundary"),
+    "U3": ("configuration-node-ca", "readyz", "node-certificate-chain"),
     "U4": ("dns-resolution",),
     "U5": ("inventory-lint", "node-certificate-chain", "pilot-capability-match"),
-    "U6": ("health-unresolved-settings", "inventory-lint"),
+    "U6": (
+        "configuration-object-store",
+        "inventory-lint",
+        "storage-roundtrip-evidence",
+    ),
 }
 
 
@@ -907,21 +1244,43 @@ def _overall_status(checks: list[dict[str, Any]]) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default=os.environ.get("INV_S01_BASE_URL"))
-    parser.add_argument("--health-url", default=os.environ.get("INV_S01_HEALTH_URL"))
-    parser.add_argument("--token-env", default="INV_S01_ACCESS_TOKEN")
+    parser.add_argument("--settings-url", default=os.environ.get("INV_S01_SETTINGS_URL"))
+    parser.add_argument(
+        "--session-token-env", "--token-env", dest="session_token_env", default="INV_S01_ACCESS_TOKEN"
+    )
+    parser.add_argument("--operator-token-env", default="INV_S01_OPERATOR_TOKEN")
     parser.add_argument("--inventory", type=Path, default=os.environ.get("INV_S01_INVENTORY"))
     parser.add_argument("--state", type=Path, default=os.environ.get("INV_LAN_PILOT_STATE"))
     parser.add_argument("--ca-bundle", type=Path, default=os.environ.get("INV_NODE_MTLS_CA_BUNDLE"))
     parser.add_argument("--http-ca-bundle", type=Path, default=os.environ.get("INV_S01_HTTP_CA_BUNDLE"))
+    parser.add_argument(
+        "--storage-evidence",
+        type=Path,
+        default=os.environ.get("INV_S01_STORAGE_EVIDENCE"),
+    )
+    parser.add_argument(
+        "--storage-attestation",
+        type=Path,
+        default=os.environ.get("INV_S01_STORAGE_ATTESTATION"),
+    )
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--timeout-seconds", type=float, default=5.0)
+    parser.add_argument("--storage-max-age-seconds", type=float, default=86_400.0)
     args = parser.parse_args(argv)
     if args.timeout_seconds <= 0 or args.timeout_seconds > 30:
         parser.error("--timeout-seconds must be in (0, 30]")
+    if args.storage_max_age_seconds <= 0 or args.storage_max_age_seconds > 604_800:
+        parser.error("--storage-max-age-seconds must be in (0, 604800]")
     output_path = args.output.resolve()
     protected_inputs = [
         path.resolve()
-        for path in (args.inventory, args.ca_bundle, args.http_ca_bundle)
+        for path in (
+            args.inventory,
+            args.ca_bundle,
+            args.http_ca_bundle,
+            args.storage_evidence,
+            args.storage_attestation,
+        )
         if path is not None
     ]
     state_path = args.state.resolve() if args.state is not None else None
@@ -931,29 +1290,36 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--output must not replace an input")
     args.output.unlink(missing_ok=True)
 
-    token = os.environ.get(args.token_env)
+    session_token = os.environ.get(args.session_token_env)
+    operator_token = os.environ.get(args.operator_token_env) or session_token
     inventory = _load_inventory(args.inventory)
     inventory_check = lint_inventory(inventory)
     if args.base_url:
-        fetch = http_fetcher(args.base_url, token, args.http_ca_bundle, args.timeout_seconds)
+        fetch = http_fetcher(
+            args.base_url,
+            session_token,
+            args.http_ca_bundle,
+            args.timeout_seconds,
+        )
     else:
         fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
-    if args.health_url:
-        health_fetch = http_fetcher(
-            args.health_url,
-            None,
+    if args.settings_url:
+        settings_fetch = http_fetcher(
+            args.settings_url,
+            operator_token,
             args.http_ca_bundle,
             args.timeout_seconds,
             exact_url=True,
         )
     else:
-        health_fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
+        settings_fetch = lambda path, authenticated: (_ for _ in ()).throw(RuntimeError())
     checks = probe_control_plane(
         base_url=args.base_url,
-        health_url=args.health_url,
-        token=token,
+        settings_url=args.settings_url,
+        session_token=session_token,
+        operator_token=operator_token,
         fetch=fetch,
-        health_fetch=health_fetch,
+        settings_fetch=settings_fetch,
     )
     checks.extend(
         [
@@ -961,6 +1327,11 @@ def main(argv: list[str] | None = None) -> int:
             probe_dns(inventory),
             inventory_check,
             probe_pilot_capabilities(args.state, inventory),
+            probe_storage_evidence(
+                args.storage_evidence,
+                args.storage_attestation,
+                max_age=timedelta(seconds=args.storage_max_age_seconds),
+            ),
         ]
     )
     report = {
