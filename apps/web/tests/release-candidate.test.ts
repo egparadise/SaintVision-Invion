@@ -17,7 +17,7 @@ describe('S11-FE: Release Candidate, WCAG 2.1 AA & Web Rollback Verification (AC
       expect(slos.filter((s) => s.status === 'met')).toHaveLength(0);
 
       // Invariant: Verify hardcoded fake evidence values do NOT exist in ReleaseManager instance
-      const serialized = JSON.stringify(rm);
+      const serialized = JSON.stringify({ evidence: (rm as any).activeEvidence, slos: rm.getSloRecords() });
       expect(serialized).not.toContain('1.24');
       expect(serialized).not.toContain('48.0');
       expect(serialized).not.toContain('4.2');

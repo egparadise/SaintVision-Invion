@@ -290,55 +290,91 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     }
   };
 
-  // G2 & G3: Invalidate in-flight responses and rotate idempotency keys when form inputs change
+  // G2 & G3 & Card 138: Invalidate in-flight responses, reset loading, and rotate idempotency keys when form inputs change
   const handleProjectIdChange = (val: string) => {
     setProjectId(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    setRegLoading(false);
+    setPinLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
   const handleModelIdChange = (val: string) => {
     setModelId(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    setRegLoading(false);
+    setPinLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
   const handleVersionChange = (val: string) => {
     setVersion(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
+    relAbortControllerRef.current?.abort();
+    relAbortControllerRef.current = null;
     regGenerationRef.current++;
     pinGenerationRef.current++;
     relGenerationRef.current++;
+    setRegLoading(false);
+    setPinLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
   const handleRegVersionChange = (val: string) => {
     setRegVersion(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegSha256Change = (val: string) => {
     setRegSha256(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handleRegByteSizeChange = (val: string) => {
     setRegByteSize(val);
+    regAbortControllerRef.current?.abort();
+    regAbortControllerRef.current = null;
     regGenerationRef.current++;
+    setRegLoading(false);
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
   };
 
   const handlePinUntilChange = (val: string) => {
     setPinUntil(val);
+    pinAbortControllerRef.current?.abort();
+    pinAbortControllerRef.current = null;
     pinGenerationRef.current++;
+    setPinLoading(false);
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
   };
 
@@ -447,7 +483,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       if (regGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       handleApiError(err, '모델 버전 등록 실패');
     } finally {
-      setRegLoading(false);
+      if (regAbortControllerRef.current === ctrl || regGenerationRef.current === currentGen) {
+        setRegLoading(false);
+      }
     }
   };
 
@@ -492,7 +530,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       if (pinGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       handleApiError(err, '보존 고정 연장 실패');
     } finally {
-      setPinLoading(false);
+      if (pinAbortControllerRef.current === ctrl || pinGenerationRef.current === currentGen) {
+        setPinLoading(false);
+      }
     }
   };
 
@@ -601,7 +641,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               id="reg-model-id"
               data-testid="input-model-id"
               type="text"
-              placeholder="mod_..."
+              placeholder="mdl_..."
               value={modelId}
               onChange={(e) => handleModelIdChange(e.target.value)}
               style={{
@@ -1521,7 +1561,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
                       data-testid="approval-input"
                       value={approvalInput}
                       onChange={(e) => setApprovalInput(e.target.value)}
-                      placeholder="승인 식별자 입력 (apr_...)"
+                      placeholder="승인 식별자 입력 (apv_...)"
                       style={{
                         padding: '6px 10px',
                         backgroundColor: '#0d1117',

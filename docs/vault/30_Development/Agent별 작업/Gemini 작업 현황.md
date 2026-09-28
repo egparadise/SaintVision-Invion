@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-GEMINI-001"
 title: "Gemini 작업 현황"
-version: "1.0.137"
+version: "1.0.138"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-29T03:28:00+09:00"
+updated: "2026-09-29T04:08:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -20,6 +20,41 @@ source_of_truth: "Git"
 - 공통 Skill: agent-delivery v1.1.0, 역할 Skill frontend-delivery v1.0.0. 계획: [[Frontend 최종 개발 계획]].
 - 계약: GUIDE-001, GOV-AGENT-001, GOV-GIT-001, ADR-INDEX-001 v1.27.0, [[Codex Workspace 편집과 PTY 및 원격 Git 계약]] v1.1.0, [[Codex 실제 실행 결과 조회 계약]]. 계약 변경 시 버전 갱신.
 - 확인 기준: 2026-09-29T00:20:00+09:00 (최신 tip `agent/gemini/g05-fe-model-registry`, PR #219 Codex r4 F1 조치: Release 쓰기 UI fail-closed 미노출 및 Idempotency-Key 헤더 제거).
+
+## 2026-09-29 프런트엔드 비차단 후속 감사 지적사항 통합 조치 완료 (Card 138, `agent/gemini/card138-fe-bundle`)
+- **개요**: 앞선 검토(PR #219, #228, #212, #178, #190)에서 비차단으로 남겨진 6대 후속 과제 전수 조치 및 되돌리면 실패하는 자동화 시험 완비.
+- **PR**: Card 138 (Base: `agent/gemini/card126-audit-fixes` head `27a6e4ca` 위 stacked)
+- **담당 및 역할**: Gemini (Frontend / UI / 접근성 소유). Reviewer: Claude (UI·테스트 축), 제어 평면 계약 합의 (계약 축).
+- **조치 내역 (Items 1~6 전수 완결)**:
+  1. **Item (1) ModelLineageView W2/W4 로딩 해제 소유권 가드 및 입력 변경 취소**:
+     - W3/W5와 동일하게 `finally`에서 현재 generation이거나 본인 controller일 때만 로딩 해제 (`if (regAbortControllerRef.current === ctrl || regGenerationRef.current === currentGen) setRegLoading(false)`).
+     - 입력 변경 핸들러에서 진행 중 요청 abort, generation++, 로딩 즉시 해제.
+     - 시험 21, 22 신설 (`tests/model-registry-business-routes.test.tsx`).
+  2. **Item (2) SealRecordPanel 봉인 Run 전환 중 늦은 R1/R2 응답 Abort 가드**:
+     - `SealRecordPanel.tsx` 모든 비동기 단계 콜백에 `if (signal.aborted || generationRef.current !== currentGen) return;` 가드 적용.
+     - 시험 25 신설 (`tests/run-detail-seal-record.test.tsx`).
+  3. **Item (3) DeveloperStudio 취소·Receipt 모달 직접 접근성 시험 (useModalA11y)**:
+     - `useModalA11y.ts` 공용 훅 도입 (포커스 트랩, Escape 전파 차단 및 닫기, 트리거 버튼 포커스 복원).
+     - `DeveloperStudio.tsx`에 연동 및 `developer-studio-modal-a11y.test.tsx` 신설 (2 passed).
+  4. **Item (4) G-07 Eval Runner casesDigest loopCount 포함 (N1) 및 REPAIRING/1 돌연변이 가드 (N2)**:
+     - `evalRunner.ts`의 `casesDigest`에 `loopCount` 포함 (N1).
+     - `agentEngine.ts` 비용/예산 필드 정합 및 `agent-mutation-guards.test.ts`에 N1 해시 변경 시험 및 N2 `REPAIRING/1` mutant kill 시험 완비 (25 passed).
+     - 정본 Evidence 파일 `s09-g07-eval-evidence-fc1c4eb5.json` 갱신 (130 cases, Conformance 100%).
+  5. **Item (5) 공용 날짜 검증 가드 (dateTime.ts) 도입 및 무효 타임존 오프셋 차단**:
+     - `shared/utils/dateTime.ts` 공용 가드 신설: 타임존 오프셋(`tzHour <= 23 && tzMin <= 59`) 엄격 검증.
+     - `modelRegistryObservation.ts`, `modelCommitmentObservation.ts`, `runSealObservation.ts`의 중복 사본 단일화.
+     - 시험 23 신설 (`tests/model-registry-business-routes.test.tsx`).
+  6. **Item (6) #228 L-항목 잔여 (식별자 prefix 정합 및 세대 단독 가드)**:
+     - `ModelLineageView.tsx` 플레이스홀더 `mdl_...`, `apv_...` 정본 어휘 정합.
+     - 시험 24 (플레이스홀더 정합) 및 시험 25 (세대 카운터 단독 stale 응답 폐기) 신설.
+- **실측 검증**:
+  - Vitest: **84 test files / 814 passed** (26.76s, 0 failures).
+  - TypeScript & 빌드: `npx tsc -b` 0 errors, `npm run build` 성공 (`dist/assets/index-BLqj7uvO.js` 876.03 kB).
+  - 파이썬 라우트 게이트: `pytest tests/test_route_coverage.py` 40 passed (2.91s).
+  - 무결성 도구: `check_frontend_integrity.py` 92 files 0 violations, `check_contract_bindings.py` 55 fixtures / 20 types PASS.
+  - 문서 및 동기화: `check_docs.py` PASS, `sync_obsidian.py --check` 0 conflicts PASS.
+- **산출 문서**: `docs/vault/30_Development/History/2026-09-29_04-08-00_KST_Card138_FE_Audit_Followups_Bundle_Gemini.md` (v1.0.0).
+- **다음 첫 행동**: `agent/gemini/card138-fe-bundle` push 및 PR 생성 후 리뷰 요청.
 
 ## 2026-09-29 apps/web 전역 감사 지적사항(F1~F7) 시정 완료 (Card 126, `agent/gemini/card126-audit-fixes`)
 - **독립 검토 r1 (Claude UI M1/L1~L3, Codex 계약 C1/C2) 전수 조치 완료**:

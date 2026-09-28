@@ -987,4 +987,89 @@ describe('SealRecordPanel Component (G-04 R1·R2·R3)', () => {
     expect(errorBanner?.textContent).not.toContain('[RES-0004]');
     fetchSpy.mockRestore();
   });
+
+  it('25. In-flight R1/R2 abort guard during run transition: late R1 and R2 responses from previous run (run_A) are discarded and do not leak into active run (run_B)', async () => {
+    let resolveR1A: ((val: any) => void) | null = null;
+    let resolveR2A: ((val: any) => void) | null = null;
+    let capturedSignalA: AbortSignal | undefined;
+
+    const uniqueRunAArtifactId = 'art_01J8Z3XQ2K9WMV5T7N4B6C8DA_UNIQUE';
+    const uniqueRunBArtifactId = 'art_01J8Z3XQ2K9WMV5T7N4B6C8DB_ACTIVE';
+
+    vi.spyOn(client, 'apiClient').mockImplementation(async (url: string, options?: any) => {
+      if (url.includes('/run_A/record/artifacts')) {
+        return new Promise((resolve) => {
+          resolveR2A = resolve;
+        });
+      }
+      if (url.includes('/run_A/context-bundle')) {
+        return { ...contextBundleFixture, runId: 'run_A' } as any;
+      }
+      if (url.includes('/run_A/record')) {
+        capturedSignalA = options?.signal;
+        return new Promise((resolve) => {
+          resolveR1A = resolve;
+        });
+      }
+
+      if (url.includes('/run_B/record/artifacts')) {
+        return {
+          ...artifactsPageFixture,
+          runId: 'run_B',
+          items: [
+            {
+              ...artifactsPageFixture.items[0],
+              artifactId: uniqueRunBArtifactId,
+            },
+          ],
+        } as any;
+      }
+      if (url.includes('/run_B/context-bundle')) {
+        return { ...contextBundleFixture, runId: 'run_B' } as any;
+      }
+      if (url.includes('/run_B/record')) {
+        return { ...sealedRecordFixture, runId: 'run_B' } as any;
+      }
+      return {} as any;
+    });
+
+    // 1. Mount with run_A
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_A" />);
+    });
+
+    expect(capturedSignalA).toBeDefined();
+    expect(capturedSignalA?.aborted).toBe(false);
+
+    // 2. Switch to run_B while run_A R1 is still in-flight
+    await act(async () => {
+      root.render(<SealRecordPanel projectId="prj_01" runId="run_B" />);
+    });
+
+    // run_A signal must be aborted immediately upon transition
+    expect(capturedSignalA?.aborted).toBe(true);
+
+    // run_B loads immediately and renders run_B artifact
+    expect(container.textContent).toContain(uniqueRunBArtifactId);
+    expect(container.textContent).not.toContain(uniqueRunAArtifactId);
+
+    // 3. Late response from run_A arrives
+    await act(async () => {
+      resolveR1A?.({ ...sealedRecordFixture, runId: 'run_A' });
+      resolveR2A?.({
+        ...artifactsPageFixture,
+        runId: 'run_A',
+        items: [
+          {
+            ...artifactsPageFixture.items[0],
+            artifactId: uniqueRunAArtifactId,
+          },
+        ],
+      });
+    });
+
+    // run_A response MUST be discarded by the abort guard and NOT leak into run_B
+    expect(container.textContent).toContain(uniqueRunBArtifactId);
+    expect(container.textContent).not.toContain(uniqueRunAArtifactId);
+  });
 });
