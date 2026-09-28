@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.205"
+version: "1.0.206"
 status: "review"
 author: "Codex"
-updated: "2026-09-23T15:10:00+09:00"
+updated: "2026-09-28T20:35:25+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 카드 92 Core CI 시간 예산 보정 — 검토 요청
+
+- 합친 tree Core run `36413452211`은 준비·통합 10분 11초 뒤 pytest가 15분 01초 실행되던 중 25분 job 상한으로 취소됐고, skip ratchet·build·Go·TypeScript gate에는 도달하지 못했다. 시험 실패로 분류하지 않는다.
+- `.github/workflows/core.yml`의 `core` job만 45분으로 올렸다. 개별 test stack dump용 `faulthandler_timeout=45`, 직렬 pytest, 후속 `s01-storage-roundtrip` 10분 예산은 불변이다.
+- YAML·diff·docs gate 후 PR에 `run-core` label을 붙여 동일 head 완주 시간을 측정한다. 현재는 hosted 완주 전 `review`, reviewer Claude다. [[2026-09-28_20-35-25_KST_Core_CI_timeout_budget_Codex_구현]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
