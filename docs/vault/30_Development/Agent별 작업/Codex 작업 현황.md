@@ -1,14 +1,20 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.213"
+version: "1.0.216"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T13:58:00+09:00"
+updated: "2026-09-28T18:43:16+09:00"
 source_of_truth: "Git"
 ---
 
 # Codex 작업 현황
+
+## 2026-09-28 Card70 S11-ST Local 저장 실패·retention journal — reviewer 인계
+
+- PR #198에서 Local provider의 host `OSError`를 기존 `STORE-0001`/503/retryable로 닫고, PITR retention apply에 durable journal·중단 재개·중복 삭제 방지·완료 receipt 회전을 구현했다. 공개 schema·route·migration 변화는 없다.
+- Claude 1차 E1~E5 뒤 r2 N1~N5를 반영했다. directory ctime 결속은 partial rmtree/권한 복구를 막으므로 제거하고, device+inode + rmtree 전 durable 외부 removal marker로 hard-interrupt 재개와 journal-only 위조 거부를 함께 고정했다. stale journal은 receipt를 보존하는 명시적 `--abandon-journal`에서만 현재 디스크로 재계획하고, `ResultView` Local read도 canonical session을 사용한다.
+- Claude r3의 최종 조건으로 marker 발행을 temp write·file fsync·atomic replace·directory fsync로 바꾸고, replace 전 hard interruption이 orphan temp를 남겨도 다음 실행을 막지 않는 회귀를 추가했다. runbook에는 abandon·label-less residue·v1 fail-closed·동시 apply 금지를 기록했다. 최종 code/test head `3178edc8`의 로컬 PG-free는 retention 37 passed, S11 경계 32 passed/12 Linux-only skipped, artifact 계약 18 passed, route coverage 40 passed이며 format/compile/diff도 통과했다. hosted Backend `36402267753`은 양 Python 각각 3174 passed/47 declared skipped/2 deselected/0 failed, Core `36402267783`은 main 3479 passed/17 declared skipped/2 deselected/0 failed + LAN 15 + CX01 18/2 declared skip + Docker host 2이고 exact/build/Go/TS/S01 gate가 모두 green이다. Claude r4가 head `3178edc8`을 승인했다. 상태는 self-close 금지에 따라 `review`; 다음은 코디네이터의 #173 뒤 retarget·병합이며 실제 disk-full·전원 차단·물리 PITR restore는 미측정이다. [[2026-09-28_17-27-00_KST_S11_Local_retention_journal_Codex]].
 
 ## 2026-09-28 Card52 S3 ObjectStore 관찰 후속 — reviewer 인계
 
