@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
 AXIS = "long-soak"
 TARGET_ID = "s11-ac11-composite-long-soak-v0"
+DRY_RUN_PURPOSE = "s11-ac11-composite-long-soak-dry-run"
 REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 REGISTRY_BLOB = "be99a506efecdb2ff29cf4e7a96a8772f5524473"
 CASE_IDENTITIES_SHA256 = "d4638030330f8c2ba857e63976cc050bf2d631491d59472fab225142eccd49c3"
@@ -214,6 +215,168 @@ def _validate_child_references(
         raise EvidenceImportError("hosted drift artifact is unavailable at physical completion")
 
 
+def _import_reference_only_dry_run(
+    report: dict[str, Any], storage: dict[str, Any], hosted: dict[str, Any], git: GitReader
+) -> dict[str, Any]:
+    """Validate a synthetic traversal without turning it into acceptance evidence."""
+
+    required_keys = {
+        "schemaVersion", "runPurpose", "referenceOnly", "acceptanceClaim",
+        "verdict", "sourceRunId", "sourceHeadSha", "checkoutTreeSha",
+        "cleanCheckout", "generatedAt", "inventoryRevision", "environment",
+        "operatorResources", "caseIdentities", "faultClasses", "cases", "casePlans",
+        "execution", "cleanup", "storageReferenceSha256", "hostedReferenceSha256",
+    }
+    if set(report) != required_keys or report.get("schemaVersion") != SCHEMA_VERSION:
+        raise EvidenceImportError("dry-run report requires the exact v1 key set")
+    if (
+        report.get("runPurpose") != DRY_RUN_PURPOSE
+        or report.get("referenceOnly") is not True
+        or report.get("acceptanceClaim") is not False
+        or report.get("verdict") != "NOT_OBSERVED"
+    ):
+        raise EvidenceImportError("dry-run report cannot claim physical acceptance")
+    if report.get("operatorResources") != []:
+        raise EvidenceImportError("dry-run report cannot claim operator resources")
+    if not str(report.get("sourceRunId", "")).strip():
+        raise EvidenceImportError("dry-run sourceRunId is required")
+    source = str(report.get("sourceHeadSha", ""))
+    target = _load_target(git, source)
+    if target is None:
+        raise EvidenceImportError("dry-run source does not contain the registered target")
+    if report.get("cleanCheckout") is not True or git.tree(source) != report.get("checkoutTreeSha"):
+        raise EvidenceImportError("dry-run report is not bound to a clean source tree")
+    generated = _utc(report.get("generatedAt"), "generatedAt")
+    inventory_revision = report.get("inventoryRevision")
+    if not isinstance(inventory_revision, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", inventory_revision):
+        raise EvidenceImportError("dry-run inventory revision is invalid")
+    expected_environment = {
+        "topology": "synthetic-five-node",
+        "registeredNodeCount": 5,
+        "eligibleNodeCount": 4,
+        "excludedNodeCount": 1,
+        "cpIndependentWorkerHostCount": 4,
+        "cpColocatedNodeCount": 1,
+        "timedPopulation": "synthetic-cp-independent-four",
+        "observer": "synthetic-monotonic-v1",
+        "faultInjection": "synthetic-noop-v1",
+        "windowClass": "dry-run",
+        "comparableGroup": "reference-only",
+    }
+    if report.get("environment") != expected_environment:
+        raise EvidenceImportError("dry-run environment is not the exact reference topology")
+    if report.get("caseIdentities") != list(CASE_IDENTITIES) or _canonical_sha(report["caseIdentities"]) != CASE_IDENTITIES_SHA256:
+        raise EvidenceImportError("dry-run case identities are not exact")
+    if report.get("faultClasses") != list(FAULT_CLASSES) or _canonical_sha(report["faultClasses"]) != FAULT_CLASSES_SHA256:
+        raise EvidenceImportError("dry-run fault-class identities are not exact")
+    cases = report.get("cases")
+    expected_cases = [
+        {"caseIdentity": identity, "status": "DECLARED_ONLY", "faultClass": None}
+        for identity in CASE_IDENTITIES
+    ]
+    if cases != expected_cases:
+        raise EvidenceImportError("dry-run cases must traverse the exact case universe")
+    plans = report.get("casePlans")
+    if not isinstance(plans, list) or len(plans) != len(CASE_IDENTITIES):
+        raise EvidenceImportError("dry-run case plans are incomplete")
+    for identity, plan in zip(CASE_IDENTITIES, plans, strict=True):
+        prefix = identity.split("/", 1)[0]
+        expected_plan = {
+            "caseIdentity": identity,
+            "plannedPhases": [
+                "preflight", "observe-baseline", "simulate-fault",
+                "observe-recovery", "cleanup",
+            ],
+            "executedPhases": [],
+            "candidateFaultClasses": sorted(ALLOWED_FAULT_CLASSES_BY_PREFIX[prefix]),
+            "containerPlan": {
+                "declaredTransitions": ["create", "start", "stop", "remove"],
+                "executedTransitions": [],
+            },
+            "observed": False,
+            "physicalActions": False,
+        }
+        if plan != expected_plan:
+            raise EvidenceImportError("dry-run case plan is not exact")
+    if report.get("execution") != {
+        "driver": "synthetic-lan-pilot-v1",
+        "mode": "plan-only",
+        "planned": True,
+        "simulationExecuted": False,
+        "physicalActions": False,
+        "declaredCaseCount": len(CASE_IDENTITIES),
+        "observedCaseCount": 0,
+    }:
+        raise EvidenceImportError("dry-run execution receipt is invalid")
+    if report.get("cleanup") != {"observed": False, "physicalResidueCount": None}:
+        raise EvidenceImportError("dry-run cleanup receipt is invalid")
+
+    if report.get("storageReferenceSha256") != _canonical_sha(storage):
+        raise EvidenceImportError("dry-run storage reference digest does not match")
+    storage_expected = {
+        "kind": "s11-storage-physical-reference",
+        "referenceOnly": True,
+        "targetId": "s11-storage-soak-physical-reference-v0",
+        "verdict": "NOT_OBSERVED",
+        "sourceHeadSha": source,
+        "inventoryRevision": inventory_revision,
+        "caseIdentitiesSha256": STORAGE_PHYSICAL_SHA256,
+    }
+    if storage != storage_expected:
+        raise EvidenceImportError("dry-run storage reference is not exact")
+    if report.get("hostedReferenceSha256") != _canonical_sha(hosted):
+        raise EvidenceImportError("dry-run hosted reference digest does not match")
+    hosted_expected = {
+        "kind": "s11-storage-reference-evidence",
+        "referenceOnly": True,
+        "executionLayer": "hosted-minio-postgresql",
+        "verdict": "MEASURED_PASS",
+        "sourceHeadSha": source,
+        "caseIdentitiesSha256": HOSTED_STORAGE_SHA256,
+        "artifactAvailable": True,
+        "runConclusion": "success",
+    }
+    if any(hosted.get(key) != value for key, value in hosted_expected.items()):
+        raise EvidenceImportError("dry-run hosted drift reference is not exact")
+    digest = str(hosted.get("artifactSha256", ""))
+    if not SHA256_RE.fullmatch(digest) or hosted.get("artifactObservedSha256") != digest:
+        raise EvidenceImportError("dry-run hosted drift artifact digest is invalid")
+    if _utc(hosted.get("artifactExpiresAt"), "hosted artifactExpiresAt") <= generated:
+        raise EvidenceImportError("dry-run hosted drift artifact is unavailable")
+
+    artifact = _canonical_sha(report)
+    expires = (generated + timedelta(days=30)).isoformat().replace("+00:00", "Z")
+    return {
+        "schemaVersion": SCHEMA_VERSION,
+        "runPurpose": "ac11-axis-evidence",
+        "axis": AXIS,
+        "referenceOnly": True,
+        "acceptanceClaim": False,
+        "sourceRunId": report["sourceRunId"],
+        "sourceHeadSha": source,
+        "checkoutTreeSha": report["checkoutTreeSha"],
+        "artifactSha256": artifact,
+        "artifactObservedSha256": artifact,
+        "artifactAvailable": True,
+        "artifactExpiresAt": expires,
+        "cleanCheckout": True,
+        "runConclusion": "success",
+        "startedAt": report["generatedAt"],
+        "finishedAt": report["generatedAt"],
+        "environment": report["environment"],
+        # The reference report says cleanup was not observed.  The axis
+        # envelope also preserves the established aggregator field so the
+        # honest classification remains NOT_OBSERVED rather than INVALID_RUN.
+        "cleanup": {
+            "residueCount": 0,
+            "observed": False,
+            "physicalResidueCount": None,
+        },
+        "verdict": "NOT_OBSERVED",
+        "reason": "synthetic dry-run is reference-only and cannot satisfy the physical target",
+    }
+
+
 def _observation(metric: str, value: int | float, zero_expected: bool) -> dict[str, Any]:
     failure = int(value) if zero_expected else 0
     n = max(1, failure)
@@ -229,6 +392,8 @@ def import_report(
 ) -> dict[str, Any]:
     if not isinstance(report, dict):
         raise EvidenceImportError("physical report must be an object")
+    if report.get("runPurpose") == DRY_RUN_PURPOSE:
+        return _import_reference_only_dry_run(report, storage, hosted, git)
     resource_values = report.get("operatorResources")
     if (
         not isinstance(resource_values, list)
