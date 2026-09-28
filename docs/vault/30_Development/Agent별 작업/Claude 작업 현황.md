@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.23"
 status: "review"
 author: "Claude"
-updated: "2026-09-28T07:15:00+09:00"
+updated: "2026-09-28T09:40:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,6 +30,10 @@ source_of_truth: "Git"
 
 - 설계 1쪽 + `tools/collect_s10_acceptance_evidence.py` + PG-free 시험 32 passed. #120 Codex 지적 3건(fail-closed 전부·clean head provenance·식별자 redaction+부정 시험)을 처음부터 적용. 실 PG 단일 invocation은 가용 메모리 547MB로 보류(≥1.5GB 규칙). `acceptanceClaim=false`, S10-DB/ST planned 유지. 상세: [[2026-09-28_07-15-00_KST_S10-DB_AC-10_Evidence_collector_Claude_설계_PGfree]]
 - 같은 날 처리: #120 S02 collector(Codex 승인, F-R1~F-R3 반영), #121 S03 runner(설계 v1.2·잔존 1건 반영, 재검토 대기), #125 S02 체크리스트 v1.2(F-R1~F-R3 반영, 재검토 대기).
+### 2026-09-28 카드 ww · S09-DB/ST AC-09 Evidence collector (branch agent/claude/s09-db-evidence-collector, base 1e8baf04)
+
+- 설계 1쪽 + `tools/collect_s09_acceptance_evidence.py` + PG-free 시험 98 passed. 5파일 73 케이스 전수를 8조항에 매핑, Linux 사설 스토리지 게이트(test_results.py 14)는 게이트 사유 not_run·PASS_MEASURED_PARTIAL로 명시(pass도 0도 아님). #120·#121·#127 Codex 결함 부류 (a)~(g) 처음부터 적용. 실 PG는 가용 메모리 ~1.0GB로 UNMEASURED(hosted Backend self-test 근거). `acceptanceClaim=false`, S09-DB/ST planned 유지. 상세: [[2026-09-28_09-40-00_KST_S09-DB_AC-09_Evidence_collector_Claude_설계_PGfree]]
+- 같은 날 앞선 처리: #127 S10 collector(Codex 4건 반영, 재검토 대기), #120 S02·#121 S03에 같은 패턴 반영(재검토 대기), #125 체크리스트 v1.2(재검토 대기). hosted Backend 3 PR 전부 green.
 
 hosted Core junit로 S04/05/07-DB 케이스 수치 보강 카드 12 (Claude, 2026-09-22, 읽기 전용): artifact `saintvision-core-evidence`(run 35706465645 `3d1892c0` + proof 35714470445 `f2aa2b14`)를 .work/ci-junit에 받아(바이너리 삭제 후 1.4MB) 파일별 수치(core 2948/58/0·shard-recovery 21·containment 28·workspace 22·business-handoff 17·lan-installer 15·docker-host 2, f2aa2b14는 core 2998/58/0 외 동일)와 카드 10의 hosted-only 항목 케이스 이름을 classname으로 추출 — 재전송 hash(output_ingestion 5·node_delivery 18·results 21), placement Explain(placement 12), shard replacement 21, containment 28, workspace 복구 12+11, 노드 스토리지 전송 27 — **전부 passed**. hosted에도 없는 것(AC-05 결정성/P95·AC-07 60초/95%·CX01)은 그대로 물리/5노드 대기로 명시. 패키지 §C-2 + 검증상태지도 §12 보강. 전문 [[2026-09-22_20-10-00_KST_S04-DB_S05-DB_S07-DB_검토인계패키지_Claude]].
 
