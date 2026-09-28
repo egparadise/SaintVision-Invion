@@ -22,25 +22,35 @@
       }
     },
     {
-      "targetId": "s11-actual-pitr-v0",
+      "targetId": "s11-st-actual-pitr-archive-failure-v0",
       "axis": "actual-pitr-rpo-rto-retention",
       "sourceDocument": {
-        "commit": "d74e82ec5d0dda0b9f379e56fea2aad2a9b714f3",
-        "path": "docs/vault/30_Development/DB 최종 개발 계획.md",
-        "blob": "4cf99daa4156e852448b61040f3085977cc3e2d8"
+        "commit": "3363ab77e7fc4ccf3be140466a053a973b0b65a4",
+        "path": "docs/vault/30_Development/S11_ST_storage_failure_target_v0.md",
+        "blob": "421d4d3a6e39720e74bc6fd832f30e8b45f8680a"
       },
       "criteria": {
         "consecutiveWeeklyRestoreSmokeWeeks": {"operator": "gte", "value": 2},
         "maxRestoreSmokeGapDays": {"operator": "lte", "value": 7},
         "retentionDays": {"operator": "gte", "value": 35},
         "rpoSeconds": {"operator": "lte", "value": 900},
-        "rtoSeconds": {"operator": "lte", "value": 3600}
+        "rtoSeconds": {"operator": "lte", "value": 3600},
+        "walArchiveFaultCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterWalArchiveFaultPassCount": {"operator": "gte", "value": 1},
+        "silentArchiveLossCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterSilentArchiveLossPassCount": {"operator": "gte", "value": 1},
+        "retentionInterruptionCaseCount": {"operator": "gte", "value": 1},
+        "recoveryAfterRetentionInterruptionPassCount": {"operator": "gte", "value": 1},
+        "falsePitrPassCount": {"operator": "eq", "value": 0},
+        "retainedBoundaryDeletionCount": {"operator": "eq", "value": 0},
+        "cleanupResidueCount": {"operator": "eq", "value": 0}
       },
       "requiredEnvironment": {
         "topology": "physical",
         "failureDomain": "separate",
         "archiveKind": "operational",
-        "sameHost": false
+        "sameHost": false,
+        "faultInjection": "controlled-v1"
       }
     },
     {
@@ -61,14 +71,32 @@
       "targetId": "s11-irreversible-restore-forward-v0",
       "axis": "irreversible-restore-forward",
       "sourceDocument": {
-        "commit": "40b592e623da4107d3857fe678e1eb3d8387541d",
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
         "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
-        "blob": "d14e09dfabad930f996a3a9d38506627535b2723"
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
       },
       "criteria": {
         "catalogMismatchCount": {"operator": "eq", "value": 0},
-        "negativeFixturePassCount": {"operator": "eq", "value": 3},
+        "negativeFixturePassCount": {"operator": "eq", "value": 4},
         "restoreForwardPassCount": {"operator": "eq", "value": 1}
+      },
+      "requiredEnvironment": {
+        "topology": "hosted-single-postgres-service",
+        "synthetic": true
+      }
+    },
+    {
+      "targetId": "s11-migration-reversible-roundtrip-v1",
+      "axis": "migration-reversible-segment",
+      "sourceDocument": {
+        "commit": "d55c97a0e2ba5248f60a498272dfda2a882c3a0a",
+        "path": "docs/vault/30_Development/S11_AC11_migration_restore_target_v0.md",
+        "blob": "dc1db2587dacc461a2814d45e11610d8d5973181"
+      },
+      "criteria": {
+        "catalogMismatchCount": {"operator": "eq", "value": 0},
+        "reversibleRoundtripPassCount": {"operator": "eq", "value": 1},
+        "sentinelMismatchCount": {"operator": "eq", "value": 0}
       },
       "requiredEnvironment": {
         "topology": "hosted-single-postgres-service",
