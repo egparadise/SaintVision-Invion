@@ -102,6 +102,26 @@ class Database:
         yield self.connection
 
 
+class LockedRoot:
+    def __init__(self, name):
+        self.root = "/" + name
+        self.identity = (name, "identity")
+
+    @contextmanager
+    def locked(self):
+        yield object()
+
+
+class CheckoutProviderReached(RuntimeError):
+    pass
+
+
+class CheckoutProvider(Provider):
+    def get(self, locator, digest, size):
+        self.calls.append(("get", locator, digest, size))
+        raise CheckoutProviderReached
+
+
 def test_provider_mismatch_is_retryable_503():
     with pytest.raises(DomainError) as raised:
         require_object_provider(Provider(LOCAL_PROVIDER_ID), ROW)
@@ -175,6 +195,35 @@ def test_checkout_reader_uses_persisted_s3_provider_not_snapshot_writer():
 
     assert reader is remote
     assert local.calls == [] and remote.calls == []
+
+
+def test_checkout_call_site_opens_the_persisted_provider_not_snapshot_writer():
+    restored = {
+        "recovery_epoch": Database.recovery_epoch,
+        "source_attempt": 1,
+        "step_id": "step",
+        "workspace_id": "workspace",
+        "content_hash": "a" * 64,
+    }
+    database = Database(dict(ROW), restored=restored)
+    local = Provider(LOCAL_PROVIDER_ID)
+    remote = CheckoutProvider("s3-compatible-v1")
+    store = SnapshotStore(database, local, ObjectStoreRegistry([local, remote]))
+    recovery = WorkspaceRecovery(store, generations=LockedRoot("immutable"))
+
+    with pytest.raises(CheckoutProviderReached):
+        recovery.checkout(
+            "tenant",
+            "project",
+            "run",
+            OBJECT,
+            UUID("33333333-3333-4333-8333-333333333333"),
+            LockedRoot("working"),
+            expected_version=3,
+        )
+
+    assert local.calls == []
+    assert remote.calls == [("get", "opaque-locator", "a" * 64, 7)]
 
 
 def test_restore_rejects_invalid_run_before_checkpoint_pin_lookup():
