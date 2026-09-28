@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The registered build, echoed back by identity.\n\n``stage`` is a literal: registration creates a draft and nothing else, so a\nchange that returns a released version under this type breaks the contract\nrather than widening it quietly. There is no person and no free text here --\nthe same rule ``LineageDeployment`` states.\n\nPython field names avoid the ``model_`` prefix because Pydantic reserves\nthat namespace; the wire names are the aliases.",
+  "properties": {
+    "byteSize": {
+      "minimum": 0,
+      "title": "Bytesize",
+      "type": "integer"
+    },
+    "contentSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contentsha256",
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "title": "Createdat",
+      "type": "string"
+    },
+    "modelId": {
+      "title": "Modelid",
+      "type": "string"
+    },
+    "modelVersionId": {
+      "title": "Modelversionid",
+      "type": "string"
+    },
+    "stage": {
+      "const": "draft",
+      "title": "Stage",
+      "type": "string"
+    },
+    "uri": {
+      "minLength": 1,
+      "title": "Uri",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersionId",
+    "modelId",
+    "version",
+    "stage",
+    "contentSha256",
+    "byteSize",
+    "uri",
+    "createdAt"
+  ],
+  "title": "ModelVersionResponse",
+  "type": "object"
+}
