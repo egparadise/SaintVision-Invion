@@ -847,16 +847,25 @@ class RunRecordArtifactPin(Strict):
     byte_size: int = Field(ge=0, alias="byteSize")
 
 
-class RunRecordArtifactsResponse(Strict):
-    """The artifacts pinned into a sealed record, optionally filtered to one role."""
+class RunRecordArtifactPageResponse(Strict):
+    """One bounded page of the artifacts pinned into a sealed record.
+
+    A record pins the run's whole artifact set, which has no bound of its own,
+    so the list is paged: at most ``limit`` (default 50, maximum 200) items in
+    stable ``artifactId`` order. ``count`` is the number of items in *this
+    page*, never the record's total. ``nextCursor`` is the last item's
+    ``artifactId`` when more follow, and null on the last page. ``role`` echoes
+    the filter, which holds across pages.
+    """
 
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
 
     record_id: str = Field(alias="recordId")
     run_id: str = Field(alias="runId")
     role: str | None = Field(default=None, pattern="^(diff|test_report|trace|log|model|dataset|other)$")
-    items: list[RunRecordArtifactPin]
-    count: int = Field(ge=0)
+    items: list[RunRecordArtifactPin] = Field(max_length=200)
+    count: int = Field(ge=0, le=200)
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
 
 
 class ArtifactPinVerificationResponse(Strict):
@@ -873,7 +882,10 @@ class ArtifactPinVerificationResponse(Strict):
     run_id: str = Field(alias="runId")
     artifact_id: str = Field(alias="artifactId")
     verified: bool
-    pinned_checksum_sha256: str | None = Field(default=None, pattern="^[0-9a-f]{64}$", alias="pinnedChecksumSha256")
+    #: Required: a pin exists whenever verification ran (the service is 404
+    #: otherwise) and its checksum is non-null in the database, so a missing or
+    #: null value here would be a fail-open integrity answer (Codex #188 F1).
+    pinned_checksum_sha256: str = Field(pattern="^[0-9a-f]{64}$", alias="pinnedChecksumSha256")
 
 
 class ModelLineageTraceResponse(Strict):

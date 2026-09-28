@@ -28,6 +28,7 @@ from saintvision.errors import (
     InvError,
 )
 from saintvision.identity.principal import Principal, StaticPrincipalVerifier
+from saintvision.services.pagination import build_page
 from saintvision.services.records import ARTIFACT_ROLES
 
 TENANT = uuid.UUID("11111111-1111-1111-1111-111111111111")
@@ -39,6 +40,7 @@ WORKLOAD = "wkl_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
 RECORD = "rec_01J8Z3XQ2K9WMV5T7N4B6C8D0E"
 ART_DIFF = "art_01J8Z3XQ2K9WMV5T7N4B6C8D0A"
 ART_TRACE = "art_01J8Z3XQ2K9WMV5T7N4B6C8D0B"
+ART_DIFF_2 = "art_01J8Z3XQ2K9WMV5T7N4B6C8D0C"
 SHA = "c" * 64
 ARTIFACTS_PATH = f"/v1/projects/{PROJECT}/runs/{RUN}/record/artifacts"
 AUTH = {"Authorization": "Bearer record-token"}
@@ -134,12 +136,19 @@ def build(monkeypatch, world):
             raise InvError(RES_RUN_NOT_FOUND, "no sealed record for this run")
         return world["record"]
 
-    def list_pinned_artifacts(_session, *, tenant_id, record_id, role=None):
-        world.setdefault("list_calls", []).append((tenant_id, record_id, role))
+    def page_pinned_artifacts(_session, *, tenant_id, record_id, role=None, limit, cursor=None):
+        """Recorded, not re-implemented: the fake answers with the product's
+        own ``build_page`` over an in-memory set, filter -> cursor -> limit."""
+        world.setdefault("list_calls", []).append((tenant_id, record_id, role, limit, cursor))
         if role is not None and role not in ARTIFACT_ROLES:
             raise InvError(VAL_SCHEMA, f"unknown artifact role: {role!r}")
-        rows = [pin for pin in world["pins"].values() if role is None or pin.role == role]
-        return sorted(rows, key=lambda pin: pin.artifact_id)
+        rows = sorted(
+            (pin for pin in world["pins"].values() if role is None or pin.role == role),
+            key=lambda pin: pin.artifact_id,
+        )
+        if cursor is not None:
+            rows = [pin for pin in rows if pin.artifact_id > cursor]
+        return build_page(rows[: limit + 1], limit=limit, id_attr="artifact_id")
 
     def verify_pin(_session, *, tenant_id, record_id, artifact_id):
         world.setdefault("verify_calls", []).append((tenant_id, record_id, artifact_id))
@@ -147,10 +156,12 @@ def build(monkeypatch, world):
         if pin is None:
             raise InvError(RES_ARTIFACT_NOT_FOUND, "artifact is not pinned to this record")
         live = world["live_checksums"].get(artifact_id)
+        if world.get("pin_vanishes_after_verify"):
+            del world["pins"][artifact_id]
         return live is not None and live == pin.checksum_sha256
 
     monkeypatch.setattr(run_records.record_service, "get_record", get_record)
-    monkeypatch.setattr(run_records.record_service, "list_pinned_artifacts", list_pinned_artifacts)
+    monkeypatch.setattr(run_records.record_service, "page_pinned_artifacts", page_pinned_artifacts)
     monkeypatch.setattr(run_records.record_service, "verify_pin", verify_pin)
     return TestClient(app, raise_server_exceptions=False)
 
@@ -186,12 +197,13 @@ def test_a_member_lists_the_pins_in_artifact_id_order_as_the_strict_contract(mon
              "checksumSha256": SHA, "objectVersion": "v1", "byteSize": 12},
         ],
         "count": 2,
+        "nextCursor": None,
     }
-    schemas.RunRecordArtifactsResponse.model_validate(body)
+    schemas.RunRecordArtifactPageResponse.model_validate(body)
     assert world["access_calls"] == [(TENANT, PROJECT, "usr_01J8Z3XQ2K9WMV5T7N4B6C8D0E")]
     assert world["session"].gets[:2] == [("Run", RUN), ("Workload", WORKLOAD)]
     assert world["record_calls"] == [(TENANT, RUN)]
-    assert world["list_calls"] == [(TENANT, RECORD, None)]
+    assert world["list_calls"] == [(TENANT, RECORD, None, 50, None)]        # default limit, no cursor
 
 
 def test_the_role_filter_is_passed_to_the_service_and_echoed(monkeypatch):
@@ -199,7 +211,7 @@ def test_the_role_filter_is_passed_to_the_service_and_echoed(monkeypatch):
     client = build(monkeypatch, world)
     body = client.get(ARTIFACTS_PATH + "?role=trace", headers=AUTH).json()
     assert body["role"] == "trace" and [i["artifactId"] for i in body["items"]] == [ART_TRACE] and body["count"] == 1
-    assert world["list_calls"] == [(TENANT, RECORD, "trace")]
+    assert world["list_calls"] == [(TENANT, RECORD, "trace", 50, None)]
 
 
 def test_an_unknown_role_is_the_services_422_not_a_route_copy_of_the_list(monkeypatch):
@@ -207,24 +219,87 @@ def test_an_unknown_role_is_the_services_422_not_a_route_copy_of_the_list(monkey
     client = build(monkeypatch, world)
     body = canonical(client.get(ARTIFACTS_PATH + "?role=screenshot", headers=AUTH), code="VAL-0003", status=422)
     assert body["detail"] == "Unknown artifact role."
-    assert world["list_calls"] == [(TENANT, RECORD, "screenshot")]      # the service decided, after the binding
+    assert world["list_calls"] == [(TENANT, RECORD, "screenshot", 50, None)]   # the service decided, after the binding
     source = open(run_records.__file__, encoding="utf-8").read()
     assert "ARTIFACT_ROLES" not in source                              # no copy of the allowed roles in the route
 
 
-@pytest.mark.parametrize("query", ["?limit=5", "?role=diff&role=trace", "?Role=diff"])
-def test_unsupported_or_repeated_query_parameters_are_refused_before_any_row(monkeypatch, query):
+@pytest.mark.parametrize(
+    "query",
+    [
+        "?page=5", "?role=diff&role=trace", "?Role=diff",
+        "?limit=1&limit=2", "?cursor=a&cursor=b",                        # repeated
+        "?limit=0", "?limit=201", "?limit=abc", "?limit=-1", "?limit=1.5", "?limit=99999",   # #175 _limit
+        "?cursor=not-an-id", "?cursor=", f"?cursor={ART_DIFF}x",          # #175 _cursor
+    ],
+)
+def test_unsupported_repeated_or_invalid_query_parameters_are_refused_before_any_row(monkeypatch, query):
     world: dict = {}
     client = build(monkeypatch, world)
     canonical(client.get(ARTIFACTS_PATH + query, headers=AUTH), code="VAL-0003", status=422)
     assert world["session"].gets == [] and "list_calls" not in world
 
 
-def test_an_empty_record_lists_nothing_with_count_zero(monkeypatch):
+def test_an_empty_record_lists_nothing_with_count_zero_and_no_next_cursor(monkeypatch):
     world = {"pins": {}}
     client = build(monkeypatch, world)
     body = client.get(ARTIFACTS_PATH, headers=AUTH).json()
-    assert body["items"] == [] and body["count"] == 0
+    assert body["items"] == [] and body["count"] == 0 and body["nextCursor"] is None
+
+
+# ---------------------------------------------------------------- list: the page is the bound (Codex #188 F2)
+
+
+def test_two_pages_cover_the_pins_exactly_once_and_the_cursor_reaches_the_service(monkeypatch):
+    world: dict = {}
+    client = build(monkeypatch, world)
+    first = client.get(ARTIFACTS_PATH + "?limit=1", headers=AUTH).json()
+    assert [i["artifactId"] for i in first["items"]] == [ART_DIFF] and first["count"] == 1
+    assert first["nextCursor"] == ART_DIFF                              # the last item's id, stable order
+    second = client.get(ARTIFACTS_PATH + f"?limit=1&cursor={first['nextCursor']}", headers=AUTH).json()
+    assert [i["artifactId"] for i in second["items"]] == [ART_TRACE] and second["nextCursor"] is None
+    assert world["list_calls"] == [(TENANT, RECORD, None, 1, None), (TENANT, RECORD, None, 1, ART_DIFF)]
+    seen = [i["artifactId"] for i in first["items"] + second["items"]]
+    assert seen == sorted(seen) and len(set(seen)) == len(seen) == 2        # no gap, no repeat
+
+
+def test_the_role_filter_holds_across_page_boundaries(monkeypatch):
+    world = {"pins": {
+        ART_DIFF: PinRow(ART_DIFF, "diff"), ART_TRACE: PinRow(ART_TRACE, "trace"), ART_DIFF_2: PinRow(ART_DIFF_2, "diff"),
+    }}
+    client = build(monkeypatch, world)
+    first = client.get(ARTIFACTS_PATH + "?role=diff&limit=1", headers=AUTH).json()
+    assert [i["artifactId"] for i in first["items"]] == [ART_DIFF] and first["nextCursor"] == ART_DIFF
+    second = client.get(ARTIFACTS_PATH + f"?role=diff&limit=1&cursor={ART_DIFF}", headers=AUTH).json()
+    assert [i["artifactId"] for i in second["items"]] == [ART_DIFF_2]   # the trace between them is skipped by role
+    assert second["role"] == "diff" and second["nextCursor"] is None
+
+
+def test_a_record_with_more_pins_than_the_maximum_never_answers_unbounded(monkeypatch):
+    """Revert: `.all()` on the record answered every row; 250 pins now answer 50 by default and 200 at most."""
+    pins = {f"art_01J8Z3XQ2K9WMV5T7N4B6C8{i:03d}": PinRow(f"art_01J8Z3XQ2K9WMV5T7N4B6C8{i:03d}", "log") for i in range(250)}
+    world = {"pins": pins}
+    client = build(monkeypatch, world)
+    default = client.get(ARTIFACTS_PATH, headers=AUTH).json()
+    assert default["count"] == len(default["items"]) == 50 and default["nextCursor"] == default["items"][-1]["artifactId"]
+    largest = client.get(ARTIFACTS_PATH + "?limit=200", headers=AUTH).json()
+    assert largest["count"] == len(largest["items"]) == 200 and largest["nextCursor"] is not None
+    rest = client.get(ARTIFACTS_PATH + f"?limit=200&cursor={largest['nextCursor']}", headers=AUTH).json()
+    assert rest["count"] == 50 and rest["nextCursor"] is None
+    assert len({i["artifactId"] for i in largest["items"] + rest["items"]}) == 250
+
+
+def test_the_page_schema_bounds_items_and_count_and_says_what_count_means():
+    too_many = [
+        {"artifactId": f"art_01J8Z3XQ2K9WMV5T7N4B6C8{i:03d}", "role": "log", "uri": "inv://x", "checksumSha256": SHA, "byteSize": 1}
+        for i in range(201)
+    ]
+    with pytest.raises(Exception):
+        schemas.RunRecordArtifactPageResponse.model_validate(
+            {"recordId": RECORD, "runId": RUN, "role": None, "items": too_many, "count": 201, "nextCursor": None}
+        )
+    doc = schemas.RunRecordArtifactPageResponse.__doc__ or ""
+    assert "this" in doc and "page" in doc and "never the record" in doc      # count = page count, not total
 
 
 # ---------------------------------------------------------------- verify: facts, not errors
@@ -239,6 +314,25 @@ def test_verify_reports_true_when_the_object_still_matches(monkeypatch):
     assert body == {"recordId": RECORD, "runId": RUN, "artifactId": ART_DIFF, "verified": True, "pinnedChecksumSha256": SHA}
     schemas.ArtifactPinVerificationResponse.model_validate(body)
     assert world["verify_calls"] == [(TENANT, RECORD, ART_DIFF)]
+
+
+def test_a_pin_that_vanishes_after_the_service_answered_is_404_not_a_verified_null(monkeypatch):
+    """Codex #188 F1: the service's success must not become ``200`` with a null
+    pinned digest (fail-open). The mutation removes the pin between the
+    service call and the route's read of it."""
+    world = {"pin_vanishes_after_verify": True}
+    client = build(monkeypatch, world)
+    body = canonical(client.get(verify_path(ART_DIFF), headers=AUTH), code="RES-0004", status=404)
+    assert body["detail"] == "No such pinned artifact."
+    assert world["verify_calls"] == [(TENANT, RECORD, ART_DIFF)]           # the service did answer
+
+
+def test_the_verification_contract_requires_the_pinned_digest():
+    base = {"recordId": RECORD, "runId": RUN, "artifactId": ART_DIFF, "verified": True}
+    for bad in ({**base}, {**base, "pinnedChecksumSha256": None}):
+        with pytest.raises(Exception):
+            schemas.ArtifactPinVerificationResponse.model_validate(bad)
+    schemas.ArtifactPinVerificationResponse.model_validate({**base, "pinnedChecksumSha256": SHA})
 
 
 def test_a_changed_or_missing_object_is_verified_false_with_200_not_an_error(monkeypatch):

@@ -38,6 +38,14 @@ def _verified_artifact(session, *, tenant_id, run_id, name, checksum="b" * 64):
 
 
 def _sealed_with_pins(app_sessionmaker, *, tenant_id, seed):
+    run_id, record_id, ids = _sealed_with(
+        app_sessionmaker, tenant_id=tenant_id, seed=seed, pins=[("changes.patch", "diff"), ("otel.json", "trace")]
+    )
+    return run_id, record_id, ids[0], ids[1]
+
+
+def _sealed_with(app_sessionmaker, *, tenant_id, seed, pins):
+    """A sealed record pinning one verified artifact per ``(name, role)``; ids in pin order."""
     with app_sessionmaker() as session:
         with session.begin():
             with tenant_scope(session, tenant_id):
@@ -54,13 +62,15 @@ def _sealed_with_pins(app_sessionmaker, *, tenant_id, seed):
                     actor_id="control-plane", action="run.complete", input_schema="RunInput@1",
                     input_payload={"objective": "train"}, output_ref=f"inv://artifacts/{run.run_id}/art_x",
                 )
-                diff = _verified_artifact(session, tenant_id=tenant_id, run_id=run.run_id, name="changes.patch")
-                trace = _verified_artifact(session, tenant_id=tenant_id, run_id=run.run_id, name="otel.json")
+                ids = [
+                    _verified_artifact(session, tenant_id=tenant_id, run_id=run.run_id, name=name)
+                    for name, _role in pins
+                ]
                 record = record_service.seal_run_record(
                     session, tenant_id=tenant_id, run_id=run.run_id, now=NOW,
-                    artifacts=[record_service.ArtifactPin(diff, "diff"), record_service.ArtifactPin(trace, "trace")],
+                    artifacts=[record_service.ArtifactPin(a, role) for a, (_n, role) in zip(ids, pins)],
                 )
-                return run.run_id, record.record_id, diff, trace
+                return run.run_id, record.record_id, ids
 
 
 def _artifacts_path(project_id, run_id, role=None):
@@ -103,6 +113,45 @@ def test_a_member_lists_and_filters_real_pins_and_a_sibling_project_cannot(
         assert diff not in str(body) and record_id not in str(body)
         _canonical(client.get(_verify_path(sibling["project_id"], run_id, diff)), code="RES-0004", status=404)
         _canonical(client.get(_artifacts_path(mine["project_id"], run_id)), code="AUTH-0030", status=403)
+
+
+def test_the_list_is_paged_on_real_rows_with_a_stable_cursor_and_the_role_filter_across_pages(
+    owner_engine, app_engine, app_sessionmaker, two_tenants, clean_tables
+):
+    """Codex #188 F2 on the real query: filter -> cursor -> limit, no gap, no repeat."""
+    tenant_a, _ = two_tenants
+    with owner_engine.begin() as connection:
+        mine = _seed_project(connection, tenant_id=tenant_a, code="mine")
+    pins = [("a.patch", "diff"), ("b.json", "trace"), ("c.patch", "diff"), ("d.log", "log"), ("e.patch", "diff")]
+    run_id, _record_id, ids = _sealed_with(app_sessionmaker, tenant_id=tenant_a, seed=mine, pins=pins)
+    ordered = sorted(ids)
+    diffs = sorted(a for a, (_n, role) in zip(ids, pins) if role == "diff")
+    base = _artifacts_path(mine["project_id"], run_id)
+    with _client(app_engine, tenant_id=tenant_a, user_id=mine["user_id"]) as client:
+        first = client.get(base + "?limit=2").json()
+        assert [i["artifactId"] for i in first["items"]] == ordered[:2] and first["count"] == 2
+        assert first["nextCursor"] == ordered[1]
+        second = client.get(base + f"?limit=2&cursor={first['nextCursor']}").json()
+        assert [i["artifactId"] for i in second["items"]] == ordered[2:4] and second["nextCursor"] == ordered[3]
+        third = client.get(base + f"?limit=2&cursor={second['nextCursor']}").json()
+        assert [i["artifactId"] for i in third["items"]] == ordered[4:] and third["nextCursor"] is None
+        walked = [i["artifactId"] for page in (first, second, third) for i in page["items"]]
+        assert walked == ordered and len(set(walked)) == 5                  # exactly once each
+        # role filter across a page boundary: three diffs, one per page
+        page, cursor, seen = None, None, []
+        for _ in range(3):
+            page = client.get(base + "?role=diff&limit=1" + (f"&cursor={cursor}" if cursor else "")).json()
+            assert page["role"] == "diff" and [i["role"] for i in page["items"]] == ["diff"]
+            seen += [i["artifactId"] for i in page["items"]]
+            cursor = page["nextCursor"]
+        assert seen == diffs and cursor is None
+        _canonical(client.get(base + "?limit=201"), code="VAL-0003", status=422)
+        _canonical(client.get(base + "?limit=0"), code="VAL-0003", status=422)
+        _canonical(client.get(base + "?cursor=not-an-id"), code="VAL-0003", status=422)
+        _canonical(client.get(base + "?limit=1&limit=2"), code="VAL-0003", status=422)
+        # a cursor past the last id is an empty last page, not an error
+        empty = client.get(base + f"?cursor={ordered[-1]}").json()
+        assert empty["items"] == [] and empty["count"] == 0 and empty["nextCursor"] is None
 
 
 def test_verify_reports_the_truth_after_the_object_changes_and_the_record_stays(

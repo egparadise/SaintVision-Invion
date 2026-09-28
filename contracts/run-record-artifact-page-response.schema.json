@@ -54,9 +54,10 @@
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "The artifacts pinned into a sealed record, optionally filtered to one role.",
+  "description": "One bounded page of the artifacts pinned into a sealed record.\n\nA record pins the run's whole artifact set, which has no bound of its own,\nso the list is paged: at most ``limit`` (default 50, maximum 200) items in\nstable ``artifactId`` order. ``count`` is the number of items in *this\npage*, never the record's total. ``nextCursor`` is the last item's\n``artifactId`` when more follow, and null on the last page. ``role`` echoes\nthe filter, which holds across pages.",
   "properties": {
     "count": {
+      "maximum": 200,
       "minimum": 0,
       "title": "Count",
       "type": "integer"
@@ -65,8 +66,21 @@
       "items": {
         "$ref": "#/$defs/RunRecordArtifactPin"
       },
+      "maxItems": 200,
       "title": "Items",
       "type": "array"
+    },
+    "nextCursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nextcursor"
     },
     "recordId": {
       "title": "Recordid",
@@ -96,6 +110,6 @@
     "items",
     "count"
   ],
-  "title": "RunRecordArtifactsResponse",
+  "title": "RunRecordArtifactPageResponse",
   "type": "object"
 }

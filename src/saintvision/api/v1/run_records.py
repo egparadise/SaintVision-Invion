@@ -43,7 +43,7 @@ from ..problem import (
     require_absent_body,
     translate,
 )
-from .lineage_query import _membership, _query
+from .lineage_query import _cursor, _limit, _membership, _query
 from .project_scope import run_in_project
 
 RECORD_PATH = "/projects/{project_id}/runs/{run_id}/record"
@@ -136,29 +136,39 @@ async def read_run_record_artifacts(
     request: Request,
     principal: Principal = Depends(get_principal),
     session: Session = Depends(get_session),
-) -> schemas.RunRecordArtifactsResponse:
-    """R2: the artifacts pinned into the record, optionally one role.
+) -> schemas.RunRecordArtifactPageResponse:
+    """R2: one bounded page of the artifacts pinned into the record.
 
-    ``role`` is the only query parameter; an unknown role is the service's
-    refusal (``VAL-0003``), so the route does not keep its own copy of the
-    allowed roles.
+    ``role``, ``limit`` and ``cursor`` are the query parameters; ``limit`` and
+    ``cursor`` are judged by the shared #175 helpers before any row is read,
+    and an unknown role is the service's refusal (``VAL-0003``), so the route
+    keeps no copy of the allowed roles. The record pins the run's whole
+    artifact set, so the page is the bound (Codex #188 F2).
     """
     _membership(session, principal=principal, project_id=project_id)
     require_absent_body(await read_bounded_body(request))
-    query = _query(request, allowed=frozenset({"role"}))
+    query = _query(request, allowed=frozenset({"role", "limit", "cursor"}))
+    limit = _limit(query.get("limit"))
+    cursor = _cursor(query.get("cursor"))
     record = _sealed_record(session, principal=principal, project_id=project_id, run_id=run_id)
     try:
-        rows = record_service.list_pinned_artifacts(
-            session, tenant_id=principal.tenant_id, record_id=record.record_id, role=query.get("role")
+        page = record_service.page_pinned_artifacts(
+            session,
+            tenant_id=principal.tenant_id,
+            record_id=record.record_id,
+            role=query.get("role"),
+            limit=limit,
+            cursor=cursor,
         )
     except InvError as error:
         raise translate(error, table=TRANSLATION, detail="Unknown artifact role.") from None
-    return schemas.RunRecordArtifactsResponse(
+    return schemas.RunRecordArtifactPageResponse(
         record_id=record.record_id,
         run_id=record.run_id,
         role=query.get("role"),
-        items=[_pin(row) for row in rows],
-        count=len(rows),
+        items=[_pin(row) for row in page.items],
+        count=len(page.items),
+        next_cursor=page.next_cursor,
     )
 
 
@@ -189,12 +199,16 @@ async def verify_run_record_artifact(
     except InvError as error:
         raise translate(error, table=TRANSLATION, detail="No such pinned artifact.") from None
     pinned = session.get(RunRecordArtifact, (principal.tenant_id, record.record_id, artifact_id))
+    if pinned is None or not pinned.checksum_sha256:
+        # The service found the pin a moment ago; a pin that is gone now is not
+        # a verified answer with a null digest (fail-open), it is no answer.
+        raise CanonicalProblem(RES_NOT_FOUND, 404, "No such pinned artifact.")
     return schemas.ArtifactPinVerificationResponse(
         record_id=record.record_id,
         run_id=record.run_id,
         artifact_id=artifact_id,
         verified=bool(verified),
-        pinned_checksum_sha256=pinned.checksum_sha256 if pinned is not None else None,
+        pinned_checksum_sha256=pinned.checksum_sha256,
     )
 
 
@@ -212,7 +226,7 @@ def register(router: APIRouter) -> None:
         ARTIFACTS_PATH,
         read_run_record_artifacts,
         methods=["GET"],
-        response_model=schemas.RunRecordArtifactsResponse,
+        response_model=schemas.RunRecordArtifactPageResponse,
         tags=["run-records"],
         name="read_run_record_artifacts",
     )

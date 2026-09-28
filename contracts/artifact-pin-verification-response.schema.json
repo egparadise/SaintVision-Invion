@@ -8,17 +8,9 @@
       "type": "string"
     },
     "pinnedChecksumSha256": {
-      "anyOf": [
-        {
-          "pattern": "^[0-9a-f]{64}$",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Pinnedchecksumsha256"
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Pinnedchecksumsha256",
+      "type": "string"
     },
     "recordId": {
       "title": "Recordid",
@@ -37,7 +29,8 @@
     "recordId",
     "runId",
     "artifactId",
-    "verified"
+    "verified",
+    "pinnedChecksumSha256"
   ],
   "title": "ArtifactPinVerificationResponse",
   "type": "object"
