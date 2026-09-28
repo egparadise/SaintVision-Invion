@@ -253,7 +253,7 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
     it('renders Real Model Commitment Observation Panel and fetches commitment via control-plane API', async () => {
       const originalFetch = globalThis.fetch;
       const mockCommitmentResponse = {
-        projectId: 'prj_test_10',
+        projectId: 'prj_default',
         modelId: 'mod_pacs_seg_v2',
         version: '2.1.0',
         manifestHash: 'sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
@@ -296,9 +296,12 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
         expect(versionInput).not.toBeNull();
         expect(fetchBtn).not.toBeNull();
 
-        // Trigger fetch
+        // Trigger fetch and flush async execution
         await act(async () => {
           fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
         });
 
         expect(globalThis.fetch).toHaveBeenCalled();
@@ -325,6 +328,9 @@ describe('S10-FE: Model Lineage, Multi-Provider Conformance & Gated Deployment (
 
         await act(async () => {
           fetchBtn!.click();
+        });
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
         });
 
         const errorBanner = container.querySelector('[data-testid="commitment-error-banner"]');

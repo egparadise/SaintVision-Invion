@@ -79,7 +79,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 digest 고정과 무관 · 실 환경 미배포 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 검증 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
