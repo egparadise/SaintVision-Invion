@@ -747,6 +747,24 @@ def test_security_scan_missing_or_payload_sha_mismatch_is_not_observed(allowlist
             lambda row: row["scanArtifact"].update(expiresAt="2020-01-01T00:00:00Z"),
             tool.Verdict.NOT_OBSERVED,
         ),
+        (
+            lambda row: row["scanArtifact"].update(
+                artifactName=f"s11-ac11-security-{'f' * 40}"
+            ),
+            tool.Verdict.NOT_OBSERVED,
+        ),
+        (
+            lambda row: row["scanArtifact"].update(runConclusion="failure"),
+            tool.Verdict.NOT_OBSERVED,
+        ),
+        (
+            lambda row: row["environment"].update(topology="physical"),
+            tool.Verdict.INVALID_RUN,
+        ),
+        (
+            lambda row: row.update(finishedAt="2026-09-28T01:59:59Z"),
+            tool.Verdict.NOT_OBSERVED,
+        ),
     ],
 )
 def test_security_scan_run_source_and_artifact_provenance_is_fail_closed(
@@ -757,6 +775,22 @@ def test_security_scan_run_source_and_artifact_provenance_is_fail_closed(
     assert (
         tool.evaluate_security_scan(report, SCAN_ALLOWLIST, NOW, FakeGit(), SOURCE)
         is expected
+    )
+
+
+@pytest.mark.parametrize("forgery", ["scanned-file", "audited-dependency"])
+def test_security_scan_resigned_payload_cannot_hide_registered_input(forgery):
+    report = security_scan_report()
+    if forgery == "scanned-file":
+        report["payload"]["scannedPythonFiles"].pop()
+        report["payload"]["summaries"]["bandit"]["scannedFileCount"] -= 1
+    else:
+        report["payload"]["auditedDependencies"].pop()
+        report["payload"]["summaries"]["pip-audit"]["dependencyCount"] -= 1
+    report["payloadSha256"] = tool._canonical_sha256(report["payload"])
+    assert (
+        tool.evaluate_security_scan(report, SCAN_ALLOWLIST, NOW, FakeGit(), SOURCE)
+        is tool.Verdict.INVALID_RUN
     )
 
 
