@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-G04-W3-MEASUREMENT-0054-001"
 title: "G-04 W3 측정 seam PR A-1 — migration 0054, kernel-owned measurement 표, verify_model_version(measurement_id 필수)"
-version: "1.2.0"
+version: "1.3.0"
 status: "active"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T20:40:12+09:00"
+updated: "2026-09-28T20:44:44+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["G-04"]
@@ -45,6 +45,10 @@ Codex F1/F2 두 건과, 같은 head의 hosted Backend 36411181371(48 failed / 51
 - **expected shape에 `channel_version >= 1` CHECK가 빠져 있었다**(Codex R2-1). 실 PG는 정확히 그 한 항목만 다르다고 답했고(다른 13개 제약·인덱스·정책 렌더링은 normalise 뒤 일치), 재개 거부 → 시험 `finally`의 재실행도 거부 → `verified_measurement_id` 없는 DB가 남아 이후 126건이 연쇄 실패했다. 항목을 추가하고, kernel SQL의 CREATE TABLE 본문에서 CHECK/PK/UNIQUE를 독립적으로 파싱해 expected 'c/p/u' 집합과 1:1임을 고정하는 PG-free 시험을 뒀다(stand-in이 expected를 되돌려 주는 구조로는 잡히지 않던 drift).
 - **owner shape**(Codex R2-2): `owner` 부분을 추가 — `(owner ∉ {inv_app, inv_kernel}, pg_has_role(inv_app, owner), pg_has_role(inv_kernel, owner)) == (True, False, False)`; reader에도 같은 검사(`READER_OWNER`). PG-free 되살림 4+4, 실 PG: `OWNER TO inv_app`·owner role membership 부여·reader `OWNER TO inv_app` 각각 public DDL 전 거부·복구 뒤 수렴. definer audit의 `runtime_can_assume_function_owner`는 `tests/integration/test_definer_audit.py::test_runtime_must_not_assume_function_owner`가 hosted에서 실행한다.
 - 실 PG `trigger-disabled` 변이는 `tests/test_db_integrity_static.py`가 helper 밖 raw `DISABLE TRIGGER`를 금지해 삭제(PG-free 'D' 상태·실 PG trigger 삭제가 남는다). downgrade 시험에 전제(revision 0054·행 ≥1·열 존재) 단언 추가. seed에 measurement 2문(GUC·INSERT)이 늘어 PG-free seed 카운트 시험 3곳(15→17, 7→9, 18→20)과 INSERT-only 테이블 집합 필터를 갱신.
+
+## 2-3. AC-11 fixture manifest — #177 카드 90 head(da112daf) merge + 0054 분류
+
+코디네이터 규칙(새 migration PR은 같은 PR에서 AC-11 fixture manifest를 갱신). #177 head `da112daf`("classify migrations through 0053")를 해소만으로 merge(충돌 0)하고 `docs/vault/30_Development/Evidence/s11-migration-fixture-manifest-v0.json`에 `0054_model_version_measurements → PRESERVED`를 추가했다. 근거는 migration 원문: `downgrade()`는 결속된 version 또는 measurement 행이 하나라도 있으면 거부하고, 없을 때만 빈 CHECK·FK·열·reader·표를 내린다 — 어느 쪽도 데이터를 잃지 않는다(0053과 같은 부류). `tools/migration_graph.py`는 0054를 reversible로 분류하고(`downgrade_body_kind`도 `reversible`), reversible tail은 `[0053, 0054]`가 되어 `tests/test_ac11_migration_rehearsal.py`의 tail·PRESERVED 단언을 그에 맞게 늘렸다. 로컬: `test_ac11_migration_rehearsal.py` 21 passed.
 
 ## 3. 소유권 경계 (코디네이터 확인 필요)
 
