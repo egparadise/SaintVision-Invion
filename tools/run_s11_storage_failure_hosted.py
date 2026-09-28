@@ -398,13 +398,14 @@ def _s3_corruption_case(identity: str, env) -> dict[str, Any]:
             injected = response.status in {200, 201, 204}
             call = lambda: store.finalize(env.tenant, env.project, object_id)
         elif identity.endswith("size-metadata"):
-            with psycopg.connect(env.owner) as owner:
-                changed = owner.execute(
-                    "UPDATE inv.storage_objects SET size_bytes=size_bytes+1 "
-                    "WHERE project_id=%s AND object_id=%s",
-                    (env.project, object_id),
-                ).rowcount
-            injected = changed == 1
+            # Change the provider object's actual length while retaining the
+            # manifest's expected size.  Mutating storage_objects directly is
+            # not a valid fault: its CHECK constraint correctly rejects that
+            # harness shortcut before the product verifier can run.
+            control.delete(locator)
+            changed = body + b"!"
+            response = control.put(locator, changed, hashlib.sha256(changed).hexdigest())
+            injected = response.status in {200, 201, 204}
             call = lambda: store.finalize(env.tenant, env.project, object_id)
         elif identity.endswith("metadata-digest"):
             control.delete(locator)
