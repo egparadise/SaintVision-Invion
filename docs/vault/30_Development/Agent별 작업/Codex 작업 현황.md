@@ -25,6 +25,11 @@ source_of_truth: "Git"
 - `08ece3bc`의 URI trailing/version slash 수정은 되살림 3건이 exit 1로 KILLED됐다. 정확한 경계는 trailing slash를 parser가, version slash를 `build_uri()`와 `test_builder_rejects_ambiguous_version_path`가 막는다. `0043` pin migration은 직접 PostgreSQL 단언을 정독해 승인했다(로컬 PG 실행은 제한에 따라 NOT_RUN). `c75201af` model shard resolution은 fail-closed/unavailable·tenant/location 경계를 직접 시험해 검토 공백을 닫았다.
 - `34791448` exact-match adapter는 casefold 완화 mutation이 2건 실패해 KILLED됐으며, request path 미결속 blocker는 유지한다. `3e267b05` archive retention은 WAL boundary mutation을 property 시험이 잡았지만 malformed `START TIME`을 directory mtime으로 fail-open 대체하는 F-VFCL04-01과 명명 timezone을 실패/UTC 오해석하는 F-VFCL04-02를 분리해 수정 요청했다.
 - #139·#143 병합 전이라 registry는 건드리지 않고 VF-CL-02/03 true, VF-CL-04 false+두 새 blocker의 의미 diff만 제안했다. 다음은 Claude가 retention timestamp fail-closed와 timezone parsing을 보정한 뒤 Codex 재검토와 registry owner 적용이다. [[2026-09-28_16-25-00_KST_VF-CL_독립검토공백_Codex]].
+## 2026-09-28 S11-BE·S11-DB AC-11 통합 인수 설계 v1.1.1 — Claude 재검토 요청
+
+- migration을 가역 `forward→downgrade→forward`와 비가역 `forward→verified restore→forward`로 분리했다. 현재 head `0046_model_manifest_readiness`는 비가역이고 reversible tail이 0개이므로 no-op downgrade를 PASS로 세지 않는다.
+- PR #126 CX01 hosted restore, VF-CL-04 readiness/retention, S05 hosted 두 비교군을 재사용하되 실제 PITR·5노드·장시간·완전한 security/accessibility는 `NOT_OBSERVED`/`BLOCKED_EXTERNAL`로 유지한다.
+- Claude r1 수정 요청에 따라 verdict 닫힌 enum·필수 8축 allowlist·집계기 재계산, `d74e82ec` 목표 결속, forward 후 sentinel/손실형 가역/catalog fingerprint, OPEN evidence digest·만료 기준점을 v1.1에 반영했다. r2 조건으로 `s11-security-allowlist-v0.json`에 실제 VF runner·workflow·시험 blob과 node ID 5개, RLS accepted 3건의 사전 disposition을 고정하고 definer/RLS 결과·exit의 severity/verdict 표를 v1.1.1에 추가했다. 구현·실행·registry 변경은 없고 S11-BE/S11-DB/AC-11은 `planned`다. [[S11-BE_DB_AC-11_통합_인수_설계]], [[2026-09-28_10-16-34_KST_S11_AC11_통합인수_설계_Codex]].
 
 ## 2026-09-23 S05 Card32 측정 provenance 보강 — 착지 요청
 
