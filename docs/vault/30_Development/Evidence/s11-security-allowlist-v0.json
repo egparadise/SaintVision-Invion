@@ -1,6 +1,20 @@
 {
   "schemaVersion": "1.0.0",
   "verifiedAt": "2026-09-28T11:12:00+09:00",
+  "definerPolicySignatures": [
+    "public.apply_capability_offer(uuid, character, character, bigint)",
+    "public.apply_resource_offer(uuid, character, text, bigint)",
+    "public.business_admin_allowed(uuid, text, text)",
+    "public.business_execution_permission(uuid, text, character)",
+    "public.consume_discovery_issue_budget(uuid)",
+    "public.model_location_readiness(text[])",
+    "public.model_registry_snapshot(uuid, text, text)",
+    "public.node_by_certificate(character)",
+    "public.project_kernel_link(uuid, text)",
+    "public.run_committed_outputs(uuid, text)",
+    "public.subject_kernel_link(uuid, character)",
+    "public.workspace_input_state(uuid, text)"
+  ],
   "secVf001": {
     "runner": {
       "path": "tools/run_vf_security_tests.py",
@@ -34,7 +48,14 @@
       "tests/integration/test_desktop_browser.py::test_browser_real_catalogue_owner_scope_and_revocation",
       "tests/integration/test_desktop_browser.py::test_browser_real_committed_model_and_current_permission",
       "tests/integration/test_studio_browser.py::test_full_studio_login_project_approval_and_logout"
-    ]
+    ],
+    "requiredCaseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+    "expectedTests": {
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "passed": 6
+    }
   },
   "rlsAcceptedDispositions": [
     {
