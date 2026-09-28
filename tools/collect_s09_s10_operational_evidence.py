@@ -173,6 +173,17 @@ def evaluate_context_reproducibility(summary: dict[str, Any] | None) -> dict[str
             "MEASURED_FAIL",
             reason="the sample seed was not recorded, so the sample cannot be reproduced",
         )
+    # Recording the seed gives reproducibility; it does not give pre-registration.
+    # An operator free to choose the seed could try several and submit only the
+    # run whose sample happens to miss a corrupted bundle, and the report would be
+    # perfectly self-consistent. So only the registered seed can carry a verdict.
+    if seed != O2_SAMPLE_SEED:
+        return _measured(
+            "MEASURED_FAIL",
+            reason="the sample seed is not the pre-registered one; a chosen seed cannot carry a verdict",
+            sampleSeed=seed,
+            registeredSeed=O2_SAMPLE_SEED,
+        )
     sampled = int(summary.get("sampled", 0))
     verified = int(summary.get("verified", 0))
     mismatched = int(summary.get("mismatched", 0))
@@ -817,11 +828,8 @@ def parser() -> argparse.ArgumentParser:
         help="O14 freshness bound; defaults to INV_MODEL_MEASUREMENT_MAX_AGE_SECONDS or 86400",
     )
     result.add_argument("--o2-limit", type=int, default=200)
-    result.add_argument(
-        "--o2-seed",
-        default=O2_SAMPLE_SEED,
-        help="pre-registered O2 sample seed; recorded in the evidence",
-    )
+    # There is deliberately no --o2-seed. The seed is pre-registered in this file,
+    # and a flag would turn it into something the executor picks.
     result.add_argument("--o6-limit", type=int, default=200)
     result.add_argument("--o6-page-limit", type=int, default=50)
     result.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
@@ -869,7 +877,7 @@ def main(argv: list[str] | None = None) -> int:
             o2_limit=args.o2_limit,
             o6_limit=args.o6_limit,
             o6_page_limit=args.o6_page_limit,
-            o2_seed=args.o2_seed,
+            o2_seed=O2_SAMPLE_SEED,
         )
         evidence = build_evidence(
             database=database, provenance=provenance, source_env=args.dsn_env

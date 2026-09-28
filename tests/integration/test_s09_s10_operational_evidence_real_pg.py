@@ -20,6 +20,8 @@ O6 and O14 are fixed PG-free in ``tests/core/test_s09_s10_operational_evidence.p
 
 from __future__ import annotations
 
+import uuid
+
 import psycopg
 from psycopg.rows import dict_row
 import pytest
@@ -102,20 +104,48 @@ def test_a_row_committed_elsewhere_is_invisible_inside_the_collector_snapshot(
     This is what "one snapshot" buys: the page walk and the count cannot straddle
     someone else's write.
     """
+    marker_tenant = str(uuid.uuid4())
+    marker_digest = "f" * 64
     engine = _engine(database_url)
     try:
         with Session(engine) as session:
             session.execute(text("SET TRANSACTION READ ONLY"))
             handle = collector.SnapshotHandle(session)
             before = handle.execute(
-                "SELECT count(*) AS value FROM public.context_bundles"
+                "SELECT count(*) AS value FROM public.context_snapshots"
             ).fetchone()["value"]
 
+            # A real row, committed by a different connection while the
+            # collection is open. A temp table would not be observable and would
+            # make this test's name a claim it does not check.
             with owner_engine.begin() as outside:
-                outside.execute(text("CREATE TEMP TABLE _probe_marker(id int)"))
+                outside.execute(
+                    text(
+                        "INSERT INTO public.context_snapshots"
+                        " (tenant_id, content_hash, content, byte_size)"
+                        " VALUES (:tenant, :digest, :content, :size)"
+                    ),
+                    {
+                        "tenant": marker_tenant,
+                        "digest": marker_digest,
+                        "content": "snapshot-visibility-probe",
+                        "size": len("snapshot-visibility-probe"),
+                    },
+                )
+
+            # A connection opened after the commit does see it, so the
+            # invisibility below is the snapshot doing its job rather than an
+            # insert that quietly failed.
+            with _conn(database_url) as witness:
+                seen = witness.execute(
+                    "SELECT count(*) AS value FROM public.context_snapshots"
+                    " WHERE tenant_id = %(tenant)s AND content_hash = %(digest)s",
+                    {"tenant": marker_tenant, "digest": marker_digest},
+                ).fetchone()["value"]
+                witness.rollback()
 
             after = handle.execute(
-                "SELECT count(*) AS value FROM public.context_bundles"
+                "SELECT count(*) AS value FROM public.context_snapshots"
             ).fetchone()["value"]
             same_snapshot = handle.execute(
                 "SELECT txid_current_snapshot()::text AS snap"
@@ -126,7 +156,16 @@ def test_a_row_committed_elsewhere_is_invisible_inside_the_collector_snapshot(
             session.rollback()
     finally:
         engine.dispose()
-    assert before == after
+        with owner_engine.begin() as cleanup:
+            cleanup.execute(
+                text(
+                    "DELETE FROM public.context_snapshots"
+                    " WHERE tenant_id = :tenant AND content_hash = :digest"
+                ),
+                {"tenant": marker_tenant, "digest": marker_digest},
+            )
+    assert seen == 1, "the marker row was never committed, so the test proves nothing"
+    assert after == before, "a row committed elsewhere became visible mid-collection"
     assert same_snapshot == again, "the snapshot moved inside one collection"
 
 

@@ -464,3 +464,38 @@ def test_o6_and_its_independent_count_share_one_connection_by_construction():
     assert "psycopg.connect" not in source
     handle_source = inspect.getsource(collector.SnapshotHandle)
     assert "session.connection().connection.driver_connection" in handle_source
+
+
+def test_o2_refuses_a_seed_the_executor_chose():
+    """Recording a seed gives reproducibility, not pre-registration.
+
+    An executor free to pick the seed could try several and submit only the run
+    whose sample misses a corrupted bundle; the report would look self-consistent.
+    Only the registered seed carries a verdict.
+    """
+    result = collector.evaluate_context_reproducibility(
+        {
+            "sampled": 40,
+            "verified": 40,
+            "mismatched": 0,
+            "errored": 0,
+            "sampleSeed": "attacker-chosen",
+            "sampleOrder": "md5(seed || bundle_id)",
+        }
+    )
+    assert result["status"] == "MEASURED_FAIL"
+    assert "pre-registered" in result["reason"]
+    assert result["registeredSeed"] == collector.O2_SAMPLE_SEED
+
+
+def test_the_seed_is_not_an_operator_flag():
+    """A flag would make the seed the executor's choice; there must not be one."""
+    import argparse
+
+    options = {
+        action.option_strings[0]
+        for action in collector.parser()._actions
+        if isinstance(action, argparse.Action) and action.option_strings
+    }
+    assert "--o2-seed" not in options
+    assert "--o2-limit" in options

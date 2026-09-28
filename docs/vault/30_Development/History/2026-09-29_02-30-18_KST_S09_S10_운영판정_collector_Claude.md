@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-S09-S10-OPERATIONAL-COLLECTOR-001"
 title: "S09-DB·S10-DB·S10-ST 운영 판정 collector — 측정 가능한 넷만 측정하고 여덟은 이유와 함께 미관측"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-29T03:05:00+09:00"
+updated: "2026-09-29T03:25:00+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 task_ids: ["S09-DB", "S10-DB", "S10-ST"]
@@ -47,7 +47,7 @@ O11′는 `0054`의 제약을 읽고 O6은 그 service 함수를 호출하므로
 
 ## 시험
 
-- **PG-free 부정 시험 46건** — `tests/core/test_s09_s10_operational_evidence.py`. 표본이 최소치보다 하나 적으면 통과가 아니고(19 → `NOT_OBSERVED`, 20 → `MEASURED_PASS`), 표본이 커도 불일치 1건이면 실패, 합계가 맞지 않으면 실패, 상한을 기록하지 않으면 실패, 손으로 쓴 verdict·`acceptanceClaim`은 거부, 잘린 표본은 일치로 세지 않고 제외로 센다. **46 passed**(#237의 7건과 합쳐 53 passed).
+- **PG-free 부정 시험 48건** — `tests/core/test_s09_s10_operational_evidence.py`. 표본이 최소치보다 하나 적으면 통과가 아니고(19 → `NOT_OBSERVED`, 20 → `MEASURED_PASS`), 표본이 커도 불일치 1건이면 실패, 합계가 맞지 않으면 실패, 상한을 기록하지 않으면 실패, 손으로 쓴 verdict·`acceptanceClaim`은 거부, 잘린 표본은 일치로 세지 않고 제외로 센다. **48 passed**(#237의 7건과 합쳐 55 passed).
 - **실 PG 시험 12건** — `tests/integration/test_s09_s10_operational_evidence_real_pg.py`(`pytest.mark.postgres`). 모든 SQL과 service 호출이 실 스키마에서 해석되고, **빈 DB는 통과가 아니며**, 가장 중요한 것은 **제약을 떼면 O11′이 `MEASURED_FAIL`이 된다**는 것이다(transaction 안에서 `DROP CONSTRAINT` → 판정 → rollback → 제약이 되돌아왔음을 재확인). 제약이 실제로 있어야 떼어 볼 수 있으므로 **이것은 fake로는 보일 수 없는 축**이다.
 - **로컬에서 실 PG 시험을 실행하지 않았다** — 이 PC의 Python은 3.10이고 integration conftest가 `enum.StrEnum`(3.11+)을 쓴다. `#237`의 integration 시험도 같은 이유로 수집되지 않는다. **hosted Core(`run-core`)가 실행 주체**다.
 
@@ -68,6 +68,18 @@ O11′는 `0054`의 제약을 읽고 O6은 그 service 함수를 호출하므로
 | **F4** | **hosted가 red였다.** ① core/integration에 같은 basename 시험 파일이 있어 Python 3.12·3.14 모두 collection error(실 PG 7건 미실행) ② 새 기준 문서들의 축약 경로가 실제 repo 경로가 아니어서 Docs citation ratchet 실패 | ① 두 쌍 모두 저장소 관례(`*_real_pg.py`)로 rename했다 — **#237의 파일도 같은 충돌**이었으므로 함께 고쳤다. ② **13개 인용을 실제 경로로 확장**했다(축약형 lineage service 경로 → `src/saintvision/services/lineage.py` 처럼 `src/saintvision/` 접두를 붙였다). **#222·#223 두 문서 모두에 있던 결함**이므로 두 문서를 함께 고쳤다 — 이대로 두면 그 두 PR이 착지할 때 같은 곳에서 깨진다 |
 
 PG-free 시험은 **46건**(신규 8건: seed 없는 표본 거부, 표본 순서 계약, PUBLIC grant FAIL, 추가 grantee FAIL, grantee 집합 일치 시에만 PASS, migration에서 읽은 기대 grantee, 그리고 **connection 분리를 되살리면 실패하는 구조 시험**). `#237`의 7건을 포함해 **53 passed**.
+
+## v1.2 — 재검토 R1: seed를 "기록"에서 "사전 등록"으로
+
+F1·F2·F4는 해소 확인을 받았고 **R1 한 건**이 남았다. 지적이 정확하다 — **seed를 기록하는 것은 재현성을 주지만 사전 등록성을 주지 않는다.** CLI가 `--o2-seed`를 공개하고 evaluator가 "비어 있지 않으면 통과 후보"였으므로, 운영자가 여러 seed를 시도해 **손상 bundle이 표본에서 빠지는 값**을 고른 뒤 그 실행만 제출할 수 있었다. 보고서 내부는 완전히 자기 일관적이어서 아무도 잡지 못한다.
+
+| 고친 것 | 어떻게 |
+|---|---|
+| **선택 가능성 제거** | `--o2-seed` **flag를 삭제**했다. seed는 이 파일에 등록된 값 하나이고, flag가 있으면 그것이 실행자의 선택이 된다. `collect_database` 호출도 `O2_SAMPLE_SEED`를 직접 넘긴다 |
+| **판정에서 강제** | evaluator가 `sampleSeed != O2_SAMPLE_SEED`면 **`MEASURED_FAIL`** 이다(비어 있는 경우와 별개 분기). 프로그램적으로 다른 값을 넣어도 통과하지 못한다 |
+| **회귀 시험 2건** | `attacker-chosen` seed가 **PASS하지 못함**을 단언하고, `parser()`의 option 집합에 **`--o2-seed`가 없음**을 단언한다(flag가 돌아오면 실패) |
+
+**비차단 관찰도 고쳤다.** `test_a_row_committed_elsewhere_is_invisible_inside_the_collector_snapshot`이 이름과 달리 temp table만 만들고 관측 대상 row를 넣지 않았다 — 시험 이름이 검사하지 않는 것을 주장하고 있었다. 이제 외부 연결이 **실제 `context_snapshots` row를 commit**하고, ① 나중에 연 연결에는 **보이며**(insert가 조용히 실패한 것이 아님을 증명) ② collector의 snapshot에는 **보이지 않음**을 단언하고 ③ 뒤에 지운다.
 
 ## 다음 첫 행동
 
