@@ -206,6 +206,7 @@ def test_workspace_output_replay_binds_provider_and_writes_one_pin_event(env):
             (env.tenant, env.project, 1024 * 1024),
         )
     run, _proofs = _running(env)
+    internal_run = {"run_id": run["runId"], "attempt": run["attempt"]}
     command = str(uuid4())
     workspace_id = new_id("wsp")
     resume_id = str(uuid4())
@@ -259,7 +260,7 @@ def test_workspace_output_replay_binds_provider_and_writes_one_pin_event(env):
                 files,
                 env.tenant,
                 env.project,
-                run,
+                internal_run,
                 command,
                 receipt,
                 result_bytes,
