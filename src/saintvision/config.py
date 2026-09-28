@@ -62,9 +62,11 @@ class Settings:
     page_limit_max: int = 200
     #: Idempotency ledger retention.
     idempotency_ttl_seconds: int = 86_400
-    #: ``SET LOCAL lock_timeout`` for the business lane's write transactions
-    #: (G-04 §5-3). Ordinary contention waits and proceeds on the committed
-    #: row; a wait past this budget is answered ``SYS-0001/503/retryable``.
+    #: ``SET LOCAL lock_timeout`` for every write transaction in the business
+    #: lane (G-04 card 84; ``api/lock_wait.py``). Ordinary contention waits and
+    #: proceeds on the committed row; a wait past this budget is answered
+    #: ``SYS-0001/503/retryable``. Validated in ``__post_init__``: an integer
+    #: between 1 and 600000 milliseconds.
     business_lock_timeout_ms: int = 5_000
     #: Base URL of the execution kernel, for the observations business routes
     #: read back over HTTP (VF-CL-03). Absent is a valid deployment: a route
@@ -82,6 +84,13 @@ class Settings:
     #: A file, not a URL. Fetching keys at verification time makes the identity
     #: provider's availability a dependency of every request.
     oidc_jwks_file: str | None = None
+
+    def __post_init__(self) -> None:
+        # Fail at construction, not at the first write: a deployment with a
+        # nonsensical budget must not start and then refuse every write.
+        from .api.lock_wait import validate_lock_timeout
+
+        validate_lock_timeout(self.business_lock_timeout_ms)
 
     @property
     def login_configured(self) -> bool:
