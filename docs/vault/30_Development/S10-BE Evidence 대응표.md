@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S10-BE-EVIDENCE-MAP-001"
-title: "S10-BE Evidence 대응표 — 두 Provider adapter(contract·reference·CLI 4종)·MLflow·승인 배포(record_deployment·approval digest)·commitment route·lineage query(#158 설계)·S10-FE(#144·#146)를 기존 코드·시험·hosted run에 file:line과 run ID로 대응, MLflow는 코드 부재(공백+BLOCKED_EXTERNAL), 실 Provider 실행은 BLOCKED_EXTERNAL (구현 추가 0, 카드 bc)"
-version: "1.1.0"
+title: "S10-BE Evidence 대응표 — 두 Provider adapter(contract·reference·CLI 4종)·MLflow·승인 배포(record_deployment·approval digest)·commitment route·lineage query(#158 설계)·S10-FE(#144·#146)를 기존 코드·시험·hosted run에 file:line과 run ID로 대응, MLflow는 adapter·계약·설정·시험 부재(내부 IMPLEMENTATION/DESIGN GAP), CLI 4종 실바이너리 적합성은 runner 미provision(CI_LANE_GAP/NOT_OBSERVED), 실 계정·CX-02 운영 인수만 BLOCKED_EXTERNAL (구현 추가 0, 카드 bc)"
+version: "1.2.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:08:11+09:00"
+updated: "2026-09-28T11:12:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -15,7 +15,7 @@ tags: ["S10-BE", "AC-10", "evidence", "adapter", "provider", "mlflow", "deployme
 
 # S10-BE Evidence 대응표 (2026-09-28, 카드 bc)
 
-task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evidence "Adapter conformance·lineage query·배포 digest", AC-10. 원칙은 #155·#160·#161·#163·#164와 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. 결론 먼저 — **adapter contract·conformance·승인 배포·commitment route는 코드·시험·hosted run이 있다. MLflow 연동은 코드에 존재하지 않는다(`git grep -i mlflow` → src·services·tools·tests·requirements 0건, 문서 7건만) → 공백 + BLOCKED_EXTERNAL. 실 Provider(CLI 4종 실행·CX-02 credential)는 hosted에서 미설치 skip → BLOCKED_EXTERNAL. lineage query는 #158 설계(route 미구현). 이 PR은 대응표만 담는다(구현·시험 추가 0).**
+task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evidence "Adapter conformance·lineage query·배포 digest", AC-10. 원칙은 #155·#160·#161·#163·#164와 같다: 이미 있는 것을 file:line·run ID로 대응하고 공백만 골라낸다, 관측 안 된 값은 NOT_OBSERVED, 판정 논리 복제 없음. 결론 먼저 — **adapter contract·conformance·승인 배포·commitment route는 코드·시험·hosted run이 있다. MLflow 연동은 코드에 존재하지 않는다(`git grep -i mlflow` → src·services·tools·tests·requirements 0건, 문서 7건만) → **내부 제품 공백(G1a IMPLEMENTATION/DESIGN GAP, owner 결정 필요)**이며, 구현 뒤 실제 endpoint·credential 운영 실측만 외부 대기(G1b). CLI 4종 실바이너리 적합성은 hosted runner에 바이너리를 provision하지 않아 skip → **CI_LANE_GAP/NOT_OBSERVED**(우리가 코드·CI로 만들 수 있음); 실 로그인 계정·CX-02 credential로 하는 운영 인수만 BLOCKED_EXTERNAL. 원칙: 우리가 코드로 만들 수 있는 것은 BLOCKED_EXTERNAL로 강등하지 않는다. lineage query는 #158 설계(route 미구현). 이 PR은 대응표만 담는다(구현·시험 추가 0).**
 
 ## 0. 인용 run·근거
 
@@ -38,8 +38,8 @@ task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evide
 | conformance 러너(계약 버전·멤버·probe·install·redaction·capability 주장·cancel·attest digest·credential 반향·오류 코드·usage·handle/result model 일치) | `adapters/conformance.py:52 Check`, `:62 ConformanceReport`, `:121 run_conformance`, `:170~:202` 개별 검사 | `tests/test_adapters.py:37,:48,:106,:121,:136,:152,:168,:186,:203,:219,:229,:243,:263,:280,:298` | Backend | 관측됨 |
 | 두 적합 adapter가 같은 계약에 같은 답(divergence 탐지·빈 비교는 pass 아님) | `conformance.py`(비교) | `test_adapters.py:315 two_conformant_adapters_answer_the_same_contract`, `:330`, `:356` | Backend | 관측됨 |
 | reference adapter·redaction(비밀 형태 제거·멱등·multiline key) | `adapters/reference.py:55 recognised_secrets`, `:68 redact_text`, `:82 ReferenceAdapter` | `test_adapters.py:64,:70,:77,:84` · `tests/test_context_redaction.py` 9 | Backend | 관측됨 |
-| CLI provider 4종(claude-code·codex-cli·gemini-cli·antigravity)의 계약 적합·install 미실행·login 상태·출력 수집/한도/redaction·cancel unknown·nonzero exit≠완료·검증 불가 명시 | `adapters/agents.py:47-99 TOOLS`, `:104 adapter_for`, `:111 readiness`; `adapters/cli.py:117 CliTool`, `:194 CliAdapter`; `process_output.py:41/73` | `tests/test_cli_adapters.py` 20(:69 계약 적합, :88, :98, :122, :144, :172, :194, :221, :236, :254, :284, :301, :314, :332, :348, :396, :403) · `test_cli_output_boundary.py` 6 | Backend | 관측됨(모의 프로세스) |
-| **실 CLI 바이너리로 적합성 실행**(`:373 the_tool_definitions_match_what_the_tools_actually_offer[tool]`) | 동일 | `test_cli_adapters.py:382 skip "… is not installed on this machine"` | Core/Backend에서 4건 **skip 선언** | **BLOCKED_EXTERNAL**(runner에 CLI 미설치; 실 계정·CX-02 credential 경계) |
+| CLI provider 4종(claude-code·codex-cli·gemini-cli·antigravity)의 계약 적합·제품 adapter가 install을 수행하지 않음(`:88`)·login 상태·출력 수집/한도/redaction·cancel unknown·nonzero exit≠완료·검증 불가 명시 | `adapters/agents.py:47-99 TOOLS`, `:104 adapter_for`, `:111 readiness`; `adapters/cli.py:117 CliTool`, `:194 CliAdapter`; `process_output.py:41/73` | `tests/test_cli_adapters.py` 20(:69 계약 적합, :88, :98, :122, :144, :172, :194, :221, :236, :254, :284, :301, :314, :332, :348, :396, :403) · `test_cli_output_boundary.py` 6 | Backend | 관측됨(모의 프로세스) |
+| **실 CLI 바이너리로 적합성 실행**(`:373 the_tool_definitions_match_what_the_tools_actually_offer[tool]`) | 동일 | `test_cli_adapters.py:382 skip "… is not installed on this machine"` | Core/Backend에서 4건 **skip 선언**(`shutil.which` 부재) | **CI_LANE_GAP / NOT_OBSERVED**(hosted runner에 바이너리 미provision — CI로 메울 수 있음, G5); 실 로그인 계정·CX-02 credential 운영 인수만 **BLOCKED_EXTERNAL**(E1) |
 | adapter readiness route | `src/saintvision/api/v1/adapters.py:35 GET /adapters`, `:64 GET /adapters/{name}`(`agents.readiness()` 노출) | `test_cli_adapters.py:415`(`agents.readiness()` 직접) — **HTTP route 레벨 시험 없음** | Backend | 관측됨(로직) / NOT_OBSERVED(HTTP 표면) — G2 |
 | conformance 결과의 API 노출 | 없음(#146이 FE에서 "실제 adapter conformance API 부재 → 미측정"으로 정직화) | — | — | **설계 대상** — G3 |
 | model import adapter 정확 일치 | `adapters/model_import.py:50 compare_declaration`, `:80 require_exact_declaration` | `tests/core/test_registry_policy_exact_match.py` 10 | Backend | 관측됨(요청경로 결속은 #152 설계) |
@@ -48,7 +48,7 @@ task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evide
 
 | 항목 | 코드 | 시험 | hosted | 상태 |
 |---|---|---|---|---|
-| MLflow 실접속·등록·tracking | **없음** — `git grep -i mlflow -- src services tools tests requirements*.txt pyproject.toml` 0건(문서 7건만) | 없음 | — | **공백(G1) + BLOCKED_EXTERNAL**: 외부 서비스·credential이 필요하고 연동 코드 자체가 아직 없음 → registry scope의 "MLflow"는 설계·결정 대상(연동 여부·범위는 코디네이터/사용자) |
+| MLflow 실접속·등록·tracking | **없음** — `git grep -i mlflow -- src services tools tests requirements*.txt pyproject.toml` 0건(문서 7건만) | 없음 | — | **G1a IMPLEMENTATION/DESIGN GAP**(adapter·계약·설정·시험 부재 — 내부 제품 공백, owner 결정 필요) → 구현 뒤 **G1b BLOCKED_EXTERNAL**(실제 MLflow endpoint·credential 운영 실측) |
 
 ### 1.3 승인 배포 (record_deployment·approval digest)
 
@@ -72,14 +72,16 @@ task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evide
 
 | # | 공백 | 분류 | 이유 / 처리 |
 |---|---|---|---|
-| G1 | MLflow 연동 코드 부재(문서에만 언급) | **공백 + BLOCKED_EXTERNAL** | 외부 서비스·credential 필요; 연동 여부·범위 결정은 코디네이터/사용자 → 결정 뒤 설계 카드 |
+| G1a | MLflow adapter·계약·설정·시험 부재(문서에만 언급) | **IMPLEMENTATION/DESIGN GAP**(내부) | 우리가 코드로 만들 수 있는 것 — owner 결정(연동 여부·범위) 뒤 설계·구현 카드 |
+| G1b | 구현 뒤 실제 MLflow endpoint·credential로 하는 운영 실측 | **BLOCKED_EXTERNAL** | G1a 이후에만 성립; 외부 서비스·credential |
 | G2 | `GET /v1/adapters` route의 HTTP 레벨 시험 없음(`agents.readiness()` 로직 시험만) | NOT_OBSERVED(HTTP 표면) | 작은 시험이지만 app principal 의존성 주입이 필요해 이 카드(docs-only, 메모리 0.9GB)에서는 만들지 않음 — 후속 소카드 |
 | G3 | conformance 결과의 API 노출 없음(#146이 FE에서 "미측정"으로 정직화) | **설계 대상** | 새 route·계약 필요(#158 lineage read API와 같은 lane) |
 | G4 | 승인 배포·lineage query business route 부재 | **설계 대상** | #158(lineage read API v1.1)·카드 ar·#152 lane |
-| E1 | 실 CLI provider 4종 실행(runner 미설치)·CX-02 credential | **BLOCKED_EXTERNAL** | hosted exact map이 skip 4건을 선언; 실 계정·credential 경계 |
+| G5 | CLI 4종 실바이너리 적합성(`test_the_tool_definitions_match_what_the_tools_actually_offer`)이 hosted에서 `shutil.which` 부재로 skip | **CI_LANE_GAP / NOT_OBSERVED** | hosted runner에 바이너리 provision(설치 step 또는 pinned 이미지)으로 메울 수 있음 — exact map의 skip 4를 실행 4로 전환하는 CI 카드 |
+| E1 | 실 로그인 계정·CX-02 credential로 하는 CLI provider 운영 인수 | **BLOCKED_EXTERNAL** | 계정·credential 경계(G5와 분리) |
 
-작은 PG-free 불변식 시험으로 메울 행동 공백은 없다(계약·conformance·승인 digest·활성 배포 1·commitment 관측이 전부 기존 시험으로 단언). 따라서 docs-only.
+작은 PG-free 불변식 시험으로 메울 행동 공백은 없다(계약·conformance·승인 digest·활성 배포 1·commitment 관측이 전부 기존 시험으로 단언); G1a·G5는 코드/CI 카드 범위라 이 docs-only 카드에서 만들지 않는다.
 
 ## 3. 경계
 
-로컬 실 PG·Docker·CLI 실행·전체 suite·무거운 명령 없음(메모리 0.9GB; `git grep`·`sed`·`ls`만). 판정 논리 복제 없음. owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-evidence-map`, base `1e8baf04`. S10-BE `planned` 유지. 다음 첫 행동: Codex 검토 → G1 MLflow 결정(코디네이터) → G3/G4는 #158 lane.
+로컬 실 PG·Docker·CLI 실행·전체 suite·무거운 명령 없음(메모리 0.9GB; `git grep`·`sed`·`ls`만). 판정 논리 복제 없음. owner Claude / reviewer Codex / 병합 금지. worktree 재사용, branch `agent/claude/s10-be-evidence-map`, base `1e8baf04`. S10-BE `planned` 유지. 다음 첫 행동: Codex 검토 → G1a MLflow owner 결정(코디네이터) → G5 CI provision 카드 → G3/G4는 #158 lane.
