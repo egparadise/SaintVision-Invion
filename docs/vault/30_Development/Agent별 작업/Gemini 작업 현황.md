@@ -4,7 +4,7 @@ title: "Gemini 작업 현황"
 version: "1.0.124"
 status: "approved"
 author: "Gemini"
-updated: "2026-09-28T05:35:00+09:00"
+updated: "2026-09-28T06:00:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -67,6 +67,23 @@ source_of_truth: "Git"
     - 백엔드 `recovery_epoch`(`0001_core.sql:19`) 근거를 `tests/integration/test_shard_recovery.py:371-383`로 교체하고, 단조 증가 카운터가 아닌 UUID equality boundary(`str(uuid4())` 불일치 시 `LEASE-0004` 거절)임을 명시.
 - **계획서 정본**: [[2026-09-28_S07-FE_분산복구_Heartbeat60s_FencingToken_Zombie차단_시나리오_매트릭스_Gemini]] (v1.0.1).
 - **독립 검토 상태**: Codex 지적 3건 전수 조치 완료 후 재대조 대기, Claude UI 경로 독립 검토 대기.
+
+## 2026-09-28 S08-FE 보안 감사·Docker 소켓 차단·Kill Switch·백업 복원 UI 시나리오 매트릭스 v1.0.3 개정 (`agent/gemini/s08-fe-matrix`)
+
+- **작업 개요**: PR #123 Claude r3 UI 경로 승인(`issuecomment-5859910871`) 및 Codex 계약 재대조(`issuecomment-5859916746`) 전수 반영하여 시나리오 매트릭스 v1.0.3 개정.
+  - 409 충돌 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`)와 403 권한 경계(`AUTH-0062`) 분리 정정.
+  - `Idempotency-Key` 규격을 `app.py:key()` 기준 1~200자 printable ASCII (ordinals 33..126)로 정밀 명시.
+- **문서 정본**: `docs/vault/30_Development/2026-09-28_S08-FE_보안감사_Docker소켓차단_KillSwitch_백업복원_시나리오_매트릭스_Gemini.md` (v1.0.3, docs-only).
+- **v1.0.2 조치 내역**:
+  1. **Kill Switch canonical 계약 (F-C1)**: 백엔드 `app.py:310, :358, :370` API 실재(`GET/POST /v1/operations/kill-switch`, `/clear`) 및 POST 필수 규격(Bearer identity, operator grant, `Idempotency-Key`, `ContainmentInput`), tenant execution barrier/reconciler 정지 규약(ADR-053) 명시. 문서 내 "API 미노출" 전면 정정.
+  2. **Drain/Resume canonical 계약 (F-C2)**: `POST /v1/nodes/{id}/drain` 및 `/resume`의 필수 규격(`Idempotency-Key` 헤더, `ContainmentInput`, principal actor 추출), 성공 canonical nodeStatus enum(`online|offline|draining|quarantined|null`, 비계약 상태 `drained` 배제), 409 경계(`GRAPH-0003`, `NODE-0033`, `NODE-0062`, `LEASE-0003`, `IDEM-0001`, `AUTH-0062`), `ContainmentResult` 응답 명시 및 mock UI와의 불일치 고지.
+  3. **계층 분리 대비표 신설 (F-C3, Table §1.1)**: 클라이언트 전용 모의 계층(`SECURITY_VIOLATION`, `APPROVAL_REQUIRED`, `apr_*`, 인메모리 원장/카운터) vs 백엔드 정본 제어평면 계약 계층(`ContainmentInput/Result/View`, UUID `approvalId`, RFC 7807 ProblemDetails, PostgreSQL 불변 원장) 완전 분리.
+  4. **올바른 Node Drain ADR-054 반영 (N1)**: Drain 탭 라벨의 `ADR-038` 표기 오류 및 정본 Node drain ADR-054 반영 (`FE-DEFECT-S08-06`).
+  5. **스키마 경로 정정 (N2)**: `contracts/v1alpha1/core.schema.json` 정본 경로 명시.
+  6. **단방향 Drain 동기화 결함 본문 기술 (N3)**: `AdminSecurityConsole.tsx:27-39` 및 `:728`의 서버 drain 해제 미반영/로컬 state 의존 결함 기술.
+  7. **문구 일치 (N4, Item 1)**: `AdminSecurityConsole:246` 문구를 KPI 타일 부제 `L2/L3 위험 작업 Two-Person 강제`로 정정, 제품 문구 "비상 정지 API 미노출 상태"(`adm:181, :830`) 결함 명시 및 `FE-DEFECT-S08-01`에 수정 과제 포함.
+  8. **DOM 단언 부재 명시 및 수치 정정 (Item 9)**: BYP-01/02, GPU-01 DOM 단언 없음 명시, AUD-01 `checkedRecords >= 6` 정정.
+- **다음 행동**: `check_docs.py` 통과 확인 후 커밋·푸시, PR #123에 조치 보고 코멘트 작성.
 
 ## 2026-09-23 S04-FE Claude 리뷰 F1~F5 전수 조치 및 정직 증거 갱신 (`agent/gemini/s04-fe-matrix-measured`)
 
