@@ -783,6 +783,78 @@ def test_delivery_never_touches_the_canonical_rows(app_sessionmaker, catalogue, 
         assert [(v.model_version_id, v.stage, v.content_sha256) for v in _rows(session, ModelVersion)] == before
 
 
+def test_two_concurrent_first_intents_of_one_project_commit_both_with_exactly_one_experiment(
+    app_sessionmaker, catalogue, configured, monkeypatch
+):
+    """Codex #172 r2/r3: the race for a project's first experiment intent.
+
+    Two threads each call the real canonical mutation (``register_model_version``
+    with its mirror hook) *inside their own transaction* while no experiment
+    intent exists. Thread A registers, then holds its transaction open. Thread B
+    registers and is stopped deterministically at the enqueue lock (a wrapper
+    around ``_serialize_enqueue`` signals the moment B reaches it), then blocks
+    on the lock until A commits. Expected: canonical rows 2, subject intents 2,
+    experiment intent 1, events == intents (3), no error. Removing the lock, or
+    committing the canonical row before the mirror in a separate transaction,
+    each fails this test.
+    """
+    tenant = catalogue["tenant_a"]
+    real_serialize = tracking_service._serialize_enqueue
+    b_at_lock = threading.Event()
+
+    def observed_serialize(session, tenant_id, scope):
+        if threading.current_thread().name == "enqueue-b":
+            b_at_lock.set()                      # B is about to take the lock
+        return real_serialize(session, tenant_id, scope)
+
+    monkeypatch.setattr(tracking_service, "_serialize_enqueue", observed_serialize)
+
+    a_registered = threading.Event()
+    release_a = threading.Event()
+    versions: dict[str, str] = {}
+    errors: dict[str, BaseException] = {}
+
+    def register(label, version, content_sha, hold):
+        try:
+            with app_sessionmaker() as session:
+                with session.begin():
+                    with tenant_scope(session, tenant):
+                        row = lineage_service.register_model_version(
+                            session, tenant_id=tenant, model_id=catalogue["model_id"], version=version,
+                            content_sha256=content_sha, uri=f"inv://models/classifier@{version}", now=NOW,
+                        )
+                        versions[label] = row.model_version_id
+                        if hold:
+                            a_registered.set()
+                            release_a.wait(timeout=15)       # keep A's transaction (and lock) open
+        except BaseException as exc:  # noqa: BLE001
+            errors[label] = exc
+            a_registered.set()
+            b_at_lock.set()
+
+    a = threading.Thread(target=register, args=("a", "1.0.0", "a" * 64, True), name="enqueue-a")
+    b = threading.Thread(target=register, args=("b", "1.0.1", "b" * 64, False), name="enqueue-b")
+    a.start()
+    assert a_registered.wait(timeout=15) and "a" not in errors
+    b.start()
+    assert b_at_lock.wait(timeout=15)            # B reached the enqueue lock while A holds it
+    time.sleep(0.3)
+    assert "b" not in versions and "b" not in errors   # B is blocked on the lock, not finished, not failed
+    release_a.set()
+    a.join(timeout=30)
+    b.join(timeout=30)
+    assert not errors, errors                     # neither canonical transaction rolled back
+    assert set(versions) == {"a", "b"}
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        by_kind = _intents_by_kind(session)
+        assert len(by_kind["experiment"]) == 1
+        assert {i.model_version_id for i in by_kind["model_version"]} == set(versions.values())
+        events = {e.event_id for e in _mirror_events(session)}
+        assert events == {i.outbox_event_id for i in _rows(session, MlflowMirrorIntent)}   # no orphan event
+        assert len(events) == 3
+        assert {v.model_version_id for v in _rows(session, ModelVersion)} == set(versions.values())
+
+
 def test_delivering_an_unknown_intent_fails_closed(app_sessionmaker, catalogue, configured):
     tenant = catalogue["tenant_a"]
     with app_sessionmaker() as session:
