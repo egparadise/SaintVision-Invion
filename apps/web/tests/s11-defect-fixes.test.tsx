@@ -707,14 +707,22 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
 
     // False claims eliminated
     expect(text).not.toContain('(ZERO BUG)');
+    expect(text).not.toContain('명도대비 11.4:1 & 키보드 완결');
+    expect(text).not.toContain('실측치 및 목표 비교');
+    expect(text).not.toContain('ACTIVE LIVE');
+    expect(text).not.toContain('✔ 검증 완료');
 
-    // Truthful simulation / unmeasured labels confirmed per Card 126 / F1
-    expect(text).toContain('주요 SLO 실측치 및 목표 비교 (AC-11)');
+    // Truthful simulation / unmeasured labels confirmed per Card 126 / F1 & S11
+    expect(text).toContain('주요 SLO 모의 규격 및 목표 비교 (AC-11)');
+    expect(text).toContain('모의 예시값 (서버 미측정)');
     expect(text).toContain('UNMEASURED (미측정)');
     expect(text).toContain('미측정 (NOT_OBSERVED)');
-    expect(text).toContain('측정 환경: 실측 텔레메트리 연동 대기 (미측정)');
-    expect(text).toContain('ACTIVE LIVE');
-    expect(text).toContain('✔ 검증 완료');
+    expect(text).toContain('WCAG 2.1 AA 접근성 체크리스트 (모의 점검)');
+    expect(text).toContain('모의 PASS');
+    expect(text).toContain('[정적 예시] 원격 텔레메트리 미연동 (사전 설계 규격 시뮬레이션)');
+    expect(text).toContain('모의 활성 (서버 API 미노출 · 실 인프라 미배포)');
+    expect(text).toContain('미측정 (대기)');
+    expect(text).toContain('[수동 계산값] 특정 텍스트 쌍 기준 (전체 UI 렌더 실측 아님): 12.26:1');
 
     // DEF-S11-17: Table wrapper has overflowX auto
     const tableWrappers = container.querySelectorAll('div[style*="overflow-x: auto"], div[style*="overflowX: auto"]');
@@ -749,15 +757,40 @@ describe('S11-FE Defect Fixes Verification (DEF-S11-01 ~ DEF-S11-19)', () => {
     expect(rollbackBtn?.getAttribute('aria-label')).toBe('이 버전(v1.0.0-rc.1)으로 롤백 실행 (AC-11)');
   });
 
+  it('DEF-S11-08: ReleaseCandidateView renders (모의 기준 충족) and 모의 MET (미측정) when telemetry meeting targets is provided', async () => {
+    await act(async () => {
+      root.render(
+        <ReleaseCandidateView
+          initialEvidence={{
+            schedulerP95LatencySeconds: 1.24,
+            heartbeatDetectionSeconds: 48.0,
+            unapprovedExecutionsCount: 0,
+            dockerSocketExposedCount: 0,
+            rpoMinutes: 4.2,
+            rtoMinutes: 12.5,
+            unresolvedVulnerabilitiesCount: 0,
+          }}
+        />
+      );
+    });
+
+    const text = container.textContent || '';
+    expect(text).toContain('(모의 기준 충족)');
+    expect(text).toContain('모의 MET (미측정)');
+    expect(text).not.toContain('(ZERO BUG)');
+    expect(text).not.toContain('ACTIVE LIVE');
+    expect(text).not.toContain('✔ 검증 완료');
+  });
+
   // DEF-S11-16: ReleaseManager candidate initial state
-  it('DEF-S11-16: ReleaseManager initializes v1.0.0-rc.1 with rollbackVerified: true and verifies rollback transition', () => {
+  it('DEF-S11-16: ReleaseManager initializes v1.0.0-rc.1 with rollbackVerified: false', () => {
     const rm = new ReleaseManager();
     const candidates = rm.getReleaseCandidates();
     const rc1 = candidates.find((c) => c.tag === 'v1.0.0-rc.1');
     expect(rc1).not.toBeUndefined();
-    expect(rc1?.rollbackVerified).toBe(true);
+    expect(rc1?.rollbackVerified).toBe(false);
 
-    // After rollback execution, rollbackVerified remains true and activeCandidate is rc1
+    // After rollback execution, rollbackVerified transitions to true
     const res = rm.rollbackToVersion('v1.0.0-rc.1');
     expect(res.success).toBe(true);
     expect(res.activeCandidate?.rollbackVerified).toBe(true);

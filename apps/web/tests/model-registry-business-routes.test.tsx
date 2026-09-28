@@ -1790,7 +1790,7 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(alertBanner?.textContent).toContain('유효한 ISO 8601 일시(예: 2026-12-31T23:59:59Z)를 입력하세요.');
   });
 
-  it('Test 24 (Card 138 Item 6): placeholder prefixes conform strictly to server ID specifications (mdl_... and apv_...)', async () => {
+  it('Test 24 (Card 138 Item 6): placeholder prefixes conform strictly to server ID specifications (mdl_... and apr_...)', async () => {
     await act(async () => {
       root.render(
         <ModelLineageView

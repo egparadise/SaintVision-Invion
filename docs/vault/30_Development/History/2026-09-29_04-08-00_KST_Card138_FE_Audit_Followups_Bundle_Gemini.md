@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-GEMINI-CARD138-001"
 title: "History: Card 138 프런트엔드 비차단 후속 감사 지적사항 통합 조치 (Items 1-6)"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Gemini"
-updated: "2026-09-29T04:35:00+09:00"
+updated: "2026-09-29T04:55:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -67,7 +67,7 @@ source_of_truth: "Git"
 
 ### Item (6) #228 L-항목 잔여 (식별자 prefix 정합 및 세대 단독 가드)
 - **문제점**:
-  1. `ModelLineageView.tsx`에서 플레이스홀더 접두사가 서버 규격과 불일치 (`mod_...` 대신 `mdl_...`, `apr_...` 대신 `apv_...`).
+  1. `ModelLineageView.tsx`에서 플레이스홀더 접두사가 서버 규격과 불일치 (`mod_...` 대신 `mdl_...`, `core.schema.json` ApprovalId 정규식과 다른 임시 접두사 대신 `apr_...`).
   2. W2/W4 늦은 응답 폐기에서 abort가 수반되지 않더라도 세대 카운터(`regGenerationRef.current !== currentGen`) 단독으로 stale 응답을 버릴 수 있는지 격리 검증 필요.
 - **조치 내용**:
   - `ModelLineageView.tsx:644` `placeholder="mdl_..."`, `:1564` `placeholder="승인 식별자 입력 (apr_...)"` 정합.
@@ -91,23 +91,33 @@ source_of_truth: "Git"
 | **L1** | Low | 1/3 수리 상태 과제 부재로 `> 0` → `> 1` 돌연변이 사살 커버리지 부족 | `coding_tasks_30.json`의 `TSK-28`을 `expected: "REPAIRING"`, `expectedLoopCount: 1`로 갱신하여 1/3 수리 상태 커버리지 확보. 고정 바이트 SHA256 갱신. | `agent-mutation-guards.test.ts:428-433` (과제 실존 및 돌연변이 사살 검증) |
 | **L2** | Low | History 전면 메타데이터 `status: "approved"` 과장 | `status: "review"`로 정정하여 독립 검토 절차 준수. | 본 문서 전면부 메타데이터 |
 
-## 4. 로컬 게이트 실측 검증 결과
+## 4. 독립 검토 r2 (Claude UI 축) 지적사항 H3 및 권고사항 전수 조치
 
-| 검증 단계 | 수행 명령 | 결과 요약 | Exit Code |
-|---|---|---|---|
-| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **86 test files passed (86), 852 tests passed (852)**, 0 failures (26.76s) | `0` |
-| **TypeScript 타입 검사** | `npx tsc -b` (apps/web) | **0 errors** | `0` |
-| **프로덕션 번들 빌드** | `npm run build` (apps/web) | Vite 프로덕션 빌드 성공 (`dist/assets/index-BLqj7uvO.js` 876.03 kB) | `0` |
-| **파이썬 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **40 passed** in 2.91s | `0` |
-| **프런트엔드 무결성** | `python tools/check_frontend_integrity.py` | 92 files 0 violations (All 9 integrity rules satisfied) | `0` |
-| **계약 바인딩 검사** | `python tools/check_contract_bindings.py` | 55 fixtures / 20 bound types / 14 replay guards PASS | `0` |
-| **문서 무결성 검사** | `python tools/check_docs.py` | 24 original hashes, 920 versioned docs, wiki links PASS | `0` |
-| **Obsidian 동기화 사전 검사** | `python tools/sync_obsidian.py --check` | 1764 managed files, 0 conflicts PASS | `0` |
+| 구분 | 심각도 | 지적 사항 | 조치 내용 | 회귀 시험 및 증거 |
+|---|---|---|---|---|
+| **H3** | High | PR #190 머지 충돌 해소 과정에서 S11 제품 결함 수정(DEF-S11-08·11~16) 누락 및 시험 퇴행 | (1) `ReleaseCandidateView.tsx`와 `releaseEngine.ts`를 S11 정직 모의 배지(`모의 활성`, `✔ 모의 검증 완료`, `주요 SLO 모의 규격 및 목표 비교`, `모의 PASS`, `[수동 계산값]: 12.26:1` 등) 기준으로 복원하고 Card 126 F1(`unmeasured`)과 조화.<br>(2) 명도대비 `11.4` 오기를 수동 계산값 및 index.css 토큰과 일치하는 `12.26:1`로 정합 (`releaseEngine.ts:78`, `release-candidate.test.ts:95`, `browser-matrix-acceptance.test.tsx:243`).<br>(3) `v1.0.0-rc.1` 초기 `rollbackVerified: false` 복원 (DEF-S11-16).<br>(4) `tests/s11-defect-fixes.test.tsx`에서 허위 배지 부정 단언 5종 복원 및 모의 기준 충족 실측 시험(`DEF-S11-08`) 추가. | `tests/s11-defect-fixes.test.tsx` (16 passed), `tests/release-candidate.test.ts` (8 passed), `tests/browser-matrix-acceptance.test.tsx` (10 passed) |
+| **L2** | Low | 진행판 머지 충돌 해소 시 ours 전면 채택으로 인한 #190 계보 항목 누락 | `Gemini 작업 현황.md`에 누락되었던 6개 섹션(G-07 및 S11-FE) 및 `전체 개발 진행 현황.md`에 누락되었던 4개 G-07 로그 항목을 완벽히 union 병합 복원. | `docs/vault/00_Index/전체 개발 진행 현황.md`, `docs/vault/30_Development/Agent별 작업/Gemini 작업 현황.md` |
+| **비차단** | Low | `model-registry-business-routes.test.tsx` Test 24 이름 내 `apv_...` 잔류 | Test 24 이름을 `apv_...`에서 canonical 정규식과 일치하는 `apr_...`로 정정. | `tests/model-registry-business-routes.test.tsx:1793` |
 
 ---
 
-## 5. 인계 및 다음 단계
+## 5. 로컬 게이트 실측 검증 결과 (r2 조치 후)
+
+| 검증 단계 | 수행 명령 | 결과 요약 | Exit Code |
+|---|---|---|---|
+| **Vitest 단위/통합** | `npx vitest run` (apps/web) | **86 test files passed (86), 853 tests passed (853)**, 0 failures (25.33s) | `0` |
+| **TypeScript 타입 검사** | `npx tsc -b` (apps/web) | **0 errors** | `0` |
+| **프로덕션 번들 빌드** | `npm run build` (apps/web) | Vite 프로덕션 빌드 성공 (`dist/assets/index-2am4jENa.js` 881.32 kB) | `0` |
+| **파이썬 라우트 커버리지** | `pytest tests/test_route_coverage.py` | **40 passed** in 1.53s | `0` |
+| **프런트엔드 무결성** | `python tools/check_frontend_integrity.py` | 92 files 0 violations (All 9 integrity rules satisfied) | `0` |
+| **계약 바인딩 검사** | `python tools/check_contract_bindings.py` | 55 fixtures / 20 bound types / 14 replay guards PASS | `0` |
+| **문서 무결성 검사** | `python tools/check_docs.py` | 24 original hashes, 929 versioned docs, wiki links PASS | `0` |
+| **Obsidian 동기화 사전 검사** | `python tools/sync_obsidian.py --check` | 1773 managed files, 0 conflicts PASS | `0` |
+
+---
+
+## 6. 인계 및 다음 단계
 
 - **작업 브랜치**: `agent/gemini/card138-fe-bundle`
-- **PR 대상**: Base `agent/gemini/card126-audit-fixes` (PR #243) 위 stacked PR 생성.
-- **후속 담당**: Claude (독립 UI 및 시험 축 리뷰) 및 제어 평면 계약 합의 (계약 축 검토).
+- **PR 대상**: Base `agent/gemini/card126-audit-fixes` (PR #243) 위 stacked PR #245.
+- **후속 담당**: Claude (독립 UI 및 시험 축 재검토). 제어 평면 계약 축은 7fddf7df에서 이미 정식 승인 완료.
