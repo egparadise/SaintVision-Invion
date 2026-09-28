@@ -1,10 +1,10 @@
 ---
 doc_id: "DESIGN-S11-ST-FAILURE-001"
 title: "S11-ST 손상·용량·backup 장애 시험 설계"
-version: "1.3.2"
+version: "1.3.3"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:02:13+09:00"
+updated: "2026-09-28T17:21:06+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 acceptance_id: "AC-11"
@@ -164,7 +164,7 @@ release manifest는 모든 축의 `sourceHeadSha == releaseSha`를 요구하므�
 | archive command가 exit 0이지만 byte를 쓰지 않음 | `BAK-03/postgresql/archive-command-true-empty`의 verifier nonzero·restore 거부 | 계층 밖 | hosted PG 10-case |
 | backup이 exit 0이지만 empty/truncated | 별도 `verify_backup_artifact.py`가 tar 구조·필수 PostgreSQL member를 검사해 `BACKUP_ARTIFACT_INVALID`; truncated fixture는 유효 tar의 `pg_control` data 구간을 실제 절단 | 구현: member 누락·잘못된 version·label 줄 누락·8191-byte control·`../`·중복 member 부정 시험 | 실제 restore는 hosted/physical |
 | invalid/unknown label을 삭제 후보로 간주 | invalid label은 계획 0/exit 3, unknown-age는 retained | 미해결: 현재 integration retention 도구는 #150 이전 | #150 병합 뒤 retention 카드 |
-| retention apply 중단 뒤 전체 성공 보고 | raw `OSError`를 성공으로 재라벨하지 않고 retained boundary digest를 재검사한다. 삭제 대상 미완료 후보 자체는 허용 residue가 아니며, retained set 손실만 finding이다 | 부분: raw `OSError` 분류 불일치와 retained-set digest 손실을 finding으로 보존; 주입 사실을 residue로 세지 않음 | receipt/journal 구현 카드 |
+| retention apply 중단 뒤 전체 성공 보고 | 적용 중단은 `RETENTION_APPLY_PARTIAL`·nonzero exit이며 receipt의 removed/incomplete 합계가 plan과 정확히 일치해야 한다 | 부분: raw `OSError` 분류 불일치와 retained-set digest 손실을 finding으로 보존; 삭제 대상 미완료 후보는 허용 상태라 residue로 세지 않음 | receipt/journal 구현 카드 |
 | retained boundary도 candidate와 함께 삭제 | boundary·이후 WAL·latest/unknown backup hash 불변 | 구현: retained set before/after digest | — |
 | hosted/physical storage reference를 `long-soak` PASS로 사용 | composite target 미등록·map 부재 → `NOT_REGISTERED`, axis envelope 생성 금지 | 구현 | — |
 | 약한 `s11-actual-pitr-v0`로 archive fault를 우회 | old targetId → `INVALID_RUN` | 구현 | — |

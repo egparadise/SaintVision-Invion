@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.213"
+version: "1.0.214"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:02:13+09:00"
+updated: "2026-09-28T17:21:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -14,7 +14,7 @@ source_of_truth: "Git"
 
 - #193 Claude r1 D1~D6에 이어 r2 C1~C2를 보강했다. truncated backup은 유효 tar의 data 구간을 실제 절단하고 verifier source 변이 6종을 부정 시험으로 고정한다.
 - retention 미완료 삭제 후보와 directory-fsync 뒤 exact canonical byte는 허용 상태라 residue로 세지 않는다. retained boundary 삭제는 digest finding이며 관측하지 않은 committed loss는 `null`이다. raw OSError 분류 공백은 숨기지 않는다.
-- 로컬 단일 시험은 storage evidence 49 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux에서 actual LocalObjects 8건·osError finding 7건과 Backend green을 확인하기 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
+- C4에서 BAK-02의 미관측 partial/cleanup residue를 `null`로 고치고 절대경로·symlink·hardlink·8193-byte control verifier 부정 시험을 추가했다. 로컬 단일 시험은 storage evidence 53 passed, aggregator 56 passed이며 PostgreSQL·Docker·전체 suite는 실행하지 않았다. 최종 hosted Linux에서 actual LocalObjects 8건·osError finding 7건과 Backend green을 확인하기 전에는 측정 상태를 `NOT_OBSERVED`로 유지한다. [[2026-09-28_16-16-21_KST_S11_ST_PG_free_evidence_importer_Codex]], [[S11-ST_손상_용량_backup_장애시험_설계]].
 
 ## 2026-09-28 CARD-S11-AC11-REGISTRY-REPIN-01 — 구현·게이트 완료
 

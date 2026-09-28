@@ -360,8 +360,6 @@ def _retention_fault(identity: str) -> dict[str, Any]:
             actual,
             beforeSha256=before,
             afterSha256=after,
-            partialResidueCount=0,
-            cleanupResidueCount=0,
         )
 
 

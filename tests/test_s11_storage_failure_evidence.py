@@ -137,8 +137,8 @@ def test_retention_and_backup_fault_cases_execute_hermetically(identity):
     assert case["matched"] is False
     assert case["observedFindingCount"] == 1
     assert case["beforeSha256"] == case["afterSha256"]
-    assert case["partialResidueCount"] == 0
-    assert case["cleanupResidueCount"] == 0
+    assert case["partialResidueCount"] is None
+    assert case["cleanupResidueCount"] is None
 
 
 @pytest.mark.parametrize("identity", producer.PG_FREE_CASES[2:4])
@@ -199,14 +199,47 @@ def _backup_tar(members: list[tuple[str, bytes]]) -> bytes:
         [("PG_VERSION", b"sixteen\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192)],
         [("PG_VERSION", b"16\n"), ("backup_label", b"not a backup label\n"), ("global/pg_control", b"x" * 8192)],
         [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8191)],
+        [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8193)],
         [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192), ("../escape", b"x")],
+        [("PG_VERSION", b"16\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192), ("/absolute", b"x")],
         [("PG_VERSION", b"16\n"), ("PG_VERSION", b"17\n"), ("backup_label", b"START WAL LOCATION: x\n"), ("global/pg_control", b"x" * 8192)],
     ],
-    ids=("missing-member", "bad-version", "missing-label-line", "short-pg-control", "unsafe-member", "duplicate-member"),
+    ids=(
+        "missing-member",
+        "bad-version",
+        "missing-label-line",
+        "short-pg-control",
+        "long-pg-control",
+        "parent-member",
+        "absolute-member",
+        "duplicate-member",
+    ),
 )
 def test_backup_verifier_rejects_each_structural_mutation(tmp_path, members):
     artifact = tmp_path / "invalid.tar"
     artifact.write_bytes(_backup_tar(members))
+    with pytest.raises(producer.BackupArtifactInvalid):
+        producer.verify_physical_backup_archive(artifact)
+
+
+@pytest.mark.parametrize("member_type", [tarfile.SYMTYPE, tarfile.LNKTYPE], ids=("symlink", "hardlink"))
+def test_backup_verifier_rejects_link_members(tmp_path, member_type):
+    artifact = tmp_path / "link.tar"
+    stream = io.BytesIO()
+    with tarfile.open(fileobj=stream, mode="w") as archive:
+        for name, data in [
+            ("PG_VERSION", b"16\n"),
+            ("backup_label", b"START WAL LOCATION: x\n"),
+            ("global/pg_control", b"x" * 8192),
+        ]:
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+        link = tarfile.TarInfo("unsafe-link")
+        link.type = member_type
+        link.linkname = "../outside"
+        archive.addfile(link)
+    artifact.write_bytes(stream.getvalue())
     with pytest.raises(producer.BackupArtifactInvalid):
         producer.verify_physical_backup_archive(artifact)
 
@@ -230,8 +263,6 @@ def test_ideal_future_retention_and_directory_fsync_surfaces_can_pass():
         copy.deepcopy(producer.EXPECTED["BAK-02/local/retention-unlink"]),
         beforeSha256=digest,
         afterSha256=digest,
-        partialResidueCount=0,
-        cleanupResidueCount=0,
     )
     fsync_case = producer._receipt(
         "OBJ-04/local/directory-fsync-eio",

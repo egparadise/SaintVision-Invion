@@ -1,10 +1,10 @@
 ---
 doc_id: "HIST-CODEX-S11-ST-PGFREE-IMPORTER-001"
 title: "S11-ST PG-free fault evidence producer와 importer"
-version: "1.2.0"
+version: "1.2.1"
 status: "review"
 author: "Codex"
-updated: "2026-09-28T17:02:13+09:00"
+updated: "2026-09-28T17:21:06+09:00"
 source_of_truth: "Git"
 task_id: "S11-ST"
 reviewer: "Claude"
@@ -33,13 +33,13 @@ reviewer: "Claude"
 
 ## 검증
 
-- `python -m pytest -q tests/test_s11_storage_failure_evidence.py`: 49 passed, exit 0.
+- `python -m pytest -q tests/test_s11_storage_failure_evidence.py`: 53 passed, exit 0.
 - `python -m pytest -q tests/test_aggregate_ac11_evidence.py`: 56 passed, exit 0.
 - `python -m py_compile` producer·importer·backup verifier: exit 0.
 - `check_docs`, `check_ontology`, `check_contract_bindings`, `check_doc_single_source --ratchet`, `git diff --check`는 모두 exit 0이다.
 
 ## provenance
 
-- initial implementation commit: `06718b5967e3a6e34c34770ea8aa09ec4448e266`; Claude r1 보강 commit은 `655261ff7634b4ce6cc7c5bc46dfa613fed0390d`이며 r2 C1~C2 보강 commit은 이 History 다음 commit으로 고정한다.
+- initial implementation commit: `06718b5967e3a6e34c34770ea8aa09ec4448e266`; Claude r1 보강 commit은 `655261ff7634b4ce6cc7c5bc46dfa613fed0390d`, r2 C1~C2 보강 commit은 `e5a490cea6bd98aff20fbdb8f88c1e7af76ba7db`다.
 - parent stack: PR #192 / head `88567849`
 - frozen tier hashes: universe `5d700981…34fd9`, PG-free `f69d161e…8799`, hosted `0509d94a…4a33`.
