@@ -1,14 +1,15 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
 export interface UseModalA11yOptions {
   isOpen?: boolean;
   onClose: () => void;
   autoFocusFirst?: boolean;
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 /**
  * Custom hook to enforce WCAG 2.1 AA accessibility standards on modals:
- * - Focus Trap (Tab / Shift+Tab cycling within modal) (DEF-S11-03 / WCAG 2.4.3)
+ * - Focus Trap (Tab / Shift+Tab cycling within modal, including container wrap) (DEF-S11-03 / WCAG 2.4.3)
  * - Focus Restoration to trigger element on unmount / close (DEF-S11-04 / WCAG 2.4.3)
  * - Modal-scoped Escape key handler with propagation stop (DEF-S11-05 / WCAG 2.1.1)
  */
@@ -16,27 +17,42 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
   isOpen = true,
   onClose,
   autoFocusFirst = true,
+  initialFocusRef,
 }: UseModalA11yOptions) {
   const containerRef = useRef<T>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useLayoutEffect(() => {
+    if (isOpen) {
+      if (!triggerRef.current && document.activeElement && document.activeElement !== document.body) {
+        triggerRef.current = document.activeElement as HTMLElement;
+      }
+    }
+  }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
-
-    // Capture the trigger element that had focus before modal opened
-    if (document.activeElement && document.activeElement !== document.body) {
-      triggerRef.current = document.activeElement as HTMLElement;
+    if (!isOpen) {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
+      return;
     }
 
-    // Auto-focus the first interactive element or the container
-    if (autoFocusFirst && containerRef.current) {
-      const focusable = containerRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusable.length > 0) {
-        focusable[0].focus();
-      } else {
-        containerRef.current.focus();
+    if (autoFocusFirst) {
+      if (initialFocusRef?.current) {
+        initialFocusRef.current.focus();
+      } else if (containerRef.current) {
+        const focusable = containerRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length > 0) {
+          focusable[0].focus();
+        } else {
+          containerRef.current.focus();
+        }
       }
     }
 
@@ -44,15 +60,17 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
       // Restore focus to the trigger element when the modal is closed / unmounted
       if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
         triggerRef.current.focus();
+        triggerRef.current = null;
       }
     };
-  }, [isOpen, autoFocusFirst]);
+  }, [isOpen, autoFocusFirst, initialFocusRef]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent | KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        onClose();
+        e.preventDefault();
+        onCloseRef.current();
         return;
       }
 
@@ -67,19 +85,21 @@ export function useModalA11y<T extends HTMLElement = HTMLDivElement>({
         const last = focusable[focusable.length - 1];
 
         if (e.shiftKey) {
-          if (document.activeElement === first) {
+          // If currently on first focusable element OR container itself, wrap to last
+          if (document.activeElement === first || document.activeElement === containerRef.current) {
             e.preventDefault();
             last.focus();
           }
         } else {
-          if (document.activeElement === last) {
+          // If currently on last focusable element OR container itself, wrap to first
+          if (document.activeElement === last || document.activeElement === containerRef.current) {
             e.preventDefault();
             first.focus();
           }
         }
       }
     },
-    [onClose]
+    []
   );
 
   return { containerRef, handleKeyDown };
