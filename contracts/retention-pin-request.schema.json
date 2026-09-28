@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "What a caller asks of W4: keep this version at least until ``until``.\n\nOne field, because ``pin_retention`` takes one: the service decides what the\nrequest means (extend, never shorten). The instant must carry an offset --\na naive time would be compared with the stored aware value by whatever the\ndriver assumes, and \"retained until when?\" is not a question to answer with\nan assumption.",
+  "properties": {
+    "until": {
+      "format": "date-time",
+      "title": "Until",
+      "type": "string"
+    }
+  },
+  "required": [
+    "until"
+  ],
+  "title": "RetentionPinRequest",
+  "type": "object"
+}
