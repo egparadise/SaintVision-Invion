@@ -33,8 +33,8 @@ and in this order and no other:**
 A shorter or equal ``until`` is a 200 no-op that changes nothing (the service
 never shortens); the response says ``extended: false`` so a caller can tell.
 
-**Lock waits are bounded.** ``SET LOCAL lock_timeout`` is set at the start of
-the write transaction from ``Settings.business_lock_timeout_ms``. Ordinary
+**Lock waits are bounded** by the lane's one helper (``api/lock_wait.py``, card
+84): ``SET LOCAL lock_timeout`` from ``Settings.business_lock_timeout_ms``. Ordinary
 contention (a release or another pin committing) waits and then proceeds on the
 committed row; a wait that exceeds the budget, or a deadlock, is answered
 ``SYS-0001/503/retryable=true`` with nothing written and no value from the
@@ -58,8 +58,6 @@ import datetime as dt
 from typing import Any, Mapping
 
 from fastapi import APIRouter, Depends, Header, Request
-from sqlalchemy import text
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from ...config import Settings
@@ -82,11 +80,11 @@ from ..deps import (
     serialise_idempotent_write,
     store_idempotent_response,
 )
+from ..lock_wait import bounded_lock_wait
 from ..problem import (
     AUTH_PROJECT,
     GRAPH_PRECONDITION,
     RES_NOT_FOUND,
-    SYS_UPSTREAM_UNAVAILABLE,
     CanonicalProblem,
     read_bounded_body,
     strict_json_object,
@@ -101,10 +99,6 @@ PIN_PATH = "/projects/{project_id}/models/{model_id}/versions/{version}/retentio
 #: The idempotency ledger's ``endpoint`` for this route (IDEM-2): a constant, so
 #: a renamed path cannot silently start a new key space.
 ENDPOINT = "POST /v1/projects/{project_id}/models/{model_id}/versions/{version}/retention-pin"
-
-#: PostgreSQL SQLSTATEs answered as a retryable 503 rather than a 500: the row
-#: lock could not be taken within the budget, or the server broke a deadlock.
-LOCK_WAIT_SQLSTATES = frozenset({"55P03", "40P01"})
 
 #: Every ``InvError`` reachable from the calls below, and its canonical form.
 TRANSLATION: Mapping[str, tuple[str, int, bool]] = {
@@ -133,34 +127,6 @@ def _require_approval(session: Session, *, principal: Principal, project_id: str
         )
 
 
-def _bound_lock_wait(session: Session, *, timeout_ms: int) -> None:
-    """``SET LOCAL lock_timeout`` for this transaction only.
-
-    ``SET`` takes no bind parameters, so the value is formatted -- after being
-    checked to be a positive integer, which ``Settings`` already guarantees.
-    """
-    if not isinstance(timeout_ms, int) or isinstance(timeout_ms, bool) or timeout_ms <= 0:
-        raise RuntimeError("business_lock_timeout_ms must be a positive integer")
-    session.execute(text(f"SET LOCAL lock_timeout = '{int(timeout_ms)}ms'"))
-
-
-def _lock_wait_problem(error: OperationalError) -> CanonicalProblem | None:
-    """A lock timeout or deadlock as the canonical retryable 503, else None.
-
-    Only those two: any other operational failure is a defect or an outage
-    that must surface as such rather than be read as "try again".
-    """
-    state = getattr(error.orig, "sqlstate", None)
-    if state in LOCK_WAIT_SQLSTATES:
-        return CanonicalProblem(
-            SYS_UPSTREAM_UNAVAILABLE,
-            503,
-            "The model version is locked by another request; retry.",
-            retryable=True,
-        )
-    return None
-
-
 def _response(row, *, extended: bool) -> schemas.RetentionPinResponse:
     return schemas.RetentionPinResponse(
         modelVersionId=row.model_version_id,
@@ -184,11 +150,15 @@ async def pin_model_version_retention(
     """Extend the retention pin to ``until``, once per idempotency key."""
     factory = make_session_factory(request.app.state.engine)
 
+    # Bounded as well (card 84 F1): effective_permission reads the user row FOR
+    # SHARE, so a held FOR UPDATE on it would otherwise wait here forever.
     # (1) Permission first, in its own short transaction, with nothing held
     # open while the body arrives.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
                 _require_approval(session, principal=principal, project_id=project_id)
 
     key = _require_idempotency_key(idempotency_key)
@@ -209,52 +179,47 @@ async def pin_model_version_retention(
     # (2) One atomic transaction, in the §5-3 order.
     with factory() as session:
         with session.begin():
-            with tenant_scope(session, principal.tenant_id):
-                _bound_lock_wait(session, timeout_ms=settings.business_lock_timeout_ms)
+            with tenant_scope(session, principal.tenant_id), bounded_lock_wait(
+                session, timeout_ms=settings.business_lock_timeout_ms
+            ):
+                serialise_idempotent_write(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    endpoint=ENDPOINT,
+                    idempotency_key=key,
+                    project_id=project_id,
+                )
+                _require_approval(session, principal=principal, project_id=project_id)
+                # Read once, here: after the body the caller paced and after
+                # the wait for the serialisation point, so every stamp this
+                # request writes is the time it actually did the work.
+                now: dt.datetime = request.app.state.clock()
                 try:
-                    serialise_idempotent_write(
+                    replayed = replay_or_reserve(
                         session,
-                        tenant_id=principal.tenant_id,
+                        principal=principal,
                         endpoint=ENDPOINT,
                         idempotency_key=key,
+                        payload=ledger_payload,
+                        now=now,
+                        ttl_seconds=settings.idempotency_ttl_seconds,
                         project_id=project_id,
                     )
-                    _require_approval(session, principal=principal, project_id=project_id)
-                    # Read once, here: after the body the caller paced and after
-                    # the wait for the serialisation point, so every stamp this
-                    # request writes is the time it actually did the work.
-                    now: dt.datetime = request.app.state.clock()
-                    try:
-                        replayed = replay_or_reserve(
-                            session,
-                            principal=principal,
-                            endpoint=ENDPOINT,
-                            idempotency_key=key,
-                            payload=ledger_payload,
-                            now=now,
-                            ttl_seconds=settings.idempotency_ttl_seconds,
-                            project_id=project_id,
-                        )
-                    except InvError as error:
-                        raise translate(
-                            error,
-                            table=TRANSLATION,
-                            detail="That idempotency key was used with a different request.",
-                        ) from None
-                    if replayed is not None:
-                        return replayed
-                    row = _locked_version(
-                        session,
-                        tenant_id=principal.tenant_id,
-                        project_id=project_id,
-                        model_id=model_id,
-                        version=version,
-                    )
-                except OperationalError as error:
-                    problem = _lock_wait_problem(error)
-                    if problem is None:
-                        raise
-                    raise problem from None
+                except InvError as error:
+                    raise translate(
+                        error,
+                        table=TRANSLATION,
+                        detail="That idempotency key was used with a different request.",
+                    ) from None
+                if replayed is not None:
+                    return replayed
+                row = _locked_version(
+                    session,
+                    tenant_id=principal.tenant_id,
+                    project_id=project_id,
+                    model_id=model_id,
+                    version=version,
+                )
                 # Re-checked after the lock: a revocation during the wait must
                 # not extend anything.
                 _require_approval(session, principal=principal, project_id=project_id)
