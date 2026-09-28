@@ -1303,3 +1303,11 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - #151 Claude r1 후속: SQLSTATE 완전성·미분류 실패 `INVALID_RUN`, job concurrency 취소 방지, dirty checkout, CLI provenance, hosted topology, stale 산출물 삭제를 구현했다.
 - 생존 변이 1~7과 요청 합계·all-request P95·job concurrency 구조·dirty checkout 선차단을 겨냥한 PG-free `main()`/부정 시험은 focused 31 passed. 첫 실행의 fixture 모순 2건(29 passed/2 failed)을 교정했고, legacy staircase·실 PG·Docker·브라우저는 실행하지 않았다.
 - 새 측정이나 gate 변경이 아니며 Card46 정본 run과 Card47 compatibility run을 소급 변경하지 않는다. [[2026-09-28_10-44-24_KST_S05_Card49_lane_quality_Codex]]
+## 2026-09-28 Card 50 — S11 AC-11 aggregator stage 1
+
+- Branch/base: `agent/codex/s11-ac11-aggregator` / `1e8baf045c5a554209aaef601ae4883b64da50a7`; owner/reviewer Codex/Claude; approved design PR #157 head `a793f258`.
+- Added a PG-free fail-closed aggregator for the eight required AC-11 axes plus the reviewed security allowlist v0. Claude r1 D1~D6 are addressed: Git-backed target registry criteria, source-tree migration graph conditional N/A, actual definer/RLS/VF producer formats with nonempty inventories, reviewed baseline/blob binding, and skip fail-closed. Producer verdicts cannot override recomputation in either direction.
+- Focused evidence after r1 fixes: `tests/test_aggregate_ac11_evidence.py` 49 passed and module compilation exit 0; docs/ontology/contract/ratchet gates are rerun before the next push. No PostgreSQL, Docker, migration rehearsal, hosted lane, or full suite was run. AC-11 remains incomplete; migration/real-PG execution belongs to stage 2.
+- History: [[2026-09-28_11-43-52_KST_S11_AC11_집계기_1단계_Codex]].
+- Claude r2 follow-up: target registry reviewed blob 고정, manifest `releaseSha` 단일 tree 결속, 축별 `requiredEnvironment`(물리 5노드 ADR-100 / 실제 PITR 분리 장애영역·운영 archive), PITR 주간 반복 기준을 추가했다. 변이 포함 PG-free focused 시험은 54 passed이며 AC-11 상태는 미완료다.
+- Claude r3 조건부 승인 C1: #170 security sourceDocument가 branch commit `c62cb671`에 결속되므로 #157 뒤 **merge commit(`--merge`)만 허용**, squash/rebase 금지. PR 본문과 History에 고정했다.
