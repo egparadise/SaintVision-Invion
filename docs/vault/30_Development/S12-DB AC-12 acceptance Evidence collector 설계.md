@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S12-DB-AC12-EVIDENCE-COLLECTOR-DESIGN-001"
 title: "S12-DB AC-12 acceptance Evidence collector 설계 — operational_readiness(--acceptance-evidence)·pitr_readiness·pitr_opt_in_dry_run·desktop-browser proof의 출력을 고정 SHA에서 읽어 AC-12 항목별 PASS·FAIL·NOT_OBSERVED·BLOCKED_EXTERNAL로 나누는 collector (판정 논리 복제 없음, #127·#131과 같은 형식, 카드 aq)"
-version: "1.0.0"
+version: "1.1.0"
 status: "proposed-review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:20:00+09:00"
+updated: "2026-09-28T10:16:43+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -42,6 +42,15 @@ tags: ["S12-DB", "AC-12", "evidence", "collector", "operational-readiness", "pit
 
 원칙: 관측하지 않은 값은 **0도 PASS도 아니다**(NOT_OBSERVED + reason, `value` 없음). 외부/사용자 입력 항목은 BLOCKED_EXTERNAL + reason, `value=null`. 도구가 `{"error": …}`나 JSON 아님을 출력하면 그 도구의 항목 전부 NOT_OBSERVED(FAIL 아님). 하네스의 fail-closed 거부(exit 2, #150)는 FAIL.
 
+## 1b. Codex 검토(#153, head 30f5ca83) 4건 반영 — fail-closed 경계
+
+| # | 지적 | 규칙 |
+|---|---|---|
+| F1 | serialize 뒤 raw 값 `.replace` → JSON escape된 값(`secret\"quote`) 잔존 | **구조화 값 단계에서 먼저 치환**(`redact_value`: dict 키·리스트·중첩) → serialize → 텍스트 치환 → `assert_redacted`가 raw·JSON-escaped·ASCII-escaped 세 표현을 모두 검사(잔존 시 거부). quote·backslash·개행·탭·U+2028 부정 시험 |
+| F2 | 미분류 blocker·`catalogComplete=false`가 PASS | `KNOWN_BLOCKER_PREFIXES`(pilot_readiness가 오늘 내는 blocker 전부, 시험이 소스로 고정) 밖의 blocker가 하나라도 있으면 blocker 파생 5항목의 PASS를 전부 **NOT_OBSERVED**(사유에 blocker 원문); `acceptanceAssessed=true`인데 `catalogComplete≠true`이고 blocker 0이면 **FAIL**(도구 자기모순). release 없는 경우의 `catalogComplete=false`는 BLOCKED_EXTERNAL 사례라 recovery 항목 판정에 쓰지 않음 |
+| F3 | `browserOptIn` 미검사·proof에 codeSha 결속 없음 | `browserOptIn is True` 필수(아니면 NOT_OBSERVED); proof의 `codeSha`/`gitSha` 또는 `--web-smoke-sha`(run head)가 이 bundle의 `codeSha`와 접두 일치해야 PASS 가능, 미결속·불일치는 NOT_OBSERVED |
+| F4 | clean만 검사, remote 도달성 미검사 | `remote_reachability`: `--reachable-ref`가 있으면 `git merge-base --is-ancestor`, 없으면 `git branch -r --contains`(`->` alias 제외)에 하나라도 있어야 함. 아니면 exit 2, `--allow-unpushed-head`는 `provenance.unpushedHeadAllowed`로 기록되는 opt-out. `remoteReachable`·`remoteRefCount` 기록 |
+
 ## 2. 판정·산출·provenance
 
 - verdict: 어느 항목이든 FAIL → **FAIL**; PASS 0건 → **NOT_OBSERVED**(exit 3); 그 외 NOT_OBSERVED/BLOCKED_EXTERNAL이 남으면 **PASS_MEASURED_PARTIAL**(exit 0, 외부 4건이 항상 남으므로 이 collector가 PASS를 낼 수 없음). `scope` = 4 상태별 항목 id 목록.
@@ -53,7 +62,7 @@ tags: ["S12-DB", "AC-12", "evidence", "collector", "operational-readiness", "pit
 
 쓰기 전 전체 텍스트를 치환한 뒤 다시 검사(잔존 시 거부): (a) `--tenant`·`--release`로 받은 **정확한 값**(모양 무관, `<value:redacted>`), (b) UUID, (c) `<2~16 소문자>_<Crockford 26>` 전부(`<id:redacted>`; core `PREFIXES` 전수 + 커널 prefix + `backup_`/`release_` 같은 긴 prefix로 부정 시험), (d) disposable DB 이름, (e) `IPv4:port`. 비밀: 이 실행이 쓴 DSN env 2개 + 표준 5개의 DSN 값·비밀번호가 텍스트에 있으면 거부.
 
-## 4. 부정 시험 목록 (PG-free, `tests/test_collect_s12_acceptance_evidence.py` **111 passed**)
+## 4. 부정 시험 목록 (PG-free, `tests/test_collect_s12_acceptance_evidence.py` **134 passed**)
 
 - 항목표 17 유일·전부 평가·상태 4종; collector가 SQL·`archive_mode`·`met_targets` 등 판정 논리를 갖지 않음(소스 검사).
 - 완전 관측 → 측정 항목 13 PASS·외부 4 BLOCKED·PASS_MEASURED_PARTIAL; `--release` 없음 → release 3항목 BLOCKED_EXTERNAL(FAIL도 PASS도 아님); catalog blocker 8종 각각 **정확히 그 항목만** FAIL; knownLimitations 0 → NOT_OBSERVED; absent/disagreeing/closed → 각 항목 FAIL; readiness unavailable → 관련 10항목 전부 NOT_OBSERVED+reason, `acceptanceCatalog=null`; pitr verdict 3종 매핑(재해석 없음); 리허설 6경우(refused → FAIL, inconclusive/not_run/unavailable → NOT_OBSERVED, mutation → FAIL); web proof 8경우(skipped 1이어도 FAIL, 미지정 → NOT_OBSERVED); 아무것도 관측 못 함 → NOT_OBSERVED exit 3, 값 0 없음; FAIL 우선; 외부 항목은 완벽한 catalog에서도 PASS 불가.

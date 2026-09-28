@@ -32,13 +32,23 @@ close AC-12.
 
 Provenance comes from ``tools.provenance.collect`` computed with the repository root as
 cwd, plus this collector's own hash; a dirty working tree is refused by default
-(``--allow-dirty-tree`` is a recorded opt-out); the output label carries the SHA and a
-UTC timestamp and existing outputs are never overwritten.  Redaction is applied to every
-produced file and refused if anything slips: DSN values and passwords (from the DSN
-environment variables this run used and the usual test/admin ones), the exact tenant /
-release / project / user values passed on the command line, UUIDs, any ``<prefix>_<26
-Crockford ULID>`` entity id regardless of prefix, and ``IPv4:port``.  Paths outside the
-repository are recorded as ``<outside-repo>/<name>``.
+(``--allow-dirty-tree`` is a recorded opt-out) and so is a head that no remote ref
+contains (``--reachable-ref`` for explicit ancestry, ``--allow-unpushed-head`` as the
+recorded opt-out); the output label carries the SHA and a UTC timestamp and existing
+outputs are never overwritten.  Redaction happens at the structured level BEFORE
+serialization and is re-checked on the produced text in raw and JSON-escaped forms, so
+quotes, backslashes or control characters in a value cannot hide it: DSN values and
+passwords (from the DSN environment variables this run used and the usual test/admin
+ones), the exact tenant / release values passed on the command line, UUIDs, any
+``<prefix>_<26 Crockford ULID>`` entity id regardless of prefix, and ``IPv4:port``.
+Paths outside the repository are recorded as ``<outside-repo>/<name>``.
+
+Fail-closed guards on the record catalog: a blocker text this collector cannot attribute
+to an item (a blocker ``pilot_readiness`` did not emit when this collector was written)
+turns every blocker-derived PASS into NOT_OBSERVED; ``acceptanceAssessed=true`` with
+``catalogComplete`` not true and no blocker is a FAIL (the tool contradicts itself).  The
+web smoke proof must carry ``browserOptIn=true`` and be bound to this bundle's code SHA
+(``codeSha``/``gitSha`` in the proof or ``--web-smoke-sha``), otherwise NOT_OBSERVED.
 
 Exit codes: 0 PASS / PASS_MEASURED_PARTIAL; 1 FAIL; 2 UNAVAILABLE (dirty tree without
 opt-out, existing output, no DSN at all); 3 NOT_OBSERVED (nothing observed).
@@ -184,7 +194,9 @@ def run_pitr_dry_run(dsn_env: str, archive: Path | None, backups: Path | None, n
     return {**result, "status": "complete", "reason": None}
 
 
-def read_web_smoke_proof(path: Path | None) -> dict[str, Any]:
+def read_web_smoke_proof(path: Path | None, bound_sha: str | None = None) -> dict[str, Any]:
+    """``bound_sha`` is the run head the proof was produced for (``gh run view --json headSha``);
+    it is recorded next to the proof so the item can be bound to the current codeSha."""
     if path is None:
         return {"status": "not_run", "reason": "no --web-smoke-proof given (desktop-browser lane, Gemini)", "payload": None}
     if not path.is_file():
@@ -195,7 +207,8 @@ def read_web_smoke_proof(path: Path | None) -> dict[str, Any]:
         return {"status": "unavailable", "reason": "proof file unreadable", "payload": None}
     if not isinstance(payload, dict) or not isinstance(payload.get("tests"), dict):
         return {"status": "unavailable", "reason": "proof has no tests counts", "payload": None}
-    return {"status": "complete", "reason": None, "payload": payload, "proofSha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    return {"status": "complete", "reason": None, "payload": payload, "proofSha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "boundSha": bound_sha}
 
 
 # --------------------------------------------------------------------------------------
@@ -207,18 +220,65 @@ def _item(status: str, reason: str | None = None, **facts: Any) -> dict[str, Any
     return {"status": status, "reason": reason, **facts}
 
 
+# Every blocker text ``pilot_readiness`` can emit today, attributed to the item it blocks.  A
+# blocker that matches none of these is UNCLASSIFIED: the catalog is then not known to be
+# clean and no blocker-derived item may become PASS (fail-closed against future blockers).
+KNOWN_BLOCKER_PREFIXES: dict[str, tuple[str, ...]] = {
+    "user-acceptance-record-ac12": ("no acceptance record for AC-12", "a rejected acceptance", "an acceptance refers to a different manifest"),
+    "database-recovery-drill-passed-with-targets": ("no passing database recovery drill", "no database recovery drill meeting"),
+    "verified-backup-in-retention": ("no verified backup",),
+    "verified-off-site-backup": ("no verified off-site backup",),
+    "contributed-folders-checked": ("contributed folder",),
+}
+BLOCKER_DERIVED_ITEMS = tuple(KNOWN_BLOCKER_PREFIXES)
+
+
+def _matches(blocker: str, prefixes: tuple[str, ...]) -> bool:
+    return any(blocker.startswith(prefix) or (prefix == "contributed folder" and "contributed folder" in blocker) for prefix in prefixes)
+
+
+def unclassified_blockers(evidence: dict[str, Any]) -> list[str]:
+    blockers = evidence.get("blockers")
+    if not isinstance(blockers, list):
+        return []
+    known = tuple(prefix for prefixes in KNOWN_BLOCKER_PREFIXES.values() for prefix in prefixes)
+    return [b for b in blockers if not isinstance(b, str) or not _matches(b, known)]
+
+
+def catalog_guard(evidence: dict[str, Any] | None) -> tuple[str, str] | None:
+    """Reason a blocker-derived PASS must be withheld, or None when the catalog is trustworthy.
+
+    * unclassified blockers -> NOT_OBSERVED (cannot attribute; not known clean);
+    * ``acceptanceAssessed`` true but ``catalogComplete`` not true while every blocker is
+      classified and none hit -> FAIL (the tool says incomplete; a PASS would contradict it).
+    """
+    if evidence is None:
+        return None
+    unknown = unclassified_blockers(evidence)
+    if unknown:
+        return NOT_OBSERVED, "unclassified blocker(s) in the catalog: " + "; ".join(str(b) for b in unknown)
+    if evidence.get("acceptanceAssessed") is True and evidence.get("catalogComplete") is not True and not evidence.get("blockers"):
+        return FAIL, "catalogComplete is not true although no blocker is reported (catalog inconsistent)"
+    return None
+
+
 def _blocker_item(evidence: dict[str, Any] | None, prefixes: tuple[str, ...]) -> dict[str, Any]:
     if evidence is None:
         return _item(NOT_OBSERVED, "acceptance evidence not produced")
     blockers = evidence.get("blockers")
     if not isinstance(blockers, list):
         return _item(NOT_OBSERVED, "blockers field missing")
-    hits = [b for b in blockers if isinstance(b, str) and b.startswith(prefixes)]
-    return _item(FAIL, "; ".join(hits), blockers=hits) if hits else _item(PASS, None, blockers=[])
+    hits = [b for b in blockers if isinstance(b, str) and _matches(b, prefixes)]
+    if hits:
+        return _item(FAIL, "; ".join(hits), blockers=hits)
+    guard = catalog_guard(evidence)
+    if guard is not None:
+        return _item(guard[0], guard[1], blockers=[])
+    return _item(PASS, None, blockers=[])
 
 
 def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dict[str, Any],
-                   web: dict[str, Any], release_given: bool) -> dict[str, dict[str, Any]]:
+                   web: dict[str, Any], release_given: bool, code_sha: str | None = None) -> dict[str, dict[str, Any]]:
     payload = readiness.get("payload") if readiness.get("status") == "complete" else None
     evidence = payload.get("acceptanceEvidence") if isinstance(payload, dict) else None
     items: dict[str, dict[str, Any]] = {}
@@ -236,8 +296,7 @@ def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dic
             _item(PASS, None, versionRecorded=bool(evidence.get("version")), manifestSha256Recorded=bool(evidence.get("manifestSha256")))
             if evidence.get("manifestSha256") and evidence.get("version") else
             _item(FAIL, "release assessed but version/manifestSha256 missing"))
-        items["user-acceptance-record-ac12"] = _blocker_item(evidence, (
-            "no acceptance record for AC-12", "a rejected acceptance", "an acceptance refers to a different manifest"))
+        items["user-acceptance-record-ac12"] = _blocker_item(evidence, KNOWN_BLOCKER_PREFIXES["user-acceptance-record-ac12"])
         limitations = evidence.get("knownLimitations")
         if isinstance(limitations, list) and limitations:
             items["known-limitations-recorded"] = _item(PASS, None, count=len(limitations))
@@ -245,14 +304,12 @@ def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dic
             items["known-limitations-recorded"] = _item(NOT_OBSERVED, "no known-limitation entries: cannot distinguish 'none' from 'not recorded'", count=0)
 
     # recovery group (record catalog)
-    items["database-recovery-drill-passed-with-targets"] = _blocker_item(evidence, ("no passing database recovery drill", "no database recovery drill meeting"))
+    items["database-recovery-drill-passed-with-targets"] = _blocker_item(evidence, KNOWN_BLOCKER_PREFIXES["database-recovery-drill-passed-with-targets"])
     if evidence is not None and isinstance(evidence.get("drillsMissingTargets"), list):
         items["database-recovery-drill-passed-with-targets"]["drillsMissingTargets"] = len(evidence["drillsMissingTargets"])
-    items["verified-backup-in-retention"] = _blocker_item(evidence, ("no verified backup",))
-    items["verified-off-site-backup"] = _blocker_item(evidence, ("no verified off-site backup",))
-    items["contributed-folders-checked"] = _blocker_item(evidence, ("contributed folder",)) if evidence is None or not any(
-        isinstance(b, str) and "contributed folder" in b for b in (evidence.get("blockers") or [])) else _item(
-        FAIL, next(b for b in evidence["blockers"] if "contributed folder" in b))
+    items["verified-backup-in-retention"] = _blocker_item(evidence, KNOWN_BLOCKER_PREFIXES["verified-backup-in-retention"])
+    items["verified-off-site-backup"] = _blocker_item(evidence, KNOWN_BLOCKER_PREFIXES["verified-off-site-backup"])
+    items["contributed-folders-checked"] = _blocker_item(evidence, KNOWN_BLOCKER_PREFIXES["contributed-folders-checked"])
     if evidence is not None and items["contributed-folders-checked"]["status"] == PASS:
         items["contributed-folders-checked"]["needingAttention"] = len(evidence.get("contributionsNeedingAttention") or [])
 
@@ -309,7 +366,9 @@ def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dic
     else:
         items["pitr-rehearsal-dry-run-observed"] = _item(NOT_OBSERVED, dry_run.get("reason") or "not run")
 
-    # web smoke
+    # web smoke: the proof must come from a real browser run (browserOptIn) AND be bound to the
+    # code SHA this bundle describes; an unbound or differently-bound proof is evidence of
+    # something else and stays NOT_OBSERVED.
     if web.get("status") != "complete":
         items["web-smoke-journeys"] = _item(NOT_OBSERVED, web.get("reason"))
     else:
@@ -317,10 +376,17 @@ def evaluate_items(readiness: dict[str, Any], pitr: dict[str, Any], dry_run: dic
         counts = proof.get("tests") or {}
         passed = counts.get("passed")
         bad = [k for k in ("failure", "error", "skipped") if counts.get(k) not in (0,)]
-        if not isinstance(passed, int):
+        proof_sha = proof.get("codeSha") or proof.get("gitSha") or web.get("boundSha")
+        if proof.get("browserOptIn") is not True:
+            items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof was not produced with browserOptIn=true (no real browser ran)", browserOptIn=proof.get("browserOptIn"))
+        elif not proof_sha:
+            items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof is not bound to a code SHA (no codeSha/gitSha in proof and no --web-smoke-sha)")
+        elif not code_sha or not str(proof_sha).lower().startswith(str(code_sha).lower()[:12]) and not str(code_sha).lower().startswith(str(proof_sha).lower()[:12]):
+            items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof is bound to a different code SHA than this bundle", proofSha=str(proof_sha)[:12])
+        elif not isinstance(passed, int):
             items["web-smoke-journeys"] = _item(NOT_OBSERVED, "proof has no passed count")
         elif passed > 0 and not bad and proof.get("exitCode") == 0 and proof.get("evidenceStatus") == "complete":
-            items["web-smoke-journeys"] = _item(PASS, None, passed=passed, proofSha256=web.get("proofSha256"))
+            items["web-smoke-journeys"] = _item(PASS, None, passed=passed, proofSha256=web.get("proofSha256"), boundSha=str(proof_sha)[:12])
         else:
             items["web-smoke-journeys"] = _item(FAIL, f"journeys not all passed (nonzero: {bad}, exit {proof.get('exitCode')}, status {proof.get('evidenceStatus')})", passed=passed)
 
@@ -373,7 +439,7 @@ def _tool_summary(result: dict[str, Any], keep: tuple[str, ...]) -> dict[str, An
 def build_evidence(*, provenance: dict[str, Any], readiness: dict[str, Any], pitr: dict[str, Any],
                    dry_run: dict[str, Any], web: dict[str, Any], release_given: bool,
                    note: str | None = None) -> dict[str, Any]:
-    items = evaluate_items(readiness, pitr, dry_run, web, release_given)
+    items = evaluate_items(readiness, pitr, dry_run, web, release_given, provenance.get("commit_sha"))
     verdict = overall_verdict(items)
     evidence = (readiness.get("payload") or {}).get("acceptanceEvidence") if readiness.get("status") == "complete" else None
     return {
@@ -393,6 +459,9 @@ def build_evidence(*, provenance: dict[str, Any], readiness: dict[str, Any], pit
                 "runtime_python", "timestamp_kst", "executor", "os_platform")},
             "collectorSha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "dirtyTreeAllowed": bool(provenance.get("dirtyTreeAllowed", False)),
+            "remoteReachable": provenance.get("remoteReachable"),
+            "remoteRefCount": provenance.get("remoteRefCount"),
+            "unpushedHeadAllowed": bool(provenance.get("unpushedHeadAllowed", False)),
         },
         "inputs": {
             "operationalReadiness": _tool_summary(readiness, ("observedAt",)),
@@ -436,18 +505,40 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _explicit_forms(value: str) -> tuple[str, ...]:
+    """Every representation an explicit value can take in the produced files: raw, JSON-escaped
+    (quotes/backslashes/control characters), and ASCII-escaped (``\\uXXXX``)."""
+    return tuple({value, json.dumps(value, ensure_ascii=False)[1:-1], json.dumps(value)[1:-1]})
+
+
 def redact_text(text: str, explicit: tuple[str, ...] = ()) -> str:
-    for value in sorted({v for v in explicit if v and len(v) >= 6}, key=len, reverse=True):
-        text = text.replace(value, "<value:redacted>")
+    forms = sorted({form for v in explicit if v and len(v) >= 6 for form in _explicit_forms(v)}, key=len, reverse=True)
+    for form in forms:
+        text = text.replace(form, "<value:redacted>")
     for pattern, placeholder in _REDACTIONS:
         text = pattern.sub(placeholder, text)
     return text
 
 
+def redact_value(obj: Any, explicit: tuple[str, ...] = ()) -> Any:
+    """Redact at the structured level, before serialization, so escaping can never hide a value."""
+    if isinstance(obj, str):
+        return redact_text(obj, explicit)
+    if isinstance(obj, dict):
+        return {redact_text(str(k), explicit) if isinstance(k, str) else k: redact_value(v, explicit) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [redact_value(v, explicit) for v in obj]
+    return obj
+
+
 def assert_redacted(text: str, explicit: tuple[str, ...] = ()) -> None:
+    """Fail closed on the raw AND the escaped representations of every explicit value."""
     for value in explicit:
-        if value and len(value) >= 6 and value in text:
-            raise ValueError("evidence would embed an unredacted identifier (<value:redacted>)")
+        if not value or len(value) < 6:
+            continue
+        for form in _explicit_forms(value):
+            if form in text:
+                raise ValueError("evidence would embed an unredacted identifier (<value:redacted>)")
     for pattern, placeholder in _REDACTIONS:
         if pattern.search(text):
             raise ValueError(f"evidence would embed an unredacted identifier ({placeholder})")
@@ -476,7 +567,11 @@ def assert_no_secrets(text: str, extra_env: tuple[str, ...] = ()) -> None:
 def write_evidence(evidence: dict[str, Any], out_dir: Path, label: str, *, explicit: tuple[str, ...] = (),
                    extra_env: tuple[str, ...] = ()) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
-    json_text = redact_text(json.dumps(evidence, indent=2, ensure_ascii=False, sort_keys=True) + "\n", explicit)
+    # 1) structured redaction before serialization (F1: escaping cannot hide a value),
+    # 2) serialization, 3) text-level redaction again, 4) fail-closed check of raw and
+    #    escaped forms plus every DSN/password.
+    clean = redact_value(evidence, explicit)
+    json_text = redact_text(json.dumps(clean, indent=2, ensure_ascii=False, sort_keys=True) + "\n", explicit)
     md_text = redact_text(render_markdown(json.loads(json_text)), explicit)
     for text in (json_text, md_text):
         assert_no_secrets(text, extra_env)
@@ -500,6 +595,29 @@ def collect_provenance_at_repo_root(executor: str | None) -> dict[str, Any]:
         os.chdir(previous)
 
 
+def _git_lines(*args: str) -> list[str]:
+    completed = subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True)
+    if completed.returncode != 0:
+        return []
+    return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+
+
+def remote_reachability(sha: str | None, ref: str | None = None) -> dict[str, Any]:
+    """Whether the commit this evidence describes can be reached from a remote ref.
+
+    A clean but unpushed commit would otherwise produce evidence nobody can check out.  With
+    ``ref`` the check is explicit ancestry (``merge-base --is-ancestor``); without it, any
+    ``refs/remotes/*`` that contains the commit counts.  Fail closed when git says nothing.
+    """
+    if not sha:
+        return {"reachable": False, "refs": [], "mode": "no-sha"}
+    if ref:
+        completed = subprocess.run(["git", "merge-base", "--is-ancestor", sha, ref], cwd=REPO_ROOT, capture_output=True, text=True)
+        return {"reachable": completed.returncode == 0, "refs": [ref] if completed.returncode == 0 else [], "mode": "explicit-ref"}
+    refs = [line for line in _git_lines("branch", "-r", "--contains", sha) if "->" not in line]
+    return {"reachable": bool(refs), "refs": refs, "mode": "remote-containment"}
+
+
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__.split("\n\n")[0], allow_abbrev=False)
     result.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
@@ -513,6 +631,13 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--pitr-archive", type=Path, default=None)
     result.add_argument("--pitr-backups", type=Path, default=None)
     result.add_argument("--web-smoke-proof", type=Path, default=None, help="vf-desktop-browser-ci.json from the desktop-browser workflow")
+    result.add_argument("--web-smoke-sha", default=None,
+                        help="head SHA of the desktop-browser run that produced the proof (gh run view --json headSha); "
+                             "required for the web item to be bound to this bundle's codeSha unless the proof carries codeSha")
+    result.add_argument("--reachable-ref", default=None,
+                        help="remote ref the head must be an ancestor of (default: any refs/remotes/* containing HEAD)")
+    result.add_argument("--allow-unpushed-head", action="store_true",
+                        help="explicit opt-out: run on a head no remote ref contains (recorded in provenance)")
     result.add_argument("--now", default=None, help="ISO 8601 UTC clock override for reproducible dry-run plans")
     result.add_argument("--allow-dirty-tree", action="store_true",
                         help="explicit opt-out: run on a dirty working tree (recorded in provenance)")
@@ -532,6 +657,14 @@ def main(argv: list[str] | None = None) -> int:
         print("working tree is not clean; evidence must come from a committed, reachable head "
               "(pass --allow-dirty-tree to record an explicit opt-out)", file=sys.stderr)
         return 2
+    reach = remote_reachability(provenance.get("commit_sha"), args.reachable_ref)
+    provenance["remoteReachable"] = reach["reachable"]
+    provenance["remoteRefCount"] = len(reach["refs"])
+    provenance["unpushedHeadAllowed"] = bool(args.allow_unpushed_head)
+    if not reach["reachable"] and not args.allow_unpushed_head:
+        print(f"head is not reachable from any remote ref ({reach['mode']}); evidence must come from a pushed head "
+              "(pass --allow-unpushed-head to record an explicit opt-out)", file=sys.stderr)
+        return 2
     if not os.environ.get(args.readiness_dsn_env) and not os.environ.get(args.pitr_dsn_env):
         print(f"neither {args.readiness_dsn_env} nor {args.pitr_dsn_env} is set; nothing can be observed", file=sys.stderr)
         return 2
@@ -540,7 +673,7 @@ def main(argv: list[str] | None = None) -> int:
     readiness = run_operational_readiness(args.readiness_dsn_env, args.tenant, args.release)
     pitr = run_pitr_readiness(args.pitr_dsn_env)
     dry_run = run_pitr_dry_run(args.pitr_dsn_env, args.pitr_archive, args.pitr_backups, now)
-    web = read_web_smoke_proof(args.web_smoke_proof)
+    web = read_web_smoke_proof(args.web_smoke_proof, args.web_smoke_sha)
     note = redact_text(args.note, explicit) if args.note else None
     evidence = build_evidence(provenance=provenance, readiness=readiness, pitr=pitr, dry_run=dry_run, web=web,
                               release_given=bool(args.release), note=note)
