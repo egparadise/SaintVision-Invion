@@ -60,10 +60,9 @@ def artifact_content_response(content: bytes, artifact: dict):
     import hashlib
     from starlette.responses import Response
 
-    if (
-        len(content) != artifact.get("byteSize")
-        or hashlib.sha256(content).hexdigest() != artifact.get("checksumSha256")
-    ):
+    if len(content) != artifact.get("byteSize") or hashlib.sha256(
+        content
+    ).hexdigest() != artifact.get("checksumSha256"):
         raise DomainError("VERIFY-0023", "Committed artifact bytes differ")
     response = {
         "statusCode": 200,
@@ -206,6 +205,27 @@ class Boundary:
             await problem(error, scope["state"]["trace_id"])(scope, receive, send)
 
 
+def _configured_object_stores(workspace, remote=None):
+    """Build the read registry from the same Local root used for recovery."""
+
+    from .object_store import LocalObjectStore, ObjectStoreRegistry, registered_provider
+
+    providers = []
+    recovery = getattr(workspace, "recovery", None) if workspace is not None else None
+    snapshots = getattr(recovery, "snapshots", None)
+    if snapshots is not None:
+        local = registered_provider(snapshots.provider)
+        if not isinstance(local, LocalObjectStore):
+            raise ValueError("Workspace recovery must use the bounded Local provider")
+        providers.append(local)
+    if remote is not None:
+        providers.append(remote)
+    registry = ObjectStoreRegistry(providers)
+    if snapshots is not None:
+        snapshots.object_stores = registry
+    return registry
+
+
 def create_app(
     database=None,
     tokens=None,
@@ -215,6 +235,7 @@ def create_app(
     business=None,
     model_retry=None,
     unresolved_settings=None,
+    object_stores=None,
 ):
     @asynccontextmanager
     async def lifespan(api):
@@ -233,6 +254,7 @@ def create_app(
     )
     if business is not None:
         from .business_surface import BusinessDispatch
+
         api.add_middleware(BusinessDispatch, business=business)
     api.add_middleware(Boundary, origins=allowed_origins)
     control = Control(database) if database else None
@@ -298,9 +320,11 @@ def create_app(
     @api.get("/v1/session")
     def session(identity=Depends(authenticated)):
         # Resource-server identity, not browser-decoded claims or IdP roles.
-        value = {"subjectId": identity.principal.subject_id,
-                 "tenantId": identity.principal.tenant_id,
-                 "expiresAt": identity.expires_at}
+        value = {
+            "subjectId": identity.principal.subject_id,
+            "tenantId": identity.principal.tenant_id,
+            "expiresAt": identity.expires_at,
+        }
         validate_contract("SessionView", value)
         return value
 
@@ -449,13 +473,16 @@ def create_app(
 
     # Both URL forms use the canonical kernel, never public.runs CRUD state.
     from .result_view import ResultView
-    result_view = ResultView(database)
+
+    result_view = ResultView(database, object_stores)
 
     from .storage_view import StorageObservationView
+
     storage_view = StorageObservationView(database)
 
     from .model_view import ModelCommitObservation, ModelExecutionManifestObservation
     from .model_uri_resolver import ModelUriResolver
+
     model_view = ModelCommitObservation(database)
     model_execution_view = ModelExecutionManifestObservation(database)
     model_uri_resolver = (
@@ -465,13 +492,15 @@ def create_app(
     )
 
     @api.get("/v1/projects/{project}/models/{model_id}/versions/{version}/commitment")
-    def model_commitment(project: str, model_id: str, version: str,
-                         identity=Depends(authenticated)):
+    def model_commitment(
+        project: str, model_id: str, version: str, identity=Depends(authenticated)
+    ):
         return model_view.get(identity.principal, project, model_id, version)
 
     @api.get("/v1/projects/{project}/models/{model_id}/versions/{version}/execution-manifest")
-    def model_execution_manifest(project: str, model_id: str, version: str,
-                                 identity=Depends(authenticated)):
+    def model_execution_manifest(
+        project: str, model_id: str, version: str, identity=Depends(authenticated)
+    ):
         return model_execution_view.get(identity.principal, project, model_id, version)
 
     @api.get("/v1/projects/{project}/models/resolve")
@@ -481,8 +510,9 @@ def create_app(
         return model_uri_resolver.get(identity.principal, project, uri)
 
     @api.get("/v1/projects/{project}/runs/{run_id}/storage-samples/{request_id}")
-    def storage_observation(project: str, run_id: str, request_id: str,
-                            identity=Depends(authenticated)):
+    def storage_observation(
+        project: str, run_id: str, request_id: str, identity=Depends(authenticated)
+    ):
         return storage_view.result(identity.principal, project, run_id, request_id)
 
     @api.get("/v1/projects/{project}/runs/{run_id}/result")
@@ -497,7 +527,9 @@ def create_app(
 
     @api.get("/v1/projects/{project}/runs/{run_id}/artifacts/content")
     @api.get("/v1/runs/{run_id}/artifacts/content")
-    def run_file(run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)):
+    def run_file(
+        run_id: str, path: str, project: str | None = None, identity=Depends(authenticated)
+    ):
         download = result_view.download(identity.principal, run_id, path, project)
         return artifact_content_response(download["content"], download["artifact"])
 
@@ -508,8 +540,13 @@ def create_app(
 
     @api.get("/v1/projects/{project}/runs/{run_id}/attempts")
     @api.get("/v1/runs/{run_id}/attempts")
-    def run_attempts(run_id: str, project: str | None = None, after: int = 0, limit: int = 50,
-                     identity=Depends(authenticated)):
+    def run_attempts(
+        run_id: str,
+        project: str | None = None,
+        after: int = 0,
+        limit: int = 50,
+        identity=Depends(authenticated),
+    ):
         return result_view.attempts(identity.principal, run_id, project, after=after, limit=limit)
 
     @api.post("/v1/projects/{project}/runs/{run_id}/cancel")
@@ -582,23 +619,34 @@ def create_app(
 
     @api.get("/v1/projects/{project}/nodes/{node_id}/resource-usage")
     def node_resource_usage(project: str, node_id: str, identity=Depends(authenticated)):
-        from .node_resource_usage import serve; return serve(control, identity.principal, project, node_id)
+        from .node_resource_usage import serve
+
+        return serve(control, identity.principal, project, node_id)
 
     @api.get("/v1/projects/{project}/capacity")
     def capacity(project: str, identity=Depends(authenticated)):
         return control.capacity(identity.principal, project)
 
     @api.get("/v1/projects/{project}/approvals")
-    def approvals(project: str, after: str | None = None, limit: int = 50,
-                  runId: str | None = None, identity=Depends(authenticated)):
-        return control.list_approvals(identity.principal, project, after=after,
-                                      limit=limit, run_id=runId)
+    def approvals(
+        project: str,
+        after: str | None = None,
+        limit: int = 50,
+        runId: str | None = None,
+        identity=Depends(authenticated),
+    ):
+        return control.list_approvals(
+            identity.principal, project, after=after, limit=limit, run_id=runId
+        )
 
     @api.get("/v1/projects/{project}/approvals/{approval_id}/review")
     def approval_review(project: str, approval_id: str, identity=Depends(authenticated)):
         from fastapi.responses import JSONResponse
-        return JSONResponse(control.approvals.review(identity.principal, project, approval_id),
-                            headers={"Cache-Control": "no-store"})
+
+        return JSONResponse(
+            control.approvals.review(identity.principal, project, approval_id),
+            headers={"Cache-Control": "no-store"},
+        )
 
     @api.get("/v1/projects/{project}/approvals/{approval_id}")
     def approval(project: str, approval_id: str, identity=Depends(authenticated)):
@@ -1090,16 +1138,20 @@ def create_configured_app():
     """Production factory: explicit operator configuration, never seeded demo data."""
     try:
         settings = strict_object(trusted_file(os.environ["INV_API_CONFIG"]))
-        if not {"identity"} <= settings.keys() <= {
-            "identity",
-            "allowedOrigins",
-            "workspace",
-            "business",
-            "modelRegistryPolicy",
-            "modelVerifier",
-            "placementShortCommit",
-            "configurationReadiness",
-        }:
+        if (
+            not {"identity"}
+            <= settings.keys()
+            <= {
+                "identity",
+                "allowedOrigins",
+                "workspace",
+                "business",
+                "modelRegistryPolicy",
+                "modelVerifier",
+                "placementShortCommit",
+                "configurationReadiness",
+            }
+        ):
             raise ValueError()
         identity = AccessTokens(**settings["identity"])
         registry_policy = None
@@ -1108,7 +1160,8 @@ def create_configured_app():
 
             registry_policy = configured_registry_policy(settings["modelRegistryPolicy"])
         database = Database(
-            os.environ["INV_RUNTIME_DSN"], recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
+            os.environ["INV_RUNTIME_DSN"],
+            recovery_epoch=os.environ["INV_RECOVERY_EPOCH"],
             registry_binding_policy=registry_policy,
             placement_short_commit=settings.get("placementShortCommit", False),
         )
@@ -1122,6 +1175,7 @@ def create_configured_app():
             if settings["business"] is not True:
                 raise ValueError()
             from .business_surface import configured_business
+
             business = configured_business(database, identity)
         model_retry = None
         if "modelVerifier" in settings:
@@ -1134,6 +1188,22 @@ def create_configured_app():
                 ConfiguredModelVerifier(**configured_model_roots(settings["modelVerifier"])),
             )
         from .configuration_readiness import configured_s01_readiness
+        from .object_store_config import (
+            configured_object_store,
+            parse_object_store_configuration,
+            unresolved_object_store,
+        )
+
+        readiness_settings = settings.get("configurationReadiness")
+        unresolved_settings = configured_s01_readiness(readiness_settings)
+        remote_object_store = None
+        if isinstance(readiness_settings, dict) and "objectStore" in readiness_settings:
+            object_store_configuration = parse_object_store_configuration(
+                readiness_settings["objectStore"]
+            )
+            if not unresolved_object_store(object_store_configuration):
+                remote_object_store = configured_object_store(object_store_configuration)
+        object_stores = _configured_object_stores(workspace, remote_object_store)
 
         return create_app(
             database,
@@ -1142,9 +1212,8 @@ def create_configured_app():
             workspace=workspace,
             business=business,
             model_retry=model_retry,
-            unresolved_settings=configured_s01_readiness(
-                settings.get("configurationReadiness")
-            ),
+            unresolved_settings=unresolved_settings,
+            object_stores=object_stores,
         )
     except Exception:
         raise RuntimeError(

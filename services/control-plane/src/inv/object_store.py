@@ -20,6 +20,7 @@ from .errors import DomainError
 
 PART_BYTES = 16 * 1024 * 1024
 MAX_BYTES = 64 * 1024 * 1024
+LOCAL_PROVIDER_ID = "local-bounded-v1"
 
 
 @dataclass(frozen=True)
@@ -44,12 +45,48 @@ class ObjectStore(Protocol):
     def delete(self, locator: str) -> None: ...
 
 
+class ObjectStoreRegistry:
+    """Exact provider-id selection; never falls back across providers."""
+
+    def __init__(self, providers=()):
+        self._providers = {}
+        for provider in providers:
+            provider_id = getattr(provider, "provider_id", None)
+            if not isinstance(provider_id, str) or provider_id in self._providers:
+                raise ValueError("Unique stable ObjectStore provider id required")
+            self._providers[provider_id] = provider
+
+    def resolve(self, provider_id):
+        provider = self._providers.get(provider_id)
+        if provider is None:
+            raise DomainError("STORE-0001", "Object provider unavailable", 503, True)
+        return provider
+
+
+def provider_id(provider):
+    """Return the stable identity of an opened provider/session."""
+
+    return getattr(provider, "provider_id", LOCAL_PROVIDER_ID)
+
+
+def require_object_provider(provider, row):
+    """Reject metadata/provider drift before bytes or object state are touched."""
+
+    if row["provider_id"] != provider_id(provider):
+        raise DomainError("STORE-0001", "Object provider unavailable", 503, True)
+    return provider
+
+
+def registered_provider(provider):
+    """Adapt the legacy local handle only at the registry boundary."""
+
+    return provider if hasattr(provider, "provider_id") else LocalObjectStore(provider)
+
+
 class LocalObjects:
     def __init__(self, root):
         if sys.platform != "linux":
-            raise DomainError(
-                "STORE-0001", "Local provider requires Linux handle checks", 503
-            )
+            raise DomainError("STORE-0001", "Local provider requires Linux handle checks", 503)
         self.root = Path(root)
         if not self.root.is_absolute():
             raise ValueError("Explicit absolute object directory required")
@@ -65,9 +102,7 @@ class LocalObjects:
         info = os.fstat(fd)
         if info.st_uid != os.geteuid() or info.st_mode & 0o077:
             os.close(fd)
-            raise DomainError(
-                "STORE-0001", "Private service-owned directory required", 503
-            )
+            raise DomainError("STORE-0001", "Private service-owned directory required", 503)
         return fd
 
     @contextmanager
@@ -93,7 +128,7 @@ class LocalObjectStore:
     synthesized from requester input here.
     """
 
-    provider_id = "local-bounded-v1"
+    provider_id = LOCAL_PROVIDER_ID
 
     def __init__(self, legacy: LocalObjects):
         self.legacy = legacy
@@ -102,13 +137,8 @@ class LocalObjectStore:
         with self.legacy.locked() as files:
             if files.exists(locator):
                 observed = files.hash(locator)
-                if (
-                    observed.sha256 != expected_sha256
-                    or observed.size_bytes != len(body)
-                ):
-                    raise DomainError(
-                        "STORE-0005", "Immutable object already differs", 409
-                    )
+                if observed.sha256 != expected_sha256 or observed.size_bytes != len(body):
+                    raise DomainError("STORE-0005", "Immutable object already differs", 409)
                 files.read(locator, expected_sha256, len(body))
                 return
             files.put(locator, body, expected_sha256)
@@ -136,6 +166,42 @@ class LocalObjectStore:
             files.remove(locator)
             if files.exists(locator):
                 raise DomainError("STORE-0001", "Object remained after deletion", 503, True)
+
+
+class _LegacyObjectSession:
+    provider_id = LOCAL_PROVIDER_ID
+
+    def __init__(self, files, provider_id=LOCAL_PROVIDER_ID):
+        self.files = files
+        self.provider_id = provider_id
+
+    def put(self, locator, body, expected_sha256):
+        self.files.put(locator, body, expected_sha256)
+
+    def get(self, locator, expected_sha256, expected_size):
+        return self.files.read(locator, expected_sha256, expected_size)
+
+    def exists(self, locator):
+        return self.files.exists(locator)
+
+    def hash(self, locator):
+        return self.files.hash(locator)
+
+    def delete(self, locator):
+        self.files.remove(locator)
+
+
+@contextmanager
+def object_store_session(provider):
+    """Hold the legacy flock across a service transaction; S3 needs no global lock."""
+
+    legacy = provider.legacy if isinstance(provider, LocalObjectStore) else provider
+    locked = getattr(legacy, "locked", None)
+    if locked is None:
+        yield provider
+    else:
+        with locked() as files:
+            yield _LegacyObjectSession(files, provider_id(provider))
 
 
 class ObjectHandle:

@@ -16,7 +16,6 @@ from inv.object_store import LocalObjectStore, ObjectDigest
 from inv.s3_client import HttpResponse, S3Client, S3Config, _authorization
 from inv.s3_object_store import S3Objects, make_s3_locator
 
-
 ROOT = Path(__file__).resolve().parents[2]
 TENANT = "aaaaaaaa-1111-4111-8111-111111111111"
 OBJECT = "22222222-2222-4222-8222-222222222222"
@@ -26,13 +25,35 @@ SHA = hashlib.sha256(BODY).hexdigest()
 LOCATOR = make_s3_locator("product", TENANT, PROJECT, "objects", OBJECT)
 
 
+def _route_parameter_names(function):
+    arguments = [
+        *function.args.posonlyargs,
+        *function.args.args,
+        *function.args.kwonlyargs,
+    ]
+    names = {argument.arg.replace("_", "").lower() for argument in arguments}
+    parameter_nodes = [
+        *(argument.annotation for argument in arguments if argument.annotation),
+        *function.args.defaults,
+        *(default for default in function.args.kw_defaults if default),
+    ]
+    for node in parameter_nodes:
+        for call in (child for child in ast.walk(node) if isinstance(child, ast.Call)):
+            for keyword in call.keywords:
+                if (
+                    keyword.arg == "alias"
+                    and isinstance(keyword.value, ast.Constant)
+                    and isinstance(keyword.value.value, str)
+                ):
+                    names.add(keyword.value.value.replace("_", "").lower())
+    return names
+
+
 class FakeClient:
     def __init__(self):
         self.calls = []
         self.put_response = HttpResponse(200, {}, b"")
-        self.get_response = HttpResponse(
-            200, {"x-amz-meta-content-sha256": SHA}, BODY
-        )
+        self.get_response = HttpResponse(200, {"x-amz-meta-content-sha256": SHA}, BODY)
         self.head_response = HttpResponse(200, {}, b"")
         self.delete_response = HttpResponse(204, {}, b"")
         self.put_error = None
@@ -126,9 +147,7 @@ def test_conditional_put_conflict_preserves_existing_bytes_and_is_not_success():
 def test_get_fails_closed_on_every_integrity_drift(damage):
     client = FakeClient()
     if damage == "body":
-        client.get_response = HttpResponse(
-            200, {"x-amz-meta-content-sha256": SHA}, b"different"
-        )
+        client.get_response = HttpResponse(200, {"x-amz-meta-content-sha256": SHA}, b"different")
     elif damage == "metadata":
         client.get_response = HttpResponse(200, {"x-amz-meta-content-sha256": "0" * 64}, BODY)
     expected_size = len(BODY) + 1 if damage == "size" else len(BODY)
@@ -211,10 +230,9 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
         (ROOT / "contracts" / "v1alpha1" / "core.schema.json").read_text(encoding="utf-8")
     )
     request_names = {
-        name
-        for name in schema["$defs"]
-        if name.endswith(("Input", "Request", "Spec", "Command"))
+        name for name in schema["$defs"] if name.endswith(("Input", "Request", "Spec", "Command"))
     }
+
     def property_names(value, definitions, seen=frozenset()):
         if not isinstance(value, dict):
             return set()
@@ -235,19 +253,14 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
 
     forbidden = {"objectId", "locator"}
     violations = {
-        name: sorted(
-            forbidden
-            & property_names(schema["$defs"][name], schema["$defs"], {name})
-        )
+        name: sorted(forbidden & property_names(schema["$defs"][name], schema["$defs"], {name}))
         for name in request_names
         if forbidden & property_names(schema["$defs"][name], schema["$defs"], {name})
     }
     standalone_requests = sorted((ROOT / "contracts").glob("*-request.schema.json"))
     for path in standalone_requests:
         standalone = json.loads(path.read_text(encoding="utf-8"))
-        leaked = sorted(
-            forbidden & property_names(standalone, standalone.get("$defs", {}))
-        )
+        leaked = sorted(forbidden & property_names(standalone, standalone.get("$defs", {})))
         if leaked:
             violations[path.name] = leaked
     app = ast.parse(
@@ -266,7 +279,7 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
         ]
         if not routes:
             continue
-        parameters = {argument.arg.replace("_", "").lower() for argument in function.args.args}
+        parameters = _route_parameter_names(function)
         if {"objectid", "locator"} & parameters:
             violations[f"route:{function.name}:parameters"] = sorted(parameters)
         for route in routes:
@@ -275,6 +288,38 @@ def test_public_request_contracts_never_accept_object_id_or_provider_locator():
                 if "{objectid" in value or "{locator" in value:
                     violations[f"route:{function.name}:path"] = [str(route.args[0].value)]
     assert violations == {}
+
+
+def test_route_input_scanner_includes_keyword_only_and_fastapi_aliases():
+    tree = ast.parse("""
+def route(positional, *, hidden=Query(None, alias="objectId"), other: Annotated[str, Query(alias="locator")]):
+    pass
+""")
+    names = _route_parameter_names(tree.body[0])
+    assert {"positional", "hidden", "other", "objectid", "locator"} <= names
+
+
+@pytest.mark.parametrize("provider_id", ["local-bounded-v1", "Uppercase.Provider"])
+def test_s3_provider_requires_lowercase_non_reserved_identity(provider_id):
+    with pytest.raises(ValueError, match="Stable provider id"):
+        S3Objects(provider_id, "product", FakeClient())
+
+
+def test_config_secret_is_not_exposed_by_repr():
+    config = S3Config("https://storage.invalid", "bucket", "ACCESS", "secret-value", "us-east-1")
+    assert "secret-value" not in repr(config)
+
+
+def test_locator_from_another_configured_prefix_is_retryable_unavailable():
+    provider = S3Objects("s3-compatible-v1", "current", FakeClient())
+    other = make_s3_locator("retired", TENANT, PROJECT, "objects", OBJECT)
+    with pytest.raises(DomainError) as raised:
+        provider.get(other, SHA, len(BODY))
+    assert (raised.value.code, raised.value.status, raised.value.retryable) == (
+        "STORE-0001",
+        503,
+        True,
+    )
 
 
 def test_sigv4_path_encoding_is_deterministic_and_secret_free_from_url():
@@ -304,9 +349,7 @@ def test_put_condition_is_signed_so_an_intermediary_cannot_strip_it():
     client.put("object", BODY, SHA)
     headers = transport.calls[0][2]
     assert headers["if-none-match"] == "*"
-    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers[
-        "authorization"
-    ]
+    assert "SignedHeaders=host;if-none-match;x-amz-content-sha256;" in headers["authorization"]
 
 
 def test_sigv4_matches_the_aws_s3_get_object_known_answer_vector():

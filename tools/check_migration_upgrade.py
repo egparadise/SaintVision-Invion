@@ -64,6 +64,7 @@ def main():
         "0040_model_run_input",
         "0041_model_runtime_input",
         "0043_replica_retention",
+        "0047_audit_events_isolation",
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--from-revision", choices=priors, help="Test one published starting revision; default tests all")
@@ -77,6 +78,7 @@ def main():
             preserved_workspace = None
             preserved_drill = None
             preserved_lease = None
+            preserved_object = None
             info = conninfo_to_dict(admin)
             url = URL.create(
                 "postgresql+psycopg",
@@ -114,6 +116,20 @@ def main():
                             VALUES(%s,%s,%s,%s,%s,1,%s,clock_timestamp()+interval '300 seconds')""", (sentinel,project,run_id,resource,lease_id,epoch))
                         preserved_lease = conn.execute("SELECT row_to_json(l) FROM inv.resource_leases l WHERE lease_id=%s", (lease_id,)).fetchone()[0]
                         preserved_sequence = conn.execute("SELECT last_value FROM inv.fencing_token_seq").fetchone()[0]
+                if target == prior and prior == "0047_audit_events_isolation":
+                    from inv.ids import new_id as kernel_id
+                    project = kernel_id("prj")
+                    preserved_object = uuid4()
+                    with psycopg.connect(make_conninfo(admin, dbname=name)) as conn:
+                        conn.execute("INSERT INTO inv.tenants VALUES(%s,'object-locator-preservation')", (sentinel,))
+                        conn.execute("INSERT INTO inv.projects VALUES(%s,%s)", (sentinel, project))
+                        conn.execute("INSERT INTO inv.storage_budgets VALUES(%s,%s,1024)", (sentinel, project))
+                        conn.execute(
+                            """INSERT INTO inv.storage_objects
+                            (tenant_id,project_id,object_id,content_hash,size_bytes)
+                            VALUES(%s,%s,%s,%s,1)""",
+                            (sentinel, project, preserved_object, "a" * 64),
+                        )
                 if target == prior and prior == "0035_credential_registry":
                     from saintvision.ids import new_id
                     user, preserved_drill = new_id('user'), new_id('drill')
@@ -170,6 +186,17 @@ def main():
                 if preserved_lease:
                     assert conn.execute("SELECT row_to_json(l) FROM inv.resource_leases l WHERE lease_id=%s", (lease_id,)).fetchone()[0] == preserved_lease
                     assert conn.execute("SELECT last_value FROM inv.fencing_token_seq").fetchone()[0] == preserved_sequence
+                if preserved_object:
+                    assert conn.execute(
+                        "SELECT provider_id,locator,content_hash,size_bytes,state FROM inv.storage_objects WHERE object_id=%s",
+                        (preserved_object,),
+                    ).fetchone() == (
+                        "local-bounded-v1",
+                        "obj-" + preserved_object.hex,
+                        "a" * 64,
+                        1,
+                        "uploading",
+                    )
                 if preserved_workspace:
                     assert conn.execute("SELECT tool_name FROM public.workspaces WHERE workspace_id=%s",(preserved_workspace,)).fetchone()==('codex-cli',)
             from check_definer_functions import audit
