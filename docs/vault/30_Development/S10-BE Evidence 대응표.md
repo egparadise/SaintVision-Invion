@@ -1,11 +1,11 @@
 ---
 doc_id: "CLAUDE-S10-BE-EVIDENCE-MAP-001"
 title: "S10-BE Evidence 대응표 — 두 Provider adapter(contract·reference·CLI 4종)·MLflow·승인 배포(record_deployment·approval digest)·commitment route·lineage query(#158 설계)·S10-FE(#144·#146)를 기존 코드·시험·hosted run에 file:line과 run ID로 대응, MLflow는 코드 부재(공백+BLOCKED_EXTERNAL), 실 Provider 실행은 BLOCKED_EXTERNAL (구현 추가 0, 카드 bc)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:05:27+09:00"
+updated: "2026-09-28T11:08:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -21,9 +21,9 @@ task-registry S10-BE: scope "두 Provider adapter·MLflow·승인 배포", evide
 
 | lane / 근거 | run / head | 결과 |
 |---|---|---|
-| Backend | **36351202242** `a0dab579`(#125 = base 집합) | 2929 passed / 47 skipped / 0 failed — `tests/test_adapters.py` 24·`test_cli_adapters.py` 20·`test_cli_output_boundary.py` 6·`test_eval_execution.py` 14·`test_lineage.py` 23·`test_model_registry.py` 14·`test_deployment_guard.py` 4·`tests/core/test_registry_policy_exact_match.py` 10·`test_model_commit_observation_contract.py` 3·`tests/integration/test_model_view.py` 7·`test_model_commit.py` 9 포함. Backend skip 47에 CLI 4종 "is not installed on this machine" 포함 |
-| Core | **36353272311** `bc27588d` | core-tests 3253/3236/17 skipped — exact map에 `claude/codex/gemini/antigravity is not installed on this machine` 각 1(`core.yml:227-233`): 실 CLI 바이너리 없이는 실행되지 않음이 hosted에서 선언됨 |
-| desktop-browser | **36364528322** `30f5ca83` | 여정 5 중 `test_browser_real_committed_model_and_current_permission`(commitment 관측 브라우저 여정) pass |
+| Backend | **36351202242** head `a0dab579b188`(#125 = base 집합; `gh run view --json headSha`) | 3.12·3.14 각각 **2929 passed / 47 skipped / 2 deselected / 0 failed** — `tests/test_adapters.py` 24·`test_cli_adapters.py` 20·`test_cli_output_boundary.py` 6·`test_eval_execution.py` 14·`test_lineage.py` 23·`test_model_registry.py` 14·`test_deployment_guard.py` 4·`tests/core/test_registry_policy_exact_match.py` 10·`test_model_commit_observation_contract.py` 3·`tests/integration/test_model_view.py` 7·`test_model_commit.py` 9 포함. Backend skip 47에 CLI 4종 "is not installed on this machine" 포함 |
+| Core | **36353272311** head `bc27588d2139` | main `core-tests.xml` **3236 passed / 17 skipped / 2 deselected / 0 failed**(skip 미합산) — exact map에 `claude/codex/gemini/antigravity is not installed on this machine` 각 1(`core.yml:227-233`): 실 CLI 바이너리 없이는 실행되지 않음이 hosted에서 선언됨 |
+| desktop-browser | **36364528322** head `30f5ca839923` | 여정 5 중 `test_browser_real_committed_model_and_current_permission`(commitment 관측 브라우저 여정) pass |
 | 로컬 실 PG(참고) | `f0f0c790` | S10 14파일 228 passed([[2026-09-22_계보모델불변_컨텍스트eval_교차증거_실PG_S09_S10_Claude]]); #127 collector가 `deployment-digest-and-approval` 12 케이스로 매핑 |
 | S10-DB lineage 조회 API 설계 | PR #158 `40d75ae7`(docs) | forward trace·dataset-digest reverse lookup·ProblemDetails 공유 모듈 — **route 미구현**(설계 v1.1) |
 | S10-FE | PR #144 `ee094e73`(매트릭스 v1.0.2, docs) · PR #146 `90757539`(apps/web 수정) | #146: adapter conformance 표기를 "미측정(모의/정적 예시·검증 아님)"으로 정직화(실제 conformance API 부재), mock deployment 정정, commitment panel 결속 |

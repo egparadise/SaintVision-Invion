@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-EVIDENCE-MAP"
 title: "S10-BE Evidence 대응표 — Provider adapter contract/conformance/CLI 4종·승인 배포·commitment route·lineage query(#158)·S10-FE(#144/#146) 대응, MLflow 코드 부재(공백+BLOCKED_EXTERNAL), 실 Provider BLOCKED_EXTERNAL, 구현 추가 0 (카드 bc, docs-only)"
-version: "1.0.0"
+version: "1.1.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T11:05:27+09:00"
+updated: "2026-09-28T11:08:11+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -19,7 +19,7 @@ tags: ["S10-BE", "AC-10", "evidence", "claude", "docs-only"]
 
 ## 1. 확인 방법(실제 수행한 것만)
 
-`grep`/`sed`/`ls`로 `src/saintvision/adapters/`(contract·reference·conformance·agents·cli·process_output·model_import)의 정의 행, `src/saintvision/api/v1/adapters.py` route, `src/saintvision/services/lineage.py:454~534`, `services/control-plane/src/inv/app.py:449`, 시험 파일별 `def test_` 이름·수, `tests/test_cli_adapters.py:382`의 skip 사유를 읽었다. MLflow는 `git grep -i mlflow -- src services tools tests requirements*.txt pyproject.toml`로 0건임을 확인했다(문서 7건만). #158·#144·#146 파일 목록과 본문 요약을 참조했다. run ID는 이 세션에서 관찰한 Backend 36351202242·Core 36353272311·desktop-browser 36364528322만 인용. 메모리 0.9GB 규칙에 따라 가벼운 명령만.
+`grep`/`sed`/`ls`로 `src/saintvision/adapters/`(contract·reference·conformance·agents·cli·process_output·model_import)의 정의 행, `src/saintvision/api/v1/adapters.py` route, `src/saintvision/services/lineage.py:454~534`, `services/control-plane/src/inv/app.py:449`, 시험 파일별 `def test_` 이름·수, `tests/test_cli_adapters.py:382`의 skip 사유를 읽었다. MLflow는 `git grep -i mlflow -- src services tools tests requirements*.txt pyproject.toml`로 0건임을 확인했다(문서 7건만). #158·#144·#146 파일 목록과 본문 요약을 참조했다. run ID는 이 세션에서 관찰한 Backend 36351202242(head a0dab579b188, 2929/47/2/0)·Core 36353272311(head bc27588d2139, main 3236/17/2/0)·desktop-browser 36364528322(head 30f5ca839923)만 인용 — SHA는 `gh run view --json headSha`, 합계는 passed·skipped·deselected·failed 분리(#164 Codex 기준). 메모리 0.9GB 규칙에 따라 가벼운 명령만.
 
 ## 2. 결과
 
