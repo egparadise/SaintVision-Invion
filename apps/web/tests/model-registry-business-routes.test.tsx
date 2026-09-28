@@ -394,8 +394,10 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     expect(capturedMethod).toBe('POST');
     expect(capturedUrl).toBe('/v1/projects/prj_alpha/models/mdl_01JLLAMA30000000000000000/versions/1.0.0-rc1/release');
-    // Model Release must NOT send Idempotency-Key
-    expect(capturedHeaders['idempotency-key']).toBeUndefined();
+    // Model Release must send Idempotency-Key
+    const relKey = capturedHeaders['idempotency-key'] || capturedHeaders['Idempotency-Key'];
+    expect(relKey).toBeDefined();
+    expect(relKey).toMatch(/^[A-Za-z0-9._:-]{1,128}$/);
 
     const parsedBody = JSON.parse(capturedBody);
     expect(parsedBody.licensePolicy).toBe('Apache-2.0');
@@ -660,13 +662,18 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(container.querySelector('[data-testid="banner-no-approve-permission"]')).toBeNull();
   });
 
-  // 9. Real Lineage with Missing Items & Scope Limitation
+  // 9. Real Lineage with Missing Items & Scope Limitation (Server-Consistent)
   it('renders missing items and traceabilityLimitedByScope correctly', async () => {
+    // In server services/lineage.py:762-768:
+    // traceabilityLimitedByScope = any(kind in unresolved for kind in COUNT_ONLY_KINDS)
+    // missing contains kinds from REQUIRED_KINDS not present in by_kind
     const traceWithMissing: ModelLineageTraceResponse = {
       ...validTraceResponse,
       fullyTraceable: false,
       traceabilityLimitedByScope: true,
-      missing: ['dataset_version', 'code_commit'],
+      missing: ['dataset_version'],
+      unresolved: [{ kind: 'code_commit', count: 2 }],
+      countOnlyKinds: ['code_commit', 'eval_run'],
       datasets: [],
       deployments: [],
     };
@@ -704,7 +711,10 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
 
     const missingSection = container.querySelector('[data-testid="real-lineage-missing"]');
     expect(missingSection?.textContent).toContain('dataset_version');
-    expect(missingSection?.textContent).toContain('code_commit');
+
+    // Unresolved item from countOnlyKinds
+    const codeCommitCard = container.querySelector('[data-testid="trace-code_commit-unobserved"]');
+    expect(codeCommitCard?.textContent).toContain('상세 범위 외 (2건 관측)');
 
     // Empty datasets & deployments message
     expect(container.querySelector('[data-testid="real-lineage-datasets"]')?.textContent).toContain(
@@ -901,8 +911,37 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
       submitBtn.click();
     });
     expect(capturedKeys.length).toBe(3);
-    expect(capturedKeys[2]).not.toBe(firstKey);
-    expect(capturedKeys[2].length).toBeGreaterThan(10);
+    const secondKey = capturedKeys[2];
+    expect(secondKey).not.toBe(firstKey);
+    expect(secondKey.length).toBeGreaterThan(10);
+
+    // Retry with changed input -> must preserve secondKey!
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(4);
+    expect(capturedKeys[3]).toBe(secondKey);
+
+    // Change model path -> must rotate to third key!
+    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(modelInput, 'mdl_NEWMODEL00000000000000001');
+    });
+
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(5);
+    const thirdKey = capturedKeys[4];
+    expect(thirdKey).not.toBe(secondKey);
+    expect(thirdKey).not.toBe(firstKey);
+
+    // Retry with new model path -> must preserve thirdKey!
+    await act(async () => {
+      submitBtn.click();
+    });
+    expect(capturedKeys.length).toBe(6);
+    expect(capturedKeys[5]).toBe(thirdKey);
   });
 
   // 14. Calendar Round-Trip & ByteSize Integer Validation (Codex F4, Claude G4)
@@ -1206,8 +1245,54 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(capturedKeys[0]).toBeTruthy();
     // Key 1 and Key 2 should be the same on retry
     expect(capturedKeys[1]).toBe(capturedKeys[0]);
-    // Key 3 should rotate because parameter changed
+    // Key 3 should rotate because until parameter changed
     expect(capturedKeys[2]).not.toBe(capturedKeys[0]);
+    const rotatedUntilKey = capturedKeys[2];
+
+    // Key 4: retry with new until -> must preserve rotatedUntilKey
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(capturedKeys.length).toBe(4);
+    expect(capturedKeys[3]).toBe(rotatedUntilKey);
+
+    // Key 5: change model path -> must rotate!
+    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(modelInput, 'mdl_PINROTATEMODEL000000000001');
+    });
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(capturedKeys.length).toBe(5);
+    expect(capturedKeys[4]).not.toBe(rotatedUntilKey);
+    const rotatedModelKey = capturedKeys[4];
+
+    // Key 6: retry with changed model path -> must preserve rotatedModelKey!
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(capturedKeys.length).toBe(6);
+    expect(capturedKeys[5]).toBe(rotatedModelKey);
+
+    // Key 7: change version path -> must rotate!
+    const versionInput = container.querySelector('[data-testid="input-version"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(versionInput, '2.0.0-pin');
+    });
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(capturedKeys.length).toBe(7);
+    expect(capturedKeys[6]).not.toBe(rotatedModelKey);
+    const rotatedVersionKey = capturedKeys[6];
+
+    // Key 8: retry with changed version path -> must preserve rotatedVersionKey!
+    await act(async () => {
+      pinBtn.click();
+    });
+    expect(capturedKeys.length).toBe(8);
+    expect(capturedKeys[7]).toBe(rotatedVersionKey);
   });
 
   // 19. Separate Abort Controllers and Non-stuck Loading across Writes (Claude G3)
@@ -1318,4 +1403,151 @@ describe('G-05 Model Registry & Lineage Business Routes (Card 94)', () => {
     expect(regBtnAfterPin.textContent).toContain('모델 버전 등록');
     expect(container.querySelector('[data-testid="registry-register-success"]')).toBeNull();
   });
+
+  // 20. Release Idempotency-Key Rotation on Parameter & Path Change (Codex High)
+  it('preserves release Idempotency-Key across retries but rotates upon parameter and path change', async () => {
+    let capturedKeys: string[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((url, init) => {
+      let key = '';
+      if (init?.headers instanceof Headers) {
+        key = init.headers.get('Idempotency-Key') || '';
+      } else if (init?.headers) {
+        key = (init.headers as any)['Idempotency-Key'] || (init.headers as any)['idempotency-key'] || '';
+      }
+      capturedKeys.push(key);
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            type: 'about:blank',
+            title: 'Temporary lock contention',
+            status: 503,
+            code: 'SYS-0001',
+            category: 'SYS',
+            detail: 'Locked; retry later.',
+            retryable: true,
+            traceId: '0123456789abcdef0123456789abcdef',
+            causeRef: null,
+            evidenceId: null,
+          }),
+          {
+            status: 503,
+            headers: { 'Content-Type': 'application/problem+json' },
+          }
+        )
+      );
+    });
+
+    await act(async () => {
+      root.render(
+        <ModelLineageView
+          projectId="prj_alpha"
+          initialModelId="mdl_01JLLAMA30000000000000000"
+          initialVersion="1.0.0"
+          currentUser={{ canApprove: true }}
+        />
+      );
+    });
+
+    const tabs = container.querySelectorAll('button');
+    const releaseTabBtn = Array.from(tabs).find((b) => b.textContent?.includes('모델 릴리스'));
+    await act(async () => {
+      releaseTabBtn?.click();
+    });
+
+    const releaseBtn = container.querySelector('[data-testid="btn-release-model"]') as HTMLButtonElement;
+    const policyInput = container.querySelector('[data-testid="input-release-license"]') as HTMLInputElement;
+    const classSelect = container.querySelector('[data-testid="select-release-classification"]') as HTMLSelectElement;
+
+    // 1. First submission -> Key 1
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(1);
+    expect(capturedKeys[0]).toBeTruthy();
+    const key1 = capturedKeys[0];
+
+    // 2. Retry with identical parameters -> Key 2 === Key 1
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(2);
+    expect(capturedKeys[1]).toBe(key1);
+
+    // 3. Change license policy -> Key 3 rotates
+    await act(async () => {
+      setInputValue(policyInput, 'MIT');
+    });
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(3);
+    expect(capturedKeys[2]).not.toBe(key1);
+    const key3 = capturedKeys[2];
+
+    // 4. Retry with new policy -> Key 4 === Key 3
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(4);
+    expect(capturedKeys[3]).toBe(key3);
+
+    // 5. Change classification -> Key 5 rotates
+    await act(async () => {
+      classSelect.value = 'public';
+      classSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(5);
+    expect(capturedKeys[4]).not.toBe(key3);
+    const key5 = capturedKeys[4];
+
+    // 6. Retry with new classification -> Key 6 === Key 5
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(6);
+    expect(capturedKeys[5]).toBe(key5);
+
+    // 7. Change modelId path -> Key 7 rotates
+    const modelInput = container.querySelector('[data-testid="input-model-id"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(modelInput, 'mdl_RELROTATEMODEL000000000001');
+    });
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(7);
+    expect(capturedKeys[6]).not.toBe(key5);
+    const key7 = capturedKeys[6];
+
+    // 8. Retry with new model path -> Key 8 === Key 7
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(8);
+    expect(capturedKeys[7]).toBe(key7);
+
+    // 9. Change version path -> Key 9 rotates
+    const versionInput = container.querySelector('[data-testid="input-version"]') as HTMLInputElement;
+    await act(async () => {
+      setInputValue(versionInput, '2.0.0-rel');
+    });
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(9);
+    expect(capturedKeys[8]).not.toBe(key7);
+    const key9 = capturedKeys[8];
+
+    // 10. Retry with new version path -> Key 10 === Key 9
+    await act(async () => {
+      releaseBtn.click();
+    });
+    expect(capturedKeys.length).toBe(10);
+    expect(capturedKeys[9]).toBe(key9);
+  });
+
 });

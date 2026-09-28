@@ -424,7 +424,7 @@ export async function releaseModelVersion(
   modelId: string,
   version: string,
   payload: ModelReleaseRequest,
-  options?: { signal?: AbortSignal }
+  options?: { signal?: AbortSignal; idempotencyKey?: string }
 ): Promise<ModelReleaseResponse> {
   if (!projectId || !modelId || !version) {
     throw new Error('프로젝트 ID, 모델 ID, 버전을 확인하세요.');
@@ -433,12 +433,14 @@ export async function releaseModelVersion(
     throw new Error('licensePolicy 및 classification 필드가 필수입니다.');
   }
 
+  const key = options?.idempotencyKey || generateIdempotencyKey('rel');
   const path = [projectId, modelId, version].map(encodeURIComponent);
   const result = await apiClient<ModelReleaseResponse>(
     `/v1/projects/${path[0]}/models/${path[1]}/versions/${path[2]}/release`,
     {
       method: 'POST',
       body: JSON.stringify(payload),
+      idempotencyKey: key,
       signal: options?.signal,
     }
   );

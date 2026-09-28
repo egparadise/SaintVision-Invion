@@ -8,7 +8,7 @@ import type { ModelLineageTraceResponse } from '@/contracts/model-lineage-trace-
 import { Button } from '@/shared/ui/Button';
 import { fetchModelCommitment } from '@/shared/api/modelCommitmentObservation';
 import { fetchConformanceStatus } from '@/shared/api/adapterObservation';
-import { modelRegistryObservation } from '@/shared/api/modelRegistryObservation';
+import { modelRegistryObservation, isValidIsoDateTime } from '@/shared/api/modelRegistryObservation';
 import { ApiError } from '@/shared/api/client';
 import { MlopsManager } from './mlopsEngine';
 
@@ -20,27 +20,6 @@ const SERVER_KIND_LABELS: Record<string, string> = {
   deployment: '배포 이력 (Deployment Record)',
   approval: '승인 기록 (Approval Record)',
 };
-
-function isValidIsoDateTime(str: string): boolean {
-  if (typeof str !== 'string') return false;
-  const regex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
-  const match = str.match(regex);
-  if (!match) return false;
-  const year = parseInt(match[1], 10);
-  const month = parseInt(match[2], 10);
-  const day = parseInt(match[3], 10);
-  const hour = parseInt(match[4], 10);
-  const min = parseInt(match[5], 10);
-  const sec = parseInt(match[6], 10);
-  if (month < 1 || month > 12) return false;
-  if (hour < 0 || hour > 23) return false;
-  if (min < 0 || min > 59) return false;
-  if (sec < 0 || sec > 59) return false;
-
-  const daysInMonth = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (day < 1 || day > daysInMonth[month - 1]) return false;
-  return true;
-}
 
 export interface ModelLineageViewProps {
   initialLineages?: ModelLineage[];
@@ -221,7 +200,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
       setLineages(mlopsManager.getLineages());
       setActionNotice({
         type: 'success',
-        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
+        text: `✔ [모의 시뮬레이션] [${res.deployedModel?.modelName}] 로컬 배포 게이트 시뮬레이션 완료 (백엔드 서빙 배포 API 미노출 상태로 실제 인프라 미반영 · 백엔드 digest 고정과 무관 · Digest: ${res.deployedModel?.deploymentDigest.slice(0, 24)}...)`,
       });
     }
   };
@@ -259,6 +238,9 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   );
   const [pinIdempotencyKey, setPinIdempotencyKey] = useState<string>(() =>
     modelRegistryObservation.generateIdempotencyKey('pin')
+  );
+  const [relIdempotencyKey, setRelIdempotencyKey] = useState<string>(() =>
+    modelRegistryObservation.generateIdempotencyKey('rel')
   );
 
   // ProblemDetails error and Live Region
@@ -320,6 +302,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     relGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleModelIdChange = (val: string) => {
@@ -329,6 +312,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     relGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleVersionChange = (val: string) => {
@@ -338,6 +322,7 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
     relGenerationRef.current++;
     setRegIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('w2'));
     setPinIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('pin'));
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleRegVersionChange = (val: string) => {
@@ -367,11 +352,13 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
   const handleRelLicensePolicyChange = (val: string) => {
     setRelLicensePolicy(val);
     relGenerationRef.current++;
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   const handleRelClassificationChange = (val: 'public' | 'internal' | 'restricted') => {
     setRelClassification(val);
     relGenerationRef.current++;
+    setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
   };
 
   // Real API Actions: Lineage, Register, Pin, Release
@@ -550,10 +537,11 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
           licensePolicy: relLicensePolicy.trim(),
           classification: relClassification,
         },
-        { signal: ctrl.signal }
+        { signal: ctrl.signal, idempotencyKey: relIdempotencyKey }
       );
       if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
       setRelResult(res);
+      setRelIdempotencyKey(modelRegistryObservation.generateIdempotencyKey('rel'));
       setLiveAnnouncement(`모델 릴리스 성공: [${res.version}] (Stage: ${res.stage})`);
     } catch (err: unknown) {
       if (relGenerationRef.current !== currentGen || ctrl.signal.aborted) return;
@@ -1214,13 +1202,10 @@ export const ModelLineageView: React.FC<ModelLineageViewProps> = ({
               gap: '12px',
             }}
           >
-            {(realTrace.countOnlyKinds && realTrace.countOnlyKinds.length > 0
-              ? realTrace.countOnlyKinds
-              : ['eval_run', 'code_commit', 'approval', 'container_image']
-            ).map((kind) => {
+            {(realTrace.countOnlyKinds || []).map((kind) => {
               const unresolvedItem = realTrace.unresolved.find((u) => u.kind === kind);
               const label = SERVER_KIND_LABELS[kind] || `${kind} 항목`;
-              const isEval = kind === 'eval_run' || kind === 'evaluations';
+              const isEval = kind === 'eval_run';
               return (
                 <div
                   key={kind}
