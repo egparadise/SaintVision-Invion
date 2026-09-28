@@ -108,6 +108,8 @@ describe('S05-FE & S06-FE Product Defect Fixes Regression Suite', () => {
           nodes={[]}
           activePool={activePool}
           allPools={[activePool]}
+          initialPools={[activePool]}
+          initialPoolsState="success"
           projectId="prj-test-01"
         />
       );

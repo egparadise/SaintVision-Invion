@@ -36,6 +36,9 @@ export interface PlacementSimulatorProps {
 
 export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   nodes = [],
+  activePool: propActivePool,
+  allPools: propAllPools,
+  projectId,
   initialPools,
   initialPoolsState,
   initialPoolsError,
@@ -48,6 +51,9 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   initialCandidatesState,
   initialCandidatesError,
 }) => {
+  const effectiveInitialPools = initialPools || propAllPools || (propActivePool ? [propActivePool] : undefined);
+  const effectiveInitialPoolsState = initialPoolsState || (effectiveInitialPools && effectiveInitialPools.length > 0 ? 'success' : undefined);
+
   const [requiredCores, setRequiredCores] = useState<number>(4);
   const [requiredRamGb, setRequiredRamGb] = useState<number>(8);
   const [requiresGpu, setRequiresGpu] = useState<boolean>(false);
@@ -56,12 +62,12 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
   const [fencedNodeIds, setFencedNodeIds] = useState<Set<string>>(new Set());
 
   // Real backend pool list state
-  const [pools, setPools] = useState<PoolItem[]>(initialPools || []);
-  const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(initialPoolsState || 'idle');
+  const [pools, setPools] = useState<PoolItem[]>(effectiveInitialPools || []);
+  const [poolsState, setPoolsState] = useState<'idle' | 'loading' | 'success' | 'error'>(effectiveInitialPoolsState || 'idle');
   const [poolsError, setPoolsError] = useState<string | null>(initialPoolsError || null);
 
   const [selectedPoolId, setSelectedPoolId] = useState<string>(
-    () => initialPools?.[0]?.poolId || (initialPools?.[0] as any)?.id || ''
+    () => propActivePool?.poolId || propActivePool?.id || effectiveInitialPools?.[0]?.poolId || (effectiveInitialPools?.[0] as any)?.id || ''
   );
 
   // Pool capacity state fetched on demand (canonical separation: pool list does NOT bundle volatile capacity)
@@ -140,7 +146,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
 
   // Fetch live resource pools & discovery candidates from backend
   useEffect(() => {
-    if (initialPools === undefined && initialPoolsState === undefined) {
+    if (effectiveInitialPools === undefined && effectiveInitialPoolsState === undefined) {
       loadPools();
     }
     if (initialCandidates === undefined && initialCandidatesState === undefined) {
