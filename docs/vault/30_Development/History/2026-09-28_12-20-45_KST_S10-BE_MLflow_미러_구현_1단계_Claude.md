@@ -1,11 +1,11 @@
 ---
 doc_id: "HIST-CLAUDE-2026-09-28-S10-BE-MLFLOW-MIRROR-IMPL-1"
 title: "S10-BE MLflow 미러 구현 1단계 — TrackingSink 계약·run_tracking_conformance·ReferenceSink, TRACK-0001~0005 표, canonical payload/URI, migration 0049(intents·attempts·defects, append-only·RLS·CHECK), 정본 tx enqueue 훅, deliver_intent(FOR UPDATE·terminal 반환), PG-free 76 + 실 PG 42(hosted) (카드 bg)"
-version: "1.2.0"
+version: "1.3.0"
 status: "review"
 author: "Claude"
 reviewer: "Codex"
-updated: "2026-09-28T12:46:08+09:00"
+updated: "2026-09-28T12:55:53+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "1e8baf04"
@@ -65,3 +65,12 @@ hosted Backend run **36373656210**(head 322488fb) = 3.12 **3138 passed / 47 skip
 | hosted 실패 (c) fixture 3 | `verify_model_version` `content_sha256` 누락; 옛 긴 code가 varchar(16) DataError; `status='done'`이 pair CHECK에 먼저 걸림 | `_release` helper에 `content_sha256=WEIGHTS_SHA`; 옛 형식은 14자; 각 행이 기대 제약 **집합** 중 하나를 맞히도록 독립 fixture 15 |
 
 로컬(3.10, 가벼운 명령): PG-free `test_tracking_canonical`+`test_tracking_sink`+`test_migrations`+`test_adapters` **160 passed**; offline render에 새 DDL 3(outbox unique·pair CHECK·composite FK) 존재; `migration_graph` head 단일 0049. `tests/core/test_object_store_locator_migration.py`는 3.11+ 전용(`StrEnum`)이라 로컬 미실행 → hosted. `test_tracking_mirror` **62 case**(hosted).
+
+## 6. Codex 2차 반영 — 첫 Experiment intent 경쟁 (v1.3, 2026-09-28T12:55:53+09:00)
+
+지적: 같은 project의 두 canonical mutation이 동시에 첫 intent를 만들면 둘 다 experiment 부재를 관측해 같은 digest를 INSERT하고, `uq_mlflow_mirror_intents_subject_payload`가 한쪽을 IntegrityError로 막으며 **그 canonical mutation 전체가 rollback**된다(결정 B 위반). 반영:
+
+- `enqueue_mirror`가 readiness 확인 직후 **`pg_advisory_xact_lock("enqueue", tenant, project)`**(eval_run은 subject 키)를 잡는다. 같은 project의 두 번째 enqueue는 첫 tx의 **commit까지 대기**한 뒤 존재 검사를 하므로 experiment를 보고 만들지 않는다. 같은 잠금이 subject intent의 존재 검사도 덮어 동일 intent 경쟁은 `existing`이다. IntegrityError 경로는 남지 않는다(outbox 먼저·`ON CONFLICT` 방식의 고아 event 문제 없음: intent와 event가 같은 tx에서 함께 만들어지고 함께 commit).
+- 부정 시험 `test_two_concurrent_first_intents_of_one_project_commit_both_with_exactly_one_experiment`: config absent로 model version 2개 준비 → thread A가 enqueue 뒤 tx를 열어둔 채 대기, thread B enqueue가 잠금에 막힘(0.5s 뒤 결과·오류 없음 확인) → A commit → B 진행. 기대: 오류 0, **experiment intent 1**, subject intent 2(각자 event 보존), mirror event 3 = intent의 event 집합(고아 0), ModelVersion 2 모두 commit.
+
+**Durable 후속 공백(1단계 범위 밖, Codex 관찰)**: 일반 `artifacts` row와 학습 run의 `output_ref`(evidence 산출물)는 미러하지 않는다. 지금 미러되는 artifact 참조는 model_version payload의 `uri`·`content_sha256`·`byte_size`뿐이다. 후속 카드 후보: "artifact 참조 미러(`artifacts` checksum·`inv://` URI를 run tag로)". 2단계(카드 bh)에도 포함되지 않는다.

@@ -123,6 +123,18 @@ def _existing_intent(
     return session.scalar(select(MlflowMirrorIntent).where(*conditions).limit(1))
 
 
+def _advisory_key(*parts: object) -> int:
+    digest = hashlib.sha256(":".join(str(p) for p in parts).encode("utf-8")).digest()[:8]
+    return int.from_bytes(digest, "big", signed=True)
+
+
+def _serialize_enqueue(session: Session, tenant_id: uuid.UUID, scope: str) -> None:
+    """Transaction-scoped advisory lock: one enqueue scope at a time per tenant."""
+    session.execute(
+        text("SELECT pg_advisory_xact_lock(:key)"), {"key": _advisory_key("enqueue", tenant_id, scope)}
+    )
+
+
 def _insert_intent(
     session: Session, *, tenant_id: uuid.UUID, subject_kind: str, subject: dict[str, str],
     project_id: str | None, canonical: dict[str, Any], digest: str, now: dt.datetime,
@@ -177,6 +189,17 @@ def enqueue_mirror(
     configuration = resolve() if configuration is None else configuration
     if not configuration.readiness.configured:
         return EnqueueOutcome("skipped", reason=configuration.readiness.value)
+
+    # Serialise enqueue per project (per subject for an eval run) for the rest
+    # of this transaction. Two canonical mutations of one project that race to
+    # make its *first* intent would otherwise both observe "no experiment yet"
+    # and both insert one; the unique index would then roll one canonical
+    # mutation back for a mirror reason, which decision B forbids (Codex #172
+    # r2). Under the lock the second waits for the first to commit and sees
+    # its experiment intent. Same lock covers the subject intent's own
+    # existence check, so an identical concurrent intent is "existing", not an
+    # IntegrityError.
+    _serialize_enqueue(session, tenant_id, project_id if project_id is not None else f"eval_run:{subject_id}")
 
     try:
         canonical = canonical_payload(payload)

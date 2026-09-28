@@ -783,6 +783,82 @@ def test_delivery_never_touches_the_canonical_rows(app_sessionmaker, catalogue, 
         assert [(v.model_version_id, v.stage, v.content_sha256) for v in _rows(session, ModelVersion)] == before
 
 
+def test_two_concurrent_first_intents_of_one_project_commit_both_with_exactly_one_experiment(
+    app_sessionmaker, catalogue, configured, monkeypatch
+):
+    """Codex #172 r2: the race for a project's first experiment intent.
+
+    Two canonical mutations of the same project enqueue at the same time while
+    no experiment intent exists. Both canonical rows must commit, exactly one
+    experiment intent (and its event) must exist, and each subject intent and
+    event must be preserved. Thread A holds its transaction open after its
+    enqueue so that thread B's enqueue overlaps it.
+    """
+    tenant = catalogue["tenant_a"]
+    # Two model versions to be the two subjects, created with mirroring absent
+    # so no intent exists yet.
+    for key in GOOD_ENV:
+        monkeypatch.delenv(key, raising=False)
+    with app_sessionmaker() as session:
+        with session.begin():
+            with tenant_scope(session, tenant):
+                first_version = _register(session, catalogue)
+                second_version = lineage_service.register_model_version(
+                    session, tenant_id=tenant, model_id=catalogue["model_id"], version="1.0.1",
+                    content_sha256="b" * 64, uri="inv://models/classifier@1.0.1", now=NOW,
+                )
+                assert _rows(session, MlflowMirrorIntent) == []
+    for key, value in GOOD_ENV.items():
+        monkeypatch.setenv(key, value)
+    config = tracking_config.resolve()
+    assert config.readiness.configured
+
+    a_done = threading.Event()
+    release = threading.Event()
+    outcomes: dict[str, tracking_service.EnqueueOutcome] = {}
+    errors: dict[str, BaseException] = {}
+
+    def enqueue(label, version, hold):
+        try:
+            with app_sessionmaker() as session:
+                with session.begin():
+                    with tenant_scope(session, tenant):
+                        outcomes[label] = tracking_service.enqueue_mirror(
+                            session, tenant_id=tenant, subject_kind="model_version",
+                            subject_id=version.model_version_id, project_id=catalogue["project_id"],
+                            payload={"tags": {"inv.model_version_id": version.model_version_id}},
+                            now=NOW, configuration=config,
+                        )
+                        if hold:
+                            a_done.set()
+                            release.wait(timeout=10)       # B is now blocked on the enqueue lock
+        except BaseException as exc:  # noqa: BLE001
+            errors[label] = exc
+            a_done.set()
+
+    a = threading.Thread(target=enqueue, args=("a", first_version, True))
+    b = threading.Thread(target=enqueue, args=("b", second_version, False))
+    a.start()
+    a_done.wait(timeout=10)
+    b.start()
+    time.sleep(0.5)
+    assert "b" not in outcomes and "b" not in errors          # serialised, not failed
+    release.set()
+    a.join(timeout=20)
+    b.join(timeout=20)
+    assert not errors, errors                                   # neither canonical transaction rolled back
+    assert outcomes["a"].kind == "intent" and outcomes["a"].experiment_intent_id is not None
+    assert outcomes["b"].kind == "intent" and outcomes["b"].experiment_intent_id is None
+    with app_sessionmaker() as session, session.begin(), tenant_scope(session, tenant):
+        by_kind = _intents_by_kind(session)
+        assert len(by_kind["experiment"]) == 1
+        assert {i.model_version_id for i in by_kind["model_version"]} == {first_version.model_version_id, second_version.model_version_id}
+        events = {e.event_id for e in _mirror_events(session)}
+        assert events == {i.outbox_event_id for i in _rows(session, MlflowMirrorIntent)}   # no orphan event
+        assert len(events) == 3
+        assert {v.model_version_id for v in _rows(session, ModelVersion)} == {first_version.model_version_id, second_version.model_version_id}
+
+
 def test_delivering_an_unknown_intent_fails_closed(app_sessionmaker, catalogue, configured):
     tenant = catalogue["tenant_a"]
     with app_sessionmaker() as session:
