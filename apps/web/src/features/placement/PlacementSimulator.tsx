@@ -313,7 +313,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid var(--color-border-strong)',
-                    backgroundColor: isSelected ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                    backgroundColor: isSelected ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
                     color: isSelected ? '#ffffff' : 'var(--color-text-secondary)',
                   }}
                 >
@@ -496,7 +496,7 @@ export const PlacementSimulator: React.FC<PlacementSimulatorProps> = ({
                 fontWeight: 600,
                 cursor: 'pointer',
                 border: '1px solid var(--color-border-strong)',
-                backgroundColor: requiresGpu ? 'var(--color-brand-primary)' : 'var(--color-bg-subtle)',
+                backgroundColor: requiresGpu ? 'var(--color-brand-primary-bg)' : 'var(--color-bg-subtle)',
                 color: requiresGpu ? '#ffffff' : 'var(--color-text-secondary)',
               }}
             >
